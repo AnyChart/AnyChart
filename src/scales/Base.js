@@ -43,7 +43,12 @@ anychart.scales.Base = function() {
    */
   this.zoomStart_ = 0;
 
-  this.applyStacking = anychart.scales.Base.prototype.applyModeNone_;
+  /**
+   * Stack mode.
+   * @type {anychart.enums.ScaleStackMode}
+   * @private
+   */
+  this.stackMode_ = anychart.enums.ScaleStackMode.NONE;
 };
 goog.inherits(anychart.scales.Base, anychart.core.Base);
 
@@ -204,6 +209,12 @@ anychart.scales.Base.prototype.finishAutoCalc = function(opt_silently) {
 anychart.scales.Base.prototype.checkScaleChanged = goog.abstractMethod;
 
 
+/** @inheritDoc */
+anychart.scales.Base.prototype.checkWeights = function() {
+  return false;
+};
+
+
 //region --- Section Internal methods ---
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -248,60 +259,9 @@ anychart.scales.Base.prototype.getPointWidthRatio = function() {
   // TODO(Anton Saukh): non-Ordinal scales must have min distance between points calculation algorithm.
   return 0;
 };
+
+
 //endregion
-
-
-//region --- Section Stacking ---
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Stacking
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Positive stack maximum for percent stacking.
- * @type {number}
- * @private
- */
-anychart.scales.Base.prototype.stackMax_ = NaN;
-
-
-/**
- * Negative stack minimum for percent stacking.
- * @type {number}
- * @private
- */
-anychart.scales.Base.prototype.stackMin_ = NaN;
-
-
-/**
- * Positive stack value.
- * @type {number}
- * @private
- */
-anychart.scales.Base.prototype.stackPositive_ = 0;
-
-
-/**
- * Negative stack value.
- * @type {number}
- * @private
- */
-anychart.scales.Base.prototype.stackNegative_ = 0;
-
-
-/**
- * @type {boolean}
- * @private
- */
-anychart.scales.Base.prototype.stackMissing_ = false;
-
-
-/**
- * Stacking mode.
- * @type {anychart.enums.ScaleStackMode}
- * @private
- */
-anychart.scales.Base.prototype.stackMode_ = anychart.enums.ScaleStackMode.NONE;
 
 
 /**
@@ -320,132 +280,15 @@ anychart.scales.Base.prototype.canBeStacked = false;
  */
 anychart.scales.Base.prototype.stackMode = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    var str = anychart.enums.normalizeScaleStackMode(opt_value);
-    var res, fn;
-    if (this.canBeStacked && str == anychart.enums.ScaleStackMode.PERCENT) {
-      res = anychart.enums.ScaleStackMode.PERCENT;
-      fn = this.applyModePercent_;
-    } else if (this.canBeStacked && str == anychart.enums.ScaleStackMode.VALUE) {
-      res = anychart.enums.ScaleStackMode.VALUE;
-      fn = this.applyModeValue_;
-    } else {
-      res = anychart.enums.ScaleStackMode.NONE;
-      fn = this.applyModeNone_;
-    }
+    var res = this.canBeStacked ? anychart.enums.normalizeScaleStackMode(opt_value) : anychart.enums.ScaleStackMode.NONE;
     if (this.stackMode_ != res) {
       this.stackMode_ = res;
-      this.applyStacking = fn;
       this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION | anychart.Signal.NEEDS_RECALCULATION);
     }
     return this;
   }
-  return this.stackMode_;
+  return this.canBeStacked ? this.stackMode_ : anychart.enums.ScaleStackMode.NONE;
 };
-
-
-/**
- * Applies positive stack top as a stack max for current iteration.
- * @param {number} min Negative stack limit.
- * @param {number} max Positive stack limit.
- * @return {anychart.scales.Base} Returns itself for method chaining.
- */
-anychart.scales.Base.prototype.setStackRange = function(min, max) {
-  this.stackMin_ = Math.min(min, max, 0);
-  this.stackMax_ = Math.max(max, min, 0);
-  return this;
-};
-
-
-/**
- * Resets current stack to the initial value.
- * @return {anychart.scales.Base} .
- */
-anychart.scales.Base.prototype.resetStack = function() {
-  this.stackPositive_ = 0;
-  this.stackNegative_ = 0;
-  this.stackMissing_ = false;
-  return this;
-};
-
-
-/**
- * Applies stacking to passed value.
- * @param {*} value Data value.
- * @return {*} Stacked data value.
- */
-anychart.scales.Base.prototype.applyStacking;
-
-
-/**
- * Returns previously stacked value.
- * @param {*} value Data value.
- * @return {number} Previously stacked data value. Returns 0, if previous value was NaN.
- */
-anychart.scales.Base.prototype.getPrevVal = function(value) {
-  value = anychart.utils.toNumber(value);
-  if (this.stackMode_ == anychart.enums.ScaleStackMode.NONE || isNaN(value)) {
-    return 0;
-  } else {
-    if (value >= 0)
-      return this.stackPositive_;
-    else
-      return this.stackNegative_;
-  }
-};
-
-
-/**
- * @return {boolean} .
- */
-anychart.scales.Base.prototype.isStackValMissing = function() {
-  return this.stackMissing_;
-};
-
-
-/**
- * Apply stack function for NONE mode of Stacker.
- * @param {*} value Data value.
- * @return {*} Stacked data value.
- * @private
- */
-anychart.scales.Base.prototype.applyModeNone_ = function(value) {
-  return value;
-};
-
-
-/**
- * Apply stack function for VALUE mode of Stacker.
- * @param {*} value Data value.
- * @return {*} Stacked data value.
- * @private
- */
-anychart.scales.Base.prototype.applyModeValue_ = function(value) {
-  value = anychart.utils.toNumber(value);
-  var isNotMissing = !isNaN(value);
-  if (isNotMissing) {
-    if (/** @type {number} */(value) >= 0) {
-      value = this.stackPositive_ += /** @type {number} */(value); // both value and stackVal become a sum of them.
-    } else {
-      value = this.stackNegative_ += /** @type {number} */(value); // both value and stackVal become a sum of them.
-    }
-  }
-  this.stackMissing_ = !isNotMissing;
-  return value;
-};
-
-
-/**
- * Apply stack function for PERCENT mode of Stacker.
- * @param {*} value Data value.
- * @return {*} Stacked data value.
- * @private
- */
-anychart.scales.Base.prototype.applyModePercent_ = function(value) {
-  value = anychart.utils.toNumber(value);
-  var max = value < 0 ? -this.stackMin_ : this.stackMax_;
-  return this.applyModeValue_(goog.math.clamp(value * 100 / max, -100, 100));
-};
-//endregion
 
 
 /**

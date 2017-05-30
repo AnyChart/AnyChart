@@ -45,9 +45,9 @@ anychart.core.resource.resourceList.SettingsWithMargin.prototype.margin = functi
 anychart.core.resource.resourceList.SettingsWithMargin.prototype.marginInvalidated_ = function(event) {
   this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
 };
+
+
 //endregion
-
-
 //region --- SETUP/DISPOSE ---
 /** @inheritDoc */
 anychart.core.resource.resourceList.SettingsWithMargin.prototype.setupByJSON = function(config, opt_default) {
@@ -70,9 +70,9 @@ anychart.core.resource.resourceList.SettingsWithMargin.prototype.disposeInternal
   goog.dispose(this.margin_);
   anychart.core.resource.resourceList.SettingsWithMargin.base(this, 'disposeInternal');
 };
+
+
 //endregion
-
-
 //exports
 (function() {
   var proto = anychart.core.resource.resourceList.SettingsWithMargin.prototype;

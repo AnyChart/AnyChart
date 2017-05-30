@@ -87,17 +87,12 @@ anychart.core.utils.Animation.prototype.setupByJSON = function(json, opt_default
 };
 
 
-/**
- * Special objects to setup current instance.
- * @param {...(Object|Array|number|string|undefined|boolean|null)} var_args
- * @return {boolean} If passed values were recognized as special setup values.
- * @protected
- */
-anychart.core.utils.Animation.prototype.setupSpecial = function(var_args) {
-  var arg0 = arguments[0];
+/** @inheritDoc */
+anychart.core.utils.Animation.prototype.setupSpecial = function(isDefault, var_args) {
+  var arg0 = arguments[1];
   if (goog.isBoolean(arg0) || goog.isNull(arg0)) {
     this.enabled(!!arg0);
-    var arg1 = arguments[1];
+    var arg1 = arguments[2];
     if (goog.isDef(arg1)) this.duration(arg1);
     return true;
   }

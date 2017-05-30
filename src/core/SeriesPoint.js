@@ -5,7 +5,7 @@ goog.require('anychart.core.Point');
 
 /**
  * Point representing all points that belongs to series-based chart.
- * @param {anychart.core.series.Base|anychart.core.SeriesBase} series Series.
+ * @param {anychart.core.series.Base} series Series.
  * @param {number} index Point index in series.
  * @constructor
  * @extends {anychart.core.Point}
@@ -15,7 +15,7 @@ anychart.core.SeriesPoint = function(series, index) {
 
   /**
    * Series point belongs to.
-   * @type {anychart.core.series.Base|anychart.core.SeriesBase}
+   * @type {anychart.core.series.Base}
    * @protected
    */
   this.series = series;
@@ -25,7 +25,7 @@ goog.inherits(anychart.core.SeriesPoint, anychart.core.Point);
 
 /**
  * Getter for series which current point belongs to.
- * @return {anychart.core.series.Base|anychart.core.SeriesBase} Series.
+ * @return {anychart.core.series.Base} Series.
  */
 anychart.core.SeriesPoint.prototype.getSeries = function() {
   return this.series;

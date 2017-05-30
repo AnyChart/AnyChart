@@ -50,7 +50,7 @@ anychart.ConsistencyState = {
   DATA_MASK: 1 << 0,
   //---------------------------------- CHART STATES (VB) ---------------------------------
   /**
-   * Chart title has changed.
+   * Chart background has changed.
    */
   CHART_BACKGROUND: 1 << 6,
   /**
@@ -58,7 +58,7 @@ anychart.ConsistencyState = {
    */
   CHART_TITLE: 1 << 7,
   /**
-   * Chart title has changed.
+   * Labels have changed.
    */
   CHART_LABELS: 1 << 8,
   // We also add SeparateChart states here to not to add prefix SEPARATE_CHART.
@@ -82,15 +82,18 @@ anychart.ConsistencyState = {
   SCALE_CHART_SCALE_MAPS: 1 << 17,
   SCALE_CHART_Y_SCALES: 1 << 18,
   SCALE_CHART_STATISTICS: 1 << 19,
+  SCALE_CHART_SCALES_STATISTICS: 1 << 20,
   //---------------------------------- CHART WITH AXES STATES (SCALE_CHART) -------------------------------
-  AXES_CHART_AXES: 1 << 20,
-  AXES_CHART_AXES_MARKERS: 1 << 21,
-  AXES_CHART_GRIDS: 1 << 22,
-  AXES_CHART_CROSSHAIR: 1 << 23,
-  AXES_CHART_ANNOTATIONS: 1 << 24,
+  AXES_CHART_AXES: 1 << 21,
+  AXES_CHART_AXES_MARKERS: 1 << 22,
+  AXES_CHART_GRIDS: 1 << 23,
+  AXES_CHART_CROSSHAIR: 1 << 24,
+  AXES_CHART_ANNOTATIONS: 1 << 25,
+  AXES_CHART_QUARTER: 1 << 26,
+  AXES_CHART_CROSSLINES: 1 << 27,
   //---------------------------------- CARTESIAN STATES (AXES_CHART) ---------------------------------
-  CARTESIAN_ZOOM: 1 << 25,
-  CARTESIAN_X_SCROLLER: 1 << 26,
+  CARTESIAN_ZOOM: 1 << 28,
+  CARTESIAN_X_SCROLLER: 1 << 29,
   //---------------------------------- PYRAMID/FUNNEL STATES (CHART) ---------------------------------
   PYRAMID_FUNNEL_LABELS: 1 << 12,
   PYRAMID_FUNNEL_MARKERS: 1 << 13,
@@ -99,6 +102,13 @@ anychart.ConsistencyState = {
   GANTT_DATA: 1 << 12,
   GANTT_POSITION: 1 << 13,
   GANTT_SPLITTER_POSITION: 1 << 14,
+  //---------------------------------- TAG CLOUD STATES (CHART) ---------------------------------
+  TAG_CLOUD_DATA: 1 << 12,
+  TAG_CLOUD_ANGLES: 1 << 13,
+  TAG_CLOUD_TAGS: 1 << 14,
+  TAG_CLOUD_COLOR_RANGE: 1 << 15,
+  TAG_CLOUD_COLOR_SCALE: 1 << 16,
+  TAG_CLOUD_SCALE: 1 << 17,
   //---------------------------------- PIE STATES (CHART) ---------------------------------
   PIE_LABELS: 1 << 12,
   PIE_DATA: 1 << 13,
@@ -119,15 +129,11 @@ anychart.ConsistencyState = {
   MAP_AXES: 1 << 25,
   MAP_GRIDS: 1 << 26,
   MAP_CROSSHAIR: 1 << 27,
-  //---------------------------------- HEAT MAP STATES (CHART) ---------------------------------
-  HEATMAP_SCALES: 1 << 12,
-  HEATMAP_SERIES: 1 << 13,
-  HEATMAP_AXES: 1 << 14,
-  HEATMAP_GRIDS: 1 << 15,
-  HEATMAP_COLOR_SCALE: 1 << 16,
-  HEATMAP_X_SCROLLER: 1 << 17,
-  HEATMAP_Y_SCROLLER: 1 << 18,
-  HEATMAP_ZOOM: 1 << 19,
+  //---------------------------------- HEAT MAP STATES (CARTESIAN_BASE) ---------------------------------
+  HEATMAP_COLOR_SCALE: 1 << 30,
+  HEATMAP_Y_SCROLLER: 1 << 31,
+  //---------------------------------- MEKKO STATES (AXES_CHART) ---------------------------------
+  MEKKO_CATEGORY_SCALE: 1 << 28,
   //---------------------------------- SERIES STATES (VB) ---------------------------------
   // also combined, due to a very big prefix
   SERIES_HATCH_FILL: 1 << 6, //
@@ -190,6 +196,8 @@ anychart.ConsistencyState = {
   LABELS_FACTORY_HANDLERS: 1 << 7,
   LABELS_FACTORY_CLIP: 1 << 8,
   LABELS_FACTORY_CONNECTOR: 1 << 9,
+  LABELS_FACTORY_CACHE: 1 << 10,
+  LABELS_FACTORY_POSITION: 1 << 11,
   //---------------------------------- LEGEND STATES (VB) ---------------------------------
   LEGEND_BACKGROUND: 1 << 6,
   LEGEND_TITLE: 1 << 7,
@@ -274,6 +282,11 @@ anychart.ConsistencyState = {
   PERT_CALCULATIONS: 1 << 13,
   PERT_LABELS: 1 << 14,
   PERT_APPEARANCE: 1 << 15,
+  //---------------------------------- VENN CHART (SEPARATE CHART) ----------------------------------
+  VENN_DATA: 1 << 12,
+  VENN_LABELS: 1 << 13,
+  VENN_APPEARANCE: 1 << 14,
+  VENN_MARKERS: 1 << 15,
   //---------------------------------- ANNOTATIONS (VB) ----------------------------------
   ANNOTATIONS_ANCHORS: 1 << 6,
   ANNOTATIONS_LAST_POINT: 1 << 7,
@@ -333,6 +346,9 @@ anychart.ConsistencyState = {
   //---------------------------------- DATE TIME WITH CALENDAR -----------------------------
   DTWC_TS_GRID: 1 << 0,
   DTWC_TS_GRID_ZERO: 1 << 1,
+  //----------------------------- QUARTER (BACKGROUND) -----------------------------
+  QUARTER_TITLE: 1 << 7,
+  QUARTER_LABELS: 1 << 8,
   /**
    * Combination of all states.
    */
@@ -362,7 +378,8 @@ anychart.Signal = {
   NEEDS_UPDATE_TOOLTIP: 1 << 14,
   ENABLED_STATE_CHANGED: 1 << 15,
   Z_INDEX_STATE_CHANGED: 1 << 16,
-  NEED_RECALCULATE_LEGEND: 1 << 17
+  NEED_RECALCULATE_LEGEND: 1 << 17,
+  NEEDS_UPDATE_MARKERS: 1 << 18
 };
 
 
@@ -576,38 +593,36 @@ anychart.core.Base.prototype.serialize = function() {
  * it doesn't reset other properties to their defaults.
  * @param {...*} var_args Arguments to setup the instance.
  * @return {anychart.core.Base} Returns itself for chaining.
+ * @final
  */
 anychart.core.Base.prototype.setup = function(var_args) {
-  var arg0 = arguments[0];
-  if (goog.isDef(arg0)) {
-    this.suspendSignalsDispatching();
-    if (!this.setupSpecial.apply(this, arguments) && goog.isObject(arg0)) {
-      //if (arg0 instanceof anychart.core.Base)
-      //  throw 'Instance of object is passed to setter. You should use JSON instead';
-      this.setupByJSON(/** @type {!Object} */(arguments[0]));
-    }
-    this.resumeSignalsDispatching(true);
+  var args = [false];
+  for (var i = 0; i < arguments.length; i++) {
+    args.push(arguments[i]);
   }
-  return this;
+  return this.setupInternal.apply(this, args);
 };
 
 
 /**
- * Setups the element using passed configuration value. It can be a JSON object or a special value that setups
- * instances of descendant classes.
- * Note: this method only changes element properties if they are supposed to be changed by the config value -
- * it doesn't reset other properties to their defaults.
- * @param {*} value Arguments to setup the instance.
- * @param {boolean=} opt_default .
- * @return {anychart.core.Base} Returns itself for chaining.
+ * Setups the element using passed configuration. It can handle JSON objects or special values that setups
+ * instances in special ways. The first parameter states, whether the settings should be applied as obtained
+ * from the theme, or from the user.
+ * @param {boolean} isDefault
+ * @param {...*} var_args
+ * @return {anychart.core.Base}
+ * @final
  */
-anychart.core.Base.prototype.setupByVal = function(value, opt_default) {
-  if (goog.isDef(value)) {
+anychart.core.Base.prototype.setupInternal = function(isDefault, var_args) {
+  var mainArg = arguments[1];
+  if (goog.isDef(mainArg)) {
     this.suspendSignalsDispatching();
-    if (!this.specialSetupByVal(value, opt_default) && goog.isObject(value)) {
-      //if (arg0 instanceof anychart.core.Base)
-      //  throw 'Instance of object is passed to setter. You should use JSON instead';
-      this.setupByJSON(/** @type {!Object} */(value), opt_default);
+    var args = [];
+    for (var i = 0; i < arguments.length; i++) {
+      args.push(arguments[i]);
+    }
+    if (!this.setupSpecial.apply(this, args) && goog.isObject(mainArg)) {
+      this.setupByJSON(mainArg, isDefault);
     }
     this.resumeSignalsDispatching(true);
   }
@@ -626,23 +641,12 @@ anychart.core.Base.prototype.setupByJSON = function(json, opt_default) {
 
 /**
  * Special objects to setup current instance.
+ * @param {boolean} isDefault
  * @param {...(Object|Array|number|string|undefined|boolean|null)} var_args
  * @return {boolean} If passed values were recognized as special setup values.
  * @protected
  */
-anychart.core.Base.prototype.setupSpecial = function(var_args) {
-  return this.specialSetupByVal(arguments[0]);
-};
-
-
-/**
- * Setups current instance using passed JSON object.
- * @param {Object|Array|number|string|undefined|boolean|null} value .
- * @param {boolean=} opt_default .
- * @return {boolean} If passed values were recognized as special setup values.
- * @protected
- */
-anychart.core.Base.prototype.specialSetupByVal = function(value, opt_default) {
+anychart.core.Base.prototype.setupSpecial = function(isDefault, var_args) {
   return false;
 };
 

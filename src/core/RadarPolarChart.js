@@ -35,7 +35,7 @@ goog.inherits(anychart.core.RadarPolarChart, anychart.core.ChartWithOrthogonalSc
 
 /**
  * Start angle for the first slice of a pie chart.
- * @type {(string|number)}
+ * @type {number}
  * @private
  */
 anychart.core.RadarPolarChart.prototype.startAngle_;
@@ -64,7 +64,7 @@ anychart.core.RadarPolarChart.prototype.SUPPORTED_CONSISTENCY_STATES =
  * chart.startAngle(45);
  * chart.container(stage).draw();
  * @param {(string|number)=} opt_value .
- * @return {(string|number|anychart.core.RadarPolarChart)} .
+ * @return {(number|anychart.core.RadarPolarChart)} .
  */
 anychart.core.RadarPolarChart.prototype.startAngle = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -486,60 +486,21 @@ anychart.core.RadarPolarChart.prototype.getSeriesStatus = function(event) {
 
   if (interactivity.hoverMode() == anychart.enums.HoverMode.BY_SPOT) {
     var spotRadius = interactivity.spotRadius();
-    var leftSideRatio, rightSideRatio;
-    if (clientRadius - spotRadius >= 0) {
-      dx = cx - x;
-      dy = cy - y;
-
-      angle = Math.atan(dx / dy);
-      if (angle <= 0)
-        angle += Math.PI;
-      if (dx < 0 || (angle == Math.PI && dy > 0))
-        angle += Math.PI;
-      angle += this.startAngle_;
-      goog.math.modulo(/** @type {number} */(angle), Math.PI * 2);
-
-
-      var dAngle = Math.asin(spotRadius / clientRadius);
-      var leftSideAngle = angle + dAngle;
-      var rightSideAngle = angle - dAngle;
-
-      leftSideRatio = 1 - (leftSideAngle / (Math.PI * 2));
-      rightSideRatio = 1 - (rightSideAngle / (Math.PI * 2));
-    } else {
-      leftSideRatio = 0;
-      rightSideRatio = 1;
-    }
-
-    var minValue, maxValue;
     for (i = 0, len = this.seriesList.length; i < len; i++) {
       series = this.seriesList[i];
       if (series.enabled()) {
-        minValue = /** @type {number} */(series.xScale().inverseTransform(leftSideRatio));
-        maxValue = /** @type {number} */(series.xScale().inverseTransform(rightSideRatio));
-
-        var indexes = this.categorizeData ?
-            series.findInRangeByX(minValue, maxValue) :
-            series.data().findInRangeByX(minValue, maxValue);
-
-        if (rightSideRatio >= 1) {
-          index = series.data().findInUnsortedDataByX(0);
-          goog.array.extend(indexes, index);
-        }
-
-        iterator = series.getDetachedIterator();
-
         var ind = [];
         var minLength = Infinity;
         var minLengthIndex;
-        for (var j = 0; j < indexes.length; j++) {
-          index = indexes[j];
-          if (iterator.select(index)) {
-            var pointX = /** @type {number} */(iterator.meta('x'));
-            var pointY = /** @type {number} */(iterator.meta('value'));
-
+        var names = series.getYValueNames();
+        iterator = series.getDetachedIterator();
+        while (iterator.advance()) {
+          var pointX = /** @type {number} */(iterator.meta('x'));
+          for (var j = 0; j < names.length; j++) {
+            var pointY = /** @type {number} */(iterator.meta(names[j]));
             var length = anychart.math.vectorLength(pointX, pointY, x, y);
             if (length <= spotRadius) {
+              index = iterator.getIndex();
               ind.push(index);
               if (length < minLength) {
                 minLength = length;
@@ -558,16 +519,10 @@ anychart.core.RadarPolarChart.prototype.getSeriesStatus = function(event) {
       }
     }
   } else if (this.interactivity().hoverMode() == anychart.enums.HoverMode.BY_X) {
-    dx = cx - x;
-    dy = cy - y;
-
-    angle = Math.atan(dx / dy);
-    if (angle <= 0)
-      angle += Math.PI;
-    if (dx < 0 || (angle == Math.PI && dy > 0))
-      angle += Math.PI;
-    angle += this.startAngle_;
-    goog.math.modulo(/** @type {number} */(angle), Math.PI * 2);
+    dx = x - cx;
+    dy = y - cy;
+    angle = Math.PI / 2 + Math.atan2(dy, -dx) + goog.math.toRadians(this.startAngle_);
+    angle = goog.math.modulo(angle, Math.PI * 2);
 
     var ratio = 1 - (angle / (Math.PI * 2));
     for (i = 0, len = this.seriesList.length; i < len; i++) {
@@ -577,18 +532,9 @@ anychart.core.RadarPolarChart.prototype.getSeriesStatus = function(event) {
         var tmp = series.findX(value);
         index = tmp >= 0 ? [tmp] : [];
       } else {
-        index = series.data().findInUnsortedDataByX(anychart.utils.toNumber(value));
-      }
-
-      var dataCache = series.data().cachedScatterValues;
-      if (dataCache && goog.isDef(dataCache.lastNotNaNValueIndex) && dataCache.lastNotNaNValueIndex != -1) {
-        iterator = series.getIterator();
-        iterator.select(dataCache.lastNotNaNValueIndex);
-        var lastNotNaNValue = iterator.get('x');
-        var lastNotNaNValueRatio = series.xScale().transform(lastNotNaNValue);
-        if (ratio > lastNotNaNValueRatio && ratio > lastNotNaNValueRatio + (1 - lastNotNaNValueRatio) / 2) {
-          index = series.data().findInUnsortedDataByX(0);
-        }
+        index = series.data().findClosestByX(
+            anychart.utils.toNumber(value),
+            series.xScale() instanceof anychart.scales.Ordinal);
       }
 
       iterator = series.getDetachedIterator();
@@ -650,7 +596,7 @@ anychart.core.RadarPolarChart.prototype.setupByJSONWithScales = function(config,
   this.setupElementsWithScales(config['minorGrids'], this.minorGrid, scalesInstances);
 
   var json = config['xAxis'];
-  this.xAxis().setupByVal(json, opt_default);
+  this.xAxis().setupInternal(!!opt_default, json);
   if (goog.isObject(json) && 'scale' in json && json['scale'] > 1)
     this.xAxis().scale(scalesInstances[json['scale']]);
 
@@ -761,5 +707,7 @@ anychart.core.RadarPolarChart.prototype.serializeGrid_ = function(item, scales, 
   proto['removeSeriesAt'] = proto.removeSeriesAt;
   proto['removeAllSeries'] = proto.removeAllSeries;
   proto['getPlotBounds'] = proto.getPlotBounds;
+  proto['getXScales'] = proto.getXScales;
+  proto['getYScales'] = proto.getYScales;
 })();
 //endregion

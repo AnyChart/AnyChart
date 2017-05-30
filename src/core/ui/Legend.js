@@ -2388,7 +2388,7 @@ anychart.core.ui.Legend.prototype.setupByJSON = function(config, opt_default) {
   this.titleSeparator(config['titleSeparator']);
   this.paginator(config['paginator']);
 
-  this.tooltip().setupByVal(config['tooltip'], opt_default);
+  this.tooltip().setupInternal(!!opt_default, config['tooltip']);
 
   this.itemsLayout(config['itemsLayout']);
   this.itemsSpacing(config['itemsSpacing']);
@@ -2461,7 +2461,8 @@ anychart.core.ui.Legend.prototype.disposeInternal = function() {
   proto['position'] = proto.position;
   proto['positionMode'] = proto.positionMode;
   proto['align'] = proto.align;
-  proto['getRemainingBounds'] = proto.getRemainingBounds;
   proto['drag'] = proto.drag;
+  proto['getRemainingBounds'] = proto.getRemainingBounds;
+  proto['getPixelBounds'] = proto.getPixelBounds;
 })();
 //endregion

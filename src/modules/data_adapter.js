@@ -6,6 +6,7 @@
 
 goog.provide('anychart.modules.data_adapter');
 goog.require('anychart.base');
+goog.require('goog.Uri');
 goog.require('goog.dom');
 goog.require('goog.net.XhrIo');
 
@@ -33,8 +34,7 @@ anychart.fromXmlFile = function(url, opt_onSuccessOrContainer, opt_onError, opt_
       opt_onSuccessOrContainer,
       opt_onError,
       opt_context,
-      method
-      );
+      method);
   goog.net.XhrIo.send(
       url,
       callback,
@@ -151,8 +151,21 @@ anychart.fromXmlFile.onConfigFileLoadingComplete_ = function(onSuccessOrContaine
  * @return {?{
  *  caption: (string|undefined),
  *  header: (Array.<string>|undefined),
- *  rows: (Array|undefined)
- * }}
+ *  rows: (Array|undefined),
+ *  text: (string|undefined),
+ *  textSettings: (string|undefined|{
+ *      mode: (string|undefined),
+ *      rowsSeparator: (string|undefined),
+ *      columnsSeparator: (string|undefined),
+ *      ignoreTrailingSpaces: (boolean|undefined),
+ *      ignoreFirstRow: (boolean|undefined),
+ *      minLength: (number|undefined),
+ *      maxLength: (number|undefined),
+ *      cutLength: (number|undefined),
+ *      ignoreItems: (Array.<string>|undefined),
+ *      maxItems: (number|undefined)
+ *   })
+ * }} This is a ?anychart.data.DataSettings, but due to modules it should be like this here.
  */
 anychart.modules.data_adapter.parseHtmlTable = function(opt_tableSelector, opt_rowsSelector, opt_cellsSelector, opt_headersSelector, opt_captionSelector, opt_valueProcessor) {
   // find table
@@ -322,34 +335,105 @@ anychart.modules.data_adapter.loadCsvFile = function(url, onSuccess, opt_onError
 
 
 /**
- * @param {goog.net.XhrIo} xhr
- * @return {Object}
- * @private
+ * @param {string|Object} key
+ * @param {Function} onSuccess
+ * @param {Function=} opt_onError
+ * @param {number=} opt_timeoutInterval
+ * @param {*=} opt_context
  */
-anychart.modules.data_adapter.processAsJson_ = function(xhr) {
-  return xhr.getResponseJson() || null;
+anychart.modules.data_adapter.loadGoogleSpreadsheet = function(key, onSuccess, opt_onError, opt_timeoutInterval, opt_context) {
+  var callback = goog.bind(
+      anychart.modules.data_adapter.onDataFileLoaded_,
+      undefined,
+      anychart.modules.data_adapter.processAsGoogleSpreadsheet_,
+      onSuccess,
+      opt_onError,
+      opt_context
+      );
+
+  var gsKey, gsSheet;
+  if (goog.isString(key)) {
+    gsKey = key;
+    gsSheet = 'od6';
+  } else {
+    gsKey = key['key'];
+    gsSheet = goog.isDef(key['sheet']) ? key['sheet'] : 'od6';
+  }
+
+  var url = 'https://spreadsheets.google.com/feeds/cells/' + gsKey + '/' + gsSheet + '/public/values';
+  var uri = new goog.Uri(url);
+  uri.setParameterValue('alt', 'json');
+  uri.makeUnique();
+
+  goog.net.XhrIo.send(
+      uri.toString(),
+      callback,
+      'GET',
+      null,
+      null,
+      opt_timeoutInterval
+  );
 };
 
 
 /**
  * @param {goog.net.XhrIo} xhr
- * @return {Object}
+ * @return {Array}
+ * @private
+ */
+anychart.modules.data_adapter.processAsJson_ = function(xhr) {
+  return [xhr.getResponseJson() || null];
+};
+
+
+/**
+ * @param {goog.net.XhrIo} xhr
+ * @return {Array}
  * @private
  */
 anychart.modules.data_adapter.processAsXml_ = function(xhr) {
   var xml = xhr.getResponseXml();
   var json = window['anychart']['utils']['xml2json'](xml);
-  return json['data'];
+  return [json['data']];
 };
 
 
 /**
  * @param {goog.net.XhrIo} xhr
- * @return {string}
+ * @return {Array}
+ * @private
+ */
+anychart.modules.data_adapter.processAsGoogleSpreadsheet_ = function(xhr) {
+  var rawData = xhr.getResponseJson();
+  var cells = rawData['feed']['entry'];
+  var result = {
+    'title': rawData['feed']['title']['$t'],
+    'rows': []
+  };
+
+  for (var i = 0, count = cells.length; i < count; i++) {
+    var cell = cells[i];
+    var value = cell['gs$cell']['$t'];
+    var col = cell['gs$cell']['col'] - 1;
+    var row = cell['gs$cell']['row'] - 1;
+
+    if (!result['rows'][row]) result['rows'][row] = [];
+    result['rows'][row][col] = value;
+  }
+
+  result['header'] = result['rows'].shift();
+
+  return [result, rawData];
+};
+
+
+/**
+ * @param {goog.net.XhrIo} xhr
+ * @return {Array}
  * @private
  */
 anychart.modules.data_adapter.processAsCsv_ = function(xhr) {
-  return xhr.getResponseText();
+  return [xhr.getResponseText()];
 };
 
 
@@ -367,7 +451,7 @@ anychart.modules.data_adapter.onDataFileLoaded_ = function(processFunc, onSucces
   if (xhrIo.isSuccess()) {
     try {
       var result = processFunc(xhrIo);
-      onSuccess.call(context, result);
+      onSuccess.apply(context, result);
     } catch (error) {
       if (onError) onError.call(context, 500, error);
     }
@@ -384,3 +468,4 @@ goog.exportSymbol('anychart.data.parseHtmlTable', anychart.modules.data_adapter.
 goog.exportSymbol('anychart.data.loadJsonFile', anychart.modules.data_adapter.loadJsonFile);
 goog.exportSymbol('anychart.data.loadXmlFile', anychart.modules.data_adapter.loadXmlFile);
 goog.exportSymbol('anychart.data.loadCsvFile', anychart.modules.data_adapter.loadCsvFile);
+goog.exportSymbol('anychart.data.loadGoogleSpreadsheet', anychart.modules.data_adapter.loadGoogleSpreadsheet);

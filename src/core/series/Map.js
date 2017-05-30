@@ -61,7 +61,14 @@ anychart.core.series.Map.prototype.SUPPORTED_CONSISTENCY_STATES =
 /**
  * Labels z-index.
  */
-anychart.core.series.Map.prototype.LABELS_ZINDEX = anychart.core.shapeManagers.MAP_LABELS_ZINDEX;
+anychart.core.series.Map.prototype.LABELS_ZINDEX = anychart.core.shapeManagers.LABELS_OVER_MARKERS_ZINDEX;
+
+
+/**
+ * Token aliases list.
+ * @type {Object.<string, string>}
+ */
+anychart.core.series.Map.prototype.TOKEN_ALIASES = ({});
 
 
 //endregion
@@ -467,17 +474,11 @@ anychart.core.series.Map.prototype.labelsDrawingMap = function(opt_value) {
 };
 
 
-/**
- * Draws label for a point.
- * @param {anychart.data.IRowInfo} point
- * @param {anychart.PointState|number} pointState Point state - normal, hover or select.
- * @protected
- */
-anychart.core.series.Map.prototype.drawLabel = function(point, pointState) {
+/** @inheritDoc */
+anychart.core.series.Map.prototype.drawLabel = function(point, pointState, pointStateChanged) {
   var index = point.getIndex();
-  if (this.check(anychart.core.series.Capabilities.SUPPORTS_LABELS) &&
-      !(this.labelsDrawingMap_ && goog.isDef(this.labelsDrawingMap_[index]) && !this.labelsDrawingMap_[index])) {
-    anychart.core.series.Map.base(this, 'drawLabel', point, pointState);
+  if (!(this.labelsDrawingMap_ && goog.isDef(this.labelsDrawingMap_[index]) && !this.labelsDrawingMap_[index])) {
+    anychart.core.series.Map.base(this, 'drawLabel', point, pointState, pointStateChanged);
   }
 };
 
@@ -880,11 +881,13 @@ anychart.core.series.Map.prototype.applyAppearanceToPoint = function(pointState)
     }
   }
   if (this.supportsOutliers()) {
-    this.drawPointOutliers(iterator, pointState);
+    this.drawPointOutliers(iterator, pointState, true);
   }
   this.drawer.updatePoint(iterator, pointState);
-  this.drawMarker(iterator, pointState);
-  this.drawLabel(iterator, pointState);
+  if (this.check(anychart.core.series.Capabilities.SUPPORTS_MARKERS))
+    this.drawMarker(iterator, pointState, true);
+  if (this.check(anychart.core.series.Capabilities.SUPPORTS_LABELS))
+    this.drawLabel(iterator, pointState, true);
 };
 
 
@@ -1031,9 +1034,19 @@ anychart.core.series.Map.prototype.getLegendItemData = function(itemsFormat) {
 //endregion
 //region --- Position and Formating
 /** @inheritDoc */
-anychart.core.series.Map.prototype.updateContext = function(provider, opt_rowInfo) {
-  var rowInfo = opt_rowInfo || this.getIterator();
+anychart.core.series.Map.prototype.createStatisticsSource = function(rowInfo) {
+  return [this, this.getChart()];
+};
 
+
+/** @inheritDoc */
+anychart.core.series.Map.prototype.getCustomTokenValues = function(rowInfo) {
+  return {};
+};
+
+
+/** @inheritDoc */
+anychart.core.series.Map.prototype.getContextProviderValues = function(provider, rowInfo) {
   var scale = this.getXScale();
   var values = {
     'chart': {value: this.getChart(), type: anychart.enums.TokenType.UNKNOWN},
@@ -1077,28 +1090,19 @@ anychart.core.series.Map.prototype.updateContext = function(provider, opt_rowInf
     if (regionId)
       values['id'] = {value: regionId, type: anychart.enums.TokenType.STRING};
 
-    provider.values(values);
-
     var features = rowInfo.meta('features');
     var pointGeoProp = features && features.length ? features[0]['properties'] : null;
     if (pointGeoProp) {
       values['regionProperties'] = {value: pointGeoProp, type: anychart.enums.TokenType.UNKNOWN};
       for (var key in pointGeoProp) {
-        if (pointGeoProp.hasOwnProperty(key)) {
-          var providerTokenValue = provider.getTokenValueInternal(key);
-          if (!goog.isDef(providerTokenValue)) {
-            values[key] = {value: pointGeoProp[key]};
-          }
+        if (pointGeoProp.hasOwnProperty(key) && !(key in values)) {
+          values[key] = {value: pointGeoProp[key]};
         }
       }
     }
   }
 
-  provider
-      .dataSource(rowInfo)
-      .statisticsSources([this, this.getChart()]);
-
-  return /** @type {anychart.format.Context} */ (provider.propagate(values));
+  return values;
 };
 
 
@@ -1141,7 +1145,8 @@ anychart.core.series.Map.prototype.createFormatProvider = function(opt_force) {
 
 
 /** @inheritDoc */
-anychart.core.series.Map.prototype.drawSingleFactoryElement = function(factory, index, positionProvider, formatProvider, chartNormalFactory, seriesStateFactory, chartStateFactory, pointOverride, statePointOverride, opt_position) {
+anychart.core.series.Map.prototype.drawSingleFactoryElement = function(factory, index, positionProvider, formatProvider,
+    chartNormalFactory, seriesStateFactory, chartStateFactory, pointOverride, statePointOverride, callDraw, opt_position) {
   if (!positionProvider['value'])
     return null;
 
@@ -1186,7 +1191,8 @@ anychart.core.series.Map.prototype.drawSingleFactoryElement = function(factory, 
     }
   }
 
-  element.draw();
+  if (callDraw)
+    element.draw();
 
   //Needs for correct drawing of label connectors in zoomed map state.
   if (this.drawer.type == anychart.enums.SeriesDrawerTypes.CHOROPLETH) {
@@ -1676,7 +1682,8 @@ anychart.core.series.Map.prototype.getPoint = function(index) {
 anychart.core.series.Map.PROPERTY_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  map['startSize'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'startSize',
       anychart.core.settings.numberNormalizer,
@@ -1684,7 +1691,8 @@ anychart.core.series.Map.PROPERTY_DESCRIPTORS = (function() {
       anychart.Signal.NEEDS_REDRAW,
       anychart.core.drawers.Capabilities.ANY);
 
-  map['endSize'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'endSize',
       anychart.core.settings.numberNormalizer,
@@ -1692,7 +1700,8 @@ anychart.core.series.Map.PROPERTY_DESCRIPTORS = (function() {
       anychart.Signal.NEEDS_REDRAW,
       anychart.core.drawers.Capabilities.ANY);
 
-  map['curvature'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'curvature',
       anychart.core.settings.numberNormalizer,

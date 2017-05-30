@@ -25,21 +25,24 @@ anychart.core.makeStandalone(anychart.standalones.ResourceList, anychart.core.re
 anychart.standalones.ResourceList.PROPERTY_DESCRIPTORS = (function() {
   var map = {};
 
-  map['rowHeight'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'rowHeight',
       anychart.core.settings.numberOrPercentNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['minRowHeight'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'minRowHeight',
       anychart.core.settings.numberOrPercentNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['maxRowHeight'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'maxRowHeight',
       anychart.core.settings.numberOrPercentNormalizer,
@@ -49,9 +52,9 @@ anychart.standalones.ResourceList.PROPERTY_DESCRIPTORS = (function() {
   return map;
 })();
 anychart.core.settings.populate(anychart.standalones.ResourceList, anychart.standalones.ResourceList.PROPERTY_DESCRIPTORS);
+
+
 //endregion
-
-
 /**
  * Raw data holder.
  * @type {?(anychart.data.View|anychart.data.Set|Array|string)}
@@ -79,7 +82,7 @@ anychart.standalones.ResourceList.prototype.data_;
 /**
  * Getter/setter for chart data.
  * @param {?(anychart.data.View|anychart.data.Set|Array|string)=} opt_value Value to set.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @return {(!anychart.standalones.ResourceList|!anychart.data.View)} Returns itself if used as a setter or the mapping if used as a getter.
  */
 anychart.standalones.ResourceList.prototype.data = function(opt_value, opt_csvSettings) {

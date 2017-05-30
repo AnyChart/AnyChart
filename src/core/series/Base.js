@@ -3,6 +3,7 @@ goog.require('acgraph');
 goog.require('anychart.color');
 goog.require('anychart.core.IChart');
 goog.require('anychart.core.IPlot');
+goog.require('anychart.core.IShapeManagerUser');
 goog.require('anychart.core.VisualBaseWithBounds');
 goog.require('anychart.core.drawers');
 goog.require('anychart.core.drawers.Base');
@@ -40,7 +41,7 @@ goog.require('goog.math');
  * @constructor
  * @extends {anychart.core.VisualBaseWithBounds}
  * @implements {anychart.core.utils.ISeriesWithError}
- * @implements {anychart.core.settings.IObjectWithSettings}
+ * @implements {anychart.core.IShapeManagerUser}
  */
 anychart.core.series.Base = function(chart, plot, type, config) {
   anychart.core.series.Base.base(this, 'constructor');
@@ -188,6 +189,20 @@ anychart.core.series.Base.prototype.SUPPORTED_SIGNALS =
 anychart.core.series.Base.prototype.LABELS_ZINDEX = anychart.core.shapeManagers.LABELS_ZINDEX;
 
 
+/**
+ * Token aliases list.
+ * @type {Object.<string, string>}
+ */
+anychart.core.series.Base.prototype.TOKEN_ALIASES = (function() {
+  var tokenAliases = {};
+  tokenAliases[anychart.enums.StringToken.BUBBLE_SIZE] = 'size';
+  tokenAliases[anychart.enums.StringToken.RANGE_START] = 'low';
+  tokenAliases[anychart.enums.StringToken.RANGE_END] = 'high';
+  tokenAliases[anychart.enums.StringToken.X_VALUE] = 'x';
+  return tokenAliases;
+})();
+
+
 //endregion
 //region --- Properties
 //----------------------------------------------------------------------------------------------------------------------
@@ -289,9 +304,9 @@ anychart.core.series.Base.prototype.meta_;
 /**
  * Series tooltip.
  * @type {anychart.core.ui.Tooltip}
- * @private
+ * @protected
  */
-anychart.core.series.Base.prototype.tooltip_;
+anychart.core.series.Base.prototype.tooltipInternal;
 
 
 /**
@@ -305,25 +320,25 @@ anychart.core.series.Base.prototype.error_;
 /**
  * Series labels object.
  * @type {anychart.core.ui.LabelsFactory}
- * @private
+ * @protected
  */
-anychart.core.series.Base.prototype.labels_;
+anychart.core.series.Base.prototype.labelsInternal;
 
 
 /**
  * Series hover labels object.
  * @type {anychart.core.ui.LabelsFactory}
- * @private
+ * @protected
  */
-anychart.core.series.Base.prototype.hoverLabels_;
+anychart.core.series.Base.prototype.hoverLabelsInternal;
 
 
 /**
  * Series select labels object.
  * @type {anychart.core.ui.LabelsFactory}
- * @private
+ * @protected
  */
-anychart.core.series.Base.prototype.selectLabels_;
+anychart.core.series.Base.prototype.selectLabelsInternal;
 
 
 /**
@@ -534,9 +549,9 @@ anychart.core.series.Base.prototype.recreateShapeManager = function() {
  */
 anychart.core.series.Base.prototype.applyDefaultsToElements = function(defaults, opt_resetLegendItem, opt_default, opt_reapplyClip) {
   if (this.supportsLabels()) {
-    this.labels().setupByVal(defaults['labels'], opt_default);
-    this.hoverLabels().setupByVal(defaults['hoverLabels'], opt_default);
-    this.selectLabels().setupByVal(defaults['selectLabels'], opt_default);
+    this.labels().setupInternal(!!opt_default, defaults['labels']);
+    this.hoverLabels().setupInternal(!!opt_default, defaults['hoverLabels']);
+    this.selectLabels().setupInternal(!!opt_default, defaults['selectLabels']);
   }
 
   if (this.supportsMarkers()) {
@@ -559,7 +574,7 @@ anychart.core.series.Base.prototype.applyDefaultsToElements = function(defaults,
   this.legendItem().setup(defaults['legendItem']);
 
   if ('tooltip' in defaults) {
-    this.tooltip().setupByVal(defaults['tooltip'], opt_default);
+    this.tooltip().setupInternal(!!opt_default, defaults['tooltip']);
   }
 
   if (!goog.isDef(opt_reapplyClip))
@@ -801,6 +816,15 @@ anychart.core.series.Base.prototype.supportsLabels = function() {
  */
 anychart.core.series.Base.prototype.isSizeBased = function() {
   return this.check(anychart.core.drawers.Capabilities.NEEDS_SIZE_SCALE);
+};
+
+
+/**
+ * Tester if the series needs heat (HeatMap).
+ * @return {boolean}
+ */
+anychart.core.series.Base.prototype.needsHeat = function() {
+  return false;
 };
 
 
@@ -1055,8 +1079,8 @@ anychart.core.series.Base.prototype.getWhiskerWidth = function(point, pointState
 
 /**
  * Returns category width in pixels according to current X scale settings.
+ * @param {number=} opt_categoryIndex Category index (for series based on ordinal scale with weights).
  * @return {number} Category width in pixels.
- * @protected
  */
 anychart.core.series.Base.prototype.getCategoryWidth = goog.abstractMethod;
 
@@ -1615,7 +1639,7 @@ anychart.core.series.Base.prototype.getLegendIconColor = function(legendItemJson
         name = 'fill';
       }
     }
-    var resolver = anychart.core.series.Base.getColorResolver([name], colorType);
+    var resolver = anychart.color.getColorResolver([name], colorType);
     legendItemJson = resolver(this, anychart.PointState.NORMAL, true);
   }
   return legendItemJson;
@@ -1645,20 +1669,20 @@ anychart.core.series.Base.prototype.getLegendItemText = function(context) {
  * @return {!(anychart.core.series.Base|anychart.core.ui.Tooltip)} Tooltip instance or itself for chaining call.
  */
 anychart.core.series.Base.prototype.tooltip = function(opt_value) {
-  if (!this.tooltip_) {
-    this.tooltip_ = new anychart.core.ui.Tooltip(0);
+  if (!this.tooltipInternal) {
+    this.tooltipInternal = new anychart.core.ui.Tooltip(0);
     if (this.chart.supportsTooltip()) {
       var chart = /** @type {anychart.core.Chart} */ (this.chart);
       var parent = /** @type {anychart.core.ui.Tooltip} */ (chart.tooltip());
-      this.tooltip_.parent(parent);
-      this.tooltip_.chart(chart);
+      this.tooltipInternal.parent(parent);
+      this.tooltipInternal.chart(chart);
     }
   }
   if (goog.isDef(opt_value)) {
-    this.tooltip_.setup(opt_value);
+    this.tooltipInternal.setup(opt_value);
     return this;
   } else {
-    return this.tooltip_;
+    return this.tooltipInternal;
   }
 };
 
@@ -1670,108 +1694,6 @@ anychart.core.series.Base.prototype.tooltip = function(opt_value) {
 //  Color resolution
 //
 //----------------------------------------------------------------------------------------------------------------------
-/**
- * Returns a color resolver for passed color names and type.
- * @param {(Array.<string>|null|boolean)} colorNames
- * @param {anychart.enums.ColorType} colorType
- * @return {function(anychart.core.series.Base, number, boolean=, boolean=):acgraph.vector.AnyColor}
- */
-anychart.core.series.Base.getColorResolver = function(colorNames, colorType) {
-  var result;
-  if (!colorNames) return anychart.core.series.Base.getNullColor_;
-  if (goog.isArray(colorNames)) {
-    var hash = colorType + '|' + colorNames.join('|');
-    result = anychart.core.series.Base.colorResolversCache_[hash];
-    if (!result) {
-      /** @type {!Function} */
-      var normalizerFunc;
-      switch (colorType) {
-        case anychart.enums.ColorType.STROKE:
-          normalizerFunc = anychart.core.settings.strokeOrFunctionSimpleNormalizer;
-          break;
-        case anychart.enums.ColorType.HATCH_FILL:
-          normalizerFunc = anychart.core.settings.hatchFillOrFunctionSimpleNormalizer;
-          break;
-        default:
-        case anychart.enums.ColorType.FILL:
-          normalizerFunc = anychart.core.settings.fillOrFunctionSimpleNormalizer;
-          break;
-      }
-      anychart.core.series.Base.colorResolversCache_[hash] = result = goog.partial(anychart.core.series.Base.getColor_,
-          colorNames, normalizerFunc, colorType == anychart.enums.ColorType.HATCH_FILL);
-    }
-  } else {
-    result = anychart.core.series.Base.colorResolversCache_['transparent'];
-    if (!result)
-      result = anychart.core.series.Base.colorResolversCache_['transparent'] = function() {return anychart.color.TRANSPARENT_HANDLER};
-  }
-  return result;
-};
-
-
-/**
- * Returns final color or hatch fill for passed params.
- * @param {Array.<string>} colorNames
- * @param {!Function} normalizer
- * @param {boolean} isHatchFill
- * @param {anychart.core.series.Base} series
- * @param {number} state
- * @param {boolean=} opt_ignorePointSettings
- * @param {boolean=} opt_ignoreColorScale
- * @return {acgraph.vector.Fill|acgraph.vector.Stroke|acgraph.vector.PatternFill}
- * @private
- */
-anychart.core.series.Base.getColor_ = function(colorNames, normalizer, isHatchFill, series, state, opt_ignorePointSettings, opt_ignoreColorScale) {
-  var stateColor, context;
-  state = anychart.core.utils.InteractivityState.clarifyState(state);
-  if (state != anychart.PointState.NORMAL && colorNames.length > 1) {
-    stateColor = opt_ignorePointSettings ?
-        series.getOption(colorNames[state]) :
-        series.resolveOption(colorNames[state], series.getIterator(), normalizer);
-    if (isHatchFill && stateColor === true)
-      stateColor = normalizer(series.getAutoHatchFill());
-    if (goog.isDef(stateColor)) {
-      if (!goog.isFunction(stateColor))
-        return /** @type {acgraph.vector.Fill|acgraph.vector.Stroke|acgraph.vector.PatternFill} */(stateColor);
-      else if (isHatchFill) { // hatch fills set as function some why cannot nest by initial implementation
-        context = series.getHatchFillResolutionContext(opt_ignorePointSettings);
-        return /** @type {acgraph.vector.PatternFill} */(normalizer(stateColor.call(context, context)));
-      }
-    }
-  }
-  // we can get here only if state color is undefined or is a function
-  var color = opt_ignorePointSettings ?
-      series.getOption(colorNames[0]) :
-      series.resolveOption(colorNames[0], series.getIterator(), normalizer);
-  if (isHatchFill && color === true)
-    color = normalizer(series.getAutoHatchFill());
-  if (goog.isFunction(color)) {
-    context = isHatchFill ?
-        series.getHatchFillResolutionContext(opt_ignorePointSettings) :
-        series.getColorResolutionContext(void 0, opt_ignorePointSettings, opt_ignoreColorScale);
-    color = /** @type {acgraph.vector.Fill|acgraph.vector.Stroke|acgraph.vector.PatternFill} */(normalizer(color.call(context, context)));
-  }
-  if (stateColor) { // it is a function and not a hatch fill here
-    context = series.getColorResolutionContext(
-        /** @type {acgraph.vector.Fill|acgraph.vector.Stroke} */(color),
-        opt_ignorePointSettings,
-        opt_ignoreColorScale);
-    color = normalizer(stateColor.call(context, context));
-  }
-  return /** @type {acgraph.vector.Fill|acgraph.vector.Stroke|acgraph.vector.PatternFill} */(color);
-};
-
-
-/**
- * Returns normalized null stroke or fill.
- * @return {string}
- * @private
- */
-anychart.core.series.Base.getNullColor_ = function() {
-  return 'none';
-};
-
-
 /**
  * Returns color resolution context.
  * This context is used to resolve a fill or stroke set as a function for current point.
@@ -1990,10 +1912,11 @@ anychart.core.series.Base.prototype.prepareFactory = function(factory, stateFact
  * @param {?Array.<number>} positionYs
  * @param {anychart.data.IRowInfo} point
  * @param {anychart.PointState|number} state
+ * @param {boolean} callDraw
  * @return {anychart.core.ui.MarkersFactory.Marker|anychart.core.ui.LabelsFactory.Label|null}
  * @protected
  */
-anychart.core.series.Base.prototype.drawFactoryElement = function(seriesFactoryGetters, chartFactoryGetters, overrideNames, hasPointOverrides, isLabel, positionYs, point, state) {
+anychart.core.series.Base.prototype.drawFactoryElement = function(seriesFactoryGetters, chartFactoryGetters, overrideNames, hasPointOverrides, isLabel, positionYs, point, state, callDraw) {
   var isDraw, positionProvider, i, indexes;
   var index = point.getIndex();
   if (positionYs) {
@@ -2049,33 +1972,62 @@ anychart.core.series.Base.prototype.drawFactoryElement = function(seriesFactoryG
         for (i = 0; i < positionYs.length; i++) {
           positionProvider = {'value': {'x': positionYs[i], 'y': x}};
           indexes[i] = this.drawSingleFactoryElement(mainFactory, indexes[i], positionProvider, formatProvider,
-              chartNormalFactory, seriesStateFactory, chartStateFactory, pointOverride, statePointOverride).getIndex();
+              chartNormalFactory, seriesStateFactory, chartStateFactory, pointOverride, statePointOverride, callDraw).getIndex();
         }
       } else {
         for (i = 0; i < positionYs.length; i++) {
           positionProvider = {'value': {'x': x, 'y': positionYs[i]}};
           indexes[i] = this.drawSingleFactoryElement(mainFactory, indexes[i], positionProvider, formatProvider,
-              chartNormalFactory, seriesStateFactory, chartStateFactory, pointOverride, statePointOverride).getIndex();
+              chartNormalFactory, seriesStateFactory, chartStateFactory, pointOverride, statePointOverride, callDraw).getIndex();
         }
       }
     } else {
-      var statePointOverridePos = statePointOverride && goog.isDef(statePointOverride['position']) ? statePointOverride['position'] : void 0;
-      var seriesStateFactoryPos = seriesStateFactory && goog.isDef(seriesStateFactory['position']()) ? seriesStateFactory['position']() : void 0;
-      var chartStateFactoryPos = chartStateFactory && goog.isDef(chartStateFactory['position']()) ? chartStateFactory['position']() : void 0;
-      var pointOverridePos = pointOverride && goog.isDef(pointOverride['position']) ? pointOverride['position'] : void 0;
-      var seriesNormalFactoryPos = mainFactory && goog.isDef(mainFactory['position']()) ? mainFactory['position']() : void 0;
+      var statePointOverridePos, seriesStateFactoryPos, chartStateFactoryPos, pointOverridePos, seriesNormalFactoryPos,
+          chartNormalFactoryPos, seriesStateThemeFactoryPos, chartStateThemeFactoryPos, seriesNormalThemeFactoryPos,
+          chartNormalThemeFactoryPos, position;
+      if (isLabel) {
+        statePointOverridePos = statePointOverride && goog.isDef(statePointOverride['position']) ? statePointOverride['position'] : void 0;
+        seriesStateFactoryPos = seriesStateFactory && goog.isDef(seriesStateFactory.getOwnOption('position')) ? seriesStateFactory.getOwnOption('position') : void 0;
+        chartStateFactoryPos = chartStateFactory && goog.isDef(chartStateFactory.getOwnOption('position')) ? chartStateFactory.getOwnOption('position') : void 0;
+        pointOverridePos = pointOverride && goog.isDef(pointOverride['position']) ? pointOverride['position'] : void 0;
+        seriesNormalFactoryPos = mainFactory && goog.isDef(mainFactory.getOwnOption('position')) ? mainFactory.getOwnOption('position') : void 0;
+        chartNormalFactoryPos = chartNormalFactory && goog.isDef(chartNormalFactory.getOwnOption('position')) ? chartNormalFactory.getOwnOption('position') : void 0;
+        seriesStateThemeFactoryPos = seriesStateFactory && goog.isDef(seriesStateFactory.getThemeOption('position')) ? seriesStateFactory.getThemeOption('position') : void 0;
+        chartStateThemeFactoryPos = chartStateFactory && goog.isDef(chartStateFactory.getThemeOption('position')) ? chartStateFactory.getThemeOption('position') : void 0;
+        seriesNormalThemeFactoryPos = mainFactory && goog.isDef(mainFactory.getThemeOption('position')) ? mainFactory.getThemeOption('position') : void 0;
+        chartNormalThemeFactoryPos = chartNormalFactory && goog.isDef(chartNormalFactory.getThemeOption('position')) ? chartNormalFactory.getThemeOption('position') : void 0;
 
-      var position = goog.isDef(statePointOverridePos) ? statePointOverridePos :
-          goog.isDef(seriesStateFactoryPos) ? seriesStateFactoryPos :
-              goog.isDef(chartStateFactoryPos) ? chartStateFactoryPos :
-                  goog.isDef(pointOverridePos) ? pointOverridePos :
-                      goog.isDef(mainFactory) ? seriesNormalFactoryPos :
-                          goog.isDef(chartNormalFactory) ? chartNormalFactory['position']() :
-                              'auto';
+        position = anychart.utils.getFirstDefinedValue(
+            statePointOverridePos,
+            seriesStateFactoryPos,
+            chartStateFactoryPos,
+            pointOverridePos,
+            seriesNormalFactoryPos,
+            chartNormalFactoryPos,
+            seriesStateThemeFactoryPos,
+            chartStateThemeFactoryPos,
+            seriesNormalThemeFactoryPos,
+            chartNormalThemeFactoryPos,
+            'auto');
+      } else {
+        statePointOverridePos = statePointOverride && goog.isDef(statePointOverride['position']) ? statePointOverride['position'] : void 0;
+        seriesStateFactoryPos = seriesStateFactory && goog.isDef(seriesStateFactory['position']()) ? seriesStateFactory['position']() : void 0;
+        chartStateFactoryPos = chartStateFactory && goog.isDef(chartStateFactory['position']()) ? chartStateFactory['position']() : void 0;
+        pointOverridePos = pointOverride && goog.isDef(pointOverride['position']) ? pointOverride['position'] : void 0;
+        seriesNormalFactoryPos = mainFactory && goog.isDef(mainFactory['position']()) ? mainFactory['position']() : void 0;
+
+        position = anychart.utils.getFirstDefinedValue(
+            statePointOverridePos,
+            seriesStateFactoryPos,
+            chartStateFactoryPos,
+            pointOverridePos,
+            seriesNormalFactoryPos,
+            'auto');
+      }
 
       positionProvider = this.createPositionProvider(/** @type {anychart.enums.Position|string} */(position), true);
       return this.drawSingleFactoryElement(mainFactory, index, positionProvider, formatProvider,
-          chartNormalFactory, seriesStateFactory, chartStateFactory, pointOverride, statePointOverride, position);
+          chartNormalFactory, seriesStateFactory, chartStateFactory, pointOverride, statePointOverride, callDraw, /** @type {string} */(position));
     }
   } else {
     if (positionYs) {
@@ -2123,21 +2075,32 @@ anychart.core.series.Base.prototype.checkDirectionIsPositive = function(position
 
 
 /**
- * Resolves anchor in auto mode.
- * @param {?anychart.enums.Position|string} position Position.
+ * Resolves auto anchor for fixed geometrical position.
+ * @param {anychart.enums.Position} position
  * @return {anychart.enums.Anchor}
  */
-anychart.core.series.Base.prototype.resolveAutoAnchor = function(position) {
+anychart.core.series.Base.prototype.resolveAutoAnchorForPosition = function(position) {
+  return anychart.utils.flipAnchor(position);
+};
+
+
+/**
+ * Resolves anchor in auto mode.
+ * @param {?anychart.enums.Position|string} position Position.
+ * @param {number} rotation Label rotation angle.
+ * @return {anychart.enums.Anchor}
+ */
+anychart.core.series.Base.prototype.resolveAutoAnchor = function(position, rotation) {
   var normalizedPosition = anychart.enums.normalizePosition(position, null);
   var result;
   if (normalizedPosition) {
-    result = anychart.utils.flipAnchor(normalizedPosition);
+    result = this.resolveAutoAnchorForPosition(normalizedPosition);
   } else {
     var positive = this.checkDirectionIsPositive(/** @type {string} */(position));
     var angle = this.getDirectionAngle(positive);
     result = anychart.utils.getAnchorForAngle(angle);
   }
-  return result;
+  return anychart.utils.rotateAnchor(result, rotation);
 };
 
 
@@ -2147,20 +2110,45 @@ anychart.core.series.Base.prototype.resolveAutoAnchor = function(position) {
  * @param {anychart.core.ui.LabelsFactory.Label} label
  */
 anychart.core.series.Base.prototype.checkBoundsCollision = function(factory, label) {
-  // reserved for 7.14.0
-  // var bounds = factory.measure(label);
-  // var anchor = /** @type {anychart.enums.Anchor} */(label.autoAnchor());
-  // if (this.getOption('isVertical')) {
-  //   if (anychart.utils.isRightAnchor(anchor) && bounds.left < this.pixelBoundsCache.left ||
-  //       anychart.utils.isLeftAnchor(anchor) && (bounds.left + bounds.width > this.pixelBoundsCache.left + this.pixelBoundsCache.width)) {
-  //     label.autoAnchor(anychart.utils.flipAnchorHorizontal(anchor));
-  //   }
-  // } else {
-  //   if (anychart.utils.isBottomAnchor(anchor) && bounds.top < this.pixelBoundsCache.top ||
-  //       anychart.utils.isTopAnchor(anchor) && (bounds.top + bounds.height > this.pixelBoundsCache.top + this.pixelBoundsCache.height)) {
-  //     label.autoAnchor(anychart.utils.flipAnchorVertical(anchor));
-  //   }
-  // }
+  var bounds = anychart.math.Rect.fromCoordinateBox(factory.measureWithTransform(label, undefined, {'anchor': label.autoAnchor()}));
+  var anchor = /** @type {anychart.enums.Anchor} */(label.autoAnchor());
+  var rotation = /** @type {number} */(label.getFinalSettings('rotation'));
+  anchor = anychart.utils.rotateAnchor(anchor, -rotation);
+  if (anychart.utils.isRightAnchor(anchor) && bounds.left < this.pixelBoundsCache.left ||
+      anychart.utils.isLeftAnchor(anchor) && (bounds.left + bounds.width > this.pixelBoundsCache.left + this.pixelBoundsCache.width)) {
+    anchor = anychart.utils.flipAnchorHorizontal(anchor);
+  }
+  if (anychart.utils.isBottomAnchor(anchor) && bounds.top < this.pixelBoundsCache.top ||
+      anychart.utils.isTopAnchor(anchor) && (bounds.top + bounds.height > this.pixelBoundsCache.top + this.pixelBoundsCache.height)) {
+    anchor = anychart.utils.flipAnchorVertical(anchor);
+  }
+  anchor = anychart.utils.rotateAnchor(anchor, rotation);
+  label.autoAnchor(anchor);
+};
+
+
+/**
+ * Setups label drawing plan.
+ * @param {anychart.core.ui.LabelsFactory.Label} label
+ * @param {anychart.core.ui.LabelsFactory} chartNormalFactory
+ * @param {anychart.core.ui.LabelsFactory} seriesNormalFactory
+ * @param {anychart.core.ui.LabelsFactory} chartStateFactory
+ * @param {anychart.core.ui.LabelsFactory} seriesStateFactory
+ * @param {*} pointOverride
+ * @param {*} statePointOverride
+ */
+anychart.core.series.Base.prototype.setupLabelDrawingPlan = function(label, chartNormalFactory, seriesNormalFactory, chartStateFactory, seriesStateFactory, pointOverride, statePointOverride) {
+  label.state('pointState', goog.isObject(statePointOverride) ? statePointOverride : null);
+  label.state('seriesState', seriesStateFactory);
+  label.state('chartState', chartStateFactory);
+  label.state('pointNormal', goog.isObject(pointOverride) ? pointOverride : null);
+  label.state('seriesNormal', seriesNormalFactory);
+  label.state('chartNormal', chartNormalFactory);
+  label.state('seriesStateTheme', seriesStateFactory ? seriesStateFactory.themeSettings : null);
+  label.state('chartStateTheme', chartStateFactory ? chartStateFactory.themeSettings : null);
+  label.state('auto', label.autoSettings);
+  label.state('seriesNormalTheme', seriesNormalFactory.themeSettings);
+  label.state('chartNormalTheme', chartNormalFactory ? chartNormalFactory.themeSettings : null);
 };
 
 
@@ -2175,11 +2163,13 @@ anychart.core.series.Base.prototype.checkBoundsCollision = function(factory, lab
  * @param {anychart.core.ui.MarkersFactory|anychart.core.ui.LabelsFactory|null} chartStateFactory
  * @param {*} pointOverride
  * @param {*} statePointOverride
+ * @param {boolean} callDraw
  * @param {(?anychart.enums.Position|string)=} opt_position Position which is needed to calculate label auto anchor.
  * @return {anychart.core.ui.MarkersFactory.Marker|anychart.core.ui.LabelsFactory.Label}
  * @protected
  */
-anychart.core.series.Base.prototype.drawSingleFactoryElement = function(factory, index, positionProvider, formatProvider, chartNormalFactory, seriesStateFactory, chartStateFactory, pointOverride, statePointOverride, opt_position) {
+anychart.core.series.Base.prototype.drawSingleFactoryElement = function(factory, index, positionProvider, formatProvider,
+    chartNormalFactory, seriesStateFactory, chartStateFactory, pointOverride, statePointOverride, callDraw, opt_position) {
   var element = formatProvider ? factory.getLabel(/** @type {number} */(index)) : factory.getMarker(/** @type {number} */(index));
   if (element) {
     if (formatProvider)
@@ -2194,22 +2184,19 @@ anychart.core.series.Base.prototype.drawSingleFactoryElement = function(factory,
   element.resetSettings();
   if (formatProvider) {
     var label = /** @type {anychart.core.ui.LabelsFactory.Label} */(element);
-    label.state('pointState', goog.isObject(statePointOverride) ? statePointOverride : null);
-    label.state('seriesState', seriesStateFactory);
-    label.state('chartState', chartStateFactory);
-    label.state('pointNormal', goog.isObject(pointOverride) ? pointOverride : null);
-    label.state('seriesNormal', factory);
-    label.state('chartNormal', chartNormalFactory);
-    label.state('seriesStateTheme', seriesStateFactory ? seriesStateFactory.themeSettings : null);
-    label.state('chartStateTheme', chartStateFactory ? chartStateFactory.themeSettings : null);
-    label.state('auto', label.autoSettings);
-    label.state('seriesNormalTheme', factory.themeSettings);
-    label.state('chartNormalTheme', chartNormalFactory ? chartNormalFactory.themeSettings : null);
+    this.setupLabelDrawingPlan(
+        label,
+        /** @type {anychart.core.ui.LabelsFactory} */(chartNormalFactory),
+        /** @type {anychart.core.ui.LabelsFactory} */(factory),
+        /** @type {anychart.core.ui.LabelsFactory} */(chartStateFactory),
+        /** @type {anychart.core.ui.LabelsFactory} */(seriesStateFactory),
+        pointOverride,
+        statePointOverride);
 
     var anchor = label.getFinalSettings('anchor');
     label.autoVertical(/** @type {boolean} */ (this.getOption('isVertical')));
     if (goog.isDef(opt_position) && anchor == anychart.enums.Anchor.AUTO) {
-      label.autoAnchor(this.resolveAutoAnchor(opt_position));
+      label.autoAnchor(this.resolveAutoAnchor(opt_position, Number(label.getFinalSettings('rotation')) || 0));
       this.checkBoundsCollision(/** @type {anychart.core.ui.LabelsFactory} */(factory), label);
     }
   } else {
@@ -2217,7 +2204,8 @@ anychart.core.series.Base.prototype.drawSingleFactoryElement = function(factory,
     element.setSettings(/** @type {Object} */(pointOverride), /** @type {Object} */(statePointOverride));
   }
 
-  element.draw();
+  if (callDraw)
+    element.draw();
   return element;
 };
 
@@ -2235,19 +2223,19 @@ anychart.core.series.Base.prototype.drawSingleFactoryElement = function(factory,
  * @return {!(anychart.core.ui.LabelsFactory|anychart.core.series.Base)} Labels instance or itself for chaining call.
  */
 anychart.core.series.Base.prototype.labels = function(opt_value) {
-  if (!this.labels_) {
-    this.labels_ = new anychart.core.ui.LabelsFactory();
-    this.labels_.setParentEventTarget(this);
-    this.labels_.listenSignals(this.labelsInvalidated_, this);
+  if (!this.labelsInternal) {
+    this.labelsInternal = new anychart.core.ui.LabelsFactory();
+    this.labelsInternal.setParentEventTarget(this);
+    this.labelsInternal.listenSignals(this.labelsInvalidated_, this);
   }
 
   if (goog.isDef(opt_value)) {
     if (goog.isObject(opt_value) && !('enabled' in opt_value))
       opt_value['enabled'] = true;
-    this.labels_.setup(opt_value);
+    this.labelsInternal.setup(opt_value);
     return this;
   }
-  return this.labels_;
+  return this.labelsInternal;
 };
 
 
@@ -2257,18 +2245,18 @@ anychart.core.series.Base.prototype.labels = function(opt_value) {
  * @return {!(anychart.core.ui.LabelsFactory|anychart.core.series.Base)} Labels instance or itself for chaining call.
  */
 anychart.core.series.Base.prototype.hoverLabels = function(opt_value) {
-  if (!this.hoverLabels_) {
-    this.hoverLabels_ = new anychart.core.ui.LabelsFactory();
-    this.hoverLabels_.markConsistent(anychart.ConsistencyState.ALL);
+  if (!this.hoverLabelsInternal) {
+    this.hoverLabelsInternal = new anychart.core.ui.LabelsFactory();
+    this.hoverLabelsInternal.markConsistent(anychart.ConsistencyState.ALL);
   }
 
   if (goog.isDef(opt_value)) {
     if (goog.isObject(opt_value) && !('enabled' in opt_value))
       opt_value['enabled'] = true;
-    this.hoverLabels_.setup(opt_value);
+    this.hoverLabelsInternal.setup(opt_value);
     return this;
   }
-  return this.hoverLabels_;
+  return this.hoverLabelsInternal;
 };
 
 
@@ -2278,18 +2266,18 @@ anychart.core.series.Base.prototype.hoverLabels = function(opt_value) {
  * @return {!(anychart.core.ui.LabelsFactory|anychart.core.series.Base)} Labels instance or itself for chaining call.
  */
 anychart.core.series.Base.prototype.selectLabels = function(opt_value) {
-  if (!this.selectLabels_) {
-    this.selectLabels_ = new anychart.core.ui.LabelsFactory();
-    this.selectLabels_.markConsistent(anychart.ConsistencyState.ALL);
+  if (!this.selectLabelsInternal) {
+    this.selectLabelsInternal = new anychart.core.ui.LabelsFactory();
+    this.selectLabelsInternal.markConsistent(anychart.ConsistencyState.ALL);
   }
 
   if (goog.isDef(opt_value)) {
     if (goog.isObject(opt_value) && !('enabled' in opt_value))
       opt_value['enabled'] = true;
-    this.selectLabels_.setup(opt_value);
+    this.selectLabelsInternal.setup(opt_value);
     return this;
   }
-  return this.selectLabels_;
+  return this.selectLabelsInternal;
 };
 
 
@@ -2309,35 +2297,27 @@ anychart.core.series.Base.prototype.labelsInvalidated_ = function(event) {
  * Draws label for a point.
  * @param {anychart.data.IRowInfo} point
  * @param {anychart.PointState|number} pointState Point state - normal, hover or select.
+ * @param {boolean} pointStateChanged
  * @protected
  */
-anychart.core.series.Base.prototype.drawLabel = function(point, pointState) {
-  if (this.check(anychart.core.series.Capabilities.SUPPORTS_LABELS))
-    point.meta('label', this.drawFactoryElement(
-        [this.labels, this.hoverLabels, this.selectLabels],
-        [this.getChart().labels, this.getChart().hoverLabels, this.getChart().selectLabels],
-        ['label', 'hoverLabel', 'selectLabel'],
-        this.planHasPointLabels(),
-        true,
-        null,
-        point,
-        pointState));
+anychart.core.series.Base.prototype.drawLabel = function(point, pointState, pointStateChanged) {
+  point.meta('label', this.drawFactoryElement(
+      [this.labels, this.hoverLabels, this.selectLabels],
+      [this.getChart().labels, this.getChart().hoverLabels, this.getChart().selectLabels],
+      ['label', 'hoverLabel', 'selectLabel'],
+      this.planHasPointLabels(),
+      true,
+      null,
+      point,
+      pointState,
+      pointStateChanged));
 };
 
 
 /**
- * Returns labels default font color.
- * @return {string}
+ * Additional labels initialization for HeatMap.
  */
-anychart.core.series.Base.prototype.getLabelsColor = function() {
-  var color;
-  if (anychart.DEFAULT_THEME != 'v6') {
-    color = anychart.color.darken(/** @type {acgraph.vector.Fill} */(this.getOption('color')));
-    if (goog.isObject(color)) {
-      color = /** @type {string|undefined} */(color['color']);
-    }
-  }
-  return /** @type {string} */(color || '');
+anychart.core.series.Base.prototype.additionalLabelsInitialize = function() {
 };
 
 
@@ -2429,19 +2409,20 @@ anychart.core.series.Base.prototype.markersInvalidated_ = function(event) {
  * Draws marker for the point.
  * @param {anychart.data.IRowInfo} point
  * @param {anychart.PointState|number} pointState Point state.
+ * @param {boolean} pointStateChanged
  * @protected
  */
-anychart.core.series.Base.prototype.drawMarker = function(point, pointState) {
-  if (this.check(anychart.core.series.Capabilities.SUPPORTS_MARKERS))
-    point.meta('marker', this.drawFactoryElement(
-        [this.markers, this.hoverMarkers, this.selectMarkers],
-        null,
-        ['marker', 'hoverMarker', 'selectMarker'],
-        this.planHasPointMarkers(),
-        false,
-        null,
-        point,
-        pointState));
+anychart.core.series.Base.prototype.drawMarker = function(point, pointState, pointStateChanged) {
+  point.meta('marker', this.drawFactoryElement(
+      [this.markers, this.hoverMarkers, this.selectMarkers],
+      null,
+      ['marker', 'hoverMarker', 'selectMarker'],
+      this.planHasPointMarkers(),
+      false,
+      null,
+      point,
+      pointState,
+      pointStateChanged));
 };
 
 
@@ -2451,7 +2432,7 @@ anychart.core.series.Base.prototype.drawMarker = function(point, pointState) {
  * @protected
  */
 anychart.core.series.Base.prototype.getMarkerFill = function() {
-  var fillGetter = anychart.core.series.Base.getColorResolver(
+  var fillGetter = anychart.color.getColorResolver(
       [this.check(anychart.core.drawers.Capabilities.USES_STROKE_AS_FILL) ? 'stroke' : 'fill'],
       anychart.enums.ColorType.FILL);
   var fill = /** @type {acgraph.vector.Fill} */(fillGetter(this, anychart.PointState.NORMAL, true, true));
@@ -2557,13 +2538,12 @@ anychart.core.series.Base.prototype.outlierMarkersInvalidated_ = function(event)
  * Draws outliers markers for the point.
  * @param {anychart.data.IIterator} iterator
  * @param {anychart.PointState|number} pointState Point state.
+ * @param {boolean} pointStateChanged
  * @protected
  */
-anychart.core.series.Base.prototype.drawPointOutliers = function(iterator, pointState) {
-  var outliers;
-  if (this.check(anychart.core.drawers.Capabilities.SUPPORTS_OUTLIERS) &&
-      (outliers = iterator.meta('outliers')) &&
-      outliers.length)
+anychart.core.series.Base.prototype.drawPointOutliers = function(iterator, pointState, pointStateChanged) {
+  var outliers = iterator.meta('outliers');
+  if (outliers && outliers.length)
     this.drawFactoryElement(
         [this.outlierMarkers, this.hoverOutlierMarkers, this.selectOutlierMarkers],
         null,
@@ -2572,7 +2552,8 @@ anychart.core.series.Base.prototype.drawPointOutliers = function(iterator, point
         false,
         /** @type {Array.<number>} */(outliers),
         iterator,
-        pointState);
+        pointState,
+        pointStateChanged);
 };
 
 
@@ -2582,7 +2563,7 @@ anychart.core.series.Base.prototype.drawPointOutliers = function(iterator, point
  * @protected
  */
 anychart.core.series.Base.prototype.getOutliersFill = function() {
-  var fillGetter = anychart.core.series.Base.getColorResolver(['fill'], anychart.enums.ColorType.FILL);
+  var fillGetter = anychart.color.getColorResolver(['fill'], anychart.enums.ColorType.FILL);
   return /** @type {acgraph.vector.Fill} */(fillGetter(this, anychart.PointState.NORMAL, true));
 };
 
@@ -2690,9 +2671,9 @@ anychart.core.series.Base.prototype.remove = function() {
   }
 
   // just a remove should be here, but the lablesFactory's remove() is very odd
-  if (this.labels_ && this.labels_.getDomElement()) {
-    this.labels_.getDomElement().remove();
-    this.labels_.invalidate(anychart.ConsistencyState.CONTAINER);
+  if (this.labelsInternal && this.labelsInternal.getDomElement()) {
+    this.labelsInternal.getDomElement().remove();
+    this.labelsInternal.invalidate(anychart.ConsistencyState.CONTAINER);
   }
 
   if (this.markers_) {
@@ -2813,6 +2794,7 @@ anychart.core.series.Base.prototype.draw = function() {
   var elementsDrawers = [];
   var factoriesToFinalize = [];
   var factory, i, state, stateFactoriesEnabled;
+  var labelsAreToBeRedrawn = false;
   var COMMON_STATES = anychart.ConsistencyState.CONTAINER | anychart.ConsistencyState.SERIES_POINTS;
 
   // preparing to draw different series parts
@@ -2827,11 +2809,13 @@ anychart.core.series.Base.prototype.draw = function() {
     stateFactoriesEnabled = /** @type {boolean} */(this.hoverLabels().enabled() || this.selectLabels().enabled());
     if (this.prepareFactory(factory, stateFactoriesEnabled, this.planHasPointLabels(),
             anychart.core.series.Capabilities.SUPPORTS_LABELS, anychart.ConsistencyState.SERIES_LABELS)) {
-      factory.setAutoZIndex(/** @type {number} */(this.zIndex() + this.LABELS_ZINDEX));
+      factory.setAutoZIndex(/** @type {number} */(this.zIndex() + this.LABELS_ZINDEX + (this.planIsStacked() ? 1 : 0)));
       // see DVF-2259
       factory.invalidate(anychart.ConsistencyState.Z_INDEX);
-      elementsDrawers.push(this.drawLabel);
+      if (this.check(anychart.core.series.Capabilities.SUPPORTS_LABELS))
+        elementsDrawers.push(this.drawLabel);
       factoriesToFinalize.push(factory);
+      labelsAreToBeRedrawn = true;
     }
     this.markConsistent(anychart.ConsistencyState.SERIES_LABELS);
   }
@@ -2841,8 +2825,9 @@ anychart.core.series.Base.prototype.draw = function() {
     stateFactoriesEnabled = /** @type {boolean} */(this.hoverMarkers().enabled() || this.selectMarkers().enabled());
     if (this.prepareFactory(factory, stateFactoriesEnabled, this.planHasPointMarkers(),
             anychart.core.series.Capabilities.SUPPORTS_MARKERS, anychart.ConsistencyState.SERIES_MARKERS)) {
-      factory.setAutoZIndex(/** @type {number} */(this.zIndex() + anychart.core.shapeManagers.MARKERS_ZINDEX));
-      elementsDrawers.push(this.drawMarker);
+      factory.setAutoZIndex(/** @type {number} */(this.zIndex() + anychart.core.shapeManagers.MARKERS_ZINDEX + (this.planIsStacked() ? 1 : 0)));
+      if (this.check(anychart.core.series.Capabilities.SUPPORTS_MARKERS))
+        elementsDrawers.push(this.drawMarker);
       factoriesToFinalize.push(factory);
     }
     this.markConsistent(anychart.ConsistencyState.SERIES_MARKERS);
@@ -2864,7 +2849,8 @@ anychart.core.series.Base.prototype.draw = function() {
     if (this.prepareFactory(factory, stateFactoriesEnabled, this.planHasPointOutliers(),
             anychart.core.drawers.Capabilities.SUPPORTS_OUTLIERS, anychart.ConsistencyState.SERIES_OUTLIERS)) {
       factory.setAutoZIndex(/** @type {number} */(this.zIndex() + anychart.core.shapeManagers.OUTLIERS_ZINDEX));
-      elementsDrawers.push(this.drawPointOutliers);
+      if (this.check(anychart.core.drawers.Capabilities.SUPPORTS_OUTLIERS))
+        elementsDrawers.push(this.drawPointOutliers);
       factoriesToFinalize.push(factory);
     }
     this.markConsistent(anychart.ConsistencyState.SERIES_OUTLIERS);
@@ -2877,7 +2863,10 @@ anychart.core.series.Base.prototype.draw = function() {
     var columns = this.retrieveDataColumns();
     var iterator;
     if (columns) {
-      this.prepareMetaMakers();
+      var yValueNames = this.getYValueNames();
+      this.prepareMetaMakers(columns, yValueNames);
+      if (labelsAreToBeRedrawn)
+        this.additionalLabelsInitialize();
       this.startDrawing();
 
       iterator = this.getResetIterator();
@@ -2885,7 +2874,7 @@ anychart.core.series.Base.prototype.draw = function() {
       // Cartesian processes preFirst point as a regular point in iterator
       var point = this.getPreFirstPoint();
       if (point) {
-        this.makePointMeta(point, this.getYValueNames(), columns);
+        this.makePointMeta(point, yValueNames, columns);
         this.drawPoint(point, this.getPointState(point.getIndex()));
       }
 
@@ -2893,17 +2882,17 @@ anychart.core.series.Base.prototype.draw = function() {
       iterator.reset();
       while (iterator.advance()) {
         state = this.getPointState(iterator.getIndex());
-        this.makePointMeta(iterator, this.getYValueNames(), columns);
+        this.makePointMeta(iterator, yValueNames, columns);
         this.drawPoint(iterator, state);
         for (i = 0; i < elementsDrawersLength; i++)
-          elementsDrawers[i].call(this, iterator, state);
+          elementsDrawers[i].call(this, iterator, state, false);
       }
 
       // currently this section is actual only for Stock, because
       // Cartesian processes preFirst point as a regular point in iterator
       point = this.getPostLastPoint();
       if (point) {
-        this.makePointMeta(point, this.getYValueNames(), columns);
+        this.makePointMeta(point, yValueNames, columns);
         this.drawPoint(point, this.getPointState(point.getIndex()));
       }
 
@@ -2921,11 +2910,13 @@ anychart.core.series.Base.prototype.draw = function() {
     }
     anychart.performance.end('Series drawing points');
   } else if (elementsDrawersLength) {
+    if (labelsAreToBeRedrawn)
+      this.additionalLabelsInitialize();
     iterator = this.getResetIterator();
     while (iterator.advance()) {
       state = this.getPointState(iterator.getIndex());
       for (i = 0; i < elementsDrawersLength; i++)
-        elementsDrawers[i].call(this, iterator, state);
+        elementsDrawers[i].call(this, iterator, state, false);
     }
   }
 
@@ -3037,16 +3028,7 @@ anychart.core.series.Base.prototype.prepareAdditional = function() {
 anychart.core.series.Base.prototype.applyZIndex = function() {
   var zIndex = /** @type {number} */(this.zIndex());
   if (this.check(anychart.core.drawers.Capabilities.USES_CONTAINER_AS_ROOT)) {
-    if (this.shapeManager instanceof anychart.core.shapeManagers.PerPoint) {
-      var iterator = this.getDetachedIterator();
-      while (iterator.advance()) {
-        var shapes = /** @type {Object.<acgraph.vector.Shape>} */(iterator.meta('shapes'));
-        if (shapes)
-          this.shapeManager.updateZIndex(zIndex, shapes);
-      }
-    } else {
-      this.shapeManager.updateZIndex(zIndex);
-    }
+    this.drawer.updateZIndex(zIndex);
   } else {
     this.rootLayer.zIndex(zIndex);
   }
@@ -3101,8 +3083,8 @@ anychart.core.series.Base.prototype.applyClip = function(opt_customClip) {
   } else {
     this.rootLayer.clip(clipElement);
   }
-  if (this.labels_) {
-    var labelDOM = this.labels_.getDomElement();
+  if (this.labelsInternal) {
+    var labelDOM = this.labelsInternal.getDomElement();
     if (labelDOM) labelDOM.clip(clipElement);
   }
   if (this.markers_) {
@@ -3436,9 +3418,11 @@ anychart.core.series.Base.prototype.makeOutliersMeta = function(rowInfo, yNames,
 
 /**
  * Prepares meta makers pipe.
+ * @param {Array.<string>} yNames
+ * @param {Array.<string|number>} yColumns
  * @protected
  */
-anychart.core.series.Base.prototype.prepareMetaMakers = function() {
+anychart.core.series.Base.prototype.prepareMetaMakers = function(yNames, yColumns) {
   this.metaMakers.length = 0;
   if (this.planIsStacked()) {
     this.metaMakers.push(this.makeStackedMeta);
@@ -3507,28 +3491,84 @@ anychart.core.series.Base.prototype.makePointMeta = function(rowInfo, yNames, yC
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Applies required data to format context.
- * @param {anychart.format.Context} provider - Format context.
- * @param {anychart.data.IRowInfo=} opt_rowInfo - Data source.
- * @return {anychart.format.Context} - Updated format context.
+ * Creates statistics source to update the context.
+ * @param {anychart.data.IRowInfo} rowInfo
+ * @return {Array.<anychart.core.BaseContext.StatisticsSource>}
+ * @protected
  */
-anychart.core.series.Base.prototype.updateContext = function(provider, opt_rowInfo) {
-  var rowInfo = opt_rowInfo || this.getIterator();
+anychart.core.series.Base.prototype.createStatisticsSource = function(rowInfo) {
+  return [this.getPoint(rowInfo.getIndex()), this, this.getChart()];
+};
+
+
+/**
+ * Returns custom token values list.
+ * @param {anychart.data.IRowInfo} rowInfo
+ * @return {Object.<string, anychart.core.BaseContext.TypedValue>}
+ * @protected
+ */
+anychart.core.series.Base.prototype.getCustomTokenValues = function(rowInfo) {
+  var tokenCustomValues = {};
+  var diff = /** @type {number} */ (rowInfo.get('high')) - /** @type {number} */ (rowInfo.get('low'));
+  tokenCustomValues[anychart.enums.StringToken.RANGE] = {
+    value: diff,
+    type: anychart.enums.TokenType.NUMBER
+  };
+  tokenCustomValues[anychart.enums.StringToken.NAME] = {
+    value: rowInfo.get('name'),
+    type: anychart.enums.TokenType.STRING
+  };
+  return tokenCustomValues;
+};
+
+
+/**
+ * Returns context provider values to propagate to it.
+ * @param {anychart.format.Context} provider - Format context.
+ * @param {anychart.data.IRowInfo} rowInfo
+ * @return {Object.<string, anychart.core.BaseContext.TypedValue>}
+ * @protected
+ */
+anychart.core.series.Base.prototype.getContextProviderValues = function(provider, rowInfo) {
   var scale = this.getXScale();
   var values = {
-    'chart': {value: this.getChart(), type: anychart.enums.TokenType.UNKNOWN},
-    'series': {value: this, type: anychart.enums.TokenType.UNKNOWN},
-    'xScale': {value: scale, type: anychart.enums.TokenType.UNKNOWN},
-    'index': {value: rowInfo.getIndex(), type: anychart.enums.TokenType.NUMBER},
-    'x': {value: rowInfo.get('x'), type: anychart.enums.TokenType.STRING},
-    'seriesName': {value: this.name(), type: anychart.enums.TokenType.STRING},
+    'chart': {
+      value: this.getChart(),
+      type: anychart.enums.TokenType.UNKNOWN
+    },
+    'series': {
+      value: this,
+      type: anychart.enums.TokenType.UNKNOWN
+    },
+    'xScale': {
+      value: scale,
+      type: anychart.enums.TokenType.UNKNOWN
+    },
+    'index': {
+      value: rowInfo.getIndex(),
+      type: anychart.enums.TokenType.NUMBER
+    },
+    'x': {
+      value: rowInfo.get('x'),
+      type: anychart.enums.TokenType.STRING
+    },
+    'seriesName': {
+      value: this.name(),
+      type: anychart.enums.TokenType.STRING
+    }
   };
 
   if (scale && goog.isFunction(scale.getType))
-    values['xScaleType'] = {value: scale.getType(), type: anychart.enums.TokenType.STRING};
+    values['xScaleType'] = {
+      value: scale.getType(),
+      type: anychart.enums.TokenType.STRING
+    };
 
   if (this.isSizeBased())
-    values['size'] = {value: rowInfo.get('size'), type: anychart.enums.TokenType.NUMBER};
+    values['size'] = {
+      value: rowInfo.get('size'),
+      type: anychart.enums.TokenType.NUMBER
+    };
 
   if (this.supportsError()) {
     /** @type {anychart.core.utils.ISeriesWithError} */
@@ -3538,40 +3578,56 @@ anychart.core.series.Base.prototype.updateContext = function(provider, opt_rowIn
     var error;
     if (mode == anychart.enums.ErrorMode.BOTH || mode == anychart.enums.ErrorMode.VALUE) {
       error = series.getErrorValues(false);
-      values['valueLowerError'] = {value: error[0], type: anychart.enums.TokenType.NUMBER};
-      values['valueUpperError'] = {value: error[1], type: anychart.enums.TokenType.NUMBER};
+      values['valueLowerError'] = {
+        value: error[0],
+        type: anychart.enums.TokenType.NUMBER
+      };
+      values['valueUpperError'] = {
+        value: error[1],
+        type: anychart.enums.TokenType.NUMBER
+      };
     }
     if (mode == anychart.enums.ErrorMode.BOTH || mode == anychart.enums.ErrorMode.X) {
       error = series.getErrorValues(true);
-      values['xLowerError'] = {value: error[0], type: anychart.enums.TokenType.NUMBER};
-      values['xUpperError'] = {value: error[1], type: anychart.enums.TokenType.NUMBER};
+      values['xLowerError'] = {
+        value: error[0],
+        type: anychart.enums.TokenType.NUMBER
+      };
+      values['xUpperError'] = {
+        value: error[1],
+        type: anychart.enums.TokenType.NUMBER
+      };
     }
   }
 
   var refValueNames = this.getYValueNames();
   for (var i = 0; i < refValueNames.length; i++) {
     var refName = refValueNames[i];
-    values[refName] = {value: rowInfo.get(refName), type: anychart.enums.TokenType.NUMBER};
+    values[refName] = {
+      value: rowInfo.get(refName),
+      type: anychart.enums.TokenType.NUMBER
+    };
   }
+  return values;
+};
 
-  var tokenAliases = {};
-  tokenAliases[anychart.enums.StringToken.BUBBLE_SIZE] = 'size';
-  tokenAliases[anychart.enums.StringToken.RANGE_START] = 'low';
-  tokenAliases[anychart.enums.StringToken.RANGE_END] = 'high';
-  tokenAliases[anychart.enums.StringToken.X_VALUE] = 'x';
 
-  var tokenCustomValues = {};
-  var diff = /** @type {number} */ (rowInfo.get('high')) - /** @type {number} */ (rowInfo.get('low'));
-  tokenCustomValues[anychart.enums.StringToken.RANGE] = {value: diff, type: anychart.enums.TokenType.NUMBER};
-  tokenCustomValues[anychart.enums.StringToken.NAME] = {value: rowInfo.get('name'), type: anychart.enums.TokenType.STRING};
+/**
+ * Applies required data to format context.
+ * @param {anychart.format.Context} provider - Format context.
+ * @param {anychart.data.IRowInfo=} opt_rowInfo - Data source.
+ * @return {anychart.format.Context} - Updated format context.
+ */
+anychart.core.series.Base.prototype.updateContext = function(provider, opt_rowInfo) {
+  var rowInfo = opt_rowInfo || this.getIterator();
 
   provider
-      .statisticsSources([this.getPoint(rowInfo.getIndex()), this, this.getChart()])
+      .statisticsSources(this.createStatisticsSource(rowInfo))
       .dataSource(rowInfo)
-      .tokenAliases(tokenAliases)
-      .tokenCustomValues(tokenCustomValues);
+      .tokenAliases(this.TOKEN_ALIASES)
+      .tokenCustomValues(this.getCustomTokenValues(rowInfo));
 
-  return /** @type {anychart.format.Context} */ (provider.propagate(values));
+  return /** @type {anychart.format.Context} */ (provider.propagate(this.getContextProviderValues(provider, rowInfo)));
 };
 
 
@@ -3729,7 +3785,8 @@ anychart.core.series.Base.prototype.createPositionProvider = function(position, 
 anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  map['fill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'fill',
       anychart.core.settings.fillOrFunctionNormalizer,
@@ -3737,7 +3794,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
       anychart.core.series.Capabilities.ANY);
 
-  map['hoverFill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverFill',
       anychart.core.settings.fillOrFunctionNormalizer,
@@ -3745,7 +3803,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.series.Capabilities.ALLOW_INTERACTIVITY);
 
-  map['selectFill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectFill',
       anychart.core.settings.fillOrFunctionNormalizer,
@@ -3753,7 +3812,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.series.Capabilities.ANY);
 
-  map['negativeFill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'negativeFill',
       anychart.core.settings.fillOrFunctionNormalizer,
@@ -3761,7 +3821,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
       anychart.core.series.Capabilities.ANY);
 
-  map['hoverNegativeFill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverNegativeFill',
       anychart.core.settings.fillOrFunctionNormalizer,
@@ -3769,7 +3830,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.series.Capabilities.ANY);
 
-  map['selectNegativeFill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectNegativeFill',
       anychart.core.settings.fillOrFunctionNormalizer,
@@ -3777,7 +3839,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.series.Capabilities.ANY);
 
-  map['risingFill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'risingFill',
       anychart.core.settings.fillOrFunctionNormalizer,
@@ -3785,7 +3848,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
       anychart.core.series.Capabilities.ANY);
 
-  map['hoverRisingFill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverRisingFill',
       anychart.core.settings.fillOrFunctionNormalizer,
@@ -3793,7 +3857,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.series.Capabilities.ANY);
 
-  map['selectRisingFill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectRisingFill',
       anychart.core.settings.fillOrFunctionNormalizer,
@@ -3801,7 +3866,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.series.Capabilities.ANY);
 
-  map['fallingFill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'fallingFill',
       anychart.core.settings.fillOrFunctionNormalizer,
@@ -3809,14 +3875,16 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
       anychart.core.series.Capabilities.ANY);
 
-  map['hoverFallingFill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverFallingFill',
       anychart.core.settings.fillOrFunctionNormalizer,
       0,
       0,
       anychart.core.series.Capabilities.ANY);
-  map['selectFallingFill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectFallingFill',
       anychart.core.settings.fillOrFunctionNormalizer,
@@ -3824,7 +3892,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.series.Capabilities.ANY);
 
-  map['stroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'stroke',
       anychart.core.settings.strokeOrFunctionNormalizer,
@@ -3832,7 +3901,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
       anychart.core.series.Capabilities.ANY);
 
-  map['hoverStroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverStroke',
       anychart.core.settings.strokeOrFunctionNormalizer,
@@ -3840,7 +3910,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.series.Capabilities.ANY);
 
-  map['selectStroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectStroke',
       anychart.core.settings.strokeOrFunctionNormalizer,
@@ -3848,7 +3919,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.series.Capabilities.ANY);
 
-  map['lowStroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'lowStroke',
       anychart.core.settings.strokeOrFunctionNormalizer,
@@ -3856,7 +3928,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
       anychart.core.series.Capabilities.ANY);
 
-  map['hoverLowStroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverLowStroke',
       anychart.core.settings.strokeOrFunctionNormalizer,
@@ -3864,7 +3937,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.series.Capabilities.ANY);
 
-  map['selectLowStroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectLowStroke',
       anychart.core.settings.strokeOrFunctionNormalizer,
@@ -3872,7 +3946,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.series.Capabilities.ANY);
 
-  map['highStroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'highStroke',
       anychart.core.settings.strokeOrFunctionNormalizer,
@@ -3880,7 +3955,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
       anychart.core.series.Capabilities.ANY);
 
-  map['hoverHighStroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverHighStroke',
       anychart.core.settings.strokeOrFunctionNormalizer,
@@ -3888,7 +3964,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.series.Capabilities.ANY);
 
-  map['selectHighStroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectHighStroke',
       anychart.core.settings.strokeOrFunctionNormalizer,
@@ -3896,7 +3973,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.series.Capabilities.ANY);
 
-  map['negativeStroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'negativeStroke',
       anychart.core.settings.strokeOrFunctionNormalizer,
@@ -3904,7 +3982,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
       anychart.core.series.Capabilities.ANY);
 
-  map['hoverNegativeStroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverNegativeStroke',
       anychart.core.settings.strokeOrFunctionNormalizer,
@@ -3912,7 +3991,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.series.Capabilities.ANY);
 
-  map['selectNegativeStroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectNegativeStroke',
       anychart.core.settings.strokeOrFunctionNormalizer,
@@ -3920,7 +4000,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.series.Capabilities.ANY);
 
-  map['risingStroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'risingStroke',
       anychart.core.settings.strokeOrFunctionNormalizer,
@@ -3928,7 +4009,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
       anychart.core.series.Capabilities.ANY);
 
-  map['hoverRisingStroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverRisingStroke',
       anychart.core.settings.strokeOrFunctionNormalizer,
@@ -3936,7 +4018,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.series.Capabilities.ANY);
 
-  map['selectRisingStroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectRisingStroke',
       anychart.core.settings.strokeOrFunctionNormalizer,
@@ -3944,7 +4027,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.series.Capabilities.ANY);
 
-  map['fallingStroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'fallingStroke',
       anychart.core.settings.strokeOrFunctionNormalizer,
@@ -3952,7 +4036,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
       anychart.core.series.Capabilities.ANY);
 
-  map['hoverFallingStroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverFallingStroke',
       anychart.core.settings.strokeOrFunctionNormalizer,
@@ -3960,7 +4045,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.series.Capabilities.ANY);
 
-  map['selectFallingStroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectFallingStroke',
       anychart.core.settings.strokeOrFunctionNormalizer,
@@ -3968,7 +4054,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.series.Capabilities.ANY);
 
-  map['medianStroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'medianStroke',
       anychart.core.settings.strokeOrFunctionNormalizer,
@@ -3976,7 +4063,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
       anychart.core.series.Capabilities.ANY);
 
-  map['hoverMedianStroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverMedianStroke',
       anychart.core.settings.strokeOrFunctionNormalizer,
@@ -3984,7 +4072,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.series.Capabilities.ANY);
 
-  map['selectMedianStroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectMedianStroke',
       anychart.core.settings.strokeOrFunctionNormalizer,
@@ -3992,7 +4081,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.series.Capabilities.ANY);
 
-  map['stemStroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'stemStroke',
       anychart.core.settings.strokeOrFunctionNormalizer,
@@ -4000,7 +4090,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
       anychart.core.series.Capabilities.ANY);
 
-  map['hoverStemStroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverStemStroke',
       anychart.core.settings.strokeOrFunctionNormalizer,
@@ -4008,7 +4099,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.series.Capabilities.ANY);
 
-  map['selectStemStroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectStemStroke',
       anychart.core.settings.strokeOrFunctionNormalizer,
@@ -4016,7 +4108,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.series.Capabilities.ANY);
 
-  map['whiskerStroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'whiskerStroke',
       anychart.core.settings.strokeOrFunctionNormalizer,
@@ -4024,7 +4117,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
       anychart.core.series.Capabilities.ANY);
 
-  map['hoverWhiskerStroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverWhiskerStroke',
       anychart.core.settings.strokeOrFunctionNormalizer,
@@ -4032,7 +4126,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.series.Capabilities.ANY);
 
-  map['selectWhiskerStroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectWhiskerStroke',
       anychart.core.settings.strokeOrFunctionNormalizer,
@@ -4040,7 +4135,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.series.Capabilities.ANY);
 
-  map['hatchFill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hatchFill',
       anychart.core.settings.hatchFillOrFunctionNormalizer,
@@ -4048,7 +4144,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
       anychart.core.series.Capabilities.ANY);
 
-  map['hoverHatchFill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverHatchFill',
       anychart.core.settings.hatchFillOrFunctionNormalizer,
@@ -4056,7 +4153,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.series.Capabilities.ANY);
 
-  map['selectHatchFill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectHatchFill',
       anychart.core.settings.hatchFillOrFunctionNormalizer,
@@ -4064,7 +4162,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.series.Capabilities.ANY);
 
-  map['negativeHatchFill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'negativeHatchFill',
       anychart.core.settings.hatchFillOrFunctionNormalizer,
@@ -4072,7 +4171,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
       anychart.core.series.Capabilities.ANY);
 
-  map['hoverNegativeHatchFill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverNegativeHatchFill',
       anychart.core.settings.hatchFillOrFunctionNormalizer,
@@ -4080,7 +4180,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.series.Capabilities.ANY);
 
-  map['selectNegativeHatchFill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectNegativeHatchFill',
       anychart.core.settings.hatchFillOrFunctionNormalizer,
@@ -4088,7 +4189,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.series.Capabilities.ANY);
 
-  map['risingHatchFill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'risingHatchFill',
       anychart.core.settings.hatchFillOrFunctionNormalizer,
@@ -4096,7 +4198,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
       anychart.core.series.Capabilities.ANY);
 
-  map['hoverRisingHatchFill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverRisingHatchFill',
       anychart.core.settings.hatchFillOrFunctionNormalizer,
@@ -4104,7 +4207,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.series.Capabilities.ANY);
 
-  map['selectRisingHatchFill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectRisingHatchFill',
       anychart.core.settings.hatchFillOrFunctionNormalizer,
@@ -4112,7 +4216,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.series.Capabilities.ANY);
 
-  map['fallingHatchFill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'fallingHatchFill',
       anychart.core.settings.hatchFillOrFunctionNormalizer,
@@ -4120,7 +4225,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
       anychart.core.series.Capabilities.ANY);
 
-  map['hoverFallingHatchFill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverFallingHatchFill',
       anychart.core.settings.hatchFillOrFunctionNormalizer,
@@ -4128,7 +4234,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.series.Capabilities.ANY);
 
-  map['selectFallingHatchFill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectFallingHatchFill',
       anychart.core.settings.hatchFillOrFunctionNormalizer,
@@ -4136,7 +4243,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.series.Capabilities.ANY);
 
-  map['color'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'color',
       anychart.core.settings.colorNormalizer,
@@ -4144,7 +4252,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
       anychart.core.series.Capabilities.ANY);
 
-  map['xPointPosition'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'xPointPosition',
       anychart.core.settings.numberNormalizer,
@@ -4152,7 +4261,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       anychart.Signal.NEEDS_REDRAW,
       anychart.core.series.Capabilities.ANY);
 
-  map['pointWidth'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'pointWidth',
       anychart.core.settings.numberOrPercentNormalizer,
@@ -4160,7 +4270,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       anychart.Signal.NEEDS_REDRAW,
       anychart.core.drawers.Capabilities.IS_WIDTH_BASED);
 
-  map['connectMissingPoints'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'connectMissingPoints',
       anychart.core.settings.booleanNormalizer,
@@ -4168,7 +4279,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       anychart.Signal.NEEDS_REDRAW,
       anychart.core.drawers.Capabilities.SUPPORTS_CONNECTING_MISSING);
 
-  map['displayNegative'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'displayNegative',
       anychart.core.settings.booleanNormalizer,
@@ -4176,7 +4288,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEEDS_RECALCULATION,
       anychart.core.drawers.Capabilities.NEEDS_SIZE_SCALE);
 
-  map['whiskerWidth'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'whiskerWidth',
       anychart.core.settings.numberOrPercentNormalizer,
@@ -4184,7 +4297,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       anychart.Signal.NEEDS_REDRAW,
       anychart.core.drawers.Capabilities.SUPPORTS_OUTLIERS);
 
-  map['hoverWhiskerWidth'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'hoverWhiskerWidth',
       anychart.core.settings.numberOrPercentNormalizer,
@@ -4192,7 +4306,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.drawers.Capabilities.SUPPORTS_OUTLIERS);
 
-  map['selectWhiskerWidth'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'selectWhiskerWidth',
       anychart.core.settings.numberOrPercentNormalizer,
@@ -4200,7 +4315,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.drawers.Capabilities.SUPPORTS_OUTLIERS);
 
-  map['type'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'type',
       anychart.core.settings.markerTypeNormalizer,
@@ -4208,7 +4324,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
       anychart.core.drawers.Capabilities.IS_MARKER_BASED);
 
-  map['hoverType'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'hoverType',
       anychart.core.settings.markerTypeNormalizer,
@@ -4216,7 +4333,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.drawers.Capabilities.IS_MARKER_BASED);
 
-  map['selectType'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'selectType',
       anychart.core.settings.markerTypeNormalizer,
@@ -4224,7 +4342,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.drawers.Capabilities.IS_MARKER_BASED);
 
-  map['size'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'size',
       anychart.core.settings.numberNormalizer,
@@ -4232,7 +4351,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       anychart.Signal.NEEDS_REDRAW,
       anychart.core.drawers.Capabilities.IS_MARKER_BASED);
 
-  map['hoverSize'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'hoverSize',
       anychart.core.settings.numberNormalizer,
@@ -4240,7 +4360,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.drawers.Capabilities.IS_MARKER_BASED);
 
-  map['selectSize'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'selectSize',
       anychart.core.settings.numberNormalizer,
@@ -4248,7 +4369,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       anychart.core.drawers.Capabilities.IS_MARKER_BASED);
 
-  map['stepDirection'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'stepDirection',
       anychart.enums.normalizeStepDirection,
@@ -4256,7 +4378,8 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       anychart.Signal.NEEDS_REDRAW,
       anychart.core.drawers.Capabilities.SUPPORTS_STEP_DIRECTION);
 
-  map['isVertical'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'isVertical',
       anychart.core.settings.boolOrNullNormalizer,
@@ -4397,9 +4520,9 @@ anychart.core.series.Base.prototype.setupByJSON = function(config, opt_default) 
   this.a11y(config['a11y']);
 
   if (this.supportsLabels()) {
-    this.labels().setupByVal(config['labels'], opt_default);
-    this.hoverLabels().setupByVal(config['hoverLabels'], opt_default);
-    this.selectLabels().setupByVal(config['selectLabels'], opt_default);
+    this.labels().setupInternal(!!opt_default, config['labels']);
+    this.hoverLabels().setupInternal(!!opt_default, config['hoverLabels']);
+    this.selectLabels().setupInternal(!!opt_default, config['selectLabels']);
   }
 
   anychart.core.settings.deserialize(this, anychart.core.series.Base.PROPERTY_DESCRIPTORS, config);
@@ -4420,13 +4543,13 @@ anychart.core.series.Base.prototype.disposeInternal = function() {
       this.markers_,
       this.hoverMarkers_,
       this.selectMarkers_,
-      this.labels_,
-      this.hoverLabels_,
-      this.selectLabels_,
+      this.labelsInternal,
+      this.hoverLabelsInternal,
+      this.selectLabelsInternal,
       this.outlierMarkers_,
       this.hoverOutlierMarkers_,
       this.selectOutlierMarkers_,
-      this.tooltip_,
+      this.tooltipInternal,
       this.legendItem_,
       this.error_
   );
@@ -4444,13 +4567,13 @@ anychart.core.series.Base.prototype.disposeInternal = function() {
   delete this.markers_;
   delete this.hoverMarkers_;
   delete this.selectMarkers_;
-  delete this.labels_;
-  delete this.hoverLabels_;
-  delete this.selectLabels_;
+  delete this.labelsInternal;
+  delete this.hoverLabelsInternal;
+  delete this.selectLabelsInternal;
   delete this.outlierMarkers_;
   delete this.hoverOutlierMarkers_;
   delete this.selectOutlierMarkers_;
-  delete this.tooltip_;
+  delete this.tooltipInternal;
   delete this.legendItem_;
   delete this.error_;
   anychart.core.series.Base.base(this, 'disposeInternal');

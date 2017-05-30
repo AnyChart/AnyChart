@@ -182,7 +182,7 @@ anychart.scales.LinearColor.prototype.valueToColor = function(value) {
         relativeRatio);
   }
 
-  return goog.color.rgbArrayToHex(/** @type {!goog.color.Rgb} */(resultRGBColor));
+  return goog.isArray(resultRGBColor) ? goog.color.rgbArrayToHex(/** @type {!goog.color.Rgb} */(resultRGBColor)) : resultRGBColor.color;
 };
 
 

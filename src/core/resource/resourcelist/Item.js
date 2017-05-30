@@ -132,9 +132,9 @@ anychart.core.resource.resourceList.Item.prototype.SUPPORTED_SIGNALS =
  */
 anychart.core.resource.resourceList.Item.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES;
+
+
 //endregion
-
-
 //region --- IObjectWithSettings IMPLEMENTATION ---
 /** @inheritDoc */
 anychart.core.resource.resourceList.Item.prototype.check = function(flags) {
@@ -170,9 +170,9 @@ anychart.core.resource.resourceList.Item.prototype.hasOwnOption = function(name)
 anychart.core.resource.resourceList.Item.prototype.setOption = function(name, value) {
   this.settings[name] = value;
 };
+
+
 //endregion
-
-
 //region --- ADDITIONAL SETTINGS METHODS ---
 /**
  * Sets default value to the instance.
@@ -280,9 +280,9 @@ anychart.core.resource.resourceList.Item.prototype.getComplexOption = function(n
     return rv;
   }
 };
+
+
 //endregion
-
-
 //region --- PROPERTIES ---
 /**
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
@@ -290,42 +290,48 @@ anychart.core.resource.resourceList.Item.prototype.getComplexOption = function(n
 anychart.core.resource.resourceList.Item.PROPERTY_DESCRIPTORS = (function() {
   var map = {};
 
-  map['width'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'width',
       anychart.core.settings.numberOrPercentNormalizer,
       0,
       0);
 
-  map['imageSrc'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'imageSrc',
       anychart.core.settings.stringNormalizer,
       0,
       0);
 
-  map['name'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'name',
       anychart.core.settings.stringNormalizer,
       0,
       0);
 
-  map['type'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'type',
       anychart.core.settings.stringNormalizer,
       0,
       0);
 
-  map['description'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'description',
       anychart.core.settings.stringNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['tags'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'tags',
       anychart.core.settings.arrayNormalizer,
@@ -335,9 +341,9 @@ anychart.core.resource.resourceList.Item.PROPERTY_DESCRIPTORS = (function() {
   return map;
 })();
 anychart.core.settings.populate(anychart.core.resource.resourceList.Item, anychart.core.resource.resourceList.Item.PROPERTY_DESCRIPTORS);
+
+
 //endregion
-
-
 //region --- SETTINGS ---
 /**
  * Applies settings to elements.
@@ -366,9 +372,8 @@ anychart.core.resource.resourceList.Item.DEFAULT_TAG_LABEL_SETTINGS = {
   'rotation': 0
 };
 
+
 //endregion
-
-
 //region --- BOUNDS ---
 /**
  * Getter/setter for offsetY.
@@ -468,9 +473,9 @@ anychart.core.resource.resourceList.Item.prototype.calculateCoordinates = functi
   element.width(textWidth);
   coords['height'] = element.getHeight() + marginBottom;
 };
+
+
 //endregion
-
-
 //region --- EVENTS HANDLING---
 /**
  * Click handler.
@@ -491,9 +496,9 @@ anychart.core.resource.resourceList.Item.prototype.handleMouseClick_ = function(
   } else
     return false;
 };
+
+
 //endregion
-
-
 //region --- DRAWING ---
 /** @inheritDoc */
 anychart.core.resource.resourceList.Item.prototype.remove = function() {
@@ -718,9 +723,9 @@ anychart.core.resource.resourceList.Item.prototype.draw = function() {
   if (manualSuspend) stage.resume();
   return this;
 };
+
+
 //endregion
-
-
 //region --- SETUP/DISPOSE ---
 /** @inheritDoc */
 anychart.core.resource.resourceList.Item.prototype.serialize = function() {

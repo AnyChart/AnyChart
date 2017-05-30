@@ -55,21 +55,9 @@ anychart.core.series.Radar.prototype.getDirectionAngle = function(positive) {
   var angle = startAngle - 90 + 360 * x;
   if (!positive)
     angle += 180;
-  return angle;
-};
-
-
-/** @inheritDoc */
-anychart.core.series.Radar.prototype.checkDirectionIsPositive = function(position) {
-  var result;
-  var inverted = /** @type {boolean} */(this.yScale().inverted());
-  if (position == 'low' || position == 'lowest')
-    result = inverted;
-  else if (position == 'high' || position == 'highest')
-    result = !inverted;
-  else
-    result = true;
-  return result;
+  if (this.yScale().inverted())
+    angle += 180;
+  return goog.math.standardAngle(angle);
 };
 
 
@@ -169,8 +157,8 @@ anychart.core.series.Radar.prototype.prepareAdditional = function() {
 
 
 /** @inheritDoc */
-anychart.core.series.Radar.prototype.prepareMetaMakers = function() {
-  anychart.core.series.Radar.base(this, 'prepareMetaMakers');
+anychart.core.series.Radar.prototype.prepareMetaMakers = function(yNames, yColumns) {
+  anychart.core.series.Radar.base(this, 'prepareMetaMakers', yNames, yColumns);
   if (this.needsZero() && !this.innerRadius) {
     var zero = this.ratiosToPixelPairs(0, [0]);
     this.zeroX = zero[0];
@@ -229,6 +217,50 @@ anychart.core.series.Radar.prototype.ratiosToPixelPairs = function(x, ys) {
 /** @inheritDoc */
 anychart.core.series.Radar.prototype.getXPointPosition = function() {
   return 0;
+};
+
+
+/**
+ * Returns if the chart is sorted mode.
+ * @return {boolean}
+ */
+anychart.core.series.Radar.prototype.sortedMode = function() {
+  return true;
+};
+
+
+/** @inheritDoc */
+anychart.core.series.Radar.prototype.makeBrowserEvent = function(e) {
+  //this method is invoked only for events from data layer
+  var res = anychart.core.VisualBase.prototype.makeBrowserEvent.call(this, e);
+  if (this.isDiscreteBased()) {
+    res['pointIndex'] = anychart.utils.toNumber(anychart.utils.extractTag(res['domTarget']).index);
+  } else if (this.sortedMode()) {
+    var clientX = e['clientX'];
+    var clientY = e['clientY'];
+
+    var containerOffset = this.container().getStage().getClientPosition();
+
+    var x = clientX - containerOffset.x;
+    var y = clientY - containerOffset.y;
+
+    var cx = Math.round(this.pixelBoundsCache.left + this.pixelBoundsCache.width / 2);
+    var cy = Math.round(this.pixelBoundsCache.top + this.pixelBoundsCache.height / 2);
+
+    var dx = x - cx;
+    var dy = y - cy;
+    var angle = Math.PI / 2 + Math.atan2(dy, -dx) + goog.math.toRadians(/** @type {number} */(this.getOption('startAngle')));
+    angle = goog.math.modulo(angle, Math.PI * 2);
+
+    var ratio = 1 - (angle / (Math.PI * 2));
+    var value = this.xScale().inverseTransform(ratio);
+    var index = this.findX(value);
+    if (index < 0) index = NaN;
+
+    res['pointIndex'] = /** @type {number} */(index);
+  }
+
+  return res;
 };
 
 

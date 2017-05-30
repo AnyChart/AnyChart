@@ -8,7 +8,7 @@ goog.require('anychart.core.PyramidFunnelBase');
  * Pyramid Chart Class.<br/>
  * <b>Note:</b> Use method {@link anychart.pyramid} to get an instance of this class:
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data for the chart.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @extends {anychart.core.PyramidFunnelBase}
  * @constructor
  */

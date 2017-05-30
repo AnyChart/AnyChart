@@ -61,7 +61,7 @@ anychart.core.drawers.PolarColumn.prototype.startDrawing = function(shapeManager
 
 
 /** @inheritDoc */
-anychart.core.drawers.PolarColumn.prototype.drawPointShape = function(point, shapes) {
+anychart.core.drawers.PolarColumn.prototype.drawPointShape = function(point, path, hatchFill) {
   var zeroRatio = this.series.planIsStacked() ? /** @type {number} */(point.meta('zeroRatio')) : 0;
   var xRatio = /** @type {number} */(point.meta('xRatio'));
   var yRatio = /** @type {number} */(point.meta('valueRatio'));
@@ -71,7 +71,6 @@ anychart.core.drawers.PolarColumn.prototype.drawPointShape = function(point, sha
   var leftSide = this.series.ratiosToPixelPairs(leftXRatio, [zeroRatio, yRatio]);
   var rightSide = this.series.ratiosToPixelPairs(rightXRatio, [zeroRatio, yRatio]);
 
-  var path = /** @type {acgraph.vector.Path} */(shapes['path']);
   path.moveTo(leftSide[2], leftSide[3]);
   path.curveTo.apply(path, anychart.math.getPolarLineParamsSimple(
       leftSide[2], leftSide[3], leftXRatio, yRatio,
@@ -83,6 +82,5 @@ anychart.core.drawers.PolarColumn.prototype.drawPointShape = function(point, sha
       leftSide[0], leftSide[1], leftXRatio, zeroRatio,
       this.cx, this.cy, this.radius, this.innerRadius, this.zeroAngle, true));
   path.close();
-  var hatch = /** @type {acgraph.vector.Path} */(shapes['hatchFill']);
-  hatch.deserialize(path.serializePathArgs());
+  hatchFill.deserialize(path.serializePathArgs());
 };

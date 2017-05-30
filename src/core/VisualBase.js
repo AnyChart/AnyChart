@@ -277,6 +277,15 @@ anychart.core.VisualBase.prototype.getOwnerElement = function(target) {
 
 
 /**
+ * Whether stage for this element owned by element.
+ * @return {boolean} Whether stage is owned by element.
+ */
+anychart.core.VisualBase.prototype.isOwnStage = function() {
+  return this.stageOwn_;
+};
+
+
+/**
  * Getter/setter for container.
  * @param {(acgraph.vector.ILayer|string|Element)=} opt_value .
  * @return {(acgraph.vector.ILayer|!anychart.core.VisualBase)} .
@@ -968,9 +977,9 @@ anychart.core.VisualBase.prototype.getPdfBase64String = function(onSuccessOrOpti
     stage.getPdfBase64String(args['onSuccess'], args['onError'], args['paperSize'] || args['width'], args['landscape'] || args['height'], args['x'], args['y']);
   }
 };
+
+
 //endregion
-
-
 /**
  * Print all element on related stage.
  * @param {(acgraph.vector.PaperSize|Object)=} opt_paperSizeOrOptions Paper size or object with options/
@@ -993,62 +1002,6 @@ anychart.core.VisualBase.prototype.print = function(opt_paperSizeOrOptions, opt_
 
 //----------------------------------------------------------------------------------------------------------------------
 //
-//  Deprecated Export.
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Saves the current visual state into PNG file.
- * @deprecated Since 7.6.0. Use saveAsPng() method instead.
- */
-anychart.core.VisualBase.prototype.saveAsPNG = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['saveAsPNG()', 'saveAsPng()'], true);
-  this.saveAsPng();
-};
-
-
-/**
- * Saves the current visual state into JPEG file.
- * @deprecated Since 7.6.0. Use saveAsJpg() method instead.
- */
-anychart.core.VisualBase.prototype.saveAsJPG = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['saveAsJPG()', 'saveAsJpg()'], true);
-  this.saveAsJpg();
-};
-
-
-/**
- * Saves the current visual state into PDF file.
- * @deprecated Since 7.6.0. Use saveAsPdf() method instead.
- */
-anychart.core.VisualBase.prototype.saveAsPDF = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['saveAsPDF()', 'saveAsPdf()'], true);
-  this.saveAsPdf();
-};
-
-
-/**
- * Saves the current visual state into SVG file.
- * @deprecated Since 7.6.0. Use saveAsSvg() method instead.
- */
-anychart.core.VisualBase.prototype.saveAsSVG = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['saveAsSVG()', 'saveAsSvg()'], true);
-  this.saveAsSvg();
-};
-
-
-/**
- * Returns SVG string if type of content SVG otherwise returns empty string.
- * @deprecated Since 7.6.0. Use toSvg() method instead.
- * @return {string}
- */
-anychart.core.VisualBase.prototype.toSVG = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['toSVG()', 'toSvg()'], true);
-  return this.toSvg();
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//
 //  JSON.
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -1063,12 +1016,13 @@ anychart.core.VisualBase.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.VisualBase.prototype.specialSetupByVal = function(value) {
-  if (goog.isBoolean(value) || goog.isNull(value)) {
-    this.enabled(!!value);
+anychart.core.VisualBase.prototype.setupSpecial = function(isDefault, var_args) {
+  var arg0 = arguments[1];
+  if (goog.isBoolean(arg0) || goog.isNull(arg0)) {
+    this.enabled(!!arg0);
     return true;
   }
-  return anychart.core.Base.prototype.specialSetupByVal.apply(this, arguments);
+  return false;
 };
 
 
@@ -1102,11 +1056,6 @@ anychart.core.VisualBase.prototype.disposeInternal = function() {
 /** @suppress {deprecated} */
 (function() {
   var proto = anychart.core.VisualBase.prototype;
-  proto['saveAsPNG'] = proto.saveAsPNG;//deprecated
-  proto['saveAsJPG'] = proto.saveAsJPG;//deprecated
-  proto['saveAsSVG'] = proto.saveAsSVG;//deprecated
-  proto['saveAsPDF'] = proto.saveAsPDF;//deprecated
-  proto['toSVG'] = proto.toSVG;//deprecated
 
   proto['zIndex'] = proto.zIndex;//in docs/final
   proto['enabled'] = proto.enabled;//doc|ex

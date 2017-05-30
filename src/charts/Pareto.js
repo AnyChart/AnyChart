@@ -24,6 +24,8 @@ anychart.charts.Pareto = function() {
    */
   this.percentScale = anychart.scales.linear();
   this.percentScale.minimum(0).maximum(100);
+
+  this.setType(anychart.enums.ChartTypes.PARETO);
 };
 goog.inherits(anychart.charts.Pareto, anychart.core.CartesianBase);
 
@@ -31,8 +33,8 @@ goog.inherits(anychart.charts.Pareto, anychart.core.CartesianBase);
 //region --- Working with data
 /**
  * Getter/setter for data.
- * @param {(anychart.data.View|anychart.data.Set|anychart.data.TableData|Array|string)=} opt_value .
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
+ * @param {(anychart.data.View|anychart.data.Set|anychart.data.DataSettings|Array|string)=} opt_value .
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @return {(anychart.data.View|anychart.charts.Pareto)} .
  * @override
  */
@@ -605,4 +607,6 @@ anychart.charts.Pareto.prototype.setupByJSON = function(config, opt_default) {
   proto['xScroller'] = proto.xScroller;
   proto['getStat'] = proto.getStat;
   proto['annotations'] = proto.annotations;
+  proto['getXScales'] = proto.getXScales;
+  proto['getYScales'] = proto.getYScales;
 })();

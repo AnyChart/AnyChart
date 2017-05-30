@@ -10,6 +10,7 @@ goog.require('anychart.data');
 goog.require('anychart.enums');
 goog.require('anychart.utils');
 goog.require('goog.array');
+goog.require('goog.math.Rect');
 
 
 
@@ -169,8 +170,14 @@ anychart.core.series.Cartesian.prototype.applyDefaultsToElements = function(defa
 //
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
-anychart.core.series.Cartesian.prototype.getCategoryWidth = function() {
-  return (this.xScale().getPointWidthRatio() || (this.xScale().getZoomFactor() / this.getIterator().getRowsCount())) *
+anychart.core.series.Cartesian.prototype.getCategoryWidth = function(opt_categoryIndex) {
+  var ratio;
+  if (goog.isDef(opt_categoryIndex) && this.xScale() instanceof anychart.scales.Ordinal) {
+    ratio = this.xScale().weightRatios()[opt_categoryIndex];
+  } else {
+    ratio = this.xScale().getPointWidthRatio();
+  }
+  return (ratio || (this.xScale().getZoomFactor() / this.getIterator().getRowsCount())) *
       (this.getOption('isVertical') ? this.pixelBoundsCache.height : this.pixelBoundsCache.width);
 };
 
@@ -263,7 +270,9 @@ anychart.core.series.Cartesian.prototype.getColorResolutionContext = function(op
     return {
       'index': iterator.getIndex(),
       'sourceColor': source,
-      'iterator': iterator
+      'iterator': iterator,
+      'series': this,
+      'chart': this.chart
     };
   }
   return {
@@ -280,7 +289,9 @@ anychart.core.series.Cartesian.prototype.getHatchFillResolutionContext = functio
     return {
       'index': iterator.getIndex(),
       'sourceHatchFill': source,
-      'iterator': iterator
+      'iterator': iterator,
+      'series': this,
+      'chart': this.chart
     };
   }
   return {
@@ -299,7 +310,7 @@ anychart.core.series.Cartesian.prototype.getHatchFillResolutionContext = functio
 /**
  * Getter/setter for series mapping.
  * @param {?(anychart.data.View|anychart.data.Set|Array|string)=} opt_value Value to set.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @return {(!anychart.core.series.Cartesian|!anychart.data.View)} Returns itself if used as a setter or the mapping if used as a getter.
  */
 anychart.core.series.Cartesian.prototype.data = function(opt_value, opt_csvSettings) {
@@ -458,13 +469,13 @@ anychart.core.series.Cartesian.prototype.setValueInternal = function(index, name
  * @return {boolean} If anything changed.
  */
 anychart.core.series.Cartesian.prototype.excludePoint = function(indexes) {
-  if (!this.excludedPoints_)
-    this.excludedPoints_ = [];
+  if (!this.excludedPoints)
+    this.excludedPoints = [];
   if (!goog.isArray(indexes))
     indexes = [indexes];
   var doInvalidate = false;
   for (var i = 0; i < indexes.length; i++) {
-    doInvalidate = goog.array.binaryInsert(this.excludedPoints_, indexes[i]) || doInvalidate;
+    doInvalidate = goog.array.binaryInsert(this.excludedPoints, indexes[i]) || doInvalidate;
   }
   if (doInvalidate)
     this.invalidate(anychart.ConsistencyState.SERIES_POINTS,
@@ -479,13 +490,13 @@ anychart.core.series.Cartesian.prototype.excludePoint = function(indexes) {
  * @return {boolean} If anything changed.
  */
 anychart.core.series.Cartesian.prototype.includePoint = function(indexes) {
-  if (!this.excludedPoints_)
+  if (!this.excludedPoints)
     return false;
   if (!goog.isArray(indexes))
     indexes = [indexes];
   var doInvalidate = false;
   for (var i = 0; i < indexes.length; i++) {
-    doInvalidate = goog.array.binaryRemove(this.excludedPoints_, indexes[i]) || doInvalidate;
+    doInvalidate = goog.array.binaryRemove(this.excludedPoints, indexes[i]) || doInvalidate;
   }
   if (doInvalidate)
     this.invalidate(anychart.ConsistencyState.SERIES_POINTS,
@@ -499,7 +510,7 @@ anychart.core.series.Cartesian.prototype.includePoint = function(indexes) {
  * @return {Array.<number>}
  */
 anychart.core.series.Cartesian.prototype.getExcludedIndexesInternal = function() {
-  return this.excludedPoints_ || [];
+  return this.excludedPoints || [];
 };
 
 
@@ -508,7 +519,7 @@ anychart.core.series.Cartesian.prototype.getExcludedIndexesInternal = function()
  * @return {Array.<anychart.core.Point>}
  */
 anychart.core.series.Cartesian.prototype.getExcludedPoints = function() {
-  return goog.array.map(this.excludedPoints_ || [], this.getPoint, this);
+  return goog.array.map(this.excludedPoints || [], this.getPoint, this);
 };
 
 
@@ -517,10 +528,10 @@ anychart.core.series.Cartesian.prototype.getExcludedPoints = function() {
  * @param {number|Array.<number>} indexes Point index.
  */
 anychart.core.series.Cartesian.prototype.keepOnlyPoints = function(indexes) {
-  this.excludedPoints_ ? this.excludedPoints_.length = 0 : this.excludedPoints_ = [];
+  this.excludedPoints ? this.excludedPoints.length = 0 : this.excludedPoints = [];
   var pointsCount = this.getIterator().getRowsCount();
   for (var i = 0; i < pointsCount; i++) {
-    this.excludedPoints_.push(i);
+    this.excludedPoints.push(i);
   }
   this.includePoint(indexes);
 };
@@ -531,8 +542,8 @@ anychart.core.series.Cartesian.prototype.keepOnlyPoints = function(indexes) {
  * @return {boolean} If anything changed.
  */
 anychart.core.series.Cartesian.prototype.includeAllPoints = function() {
-  if (this.excludedPoints_ && this.excludedPoints_.length) {
-    this.excludedPoints_.length = 0;
+  if (this.excludedPoints && this.excludedPoints.length) {
+    this.excludedPoints.length = 0;
     this.invalidate(anychart.ConsistencyState.SERIES_POINTS,
         anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW);
     return true;
@@ -603,11 +614,10 @@ anychart.core.series.Cartesian.prototype.isPointVisible = function(point) {
  * @param {Function} dataPusher
  * @param {Function} xNormalizer
  * @param {Function} xMissingChecker
- * @param {string=} opt_nameField
  * @return {anychart.core.series.Cartesian.DrawingPlan}
- * @private
+ * @protected
  */
-anychart.core.series.Cartesian.prototype.getDrawingData_ = function(data, dataPusher, xNormalizer, xMissingChecker, opt_nameField) {
+anychart.core.series.Cartesian.prototype.getDrawingData = function(data, dataPusher, xNormalizer, xMissingChecker) {
   // anychart.performance.start('Drawing plan calc');
   var dataSource = /** @type {anychart.data.IView} */(this.data());
   var iterator = dataSource.getIterator();
@@ -615,10 +625,17 @@ anychart.core.series.Cartesian.prototype.getDrawingData_ = function(data, dataPu
   var hasXErrors = false;
   var hasYErrors = false;
   var checkSize = this.isSizeBased();
+  var i, name;
 
   var additionalNames = [];
+  if (this.isDiscreteBased() && this.supportsPointSettings()) {
+    additionalNames.push('zIndex');
+  }
   if (checkSize) {
     additionalNames.push('size');
+  }
+  if (this.needsHeat()) {
+    additionalNames.push('heat');
   }
   if (this.supportsOutliers()) {
     additionalNames.push('outliers');
@@ -653,8 +670,19 @@ anychart.core.series.Cartesian.prototype.getDrawingData_ = function(data, dataPu
       }
     }
   }
-  if (opt_nameField && dataSource.checkFieldExist(opt_nameField))
-    additionalNames.push(opt_nameField);
+  if (yScale instanceof anychart.scales.Ordinal) {
+    name = yScale.getNamesField();
+    if (name && dataSource.checkFieldExist(name))
+      additionalNames.push(name);
+  }
+  var xScale = /** @type {anychart.scales.Base} */ (this.xScale());
+  if (xScale instanceof anychart.scales.Ordinal) {
+    name = xScale.getNamesField();
+    if (name && dataSource.checkFieldExist(name))
+      additionalNames.push(name);
+  }
+
+  var postProcessingMeta = this.initPostProcessingMeta();
 
   while (iterator.advance()) {
     var xValue = xNormalizer(iterator.get('x'));
@@ -662,11 +690,11 @@ anychart.core.series.Cartesian.prototype.getDrawingData_ = function(data, dataPu
       continue;
     var pointData = {};
     pointData['x'] = xValue;
-    var i, len, name, val, missing = false;
+    var len, val, missing = false;
     var yValueNames = this.getYValueNames();
     for (i = 0, len = yValueNames.length; i < len; i++) {
       name = yValueNames[i];
-      val = iterator.get(name);
+      val = this.normalizeYValue(iterator.get(name));
       missing = missing || yScale.isMissing(val);
       pointData[name] = val;
     }
@@ -688,6 +716,9 @@ anychart.core.series.Cartesian.prototype.getDrawingData_ = function(data, dataPu
       data: pointData,
       meta: meta
     };
+
+    this.postProcessPoint(iterator, point, postProcessingMeta);
+
     dataPusher(data, point);
   }
 
@@ -719,6 +750,35 @@ anychart.core.series.Cartesian.prototype.getDrawingData_ = function(data, dataPu
     hasPointYErrors: hasYErrors,
     hasPointErrors: hasXErrors || hasYErrors
   };
+};
+
+
+/**
+ * Creates a meta object used in point post-processing.
+ * @return {?Object}
+ */
+anychart.core.series.Cartesian.prototype.initPostProcessingMeta = function() {
+  return null;
+};
+
+
+/**
+ * Modifies the point info, if needed.
+ * @param {anychart.data.IRowInfo} iterator
+ * @param {{data: Object, meta: Object}} point
+ * @param {?Object} processingMeta
+ */
+anychart.core.series.Cartesian.prototype.postProcessPoint = function(iterator, point, processingMeta) {
+};
+
+
+/**
+ * @param {number} value
+ * @return {number}
+ * @protected
+ */
+anychart.core.series.Cartesian.prototype.normalizeYValue = function(value) {
+  return value;
 };
 
 
@@ -765,7 +825,7 @@ anychart.core.series.Cartesian.prototype.getScatterDrawingPlan = function(sorted
       };
   var xMissingChecker = isNaN;
 
-  var result = this.getDrawingData_([], dataPusher, xNormalizer, xMissingChecker);
+  var result = this.getDrawingData([], dataPusher, xNormalizer, xMissingChecker);
   if (needsSorting)
     goog.array.sort(result.data, anychart.core.series.Cartesian.comparePointsXNumericAsc);
   return result;
@@ -776,11 +836,10 @@ anychart.core.series.Cartesian.prototype.getScatterDrawingPlan = function(sorted
  * @param {Object.<string, number>} xHashMap
  * @param {Array.<*>} xArray
  * @param {boolean} restrictX
- * @param {string=} opt_namesField
  * @param {boolean=} opt_seriesIndependent
  * @return {anychart.core.series.Cartesian.DrawingPlan}
  */
-anychart.core.series.Cartesian.prototype.getOrdinalDrawingPlan = function(xHashMap, xArray, restrictX, opt_namesField, opt_seriesIndependent) {
+anychart.core.series.Cartesian.prototype.getOrdinalDrawingPlan = function(xHashMap, xArray, restrictX, opt_seriesIndependent) {
   var dataPusher;
   if (restrictX) {
     // dataPusher must return a point that was replaced by the point pushed (if any)
@@ -823,7 +882,7 @@ anychart.core.series.Cartesian.prototype.getOrdinalDrawingPlan = function(xHashM
     return a === undefined;
   };
 
-  var result = this.getDrawingData_(new Array(xArray.length), dataPusher, xNormalizer, xMissingChecker, opt_namesField);
+  var result = this.getDrawingData(new Array(xArray.length), dataPusher, xNormalizer, xMissingChecker);
   var data = result.data;
   for (var i = 0; i < data.length; i++) {
     if (!data[i])
@@ -945,6 +1004,65 @@ anychart.core.series.Cartesian.prototype.findInRangeByX = function(minValue, max
 };
 
 
+/**
+ * @param {number} left
+ * @param {number} top
+ * @param {number} width
+ * @param {number} height
+ * @return {Array<number>}
+ */
+anychart.core.series.Cartesian.prototype.getPointsInRect = function(left, top, width, height) {
+  var iter = this.getIterator();
+  iter.reset();
+  var res = [];
+  while (iter.advance()) {
+    if (this.pointIsInRect(iter, left, top, width, height)) {
+      res.push(iter.getIndex());
+    }
+  }
+  return res;
+};
+
+
+/**
+ * Checks whether the point intersects the rect in any point.
+ * @param {anychart.data.IRowInfo} point
+ * @param {number} left
+ * @param {number} top
+ * @param {number} width
+ * @param {number} height
+ * @return {boolean}
+ * @protected
+ */
+anychart.core.series.Cartesian.prototype.pointIsInRect = function(point, left, top, width, height) {
+  var shapes;
+  var result = false;
+  if (this.shapeManager instanceof anychart.core.shapeManagers.PerPoint &&
+      (shapes = /** @type {Object.<acgraph.vector.Element>} */(point.meta(this.shapeManager.shapesFieldName)))) {
+    result = this.drawer.checkShapesInRect(shapes, left, top, width, height);
+  } else {
+    var x1 = /** @type {number} */(point.meta(this.config.anchoredPositionBottom + 'X'));
+    var y1 = /** @type {number} */(point.meta(this.config.anchoredPositionBottom));
+    if (this.config.anchoredPositionBottom == this.config.anchoredPositionTop) {
+      result = (left <= x1 && x1 <= left + width && top <= y1 && y1 <= top + height);
+    } else {
+      var x2 = /** @type {number} */(point.meta(this.config.anchoredPositionTop + 'X'));
+      var y2 = /** @type {number} */(point.meta(this.config.anchoredPositionTop));
+      result = anychart.math.checkRectIntersection([x1, y1, x2, y2], [
+        left, top,
+        left + width, top,
+        left + width, top + height,
+        left, top + height
+      ]);
+    }
+  }
+  if (!result && (shapes = /** @type {anychart.core.ui.MarkersFactory.Marker} */(point.meta('marker')))) {
+    result = shapes.getDomElement().getBounds().intersects(new goog.math.Rect(left, top, width, height));
+  }
+  return result;
+};
+
+
 //endregion
 //region --- Interactivity
 //----------------------------------------------------------------------------------------------------------------------
@@ -963,11 +1081,13 @@ anychart.core.series.Cartesian.prototype.applyAppearanceToPoint = function(point
         /** @type {Object.<string, acgraph.vector.Shape>} */(iterator.meta('shapes')));
   }
   if (this.supportsOutliers()) {
-    this.drawPointOutliers(iterator, pointState);
+    this.drawPointOutliers(iterator, pointState, true);
   }
   this.drawer.updatePoint(iterator, pointState);
-  this.drawMarker(iterator, pointState);
-  this.drawLabel(iterator, pointState);
+  if (this.check(anychart.core.series.Capabilities.SUPPORTS_MARKERS))
+    this.drawMarker(iterator, pointState, true);
+  if (this.check(anychart.core.series.Capabilities.SUPPORTS_LABELS))
+    this.drawLabel(iterator, pointState, true);
 };
 
 
@@ -983,11 +1103,11 @@ anychart.core.series.Cartesian.prototype.finalizePointAppearance = goog.nullFunc
  */
 anychart.core.series.Cartesian.prototype.applyAppearanceToSeries = function(pointState) {
   var iterator = this.getIterator();
-  this.drawer.updatePoint(iterator, pointState);
   this.shapeManager.updateColors(pointState,
       /** @type {Object.<string, acgraph.vector.Shape>} */(iterator.meta('shapes')));
+  this.drawer.updatePoint(iterator, pointState);
   if (this.supportsOutliers()) {
-    this.drawPointOutliers(iterator, pointState);
+    this.drawPointOutliers(iterator, pointState, true);
   }
 };
 
@@ -1140,18 +1260,26 @@ anychart.core.series.Cartesian.prototype.unselect = function(opt_indexOrIndexes)
  * @return {!anychart.core.series.Cartesian} {@link anychart.core.series.Cartesian} instance for method chaining.
  */
 anychart.core.series.Cartesian.prototype.selectPoint = function(indexOrIndexes, opt_event) {
+  return this.selectPointInternal(indexOrIndexes, !!(opt_event && opt_event.shiftKey));
+};
+
+
+/**
+ * Selects a point of the series by its index. Internal, because other selectPoint methods has other signature.
+ * @param {number|Array<number>} indexOrIndexes Index of the point to select.
+ * @param {boolean} appendSelect If the shift or meta key is pressed.
+ * @return {!anychart.core.series.Cartesian} {@link anychart.core.series.Cartesian} instance for method chaining.
+ */
+anychart.core.series.Cartesian.prototype.selectPointInternal = function(indexOrIndexes, appendSelect) {
   if (!this.enabled())
     return this;
 
-  var unselect = !(opt_event && opt_event.shiftKey);
-
   if (goog.isArray(indexOrIndexes)) {
-    if (!opt_event)
+    if (!appendSelect)
       this.unselect();
-
-    this.state.setPointState(anychart.PointState.SELECT, indexOrIndexes, unselect ? anychart.PointState.HOVER : undefined);
+    this.state.setPointState(anychart.PointState.SELECT, indexOrIndexes, appendSelect ? undefined : anychart.PointState.HOVER);
   } else if (goog.isNumber(indexOrIndexes)) {
-    this.state.setPointState(anychart.PointState.SELECT, indexOrIndexes, unselect ? anychart.PointState.HOVER : undefined);
+    this.state.setPointState(anychart.PointState.SELECT, indexOrIndexes, appendSelect ? undefined : anychart.PointState.HOVER);
   }
 
   return this;

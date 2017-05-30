@@ -57,9 +57,9 @@ anychart.core.annotations.InfiniteLine.prototype.type = anychart.enums.Annotatio
  * @type {anychart.core.annotations.AnchorSupport}
  */
 anychart.core.annotations.InfiniteLine.prototype.SUPPORTED_ANCHORS = anychart.core.annotations.AnchorSupport.TWO_POINTS;
+
+
 //endregion
-
-
 //region Drawing
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -125,9 +125,9 @@ anychart.core.annotations.InfiniteLine.prototype.colorize = function(state) {
 anychart.core.annotations.InfiniteLine.prototype.checkVisible = function() {
   return true;
 };
+
+
 //endregion
-
-
 //region Serialization / Deserialization / Disposing
 //----------------------------------------------------------------------------------------------------------------------
 //

@@ -113,7 +113,7 @@ anychart.core.resource.Logo.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.core.resource.Logo.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.resource.Logo.base(this, 'setupByJSON', config, opt_default);
-  this.overlay_.setupByVal(config['overlay'], opt_default);
+  this.overlay_.setupInternal(!!opt_default, config['overlay']);
 };
 
 

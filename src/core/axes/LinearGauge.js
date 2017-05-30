@@ -25,9 +25,9 @@ goog.inherits(anychart.core.axes.LinearGauge, anychart.core.axes.Linear);
 anychart.core.axes.LinearGauge.prototype.calculateSize = function(parentSize, length, parentBounds) {
   return parentSize;
 };
+
+
 //endregion
-
-
 //region --- OWN API ---
 /**
  * Getter/setter for axis offset.
@@ -66,9 +66,9 @@ anychart.core.axes.LinearGauge.prototype.scale = function(opt_value) {
   }
   return anychart.core.axes.LinearGauge.base(this, 'scale', opt_value);
 };
+
+
 //endregion
-
-
 //region --- SETUP/DISPOSE ---
 /** @inheritDoc */
 anychart.core.axes.LinearGauge.prototype.serialize = function() {

@@ -559,6 +559,18 @@ anychart.themes.merging.mergingMap_ = [
     ]
   },
   {
+    defaultObj: 'defaultOrdinalColorScale',
+    targets: [
+      'defaultScaleSettings.ordinalColor'
+    ]
+  },
+  {
+    defaultObj: 'defaultLinearColorScale',
+    targets: [
+      'defaultScaleSettings.linearColor'
+    ]
+  },
+  {
     defaultObj: 'defaultFontSettings',
     targets: [
       'defaultTitle',
@@ -568,14 +580,22 @@ anychart.themes.merging.mergingMap_ = [
       'defaultTooltip.contentInternal',
       'defaultLegend',
       'defaultLegend.paginator',
-      'chart.defaultLabelSettings',
+      'defaultLabelSettings',
       'cartesianBase.defaultTextMarkerSettings',
       'scatter.defaultTextMarkerSettings',
+      'mekko.defaultTextMarkerSettings',
       'standalones.label',
       'standalones.table',
       'standalones.textAxisMarker',
       'standalones.resourceList.baseSettings',
       'resource.resourceList.baseSettings'
+    ]
+  },
+  {
+    defaultObj: 'defaultLabelSettings',
+    targets: [
+      'chart.defaultLabelSettings',
+      'chart.defaultQuarterSettings.defaultLabelSettings'
     ]
   },
   {
@@ -590,6 +610,8 @@ anychart.themes.merging.mergingMap_ = [
       'defaultLegend.background',
       'defaultLegend.paginator.background',
       'chart.defaultLabelSettings.background',
+      'chart.defaultQuarterSettings',
+      'chart.defaultQuarterSettings.defaultLabelSettings.background',
       'stock.defaultPlotSettings.xAxis.background',
       'stock.scroller.xAxis.background',
       'resource.grid.background',
@@ -625,7 +647,8 @@ anychart.themes.merging.mergingMap_ = [
       'defaultTimeline.header.midLevel.labels',
       'defaultTimeline.header.lowLevel.labels',
       'resource.activities.labels',
-      'resource.conflicts.labels'
+      'resource.conflicts.labels',
+      'venn.labels'
     ]
   },
   {
@@ -639,6 +662,8 @@ anychart.themes.merging.mergingMap_ = [
     targets: [
       'cartesianBase.crosshair.xLabel',
       'cartesianBase.crosshair.yLabel',
+      'mekko.crosshair.xLabel',
+      'mekko.crosshair.yLabel',
       'scatter.crosshair.xLabel',
       'scatter.crosshair.yLabel',
       'map.crosshair.xLabel',
@@ -655,7 +680,8 @@ anychart.themes.merging.mergingMap_ = [
       'standalones.markersFactory',
       'heatMap.markers',
       'map.defaultSeriesSettings.base.markers',
-      'treeMap.markers'
+      'treeMap.markers',
+      'venn.markers'
     ]
   },
   {
@@ -667,7 +693,8 @@ anychart.themes.merging.mergingMap_ = [
       'defaultLegend.title',
       'defaultDataGrid.defaultColumnSettings.title',
       'standalones.title',
-      'map.axesSettings.title'
+      'map.axesSettings.title',
+      'chart.defaultQuarterSettings.title'
     ]
   },
   {
@@ -753,6 +780,7 @@ anychart.themes.merging.mergingMap_ = [
     targets: [
       'cartesianBase.defaultLineMarkerSettings',
       'scatter.defaultLineMarkerSettings',
+      'mekko.defaultLineMarkerSettings',
       'sparkline.defaultLineMarkerSettings',
       'standalones.lineAxisMarker',
       'defaultTimeline.defaultLineMarkerSettings'
@@ -763,6 +791,7 @@ anychart.themes.merging.mergingMap_ = [
     targets: [
       'cartesianBase.defaultTextMarkerSettings',
       'scatter.defaultTextMarkerSettings',
+      'mekko.defaultTextMarkerSettings',
       'sparkline.defaultTextMarkerSettings',
       'standalones.textAxisMarker',
       'defaultTimeline.defaultTextMarkerSettings'
@@ -773,6 +802,7 @@ anychart.themes.merging.mergingMap_ = [
     targets: [
       'cartesianBase.defaultRangeMarkerSettings',
       'scatter.defaultRangeMarkerSettings',
+      'mekko.defaultRangeMarkerSettings',
       'sparkline.defaultRangeMarkerSettings',
       'standalones.rangeAxisMarker',
       'defaultTimeline.defaultRangeMarkerSettings'
@@ -787,6 +817,8 @@ anychart.themes.merging.mergingMap_ = [
       'heatMap.defaultYAxisSettings',
       'scatter.defaultXAxisSettings',
       'scatter.defaultYAxisSettings',
+      'mekko.defaultXAxisSettings',
+      'mekko.defaultYAxisSettings',
       'bullet.axis',
       'radar.xAxis',
       'radar.yAxis',
@@ -809,7 +841,8 @@ anychart.themes.merging.mergingMap_ = [
     targets: [
       'map.colorRange',
       'treeMap.colorRange',
-      'standalones.colorRange'
+      'standalones.colorRange',
+      'tagCloud.colorRange'
     ]
   },
   {
@@ -835,6 +868,7 @@ anychart.themes.merging.mergingMap_ = [
     targets: [
       'cartesianBase',
       'pieFunnelPyramidBase',
+      'tagCloud',
       'scatter',
       'radar',
       'polar',
@@ -849,7 +883,9 @@ anychart.themes.merging.mergingMap_ = [
       'treeMap',
       'linearGauge',
       'pert',
-      'resource'
+      'resource',
+      'mekko',
+      'venn'
     ]
   },
   {
@@ -904,7 +940,8 @@ anychart.themes.merging.mergingMap_ = [
       'cartesianBase.defaultSeriesSettings.rangeBar',
       'cartesianBase.defaultSeriesSettings.rangeColumn',
       'cartesianBase.defaultSeriesSettings.rangeSplineArea',
-      'cartesianBase.defaultSeriesSettings.rangeStepArea'
+      'cartesianBase.defaultSeriesSettings.rangeStepArea',
+      'cartesianBase.defaultSeriesSettings.hilo'
     ]
   },
   {
@@ -948,7 +985,8 @@ anychart.themes.merging.mergingMap_ = [
       'cartesianBase.defaultSeriesSettings.stepLine',
       'cartesianBase.defaultSeriesSettings.ohlc',
       'cartesianBase.defaultSeriesSettings.jumpLine',
-      'cartesianBase.defaultSeriesSettings.stick'
+      'cartesianBase.defaultSeriesSettings.stick',
+      'cartesianBase.defaultSeriesSettings.hilo'
     ]
   },
   {
@@ -965,7 +1003,14 @@ anychart.themes.merging.mergingMap_ = [
       'verticalLine',
       'jumpLine',
       'stick',
-      'pareto'
+      'pareto',
+      'waterfall'
+    ]
+  },
+  {
+    defaultObj: 'waterfall.defaultSeriesSettings.barLike',
+    targets: [
+      'waterfall.defaultSeriesSettings.waterfall'
     ]
   },
   {
@@ -1000,6 +1045,14 @@ anychart.themes.merging.mergingMap_ = [
   {
     defaultObj: 'area',
     targets: ['area3d']
+  },
+  {
+    defaultObj: 'mekko.defaultSeriesSettings.base',
+    targets: [
+      'mekko.defaultSeriesSettings.mekko',
+      'mekko.defaultSeriesSettings.mosaic',
+      'mekko.defaultSeriesSettings.barmekko'
+    ]
   },
   {
     defaultObj: 'scatter.defaultAnnotationSettings.base',
@@ -1040,7 +1093,8 @@ anychart.themes.merging.mergingMap_ = [
     defaultObj: 'scatter',
     targets: [
       'marker',
-      'bubble'
+      'bubble',
+      'quadrant'
     ]
   },
   {
@@ -1340,6 +1394,43 @@ anychart.themes.merging.mergingMap_ = [
       'resource.resourceList.descriptions',
       'resource.resourceList.tags'
     ]
+  },
+  {
+    defaultObj: 'chart.defaultQuarterSettings',
+    targets: [
+      'chart.quarters.rightTop',
+      'chart.quarters.leftTop',
+      'chart.quarters.leftBottom',
+      'chart.quarters.rightBottom'
+    ]
+  },
+  {
+    defaultObj: 'mekko',
+    targets: [
+      'mosaic',
+      'barmekko'
+    ]
+  },
+  {
+    defaultObj: 'mekko.defaultAnnotationSettings.base',
+    targets: [
+      'mekko.defaultAnnotationSettings.ray',
+      'mekko.defaultAnnotationSettings.line',
+      'mekko.defaultAnnotationSettings.infiniteLine',
+      'mekko.defaultAnnotationSettings.verticalLine',
+      'mekko.defaultAnnotationSettings.horizontalLine',
+      'mekko.defaultAnnotationSettings.rectangle',
+      'mekko.defaultAnnotationSettings.ellipse',
+      'mekko.defaultAnnotationSettings.triangle',
+      'mekko.defaultAnnotationSettings.trendChannel',
+      'mekko.defaultAnnotationSettings.andrewsPitchfork',
+      'mekko.defaultAnnotationSettings.fibonacciFan',
+      'mekko.defaultAnnotationSettings.fibonacciArc',
+      'mekko.defaultAnnotationSettings.fibonacciRetracement',
+      'mekko.defaultAnnotationSettings.fibonacciTimezones',
+      'mekko.defaultAnnotationSettings.marker',
+      'mekko.defaultAnnotationSettings.label'
+    ]
   }
 ];
 
@@ -1557,7 +1648,12 @@ anychart.themes.merging.multipleEntities_ = {
   'gauge.ranges': 'gauge.defaultRangeSettings',
   'gauge.axes': 'gauge.defaultAxisSettings',
   'gauge.scaleBars': 'gauge.defaultScaleBarSettings',
-  'map.callouts': 'map.defaultCalloutSettings'
+  'map.callouts': 'map.defaultCalloutSettings',
+  // Quadrant chart
+  'chart.quarters.rightTop.labels': 'chart.defaultQuarterSettings.defaultLabelSettings',
+  'chart.quarters.leftTop.labels': 'chart.defaultQuarterSettings.defaultLabelSettings',
+  'chart.quarters.leftBottom.labels': 'chart.defaultQuarterSettings.defaultLabelSettings',
+  'chart.quarters.rightBottom.labels': 'chart.defaultQuarterSettings.defaultLabelSettings'
 };
 
 

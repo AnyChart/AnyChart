@@ -801,8 +801,8 @@ anychart.core.ui.MarkersFactory.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.ui.MarkersFactory.prototype.setupSpecial = function() {
-  var arg0 = arguments[0];
+anychart.core.ui.MarkersFactory.prototype.setupSpecial = function(isDefault, var_args) {
+  var arg0 = arguments[1];
   if (goog.isString(arg0)) {
     this.type(arg0);
     this.enabled(true);

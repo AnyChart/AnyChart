@@ -57,9 +57,9 @@ anychart.core.annotations.Ray.prototype.type = anychart.enums.AnnotationTypes.RA
  * @type {anychart.core.annotations.AnchorSupport}
  */
 anychart.core.annotations.Ray.prototype.SUPPORTED_ANCHORS = anychart.core.annotations.AnchorSupport.TWO_POINTS;
+
+
 //endregion
-
-
 //region Drawing
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -133,9 +133,9 @@ anychart.core.annotations.Ray.prototype.checkVisible = function() {
   }
   return res;
 };
+
+
 //endregion
-
-
 //region Serialization / Deserialization / Disposing
 //----------------------------------------------------------------------------------------------------------------------
 //

@@ -465,6 +465,7 @@ anychart.core.axes.Polar.prototype.dropBoundsCache_ = function() {
  * @private
  */
 anychart.core.axes.Polar.prototype.calculateAxisBounds_ = function() {
+  var points;
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     this.dropBoundsCache_();
     var scale = /** @type {anychart.scales.Ordinal|anychart.scales.ScatterBase} */(this.scale());
@@ -511,7 +512,7 @@ anychart.core.axes.Polar.prototype.calculateAxisBounds_ = function() {
       }
       var majorTicksArr = (majorTicksLength || majorLabelsEnabled) ? scale.ticks().get() : [];
       var minorTicksArr = (!isOrdinal && (minorTicksLength || minorLabelsEnabled)) ? scale.minorTicks().get() : [];
-      if (!isOrdinal && this.getRatio_(0, majorTicksArr, scale, 0) == 0) {
+      if (!isOrdinal && !this.getRatio_(0, majorTicksArr, scale, 0)) {
         if (this.getRatio_(minorTicksArr.length - 1, minorTicksArr, scale, 1) == 1)
           minorTicksArr.pop();
         if (this.getRatio_(majorTicksArr.length - 1, majorTicksArr, scale, 1) == 1)
@@ -554,8 +555,7 @@ anychart.core.axes.Polar.prototype.calculateAxisBounds_ = function() {
                 anychart.math.angleDx(startAngle, this.radius_),
                 anychart.math.angleDy(startAngle, this.radius_),
                 anychart.math.angleDx(endAngle, this.radius_),
-                anychart.math.angleDy(endAngle, this.radius_)
-            );
+                anychart.math.angleDy(endAngle, this.radius_));
           }
         } else {
           ratio = minorRatio;
@@ -623,7 +623,7 @@ anychart.core.axes.Polar.prototype.calculateAxisBounds_ = function() {
             labels = majorLabels;
             boundsCache = this.labelsBounds_;
           }
-          var points = boundsCache[index];
+          points = boundsCache[index];
           label = labels.getLabel(index);
           var positionProvider = label.positionProvider();
           angle = positionProvider['value']['angle'];
@@ -1168,8 +1168,8 @@ anychart.core.axes.Polar.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.core.axes.Polar.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.axes.Polar.base(this, 'setupByJSON', config, opt_default);
-  this.labels().setupByVal(config['labels'], opt_default);
-  this.minorLabels().setupByVal(config['minorLabels'], opt_default);
+  this.labels().setupInternal(!!opt_default, config['labels']);
+  this.minorLabels().setupInternal(!!opt_default, config['minorLabels']);
   this.ticks(config['ticks']);
   this.minorTicks(config['minorTicks']);
   //this.startAngle(config['startAngle']);

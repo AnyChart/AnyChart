@@ -28,7 +28,7 @@ goog.require('goog.userAgent');
 /**
  * Resource chart class.
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Resource Chart data.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @constructor
  * @extends {anychart.core.Chart}
  * @implements {anychart.core.utils.IInteractiveSeries}
@@ -453,7 +453,7 @@ anychart.charts.Resource.prototype.zoomLevels_;
 /**
  * Getter/setter for chart data.
  * @param {?(anychart.data.View|anychart.data.Set|Array|string)=} opt_value Value to set.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @return {(!anychart.charts.Resource|!anychart.data.View)} Returns itself if used as a setter or the mapping if used as a getter.
  */
 anychart.charts.Resource.prototype.data = function(opt_value, opt_csvSettings) {
@@ -1975,7 +1975,7 @@ anychart.charts.Resource.prototype.createTooltipContextProvider = function() {
     'intervals': {value: intervals, type: anychart.enums.TokenType.UNKNOWN},
     'start': {value: start, type: anychart.enums.TokenType.NUMBER},
     'end': {value: end, type: anychart.enums.TokenType.NUMBER},
-    'minutesPerDay': {value: (intervals.length == 1) ? intervals[0]['minutesPerDay'] : NaN, type: anychart.enums.TokenType.NUMBER},
+    'minutesPerDay': {value: (intervals.length == 1) ? intervals[0]['minutesPerDay'] : NaN, type: anychart.enums.TokenType.NUMBER}
   };
 
   var tokenCustomValues = {
@@ -2039,11 +2039,11 @@ anychart.charts.Resource.prototype.setupByJSON = function(config, opt_default) {
   anychart.charts.Resource.base(this, 'setupByJSON', config);
   if ('cellPadding' in config)
     this.cellPadding_.setup(config['cellPadding']);
-  this.activities_.setupByVal(config['activities'], opt_default);
+  this.activities_.setupInternal(!!opt_default, config['activities']);
   this.data(config['data']);
-  this.logo_.setupByVal(config['logo'], opt_default);
-  this.overlay_.setupByVal(config['overlay'], opt_default);
-  this.timeLine_.setupByVal(config['timeLine'], opt_default);
+  this.logo_.setupInternal(!!opt_default, config['logo']);
+  this.overlay_.setupInternal(!!opt_default, config['overlay']);
+  this.timeLine_.setupInternal(!!opt_default, config['timeLine']);
   this.calendar_.setup(config['calendar']);
   this.xScale_.setup(config['xScale']);
   this.resourceList_.setup(config['resourceList']);

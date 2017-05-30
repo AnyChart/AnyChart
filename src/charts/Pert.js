@@ -395,9 +395,9 @@ anychart.charts.Pert.FakeEdge;
  * }}
  */
 anychart.charts.Pert.Segment;
+
+
 //endregion
-
-
 //region -- Static constants.
 /**
  * Base layer z-index.
@@ -418,9 +418,9 @@ anychart.charts.Pert.ARROW_HEIGHT = 10;
  * @type {number}
  */
 anychart.charts.Pert.ARROW_BOTTOM = 3;
+
+
 //endregion
-
-
 //region -- Type and context provider.
 /** @inheritDoc */
 anychart.charts.Pert.prototype.getType = function() {
@@ -503,28 +503,17 @@ anychart.charts.Pert.prototype.createFormatProvider = function(opt_force, opt_wo
 
   return /** @type {anychart.format.Context} */ (this.formatProvider_.propagate(values));
 };
+
+
 //endregion
-
-
 //region -- Tooltip
-/**
- * Getter for tooltip settings.
- * @param {(Object|boolean|null)=} opt_value - Tooltip settings.
- * @return {!(anychart.charts.Pert|anychart.core.ui.Tooltip)} - Tooltip instance or self for method chaining.
- */
-anychart.charts.Pert.prototype.tooltip = function(opt_value) {
-  if (!this.tooltip_) {
-    this.tooltip_ = new anychart.core.ui.Tooltip(0);
-    this.tooltip_.chart(this);
-    this.registerDisposable(this.tooltip_);
-    this.tooltip_.listenSignals(this.onTooltipSignal_, this);
-  }
-  if (goog.isDef(opt_value)) {
-    this.tooltip_.setup(opt_value);
-    return this;
-  } else {
-    return this.tooltip_;
-  }
+/** @inheritDoc */
+anychart.charts.Pert.prototype.createTooltip = function() {
+  var tooltip = new anychart.core.ui.Tooltip(0);
+  this.registerDisposable(tooltip);
+  tooltip.chart(this);
+  tooltip.listenSignals(this.onTooltipSignal_, this);
+  return tooltip;
 };
 
 
@@ -561,9 +550,9 @@ anychart.charts.Pert.prototype.applyTooltipSettings_ = function(opt_settings1, o
 
   tooltip.enabled(enabled);
 };
+
+
 //endregion
-
-
 //region -- Data.
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -615,9 +604,9 @@ anychart.charts.Pert.prototype.resizeHandler = function(evt) {
 anychart.charts.Pert.prototype.dataInvalidated_ = function(event) {
   this.invalidate(anychart.ConsistencyState.PERT_DATA, anychart.Signal.NEEDS_REDRAW);
 };
+
+
 //endregion
-
-
 //region -- Abstract methods.
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -635,9 +624,9 @@ anychart.charts.Pert.prototype.createLegendItemsProvider = function(sourceMode, 
 anychart.charts.Pert.prototype.getAllSeries = function() {
   return [];
 };
+
+
 //endregion
-
-
 //region -- Mouse interactivty.
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1086,9 +1075,9 @@ anychart.charts.Pert.prototype.makeInteractivityEvent_ = function() {
 
   return eventObject;
 };
+
+
 //endregion
-
-
 //region -- Calculations.
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -2170,9 +2159,8 @@ anychart.charts.Pert.prototype.calculateLevels_ = function() {
   }
 };
 
+
 //endregion
-
-
 //region -- Visual settings for tasks and milestones.
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -2318,10 +2306,7 @@ anychart.charts.Pert.prototype.criticalPath = function(opt_value) {
 };
 
 
-
 //endregion
-
-
 //region -- Drawing.
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -2901,9 +2886,9 @@ anychart.charts.Pert.prototype.drawContent = function(bounds) {
     this.markConsistent(anychart.ConsistencyState.PERT_LABELS);
   }
 };
+
+
 //endregion
-
-
 //region -- Util methods.
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -2961,9 +2946,9 @@ anychart.charts.Pert.prototype.labelsEnabled_ = function(labelsFactory, defaultV
       /** @type {boolean} */ (/** @type {anychart.core.ui.LabelsFactory} */ (labelsFactory).enabled()) :
       defaultVal;
 };
+
+
 //endregion
-
-
 //region -- Disposing, serialization
 //----------------------------------------------------------------------------------------------------------------------
 //

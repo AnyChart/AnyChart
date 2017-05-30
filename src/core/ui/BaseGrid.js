@@ -568,7 +568,7 @@ anychart.core.ui.BaseGrid.prototype.createFormatProvider = function(item, opt_pe
   var values = {
     'item': {value: item, type: anychart.enums.TokenType.UNKNOWN},
     'name': {value: item.get(anychart.enums.GanttDataFields.NAME), type: anychart.enums.TokenType.STRING},
-    'id': {value: item.get(anychart.enums.GanttDataFields.ID), type: anychart.enums.TokenType.STRING},
+    'id': {value: item.get(anychart.enums.GanttDataFields.ID), type: anychart.enums.TokenType.STRING}
   };
 
   if (isResources) {
@@ -732,7 +732,8 @@ anychart.core.ui.BaseGrid.prototype.handleDblMouseClick_ = function(event) {
   var evt = this.getInteractivityEvent(event);
   this.addMouseDblClick(evt);
   if (this.interactive) {
-    this.interactivityHandler.rowDblClick(evt);
+    if (evt && this.interactivityHandler.dispatchEvent(evt))
+      this.interactivityHandler.rowDblClick(evt);
   } else {
     this.interactive = true;
   }
@@ -2151,25 +2152,28 @@ anychart.core.ui.BaseGrid.prototype.initMouseFeatures = function() {
  */
 anychart.core.ui.BaseGrid.prototype.docMouseMoveListener_ = function(e) {
   var l = anychart.core.ui.BaseGrid.SCROLL_MOUSE_OUT_INSIDE_LENGTH;
-  var containerPosition = this.container().getStage().getClientPosition();
-  var top = this.pixelBoundsCache.top + containerPosition.y + this.headerHeight_ + l;
-  var bottom = containerPosition.y + this.pixelBoundsCache.height - l - l;
-  var left = containerPosition.x + this.pixelBoundsCache.left + l;
-  var right = left + this.pixelBoundsCache.width - l - l;
+  var container = this.container();
+  if (container) {
+    var containerPosition = container.getStage().getClientPosition();
+    var top = this.pixelBoundsCache.top + containerPosition.y + this.headerHeight_ + l;
+    var bottom = containerPosition.y + this.pixelBoundsCache.height - l - l;
+    var left = containerPosition.x + this.pixelBoundsCache.left + l;
+    var right = left + this.pixelBoundsCache.width - l - l;
 
-  var mouseX = e.clientX;
-  var mouseY = e.clientY;
+    var mouseX = e.clientX;
+    var mouseY = e.clientY;
 
-  this.scrollOffsetX = 0;
-  this.scrollOffsetY = 0;
-  if (mouseX < left || mouseX > right) this.scrollOffsetX = mouseX - left;
-  if (mouseY < top || mouseY > bottom) this.scrollOffsetY = mouseY - top;
+    this.scrollOffsetX = 0;
+    this.scrollOffsetY = 0;
+    if (mouseX < left || mouseX > right) this.scrollOffsetX = mouseX - left;
+    if (mouseY < top || mouseY > bottom) this.scrollOffsetY = mouseY - top;
 
-  var ths = this;
-  if (this.dragging && !this.scrollInterval) {
-    this.scrollInterval = setInterval(function() {
-      ths.mouseOutMove(e);
-    }, anychart.core.ui.BaseGrid.TIMER_STEP);
+    var ths = this;
+    if (this.dragging && !this.scrollInterval) {
+      this.scrollInterval = setInterval(function() {
+        ths.mouseOutMove(e);
+      }, anychart.core.ui.BaseGrid.TIMER_STEP);
+    }
   }
 
 };
@@ -2541,7 +2545,7 @@ anychart.core.ui.BaseGrid.prototype.setupByJSON = function(config, opt_default) 
   this.rowSelectedFill(config['rowSelectedFill']);
 
   if ('tooltip' in config)
-    this.tooltip().setupByVal(config['tooltip'], opt_default);
+    this.tooltip().setupInternal(!!opt_default, config['tooltip']);
 
   if (goog.isDef(config['titleHeight']))
     this.titleHeight(config['titleHeight']);

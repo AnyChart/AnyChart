@@ -75,9 +75,9 @@ anychart.core.series.StockScroller.prototype['selectedRisingStroke'] = anychart.
  * @type {Function}
  */
 anychart.core.series.StockScroller.prototype['selectedFallingStroke'] = anychart.core.series.Base.prototype['selectFallingStroke'];
+
+
 //endregion
-
-
 //region Config
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -105,9 +105,9 @@ anychart.core.series.StockScroller.prototype.applyConfig = function(config, opt_
 
   anychart.core.series.StockScroller.base(this, 'applyConfig', config, opt_reapplyClip);
 };
+
+
 //endregion
-
-
 //region Infrastructure
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -162,9 +162,9 @@ anychart.core.series.StockScroller.prototype.getMainChart = function() {
 anychart.core.series.StockScroller.prototype.getDetachedIterator = function() {
   return this.getSelectableData().getIteratorInternal(true, true);
 };
+
+
 //endregion
-
-
 //region Interactivity
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -177,9 +177,9 @@ anychart.core.series.StockScroller.prototype.getDetachedIterator = function() {
 anychart.core.series.StockScroller.prototype.getPointState = function(index) {
   return anychart.PointState.NORMAL;
 };
+
+
 //endregion
-
-
 //region Drawing
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -240,9 +240,9 @@ anychart.core.series.StockScroller.prototype.applyZIndex = function() {
   this.rootLayer.zIndex(zIndex);
   this.secondaryRootLayer_.zIndex(zIndex);
 };
+
+
 //endregion
-
-
 //region Serialization/Deserialization
 //----------------------------------------------------------------------------------------------------------------------
 //

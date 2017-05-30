@@ -83,9 +83,9 @@ anychart.core.annotations.TrendChannel.prototype.type = anychart.enums.Annotatio
  * @type {anychart.core.annotations.AnchorSupport}
  */
 anychart.core.annotations.TrendChannel.prototype.SUPPORTED_ANCHORS = anychart.core.annotations.AnchorSupport.THREE_POINTS;
+
+
 //endregion
-
-
 //region Drawing
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -290,9 +290,9 @@ anychart.core.annotations.TrendChannel.prototype.checkVisible = function() {
   }
   return res;
 };
+
+
 //endregion
-
-
 //region Serialization / Deserialization / Disposing
 //----------------------------------------------------------------------------------------------------------------------
 //

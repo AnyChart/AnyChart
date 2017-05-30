@@ -1151,10 +1151,11 @@ anychart.core.ui.Callout.prototype.draw = function() {
     this.labels().draw();
     for (var i = 0, len = this.labels().labelsCount(); i < len; i++) {
       var label = this.labels().getLabel(i);
-      var connector = label.getConnectorElement();
       label.parentLabelsFactory().dropCallsCache();
-      if (connector)
-        connector.clip(this.chart.getPlotBounds());
+      //todo (blackart) don't remove
+      // var connector = label.getConnectorElement();
+      // if (connector)
+      //   connector.clip(this.chart.getPlotBounds());
     }
     this.markConsistent(anychart.ConsistencyState.CALLOUT_LABELS);
   }
@@ -1224,9 +1225,9 @@ anychart.core.ui.Callout.prototype.setupByJSON = function(config, opt_default) {
   if ('margin' in config)
     this.margin(config['margin']);
 
-  this.labels().setupByVal(config['labels'], opt_default);
-  this.hoverLabels().setupByVal(config['hoverLabels'], opt_default);
-  this.selectLabels().setupByVal(config['selectLabels'], opt_default);
+  this.labels().setupInternal(!!opt_default, config['labels']);
+  this.hoverLabels().setupInternal(!!opt_default, config['hoverLabels']);
+  this.selectLabels().setupInternal(!!opt_default, config['selectLabels']);
 
   this.width(config['width']);
   this.length(config['length']);

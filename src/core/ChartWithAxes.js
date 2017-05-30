@@ -10,6 +10,8 @@ goog.require('anychart.core.axisMarkers.Range');
 goog.require('anychart.core.axisMarkers.Text');
 goog.require('anychart.core.grids.Linear');
 goog.require('anychart.core.ui.Crosshair');
+goog.require('anychart.core.utils.Crossing');
+goog.require('anychart.core.utils.QuarterSettings');
 goog.require('anychart.enums');
 goog.require('goog.array');
 
@@ -72,6 +74,13 @@ anychart.core.ChartWithAxes = function(joinData) {
    * @private
    */
   this.minorGrids_ = [];
+
+  /**
+   * Crosslines element.
+   * @type {acgraph.vector.Path}
+   * @private
+   */
+  this.crosslines_ = null;
 };
 goog.inherits(anychart.core.ChartWithAxes, anychart.core.ChartWithOrthogonalScales);
 
@@ -92,7 +101,9 @@ anychart.core.ChartWithAxes.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.AXES_CHART_AXES_MARKERS |
     anychart.ConsistencyState.AXES_CHART_GRIDS |
     anychart.ConsistencyState.AXES_CHART_CROSSHAIR |
-    anychart.ConsistencyState.AXES_CHART_ANNOTATIONS;
+    anychart.ConsistencyState.AXES_CHART_ANNOTATIONS |
+    anychart.ConsistencyState.AXES_CHART_QUARTER |
+    anychart.ConsistencyState.AXES_CHART_CROSSLINES;
 
 
 /**
@@ -276,7 +287,7 @@ anychart.core.ChartWithAxes.prototype.grid = function(opt_indexOrValue, opt_valu
     this.grids_[index] = grid;
     this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal, this);
-    this.invalidate(anychart.ConsistencyState.AXES_CHART_GRIDS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.AXES_CHART_GRIDS | anychart.ConsistencyState.SCALE_CHART_SCALES_STATISTICS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -313,7 +324,7 @@ anychart.core.ChartWithAxes.prototype.minorGrid = function(opt_indexOrValue, opt
     this.minorGrids_[index] = grid;
     this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal, this);
-    this.invalidate(anychart.ConsistencyState.AXES_CHART_GRIDS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.AXES_CHART_GRIDS | anychart.ConsistencyState.SCALE_CHART_SCALES_STATISTICS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -332,6 +343,37 @@ anychart.core.ChartWithAxes.prototype.minorGrid = function(opt_indexOrValue, opt
  */
 anychart.core.ChartWithAxes.prototype.onGridSignal = function(event) {
   this.invalidate(anychart.ConsistencyState.AXES_CHART_GRIDS, anychart.Signal.NEEDS_REDRAW);
+};
+
+
+/**
+ * @return {{vertical: number, horizontal: number}}
+ */
+anychart.core.ChartWithAxes.prototype.calculateGridsThickness = function() {
+  var grids = this.grids_;
+  var maxVerticalThickness = 0;
+  var maxHorizontalThickness = 0;
+  for (var i = 0, len = grids.length; i < len; i++) {
+    var grid = /** @type {anychart.core.grids.Linear} */(grids[i]);
+    if (grid && grid.enabled()) {
+      var thickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(grid.stroke()));
+
+      if (grid.isHorizontal()) {
+        if (thickness > maxHorizontalThickness) {
+          maxHorizontalThickness = thickness;
+        }
+      } else {
+        if (thickness > maxVerticalThickness) {
+          maxVerticalThickness = thickness;
+        }
+      }
+    }
+  }
+
+  return {
+    vertical: maxVerticalThickness,
+    horizontal: maxHorizontalThickness
+  };
 };
 
 
@@ -362,11 +404,11 @@ anychart.core.ChartWithAxes.prototype.xAxis = function(opt_indexOrValue, opt_val
   if (!axis) {
     axis = new anychart.core.axes.Linear();
     axis.setParentEventTarget(this);
-    axis.setup(this.defaultXAxisSettings());
+    axis.setupInternal(true, this.defaultXAxisSettings());
     this.xAxes_[index] = axis;
     this.registerDisposable(axis);
     axis.listenSignals(this.onAxisSignal_, this);
-    this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES | anychart.ConsistencyState.SCALE_CHART_SCALES_STATISTICS | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -398,11 +440,11 @@ anychart.core.ChartWithAxes.prototype.yAxis = function(opt_indexOrValue, opt_val
   if (!axis) {
     axis = new anychart.core.axes.Linear();
     axis.setParentEventTarget(this);
-    axis.setup(this.defaultYAxisSettings());
+    axis.setupInternal(true, this.defaultYAxisSettings());
     this.yAxes_[index] = axis;
     this.registerDisposable(axis);
     axis.listenSignals(this.onAxisSignal_, this);
-    this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES | anychart.ConsistencyState.SCALE_CHART_SCALES_STATISTICS | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -461,6 +503,15 @@ anychart.core.ChartWithAxes.prototype.getAxisByIndex = function(index) {
 };
 
 
+/**
+ * @param {anychart.core.axes.Linear} axis
+ * @protected
+ */
+anychart.core.ChartWithAxes.prototype.setYAxisScale = function(axis) {
+  axis.scale(/** @type {anychart.scales.Base} */(this.yScale()));
+};
+
+
 //endregion
 //region --- Axis markers
 //----------------------------------------------------------------------------------------------------------------------
@@ -503,7 +554,7 @@ anychart.core.ChartWithAxes.prototype.lineMarker = function(opt_indexOrValue, op
     this.lineAxesMarkers_[index] = lineMarker;
     this.registerDisposable(lineMarker);
     lineMarker.listenSignals(this.onMarkersSignal, this);
-    this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES_MARKERS | anychart.ConsistencyState.SCALE_CHART_SCALES_STATISTICS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -550,7 +601,7 @@ anychart.core.ChartWithAxes.prototype.rangeMarker = function(opt_indexOrValue, o
     this.rangeAxesMarkers_[index] = rangeMarker;
     this.registerDisposable(rangeMarker);
     rangeMarker.listenSignals(this.onMarkersSignal, this);
-    this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES_MARKERS | anychart.ConsistencyState.SCALE_CHART_SCALES_STATISTICS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -597,7 +648,7 @@ anychart.core.ChartWithAxes.prototype.textMarker = function(opt_indexOrValue, op
     this.textAxesMarkers_[index] = textMarker;
     this.registerDisposable(textMarker);
     textMarker.listenSignals(this.onMarkersSignal, this);
-    this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES_MARKERS | anychart.ConsistencyState.SCALE_CHART_SCALES_STATISTICS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -616,6 +667,72 @@ anychart.core.ChartWithAxes.prototype.textMarker = function(opt_indexOrValue, op
  */
 anychart.core.ChartWithAxes.prototype.onMarkersSignal = function(event) {
   this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
+};
+
+
+/**
+ * Gets scales from axes, grids, axes markers.
+ * @param {Object.<string, anychart.scales.Base>} scales
+ * @param {boolean} isX Whether to get x scales.
+ * @return {Object.<string, anychart.scales.Base>}
+ */
+anychart.core.ChartWithAxes.prototype.getAdditionalScales = function(scales, isX) {
+  this.calculate();
+  var scalesList = goog.object.clone(scales);
+  var elementsWithScale = goog.array.concat(
+      this.lineAxesMarkers_,
+      this.rangeAxesMarkers_,
+      this.textAxesMarkers_,
+      this.grids_,
+      this.minorGrids_);
+  var scale, uid, i, isY;
+  for (i = 0; i < elementsWithScale.length; i++) {
+    var item = elementsWithScale[i];
+    isY = !!(item.isHorizontal() ^ this.barChartMode);
+
+    // isX - means we are collecting xScales
+    // isY - means that element's scale supposed to be yScale
+    // isX | isY | collect == !continue
+    //  0  |  0  |    0      collecting yScales and element scale is xScale => !collect = continue
+    //  0  |  1  |    1      collecting yScales and element scale is yScale => collect = !continue
+    //  1  |  0  |    1      collecting xScales and element scale is xScale => collect = !continue
+    //  1  |  1  |    0      collecting xScales and element scale is yScale => !collect = continue
+    if (!(isX ^ isY))
+      continue;
+
+    scale = item.scale();
+    if (scale) {
+      uid = String(goog.getUid(scale));
+      if (!(uid in scalesList))
+        scalesList[uid] = scale;
+    }
+  }
+  var axes = isX ? this.xAxes_ : this.yAxes_;
+  for (i = 0; i < axes.length; i++) {
+    scale = /** @type {anychart.scales.Base} */ (axes[i] && axes[i].scale());
+    if (scale) {
+      uid = String(goog.getUid(scale));
+      if (!(uid in scalesList))
+        scalesList[uid] = scale;
+    }
+  }
+  return scalesList;
+};
+
+
+//endregion
+//region --- Calculation/Statistics
+/** @inheritDoc */
+anychart.core.ChartWithAxes.prototype.getXScales = function() {
+  this.calculate();
+  return this.getScales(this.getAdditionalScales(this.xScales, true));
+};
+
+
+/** @inheritDoc */
+anychart.core.ChartWithAxes.prototype.getYScales = function() {
+  this.calculate();
+  return this.getScales(this.getAdditionalScales(this.yScales, false));
 };
 
 
@@ -902,7 +1019,8 @@ anychart.core.ChartWithAxes.prototype.getBoundsChangedSignal = function() {
       anychart.ConsistencyState.AXES_CHART_AXES_MARKERS |
       anychart.ConsistencyState.SERIES_CHART_SERIES |
       anychart.ConsistencyState.AXES_CHART_ANNOTATIONS |
-      anychart.ConsistencyState.AXES_CHART_CROSSHAIR;
+      anychart.ConsistencyState.AXES_CHART_CROSSHAIR |
+      anychart.ConsistencyState.AXES_CHART_CROSSLINES;
 };
 
 
@@ -1011,7 +1129,7 @@ anychart.core.ChartWithAxes.prototype.drawContent = function(bounds) {
         item.labels().dropCallsCache();
         item.minorLabels().dropCallsCache();
         if (item && !item.scale())
-          item.scale(/** @type {anychart.scales.Base} */(this.yScale()));
+          this.setYAxisScale(item);
       }
     }
   }
@@ -1059,7 +1177,149 @@ anychart.core.ChartWithAxes.prototype.drawContent = function(bounds) {
     this.markConsistent(anychart.ConsistencyState.AXES_CHART_ANNOTATIONS);
   }
 
+  if (this.hasInvalidationState(anychart.ConsistencyState.AXES_CHART_CROSSLINES)) {
+    if (!this.crosslines_) {
+      this.crosslines_ = this.rootElement.path();
+      this.crosslines_.zIndex(2);
+    }
+    var stroke = /** @type {acgraph.vector.Stroke} */ (this.crossing().stroke());
+    var strokeIsNone = anychart.utils.isNone(stroke) || !goog.isDef(stroke);
+    var thickness = acgraph.vector.getThickness(stroke);
+    if (!strokeIsNone) {
+      var lineBounds = this.dataBounds.clone();
+      var top = lineBounds.top;
+      var bottom = top + lineBounds.height;
+      var left = lineBounds.left;
+      var right = left + lineBounds.width;
+      var middleX = anychart.utils.applyPixelShift((left + right) / 2, thickness);
+      var middleY = anychart.utils.applyPixelShift((top + bottom) / 2, thickness);
+
+      this.crosslines_
+          .clear()
+          .moveTo(middleX, top)
+          .lineTo(middleX, bottom)
+          .moveTo(left, middleY)
+          .lineTo(right, middleY);
+    }
+
+    if (this.crosslines_) {
+      this.crosslines_.stroke(stroke);
+      this.crosslines_.clip(this.dataBounds);
+    }
+
+    this.calculateQuarterBounds(thickness);
+    this.invalidate(anychart.ConsistencyState.AXES_CHART_QUARTER);
+    this.markConsistent(anychart.ConsistencyState.AXES_CHART_CROSSLINES);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.AXES_CHART_QUARTER)) {
+    var quarters = this.quarters().getItems();
+    for (i = 0; i < quarters.length; i++) {
+      var quarterInstance = quarters[i];
+      if (!quarterInstance)
+        continue;
+      quarterInstance.container(this.rootElement);
+      quarterInstance.parentBounds(this.quarterBounds_[i]);
+      quarterInstance.draw();
+    }
+    this.markConsistent(anychart.ConsistencyState.AXES_CHART_QUARTER);
+  }
+
   anychart.core.Base.resumeSignalsDispatchingFalse(this.xAxes_, this.yAxes_);
+};
+
+
+//endregion
+//region --- Quadrant
+/**
+ * Calculates bounds for all quarters.
+ * @param {number} thickness Thickness of crosslines
+ */
+anychart.core.ChartWithAxes.prototype.calculateQuarterBounds = function(thickness) {
+  /**
+   * @type {Array.<anychart.math.Rect>}
+   * @private
+   */
+  this.quarterBounds_ = [];
+
+  var w = this.dataBounds.width / 2;
+  var h = this.dataBounds.height / 2;
+
+  // right top quarter
+  this.quarterBounds_[0] = anychart.math.rect(
+      this.dataBounds.left + w + thickness / 2,
+      this.dataBounds.top, w - thickness / 2, h - thickness / 2);
+
+  // left top quarter
+  this.quarterBounds_[1] = anychart.math.rect(
+      this.dataBounds.left,
+      this.dataBounds.top, w - thickness / 2, h - thickness / 2);
+
+  // left bottom quarter
+  this.quarterBounds_[2] = anychart.math.rect(
+      this.dataBounds.left,
+      this.dataBounds.top + h + thickness / 2, w - thickness / 2, h - thickness / 2);
+
+  // right bottom quarter
+  this.quarterBounds_[3] = anychart.math.rect(
+      this.dataBounds.left + w + thickness / 2,
+      this.dataBounds.top + h + thickness / 2, w - thickness / 2, h - thickness / 2);
+};
+
+
+/**
+ * Quarter invalidation handler.
+ * @param {anychart.SignalEvent} event Signal event.
+ */
+anychart.core.ChartWithAxes.prototype.quarterInvalidated = function(event) {
+  this.invalidate(anychart.ConsistencyState.AXES_CHART_QUARTER, anychart.Signal.NEEDS_REDRAW);
+};
+
+
+/**
+ * Getter/setter for quarter settings.
+ * @param {Object=} opt_value
+ * @return {anychart.core.ChartWithAxes|anychart.core.utils.QuarterSettings} Chart or quarter settings.
+ */
+anychart.core.ChartWithAxes.prototype.quarters = function(opt_value) {
+  if (!this.quarterSettings_) {
+    this.quarterSettings_ = new anychart.core.utils.QuarterSettings(this);
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.quarterSettings_.setup(opt_value);
+    return this;
+  }
+  return this.quarterSettings_;
+};
+
+
+/**
+ * Crossing invalidation handler.
+ * @param {anychart.SignalEvent} event Signal event.
+ * @private
+ */
+anychart.core.ChartWithAxes.prototype.crossingInvalidated_ = function(event) {
+  this.invalidate(anychart.ConsistencyState.AXES_CHART_CROSSLINES | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+};
+
+
+/**
+ * Getter/setter for crossing settings.
+ * @param {(Object)=} opt_value Crossing settings object.
+ * @return {(anychart.core.ChartWithAxes|anychart.core.utils.Crossing)} Crossing settings or self for chaining.
+ */
+anychart.core.ChartWithAxes.prototype.crossing = function(opt_value) {
+  if (!this.crossing_) {
+    this.crossing_ = new anychart.core.utils.Crossing();
+    this.crossing_.listenSignals(this.crossingInvalidated_, this);
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.crossing_.setup(opt_value);
+    return this;
+  }
+  return this.crossing_;
 };
 
 
@@ -1070,6 +1330,14 @@ anychart.core.ChartWithAxes.prototype.drawContent = function(bounds) {
 //  Serialization / Deserialization / Disposing
 //
 //----------------------------------------------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.core.ChartWithAxes.prototype.setupByJSON = function(config, opt_default) {
+  anychart.core.ChartWithAxes.base(this, 'setupByJSON', config, opt_default);
+  this.crossing(config['crossing']);
+  this.quarters(config['quarters']);
+};
+
+
 /**
  * @inheritDoc
  */
@@ -1106,14 +1374,23 @@ anychart.core.ChartWithAxes.prototype.setupByJSONWithScales = function(config, s
 
 
 /** @inheritDoc */
+anychart.core.ChartWithAxes.prototype.serialize = function() {
+  var json = anychart.core.ChartWithAxes.base(this, 'serialize');
+  json['crossing'] = this.crossing().serialize();
+  json['quarters'] = this.quarters().serialize();
+  return json;
+};
+
+
+/** @inheritDoc */
 anychart.core.ChartWithAxes.prototype.serializeWithScales = function(json, scales, scaleIds) {
   anychart.core.ChartWithAxes.base(this, 'serializeWithScales', json, scales, scaleIds);
 
   json['isVertical'] = this.barChartMode;
 
   var axesIds = [];
-  this.serializeElementsWithScales(json, 'xAxes', this.xAxes_, this.serializeAxis_, scales, scaleIds, axesIds);
-  this.serializeElementsWithScales(json, 'yAxes', this.yAxes_, this.serializeAxis_, scales, scaleIds, axesIds);
+  this.serializeElementsWithScales(json, 'xAxes', this.xAxes_, this.serializeAxis, scales, scaleIds, axesIds);
+  this.serializeElementsWithScales(json, 'yAxes', this.yAxes_, this.serializeAxis, scales, scaleIds, axesIds);
 
   this.serializeElementsWithScales(json, 'grids', this.grids_, this.serializeGrid_, scales, scaleIds, axesIds);
   this.serializeElementsWithScales(json, 'minorGrids', this.minorGrids_, this.serializeGrid_, scales, scaleIds, axesIds);
@@ -1132,9 +1409,9 @@ anychart.core.ChartWithAxes.prototype.serializeWithScales = function(json, scale
  * @param {Object} scaleIds
  * @param {Array} axesIds
  * @return {Object}
- * @private
+ * @protected
  */
-anychart.core.ChartWithAxes.prototype.serializeAxis_ = function(item, scales, scaleIds, axesIds) {
+anychart.core.ChartWithAxes.prototype.serializeAxis = function(item, scales, scaleIds, axesIds) {
   var config = item.serialize();
   this.serializeScale(config, 'scale', /** @type {anychart.scales.Base} */(item.scale()), scales, scaleIds);
   axesIds.push(goog.getUid(item));
@@ -1229,7 +1506,9 @@ anychart.core.ChartWithAxes.prototype.disposeInternal = function() {
       this.rangeAxesMarkers_,
       this.textAxesMarkers_,
       this.grids_,
-      this.minorGrids_);
+      this.minorGrids_,
+      this.quarterSettings_,
+      this.crossing_);
 
   delete this.xAxes_;
   delete this.yAxes_;
@@ -1238,6 +1517,8 @@ anychart.core.ChartWithAxes.prototype.disposeInternal = function() {
   this.textAxesMarkers_ = null;
   this.grids_ = null;
   this.minorGrids_ = null;
+  this.quarterSettings_ = null;
+  this.crossing_ = null;
 
   anychart.core.ChartWithAxes.base(this, 'disposeInternal');
 };

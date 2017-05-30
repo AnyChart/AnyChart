@@ -24,7 +24,7 @@ anychart.column3d = function(var_args) {
   chart.defaultSeriesType(anychart.enums.Cartesian3dSeriesType.COLUMN);
   chart.setType(anychart.enums.ChartTypes.COLUMN_3D);
 
-  chart.setupByVal(anychart.getFullTheme('column3d'), true);
+  chart.setupInternal(true, anychart.getFullTheme('column3d'));
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['column'](arguments[i]);

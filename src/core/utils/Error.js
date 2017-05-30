@@ -622,11 +622,9 @@ anychart.core.utils.Error.prototype.serialize = function() {
 };
 
 
-/**
- * @inheritDoc
- */
-anychart.core.utils.Error.prototype.setupSpecial = function(var_args) {
-  var arg0 = arguments[0];
+/** @inheritDoc */
+anychart.core.utils.Error.prototype.setupSpecial = function(isDefault, var_args) {
+  var arg0 = arguments[1];
   if (goog.isString(arg0) || goog.isNumber(arg0) || goog.isNull(arg0)) {
     this.suspendSignalsDispatching();
     this.xError(arg0);

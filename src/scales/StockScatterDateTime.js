@@ -274,6 +274,12 @@ anychart.scales.StockScatterDateTime.prototype.inverseTransform = function(ratio
 };
 
 
+/** @inheritDoc */
+anychart.scales.StockScatterDateTime.prototype.checkWeights = function() {
+  return false;
+};
+
+
 /**
  * Returns ticks iterator.
  * @return {anychart.scales.StockScatterTicksIterator}

@@ -12,7 +12,7 @@ goog.require('anychart.modules.base');
 /**
  * Default linear gauge.<br/>
  * @param {?(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Value to set.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser
  * settings here as a hash map.
  * @return {anychart.charts.LinearGauge} Linear gauge with defaults.
  */
@@ -22,7 +22,7 @@ anychart.gauges.linear = function(opt_data, opt_csvSettings) {
   gauge.defaultPointerType(anychart.enums.LinearGaugePointerType.BAR);
   gauge.setType(anychart.enums.GaugeTypes.LINEAR);
 
-  gauge.setupByVal(anychart.getFullTheme('linearGauge'), true);
+  gauge.setupInternal(true, anychart.getFullTheme('linearGauge'));
 
   return gauge;
 };
@@ -32,7 +32,7 @@ anychart.gaugeTypesMap[anychart.enums.GaugeTypes.LINEAR] = anychart.gauges.linea
 /**
  * Default bullet gauge.<br/>
  * @param {?(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Value to set.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser
  * settings here as a hash map.
  * @return {anychart.charts.LinearGauge} Linear gauge with defaults.
  */
@@ -42,7 +42,7 @@ anychart.gauges.bullet = function(opt_data, opt_csvSettings) {
   gauge.defaultPointerType(anychart.enums.LinearGaugePointerType.BAR);
   gauge.setType(anychart.enums.GaugeTypes.BULLET);
 
-  gauge.setupByVal(anychart.getFullTheme('bullet'), true);
+  gauge.setupInternal(true, anychart.getFullTheme('bullet'));
 
   return gauge;
 };
@@ -52,7 +52,7 @@ anychart.gaugeTypesMap[anychart.enums.GaugeTypes.BULLET] = anychart.gauges.bulle
 /**
  * Default thermometer gauge.<br/>
  * @param {?(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Value to set.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser
  * settings here as a hash map.
  * @return {anychart.charts.LinearGauge} Linear gauge with defaults.
  */
@@ -62,7 +62,7 @@ anychart.gauges.thermometer = function(opt_data, opt_csvSettings) {
   gauge.defaultPointerType(anychart.enums.LinearGaugePointerType.THERMOMETER);
   gauge.setType(anychart.enums.GaugeTypes.THERMOMETER);
 
-  gauge.setupByVal(anychart.getFullTheme('thermometerGauge'), true);
+  gauge.setupInternal(true, anychart.getFullTheme('thermometerGauge'));
 
   return gauge;
 };
@@ -72,7 +72,7 @@ anychart.gaugeTypesMap[anychart.enums.GaugeTypes.THERMOMETER] = anychart.gauges.
 /**
  * Default tank gauge.<br/>
  * @param {?(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Value to set.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser
  * settings here as a hash map.
  * @return {anychart.charts.LinearGauge} Linear gauge with defaults.
  */
@@ -82,7 +82,7 @@ anychart.gauges.tank = function(opt_data, opt_csvSettings) {
   gauge.defaultPointerType(anychart.enums.LinearGaugePointerType.TANK);
   gauge.setType(anychart.enums.GaugeTypes.TANK);
 
-  gauge.setupByVal(anychart.getFullTheme('tankGauge'), true);
+  gauge.setupInternal(true, anychart.getFullTheme('tankGauge'));
 
   return gauge;
 };
@@ -92,7 +92,7 @@ anychart.gaugeTypesMap[anychart.enums.GaugeTypes.TANK] = anychart.gauges.tank;
 /**
  * Default led gauge.<br/>
  * @param {?(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Value to set.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser
  * settings here as a hash map.
  * @return {anychart.charts.LinearGauge} Linear gauge with defaults.
  */
@@ -102,7 +102,7 @@ anychart.gauges.led = function(opt_data, opt_csvSettings) {
   gauge.defaultPointerType(anychart.enums.LinearGaugePointerType.LED);
   gauge.setType(anychart.enums.GaugeTypes.LED);
 
-  gauge.setupByVal(anychart.getFullTheme('ledGauge'), true);
+  gauge.setupInternal(true, anychart.getFullTheme('ledGauge'));
 
   return gauge;
 };

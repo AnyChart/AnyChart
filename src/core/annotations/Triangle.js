@@ -83,9 +83,9 @@ anychart.core.annotations.Triangle.prototype.type = anychart.enums.AnnotationTyp
  * @type {anychart.core.annotations.AnchorSupport}
  */
 anychart.core.annotations.Triangle.prototype.SUPPORTED_ANCHORS = anychart.core.annotations.AnchorSupport.THREE_POINTS;
+
+
 //endregion
-
-
 //region Drawing
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -148,9 +148,9 @@ anychart.core.annotations.Triangle.prototype.colorize = function(state) {
       .fill(anychart.color.TRANSPARENT_HANDLER)
       .stroke(/** @type {acgraph.vector.SolidFill} */(anychart.color.TRANSPARENT_HANDLER), this['hoverGap']() * 2);
 };
+
+
 //endregion
-
-
 //region Serialization / Deserialization / Disposing
 //----------------------------------------------------------------------------------------------------------------------
 //

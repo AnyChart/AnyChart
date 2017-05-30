@@ -351,6 +351,13 @@ anychart.core.axes.StockDateTime.prototype.labelsInvalidated_ = function(e) {
 };
 
 
+/** @inheritDoc */
+anychart.core.axes.StockDateTime.prototype.remove = function() {
+  if (this.rootLayer_)
+    this.rootLayer_.remove();
+};
+
+
 /**
  * Draws the axis.
  * @return {anychart.core.axes.StockDateTime}
@@ -401,8 +408,14 @@ anychart.core.axes.StockDateTime.prototype.draw = function() {
         bounds.top = bounds.top + bounds.height - this.height_;
         bounds.height = this.height_;
       }
-      if (this.labels_) this.labels_.clear();
-      if (this.minorLabels_) this.minorLabels_.clear();
+      if (this.labels_) {
+        this.labels_.clear();
+        this.labels_.dropCallsCache();
+      }
+      if (this.minorLabels_) {
+        this.minorLabels_.clear();
+        this.minorLabels_.dropCallsCache();
+      }
 
       if (this.ticks_) {
         this.ticks_.length(bounds.height);
@@ -755,8 +768,8 @@ anychart.core.axes.StockDateTime.prototype.serialize = function() {
 anychart.core.axes.StockDateTime.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.axes.StockDateTime.base(this, 'setupByJSON', config, opt_default);
   this.height(config['height']);
-  this.labels().setupByVal(config['labels'], opt_default);
-  this.minorLabels().setupByVal(config['minorLabels'], opt_default);
+  this.labels().setupInternal(!!opt_default, config['labels']);
+  this.minorLabels().setupInternal(!!opt_default, config['minorLabels']);
   this.ticks(config['ticks']);
   this.minorTicks(config['minorTicks']);
   this.background(config['background']);

@@ -247,8 +247,7 @@ anychart.charts.Map = function() {
   this.unboundRegions(true);
   this.defaultSeriesType(anychart.enums.MapSeriesType.CHOROPLETH);
 
-  if (this.supportsBaseHighlight)
-    this.eventsHandler.listen(this, [goog.events.EventType.POINTERDOWN, acgraph.events.EventType.TOUCHSTART], this.tapHandler);
+  this.eventsHandler.listen(this, [goog.events.EventType.POINTERDOWN, acgraph.events.EventType.TOUCHSTART], this.tapHandler);
 };
 goog.inherits(anychart.charts.Map, anychart.core.ChartWithSeries);
 
@@ -541,7 +540,7 @@ anychart.charts.Map.prototype.interactivity_;
 //region --- Infrastructure
 /** @inheritDoc */
 anychart.charts.Map.prototype.getVersionHistoryLink = function() {
-  return 'http://anychart.com/products/anymap/history';
+  return 'https://anychart.com/products/anymap/history';
 };
 
 
@@ -839,7 +838,7 @@ anychart.charts.Map.prototype.controlsInteractivity_ = function() {
     goog.events.listen(this.legend(), [anychart.enums.EventType.DRAG, anychart.enums.EventType.DRAG_START], function(e) {
       this.legendDragInProcess = true;
     }, false, this);
-    goog.events.listen(this.legend(), [anychart.enums.EventType.DRAG_END], function(e) {
+    goog.events.listen(this.legend(), anychart.enums.EventType.DRAG_END, function(e) {
       this.legendDragInProcess = false;
     }, false, this);
 
@@ -962,9 +961,7 @@ anychart.charts.Map.prototype.tapHandler = function(event) {
       var firsFinger = originalTouchEvent.touches[0];
       var secondFinger = originalTouchEvent.touches[1];
 
-      var dist = anychart.math.vectorLength(firsFinger.pageX, firsFinger.pageY, secondFinger.pageX, secondFinger.pageY);
-
-      this.touchDist = dist;
+      this.touchDist = anychart.math.vectorLength(firsFinger.pageX, firsFinger.pageY, secondFinger.pageX, secondFinger.pageY);
       this.tap = false;
     } else if (touchCount == 1) {
       this.tap = true;
@@ -1449,20 +1446,8 @@ anychart.charts.Map.prototype.resizeHandler = function(evt) {
 
 
 /** @inheritDoc */
-anychart.charts.Map.prototype.interactivity = function(opt_value) {
-  if (!this.interactivity_) {
-    this.interactivity_ = new anychart.core.utils.MapInteractivity(this);
-    this.interactivity_.listenSignals(this.onInteractivitySignal, this);
-  }
-
-  if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value))
-      this.interactivity_.setup(opt_value);
-    else
-      this.interactivity_.hoverMode(/** @type {anychart.enums.HoverMode} */(opt_value));
-    return this;
-  }
-  return this.interactivity_;
+anychart.charts.Map.prototype.createInteractivitySettings = function() {
+  return new anychart.core.utils.MapInteractivity(this);
 };
 
 
@@ -1697,7 +1682,7 @@ anychart.charts.Map.prototype.axes = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    this.axesSettings_.setupByVal(opt_value);
+    this.axesSettings_.setupInternal(false, opt_value);
     return this;
   }
   return this.axesSettings_;
@@ -1731,7 +1716,7 @@ anychart.charts.Map.prototype.grids = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    this.gridSettings_.setupByVal(opt_value);
+    this.gridSettings_.setupInternal(false, opt_value);
     return this;
   }
   return this.gridSettings_;
@@ -2952,6 +2937,18 @@ anychart.charts.Map.prototype.calculate = function() {
 
         this.mapTX[key] = tx_;
       }, this);
+
+      var geoScaleSettings = geoData['scale'];
+      if (geoScaleSettings) {
+        scale.setMapLimits(
+            'minLon' in geoScaleSettings ? geoScaleSettings['minLon'] : NaN,
+            'maxLon' in geoScaleSettings ? geoScaleSettings['maxLon'] : NaN,
+            'minLat' in geoScaleSettings ? geoScaleSettings['minLat'] : NaN,
+            'maxLat' in geoScaleSettings ? geoScaleSettings['maxLat'] : NaN
+        );
+      } else {
+        scale.setMapLimits(NaN, NaN, NaN, NaN);
+      }
     }
 
     if (!this.mapLayer_) {
@@ -3361,6 +3358,7 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
     this.invalidate(state);
   }
 
+  var viewSpacePath;
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_ZOOM)) {
     var srcZoom = this.getZoomLevel();
     var dstZoom = this.zoomInc * srcZoom;
@@ -3474,7 +3472,7 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_MOVE)) {
     if (this.getZoomLevel() != minZoomLevel && mapLayer) {
-      var viewSpacePath = this.scale().getViewSpace();
+      viewSpacePath = this.scale().getViewSpace();
       boundsWithoutTx = viewSpacePath.getBoundsWithoutTransform();
       boundsWithTx = viewSpacePath.getBoundsWithTransform(mapLayer.getFullTransformation());
 
@@ -5079,7 +5077,7 @@ anychart.charts.Map.prototype.setupByJSON = function(config, opt_default) {
   if ('defaultCalloutSettings' in config)
     this.defaultCalloutSettings(config['defaultCalloutSettings']);
 
-  this.colorRange().setupByVal(config['colorRange'], opt_default);
+  this.colorRange().setupInternal(!!opt_default, config['colorRange']);
   this.unboundRegions(config['unboundRegions']);
   this.geoIdField(config['geoIdField']);
   this.overlapMode(config['overlapMode']);
@@ -5119,10 +5117,10 @@ anychart.charts.Map.prototype.setupByJSON = function(config, opt_default) {
   }
 
   if ('axesSettings' in config) {
-    this.axes().setupByVal(config['axesSettings'], opt_default);
+    this.axes().setupInternal(!!opt_default, config['axesSettings']);
   }
   if ('gridsSettings' in config) {
-    this.grids().setupByVal(config['gridsSettings'], opt_default);
+    this.grids().setupInternal(!!opt_default, config['gridsSettings']);
   }
 
   this.crosshair(config['crosshair']);
@@ -5347,7 +5345,6 @@ anychart.charts.Map.prototype.disposeInternal = function() {
   //bounds
   proto['getPlotBounds'] = proto.getPlotBounds;
   //interactivity
-  proto['interactivity'] = proto.interactivity;
   proto['allowPointsSelect'] = proto.allowPointsSelect;
   proto['crsAnimation'] = proto.crsAnimation;
   //feature manipulation

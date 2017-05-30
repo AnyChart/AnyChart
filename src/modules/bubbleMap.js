@@ -6,7 +6,7 @@
 goog.provide('anychart.modules.bubbleMap');
 
 goog.require('anychart.charts.Map');
-goog.require('anychart.core.drawers.map.Bubble');
+goog.require('anychart.core.drawers.MapBubble');
 goog.require('anychart.modules.base');
 
 
@@ -21,7 +21,7 @@ anychart.bubbleMap = function(var_args) {
 
   map.defaultSeriesType(anychart.enums.MapSeriesType.BUBBLE);
 
-  map.setupByVal(anychart.getFullTheme('bubbleMap'), true);
+  map.setupInternal(true, anychart.getFullTheme('bubbleMap'));
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     map['bubble'](arguments[i]);

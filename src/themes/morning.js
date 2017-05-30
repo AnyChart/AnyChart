@@ -179,24 +179,14 @@ goog.provide('anychart.themes.morning');
     },
     'cartesianBase': {
       'defaultXAxisSettings': {
-        'orientation': 'bottom',
-        'title': {
-          'text': 'X-Axis'
-        },
         'ticks': {
           'enabled': false
-        },
-        'scale': 0
+        }
       },
       'defaultYAxisSettings': {
-        'orientation': 'left',
-        'title': {
-          'text': 'Y-Axis'
-        },
         'ticks': {
           'enabled': false
-        },
-        'scale': 1
+        }
       },
       'xAxes': [{}],
       'grids': [],

@@ -169,15 +169,16 @@ anychart.ui.Zoom.prototype.handleButtonAction_ = function(e) {
   var descriptor = e.target.getModel();
 
   this.target_.zoomDuration = 100;
+  var currentScene = this.target_.getCurrentScene();
   switch (descriptor['type']) {
     case 'fitAll':
-      this.target_.fitAll();
+      currentScene.fitAll();
       break;
     case 'zoomIn':
-      this.target_.zoomIn();
+      currentScene.zoomIn();
       break;
     case 'zoomOut':
-      this.target_.zoomOut();
+      currentScene.zoomOut();
       break;
   }
 };

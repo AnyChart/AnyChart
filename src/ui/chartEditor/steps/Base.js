@@ -243,18 +243,18 @@ anychart.ui.chartEditor.steps.Base.prototype.updateSharedDataMappings = function
     dataSet = sharedModel.dataSets[i];
     if (!dataSet.rawMappings.length) continue;
 
-    Array.prototype.push.apply(sharedModel.dataMappings, this.getDataMappings_(dataSet));
+    Array.prototype.push.apply(sharedModel.dataMappings, this.createDataMappings_(dataSet));
   }
 };
 
 
 /**
- * Get data mappings from all data sets.
+ * Creates anychart.data.Mapping instances from data set.
  * @param {anychart.ui.chartEditor.steps.Base.DataSet} dataSet
  * @return {Array.<anychart.data.Mapping>}
  * @private
  */
-anychart.ui.chartEditor.steps.Base.prototype.getDataMappings_ = function(dataSet) {
+anychart.ui.chartEditor.steps.Base.prototype.createDataMappings_ = function(dataSet) {
   var dataMappings = [];
 
   var rawMapping;
@@ -275,10 +275,10 @@ anychart.ui.chartEditor.steps.Base.prototype.getDataMappings_ = function(dataSet
     }
 
     if (!goog.object.isEmpty(formattedMapping)) {
-      dataMappings.push(
-          dataSet.instance['mapAs'](
-              isArrayMapping ? formattedMapping : undefined,
-              !isArrayMapping ? formattedMapping : undefined));
+      var mappingInstance = dataSet.instance['mapAs'](isArrayMapping ? formattedMapping : undefined, !isArrayMapping ? formattedMapping : undefined);
+      var title = /** @type {Object} */(rawMapping)['title'];
+      mappingInstance['meta'](0, 'title', title);
+      dataMappings.push(mappingInstance);
     }
   }
 
@@ -287,23 +287,34 @@ anychart.ui.chartEditor.steps.Base.prototype.getDataMappings_ = function(dataSet
 
 
 /**
- * Gets first match chart type by selected data mappings uses mappings reference names.
- * {anychart.ui.chartEditor.steps.Base.Model.presetType} has higher priority when matching.
- * @return {string}
+ * Checks current compatibility of mappings and current chart.
+ * @param {boolean=} opt_getSuggestions 'true' if we need to get suggestion of category and chart type.
+ * @return {{type: string, category: string, isValid: boolean}}
  */
-anychart.ui.chartEditor.steps.Base.prototype.getChartType = function() {
-  var chartType = '';
-  goog.object.forEach(this.sharedModel_.presets, function(preset) {
-    goog.array.forEach(preset.list, function(chartDescriptor) {
-      if (this.isReferenceValuesPresent_(chartDescriptor.referenceNames)) {
-        if (!chartType || chartDescriptor.type == this.sharedModel_.presetType) {
-          chartType = chartDescriptor.type;
+anychart.ui.chartEditor.steps.Base.prototype.checkMappings = function(opt_getSuggestions) {
+  var result = {type: '', category: '', isValid: false};
+  for (var i in this.sharedModel_.presets) {
+    if (this.sharedModel_.presets.hasOwnProperty(i)) {
+      var preset = this.sharedModel_.presets[i];
+      var tmp = preset.category;
+      for (var j = 0; j < preset.list.length; j++) {
+        var chartDescriptor = preset.list[j];
+        if (opt_getSuggestions && this.isReferenceValuesPresent_(chartDescriptor.referenceNames)) {
+          result.category = tmp;
+          result.type = chartDescriptor.type;
+          break;
+        } else if (chartDescriptor.type == this.sharedModel_.presetType) {
+          result.category = tmp;
+          result.type = chartDescriptor.type;
+          result.isValid = this.isReferenceValuesPresent_(chartDescriptor.referenceNames);
+          break;
         }
       }
-    }, this);
-  }, this);
+    }
+    if (result.type) break;
+  }
 
-  return chartType;
+  return result;
 };
 
 

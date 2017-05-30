@@ -118,15 +118,15 @@ goog.require('goog.array');
  *     // 'close' is an element with the index of 3.
  *     // All elements with the index greater than 3 are ignored.
  * @param {(Array|string)=} opt_data Data set raw data can be set here.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_settings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
  * @constructor
  * @implements {anychart.data.IView}
  * @extends {anychart.core.Base}
  */
-anychart.data.Set = function(opt_data, opt_csvSettings) {
+anychart.data.Set = function(opt_data, opt_settings) {
   anychart.data.Set.base(this, 'constructor');
-  this.data(opt_data || null, opt_csvSettings);
+  this.data(opt_data || null, opt_settings);
 };
 goog.inherits(anychart.data.Set, anychart.core.Base);
 
@@ -172,33 +172,16 @@ anychart.data.Set.prototype.simpleValuesSeen_ = false;
 /**
  * Getter/setter for data.
  * @param {(Array|string)=} opt_value .
- * @param {Object.<string, (string|boolean|undefined)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
- *    here as a hash map.
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_settings If CSV string is passed, you
+ *    can pass CSV parser settings here as a hash map.
  * @return {!(anychart.data.Set|Array)} .
  */
-anychart.data.Set.prototype.data = function(opt_value, opt_csvSettings) {
+anychart.data.Set.prototype.data = function(opt_value, opt_settings) {
   if (goog.isDef(opt_value)) {
     anychart.globalLock.lock();
-    if (goog.isString(opt_value)) {
-      try {
-        var parser = new anychart.data.csv.Parser();
-        if (goog.isObject(opt_csvSettings)) {
-          parser.rowsSeparator(/** @type {string|undefined} */(opt_csvSettings['rowsSeparator'])); // if it is undefined, it will not be set.
-          parser.columnsSeparator(/** @type {string|undefined} */(opt_csvSettings['columnsSeparator'])); // if it is undefined, it will not be set.
-          parser.ignoreTrailingSpaces(/** @type {boolean|undefined} */(opt_csvSettings['ignoreTrailingSpaces'])); // if it is undefined, it will not be set.
-          parser.ignoreFirstRow(/** @type {boolean|undefined} */(opt_csvSettings['ignoreFirstRow'])); // if it is undefined, it will not be set.
-        }
-        opt_value = parser.parse(opt_value);
-      } catch (e) {
-        if (e instanceof Error) {
-          try {
-            goog.global['console']['log'](e.message);
-          } catch (ignored) {
-          }
-        }
-        opt_value = null;
-      }
-    }
+    if (goog.isString(opt_value))
+      opt_value = anychart.data.parseText(opt_value, opt_settings);
+
     if (goog.isArrayLike(opt_value)) {
       var data = [];
       for (var i = 0; i < opt_value.length; i++) {
@@ -535,12 +518,12 @@ anychart.data.Set.prototype.getDataSets = function() {
  * ]);
  * chart.line(data);
  * @param {(Array|string)=} opt_data Data set raw data can be set here.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_settings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
  * @return {!anychart.data.Set} The instance of {@link anychart.data.Set} class for method chaining.
  */
-anychart.data.set = function(opt_data, opt_csvSettings) {
-  return new anychart.data.Set(opt_data, opt_csvSettings);
+anychart.data.set = function(opt_data, opt_settings) {
+  return new anychart.data.Set(opt_data, opt_settings);
 };
 
 

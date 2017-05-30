@@ -143,35 +143,40 @@ anychart.core.ui.Separator.prototype.SIMPLE_SEPARATOR_DESCRIPTORS = (function() 
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
 
-  map['fill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'fill',
       anychart.core.settings.fillOrFunctionNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['stroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'stroke',
       anychart.core.settings.strokeOrFunctionNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['width'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'width',
       anychart.core.settings.numberOrPercentNormalizer,
       anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map['height'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'height',
       anychart.core.settings.numberOrPercentNormalizer,
       anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map['orientation'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'orientation',
       anychart.enums.normalizeOrientation,
@@ -181,9 +186,9 @@ anychart.core.ui.Separator.prototype.SIMPLE_SEPARATOR_DESCRIPTORS = (function() 
   return map;
 })();
 anychart.core.settings.populate(anychart.core.ui.Separator, anychart.core.ui.Separator.prototype.SIMPLE_SEPARATOR_DESCRIPTORS);
+
+
 //endregion
-
-
 //region -- IObjectWithSettings implementation
 /** @inheritDoc */
 anychart.core.ui.Separator.prototype.getOwnOption = function(name) {
@@ -217,9 +222,9 @@ anychart.core.ui.Separator.prototype.setOption = function(name, value) {
 anychart.core.ui.Separator.prototype.check = function(flags) {
   return true;
 };
+
+
 //endregion
-
-
 //region -- IResolvable implementation
 /** @inheritDoc */
 anychart.core.ui.Separator.prototype.resolutionChainCache = function(opt_value) {
@@ -252,9 +257,9 @@ anychart.core.ui.Separator.prototype.getHighPriorityResolutionChain = function()
   }
   return sett;
 };
+
+
 //endregion
-
-
 //region -- Parental relations
 /**
  * Gets/sets new parent.
@@ -306,9 +311,9 @@ anychart.core.ui.Separator.prototype.parentInvalidated_ = function(e) {
 
   this.invalidate(state, signal);
 };
+
+
 //endregion
-
-
 /**
  * Whether needs force invalidation.
  * @return {boolean}
@@ -678,7 +683,7 @@ anychart.core.ui.Separator.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.core.ui.Separator.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.settings.deserialize(this, this.SIMPLE_SEPARATOR_DESCRIPTORS, config);
-  this.margin().setupByVal(config['margin'], opt_default);
+  this.margin().setupInternal(!!opt_default, config['margin']);
   this.zIndex(config['zIndex']);
   this.enabled(config['enabled']);
 };

@@ -48,9 +48,9 @@ anychart.core.linearGauge.ScaleBar.ControlPoint;
 anychart.core.linearGauge.ScaleBar.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.APPEARANCE;
+
+
 //endregion
-
-
 //region --- OWN/INHERITED API ---
 /**
  * Getter/setter for from.
@@ -240,9 +240,9 @@ anychart.core.linearGauge.ScaleBar.prototype.points = function(opt_value) {
   }
   return this.points_;
 };
+
+
 //endregion
-
-
 //region --- POSITION/BOUNDS ---
 /**
  * Getter/setter for width.
@@ -307,9 +307,9 @@ anychart.core.linearGauge.ScaleBar.prototype.layout = function(opt_value) {
 anychart.core.linearGauge.ScaleBar.prototype.isVertical = function() {
   return this.layout_ == anychart.enums.Layout.VERTICAL;
 };
+
+
 //endregion
-
-
 //region --- DRAWING ---
 /** @inheritDoc */
 anychart.core.linearGauge.ScaleBar.prototype.remove = function() {
@@ -610,9 +610,9 @@ anychart.core.linearGauge.ScaleBar.prototype.draw = function() {
 
   return this;
 };
+
+
 //endregion
-
-
 //region --- SETUP/DISPOSING ---
 /** @inheritDoc */
 anychart.core.linearGauge.ScaleBar.prototype.serialize = function() {

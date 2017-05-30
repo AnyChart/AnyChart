@@ -26,9 +26,9 @@ anychart.core.annotations.AnnotationTypes[anychart.enums.AnnotationTypes.FIBONAC
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.annotations.FibonacciTimezones.prototype.type = anychart.enums.AnnotationTypes.FIBONACCI_TIMEZONES;
+
+
 //endregion
-
-
 //region Drawing
 //----------------------------------------------------------------------------------------------------------------------
 //

@@ -21,26 +21,49 @@ anychart.color.TRANSPARENT_HANDLER = {'color': '#fff', 'opacity': 0.00001};
 
 /**
  * Blend two colors together, using the specified factor to indicate the weight given to the first color.
- * @example <t>stageOnly</t>
- * var color1 = [255, 0, 0];
- * var color2 = [0, 0, 255];
- * stage.rect(10, 10, stage.width() / 4, stage.height() - 20).fill('red');
- * stage.rect(3 * stage.width() / 4 - 10, 10, stage.width() / 4, stage.height() - 20).fill('blue');
- * var mixColor1 = anychart.color.blend(color1, color2, 0.2);
- * var mixColor2 = anychart.color.blend(color1, color2, 0.8);
- * stage.rect(stage.width() / 3 + 10, 10, stage.width() / 4, stage.height() / 2 - 10)
- *     .fill('rgb('+mixColor1.join(',')+')');
- * stage.rect(stage.width() / 3 + 10, stage.height() / 2 + 10, stage.width() / 4, stage.height() / 2 - 20)
- *     .fill('rgb('+mixColor2.join(',')+')');
- * @param {goog.color.Rgb} rgb1 The first color represented as RGB array of 3 numbers.
- * @param {goog.color.Rgb} rgb2 The second color represented as RGB array of 3 numbers.
- * @param {number} factor The weight of the first color over the second one rgb2. Values
+ * @param {Array.<number>|acgraph.vector.SolidFill} color1 - The first color represented as RGB array of 3 numbers or
+ *  an object with color and opacity.
+ * @param {Array.<number>|acgraph.vector.SolidFill} color2 - The second color represented as RGB array of 3 numbers or
+ *  an object with color and opacity.
+ * @param {number=} opt_factor - The weight of the first color over the second one rgb2. Values
  *     should be in the [0, 1] range. If set to a value less than 0, factor will be set to 0.
- *     If greater than 1, factor will be set to 1.
- * @return {!goog.color.Rgb} Combined color represented as RGB array.
+ *     If greater than 1, factor will be set to 1. Default is 0.5.
+ * @return {acgraph.vector.SolidFill} Combined color represented as acgraph.vector.SolidFill.
  */
-anychart.color.blend = function(rgb1, rgb2, factor) {
-  return goog.color.blend(rgb1, rgb2, factor);
+anychart.color.blend = function(color1, color2, opt_factor) {
+  var colorData1 = anychart.color.toRgbAndOpacity_(color1);
+  var colorData2 = anychart.color.toRgbAndOpacity_(color2);
+
+  var blendArray = goog.color.blend(colorData1.rgb, colorData2.rgb, goog.isDef(opt_factor) ? opt_factor : 0.5);
+  var blendOpacity = (colorData1.opacity + colorData2.opacity) / 2;
+
+  return /** @type {acgraph.vector.SolidFill} */ ({
+    color: goog.color.rgbArrayToHex(blendArray),
+    opacity: blendOpacity
+  });
+};
+
+
+/**
+ * @param {Array.<number>|acgraph.vector.SolidFill} color - Color.
+ * @return {{rgb: Array.<number>, opacity: number}}
+ * @private
+ */
+anychart.color.toRgbAndOpacity_ = function(color) {
+  var colorArray = color;
+  var opacity = 1;
+  if (!goog.isArray(color)) {
+    var stringValue;
+    if (goog.isString(color)) {
+      stringValue = color;
+    } else {
+      stringValue = color.color || '#000';
+      opacity = goog.isDef(color.opacity) ? color.opacity : 1;
+    }
+    var hex = anychart.color.parseColor(/** @type {string} */ (stringValue)).hex;
+    colorArray = goog.color.hexToRgb(hex);
+  }
+  return {rgb: /** @type {Array.<number>} */ (colorArray), opacity: opacity};
 };
 
 
@@ -152,15 +175,16 @@ anychart.color.bipolarHueProgression = function(opt_color1, opt_color2, opt_coun
  */
 anychart.color.blendedHueProgression = function(opt_color1, opt_color2, opt_count) {
   var count = goog.isDef(opt_count) ? opt_count : 7;
-  var color1 = goog.color.hexToRgb(anychart.color.parseColor(opt_color1 || 'yellow').hex);
-  var color2 = goog.color.hexToRgb(anychart.color.parseColor(opt_color2 || 'brown').hex);
+  var color1 = anychart.color.parseColor(opt_color1 || 'yellow').hex;
+  var color2 = anychart.color.parseColor(opt_color2 || 'brown').hex;
 
-  var progression = [goog.color.rgbToHex.apply(null, color1)];
+  var progression = [color1];
   var step = 1 / count;
   for (var i = 1; i < count - 1; i++) {
-    progression.push(goog.color.rgbToHex.apply(null, anychart.color.blend(color2, color1, step * i)));
+    var blended = anychart.color.blend(color2, color1, step * i);
+    progression.push(blended.color);
   }
-  progression.push(goog.color.rgbToHex.apply(null, color2));
+  progression.push(color2);
   return progression;
 };
 
@@ -482,6 +506,117 @@ anychart.color.setThickness = function(stroke, thickness, opt_opacity) {
     norm['opacity'] = opt_opacity;
   return norm;
 };
+
+
+/**
+ * Series cache of resolver functions.
+ * @type {Object.<string, function(anychart.core.IShapeManagerUser, number):(acgraph.vector.Fill|acgraph.vector.Stroke|acgraph.vector.PatternFill)>}
+ */
+anychart.color.colorResolversCache = {};
+
+
+/**
+ * Returns a color resolver for passed color names and type.
+ * @param {(Array.<string>|null|boolean)} colorNames
+ * @param {anychart.enums.ColorType} colorType
+ * @return {function(anychart.core.IShapeManagerUser, number, boolean=, boolean=):acgraph.vector.AnyColor}
+ */
+anychart.color.getColorResolver = function(colorNames, colorType) {
+  var result;
+  if (!colorNames) return anychart.color.getNullColor;
+  if (goog.isArray(colorNames)) {
+    var hash = colorType + '|' + colorNames.join('|');
+    result = anychart.color.colorResolversCache[hash];
+    if (!result) {
+      /** @type {!Function} */
+      var normalizerFunc;
+      switch (colorType) {
+        case anychart.enums.ColorType.STROKE:
+          normalizerFunc = anychart.core.settings.strokeOrFunctionSimpleNormalizer;
+          break;
+        case anychart.enums.ColorType.HATCH_FILL:
+          normalizerFunc = anychart.core.settings.hatchFillOrFunctionSimpleNormalizer;
+          break;
+        default:
+        case anychart.enums.ColorType.FILL:
+          normalizerFunc = anychart.core.settings.fillOrFunctionSimpleNormalizer;
+          break;
+      }
+      anychart.color.colorResolversCache[hash] = result = goog.partial(anychart.color.getColor,
+          colorNames, normalizerFunc, colorType == anychart.enums.ColorType.HATCH_FILL);
+    }
+  } else {
+    result = anychart.color.colorResolversCache['transparent'];
+    if (!result)
+      result = anychart.color.colorResolversCache['transparent'] = function() {return anychart.color.TRANSPARENT_HANDLER};
+  }
+  return result;
+};
+
+
+/**
+ * Returns normalized null stroke or fill.
+ * @return {string}
+ */
+anychart.color.getNullColor = function() {
+  return 'none';
+};
+
+
+/**
+ * Returns final color or hatch fill for passed params.
+ * @param {Array.<string>} colorNames
+ * @param {!Function} normalizer
+ * @param {boolean} isHatchFill
+ * @param {anychart.core.IShapeManagerUser} series
+ * @param {number} state
+ * @param {boolean=} opt_ignorePointSettings
+ * @param {boolean=} opt_ignoreColorScale
+ * @return {acgraph.vector.Fill|acgraph.vector.Stroke|acgraph.vector.PatternFill}
+ */
+anychart.color.getColor = function(colorNames, normalizer, isHatchFill, series, state, opt_ignorePointSettings, opt_ignoreColorScale) {
+  var stateColor, context;
+  state = Math.min(state & (anychart.PointState.HOVER | anychart.PointState.SELECT),
+      anychart.PointState.SELECT);
+  if (state != anychart.PointState.NORMAL && colorNames.length > 1) {
+    stateColor = opt_ignorePointSettings ?
+        series.getOption(colorNames[state]) :
+        series.resolveOption(colorNames[state], series.getIterator(), normalizer);
+    if (isHatchFill && stateColor === true)
+      stateColor = normalizer(series.getAutoHatchFill());
+    if (goog.isDef(stateColor)) {
+      if (!goog.isFunction(stateColor))
+        return /** @type {acgraph.vector.Fill|acgraph.vector.Stroke|acgraph.vector.PatternFill} */(stateColor);
+      else if (isHatchFill) { // hatch fills set as function some why cannot nest by initial implementation
+        context = series.getHatchFillResolutionContext(opt_ignorePointSettings);
+        return /** @type {acgraph.vector.PatternFill} */(normalizer(stateColor.call(context, context)));
+      }
+    }
+  }
+  // we can get here only if state color is undefined or is a function
+  var color = opt_ignorePointSettings ?
+      series.getOption(colorNames[0]) :
+      series.resolveOption(colorNames[0], series.getIterator(), normalizer);
+  if (isHatchFill && color === true)
+    color = normalizer(series.getAutoHatchFill());
+  if (goog.isFunction(color)) {
+    context = isHatchFill ?
+        series.getHatchFillResolutionContext(opt_ignorePointSettings) :
+        series.getColorResolutionContext(void 0, opt_ignorePointSettings, opt_ignoreColorScale);
+    color = /** @type {acgraph.vector.Fill|acgraph.vector.Stroke|acgraph.vector.PatternFill} */(normalizer(color.call(context, context)));
+  }
+  if (stateColor) { // it is a function and not a hatch fill here
+    context = series.getColorResolutionContext(
+        /** @type {acgraph.vector.Fill|acgraph.vector.Stroke} */(color),
+        opt_ignorePointSettings,
+        opt_ignoreColorScale);
+    color = normalizer(stateColor.call(context, context));
+  }
+  return /** @type {acgraph.vector.Fill|acgraph.vector.Stroke|acgraph.vector.PatternFill} */(color);
+};
+
+
+
 
 
 //exports

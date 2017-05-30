@@ -859,17 +859,17 @@ anychart.core.gantt.TimelineHeader.Level.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.gantt.TimelineHeader.Level.prototype.setupByJSON = function(config) {
+anychart.core.gantt.TimelineHeader.Level.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.gantt.TimelineHeader.Level.base(this, 'setupByJSON', config);
 
   this.tileFill(config['tileFill']);
   this.tilesSeparationStroke(config['tilesSeparationStroke']);
-  this.labels().setupByVal(config['labels']);
+  this.labels().setupInternal(!!opt_default, config['labels']);
 
 };
+
+
 //endregion
-
-
 //exports
 (function() {
   var proto = anychart.core.gantt.TimelineHeader.prototype;

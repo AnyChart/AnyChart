@@ -23,16 +23,16 @@ anychart.standalones.Title.prototype.dependsOnContainerSize = function() {
   var height = this.height();
   return anychart.utils.isPercent(width) || anychart.utils.isPercent(height) || goog.isNull(width) || goog.isNull(height);
 };
+
+
 //endregion
-
-
 /**
  * Constructor function.
  * @return {!anychart.standalones.Title}
  */
 anychart.standalones.title = function() {
   var title = new anychart.standalones.Title();
-  title.setupByVal(anychart.getFullTheme('standalones.title'), true);
+  title.setupInternal(true, anychart.getFullTheme('standalones.title'));
   return title;
 };
 

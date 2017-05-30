@@ -30,7 +30,7 @@ anychart.line = function(var_args) {
   chart.defaultSeriesType(anychart.enums.CartesianSeriesType.LINE);
   chart.setType(anychart.enums.ChartTypes.LINE);
 
-  chart.setupByVal(anychart.getFullTheme('line'), true);
+  chart.setupInternal(true, anychart.getFullTheme('line'));
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['line'](arguments[i]);

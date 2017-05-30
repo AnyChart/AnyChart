@@ -1,4 +1,4 @@
-goog.provide('anychart.core.drawers.map.Connector');
+goog.provide('anychart.core.drawers.MapConnector');
 goog.require('anychart.core.drawers');
 goog.require('anychart.core.drawers.Base');
 goog.require('anychart.enums');
@@ -11,8 +11,8 @@ goog.require('anychart.enums');
  * @constructor
  * @extends {anychart.core.drawers.Base}
  */
-anychart.core.drawers.map.Connector = function(series) {
-  anychart.core.drawers.map.Connector.base(this, 'constructor', series);
+anychart.core.drawers.MapConnector = function(series) {
+  anychart.core.drawers.MapConnector.base(this, 'constructor', series);
 
   /**
    * @type {function(anychart.core.series.Base, anychart.data.IRowInfo, number):*}
@@ -46,16 +46,16 @@ anychart.core.drawers.map.Connector = function(series) {
    */
   this.eventHandlerPathWidth_ = 20;
 };
-goog.inherits(anychart.core.drawers.map.Connector, anychart.core.drawers.Base);
-anychart.core.drawers.AvailableDrawers[anychart.enums.SeriesDrawerTypes.CONNECTOR] = anychart.core.drawers.map.Connector;
+goog.inherits(anychart.core.drawers.MapConnector, anychart.core.drawers.Base);
+anychart.core.drawers.AvailableDrawers[anychart.enums.SeriesDrawerTypes.CONNECTOR] = anychart.core.drawers.MapConnector;
 
 
 /** @inheritDoc */
-anychart.core.drawers.map.Connector.prototype.type = anychart.enums.SeriesDrawerTypes.CONNECTOR;
+anychart.core.drawers.MapConnector.prototype.type = anychart.enums.SeriesDrawerTypes.CONNECTOR;
 
 
 /** @inheritDoc */
-anychart.core.drawers.map.Connector.prototype.flags = (
+anychart.core.drawers.MapConnector.prototype.flags = (
     // anychart.core.drawers.Capabilities.NEEDS_ZERO |
     // anychart.core.drawers.Capabilities.NEEDS_SIZE_SCALE |
     // anychart.core.drawers.Capabilities.USES_CONTAINER_AS_ROOT |
@@ -80,11 +80,11 @@ anychart.core.drawers.map.Connector.prototype.flags = (
 
 
 /** @inheritDoc */
-anychart.core.drawers.map.Connector.prototype.yValueNames = (['points']);
+anychart.core.drawers.MapConnector.prototype.yValueNames = (['points']);
 
 
 /** @inheritDoc */
-anychart.core.drawers.map.Connector.prototype.requiredShapes = (function() {
+anychart.core.drawers.MapConnector.prototype.requiredShapes = (function() {
   var res = {};
   res['path'] = anychart.enums.ShapeType.PATH;
   res['hatchFill'] = anychart.enums.ShapeType.PATH;
@@ -93,7 +93,7 @@ anychart.core.drawers.map.Connector.prototype.requiredShapes = (function() {
 
 
 /** @inheritDoc */
-anychart.core.drawers.map.Connector.prototype.drawSubsequentPoint = function(point, state) {
+anychart.core.drawers.MapConnector.prototype.drawSubsequentPoint = function(point, state) {
   var startSize = /** @type {number} */(this.startSizeGetter_(this.series, point, state));
   var endSize = /** @type {number} */(this.endSizeGetter_(this.series, point, state));
 
@@ -119,7 +119,7 @@ anychart.core.drawers.map.Connector.prototype.drawSubsequentPoint = function(poi
  *    (we do so to avoid reiterating to check on missing).
  * @protected
  */
-anychart.core.drawers.map.Connector.prototype.getReferenceCoords = function(iterator) {
+anychart.core.drawers.MapConnector.prototype.getReferenceCoords = function(iterator) {
   var refValues = this.getYValueNames();
 
   var scale = /** @type {anychart.scales.Geo} */(this.series.getChart().scale());
@@ -171,7 +171,7 @@ anychart.core.drawers.map.Connector.prototype.getReferenceCoords = function(iter
  * @return {Array.<number>}
  * @private
  */
-anychart.core.drawers.map.Connector.prototype.drawConnector_ = function(path, start_x, start_y, current_x, current_y, control1x, control1y, control2x, control2y, startSize, endSize, curvature, directionRltAngle, curvatureBasePointAngle) {
+anychart.core.drawers.MapConnector.prototype.drawConnector_ = function(path, start_x, start_y, current_x, current_y, control1x, control1y, control2x, control2y, startSize, endSize, curvature, directionRltAngle, curvatureBasePointAngle) {
   var vertical, horizontal, angle, r;
   var controlLength, direction, finalControlLength, controlDirection;
 
@@ -346,7 +346,7 @@ anychart.core.drawers.map.Connector.prototype.drawConnector_ = function(path, st
  * @param {number} endSize .
  * @private
  */
-anychart.core.drawers.map.Connector.prototype.drawPoint_ = function(point, shapes, startSize, endSize) {
+anychart.core.drawers.MapConnector.prototype.drawPoint_ = function(point, shapes, startSize, endSize) {
   var curvature = /** @type {number} */(this.curvatureGetter_(this.series, point, 0));
 
   var i, len, current_x, current_y;
@@ -394,14 +394,14 @@ anychart.core.drawers.map.Connector.prototype.drawPoint_ = function(point, shape
 
         var directionRltAngle = 1;
         var curvatureBasePointAngle;
-        if (current_x < start_x && current_y < start_y) {
+        if (current_x <= start_x && current_y <= start_y) {
           curvatureBasePointAngle = anglePathNormal - 90;
-        } else if (current_x < start_x && current_y > start_y) {
+        } else if (current_x <= start_x && current_y >= start_y) {
           curvatureBasePointAngle = 270 - anglePathNormal;
-        } else if (current_x > start_x && current_y > start_y) {
+        } else if (current_x >= start_x && current_y >= start_y) {
           curvatureBasePointAngle = anglePathNormal - 90;
           directionRltAngle = -1;
-        } else if (current_x > start_x && current_y < start_y) {
+        } else if (current_x >= start_x && current_y <= start_y) {
           curvatureBasePointAngle = 180 - anglePathNormal + 90;
           directionRltAngle = -1;
         }

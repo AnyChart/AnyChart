@@ -455,25 +455,29 @@ anychart.core.resource.Conflicts.prototype.drawLabel = function(index, formatPro
 anychart.core.resource.Conflicts.DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  map['fill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'fill',
       anychart.core.settings.fillNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
-  map['stroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'stroke',
       anychart.core.settings.strokeNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
-  map['hatchFill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hatchFill',
       anychart.core.settings.hatchFillNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
-  map['height'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'height',
       anychart.core.settings.numberNormalizer,
@@ -591,10 +595,10 @@ anychart.core.resource.Conflicts.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.resource.Conflicts.prototype.setupByJSON = function(config) {
+anychart.core.resource.Conflicts.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.resource.Conflicts.base(this, 'setupByJSON', config);
   anychart.core.settings.deserialize(this, anychart.core.resource.Conflicts.DESCRIPTORS, config);
-  this.labels().setupByVal(config['labels']);
+  this.labels().setupInternal(!!opt_default, config['labels']);
 };
 
 

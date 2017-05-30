@@ -33,7 +33,8 @@ goog.inherits(anychart.core.series.Polar, anychart.core.series.Radar);
 anychart.core.series.Polar.PROPERTY_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  map['closed'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'closed',
       anychart.core.settings.booleanNormalizer,
@@ -46,9 +47,35 @@ anychart.core.settings.populate(anychart.core.series.Polar, anychart.core.series
 
 
 /** @inheritDoc */
-anychart.core.series.Polar.prototype.getCategoryWidth = function() {
-  return (this.xScale().getPointWidthRatio() || (this.xScale().getZoomFactor() / this.getIterator().getRowsCount())) *
+anychart.core.series.Polar.prototype.getCategoryWidth = function(opt_categoryIndex) {
+  var ratio;
+  if (goog.isDef(opt_categoryIndex) && this.xScale() instanceof anychart.scales.Ordinal) {
+    ratio = this.xScale().weightRatios()[opt_categoryIndex];
+  } else {
+    ratio = this.xScale().getPointWidthRatio();
+  }
+  return (ratio || (this.xScale().getZoomFactor() / this.getIterator().getRowsCount())) *
       360;
+};
+
+
+/** @inheritDoc */
+anychart.core.series.Polar.prototype.resolveAutoAnchorForPosition = function(position) {
+  if (position == anychart.enums.Position.CENTER)
+    return anychart.enums.Anchor.CENTER;
+  var startAngle = /** @type {number} */(this.getOption('startAngle'));
+  var x = /** @type {number} */(this.getIterator().meta('xRatio'));
+  var angle = startAngle - 90 + 360 * x;
+  if (this.isWidthBased()) {
+    if (anychart.utils.isLeftAnchor(/** @type {anychart.enums.Anchor} */(position))) {
+      angle -= this.pointWidthCache / 2;
+    } else if (anychart.utils.isRightAnchor(/** @type {anychart.enums.Anchor} */(position))) {
+      angle += this.pointWidthCache / 2;
+    }
+  }
+  var anchor = anychart.utils.getAnchorForAngle(angle);
+  anchor = anychart.utils.rotateAnchorByPosition(anchor, position);
+  return anchor;
 };
 
 
@@ -66,13 +93,11 @@ anychart.core.series.Polar.prototype.createPositionProviderByGeometry = function
     bottomY = /** @type {number} */(iterator.meta(this.config.anchoredPositionBottom));
     bottomX = /** @type {number} */(iterator.meta(this.config.anchoredPositionBottom + 'X'));
   } else {
-    var diff = this.pointWidthCache / (Math.PI * 4);
+    var diff = this.pointWidthCache / 720;
     var x = /** @type {number} */(iterator.meta('xRatio'));
     var top = /** @type {number} */(iterator.meta(this.config.anchoredPositionTop + 'Ratio'));
     var bottom = /** @type {number} */(iterator.meta(this.config.anchoredPositionBottom + 'Ratio'));
-    if (anchor == anychart.enums.Anchor.LEFT_TOP ||
-        anchor == anychart.enums.Anchor.LEFT_CENTER ||
-        anchor == anychart.enums.Anchor.LEFT_BOTTOM) {
+    if (anychart.utils.isLeftAnchor(anchor)) {
       x -= diff;
     } else { // RIGHT_*
       x += diff;
@@ -105,9 +130,18 @@ anychart.core.series.Polar.prototype.makeXRatioMeta = function(rowInfo, yNames, 
 
 
 /** @inheritDoc */
-anychart.core.series.Polar.prototype.prepareMetaMakers = function() {
-  anychart.core.series.Polar.base(this, 'prepareMetaMakers');
+anychart.core.series.Polar.prototype.prepareMetaMakers = function(yNames, yColumns) {
+  anychart.core.series.Polar.base(this, 'prepareMetaMakers', yNames, yColumns);
   this.metaMakers.push(this.makeXRatioMeta);
+};
+
+
+/**
+ * Returns if the chart is sorted mode.
+ * @return {boolean}
+ */
+anychart.core.series.Polar.prototype.sortedMode = function() {
+  return /** @type {boolean} */(this.chart.sortPointsByX());
 };
 
 

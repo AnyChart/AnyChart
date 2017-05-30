@@ -835,6 +835,19 @@ anychart.core.stock.Scroller.prototype.getAllSeries = function() {
 
 
 /**
+ * Creates ADL indicator on the scroller.
+ * @param {!anychart.data.TableMapping} mapping
+ * @param {anychart.enums.StockSeriesType=} opt_seriesType
+ * @return {anychart.core.stock.indicators.ADL}
+ */
+anychart.core.stock.Scroller.prototype.adl = function(mapping, opt_seriesType) {
+  var result = new anychart.core.stock.indicators.ADL(this, mapping, opt_seriesType);
+  this.indicators_.push(result);
+  return result;
+};
+
+
+/**
  * Creates AMA indicator on the scroller.
  * @param {!anychart.data.TableMapping} mapping
  * @param {number=} opt_period
@@ -921,6 +934,68 @@ anychart.core.stock.Scroller.prototype.bbandsB = function(mapping, opt_period, o
  */
 anychart.core.stock.Scroller.prototype.bbandsWidth = function(mapping, opt_period, opt_deviation, opt_seriesType) {
   var result = new anychart.core.stock.indicators.BBandsWidth(this, mapping, opt_period, opt_deviation, opt_seriesType);
+  this.indicators_.push(result);
+  return result;
+};
+
+
+/**
+ * Creates CCI indicator on the scroller.
+ * @param {!anychart.data.TableMapping} mapping
+ * @param {number=} opt_period
+ * @param {anychart.enums.StockSeriesType=} opt_seriesType
+ * @return {anychart.core.stock.indicators.CCI}
+ */
+anychart.core.stock.Scroller.prototype.cci = function(mapping, opt_period, opt_seriesType) {
+  var result = new anychart.core.stock.indicators.CCI(this, mapping, opt_period, opt_seriesType);
+  this.indicators_.push(result);
+  return result;
+};
+
+
+/**
+ * Creates CHO indicator on the chart.
+ * @param {!anychart.data.TableMapping} mapping
+ * @param {number=} opt_fastPeriod [3] Indicator period. Defaults to 3.
+ * @param {number=} opt_slowPeriod [10] Indicator period. Defaults to 10.
+ * @param {string=} opt_maType [EMA] Indicator smoothing type. Defaults to EMA.
+ * @param {anychart.enums.StockSeriesType=} opt_seriesType
+ * @return {anychart.core.stock.indicators.CHO}
+ */
+anychart.core.stock.Scroller.prototype.cho = function(mapping, opt_fastPeriod, opt_slowPeriod, opt_maType, opt_seriesType) {
+  var result = new anychart.core.stock.indicators.CHO(this, mapping, opt_fastPeriod, opt_slowPeriod, opt_maType, opt_seriesType);
+  this.indicators_.push(result);
+  return result;
+};
+
+
+/**
+ * Creates CMF indicator on the chart.
+ * @param {!anychart.data.TableMapping} mapping
+ * @param {number=} opt_period
+ * @param {anychart.enums.StockSeriesType=} opt_seriesType
+ * @return {anychart.core.stock.indicators.CMF}
+ */
+anychart.core.stock.Scroller.prototype.cmf = function(mapping, opt_period, opt_seriesType) {
+  var result = new anychart.core.stock.indicators.CMF(this, mapping, opt_period, opt_seriesType);
+  this.indicators_.push(result);
+  return result;
+};
+
+
+/**
+ * Creates DMI indicator on the chart.
+ * @param {!anychart.data.TableMapping} mapping
+ * @param {number=} opt_period
+ * @param {number=} opt_adxPeriod
+ * @param {boolean=} opt_useWildersSmoothing
+ * @param {anychart.enums.StockSeriesType=} opt_pdiSeriesType
+ * @param {anychart.enums.StockSeriesType=} opt_ndiSeriesType
+ * @param {anychart.enums.StockSeriesType=} opt_adxSeriesType
+ * @return {anychart.core.stock.indicators.DMI}
+ */
+anychart.core.stock.Scroller.prototype.dmi = function(mapping, opt_period, opt_adxPeriod, opt_useWildersSmoothing, opt_pdiSeriesType, opt_ndiSeriesType, opt_adxSeriesType) {
+  var result = new anychart.core.stock.indicators.DMI(this, mapping, opt_period, opt_adxPeriod, opt_useWildersSmoothing, opt_pdiSeriesType, opt_ndiSeriesType, opt_adxSeriesType);
   this.indicators_.push(result);
   return result;
 };
@@ -1175,9 +1250,9 @@ anychart.core.stock.Scroller.prototype.invalidateSeries_ = function() {
         anychart.ConsistencyState.SERIES_HATCH_FILL |
         anychart.ConsistencyState.BOUNDS);
 };
+
+
 //endregion
-
-
 //region Infrastructure
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1273,9 +1348,9 @@ anychart.core.stock.Scroller.prototype.grouping = function() {
 anychart.core.stock.Scroller.prototype.isVertical = function() {
   return false;
 };
+
+
 //endregion
-
-
 //region Public methods
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1290,22 +1365,57 @@ anychart.core.stock.Scroller.prototype.isVertical = function() {
 anychart.core.stock.Scroller.prototype.yScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (goog.isString(opt_value)) {
-      this.registerDisposable(opt_value = anychart.scales.ScatterBase.fromString(opt_value, false));
+      opt_value = anychart.scales.ScatterBase.fromString(opt_value, false);
     }
     if (!(opt_value instanceof anychart.scales.ScatterBase)) {
       anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['Scatter chart scales', 'scatter', 'linear, log']);
       return this;
     }
     if (this.yScale_ != opt_value) {
+      if (this.yScale_)
+        this.yScale_.unlistenSignals(this.yScaleInvalidated, this);
       this.yScale_ = opt_value;
+      if (this.yScale_)
+        this.yScale_.listenSignals(this.yScaleInvalidated, this);
+      for (var i = 0; i < this.series_.length; i++) {
+        var series = this.series_[i];
+        if (series && series.enabled() && series.yScale() == this.yScale_) {
+          series.invalidate(anychart.ConsistencyState.SERIES_POINTS);
+          this.invalidate(anychart.ConsistencyState.STOCK_SCROLLER_SERIES);
+        }
+      }
+      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   } else {
     if (!this.yScale_) {
       this.yScale_ = anychart.scales.linear();
-      this.registerDisposable(this.yScale_);
+      this.yScale_.listenSignals(this.yScaleInvalidated, this);
     }
     return this.yScale_;
+  }
+};
+
+
+/**
+ * Scale invalidation handler.
+ * @param {anychart.SignalEvent} e
+ * @protected
+ */
+anychart.core.stock.Scroller.prototype.yScaleInvalidated = function(e) {
+  var foundOne = 0;
+  for (var i = 0; i < this.series_.length; i++) {
+    var series = this.series_[i];
+    if (series && series.enabled() && series.yScale() == this.yScale_) {
+      foundOne |= series.invalidate(anychart.ConsistencyState.SERIES_POINTS);
+    }
+  }
+  if (foundOne) {
+    var signal = anychart.Signal.NEEDS_REDRAW;
+    if (e.hasSignal(anychart.Signal.NEEDS_RECALCULATION)) {
+      signal |= anychart.Signal.NEEDS_RECALCULATION;
+    }
+    this.invalidate(anychart.ConsistencyState.STOCK_SCROLLER_SERIES, signal);
   }
 };
 
@@ -1332,9 +1442,9 @@ anychart.core.stock.Scroller.prototype.xAxis = function(opt_value) {
     return this.xAxis_;
   }
 };
+
+
 //endregion
-
-
 //region Invalidation handlers
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1365,9 +1475,9 @@ anychart.core.stock.Scroller.prototype.invalidateScaleDependend = function() {
     this.xAxis_.invalidate(anychart.ConsistencyState.APPEARANCE);
   this.invalidate(anychart.ConsistencyState.STOCK_SCROLLER_SERIES | anychart.ConsistencyState.STOCK_SCROLLER_AXIS);
 };
+
+
 //endregion
-
-
 //region Drawing
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1423,10 +1533,10 @@ anychart.core.stock.Scroller.prototype.draw = function() {
 
   return this;
 };
+
+
 //endregion
-
-
-//region --- Palettes
+//region Palettes
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Palettes
@@ -1543,9 +1653,9 @@ anychart.core.stock.Scroller.prototype.getKeyByIndex = function(index) {
 anychart.core.stock.Scroller.prototype.getIndexByKey = function(key) {
   return this.chart_.getScrollerIndexByKey(key);
 };
+
+
 //endregion
-
-
 //region Events
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1563,9 +1673,9 @@ anychart.core.stock.Scroller.prototype.makeRangeChangeEvent = function(type, sta
     'source': source
   };
 };
+
+
 //endregion
-
-
 //region Serialization / Deserialization / Disposing
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1587,6 +1697,8 @@ anychart.core.stock.Scroller.prototype.disposeInternal = function() {
 
   goog.dispose(this.xAxis_);
   this.xAxis_ = null;
+
+  this.yScale_ = null;
 
   goog.dispose(this.xScale_);
   this.xScale_ = null;
@@ -1683,9 +1795,9 @@ anychart.core.stock.Scroller.prototype.setupByJSON = function(config, opt_defaul
   this.palette(config['palette']);
   this.hatchFillPalette(config['hatchFillPalette']);
 };
+
+
 //endregion
-
-
 //exports
 (function() {
   var proto = anychart.core.stock.Scroller.prototype;
@@ -1717,12 +1829,17 @@ anychart.core.stock.Scroller.prototype.setupByJSON = function(config, opt_defaul
   proto['removeAllSeries'] = proto.removeAllSeries;
   proto['palette'] = proto.palette;
   proto['hatchFillPalette'] = proto.hatchFillPalette;
+  proto['adl'] = proto.adl;
   proto['ama'] = proto.ama;
   proto['aroon'] = proto.aroon;
   proto['atr'] = proto.atr;
   proto['bbands'] = proto.bbands;
   proto['bbandsB'] = proto.bbandsB;
   proto['bbandsWidth'] = proto.bbandsWidth;
+  proto['cci'] = proto.cci;
+  proto['cho'] = proto.cho;
+  proto['cmf'] = proto.cmf;
+  proto['dmi'] = proto.dmi;
   proto['ema'] = proto.ema;
   proto['kdj'] = proto.kdj;
   proto['macd'] = proto.macd;

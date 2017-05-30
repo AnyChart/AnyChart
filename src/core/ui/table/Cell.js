@@ -57,13 +57,13 @@ anychart.core.ui.table.Cell.prototype.reset = function(row, col) {
   this.col_ = col;
   /**
    * Content.
-   * @type {anychart.core.VisualBase|string|number}
+   * @type {acgraph.vector.Element|anychart.core.VisualBase|string|number}
    * @private
    */
   this.content_ = null;
   /**
    * Real content (strings and numbers are LabelsFactory.Labels here).
-   * @type {anychart.core.VisualBase}
+   * @type {acgraph.vector.Element|anychart.core.VisualBase}
    */
   this.realContent = null;
   /**
@@ -80,8 +80,8 @@ anychart.core.ui.table.Cell.prototype.reset = function(row, col) {
 
 /**
  * Getter/setter for content.
- * @param {(anychart.core.VisualBase|string|number)=} opt_value
- * @return {anychart.core.VisualBase|anychart.core.ui.table.Cell|string|number}
+ * @param {(acgraph.vector.Element|anychart.core.VisualBase|string|number)=} opt_value
+ * @return {acgraph.vector.Element|anychart.core.VisualBase|anychart.core.ui.table.Cell|string|number}
  */
 anychart.core.ui.table.Cell.prototype.content = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -89,10 +89,14 @@ anychart.core.ui.table.Cell.prototype.content = function(opt_value) {
       this.content_ = opt_value;
       if (this.realContent)
         this.table.clearContent(this.realContent);
-      if ((goog.isNumber(opt_value) || goog.isString(opt_value)))
+      if ((goog.isNumber(opt_value) || goog.isString(opt_value))) {
         this.realContent = this.table.createTextCellContent(opt_value);
-      else
+      } else if (opt_value instanceof acgraph.vector.Element) {
+        this.realContent = acgraph.layer();
+        this.realContent.addChild(opt_value);
+      } else {
         this.realContent = opt_value;
+      }
       this.table.invalidate(anychart.ConsistencyState.TABLE_CONTENT, anychart.Signal.NEEDS_REDRAW);
     }
     return this;

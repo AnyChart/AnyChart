@@ -1,17 +1,25 @@
 .anychart-chart-editor {
+  position: relative;
   background: white;
-  border: 1px solid #acacac;
   color: #000;
-  position: absolute;
-  width: 80%;
-  height: 80%;
-  min-width: 780px; // 260 is a min size of a settings sidebar, total min is 260 * 3
-  min-height: 400px;
-
   font-family: Arial, sans-serif;
   font-size: 13px;
+  width: 100%;
+  height: 100%;
+}
 
+.anychart-chart-editor-dialog {
+  background: white;
+  border: 1px solid #acacac;
+  position: absolute;
+  width: 90%;
+  height: 90%;
+  min-width: 780px; // 260 is a min size of a settings sidebar, total min is 260 * 3
+  min-height: 400px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, .2); //todo: replace on less mixin
+  color: #000;
+  font-family: Arial, sans-serif;
+  font-size: 13px;
 }
 
 .anychart-chart-editor a,
@@ -111,15 +119,14 @@
 
 
 
-.anychart-chart-editor-bg {
+.anychart-chart-editor-dialog-bg {
   background: #666;
   left: 0;
   position: absolute;
   top: 0;
 }
 
-.anychart-chart-editor-title {
-  color: #000;
+.anychart-chart-editor-dialog-title {
   font-weight: bold;
   height: 48px;
   position: absolute;
@@ -130,7 +137,7 @@
   _zoom: 1; /* Ensures proper width in IE6 RTL. */
 }
 
-.anychart-chart-editor-title-logo {
+.anychart-chart-editor-dialog-title-logo {
   display: inline-block;
   /* todo rescale image to 25x25, (because background-size works only IE9+) */
   background: white url("https://cdn.anychart.com/images/anychart-logo-medium.png") no-repeat;
@@ -141,7 +148,7 @@
   top: 6px;
 }
 
-.anychart-chart-editor-title-text {
+.anychart-chart-editor-dialog-title-text {
   font-size: 18px;
   line-height: 36px;
   position: relative;
@@ -150,7 +157,7 @@
   cursor: default;
 }
 
-.anychart-chart-editor-title-close {
+.anychart-chart-editor-dialog-title-close {
   float: right;
   margin-top: 15px;
   margin-right: 10px;
@@ -162,12 +169,12 @@
   opacity: 0.5;
 }
 
-.anychart-chart-editor-buttons,
-.anychart-chart-editor-content {
+.anychart-chart-editor-dialog-buttons,
+.anychart-chart-editor-dialog-content {
   background-color: #fff;
 }
 
-.anychart-chart-editor-content {
+.anychart-chart-editor-dialog-content {
   position: absolute;
   overflow: hidden;
   top: 72px;
@@ -180,6 +187,8 @@
   width: 100%;
   height: 100%;
   position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .anychart-chart-editor-step-aside {
@@ -188,7 +197,7 @@
   box-sizing: content-box;
 
   position: absolute;
-  width: 238px; //14 * 17
+  width: 240px; //14 * 17
   top: 0;
   bottom: 0;
   left: 0;
@@ -199,7 +208,7 @@
 
 .anychart-chart-editor-step-content-wrapper {
   position: absolute;
-  left: 266px; //14 *19
+  left: 264px; //14 *19
   top: 0;
   bottom: 0;
   right: 0;
@@ -553,7 +562,7 @@
 }
 
 .anychart-chart-editor-settings-control-select-image {
-  width: 38px;
+  width: 42px;
 }
 
 /* ------- CHART SETTINGS ------- */

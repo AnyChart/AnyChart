@@ -135,17 +135,17 @@ anychart.palettes.Markers.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.palettes.Markers.prototype.setupSpecial = function(var_args) {
-  var args = arguments;
-  if (goog.isArray(args[0])) {
-    this.items(args[0]);
+anychart.palettes.Markers.prototype.setupSpecial = function(isDefault, var_args) {
+  var arg0 = arguments[1];
+  if (goog.isArray(arg0)) {
+    this.items(arg0);
     return true;
   }
-  if (args[0] instanceof anychart.palettes.Markers) {
-    this.items(args[0].items());
+  if (arg0 instanceof anychart.palettes.Markers) {
+    this.items(/** @type {Array.<string>} */(arg0.items()));
     return true;
   }
-  return anychart.core.Base.prototype.setupSpecial.apply(this, args);
+  return anychart.core.Base.prototype.setupSpecial.apply(this, arguments);
 };
 
 

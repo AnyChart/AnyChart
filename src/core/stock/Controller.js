@@ -615,9 +615,9 @@ anychart.core.stock.Controller.prototype.getScrollerIndexByKey = function(key) {
 anychart.core.stock.Controller.prototype.alignHighlight = function(key) {
   return this.currentRegistry_.alignKey(key);
 };
+
+
 //endregion
-
-
 //region Selection properties retrieval
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -639,6 +639,24 @@ anychart.core.stock.Controller.prototype.getFirstKey = function() {
  */
 anychart.core.stock.Controller.prototype.getLastKey = function() {
   return this.alignedLastKey_;
+};
+
+
+/**
+ * Returns the first index in the main registry.
+ * @return {number}
+ */
+anychart.core.stock.Controller.prototype.getFirstIndex = function() {
+  return this.currentRegistry_.getFirstIndex();
+};
+
+
+/**
+ * Returns the last index in the main registry.
+ * @return {number}
+ */
+anychart.core.stock.Controller.prototype.getLastIndex = function() {
+  return this.currentRegistry_.getLastIndex();
 };
 
 
@@ -779,9 +797,9 @@ anychart.core.stock.Controller.prototype.getLastScrollerIndex = function() {
 anychart.core.stock.Controller.prototype.getGlobalPointsCountForCurrentGrouping = function() {
   return this.currentRegistry_.getKeysCount();
 };
+
+
 //endregion
-
-
 /**
  * Creates and returns stock data controller.
  * @return {!anychart.core.stock.Controller}

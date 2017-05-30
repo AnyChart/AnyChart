@@ -615,13 +615,13 @@ anychart.scales.ScatterTicks.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.scales.ScatterTicks.prototype.setupSpecial = function(var_args) {
-  var args = arguments;
-  if (goog.isArray(args[0])) {
-    this.set(args[0]);
+anychart.scales.ScatterTicks.prototype.setupSpecial = function(isDefault, var_args) {
+  var arg0 = arguments[1];
+  if (goog.isArray(arg0)) {
+    this.set(arg0);
     return true;
   }
-  return anychart.core.Base.prototype.setupSpecial.apply(this, args);
+  return anychart.core.Base.prototype.setupSpecial.apply(this, arguments);
 };
 
 

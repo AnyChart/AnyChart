@@ -21,7 +21,7 @@ goog.require('anychart.scales');
 /**
  * Sparkline chart class.<br/>
  * @param {?(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Value to set.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @extends {anychart.core.Chart}
  * @implements {anychart.core.utils.IInteractiveSeries}
  * @constructor
@@ -230,7 +230,7 @@ anychart.charts.Sparkline.prototype.getSeriesStatus = function(event) {
 
   var ratio = (x - minX) / rangeX;
   value = this.xScale().inverseTransform(ratio);
-  var indexes = this.data().findInUnsortedDataByX(anychart.utils.toNumber(value));
+  var indexes = this.data().findClosestByX(value, this.xScale() instanceof anychart.scales.Ordinal);
   index = indexes.length ? indexes[0] : NaN;
 
   var iterator = this.getIterator();
@@ -494,20 +494,6 @@ anychart.charts.Sparkline.prototype.defaultMarkerSettings = function(opt_value) 
     return this;
   }
   return this.defaultMarkerSettings_ || {};
-};
-
-
-/**
- * Getter/setter for label default settings.
- * @param {Object=} opt_value Object with default series settings.
- * @return {Object}
- */
-anychart.charts.Sparkline.prototype.defaultLabelSettings = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.defaultLabelSettings_ = opt_value;
-    return this;
-  }
-  return this.defaultLabelSettings_ || {};
 };
 
 
@@ -820,7 +806,7 @@ anychart.charts.Sparkline.prototype.onMarkersSignal_ = function(event) {
 /**
  * Getter/setter for data.
  * @param {?(anychart.data.View|anychart.data.Set|Array|string)=} opt_value Value to set.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @return {(!anychart.charts.Sparkline|!anychart.data.View)} Returns itself if used as a setter or the mapping if used as a getter.
  */
 anychart.charts.Sparkline.prototype.data = function(opt_value, opt_csvSettings) {
@@ -877,26 +863,6 @@ anychart.charts.Sparkline.prototype.dataInvalidated_ = function(e) {
   if (e.hasSignal(anychart.Signal.DATA_CHANGED)) {
     this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.DATA_CHANGED);
   }
-};
-
-
-/**
- * DO NOT PUBLISH.
- */
-anychart.charts.Sparkline.prototype.resetCategorisation = function() {
-  if (this.data_ != this.parentView_)
-    goog.dispose(this.data_);
-  this.data_ = /** @type {!anychart.data.View} */(this.parentView_);
-};
-
-
-/**
- * DO NOT PUBLISH.
- * @param {!Array.<*>|boolean} categories If Array - ordinal scale, if false - scatter scale with numbers,
- *    true - datetime scale.
- */
-anychart.charts.Sparkline.prototype.categoriseData = function(categories) {
-  this.data_ = this.parentView_.prepare('x', categories);
 };
 
 
@@ -2417,12 +2383,12 @@ anychart.charts.Sparkline.prototype.setupByJSON = function(config, opt_default) 
   if (config['minMarkers']) this.minMarkers().setupByJSON(config['minMarkers']);
   if (config['negativeMarkers']) this.negativeMarkers().setupByJSON(config['negativeMarkers']);
   if (config['markers']) this.markers().setupByJSON(config['markers']);
-  if (config['firstLabels']) this.firstLabels().setupByVal(config['firstLabels'], opt_default);
-  if (config['lastLabels']) this.lastLabels().setupByVal(config['lastLabels'], opt_default);
-  if (config['maxLabels']) this.maxLabels().setupByVal(config['maxLabels'], opt_default);
-  if (config['minLabels']) this.minLabels().setupByVal(config['minLabels'], opt_default);
-  if (config['negativeLabels']) this.negativeLabels().setupByVal(config['negativeLabels'], opt_default);
-  if (config['labels']) this.labels().setupByVal(config['labels'], opt_default);
+  if (config['firstLabels']) this.firstLabels().setupInternal(!!opt_default, config['firstLabels']);
+  if (config['lastLabels']) this.lastLabels().setupInternal(!!opt_default, config['lastLabels']);
+  if (config['maxLabels']) this.maxLabels().setupInternal(!!opt_default, config['maxLabels']);
+  if (config['minLabels']) this.minLabels().setupInternal(!!opt_default, config['minLabels']);
+  if (config['negativeLabels']) this.negativeLabels().setupInternal(!!opt_default, config['negativeLabels']);
+  if (config['labels']) this.labels().setupInternal(!!opt_default, config['labels']);
 };
 
 

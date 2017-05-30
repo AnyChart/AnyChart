@@ -42,3 +42,10 @@ anychart.scales.IXScale.prototype.transform = function(value, opt_subRangeRatio)
  * @return {boolean}
  */
 anychart.scales.IXScale.prototype.isMissing = function(value) {};
+
+
+/**
+ * Checks if weights array is valuable.
+ * @return {boolean}
+ */
+anychart.scales.IXScale.prototype.checkWeights = function() {};

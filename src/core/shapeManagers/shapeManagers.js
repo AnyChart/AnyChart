@@ -138,7 +138,7 @@ anychart.core.shapeManagers.MARKERS_ZINDEX = 11 * anychart.core.shapeManagers.ZI
  * Z index shift for the map labels.
  * @const {number}
  */
-anychart.core.shapeManagers.MAP_LABELS_ZINDEX = 12 * anychart.core.shapeManagers.ZINDEX_STEP;
+anychart.core.shapeManagers.LABELS_OVER_MARKERS_ZINDEX = 12 * anychart.core.shapeManagers.ZINDEX_STEP;
 
 
 /**
@@ -176,6 +176,34 @@ anychart.core.shapeManagers.pathStrokeConfig = {
 anychart.core.shapeManagers.pathHatchConfig = {
   name: 'hatchFill',
   shapeType: anychart.enums.ShapeType.PATH,
+  fillNames: ['hatchFill', 'hoverHatchFill', 'selectHatchFill'],
+  strokeNames: null,
+  isHatchFill: true,
+  zIndex: anychart.core.shapeManagers.HATCH_FILL_SHAPES_ZINDEX
+};
+
+
+/**
+ * Template shape config for easy reusage.
+ * @const {anychart.core.shapeManagers.ShapeConfig}
+ */
+anychart.core.shapeManagers.rectFillStrokeConfig = {
+  name: 'rect',
+  shapeType: anychart.enums.ShapeType.RECT,
+  fillNames: ['fill', 'hoverFill', 'selectFill'],
+  strokeNames: ['stroke', 'hoverStroke', 'selectStroke'],
+  isHatchFill: false,
+  zIndex: anychart.core.shapeManagers.FILL_SHAPES_ZINDEX
+};
+
+
+/**
+ * Template shape config for easy reusage.
+ * @const {anychart.core.shapeManagers.ShapeConfig}
+ */
+anychart.core.shapeManagers.rectHatchConfig = {
+  name: 'hatchRect',
+  shapeType: anychart.enums.ShapeType.RECT,
   fillNames: ['hatchFill', 'hoverHatchFill', 'selectHatchFill'],
   strokeNames: null,
   isHatchFill: true,

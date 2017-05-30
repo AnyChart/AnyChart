@@ -107,7 +107,7 @@ anychart.charts.Cartesian3d.prototype.handleMouseEvent = function(event) {
  */
 anychart.charts.Cartesian3d.areaPostProcessor = function(series, shapes, pointState) {
   var frontFill, topFill, rightFill, bottomFill, backFill, leftFill;
-  var resolver = anychart.core.series.Base.getColorResolver(
+  var resolver = anychart.color.getColorResolver(
       ['fill', 'hoverFill', 'selectFill'], anychart.enums.ColorType.FILL);
   var fill = resolver(series, pointState);
   var opacity = goog.isObject(fill) ? fill['opacity'] : 1;
@@ -163,7 +163,7 @@ anychart.charts.Cartesian3d.areaPostProcessor = function(series, shapes, pointSt
  */
 anychart.charts.Cartesian3d.barColumnPostProcessor = function(series, shapes, pointState) {
   var frontFill, topFill, rightFill, bottomFill, backFill, leftFill;
-  var resolver = anychart.core.series.Base.getColorResolver(
+  var resolver = anychart.color.getColorResolver(
       ['fill', 'hoverFill', 'selectFill'], anychart.enums.ColorType.FILL);
   var fill = resolver(series, pointState);
   var opacity = goog.isObject(fill) ? fill['opacity'] : 1;
@@ -303,7 +303,7 @@ anychart.core.ChartWithSeries.generateSeriesConstructors(anychart.charts.Cartesi
  */
 anychart.cartesian3d = function(opt_isVertical) {
   var chart = new anychart.charts.Cartesian3d();
-  chart.setupByVal(anychart.getFullTheme('cartesian3d'), true);
+  chart.setupInternal(true, anychart.getFullTheme('cartesian3d'));
   if (goog.isDef(opt_isVertical))
     chart.barChartMode = !!opt_isVertical;
 
@@ -315,7 +315,9 @@ anychart.chartTypesMap[anychart.enums.ChartTypes.CARTESIAN_3D] = anychart.cartes
 
 
 /** @inheritDoc */
-anychart.charts.Cartesian3d.prototype.isMode3d = true;
+anychart.charts.Cartesian3d.prototype.isMode3d = function() {
+  return true;
+};
 
 
 /**
@@ -689,15 +691,16 @@ anychart.charts.Cartesian3d.prototype.setupByJSON = function(config, opt_default
  */
 anychart.charts.Cartesian3d.prototype.serialize = function() {
   var json = anychart.charts.Cartesian3d.base(this, 'serialize');
+  var chart = json['chart'];
 
-  json['chart']['zAngle'] = this.zAngle();
+  chart['zAngle'] = this.zAngle();
   if (goog.isDefAndNotNull(this.zDepthInternal)) {
     // we should not place warning here on serialization.
-    json['chart']['zDepth'] = this.zDepthInternal;
+    chart['zDepth'] = this.zDepthInternal;
   }
-  json['chart']['zAspect'] = this.zAspect();
-  json['chart']['zDistribution'] = this.zDistribution();
-  json['chart']['zPadding'] = this.zPadding();
+  chart['zAspect'] = this.zAspect();
+  chart['zDistribution'] = this.zDistribution();
+  chart['zPadding'] = this.zPadding();
 
   return json;
 };
@@ -716,7 +719,9 @@ anychart.charts.Cartesian3d.prototype.serialize = function() {
   proto['grid'] = proto.grid;
   proto['minorGrid'] = proto.minorGrid;
   proto['xAxis'] = proto.xAxis;
+  proto['getXAxesCount'] = proto.getXAxesCount;
   proto['yAxis'] = proto.yAxis;
+  proto['getYAxesCount'] = proto.getYAxesCount;
   proto['getSeries'] = proto.getSeries;
   // generated automatically
   // proto['area'] = proto.area;
@@ -745,4 +750,6 @@ anychart.charts.Cartesian3d.prototype.serialize = function() {
   proto['zPadding'] = proto.zPadding;
   proto['getStat'] = proto.getStat;
   proto['zDepth'] = proto.zDepth; // deprecated
+  proto['getXScales'] = proto.getXScales;
+  proto['getYScales'] = proto.getYScales;
 })();

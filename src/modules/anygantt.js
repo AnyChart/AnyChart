@@ -19,7 +19,7 @@ goog.require('anychart.modules.resource');
  */
 anychart.ganttProject = function() {
   var chart = new anychart.charts.Gantt(false);
-  chart.setupByVal(anychart.getFullTheme('ganttProject'), true);
+  chart.setupInternal(true, anychart.getFullTheme('ganttProject'));
 
   return chart;
 };
@@ -31,7 +31,7 @@ anychart.ganttProject = function() {
  */
 anychart.ganttResource = function() {
   var chart = new anychart.charts.Gantt(true);
-  chart.setupByVal(anychart.getFullTheme('ganttResource'), true);
+  chart.setupInternal(true, anychart.getFullTheme('ganttResource'));
 
   return chart;
 };

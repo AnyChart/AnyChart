@@ -24,7 +24,7 @@ goog.require('anychart.scales');
 /**
  * Linear gauge class.<br/>
  * @param {?(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Value to set.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @extends {anychart.core.SeparateChart}
  * @constructor
  */
@@ -86,9 +86,9 @@ anychart.charts.LinearGauge.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.GAUGE_MARKER_PALETTE |
     anychart.ConsistencyState.GAUGE_PALETTE |
     anychart.ConsistencyState.GAUGE_SCALE_BAR;
+
+
 //endregion
-
-
 //region --- PROPERTIES ---
 /**
  * Map of pointers constructors by type.
@@ -108,9 +108,9 @@ anychart.charts.LinearGauge.PointersTypesMap[anychart.enums.LinearGaugePointerTy
  * @type {number}
  */
 anychart.charts.LinearGauge.ZINDEX_INCREMENT_MULTIPLIER = 0.00001;
+
+
 //endregion
-
-
 //region --- DEFAULT SETTINGS ---
 /**
  * Getter/setter for axis default settings.
@@ -167,27 +167,10 @@ anychart.charts.LinearGauge.prototype.defaultScaleBarSettings = function(opt_val
   }
   return this.defaultScaleBarSettings_ || {};
 };
+
+
 //endregion
-
-
 //region --- OWN/INHERITED API ---
-/**
- * Sets chart type. Needed for proper serialization.
- * @param {anychart.enums.GaugeTypes} value
- */
-anychart.charts.LinearGauge.prototype.setType = function(value) {
-  /**
-   * @type {anychart.enums.GaugeTypes}
-   * @private
-   */
-  this.type_ = value;
-};
-
-
-/** @inheritDoc */
-anychart.charts.LinearGauge.prototype.getType = function() {
-  return this.type_;
-};
 
 
 /**
@@ -368,9 +351,9 @@ anychart.charts.LinearGauge.prototype.resizeHandler = function(e) {
         anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
   }
 };
+
+
 //endregion
-
-
 //region --- API FOR POINTERS ---
 /** @inheritDoc */
 anychart.charts.LinearGauge.prototype.getAllSeries = function() {
@@ -551,14 +534,14 @@ anychart.charts.LinearGauge.prototype.getPointerByAutoIndex = function(autoIndex
 anychart.charts.LinearGauge.prototype.getPointersCount = function() {
   return this.pointers_.length;
 };
+
+
 //endregion
-
-
 //region --- DATA ---
 /**
  * Data for gauge.
  * @param {?(anychart.data.View|anychart.data.Set|Array|string)=} opt_value Value to set.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @return {(!anychart.charts.LinearGauge|!anychart.data.View)} Returns itself if used as a setter or the mapping if used as a getter.
  */
 anychart.charts.LinearGauge.prototype.data = function(opt_value, opt_csvSettings) {
@@ -631,9 +614,9 @@ anychart.charts.LinearGauge.prototype.getIterator = function() {
 anychart.charts.LinearGauge.prototype.getResetIterator = function() {
   return (this.iterator_ = this.data_.getIterator());
 };
+
+
 //endregion
-
-
 //region --- LEGEND ---
 /** @inheritDoc */
 anychart.charts.LinearGauge.prototype.createLegendItemsProvider = function(sourceMode, itemsFormat) {
@@ -687,9 +670,9 @@ anychart.charts.LinearGauge.prototype.legendItemOut = function(item, event) {
     pointer.unhover();
   }
 };
+
+
 //endregion
-
-
 //region --- INTERACTIVITY ---
 /** @inheritDoc */
 anychart.charts.LinearGauge.prototype.getSelectedPoints = function() {
@@ -775,9 +758,9 @@ anychart.charts.LinearGauge.prototype.makeInteractivityPointEvent = function(typ
 anychart.charts.LinearGauge.prototype.useUnionTooltipAsSingle = function() {
   return true;
 };
+
+
 //endregion
-
-
 //region --- SCALE / AXIS / SCALEBAR ---
 /**
  * Getter/setter for xAxis.
@@ -915,9 +898,9 @@ anychart.charts.LinearGauge.prototype.onScaleBarSignal_ = function(event) {
   // if there are no signals, !state and nothing happens.
   this.invalidate(state, signal);
 };
+
+
 //endregion
-
-
 //region --- CALCULATIONS ---
 /**
  * Performs calculations of scale.
@@ -951,9 +934,9 @@ anychart.charts.LinearGauge.prototype.calculate = function() {
     this.markConsistent(anychart.ConsistencyState.GAUGE_SCALE);
   }
 };
+
+
 //endregion
-
-
 //region --- DRAWING ---
 /** @inheritDoc */
 anychart.charts.LinearGauge.prototype.beforeDraw = function() {
@@ -1166,9 +1149,9 @@ anychart.charts.LinearGauge.prototype.drawContent = function(bounds) {
 
   anychart.core.Base.resumeSignalsDispatchingFalse(this.axes_, this.pointers_, this.scaleBars_);
 };
+
+
 //endregion
-
-
 //region --- JSON/DISPOSING ---
 /** @inheritDoc */
 anychart.charts.LinearGauge.prototype.serialize = function() {
@@ -1377,9 +1360,9 @@ anychart.charts.LinearGauge.prototype.disposeInternal = function() {
   this.hatchFillPalette_ = null;
   anychart.charts.LinearGauge.base(this, 'disposeInternal');
 };
+
+
 //endregion
-
-
 //region --- POINTERS CONSTRUCTORS ---
 /**
  * Pointer invalidation handler.

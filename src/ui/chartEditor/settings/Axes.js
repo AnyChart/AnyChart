@@ -139,7 +139,7 @@ anychart.ui.chartEditor.settings.Axes.prototype.createDom = function() {
  */
 anychart.ui.chartEditor.settings.Axes.prototype.update = function(model) {
   var axesCount = anychart.ui.chartEditor.Controller.getset(model, this.countKey_);
-  var count = Math.max(this.getChildCount(), axesCount);
+  var count = Math.max(this.getChildCount(), Number(axesCount));
 
   for (var i = 0; i < count; i++) {
     var child = this.getChildAt(i);

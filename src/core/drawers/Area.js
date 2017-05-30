@@ -192,9 +192,9 @@ anychart.core.drawers.Area.prototype.drawSubsequentPointSingleZero_ = function(p
   this.drawSegmentContinuation_(shapes, x, y);
   this.lastDrawnX = zeroX;
 };
+
+
 //endregion
-
-
 /** @inheritDoc */
 anychart.core.drawers.Area.prototype.startDrawing = function(shapeManager) {
   anychart.core.drawers.Area.base(this, 'startDrawing', shapeManager);

@@ -25,6 +25,8 @@ goog.require('goog.events.KeyEvent');
 goog.require('goog.events.KeyHandler');
 goog.require('goog.json.hybrid');
 
+goog.forwardDeclare('anychart.core.Chart');
+
 /**
  * Core space for all anychart components.
  * @namespace
@@ -53,14 +55,6 @@ acgraph.vector.Stage.prototype.allowCreditsDisabling = false;
 
 
 /**
- * Tooltip container layer.
- * @type {acgraph.vector.Layer}
- * @private
- */
-acgraph.vector.Stage.prototype.tooltipLayer_ = null;
-
-
-/**
  * Stage credits.
  * @param {(Object|boolean|null)=} opt_value .
  * @return {!(acgraph.vector.Stage|anychart.core.ui.StageCredits)}
@@ -75,19 +69,6 @@ acgraph.vector.Stage.prototype.credits = function(opt_value) {
     return this;
   }
   return this.credits_;
-};
-
-
-/**
- * Getter for tooltip layer. Must be to highest layer to display the tooltip in top of all.
- * @return {!acgraph.vector.Layer}
- */
-acgraph.vector.Stage.prototype.getTooltipLayer = function() {
-  if (!this.tooltipLayer_) {
-    this.tooltipLayer_ = this.layer();
-    this.tooltipLayer_.zIndex(1e10);
-  }
-  return this.tooltipLayer_;
 };
 
 
@@ -319,7 +300,7 @@ anychart.fromJson = function(jsonConfig) {
   }
 
   if (instance)
-    instance.setupByVal(chart || gauge || gantt || map);
+    instance.setupInternal(false, chart || gauge || gantt || map);
   else
     anychart.core.reporting.error(anychart.enums.ErrorCode.EMPTY_CONFIG);
 
@@ -390,9 +371,9 @@ goog.global['anychart']['fontFamily'] = "'Verdana', Helvetica, Arial, sans-serif
  *
  */
 goog.global['anychart']['textDirection'] = acgraph.vector.Text.Direction.LTR;
+
+
 //endregion
-
-
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Document load event.
@@ -686,7 +667,7 @@ anychart.getFullTheme = function(root) {
 /**
  * Creates error reporter for NO_FEATURE_IN_MODULE.
  * @param {string} featureName
- * @return {Function}
+ * @return {!Function}
  */
 anychart.createNFIMError = function(featureName) {
   return function() {
@@ -695,377 +676,421 @@ anychart.createNFIMError = function(featureName) {
 };
 
 
-/** @ignoreDoc */
-anychart.area = anychart.area || anychart.createNFIMError('Area chart');
+/**
+ * @param {string} modulePath
+ * @param {string} error
+ * @return {!Function}
+ */
+anychart.getFeatureOrError = function(modulePath, error) {
+  var path = modulePath.split('.');
+  var target = window;
+  for (var i = 0; i < path.length; i++) {
+    target = target[path[i]];
+    if (!target) return anychart.createNFIMError(error);
+  }
+  return /** @type {!Function} */(target);
+};
 
 
 /** @ignoreDoc */
-anychart.area3d = anychart.area3d || anychart.createNFIMError('3D Area chart');
+anychart.area = anychart.getFeatureOrError('anychart.area', 'Area chart');
 
 
 /** @ignoreDoc */
-anychart.bar = anychart.bar || anychart.createNFIMError('Bar chart');
+anychart.area3d = anychart.getFeatureOrError('anychart.area3d', '3D Area chart');
 
 
 /** @ignoreDoc */
-anychart.vertical = anychart.vertical || anychart.createNFIMError('Bar chart');
+anychart.bar = anychart.getFeatureOrError('anychart.bar', 'Bar chart');
 
 
 /** @ignoreDoc */
-anychart.bar3d = anychart.bar3d || anychart.createNFIMError('3D Bar chart');
+anychart.vertical = anychart.getFeatureOrError('anychart.vertical', 'Bar chart');
 
 
 /** @ignoreDoc */
-anychart.bubble = anychart.bubble || anychart.createNFIMError('Bubble chart');
+anychart.bar3d = anychart.getFeatureOrError('anychart.bar3d', '3D Bar chart');
 
 
 /** @ignoreDoc */
-anychart.bullet = anychart.bullet || anychart.createNFIMError('Bullet chart');
+anychart.bubble = anychart.getFeatureOrError('anychart.bubble', 'Bubble chart');
 
 
 /** @ignoreDoc */
-anychart.cartesian = anychart.cartesian || anychart.createNFIMError('Cartesian chart');
+anychart.bullet = anychart.getFeatureOrError('anychart.bullet', 'Bullet chart');
 
 
 /** @ignoreDoc */
-anychart.cartesian3d = anychart.cartesian3d || anychart.createNFIMError('3D Cartesian chart');
+anychart.cartesian = anychart.getFeatureOrError('anychart.cartesian', 'Cartesian chart');
 
 
 /** @ignoreDoc */
-anychart.scatter = anychart.scatter || anychart.createNFIMError('Scatter chart');
+anychart.cartesian3d = anychart.getFeatureOrError('anychart.cartesian3d', '3D Cartesian chart');
 
 
 /** @ignoreDoc */
-anychart.column = anychart.column || anychart.createNFIMError('Column chart');
+anychart.scatter = anychart.getFeatureOrError('anychart.scatter', 'Scatter chart');
 
 
 /** @ignoreDoc */
-anychart.column3d = anychart.column3d || anychart.createNFIMError('3D Column chart');
+anychart.column = anychart.getFeatureOrError('anychart.column', 'Column chart');
 
 
 /** @ignoreDoc */
-anychart.box = anychart.box || anychart.createNFIMError('Box chart');
+anychart.column3d = anychart.getFeatureOrError('anychart.column3d', '3D Column chart');
 
 
 /** @ignoreDoc */
-anychart.financial = anychart.financial || anychart.createNFIMError('Financial chart');
+anychart.box = anychart.getFeatureOrError('anychart.box', 'Box chart');
 
 
 /** @ignoreDoc */
-anychart.funnel = anychart.funnel || anychart.createNFIMError('Funnel chart');
+anychart.financial = anychart.getFeatureOrError('anychart.financial', 'Financial chart');
 
 
 /** @ignoreDoc */
-anychart.line = anychart.line || anychart.createNFIMError('Line chart');
+anychart.funnel = anychart.getFeatureOrError('anychart.funnel', 'Funnel chart');
 
 
 /** @ignoreDoc */
-anychart.verticalLine = anychart.verticalLine || anychart.createNFIMError('Vertical Line chart');
+anychart.line = anychart.getFeatureOrError('anychart.line', 'Line chart');
 
 
 /** @ignoreDoc */
-anychart.verticalArea = anychart.verticalArea || anychart.createNFIMError('Vertical Area chart');
+anychart.verticalLine = anychart.getFeatureOrError('anychart.verticalLine', 'Vertical Line chart');
 
 
 /** @ignoreDoc */
-anychart.marker = anychart.marker || anychart.createNFIMError('Marker chart');
+anychart.verticalArea = anychart.getFeatureOrError('anychart.verticalArea', 'Vertical Area chart');
 
 
 /** @ignoreDoc */
-anychart.pie = anychart.pie || anychart.createNFIMError('Pie chart');
+anychart.marker = anychart.getFeatureOrError('anychart.marker', 'Marker chart');
 
 
 /** @ignoreDoc */
-anychart.pie3d = anychart.pie3d || anychart.createNFIMError('3D Pie chart');
+anychart.pie = anychart.getFeatureOrError('anychart.pie', 'Pie chart');
 
 
 /** @ignoreDoc */
-anychart.pyramid = anychart.pyramid || anychart.createNFIMError('Pyramid chart');
+anychart.pie3d = anychart.getFeatureOrError('anychart.pie3d', '3D Pie chart');
 
 
 /** @ignoreDoc */
-anychart.radar = anychart.radar || anychart.createNFIMError('Radar chart');
+anychart.pyramid = anychart.getFeatureOrError('anychart.pyramid', 'Pyramid chart');
 
 
 /** @ignoreDoc */
-anychart.polar = anychart.polar || anychart.createNFIMError('Polar chart');
+anychart.radar = anychart.getFeatureOrError('anychart.radar', 'Radar chart');
 
 
 /** @ignoreDoc */
-anychart.sparkline = anychart.sparkline || anychart.createNFIMError('Sparkline chart');
+anychart.polar = anychart.getFeatureOrError('anychart.polar', 'Polar chart');
 
 
 /** @ignoreDoc */
-anychart.heatMap = anychart.heatMap || anychart.createNFIMError('HeatMap chart');
+anychart.sparkline = anychart.getFeatureOrError('anychart.sparkline', 'Sparkline chart');
 
 
 /** @ignoreDoc */
-anychart.circularGauge = anychart.circularGauge || anychart.createNFIMError('Circular gauge');
+anychart.heatMap = anychart.getFeatureOrError('anychart.heatMap', 'HeatMap chart');
 
 
 /** @ignoreDoc */
-anychart.gauges.circular = anychart.gauges.circular || anychart.createNFIMError('Circular gauge');
+anychart.circularGauge = anychart.getFeatureOrError('anychart.circularGauge', 'Circular gauge');
 
 
 /** @ignoreDoc */
-anychart.gauges.linear = anychart.gauges.linear || anychart.createNFIMError('Linear gauge');
+anychart.gauges.circular = anychart.getFeatureOrError('anychart.gauges.circular', 'Circular gauge');
 
 
 /** @ignoreDoc */
-anychart.gauges.tank = anychart.gauges.tank || anychart.createNFIMError('Tank gauge');
+anychart.gauges.linear = anychart.getFeatureOrError('anychart.gauges.linear', 'Linear gauge');
 
 
 /** @ignoreDoc */
-anychart.gauges.thermometer = anychart.gauges.thermometer || anychart.createNFIMError('Thermometer gauge');
+anychart.gauges.tank = anychart.getFeatureOrError('anychart.gauges.tank', 'Tank gauge');
 
 
 /** @ignoreDoc */
-anychart.gauges.led = anychart.gauges.led || anychart.createNFIMError('LED gauge');
+anychart.gauges.thermometer = anychart.getFeatureOrError('anychart.gauges.thermometer', 'Thermometer gauge');
 
 
 /** @ignoreDoc */
-anychart.map = anychart.map || anychart.createNFIMError('Map');
+anychart.gauges.led = anychart.getFeatureOrError('anychart.gauges.led', 'LED gauge');
 
 
 /** @ignoreDoc */
-anychart.choropleth = anychart.choropleth || anychart.createNFIMError('Choropleth map');
+anychart.map = anychart.getFeatureOrError('anychart.map', 'Map');
 
 
 /** @ignoreDoc */
-anychart.bubbleMap = anychart.bubbleMap || anychart.createNFIMError('Bubble map');
+anychart.choropleth = anychart.getFeatureOrError('anychart.choropleth', 'Choropleth map');
 
 
 /** @ignoreDoc */
-anychart.connector = anychart.connector || anychart.createNFIMError('Connector map');
+anychart.bubbleMap = anychart.getFeatureOrError('anychart.bubbleMap', 'Bubble map');
 
 
 /** @ignoreDoc */
-anychart.markerMap = anychart.markerMap || anychart.createNFIMError('Marker map');
+anychart.connector = anychart.getFeatureOrError('anychart.connector', 'Connector map');
 
 
 /** @ignoreDoc */
-anychart.seatMap = anychart.seatMap || anychart.createNFIMError('Seat map');
+anychart.markerMap = anychart.getFeatureOrError('anychart.markerMap', 'Marker map');
 
 
 /** @ignoreDoc */
-anychart.ganttProject = anychart.ganttProject || anychart.createNFIMError('Gantt Project chart');
+anychart.seatMap = anychart.getFeatureOrError('anychart.seatMap', 'Seat map');
 
 
 /** @ignoreDoc */
-anychart.ganttResource = anychart.ganttResource || anychart.createNFIMError('Gantt Resource chart');
+anychart.ganttProject = anychart.getFeatureOrError('anychart.ganttProject', 'Gantt Project chart');
 
 
 /** @ignoreDoc */
-anychart.stock = anychart.stock || anychart.createNFIMError('Stock chart');
+anychart.ganttResource = anychart.getFeatureOrError('anychart.ganttResource', 'Gantt Resource chart');
 
 
 /** @ignoreDoc */
-anychart.toolbar = anychart.toolbar || anychart.createNFIMError('Toolbar');
+anychart.stock = anychart.getFeatureOrError('anychart.stock', 'Stock chart');
 
 
 /** @ignoreDoc */
-anychart.ganttToolbar = anychart.ganttToolbar || anychart.createNFIMError('Gantt toolbar');
+anychart.toolbar = anychart.getFeatureOrError('anychart.toolbar', 'Toolbar');
 
 
 /** @ignoreDoc */
-anychart.treeMap = anychart.treeMap || anychart.createNFIMError('TreeMap chart');
+anychart.ganttToolbar = anychart.getFeatureOrError('anychart.ganttToolbar', 'Gantt toolbar');
+
+
+/** @ignoreDoc */
+anychart.treeMap = anychart.getFeatureOrError('anychart.treeMap', 'TreeMap chart');
 
 
 /** @inheritDoc */
-anychart.pareto = anychart.pareto || anychart.createNFIMError('Pareto chart');
+anychart.pareto = anychart.getFeatureOrError('anychart.pareto', 'Pareto chart');
 
 
 /** @inheritDoc */
-anychart.resource = anychart.resource || anychart.createNFIMError('Resource chart');
+anychart.resource = anychart.getFeatureOrError('anychart.resource', 'Resource chart');
+
+
+/** @inheritDoc */
+anychart.quadrant = anychart.getFeatureOrError('anychart.quadrant', 'Quadrant chart');
+
+
+/** @inheritDoc */
+anychart.venn = anychart.getFeatureOrError('anychart.venn', 'Venn chart');
+
+
+/** @inheritDoc */
+anychart.tagCloud = anychart.tagCloud || anychart.createNFIMError('TagCloud chart');
+
+
+/** @ignoreDoc */
+anychart.mekko = anychart.mekko || anychart.createNFIMError('Mekko chart');
+
+
+/** @ignoreDoc */
+anychart.mosaic = anychart.mosaic || anychart.createNFIMError('Mosaic chart');
+
+
+/** @ignoreDoc */
+anychart.barmekko = anychart.barmekko || anychart.createNFIMError('Barmekko chart');
+
+
+/** @inheritDoc */
+anychart.waterfall = anychart.waterfall || anychart.createNFIMError('Waterfall chart');
 
 
 //region ------ Standalones
 /** @ignoreDoc */
-anychart.standalones.background = anychart.standalones.background || anychart.createNFIMError('anychart.standalones.Background');
+anychart.standalones.background = anychart.getFeatureOrError('anychart.standalones.background', 'anychart.standalones.Background');
 
 
 /** @ignoreDoc */
-anychart.ui.background = anychart.ui.background || anychart.createNFIMError('anychart.ui.Background');
+anychart.ui.background = anychart.getFeatureOrError('anychart.ui.background', 'anychart.ui.Background');
 
 
 /** @ignoreDoc */
-anychart.standalones.colorRange = anychart.standalones.colorRange || anychart.createNFIMError('anychart.standalones.ColorRange');
+anychart.standalones.colorRange = anychart.getFeatureOrError('anychart.standalones.colorRange', 'anychart.standalones.ColorRange');
 
 
 /** @ignoreDoc */
-anychart.ui.colorRange = anychart.ui.colorRange || anychart.createNFIMError('anychart.ui.ColorRange');
+anychart.ui.colorRange = anychart.getFeatureOrError('anychart.ui.colorRange', 'anychart.ui.ColorRange');
 
 
 /** @ignoreDoc */
-anychart.standalones.dataGrid = anychart.standalones.dataGrid || anychart.createNFIMError('anychart.standalones.DataGrid');
+anychart.standalones.dataGrid = anychart.getFeatureOrError('anychart.standalones.dataGrid', 'anychart.standalones.DataGrid');
 
 
 /** @ignoreDoc */
-anychart.ui.dataGrid = anychart.ui.dataGrid || anychart.createNFIMError('anychart.ui.DataGrid');
+anychart.ui.dataGrid = anychart.getFeatureOrError('anychart.ui.dataGrid', 'anychart.ui.DataGrid');
 
 
 /** @ignoreDoc */
-anychart.standalones.label = anychart.standalones.label || anychart.createNFIMError('anychart.standalones.Label');
+anychart.standalones.label = anychart.getFeatureOrError('anychart.standalones.label', 'anychart.standalones.Label');
 
 
 /** @ignoreDoc */
-anychart.ui.label = anychart.ui.label || anychart.createNFIMError('anychart.ui.Label');
+anychart.ui.label = anychart.getFeatureOrError('anychart.ui.label', 'anychart.ui.Label');
 
 
 /** @ignoreDoc */
-anychart.standalones.labelsFactory = anychart.standalones.labelsFactory || anychart.createNFIMError('anychart.standalones.LabelsFactory');
+anychart.standalones.labelsFactory = anychart.getFeatureOrError('anychart.standalones.labelsFactory', 'anychart.standalones.LabelsFactory');
 
 
 /** @ignoreDoc */
-anychart.ui.labelsFactory = anychart.ui.labelsFactory || anychart.createNFIMError('anychart.ui.LabelsFactory');
+anychart.ui.labelsFactory = anychart.getFeatureOrError('anychart.ui.labelsFactory', 'anychart.ui.LabelsFactory');
 
 
 /** @ignoreDoc */
-anychart.standalones.legend = anychart.standalones.legend || anychart.createNFIMError('anychart.standalones.Legend');
+anychart.standalones.legend = anychart.getFeatureOrError('anychart.standalones.legend', 'anychart.standalones.Legend');
 
 
 /** @ignoreDoc */
-anychart.ui.legend = anychart.ui.legend || anychart.createNFIMError('anychart.ui.Legend');
+anychart.ui.legend = anychart.getFeatureOrError('anychart.ui.legend', 'anychart.ui.Legend');
 
 
 /** @ignoreDoc */
-anychart.standalones.markersFactory = anychart.standalones.markersFactory || anychart.createNFIMError('anychart.standalones.MarkersFactory');
+anychart.standalones.markersFactory = anychart.getFeatureOrError('anychart.standalones.markersFactory', 'anychart.standalones.MarkersFactory');
 
 
 /** @ignoreDoc */
-anychart.ui.markersFactory = anychart.ui.markersFactory || anychart.createNFIMError('anychart.ui.MarkersFactory');
+anychart.ui.markersFactory = anychart.getFeatureOrError('anychart.ui.markersFactory', 'anychart.ui.MarkersFactory');
 
 
 /** @ignoreDoc */
-anychart.standalones.projectTimeline = anychart.standalones.projectTimeline || anychart.createNFIMError('anychart.standalones.ProjectTimeline');
+anychart.standalones.projectTimeline = anychart.getFeatureOrError('anychart.standalones.projectTimeline', 'anychart.standalones.ProjectTimeline');
 
 
 /** @ignoreDoc */
-anychart.ui.projectTimeline = anychart.ui.projectTimeline || anychart.createNFIMError('anychart.ui.ProjectTimeline');
+anychart.ui.projectTimeline = anychart.getFeatureOrError('anychart.ui.projectTimeline', 'anychart.ui.ProjectTimeline');
 
 
 /** @ignoreDoc */
-anychart.standalones.resourceTimeline = anychart.standalones.resourceTimeline || anychart.createNFIMError('anychart.standalones.ResourceTimeline');
+anychart.standalones.resourceTimeline = anychart.getFeatureOrError('anychart.standalones.resourceTimeline', 'anychart.standalones.ResourceTimeline');
 
 
 /** @ignoreDoc */
-anychart.ui.resourceTimeline = anychart.ui.resourceTimeline || anychart.createNFIMError('anychart.ui.ResourceTimeline');
+anychart.ui.resourceTimeline = anychart.getFeatureOrError('anychart.ui.resourceTimeline', 'anychart.ui.ResourceTimeline');
 
 
 /** @ignoreDoc */
-anychart.standalones.resourceList = anychart.standalones.resourceList || anychart.createNFIMError('anychart.standalones.ResourceList');
+anychart.standalones.resourceList = anychart.getFeatureOrError('anychart.standalones.resourceList', 'anychart.standalones.ResourceList');
 
 
 /** @ignoreDoc */
-anychart.standalones.scroller = anychart.standalones.scroller || anychart.createNFIMError('anychart.standalones.scroller');
+anychart.standalones.scroller = anychart.getFeatureOrError('anychart.standalones.scroller', 'anychart.standalones.scroller');
 
 
 /** @ignoreDoc */
-anychart.ui.scroller = anychart.ui.scroller || anychart.createNFIMError('anychart.ui.Scroller');
+anychart.ui.scroller = anychart.getFeatureOrError('anychart.ui.scroller', 'anychart.ui.Scroller');
 
 
 /** @ignoreDoc */
-anychart.standalones.table = anychart.standalones.table || anychart.createNFIMError('anychart.standalones.Table');
+anychart.standalones.table = anychart.getFeatureOrError('anychart.standalones.table', 'anychart.standalones.Table');
 
 
 /** @ignoreDoc */
-anychart.ui.table = anychart.ui.table || anychart.createNFIMError('anychart.ui.Table');
+anychart.ui.table = anychart.getFeatureOrError('anychart.ui.table', 'anychart.ui.Table');
 
 
 /** @ignoreDoc */
-anychart.standalones.title = anychart.standalones.title || anychart.createNFIMError('anychart.standalones.Title');
+anychart.standalones.title = anychart.getFeatureOrError('anychart.standalones.title', 'anychart.standalones.Title');
 
 
 /** @ignoreDoc */
-anychart.ui.title = anychart.ui.title || anychart.createNFIMError('anychart.ui.Title');
+anychart.ui.title = anychart.getFeatureOrError('anychart.ui.title', 'anychart.ui.Title');
 
 
 /** @ignoreDoc */
-anychart.standalones.axes.linear = anychart.standalones.axes.linear || anychart.createNFIMError('anychart.standalones.axes.Linear');
+anychart.standalones.axes.linear = anychart.getFeatureOrError('anychart.standalones.axes.linear', 'anychart.standalones.axes.Linear');
 
 
 /** @ignoreDoc */
-anychart.standalones.axes.polar = anychart.standalones.axes.polar || anychart.createNFIMError('anychart.standalones.axes.Polar');
+anychart.standalones.axes.polar = anychart.getFeatureOrError('anychart.standalones.axes.polar', 'anychart.standalones.axes.Polar');
 
 
 /** @ignoreDoc */
-anychart.standalones.axes.radar = anychart.standalones.axes.radar || anychart.createNFIMError('anychart.standalones.axes.Radar');
+anychart.standalones.axes.radar = anychart.getFeatureOrError('anychart.standalones.axes.radar', 'anychart.standalones.axes.Radar');
 
 
 /** @ignoreDoc */
-anychart.standalones.axes.radial = anychart.standalones.axes.radial || anychart.createNFIMError('anychart.standalones.axes.Radial');
+anychart.standalones.axes.radial = anychart.getFeatureOrError('anychart.standalones.axes.radial', 'anychart.standalones.axes.Radial');
 
 
 /** @ignoreDoc */
-anychart.axes.linear = anychart.axes.linear || anychart.createNFIMError('anychart.axes.Linear');
+anychart.axes.linear = anychart.getFeatureOrError('anychart.axes.linear', 'anychart.axes.Linear');
 
 
 /** @ignoreDoc */
-anychart.axes.polar = anychart.axes.polar || anychart.createNFIMError('anychart.axes.Polar');
+anychart.axes.polar = anychart.getFeatureOrError('anychart.axes.polar', 'anychart.axes.Polar');
 
 
 /** @ignoreDoc */
-anychart.axes.radar = anychart.axes.radar || anychart.createNFIMError('anychart.axes.Radar');
+anychart.axes.radar = anychart.getFeatureOrError('anychart.axes.radar', 'anychart.axes.Radar');
 
 
 /** @ignoreDoc */
-anychart.axes.radial = anychart.axes.radial || anychart.createNFIMError('anychart.axes.Radial');
+anychart.axes.radial = anychart.getFeatureOrError('anychart.axes.radial', 'anychart.axes.Radial');
 
 
 /** @ignoreDoc */
-anychart.axisMarkers.line = anychart.axisMarkers.line || anychart.createNFIMError('anychart.axisMarkers.Line');
+anychart.axisMarkers.line = anychart.getFeatureOrError('anychart.axisMarkers.line', 'anychart.axisMarkers.Line');
 
 
 /** @ignoreDoc */
-anychart.axisMarkers.range = anychart.axisMarkers.range || anychart.createNFIMError('anychart.axisMarkers.Range');
+anychart.axisMarkers.range = anychart.getFeatureOrError('anychart.axisMarkers.range', 'anychart.axisMarkers.Range');
 
 
 /** @ignoreDoc */
-anychart.axisMarkers.text = anychart.axisMarkers.text || anychart.createNFIMError('anychart.axisMarkers.Text');
+anychart.axisMarkers.text = anychart.getFeatureOrError('anychart.axisMarkers.text', 'anychart.axisMarkers.Text');
 
 
 /** @ignoreDoc */
-anychart.standalones.axisMarkers.line = anychart.standalones.axisMarkers.line || anychart.createNFIMError('anychart.standalones.axisMarkers.Line');
+anychart.standalones.axisMarkers.line = anychart.getFeatureOrError('anychart.standalones.axisMarkers.line', 'anychart.standalones.axisMarkers.Line');
 
 
 /** @ignoreDoc */
-anychart.standalones.axisMarkers.range = anychart.standalones.axisMarkers.range || anychart.createNFIMError('anychart.standalones.axisMarkers.Range');
+anychart.standalones.axisMarkers.range = anychart.getFeatureOrError('anychart.standalones.axisMarkers.range', 'anychart.standalones.axisMarkers.Range');
 
 
 /** @ignoreDoc */
-anychart.standalones.axisMarkers.text = anychart.standalones.axisMarkers.text || anychart.createNFIMError('anychart.standalones.axisMarkers.Text');
+anychart.standalones.axisMarkers.text = anychart.getFeatureOrError('anychart.standalones.axisMarkers.text', 'anychart.standalones.axisMarkers.Text');
 
 
 /** @ignoreDoc */
-anychart.grids.linear = anychart.grids.linear || anychart.createNFIMError('anychart.grids.Linear');
+anychart.grids.linear = anychart.getFeatureOrError('anychart.grids.linear', 'anychart.grids.Linear');
 
 
 /** @ignoreDoc */
-anychart.grids.linear3d = anychart.grids.linear3d || anychart.createNFIMError('anychart.grids.Linear3d');
+anychart.grids.linear3d = anychart.getFeatureOrError('anychart.grids.linear3d', 'anychart.grids.Linear3d');
 
 
 /** @ignoreDoc */
-anychart.grids.polar = anychart.grids.polar || anychart.createNFIMError('anychart.grids.Polar');
+anychart.grids.polar = anychart.getFeatureOrError('anychart.grids.polar', 'anychart.grids.Polar');
 
 
 /** @ignoreDoc */
-anychart.grids.radar = anychart.grids.radar || anychart.createNFIMError('anychart.grids.Radar');
+anychart.grids.radar = anychart.getFeatureOrError('anychart.grids.radar', 'anychart.grids.Radar');
 
 
 /** @ignoreDoc */
-anychart.standalones.grids.linear = anychart.standalones.grids.linear || anychart.createNFIMError('anychart.standalones.grids.Linear');
+anychart.standalones.grids.linear = anychart.getFeatureOrError('anychart.standalones.grids.linear', 'anychart.standalones.grids.Linear');
 
 
 /** @ignoreDoc */
-anychart.standalones.grids.linear3d = anychart.standalones.grids.linear3d || anychart.createNFIMError('anychart.standalones.grids.Linear3d');
+anychart.standalones.grids.linear3d = anychart.getFeatureOrError('anychart.standalones.grids.linear3d', 'anychart.standalones.grids.Linear3d');
 
 
 /** @ignoreDoc */
-anychart.standalones.grids.polar = anychart.standalones.grids.polar || anychart.createNFIMError('anychart.standalones.grids.Polar');
+anychart.standalones.grids.polar = anychart.getFeatureOrError('anychart.standalones.grids.polar', 'anychart.standalones.grids.Polar');
 
 
 /** @ignoreDoc */
-anychart.standalones.grids.radar = anychart.standalones.grids.radar || anychart.createNFIMError('anychart.standalones.grids.Radar');
+anychart.standalones.grids.radar = anychart.getFeatureOrError('anychart.standalones.grids.radar', 'anychart.standalones.grids.Radar');
 
 
 //endregion
@@ -1080,20 +1105,81 @@ anychart.ui.contextMenu = anychart.ui.contextMenu || /** @type {function():null}
 
 
 /** @ignoreDoc */
-anychart.ui.ganttToolbar = anychart.ui.ganttToolbar || anychart.createNFIMError('Gantt toolbar');
+anychart.ui.ganttToolbar = anychart.getFeatureOrError('anychart.ui.ganttToolbar', 'Gantt toolbar');
 
 
 /** @ignoreDoc */
-anychart.ui.preloader = anychart.ui.preloader || anychart.createNFIMError('Preloader');
+anychart.ui.preloader = anychart.getFeatureOrError('anychart.ui.preloader', 'Preloader');
 
 
 /** @ignoreDoc */
-anychart.ui.rangePicker = anychart.ui.rangePicker || anychart.createNFIMError('Range picker');
+anychart.ui.rangePicker = anychart.getFeatureOrError('anychart.ui.rangePicker', 'Range picker');
 
 
 /** @ignoreDoc */
-anychart.ui.rangeSelector = anychart.ui.rangeSelector || anychart.createNFIMError('Range selector');
+anychart.ui.rangeSelector = anychart.getFeatureOrError('anychart.ui.rangeSelector', 'Range selector');
+
+
 //endregion
+//endregion
+//region ------- Charts tracking
+
+
+/**
+ * Container for tracking charts.
+ * @type {Object<string, anychart.core.Chart>}
+ * @private
+ */
+anychart.trackedCharts_ = {};
+
+
+/**
+ * Returns tracking chart by it's id.
+ * @param {!string} id
+ * @return {?anychart.core.Chart}
+ */
+anychart.getChartById = function(id) {
+  return anychart.trackedCharts_[id];
+};
+
+
+/**
+ *
+ * @param {anychart.core.Chart} chart
+ * @param {!string} newId
+ * @param {string=} opt_oldId
+ * @return {boolean}
+ */
+anychart.trackChart = function(chart, newId, opt_oldId) {
+  if (anychart.trackedCharts_[newId] && anychart.trackedCharts_[newId] != chart) {
+    anychart.core.reporting.warning(anychart.enums.WarningCode.OBJECT_KEY_COLLISION, null, [newId], true);
+    return false;
+  }
+
+  if (goog.isDef(opt_oldId))
+    anychart.untrackChart(chart, /** @type {string} */(opt_oldId));
+
+  anychart.trackedCharts_[newId] = chart;
+  return true;
+};
+
+
+/**
+ *
+ * @param {anychart.core.Chart} chart
+ * @param {string} oldId
+ * @return {boolean}
+ */
+anychart.untrackChart = function(chart, oldId) {
+  if (anychart.trackedCharts_[oldId] && anychart.trackedCharts_[oldId] == chart) {
+    delete anychart.trackedCharts_[oldId];
+    return true;
+  }
+
+  return false;
+};
+
+
 //endregion
 
 
@@ -1155,6 +1241,8 @@ goog.exportSymbol('anychart.gauges.led', anychart.gauges.led);
 goog.exportSymbol('anychart.ganttProject', anychart.ganttProject);
 goog.exportSymbol('anychart.ganttResource', anychart.ganttResource);
 goog.exportSymbol('anychart.stock', anychart.stock);
+goog.exportSymbol('anychart.quadrant', anychart.quadrant);
+goog.exportSymbol('anychart.venn', anychart.venn);
 goog.exportSymbol('anychart.theme', anychart.theme);
 goog.exportSymbol('anychart.appendTheme', anychart.appendTheme);
 goog.exportSymbol('anychart.toolbar', anychart.toolbar);
@@ -1162,6 +1250,11 @@ goog.exportSymbol('anychart.ganttToolbar', anychart.ganttToolbar);
 goog.exportSymbol('anychart.treeMap', anychart.treeMap);
 goog.exportSymbol('anychart.pareto', anychart.pareto);
 goog.exportSymbol('anychart.resource', anychart.resource);
+goog.exportSymbol('anychart.mekko', anychart.mekko);
+goog.exportSymbol('anychart.mosaic', anychart.mosaic);
+goog.exportSymbol('anychart.barmekko', anychart.barmekko);
+goog.exportSymbol('anychart.tagCloud', anychart.tagCloud);
+goog.exportSymbol('anychart.waterfall', anychart.waterfall);
 goog.exportSymbol('anychart.standalones.background', anychart.standalones.background);
 goog.exportSymbol('anychart.ui.background', anychart.ui.background);
 goog.exportSymbol('anychart.standalones.colorRange', anychart.standalones.colorRange);
@@ -1214,6 +1307,7 @@ goog.exportSymbol('anychart.ui.ganttToolbar', anychart.ui.ganttToolbar);
 goog.exportSymbol('anychart.ui.preloader', anychart.ui.preloader);
 goog.exportSymbol('anychart.ui.rangePicker', anychart.ui.rangePicker);
 goog.exportSymbol('anychart.ui.rangeSelector', anychart.ui.rangeSelector);
+goog.exportSymbol('anychart.getChartById', anychart.getChartById);
 (function() {
   var proto = acgraph.vector.Stage.prototype;
   proto['credits'] = proto.credits;

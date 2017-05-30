@@ -105,7 +105,7 @@ anychart.core.ChartWithSeries.generateSeriesConstructors = function(chartConstru
   for (var i in configs) {
     /**
      * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
-     * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
+     * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
      *    here as a hash map.
      * @return {anychart.core.series.Cartesian}
      * @this {anychart.core.ChartWithSeries}
@@ -182,7 +182,9 @@ anychart.core.ChartWithSeries.prototype.normalizeSeriesType = function(type) {
  *    anychart.enums.ScatterSeriesType |
  *    anychart.enums.RadarSeriesType |
  *    anychart.enums.PolarSeriesType |
- *    anychart.enums.MapSeriesType
+ *    anychart.enums.MapSeriesType |
+ *    anychart.enums.MekkoSeriesType |
+ *    anychart.enums.WaterfallSeriesType
  * )=} opt_value Default series type.
  * @return {
  *    anychart.core.ChartWithSeries |
@@ -190,7 +192,9 @@ anychart.core.ChartWithSeries.prototype.normalizeSeriesType = function(type) {
  *    anychart.enums.ScatterSeriesType |
  *    anychart.enums.RadarSeriesType |
  *    anychart.enums.PolarSeriesType |
- *    anychart.enums.MapSeriesType
+ *    anychart.enums.MapSeriesType |
+ *    anychart.enums.MekkoSeriesType |
+ *    anychart.enums.WaterfallSeriesType
  * } Default series type or self for chaining.
  */
 anychart.core.ChartWithSeries.prototype.defaultSeriesType = function(opt_value) {
@@ -267,7 +271,7 @@ anychart.core.ChartWithSeries.prototype.setupSeries = function(series) {
 /**
  * @param {string} type Series type.
  * @param {?(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
  * @protected
  * @return {anychart.core.series.Cartesian}
@@ -419,6 +423,12 @@ anychart.core.ChartWithSeries.prototype.removeAllSeries = function() {
         anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS,
         anychart.Signal.NEEDS_REDRAW);
     this.resumeSignalsDispatching(true);
+    // When we deleting ALL series, we should clear this statuses, cause they are loss the actuality
+    // Also we should unlisten tooltip update, cause after removing series it can be fired on disposed series
+    // See DVF-3020
+    this.prevHoverSeriesStatus = null;
+    this.prevSelectSeriesStatus = null;
+    this.unlisten(goog.events.EventType.MOUSEMOVE, this.updateTooltip);
     anychart.globalLock.unlock();
   }
   return this;
@@ -851,7 +861,9 @@ anychart.core.ChartWithSeries.prototype.calcBubbleSizes = function() {
 anychart.core.ChartWithSeries.seriesReferenceValues = {
   'bar': ['value'],
   'line': ['value'],
+  'polyline': ['value'],
   'area': ['value'],
+  'polygon': ['value'],
   'column': ['value'],
   'spline': ['value'],
   'marker': ['value'],
@@ -860,6 +872,7 @@ anychart.core.ChartWithSeries.seriesReferenceValues = {
   'splineArea': ['value'],
   'jumpLine': ['value'],
   'stick': ['value'],
+  'mekko': ['value'],
   'bubble': ['value', 'size'],
   'rangeBar': ['high', 'low'],
   'rangeArea': ['high', 'low'],
@@ -872,12 +885,14 @@ anychart.core.ChartWithSeries.seriesReferenceValues = {
   'connector': ['points'],
   'choropleth': ['id', 'value'],
   'markerMap': ['id', 'long', 'lat'],
-  'bubbleMap': ['id', 'long', 'lat', 'size']
+  'bubbleMap': ['id', 'long', 'lat', 'size'],
+  'hilo': ['high', 'low'],
+  'waterfall': ['value']
 };
 
 
 /**
- * @param {(anychart.data.Set|anychart.data.TableData|Array)=} opt_value
+ * @param {(anychart.data.Set|anychart.data.DataSettings|Array)=} opt_value
  * @return {anychart.data.View|anychart.core.ChartWithSeries}
  */
 anychart.core.ChartWithSeries.prototype.data = function(opt_value) {
@@ -1038,6 +1053,13 @@ anychart.core.ChartWithSeries.prototype.beforeSeriesDraw = function() {
 
 
 /**
+ * A hook right after series were drawn.
+ */
+anychart.core.ChartWithSeries.prototype.afterSeriesDraw = function() {
+};
+
+
+/**
  * Draws series.
  * @param {number=} opt_topAxisPadding
  * @param {number=} opt_rightAxisPadding
@@ -1060,6 +1082,7 @@ anychart.core.ChartWithSeries.prototype.drawSeries = function(opt_topAxisPadding
     for (i = 0; i < this.seriesList.length; i++) {
       this.seriesList[i].draw();
     }
+    this.afterSeriesDraw();
 
     this.markConsistent(anychart.ConsistencyState.SERIES_CHART_SERIES);
     anychart.core.Base.resumeSignalsDispatchingFalse(this.seriesList);
@@ -1151,10 +1174,10 @@ anychart.core.ChartWithSeries.prototype.setupByJSON = function(config, opt_defau
   this.palette(config['palette']);
   this.markerPalette(config['markerPalette']);
   this.hatchFillPalette(config['hatchFillPalette']);
-  this.defaultSeriesSettings(config['defaultSeriesSettings']);
-  this.labels().setupByVal(config['labels'], opt_default);
-  this.hoverLabels().setupByVal(config['hoverLabels'], opt_default);
-  this.selectLabels().setupByVal(config['selectLabels'], opt_default);
+
+  this.labels().setupInternal(!!opt_default, config['labels']);
+  this.hoverLabels().setupInternal(!!opt_default, config['hoverLabels']);
+  this.selectLabels().setupInternal(!!opt_default, config['selectLabels']);
 };
 
 

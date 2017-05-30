@@ -416,8 +416,8 @@ anychart.core.stock.Grouping.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.stock.Grouping.prototype.setupSpecial = function(var_args) {
-  var arg0 = arguments[0];
+anychart.core.stock.Grouping.prototype.setupSpecial = function(isDefault, var_args) {
+  var arg0 = arguments[1];
   if (goog.isBoolean(arg0) || goog.isNull(arg0)) {
     this.enabled(!!arg0);
     return true;

@@ -82,10 +82,9 @@ anychart.core.IChart.prototype.supportsTooltip = function() {};
  */
 anychart.core.IChart.prototype.isVertical = function() {};
 
+
+
 //endregion
-
-
-
 //region IPlot
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -116,10 +115,10 @@ anychart.core.IPlot.prototype.getAllSeries = function() {};
  * @return {Object}
  */
 anychart.core.IPlot.prototype.defaultSeriesSettings = function(opt_value) {};
+
+
+
 //endregion
-
-
-
 //region I3DProvider
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -193,10 +192,10 @@ anychart.core.I3DProvider.prototype.yInverted = function() {};
  * @return {boolean}
  */
 anychart.core.I3DProvider.prototype.xInverted = function() {};
+
+
+
 //endregion
-
-
-
 //region IGroupingProvider
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -220,10 +219,10 @@ anychart.core.IGroupingProvider.prototype.getCurrentMinDistance = function() {};
  * @return {anychart.core.IGroupingProvider|anychart.core.stock.Grouping}
  */
 anychart.core.IGroupingProvider.prototype.grouping = function() {};
+
+
+
 //endregion
-
-
-
 //region IChartWithAnnotations
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -244,10 +243,10 @@ anychart.core.IChartWithAnnotations = function() {};
  * @return {Object}
  */
 anychart.core.IChartWithAnnotations.prototype.defaultAnnotationSettings = function(opt_value) {};
+
+
+
 //endregion
-
-
-
 //region IStandaloneBackend
 //----------------------------------------------------------------------------------------------------------------------
 //

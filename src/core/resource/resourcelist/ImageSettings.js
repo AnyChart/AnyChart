@@ -22,35 +22,40 @@ goog.inherits(anychart.core.resource.resourceList.ImageSettings, anychart.core.r
 anychart.core.resource.resourceList.ImageSettings.PROPERTY_DESCRIPTORS = (function() {
   var map = {};
 
-  map['size'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'size',
       anychart.core.settings.numberOrPercentNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['borderRadius'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'borderRadius',
       anychart.core.settings.arrayNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['opacity'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'opacity',
       anychart.core.settings.ratioNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['align'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'align',
       anychart.core.settings.stringNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['fittingMode'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'fittingMode',
       anychart.core.settings.stringNormalizer,
@@ -60,9 +65,9 @@ anychart.core.resource.resourceList.ImageSettings.PROPERTY_DESCRIPTORS = (functi
   return map;
 })();
 anychart.core.settings.populate(anychart.core.resource.resourceList.ImageSettings, anychart.core.resource.resourceList.ImageSettings.PROPERTY_DESCRIPTORS);
+
+
 //endregion
-
-
 // region --- SETUP/DISPOSE ---
 /** @inheritDoc */
 anychart.core.resource.resourceList.ImageSettings.prototype.setupByJSON = function(config, opt_default) {
@@ -78,9 +83,9 @@ anychart.core.resource.resourceList.ImageSettings.prototype.serialize = function
   anychart.core.settings.serialize(this, anychart.core.resource.resourceList.ImageSettings.PROPERTY_DESCRIPTORS, json);
   return json;
 };
+
+
 //endregion
-
-
 //region --- EXPORTS ---
 //exports
 //proto['size'] = proto.size;

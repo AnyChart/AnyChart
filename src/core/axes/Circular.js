@@ -1287,8 +1287,8 @@ anychart.core.axes.Circular.prototype.setupByJSON = function(config, opt_default
   this.ticks(config['ticks']);
   this.minorTicks(config['minorTicks']);
 
-  this.labels().setupByVal(config['labels'], opt_default);
-  this.minorLabels().setupByVal(config['minorLabels'], opt_default);
+  this.labels().setupInternal(!!opt_default, config['labels']);
+  this.minorLabels().setupInternal(!!opt_default, config['minorLabels']);
 
   this.startAngle(config['startAngle']);
   this.sweepAngle(config['sweepAngle']);

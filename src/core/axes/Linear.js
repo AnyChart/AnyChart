@@ -1,3 +1,4 @@
+//region --- Provide and Require
 goog.provide('anychart.core.axes.Linear');
 goog.require('acgraph');
 goog.require('anychart.color');
@@ -14,6 +15,7 @@ goog.require('anychart.math.Rect');
 goog.require('anychart.scales.Base');
 goog.require('anychart.scales.ScatterBase');
 goog.require('anychart.utils');
+//endregion
 
 
 
@@ -58,6 +60,7 @@ anychart.core.axes.Linear = function() {
 goog.inherits(anychart.core.axes.Linear, anychart.core.VisualBase);
 
 
+//region --- States and Signals
 /**
  * Supported consistency states.
  * @type {number}
@@ -78,6 +81,8 @@ anychart.core.axes.Linear.prototype.SUPPORTED_CONSISTENCY_STATES =
 anychart.core.axes.Linear.prototype.SUPPORTED_SIGNALS = anychart.core.VisualBase.prototype.SUPPORTED_SIGNALS;
 
 
+//endregion
+//region --- Properties
 /**
  * @type {acgraph.vector.Path}
  * @private
@@ -248,6 +253,8 @@ anychart.core.axes.Linear.prototype.labelsBounds_ = null;
 anychart.core.axes.Linear.prototype.minorLabelsBounds_ = null;
 
 
+//endregion
+//region --- Settings
 /**
  * Getter/setter for title.
  * @param {(null|boolean|Object|string)=} opt_value Axis title.
@@ -327,7 +334,9 @@ anychart.core.axes.Linear.prototype.labelsInvalidated_ = function(event) {
     signal = anychart.Signal.NEEDS_REDRAW;
   }
   this.dropStaggeredLabelsCache_();
+  this.dropOverlappedLabelsCache_();
   this.dropBoundsCache();
+  this.labels().clear();
   this.invalidate(state, signal);
 };
 
@@ -371,7 +380,9 @@ anychart.core.axes.Linear.prototype.minorLabelsInvalidated_ = function(event) {
     state = anychart.ConsistencyState.AXIS_LABELS;
     signal = anychart.Signal.NEEDS_REDRAW;
   }
+  this.dropOverlappedLabelsCache_();
   this.dropBoundsCache();
+  this.minorLabels().clear();
   this.invalidate(state, signal);
 };
 
@@ -532,9 +543,10 @@ anychart.core.axes.Linear.prototype.scale = function(opt_value) {
       if (this.internalScale)
         this.internalScale.listenSignals(this.scaleInvalidated_, this);
       this.dropStaggeredLabelsCache_();
+      this.dropOverlappedLabelsCache_();
       this.dropBoundsCache();
-      this.labels().dropCallsCache();
-      this.minorLabels().dropCallsCache();
+      this.labels().clear();
+      this.minorLabels().clear();
       this.invalidate(this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
@@ -552,9 +564,10 @@ anychart.core.axes.Linear.prototype.scale = function(opt_value) {
 anychart.core.axes.Linear.prototype.scaleInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
     this.dropStaggeredLabelsCache_();
+    this.dropOverlappedLabelsCache_();
     this.dropBoundsCache();
-    this.labels().dropCallsCache();
-    this.minorLabels().dropCallsCache();
+    this.labels().clear();
+    this.minorLabels().clear();
     this.invalidate(this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
   }
 };
@@ -605,6 +618,7 @@ anychart.core.axes.Linear.prototype.padding = function(opt_spaceOrTopOrTopAndBot
 anychart.core.axes.Linear.prototype.paddingInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
     this.dropStaggeredLabelsCache_();
+    this.dropOverlappedLabelsCache_();
     this.dropBoundsCache();
     this.invalidate(this.ALL_VISUAL_STATES,
         anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
@@ -616,9 +630,127 @@ anychart.core.axes.Linear.prototype.paddingInvalidated_ = function(event) {
 /** @inheritDoc */
 anychart.core.axes.Linear.prototype.invalidateParentBounds = function() {
   this.dropStaggeredLabelsCache_();
+  this.dropOverlappedLabelsCache_();
   this.dropBoundsCache();
   this.invalidate(this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 };
+
+
+/**
+ * Getter/setter for drawFirstLabel.
+ * @param {boolean=} opt_value Drawing flag.
+ * @return {boolean|!anychart.core.axes.Linear} Drawing flag or itself for method chaining.
+ */
+anychart.core.axes.Linear.prototype.drawFirstLabel = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.drawFirstLabel_ != opt_value) {
+      this.drawFirstLabel_ = opt_value;
+      this.dropStaggeredLabelsCache_();
+      this.invalidate(this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  }
+  return this.drawFirstLabel_;
+};
+
+
+/**
+ * Getter/setter for drawLastLabel.
+ * @param {boolean=} opt_value Drawing flag.
+ * @return {boolean|!anychart.core.axes.Linear} Drawing flag or itself for method chaining.
+ */
+anychart.core.axes.Linear.prototype.drawLastLabel = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.drawLastLabel_ != opt_value) {
+      this.drawLastLabel_ = opt_value;
+      this.dropStaggeredLabelsCache_();
+      this.invalidate(this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  }
+  return this.drawLastLabel_;
+};
+
+
+/**
+ * Getter/setter for overlapMode.
+ * @param {(anychart.enums.LabelsOverlapMode|string)=} opt_value Value to set.
+ * @return {anychart.enums.LabelsOverlapMode|!anychart.core.axes.Linear} Drawing flag or itself for method chaining.
+ */
+anychart.core.axes.Linear.prototype.overlapMode = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var overlap = anychart.enums.normalizeLabelsOverlapMode(opt_value, this.overlapMode_);
+    if (this.overlapMode_ != overlap) {
+      this.overlapMode_ = overlap;
+      this.invalidate(this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  }
+  return this.overlapMode_;
+};
+
+
+/**
+ * Getter/setter for staggerMode.
+ * @param {boolean=} opt_value On/off.
+ * @return {boolean|!anychart.core.axes.Linear} .
+ */
+anychart.core.axes.Linear.prototype.staggerMode = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.staggerMode_ != opt_value) {
+      this.staggerMode_ = opt_value;
+      this.dropBoundsCache();
+      this.invalidate(this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  }
+  return this.staggerMode_;
+};
+
+
+/**
+ * Getter/setter for staggerLines.
+ * @param {?number=} opt_value Fixed/auto.
+ * @return {null|number|!anychart.core.axes.Linear} .
+ */
+anychart.core.axes.Linear.prototype.staggerLines = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = goog.isNull(opt_value) ? null : anychart.utils.normalizeToNaturalNumber(opt_value);
+    if (this.staggerLines_ != opt_value) {
+      this.staggerLines_ = opt_value;
+      this.dropBoundsCache();
+      this.dropStaggeredLabelsCache_();
+      if (this.staggerMode_)
+        this.invalidate(this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  }
+  return this.staggerLines_;
+};
+
+
+/**
+ * Getter/setter for staggerMaxLines.
+ * @param {?number=} opt_value .
+ * @return {null|number|!anychart.core.axes.Linear} .
+ */
+anychart.core.axes.Linear.prototype.staggerMaxLines = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.utils.normalizeToNaturalNumber(opt_value);
+    if (this.staggerMaxLines_ != opt_value) {
+      this.staggerMaxLines_ = opt_value;
+      this.dropBoundsCache();
+      this.dropStaggeredLabelsCache_();
+      if (this.staggerMode_)
+        this.invalidate(this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  }
+  return this.staggerMaxLines_;
+};
+
+
+//endregion
 
 
 /**
@@ -628,7 +760,6 @@ anychart.core.axes.Linear.prototype.dropBoundsCache = function() {
   if (this.labelsBoundingRects_) this.labelsBoundingRects_.length = 0;
   this.labelsBounds_.length = 0;
   this.minorLabelsBounds_.length = 0;
-  this.overlappedLabels_ = null;
 };
 
 
@@ -837,6 +968,14 @@ anychart.core.axes.Linear.prototype.getOverlappedLabels_ = function(opt_bounds) 
  */
 anychart.core.axes.Linear.prototype.dropStaggeredLabelsCache_ = function() {
   this.staggeredLabels_ = null;
+};
+
+
+/**
+ * @private
+ */
+anychart.core.axes.Linear.prototype.dropOverlappedLabelsCache_ = function() {
+  this.overlappedLabels_ = null;
 };
 
 
@@ -1375,7 +1514,11 @@ anychart.core.axes.Linear.prototype.getLabelBounds_ = function(index, isMajor, t
   var formatProvider = this.getLabelsFormatProvider(index, value);
   var positionProvider = {'value': {'x': x, 'y': y}};
 
-  var labelBounds = labels.measure(formatProvider, positionProvider, undefined, index);
+  var label = labels.add(formatProvider, positionProvider, index);
+  var settings = {};
+  goog.object.extend(settings, labels.themeSettings, labels.ownSettings);
+  label.stateOrder([label.ownSettings, settings]);
+  var labelBounds = labels.measure(label, undefined, undefined, index);
 
   switch (this.orientation()) {
     case anychart.enums.Orientation.TOP:
@@ -1394,117 +1537,6 @@ anychart.core.axes.Linear.prototype.getLabelBounds_ = function(index, isMajor, t
 
 
   return boundsCache[index] = labelBounds.toCoordinateBox();
-};
-
-
-/**
- * Getter/setter for drawFirstLabel.
- * @param {boolean=} opt_value Drawing flag.
- * @return {boolean|!anychart.core.axes.Linear} Drawing flag or itself for method chaining.
- */
-anychart.core.axes.Linear.prototype.drawFirstLabel = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.drawFirstLabel_ != opt_value) {
-      this.drawFirstLabel_ = opt_value;
-      this.dropStaggeredLabelsCache_();
-      this.invalidate(this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.drawFirstLabel_;
-};
-
-
-/**
- * Getter/setter for drawLastLabel.
- * @param {boolean=} opt_value Drawing flag.
- * @return {boolean|!anychart.core.axes.Linear} Drawing flag or itself for method chaining.
- */
-anychart.core.axes.Linear.prototype.drawLastLabel = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.drawLastLabel_ != opt_value) {
-      this.drawLastLabel_ = opt_value;
-      this.dropStaggeredLabelsCache_();
-      this.invalidate(this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.drawLastLabel_;
-};
-
-
-/**
- * Getter/setter for overlapMode.
- * @param {(anychart.enums.LabelsOverlapMode|string)=} opt_value Value to set.
- * @return {anychart.enums.LabelsOverlapMode|!anychart.core.axes.Linear} Drawing flag or itself for method chaining.
- */
-anychart.core.axes.Linear.prototype.overlapMode = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var overlap = anychart.enums.normalizeLabelsOverlapMode(opt_value, this.overlapMode_);
-    if (this.overlapMode_ != overlap) {
-      this.overlapMode_ = overlap;
-      this.invalidate(this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.overlapMode_;
-};
-
-
-/**
- * Getter/setter for staggerMode.
- * @param {boolean=} opt_value On/off.
- * @return {boolean|!anychart.core.axes.Linear} .
- */
-anychart.core.axes.Linear.prototype.staggerMode = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.staggerMode_ != opt_value) {
-      this.staggerMode_ = opt_value;
-      this.invalidate(this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.staggerMode_;
-};
-
-
-/**
- * Getter/setter for staggerLines.
- * @param {?number=} opt_value Fixed/auto.
- * @return {null|number|!anychart.core.axes.Linear} .
- */
-anychart.core.axes.Linear.prototype.staggerLines = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? null : anychart.utils.normalizeToNaturalNumber(opt_value);
-    if (this.staggerLines_ != opt_value) {
-      this.staggerLines_ = opt_value;
-      this.dropStaggeredLabelsCache_();
-      if (this.staggerMode_)
-        this.invalidate(this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.staggerLines_;
-};
-
-
-/**
- * Getter/setter for staggerMaxLines.
- * @param {?number=} opt_value .
- * @return {null|number|!anychart.core.axes.Linear} .
- */
-anychart.core.axes.Linear.prototype.staggerMaxLines = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizeToNaturalNumber(opt_value);
-    if (this.staggerMaxLines_ != opt_value) {
-      this.staggerMaxLines_ = opt_value;
-      this.dropStaggeredLabelsCache_();
-      if (this.staggerMode_)
-        this.invalidate(this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.staggerMaxLines_;
 };
 
 
@@ -1679,6 +1711,73 @@ anychart.core.axes.Linear.prototype.getLabelsFormatProvider = function(index, va
 
 
 /**
+ * Returns position provider.
+ * @param {number} index Label index.
+ * @param {boolean} isMajor Major labels or minor.
+ * @param {Array} ticksArray Array with ticks.
+ * @param {anychart.math.Rect=} opt_parentBounds Parent bounds.
+ * @return {Object} Label bounds.
+ */
+anychart.core.axes.Linear.prototype.getLabelsPositionProvider = function(index, isMajor, ticksArray, opt_parentBounds) {
+  var bounds = goog.isDef(opt_parentBounds) ? opt_parentBounds : this.getPixelBounds();
+  var lineBounds = goog.isDef(opt_parentBounds) ? opt_parentBounds : this.line.getBounds();
+  var ticks = isMajor ? this.ticks() : this.minorTicks();
+  var ticksLength = ticks.length();
+  var stroke = this.stroke();
+  var lineThickness = !stroke || anychart.utils.isNone(stroke) ? 0 : stroke['thickness'] ? parseFloat(this.stroke()['thickness']) : 1;
+
+  var isEnabled = ticks.enabled();
+  var position = ticks.position();
+  var x, y;
+  var scale = /** @type {anychart.scales.ScatterBase|anychart.scales.Ordinal} */(this.scale());
+
+  var value = ticksArray[index];
+  var ratio;
+  if (goog.isArray(value)) {
+    ratio = (scale.transform(value[0], 0) + scale.transform(value[1], 1)) / 2;
+  } else {
+    ratio = scale.transform(value, .5);
+  }
+
+  switch (this.orientation()) {
+    case anychart.enums.Orientation.TOP:
+      x = Math.round(bounds.left + ratio * bounds.width);
+      y = lineBounds.top - lineThickness / 2;
+      if (position == anychart.enums.SidePosition.OUTSIDE && isEnabled) {
+        y -= ticksLength;
+      }
+      break;
+    case anychart.enums.Orientation.RIGHT:
+      x = lineBounds.getRight() + lineThickness / 2;
+      y = Math.round(bounds.top + ratio * bounds.height);
+
+      if (position == anychart.enums.SidePosition.OUTSIDE && isEnabled) {
+        x += ticksLength;
+      }
+      break;
+    case anychart.enums.Orientation.BOTTOM:
+      x = Math.round(bounds.left + ratio * bounds.width);
+      y = lineBounds.getBottom() + lineThickness / 2;
+
+      if (position == anychart.enums.SidePosition.OUTSIDE && isEnabled) {
+        y += ticksLength;
+      }
+      break;
+    case anychart.enums.Orientation.LEFT:
+      x = lineBounds.left - lineThickness / 2;
+      y = Math.round(bounds.top + ratio * bounds.height);
+
+      if (position == anychart.enums.SidePosition.OUTSIDE && isEnabled) {
+        x -= ticksLength;
+      }
+      break;
+  }
+
+  return {'value': {'x': x, 'y': y}};
+};
+
+
+/**
  * Axis labels drawer.
  * @param {number|string} value Scale ratio.
  * @param {number} ratio Scale ratio.
@@ -1686,12 +1785,10 @@ anychart.core.axes.Linear.prototype.getLabelsFormatProvider = function(index, va
  * @param {number} pixelShift Pixel shift for sharp display.
  * @param {boolean} isMajor Is major label.
  * @param {Array} ticksArr
+ * @param {boolean} enabled
  * @private
  */
-anychart.core.axes.Linear.prototype.drawLabel_ = function(value, ratio, index, pixelShift, isMajor, ticksArr) {
-  var bounds = this.getPixelBounds();
-  var lineBounds = this.line.getBounds();
-
+anychart.core.axes.Linear.prototype.drawLabel_ = function(value, ratio, index, pixelShift, isMajor, ticksArr, enabled) {
   var labels, ticks;
   if (isMajor) {
     ticks = /** @type {!anychart.core.axes.Ticks} */(this.ticks());
@@ -1700,6 +1797,14 @@ anychart.core.axes.Linear.prototype.drawLabel_ = function(value, ratio, index, p
     ticks = /** @type {!anychart.core.axes.Ticks} */(this.minorTicks());
     labels = this.minorLabels();
   }
+
+  if (!enabled) {
+    labels.clear(index);
+    return;
+  }
+
+  var bounds = this.getPixelBounds();
+  var lineBounds = this.line.getBounds();
 
   var stroke = this.stroke();
   var lineThickness = !stroke || anychart.utils.isNone(stroke) ? 0 : stroke['thickness'] ? parseFloat(stroke['thickness']) : 1;
@@ -1744,11 +1849,16 @@ anychart.core.axes.Linear.prototype.drawLabel_ = function(value, ratio, index, p
       y = Math.round(bounds.top + bounds.height - ratio * bounds.height) + pixelShift;
       break;
   }
-
-  var formatProvider = this.getLabelsFormatProvider(index, value);
   var positionProvider = {'value': {x: x, y: y}};
-
-  labels.add(formatProvider, positionProvider, index);
+  var label = labels.getLabel(index);
+  if (!label) {
+    var formatProvider = this.getLabelsFormatProvider(index, value);
+    label = labels.add(formatProvider, positionProvider, index);
+    var settings = {};
+    goog.object.extend(settings, labels.themeSettings, labels.ownSettings);
+    label.stateOrder([label.ownSettings, settings]);
+  }
+  label.positionProvider(positionProvider);
 };
 
 
@@ -1860,12 +1970,12 @@ anychart.core.axes.Linear.prototype.draw = function() {
     var labels = this.labels();
     if (!labels.container()) labels.container(/** @type {acgraph.vector.ILayer} */(this.container()));
     labels.parentBounds(/** @type {anychart.math.Rect} */(this.parentBounds()));
-    labels.clear();
+    // labels.clear();
 
     var minorLabels = this.minorLabels();
     if (!minorLabels.container()) minorLabels.container(/** @type {acgraph.vector.ILayer} */(this.container()));
     minorLabels.parentBounds(/** @type {anychart.math.Rect} */(this.parentBounds()));
-    minorLabels.clear();
+    // minorLabels.clear();
 
     this.markConsistent(anychart.ConsistencyState.AXIS_LABELS);
   }
@@ -1920,8 +2030,14 @@ anychart.core.axes.Linear.prototype.draw = function() {
                 lineThickness,
                 majorPixelShift);
 
-          if (drawLabel)
-            this.drawLabel_(tickVal, scale.transform(tickVal, .5), i, majorPixelShift, true, scaleTicksArr);
+          this.drawLabel_(
+              tickVal,
+              scale.transform(tickVal, .5),
+              i,
+              majorPixelShift,
+              true,
+              scaleTicksArr,
+              drawLabel);
           prevMajorRatio = ratio;
           i++;
         } else {
@@ -1938,8 +2054,15 @@ anychart.core.axes.Linear.prototype.draw = function() {
                 lineThickness,
                 minorPixelShift);
 
-          if (drawLabel && prevMajorRatio != minorRatio)
-            this.drawLabel_(minorTickVal, scale.transform(minorTickVal, .5), j, minorPixelShift, false, scaleMinorTicksArr);
+
+          this.drawLabel_(
+              minorTickVal,
+              scale.transform(minorTickVal, .5),
+              j,
+              minorPixelShift,
+              false,
+              scaleMinorTicksArr,
+              drawLabel && prevMajorRatio != minorRatio);
           j++;
         }
       }
@@ -1947,6 +2070,7 @@ anychart.core.axes.Linear.prototype.draw = function() {
 
     } else {
       var labelsStates = this.calcLabels_();
+
       needDrawLabels = goog.isObject(labelsStates) ? labelsStates.labels : !labelsStates;
       pixelShift = tickThickness % 2 == 0 ? 0 : -.5;
 
@@ -1987,8 +2111,14 @@ anychart.core.axes.Linear.prototype.draw = function() {
         }
 
         drawLabel = goog.isArray(needDrawLabels) ? needDrawLabels[i] : needDrawLabels;
-        if (drawLabel && labelPosition >= 0 && labelPosition <= 1)
-          this.drawLabel_(leftTick, labelPosition, i, pixelShift, true, scaleTicksArr);
+        this.drawLabel_(
+            leftTick,
+            labelPosition,
+            i,
+            pixelShift,
+            true,
+            scaleTicksArr,
+            drawLabel && labelPosition >= 0 && labelPosition <= 1);
       }
     }
 
@@ -2044,8 +2174,8 @@ anychart.core.axes.Linear.prototype.setupByJSON = function(config, opt_default) 
   if ('title' in config)
     this.title(config['title']);
 
-  this.labels().setupByVal(config['labels'], opt_default);
-  this.minorLabels().setupByVal(config['minorLabels'], opt_default);
+  this.labels().setupInternal(!!opt_default, config['labels']);
+  this.minorLabels().setupInternal(!!opt_default, config['minorLabels']);
   this.ticks(config['ticks']);
   this.minorTicks(config['minorTicks']);
   this.staggerMode(config['staggerMode']);
@@ -2105,4 +2235,5 @@ anychart.core.axes.Linear.prototype.disposeInternal = function() {
   proto['overlapMode'] = proto.overlapMode;
   proto['isHorizontal'] = proto.isHorizontal;
   proto['padding'] = proto.padding;
+  proto['getPixelBounds'] = proto.getPixelBounds;
 })();

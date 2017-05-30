@@ -68,16 +68,16 @@ anychart.math.kdj.startFunction = function(context) {
 /**
  * KDJ calculation.
  * @param {anychart.math.kdj.Context} context KDJ Context.
- * @param {number} closeValue Current close value.
- * @param {number} highValue Current high value.
- * @param {number} lowValue Current low value.
+ * @param {number} close Current close value.
+ * @param {number} high Current high value.
+ * @param {number} low Current low value.
  * @return {Array.<number>}
  */
-anychart.math.kdj.calculate = function(context, closeValue, highValue, lowValue) {
-  if (isNaN(closeValue) || isNaN(highValue) || isNaN(lowValue)) {
+anychart.math.kdj.calculate = function(context, close, high, low) {
+  if (isNaN(close) || isNaN(high) || isNaN(low)) {
     return [NaN, NaN, NaN];
   } else {
-    var KD = anychart.math.stochastic.calculate(context, closeValue, highValue, lowValue);
+    var KD = anychart.math.stochastic.calculate(context, close, high, low);
     KD.push(context.kMultiplier * KD[0] + context.dMultiplier * KD[1]);
     return KD;
   }

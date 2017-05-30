@@ -223,7 +223,7 @@ anychart.core.utils.GeoSVGParser.prototype.parseDefs_ = function() {
  * @return {Object}
  */
 anychart.core.utils.GeoSVGParser.prototype.getRefElement = function(domElement) {
-  var href = domElement.getAttributeNS('http://www.w3.org/1999/xlink', 'href');
+  var href = domElement.getAttributeNS('https://www.w3.org/1999/xlink', 'href');
   var hrefElement = null;
   if (href) {
     var hrefId = href.substring(1, href.length);

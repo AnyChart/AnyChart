@@ -12,12 +12,13 @@ goog.require('anychart.enums');
 
 /**
  * CartesianBase chart class.
+ * @param {boolean=} opt_categorizeData
  * @extends {anychart.core.ChartWithAxes}
  * @implements {anychart.core.utils.IZoomableChart}
  * @constructor
  */
-anychart.core.CartesianBase = function() {
-  anychart.core.CartesianBase.base(this, 'constructor', true);
+anychart.core.CartesianBase = function(opt_categorizeData) {
+  anychart.core.CartesianBase.base(this, 'constructor', goog.isDef(opt_categorizeData) ? opt_categorizeData : true);
 
   /**
    * Zoom settings.
@@ -55,9 +56,6 @@ anychart.core.CartesianBase = function() {
    * @protected
    */
   this.zPaddingInternal = 0;
-
-  this.defaultSeriesType(anychart.enums.CartesianSeriesType.LINE);
-  this.setType(anychart.enums.ChartTypes.CARTESIAN);
 };
 goog.inherits(anychart.core.CartesianBase, anychart.core.ChartWithAxes);
 
@@ -188,25 +186,6 @@ anychart.core.CartesianBase.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.CARTESIAN_ZOOM;
 
 
-/**
- * Sets chart type. Needed for proper serialization.
- * @param {anychart.enums.ChartTypes} value
- */
-anychart.core.CartesianBase.prototype.setType = function(value) {
-  /**
-   * @type {anychart.enums.ChartTypes}
-   * @private
-   */
-  this.type_ = value;
-};
-
-
-/** @inheritDoc */
-anychart.core.CartesianBase.prototype.getType = function() {
-  return this.type_;
-};
-
-
 //endregion
 //region --- Zoom and scroller
 //----------------------------------------------------------------------------------------------------------------------
@@ -272,8 +251,8 @@ anychart.core.CartesianBase.prototype.xScroller = function(opt_value) {
     this.xScroller_ = new anychart.core.ui.ChartScroller();
     this.xScroller_.setParentEventTarget(this);
     this.xScroller_.listenSignals(this.scrollerInvalidated_, this);
-    this.eventsHandler.listen(this.xScroller_, anychart.enums.EventType.SCROLLER_CHANGE, this.scrollerChangeHandler_);
-    this.eventsHandler.listen(this.xScroller_, anychart.enums.EventType.SCROLLER_CHANGE_FINISH, this.scrollerChangeHandler_);
+    this.eventsHandler.listen(this.xScroller_, anychart.enums.EventType.SCROLLER_CHANGE, this.scrollerChangeHandler);
+    this.eventsHandler.listen(this.xScroller_, anychart.enums.EventType.SCROLLER_CHANGE_FINISH, this.scrollerChangeHandler);
     this.invalidate(
         anychart.ConsistencyState.CARTESIAN_X_SCROLLER |
         anychart.ConsistencyState.BOUNDS,
@@ -308,9 +287,9 @@ anychart.core.CartesianBase.prototype.scrollerInvalidated_ = function(e) {
 /**
  * Scroller change start event handler.
  * @param {anychart.core.ui.Scroller.ScrollerChangeEvent} e
- * @private
+ * @protected
  */
-anychart.core.CartesianBase.prototype.scrollerChangeHandler_ = function(e) {
+anychart.core.CartesianBase.prototype.scrollerChangeHandler = function(e) {
   if (this.xZoom_.continuous() ^ e.type == anychart.enums.EventType.SCROLLER_CHANGE_FINISH) {
     e.preventDefault();
     this.suspendSignalsDispatching();
@@ -348,12 +327,31 @@ anychart.core.CartesianBase.prototype.normalizeSeriesType = function(type) {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.CartesianBase.prototype.getBoundsWithoutAxes = function(contentAreaBounds, opt_scrollerSize) {
-  var scroller = this.xScroller();
+  var scroller = /** @type {anychart.core.ui.ChartScroller} */(this.xScroller());
+  var res = this.resetScrollerPosition(scroller, contentAreaBounds);
+  return anychart.core.CartesianBase.base(this, 'getBoundsWithoutAxes', res.contentAreaBounds, res.scrollerSize);
+};
+
+
+/** @inheritDoc */
+anychart.core.CartesianBase.prototype.applyScrollerOffset = function(offsets, scrollerSize) {
+  return this.applyScrollerOffsetInternal(offsets, /** @type {anychart.core.ui.ChartScroller} */(this.xScroller()), scrollerSize);
+};
+
+
+/**
+ * Resets scroller position and returns new contentAreaBounds and scrollerSize if nessesary.
+ * @param {anychart.core.ui.ChartScroller} scroller
+ * @param {anychart.math.Rect} contentAreaBounds
+ * @return {{contentAreaBounds: anychart.math.Rect, scrollerSize: number}}
+ * @protected
+ */
+anychart.core.CartesianBase.prototype.resetScrollerPosition = function(scroller, contentAreaBounds) {
   var scrollerBeforeAxes = scroller.position() == anychart.enums.ChartScrollerPosition.BEFORE_AXES;
   scroller.padding(0);
   scroller.parentBounds(contentAreaBounds);
   var scrollerHorizontal = scroller.isHorizontal();
-  var scrollerSize = opt_scrollerSize;
+  var scrollerSize = NaN;
   if (scrollerBeforeAxes) {
     if (scrollerHorizontal) {
       scrollerSize = contentAreaBounds.height - scroller.getRemainingBounds().height;
@@ -363,13 +361,19 @@ anychart.core.CartesianBase.prototype.getBoundsWithoutAxes = function(contentAre
   } else {
     contentAreaBounds = scroller.getRemainingBounds();
   }
-  return anychart.core.CartesianBase.base(this, 'getBoundsWithoutAxes', contentAreaBounds, scrollerSize);
+  return {contentAreaBounds: contentAreaBounds, scrollerSize: scrollerSize};
 };
 
 
-/** @inheritDoc */
-anychart.core.CartesianBase.prototype.applyScrollerOffset = function(offsets, scrollerSize) {
-  var scroller = /** @type {anychart.core.ui.ChartScroller} */(this.xScroller());
+/**
+ *
+ * @param {Array.<number>} offsets
+ * @param {anychart.core.ui.ChartScroller} scroller
+ * @param {number} scrollerSize
+ * @return {Array.<number>}
+ * @protected
+ */
+anychart.core.CartesianBase.prototype.applyScrollerOffsetInternal = function(offsets, scroller, scrollerSize) {
   if (scroller.position() == anychart.enums.ChartScrollerPosition.BEFORE_AXES) {
     switch (scroller.orientation()) {
       case anychart.enums.Orientation.TOP:
@@ -458,13 +462,12 @@ anychart.core.CartesianBase.prototype.getBoundsChangedSignal = function() {
 
 /** @inheritDoc */
 anychart.core.CartesianBase.prototype.drawElements = function() {
+  anychart.core.CartesianBase.base(this, 'drawElements');
   if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_X_SCROLLER)) {
     this.xScroller().container(this.rootElement);
     this.xScroller().draw();
     this.markConsistent(anychart.ConsistencyState.CARTESIAN_X_SCROLLER);
   }
-
-  anychart.core.CartesianBase.base(this, 'drawElements');
 };
 
 
@@ -500,7 +503,7 @@ anychart.core.CartesianBase.prototype.setupByJSONWithScales = function(config, s
  */
 anychart.core.CartesianBase.prototype.serialize = function() {
   var json = anychart.core.CartesianBase.base(this, 'serialize');
-  json['type'] = this.type_;
+  json['type'] = this.getType();
   json['barGroupsPadding'] = this.barGroupsPadding();
   json['barsPadding'] = this.barsPadding();
   json['xScroller'] = this.xScroller().serialize();

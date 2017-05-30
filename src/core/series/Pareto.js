@@ -25,28 +25,38 @@ anychart.core.series.Pareto = function(chart, plot, type, config, sortedMode) {
 goog.inherits(anychart.core.series.Pareto, anychart.core.series.Cartesian);
 
 
-//region --- Overrides
-/** @inheritDoc */
-anychart.core.series.Pareto.prototype.updateContext = function(provider, opt_rowInfo) {
-  provider = anychart.core.series.Pareto.base(this, 'updateContext', provider, opt_rowInfo);
-  var values = provider.values();
-  if (goog.isDef(values['index']) && values['index'].value > -1) {
-    var data = this.data();
-    if (goog.isDef(data)) {
-      var index = values['index'].value;
-      var paretoMapping = /** @type {anychart.data.Mapping} */ (data.getRowMapping(index));
-      if ((paretoMapping instanceof anychart.data.ParetoMapping) || (paretoMapping instanceof anychart.data.ParetoSeriesMapping)) {
-        values['cf'] = {value: paretoMapping.getCumulativeFrequency(index), type: anychart.enums.TokenType.NUMBER};
-        values['rf'] = {value: paretoMapping.getRelativeFrequency(index), type: anychart.enums.TokenType.NUMBER};
-      }
-    }
-  }
-
-  var tokenAliases = provider.tokenAliases();
+/**
+ * Token aliases list.
+ * @type {Object.<string, string>}
+ */
+anychart.core.series.Pareto.prototype.TOKEN_ALIASES = (function() {
+  var tokenAliases = {};
+  tokenAliases[anychart.enums.StringToken.BUBBLE_SIZE] = 'size';
+  tokenAliases[anychart.enums.StringToken.RANGE_START] = 'low';
+  tokenAliases[anychart.enums.StringToken.RANGE_END] = 'high';
+  tokenAliases[anychart.enums.StringToken.X_VALUE] = 'x';
   tokenAliases[anychart.enums.StringToken.CUMULATIVE_FREQUENCY] = 'cf';
   tokenAliases[anychart.enums.StringToken.RELATIVE_FREQUENCY] = 'rf';
+  return tokenAliases;
+})();
 
-  return /** @type {anychart.format.Context} */ (provider.propagate(values));
+
+//region --- Overrides
+/** @inheritDoc */
+anychart.core.series.Pareto.prototype.getContextProviderValues = function(provider, rowInfo) {
+  var values = anychart.core.series.Pareto.base(this, 'getContextProviderValues', provider, rowInfo);
+  var data = this.data();
+  var index;
+  if (goog.isDef(data) &&
+      goog.isDef(values['index']) &&
+      (index = Number(values['index'].value)) > -1) {
+    var paretoMapping = /** @type {anychart.data.Mapping} */ (data.getRowMapping(index));
+    if ((paretoMapping instanceof anychart.data.ParetoMapping) || (paretoMapping instanceof anychart.data.ParetoSeriesMapping)) {
+      values['cf'] = {value: paretoMapping.getCumulativeFrequency(index), type: anychart.enums.TokenType.NUMBER};
+      values['rf'] = {value: paretoMapping.getRelativeFrequency(index), type: anychart.enums.TokenType.NUMBER};
+    }
+  }
+  return values;
 };
 
 

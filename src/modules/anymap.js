@@ -20,7 +20,7 @@ goog.require('anychart.modules.seatMap');
  */
 anychart.map = function() {
   var chart = new anychart.charts.Map();
-  chart.setupByVal(anychart.getFullTheme('map'), true);
+  chart.setupInternal(true, anychart.getFullTheme('map'));
   return chart;
 };
 anychart.mapTypesMap[anychart.enums.MapTypes.MAP] = anychart.map;

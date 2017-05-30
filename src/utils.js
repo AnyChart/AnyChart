@@ -2,7 +2,6 @@ goog.provide('anychart.utils');
 
 goog.require('acgraph.vector.primitives');
 goog.require('anychart.core.reporting');
-goog.require('anychart.core.utils.TooltipsContainer');
 goog.require('anychart.data.csv.Parser');
 goog.require('anychart.enums');
 goog.require('anychart.math');
@@ -412,33 +411,53 @@ anychart.utils.getCoordinateByAnchor = function(bounds, anchor, opt_autoDefault)
 
 
 /**
+ * Anchors set for anchors rotation.
+ * @type {Array.<anychart.enums.Anchor>}
+ */
+anychart.utils.ANCHORS_SET = ([
+  anychart.enums.Anchor.CENTER_TOP,
+  anychart.enums.Anchor.RIGHT_TOP,
+  anychart.enums.Anchor.RIGHT_CENTER,
+  anychart.enums.Anchor.RIGHT_BOTTOM,
+  anychart.enums.Anchor.CENTER_BOTTOM,
+  anychart.enums.Anchor.LEFT_BOTTOM,
+  anychart.enums.Anchor.LEFT_CENTER,
+  anychart.enums.Anchor.LEFT_TOP
+]);
+
+
+/**
  * Returns anchor for angle.
  * @param {number} angle .
  * @return {anychart.enums.Anchor} .
  */
 anychart.utils.getAnchorForAngle = function(angle) {
-  var result;
   angle = goog.math.standardAngle(angle);
-
-  if (!angle) {
-    result = anychart.enums.Anchor.LEFT_CENTER;
-  } else if (angle > 0 && angle < 90) {
-    result = anychart.enums.Anchor.LEFT_TOP;
-  } else if (angle == 90) {
-    result = anychart.enums.Anchor.CENTER_TOP;
-  } else if (angle > 90 && angle < 180) {
-    result = anychart.enums.Anchor.RIGHT_TOP;
-  } else if (angle == 180) {
-    result = anychart.enums.Anchor.RIGHT_CENTER;
-  } else if (angle > 180 && angle < 270) {
-    result = anychart.enums.Anchor.RIGHT_BOTTOM;
-  } else if (angle == 270) {
-    result = anychart.enums.Anchor.CENTER_BOTTOM;
-  } else {
-    result = anychart.enums.Anchor.LEFT_BOTTOM;
+  var turn = angle / 90;
+  if (turn != ~~turn) {
+    turn = Math.round(turn - 0.5) + 0.5;
   }
+  turn = (turn + turn + 6) % 8;
+  return anychart.utils.ANCHORS_SET[turn];
+};
 
-  return result;
+
+/**
+ * Rotates anchor by position. CENTER_TOP position is 0 angle, clockwise.
+ * @param {anychart.enums.Anchor} anchor
+ * @param {anychart.enums.Position} position
+ * @return {anychart.enums.Anchor} .
+ */
+anychart.utils.rotateAnchorByPosition = function(anchor, position) {
+  var anchorIndex = goog.array.indexOf(anychart.utils.ANCHORS_SET, anchor);
+  if (anchorIndex >= 0) {
+    var positionIndex = goog.array.indexOf(anychart.utils.ANCHORS_SET, position);
+    if (positionIndex >= 0) {
+      anchorIndex = (anchorIndex + positionIndex) % 8;
+      anchor = anychart.utils.ANCHORS_SET[anchorIndex];
+    }
+  }
+  return anchor;
 };
 
 
@@ -448,23 +467,27 @@ anychart.utils.getAnchorForAngle = function(angle) {
  * @return {anychart.enums.Anchor}
  */
 anychart.utils.flipAnchor = function(anchor) {
-  switch (anchor) {
-    case anychart.enums.Anchor.LEFT_TOP:
-      return anychart.enums.Anchor.RIGHT_BOTTOM;
-    case anychart.enums.Anchor.LEFT_CENTER:
-      return anychart.enums.Anchor.RIGHT_CENTER;
-    case anychart.enums.Anchor.LEFT_BOTTOM:
-      return anychart.enums.Anchor.RIGHT_TOP;
-    case anychart.enums.Anchor.CENTER_TOP:
-      return anychart.enums.Anchor.CENTER_BOTTOM;
-    case anychart.enums.Anchor.CENTER_BOTTOM:
-      return anychart.enums.Anchor.CENTER_TOP;
-    case anychart.enums.Anchor.RIGHT_TOP:
-      return anychart.enums.Anchor.LEFT_BOTTOM;
-    case anychart.enums.Anchor.RIGHT_CENTER:
-      return anychart.enums.Anchor.LEFT_CENTER;
-    case anychart.enums.Anchor.RIGHT_BOTTOM:
-      return anychart.enums.Anchor.LEFT_TOP;
+  return anychart.utils.rotateAnchor(anchor, 180);
+};
+
+
+/**
+ * Rotates anchor by the angle.
+ * @param {anychart.enums.Position|anychart.enums.Anchor} anchor
+ * @param {number} angle
+ * @return {anychart.enums.Anchor}
+ */
+anychart.utils.rotateAnchor = function(anchor, angle) {
+  var turn = goog.math.standardAngle(-angle) / 90;
+  if (turn) {
+    var index = goog.array.indexOf(anychart.utils.ANCHORS_SET, anchor);
+    if (index >= 0) {
+      if (turn != ~~turn) {
+        turn = Math.round(turn - 0.5) + 0.5;
+      }
+      index += turn + turn;
+      anchor = anychart.utils.ANCHORS_SET[index % anychart.utils.ANCHORS_SET.length];
+    }
   }
   return /** @type {anychart.enums.Anchor} */(anchor);
 };
@@ -476,19 +499,10 @@ anychart.utils.flipAnchor = function(anchor) {
  * @return {anychart.enums.Anchor}
  */
 anychart.utils.flipAnchorHorizontal = function(anchor) {
-  switch (anchor) {
-    case anychart.enums.Anchor.LEFT_TOP:
-      return anychart.enums.Anchor.RIGHT_TOP;
-    case anychart.enums.Anchor.LEFT_CENTER:
-      return anychart.enums.Anchor.RIGHT_CENTER;
-    case anychart.enums.Anchor.LEFT_BOTTOM:
-      return anychart.enums.Anchor.RIGHT_BOTTOM;
-    case anychart.enums.Anchor.RIGHT_TOP:
-      return anychart.enums.Anchor.LEFT_TOP;
-    case anychart.enums.Anchor.RIGHT_CENTER:
-      return anychart.enums.Anchor.LEFT_CENTER;
-    case anychart.enums.Anchor.RIGHT_BOTTOM:
-      return anychart.enums.Anchor.LEFT_BOTTOM;
+  var index = goog.array.indexOf(anychart.utils.ANCHORS_SET, anchor);
+  if (index >= 0) {
+    var len = anychart.utils.ANCHORS_SET.length;
+    anchor = anychart.utils.ANCHORS_SET[(len - index) % len];
   }
   return /** @type {anychart.enums.Anchor} */(anchor);
 };
@@ -500,19 +514,10 @@ anychart.utils.flipAnchorHorizontal = function(anchor) {
  * @return {anychart.enums.Anchor}
  */
 anychart.utils.flipAnchorVertical = function(anchor) {
-  switch (anchor) {
-    case anychart.enums.Anchor.LEFT_TOP:
-      return anychart.enums.Anchor.LEFT_BOTTOM;
-    case anychart.enums.Anchor.LEFT_BOTTOM:
-      return anychart.enums.Anchor.LEFT_TOP;
-    case anychart.enums.Anchor.CENTER_TOP:
-      return anychart.enums.Anchor.CENTER_BOTTOM;
-    case anychart.enums.Anchor.CENTER_BOTTOM:
-      return anychart.enums.Anchor.CENTER_TOP;
-    case anychart.enums.Anchor.RIGHT_TOP:
-      return anychart.enums.Anchor.RIGHT_BOTTOM;
-    case anychart.enums.Anchor.RIGHT_BOTTOM:
-      return anychart.enums.Anchor.RIGHT_TOP;
+  var index = goog.array.indexOf(anychart.utils.ANCHORS_SET, anchor);
+  if (index >= 0) {
+    var len = anychart.utils.ANCHORS_SET.length;
+    anchor = anychart.utils.ANCHORS_SET[(len - index + 4) % len];
   }
   return /** @type {anychart.enums.Anchor} */(anchor);
 };
@@ -853,6 +858,19 @@ anychart.utils.applyOffsetByAnchor = function(position, anchor, offsetX, offsetY
 
 
 /**
+ * Returns first defined argument.
+ * @param {...*} var_args .
+ * @return {*}
+ */
+anychart.utils.getFirstDefinedValue = function(var_args) {
+  for (var i = 0, len = arguments.length; i < len; i++) {
+    var a = arguments[i];
+    if (goog.isDef(a)) return a;
+  }
+};
+
+
+/**
  * Does a recursive clone of an object.
  *
  * @param {*} obj Object to clone.
@@ -950,6 +968,19 @@ anychart.utils.trim = function(str) {
   // class (as required by section 7.2 of the ECMAScript spec), we explicitly
   // include it in the regexp to enforce consistent cross-browser behavior.
   return str.replace(/^[\s\xa0]+|[\s\xa0]+$/g, '');
+};
+
+
+/**
+ * Checks whether separator is valid.
+ * Throws an error if invalid.
+ * @param {string} separator
+ */
+anychart.utils.checkSeparator = function(separator) {
+  if (separator.indexOf('\"') != -1) {
+    anychart.core.reporting.error(anychart.enums.ErrorCode.CSV_DOUBLE_QUOTE_IN_SEPARATOR);
+    throw new Error('Double quotes in separator are not allowed');
+  }
 };
 
 
@@ -1169,7 +1200,7 @@ anychart.utils.json2xml = function(json, opt_rootNodeName, opt_returnAsXmlNode) 
   var root = anychart.utils.json2xml_(json, opt_rootNodeName || 'anychart', result);
   if (root) {
     if (!opt_rootNodeName)
-      root.setAttribute('xmlns', 'http://anychart.com/schemas/7.13.1/xml-schema.xsd');
+      root.setAttribute('xmlns', 'http://anychart.com/schemas/7.14.0/xml-schema.xsd');
     result.appendChild(root);
   }
   return opt_returnAsXmlNode ? result : goog.dom.xml.serialize(result);
@@ -1357,6 +1388,12 @@ anychart.utils.getNodeNames_ = function(arrayPropName) {
       return ['depends_on', 'item'];
     case 'precision':
       return ['precision_list', 'precision'];
+    case 'labels':
+      return ['quarter_labels', 'label'];
+    case 'weights':
+      return ['weights', 'weight'];
+    case 'angles':
+      return ['angles', 'angle'];
   }
   return null;
 };
@@ -1444,6 +1481,12 @@ anychart.utils.getArrayPropName_ = function(nodeName) {
       return ['dependsOn', 'item'];
     case 'precisionList':
       return ['precision', 'precision'];
+    case 'quarterLabels':
+      return ['labels', 'label'];
+    case 'weights':
+      return ['weights', 'weight'];
+    case 'angles':
+      return ['angles', 'angle'];
   }
   return null;
 };
@@ -1603,6 +1646,13 @@ anychart.utils.formatDateTime = function(date, pattern) {
  * @type {Object.<anychart.core.ui.Tooltip>}
  */
 anychart.utils.tooltipsRegistry = {};
+
+
+/**
+ * Tooltip local containers registry.
+ * @type {Object.<anychart.core.utils.LocalTooltipContainer>}
+ */
+anychart.utils.tooltipContainersRegistry = {};
 
 
 /**

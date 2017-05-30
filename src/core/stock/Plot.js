@@ -640,6 +640,19 @@ anychart.core.stock.Plot.prototype.getAllSeries = function() {
 
 
 /**
+ * Creates ADL indicator on the chart.
+ * @param {!anychart.data.TableMapping} mapping
+ * @param {anychart.enums.StockSeriesType=} opt_seriesType
+ * @return {anychart.core.stock.indicators.ADL}
+ */
+anychart.core.stock.Plot.prototype.adl = function(mapping, opt_seriesType) {
+  var result = new anychart.core.stock.indicators.ADL(this, mapping, opt_seriesType);
+  this.indicators_.push(result);
+  return result;
+};
+
+
+/**
  * Creates AMA indicator on the chart.
  * @param {!anychart.data.TableMapping} mapping
  * @param {number=} opt_period
@@ -726,6 +739,68 @@ anychart.core.stock.Plot.prototype.bbandsB = function(mapping, opt_period, opt_d
  */
 anychart.core.stock.Plot.prototype.bbandsWidth = function(mapping, opt_period, opt_deviation, opt_seriesType) {
   var result = new anychart.core.stock.indicators.BBandsWidth(this, mapping, opt_period, opt_deviation, opt_seriesType);
+  this.indicators_.push(result);
+  return result;
+};
+
+
+/**
+ * Creates CCI indicator on the chart.
+ * @param {!anychart.data.TableMapping} mapping
+ * @param {number=} opt_period
+ * @param {anychart.enums.StockSeriesType=} opt_seriesType
+ * @return {anychart.core.stock.indicators.CCI}
+ */
+anychart.core.stock.Plot.prototype.cci = function(mapping, opt_period, opt_seriesType) {
+  var result = new anychart.core.stock.indicators.CCI(this, mapping, opt_period, opt_seriesType);
+  this.indicators_.push(result);
+  return result;
+};
+
+
+/**
+ * Creates CHO indicator on the chart.
+ * @param {!anychart.data.TableMapping} mapping
+ * @param {number=} opt_fastPeriod [3] Indicator period. Defaults to 3.
+ * @param {number=} opt_slowPeriod [10] Indicator period. Defaults to 10.
+ * @param {string=} opt_maType [EMA] Indicator smoothing type. Defaults to EMA.
+ * @param {anychart.enums.StockSeriesType=} opt_seriesType
+ * @return {anychart.core.stock.indicators.CHO}
+ */
+anychart.core.stock.Plot.prototype.cho = function(mapping, opt_fastPeriod, opt_slowPeriod, opt_maType, opt_seriesType) {
+  var result = new anychart.core.stock.indicators.CHO(this, mapping, opt_fastPeriod, opt_slowPeriod, opt_maType, opt_seriesType);
+  this.indicators_.push(result);
+  return result;
+};
+
+
+/**
+ * Creates CMF indicator on the chart.
+ * @param {!anychart.data.TableMapping} mapping
+ * @param {number=} opt_period
+ * @param {anychart.enums.StockSeriesType=} opt_seriesType
+ * @return {anychart.core.stock.indicators.CMF}
+ */
+anychart.core.stock.Plot.prototype.cmf = function(mapping, opt_period, opt_seriesType) {
+  var result = new anychart.core.stock.indicators.CMF(this, mapping, opt_period, opt_seriesType);
+  this.indicators_.push(result);
+  return result;
+};
+
+
+/**
+ * Creates DMI indicator on the chart.
+ * @param {!anychart.data.TableMapping} mapping
+ * @param {number=} opt_period
+ * @param {number=} opt_adxPeriod
+ * @param {boolean=} opt_useWildersSmoothing
+ * @param {anychart.enums.StockSeriesType=} opt_pdiSeriesType
+ * @param {anychart.enums.StockSeriesType=} opt_ndiSeriesType
+ * @param {anychart.enums.StockSeriesType=} opt_adxSeriesType
+ * @return {anychart.core.stock.indicators.DMI}
+ */
+anychart.core.stock.Plot.prototype.dmi = function(mapping, opt_period, opt_adxPeriod, opt_useWildersSmoothing, opt_pdiSeriesType, opt_ndiSeriesType, opt_adxSeriesType) {
+  var result = new anychart.core.stock.indicators.DMI(this, mapping, opt_period, opt_adxPeriod, opt_useWildersSmoothing, opt_pdiSeriesType, opt_ndiSeriesType, opt_adxSeriesType);
   this.indicators_.push(result);
   return result;
 };
@@ -923,9 +998,9 @@ anychart.core.stock.Plot.prototype.createSeriesByType = function(type, opt_data,
 
   return series;
 };
+
+
 //endregion
-
-
 //region Infrastructure
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1047,9 +1122,19 @@ anychart.core.stock.Plot.prototype.getDrawingWidth = function() {
   this.ensureBoundsDistributed_();
   return this.seriesBounds_.width;
 };
+
+
+/**
+ * Returns series drawing bounds.
+ * @return {!anychart.math.Rect}
+ */
+anychart.core.stock.Plot.prototype.getPlotBounds = function() {
+  this.ensureBoundsDistributed_();
+  return this.seriesBounds_;
+};
+
+
 //endregion
-
-
 //region Public getters, setters and methods
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1134,6 +1219,7 @@ anychart.core.stock.Plot.prototype.yScale = function(opt_value) {
   } else {
     if (!this.yScale_) {
       this.yScale_ = anychart.scales.linear();
+      this.yScale_.listenSignals(this.yScaleInvalidated, this);
     }
     return this.yScale_;
   }
@@ -1329,15 +1415,22 @@ anychart.core.stock.Plot.prototype.dateTimeHighlighter = function(opt_strokeOrFi
     return this.dateTimeHighlighterStroke_;
   }
 };
+
+
 //endregion
-
-
 //region Drawing
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Drawing
 //
 //----------------------------------------------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.core.stock.Plot.prototype.remove = function() {
+  if (this.rootLayer_)
+    this.rootLayer_.remove();
+};
+
+
 /**
  * Draws the plot.
  * @return {anychart.core.stock.Plot}
@@ -1594,9 +1687,9 @@ anychart.core.stock.Plot.prototype.ensureBoundsDistributed_ = function() {
     this.markConsistent(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.STOCK_PLOT_LEGEND);
   }
 };
+
+
 //endregion
-
-
 //region Legend
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1770,9 +1863,9 @@ anychart.core.stock.Plot.prototype.legendItemOut = function(item, event) {
 anychart.core.stock.Plot.prototype.needsInteractiveLegendUpdate = function() {
   return true;
 };
+
+
 //endregion
-
-
 //region Interactivity
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1858,9 +1951,9 @@ anychart.core.stock.Plot.prototype.unhighlight = function() {
   }
   this.dispatchSignal(anychart.Signal.NEED_UPDATE_LEGEND);
 };
+
+
 //endregion
-
-
 //region Drag
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1921,9 +2014,9 @@ anychart.core.stock.Plot.prototype.handlePlotMouseOut_ = function(e) {
 anychart.core.stock.Plot.prototype.handlePlotMouseDown_ = function(e) {
   this.annotations().unselect();
 };
+
+
 //endregion
-
-
 //region Annotations
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1948,9 +2041,9 @@ anychart.core.stock.Plot.prototype.annotations = function(opt_value) {
   }
   return this.annotations_;
 };
+
+
 //endregion
-
-
 //region Invalidation handlers
 /**
  * Background invalidation handler.
@@ -2023,9 +2116,9 @@ anychart.core.stock.Plot.prototype.xAxisInvalidated_ = function(e) {
 anychart.core.stock.Plot.prototype.onGridSignal_ = function(e) {
   this.invalidate(anychart.ConsistencyState.STOCK_PLOT_GRIDS, anychart.Signal.NEEDS_REDRAW);
 };
+
+
 //endregion
-
-
 //region Palettes
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -2132,9 +2225,9 @@ anychart.core.stock.Plot.prototype.paletteInvalidated_ = function(event) {
     this.invalidate(anychart.ConsistencyState.STOCK_PLOT_PALETTE, anychart.Signal.NEEDS_REDRAW);
   }
 };
+
+
 //endregion
-
-
 //region Serialization / deserialization / disposing
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -2571,9 +2664,9 @@ anychart.core.stock.Plot.Dragger.prototype.limitX = function(x) {
 anychart.core.stock.Plot.Dragger.prototype.limitY = function(y) {
   return 0;
 };
+
+
 //endregion
-
-
 //exports
 (function() {
   var proto = anychart.core.stock.Plot.prototype;
@@ -2609,12 +2702,17 @@ anychart.core.stock.Plot.Dragger.prototype.limitY = function(y) {
   proto['removeSeries'] = proto.removeSeries;
   proto['removeSeriesAt'] = proto.removeSeriesAt;
   proto['removeAllSeries'] = proto.removeAllSeries;
+  proto['adl'] = proto.adl;
   proto['ama'] = proto.ama;
   proto['aroon'] = proto.aroon;
   proto['atr'] = proto.atr;
   proto['bbands'] = proto.bbands;
   proto['bbandsB'] = proto.bbandsB;
   proto['bbandsWidth'] = proto.bbandsWidth;
+  proto['cci'] = proto.cci;
+  proto['cho'] = proto.cho;
+  proto['cmf'] = proto.cmf;
+  proto['dmi'] = proto.dmi;
   proto['ema'] = proto.ema;
   proto['kdj'] = proto.kdj;
   proto['macd'] = proto.macd;

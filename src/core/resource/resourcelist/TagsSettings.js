@@ -77,9 +77,9 @@ anychart.core.resource.resourceList.TagsSettings.prototype.padding = function(op
 anychart.core.resource.resourceList.TagsSettings.prototype.paddingInvalidated_ = function(event) {
   this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
 };
+
+
 //endregion
-
-
 //region --- SETUP/DISPOSE ---
 /** @inheritDoc */
 anychart.core.resource.resourceList.TagsSettings.prototype.setupByJSON = function(config, opt_default) {
@@ -110,9 +110,9 @@ anychart.core.resource.resourceList.TagsSettings.prototype.disposeInternal = fun
   goog.dispose(this.background_);
   anychart.core.resource.resourceList.TagsSettings.base(this, 'disposeInternal');
 };
+
+
 //endregion
-
-
 //exports
 (function() {
   var proto = anychart.core.resource.resourceList.TagsSettings.prototype;

@@ -328,7 +328,7 @@ anychart.core.ui.Scroller.prototype.thumbs = function(opt_value) {
     this.thumbs_ = new anychart.core.ui.Scroller.Thumbs(this);
   }
   if (goog.isDef(opt_value)) {
-    this.thumbs_.setup(opt_value);
+    this.thumbs_.setupInternal(false, opt_value);
     return this;
   }
   return this.thumbs_;
@@ -1557,7 +1557,7 @@ anychart.core.ui.Scroller.prototype.setupByJSON = function(config, opt_default) 
   this.height(config['height']);
   this.minHeight(config['minHeight']);
   this.maxHeight(config['maxHeight']);
-  this.thumbs(config['thumbs']);
+  this.thumbs().setupInternal(!!opt_default, config['thumbs']);
 };
 
 
@@ -1873,8 +1873,9 @@ anychart.core.ui.Scroller.Thumbs.prototype.serialize = function() {
 
 /**
  * @param {Object} config
+ * @param {boolean=} opt_default
  */
-anychart.core.ui.Scroller.Thumbs.prototype.setupByJSON = function(config) {
+anychart.core.ui.Scroller.Thumbs.prototype.setupByJSON = function(config, opt_default) {
   this.enabled('enabled' in config ? !!config['enabled'] : true);
   this.fill(config['fill']);
   this.stroke(config['stroke']);
@@ -1885,11 +1886,12 @@ anychart.core.ui.Scroller.Thumbs.prototype.setupByJSON = function(config) {
 
 
 /**
+ * @param {boolean} isDefault
  * @param {...*} var_args
  * @return {boolean}
  */
-anychart.core.ui.Scroller.Thumbs.prototype.setupSpecial = function(var_args) {
-  var arg0 = arguments[0];
+anychart.core.ui.Scroller.Thumbs.prototype.setupSpecial = function(isDefault, var_args) {
+  var arg0 = arguments[1];
   if (goog.isBoolean(arg0) || goog.isNull(arg0)) {
     this.enabled(!!arg0);
     return true;
@@ -1903,16 +1905,16 @@ anychart.core.ui.Scroller.Thumbs.prototype.setupSpecial = function(var_args) {
  * instances of descendant classes.
  * Note: this method only changes element properties if they are supposed to be changed by the config value -
  * it doesn't reset other properties to their defaults.
+ * @param {boolean} isDefault
  * @param {...(Object|Array|number|string|undefined|boolean|null)} var_args Arguments to setup the instance.
  * @return {anychart.core.ui.Scroller.Thumbs} Returns itself for chaining.
  */
-anychart.core.ui.Scroller.Thumbs.prototype.setup = function(var_args) {
-  var arg0 = arguments[0];
+anychart.core.ui.Scroller.Thumbs.prototype.setupInternal = function(isDefault, var_args) {
+  var arg0 = arguments[1];
   if (goog.isDef(arg0)) {
-    if (!this.setupSpecial.apply(this, arguments) && goog.isObject(arg0)) {
-      //if (arg0 instanceof anychart.core.Base)
-      //  throw 'Instance of object is passed to setter. You should use JSON instead';
-      this.setupByJSON(/** @type {!Object} */(arguments[0]));
+    // in fact only the first argument value
+    if (!this.setupSpecial(isDefault, arg0) && goog.isObject(arg0)) {
+      this.setupByJSON(arg0, isDefault);
     }
   }
   return this;

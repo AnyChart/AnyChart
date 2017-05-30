@@ -183,9 +183,9 @@ anychart.core.ui.StageCredits.prototype.invalidate = function(state, opt_dispatc
   if (!this.isDisposed() && !this.stage_.isSuspended() && !!effective && !!opt_dispatch)
     this.stage_.render();
 };
+
+
 //endregion
-
-
 //region --- OWN API ---
 /**
  * Adds protocol to url.
@@ -322,9 +322,9 @@ anychart.core.ui.StageCredits.prototype.getStage = function() {
 anychart.core.ui.StageCredits.prototype.domElement = function() {
   return this.domElement_;
 };
+
+
 //endregion
-
-
 //region --- UTILS ---
 /**
  * @enum {string}
@@ -388,7 +388,7 @@ anychart.core.ui.StageCredits.prototype.render = function() {
 
   if (this.hasInvalidationState(anychart.core.ui.StageCredits.States.URL_ALT)) {
     goog.dom.setProperties(this.a_, {
-      'href': valid ? this.url() : 'http://www.anychart.com/?utm_source=trial',
+      'href': valid ? this.url() : 'https://www.anychart.com/?utm_source=trial',
       'title': valid ? this.alt() : 'AnyChart - JavaScript Charts designed to be embedded and integrated',
       'target': '_blank'
     });
@@ -487,9 +487,9 @@ anychart.core.ui.StageCredits.prototype.onImageErrorHandler_ = function(e) {
   if (e.target.id != this.tagetSrc) return;
   goog.dom.removeNode(this.image_);
 };
+
+
 //endregion
-
-
 //region --- SETUP/DISPOSE ---
 /**
  * Setup.
@@ -550,9 +550,9 @@ anychart.core.ui.StageCredits.prototype.disposeInternal = function() {
   this.stage_ = null;
   anychart.core.ui.StageCredits.base(this, 'disposeInternal');
 };
+
+
 //endregion
-
-
 //exports
 (function() {
   var proto = anychart.core.ui.StageCredits.prototype;

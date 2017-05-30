@@ -249,9 +249,6 @@ anychart.core.reporting.getWarningDescription_ = function(code, opt_arguments) {
     case anychart.enums.WarningCode.STOCK_WRONG_MAPPING:
       return 'Wrong mapping passed to ' + opt_arguments[0] + ' series - required "' + opt_arguments[1] + "' field is missing.";
 
-    case anychart.enums.WarningCode.SCALE_TYPE_NOT_SUPPORTED:
-      return 'Scale type "' + opt_arguments[0] + '" is not supported - only ' + opt_arguments[1] + ' is.';
-
     case anychart.enums.WarningCode.PARSE_DATETIME:
       return 'Could not parse date time value "' + opt_arguments[0] + '".' + (!!opt_arguments[1] ?
               ('Symbols parsed: ' + opt_arguments[1]) : '');
@@ -272,6 +269,12 @@ anychart.core.reporting.getWarningDescription_ = function(code, opt_arguments) {
       var interval = /** @type {number} */(opt_arguments[1]);
       var count = /** @type {number} */(opt_arguments[0]) / interval;
       return 'Current scale ticks settings resulted in too many ticks: trying to generate about ' + count + ' ticks with interval ' + interval;
+
+    case anychart.enums.WarningCode.OBJECT_KEY_COLLISION:
+      return 'Data item with ID=\'' + opt_arguments[0] + '\' already exists. You should use another key.';
+
+    case anychart.enums.WarningCode.VENN_AREA_NOT_REPRESENTED_ON_SCREEN:
+      return 'Area ' + opt_arguments[0] + ' not represented on screen.';
 
     default:
       return 'Unknown error. Please, contact support team at http://support.anychart.com/.\n' +

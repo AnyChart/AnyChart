@@ -25,7 +25,7 @@ goog.require('anychart.utils');
 /**
  * Pyramid/Funnel Base Chart Class.<br/>
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data for the chart.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @extends {anychart.core.SeparateChart}
  * @implements {anychart.core.utils.IInteractiveSeries}
  * @constructor
@@ -374,7 +374,7 @@ anychart.core.PyramidFunnelBase.prototype.isSeries = function() {
 /**
  * Getter/setter for data.
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_value Value to set.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @return {(!anychart.data.View|!anychart.core.PyramidFunnelBase)} Returns itself if used as a setter or the mapping if used as a getter.
  */
 anychart.core.PyramidFunnelBase.prototype.data = function(opt_value, opt_csvSettings) {
@@ -3478,24 +3478,13 @@ anychart.core.PyramidFunnelBase.prototype.drawMarker = function(pointState) {
 //  Tooltip.
 //
 //----------------------------------------------------------------------------------------------------------------------
-/**
- * Getter/setter for tooltip.
- * @param {(Object|boolean|null)=} opt_value Tooltip settings.
- * @return {!(anychart.core.PyramidFunnelBase|anychart.core.ui.Tooltip)} Tooltip instance or self for method chaining.
- */
-anychart.core.PyramidFunnelBase.prototype.tooltip = function(opt_value) {
-  if (!this.tooltip_) {
-    this.tooltip_ = new anychart.core.ui.Tooltip(0);
-    this.tooltip_.chart(this);
-    this.registerDisposable(this.tooltip_);
-    this.tooltip_.listenSignals(this.onTooltipSignal_, this);
-  }
-  if (goog.isDef(opt_value)) {
-    this.tooltip_.setup(opt_value);
-    return this;
-  } else {
-    return this.tooltip_;
-  }
+/** @inheritDoc */
+anychart.core.PyramidFunnelBase.prototype.createTooltip = function() {
+  var tooltip = new anychart.core.ui.Tooltip(0);
+  this.registerDisposable(tooltip);
+  tooltip.chart(this);
+  tooltip.listenSignals(this.onTooltipSignal_, this);
+  return tooltip;
 };
 
 
@@ -3931,9 +3920,9 @@ anychart.core.PyramidFunnelBase.prototype.setupByJSON = function(config, opt_def
   this.hoverHatchFill(config['hoverHatchFill']);
   this.selectHatchFill(config['selectHatchFill']);
 
-  this.labels().setupByVal(config['labels'], opt_default);
-  this.hoverLabels().setupByVal(config['hoverLabels'], opt_default);
-  this.selectLabels().setupByVal(config['selectLabels'], opt_default);
+  this.labels().setupInternal(!!opt_default, config['labels']);
+  this.hoverLabels().setupInternal(!!opt_default, config['hoverLabels']);
+  this.selectLabels().setupInternal(!!opt_default, config['selectLabels']);
 
   this.stroke(config['stroke']);
   this.hoverStroke(config['hoverStroke']);
@@ -3948,7 +3937,7 @@ anychart.core.PyramidFunnelBase.prototype.setupByJSON = function(config, opt_def
   this.pointsPadding(config['pointsPadding']);
 
   if ('tooltip' in config)
-    this.tooltip().setupByVal(config['tooltip'], opt_default);
+    this.tooltip().setupInternal(!!opt_default, config['tooltip']);
 };
 
 

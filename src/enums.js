@@ -50,7 +50,15 @@ anychart.enums.ChartTypes = {
   RESOURCE: 'resource',
   JUMP_LINE: 'jumpLine',
   STICK: 'stick',
-  PARETO: 'pareto'
+  PARETO: 'pareto',
+  QUADRANT: 'quadrant',
+  MEKKO: 'mekko',
+  MOSAIC: 'mosaic',
+  BARMEKKO: 'barmekko',
+  TAG_CLOUD: 'tagCloud',
+  VENN: 'venn',
+  HILO: 'hilo',
+  WATERFALL: 'waterfall'
 };
 
 
@@ -1460,6 +1468,34 @@ anychart.enums.normalizeStockLabelsOverlapMode = function(value, opt_default) {
 };
 
 
+/**
+ * Tag cloud mode.
+ * @enum {string}
+ */
+anychart.enums.TagCloudMode = {
+  SPIRAL: 'spiral',
+  RECT: 'rect'
+};
+
+
+/**
+ * Tag cloud mode normalizer.
+ * @param {*} value .
+ * @param {anychart.enums.TagCloudMode=} opt_default .
+ * @return {anychart.enums.TagCloudMode}
+ */
+anychart.enums.normalizeTagCloudMode = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'spiral':
+      return anychart.enums.TagCloudMode.SPIRAL;
+    case 'rect':
+      return anychart.enums.TagCloudMode.RECT;
+  }
+  return opt_default || anychart.enums.TagCloudMode.SPIRAL;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  BackgroundCornersType
@@ -2063,7 +2099,11 @@ anychart.enums.EventType = {
 
   // UI events
   CLOSE: 'close',
-  COMPLETE: 'complete'
+  COMPLETE: 'complete',
+
+  SELECT_MARQUEE_START: 'selectmarqueestart',
+  SELECT_MARQUEE_CHANGE: 'selectmarqueechange',
+  SELECT_MARQUEE_FINISH: 'selectmarqueefinish'
 };
 
 
@@ -2373,7 +2413,8 @@ anychart.enums.CartesianSeriesType = {
   SPLINE_AREA: 'splineArea',
   STEP_AREA: 'stepArea',
   STEP_LINE: 'stepLine',
-  STICK: 'stick'
+  STICK: 'stick',
+  HILO: 'hilo'
 };
 
 
@@ -2426,6 +2467,8 @@ anychart.enums.normalizeCartesianSeriesType = function(value, opt_default) {
       return anychart.enums.CartesianSeriesType.STEP_AREA;
     case 'stepline':
       return anychart.enums.CartesianSeriesType.STEP_LINE;
+    case 'hilo':
+      return anychart.enums.CartesianSeriesType.HILO;
   }
   return opt_default || anychart.enums.CartesianSeriesType.LINE;
 };
@@ -3019,6 +3062,62 @@ anychart.enums.normalizeHeatMapSeriesType = function(value, opt_default) {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  MekkoSeriesType
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * List of all series types.
+ * @enum {string}
+ */
+anychart.enums.MekkoSeriesType = {
+  MEKKO: 'mekko'
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  WaterfallSeriesType
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * List of all series types.
+ * @enum {string}
+ */
+anychart.enums.WaterfallSeriesType = {
+  WATERFALL: 'waterfall'
+};
+
+
+/**
+ * List of waterfall chart data modes.
+ * @enum {string}
+ */
+anychart.enums.WaterfallDataMode = {
+  ABSOLUTE: 'absolute',
+  DIFF: 'diff'
+};
+
+
+/**
+ * Normalizes waterfall datamode. Defaults to ABSOLUTE.
+ * @param {*} value Value to normalize.
+ * @param {anychart.enums.WaterfallDataMode=} opt_default Default value.
+ * @return {anychart.enums.WaterfallDataMode}
+ */
+anychart.enums.normalizeWaterfallDataMode = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'diff':
+      return anychart.enums.WaterfallDataMode.DIFF;
+    case 'absolute':
+      return anychart.enums.WaterfallDataMode.ABSOLUTE;
+  }
+  return opt_default || anychart.enums.WaterfallDataMode.ABSOLUTE;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  Scale types
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -3223,8 +3322,6 @@ anychart.enums.WarningCode = {
   TOOLBAR_METHOD_IS_NOT_DEFINED: 14,
   TOOLBAR_CHART_IS_NOT_SET: 15,
 
-  SCALE_TYPE_NOT_SUPPORTED: 16,
-
   DATA_ITEM_SET_PATH: 17,
 
   TREEMAP_MANY_ROOTS: 18,
@@ -3232,6 +3329,10 @@ anychart.enums.WarningCode = {
   MISSING_PROJ4: 19,
 
   TOO_MANY_TICKS: 20,
+
+  OBJECT_KEY_COLLISION: 21,
+
+  VENN_AREA_NOT_REPRESENTED_ON_SCREEN: 22,
 
   TABLE_ALREADY_IN_TRANSACTION: 101,
 
@@ -3419,6 +3520,40 @@ anychart.enums.normalizeErrorMode = function(value, opt_default) {
       return anychart.enums.ErrorMode.BOTH;
   }
   return opt_default || anychart.enums.ErrorMode.BOTH;
+};
+
+
+/**
+ * Text parsing mode.
+ * @enum {string}
+ */
+anychart.enums.TextParsingMode = {
+  CSV: 'csv',
+  BY_WORD: 'byWord',
+  BY_CHAR: 'byChar'
+};
+
+
+/**
+ * Normalizes text parsing mode
+ * @param {*} value Value to normalize.
+ * @param {anychart.enums.TextParsingMode=} opt_default Custom default value (defaults to CSV).
+ * @return {anychart.enums.TextParsingMode}
+ */
+anychart.enums.normalizeTextParsingMode = function(value, opt_default) {
+  if (goog.isObject(value))
+    value = value['mode'];
+
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'csv':
+      return anychart.enums.TextParsingMode.CSV;
+    case 'byword':
+      return anychart.enums.TextParsingMode.BY_WORD;
+    case 'bychar':
+      return anychart.enums.TextParsingMode.BY_CHAR;
+  }
+  return opt_default || anychart.enums.TextParsingMode.CSV;
 };
 
 
@@ -3720,7 +3855,11 @@ anychart.enums.TextWrap = {
   /**
    Wrap by symbol.
    */
-  BY_LETTER: 'byLetter'
+  BY_LETTER: 'byLetter',
+  /**
+   Wrap by word.
+   */
+  BY_WORD: 'byWord'
 };
 
 
@@ -3736,6 +3875,8 @@ anychart.enums.normalizeTextWrap = function(value) {
     case 'no':
     case 'n':
       return anychart.enums.TextWrap.NO_WRAP;
+    case 'byword':
+      return anychart.enums.TextWrap.BY_WORD;
     default:
       return anychart.enums.TextWrap.BY_LETTER;
   }
@@ -3976,7 +4117,9 @@ anychart.enums.StockRangeChangeSource = {
   SCROLLER_CLICK: 'scrollerClick',
   PLOT_DRAG: 'plotDrag',
   DATA_CHANGE: 'dataUpdate',
-  SELECT_RANGE: 'selectRange'
+  SELECT_RANGE: 'selectRange',
+  MARQUEE: 'marquee',
+  MOUSE_WHEEL: 'mouseWheel'
 };
 
 
@@ -4809,6 +4952,21 @@ anychart.enums.StringToken = {
   RELATIVE_FREQUENCY: '%RF',
 
   /**
+   * Point value relative to the previous point. Used in Waterfall series.
+   */
+  DIFF: '%Diff',
+
+  /**
+   * Absolute point value. Used in Waterfall series.
+   */
+  ABSOLUTE: '%Absolute',
+
+  /**
+   * If the point is a total point. Used in Waterfall series.
+   */
+  IS_TOTAL: '%IsTotal',
+
+  /**
    * Resource index that holds the activity. Used in Resource charts.
    */
   RESOURCE_INDEX: 'resourceIndex',
@@ -5424,6 +5582,11 @@ anychart.enums.Statistics = {
    The y value of this point.*/
   Y_VALUE: 'yValue',
 
+  X_SCALES_MIN: 'xScalesMin',
+  X_SCALES_MAX: 'xScalesMax',
+  Y_SCALES_MIN: 'yScalesMin',
+  Y_SCALES_MAX: 'yScalesMax',
+
   //--------------------------------------------------------------------------------------------------------------------
   // Private values. Do not export.
   //--------------------------------------------------------------------------------------------------------------------
@@ -5510,7 +5673,11 @@ anychart.enums.SeriesDrawerTypes = {
   POLAR_LINE: 25,
   POLAR_AREA: 26,
   POLAR_COLUMN: 27,
-  POLAR_RANGE_COLUMN: 28
+  POLAR_RANGE_COLUMN: 28,
+  MEKKO: 29,
+  HEAT_MAP: 30,
+  RANGE_STICK: 31,
+  WATERFALL: 32
 };
 
 
@@ -5558,9 +5725,9 @@ anychart.enums.PropertyHandlerType = {
   SINGLE_ARG_DEPRECATED: 2,
   MULTI_ARG_DEPRECATED: 3
 };
+
+
 //endregion
-
-
 /**
  * Accessibility mode.
  * @enum {string}
@@ -5684,9 +5851,9 @@ anychart.enums.normalizeAnnotationType = function(value) {
   }
   return anychart.enums.AnnotationTypes.LINE;
 };
+
+
 //endregion
-
-
 /**
  * Paper sizes.
  * @enum {string}
@@ -5957,9 +6124,9 @@ anychart.enums.normalizeTimeTrackingMode = function(value) {
 };
 
 
+
+
 //endregion
-
-
 //exports
 goog.exportSymbol('anychart.enums.RadialGridLayout.CIRCUIT', anychart.enums.RadialGridLayout.CIRCUIT);
 goog.exportSymbol('anychart.enums.RadialGridLayout.RADIAL', anychart.enums.RadialGridLayout.RADIAL);
@@ -6659,6 +6826,10 @@ goog.exportSymbol('anychart.enums.Statistics.Y_PERCENT_OF_CATEGORY', anychart.en
 goog.exportSymbol('anychart.enums.Statistics.Y_PERCENT_OF_SERIES', anychart.enums.Statistics.Y_PERCENT_OF_SERIES);
 goog.exportSymbol('anychart.enums.Statistics.Y_PERCENT_OF_TOTAL', anychart.enums.Statistics.Y_PERCENT_OF_TOTAL);
 goog.exportSymbol('anychart.enums.Statistics.Y_VALUE', anychart.enums.Statistics.Y_VALUE);
+goog.exportSymbol('anychart.enums.Statistics.X_SCALES_MIN', anychart.enums.Statistics.X_SCALES_MIN);
+goog.exportSymbol('anychart.enums.Statistics.X_SCALES_MAX', anychart.enums.Statistics.X_SCALES_MAX);
+goog.exportSymbol('anychart.enums.Statistics.Y_SCALES_MIN', anychart.enums.Statistics.Y_SCALES_MIN);
+goog.exportSymbol('anychart.enums.Statistics.Y_SCALES_MAX', anychart.enums.Statistics.Y_SCALES_MAX);
 
 goog.exportSymbol('anychart.enums.ChartDataExportMode.RAW', anychart.enums.ChartDataExportMode.RAW);
 goog.exportSymbol('anychart.enums.ChartDataExportMode.SPECIFIC', anychart.enums.ChartDataExportMode.SPECIFIC);
@@ -6730,6 +6901,8 @@ goog.exportSymbol('anychart.enums.PolarSeriesType.POLYGON', anychart.enums.Polar
 goog.exportSymbol('anychart.enums.PolarSeriesType.POLYLINE', anychart.enums.PolarSeriesType.POLYLINE);
 goog.exportSymbol('anychart.enums.PolarSeriesType.COLUMN', anychart.enums.PolarSeriesType.COLUMN);
 goog.exportSymbol('anychart.enums.PolarSeriesType.RANGE_COLUMN', anychart.enums.PolarSeriesType.RANGE_COLUMN);
+
+goog.exportSymbol('anychart.enums.MekkoSeriesType.MEKKO', anychart.enums.MekkoSeriesType.MEKKO);
 
 goog.exportSymbol('anychart.enums.MilestoneShape.CIRCLE', anychart.enums.MilestoneShape.CIRCLE);
 goog.exportSymbol('anychart.enums.MilestoneShape.RHOMBUS', anychart.enums.MilestoneShape.RHOMBUS);
@@ -6846,6 +7019,10 @@ goog.exportSymbol('anychart.enums.FontStyle.OBLIQUE', anychart.enums.FontStyle.O
 goog.exportSymbol('anychart.enums.FontVariant.NORMAL', anychart.enums.FontVariant.NORMAL);
 goog.exportSymbol('anychart.enums.FontVariant.SMALL_CAP', anychart.enums.FontVariant.SMALL_CAP);
 
+goog.exportSymbol('anychart.enums.TextParsingMode.CSV', anychart.enums.TextParsingMode.CSV);
+goog.exportSymbol('anychart.enums.TextParsingMode.BY_WORD', anychart.enums.TextParsingMode.BY_WORD);
+goog.exportSymbol('anychart.enums.TextParsingMode.BY_CHAR', anychart.enums.TextParsingMode.BY_CHAR);
+
 goog.exportSymbol('anychart.enums.HAlign.LEFT', anychart.enums.HAlign.LEFT);
 goog.exportSymbol('anychart.enums.HAlign.START', anychart.enums.HAlign.START);
 goog.exportSymbol('anychart.enums.HAlign.CENTER', anychart.enums.HAlign.CENTER);
@@ -6858,8 +7035,10 @@ goog.exportSymbol('anychart.enums.VAlign.BOTTOM', anychart.enums.VAlign.BOTTOM);
 
 goog.exportSymbol('anychart.enums.TextWrap.NO_WRAP', anychart.enums.TextWrap.NO_WRAP);
 goog.exportSymbol('anychart.enums.TextWrap.BY_LETTER', anychart.enums.TextWrap.BY_LETTER);
+goog.exportSymbol('anychart.enums.TextWrap.BY_WORD', anychart.enums.TextWrap.BY_WORD);
 
+goog.exportSymbol('anychart.enums.TagCloudMode.SPIRAL', anychart.enums.TagCloudMode.SPIRAL);
+goog.exportSymbol('anychart.enums.TagCloudMode.RECT', anychart.enums.TagCloudMode.RECT);
 
-
-
-
+goog.exportSymbol('anychart.enums.WaterfallDataMode.ABSOLUTE', anychart.enums.WaterfallDataMode.ABSOLUTE);
+goog.exportSymbol('anychart.enums.WaterfallDataMode.DIFF', anychart.enums.WaterfallDataMode.DIFF);

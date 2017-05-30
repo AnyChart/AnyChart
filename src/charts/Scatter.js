@@ -16,6 +16,7 @@ anychart.charts.Scatter = function() {
   anychart.charts.Scatter.base(this, 'constructor', false);
 
   this.defaultSeriesType(anychart.enums.ScatterSeriesType.MARKER);
+  this.setType(anychart.enums.ChartTypes.SCATTER);
 };
 goog.inherits(anychart.charts.Scatter, anychart.core.ChartWithAxes);
 
@@ -26,12 +27,6 @@ goog.inherits(anychart.charts.Scatter, anychart.core.ChartWithAxes);
 //  Infrastucture
 //
 //----------------------------------------------------------------------------------------------------------------------
-/** @inheritDoc */
-anychart.charts.Scatter.prototype.getType = function() {
-  return anychart.enums.ChartTypes.SCATTER;
-};
-
-
 /**
  * Series config for Scatter chart.
  * @type {!Object.<string, anychart.core.series.TypeConfig>}
@@ -155,14 +150,14 @@ anychart.charts.Scatter.prototype.normalizeSeriesType = function(type) {
  */
 anychart.charts.Scatter.prototype.serialize = function() {
   var json = anychart.charts.Scatter.base(this, 'serialize');
-  json['type'] = anychart.enums.ChartTypes.SCATTER;
+  json['type'] = this.getType();
   return {'chart': json};
 };
 
 
+
+
 //endregion
-
-
 //exports
 (function() {
   var proto = anychart.charts.Scatter.prototype;
@@ -196,4 +191,9 @@ anychart.charts.Scatter.prototype.serialize = function() {
   proto['removeAllSeries'] = proto.removeAllSeries;
   proto['getPlotBounds'] = proto.getPlotBounds;
   proto['annotations'] = proto.annotations;
+  proto['getXScales'] = proto.getXScales;
+  proto['getYScales'] = proto.getYScales;
+  // quadrant
+  proto['quarters'] = proto.quarters;
+  proto['crossing'] = proto.crossing;
 })();

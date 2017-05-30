@@ -24,6 +24,8 @@ goog.require('anychart.enums');
  */
 anychart.charts.Cartesian = function() {
   anychart.charts.Cartesian.base(this, 'constructor');
+
+  this.setType(anychart.enums.ChartTypes.CARTESIAN);
 };
 goog.inherits(anychart.charts.Cartesian, anychart.core.CartesianBase);
 
@@ -318,6 +320,18 @@ anychart.charts.Cartesian.prototype.seriesConfig = (function() {
     anchoredPositionTop: 'value',
     anchoredPositionBottom: 'zero'
   };
+  res[anychart.enums.CartesianSeriesType.HILO] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.RANGE_STICK,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_POINT,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathStrokeConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: 'high',
+    anchoredPositionBottom: 'low'
+  };
   return res;
 })();
 anychart.core.ChartWithSeries.generateSeriesConstructors(anychart.charts.Cartesian, anychart.charts.Cartesian.prototype.seriesConfig);
@@ -342,7 +356,7 @@ anychart.core.ChartWithSeries.generateSeriesConstructors(anychart.charts.Cartesi
  */
 anychart.cartesian = function(opt_isVertical) {
   var chart = new anychart.charts.Cartesian();
-  chart.setupByVal(anychart.getFullTheme('cartesian'), true);
+  chart.setupInternal(true, anychart.getFullTheme('cartesian'));
   if (goog.isDef(opt_isVertical))
     chart.barChartMode = !!opt_isVertical;
   return chart;
@@ -390,6 +404,7 @@ anychart.chartTypesMap[anychart.enums.ChartTypes.CARTESIAN] = anychart.cartesian
   // proto['stepArea'] = proto.stepArea;
   // proto['stick'] = proto.stick;
   // proto['jumpLine'] = proto.jumpLine;
+  // proto['hilo'] = proto.hilo;
   proto['lineMarker'] = proto.lineMarker;
   proto['rangeMarker'] = proto.rangeMarker;
   proto['textMarker'] = proto.textMarker;
@@ -414,4 +429,6 @@ anychart.chartTypesMap[anychart.enums.ChartTypes.CARTESIAN] = anychart.cartesian
   proto['getStat'] = proto.getStat;
   proto['zDepth'] = proto.zDepth; // deprecated
   proto['annotations'] = proto.annotations;
+  proto['getXScales'] = proto.getXScales;
+  proto['getYScales'] = proto.getYScales;
 })();

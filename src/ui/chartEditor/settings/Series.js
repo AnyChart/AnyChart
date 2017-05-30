@@ -38,6 +38,14 @@ anychart.ui.chartEditor.settings.Series.prototype.setSeriesId = function(value) 
 };
 
 
+/**
+ * @param {Object} options
+ */
+anychart.ui.chartEditor.settings.Series.prototype.setSeriesTypeOptions = function(options) {
+  // CE: Part 3
+};
+
+
 /** @inheritDoc */
 anychart.ui.chartEditor.settings.Series.prototype.disposeInternal = function() {
   this.nameInput_ = null;
@@ -192,7 +200,7 @@ anychart.ui.chartEditor.settings.Series.prototype.update = function(model) {
 
   for (var i = 0, count = model.dataMappings.length; i < count; i++) {
     mappings.push(i);
-    captions.push('Mapping ' + i);
+    captions.push(model.dataMappings[i]['meta'](0, 'title'));
   }
 
   this.mappingSelect_.setOptions(mappings);
