@@ -67,6 +67,11 @@ def __need_sync_contrib():
 
 
 def __sync_contrib():
+    global arguments
+    skip_linter = 'skip_linter' in arguments and arguments['skip_linter']
+    skip_lesscpy = 'skip_lesscpy' in arguments and arguments['skip_lesscpy']
+    skip_jsbeautifier = 'skip_jsbeautifier' in arguments and arguments['skip_jsbeautifier']
+
     __create_dir_if_not_exists(CONTRIB_PATH)
 
     subprocess.call(['git', 'submodule', 'init'])
@@ -83,24 +88,13 @@ def __sync_contrib():
             'compiler'
         )
 
-    # Install lesscpy
-    print 'Install lesscpy'
-    commands = [] if platform.system() == 'Windows' else ['sudo']
-    commands.append('easy_install')
-    commands.append('lesscpy')
-    try:
-        subprocess.call(commands)
-    except StandardError:
-        raise StandardError('Sync contribution failed: you should install easy_install module for python')
+    if not skip_lesscpy:
+        __install_lesscpy()
 
-    print 'Install jsbeautifier'
-    commands = [] if platform.system() == 'Windows' else ['sudo']
-    commands += ['easy_install', 'jsbeautifier==1.6.2']
-    subprocess.call(commands)
+    if not skip_jsbeautifier:
+        __install_jsbeautifier()
 
-    # Install closure linter
-    global arguments
-    if 'linter' in arguments and arguments['linter']:
+    if not skip_linter:
         __install_closure_linter()
 
     print 'All contributions installed'
@@ -129,11 +123,32 @@ def __download_and_unzip_from_http(from_url, path, dri_name):
 
 
 def __install_closure_linter():
-    print 'Install closure linter'
+    print 'Installing closure linter'
     commands = [] if platform.system() == 'Windows' else ['sudo']
     commands.append('pip')
     commands.append('install')
     commands.append('git+git://github.com/google/closure-linter.git@v2.3.19')
+    try:
+        subprocess.call(commands)
+    except StandardError:
+        raise StandardError('Sync contribution failed: you should install easy_install module for python')
+
+
+def __install_lesscpy():
+    print 'Installing lesscpy'
+    commands = [] if platform.system() == 'Windows' else ['sudo']
+    commands.append('easy_install')
+    commands.append('lesscpy')
+    try:
+        subprocess.call(commands)
+    except StandardError:
+        raise StandardError('Sync contribution failed: you should install easy_install module for python')
+
+
+def __install_jsbeautifier():
+    print 'Installing jsbeautifier'
+    commands = [] if platform.system() == 'Windows' else ['sudo']
+    commands += ['easy_install', 'jsbeautifier==1.6.2']
     try:
         subprocess.call(commands)
     except StandardError:
@@ -486,7 +501,7 @@ def __get_copyrigth(modules):
     contains = ''
     build = 'Development' if __is_develop() else 'Production'
     version = __get_version(True)
-    url = 'http://anychart.com'
+    url = 'https://anychart.com'
 
     if len(modules) == 1 and modules[0] in ['anychart_bundle', 'anychart', 'anymap', 'anygantt', 'anystock',
                                             'anychart_ui', 'data_adapter']:
@@ -497,16 +512,16 @@ def __get_copyrigth(modules):
             contains = 'AnyChart, AnyMap, AnyGantt, AnyStock, AnyChart UI'
         elif module == 'anychart':
             title = 'AnyChart - Robust JavaScript HTML5 Web Charts'
-            url = 'http://anychart.com/products/anychart/'
+            url = 'https://anychart.com/products/anychart/'
         elif module == 'anymap':
             title = 'AnyMap - JavaScript HTML5 Web Maps'
-            url = 'http://anychart.com/products/anymap/'
+            url = 'https://anychart.com/products/anymap/'
         elif module == 'anygantt':
             title = 'AnyGantt - JavaScript HTML5 Web Gantt Charts'
-            url = 'http://anychart.com/products/anygantt/'
+            url = 'https://anychart.com/products/anygantt/'
         elif module == 'anystock':
             title = 'AnyStock - JavaScript HTML5 Web Financial Charts'
-            url = 'http://anychart.com/products/anystock/'
+            url = 'https://anychart.com/products/anystock/'
         elif module == 'anychart_ui':
             title = 'AnyChart UI - JavaScript HTML5 Web Charting User Interface'
         elif module == 'data_adapter':
@@ -768,7 +783,7 @@ def __build_release():
     print "    Download demos from PG"
     if os.path.exists(os.path.join(OUT_PATH, 'gallery_demos')):
         shutil.rmtree(os.path.join(OUT_PATH, 'gallery_demos'))
-    __download_and_unzip_from_http('http://playground.anychart.stg/gallery/develop/download', OUT_PATH, 'gallery_demos')
+    __download_and_unzip_from_http('https://playground.anychart.stg/gallery/develop/download', OUT_PATH, 'gallery_demos')
 
     print "    Build AnyGantt install packages"
     __build_product_package(
@@ -1165,8 +1180,9 @@ def __compile_css(gzip):
 
     print "Compile AnyChart UI css"
     css_src_path = os.path.join(PROJECT_PATH, 'css', 'anychart.less')
-    css_out_path = os.path.join(PROJECT_PATH, 'out', 'anychart-ui.css')
-    css_min_out_path = os.path.join(PROJECT_PATH, 'out', 'anychart-ui.min.css')
+    css_out_path = os.path.join(OUT_PATH, 'anychart-ui.css')
+    css_min_out_path = os.path.join(OUT_PATH, 'anychart-ui.min.css')
+
 
     # Less
     f = open(css_out_path, 'w')
@@ -1310,14 +1326,25 @@ def __exec_main_script():
 
     # create the parser for the "contrib" command
     contrib_parser = subparsers.add_parser('contrib',
-                                           help='Synchronize project dependencies. Deprecated. Use "./build.py libs" instead')
-    contrib_parser.add_argument('-l', '--linter', action='store_true',
-                                help='Install closure linter with others contributions.')
+                                           help='Download project requirements. Deprecated. Use "./build.py libs" instead')
+    contrib_parser.add_argument('-sl', '--skip-linter', action='store_false',
+                                default=False,
+                                help='Skip linter installation')
+    contrib_parser.add_argument('-ss', '--skip-lesscpy', action='store_false',
+                                default=False,
+                                help='Skip lesscpy installation')
+    contrib_parser.add_argument('-sj', '--skip-jsbeautifier', action='store_false',
+                                default=False,
+                                help='Skip jsbeautifier installation.')
 
     # create the parser for the "libs" command
-    contrib_parser = subparsers.add_parser('libs', help='Synchronize project dependencies')
-    contrib_parser.add_argument('-l', '--linter', action='store_true',
-                                help='Install closure linter with others contributions.')
+    libs_parser = subparsers.add_parser('libs', help='Download project requirements')
+    libs_parser.add_argument('-sl', '--skip-linter', action='store_true',
+                             help='Skip linter installation')
+    libs_parser.add_argument('-ss', '--skip-lesscpy', action='store_true',
+                             help='Skip lesscpy installation')
+    libs_parser.add_argument('-sj', '--skip-jsbeautifier', action='store_true',
+                             help='Skip jsbeautifier installation.')
 
     # create the parser for the "deps" command
     subparsers.add_parser('deps', help='Generate deps.js file')

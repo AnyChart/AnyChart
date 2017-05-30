@@ -107,7 +107,7 @@ anychart.charts.Waterfall.prototype.postProcessStacking = function(drawingPlans,
       yScale.extendDataRange(point.meta['stackedValue']);
       yScale.extendDataRange(point.meta['stackedValuePrev']);
       yScale.extendDataRange(point.meta['stackedValueNext']);
-      absSum += Number(point.meta['diff']) || 0;
+      absSum += !point.meta['missing'] ? (Number(point.meta['diff']) || 0) : 0;
     }
     prevValue += absSum;
     this.pointValueSums_.push(prevValue);

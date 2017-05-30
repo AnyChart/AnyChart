@@ -228,7 +228,7 @@ anychart.charts.Gantt.prototype.getAllSeries = function() {
 
 /** @inheritDoc */
 anychart.charts.Gantt.prototype.getVersionHistoryLink = function() {
-  return 'http://anychart.com/products/anygantt/history';
+  return 'https://anychart.com/products/anygantt/history';
 };
 
 

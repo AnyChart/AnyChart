@@ -523,8 +523,12 @@ anychart.data.Tree.prototype.addToIndex = function(item, opt_field, opt_subTree)
       goog.array.insertAt(indexArr, indexKeyValue, ~index);
     } else {
       var keyValuePair = /** {anychart.data.Tree.IndexKeyValue} */ (indexArr[index]);
-      if (!goog.isArray(keyValuePair.value)) keyValuePair.value = [keyValuePair.value]; //Turning single value to array.
-      keyValuePair.value.push(item);
+      if (goog.isArray(keyValuePair.value)) {
+        goog.array.insert(keyValuePair.value, item);
+      } else if (keyValuePair.value != item) {
+        keyValuePair.value = [keyValuePair.value];
+        keyValuePair.value.push(item);
+      }
     }
   }
   return this;

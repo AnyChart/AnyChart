@@ -57,7 +57,7 @@ anychart.core.TagCloudStateSettings.prototype.SIMPLE_PROPS_DESCRIPTORS = (functi
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'fill',
-      anychart.core.settings.asIsNormalizer,
+      anychart.core.settings.fillOrFunctionSimpleNormalizer,
       anychart.ConsistencyState.ONLY_DISPATCHING,
       anychart.Signal.NEEDS_REDRAW_APPEARANCE);
 

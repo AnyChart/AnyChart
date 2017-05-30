@@ -469,13 +469,13 @@ anychart.core.series.Cartesian.prototype.setValueInternal = function(index, name
  * @return {boolean} If anything changed.
  */
 anychart.core.series.Cartesian.prototype.excludePoint = function(indexes) {
-  if (!this.excludedPoints_)
-    this.excludedPoints_ = [];
+  if (!this.excludedPoints)
+    this.excludedPoints = [];
   if (!goog.isArray(indexes))
     indexes = [indexes];
   var doInvalidate = false;
   for (var i = 0; i < indexes.length; i++) {
-    doInvalidate = goog.array.binaryInsert(this.excludedPoints_, indexes[i]) || doInvalidate;
+    doInvalidate = goog.array.binaryInsert(this.excludedPoints, indexes[i]) || doInvalidate;
   }
   if (doInvalidate)
     this.invalidate(anychart.ConsistencyState.SERIES_POINTS,
@@ -490,13 +490,13 @@ anychart.core.series.Cartesian.prototype.excludePoint = function(indexes) {
  * @return {boolean} If anything changed.
  */
 anychart.core.series.Cartesian.prototype.includePoint = function(indexes) {
-  if (!this.excludedPoints_)
+  if (!this.excludedPoints)
     return false;
   if (!goog.isArray(indexes))
     indexes = [indexes];
   var doInvalidate = false;
   for (var i = 0; i < indexes.length; i++) {
-    doInvalidate = goog.array.binaryRemove(this.excludedPoints_, indexes[i]) || doInvalidate;
+    doInvalidate = goog.array.binaryRemove(this.excludedPoints, indexes[i]) || doInvalidate;
   }
   if (doInvalidate)
     this.invalidate(anychart.ConsistencyState.SERIES_POINTS,
@@ -510,7 +510,7 @@ anychart.core.series.Cartesian.prototype.includePoint = function(indexes) {
  * @return {Array.<number>}
  */
 anychart.core.series.Cartesian.prototype.getExcludedIndexesInternal = function() {
-  return this.excludedPoints_ || [];
+  return this.excludedPoints || [];
 };
 
 
@@ -519,7 +519,7 @@ anychart.core.series.Cartesian.prototype.getExcludedIndexesInternal = function()
  * @return {Array.<anychart.core.Point>}
  */
 anychart.core.series.Cartesian.prototype.getExcludedPoints = function() {
-  return goog.array.map(this.excludedPoints_ || [], this.getPoint, this);
+  return goog.array.map(this.excludedPoints || [], this.getPoint, this);
 };
 
 
@@ -528,10 +528,10 @@ anychart.core.series.Cartesian.prototype.getExcludedPoints = function() {
  * @param {number|Array.<number>} indexes Point index.
  */
 anychart.core.series.Cartesian.prototype.keepOnlyPoints = function(indexes) {
-  this.excludedPoints_ ? this.excludedPoints_.length = 0 : this.excludedPoints_ = [];
+  this.excludedPoints ? this.excludedPoints.length = 0 : this.excludedPoints = [];
   var pointsCount = this.getIterator().getRowsCount();
   for (var i = 0; i < pointsCount; i++) {
-    this.excludedPoints_.push(i);
+    this.excludedPoints.push(i);
   }
   this.includePoint(indexes);
 };
@@ -542,8 +542,8 @@ anychart.core.series.Cartesian.prototype.keepOnlyPoints = function(indexes) {
  * @return {boolean} If anything changed.
  */
 anychart.core.series.Cartesian.prototype.includeAllPoints = function() {
-  if (this.excludedPoints_ && this.excludedPoints_.length) {
-    this.excludedPoints_.length = 0;
+  if (this.excludedPoints && this.excludedPoints.length) {
+    this.excludedPoints.length = 0;
     this.invalidate(anychart.ConsistencyState.SERIES_POINTS,
         anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW);
     return true;

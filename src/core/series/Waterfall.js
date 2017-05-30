@@ -71,8 +71,9 @@ anychart.core.series.Waterfall.prototype.initPostProcessingMeta = function() {
 
 /** @inheritDoc */
 anychart.core.series.Waterfall.prototype.postProcessPoint = function(iterator, point, processingMeta) {
+  var pointExcluded = goog.array.indexOf(this.excludedPoints || [], point.meta['rawIndex']) > -1;
   var isTotalValue = iterator.get('isTotal');
-  var isMissing = !!point.meta['missing'];
+  var isMissing = (!!point.meta['missing']) || pointExcluded;
   var isFirstPoint = !(processingMeta.hadNonMissing || isMissing);
   var isTotal = isFirstPoint ||
       (goog.isDef(isTotalValue) ? !!isTotalValue : isMissing);

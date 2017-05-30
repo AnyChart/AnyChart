@@ -273,6 +273,9 @@ anychart.core.reporting.getWarningDescription_ = function(code, opt_arguments) {
     case anychart.enums.WarningCode.OBJECT_KEY_COLLISION:
       return 'Data item with ID=\'' + opt_arguments[0] + '\' already exists. You should use another key.';
 
+    case anychart.enums.WarningCode.VENN_AREA_NOT_REPRESENTED_ON_SCREEN:
+      return 'Area ' + opt_arguments[0] + ' not represented on screen.';
+
     default:
       return 'Unknown error. Please, contact support team at http://support.anychart.com/.\n' +
           'We will be very grateful for your report!';

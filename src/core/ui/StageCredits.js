@@ -388,7 +388,7 @@ anychart.core.ui.StageCredits.prototype.render = function() {
 
   if (this.hasInvalidationState(anychart.core.ui.StageCredits.States.URL_ALT)) {
     goog.dom.setProperties(this.a_, {
-      'href': valid ? this.url() : 'http://www.anychart.com/?utm_source=trial',
+      'href': valid ? this.url() : 'https://www.anychart.com/?utm_source=trial',
       'title': valid ? this.alt() : 'AnyChart - JavaScript Charts designed to be embedded and integrated',
       'target': '_blank'
     });

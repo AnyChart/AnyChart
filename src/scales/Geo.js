@@ -1640,6 +1640,7 @@ anychart.scales.Geo.prototype.setupByJSON = function(config, opt_default) {
 (function() {
   var proto = anychart.scales.Geo.prototype;
   proto['maxTicksCount'] = proto.maxTicksCount;
+  proto['getType'] = proto.getType;
   proto['gap'] = proto.gap;
   proto['xTicks'] = proto.xTicks;
   proto['xMinorTicks'] = proto.xMinorTicks;

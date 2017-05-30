@@ -434,7 +434,7 @@ anychart.charts.Stock.prototype.createSeriesConfig = function(allowColoring) {
 
 /** @inheritDoc */
 anychart.charts.Stock.prototype.getVersionHistoryLink = function() {
-  return 'http://anychart.com/products/anystock/history';
+  return 'https://anychart.com/products/anystock/history';
 };
 
 

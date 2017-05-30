@@ -2237,9 +2237,12 @@ anychart.charts.TagCloud.prototype.setupByJSON = function(config, opt_default) {
   this.angles(config['angles']);
   this.palette(config['palette']);
   this.colorRange().setupInternal(!!opt_default, config['colorRange']);
-  this.normal_.setupByJSON(config['normal'], opt_default);
-  this.hovered_.setupByJSON(config['hovered'], opt_default);
-  this.selected_.setupByJSON(config['selected'], opt_default);
+  if (config['normal'])
+    this.normal_.setupByJSON(config['normal'], opt_default);
+  if (config['hovered'])
+    this.hovered_.setupByJSON(config['hovered'], opt_default);
+  if (config['selected'])
+    this.selected_.setupByJSON(config['selected'], opt_default);
 };
 
 

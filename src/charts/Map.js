@@ -540,7 +540,7 @@ anychart.charts.Map.prototype.interactivity_;
 //region --- Infrastructure
 /** @inheritDoc */
 anychart.charts.Map.prototype.getVersionHistoryLink = function() {
-  return 'http://anychart.com/products/anymap/history';
+  return 'https://anychart.com/products/anymap/history';
 };
 
 

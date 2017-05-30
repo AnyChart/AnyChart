@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema",
-  "description": "AnyChart 7 JSON schema, version 7.13.1",
+  "description": "AnyChart 7 JSON schema, version 7.14.0",
   "type": "object",
   "properties": {
     "chart": {
@@ -223,7 +223,7 @@
         {"$ref": "#/definitions/anychart.core.SeparateChart"}
       ],
       "properties": {
-        "type": {"enum": ["cartesian", "cartesian3d", "area", "verticalArea", "area3d", "bar", "bar3d", "box", "bubble", "column", "column3d", "financial", "line", "verticalLine", "marker", "jumpLine", "stick", "pareto", "hilo"]},
+        "type": {"enum": ["cartesian", "cartesian3d", "area", "verticalArea", "area3d", "bar", "bar3d", "box", "bubble", "column", "column3d", "financial", "line", "verticalLine", "marker", "jumpLine", "stick", "pareto", "hilo", "waterfall"]},
         "grids": {
           "type": "array",
           "items": {
@@ -5388,12 +5388,7 @@
             "number"
           ]
         },
-        "fill": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
+        "fill": {"$ref": "#/definitions/fill"},
         "fontFamily": {
           "type": [
             "string",

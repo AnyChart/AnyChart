@@ -193,6 +193,12 @@ anychart.charts.Venn.prototype.isSizeBased = function() {
 };
 
 
+/** @inheritDoc */
+anychart.charts.Venn.prototype.supportsPointSettings = function() {
+  return true;
+};
+
+
 /** @inheritDoc **/
 anychart.charts.Venn.prototype.applyAppearanceToSeries = function(pointState) {
   var iterator = this.getIterator();
@@ -1406,109 +1412,111 @@ anychart.charts.Venn.prototype.drawContent = function(bounds) {
     this.shapeManager_.setContainer(this.rootElement);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    this.shapeManager_.clearShapes();
-    var circles = anychart.math.venn.scaleSolution(this.solution_, bounds.width, bounds.height, 0);
-    this.textCenters_ = anychart.math.venn.computeTextCentres(circles, this.dataReflections_);
+  if (bounds.width > 0 && bounds.height > 0) {
+    if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
+      this.shapeManager_.clearShapes();
+      var circles = anychart.math.venn.scaleSolution(this.solution_, bounds.width, bounds.height, 0);
+      this.textCenters_ = anychart.math.venn.computeTextCentres(circles, this.dataReflections_);
 
-    for (i = 0; i < this.dataReflections_.length; i++) {
-      refl = this.dataReflections_[i];
-      iteratorIndex = refl.iteratorIndex;
-      iterator = this.getIterator();
-      iterator.select(iteratorIndex);
-      var sets = refl.sets;
+      for (i = 0; i < this.dataReflections_.length; i++) {
+        refl = this.dataReflections_[i];
+        iteratorIndex = refl.iteratorIndex;
+        iterator = this.getIterator();
+        iterator.select(iteratorIndex);
+        var sets = refl.sets;
 
-      var setData = [];
-      var set;
-      if (sets.length == 1) { //Main circle, not an intersection.
-        set = sets[0];
-        setData.push(circles[set]);
-      } else {
-        for (var j = 0; j < sets.length; j++) {
-          set = sets[j];
+        var setData = [];
+        var set;
+        if (sets.length == 1) { //Main circle, not an intersection.
+          set = sets[0];
           setData.push(circles[set]);
+        } else {
+          for (var j = 0; j < sets.length; j++) {
+            set = sets[j];
+            setData.push(circles[set]);
+          }
         }
+
+        var stats = /** @type {anychart.math.venn.Stats} */ ({});
+        anychart.math.venn.intersectionArea(setData, stats);
+
+        var group = this.shapeManager_.getShapesGroup(this.getPointState(iteratorIndex));
+        var fillPath = /** @type {acgraph.vector.Path} */ (group['fill']);
+        var hatchFillPath = /** @type {acgraph.vector.Path} */ (group['hatchFill']);
+        var strokePath = /** @type {acgraph.vector.Path} */ (group['stroke']);
+        this.drawArc_(fillPath, stats, bounds);
+        this.drawArc_(hatchFillPath, stats, bounds);
+        this.drawArc_(strokePath, stats, bounds);
+      }
+      this.invalidate(anychart.ConsistencyState.VENN_LABELS | anychart.ConsistencyState.VENN_MARKERS);
+      this.markConsistent(anychart.ConsistencyState.VENN_APPEARANCE);
+    }
+
+    var textCenter, positionProvider;
+    if (this.hasInvalidationState(anychart.ConsistencyState.VENN_LABELS)) {
+      this.labels().clear();
+
+      this.labels().container(this.rootElement);
+
+      for (i = 0; i < this.dataReflections_.length; i++) {
+        refl = this.dataReflections_[i];
+        iteratorIndex = refl.iteratorIndex;
+        iterator = this.getIterator();
+        iterator.select(iteratorIndex);
+        textCenter = this.textCenters_[iteratorIndex];
+        var labelsFormatProvider = this.createFormatProvider(true);
+        positionProvider = {
+          'value': {
+            'x': bounds.left + textCenter.x,
+            'y': bounds.top + textCenter.y
+          }
+        };
+        var label = this.labels().add(labelsFormatProvider, positionProvider, iteratorIndex);
+        iterator.meta('label', label);
+        this.drawLabel_(this.state.getPointStateByIndex(iteratorIndex), iterator);
       }
 
-      var stats = /** @type {anychart.math.venn.Stats} */ ({});
-      anychart.math.venn.intersectionArea(setData, stats);
-
-      var group = this.shapeManager_.getShapesGroup(this.getPointState(iteratorIndex));
-      var fillPath = /** @type {acgraph.vector.Path} */ (group['fill']);
-      var hatchFillPath = /** @type {acgraph.vector.Path} */ (group['hatchFill']);
-      var strokePath = /** @type {acgraph.vector.Path} */ (group['stroke']);
-      this.drawArc_(fillPath, stats, bounds);
-      this.drawArc_(hatchFillPath, stats, bounds);
-      this.drawArc_(strokePath, stats, bounds);
-    }
-    this.invalidate(anychart.ConsistencyState.VENN_LABELS | anychart.ConsistencyState.VENN_MARKERS);
-    this.markConsistent(anychart.ConsistencyState.VENN_APPEARANCE);
-  }
-
-  var textCenter, positionProvider;
-  if (this.hasInvalidationState(anychart.ConsistencyState.VENN_LABELS)) {
-    this.labels().clear();
-
-    this.labels().container(this.rootElement);
-
-    for (i = 0; i < this.dataReflections_.length; i++) {
-      refl = this.dataReflections_[i];
-      iteratorIndex = refl.iteratorIndex;
-      iterator = this.getIterator();
-      iterator.select(iteratorIndex);
-      textCenter = this.textCenters_[iteratorIndex];
-      var labelsFormatProvider = this.createFormatProvider(true);
-      positionProvider = {
-        'value': {
-          'x': bounds.left + textCenter.x,
-          'y': bounds.top + textCenter.y
-        }
-      };
-      var label = this.labels().add(labelsFormatProvider, positionProvider, iteratorIndex);
-      iterator.meta('label', label);
-      this.drawLabel_(this.state.getPointStateByIndex(iteratorIndex), iterator);
+      this.labels().draw();
+      this.intersections().markLabelsConsistent();
+      this.markConsistent(anychart.ConsistencyState.VENN_LABELS);
     }
 
-    this.labels().draw();
-    this.intersections().markLabelsConsistent();
-    this.markConsistent(anychart.ConsistencyState.VENN_LABELS);
-  }
+    if (this.hasInvalidationState(anychart.ConsistencyState.VENN_MARKERS)) {
+      this.markers().container(this.rootElement);
+      this.markers().clear();
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.VENN_MARKERS)) {
-    this.markers().container(this.rootElement);
-    this.markers().clear();
+      for (i = 0; i < this.dataReflections_.length; i++) {
+        refl = this.dataReflections_[i];
+        iteratorIndex = refl.iteratorIndex;
+        iterator = this.getIterator();
+        iterator.select(iteratorIndex);
+        textCenter = this.textCenters_[iteratorIndex];
+        positionProvider = {
+          'value': {
+            'x': bounds.left + textCenter.x + 0.5,
+            'y': bounds.top + textCenter.y + 0.5
+          }
+        };
+        var marker = this.markers().add(positionProvider, iteratorIndex);
+        iterator.meta('marker', marker);
+        this.drawMarker_(this.state.getPointStateByIndex(iteratorIndex), iterator);
+      }
 
-    for (i = 0; i < this.dataReflections_.length; i++) {
-      refl = this.dataReflections_[i];
-      iteratorIndex = refl.iteratorIndex;
-      iterator = this.getIterator();
-      iterator.select(iteratorIndex);
-      textCenter = this.textCenters_[iteratorIndex];
-      positionProvider = {
-        'value': {
-          'x': bounds.left + textCenter.x + 0.5,
-          'y': bounds.top + textCenter.y + 0.5
-        }
-      };
-      var marker = this.markers().add(positionProvider, iteratorIndex);
-      iterator.meta('marker', marker);
-      this.drawMarker_(this.state.getPointStateByIndex(iteratorIndex), iterator);
+      this.markers().draw();
+      this.intersections().markMarkersConsistent();
+      this.markConsistent(anychart.ConsistencyState.VENN_MARKERS);
     }
 
-    this.markers().draw();
-    this.intersections().markMarkersConsistent();
-    this.markConsistent(anychart.ConsistencyState.VENN_MARKERS);
-  }
+    if (this.hasInvalidationState(anychart.ConsistencyState.VENN_APPEARANCE)) {
+      this.updatePaletteFill_();
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.VENN_APPEARANCE)) {
-    this.updatePaletteFill_();
-
-    iterator = this.getResetIterator();
-    while (iterator.advance()) {
-      this.shapeManager_.updateColors(this.getPointState(iterator.getIndex()),
-          /** @type {Object.<string, acgraph.vector.Shape>} */(iterator.meta('shapes')));
+      iterator = this.getResetIterator();
+      while (iterator.advance()) {
+        this.shapeManager_.updateColors(this.getPointState(iterator.getIndex()),
+            /** @type {Object.<string, acgraph.vector.Shape>} */(iterator.meta('shapes')));
+      }
+      this.markConsistent(anychart.ConsistencyState.VENN_APPEARANCE);
     }
-    this.markConsistent(anychart.ConsistencyState.VENN_APPEARANCE);
   }
 
 };

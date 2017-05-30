@@ -1626,7 +1626,7 @@ anychart.math.venn.computeTextCentres = function(circles, areas) {
     var centre = anychart.math.venn.computeTextCentre(interior, exterior);
     ret[iteratorIndex] = centre;
     if (centre.disjoint && (areas[i].size > 0)) {
-      console.log('WARNING: area ' + area + ' not represented on screen');
+      anychart.core.reporting.warning(anychart.enums.WarningCode.VENN_AREA_NOT_REPRESENTED_ON_SCREEN, null, [(area + '')]);
     }
   }
   return ret;
