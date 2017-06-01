@@ -465,7 +465,7 @@ anychart.charts.Pareto.prototype.createSeriesInstance = function(type, config) {
 //region --- Scales
 /** @inheritDoc */
 anychart.charts.Pareto.prototype.checkXScaleType = function(scale) {
-  var res = (scale instanceof anychart.scales.Ordinal);
+  var res = (scale instanceof anychart.scales.Ordinal) && !scale.isColorScale();
   if (!res)
     anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['Pareto chart xScale', 'ordinal']);
   return res;
@@ -474,7 +474,7 @@ anychart.charts.Pareto.prototype.checkXScaleType = function(scale) {
 
 /** @inheritDoc */
 anychart.charts.Pareto.prototype.checkYScaleType = function(scale) {
-  var res = (scale instanceof anychart.scales.ScatterBase);
+  var res = (scale instanceof anychart.scales.ScatterBase) && !scale.isColorScale();
   if (!res)
     anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['Pareto chart yScale', 'scatter', 'linear, log']);
   return res;

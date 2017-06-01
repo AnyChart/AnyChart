@@ -17,3 +17,4 @@ update-submodules
 externs.js
 tests
 .travis.yml
+demos-local

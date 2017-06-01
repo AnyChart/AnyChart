@@ -64,6 +64,12 @@ goog.inherits(anychart.scales.OrdinalColor, anychart.scales.Base);
 
 
 /** @inheritDoc */
+anychart.scales.OrdinalColor.prototype.isColorScale = function() {
+  return true;
+};
+
+
+/** @inheritDoc */
 anychart.scales.OrdinalColor.prototype.getType = function() {
   return anychart.enums.ScaleTypes.ORDINAL_COLOR;
 };

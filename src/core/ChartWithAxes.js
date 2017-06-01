@@ -688,23 +688,25 @@ anychart.core.ChartWithAxes.prototype.getAdditionalScales = function(scales, isX
   var scale, uid, i, isY;
   for (i = 0; i < elementsWithScale.length; i++) {
     var item = elementsWithScale[i];
-    isY = !!(item.isHorizontal() ^ this.barChartMode);
+    if (item) {
+      isY = !!(item.isHorizontal() ^ this.barChartMode);
 
-    // isX - means we are collecting xScales
-    // isY - means that element's scale supposed to be yScale
-    // isX | isY | collect == !continue
-    //  0  |  0  |    0      collecting yScales and element scale is xScale => !collect = continue
-    //  0  |  1  |    1      collecting yScales and element scale is yScale => collect = !continue
-    //  1  |  0  |    1      collecting xScales and element scale is xScale => collect = !continue
-    //  1  |  1  |    0      collecting xScales and element scale is yScale => !collect = continue
-    if (!(isX ^ isY))
-      continue;
+      // isX - means we are collecting xScales
+      // isY - means that element's scale supposed to be yScale
+      // isX | isY | collect == !continue
+      //  0  |  0  |    0      collecting yScales and element scale is xScale => !collect = continue
+      //  0  |  1  |    1      collecting yScales and element scale is yScale => collect = !continue
+      //  1  |  0  |    1      collecting xScales and element scale is xScale => collect = !continue
+      //  1  |  1  |    0      collecting xScales and element scale is yScale => !collect = continue
+      if (!(isX ^ isY))
+        continue;
 
-    scale = item.scale();
-    if (scale) {
-      uid = String(goog.getUid(scale));
-      if (!(uid in scalesList))
-        scalesList[uid] = scale;
+      scale = item.scale();
+      if (scale) {
+        uid = String(goog.getUid(scale));
+        if (!(uid in scalesList))
+          scalesList[uid] = scale;
+      }
     }
   }
   var axes = isX ? this.xAxes_ : this.yAxes_;

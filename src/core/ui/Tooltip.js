@@ -649,6 +649,15 @@ anychart.core.ui.Tooltip.prototype.onSeparatorSignal_ = function(event) {
 };
 
 
+/**
+ * Gets current tooltip container.
+ * @return {?anychart.core.utils.LocalTooltipContainer}
+ */
+anychart.core.ui.Tooltip.prototype.getTooltipContainer = function() {
+  return this.tooltipContainer_;
+};
+
+
 //endregion
 //region -- Internal public API (not exported).
 //----------------------------------------------------------------------------------------------------------------------
@@ -2486,9 +2495,22 @@ anychart.core.ui.Tooltip.prototype.disposeInternal = function() {
   var isOwnStage = (container && container.isOwnStage) ? container.isOwnStage() : true;
 
   if (this.tooltipContainer_ && this.tooltipContainer_.isLocal() && container && isOwnStage) {
-    var stageUid = this.getCurrentStageUid_();
-    delete anychart.utils.tooltipContainersRegistry[stageUid];
-    goog.dispose(this.tooltipContainer_);
+    var allowDisposing = true;
+    for (var key in anychart.utils.tooltipsRegistry) {
+      if (anychart.utils.tooltipsRegistry.hasOwnProperty(key)) {
+        var tooltip = anychart.utils.tooltipsRegistry[key];
+        if (tooltip != this && this.tooltipContainer_ == tooltip.getTooltipContainer()) {
+          allowDisposing = false;
+          break;
+        }
+      }
+    }
+
+    if (allowDisposing) {
+      var stageUid = this.getCurrentStageUid_();
+      delete anychart.utils.tooltipContainersRegistry[stageUid];
+      goog.dispose(this.tooltipContainer_);
+    }
   }
 
   delete this.tooltipContainer_;

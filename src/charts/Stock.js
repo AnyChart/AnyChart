@@ -125,6 +125,20 @@ anychart.charts.Stock = function(opt_allowPointSettings) {
   this.mouseWheelHandler_ = null;
 
   /**
+   * Mouse wheel scroll action.
+   * @type {function()}
+   * @private
+   */
+  this.mwScrollAction_ = goog.bind(this.doMWScroll_, this);
+
+  /**
+   * Mouse wheel zoom action.
+   * @type {function()}
+   * @private
+   */
+  this.mwZoomAction_ = goog.bind(this.doMWZoom_, this);
+
+  /**
    * Series config.
    * @type {Object.<string, anychart.core.series.TypeConfig>}
    */
@@ -178,6 +192,13 @@ anychart.charts.Stock.ZOOM_FACTOR_PER_WHEEL_STEP = 0.05 / 4;
  * @const {number}
  */
 anychart.charts.Stock.SCROLL_FACTOR_PER_WHEEL_STEP = 0.1 / 4;
+
+
+/**
+ * Max mouse wheel delta.
+ * @const {number}
+ */
+anychart.charts.Stock.MOUSE_WHEEL_MAX_DELTA = 21;
 
 
 /** @inheritDoc */
@@ -2019,6 +2040,8 @@ anychart.charts.Stock.prototype.handleMouseWheel_ = function(e) {
       doZoom = false;
       delta = e.deltaX;
     }
+    delta = goog.math.sign(delta) * Math.min(Math.abs(delta), anychart.charts.Stock.MOUSE_WHEEL_MAX_DELTA);
+
     var interactivity = /** @type {anychart.core.utils.StockInteractivity} */(this.interactivity());
     if (doZoom) {
       if (interactivity.zoomOnMouseWheel()) {
@@ -2076,20 +2099,15 @@ anychart.charts.Stock.prototype.handleMouseWheel_ = function(e) {
         if ((start != this.dataController_.getFirstSelectedKey() ||
             end != this.dataController_.getLastSelectedKey())) {
           e.preventDefault();
-          if (this.dispatchRangeChange_(
-                  anychart.enums.EventType.SELECTED_RANGE_CHANGE_START,
-                  anychart.enums.StockRangeChangeSource.MOUSE_WHEEL) &&
-              this.dispatchRangeChange_(
-                  anychart.enums.EventType.SELECTED_RANGE_BEFORE_CHANGE,
-                  anychart.enums.StockRangeChangeSource.MOUSE_WHEEL,
-                  start, end)) {
-            this.selectRangeInternal_(start, end);
-            this.dispatchRangeChange_(
-                anychart.enums.EventType.SELECTED_RANGE_CHANGE,
-                anychart.enums.StockRangeChangeSource.MOUSE_WHEEL);
-            this.dispatchRangeChange_(
-                anychart.enums.EventType.SELECTED_RANGE_CHANGE_FINISH,
-                anychart.enums.StockRangeChangeSource.MOUSE_WHEEL);
+
+          this.mwZoomStart_ = start;
+          this.mwZoomEnd_ = end;
+          if (goog.isDef(this.mwScrollFrame_)) {
+            window.cancelAnimationFrame(this.mwScrollFrame_);
+            this.mwScrollAction_();
+          }
+          if (!goog.isDef(this.mwZoomFrame_)) {
+            this.mwZoomFrame_ = window.requestAnimationFrame(this.mwZoomAction_);
           }
         }
       }
@@ -2101,17 +2119,60 @@ anychart.charts.Stock.prototype.handleMouseWheel_ = function(e) {
         var ratio = this.limitDragRatio(-delta * anychart.charts.Stock.SCROLL_FACTOR_PER_WHEEL_STEP, anchor);
         if (ratio) {
           e.preventDefault();
-          if (this.dispatchRangeChange_(
-                  anychart.enums.EventType.SELECTED_RANGE_CHANGE_START,
-                  anychart.enums.StockRangeChangeSource.MOUSE_WHEEL)) {
-            this.dragToRatio(ratio, anchor, anychart.enums.StockRangeChangeSource.MOUSE_WHEEL);
-            this.dispatchRangeChange_(
-                anychart.enums.EventType.SELECTED_RANGE_CHANGE_FINISH,
-                anychart.enums.StockRangeChangeSource.MOUSE_WHEEL);
+
+          this.mwScrollRatio_ = ratio;
+          this.mwScrollAnchor_ = anchor;
+          if (goog.isDef(this.mwZoomFrame_)) {
+            window.cancelAnimationFrame(this.mwZoomFrame_);
+            this.mwZoomAction_();
+          }
+          if (!goog.isDef(this.mwScrollFrame_)) {
+            this.mwScrollFrame_ = window.requestAnimationFrame(this.mwScrollAction_);
           }
         }
       }
     }
+  }
+};
+
+
+/**
+ * Action on mouse wheel zoom.
+ * @private
+ */
+anychart.charts.Stock.prototype.doMWZoom_ = function() {
+  this.mwZoomFrame_ = undefined;
+  if (this.dispatchRangeChange_(
+          anychart.enums.EventType.SELECTED_RANGE_CHANGE_START,
+          anychart.enums.StockRangeChangeSource.MOUSE_WHEEL) &&
+      this.dispatchRangeChange_(
+          anychart.enums.EventType.SELECTED_RANGE_BEFORE_CHANGE,
+          anychart.enums.StockRangeChangeSource.MOUSE_WHEEL,
+          this.mwZoomStart_, this.mwZoomEnd_)) {
+    this.selectRangeInternal_(this.mwZoomStart_, this.mwZoomEnd_);
+    this.dispatchRangeChange_(
+        anychart.enums.EventType.SELECTED_RANGE_CHANGE,
+        anychart.enums.StockRangeChangeSource.MOUSE_WHEEL);
+    this.dispatchRangeChange_(
+        anychart.enums.EventType.SELECTED_RANGE_CHANGE_FINISH,
+        anychart.enums.StockRangeChangeSource.MOUSE_WHEEL);
+  }
+};
+
+
+/**
+ * Action on mouse wheel scroll.
+ * @private
+ */
+anychart.charts.Stock.prototype.doMWScroll_ = function() {
+  this.mwScrollFrame_ = undefined;
+  if (this.dispatchRangeChange_(
+          anychart.enums.EventType.SELECTED_RANGE_CHANGE_START,
+          anychart.enums.StockRangeChangeSource.MOUSE_WHEEL)) {
+    this.dragToRatio(this.mwScrollRatio_, this.mwScrollAnchor_, anychart.enums.StockRangeChangeSource.MOUSE_WHEEL);
+    this.dispatchRangeChange_(
+        anychart.enums.EventType.SELECTED_RANGE_CHANGE_FINISH,
+        anychart.enums.StockRangeChangeSource.MOUSE_WHEEL);
   }
 };
 

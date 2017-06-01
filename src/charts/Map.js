@@ -5363,6 +5363,10 @@ anychart.charts.Map.prototype.disposeInternal = function() {
   proto['zoomTo'] = proto.zoomTo;
   proto['getZoomLevel'] = proto.getZoomLevel;
   proto['maxZoomLevel'] = proto.maxZoomLevel;
+  proto['getCurrentScene'] = proto.getCurrentScene;
+  proto['fitAll'] = proto.fitAll;
+  proto['zoomIn'] = proto.zoomIn;
+  proto['zoomOut'] = proto.zoomOut;
   // proto['minZoomLevel'] = proto.minZoomLevel;
   //drilling
   proto['drillTo'] = proto.drillTo;

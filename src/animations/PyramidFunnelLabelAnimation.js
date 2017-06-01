@@ -54,8 +54,8 @@ anychart.animations.PyramidFunnelLabelAnimation.prototype.onEnd = function() {
 
 /** @inheritDoc */
 anychart.animations.PyramidFunnelLabelAnimation.prototype.disposeInternal = function() {
+  anychart.animations.PyramidFunnelLabelAnimation.base(this, 'disposeInternal');
   this.chart = null;
   this.connectorStroke = null;
   delete this.isOutside;
-  anychart.animations.PyramidFunnelLabelAnimation.base(this, 'disposeInternal');
 };

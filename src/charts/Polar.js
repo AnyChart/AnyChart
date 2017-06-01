@@ -208,7 +208,7 @@ anychart.charts.Polar.prototype.allowLegendCategoriesMode = function() {
 
 /** @inheritDoc */
 anychart.charts.Polar.prototype.createScaleByType = function(value, isXScale, returnNullOnError) {
-  return anychart.scales.Base.fromString(value, returnNullOnError);
+  return anychart.scales.Base.fromString(value, returnNullOnError ? null : false);
 };
 
 

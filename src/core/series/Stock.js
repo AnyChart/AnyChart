@@ -19,6 +19,7 @@ goog.require('anychart.core.drawers.Spline');
 goog.require('anychart.core.drawers.SplineArea');
 goog.require('anychart.core.drawers.StepArea');
 goog.require('anychart.core.drawers.StepLine');
+goog.require('anychart.core.drawers.Stick');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.series.Base');
 goog.require('anychart.data.Table');

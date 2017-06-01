@@ -38,6 +38,12 @@ goog.inherits(anychart.scales.LinearColor, anychart.scales.ScatterBase);
 
 
 /** @inheritDoc */
+anychart.scales.LinearColor.prototype.isColorScale = function() {
+  return true;
+};
+
+
+/** @inheritDoc */
 anychart.scales.LinearColor.prototype.getType = function() {
   return anychart.enums.ScaleTypes.LINEAR_COLOR;
 };

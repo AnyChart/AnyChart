@@ -2541,10 +2541,10 @@ anychart.core.stock.Plot.prototype.setupByJSON = function(config, opt_default) {
     }
   }
 };
+
+
+
 //endregion
-
-
-
 //region anychart.core.stock.Plot.Dragger
 //----------------------------------------------------------------------------------------------------------------------
 //

@@ -4880,6 +4880,16 @@ anychart.charts.Pie.PieOutsideLabelsDomain.prototype.calculate = function() {
 };
 
 
+/**
+ * @inheritDoc
+ */
+anychart.charts.Pie.prototype.disposeInternal = function() {
+  goog.dispose(this.animationQueue_);
+  anychart.charts.Pie.base(this, 'disposeInternal');
+};
+
+
+
 //exports
 (function() {
   var proto = anychart.charts.Pie.prototype;

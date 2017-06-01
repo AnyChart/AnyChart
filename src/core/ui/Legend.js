@@ -1206,9 +1206,10 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
   title.suspendSignalsDispatching();
 
   var calculatedBounds = null;
+  var lastCalculatedPaginatorBounds = null;
   do {
     if (calculatedBounds) {
-      paginatorBounds = calculatedBounds;
+      lastCalculatedPaginatorBounds = calculatedBounds;
       calculatedBounds = null;
     }
 
@@ -1289,7 +1290,7 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
     }
 
     paginator.parentBounds(null);
-    paginatorBounds = paginator.getPixelBounds();
+    paginatorBounds = paginator.getPixelBoundsInternal(1);
 
     if (this.itemsLayout_ == anychart.enums.LegendLayout.HORIZONTAL) {
       if (contentWidth > itemsAreaWidth && this.items_ && this.items_.length > 1) {
@@ -1407,7 +1408,7 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
     this.distributeItemsInBounds_(pageWidth, pageHeight);
     paginator.parentBounds(null);
     calculatedBounds = paginator.getPixelBounds();
-  } while (!anychart.math.Rect.equals(paginatorBounds, calculatedBounds));
+  } while (!anychart.math.Rect.equals(lastCalculatedPaginatorBounds, calculatedBounds));
 
   if (!fullWidth) {
     fullWidth = width;

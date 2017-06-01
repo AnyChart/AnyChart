@@ -54,8 +54,8 @@ anychart.animations.PieLabelAnimation.prototype.onEnd = function() {
 
 /** @inheritDoc */
 anychart.animations.PieLabelAnimation.prototype.disposeInternal = function() {
+  anychart.animations.PieLabelAnimation.base(this, 'disposeInternal');
   this.chart = null;
   this.connectorStroke = null;
   delete this.isOutside;
-  anychart.animations.PieLabelAnimation.base(this, 'disposeInternal');
 };

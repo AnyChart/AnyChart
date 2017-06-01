@@ -3941,6 +3941,15 @@ anychart.core.PyramidFunnelBase.prototype.setupByJSON = function(config, opt_def
 };
 
 
+/**
+ * @inheritDoc
+ */
+anychart.core.PyramidFunnelBase.prototype.disposeInternal = function() {
+  goog.dispose(this.animationQueue_);
+  anychart.core.PyramidFunnelBase.base(this, 'disposeInternal');
+};
+
+
 
 //----------------------------------------------------------------------------------------------------------------------
 //
