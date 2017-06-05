@@ -2216,18 +2216,19 @@
                 mekko: {
                     fill: function() {
                         var a =
-                            1 < this.chart.getSeriesCount() ? this.sourceColor : this.chart.c().b(this.iterator.a),
+                            1 < this.chart.getSeriesCount() ? this.sourceColor : this.chart.palette().itemAt(this.iterator.currentIndex),
                             a = a ? a : this.sourceColor;
                         return b.anychart.color.setOpacity(a, .85, !0)
                     },
                     hoverFill: function() {
-                        var a = 1 < this.chart.getSeriesCount() ? this.sourceColor : this.chart.c().b(this.iterator.a),
+                        var a = 1 < this.chart.getSeriesCount() ? this.sourceColor : this.chart.palette().itemAt(this.iterator.currentIndex),
                             a = a ? a : this.sourceColor;
                         return b.anychart.color.setOpacity(a, .65, !0)
                     },
                     stroke: function() {
-                        var a = 1 < this.chart.getSeriesCount() ? this.sourceColor : this.chart.c().b(this.iterator.a),
-                            a = a ? a : this.sourceColor;
+                        var a = 1 < this.chart.getSeriesCount() ? this.sourceColor : this.chart.palette().itemAt(this.iterator.currentIndex),
+                            a = a ?
+                            a : this.sourceColor;
                         return b.anychart.color.setThickness(a, 1)
                     },
                     labels: {
@@ -2673,8 +2674,7 @@
                     color: null,
                     tooltip: {
                         titleFormat: function() {
-                            return this.name || this.getData("name") ||
-                                "Tooltip title"
+                            return this.name || this.getData("name") || "Tooltip title"
                         },
                         format: function() {
                             return "Id: " + this.id + "\nValue: " + this.valuePrefix + c(this.value) + this.valuePostfix
@@ -2744,8 +2744,8 @@
                             enabled: !1
                         },
                         format: function() {
-                            return "from: " + this.startPoint.lat + ", " + this.startPoint["long"] + "\nto: " + this.endPoint.lat +
-                                ", " + this.endPoint["long"]
+                            return "from: " +
+                                this.startPoint.lat + ", " + this.startPoint["long"] + "\nto: " + this.endPoint.lat + ", " + this.endPoint["long"]
                         }
                     }
                 },
