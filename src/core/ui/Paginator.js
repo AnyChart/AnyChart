@@ -548,9 +548,10 @@ anychart.core.ui.Paginator.prototype.applyTextSettings = function(textElement, i
 /**
  * Measures maximum paginator height.
  * @private
+ * @param {number=} opt_pageCount Pages count.
  * @return {Array.<number, number>} Measured max width and height.
  */
-anychart.core.ui.Paginator.prototype.measureMaxDimensions_ = function() {
+anychart.core.ui.Paginator.prototype.measureMaxDimensions_ = function(opt_pageCount) {
   if (!this.boundsCache_) this.boundsCache_ = {};
   var reCache = false;
   for (var i in this.changedSettings) {
@@ -559,14 +560,15 @@ anychart.core.ui.Paginator.prototype.measureMaxDimensions_ = function() {
       break;
     }
   }
-  var cacheIndex = this.pageCount_ + this.layout_.substr(0, 1);
+  var pageCount = goog.isDef(opt_pageCount) ? opt_pageCount : this.pageCount_;
+  var cacheIndex = pageCount + this.layout_.substr(0, 1);
   if (reCache || !this.boundsCache_[cacheIndex]) {
     var measureText = acgraph.text();
     measureText.attr('aria-hidden', 'true');
     var stngs = this.changedSettings;
     this.applyTextSettings(measureText, true);
     this.changedSettings = stngs;
-    var textStr = this.pageCount_ + ' / ' + this.pageCount_;
+    var textStr = pageCount + ' / ' + pageCount;
     measureText.text(textStr);
     var bounds = measureText.getBounds();
     goog.dispose(measureText);
@@ -591,11 +593,9 @@ anychart.core.ui.Paginator.prototype.measureMaxDimensions_ = function() {
 /**
  * Calculates actual size of the paginator.
  * @private
+ * @param {number=} opt_pageCount
  */
-anychart.core.ui.Paginator.prototype.calculatePaginatorBounds_ = function() {
-  var container = /** @type {acgraph.vector.ILayer} */ (this.container());
-  var stage = container ? container.getStage() : null;
-
+anychart.core.ui.Paginator.prototype.calculatePaginatorBounds_ = function(opt_pageCount) {
   var padding = this.padding();
   var margin = this.margin();
 
@@ -607,7 +607,7 @@ anychart.core.ui.Paginator.prototype.calculatePaginatorBounds_ = function() {
   }
 
   var width, height;
-  var measure = this.measureMaxDimensions_();
+  var measure = this.measureMaxDimensions_(opt_pageCount);
   width = measure[0];
   height = measure[1];
 
@@ -665,8 +665,18 @@ anychart.core.ui.Paginator.prototype.calculatePaginatorBounds_ = function() {
  * @return {anychart.math.Rect} pixel bounds.
  */
 anychart.core.ui.Paginator.prototype.getPixelBounds = function() {
+  return this.getPixelBoundsInternal();
+};
+
+
+/**
+ * Calculates pixel bounds for paginator with predefined page count.
+ * @param {number=} opt_pageCount
+ * @return {anychart.math.Rect} pixel bounds.
+ */
+anychart.core.ui.Paginator.prototype.getPixelBoundsInternal = function(opt_pageCount) {
   if (!this.pixelBounds_ || this.hasInvalidationState(anychart.ConsistencyState.BOUNDS))
-    this.calculatePaginatorBounds_();
+    this.calculatePaginatorBounds_(opt_pageCount);
   return this.pixelBounds_;
 };
 

@@ -124,7 +124,7 @@ anychart.charts.Radar.prototype.createXAxisInstance = function() {
 
 /** @inheritDoc */
 anychart.charts.Radar.prototype.checkXScaleType = function(scale) {
-  var res = (scale instanceof anychart.scales.Ordinal);
+  var res = (scale instanceof anychart.scales.Ordinal) && !scale.isColorScale();
   if (!res)
     anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['Radar chart X scale', 'ordinal']);
   return res;
@@ -133,7 +133,10 @@ anychart.charts.Radar.prototype.checkXScaleType = function(scale) {
 
 /** @inheritDoc */
 anychart.charts.Radar.prototype.checkYScaleType = function(scale) {
-  return scale instanceof anychart.scales.Base;
+  var res = (scale instanceof anychart.scales.Base) && !scale.isColorScale();
+  if (!res)
+    anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['Chart scale', 'ordinal, linear, log, datetime']);
+  return res;
 };
 
 

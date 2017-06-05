@@ -51,6 +51,7 @@
     "gjslint.cfg",
     "externs.js",
     "tests",
-    ".travis.yml"
+    ".travis.yml",
+    "demos-local"
   ]
 }

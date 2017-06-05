@@ -257,7 +257,7 @@ anychart.charts.HeatMap.prototype.scrollerChangeHandler = function(e) {
 
 /** @inheritDoc */
 anychart.charts.HeatMap.prototype.checkXScaleType = function(scale) {
-  var res = (scale instanceof anychart.scales.Ordinal);
+  var res = (scale instanceof anychart.scales.Ordinal) && !scale.isColorScale();
   if (!res)
     anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['HeatMap chart scale', 'ordinal']);
   return res;

@@ -71,6 +71,6 @@ anychart.animations.PieAnimation.prototype.onEnd = function() {
 
 /** @inheritDoc */
 anychart.animations.PieAnimation.prototype.disposeInternal = function() {
-  this.chart = null;
   anychart.animations.PieAnimation.base(this, 'disposeInternal');
+  this.chart = null;
 };

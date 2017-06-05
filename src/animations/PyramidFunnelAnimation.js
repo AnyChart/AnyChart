@@ -76,7 +76,7 @@ anychart.animations.PyramidFunnelAnimation.prototype.onEnd = function() {
 
 /** @inheritDoc */
 anychart.animations.PyramidFunnelAnimation.prototype.disposeInternal = function() {
-  this.chart = null;
   anychart.animations.PyramidFunnelAnimation.base(this, 'disposeInternal');
+  this.chart = null;
 };
 

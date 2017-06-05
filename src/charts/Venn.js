@@ -193,7 +193,10 @@ anychart.charts.Venn.prototype.isSizeBased = function() {
 };
 
 
-/** @inheritDoc */
+/**
+ * Whether charts supports point settings.
+ * @return {boolean}
+ */
 anychart.charts.Venn.prototype.supportsPointSettings = function() {
   return true;
 };

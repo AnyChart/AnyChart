@@ -144,7 +144,7 @@ anychart.ui.Zoom.prototype.render = function(opt_parentElement) {
     anychart.ui.Zoom.base(this, 'render', container);
   } else {
     var bind = goog.bind(this.delayedRenderOnChartDraw_, this, container || this.target_);
-    this.target_.listenOnce(anychart.enums.EventType.CHART_DRAW, bind, false, this);
+    this.target_['listenOnce'](anychart.enums.EventType.CHART_DRAW, bind, false, this);
   }
 };
 
@@ -169,16 +169,16 @@ anychart.ui.Zoom.prototype.handleButtonAction_ = function(e) {
   var descriptor = e.target.getModel();
 
   this.target_.zoomDuration = 100;
-  var currentScene = this.target_.getCurrentScene();
+  var currentScene = this.target_['getCurrentScene']();
   switch (descriptor['type']) {
     case 'fitAll':
-      currentScene.fitAll();
+      currentScene['fitAll']();
       break;
     case 'zoomIn':
-      currentScene.zoomIn();
+      currentScene['zoomIn']();
       break;
     case 'zoomOut':
-      currentScene.zoomOut();
+      currentScene['zoomOut']();
       break;
   }
 };

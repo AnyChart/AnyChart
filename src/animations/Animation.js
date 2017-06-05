@@ -40,6 +40,6 @@ anychart.animations.Animation.prototype.onPlay = function() {
 
 /** @inheritDoc */
 anychart.animations.Animation.prototype.disposeInternal = function() {
-  this.series = null;
   anychart.animations.Animation.base(this, 'disposeInternal');
+  this.series = null;
 };

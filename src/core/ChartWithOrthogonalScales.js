@@ -177,7 +177,10 @@ anychart.core.ChartWithOrthogonalScales.prototype.allowLegendCategoriesMode = fu
  * @return {boolean}
  */
 anychart.core.ChartWithOrthogonalScales.prototype.checkXScaleType = function(scale) {
-  return scale instanceof anychart.scales.Base;
+  var res = (scale instanceof anychart.scales.Base) && !scale.isColorScale();
+  if (!res)
+    anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['Chart scale', 'ordinal, linear, log, datetime']);
+  return res;
 };
 
 
@@ -209,7 +212,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.createScaleByType = function(v
 anychart.core.ChartWithOrthogonalScales.prototype.xScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (goog.isString(opt_value)) {
-      opt_value = this.createScaleByType(opt_value, true, false);
+      opt_value = this.createScaleByType(opt_value, true, true);
     }
     if (this.checkXScaleType(opt_value) && this.xScale_ != opt_value) {
       if (this.xScale_)
@@ -269,7 +272,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.xScaleInvalidated = function(e
 anychart.core.ChartWithOrthogonalScales.prototype.yScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (goog.isString(opt_value)) {
-      opt_value = this.createScaleByType(opt_value, false, false);
+      opt_value = this.createScaleByType(opt_value, false, true);
     }
     if (this.checkYScaleType(opt_value) && this.yScale_ != opt_value) {
       if (this.yScale_)
@@ -2324,6 +2327,15 @@ anychart.core.ChartWithOrthogonalScales.prototype.serializeScale = function(json
     }
     json[propName] = scaleIds[objId];
   }
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.core.ChartWithOrthogonalScales.prototype.disposeInternal = function() {
+  goog.dispose(this.animationQueue_);
+  anychart.core.ChartWithOrthogonalScales.base(this, 'disposeInternal');
 };
 
 

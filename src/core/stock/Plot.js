@@ -519,6 +519,24 @@ anychart.core.stock.Plot.prototype.stepLine = function(opt_data, opt_mappingSett
 
 
 /**
+ * Creates and returns a new hilo series.
+ * @param {(anychart.data.TableMapping|anychart.data.Table|Array.<Array.<*>>|string)=} opt_data
+ * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_mappingSettings
+ *   An object where keys are field names and values are objects with fields:
+ *      - 'column': number - Column index, that the field should get values from;
+ *      - 'type': anychart.enums.AggregationType - How to group values for the field. Defaults to 'close'.
+ *      - 'weights': number - Column to get weights from for 'weightedAverage' grouping type. Note: If type set to
+ *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
+ *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
+ * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
+ * @return {anychart.core.series.Stock}
+ */
+anychart.core.stock.Plot.prototype.hilo = function(opt_data, opt_mappingSettings, opt_csvSettings) {
+  return this.createSeriesByType(anychart.enums.StockSeriesType.HILO, opt_data, opt_mappingSettings, opt_csvSettings);
+};
+
+
+/**
  * Add series to chart.
  * @param {...anychart.data.TableMapping} var_args Chart series data.
  * @return {Array.<anychart.core.series.Stock>} Array of created series.
@@ -2541,10 +2559,10 @@ anychart.core.stock.Plot.prototype.setupByJSON = function(config, opt_default) {
     }
   }
 };
+
+
+
 //endregion
-
-
-
 //region anychart.core.stock.Plot.Dragger
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -2688,6 +2706,7 @@ anychart.core.stock.Plot.Dragger.prototype.limitY = function(y) {
   proto['splineArea'] = proto.splineArea;
   proto['stepArea'] = proto.stepArea;
   proto['stepLine'] = proto.stepLine;
+  proto['hilo'] = proto.hilo;
   proto['getSeries'] = proto.getSeries;
   proto['yScale'] = proto.yScale;
   proto['yAxis'] = proto.yAxis;

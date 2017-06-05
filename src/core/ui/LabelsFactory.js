@@ -1261,12 +1261,12 @@ anychart.core.ui.LabelsFactory.prototype.serialize = function() {
   if (goog.isNull(json['enabled']) || !goog.isDef(json['enabled'])) delete json['enabled'];
 
   var val;
-  if (goog.isDef(this.hasOwnOption('background'))) {
+  if (this.hasOwnOption('background')) {
     val = this.background().serialize();
     if (!goog.object.isEmpty(val))
       json['background'] = val;
   }
-  if (goog.isDef(this.hasOwnOption('padding'))) {
+  if (this.hasOwnOption('padding')) {
     val = this.padding().serialize();
     if (!goog.object.isEmpty(val))
       json['padding'] = val;

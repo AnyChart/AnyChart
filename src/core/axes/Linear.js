@@ -13,6 +13,9 @@ goog.require('anychart.enums');
 goog.require('anychart.format.Context');
 goog.require('anychart.math.Rect');
 goog.require('anychart.scales.Base');
+goog.require('anychart.scales.DateTime');
+goog.require('anychart.scales.Linear');
+goog.require('anychart.scales.Ordinal');
 goog.require('anychart.scales.ScatterBase');
 goog.require('anychart.utils');
 //endregion
@@ -775,7 +778,7 @@ anychart.core.axes.Linear.prototype.getOverlappedLabels_ = function(opt_bounds) 
     if (this.overlapMode_ == anychart.enums.LabelsOverlapMode.ALLOW_OVERLAP) {
       return false;
     } else {
-      var scale = /** @type {anychart.scales.Linear|anychart.scales.DateTime|anychart.scales.Ordinal} */(this.scale());
+      var scale = /** @type {anychart.scales.ScatterBase|anychart.scales.Ordinal} */(this.scale());
       var labels = [];
       var minorLabels = [];
 

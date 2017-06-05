@@ -213,7 +213,7 @@ anychart.charts.Mekko.prototype.categoriesScaleInvalidated = function(event) {
 
 /** @inheritDoc */
 anychart.charts.Mekko.prototype.checkXScaleType = function(scale) {
-  var res = (scale instanceof anychart.scales.Ordinal);
+  var res = (scale instanceof anychart.scales.Ordinal) && !scale.isColorScale();
   if (!res)
     anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['Mekko chart X scale', 'ordinal']);
   return res;
