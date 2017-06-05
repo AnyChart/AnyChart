@@ -2079,12 +2079,21 @@ anychart.charts.TagCloud.prototype.drawContent = function(bounds) {
 
     if (!this.layer_) {
       this.layer_ = this.container().layer();
-      this.bindHandlersToGraphics(this.layer_);
+    }
+
+    if (!this.handlers_) {
+      this.handlers_ = this.layer_.layer();
+      this.bindHandlersToGraphics(this.handlers_);
+    }
+
+    if (!this.texts_) {
+      this.texts_ = this.layer_.layer();
     }
 
     this.layer_
         .setTransformationMatrix(scale_, 0, 0, scale_, this.internalBounds_.left + (this.w >> 1), this.internalBounds_.top + (this.h >> 1));
     var tx = this.layer_.getSelfTransformation();
+
 
     this.normalizedData.forEach(function(t) {
       var arr = [t.x, t.y];
@@ -2105,13 +2114,13 @@ anychart.charts.TagCloud.prototype.drawContent = function(bounds) {
       }
 
       if (!t.drawed) {
-        t.textEl = t.textEl ? t.textEl.parent(this.layer_) : this.layer_.simpleText();
+        t.textEl = t.textEl ? t.textEl.parent(this.texts_) : this.texts_.simpleText();
         t.textEl.attr('text-anchor', 'middle');
         t.textEl.disablePointerEvents(true);
         t.textEl.text(t.text.toLowerCase());
         t.textEl.cursor(acgraph.vector.Cursor.DEFAULT);
 
-        t.eHandler = t.eHandler ? t.eHandler.parent(this.layer_) : this.layer_.simpleText();
+        t.eHandler = t.eHandler ? t.eHandler.parent(this.handlers_) : this.handlers_.simpleText();
         this.makeInteractive(t);
         t.eHandler.attr('fill', '#fff');
         t.eHandler.attr('opacity', 0.000001);
@@ -2280,6 +2289,8 @@ anychart.charts.TagCloud.prototype.disposeInternal = function() {
 
   goog.disposeAll(
       this.layer_,
+      this.texts_,
+      this.handlers_,
       this.normal_,
       this.hovered_,
       this.selected_,

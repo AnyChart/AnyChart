@@ -29,18 +29,18 @@ anychart.core.drawers.RangeStick.prototype.flags = (
     // anychart.core.drawers.Capabilities.USES_CONTAINER_AS_ROOT |
     anychart.core.drawers.Capabilities.USES_STROKE_AS_FILL |
     // anychart.core.drawers.Capabilities.SUPPORTS_CONNECTING_MISSING |
-    anychart.core.drawers.Capabilities.SUPPORTS_STACK |
-    anychart.core.drawers.Capabilities.SUPPORTS_COMPARISON |
-    anychart.core.drawers.Capabilities.SUPPORTS_ERROR |
+    // anychart.core.drawers.Capabilities.SUPPORTS_STACK |
+    // anychart.core.drawers.Capabilities.SUPPORTS_COMPARISON |
+    // anychart.core.drawers.Capabilities.SUPPORTS_ERROR |
     // anychart.core.drawers.Capabilities.SUPPORTS_OUTLIERS |
     anychart.core.drawers.Capabilities.IS_DISCRETE_BASED |
-    anychart.core.drawers.Capabilities.IS_WIDTH_BASED |
+    // anychart.core.drawers.Capabilities.IS_WIDTH_BASED |
     // anychart.core.drawers.Capabilities.IS_3D_BASED |
     // anychart.core.drawers.Capabilities.IS_VERTICAL |
     // anychart.core.drawers.Capabilities.IS_MARKER_BASED |
     // anychart.core.drawers.Capabilities.IS_OHLC_BASED |
     anychart.core.drawers.Capabilities.IS_LINE_BASED |
-    // anychart.core.drawers.Capabilities.IS_RANGE_BASED |
+    anychart.core.drawers.Capabilities.IS_RANGE_BASED |
     // anychart.core.drawers.Capabilities.SUPPORTS_STEP_DIRECTION |
     anychart.core.drawers.Capabilities.SUPPORTS_DISTRIBUTION |
     0);

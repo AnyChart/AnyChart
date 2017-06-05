@@ -1217,7 +1217,8 @@ anychart.themes.merging.mergingMap_ = [
       'stock.defaultPlotSettings.defaultSeriesSettings.rangeArea',
       'stock.defaultPlotSettings.defaultSeriesSettings.rangeColumn',
       'stock.defaultPlotSettings.defaultSeriesSettings.rangeSplineArea',
-      'stock.defaultPlotSettings.defaultSeriesSettings.rangeStepArea'
+      'stock.defaultPlotSettings.defaultSeriesSettings.rangeStepArea',
+      'stock.defaultPlotSettings.defaultSeriesSettings.hilo'
     ]
   },
   {
@@ -1261,7 +1262,8 @@ anychart.themes.merging.mergingMap_ = [
       'stock.defaultPlotSettings.defaultSeriesSettings.stepLine',
       'stock.defaultPlotSettings.defaultSeriesSettings.ohlc',
       'stock.defaultPlotSettings.defaultSeriesSettings.jumpLine',
-      'stock.defaultPlotSettings.defaultSeriesSettings.stick'
+      'stock.defaultPlotSettings.defaultSeriesSettings.stick',
+      'stock.defaultPlotSettings.defaultSeriesSettings.hilo'
     ]
   },
   {

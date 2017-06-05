@@ -449,6 +449,18 @@ anychart.charts.Stock.prototype.createSeriesConfig = function(allowColoring) {
     anchoredPositionTop: 'value',
     anchoredPositionBottom: 'value'
   };
+  res[anychart.enums.StockSeriesType.HILO] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.RANGE_STICK,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_POINT,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathStrokeConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: 'high',
+    anchoredPositionBottom: 'low'
+  };
   return res;
 };
 

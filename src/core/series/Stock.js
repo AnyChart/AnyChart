@@ -15,6 +15,7 @@ goog.require('anychart.core.drawers.RangeArea');
 goog.require('anychart.core.drawers.RangeColumn');
 goog.require('anychart.core.drawers.RangeSplineArea');
 goog.require('anychart.core.drawers.RangeStepArea');
+goog.require('anychart.core.drawers.RangeStick');
 goog.require('anychart.core.drawers.Spline');
 goog.require('anychart.core.drawers.SplineArea');
 goog.require('anychart.core.drawers.StepArea');
