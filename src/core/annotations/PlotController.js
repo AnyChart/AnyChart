@@ -1146,9 +1146,18 @@ goog.inherits(anychart.core.annotations.PlotController.AnchorDragger, goog.fx.Dr
 anychart.core.annotations.PlotController.AnchorDragger.prototype.startDrag = function(e) {
   if (this.extractTarget(e)) {
     if (this.annotation_.isFinished()) {
-      anychart.core.annotations.PlotController.AnchorDragger.base(this, 'startDrag', e);
-      if (this.isDragging())
+      if (this.controller_.getController().getChart().dispatchEvent({
+            'type': anychart.enums.EventType.ANNOTATION_CHANGE_START,
+            'annotation': this.annotation_
+          })) {
+        anychart.core.annotations.PlotController.AnchorDragger.base(this, 'startDrag', e);
+        if (this.isDragging())
+          e.stopPropagation();
+      } else {
+        this.annotation_ = null;
+        this.anchorId_ = NaN;
         e.stopPropagation();
+      }
     } else { // we should just select the annotation and the ChartController will do the trick, no drag
       this.controller_.controller_.select(this.annotation_);
       this.annotation_ = null;
@@ -1197,7 +1206,11 @@ anychart.core.annotations.PlotController.AnchorDragger.prototype.computeInitialP
 
 /** @inheritDoc */
 anychart.core.annotations.PlotController.AnchorDragger.prototype.defaultAction = function(x, y) {
-  this.annotation_.moveAnchor(this.anchorId_, x, y);
+  if (this.controller_.getController().getChart().dispatchEvent({
+        'type': anychart.enums.EventType.ANNOTATION_CHANGE,
+        'annotation': this.annotation_
+      }))
+    this.annotation_.moveAnchor(this.anchorId_, x, y);
 };
 
 
@@ -1218,11 +1231,16 @@ anychart.core.annotations.PlotController.AnchorDragger.prototype.handleDragStart
  * @private
  */
 anychart.core.annotations.PlotController.AnchorDragger.prototype.handleDragEnd_ = function(e) {
+  var annotation = this.annotation_;
   this.annotation_.invalidate(anychart.ConsistencyState.ANNOTATIONS_ANCHORS);
   this.annotation_.draw();
   this.annotation_ = null;
   this.anchorId_ = NaN;
   this.controller_.preventHighlight(false);
+  this.controller_.getController().getChart().dispatchEvent({
+    'type': anychart.enums.EventType.ANNOTATION_CHANGE_FINISH,
+    'annotation': annotation
+  });
 };
 
 
