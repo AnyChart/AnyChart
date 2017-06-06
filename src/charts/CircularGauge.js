@@ -9,8 +9,10 @@ goog.require('anychart.core.gauge.pointers.Bar');
 goog.require('anychart.core.gauge.pointers.Knob');
 goog.require('anychart.core.gauge.pointers.Marker');
 goog.require('anychart.core.gauge.pointers.Needle');
+goog.require('anychart.core.settings');
 goog.require('anychart.core.ui.CircularLabel');
 goog.require('anychart.data.Set');
+goog.require('anychart.enums');
 goog.require('anychart.math.Rect');
 
 
@@ -712,115 +714,69 @@ anychart.charts.CircularGauge.prototype.getAxis = function(index) {
 
 
 /**
- * Enclose frame path with straight line.
- * @param {boolean=} opt_value [false] Boolean flag.
- * @return {anychart.charts.CircularGauge|boolean}
+ * Properties that should be defined in series.Base prototype.
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.charts.CircularGauge.prototype.encloseWithStraightLine = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.encloseWithStraightLine_ != opt_value) {
-      this.encloseWithStraightLine_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
-    }
+anychart.charts.CircularGauge.prototype.PROPERTY_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
+      'fill',
+      anychart.core.settings.fillNormalizer,
+      anychart.ConsistencyState.APPEARANCE,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
 
-    return this;
-  } else {
-    return this.encloseWithStraightLine_;
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
+      'stroke',
+      anychart.core.settings.strokeNormalizer,
+      anychart.ConsistencyState.APPEARANCE,
+      anychart.Signal.NEEDS_REDRAW);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'circularPadding',
+      anychart.utils.normalizeToPercent,
+      anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'encloseWithStraightLine',
+      anychart.core.settings.asIsNormalizer,
+      anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW);
+
+  function startAngleNormalizer(opt_value) {
+    return goog.math.standardAngle(anychart.utils.toNumber(opt_value) || 0);
   }
-};
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'startAngle',
+      startAngleNormalizer,
+      anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW);
 
-
-/**
- * Set gauge start angle.
- * @example
- * var gauge = anychart.circularGauge([1, 1.2, 1.4, 1.6, 1.2]);
- * gauge.startAngle(45);
- * gauge.container(stage).draw();
- * @param {(string|number)=} opt_value .
- * @return {(number|anychart.charts.CircularGauge)} .
- */
-anychart.charts.CircularGauge.prototype.startAngle = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = goog.math.standardAngle(anychart.utils.toNumber(opt_value) || 0);
-    if (this.startAngle_ != opt_value) {
-      this.startAngle_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  } else {
-    return this.startAngle_;
+  function sweepAngleNormalizer(opt_value) {
+    return goog.math.clamp(anychart.utils.toNumber(opt_value) || 0, -360, 360);
   }
-};
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'sweepAngle',
+      sweepAngleNormalizer,
+      anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW);
 
-
-/**
- * Set gauge sweep angle.
- * @example
- * var gauge = anychart.circularGauge([1, 1.2, 1.4, 1.6, 1.2]);
- * gauge.sweepAngle(45);
- * gauge.container(stage).draw();
- * @param {(string|number)=} opt_value .
- * @return {(number|anychart.charts.CircularGauge)} .
- */
-anychart.charts.CircularGauge.prototype.sweepAngle = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = goog.math.clamp(anychart.utils.toNumber(opt_value) || 0, -360, 360);
-    if (this.sweepAngle_ != opt_value) {
-      this.sweepAngle_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  } else {
-    return this.sweepAngle_;
-  }
-};
-
-
-/**
- * Gauge frame fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.charts.CircularGauge} .
- */
-anychart.charts.CircularGauge.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var fill = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (fill != this.fill_) {
-      this.fill_ = fill;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.fill_ || '#eee';
-};
-
-
-/**
- * Gauge frame stroke
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.charts.CircularGauge|acgraph.vector.Stroke} .
- */
-anychart.charts.CircularGauge.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (stroke != this.stroke_) {
-      this.stroke_ = stroke;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.stroke_ || '#ccc';
-};
+  return map;
+})();
+anychart.core.settings.populate(anychart.charts.CircularGauge, anychart.charts.CircularGauge.prototype.PROPERTY_DESCRIPTORS);
 
 
 /**
@@ -837,7 +793,7 @@ anychart.charts.CircularGauge.prototype.getPixRadius = function() {
  * @return {number}
  */
 anychart.charts.CircularGauge.prototype.getStartAngle = function() {
-  return this.startAngle_ + anychart.charts.CircularGauge.DEFAULT_START_ANGLE;
+  return /** @type {number} */ (this.getOption('startAngle')) + anychart.charts.CircularGauge.DEFAULT_START_ANGLE;
 };
 
 
@@ -859,25 +815,6 @@ anychart.charts.CircularGauge.prototype.getCy = function() {
 };
 
 
-/**
- * Circular space around gauge.
- * @param {(number|string)=} opt_value .
- * @return {string|anychart.charts.CircularGauge} .
- */
-anychart.charts.CircularGauge.prototype.circularPadding = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizeToPercent(opt_value);
-    if (this.circularPadding_ != opt_value) {
-      this.circularPadding_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  } else {
-    return this.circularPadding_;
-  }
-};
-
-
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Drawing.
@@ -892,7 +829,7 @@ anychart.charts.CircularGauge.prototype.circularPadding = function(opt_value) {
  * @private
  */
 anychart.charts.CircularGauge.prototype.createFrame_ = function(path, cx, cy, radius) {
-  var sweepAngle = this.sweepAngle_;
+  var sweepAngle = /** @type {number} */ (this.getOption('sweepAngle'));
   var startAngle = this.getStartAngle();
 
   var endAngle = startAngle + sweepAngle;
@@ -912,7 +849,7 @@ anychart.charts.CircularGauge.prototype.createFrame_ = function(path, cx, cy, ra
 
   if (sweepAngle % 360 == 0 && sweepAngle != 0) {
     path.circularArc(cx, cy, radius + this.pixCircularPadding_, radius + this.pixCircularPadding_, startAngle, sweepAngle);
-  } else if (Math.abs(sweepAngle) > 180 && this.encloseWithStraightLine_) {
+  } else if (Math.abs(sweepAngle) > 180 && this.getOption('encloseWithStraightLine')) {
     var correctiveAngle = 90 - (360 - Math.abs(sweepAngle)) / 2;
     path.circularArc(
         startCenterPt_x,
@@ -1042,7 +979,7 @@ anychart.charts.CircularGauge.prototype.calculate_ = function(bounds) {
   else this.framePath.clear();
 
   this.outerGaugeRadius_ = 1;
-  this.pixCircularPadding_ = anychart.utils.normalizeSize(this.circularPadding_, this.outerGaugeRadius_);
+  this.pixCircularPadding_ = anychart.utils.normalizeSize(/** @type {string|number} */ (this.getOption('circularPadding')), this.outerGaugeRadius_);
   this.gaugeRadius_ = this.outerGaugeRadius_ - this.pixCircularPadding_;
 
   this.createFrame_(this.framePath, 0, 0, this.gaugeRadius_);
@@ -1117,7 +1054,7 @@ anychart.charts.CircularGauge.prototype.setLabelSettings = function(label, bound
   label.cx(this.getCx());
   label.cy(this.getCy());
   label.startAngle(this.getStartAngle());
-  label.sweepAngle(this.sweepAngle());
+  label.sweepAngle(this.getOption('sweepAngle'));
 };
 
 
@@ -1197,8 +1134,8 @@ anychart.charts.CircularGauge.prototype.drawContent = function(bounds) {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    this.framePath.stroke(this.stroke());
-    this.framePath.fill(this.fill());
+    this.framePath.stroke(this.getOption('stroke'));
+    this.framePath.fill(this.getOption('fill'));
 
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
@@ -1270,15 +1207,11 @@ anychart.charts.CircularGauge.prototype.setupByJSON = function(config, opt_defau
   if ('defaultRangeSettings' in config)
     this.defaultRangeSettings(config['defaultRangeSettings']);
 
-  this.fill(config['fill']);
-  this.stroke(config['stroke']);
-  this.startAngle(config['startAngle']);
-  this.sweepAngle(config['sweepAngle']);
+  anychart.core.settings.deserialize(this, anychart.charts.CircularGauge.prototype.PROPERTY_DESCRIPTORS, config);
+
   this.data(config['data']);
   if (goog.isDef(config['cap']))
     this.cap(config['cap']);
-  this.circularPadding(config['circularPadding']);
-  this.encloseWithStraightLine(config['encloseWithStraightLine']);
   this.interactivity(config['interactivity']);
 
   var i, len;
@@ -1338,15 +1271,10 @@ anychart.charts.CircularGauge.prototype.serialize = function() {
 
   json['type'] = anychart.enums.GaugeTypes.CIRCULAR;
 
-  json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill()));
-  json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
-  json['startAngle'] = this.startAngle();
-  json['sweepAngle'] = this.sweepAngle();
+  anychart.core.settings.serialize(this, anychart.charts.CircularGauge.prototype.PROPERTY_DESCRIPTORS, json);
   json['data'] = this.data().serialize();
   if (this.cap_)
     json['cap'] = this.cap().serialize();
-  json['circularPadding'] = this.circularPadding();
-  json['encloseWithStraightLine'] = this.encloseWithStraightLine();
   json['interactivity'] = this.interactivity().serialize();
 
   var i, len;
@@ -1409,11 +1337,13 @@ anychart.charts.CircularGauge.prototype.getDefaultThemeObj = function() {
 //exports
 (function() {
   var proto = anychart.charts.CircularGauge.prototype;
-  proto['stroke'] = proto.stroke;
-  proto['fill'] = proto.fill;
-
-  proto['startAngle'] = proto.startAngle;
-  proto['sweepAngle'] = proto.sweepAngle;
+  //descriptors
+  //proto['stroke'] = proto.stroke;
+  //proto['fill'] = proto.fill;
+  //proto['startAngle'] = proto.startAngle;
+  //proto['sweepAngle'] = proto.sweepAngle;
+  //proto['circularPadding'] = proto.circularPadding;
+  //proto['encloseWithStraightLine'] = proto.encloseWithStraightLine;
 
   proto['data'] = proto.data;
 
@@ -1427,7 +1357,5 @@ anychart.charts.CircularGauge.prototype.getDefaultThemeObj = function() {
 
   proto['range'] = proto.range;
 
-  proto['circularPadding'] = proto.circularPadding;
-  proto['encloseWithStraightLine'] = proto.encloseWithStraightLine;
   proto['getType'] = proto.getType;
 })();

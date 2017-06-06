@@ -232,7 +232,8 @@ anychart.charts.TagCloud.prototype.getThemeOption = function(name) {
 
 
 /** @inheritDoc */
-anychart.charts.TagCloud.prototype.getOption = anychart.core.settings.getOption;
+//TODO(AntonKagakin): comment for now to avoid compiler warnings
+//anychart.charts.TagCloud.prototype.getOption = anychart.core.settings.getOption;
 
 
 /** @inheritDoc */

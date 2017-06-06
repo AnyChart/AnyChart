@@ -10,6 +10,7 @@ goog.require('acgraph.events.BrowserEvent');
 goog.require('anychart.compatibility');
 goog.require('anychart.core.VisualBaseWithBounds');
 goog.require('anychart.core.reporting');
+goog.require('anychart.core.settings.IObjectWithSettings');
 goog.require('anychart.core.ui.Background');
 goog.require('anychart.core.ui.ChartCredits');
 goog.require('anychart.core.ui.Label');
@@ -43,6 +44,7 @@ goog.forwardDeclare('anychart.ui.ContextMenu.Item');
 /**
  * Base class for all charts, contains the margins, the background and the title.
  * @constructor
+ * @implements {anychart.core.settings.IObjectWithSettings}
  * @extends {anychart.core.VisualBaseWithBounds}
  */
 anychart.core.Chart = function() {
@@ -197,6 +199,18 @@ anychart.core.Chart = function() {
    */
   this.id_ = null;
 
+  /**
+   * Theme settings.
+   * @type {Object}
+   */
+  this.themeSettings = {};
+
+  /**
+   * Own settings (Settings set by user with API).
+   * @type {Object}
+   */
+  this.ownSettings = {};
+
   this.invalidate(anychart.ConsistencyState.ALL);
   this.resumeSignalsDispatching(false);
 };
@@ -232,6 +246,44 @@ anychart.core.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
 anychart.core.Chart.prototype.contentBounds;
 
 
+//region --- IObjectWithSettings
+/** @inheritDoc */
+anychart.core.Chart.prototype.getOwnOption = function(name) {
+  return this.ownSettings[name];
+};
+
+
+/** @inheritDoc */
+anychart.core.Chart.prototype.hasOwnOption = function(name) {
+  return goog.isDef(this.ownSettings[name]);
+};
+
+
+/** @inheritDoc */
+anychart.core.Chart.prototype.getThemeOption = function(name) {
+  return this.themeSettings[name];
+};
+
+
+/** @inheritDoc */
+anychart.core.Chart.prototype.getOption = function(name) {
+  return goog.isDef(this.ownSettings[name]) ? this.ownSettings[name] : this.themeSettings[name];
+};
+
+
+/** @inheritDoc */
+anychart.core.Chart.prototype.setOption = function(name, value) {
+  this.ownSettings[name] = value;
+};
+
+
+/** @inheritDoc */
+anychart.core.Chart.prototype.check = function(flags) {
+  return true;
+};
+
+
+//endregion
 //region --- Testers
 //------------------------------------------------------------------------------
 //

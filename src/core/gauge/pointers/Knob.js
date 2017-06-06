@@ -320,7 +320,7 @@ anychart.core.gauge.pointers.Knob.prototype.draw = function() {
 
     var axisRadius = axis.getPixRadius();
     var axisStartAngle = /** @type {number} */(goog.isDef(axis.startAngle()) ? axis.getStartAngle() : gauge.getStartAngle());
-    var axisSweepAngle = /** @type {number} */(goog.isDef(axis.sweepAngle()) ? axis.sweepAngle() : gauge.sweepAngle());
+    var axisSweepAngle = /** @type {number} */(goog.isDef(axis.sweepAngle()) ? axis.sweepAngle() : /** @type {number} */(gauge.getOption('sweepAngle')));
 
     var pixTopRadius = goog.isDefAndNotNull(this.topRadius_) ?
         anychart.utils.normalizeSize(this.topRadius_, gauge.getPixRadius()) :
