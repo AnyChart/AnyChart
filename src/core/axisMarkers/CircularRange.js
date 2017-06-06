@@ -564,7 +564,7 @@ anychart.core.axisMarkers.CircularRange.prototype.draw = function() {
         return this;
 
       var axisStartAngle = /** @type {number} */(goog.isDef(axis.startAngle()) ? axis.getStartAngle() : gauge.getStartAngle());
-      var axisSweepAngle = /** @type {number} */(goog.isDef(axis.sweepAngle()) ? axis.sweepAngle() : gauge.sweepAngle());
+      var axisSweepAngle = /** @type {number} */(goog.isDef(axis.sweepAngle()) ? axis.sweepAngle() : /** @type {number} */ (gauge.getOption('sweepAngle')));
       var startAngle = axisStartAngle + fromRatio * axisSweepAngle;
       var endAngle = axisStartAngle + toRatio * axisSweepAngle;
 

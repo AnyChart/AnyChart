@@ -822,7 +822,7 @@ anychart.core.axes.Circular.prototype.getLabelBounds_ = function(index, isMajor)
   radius += anychart.utils.normalizeSize(/** @type {number|string} */(offsetY), this.gauge_.getPixRadius());
 
   var startAngle = this.getStartAngle();
-  var sweepAngle = goog.isDef(this.sweepAngle_) ? this.sweepAngle_ : this.gauge_.sweepAngle();
+  var sweepAngle = goog.isDef(this.sweepAngle_) ? this.sweepAngle_ : /** @type {number} */ (this.gauge_.getOption('sweepAngle'));
 
   var angle = goog.math.standardAngle(startAngle + ratio * sweepAngle);
   angle += anychart.utils.normalizeSize(/** @type {number|string} */(offsetX), sweepAngle);
@@ -970,7 +970,7 @@ anychart.core.axes.Circular.prototype.drawLabel_ = function(index, angle, isMajo
   label = labels.add(formatProvider, positionProvider, index);
 
   if (!autoRotate) {
-    var sweepAngle = goog.isDef(this.sweepAngle_) ? this.sweepAngle_ : this.gauge_.sweepAngle();
+    var sweepAngle = goog.isDef(this.sweepAngle_) ? this.sweepAngle_ : /** @type {number} */ (this.gauge_.getOption('sweepAngle'));
     var offsetX = label && goog.isDef(label['offsetX']()) ? label['offsetX']() : labels['offsetX']();
     angle += anychart.utils.normalizeSize(/** @type {number|string} */(offsetX), sweepAngle);
 
@@ -1019,7 +1019,7 @@ anychart.core.axes.Circular.prototype.draw = function() {
   var ticksDrawer, labelsDrawer, minorTicksDrawer, minorLabelsDrawer;
 
   var startAngle = this.getStartAngle();
-  var sweepAngle = goog.isDefAndNotNull(this.sweepAngle_) ? this.sweepAngle_ : this.gauge_.sweepAngle();
+  var sweepAngle = goog.isDefAndNotNull(this.sweepAngle_) ? this.sweepAngle_ : /** @type {number} */ (this.gauge_.getOption('sweepAngle'));
   var cx = this.gauge_.getCx();
   var cy = this.gauge_.getCy();
 
