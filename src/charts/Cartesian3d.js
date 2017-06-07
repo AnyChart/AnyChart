@@ -12,6 +12,7 @@ goog.require('anychart.core.drawers.Area3d');
 goog.require('anychart.core.drawers.Column3d');
 goog.require('anychart.core.grids.Linear3d');
 goog.require('anychart.core.reporting');
+goog.require('anychart.core.settings');
 goog.require('anychart.enums');
 goog.require('goog.color');
 
@@ -43,6 +44,9 @@ anychart.charts.Cartesian3d = function() {
   this.setType(anychart.enums.ChartTypes.CARTESIAN_3D);
 };
 goog.inherits(anychart.charts.Cartesian3d, anychart.core.CartesianBase);
+
+
+anychart.core.settings.populate(anychart.charts.Cartesian3d, anychart.core.CartesianBase.prototype.PROPERTY_DESCRIPTORS);
 
 
 /**
@@ -327,7 +331,7 @@ anychart.charts.Cartesian3d.prototype.isMode3d = function() {
  */
 anychart.charts.Cartesian3d.prototype.getX3DDistributionShift = function(seriesIndex, seriesIsStacked) {
   var x3dShift;
-  if (seriesIsStacked || !this.zDistribution()) {
+  if (seriesIsStacked || !this.getOption('zDistribution')) {
     x3dShift = 0;
   } else {
     var seriesCount = this.getSeriesCount();
@@ -345,7 +349,7 @@ anychart.charts.Cartesian3d.prototype.getX3DDistributionShift = function(seriesI
  */
 anychart.charts.Cartesian3d.prototype.getY3DDistributionShift = function(seriesIndex, seriesIsStacked) {
   var y3dShift;
-  if (seriesIsStacked || !this.zDistribution()) {
+  if (seriesIsStacked || !this.getOption('zDistribution')) {
     y3dShift = 0;
   } else {
     var seriesCount = this.getSeriesCount();
@@ -364,7 +368,7 @@ anychart.charts.Cartesian3d.prototype.getX3DShift = function(seriesIsStacked) {
   var seriesCount = this.getSeriesCount();
   var zPaddingShift = this.zPaddingXShift;
   var seriesShift = this.x3dShift;
-  if (!seriesIsStacked && this.zDistribution()) {
+  if (!seriesIsStacked && this.getOption('zDistribution')) {
     seriesShift = (seriesShift - zPaddingShift * (seriesCount - 1)) / seriesCount;
   }
   return seriesShift;
@@ -379,7 +383,7 @@ anychart.charts.Cartesian3d.prototype.getY3DShift = function(seriesIsStacked) {
   var seriesCount = this.getSeriesCount();
   var zPaddingShift = this.zPaddingYShift;
   var seriesShift = this.y3dShift;
-  if (!seriesIsStacked && this.zDistribution()) {
+  if (!seriesIsStacked && this.getOption('zDistribution')) {
     seriesShift = (seriesShift - zPaddingShift * (seriesCount - 1)) / seriesCount;
   }
   return seriesShift;
@@ -474,7 +478,7 @@ anychart.charts.Cartesian3d.prototype.setSeriesPointZIndex_ = function(series) {
   if (value > 0) {
     if (/** @type {boolean} */(series.getOption('isVertical'))) {
       if (!series.planIsStacked()) {
-        if (this.zDistribution()) {
+        if (this.getOption('zDistribution')) {
           zIndex += inc;
         } else {
           zIndex -= inc;
@@ -534,17 +538,20 @@ anychart.charts.Cartesian3d.prototype.getContentAreaBounds = function(bounds) {
   var contentAreaBounds = bounds.clone().round();
   var boundsWithoutAxes = this.getBoundsWithoutAxes(contentAreaBounds);
 
-  var needAspectCalc = !goog.isDefAndNotNull(this.zDepthInternal) && anychart.utils.isPercent(this.zAspectInternal);
+  var needAspectCalc = anychart.utils.isPercent(this.getOption('zAspect'));
   var seriesCount = this.getSeriesCount();
 
-  var angleRad = goog.math.toRadians(this.zAngleInternal);
-  var secondAngle = 90 - this.zAngleInternal;
+  var zAngle = /** @type {number} */ (this.getOption('zAngle'));
+  var zAspect = /** @type {number} */ (this.getOption('zAspect'));
+  var zPadding = /** @type {number} */ (this.getOption('zPadding'));
+  var zDistribution = /** @type {number} */ (this.getOption('zDistribution'));
+
+  var angleRad = goog.math.toRadians(zAngle);
+  var secondAngle = 90 - zAngle;
   var secondAngleRad = goog.math.toRadians(secondAngle);
 
-  var zPaddingValue = this.zPaddingInternal;
-
   if (needAspectCalc) {
-    var aspectRatio = parseFloat(this.zAspectInternal) / 100;
+    var aspectRatio = parseFloat(zAspect) / 100;
     var xAspectRatio = aspectRatio * Math.sin(secondAngleRad);
     var yAspectRatio = aspectRatio * Math.sin(angleRad);
     var x3dShiftRatio = 0;
@@ -561,7 +568,7 @@ anychart.charts.Cartesian3d.prototype.getContentAreaBounds = function(bounds) {
         var barWidthRatio;
         var barWidthRatioOfTotalWidth;
 
-        if (series.planIsStacked() || this.zDistribution()) {
+        if (series.planIsStacked() || zDistribution) {
           barWidthRatio = 1 / (1 + /** @type {number} */(this.barGroupsPadding()));
         } else {
           barWidthRatio = 1 / (seriesCount + (seriesCount - 1) * this.barsPadding() + this.barGroupsPadding());
@@ -569,7 +576,7 @@ anychart.charts.Cartesian3d.prototype.getContentAreaBounds = function(bounds) {
 
         barWidthRatioOfTotalWidth = catWidthRatio * barWidthRatio;
 
-        if (!series.planIsStacked() && this.zDistribution()) {
+        if (!series.planIsStacked() && zDistribution) {
           x3dShiftRatio += barWidthRatioOfTotalWidth * xAspectRatio;
           y3dShiftRatio += barWidthRatioOfTotalWidth * yAspectRatio;
         } else if (!x3dShiftRatio) {
@@ -579,8 +586,8 @@ anychart.charts.Cartesian3d.prototype.getContentAreaBounds = function(bounds) {
       }
     }
 
-    this.zPaddingXShift = Math.round(zPaddingValue * Math.sin(secondAngleRad));
-    this.zPaddingYShift = Math.round(zPaddingValue * Math.sin(angleRad));
+    this.zPaddingXShift = Math.round(zPadding * Math.sin(secondAngleRad));
+    this.zPaddingYShift = Math.round(zPadding * Math.sin(angleRad));
 
     var axisBoundsWidth = this.barChartMode ?
         boundsWithoutAxes.height / (1 + x3dShiftRatio) :
@@ -588,7 +595,7 @@ anychart.charts.Cartesian3d.prototype.getContentAreaBounds = function(bounds) {
 
     this.x3dShift = axisBoundsWidth * x3dShiftRatio;
     this.y3dShift = axisBoundsWidth * y3dShiftRatio;
-    if (!this.hasStackedSeries && this.zDistribution()) {
+    if (!this.hasStackedSeries && zDistribution) {
       this.x3dShift += this.zPaddingXShift * (seriesCount - 1);
       this.y3dShift += this.zPaddingYShift * (seriesCount - 1);
     }
@@ -597,16 +604,10 @@ anychart.charts.Cartesian3d.prototype.getContentAreaBounds = function(bounds) {
     this.y3dShift = Math.round(this.y3dShift);
 
   } else {
-    if (goog.isDefAndNotNull(this.zDepthInternal)) {
-      this.zDepthValue_ = this.zDepthInternal;
-
-    // not needAspectCalc
+    if (!this.hasStackedSeries && zDistribution) {
+      this.zDepthValue_ = zAspect * seriesCount + zPadding * (seriesCount - 1);
     } else {
-      if (!this.hasStackedSeries && this.zDistribution()) {
-        this.zDepthValue_ = this.zAspectInternal * seriesCount + this.zPaddingInternal * (seriesCount - 1);
-      } else {
-        this.zDepthValue_ = anychart.utils.toNumber(this.zAspectInternal);
-      }
+      this.zDepthValue_ = anychart.utils.toNumber(zAspect);
     }
 
     this.x3dShift = Math.round(this.zDepthValue_ * Math.sin(secondAngleRad));
@@ -614,12 +615,12 @@ anychart.charts.Cartesian3d.prototype.getContentAreaBounds = function(bounds) {
 
     // zPadding * (seriesCount - 1) must be less than zDepth.
     var zPaddingCount = seriesCount - 1;
-    if (zPaddingValue * zPaddingCount >= this.zDepthValue_) {
-      zPaddingValue = (this.zDepthValue_ - seriesCount) / zPaddingCount;
+    if (zPadding * zPaddingCount >= this.zDepthValue_) {
+      zPadding = (this.zDepthValue_ - seriesCount) / zPaddingCount;
     }
 
-    this.zPaddingXShift = Math.round(zPaddingValue * Math.sin(secondAngleRad));
-    this.zPaddingYShift = Math.round(zPaddingValue * Math.sin(angleRad));
+    this.zPaddingXShift = Math.round(zPadding * Math.sin(secondAngleRad));
+    this.zPaddingYShift = Math.round(zPadding * Math.sin(angleRad));
   }
 
   // value must be > 0 and not NaN
@@ -640,7 +641,7 @@ anychart.charts.Cartesian3d.prototype.getContentAreaBounds = function(bounds) {
 anychart.charts.Cartesian3d.prototype.distributeClusters = function(numClusters, drawingPlansOfScale, horizontal) {
   var wSeries;
 
-  if (!this.hasStackedSeries && this.zDistribution()) {
+  if (!this.hasStackedSeries && /** @type {boolean} */ (this.getOption('zDistribution'))) {
     if (numClusters > 0) {
       numClusters = 1 + /** @type {number} */(this.barGroupsPadding());
       var barWidthRatio = 1 / numClusters;
@@ -676,12 +677,7 @@ anychart.charts.Cartesian3d.prototype.makeBrowserEvent = function(e) {
  */
 anychart.charts.Cartesian3d.prototype.setupByJSON = function(config, opt_default) {
   anychart.charts.Cartesian3d.base(this, 'setupByJSON', config, opt_default);
-
-  this.zAngle(config['zAngle']);
-  if (goog.isDef(config['zDepth'])) this.zDepth(config['zDepth']);
-  this.zAspect(config['zAspect']);
-  this.zDistribution(config['zDistribution']);
-  this.zPadding(config['zPadding']);
+  anychart.core.settings.deserialize(this, anychart.core.CartesianBase.prototype.PROPERTY_DESCRIPTORS, config);
 };
 
 
@@ -692,16 +688,7 @@ anychart.charts.Cartesian3d.prototype.setupByJSON = function(config, opt_default
 anychart.charts.Cartesian3d.prototype.serialize = function() {
   var json = anychart.charts.Cartesian3d.base(this, 'serialize');
   var chart = json['chart'];
-
-  chart['zAngle'] = this.zAngle();
-  if (goog.isDefAndNotNull(this.zDepthInternal)) {
-    // we should not place warning here on serialization.
-    chart['zDepth'] = this.zDepthInternal;
-  }
-  chart['zAspect'] = this.zAspect();
-  chart['zDistribution'] = this.zDistribution();
-  chart['zPadding'] = this.zPadding();
-
+  anychart.core.settings.serialize(this, anychart.core.CartesianBase.prototype.PROPERTY_DESCRIPTORS, json);
   return json;
 };
 
@@ -744,12 +731,12 @@ anychart.charts.Cartesian3d.prototype.serialize = function() {
   proto['getPlotBounds'] = proto.getPlotBounds;
   proto['xZoom'] = proto.xZoom;
   proto['xScroller'] = proto.xScroller;
-  proto['zAspect'] = proto.zAspect;
-  proto['zAngle'] = proto.zAngle;
-  proto['zDistribution'] = proto.zDistribution;
-  proto['zPadding'] = proto.zPadding;
+  //proto['zAspect'] = proto.zAspect;
+  //proto['zAngle'] = proto.zAngle;
+  //proto['zDistribution'] = proto.zDistribution;
+  //proto['zPadding'] = proto.zPadding;
+  //proto['zDepth'] = proto.zDepth; // deprecated
   proto['getStat'] = proto.getStat;
-  proto['zDepth'] = proto.zDepth; // deprecated
   proto['getXScales'] = proto.getXScales;
   proto['getYScales'] = proto.getYScales;
 })();

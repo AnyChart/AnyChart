@@ -1,6 +1,7 @@
 goog.provide('anychart.charts.Cartesian');
 goog.require('anychart.core.CartesianBase');
 goog.require('anychart.core.series');
+goog.require('anychart.core.settings');
 goog.require('anychart.core.shapeManagers');
 goog.require('anychart.enums');
 
@@ -337,6 +338,8 @@ anychart.charts.Cartesian.prototype.seriesConfig = (function() {
 anychart.core.ChartWithSeries.generateSeriesConstructors(anychart.charts.Cartesian, anychart.charts.Cartesian.prototype.seriesConfig);
 
 
+anychart.core.settings.populate(anychart.charts.Cartesian, anychart.core.CartesianBase.prototype.PROPERTY_DESCRIPTORS);
+
 /**
  * Returns a chart instance with initial settings (no axes, grids, titles, legend and so on).<br/>
  * <b>Note:</b> To get a chart with initial settings use:
@@ -422,12 +425,12 @@ anychart.chartTypesMap[anychart.enums.ChartTypes.CARTESIAN] = anychart.cartesian
   proto['getPlotBounds'] = proto.getPlotBounds;
   proto['xZoom'] = proto.xZoom;
   proto['xScroller'] = proto.xScroller;
-  proto['zAspect'] = proto.zAspect;
-  proto['zAngle'] = proto.zAngle;
-  proto['zDistribution'] = proto.zDistribution;
-  proto['zPadding'] = proto.zPadding;
+  //proto['zAspect'] = proto.zAspect;
+  //proto['zAngle'] = proto.zAngle;
+  //proto['zDistribution'] = proto.zDistribution;
+  //proto['zPadding'] = proto.zPadding;
+  //proto['zDepth'] = proto.zDepth; // deprecated
   proto['getStat'] = proto.getStat;
-  proto['zDepth'] = proto.zDepth; // deprecated
   proto['annotations'] = proto.annotations;
   proto['getXScales'] = proto.getXScales;
   proto['getYScales'] = proto.getYScales;
