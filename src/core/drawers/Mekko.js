@@ -91,7 +91,7 @@ anychart.core.drawers.Mekko.prototype.drawPoint_ = function(point, shapes, opt_u
   point.meta('pointWidth', pointWidth);
 
   var pointsPadding = Math.abs(anychart.math.round(anychart.utils.normalizeSize(
-      /** @type {number|string} */((/** @type {anychart.charts.Mekko} */(this.series.chart)).pointsPadding()),
+      /** @type {number|string} */((/** @type {anychart.charts.Mekko} */(this.series.chart)).getOption('pointsPadding')),
       pointWidth)));
   var width = pointWidth - pointsPadding * 2;
   var leftX = (x - width / 2);

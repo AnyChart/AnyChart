@@ -2,6 +2,7 @@ goog.provide('anychart.charts.Mekko');
 goog.require('anychart.core.ChartWithAxes');
 goog.require('anychart.core.series');
 goog.require('anychart.core.series.Mekko');
+goog.require('anychart.core.settings');
 goog.require('anychart.core.shapeManagers');
 goog.require('anychart.enums');
 
@@ -51,11 +52,7 @@ anychart.charts.Mekko = function(opt_useCategoryScale, opt_barmekkoMode) {
    */
   this.barmekkoMode_ = !!opt_barmekkoMode;
 
-  /**
-   * @type {(number|string)}
-   * @private
-   */
-  this.pointsPadding_ = 0;
+  this.setOption('pointsPadding', 0);
 
   this.defaultSeriesType(anychart.enums.MekkoSeriesType.MEKKO);
 };
@@ -405,20 +402,23 @@ anychart.charts.Mekko.prototype.calculateCategoriesScales = function() {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter/setter for points padding.
- * @param {(number|string)=} opt_value
- * @return {(number|string|!anychart.charts.Mekko)}
+ * Properties that should be defined in series.Base prototype.
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.charts.Mekko.prototype.pointsPadding = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.pointsPadding_ != opt_value) {
-      this.pointsPadding_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.ALL, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.pointsPadding_;
-};
+anychart.charts.Mekko.prototype.PROPERTY_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'pointsPadding',
+      anychart.core.settings.asIsNormalizer,
+      anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW);
+
+  return map;
+})();
+anychart.core.settings.populate(anychart.charts.Mekko, anychart.charts.Mekko.prototype.PROPERTY_DESCRIPTORS);
 
 
 /** @inheritDoc */
@@ -450,7 +450,7 @@ anychart.charts.Mekko.prototype.defaultScalesLastIndex = function() {
 anychart.charts.Mekko.prototype.serialize = function() {
   var json = anychart.charts.Mekko.base(this, 'serialize');
   json['type'] = this.getType();
-  json['pointsPadding'] = this.pointsPadding();
+  anychart.core.settings.serialize(this, anychart.charts.Mekko.prototype.PROPERTY_DESCRIPTORS, json);
   return {'chart': json};
 };
 
@@ -479,7 +479,7 @@ anychart.charts.Mekko.prototype.serializeAxis = function(item, scales, scaleIds,
 anychart.charts.Mekko.prototype.setupByJSON = function(config, opt_default) {
   anychart.charts.Mekko.base(this, 'setupByJSON', config, opt_default);
 
-  this.pointsPadding(config['pointsPadding']);
+  anychart.core.settings.deserialize(this, anychart.charts.Mekko.prototype.PROPERTY_DESCRIPTORS, config);
 };
 
 
@@ -489,7 +489,7 @@ anychart.charts.Mekko.prototype.setupByJSON = function(config, opt_default) {
 //exports
 (function() {
   var proto = anychart.charts.Mekko.prototype;
-  proto['pointsPadding'] = proto.pointsPadding;
+  //proto['pointsPadding'] = proto.pointsPadding;
   proto['xScale'] = proto.xScale;
   proto['yScale'] = proto.yScale;
   proto['crosshair'] = proto.crosshair;
