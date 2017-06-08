@@ -1,6 +1,7 @@
 goog.provide('anychart.charts.Waterfall');
 goog.require('anychart.core.CartesianBase');
 goog.require('anychart.core.series.Waterfall');
+goog.require('anychart.core.settings');
 goog.require('anychart.core.shapeManagers');
 goog.require('anychart.enums');
 
@@ -126,8 +127,9 @@ anychart.charts.Waterfall.prototype.afterSeriesDraw = function() {
   var drawingPlans = this.drawingPlansByXScale[String(goog.getUid(xScale))];
   if (!drawingPlans || !drawingPlans.length)
     return;
-  this.connectorPath_.stroke(this.connectorStroke_);
-  var thickness = acgraph.vector.getThickness(this.connectorStroke_);
+  var connectorStroke = /** @type {acgraph.vector.Stroke} */ (this.getOption('connectorStroke'));
+  this.connectorPath_.stroke(connectorStroke);
+  var thickness = acgraph.vector.getThickness(connectorStroke);
   this.connectorPath_.parent(this.container());
   this.connectorPath_.zIndex(1000);
   this.connectorPath_.clip(this.getPlotBounds());
@@ -252,46 +254,33 @@ anychart.charts.Waterfall.prototype.createSeriesInstance = function(type, config
 
 
 //endregion
-//region --- api
+//region --- api/descriptors
 /**
- * Getter/setter for dataMode.
- * @param {string=} opt_value dataMode.
- * @return {anychart.enums.WaterfallDataMode|anychart.charts.Waterfall} dataMode or self for chaining.
+ * Properties that should be defined in series.Base prototype.
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.charts.Waterfall.prototype.dataMode = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeWaterfallDataMode(opt_value);
-    if (this.dataMode_ != opt_value) {
-      this.dataMode_ = opt_value;
-      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.dataMode_;
-};
+anychart.charts.Waterfall.prototype.PROPERTY_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'dataMode',
+      anychart.enums.normalizeWaterfallDataMode,
+      anychart.ConsistencyState.ONLY_DISPATCHING,
+      anychart.Signal.NEEDS_REDRAW);
 
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
+      'connectorStroke',
+      anychart.core.settings.strokeNormalizer,
+      anychart.ConsistencyState.ONLY_DISPATCHING,
+      anychart.Signal.NEEDS_REDRAW);
 
-/**
- * Getter/setter for crosslines stroke.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.charts.Waterfall|acgraph.vector.Stroke} .
- */
-anychart.charts.Waterfall.prototype.connectorStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (stroke != this.connectorStroke_) {
-      this.connectorStroke_ = stroke;
-      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.connectorStroke_;
-};
+  return map;
+})();
+anychart.core.settings.populate(anychart.charts.Waterfall, anychart.charts.Waterfall.prototype.PROPERTY_DESCRIPTORS);
 
 
 //endregion
@@ -454,8 +443,7 @@ anychart.charts.Waterfall.prototype.legendItemClick = function(item, event) {
 /** @inheritDoc */
 anychart.charts.Waterfall.prototype.serialize = function() {
   var json = anychart.charts.Waterfall.base(this, 'serialize');
-  json['chart']['dataMode'] = this.dataMode();
-  json['chart']['connectorStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.connectorStroke()));
+  anychart.core.settings.serialize(this, anychart.charts.Waterfall.prototype.PROPERTY_DESCRIPTORS, json['chart']);
   return json;
 };
 
@@ -463,16 +451,13 @@ anychart.charts.Waterfall.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.charts.Waterfall.prototype.setupByJSON = function(config, opt_default) {
   anychart.charts.Waterfall.base(this, 'setupByJSON', config, opt_default);
-  this.dataMode(config['dataMode']);
-  this.connectorStroke(config['connectorStroke']);
+  anychart.core.settings.deserialize(this, anychart.charts.Waterfall.prototype.PROPERTY_DESCRIPTORS, config);
 };
 
 
 /** @inheritDoc */
 anychart.charts.Waterfall.prototype.disposeInternal = function() {
   goog.dispose(this.connectorPath_);
-  delete this.connectorStroke_;
-  delete this.dataMode_;
   anychart.charts.Waterfall.base(this, 'disposeInternal');
 };
 
@@ -481,10 +466,10 @@ anychart.charts.Waterfall.prototype.disposeInternal = function() {
 //region --- exports
 (function() {
   var proto = anychart.charts.Waterfall.prototype;
-  // generated automatically
-  // proto['waterfall'] = proto.waterfall;
-  proto['dataMode'] = proto.dataMode;
-  proto['connectorStroke'] = proto.connectorStroke;
+  //generated automatically
+  //proto['waterfall'] = proto.waterfall;
+  //proto['dataMode'] = proto.dataMode;
+  //proto['connectorStroke'] = proto.connectorStroke;
 
   proto['xScale'] = proto.xScale;
   proto['yScale'] = proto.yScale;
