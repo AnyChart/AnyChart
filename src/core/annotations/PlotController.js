@@ -1147,9 +1147,9 @@ anychart.core.annotations.PlotController.AnchorDragger.prototype.startDrag = fun
   if (this.extractTarget(e)) {
     if (this.annotation_.isFinished()) {
       if (this.controller_.getController().getChart().dispatchEvent({
-            'type': anychart.enums.EventType.ANNOTATION_CHANGE_START,
-            'annotation': this.annotation_
-          })) {
+        'type': anychart.enums.EventType.ANNOTATION_CHANGE_START,
+        'annotation': this.annotation_
+      })) {
         anychart.core.annotations.PlotController.AnchorDragger.base(this, 'startDrag', e);
         if (this.isDragging())
           e.stopPropagation();
@@ -1207,9 +1207,9 @@ anychart.core.annotations.PlotController.AnchorDragger.prototype.computeInitialP
 /** @inheritDoc */
 anychart.core.annotations.PlotController.AnchorDragger.prototype.defaultAction = function(x, y) {
   if (this.controller_.getController().getChart().dispatchEvent({
-        'type': anychart.enums.EventType.ANNOTATION_CHANGE,
-        'annotation': this.annotation_
-      }))
+    'type': anychart.enums.EventType.ANNOTATION_CHANGE,
+    'annotation': this.annotation_
+  }))
     this.annotation_.moveAnchor(this.anchorId_, x, y);
 };
 
