@@ -478,7 +478,7 @@ anychart.charts.HeatMap.PROPERTY_DESCRIPTORS = (function() {
       anychart.enums.PropertyHandlerType.SINGLE_ARG_HOOK,
       'labelsDisplayMode',
       anychart.enums.normalizeLabelsDisplayMode,
-      anychart.ConsistencyState.BOUNDS,
+      anychart.ConsistencyState.SERIES_CHART_SERIES,
       anychart.Signal.NEEDS_REDRAW,
       beforeInvalidation);
   return map;
