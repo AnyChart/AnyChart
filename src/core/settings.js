@@ -31,6 +31,13 @@ goog.require('goog.math');
  *    consistency: (anychart.ConsistencyState|number),
  *    signal: (anychart.Signal|number),
  *    deprecatedPropName: string
+ * }|{
+ *    handler: number,
+ *    propName: string,
+ *    normalizer: Function,
+ *    consistency: (anychart.ConsistencyState|number),
+ *    signal: (anychart.Signal|number),
+ *    beforeInvalidateHook: Function
  * }}
  */
 anychart.core.settings.PropertyDescriptor;
@@ -66,6 +73,28 @@ anychart.core.settings.createDescriptor = function(map, handler, propName, norma
     methodName = descriptor.deprecatedPropName = opt_methodName;
   }
   map[methodName] = descriptor;
+};
+
+
+/**
+ * Creates descriptor.
+ * @param {!Object.<string, anychart.core.settings.PropertyDescriptor>} map
+ * @param {anychart.enums.PropertyHandlerType} handler - Handler type.
+ * @param {string} propName - Property name.
+ * @param {Function} normalizer - Normalizer function.
+ * @param {number} consistency - Consistency to set.
+ * @param {number} signal - Signal.
+ * @param {Function} beforeInvalidateHook
+ * @param {number=} opt_check - Check function.
+ * @param {string=} opt_methodName - Deprecated prop name.
+ */
+anychart.core.settings.createHookedDescriptor = function(map, handler, propName, normalizer, consistency, signal, beforeInvalidateHook, opt_check, opt_methodName) {
+  anychart.core.settings.createDescriptor(map, handler, propName, normalizer, consistency, signal, opt_check, opt_methodName);
+  var methodName = propName;
+  if (goog.isDef(opt_methodName)) {
+    methodName = opt_methodName;
+  }
+  map[methodName].beforeInvalidateHook = beforeInvalidateHook;
 };
 
 
@@ -284,7 +313,8 @@ anychart.core.settings.populate = function(classConstructor, descriptors) {
         descriptor.normalizer,
         descriptor.capabilityCheck,
         descriptor.consistency,
-        descriptor.signal);
+        descriptor.signal,
+        descriptor.beforeInvalidateHook);
   }
 };
 
@@ -480,6 +510,39 @@ anychart.core.settings.multiArgsDeprecatedHandler = function(fieldName, deprecat
 
 
 /**
+ * Simple field handler, that is suitable for partial application to make real handlers.
+ * @param {string} fieldName
+ * @param {string} deprecatedFieldName
+ * @param {function(*):*} normalizer
+ * @param {number} supportCheck - set to anychart.core.series.Capabilities.ANY to invalidate in any case.
+ * @param {anychart.ConsistencyState|number} consistencyState
+ * @param {anychart.Signal|number} signal
+ * @param {Function} beforeInvalidateHook
+ * @param {*=} opt_value
+ * @return {*|anychart.core.settings.IObjectWithSettings}
+ * @this {anychart.core.settings.IObjectWithSettings}
+ */
+anychart.core.settings.singleArgHookHandler = function(fieldName, deprecatedFieldName, normalizer, supportCheck, consistencyState, signal, beforeInvalidateHook, opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = normalizer(opt_value);
+    if (this.getOwnOption(fieldName) !== opt_value) {
+      this.setOption(fieldName, opt_value);
+      if (this.check(supportCheck)) {
+        beforeInvalidateHook.call(this);
+        if (consistencyState) {
+          this.invalidate(consistencyState, signal);
+        } else {
+          this.dispatchSignal(signal);
+        }
+      }
+    }
+    return this;
+  }
+  return this.getOption(fieldName);
+};
+
+
+/**
  * Handlers map to avoid switching.
  * @type {Array.<Function>}
  */
@@ -489,6 +552,7 @@ anychart.core.settings.handlersMap = (function() {
   map[anychart.enums.PropertyHandlerType.MULTI_ARG] = anychart.core.settings.multiArgsHandler;
   map[anychart.enums.PropertyHandlerType.SINGLE_ARG_DEPRECATED] = anychart.core.settings.simpleDeprecatedHandler;
   map[anychart.enums.PropertyHandlerType.MULTI_ARG_DEPRECATED] = anychart.core.settings.multiArgsDeprecatedHandler;
+  map[anychart.enums.PropertyHandlerType.SINGLE_ARG_HOOK] = anychart.core.settings.singleArgHookHandler;
   return map;
 })();
 
