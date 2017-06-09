@@ -408,6 +408,7 @@ anychart.core.CartesianBase.prototype.drawElements = function() {
 anychart.core.CartesianBase.prototype.setupByJSONWithScales = function(config, scalesInstances, opt_default) {
   anychart.core.CartesianBase.base(this, 'setupByJSONWithScales', config, scalesInstances, opt_default);
 
+  anychart.core.settings.deserialize(this, anychart.core.CartesianBase.PROPERTY_DESCRIPTORS, config);
   this.xScroller(config['xScroller']);
 
   var xZoom = config['xZoom'];
@@ -419,13 +420,6 @@ anychart.core.CartesianBase.prototype.setupByJSONWithScales = function(config, s
   } else {
     this.xZoom(xZoom);
   }
-};
-
-
-/** @inheritDoc */
-anychart.core.CartesianBase.prototype.setupByJSON = function(config, opt_default) {
-  anychart.core.CartesianBase.base(this, 'setupByJSON', config, opt_default);
-  anychart.core.settings.deserialize(this, anychart.core.CartesianBase.PROPERTY_DESCRIPTORS, config);
 };
 
 
