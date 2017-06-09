@@ -464,22 +464,26 @@ anychart.charts.HeatMap.prototype.legendItemOut = function(item, event) {
 
 
 /**
- * Labels display mode.
- * @param {(string|anychart.enums.LabelsDisplayMode)=} opt_value Mode to set.
- * @return {string|anychart.enums.LabelsDisplayMode|anychart.charts.HeatMap}
+ * Properties that should be defined in series.Base prototype.
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.charts.HeatMap.prototype.labelsDisplayMode = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeLabelsDisplayMode(opt_value);
-    if (this.labelDisplayMode_ != opt_value) {
-      this.labelDisplayMode_ = opt_value;
-      this.series_.invalidate(anychart.ConsistencyState.SERIES_LABELS);
-      this.invalidate(anychart.ConsistencyState.SERIES_CHART_SERIES, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
+anychart.charts.HeatMap.PROPERTY_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+  function beforeInvalidate() {
+    this.series_.invalidate(anychart.ConsistencyState.SERIES_LABELS);
   }
-  return this.labelDisplayMode_;
-};
+  anychart.core.settings.createHookedDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG_HOOK,
+      'labelsDisplayMode',
+      anychart.enums.normalizeLabelsDisplayMode,
+      anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW,
+      beforeInvalidate);
+  return map;
+})();
+anychart.core.settings.populate(anychart.charts.HeatMap, anychart.charts.HeatMap.PROPERTY_DESCRIPTORS);
 
 
 /** @inheritDoc */
@@ -752,7 +756,7 @@ anychart.charts.HeatMap.prototype.setupByJSONWithScales = function(config, scale
 
   anychart.charts.HeatMap.base(this, 'setupByJSONWithScales', config, scalesInstances, opt_default);
 
-  this.labelsDisplayMode(config['labelsDisplayMode']);
+  anychart.core.settings.deserialize(this, anychart.charts.HeatMap.PROPERTY_DESCRIPTORS, config);
   this.yScroller(config['yScroller']);
 
   var yZoom = config['yZoom'];
@@ -774,7 +778,7 @@ anychart.charts.HeatMap.prototype.serializeWithScales = function(json, scales, s
   anychart.charts.HeatMap.base(this, 'serializeWithScales', json, scales, scaleIds);
   json['yScroller'] = this.yScroller().serialize();
   json['yZoom'] = this.yZoom().serialize();
-  json['labelsDisplayMode'] = this.labelsDisplayMode();
+  anychart.core.settings.serialize(this, anychart.charts.HeatMap.PROPERTY_DESCRIPTORS, json);
 
   this.serializeScale(json, 'colorScale', /** @type {anychart.scales.Base} */(this.colorScale()), scales, scaleIds);
 };
@@ -839,8 +843,8 @@ anychart.charts.HeatMap.prototype.disposeInternal = function() {
   proto['yAxis'] = proto.yAxis;
   proto['xScale'] = proto.xScale;
   proto['yScale'] = proto.yScale;
-  proto['labelsDisplayMode'] = proto.labelsDisplayMode;
   // generated methods:
+  // proto['labelsDisplayMode'] = proto.labelsDisplayMode;
   // proto['fill'] = proto.fill;
   // proto['hoverFill'] = proto.hoverFill;
   // proto['selectFill'] = proto.selectFill;

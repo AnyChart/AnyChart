@@ -327,7 +327,7 @@ anychart.core.series.HeatMap.prototype.createPositionProviderByGeometry = functi
 
 /** @inheritDoc */
 anychart.core.series.HeatMap.prototype.drawLabel = function(point, pointState, pointStateChanged) {
-  var displayMode = (/** @type {anychart.charts.HeatMap} */(this.chart)).labelsDisplayMode();
+  var displayMode = (/** @type {anychart.charts.HeatMap} */(this.chart)).getOption('labelsDisplayMode');
   var label = this.drawFactoryElement(
       [this.labels, this.hoverLabels, this.selectLabels],
       null,
