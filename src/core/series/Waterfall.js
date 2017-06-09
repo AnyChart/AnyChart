@@ -64,7 +64,7 @@ anychart.core.series.Waterfall.prototype.initPostProcessingMeta = function() {
   return {
     prevValue: 0,
     hadNonMissing: false,
-    modeAbsolute: /** @type {string} */ (this.chart.getOption('dataMode')) == anychart.enums.WaterfallDataMode.ABSOLUTE
+    modeAbsolute: /** @type {string} */ (/** @type {anychart.charts.Waterfall} */ (this.chart).getOption('dataMode')) == anychart.enums.WaterfallDataMode.ABSOLUTE
   };
 };
 
