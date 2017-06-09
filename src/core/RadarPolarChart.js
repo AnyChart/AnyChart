@@ -54,7 +54,7 @@ anychart.core.RadarPolarChart.prototype.SUPPORTED_CONSISTENCY_STATES =
  * Properties that should be defined in series.Base prototype.
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.core.RadarPolarChart.prototype.PROPERTY_DESCRIPTORS = (function() {
+anychart.core.RadarPolarChart.PROPERTY_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
   function startAngleNormalizer(opt_value) {
@@ -70,7 +70,7 @@ anychart.core.RadarPolarChart.prototype.PROPERTY_DESCRIPTORS = (function() {
 
   return map;
 })();
-anychart.core.settings.populate(anychart.core.RadarPolarChart, anychart.core.RadarPolarChart.prototype.PROPERTY_DESCRIPTORS);
+anychart.core.settings.populate(anychart.core.RadarPolarChart, anychart.core.RadarPolarChart.PROPERTY_DESCRIPTORS);
 
 
 /**
@@ -582,7 +582,7 @@ anychart.core.RadarPolarChart.prototype.serialize = function() {
 anychart.core.RadarPolarChart.prototype.setupByJSONWithScales = function(config, scalesInstances, opt_default) {
   anychart.core.RadarPolarChart.base(this, 'setupByJSONWithScales', config, scalesInstances, opt_default);
 
-  anychart.core.settings.deserialize(this, anychart.core.RadarPolarChart.prototype.PROPERTY_DESCRIPTORS, config);
+  anychart.core.settings.deserialize(this, anychart.core.RadarPolarChart.PROPERTY_DESCRIPTORS, config);
   this.innerRadius(config['innerRadius']);
   this.defaultGridSettings(config['defaultGridSettings']);
   this.defaultMinorGridSettings(config['defaultMinorGridSettings']);
@@ -607,7 +607,7 @@ anychart.core.RadarPolarChart.prototype.serializeWithScales = function(json, sca
   anychart.core.RadarPolarChart.base(this, 'serializeWithScales', json, scales, scaleIds);
 
   var axesIds = [];
-  anychart.core.settings.serialize(this, anychart.core.RadarPolarChart.prototype.PROPERTY_DESCRIPTORS, json);
+  anychart.core.settings.serialize(this, anychart.core.RadarPolarChart.PROPERTY_DESCRIPTORS, json);
   json['innerRadius'] = this.innerRadius();
 
   json['xAxis'] = this.serializeAxis_(/** @type {anychart.core.axes.Radar|anychart.core.axes.Polar} */(this.xAxis()), scales, scaleIds, axesIds);

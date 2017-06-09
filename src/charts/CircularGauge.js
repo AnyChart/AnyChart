@@ -717,7 +717,7 @@ anychart.charts.CircularGauge.prototype.getAxis = function(index) {
  * Properties that should be defined in series.Base prototype.
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.charts.CircularGauge.prototype.PROPERTY_DESCRIPTORS = (function() {
+anychart.charts.CircularGauge.PROPERTY_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
   anychart.core.settings.createDescriptor(
@@ -776,7 +776,7 @@ anychart.charts.CircularGauge.prototype.PROPERTY_DESCRIPTORS = (function() {
 
   return map;
 })();
-anychart.core.settings.populate(anychart.charts.CircularGauge, anychart.charts.CircularGauge.prototype.PROPERTY_DESCRIPTORS);
+anychart.core.settings.populate(anychart.charts.CircularGauge, anychart.charts.CircularGauge.PROPERTY_DESCRIPTORS);
 
 
 /**
@@ -1207,7 +1207,7 @@ anychart.charts.CircularGauge.prototype.setupByJSON = function(config, opt_defau
   if ('defaultRangeSettings' in config)
     this.defaultRangeSettings(config['defaultRangeSettings']);
 
-  anychart.core.settings.deserialize(this, anychart.charts.CircularGauge.prototype.PROPERTY_DESCRIPTORS, config);
+  anychart.core.settings.deserialize(this, anychart.charts.CircularGauge.PROPERTY_DESCRIPTORS, config);
 
   this.data(config['data']);
   if (goog.isDef(config['cap']))
@@ -1271,7 +1271,7 @@ anychart.charts.CircularGauge.prototype.serialize = function() {
 
   json['type'] = anychart.enums.GaugeTypes.CIRCULAR;
 
-  anychart.core.settings.serialize(this, anychart.charts.CircularGauge.prototype.PROPERTY_DESCRIPTORS, json);
+  anychart.core.settings.serialize(this, anychart.charts.CircularGauge.PROPERTY_DESCRIPTORS, json);
   json['data'] = this.data().serialize();
   if (this.cap_)
     json['cap'] = this.cap().serialize();

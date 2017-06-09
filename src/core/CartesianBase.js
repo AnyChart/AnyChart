@@ -46,7 +46,7 @@ goog.inherits(anychart.core.CartesianBase, anychart.core.ChartWithAxes);
  * Properties that should be defined in series.Base prototype.
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.core.CartesianBase.prototype.PROPERTY_DESCRIPTORS = (function() {
+anychart.core.CartesianBase.PROPERTY_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
 
@@ -92,6 +92,7 @@ anychart.core.CartesianBase.prototype.PROPERTY_DESCRIPTORS = (function() {
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
   return map;
 })();
+anychart.core.settings.populate(anychart.core.CartesianBase, anychart.core.CartesianBase.PROPERTY_DESCRIPTORS);
 
 
 //endregion
@@ -423,11 +424,19 @@ anychart.core.CartesianBase.prototype.setupByJSONWithScales = function(config, s
 };
 
 
+/** @inheritDoc */
+anychart.core.CartesianBase.prototype.setupByJSON = function(config, opt_default) {
+  anychart.core.CartesianBase.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.settings.deserialize(this, anychart.core.CartesianBase.PROPERTY_DESCRIPTORS, config);
+};
+
+
 /**
  * @inheritDoc
  */
 anychart.core.CartesianBase.prototype.serialize = function() {
   var json = anychart.core.CartesianBase.base(this, 'serialize');
+  anychart.core.settings.serialize(this, anychart.core.CartesianBase.PROPERTY_DESCRIPTORS, json);
   json['type'] = this.getType();
   json['barGroupsPadding'] = this.barGroupsPadding();
   json['barsPadding'] = this.barsPadding();

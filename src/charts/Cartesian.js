@@ -338,8 +338,6 @@ anychart.charts.Cartesian.prototype.seriesConfig = (function() {
 anychart.core.ChartWithSeries.generateSeriesConstructors(anychart.charts.Cartesian, anychart.charts.Cartesian.prototype.seriesConfig);
 
 
-anychart.core.settings.populate(anychart.charts.Cartesian, anychart.core.CartesianBase.prototype.PROPERTY_DESCRIPTORS);
-
 /**
  * Returns a chart instance with initial settings (no axes, grids, titles, legend and so on).<br/>
  * <b>Note:</b> To get a chart with initial settings use:

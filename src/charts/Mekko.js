@@ -405,7 +405,7 @@ anychart.charts.Mekko.prototype.calculateCategoriesScales = function() {
  * Properties that should be defined in series.Base prototype.
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.charts.Mekko.prototype.PROPERTY_DESCRIPTORS = (function() {
+anychart.charts.Mekko.PROPERTY_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
   anychart.core.settings.createDescriptor(
@@ -418,7 +418,7 @@ anychart.charts.Mekko.prototype.PROPERTY_DESCRIPTORS = (function() {
 
   return map;
 })();
-anychart.core.settings.populate(anychart.charts.Mekko, anychart.charts.Mekko.prototype.PROPERTY_DESCRIPTORS);
+anychart.core.settings.populate(anychart.charts.Mekko, anychart.charts.Mekko.PROPERTY_DESCRIPTORS);
 
 
 /** @inheritDoc */
@@ -450,7 +450,7 @@ anychart.charts.Mekko.prototype.defaultScalesLastIndex = function() {
 anychart.charts.Mekko.prototype.serialize = function() {
   var json = anychart.charts.Mekko.base(this, 'serialize');
   json['type'] = this.getType();
-  anychart.core.settings.serialize(this, anychart.charts.Mekko.prototype.PROPERTY_DESCRIPTORS, json);
+  anychart.core.settings.serialize(this, anychart.charts.Mekko.PROPERTY_DESCRIPTORS, json);
   return {'chart': json};
 };
 
@@ -479,7 +479,7 @@ anychart.charts.Mekko.prototype.serializeAxis = function(item, scales, scaleIds,
 anychart.charts.Mekko.prototype.setupByJSON = function(config, opt_default) {
   anychart.charts.Mekko.base(this, 'setupByJSON', config, opt_default);
 
-  anychart.core.settings.deserialize(this, anychart.charts.Mekko.prototype.PROPERTY_DESCRIPTORS, config);
+  anychart.core.settings.deserialize(this, anychart.charts.Mekko.PROPERTY_DESCRIPTORS, config);
 };
 
 

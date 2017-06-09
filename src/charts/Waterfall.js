@@ -259,7 +259,7 @@ anychart.charts.Waterfall.prototype.createSeriesInstance = function(type, config
  * Properties that should be defined in series.Base prototype.
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.charts.Waterfall.prototype.PROPERTY_DESCRIPTORS = (function() {
+anychart.charts.Waterfall.PROPERTY_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
   anychart.core.settings.createDescriptor(
@@ -280,7 +280,7 @@ anychart.charts.Waterfall.prototype.PROPERTY_DESCRIPTORS = (function() {
 
   return map;
 })();
-anychart.core.settings.populate(anychart.charts.Waterfall, anychart.charts.Waterfall.prototype.PROPERTY_DESCRIPTORS);
+anychart.core.settings.populate(anychart.charts.Waterfall, anychart.charts.Waterfall.PROPERTY_DESCRIPTORS);
 
 
 //endregion
@@ -443,7 +443,7 @@ anychart.charts.Waterfall.prototype.legendItemClick = function(item, event) {
 /** @inheritDoc */
 anychart.charts.Waterfall.prototype.serialize = function() {
   var json = anychart.charts.Waterfall.base(this, 'serialize');
-  anychart.core.settings.serialize(this, anychart.charts.Waterfall.prototype.PROPERTY_DESCRIPTORS, json['chart']);
+  anychart.core.settings.serialize(this, anychart.charts.Waterfall.PROPERTY_DESCRIPTORS, json['chart']);
   return json;
 };
 
@@ -451,7 +451,7 @@ anychart.charts.Waterfall.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.charts.Waterfall.prototype.setupByJSON = function(config, opt_default) {
   anychart.charts.Waterfall.base(this, 'setupByJSON', config, opt_default);
-  anychart.core.settings.deserialize(this, anychart.charts.Waterfall.prototype.PROPERTY_DESCRIPTORS, config);
+  anychart.core.settings.deserialize(this, anychart.charts.Waterfall.PROPERTY_DESCRIPTORS, config);
 };
 
 

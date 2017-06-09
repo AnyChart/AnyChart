@@ -46,9 +46,6 @@ anychart.charts.Cartesian3d = function() {
 goog.inherits(anychart.charts.Cartesian3d, anychart.core.CartesianBase);
 
 
-anychart.core.settings.populate(anychart.charts.Cartesian3d, anychart.core.CartesianBase.prototype.PROPERTY_DESCRIPTORS);
-
-
 /**
  * Dispatchs browser mouse events form series.
  * @param {anychart.core.MouseEvent} event Event object.
@@ -677,7 +674,6 @@ anychart.charts.Cartesian3d.prototype.makeBrowserEvent = function(e) {
  */
 anychart.charts.Cartesian3d.prototype.setupByJSON = function(config, opt_default) {
   anychart.charts.Cartesian3d.base(this, 'setupByJSON', config, opt_default);
-  anychart.core.settings.deserialize(this, anychart.core.CartesianBase.prototype.PROPERTY_DESCRIPTORS, config);
 };
 
 
@@ -688,7 +684,6 @@ anychart.charts.Cartesian3d.prototype.setupByJSON = function(config, opt_default
 anychart.charts.Cartesian3d.prototype.serialize = function() {
   var json = anychart.charts.Cartesian3d.base(this, 'serialize');
   var chart = json['chart'];
-  anychart.core.settings.serialize(this, anychart.core.CartesianBase.prototype.PROPERTY_DESCRIPTORS, json);
   return json;
 };
 
