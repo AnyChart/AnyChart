@@ -408,8 +408,6 @@ anychart.core.CartesianBase.prototype.drawElements = function() {
 anychart.core.CartesianBase.prototype.setupByJSONWithScales = function(config, scalesInstances, opt_default) {
   anychart.core.CartesianBase.base(this, 'setupByJSONWithScales', config, scalesInstances, opt_default);
 
-  this.barGroupsPadding(config['barGroupsPadding']);
-  this.barsPadding(config['barsPadding']);
   this.xScroller(config['xScroller']);
 
   var xZoom = config['xZoom'];
@@ -438,8 +436,6 @@ anychart.core.CartesianBase.prototype.serialize = function() {
   var json = anychart.core.CartesianBase.base(this, 'serialize');
   anychart.core.settings.serialize(this, anychart.core.CartesianBase.PROPERTY_DESCRIPTORS, json);
   json['type'] = this.getType();
-  json['barGroupsPadding'] = this.barGroupsPadding();
-  json['barsPadding'] = this.barsPadding();
   json['xScroller'] = this.xScroller().serialize();
   json['xZoom'] = this.xZoom().serialize();
   return {'chart': json};

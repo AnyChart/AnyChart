@@ -149,7 +149,7 @@ anychart.core.series.Radar.prototype.prepareAdditional = function() {
   var bounds = this.pixelBoundsCache;
   var chart = (/** @type {anychart.core.RadarPolarChart} */(this.chart));
   this.radius = Math.min(bounds.width, bounds.height) / 2;
-  this.innerRadius = anychart.utils.normalizeSize(/** @type {number|string} */(chart.innerRadius()), this.radius);
+  this.innerRadius = anychart.utils.normalizeSize(/** @type {number|string} */(chart.getOption('innerRadius')), this.radius);
   this.cx = Math.round(bounds.left + bounds.width / 2);
   this.cy = Math.round(bounds.top + bounds.height / 2);
   anychart.core.series.Radar.base(this, 'prepareAdditional');

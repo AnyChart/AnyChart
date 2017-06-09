@@ -372,8 +372,9 @@ anychart.chartTypesMap[anychart.enums.ChartTypes.CARTESIAN] = anychart.cartesian
   goog.exportSymbol('anychart.cartesian', anychart.cartesian);
   proto['xScale'] = proto.xScale;
   proto['yScale'] = proto.yScale;
-  proto['barsPadding'] = proto.barsPadding;
-  proto['barGroupsPadding'] = proto.barGroupsPadding;
+  // auto generated from ChartWithOrthogonalScales
+  // proto['barsPadding'] = proto.barsPadding;
+  // proto['barGroupsPadding'] = proto.barGroupsPadding;
   proto['crosshair'] = proto.crosshair;
   proto['maxBubbleSize'] = proto.maxBubbleSize;
   proto['minBubbleSize'] = proto.minBubbleSize;

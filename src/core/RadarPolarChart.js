@@ -68,32 +68,26 @@ anychart.core.RadarPolarChart.PROPERTY_DESCRIPTORS = (function() {
       anychart.ConsistencyState.BOUNDS,
       anychart.Signal.NEEDS_REDRAW);
 
+  function innerRadiusNormalizer(opt_value) {
+    return anychart.utils.normalizeNumberOrPercent(opt_value, this.getOption('innerRadius'));
+  }
+  function beforeInvalidation() {
+    for (var i = 0; i < this.seriesList.length; i++) {
+      this.seriesList[i].invalidate(anychart.ConsistencyState.SERIES_POINTS);
+    }
+  }
+  anychart.core.settings.createHookedDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG_HOOK,
+      'innerRadius',
+      innerRadiusNormalizer,
+      anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.SERIES_CHART_SERIES,
+      anychart.Signal.NEEDS_REDRAW,
+      beforeInvalidation);
+
   return map;
 })();
 anychart.core.settings.populate(anychart.core.RadarPolarChart, anychart.core.RadarPolarChart.PROPERTY_DESCRIPTORS);
-
-
-/**
- * Inner radius getter/setter. Can be in pixels or percent of main radius.
- * @param {(number|string)=} opt_value
- * @return {number|string|anychart.core.RadarPolarChart}
- */
-anychart.core.RadarPolarChart.prototype.innerRadius = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var value = anychart.utils.normalizeNumberOrPercent(opt_value, this.innerRadius_);
-    if (this.innerRadius_ != value) {
-      this.innerRadius_ = value;
-      for (var i = 0; i < this.seriesList.length; i++) {
-        this.seriesList[i].invalidate(anychart.ConsistencyState.SERIES_POINTS);
-      }
-      this.invalidate(
-          anychart.ConsistencyState.BOUNDS |
-          anychart.ConsistencyState.SERIES_CHART_SERIES, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.innerRadius_;
-};
 
 
 /** @inheritDoc */
@@ -399,6 +393,7 @@ anychart.core.RadarPolarChart.prototype.drawContent = function(bounds) {
     axisInvalidated = true;
   }
 
+  var innerRadius = /** @type {string|number} */ (this.getOption('innerRadius'));
   if (this.hasInvalidationState(anychart.ConsistencyState.AXES_CHART_GRIDS)) {
     var grids = goog.array.concat(this.grids_, this.minorGrids_);
 
@@ -410,7 +405,7 @@ anychart.core.RadarPolarChart.prototype.drawContent = function(bounds) {
           grid.invalidate(anychart.ConsistencyState.GRIDS_POSITION);
         }
         grid.parentBounds(this.dataBounds);
-        grid.innerRadius(this.innerRadius_);
+        grid.innerRadius(innerRadius);
         grid.container(this.rootElement);
         grid.startAngle(startAngle);
         grid.draw();
@@ -433,7 +428,7 @@ anychart.core.RadarPolarChart.prototype.drawContent = function(bounds) {
     axis = this.yAxis();
     axis.container(this.rootElement);
     axis.startAngle(startAngle);
-    axis.innerRadius(this.innerRadius_);
+    axis.innerRadius(innerRadius);
     axis.parentBounds(this.dataBounds.clone());
     axis.draw();
 
@@ -583,7 +578,6 @@ anychart.core.RadarPolarChart.prototype.setupByJSONWithScales = function(config,
   anychart.core.RadarPolarChart.base(this, 'setupByJSONWithScales', config, scalesInstances, opt_default);
 
   anychart.core.settings.deserialize(this, anychart.core.RadarPolarChart.PROPERTY_DESCRIPTORS, config);
-  this.innerRadius(config['innerRadius']);
   this.defaultGridSettings(config['defaultGridSettings']);
   this.defaultMinorGridSettings(config['defaultMinorGridSettings']);
 
@@ -608,7 +602,6 @@ anychart.core.RadarPolarChart.prototype.serializeWithScales = function(json, sca
 
   var axesIds = [];
   anychart.core.settings.serialize(this, anychart.core.RadarPolarChart.PROPERTY_DESCRIPTORS, json);
-  json['innerRadius'] = this.innerRadius();
 
   json['xAxis'] = this.serializeAxis_(/** @type {anychart.core.axes.Radar|anychart.core.axes.Polar} */(this.xAxis()), scales, scaleIds, axesIds);
   json['yAxis'] = this.serializeAxis_(/** @type {anychart.core.axes.Radial} */(this.yAxis()), scales, scaleIds, axesIds);
@@ -689,11 +682,11 @@ anychart.core.RadarPolarChart.prototype.serializeGrid_ = function(item, scales, 
   // proto['area'] = proto.area;//doc|ex
   // proto['line'] = proto.line;//doc|ex
   // proto['marker'] = proto.marker;//doc|ex
-  //proto['startAngle'] = proto.startAngle;//doc|ex
+  // proto['startAngle'] = proto.startAngle;//doc|ex
+  // proto['innerRadius'] = proto.innerRadius;
   proto['palette'] = proto.palette;//doc|ex
   proto['markerPalette'] = proto.markerPalette;//doc|ex
   proto['hatchFillPalette'] = proto.hatchFillPalette;
-  proto['innerRadius'] = proto.innerRadius;
   proto['defaultSeriesType'] = proto.defaultSeriesType;
   proto['addSeries'] = proto.addSeries;
   proto['getSeriesAt'] = proto.getSeriesAt;

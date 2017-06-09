@@ -51,17 +51,8 @@ anychart.core.ChartWithOrthogonalScales = function(categorizeData) {
    */
   this.hasStackedSeries = false;
 
-  /**
-   * @type {number}
-   * @private
-   */
-  this.barGroupsPadding_ = 0;
-
-  /**
-   * @type {number}
-   * @private
-   */
-  this.barsPadding_ = 0;
+  this.setOption('barGroupsPadding', 0);
+  this.setOption('barsPadding', 0);
 
   /**
    * Y scales hash map by uid.
@@ -121,41 +112,36 @@ anychart.core.ChartWithOrthogonalScales.prototype.SUPPORTED_CONSISTENCY_STATES =
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter/setter for barGroupsPadding.
- * @param {number=} opt_value .
- * @return {number|anychart.core.ChartWithOrthogonalScales} .
+ * Properties that should be defined in series.Base prototype.
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.core.ChartWithOrthogonalScales.prototype.barGroupsPadding = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.barGroupsPadding_ != +opt_value) {
-      this.barGroupsPadding_ = +opt_value;
-      this.invalidateWidthBasedSeries();
-      this.invalidate(anychart.ConsistencyState.SERIES_CHART_SERIES | anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
+anychart.core.ChartWithOrthogonalScales.PROPERTY_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+  function beforeInvalidation() {
+    this.invalidateWidthBasedSeries();
   }
-  return this.barGroupsPadding_;
-};
+  anychart.core.settings.createHookedDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG_HOOK,
+      'barGroupsPadding',
+      anychart.utils.toNumber,
+      anychart.ConsistencyState.SERIES_CHART_SERIES | anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED,
+      beforeInvalidation);
 
+  anychart.core.settings.createHookedDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG_HOOK,
+      'barsPadding',
+      anychart.utils.toNumber,
+      anychart.ConsistencyState.SERIES_CHART_SERIES | anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED,
+      beforeInvalidation);
 
-/**
- * Getter/setter for barsPadding.
- * @param {number=} opt_value .
- * @return {number|anychart.core.ChartWithOrthogonalScales} .
- */
-anychart.core.ChartWithOrthogonalScales.prototype.barsPadding = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.barsPadding_ != +opt_value) {
-      this.barsPadding_ = +opt_value;
-      this.invalidateWidthBasedSeries();
-      this.invalidate(anychart.ConsistencyState.SERIES_CHART_SERIES | anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.barsPadding_;
-};
+  return map;
+})();
+anychart.core.settings.populate(anychart.core.ChartWithOrthogonalScales, anychart.core.ChartWithOrthogonalScales.PROPERTY_DESCRIPTORS);
 
 
 //endregion
@@ -1631,10 +1617,12 @@ anychart.core.ChartWithOrthogonalScales.prototype.distributeClusters = function(
   var currPosition;
   var barWidthRatio;
 
+  var barsPadding = /** @type {number} */ (this.getOption('barsPadding'));
+  var barGroupsPadding = /** @type {number} */ (this.getOption('barGroupsPadding'));
   if (numClusters > 0) {
-    numClusters = numClusters + (numClusters - 1) * this.barsPadding_ + this.barGroupsPadding_;
+    numClusters = numClusters + (numClusters - 1) * barsPadding + barGroupsPadding;
     barWidthRatio = 1 / numClusters;
-    currPosition = barWidthRatio * this.barGroupsPadding_ / 2;
+    currPosition = barWidthRatio * barGroupsPadding / 2;
     seenScales = {};
     for (var i = 0; i < drawingPlansOfScale.length; i++) {
       wSeries = drawingPlansOfScale[i].series;
@@ -1643,7 +1631,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.distributeClusters = function(
         if (this.getYScaleStackMode(scale) == anychart.enums.ScaleStackMode.NONE) {
           wSeries.setAutoXPointPosition(currPosition + barWidthRatio / 2);
           wSeries.setAutoPointWidth(barWidthRatio);
-          currPosition += barWidthRatio * (1 + this.barsPadding_);
+          currPosition += barWidthRatio * (1 + barsPadding);
         } else {
           id = goog.getUid(scale);
           if (id in seenScales) {
@@ -1653,7 +1641,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.distributeClusters = function(
             wSeries.setAutoXPointPosition(currPosition + barWidthRatio / 2);
             wSeries.setAutoPointWidth(barWidthRatio);
             seenScales[id] = currPosition;
-            currPosition += barWidthRatio * (1 + this.barsPadding_);
+            currPosition += barWidthRatio * (1 + barsPadding);
           }
         }
       }
@@ -2090,6 +2078,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.selectByRect = function(marque
  */
 anychart.core.ChartWithOrthogonalScales.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.ChartWithOrthogonalScales.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.settings.deserialize(this, anychart.core.ChartWithOrthogonalScales.PROPERTY_DESCRIPTORS, config);
 
   var type = this.getType();
   var i, json, scale;
@@ -2163,6 +2152,8 @@ anychart.core.ChartWithOrthogonalScales.prototype.serialize = function() {
   var json = anychart.core.ChartWithOrthogonalScales.base(this, 'serialize');
   var scaleIds = {};
   var scales = [];
+
+  anychart.core.settings.serialize(this, anychart.core.ChartWithOrthogonalScales.PROPERTY_DESCRIPTORS, json);
 
   this.serializeScale(json, 'xScale', /** @type {anychart.scales.Base} */(this.xScale()), scales, scaleIds);
   this.serializeScale(json, 'yScale', /** @type {anychart.scales.Base} */(this.yScale()), scales, scaleIds);

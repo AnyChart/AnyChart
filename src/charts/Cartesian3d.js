@@ -565,10 +565,12 @@ anychart.charts.Cartesian3d.prototype.getContentAreaBounds = function(bounds) {
         var barWidthRatio;
         var barWidthRatioOfTotalWidth;
 
+        var barsPadding = /** @type {number} */ (this.getOption('barsPadding'));
+        var barGroupsPadding = /** @type {number} */ (this.getOption('barGroupsPadding'));
         if (series.planIsStacked() || zDistribution) {
-          barWidthRatio = 1 / (1 + /** @type {number} */(this.barGroupsPadding()));
+          barWidthRatio = 1 / (1 + barGroupsPadding);
         } else {
-          barWidthRatio = 1 / (seriesCount + (seriesCount - 1) * this.barsPadding() + this.barGroupsPadding());
+          barWidthRatio = 1 / (seriesCount + (seriesCount - 1) * barsPadding + barGroupsPadding);
         }
 
         barWidthRatioOfTotalWidth = catWidthRatio * barWidthRatio;
@@ -640,7 +642,7 @@ anychart.charts.Cartesian3d.prototype.distributeClusters = function(numClusters,
 
   if (!this.hasStackedSeries && /** @type {boolean} */ (this.getOption('zDistribution'))) {
     if (numClusters > 0) {
-      numClusters = 1 + /** @type {number} */(this.barGroupsPadding());
+      numClusters = 1 + /** @type {number} */(this.getOption('barGroupsPadding'));
       var barWidthRatio = 1 / numClusters;
       for (var i = 0; i < drawingPlansOfScale.length; i++) {
         wSeries = drawingPlansOfScale[i].series;
@@ -695,8 +697,9 @@ anychart.charts.Cartesian3d.prototype.serialize = function() {
   goog.exportSymbol('anychart.cartesian3d', anychart.cartesian3d);
   proto['xScale'] = proto.xScale;
   proto['yScale'] = proto.yScale;
-  proto['barsPadding'] = proto.barsPadding;
-  proto['barGroupsPadding'] = proto.barGroupsPadding;
+  // auto generated from ChartWithOrthogonalScales
+  // proto['barsPadding'] = proto.barsPadding;
+  // proto['barGroupsPadding'] = proto.barGroupsPadding;
   proto['crosshair'] = proto.crosshair;
   proto['grid'] = proto.grid;
   proto['minorGrid'] = proto.minorGrid;

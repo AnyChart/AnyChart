@@ -37,7 +37,7 @@ goog.require('goog.math');
  *    normalizer: Function,
  *    consistency: (anychart.ConsistencyState|number),
  *    signal: (anychart.Signal|number),
- *    beforeInvalidateHook: Function
+ *    beforeInvalidationHook: Function
  * }}
  */
 anychart.core.settings.PropertyDescriptor;
@@ -84,17 +84,17 @@ anychart.core.settings.createDescriptor = function(map, handler, propName, norma
  * @param {Function} normalizer - Normalizer function.
  * @param {number} consistency - Consistency to set.
  * @param {number} signal - Signal.
- * @param {Function} beforeInvalidateHook
+ * @param {Function} beforeInvalidationHook
  * @param {number=} opt_check - Check function.
  * @param {string=} opt_methodName - Deprecated prop name.
  */
-anychart.core.settings.createHookedDescriptor = function(map, handler, propName, normalizer, consistency, signal, beforeInvalidateHook, opt_check, opt_methodName) {
+anychart.core.settings.createHookedDescriptor = function(map, handler, propName, normalizer, consistency, signal, beforeInvalidationHook, opt_check, opt_methodName) {
   anychart.core.settings.createDescriptor(map, handler, propName, normalizer, consistency, signal, opt_check, opt_methodName);
   var methodName = propName;
   if (goog.isDef(opt_methodName)) {
     methodName = opt_methodName;
   }
-  map[methodName].beforeInvalidateHook = beforeInvalidateHook;
+  map[methodName].beforeInvalidationHook = beforeInvalidationHook;
 };
 
 
@@ -314,7 +314,7 @@ anychart.core.settings.populate = function(classConstructor, descriptors) {
         descriptor.capabilityCheck,
         descriptor.consistency,
         descriptor.signal,
-        descriptor.beforeInvalidateHook);
+        descriptor.beforeInvalidationHook);
   }
 };
 
@@ -517,18 +517,18 @@ anychart.core.settings.multiArgsDeprecatedHandler = function(fieldName, deprecat
  * @param {number} supportCheck - set to anychart.core.series.Capabilities.ANY to invalidate in any case.
  * @param {anychart.ConsistencyState|number} consistencyState
  * @param {anychart.Signal|number} signal
- * @param {Function} beforeInvalidateHook
+ * @param {Function} beforeInvalidationHook
  * @param {*=} opt_value
  * @return {*|anychart.core.settings.IObjectWithSettings}
  * @this {anychart.core.settings.IObjectWithSettings}
  */
-anychart.core.settings.singleArgHookHandler = function(fieldName, deprecatedFieldName, normalizer, supportCheck, consistencyState, signal, beforeInvalidateHook, opt_value) {
+anychart.core.settings.singleArgHookHandler = function(fieldName, deprecatedFieldName, normalizer, supportCheck, consistencyState, signal, beforeInvalidationHook, opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = normalizer(opt_value);
+    opt_value = normalizer.call(this, opt_value);
     if (this.getOwnOption(fieldName) !== opt_value) {
       this.setOption(fieldName, opt_value);
       if (this.check(supportCheck)) {
-        beforeInvalidateHook.call(this);
+        beforeInvalidationHook.call(this);
         if (consistencyState) {
           this.invalidate(consistencyState, signal);
         } else {

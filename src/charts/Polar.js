@@ -229,8 +229,6 @@ anychart.charts.Polar.prototype.createSeriesInstance = function(type, config) {
 anychart.charts.Polar.prototype.setupByJSONWithScales = function(config, scalesInstances, opt_default) {
   anychart.charts.Polar.base(this, 'setupByJSONWithScales', config, scalesInstances, opt_default);
   this.sortPointsByX(config['sortPointsByX']);
-  this.barGroupsPadding(config['barGroupsPadding']);
-  this.barsPadding(config['barsPadding']);
 };
 
 
@@ -238,8 +236,6 @@ anychart.charts.Polar.prototype.setupByJSONWithScales = function(config, scalesI
 anychart.charts.Polar.prototype.serializeWithScales = function(json, scales, scaleIds) {
   anychart.charts.Polar.base(this, 'serializeWithScales', json, scales, scaleIds);
   json['sortPointsByX'] = this.sortPointsByX();
-  json['barGroupsPadding'] = this.barGroupsPadding();
-  json['barsPadding'] = this.barsPadding();
 };
 
 
@@ -255,7 +251,8 @@ anychart.charts.Polar.prototype.serializeWithScales = function(json, scales, sca
   var proto = anychart.charts.Polar.prototype;
   proto['getType'] = proto.getType;
   proto['sortPointsByX'] = proto.sortPointsByX;
-  proto['barsPadding'] = proto.barsPadding;
-  proto['barGroupsPadding'] = proto.barGroupsPadding;
+  // auto generated from ChartWithOrthogonalScales
+  // proto['barsPadding'] = proto.barsPadding;
+  // proto['barGroupsPadding'] = proto.barGroupsPadding;
 })();
 //endregion

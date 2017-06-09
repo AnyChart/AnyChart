@@ -470,7 +470,7 @@ anychart.charts.HeatMap.prototype.legendItemOut = function(item, event) {
 anychart.charts.HeatMap.PROPERTY_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  function beforeInvalidate() {
+  function beforeInvalidation() {
     this.series_.invalidate(anychart.ConsistencyState.SERIES_LABELS);
   }
   anychart.core.settings.createHookedDescriptor(
@@ -480,7 +480,7 @@ anychart.charts.HeatMap.PROPERTY_DESCRIPTORS = (function() {
       anychart.enums.normalizeLabelsDisplayMode,
       anychart.ConsistencyState.BOUNDS,
       anychart.Signal.NEEDS_REDRAW,
-      beforeInvalidate);
+      beforeInvalidation);
   return map;
 })();
 anychart.core.settings.populate(anychart.charts.HeatMap, anychart.charts.HeatMap.PROPERTY_DESCRIPTORS);
