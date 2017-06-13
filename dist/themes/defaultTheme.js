@@ -4296,7 +4296,7 @@
             zoomMarqueeFill: "#d3d3d3 0.4",
             zoomMarqueeStroke: "#d3d3d3",
             interactivity: {
-                zoomOnMouseWheel: !0,
+                zoomOnMouseWheel: !1,
                 scrollOnMouseWheel: !0
             }
         },
