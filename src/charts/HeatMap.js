@@ -464,7 +464,6 @@ anychart.charts.HeatMap.prototype.legendItemOut = function(item, event) {
 
 
 /**
- * Properties that should be defined in series.Base prototype.
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
 anychart.charts.HeatMap.PROPERTY_DESCRIPTORS = (function() {

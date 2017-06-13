@@ -402,7 +402,6 @@ anychart.charts.Mekko.prototype.calculateCategoriesScales = function() {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Properties that should be defined in series.Base prototype.
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
 anychart.charts.Mekko.PROPERTY_DESCRIPTORS = (function() {

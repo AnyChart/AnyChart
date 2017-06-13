@@ -51,7 +51,6 @@ anychart.core.RadarPolarChart.prototype.SUPPORTED_CONSISTENCY_STATES =
 //
 //------------------------------------------------------------------------------
 /**
- * Properties that should be defined in series.Base prototype.
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
 anychart.core.RadarPolarChart.PROPERTY_DESCRIPTORS = (function() {

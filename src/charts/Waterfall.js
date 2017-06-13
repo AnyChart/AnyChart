@@ -256,7 +256,6 @@ anychart.charts.Waterfall.prototype.createSeriesInstance = function(type, config
 //endregion
 //region --- api/descriptors
 /**
- * Properties that should be defined in series.Base prototype.
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
 anychart.charts.Waterfall.PROPERTY_DESCRIPTORS = (function() {

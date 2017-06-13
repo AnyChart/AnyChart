@@ -43,7 +43,6 @@ goog.inherits(anychart.core.CartesianBase, anychart.core.ChartWithAxes);
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Properties that should be defined in series.Base prototype.
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
 anychart.core.CartesianBase.PROPERTY_DESCRIPTORS = (function() {

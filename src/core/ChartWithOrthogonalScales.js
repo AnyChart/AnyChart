@@ -112,7 +112,6 @@ anychart.core.ChartWithOrthogonalScales.prototype.SUPPORTED_CONSISTENCY_STATES =
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Properties that should be defined in series.Base prototype.
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
 anychart.core.ChartWithOrthogonalScales.PROPERTY_DESCRIPTORS = (function() {

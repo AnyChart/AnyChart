@@ -714,7 +714,6 @@ anychart.charts.CircularGauge.prototype.getAxis = function(index) {
 
 
 /**
- * Properties that should be defined in series.Base prototype.
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
 anychart.charts.CircularGauge.PROPERTY_DESCRIPTORS = (function() {
