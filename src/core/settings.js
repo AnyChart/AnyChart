@@ -473,7 +473,7 @@ anychart.core.settings.multiArgsHandler = function(fieldName, deprecatedFieldNam
     // Copying using loop to avoid deop due to passing arguments object to
     // function. This is faster in many JS engines as of late 2014.
     var args = [];
-    for (var i = 6; i < arguments.length; i++) {
+    for (var i = 7; i < arguments.length; i++) {
       args.push(arguments[i]);
     }
     opt_value = arrayNormalizer(args);
