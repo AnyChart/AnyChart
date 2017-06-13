@@ -79,6 +79,7 @@ anychart.core.drawers.HeatMap.prototype.updatePointInternal = function(point, st
  * @private
  */
 anychart.core.drawers.HeatMap.prototype.drawPoint_ = function(point, state, shapes) {
+  if (!shapes) return;
   var prefix;
   if (state == anychart.PointState.NORMAL) {
     prefix = 'normal';

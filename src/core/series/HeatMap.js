@@ -347,6 +347,7 @@ anychart.core.series.HeatMap.prototype.drawLabel = function(point, pointState, p
     } else {
       prefix = 'select';
     }
+
     var x = /** @type {number} */(point.meta(prefix + 'X'));
     var y = /** @type {number} */(point.meta(prefix + 'Y'));
     var width = /** @type {number} */(point.meta(prefix + 'Width'));
@@ -367,12 +368,19 @@ anychart.core.series.HeatMap.prototype.drawLabel = function(point, pointState, p
         label = null;
       }
     }
+
     if (label) {
-      label['clip'](displayMode == anychart.enums.LabelsDisplayMode.ALWAYS_SHOW ? this.pixelBoundsCache : cellBounds);
-      // label['width'](cellBounds.width);
-      // label['height'](cellBounds.height);
-      if (pointStateChanged)
-        label.draw();
+      var clipBounds = displayMode == anychart.enums.LabelsDisplayMode.ALWAYS_SHOW ?
+          this.pixelBoundsCache :
+          goog.math.Rect.intersection(this.pixelBoundsCache, /** @type {goog.math.Rect} */ (cellBounds));
+      if (clipBounds) {
+        label['clip'](clipBounds);
+
+        if (pointStateChanged)
+          label.draw();
+      } else {
+        this.labels().clear(label.getIndex());
+      }
     }
   }
   point.meta('label', label);

@@ -4901,7 +4901,7 @@ goog.provide('anychart.themes.defaultTheme');
       'zoomMarqueeFill': '#d3d3d3 0.4',
       'zoomMarqueeStroke': '#d3d3d3',
       'interactivity': {
-        'zoomOnMouseWheel': true,
+        'zoomOnMouseWheel': false,
         'scrollOnMouseWheel': true
       }
     },
