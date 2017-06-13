@@ -110,6 +110,40 @@ anychart.charts.LinearGauge.PointersTypesMap[anychart.enums.LinearGaugePointerTy
 anychart.charts.LinearGauge.ZINDEX_INCREMENT_MULTIPLIER = 0.00001;
 
 
+/**
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.charts.LinearGauge.PROPERTY_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'globalOffset',
+      anychart.utils.normalizeToPercent,
+      anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'layout',
+      anychart.enums.normalizeLayout,
+      anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'defaultPointerType',
+      anychart.enums.normalizeLinearGaugePointerType,
+      0,
+      0);
+  return map;
+})();
+anychart.core.settings.populate(anychart.charts.LinearGauge, anychart.charts.LinearGauge.PROPERTY_DESCRIPTORS);
+
+
 //endregion
 //region --- DEFAULT SETTINGS ---
 /**
@@ -123,21 +157,6 @@ anychart.charts.LinearGauge.prototype.defaultAxisSettings = function(opt_value) 
     return this;
   }
   return this.defaultAxisSettings_ || {};
-};
-
-
-/**
- * Getter/setter for linear gauge defaultPointerType.
- * @param {(string|anychart.enums.LinearGaugePointerType)=} opt_value Default pointer type.
- * @return {anychart.charts.LinearGauge|anychart.enums.LinearGaugePointerType} Default pointer type or self for chaining.
- */
-anychart.charts.LinearGauge.prototype.defaultPointerType = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeLinearGaugePointerType(opt_value);
-    this.defaultPointerType_ = opt_value;
-    return this;
-  }
-  return this.defaultPointerType_;
 };
 
 
@@ -171,42 +190,6 @@ anychart.charts.LinearGauge.prototype.defaultScaleBarSettings = function(opt_val
 
 //endregion
 //region --- OWN/INHERITED API ---
-
-
-/**
- * Getter/setter for global offset.
- * @param {(string|number)=} opt_value
- * @return {string|number|anychart.charts.LinearGauge} Global offset or self for chaining.
- */
-anychart.charts.LinearGauge.prototype.globalOffset = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = /** @type {number|string} */ (anychart.utils.normalizeToPercent(opt_value));
-    if (opt_value != this.globalOffset_) {
-      this.globalOffset_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.globalOffset_;
-};
-
-
-/**
- * Getter/setter for gauge layout.
- * @param {(string|anychart.enums.Layout)=} opt_value Layout of gauge.
- * @return {anychart.enums.Layout|anychart.charts.LinearGauge} Layout or self for chaining.
- */
-anychart.charts.LinearGauge.prototype.layout = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeLayout(opt_value);
-    if (opt_value != this.layout_) {
-      this.layout_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.layout_;
-};
 
 
 /**
@@ -340,7 +323,7 @@ anychart.charts.LinearGauge.prototype.hatchFillPaletteInvalidated_ = function(ev
  * @return {boolean} Is layout vertical or not.
  */
 anychart.charts.LinearGauge.prototype.isVertical = function() {
-  return this.layout_ == anychart.enums.Layout.VERTICAL;
+  return this.getOption('layout') == anychart.enums.Layout.VERTICAL;
 };
 
 
@@ -414,7 +397,7 @@ anychart.charts.LinearGauge.prototype.createPointerByType_ = function(type, data
 anychart.charts.LinearGauge.prototype.addPointer = function(var_args) {
   var rv = [];
 
-  var type = /** @type {string} */ (this.defaultPointerType());
+  var type = /** @type {string} */ (this.getOption('defaultPointerType'));
   var count = arguments.length;
   this.suspendSignalsDispatching();
   if (count) {
@@ -983,9 +966,10 @@ anychart.charts.LinearGauge.prototype.beforeDraw = function() {
     }
   }
 
+  var layout = /** @type {anychart.enums.Layout} */ (this.getOption('layout'));
   for (i = 0; i < this.pointers_.length; i++) {
     item = this.pointers_[i];
-    item.layout(/** @type {anychart.enums.Layout} */ (this.layout()));
+    item.layout(layout);
     if (!item.scale())
       item.scale(/** @type {anychart.scales.ScatterBase} */ (this.scale()));
     if (item instanceof anychart.core.linearGauge.pointers.Marker) {
@@ -998,7 +982,7 @@ anychart.charts.LinearGauge.prototype.beforeDraw = function() {
   for (i = 0; i < this.scaleBars_.length; i++) {
     item = this.scaleBars_[i];
     if (item) {
-      item.layout(/** @type {anychart.enums.Layout} */ (this.layout()));
+      item.layout(layout);
       if (!item.scale())
         item.scale(/** @type {anychart.scales.ScatterBase} */ (this.scale()));
     }
@@ -1093,10 +1077,10 @@ anychart.charts.LinearGauge.prototype.drawContent = function(bounds) {
 
     if (isVertical) {
       b1 = bounds.left + (bounds.width - fullBounds.width) / 2 - fullBounds.left;
-      globalOffset = anychart.utils.normalizeSize(/** @type {number|string} */ (this.globalOffset()), bounds.width);
+      globalOffset = anychart.utils.normalizeSize(/** @type {number|string} */ (this.getOption('globalOffset')), bounds.width);
     } else {
       b1 = bounds.top + (bounds.height - fullBounds.height) / 2 - fullBounds.top;
-      globalOffset = anychart.utils.normalizeSize(/** @type {number|string} */ (this.globalOffset()), bounds.height);
+      globalOffset = anychart.utils.normalizeSize(/** @type {number|string} */ (this.getOption('globalOffset')), bounds.height);
     }
     var finalOffset = b1 + globalOffset;
     var offsetLeft = isVertical ? finalOffset : 0;
@@ -1162,8 +1146,7 @@ anychart.charts.LinearGauge.prototype.serialize = function() {
   json['markerPalette'] = this.markerPalette().serialize();
   json['hatchFillPalette'] = this.hatchFillPalette().serialize();
 
-  json['globalOffset'] = this.globalOffset();
-  json['layout'] = this.layout();
+  anychart.core.settings.serialize(this, anychart.charts.LinearGauge.PROPERTY_DESCRIPTORS, json);
   json['data'] = this.data().serialize();
 
   var scalesIds = {};
@@ -1256,8 +1239,7 @@ anychart.charts.LinearGauge.prototype.setupByJSON = function(config, opt_default
   if ('defaultScaleBarSettings' in config)
     this.defaultScaleBarSettings(config['defaultScaleBarSettings']);
 
-  this.globalOffset(config['globalOffset']);
-  this.layout(config['layout']);
+  anychart.core.settings.deserialize(this, anychart.charts.LinearGauge.PROPERTY_DESCRIPTORS, config);
   this.data(config['data']);
 
   if ('palette' in config)
@@ -1325,7 +1307,7 @@ anychart.charts.LinearGauge.prototype.setupByJSON = function(config, opt_default
   if (goog.isArray(pointers)) {
     for (i = 0; i < pointers.length; i++) {
       json = pointers[i];
-      var pointerType = json['pointerType'] || this.defaultPointerType();
+      var pointerType = json['pointerType'] || this.getOption('defaultPointerType');
       var dataIndex = json['dataIndex'];
       var pointerInst = this.createPointerByType_(pointerType, dataIndex);
       if (pointerInst) {
@@ -1447,10 +1429,11 @@ anychart.charts.LinearGauge.prototype.thermometer = function(dataIndex) {
 (function() {
   var proto = anychart.charts.LinearGauge.prototype;
   proto['getType'] = proto.getType;
-  proto['defaultPointerType'] = proto.defaultPointerType;
+  // auto generated
+  // proto['defaultPointerType'] = proto.defaultPointerType;
+  // proto['globalOffset'] = proto.globalOffset;
+  // proto['layout'] = proto.layout;
 
-  proto['globalOffset'] = proto.globalOffset;
-  proto['layout'] = proto.layout;
   proto['palette'] = proto.palette;
   proto['markerPalette'] = proto.markerPalette;
   proto['hatchFillPalette'] = proto.hatchFillPalette;

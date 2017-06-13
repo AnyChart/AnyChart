@@ -19,7 +19,7 @@ goog.require('anychart.modules.base');
 anychart.gauges.linear = function(opt_data, opt_csvSettings) {
   var gauge = new anychart.charts.LinearGauge();
   gauge.data(opt_data, opt_csvSettings);
-  gauge.defaultPointerType(anychart.enums.LinearGaugePointerType.BAR);
+  gauge.setOption('defaultPointerType', anychart.enums.LinearGaugePointerType.BAR);
   gauge.setType(anychart.enums.GaugeTypes.LINEAR);
 
   gauge.setupInternal(true, anychart.getFullTheme('linearGauge'));
@@ -39,7 +39,7 @@ anychart.gaugeTypesMap[anychart.enums.GaugeTypes.LINEAR] = anychart.gauges.linea
 anychart.gauges.bullet = function(opt_data, opt_csvSettings) {
   var gauge = new anychart.charts.LinearGauge();
   gauge.data(opt_data, opt_csvSettings);
-  gauge.defaultPointerType(anychart.enums.LinearGaugePointerType.BAR);
+  gauge.setOption('defaultPointerType', anychart.enums.LinearGaugePointerType.BAR);
   gauge.setType(anychart.enums.GaugeTypes.BULLET);
 
   gauge.setupInternal(true, anychart.getFullTheme('bullet'));
@@ -59,7 +59,7 @@ anychart.gaugeTypesMap[anychart.enums.GaugeTypes.BULLET] = anychart.gauges.bulle
 anychart.gauges.thermometer = function(opt_data, opt_csvSettings) {
   var gauge = new anychart.charts.LinearGauge();
   gauge.data(opt_data, opt_csvSettings);
-  gauge.defaultPointerType(anychart.enums.LinearGaugePointerType.THERMOMETER);
+  gauge.setOption('defaultPointerType', anychart.enums.LinearGaugePointerType.THERMOMETER);
   gauge.setType(anychart.enums.GaugeTypes.THERMOMETER);
 
   gauge.setupInternal(true, anychart.getFullTheme('thermometerGauge'));
@@ -79,7 +79,7 @@ anychart.gaugeTypesMap[anychart.enums.GaugeTypes.THERMOMETER] = anychart.gauges.
 anychart.gauges.tank = function(opt_data, opt_csvSettings) {
   var gauge = new anychart.charts.LinearGauge();
   gauge.data(opt_data, opt_csvSettings);
-  gauge.defaultPointerType(anychart.enums.LinearGaugePointerType.TANK);
+  gauge.setOption('defaultPointerType', anychart.enums.LinearGaugePointerType.TANK);
   gauge.setType(anychart.enums.GaugeTypes.TANK);
 
   gauge.setupInternal(true, anychart.getFullTheme('tankGauge'));
@@ -99,7 +99,7 @@ anychart.gaugeTypesMap[anychart.enums.GaugeTypes.TANK] = anychart.gauges.tank;
 anychart.gauges.led = function(opt_data, opt_csvSettings) {
   var gauge = new anychart.charts.LinearGauge();
   gauge.data(opt_data, opt_csvSettings);
-  gauge.defaultPointerType(anychart.enums.LinearGaugePointerType.LED);
+  gauge.setOption('defaultPointerType', anychart.enums.LinearGaugePointerType.LED);
   gauge.setType(anychart.enums.GaugeTypes.LED);
 
   gauge.setupInternal(true, anychart.getFullTheme('ledGauge'));

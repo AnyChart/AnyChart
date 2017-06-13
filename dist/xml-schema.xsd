@@ -321,6 +321,7 @@
         <xsd:attribute name="circular_padding" type="simple.NumberOrPercent"/>
         <xsd:attribute name="enclose_with_straight_line" type="simple.Bool"/>
         <!-- anychart.charts.LinearGauge common attrs -->
+        <xsd:attribute name="default_pointer_type" type="xsd:string"/>
         <xsd:attribute name="global_offset" type="xsd:string"/>
         <xsd:attribute name="layout" type="enums.Layout"/>
         <xsd:attribute name="scale" type="simple.ScaleRef"/>
