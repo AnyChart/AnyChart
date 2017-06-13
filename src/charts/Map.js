@@ -20,6 +20,7 @@ goog.require('anychart.core.map.projections');
 goog.require('anychart.core.map.projections.TwinProjection');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.series.Map');
+goog.require('anychart.core.settings');
 goog.require('anychart.core.ui.Callout');
 goog.require('anychart.core.ui.ColorRange');
 goog.require('anychart.core.ui.MapCrosshair');
@@ -112,7 +113,7 @@ anychart.charts.Map = function() {
    */
   this.isDesktop = true;
 
-  this.setOption('zoomFactor', 1.3)
+  this.setOption('zoomFactor', 1.3);
 
   /**
    * Zoom animation duration.
@@ -3126,7 +3127,7 @@ anychart.charts.Map.prototype.calculate = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_GEO_DATA_INDEX)) {
     var geoIdField = /** @type {string} */ (this.getOption('geoIdField'));
     this.indexedGeoData_ = {};
-    this.indexedGeoData_[getIdField] = {};
+    this.indexedGeoData_[geoIdField] = {};
     if (this.internalGeoData) {
       for (i = this.seriesList.length; i--;) {
         series = this.seriesList[i];
