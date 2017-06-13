@@ -591,7 +591,7 @@ anychart.scales.GanttDateTime.prototype.maximumGap = function(opt_value) {
  * @return {Array.<number>} - Array of ticks.
  */
 anychart.scales.GanttDateTime.prototype.getTicks = function(anchorDate, interval) {
-  var anchor = anychart.utils.normalizeTimestamp(anchorDate);
+  var anchor = anychart.utils.normalizeTimestamp(anchorDate) + anychart.format.outputTimezone() * 60000;
   var range = this.getRange();
   var min = range['min'];
   var max = range['max'];
