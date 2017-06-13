@@ -30,10 +30,9 @@ goog.inherits(anychart.animations.MapZoomAnimation, anychart.animations.MapAnima
 anychart.animations.MapZoomAnimation.prototype.doZoom_ = function(zoom) {
   if (!this.map.geoData()) return;
   var mapLayer = this.map.getMapLayer();
-  // var viewSpacePath = this.map.scale().getViewSpace();
 
-  var boundsWithoutTx = mapLayer.getBoundsWithoutTransform();
-  var boundsWithTx = mapLayer.getBounds();
+  var boundsWithoutTx = mapLayer.getBoundsWithoutTransform().round();
+  var boundsWithTx = mapLayer.getBounds().round();
 
   var cx = this.map.cx;
   var cy = this.map.cy;
@@ -41,6 +40,12 @@ anychart.animations.MapZoomAnimation.prototype.doZoom_ = function(zoom) {
   var zoomInc = this.map.zoomDest / this.map.zoomSource;
 
   if (!this.map.unlimitedZoom) {
+    if (zoomInc < 1 && !boundsWithTx.contains(boundsWithoutTx)) {
+      var zoomParam = this.map.zoomToBounds(boundsWithoutTx, boundsWithTx);
+      cx = zoomParam[1];
+      cy = zoomParam[2];
+    }
+
     if (cx < boundsWithTx.left)
       cx = boundsWithTx.left;
     else if (cx > boundsWithTx.getRight())
@@ -50,12 +55,6 @@ anychart.animations.MapZoomAnimation.prototype.doZoom_ = function(zoom) {
       cy = boundsWithTx.top;
     else if (cy > boundsWithTx.getBottom())
       cy = boundsWithTx.getBottom();
-
-    if (zoomInc < 1 && !boundsWithTx.contains(boundsWithoutTx)) {
-      var zoomParam = this.map.zoomToBounds(boundsWithTx);
-      cx = zoomParam[1];
-      cy = zoomParam[2];
-    }
   }
 
   var zoomMultiplier = zoom / this.map.getZoomLevel();
@@ -68,6 +67,17 @@ anychart.animations.MapZoomAnimation.prototype.doZoom_ = function(zoom) {
   this.map.scale().setMapZoom(tx.getScaleX());
   this.map.scale().setOffsetFocusPoint(tx.getTranslateX(), tx.getTranslateY());
   this.map.updateSeriesOnZoomOrMove();
+
+  //debug shapes
+  // var mapLayer = this.map.getMapLayer();
+  // var boundsWithoutTx = mapLayer.getBoundsWithoutTransform();
+  // var boundsWithTx = mapLayer.getBounds();
+  //
+  // if (!this.map.bwt) this.map.bwt = this.map.container().rect().zIndex(1000);
+  // this.map.bwt.setBounds(boundsWithoutTx);
+  //
+  // if (!this.map.bwit) this.map.bwit = this.map.container().rect().zIndex(1000);
+  // this.map.bwit.setBounds(boundsWithTx);
 };
 
 
@@ -85,6 +95,17 @@ anychart.animations.MapZoomAnimation.prototype.doMove_ = function(dx, dy) {
   this.map.scale().setOffsetFocusPoint(tx.getTranslateX(), tx.getTranslateY());
 
   this.map.updateSeriesOnZoomOrMove();
+
+  //debug shapes
+  // var mapLayer = this.map.getMapLayer();
+  // var boundsWithoutTx = mapLayer.getBoundsWithoutTransform();
+  // var boundsWithTx = mapLayer.getBounds();
+  //
+  // if (!this.map.bwt) this.map.bwt = this.map.container().rect().zIndex(1000);
+  // this.map.bwt.setBounds(boundsWithoutTx);
+  //
+  // if (!this.map.bwit) this.map.bwit = this.map.container().rect().zIndex(1000);
+  // this.map.bwit.setBounds(boundsWithTx);
 };
 
 
@@ -142,6 +163,17 @@ anychart.animations.MapZoomAnimation.prototype.onFinish = function() {
   this.map.lastZoomIsUnlimited = this.map.unlimitedZoom;
   this.map.unlimitedZoom = false;
   this.map.zoomDuration = NaN;
+
+  //debug shapes
+  // var mapLayer = this.map.getMapLayer();
+  // var boundsWithoutTx = mapLayer.getBoundsWithoutTransform();
+  // var boundsWithTx = mapLayer.getBounds();
+  //
+  // if (!this.map.bwt) this.map.bwt = this.map.container().rect().zIndex(1000);
+  // this.map.bwt.setBounds(boundsWithoutTx);
+  //
+  // if (!this.map.bwit) this.map.bwit = this.map.container().rect().zIndex(1000);
+  // this.map.bwit.setBounds(boundsWithTx);
 
   anychart.animations.MapZoomAnimation.base(this, 'onFinish');
 };

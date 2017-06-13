@@ -627,10 +627,13 @@ anychart.charts.Map.prototype.controlsInteractivity_ = function() {
       if (!this.interactivity_.keyboardZoomAndMove())
         return;
 
+      if (anychart.mapTextarea.chart && anychart.mapTextarea.chart != this)
+        return;
+
       var dx = 0, dy = 0;
       this.isDesktop = true;
       this.zoomDuration = 100;
-      var scene = this.getCurrentScene();
+      var scene = anychart.mapTextarea.chart.getCurrentScene();
 
       switch (e.identifier) {
         case 'zoom_in':
@@ -787,6 +790,7 @@ anychart.charts.Map.prototype.controlsInteractivity_ = function() {
         var scrollY = scrollEl.scrollTop;
 
         anychart.mapTextarea.focus();
+        anychart.mapTextarea.chart = this;
         if (goog.userAgent.GECKO) {
           var newScrollX = scrollEl.scrollLeft;
           var newScrollY = scrollEl.scrollTop;
@@ -3472,9 +3476,9 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_MOVE)) {
     if (this.getZoomLevel() != minZoomLevel && mapLayer) {
-      viewSpacePath = this.scale().getViewSpace();
-      boundsWithoutTx = viewSpacePath.getBoundsWithoutTransform();
-      boundsWithTx = viewSpacePath.getBoundsWithTransform(mapLayer.getFullTransformation());
+      // viewSpacePath = this.scale().getViewSpace();
+      boundsWithoutTx = mapLayer.getBoundsWithoutTransform();
+      boundsWithTx = mapLayer.getBoundsWithTransform(mapLayer.getFullTransformation());
 
       if (this.lastZoomIsUnlimited) {
         if ((boundsWithTx.left + this.offsetX >= boundsWithoutTx.left) && this.offsetX > 0) {
@@ -3522,6 +3526,16 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
         this.scale().setOffsetFocusPoint(tx.getTranslateX(), tx.getTranslateY());
         this.updateSeriesOnZoomOrMove();
       }
+
+      //debug shapes
+      // var boundsWithoutTx = mapLayer.getBoundsWithoutTransform();
+      // var boundsWithTx = mapLayer.getBounds();
+      //
+      // if (!this.bwt) this.bwt = this.container().rect().zIndex(1000);
+      // this.bwt.setBounds(boundsWithoutTx);
+      //
+      // if (!this.bwit) this.bwit = this.container().rect().zIndex(1000);
+      // this.bwit.setBounds(boundsWithTx);
     }
 
     this.markConsistent(anychart.ConsistencyState.MAP_MOVE);

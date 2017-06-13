@@ -1307,7 +1307,8 @@ anychart.themes.merging.mergingMap_ = [
       'stock.scroller.defaultSeriesSettings.stepLine',
       'stock.scroller.defaultSeriesSettings.ohlc',
       'stock.scroller.defaultSeriesSettings.jumpLine',
-      'stock.scroller.defaultSeriesSettings.stick'
+      'stock.scroller.defaultSeriesSettings.stick',
+      'stock.scroller.defaultSeriesSettings.hilo'
     ]
   },
   {
@@ -1316,7 +1317,8 @@ anychart.themes.merging.mergingMap_ = [
       'stock.scroller.defaultSeriesSettings.rangeArea',
       'stock.scroller.defaultSeriesSettings.rangeColumn',
       'stock.scroller.defaultSeriesSettings.rangeSplineArea',
-      'stock.scroller.defaultSeriesSettings.rangeStepArea'
+      'stock.scroller.defaultSeriesSettings.rangeStepArea',
+      'stock.scroller.defaultSeriesSettings.hilo'
     ]
   },
   {

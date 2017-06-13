@@ -641,7 +641,7 @@ anychart.core.series.Map.prototype.applyZoomMoveTransformToLabel = function(labe
 
   var connectorElement = label.getConnectorElement();
   if (connectorElement && iterator.meta('positionMode') != anychart.enums.MapPointOutsidePositionMode.OFFSET) {
-    prevTx = this.mapTx;
+    prevTx = label.mapTx || this.mapTx;
     tx = this.chart.getMapLayer().getFullTransformation().clone();
 
     if (prevTx) {
@@ -1196,7 +1196,7 @@ anychart.core.series.Map.prototype.drawSingleFactoryElement = function(factory, 
 
   //Needs for correct drawing of label connectors in zoomed map state.
   if (this.drawer.type == anychart.enums.SeriesDrawerTypes.CHOROPLETH) {
-    this.mapTx = this.chart.getMapLayer().getFullTransformation().clone();
+    element.mapTx = this.chart.getMapLayer().getFullTransformation().clone();
   }
   return element;
 };

@@ -210,6 +210,20 @@ anychart.core.stock.Scroller.prototype.seriesConfig = (function() {
     anchoredPositionTop: 'value',
     anchoredPositionBottom: 'value'
   };
+  res[anychart.enums.StockSeriesType.HILO] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.RANGE_STICK,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_POINT,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathStrokeConfig
+    ],
+    secondaryShapesConfig: [
+      anychart.core.shapeManagers.pathScrollerSelectStrokeConfig
+    ],
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: 'high',
+    anchoredPositionBottom: 'low'
+  };
   res[anychart.enums.CartesianSeriesType.STICK] = {
     drawerType: anychart.enums.SeriesDrawerTypes.STICK,
     shapeManagerType: anychart.enums.ShapeManagerTypes.PER_POINT,
@@ -498,6 +512,24 @@ anychart.core.stock.Scroller.prototype.column = function(opt_data, opt_mappingSe
  */
 anychart.core.stock.Scroller.prototype.jumpLine = function(opt_data, opt_mappingSettings, opt_csvSettings) {
   return this.createSeriesByType(anychart.enums.StockSeriesType.JUMP_LINE, opt_data, opt_mappingSettings, opt_csvSettings);
+};
+
+
+/**
+ * Creates and returns a new hilo series.
+ * @param {(anychart.data.TableMapping|anychart.data.Table|Array.<Array.<*>>|string)=} opt_data
+ * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_mappingSettings
+ *   An object where keys are field names and values are objects with fields:
+ *      - 'column': number - Column index, that the field should get values from;
+ *      - 'type': anychart.enums.AggregationType - How to group values for the field. Defaults to 'close'.
+ *      - 'weights': number - Column to get weights from for 'weightedAverage' grouping type. Note: If type set to
+ *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
+ *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
+ * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
+ * @return {anychart.core.series.StockScroller}
+ */
+anychart.core.stock.Scroller.prototype.hilo = function(opt_data, opt_mappingSettings, opt_csvSettings) {
+  return this.createSeriesByType(anychart.enums.StockSeriesType.HILO, opt_data, opt_mappingSettings, opt_csvSettings);
 };
 
 
@@ -1806,6 +1838,7 @@ anychart.core.stock.Scroller.prototype.setupByJSON = function(config, opt_defaul
   proto['column'] = proto.column;
   proto['stick'] = proto.stick;
   proto['jumpLine'] = proto.jumpLine;
+  proto['hilo'] = proto.hilo;
   proto['line'] = proto.line;
   proto['marker'] = proto.marker;
   proto['ohlc'] = proto.ohlc;
