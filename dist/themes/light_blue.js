@@ -1,27 +1,27 @@
 (function() {
     function c() {
-        return b.anychart.color.lighten(this.sourceColor)
+        return a.anychart.color.lighten(this.sourceColor)
     }
 
     function d() {
-        return b.anychart.color.darken(this.sourceColor)
+        return a.anychart.color.darken(this.sourceColor)
     }
 
-    function a() {
-        return this.sourceColor
+    function b() {
+        return a.anychart.color.setOpacity(this.sourceColor, .5, !0)
     }
-    var b = this;
-    b.anychart = b.anychart || {};
-    b.anychart.themes = b.anychart.themes || {};
-    b.anychart.themes.lightBlue = {
+    var a = this;
+    a.anychart = a.anychart || {};
+    a.anychart.themes = a.anychart.themes || {};
+    a.anychart.themes.lightBlue = {
         palette: {
             type: "distinct",
             items: "#40c4ff #0288d1 #9fa8da #5c6bc0 #7e57c2 #54dbdf #15a9c7 #00897b #304ffe #01579b".split(" ")
         },
         defaultOrdinalColorScale: {
-            autoColors: function(a) {
-                return b.anychart.color.blendedHueProgression("#40c4ff",
-                    "#01579b", a)
+            autoColors: function(b) {
+                return a.anychart.color.blendedHueProgression("#40c4ff",
+                    "#01579b", b)
             }
         },
         defaultLinearColorScale: {
@@ -289,24 +289,23 @@
                 outlineStroke: "#b0bec5",
                 defaultSeriesSettings: {
                     base: {
-                        color: "#40c4ff 0.5",
-                        selectStroke: a
+                        selectStroke: b
                     },
                     candlestick: {
                         risingFill: "#999",
                         risingStroke: "#999",
                         fallingFill: "#999",
                         fallingStroke: "#999",
-                        selectRisingStroke: a,
-                        selectFallingStroke: a,
-                        selectRisingFill: a,
-                        selectFallingFill: a
+                        selectRisingStroke: b,
+                        selectFallingStroke: b,
+                        selectRisingFill: b,
+                        selectFallingFill: b
                     },
                     ohlc: {
                         risingStroke: "#999",
                         fallingStroke: "#999",
-                        selectRisingStroke: a,
-                        selectFallingStroke: a
+                        selectRisingStroke: b,
+                        selectFallingStroke: b
                     }
                 }
             },
