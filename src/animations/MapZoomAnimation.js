@@ -146,7 +146,7 @@ anychart.animations.MapZoomAnimation.prototype.onFinish = function() {
       this.doMove_(currDx, currDy);
     } else {
       var tx = this.map.getMapLayer().getSelfTransformation();
-      var minZoom = /** @type {number} */(this.map.minZoomLevel());
+      var minZoom = /** @type {number} */(this.map.getOption('minZoomLevel'));
 
       if (!this.map.unlimitedZoom && currZoom <= minZoom && !tx.isIdentity() || this.map.zoomDest == minZoom) {
         this.map.getMapLayer().setTransformationMatrix(minZoom, 0, 0, minZoom, 0, 0);

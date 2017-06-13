@@ -449,7 +449,7 @@ anychart.core.series.Map.prototype.overlapMode = function(opt_value) {
     return this;
   }
   return goog.isNull(this.overlapMode_) ?
-      /** @type {anychart.enums.LabelsOverlapMode} */(this.chart.overlapMode()) :
+      /** @type {anychart.enums.LabelsOverlapMode} */(this.chart.getOption('overlapMode')) :
       this.overlapMode_ ?
           anychart.enums.LabelsOverlapMode.ALLOW_OVERLAP :
           anychart.enums.LabelsOverlapMode.NO_OVERLAP;
