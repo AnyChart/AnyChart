@@ -6,7 +6,7 @@ goog.require('anychart.animations.Animation');
 /**
  * Pie animation.
  * @constructor
- * @param {anychart.core.PyramidFunnelBase} chart Pie chart instance.
+ * @param {anychart.charts.PyramidFunnel} chart Pie chart instance.
  * @param {number} duration Length of animation in milliseconds.
  * @param {Function=} opt_acc Acceleration function, returns 0-1 for inputs 0-1.
  * @extends {anychart.animations.Animation}
@@ -15,7 +15,7 @@ anychart.animations.PyramidFunnelLabelAnimation = function(chart, duration, opt_
   anychart.animations.PyramidFunnelLabelAnimation.base(this, 'constructor', null, [], [], duration, opt_acc);
 
   /**
-   * @type {anychart.core.PyramidFunnelBase}
+   * @type {anychart.charts.PyramidFunnel}
    */
   this.chart = chart;
 
@@ -27,7 +27,7 @@ anychart.animations.PyramidFunnelLabelAnimation = function(chart, duration, opt_
   /**
    * @type {?acgraph.vector.Stroke}
    */
-  this.connectorStroke = /** @type {acgraph.vector.Stroke} */ (this.chart.connectorStroke());
+  this.connectorStroke = /** @type {acgraph.vector.Stroke} */ (this.chart.getOption('connectorStroke'));
 };
 goog.inherits(anychart.animations.PyramidFunnelLabelAnimation, anychart.animations.Animation);
 

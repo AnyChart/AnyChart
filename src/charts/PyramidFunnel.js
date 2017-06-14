@@ -1,4 +1,4 @@
-goog.provide('anychart.core.PyramidFunnelBase');
+goog.provide('anychart.charts.PyramidFunnel');
 
 goog.require('anychart.animations.AnimationSerialQueue');
 goog.require('anychart.animations.PyramidFunnelAnimation');
@@ -30,23 +30,9 @@ goog.require('anychart.utils');
  * @implements {anychart.core.utils.IInteractiveSeries}
  * @constructor
  */
-anychart.core.PyramidFunnelBase = function(opt_data, opt_csvSettings) {
-  anychart.core.PyramidFunnelBase.base(this, 'constructor');
+anychart.charts.PyramidFunnel = function(opt_data, opt_csvSettings) {
+  anychart.charts.PyramidFunnel.base(this, 'constructor');
   this.suspendSignalsDispatching();
-
-  /**
-   * The width of the connector compared to the ((bounds.width - baseWidth) / 2), or the pixel width if it is a number.
-   * Defaults to 20 px.
-   * @type {!(string|number)}
-   * @private
-   */
-  this.connectorLength_;
-
-  /**
-   * @type {!acgraph.vector.Stroke}
-   * @private
-   */
-  this.connectorStroke_;
 
   /**
    * Default fill function.
@@ -69,14 +55,6 @@ anychart.core.PyramidFunnelBase = function(opt_data, opt_csvSettings) {
    * @private
    */
   this.hatchFillPalette_ = null;
-
-  /**
-   * The width of the pyramid/funnel compared to the width of the bounds, or the pixel width if it is a number.
-   * Defaults to 90%.
-   * @type {(string|number)}
-   * @private
-   */
-  this.baseWidth_;
 
   /**
    * Default fill function for hover state.
@@ -154,7 +132,7 @@ anychart.core.PyramidFunnelBase = function(opt_data, opt_csvSettings) {
 
   /**
    * List of all label domains
-   * @type {Array.<anychart.core.PyramidFunnelBase.LabelsDomain>}
+   * @type {Array.<anychart.charts.PyramidFunnel.LabelsDomain>}
    */
   this.labelDomains = [];
 
@@ -178,20 +156,6 @@ anychart.core.PyramidFunnelBase = function(opt_data, opt_csvSettings) {
   this.minHeightOfPoint_ = 1;
 
   /**
-   * The height of the neck. (for funnel)
-   * @type {!(string|number)}
-   * @private
-   */
-  this.neckHeight_ = NaN;
-
-  /**
-   * The width of the neck. (for funnel)
-   * @type {!(string|number)}
-   * @private
-   */
-  this.neckWidth_ = NaN;
-
-  /**
    * Chart default palette.
    * @type {anychart.palettes.DistinctColors|anychart.palettes.RangeColors}
    * @private
@@ -211,21 +175,6 @@ anychart.core.PyramidFunnelBase = function(opt_data, opt_csvSettings) {
    * @private
    */
   this.pointProvider_;
-
-  /**
-   * The distance between points in pixels (or percent) of the bounds height.
-   * Defaults to 5.
-   * @type {!(string|number)}
-   * @private
-   */
-  this.pointsPadding_ = 3;
-
-  /**
-   * Specifies that the pyramid is inverted base up.
-   * @type {boolean}
-   * @private
-   */
-  this.reversed_ = false;
 
   /**
    * Default stroke function.
@@ -248,7 +197,7 @@ anychart.core.PyramidFunnelBase = function(opt_data, opt_csvSettings) {
 
   this.resumeSignalsDispatching(false);
 };
-goog.inherits(anychart.core.PyramidFunnelBase, anychart.core.SeparateChart);
+goog.inherits(anychart.charts.PyramidFunnel, anychart.core.SeparateChart);
 
 
 /**
@@ -258,7 +207,7 @@ goog.inherits(anychart.core.PyramidFunnelBase, anychart.core.SeparateChart);
  * @type {?(anychart.data.View|anychart.data.Set|Array|string)}
  * @private
  */
-anychart.core.PyramidFunnelBase.prototype.rawData_;
+anychart.charts.PyramidFunnel.prototype.rawData_;
 
 
 /**
@@ -266,7 +215,7 @@ anychart.core.PyramidFunnelBase.prototype.rawData_;
  * @type {number}
  * @const
  */
-anychart.core.PyramidFunnelBase.ZINDEX_PYRAMID_FUNNEL = 30;
+anychart.charts.PyramidFunnel.ZINDEX_PYRAMID_FUNNEL = 30;
 
 
 /**
@@ -274,7 +223,7 @@ anychart.core.PyramidFunnelBase.ZINDEX_PYRAMID_FUNNEL = 30;
  * @type {number}
  * @const
  */
-anychart.core.PyramidFunnelBase.ZINDEX_HATCH_FILL = 31;
+anychart.charts.PyramidFunnel.ZINDEX_HATCH_FILL = 31;
 
 
 /**
@@ -282,7 +231,7 @@ anychart.core.PyramidFunnelBase.ZINDEX_HATCH_FILL = 31;
  * @type {number}
  * @const
  */
-anychart.core.PyramidFunnelBase.ZINDEX_LABELS_CONNECTOR = 32;
+anychart.charts.PyramidFunnel.ZINDEX_LABELS_CONNECTOR = 32;
 
 
 /**
@@ -290,7 +239,7 @@ anychart.core.PyramidFunnelBase.ZINDEX_LABELS_CONNECTOR = 32;
  * @type {number}
  * @const
  */
-anychart.core.PyramidFunnelBase.MIN_CONNECTOR_LENGTH = 5;
+anychart.charts.PyramidFunnel.MIN_CONNECTOR_LENGTH = 5;
 
 
 /**
@@ -299,7 +248,7 @@ anychart.core.PyramidFunnelBase.MIN_CONNECTOR_LENGTH = 5;
  * @const
  * @private
  */
-anychart.core.PyramidFunnelBase.OVERLAP_CORRECTION_ITERATION_COUNT_MAX_ = 10;
+anychart.charts.PyramidFunnel.OVERLAP_CORRECTION_ITERATION_COUNT_MAX_ = 10;
 
 
 /**
@@ -313,14 +262,14 @@ anychart.core.PyramidFunnelBase.OVERLAP_CORRECTION_ITERATION_COUNT_MAX_ = 10;
  *   labels animation - 450ms.
  * @type {number}
  */
-anychart.core.PyramidFunnelBase.PIE_ANIMATION_DURATION_RATIO = 0.85;
+anychart.charts.PyramidFunnel.PIE_ANIMATION_DURATION_RATIO = 0.85;
 
 
 /**
  * Supported signals.
  * @type {number}
  */
-anychart.core.PyramidFunnelBase.prototype.SUPPORTED_SIGNALS =
+anychart.charts.PyramidFunnel.prototype.SUPPORTED_SIGNALS =
     anychart.core.SeparateChart.prototype.SUPPORTED_SIGNALS |
     anychart.Signal.DATA_CHANGED;
 
@@ -329,7 +278,7 @@ anychart.core.PyramidFunnelBase.prototype.SUPPORTED_SIGNALS =
  * Supported consistency states.
  * @type {number}
  */
-anychart.core.PyramidFunnelBase.prototype.SUPPORTED_CONSISTENCY_STATES =
+anychart.charts.PyramidFunnel.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.SeparateChart.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.APPEARANCE |
     anychart.ConsistencyState.PYRAMID_FUNNEL_LABELS |
@@ -340,7 +289,7 @@ anychart.core.PyramidFunnelBase.prototype.SUPPORTED_CONSISTENCY_STATES =
 /**
  * @inheritDoc
  */
-anychart.core.PyramidFunnelBase.prototype.getAllSeries = function() {
+anychart.charts.PyramidFunnel.prototype.getAllSeries = function() {
   return [this];
 };
 
@@ -349,7 +298,7 @@ anychart.core.PyramidFunnelBase.prototype.getAllSeries = function() {
  * Tester if the series is discrete based.
  * @return {boolean}
  */
-anychart.core.PyramidFunnelBase.prototype.isDiscreteBased = function() {
+anychart.charts.PyramidFunnel.prototype.isDiscreteBased = function() {
   return true;
 };
 
@@ -358,7 +307,7 @@ anychart.core.PyramidFunnelBase.prototype.isDiscreteBased = function() {
  * Tester if the series is size based.
  * @return {boolean}
  */
-anychart.core.PyramidFunnelBase.prototype.isSizeBased = function() {
+anychart.charts.PyramidFunnel.prototype.isSizeBased = function() {
   return false;
 };
 
@@ -366,7 +315,7 @@ anychart.core.PyramidFunnelBase.prototype.isSizeBased = function() {
 /**
  * @inheritDoc
  */
-anychart.core.PyramidFunnelBase.prototype.isSeries = function() {
+anychart.charts.PyramidFunnel.prototype.isSeries = function() {
   return true;
 };
 
@@ -375,9 +324,9 @@ anychart.core.PyramidFunnelBase.prototype.isSeries = function() {
  * Getter/setter for data.
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_value Value to set.
  * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
- * @return {(!anychart.data.View|!anychart.core.PyramidFunnelBase)} Returns itself if used as a setter or the mapping if used as a getter.
+ * @return {(!anychart.data.View|!anychart.charts.PyramidFunnel)} Returns itself if used as a setter or the mapping if used as a getter.
  */
-anychart.core.PyramidFunnelBase.prototype.data = function(opt_value, opt_csvSettings) {
+anychart.charts.PyramidFunnel.prototype.data = function(opt_value, opt_csvSettings) {
   if (goog.isDef(opt_value)) {
     // handle HTML table data
     if (opt_value) {
@@ -438,7 +387,7 @@ anychart.core.PyramidFunnelBase.prototype.data = function(opt_value, opt_csvSett
  * @param {anychart.SignalEvent} event Event object.
  * @private
  */
-anychart.core.PyramidFunnelBase.prototype.dataInvalidated_ = function(event) {
+anychart.charts.PyramidFunnel.prototype.dataInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.DATA_CHANGED)) {
     this.invalidate(
         anychart.ConsistencyState.APPEARANCE |
@@ -457,7 +406,7 @@ anychart.core.PyramidFunnelBase.prototype.dataInvalidated_ = function(event) {
  * Returns current view iterator.
  * @return {!anychart.data.Iterator} Current chart view iterator.
  */
-anychart.core.PyramidFunnelBase.prototype.getIterator = function() {
+anychart.charts.PyramidFunnel.prototype.getIterator = function() {
   return this.iterator_ || (this.iterator_ = this.view_.getIterator());
 };
 
@@ -466,7 +415,7 @@ anychart.core.PyramidFunnelBase.prototype.getIterator = function() {
  * Returns new default iterator for the current mapping.
  * @return {!anychart.data.Iterator} New iterator.
  */
-anychart.core.PyramidFunnelBase.prototype.getResetIterator = function() {
+anychart.charts.PyramidFunnel.prototype.getResetIterator = function() {
   return this.iterator_ = this.view_.getIterator();
 };
 
@@ -475,7 +424,7 @@ anychart.core.PyramidFunnelBase.prototype.getResetIterator = function() {
  * Returns detached iterator.
  * @return {!anychart.data.Iterator} Detached iterator.
  */
-anychart.core.PyramidFunnelBase.prototype.getDetachedIterator = function() {
+anychart.charts.PyramidFunnel.prototype.getDetachedIterator = function() {
   return this.view_.getIterator();
 };
 
@@ -492,7 +441,7 @@ anychart.core.PyramidFunnelBase.prototype.getDetachedIterator = function() {
  * @return {!(acgraph.vector.Fill|acgraph.vector.Stroke)} Normalized color.
  * @protected
  */
-anychart.core.PyramidFunnelBase.prototype.normalizeColor = function(color, var_args) {
+anychart.charts.PyramidFunnel.prototype.normalizeColor = function(color, var_args) {
   var fill;
   var index = this.getIterator().getIndex();
   var sourceColor, scope;
@@ -518,7 +467,7 @@ anychart.core.PyramidFunnelBase.prototype.normalizeColor = function(color, var_a
  * @param {anychart.PointState|number} pointState Point state.
  * @private
  */
-anychart.core.PyramidFunnelBase.prototype.colorizePoint_ = function(pointState) {
+anychart.charts.PyramidFunnel.prototype.colorizePoint_ = function(pointState) {
   var point = /** @type {acgraph.vector.Path} */ (this.getIterator().meta('point'));
   if (goog.isDef(point)) {
     var fillColor = this.getFinalFill(true, pointState);
@@ -538,9 +487,9 @@ anychart.core.PyramidFunnelBase.prototype.colorizePoint_ = function(pointState) 
 /**
  * Getter/setter for palette.
  * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|Object|Array.<string>)=} opt_value .
- * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|anychart.core.PyramidFunnelBase)} .
+ * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|anychart.charts.PyramidFunnel)} .
  */
-anychart.core.PyramidFunnelBase.prototype.palette = function(opt_value) {
+anychart.charts.PyramidFunnel.prototype.palette = function(opt_value) {
   if (opt_value instanceof anychart.palettes.RangeColors) {
     this.setupPalette_(anychart.palettes.RangeColors, opt_value);
     return this;
@@ -564,9 +513,9 @@ anychart.core.PyramidFunnelBase.prototype.palette = function(opt_value) {
 /**
  * Chart markers palette settings.
  * @param {(anychart.palettes.Markers|Object|Array.<anychart.enums.MarkerType>)=} opt_value Chart marker palette settings to set.
- * @return {!(anychart.palettes.Markers|anychart.core.PyramidFunnelBase)} Return current chart markers palette or itself for chaining call.
+ * @return {!(anychart.palettes.Markers|anychart.charts.PyramidFunnel)} Return current chart markers palette or itself for chaining call.
  */
-anychart.core.PyramidFunnelBase.prototype.markerPalette = function(opt_value) {
+anychart.charts.PyramidFunnel.prototype.markerPalette = function(opt_value) {
   if (!this.markerPalette_) {
     this.markerPalette_ = new anychart.palettes.Markers();
     this.markerPalette_.listenSignals(this.markerPaletteInvalidated_, this);
@@ -586,10 +535,10 @@ anychart.core.PyramidFunnelBase.prototype.markerPalette = function(opt_value) {
  * Chart hatch fill palette settings.
  * @param {(Array.<acgraph.vector.HatchFill.HatchFillType>|Object|anychart.palettes.HatchFills)=} opt_value Chart
  * hatch fill palette settings to set.
- * @return {!(anychart.palettes.HatchFills|anychart.core.PyramidFunnelBase)} Return current chart hatch fill palette or itself
+ * @return {!(anychart.palettes.HatchFills|anychart.charts.PyramidFunnel)} Return current chart hatch fill palette or itself
  * for chaining call.
  */
-anychart.core.PyramidFunnelBase.prototype.hatchFillPalette = function(opt_value) {
+anychart.charts.PyramidFunnel.prototype.hatchFillPalette = function(opt_value) {
   if (!this.hatchFillPalette_) {
     this.hatchFillPalette_ = new anychart.palettes.HatchFills();
     this.hatchFillPalette_.listenSignals(this.hatchFillPaletteInvalidated_, this);
@@ -610,7 +559,7 @@ anychart.core.PyramidFunnelBase.prototype.hatchFillPalette = function(opt_value)
  * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors)=} opt_cloneFrom Settings to clone from.
  * @private
  */
-anychart.core.PyramidFunnelBase.prototype.setupPalette_ = function(cls, opt_cloneFrom) {
+anychart.charts.PyramidFunnel.prototype.setupPalette_ = function(cls, opt_cloneFrom) {
   if (this.palette_ instanceof cls) {
     if (opt_cloneFrom)
       this.palette_.setup(opt_cloneFrom);
@@ -639,7 +588,7 @@ anychart.core.PyramidFunnelBase.prototype.setupPalette_ = function(cls, opt_clon
  * @param {anychart.SignalEvent} event Event object.
  * @private
  */
-anychart.core.PyramidFunnelBase.prototype.paletteInvalidated_ = function(event) {
+anychart.charts.PyramidFunnel.prototype.paletteInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
     this.invalidate(anychart.ConsistencyState.APPEARANCE |
         anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
@@ -652,7 +601,7 @@ anychart.core.PyramidFunnelBase.prototype.paletteInvalidated_ = function(event) 
  * @param {anychart.SignalEvent} event Event object.
  * @private
  */
-anychart.core.PyramidFunnelBase.prototype.markerPaletteInvalidated_ = function(event) {
+anychart.charts.PyramidFunnel.prototype.markerPaletteInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
     this.invalidate(anychart.ConsistencyState.APPEARANCE |
         anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
@@ -665,7 +614,7 @@ anychart.core.PyramidFunnelBase.prototype.markerPaletteInvalidated_ = function(e
  * @param {anychart.SignalEvent} event Event object.
  * @private
  */
-anychart.core.PyramidFunnelBase.prototype.hatchFillPaletteInvalidated_ = function(event) {
+anychart.charts.PyramidFunnel.prototype.hatchFillPaletteInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
     this.invalidate(anychart.ConsistencyState.APPEARANCE |
         anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
@@ -687,9 +636,9 @@ anychart.core.PyramidFunnelBase.prototype.hatchFillPaletteInvalidated_ = functio
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.core.PyramidFunnelBase|Function} .
+ * @return {acgraph.vector.Fill|anychart.charts.PyramidFunnel|Function} .
  */
-anychart.core.PyramidFunnelBase.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+anychart.charts.PyramidFunnel.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
     var fill = goog.isFunction(opt_fillOrColorOrKeys) ?
         opt_fillOrColorOrKeys :
@@ -714,9 +663,9 @@ anychart.core.PyramidFunnelBase.prototype.fill = function(opt_fillOrColorOrKeys,
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.core.PyramidFunnelBase|Function} .
+ * @return {acgraph.vector.Fill|anychart.charts.PyramidFunnel|Function} .
  */
-anychart.core.PyramidFunnelBase.prototype.hoverFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+anychart.charts.PyramidFunnel.prototype.hoverFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
     var fill = goog.isFunction(opt_fillOrColorOrKeys) ?
         opt_fillOrColorOrKeys :
@@ -740,9 +689,9 @@ anychart.core.PyramidFunnelBase.prototype.hoverFill = function(opt_fillOrColorOr
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.core.PyramidFunnelBase|Function} .
+ * @return {acgraph.vector.Fill|anychart.charts.PyramidFunnel|Function} .
  */
-anychart.core.PyramidFunnelBase.prototype.selectFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+anychart.charts.PyramidFunnel.prototype.selectFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
     var fill = goog.isFunction(opt_fillOrColorOrKeys) ?
         opt_fillOrColorOrKeys :
@@ -764,7 +713,7 @@ anychart.core.PyramidFunnelBase.prototype.selectFill = function(opt_fillOrColorO
  * @return {!acgraph.vector.Fill} Final hover stroke for the current row.
  * @protected
  */
-anychart.core.PyramidFunnelBase.prototype.getFinalFill = function(usePointSettings, pointState) {
+anychart.charts.PyramidFunnel.prototype.getFinalFill = function(usePointSettings, pointState) {
   var iterator = this.getIterator();
   var normalColor = /** @type {acgraph.vector.Fill|Function} */((usePointSettings && iterator.get('fill')) || this.fill());
 
@@ -799,9 +748,9 @@ anychart.core.PyramidFunnelBase.prototype.getFinalFill = function(usePointSettin
  * @param {string=} opt_color Color.
  * @param {number=} opt_thickness Thickness.
  * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.core.PyramidFunnelBase|Function|boolean} Hatch fill.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.charts.PyramidFunnel|Function|boolean} Hatch fill.
  */
-anychart.core.PyramidFunnelBase.prototype.hatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
+anychart.charts.PyramidFunnel.prototype.hatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
   if (goog.isDef(opt_patternFillOrTypeOrState)) {
     var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
         opt_patternFillOrTypeOrState :
@@ -825,9 +774,9 @@ anychart.core.PyramidFunnelBase.prototype.hatchFill = function(opt_patternFillOr
  * @param {string=} opt_color Color.
  * @param {number=} opt_thickness Thickness.
  * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.core.PyramidFunnelBase|Function|boolean} Hatch fill.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.charts.PyramidFunnel|Function|boolean} Hatch fill.
  */
-anychart.core.PyramidFunnelBase.prototype.hoverHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
+anychart.charts.PyramidFunnel.prototype.hoverHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
   if (goog.isDef(opt_patternFillOrTypeOrState)) {
     var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
         opt_patternFillOrTypeOrState :
@@ -849,9 +798,9 @@ anychart.core.PyramidFunnelBase.prototype.hoverHatchFill = function(opt_patternF
  * @param {string=} opt_color Color.
  * @param {number=} opt_thickness Thickness.
  * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.core.PyramidFunnelBase|Function|boolean} Hatch fill.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.charts.PyramidFunnel|Function|boolean} Hatch fill.
  */
-anychart.core.PyramidFunnelBase.prototype.selectHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
+anychart.charts.PyramidFunnel.prototype.selectHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
   if (goog.isDef(opt_patternFillOrTypeOrState)) {
     var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
         opt_patternFillOrTypeOrState :
@@ -873,7 +822,7 @@ anychart.core.PyramidFunnelBase.prototype.selectHatchFill = function(opt_pattern
  * @return {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} Final hatch fill for the current row.
  * @protected
  */
-anychart.core.PyramidFunnelBase.prototype.getFinalHatchFill = function(usePointSettings, pointState) {
+anychart.charts.PyramidFunnel.prototype.getFinalHatchFill = function(usePointSettings, pointState) {
   var iterator = this.getIterator();
 
   var normalHatchFill;
@@ -916,7 +865,7 @@ anychart.core.PyramidFunnelBase.prototype.getFinalHatchFill = function(usePointS
  * @return {acgraph.vector.HatchFill|acgraph.vector.PatternFill} Normalized hatch fill.
  * @protected
  */
-anychart.core.PyramidFunnelBase.prototype.normalizeHatchFill = function(hatchFill) {
+anychart.charts.PyramidFunnel.prototype.normalizeHatchFill = function(hatchFill) {
   var fill;
   var index = this.getIterator().getIndex();
   if (goog.isFunction(hatchFill)) {
@@ -942,7 +891,7 @@ anychart.core.PyramidFunnelBase.prototype.normalizeHatchFill = function(hatchFil
  * @param {anychart.PointState|number} pointState Point state.
  * @protected
  */
-anychart.core.PyramidFunnelBase.prototype.applyHatchFill = function(pointState) {
+anychart.charts.PyramidFunnel.prototype.applyHatchFill = function(pointState) {
   var hatchPoint = /** @type {acgraph.vector.Path} */(this.getIterator().meta('hatchPoint'));
   if (goog.isDefAndNotNull(hatchPoint)) {
     hatchPoint
@@ -965,9 +914,9 @@ anychart.core.PyramidFunnelBase.prototype.applyHatchFill = function(pointState) 
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
  * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.core.PyramidFunnelBase|acgraph.vector.Stroke|Function} .
+ * @return {anychart.charts.PyramidFunnel|acgraph.vector.Stroke|Function} .
  */
-anychart.core.PyramidFunnelBase.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+anychart.charts.PyramidFunnel.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {
     var stroke = goog.isFunction(opt_strokeOrFill) ?
         opt_strokeOrFill :
@@ -990,9 +939,9 @@ anychart.core.PyramidFunnelBase.prototype.stroke = function(opt_strokeOrFill, op
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
  * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.core.PyramidFunnelBase|acgraph.vector.Stroke|Function} .
+ * @return {anychart.charts.PyramidFunnel|acgraph.vector.Stroke|Function} .
  */
-anychart.core.PyramidFunnelBase.prototype.hoverStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+anychart.charts.PyramidFunnel.prototype.hoverStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {
     var stroke = goog.isFunction(opt_strokeOrFill) ?
         opt_strokeOrFill :
@@ -1015,9 +964,9 @@ anychart.core.PyramidFunnelBase.prototype.hoverStroke = function(opt_strokeOrFil
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
  * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.core.PyramidFunnelBase|acgraph.vector.Stroke|Function} .
+ * @return {anychart.charts.PyramidFunnel|acgraph.vector.Stroke|Function} .
  */
-anychart.core.PyramidFunnelBase.prototype.selectStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+anychart.charts.PyramidFunnel.prototype.selectStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {
     var stroke = goog.isFunction(opt_strokeOrFill) ?
         opt_strokeOrFill :
@@ -1039,7 +988,7 @@ anychart.core.PyramidFunnelBase.prototype.selectStroke = function(opt_strokeOrFi
  * @return {!acgraph.vector.Stroke} Final hover stroke for the current row.
  * @protected
  */
-anychart.core.PyramidFunnelBase.prototype.getFinalStroke = function(usePointSettings, pointState) {
+anychart.charts.PyramidFunnel.prototype.getFinalStroke = function(usePointSettings, pointState) {
   var iterator = this.getIterator();
   var normalColor = /** @type {acgraph.vector.Stroke|Function} */((usePointSettings && iterator.get('stroke')) || this.stroke());
 
@@ -1070,14 +1019,14 @@ anychart.core.PyramidFunnelBase.prototype.getFinalStroke = function(usePointSett
 /**
  * @inheritDoc
  */
-anychart.core.PyramidFunnelBase.prototype.remove = function() {
+anychart.charts.PyramidFunnel.prototype.remove = function() {
   this.markers().container(null);
   this.labels().container(null);
   this.clearLabelDomains_();
 
   if (this.dataLayer_) this.dataLayer_.parent(null);
 
-  anychart.core.PyramidFunnelBase.base(this, 'remove');
+  anychart.charts.PyramidFunnel.base(this, 'remove');
 };
 
 
@@ -1085,7 +1034,7 @@ anychart.core.PyramidFunnelBase.prototype.remove = function() {
  * Draw chart chart content items.
  * @param {anychart.math.Rect} bounds Bounds of chart content area.
  */
-anychart.core.PyramidFunnelBase.prototype.drawContent = function(bounds) {
+anychart.charts.PyramidFunnel.prototype.drawContent = function(bounds) {
   if (this.isConsistent()) return;
 
   this.calculate();
@@ -1110,7 +1059,7 @@ anychart.core.PyramidFunnelBase.prototype.drawContent = function(bounds) {
         (/** @type {acgraph.vector.Path} */ (child)).clear();
       });
       this.registerDisposable(this.dataLayer_);
-      this.dataLayer_.zIndex(anychart.core.PyramidFunnelBase.ZINDEX_PYRAMID_FUNNEL);
+      this.dataLayer_.zIndex(anychart.charts.PyramidFunnel.ZINDEX_PYRAMID_FUNNEL);
       this.dataLayer_.parent(this.rootElement);
     }
 
@@ -1124,24 +1073,24 @@ anychart.core.PyramidFunnelBase.prototype.drawContent = function(bounds) {
       });
       this.registerDisposable(this.hatchLayer_);
       this.hatchLayer_.parent(this.rootElement);
-      this.hatchLayer_.zIndex(anychart.core.PyramidFunnelBase.ZINDEX_HATCH_FILL).disablePointerEvents(true);
+      this.hatchLayer_.zIndex(anychart.charts.PyramidFunnel.ZINDEX_HATCH_FILL).disablePointerEvents(true);
     }
 
     if (this.palette_ && this.palette_ instanceof anychart.palettes.RangeColors) {
       this.palette_.count(iterator.getRowsCount());
     }
 
-    this.pointsPaddingValue_ = Math.abs(anychart.math.round(anychart.utils.normalizeSize(this.pointsPadding_, bounds.height), 2));
-    this.baseWidthValue_ = Math.abs(anychart.math.round(anychart.utils.normalizeSize(this.baseWidth_, bounds.width), 2));
-    this.neckWidthValue_ = Math.abs(anychart.math.round(anychart.utils.normalizeSize(this.neckWidth_, bounds.width), 2));
-    this.neckHeightValue_ = Math.abs(anychart.math.round(anychart.utils.normalizeSize(this.neckHeight_, bounds.height), 2));
+    this.pointsPaddingValue_ = Math.abs(anychart.math.round(anychart.utils.normalizeSize(/** @type {number|string} */ (this.getOption('pointsPadding')), bounds.height), 2));
+    this.baseWidthValue_ = Math.abs(anychart.math.round(anychart.utils.normalizeSize(/** @type {number|string} */ (this.getOption('baseWidth')), bounds.width), 2));
+    this.neckWidthValue_ = Math.abs(anychart.math.round(anychart.utils.normalizeSize(/** @type {number|string} */ (this.getOption('neckWidth')), bounds.width), 2));
+    this.neckHeightValue_ = Math.abs(anychart.math.round(anychart.utils.normalizeSize(/** @type {number|string} */ (this.getOption('neckHeight')), bounds.height), 2));
     this.neckYValue_ = bounds.top + bounds.height - this.neckHeightValue_;
     this.centerXValue_ = bounds.width / 2;
 
     this.connectorLengthValue_ = anychart.utils.normalizeSize(
-        this.connectorLength_, ((bounds.width - this.baseWidthValue_) / 2));
+        /** @type {number|string} */ (this.getOption('connectorLength')), ((bounds.width - this.baseWidthValue_) / 2));
     if (this.connectorLengthValue_ < 0) {
-      this.connectorLengthValue_ = anychart.core.PyramidFunnelBase.MIN_CONNECTOR_LENGTH;
+      this.connectorLengthValue_ = anychart.charts.PyramidFunnel.MIN_CONNECTOR_LENGTH;
     }
 
     this.boundsValue_ = bounds;
@@ -1193,7 +1142,7 @@ anychart.core.PyramidFunnelBase.prototype.drawContent = function(bounds) {
     if (this.drawnConnectors_) {
       for (var i in this.drawnConnectors_) {
         if (this.drawnConnectors_.hasOwnProperty(i))
-          this.drawnConnectors_[i].stroke(this.connectorStroke_);
+          this.drawnConnectors_[i].stroke(this.getOption('connectorStroke'));
       }
     }
 
@@ -1231,10 +1180,10 @@ anychart.core.PyramidFunnelBase.prototype.drawContent = function(bounds) {
 
     if (!this.isInsideLabels()) {
       this.connectorLengthValue_ = anychart.utils.normalizeSize(
-          this.connectorLength_, ((bounds.width - this.baseWidthValue_) / 2));
+          /** @type {number|string} */ (this.getOption('connectorLength')), ((bounds.width - this.baseWidthValue_) / 2));
       // foolproof
       if (this.connectorLengthValue_ < 0) {
-        this.connectorLengthValue_ = anychart.core.PyramidFunnelBase.MIN_CONNECTOR_LENGTH;
+        this.connectorLengthValue_ = anychart.charts.PyramidFunnel.MIN_CONNECTOR_LENGTH;
       }
 
       // init connector element
@@ -1248,7 +1197,7 @@ anychart.core.PyramidFunnelBase.prototype.drawContent = function(bounds) {
         });
         this.registerDisposable(this.connectorsLayer_);
         this.connectorsLayer_.parent(this.rootElement);
-        this.connectorsLayer_.zIndex(anychart.core.PyramidFunnelBase.ZINDEX_LABELS_CONNECTOR);
+        this.connectorsLayer_.zIndex(anychart.charts.PyramidFunnel.ZINDEX_LABELS_CONNECTOR);
       }
       this.connectorsLayer_.clip(bounds);
       this.drawnConnectors_ = [];
@@ -1275,21 +1224,12 @@ anychart.core.PyramidFunnelBase.prototype.drawContent = function(bounds) {
 
 
 /**
- * @return {*}
- * @protected
- */
-anychart.core.PyramidFunnelBase.prototype.getProperThemePart = function() {
-  return anychart.getFullTheme('pyramid');
-};
-
-
-/**
  * Return the width at a specific Y coordinate.
  * @param {number} y
  * @return {number}
  * @private
  */
-anychart.core.PyramidFunnelBase.prototype.getWidthAtY_ = function(y) {
+anychart.charts.PyramidFunnel.prototype.getWidthAtY_ = function(y) {
   var width = this.baseWidthValue_;
   var height = this.boundsValue_.height;
   var neckWidth = this.neckWidthValue_;
@@ -1306,7 +1246,7 @@ anychart.core.PyramidFunnelBase.prototype.getWidthAtY_ = function(y) {
  * @return {number}
  * @private
  */
-anychart.core.PyramidFunnelBase.prototype.handleValue_ = function(value) {
+anychart.charts.PyramidFunnel.prototype.handleValue_ = function(value) {
   return this.isMissing_(value) ? 0 : anychart.utils.toNumber(value);
 };
 
@@ -1317,7 +1257,7 @@ anychart.core.PyramidFunnelBase.prototype.handleValue_ = function(value) {
  * @return {boolean} Is value represents missing value.
  * @private
  */
-anychart.core.PyramidFunnelBase.prototype.isMissing_ = function(value) {
+anychart.charts.PyramidFunnel.prototype.isMissing_ = function(value) {
   value = anychart.utils.toNumber(value);
   return value <= 0 || !goog.math.isFiniteNumber(value);
 };
@@ -1326,7 +1266,7 @@ anychart.core.PyramidFunnelBase.prototype.isMissing_ = function(value) {
 /**
  * @private
  */
-anychart.core.PyramidFunnelBase.prototype.calculatePoint_ = function() {
+anychart.charts.PyramidFunnel.prototype.calculatePoint_ = function() {
   var iterator = this.getIterator();
   var index = /** @type {number} */ (iterator.getIndex());
 
@@ -1441,7 +1381,7 @@ anychart.core.PyramidFunnelBase.prototype.calculatePoint_ = function() {
   x3 = bounds.left + x3;
   x4 = bounds.left + x4;
 
-  if (!this.reversed_) {
+  if (!this.getOption('reversed')) {
     y1 = bounds.height - (y1 - bounds.top) + bounds.top;
     y2 = bounds.height - (y2 - bounds.top) + bounds.top;
     y3 = (y3 ? bounds.height - (y3 - bounds.top) + bounds.top : null);
@@ -1466,7 +1406,7 @@ anychart.core.PyramidFunnelBase.prototype.calculatePoint_ = function() {
  * Updates point on animate.
  * @param {anychart.data.Iterator} point
  */
-anychart.core.PyramidFunnelBase.prototype.updatePointOnAnimate = function(point) {
+anychart.charts.PyramidFunnel.prototype.updatePointOnAnimate = function(point) {
   var shape = point.meta('point');
   shape.clear();
 
@@ -1509,7 +1449,7 @@ anychart.core.PyramidFunnelBase.prototype.updatePointOnAnimate = function(point)
  * @param {number} connectorOpacity Connector opacity.
  * @param {boolean} isOutside Whether labels has outside position.
  */
-anychart.core.PyramidFunnelBase.prototype.updateLabelsOnAnimate = function(labelOpacity, connectorOpacity, isOutside) {
+anychart.charts.PyramidFunnel.prototype.updateLabelsOnAnimate = function(labelOpacity, connectorOpacity, isOutside) {
   var labels = this.labels();
   labels.suspendSignalsDispatching();
   labels['fontOpacity'](labelOpacity);
@@ -1518,14 +1458,14 @@ anychart.core.PyramidFunnelBase.prototype.updateLabelsOnAnimate = function(label
   if (isOutside && this.drawnConnectors_) {
     for (var i in this.drawnConnectors_) {
       if (this.drawnConnectors_.hasOwnProperty(i))
-        this.drawnConnectors_[i].stroke(anychart.color.setOpacity(this.connectorStroke_, connectorOpacity));
+        this.drawnConnectors_[i].stroke(anychart.color.setOpacity(/** @type {acgraph.vector.Stroke} */ (this.getOption('connectorStroke')), connectorOpacity));
     }
   }
 };
 
 
 /** @inheritDoc */
-anychart.core.PyramidFunnelBase.prototype.doAnimation = function() {
+anychart.charts.PyramidFunnel.prototype.doAnimation = function() {
   if (this.animation().enabled() && this.animation().duration() > 0) {
     if (this.animationQueue_ && this.animationQueue_.isPlaying()) {
       this.animationQueue_.update();
@@ -1533,8 +1473,8 @@ anychart.core.PyramidFunnelBase.prototype.doAnimation = function() {
       goog.dispose(this.animationQueue_);
       this.animationQueue_ = new anychart.animations.AnimationSerialQueue();
       var duration = /** @type {number} */(this.animation().duration());
-      var pyramidFunnelDuration = duration * anychart.core.PyramidFunnelBase.PIE_ANIMATION_DURATION_RATIO;
-      var pyramidFunnelLabelDuration = duration * (1 - anychart.core.PyramidFunnelBase.PIE_ANIMATION_DURATION_RATIO);
+      var pyramidFunnelDuration = duration * anychart.charts.PyramidFunnel.PIE_ANIMATION_DURATION_RATIO;
+      var pyramidFunnelLabelDuration = duration * (1 - anychart.charts.PyramidFunnel.PIE_ANIMATION_DURATION_RATIO);
 
       var pyramidFunnelAnimation = new anychart.animations.PyramidFunnelAnimation(this, pyramidFunnelDuration);
       var pyramidFunnelLabelAnimation = new anychart.animations.PyramidFunnelLabelAnimation(this, pyramidFunnelLabelDuration);
@@ -1568,7 +1508,7 @@ anychart.core.PyramidFunnelBase.prototype.doAnimation = function() {
  * Internal function for drawing a point by arguments.
  * @private
  */
-anychart.core.PyramidFunnelBase.prototype.drawPoint_ = function() {
+anychart.charts.PyramidFunnel.prototype.drawPoint_ = function() {
   var iterator = this.getIterator();
   var index = /** @type {number} */ (iterator.getIndex());
 
@@ -1630,7 +1570,7 @@ anychart.core.PyramidFunnelBase.prototype.drawPoint_ = function() {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
-anychart.core.PyramidFunnelBase.prototype.makeBrowserEvent = function(e) {
+anychart.charts.PyramidFunnel.prototype.makeBrowserEvent = function(e) {
   var res = {
     'type': e['type'],
     'target': this,
@@ -1660,7 +1600,7 @@ anychart.core.PyramidFunnelBase.prototype.makeBrowserEvent = function(e) {
 
 
 /** @inheritDoc */
-anychart.core.PyramidFunnelBase.prototype.handleMouseEvent = function(event) {
+anychart.charts.PyramidFunnel.prototype.handleMouseEvent = function(event) {
   var evt = this.makePointEvent(event);
   if (evt)
     this.dispatchEvent(evt);
@@ -1673,7 +1613,7 @@ anychart.core.PyramidFunnelBase.prototype.handleMouseEvent = function(event) {
  * @param {anychart.core.MouseEvent} event
  * @return {Object} An object of event to dispatch. If null - unrecognized type was found.
  */
-anychart.core.PyramidFunnelBase.prototype.makePointEvent = function(event) {
+anychart.charts.PyramidFunnel.prototype.makePointEvent = function(event) {
   var pointIndex;
   if ('pointIndex' in event) {
     pointIndex = event['pointIndex'];
@@ -1732,7 +1672,7 @@ anychart.core.PyramidFunnelBase.prototype.makePointEvent = function(event) {
 
 
 /** @inheritDoc */
-anychart.core.PyramidFunnelBase.prototype.getPoint = function(index) {
+anychart.charts.PyramidFunnel.prototype.getPoint = function(index) {
   var point = new anychart.core.Point(this, index);
   var iter = this.getIterator();
   var value;
@@ -1749,7 +1689,7 @@ anychart.core.PyramidFunnelBase.prototype.getPoint = function(index) {
 
 
 /** @inheritDoc */
-anychart.core.PyramidFunnelBase.prototype.getSeriesStatus = function(event) {
+anychart.charts.PyramidFunnel.prototype.getSeriesStatus = function(event) {
   //todo (blackart) coming soon.
   //var bounds = anychart.math.rect(0, 0, 0, 0);
   //var clientX = event['clientX'];
@@ -1792,9 +1732,9 @@ anychart.core.PyramidFunnelBase.prototype.getSeriesStatus = function(event) {
 /**
  * If index is passed, hovers a point of the series by its index, else hovers all points of the series.
  * @param {(number|Array<number>)=} opt_indexOrIndexes Point index or array of indexes.
- * @return {!anychart.core.PyramidFunnelBase}  {@link anychart.core.PyramidFunnelBase} instance for method chaining.
+ * @return {!anychart.charts.PyramidFunnel}  {@link anychart.charts.PyramidFunnel} instance for method chaining.
  */
-anychart.core.PyramidFunnelBase.prototype.hover = function(opt_indexOrIndexes) {
+anychart.charts.PyramidFunnel.prototype.hover = function(opt_indexOrIndexes) {
   if (goog.isDef(opt_indexOrIndexes))
     this.hoverPoint(opt_indexOrIndexes);
   else
@@ -1805,7 +1745,7 @@ anychart.core.PyramidFunnelBase.prototype.hover = function(opt_indexOrIndexes) {
 
 
 /** @inheritDoc */
-anychart.core.PyramidFunnelBase.prototype.unhover = function(opt_indexOrIndexes) {
+anychart.charts.PyramidFunnel.prototype.unhover = function(opt_indexOrIndexes) {
   if (!(this.state.hasPointState(anychart.PointState.HOVER) ||
       this.state.isStateContains(this.state.getSeriesState(), anychart.PointState.HOVER)) ||
       !this.enabled())
@@ -1836,9 +1776,9 @@ anychart.core.PyramidFunnelBase.prototype.unhover = function(opt_indexOrIndexes)
  * @param {number|Array<number>} index Index of the point to hover.
  * @param {anychart.core.MouseEvent=} opt_event Event that initiate point hovering.<br/>
  *    <b>Note:</b> Used only to display float tooltip.
- * @return {!anychart.core.PyramidFunnelBase}  {@link anychart.core.PyramidFunnelBase} instance for method chaining.
+ * @return {!anychart.charts.PyramidFunnel}  {@link anychart.charts.PyramidFunnel} instance for method chaining.
  */
-anychart.core.PyramidFunnelBase.prototype.hoverPoint = function(index, opt_event) {
+anychart.charts.PyramidFunnel.prototype.hoverPoint = function(index, opt_event) {
   if (!this.enabled())
     return this;
 
@@ -1884,9 +1824,9 @@ anychart.core.PyramidFunnelBase.prototype.hoverPoint = function(index, opt_event
 
 /**
  * Hovers all points of the series. Use <b>unhover</b> method for unhover series.
- * @return {!anychart.core.PyramidFunnelBase} An instance of the {@link anychart.core.PyramidFunnelBase} class for method chaining.
+ * @return {!anychart.charts.PyramidFunnel} An instance of the {@link anychart.charts.PyramidFunnel} class for method chaining.
  */
-anychart.core.PyramidFunnelBase.prototype.hoverSeries = function() {
+anychart.charts.PyramidFunnel.prototype.hoverSeries = function() {
   if (!this.enabled())
     return this;
 
@@ -1905,9 +1845,9 @@ anychart.core.PyramidFunnelBase.prototype.hoverSeries = function() {
 /**
  * Imitates selects a point of the series by its index.
  * @param {(number|Array.<number>)=} opt_indexOrIndexes Index or array of indexes of the point to select.
- * @return {!anychart.core.PyramidFunnelBase} {@link anychart.core.PyramidFunnelBase} instance for method chaining.
+ * @return {!anychart.charts.PyramidFunnel} {@link anychart.charts.PyramidFunnel} instance for method chaining.
  */
-anychart.core.PyramidFunnelBase.prototype.select = function(opt_indexOrIndexes) {
+anychart.charts.PyramidFunnel.prototype.select = function(opt_indexOrIndexes) {
   if (!this.enabled())
     return this;
 
@@ -1922,9 +1862,9 @@ anychart.core.PyramidFunnelBase.prototype.select = function(opt_indexOrIndexes) 
 
 /**
  * Selects all points of the series. Use <b>unselect</b> method for unselect series.
- * @return {!anychart.core.PyramidFunnelBase} An instance of the {@link anychart.core.PyramidFunnelBase} class for method chaining.
+ * @return {!anychart.charts.PyramidFunnel} An instance of the {@link anychart.charts.PyramidFunnel} class for method chaining.
  */
-anychart.core.PyramidFunnelBase.prototype.selectSeries = function() {
+anychart.charts.PyramidFunnel.prototype.selectSeries = function() {
   if (!this.enabled())
     return this;
 
@@ -1942,9 +1882,9 @@ anychart.core.PyramidFunnelBase.prototype.selectSeries = function() {
  * Selects a point of the series by its index.
  * @param {number|Array<number>} indexOrIndexes Index of the point to select.
  * @param {anychart.core.MouseEvent=} opt_event Event that initiate point selecting.
- * @return {!anychart.core.PyramidFunnelBase} {@link anychart.core.PyramidFunnelBase} instance for method chaining.
+ * @return {!anychart.charts.PyramidFunnel} {@link anychart.charts.PyramidFunnel} instance for method chaining.
  */
-anychart.core.PyramidFunnelBase.prototype.selectPoint = function(indexOrIndexes, opt_event) {
+anychart.charts.PyramidFunnel.prototype.selectPoint = function(indexOrIndexes, opt_event) {
   if (!this.enabled())
     return this;
 
@@ -1978,7 +1918,7 @@ anychart.core.PyramidFunnelBase.prototype.selectPoint = function(indexOrIndexes,
 
 
 /** @inheritDoc */
-anychart.core.PyramidFunnelBase.prototype.unselect = function(opt_indexOrIndexes) {
+anychart.charts.PyramidFunnel.prototype.unselect = function(opt_indexOrIndexes) {
   if (!this.enabled())
     return;
 
@@ -2009,7 +1949,7 @@ anychart.core.PyramidFunnelBase.prototype.unselect = function(opt_indexOrIndexes
  * Apply appearance to point.
  * @param {anychart.PointState|number} pointState
  */
-anychart.core.PyramidFunnelBase.prototype.applyAppearanceToPoint = function(pointState) {
+anychart.charts.PyramidFunnel.prototype.applyAppearanceToPoint = function(pointState) {
   this.colorizePoint_(pointState);
   this.applyHatchFill(pointState);
   this.drawMarker(pointState);
@@ -2019,14 +1959,14 @@ anychart.core.PyramidFunnelBase.prototype.applyAppearanceToPoint = function(poin
 /**
  * Finalization point appearance. For drawing labels and markers.
  */
-anychart.core.PyramidFunnelBase.prototype.finalizePointAppearance = goog.nullFunction;
+anychart.charts.PyramidFunnel.prototype.finalizePointAppearance = goog.nullFunction;
 
 
 /**
  * Apply appearance to series.
  * @param {anychart.PointState|number} pointState .
  */
-anychart.core.PyramidFunnelBase.prototype.applyAppearanceToSeries = function(pointState) {
+anychart.charts.PyramidFunnel.prototype.applyAppearanceToSeries = function(pointState) {
   this.drawLabel_(pointState);
   this.colorizePoint_(pointState);
   this.applyHatchFill(pointState);
@@ -2034,105 +1974,72 @@ anychart.core.PyramidFunnelBase.prototype.applyAppearanceToSeries = function(poi
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Settings.
-//
-//----------------------------------------------------------------------------------------------------------------------
 /**
- * The width of the pyramid/funnel in pixels or in percentage of the width of the bounds.
- * Defaults to 90%.
- * @param {(string|number)=} opt_value
- * @return {string|number|anychart.core.PyramidFunnelBase}
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.core.PyramidFunnelBase.prototype.baseWidth = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.baseWidth_ != opt_value) {
-      this.baseWidth_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.baseWidth_;
-};
+anychart.charts.PyramidFunnel.PROPERTY_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'baseWidth',
+      anychart.core.settings.asIsNormalizer,
+      anychart.ConsistencyState.APPEARANCE,
+      anychart.Signal.NEEDS_REDRAW);
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'neckHeight',
+      anychart.core.settings.asIsNormalizer,
+      anychart.ConsistencyState.APPEARANCE,
+      anychart.Signal.NEEDS_REDRAW);
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'neckWidth',
+      anychart.core.settings.asIsNormalizer,
+      anychart.ConsistencyState.APPEARANCE,
+      anychart.Signal.NEEDS_REDRAW);
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'pointsPadding',
+      anychart.core.settings.asIsNormalizer,
+      anychart.ConsistencyState.APPEARANCE,
+      anychart.Signal.NEEDS_REDRAW);
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'reversed',
+      anychart.core.settings.asIsNormalizer,
+      anychart.ConsistencyState.APPEARANCE,
+      anychart.Signal.NEEDS_REDRAW);
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'overlapMode',
+      anychart.enums.normalizeLabelsOverlapMode,
+      anychart.ConsistencyState.PYRAMID_FUNNEL_LABELS,
+      anychart.Signal.NEEDS_REDRAW);
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'connectorLength',
+      anychart.core.settings.asIsNormalizer,
+      anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.PYRAMID_FUNNEL_LABELS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'connectorStroke',
+      anychart.core.settings.strokeNormalizer,
+      anychart.ConsistencyState.APPEARANCE,
+      anychart.Signal.NEEDS_REDRAW);
 
-
-/**
- * The height of the neck, the lower part of the funnel.
- * In pixels or in percentage of the height of the bounds.
- * Defaults to 25%.
- * For funnel chart ONLY.
- * @param {(string|number)=} opt_value
- * @return {string|number|anychart.core.PyramidFunnelBase}
- */
-anychart.core.PyramidFunnelBase.prototype.neckHeight = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.neckHeight_ != opt_value) {
-      this.neckHeight_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.neckHeight_;
-};
-
-
-/**
- * The width of the neck, the lower part of the funnel.
- * In pixels or in percentage of the width of the bounds.
- * Defaults to 30%.
- * For funnel chart ONLY.
- * @param {(string|number)=} opt_value
- * @return {string|number|anychart.core.PyramidFunnelBase}
- */
-anychart.core.PyramidFunnelBase.prototype.neckWidth = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.neckWidth_ != opt_value) {
-      this.neckWidth_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.neckWidth_;
-};
-
-
-/**
- * The distance between points in pixels (or percent) of the bounds height.
- * Defaults to 5.
- * @param {(string|number)=} opt_value
- * @return {string|number|anychart.core.PyramidFunnelBase}
- */
-anychart.core.PyramidFunnelBase.prototype.pointsPadding = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.pointsPadding_ != opt_value) {
-      this.pointsPadding_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.pointsPadding_;
-};
-
-
-/**
- * Method allows you to flip the pyramid upside down.
- * Defaults to false.
- * For Pyramid ONLY.
- * @param {boolean=} opt_value
- * @return {boolean|anychart.core.PyramidFunnelBase}
- */
-anychart.core.PyramidFunnelBase.prototype.reversed = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.reversed_ != opt_value) {
-      this.reversed_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.reversed_;
-};
-
+  return map;
+})();
+anychart.core.settings.populate(anychart.charts.PyramidFunnel, anychart.charts.PyramidFunnel.PROPERTY_DESCRIPTORS);
 
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -2142,9 +2049,9 @@ anychart.core.PyramidFunnelBase.prototype.reversed = function(opt_value) {
 /**
  * Getter/setter for labels.
  * @param {(Object|boolean|null)=} opt_value .
- * @return {!(anychart.core.ui.LabelsFactory|anychart.core.PyramidFunnelBase)} .
+ * @return {!(anychart.core.ui.LabelsFactory|anychart.charts.PyramidFunnel)} .
  */
-anychart.core.PyramidFunnelBase.prototype.labels = function(opt_value) {
+anychart.charts.PyramidFunnel.prototype.labels = function(opt_value) {
   if (!this.labels_) {
     this.labels_ = new anychart.core.ui.LabelsFactory();
 
@@ -2167,9 +2074,9 @@ anychart.core.PyramidFunnelBase.prototype.labels = function(opt_value) {
 /**
  * Getter/setter for series hover data labels.
  * @param {(Object|boolean|null)=} opt_value chart hover data labels settings.
- * @return {!(anychart.core.ui.LabelsFactory|anychart.core.PyramidFunnelBase)} Labels instance or itself for chaining call.
+ * @return {!(anychart.core.ui.LabelsFactory|anychart.charts.PyramidFunnel)} Labels instance or itself for chaining call.
  */
-anychart.core.PyramidFunnelBase.prototype.hoverLabels = function(opt_value) {
+anychart.charts.PyramidFunnel.prototype.hoverLabels = function(opt_value) {
   if (!this.hoverLabels_) {
     this.hoverLabels_ = new anychart.core.ui.LabelsFactory();
     this.registerDisposable(this.hoverLabels_);
@@ -2188,9 +2095,9 @@ anychart.core.PyramidFunnelBase.prototype.hoverLabels = function(opt_value) {
 /**
  * Getter/setter for series select data labels.
  * @param {(Object|boolean|null)=} opt_value chart hover data labels settings.
- * @return {!(anychart.core.ui.LabelsFactory|anychart.core.PyramidFunnelBase)} Labels instance or itself for chaining call.
+ * @return {!(anychart.core.ui.LabelsFactory|anychart.charts.PyramidFunnel)} Labels instance or itself for chaining call.
  */
-anychart.core.PyramidFunnelBase.prototype.selectLabels = function(opt_value) {
+anychart.charts.PyramidFunnel.prototype.selectLabels = function(opt_value) {
   if (!this.selectLabels_) {
     this.selectLabels_ = new anychart.core.ui.LabelsFactory();
     this.registerDisposable(this.selectLabels_);
@@ -2211,7 +2118,7 @@ anychart.core.PyramidFunnelBase.prototype.selectLabels = function(opt_value) {
  * @param {anychart.SignalEvent} event Event object.
  * @private
  */
-anychart.core.PyramidFunnelBase.prototype.labelsInvalidated_ = function(event) {
+anychart.charts.PyramidFunnel.prototype.labelsInvalidated_ = function(event) {
   var state = 0, signal = 0;
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
     state |= anychart.ConsistencyState.PYRAMID_FUNNEL_LABELS;
@@ -2228,71 +2135,12 @@ anychart.core.PyramidFunnelBase.prototype.labelsInvalidated_ = function(event) {
 
 
 /**
- * Allows the labels to cross other labels. ONLY for outside labels.
- * @param {(anychart.enums.LabelsOverlapMode|string)=} opt_value .
- * @return {anychart.enums.LabelsOverlapMode|anychart.core.PyramidFunnelBase} .
- */
-anychart.core.PyramidFunnelBase.prototype.overlapMode = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var val = anychart.enums.normalizeLabelsOverlapMode(opt_value);
-    if (this.labelsOverlap_ != val) {
-      this.labelsOverlap_ = val;
-      this.invalidate(anychart.ConsistencyState.PYRAMID_FUNNEL_LABELS, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.labelsOverlap_;
-};
-
-
-/**
- * Getter/setter for connectorLength.
- * @param {(number|string)=} opt_value [30%] Value to set.
- * @return {!anychart.core.PyramidFunnelBase|number|string|null} Outside labels margin or self for chaining call.
- */
-anychart.core.PyramidFunnelBase.prototype.connectorLength = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.connectorLength_ != opt_value) {
-      this.connectorLength_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.PYRAMID_FUNNEL_LABELS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.connectorLength_;
-};
-
-
-/**
- * Getter/setter for connectorStroke.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.core.PyramidFunnelBase|acgraph.vector.Stroke|Function} .
- */
-anychart.core.PyramidFunnelBase.prototype.connectorStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (stroke != this.connectorStroke_) {
-      this.connectorStroke_ = stroke;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.connectorStroke_;
-};
-
-
-/**
  * Draws outside label for a point.
  * @private
  * @param {anychart.PointState|number} pointState Point state.
  * @return {anychart.core.ui.LabelsFactory.Label} Label.
  */
-anychart.core.PyramidFunnelBase.prototype.drawLabel_ = function(pointState) {
+anychart.charts.PyramidFunnel.prototype.drawLabel_ = function(pointState) {
   var iterator = this.getIterator();
 
   var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
@@ -2344,7 +2192,7 @@ anychart.core.PyramidFunnelBase.prototype.drawLabel_ = function(pointState) {
   var isInsideLabels = this.isInsideLabels();
 
   var isFitToPoint = true;
-  if (!hovered && !selected && isInsideLabels && this.overlapMode() == anychart.enums.LabelsOverlapMode.NO_OVERLAP) {
+  if (!hovered && !selected && isInsideLabels && this.getOption('overlapMode') == anychart.enums.LabelsOverlapMode.NO_OVERLAP) {
     var labelBounds = labelsFactory.measureWithTransform(formatProvider, positionProvider, /** @type {Object} */(pointLabel), index);
     isFitToPoint = this.isLabelFitsIntoThePoint_(labelBounds);
   }
@@ -2408,7 +2256,7 @@ anychart.core.PyramidFunnelBase.prototype.drawLabel_ = function(pointState) {
  * @return {Object} Object with info for labels formatting.
  * @private
  */
-anychart.core.PyramidFunnelBase.prototype.createLabelsPositionProvider_ = function(opt_label, opt_pointState) {
+anychart.charts.PyramidFunnel.prototype.createLabelsPositionProvider_ = function(opt_label, opt_pointState) {
   var labelPosition = this.getLabelsPosition_();
 
   var iterator = this.getIterator();
@@ -2523,7 +2371,7 @@ anychart.core.PyramidFunnelBase.prototype.createLabelsPositionProvider_ = functi
  * @param {anychart.PointState|number} pointState Point state.
  * @return {!anychart.math.Rect}
  */
-anychart.core.PyramidFunnelBase.prototype.getTrueLabelBounds = function(label, pointState) {
+anychart.charts.PyramidFunnel.prototype.getTrueLabelBounds = function(label, pointState) {
   var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
   var hovered = !selected && this.state.isStateContains(pointState, anychart.PointState.HOVER);
 
@@ -2552,8 +2400,8 @@ anychart.core.PyramidFunnelBase.prototype.getTrueLabelBounds = function(label, p
  * @private
  * @param {anychart.core.ui.LabelsFactory.Label=} opt_hoveredLabel If label is hovered.
  */
-anychart.core.PyramidFunnelBase.prototype.overlapCorrection_ = function(opt_hoveredLabel) {
-  if (this.overlapMode() != anychart.enums.LabelsOverlapMode.NO_OVERLAP || this.isInsideLabels() || !this.labels().enabled()) {
+anychart.charts.PyramidFunnel.prototype.overlapCorrection_ = function(opt_hoveredLabel) {
+  if (this.getOption('overlapMode') != anychart.enums.LabelsOverlapMode.NO_OVERLAP || this.isInsideLabels() || !this.labels().enabled()) {
     return;
   }
 
@@ -2573,8 +2421,8 @@ anychart.core.PyramidFunnelBase.prototype.overlapCorrection_ = function(opt_hove
  * @param {anychart.core.ui.LabelsFactory.Label=} opt_hoveredLabel If label is hovered.
  * @private
  */
-anychart.core.PyramidFunnelBase.prototype.checkOverlapWithSiblings_ = function(pointState, opt_hoveredLabel) {
-  if (this.overlapCorrectionIterationCount_ == anychart.core.PyramidFunnelBase.OVERLAP_CORRECTION_ITERATION_COUNT_MAX_) {
+anychart.charts.PyramidFunnel.prototype.checkOverlapWithSiblings_ = function(pointState, opt_hoveredLabel) {
+  if (this.overlapCorrectionIterationCount_ == anychart.charts.PyramidFunnel.OVERLAP_CORRECTION_ITERATION_COUNT_MAX_) {
     return;
   }
 
@@ -2586,8 +2434,9 @@ anychart.core.PyramidFunnelBase.prototype.checkOverlapWithSiblings_ = function(p
   var siblingLabel;
   var siblingLabelBounds;
 
+  var reversed = /** @type {boolean} */ (this.getOption('reversed'));
   for (var i = 0; i < count - 1; i++) {
-    if (this.reversed_) {
+    if (reversed) {
       index = i;
     } else {
       // Invert the cycle
@@ -2600,7 +2449,7 @@ anychart.core.PyramidFunnelBase.prototype.checkOverlapWithSiblings_ = function(p
     }
     labelBounds = this.getTrueLabelBounds(label, pointState);
 
-    siblingLabel = this.reversed_ ? this.getNextEnabledLabel(label) : this.getPreviousEnabledLabel(label);
+    siblingLabel = reversed ? this.getNextEnabledLabel(label) : this.getPreviousEnabledLabel(label);
 
     // for disabled labels
     if (!siblingLabel) {
@@ -2648,7 +2497,7 @@ anychart.core.PyramidFunnelBase.prototype.checkOverlapWithSiblings_ = function(p
  * @param {anychart.core.ui.LabelsFactory.Label} label
  * @return {anychart.core.ui.LabelsFactory.Label}
  */
-anychart.core.PyramidFunnelBase.prototype.getNextEnabledLabel = function(label) {
+anychart.charts.PyramidFunnel.prototype.getNextEnabledLabel = function(label) {
   if (!label) {
     return null;
   }
@@ -2679,7 +2528,7 @@ anychart.core.PyramidFunnelBase.prototype.getNextEnabledLabel = function(label) 
  * @param {anychart.core.ui.LabelsFactory.Label} label
  * @return {anychart.core.ui.LabelsFactory.Label}
  */
-anychart.core.PyramidFunnelBase.prototype.getPreviousEnabledLabel = function(label) {
+anychart.charts.PyramidFunnel.prototype.getPreviousEnabledLabel = function(label) {
   if (!label) {
     return null;
   }
@@ -2711,7 +2560,7 @@ anychart.core.PyramidFunnelBase.prototype.getPreviousEnabledLabel = function(lab
  * @param {anychart.core.ui.LabelsFactory.Label} label
  * @param {anychart.core.ui.LabelsFactory.Label} addedLabel
  */
-anychart.core.PyramidFunnelBase.prototype.putLabelIntoLabelsDomain_ = function(label, addedLabel) {
+anychart.charts.PyramidFunnel.prototype.putLabelIntoLabelsDomain_ = function(label, addedLabel) {
   var foundDomain = this.getLabelsDomainByLabel(label);
 
   if (!goog.isNull(foundDomain)) {
@@ -2720,7 +2569,7 @@ anychart.core.PyramidFunnelBase.prototype.putLabelIntoLabelsDomain_ = function(l
   } else {
     var newLabelsDomain;
 
-    newLabelsDomain = new anychart.core.PyramidFunnelBase.LabelsDomain(this);
+    newLabelsDomain = new anychart.charts.PyramidFunnel.LabelsDomain(this);
     newLabelsDomain.addLabel(label);
     newLabelsDomain.addLabel(addedLabel);
 
@@ -2733,9 +2582,9 @@ anychart.core.PyramidFunnelBase.prototype.putLabelIntoLabelsDomain_ = function(l
  * If the label is already contained in another domain, to find this domain.
  * @protected
  * @param {anychart.core.ui.LabelsFactory.Label} label
- * @return {?anychart.core.PyramidFunnelBase.LabelsDomain}
+ * @return {?anychart.charts.PyramidFunnel.LabelsDomain}
  */
-anychart.core.PyramidFunnelBase.prototype.getLabelsDomainByLabel = function(label) {
+anychart.charts.PyramidFunnel.prototype.getLabelsDomainByLabel = function(label) {
   if (!this.labelDomains.length) {
     return null;
   }
@@ -2749,11 +2598,11 @@ anychart.core.PyramidFunnelBase.prototype.getLabelsDomainByLabel = function(labe
 /**
  *
  * @protected
- * @param {anychart.core.PyramidFunnelBase.LabelsDomain} targetDomain
- * @param {anychart.core.PyramidFunnelBase.LabelsDomain} sourceDomain
- * @return {anychart.core.PyramidFunnelBase.LabelsDomain}
+ * @param {anychart.charts.PyramidFunnel.LabelsDomain} targetDomain
+ * @param {anychart.charts.PyramidFunnel.LabelsDomain} sourceDomain
+ * @return {anychart.charts.PyramidFunnel.LabelsDomain}
  */
-anychart.core.PyramidFunnelBase.prototype.mergeLabelsDomains = function(targetDomain, sourceDomain) {
+anychart.charts.PyramidFunnel.prototype.mergeLabelsDomains = function(targetDomain, sourceDomain) {
   var targetDomainIndex = targetDomain.labels[0].getIndex();
   var sourceDomainIndex = sourceDomain.labels[0].getIndex();
 
@@ -2764,7 +2613,7 @@ anychart.core.PyramidFunnelBase.prototype.mergeLabelsDomains = function(targetDo
    *
    * This method was simplified by using mathematical logic (by Alexander Ky).
    */
-  targetDomain.labels = (this.reversed_ == targetDomainIndex < sourceDomainIndex) ?
+  targetDomain.labels = (this.getOption('reversed') == (targetDomainIndex < sourceDomainIndex)) ?
       goog.array.concat(targetDomain.labels, sourceDomain.labels) :
       goog.array.concat(sourceDomain.labels, targetDomain.labels);
 
@@ -2778,7 +2627,7 @@ anychart.core.PyramidFunnelBase.prototype.mergeLabelsDomains = function(targetDo
  * To clear an array of label domains.
  * @private
  */
-anychart.core.PyramidFunnelBase.prototype.clearLabelDomains_ = function() {
+anychart.charts.PyramidFunnel.prototype.clearLabelDomains_ = function() {
   if (!this.labelDomains.length) {
     return;
   }
@@ -2794,9 +2643,9 @@ anychart.core.PyramidFunnelBase.prototype.clearLabelDomains_ = function() {
 /**
  * To remove the label domain.
  * @protected
- * @param {anychart.core.PyramidFunnelBase.LabelsDomain} labelDomain
+ * @param {anychart.charts.PyramidFunnel.LabelsDomain} labelDomain
  */
-anychart.core.PyramidFunnelBase.prototype.removeLabelDomain = function(labelDomain) {
+anychart.charts.PyramidFunnel.prototype.removeLabelDomain = function(labelDomain) {
   if (!this.labelDomains.length) {
     return;
   }
@@ -2812,7 +2661,7 @@ anychart.core.PyramidFunnelBase.prototype.removeLabelDomain = function(labelDoma
  * @param {Array.<number>} labelBounds .
  * @return {boolean} .
  */
-anychart.core.PyramidFunnelBase.prototype.isLabelFitsIntoThePoint_ = function(labelBounds) {
+anychart.charts.PyramidFunnel.prototype.isLabelFitsIntoThePoint_ = function(labelBounds) {
   var iterator = this.getIterator();
   var pointBounds = [
     iterator.meta('x1'), iterator.meta('y1'),
@@ -2860,7 +2709,7 @@ anychart.core.PyramidFunnelBase.prototype.isLabelFitsIntoThePoint_ = function(la
 /**
  * @return {!boolean} Define, is labels have inside position.
  */
-anychart.core.PyramidFunnelBase.prototype.isInsideLabels = function() {
+anychart.charts.PyramidFunnel.prototype.isInsideLabels = function() {
   return this.getLabelsPosition_() == anychart.enums.PyramidLabelsPosition.INSIDE;
 };
 
@@ -2869,7 +2718,7 @@ anychart.core.PyramidFunnelBase.prototype.isInsideLabels = function() {
  * @private
  * @return {!boolean} .
  */
-anychart.core.PyramidFunnelBase.prototype.isInColumn_ = function() {
+anychart.charts.PyramidFunnel.prototype.isInColumn_ = function() {
   var position = this.getLabelsPosition_();
 
   return (position == anychart.enums.PyramidLabelsPosition.OUTSIDE_RIGHT_IN_COLUMN ||
@@ -2881,7 +2730,7 @@ anychart.core.PyramidFunnelBase.prototype.isInColumn_ = function() {
  * @private
  * @return {!boolean} .
  */
-anychart.core.PyramidFunnelBase.prototype.isInLeftPosition_ = function() {
+anychart.charts.PyramidFunnel.prototype.isInLeftPosition_ = function() {
   var position = this.getLabelsPosition_();
 
   return (position == anychart.enums.PyramidLabelsPosition.OUTSIDE_LEFT ||
@@ -2893,7 +2742,7 @@ anychart.core.PyramidFunnelBase.prototype.isInLeftPosition_ = function() {
  * @private
  * @return {!boolean} .
  */
-anychart.core.PyramidFunnelBase.prototype.isInRightPosition_ = function() {
+anychart.charts.PyramidFunnel.prototype.isInRightPosition_ = function() {
   var position = this.getLabelsPosition_();
 
   return (position == anychart.enums.PyramidLabelsPosition.OUTSIDE_RIGHT ||
@@ -2905,7 +2754,7 @@ anychart.core.PyramidFunnelBase.prototype.isInRightPosition_ = function() {
  * Shifts centerX if the label does not fit on width. And sets a new width for the label.
  * @private
  */
-anychart.core.PyramidFunnelBase.prototype.shiftCenterX_ = function() {
+anychart.charts.PyramidFunnel.prototype.shiftCenterX_ = function() {
   if (!this.labels().enabled()) {
     return;
   }
@@ -2944,7 +2793,7 @@ anychart.core.PyramidFunnelBase.prototype.shiftCenterX_ = function() {
   var newLabelWidth;
   var minLabelWidth = 10;
 
-  var pointWidthAtY = this.reversed_ ?
+  var pointWidthAtY = this.getOption('reversed') ?
       this.getWidthAtY_(labelBounds.top - bounds.top) :
       this.getWidthAtY_(bounds.height - (labelBounds.top + labelBounds.height) + bounds.top);
 
@@ -2958,9 +2807,9 @@ anychart.core.PyramidFunnelBase.prototype.shiftCenterX_ = function() {
     maxShift = bounds.width - this.centerXValue_ - halfBaseWidth;
 
     if (this.isInColumn_()) {
-      // The connector must not be less than anychart.core.PyramidFunnelBase.MIN_CONNECTOR_LENGTH
-      if (labelX2 + anychart.core.PyramidFunnelBase.MIN_CONNECTOR_LENGTH > pointXLeft) {
-        numberToShift = labelX2 + anychart.core.PyramidFunnelBase.MIN_CONNECTOR_LENGTH - pointXLeft;
+      // The connector must not be less than anychart.charts.PyramidFunnel.MIN_CONNECTOR_LENGTH
+      if (labelX2 + anychart.charts.PyramidFunnel.MIN_CONNECTOR_LENGTH > pointXLeft) {
+        numberToShift = labelX2 + anychart.charts.PyramidFunnel.MIN_CONNECTOR_LENGTH - pointXLeft;
 
         if (numberToShift > maxShift) {
           this.centerXValue_ = this.centerXValue_ + maxShift;
@@ -2969,7 +2818,7 @@ anychart.core.PyramidFunnelBase.prototype.shiftCenterX_ = function() {
           pointXLeft = this.centerXValue_ - pointWidthAtY / 2;
           pointXLeft = bounds.left + pointXLeft;
 
-          newLabelWidth = pointXLeft - anychart.core.PyramidFunnelBase.MIN_CONNECTOR_LENGTH - labelX1;
+          newLabelWidth = pointXLeft - anychart.charts.PyramidFunnel.MIN_CONNECTOR_LENGTH - labelX1;
 
           iterator.meta('labelWidthForced', newLabelWidth);
 
@@ -3014,8 +2863,8 @@ anychart.core.PyramidFunnelBase.prototype.shiftCenterX_ = function() {
 
     if (this.isInColumn_()) {
       // labelX1 can be less than zero if it is too long
-      if (labelX1 < 0 || labelX1 - anychart.core.PyramidFunnelBase.MIN_CONNECTOR_LENGTH < pointXRight) {
-        numberToShift = Math.abs(pointXRight - labelX1 + anychart.core.PyramidFunnelBase.MIN_CONNECTOR_LENGTH);
+      if (labelX1 < 0 || labelX1 - anychart.charts.PyramidFunnel.MIN_CONNECTOR_LENGTH < pointXRight) {
+        numberToShift = Math.abs(pointXRight - labelX1 + anychart.charts.PyramidFunnel.MIN_CONNECTOR_LENGTH);
 
         if (labelX1 < 0 || numberToShift > maxShift) {
           this.centerXValue_ = this.centerXValue_ - maxShift;
@@ -3024,7 +2873,7 @@ anychart.core.PyramidFunnelBase.prototype.shiftCenterX_ = function() {
           pointXRight = this.centerXValue_ + pointWidthAtY / 2;
           pointXRight = pointXRight + bounds.left;
 
-          newLabelWidth = labelX2 - anychart.core.PyramidFunnelBase.MIN_CONNECTOR_LENGTH - pointXRight;
+          newLabelWidth = labelX2 - anychart.charts.PyramidFunnel.MIN_CONNECTOR_LENGTH - pointXRight;
 
           iterator.meta('labelWidthForced', newLabelWidth);
 
@@ -3062,7 +2911,7 @@ anychart.core.PyramidFunnelBase.prototype.shiftCenterX_ = function() {
  * @private
  * @return {anychart.enums.PyramidLabelsPosition}
  */
-anychart.core.PyramidFunnelBase.prototype.getLabelsPosition_ = function() {
+anychart.charts.PyramidFunnel.prototype.getLabelsPosition_ = function() {
   return anychart.enums.normalizePyramidLabelsPosition(this.labels().getOption('position'));
 };
 
@@ -3074,13 +2923,13 @@ anychart.core.PyramidFunnelBase.prototype.getLabelsPosition_ = function() {
  * @param {acgraph.vector.Path} path Connector path element.
  * @param {anychart.PointState|number} pointState Point state.
  */
-anychart.core.PyramidFunnelBase.prototype.drawConnectorLine_ = function(label, path, pointState) {
+anychart.charts.PyramidFunnel.prototype.drawConnectorLine_ = function(label, path, pointState) {
   var bounds = this.boundsValue_;
   var index = label.getIndex();
 
   // '.data()' drawing connector should occur regardless of the position of the iterator.
   // Since the connectors can be redrawn several times through the method of
-  // anychart.core.PyramidFunnelBase.LabelsDomain.prototype.applyLabelsPosition_
+  // anychart.charts.PyramidFunnel.LabelsDomain.prototype.applyLabelsPosition_
   var pointPath = this.data().meta(index, 'point');
   var pointBounds = pointPath.getBounds();
   var labelBounds = this.getTrueLabelBounds(label, pointState);
@@ -3099,8 +2948,8 @@ anychart.core.PyramidFunnelBase.prototype.drawConnectorLine_ = function(label, p
     x1 = this.centerXValue_ - pointWidthAtY / 2;
     x1 = x1 + bounds.left;
 
-    if (x0 > x1 && (Math.abs(y1 - y0) < anychart.core.PyramidFunnelBase.MIN_CONNECTOR_LENGTH)) {
-      x0 = x1 - anychart.core.PyramidFunnelBase.MIN_CONNECTOR_LENGTH;
+    if (x0 > x1 && (Math.abs(y1 - y0) < anychart.charts.PyramidFunnel.MIN_CONNECTOR_LENGTH)) {
+      x0 = x1 - anychart.charts.PyramidFunnel.MIN_CONNECTOR_LENGTH;
     }
 
     // in right
@@ -3108,8 +2957,8 @@ anychart.core.PyramidFunnelBase.prototype.drawConnectorLine_ = function(label, p
     x1 = this.centerXValue_ + pointWidthAtY / 2;
     x1 = x1 + bounds.left;
 
-    if (x0 < x1 && (Math.abs(y1 - y0) < anychart.core.PyramidFunnelBase.MIN_CONNECTOR_LENGTH)) {
-      x0 = x1 + anychart.core.PyramidFunnelBase.MIN_CONNECTOR_LENGTH;
+    if (x0 < x1 && (Math.abs(y1 - y0) < anychart.charts.PyramidFunnel.MIN_CONNECTOR_LENGTH)) {
+      x0 = x1 + anychart.charts.PyramidFunnel.MIN_CONNECTOR_LENGTH;
     }
   }
 
@@ -3126,7 +2975,7 @@ anychart.core.PyramidFunnelBase.prototype.drawConnectorLine_ = function(label, p
  * @param {anychart.core.ui.LabelsFactory.Label} label
  * @param {anychart.PointState|number} pointState If label is hovered.
  */
-anychart.core.PyramidFunnelBase.prototype.updateConnector = function(label, pointState) {
+anychart.charts.PyramidFunnel.prototype.updateConnector = function(label, pointState) {
   var labelIndex = label.getIndex();
 
   if (this.drawnConnectors_[labelIndex]) {
@@ -3134,7 +2983,7 @@ anychart.core.PyramidFunnelBase.prototype.updateConnector = function(label, poin
   } else {
     var connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLayer_.genNextChild());
     this.drawnConnectors_[labelIndex] = connectorPath;
-    connectorPath.stroke(this.connectorStroke_);
+    connectorPath.stroke(/** @type {acgraph.vector.Stroke} */ (this.getOption('connectorStroke')));
     this.drawConnectorLine_(label, connectorPath, pointState);
   }
 };
@@ -3148,9 +2997,9 @@ anychart.core.PyramidFunnelBase.prototype.updateConnector = function(label, poin
 /**
  * Getter/setter for markers.
  * @param {(Object|boolean|null|string)=} opt_value Data markers settings.
- * @return {!(anychart.core.ui.MarkersFactory|anychart.core.PyramidFunnelBase)} Markers instance or itself for chaining call.
+ * @return {!(anychart.core.ui.MarkersFactory|anychart.charts.PyramidFunnel)} Markers instance or itself for chaining call.
  */
-anychart.core.PyramidFunnelBase.prototype.markers = function(opt_value) {
+anychart.charts.PyramidFunnel.prototype.markers = function(opt_value) {
   if (!this.markers_) {
     this.markers_ = new anychart.core.ui.MarkersFactory();
 
@@ -3172,9 +3021,9 @@ anychart.core.PyramidFunnelBase.prototype.markers = function(opt_value) {
 /**
  * Getter/setter for hoverMarkers.
  * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
- * @return {!(anychart.core.ui.MarkersFactory|anychart.core.PyramidFunnelBase)} Markers instance or itself for chaining call.
+ * @return {!(anychart.core.ui.MarkersFactory|anychart.charts.PyramidFunnel)} Markers instance or itself for chaining call.
  */
-anychart.core.PyramidFunnelBase.prototype.hoverMarkers = function(opt_value) {
+anychart.charts.PyramidFunnel.prototype.hoverMarkers = function(opt_value) {
   if (!this.hoverMarkers_) {
     this.hoverMarkers_ = new anychart.core.ui.MarkersFactory();
 
@@ -3195,9 +3044,9 @@ anychart.core.PyramidFunnelBase.prototype.hoverMarkers = function(opt_value) {
 /**
  * Getter/setter for series data markers on select.
  * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
- * @return {!(anychart.core.ui.MarkersFactory|anychart.core.PyramidFunnelBase)} Markers instance or itself for chaining call.
+ * @return {!(anychart.core.ui.MarkersFactory|anychart.charts.PyramidFunnel)} Markers instance or itself for chaining call.
  */
-anychart.core.PyramidFunnelBase.prototype.selectMarkers = function(opt_value) {
+anychart.charts.PyramidFunnel.prototype.selectMarkers = function(opt_value) {
   if (!this.selectMarkers_) {
     this.selectMarkers_ = new anychart.core.ui.MarkersFactory();
 
@@ -3220,7 +3069,7 @@ anychart.core.PyramidFunnelBase.prototype.selectMarkers = function(opt_value) {
  * @private
  * @param {anychart.SignalEvent} event Invalidation event.
  */
-anychart.core.PyramidFunnelBase.prototype.markersInvalidated_ = function(event) {
+anychart.charts.PyramidFunnel.prototype.markersInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
     this.invalidate(anychart.ConsistencyState.PYRAMID_FUNNEL_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -3231,7 +3080,7 @@ anychart.core.PyramidFunnelBase.prototype.markersInvalidated_ = function(event) 
  * Return marker fill color for point.
  * @return {!acgraph.vector.Fill} Marker color for point.
  */
-anychart.core.PyramidFunnelBase.prototype.getMarkerFill = function() {
+anychart.charts.PyramidFunnel.prototype.getMarkerFill = function() {
   return this.getFinalFill(false, anychart.PointState.NORMAL);
 };
 
@@ -3240,7 +3089,7 @@ anychart.core.PyramidFunnelBase.prototype.getMarkerFill = function() {
  * Return marker stroke color for point.
  * @return {!acgraph.vector.Stroke} Marker color for point.
  */
-anychart.core.PyramidFunnelBase.prototype.getMarkerStroke = function() {
+anychart.charts.PyramidFunnel.prototype.getMarkerStroke = function() {
   return /** @type {acgraph.vector.Stroke} */(anychart.color.darken(this.getMarkerFill()));
 };
 
@@ -3251,7 +3100,7 @@ anychart.core.PyramidFunnelBase.prototype.getMarkerStroke = function() {
  * @param {string} anchorPosition Understands anychart.enums.Anchor and some additional values.
  * @return {Object} Object with info for markers position.
  */
-anychart.core.PyramidFunnelBase.prototype.createMarkersPositionProvider_ = function(anchorPosition) {
+anychart.charts.PyramidFunnel.prototype.createMarkersPositionProvider_ = function(anchorPosition) {
   anchorPosition = anychart.enums.normalizeAnchor(anchorPosition);
 
   var bounds = this.boundsValue_;
@@ -3333,9 +3182,9 @@ anychart.core.PyramidFunnelBase.prototype.createMarkersPositionProvider_ = funct
  * @return {number} current width of funnel.
  * @private
  */
-anychart.core.PyramidFunnelBase.prototype.getWidthAtYGivenReversed_ = function(y) {
+anychart.charts.PyramidFunnel.prototype.getWidthAtYGivenReversed_ = function(y) {
   var bounds = this.boundsValue_;
-  return this.reversed_ ?
+  return this.getOption('reversed') ?
       this.getWidthAtY_(y - bounds.top) :
       this.getWidthAtY_(bounds.height - y + bounds.top);
 };
@@ -3346,7 +3195,7 @@ anychart.core.PyramidFunnelBase.prototype.getWidthAtYGivenReversed_ = function(y
  * @protected
  * @param {anychart.PointState|number} pointState Point state.
  */
-anychart.core.PyramidFunnelBase.prototype.drawMarker = function(pointState) {
+anychart.charts.PyramidFunnel.prototype.drawMarker = function(pointState) {
   var iterator = this.getIterator();
 
   var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
@@ -3479,7 +3328,7 @@ anychart.core.PyramidFunnelBase.prototype.drawMarker = function(pointState) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
-anychart.core.PyramidFunnelBase.prototype.createTooltip = function() {
+anychart.charts.PyramidFunnel.prototype.createTooltip = function() {
   var tooltip = new anychart.core.ui.Tooltip(0);
   this.registerDisposable(tooltip);
   tooltip.chart(this);
@@ -3493,7 +3342,7 @@ anychart.core.PyramidFunnelBase.prototype.createTooltip = function() {
  * @private
  * @param {anychart.SignalEvent} event Event object.
  */
-anychart.core.PyramidFunnelBase.prototype.onTooltipSignal_ = function(event) {
+anychart.charts.PyramidFunnel.prototype.onTooltipSignal_ = function(event) {
   var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
   tooltip.draw();
 };
@@ -3503,7 +3352,7 @@ anychart.core.PyramidFunnelBase.prototype.onTooltipSignal_ = function(event) {
  * @param {anychart.core.MouseEvent=} opt_event initiates tooltip show.
  * @protected
  */
-anychart.core.PyramidFunnelBase.prototype.showTooltip = function(opt_event) {
+anychart.charts.PyramidFunnel.prototype.showTooltip = function(opt_event) {
   if (opt_event && opt_event['target'] == this.legend()) {
     return;
   }
@@ -3535,7 +3384,7 @@ anychart.core.PyramidFunnelBase.prototype.showTooltip = function(opt_event) {
  * Hide data point tooltip.
  * @protected
  */
-anychart.core.PyramidFunnelBase.prototype.hideTooltip = function() {
+anychart.charts.PyramidFunnel.prototype.hideTooltip = function() {
   var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
   this.unlisten(goog.events.EventType.MOUSEMOVE, this.showTooltip);
   // if (tooltip.isFloating()) {
@@ -3549,7 +3398,7 @@ anychart.core.PyramidFunnelBase.prototype.hideTooltip = function() {
 /**
  * @inheritDoc
  */
-anychart.core.PyramidFunnelBase.prototype.calculate = function() {
+anychart.charts.PyramidFunnel.prototype.calculate = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.PYRAMID_FUNNEL_DATA)) {
     this.resetStatistics();
 
@@ -3592,7 +3441,7 @@ anychart.core.PyramidFunnelBase.prototype.calculate = function() {
  * @return {Object} Object with info for labels/tooltip formatting.
  * @protected
  */
-anychart.core.PyramidFunnelBase.prototype.createFormatProvider = function() {
+anychart.charts.PyramidFunnel.prototype.createFormatProvider = function() {
   var iterator = this.getIterator();
 
   if (!this.pointProvider_)
@@ -3620,7 +3469,7 @@ anychart.core.PyramidFunnelBase.prototype.createFormatProvider = function() {
  * Creates tooltip format provider.
  * @return {Object}
  */
-anychart.core.PyramidFunnelBase.prototype.createTooltipContextProvider = function() {
+anychart.charts.PyramidFunnel.prototype.createTooltipContextProvider = function() {
   return this.createFormatProvider();
 };
 
@@ -3633,7 +3482,7 @@ anychart.core.PyramidFunnelBase.prototype.createTooltipContextProvider = functio
 /**
  * @inheritDoc
  */
-anychart.core.PyramidFunnelBase.prototype.createLegendItemsProvider = function(sourceMode, itemsFormat) {
+anychart.charts.PyramidFunnel.prototype.createLegendItemsProvider = function(sourceMode, itemsFormat) {
   /**
    * @type {!Array.<anychart.core.ui.Legend.LegendItemProvider>}
    */
@@ -3679,13 +3528,13 @@ anychart.core.PyramidFunnelBase.prototype.createLegendItemsProvider = function(s
 
 
 /** @inheritDoc */
-anychart.core.PyramidFunnelBase.prototype.legendItemCanInteractInMode = function(mode) {
+anychart.charts.PyramidFunnel.prototype.legendItemCanInteractInMode = function(mode) {
   return true;
 };
 
 
 /** @inheritDoc */
-anychart.core.PyramidFunnelBase.prototype.legendItemClick = function(item, event) {
+anychart.charts.PyramidFunnel.prototype.legendItemClick = function(item, event) {
   var sourceKey = item.sourceKey();
   if (item && !goog.isDefAndNotNull(sourceKey) && !isNaN(sourceKey))
     return;
@@ -3697,7 +3546,7 @@ anychart.core.PyramidFunnelBase.prototype.legendItemClick = function(item, event
 
 
 /** @inheritDoc */
-anychart.core.PyramidFunnelBase.prototype.legendItemOver = function(item, event) {
+anychart.charts.PyramidFunnel.prototype.legendItemOver = function(item, event) {
   var sourceKey = item.sourceKey();
   if (item && !goog.isDefAndNotNull(sourceKey) && !isNaN(sourceKey))
     return;
@@ -3709,7 +3558,7 @@ anychart.core.PyramidFunnelBase.prototype.legendItemOver = function(item, event)
 
 
 /** @inheritDoc */
-anychart.core.PyramidFunnelBase.prototype.legendItemOut = function(item, event) {
+anychart.charts.PyramidFunnel.prototype.legendItemOut = function(item, event) {
   var sourceKey = item.sourceKey();
   if (item && !goog.isDefAndNotNull(sourceKey) && !isNaN(sourceKey))
     return;
@@ -3722,18 +3571,18 @@ anychart.core.PyramidFunnelBase.prototype.legendItemOut = function(item, event) 
 
 /**
  * @param {(anychart.enums.SelectionMode|string|null)=} opt_value Selection mode.
- * @return {anychart.core.PyramidFunnelBase|anychart.enums.SelectionMode|null} .
+ * @return {anychart.charts.PyramidFunnel|anychart.enums.SelectionMode|null} .
  */
-anychart.core.PyramidFunnelBase.prototype.selectionMode = function(opt_value) {
+anychart.charts.PyramidFunnel.prototype.selectionMode = function(opt_value) {
   return null;
 };
 
 
 /**
  * @param {(anychart.enums.HoverMode|string)=} opt_value Hover mode.
- * @return {anychart.core.PyramidFunnelBase|anychart.enums.HoverMode} .
+ * @return {anychart.charts.PyramidFunnel|anychart.enums.HoverMode} .
  */
-anychart.core.PyramidFunnelBase.prototype.hoverMode = function(opt_value) {
+anychart.charts.PyramidFunnel.prototype.hoverMode = function(opt_value) {
   if (goog.isDef(opt_value)) {
     opt_value = anychart.enums.normalizeHoverMode(opt_value);
     if (opt_value != this.hoverMode_) {
@@ -3748,10 +3597,10 @@ anychart.core.PyramidFunnelBase.prototype.hoverMode = function(opt_value) {
 /**
  * @inheritDoc
  */
-anychart.core.PyramidFunnelBase.prototype.serialize = function() {
-  var json = anychart.core.PyramidFunnelBase.base(this, 'serialize');
+anychart.charts.PyramidFunnel.prototype.serialize = function() {
+  var json = anychart.charts.PyramidFunnel.base(this, 'serialize');
 
-  json['type'] = anychart.enums.ChartTypes.PYRAMID;
+  json['type'] = this.getType();
   json['data'] = this.data().serialize();
 
   json['labels'] = this.labels().serialize();
@@ -3773,22 +3622,7 @@ anychart.core.PyramidFunnelBase.prototype.serialize = function() {
   json['hoverMarkers'] = this.hoverMarkers().serialize();
   json['selectMarkers'] = this.selectMarkers().serialize();
 
-  json['baseWidth'] = this.baseWidth();
-  json['overlapMode'] = this.overlapMode();
-  json['pointsPadding'] = this.pointsPadding();
-  json['connectorLength'] = this.connectorLength();
-
-  if (goog.isFunction(this['connectorStroke'])) {
-    if (goog.isFunction(this.connectorStroke())) {
-      anychart.core.reporting.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          [this.getType() + ' connectorStroke']
-      );
-    } else {
-      json['connectorStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.connectorStroke()));
-    }
-  }
+  anychart.core.settings.serialize(this, anychart.charts.PyramidFunnel.PROPERTY_DESCRIPTORS, json);
 
   if (goog.isFunction(this['fill'])) {
     if (goog.isFunction(this.fill())) {
@@ -3894,19 +3728,17 @@ anychart.core.PyramidFunnelBase.prototype.serialize = function() {
     }
   }
 
-  return json;
+  return {'chart': json};
 };
 
 
 /**
  * @inheritDoc
  */
-anychart.core.PyramidFunnelBase.prototype.setupByJSON = function(config, opt_default) {
-  anychart.core.PyramidFunnelBase.base(this, 'setupByJSON', config, opt_default);
+anychart.charts.PyramidFunnel.prototype.setupByJSON = function(config, opt_default) {
+  anychart.charts.PyramidFunnel.base(this, 'setupByJSON', config, opt_default);
 
-  this.baseWidth(config['baseWidth']);
-  this.connectorLength(config['connectorLength']);
-  this.connectorStroke(config['connectorStroke']);
+  anychart.core.settings.deserialize(this, anychart.charts.PyramidFunnel.PROPERTY_DESCRIPTORS, config);
   this.data(config['data']);
 
   this.hatchFillPalette(config['hatchFillPalette']);
@@ -3932,9 +3764,7 @@ anychart.core.PyramidFunnelBase.prototype.setupByJSON = function(config, opt_def
   this.hoverMarkers().setup(config['hoverMarkers']);
   this.selectMarkers().setup(config['selectMarkers']);
 
-  this.overlapMode(config['overlapMode']);
   this.palette(config['palette']);
-  this.pointsPadding(config['pointsPadding']);
 
   if ('tooltip' in config)
     this.tooltip().setupInternal(!!opt_default, config['tooltip']);
@@ -3944,9 +3774,9 @@ anychart.core.PyramidFunnelBase.prototype.setupByJSON = function(config, opt_def
 /**
  * @inheritDoc
  */
-anychart.core.PyramidFunnelBase.prototype.disposeInternal = function() {
+anychart.charts.PyramidFunnel.prototype.disposeInternal = function() {
   goog.dispose(this.animationQueue_);
-  anychart.core.PyramidFunnelBase.base(this, 'disposeInternal');
+  anychart.charts.PyramidFunnel.base(this, 'disposeInternal');
 };
 
 
@@ -3959,12 +3789,12 @@ anychart.core.PyramidFunnelBase.prototype.disposeInternal = function() {
 /**
  * Labels domain for overlap mode.
  * @constructor
- * @param {!anychart.core.PyramidFunnelBase} chart .
+ * @param {!anychart.charts.PyramidFunnel} chart .
  */
-anychart.core.PyramidFunnelBase.LabelsDomain = function(chart) {
+anychart.charts.PyramidFunnel.LabelsDomain = function(chart) {
   /**
    * Link to chart.
-   * @type {!anychart.core.PyramidFunnelBase}
+   * @type {!anychart.charts.PyramidFunnel}
    */
   this.chart = chart;
 
@@ -3986,9 +3816,9 @@ anychart.core.PyramidFunnelBase.LabelsDomain = function(chart) {
  * @protected
  * @param {anychart.core.ui.LabelsFactory.Label} label
  */
-anychart.core.PyramidFunnelBase.LabelsDomain.prototype.addLabel = function(label) {
+anychart.charts.PyramidFunnel.LabelsDomain.prototype.addLabel = function(label) {
   this.labels.push(label);
-  if (this.chart.reversed_) {
+  if (this.chart.getOption('reversed')) {
     // ascending
     goog.array.sort(this.labels, function(a, b) {
       return a.getIndex() - b.getIndex();
@@ -4006,7 +3836,7 @@ anychart.core.PyramidFunnelBase.LabelsDomain.prototype.addLabel = function(label
  * To clear an array of labels.
  * @protected
  */
-anychart.core.PyramidFunnelBase.LabelsDomain.prototype.clear = function() {
+anychart.charts.PyramidFunnel.LabelsDomain.prototype.clear = function() {
   this.labels.length = 0;
 };
 
@@ -4016,7 +3846,7 @@ anychart.core.PyramidFunnelBase.LabelsDomain.prototype.clear = function() {
  * @protected
  * @param {anychart.core.ui.LabelsFactory.Label=} opt_hoveredLabel
  */
-anychart.core.PyramidFunnelBase.LabelsDomain.prototype.recalculateLabelsPosition = function(opt_hoveredLabel) {
+anychart.charts.PyramidFunnel.LabelsDomain.prototype.recalculateLabelsPosition = function(opt_hoveredLabel) {
   if (this.labels.length < 2) {
     this.chart.removeLabelDomain(this);
     return;
@@ -4066,7 +3896,7 @@ anychart.core.PyramidFunnelBase.LabelsDomain.prototype.recalculateLabelsPosition
  * @private
  * @param {anychart.core.ui.LabelsFactory.Label=} opt_hoveredLabel
  */
-anychart.core.PyramidFunnelBase.LabelsDomain.prototype.applyLabelsPosition_ = function(opt_hoveredLabel) {
+anychart.charts.PyramidFunnel.LabelsDomain.prototype.applyLabelsPosition_ = function(opt_hoveredLabel) {
   var domain = this;
 
   var labelsHeightSum = 0;
@@ -4115,7 +3945,7 @@ anychart.core.PyramidFunnelBase.LabelsDomain.prototype.applyLabelsPosition_ = fu
  * @param {anychart.PointState|number} pointState
  * @return {!anychart.math.Rect}
  */
-anychart.core.PyramidFunnelBase.LabelsDomain.prototype.getLabelBounds_ = function(label, pointState) {
+anychart.charts.PyramidFunnel.LabelsDomain.prototype.getLabelBounds_ = function(label, pointState) {
   var selected = this.chart.state.isStateContains(pointState, anychart.PointState.SELECT);
   var hovered = !selected && this.chart.state.isStateContains(pointState, anychart.PointState.HOVER);
 
@@ -4137,3 +3967,53 @@ anychart.core.PyramidFunnelBase.LabelsDomain.prototype.getLabelBounds_ = functio
 
   return anychart.math.Rect.fromCoordinateBox(labelBounds);
 };
+
+
+//exports
+(function() {
+  var proto = anychart.charts.PyramidFunnel.prototype;
+  proto['data'] = proto.data;
+  proto['getType'] = proto.getType;
+  proto['palette'] = proto.palette;
+  proto['tooltip'] = proto.tooltip;
+
+  proto['hatchFillPalette'] = proto.hatchFillPalette;
+  proto['markerPalette'] = proto.markerPalette;
+
+  proto['fill'] = proto.fill;
+  proto['hoverFill'] = proto.hoverFill;
+  proto['selectFill'] = proto.selectFill;
+
+  proto['hatchFill'] = proto.hatchFill;
+  proto['hoverHatchFill'] = proto.hoverHatchFill;
+  proto['selectHatchFill'] = proto.selectHatchFill;
+
+  proto['labels'] = proto.labels;
+  proto['hoverLabels'] = proto.hoverLabels;
+  proto['selectLabels'] = proto.selectLabels;
+
+  proto['stroke'] = proto.stroke;
+  proto['hoverStroke'] = proto.hoverStroke;
+  proto['selectStroke'] = proto.selectStroke;
+
+  proto['markers'] = proto.markers;
+  proto['hoverMarkers'] = proto.hoverMarkers;
+  proto['selectMarkers'] = proto.selectMarkers;
+
+  proto['hover'] = proto.hover;
+  proto['unhover'] = proto.unhover;
+
+  proto['select'] = proto.select;
+  proto['unselect'] = proto.unselect;
+  proto['getPoint'] = proto.getPoint;
+
+  // auto generated
+  // proto['baseWidth'] = proto.baseWidth;
+  // proto['neckHeight'] = proto.neckHeight;
+  // proto['neckWidth'] = proto.neckWidth;
+  // proto['pointsPadding'] = proto.pointsPadding;
+  // proto['reversed'] = proto.reversed;
+  // proto['overlapMode'] = proto.overlapMode;
+  // proto['connectorLength'] = proto.connectorLength;
+  // proto['connectorStroke'] = proto.connectorStroke;
+})();

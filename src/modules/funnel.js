@@ -5,7 +5,7 @@
 
 goog.provide('anychart.modules.funnel');
 
-goog.require('anychart.charts.Funnel');
+goog.require('anychart.charts.PyramidFunnel');
 goog.require('anychart.modules.base');
 
 
@@ -17,10 +17,11 @@ goog.require('anychart.modules.base');
  *   .container(stage).draw();
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data for the chart.
  * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
- * @return {anychart.charts.Funnel}
+ * @return {anychart.charts.PyramidFunnel}
  */
 anychart.funnel = function(opt_data, opt_csvSettings) {
-  var chart = new anychart.charts.Funnel(opt_data, opt_csvSettings);
+  var chart = new anychart.charts.PyramidFunnel(opt_data, opt_csvSettings);
+  chart.setType(anychart.enums.ChartTypes.FUNNEL);
   chart.setupInternal(true, anychart.getFullTheme('funnel'));
 
   return chart;

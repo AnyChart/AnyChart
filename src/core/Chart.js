@@ -3404,7 +3404,7 @@ anychart.core.Chart.prototype.toCsv = function(opt_chartDataExportMode, opt_csvS
 
   for (i = 0; i < seriesListLength; i++) {
     series = /** @type {anychart.core.series.Base|anychart.core.ChartWithSeries|anychart.charts.Resource|
-        anychart.core.PyramidFunnelBase|anychart.charts.Venn|anychart.charts.LinearGauge|anychart.charts.Bullet|
+        anychart.charts.PyramidFunnel|anychart.charts.Venn|anychart.charts.LinearGauge|anychart.charts.Bullet|
         anychart.charts.TreeMap|anychart.charts.TagCloud|anychart.charts.Sparkline|anychart.charts.Gantt|
         anychart.charts.Pert|anychart.charts.CircularGauge} */ (seriesList[i]);
     seriesData = /** @type {anychart.data.View} */ (series.data());

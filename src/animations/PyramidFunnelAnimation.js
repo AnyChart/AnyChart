@@ -6,7 +6,7 @@ goog.require('anychart.animations.Animation');
 /**
  * Funnel/Pyramid animation.
  * @constructor
- * @param {anychart.core.PyramidFunnelBase} chart Pie chart instance.
+ * @param {anychart.charts.PyramidFunnel} chart PyramidFunnel chart instance.
  * @param {number} duration Length of animation in milliseconds.
  * @param {Function=} opt_acc Acceleration function, returns 0-1 for inputs 0-1.
  * @extends {anychart.animations.Animation}
@@ -15,7 +15,7 @@ anychart.animations.PyramidFunnelAnimation = function(chart, duration, opt_acc) 
   anychart.animations.PyramidFunnelAnimation.base(this, 'constructor', null, [], [], duration, opt_acc);
 
   /**
-   * @type {anychart.core.PyramidFunnelBase}
+   * @type {anychart.charts.PyramidFunnel}
    */
   this.chart = chart;
 };
