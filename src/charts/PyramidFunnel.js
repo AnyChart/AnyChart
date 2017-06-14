@@ -2031,7 +2031,7 @@ anychart.charts.PyramidFunnel.PROPERTY_DESCRIPTORS = (function() {
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
   anychart.core.settings.createDescriptor(
       map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
       'connectorStroke',
       anychart.core.settings.strokeNormalizer,
       anychart.ConsistencyState.APPEARANCE,
@@ -2039,7 +2039,20 @@ anychart.charts.PyramidFunnel.PROPERTY_DESCRIPTORS = (function() {
 
   return map;
 })();
+
+
+/**
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.charts.PyramidFunnel.COLOR_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  return map;
+})();
 anychart.core.settings.populate(anychart.charts.PyramidFunnel, anychart.charts.PyramidFunnel.PROPERTY_DESCRIPTORS);
+anychart.core.settings.populate(anychart.charts.PyramidFunnel, anychart.charts.PyramidFunnel.COLOR_DESCRIPTORS);
+
 
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -3988,13 +4001,13 @@ anychart.charts.PyramidFunnel.LabelsDomain.prototype.getLabelBounds_ = function(
   proto['hoverHatchFill'] = proto.hoverHatchFill;
   proto['selectHatchFill'] = proto.selectHatchFill;
 
-  proto['labels'] = proto.labels;
-  proto['hoverLabels'] = proto.hoverLabels;
-  proto['selectLabels'] = proto.selectLabels;
-
   proto['stroke'] = proto.stroke;
   proto['hoverStroke'] = proto.hoverStroke;
   proto['selectStroke'] = proto.selectStroke;
+
+  proto['labels'] = proto.labels;
+  proto['hoverLabels'] = proto.hoverLabels;
+  proto['selectLabels'] = proto.selectLabels;
 
   proto['markers'] = proto.markers;
   proto['hoverMarkers'] = proto.hoverMarkers;
