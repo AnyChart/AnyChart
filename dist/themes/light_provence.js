@@ -295,7 +295,6 @@
                 outlineStroke: "#dacfd3",
                 defaultSeriesSettings: {
                     base: {
-                        color: "#aa8ab3",
                         selectStroke: function() {
                             return this.sourceColor
                         }

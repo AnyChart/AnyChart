@@ -783,7 +783,7 @@ def __build_release():
     print "    Download demos from PG"
     if os.path.exists(os.path.join(OUT_PATH, 'gallery_demos')):
         shutil.rmtree(os.path.join(OUT_PATH, 'gallery_demos'))
-    __download_and_unzip_from_http('https://playground.anychart.stg/gallery/develop/download', OUT_PATH, 'gallery_demos')
+    __download_and_unzip_from_http('http://playground.anychart.stg/gallery/develop/download', OUT_PATH, 'gallery_demos')
 
     print "    Build AnyGantt install packages"
     __build_product_package(

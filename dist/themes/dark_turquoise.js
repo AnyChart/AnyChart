@@ -8,7 +8,7 @@
     }
 
     function a() {
-        return this.sourceColor
+        return b.anychart.color.setOpacity(this.sourceColor, .6, !0)
     }
     var b = this;
     b.anychart = b.anychart || {};
@@ -200,24 +200,14 @@
                 }
             },
             defaultXAxisSettings: {
-                orientation: "bottom",
-                title: {
-                    text: "X-Axis"
-                },
                 ticks: {
                     enabled: !1
-                },
-                scale: 0
+                }
             },
             defaultYAxisSettings: {
-                orientation: "left",
-                title: {
-                    text: "Y-Axis"
-                },
                 ticks: {
                     enabled: !1
-                },
-                scale: 1
+                }
             },
             xAxes: [{}],
             grids: [],
@@ -361,7 +351,6 @@
                 outlineStroke: "#616161",
                 defaultSeriesSettings: {
                     base: {
-                        color: "#80deea 0.6",
                         selectStroke: a,
                         selectFill: a
                     },

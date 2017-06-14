@@ -8,7 +8,7 @@
     }
 
     function a() {
-        return this.sourceColor
+        return b.anychart.color.setOpacity(this.sourceColor, .5, !0)
     }
     var b = this;
     b.anychart = b.anychart || {};
@@ -171,24 +171,14 @@
         },
         cartesianBase: {
             defaultXAxisSettings: {
-                orientation: "bottom",
-                title: {
-                    text: "X-Axis"
-                },
                 ticks: {
                     enabled: !1
-                },
-                scale: 0
+                }
             },
             defaultYAxisSettings: {
-                orientation: "left",
-                title: {
-                    text: "Y-Axis"
-                },
                 ticks: {
                     enabled: !1
-                },
-                scale: 1
+                }
             },
             xAxes: [{}],
             grids: [],
@@ -327,7 +317,6 @@
                 outlineStroke: "#bdbdbd",
                 defaultSeriesSettings: {
                     base: {
-                        color: "#00838f 0.5",
                         selectFill: a,
                         selectStroke: a
                     },

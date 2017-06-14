@@ -98,6 +98,7 @@ AnyChart provides wide variety of [plugins](https://www.anychart.com/plugins/) f
 ## Using AnyChart with TypeScript
 
 You can use AnyChart in your TypeScript projects - we have definition file for our library which you can find in [distribution folder](https://github.com/AnyChart/anychart/tree/master/dist/index.d.ts).
+Please, take a look at [webpack and typescript integration](https://github.com/anychart-integrations/webpack-typescript-example) example for more details.
 
 ## Technical Integrations
 

@@ -8,6 +8,10 @@
     }
 
     function a() {
+        return b.anychart.color.setOpacity(this.sourceColor, .6, !0)
+    }
+
+    function e() {
         return this.sourceColor
     }
     var b = this;
@@ -312,7 +316,6 @@
                 outlineStroke: "#636363 0.6",
                 defaultSeriesSettings: {
                     base: {
-                        color: "#827717 0.6",
                         selectStroke: a,
                         selectFill: a
                     },
@@ -339,8 +342,8 @@
                     ohlc: {
                         risingStroke: "#999 0.6",
                         fallingStroke: "#999 0.6",
-                        selectRisingStroke: a,
-                        selectFallingStroke: a
+                        selectRisingStroke: e,
+                        selectFallingStroke: e
                     }
                 }
             }
