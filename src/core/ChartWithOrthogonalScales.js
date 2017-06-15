@@ -2211,7 +2211,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.setupSeriesByJSON = function(c
   if (goog.isArray(series)) {
     for (i = 0; i < series.length; i++) {
       json = series[i];
-      var seriesType = json['seriesType'] || this.defaultSeriesType();
+      var seriesType = json['seriesType'] || this.getOption('defaultSeriesType');
       var data = json['data'];
       var seriesInst = this.createSeriesByType(seriesType, data);
       if (seriesInst) {

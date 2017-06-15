@@ -29,7 +29,7 @@ goog.require('anychart.modules.base');
  */
 anychart.financial = function(var_args) {
   var chart = new anychart.charts.Cartesian();
-  chart.defaultSeriesType(anychart.enums.CartesianSeriesType.CANDLESTICK);
+  chart.setOption('defaultSeriesType', anychart.enums.CartesianSeriesType.CANDLESTICK);
   chart.setType(anychart.enums.ChartTypes.FINANCIAL);
 
   chart.setupInternal(true, anychart.getFullTheme('financial'));

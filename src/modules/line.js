@@ -25,9 +25,8 @@ goog.require('anychart.modules.base');
 anychart.line = function(var_args) {
   anychart.performance.start('anychart.line()');
   var chart = new anychart.charts.Cartesian();
-  var theme = anychart.getFullTheme('line');
 
-  chart.defaultSeriesType(anychart.enums.CartesianSeriesType.LINE);
+  chart.setOption('defaultSeriesType', anychart.enums.CartesianSeriesType.LINE);
   chart.setType(anychart.enums.ChartTypes.LINE);
 
   chart.setupInternal(true, anychart.getFullTheme('line'));

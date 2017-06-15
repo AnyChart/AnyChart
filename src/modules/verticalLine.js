@@ -21,7 +21,7 @@ goog.require('anychart.modules.base');
 anychart.verticalLine = function(var_args) {
   var chart = new anychart.charts.Cartesian();
 
-  chart.defaultSeriesType(anychart.enums.CartesianSeriesType.LINE);
+  chart.setOption('defaultSeriesType', anychart.enums.CartesianSeriesType.LINE);
   chart.setType(anychart.enums.ChartTypes.VERTICAL_LINE);
 
   chart.setupInternal(true, anychart.getFullTheme('verticalLine'));

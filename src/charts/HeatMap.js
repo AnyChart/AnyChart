@@ -35,7 +35,7 @@ anychart.charts.HeatMap = function(opt_data, opt_csvSettings) {
   this.yZoom_ = new anychart.core.utils.OrdinalZoom(this, false);
 
   this.setType(anychart.enums.ChartTypes.HEAT_MAP);
-  this.defaultSeriesType(anychart.enums.HeatMapSeriesType.HEAT_MAP);
+  this.setOption('defaultSeriesType', anychart.enums.HeatMapSeriesType.HEAT_MAP);
 
   var config = anychart.getFullTheme('heatMap');
   this.defaultSeriesSettings({

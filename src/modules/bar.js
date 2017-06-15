@@ -23,7 +23,7 @@ goog.require('anychart.modules.base');
 anychart.bar = function(var_args) {
   var chart = new anychart.charts.Cartesian();
 
-  chart.defaultSeriesType(anychart.enums.CartesianSeriesType.BAR);
+  chart.setOption('defaultSeriesType', anychart.enums.CartesianSeriesType.BAR);
   chart.setType(anychart.enums.ChartTypes.BAR);
 
   chart.setupInternal(true, anychart.getFullTheme('bar'));

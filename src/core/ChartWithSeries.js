@@ -175,36 +175,31 @@ anychart.core.ChartWithSeries.prototype.normalizeSeriesType = function(type) {
 
 
 /**
- * Getter/setter for defaultSeriesType.
- * @param {(
- *    string |
- *    anychart.enums.CartesianSeriesType |
- *    anychart.enums.ScatterSeriesType |
- *    anychart.enums.RadarSeriesType |
- *    anychart.enums.PolarSeriesType |
- *    anychart.enums.MapSeriesType |
- *    anychart.enums.MekkoSeriesType |
- *    anychart.enums.WaterfallSeriesType
- * )=} opt_value Default series type.
- * @return {
- *    anychart.core.ChartWithSeries |
- *    anychart.enums.CartesianSeriesType |
- *    anychart.enums.ScatterSeriesType |
- *    anychart.enums.RadarSeriesType |
- *    anychart.enums.PolarSeriesType |
- *    anychart.enums.MapSeriesType |
- *    anychart.enums.MekkoSeriesType |
- *    anychart.enums.WaterfallSeriesType
- * } Default series type or self for chaining.
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.core.ChartWithSeries.prototype.defaultSeriesType = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = this.normalizeSeriesType(opt_value);
-    this.defaultSeriesType_ = opt_value;
-    return this;
+anychart.core.ChartWithSeries.PROPERTY_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  /**
+   * @this {anychart.core.ChartWithSeries}
+   * @param {*=} opt_value
+   * @return {string}
+   */
+  function seriesTypeNormalizer(opt_value) {
+    return this.normalizeSeriesType(opt_value);
   }
-  return this.defaultSeriesType_;
-};
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'defaultSeriesType',
+      this.normalizeSeriesType,
+      0,
+      0);
+
+  return map;
+})();
+anychart.core.settings.populate(anychart.core.ChartWithSeries, anychart.core.ChartWithSeries.PROPERTY_DESCRIPTORS);
 
 
 /**
@@ -310,7 +305,7 @@ anychart.core.ChartWithSeries.prototype.createSeriesByType = function(type, data
  */
 anychart.core.ChartWithSeries.prototype.addSeries = function(var_args) {
   var rv = [];
-  var type = /** @type {string} */ (this.defaultSeriesType());
+  var type = /** @type {string} */ (this.getOption('defaultSeriesType'));
   var count = arguments.length;
   this.suspendSignalsDispatching();
   if (!count)
@@ -950,7 +945,7 @@ anychart.core.ChartWithSeries.prototype.data = function(opt_value) {
       seriesIndex++;
     }
 
-    var type = /** @type {string} */(this.defaultSeriesType());
+    var type = /** @type {string} */(this.getOption('defaultSeriesType'));
     names = anychart.core.ChartWithSeries.seriesReferenceValues[type];
 
     do {
@@ -1168,7 +1163,7 @@ anychart.core.ChartWithSeries.prototype.createLegendItemsProvider = function(sou
 anychart.core.ChartWithSeries.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.ChartWithSeries.base(this, 'setupByJSON', config, opt_default);
 
-  this.defaultSeriesType(config['defaultSeriesType']);
+  anychart.core.settings.deserialize(this, anychart.core.ChartWithSeries.PROPERTY_DESCRIPTORS, config);
   this.minBubbleSize(config['minBubbleSize']);
   this.maxBubbleSize(config['maxBubbleSize']);
   this.palette(config['palette']);
@@ -1187,7 +1182,7 @@ anychart.core.ChartWithSeries.prototype.setupByJSON = function(config, opt_defau
 anychart.core.ChartWithSeries.prototype.serialize = function() {
   var json = anychart.core.ChartWithSeries.base(this, 'serialize');
 
-  json['defaultSeriesType'] = this.defaultSeriesType();
+  anychart.core.settings.serialize(this, anychart.core.ChartWithSeries.PROPERTY_DESCRIPTORS, json);
   json['minBubbleSize'] = this.minBubbleSize();
   json['maxBubbleSize'] = this.maxBubbleSize();
   json['palette'] = this.palette().serialize();
@@ -1228,7 +1223,8 @@ anychart.core.ChartWithSeries.prototype.disposeInternal = function() {
 //exports
 (function() {
   var proto = anychart.core.ChartWithSeries.prototype;
-
+  // auto generated
+  // proto['defaultSeriesType'] = proto.defaultSeriesType;
   proto['labels'] = proto.labels;
   proto['hoverLabels'] = proto.hoverLabels;
   proto['selectLabels'] = proto.selectLabels;

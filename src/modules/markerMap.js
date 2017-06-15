@@ -18,7 +18,7 @@ goog.require('anychart.modules.base');
  */
 anychart.markerMap = function(var_args) {
   var map = new anychart.charts.Map();
-  map.defaultSeriesType(anychart.enums.MapSeriesType.MARKER);
+  map.setOption('defaultSeriesType', anychart.enums.MapSeriesType.MARKER);
 
   map.setupInternal(true, anychart.getFullTheme('markerMap'));
 

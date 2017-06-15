@@ -417,7 +417,7 @@ anychart.core.settings.copy = function(target, descriptors, config) {
  */
 anychart.core.settings.simpleHandler = function(fieldName, deprecatedFieldName, normalizer, supportCheck, consistencyState, signal, beforeInvalidateHook, opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = normalizer(opt_value);
+    opt_value = normalizer.call(this, opt_value);
     if (this.getOwnOption(fieldName) !== opt_value) {
       this.setOption(fieldName, opt_value);
       if (this.check(supportCheck)) {
@@ -476,7 +476,7 @@ anychart.core.settings.multiArgsHandler = function(fieldName, deprecatedFieldNam
     for (var i = 7; i < arguments.length; i++) {
       args.push(arguments[i]);
     }
-    opt_value = arrayNormalizer(args);
+    opt_value = arrayNormalizer.call(this, args);
     if (this.getOwnOption(fieldName) !== opt_value) {
       this.setOption(fieldName, opt_value);
       if (this.check(supportCheck))

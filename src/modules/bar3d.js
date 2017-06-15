@@ -22,7 +22,7 @@ goog.require('anychart.modules.base');
 anychart.bar3d = function(var_args) {
   var chart = new anychart.charts.Cartesian3d();
 
-  chart.defaultSeriesType(anychart.enums.Cartesian3dSeriesType.BAR);
+  chart.setOption('defaultSeriesType', anychart.enums.Cartesian3dSeriesType.BAR);
   chart.setType(anychart.enums.ChartTypes.BAR_3D);
 
   chart.setupInternal(true, anychart.getFullTheme('bar3d'));

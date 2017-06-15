@@ -241,7 +241,7 @@ anychart.charts.Map = function() {
   this.callouts_ = [];
 
   this.unboundRegions(true);
-  this.defaultSeriesType(anychart.enums.MapSeriesType.CHOROPLETH);
+  this.setOption('defaultSeriesType', anychart.enums.MapSeriesType.CHOROPLETH);
 
   this.eventsHandler.listen(this, [goog.events.EventType.POINTERDOWN, acgraph.events.EventType.TOUCHSTART], this.tapHandler);
 };
@@ -5100,7 +5100,7 @@ anychart.charts.Map.prototype.setupByJSON = function(config, opt_default) {
   if (goog.isArray(series)) {
     for (i = 0; i < series.length; i++) {
       json = series[i];
-      var seriesType = (json['seriesType'] || this.defaultSeriesType()).toLowerCase();
+      var seriesType = (json['seriesType'] || this.getOption('defaultSeriesType')).toLowerCase();
       var data = json['data'];
       var seriesInst = this.createSeriesByType(seriesType, data);
       if (seriesInst) {
@@ -5278,7 +5278,8 @@ anychart.charts.Map.prototype.disposeInternal = function() {
   proto['removeSeries'] = proto.removeSeries;
   proto['removeSeriesAt'] = proto.removeSeriesAt;
   proto['removeAllSeries'] = proto.removeAllSeries;
-  proto['defaultSeriesType'] = proto.defaultSeriesType;
+  // auto from ChartWithSeries
+  // proto['defaultSeriesType'] = proto.defaultSeriesType;
   //bubble
   proto['maxBubbleSize'] = proto.maxBubbleSize;
   proto['minBubbleSize'] = proto.minBubbleSize;

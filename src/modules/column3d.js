@@ -21,7 +21,7 @@ goog.require('anychart.modules.base');
  */
 anychart.column3d = function(var_args) {
   var chart = new anychart.charts.Cartesian3d();
-  chart.defaultSeriesType(anychart.enums.Cartesian3dSeriesType.COLUMN);
+  chart.setOption('defaultSeriesType', anychart.enums.Cartesian3dSeriesType.COLUMN);
   chart.setType(anychart.enums.ChartTypes.COLUMN_3D);
 
   chart.setupInternal(true, anychart.getFullTheme('column3d'));

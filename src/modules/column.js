@@ -24,7 +24,7 @@ goog.require('anychart.modules.base');
  */
 anychart.column = function(var_args) {
   var chart = new anychart.charts.Cartesian();
-  chart.defaultSeriesType(anychart.enums.CartesianSeriesType.COLUMN);
+  chart.setOption('defaultSeriesType', anychart.enums.CartesianSeriesType.COLUMN);
   chart.setType(anychart.enums.ChartTypes.COLUMN);
 
   chart.setupInternal(true, anychart.getFullTheme('column'));
@@ -49,7 +49,7 @@ anychart.chartTypesMap[anychart.enums.ChartTypes.COLUMN] = anychart.column;
  */
 anychart.hilo = function(var_args) {
   var chart = new anychart.charts.Cartesian();
-  chart.defaultSeriesType(anychart.enums.CartesianSeriesType.HILO);
+  chart.setOption('defaultSeriesType', anychart.enums.CartesianSeriesType.HILO);
   chart.setType(anychart.enums.ChartTypes.HILO);
 
   chart.setupInternal(true, anychart.getFullTheme('column'));

@@ -15,7 +15,7 @@ goog.require('anychart.enums');
 anychart.charts.Scatter = function() {
   anychart.charts.Scatter.base(this, 'constructor', false);
 
-  this.defaultSeriesType(anychart.enums.ScatterSeriesType.MARKER);
+  this.setOption('defaultSeriesType', anychart.enums.ScatterSeriesType.MARKER);
   this.setType(anychart.enums.ChartTypes.SCATTER);
 };
 goog.inherits(anychart.charts.Scatter, anychart.core.ChartWithAxes);
@@ -167,7 +167,8 @@ anychart.charts.Scatter.prototype.serialize = function() {
   proto['getType'] = proto.getType;
   proto['maxBubbleSize'] = proto.maxBubbleSize;
   proto['minBubbleSize'] = proto.minBubbleSize;
-  proto['defaultSeriesType'] = proto.defaultSeriesType;
+  // auto from ChartWithSeries
+  // proto['defaultSeriesType'] = proto.defaultSeriesType;
   proto['addSeries'] = proto.addSeries;
   proto['getSeriesAt'] = proto.getSeriesAt;
   proto['getSeriesCount'] = proto.getSeriesCount;

@@ -18,8 +18,7 @@ goog.require('anychart.modules.base');
  */
 anychart.connector = function(var_args) {
   var map = new anychart.charts.Map();
-  map.defaultSeriesType(anychart.enums.MapSeriesType.CONNECTOR);
-
+  map.setOption('defaultSeriesType', anychart.enums.MapSeriesType.CONNECTOR);
   map.setupInternal(true, anychart.getFullTheme('connector'));
 
   for (var i = 0, count = arguments.length; i < count; i++) {

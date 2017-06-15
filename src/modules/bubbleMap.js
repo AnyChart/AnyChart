@@ -18,9 +18,7 @@ goog.require('anychart.modules.base');
  */
 anychart.bubbleMap = function(var_args) {
   var map = new anychart.charts.Map();
-
-  map.defaultSeriesType(anychart.enums.MapSeriesType.BUBBLE);
-
+  map.setOption('defaultSeriesType', anychart.enums.MapSeriesType.BUBBLE);
   map.setupInternal(true, anychart.getFullTheme('bubbleMap'));
 
   for (var i = 0, count = arguments.length; i < count; i++) {

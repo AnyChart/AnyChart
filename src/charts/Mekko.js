@@ -53,8 +53,7 @@ anychart.charts.Mekko = function(opt_useCategoryScale, opt_barmekkoMode) {
   this.barmekkoMode_ = !!opt_barmekkoMode;
 
   this.setOption('pointsPadding', 0);
-
-  this.defaultSeriesType(anychart.enums.MekkoSeriesType.MEKKO);
+  this.setOption('defaultSeriesType', anychart.enums.MekkoSeriesType.MEKKO);
 };
 goog.inherits(anychart.charts.Mekko, anychart.core.ChartWithAxes);
 
@@ -501,7 +500,8 @@ anychart.charts.Mekko.prototype.setupByJSON = function(config, opt_default) {
   proto['markerPalette'] = proto.markerPalette;
   proto['hatchFillPalette'] = proto.hatchFillPalette;
   proto['getType'] = proto.getType;
-  proto['defaultSeriesType'] = proto.defaultSeriesType;
+  // auto from ChartWithSeries
+  // proto['defaultSeriesType'] = proto.defaultSeriesType;
   proto['addSeries'] = proto.addSeries;
   proto['getSeriesAt'] = proto.getSeriesAt;
   proto['getSeriesCount'] = proto.getSeriesCount;

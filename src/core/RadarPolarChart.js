@@ -686,7 +686,8 @@ anychart.core.RadarPolarChart.prototype.serializeGrid_ = function(item, scales, 
   proto['palette'] = proto.palette;//doc|ex
   proto['markerPalette'] = proto.markerPalette;//doc|ex
   proto['hatchFillPalette'] = proto.hatchFillPalette;
-  proto['defaultSeriesType'] = proto.defaultSeriesType;
+  // auto from ChartWithSeries
+  // proto['defaultSeriesType'] = proto.defaultSeriesType;
   proto['addSeries'] = proto.addSeries;
   proto['getSeriesAt'] = proto.getSeriesAt;
   proto['getSeriesCount'] = proto.getSeriesCount;
