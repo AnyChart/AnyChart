@@ -193,7 +193,7 @@ anychart.core.ChartWithSeries.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'defaultSeriesType',
-      this.normalizeSeriesType,
+      seriesTypeNormalizer,
       0,
       0);
 
