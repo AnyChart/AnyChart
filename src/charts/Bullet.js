@@ -794,7 +794,8 @@ anychart.charts.Bullet.prototype.setupByJSON = function(config, opt_default) {
 (function() {
   var proto = anychart.charts.Bullet.prototype;
   proto['data'] = proto.data;//doc|ex
-  proto['layout'] = proto.layout;//doc|ex
+  // auto generated
+  // proto['layout'] = proto.layout;//doc|ex
   proto['rangePalette'] = proto.rangePalette;//doc|ex
   proto['markerPalette'] = proto.markerPalette;//doc|ex
   proto['scale'] = proto.scale;//doc|ex
