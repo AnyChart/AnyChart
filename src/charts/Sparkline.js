@@ -962,6 +962,11 @@ anychart.charts.Sparkline.PROPERTY_DESCRIPTORS = (function() {
       0,
       0,
       pointWidthBeforeInvalidation);
+  function connectMissingBeforeInvalidation() {
+    if (this.series_ && !this.series_.isWidthBased())
+      this.series_.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL | anychart.ConsistencyState.APPEARANCE,
+          anychart.Signal.NEEDS_REDRAW);
+  }
   anychart.core.settings.createHookedDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG_HOOK,
@@ -969,7 +974,7 @@ anychart.charts.Sparkline.PROPERTY_DESCRIPTORS = (function() {
       anychart.core.settings.booleanNormalizer,
       0,
       0,
-      pointWidthBeforeInvalidation);
+      connectMissingBeforeInvalidation);
 
   return map;
 })();
