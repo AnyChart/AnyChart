@@ -4,9 +4,11 @@ goog.require('anychart.animations.AnimationSerialQueue');
 goog.require('anychart.animations.PyramidFunnelAnimation');
 goog.require('anychart.animations.PyramidFunnelLabelAnimation');
 goog.require('anychart.color');
+goog.require('anychart.core.IShapeManagerUser');
 goog.require('anychart.core.Point');
 goog.require('anychart.core.SeparateChart');
 goog.require('anychart.core.reporting');
+goog.require('anychart.core.settings');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.MarkersFactory');
 goog.require('anychart.core.ui.Tooltip');
@@ -28,27 +30,12 @@ goog.require('anychart.utils');
  * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @extends {anychart.core.SeparateChart}
  * @implements {anychart.core.utils.IInteractiveSeries}
+ * @implements {anychart.core.IShapeManagerUser}
  * @constructor
  */
 anychart.charts.PyramidFunnel = function(opt_data, opt_csvSettings) {
   anychart.charts.PyramidFunnel.base(this, 'constructor');
   this.suspendSignalsDispatching();
-
-  /**
-   * Default fill function.
-   * this {{index:number, sourceColor: acgraph.vector.Fill}}
-   * return {acgraph.vector.Fill} Fill for a chart point.
-   * @type {acgraph.vector.Fill|Function}
-   * @private
-   */
-  this.fill_;
-
-  /**
-   * Hatch fill.
-   * @type {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|boolean}
-   * @private
-   */
-  this.hatchFill_ = null;
 
   /**
    * @type {anychart.palettes.HatchFills}
@@ -57,66 +44,16 @@ anychart.charts.PyramidFunnel = function(opt_data, opt_csvSettings) {
   this.hatchFillPalette_ = null;
 
   /**
-   * Default fill function for hover state.
-   * this {{index:number, sourceColor: acgraph.vector.Fill}}
-   * return {acgraph.vector.Fill} Fill for a chart point in hover state.
-   * @type {acgraph.vector.Fill|Function}
-   * @private
-   */
-  this.hoverFill_;
-
-  /**
-   * Hover hatch fill.
-   * @type {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|boolean}
-   * @private
-   */
-  this.hoverHatchFill_;
-
-  /**
    * @type {anychart.core.ui.MarkersFactory}
    * @private
    */
   this.hoverMarkers_ = null;
 
   /**
-   * Default stroke function for hover state.
-   * this {{index:number, sourceColor: acgraph.vector.Stroke}}
-   * return {acgraph.vector.Stroke} Stroke for a chart point in hover state.
-   * @type {acgraph.vector.Stroke|Function}
-   * @private
-   */
-  this.hoverStroke_;
-
-  /**
-   * Default fill function for hover state.
-   * this {{index:number, sourceColor: acgraph.vector.Fill}}
-   * return {acgraph.vector.Fill} Fill for a chart point in hover state.
-   * @type {acgraph.vector.Fill|Function}
-   * @private
-   */
-  this.selectFill_;
-
-  /**
-   * Select hatch fill.
-   * @type {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|boolean}
-   * @private
-   */
-  this.selectHatchFill_;
-
-  /**
    * @type {anychart.core.ui.MarkersFactory}
    * @private
    */
   this.selectMarkers_ = null;
-
-  /**
-   * Default stroke function for select state.
-   * this {{index:number, sourceColor: acgraph.vector.Stroke}}
-   * return {acgraph.vector.Stroke} Stroke for a chart point in hover state.
-   * @type {acgraph.vector.Stroke|Function}
-   * @private
-   */
-  this.selectStroke_;
 
   /**
    * @type {!anychart.data.Iterator}
@@ -175,17 +112,6 @@ anychart.charts.PyramidFunnel = function(opt_data, opt_csvSettings) {
    * @private
    */
   this.pointProvider_;
-
-  /**
-   * Default stroke function.
-   * this {{index:number, sourceColor: acgraph.vector.Stroke}}
-   * return {acgraph.vector.Stroke} Stroke for a chart point.
-   * @type {acgraph.vector.Stroke|Function}
-   * @private
-   */
-  this.stroke_ = (function() {
-    return /** @type {acgraph.vector.Stroke} */ (anychart.color.darken(this['sourceColor'], .2));
-  });
 
   /**
    * Interactivity state.
@@ -429,38 +355,6 @@ anychart.charts.PyramidFunnel.prototype.getDetachedIterator = function() {
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Color.
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Gets final normalized fill or stroke color.
- * @param {acgraph.vector.Fill|acgraph.vector.Stroke|Function|boolean} color Normal state color.
- * @param {...(acgraph.vector.Fill|acgraph.vector.Stroke|Function)} var_args .
- * @return {!(acgraph.vector.Fill|acgraph.vector.Stroke)} Normalized color.
- * @protected
- */
-anychart.charts.PyramidFunnel.prototype.normalizeColor = function(color, var_args) {
-  var fill;
-  var index = this.getIterator().getIndex();
-  var sourceColor, scope;
-  if (goog.isFunction(color)) {
-    sourceColor = arguments.length > 1 ?
-        this.normalizeColor.apply(this, goog.array.slice(arguments, 1)) :
-        this.palette().itemAt(index);
-    scope = {
-      'index': index,
-      'sourceColor': sourceColor,
-      'iterator': this.getIterator()
-    };
-    fill = color.call(scope);
-  } else
-    fill = color;
-  return fill;
-};
-
-
 /**
  * Colorizes shape in accordance to current point colorization settings.
  * Shape is get from current meta 'shape'.
@@ -470,10 +364,12 @@ anychart.charts.PyramidFunnel.prototype.normalizeColor = function(color, var_arg
 anychart.charts.PyramidFunnel.prototype.colorizePoint_ = function(pointState) {
   var point = /** @type {acgraph.vector.Path} */ (this.getIterator().meta('point'));
   if (goog.isDef(point)) {
-    var fillColor = this.getFinalFill(true, pointState);
+    var fillResolver = anychart.color.getColorResolver(['fill', 'hoverFill', 'selectFill'], anychart.enums.ColorType.FILL);
+    var fillColor = /** @type {acgraph.vector.Fill} */ (fillResolver(this, pointState, false, true));
     point.fill(fillColor);
 
-    var strokeColor = this.getFinalStroke(true, pointState);
+    var strokeResolver = anychart.color.getColorResolver(['stroke', 'hoverStroke', 'selectStroke'], anychart.enums.ColorType.STROKE);
+    var strokeColor = /** @type {acgraph.vector.Stroke} */ (strokeResolver(this, pointState, false, true));
     point.stroke(strokeColor);
   }
 };
@@ -707,185 +603,6 @@ anychart.charts.PyramidFunnel.prototype.selectFill = function(opt_fillOrColorOrK
 
 
 /**
- * Method that gets final stroke color for the current point, with all fallbacks taken into account.
- * @param {boolean} usePointSettings If point settings should count too (iterator questioning).
- * @param {anychart.PointState|number} pointState Point state.
- * @return {!acgraph.vector.Fill} Final hover stroke for the current row.
- * @protected
- */
-anychart.charts.PyramidFunnel.prototype.getFinalFill = function(usePointSettings, pointState) {
-  var iterator = this.getIterator();
-  var normalColor = /** @type {acgraph.vector.Fill|Function} */((usePointSettings && iterator.get('fill')) || this.fill());
-
-  var result;
-  if (this.state.isStateContains(pointState, anychart.PointState.SELECT)) {
-    result = this.normalizeColor(
-        /** @type {acgraph.vector.Fill|Function} */(
-        (usePointSettings && iterator.get('selectFill')) || this.selectFill() || normalColor),
-        normalColor);
-  } else if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
-    result = this.normalizeColor(
-        /** @type {acgraph.vector.Fill|Function} */(
-        (usePointSettings && iterator.get('hoverFill')) || this.hoverFill() || normalColor),
-        normalColor);
-  } else {
-    result = this.normalizeColor(normalColor);
-  }
-
-  return acgraph.vector.normalizeFill(/** @type {!acgraph.vector.Fill} */(result));
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  HatchFill.
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Getter/setter for hatchFill.
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.charts.PyramidFunnel|Function|boolean} Hatch fill.
- */
-anychart.charts.PyramidFunnel.prototype.hatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrTypeOrState)) {
-    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
-        opt_patternFillOrTypeOrState :
-        acgraph.vector.normalizeHatchFill.apply(null, arguments);
-
-    if (hatchFill != this.hatchFill_) {
-      this.hatchFill_ = hatchFill;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE |
-          anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return /** @type {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|boolean} */ (this.hatchFill_);
-};
-
-
-/**
- * Getter/setter for hoverHatchFill.
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.charts.PyramidFunnel|Function|boolean} Hatch fill.
- */
-anychart.charts.PyramidFunnel.prototype.hoverHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrTypeOrState)) {
-    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
-        opt_patternFillOrTypeOrState :
-        acgraph.vector.normalizeHatchFill.apply(null, arguments);
-
-    if (this.hoverHatchFill_ != hatchFill)
-      this.hoverHatchFill_ = hatchFill;
-
-    return this;
-  }
-  return /** @type {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|boolean} */ (this.hoverHatchFill_);
-};
-
-
-/**
- * Getter/setter for current select hatch fill settings.
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.charts.PyramidFunnel|Function|boolean} Hatch fill.
- */
-anychart.charts.PyramidFunnel.prototype.selectHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrTypeOrState)) {
-    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
-        opt_patternFillOrTypeOrState :
-        acgraph.vector.normalizeHatchFill.apply(null, arguments);
-
-    if (this.selectHatchFill_ != hatchFill)
-      this.selectHatchFill_ = hatchFill;
-
-    return this;
-  }
-  return /** @type {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|boolean} */ (this.selectHatchFill_);
-};
-
-
-/**
- * Method that gets the final hatch fill for a current point, with all fallbacks taken into account.
- * @param {boolean} usePointSettings If point settings should count too (iterator questioning).
- * @param {anychart.PointState|number} pointState Point state.
- * @return {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} Final hatch fill for the current row.
- * @protected
- */
-anychart.charts.PyramidFunnel.prototype.getFinalHatchFill = function(usePointSettings, pointState) {
-  var iterator = this.getIterator();
-
-  var normalHatchFill;
-  if (usePointSettings && goog.isDef(iterator.get('hatchFill'))) {
-    normalHatchFill = iterator.get('hatchFill');
-  } else {
-    normalHatchFill = this.hatchFill();
-  }
-
-  var hatchFill;
-  if (this.state.isStateContains(pointState, anychart.PointState.SELECT)) {
-    if (usePointSettings && goog.isDef(iterator.get('selectHatchFill'))) {
-      hatchFill = iterator.get('selectHatchFill');
-    } else if (goog.isDef(this.selectHatchFill())) {
-      hatchFill = this.selectHatchFill();
-    } else {
-      hatchFill = normalHatchFill;
-    }
-  } else if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
-    if (usePointSettings && goog.isDef(iterator.get('hoverHatchFill'))) {
-      hatchFill = iterator.get('hoverHatchFill');
-    } else if (goog.isDef(this.hoverHatchFill())) {
-      hatchFill = this.hoverHatchFill();
-    } else {
-      hatchFill = normalHatchFill;
-    }
-  } else {
-    hatchFill = normalHatchFill;
-  }
-
-  return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */(
-      this.normalizeHatchFill(
-          /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|boolean|string} */(hatchFill)));
-};
-
-
-/**
- * Gets final normalized pattern/hatch fill.
- * @param {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|boolean|string} hatchFill Normal state hatch fill.
- * @return {acgraph.vector.HatchFill|acgraph.vector.PatternFill} Normalized hatch fill.
- * @protected
- */
-anychart.charts.PyramidFunnel.prototype.normalizeHatchFill = function(hatchFill) {
-  var fill;
-  var index = this.getIterator().getIndex();
-  if (goog.isFunction(hatchFill)) {
-    var sourceHatchFill = acgraph.vector.normalizeHatchFill(
-        /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(index)));
-    var scope = {
-      'index': index,
-      'sourceHatchFill': sourceHatchFill,
-      'iterator': this.getIterator()
-    };
-    fill = acgraph.vector.normalizeHatchFill(hatchFill.call(scope));
-  } else if (goog.isBoolean(hatchFill)) {
-    fill = hatchFill ? /** @type {acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(index)) : null;
-  } else
-    fill = acgraph.vector.normalizeHatchFill(hatchFill);
-  return fill;
-};
-
-
-/**
  * Apply hatch fill to shape in accordance to current point colorization settings.
  * Shape is get from current meta 'hatchFillShape'.
  * @param {anychart.PointState|number} pointState Point state.
@@ -894,120 +611,11 @@ anychart.charts.PyramidFunnel.prototype.normalizeHatchFill = function(hatchFill)
 anychart.charts.PyramidFunnel.prototype.applyHatchFill = function(pointState) {
   var hatchPoint = /** @type {acgraph.vector.Path} */(this.getIterator().meta('hatchPoint'));
   if (goog.isDefAndNotNull(hatchPoint)) {
+    var hatchFillResolver = anychart.color.getColorResolver(['hatchFill', 'hoverHatchFill', 'selectHatchFill'], anychart.enums.ColorType.HATCH_FILL);
     hatchPoint
         .stroke(null)
-        .fill(this.getFinalHatchFill(true, pointState));
+        .fill(hatchFillResolver(this, pointState, true));
   }
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Stroke.
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Getter/setter for stroke.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.charts.PyramidFunnel|acgraph.vector.Stroke|Function} .
- */
-anychart.charts.PyramidFunnel.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var stroke = goog.isFunction(opt_strokeOrFill) ?
-        opt_strokeOrFill :
-        acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (stroke != this.stroke_) {
-      this.stroke_ = stroke;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.stroke_;
-};
-
-
-/**
- * Getter/setter for hoverStroke.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.charts.PyramidFunnel|acgraph.vector.Stroke|Function} .
- */
-anychart.charts.PyramidFunnel.prototype.hoverStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var stroke = goog.isFunction(opt_strokeOrFill) ?
-        opt_strokeOrFill :
-        acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (stroke != this.hoverStroke_) {
-      this.hoverStroke_ = stroke;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.hoverStroke_;
-};
-
-
-/**
- * Getter for the chart points stroke in the select state.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.charts.PyramidFunnel|acgraph.vector.Stroke|Function} .
- */
-anychart.charts.PyramidFunnel.prototype.selectStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var stroke = goog.isFunction(opt_strokeOrFill) ?
-        opt_strokeOrFill :
-        acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (stroke != this.selectStroke_) {
-      this.selectStroke_ = stroke;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.selectStroke_;
-};
-
-
-/**
- * Method that gets final line color for the current point, with all fallbacks taken into account.
- * @param {boolean} usePointSettings If point settings should count too (iterator questioning).
- * @param {anychart.PointState|number} pointState Point state.
- * @return {!acgraph.vector.Stroke} Final hover stroke for the current row.
- * @protected
- */
-anychart.charts.PyramidFunnel.prototype.getFinalStroke = function(usePointSettings, pointState) {
-  var iterator = this.getIterator();
-  var normalColor = /** @type {acgraph.vector.Stroke|Function} */((usePointSettings && iterator.get('stroke')) || this.stroke());
-
-  var result;
-  if (this.state.isStateContains(pointState, anychart.PointState.SELECT)) {
-    result = this.normalizeColor(
-        /** @type {acgraph.vector.Stroke|Function} */(
-        (usePointSettings && iterator.get('selectStroke')) || this.selectStroke() || normalColor),
-        normalColor);
-  } else if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
-    result = this.normalizeColor(
-        /** @type {acgraph.vector.Stroke|Function} */(
-        (usePointSettings && iterator.get('hoverStroke')) || this.hoverStroke() || normalColor),
-        normalColor);
-  } else {
-    result = this.normalizeColor(normalColor);
-  }
-
-  return acgraph.vector.normalizeStroke(/** @type {!acgraph.vector.Stroke} */(result));
 };
 
 
@@ -1438,7 +1046,9 @@ anychart.charts.PyramidFunnel.prototype.updatePointOnAnimate = function(point) {
     this.getIterator().select(point.getIndex());
     hatchPoint.clear();
     hatchPoint.deserialize(shape.serialize());
-    hatchPoint.stroke(null).fill(this.getFinalHatchFill(true, this.state.getPointStateByIndex(point.getIndex())));
+    var pointState = this.state.getPointStateByIndex(point.getIndex());
+    var hatchFillResolver = anychart.color.getColorResolver(['hatchFill', 'hoverHatchFill', 'selectHatchFill'], anychart.enums.ColorType.HATCH_FILL);
+    hatchPoint.stroke(null).fill(hatchFillResolver(this, pointState, true));
   }
 };
 
@@ -2047,11 +1657,114 @@ anychart.charts.PyramidFunnel.PROPERTY_DESCRIPTORS = (function() {
 anychart.charts.PyramidFunnel.COLOR_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
+      'fill',
+      anychart.core.settings.fillOrFunctionNormalizer,
+      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.CHART_LEGEND,
+      anychart.Signal.NEEDS_REDRAW);
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
+      'hoverFill',
+      anychart.core.settings.fillOrFunctionNormalizer,
+      anychart.ConsistencyState.APPEARANCE,
+      anychart.Signal.NEEDS_REDRAW);
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
+      'selectFill',
+      anychart.core.settings.fillOrFunctionNormalizer,
+      anychart.ConsistencyState.APPEARANCE,
+      anychart.Signal.NEEDS_REDRAW);
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
+      'stroke',
+      anychart.core.settings.strokeOrFunctionNormalizer,
+      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.CHART_LEGEND,
+      anychart.Signal.NEEDS_REDRAW);
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
+      'hoverStroke',
+      anychart.core.settings.strokeOrFunctionNormalizer,
+      anychart.ConsistencyState.APPEARANCE,
+      anychart.Signal.NEEDS_REDRAW);
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
+      'selectStroke',
+      anychart.core.settings.strokeOrFunctionNormalizer,
+      anychart.ConsistencyState.APPEARANCE,
+      anychart.Signal.NEEDS_REDRAW);
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
+      'hatchFill',
+      anychart.core.settings.hatchFillOrFunctionNormalizer,
+      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.CHART_LEGEND,
+      anychart.Signal.NEEDS_REDRAW);
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
+      'hoverHatchFill',
+      anychart.core.settings.hatchFillOrFunctionNormalizer,
+      0,
+      0);
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
+      'selectHatchFill',
+      anychart.core.settings.hatchFillOrFunctionNormalizer,
+      0,
+      0);
   return map;
 })();
 anychart.core.settings.populate(anychart.charts.PyramidFunnel, anychart.charts.PyramidFunnel.PROPERTY_DESCRIPTORS);
 anychart.core.settings.populate(anychart.charts.PyramidFunnel, anychart.charts.PyramidFunnel.COLOR_DESCRIPTORS);
+
+
+//region --- anychart.core.IShapeManagerUser implementation
+/** @inheritDoc */
+anychart.charts.PyramidFunnel.prototype.resolveOption = function(name, point, normalizer, opt_seriesName) {
+  var val = point.get(name) || this.getOption(name);
+  if (goog.isDef(val))
+    val = normalizer(val);
+  return val;
+};
+
+
+/** @inheritDoc */
+anychart.charts.PyramidFunnel.prototype.getAutoHatchFill = function() {
+  return /** @type {acgraph.vector.HatchFill} */ (acgraph.vector.normalizeHatchFill(acgraph.vector.HatchFill.HatchFillType.DIAGONAL_BRICK));
+};
+
+
+/** @inheritDoc */
+anychart.charts.PyramidFunnel.prototype.getHatchFillResolutionContext = function(opt_ignorePointSettings) {
+  var iterator = this.getIterator();
+  var index = iterator.getIndex();
+  var sourceHatchFill = this.hatchFillPalette().itemAt(index);
+  return {
+    'index': index,
+    'sourceHatchFill': sourceHatchFill,
+    'iterator': iterator
+  };
+};
+
+
+/** @inheritDoc */
+anychart.charts.PyramidFunnel.prototype.getColorResolutionContext = function(opt_baseColor, opt_ignorePointSettings, opt_ignoreColorScale) {
+  var iterator = this.getIterator();
+  return {
+    'index': iterator.getIndex(),
+    'sourceColor': opt_baseColor || this.palette().itemAt(iterator.getIndex()) || 'blue',
+    'iterator': iterator
+  };
+};
+//endregion
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -3094,7 +2807,9 @@ anychart.charts.PyramidFunnel.prototype.markersInvalidated_ = function(event) {
  * @return {!acgraph.vector.Fill} Marker color for point.
  */
 anychart.charts.PyramidFunnel.prototype.getMarkerFill = function() {
-  return this.getFinalFill(false, anychart.PointState.NORMAL);
+  var fillGetter = anychart.color.getColorResolver(['fill'], anychart.enums.ColorType.FILL);
+  var fill = /** @type {acgraph.vector.Fill} */(fillGetter(this, anychart.PointState.NORMAL, true, true));
+  return /** @type {acgraph.vector.Fill} */(anychart.color.setOpacity(fill, 1, true));
 };
 
 
@@ -3517,6 +3232,11 @@ anychart.charts.PyramidFunnel.prototype.createLegendItemsProvider = function(sou
     if (!goog.isString(itemText)) {
       itemText = String(goog.isDef(iterator.get('name')) ? iterator.get('name') : iterator.get('x'));
     }
+
+    var fillResolver = anychart.color.getColorResolver(['fill'], anychart.enums.ColorType.FILL);
+    var strokeResolver = anychart.color.getColorResolver(['stroke'], anychart.enums.ColorType.STROKE);
+    var hatchFillResolver = anychart.color.getColorResolver(['hatchFill'], anychart.enums.ColorType.HATCH_FILL);
+
     var obj = {
       'enabled': true,
       'meta': {
@@ -3526,9 +3246,9 @@ anychart.charts.PyramidFunnel.prototype.createLegendItemsProvider = function(sou
       },
       'iconType': anychart.enums.LegendItemIconType.SQUARE,
       'text': itemText,
-      'iconStroke': this.getFinalStroke(true, anychart.PointState.NORMAL),
-      'iconFill': this.getFinalFill(true, anychart.PointState.NORMAL),
-      'iconHatchFill': this.getFinalHatchFill(true, anychart.PointState.NORMAL)
+      'iconStroke': /** @type {acgraph.vector.Stroke} */ (strokeResolver(this, anychart.PointState.NORMAL, true)),
+      'iconFill': /** @type {acgraph.vector.Fill} */ (fillResolver(this, anychart.PointState.NORMAL, true)),
+      'iconHatchFill': /** @type {acgraph.vector.HatchFill} */ (hatchFillResolver(this, anychart.PointState.NORMAL, true))
     };
     goog.object.extend(obj, legendItem);
     obj['sourceUid'] = goog.getUid(this);
@@ -3636,110 +3356,7 @@ anychart.charts.PyramidFunnel.prototype.serialize = function() {
   json['selectMarkers'] = this.selectMarkers().serialize();
 
   anychart.core.settings.serialize(this, anychart.charts.PyramidFunnel.PROPERTY_DESCRIPTORS, json);
-
-  if (goog.isFunction(this['fill'])) {
-    if (goog.isFunction(this.fill())) {
-      anychart.core.reporting.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          [this.getType() + ' fill']
-      );
-    } else {
-      json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.fill()));
-    }
-  }
-  if (goog.isFunction(this['hoverFill'])) {
-    if (goog.isFunction(this.hoverFill())) {
-      anychart.core.reporting.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          [this.getType() + ' hoverFill']
-      );
-    } else {
-      json['hoverFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverFill()));
-    }
-  }
-  if (goog.isFunction(this['selectFill'])) {
-    if (goog.isFunction(this.selectFill())) {
-      anychart.core.reporting.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          [this.getType() + ' selectFill']
-      );
-    } else {
-      json['selectFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.selectFill()));
-    }
-  }
-
-  if (goog.isFunction(this['stroke'])) {
-    if (goog.isFunction(this.stroke())) {
-      anychart.core.reporting.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          [this.getType() + ' stroke']
-      );
-    } else {
-      json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.stroke()));
-    }
-  }
-  if (goog.isFunction(this['hoverStroke'])) {
-    if (goog.isFunction(this.hoverStroke())) {
-      anychart.core.reporting.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          [this.getType() + ' hoverStroke']
-      );
-    } else {
-      json['hoverStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.hoverStroke()));
-    }
-  }
-  if (goog.isFunction(this['selectStroke'])) {
-    if (goog.isFunction(this.selectStroke())) {
-      anychart.core.reporting.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          [this.getType() + ' selectStroke']
-      );
-    } else {
-      json['selectStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.selectStroke()));
-    }
-  }
-
-  if (goog.isFunction(this['hatchFill'])) {
-    if (goog.isFunction(this.hatchFill())) {
-      anychart.core.reporting.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          [this.getType() + ' hatchFill']
-      );
-    } else {
-      json['hatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hatchFill()));
-    }
-  }
-  if (goog.isFunction(this['hoverHatchFill'])) {
-    if (goog.isFunction(this.hoverHatchFill())) {
-      anychart.core.reporting.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          [this.getType() + ' hoverHatchFill']
-      );
-    } else {
-      json['hoverHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/
-          (this.hoverHatchFill()));
-    }
-  }
-  if (goog.isFunction(this['selectHatchFill'])) {
-    if (goog.isFunction(this.selectHatchFill())) {
-      anychart.core.reporting.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          [this.getType() + ' selectHatchFill']
-      );
-    } else {
-      json['selectHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/
-          (this.selectHatchFill()));
-    }
-  }
+  anychart.core.settings.serialize(this, anychart.charts.PyramidFunnel.COLOR_DESCRIPTORS, json);
 
   return {'chart': json};
 };
@@ -3752,26 +3369,15 @@ anychart.charts.PyramidFunnel.prototype.setupByJSON = function(config, opt_defau
   anychart.charts.PyramidFunnel.base(this, 'setupByJSON', config, opt_default);
 
   anychart.core.settings.deserialize(this, anychart.charts.PyramidFunnel.PROPERTY_DESCRIPTORS, config);
+  anychart.core.settings.deserialize(this, anychart.charts.PyramidFunnel.COLOR_DESCRIPTORS, config);
   this.data(config['data']);
 
   this.hatchFillPalette(config['hatchFillPalette']);
   this.markerPalette(config['markerPalette']);
 
-  this.fill(config['fill']);
-  this.hoverFill(config['hoverFill']);
-  this.selectFill(config['selectFill']);
-
-  this.hatchFill(config['hatchFill']);
-  this.hoverHatchFill(config['hoverHatchFill']);
-  this.selectHatchFill(config['selectHatchFill']);
-
   this.labels().setupInternal(!!opt_default, config['labels']);
   this.hoverLabels().setupInternal(!!opt_default, config['hoverLabels']);
   this.selectLabels().setupInternal(!!opt_default, config['selectLabels']);
-
-  this.stroke(config['stroke']);
-  this.hoverStroke(config['hoverStroke']);
-  this.selectStroke(config['selectStroke']);
 
   this.markers().setup(config['markers']);
   this.hoverMarkers().setup(config['hoverMarkers']);

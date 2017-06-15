@@ -2350,6 +2350,13 @@ goog.provide('anychart.themes.defaultTheme');
       }
     },
     'funnel': {
+      /**
+       * @this {*}
+       * @return {*}
+       */
+      'stroke': function() {
+        return /** @type {acgraph.vector.Stroke} */ (anychart.color.darken(this['sourceColor'], .2));
+      },
       'title': {
         'text': 'Funnel Chart'
       },
@@ -2361,6 +2368,13 @@ goog.provide('anychart.themes.defaultTheme');
       }
     },
     'pyramid': {
+      /**
+       * @this {*}
+       * @return {*}
+       */
+      'stroke': function() {
+        return /** @type {acgraph.vector.Stroke} */ (anychart.color.darken(this['sourceColor'], .2));
+      },
       'title': {
         'text': 'Pyramid Chart'
       },
