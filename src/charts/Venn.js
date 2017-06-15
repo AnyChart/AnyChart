@@ -35,18 +35,6 @@ anychart.charts.Venn = function(opt_data, opt_csvSettings) {
   anychart.charts.Venn.base(this, 'constructor');
 
   /**
-   * Theme settings.
-   * @type {Object}
-   */
-  this.themeSettings = {};
-
-  /**
-   * Own settings (Settings set by user with API).
-   * @type {Object}
-   */
-  this.ownSettings = {};
-
-  /**
    * @type {anychart.data.Iterator}
    * @private
    */
@@ -301,44 +289,6 @@ anychart.charts.Venn.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
   return map;
 })();
 anychart.core.settings.populate(anychart.charts.Venn, anychart.charts.Venn.prototype.SIMPLE_PROPS_DESCRIPTORS);
-
-
-//endregion
-//region -- IObjectWithSettings implementation
-/** @inheritDoc */
-anychart.charts.Venn.prototype.getOwnOption = function(name) {
-  return this.ownSettings[name];
-};
-
-
-/** @inheritDoc */
-anychart.charts.Venn.prototype.hasOwnOption = function(name) {
-  return goog.isDef(this.ownSettings[name]);
-};
-
-
-/** @inheritDoc */
-anychart.charts.Venn.prototype.getThemeOption = function(name) {
-  return this.themeSettings[name];
-};
-
-
-/** @inheritDoc */
-anychart.charts.Venn.prototype.getOption = function(name) {
-  return goog.isDef(this.ownSettings[name]) ? this.ownSettings[name] : this.themeSettings[name];
-};
-
-
-/** @inheritDoc */
-anychart.charts.Venn.prototype.setOption = function(name, value) {
-  this.ownSettings[name] = value;
-};
-
-
-/** @inheritDoc */
-anychart.charts.Venn.prototype.check = function(flags) {
-  return true;
-};
 
 
 //endregion
