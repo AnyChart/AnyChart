@@ -5,6 +5,7 @@ goog.require('anychart.core.axes.Linear');
 goog.require('anychart.core.axisMarkers.Range');
 goog.require('anychart.core.bullet.Marker');
 goog.require('anychart.core.reporting');
+goog.require('anychart.core.settings');
 goog.require('anychart.data.Set');
 goog.require('anychart.enums');
 goog.require('anychart.palettes');
@@ -39,13 +40,6 @@ anychart.charts.Bullet = function(opt_data, opt_csvSettings) {
    * @private
    */
   this.markers_ = [];
-
-  /**
-   * Layout of bullet chart.
-   * @type {anychart.enums.Layout}
-   * @private
-   */
-  this.layout_;
 
   /** @inheritDoc */
   this.allowCreditsDisabling = true;
@@ -166,29 +160,25 @@ anychart.charts.Bullet.prototype.dataInvalidated_ = function(e) {
 
 
 /**
- * Getter/setter for bullet chart layout.
- * @param {(string|anychart.enums.Layout)=} opt_value [{@link anychart.enums.Layout}.HORIZONTAL] Layout for bullet chart.
- * @return {anychart.enums.Layout|anychart.charts.Bullet} Layout of bullet chart of self for method chaining.
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.charts.Bullet.prototype.layout = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeLayout(opt_value, anychart.enums.Layout.HORIZONTAL);
-    if (this.layout_ != opt_value) {
-      this.layout_ = opt_value;
-      this.invalidate(
-          anychart.ConsistencyState.BULLET_AXES |
-              anychart.ConsistencyState.CHART_TITLE |
-              anychart.ConsistencyState.BULLET_MARKERS |
-              anychart.ConsistencyState.BULLET_AXES_MARKERS |
-              anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW |
-              anychart.Signal.BOUNDS_CHANGED
-      );
-    }
-    return this;
-  }
-  return this.layout_;
-};
+anychart.charts.Bullet.PROPERTY_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'layout',
+      anychart.enums.normalizeLayout,
+      anychart.ConsistencyState.BULLET_AXES |
+          anychart.ConsistencyState.CHART_TITLE |
+          anychart.ConsistencyState.BULLET_MARKERS |
+          anychart.ConsistencyState.BULLET_AXES_MARKERS |
+          anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+  return map;
+})();
+anychart.core.settings.populate(anychart.charts.Bullet, anychart.charts.Bullet.PROPERTY_DESCRIPTORS);
 
 
 /**
@@ -197,7 +187,7 @@ anychart.charts.Bullet.prototype.layout = function(opt_value) {
 anychart.charts.Bullet.prototype.updateLayoutDefaults = function() {
   var i, count, rangeLayout;
   var isHorizontal = this.isHorizontal();
-  var markersLayout = /** @type {anychart.enums.Layout} */(this.layout());
+  var markersLayout = /** @type {anychart.enums.Layout} */(this.getOption('layout'));
   var title = this.title();
   title.setDefaultRotation(0);
   var axis = this.axis();
@@ -231,7 +221,7 @@ anychart.charts.Bullet.prototype.updateLayoutDefaults = function() {
  * @return {boolean} If the bullet chart is horizontal.
  */
 anychart.charts.Bullet.prototype.isHorizontal = function() {
-  return (this.layout_ == anychart.enums.Layout.HORIZONTAL);
+  return (this.getOption('layout') == anychart.enums.Layout.HORIZONTAL);
 };
 
 
@@ -558,7 +548,7 @@ anychart.charts.Bullet.prototype.drawContent = function(bounds) {
       marker.suspendSignalsDispatching();
       marker.parentBounds(boundsWithoutAxis);
       marker.setDefaultType(/** @type {anychart.enums.BulletMarkerType} */(this.markerPalette().itemAt(i)));
-      marker.setDefaultLayout(/** @type {anychart.enums.Layout} */(this.layout()));
+      marker.setDefaultLayout(/** @type {anychart.enums.Layout} */(this.getOption('layout')));
       marker.draw();
       marker.resumeSignalsDispatching(false);
     }
@@ -750,7 +740,7 @@ anychart.charts.Bullet.prototype.hoverMode = function(opt_value) {
 anychart.charts.Bullet.prototype.serialize = function() {
   var json = anychart.charts.Bullet.base(this, 'serialize');
   json['type'] = anychart.enums.ChartTypes.BULLET;
-  json['layout'] = this.layout();
+  anychart.core.settings.serialize(this, anychart.charts.Bullet.PROPERTY_DESCRIPTORS, json);
   json['data'] = this.data().serialize();
   json['rangePalette'] = this.rangePalette().serialize();
   json['markerPalette'] = this.markerPalette().serialize();
@@ -775,7 +765,7 @@ anychart.charts.Bullet.prototype.setupByJSON = function(config, opt_default) {
     this.defaultMarkerSettings(config['defaultMarkerSettings']);
 
   this.data(config['data']);
-  this.layout(config['layout']);
+  anychart.core.settings.deserialize(this, anychart.charts.Bullet.PROPERTY_DESCRIPTORS, config);
   this.rangePalette(config['rangePalette']);
   this.markerPalette(config['markerPalette']);
 
