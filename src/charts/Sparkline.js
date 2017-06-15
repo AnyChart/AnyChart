@@ -6,6 +6,7 @@ goog.require('anychart.core.axisMarkers.Line');
 goog.require('anychart.core.axisMarkers.Range');
 goog.require('anychart.core.axisMarkers.Text');
 goog.require('anychart.core.reporting');
+goog.require('anychart.core.settings');
 goog.require('anychart.core.sparkline.series.Base');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.MarkersFactory');
@@ -77,12 +78,6 @@ anychart.charts.Sparkline = function(opt_data, opt_csvSettings) {
    * @private
    */
   this.dataBounds_ = null;
-
-  /**
-   * @type {boolean}
-   * @protected
-   */
-  this.connectMissing;
 
   /**
    * Series clip.
@@ -590,21 +585,6 @@ anychart.charts.Sparkline.prototype.data_;
 
 
 /**
- * Series type.
- * @type {string|anychart.enums.SparklineSeriesType}
- * @private
- */
-anychart.charts.Sparkline.prototype.type_;
-
-
-/**
- * @private
- * @type {(number|string|null)}
- */
-anychart.charts.Sparkline.prototype.barWidth_ = '95%';
-
-
-/**
  * @type {anychart.data.View}
  * @private
  */
@@ -945,25 +925,55 @@ anychart.charts.Sparkline.prototype.seriesInvalidated_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter/setter for sparkline series type.
- * @param {(string|anychart.enums.SparklineSeriesType)=} opt_type Series type.
- * @return {string|anychart.enums.SparklineSeriesType|anychart.charts.Sparkline} .
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.charts.Sparkline.prototype.type = function(opt_type) {
-  if (goog.isDef(opt_type)) {
-    opt_type = anychart.enums.normalizeSparklineSeriesType(opt_type);
-    if (this.type_ != opt_type) {
-      this.type_ = opt_type;
-      if (this.series_) {
-        this.series_.dispose();
-        this.series_ = null;
-      }
-      this.invalidate(anychart.ConsistencyState.SPARK_SERIES, anychart.Signal.NEEDS_REDRAW);
+anychart.charts.Sparkline.PROPERTY_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  function typeBeforeInvalidation() {
+    if (this.series_) {
+      this.series_.dispose();
+      this.series_ = null;
     }
-    return this;
   }
-  return this.type_;
-};
+  anychart.core.settings.createHookedDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG_HOOK,
+      'seriesType',
+      anychart.enums.normalizeSparklineSeriesType,
+      anychart.ConsistencyState.SPARK_SERIES,
+      anychart.Signal.NEEDS_REDRAW,
+      typeBeforeInvalidation);
+
+  function pointWidthNormalizer(opt_value) {
+    return anychart.utils.normalizeNumberOrPercent(opt_value, /** @type {number|string} */ (this.getOption('pointWidth')));
+  }
+  function pointWidthBeforeInvalidation() {
+    if (this.series_ && this.series_.isWidthBased())
+      this.series_.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL | anychart.ConsistencyState.APPEARANCE,
+          anychart.Signal.NEEDS_REDRAW);
+  }
+  anychart.core.settings.createHookedDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG_HOOK,
+      'pointWidth',
+      pointWidthNormalizer,
+      0,
+      0,
+      pointWidthBeforeInvalidation);
+  anychart.core.settings.createHookedDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG_HOOK,
+      'connectMissingPoints',
+      anychart.core.settings.booleanNormalizer,
+      0,
+      0,
+      pointWidthBeforeInvalidation);
+
+  return map;
+})();
+anychart.core.settings.populate(anychart.charts.Sparkline, anychart.charts.Sparkline.PROPERTY_DESCRIPTORS);
 
 
 /**
@@ -984,47 +994,6 @@ anychart.charts.Sparkline.prototype.clip = function(opt_value) {
   } else {
     return this.clip_;
   }
-};
-
-
-/**
- * Getter/setter for pointWidth.
- * @param {(number|string|null)=} opt_value Point width pixel value.
- * @return {string|number|anychart.charts.Sparkline} Bar width pixel value or Bar instance for chaining call.
- */
-anychart.charts.Sparkline.prototype.pointWidth = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizeNumberOrPercent(opt_value, '95%');
-    if (this.barWidth_ != opt_value) {
-      this.barWidth_ = opt_value;
-      if (this.series_ && this.series_.isWidthBased())
-        this.series_.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL | anychart.ConsistencyState.APPEARANCE,
-            anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  } else {
-    return this.barWidth_;
-  }
-};
-
-
-/**
- * Getter/setter for connectMissingPoints.
- * @param {boolean=} opt_value The value to be set.
- * @return {!anychart.charts.Sparkline|boolean} The setting, or itself for method chaining.
- */
-anychart.charts.Sparkline.prototype.connectMissingPoints = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = !!opt_value;
-    if (this.connectMissing != opt_value) {
-      this.connectMissing = opt_value;
-      if (this.series_ && !this.series_.isWidthBased())
-        this.series_.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL,
-            anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.connectMissing;
 };
 
 
@@ -2152,7 +2121,7 @@ anychart.charts.Sparkline.prototype.calculate = function() {
 anychart.charts.Sparkline.prototype.drawContent = function(bounds) {
   if (this.hasInvalidationState(anychart.ConsistencyState.SPARK_SERIES)) {
     if (!this.series_)
-      this.series_ = this.createSeriesByType_(this.type_);
+      this.series_ = this.createSeriesByType_(/** @type {anychart.enums.SparklineSeriesType} */ (this.getOption('seriesType')));
   }
 
   this.calculate();
@@ -2273,11 +2242,9 @@ anychart.charts.Sparkline.prototype.setupByJSON = function(config, opt_default) 
 
   this.data(config['data']);
 
-  this.type(config['seriesType']);
+  anychart.core.settings.deserialize(this, anychart.charts.Sparkline.PROPERTY_DESCRIPTORS, config);
   this.clip(config['clip']);
   this.data(config['data']);
-  this.connectMissingPoints(config['connectMissingPoints']);
-  this.pointWidth(config['pointWidth']);
 
   var type = this.getType();
 
@@ -2414,11 +2381,9 @@ anychart.charts.Sparkline.prototype.serialize = function() {
   json['yScale'] = scales.length - 1;
   json['type'] = anychart.enums.ChartTypes.SPARKLINE;
 
-  json['seriesType'] = this.type();
+  anychart.core.settings.serialize(this, anychart.charts.Sparkline.PROPERTY_DESCRIPTORS, json);
   json['clip'] = (this.clip_ instanceof anychart.math.Rect) ? this.clip_.serialize() : this.clip_;
   json['data'] = this.data().serialize();
-  json['connectMissingPoints'] = this.connectMissingPoints();
-  json['pointWidth'] = this.pointWidth();
 
 
   if (goog.isFunction(this['lastFill'])) {
@@ -2607,12 +2572,12 @@ anychart.chartTypesMap[anychart.enums.ChartTypes.SPARKLINE] = anychart.sparkline
   proto['rangeMarker'] = proto.rangeMarker;
   proto['textMarker'] = proto.textMarker;
 
-  proto['type'] = proto.type;
+  // auto generated
+  // proto['type'] = proto.type;
+  // proto['connectMissingPoints'] = proto.connectMissingPoints;
+  // proto['pointWidth'] = proto.pointWidth;
   proto['data'] = proto.data;
   proto['clip'] = proto.clip;
-
-  proto['connectMissingPoints'] = proto.connectMissingPoints;
-  proto['pointWidth'] = proto.pointWidth;
 
   proto['lastFill'] = proto.lastFill;
   proto['lastHatchFill'] = proto.lastHatchFill;

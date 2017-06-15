@@ -85,7 +85,7 @@ anychart.core.sparkline.series.Column.prototype.getPixelPointWidth = function(op
       bounds.width);
 
   var pointWidthPix = Math.floor(
-      anychart.utils.normalizeSize(/** @type {(number|string)} */(this.chart.pointWidth()), categoryWidth));
+      anychart.utils.normalizeSize(/** @type {(number|string)} */(this.chart.getOption('pointWidth')), categoryWidth));
 
   if (pointWidthPix < 1) pointWidthPix = 1;
 

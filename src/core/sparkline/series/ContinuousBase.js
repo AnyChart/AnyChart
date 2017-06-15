@@ -50,7 +50,7 @@ anychart.core.sparkline.series.ContinuousBase.prototype.drawPoint = function() {
       this.drawLabel();
     }
     // if connectMissing == true, firstPointDrawn will never be false when drawing.
-    this.firstPointDrawn = (this.chart.connectMissingPoints() && this.firstPointDrawn) || pointDrawn;
+    this.firstPointDrawn = (/** @type {boolean} */ (this.chart.getOption('connectMissingPoints')) && this.firstPointDrawn) || pointDrawn;
   }
 };
 
@@ -118,7 +118,7 @@ anychart.core.sparkline.series.ContinuousBase.prototype.startDrawing = function(
 
 /** @inheritDoc */
 anychart.core.sparkline.series.ContinuousBase.prototype.drawMissing = function() {
-  if (!this.chart.connectMissingPoints()) {
+  if (!this.chart.getOption('connectMissingPoints')) {
     anychart.core.sparkline.series.ContinuousBase.base(this, 'drawMissing');
     this.finalizeSegment();
   }
