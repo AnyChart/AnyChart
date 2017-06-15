@@ -3599,18 +3599,6 @@ anychart.charts.PyramidFunnel.LabelsDomain.prototype.getLabelBounds_ = function(
   proto['hatchFillPalette'] = proto.hatchFillPalette;
   proto['markerPalette'] = proto.markerPalette;
 
-  proto['fill'] = proto.fill;
-  proto['hoverFill'] = proto.hoverFill;
-  proto['selectFill'] = proto.selectFill;
-
-  proto['hatchFill'] = proto.hatchFill;
-  proto['hoverHatchFill'] = proto.hoverHatchFill;
-  proto['selectHatchFill'] = proto.selectHatchFill;
-
-  proto['stroke'] = proto.stroke;
-  proto['hoverStroke'] = proto.hoverStroke;
-  proto['selectStroke'] = proto.selectStroke;
-
   proto['labels'] = proto.labels;
   proto['hoverLabels'] = proto.hoverLabels;
   proto['selectLabels'] = proto.selectLabels;
@@ -3635,4 +3623,13 @@ anychart.charts.PyramidFunnel.LabelsDomain.prototype.getLabelBounds_ = function(
   // proto['overlapMode'] = proto.overlapMode;
   // proto['connectorLength'] = proto.connectorLength;
   // proto['connectorStroke'] = proto.connectorStroke;
+  // proto['fill'] = proto.fill;
+  // proto['hoverFill'] = proto.hoverFill;
+  // proto['selectFill'] = proto.selectFill;
+  // proto['hatchFill'] = proto.hatchFill;
+  // proto['hoverHatchFill'] = proto.hoverHatchFill;
+  // proto['selectHatchFill'] = proto.selectHatchFill;
+  // proto['stroke'] = proto.stroke;
+  // proto['hoverStroke'] = proto.hoverStroke;
+  // proto['selectStroke'] = proto.selectStroke;
 })();

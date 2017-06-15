@@ -2355,7 +2355,7 @@ goog.provide('anychart.themes.defaultTheme');
        * @return {*}
        */
       'stroke': function() {
-        return /** @type {acgraph.vector.Stroke} */ (anychart.color.darken(this['sourceColor'], .2));
+        return global['anychart']['color']['darken'](this['sourceColor'], .2);
       },
       'title': {
         'text': 'Funnel Chart'
@@ -2373,7 +2373,7 @@ goog.provide('anychart.themes.defaultTheme');
        * @return {*}
        */
       'stroke': function() {
-        return /** @type {acgraph.vector.Stroke} */ (anychart.color.darken(this['sourceColor'], .2));
+        return global['anychart']['color']['darken'](this['sourceColor'], .2);
       },
       'title': {
         'text': 'Pyramid Chart'
