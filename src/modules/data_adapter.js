@@ -451,10 +451,10 @@ anychart.modules.data_adapter.onDataFileLoaded_ = function(processFunc, onSucces
   if (xhrIo.isSuccess()) {
     try {
       var result = processFunc(xhrIo);
-      onSuccess.apply(context, result);
     } catch (error) {
       if (onError) onError.call(context, 500, error);
     }
+    onSuccess.apply(context, result);
   } else if (onError) {
     onError.call(context, xhrIo.getLastErrorCode(), xhrIo.getLastError());
   }
