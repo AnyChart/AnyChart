@@ -1738,7 +1738,9 @@ anychart.charts.PyramidFunnel.prototype.resolveOption = function(name, point, no
 
 /** @inheritDoc */
 anychart.charts.PyramidFunnel.prototype.getAutoHatchFill = function() {
-  return /** @type {acgraph.vector.HatchFill} */ (acgraph.vector.normalizeHatchFill(acgraph.vector.HatchFill.HatchFillType.DIAGONAL_BRICK));
+  return /** @type {acgraph.vector.HatchFill} */ (
+      acgraph.vector.normalizeHatchFill(this.hatchFillPalette().itemAt(this.getIterator().getIndex()) ||
+      acgraph.vector.HatchFill.HatchFillType.DIAGONAL_BRICK));
 };
 
 
@@ -1746,10 +1748,9 @@ anychart.charts.PyramidFunnel.prototype.getAutoHatchFill = function() {
 anychart.charts.PyramidFunnel.prototype.getHatchFillResolutionContext = function(opt_ignorePointSettings) {
   var iterator = this.getIterator();
   var index = iterator.getIndex();
-  var sourceHatchFill = this.hatchFillPalette().itemAt(index);
   return {
     'index': index,
-    'sourceHatchFill': sourceHatchFill,
+    'sourceHatchFill': this.getAutoHatchFill(),
     'iterator': iterator
   };
 };
