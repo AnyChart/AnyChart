@@ -122,23 +122,6 @@ anychart.charts.TreeMap.prototype.usesTreeData = function() {
 anychart.charts.TreeMap.PROPERTY_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'hoverMode',
-      anychart.enums.normalizeHoverMode,
-      0,
-      0);
-  function selectionModeNormalizer(opt_value) {
-    return goog.isNull(opt_value) ? null : anychart.enums.normalizeSelectMode(opt_value);
-  }
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'selectionMode',
-      selectionModeNormalizer,
-      0,
-      0);
   function maxDepthNormalizer(opt_value) {
     return anychart.utils.normalizeToNaturalNumber(opt_value, 1, false);
   }
@@ -301,6 +284,22 @@ anychart.charts.TreeMap.prototype.hoverMode = function(opt_value) {
     return this;
   }
   return /** @type {anychart.enums.HoverMode}*/(this.hoverMode_);
+};
+
+
+/**
+ * @param {(anychart.enums.SelectionMode|string|null)=} opt_value Selection mode.
+ * @return {anychart.charts.TreeMap|anychart.enums.SelectionMode|null} .
+ */
+anychart.charts.TreeMap.prototype.selectionMode = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = goog.isNull(opt_value) ? null : anychart.enums.normalizeSelectMode(opt_value);
+    if (opt_value != this.selectionMode_) {
+      this.selectionMode_ = opt_value;
+    }
+    return this;
+  }
+  return /** @type {anychart.enums.SelectionMode}*/(this.selectionMode_);
 };
 
 
@@ -2792,6 +2791,8 @@ anychart.charts.TreeMap.prototype.setupByJSON = function(config, opt_default) {
 
   anychart.core.settings.deserialize(this, anychart.charts.TreeMap.PROPERTY_DESCRIPTORS, config);
   anychart.core.settings.deserialize(this, anychart.charts.TreeMap.COLOR_DESCRIPTORS, config);
+  this.hoverMode(config['hoverMode']);
+  this.selectionMode(config['selectionMode']);
 
   if ('colorRange' in config)
     this.colorRange(config['colorRange']);
@@ -2943,8 +2944,6 @@ anychart.charts.TreeMap.prototype.serialize = function() {
   json['colorRange'] = this.colorRange().serialize();
 
   anychart.core.settings.serialize(this, anychart.charts.TreeMap.PROPERTY_DESCRIPTORS, json);
-  delete json['hoverMode'];
-  delete json['selectionMode'];
   anychart.core.settings.serialize(this, anychart.charts.TreeMap.COLOR_DESCRIPTORS, json);
 
   json['labels'] = this.labels().serialize();
@@ -2992,9 +2991,9 @@ anychart.charts.TreeMap.prototype.disposeInternal = function() {
   proto['getType'] = proto.getType;
 
   proto['data'] = proto.data;
+  proto['selectionMode'] = proto.selectionMode;
+  proto['hoverMode'] = proto.hoverMode;
   // auto generated
-  // proto['selectionMode'] = proto.selectionMode;
-  // proto['hoverMode'] = proto.hoverMode;
   // proto['maxDepth'] = proto.maxDepth;
   // proto['hintDepth'] = proto.hintDepth;
   // proto['hintOpacity'] = proto.hintOpacity;
