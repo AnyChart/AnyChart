@@ -4,6 +4,7 @@ goog.require('anychart.core.SeparateChart');
 goog.require('anychart.core.pert.CriticalPath');
 goog.require('anychart.core.pert.Milestones');
 goog.require('anychart.core.pert.Tasks');
+goog.require('anychart.core.settings');
 goog.require('anychart.core.ui.Tooltip');
 goog.require('anychart.core.utils.TypedLayer');
 goog.require('anychart.data.Tree');
@@ -59,12 +60,6 @@ anychart.charts.Pert = function() {
    * @private {Array.<(anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)>}
    */
   this.finishActivities_ = [];
-
-  /**
-   * Function that calculates expected time.
-   * @private {Function}
-   */
-  this.expectedTimeCalculator_ = goog.nullFunction;
 
   /**
    * Format provider.
@@ -191,20 +186,6 @@ anychart.charts.Pert = function() {
    * @private {Array.<Array.<(anychart.charts.Pert.Milestone|anychart.charts.Pert.FakeMilestone)>>}
    */
   this.faces_ = [];
-
-  /**
-   * Vertical spacing between milestones.
-   * @type {number|string}
-   * @private
-   */
-  this.verticalSpacing_ = 20;
-
-  /**
-   * Horizontal spacing between milestones.
-   * @type {number|string}
-   * @private
-   */
-  this.horizontalSpacing_ = 80;
 
   /**
    * Default tooltip settings from theme.
@@ -1078,27 +1059,53 @@ anychart.charts.Pert.prototype.makeInteractivityEvent_ = function() {
 
 
 //endregion
+//region -- Descriptors
+/**
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.charts.Pert.PROPERTY_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'expectedTimeCalculator',
+      anychart.core.settings.asIsNormalizer,
+      anychart.ConsistencyState.PERT_CALCULATIONS,
+      anychart.Signal.NEEDS_REDRAW);
+  function verticalSpacingNormalizer(opt_value) {
+    return anychart.utils.normalizeNumberOrPercent(opt_value, 20);
+  }
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'verticalSpacing',
+      verticalSpacingNormalizer,
+      anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW);
+  function horizontalSpacingNormalizer(opt_value) {
+    return anychart.utils.normalizeNumberOrPercent(opt_value, 20);
+  }
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'horizontalSpacing',
+      horizontalSpacingNormalizer,
+      anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW);
+
+  return map;
+})();
+anychart.core.settings.populate(anychart.charts.Pert, anychart.charts.Pert.PROPERTY_DESCRIPTORS);
+
+
+//endregion
 //region -- Calculations.
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Calculations.
 //
 //----------------------------------------------------------------------------------------------------------------------
-/**
- * Gets/sets function to calculate expected time.
- * @param {function():number=} opt_value - Value to be set.
- * @return {function():number|anychart.charts.Pert} - Current value or itself for method chaining.
- */
-anychart.charts.Pert.prototype.expectedTimeCalculator = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.expectedTimeCalculator_ = opt_value;
-    this.invalidate(anychart.ConsistencyState.PERT_CALCULATIONS, anychart.Signal.NEEDS_REDRAW);
-    return this;
-  }
-  return this.expectedTimeCalculator_;
-};
-
-
 /** @inheritDoc */
 anychart.charts.Pert.prototype.calculate = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.PERT_DATA)) {
@@ -1218,7 +1225,7 @@ anychart.charts.Pert.prototype.calculateActivity_ = function(id) {
 
   if (!goog.isDef(activity.duration)) {
     var formatProvider = this.createFormatProvider(false, workData, activity);
-    activity.duration = anychart.math.round(this.expectedTimeCalculator_.call(formatProvider, formatProvider), 3);
+    activity.duration = anychart.math.round(/** @type {Function} */ (this.getOption('expectedTimeCalculator')).call(formatProvider, formatProvider), 3);
   }
 
   var duration = activity.duration;
@@ -2168,42 +2175,6 @@ anychart.charts.Pert.prototype.calculateLevels_ = function() {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Gets/sets milestones vertical spacing.
- * @param {(number|string)=} opt_value - Value to be set.
- * @return {anychart.charts.Pert|string|number} - Chart itself or current value.
- */
-anychart.charts.Pert.prototype.verticalSpacing = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = /** @type {number|string} */ (anychart.utils.normalizeNumberOrPercent(opt_value, 20));
-    if (this.verticalSpacing_ != opt_value) {
-      this.verticalSpacing_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.verticalSpacing_;
-};
-
-
-/**
- * Gets/sets milestones horizontal spacing.
- * @param {(number|string)=} opt_value - Value to be set.
- * @return {anychart.charts.Pert|string|number} - Chart itself or current value.
- */
-anychart.charts.Pert.prototype.horizontalSpacing = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = /** @type {number|string} */ (anychart.utils.normalizeNumberOrPercent(opt_value, 80));
-    if (this.horizontalSpacing_ != opt_value) {
-      this.horizontalSpacing_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.horizontalSpacing_;
-};
-
-
-/**
  * Listener for milestones invalidation.
  * @param {anychart.SignalEvent} event - Signal event.
  * @private
@@ -2631,8 +2602,8 @@ anychart.charts.Pert.prototype.drawContent = function(bounds) {
     // this.criticalPath().milestones().clearLabels();
     // this.criticalPath().tasks().clearLabels();
 
-    var verticalStep = anychart.utils.normalizeSize(this.verticalSpacing_, bounds.height);
-    var horizontalStep = anychart.utils.normalizeSize(this.horizontalSpacing_, bounds.width);
+    var verticalStep = anychart.utils.normalizeSize(/** @type {number} */ (this.getOption('verticalSpacing')), bounds.height);
+    var horizontalStep = anychart.utils.normalizeSize(/** @type {number} */ (this.getOption('horizontalSpacing')), bounds.width);
 
     var i, j;
     var left, top;
@@ -2983,8 +2954,7 @@ anychart.charts.Pert.prototype.serialize = function() {
   json['tasks'] = this.tasks().serialize();
   json['criticalPath'] = this.criticalPath().serialize();
 
-  json['horizontalSpacing'] = this.horizontalSpacing_;
-  json['verticalSpacing'] = this.verticalSpacing_;
+  anychart.core.settings.serialize(this, anychart.charts.Pert.PROPERTY_DESCRIPTORS, json);
 
   return {'chart': json};
 };
@@ -3001,10 +2971,7 @@ anychart.charts.Pert.prototype.setupByJSON = function(config, opt_default) {
   if ('tasks' in config) this.tasks().setupByJSON(config['tasks'], opt_default);
   if ('criticalPath' in config) this.criticalPath().setupByJSON(config['criticalPath'], opt_default);
 
-  this.verticalSpacing(config['verticalSpacing']);
-  this.horizontalSpacing(config['horizontalSpacing']);
-
-  this.expectedTimeCalculator(config['expectedTimeCalculator']);
+  anychart.core.settings.deserialize(this, anychart.charts.Pert.PROPERTY_DESCRIPTORS, config);
 };
 //endregion.
 
@@ -3012,15 +2979,16 @@ anychart.charts.Pert.prototype.setupByJSON = function(config, opt_default) {
 //exports
 (function() {
   var proto = anychart.charts.Pert.prototype;
+  // auto generated
+  // proto['expectedTimeCalculator'] = proto.expectedTimeCalculator;
+  // proto['verticalSpacing'] = proto.verticalSpacing;
+  // proto['horizontalSpacing'] = proto.horizontalSpacing;
   proto['getType'] = proto.getType;
   proto['tasks'] = proto.tasks;
   proto['milestones'] = proto.milestones;
   proto['criticalPath'] = proto.criticalPath;
   proto['data'] = proto.data;
   proto['getType'] = proto.getType;
-  proto['expectedTimeCalculator'] = proto.expectedTimeCalculator;
-  proto['verticalSpacing'] = proto.verticalSpacing;
-  proto['horizontalSpacing'] = proto.horizontalSpacing;
   proto['toCsv'] = proto.toCsv;
 })();
 
