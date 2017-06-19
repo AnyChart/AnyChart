@@ -27,7 +27,7 @@ anychart.animations.PieLabelAnimation = function(chart, duration, opt_acc) {
   /**
    * @type {?acgraph.vector.Stroke}
    */
-  this.connectorStroke = /** @type {acgraph.vector.Stroke} */ (this.chart.connectorStroke());
+  this.connectorStroke = /** @type {acgraph.vector.Stroke} */ (this.chart.getOption('connectorStroke'));
 };
 goog.inherits(anychart.animations.PieLabelAnimation, anychart.animations.Animation);
 
