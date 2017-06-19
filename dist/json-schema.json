@@ -2138,6 +2138,8 @@
       "allOf": [{"$ref": "#/definitions/anychart.core.SeparateChart"}],
       "properties": {
         "type": {"enum": ["ganttResource"]},
+        "rowStroke": {"$ref": "#/definitions/stroke"},
+        "columnStroke": {"$ref": "#/definitions/stroke"},
         "headerHeight": {"type": "number"},
         "defaultRowHeight": {"type": "number"},
         "rowHoverFill": {"$ref": "#/definitions/fill"},
@@ -2161,6 +2163,8 @@
       "allOf": [{"$ref": "#/definitions/anychart.core.SeparateChart"}],
       "properties": {
         "type": {"enum": ["ganttProject"]},
+        "rowStroke": {"$ref": "#/definitions/stroke"},
+        "columnStroke": {"$ref": "#/definitions/stroke"},
         "headerHeight": {"type": "number"},
         "defaultRowHeight": {"type": "number"},
         "rowHoverFill": {"$ref": "#/definitions/fill"},

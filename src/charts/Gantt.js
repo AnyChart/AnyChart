@@ -83,56 +83,6 @@ anychart.charts.Gantt = function(opt_isResourcesChart) {
   this.splitter_ = null;
 
   /**
-   * Splitter position. Percent or pixel value of splitter position.
-   * Pixel value in this case is actually a width of data grid.
-   * @type {(string|number)}
-   * @private
-   */
-  this.splitterPosition_ = NaN;
-
-  /**
-   * Default header height.
-   * @type {number}
-   * @private
-   */
-  this.headerHeight_ = NaN;
-
-  /**
-   * Default hover fill.
-   * @type {acgraph.vector.Fill}
-   * @private
-   */
-  this.hoverFill_;
-
-  /**
-   * Default row selected fill.
-   * @type {acgraph.vector.Fill}
-   * @private
-   */
-  this.rowSelectedFill_;
-
-
-  /**
-   * Cell border settings.
-   * @type {acgraph.vector.Stroke}
-   * @private
-   */
-  this.columnStroke_;
-
-  /**
-   * Row vertical line separation path.
-   * @type {acgraph.vector.Stroke}
-   * @private
-   */
-  this.rowStroke_;
-
-  /**
-   * Whether is editable.
-   * @type {boolean}
-   */
-  this.editable = false;
-
-  /**
    * Context provider.
    * @type {anychart.format.Context}
    * @private
@@ -395,20 +345,85 @@ anychart.charts.Gantt.prototype.defaultRowHeight = function(opt_value) {
 
 
 /**
- * Gets/sets header height.
- * @param {number=} opt_value - Value to be set.
- * @return {(anychart.charts.Gantt|number)} - Current value or itself for method chaining.
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.charts.Gantt.prototype.headerHeight = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.headerHeight_ != opt_value) {
-      this.headerHeight_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
+anychart.charts.Gantt.PROPERTY_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'headerHeight',
+      anychart.core.settings.asIsNormalizer,
+      anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW);
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'splitterPosition',
+      anychart.core.settings.asIsNormalizer,
+      anychart.ConsistencyState.GANTT_SPLITTER_POSITION,
+      anychart.Signal.NEEDS_REDRAW);
+  function rowHoverFillBeforeInvalidation() {
+    //rowHoverFill does not invalidate anything. Here's no need to suspend it.
+    this.getTimeline().rowHoverFill(/** @type {acgraph.vector.Fill} */ (this.getOption('rowHoverFill')));
+    this.getDataGrid_().rowHoverFill(/** @type {acgraph.vector.Fill} */ (this.getOption('rowHoverFill')));
   }
-  return this.headerHeight_;
-};
+  anychart.core.settings.createHookedDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.MULTI_ARG_HOOK,
+      'rowHoverFill',
+      anychart.core.settings.fillNormalizer,
+      0,
+      0,
+      rowHoverFillBeforeInvalidation);
+  function rowSelectedFillBeforeInvalidation() {
+    anychart.core.Base.suspendSignalsDispatching(this.getTimeline(), this.getDataGrid_());
+    this.tl_.rowSelectedFill(/** @type {acgraph.vector.Fill} */ (this.getOption('rowSelectedFill')));
+    this.dg_.rowSelectedFill(/** @type {acgraph.vector.Fill} */ (this.getOption('rowSelectedFill')));
+    anychart.core.Base.resumeSignalsDispatchingTrue(this.dg_, this.tl_);
+  }
+  anychart.core.settings.createHookedDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.MULTI_ARG_HOOK,
+      'rowSelectedFill',
+      anychart.core.settings.fillNormalizer,
+      0,
+      0,
+      rowSelectedFillBeforeInvalidation);
+  function columnStrokeBeforeInvalidation() {
+    anychart.core.Base.suspendSignalsDispatching(this.getTimeline(), this.getDataGrid_());
+    this.dg_.columnStroke(/** @type {acgraph.vector.Stroke} */ (this.getOption('columnStroke')));
+    this.tl_.columnStroke(/** @type {acgraph.vector.Stroke} */ (this.getOption('columnStroke')));
+    anychart.core.Base.resumeSignalsDispatchingTrue(this.dg_, this.tl_);
+  }
+  anychart.core.settings.createHookedDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.MULTI_ARG_HOOK,
+      'columnStroke',
+      anychart.core.settings.strokeNormalizer,
+      0,
+      0,
+      columnStrokeBeforeInvalidation);
+  function rowStrokeBeforeInvalidation() {
+    anychart.core.Base.suspendSignalsDispatching(this.getTimeline(), this.getDataGrid_(), this.controller_);
+    var val = /** @type {acgraph.vector.Stroke} */ (this.getOption('rowStroke'));
+    this.dg_.rowStroke(val);
+    this.tl_.rowStroke(val);
+    this.controller_.rowStrokeThickness(anychart.utils.extractThickness(val));
+    anychart.core.Base.resumeSignalsDispatchingTrue(this.dg_, this.tl_, this.controller_);
+  }
+  anychart.core.settings.createHookedDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.MULTI_ARG_HOOK,
+      'rowStroke',
+      anychart.core.settings.strokeNormalizer,
+      0,
+      0,
+      rowStrokeBeforeInvalidation);
+  return map;
+})();
+anychart.core.settings.populate(anychart.charts.Gantt, anychart.charts.Gantt.PROPERTY_DESCRIPTORS);
 
 
 /**
@@ -473,95 +488,6 @@ anychart.charts.Gantt.prototype.getTimeline = function() {
   }
 
   return this.tl_;
-};
-
-
-/**
- * Gets/sets row hover fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.charts.Gantt|string} - Current value or itself for method chaining.
- */
-anychart.charts.Gantt.prototype.rowHoverFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    this.hoverFill_ = acgraph.vector.normalizeFill.apply(null, arguments);
-    //rowHoverFill does not invalidate anything. Here's no need to suspend it.
-    this.getTimeline().rowHoverFill(this.hoverFill_);
-    this.getDataGrid_().rowHoverFill(this.hoverFill_);
-    return this;
-  }
-  return this.hoverFill_;
-};
-
-
-/**
- * Gets/sets row selected fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.charts.Gantt|string} - Current value or itself for method chaining.
- */
-anychart.charts.Gantt.prototype.rowSelectedFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.rowSelectedFill_), val)) {
-      this.rowSelectedFill_ = val;
-      anychart.core.Base.suspendSignalsDispatching(this.getTimeline(), this.getDataGrid_());
-      this.tl_.rowSelectedFill(this.rowSelectedFill_);
-      this.dg_.rowSelectedFill(this.rowSelectedFill_);
-      anychart.core.Base.resumeSignalsDispatchingTrue(this.dg_, this.tl_);
-    }
-    return this;
-  }
-  return this.rowSelectedFill_;
-};
-
-
-/**
- * Gets/sets column stroke.
- * @param {(acgraph.vector.Stroke|string)=} opt_value - Value to be set.
- * @return {(string|acgraph.vector.Stroke|anychart.charts.Gantt)} - Current value or itself for method chaining.
- */
-anychart.charts.Gantt.prototype.columnStroke = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
-    anychart.core.Base.suspendSignalsDispatching(this.getTimeline(), this.getDataGrid_());
-    this.columnStroke_ = val;
-    this.dg_.columnStroke(val);
-    this.tl_.columnStroke(val);
-    anychart.core.Base.resumeSignalsDispatchingTrue(this.dg_, this.tl_);
-    return this;
-  }
-  return this.columnStroke_;
-};
-
-
-/**
- * Gets/sets row stroke.
- * @param {(acgraph.vector.Stroke|string)=} opt_value - Value to be set.
- * @return {(string|acgraph.vector.Stroke|anychart.charts.Gantt)} - Current value or itself for method chaining.
- */
-anychart.charts.Gantt.prototype.rowStroke = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
-    anychart.core.Base.suspendSignalsDispatching(this.getTimeline(), this.getDataGrid_(), this.controller_);
-    this.rowStroke_ = val;
-    this.dg_.rowStroke(val);
-    this.tl_.rowStroke(val);
-    this.controller_.rowStrokeThickness(anychart.utils.extractThickness(val));
-    anychart.core.Base.resumeSignalsDispatchingTrue(this.dg_, this.tl_, this.controller_);
-    return this;
-  }
-  return this.rowStroke_;
 };
 
 
@@ -784,23 +710,6 @@ anychart.charts.Gantt.prototype.collapseTask = function(taskId) {
 
 
 /**
- * Gets/sets splitter position.
- * @param {(string|number)=} opt_value - Pixel or percent value. Actually sets a width of data grid.
- * @return {(anychart.charts.Gantt|number|string)} - Current value or itself for method chaining.
- */
-anychart.charts.Gantt.prototype.splitterPosition = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.splitterPosition_ != opt_value) {
-      this.splitterPosition_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.GANTT_SPLITTER_POSITION, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.splitterPosition_;
-};
-
-
-/**
  * Getter/setter for splitter.
  * TODO (A.Kudryavtsev): Turn it to getter for a while?
  * @param {(Object|boolean|null)=} opt_value - Value to be set.
@@ -820,7 +729,7 @@ anychart.charts.Gantt.prototype.splitter = function(opt_value) {
     this.splitter_//TODO (A.Kudryavtsev): Move this settings to theme.
         .suspendSignalsDispatching()
         .layout(anychart.enums.Layout.VERTICAL)
-        .position(this.splitterPosition_)
+        .position(/** @type {number|string} */ (this.getOption('splitterPosition')))
         .dragPreviewFill('#000 0.3')
         .stroke('none')
         .splitterWidth(2)
@@ -1050,13 +959,14 @@ anychart.charts.Gantt.prototype.drawContent = function(bounds) {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.GANTT_SPLITTER_POSITION) || this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     if (bounds.width > 0) {
-      var dgWidth = Math.round(anychart.utils.normalizeSize(this.splitterPosition_, bounds.width));
+      var dgWidth = Math.round(anychart.utils.normalizeSize(/** @type {number|string} */ (this.getOption('splitterPosition')), bounds.width));
       var dgRatio = goog.math.clamp(dgWidth / bounds.width, 0, 1);
       this.splitter().position(dgRatio);
       this.markConsistent(anychart.ConsistencyState.GANTT_SPLITTER_POSITION);
     }
   }
 
+  var headerHeight = /** @type {number} */ (this.getOption('headerHeight'));
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     if (bounds.width > 0) {
       if (this.dg_.enabled()) {
@@ -1065,10 +975,10 @@ anychart.charts.Gantt.prototype.drawContent = function(bounds) {
         this.tl_.bounds().set(bounds);
       }
 
-      var newAvailableHeight = bounds.height - this.headerHeight_ - 1;
+      var newAvailableHeight = bounds.height - headerHeight - 1;
       if (this.controller_.availableHeight() != newAvailableHeight) {
-        this.tl_.headerHeight(this.headerHeight_);
-        this.dg_.headerHeight(this.headerHeight_);
+        this.tl_.headerHeight(headerHeight);
+        this.dg_.headerHeight(headerHeight);
         this.controller_.availableHeight(newAvailableHeight);
       }
 
@@ -1084,9 +994,9 @@ anychart.charts.Gantt.prototype.drawContent = function(bounds) {
       var barSize = /** @type {number} */ (this.verticalScrollBar_.barSize());
       this.verticalScrollBar_.bounds(
           (bounds.left + bounds.width - barSize - 1),
-          (tlBounds.top + this.headerHeight_ + barSize + 1),
+          (tlBounds.top + headerHeight + barSize + 1),
           barSize,
-          (tlBounds.height - this.headerHeight_ - 2 * barSize - 2)
+          (tlBounds.height - headerHeight - 2 * barSize - 2)
       );
     }
   }
@@ -1117,11 +1027,8 @@ anychart.charts.Gantt.prototype.serialize = function() {
 
   json['type'] = this.getType();
 
-  json['headerHeight'] = this.headerHeight();
+  anychart.core.settings.serialize(this, anychart.charts.Gantt.PROPERTY_DESCRIPTORS, json);
   json['defaultRowHeight'] = this.defaultRowHeight();
-  json['rowHoverFill'] = anychart.color.serialize(this.hoverFill_);
-  json['rowSelectedFill'] = anychart.color.serialize(this.rowSelectedFill_);
-  json['splitterPosition'] = this.splitterPosition();
 
   json['controller'] = this.controller_.serialize();
   json['dataGrid'] = this.dataGrid().serialize();
@@ -1139,11 +1046,8 @@ anychart.charts.Gantt.prototype.setupByJSON = function(config, opt_default) {
 
   this.data(/** @type {anychart.data.Tree} */ (this.controller_.data()));
 
-  this.headerHeight(config['headerHeight']);
+  anychart.core.settings.deserialize(this, anychart.charts.Gantt.PROPERTY_DESCRIPTORS, config);
   this.defaultRowHeight(config['defaultRowHeight']);
-  this.rowHoverFill(config['rowHoverFill']);
-  this.rowSelectedFill(config['rowSelectedFill']);
-  this.splitterPosition(config['splitterPosition']);
   this.editing(config['editing']);
 
   if ('dataGrid' in config) this.dataGrid().setupByJSON(config['dataGrid'], opt_default);
@@ -1158,14 +1062,9 @@ anychart.charts.Gantt.prototype.setupByJSON = function(config, opt_default) {
   proto['data'] = proto.data;
   proto['dataGrid'] = proto.dataGrid;
   proto['getTimeline'] = proto.getTimeline;
-  proto['rowHoverFill'] = proto.rowHoverFill;
-  proto['rowSelectedFill'] = proto.rowSelectedFill;
-  proto['columnStroke'] = proto.columnStroke;
-  proto['rowStroke'] = proto.rowStroke;
   proto['zoomIn'] = proto.zoomIn;
   proto['zoomOut'] = proto.zoomOut;
   proto['zoomTo'] = proto.zoomTo;
-  proto['headerHeight'] = proto.headerHeight;
   proto['fitAll'] = proto.fitAll;
   proto['fitToTask'] = proto.fitToTask;
   proto['scrollTo'] = proto.scrollTo;
@@ -1175,10 +1074,17 @@ anychart.charts.Gantt.prototype.setupByJSON = function(config, opt_default) {
   proto['expandAll'] = proto.expandAll;
   proto['expandTask'] = proto.expandTask;
   proto['collapseTask'] = proto.collapseTask;
-  proto['splitterPosition'] = proto.splitterPosition;
   proto['getType'] = proto.getType;
   proto['editing'] = proto.editing;
   proto['toCsv'] = proto.toCsv;
   proto['xScale'] = proto.xScale;
   proto['defaultRowHeight'] = proto.defaultRowHeight;
+
+  // auto generated
+  // proto['rowHoverFill'] = proto.rowHoverFill;
+  // proto['rowSelectedFill'] = proto.rowSelectedFill;
+  // proto['columnStroke'] = proto.columnStroke;
+  // proto['rowStroke'] = proto.rowStroke;
+  // proto['headerHeight'] = proto.headerHeight;
+  // proto['splitterPosition'] = proto.splitterPosition;
 })();
