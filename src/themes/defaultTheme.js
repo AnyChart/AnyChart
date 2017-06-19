@@ -1963,7 +1963,8 @@ goog.provide('anychart.themes.defaultTheme');
           'inverted': true
         },
         {
-          'type': 'linear'
+          'type': 'linear',
+          'softMinimum': 0
         }
       ],
       'tooltip': {
@@ -1983,7 +1984,16 @@ goog.provide('anychart.themes.defaultTheme');
         'anchor': 'centerBottom',
         'offsetX': 0,
         'offsetY': 10
-      }
+      },
+      'scales': [
+        {
+          'type': 'ordinal'
+        },
+        {
+          'type': 'linear',
+          'softMinimum': 0
+        }
+      ]
     },
     'line': {
       'defaultSeriesType': 'line',
@@ -2165,7 +2175,16 @@ goog.provide('anychart.themes.defaultTheme');
       'legend': {
         'enabled': true,
         'itemsSourceMode': 'categories'
-      }
+      },
+      'scales': [
+        {
+          'type': 'ordinal'
+        },
+        {
+          'type': 'linear',
+          'softMinimum': 0
+        }
+      ]
     },
 
     // merges with nothing
@@ -2679,7 +2698,8 @@ goog.provide('anychart.themes.defaultTheme');
         },
         {
           'type': 'linear',
-          'stackMode': 'value'
+          'stackMode': 'value',
+          'softMinimum': 0
         },
         {
           'type': 'ordinal'
