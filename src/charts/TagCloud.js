@@ -24,7 +24,6 @@ goog.require('anychart.format.Context');
  * @extends {anychart.core.SeparateChart}
  * @implements {anychart.core.utils.IInteractiveSeries}
  * @implements {anychart.core.settings.IObjectWithSettings}
- * @implements {anychart.core.settings.IResolvable}
  */
 anychart.charts.TagCloud = function(opt_data, opt_settings) {
   anychart.charts.TagCloud.base(this, 'constructor');
@@ -62,18 +61,6 @@ anychart.charts.TagCloud = function(opt_data, opt_settings) {
    * @type {number}
    */
   this.maxFontSize = NaN;
-
-  /**
-   * Theme settings.
-   * @type {Object}
-   */
-  this.themeSettings = {};
-
-  /**
-   * Own settings (Settings set by user with API).
-   * @type {Object}
-   */
-  this.ownSettings = {};
 
   /**
    * @type {anychart.core.TagCloudStateSettings}
@@ -167,88 +154,6 @@ anychart.charts.TagCloud.prototype.SUPPORTED_CONSISTENCY_STATES =
 anychart.charts.TagCloud.Tag;
 
 
-//region --- IResolvable implementation
-/** @inheritDoc */
-anychart.charts.TagCloud.prototype.resolutionChainCache = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.resolutionChainCache_ = opt_value;
-  }
-  return this.resolutionChainCache_;
-};
-
-
-/**
- * Resolution chain getter.
- * @return {Array.<Object|null|undefined>} - Chain of settings.
- */
-anychart.charts.TagCloud.prototype.getResolutionChain = function() {
-  var chain = this.resolutionChainCache();
-  if (!chain) {
-    chain = goog.array.concat(this.getHighPriorityResolutionChain(), this.getLowPriorityResolutionChain());
-    this.resolutionChainCache(chain);
-  }
-  return chain;
-};
-
-
-/** @inheritDoc */
-anychart.charts.TagCloud.prototype.getLowPriorityResolutionChain = function() {
-  var sett = [this.themeSettings];
-  if (this.parent_) {
-    sett = goog.array.concat(sett, this.parent_.getLowPriorityResolutionChain());
-  }
-  return sett;
-};
-
-
-/** @inheritDoc */
-anychart.charts.TagCloud.prototype.getHighPriorityResolutionChain = function() {
-  var sett = [this.ownSettings];
-  if (this.parent_) {
-    sett = goog.array.concat(sett, this.parent_.getHighPriorityResolutionChain());
-  }
-  return sett;
-};
-
-
-//endregion
-//region --- IObjectWithSettings implementation
-/** @inheritDoc */
-anychart.charts.TagCloud.prototype.getOwnOption = function(name) {
-  return this.ownSettings[name];
-};
-
-
-/** @inheritDoc */
-anychart.charts.TagCloud.prototype.hasOwnOption = function(name) {
-  return goog.isDefAndNotNull(this.ownSettings[name]);
-};
-
-
-/** @inheritDoc */
-anychart.charts.TagCloud.prototype.getThemeOption = function(name) {
-  return this.themeSettings[name];
-};
-
-
-/** @inheritDoc */
-//TODO(AntonKagakin): comment for now to avoid compiler warnings
-//anychart.charts.TagCloud.prototype.getOption = anychart.core.settings.getOption;
-
-
-/** @inheritDoc */
-anychart.charts.TagCloud.prototype.setOption = function(name, value) {
-  this.ownSettings[name] = value;
-};
-
-
-/** @inheritDoc */
-anychart.charts.TagCloud.prototype.check = function(flags) {
-  return true;
-};
-
-
-//endregion
 //region --- Descriptors
 /**
  * Simple properties descriptors.
