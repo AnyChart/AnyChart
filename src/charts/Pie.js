@@ -1097,7 +1097,7 @@ anychart.charts.Pie.prototype.group = function(opt_value) {
  *      pieCenter.x + pieInnerRadius,
  *      pieCenter.y + pieInnerRadius
  *  );
- *  anychart.ui.label()
+ *  anychart.standalones.label()
  *      .text('Pie\ninner\nlabel')
  *      .parentBounds(labelBounds)
  *      .container(stage)

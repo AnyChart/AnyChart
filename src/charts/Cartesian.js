@@ -351,22 +351,19 @@ anychart.core.ChartWithSeries.generateSeriesConstructors(anychart.charts.Cartesi
  * @example
  * var chart = anychart.cartesian();
  * chart.line([20, 7, 10, 14]);
- * @param {boolean=} opt_isVertical If true, sets the chart to Bar Chart mode, swapping default chart elements
- *    behaviour to horizontal-oriented (setting default layout to VERTICAL, swapping axes, etc).
  * @return {!anychart.charts.Cartesian} Empty chart.
  */
-anychart.cartesian = function(opt_isVertical) {
+anychart.cartesian = function() {
   var chart = new anychart.charts.Cartesian();
   chart.setupInternal(true, anychart.getFullTheme('cartesian'));
-  if (goog.isDef(opt_isVertical))
-    chart.barChartMode = !!opt_isVertical;
   return chart;
 };
+
+
 anychart.chartTypesMap[anychart.enums.ChartTypes.CARTESIAN] = anychart.cartesian;
 
 
 //exports
-/** @suppress {deprecated} */
 (function() {
   var proto = anychart.charts.Cartesian.prototype;
   goog.exportSymbol('anychart.cartesian', anychart.cartesian);

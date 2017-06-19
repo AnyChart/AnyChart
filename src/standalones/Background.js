@@ -25,24 +25,11 @@ anychart.standalones.background = function() {
 };
 
 
-/**
- * Constructor function.
- * @return {!anychart.standalones.Background}
- * @deprecated Since 7.12.0. Use anychart.standalones.background instead.
- */
-anychart.ui.background = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.ui.background()', 'anychart.standalones.background()', null, 'Constructor'], true);
-  return anychart.standalones.background();
-};
-
-
 //exports
 //proto['getRemainingBounds'] = proto.getRemainingBounds;
-/** @suppress {deprecated} */
 (function() {
   var proto = anychart.standalones.Background.prototype;
   goog.exportSymbol('anychart.standalones.background', anychart.standalones.background);
-  goog.exportSymbol('anychart.ui.background', anychart.ui.background);
   proto['draw'] = proto.draw;
   proto['parentBounds'] = proto.parentBounds;
   proto['container'] = proto.container;

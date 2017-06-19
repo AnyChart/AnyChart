@@ -42,22 +42,9 @@ anychart.standalones.markersFactory = function() {
 };
 
 
-/**
- * Constructor function.
- * @return {!anychart.standalones.MarkersFactory}
- * @deprecated Since 7.12.0. Use anychart.standalones.markersFactory instead.
- */
-anychart.ui.markersFactory = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.ui.markersFactory()', 'anychart.standalones.markersFactory()', null, 'Constructor'], true);
-  return anychart.standalones.markersFactory();
-};
-
-
 //exports
-/** @suppress {deprecated} */
 (function() {
   var proto = anychart.standalones.MarkersFactory.prototype;
-  goog.exportSymbol('anychart.ui.markersFactory', anychart.ui.markersFactory);
   goog.exportSymbol('anychart.standalones.markersFactory', anychart.standalones.markersFactory);
   proto['draw'] = proto.draw;
   proto['parentBounds'] = proto.parentBounds;

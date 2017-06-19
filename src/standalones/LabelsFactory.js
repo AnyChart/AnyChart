@@ -1,5 +1,4 @@
 goog.provide('anychart.standalones.LabelsFactory');
-goog.provide('anychart.ui.LabelsFactory');
 goog.require('anychart.core.ui.LabelsFactory');
 
 
@@ -43,22 +42,9 @@ anychart.standalones.labelsFactory = function() {
 };
 
 
-/**
- * Constructor function.
- * @return {!anychart.standalones.LabelsFactory}
- * @deprecated Since 7.12.0. Use anychart.standalones.labelsFactory instead.
- */
-anychart.ui.labelsFactory = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.ui.labelsFactory()', 'anychart.standalones.labelsFactory()', null, 'Constructor'], true);
-  return anychart.standalones.labelsFactory();
-};
-
-
 //exports
-/** @suppress {deprecated} */
 (function() {
   var proto = anychart.standalones.LabelsFactory.prototype;
-  goog.exportSymbol('anychart.ui.labelsFactory', anychart.ui.labelsFactory);
   goog.exportSymbol('anychart.standalones.labelsFactory', anychart.standalones.labelsFactory);
   proto['draw'] = proto.draw;
   proto['parentBounds'] = proto.parentBounds;

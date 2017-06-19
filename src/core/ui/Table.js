@@ -20,7 +20,7 @@ goog.require('anychart.utils');
 
 /**
  * Represents table element.<br/>
- * <b>Note:</b> Use {@link anychart.ui.table} method to create it.
+ * <b>Note:</b> Use {@link anychart.standalones.table} method to create it.
  * @param {number=} opt_rowsCount Number of rows in the table.
  * @param {number=} opt_colsCount Number of columns in the table.
  * @constructor
@@ -161,8 +161,7 @@ anychart.core.ui.Table = function(opt_rowsCount, opt_colsCount) {
     'enabled': true
   };
 
-  if (anychart.DEFAULT_THEME != 'v6')
-    this.settingsObj['fill'] = '#fff';
+  this.settingsObj['fill'] = '#fff';
 };
 goog.inherits(anychart.core.ui.Table, anychart.core.VisualBaseWithBounds);
 
@@ -419,9 +418,9 @@ anychart.core.ui.Table.prototype.colsCount = function(opt_value) {
 /**
  * Returns cell by its row and column number.
  * @example <t>simple-h100</t>
- * var table = anychart.ui.table();
+ * var table = anychart.standalones.table();
  * var cell = table.getCell(1,1);
- * cell.content( anychart.ui.label().text('Text element'));
+ * cell.content( anychart.standalones.label().text('Text element'));
  * table.container(stage).draw();
  * @param {number} row Row index.
  * @param {number} col Column index.

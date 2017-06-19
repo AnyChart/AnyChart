@@ -29,7 +29,7 @@ goog.require('goog.math.AffineTransform');
  * @illustrationDesc
  * Title occupies the whole part of a container (depending on the orientation by the width or the height).
  * @example <c>Self-sufficient title.</c><t>simple-h100</t>
- * anychart.ui.title()
+ * anychart.standalones.title()
  *     .text('My custom Title')
  *     .fontSize(27)
  *     .height('100')
@@ -750,12 +750,12 @@ anychart.core.ui.Title.prototype.remove = function() {
  * Returns the remaining (after title placement) part of the container.
  * @example <t>simple-h100</t>
  * // Placing the first title on the top of the Stage.
- * var title1 = anychart.ui.title()
+ * var title1 = anychart.standalones.title()
  *     .text('First title')
  *     .container(stage)
  *     .draw();
  * // Placing the second title over the remaining part - under the first title.
- * anychart.ui.title()
+ * anychart.standalones.title()
  *     .text('Second title')
  *     .container(stage)
  *     .parentBounds(title1.getRemainingBounds())

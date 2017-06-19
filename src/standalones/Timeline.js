@@ -49,34 +49,9 @@ anychart.standalones.resourceTimeline = function() {
 };
 
 
-/**
- * Constructor function.
- * @return {!anychart.standalones.ProjectTimeline}
- * @deprecated Since 7.12.0. Use anychart.standalones.projectTimeline instead.
- */
-anychart.ui.projectTimeline = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.ui.projectTimeline()', 'anychart.standalones.projectTimeline()', null, 'Constructor'], true);
-  return anychart.standalones.projectTimeline();
-};
-
-
-/**
- * Constructor function.
- * @return {!anychart.standalones.ResourceTimeline}
- * @deprecated Since 7.12.0. Use anychart.standalones.resourceTimeline instead.
- */
-anychart.ui.resourceTimeline = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.ui.resourceTimeline()', 'anychart.standalones.resourceTimeline()', null, 'Constructor'], true);
-  return anychart.standalones.resourceTimeline();
-};
-
-
 //exports
-/** @suppress {deprecated} */
 (function() {
   var proto = anychart.standalones.ProjectTimeline.prototype;
-  goog.exportSymbol('anychart.ui.projectTimeline', anychart.ui.projectTimeline);
-  goog.exportSymbol('anychart.ui.resourceTimeline', anychart.ui.resourceTimeline);
   goog.exportSymbol('anychart.standalones.projectTimeline', anychart.standalones.projectTimeline);
   goog.exportSymbol('anychart.standalones.resourceTimeline', anychart.standalones.resourceTimeline);
   proto['draw'] = proto.draw;

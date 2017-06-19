@@ -252,17 +252,6 @@ anychart.core.ui.Tooltip.prototype.TOOLTIP_SIMPLE_DESCRIPTORS = (function() {
       anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
       anychart.Signal.NEEDS_REDRAW);
 
-  //@deprecated Since 7.13.1. Use 'titleFormat' instead.
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG_DEPRECATED,
-      'titleFormat',
-      anychart.core.settings.stringOrFunctionNormalizer,
-      anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
-      anychart.Signal.NEEDS_REDRAW,
-      void 0,
-      'titleFormatter');
-
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
@@ -271,28 +260,6 @@ anychart.core.ui.Tooltip.prototype.TOOLTIP_SIMPLE_DESCRIPTORS = (function() {
       anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
       anychart.Signal.NEEDS_REDRAW);
 
-  //@deprecated Since 7.13.1. Use 'format' instead.
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG_DEPRECATED,
-      'format',
-      anychart.core.settings.stringOrFunctionNormalizer,
-      anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
-      anychart.Signal.NEEDS_REDRAW,
-      void 0,
-      'textFormatter');
-
-  //@deprecated Since 7.7.0. Use format() method instead.
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG_DEPRECATED,
-      'format',
-      anychart.core.settings.stringOrFunctionNormalizer,
-      anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
-      anychart.Signal.NEEDS_REDRAW,
-      void 0,
-      'contentFormatter');
-
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
@@ -300,17 +267,6 @@ anychart.core.ui.Tooltip.prototype.TOOLTIP_SIMPLE_DESCRIPTORS = (function() {
       anychart.core.settings.stringOrFunctionNormalizer,
       anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
       anychart.Signal.NEEDS_REDRAW);
-
-  //@deprecated Since 7.7.0. Use unionFormat() method instead.
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'unionFormat',
-      anychart.core.settings.stringOrFunctionNormalizer,
-      anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
-      anychart.Signal.NEEDS_REDRAW,
-      void 0,
-      'unionTextFormatter');
 
   anychart.core.settings.createDescriptor(
       map,
@@ -1280,19 +1236,6 @@ anychart.core.ui.Tooltip.prototype.contentInternal = function(opt_value) {
   } else {
     return this.content_;
   }
-};
-
-
-/**
- * Tooltip content.
- * @param {(Object|boolean|null|string)=} opt_value Content settings.
- * @return {!(anychart.core.ui.Label|anychart.core.ui.Tooltip)} .
- * @deprecated Since 7.7.0. Use methods directly instead.
- */
-anychart.core.ui.Tooltip.prototype.content = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['.content()', 'the following behaviour',
-    ': the method called through the .content()-method should be applied to the .tooltip()-method directly'], true);
-  return this.contentInternal(opt_value);
 };
 
 
@@ -2283,26 +2226,6 @@ anychart.core.ui.Tooltip.prototype.getHighPriorityResolutionChain = function() {
 
 
 //endregion
-//region -- Deprecated methods
-/**
- * Enabled 'float' position mode for all tooltips.
- * @param {boolean=} opt_value
- * @return {boolean|anychart.core.ui.Tooltip}
- * @deprecated Since 7.7.0. Use tooltip().positionMode('float') instead.
- */
-anychart.core.ui.Tooltip.prototype.isFloating = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['isFloating()', 'positionMode()'], true);
-  var currValue = this.getOption('positionMode');
-  if (goog.isDef(opt_value)) {
-    if ((currValue == anychart.enums.TooltipPositionMode.FLOAT) != opt_value)
-      this.setOption('positionMode', opt_value ? anychart.enums.TooltipPositionMode.FLOAT : anychart.enums.TooltipPositionMode.CHART);
-    return this;
-  }
-  return currValue == anychart.enums.TooltipPositionMode.FLOAT;
-};
-
-
-//endregion
 //region -- Serialization / Deserialization / Disposing
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -2382,7 +2305,6 @@ anychart.core.ui.Tooltip.prototype.serialize = function() {
 
   if (goog.isDef(this.hideDelay_))
     json['hideDelay'] = this.hideDelay_;
-  // json['content'] = this.contentInternal().serialize();
 
   if (goog.isDef(this.zIndex()))
     json['zIndex'] = this.zIndex();
@@ -2394,18 +2316,8 @@ anychart.core.ui.Tooltip.prototype.serialize = function() {
 };
 
 
-/**
- * @inheritDoc
- * @suppress {deprecated}
- */
+/** @inheritDoc */
 anychart.core.ui.Tooltip.prototype.setupByJSON = function(config, opt_default) {
-  if (config['content']) {
-    this.content(config['content']);
-  }
-  if (config['isFloating']) {
-    this.isFloating(config['isFloating']);
-  }
-
   if (opt_default) {
     this.setThemeSettings(config);
   } else {
@@ -2419,39 +2331,9 @@ anychart.core.ui.Tooltip.prototype.setupByJSON = function(config, opt_default) {
   this.padding().setupInternal(!!opt_default, config['padding']);
   this.hideDelay(config['hideDelay']);
 
-  /*
-    NOTE: For backward compatibility purposes we still use this.content() public deprecated method
-          to get access to label's methods like label.anchor() and label.position().
-          That' why we have to set these values manually even for new implementation of tooltip.
-   */
-  var contentConfig = config['contentInternal'];
-  if (!contentConfig || !('anchor' in config) || !('position' in config)) {
-    var position;
-    var anchor;
-    if (contentConfig) {
-      position = contentConfig['position'];
-      anchor = contentConfig['anchor'];
-    }
-
-    if (!position || !anchor) {
-      var chain = this.getResolutionChain();
-      for (var i = 0; i < chain.length; i++) {
-        var obj = chain[i]['content'];
-        if (obj) {
-          position = position || obj['position'];
-          anchor = anchor || obj['anchor'];
-        }
-        if (goog.isDef(position) && goog.isDef(anchor))
-          break;
-      }
-      if (!position || !anchor) {
-        var miniConfig = {};
-        miniConfig['position'] = position || anychart.enums.Position.LEFT_TOP;
-        miniConfig['anchor'] = anchor || anychart.enums.Anchor.LEFT_TOP;
-        this.contentInternal(miniConfig);
-      }
-    }
-  }
+  var contentConfig = config['contentInternal'] || {};
+  contentConfig['position'] = contentConfig['position'] ? contentConfig['position'] : anychart.enums.Position.LEFT_TOP;
+  contentConfig['anchor'] = contentConfig['anchor'] ? contentConfig['anchor'] : anychart.enums.Anchor.LEFT_TOP;
   this.contentInternal(contentConfig);
 
   this.zIndex(config['zIndex']);
@@ -2516,7 +2398,6 @@ anychart.core.ui.Tooltip.prototype.disposeInternal = function() {
 
 
 //exports
-/** @suppress {deprecated} */
 (function() {
   var proto = anychart.core.ui.Tooltip.prototype;
   proto['title'] = proto.title;
@@ -2527,13 +2408,5 @@ anychart.core.ui.Tooltip.prototype.disposeInternal = function() {
   proto['hide'] = proto.hide;
   proto['hideDelay'] = proto.hideDelay;
   proto['textSettings'] = proto.textSettings;
-
-
-  //deprecated
-  proto['content'] = proto.content;
-  proto['isFloating'] = proto.isFloating;
 })();
-
 //endregion
-
-

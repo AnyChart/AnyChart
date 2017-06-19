@@ -154,7 +154,6 @@
         <xsd:attribute name="scale" type="simple.ChartScaleRef" default="linear"/>
         <xsd:attribute name="axis" type="simple.BoolOrNull" default="true"/>
         <!-- charts.Cartesian attrs -->
-        <xsd:attribute name="bar_chart_mode" type="simple.Bool" default="false"/>
         <xsd:attribute name="is_vertical" type="simple.Bool" default="false"/>
         <xsd:attribute name="bar_groups_padding" type="xsd:double" default="0.5"/>
         <xsd:attribute name="bars_padding" type="xsd:double" default="0.1"/>

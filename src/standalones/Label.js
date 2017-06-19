@@ -25,22 +25,9 @@ anychart.standalones.label = function() {
 };
 
 
-/**
- * Constructor function.
- * @return {!anychart.standalones.Label}
- * @deprecated Since 7.12.0. Use anychart.standalones.label instead.
- */
-anychart.ui.label = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.ui.label()', 'anychart.standalones.label()', null, 'Constructor'], true);
-  return anychart.standalones.label();
-};
-
-
 //exports
-/** @suppress {deprecated} */
 (function() {
   var proto = anychart.standalones.Label.prototype;
-  goog.exportSymbol('anychart.ui.label', anychart.ui.label);
   goog.exportSymbol('anychart.standalones.label', anychart.standalones.label);
   proto['draw'] = proto.draw;
   proto['parentBounds'] = proto.parentBounds;

@@ -25,22 +25,9 @@ anychart.standalones.grids.polar = function() {
 };
 
 
-/**
- * Constructor function.
- * @return {!anychart.standalones.grids.Polar}
- * @deprecated Since 7.12.0. Use anychart.standalones.grids.polar instead.
- */
-anychart.grids.polar = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.grids.polar()', 'anychart.standalones.grids.polar()', null, 'Constructor'], true);
-  return anychart.standalones.grids.polar();
-};
-
-
 //exports
-/** @suppress {deprecated} */
 (function() {
   var proto = anychart.standalones.grids.Polar.prototype;
-  goog.exportSymbol('anychart.grids.polar', anychart.grids.polar);
   goog.exportSymbol('anychart.standalones.grids.polar', anychart.standalones.grids.polar);
   proto['draw'] = proto.draw;
   proto['parentBounds'] = proto.parentBounds;

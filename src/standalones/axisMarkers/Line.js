@@ -25,22 +25,9 @@ anychart.standalones.axisMarkers.line = function() {
 };
 
 
-/**
- * Constructor function.
- * @deprecated Since 7.12.0. Use anychart.standalones.axisMarkers.line instead.
- * @return {!anychart.standalones.axisMarkers.Line}
- */
-anychart.axisMarkers.line = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.axisMarkers.line()', 'anychart.standalones.axisMarkers.line()', null, 'Constructor'], true);
-  return anychart.standalones.axisMarkers.line();
-};
-
-
 //exports
-/** @suppress {deprecated} */
 (function() {
   var proto = anychart.standalones.axisMarkers.Line.prototype;
-  goog.exportSymbol('anychart.axisMarkers.line', anychart.axisMarkers.line);
   goog.exportSymbol('anychart.standalones.axisMarkers.line', anychart.standalones.axisMarkers.line);
   proto['draw'] = proto.draw;
   proto['parentBounds'] = proto.parentBounds;

@@ -41,23 +41,9 @@ anychart.standalones.axes.polar = function() {
 };
 
 
-/**
- * Returns axis instance.<br/>
- * <b>Note:</b> Any axis must be bound to a scale.
- * @return {!anychart.standalones.axes.Polar}
- * @deprecated Since 7.12.0. Use anychart.standalones.axes.polar instead.
- */
-anychart.axes.polar = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.axes.polar()', 'anychart.standalones.axes.polar()', null, 'Constructor'], true);
-  return anychart.standalones.axes.polar();
-};
-
-
 //exports
-/** @suppress {deprecated} */
 (function() {
   var proto = anychart.standalones.axes.Polar.prototype;
-  goog.exportSymbol('anychart.axes.polar', anychart.axes.polar);
   goog.exportSymbol('anychart.standalones.axes.polar', anychart.standalones.axes.polar);
   proto['draw'] = proto.draw;
   proto['parentBounds'] = proto.parentBounds;

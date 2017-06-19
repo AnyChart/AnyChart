@@ -38,19 +38,6 @@ anychart.palettes.Markers.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS_RE
 /**
  * Setter for the marker at index if the opt_marker set, getter otherwise.
  * @param {number} index Index of marker to get/set.
- * @param {string=} opt_marker Type of the marker to set.
- * @return {anychart.enums.MarkerType|anychart.enums.BulletMarkerType|anychart.palettes.Markers} Marker by index or self for chaining.
- * @deprecated Since 7.7.0. Use itemAt() method instead.
- */
-anychart.palettes.Markers.prototype.markerAt = function(index, opt_marker) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['markerAt()', 'itemAt()'], true);
-  return this.itemAt(index, opt_marker);
-};
-
-
-/**
- * Setter for the marker at index if the opt_marker set, getter otherwise.
- * @param {number} index Index of marker to get/set.
  * @param {string=} opt_item Type of the marker to set.
  * @return {anychart.enums.MarkerType|anychart.enums.BulletMarkerType|anychart.palettes.Markers} Marker by index or self for chaining.
  */
@@ -76,24 +63,6 @@ anychart.palettes.Markers.prototype.itemAt = function(index, opt_item) {
     marker = this.markers_[index];
     return marker || null;
   }
-};
-
-
-/**
- * Getter/setter for markers list of palette.
- * @example <t>listingOnly</t>
- * var palette = anychart.utils.markerPalette();
- * palette.markers(); // ['star4', 'star5', 'star6', ...]
- * palette.markers(['cross', 'diagonalcross']).markers(); // ['cross', 'diagonalcross']
- * palette.markers('diamond', 'circle', 'square').markers(); // ['diamond', 'circle', 'square']
- * @param {(Array.<string>|string)=} opt_markers
- * @param {...string} var_args .
- * @return {Array.<string>|anychart.palettes.Markers} Markers list or self for method chaining.
- * @deprecated Since 7.7.0. Use items() method instead.
- */
-anychart.palettes.Markers.prototype.markers = function(opt_markers, var_args) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['markers()', 'items()'], true);
-  return this.items.apply(this, arguments);
 };
 
 
@@ -149,14 +118,9 @@ anychart.palettes.Markers.prototype.setupSpecial = function(isDefault, var_args)
 };
 
 
-/**
- * @inheritDoc
- * @suppress {deprecated}
- */
+/** @inheritDoc */
 anychart.palettes.Markers.prototype.setupByJSON = function(config, opt_default) {
   anychart.palettes.Markers.base(this, 'setupByJSON', config, opt_default);
-  if (goog.isDef(config['markers']))
-    this.markers(config['markers']);
   this.items(config['items']);
 };
 
@@ -177,12 +141,9 @@ anychart.palettes.markers = function(opt_value, var_args) {
 
 
 //exports
-/** @suppress {deprecated} */
 (function() {
   var proto = anychart.palettes.Markers.prototype;
   goog.exportSymbol('anychart.palettes.markers', anychart.palettes.markers);
-  proto['markerAt'] = proto.markerAt;
   proto['itemAt'] = proto.itemAt;
-  proto['markers'] = proto.markers;
   proto['items'] = proto.items;
 })();

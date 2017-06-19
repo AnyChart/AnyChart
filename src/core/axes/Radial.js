@@ -17,9 +17,9 @@ goog.require('anychart.utils');
 /**
  * Axis Class.<br/>
  * Any axis must be bound to a scale.<br/>
- * To obtain a new instance of Axis use {@link anychart.axes.linear}.
+ * To obtain a new instance of Axis use {@link anychart.standalones.axes.linear}.
  * @example <t>simple-h100</t>
- * anychart.axes.linear()
+ * anychart.standalones.axes.linear()
  *    .scale(anychart.scales.linear())
  *    .container(stage).draw();
  * @constructor

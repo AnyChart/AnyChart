@@ -306,7 +306,7 @@ anychart.cartesian3d = function(opt_isVertical) {
   var chart = new anychart.charts.Cartesian3d();
   chart.setupInternal(true, anychart.getFullTheme('cartesian3d'));
   if (goog.isDef(opt_isVertical))
-    chart.barChartMode = !!opt_isVertical;
+    chart.isVerticalInternal = !!opt_isVertical;
 
   return chart;
 };
@@ -534,8 +534,6 @@ anychart.charts.Cartesian3d.prototype.prepare3d = function() {
 anychart.charts.Cartesian3d.prototype.getContentAreaBounds = function(bounds) {
   var contentAreaBounds = bounds.clone().round();
   var boundsWithoutAxes = this.getBoundsWithoutAxes(contentAreaBounds);
-
-  var needAspectCalc = anychart.utils.isPercent(this.getOption('zAspect'));
   var seriesCount = this.getSeriesCount();
 
   var zAngle = /** @type {number} */ (this.getOption('zAngle'));
@@ -547,7 +545,7 @@ anychart.charts.Cartesian3d.prototype.getContentAreaBounds = function(bounds) {
   var secondAngle = 90 - zAngle;
   var secondAngleRad = goog.math.toRadians(secondAngle);
 
-  if (needAspectCalc) {
+  if (anychart.utils.isPercent(zAspect)) {
     var aspectRatio = parseFloat(zAspect) / 100;
     var xAspectRatio = aspectRatio * Math.sin(secondAngleRad);
     var yAspectRatio = aspectRatio * Math.sin(angleRad);
@@ -588,7 +586,7 @@ anychart.charts.Cartesian3d.prototype.getContentAreaBounds = function(bounds) {
     this.zPaddingXShift = Math.round(zPadding * Math.sin(secondAngleRad));
     this.zPaddingYShift = Math.round(zPadding * Math.sin(angleRad));
 
-    var axisBoundsWidth = this.barChartMode ?
+    var axisBoundsWidth = this.isVerticalInternal ?
         boundsWithoutAxes.height / (1 + x3dShiftRatio) :
         boundsWithoutAxes.width / (1 + x3dShiftRatio);
 
@@ -670,28 +668,13 @@ anychart.charts.Cartesian3d.prototype.makeBrowserEvent = function(e) {
 };
 
 
-/**
- * @inheritDoc
- * @suppress {deprecated}
- */
+/** @inheritDoc */
 anychart.charts.Cartesian3d.prototype.setupByJSON = function(config, opt_default) {
   anychart.charts.Cartesian3d.base(this, 'setupByJSON', config, opt_default);
 };
 
 
-/**
- * @inheritDoc
- * @suppress {deprecated}
- */
-anychart.charts.Cartesian3d.prototype.serialize = function() {
-  var json = anychart.charts.Cartesian3d.base(this, 'serialize');
-  var chart = json['chart'];
-  return json;
-};
-
-
 //exports
-/** @suppress {deprecated} */
 (function() {
   var proto = anychart.charts.Cartesian3d.prototype;
   goog.exportSymbol('anychart.cartesian3d', anychart.cartesian3d);

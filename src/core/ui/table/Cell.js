@@ -182,7 +182,7 @@ anychart.core.ui.table.Cell.prototype.getCol = function() {
 /**
  * Returns cell bounds without padding counted (bounds which are used for borders drawing).
  * @example <t>simple-h100</t>
- * var table = anychart.ui.table();
+ * var table = anychart.standalones.table();
  * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
  * table.container(stage).draw();
  * stage.rect().fill('red 0.2').setBounds(

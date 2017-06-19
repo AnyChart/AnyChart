@@ -449,28 +449,6 @@ anychart.scales.StockScatterDateTime.prototype.ticksInvalidated_ = function(even
 
 
 /**
- * Gets current grouping unit.
- * @return {anychart.enums.Interval}
- * @deprecated Since 7.10.0. Use stockChart.grouping().getCurrentDataInterval() instead.
- */
-anychart.scales.StockScatterDateTime.prototype.getGroupingUnit = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['getGroupingUnit()', 'stockChart.grouping().getCurrentDataInterval()'], true);
-  return this.unit;
-};
-
-
-/**
- * Gets current grouping unit count.
- * @return {number}
- * @deprecated Since 7.10.0. Use stockChart.grouping().getCurrentDataInterval() instead.
- */
-anychart.scales.StockScatterDateTime.prototype.getGroupingUnitCount = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['getGroupingUnitCount()', 'stockChart.grouping().getCurrentDataInterval()'], true);
-  return this.count;
-};
-
-
-/**
  * Returns true if passed string indicates Scatter scale.
  * @param {string} type
  * @return {boolean}
@@ -598,7 +576,6 @@ anychart.scales.StockScatterDateTime.MAJOR_INTERVALS_ = [
 
 
 //exports
-/** @suppress {deprecated} */
 (function() {
   var proto = anychart.scales.StockScatterDateTime.prototype;
   proto['getFullMinimum'] = proto.getFullMinimum;
@@ -607,6 +584,4 @@ anychart.scales.StockScatterDateTime.MAJOR_INTERVALS_ = [
   proto['getMaximum'] = proto.getMaximum;
   proto['transform'] = proto.transform;
   proto['inverseTransform'] = proto.inverseTransform;
-  proto['getGroupingUnit'] = proto.getGroupingUnit;
-  proto['getGroupingUnitCount'] = proto.getGroupingUnitCount;
 })();

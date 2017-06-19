@@ -998,32 +998,25 @@ anychart.core.annotations.PlotController.prototype.setupByJSON = function(config
 /**
  * Return plot annotations configuration as JSON object or string.
  * @param {boolean=} opt_stringify
- * @param {boolean=} opt_includeTheme
  * @return {Object|string}
  */
-anychart.core.annotations.PlotController.prototype.toJson = function(opt_stringify, opt_includeTheme) {
-  var data = this.isDisposed() ? {} : { 'annotationsList': this.annotationsJson_() };
-  if (!opt_includeTheme) {
-    var defaultTheme = {
-      'defaultAnnotationSettings': this.getController().getChart().defaultAnnotationSettings()
-    };
-    data = /** @type {!Object} */(anychart.themes.merging.demerge(
-        data, defaultTheme)) || {};
-  }
-  return opt_stringify ?
-      goog.json.hybrid.stringify(data) :
-      data;
+anychart.core.annotations.PlotController.prototype.toJson = function(opt_stringify) {
+  var data = this.isDisposed() ? {} : {'annotationsList': this.annotationsJson_()};
+  var defaultTheme = {
+    'defaultAnnotationSettings': this.getController().getChart().defaultAnnotationSettings()
+  };
+  data = /** @type {!Object} */(anychart.themes.merging.demerge(data, defaultTheme)) || {};
+  return opt_stringify ? goog.json.hybrid.stringify(data) : data;
 };
 
 
 /**
  * Return chart configuration as XML string or XMLNode.
  * @param {boolean=} opt_asXmlNode Return XML as XMLNode.
- * @param {boolean=} opt_includeTheme If the current theme properties should be included into the result.
  * @return {string|Node} Chart configuration.
  */
-anychart.core.annotations.PlotController.prototype.toXml = function(opt_asXmlNode, opt_includeTheme) {
-  var data = this.toJson(false, opt_includeTheme);
+anychart.core.annotations.PlotController.prototype.toXml = function(opt_asXmlNode) {
+  var data = this.toJson(false);
   return anychart.utils.json2xml(data, 'annotations', opt_asXmlNode);
 };
 

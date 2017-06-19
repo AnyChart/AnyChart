@@ -821,31 +821,6 @@ anychart.core.series.Map.prototype.applyZoomMoveTransform = function() {
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  AllowPointsSelect. (Deprecated)
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Allows to select points of the series.
- * @param {?boolean=} opt_value Allow or not.
- * @return {null|boolean|anychart.core.series.Map} Returns allow points select state or current series instance for chaining.
- * @deprecated Since 7.13.0 in Map series and was never introduced in public API of other series, but was exported. Use this.selectionMode() instead.
- */
-anychart.core.series.Map.prototype.allowPointsSelect = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['allowPointsSelect()', 'selectionMode()'], true);
-  if (goog.isDef(opt_value)) {
-    this.selectionMode(goog.isBoolean(opt_value) ?
-        (opt_value ?
-            anychart.enums.SelectionMode.MULTI_SELECT :
-            anychart.enums.SelectionMode.NONE) :
-        opt_value);
-    return this;
-  }
-  return goog.isNull(this.selectionMode()) ? null : this.selectionMode() != anychart.enums.SelectionMode.NONE;
-};
-
-
 /** @inheritDoc */
 anychart.core.series.Map.prototype.applyAppearanceToPoint = function(pointState) {
   var iterator = this.getIterator();
@@ -1735,10 +1710,7 @@ anychart.core.series.Map.prototype.serialize = function() {
 };
 
 
-/**
- * @inheritDoc
- * @suppress {deprecated}
- */
+/** @inheritDoc */
 anychart.core.series.Map.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.series.Map.base(this, 'setupByJSON', config, opt_default);
 
@@ -1746,26 +1718,18 @@ anychart.core.series.Map.prototype.setupByJSON = function(config, opt_default) {
 
   this.overlapMode(config['overlapMode']);
   this.geoIdField(config['geoIdField']);
-  if (goog.isDef(config['allowPointsSelect'])) {
-    this.allowPointsSelect(config['allowPointsSelect']);
-  }
 };
 
 
 //endregion
 //region --- Exports
 //exports
-/** @suppress {deprecated} */
 (function() {
   var proto = anychart.core.series.Map.prototype;
   proto['overlapMode'] = proto.overlapMode;
-
   proto['geoIdField'] = proto.geoIdField;
   proto['transformXY'] = proto.transformXY;
-
   proto['colorScale'] = proto.colorScale;
   proto['getPoint'] = proto.getPoint;
-
-  proto['allowPointsSelect'] = proto.allowPointsSelect;
 })();
 //endregion

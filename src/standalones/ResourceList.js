@@ -188,7 +188,6 @@ anychart.standalones.resourceList = function(opt_data) {
 
 
 //exports
-/** @suppress {deprecated} */
 (function() {
   var proto = anychart.standalones.ResourceList.prototype;
   goog.exportSymbol('anychart.standalones.resourceList', anychart.standalones.resourceList);

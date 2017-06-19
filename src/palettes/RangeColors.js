@@ -14,7 +14,7 @@ goog.require('goog.color');
  *     .count(9);
  * for (var i = 1; i < 10; i++) {
  *   stage.rect((i - 1) * stage.width() / 9, 0, stage.width() / 9 - .5, stage.height())
- *     .fill(palette.colorAt(i))
+ *     .fill(palette.itemAt(i))
  *     .stroke('1px #000');
  * }
  * @constructor
@@ -69,21 +69,6 @@ anychart.palettes.RangeColors.prototype.colorPalette_;
 /**
  * Getter/setter for the color palette colors list.
  * @param {(Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradientFill|acgraph.vector.RadialGradientFill|
- * Array.<acgraph.vector.GradientKey>|Array.<string>|acgraph.vector.SolidFill|string)=} opt_value Color palette colors list to set.
- * @param {...(acgraph.vector.SolidFill|string)} var_args .
- * @return {Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradientFill|acgraph.vector.RadialGradientFill|
- * Array.<acgraph.vector.GradientKey>|Array.<string>|anychart.palettes.RangeColors} .
- * @deprecated Since 7.7.0. Use items() method instead.
- */
-anychart.palettes.RangeColors.prototype.colors = function(opt_value, var_args) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['colors()', 'items()'], true);
-  return this.items.apply(this, arguments);
-};
-
-
-/**
- * Getter/setter for the color palette colors list.
- * @param {(Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradientFill|acgraph.vector.RadialGradientFill|
  * Array.<acgraph.vector.GradientKey>|Array.<string>|acgraph.vector.SolidFill|string)=} opt_value .
  * @param {...(acgraph.vector.SolidFill|string)} var_args .
  * @return {Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradientFill|acgraph.vector.RadialGradientFill|
@@ -127,19 +112,6 @@ anychart.palettes.RangeColors.prototype.count = function(opt_value) {
   } else {
     return this.count_;
   }
-};
-
-
-/**
- * Getter/setter for color palette colors from list by index.
- * @param {number} index .
- * @param {acgraph.vector.SolidFill=} opt_color .
- * @return {acgraph.vector.SolidFill|anychart.palettes.RangeColors} .
- * @deprecated Since 7.7.0. Use itemAt() method instead.
- */
-anychart.palettes.RangeColors.prototype.colorAt = function(index, opt_color) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['colorAt()', 'itemAt()'], true);
-  return this.itemAt(index, opt_color);
 };
 
 
@@ -325,14 +297,9 @@ anychart.palettes.RangeColors.prototype.setupSpecial = function(isDefault, var_a
 };
 
 
-/**
- * @inheritDoc
- * @suppress {deprecated}
- */
+/** @inheritDoc */
 anychart.palettes.RangeColors.prototype.setupByJSON = function(config, opt_default) {
   anychart.palettes.RangeColors.base(this, 'setupByJSON', config, opt_default);
-  if (goog.isDef(config['colors']))
-    this.colors(config['colors']);
   this.items(config['items']);
   this.count(config['count']);
 };
@@ -355,13 +322,10 @@ anychart.palettes.rangeColors = function(opt_value, var_args) {
 
 
 //exports
-/** @suppress {deprecated} */
 (function() {
   var proto = anychart.palettes.RangeColors.prototype;
   goog.exportSymbol('anychart.palettes.rangeColors', anychart.palettes.rangeColors);
-  proto['colorAt'] = proto.colorAt;
   proto['itemAt'] = proto.itemAt;
-  proto['colors'] = proto.colors;
   proto['items'] = proto.items;
   proto['count'] = proto.count;
 })();

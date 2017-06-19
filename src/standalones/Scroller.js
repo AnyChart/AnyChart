@@ -66,22 +66,9 @@ anychart.standalones.scroller = function() {
 };
 
 
-/**
- * Scroller standalone constructor.
- * @return {anychart.standalones.Scroller}
- * @deprecated Since 7.12.0. Use anychart.standalones.scroller instead.
- */
-anychart.ui.scroller = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.ui.scroller()', 'anychart.standalones.scroller()', null, 'Constructor'], true);
-  return anychart.standalones.scroller();
-};
-
-
 //exports
-/** @suppress {deprecated} */
 (function() {
   var proto = anychart.standalones.Scroller.prototype;
-  goog.exportSymbol('anychart.ui.scroller', anychart.ui.scroller);
   goog.exportSymbol('anychart.standalones.scroller', anychart.standalones.scroller);
   proto['setRange'] = proto.setRange;
   proto['startRatio'] = proto.startRatio;

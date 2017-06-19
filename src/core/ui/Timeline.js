@@ -1522,38 +1522,6 @@ anychart.core.ui.Timeline.prototype.onMarkersSignal_ = function(event) {
 
 
 /**
- * Gets/sets minimum gap.
- * @param {number=} opt_value - Value to be set.
- * @return {number|anychart.core.ui.Timeline} - Current value or itself for method chaining.
- * @deprecated Since 7.12.0. Use this.scale().minimumGap() instead.
- */
-anychart.core.ui.Timeline.prototype.minimumGap = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['minimumGap()', 'scale().minimumGap()'], true);
-  if (goog.isDef(opt_value)) {
-    this.scale_.minimumGap(opt_value);
-    return this;
-  }
-  return /** @type {number} */ (this.scale_.minimumGap());
-};
-
-
-/**
- * Gets/sets maximum gap.
- * @param {number=} opt_value - Value to be set.
- * @return {number|anychart.core.ui.Timeline} - Current value or itself for method chaining.
- * @deprecated Since 7.12.0. Use this.scale().maximumGap() instead.
- */
-anychart.core.ui.Timeline.prototype.maximumGap = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['maximumGap()', 'scale().maximumGap()'], true);
-  if (goog.isDef(opt_value)) {
-    this.scale_.maximumGap(opt_value);
-    return this;
-  }
-  return /** @type {number} */ (this.scale_.maximumGap());
-};
-
-
-/**
  * Labels factory getter/setter.
  * @param {Object=} opt_value - Value to be set.
  * @return {anychart.core.ui.Timeline|anychart.core.ui.LabelsFactory} - Current value or itself for method chaining.
@@ -2954,9 +2922,8 @@ anychart.core.ui.Timeline.prototype.addConnector = function(startItem, targetIte
         startItem.set(anychart.enums.GanttDataFields.PERIODS, opt_startPeriodIndex,
             anychart.enums.GanttDataFields.CONNECTOR, connLength, connectorToBeAdded);
       }
-
-
     } //TODO (A.Kudryavtsev): Do we need to add some warning here?
+
   } else {
     conn = startItem.get(anychart.enums.GanttDataFields.CONNECTOR);
     connectorToBeAdded = {};
@@ -4813,23 +4780,13 @@ anychart.core.ui.Timeline.prototype.serialize = function() {
 };
 
 
-/**
- * @inheritDoc
- * @suppress {deprecated}
- */
+/** @inheritDoc */
 anychart.core.ui.Timeline.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.ui.Timeline.base(this, 'setupByJSON', config, opt_default);
 
-  if (goog.isDef(config['minimumGap'])) {
-    this.minimumGap(config['minimumGap']);
-  }
-  if (goog.isDef(config['maximumGap'])) {
-    this.maximumGap(config['maximumGap']);
-  }
   if ('scale' in config) this.scale_.setup(config['scale']);
   if ('labels' in config) this.labels(config['labels']);
   if ('markers' in config) this.markers(config['markers']);
-
   if ('header' in config) this.header(config['header']);
 
   this.columnStroke(config['columnStroke']);
@@ -5208,13 +5165,9 @@ anychart.core.ui.Timeline.ConnectorDragger.prototype.computeInitialPosition = fu
 
 
 //exports
-/** @suppress {deprecated} */
 (function() {
   var proto = anychart.core.ui.Timeline.prototype;
   proto['backgroundFill'] = proto.backgroundFill;
-  proto['cellOddFill'] = proto.cellOddFill; //deprecated since 7.7.0
-  proto['cellEvenFill'] = proto.cellEvenFill; //deprecated since 7.7.0
-  proto['cellFill'] = proto.cellFill; //deprecated since 7.7.0
   proto['columnStroke'] = proto.columnStroke;
   proto['rowFill'] = proto.rowFill;
   proto['rowEvenFill'] = proto.rowEvenFill;
@@ -5242,8 +5195,6 @@ anychart.core.ui.Timeline.ConnectorDragger.prototype.computeInitialPosition = fu
   proto['selectedElementFill'] = proto.selectedElementFill;
   proto['selectedElementStroke'] = proto.selectedElementStroke;
   proto['tooltip'] = proto.tooltip;
-  proto['minimumGap'] = proto.minimumGap;
-  proto['maximumGap'] = proto.maximumGap;
   proto['labels'] = proto.labels;
   proto['markers'] = proto.markers;
   proto['scale'] = proto.scale;

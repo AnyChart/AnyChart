@@ -25,22 +25,9 @@ anychart.standalones.grids.linear = function() {
 };
 
 
-/**
- * Constructor function.
- * @return {!anychart.standalones.grids.Linear}
- * @deprecated Since 7.12.0. Use anychart.standalones.grids.linear instead.
- */
-anychart.grids.linear = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.grids.linear()', 'anychart.standalones.grids.linear()', null, 'Constructor'], true);
-  return anychart.standalones.grids.linear();
-};
-
-
 //exports
-/** @suppress {deprecated} */
 (function() {
   var proto = anychart.standalones.grids.Linear.prototype;
-  goog.exportSymbol('anychart.grids.linear', anychart.grids.linear);
   goog.exportSymbol('anychart.standalones.grids.linear', anychart.standalones.grids.linear);
   proto['draw'] = proto.draw;
   proto['parentBounds'] = proto.parentBounds;

@@ -22,7 +22,7 @@ goog.require('goog.math.Coordinate');
  * </ul>
  * Also you can access any marker from the set and change it:
  * @example <t>simple-h100</t>
- * var MMarker = anychart.ui.markersFactory()
+ * var MMarker = anychart.standalones.markersFactory()
  *     .type('star5')
  *     .size(27)
  *     .fill('blue')

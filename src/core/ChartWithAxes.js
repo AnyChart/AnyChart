@@ -115,12 +115,12 @@ anychart.core.ChartWithAxes.MAX_ATTEMPTS_AXES_CALCULATION = 5;
 
 
 /**
- * Sets default scale for layout based element depending on barChartMode.
+ * Sets default scale for layout based element depending on isVertical.
  * @param {anychart.core.axisMarkers.Line|anychart.core.axisMarkers.Range|anychart.core.axisMarkers.Text|anychart.core.grids.Linear} item Item to set scale.
  * @protected
  */
 anychart.core.ChartWithAxes.prototype.setDefaultScaleForLayoutBasedElements = function(item) {
-  if (!!(item.isHorizontal() ^ this.barChartMode)) {
+  if (!!(item.isHorizontal() ^ this.isVerticalInternal)) {
     item.scale(/** @type {anychart.scales.Base} */(this.yScale()));
   } else {
     item.scale(/** @type {anychart.scales.Base} */(this.xScale()));
@@ -130,7 +130,7 @@ anychart.core.ChartWithAxes.prototype.setDefaultScaleForLayoutBasedElements = fu
 
 /** @inheritDoc */
 anychart.core.ChartWithAxes.prototype.isVertical = function() {
-  return this.barChartMode;
+  return this.isVerticalInternal;
 };
 
 
@@ -282,7 +282,7 @@ anychart.core.ChartWithAxes.prototype.grid = function(opt_indexOrValue, opt_valu
   if (!grid) {
     grid = this.createGridInstance();
     grid.setChart(this);
-    grid.setDefaultLayout(this.barChartMode ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
+    grid.setDefaultLayout(this.isVerticalInternal ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
     grid.setup(this.defaultGridSettings());
     this.grids_[index] = grid;
     this.registerDisposable(grid);
@@ -319,7 +319,7 @@ anychart.core.ChartWithAxes.prototype.minorGrid = function(opt_indexOrValue, opt
   if (!grid) {
     grid = this.createGridInstance();
     grid.setChart(this);
-    grid.setDefaultLayout(this.barChartMode ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
+    grid.setDefaultLayout(this.isVerticalInternal ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
     grid.setup(this.defaultMinorGridSettings());
     this.minorGrids_[index] = grid;
     this.registerDisposable(grid);
@@ -550,7 +550,7 @@ anychart.core.ChartWithAxes.prototype.lineMarker = function(opt_indexOrValue, op
     lineMarker = this.createLineMarkerInstance();
     lineMarker.setChart(this);
     lineMarker.setup(this.defaultLineMarkerSettings());
-    lineMarker.setDefaultLayout(this.barChartMode ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
+    lineMarker.setDefaultLayout(this.isVerticalInternal ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
     this.lineAxesMarkers_[index] = lineMarker;
     this.registerDisposable(lineMarker);
     lineMarker.listenSignals(this.onMarkersSignal, this);
@@ -597,7 +597,7 @@ anychart.core.ChartWithAxes.prototype.rangeMarker = function(opt_indexOrValue, o
     rangeMarker = this.createRangeMarkerInstance();
     rangeMarker.setChart(this);
     rangeMarker.setup(this.defaultRangeMarkerSettings());
-    rangeMarker.setDefaultLayout(this.barChartMode ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
+    rangeMarker.setDefaultLayout(this.isVerticalInternal ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
     this.rangeAxesMarkers_[index] = rangeMarker;
     this.registerDisposable(rangeMarker);
     rangeMarker.listenSignals(this.onMarkersSignal, this);
@@ -644,7 +644,7 @@ anychart.core.ChartWithAxes.prototype.textMarker = function(opt_indexOrValue, op
     textMarker = this.createTextMarkerInstance();
     textMarker.setChart(this);
     textMarker.setup(this.defaultTextMarkerSettings());
-    textMarker.setDefaultLayout(this.barChartMode ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
+    textMarker.setDefaultLayout(this.isVerticalInternal ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
     this.textAxesMarkers_[index] = textMarker;
     this.registerDisposable(textMarker);
     textMarker.listenSignals(this.onMarkersSignal, this);
@@ -689,7 +689,7 @@ anychart.core.ChartWithAxes.prototype.getAdditionalScales = function(scales, isX
   for (i = 0; i < elementsWithScale.length; i++) {
     var item = elementsWithScale[i];
     if (item) {
-      isY = !!(item.isHorizontal() ^ this.barChartMode);
+      isY = !!(item.isHorizontal() ^ this.isVerticalInternal);
 
       // isX - means we are collecting xScales
       // isY - means that element's scale supposed to be yScale
@@ -1160,7 +1160,7 @@ anychart.core.ChartWithAxes.prototype.drawContent = function(bounds) {
     crosshair.suspendSignalsDispatching();
     crosshair.parentBounds(this.dataBounds);
     crosshair.container(this.rootElement);
-    crosshair.barChartMode(this.barChartMode);
+    crosshair.barChartMode(this.isVerticalInternal);
     crosshair.xAxis(this.xAxes_[/** @type {number} */(this.crosshair_.xLabel().axisIndex())]);
     crosshair.yAxis(this.yAxes_[/** @type {number} */(this.crosshair_.yLabel().axisIndex())]);
     crosshair.draw();
@@ -1346,13 +1346,8 @@ anychart.core.ChartWithAxes.prototype.setupByJSON = function(config, opt_default
 anychart.core.ChartWithAxes.prototype.setupByJSONWithScales = function(config, scalesInstances, opt_default) {
   anychart.core.ChartWithAxes.base(this, 'setupByJSONWithScales', config, scalesInstances, opt_default);
 
-  // barChartMode is @deprecated Since 7.13.0.
-  if ('barChartMode' in config) {
-    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['barChartMode', 'isVertical', null, 'JSON property'], true);
-    this.barChartMode = !!config['barChartMode'];
-  }
   if ('isVertical' in config)
-    this.barChartMode = !!config['isVertical'];
+    this.isVerticalInternal = !!config['isVertical'];
 
   this.defaultXAxisSettings(config['defaultXAxisSettings']);
   this.defaultYAxisSettings(config['defaultYAxisSettings']);
@@ -1388,7 +1383,7 @@ anychart.core.ChartWithAxes.prototype.serialize = function() {
 anychart.core.ChartWithAxes.prototype.serializeWithScales = function(json, scales, scaleIds) {
   anychart.core.ChartWithAxes.base(this, 'serializeWithScales', json, scales, scaleIds);
 
-  json['isVertical'] = this.barChartMode;
+  json['isVertical'] = this.isVerticalInternal;
 
   var axesIds = [];
   this.serializeElementsWithScales(json, 'xAxes', this.xAxes_, this.serializeAxis, scales, scaleIds, axesIds);
