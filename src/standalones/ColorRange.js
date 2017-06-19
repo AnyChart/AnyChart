@@ -25,22 +25,9 @@ anychart.standalones.colorRange = function() {
 };
 
 
-/**
- * Returns color range instance.
- * @return {!anychart.standalones.ColorRange}
- * @deprecated Since 7.12.0. Use anychart.standalones.colorRange instead.
- */
-anychart.ui.colorRange = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.ui.colorRange()', 'anychart.standalones.colorRange()', null, 'Constructor'], true);
-  return anychart.standalones.colorRange();
-};
-
-
 //exports
-/** @suppress {deprecated} */
 (function() {
   var proto = anychart.standalones.ColorRange.prototype;
-  goog.exportSymbol('anychart.ui.colorRange', anychart.ui.colorRange);
   goog.exportSymbol('anychart.standalones.colorRange', anychart.standalones.colorRange);
   proto['padding'] = proto.padding;
   proto['draw'] = proto.draw;

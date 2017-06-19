@@ -297,9 +297,6 @@
           }
         },
         "crosshair": {"$ref": "#/definitions/anychart.core.ui.Crosshair"},
-        "barChartMode": {
-          "type": "boolean"
-        },
         "isVertical": {
           "type": "boolean"
         },
@@ -442,7 +439,6 @@
           ]
         },
         "zAngle": {"type": ["number"]},
-        "zDepth": {"type": ["number", "null"]},
         "zAspect": {"type": ["number", "string"]},
         "zPadding": {"type": ["number"]},
         "zDistribution": {"type": ["boolean"]}
@@ -5151,8 +5147,6 @@
         "selectable": {"type": ["boolean", "null"]},
         "disablePointerEvents": {"type": ["boolean", "null"]},
         "useHtml": {"type": ["boolean", "null"]},
-        "textFormatter": {"type": "string"},
-
         "allowLeaveScreen": {"type": "boolean"}
       }
     },

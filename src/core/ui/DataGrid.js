@@ -1197,19 +1197,6 @@ anychart.core.ui.DataGrid.Column.prototype.format = function(opt_value) {
 
 
 /**
- * Sets cell text value formatter.
- * @param {(function(anychart.data.Tree.DataItem=):string)=} opt_value - Function to be set.
- * @return {(function(anychart.data.Tree.DataItem=):string|anychart.core.ui.DataGrid.Column)} - Current function or itself
- *  for method chaining.
- * @deprecated Since 7.13.1. Use 'format' instead.
- */
-anychart.core.ui.DataGrid.Column.prototype.textFormatter = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['textFormatter()', 'format()'], true);
-  return this.format(opt_value);
-};
-
-
-/**
  * Gets/sets label factory to decorate cells.
  * @param {Object=} opt_value - Value to be set.
  * @return {(anychart.core.ui.DataGrid.Column|anychart.core.ui.LabelsFactory)} - Current value or itself for method chaining.
@@ -1730,10 +1717,7 @@ anychart.core.ui.DataGrid.Column.prototype.serialize = function() {
 };
 
 
-/**
- * @inheritDoc
- * @suppress {deprecated}
- */
+/** @inheritDoc */
 anychart.core.ui.DataGrid.Column.prototype.setupByJSON = function(json, opt_default) {
   anychart.core.ui.DataGrid.Column.base(this, 'setupByJSON', json, opt_default);
 
@@ -1747,7 +1731,6 @@ anychart.core.ui.DataGrid.Column.prototype.setupByJSON = function(json, opt_defa
   this.title(json['title']);
 
   if ('format' in json) this.format(json['format']);
-  if ('textFormatter' in json) this.textFormatter(json['format']);
   if ('cellTextSettingsOverrider' in json) this.cellTextSettingsOverrider(json['cellTextSettingsOverrider']);
 };
 
@@ -1862,13 +1845,9 @@ anychart.core.ui.DataGrid.Button.prototype.switchState = function() {
 
 
 //exports
-/** @suppress {deprecated} */
 (function() {
   var proto = anychart.core.ui.DataGrid.prototype;
   proto['backgroundFill'] = proto.backgroundFill;
-  proto['cellFill'] = proto.cellFill; //deprecated
-  proto['cellEvenFill'] = proto.cellEvenFill; //deprecated
-  proto['cellOddFill'] = proto.cellOddFill; //deprecated
   proto['rowFill'] = proto.rowFill;
   proto['rowEvenFill'] = proto.rowEvenFill;
   proto['rowOddFill'] = proto.rowOddFill;
@@ -1898,7 +1877,6 @@ anychart.core.ui.DataGrid.Button.prototype.switchState = function() {
   proto['defaultWidth'] = proto.defaultWidth;
   proto['enabled'] = proto.enabled;
   proto['format'] = proto.format;
-  proto['textFormatter'] = proto.textFormatter;
   proto['cellTextSettings'] = proto.cellTextSettings;
   proto['cellTextSettingsOverrider'] = proto.cellTextSettingsOverrider;
   proto['collapseExpandButtons'] = proto.collapseExpandButtons;

@@ -24,7 +24,7 @@ anychart.core.ChartWithOrthogonalScales = function(categorizeData) {
    * If true, all default chart elements layout is swapped.
    * @type {boolean}
    */
-  this.barChartMode = false;
+  this.isVerticalInternal = false;
 
   /**
    * If series data should be sorted and joined
@@ -1916,7 +1916,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.getSeriesStatus = function(eve
   if (interactivity.hoverMode() == anychart.enums.HoverMode.BY_SPOT) {
     var spotRadius = interactivity.spotRadius();
     var minRatio, maxRatio;
-    if (this.barChartMode) {
+    if (this.isVerticalInternal) {
       minRatio = (rangeY - (y - spotRadius - minY)) / rangeY;
       maxRatio = (rangeY - (y + spotRadius - minY)) / rangeY;
 
@@ -1977,7 +1977,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.getSeriesStatus = function(eve
       }
     }
   } else if (this.interactivity().hoverMode() == anychart.enums.HoverMode.BY_X) {
-    var ratio = ((this.barChartMode) ?
+    var ratio = ((this.isVerticalInternal) ?
         ((rangeY - (y - minY)) / rangeY) :
         ((x - minX) / rangeX));
 

@@ -105,18 +105,6 @@ anychart.core.ui.CrosshairLabel.prototype.format = function(opt_value) {
 
 
 /**
- * Gets or sets labels text formatter function.
- * @param {Function=} opt_value Labels text formatter function.
- * @return {Function|anychart.core.ui.CrosshairLabel} Labels text formatter function or Labels instance for chaining call.
- * @deprecated Since 7.13.1. Use 'format' instead.
- */
-anychart.core.ui.CrosshairLabel.prototype.textFormatter = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['textFormatter()', 'format()'], true);
-  return this.format(opt_value);
-};
-
-
-/**
  * Sets X coord.
  * @param {number} value
  * @return {anychart.core.ui.CrosshairLabel}
@@ -218,28 +206,20 @@ anychart.core.ui.CrosshairLabel.prototype.serialize = function() {
 };
 
 
-/**
- * @inheritDoc
- * @suppress {deprecated}
- */
+/** @inheritDoc */
 anychart.core.ui.CrosshairLabel.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.ui.CrosshairLabel.base(this, 'setupByJSON', config, opt_default);
   this.axisIndex(config['axisIndex']);
   this.anchor(config['anchor']);
-  if ('textFormatter' in config) {
-    this.textFormatter(config['textFormatter']);
-  }
   this.format(config['format']);
 };
 
 
-/** @suppress {deprecated} */
 (function() {
   var proto = anychart.core.ui.CrosshairLabel.prototype;
   //exports
   proto['axisIndex'] = proto.axisIndex;
   proto['format'] = proto.format;
-  proto['textFormatter'] = proto.textFormatter;
   proto['background'] = proto.background;
   proto['padding'] = proto.padding;
   proto['width'] = proto.width;

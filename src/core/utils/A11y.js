@@ -78,18 +78,6 @@ anychart.core.utils.A11y.prototype.enabled = function(opt_value) {
  * Function to format title text.
  * @param {(Function|string)=} opt_value - Function to format content text.
  * @return {Function|string|anychart.core.utils.A11y} Function to format content text or itself for method chaining.
- * @deprecated Since 7.13.1. Use 'titleFormat' instead.
- */
-anychart.core.utils.A11y.prototype.titleFormatter = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['titleFormatter', 'titleFormat'], true);
-  return this.titleFormat(opt_value);
-};
-
-
-/**
- * Function to format title text.
- * @param {(Function|string)=} opt_value - Function to format content text.
- * @return {Function|string|anychart.core.utils.A11y} Function to format content text or itself for method chaining.
  */
 anychart.core.utils.A11y.prototype.titleFormat = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -190,23 +178,15 @@ anychart.core.utils.A11y.prototype.setupSpecial = function(isDefault, var_args) 
 };
 
 
-/**
- * @inheritDoc
- * @suppress {deprecated}
- */
+/** @inheritDoc */
 anychart.core.utils.A11y.prototype.setupByJSON = function(json, opt_default) {
   anychart.core.utils.A11y.base(this, 'setupByJSON', json, opt_default);
   this.enabled('enabled' in json ? json['enabled'] : true);
   this.titleFormat(json['titleFormat']);
-  if ('titleFormatter' in json)
-    this.titleFormatter(json['titleFormatter']);
 };
 
 
-/**
- * @inheritDoc
- * @suppress {deprecated}
- */
+/** @inheritDoc */
 anychart.core.utils.A11y.prototype.disposeInternal = function() {
   this.chart = null;
   if (this.parentA11y_) {
@@ -407,19 +387,13 @@ anychart.core.utils.SeriesA11y.prototype.disposeInternal = function() {
 
 
 //exports
-/**
- * @suppress {deprecated}
- */
 (function() {
   var proto = anychart.core.utils.ChartA11y.prototype;
   proto['enabled'] = proto.enabled;
   proto['titleFormat'] = proto.titleFormat;
-  proto['titleFormatter'] = proto.titleFormatter;
   proto['mode'] = proto.mode;
-
   proto = anychart.core.utils.SeriesA11y.prototype;
   proto['enabled'] = proto.enabled;
   proto['titleFormat'] = proto.titleFormat;
-  proto['titleFormatter'] = proto.titleFormatter;
 })();
 

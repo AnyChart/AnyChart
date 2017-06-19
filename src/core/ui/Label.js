@@ -15,7 +15,7 @@ goog.require('anychart.core.ui.LabelBase');
  *   <li>{@link anychart.core.ui.Label#parentBounds}</li>
  * </ul>
  * @example <c>Creating an autonomous label.</c><t>simple-h100</t>
- * anychart.ui.label()
+ * anychart.standalones.label()
  *     .text('My custom Label')
  *     .fontSize(27)
  *     .background(null)

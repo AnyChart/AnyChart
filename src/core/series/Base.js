@@ -2436,10 +2436,7 @@ anychart.core.series.Base.prototype.getMarkerFill = function() {
       [this.check(anychart.core.drawers.Capabilities.USES_STROKE_AS_FILL) ? 'stroke' : 'fill'],
       anychart.enums.ColorType.FILL);
   var fill = /** @type {acgraph.vector.Fill} */(fillGetter(this, anychart.PointState.NORMAL, true, true));
-  if (anychart.DEFAULT_THEME != 'v6')
-    return /** @type {acgraph.vector.Fill} */(anychart.color.setOpacity(fill, 1, true));
-  else
-    return fill;
+  return /** @type {acgraph.vector.Fill} */(anychart.color.setOpacity(fill, 1, true));
 };
 
 

@@ -1679,28 +1679,22 @@ anychart.core.Chart.prototype.invalidateHandler_ = function(event) {
  * For the moment we have no way around this "nice feature" of the compiler.
  * @param {boolean=} opt_stringify Return as JSON as string.
  *  Note: stringifying ignores this flag.
- * @param {boolean=} opt_includeTheme If the current theme properties should be included into the result.
  * @return {*} Chart JSON.
  */
-anychart.core.Chart.prototype.toJson = function(opt_stringify, opt_includeTheme) {
+anychart.core.Chart.prototype.toJson = function(opt_stringify) {
   var data = this.isDisposed() ? {} : this.serialize();
-  if (!opt_includeTheme) {
-    data = /** @type {!Object} */(anychart.themes.merging.demerge(data, this.getDefaultThemeObj())) || {};
-  }
-  return opt_stringify ?
-      goog.json.hybrid.stringify(data) :
-      data;
+  data = /** @type {!Object} */(anychart.themes.merging.demerge(data, this.getDefaultThemeObj())) || {};
+  return opt_stringify ? goog.json.hybrid.stringify(data) : data;
 };
 
 
 /**
  * Return chart configuration as XML string or XMLNode.
  * @param {boolean=} opt_asXmlNode Return XML as XMLNode.
- * @param {boolean=} opt_includeTheme If the current theme properties should be included into the result.
  * @return {string|Node} Chart configuration.
  */
-anychart.core.Chart.prototype.toXml = function(opt_asXmlNode, opt_includeTheme) {
-  return anychart.utils.json2xml(/** @type {Object} */(this.toJson(false, opt_includeTheme)), '', opt_asXmlNode);
+anychart.core.Chart.prototype.toXml = function(opt_asXmlNode) {
+  return anychart.utils.json2xml(/** @type {Object} */(this.toJson(false)), '', opt_asXmlNode);
 };
 
 
@@ -3552,11 +3546,10 @@ anychart.core.Chart.prototype.toA11yTable = function(opt_title, opt_asString) {
 
 /**
  * Saves chart config as XML document.
- * @param {boolean=} opt_includeTheme If the current theme properties should be included into the result.
  * @param {string=} opt_filename file name to save.
  */
-anychart.core.Chart.prototype.saveAsXml = function(opt_includeTheme, opt_filename) {
-  var xml = /** @type {string} */(this.toXml(false, opt_includeTheme));
+anychart.core.Chart.prototype.saveAsXml = function(opt_filename) {
+  var xml = /** @type {string} */(this.toXml(false));
   var options = {};
   options['file-name'] = opt_filename || anychart.exports.filename();
   options['data'] = xml;
@@ -3568,11 +3561,10 @@ anychart.core.Chart.prototype.saveAsXml = function(opt_includeTheme, opt_filenam
 
 /**
  * Saves chart config as XML document.
- * @param {boolean=} opt_includeTheme If the current theme properties should be included into the result.
  * @param {string=} opt_filename file name to save.
  */
-anychart.core.Chart.prototype.saveAsJson = function(opt_includeTheme, opt_filename) {
-  var json = /** @type {string} */(this.toJson(true, opt_includeTheme));
+anychart.core.Chart.prototype.saveAsJson = function(opt_filename) {
+  var json = /** @type {string} */(this.toJson(true));
   var options = {};
   options['file-name'] = opt_filename || anychart.exports.filename();
   options['data'] = json;

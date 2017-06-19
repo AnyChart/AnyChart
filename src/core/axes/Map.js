@@ -1161,12 +1161,12 @@ anychart.core.axes.Map.prototype.getAffectingBounds = function(opt_bounds) {
 /**
  * Returns remaining parent bounds to use elsewhere.
  * @example <t>simple-h100</t>
- * var axis = anychart.axes.linear();
+ * var axis = anychart.standalones.axes.linear();
  * axis
  *     .orientation('left')
  *     .scale(anychart.scales.ordinal().values([1,2,3]))
  *     .container(stage).draw();
- * var label = anychart.ui.label();
+ * var label = anychart.standalones.label();
  * label
  *     .parentBounds(axis.getRemainingBounds())
  *     .width('100%')

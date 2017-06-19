@@ -1,4 +1,3 @@
-goog.provide('anychart.axisMarkers.Text');
 goog.provide('anychart.standalones.axisMarkers.Text');
 goog.require('anychart.core.axisMarkers.Text');
 
@@ -26,22 +25,9 @@ anychart.standalones.axisMarkers.text = function() {
 };
 
 
-/**
- * Constructor function.
- * @deprecated Since 7.12.0. Use anychart.standalones.axisMarkers.text instead.
- * @return {!anychart.standalones.axisMarkers.Text}
- */
-anychart.axisMarkers.text = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.axisMarkers.text()', 'anychart.standalones.axisMarkers.text()', null, 'Constructor'], true);
-  return anychart.standalones.axisMarkers.text();
-};
-
-
 //exports
-/** @suppress {deprecated} */
 (function() {
   var proto = anychart.standalones.axisMarkers.Text.prototype;
-  goog.exportSymbol('anychart.axisMarkers.text', anychart.axisMarkers.text);
   goog.exportSymbol('anychart.standalones.axisMarkers.text', anychart.standalones.axisMarkers.text);
   proto['draw'] = proto.draw;
   proto['parentBounds'] = proto.parentBounds;

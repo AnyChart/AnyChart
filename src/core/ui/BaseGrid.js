@@ -1226,24 +1226,6 @@ anychart.core.ui.BaseGrid.prototype.rowFill = function(opt_fillOrColorOrKeys, op
 
 
 /**
- * Gets/sets a default rows fill. Resets odd fill and even fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.core.ui.BaseGrid|string} - Current value or itself for method chaining.
- * @deprecated Since 7.7.0. Use rowFill() instead.
- */
-anychart.core.ui.BaseGrid.prototype.cellFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['cellFill()', 'rowFill()'], true);
-  return this.rowFill(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy);
-};
-
-
-/**
  * Gets/sets row odd fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
@@ -1268,24 +1250,6 @@ anychart.core.ui.BaseGrid.prototype.rowOddFill = function(opt_fillOrColorOrKeys,
 
 
 /**
- * Gets/sets row odd fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.core.ui.BaseGrid|string} - Current value or itself for method chaining.
- * @deprecated Since 7.7.0. Use rowOddFill() instead.
- */
-anychart.core.ui.BaseGrid.prototype.cellOddFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['cellOddFill()', 'rowOddFill()'], true);
-  return this.rowOddFill(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy);
-};
-
-
-/**
  * Gets/sets row even fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
@@ -1306,24 +1270,6 @@ anychart.core.ui.BaseGrid.prototype.rowEvenFill = function(opt_fillOrColorOrKeys
     return this;
   }
   return this.rowEvenFill_;
-};
-
-
-/**
- * Gets/sets row even fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.core.ui.BaseGrid|string} - Current value or itself for method chaining.
- * @deprecated Since 7.7.0. Use rowEvenFill() instead.
- */
-anychart.core.ui.BaseGrid.prototype.cellEvenFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['cellEvenFill()', 'rowEvenFill()'], true);
-  return this.rowEvenFill(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy);
 };
 
 
@@ -2424,18 +2370,6 @@ anychart.core.ui.BaseGrid.prototype.headerHeight = function(opt_value) {
 
 
 /**
- * Gets/sets header height.
- * @param {number=} opt_value - Value to be set.
- * @deprecated Since 7.7.0. Use headerHeight() instead.
- * @return {(number|anychart.core.ui.BaseGrid)} - Current value or itself for method chaining.
- */
-anychart.core.ui.BaseGrid.prototype.titleHeight = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['titleHeight()', 'headerHeight()'], true);
-  return this.headerHeight(opt_value);
-};
-
-
-/**
  * Getter for tooltip settings.
  * @param {(Object|boolean|null)=} opt_value - Tooltip settings.
  * @return {!(anychart.core.ui.BaseGrid|anychart.core.ui.Tooltip)} - Tooltip instance or self for method chaining.
@@ -2516,7 +2450,6 @@ anychart.core.ui.BaseGrid.prototype.serialize = function() {
 
 /**
  * @inheritDoc
- * @suppress {deprecated}
  */
 anychart.core.ui.BaseGrid.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.ui.BaseGrid.base(this, 'setupByJSON', config, opt_default);
@@ -2529,13 +2462,6 @@ anychart.core.ui.BaseGrid.prototype.setupByJSON = function(config, opt_default) 
     this.defaultRowHeight(config['defaultRowHeight']);
   }
 
-  if (goog.isDef(config['cellFill']))
-    this.cellFill(config['cellFill']);
-  if (goog.isDef(config['cellOddFill']))
-    this.cellOddFill(config['cellOddFill']);
-  if (goog.isDef(config['cellEvenFill']))
-    this.cellEvenFill(config['cellEvenFill']);
-
   this.backgroundFill(config['backgroundFill']);
   this.rowStroke(config['rowStroke']);
   this.rowFill(config['rowFill']);
@@ -2546,9 +2472,6 @@ anychart.core.ui.BaseGrid.prototype.setupByJSON = function(config, opt_default) 
 
   if ('tooltip' in config)
     this.tooltip().setupInternal(!!opt_default, config['tooltip']);
-
-  if (goog.isDef(config['titleHeight']))
-    this.titleHeight(config['titleHeight']);
 
   this.headerHeight(config['headerHeight']);
   this.editStructurePreviewFill(config['editStructurePreviewFill']);

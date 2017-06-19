@@ -218,16 +218,6 @@ anychart.core.resource.TimeLineLevelHolidaysSettings.TEXT_DESCRIPTORS = (functio
       anychart.core.settings.stringOrFunctionNormalizer,
       anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-  //@deprecated Since 7.13.1. Use 'format' instead.
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG_DEPRECATED,
-      'format',
-      anychart.core.settings.stringOrFunctionNormalizer,
-      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED,
-      void 0,
-      'textFormatter');
   return map;
 })();
 anychart.core.settings.populate(anychart.core.resource.TimeLineLevelHolidaysSettings, anychart.core.resource.TimeLineLevelHolidaysSettings.TEXT_DESCRIPTORS);

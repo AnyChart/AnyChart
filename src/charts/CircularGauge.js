@@ -733,7 +733,7 @@ anychart.charts.CircularGauge.prototype.encloseWithStraightLine = function(opt_v
 /**
  * Set gauge start angle.
  * @example
- * var gauge = anychart.circularGauge([1, 1.2, 1.4, 1.6, 1.2]);
+ * var gauge = anychart.gauges.circular([1, 1.2, 1.4, 1.6, 1.2]);
  * gauge.startAngle(45);
  * gauge.container(stage).draw();
  * @param {(string|number)=} opt_value .
@@ -756,7 +756,7 @@ anychart.charts.CircularGauge.prototype.startAngle = function(opt_value) {
 /**
  * Set gauge sweep angle.
  * @example
- * var gauge = anychart.circularGauge([1, 1.2, 1.4, 1.6, 1.2]);
+ * var gauge = anychart.gauges.circular([1, 1.2, 1.4, 1.6, 1.2]);
  * gauge.sweepAngle(45);
  * gauge.container(stage).draw();
  * @param {(string|number)=} opt_value .

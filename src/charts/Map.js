@@ -515,14 +515,6 @@ anychart.charts.Map.prototype.mapTX = null;
 
 
 /**
- * Allow point selection if is true.
- * @type {boolean}
- * @private
- */
-anychart.charts.Map.prototype.allowPointsSelect_;
-
-
-/**
  * @type {boolean}
  * @private
  */
@@ -1152,24 +1144,6 @@ anychart.charts.Map.prototype.handleMouseOut = function(event) {
       scene.prevHoverSeriesStatus = null;
     }
   }
-};
-
-
-/**
- * Allows to select points of the Map.
- * @param {boolean=} opt_value Allow or not.
- * @return {boolean|anychart.charts.Map} Returns allow points select state or current map instance for chaining.
- * @deprecated Since 7.8.0. Use chart.interactivity().selectionMode().
- */
-anychart.charts.Map.prototype.allowPointsSelect = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['allowPointsSelect()', 'interactivity().selectionMode()'], true);
-  if (goog.isDef(opt_value)) {
-    this.interactivity().selectionMode(opt_value ?
-        anychart.enums.SelectionMode.MULTI_SELECT :
-        anychart.enums.SelectionMode.NONE);
-    return this;
-  }
-  return this.interactivity().selectionMode() != anychart.enums.SelectionMode.NONE;
 };
 
 
@@ -5078,10 +5052,7 @@ anychart.charts.Map.prototype.toGeoJSON = function() {
 };
 
 
-/**
- * @inheritDoc
- * @suppress {deprecated}
- */
+/** @inheritDoc */
 anychart.charts.Map.prototype.setupByJSON = function(config, opt_default) {
   anychart.charts.Map.base(this, 'setupByJSON', config, opt_default);
 
@@ -5101,9 +5072,6 @@ anychart.charts.Map.prototype.setupByJSON = function(config, opt_default) {
   var geoData = config['geoData'];
   if (geoData) {
     this.geoData(/** @type {string} */(goog.string.startsWith(geoData, '{') ? JSON.parse(geoData) : geoData));
-  }
-  if (goog.isDef(config['allowPointsSelect'])) {
-    this.allowPointsSelect(config['allowPointsSelect']);
   }
 
   this.crsAnimation(config['crsAnimation']);
@@ -5317,7 +5285,6 @@ anychart.charts.Map.prototype.disposeInternal = function() {
 //endregion
 //region --- Exports
 //exports
-/** @suppress {deprecated} */
 (function() {
   var proto = anychart.charts.Map.prototype;
   //
@@ -5359,7 +5326,6 @@ anychart.charts.Map.prototype.disposeInternal = function() {
   //bounds
   proto['getPlotBounds'] = proto.getPlotBounds;
   //interactivity
-  proto['allowPointsSelect'] = proto.allowPointsSelect;
   proto['crsAnimation'] = proto.crsAnimation;
   //feature manipulation
   proto['featureTranslation'] = proto.featureTranslation;

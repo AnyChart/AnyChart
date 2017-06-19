@@ -1590,7 +1590,6 @@ anychart.core.series.Cartesian.prototype.disposeInternal = function() {
 //
 //------------------------------------------------------------------------------
 //exports
-/** @suppress {deprecated} */
 (function() {
   var proto = anychart.core.series.Cartesian.prototype;
   proto['data'] = proto.data;

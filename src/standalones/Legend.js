@@ -132,22 +132,9 @@ anychart.standalones.legend = function() {
 };
 
 
-/**
- * Constructor function.
- * @return {!anychart.standalones.Legend}
- * @deprecated Since 7.12.0. Use anychart.standalones.legend instead.
- */
-anychart.ui.legend = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.ui.legend()', 'anychart.standalones.legend()', null, 'Constructor'], true);
-  return anychart.standalones.legend();
-};
-
-
 //exports
-/** @suppress {deprecated} */
 (function() {
   var proto = anychart.standalones.Legend.prototype;
-  goog.exportSymbol('anychart.ui.legend', anychart.ui.legend);
   goog.exportSymbol('anychart.standalones.legend', anychart.standalones.legend);
   proto['draw'] = proto.draw;
   proto['parentBounds'] = proto.parentBounds;

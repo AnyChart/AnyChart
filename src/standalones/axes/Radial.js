@@ -43,23 +43,9 @@ anychart.standalones.axes.radial = function() {
 };
 
 
-/**
- * Returns axis instance.<br/>
- * <b>Note:</b> Any axis must be bound to a scale.
- * @return {!anychart.standalones.axes.Radial}
- * @deprecated Since 7.12.0. Use anychart.standalones.axes.radar instead.
- */
-anychart.axes.radial = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.axes.radial()', 'anychart.standalones.axes.radial()', null, 'Constructor'], true);
-  return anychart.standalones.axes.radial();
-};
-
-
 //exports
-/** @suppress {deprecated} */
 (function() {
   var proto = anychart.standalones.axes.Radial.prototype;
-  goog.exportSymbol('anychart.axes.radial', anychart.axes.radial);
   goog.exportSymbol('anychart.standalones.axes.radial', anychart.standalones.axes.radial);
   proto['draw'] = proto.draw;
   proto['parentBounds'] = proto.parentBounds;

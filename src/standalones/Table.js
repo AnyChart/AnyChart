@@ -128,24 +128,9 @@ anychart.standalones.table = function(opt_rowsCount, opt_colsCount) {
 };
 
 
-/**
- * Constructor function.
- * @param {number=} opt_rowsCount Number of rows in the table.
- * @param {number=} opt_colsCount Number of columns in the table.
- * @return {!anychart.standalones.Table}
- * @deprecated Since 7.12.0. Use anychart.standalones.table instead.
- */
-anychart.ui.table = function(opt_rowsCount, opt_colsCount) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.ui.table()', 'anychart.standalones.table()', null, 'Constructor'], true);
-  return anychart.standalones.table(opt_rowsCount, opt_colsCount);
-};
-
-
 //exports
-/** @suppress {deprecated} */
 (function() {
   var proto = anychart.standalones.Table.prototype;
-  goog.exportSymbol('anychart.ui.table', anychart.ui.table);
   goog.exportSymbol('anychart.standalones.table', anychart.standalones.table);
   proto['draw'] = proto.draw;
   proto['parentBounds'] = proto.parentBounds;

@@ -37,23 +37,10 @@ anychart.standalones.title = function() {
 };
 
 
-/**
- * Constructor function.
- * @deprecated Since 7.12.0. Use anychart.standalones.title instead.
- * @return {!anychart.standalones.Title}
- */
-anychart.ui.title = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.ui.title()', 'anychart.standalones.title()', null, 'Constructor'], true);
-  return anychart.standalones.title();
-};
-
-
 //exports
-/** @suppress {deprecated} */
 (function() {
   var proto = anychart.standalones.Title.prototype;
   goog.exportSymbol('anychart.standalones.title', anychart.standalones.title);
-  goog.exportSymbol('anychart.ui.title', anychart.ui.title);
   proto['draw'] = proto.draw;
   proto['parentBounds'] = proto.parentBounds;
   proto['container'] = proto.container;

@@ -1053,10 +1053,8 @@ anychart.core.VisualBase.prototype.disposeInternal = function() {
 
 
 //exports
-/** @suppress {deprecated} */
 (function() {
   var proto = anychart.core.VisualBase.prototype;
-
   proto['zIndex'] = proto.zIndex;//in docs/final
   proto['enabled'] = proto.enabled;//doc|ex
   proto['print'] = proto.print;

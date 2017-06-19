@@ -6457,13 +6457,6 @@ goog.exportSymbol('anychart.enums.DataField.TO', anychart.enums.DataField.TO);
 goog.exportSymbol('anychart.enums.DataField.ID', anychart.enums.DataField.ID);
 goog.exportSymbol('anychart.enums.DataField.NAME', anychart.enums.DataField.NAME);
 
-goog.exportSymbol('anychart.enums.Interval.YEARS', anychart.enums.Interval.YEAR);//deprecated since 7.7.0
-goog.exportSymbol('anychart.enums.Interval.MONTHS', anychart.enums.Interval.MONTH);//deprecated since 7.7.0
-goog.exportSymbol('anychart.enums.Interval.DAYS', anychart.enums.Interval.DAY);//deprecated since 7.7.0
-goog.exportSymbol('anychart.enums.Interval.HOURS', anychart.enums.Interval.HOUR);//deprecated since 7.7.0
-goog.exportSymbol('anychart.enums.Interval.MINUTES', anychart.enums.Interval.MINUTE);//deprecated since 7.7.0
-goog.exportSymbol('anychart.enums.Interval.SECONDS', anychart.enums.Interval.SECOND);//deprecated since 7.7.0
-
 goog.exportSymbol('anychart.enums.Interval.YEAR', anychart.enums.Interval.YEAR);
 goog.exportSymbol('anychart.enums.Interval.SEMESTER', anychart.enums.Interval.SEMESTER);
 goog.exportSymbol('anychart.enums.Interval.QUARTER', anychart.enums.Interval.QUARTER);
@@ -6546,12 +6539,6 @@ goog.exportSymbol('anychart.enums.LabelsDisplayMode.CLIP', anychart.enums.Labels
 goog.exportSymbol('anychart.enums.StepDirection.CENTER', anychart.enums.StepDirection.CENTER);
 goog.exportSymbol('anychart.enums.StepDirection.FORWARD', anychart.enums.StepDirection.FORWARD);
 goog.exportSymbol('anychart.enums.StepDirection.BACKWARD', anychart.enums.StepDirection.BACKWARD);
-
-goog.exportSymbol('anychart.enums.TokenType.UNKNOWN', anychart.enums.TokenType.UNKNOWN); //@deprecated Since 7.13.1. Don't use it at all.
-goog.exportSymbol('anychart.enums.TokenType.NUMBER', anychart.enums.TokenType.NUMBER); //@deprecated Since 7.13.1. Don't use it at all.
-goog.exportSymbol('anychart.enums.TokenType.STRING', anychart.enums.TokenType.STRING); //@deprecated Since 7.13.1. Don't use it at all.
-goog.exportSymbol('anychart.enums.TokenType.DATE_TIME', anychart.enums.TokenType.DATE_TIME); //@deprecated Since 7.13.1. Don't use it at all.
-goog.exportSymbol('anychart.enums.TokenType.PERCENT', anychart.enums.TokenType.PERCENT); //@deprecated Since 7.13.1. Don't use it at all.
 
 //goog.exportSymbol('anychart.enums.StringToken.AXIS_AVERAGE', anychart.enums.StringToken.AXIS_AVERAGE);
 //goog.exportSymbol('anychart.enums.StringToken.AXIS_BUBBLE_SIZE_MAX', anychart.enums.StringToken.AXIS_BUBBLE_SIZE_MAX);

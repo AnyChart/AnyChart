@@ -64,10 +64,7 @@ anychart.core.utils.StockInteractivity.prototype.scrollOnMouseWheel = function(o
 
 //endregion
 //region --- Setup and serialize
-/**
- * @inheritDoc
- * @suppress {deprecated}
- */
+/** @inheritDoc */
 anychart.core.utils.StockInteractivity.prototype.setupByJSON = function(value, opt_default) {
   anychart.core.utils.StockInteractivity.base(this, 'setupByJSON', value, opt_default);
 

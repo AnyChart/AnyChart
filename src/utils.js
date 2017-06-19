@@ -345,23 +345,6 @@ anychart.utils.normalizeTimestamp = function(value) {
 
 
 /**
- * Formats incoming timestamp as 'yyyy.MM.dd'.
- * @param {number|string} timestamp - Timestamp.
- * @return {string} - Formatted date.
- * @deprecated Since 7.9.0. Use anychart.format.dateTime instead.
- */
-anychart.utils.defaultDateFormatter = function(timestamp) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.utils.defaultDateFormatter', 'anychart.format.dateTime'], true);
-  if (goog.isNumber(timestamp) || goog.isString(timestamp)) {
-    var formatter = new goog.i18n.DateTimeFormat('yyyy.MM.dd');
-    return formatter.format(new goog.date.UtcDateTime(new Date(+timestamp)));
-  } else {
-    return '';
-  }
-};
-
-
-/**
  * Gets anchor coordinates by bounds.
  * @param {anychart.math.Rect} bounds Bounds rectangle.
  * @param {?(anychart.enums.Anchor|string)} anchor Anchor.
@@ -1619,29 +1602,6 @@ anychart.utils.UTCTimeZoneCache_;
 
 
 /**
- * Formats date by pattern.
- * @param {number|Date} date UTC timestamp or Date object.
- * @param {string} pattern
- * @return {string}
- * @deprecated Since 7.9.0. Use anychart.format.dateTime instead.
- */
-anychart.utils.formatDateTime = function(date, pattern) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.utils.formatDateTime', 'anychart.format.dateTime'], true);
-  /** @type {goog.i18n.DateTimeFormat} */
-  var formatter;
-  if (pattern in anychart.utils.formatDateTimeCache_)
-    formatter = anychart.utils.formatDateTimeCache_[pattern];
-  else
-    formatter = anychart.utils.formatDateTimeCache_[pattern] = new goog.i18n.DateTimeFormat(pattern);
-
-  if (!anychart.utils.UTCTimeZoneCache_)
-    anychart.utils.UTCTimeZoneCache_ = goog.i18n.TimeZone.createTimeZone(0);
-
-  return formatter.format(goog.isNumber(date) ? new Date(date) : date, anychart.utils.UTCTimeZoneCache_);
-};
-
-
-/**
  * Global tooltips registry. Used to make anychart.utils.hideTooltips() work correctly.
  * @type {Object.<anychart.core.ui.Tooltip>}
  */
@@ -2274,7 +2234,5 @@ anychart.utils.decomposeArguments = function(namedArguments, opt_options, opt_de
 goog.exportSymbol('anychart.utils.printUtilsBoolean', anychart.utils.printUtilsBoolean);
 goog.exportSymbol('anychart.utils.xml2json', anychart.utils.xml2json);
 goog.exportSymbol('anychart.utils.json2xml', anychart.utils.json2xml);
-goog.exportSymbol('anychart.utils.defaultDateFormatter', anychart.utils.defaultDateFormatter);
-goog.exportSymbol('anychart.utils.formatDateTime', anychart.utils.formatDateTime);
 goog.exportSymbol('anychart.utils.hideTooltips', anychart.utils.hideTooltips);
 goog.exportSymbol('anychart.utils.htmlTableFromCsv', anychart.utils.htmlTableFromCsv);

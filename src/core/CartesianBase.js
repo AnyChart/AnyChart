@@ -40,12 +40,6 @@ anychart.core.CartesianBase = function(opt_categorizeData) {
   this.zAngleInternal = 0;
 
   /**
-   * @type {?number}
-   * @protected
-   */
-  this.zDepthInternal = null;
-
-  /**
    * @type {boolean}
    * @protected
    */
@@ -101,27 +95,6 @@ anychart.core.CartesianBase.prototype.zAspect = function(opt_value) {
     return this;
   } else {
     return this.zAspectInternal;
-  }
-};
-
-
-/**
- * Getter/setter for zDepth.
- * @param {?(number)=} opt_value
- * @return {number|null|anychart.core.CartesianBase}
- * @deprecated Since 7.10.0. Use chart.zAspect instead.
- */
-anychart.core.CartesianBase.prototype.zDepth = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['chart.zDepth', 'chart.zAspect with chart.zPadding'], true);
-  if (goog.isDef(opt_value)) {
-    if (this.zDepthInternal != opt_value) {
-      this.zDepthInternal = goog.isNull(opt_value) ? opt_value : anychart.utils.toNumber(opt_value);
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.zDepthInternal;
   }
 };
 
