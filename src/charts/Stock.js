@@ -5,6 +5,7 @@ goog.require('anychart.core.IChartWithAnnotations');
 goog.require('anychart.core.IGroupingProvider');
 goog.require('anychart.core.annotations.ChartController');
 goog.require('anychart.core.reporting');
+goog.require('anychart.core.settings');
 goog.require('anychart.core.stock.Controller');
 goog.require('anychart.core.stock.IKeyIndexTransformer');
 goog.require('anychart.core.stock.Plot');
@@ -1878,6 +1879,34 @@ anychart.charts.Stock.prototype.createSelectMarqueeEvent = function(eventType, p
 
 
 //endregion
+//region Descriptors
+/**
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.charts.Stock.PROPERTY_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
+      'zoomMarqueeFill',
+      anychart.core.settings.fillNormalizer,
+      0,
+      0);
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
+      'zoomMarqueeStroke',
+      anychart.core.settings.strokeNormalizer,
+      0,
+      0);
+
+  return map;
+})();
+anychart.core.settings.populate(anychart.charts.Stock, anychart.charts.Stock.PROPERTY_DESCRIPTORS);
+
+
+//endregion
 //region Zoom Marquee
 //------------------------------------------------------------------------------
 //
@@ -1892,47 +1921,8 @@ anychart.charts.Stock.prototype.createSelectMarqueeEvent = function(eventType, p
  */
 anychart.charts.Stock.prototype.startZoomMarquee = function(opt_repeat, opt_asRect) {
   this.startIRDrawing(this.onZoomMarqueeStart_, null, this.onZoomMarqueeFinish_, this.getSelectMarqueeBounds(),
-      false, acgraph.vector.Cursor.CROSSHAIR, opt_repeat, this.zoomMarqueeStroke_, this.zoomMarqueeFill_, !opt_asRect);
+      false, acgraph.vector.Cursor.CROSSHAIR, opt_repeat, /** @type {acgraph.vector.Stroke} */ (this.getOption('zoomMarqueeStroke')), /** @type {acgraph.vector.Fill} */ (this.getOption('zoomMarqueeFill')), !opt_asRect);
   return this;
-};
-
-
-/**
- * Getter/setter for select marquee fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.charts.Stock} .
- */
-anychart.charts.Stock.prototype.zoomMarqueeFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    this.zoomMarqueeFill_ = acgraph.vector.normalizeFill.apply(null, arguments);
-    return this;
-  }
-  return this.zoomMarqueeFill_;
-};
-
-
-/**
- * Getter/setter for select marquee stroke.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.charts.Stock|acgraph.vector.Stroke} .
- */
-anychart.charts.Stock.prototype.zoomMarqueeStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    this.zoomMarqueeStroke_ = acgraph.vector.normalizeStroke.apply(null, arguments);
-    return this;
-  }
-  return this.zoomMarqueeStroke_;
 };
 
 
@@ -2477,9 +2467,7 @@ anychart.charts.Stock.prototype.serialize = function() {
   json['scroller'] = this.scroller().serialize();
   json['plots'] = goog.array.map(this.plots_, function(element) { return element ? element.serialize() : null; });
 
-  json['selectMarqueeFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.selectMarqueeFill()));
-  json['selectMarqueeStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.selectMarqueeStroke()));
-
+  anychart.core.settings.serialize(this, anychart.charts.Stock.PROPERTY_DESCRIPTORS, json);
   json['interactivity'] = this.interactivity().serialize();
   return json;
 };
@@ -2515,8 +2503,7 @@ anychart.charts.Stock.prototype.setupByJSON = function(config, opt_default) {
     this.selectRange(json['start'], json['end']);
   }
 
-  this.zoomMarqueeFill(config['zoomMarqueeFill']);
-  this.zoomMarqueeStroke(config['zoomMarqueeStroke']);
+  anychart.core.settings.deserialize(this, anychart.charts.Stock.PROPERTY_DESCRIPTORS, config);
   this.interactivity(config['interactivity']);
 };
 
@@ -2828,7 +2815,8 @@ anychart.charts.Stock.prototype.toCsv = function(opt_chartDataExportMode, opt_cs
   proto['annotations'] = proto.annotations;
   proto['getPlotsCount'] = proto.getPlotsCount;
   proto['startZoomMarquee'] = proto.startZoomMarquee;
-  proto['zoomMarqueeFill'] = proto.zoomMarqueeFill;
-  proto['zoomMarqueeStroke'] = proto.zoomMarqueeStroke;
+  // auto generated
+  // proto['zoomMarqueeFill'] = proto.zoomMarqueeFill;
+  // proto['zoomMarqueeStroke'] = proto.zoomMarqueeStroke;
   proto['interactivity'] = proto.interactivity;
 })();

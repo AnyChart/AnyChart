@@ -410,12 +410,12 @@ anychart.core.settings.copy = function(target, descriptors, config) {
  * @param {number} supportCheck - set to anychart.core.series.Capabilities.ANY to invalidate in any case.
  * @param {anychart.ConsistencyState|number} consistencyState
  * @param {anychart.Signal|number} signal
- * @param {Function} beforeInvalidateHook
+ * @param {Function} beforeInvalidationHook
  * @param {*=} opt_value
  * @return {*|anychart.core.settings.IObjectWithSettings}
  * @this {anychart.core.settings.IObjectWithSettings}
  */
-anychart.core.settings.simpleHandler = function(fieldName, deprecatedFieldName, normalizer, supportCheck, consistencyState, signal, beforeInvalidateHook, opt_value) {
+anychart.core.settings.simpleHandler = function(fieldName, deprecatedFieldName, normalizer, supportCheck, consistencyState, signal, beforeInvalidationHook, opt_value) {
   if (goog.isDef(opt_value)) {
     opt_value = normalizer.call(this, opt_value);
     if (this.getOwnOption(fieldName) !== opt_value) {
@@ -442,14 +442,14 @@ anychart.core.settings.simpleHandler = function(fieldName, deprecatedFieldName, 
  * @param {number} supportCheck - set to anychart.core.series.Capabilities.ANY to invalidate in any case.
  * @param {anychart.ConsistencyState|number} consistencyState
  * @param {anychart.Signal|number} signal
- * @param {Function} beforeInvalidateHook
+ * @param {Function} beforeInvalidationHook
  * @param {*=} opt_value
  * @return {*|anychart.core.settings.IObjectWithSettings}
  * @this {anychart.core.settings.IObjectWithSettings}
  */
-anychart.core.settings.simpleDeprecatedHandler = function(fieldName, deprecatedFieldName, normalizer, supportCheck, consistencyState, signal, beforeInvalidateHook, opt_value) {
+anychart.core.settings.simpleDeprecatedHandler = function(fieldName, deprecatedFieldName, normalizer, supportCheck, consistencyState, signal, beforeInvalidationHook, opt_value) {
   anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, [deprecatedFieldName + '()', fieldName + '()'], true);
-  return anychart.core.settings.simpleHandler.call(this, fieldName, deprecatedFieldName, normalizer, supportCheck, consistencyState, signal, beforeInvalidateHook, opt_value);
+  return anychart.core.settings.simpleHandler.call(this, fieldName, deprecatedFieldName, normalizer, supportCheck, consistencyState, signal, beforeInvalidationHook, opt_value);
 };
 
 
@@ -462,13 +462,13 @@ anychart.core.settings.simpleDeprecatedHandler = function(fieldName, deprecatedF
  * @param {number} supportCheck - set to anychart.core.series.Capabilities.ANY to invalidate in any case.
  * @param {anychart.ConsistencyState|number} consistencyState
  * @param {anychart.Signal|number} signal
- * @param {Function} beforeInvalidateHook
+ * @param {Function} beforeInvalidationHook
  * @param {*=} opt_value
  * @param {...*} var_args
  * @return {*|anychart.core.settings.IObjectWithSettings}
  * @this {anychart.core.settings.IObjectWithSettings}
  */
-anychart.core.settings.multiArgsHandler = function(fieldName, deprecatedFieldName, arrayNormalizer, supportCheck, consistencyState, signal, beforeInvalidateHook, opt_value, var_args) {
+anychart.core.settings.multiArgsHandler = function(fieldName, deprecatedFieldName, arrayNormalizer, supportCheck, consistencyState, signal, beforeInvalidationHook, opt_value, var_args) {
   if (goog.isDef(opt_value)) {
     // Copying using loop to avoid deop due to passing arguments object to
     // function. This is faster in many JS engines as of late 2014.
@@ -480,10 +480,10 @@ anychart.core.settings.multiArgsHandler = function(fieldName, deprecatedFieldNam
     if (this.getOwnOption(fieldName) !== opt_value) {
       this.setOption(fieldName, opt_value);
       if (this.check(supportCheck))
-        if (consistencyState == anychart.ConsistencyState.ONLY_DISPATCHING) {
-          this.dispatchSignal(signal);
-        } else {
+        if (consistencyState) {
           this.invalidate(consistencyState, signal);
+        } else {
+          this.dispatchSignal(signal);
         }
     }
     return this;
@@ -501,15 +501,15 @@ anychart.core.settings.multiArgsHandler = function(fieldName, deprecatedFieldNam
  * @param {number} supportCheck - set to anychart.core.series.Capabilities.ANY to invalidate in any case.
  * @param {anychart.ConsistencyState|number} consistencyState
  * @param {anychart.Signal|number} signal
- * @param {Function} beforeInvalidateHook
+ * @param {Function} beforeInvalidationHook
  * @param {*=} opt_value
  * @param {...*} var_args
  * @return {*|anychart.core.settings.IObjectWithSettings}
  * @this {anychart.core.settings.IObjectWithSettings}
  */
-anychart.core.settings.multiArgsDeprecatedHandler = function(fieldName, deprecatedFieldName, arrayNormalizer, supportCheck, consistencyState, signal, beforeInvalidateHook, opt_value, var_args) {
+anychart.core.settings.multiArgsDeprecatedHandler = function(fieldName, deprecatedFieldName, arrayNormalizer, supportCheck, consistencyState, signal, beforeInvalidationHook, opt_value, var_args) {
   anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, [deprecatedFieldName + '()', fieldName + '()'], true);
-  return anychart.core.settings.multiArgsHandler(fieldName, deprecatedFieldName, arrayNormalizer, supportCheck, consistencyState, signal, beforeInvalidateHook, opt_value, var_args);
+  return anychart.core.settings.multiArgsHandler(fieldName, deprecatedFieldName, arrayNormalizer, supportCheck, consistencyState, signal, beforeInvalidationHook, opt_value, var_args);
 };
 
 
@@ -547,6 +547,47 @@ anychart.core.settings.singleArgHookHandler = function(fieldName, deprecatedFiel
 
 
 /**
+ * Field handler, that is suitable for partial application to make real handlers. Unlike the simpleHandler it passes
+ * all args starting to the normalizer instead of the first param only.
+ * @param {string} fieldName
+ * @param {string} deprecatedFieldName
+ * @param {function(Array):*} arrayNormalizer
+ * @param {number} supportCheck - set to anychart.core.series.Capabilities.ANY to invalidate in any case.
+ * @param {anychart.ConsistencyState|number} consistencyState
+ * @param {anychart.Signal|number} signal
+ * @param {Function} beforeInvalidationHook
+ * @param {*=} opt_value
+ * @param {...*} var_args
+ * @return {*|anychart.core.settings.IObjectWithSettings}
+ * @this {anychart.core.settings.IObjectWithSettings}
+ */
+anychart.core.settings.multiArgsHookHandler = function(fieldName, deprecatedFieldName, arrayNormalizer, supportCheck, consistencyState, signal, beforeInvalidationHook, opt_value, var_args) {
+  if (goog.isDef(opt_value)) {
+    // Copying using loop to avoid deop due to passing arguments object to
+    // function. This is faster in many JS engines as of late 2014.
+    var args = [];
+    for (var i = 7; i < arguments.length; i++) {
+      args.push(arguments[i]);
+    }
+    opt_value = arrayNormalizer.call(this, args);
+    if (this.getOwnOption(fieldName) !== opt_value) {
+      this.setOption(fieldName, opt_value);
+      if (this.check(supportCheck)) {
+        beforeInvalidationHook.call(this);
+        if (consistencyState) {
+          this.invalidate(consistencyState, signal);
+        } else {
+          this.dispatchSignal(signal);
+        }
+      }
+    }
+    return this;
+  }
+  return this.getOption(fieldName);
+};
+
+
+/**
  * Handlers map to avoid switching.
  * @type {Array.<Function>}
  */
@@ -557,6 +598,7 @@ anychart.core.settings.handlersMap = (function() {
   map[anychart.enums.PropertyHandlerType.SINGLE_ARG_DEPRECATED] = anychart.core.settings.simpleDeprecatedHandler;
   map[anychart.enums.PropertyHandlerType.MULTI_ARG_DEPRECATED] = anychart.core.settings.multiArgsDeprecatedHandler;
   map[anychart.enums.PropertyHandlerType.SINGLE_ARG_HOOK] = anychart.core.settings.singleArgHookHandler;
+  map[anychart.enums.PropertyHandlerType.MULTI_ARG_HOOK] = anychart.core.settings.multiArgsHookHandler;
   return map;
 })();
 

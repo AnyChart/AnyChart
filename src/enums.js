@@ -5730,7 +5730,8 @@ anychart.enums.PropertyHandlerType = {
   MULTI_ARG: 1,
   SINGLE_ARG_DEPRECATED: 2,
   MULTI_ARG_DEPRECATED: 3,
-  SINGLE_ARG_HOOK: 4
+  SINGLE_ARG_HOOK: 4,
+  MULTI_ARG_HOOK: 5
 };
 
 

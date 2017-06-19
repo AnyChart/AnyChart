@@ -1717,6 +1717,45 @@ anychart.core.Chart.prototype.invalidateHandler_ = function(event) {
 
 
 //endregion
+//region --- Descriptors
+/**
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.core.Chart.PROPERTY_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+  function selectMarqueeFillBeforeInvalidation() {
+    if (this.inMarquee()) {
+      this.interactivityRect.fill(/** @type {acgraph.vector.Fill} */ (this.getOption('selectMarqueeFill')));
+    }
+  }
+  anychart.core.settings.createHookedDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.MULTI_ARG_HOOK,
+      'selectMarqueeFill',
+      anychart.core.settings.fillNormalizer,
+      0,
+      0,
+      selectMarqueeFillBeforeInvalidation);
+  function selectMarqueeStrokeBeforeInvalidation() {
+    if (this.inMarquee()) {
+      this.interactivityRect.stroke(/** @type {acgraph.vector.Stroke} */ (this.getOption('selectMarqueeStroke')));
+    }
+  }
+  anychart.core.settings.createHookedDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.MULTI_ARG_HOOK,
+      'selectMarqueeStroke',
+      anychart.core.settings.strokeNormalizer,
+      0,
+      0,
+      selectMarqueeStrokeBeforeInvalidation);
+  return map;
+})();
+anychart.core.settings.populate(anychart.core.Chart, anychart.core.Chart.PROPERTY_DESCRIPTORS);
+
+
+//endregion
 //region --- Ser/Deser/Json/XML/Dispose
 //------------------------------------------------------------------------------
 //
@@ -1811,8 +1850,7 @@ anychart.core.Chart.prototype.serialize = function() {
 
   json['credits'] = this.credits().serialize();
 
-  json['selectMarqueeFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.selectMarqueeFill()));
-  json['selectMarqueeStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.selectMarqueeStroke()));
+  anychart.core.settings.serialize(this, anychart.core.Chart.PROPERTY_DESCRIPTORS, json);
   return json;
 };
 
@@ -1867,8 +1905,7 @@ anychart.core.Chart.prototype.setupByJSON = function(config, opt_default) {
 
   this.credits(config['credits']);
 
-  this.selectMarqueeFill(config['selectMarqueeFill']);
-  this.selectMarqueeStroke(config['selectMarqueeStroke']);
+  anychart.core.settings.deserialize(this, anychart.core.Chart.PROPERTY_DESCRIPTORS, config);
 };
 
 
@@ -2940,59 +2977,8 @@ anychart.core.Chart.IRDragger.prototype.defaultAction = function(x, y) {};
 anychart.core.Chart.prototype.startSelectMarquee = function(opt_repeat) {
   this.preventMouseDownInteractivity =
       this.startIRDrawing(this.onSelectMarqueeStart, this.onSelectMarqueeChange, this.onSelectMarqueeFinish, this.getSelectMarqueeBounds(),
-          false, undefined, opt_repeat, this.selectMarqueeStroke_, this.selectMarqueeFill_);
+          false, undefined, opt_repeat, /** @type {acgraph.vector.Stroke} */ (this.getOption('selectMarqueeStroke')), /** @type {acgraph.vector.Fill} */ (this.getOption('selectMarqueeFill')));
   return this;
-};
-
-
-/**
- * Getter/setter for select marquee fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.core.Chart} .
- */
-anychart.core.Chart.prototype.selectMarqueeFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var fill = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (fill != this.selectMarqueeFill_) {
-      this.selectMarqueeFill_ = fill;
-      if (this.inMarquee()) {
-        this.interactivityRect.fill(this.selectMarqueeFill_);
-      }
-    }
-    return this;
-  }
-  return this.selectMarqueeFill_;
-};
-
-
-/**
- * Getter/setter for select marquee stroke.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.core.Chart|acgraph.vector.Stroke} .
- */
-anychart.core.Chart.prototype.selectMarqueeStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (stroke != this.selectMarqueeStroke_) {
-      this.selectMarqueeStroke_ = stroke;
-      if (this.inMarquee()) {
-        this.interactivityRect.stroke(this.selectMarqueeStroke_);
-      }
-    }
-    return this;
-  }
-  return this.selectMarqueeStroke_;
 };
 
 
@@ -3938,8 +3924,9 @@ anychart.core.Chart.prototype.id = function(opt_value) {
   proto['shareWithLinkedIn'] = proto.shareWithLinkedIn;
   proto['shareWithPinterest'] = proto.shareWithPinterest;
   proto['startSelectMarquee'] = proto.startSelectMarquee;
-  proto['selectMarqueeFill'] = proto.selectMarqueeFill;
-  proto['selectMarqueeStroke'] = proto.selectMarqueeStroke;
+  // auto generated
+  // proto['selectMarqueeFill'] = proto.selectMarqueeFill;
+  // proto['selectMarqueeStroke'] = proto.selectMarqueeStroke;
   proto['inMarquee'] = proto.inMarquee;
   proto['cancelMarquee'] = proto.cancelMarquee;
   proto['id'] = proto.id;
