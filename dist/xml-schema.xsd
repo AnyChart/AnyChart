@@ -202,6 +202,7 @@
         <xsd:attribute name="connector_length" type="simple.NumberOrPercent" default="20%"/>
         <xsd:attribute name="outside_labels_critical_angle" type="xsd:double" default="60"/>
         <xsd:attribute name="connector_stroke" type="xsd:string" default="black 0.3"/>
+        <xsd:attribute name="mode3d" type="xsd:boolean"/>
         <xsd:attribute name="fill" type="xsd:string"/>
         <xsd:attribute name="hover_fill" type="xsd:string"/>
         <xsd:attribute name="stroke" type="xsd:string"/>

@@ -2233,6 +2233,7 @@ goog.provide('anychart.themes.defaultTheme');
 
     // merge with chart
     'pieFunnelPyramidBase': {
+      'mode3d': false,
       'animation': {
         'duration': 500
       },
@@ -2389,6 +2390,7 @@ goog.provide('anychart.themes.defaultTheme');
 
     // merge with pie
     'pie3d': {
+      'mode3d': true,
       'explode': '5%',
       'connectorLength': '15%',
       //'legend': {

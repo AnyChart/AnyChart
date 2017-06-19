@@ -1452,6 +1452,9 @@
         "forceHoverLabels": {
           "type": "boolean"
         },
+        "mode3d": {
+          "type": "boolean"
+        },
         "connectorLength": {
           "type": [
             "string",

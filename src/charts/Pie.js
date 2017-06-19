@@ -50,13 +50,6 @@ anychart.charts.Pie = function(opt_data, opt_csvSettings) {
   this.groupedPointFilter_ = null;
 
   /**
-   * 3D mode flag.
-   * @type {boolean}
-   * @private
-   */
-  this.mode3d_ = false;
-
-  /**
    * @type {anychart.core.ui.CircularLabelsFactory}
    * @private
    */
@@ -208,7 +201,7 @@ anychart.charts.Pie.prototype.rawData_;
 
 /** @inheritDoc */
 anychart.charts.Pie.prototype.getType = function() {
-  return this.mode3d_ ? anychart.enums.ChartTypes.PIE_3D : anychart.enums.ChartTypes.PIE;
+  return /** @type {boolean} */ (this.getOption('mode3d')) ? anychart.enums.ChartTypes.PIE_3D : anychart.enums.ChartTypes.PIE;
 };
 
 
@@ -350,7 +343,7 @@ anychart.charts.Pie.DEFAULT_HATCH_FILL_TYPE = 'none';
 
 /** @inheritDoc */
 anychart.charts.Pie.prototype.doAnimation = function() {
-  if (!this.mode3d_ && this.animation().enabled() && this.animation().duration() > 0) {
+  if (!this.getOption('mode3d') && this.animation().enabled() && this.animation().duration() > 0) {
     if (this.animationQueue_ && this.animationQueue_.isPlaying()) {
       this.animationQueue_.update();
     } else if (this.hasInvalidationState(anychart.ConsistencyState.CHART_ANIMATION)) {
@@ -650,7 +643,7 @@ anychart.charts.Pie.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacity
     }
 
     // 3d mode does not have aqua style.
-    if (this.mode3d_ && isAqua) {
+    if (this.getOption('mode3d') && isAqua) {
       return this;
     }
 
@@ -1001,6 +994,13 @@ anychart.charts.Pie.PROPERTY_DESCRIPTORS = (function() {
       'connectorStroke',
       anychart.core.settings.strokeNormalizer,
       anychart.ConsistencyState.APPEARANCE,
+      anychart.Signal.NEEDS_REDRAW);
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'mode3d',
+      anychart.core.settings.booleanNormalizer,
+      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.PIE_LABELS,
       anychart.Signal.NEEDS_REDRAW);
 
   return map;
@@ -1364,6 +1364,7 @@ anychart.charts.Pie.prototype.drawContent = function(bounds) {
   var exploded;
   var value;
   var rowsCount = iterator.getRowsCount();
+  var mode3d = /** @type {boolean} */ (this.getOption('mode3d'));
 
   if (rowsCount > 7) {
     anychart.core.reporting.info(anychart.enums.InfoCode.PIE_TOO_MUCH_POINTS, [rowsCount]);
@@ -1403,7 +1404,7 @@ anychart.charts.Pie.prototype.drawContent = function(bounds) {
       this.hatchLayer_.zIndex(/** @type {number} */(anychart.charts.Pie.ZINDEX_HATCH_FILL)).disablePointerEvents(true);
     }
 
-    if (this.mode3d_) {
+    if (mode3d) {
       this.sides3D_.length = 0;
     }
 
@@ -1429,7 +1430,7 @@ anychart.charts.Pie.prototype.drawContent = function(bounds) {
       }
 
 
-      if (this.mode3d_) {
+      if (mode3d) {
         this.prepare3DSlice_();
       } else {
         this.drawSlice_();
@@ -1437,7 +1438,7 @@ anychart.charts.Pie.prototype.drawContent = function(bounds) {
       start += sweep;
     }
 
-    if (this.mode3d_) {
+    if (mode3d) {
       this.draw3DSlices_();
     }
 
@@ -1461,7 +1462,7 @@ anychart.charts.Pie.prototype.drawContent = function(bounds) {
     this.labels().clear();
     if (this.connectorsLayer_) {
       this.connectorsLayer_.clear();
-      if (this.mode3d_) this.connectorsLowerLayer_.clear();
+      if (mode3d) this.connectorsLowerLayer_.clear();
     }
 
     var themePart = this.isOutsideLabels() ?
@@ -1645,23 +1646,6 @@ anychart.charts.Pie.prototype.hoverMode = function(opt_value) {
 //  3D mode.
 //
 //----------------------------------------------------------------------------------------------------------------------
-/**
- * Enable 3d mode
- * @param {boolean=} opt_value
- * @return {boolean|anychart.charts.Pie}
- */
-anychart.charts.Pie.prototype.mode3d = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.mode3d_ != opt_value) {
-      this.mode3d_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.PIE_LABELS,
-          anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  } else {
-    return this.mode3d_;
-  }
-};
 
 
 /**
@@ -2703,8 +2687,9 @@ anychart.charts.Pie.prototype.drawLabel_ = function(pointState, opt_updateConnec
   var positionProvider = this.createPositionProvider();
   var formatProvider = this.createFormatProvider(true);
 
+  var mode3d = /** @type {boolean} */ (this.getOption('mode3d'));
   var isFitToSlice = true;
-  if ((!hovered || (hovered && !this.getOption('forceHoverLabels'))) && this.getOption('insideLabelsOverlap') != anychart.enums.LabelsOverlapMode.ALLOW_OVERLAP) {
+  if ((!hovered || (hovered && !this.getOption('forceHoverLabels'))) && this.getOption('overlapMode') != anychart.enums.LabelsOverlapMode.ALLOW_OVERLAP) {
     var start = /** @type {number} */ (iterator.meta('start'));
     var sweep = /** @type {number} */ (iterator.meta('sweep'));
 
@@ -2716,18 +2701,18 @@ anychart.charts.Pie.prototype.drawLabel_ = function(pointState, opt_updateConnec
     if (exploded) {
       angle = (start + sweep / 2) * Math.PI / 180;
       var ex = this.explodeValue_ * Math.cos(angle);
-      var ey = (this.mode3d_ ? this.get3DYRadius(this.explodeValue_) : this.explodeValue_) * Math.sin(angle);
+      var ey = (mode3d ? this.get3DYRadius(this.explodeValue_) : this.explodeValue_) * Math.sin(angle);
       cx += ex;
       cy += ey;
     }
 
     angle = start * Math.PI / 180;
     var ax = cx + this.radiusValue_ * Math.cos(angle);
-    var ay = cy + (this.mode3d_ ? this.get3DYRadius(this.radiusValue_) : this.radiusValue_) * Math.sin(angle);
+    var ay = cy + (mode3d ? this.get3DYRadius(this.radiusValue_) : this.radiusValue_) * Math.sin(angle);
 
     angle = (start + sweep) * Math.PI / 180;
     var bx = cx + this.radiusValue_ * Math.cos(angle);
-    var by = cy + (this.mode3d_ ? this.get3DYRadius(this.radiusValue_) : this.radiusValue_) * Math.sin(angle);
+    var by = cy + (mode3d ? this.get3DYRadius(this.radiusValue_) : this.radiusValue_) * Math.sin(angle);
 
     if (!this.measureLabel_) {
       this.measureLabel_ = new anychart.core.ui.CircularLabelsFactory.Label();
@@ -2799,7 +2784,7 @@ anychart.charts.Pie.prototype.drawLabel_ = function(pointState, opt_updateConnec
  * @protected
  */
 anychart.charts.Pie.prototype.colorizeSlice = function(pointState) {
-  if (this.mode3d_) {
+  if (this.getOption('mode3d')) {
     this.colorize3DSlice_(pointState);
 
   } else {
@@ -2917,7 +2902,7 @@ anychart.charts.Pie.prototype.clickSlice = function(opt_explode) {
   if (!goog.isDef(start) || !goog.isDef(sweep) || !sweep) return;
 
   var index = iterator.getIndex();
-  if (this.mode3d_) {
+  if (this.getOption('mode3d')) {
     this.draw3DSlices_(index, true);
   } else {
     this.drawSlice_(true);
@@ -3170,6 +3155,7 @@ anychart.charts.Pie.prototype.createLegendItemsProvider = function(sourceMode, i
       else
         itemText = String(goog.isDef(iterator.get('name')) ? iterator.get('name') : iterator.get('x'));
     }
+    var mode3d = this.getOption('mode3d');
     var obj = {
       'enabled': true,
       'meta': {
@@ -3178,8 +3164,8 @@ anychart.charts.Pie.prototype.createLegendItemsProvider = function(sourceMode, i
       },
       'iconType': anychart.enums.LegendItemIconType.SQUARE,
       'text': itemText,
-      'iconStroke': this.mode3d_ ? this.get3DStrokeColor() : this.getFinalStroke(true, anychart.PointState.NORMAL),
-      'iconFill': this.mode3d_ ? this.get3DFillColor_(anychart.PointState.NORMAL) : this.getFinalFill(true, anychart.PointState.NORMAL),
+      'iconStroke': mode3d ? this.get3DStrokeColor() : this.getFinalStroke(true, anychart.PointState.NORMAL),
+      'iconFill': mode3d ? this.get3DFillColor_(anychart.PointState.NORMAL) : this.getFinalFill(true, anychart.PointState.NORMAL),
       'iconHatchFill': this.getFinalHatchFill(true, anychart.PointState.NORMAL)
     };
     goog.object.extend(obj, legendItem);
@@ -3701,9 +3687,10 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
   this.connectorAnchorCoords = [];
   var connector;
 
+  var mode3d = this.getOption('mode3d');
   if (this.connectorsLayer_) {
     this.connectorsLayer_.clear();
-    if (this.mode3d_) this.connectorsLowerLayer_.clear();
+    if (mode3d) this.connectorsLowerLayer_.clear();
   } else {
     this.connectorsLayer_ = new anychart.core.utils.TypedLayer(function() {
       return acgraph.path();
@@ -3713,7 +3700,7 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
     this.connectorsLayer_.parent(this.rootElement);
     this.connectorsLayer_.zIndex(anychart.charts.Pie.ZINDEX_LABEL);
 
-    if (this.mode3d_) {
+    if (mode3d) {
       this.connectorsLowerLayer_ = new anychart.core.utils.TypedLayer(function() {
         return acgraph.path();
       }, function(child) {
@@ -3761,7 +3748,7 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
     isRightSide = angleDeg < 90 || angleDeg > 270;
 
     dR0 = this.radiusValue_ + (exploded ? this.explodeValue_ : 0);
-    var dR1 = this.mode3d_ ?
+    var dR1 = mode3d ?
         (this.get3DYRadius(this.radiusValue_) + (exploded ? this.get3DYRadius(this.explodeValue_) : 0)) :
         dR0;
 
@@ -3769,7 +3756,7 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
     x0 = this.cx_ + dR0 * Math.cos(angle);
     y0 = this.cy_ + dR1 * Math.sin(angle);
 
-    if (this.mode3d_) {
+    if (mode3d) {
       y0 += this.get3DHeight() / 2;
     }
 
@@ -3793,13 +3780,13 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
       switchToLeftSide ? leftSideLabels2.push(label) : leftSideLabels.push(label);
     }
 
-    if (this.getOption('insideLabelsOverlap') == anychart.enums.LabelsOverlapMode.ALLOW_OVERLAP) {
+    if (this.getOption('overlapMode') == anychart.enums.LabelsOverlapMode.ALLOW_OVERLAP) {
       if (label && label.enabled() != false) {
         index = label.getIndex();
 
         if (!this.drawnConnectors_[index]) {
           y0 = this.connectorAnchorCoords[index * 2 + 1] - this.get3DHeight() / 2;
-          if (this.mode3d_ && y0 < this.cy_) {
+          if (mode3d && y0 < this.cy_) {
             connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLowerLayer_.genNextChild());
           } else {
             connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLayer_.genNextChild());
@@ -3815,7 +3802,7 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
   rightSideLabels = rightSideLabels2 ? rightSideLabels2.concat(rightSideLabels) : rightSideLabels;
   leftSideLabels = leftSideLabels2 ? leftSideLabels2.concat(leftSideLabels) : leftSideLabels;
 
-  if (this.getOption('insideLabelsOverlap') != anychart.enums.LabelsOverlapMode.ALLOW_OVERLAP) {
+  if (this.getOption('overlapMode') != anychart.enums.LabelsOverlapMode.ALLOW_OVERLAP) {
 
     //------------------------------------ left domain calculation ------------------------------------------------------
 
@@ -4004,7 +3991,7 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
 
             if (!this.drawnConnectors_[index]) {
               y0 = this.connectorAnchorCoords[index * 2 + 1] - this.get3DHeight() / 2;
-              if (this.mode3d_ && y0 < this.cy_) {
+              if (mode3d && y0 < this.cy_) {
                 connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLowerLayer_.genNextChild());
               } else {
                 connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLayer_.genNextChild());
@@ -4032,7 +4019,7 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
 
             if (!this.drawnConnectors_[index]) {
               y0 = this.connectorAnchorCoords[index * 2 + 1] - this.get3DHeight() / 2;
-              if (this.mode3d_ && y0 < this.cy_) {
+              if (mode3d && y0 < this.cy_) {
                 connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLowerLayer_.genNextChild());
               } else {
                 connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLayer_.genNextChild());
@@ -4132,8 +4119,9 @@ anychart.charts.Pie.prototype.createPositionProvider = function() {
   var xRadius;
   var yRadius;
 
+  var mode3d = /** @type {boolean} */ (this.getOption('mode3d'));
   var insideLabelsOffset = /** @type {number|string} */ (this.getOption('insideLabelsOffset'));
-  if (this.mode3d_) {
+  if (mode3d) {
     if (outside) {
       xRadius = this.radiusValue_ + this.connectorLengthValue_;
       yRadius = this.get3DYRadius(this.radiusValue_) + this.connectorLengthValue_;
@@ -4504,7 +4492,8 @@ anychart.charts.Pie.PieOutsideLabelsDomain.prototype.calcDomain = function() {
   var cx = pieCenter['x'], cy = pieCenter['y'];
   var bottomLabelsYLimit, topLabelsYLimit;
 
-  if (this.pie.mode3d_) {
+  var mode3d = /** @type {boolean} */ (this.pie.getOption('mode3d'));
+  if (mode3d) {
     bottomLabelsYLimit = cy + this.pie.get3DYRadius(this.pie.getPixelRadius()) + this.pie.connectorLengthValue_ - .1 + this.pie.get3DHeight() / 2;
     topLabelsYLimit = cy - (this.pie.get3DYRadius(this.pie.getPixelRadius()) + this.pie.connectorLengthValue_) + .1 - this.pie.get3DHeight() / 2;
   } else {
@@ -4579,7 +4568,7 @@ anychart.charts.Pie.PieOutsideLabelsDomain.prototype.calcDomain = function() {
     dR = (this.pie.getPixelRadius() + this.pie.connectorLengthValue_) + (exploded ? this.pie.explodeValue_ : 0) + offsetRadius;
 
     var dRYPie, dRY;
-    if (this.pie.mode3d_) {
+    if (mode3d) {
       dRYPie = this.pie.get3DYRadius(this.pie.radiusValue_) + (exploded ? this.pie.get3DYRadius(this.pie.explodeValue_) : 0);
       dRY = (this.pie.get3DYRadius(this.pie.getPixelRadius()) + this.pie.connectorLengthValue_) + (exploded ? this.pie.get3DYRadius(this.pie.explodeValue_) : 0) + this.pie.get3DYRadius(offsetRadius);
     } else {
@@ -4633,7 +4622,7 @@ anychart.charts.Pie.PieOutsideLabelsDomain.prototype.calcDomain = function() {
     var x_ = labelXCoord - cx;
     var y_ = y - cy;
 
-    if (this.pie.mode3d_) {
+    if (mode3d) {
       y_ += this.pie.get3DHeight() / 2;
     }
 
@@ -4718,6 +4707,7 @@ anychart.charts.Pie.prototype.disposeInternal = function() {
   // proto['outsideLabelsCriticalAngle'] = proto.outsideLabelsCriticalAngle;//doc|ex
   // proto['forceHoverLabels'] = proto.forceHoverLabels;
   // proto['connectorStroke'] = proto.connectorStroke;//doc|ex
+  // proto['mode3d'] = proto.mode3d;
 
   proto['group'] = proto.group;//doc|ex|non-tr
   proto['data'] = proto.data;//doc|ex|
