@@ -27,11 +27,6 @@ anychart.core.CartesianBase = function(opt_categorizeData) {
    * @private
    */
   this.xZoom_ = new anychart.core.utils.OrdinalZoom(this, true);
-
-  this.setOption('zAspect', 0);
-  this.setOption('zAngle', 0);
-  this.setOption('zDistribution', false);
-  this.setOption('zPadding', 0);
 };
 goog.inherits(anychart.core.CartesianBase, anychart.core.ChartWithAxes);
 
