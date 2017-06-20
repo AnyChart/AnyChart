@@ -7,6 +7,7 @@ goog.require('anychart.core.resource.Logo');
 goog.require('anychart.core.resource.Resource');
 goog.require('anychart.core.resource.ResourceList');
 goog.require('anychart.core.resource.TimeLine');
+goog.require('anychart.core.settings');
 goog.require('anychart.core.ui.Overlay');
 goog.require('anychart.core.ui.Scroller');
 goog.require('anychart.core.utils.IInteractiveSeries');
@@ -152,12 +153,7 @@ anychart.charts.Resource = function(opt_data, opt_csvSettings) {
   this.xScale_.calendar(this.calendar_);
   this.xScale_.listenSignals(this.handleXScaleSignal_, this);
 
-  /**
-   * Current X start point.
-   * @type {number}
-   * @private
-   */
-  this.currentXStartDate_ = NaN;
+  this.setOption('currentStartDate', NaN);
 
   /**
    * Data X full pix width coord.
@@ -200,20 +196,6 @@ anychart.charts.Resource = function(opt_data, opt_csvSettings) {
    * @private
    */
   this.currentYStartRatio_ = 0;
-
-  /**
-   * Time line height settings.
-   * @type {string|number}
-   * @private
-   */
-  this.timeLineHeight_ = 0;
-
-  /**
-   * Resource list width settings.
-   * @type {string|number}
-   * @private
-   */
-  this.resourceListWidth_ = 0;
 
   /**
    * Events interceptor rect.
@@ -285,27 +267,6 @@ anychart.charts.Resource = function(opt_data, opt_csvSettings) {
    * @private
    */
   this.trackAvailability_ = false;
-
-  /**
-   * Default value for resource activity minutesPerDay value.
-   * @type {number}
-   * @private
-   */
-  this.defaultMinutesPerDay_ = 60;
-
-  /**
-   * Pix per hour value.
-   * @type {number}
-   * @private
-   */
-  this.pixPerHour_ = 30;
-
-  /**
-   * Min row height.
-   * @type {number}
-   * @private
-   */
-  this.minRowHeight_ = 100;
 
   /**
    * Resources clip.
@@ -444,6 +405,98 @@ anychart.charts.Resource.prototype.zoomLevels_;
 
 
 //endregion
+//region --- Descriptors
+/**
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.charts.Resource.PROPERTY_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  function pixPerHourNormalizer(opt_value) {
+    var value = anychart.utils.toNumber(opt_value);
+    return !isNaN(value) ? value : this.getOption('pixPerHour');
+  }
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'pixPerHour',
+      pixPerHourNormalizer,
+      anychart.ConsistencyState.RESOURCE_DATA,
+      anychart.Signal.NEEDS_REDRAW);
+
+  function minRowHeightNormalizer(opt_value) {
+    var value = anychart.utils.toNumber(opt_value);
+    return !isNaN(value) ? value : this.getOption('minRowHeight');
+  }
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'minRowHeight',
+      minRowHeightNormalizer,
+      anychart.ConsistencyState.RESOURCE_DATA,
+      anychart.Signal.NEEDS_REDRAW);
+
+  function resourceListWidthNormalizer(opt_value) {
+    var value = anychart.utils.normalizeNumberOrPercent(opt_value);
+    return !goog.isNull(value) ? value : this.getOption('resourceListWidth');
+  }
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'resourceListWidth',
+      resourceListWidthNormalizer,
+      anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+
+  function timeLineHeightNormalizer(opt_value) {
+    var value = anychart.utils.normalizeNumberOrPercent(opt_value);
+    return !goog.isNull(value) ? value : this.getOption('timeLineHeight');
+  }
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'timeLineHeight',
+      timeLineHeightNormalizer,
+      anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+
+  function defaultMinutesPerDayNormalizer(opt_value) {
+    return anychart.utils.normalizeToNaturalNumber(opt_value, 60);
+  }
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'defaultMinutesPerDay',
+      defaultMinutesPerDayNormalizer,
+      anychart.ConsistencyState.RESOURCE_DATA,
+      anychart.Signal.NEEDS_REDRAW);
+
+  function currentStartDateNormalizer(opt_value) {
+    var date = anychart.format.parseDateTime(opt_value);
+    return date ? date.getTime() : this.getOption('currentStartDate');
+  }
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'currentStartDate',
+      currentStartDateNormalizer,
+      anychart.ConsistencyState.RESOURCE_X_SCALE_POSITION,
+      anychart.Signal.NEEDS_REDRAW);
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
+      'splitterStroke',
+      anychart.core.settings.strokeNormalizer,
+      anychart.ConsistencyState.RESOURCE_SPLITTER,
+      anychart.Signal.NEEDS_REDRAW);
+
+  return map;
+})();
+anychart.core.settings.populate(anychart.charts.Resource, anychart.charts.Resource.PROPERTY_DESCRIPTORS);
+
+
+//endregion
 //region --- Public methods
 //------------------------------------------------------------------------------
 //
@@ -519,84 +572,6 @@ anychart.charts.Resource.prototype.timeTrackingMode = function(opt_value) {
       (this.trackAvailability_ ?
           anychart.enums.TimeTrackingMode.AVAILABILITY_PER_RESOURCE :
           anychart.enums.TimeTrackingMode.ACTIVITY_PER_RESOURCE);
-};
-
-
-/**
- * Default minutes per day getter/setter.
- * @param {number=} opt_value
- * @return {number|anychart.charts.Resource}
- */
-anychart.charts.Resource.prototype.defaultMinutesPerDay = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var value = anychart.utils.normalizeToNaturalNumber(opt_value, 60);
-    if (this.defaultMinutesPerDay_ != value) {
-      this.defaultMinutesPerDay_ = value;
-      this.invalidate(anychart.ConsistencyState.RESOURCE_DATA, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.defaultMinutesPerDay_;
-};
-
-
-/**
- * Pix per hour getter/setter.
- * @param {number=} opt_value
- * @return {number|anychart.charts.Resource}
- */
-anychart.charts.Resource.prototype.pixPerHour = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var value = anychart.utils.toNumber(opt_value);
-    if (!isNaN(value) && this.pixPerHour_ != value) {
-      this.pixPerHour_ = value;
-      // the easiest way to reset enough states and redraw
-      this.invalidate(anychart.ConsistencyState.RESOURCE_DATA, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.pixPerHour_;
-};
-
-
-/**
- * Minimal row height.
- * @param {number=} opt_value
- * @return {number|anychart.charts.Resource}
- */
-anychart.charts.Resource.prototype.minRowHeight = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var value = anychart.utils.toNumber(opt_value);
-    if (!isNaN(value) && this.minRowHeight_ != value) {
-      this.minRowHeight_ = value;
-      this.invalidate(anychart.ConsistencyState.RESOURCE_DATA, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.minRowHeight_;
-};
-
-
-/**
- * Getter/setter for stroke.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.charts.Resource|acgraph.vector.Stroke} .
- */
-anychart.charts.Resource.prototype.splitterStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (stroke != this.splitterStroke_) {
-      this.splitterStroke_ = stroke;
-      this.invalidate(anychart.ConsistencyState.RESOURCE_SPLITTER, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.splitterStroke_;
 };
 
 
@@ -795,44 +770,6 @@ anychart.charts.Resource.prototype.zoomLevel = function(opt_indexOrId) {
 
 
 /**
- * Time line height getter/setter.
- * @param {(number|string)=} opt_value
- * @return {anychart.charts.Resource|number|string}
- */
-anychart.charts.Resource.prototype.timeLineHeight = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var val = anychart.utils.normalizeNumberOrPercent(opt_value);
-    if (!goog.isNull(val) && this.timeLineHeight_ != val) {
-      this.timeLineHeight_ = val;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.timeLineHeight_;
-};
-
-
-/**
- * Resource list width getter/setter.
- * @param {(number|string)=} opt_value
- * @return {anychart.charts.Resource|number|string}
- */
-anychart.charts.Resource.prototype.resourceListWidth = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var val = anychart.utils.normalizeNumberOrPercent(opt_value);
-    if (!goog.isNull(val) && this.resourceListWidth_ != val) {
-      this.resourceListWidth_ = val;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.resourceListWidth_;
-};
-
-
-/**
  * Overlay element.
  * @param {(string|Object|null|boolean)=} opt_value .
  * @return {anychart.charts.Resource|anychart.core.ui.Overlay}
@@ -859,28 +796,6 @@ anychart.charts.Resource.prototype.resourceList = function(opt_value) {
     return this;
   }
   return this.resourceList_;
-};
-
-
-/**
- * Getter/setter for current start date.
- * @param {(string|number|Date)=} opt_value
- * @return {number|anychart.charts.Resource}
- */
-anychart.charts.Resource.prototype.currentStartDate = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var date = anychart.format.parseDateTime(opt_value);
-    if (date) {
-      var val = date.getTime();
-      // var val = goog.math.clamp(data.getTime(), this.xScale_.minimum(), this.xScale_.maximum());
-      if (this.currentXStartDate_ != val) {
-        this.currentXStartDate_ = val;
-        this.invalidate(anychart.ConsistencyState.RESOURCE_X_SCALE_POSITION, anychart.Signal.NEEDS_REDRAW);
-      }
-    }
-    return this;
-  }
-  return this.currentXStartDate_;
 };
 
 
@@ -1040,7 +955,7 @@ anychart.charts.Resource.prototype.handleConflictsSignals_ = function(e) {
  * @private
  */
 anychart.charts.Resource.prototype.handleXScrollChange_ = function(e) {
-  this.currentXStartDate_ = this.xScale_.pixToDate(e['startRatio'] * this.fullPixWidth_ - this.currentXStartPix_);
+  this.setOption('currentStartDate', this.xScale_.pixToDate(e['startRatio'] * this.fullPixWidth_ - this.currentXStartPix_));
   this.invalidate(anychart.ConsistencyState.RESOURCE_X_SCALE_POSITION, anychart.Signal.NEEDS_REDRAW);
   return false;
 };
@@ -1080,8 +995,8 @@ anychart.charts.Resource.prototype.dragTo_ = function(x, y) {
   var xVal = this.xScale_.pixToDate(x - this.currentXStartPix_);
   var yVal = y / this.fullPixHeight_;
   this.suspendSignalsDispatching();
-  if (xVal != this.currentXStartDate_) {
-    this.currentXStartDate_ = xVal;
+  if (xVal != this.getOption('currentStartDate')) {
+    this.setOption('currentStartDate', xVal);
     this.invalidate(anychart.ConsistencyState.RESOURCE_X_SCALE_POSITION, anychart.Signal.NEEDS_REDRAW);
   }
   if (yVal != this.currentYStartRatio_) {
@@ -1125,8 +1040,8 @@ anychart.charts.Resource.prototype.handleMouseWheel_ = function(e) {
   var xVal = this.xScale_.pixToDate(x - this.currentXStartPix_);
   var yVal = y / this.fullPixHeight_;
   this.suspendSignalsDispatching();
-  if (xVal != this.currentXStartDate_) {
-    this.currentXStartDate_ = xVal;
+  if (xVal != this.getOption('currentStartDate')) {
+    this.setOption('currentStartDate', xVal);
     this.invalidate(anychart.ConsistencyState.RESOURCE_X_SCALE_POSITION, anychart.Signal.NEEDS_REDRAW);
   }
   if (yVal != this.currentYStartRatio_) {
@@ -1322,7 +1237,7 @@ anychart.charts.Resource.prototype.calculate = function() {
     for (i = 0; i < this.resources_.length; i++) {
       resource = /** @type {anychart.core.resource.Resource} */(this.resources_[i]);
       var occupation = this.yScalePerChart_ ? maxOccupation : resource.getMaxOccupation();
-      var height = Math.max(this.pixPerHour_ * occupation / 60, this.minRowHeight_);
+      var height = Math.max(/** @type {number} */ (this.getOption('pixPerHour')) * occupation / 60, /** @type {number} */ (this.getOption('minRowHeight')));
       height = this.cellPadding_.widenHeight(height);
       if (resource.hasConflicts) {
         height += statusHeight + anychart.core.resource.Resource.ACTIVITIES_SPACING;
@@ -1345,11 +1260,11 @@ anychart.charts.Resource.prototype.calculateContentAreaSpace = function(totalBou
   var bounds = anychart.charts.Resource.base(this, 'calculateContentAreaSpace', totalBounds);
   bounds = anychart.utils.applyPixelShiftToRect(bounds, 0);
 
-  var splitterStroke = this.splitterStroke();
-  var splitterStrokeThickness = splitterStroke ? acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(splitterStroke)) : 0;
+  var splitterStroke = /** @type {acgraph.vector.Stroke} */ (this.getOption('splitterStroke'));
+  var splitterStrokeThickness = splitterStroke ? acgraph.vector.getThickness(splitterStroke) : 0;
 
-  var timeLineHeight = anychart.utils.normalizeSize(this.timeLineHeight_, bounds.height);
-  var resourceListWidth = anychart.utils.normalizeSize(this.resourceListWidth_, bounds.width);
+  var timeLineHeight = anychart.utils.normalizeSize(/** @type {number|string} */ (this.getOption('timeLineHeight')), bounds.height);
+  var resourceListWidth = anychart.utils.normalizeSize(/** @type {number|string} */ (this.getOption('resourceListWidth')), bounds.width);
 
   var cbTop = anychart.utils.applyPixelShift(bounds.top + timeLineHeight, 0);
   var cbLeft = anychart.utils.applyPixelShift(bounds.left + resourceListWidth + splitterStrokeThickness, 0);
@@ -1441,15 +1356,15 @@ anychart.charts.Resource.prototype.drawContent = function(bounds) {
 
   var startPosition, endPosition;
   if (this.hasInvalidationState(anychart.ConsistencyState.RESOURCE_X_SCALE_RANGE)) {
-    if (isNaN(this.currentXStartDate_)) {
+    if (isNaN(this.getOption('currentStartDate'))) {
       //possible problem with no data
-      this.currentXStartDate_ = /** @type {number} */(this.xScale_.minimum());
-      this.xScale_.startDate(this.currentXStartDate_);
+      this.setOption('currentStartDate', /** @type {number} */(this.xScale_.minimum()));
+      this.xScale_.startDate(/** @type {number} */ (this.getOption('currentStartDate')));
     }
     var min = this.xScale_.dateToPix(/** @type {number} */(this.xScale_.minimum()));
     var max = this.xScale_.dateToPix(/** @type {number} */(this.xScale_.maximum()));
     this.fullPixWidth_ = max - min;
-    startPosition = this.xScale_.dateToPix(this.currentXStartDate_);
+    startPosition = this.xScale_.dateToPix(/** @type {number} */ (this.getOption('currentStartDate')));
     if (isNaN(startPosition)) startPosition = min;
     endPosition = startPosition + bounds.width;
     if (endPosition > max) {
@@ -1461,12 +1376,12 @@ anychart.charts.Resource.prototype.drawContent = function(bounds) {
         endPosition = min + this.fullPixWidth_;
       }
     }
-    this.currentXStartDate_ = this.xScale_.pixToDate(startPosition);
+    this.setOption('currentStartDate', this.xScale_.pixToDate(startPosition));
     this.markConsistent(anychart.ConsistencyState.RESOURCE_X_SCALE_RANGE);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.RESOURCE_X_SCALE_POSITION)) {
-    this.xScale_.startDate(this.currentXStartDate_);
+    this.xScale_.startDate(/** @type {number} */ (this.getOption('currentStartDate')));
     this.currentXStartPix_ = -this.xScale_.dateToPix(/** @type {number} */(this.xScale_.minimum()));
     this.xScroll_.setRangeInternal(
         this.currentXStartPix_ / this.fullPixWidth_,
@@ -1539,8 +1454,8 @@ anychart.charts.Resource.prototype.drawContent = function(bounds) {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.RESOURCE_SPLITTER)) {
-    var splitterStroke = this.splitterStroke();
-    var splitterStrokeThickness = splitterStroke ? acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(splitterStroke)) : 0;
+    var splitterStroke = /** @type {acgraph.vector.Stroke} */ (this.getOption('splitterStroke'));
+    var splitterStrokeThickness = splitterStroke ? acgraph.vector.getThickness(splitterStroke) : 0;
 
     var splitterPosition = anychart.utils.applyPixelShift(this.resourceListBounds_.getRight() + splitterStrokeThickness / 2, splitterStrokeThickness);
     this.splitterLine_
@@ -2022,14 +1937,11 @@ anychart.charts.Resource.prototype.serialize = function() {
   json['horizontalScrollBar'] = this.xScroll_.serialize();
   json['verticalScrollBar'] = this.yScroll_.serialize();
   json['grid'] = this.grid_.serialize();
-  json['timeLineHeight'] = this.timeLineHeight_;
-  json['resourceListWidth'] = this.resourceListWidth_;
   json['timeTrackingMode'] = this.timeTrackingMode();
-  json['pixPerHour'] = this.pixPerHour_;
-  json['minRowHeight'] = this.minRowHeight_;
   json['overlay'] = this.overlay_.serialize();
   json['cellPadding'] = this.cellPadding_.serialize();
   json['conflicts'] = this.conflicts_.serialize();
+  anychart.core.settings.serialize(this, anychart.charts.Resource.PROPERTY_DESCRIPTORS, json);
   return json;
 };
 
@@ -2050,15 +1962,11 @@ anychart.charts.Resource.prototype.setupByJSON = function(config, opt_default) {
   this.xScroll_.setup(config['horizontalScrollBar']);
   this.yScroll_.setup(config['verticalScrollBar']);
   this.grid_.setup(config['grid']);
-  this.resourceListWidth(config['resourceListWidth']);
-  this.timeLineHeight(config['timeLineHeight']);
   this.zoomLevels(config['zoomLevels']);
   this.zoomLevel(config['zoomLevel']);
-  this.minRowHeight(config['minRowHeight']);
-  this.pixPerHour(config['pixPerHour']);
   this.timeTrackingMode(config['timeTrackingMode']);
-  this.splitterStroke(config['splitterStroke']);
   this.conflicts(config['conflicts']);
+  anychart.core.settings.deserialize(this, anychart.charts.Resource.PROPERTY_DESCRIPTORS, config);
 };
 
 
@@ -2352,9 +2260,7 @@ anychart.charts.Resource.ActivityIterator.prototype.meta = function(name, opt_va
   proto['getType'] = proto.getType;
   proto['data'] = proto.data;
   proto['timeTrackingMode'] = proto.timeTrackingMode;
-  proto['pixPerHour'] = proto.pixPerHour;
   proto['cellPadding'] = proto.cellPadding;
-  proto['minRowHeight'] = proto.minRowHeight;
   proto['zoomLevels'] = proto.zoomLevels;
   proto['zoomLevel'] = proto.zoomLevel;
   proto['xScale'] = proto.xScale;
@@ -2364,21 +2270,24 @@ anychart.charts.Resource.ActivityIterator.prototype.meta = function(name, opt_va
   proto['logo'] = proto.logo;
   proto['timeLine'] = proto.timeLine;
   proto['calendar'] = proto.calendar;
-  proto['resourceListWidth'] = proto.resourceListWidth;
-  proto['timeLineHeight'] = proto.timeLineHeight;
-  proto['defaultMinutesPerDay'] = proto.defaultMinutesPerDay;
   proto['overlay'] = proto.overlay;
   proto['activities'] = proto.activities;
   proto['conflicts'] = proto.conflicts;
   proto['resourceList'] = proto.resourceList;
-  proto['splitterStroke'] = proto.splitterStroke;
-  proto['currentStartDate'] = proto.currentStartDate;
   proto['hover'] = proto.hover;
   proto['hoverPoint'] = proto.hoverPoint;
   proto['unhover'] = proto.unhover;
   proto['select'] = proto.select;
   proto['selectPoint'] = proto.selectPoint;
   proto['unselect'] = proto.unselect;
+  // auto generated
+  //proto['pixPerHour'] = proto.pixPerHour;
+  //proto['minRowHeight'] = proto.minRowHeight;
+  //proto['resourceListWidth'] = proto.resourceListWidth;
+  //proto['timeLineHeight'] = proto.timeLineHeight;
+  //proto['defaultMinutesPerDay'] = proto.defaultMinutesPerDay;
+  //proto['splitterStroke'] = proto.splitterStroke;
+  //proto['currentStartDate'] = proto.currentStartDate;
 })();
 
 

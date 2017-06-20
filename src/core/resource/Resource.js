@@ -388,7 +388,7 @@ anychart.core.resource.Resource.prototype.activityFromData_ = function(dataObj) 
   if (!goog.isArray(rawIntervals)) {
     rawIntervals = [dataObj];
   }
-  var defaultMPDValue = /** @type {number} */(this.chart_.defaultMinutesPerDay());
+  var defaultMPDValue = /** @type {number} */(this.chart_.getOption('defaultMinutesPerDay'));
   var intervals = [];
   for (var i = 0; i < rawIntervals.length; i++) {
     var interval = rawIntervals[i];
