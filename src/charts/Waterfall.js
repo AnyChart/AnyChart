@@ -131,7 +131,7 @@ anychart.charts.Waterfall.prototype.afterSeriesDraw = function() {
   this.connectorPath_.parent(this.container());
   this.connectorPath_.zIndex(1000);
   this.connectorPath_.clip(this.getPlotBounds());
-  var isVertical = this.isVertical();
+  var isVertical = /** @type {boolean} */(this.isVertical());
   var individualPointWidths = xScale.checkWeights();
   var firstIndex = drawingPlans[0].firstIndex;
   var lastIndex = drawingPlans[0].lastIndex;

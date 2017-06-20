@@ -297,16 +297,11 @@ anychart.core.ChartWithSeries.generateSeriesConstructors(anychart.charts.Cartesi
  * @example
  * var chart = anychart.cartesian3d();
  * chart.area([20, 7, 10, 14]);
- * @param {boolean=} opt_isVertical If true, sets the chart to Bar Chart mode, swapping default chart elements
- *    behaviour to horizontal-oriented (setting default layout to VERTICAL, swapping axes, etc).
  * @return {!anychart.charts.Cartesian3d} Empty chart.
  */
-anychart.cartesian3d = function(opt_isVertical) {
+anychart.cartesian3d = function() {
   var chart = new anychart.charts.Cartesian3d();
   chart.setupInternal(true, anychart.getFullTheme('cartesian3d'));
-  if (goog.isDef(opt_isVertical))
-    chart.isVerticalInternal = !!opt_isVertical;
-
   return chart;
 };
 

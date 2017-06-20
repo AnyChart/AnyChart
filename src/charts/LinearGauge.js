@@ -336,10 +336,15 @@ anychart.charts.LinearGauge.prototype.hatchFillPaletteInvalidated_ = function(ev
 
 
 /**
- * Util method to identify whether layout is vertical.
- * @return {boolean} Is layout vertical or not.
+ * Getter/setter for isVertical property.
+ * @param {boolean=} opt_value
+ * @return {boolean|anychart.charts.LinearGauge} Is layout vertical or not. Or self for chaining.
  */
-anychart.charts.LinearGauge.prototype.isVertical = function() {
+anychart.charts.LinearGauge.prototype.isVertical = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.layout(opt_value ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
+    return this;
+  }
   return this.layout_ == anychart.enums.Layout.VERTICAL;
 };
 

@@ -129,7 +129,55 @@ anychart.core.ChartWithAxes.prototype.setDefaultScaleForLayoutBasedElements = fu
 
 
 /** @inheritDoc */
-anychart.core.ChartWithAxes.prototype.isVertical = function() {
+anychart.core.ChartWithAxes.prototype.isVertical = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = !!opt_value;
+    if (this.isVerticalInternal != opt_value) {
+      this.isVerticalInternal = opt_value;
+
+      for (var i = this.seriesList.length; i--;) {
+        this.seriesList[i]['isVertical'](this.isVerticalInternal);
+      }
+
+      var newValue;
+      var axes = goog.array.concat(this.xAxes_, this.yAxes_);
+      anychart.core.Base.suspendSignalsDispatching(axes);
+      for (i = axes.length; i--;) {
+        var axis = axes[i];
+        if (axis) {
+          switch (axis.orientation()) {
+            case anychart.enums.Orientation.BOTTOM:
+              newValue = anychart.enums.Orientation.LEFT;
+              break;
+            case anychart.enums.Orientation.TOP:
+              newValue = anychart.enums.Orientation.RIGHT;
+              break;
+            case anychart.enums.Orientation.LEFT:
+              newValue = anychart.enums.Orientation.BOTTOM;
+              break;
+            case anychart.enums.Orientation.RIGHT:
+              newValue = anychart.enums.Orientation.TOP;
+              break;
+          }
+          axis.orientation(newValue);
+        }
+      }
+
+      var items = goog.array.concat(this.grids_, this.minorGrids_, this.lineAxesMarkers_, this.rangeAxesMarkers_, this.textAxesMarkers_);
+      anychart.core.Base.suspendSignalsDispatching(items);
+      for (i = items.length; i--;) {
+        var item = items[i];
+        if (item) {
+          newValue = item.layout() == anychart.enums.Layout.HORIZONTAL ?
+              anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL;
+          item.layout(newValue);
+        }
+      }
+
+      anychart.core.Base.resumeSignalsDispatchingTrue(axes, items);
+    }
+    return this;
+  }
   return this.isVerticalInternal;
 };
 

@@ -1,5 +1,6 @@
 goog.provide('anychart.core.ChartWithSeries');
 
+goog.require('anychart.core.IChart');
 goog.require('anychart.core.SeparateChart');
 goog.require('anychart.core.annotations');
 goog.require('anychart.core.reporting');
@@ -16,6 +17,7 @@ goog.require('goog.array');
  * A base class for the chart with series.
  * @constructor
  * @extends {anychart.core.SeparateChart}
+ * @implements {anychart.core.IChart}
  */
 anychart.core.ChartWithSeries = function() {
   anychart.core.ChartWithSeries.base(this, 'constructor');
@@ -502,11 +504,16 @@ anychart.core.ChartWithSeries.prototype.invalidateSizeBasedSeries = function() {
 
 /**
  * Returns if the chart is vertical.
- * @return {boolean}
+ * @param {boolean=} opt_value
+ * @return {!(boolean|anychart.core.ChartWithSeries)}
  */
-anychart.core.ChartWithSeries.prototype.isVertical = function() {
-  return false;
+anychart.core.ChartWithSeries.prototype.isVertical = function(opt_value) {
+  return goog.isDef(opt_value) ? this : false;
 };
+
+
+/** @inheritDoc */
+anychart.core.ChartWithSeries.prototype.xScale = function() {};
 
 
 /**
@@ -1232,6 +1239,7 @@ anychart.core.ChartWithSeries.prototype.disposeInternal = function() {
   proto['labels'] = proto.labels;
   proto['hoverLabels'] = proto.hoverLabels;
   proto['selectLabels'] = proto.selectLabels;
+  proto['isVertical'] = proto.isVertical;
 })();
 
 
