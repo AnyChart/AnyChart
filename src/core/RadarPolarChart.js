@@ -75,13 +75,14 @@ anychart.core.RadarPolarChart.PROPERTY_DESCRIPTORS = (function() {
       this.seriesList[i].invalidate(anychart.ConsistencyState.SERIES_POINTS);
     }
   }
-  anychart.core.settings.createHookedDescriptor(
+  anychart.core.settings.createDescriptor(
       map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG_HOOK,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'innerRadius',
       innerRadiusNormalizer,
       anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.SERIES_CHART_SERIES,
       anychart.Signal.NEEDS_REDRAW,
+      0,
       beforeInvalidation);
 
   return map;

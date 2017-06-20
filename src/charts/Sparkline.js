@@ -937,13 +937,14 @@ anychart.charts.Sparkline.PROPERTY_DESCRIPTORS = (function() {
       this.series_ = null;
     }
   }
-  anychart.core.settings.createHookedDescriptor(
+  anychart.core.settings.createDescriptor(
       map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG_HOOK,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'seriesType',
       anychart.enums.normalizeSparklineSeriesType,
       anychart.ConsistencyState.SPARK_SERIES,
       anychart.Signal.NEEDS_REDRAW,
+      0,
       typeBeforeInvalidation);
 
   function pointWidthNormalizer(opt_value) {
@@ -954,11 +955,12 @@ anychart.charts.Sparkline.PROPERTY_DESCRIPTORS = (function() {
       this.series_.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL | anychart.ConsistencyState.APPEARANCE,
           anychart.Signal.NEEDS_REDRAW);
   }
-  anychart.core.settings.createHookedDescriptor(
+  anychart.core.settings.createDescriptor(
       map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG_HOOK,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'pointWidth',
       pointWidthNormalizer,
+      0,
       0,
       0,
       pointWidthBeforeInvalidation);
@@ -967,11 +969,12 @@ anychart.charts.Sparkline.PROPERTY_DESCRIPTORS = (function() {
       this.series_.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL | anychart.ConsistencyState.APPEARANCE,
           anychart.Signal.NEEDS_REDRAW);
   }
-  anychart.core.settings.createHookedDescriptor(
+  anychart.core.settings.createDescriptor(
       map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG_HOOK,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'connectMissingPoints',
       anychart.core.settings.booleanNormalizer,
+      0,
       0,
       0,
       connectMissingBeforeInvalidation);

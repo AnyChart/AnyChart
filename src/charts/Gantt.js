@@ -369,11 +369,12 @@ anychart.charts.Gantt.PROPERTY_DESCRIPTORS = (function() {
     this.getTimeline().rowHoverFill(/** @type {acgraph.vector.Fill} */ (this.getOption('rowHoverFill')));
     this.getDataGrid_().rowHoverFill(/** @type {acgraph.vector.Fill} */ (this.getOption('rowHoverFill')));
   }
-  anychart.core.settings.createHookedDescriptor(
+  anychart.core.settings.createDescriptor(
       map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG_HOOK,
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
       'rowHoverFill',
       anychart.core.settings.fillNormalizer,
+      0,
       0,
       0,
       rowHoverFillBeforeInvalidation);
@@ -383,11 +384,12 @@ anychart.charts.Gantt.PROPERTY_DESCRIPTORS = (function() {
     this.dg_.rowSelectedFill(/** @type {acgraph.vector.Fill} */ (this.getOption('rowSelectedFill')));
     anychart.core.Base.resumeSignalsDispatchingTrue(this.dg_, this.tl_);
   }
-  anychart.core.settings.createHookedDescriptor(
+  anychart.core.settings.createDescriptor(
       map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG_HOOK,
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
       'rowSelectedFill',
       anychart.core.settings.fillNormalizer,
+      0,
       0,
       0,
       rowSelectedFillBeforeInvalidation);
@@ -397,11 +399,12 @@ anychart.charts.Gantt.PROPERTY_DESCRIPTORS = (function() {
     this.tl_.columnStroke(/** @type {acgraph.vector.Stroke} */ (this.getOption('columnStroke')));
     anychart.core.Base.resumeSignalsDispatchingTrue(this.dg_, this.tl_);
   }
-  anychart.core.settings.createHookedDescriptor(
+  anychart.core.settings.createDescriptor(
       map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG_HOOK,
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
       'columnStroke',
       anychart.core.settings.strokeNormalizer,
+      0,
       0,
       0,
       columnStrokeBeforeInvalidation);
@@ -413,11 +416,12 @@ anychart.charts.Gantt.PROPERTY_DESCRIPTORS = (function() {
     this.controller_.rowStrokeThickness(anychart.utils.extractThickness(val));
     anychart.core.Base.resumeSignalsDispatchingTrue(this.dg_, this.tl_, this.controller_);
   }
-  anychart.core.settings.createHookedDescriptor(
+  anychart.core.settings.createDescriptor(
       map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG_HOOK,
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
       'rowStroke',
       anychart.core.settings.strokeNormalizer,
+      0,
       0,
       0,
       rowStrokeBeforeInvalidation);

@@ -182,41 +182,6 @@ anychart.core.settings.populate(anychart.charts.Bullet, anychart.charts.Bullet.P
 
 
 /**
- * Update Bullet Chart internal elements default layout settings depend on Bullet Chart layout.
- */
-anychart.charts.Bullet.prototype.updateLayoutDefaults = function() {
-  var i, count, rangeLayout;
-  var isHorizontal = this.isHorizontal();
-  var markersLayout = /** @type {anychart.enums.Layout} */(this.getOption('layout'));
-  var title = this.title();
-  title.setDefaultRotation(0);
-  var axis = this.axis();
-
-  if (isHorizontal) {
-    rangeLayout = anychart.enums.Layout.VERTICAL;
-    axis.setDefaultOrientation(anychart.enums.Orientation.BOTTOM);
-    title.defaultOrientation(anychart.enums.Orientation.LEFT);
-  } else {
-    axis.setDefaultOrientation(anychart.enums.Orientation.LEFT);
-    title.defaultOrientation(anychart.enums.Orientation.BOTTOM);
-    rangeLayout = anychart.enums.Layout.HORIZONTAL;
-  }
-
-  for (i = 0, count = this.ranges_.length; i < count; i++) {
-    var range = this.ranges_[i];
-    if (range) {
-      range.setDefaultLayout(rangeLayout);
-    }
-  }
-
-  for (i = 0, count = this.markers_.length; i < count; i++) {
-    var marker = this.markers_[i];
-    marker.setDefaultLayout(markersLayout);
-  }
-};
-
-
-/**
  * Whether an bullet chart is horizontal.
  * @return {boolean} If the bullet chart is horizontal.
  */

@@ -120,22 +120,24 @@ anychart.core.ChartWithOrthogonalScales.PROPERTY_DESCRIPTORS = (function() {
   function beforeInvalidation() {
     this.invalidateWidthBasedSeries();
   }
-  anychart.core.settings.createHookedDescriptor(
+  anychart.core.settings.createDescriptor(
       map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG_HOOK,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'barGroupsPadding',
       anychart.utils.toNumber,
       anychart.ConsistencyState.SERIES_CHART_SERIES | anychart.ConsistencyState.BOUNDS,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED,
+      0,
       beforeInvalidation);
 
-  anychart.core.settings.createHookedDescriptor(
+  anychart.core.settings.createDescriptor(
       map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG_HOOK,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'barsPadding',
       anychart.utils.toNumber,
       anychart.ConsistencyState.SERIES_CHART_SERIES | anychart.ConsistencyState.BOUNDS,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED,
+      0,
       beforeInvalidation);
 
   return map;

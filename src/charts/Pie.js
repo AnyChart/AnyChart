@@ -936,13 +936,14 @@ anychart.charts.Pie.PROPERTY_DESCRIPTORS = (function() {
   function sortBeforeInvalidation() {
     this.redefineView_();
   }
-  anychart.core.settings.createHookedDescriptor(
+  anychart.core.settings.createDescriptor(
       map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG_HOOK,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'sort',
       anychart.enums.normalizeSort,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW,
+      0,
       sortBeforeInvalidation);
   function outsideLabelsSpaceNormalizer(opt_value) {
     return anychart.utils.normalizeNumberOrPercent(opt_value, '30%');

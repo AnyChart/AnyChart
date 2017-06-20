@@ -472,13 +472,14 @@ anychart.charts.HeatMap.PROPERTY_DESCRIPTORS = (function() {
   function beforeInvalidation() {
     this.series_.invalidate(anychart.ConsistencyState.SERIES_LABELS);
   }
-  anychart.core.settings.createHookedDescriptor(
+  anychart.core.settings.createDescriptor(
       map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG_HOOK,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'labelsDisplayMode',
       anychart.enums.normalizeLabelsDisplayMode,
       anychart.ConsistencyState.SERIES_CHART_SERIES,
       anychart.Signal.NEEDS_REDRAW,
+      0,
       beforeInvalidation);
   return map;
 })();

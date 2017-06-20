@@ -1729,11 +1729,12 @@ anychart.core.Chart.PROPERTY_DESCRIPTORS = (function() {
       this.interactivityRect.fill(/** @type {acgraph.vector.Fill} */ (this.getOption('selectMarqueeFill')));
     }
   }
-  anychart.core.settings.createHookedDescriptor(
+  anychart.core.settings.createDescriptor(
       map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG_HOOK,
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectMarqueeFill',
       anychart.core.settings.fillNormalizer,
+      0,
       0,
       0,
       selectMarqueeFillBeforeInvalidation);
@@ -1742,11 +1743,12 @@ anychart.core.Chart.PROPERTY_DESCRIPTORS = (function() {
       this.interactivityRect.stroke(/** @type {acgraph.vector.Stroke} */ (this.getOption('selectMarqueeStroke')));
     }
   }
-  anychart.core.settings.createHookedDescriptor(
+  anychart.core.settings.createDescriptor(
       map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG_HOOK,
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectMarqueeStroke',
       anychart.core.settings.strokeNormalizer,
+      0,
       0,
       0,
       selectMarqueeStrokeBeforeInvalidation);

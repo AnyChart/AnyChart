@@ -1225,7 +1225,7 @@ anychart.charts.Pert.prototype.calculateActivity_ = function(id) {
 
   if (!goog.isDef(activity.duration)) {
     var formatProvider = this.createFormatProvider(false, workData, activity);
-    activity.duration = anychart.math.round(/** @type {Function} */ (this.getOption('expectedTimeCalculator')).call(formatProvider, formatProvider), 3);
+    activity.duration = anychart.math.round(/** @type {number} */ (/** @type {Function} */ (this.getOption('expectedTimeCalculator')).call(formatProvider, formatProvider)), 3);
   }
 
   var duration = activity.duration;
