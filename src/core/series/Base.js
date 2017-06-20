@@ -2774,6 +2774,7 @@ anychart.core.series.Base.prototype.draw = function() {
 
   // calculating pixel positions
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_DATA)) {
+    this.getResetIterator();
     this.prepareData();
     this.invalidate(anychart.ConsistencyState.SERIES_POINTS | anychart.ConsistencyState.SERIES_COLOR | anychart.ConsistencyState.A11Y,
         anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEEDS_UPDATE_A11Y);
