@@ -614,7 +614,7 @@ anychart.charts.PyramidFunnel.prototype.applyHatchFill = function(pointState) {
     var hatchFillResolver = anychart.color.getColorResolver(['hatchFill', 'hoverHatchFill', 'selectHatchFill'], anychart.enums.ColorType.HATCH_FILL);
     hatchPoint
         .stroke(null)
-        .fill(hatchFillResolver(this, pointState, true));
+        .fill(hatchFillResolver(this, pointState, false));
   }
 };
 
@@ -1048,7 +1048,7 @@ anychart.charts.PyramidFunnel.prototype.updatePointOnAnimate = function(point) {
     hatchPoint.deserialize(shape.serialize());
     var pointState = this.state.getPointStateByIndex(point.getIndex());
     var hatchFillResolver = anychart.color.getColorResolver(['hatchFill', 'hoverHatchFill', 'selectHatchFill'], anychart.enums.ColorType.HATCH_FILL);
-    hatchPoint.stroke(null).fill(hatchFillResolver(this, pointState, true));
+    hatchPoint.stroke(null).fill(hatchFillResolver(this, pointState, false));
   }
 };
 
