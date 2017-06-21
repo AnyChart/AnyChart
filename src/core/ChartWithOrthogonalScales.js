@@ -2,7 +2,6 @@ goog.provide('anychart.core.ChartWithOrthogonalScales');
 
 goog.require('anychart.animations');
 goog.require('anychart.core.ChartWithSeries');
-goog.require('anychart.core.IChart');
 goog.require('anychart.core.IPlot');
 goog.require('anychart.scales');
 goog.require('goog.array');
@@ -13,7 +12,6 @@ goog.require('goog.array');
  * A base class for the chart with series.
  * @constructor
  * @extends {anychart.core.ChartWithSeries}
- * @implements {anychart.core.IChart}
  * @implements {anychart.core.IPlot}
  * @param {boolean} categorizeData
  */

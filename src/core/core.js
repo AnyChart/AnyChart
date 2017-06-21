@@ -77,10 +77,11 @@ anychart.core.IChart.prototype.supportsTooltip = function() {};
 
 
 /**
- * Getter for an isVertical property.
- * @return {boolean}
+ * Getter/setter for isVertical property.
+ * @param {boolean=} opt_value
+ * @return {!(boolean|anychart.core.IChart)}
  */
-anychart.core.IChart.prototype.isVertical = function() {};
+anychart.core.IChart.prototype.isVertical = function(opt_value) {};
 
 
 
