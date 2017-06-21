@@ -3247,9 +3247,9 @@ anychart.charts.PyramidFunnel.prototype.createLegendItemsProvider = function(sou
       },
       'iconType': anychart.enums.LegendItemIconType.SQUARE,
       'text': itemText,
-      'iconStroke': /** @type {acgraph.vector.Stroke} */ (strokeResolver(this, anychart.PointState.NORMAL, true)),
-      'iconFill': /** @type {acgraph.vector.Fill} */ (fillResolver(this, anychart.PointState.NORMAL, true)),
-      'iconHatchFill': /** @type {acgraph.vector.HatchFill} */ (hatchFillResolver(this, anychart.PointState.NORMAL, true))
+      'iconStroke': /** @type {acgraph.vector.Stroke} */ (strokeResolver(this, anychart.PointState.NORMAL, false)),
+      'iconFill': /** @type {acgraph.vector.Fill} */ (fillResolver(this, anychart.PointState.NORMAL, false)),
+      'iconHatchFill': /** @type {acgraph.vector.HatchFill} */ (hatchFillResolver(this, anychart.PointState.NORMAL, false))
     };
     goog.object.extend(obj, legendItem);
     obj['sourceUid'] = goog.getUid(this);
