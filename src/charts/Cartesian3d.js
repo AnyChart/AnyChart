@@ -712,7 +712,6 @@ anychart.charts.Cartesian3d.prototype.setupByJSON = function(config, opt_default
   //proto['zAngle'] = proto.zAngle;
   //proto['zDistribution'] = proto.zDistribution;
   //proto['zPadding'] = proto.zPadding;
-  //proto['zDepth'] = proto.zDepth; // deprecated
   proto['getStat'] = proto.getStat;
   proto['getXScales'] = proto.getXScales;
   proto['getYScales'] = proto.getYScales;
