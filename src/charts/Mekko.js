@@ -411,7 +411,7 @@ anychart.charts.Mekko.PROPERTY_DESCRIPTORS = (function() {
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'pointsPadding',
       anychart.core.settings.asIsNormalizer,
-      anychart.ConsistencyState.BOUNDS,
+      anychart.ConsistencyState.ALL,
       anychart.Signal.NEEDS_REDRAW);
 
   return map;
