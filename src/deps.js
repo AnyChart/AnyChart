@@ -487,7 +487,7 @@ goog.addDependency('../../../../src/standalones/Background.js', ['anychart.stand
 goog.addDependency('../../../../src/standalones/ColorRange.js', ['anychart.standalones.ColorRange'], ['anychart.core.ui.ColorRange'], false);
 goog.addDependency('../../../../src/standalones/DataGrid.js', ['anychart.standalones.DataGrid'], ['anychart.core.ui.DataGrid'], false);
 goog.addDependency('../../../../src/standalones/Label.js', ['anychart.standalones.Label'], ['anychart.core.ui.Label'], false);
-goog.addDependency('../../../../src/standalones/LabelsFactory.js', ['anychart.standalones.LabelsFactory', 'anychart.ui.LabelsFactory'], ['anychart.core.ui.LabelsFactory'], false);
+goog.addDependency('../../../../src/standalones/LabelsFactory.js', ['anychart.standalones.LabelsFactory'], ['anychart.core.ui.LabelsFactory'], false);
 goog.addDependency('../../../../src/standalones/Legend.js', ['anychart.standalones.Legend', 'anychart.standalones.LegendItem'], ['anychart.core.ui.Legend', 'anychart.core.ui.LegendItem'], false);
 goog.addDependency('../../../../src/standalones/MarkersFactory.js', ['anychart.standalones.MarkersFactory'], ['anychart.core.ui.MarkersFactory'], false);
 goog.addDependency('../../../../src/standalones/ResourceList.js', ['anychart.standalones.ResourceList'], ['anychart.core.resource.ResourceList', 'anychart.data', 'anychart.utils'], false);
@@ -502,7 +502,7 @@ goog.addDependency('../../../../src/standalones/axes/Radial.js', ['anychart.stan
 goog.addDependency('../../../../src/standalones/axes/axes.js', ['anychart.axes', 'anychart.standalones.axes'], [], false);
 goog.addDependency('../../../../src/standalones/axisMarkers/Line.js', ['anychart.standalones.axisMarkers.Line'], ['anychart.core.axisMarkers.Line'], false);
 goog.addDependency('../../../../src/standalones/axisMarkers/Range.js', ['anychart.standalones.axisMarkers.Range'], ['anychart.core.axisMarkers.Range'], false);
-goog.addDependency('../../../../src/standalones/axisMarkers/Text.js', ['anychart.axisMarkers.Text', 'anychart.standalones.axisMarkers.Text'], ['anychart.core.axisMarkers.Text'], false);
+goog.addDependency('../../../../src/standalones/axisMarkers/Text.js', ['anychart.standalones.axisMarkers.Text'], ['anychart.core.axisMarkers.Text'], false);
 goog.addDependency('../../../../src/standalones/axisMarkers/axisMarkers.js', ['anychart.axisMarkers', 'anychart.standalones.axisMarkers'], [], false);
 goog.addDependency('../../../../src/standalones/grids/Linear.js', ['anychart.standalones.grids.Linear'], ['anychart.core.grids.Linear'], false);
 goog.addDependency('../../../../src/standalones/grids/Linear3d.js', ['anychart.standalones.grids.Linear3d'], ['anychart.core.grids.Linear3d'], false);
