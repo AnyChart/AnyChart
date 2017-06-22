@@ -75,7 +75,7 @@ anychart.core.CartesianBase.PROPERTY_DESCRIPTORS = (function() {
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
   function zPaddingNormalizer(opt_value) {
-    return Math.max(anychart.utils.toNumber(opt_value), 0);
+    return Math.max(anychart.utils.toNumber(opt_value), 0) || 0;
   }
   anychart.core.settings.createDescriptor(
       map,
