@@ -662,19 +662,17 @@ anychart.format.parseDateTime = function(value, opt_format, opt_baseDate, opt_lo
 
       var date = goog.isDateLike(opt_baseDate) ? /** @type {Date} */ (opt_baseDate) : anychart.format.inputBaseDate();
 
-      var timezoneOffset = (format.replace(/'.+?'/g, '').search(/z+/i) == -1) ? date.getTimezoneOffset() * 60000 : 0;
-      if (timezoneOffset) {
-        var localTime = date.getTime() + timezoneOffset;
-        date.setTime(localTime);
+      var hasNoTZInFormat = (format.replace(/'.+?'/g, '').search(/z+/i) == -1);
+      if (hasNoTZInFormat) {
+        date.setTime(date.getTime() + date.getTimezoneOffset() * 60000);
       }
 
       var valueLength = value.length;
       var resultLength = parser.parse(value, date);
 
       if (valueLength == resultLength) {//parsing successful.
-        if (timezoneOffset) {
-          var utcTime = date.getTime() - timezoneOffset;
-          date.setTime(utcTime);
+        if (hasNoTZInFormat) {
+          date.setTime(date.getTime() - date.getTimezoneOffset() * 60000);
         }
         return /** @type {Date} */ (date);
       } else {
