@@ -52,8 +52,7 @@ anychart.core.resource.resourceList.SettingsWithMargin.prototype.marginInvalidat
 /** @inheritDoc */
 anychart.core.resource.resourceList.SettingsWithMargin.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.resource.resourceList.SettingsWithMargin.base(this, 'setupByJSON', config, opt_default);
-  if (goog.isDef(config['margin']))
-    this.margin().setupByJSON(config['margin'], opt_default);
+  this.margin().setupInternal(!!opt_default, config['margin']);
 };
 
 

@@ -84,10 +84,8 @@ anychart.core.resource.resourceList.TagsSettings.prototype.paddingInvalidated_ =
 /** @inheritDoc */
 anychart.core.resource.resourceList.TagsSettings.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.resource.resourceList.TagsSettings.base(this, 'setupByJSON', config, opt_default);
-  if (goog.isDef(config['padding']))
-    this.padding().setupByJSON(config['padding'], opt_default);
-  if (goog.isDef(config['background']))
-    this.background().setupByJSON(config['background'], opt_default);
+  this.padding().setupInternal(!!opt_default, config['padding']);
+  this.background().setupInternal(!!opt_default, config['background']);
 };
 
 

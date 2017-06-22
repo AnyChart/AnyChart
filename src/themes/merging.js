@@ -1509,6 +1509,7 @@ anychart.themes.merging.NonMergableEntityTypes_ = {
 anychart.themes.merging.nonMergableEntities_ = {
 
   'padding': anychart.themes.merging.NonMergableEntityTypes_.PADDING,
+  'margin': anychart.themes.merging.NonMergableEntityTypes_.PADDING,
 
   'scale': anychart.themes.merging.NonMergableEntityTypes_.SCALE,
   'xScale': anychart.themes.merging.NonMergableEntityTypes_.SCALE,
