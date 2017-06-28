@@ -137,8 +137,16 @@ anychart.core.resource.resourceList.TextSettings.PROPERTY_DESCRIPTORS = (functio
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'textWrap',
-      anychart.enums.normalizeTextWrap,
+      'wordWrap',
+      anychart.core.settings.asIsNormalizer,
+      0,
+      anychart.Signal.NEEDS_REDRAW);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'wordBreak',
+      anychart.core.settings.asIsNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
@@ -214,7 +222,8 @@ anychart.core.resource.resourceList.TextSettings.prototype.serialize = function(
 //proto['textIndent'] = proto.textIndent;
 //proto['vAlign'] = proto.vAlign;
 //proto['hAlign'] = proto.hAlign;
-//proto['textWrap'] = proto.textWrap;
+//proto['wordWrap'] = proto.wordWrap;
+//proto['wordBreak'] = proto.wordBreak;
 //proto['textOverflow'] = proto.textOverflow;
 //proto['selectable'] = proto.selectable;
 //proto['useHtml'] = proto.useHtml;

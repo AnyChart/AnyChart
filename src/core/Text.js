@@ -261,15 +261,22 @@ anychart.core.Text.prototype.hAlign = function(opt_value) {
 
 
 /**
- * Getter/setter for textWrap.
- * @param {anychart.enums.TextWrap|string=} opt_value
- * @return {!anychart.core.Text|anychart.enums.TextWrap}
+ * Getter/setter for wordWrap.
+ * @param {string=} opt_value
+ * @return {!anychart.core.Text|string}
  */
-anychart.core.Text.prototype.textWrap = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeTextWrap(opt_value);
-  }
-  return /** @type {!anychart.core.Text|anychart.enums.TextWrap} */(this.textSettings('textWrap', opt_value));
+anychart.core.Text.prototype.wordWrap = function(opt_value) {
+  return /** @type {!anychart.core.Text|string} */(this.textSettings('wordWrap', opt_value));
+};
+
+
+/**
+ * Getter/setter for wordBreak.
+ * @param {string=} opt_value
+ * @return {!anychart.core.Text|string}
+ */
+anychart.core.Text.prototype.wordBreak = function(opt_value) {
+  return /** @type {!anychart.core.Text|string} */(this.textSettings('wordBreak', opt_value));
 };
 
 
@@ -332,8 +339,10 @@ anychart.core.Text.prototype.applyTextSettings = function(textElement, isInitial
     textElement.color(/** @type {string} */(this.fontColor()));
   if (isInitial || 'textDirection' in this.changedSettings)
     textElement.direction(this.settingsObj['textDirection']);
-  if (isInitial || 'textWrap' in this.changedSettings)
-    textElement.textWrap(this.settingsObj['textWrap']);
+  if (isInitial || 'wordWrap' in this.changedSettings)
+    textElement.wordWrap(this.settingsObj['wordWrap']);
+  if (isInitial || 'wordBreak' in this.changedSettings)
+    textElement.wordBreak(this.settingsObj['wordBreak']);
   if ('fontOpacity' in this.changedSettings)
     textElement.opacity(this.settingsObj['fontOpacity']);
   if ('fontDecoration' in this.changedSettings)
@@ -380,7 +389,8 @@ anychart.core.Text.prototype.serialize = function() {
   if (goog.isDef(this.textIndent())) json['textIndent'] = this.textIndent();
   if (goog.isDef(this.vAlign())) json['vAlign'] = this.vAlign();
   if (goog.isDef(this.hAlign())) json['hAlign'] = this.hAlign();
-  if (goog.isDef(this.textWrap())) json['textWrap'] = this.textWrap();
+  if (goog.isDef(this.wordWrap())) json['wordWrap'] = this.wordWrap();
+  if (goog.isDef(this.wordBreak())) json['wordBreak'] = this.wordBreak();
   if (goog.isDef(this.textOverflow())) json['textOverflow'] = this.textOverflow();
   if (goog.isDef(this.selectable())) json['selectable'] = this.selectable();
   if (goog.isDef(this.disablePointerEvents())) json['disablePointerEvents'] = this.disablePointerEvents();
@@ -406,7 +416,8 @@ anychart.core.Text.prototype.setupByJSON = function(config, opt_default) {
   this.textIndent(config['textIndent']);
   this.vAlign(config['vAlign']);
   this.hAlign(config['hAlign']);
-  this.textWrap(config['textWrap']);
+  this.wordWrap(config['wordWrap']);
+  this.wordBreak(config['wordBreak']);
   this.textOverflow(config['textOverflow']);
   this.selectable(config['selectable']);
   this.disablePointerEvents(config['disablePointerEvents']);
@@ -431,7 +442,8 @@ anychart.core.Text.prototype.setupByJSON = function(config, opt_default) {
   proto['textIndent'] = proto.textIndent;//in docs/final
   proto['vAlign'] = proto.vAlign;//in docs/final
   proto['hAlign'] = proto.hAlign;//in docs/final
-  proto['textWrap'] = proto.textWrap;//in docs/final
+  proto['wordWrap'] = proto.wordWrap;//in docs/final
+  proto['wordBreak'] = proto.wordBreak;//in docs/final
   proto['textOverflow'] = proto.textOverflow;//in docs/final
   proto['selectable'] = proto.selectable;//in docs/final
   proto['disablePointerEvents'] = proto.disablePointerEvents;//in docs/final

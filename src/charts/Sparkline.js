@@ -572,7 +572,7 @@ anychart.charts.Sparkline.MARKERS_FIELD_NAMES_FOR_MERGE_ = [
 anychart.charts.Sparkline.LABELS_FIELD_NAMES_FOR_MERGE_ = [
   'enabled', 'background', 'padding', 'position', 'anchor', 'offsetX', 'offsetY', 'rotation', 'width', 'height',
   'fontSize', 'fontFamily', 'fontColor', 'fontOpacity', 'fontDecoration', 'fontStyle', 'fontVariant', 'fontWeight',
-  'letterSpacing', 'textDirection', 'lineHeight', 'textIndent', 'vAlign', 'hAlign', 'textWrap', 'textOverflow',
+  'letterSpacing', 'textDirection', 'lineHeight', 'textIndent', 'vAlign', 'hAlign', 'wordWrap', 'wordBreak', 'textOverflow',
   'selectable', 'disablePointerEvents', 'useHtml'
 ];
 

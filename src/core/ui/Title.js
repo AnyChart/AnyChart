@@ -838,7 +838,8 @@ anychart.core.ui.Title.prototype.applyTextSettings = function(isInitial) {
   this.text_.fontFamily(/** @type {string} */ (this.getOption('fontFamily')));
   this.text_.color(/** @type {string} */ (this.getOption('fontColor')));
   this.text_.direction(/** @type {string} */ (this.getOption('textDirection')));
-  this.text_.textWrap(/** @type {string} */ (this.getOption('textWrap')));
+  this.text_.wordBreak(/** @type {string} */ (this.getOption('wordBreak')));
+  this.text_.wordWrap(/** @type {string} */ (this.getOption('wordWrap')));
   this.text_.opacity(/** @type {number} */ (this.getOption('fontOpacity')));
   this.text_.decoration(/** @type {string} */ (this.getOption('fontDecoration')));
   this.text_.fontStyle(/** @type {string} */ (this.getOption('fontStyle')));
@@ -1250,7 +1251,7 @@ anychart.core.ui.Title.prototype.setupByJSON = function(config, opt_default) {
   // proto['textIndent'] = proto.textIndent;
   // proto['vAlign'] = proto.vAlign;
   // proto['hAlign'] = proto.hAlign;
-  // proto['textWrap'] = proto.textWrap;
+  // proto['wordWrap'] = proto.wordWrap;
   // proto['textOverflow'] = proto.textOverflow;
   // proto['selectable'] = proto.selectable;
   // proto['disablePointerEvents'] = proto.disablePointerEvents;

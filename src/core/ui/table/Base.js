@@ -109,7 +109,8 @@ goog.inherits(anychart.core.ui.table.Base, goog.Disposable);
  *  textIndent: (number|undefined),
  *  vAlign: (anychart.enums.VAlign|undefined),
  *  hAlign: (anychart.enums.HAlign|undefined),
- *  textWrap: (anychart.enums.TextWrap|undefined),
+ *  wordWrap: (string|undefined),
+ *  wordBreak: (string|undefined),
  *  textOverflow: (acgraph.vector.Text.TextOverflow|undefined),
  *  selectable: (boolean|undefined),
  *  disablePointerEvents: (boolean|undefined),
@@ -323,15 +324,22 @@ anychart.core.ui.table.Base.prototype.hAlign = function(opt_value) {
 
 
 /**
- * Getter/setter for textWrap.
- * @param {anychart.enums.TextWrap|string=} opt_value .
- * @return {!anychart.core.ui.table.Base|anychart.enums.TextWrap} .
+ * Getter/setter for wordWrap.
+ * @param {string=} opt_value .
+ * @return {!anychart.core.ui.table.Base|string} .
  */
-anychart.core.ui.table.Base.prototype.textWrap = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeTextWrap(opt_value);
-  }
-  return /** @type {!anychart.core.ui.table.Base|anychart.enums.TextWrap} */(this.settings('textWrap', opt_value));
+anychart.core.ui.table.Base.prototype.wordWrap = function(opt_value) {
+  return /** @type {!anychart.core.ui.table.Base|string} */(this.settings('wordWrap', opt_value));
+};
+
+
+/**
+ * Getter/setter for wordBreak.
+ * @param {string=} opt_value .
+ * @return {!anychart.core.ui.table.Base|string} .
+ */
+anychart.core.ui.table.Base.prototype.wordBreak = function(opt_value) {
+  return /** @type {!anychart.core.ui.table.Base|string} */(this.settings('wordBreak', opt_value));
 };
 
 
@@ -480,7 +488,8 @@ anychart.core.ui.table.Base.prototype.paddingInternal = function(opt_spaceOrTopO
 //  if (goog.isDef(this.textIndent())) json['textIndent'] = this.textIndent();
 //  if (goog.isDef(this.vAlign())) json['vAlign'] = this.vAlign();
 //  if (goog.isDef(this.hAlign())) json['hAlign'] = this.hAlign();
-//  if (goog.isDef(this.textWrap())) json['textWrap'] = this.textWrap();
+//  if (goog.isDef(this.wordWrap())) json['wordWrap'] = this.wordWrap();
+//  if (goog.isDef(this.wordBreak())) json['wordBreak'] = this.wordBreak();
 //  if (goog.isDef(this.textOverflow())) json['textOverflow'] = this.textOverflow();
 //  if (goog.isDef(this.selectable())) json['selectable'] = this.selectable();
 //  if (goog.isDef(this.disablePointerEvents())) json['disablePointerEvents'] = this.disablePointerEvents();
@@ -506,7 +515,8 @@ anychart.core.ui.table.Base.prototype.paddingInternal = function(opt_spaceOrTopO
 //  this.textIndent(config['textIndent']);
 //  this.vAlign(config['vAlign']);
 //  this.hAlign(config['hAlign']);
-//  this.textWrap(config['textWrap']);
+//  this.wordWrap(config['wordWrap']);
+//  this.wordBreak(config['wordBreak']);
 //  this.textOverflow(config['textOverflow']);
 //  this.selectable(config['selectable']);
 //  this.disablePointerEvents(config['disablePointerEvents']);
@@ -531,7 +541,8 @@ anychart.core.ui.table.Base.prototype.paddingInternal = function(opt_spaceOrTopO
   proto['textIndent'] = proto.textIndent;//in docs/final
   proto['vAlign'] = proto.vAlign;//in docs/final
   proto['hAlign'] = proto.hAlign;//in docs/final
-  proto['textWrap'] = proto.textWrap;//in docs/final
+  proto['wordWrap'] = proto.wordWrap;//in docs/final
+  proto['wordBreak'] = proto.wordBreak;//in docs/final
   proto['textOverflow'] = proto.textOverflow;//in docs/final
   proto['selectable'] = proto.selectable;//in docs/final
   proto['disablePointerEvents'] = proto.disablePointerEvents;//in docs/final

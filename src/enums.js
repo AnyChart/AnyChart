@@ -3850,42 +3850,38 @@ anychart.enums.normalizeTextDirection = function(value) {
 
 
 /**
- * Text wrap settings enumeration.
+ * Text WordBreak mode.
  * @enum {string}
  */
-anychart.enums.TextWrap = {
+anychart.enums.WordBreak = {
   /**
-   No wrap.
+   Break words according to their usual rules.
    */
-  NO_WRAP: 'noWrap',
+  NORMAL: 'normal',
   /**
-   Wrap by symbol.
+   Don't allow word breaks for CJK text.  Non-CJK text behavior is the same as for normal.
    */
-  BY_LETTER: 'byLetter',
+  KEEP_ALL: 'keep-all',
   /**
-   Wrap by word.
+   Word breaks may be inserted between any character.
    */
-  BY_WORD: 'byWord'
+  BREAK_ALL: 'break-all'
 };
 
 
 /**
- * Normalizes font style.
- * @param {*} value
- * @return {anychart.enums.TextWrap}
+ * Text WordWrap mode.
+ * @enum {string}
  */
-anychart.enums.normalizeTextWrap = function(value) {
-  value = (String(value)).toLowerCase();
-  switch (value) {
-    case 'nowrap':
-    case 'no':
-    case 'n':
-      return anychart.enums.TextWrap.NO_WRAP;
-    case 'byword':
-      return anychart.enums.TextWrap.BY_WORD;
-    default:
-      return anychart.enums.TextWrap.BY_LETTER;
-  }
+anychart.enums.WordWrap = {
+  /**
+   Indicates that lines may only break at normal word break points.
+   */
+  NORMAL: 'normal',
+  /**
+   Indicates that normally unbreakable words may be broken at arbitrary points if there are no otherwise acceptable break points in the line.
+   */
+  BREAK_WORD: 'break-word'
 };
 
 
@@ -7025,10 +7021,6 @@ goog.exportSymbol('anychart.enums.HAlign.RIGHT', anychart.enums.HAlign.RIGHT);
 goog.exportSymbol('anychart.enums.VAlign.TOP', anychart.enums.VAlign.TOP);
 goog.exportSymbol('anychart.enums.VAlign.MIDDLE', anychart.enums.VAlign.MIDDLE);
 goog.exportSymbol('anychart.enums.VAlign.BOTTOM', anychart.enums.VAlign.BOTTOM);
-
-goog.exportSymbol('anychart.enums.TextWrap.NO_WRAP', anychart.enums.TextWrap.NO_WRAP);
-goog.exportSymbol('anychart.enums.TextWrap.BY_LETTER', anychart.enums.TextWrap.BY_LETTER);
-goog.exportSymbol('anychart.enums.TextWrap.BY_WORD', anychart.enums.TextWrap.BY_WORD);
 
 goog.exportSymbol('anychart.enums.TagCloudMode.SPIRAL', anychart.enums.TagCloudMode.SPIRAL);
 goog.exportSymbol('anychart.enums.TagCloudMode.RECT', anychart.enums.TagCloudMode.RECT);

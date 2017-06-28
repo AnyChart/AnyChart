@@ -78,7 +78,6 @@ anychart.core.ui.LabelsFactory = function() {
     'maxFontSize',
     'clip',
     'connectorStroke',
-    'textWrap',
     'adjustFontSize',
     'useHtml',
     'fontSize',
@@ -87,7 +86,8 @@ anychart.core.ui.LabelsFactory = function() {
     'fontFamily',
     'fontColor',
     'textDirection',
-    'textWrap',
+    'wordWrap',
+    'wordBreak',
     'fontOpacity',
     'fontDecoration',
     'fontStyle',
@@ -2440,7 +2440,8 @@ anychart.core.ui.LabelsFactory.Label.prototype.applyTextSettings = function(text
   textElement.fontFamily(/** @type {string} */ (target.call(this, 'fontFamily')));
   textElement.color(/** @type {string} */ (target.call(this, 'fontColor')));
   textElement.direction(/** @type {string} */ (target.call(this, 'textDirection')));
-  textElement.textWrap(/** @type {string} */ (target.call(this, 'textWrap')));
+  textElement.wordWrap(/** @type {string} */ (target.call(this, 'wordWrap')));
+  textElement.wordBreak(/** @type {string} */ (target.call(this, 'wordBreak')));
   textElement.opacity(/** @type {number} */ (target.call(this, 'fontOpacity')));
   textElement.decoration(/** @type {string} */ (target.call(this, 'fontDecoration')));
   textElement.fontStyle(/** @type {string} */ (target.call(this, 'fontStyle')));

@@ -226,8 +226,16 @@ anychart.core.settings.createTextPropertiesDescriptors = function(invalidateBoun
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'textWrap',
-      anychart.enums.normalizeTextWrap,
+      'wordWrap',
+      anychart.core.settings.asIsNormalizer,
+      invalidateBoundsState,
+      boundsChangedSignal);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'wordBreak',
+      anychart.core.settings.asIsNormalizer,
       invalidateBoundsState,
       boundsChangedSignal);
 

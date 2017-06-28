@@ -3399,11 +3399,18 @@
         </xsd:union>
     </xsd:simpleType>
 
-    <xsd:simpleType name="enums.TextWrap">
+    <xsd:simpleType name="enums.WordBreak">
         <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="noWrap"/>
-            <xsd:enumeration value="byLetter"/>
-            <xsd:enumeration value="byWord"/>
+            <xsd:enumeration value="normal"/>
+            <xsd:enumeration value="keep-all"/>
+            <xsd:enumeration value="break-all"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="enums.WordWrap">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="normal"/>
+            <xsd:enumeration value="break-word"/>
         </xsd:restriction>
     </xsd:simpleType>
 
@@ -3553,7 +3560,8 @@
         <xsd:attribute name="text_indent" type="xsd:double"/>
         <xsd:attribute name="v_align" type="enums.VAlign"/>
         <xsd:attribute name="h_align" type="enums.HAlign"/>
-        <xsd:attribute name="text_wrap" type="enums.TextWrap"/>
+        <xsd:attribute name="word_break" type="enums.WordBreak"/>
+        <xsd:attribute name="word_wrap" type="enums.WordWrap"/>
         <xsd:attribute name="text_overflow" type="xsd:string"/>
         <xsd:attribute name="selectable" type="simple.Bool" default="false"/>
         <xsd:attribute name="disable_pointer_events" type="simple.Bool" default="true"/>

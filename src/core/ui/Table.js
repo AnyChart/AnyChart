@@ -137,7 +137,8 @@ anychart.core.ui.Table = function(opt_rowsCount, opt_colsCount) {
    *  textIndent: (number|undefined),
    *  vAlign: (anychart.enums.VAlign|undefined),
    *  hAlign: (anychart.enums.HAlign|undefined),
-   *  textWrap: (anychart.enums.TextWrap|undefined),
+   *  wordWrap: (string|undefined),
+   *  wordBreak: (string|undefined),
    *  textOverflow: (acgraph.vector.Text.TextOverflow|undefined),
    *  selectable: (boolean|undefined),
    *  disablePointerEvents: (boolean|undefined),
@@ -158,7 +159,8 @@ anychart.core.ui.Table = function(opt_rowsCount, opt_colsCount) {
     'leftPadding': 0,
     'hAlign': anychart.enums.HAlign.START,
     'vAlign': anychart.enums.VAlign.TOP,
-    'enabled': true
+    'enabled': true,
+    'wordWrap': 'break-word'
   };
 
   this.settingsObj['fill'] = '#fff';
@@ -904,15 +906,22 @@ anychart.core.ui.Table.prototype.hAlign = function(opt_value) {
 
 
 /**
- * Getter/setter for textWrap.
- * @param {anychart.enums.TextWrap|string=} opt_value .
- * @return {!anychart.core.ui.Table|anychart.enums.TextWrap} .
+ * Getter/setter for wordBreak.
+ * @param {string|string=} opt_value .
+ * @return {!anychart.core.ui.Table|string} .
  */
-anychart.core.ui.Table.prototype.textWrap = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeTextWrap(opt_value);
-  }
-  return /** @type {!anychart.core.ui.Table|anychart.enums.TextWrap} */(this.settings('textWrap', opt_value));
+anychart.core.ui.Table.prototype.wordBreak = function(opt_value) {
+  return /** @type {!anychart.core.ui.Table|string} */(this.settings('wordBreak', opt_value));
+};
+
+
+/**
+ * Getter/setter for wordWrap.
+ * @param {string|string=} opt_value .
+ * @return {!anychart.core.ui.Table|string} .
+ */
+anychart.core.ui.Table.prototype.wordWrap = function(opt_value) {
+  return /** @type {!anychart.core.ui.Table|string} */(this.settings('wordWrap', opt_value));
 };
 
 
@@ -2441,7 +2450,8 @@ anychart.core.ui.Table.prototype.disposeInternal = function() {
   proto['textIndent'] = proto.textIndent;
   proto['vAlign'] = proto.vAlign;
   proto['hAlign'] = proto.hAlign;
-  proto['textWrap'] = proto.textWrap;
+  proto['wordWrap'] = proto.wordBreak;
+  proto['wordWrap'] = proto.wordWrap;
   proto['textOverflow'] = proto.textOverflow;
   proto['selectable'] = proto.selectable;
   proto['disablePointerEvents'] = proto.disablePointerEvents;

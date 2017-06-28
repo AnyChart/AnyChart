@@ -1296,7 +1296,8 @@ anychart.core.ui.DataGrid.Column.prototype.title = function(opt_value) {
     this.title_
         .container(this.getTitleLayer_())
         .margin(0);
-    this.title_['textWrap'](anychart.enums.TextWrap.NO_WRAP);
+    this.title_['wordWrap']('normal');
+    this.title_['wordBreak']('normal');
     this.title_['hAlign'](anychart.enums.HAlign.CENTER);
     this.title_['vAlign'](anychart.enums.VAlign.MIDDLE);
     this.title_.resumeSignalsDispatching(false);
