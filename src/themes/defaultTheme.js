@@ -4902,7 +4902,7 @@ goog.provide('anychart.themes.defaultTheme');
       'zoomMarqueeStroke': '#d3d3d3',
       'interactivity': {
         'zoomOnMouseWheel': false,
-        'scrollOnMouseWheel': true
+        'scrollOnMouseWheel': false
       }
     },
 
