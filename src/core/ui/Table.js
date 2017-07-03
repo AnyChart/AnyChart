@@ -160,7 +160,8 @@ anychart.core.ui.Table = function(opt_rowsCount, opt_colsCount) {
     'hAlign': anychart.enums.HAlign.START,
     'vAlign': anychart.enums.VAlign.TOP,
     'enabled': true,
-    'wordWrap': 'break-word'
+    'wordWrap': 'break-word',
+    'wordBreak': 'normal'
   };
 
   this.settingsObj['fill'] = '#fff';
@@ -2450,7 +2451,7 @@ anychart.core.ui.Table.prototype.disposeInternal = function() {
   proto['textIndent'] = proto.textIndent;
   proto['vAlign'] = proto.vAlign;
   proto['hAlign'] = proto.hAlign;
-  proto['wordWrap'] = proto.wordBreak;
+  proto['wordBreak'] = proto.wordBreak;
   proto['wordWrap'] = proto.wordWrap;
   proto['textOverflow'] = proto.textOverflow;
   proto['selectable'] = proto.selectable;
