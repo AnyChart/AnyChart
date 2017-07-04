@@ -2331,7 +2331,11 @@ anychart.core.ui.LabelsFactory.Label.prototype.clear = function() {
  */
 anychart.core.ui.LabelsFactory.Label.prototype.drawLabel = function(bounds, parentBounds) {
   var positionFormatter = this.mergedSettings['positionFormatter'];
-  var anchor = anychart.core.ui.LabelsFactory.anchorNoAutoNormalizer(this.mergedSettings['anchor']) || anychart.enums.Anchor.LEFT_TOP;
+  var isTextByPath = !!this.textElement.path();
+  var anchor = isTextByPath ?
+      anychart.enums.Anchor.CENTER :
+      anychart.core.ui.LabelsFactory.anchorNoAutoNormalizer(this.mergedSettings['anchor']) || anychart.enums.Anchor.LEFT_TOP;
+
   var isVertical = this.autoVertical();
 
   var offsetX = this.mergedSettings['offsetX'];
@@ -2628,6 +2632,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.draw = function() {
       }
       autoWidth = true;
     }
+
     if (goog.isDef(textWidth)) this.textElement.width(textWidth);
 
     //calculate text height and outer height

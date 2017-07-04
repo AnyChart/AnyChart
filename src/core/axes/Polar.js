@@ -5,7 +5,7 @@ goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.axes.RadialTicks');
 goog.require('anychart.core.reporting');
-goog.require('anychart.core.ui.CircularLabelsFactory');
+goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.utils.Bounds');
 goog.require('anychart.enums');
 goog.require('anychart.format.Context');
@@ -91,7 +91,7 @@ anychart.core.axes.Polar.prototype.name_ = 'axis';
 
 
 /**
- * @type {anychart.core.ui.CircularLabelsFactory}
+ * @type {anychart.core.ui.LabelsFactory}
  * @private
  */
 anychart.core.axes.Polar.prototype.labels_ = null;
@@ -105,7 +105,7 @@ anychart.core.axes.Polar.prototype.ticks_ = null;
 
 
 /**
- * @type {anychart.core.ui.CircularLabelsFactory}
+ * @type {anychart.core.ui.LabelsFactory}
  * @private
  */
 anychart.core.axes.Polar.prototype.minorLabels_ = null;
@@ -213,12 +213,11 @@ anychart.core.axes.Polar.prototype.dropLabelCallsCache = function() {
 
 /**
  * @param {(Object|boolean|null)=} opt_value Axis labels.
- * @return {!(anychart.core.ui.CircularLabelsFactory|anychart.core.axes.Polar)} Axis labels of itself for method chaining.
+ * @return {!(anychart.core.ui.LabelsFactory|anychart.core.axes.Polar)} Axis labels of itself for method chaining.
  */
 anychart.core.axes.Polar.prototype.minorLabels = function(opt_value) {
   if (!this.minorLabels_) {
-    this.minorLabels_ = new anychart.core.ui.CircularLabelsFactory();
-    this.minorLabels_.sweepAngle(360);
+    this.minorLabels_ = new anychart.core.ui.LabelsFactory();
     this.minorLabels_.setParentEventTarget(this);
     this.minorLabels_.listenSignals(this.labelsInvalidated_, this);
     this.registerDisposable(this.minorLabels_);
@@ -236,12 +235,11 @@ anychart.core.axes.Polar.prototype.minorLabels = function(opt_value) {
 
 /**
  * @param {(Object|boolean|null)=} opt_value Axis labels.
- * @return {!(anychart.core.ui.CircularLabelsFactory|anychart.core.axes.Polar)} Axis labels of itself for method chaining.
+ * @return {!(anychart.core.ui.LabelsFactory|anychart.core.axes.Polar)} Axis labels of itself for method chaining.
  */
 anychart.core.axes.Polar.prototype.labels = function(opt_value) {
   if (!this.labels_) {
-    this.labels_ = new anychart.core.ui.CircularLabelsFactory();
-    this.labels_.sweepAngle(360);
+    this.labels_ = new anychart.core.ui.LabelsFactory();
     this.labels_.setParentEventTarget(this);
     this.labels_.listenSignals(this.labelsInvalidated_, this);
     this.registerDisposable(this.labels_);
@@ -474,22 +472,14 @@ anychart.core.axes.Polar.prototype.calculateAxisBounds_ = function() {
     this.radius_ = Math.max(Math.round(Math.min(parentBounds.width, parentBounds.height) / 2), 0);
     this.cx_ = Math.round(parentBounds.left + parentBounds.width / 2);
     this.cy_ = Math.round(parentBounds.top + parentBounds.height / 2);
-    var majorLabels = /** @type {anychart.core.ui.CircularLabelsFactory} */(this.labels());
-    var minorLabels = /** @type {anychart.core.ui.CircularLabelsFactory} */(this.minorLabels());
+    var majorLabels = /** @type {anychart.core.ui.LabelsFactory} */(this.labels());
+    var minorLabels = /** @type {anychart.core.ui.LabelsFactory} */(this.minorLabels());
 
     majorLabels
-        .cx(this.cx_)
-        .cy(this.cy_)
-        .parentRadius(this.radius_)
-        .startAngle(this.startAngle_)
         .clear()
         .parentBounds(parentBounds);
 
     minorLabels
-        .cx(this.cx_)
-        .cy(this.cy_)
-        .parentRadius(this.radius_)
-        .startAngle(this.startAngle_)
         .clear()
         .parentBounds(parentBounds);
 
@@ -524,93 +514,150 @@ anychart.core.axes.Polar.prototype.calculateAxisBounds_ = function() {
       var labelsOrder = [];
       var majorTickAngles = [];
       var minorTickAngles = [];
-      i = j = 0;
-      majorRatio = this.getRatio_(i, majorTicksArr, scale, 0.5);
-      minorRatio = this.getRatio_(j, minorTicksArr, scale, 0.5);
       var radiusDelta = lineThickness / 2;
       var hasFill = this.fill_ != 'none';
       var boundsChecker = hasFill ? this.checkCrossesParentRadius_ : this.checkCrossesParentBounds_;
-      var overlapMode = this.overlapMode_ == anychart.enums.LabelsOverlapMode.AUTO_WIDTH && !isOrdinal ?
-          anychart.enums.LabelsOverlapMode.NO_OVERLAP :
-          this.overlapMode_;
-      var setAutoWidth = overlapMode == anychart.enums.LabelsOverlapMode.AUTO_WIDTH;
-      var autoWidth = null;
-      while (!isNaN(majorRatio) || !isNaN(minorRatio)) {
-        if (isNaN(minorRatio) || (majorRatio <= minorRatio)) {
-          ratio = majorRatio;
-          isMajor = true;
-          index = i;
-          labelsEnabled = majorLabelsEnabled;
-          tickLength = majorTicksLength;
-          ticksArr = majorTicksArr;
-          labelsOffset = majorLabelsOffsetByTicks;
-          boundsCache = this.labelsBounds_;
-          labels = majorLabels;
-          ticksAngles = majorTickAngles;
-          ignoreTicks = ignoreMajorTicks;
-          if (setAutoWidth) {
-            var startAngle = goog.math.toRadians(this.startAngle_ - 90 + this.getRatio_(i, majorTicksArr, scale, 0) * 360);
-            var endAngle = goog.math.toRadians(this.startAngle_ - 90 + this.getRatio_(i, majorTicksArr, scale, 1) * 360);
-            autoWidth = anychart.math.vectorLength(
-                anychart.math.angleDx(startAngle, this.radius_),
-                anychart.math.angleDy(startAngle, this.radius_),
-                anychart.math.angleDx(endAngle, this.radius_),
-                anychart.math.angleDy(endAngle, this.radius_));
-          }
-        } else {
-          ratio = minorRatio;
-          isMajor = false;
-          index = j;
-          labelsEnabled = minorLabelsEnabled;
-          tickLength = minorTicksLength;
-          ticksArr = minorTicksArr;
-          labelsOffset = minorTicksLength;
-          boundsCache = this.minorLabelsBounds_;
-          labels = minorLabels;
-          ticksAngles = minorTickAngles;
-          ignoreTicks = false;
-        }
+      var overlapMode = !isOrdinal ? anychart.enums.LabelsOverlapMode.NO_OVERLAP : this.overlapMode_;
 
-        angle = anychart.math.round(goog.math.standardAngle(this.startAngle_ - 90 + ratio * 360), 4);
-        angleRad = goog.math.toRadians(angle);
-        dx = anychart.math.angleDx(angleRad, 1);
-        dy = anychart.math.angleDy(angleRad, 1);
-        if (labelsEnabled) {
-          points = this.configureLabel_(labels, index, ticksArr[index], angle, this.radius_ + labelsOffset, boundsCache, autoWidth);
-          radiusDelta = Math.max(boundsChecker.call(this, angle, dx, dy, points), radiusDelta);
-          labelsOrder.push(isMajor ? index : ~index);
-        }
-        if (tickLength) {
-          var tickAngle, tickDx, tickDy;
-          if (isOrdinal) {
-            var tickRatio = this.getRatio_(index, ticksArr, scale, 0);
-            tickAngle = anychart.math.round(goog.math.standardAngle(this.startAngle_ - 90 + tickRatio * 360), 4);
-            angleRad = goog.math.toRadians(tickAngle);
-            tickDx = anychart.math.angleDx(angleRad, 1);
-            tickDy = anychart.math.angleDy(angleRad, 1);
+      var padding, commonIndex, radiusChanged, labelsOriginRadius;
+      var changerIndex = NaN;
+      var iterateStep = 0;
+      do {
+        radiusChanged = false;
+        i = j = 0;
+        majorRatio = this.getRatio_(i, majorTicksArr, scale, 0.5);
+        minorRatio = this.getRatio_(j, minorTicksArr, scale, 0.5);
+
+        while (!isNaN(majorRatio) || !isNaN(minorRatio)) {
+          if (isNaN(minorRatio) || (majorRatio <= minorRatio)) {
+            ratio = majorRatio;
+            isMajor = true;
+            index = i;
+            labelsEnabled = majorLabelsEnabled;
+            tickLength = majorTicksLength;
+            ticksArr = majorTicksArr;
+            labelsOffset = majorLabelsOffsetByTicks;
+            boundsCache = this.labelsBounds_;
+            labels = majorLabels;
+            ticksAngles = majorTickAngles;
+            ignoreTicks = ignoreMajorTicks;
           } else {
-            tickAngle = angle;
-            tickDx = dx;
-            tickDy = dy;
+            ratio = minorRatio;
+            isMajor = false;
+            index = j;
+            labelsEnabled = minorLabelsEnabled;
+            tickLength = minorTicksLength;
+            ticksArr = minorTicksArr;
+            labelsOffset = minorTicksLength;
+            boundsCache = this.minorLabelsBounds_;
+            labels = minorLabels;
+            ticksAngles = minorTickAngles;
+            ignoreTicks = false;
           }
-          ticksAngles.push(tickAngle);
-          if (!ignoreTicks) {
-            radius = this.radius_ + tickLength + lineThickness / 2;
-            var x = dx * radius + this.cx_;
-            var y = dy * radius + this.cy_;
-            radiusDelta = Math.max(boundsChecker.call(this, tickAngle, dx, dy, [x, y]), radiusDelta);
+
+          labelsOriginRadius = isOrdinal ? this.radius_ : this.radius_ + tickLength;
+          commonIndex = isMajor ? index : ~index;
+          angle = anychart.math.round(goog.math.standardAngle(this.startAngle_ - 90 + ratio * 360), 4);
+          angleRad = goog.math.toRadians(angle);
+          dx = anychart.math.angleDx(angleRad, 1);
+          dy = anychart.math.angleDy(angleRad, 1);
+          if (labelsEnabled) {
+            this.configureLabel_(labels, index, ticksArr, angle, labelsOriginRadius, radiusDelta);
+            label = labels.getLabel(index);
+
+            if (label.getFinalSettings('position') == 'normal') {
+              points = labels.measureWithTransform(label);
+              boundsCache[index] = points;
+              radiusDelta = Math.max(boundsChecker.call(this, angle, dx, dy, points), radiusDelta);
+            } else {
+              padding = label.getFinalSettings('padding');
+
+              labels.measureWithTransform(label);
+              this.calcLabelTextPath(label, i, ticksArr);
+
+              var prevRadiusDelta = radiusDelta;
+
+              if (hasFill) {
+                radiusDelta = Math.min(Math.max(padding.widenHeight(label.getTextElement().getTextHeight()), radiusDelta), labelsOriginRadius / 1.25);
+              } else {
+                var bounds = padding.widenBounds(label.getTextElement().getBounds());
+
+                //Debug info
+                // var ___name = 'lbl_fb' + (isMajor ? 'm' + index : index);
+                // if (!this[___name]) this[___name] = stage.rect().zIndex(1000).setBounds(bounds).stroke('blue');
+                // this[___name].setBounds(bounds);
+
+                radiusDelta += Math.max(
+                    parentBounds.left - bounds.left,
+                    parentBounds.top - bounds.top,
+                    bounds.getRight() - parentBounds.getRight(),
+                    bounds.getBottom() - parentBounds.getBottom(),
+                    0);
+              }
+
+              var deltaChanged = radiusDelta > prevRadiusDelta;
+              if (deltaChanged) {
+                changerIndex = commonIndex;
+              } else if (changerIndex == commonIndex) {
+                break;
+              }
+              radiusChanged = radiusChanged || deltaChanged;
+            }
+            if (!iterateStep)
+              labelsOrder.push(commonIndex);
           }
+          if (tickLength) {
+            var tickAngle, tickDx, tickDy;
+            if (isOrdinal) {
+              var tickRatio = this.getRatio_(index, ticksArr, scale, 0);
+              tickAngle = anychart.math.round(goog.math.standardAngle(this.startAngle_ - 90 + tickRatio * 360), 4);
+              angleRad = goog.math.toRadians(tickAngle);
+              tickDx = anychart.math.angleDx(angleRad, 1);
+              tickDy = anychart.math.angleDy(angleRad, 1);
+            } else {
+              tickAngle = angle;
+              tickDx = dx;
+              tickDy = dy;
+            }
+            if (!iterateStep)
+              ticksAngles.push(tickAngle);
+            if (!ignoreTicks) {
+              radius = this.radius_ + tickLength + lineThickness / 2;
+              var x = tickDx * radius + this.cx_;
+              var y = tickDy * radius + this.cy_;
+
+              //debug shapes
+              // if (!this['lbl_fb99' + index]) this['lbl_fb99' + index] = stage.circle().zIndex(1000).radius(2).stroke('blue');
+              // this['lbl_fb99' + index].centerX(x).centerY(y);
+
+              prevRadiusDelta = radiusDelta;
+              radiusDelta = Math.max(boundsChecker.call(this, tickAngle, tickDx, tickDy, [x, y]), radiusDelta);
+
+              deltaChanged = radiusDelta > prevRadiusDelta;
+              if (deltaChanged) {
+                changerIndex = NaN;
+              }
+              radiusChanged = radiusChanged || deltaChanged;
+            }
+          }
+
+          if (!isMajor || majorRatio == minorRatio)
+            minorRatio = this.getRatio_(++j, minorTicksArr, scale, 0.5);
+          if (isMajor)
+            majorRatio = this.getRatio_(++i, majorTicksArr, scale, 0.5);
         }
 
-        if (!isMajor || majorRatio == minorRatio)
-          minorRatio = this.getRatio_(++j, minorTicksArr, scale, 0.5);
-        if (isMajor)
-          majorRatio = this.getRatio_(++i, majorTicksArr, scale, 0.5);
-      }
+        iterateStep++;
+      } while (radiusChanged);
+
       this.originalRadius_ = this.radius_;
-      this.radius_ = Math.floor(this.radius_ - radiusDelta);
+      this.radius_ = Math.max(0, Math.floor(this.radius_ - radiusDelta));
       this.majorTickAngles_ = majorTickAngles;
       this.minorTickAngles_ = minorTickAngles;
+
+      radiusDelta = Math.min(radiusDelta, this.originalRadius_);
+
+      var isCircularInsidePosition = label.getFinalSettings('position') != 'normal' && hasFill;
       if (radiusDelta) {
         var delta = radiusDelta;
         for (i = 0; i < labelsOrder.length; i++) {
@@ -619,39 +666,54 @@ anychart.core.axes.Polar.prototype.calculateAxisBounds_ = function() {
             index = ~index;
             labels = minorLabels;
             boundsCache = this.minorLabelsBounds_;
+            labelsOffset = minorTicksLength;
           } else {
             labels = majorLabels;
             boundsCache = this.labelsBounds_;
+            labelsOffset = majorLabelsOffsetByTicks;
           }
-          points = boundsCache[index];
           label = labels.getLabel(index);
           var positionProvider = label.positionProvider();
           angle = positionProvider['value']['angle'];
-          angleRad = goog.math.toRadians(angle);
-          dx = anychart.math.angleDx(angleRad, 1);
-          dy = anychart.math.angleDy(angleRad, 1);
-          if (hasFill) {
-            var projection = goog.array.slice(points, 0);
-            anychart.math.projectToLine(projection, dx, dy, this.cx_, this.cy_);
-            var rect = anychart.math.Rect.fromCoordinateBox(projection);
-            var dRadius = anychart.math.vectorLength(0, 0, rect.width, rect.height);
-            delta = radiusDelta - (radiusDelta - dRadius) / 2;
-          }
-          dx *= delta;
-          dy *= delta;
-          for (j = 0; j < points.length; j += 2) {
-            points[j] -= dx;
-            points[j + 1] -= dy;
-          }
-          positionProvider['value']['radius'] -= delta;
-          // One cannot just _set_ a position provider...
-          label.positionProvider(null);
-          label.positionProvider(positionProvider);
 
+          if (label.getFinalSettings('position') == 'normal') {
+            points = boundsCache[index];
+            angleRad = goog.math.toRadians(angle);
+            dx = anychart.math.angleDx(angleRad, 1);
+            dy = anychart.math.angleDy(angleRad, 1);
+            if (hasFill) {
+              var projection = goog.array.slice(points, 0);
+              anychart.math.projectToLine(projection, dx, dy, this.cx_, this.cy_);
+              var rect = anychart.math.Rect.fromCoordinateBox(projection);
+              var dRadius = anychart.math.vectorLength(0, 0, rect.width, rect.height);
+              delta = radiusDelta - (radiusDelta - dRadius) / 2;
+            }
+            dx *= delta;
+            dy *= delta;
+            for (j = 0; j < points.length; j += 2) {
+              points[j] -= dx;
+              points[j + 1] -= dy;
+            }
+
+            positionProvider['value']['radius'] -= delta;
+
+            dx = anychart.math.angleDx(goog.math.toRadians(angle), positionProvider['value']['radius'], this.cx_);
+            dy = anychart.math.angleDy(goog.math.toRadians(angle), positionProvider['value']['radius'], this.cy_);
+
+            positionProvider['value']['x'] = dx;
+            positionProvider['value']['y'] = dy;
+
+            //One cannot just _set_ a position provider...
+            label.positionProvider(null);
+            label.positionProvider(positionProvider);
+          } else {
+            label.height(radiusDelta);
+          }
           // this.drawDebugPath_(points, '2 green');
         }
       }
-      if (overlapMode == anychart.enums.LabelsOverlapMode.NO_OVERLAP && labelsOrder.length) {
+
+      if (overlapMode == anychart.enums.LabelsOverlapMode.NO_OVERLAP && labelsOrder.length && !isCircularInsidePosition) {
         var newLabelsOrder = [labelsOrder[0]];
         var lastMajor = labelsOrder[0] < 0 ? NaN : 0;
         var firstMajor = lastMajor;
@@ -825,68 +887,72 @@ anychart.core.axes.Polar.prototype.getRatio_ = function(i, ticksArr, scale, subR
 
 /**
  * Configures the label. Returns label bounds coordinate box.
- * @param {anychart.core.ui.CircularLabelsFactory} labels
+ * @param {anychart.core.ui.LabelsFactory} labels
  * @param {number} index
- * @param {string|number} value
+ * @param {Array.<number|string>} ticksArr
  * @param {number} angle
  * @param {number} radius
- * @param {Array} cache
- * @param {?number=} opt_width
- * @return {Array.<number>} Label coordinate box.
+ * @param {number} radiusDelta
  * @private
  */
-anychart.core.axes.Polar.prototype.configureLabel_ = function(labels, index, value, angle, radius, cache, opt_width) {
+anychart.core.axes.Polar.prototype.configureLabel_ = function(labels, index, ticksArr, angle, radius, radiusDelta) {
+  var value = ticksArr[index];
+  var hasFill = this.fill_ != 'none';
   var formatProvider = this.getLabelsFormatProvider_(index, value);
-  var positionProvider = {'value': {'angle': angle, 'radius': radius}};
   var label = labels.getLabel(index);
   if (label) {
     label.suspendSignalsDispatching();
     label.formatProvider(formatProvider);
-    label.positionProvider(positionProvider);
     label.state('pointState', null);
+    label.state('seriesState', null);
   } else {
-    label = labels.add(formatProvider, positionProvider, index);
+    label = labels.add(formatProvider, null, index);
     label.suspendSignalsDispatching();
   }
-  var autoRotate = label.getFinalSettings('autoRotate');
-  if (autoRotate) {
-    label.state('seriesState', {'width': anychart.utils.isNaN(opt_width) ? null : opt_width});
-  }
-  if (label.getFinalSettings('anchor') == anychart.enums.Anchor.AUTO) {
-    label.state('pointState', {
-      'anchor': autoRotate ?
-          anychart.enums.Anchor.CENTER :
-          anychart.utils.getAnchorForAngle(angle - /** @type {number} */(label.getFinalSettings('rotation')))
-    });
-  }
-  var points = labels.measureWithTransform(label);
+  label.height(null);
 
-  // this.drawDebugPath_(points, '2 red');
-
-  if (autoRotate) {
-    var angleRad = goog.math.toRadians(angle);
-    var dx = anychart.math.angleDx(angleRad, 1);
-    var dy = anychart.math.angleDy(angleRad, 1);
-    var projection = goog.array.slice(points, 0);
-    anychart.math.projectToLine(projection, dx, dy, this.cx_, this.cy_);
-    var rect = anychart.math.Rect.fromCoordinateBox(projection);
-    var dRadius = anychart.math.vectorLength(0, 0, rect.width, rect.height) / 2;
-    positionProvider['value']['radius'] = radius + dRadius;
-    // One cannot just _set_ a position provider...
-    label.positionProvider(null);
-    label.positionProvider(positionProvider);
-    // adjusting points to avoid remeasuring label
-    dx *= dRadius;
-    dy *= dRadius;
-    for (var i = 0; i < points.length; i += 2) {
-      points[i] += dx;
-      points[i + 1] += dy;
+  var pointState = {};
+  if (label.getFinalSettings('position') != 'normal') {
+    var padding = label.getFinalSettings('padding');
+    var dr;
+    var vAlign = label.getFinalSettings('vAlign');
+    if (angle > 0 && angle < 180) {
+      if (label.getFinalSettings('vAlign') == 'top')
+        label.state('seriesState', {'vAlign': 'bottom'});
+      else if (label.getFinalSettings('vAlign') == 'bottom')
+        label.state('seriesState', {'vAlign': 'top'});
     }
-  }
-  cache[index] = points;
+    if (hasFill) {
+      pointState['adjustFontSize'] = false;
+      dr = -(vAlign == acgraph.vector.Text.VAlign.MIDDLE ?
+          radiusDelta / 2 : vAlign == acgraph.vector.Text.VAlign.BOTTOM ? radiusDelta - padding.bottom() : padding.top());
+    } else {
+      labels.measureWithTransform(label);
+      this.calcLabelTextPath(label, index, ticksArr, radius, angle);
+      var height = label.getTextElement().getTextHeight();
 
+      var dh = vAlign == acgraph.vector.Text.VAlign.MIDDLE ?
+          height / 2 + padding.bottom() : vAlign == acgraph.vector.Text.VAlign.BOTTOM ? padding.top() : height + padding.bottom();
+      dr = dh - radiusDelta;
+    }
+
+    radius = radius + dr;
+  } else {
+    label.getTextElement().path(null);
+  }
+
+  var dx = anychart.math.angleDx(goog.math.toRadians(angle), radius, this.cx_);
+  var dy = anychart.math.angleDy(goog.math.toRadians(angle), radius, this.cy_);
+
+  var positionProvider = {'value': {'angle': angle, 'radius': radius, 'x': dx, 'y': dy}};
+  label.positionProvider(positionProvider);
+
+  if (label.getFinalSettings('anchor') == anychart.enums.Anchor.AUTO) {
+    pointState['anchor'] = anychart.utils.getAnchorForAngle(angle - /** @type {number} */(label.getFinalSettings('rotation')));
+  }
+
+  label.state('pointState', pointState);
   label.resumeSignalsDispatching(true);
-  return points;
 };
 
 
@@ -901,16 +967,37 @@ anychart.core.axes.Polar.prototype.getLabelCoordinateBox_ = function(index) {
   if (index < 0) {
     index = ~index;
     cache = this.minorLabelsBounds_;
-    labels = this.labels();
+    labels = this.minorLabels();
   } else {
     cache = this.labelsBounds_;
-    labels = this.minorLabels();
+    labels = this.labels();
   }
   var result;
   if (cache[index]) {
     result = cache[index];
   } else {
-    result = cache[index] = labels.measureWithTransform(labels.getLabel(index));
+    var label = labels.getLabel(index);
+    result = labels.measureWithTransform(label);
+    if (label.getFinalSettings('position') != 'normal') {
+      var bounds = label.getTextElement().getBounds();
+
+      var rotation = label.getFinalSettings('rotation') || 0;
+      if (rotation) {
+        var anchor = 'center';
+        var point = anychart.utils.getCoordinateByAnchor(bounds, /** @type {anychart.enums.Anchor} */(anchor));
+        var tx = goog.math.AffineTransform.getRotateInstance(goog.math.toRadians(/** @type {number} */(rotation)), point.x, point.y);
+
+        result = bounds.toCoordinateBox() || [];
+        tx.transform(result, 0, result, 0, 4);
+      } else {
+        result = bounds.toCoordinateBox() || [];
+      }
+    }
+    cache[index] = result;
+
+    //debug purpose
+    // if (!this['lbl_lcb' + index]) this['lbl_lcb' + index] = stage.rect().zIndex(1000);
+    // this['lbl_lcb' + index].setBounds(anychart.math.Rect.fromCoordinateBox(result));
   }
   return result;
 };
@@ -967,6 +1054,68 @@ anychart.core.axes.Polar.prototype.getLabelsFormatProvider_ = function(index, va
   context.tokenAliases(aliases);
 
   return context.propagate();
+};
+
+
+/**
+ * Calculating text path.
+ * @param {anychart.core.ui.LabelsFactory.Label} label .
+ * @param {number} index
+ * @param {Array.<number>} ticksArr
+ * @param {number=} opt_radius
+ * @param {number=} opt_angle
+ * @return {!acgraph.vector.Path}
+ */
+anychart.core.axes.Polar.prototype.calcLabelTextPath = function(label, index, ticksArr, opt_radius, opt_angle) {
+  var scale = /** @type {anychart.scales.Ordinal|anychart.scales.ScatterBase} */(this.scale());
+  var radius = goog.isDef(opt_radius) ? opt_radius : label.positionProvider()['value']['radius'];
+  var angle = goog.isDef(opt_angle) ? opt_angle : label.positionProvider()['value']['angle'];
+  var padding = label.getFinalSettings('padding');
+  var pxPerDegree = (2 * Math.PI * radius) / 360;
+  var startAngle, endAngle;
+
+  if (scale instanceof anychart.scales.Ordinal) {
+    startAngle = this.startAngle_ - 90 + this.getRatio_(index, ticksArr, scale, 0) * 360;
+    endAngle = this.startAngle_ - 90 + this.getRatio_(index, ticksArr, scale, 1) * 360;
+
+    var tmpSweep = Math.abs(endAngle - startAngle);
+    var dw = ((tmpSweep - (padding.tightenWidth(tmpSweep * pxPerDegree) - acgraph.vector.getThickness(this.ticks().stroke())) / pxPerDegree)) / 2;
+
+    startAngle += dw;
+    endAngle -= dw;
+  } else {
+    var da = 360 / ticksArr.length;
+    startAngle = angle - da;
+    endAngle = angle + da;
+  }
+
+  if (angle > 0 && angle < 180) {
+    var tmpA = startAngle;
+    startAngle = endAngle;
+    endAngle = tmpA;
+  }
+
+  var startAngleRad = goog.math.toRadians(startAngle);
+  var dx = anychart.math.angleDx(startAngleRad, radius, this.cx_);
+  var dy = anychart.math.angleDy(startAngleRad, radius, this.cy_);
+
+  var path = label.getTextElement().path() ? label.getTextElement().path().clear() : acgraph.path();
+  path
+      .moveTo(dx, dy)
+      .arcToAsCurves(radius, radius, startAngle, endAngle - startAngle);
+
+  //Debug text path
+  // (this['lbl' + index] || (this['lbl' + index] = stage.path())).deserialize(path.serializePathArgs());
+  // stage.path().deserialize(path.serializePathArgs());
+
+  label.getTextElement().path(path);
+
+  //Debug full bounds
+  // var bounds = label.getTextElement().getBounds();
+  // if (!this['lbl_fb' + index]) this['lbl_fb' + index] = stage.rect().zIndex(1000);
+  // this['lbl_fb' + index].setBounds(bounds);
+
+  return path;
 };
 
 
