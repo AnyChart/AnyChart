@@ -4297,7 +4297,7 @@
             zoomMarqueeStroke: "#d3d3d3",
             interactivity: {
                 zoomOnMouseWheel: !1,
-                scrollOnMouseWheel: !0
+                scrollOnMouseWheel: !1
             }
         },
         pert: {
