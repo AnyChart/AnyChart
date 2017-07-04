@@ -121,6 +121,38 @@ anychart.charts.PyramidFunnel = function(opt_data, opt_csvSettings) {
 
   this.data(opt_data || null, opt_csvSettings);
 
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['baseWidth', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['neckHeight', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['neckWidth', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['pointsPadding', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['reversed', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['overlapMode', anychart.ConsistencyState.PYRAMID_FUNNEL_LABELS, anychart.Signal.NEEDS_REDRAW],
+    ['connectorLength',
+      anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.PYRAMID_FUNNEL_LABELS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['connectorStroke', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['fill',
+      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.CHART_LEGEND,
+      anychart.Signal.NEEDS_REDRAW],
+    ['hoverFill',
+      anychart.ConsistencyState.APPEARANCE,
+      anychart.Signal.NEEDS_REDRAW],
+    ['selectFill',
+      anychart.ConsistencyState.APPEARANCE,
+      anychart.Signal.NEEDS_REDRAW],
+    ['stroke',
+      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.CHART_LEGEND,
+      anychart.Signal.NEEDS_REDRAW],
+    ['hoverStroke', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['selectStroke', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['hatchFill',
+      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.CHART_LEGEND,
+      anychart.Signal.NEEDS_REDRAW],
+    ['hoverHatchFill', 0, 0],
+    ['selectHatchFill', 0, 0]
+  ]);
+
   this.resumeSignalsDispatching(false);
 };
 goog.inherits(anychart.charts.PyramidFunnel, anychart.core.SeparateChart);
@@ -1594,58 +1626,42 @@ anychart.charts.PyramidFunnel.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'baseWidth',
-      anychart.core.settings.asIsNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.asIsNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'neckHeight',
-      anychart.core.settings.asIsNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.asIsNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'neckWidth',
-      anychart.core.settings.asIsNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.asIsNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'pointsPadding',
-      anychart.core.settings.asIsNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.asIsNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'reversed',
-      anychart.core.settings.asIsNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.asIsNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'overlapMode',
-      anychart.enums.normalizeLabelsOverlapMode,
-      anychart.ConsistencyState.PYRAMID_FUNNEL_LABELS,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.enums.normalizeLabelsOverlapMode);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'connectorLength',
-      anychart.core.settings.asIsNormalizer,
-      anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.PYRAMID_FUNNEL_LABELS,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      anychart.core.settings.asIsNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'connectorStroke',
-      anychart.core.settings.strokeNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.strokeNormalizer);
 
   return map;
 })();
@@ -1661,65 +1677,47 @@ anychart.charts.PyramidFunnel.COLOR_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'fill',
-      anychart.core.settings.fillOrFunctionNormalizer,
-      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.CHART_LEGEND,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.fillOrFunctionNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverFill',
-      anychart.core.settings.fillOrFunctionNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.fillOrFunctionNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectFill',
-      anychart.core.settings.fillOrFunctionNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.fillOrFunctionNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'stroke',
-      anychart.core.settings.strokeOrFunctionNormalizer,
-      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.CHART_LEGEND,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.strokeOrFunctionNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverStroke',
-      anychart.core.settings.strokeOrFunctionNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.strokeOrFunctionNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectStroke',
-      anychart.core.settings.strokeOrFunctionNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.strokeOrFunctionNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hatchFill',
-      anychart.core.settings.hatchFillOrFunctionNormalizer,
-      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.CHART_LEGEND,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.hatchFillOrFunctionNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverHatchFill',
-      anychart.core.settings.hatchFillOrFunctionNormalizer,
-      0,
-      0);
+      anychart.core.settings.hatchFillOrFunctionNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectHatchFill',
-      anychart.core.settings.hatchFillOrFunctionNormalizer,
-      0,
-      0);
+      anychart.core.settings.hatchFillOrFunctionNormalizer);
   return map;
 })();
 anychart.core.settings.populate(anychart.charts.PyramidFunnel, anychart.charts.PyramidFunnel.PROPERTY_DESCRIPTORS);

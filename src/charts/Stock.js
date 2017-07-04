@@ -144,6 +144,11 @@ anychart.charts.Stock = function(opt_allowPointSettings) {
    * @type {Object.<string, anychart.core.series.TypeConfig>}
    */
   this.seriesConfig = this.createSeriesConfig(!!opt_allowPointSettings);
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['zoomMarqueeFill', 0, 0],
+    ['zoomMarqueeStroke', 0, 0]
+  ]);
 };
 goog.inherits(anychart.charts.Stock, anychart.core.Chart);
 
@@ -1890,16 +1895,12 @@ anychart.charts.Stock.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'zoomMarqueeFill',
-      anychart.core.settings.fillNormalizer,
-      0,
-      0);
+      anychart.core.settings.fillNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'zoomMarqueeStroke',
-      anychart.core.settings.strokeNormalizer,
-      0,
-      0);
+      anychart.core.settings.strokeNormalizer);
 
   return map;
 })();

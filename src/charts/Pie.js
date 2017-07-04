@@ -184,6 +184,38 @@ anychart.charts.Pie = function(opt_data, opt_csvSettings) {
   this.data(opt_data || null, opt_csvSettings);
 
   this.invalidate(anychart.ConsistencyState.ALL);
+
+  /**
+   * @this {anychart.charts.Pie}
+   */
+  function sortBeforeInvalidation() {
+    this.redefineView_();
+  }
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['overlapMode', anychart.ConsistencyState.PIE_LABELS, anychart.Signal.NEEDS_REDRAW],
+    ['radius', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW],
+    ['innerRadius', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW],
+    ['startAngle', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.PIE_LABELS,
+      anychart.Signal.NEEDS_REDRAW],
+    ['explode',
+      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.PIE_LABELS,
+      anychart.Signal.NEEDS_REDRAW],
+    ['sort', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW, 0, sortBeforeInvalidation],
+    ['outsideLabelsSpace',
+      anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.PIE_LABELS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['insideLabelsOffset',
+      anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.PIE_LABELS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['connectorLength',
+      anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.PIE_LABELS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['outsideLabelsCriticalAngle', anychart.ConsistencyState.PIE_LABELS, anychart.Signal.NEEDS_REDRAW],
+    ['forceHoverLabels', anychart.ConsistencyState.PIE_LABELS, anychart.Signal.NEEDS_REDRAW],
+    ['connectorStroke', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['mode3d', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.PIE_LABELS, anychart.Signal.NEEDS_REDRAW]
+  ]);
+
   this.resumeSignalsDispatching(false);
 };
 goog.inherits(anychart.charts.Pie, anychart.core.SeparateChart);
@@ -890,9 +922,7 @@ anychart.charts.Pie.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'overlapMode',
-      anychart.enums.normalizeLabelsOverlapMode,
-      anychart.ConsistencyState.PIE_LABELS,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.enums.normalizeLabelsOverlapMode);
   function radiusNormalizer(opt_value) {
     return anychart.utils.normalizeNumberOrPercent(opt_value, '100%');
   }
@@ -900,9 +930,7 @@ anychart.charts.Pie.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'radius',
-      radiusNormalizer,
-      anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW);
+      radiusNormalizer);
   function innerRadiusNormalizer(opt_value) {
     return goog.isFunction(opt_value) ? opt_value : anychart.utils.normalizeNumberOrPercent(opt_value);
   }
@@ -910,9 +938,7 @@ anychart.charts.Pie.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'innerRadius',
-      innerRadiusNormalizer,
-      anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW);
+      innerRadiusNormalizer);
   function startAngleNormalizer(opt_value) {
     return goog.math.standardAngle(anychart.utils.toNumber(opt_value) || 0);
   }
@@ -920,9 +946,7 @@ anychart.charts.Pie.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'startAngle',
-      startAngleNormalizer,
-      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.PIE_LABELS,
-      anychart.Signal.NEEDS_REDRAW);
+      startAngleNormalizer);
   function explodeNormalizer(opt_value) {
     return anychart.utils.normalizeNumberOrPercent(opt_value, 15);
   }
@@ -930,21 +954,13 @@ anychart.charts.Pie.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'explode',
-      explodeNormalizer,
-      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.PIE_LABELS,
-      anychart.Signal.NEEDS_REDRAW);
-  function sortBeforeInvalidation() {
-    this.redefineView_();
-  }
+      explodeNormalizer);
+
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'sort',
-      anychart.enums.normalizeSort,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW,
-      0,
-      sortBeforeInvalidation);
+      anychart.enums.normalizeSort);
   function outsideLabelsSpaceNormalizer(opt_value) {
     return anychart.utils.normalizeNumberOrPercent(opt_value, '30%');
   }
@@ -952,16 +968,12 @@ anychart.charts.Pie.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'outsideLabelsSpace',
-      outsideLabelsSpaceNormalizer,
-      anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.PIE_LABELS,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      outsideLabelsSpaceNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'insideLabelsOffset',
-      anychart.utils.normalizeNumberOrPercent,
-      anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.PIE_LABELS,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      anychart.utils.normalizeNumberOrPercent);
   function connectorLengthNormalizer(opt_value) {
     return anychart.utils.normalizeNumberOrPercent(opt_value, '20%');
   }
@@ -969,9 +981,7 @@ anychart.charts.Pie.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'connectorLength',
-      connectorLengthNormalizer,
-      anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.PIE_LABELS,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      connectorLengthNormalizer);
   function criticalAngleNormalizer(opt_value) {
     return goog.math.standardAngle(anychart.utils.normalizeSize(opt_value));
   }
@@ -979,30 +989,22 @@ anychart.charts.Pie.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'outsideLabelsCriticalAngle',
-      criticalAngleNormalizer,
-      anychart.ConsistencyState.PIE_LABELS,
-      anychart.Signal.NEEDS_REDRAW);
+      criticalAngleNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'forceHoverLabels',
-      anychart.core.settings.asIsNormalizer,
-      anychart.ConsistencyState.PIE_LABELS,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.asIsNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'connectorStroke',
-      anychart.core.settings.strokeNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.strokeNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'mode3d',
-      anychart.core.settings.booleanNormalizer,
-      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.PIE_LABELS,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.booleanNormalizer);
 
   return map;
 })();

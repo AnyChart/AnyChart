@@ -13,6 +13,12 @@ anychart.standalones.ResourceList = function() {
   anychart.standalones.ResourceList.base(this, 'constructor');
 
   this.data(null);
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['rowHeight', 0],
+    ['minRowHeight', 0],
+    ['maxRowHeight', 0]
+  ]);
 };
 goog.inherits(anychart.standalones.ResourceList, anychart.core.resource.ResourceList);
 anychart.core.makeStandalone(anychart.standalones.ResourceList, anychart.core.resource.ResourceList);
@@ -29,25 +35,19 @@ anychart.standalones.ResourceList.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'rowHeight',
-      anychart.core.settings.numberOrPercentNormalizer,
-      0,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.numberOrPercentNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'minRowHeight',
-      anychart.core.settings.numberOrPercentNormalizer,
-      0,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.numberOrPercentNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'maxRowHeight',
-      anychart.core.settings.numberOrPercentNormalizer,
-      0,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.numberOrPercentNormalizer);
 
   return map;
 })();

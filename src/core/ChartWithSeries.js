@@ -67,6 +67,10 @@ anychart.core.ChartWithSeries = function() {
    * @protected
    */
   this.dataBounds = null;
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['defaultSeriesType', 0, 0]
+  ]);
 };
 goog.inherits(anychart.core.ChartWithSeries, anychart.core.SeparateChart);
 
@@ -195,9 +199,7 @@ anychart.core.ChartWithSeries.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'defaultSeriesType',
-      seriesTypeNormalizer,
-      0,
-      0);
+      seriesTypeNormalizer);
 
   return map;
 })();

@@ -57,6 +57,11 @@ anychart.core.annotations.Rectangle = function(chartController) {
       anychart.core.annotations.Base.getColorResolver(
           ['hatchFill', 'hoverHatchFill', 'selectHatchFill'],
           anychart.enums.ColorType.HATCH_FILL));
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.core.annotations.X_ANCHOR_DESCRIPTORS_META);
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.core.annotations.VALUE_ANCHOR_DESCRIPTORS_META);
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.core.annotations.SECOND_ANCHOR_POINT_DESCRIPTORS_META);
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.core.annotations.STROKE_DESCRIPTORS_META);
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.core.annotations.FILL_DESCRIPTORS_META);
 };
 goog.inherits(anychart.core.annotations.Rectangle, anychart.core.annotations.Base);
 anychart.core.settings.populate(anychart.core.annotations.Rectangle, anychart.core.annotations.X_ANCHOR_DESCRIPTORS);

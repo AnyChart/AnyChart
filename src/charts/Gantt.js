@@ -105,6 +105,54 @@ anychart.charts.Gantt = function(opt_isResourcesChart) {
     this.dataGrid().initKeysFeatures();
     this.getTimeline().initKeysFeatures();
   }, false, this);
+
+  //region Init descriptors meta
+  /**
+   * @this {anychart.charts.Gantt}
+   */
+  function rowHoverFillBeforeInvalidation() {
+    //rowHoverFill does not invalidate anything. Here's no need to suspend it.
+    this.getTimeline().rowHoverFill(/** @type {acgraph.vector.Fill} */ (this.getOption('rowHoverFill')));
+    this.getDataGrid_().rowHoverFill(/** @type {acgraph.vector.Fill} */ (this.getOption('rowHoverFill')));
+  }
+  /**
+   * @this {anychart.charts.Gantt}
+   */
+  function rowSelectedFillBeforeInvalidation() {
+    anychart.core.Base.suspendSignalsDispatching(this.getTimeline(), this.getDataGrid_());
+    this.tl_.rowSelectedFill(/** @type {acgraph.vector.Fill} */ (this.getOption('rowSelectedFill')));
+    this.dg_.rowSelectedFill(/** @type {acgraph.vector.Fill} */ (this.getOption('rowSelectedFill')));
+    anychart.core.Base.resumeSignalsDispatchingTrue(this.dg_, this.tl_);
+  }
+  /**
+   * @this {anychart.charts.Gantt}
+   */
+  function columnStrokeBeforeInvalidation() {
+    anychart.core.Base.suspendSignalsDispatching(this.getTimeline(), this.getDataGrid_());
+    this.dg_.columnStroke(/** @type {acgraph.vector.Stroke} */ (this.getOption('columnStroke')));
+    this.tl_.columnStroke(/** @type {acgraph.vector.Stroke} */ (this.getOption('columnStroke')));
+    anychart.core.Base.resumeSignalsDispatchingTrue(this.dg_, this.tl_);
+  }
+  /**
+   * @this {anychart.charts.Gantt}
+   */
+  function rowStrokeBeforeInvalidation() {
+    anychart.core.Base.suspendSignalsDispatching(this.getTimeline(), this.getDataGrid_(), this.controller_);
+    var val = /** @type {acgraph.vector.Stroke} */ (this.getOption('rowStroke'));
+    this.dg_.rowStroke(val);
+    this.tl_.rowStroke(val);
+    this.controller_.rowStrokeThickness(anychart.utils.extractThickness(val));
+    anychart.core.Base.resumeSignalsDispatchingTrue(this.dg_, this.tl_, this.controller_);
+  }
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['headerHeight', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW],
+    ['splitterPosition', anychart.ConsistencyState.GANTT_SPLITTER_POSITION, anychart.Signal.NEEDS_REDRAW],
+    ['rowHoverFill', 0, 0, 0, rowHoverFillBeforeInvalidation],
+    ['rowSelectedFill', 0, 0, 0, rowSelectedFillBeforeInvalidation],
+    ['columnStroke', 0, 0, 0, columnStrokeBeforeInvalidation],
+    ['rowStroke', 0, 0, 0, rowStrokeBeforeInvalidation]
+  ]);
+  //endregion
 };
 goog.inherits(anychart.charts.Gantt, anychart.core.SeparateChart);
 
@@ -354,77 +402,36 @@ anychart.charts.Gantt.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'headerHeight',
-      anychart.core.settings.asIsNormalizer,
-      anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.asIsNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'splitterPosition',
-      anychart.core.settings.asIsNormalizer,
-      anychart.ConsistencyState.GANTT_SPLITTER_POSITION,
-      anychart.Signal.NEEDS_REDRAW);
-  function rowHoverFillBeforeInvalidation() {
-    //rowHoverFill does not invalidate anything. Here's no need to suspend it.
-    this.getTimeline().rowHoverFill(/** @type {acgraph.vector.Fill} */ (this.getOption('rowHoverFill')));
-    this.getDataGrid_().rowHoverFill(/** @type {acgraph.vector.Fill} */ (this.getOption('rowHoverFill')));
-  }
+      anychart.core.settings.asIsNormalizer);
+
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'rowHoverFill',
-      anychart.core.settings.fillNormalizer,
-      0,
-      0,
-      0,
-      rowHoverFillBeforeInvalidation);
-  function rowSelectedFillBeforeInvalidation() {
-    anychart.core.Base.suspendSignalsDispatching(this.getTimeline(), this.getDataGrid_());
-    this.tl_.rowSelectedFill(/** @type {acgraph.vector.Fill} */ (this.getOption('rowSelectedFill')));
-    this.dg_.rowSelectedFill(/** @type {acgraph.vector.Fill} */ (this.getOption('rowSelectedFill')));
-    anychart.core.Base.resumeSignalsDispatchingTrue(this.dg_, this.tl_);
-  }
+      anychart.core.settings.fillNormalizer);
+
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'rowSelectedFill',
-      anychart.core.settings.fillNormalizer,
-      0,
-      0,
-      0,
-      rowSelectedFillBeforeInvalidation);
-  function columnStrokeBeforeInvalidation() {
-    anychart.core.Base.suspendSignalsDispatching(this.getTimeline(), this.getDataGrid_());
-    this.dg_.columnStroke(/** @type {acgraph.vector.Stroke} */ (this.getOption('columnStroke')));
-    this.tl_.columnStroke(/** @type {acgraph.vector.Stroke} */ (this.getOption('columnStroke')));
-    anychart.core.Base.resumeSignalsDispatchingTrue(this.dg_, this.tl_);
-  }
+      anychart.core.settings.fillNormalizer);
+
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'columnStroke',
-      anychart.core.settings.strokeNormalizer,
-      0,
-      0,
-      0,
-      columnStrokeBeforeInvalidation);
-  function rowStrokeBeforeInvalidation() {
-    anychart.core.Base.suspendSignalsDispatching(this.getTimeline(), this.getDataGrid_(), this.controller_);
-    var val = /** @type {acgraph.vector.Stroke} */ (this.getOption('rowStroke'));
-    this.dg_.rowStroke(val);
-    this.tl_.rowStroke(val);
-    this.controller_.rowStrokeThickness(anychart.utils.extractThickness(val));
-    anychart.core.Base.resumeSignalsDispatchingTrue(this.dg_, this.tl_, this.controller_);
-  }
+      anychart.core.settings.strokeNormalizer);
+
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'rowStroke',
-      anychart.core.settings.strokeNormalizer,
-      0,
-      0,
-      0,
-      rowStrokeBeforeInvalidation);
+      anychart.core.settings.strokeNormalizer);
   return map;
 })();
 anychart.core.settings.populate(anychart.charts.Gantt, anychart.charts.Gantt.PROPERTY_DESCRIPTORS);

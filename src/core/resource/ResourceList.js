@@ -17,7 +17,6 @@ goog.require('anychart.core.utils.Space');
 /**
  * Resource list constructor.
  * @implements {anychart.core.IStandaloneBackend}
- * @implements {anychart.core.settings.IObjectWithSettings}
  * @extends {anychart.core.VisualBaseWithBounds}
  * @constructor
  */
@@ -39,20 +38,6 @@ anychart.core.resource.ResourceList = function() {
    * @type {acgraph.vector.Layer}
    */
   this.itemsLayer = null;
-
-  /**
-   * Settings storage.
-   * @type {!Object}
-   * @protected
-   */
-  this.settings = {};
-
-  /**
-   * Default settings.
-   * @type {!Object}
-   * @protected
-   */
-  this.defaultSettings = {};
 
   /**
    * Resource items pool.
@@ -93,6 +78,16 @@ anychart.core.resource.ResourceList = function() {
       anychart.ConsistencyState.RESOURCE_LIST_TYPES_SETTINGS |
       anychart.ConsistencyState.RESOURCE_LIST_DESCRIPTIONS_SETTINGS |
       anychart.ConsistencyState.RESOURCE_LIST_TAGS_SETTINGS;
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['stroke', anychart.ConsistencyState.APPEARANCE],
+    ['oddFill', anychart.ConsistencyState.APPEARANCE],
+    ['evenFill', anychart.ConsistencyState.APPEARANCE],
+    ['drawTopLine', anychart.ConsistencyState.RESOURCE_LIST_ITEMS],
+    ['drawRightLine', anychart.ConsistencyState.RESOURCE_LIST_ITEMS],
+    ['drawBottomLine', anychart.ConsistencyState.RESOURCE_LIST_ITEMS],
+    ['drawLeftLine', anychart.ConsistencyState.RESOURCE_LIST_ITEMS]
+  ]);
 };
 goog.inherits(anychart.core.resource.ResourceList, anychart.core.VisualBaseWithBounds);
 
@@ -178,57 +173,43 @@ anychart.core.resource.ResourceList.DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'stroke',
-      anychart.core.settings.strokeNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.strokeNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'oddFill',
-      anychart.core.settings.fillNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.fillNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'evenFill',
-      anychart.core.settings.fillNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.fillNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'drawTopLine',
-      anychart.core.settings.booleanNormalizer,
-      anychart.ConsistencyState.RESOURCE_LIST_ITEMS,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.booleanNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'drawRightLine',
-      anychart.core.settings.booleanNormalizer,
-      anychart.ConsistencyState.RESOURCE_LIST_ITEMS,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.booleanNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'drawBottomLine',
-      anychart.core.settings.booleanNormalizer,
-      anychart.ConsistencyState.RESOURCE_LIST_ITEMS,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.booleanNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'drawLeftLine',
-      anychart.core.settings.booleanNormalizer,
-      anychart.ConsistencyState.RESOURCE_LIST_ITEMS,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.booleanNormalizer);
 
   return map;
 })();
@@ -236,64 +217,17 @@ anychart.core.settings.populate(anychart.core.resource.ResourceList, anychart.co
 
 
 //endregion
-//region --- IObjectWithSettings impl
-/**
- * Returns option value if it was set directly to the object.
- * @param {string} name
- * @return {*}
- */
-anychart.core.resource.ResourceList.prototype.getOwnOption = function(name) {
-  return this.settings[name];
-};
-
-
-/**
- * Returns true if the option value was set directly to the object.
- * @param {string} name
- * @return {boolean}
- */
+//region --- IObjectWithSettings overrides
+/** @inheritDoc */
 anychart.core.resource.ResourceList.prototype.hasOwnOption = function(name) {
-  return goog.isDefAndNotNull(this.settings[name]);
+  return goog.isDefAndNotNull(this.ownSettings[name]);
 };
 
 
-/**
- * Returns option value from the theme if any.
- * @param {string} name
- * @return {*}
- */
-anychart.core.resource.ResourceList.prototype.getThemeOption = function(name) {
-  return this.defaultSettings[name];
-};
-
-
-/**
- * Returns option value by priorities.
- * @param {string} name
- * @return {*}
- */
-anychart.core.resource.ResourceList.prototype.getOption = function(name) {
-  return goog.isDefAndNotNull(this.settings[name]) ? this.settings[name] : this.defaultSettings[name];
-};
-
-
-/**
- * Sets option value to the instance.
- * @param {string} name
- * @param {*} value
- */
-anychart.core.resource.ResourceList.prototype.setOption = function(name, value) {
-  this.settings[name] = value;
-};
-
-
-/**
- * Performs checks on the instance to determine whether the state should be invalidated after option change.
- * @param {number} flags
- * @return {boolean}
- */
-anychart.core.resource.ResourceList.prototype.check = function(flags) {
-  return true;
+/** @inheritDoc */
+anychart.core.resource.ResourceList.prototype.getSignal = function(fieldName) {
+  // because all descriptors invalidates with NEEDS_REDRAW signal
+  return anychart.Signal.NEEDS_REDRAW;
 };
 
 
@@ -1035,7 +969,7 @@ anychart.core.resource.ResourceList.prototype.draw = function() {
  * @param {!Object} config
  */
 anychart.core.resource.ResourceList.prototype.setThemeSettings = function(config) {
-  anychart.core.settings.copy(this.defaultSettings, anychart.core.resource.ResourceList.DESCRIPTORS, config);
+  anychart.core.settings.copy(this.themeSettings, anychart.core.resource.ResourceList.DESCRIPTORS, config);
 };
 
 

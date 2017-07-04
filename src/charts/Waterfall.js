@@ -20,6 +20,11 @@ anychart.charts.Waterfall = function() {
   anychart.charts.Waterfall.base(this, 'constructor');
 
   this.setType(anychart.enums.ChartTypes.WATERFALL);
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['dataMode', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
+    ['connectorStroke', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW]
+  ]);
 };
 goog.inherits(anychart.charts.Waterfall, anychart.core.CartesianBase);
 
@@ -265,17 +270,13 @@ anychart.charts.Waterfall.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'dataMode',
-      anychart.enums.normalizeWaterfallDataMode,
-      anychart.ConsistencyState.ONLY_DISPATCHING,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.enums.normalizeWaterfallDataMode);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'connectorStroke',
-      anychart.core.settings.strokeNormalizer,
-      anychart.ConsistencyState.ONLY_DISPATCHING,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.strokeNormalizer);
 
   return map;
 })();

@@ -10,7 +10,6 @@ goog.require('anychart.core.ui.Overlay');
  * Resource Chart grid.
  * @constructor
  * @extends {anychart.core.VisualBaseWithBounds}
- * @implements {anychart.core.settings.IObjectWithSettings}
  */
 anychart.core.resource.Grid = function() {
   anychart.core.resource.Grid.base(this, 'constructor');
@@ -125,18 +124,6 @@ anychart.core.resource.Grid = function() {
   this.xScale_ = null;
 
   /**
-   * Settings holder.
-   * @type {Object}
-   */
-  this.settings = {};
-
-  /**
-   * Default settings holder.
-   * @type {Object}
-   */
-  this.defaultSettings = {};
-
-  /**
    * Heights array.
    * @type {Array.<number>}
    * @private
@@ -149,6 +136,23 @@ anychart.core.resource.Grid = function() {
    * @private
    */
   this.yScrollPosition_ = 0;
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['horizontalStroke', anychart.ConsistencyState.APPEARANCE],
+    ['verticalStroke', anychart.ConsistencyState.APPEARANCE],
+    ['oddFill', anychart.ConsistencyState.APPEARANCE],
+    ['evenFill', anychart.ConsistencyState.APPEARANCE],
+    ['oddHolidayFill', anychart.ConsistencyState.APPEARANCE],
+    ['evenHolidayFill', anychart.ConsistencyState.APPEARANCE],
+    ['oddHatchFill', anychart.ConsistencyState.APPEARANCE],
+    ['evenHatchFill', anychart.ConsistencyState.APPEARANCE],
+    ['oddHolidayHatchFill', anychart.ConsistencyState.APPEARANCE],
+    ['evenHolidayHatchFill', anychart.ConsistencyState.APPEARANCE],
+    ['drawTopLine', anychart.ConsistencyState.RESOURCE_GRID_TICKS],
+    ['drawRightLine', anychart.ConsistencyState.RESOURCE_GRID_TICKS],
+    ['drawBottomLine', anychart.ConsistencyState.RESOURCE_GRID_TICKS],
+    ['drawLeftLine', anychart.ConsistencyState.RESOURCE_GRID_TICKS]
+  ]);
 };
 goog.inherits(anychart.core.resource.Grid, anychart.core.VisualBaseWithBounds);
 
@@ -198,100 +202,72 @@ anychart.core.resource.Grid.DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'horizontalStroke',
-      anychart.core.settings.strokeNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.strokeNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'verticalStroke',
-      anychart.core.settings.strokeNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.strokeNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'oddFill',
-      anychart.core.settings.fillNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.fillNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'evenFill',
-      anychart.core.settings.fillNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.fillNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'oddHolidayFill',
-      anychart.core.settings.fillNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.fillNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'evenHolidayFill',
-      anychart.core.settings.fillNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.fillNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'oddHatchFill',
-      anychart.core.settings.hatchFillNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.hatchFillNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'evenHatchFill',
-      anychart.core.settings.hatchFillNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.hatchFillNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'oddHolidayHatchFill',
-      anychart.core.settings.hatchFillNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.hatchFillNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'evenHolidayHatchFill',
-      anychart.core.settings.hatchFillNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.hatchFillNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'drawTopLine',
-      anychart.core.settings.booleanNormalizer,
-      anychart.ConsistencyState.RESOURCE_GRID_TICKS,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.booleanNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'drawRightLine',
-      anychart.core.settings.booleanNormalizer,
-      anychart.ConsistencyState.RESOURCE_GRID_TICKS,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.booleanNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'drawBottomLine',
-      anychart.core.settings.booleanNormalizer,
-      anychart.ConsistencyState.RESOURCE_GRID_TICKS,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.booleanNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'drawLeftLine',
-      anychart.core.settings.booleanNormalizer,
-      anychart.ConsistencyState.RESOURCE_GRID_TICKS,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.booleanNormalizer);
   return map;
 })();
 anychart.core.settings.populate(anychart.core.resource.Grid, anychart.core.resource.Grid.DESCRIPTORS);
@@ -634,69 +610,22 @@ anychart.core.resource.Grid.prototype.remove = function() {
 
 
 //endregion
-//region --- IObjectWithSettings impl
+//region --- IObjectWithSettings overrides
 //----------------------------------------------------------------------------------------------------------------------
 //
-//  --- IObjectWithSettings impl
+//  --- IObjectWithSettings overrides
 //
 //----------------------------------------------------------------------------------------------------------------------
-/**
- * Returns option value if it was set directly to the object.
- * @param {string} name
- * @return {*}
- */
-anychart.core.resource.Grid.prototype.getOwnOption = function(name) {
-  return this.settings[name];
-};
-
-
-/**
- * Returns true if the option value was set directly to the object.
- * @param {string} name
- * @return {boolean}
- */
+/** @inheritDoc */
 anychart.core.resource.Grid.prototype.hasOwnOption = function(name) {
-  return goog.isDefAndNotNull(this.settings[name]);
+  return goog.isDefAndNotNull(this.ownSettings[name]);
 };
 
 
-/**
- * Returns option value from the theme if any.
- * @param {string} name
- * @return {*}
- */
-anychart.core.resource.Grid.prototype.getThemeOption = function(name) {
-  return this.defaultSettings[name];
-};
-
-
-/**
- * Returns option value by priorities.
- * @param {string} name
- * @return {*}
- */
-anychart.core.resource.Grid.prototype.getOption = function(name) {
-  return goog.isDefAndNotNull(this.settings[name]) ? this.settings[name] : this.defaultSettings[name];
-};
-
-
-/**
- * Sets option value to the instance.
- * @param {string} name
- * @param {*} value
- */
-anychart.core.resource.Grid.prototype.setOption = function(name, value) {
-  this.settings[name] = value;
-};
-
-
-/**
- * Performs checks on the instance to determine whether the state should be invalidated after option change.
- * @param {number} flags
- * @return {boolean}
- */
-anychart.core.resource.Grid.prototype.check = function(flags) {
-  return true;
+/** @inheritDoc */
+anychart.core.resource.Grid.prototype.getSignal = function(fieldName) {
+  // because all descriptors invalidates with NEEDS_REDRAW signal
+  return anychart.Signal.NEEDS_REDRAW;
 };
 
 

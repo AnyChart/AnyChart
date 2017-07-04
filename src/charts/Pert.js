@@ -203,6 +203,11 @@ anychart.charts.Pert = function() {
   this.bindHandlersToComponent(this, this.handleMouseOverAndMove, this.handleMouseOut, this.clickHandler_,
       this.handleMouseOverAndMove, null, this.handleMouseDown);
 
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['expectedTimeCalculator', anychart.ConsistencyState.PERT_CALCULATIONS, anychart.Signal.NEEDS_REDRAW],
+    ['verticalSpacing', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW],
+    ['horizontalSpacing', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW]
+  ]);
 };
 goog.inherits(anychart.charts.Pert, anychart.core.SeparateChart);
 
@@ -1070,9 +1075,7 @@ anychart.charts.Pert.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'expectedTimeCalculator',
-      anychart.core.settings.asIsNormalizer,
-      anychart.ConsistencyState.PERT_CALCULATIONS,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.asIsNormalizer);
   function verticalSpacingNormalizer(opt_value) {
     return anychart.utils.normalizeNumberOrPercent(opt_value, 20);
   }
@@ -1080,9 +1083,7 @@ anychart.charts.Pert.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'verticalSpacing',
-      verticalSpacingNormalizer,
-      anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW);
+      verticalSpacingNormalizer);
   function horizontalSpacingNormalizer(opt_value) {
     return anychart.utils.normalizeNumberOrPercent(opt_value, 20);
   }
@@ -1090,9 +1091,7 @@ anychart.charts.Pert.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'horizontalSpacing',
-      horizontalSpacingNormalizer,
-      anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW);
+      horizontalSpacingNormalizer);
 
   return map;
 })();

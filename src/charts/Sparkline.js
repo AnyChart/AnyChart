@@ -132,6 +132,39 @@ anychart.charts.Sparkline = function(opt_data, opt_csvSettings) {
   this.data(opt_data || null, opt_csvSettings);
 
   this.bindHandlersToComponent(this, this.handleMouseOverAndMove, this.handleMouseOut, null, this.handleMouseOverAndMove, null, this.handleMouseDown);
+
+  //region Init descriptors meta
+  /**
+   * @this {anychart.charts.Sparkline}
+   */
+  function typeBeforeInvalidation() {
+    if (this.series_) {
+      this.series_.dispose();
+      this.series_ = null;
+    }
+  }
+  /**
+   * @this {anychart.charts.Sparkline}
+   */
+  function pointWidthBeforeInvalidation() {
+    if (this.series_ && this.series_.isWidthBased())
+      this.series_.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL | anychart.ConsistencyState.APPEARANCE,
+          anychart.Signal.NEEDS_REDRAW);
+  }
+  /**
+   * @this {anychart.charts.Sparkline}
+   */
+  function connectMissingBeforeInvalidation() {
+    if (this.series_ && !this.series_.isWidthBased())
+      this.series_.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL | anychart.ConsistencyState.APPEARANCE,
+          anychart.Signal.NEEDS_REDRAW);
+  }
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['seriesType', anychart.ConsistencyState.SPARK_SERIES, anychart.Signal.NEEDS_REDRAW, 0, typeBeforeInvalidation],
+    ['pointWidth', 0, 0, 0, pointWidthBeforeInvalidation],
+    ['connectMissingPoints', 0, 0, 0, connectMissingBeforeInvalidation]
+  ]);
+  //endregion
 };
 goog.inherits(anychart.charts.Sparkline, anychart.core.Chart);
 
@@ -931,53 +964,26 @@ anychart.charts.Sparkline.PROPERTY_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
 
-  function typeBeforeInvalidation() {
-    if (this.series_) {
-      this.series_.dispose();
-      this.series_ = null;
-    }
-  }
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'seriesType',
-      anychart.enums.normalizeSparklineSeriesType,
-      anychart.ConsistencyState.SPARK_SERIES,
-      anychart.Signal.NEEDS_REDRAW,
-      0,
-      typeBeforeInvalidation);
+      anychart.enums.normalizeSparklineSeriesType);
 
   function pointWidthNormalizer(opt_value) {
     return anychart.utils.normalizeNumberOrPercent(opt_value, /** @type {number|string} */ (this.getOption('pointWidth')));
-  }
-  function pointWidthBeforeInvalidation() {
-    if (this.series_ && this.series_.isWidthBased())
-      this.series_.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL | anychart.ConsistencyState.APPEARANCE,
-          anychart.Signal.NEEDS_REDRAW);
   }
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'pointWidth',
-      pointWidthNormalizer,
-      0,
-      0,
-      0,
-      pointWidthBeforeInvalidation);
-  function connectMissingBeforeInvalidation() {
-    if (this.series_ && !this.series_.isWidthBased())
-      this.series_.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL | anychart.ConsistencyState.APPEARANCE,
-          anychart.Signal.NEEDS_REDRAW);
-  }
+      pointWidthNormalizer);
+
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'connectMissingPoints',
-      anychart.core.settings.booleanNormalizer,
-      0,
-      0,
-      0,
-      connectMissingBeforeInvalidation);
+      anychart.core.settings.booleanNormalizer);
 
   return map;
 })();

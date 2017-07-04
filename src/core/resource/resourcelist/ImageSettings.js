@@ -11,6 +11,14 @@ goog.require('anychart.core.settings');
  */
 anychart.core.resource.resourceList.ImageSettings = function() {
   anychart.core.resource.resourceList.ImageSettings.base(this, 'constructor');
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['size', 0, anychart.Signal.NEEDS_REDRAW],
+    ['borderRadius', 0, anychart.Signal.NEEDS_REDRAW],
+    ['opacity', 0, anychart.Signal.NEEDS_REDRAW],
+    ['align', 0, anychart.Signal.NEEDS_REDRAW],
+    ['fittingMode', 0, anychart.Signal.NEEDS_REDRAW]
+  ]);
 };
 goog.inherits(anychart.core.resource.resourceList.ImageSettings, anychart.core.resource.resourceList.SettingsWithMargin);
 
@@ -26,41 +34,31 @@ anychart.core.resource.resourceList.ImageSettings.PROPERTY_DESCRIPTORS = (functi
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'size',
-      anychart.core.settings.numberOrPercentNormalizer,
-      0,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.numberOrPercentNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'borderRadius',
-      anychart.core.settings.arrayNormalizer,
-      0,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.arrayNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'opacity',
-      anychart.core.settings.ratioNormalizer,
-      0,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.ratioNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'align',
-      anychart.core.settings.stringNormalizer,
-      0,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.stringNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'fittingMode',
-      anychart.core.settings.stringNormalizer,
-      0,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.stringNormalizer);
 
   return map;
 })();

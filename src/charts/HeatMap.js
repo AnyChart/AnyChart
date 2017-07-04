@@ -48,6 +48,16 @@ anychart.charts.HeatMap = function(opt_data, opt_csvSettings) {
    * @private
    */
   this.series_ = /** @type {anychart.core.series.HeatMap} */(this.createSeriesByType('', opt_data || null, opt_csvSettings));
+
+  /**
+   * @this {anychart.charts.HeatMap}
+   */
+  function beforeInvalidation() {
+    this.series_.invalidate(anychart.ConsistencyState.SERIES_LABELS);
+  }
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['labelsDisplayMode', anychart.ConsistencyState.SERIES_CHART_SERIES, anychart.Signal.NEEDS_REDRAW, 0, beforeInvalidation]
+  ]);
 };
 goog.inherits(anychart.charts.HeatMap, anychart.core.CartesianBase);
 
@@ -469,18 +479,11 @@ anychart.charts.HeatMap.prototype.legendItemOut = function(item, event) {
 anychart.charts.HeatMap.PROPERTY_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  function beforeInvalidation() {
-    this.series_.invalidate(anychart.ConsistencyState.SERIES_LABELS);
-  }
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'labelsDisplayMode',
-      anychart.enums.normalizeLabelsDisplayMode,
-      anychart.ConsistencyState.SERIES_CHART_SERIES,
-      anychart.Signal.NEEDS_REDRAW,
-      0,
-      beforeInvalidation);
+      anychart.enums.normalizeLabelsDisplayMode);
   return map;
 })();
 anychart.core.settings.populate(anychart.charts.HeatMap, anychart.charts.HeatMap.PROPERTY_DESCRIPTORS);

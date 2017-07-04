@@ -54,6 +54,10 @@ anychart.charts.Mekko = function(opt_useCategoryScale, opt_barmekkoMode) {
 
   this.setOption('pointsPadding', 0);
   this.setOption('defaultSeriesType', anychart.enums.MekkoSeriesType.MEKKO);
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['pointsPadding', anychart.ConsistencyState.ALL, anychart.Signal.NEEDS_REDRAW]
+  ]);
 };
 goog.inherits(anychart.charts.Mekko, anychart.core.ChartWithAxes);
 
@@ -410,9 +414,7 @@ anychart.charts.Mekko.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'pointsPadding',
-      anychart.core.settings.asIsNormalizer,
-      anychart.ConsistencyState.ALL,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.asIsNormalizer);
 
   return map;
 })();

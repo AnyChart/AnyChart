@@ -11,6 +11,30 @@ goog.require('anychart.core.settings');
  */
 anychart.core.resource.resourceList.TextSettings = function() {
   anychart.core.resource.resourceList.TextSettings.base(this, 'constructor');
+
+  //TODO(AntonKagakin): rework anychart.core.settings.createTextProperties to use it here
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['fontSize', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
+    ['fontFamily', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
+    ['fontColor', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
+    ['fontOpacity', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
+    ['fontDecoration', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
+    ['fontStyle', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
+    ['fontVariant', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
+    ['fontWeight', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
+    ['letterSpacing', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
+    ['textDirection', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
+    ['lineHeight', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
+    ['textIndent', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
+    ['vAlign', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
+    ['hAlign', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
+    ['wordWrap', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
+    ['wordBreak', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
+    ['textOverflow', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
+    ['selectable', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
+    ['useHtml', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
+    ['disablePointerEvents', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW]
+  ]);
 };
 goog.inherits(anychart.core.resource.resourceList.TextSettings, anychart.core.resource.resourceList.SettingsWithMargin);
 
@@ -26,161 +50,121 @@ anychart.core.resource.resourceList.TextSettings.PROPERTY_DESCRIPTORS = (functio
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'fontSize',
-      anychart.core.settings.stringNormalizer,
-      0,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.stringNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'fontFamily',
-      anychart.core.settings.stringNormalizer,
-      0,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.stringNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'fontColor',
-      anychart.core.settings.stringNormalizer,
-      0,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.stringNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'fontOpacity',
-      anychart.core.settings.ratioNormalizer,
-      0,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.ratioNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'fontDecoration',
-      anychart.enums.normalizeFontDecoration,
-      0,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.enums.normalizeFontDecoration);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'fontStyle',
-      anychart.enums.normalizeFontStyle,
-      0,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.enums.normalizeFontStyle);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'fontVariant',
-      anychart.enums.normalizeFontVariant,
-      0,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.enums.normalizeFontVariant);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'fontWeight',
-      anychart.core.settings.numberOrStringNormalizer,
-      0,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.numberOrStringNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'letterSpacing',
-      anychart.core.settings.numberOrStringNormalizer,
-      0,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.numberOrStringNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'textDirection',
-      anychart.enums.normalizeTextDirection,
-      0,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.enums.normalizeTextDirection);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'lineHeight',
-      anychart.core.settings.numberOrStringNormalizer,
-      0,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.numberOrStringNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'textIndent',
-      anychart.core.settings.numberNormalizer,
-      0,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.numberNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'vAlign',
-      anychart.enums.normalizeVAlign,
-      0,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.enums.normalizeVAlign);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'hAlign',
-      anychart.enums.normalizeHAlign,
-      0,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.enums.normalizeHAlign);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'wordWrap',
-      anychart.core.settings.asIsNormalizer,
-      0,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.asIsNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'wordBreak',
-      anychart.core.settings.asIsNormalizer,
-      0,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.asIsNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'textOverflow',
-      anychart.core.settings.stringNormalizer,
-      0,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.stringNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'selectable',
-      anychart.core.settings.booleanNormalizer,
-      0,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.booleanNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'useHtml',
-      anychart.core.settings.booleanNormalizer,
-      0,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.booleanNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'disablePointerEvents',
-      anychart.core.settings.booleanNormalizer,
-      0,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.booleanNormalizer);
 
   return map;
 })();

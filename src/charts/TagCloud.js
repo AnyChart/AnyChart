@@ -23,7 +23,6 @@ goog.require('anychart.format.Context');
  * @constructor
  * @extends {anychart.core.SeparateChart}
  * @implements {anychart.core.utils.IInteractiveSeries}
- * @implements {anychart.core.settings.IObjectWithSettings}
  */
 anychart.charts.TagCloud = function(opt_data, opt_settings) {
   anychart.charts.TagCloud.base(this, 'constructor');
@@ -102,6 +101,14 @@ anychart.charts.TagCloud = function(opt_data, opt_settings) {
   this.normalizedData;
 
   this.data(opt_data || null, opt_settings);
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['mode', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW],
+    ['fromAngle', anychart.ConsistencyState.TAG_CLOUD_ANGLES, anychart.Signal.NEEDS_REDRAW],
+    ['toAngle', anychart.ConsistencyState.TAG_CLOUD_ANGLES, anychart.Signal.NEEDS_REDRAW],
+    ['anglesCount', anychart.ConsistencyState.TAG_CLOUD_ANGLES, anychart.Signal.NEEDS_REDRAW],
+    ['textSpacing', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW]
+  ]);
 };
 goog.inherits(anychart.charts.TagCloud, anychart.core.SeparateChart);
 
@@ -167,41 +174,31 @@ anychart.charts.TagCloud.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'mode',
-      anychart.enums.normalizeTagCloudMode,
-      anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.enums.normalizeTagCloudMode);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'fromAngle',
-      anychart.core.settings.numberNormalizer,
-      anychart.ConsistencyState.TAG_CLOUD_ANGLES,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.numberNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'toAngle',
-      anychart.core.settings.numberNormalizer,
-      anychart.ConsistencyState.TAG_CLOUD_ANGLES,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.numberNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'anglesCount',
-      anychart.core.settings.numberNormalizer,
-      anychart.ConsistencyState.TAG_CLOUD_ANGLES,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.numberNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'textSpacing',
-      anychart.core.settings.numberNormalizer,
-      anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.numberNormalizer);
 
   return map;
 })();

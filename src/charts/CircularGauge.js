@@ -93,6 +93,27 @@ anychart.charts.CircularGauge = function(opt_data, opt_csvSettings) {
 
   this.bindHandlersToComponent(this, this.handleMouseOverAndMove, this.handleMouseOut, null, this.handleMouseOverAndMove, null, this.handleMouseDown);
 
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['fill',
+      anychart.ConsistencyState.APPEARANCE,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND],
+    ['stroke',
+      anychart.ConsistencyState.APPEARANCE,
+      anychart.Signal.NEEDS_REDRAW],
+    ['circularPadding',
+      anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW],
+    ['encloseWithStraightLine',
+      anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW],
+    ['startAngle',
+      anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW],
+    ['sweepAngle',
+      anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW]
+  ]);
+
   this.resumeSignalsDispatching(true);
 };
 goog.inherits(anychart.charts.CircularGauge, anychart.core.Chart);
@@ -723,33 +744,25 @@ anychart.charts.CircularGauge.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'fill',
-      anychart.core.settings.fillNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
+      anychart.core.settings.fillNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'stroke',
-      anychart.core.settings.strokeNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.strokeNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'circularPadding',
-      anychart.utils.normalizeToPercent,
-      anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.utils.normalizeToPercent);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'encloseWithStraightLine',
-      anychart.core.settings.asIsNormalizer,
-      anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.asIsNormalizer);
 
   function startAngleNormalizer(opt_value) {
     return goog.math.standardAngle(anychart.utils.toNumber(opt_value) || 0);
@@ -758,9 +771,7 @@ anychart.charts.CircularGauge.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'startAngle',
-      startAngleNormalizer,
-      anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW);
+      startAngleNormalizer);
 
   function sweepAngleNormalizer(opt_value) {
     return goog.math.clamp(anychart.utils.toNumber(opt_value) || 0, -360, 360);
@@ -769,9 +780,7 @@ anychart.charts.CircularGauge.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'sweepAngle',
-      sweepAngleNormalizer,
-      anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW);
+      sweepAngleNormalizer);
 
   return map;
 })();

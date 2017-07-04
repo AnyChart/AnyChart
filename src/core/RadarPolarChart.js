@@ -30,6 +30,20 @@ anychart.core.RadarPolarChart = function(categorizeData) {
    * @private
    */
   this.minorGrids_ = [];
+
+  function beforeInvalidation() {
+    for (var i = 0; i < this.seriesList.length; i++) {
+      this.seriesList[i].invalidate(anychart.ConsistencyState.SERIES_POINTS);
+    }
+  }
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['startAngle', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW],
+    ['innerRadius',
+      anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.SERIES_CHART_SERIES,
+      anychart.Signal.NEEDS_REDRAW,
+      0,
+      beforeInvalidation]
+  ]);
 };
 goog.inherits(anychart.core.RadarPolarChart, anychart.core.ChartWithOrthogonalScales);
 
@@ -63,27 +77,17 @@ anychart.core.RadarPolarChart.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'startAngle',
-      startAngleNormalizer,
-      anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW);
+      startAngleNormalizer);
 
   function innerRadiusNormalizer(opt_value) {
     return anychart.utils.normalizeNumberOrPercent(opt_value, this.getOption('innerRadius'));
   }
-  function beforeInvalidation() {
-    for (var i = 0; i < this.seriesList.length; i++) {
-      this.seriesList[i].invalidate(anychart.ConsistencyState.SERIES_POINTS);
-    }
-  }
+
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'innerRadius',
-      innerRadiusNormalizer,
-      anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.SERIES_CHART_SERIES,
-      anychart.Signal.NEEDS_REDRAW,
-      0,
-      beforeInvalidation);
+      innerRadiusNormalizer);
 
   return map;
 })();

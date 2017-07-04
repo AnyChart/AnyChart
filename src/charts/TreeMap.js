@@ -81,6 +81,20 @@ anychart.charts.TreeMap = function(opt_data, opt_fillMethod) {
   this.state = new anychart.core.utils.InteractivityState(this);
 
   this.data(opt_data, opt_fillMethod);
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['maxDepth',
+      anychart.ConsistencyState.CHART_LEGEND | anychart.ConsistencyState.TREEMAP_NODE_TYPES | anychart.ConsistencyState.APPEARANCE,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_COLOR_RANGE],
+    ['hintDepth',
+      anychart.ConsistencyState.TREEMAP_NODE_TYPES | anychart.ConsistencyState.APPEARANCE,
+      anychart.Signal.NEEDS_REDRAW],
+    ['hintOpacity', anychart.ConsistencyState.TREEMAP_HINT_OPACITY, anychart.Signal.NEEDS_REDRAW],
+    ['maxHeadersHeight', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['sort', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['headersDisplayMode', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['labelsDisplayMode', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW]
+  ]);
 };
 goog.inherits(anychart.charts.TreeMap, anychart.core.SeparateChart);
 
@@ -129,9 +143,7 @@ anychart.charts.TreeMap.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'maxDepth',
-      maxDepthNormalizer,
-      anychart.ConsistencyState.CHART_LEGEND | anychart.ConsistencyState.TREEMAP_NODE_TYPES | anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_COLOR_RANGE);
+      maxDepthNormalizer);
   function hintDepthNormalizer(opt_value) {
     return anychart.utils.normalizeToNaturalNumber(opt_value, 0, false);
   }
@@ -139,23 +151,17 @@ anychart.charts.TreeMap.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'hintDepth',
-      hintDepthNormalizer,
-      anychart.ConsistencyState.TREEMAP_NODE_TYPES | anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      hintDepthNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'hintOpacity',
-      anychart.core.settings.ratioNormalizer,
-      anychart.ConsistencyState.TREEMAP_HINT_OPACITY,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.ratioNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'maxHeadersHeight',
-      anychart.core.settings.asIsNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.asIsNormalizer);
   function sortNormalizer(opt_value) {
     return anychart.enums.normalizeSort(opt_value, anychart.enums.Sort.DESC);
   }
@@ -163,23 +169,17 @@ anychart.charts.TreeMap.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'sort',
-      sortNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      sortNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'headersDisplayMode',
-      anychart.enums.normalizeLabelsDisplayMode,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.enums.normalizeLabelsDisplayMode);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'labelsDisplayMode',
-      anychart.enums.normalizeLabelsDisplayMode,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.enums.normalizeLabelsDisplayMode);
 
   return map;
 })();

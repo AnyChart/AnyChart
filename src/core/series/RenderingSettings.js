@@ -9,7 +9,6 @@ goog.require('anychart.core.settings');
  * @param {anychart.core.series.Base} series
  * @constructor
  * @extends {anychart.core.Base}
- * @implements {anychart.core.settings.IObjectWithSettings}
  */
 anychart.core.series.RenderingSettings = function(series) {
   anychart.core.series.RenderingSettings.base(this, 'constructor');
@@ -22,23 +21,21 @@ anychart.core.series.RenderingSettings = function(series) {
   this.series_ = series;
 
   /**
-   * Settings obj.
-   * @type {Object}
-   */
-  this.settings = {};
-
-  /**
-   * Defaults.
-   * @type {Object}
-   */
-  this.defaultSettings = {};
-
-  /**
    * Shapes settings.
    * @type {?Array.<anychart.core.shapeManagers.ShapeConfig>}
    * @private
    */
   this.shapes_ = null;
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['start', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
+    ['point', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
+    ['updatePoint', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
+    ['finish', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
+    ['needsZero', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_RECALCULATION],
+    ['needsWidth', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_RECALCULATION],
+    ['yValues', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_RECALCULATION]
+  ]);
 };
 goog.inherits(anychart.core.series.RenderingSettings, anychart.core.Base);
 
@@ -224,9 +221,9 @@ anychart.core.series.RenderingSettings.prototype.getShapesConfig = function() {
  * Resets rendering settings to default values.
  */
 anychart.core.series.RenderingSettings.prototype.setDefaults = function() {
-  this.defaultSettings['needsZero'] = this.series_.check(anychart.core.drawers.Capabilities.NEEDS_ZERO);
-  this.defaultSettings['needsWidth'] = this.series_.check(anychart.core.drawers.Capabilities.IS_WIDTH_BASED);
-  this.defaultSettings['yValues'] = goog.array.slice(this.series_.drawer.getYValueNames(), 0);
+  this.themeSettings['needsZero'] = this.series_.check(anychart.core.drawers.Capabilities.NEEDS_ZERO);
+  this.themeSettings['needsWidth'] = this.series_.check(anychart.core.drawers.Capabilities.IS_WIDTH_BASED);
+  this.themeSettings['yValues'] = goog.array.slice(this.series_.drawer.getYValueNames(), 0);
 };
 
 
@@ -241,57 +238,43 @@ anychart.core.series.RenderingSettings.DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'start',
-      anychart.core.settings.functionNormalizer,
-      anychart.ConsistencyState.ONLY_DISPATCHING,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.functionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'point',
-      anychart.core.settings.functionNormalizer,
-      anychart.ConsistencyState.ONLY_DISPATCHING,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.functionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'updatePoint',
-      anychart.core.settings.functionNormalizer,
-      anychart.ConsistencyState.ONLY_DISPATCHING,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.functionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'finish',
-      anychart.core.settings.functionNormalizer,
-      anychart.ConsistencyState.ONLY_DISPATCHING,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.functionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'needsZero',
-      anychart.core.settings.booleanNormalizer,
-      anychart.ConsistencyState.ONLY_DISPATCHING,
-      anychart.Signal.NEEDS_RECALCULATION);
+      anychart.core.settings.booleanNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'needsWidth',
-      anychart.core.settings.booleanNormalizer,
-      anychart.ConsistencyState.ONLY_DISPATCHING,
-      anychart.Signal.NEEDS_RECALCULATION);
+      anychart.core.settings.booleanNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'yValues',
-      anychart.core.settings.arrayNormalizer,
-      anychart.ConsistencyState.ONLY_DISPATCHING,
-      anychart.Signal.NEEDS_RECALCULATION);
+      anychart.core.settings.arrayNormalizer);
 
   return map;
 })();
@@ -299,69 +282,15 @@ anychart.core.settings.populate(anychart.core.series.RenderingSettings, anychart
 
 
 //endregion
-//region --- IObjectWithSettings impl
+//region --- IObjectWithSettings overrides
 //----------------------------------------------------------------------------------------------------------------------
 //
-//  IObjectWithSettings impl
+//  IObjectWithSettings overrides
 //
 //----------------------------------------------------------------------------------------------------------------------
-/**
- * Returns option value if it was set directly to the object.
- * @param {string} name
- * @return {*}
- */
-anychart.core.series.RenderingSettings.prototype.getOwnOption = function(name) {
-  return this.settings[name];
-};
-
-
-/**
- * Returns true if the option value was set directly to the object.
- * @param {string} name
- * @return {boolean}
- */
+/** @inheritDoc */
 anychart.core.series.RenderingSettings.prototype.hasOwnOption = function(name) {
-  return goog.isDefAndNotNull(this.settings[name]);
-};
-
-
-/**
- * Returns option value from the theme if any.
- * @param {string} name
- * @return {*}
- */
-anychart.core.series.RenderingSettings.prototype.getThemeOption = function(name) {
-  return this.defaultSettings[name];
-};
-
-
-/**
- * Returns option value by priorities.
- * @param {string} name
- * @return {*}
- */
-anychart.core.series.RenderingSettings.prototype.getOption = function(name) {
-  return this.hasOwnOption(name) ? this.getOwnOption(name) : this.getThemeOption(name);
-};
-
-
-/**
- * Sets option value to the instance.
- * @param {string} name
- * @param {*} value
- */
-anychart.core.series.RenderingSettings.prototype.setOption = function(name, value) {
-  this.settings[name] = value;
-};
-
-
-/**
- * Performs checks on the instance to determine whether the state should be invalidated after option change.
- * @param {number} flags
- * @return {boolean}
- */
-anychart.core.series.RenderingSettings.prototype.check = function(flags) {
-  return true;
+  return goog.isDefAndNotNull(this.ownSettings[name]);
 };
 
 
@@ -406,7 +335,6 @@ anychart.core.series.RenderingSettings.prototype.setupSpecial = function(isDefau
 /** @inheritDoc */
 anychart.core.series.RenderingSettings.prototype.disposeInternal = function() {
   anychart.core.series.RenderingSettings.base(this, 'disposeInternal');
-  this.settings = null;
   this.series_ = null;
   this.shapes_ = null;
 };

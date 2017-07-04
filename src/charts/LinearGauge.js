@@ -60,6 +60,12 @@ anychart.charts.LinearGauge = function(opt_data, opt_csvSettings) {
   this.markersCount_ = 0;
 
   this.data(opt_data || null, opt_csvSettings);
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['globalOffset', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW],
+    ['layout', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW],
+    ['defaultPointerType', 0, 0]
+  ]);
 };
 goog.inherits(anychart.charts.LinearGauge, anychart.core.SeparateChart);
 
@@ -120,25 +126,19 @@ anychart.charts.LinearGauge.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'globalOffset',
-      anychart.utils.normalizeToPercent,
-      anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.utils.normalizeToPercent);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'layout',
-      anychart.enums.normalizeLayout,
-      anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.enums.normalizeLayout);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'defaultPointerType',
-      anychart.enums.normalizeLinearGaugePointerType,
-      0,
-      0);
+      anychart.enums.normalizeLinearGaugePointerType);
   return map;
 })();
 anychart.core.settings.populate(anychart.charts.LinearGauge, anychart.charts.LinearGauge.PROPERTY_DESCRIPTORS);
