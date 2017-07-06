@@ -657,7 +657,7 @@ anychart.core.axes.Polar.prototype.calculateAxisBounds_ = function() {
 
       radiusDelta = Math.min(radiusDelta, this.originalRadius_);
 
-      var isCircularInsidePosition = label.getFinalSettings('position') != 'normal' && hasFill;
+      var isCircularInsidePosition = label && label.getFinalSettings('position') != 'normal' && hasFill;
       if (radiusDelta) {
         var delta = radiusDelta;
         for (i = 0; i < labelsOrder.length; i++) {
