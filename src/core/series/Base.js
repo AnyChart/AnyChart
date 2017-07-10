@@ -643,7 +643,7 @@ anychart.core.series.Base.prototype.applyConfig = function(config, opt_reapplyCl
 
   this.recreateShapeManager();
 
-  this.themeSettings = this.plot.defaultSeriesSettings()[this.type_] || {};
+  this.themeSettings = this.plot.defaultSeriesSettings()[anychart.utils.toCamelCase(this.type_)] || {};
 
   if (this.supportsOutliers()) {
     this.indexToMarkerIndexes_ = {};
@@ -3856,6 +3856,8 @@ anychart.core.series.Base.prototype.createPositionProvider = function(position, 
       point = this.createPositionProviderByGeometry(/** @type {anychart.enums.Anchor} */(anchor));
     } else {
       point = this.createPositionProviderByData(position);
+      if (isNaN(point['x']) || isNaN(point['y']))
+        point = this.createPositionProviderByGeometry(anychart.enums.Anchor.CENTER_TOP);
     }
 
     if (opt_shift3D && this.check(anychart.core.drawers.Capabilities.IS_3D_BASED)) {

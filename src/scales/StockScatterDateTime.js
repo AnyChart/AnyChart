@@ -456,18 +456,11 @@ anychart.scales.StockScatterDateTime.prototype.ticksInvalidated_ = function(even
 anychart.scales.StockScatterDateTime.askedForScatter = function(type) {
   type = (type + '').toLowerCase();
   switch (type) {
-    case 'lin':
     case 'linear':
     case 'scatter':
     case 'datetime':
-    case 's':
     case 'simple':
       return true;
-    //case 'ordinal':
-    //case 'ord':
-    //case 'o':
-    //case 'default':
-    //  return new anychart.scales.StockOrdinalDateTime(chart);
     default:
       return false;
   }

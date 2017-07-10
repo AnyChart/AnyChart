@@ -41,7 +41,7 @@ anychart.core.ui.LegendItem = function() {
   this.nonNullableStrokes_ = {
     'line': 'black',
     'spline': 'black',
-    'stepline': 'black',
+    'step-line': 'black',
     'ohlc': 'black',
     'candlestick': 'black'
   };
@@ -54,7 +54,7 @@ anychart.core.ui.LegendItem = function() {
   this.shouldBeNullFills_ = {
     'line': true,
     'spline': true,
-    'stepline': true,
+    'step-line': true,
     'ohlc': true
   };
 

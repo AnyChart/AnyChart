@@ -914,7 +914,7 @@ anychart.charts.Sparkline.prototype.createSeriesByType_ = function(type) {
     instance.setAutoZIndex(anychart.charts.Sparkline.ZINDEX_SERIES);
     instance.listenSignals(this.seriesInvalidated_, this);
 
-    this.seriesDefaults_ = this.defaultSeriesSettings()[type] || this.series_.getDefaults();
+    this.seriesDefaults_ = this.defaultSeriesSettings()[anychart.utils.toCamelCase(type)] || this.series_.getDefaults();
 
     this.invalidate(anychart.ConsistencyState.SPARK_SERIES | anychart.ConsistencyState.SPARK_SCALES,
         anychart.Signal.NEEDS_REDRAW);

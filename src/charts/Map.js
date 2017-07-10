@@ -240,7 +240,7 @@ anychart.charts.Map = function() {
    */
   this.callouts_ = [];
 
-  this.unboundRegions(true);
+  this.unboundRegions(anychart.enums.MapUnboundRegionsMode.AS_IS);
   this.setOption('defaultSeriesType', anychart.enums.MapSeriesType.CHOROPLETH);
 
   this.eventsHandler.listen(this, [goog.events.EventType.POINTERDOWN, acgraph.events.EventType.TOUCHSTART], this.tapHandler);
@@ -2037,7 +2037,7 @@ anychart.charts.Map.prototype.yScale = function() {return null};
 
 /**
  * Sets/gets settings for regions doesn't linked to anything regions.
- * @param {(Object|boolean)=} opt_value Settings object or boolean value like enabled state.
+ * @param {(Object|string)=} opt_value Settings object or boolean value like enabled state.
  * @return {anychart.core.utils.UnboundRegionsSettings|anychart.charts.Map}
  */
 anychart.charts.Map.prototype.unboundRegions = function(opt_value) {
@@ -5048,10 +5048,10 @@ anychart.charts.Map.prototype.setupByJSON = function(config, opt_default) {
       var type = goog.isString(json) ? json : json['type'];
       type = (type + '').toLowerCase();
       switch (type) {
-        case 'ordinalcolor':
+        case anychart.enums.ScaleTypes.ORDINAL_COLOR:
           scale = anychart.scales.ordinalColor();
           break;
-        case 'linearcolor':
+        case anychart.enums.ScaleTypes.LINEAR_COLOR:
           scale = anychart.scales.linearColor();
           break;
         default:

@@ -99,7 +99,7 @@ anychart.core.ChartWithSeries.prototype.SUPPORTED_CONSISTENCY_STATES =
  * @param {!Object} configs
  */
 anychart.core.ChartWithSeries.generateSeriesConstructors = function(chartConstructor, configs) {
-  var proto = chartConstructor.prototype;
+  var prototype = chartConstructor.prototype;
   var methodsGenerator = function(name) {
     return function(data, opt_csvSettings) {
       return this.createSeriesByType(
@@ -109,6 +109,7 @@ anychart.core.ChartWithSeries.generateSeriesConstructors = function(chartConstru
     };
   };
   for (var i in configs) {
+    var methodName = anychart.utils.toCamelCase(i);
     /**
      * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
      * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
@@ -116,7 +117,7 @@ anychart.core.ChartWithSeries.generateSeriesConstructors = function(chartConstru
      * @return {anychart.core.series.Cartesian}
      * @this {anychart.core.ChartWithSeries}
      */
-    proto[i] = methodsGenerator(i);
+    prototype[methodName] = methodsGenerator(i);
   }
 };
 
@@ -871,25 +872,25 @@ anychart.core.ChartWithSeries.seriesReferenceValues = {
   'column': ['value'],
   'spline': ['value'],
   'marker': ['value'],
-  'stepArea': ['value'],
-  'stepLine:': ['value'],
-  'splineArea': ['value'],
-  'jumpLine': ['value'],
+  'step-area': ['value'],
+  'step-line:': ['value'],
+  'spline-area': ['value'],
+  'jump-line': ['value'],
   'stick': ['value'],
   'mekko': ['value'],
   'bubble': ['value', 'size'],
-  'rangeBar': ['high', 'low'],
-  'rangeArea': ['high', 'low'],
-  'rangeColumn': ['high', 'low'],
-  'rangeStepArea': ['high', 'low'],
-  'rangeSplineArea': ['high', 'low'],
+  'range-bar': ['high', 'low'],
+  'range-area': ['high', 'low'],
+  'range-column': ['high', 'low'],
+  'range-step-area': ['high', 'low'],
+  'range-spline-area': ['high', 'low'],
   'ohlc': ['open', 'high', 'low', 'close'],
   'candlestick': ['open', 'high', 'low', 'close'],
   'box': ['lowest', 'q1', 'median', 'q3', 'highest'],
   'connector': ['points'],
   'choropleth': ['id', 'value'],
-  'markerMap': ['id', 'long', 'lat'],
-  'bubbleMap': ['id', 'long', 'lat', 'size'],
+  'marker-map': ['id', 'long', 'lat'],
+  'bubble-map': ['id', 'long', 'lat', 'size'],
   'hilo': ['high', 'low'],
   'waterfall': ['value']
 };

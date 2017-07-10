@@ -62,7 +62,7 @@ anychart.gauges.thermometer = function(opt_data, opt_csvSettings) {
   gauge.setOption('defaultPointerType', anychart.enums.LinearGaugePointerType.THERMOMETER);
   gauge.setType(anychart.enums.GaugeTypes.THERMOMETER);
 
-  gauge.setupInternal(true, anychart.getFullTheme('thermometerGauge'));
+  gauge.setupInternal(true, anychart.getFullTheme('thermometer'));
 
   return gauge;
 };
@@ -82,7 +82,7 @@ anychart.gauges.tank = function(opt_data, opt_csvSettings) {
   gauge.setOption('defaultPointerType', anychart.enums.LinearGaugePointerType.TANK);
   gauge.setType(anychart.enums.GaugeTypes.TANK);
 
-  gauge.setupInternal(true, anychart.getFullTheme('tankGauge'));
+  gauge.setupInternal(true, anychart.getFullTheme('tank'));
 
   return gauge;
 };
@@ -102,7 +102,7 @@ anychart.gauges.led = function(opt_data, opt_csvSettings) {
   gauge.setOption('defaultPointerType', anychart.enums.LinearGaugePointerType.LED);
   gauge.setType(anychart.enums.GaugeTypes.LED);
 
-  gauge.setupInternal(true, anychart.getFullTheme('ledGauge'));
+  gauge.setupInternal(true, anychart.getFullTheme('led'));
 
   return gauge;
 };

@@ -119,12 +119,14 @@ anychart.themes.merging.mergeScale = function(scaleObj, index, chartType, defaul
 
   scaleType = scaleObj['type'] || defaultType;
   var scaleDefault;
-  if (String(scaleType).toLowerCase() == 'ordinalcolor') {
+  if (scaleType == anychart.enums.ScaleTypes.ORDINAL_COLOR) {
     anychart.getFullTheme('defaultOrdinalColorScale');
-  } else if (String(scaleType).toLowerCase() == 'linearcolor') {
+  } else if (scaleType == anychart.enums.ScaleTypes.LINEAR_COLOR) {
     anychart.getFullTheme('defaultLinearColorScale');
   } else {
-    scaleDefault = anychart.themes.merging.getThemePart_(anychart.getFullTheme('defaultScaleSettings'), [scaleType]);
+    scaleDefault = anychart.themes.merging.getThemePart_(
+        anychart.getFullTheme('defaultScaleSettings'),
+        [anychart.utils.toCamelCase(scaleType)]);
   }
 
   return /** @type {Object} */ (anychart.themes.merging.merge(scaleObj, scaleDefault));
@@ -1375,10 +1377,9 @@ anychart.themes.merging.mergingMap_ = [
   {
     defaultObj: 'linearGauge',
     targets: [
-      'bulletGauge',
-      'thermometerGauge',
-      'tankGauge',
-      'ledGauge'
+      'thermometer',
+      'tank',
+      'led'
     ]
   },
   {

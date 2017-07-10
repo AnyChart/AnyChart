@@ -313,7 +313,7 @@ anychart.core.annotations.ChartController.prototype.createAnnotationByType = fun
   }
   type = anychart.enums.normalizeAnnotationType(type);
   var annotation = /** @type {anychart.core.annotations.Base} */(new anychart.core.annotations.AnnotationTypes[type](this));
-  annotation.setDefaultSettings(this.chart_.defaultAnnotationSettings()[annotation.getType()]);
+  annotation.setDefaultSettings(this.chart_.defaultAnnotationSettings()[anychart.utils.toCamelCase(annotation.getType())]);
   annotation.setup(config);
   return annotation;
 };

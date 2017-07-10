@@ -1758,14 +1758,14 @@ anychart.core.Chart.prototype.getNormalizedType_ = function() {
   switch (type.toLowerCase()) {
     case 'map':
       return 'map';
-    case 'ganttresource':
-    case 'ganttproject':
+    case 'gantt-resource':
+    case 'gantt-project':
       return 'gantt';
-    case 'circular':
-    case 'lineargauge':
-    case 'thermometergauge':
-    case 'tankgauge':
-    case 'ledgauge':
+    case 'circular-gauge':
+    case 'linear-gauge':
+    case 'thermometer':
+    case 'tank':
+    case 'led':
       return 'gauge';
     default:
       return 'chart';

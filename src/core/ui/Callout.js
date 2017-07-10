@@ -916,16 +916,16 @@ anychart.core.ui.Callout.prototype.configureLabel = function(item, label, opt_po
 
   switch (this.orientation()) {
     case anychart.enums.Orientation.TOP:
-      label['anchor']('centerbottom');
+      label['anchor'](anychart.enums.Anchor.CENTER_BOTTOM);
       break;
     case anychart.enums.Orientation.RIGHT:
-      label['anchor']('leftcenter');
+      label['anchor'](anychart.enums.Anchor.LEFT_CENTER);
       break;
     case anychart.enums.Orientation.BOTTOM:
-      label['anchor']('centertop');
+      label['anchor'](anychart.enums.Anchor.CENTER_TOP);
       break;
     case anychart.enums.Orientation.LEFT:
-      label['anchor']('rightcenter');
+      label['anchor'](anychart.enums.Anchor.RIGHT_CENTER);
       break;
   }
 

@@ -216,14 +216,13 @@
         }
       }
     },
-
     "anychart.core.CartesianBase": {
       "type": "object",
       "allOf": [
         {"$ref": "#/definitions/anychart.core.SeparateChart"}
       ],
       "properties": {
-        "type": {"enum": ["cartesian", "cartesian3d", "area", "verticalArea", "area3d", "bar", "bar3d", "box", "bubble", "column", "column3d", "financial", "line", "verticalLine", "marker", "jumpLine", "stick", "pareto", "hilo", "waterfall"]},
+        "type": {"enum": ["cartesian", "cartesian-3d", "area", "vertical-area", "area-3d", "bar", "bar-3d", "box", "bubble", "column", "column-3d", "financial", "line", "vertical-line", "marker", "jump-line", "stick", "pareto", "hilo", "waterfall"]},
         "grids": {
           "type": "array",
           "items": {
@@ -456,21 +455,21 @@
         "type": {
           "enum": [
             "cartesian",
-            "cartesian3d",
+            "cartesian-3d",
             "area",
-            "verticalArea",
-            "area3d",
+            "vertical-area",
+            "area-3d",
             "bar",
-            "bar3d",
+            "bar-3d",
             "box",
             "bubble",
             "column",
-            "column3d",
+            "column-3d",
             "financial",
             "line",
-            "verticalLine",
+            "vertical-line",
             "marker",
-            "jumpLine",
+            "jump-line",
             "stick",
             "pareto"
           ]
@@ -1348,7 +1347,7 @@
         {"$ref": "#/definitions/anychart.core.SeparateChart"}
       ],
       "properties": {
-        "type": {"enum": ["pie", "pie3d"]},
+        "type": {"enum": ["pie", "pie-3d"]},
         "data": {"$ref": "#/definitions/data"},
         "labels": {
           "oneOf": [
@@ -1556,7 +1555,7 @@
           "enum": [
             "column",
             "line",
-            "winLoss",
+            "win-loss",
             "area"
           ]
         },
@@ -1745,7 +1744,7 @@
         {"$ref": "#/definitions/anychart.core.Chart"}
       ],
       "properties": {
-        "type": {"enum": ["heatMap"]},
+        "type": {"enum": ["heat-map"]},
         "data": {"$ref": "#/definitions/data"},
         "grids": {
           "type": "array",
@@ -1914,7 +1913,7 @@
         {"$ref": "#/definitions/anychart.core.Chart"}
       ],
       "properties": {
-        "type": {"enum": ["treeMap"]},
+        "type": {"enum": ["tree-map"]},
         "treeData": {"$ref": "#/definitions/treeData"},
         "drillTo": {"type": "array"},
 
@@ -2027,7 +2026,7 @@
         {"$ref": "#/definitions/anychart.core.SeparateChart"}
       ],
       "properties": {
-        "type": {"enum": ["tagCloud"]},
+        "type": {"enum": ["tag-cloud"]},
         "data": {"$ref": "#/definitions/data"},
         "mode": {"enum": ["rect", "spiral"]},
         "fromAngle": {"type": "number"},
@@ -2090,7 +2089,6 @@
       },
       "required": ["type"]
     },
-
     "anychart.charts.Pert": {
       "type": "object",
       "allOf": [
@@ -2119,7 +2117,6 @@
       },
       "required": ["type"]
     },
-
     "anychart.charts.Venn": {
       "type": "object",
       "allOf": [
@@ -2132,12 +2129,11 @@
       },
       "required": ["type"]
     },
-
     "anychart.gantt.Resource": {
       "type": "object",
       "allOf": [{"$ref": "#/definitions/anychart.core.SeparateChart"}],
       "properties": {
-        "type": {"enum": ["ganttResource"]},
+        "type": {"enum": ["gantt-resource"]},
         "rowStroke": {"$ref": "#/definitions/stroke"},
         "columnStroke": {"$ref": "#/definitions/stroke"},
         "headerHeight": {"type": "number"},
@@ -2157,12 +2153,11 @@
       },
       "required": ["type"]
     },
-
     "anychart.gantt.Project": {
       "type": "object",
       "allOf": [{"$ref": "#/definitions/anychart.core.SeparateChart"}],
       "properties": {
-        "type": {"enum": ["ganttProject"]},
+        "type": {"enum": ["gantt-project"]},
         "rowStroke": {"$ref": "#/definitions/stroke"},
         "columnStroke": {"$ref": "#/definitions/stroke"},
         "headerHeight": {"type": "number"},
@@ -2182,14 +2177,13 @@
       },
       "required": ["type"]
     },
-
     "anychart.charts.CircularGauge": {
       "type": "object",
       "allOf": [
         {"$ref": "#/definitions/anychart.core.Chart"}
       ],
       "properties": {
-        "type": {"enum": ["circular"]},
+        "type": {"enum": ["circular-gauge"]},
         "data": {"$ref": "#/definitions/data"},
         "stroke": {"$ref": "#/definitions/stroke"},
         "fill": {"$ref": "#/definitions/fill"},
@@ -2274,7 +2268,7 @@
         {"$ref": "#/definitions/anychart.core.Chart"}
       ],
       "properties": {
-        "type": {"enum": ["linearGauge", "thermometerGauge", "tankGauge", "ledGauge"]},
+        "type": {"enum": ["linear-gauge", "bullet", "thermometer", "tank", "led"]},
         "data": {"$ref": "#/definitions/data"},
         "defaultPointerType": {
           "type": "string"
@@ -2392,7 +2386,6 @@
       },
       "required": ["type"]
     },
-
     "anychart.charts.Map": {
       "type": "object",
       "allOf": [
@@ -2533,7 +2526,6 @@
       },
       "required": ["type"]
     },
-
     "anychart.charts.Mekko": {
       "type": "object",
       "allOf": [
@@ -2762,7 +2754,6 @@
         "selectHatchFill": {"$ref": "#/definitions/hatchFillSet"}
       }
     },
-
     "anychart.core.series.Base": {
       "type": "object",
       "allOf": [
@@ -2772,39 +2763,39 @@
         "seriesType": {
           "enum": [
             "area",
-            "verticalArea",
+            "vertical-area",
             "bar",
             "box",
-            "verticalBox",
+            "vertical-box",
             "bubble",
-            "verticalBubble",
+            "vertical-bubble",
             "candlestick",
             "column",
             "line",
-            "verticalLine",
+            "vertical-line",
             "marker",
-            "verticalMarker",
+            "vertical-marker",
             "ohlc",
-            "rangeArea",
-            "verticalRangeArea",
-            "rangeBar",
-            "rangeColumn",
-            "rangeSplineArea",
-            "verticalRangeSplineArea",
-            "rangeStepArea",
-            "verticalRangeStepArea",
+            "range-area",
+            "vertical-range-area",
+            "range-bar",
+            "range-column",
+            "range-spline-area",
+            "vertical-range-spline-area",
+            "range-step-area",
+            "vertical-range-step-area",
             "spline",
-            "verticalSpline",
-            "splineArea",
-            "verticalSplineArea",
-            "stepArea",
-            "verticalStepArea",
-            "stepLine",
-            "verticalStepLine",
-            "jumpLine",
-            "verticalJumpLine",
+            "vertical-spline",
+            "spline-area",
+            "vertical-spline-area",
+            "step-area",
+            "vertical-step-area",
+            "step-line",
+            "vertical-step-line",
+            "jump-line",
+            "vertical-jump-line",
             "stick",
-            "verticalStick",
+            "vertical-stick",
             "choropleth",
             "connector",
             "mekko",
@@ -3069,7 +3060,7 @@
         {"$ref": "#/definitions/anychart.core.polar.series.Base"}
       ],
       "properties": {
-        "seriesType": {"enum": ["column", "rangeColumn"]}
+        "seriesType": {"enum": ["column", "range-column"]}
       }
     },
     "anychart.core.polar.series.Line": {
@@ -4300,7 +4291,7 @@
         {"$ref": "#/definitions/anychart.scales.Base"}
       ],
       "properties": {
-        "type": {"enum": ["linearColor"]},
+        "type": {"enum": ["linear-color"]},
         "ticks": {"$ref": "#/definitions/anychart.scales.ScatterTicks"},
         "minorTicks": {"$ref": "#/definitions/anychart.scales.ScatterTicks"},
         "colors": {
@@ -4371,7 +4362,7 @@
         {"$ref": "#/definitions/anychart.scales.Base"}
       ],
       "properties": {
-        "type": {"enum": ["ordinalColor"]},
+        "type": {"enum": ["ordinal-color"]},
         "ticks": {"$ref": "#/definitions/anychart.scales.OrdinalTicks"},
         "colors": {
           "type": [
@@ -4399,7 +4390,7 @@
         {"$ref": "#/definitions/anychart.scales.ScatterBase"}
       ],
       "properties": {
-        "type": {"enum": ["dateTime"]},
+        "type": {"enum": ["date-time"]},
         "ticks": {"$ref": "#/definitions/anychart.scales.DateTimeTicks"},
         "minorTicks": {"$ref": "#/definitions/anychart.scales.DateTimeTicks"}
       }
@@ -5152,7 +5143,8 @@
         "textIndent": {"type": ["number", "null"]},
         "vAlign": {"enum": ["top", "middle", "bottom", "null"]},
         "hAlign": {"enum": ["left", "start", "center", "end", "right", "null"]},
-        "textWrap": {"enum": ["noWrap", "byLetter", "byWord", "null"]},
+        "wordWrap": {"enum": ["normal", "break-word", "null"]},
+        "wordBreak": {"enum": ["normal", "keep-all", "break-all", "null"]},
         "textOverflow": {"type": ["string", "null"]},
         "selectable": {"type": ["boolean", "null"]},
         "disablePointerEvents": {"type": ["boolean", "null"]},
@@ -5337,14 +5329,8 @@
             "null"
           ]
         },
-        "textWrap": {
-          "enum": [
-            "noWrap",
-            "byLetter",
-            "byWord",
-            "null"
-          ]
-        },
+        "wordWrap": {"enum": ["normal", "break-word", "null"]},
+        "wordBreak": {"enum": ["normal", "keep-all", "break-all", "null"]},
         "width": {
           "type": [
             "string",
@@ -5661,17 +5647,17 @@
 
     "anychart.enums.HoverMode": {
       "enum": [
-        "bySpot",
-        "byX",
+        "by-spot",
+        "by-x",
         "single"
       ]
     },
     "anychart.enums.SelectionMode": {
       "enum": [
         "none",
-        "singleSelect",
-        "multiSelect",
-        "drillDown"
+        "single-select",
+        "multi-select",
+        "drill-down"
       ]
     },
     "anychart.enums.Align": {
@@ -5685,28 +5671,28 @@
     },
     "anychart.enums.NinePositions": {
       "enum": [
-        "leftTop",
+        "left-top",
         "top",
-        "rightTop",
-        "leftCenter",
+        "right-top",
+        "left-center",
         "center",
-        "rightCenter",
-        "leftBottom",
+        "right-center",
+        "left-bottom",
         "bottom",
-        "rightBottom"
+        "right-bottom"
       ]
     },
     "anychart.enums.Anchor": {
       "enum": [
-        "leftTop",
-        "leftCenter",
-        "leftBottom",
-        "centerTop",
+        "left-top",
+        "left-center",
+        "left-bottom",
+        "center-top",
         "center",
-        "centerBottom",
-        "rightTop",
-        "rightCenter",
-        "rightBottom",
+        "center-bottom",
+        "right-top",
+        "right-center",
+        "right-bottom",
         "auto"
       ]
     },
@@ -5726,8 +5712,8 @@
     },
     "anychart.enums.ChartScrollerPosition": {
       "enum": [
-        "afterAxes",
-        "beforeAxes"
+        "after-axes",
+        "before-axes"
       ]
     },
     "anychart.enums.Sort": {
@@ -5742,7 +5728,7 @@
         "none",
         "cut",
         "round",
-        "roundInner"
+        "round-inner"
       ]
     },
     "anychart.enums.MarkerType": {
@@ -5752,29 +5738,29 @@
         "star6",
         "star7",
         "star10",
-        "triangleUp",
-        "triangleDown",
-        "triangleLeft",
-        "triangleRight",
+        "triangle-up",
+        "triangle-down",
+        "triangle-left",
+        "triangle-right",
         "cross",
         "diamond",
-        "diagonalCross",
+        "diagonal-cross",
         "circle",
         "square",
         "trapezium",
         "pentagon",
         "line",
-        "vline",
+        "v-line",
         "x",
         "ellipse",
         "bar",
         "trapezoid",
         "arrow",
         "arrowhead",
-        "arrowUp",
-        "arrowDown",
-        "arrowLeft",
-        "arrowRight"
+        "arrow-up",
+        "arrow-down",
+        "arrow-left",
+        "arrow-right"
       ]
     },
     "anychart.enums.Layout": {
@@ -5786,9 +5772,9 @@
     "anychart.enums.LegendLayout": {
       "enum": [
         "vertical",
-        "verticalexpandable",
+        "vertical-expandable",
         "horizontal",
-        "horizontalexpandable"
+        "horizontal-expandable"
       ]
     },
     "anychart.enums.RadialGridLayout": {
@@ -5799,13 +5785,14 @@
     },
     "anychart.enums.LabelsOverlapMode": {
       "enum": [
-        "noOverlap",
-        "allowOverlap"
+        "no-overlap",
+        "allow-overlap",
+        "auto-width"
       ]
     },
     "anychart.enums.LabelsDisplayMode": {
       "enum": [
-        "alwaysShow",
+        "always-show",
         "clip",
         "drop"
       ]
@@ -5879,38 +5866,38 @@
 
     "acgraph.vector.HatchFill.HatchFillType": {
       "enum": [
-        "backwardDiagonal",
-        "forwardDiagonal",
+        "backward-diagonal",
+        "forward-diagonal",
         "horizontal",
         "vertical",
-        "dashedBackwardDiagonal",
+        "dashed-backward-diagonal",
         "grid",
-        "dashedForwardDiagonal",
-        "dashedHorizontal",
-        "dashedVertical",
-        "diagonalCross",
-        "diagonalBrick",
+        "dashed-forward-diagonal",
+        "dashed-horizontal",
+        "dashed-vertical",
+        "diagonal-cross",
+        "diagonal-brick",
         "divot",
-        "horizontalBrick",
-        "verticalBrick",
-        "checkerBoard",
+        "horizontal-brick",
+        "vertical-brick",
+        "checker-board",
         "confetti",
         "plaid",
-        "solidDiamond",
-        "zigZag",
+        "solid-diamond",
+        "zig-zag",
         "weave",
-        "percent05",
-        "percent10",
-        "percent20",
-        "percent25",
-        "percent30",
-        "percent40",
-        "percent50",
-        "percent60",
-        "percent70",
-        "percent75",
-        "percent80",
-        "percent90"
+        "percent-05",
+        "percent-10",
+        "percent-20",
+        "percent-25",
+        "percent-30",
+        "percent-40",
+        "percent-50",
+        "percent-60",
+        "percent-70",
+        "percent-75",
+        "percent-80",
+        "percent-90"
       ]
     },
 

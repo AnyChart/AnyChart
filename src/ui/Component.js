@@ -50,11 +50,11 @@ anychart.ui.Component.prototype.removeAllListeners = function(opt_type) {
 
 
 //exports
-(function() {
-  var proto = anychart.ui.Component.prototype;
-  proto['listen'] = proto.listen;
-  proto['listenOnce'] = proto.listenOnce;
-  proto['unlisten'] = proto.unlisten;
-  proto['unlistenByKey'] = proto.unlistenByKey;
-  proto['removeAllListeners'] = proto.removeAllListeners;
-})();
+// (function() {
+//   var proto = anychart.ui.Component.prototype;
+//   proto['listen'] = proto.listen;
+//   proto['listenOnce'] = proto.listenOnce;
+//   proto['unlisten'] = proto.unlisten;
+//   proto['unlistenByKey'] = proto.unlistenByKey;
+//   proto['removeAllListeners'] = proto.removeAllListeners;
+// })();

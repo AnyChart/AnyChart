@@ -358,7 +358,7 @@ anychart.charts.LinearGauge.prototype.getAllSeries = function() {
  */
 anychart.charts.LinearGauge.prototype.createPointerByType_ = function(type, dataIndex) {
   type = anychart.enums.normalizeLinearGaugePointerType(type);
-  var config = this.defaultPointerSettings()[type];
+  var config = this.defaultPointerSettings()[anychart.utils.toCamelCase(type)];
   var ctl = anychart.charts.LinearGauge.PointersTypesMap[type];
   /**
    * @type {anychart.core.linearGauge.pointers.Base}

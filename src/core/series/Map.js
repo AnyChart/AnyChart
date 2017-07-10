@@ -456,6 +456,7 @@ anychart.core.series.Map.prototype.getAnchorForLabel = function(angle) {
  */
 anychart.core.series.Map.prototype.overlapMode = function(opt_value) {
   if (goog.isDef(opt_value)) {
+    opt_value = opt_value === false ? anychart.enums.LabelsOverlapMode.NO_OVERLAP : opt_value;
     var val = goog.isNull(opt_value) ? opt_value : anychart.enums.normalizeLabelsOverlapMode(opt_value) == anychart.enums.LabelsOverlapMode.ALLOW_OVERLAP;
     if (this.overlapMode_ != val) {
       this.overlapMode_ = val;

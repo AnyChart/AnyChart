@@ -95,8 +95,8 @@ anychart.core.resource.resourceList.TagsSettings.prototype.serialize = function(
   json['padding'] = this.padding().serialize();
   json['background'] = this.background().serialize();
   // settings for core.ui.Label in resourceList.Item class. They cant be changed from the outside.
-  json['position'] = 'leftTop';
-  json['anchor'] = 'leftTop';
+  json['position'] = 'left-top';
+  json['anchor'] = 'left-top';
   json['rotation'] = '0';
   return json;
 };

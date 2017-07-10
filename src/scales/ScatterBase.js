@@ -461,17 +461,12 @@ anychart.scales.ScatterBase.prototype.setupByJSON = function(config, opt_default
  * @return {anychart.scales.ScatterBase}
  */
 anychart.scales.ScatterBase.fromString = function(type, opt_canReturnNull) {
-  type = (type + '').toLowerCase();
   switch (type) {
-    case 'log':
-    case 'logarithmic':
+    case anychart.enums.ScaleTypes.LOG:
       return anychart.scales.log();
-    case 'lin':
-    case 'linear':
+    case anychart.enums.ScaleTypes.LINEAR:
       return anychart.scales.linear();
-    case 'date':
-    case 'datetime':
-    case 'dt':
+    case anychart.enums.ScaleTypes.DATE_TIME:
       return anychart.scales.dateTime();
     default:
       return opt_canReturnNull ? null : anychart.scales.linear();

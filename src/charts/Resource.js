@@ -38,7 +38,7 @@ anychart.charts.Resource = function(opt_data, opt_csvSettings) {
   anychart.charts.Resource.base(this, 'constructor');
 
   // it doesn't support other options
-  this.interactivity().hoverMode('single').selectionMode('multiSelect');
+  this.interactivity().hoverMode('single').selectionMode(anychart.enums.SelectionMode.MULTI_SELECT);
 
   /**
    * Interactivity state.

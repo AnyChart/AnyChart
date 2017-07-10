@@ -311,8 +311,8 @@ anychart.core.resource.resourceList.Item.prototype.applySettings = function(elem
  * @type {Object}
  */
 anychart.core.resource.resourceList.Item.DEFAULT_TAG_LABEL_SETTINGS = {
-  'position': 'leftTop',
-  'anchor': 'leftTop',
+  'position': 'left-top',
+  'anchor': 'left-top',
   'rotation': 0
 };
 

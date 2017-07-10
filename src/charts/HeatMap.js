@@ -85,7 +85,7 @@ anychart.charts.HeatMap.prototype.seriesConfig = (function() {
       anychart.core.series.Capabilities.SUPPORTS_MARKERS |
       anychart.core.series.Capabilities.SUPPORTS_LABELS |
       0);
-  res['heatMap'] = {
+  res[anychart.enums.HeatMapSeriesType.HEAT_MAP] = {
     drawerType: anychart.enums.SeriesDrawerTypes.HEAT_MAP,
     shapeManagerType: anychart.enums.ShapeManagerTypes.PER_POINT,
     shapesConfig: [

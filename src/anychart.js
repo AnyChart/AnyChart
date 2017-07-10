@@ -601,6 +601,7 @@ anychart.appendTheme = function(value) {
  * @return {*}
  */
 anychart.getFullTheme = function(root) {
+  root = anychart.utils.toCamelCase(root);
   anychart.performance.start('Theme compilation');
   var i;
   if (!anychart.themeClones_.length) {
@@ -648,28 +649,19 @@ anychart.getFullTheme = function(root) {
 //
 //------------------------------------------------------------------------------
 /**
- * Creates error reporter for NO_FEATURE_IN_MODULE.
- * @param {string} featureName
+ * @param {string} modulePath Feature constructor path.
+ * @param {string} featureName Feature name to display in error message.
  * @return {!Function}
  */
-anychart.createNFIMError = function(featureName) {
-  return function() {
-    anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, [featureName]);
-  };
-};
-
-
-/**
- * @param {string} modulePath
- * @param {string} error
- * @return {!Function}
- */
-anychart.getFeatureOrError = function(modulePath, error) {
+anychart.getFeatureOrError = function(modulePath, featureName) {
   var path = modulePath.split('.');
   var target = window;
   for (var i = 0; i < path.length; i++) {
     target = target[path[i]];
-    if (!target) return anychart.createNFIMError(error);
+    if (!target)
+      return function() {
+        anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, [featureName]);
+      };
   }
   return /** @type {!Function} */(target);
 };
@@ -856,23 +848,23 @@ anychart.venn = anychart.getFeatureOrError('anychart.venn', 'Venn chart');
 
 
 /** @inheritDoc */
-anychart.tagCloud = anychart.tagCloud || anychart.createNFIMError('TagCloud chart');
+anychart.tagCloud = anychart.getFeatureOrError('anychart.tagCloud', 'TagCloud chart');
 
 
 /** @ignoreDoc */
-anychart.mekko = anychart.mekko || anychart.createNFIMError('Mekko chart');
+anychart.mekko = anychart.getFeatureOrError('anychart.mekko', 'Mekko chart');
 
 
 /** @ignoreDoc */
-anychart.mosaic = anychart.mosaic || anychart.createNFIMError('Mosaic chart');
+anychart.mosaic = anychart.getFeatureOrError('anychart.mosaic', 'Mosaic chart');
 
 
 /** @ignoreDoc */
-anychart.barmekko = anychart.barmekko || anychart.createNFIMError('Barmekko chart');
+anychart.barmekko = anychart.getFeatureOrError('anychart.barmekko', 'Barmekko chart');
 
 
 /** @inheritDoc */
-anychart.waterfall = anychart.waterfall || anychart.createNFIMError('Waterfall chart');
+anychart.waterfall = anychart.getFeatureOrError('anychart.waterfall', 'Waterfall chart');
 
 
 //region ------ Standalones

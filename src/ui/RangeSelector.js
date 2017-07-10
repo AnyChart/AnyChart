@@ -51,40 +51,40 @@ anychart.ui.RangeSelector = function() {
   this.ranges_ = [];
 
   this.ranges([{
-    'type': 'Unit',
+    'type': anychart.enums.StockRangeType.UNIT,
     'unit': 'Day',
     'count': 10,
     'text': '10D'
   },{
-    'type': 'Unit',
+    'type': anychart.enums.StockRangeType.UNIT,
     'unit': 'Month',
     'count': 1,
     'text': '1M'
   },{
-    'type': 'Unit',
+    'type': anychart.enums.StockRangeType.UNIT,
     'unit': 'Month',
     'count': 3,
     'text': '3M'
   },{
-    'type': 'YTD',
+    'type': anychart.enums.StockRangeType.YTD,
     'text': 'YTD'
   },{
-    'type': 'Unit',
+    'type': anychart.enums.StockRangeType.UNIT,
     'unit': 'Year',
     'count': 1,
     'text': '1Y'
   },{
-    'type': 'Unit',
+    'type': anychart.enums.StockRangeType.UNIT,
     'unit': 'Year',
     'count': 2,
     'text': '2Y'
   },{
-    'type': 'Unit',
+    'type': anychart.enums.StockRangeType.UNIT,
     'unit': 'Year',
     'count': 5,
     'text': '5Y'
   },{
-    'type': 'Max',
+    'type': anychart.enums.StockRangeType.MAX,
     'text': 'MAX'
   }]);
 
