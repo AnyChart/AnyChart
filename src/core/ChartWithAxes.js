@@ -1570,3 +1570,8 @@ anychart.core.ChartWithAxes.prototype.disposeInternal = function() {
 
 
 //endregion
+//exports
+(function() {
+  var proto = anychart.core.ChartWithAxes.prototype;
+  proto['isVertical'] = proto.isVertical;
+})();
