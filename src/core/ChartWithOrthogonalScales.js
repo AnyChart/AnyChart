@@ -376,7 +376,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.makeScaleMaps = function() {
     anychart.core.Base.suspendSignalsDispatching(this.seriesList);
     var i, series;
     var seriesCount = this.seriesList.length;
-    var changed = false;
+    var changed = !seriesCount;
     var xScales = {};
     var yScales = {};
     for (i = 0; i < seriesCount; i++) {
@@ -701,6 +701,13 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateXScales = function() 
       if (xScale.needsAutoCalc())
         xScale.finishAutoCalc();
     }
+
+    //This action correctly resets scale domain when all series are removed.
+    if (goog.object.isEmpty(this.xScales) && this.xScale().needsAutoCalc()) {
+      this.xScale().startAutoCalc();
+      this.xScale().finishAutoCalc();
+    }
+
     this.markConsistent(anychart.ConsistencyState.SCALE_CHART_SCALES);
     anychart.performance.end('X scales and drawing plan calculation');
   }
@@ -1003,6 +1010,11 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateYScales = function() 
         yScale.finishAutoCalc();
     }
 
+    //This action correctly resets scale domain when all series are removed.
+    if (goog.object.isEmpty(this.yScales) && this.yScale().needsAutoCalc()) {
+      this.yScale().startAutoCalc();
+      this.yScale().finishAutoCalc();
+    }
 
     this.invalidate(anychart.ConsistencyState.SCALE_CHART_STATISTICS | anychart.ConsistencyState.SCALE_CHART_SCALES_STATISTICS);
     this.markConsistent(anychart.ConsistencyState.SCALE_CHART_Y_SCALES);
