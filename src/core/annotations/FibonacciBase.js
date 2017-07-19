@@ -469,6 +469,10 @@ anychart.core.annotations.FibonacciBase.prototype.serialize = function() {
   anychart.core.settings.serialize(this, anychart.core.annotations.VALUE_ANCHOR_DESCRIPTORS, json, 'Annotation');
   anychart.core.settings.serialize(this, anychart.core.annotations.SECOND_ANCHOR_POINT_DESCRIPTORS, json, 'Annotation');
 
+  json['labels'] = this.labels().serialize();
+  json['hoverLabels'] = this.hoverLabels().serialize();
+  json['selectLabels'] = this.selectLabels().serialize();
+
   return json;
 };
 
@@ -482,6 +486,10 @@ anychart.core.annotations.FibonacciBase.prototype.setupByJSON = function(config,
   anychart.core.settings.deserialize(this, anychart.core.annotations.X_ANCHOR_DESCRIPTORS, config);
   anychart.core.settings.deserialize(this, anychart.core.annotations.VALUE_ANCHOR_DESCRIPTORS, config);
   anychart.core.settings.deserialize(this, anychart.core.annotations.SECOND_ANCHOR_POINT_DESCRIPTORS, config);
+
+  this.labels().setupInternal(!!opt_default, config['labels']);
+  this.hoverLabels().setupInternal(!!opt_default, config['hoverLabels']);
+  this.selectLabels().setupInternal(!!opt_default, config['selectLabels']);
 
   anychart.core.annotations.FibonacciBase.base(this, 'setupByJSON', config, opt_default);
 };
@@ -505,4 +513,7 @@ anychart.core.annotations.FibonacciBase.prototype.disposeInternal = function() {
 (function() {
   var proto = anychart.core.annotations.FibonacciBase.prototype;
   proto['levels'] = proto.levels;
+  proto['labels'] = proto.labels;
+  proto['hoverLabels'] = proto.hoverLabels;
+  proto['selectLabels'] = proto.selectLabels;
 })();
