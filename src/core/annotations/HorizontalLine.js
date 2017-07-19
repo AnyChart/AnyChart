@@ -33,6 +33,8 @@ anychart.core.annotations.HorizontalLine = function(chartController) {
       anychart.core.annotations.Base.getColorResolver(
           ['stroke', 'hoverStroke', 'selectStroke'],
           anychart.enums.ColorType.STROKE));
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.core.annotations.VALUE_ANCHOR_DESCRIPTORS_META);
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.core.annotations.STROKE_DESCRIPTORS_META);
 };
 goog.inherits(anychart.core.annotations.HorizontalLine, anychart.core.annotations.Base);
 anychart.core.settings.populate(anychart.core.annotations.HorizontalLine, anychart.core.annotations.VALUE_ANCHOR_DESCRIPTORS);

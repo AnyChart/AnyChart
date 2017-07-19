@@ -19,25 +19,10 @@ goog.require('anychart.utils');
  * @param {(string|number)=} opt_left Left space.
  * @constructor
  * @extends {anychart.core.Base}
- * @implements {anychart.core.settings.IObjectWithSettings}
  * @implements {anychart.core.settings.IResolvable}
  */
 anychart.core.utils.Space = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   anychart.core.utils.Space.base(this, 'constructor');
-
-  /**
-   * Theme settings.
-   * @type {Object}
-   */
-  this.themeSettings = {};
-
-
-  /**
-   * Own settings (Settings set by user with API).
-   * @type {Object}
-   */
-  this.ownSettings = {};
-
 
   /**
    * Parent.
@@ -55,6 +40,13 @@ anychart.core.utils.Space = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRi
 
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom) || goog.isDef(opt_rightOrRightAndLeft) || goog.isDef(opt_bottom) || goog.isDef(opt_left))
     this.set.apply(this, arguments);
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['left'],
+    ['top'],
+    ['bottom'],
+    ['right']
+  ]);
 };
 goog.inherits(anychart.core.utils.Space, anychart.core.Base);
 
@@ -90,33 +82,25 @@ anychart.core.utils.Space.SIMPLE_PROPS_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'left',
-      anychart.core.settings.numberOrZeroNormalizer,
-      anychart.ConsistencyState.ONLY_DISPATCHING,
-      anychart.Signal.NEEDS_REAPPLICATION);
+      anychart.core.settings.numberOrZeroNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'top',
-      anychart.core.settings.numberOrZeroNormalizer,
-      anychart.ConsistencyState.ONLY_DISPATCHING,
-      anychart.Signal.NEEDS_REAPPLICATION);
+      anychart.core.settings.numberOrZeroNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'bottom',
-      anychart.core.settings.numberOrZeroNormalizer,
-      anychart.ConsistencyState.ONLY_DISPATCHING,
-      anychart.Signal.NEEDS_REAPPLICATION);
+      anychart.core.settings.numberOrZeroNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'right',
-      anychart.core.settings.numberOrZeroNormalizer,
-      anychart.ConsistencyState.ONLY_DISPATCHING,
-      anychart.Signal.NEEDS_REAPPLICATION);
+      anychart.core.settings.numberOrZeroNormalizer);
 
   return map;
 })();
@@ -126,20 +110,8 @@ anychart.core.settings.populate(anychart.core.utils.Space, anychart.core.utils.S
 //endregion
 //region -- IObjectWithSettings implementation
 /** @inheritDoc */
-anychart.core.utils.Space.prototype.getOwnOption = function(name) {
-  return this.ownSettings[name];
-};
-
-
-/** @inheritDoc */
 anychart.core.utils.Space.prototype.hasOwnOption = function(name) {
   return goog.isDefAndNotNull(this.ownSettings[name]);
-};
-
-
-/** @inheritDoc */
-anychart.core.utils.Space.prototype.getThemeOption = function(name) {
-  return this.themeSettings[name];
 };
 
 
@@ -150,14 +122,16 @@ anychart.core.utils.Space.prototype.getOption = function(name) {
 
 
 /** @inheritDoc */
-anychart.core.utils.Space.prototype.setOption = function(name, value) {
-  this.ownSettings[name] = value;
+anychart.core.utils.Space.prototype.getConsistencyState = function(fieldName) {
+  // because all descriptors invalidates ONLY_DISPATCHING
+  return anychart.ConsistencyState.ONLY_DISPATCHING;
 };
 
 
 /** @inheritDoc */
-anychart.core.utils.Space.prototype.check = function(flags) {
-  return true;
+anychart.core.utils.Space.prototype.getSignal = function(fieldName) {
+  // because all descriptors invalidates with NEEDS_REAPPLICATION signal
+  return anychart.Signal.NEEDS_REAPPLICATION;
 };
 
 

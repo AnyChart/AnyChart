@@ -39,6 +39,7 @@ anychart.core.annotations.FibonacciFan = function(chartController) {
       anychart.core.annotations.Base.getColorResolver(
           ['grid', 'hoverGrid', 'selectGrid'],
           anychart.enums.ColorType.STROKE));
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.core.annotations.GRID_DESCRIPTORS_META);
 };
 goog.inherits(anychart.core.annotations.FibonacciFan, anychart.core.annotations.FibonacciBase);
 anychart.core.settings.populate(anychart.core.annotations.FibonacciFan, anychart.core.annotations.GRID_DESCRIPTORS);

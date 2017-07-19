@@ -20,23 +20,10 @@ goog.require('goog.array');
  * @extends {anychart.core.VisualBaseWithBounds}
  * @implements {anychart.core.IStandaloneBackend}
  * @constructor
- * @implements {anychart.core.settings.IObjectWithSettings}
  * @implements {anychart.core.settings.IResolvable}
  */
 anychart.core.ui.Background = function() {
   anychart.core.ui.Background.base(this, 'constructor');
-
-  /**
-   * Theme settings.
-   * @type {Object}
-   */
-  this.themeSettings = {};
-
-  /**
-   * Own settings (Settings set by user with API).
-   * @type {Object}
-   */
-  this.ownSettings = {};
 
   /**
    * Parent title.
@@ -56,6 +43,17 @@ anychart.core.ui.Background = function() {
    * @private
    */
   this.resolutionChainCache_ = null;
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['fill', anychart.ConsistencyState.APPEARANCE],
+    ['stroke', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS],
+    ['topStroke', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS],
+    ['rightStroke', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS],
+    ['bottomStroke', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS],
+    ['leftStroke', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS],
+    ['disablePointerEvents', anychart.ConsistencyState.BACKGROUND_POINTER_EVENTS],
+    ['cornerType', anychart.ConsistencyState.BOUNDS]
+  ]);
 };
 goog.inherits(anychart.core.ui.Background, anychart.core.VisualBaseWithBounds);
 
@@ -93,65 +91,49 @@ anychart.core.ui.Background.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'fill',
-      anychart.core.settings.fillNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.fillNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'stroke',
-      anychart.core.settings.strokeNormalizer,
-      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.strokeNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'topStroke',
-      anychart.core.settings.strokeNormalizer,
-      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.strokeNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'rightStroke',
-      anychart.core.settings.strokeNormalizer,
-      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.strokeNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'bottomStroke',
-      anychart.core.settings.strokeNormalizer,
-      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.strokeNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'leftStroke',
-      anychart.core.settings.strokeNormalizer,
-      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.strokeNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'disablePointerEvents',
-      anychart.core.settings.booleanNormalizer,
-      anychart.ConsistencyState.BACKGROUND_POINTER_EVENTS,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.booleanNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'cornerType',
-      anychart.enums.normalizeBackgroundCornerType,
-      anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.enums.normalizeBackgroundCornerType);
 
   return map;
 })();
@@ -198,37 +180,18 @@ anychart.core.ui.Background.prototype.zIndex = function(opt_value) {
 
 //endregion
 //region -- IObjectWithSettings implementation
-/** @inheritDoc */
-anychart.core.ui.Background.prototype.getOwnOption = function(name) {
-  return this.ownSettings[name];
-};
-
-
-/** @inheritDoc */
-anychart.core.ui.Background.prototype.hasOwnOption = function(name) {
-  return goog.isDef(this.ownSettings[name]);
-};
-
-
-/** @inheritDoc */
-anychart.core.ui.Background.prototype.getThemeOption = function(name) {
-  return this.themeSettings[name];
-};
-
-
-/** @inheritDoc */
+/**
+ * @override
+ * @param {string} name
+ * @return {*}
+ */
 anychart.core.ui.Background.prototype.getOption = anychart.core.settings.getOption;
 
 
 /** @inheritDoc */
-anychart.core.ui.Background.prototype.setOption = function(name, value) {
-  this.ownSettings[name] = value;
-};
-
-
-/** @inheritDoc */
-anychart.core.ui.Background.prototype.check = function(flags) {
-  return true;
+anychart.core.ui.Background.prototype.getSignal = function(fieldName) {
+  // all props invalidates with NEEDS_REDRAW
+  return anychart.Signal.NEEDS_REDRAW;
 };
 
 
@@ -771,22 +734,11 @@ anychart.core.ui.Background.prototype.setThemeSettings = function(config) {
 anychart.core.ui.Background.prototype.serialize = function() {
   var json = {};
 
-  var zIndex;
-  if (this.hasOwnOption('zIndex')) {
-    zIndex = this.getOwnOption('zIndex');
-  }
-  if (!goog.isDef(zIndex)) {
-    zIndex = this.getThemeOption('zIndex');
-  }
-  if (goog.isDef(zIndex)) json['zIndex'] = zIndex;
+  var zIndex = anychart.core.Base.prototype.getOption.call(this, 'zIndex');
+  if (goog.isDef(zIndex))
+    json['zIndex'] = zIndex;
 
-  var enabled;
-  if (this.hasOwnOption('enabled')) {
-    enabled = this.getOwnOption('enabled');
-  }
-  if (!goog.isDef(enabled)) {
-    enabled = this.getThemeOption('enabled');
-  }
+  var enabled = anychart.core.Base.prototype.getOption.call(this, 'enabled');
   if (goog.isDef(enabled))
     json['enabled'] = enabled;
 

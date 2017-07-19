@@ -92,6 +92,18 @@ anychart.charts.Venn = function(opt_data, opt_csvSettings) {
 
   this.bindHandlersToComponent(this, this.handleMouseOverAndMove, this.handleMouseOut, null, this.handleMouseOverAndMove, null, this.handleMouseDown);
 
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['dataSeparator', anychart.ConsistencyState.VENN_DATA, anychart.Signal.NEEDS_REDRAW],
+    ['fill', anychart.ConsistencyState.VENN_APPEARANCE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW],
+    ['hoverFill', anychart.ConsistencyState.VENN_APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['selectFill', anychart.ConsistencyState.VENN_APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['hatchFill', anychart.ConsistencyState.VENN_APPEARANCE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW],
+    ['hoverHatchFill', anychart.ConsistencyState.VENN_APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['selectHatchFill', anychart.ConsistencyState.VENN_APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['stroke', anychart.ConsistencyState.VENN_APPEARANCE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW],
+    ['hoverStroke', anychart.ConsistencyState.VENN_APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['selectStroke', anychart.ConsistencyState.VENN_APPEARANCE, anychart.Signal.NEEDS_REDRAW]
+  ]);
 };
 goog.inherits(anychart.charts.Venn, anychart.core.SeparateChart);
 
@@ -210,81 +222,61 @@ anychart.charts.Venn.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'dataSeparator',
-      anychart.core.settings.stringNormalizer,
-      anychart.ConsistencyState.VENN_DATA,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.stringNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'fill',
-      anychart.core.settings.fillOrFunctionNormalizer,
-      anychart.ConsistencyState.VENN_APPEARANCE | anychart.ConsistencyState.CHART_LEGEND,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.fillOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverFill',
-      anychart.core.settings.fillOrFunctionNormalizer,
-      anychart.ConsistencyState.VENN_APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.fillOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectFill',
-      anychart.core.settings.fillOrFunctionNormalizer,
-      anychart.ConsistencyState.VENN_APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.fillOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hatchFill',
-      anychart.core.settings.hatchFillOrFunctionNormalizer,
-      anychart.ConsistencyState.VENN_APPEARANCE | anychart.ConsistencyState.CHART_LEGEND,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.hatchFillOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverHatchFill',
-      anychart.core.settings.hatchFillOrFunctionNormalizer,
-      anychart.ConsistencyState.VENN_APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.hatchFillOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectHatchFill',
-      anychart.core.settings.hatchFillOrFunctionNormalizer,
-      anychart.ConsistencyState.VENN_APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.hatchFillOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'stroke',
-      anychart.core.settings.strokeOrFunctionNormalizer,
-      anychart.ConsistencyState.VENN_APPEARANCE | anychart.ConsistencyState.CHART_LEGEND,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.strokeOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverStroke',
-      anychart.core.settings.strokeOrFunctionNormalizer,
-      anychart.ConsistencyState.VENN_APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.strokeOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectStroke',
-      anychart.core.settings.strokeOrFunctionNormalizer,
-      anychart.ConsistencyState.VENN_APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.strokeOrFunctionNormalizer);
 
   return map;
 })();

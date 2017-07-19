@@ -14,7 +14,6 @@ goog.require('anychart.math.Rect');
 /**
  * @constructor
  * @extends {anychart.core.VisualBase}
- * @implements {anychart.core.settings.IObjectWithSettings}
  * @implements {anychart.core.settings.IResolvable}
  */
 anychart.core.axes.Map = function() {
@@ -22,18 +21,6 @@ anychart.core.axes.Map = function() {
 
   this.labelsBounds_ = [];
   this.minorLabelsBounds_ = [];
-
-  /**
-   * Theme settings.
-   * @type {Object}
-   */
-  this.themeSettings = {};
-
-  /**
-   * Own settings (Settings set by user with API).
-   * @type {Object}
-   */
-  this.ownSettings = {};
 
   /**
    * Parent title.
@@ -59,6 +46,34 @@ anychart.core.axes.Map = function() {
       anychart.ConsistencyState.AXIS_TICKS |
       anychart.ConsistencyState.BOUNDS |
       anychart.ConsistencyState.AXIS_OVERLAP;
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['stroke', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['overlapMode',
+          anychart.ConsistencyState.APPEARANCE |
+          anychart.ConsistencyState.AXIS_TITLE |
+          anychart.ConsistencyState.AXIS_LABELS |
+          anychart.ConsistencyState.AXIS_TICKS |
+          anychart.ConsistencyState.BOUNDS |
+          anychart.ConsistencyState.AXIS_OVERLAP,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['drawFirstLabel',
+          anychart.ConsistencyState.APPEARANCE |
+          anychart.ConsistencyState.AXIS_TITLE |
+          anychart.ConsistencyState.AXIS_LABELS |
+          anychart.ConsistencyState.AXIS_TICKS |
+          anychart.ConsistencyState.BOUNDS |
+          anychart.ConsistencyState.AXIS_OVERLAP,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['drawLastLabel',
+          anychart.ConsistencyState.APPEARANCE |
+          anychart.ConsistencyState.AXIS_TITLE |
+          anychart.ConsistencyState.AXIS_LABELS |
+          anychart.ConsistencyState.AXIS_TICKS |
+          anychart.ConsistencyState.BOUNDS |
+          anychart.ConsistencyState.AXIS_OVERLAP,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED]
+  ]);
 };
 goog.inherits(anychart.core.axes.Map, anychart.core.VisualBase);
 
@@ -164,39 +179,13 @@ anychart.core.axes.Map.prototype.minorLabelsBounds_ = null;
 
 
 //endregion
-//region --- IObjectWithSettings implementation
-/** @inheritDoc */
-anychart.core.axes.Map.prototype.getOwnOption = function(name) {
-  return this.ownSettings[name];
-};
-
-
-/** @inheritDoc */
-anychart.core.axes.Map.prototype.hasOwnOption = function(name) {
-  return goog.isDef(this.ownSettings[name]);
-};
-
-
-/** @inheritDoc */
-anychart.core.axes.Map.prototype.getThemeOption = function(name) {
-  return this.themeSettings[name];
-};
-
-
-/** @inheritDoc */
+//region --- IObjectWithSettings overrides
+/**
+ * @override
+ * @param {string} name
+ * @return {*}
+ */
 anychart.core.axes.Map.prototype.getOption = anychart.core.settings.getOption;
-
-
-/** @inheritDoc */
-anychart.core.axes.Map.prototype.setOption = function(name, value) {
-  this.ownSettings[name] = value;
-};
-
-
-/** @inheritDoc */
-anychart.core.axes.Map.prototype.check = function(flags) {
-  return true;
-};
 
 
 //endregion
@@ -299,48 +288,25 @@ anychart.core.axes.Map.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'stroke',
-      anychart.core.settings.strokeNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.strokeNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'overlapMode',
-      anychart.enums.normalizeLabelsOverlapMode,
-      anychart.ConsistencyState.APPEARANCE |
-      anychart.ConsistencyState.AXIS_TITLE |
-      anychart.ConsistencyState.AXIS_LABELS |
-      anychart.ConsistencyState.AXIS_TICKS |
-      anychart.ConsistencyState.BOUNDS |
-      anychart.ConsistencyState.AXIS_OVERLAP,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      anychart.enums.normalizeLabelsOverlapMode);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'drawFirstLabel',
-      anychart.core.settings.booleanNormalizer,
-      anychart.ConsistencyState.APPEARANCE |
-      anychart.ConsistencyState.AXIS_TITLE |
-      anychart.ConsistencyState.AXIS_LABELS |
-      anychart.ConsistencyState.AXIS_TICKS |
-      anychart.ConsistencyState.BOUNDS |
-      anychart.ConsistencyState.AXIS_OVERLAP,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      anychart.core.settings.booleanNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'drawLastLabel',
-      anychart.core.settings.booleanNormalizer,
-      anychart.ConsistencyState.APPEARANCE |
-      anychart.ConsistencyState.AXIS_TITLE |
-      anychart.ConsistencyState.AXIS_LABELS |
-      anychart.ConsistencyState.AXIS_TICKS |
-      anychart.ConsistencyState.BOUNDS |
-      anychart.ConsistencyState.AXIS_OVERLAP,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      anychart.core.settings.booleanNormalizer);
 
   return map;
 })();
@@ -1795,22 +1761,10 @@ anychart.core.axes.Map.prototype.setupByJSON = function(config, opt_default) {
 anychart.core.axes.Map.prototype.serialize = function() {
   var json = {};
 
-  var zIndex;
-  if (this.hasOwnOption('zIndex')) {
-    zIndex = this.getOwnOption('zIndex');
-  }
-  if (!goog.isDef(zIndex)) {
-    zIndex = this.getThemeOption('zIndex');
-  }
+  var zIndex = anychart.core.Base.prototype.getOption.call(this, 'zIndex');
   if (goog.isDef(zIndex)) json['zIndex'] = zIndex;
 
-  var enabled;
-  if (this.hasOwnOption('enabled')) {
-    enabled = this.getOwnOption('enabled');
-  }
-  if (!goog.isDef(enabled)) {
-    enabled = this.getThemeOption('enabled');
-  }
+  var enabled = anychart.core.Base.prototype.getOption.call(this, 'enabled');
   json['enabled'] = goog.isDef(enabled) ? enabled : null;
 
   var titleConfig = this.title().serialize();

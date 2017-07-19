@@ -33,6 +33,21 @@ anychart.core.series.Map = function(chart, plot, type, config, sortedMode) {
 
   this.geoData = [];
   this.seriesPoints = [];
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['startSize',
+      anychart.ConsistencyState.SERIES_POINTS,
+      anychart.Signal.NEEDS_REDRAW,
+      anychart.core.drawers.Capabilities.ANY],
+    ['endSize',
+      anychart.ConsistencyState.SERIES_POINTS,
+      anychart.Signal.NEEDS_REDRAW,
+      anychart.core.drawers.Capabilities.ANY],
+    ['curvature',
+      anychart.ConsistencyState.SERIES_POINTS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_OVERLAP,
+      anychart.core.drawers.Capabilities.ANY]
+  ]);
 };
 goog.inherits(anychart.core.series.Map, anychart.core.series.Cartesian);
 
@@ -1661,28 +1676,19 @@ anychart.core.series.Map.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'startSize',
-      anychart.core.settings.numberNormalizer,
-      anychart.ConsistencyState.SERIES_POINTS,
-      anychart.Signal.NEEDS_REDRAW,
-      anychart.core.drawers.Capabilities.ANY);
+      anychart.core.settings.numberNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'endSize',
-      anychart.core.settings.numberNormalizer,
-      anychart.ConsistencyState.SERIES_POINTS,
-      anychart.Signal.NEEDS_REDRAW,
-      anychart.core.drawers.Capabilities.ANY);
+      anychart.core.settings.numberNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'curvature',
-      anychart.core.settings.numberNormalizer,
-      anychart.ConsistencyState.SERIES_POINTS,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_OVERLAP,
-      anychart.core.drawers.Capabilities.ANY);
+      anychart.core.settings.numberNormalizer);
 
   return map;
 })();

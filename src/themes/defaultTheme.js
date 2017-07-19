@@ -2802,6 +2802,9 @@ goog.provide('anychart.themes.defaultTheme');
         'zIndex': 25,
         'fill': 'none',
         'labels': {
+          'position': 'byPath',
+          'vAlign': 'middle',
+          'hAlign': 'middle',
           'anchor': 'auto',
           'zIndex': 25
         },

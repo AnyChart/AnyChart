@@ -13,24 +13,11 @@ goog.require('anychart.enums');
 /**
  * Map axes settings.
  * @extends {anychart.core.VisualBase}
- * @implements {anychart.core.settings.IObjectWithSettings}
  * @implements {anychart.core.settings.IResolvable}
  * @constructor
  */
 anychart.core.grids.Map = function() {
   anychart.core.grids.Map.base(this, 'constructor');
-
-  /**
-   * Theme settings.
-   * @type {Object}
-   */
-  this.themeSettings = {};
-
-  /**
-   * Own settings (Settings set by user with API).
-   * @type {Object}
-   */
-  this.ownSettings = {};
 
   /**
    * Parent title.
@@ -81,6 +68,15 @@ anychart.core.grids.Map = function() {
    * @private
    */
   this.resolutionChainCache_ = null;
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['stroke', anychart.ConsistencyState.APPEARANCE],
+    ['minorStroke', anychart.ConsistencyState.APPEARANCE],
+    ['oddFill', anychart.ConsistencyState.APPEARANCE],
+    ['evenFill', anychart.ConsistencyState.APPEARANCE],
+    ['drawFirstLine', anychart.ConsistencyState.GRIDS_POSITION],
+    ['drawLastLine', anychart.ConsistencyState.GRIDS_POSITION]
+  ]);
 };
 goog.inherits(anychart.core.grids.Map, anychart.core.VisualBase);
 
@@ -107,38 +103,19 @@ anychart.core.grids.Map.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 //endregion
-//region --- IObjectWithSettings implementation
-/** @inheritDoc */
-anychart.core.grids.Map.prototype.getOwnOption = function(name) {
-  return this.ownSettings[name];
-};
-
-
-/** @inheritDoc */
-anychart.core.grids.Map.prototype.hasOwnOption = function(name) {
-  return goog.isDef(this.ownSettings[name]);
-};
-
-
-/** @inheritDoc */
-anychart.core.grids.Map.prototype.getThemeOption = function(name) {
-  return this.themeSettings[name];
-};
-
-
-/** @inheritDoc */
+//region --- IObjectWithSettings overrides
+/**
+ * @override
+ * @param {string} name
+ * @return {*}
+ */
 anychart.core.grids.Map.prototype.getOption = anychart.core.settings.getOption;
 
 
 /** @inheritDoc */
-anychart.core.grids.Map.prototype.setOption = function(name, value) {
-  this.ownSettings[name] = value;
-};
-
-
-/** @inheritDoc */
-anychart.core.grids.Map.prototype.check = function(flags) {
-  return true;
+anychart.core.grids.Map.prototype.getSignal = function(fieldName) {
+  // all properties invalidates with NEEDS_REDRAW;
+  return anychart.Signal.NEEDS_REDRAW;
 };
 
 
@@ -243,49 +220,37 @@ anychart.core.grids.Map.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'stroke',
-      anychart.core.settings.strokeNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.strokeNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'minorStroke',
-      anychart.core.settings.strokeNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.strokeNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'oddFill',
-      anychart.core.settings.fillNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.fillNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'evenFill',
-      anychart.core.settings.fillNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.fillNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'drawFirstLine',
-      anychart.core.settings.booleanNormalizer,
-      anychart.ConsistencyState.GRIDS_POSITION,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.booleanNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'drawLastLine',
-      anychart.core.settings.booleanNormalizer,
-      anychart.ConsistencyState.GRIDS_POSITION,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.booleanNormalizer);
 
   return map;
 })();
@@ -888,22 +853,11 @@ anychart.core.grids.Map.prototype.setThemeSettings = function(config) {
 anychart.core.grids.Map.prototype.serialize = function() {
   var json = {};
 
-  var zIndex;
-  if (this.hasOwnOption('zIndex')) {
-    zIndex = this.getOwnOption('zIndex');
-  }
-  if (!goog.isDef(zIndex)) {
-    zIndex = this.getThemeOption('zIndex');
-  }
-  if (goog.isDef(zIndex)) json['zIndex'] = zIndex;
+  var zIndex = anychart.core.Base.prototype.getOption.call(this, 'zIndex');
+  if (goog.isDef(zIndex))
+    json['zIndex'] = zIndex;
 
-  var enabled;
-  if (this.hasOwnOption('enabled')) {
-    enabled = this.getOwnOption('enabled');
-  }
-  if (!goog.isDef(enabled)) {
-    enabled = this.getThemeOption('enabled');
-  }
+  var enabled = anychart.core.Base.prototype.getOption.call(this, 'enabled');
   json['enabled'] = goog.isDef(enabled) ? enabled : null;
 
   anychart.core.settings.serialize(this, this.SIMPLE_PROPS_DESCRIPTORS, json, 'Map grids props');

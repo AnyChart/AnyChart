@@ -9,8 +9,6 @@ goog.require('anychart.math.Rect');
 
 /**
  * @constructor
- * @implements {anychart.core.settings.IObjectWithSettings}
- * @implements {anychart.core.settings.IResolvable}
  * @extends {anychart.core.ui.LabelsFactory}
  */
 anychart.core.ui.CircularLabelsFactory = function() {
@@ -18,6 +16,10 @@ anychart.core.ui.CircularLabelsFactory = function() {
 
   if (!goog.array.contains(this.settingsFieldsForMerge, 'autoRotate'))
     this.settingsFieldsForMerge.push('autoRotate');
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['autoRotate', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED]
+  ]);
 };
 goog.inherits(anychart.core.ui.CircularLabelsFactory, anychart.core.ui.LabelsFactory);
 
@@ -132,9 +134,7 @@ anychart.core.ui.CircularLabelsFactory.prototype.SIMPLE_PROPS_DESCRIPTORS = (fun
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'autoRotate',
-      anychart.core.settings.booleanNormalizer,
-      anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      anychart.core.settings.booleanNormalizer);
 
   return map;
 })();
@@ -273,12 +273,14 @@ anychart.core.ui.CircularLabelsFactory.prototype.createLabel = function() {
 
 /**
  * @constructor
- * @implements {anychart.core.settings.IObjectWithSettings}
- * @implements {anychart.core.settings.IResolvable}
  * @extends {anychart.core.ui.LabelsFactory.Label}
  */
 anychart.core.ui.CircularLabelsFactory.Label = function() {
   anychart.core.ui.CircularLabelsFactory.Label.base(this, 'constructor');
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['autoRotate', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED]
+  ]);
 };
 goog.inherits(anychart.core.ui.CircularLabelsFactory.Label, anychart.core.ui.LabelsFactory.Label);
 
@@ -292,9 +294,7 @@ anychart.core.ui.CircularLabelsFactory.Label.prototype.SIMPLE_PROPS_DESCRIPTORS 
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'autoRotate',
-      anychart.core.settings.booleanNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      anychart.core.settings.booleanNormalizer);
 
   return map;
 })();

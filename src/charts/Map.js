@@ -244,6 +244,14 @@ anychart.charts.Map = function() {
   this.setOption('defaultSeriesType', anychart.enums.MapSeriesType.CHOROPLETH);
 
   this.eventsHandler.listen(this, [goog.events.EventType.POINTERDOWN, acgraph.events.EventType.TOUCHSTART], this.tapHandler);
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['geoIdField', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.MAP_GEO_DATA_INDEX, anychart.Signal.NEEDS_REDRAW],
+    ['overlapMode', anychart.ConsistencyState.MAP_LABELS, anychart.Signal.NEEDS_REDRAW],
+    ['minZoomLevel', 0, 0],
+    ['maxZoomLevel', 0, 0]
+    //['zoomFactor', 0, 0] uncomment when it will be needed
+  ]);
 };
 goog.inherits(anychart.charts.Map, anychart.core.ChartWithSeries);
 
@@ -331,41 +339,31 @@ anychart.charts.Map.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'geoIdField',
-      anychart.core.settings.asIsNormalizer,
-      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.MAP_GEO_DATA_INDEX,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.asIsNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'overlapMode',
-      anychart.enums.normalizeLabelsOverlapMode,
-      anychart.ConsistencyState.MAP_LABELS,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.enums.normalizeLabelsOverlapMode);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'minZoomLevel',
-      anychart.utils.toNumber,
-      0,
-      0);
+      anychart.utils.toNumber);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'maxZoomLevel',
-      anychart.utils.toNumber,
-      0,
-      0);
+      anychart.utils.toNumber);
 
   //TODO(AntonKagakin): Uncomment descriptor when it will be needed
   /*anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'zoomFactor',
-      anychart.core.settings.asIsNormalizer,
-      0,
-      0);*/
+      anychart.core.settings.asIsNormalizer);*/
   return map;
 })();
 anychart.core.settings.populate(anychart.charts.Map, anychart.charts.Map.PROPERTY_DESCRIPTORS);

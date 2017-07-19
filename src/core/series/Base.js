@@ -59,25 +59,12 @@ anychart.core.series.Base = function(chart, plot, type, config) {
   this.plot = plot;
 
   /**
-   * Visual settings storage.
-   * @type {!Object}
-   * @protected
-   */
-  this.settings = {};
-
-  /**
    * Auto values of settings set by external controller.
    * @type {!Object}
    */
   this.autoSettings = {};
   this.autoSettings['pointWidth'] = '90%';
   this.autoSettings['isVertical'] = this.chart.isVertical();
-
-  /**
-   * Default (theme) settings holder.
-   * @type {!Object}
-   */
-  this.defaultSettings = {};
 
   /**
    * Series clip.
@@ -148,6 +135,157 @@ anychart.core.series.Base = function(chart, plot, type, config) {
   this.renderingSettings_.listenSignals(this.rendererInvalidated_, this);
 
   this.applyConfig(config, true);
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['fill',
+      anychart.ConsistencyState.SERIES_COLOR,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
+      anychart.core.series.Capabilities.ANY],
+    ['hoverFill', 0, 0, anychart.core.series.Capabilities.ALLOW_INTERACTIVITY],
+    ['selectFill', 0, 0, anychart.core.series.Capabilities.ANY],
+    ['negativeFill',
+      anychart.ConsistencyState.SERIES_COLOR,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
+      anychart.core.series.Capabilities.ANY],
+    ['hoverNegativeFill', 0, 0, anychart.core.series.Capabilities.ANY],
+    ['selectNegativeFill', 0, 0, anychart.core.series.Capabilities.ANY],
+    ['risingFill',
+      anychart.ConsistencyState.SERIES_COLOR,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
+      anychart.core.series.Capabilities.ANY],
+    ['hoverRisingFill', 0, 0, anychart.core.series.Capabilities.ANY],
+    ['selectRisingFill', 0, 0, anychart.core.series.Capabilities.ANY],
+    ['fallingFill',
+      anychart.ConsistencyState.SERIES_COLOR,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
+      anychart.core.series.Capabilities.ANY],
+    ['hoverFallingFill', 0, 0, anychart.core.series.Capabilities.ANY],
+    ['selectFallingFill', 0, 0, anychart.core.series.Capabilities.ANY],
+    ['stroke',
+      anychart.ConsistencyState.SERIES_COLOR,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
+      anychart.core.series.Capabilities.ANY],
+    ['hoverStroke', 0, 0, anychart.core.series.Capabilities.ANY],
+    ['selectStroke', 0, 0, anychart.core.series.Capabilities.ANY],
+    ['lowStroke',
+      anychart.ConsistencyState.SERIES_COLOR,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
+      anychart.core.series.Capabilities.ANY],
+    ['hoverLowStroke', 0, 0, anychart.core.series.Capabilities.ANY],
+    ['selectLowStroke', 0, 0, anychart.core.series.Capabilities.ANY],
+    ['highStroke',
+      anychart.ConsistencyState.SERIES_COLOR,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
+      anychart.core.series.Capabilities.ANY],
+    ['hoverHighStroke', 0, 0, anychart.core.series.Capabilities.ANY],
+    ['selectHighStroke', 0, 0, anychart.core.series.Capabilities.ANY],
+    ['negativeStroke',
+      anychart.ConsistencyState.SERIES_COLOR,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
+      anychart.core.series.Capabilities.ANY],
+    ['hoverNegativeStroke', 0, 0, anychart.core.series.Capabilities.ANY],
+    ['selectNegativeStroke', 0, 0, anychart.core.series.Capabilities.ANY],
+    ['risingStroke',
+      anychart.ConsistencyState.SERIES_COLOR,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
+      anychart.core.series.Capabilities.ANY],
+    ['hoverRisingStroke', 0, 0, anychart.core.series.Capabilities.ANY],
+    ['selectRisingStroke', 0, 0, anychart.core.series.Capabilities.ANY],
+    ['fallingStroke',
+      anychart.ConsistencyState.SERIES_COLOR,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
+      anychart.core.series.Capabilities.ANY],
+    ['hoverFallingStroke', 0, 0, anychart.core.series.Capabilities.ANY],
+    ['selectFallingStroke', 0, 0, anychart.core.series.Capabilities.ANY],
+    ['medianStroke',
+      anychart.ConsistencyState.SERIES_COLOR,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
+      anychart.core.series.Capabilities.ANY],
+    ['hoverMedianStroke', 0, 0, anychart.core.series.Capabilities.ANY],
+    ['selectMedianStroke', 0, 0, anychart.core.series.Capabilities.ANY],
+    ['stemStroke',
+      anychart.ConsistencyState.SERIES_COLOR,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
+      anychart.core.series.Capabilities.ANY],
+    ['hoverStemStroke', 0, 0, anychart.core.series.Capabilities.ANY],
+    ['selectStemStroke', 0, 0, anychart.core.series.Capabilities.ANY],
+    ['whiskerStroke',
+      anychart.ConsistencyState.SERIES_COLOR,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
+      anychart.core.series.Capabilities.ANY],
+    ['hoverWhiskerStroke', 0, 0, anychart.core.series.Capabilities.ANY],
+    ['selectWhiskerStroke', 0, 0, anychart.core.series.Capabilities.ANY],
+    ['hatchFill',
+      anychart.ConsistencyState.SERIES_COLOR | anychart.ConsistencyState.SERIES_POINTS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
+      anychart.core.series.Capabilities.ANY],
+    ['hoverHatchFill', 0, 0, anychart.core.series.Capabilities.ANY],
+    ['selectHatchFill', 0, 0, anychart.core.series.Capabilities.ANY],
+    ['negativeHatchFill',
+      anychart.ConsistencyState.SERIES_COLOR,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
+      anychart.core.series.Capabilities.ANY],
+    ['hoverNegativeHatchFill', 0, 0, anychart.core.series.Capabilities.ANY],
+    ['selectNegativeHatchFill', 0, 0, anychart.core.series.Capabilities.ANY],
+    ['risingHatchFill',
+      anychart.ConsistencyState.SERIES_COLOR,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
+      anychart.core.series.Capabilities.ANY],
+    ['hoverRisingHatchFill', 0, 0, anychart.core.series.Capabilities.ANY],
+    ['selectRisingHatchFill', 0, 0, anychart.core.series.Capabilities.ANY],
+    ['fallingHatchFill',
+      anychart.ConsistencyState.SERIES_COLOR,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
+      anychart.core.series.Capabilities.ANY],
+    ['hoverFallingHatchFill', 0, 0, anychart.core.series.Capabilities.ANY],
+    ['selectFallingHatchFill', 0, 0, anychart.core.series.Capabilities.ANY],
+    ['color',
+      anychart.ConsistencyState.SERIES_COLOR,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
+      anychart.core.series.Capabilities.ANY],
+    ['xPointPosition',
+      anychart.ConsistencyState.SERIES_POINTS,
+      anychart.Signal.NEEDS_REDRAW,
+      anychart.core.series.Capabilities.ANY],
+    ['pointWidth',
+      anychart.ConsistencyState.SERIES_POINTS,
+      anychart.Signal.NEEDS_REDRAW,
+      anychart.core.drawers.Capabilities.IS_WIDTH_BASED],
+    ['connectMissingPoints',
+      anychart.ConsistencyState.SERIES_POINTS,
+      anychart.Signal.NEEDS_REDRAW,
+      anychart.core.drawers.Capabilities.SUPPORTS_CONNECTING_MISSING],
+    ['displayNegative',
+      anychart.ConsistencyState.SERIES_POINTS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEEDS_RECALCULATION,
+      anychart.core.drawers.Capabilities.NEEDS_SIZE_SCALE],
+    ['whiskerWidth',
+      anychart.ConsistencyState.SERIES_POINTS,
+      anychart.Signal.NEEDS_REDRAW,
+      anychart.core.drawers.Capabilities.SUPPORTS_OUTLIERS],
+    ['hoverWhiskerWidth', 0, 0, anychart.core.drawers.Capabilities.SUPPORTS_OUTLIERS],
+    ['selectWhiskerWidth', 0, 0, anychart.core.drawers.Capabilities.SUPPORTS_OUTLIERS],
+    ['type',
+      anychart.ConsistencyState.SERIES_POINTS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
+      anychart.core.drawers.Capabilities.IS_MARKER_BASED],
+    ['hoverType', 0, 0, anychart.core.drawers.Capabilities.IS_MARKER_BASED],
+    ['selectType', 0, 0, anychart.core.drawers.Capabilities.IS_MARKER_BASED],
+    ['size',
+      anychart.ConsistencyState.SERIES_POINTS,
+      anychart.Signal.NEEDS_REDRAW,
+      anychart.core.drawers.Capabilities.IS_MARKER_BASED],
+    ['hoverSize', 0, 0, anychart.core.drawers.Capabilities.IS_MARKER_BASED],
+    ['selectSize', 0, 0, anychart.core.drawers.Capabilities.IS_MARKER_BASED],
+    ['stepDirection',
+      anychart.ConsistencyState.SERIES_POINTS,
+      anychart.Signal.NEEDS_REDRAW,
+      anychart.core.drawers.Capabilities.SUPPORTS_STEP_DIRECTION],
+    ['isVertical',
+      anychart.ConsistencyState.SERIES_POINTS,
+      anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW,
+      anychart.core.drawers.Capabilities.ANY]
+  ]);
 };
 goog.inherits(anychart.core.series.Base, anychart.core.VisualBaseWithBounds);
 
@@ -505,7 +643,7 @@ anychart.core.series.Base.prototype.applyConfig = function(config, opt_reapplyCl
 
   this.recreateShapeManager();
 
-  this.defaultSettings = this.plot.defaultSeriesSettings()[this.type_] || {};
+  this.themeSettings = this.plot.defaultSeriesSettings()[this.type_] || {};
 
   if (this.supportsOutliers()) {
     this.indexToMarkerIndexes_ = {};
@@ -516,7 +654,7 @@ anychart.core.series.Base.prototype.applyConfig = function(config, opt_reapplyCl
   this.autoSettings['xPointPosition'] = 0.5;
 
   this.suspendSignalsDispatching();
-  this.applyDefaultsToElements(this.defaultSettings, true, true, opt_reapplyClip);
+  this.applyDefaultsToElements(this.themeSettings, true, true, opt_reapplyClip);
   this.resumeSignalsDispatching(false);
   // here should markers/labels/errors/outliers setup be
 
@@ -1771,60 +1909,22 @@ anychart.core.series.Base.prototype.getPointOption = function(name) {
 };
 
 
-/**
- * Returns option value if it was set directly to the series.
- * @param {string} name
- * @return {*}
- */
-anychart.core.series.Base.prototype.getOwnOption = function(name) {
-  return this.settings[name];
-};
-
-
-/**
- * Returns option value from the theme if any.
- * @param {string} name
- * @return {*}
- */
-anychart.core.series.Base.prototype.getThemeOption = function(name) {
-  return this.defaultSettings[name];
-};
-
-
-/**
- * RReturns true if the option value was set directly to the object.
- * @param {string} name
- * @return {boolean}
- */
+/** @inheritDoc */
 anychart.core.series.Base.prototype.hasOwnOption = function(name) {
-  return goog.isDefAndNotNull(this.settings[name]);
+  return goog.isDefAndNotNull(this.ownSettings[name]);
 };
 
 
-/**
- * Returns an option value for the series.
- * @param {string} name
- * @return {*}
- */
+/** @inheritDoc */
 anychart.core.series.Base.prototype.getOption = function(name) {
-  var res = this.settings[name];
+  var res = this.ownSettings[name];
   if (!goog.isDefAndNotNull(res)) {
-    res = this.defaultSettings[name];
+    res = this.themeSettings[name];
     if (!goog.isDefAndNotNull(res)) {
       res = this.autoSettings[name];
     }
   }
   return res;
-};
-
-
-/**
- * Sets series option value.
- * @param {string} name
- * @param {*} value
- */
-anychart.core.series.Base.prototype.setOption = function(name, value) {
-  this.settings[name] = value;
 };
 
 
@@ -1844,9 +1944,9 @@ anychart.core.series.Base.prototype.resolveOption = function(name, point, normal
     val = normalizer(val);
   } else {
     name = opt_seriesName || name;
-    val = this.settings[name];
+    val = this.ownSettings[name];
     if (!goog.isDefAndNotNull(val)) {
-      val = this.defaultSettings[name];
+      val = this.themeSettings[name];
       if (!goog.isDefAndNotNull(val))
         val = this.autoSettings[name];
       if (goog.isDef(val))
@@ -3787,603 +3887,402 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'fill',
-      anychart.core.settings.fillOrFunctionNormalizer,
-      anychart.ConsistencyState.SERIES_COLOR,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.fillOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverFill',
-      anychart.core.settings.fillOrFunctionNormalizer,
-      0,
-      0,
-      anychart.core.series.Capabilities.ALLOW_INTERACTIVITY);
+      anychart.core.settings.fillOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectFill',
-      anychart.core.settings.fillOrFunctionNormalizer,
-      0,
-      0,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.fillOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'negativeFill',
-      anychart.core.settings.fillOrFunctionNormalizer,
-      anychart.ConsistencyState.SERIES_COLOR,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.fillOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverNegativeFill',
-      anychart.core.settings.fillOrFunctionNormalizer,
-      0,
-      0,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.fillOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectNegativeFill',
-      anychart.core.settings.fillOrFunctionNormalizer,
-      0,
-      0,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.fillOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'risingFill',
-      anychart.core.settings.fillOrFunctionNormalizer,
-      anychart.ConsistencyState.SERIES_COLOR,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.fillOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverRisingFill',
-      anychart.core.settings.fillOrFunctionNormalizer,
-      0,
-      0,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.fillOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectRisingFill',
-      anychart.core.settings.fillOrFunctionNormalizer,
-      0,
-      0,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.fillOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'fallingFill',
-      anychart.core.settings.fillOrFunctionNormalizer,
-      anychart.ConsistencyState.SERIES_COLOR,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.fillOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverFallingFill',
-      anychart.core.settings.fillOrFunctionNormalizer,
-      0,
-      0,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.fillOrFunctionNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectFallingFill',
-      anychart.core.settings.fillOrFunctionNormalizer,
-      0,
-      0,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.fillOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'stroke',
-      anychart.core.settings.strokeOrFunctionNormalizer,
-      anychart.ConsistencyState.SERIES_COLOR,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.strokeOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverStroke',
-      anychart.core.settings.strokeOrFunctionNormalizer,
-      0,
-      0,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.strokeOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectStroke',
-      anychart.core.settings.strokeOrFunctionNormalizer,
-      0,
-      0,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.strokeOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'lowStroke',
-      anychart.core.settings.strokeOrFunctionNormalizer,
-      anychart.ConsistencyState.SERIES_COLOR,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.strokeOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverLowStroke',
-      anychart.core.settings.strokeOrFunctionNormalizer,
-      0,
-      0,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.strokeOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectLowStroke',
-      anychart.core.settings.strokeOrFunctionNormalizer,
-      0,
-      0,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.strokeOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'highStroke',
-      anychart.core.settings.strokeOrFunctionNormalizer,
-      anychart.ConsistencyState.SERIES_COLOR,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.strokeOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverHighStroke',
-      anychart.core.settings.strokeOrFunctionNormalizer,
-      0,
-      0,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.strokeOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectHighStroke',
-      anychart.core.settings.strokeOrFunctionNormalizer,
-      0,
-      0,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.strokeOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'negativeStroke',
-      anychart.core.settings.strokeOrFunctionNormalizer,
-      anychart.ConsistencyState.SERIES_COLOR,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.strokeOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverNegativeStroke',
-      anychart.core.settings.strokeOrFunctionNormalizer,
-      0,
-      0,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.strokeOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectNegativeStroke',
-      anychart.core.settings.strokeOrFunctionNormalizer,
-      0,
-      0,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.strokeOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'risingStroke',
-      anychart.core.settings.strokeOrFunctionNormalizer,
-      anychart.ConsistencyState.SERIES_COLOR,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.strokeOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverRisingStroke',
-      anychart.core.settings.strokeOrFunctionNormalizer,
-      0,
-      0,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.strokeOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectRisingStroke',
-      anychart.core.settings.strokeOrFunctionNormalizer,
-      0,
-      0,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.strokeOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'fallingStroke',
-      anychart.core.settings.strokeOrFunctionNormalizer,
-      anychart.ConsistencyState.SERIES_COLOR,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.strokeOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverFallingStroke',
-      anychart.core.settings.strokeOrFunctionNormalizer,
-      0,
-      0,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.strokeOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectFallingStroke',
-      anychart.core.settings.strokeOrFunctionNormalizer,
-      0,
-      0,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.strokeOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'medianStroke',
-      anychart.core.settings.strokeOrFunctionNormalizer,
-      anychart.ConsistencyState.SERIES_COLOR,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.strokeOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverMedianStroke',
-      anychart.core.settings.strokeOrFunctionNormalizer,
-      0,
-      0,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.strokeOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectMedianStroke',
-      anychart.core.settings.strokeOrFunctionNormalizer,
-      0,
-      0,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.strokeOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'stemStroke',
-      anychart.core.settings.strokeOrFunctionNormalizer,
-      anychart.ConsistencyState.SERIES_COLOR,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.strokeOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverStemStroke',
-      anychart.core.settings.strokeOrFunctionNormalizer,
-      0,
-      0,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.strokeOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectStemStroke',
-      anychart.core.settings.strokeOrFunctionNormalizer,
-      0,
-      0,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.strokeOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'whiskerStroke',
-      anychart.core.settings.strokeOrFunctionNormalizer,
-      anychart.ConsistencyState.SERIES_COLOR,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.strokeOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverWhiskerStroke',
-      anychart.core.settings.strokeOrFunctionNormalizer,
-      0,
-      0,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.strokeOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectWhiskerStroke',
-      anychart.core.settings.strokeOrFunctionNormalizer,
-      0,
-      0,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.strokeOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hatchFill',
-      anychart.core.settings.hatchFillOrFunctionNormalizer,
-      anychart.ConsistencyState.SERIES_COLOR | anychart.ConsistencyState.SERIES_POINTS,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.hatchFillOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverHatchFill',
-      anychart.core.settings.hatchFillOrFunctionNormalizer,
-      0,
-      0,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.hatchFillOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectHatchFill',
-      anychart.core.settings.hatchFillOrFunctionNormalizer,
-      0,
-      0,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.hatchFillOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'negativeHatchFill',
-      anychart.core.settings.hatchFillOrFunctionNormalizer,
-      anychart.ConsistencyState.SERIES_COLOR,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.hatchFillOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverNegativeHatchFill',
-      anychart.core.settings.hatchFillOrFunctionNormalizer,
-      0,
-      0,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.hatchFillOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectNegativeHatchFill',
-      anychart.core.settings.hatchFillOrFunctionNormalizer,
-      0,
-      0,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.hatchFillOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'risingHatchFill',
-      anychart.core.settings.hatchFillOrFunctionNormalizer,
-      anychart.ConsistencyState.SERIES_COLOR,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.hatchFillOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverRisingHatchFill',
-      anychart.core.settings.hatchFillOrFunctionNormalizer,
-      0,
-      0,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.hatchFillOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectRisingHatchFill',
-      anychart.core.settings.hatchFillOrFunctionNormalizer,
-      0,
-      0,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.hatchFillOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'fallingHatchFill',
-      anychart.core.settings.hatchFillOrFunctionNormalizer,
-      anychart.ConsistencyState.SERIES_COLOR,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.hatchFillOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverFallingHatchFill',
-      anychart.core.settings.hatchFillOrFunctionNormalizer,
-      0,
-      0,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.hatchFillOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectFallingHatchFill',
-      anychart.core.settings.hatchFillOrFunctionNormalizer,
-      0,
-      0,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.hatchFillOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'color',
-      anychart.core.settings.colorNormalizer,
-      anychart.ConsistencyState.SERIES_COLOR,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.colorNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'xPointPosition',
-      anychart.core.settings.numberNormalizer,
-      anychart.ConsistencyState.SERIES_POINTS,
-      anychart.Signal.NEEDS_REDRAW,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.numberNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'pointWidth',
-      anychart.core.settings.numberOrPercentNormalizer,
-      anychart.ConsistencyState.SERIES_POINTS,
-      anychart.Signal.NEEDS_REDRAW,
-      anychart.core.drawers.Capabilities.IS_WIDTH_BASED);
+      anychart.core.settings.numberOrPercentNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'connectMissingPoints',
-      anychart.core.settings.booleanNormalizer,
-      anychart.ConsistencyState.SERIES_POINTS,
-      anychart.Signal.NEEDS_REDRAW,
-      anychart.core.drawers.Capabilities.SUPPORTS_CONNECTING_MISSING);
+      anychart.core.settings.booleanNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'displayNegative',
-      anychart.core.settings.booleanNormalizer,
-      anychart.ConsistencyState.SERIES_POINTS,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEEDS_RECALCULATION,
-      anychart.core.drawers.Capabilities.NEEDS_SIZE_SCALE);
+      anychart.core.settings.booleanNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'whiskerWidth',
-      anychart.core.settings.numberOrPercentNormalizer,
-      anychart.ConsistencyState.SERIES_POINTS,
-      anychart.Signal.NEEDS_REDRAW,
-      anychart.core.drawers.Capabilities.SUPPORTS_OUTLIERS);
+      anychart.core.settings.numberOrPercentNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'hoverWhiskerWidth',
-      anychart.core.settings.numberOrPercentNormalizer,
-      0,
-      0,
-      anychart.core.drawers.Capabilities.SUPPORTS_OUTLIERS);
+      anychart.core.settings.numberOrPercentNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'selectWhiskerWidth',
-      anychart.core.settings.numberOrPercentNormalizer,
-      0,
-      0,
-      anychart.core.drawers.Capabilities.SUPPORTS_OUTLIERS);
+      anychart.core.settings.numberOrPercentNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'type',
-      anychart.core.settings.markerTypeNormalizer,
-      anychart.ConsistencyState.SERIES_POINTS,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
-      anychart.core.drawers.Capabilities.IS_MARKER_BASED);
+      anychart.core.settings.markerTypeNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'hoverType',
-      anychart.core.settings.markerTypeNormalizer,
-      0,
-      0,
-      anychart.core.drawers.Capabilities.IS_MARKER_BASED);
+      anychart.core.settings.markerTypeNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'selectType',
-      anychart.core.settings.markerTypeNormalizer,
-      0,
-      0,
-      anychart.core.drawers.Capabilities.IS_MARKER_BASED);
+      anychart.core.settings.markerTypeNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'size',
-      anychart.core.settings.numberNormalizer,
-      anychart.ConsistencyState.SERIES_POINTS,
-      anychart.Signal.NEEDS_REDRAW,
-      anychart.core.drawers.Capabilities.IS_MARKER_BASED);
+      anychart.core.settings.numberNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'hoverSize',
-      anychart.core.settings.numberNormalizer,
-      0,
-      0,
-      anychart.core.drawers.Capabilities.IS_MARKER_BASED);
+      anychart.core.settings.numberNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'selectSize',
-      anychart.core.settings.numberNormalizer,
-      0,
-      0,
-      anychart.core.drawers.Capabilities.IS_MARKER_BASED);
+      anychart.core.settings.numberNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'stepDirection',
-      anychart.enums.normalizeStepDirection,
-      anychart.ConsistencyState.SERIES_POINTS,
-      anychart.Signal.NEEDS_REDRAW,
-      anychart.core.drawers.Capabilities.SUPPORTS_STEP_DIRECTION);
+      anychart.enums.normalizeStepDirection);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'isVertical',
-      anychart.core.settings.boolOrNullNormalizer,
-      anychart.ConsistencyState.SERIES_POINTS,
-      anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW,
-      anychart.core.drawers.Capabilities.ANY);
+      anychart.core.settings.boolOrNullNormalizer);
 
   return map;
 })();
@@ -4557,9 +4456,9 @@ anychart.core.series.Base.prototype.disposeInternal = function() {
   delete this.chart;
   delete this.plot;
   delete this.iterator;
-  delete this.defaultSettings;
+  delete this.themeSettings;
   delete this.autoSettings;
-  delete this.settings;
+  delete this.ownSettings;
   delete this.shapeManager;
   delete this.drawer;
   delete this.markers_;

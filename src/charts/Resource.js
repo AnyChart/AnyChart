@@ -302,6 +302,16 @@ anychart.charts.Resource = function(opt_data, opt_csvSettings) {
   this.data(opt_data || null, opt_csvSettings);
 
   this.bindHandlersToComponent(this, this.handleMouseOverAndMove, this.handleMouseOut, null, this.handleMouseOverAndMove, null, this.handleMouseDown);
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['pixPerHour', anychart.ConsistencyState.RESOURCE_DATA, anychart.Signal.NEEDS_REDRAW],
+    ['minRowHeight', anychart.ConsistencyState.RESOURCE_DATA, anychart.Signal.NEEDS_REDRAW],
+    ['resourceListWidth', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['timeLineHeight', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['defaultMinutesPerDay', anychart.ConsistencyState.RESOURCE_DATA, anychart.Signal.NEEDS_REDRAW],
+    ['currentStartDate', anychart.ConsistencyState.RESOURCE_X_SCALE_POSITION, anychart.Signal.NEEDS_REDRAW],
+    ['splitterStroke', anychart.ConsistencyState.RESOURCE_SPLITTER, anychart.Signal.NEEDS_REDRAW]
+  ]);
 };
 goog.inherits(anychart.charts.Resource, anychart.core.Chart);
 
@@ -421,9 +431,7 @@ anychart.charts.Resource.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'pixPerHour',
-      pixPerHourNormalizer,
-      anychart.ConsistencyState.RESOURCE_DATA,
-      anychart.Signal.NEEDS_REDRAW);
+      pixPerHourNormalizer);
 
   function minRowHeightNormalizer(opt_value) {
     var value = anychart.utils.toNumber(opt_value);
@@ -433,9 +441,7 @@ anychart.charts.Resource.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'minRowHeight',
-      minRowHeightNormalizer,
-      anychart.ConsistencyState.RESOURCE_DATA,
-      anychart.Signal.NEEDS_REDRAW);
+      minRowHeightNormalizer);
 
   function resourceListWidthNormalizer(opt_value) {
     var value = anychart.utils.normalizeNumberOrPercent(opt_value);
@@ -445,9 +451,7 @@ anychart.charts.Resource.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'resourceListWidth',
-      resourceListWidthNormalizer,
-      anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      resourceListWidthNormalizer);
 
   function timeLineHeightNormalizer(opt_value) {
     var value = anychart.utils.normalizeNumberOrPercent(opt_value);
@@ -457,9 +461,7 @@ anychart.charts.Resource.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'timeLineHeight',
-      timeLineHeightNormalizer,
-      anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      timeLineHeightNormalizer);
 
   function defaultMinutesPerDayNormalizer(opt_value) {
     return anychart.utils.normalizeToNaturalNumber(opt_value, 60);
@@ -468,9 +470,7 @@ anychart.charts.Resource.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'defaultMinutesPerDay',
-      defaultMinutesPerDayNormalizer,
-      anychart.ConsistencyState.RESOURCE_DATA,
-      anychart.Signal.NEEDS_REDRAW);
+      defaultMinutesPerDayNormalizer);
 
   function currentStartDateNormalizer(opt_value) {
     var date = anychart.format.parseDateTime(opt_value);
@@ -480,16 +480,12 @@ anychart.charts.Resource.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'currentStartDate',
-      currentStartDateNormalizer,
-      anychart.ConsistencyState.RESOURCE_X_SCALE_POSITION,
-      anychart.Signal.NEEDS_REDRAW);
+      currentStartDateNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'splitterStroke',
-      anychart.core.settings.strokeNormalizer,
-      anychart.ConsistencyState.RESOURCE_SPLITTER,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.strokeNormalizer);
 
   return map;
 })();

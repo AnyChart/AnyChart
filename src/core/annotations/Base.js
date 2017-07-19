@@ -12,7 +12,6 @@ goog.require('anychart.math.Rect');
  * @param {!anychart.core.annotations.ChartController} chartController
  * @constructor
  * @extends {anychart.core.VisualBaseWithBounds}
- * @implements {anychart.core.settings.IObjectWithSettings}
  */
 anychart.core.annotations.Base = function(chartController) {
   anychart.core.annotations.Base.base(this, 'constructor');
@@ -29,20 +28,6 @@ anychart.core.annotations.Base = function(chartController) {
    * @private
    */
   this.plotController_ = null;
-
-  /**
-   * Settings storage.
-   * @type {!Object}
-   * @protected
-   */
-  this.settings = {};
-
-  /**
-   * Default settings.
-   * @type {!Object}
-   * @protected
-   */
-  this.defaultSettings = {};
 
   /**
    * Root annotation layer.
@@ -122,6 +107,8 @@ anychart.core.annotations.Base = function(chartController) {
    * @protected
    */
   this.markersSupported = true;
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.core.annotations.BASE_DESCRIPTORS_META);
 };
 goog.inherits(anychart.core.annotations.Base, anychart.core.VisualBaseWithBounds);
 anychart.core.settings.populate(anychart.core.annotations.Base, anychart.core.annotations.BASE_DESCRIPTORS);
@@ -379,11 +366,11 @@ anychart.core.annotations.Base.prototype.updateLastPoint = function(x, y) {
 anychart.core.annotations.Base.prototype.saveLastPoint = function() {
   this.calculate();
   if (this.lastPointXName) {
-    this.settings[this.lastPointXName] = this.xScale().inverseTransform(
+    this.ownSettings[this.lastPointXName] = this.xScale().inverseTransform(
         (this.lastPointX - this.pixelBoundsCache.left) / this.pixelBoundsCache.width);
   }
   if (this.lastPointYName)
-    this.settings[this.lastPointYName] = this.yScale().inverseTransform(
+    this.ownSettings[this.lastPointYName] = this.yScale().inverseTransform(
         (this.pixelBoundsCache.getBottom() - this.lastPointY) / this.pixelBoundsCache.height);
   this.lastPointX = this.lastPointY = NaN;
   this.allowUnbindPlot_ = false;
@@ -463,12 +450,12 @@ anychart.core.annotations.Base.prototype.moveAnchor = function(anchorId, dx, dy)
 anychart.core.annotations.Base.prototype.moveAnchor_ = function(xName, yName, dx, dy) {
   if (xName) {
     this.coords[xName] = this.securedCoords[xName] + dx;
-    this.settings[xName] = this.xScale().inverseTransform(
+    this.ownSettings[xName] = this.xScale().inverseTransform(
         (this.coords[xName] - this.pixelBoundsCache.left) / this.pixelBoundsCache.width);
   }
   if (yName) {
     this.coords[yName] = this.securedCoords[yName] + dy;
-    this.settings[yName] = this.yScale().inverseTransform(
+    this.ownSettings[yName] = this.yScale().inverseTransform(
         (this.pixelBoundsCache.getBottom() - this.coords[yName]) / this.pixelBoundsCache.height);
   }
 };
@@ -1212,63 +1199,9 @@ anychart.core.annotations.Base.prototype.unselect = function() {
 //  IObjectWithSettings impl
 //
 //----------------------------------------------------------------------------------------------------------------------
-/**
- * Returns option value if it was set directly to the object.
- * @param {string} name
- * @return {*}
- */
-anychart.core.annotations.Base.prototype.getOwnOption = function(name) {
-  return this.settings[name];
-};
-
-
-/**
- * Returns true if the option value was set directly to the object.
- * @param {string} name
- * @return {boolean}
- */
+/** @inheritDoc */
 anychart.core.annotations.Base.prototype.hasOwnOption = function(name) {
-  return goog.isDefAndNotNull(this.settings[name]);
-};
-
-
-/**
- * Returns option value from the theme if any.
- * @param {string} name
- * @return {*}
- */
-anychart.core.annotations.Base.prototype.getThemeOption = function(name) {
-  return this.defaultSettings[name];
-};
-
-
-/**
- * Returns option value by priorities.
- * @param {string} name
- * @return {*}
- */
-anychart.core.annotations.Base.prototype.getOption = function(name) {
-  return goog.isDefAndNotNull(this.settings[name]) ? this.settings[name] : this.defaultSettings[name];
-};
-
-
-/**
- * Sets option value to the instance.
- * @param {string} name
- * @param {*} value
- */
-anychart.core.annotations.Base.prototype.setOption = function(name, value) {
-  this.settings[name] = value;
-};
-
-
-/**
- * Performs checks on the instance to determine whether the state should be invalidated after option change.
- * @param {number} flags
- * @return {boolean}
- */
-anychart.core.annotations.Base.prototype.check = function(flags) {
-  return true;
+  return goog.isDefAndNotNull(this.ownSettings[name]);
 };
 
 
@@ -1284,7 +1217,7 @@ anychart.core.annotations.Base.prototype.check = function(flags) {
  * @param {!Object} value
  */
 anychart.core.annotations.Base.prototype.setDefaultSettings = function(value) {
-  this.defaultSettings = value;
+  this.themeSettings = value;
   this.markers().setup(value['markers']);
   this.hoverMarkers().setup(value['hoverMarkers']);
   this.selectMarkers().setup(value['selectMarkers']);
@@ -1326,8 +1259,8 @@ anychart.core.annotations.Base.prototype.disposeInternal = function() {
   this.plotController_ = null;
   this.xScale_ = null;
   this.yScale_ = null;
-  delete this.settings;
-  delete this.defaultSettings;
+  delete this.ownSettings;
+  delete this.themeSettings;
 
   anychart.core.annotations.Base.base(this, 'disposeInternal');
 };

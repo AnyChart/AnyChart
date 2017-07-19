@@ -26,7 +26,6 @@ goog.require('goog.object');
  *  DEV NOTE: Use this parameter in constructor function only!
  * @constructor
  * @extends {anychart.core.VisualBase}
- * @implements {anychart.core.settings.IObjectWithSettings}
  * @implements {anychart.core.settings.IResolvable}
  */
 anychart.core.ui.Tooltip = function(capability) {
@@ -38,18 +37,6 @@ anychart.core.ui.Tooltip = function(capability) {
    * @type {number}
    */
   this.capability = capability;
-
-  /**
-   * Settings storage.
-   * @type {!Object}
-   */
-  this.ownSettings = {};
-
-  /**
-   * Theme settings.
-   * @type {!Object}
-   */
-  this.themeSettings = {};
 
   /**
    * Pixel bounds cache.
@@ -146,6 +133,71 @@ anychart.core.ui.Tooltip = function(capability) {
   this.tooltipContainer_ = null;
 
   anychart.utils.tooltipsRegistry[String(goog.getUid(this))] = this;
+
+  anychart.core.settings.createTextPropertiesDescriptorsMeta(this.descriptorsMeta,
+      anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
+      anychart.ConsistencyState.TOOLTIP_CONTENT | anychart.ConsistencyState.TOOLTIP_TITLE,
+      anychart.Signal.NEEDS_REDRAW,
+      anychart.Signal.NEEDS_REDRAW);
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['width',
+      anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['height',
+      anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['titleFormat',
+      anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
+      anychart.Signal.NEEDS_REDRAW],
+    ['format',
+      anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
+      anychart.Signal.NEEDS_REDRAW],
+    ['unionFormat',
+      anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
+      anychart.Signal.NEEDS_REDRAW],
+    ['valuePrefix',
+      anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
+      anychart.Signal.NEEDS_REDRAW],
+    ['valuePostfix',
+      anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
+      anychart.Signal.NEEDS_REDRAW],
+    ['position',
+      anychart.ConsistencyState.TOOLTIP_POSITION,
+      anychart.Signal.NEEDS_REDRAW],
+    ['anchor',
+      anychart.ConsistencyState.TOOLTIP_POSITION,
+      anychart.Signal.NEEDS_REDRAW],
+    ['offsetX',
+      anychart.ConsistencyState.TOOLTIP_POSITION,
+      anychart.Signal.NEEDS_REDRAW],
+    ['offsetY',
+      anychart.ConsistencyState.TOOLTIP_POSITION,
+      anychart.Signal.NEEDS_REDRAW],
+    ['x',
+      anychart.ConsistencyState.TOOLTIP_POSITION,
+      anychart.Signal.NEEDS_REDRAW],
+    ['y',
+      anychart.ConsistencyState.TOOLTIP_POSITION,
+      anychart.Signal.NEEDS_REDRAW],
+    //TODO (A.Kudryavtsev): Check consistency states and signals!!!
+    ['allowLeaveScreen',
+      anychart.ConsistencyState.CONTAINER,
+      anychart.Signal.NEEDS_REDRAW],
+    ['allowLeaveChart',
+      anychart.ConsistencyState.CONTAINER,
+      anychart.Signal.NEEDS_REDRAW],
+    ['allowLeaveStage',
+      anychart.ConsistencyState.CONTAINER,
+      anychart.Signal.NEEDS_REDRAW],
+    ['displayMode',
+      anychart.ConsistencyState.TOOLTIP_MODE,
+      anychart.Signal.NEEDS_REDRAW,
+      anychart.core.ui.Tooltip.Capabilities.CAN_CHANGE_DISPLAY_MODE],
+    ['positionMode',
+      anychart.ConsistencyState.TOOLTIP_POSITION,
+      anychart.Signal.NEEDS_REDRAW,
+      anychart.core.ui.Tooltip.Capabilities.CAN_CHANGE_POSITION_MODE]
+  ]);
 };
 goog.inherits(anychart.core.ui.Tooltip, anychart.core.VisualBase);
 
@@ -211,12 +263,7 @@ anychart.core.ui.Tooltip.Capabilities = {
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
 anychart.core.ui.Tooltip.prototype.TEXT_PROPERTY_DESCRIPTORS =
-    anychart.core.settings.createTextPropertiesDescriptors(
-        anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
-        anychart.ConsistencyState.TOOLTIP_CONTENT | anychart.ConsistencyState.TOOLTIP_TITLE,
-        anychart.Signal.NEEDS_REDRAW,
-        anychart.Signal.NEEDS_REDRAW
-    );
+    anychart.core.settings.createTextPropertiesDescriptors();
 anychart.core.settings.populate(anychart.core.ui.Tooltip, anychart.core.ui.Tooltip.prototype.TEXT_PROPERTY_DESCRIPTORS);
 
 
@@ -232,148 +279,109 @@ anychart.core.ui.Tooltip.prototype.TOOLTIP_SIMPLE_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'width',
-      anychart.core.settings.numberOrPercentNormalizer,
-      anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      anychart.core.settings.numberOrPercentNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'height',
-      anychart.core.settings.numberOrPercentNormalizer,
-      anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      anychart.core.settings.numberOrPercentNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'titleFormat',
-      anychart.core.settings.stringOrFunctionNormalizer,
-      anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.stringOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'format',
-      anychart.core.settings.stringOrFunctionNormalizer,
-      anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.stringOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'unionFormat',
-      anychart.core.settings.stringOrFunctionNormalizer,
-      anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.stringOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'valuePrefix',
-      anychart.core.settings.stringNormalizer,
-      anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.stringNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'valuePostfix',
-      anychart.core.settings.stringNormalizer,
-      anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.stringNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'position',
-      anychart.enums.normalizePosition,
-      anychart.ConsistencyState.TOOLTIP_POSITION,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.enums.normalizePosition);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'anchor',
-      anychart.enums.normalizeAnchor,
-      anychart.ConsistencyState.TOOLTIP_POSITION,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.enums.normalizeAnchor);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'offsetX',
-      anychart.core.settings.numberNormalizer,
-      anychart.ConsistencyState.TOOLTIP_POSITION,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.numberNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'offsetY',
-      anychart.core.settings.numberNormalizer,
-      anychart.ConsistencyState.TOOLTIP_POSITION,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.numberNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'x',
-      anychart.core.settings.numberNormalizer,
-      anychart.ConsistencyState.TOOLTIP_POSITION,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.numberNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'y',
-      anychart.core.settings.numberNormalizer,
-      anychart.ConsistencyState.TOOLTIP_POSITION,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.numberNormalizer);
 
-  //TODO (A.Kudryavtsev): Check consistency states and signals!!!
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'allowLeaveScreen',
-      anychart.core.settings.booleanNormalizer,
-      anychart.ConsistencyState.CONTAINER,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.booleanNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'allowLeaveChart',
-      anychart.core.settings.booleanNormalizer,
-      anychart.ConsistencyState.CONTAINER,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.booleanNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'allowLeaveStage',
-      anychart.core.settings.booleanNormalizer,
-      anychart.ConsistencyState.CONTAINER,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.booleanNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'displayMode',
-      anychart.enums.normalizeTooltipDisplayMode,
-      anychart.ConsistencyState.TOOLTIP_MODE,
-      anychart.Signal.NEEDS_REDRAW,
-      anychart.core.ui.Tooltip.Capabilities.CAN_CHANGE_DISPLAY_MODE);
+      anychart.enums.normalizeTooltipDisplayMode);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'positionMode',
-      anychart.enums.normalizeTooltipPositionMode,
-      anychart.ConsistencyState.TOOLTIP_POSITION,
-      anychart.Signal.NEEDS_REDRAW,
-      anychart.core.ui.Tooltip.Capabilities.CAN_CHANGE_POSITION_MODE);
+      anychart.enums.normalizeTooltipPositionMode);
 
   return map;
 })();
@@ -2133,55 +2141,21 @@ anychart.core.ui.Tooltip.prototype.parentInvalidated_ = function(e) {
 //  IObjectWithSettings impl
 //
 //----------------------------------------------------------------------------------------------------------------------
-/**
- * Returns option value if it was set directly to the object.
- * @param {string} name
- * @return {*}
- */
-anychart.core.ui.Tooltip.prototype.getOwnOption = function(name) {
-  return this.ownSettings[name];
-};
-
-
-/**
- * Returns true if the option value was set directly to the object.
- * @param {string} name
- * @return {boolean}
- */
+/** @inheritDoc */
 anychart.core.ui.Tooltip.prototype.hasOwnOption = function(name) {
   return goog.isDefAndNotNull(this.ownSettings[name]);
 };
 
 
 /**
- * Returns option value from the theme if any.
+ * @override
  * @param {string} name
  * @return {*}
  */
-anychart.core.ui.Tooltip.prototype.getThemeOption = function(name) {
-  return this.themeSettings[name];
-};
-
-
-/** @inheritDoc */
 anychart.core.ui.Tooltip.prototype.getOption = anychart.core.settings.getOption;
 
 
-/**
- * Sets option value to the instance.
- * @param {string} name
- * @param {*} value
- */
-anychart.core.ui.Tooltip.prototype.setOption = function(name, value) {
-  this.ownSettings[name] = value;
-};
-
-
-/**
- * Performs checks on the instance to determine whether the state should be invalidated after option change.
- * @param {number} flags
- * @return {boolean}
- */
+/** @inheritDoc */
 anychart.core.ui.Tooltip.prototype.check = function(flags) {
   if (goog.isDef(flags)) {
     return !!(flags & this.capability);

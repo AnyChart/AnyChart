@@ -22,6 +22,13 @@ goog.require('anychart.core.series.Radar');
  */
 anychart.core.series.Polar = function(chart, plot, type, config, sortedMode) {
   anychart.core.series.Polar.base(this, 'constructor', chart, plot, type, config, sortedMode);
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['closed',
+      anychart.ConsistencyState.SERIES_POINTS,
+      anychart.Signal.NEEDS_REDRAW,
+      anychart.core.series.Capabilities.ANY]
+  ]);
 };
 goog.inherits(anychart.core.series.Polar, anychart.core.series.Radar);
 
@@ -37,10 +44,7 @@ anychart.core.series.Polar.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'closed',
-      anychart.core.settings.booleanNormalizer,
-      anychart.ConsistencyState.SERIES_POINTS,
-      anychart.Signal.NEEDS_REDRAW,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.booleanNormalizer);
   return map;
 })();
 anychart.core.settings.populate(anychart.core.series.Polar, anychart.core.series.Polar.PROPERTY_DESCRIPTORS);

@@ -13,7 +13,6 @@ goog.require('anychart.utils');
  * Class for a separator element.
  * @constructor
  * @extends {anychart.core.VisualBase}
- * @implements {anychart.core.settings.IObjectWithSettings}
  * @implements {anychart.core.settings.IResolvable}
  */
 anychart.core.ui.Separator = function() {
@@ -61,18 +60,6 @@ anychart.core.ui.Separator = function() {
   this.pixelBounds_ = null;
 
   /**
-   * Theme settings.
-   * @type {Object}
-   */
-  this.themeSettings = {};
-
-  /**
-   * Own settings (Settings set by user with API).
-   * @type {Object}
-   */
-  this.ownSettings = {};
-
-  /**
    * Parent separator.
    * @type {anychart.core.ui.Separator}
    * @private
@@ -111,6 +98,14 @@ anychart.core.ui.Separator = function() {
   this.drawer(drawer);
 
   this.invalidate(anychart.ConsistencyState.ALL);
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['fill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['stroke', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['width', anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['height', anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['orientation', anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED]
+  ]);
 };
 goog.inherits(anychart.core.ui.Separator, anychart.core.VisualBase);
 
@@ -147,41 +142,31 @@ anychart.core.ui.Separator.prototype.SIMPLE_SEPARATOR_DESCRIPTORS = (function() 
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'fill',
-      anychart.core.settings.fillOrFunctionNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.fillOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'stroke',
-      anychart.core.settings.strokeOrFunctionNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.strokeOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'width',
-      anychart.core.settings.numberOrPercentNormalizer,
-      anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      anychart.core.settings.numberOrPercentNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'height',
-      anychart.core.settings.numberOrPercentNormalizer,
-      anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      anychart.core.settings.numberOrPercentNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'orientation',
-      anychart.enums.normalizeOrientation,
-      anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      anychart.enums.normalizeOrientation);
 
   return map;
 })();
@@ -191,37 +176,17 @@ anychart.core.settings.populate(anychart.core.ui.Separator, anychart.core.ui.Sep
 //endregion
 //region -- IObjectWithSettings implementation
 /** @inheritDoc */
-anychart.core.ui.Separator.prototype.getOwnOption = function(name) {
-  return this.ownSettings[name];
-};
-
-
-/** @inheritDoc */
 anychart.core.ui.Separator.prototype.hasOwnOption = function(name) {
   return goog.isDefAndNotNull(this.ownSettings[name]);
 };
 
 
-/** @inheritDoc */
-anychart.core.ui.Separator.prototype.getThemeOption = function(name) {
-  return this.themeSettings[name];
-};
-
-
-/** @inheritDoc */
+/**
+ * @override
+ * @param {string} name
+ * @return {*}
+ */
 anychart.core.ui.Separator.prototype.getOption = anychart.core.settings.getOption;
-
-
-/** @inheritDoc */
-anychart.core.ui.Separator.prototype.setOption = function(name, value) {
-  this.ownSettings[name] = value;
-};
-
-
-/** @inheritDoc */
-anychart.core.ui.Separator.prototype.check = function(flags) {
-  return true;
-};
 
 
 //endregion
@@ -651,22 +616,11 @@ anychart.core.ui.Separator.prototype.enabled = function(opt_value) {
 anychart.core.ui.Separator.prototype.serialize = function() {
   var json = {};
 
-  var zIndex;
-  if (this.hasOwnOption('zIndex')) {
-    zIndex = this.getOwnOption('zIndex');
-  }
-  if (!goog.isDef(zIndex)) {
-    zIndex = this.getThemeOption('zIndex');
-  }
-  if (goog.isDef(zIndex)) json['zIndex'] = zIndex;
+  var zIndex = anychart.core.Base.prototype.getOption.call(this, 'zIndex');
+  if (goog.isDef(zIndex))
+    json['zIndex'] = zIndex;
 
-  var enabled;
-  if (this.hasOwnOption('enabled')) {
-    enabled = this.getOwnOption('enabled');
-  }
-  if (!goog.isDef(enabled)) {
-    enabled = this.getThemeOption('enabled');
-  }
+  var enabled = anychart.core.Base.prototype.getOption.call(this, 'enabled');
   if (goog.isDef(enabled))
     json['enabled'] = enabled;
 

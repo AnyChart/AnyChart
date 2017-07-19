@@ -9,7 +9,6 @@ goog.require('anychart.core.ui.Label');
  * Class representing item in resource list.
  * @param {anychart.core.resource.ResourceList} resourceList
  * @constructor
- * @implements {anychart.core.settings.IObjectWithSettings}
  * @extends {anychart.core.VisualBase}
  */
 anychart.core.resource.resourceList.Item = function(resourceList) {
@@ -21,20 +20,6 @@ anychart.core.resource.resourceList.Item = function(resourceList) {
    * @private
    */
   this.resourceList_ = resourceList;
-
-  /**
-   * Settings storage.
-   * @type {!Object}
-   * @protected
-   */
-  this.settings = {};
-
-  /**
-   * Default settings.
-   * @type {!Object}
-   * @protected
-   */
-  this.defaultSettings = {};
 
   /**
    * Root layer of resource item.
@@ -113,6 +98,15 @@ anychart.core.resource.resourceList.Item = function(resourceList) {
    * @type {number}
    */
   this.index = NaN;
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['width', 0, 0],
+    ['imageSrc', 0, 0],
+    ['name', 0, 0],
+    ['type', 0, 0],
+    ['description', 0, anychart.Signal.NEEDS_REDRAW],
+    ['tags', 0, anychart.Signal.NEEDS_REDRAW]
+  ]);
 };
 goog.inherits(anychart.core.resource.resourceList.Item, anychart.core.VisualBase);
 
@@ -135,44 +129,6 @@ anychart.core.resource.resourceList.Item.prototype.SUPPORTED_CONSISTENCY_STATES 
 
 
 //endregion
-//region --- IObjectWithSettings IMPLEMENTATION ---
-/** @inheritDoc */
-anychart.core.resource.resourceList.Item.prototype.check = function(flags) {
-  return true;
-};
-
-
-/** @inheritDoc */
-anychart.core.resource.resourceList.Item.prototype.getOption = function(name) {
-  return goog.isDef(this.settings[name]) ? this.settings[name] : this.defaultSettings[name];
-};
-
-
-/** @inheritDoc */
-anychart.core.resource.resourceList.Item.prototype.getOwnOption = function(name) {
-  return this.settings[name];
-};
-
-
-/** @inheritDoc */
-anychart.core.resource.resourceList.Item.prototype.getThemeOption = function(name) {
-  return this.defaultSettings[name];
-};
-
-
-/** @inheritDoc */
-anychart.core.resource.resourceList.Item.prototype.hasOwnOption = function(name) {
-  return goog.isDef(this.settings[name]);
-};
-
-
-/** @inheritDoc */
-anychart.core.resource.resourceList.Item.prototype.setOption = function(name, value) {
-  this.settings[name] = value;
-};
-
-
-//endregion
 //region --- ADDITIONAL SETTINGS METHODS ---
 /**
  * Sets default value to the instance.
@@ -180,7 +136,7 @@ anychart.core.resource.resourceList.Item.prototype.setOption = function(name, va
  * @param {*} value
  */
 anychart.core.resource.resourceList.Item.prototype.setThemeOption = function(name, value) {
-  this.defaultSettings[name] = value;
+  this.themeSettings[name] = value;
 };
 
 
@@ -294,49 +250,37 @@ anychart.core.resource.resourceList.Item.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'width',
-      anychart.core.settings.numberOrPercentNormalizer,
-      0,
-      0);
+      anychart.core.settings.numberOrPercentNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'imageSrc',
-      anychart.core.settings.stringNormalizer,
-      0,
-      0);
+      anychart.core.settings.stringNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'name',
-      anychart.core.settings.stringNormalizer,
-      0,
-      0);
+      anychart.core.settings.stringNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'type',
-      anychart.core.settings.stringNormalizer,
-      0,
-      0);
+      anychart.core.settings.stringNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'description',
-      anychart.core.settings.stringNormalizer,
-      0,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.stringNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'tags',
-      anychart.core.settings.arrayNormalizer,
-      0,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.arrayNormalizer);
 
   return map;
 })();

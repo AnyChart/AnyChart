@@ -11,7 +11,6 @@ goog.require('anychart.core.utils.Padding');
  * Resource Chart Timeline element.
  * @constructor
  * @extends {anychart.core.Base}
- * @implements {anychart.core.settings.IObjectWithSettings}
  * @implements {anychart.core.settings.IResolvable}
  */
 anychart.core.resource.TimeLineLevelHolidaysSettings = function() {
@@ -24,18 +23,6 @@ anychart.core.resource.TimeLineLevelHolidaysSettings = function() {
    */
   this.padding_ = new anychart.core.utils.Padding();
   this.padding_.listenSignals(this.boundsInvalidated_, this);
-
-  /**
-   * Settings holder.
-   * @type {!Object}
-   */
-  this.settings = {};
-
-  /**
-   * Default settings holder.
-   * @type {!Object}
-   */
-  this.defaultSettings = {};
 
   /**
    * Parent title.
@@ -52,6 +39,16 @@ anychart.core.resource.TimeLineLevelHolidaysSettings = function() {
   this.resolutionChainCache_ = null;
 
   this.markConsistent(anychart.ConsistencyState.ALL);
+
+  anychart.core.settings.createTextPropertiesDescriptorsMeta(this.descriptorsMeta,
+      anychart.ConsistencyState.ONLY_DISPATCHING,
+      anychart.ConsistencyState.ONLY_DISPATCHING,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED,
+      anychart.Signal.NEEDS_REDRAW);
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['fill', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
+    ['format', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED]
+  ]);
 };
 goog.inherits(anychart.core.resource.TimeLineLevelHolidaysSettings, anychart.core.Base);
 
@@ -73,39 +70,13 @@ anychart.core.resource.TimeLineLevelHolidaysSettings.prototype.SUPPORTED_SIGNALS
 
 
 //endregion
-//region --- IObjectWithSettings implementation
-/** @inheritDoc */
-anychart.core.resource.TimeLineLevelHolidaysSettings.prototype.getOwnOption = function(name) {
-  return this.settings[name];
-};
-
-
-/** @inheritDoc */
-anychart.core.resource.TimeLineLevelHolidaysSettings.prototype.hasOwnOption = function(name) {
-  return goog.isDef(this.settings[name]);
-};
-
-
-/** @inheritDoc */
-anychart.core.resource.TimeLineLevelHolidaysSettings.prototype.getThemeOption = function(name) {
-  return this.defaultSettings[name];
-};
-
-
-/** @inheritDoc */
+//region --- IObjectWithSettings overrides
+/**
+ * @override
+ * @param {string} name
+ * @return {*}
+ */
 anychart.core.resource.TimeLineLevelHolidaysSettings.prototype.getOption = anychart.core.settings.getOption;
-
-
-/** @inheritDoc */
-anychart.core.resource.TimeLineLevelHolidaysSettings.prototype.setOption = function(name, value) {
-  this.settings[name] = value;
-};
-
-
-/** @inheritDoc */
-anychart.core.resource.TimeLineLevelHolidaysSettings.prototype.check = function(flags) {
-  return true;
-};
 
 
 //endregion
@@ -125,7 +96,7 @@ anychart.core.resource.TimeLineLevelHolidaysSettings.prototype.getResolutionChai
 
 /** @inheritDoc */
 anychart.core.resource.TimeLineLevelHolidaysSettings.prototype.getLowPriorityResolutionChain = function() {
-  var sett = [this.defaultSettings];
+  var sett = [this.themeSettings];
   if (this.parent_) {
     sett = goog.array.concat(sett, this.parent_.getLowPriorityResolutionChain());
   }
@@ -135,7 +106,7 @@ anychart.core.resource.TimeLineLevelHolidaysSettings.prototype.getLowPriorityRes
 
 /** @inheritDoc */
 anychart.core.resource.TimeLineLevelHolidaysSettings.prototype.getHighPriorityResolutionChain = function() {
-  var sett = [this.settings];
+  var sett = [this.ownSettings];
   if (this.parent_) {
     sett = goog.array.concat(sett, this.parent_.getHighPriorityResolutionChain());
   }
@@ -206,18 +177,12 @@ anychart.core.resource.TimeLineLevelHolidaysSettings.prototype.parentInvalidated
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
 anychart.core.resource.TimeLineLevelHolidaysSettings.TEXT_DESCRIPTORS = (function() {
-  var map = anychart.core.settings.createTextPropertiesDescriptors(
-      anychart.ConsistencyState.ONLY_DISPATCHING,
-      anychart.ConsistencyState.ONLY_DISPATCHING,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED,
-      anychart.Signal.NEEDS_REDRAW);
+  var map = anychart.core.settings.createTextPropertiesDescriptors();
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'format',
-      anychart.core.settings.stringOrFunctionNormalizer,
-      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      anychart.core.settings.stringOrFunctionNormalizer);
   return map;
 })();
 anychart.core.settings.populate(anychart.core.resource.TimeLineLevelHolidaysSettings, anychart.core.resource.TimeLineLevelHolidaysSettings.TEXT_DESCRIPTORS);
@@ -235,9 +200,7 @@ anychart.core.resource.TimeLineLevelHolidaysSettings.DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'fill',
-      anychart.core.settings.fillNormalizer,
-      anychart.ConsistencyState.ONLY_DISPATCHING,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.fillNormalizer);
 
   return map;
 })();
@@ -288,8 +251,8 @@ anychart.core.resource.TimeLineLevelHolidaysSettings.prototype.boundsInvalidated
  * @param {!Object} config
  */
 anychart.core.resource.TimeLineLevelHolidaysSettings.prototype.setThemeSettings = function(config) {
-  anychart.core.settings.copy(this.defaultSettings, anychart.core.resource.TimeLineLevelHolidaysSettings.DESCRIPTORS, config);
-  anychart.core.settings.copy(this.defaultSettings, anychart.core.resource.TimeLineLevelHolidaysSettings.TEXT_DESCRIPTORS, config);
+  anychart.core.settings.copy(this.themeSettings, anychart.core.resource.TimeLineLevelHolidaysSettings.DESCRIPTORS, config);
+  anychart.core.settings.copy(this.themeSettings, anychart.core.resource.TimeLineLevelHolidaysSettings.TEXT_DESCRIPTORS, config);
 };
 
 

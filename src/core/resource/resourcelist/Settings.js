@@ -6,26 +6,11 @@ goog.require('anychart.core.settings');
 
 /**
  * Base class for all settings.
- * @implements {anychart.core.settings.IObjectWithSettings}
  * @extends {anychart.core.Base}
  * @constructor
  */
 anychart.core.resource.resourceList.Settings = function() {
   anychart.core.resource.resourceList.Settings.base(this, 'constructor');
-
-  /**
-   * Settings storage.
-   * @type {!Object}
-   * @protected
-   */
-  this.settings = {};
-
-  /**
-   * Default settings.
-   * @type {!Object}
-   * @protected
-   */
-  this.defaultSettings = {};
 };
 goog.inherits(anychart.core.resource.resourceList.Settings, anychart.core.Base);
 
@@ -59,44 +44,8 @@ anychart.core.resource.resourceList.Settings.prototype.invalidate = function(sta
 anychart.core.resource.resourceList.Settings.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.resource.resourceList.Settings.base(this, 'setupByJSON', config, opt_default);
   if (!!opt_default)
-    this.defaultSettings = config || {};
+    this.themeSettings = config || {};
 };
 
 
-//endregion
-//region --- IObjectWithSettings implementation ---
-/** @inheritDoc */
-anychart.core.resource.resourceList.Settings.prototype.getOwnOption = function(name) {
-  return this.settings[name];
-};
-
-
-/** @inheritDoc */
-anychart.core.resource.resourceList.Settings.prototype.hasOwnOption = function(name) {
-  return goog.isDef(this.settings[name]);
-};
-
-
-/** @inheritDoc */
-anychart.core.resource.resourceList.Settings.prototype.getThemeOption = function(name) {
-  return this.defaultSettings[name];
-};
-
-
-/** @inheritDoc */
-anychart.core.resource.resourceList.Settings.prototype.getOption = function(name) {
-  return goog.isDef(this.settings[name]) ? this.settings[name] : this.defaultSettings[name];
-};
-
-
-/** @inheritDoc */
-anychart.core.resource.resourceList.Settings.prototype.setOption = function(name, value) {
-  this.settings[name] = value;
-};
-
-
-/** @inheritDoc */
-anychart.core.resource.resourceList.Settings.prototype.check = function(flags) {
-  return true;
-};
 //endregion

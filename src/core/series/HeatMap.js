@@ -35,6 +35,12 @@ anychart.core.series.HeatMap = function(chart, plot, type, config, sortedMode) {
   this.strokeResolver_ = /** @type {function(anychart.core.series.Base, number, boolean=, boolean=):acgraph.vector.Stroke} */(
       anychart.color.getColorResolver(
       ['stroke', 'hoverStroke', 'selectStroke'], anychart.enums.ColorType.STROKE));
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['stroke',
+      anychart.ConsistencyState.SERIES_POINTS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
+      anychart.core.series.Capabilities.ANY]
+  ]);
 };
 goog.inherits(anychart.core.series.HeatMap, anychart.core.series.Cartesian);
 
@@ -49,10 +55,7 @@ anychart.core.series.HeatMap.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'stroke',
-      anychart.core.settings.strokeOrFunctionNormalizer,
-      anychart.ConsistencyState.SERIES_POINTS,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
-      anychart.core.series.Capabilities.ANY);
+      anychart.core.settings.strokeOrFunctionNormalizer);
   return map;
 })();
 // populating series base prototype with properties

@@ -27,6 +27,13 @@ anychart.core.CartesianBase = function(opt_categorizeData) {
    * @private
    */
   this.xZoom_ = new anychart.core.utils.OrdinalZoom(this, true);
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['zAngle', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['zAspect', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['zDistribution', anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['zPadding', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED]
+  ]);
 };
 goog.inherits(anychart.core.CartesianBase, anychart.core.ChartWithAxes);
 
@@ -51,9 +58,7 @@ anychart.core.CartesianBase.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'zAngle',
-      zAngleNormalizer,
-      anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      zAngleNormalizer);
 
   function zAspectNormalizer(opt_value) {
     return goog.isNumber(opt_value) ? Math.max(opt_value, 0) : opt_value;
@@ -62,17 +67,13 @@ anychart.core.CartesianBase.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'zAspect',
-      zAspectNormalizer,
-      anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      zAspectNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'zDistribution',
-      anychart.core.settings.booleanNormalizer,
-      anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      anychart.core.settings.booleanNormalizer);
 
   function zPaddingNormalizer(opt_value) {
     return Math.max(anychart.utils.toNumber(opt_value), 0) || 0;
@@ -81,9 +82,7 @@ anychart.core.CartesianBase.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'zPadding',
-      zPaddingNormalizer,
-      anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      zPaddingNormalizer);
   return map;
 })();
 anychart.core.settings.populate(anychart.core.CartesianBase, anychart.core.CartesianBase.PROPERTY_DESCRIPTORS);

@@ -45,6 +45,16 @@ anychart.charts.Bullet = function(opt_data, opt_csvSettings) {
   this.allowCreditsDisabling = true;
 
   this.data(opt_data || null, opt_csvSettings);
+
+  anychart.core.settings.createDescriptorMeta(this.descriptorsMeta,
+      'layout',
+      anychart.ConsistencyState.BULLET_AXES |
+          anychart.ConsistencyState.CHART_TITLE |
+          anychart.ConsistencyState.BULLET_MARKERS |
+          anychart.ConsistencyState.BULLET_AXES_MARKERS |
+          anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED
+  );
 };
 goog.inherits(anychart.charts.Bullet, anychart.core.Chart);
 
@@ -169,13 +179,7 @@ anychart.charts.Bullet.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'layout',
-      anychart.enums.normalizeLayout,
-      anychart.ConsistencyState.BULLET_AXES |
-          anychart.ConsistencyState.CHART_TITLE |
-          anychart.ConsistencyState.BULLET_MARKERS |
-          anychart.ConsistencyState.BULLET_AXES_MARKERS |
-          anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      anychart.enums.normalizeLayout);
   return map;
 })();
 anychart.core.settings.populate(anychart.charts.Bullet, anychart.charts.Bullet.PROPERTY_DESCRIPTORS);

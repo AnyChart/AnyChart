@@ -33,6 +33,10 @@ anychart.core.annotations.Line = function(chartController) {
       anychart.core.annotations.Base.getColorResolver(
           ['stroke', 'hoverStroke', 'selectStroke'],
           anychart.enums.ColorType.STROKE));
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.core.annotations.X_ANCHOR_DESCRIPTORS_META);
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.core.annotations.VALUE_ANCHOR_DESCRIPTORS_META);
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.core.annotations.SECOND_ANCHOR_POINT_DESCRIPTORS_META);
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.core.annotations.STROKE_DESCRIPTORS_META);
 };
 goog.inherits(anychart.core.annotations.Line, anychart.core.annotations.Base);
 anychart.core.settings.populate(anychart.core.annotations.Line, anychart.core.annotations.X_ANCHOR_DESCRIPTORS);
