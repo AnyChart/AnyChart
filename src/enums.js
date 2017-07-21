@@ -2269,7 +2269,7 @@ anychart.enums.ErrorCode = {
   CONTAINER_NOT_SET: 1,
   SCALE_NOT_SET: 2,
 
-  //anychart.core.ui.Table
+  //anychart.tableModule.Table
   WRONG_TABLE_CONTENTS: 3,
 
   NO_FEATURE_IN_MODULE: 4,
@@ -2315,7 +2315,7 @@ anychart.enums.InfoCode = {
  * @enum {number}
  */
 anychart.enums.WarningCode = {
-  //anychart.data.Tree
+  //anychart.treeDataModule.Tree
   DUPLICATED_DATA_ITEM: 1,
   REFERENCE_IS_NOT_UNIQUE: 2,
   MISSING_PARENT_ID: 3,
@@ -2328,7 +2328,7 @@ anychart.enums.WarningCode = {
 
   CANT_SERIALIZE_FUNCTION: 8,
 
-  //anychart.core.ui.DataGrid incorrect component usage.
+  //anychart.ganttModule.DataGrid incorrect component usage.
   DG_INCORRECT_METHOD_USAGE: 9, //can't be tested now
 
   GANTT_FIT_TO_TASK: 11,

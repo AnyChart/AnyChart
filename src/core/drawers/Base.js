@@ -75,7 +75,7 @@ anychart.core.drawers.Base.prototype.flags = (
  * Y values list that are required by this drawer.
  * @type {Array.<string>}
  */
-anychart.core.drawers.Base.prototype.yValueNames = (['value']);
+anychart.core.drawers.Base.prototype.yValueNames = (function () { return ['value']; })();
 
 
 /**
@@ -90,7 +90,7 @@ anychart.core.drawers.Base.prototype.valueFieldName = 'value';
  * This is checked before on drawing start.
  * @type {Object.<string, anychart.enums.ShapeType>}
  */
-anychart.core.drawers.Base.prototype.requiredShapes = ({});
+anychart.core.drawers.Base.prototype.requiredShapes = (function () { return {}; })();
 
 
 /**

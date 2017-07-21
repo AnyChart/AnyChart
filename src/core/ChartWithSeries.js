@@ -2,7 +2,6 @@ goog.provide('anychart.core.ChartWithSeries');
 
 goog.require('anychart.core.IChart');
 goog.require('anychart.core.SeparateChart');
-goog.require('anychart.core.annotations');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.palettes.DistinctColors');
@@ -154,7 +153,7 @@ anychart.core.ChartWithSeries.ZINDEX_INCREMENT_MULTIPLIER = 0.00001;
  * Series config for the chart.
  * @type {!Object.<string, anychart.core.series.TypeConfig>}
  */
-anychart.core.ChartWithSeries.prototype.seriesConfig = ({});
+anychart.core.ChartWithSeries.prototype.seriesConfig = (function () { return {}; })();
 
 
 /**
@@ -237,7 +236,7 @@ anychart.core.ChartWithSeries.prototype.createSeriesInstance = goog.abstractMeth
 
 /**
  * Returns base series z-index.
- * @param {anychart.core.series.Cartesian|anychart.core.series.Map} series .
+ * @param {anychart.core.series.Cartesian|anychart.mapModule.Series} series .
  * @return {number}
  */
 anychart.core.ChartWithSeries.prototype.getBaseSeriesZIndex = function(series) {
@@ -249,7 +248,7 @@ anychart.core.ChartWithSeries.prototype.getBaseSeriesZIndex = function(series) {
 
 /**
  * Setup series.
- * @param {!(anychart.core.series.Cartesian|anychart.core.series.Map)} series .
+ * @param {!(anychart.core.series.Cartesian|anychart.mapModule.Series)} series .
  */
 anychart.core.ChartWithSeries.prototype.setupSeries = function(series) {
   var lastSeries = this.seriesList[this.seriesList.length - 1];
@@ -515,16 +514,6 @@ anychart.core.ChartWithSeries.prototype.xScale = function() {};
 
 
 /**
- * Annotations plot-level controller.
- * @param {Array.<anychart.enums.AnnotationTypes|anychart.core.annotations.AnnotationJSONFormat>=} opt_annotationsList
- * @return {anychart.core.ChartWithSeries|anychart.core.annotations.PlotController}
- */
-anychart.core.ChartWithSeries.prototype.annotations = function(opt_annotationsList) {
-  return null;
-};
-
-
-/**
  * Calculate for 3d.
  * @protected
  */
@@ -544,12 +533,6 @@ anychart.core.ChartWithSeries.prototype.distributeSeries = function() {};
 anychart.core.ChartWithSeries.prototype.allowLegendCategoriesMode = function() {
   return true;
 };
-
-
-/**
- * A hook to invalidate annotations, if needed.
- */
-anychart.core.ChartWithSeries.prototype.invalidateAnnotations = goog.nullFunction;
 
 
 //endregion

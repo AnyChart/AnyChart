@@ -23,12 +23,12 @@ goog.require('anychart.core.utils.Interactivity');
 goog.require('anychart.core.utils.InteractivityState');
 goog.require('anychart.core.utils.Margin');
 goog.require('anychart.core.utils.Padding');
-goog.require('anychart.exports');
 goog.require('anychart.format.Context');
 goog.require('anychart.math.Rect');
 goog.require('anychart.performance');
 goog.require('anychart.themes.merging');
 goog.require('anychart.utils');
+goog.require('goog.array');
 goog.require('goog.dom');
 goog.require('goog.dom.classlist');
 goog.require('goog.events.EventHandler');
@@ -133,14 +133,14 @@ anychart.core.Chart = function() {
 
 
   /**
-   * X shift (in pixels) for 3D mode. Calculated in anychart.charts.Cartesian3d.
+   * X shift (in pixels) for 3D mode. Calculated in anychart.cartesian3dModule.Chart.
    * @type {number}
    */
   this.x3dShift = 0;
 
 
   /**
-   * Y shift (in pixels) for 3D mode. Calculated in anychart.charts.Cartesian3d.
+   * Y shift (in pixels) for 3D mode. Calculated in anychart.cartesian3dModule.Chart.
    * @type {number}
    */
   this.y3dShift = 0;
@@ -284,7 +284,7 @@ anychart.core.Chart.prototype.isMode3d = function() {
 
 
 /**
- * Whether chart uses anychart.data.Tree as data source.
+ * Whether chart uses anychart.treeDataModule.Tree as data source.
  * @return {boolean}
  */
 anychart.core.Chart.prototype.usesTreeData = function() {
@@ -314,7 +314,7 @@ anychart.core.Chart.prototype.legend = function(opt_value) {
 
 /**
  * Internal public method. Returns all chart series.
- * @return {!Array.<anychart.core.series.Base|anychart.core.linearGauge.pointers.Base>}
+ * @return {!Array.<anychart.core.series.Base|anychart.linearGaugeModule.pointers.Base>}
  */
 anychart.core.Chart.prototype.getAllSeries = goog.abstractMethod;
 
@@ -955,7 +955,13 @@ anychart.core.Chart.prototype.contextMenuItemsProvider = function(context) {
       meta.series['seriesType'] && goog.isDef(meta.index);
   var isPointContext = isSeries || (parentEventTarget && parentEventTarget['seriesType']);
 
-  var items = /** @type {Array.<anychart.ui.ContextMenu.Item>} */ (anychart.utils.recursiveClone(anychart.core.Chart.contextMenuMap.main));
+  var items;
+  if (goog.global['anychart']['exports']) {
+    items = /** @type {Array.<anychart.ui.ContextMenu.Item>} */(anychart.utils.recursiveClone(anychart.core.Chart.contextMenuMap.exporting));
+  } else {
+    items = [];
+  }
+  items = /** @type {Array.<anychart.ui.ContextMenu.Item>} */ (goog.array.concat(items, anychart.utils.recursiveClone(anychart.core.Chart.contextMenuMap.main)));
 
   if (anychart.DEVELOP) {
     // prepare version link (specific to each product)
@@ -1174,12 +1180,14 @@ anychart.core.Chart.contextMenuItems = {
  */
 anychart.core.Chart.contextMenuMap = {
   // Menu 'Default menu'.
-  main: [
+  exporting: [
     anychart.core.Chart.contextMenuItems.exportAs,
     anychart.core.Chart.contextMenuItems.saveDataAs,
     anychart.core.Chart.contextMenuItems.shareWith,
     anychart.core.Chart.contextMenuItems.printChart,
-    null,
+    null
+  ],
+  main: [
     anychart.core.Chart.contextMenuItems.about
   ],
   selectMarquee: [
@@ -2055,7 +2063,7 @@ anychart.core.Chart.prototype.getPoint = goog.abstractMethod;
  * Returns points by event.
  * @param {anychart.core.MouseEvent} event
  * @return {?Array.<{
- *    series: (anychart.core.series.Base|anychart.core.linearGauge.pointers.Base),
+ *    series: (anychart.core.series.Base|anychart.linearGaugeModule.pointers.Base),
  *    points: Array.<number>,
  *    lastPoint: (number|undefined),
  *    nearestPointToCursor: (Object.<number>|undefined)
@@ -2807,8 +2815,8 @@ anychart.core.Chart.prototype.irDrawingMouseDownHandler_ = function(e) {
   var rect, rectIndex;
   var container = /** @type {acgraph.vector.ILayer} */(this.container());
   var cp = container.getStage().getClientPosition();
-  var startX = e.clientX - cp.x;
-  var startY = e.clientY - cp.y;
+  var startX = e['clientX'] - cp.x;
+  var startY = e['clientY'] - cp.y;
   if ((e.type != acgraph.events.EventType.MOUSEDOWN || e.getOriginalEvent().isMouseActionButton()) &&
       (rectIndex = this.getIRDrawingBoundsIndex_(e['clientX'], e['clientY'])) &&
       (!this.irOnStart_ || this.irOnStart_(rectIndex - 1, startX, startY, 0, 0, e) !== false)) {
@@ -3085,7 +3093,7 @@ anychart.core.Chart.prototype.selectByRect = function(marqueeFinishEvent) {
 //------------------------------------------------------------------------------
 /**
  * Extract headers from chart data set or stock storage.
- * @param {anychart.data.Set|anychart.data.TableStorage} dataSet
+ * @param {anychart.data.Set|anychart.stockModule.data.TableStorage} dataSet
  * @param {Object} headers Object with headers.
  * @param {number} headersLength Headers length.
  * @return {number} headers length.
@@ -3342,10 +3350,10 @@ anychart.core.Chart.prototype.toCsv = function(opt_chartDataExportMode, opt_csvS
   var dataSetsCount = 0;
 
   for (i = 0; i < seriesListLength; i++) {
-    series = /** @type {anychart.core.series.Base|anychart.core.ChartWithSeries|anychart.charts.Resource|
-        anychart.charts.PyramidFunnel|anychart.charts.Venn|anychart.charts.LinearGauge|anychart.charts.Bullet|
-        anychart.charts.TreeMap|anychart.charts.TagCloud|anychart.charts.Sparkline|anychart.charts.Gantt|
-        anychart.charts.Pert|anychart.charts.CircularGauge} */ (seriesList[i]);
+    series = /** @type {anychart.core.series.Base|anychart.core.ChartWithSeries|anychart.resourceModule.Chart|
+        anychart.pyramidFunnelModule.Chart|anychart.vennModule.Chart|anychart.linearGaugeModule.Chart|anychart.bulletModule.Chart|
+        anychart.treemapModule.Chart|anychart.tagCloudModule.Chart|anychart.sparklineModule.Chart|anychart.ganttModule.Chart|
+        anychart.pertModule.Chart|anychart.circularGaugeModule.Chart} */ (seriesList[i]);
     seriesData = /** @type {anychart.data.View} */ (series.data());
     seriesDataSets = seriesData.getDataSets();
     for (j = 0, len = seriesDataSets.length; j < len; j++) {
@@ -3425,7 +3433,7 @@ anychart.core.Chart.prototype.toCsv = function(opt_chartDataExportMode, opt_csvS
     var seriesPrefix;
     var csvRows = {};
     var iterator;
-    var x, k;
+    var k;
     var prefixed;
     var groupingField;
     for (i = 0; i < seriesListLength; i++) {
@@ -3546,13 +3554,13 @@ anychart.core.Chart.prototype.toA11yTable = function(opt_title, opt_asString) {
  * @param {string=} opt_filename file name to save.
  */
 anychart.core.Chart.prototype.saveAsXml = function(opt_filename) {
-  var xml = /** @type {string} */(this.toXml(false));
-  var options = {};
-  options['file-name'] = opt_filename || anychart.exports.filename();
-  options['data'] = xml;
-  options['dataType'] = 'xml';
-  options['responseType'] = 'file';
-  acgraph.sendRequestToExportServer(acgraph.exportServer + '/xml', options);
+  var exports = goog.global['anychart']['exports'];
+  if (exports) {
+    var xml = /** @type {string} */(this.toXml(false));
+    exports['saveAsXml'](xml, opt_filename);
+  } else {
+    anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Exporting']);
+  }
 };
 
 
@@ -3561,13 +3569,13 @@ anychart.core.Chart.prototype.saveAsXml = function(opt_filename) {
  * @param {string=} opt_filename file name to save.
  */
 anychart.core.Chart.prototype.saveAsJson = function(opt_filename) {
-  var json = /** @type {string} */(this.toJson(true));
-  var options = {};
-  options['file-name'] = opt_filename || anychart.exports.filename();
-  options['data'] = json;
-  options['dataType'] = 'json';
-  options['responseType'] = 'file';
-  acgraph.sendRequestToExportServer(acgraph.exportServer + '/json', options);
+  var exports = goog.global['anychart']['exports'];
+  if (exports) {
+    var json = /** @type {string} */(this.toJson(true));
+    exports['saveAsJson'](json, opt_filename);
+  } else {
+    anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Exporting']);
+  }
 };
 
 
@@ -3578,13 +3586,13 @@ anychart.core.Chart.prototype.saveAsJson = function(opt_filename) {
  * @param {string=} opt_filename file name to save.
  */
 anychart.core.Chart.prototype.saveAsCsv = function(opt_chartDataExportMode, opt_csvSettings, opt_filename) {
-  var csv = this.toCsv(opt_chartDataExportMode, opt_csvSettings);
-  var options = {};
-  options['file-name'] = opt_filename || anychart.exports.filename();
-  options['data'] = csv;
-  options['dataType'] = 'csv';
-  options['responseType'] = 'file';
-  acgraph.sendRequestToExportServer(acgraph.exportServer + '/csv', options);
+  var exports = goog.global['anychart']['exports'];
+  if (exports) {
+    var csv = this.toCsv(opt_chartDataExportMode, opt_csvSettings);
+    exports['saveAsCsv'](csv, opt_filename);
+  } else {
+    anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Exporting']);
+  }
 };
 
 
@@ -3594,217 +3602,17 @@ anychart.core.Chart.prototype.saveAsCsv = function(opt_chartDataExportMode, opt_
  * @param {string=} opt_filename file name to save.
  */
 anychart.core.Chart.prototype.saveAsXlsx = function(opt_chartDataExportMode, opt_filename) {
-  var csv = this.toCsv(opt_chartDataExportMode, {
-    'rowsSeparator': '\n',
-    'columnsSeparator': ',',
-    'ignoreFirstRow': false
-  });
-  var options = {};
-  options['file-name'] = opt_filename || anychart.exports.filename();
-  options['data'] = csv;
-  options['dataType'] = 'xlsx';
-  options['responseType'] = 'file';
-  acgraph.sendRequestToExportServer(acgraph.exportServer + '/xlsx', options);
-};
-
-
-/**
- * Opens Facebook sharing dialog.
- * @param {(string|Object)=} opt_captionOrOptions Caption for main link. If not set hostname will be used. Or object with options.
- * @param {string=} opt_link Url of the link attached to publication.
- * @param {string=} opt_name Title for the attached link. If not set hostname or opt_link url will be used.
- * @param {string=} opt_description Description for the attached link.
- */
-anychart.core.Chart.prototype.shareWithFacebook = function(opt_captionOrOptions, opt_link, opt_name, opt_description) {
-  var exportOptions = anychart.exports.facebook();
-  var args = anychart.utils.decomposeArguments({
-    'caption': opt_captionOrOptions,
-    'link': opt_link,
-    'name': opt_name,
-    'description': opt_description
-  }, opt_captionOrOptions, exportOptions);
-
-  var w = 550;
-  var h = 550;
-  var left = Number((screen.width / 2) - (w / 2));
-  var top = Number((screen.height / 2) - (h / 2));
-  var window = goog.dom.getWindow();
-  var popup = window.open('', '_blank', 'scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
-
-  var onSuccess = function(imgUrl) {
-    var urlBase = 'https://www.facebook.com/dialog/feed';
-
-    // Dialog options described here https://developers.facebook.com/docs/sharing/reference/feed-dialog
-    var urlOptions = {
-      'app_id': exportOptions['appId'],
-      'display': 'popup',
-      'picture': imgUrl
-    };
-
-    urlOptions['caption'] = args['caption'];
-
-    if (args['link']) {
-      urlOptions['link'] = args['link'];
-
-      if (args['name']) {
-        urlOptions['name'] = args['name'];
-      }
-      if (args['description']) {
-        urlOptions['description'] = args['description'];
-      }
-    }
-
-    var options = '';
-    for (var k in urlOptions) {
-      options += options ? '&' : '';
-      options += k + '=' + urlOptions[k];
-    }
-    popup.location.href = urlBase + '?' + options;
-  };
-
-  var imageWidth = exportOptions['width'];
-  var imageHeight = exportOptions['height'];
-  this.shareAsPng(onSuccess, undefined, false, imageWidth, imageHeight);
-};
-
-
-/**
- * Opens Twitter sharing dialog.
- */
-anychart.core.Chart.prototype.shareWithTwitter = function() {
-  var exportOptions = anychart.exports.twitter();
-  var w = 600;
-  var h = 520;
-  var left = Number((screen.width / 2) - (w / 2));
-  var top = Number((screen.height / 2) - (h / 2));
-  var formClass = 'ac-share-twitter-form';
-  var dataInputClass = 'ac-share-twitter-data-input';
-
-  var mapForm;
-  var dataInput;
-  var el = goog.dom.getElementsByTagNameAndClass(goog.dom.TagName.INPUT, dataInputClass);
-  if (el.length > 0) {
-    dataInput = el[0];
-    mapForm = goog.dom.getElementsByTagNameAndClass(goog.dom.TagName.FORM, formClass)[0];
+  var exports = goog.global['anychart']['exports'];
+  if (exports) {
+    var csv = this.toCsv(opt_chartDataExportMode, {
+      'rowsSeparator': '\n',
+      'columnsSeparator': ',',
+      'ignoreFirstRow': false
+    });
+    exports['saveAsXlsx'](csv, opt_filename);
   } else {
-    mapForm = goog.dom.createElement(goog.dom.TagName.FORM);
-    goog.dom.classlist.add(mapForm, formClass);
-    mapForm.target = 'Map';
-    mapForm.method = 'POST';
-    mapForm.action = exportOptions['url'];
-
-    dataInput = goog.dom.createElement(goog.dom.TagName.INPUT);
-    goog.dom.classlist.add(dataInput, dataInputClass);
-    dataInput.type = 'hidden';
-    dataInput.name = 'data';
-
-    var dataTypeInput = goog.dom.createElement(goog.dom.TagName.INPUT);
-    dataTypeInput.type = 'hidden';
-    dataTypeInput.name = 'dataType';
-    dataTypeInput.value = 'svg';
-
-    goog.dom.appendChild(mapForm, dataInput);
-    goog.dom.appendChild(mapForm, dataTypeInput);
-    goog.dom.appendChild(goog.dom.getElementsByTagName(goog.dom.TagName.BODY)[0], mapForm);
+    anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Exporting']);
   }
-
-  if (goog.isDef(mapForm) && goog.isDef(dataInput)) {
-    dataInput.value = this.toSvg(exportOptions['width'], exportOptions['height']);
-    var window = goog.dom.getWindow();
-    var mapWindow = window.open('', 'Map', 'status=0,title=0,height=520,width=600,scrollbars=1, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
-    if (mapWindow) mapForm.submit();
-  }
-};
-
-
-/**
- * Opens LinkedIn sharing dialog.
- * @param {(string|Object)=} opt_captionOrOptions Caption for publication. If not set 'AnyChart' will be used. Or object with options.
- * @param {string=} opt_description Description. If not set opt_caption will be used.
- */
-anychart.core.Chart.prototype.shareWithLinkedIn = function(opt_captionOrOptions, opt_description) {
-  var exportOptions = anychart.exports.linkedin();
-  var args = anychart.utils.decomposeArguments({
-    'caption': opt_captionOrOptions,
-    'description': opt_description
-  }, opt_captionOrOptions, exportOptions);
-
-  var w = 550;
-  var h = 520;
-  var left = Number((screen.width / 2) - (w / 2));
-  var top = Number((screen.height / 2) - (h / 2));
-  var window = goog.dom.getWindow();
-  var popup = window.open('', '_blank', 'scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
-
-  var onSuccess = function(imgUrl) {
-    var urlBase = 'https://www.linkedin.com/shareArticle';
-
-    // Dialog options described here https://developer.linkedin.com/docs/share-on-linkedin
-    var urlOptions = {
-      'mini': 'true',
-      'url' : imgUrl
-    };
-
-    urlOptions['title'] = args['caption'];
-    if (args['description']) {
-      urlOptions['summary'] = args['description'];
-    }
-
-    var options = '';
-    for (var k in urlOptions) {
-      options += options ? '&' : '';
-      options += k + '=' + urlOptions[k];
-    }
-    popup.location.href = urlBase + '?' + options;
-  };
-
-  this.shareAsPng(onSuccess, undefined, false, exportOptions['width'], exportOptions['height']);
-};
-
-
-/**
- * Opens Pinterest sharing dialog.
- * @param {(string|Object)=} opt_linkOrOptions Attached link. If not set, the image url will be used. Or object with options.
- * @param {string=} opt_description Description.
- */
-anychart.core.Chart.prototype.shareWithPinterest = function(opt_linkOrOptions, opt_description) {
-  var exportOptions = anychart.exports.pinterest();
-  var args = anychart.utils.decomposeArguments({
-    'link': opt_linkOrOptions,
-    'description': opt_description
-  }, opt_linkOrOptions, exportOptions);
-
-  var w = 550;
-  var h = 520;
-  var left = Number((screen.width / 2) - (w / 2));
-  var top = Number((screen.height / 2) - (h / 2));
-  var window = goog.dom.getWindow();
-  var popup = window.open('', '_blank', 'scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
-
-  var onSuccess = function(imgUrl) {
-    var urlBase = 'https://pinterest.com/pin/create/link';
-    var urlOptions = {
-      'media' : imgUrl
-    };
-
-    if (args['link']) {
-      urlOptions['url'] = args['link'];
-    }
-
-    if (args['description']) {
-      urlOptions['description'] = args['description'];
-    }
-
-    var options = '';
-    for (var k in urlOptions) {
-      options += options ? '&' : '';
-      options += k + '=' + urlOptions[k];
-    }
-
-    popup.location.href = urlBase + '?' + options;
-  };
-
-  this.shareAsPng(onSuccess, undefined, false, exportOptions['width'], exportOptions['height']);
 };
 
 

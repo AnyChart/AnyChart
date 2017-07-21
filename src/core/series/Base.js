@@ -1531,7 +1531,7 @@ anychart.core.series.Base.prototype.getErrorPath = function(stroke) {
 /**
  * Returns array of [lowerError, upperError].
  * @param {boolean} horizontal is error horizontal (x error).
- * @return {Array.<number, number>} Array of lower and upper errors value.
+ * @return {Array.<number>} Array of lower and upper errors value.
  */
 anychart.core.series.Base.prototype.getErrorValues = function(horizontal) {
   return this.error().getErrorValues(horizontal);

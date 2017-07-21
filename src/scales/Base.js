@@ -347,9 +347,15 @@ anychart.scales.Base.fromString = function(type, defaultIsOrdinal) {
     case anychart.enums.ScaleTypes.ORDINAL:
       return anychart.scales.ordinal();
     case anychart.enums.ScaleTypes.ORDINAL_COLOR:
-      return anychart.scales.ordinalColor();
+      if (goog.global['anychart']['scales']['ordinalColor'])
+        return goog.global['anychart']['scales']['ordinalColor']();
+      anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Color scales']);
+      return null;
     case anychart.enums.ScaleTypes.LINEAR_COLOR:
-      return anychart.scales.linearColor();
+      if (goog.global['anychart']['scales']['linearColor'])
+        return goog.global['anychart']['scales']['linearColor']();
+      anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Color scales']);
+      return null;
     default:
       return goog.isNull(defaultIsOrdinal) ?
           null :

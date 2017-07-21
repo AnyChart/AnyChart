@@ -1,0 +1,72 @@
+--charset UTF-8
+
+--process_closure_primitives
+
+--language_in ECMASCRIPT3
+--language_out ECMASCRIPT3
+
+--extra_annotation_name "includeDoc"
+--extra_annotation_name "illustration"
+--extra_annotation_name "illustrationDesc"
+--extra_annotation_name "ignoreDoc"
+--extra_annotation_name "propertyDoc"
+--extra_annotation_name "shortDescription"
+
+--warning_level VERBOSE
+
+--jscomp_warning accessControls
+--jscomp_warning ambiguousFunctionDecl
+--jscomp_warning checkDebuggerStatement
+--jscomp_warning checkEventfulObjectDisposal
+--jscomp_warning checkRegExp
+--jscomp_warning checkTypes
+--jscomp_warning checkVars
+--jscomp_warning closureDepMethodUsageChecks
+--jscomp_warning commonJsModuleLoad
+--jscomp_warning conformanceViolations
+--jscomp_warning const
+--jscomp_warning constantProperty
+--jscomp_warning deprecated
+--jscomp_warning deprecatedAnnotations
+--jscomp_warning duplicate
+--jscomp_warning duplicateMessage
+--jscomp_warning es3
+--jscomp_warning es5Strict
+--jscomp_warning externsValidation
+--jscomp_off extraRequire
+--jscomp_warning fileoverviewTags
+--jscomp_warning functionParams
+--jscomp_warning globalThis
+--jscomp_warning inferredConstCheck
+--jscomp_warning internetExplorerChecks
+--jscomp_warning invalidCasts
+--jscomp_warning misplacedTypeAnnotation
+--jscomp_warning missingGetCssName
+--jscomp_off missingOverride
+--jscomp_warning missingPolyfill
+--jscomp_warning missingProperties
+--jscomp_warning missingProvide
+--jscomp_warning missingRequire
+--jscomp_warning missingReturn
+--jscomp_warning msgDescriptions
+--jscomp_off newCheckTypes
+--jscomp_off newCheckTypesExtraChecks
+--jscomp_off nonStandardJsDocs
+--jscomp_off reportUnknownTypes
+--jscomp_warning suspiciousCode
+--jscomp_warning strictModuleDepCheck
+--jscomp_warning typeInvalidation
+--jscomp_warning undefinedNames
+--jscomp_warning undefinedVars
+--jscomp_warning unknownDefines
+--jscomp_off unusedLocalVariables
+--jscomp_off unusedPrivateMembers
+--jscomp_warning uselessCode
+--jscomp_off useOfGoogBase
+--jscomp_warning underscore
+--jscomp_warning visibility
+--jscomp_warning lintChecks
+
+--hide_warnings_for "libs/closure-library"
+--assume_function_wrapper
+--use_types_for_optimization true

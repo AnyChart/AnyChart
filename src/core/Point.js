@@ -78,7 +78,7 @@ anychart.core.Point.prototype.set = function(field, value) {
  * @return {(boolean|anychart.core.Point)} Hover state of self for chaining.
  */
 anychart.core.Point.prototype.hovered = function(opt_value) {
-  var chart = /** @type {anychart.charts.PyramidFunnel|anychart.charts.Pie} */ (this.getChart());
+  var chart = /** @type {anychart.pyramidFunnelModule.Chart|anychart.pieModule.Chart} */ (this.getChart());
   var state = chart.state.hasPointStateByPointIndex(anychart.PointState.HOVER, this.index);
   if (goog.isDef(opt_value)) {
     if (state != opt_value) {
@@ -99,7 +99,7 @@ anychart.core.Point.prototype.hovered = function(opt_value) {
  * @return {(boolean|anychart.core.Point)} Select state of self for chaining.
  */
 anychart.core.Point.prototype.selected = function(opt_value) {
-  var chart = /** @type {anychart.charts.PyramidFunnel|anychart.charts.Pie} */ (this.getChart());
+  var chart = /** @type {anychart.pyramidFunnelModule.Chart|anychart.pieModule.Chart} */ (this.getChart());
   var state = chart.state.hasPointStateByPointIndex(anychart.PointState.SELECT, this.index);
   if (goog.isDef(opt_value)) {
     if (state != opt_value) {

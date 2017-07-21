@@ -3,6 +3,8 @@
  */
 
 goog.provide('anychart.base');
+// temporary, for modules compatibility
+goog.require('goog.labs.userAgent.device');
 
 
 /**

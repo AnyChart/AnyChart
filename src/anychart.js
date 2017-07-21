@@ -11,12 +11,7 @@ goog.require('anychart.base');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.StageCredits');
 goog.require('anychart.performance');
-goog.require('anychart.standalones');
-goog.require('anychart.standalones.axes');
-goog.require('anychart.standalones.axisMarkers');
-goog.require('anychart.standalones.grids');
 goog.require('anychart.themes.merging');
-goog.require('anychart.ui');
 goog.require('anychart.utils');
 goog.require('goog.array');
 goog.require('goog.dom');
@@ -649,349 +644,37 @@ anychart.getFullTheme = function(root) {
 //
 //------------------------------------------------------------------------------
 /**
- * @param {string} modulePath Feature constructor path.
- * @param {string} featureName Feature name to display in error message.
+ * Creates error reporter for NO_FEATURE_IN_MODULE.
+ * @param {string} featureName
+ * @param {boolean=} opt_ifNotFromTheme
  * @return {!Function}
  */
-anychart.getFeatureOrError = function(modulePath, featureName) {
+anychart.createNFIMError = function(featureName, opt_ifNotFromTheme) {
+  return function(opt_fromTheme) {
+    if (!opt_ifNotFromTheme || !opt_fromTheme) {
+      anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, [featureName]);
+    }
+  };
+};
+
+
+/**
+ * @param {string} modulePath
+ * @param {string} error
+ * @param {boolean=} opt_ifNotFromTheme
+ * @return {!Function}
+ */
+anychart.getFeatureOrError = function(modulePath, error, opt_ifNotFromTheme) {
   var path = modulePath.split('.');
   var target = window;
   for (var i = 0; i < path.length; i++) {
     target = target[path[i]];
-    if (!target)
-      return function() {
-        anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, [featureName]);
-      };
+    if (!target) return anychart.createNFIMError(error, opt_ifNotFromTheme);
   }
   return /** @type {!Function} */(target);
 };
 
 
-/** @ignoreDoc */
-anychart.area = anychart.getFeatureOrError('anychart.area', 'Area chart');
-
-
-/** @ignoreDoc */
-anychart.area3d = anychart.getFeatureOrError('anychart.area3d', '3D Area chart');
-
-
-/** @ignoreDoc */
-anychart.bar = anychart.getFeatureOrError('anychart.bar', 'Bar chart');
-
-
-/** @ignoreDoc */
-anychart.vertical = anychart.getFeatureOrError('anychart.vertical', 'Bar chart');
-
-
-/** @ignoreDoc */
-anychart.bar3d = anychart.getFeatureOrError('anychart.bar3d', '3D Bar chart');
-
-
-/** @ignoreDoc */
-anychart.bubble = anychart.getFeatureOrError('anychart.bubble', 'Bubble chart');
-
-
-/** @ignoreDoc */
-anychart.bullet = anychart.getFeatureOrError('anychart.bullet', 'Bullet chart');
-
-
-/** @ignoreDoc */
-anychart.cartesian = anychart.getFeatureOrError('anychart.cartesian', 'Cartesian chart');
-
-
-/** @ignoreDoc */
-anychart.cartesian3d = anychart.getFeatureOrError('anychart.cartesian3d', '3D Cartesian chart');
-
-
-/** @ignoreDoc */
-anychart.scatter = anychart.getFeatureOrError('anychart.scatter', 'Scatter chart');
-
-
-/** @ignoreDoc */
-anychart.column = anychart.getFeatureOrError('anychart.column', 'Column chart');
-
-
-/** @ignoreDoc */
-anychart.column3d = anychart.getFeatureOrError('anychart.column3d', '3D Column chart');
-
-
-/** @ignoreDoc */
-anychart.box = anychart.getFeatureOrError('anychart.box', 'Box chart');
-
-
-/** @ignoreDoc */
-anychart.financial = anychart.getFeatureOrError('anychart.financial', 'Financial chart');
-
-
-/** @ignoreDoc */
-anychart.funnel = anychart.getFeatureOrError('anychart.funnel', 'Funnel chart');
-
-
-/** @ignoreDoc */
-anychart.line = anychart.getFeatureOrError('anychart.line', 'Line chart');
-
-
-/** @ignoreDoc */
-anychart.verticalLine = anychart.getFeatureOrError('anychart.verticalLine', 'Vertical Line chart');
-
-
-/** @ignoreDoc */
-anychart.verticalArea = anychart.getFeatureOrError('anychart.verticalArea', 'Vertical Area chart');
-
-
-/** @ignoreDoc */
-anychart.marker = anychart.getFeatureOrError('anychart.marker', 'Marker chart');
-
-
-/** @ignoreDoc */
-anychart.pie = anychart.getFeatureOrError('anychart.pie', 'Pie chart');
-
-
-/** @ignoreDoc */
-anychart.pie3d = anychart.getFeatureOrError('anychart.pie3d', '3D Pie chart');
-
-
-/** @ignoreDoc */
-anychart.pyramid = anychart.getFeatureOrError('anychart.pyramid', 'Pyramid chart');
-
-
-/** @ignoreDoc */
-anychart.radar = anychart.getFeatureOrError('anychart.radar', 'Radar chart');
-
-
-/** @ignoreDoc */
-anychart.polar = anychart.getFeatureOrError('anychart.polar', 'Polar chart');
-
-
-/** @ignoreDoc */
-anychart.sparkline = anychart.getFeatureOrError('anychart.sparkline', 'Sparkline chart');
-
-
-/** @ignoreDoc */
-anychart.heatMap = anychart.getFeatureOrError('anychart.heatMap', 'HeatMap chart');
-
-
-/** @ignoreDoc */
-anychart.gauges.circular = anychart.getFeatureOrError('anychart.gauges.circular', 'Circular gauge');
-
-
-/** @ignoreDoc */
-anychart.gauges.linear = anychart.getFeatureOrError('anychart.gauges.linear', 'Linear gauge');
-
-
-/** @ignoreDoc */
-anychart.gauges.tank = anychart.getFeatureOrError('anychart.gauges.tank', 'Tank gauge');
-
-
-/** @ignoreDoc */
-anychart.gauges.thermometer = anychart.getFeatureOrError('anychart.gauges.thermometer', 'Thermometer gauge');
-
-
-/** @ignoreDoc */
-anychart.gauges.led = anychart.getFeatureOrError('anychart.gauges.led', 'LED gauge');
-
-
-/** @ignoreDoc */
-anychart.map = anychart.getFeatureOrError('anychart.map', 'Map');
-
-
-/** @ignoreDoc */
-anychart.choropleth = anychart.getFeatureOrError('anychart.choropleth', 'Choropleth map');
-
-
-/** @ignoreDoc */
-anychart.bubbleMap = anychart.getFeatureOrError('anychart.bubbleMap', 'Bubble map');
-
-
-/** @ignoreDoc */
-anychart.connector = anychart.getFeatureOrError('anychart.connector', 'Connector map');
-
-
-/** @ignoreDoc */
-anychart.markerMap = anychart.getFeatureOrError('anychart.markerMap', 'Marker map');
-
-
-/** @ignoreDoc */
-anychart.seatMap = anychart.getFeatureOrError('anychart.seatMap', 'Seat map');
-
-
-/** @ignoreDoc */
-anychart.ganttProject = anychart.getFeatureOrError('anychart.ganttProject', 'Gantt Project chart');
-
-
-/** @ignoreDoc */
-anychart.ganttResource = anychart.getFeatureOrError('anychart.ganttResource', 'Gantt Resource chart');
-
-
-/** @ignoreDoc */
-anychart.stock = anychart.getFeatureOrError('anychart.stock', 'Stock chart');
-
-
-/** @ignoreDoc */
-anychart.treeMap = anychart.getFeatureOrError('anychart.treeMap', 'TreeMap chart');
-
-
-/** @inheritDoc */
-anychart.pareto = anychart.getFeatureOrError('anychart.pareto', 'Pareto chart');
-
-
-/** @inheritDoc */
-anychart.resource = anychart.getFeatureOrError('anychart.resource', 'Resource chart');
-
-
-/** @inheritDoc */
-anychart.quadrant = anychart.getFeatureOrError('anychart.quadrant', 'Quadrant chart');
-
-
-/** @inheritDoc */
-anychart.venn = anychart.getFeatureOrError('anychart.venn', 'Venn chart');
-
-
-/** @inheritDoc */
-anychart.tagCloud = anychart.getFeatureOrError('anychart.tagCloud', 'TagCloud chart');
-
-
-/** @ignoreDoc */
-anychart.mekko = anychart.getFeatureOrError('anychart.mekko', 'Mekko chart');
-
-
-/** @ignoreDoc */
-anychart.mosaic = anychart.getFeatureOrError('anychart.mosaic', 'Mosaic chart');
-
-
-/** @ignoreDoc */
-anychart.barmekko = anychart.getFeatureOrError('anychart.barmekko', 'Barmekko chart');
-
-
-/** @inheritDoc */
-anychart.waterfall = anychart.getFeatureOrError('anychart.waterfall', 'Waterfall chart');
-
-
-//region ------ Standalones
-/** @ignoreDoc */
-anychart.standalones.background = anychart.getFeatureOrError('anychart.standalones.background', 'anychart.standalones.Background');
-
-
-/** @ignoreDoc */
-anychart.standalones.colorRange = anychart.getFeatureOrError('anychart.standalones.colorRange', 'anychart.standalones.ColorRange');
-
-
-/** @ignoreDoc */
-anychart.standalones.dataGrid = anychart.getFeatureOrError('anychart.standalones.dataGrid', 'anychart.standalones.DataGrid');
-
-
-/** @ignoreDoc */
-anychart.standalones.label = anychart.getFeatureOrError('anychart.standalones.label', 'anychart.standalones.Label');
-
-
-/** @ignoreDoc */
-anychart.standalones.labelsFactory = anychart.getFeatureOrError('anychart.standalones.labelsFactory', 'anychart.standalones.LabelsFactory');
-
-
-/** @ignoreDoc */
-anychart.standalones.legend = anychart.getFeatureOrError('anychart.standalones.legend', 'anychart.standalones.Legend');
-
-
-/** @ignoreDoc */
-anychart.standalones.markersFactory = anychart.getFeatureOrError('anychart.standalones.markersFactory', 'anychart.standalones.MarkersFactory');
-
-
-/** @ignoreDoc */
-anychart.standalones.projectTimeline = anychart.getFeatureOrError('anychart.standalones.projectTimeline', 'anychart.standalones.ProjectTimeline');
-
-
-/** @ignoreDoc */
-anychart.standalones.resourceTimeline = anychart.getFeatureOrError('anychart.standalones.resourceTimeline', 'anychart.standalones.ResourceTimeline');
-
-
-/** @ignoreDoc */
-anychart.standalones.resourceList = anychart.getFeatureOrError('anychart.standalones.resourceList', 'anychart.standalones.ResourceList');
-
-
-/** @ignoreDoc */
-anychart.standalones.scroller = anychart.getFeatureOrError('anychart.standalones.scroller', 'anychart.standalones.scroller');
-
-
-/** @ignoreDoc */
-anychart.standalones.table = anychart.getFeatureOrError('anychart.standalones.table', 'anychart.standalones.Table');
-
-
-/** @ignoreDoc */
-anychart.standalones.title = anychart.getFeatureOrError('anychart.standalones.title', 'anychart.standalones.Title');
-
-
-/** @ignoreDoc */
-anychart.standalones.axes.linear = anychart.getFeatureOrError('anychart.standalones.axes.linear', 'anychart.standalones.axes.Linear');
-
-
-/** @ignoreDoc */
-anychart.standalones.axes.polar = anychart.getFeatureOrError('anychart.standalones.axes.polar', 'anychart.standalones.axes.Polar');
-
-
-/** @ignoreDoc */
-anychart.standalones.axes.radar = anychart.getFeatureOrError('anychart.standalones.axes.radar', 'anychart.standalones.axes.Radar');
-
-
-/** @ignoreDoc */
-anychart.standalones.axes.radial = anychart.getFeatureOrError('anychart.standalones.axes.radial', 'anychart.standalones.axes.Radial');
-
-
-/** @ignoreDoc */
-anychart.standalones.axisMarkers.line = anychart.getFeatureOrError('anychart.standalones.axisMarkers.line', 'anychart.standalones.axisMarkers.Line');
-
-
-/** @ignoreDoc */
-anychart.standalones.axisMarkers.range = anychart.getFeatureOrError('anychart.standalones.axisMarkers.range', 'anychart.standalones.axisMarkers.Range');
-
-
-/** @ignoreDoc */
-anychart.standalones.axisMarkers.text = anychart.getFeatureOrError('anychart.standalones.axisMarkers.text', 'anychart.standalones.axisMarkers.Text');
-
-
-/** @ignoreDoc */
-anychart.standalones.grids.linear = anychart.getFeatureOrError('anychart.standalones.grids.linear', 'anychart.standalones.grids.Linear');
-
-
-/** @ignoreDoc */
-anychart.standalones.grids.linear3d = anychart.getFeatureOrError('anychart.standalones.grids.linear3d', 'anychart.standalones.grids.Linear3d');
-
-
-/** @ignoreDoc */
-anychart.standalones.grids.polar = anychart.getFeatureOrError('anychart.standalones.grids.polar', 'anychart.standalones.grids.Polar');
-
-
-/** @ignoreDoc */
-anychart.standalones.grids.radar = anychart.getFeatureOrError('anychart.standalones.grids.radar', 'anychart.standalones.grids.Radar');
-
-
-//endregion
-//region ------ UI
-/** @ignoreDoc */
-anychart.ui.contextMenu = anychart.ui.contextMenu || /** @type {function():null} */ (function(opt_fromTheme) {
-  if (!opt_fromTheme) {
-    anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Context Menu']);
-  }
-  return null;
-});
-
-
-/** @ignoreDoc */
-anychart.ui.ganttToolbar = anychart.getFeatureOrError('anychart.ui.ganttToolbar', 'Gantt toolbar');
-
-
-/** @ignoreDoc */
-anychart.ui.preloader = anychart.getFeatureOrError('anychart.ui.preloader', 'Preloader');
-
-
-/** @ignoreDoc */
-anychart.ui.rangePicker = anychart.getFeatureOrError('anychart.ui.rangePicker', 'Range picker');
-
-
-/** @ignoreDoc */
-anychart.ui.rangeSelector = anychart.getFeatureOrError('anychart.ui.rangeSelector', 'Range selector');
-
-
-//endregion
 //endregion
 //region ------- Charts tracking
 
@@ -1070,88 +753,99 @@ goog.exportSymbol('anychart.fromXml', anychart.fromXml);//doc|ex
 goog.exportSymbol('anychart.onDocumentLoad', anychart.onDocumentLoad);//doc|need-ex
 goog.exportSymbol('anychart.onDocumentReady', anychart.onDocumentReady);//doc|ex
 goog.exportSymbol('anychart.licenseKey', anychart.licenseKey);//doc|ex
-goog.exportSymbol('anychart.area', anychart.area);//linkedFromModule
-goog.exportSymbol('anychart.verticalArea', anychart.verticalArea);//linkedFromModule
-goog.exportSymbol('anychart.area3d', anychart.area3d);
-goog.exportSymbol('anychart.bar', anychart.bar);//linkedFromModule
-goog.exportSymbol('anychart.vertical', anychart.vertical);
-goog.exportSymbol('anychart.bar3d', anychart.bar3d);
-goog.exportSymbol('anychart.box', anychart.box);
-goog.exportSymbol('anychart.bubble', anychart.bubble);//linkedFromModule
-goog.exportSymbol('anychart.bullet', anychart.bullet);//linkedFromModule
-goog.exportSymbol('anychart.cartesian', anychart.cartesian);//linkedFromModule
-goog.exportSymbol('anychart.cartesian3d', anychart.cartesian3d);
-goog.exportSymbol('anychart.column', anychart.column);//linkedFromModule
-goog.exportSymbol('anychart.column3d', anychart.column3d);
-goog.exportSymbol('anychart.financial', anychart.financial);//linkedFromModule
-goog.exportSymbol('anychart.funnel', anychart.funnel);//linkedFromModule
-goog.exportSymbol('anychart.line', anychart.line);//linkedFromModule
-goog.exportSymbol('anychart.verticalLine', anychart.verticalLine);//linkedFromModule
-goog.exportSymbol('anychart.marker', anychart.marker);//linkedFromModule
-goog.exportSymbol('anychart.pie', anychart.pie);//linkedFromModule
-goog.exportSymbol('anychart.pie3d', anychart.pie3d);//linkedFromModule
-goog.exportSymbol('anychart.pyramid', anychart.pyramid);//linkedFromModule
-goog.exportSymbol('anychart.radar', anychart.radar);
-goog.exportSymbol('anychart.polar', anychart.polar);
-goog.exportSymbol('anychart.sparkline', anychart.sparkline);
-goog.exportSymbol('anychart.heatMap', anychart.heatMap);
-goog.exportSymbol('anychart.scatter', anychart.scatter);
-goog.exportSymbol('anychart.map', anychart.map);
-goog.exportSymbol('anychart.choropleth', anychart.choropleth);
-goog.exportSymbol('anychart.bubbleMap', anychart.bubbleMap);
-goog.exportSymbol('anychart.markerMap', anychart.markerMap);
-goog.exportSymbol('anychart.seatMap', anychart.seatMap);
-goog.exportSymbol('anychart.connector', anychart.connector);
-goog.exportSymbol('anychart.gauges.circular', anychart.gauges.circular);
-goog.exportSymbol('anychart.gauges.linear', anychart.gauges.linear);
-goog.exportSymbol('anychart.gauges.thermometer', anychart.gauges.thermometer);
-goog.exportSymbol('anychart.gauges.tank', anychart.gauges.tank);
-goog.exportSymbol('anychart.gauges.led', anychart.gauges.led);
-goog.exportSymbol('anychart.ganttProject', anychart.ganttProject);
-goog.exportSymbol('anychart.ganttResource', anychart.ganttResource);
-goog.exportSymbol('anychart.stock', anychart.stock);
-goog.exportSymbol('anychart.quadrant', anychart.quadrant);
-goog.exportSymbol('anychart.venn', anychart.venn);
 goog.exportSymbol('anychart.theme', anychart.theme);
 goog.exportSymbol('anychart.appendTheme', anychart.appendTheme);
-goog.exportSymbol('anychart.treeMap', anychart.treeMap);
-goog.exportSymbol('anychart.pareto', anychart.pareto);
-goog.exportSymbol('anychart.resource', anychart.resource);
-goog.exportSymbol('anychart.mekko', anychart.mekko);
-goog.exportSymbol('anychart.mosaic', anychart.mosaic);
-goog.exportSymbol('anychart.barmekko', anychart.barmekko);
-goog.exportSymbol('anychart.tagCloud', anychart.tagCloud);
-goog.exportSymbol('anychart.waterfall', anychart.waterfall);
-goog.exportSymbol('anychart.standalones.background', anychart.standalones.background);
-goog.exportSymbol('anychart.standalones.colorRange', anychart.standalones.colorRange);
-goog.exportSymbol('anychart.standalones.dataGrid', anychart.standalones.dataGrid);
-goog.exportSymbol('anychart.standalones.label', anychart.standalones.label);
-goog.exportSymbol('anychart.standalones.labelsFactory', anychart.standalones.labelsFactory);
-goog.exportSymbol('anychart.standalones.legend', anychart.standalones.legend);
-goog.exportSymbol('anychart.standalones.markersFactory', anychart.standalones.markersFactory);
-goog.exportSymbol('anychart.standalones.projectTimeline', anychart.standalones.projectTimeline);
-goog.exportSymbol('anychart.standalones.resourceTimeline', anychart.standalones.resourceTimeline);
-goog.exportSymbol('anychart.standalones.resourceList', anychart.standalones.resourceList);
-goog.exportSymbol('anychart.standalones.scroller', anychart.standalones.scroller);
-goog.exportSymbol('anychart.standalones.table', anychart.standalones.table);
-goog.exportSymbol('anychart.standalones.title', anychart.standalones.title);
-goog.exportSymbol('anychart.standalones.axes.linear', anychart.standalones.axes.linear);
-goog.exportSymbol('anychart.standalones.axes.polar', anychart.standalones.axes.polar);
-goog.exportSymbol('anychart.standalones.axes.radar', anychart.standalones.axes.radar);
-goog.exportSymbol('anychart.standalones.axes.radial', anychart.standalones.axes.radial);
-goog.exportSymbol('anychart.standalones.axisMarkers.line', anychart.standalones.axisMarkers.line);
-goog.exportSymbol('anychart.standalones.axisMarkers.range', anychart.standalones.axisMarkers.range);
-goog.exportSymbol('anychart.standalones.axisMarkers.text', anychart.standalones.axisMarkers.text);
-goog.exportSymbol('anychart.standalones.grids.linear', anychart.standalones.grids.linear);
-goog.exportSymbol('anychart.standalones.grids.linear3d', anychart.standalones.grids.linear3d);
-goog.exportSymbol('anychart.standalones.grids.polar', anychart.standalones.grids.polar);
-goog.exportSymbol('anychart.standalones.grids.radar', anychart.standalones.grids.radar);
-goog.exportSymbol('anychart.ui.contextMenu', anychart.ui.contextMenu);
-goog.exportSymbol('anychart.ui.ganttToolbar', anychart.ui.ganttToolbar);
-goog.exportSymbol('anychart.ui.preloader', anychart.ui.preloader);
-goog.exportSymbol('anychart.ui.rangePicker', anychart.ui.rangePicker);
-goog.exportSymbol('anychart.ui.rangeSelector', anychart.ui.rangeSelector);
 goog.exportSymbol('anychart.getChartById', anychart.getChartById);
+goog.exportSymbol('anychart.area', anychart.getFeatureOrError('anychart.area', 'Area chart'));
+goog.exportSymbol('anychart.area3d', anychart.getFeatureOrError('anychart.area3d', '3D Area chart'));
+goog.exportSymbol('anychart.bar', anychart.getFeatureOrError('anychart.bar', 'Bar chart'));
+goog.exportSymbol('anychart.vertical', anychart.getFeatureOrError('anychart.vertical', 'Bar chart'));
+goog.exportSymbol('anychart.bar3d', anychart.getFeatureOrError('anychart.bar3d', '3D Bar chart'));
+goog.exportSymbol('anychart.bubble', anychart.getFeatureOrError('anychart.bubble', 'Bubble chart'));
+goog.exportSymbol('anychart.bullet', anychart.getFeatureOrError('anychart.bullet', 'Bullet chart'));
+goog.exportSymbol('anychart.cartesian', anychart.getFeatureOrError('anychart.cartesian', 'Cartesian chart'));
+goog.exportSymbol('anychart.cartesian3d', anychart.getFeatureOrError('anychart.cartesian3d', '3D Cartesian chart'));
+goog.exportSymbol('anychart.scatter', anychart.getFeatureOrError('anychart.scatter', 'Scatter chart'));
+goog.exportSymbol('anychart.column', anychart.getFeatureOrError('anychart.column', 'Column chart'));
+goog.exportSymbol('anychart.column3d', anychart.getFeatureOrError('anychart.column3d', '3D Column chart'));
+goog.exportSymbol('anychart.box', anychart.getFeatureOrError('anychart.box', 'Box chart'));
+goog.exportSymbol('anychart.financial', anychart.getFeatureOrError('anychart.financial', 'Financial chart'));
+goog.exportSymbol('anychart.funnel', anychart.getFeatureOrError('anychart.funnel', 'Funnel chart'));
+goog.exportSymbol('anychart.line', anychart.getFeatureOrError('anychart.line', 'Line chart'));
+goog.exportSymbol('anychart.verticalLine', anychart.getFeatureOrError('anychart.verticalLine', 'Vertical Line chart'));
+goog.exportSymbol('anychart.verticalArea', anychart.getFeatureOrError('anychart.verticalArea', 'Vertical Area chart'));
+goog.exportSymbol('anychart.marker', anychart.getFeatureOrError('anychart.marker', 'Marker chart'));
+goog.exportSymbol('anychart.pie', anychart.getFeatureOrError('anychart.pie', 'Pie chart'));
+goog.exportSymbol('anychart.pie3d', anychart.getFeatureOrError('anychart.pie3d', '3D Pie chart'));
+goog.exportSymbol('anychart.pyramid', anychart.getFeatureOrError('anychart.pyramid', 'Pyramid chart'));
+goog.exportSymbol('anychart.radar', anychart.getFeatureOrError('anychart.radar', 'Radar chart'));
+goog.exportSymbol('anychart.polar', anychart.getFeatureOrError('anychart.polar', 'Polar chart'));
+goog.exportSymbol('anychart.pert', anychart.getFeatureOrError('anychart.pert', 'Pert chart'));
+goog.exportSymbol('anychart.sparkline', anychart.getFeatureOrError('anychart.sparkline', 'Sparkline chart'));
+goog.exportSymbol('anychart.heatMap', anychart.getFeatureOrError('anychart.heatMap', 'HeatMap chart'));
+goog.exportSymbol('anychart.gauges.circular', anychart.getFeatureOrError('anychart.gauges.circular', 'Circular gauge'));
+goog.exportSymbol('anychart.gauges.linear', anychart.getFeatureOrError('anychart.gauges.linear', 'Linear gauge'));
+goog.exportSymbol('anychart.gauges.tank', anychart.getFeatureOrError('anychart.gauges.tank', 'Tank gauge'));
+goog.exportSymbol('anychart.gauges.thermometer', anychart.getFeatureOrError('anychart.gauges.thermometer', 'Thermometer gauge'));
+goog.exportSymbol('anychart.gauges.led', anychart.getFeatureOrError('anychart.gauges.led', 'LED gauge'));
+goog.exportSymbol('anychart.map', anychart.getFeatureOrError('anychart.map', 'Map'));
+goog.exportSymbol('anychart.choropleth', anychart.getFeatureOrError('anychart.choropleth', 'Choropleth map'));
+goog.exportSymbol('anychart.bubbleMap', anychart.getFeatureOrError('anychart.bubbleMap', 'Bubble map'));
+goog.exportSymbol('anychart.connector', anychart.getFeatureOrError('anychart.connector', 'Connector map'));
+goog.exportSymbol('anychart.markerMap', anychart.getFeatureOrError('anychart.markerMap', 'Marker map'));
+goog.exportSymbol('anychart.seatMap', anychart.getFeatureOrError('anychart.seatMap', 'Seat map'));
+goog.exportSymbol('anychart.ganttProject', anychart.getFeatureOrError('anychart.ganttProject', 'Gantt Project chart'));
+goog.exportSymbol('anychart.ganttResource', anychart.getFeatureOrError('anychart.ganttResource', 'Gantt Resource chart'));
+goog.exportSymbol('anychart.stock', anychart.getFeatureOrError('anychart.stock', 'Stock chart'));
+goog.exportSymbol('anychart.treeMap', anychart.getFeatureOrError('anychart.treeMap', 'TreeMap chart'));
+goog.exportSymbol('anychart.pareto', anychart.getFeatureOrError('anychart.pareto', 'Pareto chart'));
+goog.exportSymbol('anychart.resource', anychart.getFeatureOrError('anychart.resource', 'Resource chart'));
+goog.exportSymbol('anychart.quadrant', anychart.getFeatureOrError('anychart.quadrant', 'Quadrant chart'));
+goog.exportSymbol('anychart.venn', anychart.getFeatureOrError('anychart.venn', 'Venn chart'));
+goog.exportSymbol('anychart.tagCloud', anychart.getFeatureOrError('anychart.tagCloud', 'TagCloud chart'));
+goog.exportSymbol('anychart.mekko', anychart.getFeatureOrError('anychart.mekko', 'Mekko chart'));
+goog.exportSymbol('anychart.mosaic', anychart.getFeatureOrError('anychart.mosaic', 'Mosaic chart'));
+goog.exportSymbol('anychart.barmekko', anychart.getFeatureOrError('anychart.barmekko', 'Barmekko chart'));
+goog.exportSymbol('anychart.waterfall', anychart.getFeatureOrError('anychart.waterfall', 'Waterfall chart'));
+goog.exportSymbol('anychart.standalones.background', anychart.getFeatureOrError('anychart.standalones.background', 'anychart.standalones.Background'));
+goog.exportSymbol('anychart.standalones.colorRange', anychart.getFeatureOrError('anychart.standalones.colorRange', 'anychart.standalones.ColorRange'));
+goog.exportSymbol('anychart.standalones.dataGrid', anychart.getFeatureOrError('anychart.standalones.dataGrid', 'anychart.standalones.DataGrid'));
+goog.exportSymbol('anychart.standalones.label', anychart.getFeatureOrError('anychart.standalones.label', 'anychart.standalones.Label'));
+goog.exportSymbol('anychart.standalones.labelsFactory', anychart.getFeatureOrError('anychart.standalones.labelsFactory', 'anychart.standalones.LabelsFactory'));
+goog.exportSymbol('anychart.standalones.legend', anychart.getFeatureOrError('anychart.standalones.legend', 'anychart.standalones.Legend'));
+goog.exportSymbol('anychart.standalones.markersFactory', anychart.getFeatureOrError('anychart.standalones.markersFactory', 'anychart.standalones.MarkersFactory'));
+goog.exportSymbol('anychart.standalones.projectTimeline', anychart.getFeatureOrError('anychart.standalones.projectTimeline', 'anychart.standalones.ProjectTimeline'));
+goog.exportSymbol('anychart.standalones.resourceTimeline', anychart.getFeatureOrError('anychart.standalones.resourceTimeline', 'anychart.standalones.ResourceTimeline'));
+goog.exportSymbol('anychart.standalones.resourceList', anychart.getFeatureOrError('anychart.standalones.resourceList', 'anychart.standalones.ResourceList'));
+goog.exportSymbol('anychart.standalones.scroller', anychart.getFeatureOrError('anychart.standalones.scroller', 'anychart.standalones.scroller'));
+goog.exportSymbol('anychart.standalones.table', anychart.getFeatureOrError('anychart.standalones.table', 'anychart.standalones.Table'));
+goog.exportSymbol('anychart.standalones.title', anychart.getFeatureOrError('anychart.standalones.title', 'anychart.standalones.Title'));
+goog.exportSymbol('anychart.standalones.axes.linear', anychart.getFeatureOrError('anychart.standalones.axes.linear', 'anychart.standalones.axes.Linear'));
+goog.exportSymbol('anychart.standalones.axes.polar', anychart.getFeatureOrError('anychart.standalones.axes.polar', 'anychart.standalones.axes.Polar'));
+goog.exportSymbol('anychart.standalones.axes.radar', anychart.getFeatureOrError('anychart.standalones.axes.radar', 'anychart.standalones.axes.Radar'));
+goog.exportSymbol('anychart.standalones.axes.radial', anychart.getFeatureOrError('anychart.standalones.axes.radial', 'anychart.standalones.axes.Radial'));
+goog.exportSymbol('anychart.standalones.axisMarkers.line', anychart.getFeatureOrError('anychart.standalones.axisMarkers.line', 'anychart.standalones.axisMarkers.Line'));
+goog.exportSymbol('anychart.standalones.axisMarkers.range', anychart.getFeatureOrError('anychart.standalones.axisMarkers.range', 'anychart.standalones.axisMarkers.Range'));
+goog.exportSymbol('anychart.standalones.axisMarkers.text', anychart.getFeatureOrError('anychart.standalones.axisMarkers.text', 'anychart.standalones.axisMarkers.Text'));
+goog.exportSymbol('anychart.standalones.grids.linear', anychart.getFeatureOrError('anychart.standalones.grids.linear', 'anychart.standalones.grids.Linear'));
+goog.exportSymbol('anychart.standalones.grids.linear3d', anychart.getFeatureOrError('anychart.standalones.grids.linear3d', 'anychart.standalones.grids.Linear3d'));
+goog.exportSymbol('anychart.standalones.grids.polar', anychart.getFeatureOrError('anychart.standalones.grids.polar', 'anychart.standalones.grids.Polar'));
+goog.exportSymbol('anychart.standalones.grids.radar', anychart.getFeatureOrError('anychart.standalones.grids.radar', 'anychart.standalones.grids.Radar'));
+goog.exportSymbol('anychart.ui.contextMenu', anychart.getFeatureOrError('anychart.ui.contextMenu', 'Context Menu', true));
+goog.exportSymbol('anychart.ui.ganttToolbar', anychart.getFeatureOrError('anychart.ui.ganttToolbar', 'Gantt toolbar'));
+goog.exportSymbol('anychart.ui.preloader', anychart.getFeatureOrError('anychart.ui.preloader', 'Preloader'));
+goog.exportSymbol('anychart.ui.rangePicker', anychart.getFeatureOrError('anychart.ui.rangePicker', 'Range picker'));
+goog.exportSymbol('anychart.ui.rangeSelector', anychart.getFeatureOrError('anychart.ui.rangeSelector', 'Range selector'));
+goog.exportSymbol('anychart.ui.zoom', anychart.getFeatureOrError('anychart.ui.zoom', 'Zoom control'));
+goog.exportSymbol('anychart.ui.binding.exec', anychart.getFeatureOrError('anychart.ui.binding.exec', 'UI binding'));
+goog.exportSymbol('anychart.ui.binding.init', anychart.getFeatureOrError('anychart.ui.binding.init', 'UI binding'));
+goog.exportSymbol('anychart.fromXmlFile', anychart.getFeatureOrError('anychart.fromXmlFile', 'Data adapter'));
+goog.exportSymbol('anychart.fromJsonFile', anychart.getFeatureOrError('anychart.fromJsonFile', 'Data adapter'));
+goog.exportSymbol('anychart.data.parseHtmlTable', anychart.getFeatureOrError('anychart.data.parseHtmlTable', 'Data adapter'));
+goog.exportSymbol('anychart.data.loadJsonFile', anychart.getFeatureOrError('anychart.data.loadJsonFile', 'Data adapter'));
+goog.exportSymbol('anychart.data.loadXmlFile', anychart.getFeatureOrError('anychart.data.loadXmlFile', 'Data adapter'));
+goog.exportSymbol('anychart.data.loadCsvFile', anychart.getFeatureOrError('anychart.data.loadCsvFile', 'Data adapter'));
+goog.exportSymbol('anychart.data.loadGoogleSpreadsheet', anychart.getFeatureOrError('anychart.data.loadGoogleSpreadsheet', 'Data adapter'));
 (function() {
   var proto = acgraph.vector.Stage.prototype;
   proto['credits'] = proto.credits;

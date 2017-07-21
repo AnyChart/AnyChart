@@ -157,7 +157,7 @@ anychart.core.utils.InteractivityState.prototype.setPointState = function(state,
       return;
     this.target.finalizePointAppearance();
   } else if (!this.isStateContains(this.seriesState, state)) {
-    var iterator, index, update;
+    var iterator, index;
     var removeState = anychart.PointState.NORMAL;
     if (state == anychart.PointState.NORMAL || state == anychart.PointState.HOVER) {
       removeState = anychart.PointState.HOVER;
@@ -489,7 +489,7 @@ anychart.core.utils.InteractivityState.clarifyState = function(state) {
 
 /**
  * Interactivity state class for pie. See #addPointStateInternal method.
- * @param {anychart.charts.Pie} target Pie chart.
+ * @param {anychart.pieModule.Chart} target Pie chart.
  * @constructor
  * @extends {anychart.core.utils.InteractivityState}
  */
@@ -532,7 +532,7 @@ anychart.core.utils.PieInteractivityState.prototype.addPointStateInternal = func
 
 /**
  * Interactivity state class for linear gauge. Overrides setPointState method.
- * @param {anychart.core.linearGauge.pointers.Base} target Pie chart.
+ * @param {anychart.linearGaugeModule.pointers.Base} target Pie chart.
  * @constructor
  * @extends {anychart.core.utils.InteractivityState}
  */

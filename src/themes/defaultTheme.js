@@ -308,15 +308,6 @@ goog.provide('anychart.themes.defaultTheme');
    * @this {*}
    * @return {*}
    */
-  var returnThickenedDashedStrokeSourceColor = function() {
-    return {'color': this['sourceColor'], 'dash': '6 4', 'thickness': 1.5};
-  };
-
-
-  /**
-   * @this {*}
-   * @return {*}
-   */
   var returnRangeTooltipContentFormatter = function() {
     return 'High: ' + locNum(this['high']) + '\n' +
         'Low: ' + locNum(this['low']);
@@ -487,39 +478,39 @@ goog.provide('anychart.themes.defaultTheme');
   };
 
 
-  /**
-   * @this {*}
-   * @return {*}
-   */
-  var stockBaseA11yTitleFormatter = function() {
-    var chart = this['chart'];
-    var res = chartA11yTitleFormatter.call(this);
-    var seriesLength = chart['getSeriesCount']();
-
-    var seriesMap = {};
-    for (var i = 0; i < seriesLength; i++) {
-      var ser = chart['getSeriesAt'](i);
-      var type = ser['seriesType']();
-      if (seriesMap.hasOwnProperty(type)) {
-        seriesMap[type] += 1;
-      } else {
-        seriesMap[type] = 1;
-      }
-    }
-
-    res += ', with ';
-    for (var key in seriesMap) {
-      res += seriesMap[key] + ' ' + key + ' series, ';
-    }
-    res += '. ';
-
-    var xScale = chart['xScale']();
-
-    res += 'X-scale minimum value is ' + dateTime(xScale['getMinimum']()) +
-        ' , maximum value is ' + dateTime(xScale['getMaximum']()) + '. ';
-
-    return res;
-  };
+  // /**
+  //  * @this {*}
+  //  * @return {*}
+  //  */
+  // var stockBaseA11yTitleFormatter = function() {
+  //   var chart = this['chart'];
+  //   var res = chartA11yTitleFormatter.call(this);
+  //   var seriesLength = chart['getSeriesCount']();
+  //
+  //   var seriesMap = {};
+  //   for (var i = 0; i < seriesLength; i++) {
+  //     var ser = chart['getSeriesAt'](i);
+  //     var type = ser['seriesType']();
+  //     if (seriesMap.hasOwnProperty(type)) {
+  //       seriesMap[type] += 1;
+  //     } else {
+  //       seriesMap[type] = 1;
+  //     }
+  //   }
+  //
+  //   res += ', with ';
+  //   for (var key in seriesMap) {
+  //     res += seriesMap[key] + ' ' + key + ' series, ';
+  //   }
+  //   res += '. ';
+  //
+  //   var xScale = chart['xScale']();
+  //
+  //   res += 'X-scale minimum value is ' + dateTime(xScale['getMinimum']()) +
+  //       ' , maximum value is ' + dateTime(xScale['getMaximum']()) + '. ';
+  //
+  //   return res;
+  // };
 
 
   /**
@@ -3633,8 +3624,9 @@ goog.provide('anychart.themes.defaultTheme');
         },
         'led': {
           /**
-           * @this {*}
+           * @param {*} color
            * @return {*}
+           * @this {*}
            */
           'dimmer': function(color) {
             return darken(color);
@@ -5311,7 +5303,10 @@ goog.provide('anychart.themes.defaultTheme');
         },
         'separator': {'enabled': true},
         'titleFormat': '{%name}',
-        /** @this {*} */
+        /**
+         * @return {string}
+         * @this {*}
+         */
         'format': function() {
           return 'Starts: ' + date(this['start']) + '\nEnds: ' + date(this['end']);
         }

@@ -1,4 +1,5 @@
 goog.provide('anychart.core.ui.Label');
+goog.provide('anychart.standalones.Label');
 goog.require('anychart.core.ui.LabelBase');
 
 
@@ -57,6 +58,29 @@ anychart.core.ui.Label.prototype.disposeInternal = function() {
 };
 
 
+
+/**
+ * @constructor
+ * @extends {anychart.core.ui.Label}
+ */
+anychart.standalones.Label = function() {
+  anychart.standalones.Label.base(this, 'constructor');
+};
+goog.inherits(anychart.standalones.Label, anychart.core.ui.Label);
+anychart.core.makeStandalone(anychart.standalones.Label, anychart.core.ui.Label);
+
+
+/**
+ * Constructor function.
+ * @return {!anychart.standalones.Label}
+ */
+anychart.standalones.label = function() {
+  var label = new anychart.standalones.Label();
+  label.setup(anychart.getFullTheme('standalones.label'));
+  return label;
+};
+
+
 //exports
 (function() {
   var proto = anychart.core.ui.Label.prototype;
@@ -73,4 +97,10 @@ anychart.core.ui.Label.prototype.disposeInternal = function() {
   proto['maxFontSize'] = proto.maxFontSize;
   proto['adjustFontSize'] = proto.adjustFontSize;
   proto['rotation'] = proto.rotation;
+
+  proto = anychart.standalones.Label.prototype;
+  goog.exportSymbol('anychart.standalones.label', anychart.standalones.label);
+  proto['draw'] = proto.draw;
+  proto['parentBounds'] = proto.parentBounds;
+  proto['container'] = proto.container;
 })();

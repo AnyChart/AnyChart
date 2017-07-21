@@ -1370,4 +1370,23 @@ anychart.core.ui.LegendItem.prototype.disposeInternal = function() {
 //endregion
 //region --- Exports
 //exports
+(function() {
+  // Used only in a standalone
+  var proto = anychart.core.ui.LegendItem.prototype;
+  proto['x'] = proto.x;
+  proto['y'] = proto.y;
+  proto['iconType'] = proto.iconType;
+  proto['iconFill'] = proto.iconFill;
+  proto['iconStroke'] = proto.iconStroke;
+  proto['iconHatchFill'] = proto.iconHatchFill;
+  proto['iconTextSpacing'] = proto.iconTextSpacing;
+  proto['maxWidth'] = proto.maxWidth;
+  proto['maxHeight'] = proto.maxHeight;
+  proto['text'] = proto.text;
+  proto['getTextElement'] = proto.getTextElement;
+  proto['getContentBounds'] = proto.getContentBounds;
+  proto['getWidth'] = proto.getWidth;
+  proto['getHeight'] = proto.getHeight;
+  proto['draw'] = proto.draw;
+})();
 //endregion

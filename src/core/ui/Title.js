@@ -1,4 +1,5 @@
 goog.provide('anychart.core.ui.Title');
+goog.provide('anychart.standalones.Title');
 goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.settings');
@@ -1188,8 +1189,50 @@ anychart.core.ui.Title.prototype.setupByJSON = function(config, opt_default) {
   if ('margin' in config)
     this.margin(config['margin']);
 };
-//endregion
 
+
+
+//endregion
+//region --- Standalone
+//------------------------------------------------------------------------------
+//
+//  Standalone
+//
+//------------------------------------------------------------------------------
+/**
+ * @constructor
+ * @extends {anychart.core.ui.Title}
+ */
+anychart.standalones.Title = function() {
+  anychart.standalones.Title.base(this, 'constructor');
+};
+goog.inherits(anychart.standalones.Title, anychart.core.ui.Title);
+anychart.core.makeStandalone(anychart.standalones.Title, anychart.core.ui.Title);
+
+
+//region --- STANDALONE ---
+/** @inheritDoc */
+anychart.standalones.Title.prototype.dependsOnContainerSize = function() {
+  //TODO(AntonKagakin): should be reworked to getOption
+  var width = this.width();
+  var height = this.height();
+  return anychart.utils.isPercent(width) || anychart.utils.isPercent(height) || goog.isNull(width) || goog.isNull(height);
+};
+
+
+//endregion
+/**
+ * Constructor function.
+ * @return {!anychart.standalones.Title}
+ */
+anychart.standalones.title = function() {
+  var title = new anychart.standalones.Title();
+  title.setupInternal(true, anychart.getFullTheme('standalones.title'));
+  return title;
+};
+
+
+//endregion
 //exports
 (function() {
   var proto = anychart.core.ui.Title.prototype;
@@ -1224,4 +1267,10 @@ anychart.core.ui.Title.prototype.setupByJSON = function(config, opt_default) {
   // proto['align'] = proto.align;
   // proto['orientation'] = proto.orientation;
   proto['getRemainingBounds'] = proto.getRemainingBounds;
+
+  proto = anychart.standalones.Title.prototype;
+  goog.exportSymbol('anychart.standalones.title', anychart.standalones.title);
+  proto['draw'] = proto.draw;
+  proto['parentBounds'] = proto.parentBounds;
+  proto['container'] = proto.container;
 })();

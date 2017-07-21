@@ -786,7 +786,7 @@ anychart.core.ui.Tooltip.prototype.showAsSingle_ = function(points, clientX, cli
  * @param {anychart.core.ui.Tooltip} tooltip - Tooltip.
  * @param {number} clientX - ClientX coordinate.
  * @param {number} clientY - ClientY coordinate.
- * @param {anychart.core.series.Base|anychart.charts.TreeMap=} opt_series - Series.
+ * @param {anychart.core.series.Base|anychart.treemapModule.Chart=} opt_series - Series.
  * @private
  */
 anychart.core.ui.Tooltip.prototype.setPositionForSingle_ = function(tooltip, clientX, clientY, opt_series) {
@@ -1682,7 +1682,7 @@ anychart.core.ui.Tooltip.prototype.calculatePosition_ = function() {
  * @param {anychart.core.ui.Tooltip} tooltip
  * @param {number} clientX
  * @param {number} clientY
- * @param {anychart.core.series.Base|anychart.charts.TreeMap=} opt_series
+ * @param {anychart.core.series.Base|anychart.treemapModule.Chart=} opt_series
  * @private
  */
 anychart.core.ui.Tooltip.prototype.setPositionForSeparated_ = function(tooltip, clientX, clientY, opt_series) {

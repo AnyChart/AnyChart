@@ -507,8 +507,6 @@ anychart.core.ui.Button.prototype.drawDisabled = function(settings) {
  * @private
  */
 anychart.core.ui.Button.prototype.calculateButtonBounds_ = function() {
-  var container = /** @type {acgraph.vector.ILayer} */ (this.container());
-  var stage = container ? container.getStage() : null;
   var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
 
   var parentWidth, parentHeight;

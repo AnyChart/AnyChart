@@ -476,7 +476,7 @@ anychart.core.ui.LabelBase.prototype.maxFontSize = function(opt_value) {
 
 /**
  * Getter/setter for adjustFontSize.
- * @param {(boolean|Array.<boolean, boolean>|{width:boolean,height:boolean})=} opt_adjustOrAdjustByWidth Is font needs to be adjusted in case of 1 argument and adjusted by width in case of 2 arguments.
+ * @param {(boolean|Array.<boolean>|{width:boolean,height:boolean})=} opt_adjustOrAdjustByWidth Is font needs to be adjusted in case of 1 argument and adjusted by width in case of 2 arguments.
  * @param {boolean=} opt_adjustByHeight Is font needs to be adjusted by height.
  * @return {({width:boolean,height:boolean}|anychart.core.ui.LabelBase)} adjustFontSite setting or self for method chaining.
  */

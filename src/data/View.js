@@ -99,28 +99,6 @@ anychart.data.View.prototype.ensureConsistent = function() {
 
 
 /**
- * Creates a pie-ready view.
- * @param {string} fieldName A field name to make filter by.
- * @param {function(*):boolean=} opt_func A filter function that should accept a field value and return true if the row
- *    should be included into the resulting view as a and false otherwise.
- * @param {(function(R, T, number, Array) : R)=} opt_other The function to call for
- *     every value of other. This function
- *     takes 4 arguments (the function's previous result or the initial value,
- *     the value of the current array element, the current array index, and the
- *     array itself)
- *     function(previousValue, currentValue, index, array).
- * @param {(function():R)=} opt_otherInitialConstructor The function that constructs initial value for opt_other func.
- * @template T,S,R
- * @return {!anychart.data.View} The new derived view.
- */
-anychart.data.View.prototype.preparePie = function(fieldName, opt_func, opt_other, opt_otherInitialConstructor) {
-  var result = new anychart.data.PieView(this, fieldName, opt_func, opt_other, opt_otherInitialConstructor);
-  this.registerDisposable(result);
-  return result;
-};
-
-
-/**
  * Creates a derived view, containing just the same data set and order as this view does.
  * @example <t>lineChart</t>
  *  var data = anychart.data.set([

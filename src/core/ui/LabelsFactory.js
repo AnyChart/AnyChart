@@ -1,6 +1,8 @@
 //region --- Requiring and Providing
 goog.provide('anychart.core.ui.LabelsFactory');
 goog.provide('anychart.core.ui.LabelsFactory.Label');
+goog.provide('anychart.standalones.LabelsFactory');
+goog.provide('anychart.standalones.LabelsFactory.Label');
 goog.require('acgraph.math');
 goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.VisualBase');
@@ -2332,7 +2334,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.drawConnector = function() {
 anychart.core.ui.LabelsFactory.Label.prototype.applyTextSettings = function(textElement, isInitial, opt_settings) {
   var textVal, useHtml, text;
   var target = goog.isDef(opt_settings) ?
-      function(value) {return opt_settings[value]} :
+      function(value) { return opt_settings[value]; } :
       this instanceof anychart.core.ui.LabelsFactory.Label ?
           this.getOwnOption :
           anychart.core.ui.LabelsFactory.prototype.getOwnAndAutoOption;
@@ -2752,6 +2754,53 @@ anychart.core.ui.LabelsFactory.Label.prototype.disposeInternal = function() {
 };
 
 
+
+//endregion
+//region --- anychart.standalones.LabelsFactory
+//------------------------------------------------------------------------------
+//
+//  anychart.standalones.LabelsFactory
+//
+//------------------------------------------------------------------------------
+/**
+ * @constructor
+ * @extends {anychart.core.ui.LabelsFactory}
+ */
+anychart.standalones.LabelsFactory = function() {
+  anychart.standalones.LabelsFactory.base(this, 'constructor');
+};
+goog.inherits(anychart.standalones.LabelsFactory, anychart.core.ui.LabelsFactory);
+anychart.core.makeStandalone(anychart.standalones.LabelsFactory, anychart.core.ui.LabelsFactory);
+
+
+/** @inheritDoc */
+anychart.standalones.LabelsFactory.prototype.createLabel = function() {
+  return new anychart.standalones.LabelsFactory.Label();
+};
+
+
+
+/**
+ * @constructor
+ * @extends {anychart.core.ui.LabelsFactory.Label}
+ */
+anychart.standalones.LabelsFactory.Label = function() {
+  anychart.standalones.LabelsFactory.Label.base(this, 'constructor');
+};
+goog.inherits(anychart.standalones.LabelsFactory.Label, anychart.core.ui.LabelsFactory.Label);
+
+
+/**
+ * Constructor function.
+ * @return {!anychart.standalones.LabelsFactory}
+ */
+anychart.standalones.labelsFactory = function() {
+  var factory = new anychart.standalones.LabelsFactory();
+  factory.setupInternal(true, anychart.getFullTheme('standalones.labelsFactory'));
+  return factory;
+};
+
+
 //endregion
 //region --- Exports
 //exports
@@ -2798,5 +2847,16 @@ anychart.core.ui.LabelsFactory.Label.prototype.disposeInternal = function() {
   // proto['adjustFontSize'] = proto.adjustFontSize;
   // proto['minFontSize'] = proto.minFontSize;
   // proto['maxFontSize'] = proto.maxFontSize;
+
+
+  proto = anychart.standalones.LabelsFactory.prototype;
+  goog.exportSymbol('anychart.standalones.labelsFactory', anychart.standalones.labelsFactory);
+  proto['draw'] = proto.draw;
+  proto['parentBounds'] = proto.parentBounds;
+  proto['container'] = proto.container;
+  proto['add'] = proto.add;
+  proto['clear'] = proto.clear;
+  proto['measure'] = proto.measure;
+  proto['measureWithTransform'] = proto.measureWithTransform;
 })();
 //endregion

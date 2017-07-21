@@ -2255,13 +2255,11 @@ anychart.core.ChartWithOrthogonalScales.prototype.setupSeriesByJSON = function(c
  */
 anychart.core.ChartWithOrthogonalScales.prototype.serializeSeries = function(json, scales, scaleIds) {
   var i;
-  var scale;
   var config;
   var seriesList = [];
   for (i = 0; i < this.seriesList.length; i++) {
     var series = this.seriesList[i];
     config = series.serialize();
-    scale = series.xScale();
     this.serializeScale(config, 'xScale', /** @type {anychart.scales.Base} */(series.xScale()), scales, scaleIds);
     this.serializeScale(config, 'yScale', /** @type {anychart.scales.Base} */(series.yScale()), scales, scaleIds);
     seriesList.push(config);

@@ -56,7 +56,7 @@ anychart.core.drawers.OHLC.prototype.requiredShapes = (function() {
 
 
 /** @inheritDoc */
-anychart.core.drawers.OHLC.prototype.yValueNames = (['open', 'high', 'low', 'close']);
+anychart.core.drawers.OHLC.prototype.yValueNames = (function () { return ['open', 'high', 'low', 'close']; })();
 
 
 /** @inheritDoc */

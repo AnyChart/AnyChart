@@ -549,7 +549,7 @@ anychart.core.ui.Paginator.prototype.applyTextSettings = function(textElement, i
  * Measures maximum paginator height.
  * @private
  * @param {number=} opt_pageCount Pages count.
- * @return {Array.<number, number>} Measured max width and height.
+ * @return {Array.<number>} Measured max width and height.
  */
 anychart.core.ui.Paginator.prototype.measureMaxDimensions_ = function(opt_pageCount) {
   if (!this.boundsCache_) this.boundsCache_ = {};
