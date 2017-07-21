@@ -710,19 +710,20 @@ anychart.data.View.prototype.serializeRow = function(index) {
   var key;
   var i;
   var val;
+  var m;
   row = this.row(index);
   // if row represented by array - convert it to object with help of array mapping.
   if (goog.isArray(row)) {
     // get array mapping for the row
     mapping = this.getRowMapping(index);
-    if (mapping.isArrayMappingCustom) {
+    if (mapping.isMappingCustom) {
       rowObject = {};
-      var arrayMapping = mapping.getArrayMapping();
-      for (key in arrayMapping) {
-        map = arrayMapping[key];
+      m = mapping.getMapping();
+      for (key in m) {
+        map = m[key];
         for (i = 0; i < map.length; i++) {
           if (map[i] in row) {
-            val = this.serializeValue_(row[map[i]]);
+            val = this.serializeValue_(row[/** @type {number} */ (map[i])]);
             rowObject[key] = val;
             break;
           }
@@ -735,11 +736,11 @@ anychart.data.View.prototype.serializeRow = function(index) {
     // if row is presented by object - normalize it to default mapping, because we cannot provide
     // mapping info to the resulting JSON now
     mapping = this.getRowMapping(index);
-    if (mapping.isObjectMappingCustom) {
+    if (mapping.isMappingCustom) {
       rowObject = {};
-      var objectMapping = mapping.getObjectMapping();
-      for (key in objectMapping) {
-        map = objectMapping[key];
+      m = mapping.getMapping();
+      for (key in m) {
+        map = m[key];
         for (i = 0; i < map.length; i++) {
           if (map[i] in row) {
             val = row[map[i]];
@@ -753,7 +754,7 @@ anychart.data.View.prototype.serializeRow = function(index) {
         }
       }
       for (key in row) {
-        if (row.hasOwnProperty(key) && !(key in objectMapping && key in rowObject)) {
+        if (row.hasOwnProperty(key) && !(key in m && key in rowObject)) {
           val = this.serializeValue_(row[key]);
           rowObject[key] = val;
         }

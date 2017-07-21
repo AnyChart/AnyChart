@@ -38,10 +38,9 @@ goog.require('goog.object');
  * @param {string} field Field name.
  * @param {?Array.<string>} mapping Mapping.
  * @param {*=} opt_setValue Value to set.
- * @param {boolean=} opt_setToFirstByMapping If true, sets value to the first fieldName by mapping.
  * @return {*} Current or previous value.
  */
-anychart.utils.mapObject = function(obj, field, mapping, opt_setValue, opt_setToFirstByMapping) {
+anychart.utils.mapObject = function(obj, field, mapping, opt_setValue) {
   if (mapping) {
     for (var i = 0; i < mapping.length; i++) {
       var propName = mapping[i];
@@ -53,7 +52,7 @@ anychart.utils.mapObject = function(obj, field, mapping, opt_setValue, opt_setTo
   }
   if (arguments.length > 3) {
     var result = obj[field];
-    obj[(mapping && opt_setToFirstByMapping) ? mapping[0] : field] = opt_setValue;
+    obj[field] = opt_setValue;
     return result;
   }
   return obj[field];

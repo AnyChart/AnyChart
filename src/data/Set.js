@@ -238,83 +238,11 @@ anychart.data.Set.prototype.data = function(opt_value, opt_settings) {
 /**
  * Defines data mapping.<br/>
  * You can define mappings for the different types of data (see samples).
- * Default mapping is shown in {@link anychart.data.Set} constructor samples.
- * @example <c>Custom data mapping.</c><t>listingOnly</t>
- * // Simple mapping
- *  dataSet.mapAs({
- *    'value': [0],
- *    'x': [1],
- *    'fill': [2]
- *  });
- *   // Raw data          Mapped as
- *   [
- *    [11, 1, 'red 0.5'],       {x: 1, value: 11, fill: 'red 0.5'}
- *    [21, 2, 'green 0.5'],     {x: 2, value: 21, fill: 'green 0.5'}
- *    [14, 3, 'blue 0.5'],      {x: 3, value: 14, fill: 'blue 0.5'}
- *    [11, 4, 'yellow 0.5']     {x: 4, value: 11, fill: 'yellow 0.5'}
- *   ]
- * // Combined mapping
- *  dataSet.mapAs({
- *    'value': [0],
- *    'x': [1],
- *    'fill': [2]
- *   },{
- *    'value': ['close', 'customY'],
- *    'fill': ['fill', 'color']
- *   }, null, ['close']
- *  );
- *  // Raw data          Mapped as
- *   [
- *    [11, 1, 'red 0.5'],       {x: 1, value: 11, fill: 'red 0.5'}
- *    [21, 2, 'green 0.5'],     {x: 2, value: 21, fill: 'green 0.5'}
- *    {
- *      value: 14,
- *      x: 3,                   {x: 3, value: 14, fill: 'blue 0.5'}
- *      fill: 'blue 0.5'
- *    },{
- *      customY: '71',
- *      x: 3,                   {x: 3, value: 71, fill: 'blue 0.5', size 14}
- *      color: 'blue 0.5',
- *      size: 14
- *    },
- *    11,                       {close: 4, value: 11}
- *    function(){ return 99;}   {close: 5, value: 99}
- *   ]
- * @example
- * var dataSet = anychart.data.set([
- *      [11, 18, 1, 'red 0.5', 'orange'],
- *      [21, 15, 2, 'green 0.5', 'blue'],
- *      [14, 16, 3, 'white', 'black'],
- *      {value: 17, x: 4, fill: 'yellow'}
- * ]);
- * var chart = anychart.bar();
- * chart.column(
- *      dataSet.mapAs({'value': [0], 'x': [2], 'fill': [3]})
- * );
- * chart.column(
- *      dataSet.mapAs({'value': [1], 'x': [2], 'fill': [4]})
- * );
- * chart.yScale().minimum(0);
- * chart.container(stage).draw();
- * @param {!(Object.<Array.<number>>)=} opt_arrayMapping [{
- *   'x': &#91;0&#93;,
- *   'value': &#91;1, 0&#93;,
- *   'size': &#91;2&#93;,
- *   'open': &#91;1&#93;,
- *   'high': &#91;2&#93;,
- *   'low': &#91;3, 1&#93;,
- *   'close': &#91;4&#93;
- * }] Column mapping for the rows which are arrays.
- * @param {!(Object.<Array.<string>>)=} opt_objectMapping [{'value': &#91;'value', 'y', 'close'&#93;}] Column mapping for the rows
- *  which are objects.
- * @param {!(Array.<string>)=} opt_defaultProps [&#91;'value', 'close'&#93;] The names of the fields to map to
- *  if a row is a string, number or a function. Does not work in cases when a row is an object.
- * @param {!(Array.<string>)=} opt_indexProps [&#91;'x'&#93;] The names of the fields to be mapped to the current index
- *  if other options failed.
+ * @param {!(Object.<Array.<number|string>>)=} opt_mapping - Column mapping for the rows.
  * @return {!anychart.data.Mapping} The instance of {@link anychart.data.Mapping} class for method chaining.
  */
-anychart.data.Set.prototype.mapAs = function(opt_arrayMapping, opt_objectMapping, opt_defaultProps, opt_indexProps) {
-  var res = new anychart.data.Mapping(this, opt_arrayMapping, opt_objectMapping, opt_defaultProps, opt_indexProps);
+anychart.data.Set.prototype.mapAs = function(opt_mapping) {
+  var res = new anychart.data.Mapping(this, opt_mapping);
   this.registerDisposable(res);
   return res;
 };

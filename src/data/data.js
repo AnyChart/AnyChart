@@ -190,7 +190,7 @@ anychart.data.buildMapping = function(dataSet, fromIndex, toIndex, names, opt_ke
     fromIndex++;
   }
 
-  return opt_keys ? dataSet.mapAs(undefined, settings) : dataSet.mapAs(settings, undefined);
+  return dataSet.mapAs(settings);
 };
 
 
