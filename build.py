@@ -101,7 +101,7 @@ def __ensure_installed(module_name, version=None):
         try:
             subprocess.call(commands)
         except StandardError:
-            raise StandardError('Install failed: you should install easy_install module for python')
+            raise StandardError('Install failed: you should install pip manually first')
         print 'Done'
         return True
 
