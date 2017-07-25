@@ -194,8 +194,8 @@ anychart.stockModule.math.stochastic.createComputer = function(mapping, opt_kPer
 
 
 //exports
-goog.exportSymbol('anychart.stockModule.math.stochastic.initContext', anychart.stockModule.math.stochastic.initContext);
-goog.exportSymbol('anychart.stockModule.math.stochastic.startFunction', anychart.stockModule.math.stochastic.startFunction);
-goog.exportSymbol('anychart.stockModule.math.stochastic.calculate', anychart.stockModule.math.stochastic.calculate);
-goog.exportSymbol('anychart.stockModule.math.stochastic.calculationFunction', anychart.stockModule.math.stochastic.calculationFunction);
-goog.exportSymbol('anychart.stockModule.math.stochastic.createComputer', anychart.stockModule.math.stochastic.createComputer);
+goog.exportSymbol('anychart.math.stochastic.initContext', anychart.stockModule.math.stochastic.initContext);
+goog.exportSymbol('anychart.math.stochastic.startFunction', anychart.stockModule.math.stochastic.startFunction);
+goog.exportSymbol('anychart.math.stochastic.calculate', anychart.stockModule.math.stochastic.calculate);
+goog.exportSymbol('anychart.math.stochastic.calculationFunction', anychart.stockModule.math.stochastic.calculationFunction);
+goog.exportSymbol('anychart.math.stochastic.createComputer', anychart.stockModule.math.stochastic.createComputer);
