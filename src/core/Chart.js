@@ -2155,6 +2155,7 @@ anychart.core.Chart.prototype.handleMouseOverAndMove = function(event) {
             });
 
           if (eventSeriesStatus.length) {
+            series.getIterator().select(eventSeriesStatus[0].nearestPointToCursor.index);
             this.dispatchEvent(this.makeInteractivityPointEvent('hovered', event, eventSeriesStatus, false, forbidTooltip));
             this.prevHoverSeriesStatus = eventSeriesStatus.length ? eventSeriesStatus : null;
           }
