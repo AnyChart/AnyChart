@@ -2,22 +2,28 @@ language: java
 jdk:
   - oraclejdk8
 
-before_script: 
-- git submodule update
-- ./build.py contrib
+git:
+  submodules: false
+  depth: 1
+
+before_install:
+  - git submodule update --init
+  - ./build.py libs
+
 script: 
-- ./build.py compile
-- ls -lah /home/travis/build/AnyChart/AnyChart/out/
+  - ./build.py compile
+  - ./build.py css
+  - ls -lah /home/travis/build/AnyChart/AnyChart/out/
 
 after_success:
-- echo -e "Host $STATIC_HOST\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
-- ssh $STATIC_HOST_SSH_STRING "mkdir -p /apps/static/js/$TRAVIS_BRANCH"
-- ssh $STATIC_HOST_SSH_STRING "mkdir -p /apps/static/css/$TRAVIS_BRANCH"
-- git rev-parse HEAD >> ./out/commit-hash.txt
-- scp /home/travis/build/AnyChart/AnyChart/out/anychart-bundle.min.js $STATIC_HOST_SSH_STRING:/apps/static/js/$TRAVIS_BRANCH/anychart-bundle.min.js
-- scp /home/travis/build/AnyChart/AnyChart/out/anychart-ui.min.css $STATIC_HOST_SSH_STRING:/apps/static/css/$TRAVIS_BRANCH/anychart-ui.min.css
-- scp /home/travis/build/AnyChart/AnyChart/out/commit-hash.txt $STATIC_HOST_SSH_STRING:/apps/static/js/$TRAVIS_BRANCH/commit-hash.txt
-- curl -X POST $TESTS_HOST/ci_test --data "branch=$TRAVIS_BRANCH&commit=$TRAVIS_COMMIT"
+  - echo -e "Host $STATIC_HOST\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+  - ssh $STATIC_HOST_SSH_STRING "mkdir -p /apps/static/js/$TRAVIS_BRANCH/parts && mkdir -p /apps/static/css/$TRAVIS_BRANCH"
+  - git rev-parse HEAD >> ./out/commit-hash.txt
+  - cd ./out/
+  - zip -r upload.zip *
+  - scp upload.zip $STATIC_HOST_SSH_STRING:/apps/static/js/$TRAVIS_BRANCH/upload.zip
+  - ssh $STATIC_HOST_SSH_STRING "unzip -o /apps/static/js/$TRAVIS_BRANCH/upload.zip -d /apps/static/js/$TRAVIS_BRANCH/ && mv /apps/static/js/$TRAVIS_BRANCH/*.css /apps/static/css/$TRAVIS_BRANCH/"
+  - curl -X POST $TESTS_HOST/ci_test --data "branch=$TRAVIS_BRANCH&commit=$TRAVIS_COMMIT"
 
 notifications:
   slack: anychart-team:$SLACK_CHAT_KEY

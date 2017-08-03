@@ -7,7 +7,7 @@ goog.require('goog.events.KeyHandler');
 goog.require('goog.ui.Component');
 goog.require('goog.ui.LabelInput');
 
-goog.forwardDeclare('anychart.charts.Stock');
+goog.forwardDeclare('anychart.stockModule.Chart');
 
 
 
@@ -21,7 +21,7 @@ anychart.ui.RangePicker = function() {
 
   /**
    * Stock chart.
-   * @type {?anychart.charts.Stock}
+   * @type {?anychart.stockModule.Chart}
    * @private
    */
   this.target_ = null;
@@ -118,7 +118,7 @@ anychart.ui.RangePicker.DEFAULT_HEIGHT = 21;
 
 /**
  * Set stock chart for Range Picker.
- * @param {anychart.charts.Stock} chart
+ * @param {anychart.stockModule.Chart} chart
  */
 anychart.ui.RangePicker.prototype.target = function(chart) {
   this.target_ = chart;
@@ -235,14 +235,14 @@ anychart.ui.RangePicker.prototype.isStockChart_ = function(chart) {
 
 
 /**
- * @param {(anychart.charts.Stock|Element)=} opt_parentElement Optional parent element or stock chart to render the
+ * @param {(anychart.stockModule.Chart|Element)=} opt_parentElement Optional parent element or stock chart to render the
  *    range picker into.
  * @return {Element|undefined}
  * @private
  */
 anychart.ui.RangePicker.prototype.extractChartContainer_ = function(opt_parentElement) {
   if (this.isStockChart_(opt_parentElement)) {
-    this.target(/** @type {anychart.charts.Stock} */(opt_parentElement));
+    this.target(/** @type {anychart.stockModule.Chart} */(opt_parentElement));
     this.insideChart_ = true;
     var stage = this.target_['container']() ? this.target_['container']()['getStage']() : null;
     if (stage && stage['container']()) {
@@ -256,7 +256,7 @@ anychart.ui.RangePicker.prototype.extractChartContainer_ = function(opt_parentEl
 
 
 /**
- * @param {(anychart.charts.Stock|Element)=} opt_parentElement Optional parent element or stock chart to render the range picker into.
+ * @param {(anychart.stockModule.Chart|Element)=} opt_parentElement Optional parent element or stock chart to render the range picker into.
  * @private
  */
 anychart.ui.RangePicker.prototype.delayedRenderOnChartDraw_ = function(opt_parentElement) {
@@ -312,7 +312,7 @@ anychart.ui.RangePicker.prototype.toLabelText = function(opt_value) {
 
 
 /**
- * @param {(anychart.charts.Stock|Element)=} opt_parentElement Optional parent element or stock chart to render the
+ * @param {(anychart.stockModule.Chart|Element)=} opt_parentElement Optional parent element or stock chart to render the
  *    range picker into.
  * @override
  */

@@ -634,7 +634,6 @@ anychart.format.outputTimezone = function(opt_value) {
  * @return {?Date} - Parsed date or null if got wrong input value.
  */
 anychart.format.parseDateTime = function(value, opt_format, opt_baseDate, opt_locale) {
-  var locales = goog.global['anychart']['format']['locales'];
   if (goog.isDateLike(value)) {
     return /** @type {Date} */ (value);
   } else if (goog.isNumber(value)) {

@@ -7,12 +7,8 @@ goog.provide('anychart.data');
 
 goog.require('anychart.data.ConcatView');
 goog.require('anychart.data.FilterView');
-goog.require('anychart.data.ParetoMapping');
-goog.require('anychart.data.PieView');
 goog.require('anychart.data.Set');
 goog.require('anychart.data.SortView');
-goog.require('anychart.data.Table');
-goog.require('anychart.data.Tree');
 goog.require('anychart.data.csv.Parser');
 goog.require('anychart.enums');
 
@@ -20,8 +16,8 @@ goog.require('anychart.enums');
  * Classes for handling data structures/sources<br/>
  * The following data types/hierarchy is supported:
  * <ul>
- *  <li>Linear ({@link anychart.data.Set} and {@link anychart.data.Table})</li>
- *  <li>Tree ({@link anychart.data.Tree})</li>
+ *  <li>Linear ({@link anychart.data.Set} and {@link anychart.stockModule.data.Table})</li>
+ *  <li>Tree ({@link anychart.treeDataModule.Tree})</li>
  * </ul>
  * You can map any of these data sets to ({@link anychart.data.View}), and then
  * work with it using {@link anychart.data.Iterator} iterator.
@@ -190,7 +186,7 @@ anychart.data.buildMapping = function(dataSet, fromIndex, toIndex, names, opt_ke
     fromIndex++;
   }
 
-  return opt_keys ? dataSet.mapAs(undefined, settings) : dataSet.mapAs(settings, undefined);
+  return dataSet.mapAs(settings);
 };
 
 

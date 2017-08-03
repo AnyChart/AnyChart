@@ -99,28 +99,6 @@ anychart.data.View.prototype.ensureConsistent = function() {
 
 
 /**
- * Creates a pie-ready view.
- * @param {string} fieldName A field name to make filter by.
- * @param {function(*):boolean=} opt_func A filter function that should accept a field value and return true if the row
- *    should be included into the resulting view as a and false otherwise.
- * @param {(function(R, T, number, Array) : R)=} opt_other The function to call for
- *     every value of other. This function
- *     takes 4 arguments (the function's previous result or the initial value,
- *     the value of the current array element, the current array index, and the
- *     array itself)
- *     function(previousValue, currentValue, index, array).
- * @param {(function():R)=} opt_otherInitialConstructor The function that constructs initial value for opt_other func.
- * @template T,S,R
- * @return {!anychart.data.View} The new derived view.
- */
-anychart.data.View.prototype.preparePie = function(fieldName, opt_func, opt_other, opt_otherInitialConstructor) {
-  var result = new anychart.data.PieView(this, fieldName, opt_func, opt_other, opt_otherInitialConstructor);
-  this.registerDisposable(result);
-  return result;
-};
-
-
-/**
  * Creates a derived view, containing just the same data set and order as this view does.
  * @example <t>lineChart</t>
  *  var data = anychart.data.set([
@@ -710,19 +688,20 @@ anychart.data.View.prototype.serializeRow = function(index) {
   var key;
   var i;
   var val;
+  var m;
   row = this.row(index);
   // if row represented by array - convert it to object with help of array mapping.
   if (goog.isArray(row)) {
     // get array mapping for the row
     mapping = this.getRowMapping(index);
-    if (mapping.isArrayMappingCustom) {
+    if (mapping.isMappingCustom) {
       rowObject = {};
-      var arrayMapping = mapping.getArrayMapping();
-      for (key in arrayMapping) {
-        map = arrayMapping[key];
+      m = mapping.getMapping();
+      for (key in m) {
+        map = m[key];
         for (i = 0; i < map.length; i++) {
           if (map[i] in row) {
-            val = this.serializeValue_(row[map[i]]);
+            val = this.serializeValue_(row[/** @type {number} */ (map[i])]);
             rowObject[key] = val;
             break;
           }
@@ -735,11 +714,11 @@ anychart.data.View.prototype.serializeRow = function(index) {
     // if row is presented by object - normalize it to default mapping, because we cannot provide
     // mapping info to the resulting JSON now
     mapping = this.getRowMapping(index);
-    if (mapping.isObjectMappingCustom) {
+    if (mapping.isMappingCustom) {
       rowObject = {};
-      var objectMapping = mapping.getObjectMapping();
-      for (key in objectMapping) {
-        map = objectMapping[key];
+      m = mapping.getMapping();
+      for (key in m) {
+        map = m[key];
         for (i = 0; i < map.length; i++) {
           if (map[i] in row) {
             val = row[map[i]];
@@ -753,7 +732,7 @@ anychart.data.View.prototype.serializeRow = function(index) {
         }
       }
       for (key in row) {
-        if (row.hasOwnProperty(key) && !(key in objectMapping && key in rowObject)) {
+        if (row.hasOwnProperty(key) && !(key in m && key in rowObject)) {
           val = this.serializeValue_(row[key]);
           rowObject[key] = val;
         }

@@ -2,7 +2,6 @@ goog.provide('anychart.core.ChartWithSeries');
 
 goog.require('anychart.core.IChart');
 goog.require('anychart.core.SeparateChart');
-goog.require('anychart.core.annotations');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.palettes.DistinctColors');
@@ -99,7 +98,7 @@ anychart.core.ChartWithSeries.prototype.SUPPORTED_CONSISTENCY_STATES =
  * @param {!Object} configs
  */
 anychart.core.ChartWithSeries.generateSeriesConstructors = function(chartConstructor, configs) {
-  var proto = chartConstructor.prototype;
+  var prototype = chartConstructor.prototype;
   var methodsGenerator = function(name) {
     return function(data, opt_csvSettings) {
       return this.createSeriesByType(
@@ -109,6 +108,7 @@ anychart.core.ChartWithSeries.generateSeriesConstructors = function(chartConstru
     };
   };
   for (var i in configs) {
+    var methodName = anychart.utils.toCamelCase(i);
     /**
      * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
      * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
@@ -116,7 +116,7 @@ anychart.core.ChartWithSeries.generateSeriesConstructors = function(chartConstru
      * @return {anychart.core.series.Cartesian}
      * @this {anychart.core.ChartWithSeries}
      */
-    proto[i] = methodsGenerator(i);
+    prototype[methodName] = methodsGenerator(i);
   }
 };
 
@@ -153,7 +153,7 @@ anychart.core.ChartWithSeries.ZINDEX_INCREMENT_MULTIPLIER = 0.00001;
  * Series config for the chart.
  * @type {!Object.<string, anychart.core.series.TypeConfig>}
  */
-anychart.core.ChartWithSeries.prototype.seriesConfig = ({});
+anychart.core.ChartWithSeries.prototype.seriesConfig = (function () { return {}; })();
 
 
 /**
@@ -236,7 +236,7 @@ anychart.core.ChartWithSeries.prototype.createSeriesInstance = goog.abstractMeth
 
 /**
  * Returns base series z-index.
- * @param {anychart.core.series.Cartesian|anychart.core.series.Map} series .
+ * @param {anychart.core.series.Cartesian|anychart.mapModule.Series} series .
  * @return {number}
  */
 anychart.core.ChartWithSeries.prototype.getBaseSeriesZIndex = function(series) {
@@ -248,7 +248,7 @@ anychart.core.ChartWithSeries.prototype.getBaseSeriesZIndex = function(series) {
 
 /**
  * Setup series.
- * @param {!(anychart.core.series.Cartesian|anychart.core.series.Map)} series .
+ * @param {!(anychart.core.series.Cartesian|anychart.mapModule.Series)} series .
  */
 anychart.core.ChartWithSeries.prototype.setupSeries = function(series) {
   var lastSeries = this.seriesList[this.seriesList.length - 1];
@@ -514,16 +514,6 @@ anychart.core.ChartWithSeries.prototype.xScale = function() {};
 
 
 /**
- * Annotations plot-level controller.
- * @param {Array.<anychart.enums.AnnotationTypes|anychart.core.annotations.AnnotationJSONFormat>=} opt_annotationsList
- * @return {anychart.core.ChartWithSeries|anychart.core.annotations.PlotController}
- */
-anychart.core.ChartWithSeries.prototype.annotations = function(opt_annotationsList) {
-  return null;
-};
-
-
-/**
  * Calculate for 3d.
  * @protected
  */
@@ -543,12 +533,6 @@ anychart.core.ChartWithSeries.prototype.distributeSeries = function() {};
 anychart.core.ChartWithSeries.prototype.allowLegendCategoriesMode = function() {
   return true;
 };
-
-
-/**
- * A hook to invalidate annotations, if needed.
- */
-anychart.core.ChartWithSeries.prototype.invalidateAnnotations = goog.nullFunction;
 
 
 //endregion
@@ -871,25 +855,25 @@ anychart.core.ChartWithSeries.seriesReferenceValues = {
   'column': ['value'],
   'spline': ['value'],
   'marker': ['value'],
-  'stepArea': ['value'],
-  'stepLine:': ['value'],
-  'splineArea': ['value'],
-  'jumpLine': ['value'],
+  'step-area': ['value'],
+  'step-line:': ['value'],
+  'spline-area': ['value'],
+  'jump-line': ['value'],
   'stick': ['value'],
   'mekko': ['value'],
   'bubble': ['value', 'size'],
-  'rangeBar': ['high', 'low'],
-  'rangeArea': ['high', 'low'],
-  'rangeColumn': ['high', 'low'],
-  'rangeStepArea': ['high', 'low'],
-  'rangeSplineArea': ['high', 'low'],
+  'range-bar': ['high', 'low'],
+  'range-area': ['high', 'low'],
+  'range-column': ['high', 'low'],
+  'range-step-area': ['high', 'low'],
+  'range-spline-area': ['high', 'low'],
   'ohlc': ['open', 'high', 'low', 'close'],
   'candlestick': ['open', 'high', 'low', 'close'],
   'box': ['lowest', 'q1', 'median', 'q3', 'highest'],
   'connector': ['points'],
   'choropleth': ['id', 'value'],
-  'markerMap': ['id', 'long', 'lat'],
-  'bubbleMap': ['id', 'long', 'lat', 'size'],
+  'marker-map': ['id', 'long', 'lat'],
+  'bubble-map': ['id', 'long', 'lat', 'size'],
   'hilo': ['high', 'low'],
   'waterfall': ['value']
 };

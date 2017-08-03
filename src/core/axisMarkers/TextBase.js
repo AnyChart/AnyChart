@@ -1,9 +1,9 @@
 goog.provide('anychart.core.axisMarkers.TextBase');
 
 goog.require('acgraph.math');
+goog.require('anychart.core.Axis');
 goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.Text');
-goog.require('anychart.core.axes.Linear');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.utils.Padding');
 goog.require('anychart.enums');
@@ -30,7 +30,7 @@ anychart.core.axisMarkers.TextBase = function() {
 
   /**
    * Current scale.
-   * @type {anychart.scales.Base|anychart.scales.GanttDateTime}
+   * @type {anychart.scales.Base|anychart.ganttModule.Scale}
    * @private
    */
   this.scale_;
@@ -44,7 +44,7 @@ anychart.core.axisMarkers.TextBase = function() {
 
   /**
    * Assigned axis.
-   * @type {anychart.core.axes.Linear}
+   * @type {anychart.core.Axis}
    * @private
    */
   this.axis_ = null;
@@ -156,8 +156,8 @@ anychart.core.axisMarkers.TextBase.prototype.getChart = function() {
 /**
  * Getter/setter for default scale.
  * Works with instances of anychart.scales.Base only.
- * @param {(anychart.scales.Base|anychart.scales.GanttDateTime)=} opt_value - Scale.
- * @return {anychart.scales.Base|anychart.scales.GanttDateTime|!anychart.core.axisMarkers.TextBase} - Axis scale or
+ * @param {(anychart.scales.Base|anychart.ganttModule.Scale)=} opt_value - Scale.
+ * @return {anychart.scales.Base|anychart.ganttModule.Scale|!anychart.core.axisMarkers.TextBase} - Axis scale or
  * itself for method chaining.
  */
 anychart.core.axisMarkers.TextBase.prototype.scaleInternal = function(opt_value) {
@@ -173,7 +173,7 @@ anychart.core.axisMarkers.TextBase.prototype.scaleInternal = function(opt_value)
     return this;
   } else {
     if (this.scale_) {
-      return /** @type {anychart.scales.Base|anychart.scales.GanttDateTime} */ (this.scale_);
+      return /** @type {anychart.scales.Base|anychart.ganttModule.Scale} */ (this.scale_);
     } else {
       if (this.axis_)
         return /** @type {?anychart.scales.Base} */ (this.axis_.scale());
@@ -216,8 +216,8 @@ anychart.core.axisMarkers.TextBase.prototype.axisInvalidated_ = function(event) 
 
 /**
  * Sets axis for marker.
- * @param {anychart.core.axes.Linear=} opt_value - Value to be set.
- * @return {(anychart.core.axes.Linear|anychart.core.axisMarkers.TextBase)} - Current value or itself for method chaining.
+ * @param {anychart.core.Axis=} opt_value - Value to be set.
+ * @return {(anychart.core.Axis|anychart.core.axisMarkers.TextBase)} - Current value or itself for method chaining.
  */
 anychart.core.axisMarkers.TextBase.prototype.axis = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -716,7 +716,7 @@ anychart.core.axisMarkers.TextBase.prototype.setupByJSON = function(config, opt_
       if (this.chart_) {
         this.axis((/** @type {anychart.core.CartesianBase} */(this.chart_)).getAxisByIndex(ax));
       }
-    } else if (ax instanceof anychart.core.axes.Linear) {
+    } else if (ax instanceof anychart.core.Axis) {
       this.axis(ax);
     }
   }

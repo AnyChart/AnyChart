@@ -196,7 +196,7 @@
         <xsd:attribute name="explode" type="simple.NumberOrPercent" default="15"/>
         <xsd:attribute name="outside_labels_space" type="simple.NumberOrPercent" default="30%"/>
         <xsd:attribute name="inside_labels_offset" type="simple.NumberOrPercent" default="50%"/>
-        <xsd:attribute name="overlap_mode" type="enums.LabelsOverlapMode" default="noOverlap"/>
+        <xsd:attribute name="overlap_mode" type="enums.LabelsOverlapMode" default="no-overlap"/>
         <xsd:attribute name="labels_display_mode" type="enums.LabelsDisplayMode" default="clip"/>
         <xsd:attribute name="connector_length" type="simple.NumberOrPercent" default="20%"/>
         <xsd:attribute name="outside_labels_critical_angle" type="xsd:double" default="60"/>
@@ -742,7 +742,7 @@
         <xsd:attribute name="sweep_angle" type="simple.DoubleOrNull"/>
         <xsd:attribute name="radius" type="simple.NumberOrPercentOrNull"/>
         <xsd:attribute name="corners_rounding" type="simple.NumberOrPercent"/>
-        <xsd:attribute name="overlap_mode" type="enums.LabelsOverlapMode" default="noOverlap"/>
+        <xsd:attribute name="overlap_mode" type="enums.LabelsOverlapMode" default="no-overlap"/>
         <xsd:attribute name="labels" type="simple.BoolOrNull" default="true"/>
         <xsd:attribute name="minor_labels" type="simple.BoolOrNull"/>
         <xsd:attribute name="ticks" type="simple.BoolOrNull" default="true"/>
@@ -790,7 +790,7 @@
         <xsd:attribute name="orientation" type="enums.Orientation"/>
         <xsd:attribute name="draw_first_label" type="simple.Bool" default="true"/>
         <xsd:attribute name="draw_last_label" type="simple.Bool" default="true"/>
-        <xsd:attribute name="overlap_mode" type="enums.LabelsOverlapMode" default="noOverlap"/>
+        <xsd:attribute name="overlap_mode" type="enums.LabelsOverlapMode" default="no-overlap"/>
         <xsd:attribute name="scale" type="simple.ScaleRef"/>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
     </xsd:complexType>
@@ -841,7 +841,7 @@
         <xsd:attribute name="minor_ticks" type="simple.BoolOrNull" default="true"/>
         <xsd:attribute name="stroke" type="xsd:string"/>
         <xsd:attribute name="fill" type="xsd:string"/>
-        <xsd:attribute name="overlap_mode" type="enums.LabelsOverlapMode" default="noOverlap"/>
+        <xsd:attribute name="overlap_mode" type="enums.LabelsOverlapMode" default="no-overlap"/>
         <xsd:attribute name="scale" type="simple.ScaleRef"/>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
     </xsd:complexType>
@@ -861,7 +861,7 @@
         <xsd:attribute name="stroke" type="xsd:string"/>
         <xsd:attribute name="draw_first_label" type="simple.Bool" default="true"/>
         <xsd:attribute name="draw_last_label" type="simple.Bool" default="true"/>
-        <xsd:attribute name="overlap_mode" type="enums.LabelsOverlapMode" default="noOverlap"/>
+        <xsd:attribute name="overlap_mode" type="enums.LabelsOverlapMode" default="no-overlap"/>
         <xsd:attribute name="scale" type="simple.ScaleRef"/>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
     </xsd:complexType>
@@ -892,7 +892,7 @@
         <xsd:attribute name="stroke" type="xsd:string"/>
         <xsd:attribute name="draw_first_label" type="simple.Bool" default="true"/>
         <xsd:attribute name="draw_last_label" type="simple.Bool" default="true"/>
-        <xsd:attribute name="overlap_mode" type="enums.LabelsOverlapMode" default="noOverlap"/>
+        <xsd:attribute name="overlap_mode" type="enums.LabelsOverlapMode" default="no-overlap"/>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
     </xsd:complexType>
 
@@ -921,7 +921,7 @@
         <xsd:attribute name="stroke" type="xsd:string"/>
         <xsd:attribute name="draw_first_label" type="simple.Bool" default="true"/>
         <xsd:attribute name="draw_last_label" type="simple.Bool" default="true"/>
-        <xsd:attribute name="overlap_mode" type="enums.LabelsOverlapMode" default="noOverlap"/>
+        <xsd:attribute name="overlap_mode" type="enums.LabelsOverlapMode" default="no-overlap"/>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
     </xsd:complexType>
 
@@ -1377,8 +1377,8 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="title_format" type="simple.Text"/>
         </xsd:all>
         <xsd:attribute name="display_mode" type="enums.TooltipDisplayMode" default="single"/>
-        <xsd:attribute name="position" type="enums.AnchorAndPosition" default="leftTop"/>
-        <xsd:attribute name="anchor" type="enums.AnchorAndPosition" default="leftTop"/>
+        <xsd:attribute name="position" type="enums.AnchorAndPosition" default="left-top"/>
+        <xsd:attribute name="anchor" type="enums.AnchorAndPosition" default="left-top"/>
         <xsd:attribute name="offset_x" type="xsd:double" default="0"/>
         <xsd:attribute name="offset_y" type="xsd:double" default="0"/>
         <xsd:attribute name="position_mode" type="enums.TooltipPositionMode" default="float"/>
@@ -1610,7 +1610,7 @@
         <xsd:attribute name="orientation" type="enums.Orientation"/>
         <xsd:attribute name="draw_first_label" type="simple.Bool" default="true"/>
         <xsd:attribute name="draw_last_label" type="simple.Bool" default="true"/>
-        <xsd:attribute name="overlap_mode" type="enums.LabelsOverlapMode" default="noOverlap"/>
+        <xsd:attribute name="overlap_mode" type="enums.LabelsOverlapMode" default="no-overlap"/>
         <xsd:attribute name="scale" type="simple.ScaleRef"/>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
         <!-- Color range-->
@@ -1993,7 +1993,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="ranges" type="OrdinalColorScaleRanges"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="names" type="OrdinalScaleNames"/>
         </xsd:all>
-        <xsd:attribute name="type" type="enums.ScaleTypes" default="ordinalColor"/>
+        <xsd:attribute name="type" type="enums.ScaleTypes" default="ordinal-color"/>
         <xsd:attribute name="max_ticks_count" type="xsd:integer" default="1000"/>
         <xsd:attribute name="inverted" type="simple.Bool" default="false"/>
         <xsd:attribute name="names" type="xsd:string" default="name"/>
@@ -2015,7 +2015,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="ranges" type="OrdinalColorScaleRanges"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="names" type="OrdinalScaleNames"/>
         </xsd:all>
-        <xsd:attribute name="type" type="enums.ScaleTypes" default="ordinalColor"/>
+        <xsd:attribute name="type" type="enums.ScaleTypes" default="ordinal-color"/>
         <xsd:attribute name="inverted" type="simple.Bool" default="false"/>
         <xsd:attribute name="names" type="xsd:string" default="name"/>
     </xsd:complexType>
@@ -2082,7 +2082,7 @@
         <xsd:attribute name="soft_maximum" type="simple.DoubleOrNull" default="null"/>
         <xsd:attribute name="minimum_gap" type="xsd:double" default="0.1"/>
         <xsd:attribute name="maximum_gap" type="xsd:double" default="0.1"/>
-        <xsd:attribute name="type" type="enums.ScaleTypes" default="linearColor"/>
+        <xsd:attribute name="type" type="enums.ScaleTypes" default="linear-color"/>
         <xsd:attribute name="names" type="xsd:string" default="name"/>
     </xsd:complexType>
 
@@ -2491,13 +2491,13 @@
         <xsd:attribute name="min_height" type="simple.NumberOrPercentOrNull"/>
         <xsd:attribute name="max_height" type="simple.NumberOrPercentOrNull"/>
         <xsd:attribute name="thumbs" type="simple.BoolOrNull"/>
-        <xsd:attribute name="position" type="enums.ChartScrollerPosition" default="afterAxes"/>
+        <xsd:attribute name="position" type="enums.ChartScrollerPosition" default="after-axes"/>
     </xsd:complexType>
 
     <xsd:simpleType name="enums.ChartScrollerPosition">
         <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="beforeAxes"/>
-            <xsd:enumeration value="afterAxes"/>
+            <xsd:enumeration value="before-axes"/>
+            <xsd:enumeration value="after-axes"/>
         </xsd:restriction>
     </xsd:simpleType>
 
@@ -2999,38 +2999,38 @@
 
     <xsd:simpleType name="enums.ChartTypes">
         <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="tagCloud"/>
+            <xsd:enumeration value="tag-cloud"/>
             <xsd:enumeration value="area"/>
-            <xsd:enumeration value="verticalArea"/>
-            <xsd:enumeration value="area3d"/>
+            <xsd:enumeration value="vertical-area"/>
+            <xsd:enumeration value="area-3d"/>
             <xsd:enumeration value="bar"/>
-            <xsd:enumeration value="bar3d"/>
+            <xsd:enumeration value="bar-3d"/>
             <xsd:enumeration value="box"/>
             <xsd:enumeration value="bubble"/>
             <xsd:enumeration value="bullet"/>
             <xsd:enumeration value="cartesian"/>
-            <xsd:enumeration value="cartesian3d"/>
+            <xsd:enumeration value="cartesian-3d"/>
             <xsd:enumeration value="column"/>
-            <xsd:enumeration value="column3d"/>
+            <xsd:enumeration value="column-3d"/>
             <xsd:enumeration value="financial"/>
             <xsd:enumeration value="funnel"/>
-            <xsd:enumeration value="heatMap"/>
-            <xsd:enumeration value="treeMap"/>
+            <xsd:enumeration value="heat-map"/>
+            <xsd:enumeration value="tree-map"/>
             <xsd:enumeration value="line"/>
-            <xsd:enumeration value="verticalLine"/>
+            <xsd:enumeration value="vertical-line"/>
             <xsd:enumeration value="marker"/>
             <xsd:enumeration value="pie"/>
-            <xsd:enumeration value="pie3d"/>
+            <xsd:enumeration value="pie-3d"/>
             <xsd:enumeration value="polar"/>
             <xsd:enumeration value="pyramid"/>
             <xsd:enumeration value="radar"/>
             <xsd:enumeration value="scatter"/>
             <xsd:enumeration value="sparkline"/>
-            <xsd:enumeration value="ganttResource"/>
-            <xsd:enumeration value="ganttProject"/>
+            <xsd:enumeration value="gantt-resource"/>
+            <xsd:enumeration value="gantt-project"/>
             <xsd:enumeration value="map"/>
             <xsd:enumeration value="pert"/>
-            <xsd:enumeration value="jumpLine"/>
+            <xsd:enumeration value="jump-line"/>
             <xsd:enumeration value="stick"/>
             <xsd:enumeration value="pareto"/>
             <xsd:enumeration value="quadrant"/>
@@ -3045,18 +3045,19 @@
 
     <xsd:simpleType name="enums.GaugeTypes">
         <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="circular"/>
-            <xsd:enumeration value="linearGauge"/>
-            <xsd:enumeration value="thermometerGauge"/>
-            <xsd:enumeration value="tankGauge"/>
-            <xsd:enumeration value="ledGauge"/>
+            <xsd:enumeration value="circular-gauge"/>
+            <xsd:enumeration value="linear-gauge"/>
+            <xsd:enumeration value="bullet"/>
+            <xsd:enumeration value="thermometer"/>
+            <xsd:enumeration value="tank"/>
+            <xsd:enumeration value="led"/>
         </xsd:restriction>
     </xsd:simpleType>
 
     <xsd:simpleType name="enums.GanttTypes">
         <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="ganttResource"/>
-            <xsd:enumeration value="ganttProject"/>
+            <xsd:enumeration value="gantt-resource"/>
+            <xsd:enumeration value="gantt-project"/>
         </xsd:restriction>
     </xsd:simpleType>
 
@@ -3082,15 +3083,15 @@
 
     <xsd:simpleType name="enums.AnchorAndPosition">
         <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="leftTop"/>
-            <xsd:enumeration value="leftCenter"/>
-            <xsd:enumeration value="leftBottom"/>
-            <xsd:enumeration value="centerTop"/>
+            <xsd:enumeration value="left-top"/>
+            <xsd:enumeration value="left-center"/>
+            <xsd:enumeration value="left-bottom"/>
+            <xsd:enumeration value="center-top"/>
             <xsd:enumeration value="center"/>
-            <xsd:enumeration value="centerBottom"/>
-            <xsd:enumeration value="rightTop"/>
-            <xsd:enumeration value="rightCenter"/>
-            <xsd:enumeration value="rightBottom"/>
+            <xsd:enumeration value="center-bottom"/>
+            <xsd:enumeration value="right-top"/>
+            <xsd:enumeration value="right-center"/>
+            <xsd:enumeration value="right-bottom"/>
             <xsd:enumeration value="auto"/>
             <xsd:enumeration value="null"/>
         </xsd:restriction>
@@ -3116,9 +3117,9 @@
     <xsd:simpleType name="enums.LegendLayout">
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="vertical"/>
-            <xsd:enumeration value="verticalexpandable"/>
+            <xsd:enumeration value="vertical-expandable"/>
             <xsd:enumeration value="horizontal"/>
-            <xsd:enumeration value="horizontalexpandable"/>
+            <xsd:enumeration value="horizontal-expandable"/>
         </xsd:restriction>
     </xsd:simpleType>
 
@@ -3159,43 +3160,44 @@
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="circle"/>
             <xsd:enumeration value="square"/>
-            <xsd:enumeration value="triangleUp"/>
             <xsd:enumeration value="diamond"/>
-            <xsd:enumeration value="triangleDown"/>
-            <xsd:enumeration value="triangleLeft"/>
-            <xsd:enumeration value="triangleRight"/>
+            <xsd:enumeration value="triangle-up"/>
+            <xsd:enumeration value="triangle-down"/>
+            <xsd:enumeration value="triangle-left"/>
+            <xsd:enumeration value="triangle-right"/>
             <xsd:enumeration value="cross"/>
-            <xsd:enumeration value="diagonalCross"/>
+            <xsd:enumeration value="diagonal-cross"/>
             <xsd:enumeration value="star4"/>
             <xsd:enumeration value="star5"/>
             <xsd:enumeration value="star6"/>
             <xsd:enumeration value="star7"/>
             <xsd:enumeration value="star10"/>
-            <xsd:enumeration value="bar"/>
-            <xsd:enumeration value="x"/>
-            <xsd:enumeration value="line"/>
-            <xsd:enumeration value="vline"/>
-            <xsd:enumeration value="ellipse"/>
-            <xsd:enumeration value="trapezium"/>
             <xsd:enumeration value="pentagon"/>
+            <xsd:enumeration value="trapezium"/>
+            <xsd:enumeration value="line"/>
+            <xsd:enumeration value="v-line"/>
             <xsd:enumeration value="arrowhead"/>
-            <xsd:enumeration value="arrowUp"/>
-            <xsd:enumeration value="arrowDown"/>
-            <xsd:enumeration value="arrowLeft"/>
-            <xsd:enumeration value="arrowRight"/>
+            <xsd:enumeration value="arrow-up"/>
+            <xsd:enumeration value="arrow-down"/>
+            <xsd:enumeration value="arrow-left"/>
+            <xsd:enumeration value="arrow-right"/>
+            <xsd:enumeration value="ellipse"/>
+            <xsd:enumeration value="x"/>
+            <xsd:enumeration value="bar"/>
         </xsd:restriction>
     </xsd:simpleType>
 
     <xsd:simpleType name="enums.LabelsOverlapMode">
         <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="noOverlap"/>
-            <xsd:enumeration value="allowOverlap"/>
+            <xsd:enumeration value="no-overlap"/>
+            <xsd:enumeration value="allow-overlap"/>
+            <xsd:enumeration value="auto-width"/>
         </xsd:restriction>
     </xsd:simpleType>
 
     <xsd:simpleType name="enums.LabelsDisplayMode">
         <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="alwaysShow"/>
+            <xsd:enumeration value="always-show"/>
             <xsd:enumeration value="clip"/>
             <xsd:enumeration value="drop"/>
         </xsd:restriction>
@@ -3229,7 +3231,7 @@
             <xsd:enumeration value="none"/>
             <xsd:enumeration value="round"/>
             <xsd:enumeration value="cut"/>
-            <xsd:enumeration value="roundInner"/>
+            <xsd:enumeration value="round-inner"/>
         </xsd:restriction>
     </xsd:simpleType>
 
@@ -3260,7 +3262,6 @@
     <xsd:simpleType name="enums.ScatterTicksMode">
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="linear"/>
-            <xsd:enumeration value="log"/>
             <xsd:enumeration value="logarithmic"/>
         </xsd:restriction>
     </xsd:simpleType>
@@ -3268,39 +3269,39 @@
     <xsd:simpleType name="enums.SeriesTypes">
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="area"/>
-            <xsd:enumeration value="verticalArea"/>
+            <xsd:enumeration value="vertical-area"/>
             <xsd:enumeration value="bar"/>
             <xsd:enumeration value="box"/>
-            <xsd:enumeration value="verticalBox"/>
+            <xsd:enumeration value="vertical-box"/>
             <xsd:enumeration value="bubble"/>
-            <xsd:enumeration value="verticalBubble"/>
+            <xsd:enumeration value="vertical-bubble"/>
             <xsd:enumeration value="candlestick"/>
             <xsd:enumeration value="column"/>
             <xsd:enumeration value="line"/>
-            <xsd:enumeration value="verticalLine"/>
+            <xsd:enumeration value="vertical-line"/>
             <xsd:enumeration value="marker"/>
-            <xsd:enumeration value="verticalMarker"/>
+            <xsd:enumeration value="vertical-marker"/>
             <xsd:enumeration value="ohlc"/>
-            <xsd:enumeration value="rangeArea"/>
-            <xsd:enumeration value="verticalRangeArea"/>
-            <xsd:enumeration value="rangeBar"/>
-            <xsd:enumeration value="rangeColumn"/>
-            <xsd:enumeration value="rangeSplineArea"/>
-            <xsd:enumeration value="verticalRangeSplineArea"/>
-            <xsd:enumeration value="rangeStepArea"/>
-            <xsd:enumeration value="verticalRangeStepArea"/>
+            <xsd:enumeration value="range-area"/>
+            <xsd:enumeration value="vertical-range-area"/>
+            <xsd:enumeration value="range-bar"/>
+            <xsd:enumeration value="range-column"/>
+            <xsd:enumeration value="range-spline-area"/>
+            <xsd:enumeration value="vertical-range-spline-area"/>
+            <xsd:enumeration value="range-step-area"/>
+            <xsd:enumeration value="vertical-range-step-area"/>
             <xsd:enumeration value="spline"/>
-            <xsd:enumeration value="verticalSpline"/>
-            <xsd:enumeration value="splineArea"/>
-            <xsd:enumeration value="verticalSplineArea"/>
-            <xsd:enumeration value="stepArea"/>
-            <xsd:enumeration value="verticalStepArea"/>
-            <xsd:enumeration value="stepLine"/>
-            <xsd:enumeration value="verticalStepLine"/>
-            <xsd:enumeration value="jumpLine"/>
-            <xsd:enumeration value="verticalJumpLine"/>
+            <xsd:enumeration value="vertical-spline"/>
+            <xsd:enumeration value="spline-area"/>
+            <xsd:enumeration value="vertical-spline-area"/>
+            <xsd:enumeration value="step-area"/>
+            <xsd:enumeration value="vertical-step-area"/>
+            <xsd:enumeration value="step-line"/>
+            <xsd:enumeration value="vertical-step-line"/>
+            <xsd:enumeration value="jump-line"/>
+            <xsd:enumeration value="vertical-jump-line"/>
             <xsd:enumeration value="stick"/>
-            <xsd:enumeration value="verticalStick"/>
+            <xsd:enumeration value="vertical-stick"/>
             <xsd:enumeration value="choropleth"/>
             <xsd:enumeration value="connector"/>
             <xsd:enumeration value="polygon"/>
@@ -3324,56 +3325,57 @@
             <xsd:enumeration value="area"/>
             <xsd:enumeration value="column"/>
             <xsd:enumeration value="line"/>
-            <xsd:enumeration value="winLoss"/>
+            <xsd:enumeration value="win-loss"/>
         </xsd:restriction>
     </xsd:simpleType>
 
     <xsd:simpleType name="enums.HatchFill">
         <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="backwardDiagonal"/>
-            <xsd:enumeration value="forwardDiagonal"/>
+            <xsd:enumeration value="backward-diagonal"/>
+            <xsd:enumeration value="forward-diagonal"/>
             <xsd:enumeration value="horizontal"/>
             <xsd:enumeration value="vertical"/>
-            <xsd:enumeration value="dashedBackwardDiagonal"/>
+            <xsd:enumeration value="dashed-backward-diagonal"/>
             <xsd:enumeration value="grid"/>
-            <xsd:enumeration value="dashedForwardDiagonal"/>
-            <xsd:enumeration value="dashedHorizontal"/>
-            <xsd:enumeration value="dashedVertical"/>
-            <xsd:enumeration value="diagonalCross"/>
-            <xsd:enumeration value="diagonalBrick"/>
+            <xsd:enumeration value="dashed-forward-diagonal"/>
+            <xsd:enumeration value="dashed-horizontal"/>
+            <xsd:enumeration value="dashed-vertical"/>
+            <xsd:enumeration value="diagonal-cross"/>
+            <xsd:enumeration value="diagonal-brick"/>
             <xsd:enumeration value="divot"/>
-            <xsd:enumeration value="horizontalBrick"/>
-            <xsd:enumeration value="verticalBrick"/>
-            <xsd:enumeration value="checkerBoard"/>
+            <xsd:enumeration value="horizontal-brick"/>
+            <xsd:enumeration value="vertical-brick"/>
+            <xsd:enumeration value="checker-board"/>
             <xsd:enumeration value="confetti"/>
             <xsd:enumeration value="plaid"/>
-            <xsd:enumeration value="solidDiamond"/>
-            <xsd:enumeration value="zigZag"/>
+            <xsd:enumeration value="solid-diamond"/>
+            <xsd:enumeration value="zig-zag"/>
             <xsd:enumeration value="weave"/>
-            <xsd:enumeration value="percent05"/>
-            <xsd:enumeration value="percent10"/>
-            <xsd:enumeration value="percent20"/>
-            <xsd:enumeration value="percent25"/>
-            <xsd:enumeration value="percent30"/>
-            <xsd:enumeration value="percent40"/>
-            <xsd:enumeration value="percent50"/>
-            <xsd:enumeration value="percent60"/>
-            <xsd:enumeration value="percent70"/>
-            <xsd:enumeration value="percent75"/>
-            <xsd:enumeration value="percent80"/>
-            <xsd:enumeration value="percent90"/>
+            <xsd:enumeration value="percent-05"/>
+            <xsd:enumeration value="percent-10"/>
+            <xsd:enumeration value="percent-20"/>
+            <xsd:enumeration value="percent-25"/>
+            <xsd:enumeration value="percent-30"/>
+            <xsd:enumeration value="percent-40"/>
+            <xsd:enumeration value="percent-50"/>
+            <xsd:enumeration value="percent-60"/>
+            <xsd:enumeration value="percent-70"/>
+            <xsd:enumeration value="percent-75"/>
+            <xsd:enumeration value="percent-80"/>
+            <xsd:enumeration value="percent-90"/>
         </xsd:restriction>
     </xsd:simpleType>
 
     <xsd:simpleType name="enums.ScaleTypes">
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="linear"/>
-            <xsd:enumeration value="linearColor"/>
+            <xsd:enumeration value="linear-color"/>
             <xsd:enumeration value="log"/>
-            <xsd:enumeration value="dateTime"/>
+            <xsd:enumeration value="date-time"/>
             <xsd:enumeration value="ordinal"/>
-            <xsd:enumeration value="ordinalColor"/>
+            <xsd:enumeration value="ordinal-color"/>
             <xsd:enumeration value="geo"/>
+            <xsd:enumeration value="date-time-with-calendar"/>
         </xsd:restriction>
     </xsd:simpleType>
 
@@ -3381,7 +3383,7 @@
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="linear"/>
             <xsd:enumeration value="log"/>
-            <xsd:enumeration value="dateTime"/>
+            <xsd:enumeration value="date-time"/>
         </xsd:restriction>
     </xsd:simpleType>
 
@@ -3428,7 +3430,6 @@
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="top"/>
             <xsd:enumeration value="middle"/>
-            <xsd:enumeration value="center"/>
             <xsd:enumeration value="bottom"/>
         </xsd:restriction>
     </xsd:simpleType>
@@ -3500,16 +3501,16 @@
     <xsd:simpleType name="enums.SelectionMode">
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="none"/>
-            <xsd:enumeration value="singleSelect"/>
-            <xsd:enumeration value="multiSelect"/>
-            <xsd:enumeration value="drillDown"/>
+            <xsd:enumeration value="single-select"/>
+            <xsd:enumeration value="multi-select"/>
+            <xsd:enumeration value="drill-down"/>
         </xsd:restriction>
     </xsd:simpleType>
 
     <xsd:simpleType name="enums.HoverMode">
         <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="bySpot"/>
-            <xsd:enumeration value="byX"/>
+            <xsd:enumeration value="by-spot"/>
+            <xsd:enumeration value="by-x"/>
             <xsd:enumeration value="single"/>
         </xsd:restriction>
     </xsd:simpleType>
@@ -3517,7 +3518,7 @@
     <xsd:simpleType name="enums.LinearGaugePointerType">
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="bar"/>
-            <xsd:enumeration value="rangeBar"/>
+            <xsd:enumeration value="range-bar"/>
             <xsd:enumeration value="marker"/>
             <xsd:enumeration value="thermometer"/>
             <xsd:enumeration value="tank"/>

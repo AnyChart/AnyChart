@@ -9,21 +9,14 @@ goog.require('goog.array');
 
 /**
  * Special View which allows to map anychart.data.Set storages.
- * @param {!(anychart.data.Set|anychart.data.IView)} parentSet The data set to map.
- * @param {!Object.<Array.<number>>=} opt_arrayMapping Mapping for array rows.
- * @param {!Object.<Array.<string>>=} opt_objectMapping Mapping for object rows.
- * @param {!Array.<string>=} opt_defaultProps Mapping for rows which are string, number or a function.
- *    Doesn't work if a row is an object.
- * @param {!Array.<string>=} opt_indexProps Array of the names in case other options fail.
- * @param {boolean=} opt_writeToFirstFieldByMapping If true, in case of object rows, values are written to the first
- *    fieldName, defined by object field mapping (they are written to the field they are read from by default).
+ * @param {!(anychart.data.Set|anychart.data.IView)} parentSet - The data set to map.
+ * @param {!Object.<Array.<number|string>>=} opt_mapping - Mapping for rows (array or object).
  * @constructor
  * @extends {anychart.data.View}
  */
-anychart.data.Mapping = function(parentSet, opt_arrayMapping, opt_objectMapping, opt_defaultProps, opt_indexProps,
-    opt_writeToFirstFieldByMapping) {
+anychart.data.Mapping = function(parentSet, opt_mapping) {
   anychart.data.Mapping.base(this, 'constructor', parentSet);
-  this.initMappingInfo(opt_arrayMapping, opt_objectMapping, opt_defaultProps, opt_indexProps, opt_writeToFirstFieldByMapping);
+  this.initMappingInfo(opt_mapping);
 };
 goog.inherits(anychart.data.Mapping, anychart.data.View);
 
@@ -56,7 +49,7 @@ anychart.data.Mapping.prototype.getInternal = function(row, rowIndex, fieldName)
   var rowType = goog.typeOf(row);
   if (rowType == 'array') {
     /** @type {Array.<number>} */
-    var indexes = this.arrayMapping_[fieldName];
+    var indexes = this.mapping_[fieldName];
     if (indexes) {
       for (var i = 0; i < indexes.length; i++) {
         if (indexes[i] < row.length) {
@@ -66,11 +59,11 @@ anychart.data.Mapping.prototype.getInternal = function(row, rowIndex, fieldName)
       }
     }
   } else if (rowType == 'object') {
-    result = anychart.utils.mapObject(/** @type {!Object} */(row), fieldName, this.objectMapping_[fieldName]);
-  } else if (goog.array.indexOf(this.defaultProps_, fieldName) > -1) {
+    result = anychart.utils.mapObject(/** @type {!Object} */(row), fieldName, this.mapping_[fieldName]);
+  } else if (goog.array.indexOf(anychart.data.Mapping.DEFAULT_SIMPLE_ROW_MAPPING, fieldName) > -1) {
     result = row;
   }
-  if (!goog.isDef(result) && goog.array.indexOf(this.indexProps_, fieldName) > -1) {
+  if (!goog.isDef(result) && goog.array.indexOf(anychart.data.Mapping.DEFAULT_INDEX_MAPPING, fieldName) > -1) {
     result = rowIndex;
   }
   return result;
@@ -89,7 +82,7 @@ anychart.data.Mapping.prototype.setInternal = function(row, fieldName, value) {
   var rowType = goog.typeOf(row);
   if (rowType == 'array') {
     /** @type {Array.<number>} */
-    var indexes = this.arrayMapping_[fieldName];
+    var indexes = this.mapping_[fieldName];
     if (indexes) {
       var minIndex = indexes[0];
       for (var i = 0; i < indexes.length; i++) {
@@ -110,13 +103,12 @@ anychart.data.Mapping.prototype.setInternal = function(row, fieldName, value) {
     }
     anychart.core.reporting.warning(anychart.enums.WarningCode.NOT_MAPPED_FIELD, null, [fieldName]);
   } else if (rowType == 'object') {
-    var result = anychart.utils.mapObject(/** @type {!Object} */(row), fieldName, this.objectMapping_[fieldName], value,
-        this.writeToFirstFieldByMapping_);
+    var result = anychart.utils.mapObject(/** @type {!Object} */(row), fieldName, this.mapping_[fieldName], value);
     // result will be undefined if there no such field in row, but row will have property because it will be set.
     if ((result === void 0) && row.hasOwnProperty(fieldName)) {
       this.parentView.addSeenField(fieldName);
     }
-  } else if (goog.array.indexOf(this.defaultProps_, fieldName) > -1) {
+  } else if (goog.array.indexOf(anychart.data.Mapping.DEFAULT_SIMPLE_ROW_MAPPING, fieldName) > -1) {
     if (anychart.DEVELOP && (goog.isArray(value) || goog.isObject(value)))
       anychart.core.reporting.warning(anychart.enums.WarningCode.COMPLEX_VALUE_TO_DEFAULT_FIELD, null, [fieldName]);
     row = value;
@@ -164,26 +156,19 @@ anychart.data.Mapping.prototype.checkFieldExist = function(name) {
   if (this.parentView.checkFieldExist(name))
     return true;
   var i;
-  var mapping = this.indexProps_;
+  var mapping = anychart.data.Mapping.DEFAULT_INDEX_MAPPING;
   for (i = 0; i < mapping.length; i++) {
     if (mapping[i] == name)
       return true;
   }
   if (this.parentView.hasSimpleRows()) {
-    mapping = this.defaultProps_;
+    mapping = anychart.data.Mapping.DEFAULT_SIMPLE_ROW_MAPPING;
     for (i = 0; i < mapping.length; i++) {
       if (mapping[i] == name)
         return true;
     }
   }
-  mapping = this.objectMapping_[name];
-  if (mapping) {
-    for (i = 0; i < mapping.length; i++) {
-      if (this.parentView.checkFieldExist(mapping[i]))
-        return true;
-    }
-  }
-  mapping = this.arrayMapping_[name];
+  mapping = this.mapping_[name];
   if (mapping) {
     for (i = 0; i < mapping.length; i++) {
       if (this.parentView.checkFieldExist(mapping[i]))
@@ -196,11 +181,11 @@ anychart.data.Mapping.prototype.checkFieldExist = function(name) {
 
 /**
  * @const
- * @type {!Object.<Array.<number>>}
+ * @type {!Object.<Array.<number|string>>}
  */
-anychart.data.Mapping.DEFAULT_ARRAY_MAPPING = {
-  'x': [0],
-  'value': [1, 0],
+anychart.data.Mapping.DEFAULT_MAPPING = {
+  'x': [0, 'column', 'x'],
+  'value': [1, 0, 'value', 'y', 'close', 'heat'],
   'size': [2, 1], // bubble series
   'open': [1],
   'high': [2],
@@ -208,49 +193,28 @@ anychart.data.Mapping.DEFAULT_ARRAY_MAPPING = {
   'close': [4],
 
   // box/whisker series
-  'lowest': [1],
+  'lowest': [1, 'lowest', 'low'],
   'q1': [2],
   'median': [3],
   'q3': [4],
-  'highest': [5],
+  'highest': [5, 'highest', 'high'],
   'outliers': [6],
 
   // maps
   'id': [0],
-  'lat': [0],
-  'long': [1],
+  'lat': [0, 'lat', 'y', 'value'],
+  'long': [1, 'long', 'lon', 'x'],
   'points': [0],  //connector series
 
   // heat map
-  'y': [1],
-  'heat': [2],
+  'y': [1, 'row', 'y'],
+  'heat': [2, 'heat', 'value'],
 
   // tag cloud
   'category': [2],
 
   // water fall
   'isTotal': [2]
-};
-
-
-/**
- * @const
- * @type {!Object.<Array.<string>>}
- */
-anychart.data.Mapping.DEFAULT_OBJECT_MAPPING = {
-  //'x': ['x'], // this mapping entry can be omitted cause of defaults
-  'x': ['column', 'x'],
-  'value': ['value', 'y', 'close', 'heat'], // 'value' here enforces checking order
-
-  'lowest': ['lowest', 'low'],
-  'highest': ['highest', 'high'],
-  //for maps
-  'lat': ['lat', 'y', 'value'],
-  'long': ['long', 'lon', 'x'],
-  //for heat map
-
-  'y': ['row', 'y'],
-  'heat': ['heat', 'value']
 };
 
 
@@ -270,120 +234,48 @@ anychart.data.Mapping.DEFAULT_INDEX_MAPPING = ['x'];
 
 /**
  * Initializes mapping info objects for the mapping.
- * @param {!Object.<(Array.<number>|number)>=} opt_arrayMapping Mapping settings for array rows.
- * @param {!Object.<(Array.<string>|string)>=} opt_objectMapping Mapping setting for object rows.
- * @param {!Array.<string>=} opt_defaultProps Mapping for rows which are string, number or a function.
- *    Doesn't work if a row is an object.
- * @param {!Array.<string>=} opt_indexProps Array of the names in case other options fail.
- * @param {boolean=} opt_writeToFirstFieldByMapping If true, in case of object rows, values are written to the first
- *    fieldName, defined by object field mapping (they are written to the field they are read from by default).
+ * @param {!(Object.<Array.<number|string>>)=} opt_mapping - Mapping settings for rows.
  * @protected
  */
-anychart.data.Mapping.prototype.initMappingInfo = function(opt_arrayMapping, opt_objectMapping, opt_defaultProps, opt_indexProps,
-    opt_writeToFirstFieldByMapping) {
+anychart.data.Mapping.prototype.initMappingInfo = function(opt_mapping) {
   var i;
-  if (goog.isObject(opt_arrayMapping)) {
-    for (i in opt_arrayMapping) {
-      if (!goog.isArray(opt_arrayMapping[i]))
-        opt_arrayMapping[i] = [opt_arrayMapping[i]];
+  if (goog.isObject(opt_mapping)) {
+    for (i in opt_mapping) {
+      if (!goog.isArray(opt_mapping[i]))
+        opt_mapping[i] = [opt_mapping[i]];
     }
   } else {
-    opt_arrayMapping = undefined;
+    opt_mapping = undefined;
   }
-  this.isArrayMappingCustom = !!opt_arrayMapping;
+  this.isMappingCustom = !!opt_mapping;
 
-  if (goog.isObject(opt_objectMapping)) {
-    for (i in opt_objectMapping) {
-      if (!goog.isArray(opt_objectMapping[i]))
-        opt_objectMapping[i] = [opt_objectMapping[i]];
-    }
-  } else {
-    opt_objectMapping = undefined;
-  }
-  this.isObjectMappingCustom = !!opt_objectMapping;
 
   /**
-   * Mapping settings for array rows.
-   * @type {!Object.<Array.<number>>}
+   * Mapping settings for rows.
+   * @type {!Object.<Array.<number|string>>}
    * @private
    */
-  this.arrayMapping_ = /** @type {!Object.<Array.<number>>} */(opt_arrayMapping) || anychart.data.Mapping.DEFAULT_ARRAY_MAPPING;
-
-  /**
-   * Mapping settings for object rows.
-   * @type {!Object.<Array.<string>>}
-   * @private
-   */
-  this.objectMapping_ = /** @type {!Object.<Array.<string>>} */(opt_objectMapping) || anychart.data.Mapping.DEFAULT_OBJECT_MAPPING;
-
-  /**
-   * Mapping array for the fields where values can be taken as a row value
-   * is it not an object or an array.
-   * @type {!Array.<string>}
-   * @private
-   */
-  this.defaultProps_ = opt_defaultProps || anychart.data.Mapping.DEFAULT_SIMPLE_ROW_MAPPING;
-
-  /**
-   * Mapping array for the fields where values can be taken as an index of a row
-   * is it not an object or an array.
-   * @type {!Array.<string>}
-   * @private
-   */
-  this.indexProps_ = opt_indexProps || anychart.data.Mapping.DEFAULT_INDEX_MAPPING;
-
-  this.writeToFirstFieldByMapping_ = !!opt_writeToFirstFieldByMapping;
+  this.mapping_ = /** @type {!Object.<Array.<number|string>>} */(opt_mapping) || anychart.data.Mapping.DEFAULT_MAPPING;
 };
 
 
 /**
- * Getter for array mapping.
- * @return {!Object.<Array.<number>>} Array mapping.
+ * Getter for mapping.
+ * @return {!Object.<Array.<number|string>>} - Mapping.
  */
-anychart.data.Mapping.prototype.getArrayMapping = function() {
-  return this.arrayMapping_;
-};
-
-
-/**
- * Getter for object mapping.
- * @return {!Object.<Array.<string>>} Object mapping.
- */
-anychart.data.Mapping.prototype.getObjectMapping = function() {
-  return this.objectMapping_;
-};
-
-
-/**
- * Getter for simple row mapping.
- * @return {!Array.<string>} Simple row mapping.
- */
-anychart.data.Mapping.prototype.getSimpleRowMapping = function() {
-  return this.defaultProps_;
-};
-
-
-/**
- * Getter for index mapping.
- * @return {!Array.<string>} Simple row mapping.
- */
-anychart.data.Mapping.prototype.getIndexMapping = function() {
-  return this.indexProps_;
+anychart.data.Mapping.prototype.getMapping = function() {
+  return this.mapping_;
 };
 
 
 //exports
 (function() {
   var proto = anychart.data.Mapping.prototype;
-  goog.exportSymbol('anychart.data.Mapping.DEFAULT_ARRAY_MAPPING', anychart.data.Mapping.DEFAULT_ARRAY_MAPPING);
-  goog.exportSymbol('anychart.data.Mapping.DEFAULT_OBJECT_MAPPING', anychart.data.Mapping.DEFAULT_OBJECT_MAPPING);
+  goog.exportSymbol('anychart.data.Mapping.DEFAULT_MAPPING', anychart.data.Mapping.DEFAULT_MAPPING);
   goog.exportSymbol('anychart.data.Mapping.DEFAULT_SIMPLE_ROW_MAPPING', anychart.data.Mapping.DEFAULT_SIMPLE_ROW_MAPPING);
   goog.exportSymbol('anychart.data.Mapping.DEFAULT_INDEX_MAPPING', anychart.data.Mapping.DEFAULT_INDEX_MAPPING);
   proto['getRowsCount'] = proto.getRowsCount;
   proto['getIterator'] = proto.getIterator;
   proto['row'] = proto.row;
-  proto['getArrayMapping'] = proto.getArrayMapping;
-  proto['getObjectMapping'] = proto.getObjectMapping;
-  proto['getSimpleRowMapping'] = proto.getSimpleRowMapping;
-  proto['getIndexMapping'] = proto.getIndexMapping;
+  proto['getMapping'] = proto.getMapping;
 })();

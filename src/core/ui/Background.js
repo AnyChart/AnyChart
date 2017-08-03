@@ -1,5 +1,6 @@
 //region --- Requiring and Providing
 goog.provide('anychart.core.ui.Background');
+goog.provide('anychart.standalones.Background');
 goog.require('acgraph');
 goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.VisualBaseWithBounds');
@@ -827,6 +828,29 @@ anychart.core.ui.Background.prototype.disposeInternal = function() {
 };
 
 
+
+/**
+ * @constructor
+ * @extends {anychart.core.ui.Background}
+ */
+anychart.standalones.Background = function() {
+  anychart.standalones.Background.base(this, 'constructor');
+};
+goog.inherits(anychart.standalones.Background, anychart.core.ui.Background);
+anychart.core.makeStandalone(anychart.standalones.Background, anychart.core.ui.Background);
+
+
+/**
+ * Constructor function.
+ * @return {!anychart.standalones.Background}
+ */
+anychart.standalones.background = function() {
+  var background = new anychart.standalones.Background();
+  background.setupInternal(true, anychart.getFullTheme('standalones.background'));
+  return background;
+};
+
+
 //endregion
 //exports
 (function() {
@@ -839,4 +863,10 @@ anychart.core.ui.Background.prototype.disposeInternal = function() {
   // proto['leftStroke'] = proto.leftStroke;
   // proto['cornerType'] = proto.cornerType;//in docs/final
   proto['corners'] = proto.corners;//in docs/final
+
+  proto = anychart.standalones.Background.prototype;
+  goog.exportSymbol('anychart.standalones.background', anychart.standalones.background);
+  proto['draw'] = proto.draw;
+  proto['parentBounds'] = proto.parentBounds;
+  proto['container'] = proto.container;
 })();

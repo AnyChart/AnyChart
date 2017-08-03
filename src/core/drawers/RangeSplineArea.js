@@ -65,7 +65,7 @@ anychart.core.drawers.RangeSplineArea.prototype.requiredShapes = (function() {
 
 
 /** @inheritDoc */
-anychart.core.drawers.RangeSplineArea.prototype.yValueNames = (['low', 'high']);
+anychart.core.drawers.RangeSplineArea.prototype.yValueNames = (function () { return ['low', 'high']; })();
 
 
 /** @inheritDoc */

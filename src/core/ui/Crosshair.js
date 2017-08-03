@@ -13,7 +13,7 @@ anychart.core.ui.Crosshair = function() {
   anychart.core.ui.Crosshair.base(this, 'constructor');
 
   /**
-   * @type {anychart.core.ChartWithAxes|anychart.charts.Map}
+   * @type {anychart.core.ChartWithAxes|anychart.mapModule.Chart}
    * @protected
    */
   this.chart = null;
@@ -32,13 +32,13 @@ anychart.core.ui.Crosshair = function() {
   this.displayMode_ = anychart.enums.CrosshairDisplayMode.FLOAT;
 
   /**
-   * @type {anychart.core.axes.Linear|anychart.core.axes.Map}
+   * @type {anychart.core.Axis|anychart.mapModule.elements.Axis}
    * @private
    */
   this.xAxis_ = null;
 
   /**
-   * @type {anychart.core.axes.Linear|anychart.core.axes.Map}
+   * @type {anychart.core.Axis|anychart.mapModule.elements.Axis}
    * @private
    */
   this.yAxis_ = null;
@@ -156,8 +156,8 @@ anychart.core.ui.Crosshair.prototype.displayMode = function(opt_value) {
 
 /**
  *
- * @param {(anychart.core.axes.Linear|anychart.core.axes.Map)=} opt_value
- * @return {anychart.core.axes.Linear|anychart.core.axes.Map|anychart.core.ui.Crosshair}
+ * @param {(anychart.core.Axis|anychart.mapModule.elements.Axis)=} opt_value
+ * @return {anychart.core.Axis|anychart.mapModule.elements.Axis|anychart.core.ui.Crosshair}
  */
 anychart.core.ui.Crosshair.prototype.xAxis = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -185,8 +185,8 @@ anychart.core.ui.Crosshair.prototype.xAxis = function(opt_value) {
 
 /**
  *
- * @param {(anychart.core.axes.Linear|anychart.core.axes.Map)=} opt_value
- * @return {anychart.core.axes.Linear|anychart.core.axes.Map|anychart.core.ui.Crosshair}
+ * @param {(anychart.core.Axis|anychart.mapModule.elements.Axis)=} opt_value
+ * @return {anychart.core.Axis|anychart.mapModule.elements.Axis|anychart.core.ui.Crosshair}
  */
 anychart.core.ui.Crosshair.prototype.yAxis = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -214,7 +214,7 @@ anychart.core.ui.Crosshair.prototype.yAxis = function(opt_value) {
 
 /**
  *
- * @param {anychart.core.axes.Linear|anychart.core.axes.Map} axis
+ * @param {anychart.core.Axis|anychart.mapModule.elements.Axis} axis
  * @return {anychart.enums.Anchor}
  * @private
  */
@@ -362,7 +362,7 @@ anychart.core.ui.Crosshair.prototype.draw = function() {
 
 /**
  *
- * @param {(anychart.core.ChartWithAxes|anychart.charts.Map)=} opt_chart
+ * @param {(anychart.core.ChartWithAxes|anychart.mapModule.Chart)=} opt_chart
  */
 anychart.core.ui.Crosshair.prototype.bindHandlers = function(opt_chart) {
   if (opt_chart) {
@@ -506,7 +506,7 @@ anychart.core.ui.Crosshair.prototype.hideY = function() {
 
 /**
  * Checks whether scale for axis can return a value.
- * @param {anychart.core.axes.Linear|anychart.core.axes.Map} axis Axis.
+ * @param {anychart.core.Axis|anychart.mapModule.elements.Axis} axis Axis.
  * @return {boolean} Is scale of axis can resolve defined ratio.
  */
 anychart.core.ui.Crosshair.prototype.canDrawForAxis = function(axis) {
@@ -618,7 +618,7 @@ anychart.core.ui.Crosshair.prototype.handleMouseOverAndMove = function(e) {
 
 /**
  * Get the coordinate on the axis scale, given the type of scale.
- * @param {anychart.core.axes.Linear|anychart.core.axes.Map} axis
+ * @param {anychart.core.Axis|anychart.mapModule.elements.Axis} axis
  * @param {number} ratio Current ratio.
  * @param {number} coord Current mouse coordinate.
  * @return {number}
@@ -640,7 +640,7 @@ anychart.core.ui.Crosshair.prototype.prepareCoordinate_ = function(axis, ratio, 
 
 /**
  * Get the label position, given the type of scale and axis orientation.
- * @param {anychart.core.axes.Linear|anychart.core.axes.Map} axis
+ * @param {anychart.core.Axis|anychart.mapModule.elements.Axis} axis
  * @param {anychart.core.ui.CrosshairLabel} label
  * @param {number} mouseX
  * @param {number} mouseY
@@ -718,7 +718,7 @@ anychart.core.ui.Crosshair.prototype.isLabelAnchorTop = function(label) {
 
 /**
  * Gets format provider for label.
- * @param {anychart.core.axes.Linear|anychart.core.axes.Map} axis
+ * @param {anychart.core.Axis|anychart.mapModule.elements.Axis} axis
  * @param {number} ratio
  * @return {Object} Labels format provider.
  * @protected

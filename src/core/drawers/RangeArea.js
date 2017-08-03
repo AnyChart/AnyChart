@@ -58,7 +58,7 @@ anychart.core.drawers.RangeArea.prototype.requiredShapes = (function() {
 
 
 /** @inheritDoc */
-anychart.core.drawers.RangeArea.prototype.yValueNames = (['low', 'high']);
+anychart.core.drawers.RangeArea.prototype.yValueNames = (function () { return ['low', 'high']; })();
 
 
 /** @inheritDoc */

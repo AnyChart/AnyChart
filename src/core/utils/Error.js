@@ -492,7 +492,7 @@ anychart.core.utils.Error.prototype.getErrorStroke = function(horizontal) {
 /**
  * Returns array of [lowerError, upperError].
  * @param {boolean} horizontal is error horizontal (x error).
- * @return {Array.<number, number>} Array of lower and upper errors value.
+ * @return {Array.<number>} Array of lower and upper errors value.
  */
 anychart.core.utils.Error.prototype.getErrorValues = function(horizontal) {
   if (!this.series_.supportsError())
@@ -712,7 +712,7 @@ anychart.core.utils.ISeriesWithError.prototype.getErrorPath = function(stroke) {
 /**
  * Returns array of [lowerError, upperError].
  * @param {boolean} horizontal is error horizontal (x error).
- * @return {Array.<number, number>} Array of lower and upper errors value.
+ * @return {Array.<number>} Array of lower and upper errors value.
  */
 anychart.core.utils.ISeriesWithError.prototype.getErrorValues = function(horizontal) {};
 

@@ -217,7 +217,7 @@ anychart.core.IGroupingProvider.prototype.getCurrentMinDistance = function() {};
 
 
 /**
- * @return {anychart.core.IGroupingProvider|anychart.core.stock.Grouping}
+ * @return {anychart.core.IGroupingProvider|anychart.stockModule.Grouping}
  */
 anychart.core.IGroupingProvider.prototype.grouping = function() {};
 

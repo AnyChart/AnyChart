@@ -1,4 +1,5 @@
 goog.provide('anychart.core.axisMarkers.Line');
+goog.provide('anychart.standalones.axisMarkers.Line');
 
 goog.require('acgraph');
 goog.require('anychart.color');
@@ -193,6 +194,36 @@ anychart.core.axisMarkers.Line.prototype.setupByJSON = function(config, opt_defa
 };
 
 
+
+//region --- Standalone
+//------------------------------------------------------------------------------
+//
+//  Standalone
+//
+//------------------------------------------------------------------------------
+/**
+ * @constructor
+ * @extends {anychart.core.axisMarkers.Line}
+ */
+anychart.standalones.axisMarkers.Line = function() {
+  anychart.standalones.axisMarkers.Line.base(this, 'constructor');
+};
+goog.inherits(anychart.standalones.axisMarkers.Line, anychart.core.axisMarkers.Line);
+anychart.core.makeStandalone(anychart.standalones.axisMarkers.Line, anychart.core.axisMarkers.Line);
+
+
+/**
+ * Constructor function.
+ * @return {!anychart.standalones.axisMarkers.Line}
+ */
+anychart.standalones.axisMarkers.line = function() {
+  var line = new anychart.standalones.axisMarkers.Line();
+  line.setup(anychart.getFullTheme('standalones.lineAxisMarker'));
+  return line;
+};
+
+
+//endregion
 //exports
 (function() {
   var proto = anychart.core.axisMarkers.Line.prototype;
@@ -202,4 +233,10 @@ anychart.core.axisMarkers.Line.prototype.setupByJSON = function(config, opt_defa
   proto['layout'] = proto.layout;
   proto['stroke'] = proto.stroke;
   proto['isHorizontal'] = proto.isHorizontal;
+
+  proto = anychart.standalones.axisMarkers.Line.prototype;
+  goog.exportSymbol('anychart.standalones.axisMarkers.line', anychart.standalones.axisMarkers.line);
+  proto['draw'] = proto.draw;
+  proto['parentBounds'] = proto.parentBounds;
+  proto['container'] = proto.container;
 })();

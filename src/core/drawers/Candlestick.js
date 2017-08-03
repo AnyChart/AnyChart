@@ -58,7 +58,7 @@ anychart.core.drawers.Candlestick.prototype.requiredShapes = (function() {
 
 
 /** @inheritDoc */
-anychart.core.drawers.Candlestick.prototype.yValueNames = (['open', 'high', 'low', 'close']);
+anychart.core.drawers.Candlestick.prototype.yValueNames = (function () { return ['open', 'high', 'low', 'close']; })();
 
 
 /** @inheritDoc */

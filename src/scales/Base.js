@@ -337,28 +337,25 @@ anychart.scales.Base.prototype.setupByJSON = function(config, opt_default) {
  * @return {anychart.scales.Base}
  */
 anychart.scales.Base.fromString = function(type, defaultIsOrdinal) {
-  type = (type + '').toLowerCase();
   switch (type) {
-    case 'log':
-    case 'logarithmic':
+    case anychart.enums.ScaleTypes.LOG:
       return anychart.scales.log();
-    case 'lin':
-    case 'linear':
+    case anychart.enums.ScaleTypes.LINEAR:
       return anychart.scales.linear();
-    case 'date':
-    case 'datetime':
-    case 'dt':
+    case anychart.enums.ScaleTypes.DATE_TIME:
       return anychart.scales.dateTime();
-    case 'ordinal':
-    case 'ord':
-    case 'discrete':
+    case anychart.enums.ScaleTypes.ORDINAL:
       return anychart.scales.ordinal();
-    case 'color':
-    case 'ordinalcolor':
-    case 'discretecolor':
-      return anychart.scales.ordinalColor();
-    case 'linearcolor':
-      return anychart.scales.linearColor();
+    case anychart.enums.ScaleTypes.ORDINAL_COLOR:
+      if (goog.global['anychart']['scales']['ordinalColor'])
+        return goog.global['anychart']['scales']['ordinalColor']();
+      anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Color scales']);
+      return null;
+    case anychart.enums.ScaleTypes.LINEAR_COLOR:
+      if (goog.global['anychart']['scales']['linearColor'])
+        return goog.global['anychart']['scales']['linearColor']();
+      anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Color scales']);
+      return null;
     default:
       return goog.isNull(defaultIsOrdinal) ?
           null :

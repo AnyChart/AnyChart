@@ -443,9 +443,6 @@ anychart.core.ui.Separator.prototype.getRemainingBounds = function() {
  * @private
  */
 anychart.core.ui.Separator.prototype.calculateSeparatorBounds_ = function() {
-  var container = /** @type {acgraph.vector.ILayer} */(this.container());
-  var stage = container ? container.getStage() : null;
-
   var margin = this.margin();
 
   /** @type {anychart.math.Rect} */

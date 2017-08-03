@@ -8,6 +8,7 @@ goog.require('goog.dom');
 goog.require('goog.dom.classlist');
 goog.require('goog.style');
 goog.require('goog.ui.MenuItemRenderer');
+goog.require('goog.ui.SubMenu');
 
 
 
