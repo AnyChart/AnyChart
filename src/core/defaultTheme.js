@@ -1,0 +1,2280 @@
+goog.provide('anychart.core.defaultTheme');
+goog.require('anychart.color');
+goog.require('anychart.format');
+
+
+
+//region --- Aux
+//------------------------------------------------------------------------------
+//
+//  Aux
+//
+//------------------------------------------------------------------------------
+/**
+ * @const {string}
+ */
+anychart.core.defaultTheme.colorStrokeThin = '#EAEAEA';
+
+
+/**
+ * @const {string}
+ */
+anychart.core.defaultTheme.colorStrokeNormal = '#CECECE';
+
+
+/**
+ * @const {string}
+ */
+anychart.core.defaultTheme.colorStrokeBright = '#c1c1c1';
+
+
+/**
+ * @const {string}
+ */
+anychart.core.defaultTheme.colorStrokeExtraBright = '#969EA5';
+
+
+/**
+ * @const {string}
+ */
+anychart.core.defaultTheme.colorFillBackground = '#ffffff';
+
+
+/**
+ * @const {string}
+ */
+anychart.core.defaultTheme.colorFillExtraThin = '#f5f5f5';
+
+
+/**
+ * @const {string}
+ */
+anychart.core.defaultTheme.colorFillBackgroundReversed = '#212121';
+
+
+/**
+ * @const {string}
+ */
+anychart.core.defaultTheme.fontColorNormal = '#7c868e';
+
+
+/**
+ * @const {string}
+ */
+anychart.core.defaultTheme.fontColorBright = '#545f69';
+
+
+/**
+ * @const {string}
+ */
+anychart.core.defaultTheme.fontColorDark = '#212121';
+
+
+/**
+ * @const {string}
+ */
+anychart.core.defaultTheme.defaultHoverColor = '#757575';
+
+
+/**
+ * @const {string}
+ */
+anychart.core.defaultTheme.defaultSelectSolidColor = '#333';
+
+
+/**
+ * @const {string}
+ */
+anychart.core.defaultTheme.defaultSelectColor = '#333 0.85';
+
+
+/**
+ * @const {string}
+ */
+anychart.core.defaultTheme.defaultSelectStroke = '1.5 #212121';
+
+
+/**
+ * @const {string}
+ */
+anychart.core.defaultTheme.fontColorReversedNormal = '#ffffff';
+
+
+/**
+ * @const {string}
+ */
+anychart.core.defaultTheme.opacityThin = ' 0.3';
+
+
+/**
+ * @const {string}
+ */
+anychart.core.defaultTheme.opacityStrong = ' 0.7';
+
+
+/**
+ * @const {string}
+ */
+anychart.core.defaultTheme.risingColor = '#64b5f6';
+
+
+/**
+ * @const {string}
+ */
+anychart.core.defaultTheme.fallingColor = '#ef6c00';
+
+
+/**
+ * @const {string}
+ */
+anychart.core.defaultTheme.waterfallTotalFill = '#96a6a6';
+
+
+/**
+ * @const {string}
+ */
+anychart.core.defaultTheme.waterfallRisingFill = '#64b5f6';
+
+
+/**
+ * @const {string}
+ */
+anychart.core.defaultTheme.waterfallFallingFill = '#ef6c00';
+
+
+/**
+ * @const {string}
+ */
+anychart.core.defaultTheme.waterfallTotalStroke = '#697474';
+
+
+/**
+ * @const {string}
+ */
+anychart.core.defaultTheme.waterfallRisingStroke = '#467fac';
+
+
+/**
+ * @const {string}
+ */
+anychart.core.defaultTheme.waterfallFallingStroke = '#a74c00';
+
+
+/**
+ * @const {string}
+ */
+anychart.core.defaultTheme.VALUE_TOKEN_DECIMALS_COUNT_2 = '{%Value}{decimalsCount:2}';
+
+
+/**
+ * @const {string}
+ */
+anychart.core.defaultTheme.VALUE_TOKEN_DECIMALS_COUNT_10 = '{%Value}{decimalsCount:10}';
+
+
+/**
+ * @const {string}
+ */
+anychart.core.defaultTheme.PERCENT_VALUE_TOKEN = '{%PercentValue}{decimalsCount:1,zeroFillDecimals:true}';
+
+
+/**
+ * @param {*} val - Value to localize.
+ * @param {(number|string)=} opt_decimalsCountOrLocale
+ * @param {string=} opt_decimalPoint
+ * @param {string=} opt_groupsSeparator
+ * @param {({factors:Array.<number>,suffixes:Array.<string>}|boolean)=} opt_scale
+ * @param {boolean=} opt_zeroFillDecimals
+ * @param {string=} opt_scaleSuffixSeparator
+ * @param {boolean=} opt_useBracketsForNegative
+ * @return {*}
+ */
+anychart.core.defaultTheme.locNum = function(val, opt_decimalsCountOrLocale, opt_decimalPoint, opt_groupsSeparator,
+                      opt_scale, opt_zeroFillDecimals, opt_scaleSuffixSeparator, opt_useBracketsForNegative) {
+  var val_ = (val === null) || (typeof val == 'boolean') || (val == '') ? NaN : +/** @type {number} */(val);
+  return isNaN(val_) ? val : anychart.format.number(val_, opt_decimalsCountOrLocale, opt_decimalPoint, opt_groupsSeparator,
+      opt_scale, opt_zeroFillDecimals, opt_scaleSuffixSeparator, opt_useBracketsForNegative);
+};
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
+anychart.core.defaultTheme.returnValue = function() {
+  return anychart.core.defaultTheme.locNum(this['value']);
+};
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
+anychart.core.defaultTheme.notRoundedValue = function() {
+  return anychart.core.defaultTheme.locNum(this['value'], 10);
+};
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
+anychart.core.defaultTheme.returnName = function() {
+  return this['name'] || this['getData']('id');
+};
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
+anychart.core.defaultTheme.returnMilestoneName = function() {
+  if (this['creator']) {
+    return this['index'];
+  } else {
+    return this['isStart'] ? 'S' : 'F';
+  }
+};
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
+anychart.core.defaultTheme.returnNameWithValue = function() {
+  var name = this['name'] || this['getData']('id');
+  return name + '\n' + anychart.core.defaultTheme.locNum(this['value']);
+};
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
+anychart.core.defaultTheme.returnValueWithPrefixPostfix = function() {
+  return this['valuePrefix'] + anychart.core.defaultTheme.locNum(this['value']) + this['valuePostfix'];
+};
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
+anychart.core.defaultTheme.returnX = function() {
+  return this['x'];
+};
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
+anychart.core.defaultTheme.returnDateTimeX = function() {
+  return anychart.format.date(this['x']);
+};
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
+anychart.core.defaultTheme.returnDateTimeTickValue = function() {
+  return anychart.format.date(this['tickValue']);
+};
+
+
+/**
+ * @this {{
+ *    sourceColor: (acgraph.vector.SolidFill|string)
+ * }}
+ * @return {*}
+ */
+anychart.core.defaultTheme.returnSourceColor = function() {
+  return this['sourceColor'];
+};
+
+
+/**
+ * @this {{
+ *    sourceColor: (acgraph.vector.SolidFill|string)
+ * }}
+ * @return {*}
+ */
+anychart.core.defaultTheme.returnSourceColor70 = function() {
+  return anychart.color.setOpacity(this['sourceColor'], 0.7, true);
+};
+
+
+/**
+ * @this {{
+ *    sourceColor: (acgraph.vector.SolidFill|string)
+ * }}
+ * @return {*}
+ */
+anychart.core.defaultTheme.returnSourceColor65 = function() {
+  return anychart.color.setOpacity(this['sourceColor'], 0.65, true);
+};
+
+
+/**
+ * @this {{
+ *    sourceColor: (acgraph.vector.SolidFill|string)
+ * }}
+ * @return {*}
+ */
+anychart.core.defaultTheme.returnSourceColor50 = function() {
+  return anychart.color.setOpacity(this['sourceColor'], 0.50, true);
+};
+
+
+/**
+ * @this {{
+ *    sourceColor: (acgraph.vector.SolidFill|string)
+ * }}
+ * @return {*}
+ */
+anychart.core.defaultTheme.returnSourceColor85 = function() {
+  return anychart.color.setOpacity(this['sourceColor'], 0.85, true);
+};
+
+
+/**
+ * @this {{
+ *    sourceColor: (acgraph.vector.SolidFill|string)
+ * }}
+ * @return {*}
+ */
+anychart.core.defaultTheme.returnDarkenSourceColor = function() {
+  return anychart.color.darken(this['sourceColor']);
+};
+
+
+/**
+ * @this {{
+ *    sourceColor: (acgraph.vector.SolidFill|string)
+ * }}
+ * @return {*}
+ */
+anychart.core.defaultTheme.returnLightenSourceColor = function() {
+  return anychart.color.lighten(this['sourceColor']);
+};
+
+
+/**
+ * @this {{
+ *    sourceColor: (acgraph.vector.SolidFill|string)
+ * }}
+ * @return {*}
+ */
+anychart.core.defaultTheme.returnLightenSourceColor50 = function() {
+  return anychart.color.setOpacity(anychart.color.lighten(this['sourceColor']), 0.5, true);
+};
+
+
+/**
+ * @this {{
+ *    sourceColor: (acgraph.vector.SolidFill|string)
+ * }}
+ * @return {*}
+ */
+anychart.core.defaultTheme.returnStrokeSourceColor = function() {
+  return anychart.color.setThickness(this['sourceColor'], 1.5);
+};
+
+
+/**
+ * @this {{
+ *    sourceColor: (acgraph.vector.SolidFill|string)
+ * }}
+ * @return {*}
+ */
+anychart.core.defaultTheme.returnStrokeSourceColor1 = function() {
+  return anychart.color.setThickness(this['sourceColor'], 1);
+};
+
+
+/**
+ * @this {{
+ *    sourceColor: (acgraph.vector.SolidFill|string)
+ * }}
+ * @return {*}
+ */
+anychart.core.defaultTheme.returnLightenStrokeSourceColor = function() {
+  return anychart.color.setThickness(/** @type {acgraph.vector.Stroke} */(anychart.color.lighten(this['sourceColor'])), 1.5);
+};
+
+
+/**
+ * @this {{
+ *    sourceColor: (acgraph.vector.SolidFill|string)
+ * }}
+ * @return {*}
+ */
+anychart.core.defaultTheme.returnLightenStrokeSourceColor1 = function() {
+  return anychart.color.setThickness(/** @type {acgraph.vector.Stroke} */(anychart.color.lighten(this['sourceColor'])), 1);
+};
+
+
+/**
+ * @this {{
+ *    sourceColor: (acgraph.vector.SolidFill|string)
+ * }}
+ * @return {*}
+ */
+anychart.core.defaultTheme.returnThickenedStrokeSourceColor = function() {
+  return anychart.color.setThickness(this['sourceColor'], 1.5);
+};
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
+anychart.core.defaultTheme.returnDashedStrokeSourceColor = function() {
+  return {
+    'color': this['sourceColor'],
+    'dash': '6 4'
+  };
+};
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
+anychart.core.defaultTheme.returnRangeTooltipContentFormatter = function() {
+  return 'High: ' + anychart.core.defaultTheme.locNum(this['high']) + '\n' +
+      'Low: ' + anychart.core.defaultTheme.locNum(this['low']);
+};
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
+anychart.core.defaultTheme.returnRangeLabelsContentFormatter = function() {
+  return anychart.core.defaultTheme.locNum(this['high']);
+};
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
+anychart.core.defaultTheme.OHLCTooltipFormatter = function() {
+  return 'Open: ' + anychart.core.defaultTheme.locNum(this['open']) + '\n' +
+      'High: ' + anychart.core.defaultTheme.locNum(this['high']) + '\n' +
+      'Low: ' + anychart.core.defaultTheme.locNum(this['low']) + '\n' +
+      'Close: ' + anychart.core.defaultTheme.locNum(this['close']);
+};
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
+anychart.core.defaultTheme.returnStrokeWithThickness = function() {
+  return anychart.color.setThickness(this['sourceColor'], 1.5);
+};
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
+anychart.core.defaultTheme.chartA11yTitleFormatter = function() {
+  /** @type {anychart.core.Chart} */
+  var chart = this['chart'];
+  var title = chart.title();
+  var titleText = title && title.enabled() && title.text() ? title.text() : '';
+  var type = chart.getType();
+  var typeText = type || 'Anychart ';
+  return typeText + ' chart ' + (titleText ? ' entitled ' + titleText : '');
+};
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
+anychart.core.defaultTheme.pieA11yTitleFormatter = function() {
+  /** @type {anychart.pieModule.Chart} */
+  var chart = this['chart'];
+  var res = anychart.core.defaultTheme.chartA11yTitleFormatter.apply(this);
+  res += ', with ' + chart.getStat('count') + ' points. ';
+  res += 'Min value is ' + chart.getStat('min') + ', max value is ' + chart.getStat('max') + '.';
+  return res;
+};
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
+anychart.core.defaultTheme.bulletA11yTitleFormatter = function() {
+  var res = anychart.core.defaultTheme.chartA11yTitleFormatter.apply(this);
+  return res + '. ';
+};
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
+anychart.core.defaultTheme.cartesianBaseA11yTitleFormatter = function() {
+  /** @type {anychart.core.CartesianBase} */
+  var chart = this['chart'];
+  var res = anychart.core.defaultTheme.chartA11yTitleFormatter.call(this);
+  var seriesLength = chart.getSeriesCount();
+
+  var seriesMap = {};
+  for (var i = 0; i < seriesLength; i++) {
+    var ser = chart.getSeriesAt(i);
+    var type = ser.seriesType();
+    if (seriesMap.hasOwnProperty(type)) {
+      seriesMap[type] += 1;
+    } else {
+      seriesMap[type] = 1;
+    }
+  }
+
+  res += ', with ';
+  for (var key in seriesMap) {
+    res += seriesMap[key] + ' ' + key + ' series, ';
+  }
+  res += '. ';
+
+  var yScale = chart.yScale();
+  var xScale = chart.xScale();
+  var xType = xScale.getType();
+  var yType = yScale.getType();
+  var min,
+      max;
+
+  if (yType == 'ordinal') { //By xml-scheme, enums.ScaleTypes
+    var yVals = yScale.values();
+    res += 'Y-scale with ' + yVals.length + ' categories: ';
+    for (var y = 0; y < yVals.length; y++) {
+      res += yVals[y] + ', ';
+    }
+    res += '. ';
+  } else {
+    min = yScale.minimum();
+    max = yScale.maximum();
+    if (yType == 'date-time') {
+      min = anychart.format.dateTime(min);
+      max = anychart.format.dateTime(max);
+    }
+    res += 'Y-scale minimum value is ' + min + ' , maximum value is ' + max + '. ';
+  }
+
+  if (xType == 'ordinal') {
+    var xVals = xScale.values();
+    res += 'X-scale with ' + xVals.length + ' categories: ';
+    for (var x = 0; x < xVals.length; x++) {
+      res += xVals[x] + ', ';
+    }
+    res += '. ';
+  } else {
+    min = xScale.minimum();
+    max = xScale.maximum();
+    if (xType == 'date-time') {
+      min = anychart.format.dateTime(min);
+      max = anychart.format.dateTime(max);
+    }
+    res += 'X-scale minimum value is ' + min + ' , maximum value is ' + max + '. ';
+  }
+
+  return res;
+};
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
+anychart.core.defaultTheme.scatterA11yTitleFormatter = function() {
+  /** @type {anychart.scatterModule.Chart} */
+  var chart = this['chart'];
+  var res = anychart.core.defaultTheme.chartA11yTitleFormatter.call(this);
+  var seriesLength = chart.getSeriesCount();
+
+  var seriesMap = {};
+  for (var i = 0; i < seriesLength; i++) {
+    var ser = chart.getSeriesAt(i);
+    var type = ser.getType();
+    if (seriesMap.hasOwnProperty(type)) {
+      seriesMap[type] += 1;
+    } else {
+      seriesMap[type] = 1;
+    }
+  }
+
+  res += ', with ';
+  for (var key in seriesMap) {
+    res += seriesMap[key] + ' ' + key + ' series, ';
+  }
+  res += '. ';
+
+  var yScale = chart.yScale();
+  var xScale = chart.xScale();
+  var xType = xScale.getType();
+  var yType = yScale.getType();
+  var min,
+      max;
+
+  if (yType == 'ordinal') { //By xml-scheme, enums.ScaleTypes
+    var yVals = yScale.values();
+    res += 'Y-scale with ' + yVals.length + ' categories: ';
+    for (var y = 0; y < yVals.length; y++) {
+      res += yVals[y] + ', ';
+    }
+    res += '. ';
+  } else {
+    min = yScale.minimum();
+    max = yScale.maximum();
+    if (yType == 'date-time') {
+      min = anychart.format.dateTime(min);
+      max = anychart.format.dateTime(max);
+    }
+    res += 'Y-scale minimum value is ' + min + ', maximum value is ' + max + '. ';
+  }
+
+  if (xType == 'ordinal') {
+    var xVals = xScale.values();
+    res += 'X-scale with ' + xVals.length + ' categories: ';
+    for (var x = 0; x < xVals.length; x++) {
+      res += xVals[x] + ', ';
+    }
+    res += '. ';
+  } else {
+    min = xScale.minimum();
+    max = xScale.maximum();
+    if (xType == 'date-time') {
+      min = anychart.format.dateTime(min);
+      max = anychart.format.dateTime(max);
+    }
+    res += 'X-scale minimum value is ' + min + ', maximum value is ' + max + '. ';
+  }
+
+  return res;
+};
+
+/**
+ * @param {*} contextProvider
+ * @return {*}
+ */
+anychart.core.defaultTheme.tooltipTitleFormatter = function(contextProvider) {
+  switch (contextProvider['xScaleType']) {
+    case 'date-time':
+      return anychart.format.date(contextProvider['x']);
+    default:
+      return anychart.core.defaultTheme.locNum(contextProvider['x']);
+  }
+};
+//endregion
+
+
+goog.exportSymbol('anychart.themes.defaultTheme', {
+  'palette': {
+    'type': 'distinct',
+    'items': ['#64b5f6', '#1976d2', '#ef6c00', '#ffd54f', '#455a64', '#96a6a6', '#dd2c00', '#00838f', '#00bfa5', '#ffa000']
+  },
+  'hatchFillPalette': {
+    'items': ['backward-diagonal', 'forward-diagonal', 'horizontal', 'vertical', 'dashed-backward-diagonal', 'grid', 'dashed-forward-diagonal', 'dashed-horizontal', 'dashed-vertical', 'diagonal-cross', 'diagonal-brick', 'divot', 'horizontal-brick', 'vertical-brick', 'checker-board', 'confetti', 'plaid', 'solid-diamond', 'zig-zag', 'weave', 'percent-05', 'percent-10', 'percent-20', 'percent-25', 'percent-30', 'percent-40', 'percent-50', 'percent-60', 'percent-70', 'percent-75', 'percent-80', 'percent-90']
+  },
+  'hatchFillPaletteFor3D': {
+    'items': ['backward-diagonal', 'forward-diagonal', 'dashed-backward-diagonal', 'grid', 'dashed-forward-diagonal', 'dashed-horizontal', 'dashed-vertical', 'diagonal-cross', 'diagonal-brick', 'divot', 'horizontal-brick', 'vertical-brick', 'checker-board', 'confetti', 'plaid', 'solid-diamond', 'zig-zag', 'weave', 'percent-05', 'percent-10', 'percent-20', 'percent-25', 'percent-30', 'percent-40', 'percent-50', 'percent-60', 'percent-70', 'percent-75', 'percent-80', 'percent-90', 'horizontal', 'vertical']
+  },
+  'markerPalette': {
+    'items': ['circle', 'diamond', 'square', 'triangle-down', 'triangle-up', 'diagonal-cross', 'pentagon', 'cross', 'v-line', 'star5', 'star4', 'trapezium', 'star7', 'star6', 'star10']
+  },
+
+  'defaultScaleSettings': {
+    'linear': {
+      'maxTicksCount': 1000,
+      'inverted': false,
+      'maximum': null,
+      'minimum': null,
+      'minimumGap': 0.1,
+      'maximumGap': 0.1,
+      'softMinimum': null,
+      'softMaximum': null,
+      'ticks': {
+        'mode': 'linear',
+        'base': 0,
+        'explicit': null,
+        'minCount': 4,
+        'maxCount': 6,
+        'interval': NaN
+      },
+      'minorTicks': {
+        'mode': 'linear',
+        'base': 0,
+        'explicit': null,
+        'count': 5,
+        'interval': NaN
+      },
+      'stackMode': 'none',
+      'stickToZero': true
+    },
+    'ordinal': {
+      'type': 'ordinal',
+      'inverted': false,
+      'names': [],
+      'ticks': {
+        'maxCount': 100
+      }
+    },
+    'log': {
+      'type': 'log',
+      'logBase': 10,
+      'ticks': {
+        'mode': 'log'
+      },
+      'minorTicks': {
+        'mode': 'log'
+      }
+    },
+    'dateTime': {
+      'type': 'date-time',
+      'ticks': {
+        'count': 4
+      },
+      'minorTicks': {
+        'count': 4
+      }
+    }
+  },
+
+  'defaultFontSettings': {
+    'fontSize': 13,
+    'fontFamily': 'Verdana, Helvetica, Arial, sans-serif',
+    'fontColor': anychart.core.defaultTheme.fontColorNormal,
+    'textDirection': 'ltr',
+    'fontOpacity': 1,
+    'fontDecoration': 'none',
+    'fontStyle': 'normal',
+    'fontVariant': 'normal',
+    'fontWeight': 'normal',
+    'letterSpacing': 'normal',
+    'lineHeight': 'normal',
+    'textIndent': 0,
+    'vAlign': 'top',
+    'hAlign': 'start',
+    'wordWrap': 'normal',
+    'wordBreak': 'normal',
+    'textOverflow': '',
+    'selectable': false,
+    'disablePointerEvents': false,
+    'useHtml': false
+  },
+
+  'defaultBackground': {
+    'enabled': false,
+    'fill': anychart.core.defaultTheme.colorFillBackground,
+    'stroke': 'none',
+    'cornerType': 'round',
+    'corners': 0
+  },
+
+  'defaultSeparator': {
+    'enabled': false,
+    'fill': anychart.core.defaultTheme.colorStrokeNormal + anychart.core.defaultTheme.opacityThin,
+    'width': '100%',
+    'height': 1,
+    'margin': {'top': 5, 'right': 0, 'bottom': 5, 'left': 0},
+    'orientation': 'top',
+    'stroke': 'none',
+    'zIndex': 1
+  },
+
+  'defaultLabelFactory': {
+    'enabled': false,
+    'offsetX': 0,
+    'offsetY': 0,
+    'width': null,
+    'height': null,
+    'clip': null,
+    'fontSize': 12,
+    'minFontSize': 8,
+    'maxFontSize': 72,
+    'adjustFontSize': {
+      'width': false,
+      'height': false
+    },
+    'anchor': 'center',
+    'padding': 4,
+    'rotation': 0,
+    'format': anychart.core.defaultTheme.returnValue,
+    'positionFormatter': anychart.core.defaultTheme.returnValue
+  },
+
+  'defaultMarkerFactory': {
+    'anchor': 'center',
+    'size': 6,
+    'offsetX': 0,
+    'offsetY': 0,
+    'rotation': 0,
+    'positionFormatter': anychart.core.defaultTheme.returnValue
+  },
+
+  'defaultTitle': {
+    'enabled': false,
+    'fontSize': 16,
+    'text': 'Title text',
+    'width': null,
+    'height': null,
+    'align': 'center',
+    'hAlign': 'center',
+    'padding': 0,
+    'margin': 0
+  },
+
+  'defaultTooltip': {
+    'enabled': true,
+    'title': {
+      'fontColor': anychart.core.defaultTheme.fontColorReversedNormal,
+      'text': '',
+      'fontSize': 14,
+      'rotation': 0,
+      'align': 'left',
+      'hAlign': 'left',
+      'orientation': 'top',
+      'zIndex': 1,
+      'background': {
+        'fill': 'none',
+        'stroke': 'none'
+      }
+    },
+    'contentInternal': {
+      'enabled': true,
+      'fontSize': 12,
+      'minFontSize': 9,
+      'maxFontSize': 13,
+      'fontColor': anychart.core.defaultTheme.fontColorReversedNormal,
+      'hAlign': 'left',
+      'text': 'Tooltip Text',
+      'width': '100%',
+      'height': '100%',
+      'anchor': 'left-top',
+      'offsetX': 0,
+      'offsetY': 0,
+      'position': 'left-top',
+      'adjustFontSize': {
+        'width': false,
+        'height': false
+      },
+      'padding': 0,
+      'rotation': 0,
+      'zIndex': 1,
+      'background': {
+        'disablePointerEvents': false,
+        'fill': 'none',
+        'stroke': 'none'
+      }
+    },
+    'fontSize': 12,
+    'minFontSize': 9,
+    'maxFontSize': 13,
+    'fontColor': anychart.core.defaultTheme.fontColorReversedNormal,
+    'text': 'Tooltip Text',
+    'width': null,
+    'height': null,
+    'adjustFontSize': {
+      'width': false,
+      'height': false
+    },
+    'background': {
+      'enabled': true,
+      'fill': anychart.core.defaultTheme.colorFillBackgroundReversed + anychart.core.defaultTheme.opacityStrong,
+      'corners': 3,
+      'zIndex': 0,
+      'cornerType': 'round'
+    },
+    'offsetX': 10,
+    'offsetY': 10,
+    'padding': {'top': 5, 'right': 10, 'bottom': 5, 'left': 10},
+    'valuePrefix': '',
+    'valuePostfix': '',
+    'position': 'left-top',
+    'anchor': 'left-top',
+    'hideDelay': 0,
+    'titleFormat': anychart.core.defaultTheme.returnValue,
+    'format': anychart.core.defaultTheme.returnValueWithPrefixPostfix,
+    /**
+     * @this {*}
+     * @return {*}
+     */
+    'unionFormat': function() {
+      return this['formattedValues'].join('\n');
+    },
+    'zIndex': 0,
+    'allowLeaveChart': true,
+    'allowLeaveScreen': false,
+    'allowLeaveStage': false
+  },
+
+  'defaultAxis': {
+    'enabled': true,
+    'startAngle': 0,
+    'drawLastLabel': true,
+    'drawFirstLabel': true,
+    'staggerMaxLines': 2,
+    'staggerMode': false,
+    'staggerLines': null,
+    'width': null,
+    'overlapMode': 'no-overlap',
+    'stroke': anychart.core.defaultTheme.colorStrokeNormal,
+    'title': {
+      'padding': 5,
+      'fontSize': 13,
+      'text': 'Axis title',
+      'fontColor': anychart.core.defaultTheme.fontColorBright,
+      'zIndex': 35
+    },
+    'labels': {
+      'enabled': true,
+      'format': anychart.core.defaultTheme.notRoundedValue,
+      'zIndex': 35
+    },
+    'minorLabels': {
+      'fontSize': 9,
+      'format': anychart.core.defaultTheme.notRoundedValue,
+      'zIndex': 35
+    },
+    'ticks': {
+      'enabled': true,
+      'length': 6,
+      'position': 'outside',
+      'stroke': anychart.core.defaultTheme.colorStrokeNormal,
+      'zIndex': 35
+    },
+    'minorTicks': {
+      'enabled': false,
+      'length': 4,
+      'position': 'outside',
+      'stroke': anychart.core.defaultTheme.colorStrokeThin,
+      'zIndex': 35
+    },
+    'zIndex': 35
+  },
+
+  'defaultGridSettings': {
+    'enabled': true,
+    'isMinor': false,
+    'drawFirstLine': true,
+    'drawLastLine': true,
+    'oddFill': 'none',
+    'evenFill': 'none',
+    'stroke': anychart.core.defaultTheme.colorStrokeNormal,
+    'scale': 1,
+    'zIndex': 11
+  },
+
+  'defaultMinorGridSettings': {
+    'isMinor': true,
+    'stroke': anychart.core.defaultTheme.colorStrokeThin,
+    'zIndex': 10
+  },
+
+  'defaultLineMarkerSettings': {
+    'enabled': true,
+    'value': 0,
+    'layout': null,
+    'stroke': {
+      'color': '#7c868e',
+      'thickness': 2,
+      'opacity': 1,
+      'dash': '',
+      'lineJoin': 'miter',
+      'lineCap': 'square'
+    },
+    'zIndex': 25.2,
+    'scale': 1
+  },
+
+  'defaultTextMarkerSettings': {
+    'enabled': true,
+    'fontSize': 12,
+    'value': 0,
+    'anchor': 'center',
+    'align': 'center',
+    'layout': null,
+    'offsetX': 0,
+    'offsetY': 0,
+    'text': 'Text marker',
+    'width': null,
+    'height': null,
+    'zIndex': 25.3,
+    'scale': 1
+  },
+
+  'defaultRangeMarkerSettings': {
+    'enabled': true,
+    'from': 0,
+    'to': 0,
+    'layout': null,
+    'fill': anychart.core.defaultTheme.colorStrokeBright + ' 0.4',
+    'zIndex': 25.1,
+    'scale': 1
+  },
+
+  'defaultLegend': {
+    'enabled': false,
+    'vAlign': 'bottom',
+    'fontSize': 12,
+    'textOverflow': '...',
+    'itemsLayout': 'horizontal',
+    'positionMode': 'outside',
+    'itemsSpacing': 15,
+    'items': null,
+    'itemsFormat': null,
+    'itemsSourceMode': 'default',
+    'inverted': false,
+    'hoverCursor': 'pointer',
+    'iconTextSpacing': 5,
+    'iconSize': 15,
+    'width': null,
+    'height': null,
+    'position': 'top',
+    'align': 'center',
+    'padding': {'top': 0, 'right': 10, 'bottom': 10, 'left': 10},
+    'margin': 0,
+    'title': {
+      'fontSize': 15
+    },
+    'paginator': {
+      'enabled': true,
+      'fontSize': 12,
+      'fontColor': anychart.core.defaultTheme.fontColorBright,
+      'orientation': 'right',
+      'layout': 'horizontal',
+      'padding': {'top': 0, 'right': 0, 'bottom': 0, 'left': 5},
+      'margin': 0,
+      'zIndex': 30,
+      'buttonsSettings': {
+        'normal': {
+          'stroke': '#757575',
+          'fill': '#9e9e9e'
+        },
+        'hover': {
+          'stroke': '#546e7a',
+          'fill': anychart.core.defaultTheme.fontColorNormal
+        },
+        'pushed': {
+          'stroke': anychart.core.defaultTheme.fontColorNormal,
+          'fill': '#9e9e9e'
+        },
+        'disabled': {
+          'stroke': null,
+          'fill': '#e0e0e0'
+        }
+      }
+    },
+    'titleFormat': null,
+    'tooltip': {
+      'enabled': false,
+      'allowLeaveScreen': true
+    },
+    'drag': false,
+    'maxWidth': null,
+    'maxHeight': null,
+    'zIndex': 200
+  },
+
+  'defaultCrosshairLabel': {
+    'x': 0,
+    'y': 0,
+    'axisIndex': 0,
+    'anchor': null,
+    'format': anychart.core.defaultTheme.returnValue,
+    'enabled': true,
+    'fontSize': 12,
+    'minFontSize': 8,
+    'maxFontSize': 16,
+    'fontColor': anychart.core.defaultTheme.fontColorReversedNormal,
+    'fontWeight': 400,
+    'disablePointerEvents': true,
+    'text': 'Label text',
+    'background': {
+      'enabled': true,
+      'disablePointerEvents': true,
+      'fill': anychart.core.defaultTheme.colorFillBackgroundReversed + anychart.core.defaultTheme.opacityStrong,
+      'corners': 3,
+      'zIndex': 0
+    },
+    'padding': {'top': 5, 'right': 10, 'bottom': 5, 'left': 10},
+    'width': null,
+    'height': null,
+    'offsetX': 0,
+    'offsetY': 0,
+    'adjustFontSize': {
+      'width': false,
+      'height': false
+    },
+    'rotation': 0
+  },
+
+  'defaultCallout': {
+    'enabled': true,
+    'orientation': 'left',
+    'title': {'enabled': false},
+    'padding': 0,
+    'margin': 0,
+    'align': 'center',
+    'labels': {
+      'enabled': true,
+      'vAlign': 'middle',
+      'hAlign': 'center',
+      'positionFormatter': anychart.core.defaultTheme.returnValue,
+      'adjustFontSize': false,
+      'connectorStroke': null
+    }
+  },
+
+  'defaultScroller': {
+    'enabled': false,
+    'fill': '#f7f7f7',
+    'selectedFill': '#ddd',
+    'outlineStroke': 'none',
+    'height': 16,
+    'minHeight': null,
+    'maxHeight': null,
+    'autoHide': false,
+    'orientation': 'bottom',
+    'position': 'after-axes',
+    'allowRangeChange': true,
+    'thumbs': {
+      'enabled': true,
+      'autoHide': false,
+      'fill': '#E9E9E9',
+      'stroke': '#7c868e',
+      'hoverFill': '#ffffff',
+      'hoverStroke': anychart.core.defaultTheme.defaultHoverColor
+    },
+    'inverted': false,
+    'zIndex': 35
+  },
+
+  'defaultLabelSettings': {
+    'enabled': true,
+    'text': 'Chart label',
+    'width': null,
+    'height': null,
+    'anchor': 'left-top',
+    'position': 'left-top',
+    'offsetX': 0,
+    'offsetY': 0,
+    'minFontSize': 8,
+    'maxFontSize': 72,
+    'adjustFontSize': {
+      'width': false,
+      'height': false
+    },
+    'rotation': 0,
+    'zIndex': 50
+  },
+
+  'stageCredits': {
+    'text': 'AnyChart',
+    'url': 'https://www.anychart.com/?utm_source=registered',
+    'alt': 'AnyChart - JavaScript Charts designed to be embedded and integrated',
+    'imgAlt': 'AnyChart - JavaScript Charts',
+    'logoSrc': 'https://static.anychart.com/logo.png'
+  },
+
+  'chart': {
+    'enabled': true,
+    'padding': {'top': 10, 'right': 20, 'bottom': 15, 'left': 10},
+    'margin': 0,
+    'background': {'enabled': true, 'zIndex': 1},
+    'contextMenu': {
+      'fromTheme': true, // suppress NO_FEATURE_IN_MODULE warning
+      'enabled': true
+    },
+    'title': {
+      'text': 'Chart Title',
+      'padding': {'top': 0, 'right': 0, 'bottom': 10, 'left': 0},
+      'zIndex': 80,
+      'background': {
+        'zIndex': 0
+      }
+    },
+    'animation': {
+      'enabled': false,
+      'duration': 1000
+    },
+    'interactivity': {
+      'hoverMode': 'single',
+      'selectionMode': 'multi-select',
+      'spotRadius': 2,
+      'allowMultiSeriesSelection': true
+    },
+    'tooltip': {
+      'displayMode': 'single',
+      'positionMode': 'float',
+      'title': {
+        'enabled': true
+      },
+      'separator': {'enabled': true},
+      /**
+       * @this {*}
+       * @return {*}
+       */
+      'titleFormat': function() {
+        return anychart.core.defaultTheme.tooltipTitleFormatter(this['points'][0]);
+      },
+      /**
+       * @this {*}
+       * @return {*}
+       */
+      'format': function() {
+        return this['formattedValues'].join('\n');
+      }
+    },
+    'bounds': {
+      'top': null,
+      'right': null,
+      'bottom': null,
+      'left': null,
+      'width': null,
+      'height': null,
+      'minWidth': null,
+      'minHeight': null,
+      'maxWidth': null,
+      'maxHeight': null
+    },
+    'credits': {},
+    'defaultSeriesSettings': {
+      'base': {
+        'enabled': true,
+        'isVertical': null,
+        'background': {'enabled': true},
+        'tooltip': {
+          /**
+           * @this {*}
+           * @return {*}
+           */
+          'titleFormat': function() {
+            return anychart.core.defaultTheme.tooltipTitleFormatter(this);
+          },
+          /**
+           * @this {*}
+           * @return {*}
+           */
+          'format': function() {
+            return this['seriesName'] + ': ' + this['valuePrefix'] + anychart.core.defaultTheme.locNum(this['value']) + this['valuePostfix'];
+          },
+          'zIndex': 0
+        },
+        'hatchFill': false,
+        'hoverHatchFill': null,
+        'selectHatchFill': null,
+        'labels': {
+          'enabled': null,
+          'anchor': 'auto',
+          'position': 'value'
+        },
+        'hoverLabels': {'enabled': null},
+        'selectLabels': {'enabled': null},
+        'markers': {
+          'enabled': false,
+          'disablePointerEvents': false,
+          'position': 'value',
+          'positionFormatter': anychart.core.defaultTheme.returnValue,
+          'size': 4
+        },
+        'hoverMarkers': {
+          'enabled': null,
+          'size': 6
+        },
+        'selectMarkers': {
+          'enabled': null,
+          'fill': anychart.core.defaultTheme.defaultSelectColor,
+          'stroke': anychart.core.defaultTheme.defaultSelectStroke,
+          'size': 6
+        },
+        'legendItem': {
+          'enabled': true,
+          'iconType': 'square'
+        },
+        'fill': anychart.core.defaultTheme.returnSourceColor65,
+        'hoverFill': anychart.core.defaultTheme.returnSourceColor,
+        'selectFill': anychart.core.defaultTheme.defaultSelectColor,
+        'stroke': anychart.core.defaultTheme.returnStrokeSourceColor,
+        'hoverStroke': anychart.core.defaultTheme.returnLightenStrokeSourceColor,
+        'selectStroke': anychart.core.defaultTheme.defaultSelectColor,
+        'lowStroke': anychart.core.defaultTheme.returnStrokeSourceColor,
+        'hoverLowStroke': anychart.core.defaultTheme.returnLightenStrokeSourceColor,
+        'selectLowStroke': anychart.core.defaultTheme.defaultSelectColor,
+        'highStroke': anychart.core.defaultTheme.returnStrokeSourceColor,
+        'hoverHighStroke': anychart.core.defaultTheme.returnLightenStrokeSourceColor,
+        'selectHighStroke': anychart.core.defaultTheme.defaultSelectColor,
+        'clip': true,
+        'color': null,
+        'xScale': null,
+        'yScale': null,
+        'error': {
+          'mode': 'both',
+          'xError': null,
+          'xUpperError': null,
+          'xLowerError': null,
+          'valueError': null,
+          'valueUpperError': null,
+          'valueLowerError': null,
+          'xErrorWidth': 10,
+          'valueErrorWidth': 10,
+          'xErrorStroke': anychart.core.defaultTheme.returnDarkenSourceColor,
+          'valueErrorStroke': anychart.core.defaultTheme.returnDarkenSourceColor
+        },
+        'pointWidth': null,
+        'connectMissingPoints': false,
+        'a11y': {
+          'enabled': false,
+          'titleFormat': 'Series named {%SeriesName} with {%SeriesPointsCount} points. Min value is {%SeriesYMin}, max value is {%SeriesYMax}'
+        }
+      },
+      'marker': {
+        'fill': anychart.core.defaultTheme.returnSourceColor,
+        'stroke': anychart.core.defaultTheme.returnStrokeWithThickness,
+        'hoverFill': anychart.core.defaultTheme.returnLightenSourceColor,
+        'hoverStroke': anychart.core.defaultTheme.returnStrokeWithThickness,
+        'selectFill': anychart.core.defaultTheme.defaultSelectColor,
+        'selectStroke': anychart.core.defaultTheme.defaultSelectStroke,
+        'size': 4,
+        'hoverSize': 6,
+        'selectSize': 6,
+        'legendItem': {
+          'iconStroke': 'none'
+        },
+        'labels': {
+          'offsetY': 3
+        }
+      },
+      'bubble': {
+        'fill': anychart.core.defaultTheme.returnSourceColor70,
+        'hoverFill': anychart.core.defaultTheme.returnSourceColor50,
+        'displayNegative': false,
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'negativeFill': function() {
+          return anychart.color.darken(anychart.color.darken(anychart.color.darken(this['sourceColor'])));
+        },
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'hoverNegativeFill': function() {
+          return anychart.color.darken(anychart.color.darken(anychart.color.darken(anychart.color.darken(this['sourceColor']))));
+        },
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'selectNegativeFill': function() {
+          return anychart.color.darken(anychart.color.darken(anychart.color.darken(this['sourceColor'])));
+        },
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'negativeStroke': function() {
+          return anychart.color.darken(anychart.color.darken(anychart.color.darken(anychart.color.darken((this['sourceColor'])))));
+        },
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'hoverNegativeStroke': function() {
+          return anychart.color.darken(anychart.color.darken(anychart.color.darken(anychart.color.darken(anychart.color.darken(this['sourceColor'])))));
+        },
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'selectNegativeStroke': function() {
+          return anychart.color.darken(anychart.color.darken(anychart.color.darken(anychart.color.darken(this['sourceColor']))));
+        },
+        'negativeHatchFill': false,
+        'hoverNegativeHatchFill': null,
+        'selectNegativeHatchFill': null,
+        'legendItem': {
+          'iconStroke': 'none'
+        },
+        'labels': {
+          'anchor': 'center'
+        }
+      },
+      'areaLike': {
+        'fill': anychart.core.defaultTheme.returnSourceColor65,
+        'hoverFill': anychart.core.defaultTheme.returnSourceColor65,
+        'hoverMarkers': {
+          'enabled': true
+        },
+        'selectMarkers': {
+          'enabled': true
+        },
+        'legendItem': {
+          'iconStroke': 'none'
+        },
+        'stepDirection': 'center'
+      },
+      'barLike': {
+        'fill': anychart.core.defaultTheme.returnSourceColor85,
+        'hoverFill': anychart.core.defaultTheme.returnSourceColor65,
+        'legendItem': {
+          'iconStroke': 'none'
+        }
+      },
+      'lineLike': {
+        'hoverMarkers': {
+          'enabled': true
+        },
+        'selectMarkers': {
+          'enabled': true
+        },
+        'stepDirection': 'center'
+      },
+      'rangeLike': {
+        'labels': {
+          'format': anychart.core.defaultTheme.returnRangeLabelsContentFormatter,
+          'position': 'high'
+        },
+        'markers': {
+          'position': 'high'
+        },
+        'tooltip': {
+          'format': anychart.core.defaultTheme.returnRangeTooltipContentFormatter
+        }
+      },
+      'candlestick': {
+        'risingFill': anychart.core.defaultTheme.risingColor,
+        'risingStroke': anychart.core.defaultTheme.risingColor,
+        'hoverRisingFill': anychart.core.defaultTheme.returnLightenSourceColor,
+        'hoverRisingStroke': anychart.core.defaultTheme.returnDarkenSourceColor,
+        'fallingFill': anychart.core.defaultTheme.fallingColor,
+        'fallingStroke': anychart.core.defaultTheme.fallingColor,
+        'hoverFallingFill': anychart.core.defaultTheme.returnLightenSourceColor,
+        'hoverFallingStroke': anychart.core.defaultTheme.returnDarkenSourceColor,
+
+        'risingHatchFill': false,
+        'hoverRisingHatchFill': null,
+        'selectRisingHatchFill': null,
+        'fallingHatchFill': false,
+        'hoverFallingHatchFill': null,
+        'selectFallingHatchFill': null,
+        'selectFallingFill': anychart.core.defaultTheme.defaultSelectColor,
+        'selectRisingFill': anychart.core.defaultTheme.defaultSelectColor,
+        'selectRisingStroke': anychart.core.defaultTheme.defaultSelectColor,
+        'selectFallingStroke': anychart.core.defaultTheme.defaultSelectColor,
+        'tooltip': {
+          'format': anychart.core.defaultTheme.OHLCTooltipFormatter
+        },
+        'markers': {
+          'position': 'high'
+        },
+        'labels': {
+          'position': 'high',
+          'format': anychart.core.defaultTheme.returnX
+        }
+      },
+      'column': {
+        'isVertical': false,
+        'labels': {
+          'offsetY': 3
+        }
+      },
+      'ohlc': {
+        'risingStroke': anychart.core.defaultTheme.risingColor,
+        'hoverRisingStroke': anychart.core.defaultTheme.returnDarkenSourceColor,
+        'fallingStroke': anychart.core.defaultTheme.fallingColor,
+        'hoverFallingStroke': anychart.core.defaultTheme.returnDarkenSourceColor,
+        'selectRisingStroke': '3 ' + anychart.core.defaultTheme.defaultSelectColor,
+        'selectFallingStroke': '3 ' + anychart.core.defaultTheme.defaultSelectColor,
+        'tooltip': {
+          'format': anychart.core.defaultTheme.OHLCTooltipFormatter
+        },
+        'markers': {
+          'position': 'high'
+        },
+        'labels': {
+          'position': 'high',
+          'format': anychart.core.defaultTheme.returnX
+        }
+      },
+      'stick': {
+        'stroke': anychart.core.defaultTheme.returnStrokeSourceColor1
+      },
+      'jumpLine': {
+        'pointWidth': '100%'
+      },
+      'hilo': {
+        'pointWidth': 1
+      }
+    },
+    'chartLabels': [],
+    'maxBubbleSize': '20%',
+    'minBubbleSize': '5%',
+    'a11y': {
+      'enabled': true,
+      'titleFormat': anychart.core.defaultTheme.chartA11yTitleFormatter,
+      'mode': 'chart-elements'
+    },
+    'labels': {'enabled': false},
+    'hoverLabels': {'enabled': null},
+    'selectLabels': {'enabled': null},
+
+    'crossing': {
+      'stroke': 'none'
+    },
+
+    'defaultQuarterSettings': {
+      'enabled': false,
+      'zIndex': 1,
+      'fill': 'none',
+      'stroke': 'none',
+      'title': {
+        'padding': 5
+      },
+      'defaultLabelSettings': {
+        'text': 'Quarter label',
+        'anchor': 'center',
+        'position': 'center'
+      },
+      'margin': {},
+      'padding': {}
+    },
+
+    'quarters': {
+      'rightTop': {
+        'fill': '#e3f2fd',
+        'title': {
+          'orientation': 'top'
+        }
+      },
+      'leftTop': {
+        'title': {
+          'orientation': 'top'
+        }
+      },
+      'leftBottom': {
+        'fill': '#e3f2fd',
+        'title': {
+          'orientation': 'bottom'
+        }
+      },
+      'rightBottom': {
+        'title': {
+          'orientation': 'bottom'
+        }
+      }
+    },
+    'selectMarqueeFill': '#d3d3d3 0.4',
+    'selectMarqueeStroke': '#d3d3d3'
+  },
+
+  'cartesianBase': {
+    'defaultSeriesSettings': {
+      'base': {
+        'labels': {
+          'format': anychart.core.defaultTheme.VALUE_TOKEN_DECIMALS_COUNT_2
+        }
+      },
+      'bar': {
+        'isVertical': true,
+        'labels': {
+          'offsetY': 3
+        },
+        'tooltip': {
+          'anchor': 'left-top'
+        }
+      },
+      'column': {
+        'tooltip': {
+          'anchor': 'left-top'
+        }
+      },
+      'rangeColumn': {
+        'isVertical': false,
+        'tooltip': {
+          'anchor': 'left-top',
+          'offsetX': 10
+        }
+      },
+      'rangeBar': {
+        'isVertical': true,
+        'labels': {
+          'offsetY': 3
+        }
+      },
+      'box': {
+        'medianStroke': anychart.core.defaultTheme.returnDarkenSourceColor,
+        'hoverMedianStroke': anychart.core.defaultTheme.returnSourceColor,
+        'selectMedianStroke': anychart.core.defaultTheme.defaultSelectColor,
+        'stemStroke': anychart.core.defaultTheme.returnDarkenSourceColor,
+        'hoverStemStroke': anychart.core.defaultTheme.returnSourceColor,
+        'selectStemStroke': anychart.core.defaultTheme.defaultSelectColor,
+        'whiskerStroke': anychart.core.defaultTheme.returnDarkenSourceColor,
+        'hoverWhiskerStroke': anychart.core.defaultTheme.returnDarkenSourceColor,
+        'selectWhiskerStroke': anychart.core.defaultTheme.defaultSelectColor,
+        'whiskerWidth': 0,
+        'hoverWhiskerWidth': null,
+        'selectWhiskerWidth': null,
+        'outlierMarkers': {
+          'enabled': true,
+          'disablePointerEvents': false,
+          'position': 'center',
+          'rotation': 0,
+          'anchor': 'center',
+          'offsetX': 0,
+          'offsetY': 0,
+          'type': 'circle',
+          'size': 3,
+          'positionFormatter': anychart.core.defaultTheme.returnValue
+        },
+        'hoverOutlierMarkers': {
+          'enabled': null,
+          'size': 4
+        },
+        'selectOutlierMarkers': {
+          'enabled': null,
+          'size': 4,
+          'fill': anychart.core.defaultTheme.defaultSelectColor,
+          'stroke': anychart.core.defaultTheme.defaultSelectStroke
+        },
+        'markers': {
+          'position': 'median'
+        },
+        'labels': {
+          'position': 'highest',
+          /**
+           * @this {*}
+           * @return {*}
+           */
+          'format': function() {
+            return 'Highest: ' + anychart.core.defaultTheme.locNum(this['highest']) + '\n' +
+                'Median: ' + anychart.core.defaultTheme.locNum(this['median']) + '\n' +
+                'Lowest: ' + anychart.core.defaultTheme.locNum(this['lowest']);
+          }
+        },
+        'tooltip': {
+          /**
+           * @this {*}
+           * @return {*}
+           */
+          'titleFormat': function() {
+            return this['name'] || this['x'];
+          },
+          /**
+           * @this {*}
+           * @return {*}
+           */
+          'format': function() {
+            return 'Lowest: ' + this['valuePrefix'] + anychart.core.defaultTheme.locNum(this['lowest']) + this['valuePostfix'] + '\n' +
+                'Q1: ' + this['valuePrefix'] + anychart.core.defaultTheme.locNum(this['q1']) + this['valuePostfix'] + '\n' +
+                'Median: ' + this['valuePrefix'] + anychart.core.defaultTheme.locNum(this['median']) + this['valuePostfix'] + '\n' +
+                'Q3: ' + this['valuePrefix'] + anychart.core.defaultTheme.locNum(this['q3']) + this['valuePostfix'] + '\n' +
+                'Highest: ' + this['valuePrefix'] + anychart.core.defaultTheme.locNum(this['highest']) + this['valuePostfix'];
+          }
+        }
+      }
+    },
+    'defaultXAxisSettings': {
+      'orientation': 'bottom',
+      'title': {
+        'text': 'X-Axis',
+        'padding': {'top': 5, 'right': 0, 'bottom': 0, 'left': 0}
+      },
+      'labels': {
+        'format': anychart.core.defaultTheme.VALUE_TOKEN_DECIMALS_COUNT_10
+      },
+      'scale': 0
+    },
+    'defaultYAxisSettings': {
+      'orientation': 'left',
+      'title': {
+        'text': 'Y-Axis',
+        'padding': {'top': 0, 'right': 0, 'bottom': 5, 'left': 0}
+      },
+      'labels': {
+        'format': anychart.core.defaultTheme.VALUE_TOKEN_DECIMALS_COUNT_10
+      },
+      'scale': 1
+    },
+    'defaultAnnotationSettings': {},
+    'annotations': {
+      'annotationsList': [],
+      'zIndex': 2000
+    },
+    'xAxes': [{}],
+    'yAxes': [{}],
+    'grids': [],
+    'minorGrids': [],
+    'series': [],
+    'lineAxesMarkers': [],
+    'rangeAxesMarkers': [],
+    'textAxesMarkers': [],
+    'xScale': 0,
+    'yScale': 1,
+    'barsPadding': 0.4,
+    'barGroupsPadding': 0.8,
+    'maxBubbleSize': '20%',
+    'minBubbleSize': '5%',
+    'isVertical': false,
+    'scales': [
+      {
+        'type': 'ordinal'
+      },
+      {
+        'type': 'linear'
+      }
+    ],
+    'crosshair': {
+      'enabled': false,
+      'displayMode': 'float',
+      'xStroke': anychart.core.defaultTheme.colorStrokeExtraBright,
+      'yStroke': anychart.core.defaultTheme.colorStrokeExtraBright,
+      'zIndex': 41
+    },
+    'xZoom': {
+      'continuous': true,
+      'startRatio': 0,
+      'endRatio': 1
+    },
+    'a11y': {
+      'titleFormat': anychart.core.defaultTheme.cartesianBaseA11yTitleFormatter
+    }
+  },
+
+  'pieFunnelPyramidBase': {
+    'mode3d': false,
+    'animation': {
+      'duration': 500
+    },
+    'fill': anychart.core.defaultTheme.returnSourceColor,
+    'stroke': 'none',
+    'hoverFill': anychart.core.defaultTheme.returnLightenSourceColor,
+    'hoverStroke': anychart.core.defaultTheme.returnSourceColor,
+    'selectFill': anychart.core.defaultTheme.defaultSelectColor,
+    'selectStroke': anychart.core.defaultTheme.defaultSelectStroke,
+    'connectorStroke': anychart.core.defaultTheme.colorStrokeNormal,
+    'overlapMode': 'no-overlap',
+    'connectorLength': 20,
+    'baseWidth': '70%',
+    'neckWidth': null,
+    'neckHeight': null,
+    'pointsPadding': 0,
+    'hatchFill': null,
+    'forceHoverLabels': false,
+    'labels': {
+      'enabled': true,
+      'fontColor': null,
+      'position': 'inside',
+      'disablePointerEvents': false,
+      'autoRotate': false,
+      'zIndex': 34,
+      /**
+       * @this {*}
+       * @return {*}
+       */
+      'format': function() {
+        return this['name'] ? this['name'] : this['x'];
+      }
+    },
+    'outsideLabels': {
+      'disablePointerEvents': false,
+      'autoColor': anychart.core.defaultTheme.fontColorBright
+    },
+    'insideLabels': {
+      'disablePointerEvents': true,
+      'autoColor': anychart.core.defaultTheme.fontColorReversedNormal
+    },
+    'hoverLabels': {
+      'enabled': null
+    },
+    'selectLabels': {
+      'enabled': null
+    },
+    'legend': {
+      'enabled': true,
+      'padding': {
+        'top': 10,
+        'right': 10,
+        'bottom': 0,
+        'left': 10
+      },
+      'position': 'bottom'
+    },
+    'markers': {
+      'enabled': false,
+      'position': 'center',
+      'positionFormatter': anychart.core.defaultTheme.returnValue,
+      'zIndex': 33
+    },
+    'hoverMarkers': {
+      'enabled': null
+    },
+    'selectMarkers': {
+      'enabled': null
+    },
+    'tooltip': {
+      'title': {'enabled': true},
+      'separator': {'enabled': true},
+      /**
+       * @this {*}
+       * @return {*}
+       */
+      'titleFormat': function() {
+        return this['name'] || this['x'];
+      },
+      /**
+       * @this {*}
+       * @return {*}
+       */
+      'format': function() {
+        return 'Value: ' + anychart.core.defaultTheme.locNum(this['value']) + '\nPercent Value: ' + (this['value'] * 100 / this['getStat']('sum')).toFixed(1) + '%';
+      }
+    },
+    'interactivity': {
+      'hoverMode': 'single'
+    }
+  },
+
+  'defaultScrollBar': {
+    'barSize': 10,
+    'backgroundFill': '#e0e0e0',
+    'backgroundStroke': '#d5d5d5',
+    'sliderFill': '#d5d5d5',
+    'sliderStroke': '#656565',
+    'mouseOverOpacity': 0.45,
+    'mouseOutOpacity': 0.25,
+    'handlePositionChange': true,
+    'startRatio': '0',
+    'endRatio': '1',
+    'buttonsVisible': false,
+    'cornersRadius': 5
+  },
+
+  'defaultDataGrid': {
+    'isStandalone': true,
+    'headerHeight': 25,
+    'backgroundFill': '#fff',
+    'columnStroke': '#cecece',
+    'rowStroke': '#cecece',
+    'rowOddFill': '#fff',
+    'rowEvenFill': '#fff',
+    'rowFill': '#fff',
+    'hoverFill': '#F8FAFB',
+    'rowSelectedFill': '#ebf1f4',
+    'zIndex': 5,
+    'editing': false,
+    'editStructurePreviewFill': {
+      'color': '#4285F4',
+      'opacity': 0.2
+    },
+    'editStructurePreviewStroke': {
+      'color': '#4285F4',
+      'thickness': 2
+    },
+    'editStructurePreviewDashStroke': {
+      'color': '#4285F4',
+      'dash': '4 4'
+    },
+    'headerFill': '#f7f7f7',
+    'tooltip': {
+      'padding': 5,
+      'title': {
+        'enabled': true,
+        'fontSize': '14px',
+        'fontWeight': 'normal',
+        'fontColor': '#e5e5e5'
+      },
+      'separator': {
+        'enabled': true
+      },
+      /**
+       * @this {*}
+       * @return {string}
+       */
+      'format': function() {
+        var name = this['name'];
+        return (name !== void 0) ? name + '' : '';
+      }
+    },
+    'defaultColumnSettings': {
+      'width': 90,
+      'buttonCursor': 'pointer',
+      'cellTextSettings': {
+        'enabled': true,
+        'wordBreak': 'break-all',
+        'anchor': 'left-top',
+        'vAlign': 'middle',
+        'padding': {
+          'top': 0,
+          'right': 5,
+          'bottom': 0,
+          'left': 5
+        },
+        'background': null,
+        'fontSize': 11,
+        'disablePointerEvents': true
+      },
+      'depthPaddingMultiplier': 0,
+      'collapseExpandButtons': false,
+      'title': {
+        'enabled': true,
+        'margin': 0,
+        'vAlign': 'middle',
+        'background': {
+          'enabled': false
+        }
+      },
+      /**
+       * @this {*}
+       * @return {string}
+       */
+      'format': function() {
+        return '';
+      }
+    },
+    'columns': [
+      {
+        'width': 50,
+        /**
+         * @this {*}
+         * @return {string}
+         */
+        'format': function() {
+          var val = this['item']['meta']('index');
+          return (val != null) ? (val + 1) + '' : '';
+        },
+        'title': {
+          'text': '#'
+        }
+      },
+      {
+        'width': 170,
+        'collapseExpandButtons': true,
+        'depthPaddingMultiplier': 15,
+        /**
+         * @this {*}
+         * @return {string}
+         */
+        'format': function() {
+          var val = this['name'];
+          return (val != null) ? (val + '') : '';
+        },
+        'title': {
+          'text': 'Name'
+        }
+      }
+    ]
+  },
+
+  'defaultTimeline': {
+    'isStandalone': true,
+    'columnStroke': '#cecece',
+    'rowStroke': '#cecece',
+    'backgroundFill': 'none',
+    'rowOddFill': '#fff',
+    'rowEvenFill': '#fff',
+    'rowFill': '#fff',
+
+    'hoverFill': '#F8FAFB',
+    'rowSelectedFill': '#ebf1f4',
+
+    'zIndex': 5,
+    'headerHeight': 70,
+    'editing': false,
+
+    'connectorPreviewStroke': {
+      'color': '#545f69',
+      'dash': '3 3'
+    },
+
+    'editPreviewFill': {
+      'color': '#fff',
+      'opacity': 0.00001
+    },
+
+    'editPreviewStroke': {
+      'color': '#aaa',
+      'dash': '3 3'
+    },
+
+    'editProgressFill': '#EAEAEA',
+    'editProgressStroke': '#545f69',
+    'editIntervalThumbFill': '#EAEAEA',
+    'editIntervalThumbStroke': '#545f69',
+    'editConnectorThumbFill': '#EAEAEA',
+    'editConnectorThumbStroke': '#545f69',
+
+    'editStructurePreviewFill': {
+      'color': '#4285F4',
+      'opacity': 0.2
+    },
+
+    'editStructurePreviewStroke': {
+      'color': '#4285F4',
+      'thickness': 2
+    },
+
+    'editStructurePreviewDashStroke': {
+      'color': '#4285F4',
+      'dash': '4 4'
+    },
+
+    'baseFill': '#7ec1f5',
+    'baseStroke': '#74b2e2',
+    'progressFill': '#1976d2',
+    'progressStroke': {
+      'color': '#fff',
+      'opacity': 0.00001
+    },
+
+    'editStartConnectorMarkerType': 'circle',
+    'editStartConnectorMarkerSize': 10,
+    'editStartConnectorMarkerHorizontalOffset': 0,
+    'editStartConnectorMarkerVerticalOffset': 0,
+    'editFinishConnectorMarkerType': 'circle',
+    'editFinishConnectorMarkerSize': 10,
+    'editFinishConnectorMarkerHorizontalOffset': 0,
+    'editFinishConnectorMarkerVerticalOffset': 0,
+    'editIntervalWidth': 3,
+
+    'baselineFill': '#d5ebfc',
+    'baselineStroke': '#bfd1e0',
+    'parentFill': '#455a64',
+    'parentStroke': '#2f3f46',
+    'milestoneFill': '#ffa000',
+    'milestoneStroke': '#d26104',
+    'connectorFill': '#545f69',
+    'connectorStroke': '#545f69',
+    'selectedElementFill': '#ef6c00',
+    'selectedElementStroke': '#bc5704',
+    'selectedConnectorStroke': '2 #bc5704',
+    'baselineAbove': false,
+    'tooltip': {
+      'padding': 5,
+      'title': {
+        'enabled': true,
+        'fontSize': '14px',
+        'fontWeight': 'normal',
+        'fontColor': '#e5e5e5'
+      },
+      'separator': {
+        'enabled': true
+      },
+      'zIndex': 100,
+      'allowLeaveChart': false
+    },
+    'labels': {
+      'enabled': true,
+      'anchor': 'left-center',
+      'position': 'right-center',
+      'padding': {
+        'top': 3,
+        'right': 5,
+        'bottom': 3,
+        'left': 5
+      },
+      'vAlign': 'middle',
+      'background': null,
+      'fontSize': 11,
+      'zIndex': 40,
+      'disablePointerEvents': true
+    },
+    'markers': {
+      'anchor': 'center-top',
+      'zIndex': 50,
+      'type': 'star5',
+      'fill': '#ff0',
+      'stroke': '2 red'
+    },
+    'defaultLineMarkerSettings': {
+      'layout': 'vertical',
+      'zIndex': 1.5
+    },
+    'defaultRangeMarkerSettings': {
+      'layout': 'vertical',
+      'zIndex': 1
+    },
+    'defaultTextMarkerSettings': {
+      'layout': 'vertical',
+      'zIndex': 2
+    },
+    'header': {
+      'backgroundFill': '#cecece',
+      'levelsSeparationStroke': '#cecece',
+
+      'topLevel': {
+        'tileFill': '#f7f7f7',
+        'tilesSeparationStroke': '#cecece',
+        'labels': {
+          'enabled': true,
+          'anchor': 'left-top',
+          'fontSize': 10,
+          'vAlign': 'middle',
+          'padding': {
+            'top': 0,
+            'right': 5,
+            'bottom': 0,
+            'left': 5
+          },
+          'background': null,
+          'disablePointerEvents': true
+        }
+      },
+
+      'midLevel': {
+        'tileFill': '#f7f7f7',
+        'tilesSeparationStroke': '#cecece',
+        'labels': {
+          'enabled': true,
+          'anchor': 'left-top',
+          'fontSize': 10,
+          'vAlign': 'middle',
+          'padding': {
+            'top': 0,
+            'right': 5,
+            'bottom': 0,
+            'left': 5
+          },
+          'background': null,
+          'disablePointerEvents': true
+        }
+      },
+
+      'lowLevel': {
+        'tileFill': '#f7f7f7',
+        'tilesSeparationStroke': '#cecece',
+        'labels': {
+          'enabled': true,
+          'anchor': 'left-top',
+          'fontSize': 10,
+          'vAlign': 'middle',
+          'padding': {
+            'top': 0,
+            'right': 5,
+            'bottom': 0,
+            'left': 5
+          },
+          'background': null,
+          'disablePointerEvents': true
+        }
+      }
+
+    }
+  },
+
+  // standalone components
+  'standalones': {
+    'background': {
+      'enabled': true,
+      'zIndex': 0
+    },
+    'label': {
+      'enabled': true,
+      'text': 'Label text',
+      'padding': 0,
+      'width': null,
+      'height': null,
+      'anchor': 'left-top',
+      'position': 'left-top',
+      'offsetX': 0,
+      'offsetY': 0,
+      'minFontSize': 8,
+      'maxFontSize': 72,
+      'adjustFontSize': {
+        'width': false,
+        'height': false
+      },
+      'rotation': 0,
+      'zIndex': 0
+    },
+    'labelsFactory': {
+      'enabled': true,
+      'zIndex': 0
+    },
+    'legend': {
+      'enabled': true,
+      'zIndex': 0
+    },
+    'markersFactory': {
+      'enabled': true,
+      'zIndex': 0
+    },
+    'title': {
+      'enabled': true,
+      'zIndex': 0
+    },
+    'linearAxis': {
+      'enabled': true,
+      'zIndex': 0,
+      'ticks': {'enabled': true},
+      'minorTicks': {'enabled': true}
+    },
+    'polarAxis': {
+      'enabled': true,
+      'startAngle': 0,
+      'zIndex': 0,
+      'ticks': {'enabled': true},
+      'minorTicks': {'enabled': true}
+    },
+    'radarAxis': {
+      'enabled': true,
+      'startAngle': 0,
+      'zIndex': 0,
+      'ticks': {'enabled': true},
+      'minorTicks': {'enabled': true}
+    },
+    'radialAxis': {
+      'enabled': true,
+      'startAngle': 0,
+      'zIndex': 0,
+      'ticks': {'enabled': true},
+      'minorTicks': {'enabled': true},
+      'minorLabels': {
+        'padding': {
+          'top': 1,
+          'right': 1,
+          'bottom': 0,
+          'left': 1
+        }
+      }
+    },
+    'linearGrid': {
+      'enabled': true,
+      'scale': null,
+      'zIndex': 0
+    },
+    'polarGrid': {
+      'enabled': true,
+      'layout': 'circuit',
+      'zIndex': 0
+    },
+    'radarGrid': {
+      'enabled': true,
+      'layout': 'circuit',
+      'zIndex': 0
+    },
+    'lineAxisMarker': {
+      'enabled': true,
+      'zIndex': 0
+    },
+    'textAxisMarker': {
+      'enabled': true,
+      'zIndex': 0
+    },
+    'rangeAxisMarker': {
+      'enabled': true,
+      'zIndex': 0
+    },
+    'scroller': {
+      'enabled': true
+    }
+  }
+});
