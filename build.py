@@ -807,7 +807,7 @@ def __stat(*args, **kwargs):
 
         print '  Building module binaries'
         stopwatch('  ')(__compile)(js_files=False, version=True, additional_params=additional_flags,
-                                   flag_file=files_list_file_name)
+                                   flag_file=files_list_file_name, perf_mon=False, dev_edition=False)
 
         # os.remove(files_list_file_name)
 
