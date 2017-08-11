@@ -10,15 +10,6 @@ goog.provide('anychart.themes.monochrome');
    * @this {*}
    * @return {*}
    */
-  var returnSourceColor = function() {
-    return this['sourceColor'];
-  };
-
-
-  /**
-   * @this {*}
-   * @return {*}
-   */
   var returnSourceColor60 = function() {
     return global['anychart']['color']['setOpacity'](this['sourceColor'], 0.6, true);
   };

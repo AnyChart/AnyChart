@@ -200,8 +200,9 @@ def __get_modules_config():
 @memoize
 def __get_themes_list():
     themes_list = []
+    restricted = ['merging.js', 'defaultTheme.js']
     for f in os.listdir(THEMES_PATH):
-        if f.endswith('.js') and not f.startswith('merging') and not f.startswith('template'):
+        if f.endswith('.js') and f not in restricted:
             themes_list.append(f[:-3])
     return themes_list
 
