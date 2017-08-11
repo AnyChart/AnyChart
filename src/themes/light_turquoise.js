@@ -10,15 +10,6 @@ goog.provide('anychart.themes.light_turquoise');
    * @this {*}
    * @return {*}
    */
-  var returnSourceColor = function() {
-    return this['sourceColor'];
-  };
-
-
-  /**
-   * @this {*}
-   * @return {*}
-   */
   var returnSourceColor50 = function() {
     return global['anychart']['color']['setOpacity'](this['sourceColor'], 0.5, true);
   };

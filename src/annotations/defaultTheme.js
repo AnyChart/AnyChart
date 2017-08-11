@@ -1,4 +1,5 @@
 goog.provide('anychart.annotationsModule.defaultTheme');
+goog.require('anychart.core.defaultTheme');
 
 
 goog.mixin(goog.global['anychart']['themes']['defaultTheme']['chart'], {
