@@ -51,7 +51,6 @@
       ]
     },
     "core": {
-      "includeTheme": true,
       "skipCoreCheck": true,
       "entry": "anychart.core.entry",
       "deps": []
@@ -227,6 +226,187 @@
         "core",
         "cartesian"
       ]
+    },
+    "theme-annotations": {
+      "entry": "anychart.annotationsModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-bullet": {
+      "entry": "anychart.bulletModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-cartesian": {
+      "entry": "anychart.cartesianModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-cartesian-3d": {
+      "entry": "anychart.cartesian3dModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-circular-gauge": {
+      "entry": "anychart.circularGaugeModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-color-scales": {
+      "entry": "anychart.colorScalesModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-core": {
+      "entry": "anychart.core.defaultTheme",
+      "deps": [
+        "core"
+      ]
+    },
+    "theme-gantt": {
+      "entry": "anychart.ganttModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-heatmap": {
+      "entry": "anychart.heatmapModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-linear-gauge": {
+      "entry": "anychart.linearGaugeModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-map": {
+      "entry": "anychart.mapModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-mekko": {
+      "entry": "anychart.mekkoModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-pareto": {
+      "entry": "anychart.paretoModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-pert": {
+      "entry": "anychart.pertModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-pie": {
+      "entry": "anychart.pieModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-polar": {
+      "entry": "anychart.polarModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-pyramid-funnel": {
+      "entry": "anychart.pyramidFunnelModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-radar": {
+      "entry": "anychart.radarModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-resource": {
+      "entry": "anychart.resourceModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-scatter": {
+      "entry": "anychart.scatterModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-sparkline": {
+      "entry": "anychart.sparklineModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-stock": {
+      "entry": "anychart.stockModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-tag-cloud": {
+      "entry": "anychart.tagCloudModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-treemap": {
+      "entry": "anychart.treemapModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-venn": {
+      "entry": "anychart.vennModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-waterfall": {
+      "entry": "anychart.waterfallModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
     }
   },
   "modules": {
@@ -234,22 +414,57 @@
       "type": "required",
       "parts": [
         "core",
+        "theme-core",
         "pie",
+        "theme-pie",
         "cartesian",
-        "scatter"
+        "theme-cartesian",
+        "scatter",
+        "theme-scatter"
       ]
     },
     "anychart-core": {
       "type": "required",
       "parts": [
-        "core"
+        "core",
+        "theme-core"
       ]
     },
-
+    "anychart-default-theme": {
+      "type": "required",
+      "parts": [
+        "theme-core",
+        "theme-annotations",
+        "theme-bullet",
+        "theme-cartesian",
+        "theme-cartesian-3d",
+        "theme-circular-gauge",
+        "theme-gantt",
+        "theme-heatmap",
+        "theme-linear-gauge",
+        "theme-map",
+        "theme-mekko",
+        "theme-pareto",
+        "theme-pert",
+        "theme-pie",
+        "theme-polar",
+        "theme-pyramid-funnel",
+        "theme-radar",
+        "theme-resource",
+        "theme-scatter",
+        "theme-sparkline",
+        "theme-stock",
+        "theme-tag-cloud",
+        "theme-treemap",
+        "theme-venn",
+        "theme-waterfall"
+      ]
+    },
     "anychart-annotations": {
       "type": "feature",
       "parts": [
-        "annotations"
+        "annotations",
+        "theme-annotations"
       ]
     },
     "anychart-chart-editor": {
@@ -298,142 +513,169 @@
     "anychart-bullet": {
       "type": "chart-type",
       "parts": [
-        "bullet"
+        "bullet",
+        "theme-bullet"
       ]
     },
     "anychart-cartesian-3d": {
       "type": "chart-type",
       "parts": [
-        "cartesian-3d"
+        "cartesian-3d",
+        "theme-cartesian-3d"
       ]
     },
     "anychart-circular-gauge": {
       "type": "chart-type",
       "parts": [
-        "circular-gauge"
+        "circular-gauge",
+        "theme-circular-gauge"
       ]
     },
     "anychart-linear-gauge": {
       "type": "chart-type",
       "parts": [
         "color-scales",
-        "linear-gauge-part"
+        "theme-color-scales",
+        "linear-gauge-part",
+        "theme-linear-gauge"
       ]
     },
     "anychart-mekko": {
       "type": "chart-type",
       "parts": [
-        "mekko"
+        "mekko",
+        "theme-mekko"
       ]
     },
     "anychart-pareto": {
       "type": "chart-type",
       "parts": [
-        "pareto"
+        "pareto",
+        "theme-pareto"
       ]
     },
     "anychart-pyramid-funnel": {
       "type": "chart-type",
       "parts": [
-        "pyramid-funnel"
+        "pyramid-funnel",
+        "theme-pyramid-funnel"
       ]
     },
     "anychart-resource": {
       "type": "chart-type",
       "parts": [
-        "resource"
+        "resource",
+        "theme-resource"
       ]
     },
     "anychart-sparkline": {
       "type": "chart-type",
       "parts": [
-        "sparkline"
+        "sparkline",
+        "theme-sparkline"
       ]
     },
     "anychart-stock": {
       "type": "chart-type",
       "parts": [
-        "stock"
+        "stock",
+        "theme-stock"
       ]
     },
     "anychart-venn": {
       "type": "chart-type",
       "parts": [
-        "venn"
+        "venn",
+        "theme-venn"
       ]
     },
     "anychart-waterfall": {
       "type": "chart-type",
       "parts": [
-        "waterfall"
+        "waterfall",
+        "theme-waterfall"
       ]
     },
     "anychart-cartesian": {
       "type": "chart-type",
       "parts": [
-        "cartesian"
+        "cartesian",
+        "theme-cartesian"
       ]
     },
     "anychart-scatter": {
       "type": "chart-type",
       "parts": [
         "cartesian",
-        "scatter"
+        "theme-cartesian",
+        "scatter",
+        "theme-scatter"
       ]
     },
     "anychart-pie": {
       "type": "chart-type",
       "parts": [
-        "pie"
+        "pie",
+        "theme-pie"
       ]
     },
     "anychart-radar": {
       "type": "chart-type",
       "parts": [
         "radar-polar-base",
-        "radar-part"
+        "radar-part",
+        "theme-radar"
       ]
     },
     "anychart-polar": {
       "type": "chart-type",
       "parts": [
         "radar-polar-base",
-        "polar-part"
+        "polar-part",
+        "theme-polar"
       ]
     },
     "anychart-gantt": {
       "type": "chart-type",
       "parts": [
         "tree-data",
-        "gantt-part"
+        "gantt-part",
+        "theme-gantt"
       ]
     },
     "anychart-heatmap": {
       "type": "chart-type",
       "parts": [
         "color-scales",
-        "heatmap-part"
+        "theme-color-scales",
+        "heatmap-part",
+        "theme-heatmap"
       ]
     },
     "anychart-map": {
       "type": "chart-type",
       "parts": [
         "color-scales",
-        "map-part"
+        "theme-color-scales",
+        "map-part",
+        "theme-map"
       ]
     },
     "anychart-pert": {
       "type": "chart-type",
       "parts": [
         "tree-data",
-        "pert"
+        "pert",
+        "theme-pert"
       ]
     },
     "anychart-tag-cloud": {
       "type": "chart-type",
       "parts": [
         "color-scales",
-        "tag-cloud-part"
+        "theme-color-scales",
+        "tag-cloud-part",
+        "theme-tag-cloud"
       ]
     },
     "anychart-treemap": {
@@ -441,7 +683,9 @@
       "parts": [
         "tree-data",
         "color-scales",
-        "treemap-part"
+        "theme-color-scales",
+        "treemap-part",
+        "theme-treemap"
       ]
     }
   }

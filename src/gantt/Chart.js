@@ -751,7 +751,7 @@ anychart.ganttModule.Chart.prototype.splitter = function(opt_value) {
     this.splitter_.listen(anychart.enums.EventType.SPLITTER_CHANGE, function() {
       //This also stores current position for case if dg is being disabled.
       //Here we don't check if newPosition == oldPosition because it is handled by splitter.
-      ths.splitterPosition_ = Math.round(ths.splitter().position() * this.pixelBoundsCache_.width);
+      ths.setOption('splitterPosition', Math.round(ths.splitter().position() * ths.getPixelBounds().width));
       ths.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
     });
 
@@ -972,7 +972,9 @@ anychart.ganttModule.Chart.prototype.drawContent = function(bounds) {
     if (bounds.width > 0) {
       var dgWidth = Math.round(anychart.utils.normalizeSize(/** @type {number|string} */ (this.getOption('splitterPosition')), bounds.width));
       var dgRatio = goog.math.clamp(dgWidth / bounds.width, 0, 1);
+      this.splitter().handlePositionChange(false);
       this.splitter().position(dgRatio);
+      this.splitter().handlePositionChange(true);
       this.markConsistent(anychart.ConsistencyState.GANTT_SPLITTER_POSITION);
     }
   }

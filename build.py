@@ -339,6 +339,7 @@ def __compile(entry_point=None, output=None, js_files=True, level="ADVANCED_OPTI
                         os.path.join(CLOSURE_SOURCE_PATH, '**.js'),
                         '!' + os.path.join(CLOSURE_SOURCE_PATH, '**_test.js'),
                         os.path.join(GRAPHICS_SRC_PATH, '**.js')]
+            commands.append('--dependency_mode=STRICT')
         commands.extend(map(make_js_file, js_files))
 
     if externs is not None:
@@ -451,11 +452,8 @@ def __make_manifest(module_name, files, theme_name='none', gen_manifest=False, a
 
     put_in_order(entry_point)
 
-    if theme_name is not None and theme_name is not 'none':
-        theme = os.path.join(SRC_PATH, 'themes', theme_name + '.js')
-        if not os.path.exists(theme):
-            theme = os.path.join(SRC_PATH, 'themes', 'defaultTheme.js')
-        all_files.append(theme)
+    # if theme_name is not None and theme_name is not 'none':
+    #     put_in_order(__get_theme_entry_point(theme_name))
 
     module_files = []
     for line in all_files:
@@ -807,7 +805,7 @@ def __stat(*args, **kwargs):
 
         print '  Building module binaries'
         stopwatch('  ')(__compile)(js_files=False, version=True, additional_params=additional_flags,
-                                   flag_file=files_list_file_name)
+                                   flag_file=files_list_file_name, perf_mon=False, dev_edition=False)
 
         # os.remove(files_list_file_name)
 
