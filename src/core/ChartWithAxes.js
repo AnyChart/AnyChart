@@ -65,13 +65,25 @@ anychart.core.ChartWithAxes = function(joinData) {
    * @type {Array.<anychart.core.Grid>|Array.<anychart.cartesian3dModule.Grid>}
    * @private
    */
-  this.grids_ = [];
+  this.xGrids_ = [];
 
   /**
    * @type {Array.<anychart.core.Grid>|Array.<anychart.cartesian3dModule.Grid>}
    * @private
    */
-  this.minorGrids_ = [];
+  this.yGrids_ = [];
+
+  /**
+   * @type {Array.<anychart.core.Grid>|Array.<anychart.cartesian3dModule.Grid>}
+   * @private
+   */
+  this.xMinorGrids_ = [];
+
+  /**
+   * @type {Array.<anychart.core.Grid>|Array.<anychart.cartesian3dModule.Grid>}
+   * @private
+   */
+  this.yMinorGrids_ = [];
 
   /**
    * Crosslines element.
@@ -168,7 +180,7 @@ anychart.core.ChartWithAxes.prototype.isVertical = function(opt_value) {
         }
       }
 
-      var items = goog.array.concat(this.grids_, this.minorGrids_, this.lineAxesMarkers_, this.rangeAxesMarkers_, this.textAxesMarkers_);
+      var items = goog.array.concat(this.xGrids_, this.yGrids_, this.xMinorGrids_, this.yMinorGrids_, this.lineAxesMarkers_, this.rangeAxesMarkers_, this.textAxesMarkers_);
       anychart.core.Base.suspendSignalsDispatching(items);
       for (i = items.length; i--;) {
         var item = items[i];
@@ -317,12 +329,12 @@ anychart.core.ChartWithAxes.prototype.createGridInstance = function() {
 
 
 /**
- * Getter/setter for grid.
+ * Getter/setter for xGrid.
  * @param {(Object|boolean|null|number)=} opt_indexOrValue Grid settings.
  * @param {(Object|boolean|null)=} opt_value Grid settings to set.
  * @return {!(anychart.core.Grid|anychart.cartesian3dModule.Grid|anychart.core.ChartWithAxes)} Grid instance by index or itself for method chaining.
  */
-anychart.core.ChartWithAxes.prototype.grid = function(opt_indexOrValue, opt_value) {
+anychart.core.ChartWithAxes.prototype.xGrid = function(opt_indexOrValue, opt_value) {
   var index, value;
   index = anychart.utils.toNumber(opt_indexOrValue);
   if (isNaN(index)) {
@@ -332,13 +344,13 @@ anychart.core.ChartWithAxes.prototype.grid = function(opt_indexOrValue, opt_valu
     index = /** @type {number} */(opt_indexOrValue);
     value = opt_value;
   }
-  var grid = this.grids_[index];
+  var grid = this.xGrids_[index];
   if (!grid) {
     grid = this.createGridInstance();
     grid.setChart(this);
     grid.setDefaultLayout(this.isVerticalInternal ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
     grid.setup(this.defaultGridSettings());
-    this.grids_[index] = grid;
+    this.xGrids_[index] = grid;
     this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal, this);
     this.invalidate(anychart.ConsistencyState.AXES_CHART_GRIDS | anychart.ConsistencyState.SCALE_CHART_SCALES_STATISTICS, anychart.Signal.NEEDS_REDRAW);
@@ -354,12 +366,12 @@ anychart.core.ChartWithAxes.prototype.grid = function(opt_indexOrValue, opt_valu
 
 
 /**
- * Getter/setter for minorGrid.
- * @param {(Object|boolean|null|number)=} opt_indexOrValue Minor grid settings.
- * @param {(Object|boolean|null)=} opt_value Minor grid settings to set.
- * @return {!(anychart.core.Grid|anychart.cartesian3dModule.Grid|anychart.core.ChartWithAxes)} Minor grid instance by index or itself for method chaining.
+ * Getter/setter for grid.
+ * @param {(Object|boolean|null|number)=} opt_indexOrValue Grid settings.
+ * @param {(Object|boolean|null)=} opt_value Grid settings to set.
+ * @return {!(anychart.core.Grid|anychart.cartesian3dModule.Grid|anychart.core.ChartWithAxes)} Grid instance by index or itself for method chaining.
  */
-anychart.core.ChartWithAxes.prototype.minorGrid = function(opt_indexOrValue, opt_value) {
+anychart.core.ChartWithAxes.prototype.yGrid = function(opt_indexOrValue, opt_value) {
   var index, value;
   index = anychart.utils.toNumber(opt_indexOrValue);
   if (isNaN(index)) {
@@ -369,13 +381,87 @@ anychart.core.ChartWithAxes.prototype.minorGrid = function(opt_indexOrValue, opt
     index = /** @type {number} */(opt_indexOrValue);
     value = opt_value;
   }
-  var grid = this.minorGrids_[index];
+  var grid = this.yGrids_[index];
+  if (!grid) {
+    grid = this.createGridInstance();
+    grid.setChart(this);
+    grid.setDefaultLayout(this.isVerticalInternal ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
+    grid.setup(this.defaultGridSettings());
+    this.yGrids_[index] = grid;
+    this.registerDisposable(grid);
+    grid.listenSignals(this.onGridSignal, this);
+    this.invalidate(anychart.ConsistencyState.AXES_CHART_GRIDS | anychart.ConsistencyState.SCALE_CHART_SCALES_STATISTICS, anychart.Signal.NEEDS_REDRAW);
+  }
+
+  if (goog.isDef(value)) {
+    grid.setup(value);
+    return this;
+  } else {
+    return grid;
+  }
+};
+
+
+/**
+ * Getter/setter for x minorGrid.
+ * @param {(Object|boolean|null|number)=} opt_indexOrValue Minor grid settings.
+ * @param {(Object|boolean|null)=} opt_value Minor grid settings to set.
+ * @return {!(anychart.core.Grid|anychart.cartesian3dModule.Grid|anychart.core.ChartWithAxes)} Minor grid instance by index or itself for method chaining.
+ */
+anychart.core.ChartWithAxes.prototype.xMinorGrid = function(opt_indexOrValue, opt_value) {
+  var index, value;
+  index = anychart.utils.toNumber(opt_indexOrValue);
+  if (isNaN(index)) {
+    index = 0;
+    value = opt_indexOrValue;
+  } else {
+    index = /** @type {number} */(opt_indexOrValue);
+    value = opt_value;
+  }
+  var grid = this.xMinorGrids_[index];
   if (!grid) {
     grid = this.createGridInstance();
     grid.setChart(this);
     grid.setDefaultLayout(this.isVerticalInternal ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
     grid.setup(this.defaultMinorGridSettings());
-    this.minorGrids_[index] = grid;
+    this.xMinorGrids_[index] = grid;
+    this.registerDisposable(grid);
+    grid.listenSignals(this.onGridSignal, this);
+    this.invalidate(anychart.ConsistencyState.AXES_CHART_GRIDS | anychart.ConsistencyState.SCALE_CHART_SCALES_STATISTICS, anychart.Signal.NEEDS_REDRAW);
+  }
+
+  if (goog.isDef(value)) {
+    grid.setup(value);
+    return this;
+  } else {
+    return grid;
+  }
+};
+
+
+/**
+ * Getter/setter for y minorGrid.
+ * @param {(Object|boolean|null|number)=} opt_indexOrValue Minor grid settings.
+ * @param {(Object|boolean|null)=} opt_value Minor grid settings to set.
+ * @return {!(anychart.core.Grid|anychart.cartesian3dModule.Grid|anychart.core.ChartWithAxes)} Minor grid instance by index or itself for method chaining.
+ */
+anychart.core.ChartWithAxes.prototype.yMinorGrid = function(opt_indexOrValue, opt_value) {
+  var index, value;
+  index = anychart.utils.toNumber(opt_indexOrValue);
+  if (isNaN(index)) {
+    index = 0;
+    value = opt_indexOrValue;
+  } else {
+    index = /** @type {number} */(opt_indexOrValue);
+    value = opt_value;
+  }
+  var grid = this.yMinorGrids_[index];
+  if (!grid) {
+    grid = this.createGridInstance();
+    grid.setChart(this);
+    grid.setDefaultLayout(this.isVerticalInternal ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
+    grid.setup(this.defaultMinorGridSettings());
+    this.yMinorGrids_[index] = grid;
     this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal, this);
     this.invalidate(anychart.ConsistencyState.AXES_CHART_GRIDS | anychart.ConsistencyState.SCALE_CHART_SCALES_STATISTICS, anychart.Signal.NEEDS_REDRAW);
@@ -404,7 +490,7 @@ anychart.core.ChartWithAxes.prototype.onGridSignal = function(event) {
  * @return {{vertical: number, horizontal: number}}
  */
 anychart.core.ChartWithAxes.prototype.calculateGridsThickness = function() {
-  var grids = this.grids_;
+  var grids = goog.array.concat(this.xGrids_, this.yGrids_);
   var maxVerticalThickness = 0;
   var maxHorizontalThickness = 0;
   for (var i = 0, len = grids.length; i < len; i++) {
@@ -737,8 +823,10 @@ anychart.core.ChartWithAxes.prototype.getAdditionalScales = function(scales, isX
       this.lineAxesMarkers_,
       this.rangeAxesMarkers_,
       this.textAxesMarkers_,
-      this.grids_,
-      this.minorGrids_);
+      this.xGrids_,
+      this.yGrids_,
+      this.xMinorGrids_,
+      this.yMinorGrids_);
   var scale, uid, i, isY;
   for (i = 0; i < elementsWithScale.length; i++) {
     var item = elementsWithScale[i];
@@ -1094,7 +1182,7 @@ anychart.core.ChartWithAxes.prototype.getBoundsChangedSignal = function() {
 anychart.core.ChartWithAxes.prototype.drawElements = function() {
   var i, count;
   if (this.hasInvalidationState(anychart.ConsistencyState.AXES_CHART_GRIDS)) {
-    var grids = goog.array.concat(this.grids_, this.minorGrids_);
+    var grids = goog.array.concat(this.yGrids_, this.xGrids_, this.xMinorGrids_, this.yMinorGrids_);
 
     for (i = 0, count = grids.length; i < count; i++) {
       var grid = grids[i];
@@ -1426,8 +1514,10 @@ anychart.core.ChartWithAxes.prototype.setupByJSONWithScales = function(config, s
   if (this.annotationsModule_)
     this.annotations(config['annotations']);
 
-  this.setupElementsWithScales(config['grids'], this.grid, scalesInstances);
-  this.setupElementsWithScales(config['minorGrids'], this.minorGrid, scalesInstances);
+  this.setupElementsWithScales(config['grids'], this.xGrid, scalesInstances);
+  this.setupElementsWithScales(config['grids'], this.yGrid, scalesInstances);
+  this.setupElementsWithScales(config['minorGrids'], this.xMinorGrid, scalesInstances);
+  this.setupElementsWithScales(config['minorGrids'], this.yMinorGrid, scalesInstances);
   this.setupElementsWithScales(config['xAxes'], this.xAxis, scalesInstances);
   this.setupElementsWithScales(config['yAxes'], this.yAxis, scalesInstances);
   this.setupElementsWithScales(config['lineAxesMarkers'], this.lineMarker, scalesInstances);
@@ -1456,8 +1546,10 @@ anychart.core.ChartWithAxes.prototype.serializeWithScales = function(json, scale
   this.serializeElementsWithScales(json, 'xAxes', this.xAxes_, this.serializeAxis, scales, scaleIds, axesIds);
   this.serializeElementsWithScales(json, 'yAxes', this.yAxes_, this.serializeAxis, scales, scaleIds, axesIds);
 
-  this.serializeElementsWithScales(json, 'grids', this.grids_, this.serializeGrid_, scales, scaleIds, axesIds);
-  this.serializeElementsWithScales(json, 'minorGrids', this.minorGrids_, this.serializeGrid_, scales, scaleIds, axesIds);
+  this.serializeElementsWithScales(json, 'grids', this.xGrids_, this.serializeGrid_, scales, scaleIds, axesIds);
+  this.serializeElementsWithScales(json, 'grids', this.yGrids_, this.serializeGrid_, scales, scaleIds, axesIds);
+  this.serializeElementsWithScales(json, 'minorGrids', this.xMinorGrids_, this.serializeGrid_, scales, scaleIds, axesIds);
+  this.serializeElementsWithScales(json, 'minorGrids', this.yMinorGrids_, this.serializeGrid_, scales, scaleIds, axesIds);
   this.serializeElementsWithScales(json, 'lineAxesMarkers', this.lineAxesMarkers_, this.serializeAxisMarker_, scales, scaleIds, axesIds);
   this.serializeElementsWithScales(json, 'rangeAxesMarkers', this.rangeAxesMarkers_, this.serializeAxisMarker_, scales, scaleIds, axesIds);
   this.serializeElementsWithScales(json, 'textAxesMarkers', this.textAxesMarkers_, this.serializeAxisMarker_, scales, scaleIds, axesIds);
@@ -1569,8 +1661,10 @@ anychart.core.ChartWithAxes.prototype.disposeInternal = function() {
       this.lineAxesMarkers_,
       this.rangeAxesMarkers_,
       this.textAxesMarkers_,
-      this.grids_,
-      this.minorGrids_,
+      this.xGrids_,
+      this.yGrids_,
+      this.xMinorGrids_,
+      this.yMinorGrids_,
       this.quarterSettings_,
       this.crossing_);
 
@@ -1579,8 +1673,10 @@ anychart.core.ChartWithAxes.prototype.disposeInternal = function() {
   this.lineAxesMarkers_ = null;
   this.rangeAxesMarkers_ = null;
   this.textAxesMarkers_ = null;
-  this.grids_ = null;
-  this.minorGrids_ = null;
+  this.xGrids_ = null;
+  this.yGrids_ = null;
+  this.xMinorGrids_ = null;
+  this.yMinorGrids_ = null;
   this.quarterSettings_ = null;
   this.crossing_ = null;
 
