@@ -2361,70 +2361,21 @@ anychart.stockModule.Plot.prototype.disposeInternal = function() {
 };
 
 
-anychart.stockModule.Plot.prototype.serializeGrid_ = function() {
-  
-}
-
-
-/** @inheritDoc */
-anychart.stockModule.Plot.prototype.serialize = function() {
-  var json = anychart.stockModule.Plot.base(this, 'serialize');
-  var scalesIds = {};
-  var scales = [];
-  var axesIds = [];
-
-  var scale;
-  var config;
-  var objId;
-  var i;
-  var axisId;
-  var axis;
-  var axisIndex;
-  var axisScale;
-  var axisOrientation;
-  var isHorizontal;
-
-  scalesIds[goog.getUid(this.yScale())] = this.yScale().serialize();
-  scales.push(scalesIds[goog.getUid(this.yScale())]);
-  json['yScale'] = scales.length - 1;
-
-  json['defaultSeriesType'] = this.defaultSeriesType();
-  json['background'] = this.background().serialize();
-
-  axesIds.push(goog.getUid(this.xAxis()));
-  json['xAxis'] = this.xAxis().serialize();
-  json['dateTimeHighlighter'] = anychart.color.serialize(this.dateTimeHighlighterStroke_);
-
-  json['palette'] = this.palette().serialize();
-  json['markerPalette'] = this.markerPalette().serialize();
-  json['hatchFillPalette'] = this.hatchFillPalette().serialize();
-
-  var yAxes = [];
-  for (i = 0; i < this.yAxes_.length; i++) {
-    var yAxis = this.yAxes_[i];
-    config = yAxis.serialize();
-    scale = yAxis.scale();
-    if (scale) {
-      objId = goog.getUid(scale);
-      if (!scalesIds[objId]) {
-        scalesIds[objId] = scale.serialize();
-        scales.push(scalesIds[objId]);
-        config['scale'] = scales.length - 1;
-      } else {
-        config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
-      }
-    }
-    axesIds.push(goog.getUid(yAxis));
-
-    yAxes.push(config);
-  }
-  if (yAxes.length)
-    json['yAxes'] = yAxes;
-
-
+/**
+ * Grids serialization.
+ * @param {string} propName
+ * @param {Array.<anychart.stockModule.Grid>} list
+ * @param {!Object} json
+ * @param {Array.<Object>} scales
+ * @param {Object} scalesIds
+ * @param {Array} axesIds
+ * @private
+ */
+anychart.stockModule.Plot.prototype.serializeGrids_ = function(propName, list, json, scales, scalesIds, axesIds) {
+  var i, scale, objId, config, axis, axisId, axisIndex, axisScale, isHorizontal, axisOrientation;
   var grids = [];
-  for (i = 0; i < this.grids_.length; i++) {
-    var grid = this.grids_[i];
+  for (i = 0; i < list.length; i++) {
+    var grid = list[i];
     if (grid) {
       config = grid.serialize();
       scale = grid.scale();
@@ -2471,30 +2422,63 @@ anychart.stockModule.Plot.prototype.serialize = function() {
     }
   }
   if (grids.length)
-    json['grids'] = grids;
+    json[propName] = grids;
+};
 
-  var minorGrids = [];
-  for (i = 0; i < this.xMinorGrids_.length; i++) {
-    var minorGrid = this.xMinorGrids_[i];
-    if (minorGrid) {
-      config = minorGrid.serialize();
-      scale = minorGrid.scale();
-      if (scale) {
-        objId = goog.getUid(scale);
-        if (!scalesIds[objId]) {
-          scalesIds[objId] = scale.serialize();
-          scales.push(scalesIds[objId]);
-          config['scale'] = scales.length - 1;
-        } else {
-          config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
-        }
+
+/** @inheritDoc */
+anychart.stockModule.Plot.prototype.serialize = function() {
+  var json = anychart.stockModule.Plot.base(this, 'serialize');
+  var scalesIds = {};
+  var scales = [];
+  var axesIds = [];
+
+  var scale;
+  var config;
+  var objId;
+  var i;
+
+  scalesIds[goog.getUid(this.yScale())] = this.yScale().serialize();
+  scales.push(scalesIds[goog.getUid(this.yScale())]);
+  json['yScale'] = scales.length - 1;
+
+  json['defaultSeriesType'] = this.defaultSeriesType();
+  json['background'] = this.background().serialize();
+
+  axesIds.push(goog.getUid(this.xAxis()));
+  json['xAxis'] = this.xAxis().serialize();
+  json['dateTimeHighlighter'] = anychart.color.serialize(this.dateTimeHighlighterStroke_);
+
+  json['palette'] = this.palette().serialize();
+  json['markerPalette'] = this.markerPalette().serialize();
+  json['hatchFillPalette'] = this.hatchFillPalette().serialize();
+
+  var yAxes = [];
+  for (i = 0; i < this.yAxes_.length; i++) {
+    var yAxis = this.yAxes_[i];
+    config = yAxis.serialize();
+    scale = yAxis.scale();
+    if (scale) {
+      objId = goog.getUid(scale);
+      if (!scalesIds[objId]) {
+        scalesIds[objId] = scale.serialize();
+        scales.push(scalesIds[objId]);
+        config['scale'] = scales.length - 1;
+      } else {
+        config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
       }
-      minorGrids.push(config);
     }
-  }
-  if (minorGrids.length)
-    json['minorGrids'] = minorGrids;
+    axesIds.push(goog.getUid(yAxis));
 
+    yAxes.push(config);
+  }
+  if (yAxes.length)
+    json['yAxes'] = yAxes;
+
+  this.serializeGrids_('xGrids', this.xGrids_, json, scales, scalesIds, axesIds);
+  this.serializeGrids_('yGrids', this.yGrids_, json, scales, scalesIds, axesIds);
+  this.serializeGrids_('xMinorGrids', this.xMinorGrids_, json, scales, scalesIds, axesIds);
+  this.serializeGrids_('yMinorGrids', this.yMinorGrids_, json, scales, scalesIds, axesIds);
 
   var series = [];
   for (i = 0; i < this.series_.length; i++) {

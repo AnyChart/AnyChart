@@ -841,7 +841,8 @@ anychart.heatmapModule.Chart.prototype.disposeInternal = function() {
 (function() {
   var proto = anychart.heatmapModule.Chart.prototype;
   proto['getType'] = proto.getType;
-  proto['grid'] = proto.grid;
+  proto['xGrid'] = proto.xGrid;
+  proto['yGrid'] = proto.yGrid;
   proto['xAxis'] = proto.xAxis;
   proto['yAxis'] = proto.yAxis;
   proto['xScale'] = proto.xScale;

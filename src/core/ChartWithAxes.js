@@ -385,7 +385,7 @@ anychart.core.ChartWithAxes.prototype.yGrid = function(opt_indexOrValue, opt_val
   if (!grid) {
     grid = this.createGridInstance();
     grid.setChart(this);
-    grid.setDefaultLayout(this.isVerticalInternal ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
+    grid.setDefaultLayout(this.isVerticalInternal ? anychart.enums.Layout.HORIZONTAL : anychart.enums.Layout.VERTICAL);
     grid.setup(this.defaultGridSettings());
     this.yGrids_[index] = grid;
     this.registerDisposable(grid);
@@ -1546,10 +1546,10 @@ anychart.core.ChartWithAxes.prototype.serializeWithScales = function(json, scale
   this.serializeElementsWithScales(json, 'xAxes', this.xAxes_, this.serializeAxis, scales, scaleIds, axesIds);
   this.serializeElementsWithScales(json, 'yAxes', this.yAxes_, this.serializeAxis, scales, scaleIds, axesIds);
 
-  this.serializeElementsWithScales(json, 'grids', this.xGrids_, this.serializeGrid_, scales, scaleIds, axesIds);
-  this.serializeElementsWithScales(json, 'grids', this.yGrids_, this.serializeGrid_, scales, scaleIds, axesIds);
-  this.serializeElementsWithScales(json, 'minorGrids', this.xMinorGrids_, this.serializeGrid_, scales, scaleIds, axesIds);
-  this.serializeElementsWithScales(json, 'minorGrids', this.yMinorGrids_, this.serializeGrid_, scales, scaleIds, axesIds);
+  this.serializeElementsWithScales(json, 'xGrids', this.xGrids_, this.serializeGrid_, scales, scaleIds, axesIds);
+  this.serializeElementsWithScales(json, 'yGrids', this.yGrids_, this.serializeGrid_, scales, scaleIds, axesIds);
+  this.serializeElementsWithScales(json, 'xMinorGrids', this.xMinorGrids_, this.serializeGrid_, scales, scaleIds, axesIds);
+  this.serializeElementsWithScales(json, 'yMinorGrids', this.yMinorGrids_, this.serializeGrid_, scales, scaleIds, axesIds);
   this.serializeElementsWithScales(json, 'lineAxesMarkers', this.lineAxesMarkers_, this.serializeAxisMarker_, scales, scaleIds, axesIds);
   this.serializeElementsWithScales(json, 'rangeAxesMarkers', this.rangeAxesMarkers_, this.serializeAxisMarker_, scales, scaleIds, axesIds);
   this.serializeElementsWithScales(json, 'textAxesMarkers', this.textAxesMarkers_, this.serializeAxisMarker_, scales, scaleIds, axesIds);
