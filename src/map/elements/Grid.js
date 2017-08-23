@@ -69,11 +69,24 @@ anychart.mapModule.elements.Grid = function() {
    */
   this.resolutionChainCache_ = null;
 
+  /**
+   * Palette for series colors.
+   * @type {anychart.palettes.RangeColors|anychart.palettes.DistinctColors}
+   * @private
+   */
+  this.palette_ = null;
+
+  /**
+   *
+   * @type {Object.<string, Object.<{fill: acgraph.vector.Fill, path: acgraph.vector.Path}>>}
+   * @private
+   */
+  this.fillMap_ = {};
+
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['stroke', anychart.ConsistencyState.APPEARANCE],
     ['minorStroke', anychart.ConsistencyState.APPEARANCE],
-    ['oddFill', anychart.ConsistencyState.APPEARANCE],
-    ['evenFill', anychart.ConsistencyState.APPEARANCE],
+    ['fill', anychart.ConsistencyState.APPEARANCE],
     ['drawFirstLine', anychart.ConsistencyState.GRIDS_POSITION],
     ['drawLastLine', anychart.ConsistencyState.GRIDS_POSITION]
   ]);
@@ -231,14 +244,8 @@ anychart.mapModule.elements.Grid.prototype.SIMPLE_PROPS_DESCRIPTORS = (function(
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'oddFill',
-      anychart.core.settings.fillNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'evenFill',
-      anychart.core.settings.fillNormalizer);
+      'fill',
+      anychart.core.settings.fillOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
@@ -292,6 +299,133 @@ anychart.mapModule.elements.Grid.prototype.zIndex = function(opt_value) {
     return this;
   }
   return /** @type {number} */(goog.isDef(this.getOwnOption('zIndex')) ? this.getOwnOption('zIndex') : goog.isDef(this.autoZIndex) ? this.autoZIndex : this.getOption('zIndex'));
+};
+
+
+//endregion
+//region --- Palette
+/**
+ * Getter/setter for palette.
+ * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|Object|Array.<string>)=} opt_value .
+ * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|anychart.mapModule.elements.Grid)} .
+ */
+anychart.mapModule.elements.Grid.prototype.palette = function(opt_value) {
+  if (opt_value instanceof anychart.palettes.RangeColors) {
+    this.setupPalette_(anychart.palettes.RangeColors, opt_value);
+    return this;
+  } else if (opt_value instanceof anychart.palettes.DistinctColors) {
+    this.setupPalette_(anychart.palettes.DistinctColors, opt_value);
+    return this;
+  } else if (goog.isObject(opt_value) && opt_value['type'] == 'range') {
+    this.setupPalette_(anychart.palettes.RangeColors);
+  } else if (goog.isObject(opt_value) || this.palette_ == null)
+    this.setupPalette_(anychart.palettes.DistinctColors);
+
+  if (goog.isDef(opt_value)) {
+    this.palette_.setup(opt_value);
+    return this;
+  }
+  return /** @type {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors)} */(this.palette_);
+};
+
+
+/**
+ * @param {Function} cls Palette constructor.
+ * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors)=} opt_cloneFrom Settings to clone from.
+ * @private
+ */
+anychart.mapModule.elements.Grid.prototype.setupPalette_ = function(cls, opt_cloneFrom) {
+  if (this.palette_ instanceof cls) {
+    if (opt_cloneFrom)
+      this.palette_.setup(opt_cloneFrom);
+  } else {
+    // we dispatch only if we replace existing palette.
+    var doDispatch = !!this.palette_;
+    goog.dispose(this.palette_);
+    this.palette_ = new cls();
+    if (opt_cloneFrom)
+      this.palette_.setup(opt_cloneFrom);
+    this.palette_.listenSignals(this.paletteInvalidated_, this);
+    this.registerDisposable(this.palette_);
+    if (doDispatch)
+      this.invalidate(anychart.ConsistencyState.SERIES_CHART_PALETTE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
+  }
+};
+
+
+/**
+ * Internal palette invalidation handler.
+ * @param {anychart.SignalEvent} event Event object.
+ * @private
+ */
+anychart.mapModule.elements.Grid.prototype.paletteInvalidated_ = function(event) {
+  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
+    this.invalidate(anychart.ConsistencyState.SERIES_CHART_PALETTE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
+  }
+};
+
+
+//endregion
+//region --- Coloring
+anychart.mapModule.elements.Grid.prototype.createFillElement = function(fill) {
+  var path = acgraph.path();
+  path.parent(this.rootLayer_);
+  path.zIndex(100);
+  path
+      .stroke('none')
+      .fill(fill);
+  this.registerDisposable(path);
+
+  return path;
+};
+
+
+anychart.mapModule.elements.Grid.prototype.clearFillElements = function() {
+  goog.object.forEach(this.fillMap_, function(value, key) {
+    value.path.clear();
+  });
+};
+
+
+anychart.mapModule.elements.Grid.prototype.getFillElement = function(index) {
+  var fill = /** @type {acgraph.vector.Fill|function} */(this.getOption('fill'));
+  var fill_, result, path;
+  if (goog.isFunction(fill)) {
+    var context = {
+      'index': index,
+      'grid': this,
+      'palette': this.palette_ || this.parent_.palette(),
+      'sourceColor': 'blue'
+    };
+
+    fill_ = fill.call(context);
+
+    var key = goog.object.findKey(this.fillMap_, function(value, key) {
+      return value.fill == fill_;
+    });
+    if (key) {
+      result = this.fillMap_[key];
+    } else {
+      path = this.createFillElement(fill_);
+
+      result = this.fillMap_[index] = {
+        fill: fill_,
+        path: path
+      };
+    }
+  } else {
+    result = this.fillMap_['d'];
+    if (!result) {
+      path = this.createFillElement(fill);
+
+      result = this.fillMap_['d'] = {
+        fill: fill,
+        path: path
+      };
+    }
+  }
+
+  return result;
 };
 
 
@@ -725,8 +859,8 @@ anychart.mapModule.elements.Grid.prototype.draw = function() {
 
   if (!this.rootLayer_) {
     this.rootLayer_ = acgraph.layer();
-    this.evenFillElement().parent(this.rootLayer_);
-    this.oddFillElement().parent(this.rootLayer_);
+    // this.evenFillElement().parent(this.rootLayer_);
+    // this.oddFillElement().parent(this.rootLayer_);
     majorLineElement.parent(this.rootLayer_).zIndex(1);
     minorLineElement.parent(this.rootLayer_).zIndex(0);
   }
@@ -746,16 +880,18 @@ anychart.mapModule.elements.Grid.prototype.draw = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     majorLineElement.stroke(/** @type {acgraph.vector.Stroke} */(this.getOption('stroke')));
     minorLineElement.stroke(/** @type {acgraph.vector.Stroke} */(this.getOption('minorStroke')));
-    this.oddFillElement().fill(/** @type {acgraph.vector.Fill} */(this.getOption('oddFill')));
-    this.evenFillElement().fill(/** @type {acgraph.vector.Fill} */(this.getOption('evenFill')));
+
+    // this.oddFillElement().fill(/** @type {acgraph.vector.Fill} */(this.getOption('oddFill')));
+    // this.evenFillElement().fill(/** @type {acgraph.vector.Fill} */(this.getOption('evenFill')));
+
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.GRIDS_POSITION) ||
       this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    var layout, fill, path, ticks, minorTicks, tickVal;
+    var layout, fill, path, ticks, minorTicks, tickVal, elem;
     var prevTickVal = NaN;
-    var pixelShift, i, count, scaleMaximum;
+    var pixelShift, i, count, scaleMaximum, lineDrawer;
     var precision = scale.precision();
     if (this.isHorizontal()) {
       ticks = scale.yTicks();
@@ -774,8 +910,10 @@ anychart.mapModule.elements.Grid.prototype.draw = function() {
     var ticksArray = ticks.get();
     var minorTicksArray = minorTicks.get();
 
-    this.evenFillElement().clear();
-    this.oddFillElement().clear();
+    // this.evenFillElement().clear();
+    // this.oddFillElement().clear();
+    this.clearFillElements();
+
     majorLineElement.clear();
     minorLineElement.clear();
 
@@ -787,13 +925,9 @@ anychart.mapModule.elements.Grid.prototype.draw = function() {
     for (i = 0, count = ticksArray.length; i < count; i++) {
       tickVal = ticksArray[i];
 
-      if (i % 2 == 0) {
-        fill = this.getOption('evenFill');
-        path = this.evenFillElement_;
-      } else {
-        fill = this.getOption('oddFill');
-        path = this.oddFillElement_;
-      }
+      elem = this.getFillElement(i);
+      fill = elem.fill;
+      path = elem.path;
 
       drawInterlace.call(this, tickVal, prevTickVal, fill, path, pixelShift, precision);
 
@@ -805,14 +939,9 @@ anychart.mapModule.elements.Grid.prototype.draw = function() {
     }
 
     if (tickVal != scaleMaximum) {
-      //draw last interlace if last scale tick is not scale maximum
-      if (i % 2 == 0) {
-        fill = this.getOption('evenFill');
-        path = this.evenFillElement_;
-      } else {
-        fill = this.getOption('oddFill');
-        path = this.oddFillElement_;
-      }
+      elem = this.getFillElement(i);
+      fill = elem.fill;
+      path = elem.path;
 
       drawInterlace.call(this, scaleMaximum, prevTickVal, fill, path, pixelShift);
     }
@@ -853,12 +982,16 @@ anychart.mapModule.elements.Grid.prototype.setThemeSettings = function(config) {
 anychart.mapModule.elements.Grid.prototype.serialize = function() {
   var json = {};
 
+  json['palette'] = this.palette().serialize();
+
   var zIndex = anychart.core.Base.prototype.getOption.call(this, 'zIndex');
   if (goog.isDef(zIndex))
     json['zIndex'] = zIndex;
 
   var enabled = anychart.core.Base.prototype.getOption.call(this, 'enabled');
   json['enabled'] = goog.isDef(enabled) ? enabled : null;
+
+  this.palette(config['palette']);
 
   anychart.core.settings.serialize(this, this.SIMPLE_PROPS_DESCRIPTORS, json, 'Map grids props');
 
@@ -882,6 +1015,8 @@ anychart.mapModule.elements.Grid.prototype.setupSpecial = function(isDefault, va
 
 /** @inheritDoc */
 anychart.mapModule.elements.Grid.prototype.setupByJSON = function(config, opt_default) {
+  this.palette(config['palette']);
+
   if (opt_default) {
     this.setThemeSettings(config);
   } else {
@@ -908,12 +1043,12 @@ anychart.mapModule.elements.Grid.prototype.disposeInternal = function() {
 (function() {
   var proto = anychart.mapModule.elements.Grid.prototype;
   proto['enabled'] = proto.enabled;
+  proto['palette'] = proto.palette;
   // proto['zIndex'] = proto.zIndex;
   // proto['stroke'] = proto.stroke;
   // proto['minorStroke'] = proto.minorStroke;
   // proto['drawFirstLine'] = proto.drawFirstLine;
   // proto['drawLastLine'] = proto.drawLastLine;
-  // proto['oddFill'] = proto.oddFill;
-  // proto['evenFill'] = proto.evenFill;
+  // proto['fill'] = proto.fill;
 })();
 //endregion

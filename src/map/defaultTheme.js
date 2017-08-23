@@ -267,8 +267,10 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       'enabled': false,
       'drawFirstLine': true,
       'drawLastLine': true,
-      'oddFill': 'none',
-      'evenFill': 'none',
+      'fill': function() {
+        return this['palette'].itemAt(this['index']);
+      },
+      'palette': ['red', 'green', 'blue', 'yellow'],
       'stroke': anychart.core.defaultTheme.colorStrokeNormal,
       'minorStroke': 'none',
       'zIndex': 5
