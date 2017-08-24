@@ -20,31 +20,7 @@ anychart.stockModule.Grid = function() {
    * @type {acgraph.vector.Path}
    * @private
    */
-  this.oddFillElement_;
-
-  /**
-   * @type {acgraph.vector.Path}
-   * @private
-   */
-  this.evenFillElement_;
-
-  /**
-   * @type {acgraph.vector.Path}
-   * @private
-   */
   this.lineElement_;
-
-  /**
-   * @type {string|acgraph.vector.Fill}
-   * @private
-   */
-  this.oddFill_;
-
-  /**
-   * @type {string|acgraph.vector.Fill}
-   * @private
-   */
-  this.evenFill_;
 
   /**
    * @type {string|acgraph.vector.Stroke}
@@ -94,6 +70,20 @@ anychart.stockModule.Grid = function() {
    * @private
    */
   this.defaultLayout_ = anychart.enums.Layout.HORIZONTAL;
+
+  /**
+   * Palette for series colors.
+   * @type {anychart.palettes.RangeColors|anychart.palettes.DistinctColors}
+   * @private
+   */
+  this.palette_ = null;
+
+  /**
+   *
+   * @type {Object.<string, acgraph.vector.Path>}
+   * @private
+   */
+  this.fillMap_ = {};
 };
 goog.inherits(anychart.stockModule.Grid, anychart.core.VisualBase);
 
@@ -116,6 +106,71 @@ anychart.stockModule.Grid.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES |
         anychart.ConsistencyState.APPEARANCE |
         anychart.ConsistencyState.GRIDS_POSITION;
+
+
+//region --- Palette
+/**
+ * Getter/setter for palette.
+ * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|Object|Array.<string>)=} opt_value .
+ * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|anychart.mapModule.elements.Grid)} .
+ */
+anychart.stockModule.Grid.prototype.palette = function(opt_value) {
+  if (opt_value instanceof anychart.palettes.RangeColors) {
+    this.setupPalette_(anychart.palettes.RangeColors, opt_value);
+    return this;
+  } else if (opt_value instanceof anychart.palettes.DistinctColors) {
+    this.setupPalette_(anychart.palettes.DistinctColors, opt_value);
+    return this;
+  } else if (goog.isObject(opt_value) && opt_value['type'] == 'range') {
+    this.setupPalette_(anychart.palettes.RangeColors);
+  } else if (goog.isObject(opt_value) || this.palette_ == null)
+    this.setupPalette_(anychart.palettes.DistinctColors);
+
+  if (goog.isDef(opt_value)) {
+    this.palette_.setup(opt_value);
+    return this;
+  }
+  return /** @type {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors)} */(this.palette_);
+};
+
+
+/**
+ * @param {Function} cls Palette constructor.
+ * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors)=} opt_cloneFrom Settings to clone from.
+ * @private
+ */
+anychart.stockModule.Grid.prototype.setupPalette_ = function(cls, opt_cloneFrom) {
+  if (this.palette_ instanceof cls) {
+    if (opt_cloneFrom)
+      this.palette_.setup(opt_cloneFrom);
+  } else {
+    // we dispatch only if we replace existing palette.
+    var doDispatch = !!this.palette_;
+    goog.dispose(this.palette_);
+    this.palette_ = new cls();
+    if (opt_cloneFrom)
+      this.palette_.setup(opt_cloneFrom);
+    this.palette_.listenSignals(this.paletteInvalidated_, this);
+    this.registerDisposable(this.palette_);
+    if (doDispatch)
+      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW);
+  }
+};
+
+
+/**
+ * Internal palette invalidation handler.
+ * @param {anychart.SignalEvent} event Event object.
+ * @private
+ */
+anychart.stockModule.Grid.prototype.paletteInvalidated_ = function(event) {
+  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
+    this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW);
+  }
+};
+
+
+//endregion
 
 
 /**
@@ -285,7 +340,7 @@ anychart.stockModule.Grid.prototype.axesLinesSpace = function(opt_spaceOrTopOrTo
 //  Settings.
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Get/set grid odd fill settings.
+ * Get/set grid fill settings.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -293,42 +348,18 @@ anychart.stockModule.Grid.prototype.axesLinesSpace = function(opt_spaceOrTopOrTo
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
- * @return {!(acgraph.vector.Fill|anychart.stockModule.Grid)} Grid odd fill settings or Grid instance for method chaining.
+ * @return {!(acgraph.vector.Fill|anychart.core.Grid)} Grid fill settings or Grid instance for method chaining.
  */
-anychart.stockModule.Grid.prototype.oddFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+anychart.stockModule.Grid.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.oddFill_), val)) {
-      this.oddFill_ = val;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    var val = anychart.core.settings.fillOrFunctionNormalizer.call(null, arguments);
+    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.fill_), val)) {
+      this.fill_ = val;
+      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
-  return this.oddFill_;
-};
-
-
-/**
- * Get/set grid even fill settings.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {!(acgraph.vector.Fill|anychart.stockModule.Grid)} Grid even fill settings or Grid instance for method chaining.
- */
-anychart.stockModule.Grid.prototype.evenFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.evenFill_), val)) {
-      this.evenFill_ = val;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.evenFill_;
+  return this.fill_;
 };
 
 
@@ -354,6 +385,65 @@ anychart.stockModule.Grid.prototype.stroke = function(opt_strokeOrFill, opt_thic
     return this.stroke_;
   }
 };
+
+
+//region --- Coloring
+/**
+ * Creates and returns fill path.
+ * @return {acgraph.vector.Path}
+ */
+anychart.stockModule.Grid.prototype.createFillElement = function() {
+  var path = acgraph.path();
+  path
+      .parent(/** @type {acgraph.vector.ILayer} */(this.container()))
+      .zIndex(/** @type {number} */(this.zIndex()))
+      .stroke('none');
+  this.registerDisposable(path);
+  return path;
+};
+
+
+/**
+ * Clearing fills cache elements.
+ */
+anychart.stockModule.Grid.prototype.clearFillElements = function() {
+  goog.object.forEach(this.fillMap_, function(value, key) {
+    value.clear();
+  });
+};
+
+
+/**
+ * Returns fill path element.
+ * @param {number} index .
+ * @return {acgraph.vector.Path}
+ */
+anychart.stockModule.Grid.prototype.getFillElement = function(index) {
+  var fill = /** @type {acgraph.vector.Fill|function} */(this.fill_);
+  var fill_, result, hashFill;
+  if (goog.isFunction(fill)) {
+    var context = {
+      'index': index,
+      'grid': this,
+      'palette': this.palette_ || this.parent_.palette(),
+      'sourceColor': 'blue'
+    };
+
+    fill_ = fill.call(context);
+  } else {
+    fill_ = fill;
+  }
+
+  var sFill = anychart.color.serialize(fill_);
+  hashFill = goog.isString(sFill) ? sFill : JSON.stringify(sFill);
+  result = hashFill in this.fillMap_ ? this.fillMap_[hashFill] : (this.fillMap_[hashFill] = this.createFillElement());
+  result.fill(fill_);
+
+  return result;
+};
+
+
+//endregion
 
 
 /**
@@ -468,12 +558,11 @@ anychart.stockModule.Grid.prototype.isHorizontal = function() {
  * Draw horizontal line.
  * @param {number} ratio Scale ratio to draw grid interlace.
  * @param {number} prevRatio Previous scale ratio to draw grid interlace.
- * @param {string} fillSettings Interlace fill settings.
  * @param {acgraph.vector.Path} path Layer to draw interlace.
  * @param {number} needsShift Grid line pixel shift.
  * @protected
  */
-anychart.stockModule.Grid.prototype.drawInterlaceHorizontal = function(ratio, prevRatio, fillSettings, path, needsShift) {
+anychart.stockModule.Grid.prototype.drawInterlaceHorizontal = function(ratio, prevRatio, path, needsShift) {
   if (!isNaN(prevRatio)) {
     var parentBounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
     var shift = needsShift ? 0.5 : 0;
@@ -497,12 +586,11 @@ anychart.stockModule.Grid.prototype.drawInterlaceHorizontal = function(ratio, pr
  * Draw horizontal line.
  * @param {number} ratio Scale ratio to draw grid interlace.
  * @param {number} prevRatio Previous scale ratio to draw grid interlace.
- * @param {string} fillSettings Interlace fill settings.
  * @param {acgraph.vector.Path} path Layer to draw interlace.
  * @param {boolean} needsShift Grid line pixel shift.
  * @protected
  */
-anychart.stockModule.Grid.prototype.drawInterlaceVertical = function(ratio, prevRatio, fillSettings, path, needsShift) {
+anychart.stockModule.Grid.prototype.drawInterlaceVertical = function(ratio, prevRatio, path, needsShift) {
   if (!isNaN(prevRatio)) {
     var parentBounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
 
@@ -545,16 +633,12 @@ anychart.stockModule.Grid.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
     var zIndex = /** @type {number} */(this.zIndex());
-    this.evenFillElement().zIndex(zIndex);
-    this.oddFillElement().zIndex(zIndex);
     this.lineElement().zIndex(zIndex);
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
     var container = /** @type {acgraph.vector.ILayer} */(this.container());
-    this.evenFillElement().parent(container);
-    this.oddFillElement().parent(container);
     this.lineElement().parent(container);
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
@@ -584,16 +668,15 @@ anychart.stockModule.Grid.prototype.draw = function() {
       layout = [this.drawLineVertical, this.drawInterlaceVertical];
     }
 
-    this.evenFillElement().clear();
-    this.oddFillElement().clear();
+    this.clearFillElements();
     this.lineElement().clear();
 
     var bounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
     var axesLinesSpace = this.axesLinesSpace();
     var clip = axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds));
 
-    this.evenFillElement().clip(clip);
-    this.oddFillElement().clip(clip);
+    // this.evenFillElement().clip(clip);
+    // this.oddFillElement().clip(clip);
     this.lineElement().clip(clip);
 
     var drawInterlace = layout[1];
@@ -609,16 +692,9 @@ anychart.stockModule.Grid.prototype.draw = function() {
       else
         ratio = scale.transform(tickVal);
 
-      if (i % 2 == 0) {
-        fill = this.evenFill_;
-        path = this.evenFillElement_;
-      } else {
-        fill = this.oddFill_;
-        path = this.oddFillElement_;
-      }
-
-      if (fill != 'none') {
-        drawInterlace.call(this, ratio, prevRatio, fill, path, needsShift);
+      path = this.getFillElement(i);
+      if (path) {
+        drawInterlace.call(this, ratio, prevRatio, path, needsShift);
       }
 
       if (!i) {
@@ -635,17 +711,12 @@ anychart.stockModule.Grid.prototype.draw = function() {
     }
 
     //draw last line on ordinal
-    if (i % 2 == 0) {
-      fill = this.evenFill_;
-      path = this.evenFillElement_;
-    } else {
-      fill = this.oddFill_;
-      path = this.oddFillElement_;
-    }
-
     if (isOrdinal && goog.isDef(tickVal)) {
       if (this.drawLastLine_) drawLine.call(this, 1, needsShift);
-      drawInterlace.call(this, 1, ratio, fill, path, needsShift);
+      path = this.getFillElement(i);
+      if (path) {
+        drawInterlace.call(this, 1, ratio, path, needsShift);
+      }
     }
 
     this.markConsistent(anychart.ConsistencyState.GRIDS_POSITION & anychart.ConsistencyState.BOUNDS);
@@ -667,8 +738,6 @@ anychart.stockModule.Grid.prototype.draw = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.stockModule.Grid.prototype.remove = function() {
-  this.evenFillElement().parent(null);
-  this.oddFillElement().parent(null);
   this.lineElement().parent(null);
 };
 
@@ -688,36 +757,6 @@ anychart.stockModule.Grid.prototype.lineElement = function() {
 };
 
 
-/**
- * @return {!acgraph.vector.Path} Grid odd fill element.
- * @protected
- */
-anychart.stockModule.Grid.prototype.oddFillElement = function() {
-  if (!this.oddFillElement_) {
-    this.oddFillElement_ = acgraph.path();
-    this.oddFillElement_.stroke('none');
-    this.registerDisposable(this.oddFillElement_);
-  }
-
-  return this.oddFillElement_;
-};
-
-
-/**
- * @return {!acgraph.vector.Path} Grid event fill element.
- * @protected
- */
-anychart.stockModule.Grid.prototype.evenFillElement = function() {
-  if (!this.evenFillElement_) {
-    this.evenFillElement_ = acgraph.path();
-    this.evenFillElement_.stroke('none');
-    this.registerDisposable(this.evenFillElement_);
-  }
-
-  return this.evenFillElement_;
-};
-
-
 //----------------------------------------------------------------------------------------------------------------------
 //  Serialize & Deserialize
 //----------------------------------------------------------------------------------------------------------------------
@@ -726,10 +765,10 @@ anychart.stockModule.Grid.prototype.serialize = function() {
   var json = anychart.stockModule.Grid.base(this, 'serialize');
   json['isMinor'] = this.isMinor();
   if (this.layout_) json['layout'] = this.layout_;
+  json['palette'] = this.palette().serialize();
   json['drawFirstLine'] = this.drawFirstLine();
   json['drawLastLine'] = this.drawLastLine();
-  json['oddFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.oddFill()));
-  json['evenFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.evenFill()));
+  json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill()));
   json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
   return json;
 };
@@ -742,8 +781,8 @@ anychart.stockModule.Grid.prototype.setupByJSON = function(config, opt_default) 
   this.layout(config['layout']);
   this.drawFirstLine(config['drawFirstLine']);
   this.drawLastLine(config['drawLastLine']);
-  this.oddFill(config['oddFill']);
-  this.evenFill(config['evenFill']);
+  this.palette(config['palette']);
+  this.fill(config['fill']);
   this.stroke(config['stroke']);
   if ('axis' in config) {
     var ax = config['axis'];
@@ -774,8 +813,8 @@ anychart.stockModule.Grid.prototype.disposeInternal = function() {
 (function() {
   var proto = anychart.stockModule.Grid.prototype;
   proto['isMinor'] = proto.isMinor;
-  proto['oddFill'] = proto.oddFill;
-  proto['evenFill'] = proto.evenFill;
+  proto['palette'] = proto.palette;
+  proto['fill'] = proto.fill;
   proto['layout'] = proto.layout;
   proto['isHorizontal'] = proto.isHorizontal;
   proto['scale'] = proto.scale;

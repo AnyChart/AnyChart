@@ -270,7 +270,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       'fill': function() {
         return this['palette'].itemAt(this['index']);
       },
-      'palette': ['red', 'green', 'blue', 'yellow'],
+      'palette': ['none'],
       'stroke': anychart.core.defaultTheme.colorStrokeNormal,
       'minorStroke': 'none',
       'zIndex': 5

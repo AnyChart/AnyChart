@@ -76,12 +76,11 @@ anychart.cartesian3dModule.Grid.prototype.drawLineVertical = function(ratio, shi
  * Draw horizontal line.
  * @param {number} ratio Scale ratio to draw grid interlace.
  * @param {number} prevRatio Previous scale ratio to draw grid interlace.
- * @param {string} fillSettings Interlace fill settings.
  * @param {acgraph.vector.Path} path Layer to draw interlace.
  * @param {number} shift Grid line pixel shift.
  * @protected
  */
-anychart.cartesian3dModule.Grid.prototype.drawInterlaceHorizontal = function(ratio, prevRatio, fillSettings, path, shift) {
+anychart.cartesian3dModule.Grid.prototype.drawInterlaceHorizontal = function(ratio, prevRatio, path, shift) {
   if (!isNaN(prevRatio)) {
     var parentBounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
     var y1, y2, checkIndex;
@@ -107,12 +106,11 @@ anychart.cartesian3dModule.Grid.prototype.drawInterlaceHorizontal = function(rat
  * Draw horizontal line.
  * @param {number} ratio Scale ratio to draw grid interlace.
  * @param {number} prevRatio Previous scale ratio to draw grid interlace.
- * @param {string} fillSettings Interlace fill settings.
  * @param {acgraph.vector.Path} path Layer to draw interlace.
  * @param {number} shift Grid line pixel shift.
  * @protected
  */
-anychart.cartesian3dModule.Grid.prototype.drawInterlaceVertical = function(ratio, prevRatio, fillSettings, path, shift) {
+anychart.cartesian3dModule.Grid.prototype.drawInterlaceVertical = function(ratio, prevRatio, path, shift) {
   if (!isNaN(prevRatio)) {
     var parentBounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
     var x1, x2, checkIndex;

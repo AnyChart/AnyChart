@@ -28,18 +28,6 @@ anychart.mapModule.elements.Grid = function() {
 
   /**
    * @type {acgraph.vector.Path}
-   * @private
-   */
-  this.oddFillElement_ = null;
-
-  /**
-   * @type {acgraph.vector.Path}
-   * @private
-   */
-  this.evenFillElement_ = null;
-
-  /**
-   * @type {acgraph.vector.Path}
    * @protected
    */
   this.lineElementInternal = null;
@@ -78,7 +66,7 @@ anychart.mapModule.elements.Grid = function() {
 
   /**
    *
-   * @type {Object.<string, Object.<{fill: acgraph.vector.Fill, path: acgraph.vector.Path}>>}
+   * @type {Object.<string, acgraph.vector.Path>}
    * @private
    */
   this.fillMap_ = {};
@@ -86,7 +74,7 @@ anychart.mapModule.elements.Grid = function() {
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['stroke', anychart.ConsistencyState.APPEARANCE],
     ['minorStroke', anychart.ConsistencyState.APPEARANCE],
-    ['fill', anychart.ConsistencyState.APPEARANCE],
+    ['fill', anychart.ConsistencyState.BOUNDS],
     ['drawFirstLine', anychart.ConsistencyState.GRIDS_POSITION],
     ['drawLastLine', anychart.ConsistencyState.GRIDS_POSITION]
   ]);
@@ -348,7 +336,7 @@ anychart.mapModule.elements.Grid.prototype.setupPalette_ = function(cls, opt_clo
     this.palette_.listenSignals(this.paletteInvalidated_, this);
     this.registerDisposable(this.palette_);
     if (doDispatch)
-      this.invalidate(anychart.ConsistencyState.SERIES_CHART_PALETTE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -360,36 +348,46 @@ anychart.mapModule.elements.Grid.prototype.setupPalette_ = function(cls, opt_clo
  */
 anychart.mapModule.elements.Grid.prototype.paletteInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
-    this.invalidate(anychart.ConsistencyState.SERIES_CHART_PALETTE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
 
 //endregion
 //region --- Coloring
-anychart.mapModule.elements.Grid.prototype.createFillElement = function(fill) {
+/**
+ * Creates and returns fill path.
+ * @return {acgraph.vector.Path}
+ */
+anychart.mapModule.elements.Grid.prototype.createFillElement = function() {
   var path = acgraph.path();
-  path.parent(this.rootLayer_);
-  path.zIndex(100);
   path
-      .stroke('none')
-      .fill(fill);
+      .parent(this.rootLayer_)
+      .zIndex(3)
+      .stroke('none');
   this.registerDisposable(path);
-
   return path;
 };
 
 
+/**
+ * Clearing fills cache elements.
+ */
 anychart.mapModule.elements.Grid.prototype.clearFillElements = function() {
   goog.object.forEach(this.fillMap_, function(value, key) {
-    value.path.clear();
+    value.clear();
   });
 };
 
 
+/**
+ * Returns fill path element.
+ * @param {number} index .
+ * @return {acgraph.vector.Path}
+ */
 anychart.mapModule.elements.Grid.prototype.getFillElement = function(index) {
   var fill = /** @type {acgraph.vector.Fill|function} */(this.getOption('fill'));
-  var fill_, result, path;
+  var fill_, result, hashFill;
   if (goog.isFunction(fill)) {
     var context = {
       'index': index,
@@ -399,31 +397,14 @@ anychart.mapModule.elements.Grid.prototype.getFillElement = function(index) {
     };
 
     fill_ = fill.call(context);
-
-    var key = goog.object.findKey(this.fillMap_, function(value, key) {
-      return value.fill == fill_;
-    });
-    if (key) {
-      result = this.fillMap_[key];
-    } else {
-      path = this.createFillElement(fill_);
-
-      result = this.fillMap_[index] = {
-        fill: fill_,
-        path: path
-      };
-    }
   } else {
-    result = this.fillMap_['d'];
-    if (!result) {
-      path = this.createFillElement(fill);
-
-      result = this.fillMap_['d'] = {
-        fill: fill,
-        path: path
-      };
-    }
+    fill_ = fill;
   }
+
+  var sFill = anychart.color.serialize(fill_);
+  hashFill = goog.isString(sFill) ? sFill : JSON.stringify(sFill);
+  result = hashFill in this.fillMap_ ? this.fillMap_[hashFill] : (this.fillMap_[hashFill] = this.createFillElement());
+  result.fill(fill_);
 
   return result;
 };
@@ -859,8 +840,6 @@ anychart.mapModule.elements.Grid.prototype.draw = function() {
 
   if (!this.rootLayer_) {
     this.rootLayer_ = acgraph.layer();
-    // this.evenFillElement().parent(this.rootLayer_);
-    // this.oddFillElement().parent(this.rootLayer_);
     majorLineElement.parent(this.rootLayer_).zIndex(1);
     minorLineElement.parent(this.rootLayer_).zIndex(0);
   }
@@ -881,17 +860,14 @@ anychart.mapModule.elements.Grid.prototype.draw = function() {
     majorLineElement.stroke(/** @type {acgraph.vector.Stroke} */(this.getOption('stroke')));
     minorLineElement.stroke(/** @type {acgraph.vector.Stroke} */(this.getOption('minorStroke')));
 
-    // this.oddFillElement().fill(/** @type {acgraph.vector.Fill} */(this.getOption('oddFill')));
-    // this.evenFillElement().fill(/** @type {acgraph.vector.Fill} */(this.getOption('evenFill')));
-
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.GRIDS_POSITION) ||
       this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    var layout, fill, path, ticks, minorTicks, tickVal, elem;
+    var layout, path, ticks, minorTicks, tickVal;
     var prevTickVal = NaN;
-    var pixelShift, i, count, scaleMaximum, lineDrawer;
+    var pixelShift, i, count, scaleMaximum;
     var precision = scale.precision();
     if (this.isHorizontal()) {
       ticks = scale.yTicks();
@@ -910,8 +886,6 @@ anychart.mapModule.elements.Grid.prototype.draw = function() {
     var ticksArray = ticks.get();
     var minorTicksArray = minorTicks.get();
 
-    // this.evenFillElement().clear();
-    // this.oddFillElement().clear();
     this.clearFillElements();
 
     majorLineElement.clear();
@@ -925,11 +899,8 @@ anychart.mapModule.elements.Grid.prototype.draw = function() {
     for (i = 0, count = ticksArray.length; i < count; i++) {
       tickVal = ticksArray[i];
 
-      elem = this.getFillElement(i);
-      fill = elem.fill;
-      path = elem.path;
-
-      drawInterlace.call(this, tickVal, prevTickVal, fill, path, pixelShift, precision);
+      path = this.getFillElement(i);
+      drawInterlace.call(this, tickVal, prevTickVal, null, path, pixelShift, precision);
 
       if ((!i && this.getOption('drawFirstLine')) || (i == count - 1 && this.getOption('drawLastLine')) || (i != 0 && i != count - 1)) {
         drawLine.call(this, tickVal, majorLineElement, pixelShift, precision);
@@ -939,11 +910,8 @@ anychart.mapModule.elements.Grid.prototype.draw = function() {
     }
 
     if (tickVal != scaleMaximum) {
-      elem = this.getFillElement(i);
-      fill = elem.fill;
-      path = elem.path;
-
-      drawInterlace.call(this, scaleMaximum, prevTickVal, fill, path, pixelShift);
+      path = this.getFillElement(i);
+      drawInterlace.call(this, scaleMaximum, prevTickVal, null, path, pixelShift);
     }
 
     pixelShift = -majorLineElement.strokeThickness() % 2 / 2;
@@ -991,8 +959,6 @@ anychart.mapModule.elements.Grid.prototype.serialize = function() {
   var enabled = anychart.core.Base.prototype.getOption.call(this, 'enabled');
   json['enabled'] = goog.isDef(enabled) ? enabled : null;
 
-  this.palette(config['palette']);
-
   anychart.core.settings.serialize(this, this.SIMPLE_PROPS_DESCRIPTORS, json, 'Map grids props');
 
   return json;
@@ -1033,6 +999,15 @@ anychart.mapModule.elements.Grid.prototype.setupByJSON = function(config, opt_de
 anychart.mapModule.elements.Grid.prototype.disposeInternal = function() {
   this.axis_ = null;
   this.chart_ = null;
+
+  goog.object.forEach(this.fillMap_, function(value, key) {
+    value.path.dispose();
+    delete value.path;
+    delete value.fill;
+    this.fillMap_[key] = null;
+  });
+  this.fillMap_ = null;
+
   anychart.mapModule.elements.Grid.base(this, 'disposeInternal');
 };
 

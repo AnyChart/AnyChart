@@ -348,7 +348,7 @@ anychart.core.ChartWithAxes.prototype.xGrid = function(opt_indexOrValue, opt_val
   if (!grid) {
     grid = this.createGridInstance();
     grid.setChart(this);
-    grid.setDefaultLayout(this.isVerticalInternal ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
+    grid.setDefaultLayout(this.isVerticalInternal ? anychart.enums.Layout.HORIZONTAL : anychart.enums.Layout.VERTICAL);
     grid.setup(this.defaultGridSettings());
     this.xGrids_[index] = grid;
     this.registerDisposable(grid);
@@ -385,7 +385,7 @@ anychart.core.ChartWithAxes.prototype.yGrid = function(opt_indexOrValue, opt_val
   if (!grid) {
     grid = this.createGridInstance();
     grid.setChart(this);
-    grid.setDefaultLayout(this.isVerticalInternal ? anychart.enums.Layout.HORIZONTAL : anychart.enums.Layout.VERTICAL);
+    grid.setDefaultLayout(this.isVerticalInternal ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
     grid.setup(this.defaultGridSettings());
     this.yGrids_[index] = grid;
     this.registerDisposable(grid);
