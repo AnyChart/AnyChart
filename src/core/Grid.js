@@ -15,10 +15,18 @@ goog.require('anychart.scales');
  * Grid.
  * @constructor
  * @extends {anychart.core.VisualBase}
+ * @implements {anychart.core.settings.IResolvable}
  * @implements {anychart.core.IStandaloneBackend}
  */
 anychart.core.Grid = function() {
   anychart.core.Grid.base(this, 'constructor');
+
+  /**
+   * Parent title.
+   * @type {anychart.mapModule.elements.GridSettings}
+   * @private
+   */
+  this.parent_ = null;
 
   /**
    * @type {acgraph.vector.Path}
@@ -27,10 +35,11 @@ anychart.core.Grid = function() {
   this.lineElementInternal = null;
 
   /**
-   * @type {string|acgraph.vector.Stroke}
+   * Resolution chain cache.
+   * @type {?Array.<Object|null|undefined>}
    * @private
    */
-  this.stroke_;
+  this.resolutionChainCache_ = null;
 
   /**
    * @type {anychart.scales.Base}
@@ -51,29 +60,11 @@ anychart.core.Grid = function() {
   this.layout_;
 
   /**
-   * @type {boolean}
-   * @private
-   */
-  this.drawFirstLine_;
-
-  /**
-   * @type {boolean}
-   * @private
-   */
-  this.drawLastLine_;
-
-  /**
    * Assigned axis.
    * @type {anychart.core.Axis}
    * @private
    */
   this.axis_ = null;
-
-  /**
-   * @type {anychart.enums.Layout}
-   * @private
-   */
-  this.defaultLayout_ = anychart.enums.Layout.HORIZONTAL;
 
   /**
    * Palette for series colors.
@@ -87,21 +78,28 @@ anychart.core.Grid = function() {
    * @type {Object.<string, acgraph.vector.Path>}
    * @private
    */
-  this.fillMap_ = {};
+  this.fillMap = {};
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['stroke', anychart.ConsistencyState.APPEARANCE],
+    ['fill', anychart.ConsistencyState.BOUNDS],
+    ['drawFirstLine', anychart.ConsistencyState.GRIDS_POSITION],
+    ['drawLastLine', anychart.ConsistencyState.GRIDS_POSITION]
+  ]);
 };
 goog.inherits(anychart.core.Grid, anychart.core.VisualBase);
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//  States and signals.
-//----------------------------------------------------------------------------------------------------------------------
+//region --- Internal properties
 /**
  * Supported signals.
  * @type {number}
  */
 anychart.core.Grid.prototype.SUPPORTED_SIGNALS =
     anychart.core.VisualBase.prototype.SUPPORTED_SIGNALS |
-        anychart.Signal.BOUNDS_CHANGED;
+        anychart.Signal.BOUNDS_CHANGED |
+        anychart.Signal.ENABLED_STATE_CHANGED |
+        anychart.Signal.Z_INDEX_STATE_CHANGED;
 
 
 /**
@@ -114,11 +112,199 @@ anychart.core.Grid.prototype.SUPPORTED_CONSISTENCY_STATES =
         anychart.ConsistencyState.GRIDS_POSITION;
 
 
+//endregion
+//region --- IObjectWithSettings overrides
+/**
+ * @override
+ * @param {string} name
+ * @return {*}
+ */
+anychart.core.Grid.prototype.getOption = anychart.core.settings.getOption;
+
+
+/** @inheritDoc */
+anychart.core.Grid.prototype.getSignal = function(fieldName) {
+  // all properties invalidates with NEEDS_REDRAW;
+  return anychart.Signal.NEEDS_REDRAW;
+};
+
+
+//endregion
+//region --- IResolvable implementation
+/** @inheritDoc */
+anychart.core.Grid.prototype.resolutionChainCache = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.resolutionChainCache_ = opt_value;
+  }
+  return this.resolutionChainCache_;
+};
+
+
+/** @inheritDoc */
+anychart.core.Grid.prototype.getResolutionChain = anychart.core.settings.getResolutionChain;
+
+
+/** @inheritDoc */
+anychart.core.Grid.prototype.getLowPriorityResolutionChain = function() {
+  var sett = [this.themeSettings];
+  if (this.parent_) {
+    sett = goog.array.concat(sett, this.parent_.getLowPriorityResolutionChain());
+  }
+  return sett;
+};
+
+
+/** @inheritDoc */
+anychart.core.Grid.prototype.getHighPriorityResolutionChain = function() {
+  var sett = [this.ownSettings];
+  if (this.parent_) {
+    sett = goog.array.concat(sett, this.parent_.getHighPriorityResolutionChain());
+  }
+  return sett;
+};
+
+
+//endregion
+//region --- Parental relations
+/**
+ * Gets/sets new parent.
+ * @param {anychart.core.GridSettings=} opt_value - Value to set.
+ * @return {anychart.core.GridSettings|anychart.core.Grid} - Current value or itself for method chaining.
+ */
+anychart.core.Grid.prototype.parent = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.parent_ != opt_value) {
+      if (this.parent_)
+        this.parent_.unlistenSignals(this.parentInvalidated_, this);
+      this.parent_ = opt_value;
+      if (this.parent_)
+        this.parent_.listenSignals(this.parentInvalidated_, this);
+    }
+    return this;
+  }
+  return this.parent_;
+};
+
+
+/**
+ * Parent invalidation handler.
+ * @param {anychart.SignalEvent} e - Signal event.
+ * @private
+ */
+anychart.core.Grid.prototype.parentInvalidated_ = function(e) {
+  var state = 0;
+  var signal = 0;
+
+  if (e.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
+    state |= anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.GRIDS_POSITION;
+    signal |= anychart.Signal.NEEDS_REDRAW;
+  }
+
+  if (e.hasSignal(anychart.Signal.ENABLED_STATE_CHANGED)) {
+    state |= anychart.ConsistencyState.ENABLED;
+    signal |= anychart.Signal.NEEDS_REDRAW;
+  }
+
+
+  if (e.hasSignal(anychart.Signal.Z_INDEX_STATE_CHANGED)) {
+    state |= anychart.ConsistencyState.Z_INDEX;
+    signal |= anychart.Signal.NEEDS_REDRAW;
+  }
+
+  this.resolutionChainCache_ = null;
+
+  this.invalidate(state, signal);
+};
+
+
+//endregion
+//region --- Optimized props descriptors
+/**
+ * Simple properties descriptors.
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.core.Grid.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
+      'stroke',
+      anychart.core.settings.strokeNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
+      'minorStroke',
+      anychart.core.settings.strokeNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
+      'fill',
+      anychart.core.settings.fillOrFunctionNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'drawFirstLine',
+      anychart.core.settings.booleanNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'drawLastLine',
+      anychart.core.settings.booleanNormalizer);
+
+  return map;
+})();
+anychart.core.settings.populate(anychart.core.Grid, anychart.core.Grid.prototype.SIMPLE_PROPS_DESCRIPTORS);
+
+
+/** @inheritDoc */
+anychart.core.Grid.prototype.enabled = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.ownSettings['enabled'] != opt_value) {
+      this.ownSettings['enabled'] = opt_value;
+      this.invalidate(anychart.ConsistencyState.ENABLED, this.getEnableChangeSignals());
+      if (this.ownSettings['enabled']) {
+        this.doubleSuspension = false;
+        this.resumeSignalsDispatching(true);
+      } else {
+        if (isNaN(this.suspendedDispatching)) {
+          this.suspendSignalsDispatching();
+        } else {
+          this.doubleSuspension = true;
+        }
+      }
+    }
+    return this;
+  } else {
+    return /** @type {boolean} */(this.getOption('enabled'));
+  }
+};
+
+
+/** @inheritDoc */
+anychart.core.Grid.prototype.zIndex = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var val = +opt_value || 0;
+    if (this.ownSettings['zIndex'] != val) {
+      this.ownSettings['zIndex'] = val;
+      this.invalidate(anychart.ConsistencyState.Z_INDEX, anychart.Signal.NEEDS_REDRAW | anychart.Signal.Z_INDEX_STATE_CHANGED);
+    }
+    return this;
+  }
+  return /** @type {number} */(goog.isDef(this.getOwnOption('zIndex')) ? this.getOwnOption('zIndex') : goog.isDef(this.autoZIndex) ? this.autoZIndex : this.getOption('zIndex'));
+};
+
+
+//endregion
 //region --- Palette
 /**
  * Getter/setter for palette.
  * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|Object|Array.<string>)=} opt_value .
- * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|anychart.mapModule.elements.Grid)} .
+ * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|anychart.core.Grid)} .
  */
 anychart.core.Grid.prototype.palette = function(opt_value) {
   if (opt_value instanceof anychart.palettes.RangeColors) {
@@ -177,8 +363,7 @@ anychart.core.Grid.prototype.paletteInvalidated_ = function(event) {
 
 
 //endregion
-
-
+//region --- Infrastructure
 /**
  * Sets the chart series belongs to.
  * @param {anychart.core.SeparateChart} chart Chart instance.
@@ -197,9 +382,6 @@ anychart.core.Grid.prototype.getChart = function() {
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//  Layout.
-//----------------------------------------------------------------------------------------------------------------------
 /**
  * Get/set grid layout.
  * @param {anychart.enums.Layout=} opt_value Grid layout.
@@ -207,34 +389,15 @@ anychart.core.Grid.prototype.getChart = function() {
  */
 anychart.core.Grid.prototype.layout = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    var layout = anychart.enums.normalizeLayout(opt_value);
-    if (this.layout_ != layout) {
-      this.layout_ = layout;
-      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
+    this.layout_ = opt_value;
     return this;
-  } else if (this.layout_) {
-    return this.layout_;
-  } else if (this.axis_) {
-    var axisOrientation = this.axis_.orientation();
-    var isHorizontal = (axisOrientation == anychart.enums.Orientation.LEFT || axisOrientation == anychart.enums.Orientation.RIGHT);
-    return isHorizontal ? anychart.enums.Layout.HORIZONTAL : anychart.enums.Layout.VERTICAL;
   } else {
-    return this.defaultLayout_;
+    return this.layout_;
   }
 };
 
 
-/**
- * Set default layout.
- * @param {anychart.enums.Layout} value - Layout value.
- */
-anychart.core.Grid.prototype.setDefaultLayout = function(value) {
-  var needInvalidate = !this.layout_ && this.defaultLayout_ != value;
-  this.defaultLayout_ = value;
-  if (needInvalidate) this.invalidate(anychart.ConsistencyState.GRIDS_POSITION);
-};
+//endregion
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -291,16 +454,6 @@ anychart.core.Grid.prototype.scaleInvalidated_ = function(event) {
 //  Axis.
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Axis invalidation handler.
- * @param {anychart.SignalEvent} event - Event object.
- * @private
- */
-anychart.core.Grid.prototype.axisInvalidated_ = function(event) {
-  this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-};
-
-
-/**
  * Sets axis.
  * @param {anychart.core.Axis=} opt_value - Value to be set.
  * @return {(anychart.core.Axis|anychart.core.Grid)} - Current value or itself for method chaining.
@@ -317,6 +470,16 @@ anychart.core.Grid.prototype.axis = function(opt_value) {
     return this;
   }
   return this.axis_;
+};
+
+
+/**
+ * Axis invalidation handler.
+ * @param {anychart.SignalEvent} event - Event object.
+ * @private
+ */
+anychart.core.Grid.prototype.axisInvalidated_ = function(event) {
+  this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 };
 
 
@@ -347,65 +510,6 @@ anychart.core.Grid.prototype.axesLinesSpace = function(opt_spaceOrTopOrTopAndBot
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//  Settings.
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Get/set grid fill settings.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {!(acgraph.vector.Fill|anychart.core.Grid)} Grid fill settings or Grid instance for method chaining.
- */
-anychart.core.Grid.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = anychart.core.settings.fillOrFunctionNormalizer.call(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.fill_), val)) {
-      this.fill_ = val;
-      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.fill_;
-};
-
-
-/**
- * Get/set grid stroke line.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {!(anychart.core.Grid|acgraph.vector.Stroke)} Grid stroke line settings or Grid instance for method chaining.
- */
-anychart.core.Grid.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (this.stroke_ != stroke) {
-      var oldThickness = this.stroke_ ? acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(this.stroke_)) : 0;
-      this.stroke_ = stroke;
-      var newThickness = this.stroke_ ? acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(this.stroke_)) : 0;
-      var state = anychart.ConsistencyState.APPEARANCE;
-      var signal = anychart.Signal.NEEDS_REDRAW;
-      if (oldThickness != newThickness) {
-        state |= anychart.ConsistencyState.GRIDS_POSITION | anychart.ConsistencyState.BOUNDS;
-        signal |= anychart.Signal.BOUNDS_CHANGED;
-      }
-      this.invalidate(state, signal);
-    }
-    return this;
-  } else {
-    return this.stroke_;
-  }
-};
-
-
 //region --- Coloring
 /**
  * Creates and returns fill path.
@@ -426,7 +530,7 @@ anychart.core.Grid.prototype.createFillElement = function() {
  * Clearing fills cache elements.
  */
 anychart.core.Grid.prototype.clearFillElements = function() {
-  goog.object.forEach(this.fillMap_, function(value, key) {
+  goog.object.forEach(this.fillMap, function(value, key) {
     value.clear();
   });
 };
@@ -455,7 +559,7 @@ anychart.core.Grid.prototype.getFillElement = function(index) {
 
   var sFill = anychart.color.serialize(fill_);
   hashFill = goog.isString(sFill) ? sFill : JSON.stringify(sFill);
-  result = hashFill in this.fillMap_ ? this.fillMap_[hashFill] : (this.fillMap_[hashFill] = this.createFillElement());
+  result = hashFill in this.fillMap ? this.fillMap[hashFill] : (this.fillMap[hashFill] = this.createFillElement());
   result.fill(fill_);
 
   return result;
@@ -463,63 +567,6 @@ anychart.core.Grid.prototype.getFillElement = function(index) {
 
 
 //endregion
-
-
-/**
- * Whether to draw the first line.
- * @param {boolean=} opt_value Whether grid should draw first line.
- * @return {boolean|anychart.core.Grid} Whether grid should draw first line or Grid instance for method chaining.
- */
-anychart.core.Grid.prototype.drawFirstLine = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.drawFirstLine_ != opt_value) {
-      this.drawFirstLine_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.drawFirstLine_;
-  }
-};
-
-
-/**
- * Whether to draw the last line.
- * @param {boolean=} opt_value Whether grid should draw last line.
- * @return {boolean|anychart.core.Grid} Whether grid should draw first line or Grid instance for method chaining.
- */
-anychart.core.Grid.prototype.drawLastLine = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.drawLastLine_ != opt_value) {
-      this.drawLastLine_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.drawLastLine_;
-  }
-};
-
-
-/**
- * Whether it is a minor grid or not.
- * @param {boolean=} opt_value Minor or not.
- * @return {boolean|anychart.core.Grid} Is minor grid or Grid instance for method chaining.
- */
-anychart.core.Grid.prototype.isMinor = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.isMinor_ != opt_value) {
-      this.isMinor_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION | anychart.ConsistencyState.APPEARANCE,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.isMinor_;
-  }
-};
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -581,23 +628,7 @@ anychart.core.Grid.prototype.isHorizontal = function() {
  * @param {number} shift Grid line pixel shift.
  * @protected
  */
-anychart.core.Grid.prototype.drawInterlaceHorizontal = function(ratio, prevRatio, path, shift) {
-  if (!isNaN(prevRatio)) {
-    var parentBounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
-    var y1, y2, checkIndex;
-    y1 = Math.round(parentBounds.getBottom() - prevRatio * parentBounds.height);
-    y2 = Math.round(parentBounds.getBottom() - ratio * parentBounds.height);
-    checkIndex = 1;
-    ratio == checkIndex ? y2 -= shift : y2 += shift;
-    prevRatio == checkIndex ? y1 -= shift : y1 += shift;
-
-    path.moveTo(parentBounds.getLeft(), y1);
-    path.lineTo(parentBounds.getRight(), y1);
-    path.lineTo(parentBounds.getRight(), y2);
-    path.lineTo(parentBounds.getLeft(), y2);
-    path.close();
-  }
-};
+anychart.core.Grid.prototype.drawInterlaceHorizontal = goog.abstractMethod;
 
 
 /**
@@ -608,23 +639,7 @@ anychart.core.Grid.prototype.drawInterlaceHorizontal = function(ratio, prevRatio
  * @param {number} shift Grid line pixel shift.
  * @protected
  */
-anychart.core.Grid.prototype.drawInterlaceVertical = function(ratio, prevRatio, path, shift) {
-  if (!isNaN(prevRatio)) {
-    var parentBounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
-    var x1, x2, checkIndex;
-    x1 = Math.round(parentBounds.getLeft() + prevRatio * parentBounds.width);
-    x2 = Math.round(parentBounds.getLeft() + ratio * parentBounds.width);
-    checkIndex = 1;
-    ratio == checkIndex ? x2 += shift : x2 -= shift;
-    prevRatio == checkIndex ? x1 += shift : x1 -= shift;
-
-    path.moveTo(x1, parentBounds.getTop());
-    path.lineTo(x2, parentBounds.getTop());
-    path.lineTo(x2, parentBounds.getBottom());
-    path.lineTo(x1, parentBounds.getBottom());
-    path.close();
-  }
-};
+anychart.core.Grid.prototype.drawInterlaceVertical = goog.abstractMethod;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -859,7 +874,7 @@ anychart.standalones.grids.linear = function() {
   proto['isMinor'] = proto.isMinor;
   proto['palette'] = proto.palette;
   proto['fill'] = proto.fill;
-  proto['layout'] = proto.layout;
+  // proto['layout'] = proto.layout;
   proto['isHorizontal'] = proto.isHorizontal;
   proto['scale'] = proto.scale;
   proto['stroke'] = proto.stroke;
