@@ -1,21 +1,21 @@
 goog.provide('anychart.cartesian3dModule.Grid');
 goog.provide('anychart.standalones.grids.Linear3d');
 goog.require('acgraph');
-goog.require('anychart.core.Grid');
 goog.require('anychart.core.IStandaloneBackend');
+goog.require('anychart.core.GridWithOneDimension');
 
 
 
 /**
  * Grid.
  * @constructor
- * @extends {anychart.core.Grid}
+ * @extends {anychart.core.GridWithOneDimension}
  * @implements {anychart.core.IStandaloneBackend}
  */
 anychart.cartesian3dModule.Grid = function() {
   anychart.cartesian3dModule.Grid.base(this, 'constructor');
 };
-goog.inherits(anychart.cartesian3dModule.Grid, anychart.core.Grid);
+goog.inherits(anychart.cartesian3dModule.Grid, anychart.core.GridWithOneDimension);
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -144,7 +144,6 @@ anychart.cartesian3dModule.Grid.prototype.drawInterlaceVertical = function(ratio
  */
 anychart.standalones.grids.Linear3d = function() {
   anychart.standalones.grids.Linear3d.base(this, 'constructor');
-  anychart.standalones.grids.Linear3d.base(this, 'constructor');
 };
 goog.inherits(anychart.standalones.grids.Linear3d, anychart.cartesian3dModule.Grid);
 anychart.core.makeStandalone(anychart.standalones.grids.Linear3d, anychart.cartesian3dModule.Grid);
@@ -164,8 +163,8 @@ anychart.standalones.grids.linear3d = function() {
 //endregion
 //exports
 (function() {
-  var proto = anychart.standalones.grids.Linear.prototype;
-  goog.exportSymbol('anychart.standalones.grids.linear', anychart.standalones.grids.linear);
+  var proto = anychart.standalones.grids.Linear3d.prototype;
+  goog.exportSymbol('anychart.standalones.grids.linear3d', anychart.standalones.grids.linear3d);
   proto['draw'] = proto.draw;
   proto['parentBounds'] = proto.parentBounds;
   proto['container'] = proto.container;

@@ -19,7 +19,7 @@ anychart.mapModule.elements.GridSettings = function(map) {
 
   /**
    * Parent title.
-   * @type {anychart.mapModule.elements.AxisSettings}
+   * @type {anychart.core.settings.IResolvable}
    * @private
    */
   this.parent_ = null;
