@@ -5,6 +5,7 @@ goog.require('anychart.core.IPlot');
 goog.require('anychart.core.VisualBaseWithBounds');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.Background');
+goog.require('anychart.core.ui.Crosshair');
 goog.require('anychart.core.ui.Legend');
 goog.require('anychart.enums');
 goog.require('anychart.format.Context');
@@ -49,6 +50,13 @@ anychart.stockModule.Plot = function(chart) {
    * @private
    */
   this.background_ = null;
+
+  /**
+   * Plot crosshair.
+   * @type {anychart.core.ui.Crosshair}
+   * @private
+   */
+  this.crosshair_ = null;
 
   /**
    * Series list.
@@ -98,22 +106,17 @@ anychart.stockModule.Plot = function(chart) {
   this.minorGrids_ = [];
 
   /**
-   * @type {acgraph.vector.Path}
-   * @private
-   */
-  this.dateTimeHighlighter_ = null;
-
-  /**
-   * @type {acgraph.vector.Stroke}
-   * @private
-   */
-  this.dateTimeHighlighterStroke_ = '#f00';
-
-  /**
    * @type {acgraph.vector.Rect}
    * @private
    */
   this.eventsInterceptor_ = null;
+
+  /**
+   * Whether this plot is last in chart.
+   * @type {boolean}
+   * @private
+   */
+  this.isLastPlot_ = false;
 
   /**
    * @type {number|undefined}
@@ -127,10 +130,11 @@ anychart.stockModule.Plot = function(chart) {
    */
   this.frameAction_ = goog.bind(function(time) {
     this.frame_ = undefined;
-    if (isNaN(this.frameHighlightRatio_))
+    if (isNaN(this.frameHighlightRatio_)) {
       this.chart_.unhighlight();
-    else
-      this.chart_.highlightAtRatio(this.frameHighlightRatio_, this.frameHighlightX_, this.frameHighlightY_);
+    } else {
+      this.chart_.highlightAtRatio(this.frameHighlightRatio_, this.frameHighlightX_, this.frameHighlightY_, this);
+    }
   }, this);
 
   this.defaultSeriesType(anychart.enums.StockSeriesType.LINE);
@@ -183,7 +187,8 @@ anychart.stockModule.Plot.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.STOCK_PLOT_BACKGROUND |
     anychart.ConsistencyState.STOCK_PLOT_PALETTE |
     anychart.ConsistencyState.STOCK_PLOT_ANNOTATIONS |
-    anychart.ConsistencyState.STOCK_PLOT_LEGEND;
+    anychart.ConsistencyState.STOCK_PLOT_LEGEND |
+    anychart.ConsistencyState.AXES_CHART_CROSSHAIR;
 
 
 /**
@@ -1189,7 +1194,6 @@ anychart.stockModule.Plot.prototype.legend = function(opt_value) {
   if (!this.legend_) {
     this.legend_ = new anychart.core.ui.Legend();
     this.registerDisposable(this.legend_);
-    this.legend_.zIndex(200);
     this.legend_.listenSignals(this.onLegendSignal_, this);
     this.legend_.listen(anychart.enums.EventType.DRAG_START, function(e) {
       this.chart_.preventHighlight();
@@ -1408,33 +1412,6 @@ anychart.stockModule.Plot.prototype.minorGrid = function(opt_indexOrValue, opt_v
 };
 
 
-/**
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Stroke settings,
- *    if used as a setter.
- * @param {number=} opt_thickness Line thickness. If empty - set to 1.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- *    Dash array contains a list of comma and/or white space separated lengths and percentages that specify the
- *    lengths of alternating dashes and gaps. If an odd number of values is provided, then the list of values is
- *    repeated to yield an even number of values. Thus, stroke dashpattern: 5,3,2 is equivalent to dashpattern: 5,3,2,5,3,2.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
- * @return {acgraph.vector.Stroke|anychart.stockModule.Plot} .
- */
-anychart.stockModule.Plot.prototype.dateTimeHighlighter = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var color = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (this.dateTimeHighlighterStroke_ != color) {
-      this.dateTimeHighlighterStroke_ = color;
-      if (this.dateTimeHighlighter_)
-        this.dateTimeHighlighter_.stroke(this.dateTimeHighlighterStroke_);
-    }
-    return this;
-  } else {
-    return this.dateTimeHighlighterStroke_;
-  }
-};
-
-
 //endregion
 //region Drawing
 //----------------------------------------------------------------------------------------------------------------------
@@ -1576,6 +1553,19 @@ anychart.stockModule.Plot.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.STOCK_PLOT_ANNOTATIONS);
   }
 
+  if (this.hasInvalidationState(anychart.ConsistencyState.AXES_CHART_CROSSHAIR)) {
+    var crosshair = /** @type {anychart.core.ui.Crosshair} */(this.crosshair());
+    crosshair.suspendSignalsDispatching();
+    crosshair.parentBounds(this.getPlotBounds());
+    crosshair.container(this.rootLayer_);
+    crosshair.xAxis(this.xAxis_);
+    crosshair.yAxis(this.yAxes_[/** @type {number} */(this.crosshair_.yLabel().axisIndex())]);
+    crosshair.draw();
+    crosshair.resumeSignalsDispatching(false);
+
+    this.markConsistent(anychart.ConsistencyState.AXES_CHART_CROSSHAIR);
+  }
+
   this.resumeSignalsDispatching(false);
 
   // this is a debug code and should remain until we finally decide what to do with auto gaps
@@ -1703,6 +1693,9 @@ anychart.stockModule.Plot.prototype.ensureBoundsDistributed_ = function() {
 
     this.seriesBounds_ = seriesBounds;
     this.eventsInterceptor_.setBounds(this.seriesBounds_);
+
+    this.crosshair().parentBounds(seriesBounds);
+
     this.invalidateRedrawable(true, true);
     this.markConsistent(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.STOCK_PLOT_LEGEND);
   }
@@ -1720,9 +1713,10 @@ anychart.stockModule.Plot.prototype.ensureBoundsDistributed_ = function() {
  * Gets autoText for legend title.
  * @param {string|Function} legendFormatter Legend title formatter.
  * @param {number=} opt_titleValue Value for title.
+ * @param {number=} opt_rawValue - As is date.
  * @return {?string} Title auto text or null.
  */
-anychart.stockModule.Plot.prototype.getLegendAutoText = function(legendFormatter, opt_titleValue) {
+anychart.stockModule.Plot.prototype.getLegendAutoText = function(legendFormatter, opt_titleValue, opt_rawValue) {
   opt_titleValue = opt_titleValue || (isNaN(this.highlightedValue_) ? this.chart_.getLastDate() : this.highlightedValue_);
   var formatter;
   if (!isNaN(opt_titleValue) && (formatter = legendFormatter)) {
@@ -1733,6 +1727,7 @@ anychart.stockModule.Plot.prototype.getLegendAutoText = function(legendFormatter
 
       var values = {
         'value': {value: opt_titleValue, type: anychart.enums.TokenType.DATE_TIME},
+        'rawValue': {value: opt_rawValue, type: anychart.enums.TokenType.DATE_TIME},
         'hoveredDate': {value: opt_titleValue, type: anychart.enums.TokenType.DATE_TIME},
         'dataIntervalUnit': {value: grouping.getCurrentDataInterval()['unit'], type: anychart.enums.TokenType.STRING},
         'dataIntervalUnitCount': {value: grouping.getCurrentDataInterval()['count'], type: anychart.enums.TokenType.NUMBER},
@@ -1750,16 +1745,17 @@ anychart.stockModule.Plot.prototype.getLegendAutoText = function(legendFormatter
  * Updates legend.
  * @param {anychart.math.Rect=} opt_seriesBounds
  * @param {number=} opt_titleValue
+ * @param {number=} opt_rawValue - As is date.
  * @private
  */
-anychart.stockModule.Plot.prototype.updateLegend_ = function(opt_seriesBounds, opt_titleValue) {
+anychart.stockModule.Plot.prototype.updateLegend_ = function(opt_seriesBounds, opt_titleValue, opt_rawValue) {
   var legend = /** @type {anychart.core.ui.Legend} */(this.legend());
   legend.suspendSignalsDispatching();
   legend.container(this.rootLayer_);
   if (opt_seriesBounds) {
     legend.parentBounds(opt_seriesBounds);
   }
-  var autoText = this.getLegendAutoText(/** @type {string|Function} */ (legend.titleFormat()), opt_titleValue);
+  var autoText = this.getLegendAutoText(/** @type {string|Function} */ (legend.titleFormat()), opt_titleValue, opt_rawValue);
   if (!goog.isNull(autoText))
     legend.title().autoText(autoText);
   if (!legend.itemsSource())
@@ -1909,44 +1905,33 @@ anychart.stockModule.Plot.prototype.prepareHighlight = function(value) {
 
 /**
  * Highlights passed value.
- * @param {number} value
+ * @param {number} value - Aligned date.
+ * @param {number} rawValue - As is date.
+ * @param {anychart.stockModule.Plot} hlSource - Highlight source.
+ * @param {number=} opt_y - .
  */
-anychart.stockModule.Plot.prototype.highlight = function(value) {
+anychart.stockModule.Plot.prototype.highlight = function(value, rawValue, hlSource, opt_y) {
   if (!this.rootLayer_ || !this.seriesBounds_) return;
 
-  var ratio = this.chart_.xScale().transform(value);
+  var sticky = this.crosshair().getOption('displayMode') == anychart.enums.CrosshairDisplayMode.STICKY;
+  var setValue = sticky ? value : rawValue;
 
-  this.highlightedValue_ = value;
+  var ratio = this.chart_.xScale().transform(setValue);
+  var thickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */ (this.crosshair().getOption('yStroke')));
+  var x = this.seriesBounds_.left + ratio * this.seriesBounds_.width;
+  x = anychart.utils.applyPixelShift(x, thickness);
 
-  var thickness = acgraph.vector.getThickness(this.dateTimeHighlighterStroke_);
-  if (thickness && this.dateTimeHighlighterStroke_ != 'none' && ratio >= 0 && ratio <= 1) {
-    if (!this.dateTimeHighlighter_) {
-      this.dateTimeHighlighter_ = acgraph.path();
-      this.dateTimeHighlighter_.fill(null);
-      this.dateTimeHighlighter_.stroke(this.dateTimeHighlighterStroke_);
-      this.dateTimeHighlighter_.disablePointerEvents(true);
-      this.dateTimeHighlighter_.zIndex(1000);
-    } else {
-      this.dateTimeHighlighter_.clear();
-    }
-    var x = this.seriesBounds_.left + ratio * this.seriesBounds_.width;
-    x = anychart.utils.applyPixelShift(x, thickness);
-    this.dateTimeHighlighter_.moveTo(x, this.seriesBounds_.top);
-    this.dateTimeHighlighter_.lineTo(x, this.seriesBounds_.getBottom());
-    if (!this.dateTimeHighlighter_.parent())
-      this.rootLayer_.addChild(this.dateTimeHighlighter_);
-  } else if (this.dateTimeHighlighter_) {
-    this.dateTimeHighlighter_.remove();
-  }
+  this.crosshair().xLabelAutoEnabled(this.isLastPlot_);
+  this.crosshair().autoHighlightX(x, this.isLastPlot_, hlSource != this, opt_y, ratio);
 
   for (var i = 0; i < this.series_.length; i++) {
     var series = this.series_[i];
     if (series)
-      series.highlight(value);
+      series.highlight(setValue);
   }
 
   if (this.legend_ && this.legend_.enabled()) {
-    this.updateLegend_(null, value);
+    this.updateLegend_(null, value, rawValue);
   }
   this.dispatchSignal(anychart.Signal.NEED_UPDATE_LEGEND);
 };
@@ -1956,9 +1941,6 @@ anychart.stockModule.Plot.prototype.highlight = function(value) {
  * Removes plot highlight.
  */
 anychart.stockModule.Plot.prototype.unhighlight = function() {
-  if (this.dateTimeHighlighter_)
-    this.dateTimeHighlighter_.remove();
-
   this.highlightedValue_ = NaN;
 
   for (var i = 0; i < this.series_.length; i++) {
@@ -1967,6 +1949,7 @@ anychart.stockModule.Plot.prototype.unhighlight = function() {
       series.removeHighlight();
   }
 
+  this.crosshair().hide();
   if (this.legend_ && this.legend_.enabled()) {
     this.updateLegend_(null, this.chart_.getLastDate());
   }
@@ -2008,6 +1991,7 @@ anychart.stockModule.Plot.prototype.handlePlotMouseOverAndMove_ = function(e) {
       this.frameHighlightRatio_ = x / this.seriesBounds_.width;
       this.frameHighlightX_ = e['clientX'];
       this.frameHighlightY_ = e['clientY'];
+      this.crosshair().xLabelAutoEnabled(this.isLastPlot_);
       if (!goog.isDef(this.frame_))
         this.frame_ = window.requestAnimationFrame(this.frameAction_);
     }
@@ -2021,6 +2005,7 @@ anychart.stockModule.Plot.prototype.handlePlotMouseOverAndMove_ = function(e) {
  * @private
  */
 anychart.stockModule.Plot.prototype.handlePlotMouseOut_ = function(e) {
+  this.dispatchEvent(acgraph.events.EventType.MOUSEOUT);
   this.frameHighlightRatio_ = NaN;
   if (!goog.isDef(this.frame_))
     this.frame_ = window.requestAnimationFrame(this.frameAction_);
@@ -2035,6 +2020,59 @@ anychart.stockModule.Plot.prototype.handlePlotMouseOut_ = function(e) {
 anychart.stockModule.Plot.prototype.handlePlotMouseDown_ = function(e) {
   if (this.chart_.annotationsModule)
     this.annotations().unselect();
+};
+
+
+//endregion
+//region --- Crosshair
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Crosshair
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Sets whether this plot is last in chart.
+ * @param {boolean=} opt_value - Value to set.
+ * @return {anychart.stockModule.Plot|boolean}
+ */
+anychart.stockModule.Plot.prototype.isLastPlot = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.isLastPlot_ = opt_value;
+    return this;
+  }
+  return this.isLastPlot_;
+};
+
+
+/**
+ *
+ * @param {(Object|boolean|null)=} opt_value
+ * @return {!(anychart.core.ui.Crosshair|anychart.stockModule.Plot)}
+ */
+anychart.stockModule.Plot.prototype.crosshair = function(opt_value) {
+  if (!this.crosshair_) {
+    this.crosshair_ = new anychart.core.ui.Crosshair();
+    this.registerDisposable(this.crosshair_);
+    this.crosshair_.listenSignals(this.onCrosshairSignal_, this);
+    this.invalidate(anychart.ConsistencyState.AXES_CHART_CROSSHAIR, anychart.Signal.NEEDS_REDRAW);
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.crosshair_.setup(opt_value);
+    return this;
+  } else {
+    return this.crosshair_;
+  }
+};
+
+
+/**
+ * Listener for crosshair invalidation.
+ * @param {anychart.SignalEvent} event Invalidation event.
+ * @private
+ */
+anychart.stockModule.Plot.prototype.onCrosshairSignal_ = function(event) {
+  this.invalidate(anychart.ConsistencyState.AXES_CHART_CROSSHAIR, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -2309,11 +2347,11 @@ anychart.stockModule.Plot.prototype.serialize = function() {
 
   axesIds.push(goog.getUid(this.xAxis()));
   json['xAxis'] = this.xAxis().serialize();
-  json['dateTimeHighlighter'] = anychart.color.serialize(this.dateTimeHighlighterStroke_);
 
   json['palette'] = this.palette().serialize();
   json['markerPalette'] = this.markerPalette().serialize();
   json['hatchFillPalette'] = this.hatchFillPalette().serialize();
+  json['crosshair'] = this.crosshair().serialize();
 
   var yAxes = [];
   for (i = 0; i < this.yAxes_.length; i++) {
@@ -2452,7 +2490,6 @@ anychart.stockModule.Plot.prototype.setupByJSON = function(config, opt_default) 
   this.background(config['background']);
 
   this.xAxis(config['xAxis']);
-  this.dateTimeHighlighter(config['dateTimeHighlighter']);
   this.legend(config['legend']);
   var type = this.getChart().getType();
 
@@ -2556,6 +2593,8 @@ anychart.stockModule.Plot.prototype.setupByJSON = function(config, opt_default) 
       }
     }
   }
+
+  this.crosshair(config['crosshair']);
 };
 
 
@@ -2686,6 +2725,7 @@ anychart.stockModule.Plot.Dragger.prototype.limitY = function(y) {
 //exports
 (function() {
   var proto = anychart.stockModule.Plot.prototype;
+  proto['crosshair'] = proto.crosshair;
   proto['background'] = proto.background;
   proto['legend'] = proto.legend;
   proto['area'] = proto.area;
@@ -2711,7 +2751,6 @@ anychart.stockModule.Plot.Dragger.prototype.limitY = function(y) {
   proto['xAxis'] = proto.xAxis;
   proto['grid'] = proto.grid;
   proto['minorGrid'] = proto.minorGrid;
-  proto['dateTimeHighlighter'] = proto.dateTimeHighlighter;
   proto['defaultSeriesType'] = proto.defaultSeriesType;
   proto['addSeries'] = proto.addSeries;
   proto['getSeriesAt'] = proto.getSeriesAt;

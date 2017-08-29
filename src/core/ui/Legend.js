@@ -1693,7 +1693,7 @@ anychart.core.ui.Legend.prototype.initializeLegendItems_ = function(items) {
             itemSourceKey == items[i]['sourceKey']) {
           item.clear();
           item.setup(items[i]);
-          item.applyTextSettings(item.getTextElement(), false);
+          item.applyFontColor();
           item.setItemIndexToLayer(this.inverted_ ? items.length - 1 - i : i);
           break;
         }
@@ -1715,6 +1715,8 @@ anychart.core.ui.Legend.prototype.initializeLegendItems_ = function(items) {
       item.container(this.itemsLayer_);
       items[i]['enabled'] = false;
       item.setup(items[i]);
+      if (!item.hasOwnOption('text'))
+        item.ownSettings['text'] = 'Legend Item';
       item.applyTextSettings(item.getTextElement(), true);
       item.setItemIndexToLayer(this.inverted_ ? items.length - 1 - i : i);
 
@@ -1844,7 +1846,7 @@ anychart.core.ui.Legend.prototype.draw = function() {
   this.clearLastDrawedPage_();
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     // Reset items width (needs when container was resized) for DVF-2119
-    if (this.items_ && this.textOverflow() == acgraph.vector.Text.TextOverflow.ELLIPSIS) {
+    if (this.items_ && this.getOption('textOverflow') == acgraph.vector.Text.TextOverflow.ELLIPSIS) {
       for (var i = 0, len = this.items_.length; i < len; i++) {
         this.items_[i].parentBounds(null);
         this.items_[i].getTextElement().width(null);

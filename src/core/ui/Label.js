@@ -31,33 +31,6 @@ anychart.core.ui.Label = function() {
 goog.inherits(anychart.core.ui.Label, anychart.core.ui.LabelBase);
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Utils.
-//
-//----------------------------------------------------------------------------------------------------------------------
-/** @inheritDoc */
-anychart.core.ui.Label.prototype.serialize = function() {
-  var json = anychart.core.ui.Label.base(this, 'serialize');
-  if (goog.isDef(this.position()))
-    json['position'] = this.position();
-  return json;
-};
-
-
-/** @inheritDoc */
-anychart.core.ui.Label.prototype.setupByJSON = function(config, opt_default) {
-  anychart.core.ui.Label.base(this, 'setupByJSON', config, opt_default);
-  this.position(config['position']);
-};
-
-
-/** @inheritDoc */
-anychart.core.ui.Label.prototype.disposeInternal = function() {
-  anychart.core.ui.Label.base(this, 'disposeInternal');
-};
-
-
 
 /**
  * @constructor
@@ -84,19 +57,8 @@ anychart.standalones.label = function() {
 //exports
 (function() {
   var proto = anychart.core.ui.Label.prototype;
-  proto['position'] = proto.position;
   proto['background'] = proto.background;
   proto['padding'] = proto.padding;
-  proto['width'] = proto.width;
-  proto['height'] = proto.height;
-  proto['anchor'] = proto.anchor;
-  proto['offsetX'] = proto.offsetX;
-  proto['offsetY'] = proto.offsetY;
-  proto['text'] = proto.text;
-  proto['minFontSize'] = proto.minFontSize;
-  proto['maxFontSize'] = proto.maxFontSize;
-  proto['adjustFontSize'] = proto.adjustFontSize;
-  proto['rotation'] = proto.rotation;
 
   proto = anychart.standalones.Label.prototype;
   goog.exportSymbol('anychart.standalones.label', anychart.standalones.label);

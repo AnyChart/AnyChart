@@ -735,7 +735,8 @@ anychart.themes.merging.mergingMap_ = (function() {
           'cartesianBase',
           'mekko',
           'scatter',
-          'map'
+          'map',
+          'stock'
         ], [
           ['.crosshair.', [
             [[

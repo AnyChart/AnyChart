@@ -631,8 +631,8 @@ anychart.resourceModule.resourceList.Item.prototype.draw = function() {
           offsetY = offsetY + tagBounds.height + marginBottom + marginTop;
           atLeastOneInARow = false;
         }
-        tag.offsetX(offsetX);
-        tag.offsetY(offsetY);
+        tag['offsetX'](offsetX);
+        tag['offsetY'](offsetY);
         tag.draw();
         atLeastOneInARow = true;
         offsetX += tagBounds.width + marginRight + marginLeft;

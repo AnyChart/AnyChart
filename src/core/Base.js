@@ -426,6 +426,13 @@ anychart.core.Base = function() {
    * @type {!Object.<string, anychart.core.settings.PropertyDescriptorMeta>}
    */
   this.descriptorsMeta = {};
+
+  /**
+   * Whether to dispatch signals even if current consistency state is not effective.
+   * @type {boolean}
+   * @private
+   */
+  this.needsForceSignalsDispatching_ = false;
 };
 goog.inherits(anychart.core.Base, goog.events.EventTarget);
 
@@ -545,6 +552,20 @@ anychart.core.Base.prototype.getHook = function(fieldName) {
 
 
 /**
+ * Whether to dispatch signals even if current consistency state is not effective.
+ * @param {boolean=} opt_value - Value to set.
+ * @return {boolean|anychart.core.Base}
+ */
+anychart.core.Base.prototype.needsForceSignalsDispatching = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.needsForceSignalsDispatching_ = opt_value;
+    return this;
+  }
+  return this.needsForceSignalsDispatching_;
+};
+
+
+/**
  * Adds a signal events listener.
  *
  * @param {function(this:SCOPE, anychart.SignalEvent):(boolean|undefined)} listener Callback
@@ -584,7 +605,7 @@ anychart.core.Base.prototype.invalidate = function(state, opt_signal) {
   state &= this.SUPPORTED_CONSISTENCY_STATES;
   var effective = state & ~this.consistency_;
   this.consistency_ |= effective;
-  if (!!effective)
+  if (effective || this.needsForceSignalsDispatching())
     this.dispatchSignal(opt_signal || 0);
   return effective;
 };

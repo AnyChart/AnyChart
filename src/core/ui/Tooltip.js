@@ -1143,7 +1143,7 @@ anychart.core.ui.Tooltip.prototype.showFloat = function(clientX, clientY, opt_co
     opt_contextProvider['clientX'] = clientX;
     opt_contextProvider['clientY'] = clientY;
     this.title().autoText(this.getFormattedTitle(opt_contextProvider));
-    this.contentInternal().text(this.getFormattedContent_(opt_contextProvider));
+    this.contentInternal()['text'](this.getFormattedContent_(opt_contextProvider));
   }
 
   this.setContainerToTooltip_(this);
@@ -1321,10 +1321,9 @@ anychart.core.ui.Tooltip.prototype.remove = function() {
 
 
 /**
- * Whether needs force invalidation.
- * @return {boolean}
+ * @inheritDoc
  */
-anychart.core.ui.Tooltip.prototype.needsForceInvalidation = function() {
+anychart.core.ui.Tooltip.prototype.needsForceSignalsDispatching = function(opt_value) {
   return (this.check(anychart.core.ui.Tooltip.Capabilities.CAN_CHANGE_DISPLAY_MODE) && !goog.object.isEmpty(this.childTooltipsMap));
 };
 
@@ -1333,10 +1332,10 @@ anychart.core.ui.Tooltip.prototype.needsForceInvalidation = function() {
  * Updates needsForceInvalidation state for complex properties like bg, title, etc.
  */
 anychart.core.ui.Tooltip.prototype.updateForceInvalidation = function() {
-  var forceInvalidation = this.needsForceInvalidation();
-  this.title().forceInvalidate = forceInvalidation;
-  this.separator().forceInvalidate = forceInvalidation;
-  this.background().forceInvalidate = forceInvalidation;
+  var forceInvalidation = /** @type {boolean} */ (this.needsForceSignalsDispatching());
+  this.title().needsForceSignalsDispatching(forceInvalidation);
+  this.separator().needsForceSignalsDispatching(forceInvalidation);
+  this.background().needsForceSignalsDispatching(forceInvalidation);
 };
 
 
@@ -1372,28 +1371,16 @@ anychart.core.ui.Tooltip.prototype.applyTextSettings = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.TOOLTIP_CONTENT)) {
     this.contentInternal().suspendSignalsDispatching();
     for (var key in this.TEXT_PROPERTY_DESCRIPTORS) {
-      // if (key != 'anchor')
       var val = /** @type {Function|boolean|null|number|string|undefined} */ (this.getOption(key));
       if (goog.isDef(val)) {
         this.contentInternal().textSettings(key, val);
       }
     }
-    this.contentInternal().adjustFontSize(/** @type {boolean} */ (this.getOption('adjustFontSize')));
-    this.contentInternal().minFontSize(/** @type {number|string} */ (this.getOption('minFontSize')));
-    this.contentInternal().maxFontSize(/** @type {number|string} */ (this.getOption('maxFontSize')));
+    this.contentInternal()['adjustFontSize'](/** @type {boolean} */ (this.getOption('adjustFontSize')));
+    this.contentInternal()['minFontSize'](/** @type {number|string} */ (this.getOption('minFontSize')));
+    this.contentInternal()['maxFontSize'](/** @type {number|string} */ (this.getOption('maxFontSize')));
     this.contentInternal().resumeSignalsDispatching(false);
   }
-};
-
-
-/**
- * @inheritDoc
- */
-anychart.core.ui.Tooltip.prototype.invalidate = function(state, opt_signal) {
-  var effective = anychart.core.ui.Tooltip.base(this, 'invalidate', state, opt_signal);
-  if (!effective && this.needsForceInvalidation())
-    this.dispatchSignal(opt_signal || 0);
-  return effective;
 };
 
 

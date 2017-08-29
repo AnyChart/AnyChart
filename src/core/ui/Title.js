@@ -164,11 +164,6 @@ anychart.core.ui.Title = function() {
 
 
   /**
-   * @type {boolean}
-   */
-  this.forceInvalidate = false;
-
-  /**
    * Auto text.
    * @type {string}
    * @private
@@ -592,26 +587,6 @@ anychart.core.ui.Title.prototype.autoText = function(opt_value) {
     return this;
   }
   return this.autoText_;
-};
-
-
-/**
- * @inheritDoc
- */
-anychart.core.ui.Title.prototype.invalidate = function(state, opt_signal) {
-  var effective = anychart.core.ui.Title.base(this, 'invalidate', state, opt_signal);
-  if (!effective && this.needsForceInvalidation())
-    this.dispatchSignal(opt_signal || 0);
-  return effective;
-};
-
-
-/**
- * Whether needs force invalidation.
- * @return {boolean}
- */
-anychart.core.ui.Title.prototype.needsForceInvalidation = function() {
-  return this.forceInvalidate;
 };
 
 
