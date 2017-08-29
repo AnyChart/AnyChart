@@ -5,6 +5,7 @@
  */
 
 goog.provide('anychart.core.I3DProvider');
+goog.provide('anychart.core.IAxis');
 goog.provide('anychart.core.IChart');
 goog.provide('anychart.core.IChartWithAnnotations');
 goog.provide('anychart.core.IGroupingProvider');
@@ -15,6 +16,32 @@ goog.forwardDeclare('anychart.core.series.TypeConfig');
 
 
 
+//region IAxis
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  IAxis
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * @interface
+ */
+anychart.core.IAxis = function() {};
+
+
+/**
+ * @return {anychart.scales.IXScale|anychart.core.IAxis}
+ */
+anychart.core.IAxis.prototype.scale = function() {};
+
+
+/**
+ * @param {(Object|boolean|null)=} opt_value Axis labels.
+ * @return {anychart.core.ui.LabelsFactory|anychart.core.IAxis}
+ */
+anychart.core.IAxis.prototype.labels = function(opt_value) {};
+
+
+//endregion
 //region IChart
 //----------------------------------------------------------------------------------------------------------------------
 //

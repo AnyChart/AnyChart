@@ -26,6 +26,7 @@ goog.require('anychart.utils');
  * @constructor
  * @extends {anychart.core.VisualBase}
  * @implements {anychart.core.IStandaloneBackend}
+ * @implements {anychart.core.IAxis}
  */
 anychart.radarPolarBaseModule.RadialAxis = function() {
   this.suspendSignalsDispatching();

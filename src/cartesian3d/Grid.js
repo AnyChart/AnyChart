@@ -2,33 +2,24 @@ goog.provide('anychart.cartesian3dModule.Grid');
 goog.provide('anychart.standalones.grids.Linear3d');
 goog.require('acgraph');
 goog.require('anychart.core.IStandaloneBackend');
-goog.require('anychart.core.GridWithOneDimension');
+goog.require('anychart.core.GridWithLayout');
 
 
 
 /**
  * Grid.
  * @constructor
- * @extends {anychart.core.GridWithOneDimension}
+ * @extends {anychart.core.GridWithLayout}
  * @implements {anychart.core.IStandaloneBackend}
  */
 anychart.cartesian3dModule.Grid = function() {
   anychart.cartesian3dModule.Grid.base(this, 'constructor');
 };
-goog.inherits(anychart.cartesian3dModule.Grid, anychart.core.GridWithOneDimension);
+goog.inherits(anychart.cartesian3dModule.Grid, anychart.core.GridWithLayout);
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Line drawing.
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Draw horizontal line.
- * @param {number} ratio Scale ratio to draw grid line.
- * @param {number} shift Grid line pixel shift.
- * @protected
- */
+//region --- Drawing
+/** @inheritDoc */
 anychart.cartesian3dModule.Grid.prototype.drawLineHorizontal = function(ratio, shift) {
   var parentBounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
   /** @type {number}*/
@@ -45,12 +36,7 @@ anychart.cartesian3dModule.Grid.prototype.drawLineHorizontal = function(ratio, s
 };
 
 
-/**
- * Draw vertical line.
- * @param {number} ratio Scale ratio to draw grid line.
- * @param {number} shift Grid line pixel shift.
- * @protected
- */
+/** @inheritDoc */
 anychart.cartesian3dModule.Grid.prototype.drawLineVertical = function(ratio, shift) {
   var parentBounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
   /** @type {number}*/
@@ -67,19 +53,7 @@ anychart.cartesian3dModule.Grid.prototype.drawLineVertical = function(ratio, shi
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Interlaced drawing.
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Draw horizontal line.
- * @param {number} ratio Scale ratio to draw grid interlace.
- * @param {number} prevRatio Previous scale ratio to draw grid interlace.
- * @param {acgraph.vector.Path} path Layer to draw interlace.
- * @param {number} shift Grid line pixel shift.
- * @protected
- */
+/** @inheritDoc */
 anychart.cartesian3dModule.Grid.prototype.drawInterlaceHorizontal = function(ratio, prevRatio, path, shift) {
   if (!isNaN(prevRatio)) {
     var parentBounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
@@ -102,14 +76,7 @@ anychart.cartesian3dModule.Grid.prototype.drawInterlaceHorizontal = function(rat
 };
 
 
-/**
- * Draw horizontal line.
- * @param {number} ratio Scale ratio to draw grid interlace.
- * @param {number} prevRatio Previous scale ratio to draw grid interlace.
- * @param {acgraph.vector.Path} path Layer to draw interlace.
- * @param {number} shift Grid line pixel shift.
- * @protected
- */
+/** @inheritDoc */
 anychart.cartesian3dModule.Grid.prototype.drawInterlaceVertical = function(ratio, prevRatio, path, shift) {
   if (!isNaN(prevRatio)) {
     var parentBounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
@@ -132,6 +99,7 @@ anychart.cartesian3dModule.Grid.prototype.drawInterlaceVertical = function(ratio
 };
 
 
+//endregion
 //region --- Standalone
 //------------------------------------------------------------------------------
 //
@@ -163,9 +131,15 @@ anychart.standalones.grids.linear3d = function() {
 //endregion
 //exports
 (function() {
-  var proto = anychart.standalones.grids.Linear3d.prototype;
+  var proto = anychart.cartesian3dModule.Grid.prototype;
+  proto['isHorizontal'] = proto.isHorizontal;
+  proto['scale'] = proto.scale;
+  proto['axis'] = proto.axis;
+
+  proto = anychart.standalones.grids.Linear3d.prototype;
   goog.exportSymbol('anychart.standalones.grids.linear3d', anychart.standalones.grids.linear3d);
   proto['draw'] = proto.draw;
   proto['parentBounds'] = proto.parentBounds;
   proto['container'] = proto.container;
+//endregion
 })();

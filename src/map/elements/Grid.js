@@ -475,8 +475,11 @@ anychart.mapModule.elements.Grid.prototype.draw = function() {
     for (i = 0, count = ticksArray.length; i < count; i++) {
       tickVal = ticksArray[i];
 
-      path = this.getFillElement(i);
-      drawInterlace.call(this, tickVal, prevTickVal, null, path, pixelShift, precision);
+      if (i) {
+        path = this.getFillElement(i - 1);
+        if (path)
+          drawInterlace.call(this, tickVal, prevTickVal, null, path, pixelShift, precision);
+      }
 
       if ((!i && this.getOption('drawFirstLine')) || (i == count - 1 && this.getOption('drawLastLine')) || (i != 0 && i != count - 1)) {
         drawLine.call(this, tickVal, majorLineElement, pixelShift, precision);
@@ -486,8 +489,9 @@ anychart.mapModule.elements.Grid.prototype.draw = function() {
     }
 
     if (tickVal != scaleMaximum) {
-      path = this.getFillElement(i);
-      drawInterlace.call(this, scaleMaximum, prevTickVal, null, path, pixelShift);
+      path = this.getFillElement(i - 1);
+      if (path)
+        drawInterlace.call(this, scaleMaximum, prevTickVal, null, path, pixelShift);
     }
 
     pixelShift = -majorLineElement.strokeThickness() % 2 / 2;

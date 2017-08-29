@@ -146,7 +146,7 @@ anychart.radarPolarBaseModule.Chart.prototype.xGrid = function(opt_indexOrValue,
   var grid = this.xGrids_[index];
   if (!grid) {
     grid = this.createGridInstance();
-    grid.setChart(this);
+    grid.setParentElement(this);
     grid.setDefaultLayout(anychart.enums.RadialGridLayout.RADIAL);
     grid.setup(this.defaultGridSettings());
     this.xGrids_[index] = grid;
@@ -183,8 +183,8 @@ anychart.radarPolarBaseModule.Chart.prototype.yGrid = function(opt_indexOrValue,
   var grid = this.yGrids_[index];
   if (!grid) {
     grid = this.createGridInstance();
-    grid.setChart(this);
-    grid.setDefaultLayout(anychart.enums.RadialGridLayout.RADIAL);
+    grid.setParentElement(this);
+    grid.setDefaultLayout(anychart.enums.RadialGridLayout.CIRCUIT);
     grid.setup(this.defaultGridSettings());
     this.yGrids_[index] = grid;
     this.registerDisposable(grid);
@@ -220,8 +220,8 @@ anychart.radarPolarBaseModule.Chart.prototype.xMinorGrid = function(opt_indexOrV
   var grid = this.xMinorGrids_[index];
   if (!grid) {
     grid = this.createGridInstance();
-    grid.setChart(this);
-    grid.setDefaultLayout(anychart.enums.RadialGridLayout.CIRCUIT);
+    grid.setParentElement(this);
+    grid.setDefaultLayout(anychart.enums.RadialGridLayout.RADIAL);
     grid.setup(this.defaultMinorGridSettings());
     this.xMinorGrids_[index] = grid;
     this.registerDisposable(grid);
@@ -257,7 +257,7 @@ anychart.radarPolarBaseModule.Chart.prototype.yMinorGrid = function(opt_indexOrV
   var grid = this.yMinorGrids_[index];
   if (!grid) {
     grid = this.createGridInstance();
-    grid.setChart(this);
+    grid.setParentElement(this);
     grid.setDefaultLayout(anychart.enums.RadialGridLayout.CIRCUIT);
     grid.setup(this.defaultMinorGridSettings());
     this.yMinorGrids_[index] = grid;
@@ -671,10 +671,10 @@ anychart.radarPolarBaseModule.Chart.prototype.setupByJSONWithScales = function(c
   this.defaultGridSettings(config['defaultGridSettings']);
   this.defaultMinorGridSettings(config['defaultMinorGridSettings']);
 
-  this.setupElementsWithScales(config['grids'], this.xGrid, scalesInstances);
-  this.setupElementsWithScales(config['grids'], this.yGrid, scalesInstances);
-  this.setupElementsWithScales(config['minorGrids'], this.xMinorGrid, scalesInstances);
-  this.setupElementsWithScales(config['minorGrids'], this.yMinorGrid, scalesInstances);
+  this.setupElementsWithScales(config['xGrids'], this.xGrid, scalesInstances);
+  this.setupElementsWithScales(config['yGrids'], this.yGrid, scalesInstances);
+  this.setupElementsWithScales(config['xMinorGrids'], this.xMinorGrid, scalesInstances);
+  this.setupElementsWithScales(config['yMinorGrids'], this.yMinorGrid, scalesInstances);
 
   var json = config['xAxis'];
   this.xAxis().setupInternal(!!opt_default, json);
@@ -698,10 +698,10 @@ anychart.radarPolarBaseModule.Chart.prototype.serializeWithScales = function(jso
   json['xAxis'] = this.serializeAxis_(/** @type {anychart.radarModule.Axis|anychart.polarModule.Axis} */(this.xAxis()), scales, scaleIds, axesIds);
   json['yAxis'] = this.serializeAxis_(/** @type {anychart.radarPolarBaseModule.RadialAxis} */(this.yAxis()), scales, scaleIds, axesIds);
 
-  this.serializeElementsWithScales(json, 'grids', this.xGrids_, this.serializeGrid_, scales, scaleIds, axesIds);
-  this.serializeElementsWithScales(json, 'grids', this.yGrids_, this.serializeGrid_, scales, scaleIds, axesIds);
-  this.serializeElementsWithScales(json, 'minorGrids', this.xMinorGrids_, this.serializeGrid_, scales, scaleIds, axesIds);
-  this.serializeElementsWithScales(json, 'minorGrids', this.yMinorGrids_, this.serializeGrid_, scales, scaleIds, axesIds);
+  this.serializeElementsWithScales(json, 'xGrids', this.xGrids_, this.serializeGrid_, scales, scaleIds, axesIds);
+  this.serializeElementsWithScales(json, 'yGrids', this.yGrids_, this.serializeGrid_, scales, scaleIds, axesIds);
+  this.serializeElementsWithScales(json, 'xMinorGrids', this.xMinorGrids_, this.serializeGrid_, scales, scaleIds, axesIds);
+  this.serializeElementsWithScales(json, 'yMinorGrids', this.yMinorGrids_, this.serializeGrid_, scales, scaleIds, axesIds);
 };
 
 

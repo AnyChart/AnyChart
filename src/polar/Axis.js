@@ -19,6 +19,7 @@ goog.require('anychart.radarPolarBaseModule.RadialAxisTicks');
  * @constructor
  * @extends {anychart.core.VisualBase}
  * @implements {anychart.core.IStandaloneBackend}
+ * @implements {anychart.core.IAxis}
  */
 anychart.polarModule.Axis = function() {
   this.suspendSignalsDispatching();

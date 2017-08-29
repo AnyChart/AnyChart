@@ -1,5 +1,6 @@
 goog.provide('anychart.stockModule.Axis');
 goog.require('acgraph');
+goog.require('anychart.core.IAxis');
 goog.require('anychart.core.IGroupingProvider');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.ui.Background');
@@ -14,6 +15,7 @@ goog.require('anychart.stockModule.AxisTicks');
  * @param {anychart.core.IGroupingProvider} groupingProvider
  * @param {boolean=} opt_disableInteractivity
  * @constructor
+ * @implements {anychart.core.IAxis}
  * @extends {anychart.core.VisualBase}
  */
 anychart.stockModule.Axis = function(groupingProvider, opt_disableInteractivity) {

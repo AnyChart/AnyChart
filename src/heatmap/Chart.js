@@ -4,7 +4,7 @@ goog.require('anychart'); // otherwise we can't use anychart.chartTypesMap objec
 goog.require('anychart.colorScalesModule.Ordinal');
 goog.require('anychart.core.Axis');
 goog.require('anychart.core.CartesianBase');
-goog.require('anychart.core.GridWithOneDimension');
+goog.require('anychart.cartesianModule.Grid');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.ChartScroller');
 goog.require('anychart.core.utils.IZoomableChart');

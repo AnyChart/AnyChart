@@ -1,7 +1,7 @@
 goog.provide('anychart.stockModule.Grid');
 goog.require('acgraph');
 goog.require('anychart.color');
-goog.require('anychart.core.GridWithOneDimension');
+goog.require('anychart.core.GridWithLayout');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.utils.Padding');
 goog.require('anychart.enums');
@@ -11,12 +11,12 @@ goog.require('anychart.enums');
 /**
  * Grid.
  * @constructor
- * @extends {anychart.core.GridWithOneDimension}
+ * @extends {anychart.core.GridWithLayout}
  */
 anychart.stockModule.Grid = function() {
   anychart.stockModule.Grid.base(this, 'constructor');
 };
-goog.inherits(anychart.stockModule.Grid, anychart.core.GridWithOneDimension);
+goog.inherits(anychart.stockModule.Grid, anychart.core.GridWithLayout);
 
 
 //region --- Infrastructure
@@ -32,7 +32,12 @@ anychart.stockModule.Grid.prototype.scaleInvalidated = function(event) {
 
 //endregion
 //region --- Drawing
-/** @inheritDoc */
+/**
+ * Draw horizontal line.
+ * @param {number} ratio Scale ratio to draw grid line.
+ * @param {number} shift Grid line pixel shift.
+ * @protected
+ */
 anychart.stockModule.Grid.prototype.drawLineHorizontal = function(ratio, shift) {
   var parentBounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
   /** @type {number}*/
@@ -44,7 +49,12 @@ anychart.stockModule.Grid.prototype.drawLineHorizontal = function(ratio, shift) 
 };
 
 
-/** @inheritDoc */
+/**
+ * Draw vertical line.
+ * @param {number} ratio Scale ratio to draw grid line.
+ * @param {number} shift Grid line pixel shift.
+ * @protected
+ */
 anychart.stockModule.Grid.prototype.drawLineVertical = function(ratio, shift) {
   var parentBounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
   var x = Math.floor((parentBounds.getLeft() + ratio * parentBounds.width) * 2);
@@ -56,7 +66,14 @@ anychart.stockModule.Grid.prototype.drawLineVertical = function(ratio, shift) {
 };
 
 
-/** @inheritDoc */
+/**
+ * Draw horizontal line.
+ * @param {number} ratio Scale ratio to draw grid interlace.
+ * @param {number} prevRatio Previous scale ratio to draw grid interlace.
+ * @param {acgraph.vector.Path} path Layer to draw interlace.
+ * @param {number} shift Grid line pixel shift.
+ * @protected
+ */
 anychart.stockModule.Grid.prototype.drawInterlaceHorizontal = function(ratio, prevRatio, path, shift) {
   if (!isNaN(prevRatio)) {
     var parentBounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
@@ -77,7 +94,14 @@ anychart.stockModule.Grid.prototype.drawInterlaceHorizontal = function(ratio, pr
 };
 
 
-/** @inheritDoc */
+/**
+ * Draw horizontal line.
+ * @param {number} ratio Scale ratio to draw grid interlace.
+ * @param {number} prevRatio Previous scale ratio to draw grid interlace.
+ * @param {acgraph.vector.Path} path Layer to draw interlace.
+ * @param {number} shift Grid line pixel shift.
+ * @protected
+ */
 anychart.stockModule.Grid.prototype.drawInterlaceVertical = function(ratio, prevRatio, path, shift) {
   if (!isNaN(prevRatio)) {
     var parentBounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
@@ -102,118 +126,92 @@ anychart.stockModule.Grid.prototype.drawInterlaceVertical = function(ratio, prev
 
 
 /** @inheritDoc */  
-anychart.stockModule.Grid.prototype.draw = function() {
+anychart.stockModule.Grid.prototype.drawInternal = function() {
   var scale = /** @type {anychart.scales.Base|anychart.stockModule.scales.Scatter} */(this.scale());
 
-  if (!scale) {
-    anychart.core.reporting.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
-    return this;
+  var layout;
+  var path;
+  var ratio;
+  var prevRatio = NaN;
+  var isOrdinal = scale instanceof anychart.scales.Ordinal;
+  var isStock = scale instanceof anychart.stockModule.scales.Scatter;
+  var ticksArray;
+  var isMinor = this.getOption('isMinor');
+  if (isStock) {
+    ticksArray = (/** @type {anychart.stockModule.scales.Scatter} */(scale)).getTicks().toArray(!isMinor);
+  } else if (isOrdinal) {
+    ticksArray = (/** @type {anychart.scales.Ordinal} */(scale)).ticks().get();
+  } else if (isMinor) {
+    ticksArray = (/** @type {anychart.scales.Linear} */(scale)).minorTicks().get();
+  } else {
+    ticksArray = (/** @type {anychart.scales.Linear} */(scale)).ticks().get();
   }
 
-  if (!this.checkDrawingNeeded())
-    return this;
-
-  if (!this.rootLayer) {
-    this.rootLayer = acgraph.layer();
+  if (this.isHorizontal()) {
+    layout = [this.drawLineHorizontal, this.drawInterlaceHorizontal];
+  } else {
+    layout = [this.drawLineVertical, this.drawInterlaceVertical];
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
-    var zIndex = /** @type {number} */(this.zIndex());
-    this.rootLayer.zIndex(zIndex);
-    this.markConsistent(anychart.ConsistencyState.Z_INDEX);
-  }
+  this.clearFillElements();
+  this.lineElement().clear();
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
-    var container = /** @type {acgraph.vector.ILayer} */(this.container());
-    this.rootLayer.parent(container);
-    this.markConsistent(anychart.ConsistencyState.CONTAINER);
-  }
+  var bounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
+  var axesLinesSpace = this.axesLinesSpace();
+  var clip = axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds));
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.GRIDS_POSITION | anychart.ConsistencyState.BOUNDS)) {
-    var layout;
-    var path;
-    var ratio;
-    var prevRatio = NaN;
-    var isOrdinal = scale instanceof anychart.scales.Ordinal;
-    var isStock = scale instanceof anychart.stockModule.scales.Scatter;
-    var ticksArray;
-    var isMinor = this.getOption('isMinor');
-    if (isStock) {
-      ticksArray = (/** @type {anychart.stockModule.scales.Scatter} */(scale)).getTicks().toArray(!isMinor);
-    } else if (isOrdinal) {
-      ticksArray = (/** @type {anychart.scales.Ordinal} */(scale)).ticks().get();
-    } else if (isMinor) {
-      ticksArray = (/** @type {anychart.scales.Linear} */(scale)).minorTicks().get();
-    } else {
-      ticksArray = (/** @type {anychart.scales.Linear} */(scale)).ticks().get();
-    }
+  this.lineElement().clip(clip);
 
-    if (this.isHorizontal()) {
-      layout = [this.drawLineHorizontal, this.drawInterlaceHorizontal];
-    } else {
-      layout = [this.drawLineVertical, this.drawInterlaceVertical];
-    }
+  var drawInterlace = layout[1];
+  var drawLine = layout[0];
 
-    this.clearFillElements();
-    this.lineElement().clear();
+  var needsShift = acgraph.vector.getThickness(this.stroke_) % 2 == 1;
 
-    var bounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
-    var axesLinesSpace = this.axesLinesSpace();
-    var clip = axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds));
+  for (var i = 0, count = ticksArray.length; i < count; i++) {
+    var tickVal = ticksArray[i];
+    if (goog.isArray(tickVal)) tickVal = tickVal[0];
+    if (isStock)
+      ratio = (/** @type {anychart.stockModule.scales.Scatter} */(scale)).transformAligned(tickVal);
+    else
+      ratio = scale.transform(tickVal);
 
-    this.lineElement().clip(clip);
-
-    var drawInterlace = layout[1];
-    var drawLine = layout[0];
-
-    var needsShift = acgraph.vector.getThickness(this.stroke_) % 2 == 1;
-
-    for (var i = 0, count = ticksArray.length; i < count; i++) {
-      var tickVal = ticksArray[i];
-      if (goog.isArray(tickVal)) tickVal = tickVal[0];
-      if (isStock)
-        ratio = (/** @type {anychart.stockModule.scales.Scatter} */(scale)).transformAligned(tickVal);
-      else
-        ratio = scale.transform(tickVal);
-
-      path = this.getFillElement(i);
+    if (i) {
+      path = this.getFillElement(i - 1);
       if (path) {
         drawInterlace.call(this, ratio, prevRatio, path, needsShift);
       }
+    }
 
-      if (!i) {
-        if (this.getOption('drawFirstLine'))
-          drawLine.call(this, ratio, needsShift);
-      } else if (i == count - 1) {
-        if (this.getOption('drawLastLine') || isOrdinal)
-          drawLine.call(this, ratio, needsShift);
-      } else {
+    if (!i) {
+      if (this.getOption('drawFirstLine'))
         drawLine.call(this, ratio, needsShift);
-      }
-
-      prevRatio = ratio;
+    } else if (i == count - 1) {
+      if (this.getOption('drawLastLine') || isOrdinal)
+        drawLine.call(this, ratio, needsShift);
+    } else {
+      drawLine.call(this, ratio, needsShift);
     }
 
-    //draw last line on ordinal
-    if (isOrdinal && goog.isDef(tickVal)) {
-      if (this.getOption('drawLastLine')) drawLine.call(this, 1, needsShift);
-      path = this.getFillElement(i);
-      if (path) {
-        drawInterlace.call(this, 1, ratio, path, needsShift);
-      }
+    prevRatio = ratio;
+  }
+
+  //draw last line on ordinal
+  if (isOrdinal && goog.isDef(tickVal)) {
+    if (this.getOption('drawLastLine')) drawLine.call(this, 1, needsShift);
+    path = this.getFillElement(i - 1);
+    if (path) {
+      drawInterlace.call(this, 1, ratio, path, needsShift);
     }
-
-    this.markConsistent(anychart.ConsistencyState.GRIDS_POSITION | anychart.ConsistencyState.BOUNDS);
   }
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    this.lineElement().stroke(/** @type {acgraph.vector.Stroke} */(this.stroke()));
-    this.markConsistent(anychart.ConsistencyState.APPEARANCE);
-  }
-
-  return this;
 };
 
 
 //endregion
-
+//region --- Exports
+(function() {
+  var proto = anychart.cartesianModule.Grid.prototype;
+  proto['isHorizontal'] = proto.isHorizontal;
+  proto['scale'] = proto.scale;
+  proto['axis'] = proto.axis;
+})();
+//endregion

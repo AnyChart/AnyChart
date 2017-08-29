@@ -20,6 +20,7 @@ goog.require('anychart.scales.Base');
  * @constructor
  * @extends {anychart.core.VisualBase}
  * @implements {anychart.core.IStandaloneBackend}
+ * @implements {anychart.core.IAxis}
  */
 anychart.radarModule.Axis = function() {
   this.suspendSignalsDispatching();
