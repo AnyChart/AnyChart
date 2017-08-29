@@ -135,6 +135,15 @@ anychart.stockModule.scales.Scatter.prototype.SUPPORTED_SIGNALS =
 
 
 /**
+ * Return scale type.
+ * @return {anychart.enums.ScaleTypes}
+ */
+anychart.stockModule.scales.Scatter.prototype.getType = function() {
+  return anychart.enums.ScaleTypes.STOCK_SCATTER_DATE_TIME;
+};
+
+
+/**
  * Max ticks count for interval-mode ticks calculation.
  * @param {number=} opt_value
  * @return {number|anychart.stockModule.scales.Scatter}

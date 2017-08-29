@@ -1,6 +1,10 @@
 goog.provide('anychart.core.Text');
+
 goog.require('acgraph');
 goog.require('anychart.core.VisualBase');
+goog.require('anychart.core.settings');
+goog.require('anychart.enums');
+goog.require('goog.array');
 
 
 
@@ -8,39 +12,62 @@ goog.require('anychart.core.VisualBase');
  * This class is responsible of the text formatting, it processes the plain text and the text in HTML format.
  * @constructor
  * @extends {anychart.core.VisualBase}
+ * @implements {anychart.core.settings.IResolvable}
  */
 anychart.core.Text = function() {
   anychart.core.Text.base(this, 'constructor');
 
   /**
-   * Settings object.
-   * @type {!Object}
-   * @protected
+   * Parent settings storage.
+   * @type {?anychart.core.Text}
+   * @private
    */
-  this.settingsObj = {};
+  this.parent_ = null;
 
   /**
-   * Contains the flags for all settings that were changed.
-   * @type {!Object.<boolean>}
-   * @protected
+   * @type {Object.<string, anychart.core.Text>}
    */
-  this.changedSettings = {};
+  this.childTextMap = {};
 
   /**
-   * The enumeration of the text settings that do not cause PIXEL_BOUNDS invalidation both with APPEARANCE.
-   * @type {Object.<boolean>}
-   * @protected
+   * Resolution chain cache.
+   * @type {?Array.<Object|null|undefined>}
+   * @private
    */
-  this.notCauseBoundsChange = {
-    'fontColor': true,
-    'fontOpacity': true,
-    'selectable': true,
-    'disablePointerEvents': true
-  };
+  this.resolutionChainCache_ = null;
+
+  var boundsState = anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS;
+  var noBoundsState = anychart.ConsistencyState.APPEARANCE;
+  var boundsSignal = anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED;
+  var noBoundsSignal = anychart.Signal.NEEDS_REDRAW;
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['fontSize', boundsState, boundsSignal],
+    ['fontFamily', boundsState, boundsSignal],
+    ['fontColor', noBoundsState, noBoundsSignal],
+    ['fontOpacity', noBoundsState, noBoundsSignal],
+    ['fontDecoration', boundsState, boundsSignal],
+    ['fontStyle', boundsState, boundsSignal],
+    ['fontVariant', boundsState, boundsSignal],
+    ['fontWeight', boundsState, boundsSignal],
+    ['letterSpacing', boundsState, boundsSignal],
+    ['textDirection', boundsState, boundsSignal],
+    ['lineHeight', boundsState, boundsSignal],
+    ['textIndent', boundsState, boundsSignal],
+    ['vAlign', boundsState, boundsSignal],
+    ['hAlign', boundsState, boundsSignal],
+    ['wordWrap', boundsState, boundsSignal],
+    ['wordBreak', boundsState, boundsSignal],
+    ['textOverflow', boundsState, boundsSignal],
+    ['selectable', noBoundsState, noBoundsSignal],
+    ['disablePointerEvents', noBoundsState, noBoundsSignal],
+    ['useHtml', boundsState, boundsSignal]
+  ]);
 };
 goog.inherits(anychart.core.Text, anychart.core.VisualBase);
 
 
+//region -- Consistency states and signals.
 /**
  * Supported consistency states.
  * @type {number}
@@ -59,6 +86,256 @@ anychart.core.Text.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.APPEARANCE;
 
 
+//endregion
+//region -- Descriptors.
+/**
+ * Base descriptors.
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.core.Text.BASE_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'fontSize',
+      anychart.core.settings.numberOrStringNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'fontFamily',
+      anychart.core.settings.stringNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'fontColor',
+      anychart.core.settings.stringNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'fontOpacity',
+      anychart.core.settings.ratioNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'fontDecoration',
+      anychart.enums.normalizeFontDecoration);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'fontStyle',
+      anychart.enums.normalizeFontStyle);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'fontVariant',
+      anychart.enums.normalizeFontVariant);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'fontWeight',
+      anychart.core.settings.numberOrStringNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'letterSpacing',
+      anychart.core.settings.numberOrStringNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'textDirection',
+      anychart.enums.normalizeTextDirection);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'lineHeight',
+      anychart.core.settings.numberOrStringNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'textIndent',
+      anychart.core.settings.numberOrStringNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'vAlign',
+      anychart.enums.normalizeVAlign);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'hAlign',
+      anychart.enums.normalizeHAlign);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'wordWrap',
+      anychart.core.settings.stringNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'wordBreak',
+      anychart.core.settings.stringNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'textOverflow',
+      anychart.core.settings.stringNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'selectable',
+      anychart.core.settings.booleanNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'disablePointerEvents',
+      anychart.core.settings.booleanNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'useHtml',
+      anychart.core.settings.booleanNormalizer);
+
+  return map;
+})();
+anychart.core.settings.populate(anychart.core.Text, anychart.core.Text.BASE_DESCRIPTORS);
+
+
+/**
+ * Text descriptors. Adds text() method if needed.
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.core.Text.TEXT_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'text',
+      anychart.core.settings.stringNormalizer);
+
+  return map;
+})();
+
+
+//endregion
+//region -- Parental relations.
+/**
+ * Gets/sets parent tooltip.
+ * @param {anychart.core.Text=} opt_value - Parent to set.
+ * @return {anychart.core.Text}
+ */
+anychart.core.Text.prototype.parent = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.parent_ != opt_value) {
+      var uid = String(goog.getUid(this));
+      if (goog.isNull(opt_value)) { //removing parent.
+        //this.parent_ is not null here.
+        this.parent_.unlistenSignals(this.parentInvalidated_, this);
+        delete this.parent_.childTextMap[uid];
+        this.parent_ = null;
+      } else {
+        if (this.parent_)
+          this.parent_.unlistenSignals(this.parentInvalidated_, this);
+        this.parent_ = opt_value;
+        this.parent_.childTextMap[uid] = this;
+        this.parent_.listenSignals(this.parentInvalidated_, this);
+      }
+    }
+    return this;
+  }
+  return this.parent_;
+};
+
+
+/**
+ * Parent invalidation handler.
+ * @param {anychart.SignalEvent} e - Signal event.
+ * @private
+ */
+anychart.core.Text.prototype.parentInvalidated_ = function(e) {
+  var state = anychart.ConsistencyState.APPEARANCE;
+  var signal = anychart.Signal.NEEDS_REDRAW;
+
+  if (e.hasSignal(anychart.Signal.BOUNDS_CHANGED) || e.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
+    state |= anychart.ConsistencyState.BOUNDS;
+    signal |= anychart.Signal.BOUNDS_CHANGED;
+  }
+
+  if (e.hasSignal(anychart.Signal.ENABLED_STATE_CHANGED)) {
+    state |= anychart.ConsistencyState.ENABLED;
+  }
+
+  this.resolutionChainCache_ = null;
+  this.invalidate(state, signal);
+};
+
+
+//endregion
+//region -- IResolvable impl.
+/**
+ * @override
+ * @param {string} name
+ * @return {*}
+ */
+anychart.core.Text.prototype.getOption = anychart.core.settings.getOption;
+
+
+/** @inheritDoc */
+anychart.core.Text.prototype.resolutionChainCache = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.resolutionChainCache_ = opt_value;
+  }
+  return this.resolutionChainCache_;
+};
+
+
+/** @inheritDoc */
+anychart.core.Text.prototype.getResolutionChain = anychart.core.settings.getResolutionChain;
+
+
+/** @inheritDoc */
+anychart.core.Text.prototype.getLowPriorityResolutionChain = function() {
+  var sett = [this.themeSettings];
+  if (this.parent_)
+    sett = goog.array.concat(sett, this.parent_.getLowPriorityResolutionChain());
+  return sett;
+};
+
+
+/** @inheritDoc */
+anychart.core.Text.prototype.getHighPriorityResolutionChain = function() {
+  var sett = [this.ownSettings];
+  if (this.parent_) {
+    sett = goog.array.concat(sett, this.parent_.getHighPriorityResolutionChain());
+  }
+  return sett;
+};
+
+
+//endregion
+//region -- Working with text props.
 /**
  * Getter/setter for textSettings.
  * @param {(Object|string)=} opt_objectOrName Settings object or settings name or nothing to get complete object.
@@ -69,258 +346,23 @@ anychart.core.Text.prototype.textSettings = function(opt_objectOrName, opt_value
   if (goog.isDef(opt_objectOrName)) {
     if (goog.isString(opt_objectOrName)) {
       if (goog.isDef(opt_value)) {
-        if (this.settingsObj[opt_objectOrName] != opt_value) {
-          this.settingsObj[opt_objectOrName] = opt_value;
-          this.changedSettings[opt_objectOrName] = true;
-          var state = anychart.ConsistencyState.APPEARANCE;
-          var signal = anychart.Signal.NEEDS_REDRAW;
-          if (!(opt_objectOrName in this.notCauseBoundsChange)) {
-            state |= anychart.ConsistencyState.BOUNDS;
-            signal |= anychart.Signal.BOUNDS_CHANGED;
-          }
-          this.invalidate(state, signal);
-        }
+        if (opt_objectOrName in anychart.core.Text.BASE_DESCRIPTORS)
+          this[opt_objectOrName](opt_value);
         return this;
       } else {
-        return this.settingsObj[opt_objectOrName];
+        return this.ownSettings[opt_objectOrName];
       }
     } else if (goog.isObject(opt_objectOrName)) {
+      this.suspendSignalsDispatching();
       for (var item in opt_objectOrName) {
-        this.textSettings(item, opt_objectOrName[item]);
+        if (opt_objectOrName.hasOwnProperty(item))
+          this.textSettings(item, opt_objectOrName[item]);
       }
+      this.resumeSignalsDispatching(true);
     }
     return this;
   }
-  return goog.object.clone(this.settingsObj);
-};
-
-
-/**
- * Getter/setter for fontSize.
- * @param {string|number=} opt_value
- * @return {!anychart.core.Text|string|number}
- */
-anychart.core.Text.prototype.fontSize = function(opt_value) {
-  if (goog.isDef(opt_value)) opt_value = anychart.utils.toNumberOrString(opt_value);
-  return /** @type {!anychart.core.Text|string|number} */(this.textSettings('fontSize', opt_value));
-};
-
-
-/**
- * Getter/setter for fontFamily.
- * @param {string=} opt_value
- * @return {!anychart.core.Text|string}
- */
-anychart.core.Text.prototype.fontFamily = function(opt_value) {
-  if (goog.isDef(opt_value)) opt_value = String(opt_value);
-  return /** @type {!anychart.core.Text|string} */(this.textSettings('fontFamily', opt_value));
-};
-
-
-/**
- * Getter/setter for fontColor.
- * @param {string=} opt_value
- * @return {!anychart.core.Text|string}
- */
-anychart.core.Text.prototype.fontColor = function(opt_value) {
-  if (goog.isDef(opt_value)) opt_value = String(opt_value);
-  return /** @type {!anychart.core.Text|string} */(this.textSettings('fontColor', opt_value));
-};
-
-
-/**
- * Getter/setter for fontOpacity.
- * @param {number=} opt_value
- * @return {!anychart.core.Text|number}
- */
-anychart.core.Text.prototype.fontOpacity = function(opt_value) {
-  if (goog.isDef(opt_value)) opt_value = goog.math.clamp(+opt_value, 0, 1);
-  return /** @type {!anychart.core.Text|number} */(this.textSettings('fontOpacity', opt_value));
-};
-
-
-/**
- * Getter/setter for fontDecoration.
- * @param {(anychart.enums.TextDecoration|string)=} opt_value
- * @return {!anychart.core.Text|anychart.enums.TextDecoration}
- */
-anychart.core.Text.prototype.fontDecoration = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeFontDecoration(opt_value);
-  }
-  return /** @type {!anychart.core.Text|anychart.enums.TextDecoration} */(this.textSettings('fontDecoration', opt_value));
-};
-
-
-/**
- * Getter/setter for fontStyle.
- * @param {anychart.enums.FontStyle|string=} opt_value
- * @return {!anychart.core.Text|anychart.enums.FontStyle}
- */
-anychart.core.Text.prototype.fontStyle = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeFontStyle(opt_value);
-  }
-  return /** @type {!anychart.core.Text|anychart.enums.FontStyle} */(this.textSettings('fontStyle', opt_value));
-};
-
-
-/**
- * Getter/setter for fontVariant.
- * @param {anychart.enums.FontVariant|string=} opt_value
- * @return {!anychart.core.Text|anychart.enums.FontVariant}
- */
-anychart.core.Text.prototype.fontVariant = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeFontVariant(opt_value);
-  }
-  return /** @type {!anychart.core.Text|anychart.enums.FontVariant} */(this.textSettings('fontVariant', opt_value));
-};
-
-
-/**
- * Getter/setter for fontWeight.
- * @param {(string|number)=} opt_value
- * @return {!anychart.core.Text|string|number}
- */
-anychart.core.Text.prototype.fontWeight = function(opt_value) {
-  if (goog.isDef(opt_value)) opt_value = anychart.utils.toNumberOrString(opt_value);
-  return /** @type {!anychart.core.Text|string|number} */(this.textSettings('fontWeight', opt_value));
-};
-
-
-/**Getter/setter for letterSpacing.
- * @param {(number|string)=} opt_value
- * @return {!anychart.core.Text|number|string}
- */
-anychart.core.Text.prototype.letterSpacing = function(opt_value) {
-  if (goog.isDef(opt_value)) opt_value = anychart.utils.toNumberOrString(opt_value);
-  return /** @type {!anychart.core.Text|number|string} */(this.textSettings('letterSpacing', opt_value));
-};
-
-
-/**
- * Getter/setter for textDirection.
- * @param {anychart.enums.TextDirection|string=} opt_value
- * @return {!anychart.core.Text|anychart.enums.TextDirection}
- */
-anychart.core.Text.prototype.textDirection = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeTextDirection(opt_value);
-  }
-  return /** @type {!anychart.core.Text|anychart.enums.TextDirection} */(this.textSettings('textDirection', opt_value));
-};
-
-
-/**
- * Getter/setter for lineHeight.
- * @param {(number|string)=} opt_value
- * @return {!anychart.core.Text|number|string}
- */
-anychart.core.Text.prototype.lineHeight = function(opt_value) {
-  if (goog.isDef(opt_value)) opt_value = anychart.utils.toNumberOrString(opt_value);
-  return /** @type {!anychart.core.Text|number|string} */(this.textSettings('lineHeight', opt_value));
-};
-
-
-/**
- * Getter/setter for textIndent.
- * @param {number=} opt_value
- * @return {!anychart.core.Text|number}
- */
-anychart.core.Text.prototype.textIndent = function(opt_value) {
-  if (goog.isDef(opt_value)) opt_value = parseFloat(anychart.utils.toNumberOrString(opt_value));
-  return /** @type {!anychart.core.Text|number} */(this.textSettings('textIndent', opt_value));
-};
-
-
-/**
- * Getter/setter for vAlign.
- * @param {anychart.enums.VAlign|string=} opt_value
- * @return {!anychart.core.Text|anychart.enums.VAlign}
- */
-anychart.core.Text.prototype.vAlign = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeVAlign(opt_value);
-  }
-  return /** @type {!anychart.core.Text|anychart.enums.VAlign} */(this.textSettings('vAlign', opt_value));
-};
-
-
-/**
- * Getter/setter for hAlign.
- * @param {anychart.enums.HAlign|string=} opt_value
- * @return {!anychart.core.Text|anychart.enums.HAlign}
- */
-anychart.core.Text.prototype.hAlign = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeHAlign(opt_value);
-  }
-  return /** @type {!anychart.core.Text|anychart.enums.HAlign} */(this.textSettings('hAlign', opt_value));
-};
-
-
-/**
- * Getter/setter for wordWrap.
- * @param {string=} opt_value
- * @return {!anychart.core.Text|string}
- */
-anychart.core.Text.prototype.wordWrap = function(opt_value) {
-  return /** @type {!anychart.core.Text|string} */(this.textSettings('wordWrap', opt_value));
-};
-
-
-/**
- * Getter/setter for wordBreak.
- * @param {string=} opt_value
- * @return {!anychart.core.Text|string}
- */
-anychart.core.Text.prototype.wordBreak = function(opt_value) {
-  return /** @type {!anychart.core.Text|string} */(this.textSettings('wordBreak', opt_value));
-};
-
-
-/**
- * Getter/setter for textOverflow.
- * @param {acgraph.vector.Text.TextOverflow|string=} opt_value
- * @return {!anychart.core.Text|acgraph.vector.Text.TextOverflow}
- */
-anychart.core.Text.prototype.textOverflow = function(opt_value) {
-  if (goog.isDef(opt_value)) opt_value = String(opt_value);
-  return /** @type {!anychart.core.Text|acgraph.vector.Text.TextOverflow} */(this.textSettings('textOverflow', opt_value));
-};
-
-
-/**
- * Getter/setter for selectable.
- * @param {boolean=} opt_value
- * @return {!anychart.core.Text|boolean}
- */
-anychart.core.Text.prototype.selectable = function(opt_value) {
-  if (goog.isDef(opt_value)) opt_value = !!opt_value;
-  return /** @type {!anychart.core.Text|boolean} */(this.textSettings('selectable', opt_value));
-};
-
-
-/**
- * Pointer events.
- * @param {boolean=} opt_value
- * @return {!anychart.core.Text|boolean}
- */
-anychart.core.Text.prototype.disablePointerEvents = function(opt_value) {
-  if (goog.isDef(opt_value)) opt_value = !!opt_value;
-  return /** @type {!anychart.core.Text|boolean} */(this.textSettings('disablePointerEvents', opt_value));
-};
-
-
-/**
- * Getter/setter for useHtml.
- * @param {boolean=} opt_value
- * @return {!anychart.core.Text|boolean}
- */
-anychart.core.Text.prototype.useHtml = function(opt_value) {
-  if (goog.isDef(opt_value)) opt_value = !!opt_value;
-  return /** @type {!anychart.core.Text|boolean} */(this.textSettings('useHtml', opt_value));
+  return goog.object.clone(this.ownSettings);
 };
 
 
@@ -331,70 +373,78 @@ anychart.core.Text.prototype.useHtml = function(opt_value) {
  * @protected
  */
 anychart.core.Text.prototype.applyTextSettings = function(textElement, isInitial) {
-  if (isInitial || 'fontSize' in this.changedSettings)
-    textElement.fontSize(this.settingsObj['fontSize']);
-  if (isInitial || 'fontFamily' in this.changedSettings)
-    textElement.fontFamily(this.settingsObj['fontFamily']);
-  if (isInitial || 'fontColor' in this.changedSettings)
-    textElement.color(/** @type {string} */(this.fontColor()));
-  if (isInitial || 'textDirection' in this.changedSettings)
-    textElement.direction(this.settingsObj['textDirection']);
-  if (isInitial || 'wordWrap' in this.changedSettings)
-    textElement.wordWrap(this.settingsObj['wordWrap']);
-  if (isInitial || 'wordBreak' in this.changedSettings)
-    textElement.wordBreak(this.settingsObj['wordBreak']);
-  if ('fontOpacity' in this.changedSettings)
-    textElement.opacity(this.settingsObj['fontOpacity']);
-  if ('fontDecoration' in this.changedSettings)
-    textElement.decoration(this.settingsObj['fontDecoration']);
-  if (isInitial || 'fontStyle' in this.changedSettings)
-    textElement.fontStyle(this.settingsObj['fontStyle']);
-  if ('fontVariant' in this.changedSettings)
-    textElement.fontVariant(this.settingsObj['fontVariant']);
-  if (isInitial || 'fontWeight' in this.changedSettings)
-    textElement.fontWeight(this.settingsObj['fontWeight']);
-  if ('letterSpacing' in this.changedSettings)
-    textElement.letterSpacing(this.settingsObj['letterSpacing']);
-  if ('lineHeight' in this.changedSettings)
-    textElement.lineHeight(this.settingsObj['lineHeight']);
-  if ('textIndent' in this.changedSettings)
-    textElement.textIndent(this.settingsObj['textIndent']);
-  if ('vAlign' in this.changedSettings)
-    textElement.vAlign(this.settingsObj['vAlign']);
-  if ('hAlign' in this.changedSettings)
-    textElement.hAlign(this.settingsObj['hAlign']);
-  if ('textOverflow' in this.changedSettings)
-    textElement.textOverflow(this.settingsObj['textOverflow']);
-  if (isInitial || 'selectable' in this.changedSettings)
-    textElement.selectable(this.settingsObj['selectable']);
-  if (isInitial || 'disablePointerEvents' in this.changedSettings)
-    textElement.disablePointerEvents(!!this.settingsObj['disablePointerEvents']);
+  var key;
+  for (key in anychart.core.Text.BASE_DESCRIPTORS) {
+    if (anychart.core.Text.BASE_DESCRIPTORS.hasOwnProperty(key)) {
+      var textElementKey;
+      switch (key) {
+        case 'fontColor':
+          textElementKey = 'color';
+          break;
+        case 'textDirection':
+          textElementKey = 'direction';
+          break;
+        case 'fontOpacity':
+          textElementKey = 'opacity';
+          break;
+        case 'fontDecoration':
+          textElementKey = 'decoration';
+          break;
+        default:
+          textElementKey = key;
+      }
+
+      if (textElementKey != 'useHtml' && (isInitial || textElement[textElementKey]() !== this.getOption(key)))
+        textElement[textElementKey](this.getOption(key));
+    }
+  }
+
+  if ('text' in this.descriptorsMeta) {
+    var text = /** @type {string|undefined} */ (this.getOption('text'));
+    var useHtml = !!this.getOption('useHtml');
+    var textElementText = useHtml ? textElement.htmlText() : textElement.text();
+
+    if (isInitial || text !== textElementText) {
+      if (useHtml)
+        textElement.htmlText(text);
+      else
+        textElement.text(text);
+    }
+  }
+};
+
+
+//endregion
+//region -- Serialization/Deserialization.
+/** @inheritDoc */
+anychart.core.Text.prototype.enabled = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.ownSettings['enabled'] != opt_value) {
+      this.ownSettings['enabled'] = opt_value;
+      this.invalidate(anychart.ConsistencyState.ENABLED,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED | anychart.Signal.ENABLED_STATE_CHANGED);
+      if (this.ownSettings['enabled']) {
+        this.doubleSuspension = false;
+        this.resumeSignalsDispatching(true);
+      } else {
+        if (isNaN(this.suspendedDispatching)) {
+          this.suspendSignalsDispatching();
+        } else {
+          this.doubleSuspension = true;
+        }
+      }
+    }
+    return this;
+  } else {
+    return /** @type {boolean} */(this.getOption('enabled'));
+  }
 };
 
 
 /** @inheritDoc */
 anychart.core.Text.prototype.serialize = function() {
   var json = anychart.core.Text.base(this, 'serialize');
-  if (goog.isDef(this.fontSize())) json['fontSize'] = this.fontSize();
-  if (goog.isDef(this.fontFamily())) json['fontFamily'] = this.fontFamily();
-  if (goog.isDef(this.fontColor())) json['fontColor'] = this.fontColor();
-  if (goog.isDef(this.fontOpacity())) json['fontOpacity'] = this.fontOpacity();
-  if (goog.isDef(this.fontDecoration())) json['fontDecoration'] = this.fontDecoration();
-  if (goog.isDef(this.fontStyle())) json['fontStyle'] = this.fontStyle();
-  if (goog.isDef(this.fontVariant())) json['fontVariant'] = this.fontVariant();
-  if (goog.isDef(this.fontWeight())) json['fontWeight'] = this.fontWeight();
-  if (goog.isDef(this.letterSpacing())) json['letterSpacing'] = this.letterSpacing();
-  if (goog.isDef(this.textDirection())) json['textDirection'] = this.textDirection();
-  if (goog.isDef(this.lineHeight())) json['lineHeight'] = this.lineHeight();
-  if (goog.isDef(this.textIndent())) json['textIndent'] = this.textIndent();
-  if (goog.isDef(this.vAlign())) json['vAlign'] = this.vAlign();
-  if (goog.isDef(this.hAlign())) json['hAlign'] = this.hAlign();
-  if (goog.isDef(this.wordWrap())) json['wordWrap'] = this.wordWrap();
-  if (goog.isDef(this.wordBreak())) json['wordBreak'] = this.wordBreak();
-  if (goog.isDef(this.textOverflow())) json['textOverflow'] = this.textOverflow();
-  if (goog.isDef(this.selectable())) json['selectable'] = this.selectable();
-  if (goog.isDef(this.disablePointerEvents())) json['disablePointerEvents'] = this.disablePointerEvents();
-  if (goog.isDef(this.useHtml())) json['useHtml'] = this.useHtml();
+  anychart.core.settings.serialize(this, anychart.core.Text.BASE_DESCRIPTORS, json, 'Text');
   return json;
 };
 
@@ -402,51 +452,17 @@ anychart.core.Text.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.core.Text.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.Text.base(this, 'setupByJSON', config, opt_default);
-  this.fontSize(config['fontSize']);
-  this.fontFamily(config['fontFamily']);
-  this.fontColor(config['fontColor']);
-  this.fontOpacity(config['fontOpacity']);
-  this.fontDecoration(config['fontDecoration']);
-  this.fontStyle(config['fontStyle']);
-  this.fontVariant(config['fontVariant']);
-  this.fontWeight(config['fontWeight']);
-  this.letterSpacing(config['letterSpacing']);
-  this.textDirection(config['textDirection']);
-  this.lineHeight(config['lineHeight']);
-  this.textIndent(config['textIndent']);
-  this.vAlign(config['vAlign']);
-  this.hAlign(config['hAlign']);
-  this.wordWrap(config['wordWrap']);
-  this.wordBreak(config['wordBreak']);
-  this.textOverflow(config['textOverflow']);
-  this.selectable(config['selectable']);
-  this.disablePointerEvents(config['disablePointerEvents']);
-  this.useHtml(config['useHtml']);
+  if (opt_default) {
+    anychart.core.settings.copy(this.themeSettings, anychart.core.Text.BASE_DESCRIPTORS, config);
+  } else {
+    anychart.core.settings.deserialize(this, anychart.core.Text.BASE_DESCRIPTORS, config);
+  }
 };
 
 
-//exports
+//endregion
+// exports
 (function() {
   var proto = anychart.core.Text.prototype;
-  proto['fontSize'] = proto.fontSize;//in docs/final
-  proto['fontFamily'] = proto.fontFamily;//in docs/final
-  proto['fontColor'] = proto.fontColor;//in docs/final
-  proto['fontOpacity'] = proto.fontOpacity;//in docs/final
-  proto['fontDecoration'] = proto.fontDecoration;//in docs/final
-  proto['fontStyle'] = proto.fontStyle;//in docs/final
-  proto['fontVariant'] = proto.fontVariant;//in docs/final
-  proto['fontWeight'] = proto.fontWeight;//in docs/final
-  proto['letterSpacing'] = proto.letterSpacing;//in docs/final
-  proto['textDirection'] = proto.textDirection;//in docs/final
-  proto['lineHeight'] = proto.lineHeight;//in docs/final
-  proto['textIndent'] = proto.textIndent;//in docs/final
-  proto['vAlign'] = proto.vAlign;//in docs/final
-  proto['hAlign'] = proto.hAlign;//in docs/final
-  proto['wordWrap'] = proto.wordWrap;//in docs/final
-  proto['wordBreak'] = proto.wordBreak;//in docs/final
-  proto['textOverflow'] = proto.textOverflow;//in docs/final
-  proto['selectable'] = proto.selectable;//in docs/final
-  proto['disablePointerEvents'] = proto.disablePointerEvents;//in docs/final
-  proto['useHtml'] = proto.useHtml;//in docs/final
   proto['textSettings'] = proto.textSettings;//in docs/final
 })();

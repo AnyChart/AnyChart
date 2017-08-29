@@ -165,8 +165,8 @@ anychart.circularGaugeModule.Label.prototype.drawLabel = function() {
   var position = new goog.math.Coordinate(0, 0);
 
   if (this.parentBounds() || (!isNaN(this.cx_) && !isNaN(this.cy_))) {
-    var offsetX = /** @type {number|string} */(this.offsetX());
-    var offsetY = /** @type {number|string} */(this.offsetY());
+    var offsetX = /** @type {number|string} */(this.getOption('offsetX'));
+    var offsetY = /** @type {number|string} */(this.getOption('offsetY'));
     var cx = isNaN(this.cx_) ? parentX + parentWidth / 2 : this.cx_;
     var cy = isNaN(this.cy_) ? parentY + parentHeight / 2 : this.cy_;
     var startAngle = goog.isDefAndNotNull(this.startAngle_) ? this.startAngle_ : 0;
@@ -185,7 +185,7 @@ anychart.circularGaugeModule.Label.prototype.drawLabel = function() {
     position.y = 0;
   }
 
-  var anchor = /** @type {anychart.enums.Anchor} */(this.anchor());
+  var anchor = /** @type {anychart.enums.Anchor} */(this.getOption('anchor'));
   var anchorCoordinate = anychart.utils.getCoordinateByAnchor(
       new anychart.math.Rect(0, 0, this.backgroundWidth, this.backgroundHeight),
       anchor);

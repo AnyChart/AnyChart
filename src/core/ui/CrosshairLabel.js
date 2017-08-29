@@ -32,12 +32,9 @@ anychart.core.ui.CrosshairLabel = function() {
    */
   this.y_ = NaN;
 
-  /**
-   * Label text formatting function, by default we use value field of the format provider.
-   * @type {Function}
-   * @private
-   */
-  this.format_ = null;
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['format', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED]
+  ]);
 };
 goog.inherits(anychart.core.ui.CrosshairLabel, anychart.core.ui.LabelBase);
 
@@ -51,6 +48,27 @@ anychart.core.ui.CrosshairLabel.prototype.SUPPORTED_SIGNALS =
     anychart.Signal.NEEDS_REAPPLICATION;
 
 
+//region -- Descriptors.
+/**
+ * Descriptors.
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.core.ui.CrosshairLabel.DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'format',
+      anychart.core.settings.functionNormalizer);
+
+  return map;
+})();
+anychart.core.settings.populate(anychart.core.ui.CrosshairLabel, anychart.core.ui.CrosshairLabel.DESCRIPTORS);
+
+
+//endregion
 /**
  * Gets/Sets axis index.
  * @param {number=} opt_value
@@ -83,23 +101,6 @@ anychart.core.ui.CrosshairLabel.prototype.formatProvider = function(opt_value) {
     return this;
   } else {
     return this.formatProvider_;
-  }
-};
-
-
-/**
- * Gets or sets labels text formatter function.
- * @param {Function=} opt_value Labels text formatter function.
- * @return {Function|anychart.core.ui.CrosshairLabel} Labels text formatter function or Labels instance for chaining call.
- */
-anychart.core.ui.CrosshairLabel.prototype.format = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.format_ = opt_value;
-    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
-        anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    return this;
-  } else {
-    return this.format_;
   }
 };
 
@@ -173,8 +174,8 @@ anychart.core.ui.CrosshairLabel.prototype.drawLabel = function() {
   position.x -= anchorCoordinate.x;
   position.y -= anchorCoordinate.y;
 
-  var rawOffsetX = /** @type {number|string} */(this.offsetX());
-  var rawOffsetY = /** @type {number|string} */(this.offsetY());
+  var rawOffsetX = /** @type {number|string} */(this.getOption('offsetX'));
+  var rawOffsetY = /** @type {number|string} */(this.getOption('offsetY'));
 
   var offsetX = goog.isDef(rawOffsetX) ? anychart.utils.normalizeSize(rawOffsetX, parentWidth) : 0;
   var offsetY = goog.isDef(rawOffsetY) ? anychart.utils.normalizeSize(rawOffsetY, parentHeight) : 0;
@@ -201,6 +202,7 @@ anychart.core.ui.CrosshairLabel.prototype.drawLabel = function() {
 /** @inheritDoc */
 anychart.core.ui.CrosshairLabel.prototype.serialize = function() {
   var json = anychart.core.ui.CrosshairLabel.base(this, 'serialize');
+  anychart.core.settings.serialize(this, anychart.core.ui.CrosshairLabel.DESCRIPTORS, json, 'Crosshair Label');
   json['axisIndex'] = this.axisIndex_;
   return json;
 };
@@ -209,9 +211,14 @@ anychart.core.ui.CrosshairLabel.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.core.ui.CrosshairLabel.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.ui.CrosshairLabel.base(this, 'setupByJSON', config, opt_default);
+
+  if (opt_default) {
+    anychart.core.settings.copy(this.themeSettings, anychart.core.ui.CrosshairLabel.DESCRIPTORS, config);
+  } else {
+    anychart.core.settings.deserialize(this, anychart.core.ui.CrosshairLabel.DESCRIPTORS, config);
+  }
+
   this.axisIndex(config['axisIndex']);
-  this.anchor(config['anchor']);
-  this.format(config['format']);
 };
 
 
@@ -219,16 +226,6 @@ anychart.core.ui.CrosshairLabel.prototype.setupByJSON = function(config, opt_def
   var proto = anychart.core.ui.CrosshairLabel.prototype;
   //exports
   proto['axisIndex'] = proto.axisIndex;
-  proto['format'] = proto.format;
   proto['background'] = proto.background;
   proto['padding'] = proto.padding;
-  proto['width'] = proto.width;
-  proto['height'] = proto.height;
-  proto['anchor'] = proto.anchor;
-  proto['offsetX'] = proto.offsetX;
-  proto['offsetY'] = proto.offsetY;
-  proto['minFontSize'] = proto.minFontSize;
-  proto['maxFontSize'] = proto.maxFontSize;
-  proto['adjustFontSize'] = proto.adjustFontSize;
-  proto['rotation'] = proto.rotation;
 })();

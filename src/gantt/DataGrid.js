@@ -1776,13 +1776,14 @@ anychart.ganttModule.DataGrid.Button = function(dataGrid) {
   this
       .width(anychart.ganttModule.DataGrid.DEFAULT_EXPAND_COLLAPSE_BUTTON_SIDE)
       .height(anychart.ganttModule.DataGrid.DEFAULT_EXPAND_COLLAPSE_BUTTON_SIDE)
-      .hAlign('center')
-      .vAlign('middle')
       .supportedStates(anychart.core.ui.Button.State.CHECKED, false);
+
+  this['hAlign']('center');
+  this['vAlign']('middle');
 
   //this.backgroundPath.stroke('red');
 
-  this.text('-');
+  this['text']('-');
   this.resumeSignalsDispatching(false);
 
   //Listens itself to process 'hover' and 'press' button decorations correctly.
@@ -1814,7 +1815,7 @@ anychart.ganttModule.DataGrid.Button.prototype.collapsed = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.collapsed_ != opt_value) {
       this.collapsed_ = opt_value;
-      this.text(this.collapsed_ ? '+' : '-');
+      this['text'](this.collapsed_ ? '+' : '-');
     }
     return this;
   }

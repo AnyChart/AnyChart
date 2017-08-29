@@ -27,16 +27,11 @@ anychart.core.ui.Background = function() {
   anychart.core.ui.Background.base(this, 'constructor');
 
   /**
-   * Parent title.
+   * Parent.
    * @type {anychart.core.ui.Background}
    * @private
    */
   this.parent_ = null;
-
-  /**
-   * @type {boolean}
-   */
-  this.forceInvalidate = false;
 
   /**
    * Resolution chain cache.
@@ -274,15 +269,6 @@ anychart.core.ui.Background.prototype.corners = function(opt_value) {
   } else {
     return /** @type {Array.<number|string>} */(this.getOption('corners'));
   }
-};
-
-
-/**
- * Whether needs force invalidation.
- * @return {boolean}
- */
-anychart.core.ui.Background.prototype.needsForceInvalidation = function() {
-  return this.forceInvalidate;
 };
 
 
@@ -699,17 +685,6 @@ anychart.core.ui.Background.prototype.getRemainingBounds = function() {
   parentBounds.width -= 2 * thickness;
 
   return parentBounds;
-};
-
-
-/**
- * @inheritDoc
- */
-anychart.core.ui.Background.prototype.invalidate = function(state, opt_signal) {
-  var effective = anychart.core.ui.Background.base(this, 'invalidate', state, opt_signal);
-  if (!effective && this.needsForceInvalidation())
-    this.dispatchSignal(opt_signal || 0);
-  return effective;
 };
 
 

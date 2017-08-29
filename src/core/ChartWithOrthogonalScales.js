@@ -1893,13 +1893,82 @@ anychart.core.ChartWithOrthogonalScales.contextMenuMap = {
 //  Interactivity
 //
 //----------------------------------------------------------------------------------------------------------------------
+/**
+ * Gets points info considering interactivity by X.
+ * @param {number} clientX - .
+ * @param {number} clientY - .
+ * @return {?Array.<Object>} - .
+ */
+anychart.core.ChartWithOrthogonalScales.prototype.getByXInfo = function(clientX, clientY) {
+  var bounds = this.dataBounds || anychart.math.rect(0, 0, 0, 0);
+  var minX = bounds.left;
+  var minY = bounds.top;
+  var rangeX = bounds.width;
+  var rangeY = bounds.height;
+
+  var containerOffset = this.container().getStage().getClientPosition();
+  var x = clientX - containerOffset.x;
+  var y = clientY - containerOffset.y;
+
+  var ratio = ((this.isVerticalInternal) ? ((rangeY - (y - minY)) / rangeY) : ((x - minX) / rangeX));
+  if (x < minX || x > minX + rangeX || y < minY || y > minY + rangeY)
+    return null;
+
+  var points = [];
+
+  var value, iterator;
+  var i, len, series, names;
+  var indexes;
+
+  for (i = 0, len = this.seriesList.length; i < len; i++) {
+    series = this.seriesList[i];
+    if (series && series.enabled()) {
+      value = series.xScale().inverseTransform(ratio);
+      if (this.categorizeData) {
+        var tmp = series.findX(value);
+        indexes = tmp >= 0 ? [tmp] : [];
+      } else {
+        indexes = series.data().findClosestByX(value, series.xScale() instanceof anychart.scales.Ordinal);
+      }
+      iterator = series.getIterator();
+      var minLength = Infinity;
+      var minLengthIndex;
+      if (indexes.length) {
+        for (var j = 0; j < indexes.length; j++) {
+          if (iterator.select(indexes[j])) {
+            var pixX = /** @type {number} */(iterator.meta('x'));
+            names = series.getYValueNames();
+            for (var k = 0; k < names.length; k++) {
+              var pixY = /** @type {number} */(iterator.meta(names[k]));
+              var length = anychart.math.vectorLength(pixX, pixY, x, y);
+              if (length < minLength) {
+                minLength = length;
+                minLengthIndex = indexes[j];
+              }
+            }
+          }
+        }
+
+        points.push({
+          series: series,
+          points: indexes,
+          lastPoint: indexes[indexes.length - 1],
+          nearestPointToCursor: {index: minLengthIndex, distance: minLength}
+        });
+      }
+    }
+  }
+  return /** @type {Array.<Object>} */(points);
+};
+
+
 /** @inheritDoc */
 anychart.core.ChartWithOrthogonalScales.prototype.getSeriesStatus = function(event) {
   var bounds = this.dataBounds || anychart.math.rect(0, 0, 0, 0);
   var clientX = event['clientX'];
   var clientY = event['clientY'];
 
-  var value, index, iterator;
+  var index, iterator;
 
   var containerOffset = this.container().getStage().getClientPosition();
 
@@ -1982,47 +2051,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.getSeriesStatus = function(eve
       }
     }
   } else if (this.interactivity().hoverMode() == anychart.enums.HoverMode.BY_X) {
-    var ratio = ((this.isVerticalInternal) ?
-        ((rangeY - (y - minY)) / rangeY) :
-        ((x - minX) / rangeX));
-
-    for (i = 0, len = this.seriesList.length; i < len; i++) {
-      series = this.seriesList[i];
-      if (series && series.enabled()) {
-        value = series.xScale().inverseTransform(ratio);
-        if (this.categorizeData) {
-          var tmp = series.findX(value);
-          indexes = tmp >= 0 ? [tmp] : [];
-        } else {
-          indexes = series.data().findClosestByX(value, series.xScale() instanceof anychart.scales.Ordinal);
-        }
-        iterator = series.getIterator();
-        minLength = Infinity;
-        if (indexes.length) {
-          for (j = 0; j < indexes.length; j++) {
-            if (iterator.select(indexes[j])) {
-              pixX = /** @type {number} */(iterator.meta('x'));
-              names = series.getYValueNames();
-              for (k = 0; k < names.length; k++) {
-                pixY = /** @type {number} */(iterator.meta(names[k]));
-                length = anychart.math.vectorLength(pixX, pixY, x, y);
-                if (length < minLength) {
-                  minLength = length;
-                  minLengthIndex = indexes[j];
-                }
-              }
-            }
-          }
-
-          points.push({
-            series: series,
-            points: indexes,
-            lastPoint: indexes[indexes.length - 1],
-            nearestPointToCursor: {index: minLengthIndex, distance: minLength}
-          });
-        }
-      }
-    }
+    points = this.getByXInfo(clientX, clientY);
   }
 
   return /** @type {Array.<Object>} */(points);

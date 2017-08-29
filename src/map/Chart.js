@@ -1752,7 +1752,7 @@ anychart.mapModule.Chart.prototype.crosshair = function(opt_value) {
   if (!this.crosshair_) {
     this.crosshair_ = new anychart.mapModule.elements.Crosshair();
     this.crosshair_.enabled(false);
-    this.crosshair_.bindHandlers(this);
+    this.crosshair_.interactivityTarget(this);
     this.registerDisposable(this.crosshair_);
     this.crosshair_.listenSignals(this.onCrosshairSignal_, this);
   }

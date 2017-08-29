@@ -526,7 +526,11 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       ],
       'yScale': 0,
       'zIndex': 10,
-      'yAxes': [{}]
+      'yAxes': [{}],
+      'crosshair': {
+        'zIndex': 201,
+        'enabled': null
+      }
     },
     'padding': [20, 30, 20, 60],
     'plots': [{}],
@@ -648,6 +652,12 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'interactivity': {
       'zoomOnMouseWheel': false,
       'scrollOnMouseWheel': false
+    },
+    'crosshair': {
+      'enabled': true,
+      'displayMode': 'sticky',
+      'xStroke': anychart.core.defaultTheme.colorStrokeExtraBright,
+      'yStroke': anychart.core.defaultTheme.colorStrokeExtraBright
     }
   }
 });
