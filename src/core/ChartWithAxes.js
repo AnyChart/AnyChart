@@ -1,9 +1,9 @@
 goog.provide('anychart.core.ChartWithAxes');
 
+goog.require('anychart.cartesianModule.Grid');
 goog.require('anychart.core.Axis');
 goog.require('anychart.core.ChartWithOrthogonalScales');
 goog.require('anychart.core.IChartWithAnnotations');
-goog.require('anychart.cartesianModule.Grid');
 goog.require('anychart.core.axisMarkers.Line');
 goog.require('anychart.core.axisMarkers.Range');
 goog.require('anychart.core.axisMarkers.Text');
@@ -62,25 +62,25 @@ anychart.core.ChartWithAxes = function(joinData) {
   this.textAxesMarkers_ = [];
 
   /**
-   * @type {Array.<anychart.cartesianModule.Grid>}
+   * @type {Array.<anychart.core.GridBase>}
    * @private
    */
   this.xGrids_ = [];
 
   /**
-   * @type {Array.<anychart.cartesianModule.Grid>}
+   * @type {Array.<anychart.core.GridBase>}
    * @private
    */
   this.yGrids_ = [];
 
   /**
-   * @type {Array.<anychart.cartesianModule.Grid>}
+   * @type {Array.<anychart.core.GridBase>}
    * @private
    */
   this.xMinorGrids_ = [];
 
   /**
-   * @type {Array.<anychart.cartesianModule.Grid>}
+   * @type {Array.<anychart.core.GridBase>}
    * @private
    */
   this.yMinorGrids_ = [];
@@ -133,7 +133,7 @@ anychart.core.ChartWithAxes.MAX_ATTEMPTS_AXES_CALCULATION = 5;
 
 /**
  * Sets default scale for layout based element depending on isVertical.
- * @param {anychart.core.axisMarkers.Line|anychart.core.axisMarkers.Range|anychart.core.axisMarkers.Text|anychart.cartesianModule.Grid} item Item to set scale.
+ * @param {anychart.core.axisMarkers.Line|anychart.core.axisMarkers.Range|anychart.core.axisMarkers.Text|anychart.core.GridBase} item Item to set scale.
  * @protected
  */
 anychart.core.ChartWithAxes.prototype.setDefaultScaleForLayoutBasedElements = function(item) {
@@ -320,7 +320,7 @@ anychart.core.ChartWithAxes.prototype.defaultRangeMarkerSettings = function(opt_
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Create Grid instance.
- * @return {!anychart.cartesianModule.Grid}
+ * @return {!anychart.core.GridBase}
  * @protected
  */
 anychart.core.ChartWithAxes.prototype.createGridInstance = function() {
@@ -332,7 +332,7 @@ anychart.core.ChartWithAxes.prototype.createGridInstance = function() {
  * Getter/setter for xGrid.
  * @param {(Object|boolean|null|number)=} opt_indexOrValue Grid settings.
  * @param {(Object|boolean|null)=} opt_value Grid settings to set.
- * @return {!(anychart.cartesianModule.Grid|anychart.core.ChartWithAxes)} Grid instance by index or itself for method chaining.
+ * @return {!(anychart.core.GridBase|anychart.core.ChartWithAxes)} Grid instance by index or itself for method chaining.
  */
 anychart.core.ChartWithAxes.prototype.xGrid = function(opt_indexOrValue, opt_value) {
   var index, value;
@@ -347,7 +347,7 @@ anychart.core.ChartWithAxes.prototype.xGrid = function(opt_indexOrValue, opt_val
   var grid = this.xGrids_[index];
   if (!grid) {
     grid = this.createGridInstance();
-    grid.setParentElement(this);
+    grid.setOwner(this);
     grid.setDefaultLayout(this.isVerticalInternal ? anychart.enums.Layout.HORIZONTAL : anychart.enums.Layout.VERTICAL);
     grid.setup(this.defaultGridSettings());
     this.xGrids_[index] = grid;
@@ -369,7 +369,7 @@ anychart.core.ChartWithAxes.prototype.xGrid = function(opt_indexOrValue, opt_val
  * Getter/setter for grid.
  * @param {(Object|boolean|null|number)=} opt_indexOrValue Grid settings.
  * @param {(Object|boolean|null)=} opt_value Grid settings to set.
- * @return {!(anychart.cartesianModule.Grid|anychart.core.ChartWithAxes)} Grid instance by index or itself for method chaining.
+ * @return {!(anychart.core.GridBase|anychart.core.ChartWithAxes)} Grid instance by index or itself for method chaining.
  */
 anychart.core.ChartWithAxes.prototype.yGrid = function(opt_indexOrValue, opt_value) {
   var index, value;
@@ -384,7 +384,7 @@ anychart.core.ChartWithAxes.prototype.yGrid = function(opt_indexOrValue, opt_val
   var grid = this.yGrids_[index];
   if (!grid) {
     grid = this.createGridInstance();
-    grid.getParentElement(this);
+    grid.setOwner(this);
     grid.setDefaultLayout(this.isVerticalInternal ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
     grid.setup(this.defaultGridSettings());
     this.yGrids_[index] = grid;
@@ -406,7 +406,7 @@ anychart.core.ChartWithAxes.prototype.yGrid = function(opt_indexOrValue, opt_val
  * Getter/setter for x minorGrid.
  * @param {(Object|boolean|null|number)=} opt_indexOrValue Minor grid settings.
  * @param {(Object|boolean|null)=} opt_value Minor grid settings to set.
- * @return {!(anychart.cartesianModule.Grid|anychart.core.ChartWithAxes)} Minor grid instance by index or itself for method chaining.
+ * @return {!(anychart.core.GridBase|anychart.core.ChartWithAxes)} Minor grid instance by index or itself for method chaining.
  */
 anychart.core.ChartWithAxes.prototype.xMinorGrid = function(opt_indexOrValue, opt_value) {
   var index, value;
@@ -421,7 +421,7 @@ anychart.core.ChartWithAxes.prototype.xMinorGrid = function(opt_indexOrValue, op
   var grid = this.xMinorGrids_[index];
   if (!grid) {
     grid = this.createGridInstance();
-    grid.getParentElement(this);
+    grid.setOwner(this);
     grid.setDefaultLayout(this.isVerticalInternal ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
     grid.setup(this.defaultMinorGridSettings());
     this.xMinorGrids_[index] = grid;
@@ -443,7 +443,7 @@ anychart.core.ChartWithAxes.prototype.xMinorGrid = function(opt_indexOrValue, op
  * Getter/setter for y minorGrid.
  * @param {(Object|boolean|null|number)=} opt_indexOrValue Minor grid settings.
  * @param {(Object|boolean|null)=} opt_value Minor grid settings to set.
- * @return {!(anychart.cartesianModule.Grid|anychart.core.ChartWithAxes)} Minor grid instance by index or itself for method chaining.
+ * @return {!(anychart.core.GridBase|anychart.core.ChartWithAxes)} Minor grid instance by index or itself for method chaining.
  */
 anychart.core.ChartWithAxes.prototype.yMinorGrid = function(opt_indexOrValue, opt_value) {
   var index, value;
@@ -458,7 +458,7 @@ anychart.core.ChartWithAxes.prototype.yMinorGrid = function(opt_indexOrValue, op
   var grid = this.yMinorGrids_[index];
   if (!grid) {
     grid = this.createGridInstance();
-    grid.getParentElement(this);
+    grid.setOwner(this);
     grid.setDefaultLayout(this.isVerticalInternal ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
     grid.setup(this.defaultMinorGridSettings());
     this.yMinorGrids_[index] = grid;
@@ -494,9 +494,9 @@ anychart.core.ChartWithAxes.prototype.calculateGridsThickness = function() {
   var maxVerticalThickness = 0;
   var maxHorizontalThickness = 0;
   for (var i = 0, len = grids.length; i < len; i++) {
-    var grid = /** @type {anychart.cartesianModule.Grid} */(grids[i]);
+    var grid = /** @type {anychart.core.GridBase} */(grids[i]);
     if (grid && grid.enabled()) {
-      var thickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(grid.stroke()));
+      var thickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(grid.getOption('stroke')));
 
       if (grid.isHorizontal()) {
         if (thickness > maxHorizontalThickness) {
@@ -1576,7 +1576,7 @@ anychart.core.ChartWithAxes.prototype.serializeAxis = function(item, scales, sca
 
 /**
  * Serializes a grid and returns its config.
- * @param {anychart.cartesianModule.Grid} item
+ * @param {anychart.core.GridBase} item
  * @param {Array} scales
  * @param {Object} scaleIds
  * @param {Array} axesIds
@@ -1608,7 +1608,7 @@ anychart.core.ChartWithAxes.prototype.serializeGrid_ = function(item, scales, sc
 
 /**
  * Serializes a grid and returns its config.
- * @param {anychart.core.axisMarkers.PathBase|anychart.core.axisMarkers.TextBase|anychart.cartesianModule.Grid} item
+ * @param {anychart.core.axisMarkers.PathBase|anychart.core.axisMarkers.TextBase|anychart.core.GridBase} item
  * @param {Object} config
  * @param {Array} scales
  * @param {Object} scaleIds

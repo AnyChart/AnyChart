@@ -1,11 +1,12 @@
 goog.provide('anychart.radarPolarBaseModule.Grid');
 goog.require('acgraph');
 goog.require('anychart.color');
+goog.require('anychart.core.GridBase');
 goog.require('anychart.core.IStandaloneBackend');
-goog.require('anychart.core.GridWithLayout');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.utils.TypedLayer');
 goog.require('anychart.enums');
+goog.require('anychart.radarPolarBaseModule.RadialAxis');
 goog.require('anychart.scales');
 
 
@@ -13,7 +14,7 @@ goog.require('anychart.scales');
 /**
  * Grid.
  * @constructor
- * @extends {anychart.core.GridWithLayout}
+ * @extends {anychart.core.GridBase}
  * @implements {anychart.core.IStandaloneBackend}
  */
 anychart.radarPolarBaseModule.Grid = function() {
@@ -43,28 +44,20 @@ anychart.radarPolarBaseModule.Grid = function() {
    */
   this.defaultLayout = anychart.enums.RadialGridLayout.CIRCUIT;
 };
-goog.inherits(anychart.radarPolarBaseModule.Grid, anychart.core.GridWithLayout);
+goog.inherits(anychart.radarPolarBaseModule.Grid, anychart.core.GridBase);
 
 
 //region --- Layout
 /** @inheritDoc */
-anychart.radarPolarBaseModule.Grid.prototype.layout = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var layout = anychart.enums.normalizePolarLayout(opt_value, anychart.enums.RadialGridLayout.CIRCUIT);
-    if (this.layout_ != layout) {
-      this.layout_ = layout;
-      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else if (this.layout_) {
-    return this.layout_;
-  } else if (this.axis_) {
-    var isCircuit = this.axis_ instanceof anychart.radarPolarBaseModule.RadialAxis;
-    return isCircuit ? anychart.enums.RadialGridLayout.CIRCUIT : anychart.enums.RadialGridLayout.RADIAL;
-  } else {
-    return this.defaultLayout;
-  }
+anychart.radarPolarBaseModule.Grid.prototype.normalizeLayout = function(layout) {
+  return anychart.enums.normalizePolarLayout(layout, anychart.enums.RadialGridLayout.CIRCUIT);
+};
+
+
+/** @inheritDoc */
+anychart.radarPolarBaseModule.Grid.prototype.getLayoutByAxis = function(axis) {
+  var isCircuit = axis instanceof anychart.radarPolarBaseModule.RadialAxis;
+  return isCircuit ? anychart.enums.RadialGridLayout.CIRCUIT : anychart.enums.RadialGridLayout.RADIAL;
 };
 
 
@@ -88,8 +81,8 @@ anychart.radarPolarBaseModule.Grid.prototype.yScale = function(opt_value) {
     return this.yScale_;
   } else if (this.axis_ && this.axis_ instanceof anychart.radarPolarBaseModule.RadialAxis) {
     return /** @type {anychart.scales.Base} */ (this.axis_.scale());
-  } else if (this.getParentElement()) {
-    return /** @type {anychart.scales.Base} */ (this.getParentElement().yScale());
+  } else if (this.getOwner()) {
+    return /** @type {anychart.scales.Base} */ (this.getOwner().yScale());
   } else {
     return null;
   }
@@ -133,10 +126,10 @@ anychart.radarPolarBaseModule.Grid.prototype.xScale = function(opt_value) {
     return this;
   } else if (this.xScale_) {
     return this.xScale_;
-  } else if (this.axis_ && this.axis_ instanceof anychart.radarPolarBaseModule.Axis) {
+  } else if (this.axis_ && this.axis_.scale) {
     return /** @type {anychart.scales.Ordinal} */(this.axis_.scale());
-  } else if (this.getParentElement()) {
-    return /** @type {anychart.scales.Ordinal} */ (this.getParentElement().xScale());
+  } else if (this.getOwner()) {
+    return /** @type {anychart.scales.Ordinal} */ (this.getOwner().xScale());
   } else {
     return null;
   }
@@ -237,5 +230,6 @@ anychart.radarPolarBaseModule.Grid.prototype.checkScale = function() {
   proto['yScale'] = proto.yScale;
   proto['xScale'] = proto.xScale;
   proto['axis'] = proto.axis;
+  // proto['isMinor'] = proto.isMinor;
 })();
 //endregion

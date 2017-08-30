@@ -59,28 +59,8 @@ anychart.core.settings.populate(anychart.mapModule.elements.Grid, anychart.mapMo
 
 //endregion
 //region --- Settings
-/**
- * Setter for scale.
- * @param {anychart.mapModule.scales.Geo} value Scale.
- * @return {anychart.mapModule.elements.Grid} .
- */
-anychart.mapModule.elements.Grid.prototype.setScale = function(value) {
-  if (this.scale_ != value) {
-    this.scale_ = value;
-    this.scale_.listenSignals(this.scaleInvalidated_, this);
-    this.invalidate(anychart.ConsistencyState.GRIDS_POSITION | anychart.ConsistencyState.BOUNDS,
-        anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-  }
-  return this;
-};
-
-
-/**
- * Internal scale invalidation handler.
- * @param {anychart.SignalEvent} event Event object.
- * @private
- */
-anychart.mapModule.elements.Grid.prototype.scaleInvalidated_ = function(event) {
+/** @inheritDoc */
+anychart.mapModule.elements.Grid.prototype.scaleInvalidated = function(event) {
   var signal = 0;
   if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION))
     signal |= anychart.Signal.NEEDS_RECALCULATION;
@@ -138,7 +118,7 @@ anychart.mapModule.elements.Grid.prototype.updateOnZoomOrMove = function(tx) {
  * @param {number} precision Grid precision.
  * @protected
  */
-anychart.mapModule.elements.Grid.prototype.drawLineHorizontal = function(value, line, shift, precision) {
+anychart.mapModule.elements.Grid.prototype.drawLineLongitude = function(value, line, shift, precision) {
   var scale = this.scale_;
   var xy;
 
@@ -177,7 +157,7 @@ anychart.mapModule.elements.Grid.prototype.drawLineHorizontal = function(value, 
  * @param {number} precision Grid precision.
  * @protected
  */
-anychart.mapModule.elements.Grid.prototype.drawLineVertical = function(value, line, shift, precision) {
+anychart.mapModule.elements.Grid.prototype.drawLineLLatitude = function(value, line, shift, precision) {
   var scale = this.scale_;
   var xy;
 
@@ -217,7 +197,7 @@ anychart.mapModule.elements.Grid.prototype.drawLineVertical = function(value, li
  * @param {number} precision Grid precision.
  * @protected
  */
-anychart.mapModule.elements.Grid.prototype.drawInterlaceHorizontal = function(value, prevValue, fillSettings, path, shift, precision) {
+anychart.mapModule.elements.Grid.prototype.drawInterlaceLongitude = function(value, prevValue, fillSettings, path, shift, precision) {
   var scale = this.scale_;
 
   var minimumX = /** @type {number} */(scale.minimumX());
@@ -314,7 +294,7 @@ anychart.mapModule.elements.Grid.prototype.drawInterlaceHorizontal = function(va
  * @param {number} precision Grid precision.
  * @protected
  */
-anychart.mapModule.elements.Grid.prototype.drawInterlaceVertical = function(value, prevValue, fillSettings, path, shift, precision) {
+anychart.mapModule.elements.Grid.prototype.drawInterlaceLatitude = function(value, prevValue, fillSettings, path, shift, precision) {
   var scale = this.scale_;
 
   var minimumX = /** @type {number} */(scale.minimumX());
@@ -402,42 +382,18 @@ anychart.mapModule.elements.Grid.prototype.drawInterlaceVertical = function(valu
 
 
 /** @inheritDoc */
-anychart.mapModule.elements.Grid.prototype.draw = function() {
+anychart.mapModule.elements.Grid.prototype.applyAppearance = function() {
+  this.lineElement(true).stroke(/** @type {acgraph.vector.Stroke} */(this.getOption('stroke')));
+  this.lineElement(false).stroke(/** @type {acgraph.vector.Stroke} */(this.getOption('minorStroke')));
+};
+
+
+/** @inheritDoc */
+anychart.mapModule.elements.Grid.prototype.drawInternal = function() {
   var scale = /** @type {anychart.mapModule.scales.Geo} */(this.scale_);
-
-  if (!scale) {
-    anychart.core.reporting.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
-    return this;
-  }
-
-  if (!this.checkDrawingNeeded())
-    return this;
-
-  if (!this.rootLayer) {
-    this.rootLayer = acgraph.layer();
-  }
 
   var majorLineElement = this.lineElement(true);
   var minorLineElement = this.lineElement(false);
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
-    var zIndex = /** @type {number} */(this.zIndex());
-    this.rootLayer.zIndex(zIndex);
-    this.markConsistent(anychart.ConsistencyState.Z_INDEX);
-  }
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
-    var container = /** @type {acgraph.vector.ILayer} */(this.container());
-    this.rootLayer.parent(container);
-    this.markConsistent(anychart.ConsistencyState.CONTAINER);
-  }
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    majorLineElement.stroke(/** @type {acgraph.vector.Stroke} */(this.getOption('stroke')));
-    minorLineElement.stroke(/** @type {acgraph.vector.Stroke} */(this.getOption('minorStroke')));
-
-    this.markConsistent(anychart.ConsistencyState.APPEARANCE);
-  }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.GRIDS_POSITION) ||
       this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
@@ -450,13 +406,13 @@ anychart.mapModule.elements.Grid.prototype.draw = function() {
       minorTicks = scale.yMinorTicks();
       precision = precision[0];
       scaleMaximum = /** @type {number} */(scale.maximumY());
-      layout = [this.drawLineHorizontal, this.drawInterlaceHorizontal];
+      layout = [this.drawLineLongitude, this.drawInterlaceLongitude];
     } else {
       ticks = scale.xTicks();
       minorTicks = scale.xMinorTicks();
       precision = precision[1];
       scaleMaximum = /** @type {number} */(scale.maximumX());
-      layout = [this.drawLineVertical, this.drawInterlaceVertical];
+      layout = [this.drawLineLLatitude, this.drawInterlaceLatitude];
     }
 
     var ticksArray = ticks.get();
@@ -504,8 +460,6 @@ anychart.mapModule.elements.Grid.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.GRIDS_POSITION);
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
-
-  return this;
 };
 
 

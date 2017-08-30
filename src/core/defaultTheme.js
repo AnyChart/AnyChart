@@ -965,6 +965,10 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'isMinor': false,
     'drawFirstLine': true,
     'drawLastLine': true,
+    /**
+     * @this {*}
+     * @return {*}
+     */
     'fill': function() {
       return this['palette'].itemAt(this['index']);
     },

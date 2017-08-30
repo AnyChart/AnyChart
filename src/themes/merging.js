@@ -871,8 +871,10 @@ anychart.themes.merging.mergingMap_ = (function() {
             'radar',
             'heatMap',
             'stock.defaultPlotSettings'
+
           ], '.default']
         ], 'GridSettings'],
+        'map.gridsSettings',
         ['standalones.', [
           [[
             'linear',

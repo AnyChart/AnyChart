@@ -110,7 +110,7 @@ anychart.polarModule.Grid.prototype.drawInterlaceRadial = function(angle, sweep,
 
 /** @inheritDoc */
 anychart.polarModule.Grid.prototype.drawInternal = function() {
-  var xScale = /** @type {anychart.scales.Ordinal} */(this.xScale());
+  var xScale = /** @type {anychart.scales.Linear|anychart.scales.Ordinal} */(this.xScale());
   var yScale = /** @type {anychart.scales.Linear|anychart.scales.Ordinal} */(this.yScale());
 
   this.clearFillElements();

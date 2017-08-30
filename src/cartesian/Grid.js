@@ -1,7 +1,7 @@
 goog.provide('anychart.cartesianModule.Grid');
 goog.require('acgraph');
 goog.require('anychart.color');
-goog.require('anychart.core.GridWithLayout');
+goog.require('anychart.core.GridBase');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.utils.Padding');
 goog.require('anychart.enums');
@@ -11,12 +11,12 @@ goog.require('anychart.enums');
 /**
  * Grid.
  * @constructor
- * @extends {anychart.core.GridWithLayout}
+ * @extends {anychart.core.GridBase}
  */
 anychart.cartesianModule.Grid = function() {
   anychart.cartesianModule.Grid.base(this, 'constructor');
 };
-goog.inherits(anychart.cartesianModule.Grid, anychart.core.GridWithLayout);
+goog.inherits(anychart.cartesianModule.Grid, anychart.core.GridBase);
 
 
 //region --- Infrastructure
@@ -108,5 +108,6 @@ anychart.cartesianModule.Grid.prototype.drawInterlaceVertical = function(ratio, 
   proto['isHorizontal'] = proto.isHorizontal;
   proto['scale'] = proto.scale;
   proto['axis'] = proto.axis;
+  // proto['isMinor'] = proto.isMinor;
 })();
 //endregion

@@ -3,12 +3,14 @@ goog.provide('anychart.mapModule.scales.Geo');
 goog.require('anychart.core.Base');
 goog.require('anychart.enums');
 goog.require('anychart.mapModule.scales.GeoTicks');
+goog.require('anychart.scales.IGeoScale');
 
 
 
 /**
  * @constructor
  * @extends {anychart.core.Base}
+ * @implements {anychart.scales.IGeoScale}
  */
 anychart.mapModule.scales.Geo = function() {
   anychart.mapModule.scales.Geo.base(this, 'constructor');

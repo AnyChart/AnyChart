@@ -146,7 +146,7 @@ anychart.radarPolarBaseModule.Chart.prototype.xGrid = function(opt_indexOrValue,
   var grid = this.xGrids_[index];
   if (!grid) {
     grid = this.createGridInstance();
-    grid.setParentElement(this);
+    grid.setOwner(this);
     grid.setDefaultLayout(anychart.enums.RadialGridLayout.RADIAL);
     grid.setup(this.defaultGridSettings());
     this.xGrids_[index] = grid;
@@ -183,7 +183,7 @@ anychart.radarPolarBaseModule.Chart.prototype.yGrid = function(opt_indexOrValue,
   var grid = this.yGrids_[index];
   if (!grid) {
     grid = this.createGridInstance();
-    grid.setParentElement(this);
+    grid.setOwner(this);
     grid.setDefaultLayout(anychart.enums.RadialGridLayout.CIRCUIT);
     grid.setup(this.defaultGridSettings());
     this.yGrids_[index] = grid;
@@ -220,7 +220,7 @@ anychart.radarPolarBaseModule.Chart.prototype.xMinorGrid = function(opt_indexOrV
   var grid = this.xMinorGrids_[index];
   if (!grid) {
     grid = this.createGridInstance();
-    grid.setParentElement(this);
+    grid.setOwner(this);
     grid.setDefaultLayout(anychart.enums.RadialGridLayout.RADIAL);
     grid.setup(this.defaultMinorGridSettings());
     this.xMinorGrids_[index] = grid;
@@ -257,7 +257,7 @@ anychart.radarPolarBaseModule.Chart.prototype.yMinorGrid = function(opt_indexOrV
   var grid = this.yMinorGrids_[index];
   if (!grid) {
     grid = this.createGridInstance();
-    grid.setParentElement(this);
+    grid.setOwner(this);
     grid.setDefaultLayout(anychart.enums.RadialGridLayout.CIRCUIT);
     grid.setup(this.defaultMinorGridSettings());
     this.yMinorGrids_[index] = grid;

@@ -265,13 +265,6 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     },
     'gridsSettings': {
       'enabled': false,
-      'drawFirstLine': true,
-      'drawLastLine': true,
-      'fill': function() {
-        return this['palette'].itemAt(this['index']);
-      },
-      'palette': ['none'],
-      'stroke': anychart.core.defaultTheme.colorStrokeNormal,
       'minorStroke': 'none',
       'zIndex': 5
     },

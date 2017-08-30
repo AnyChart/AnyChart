@@ -1366,7 +1366,7 @@ anychart.stockModule.Plot.prototype.xGrid = function(opt_indexOrValue, opt_value
   var grid = this.xGrids_[index];
   if (!grid) {
     grid = new anychart.stockModule.Grid();
-    grid.getParentElement(this);
+    grid.setOwner(this);
     grid.setDefaultLayout(anychart.enums.Layout.HORIZONTAL);
     grid.setup(this.defaultGridSettings_);
     this.xGrids_[index] = grid;
@@ -1402,7 +1402,7 @@ anychart.stockModule.Plot.prototype.yGrid = function(opt_indexOrValue, opt_value
   var grid = this.yGrids_[index];
   if (!grid) {
     grid = new anychart.stockModule.Grid();
-    grid.getParentElement(this);
+    grid.setOwner(this);
     grid.setDefaultLayout(anychart.enums.Layout.HORIZONTAL);
     grid.setup(this.defaultGridSettings_);
     this.yGrids_[index] = grid;
@@ -1438,7 +1438,7 @@ anychart.stockModule.Plot.prototype.xMinorGrid = function(opt_indexOrValue, opt_
   var grid = this.xMinorGrids_[index];
   if (!grid) {
     grid = new anychart.stockModule.Grid();
-    grid.getParentElement(this);
+    grid.setOwner(this);
     grid.setDefaultLayout(anychart.enums.Layout.HORIZONTAL);
     grid.setup(this.defaultMinorGridSettings_);
     this.xMinorGrids_[index] = grid;
@@ -1473,7 +1473,7 @@ anychart.stockModule.Plot.prototype.yMinorGrid = function(opt_indexOrValue, opt_
   var grid = this.yMinorGrids_[index];
   if (!grid) {
     grid = new anychart.stockModule.Grid();
-    grid.getParentElement(this);
+    grid.setOwner(this);
     grid.setDefaultLayout(anychart.enums.Layout.HORIZONTAL);
     grid.setup(this.defaultMinorGridSettings_);
     this.yMinorGrids_[index] = grid;
@@ -2485,7 +2485,6 @@ anychart.stockModule.Plot.prototype.serialize = function() {
 
   axesIds.push(goog.getUid(this.xAxis()));
   json['xAxis'] = this.xAxis().serialize();
-  json['dateTimeHighlighter'] = anychart.color.serialize(this.dateTimeHighlighterStroke_);
 
   json['palette'] = this.palette().serialize();
   json['markerPalette'] = this.markerPalette().serialize();

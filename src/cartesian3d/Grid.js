@@ -1,21 +1,21 @@
 goog.provide('anychart.cartesian3dModule.Grid');
 goog.provide('anychart.standalones.grids.Linear3d');
 goog.require('acgraph');
+goog.require('anychart.core.GridBase');
 goog.require('anychart.core.IStandaloneBackend');
-goog.require('anychart.core.GridWithLayout');
 
 
 
 /**
  * Grid.
  * @constructor
- * @extends {anychart.core.GridWithLayout}
+ * @extends {anychart.core.GridBase}
  * @implements {anychart.core.IStandaloneBackend}
  */
 anychart.cartesian3dModule.Grid = function() {
   anychart.cartesian3dModule.Grid.base(this, 'constructor');
 };
-goog.inherits(anychart.cartesian3dModule.Grid, anychart.core.GridWithLayout);
+goog.inherits(anychart.cartesian3dModule.Grid, anychart.core.GridBase);
 
 
 //region --- Drawing
@@ -135,6 +135,7 @@ anychart.standalones.grids.linear3d = function() {
   proto['isHorizontal'] = proto.isHorizontal;
   proto['scale'] = proto.scale;
   proto['axis'] = proto.axis;
+  // proto['isMinor'] = proto.isMinor;
 
   proto = anychart.standalones.grids.Linear3d.prototype;
   goog.exportSymbol('anychart.standalones.grids.linear3d', anychart.standalones.grids.linear3d);

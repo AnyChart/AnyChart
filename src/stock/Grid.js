@@ -1,7 +1,7 @@
 goog.provide('anychart.stockModule.Grid');
 goog.require('acgraph');
 goog.require('anychart.color');
-goog.require('anychart.core.GridWithLayout');
+goog.require('anychart.core.GridBase');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.utils.Padding');
 goog.require('anychart.enums');
@@ -11,12 +11,12 @@ goog.require('anychart.enums');
 /**
  * Grid.
  * @constructor
- * @extends {anychart.core.GridWithLayout}
+ * @extends {anychart.core.GridBase}
  */
 anychart.stockModule.Grid = function() {
   anychart.stockModule.Grid.base(this, 'constructor');
 };
-goog.inherits(anychart.stockModule.Grid, anychart.core.GridWithLayout);
+goog.inherits(anychart.stockModule.Grid, anychart.core.GridBase);
 
 
 //region --- Infrastructure
@@ -165,7 +165,7 @@ anychart.stockModule.Grid.prototype.drawInternal = function() {
   var drawInterlace = layout[1];
   var drawLine = layout[0];
 
-  var needsShift = acgraph.vector.getThickness(this.stroke_) % 2 == 1;
+  var needsShift = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(this.getOption('stroke'))) % 2 == 1;
 
   for (var i = 0, count = ticksArray.length; i < count; i++) {
     var tickVal = ticksArray[i];
@@ -213,5 +213,6 @@ anychart.stockModule.Grid.prototype.drawInternal = function() {
   proto['isHorizontal'] = proto.isHorizontal;
   proto['scale'] = proto.scale;
   proto['axis'] = proto.axis;
+  // proto['isMinor'] = proto.isMinor;
 })();
 //endregion

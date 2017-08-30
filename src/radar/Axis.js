@@ -2,6 +2,7 @@ goog.provide('anychart.radarModule.Axis');
 goog.provide('anychart.standalones.axes.Radar');
 goog.require('acgraph');
 goog.require('anychart.color');
+goog.require('anychart.core.IAxis');
 goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.reporting');
