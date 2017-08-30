@@ -129,7 +129,7 @@ anychart.standalones.grids.linear3d = function() {
 
 
 //endregion
-//exports
+//region --- Exports
 (function() {
   var proto = anychart.cartesian3dModule.Grid.prototype;
   proto['isHorizontal'] = proto.isHorizontal;
@@ -142,5 +142,5 @@ anychart.standalones.grids.linear3d = function() {
   proto['draw'] = proto.draw;
   proto['parentBounds'] = proto.parentBounds;
   proto['container'] = proto.container;
-//endregion
 })();
+//endregion

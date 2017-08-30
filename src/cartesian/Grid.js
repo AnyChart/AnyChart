@@ -1,4 +1,5 @@
 goog.provide('anychart.cartesianModule.Grid');
+goog.provide('anychart.standalones.grids.Linear');
 goog.require('acgraph');
 goog.require('anychart.color');
 goog.require('anychart.core.GridBase');
@@ -102,6 +103,38 @@ anychart.cartesianModule.Grid.prototype.drawInterlaceVertical = function(ratio, 
 
 
 //endregion
+//region --- Standalone
+
+
+
+//------------------------------------------------------------------------------
+//
+//  Standalone
+//
+//------------------------------------------------------------------------------
+/**
+ * @constructor
+ * @extends {anychart.cartesianModule.Grid}
+ */
+anychart.standalones.grids.Linear = function() {
+  anychart.standalones.grids.Linear.base(this, 'constructor');
+};
+goog.inherits(anychart.standalones.grids.Linear, anychart.cartesianModule.Grid);
+anychart.core.makeStandalone(anychart.standalones.grids.Linear, anychart.cartesianModule.Grid);
+
+
+/**
+ * Constructor function.
+ * @return {!anychart.standalones.grids.Linear}
+ */
+anychart.standalones.grids.linear = function() {
+  var grid = new anychart.standalones.grids.Linear();
+  grid.setup(anychart.getFullTheme('standalones.linearGrid'));
+  return grid;
+};
+
+
+//endregion
 //region --- Exports
 (function() {
   var proto = anychart.cartesianModule.Grid.prototype;
@@ -109,5 +142,11 @@ anychart.cartesianModule.Grid.prototype.drawInterlaceVertical = function(ratio, 
   proto['scale'] = proto.scale;
   proto['axis'] = proto.axis;
   // proto['isMinor'] = proto.isMinor;
+
+  proto = anychart.standalones.grids.Linear.prototype;
+  goog.exportSymbol('anychart.standalones.grids.linear', anychart.standalones.grids.linear);
+  proto['draw'] = proto.draw;
+  proto['parentBounds'] = proto.parentBounds;
+  proto['container'] = proto.container;
 })();
 //endregion

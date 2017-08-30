@@ -566,8 +566,7 @@ anychart.core.GridBase.prototype.getFillElement = function(index) {
     var context = {
       'index': index,
       'grid': this,
-      'palette': this.palette_ || this.parent_.palette(),
-      'sourceColor': 'blue'
+      'palette': this.palette_ || this.parent_.palette()
     };
 
     fill_ = fill.call(context);
