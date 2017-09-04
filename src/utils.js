@@ -1703,10 +1703,10 @@ anychart.utils.INTERVAL_ESTIMATIONS = [
 
 
 /**
- * Returns an array of [unit: anychart.enums.Interval, count: number] with estimation of the data interval passed.
+ * Returns an object of [unit: anychart.enums.Interval, count: number] with estimation of the data interval passed.
  * Interval must be a valid number (not a NaN).
  * @param {number} interval
- * @return {!{unit: anychart.enums.Interval, count: number}} }
+ * @return {!{unit: anychart.enums.Interval, count: number}}
  */
 anychart.utils.estimateInterval = function(interval) {
   interval = Math.floor(interval);
