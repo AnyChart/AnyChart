@@ -91,7 +91,7 @@ anychart.ui.menu.SubMenuRenderer.prototype.decorate = function(control, element)
     var childMenuEl = childMenuEls[0];
     // Hide the menu element before attaching it to the document body; see bug 1089244.
     goog.style.setElementShown(childMenuEl, false);
-    subMenu.getDomHelper().getDocument().body.appendChild(childMenuEl);
+    goog.dom.appendChild(subMenu.getDomHelper().getDocument().body, childMenuEl);
     childMenu.decorate(childMenuEl);
     subMenu.setMenu(childMenu, true);
   }
@@ -118,7 +118,7 @@ anychart.ui.menu.SubMenuRenderer.prototype.setContent = function(element, conten
       contentElement.lastChild != arrowElement &&
       goog.dom.classlist.contains(/** @type {!Element} */ (arrowElement),
           anychart.ui.menu.SubMenuRenderer.CSS_CLASS_SUBMENU_)) {
-    contentElement.appendChild(arrowElement);
+    goog.dom.appendChild(contentElement, arrowElement);
   }
 };
 
@@ -155,7 +155,7 @@ anychart.ui.menu.SubMenuRenderer.prototype.initializeDom = function(control) {
    */
   arrow.innerHTML = '&nbsp;';
   if (arrow != element.lastChild) {
-    element.appendChild(arrow);
+    goog.dom.appendChild(element, arrow);
   }
   var subMenuElement = subMenu.getElement();
   goog.asserts.assert(subMenuElement, 'The sub menu DOM element cannot be null.');
@@ -174,5 +174,5 @@ anychart.ui.menu.SubMenuRenderer.prototype.addArrow_ = function(subMenu, element
   var arrow = subMenu.getDomHelper().createDom('span');
   arrow.className = anychart.ui.menu.SubMenuRenderer.CSS_CLASS_SUBMENU_;
   arrow.innerHTML = '&nbsp;';
-  this.getContentElement(element).appendChild(arrow);
+  goog.dom.appendChild(this.getContentElement(element), arrow);
 };
