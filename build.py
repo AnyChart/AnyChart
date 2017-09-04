@@ -30,8 +30,6 @@ PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
 LIBS_PATH = os.path.join(PROJECT_PATH, 'libs')
 SRC_PATH = os.path.join(PROJECT_PATH, 'src')
 OUT_PATH = os.path.join(PROJECT_PATH, 'out')
-MODULES_OUT_DIR = os.path.join(OUT_PATH, 'parts')
-MODULES_CONFIG_OUT_PATH = os.path.join(OUT_PATH, 'modules.json')
 MANIFEST_OUT_PATH = os.path.join(OUT_PATH, 'file.manifest.json')
 TRAVIS_COMMANDS_PATH = os.path.join(OUT_PATH, 'travis-copy-bundles')
 DIST_PATH = os.path.join(PROJECT_PATH, 'dist')
@@ -53,10 +51,15 @@ CLOSURE_BUILDER_PATH = os.path.join(CLOSURE_BIN_PATH, 'build', 'closurebuilder.p
 
 # special files
 STAT_REPORT_OUT_PATH = os.path.join(OUT_PATH, 'size.stat.json')
-MODULES_CONFIG_PATH = os.path.join(PROJECT_PATH, 'modules.json')
+MODULES_CONFIG_PATH = os.path.join(PROJECT_PATH, 'bin', 'modules.json')
 VERSION_INI_PATH = os.path.join(PROJECT_PATH, 'version.ini')
 ANYCHART_DEPS_PATH = os.path.join(SRC_PATH, 'deps.js')
 CLOSURE_DEPS_PATH = os.path.join(CLOSURE_SOURCE_PATH, 'deps.js')
+
+CHECKS_FLAGS = os.path.join(PROJECT_PATH, 'bin', 'checks.flags')
+COMMON_FLAGS = os.path.join(PROJECT_PATH, 'bin', 'common.flags')
+BINARIES_WRAPPER_START = os.path.join(PROJECT_PATH, 'bin', 'binaries_wrapper_start.txt')
+BINARIES_WRAPPER_END = os.path.join(PROJECT_PATH, 'bin', 'binaries_wrapper_end.txt')
 
 
 # endregion
@@ -137,6 +140,21 @@ def sync_libs(needs_lesscpy=False, needs_jsb=False):
 def __gzip_file(f):
     with open(f, 'rb') as f_in, gzip.open(f + '.gz', 'wb') as f_out:
         f_out.writelines(f_in)
+
+
+def __get_gzip_file_size(f):
+    gzip_path = f + '.gz'
+    rm_after = False
+
+    if not os.path.exists(gzip_path):
+        __gzip_file(f)
+        rm_after = True
+    size = os.path.getsize(gzip_path)
+
+    if rm_after:
+        os.remove(gzip_path)
+
+    return int(round(size / 1000))
 
 
 # endregion
@@ -292,6 +310,7 @@ def __parse_deps():
                             raise Exception('Duplicate namespace %s provided in file %s. Original provide in %s' %
                                             (ns, file_name, result[ns][0]))
                         result[ns] = (file_name, provides, requires)
+
     result = dict()
     __parse_file(CLOSURE_DEPS_PATH)
     __parse_file(ANYCHART_DEPS_PATH)
@@ -318,7 +337,7 @@ def __call_console_commands(commands):
 
 
 def __compile(entry_point=None, output=None, js_files=True, level="ADVANCED_OPTIMIZATIONS", theme=None,
-              flag_file='common.flags', defines=None, version=False, dev_edition=None, perf_mon=None,
+              flag_file=COMMON_FLAGS, defines=None, version=False, dev_edition=None, perf_mon=None,
               additional_params=None, manifest=None, checks_only=False, debug_files=None, externs=None):
     def make_define(*args):
         if isinstance(args[0], tuple):
@@ -492,12 +511,13 @@ def __make_manifest(module_name, files, theme_name='none', gen_manifest=False, a
 
 @stopwatch()
 def __make_build(build_name, modules, checks_only=False, theme_name='none', dev_edition=False, perf_mon=False,
-                 gen_manifest=False, debug_files=False):
-    __create_dir_if_not_exists(MODULES_OUT_DIR)
-    print '\nBuilding manifests for target "%s" (%s parts) to %s' % (build_name, len(modules), MODULES_OUT_DIR)
+                 gen_manifest=False, debug_files=False, output=OUT_PATH):
+    modules_parts_output = os.path.join(output, 'parts')
+    __create_dir_if_not_exists(modules_parts_output)
+    print '\nBuilding manifests for target "%s" (%s parts) to %s' % (build_name, len(modules), modules_parts_output)
     files_list_file_name = os.path.join(OUT_PATH, '%s.files.list' % build_name)
     additional_flags = [
-        '--module_output_path_prefix "%s%s"' % (MODULES_OUT_DIR, os.path.sep),
+        '--module_output_path_prefix "%s%s"' % (modules_parts_output, os.path.sep),
         '--rename_prefix_namespace="$"',
         '--rewrite_polyfills="false"'
     ]
@@ -522,7 +542,7 @@ def __make_build(build_name, modules, checks_only=False, theme_name='none', dev_
         all_files.extend(module_files)
 
     with open(files_list_file_name, 'w') as files_list:
-        with open(os.path.join(PROJECT_PATH, 'checks.flags'), 'r') as checks:
+        with open(CHECKS_FLAGS, 'r') as checks:
             for line in checks:
                 files_list.write(line)
         files_list.write('\n'.join(map(lambda f: '--js="%s"' % f, all_files)))
@@ -546,8 +566,11 @@ def __make_build(build_name, modules, checks_only=False, theme_name='none', dev_
 
 
 @stopwatch()
-def __make_bundle(bundle_name, modules, dev_edition=False, perf_mon=False, debug_files=False, gzip=False, stat=False):
-    file_name = os.path.join(OUT_PATH, '%s.min.js' % bundle_name)
+def __make_bundle(bundle_name, modules, dev_edition=False, perf_mon=False, debug_files=False, gzip=False, stat=False,
+                  output=OUT_PATH):
+    print output
+    modules_parts_output = os.path.join(output, 'parts')
+    file_name = os.path.join(output, '%s.min.js' % bundle_name)
 
     if not stat:
         print 'Assembling module "%s"' \
@@ -564,7 +587,7 @@ def __make_bundle(bundle_name, modules, dev_edition=False, perf_mon=False, debug
     with open(file_name, 'w') as output:
         output.write(wrapper[0])
         for module_name in modules:
-            with open(os.path.join(MODULES_OUT_DIR, '%s.js' % module_name)) as f:
+            with open(os.path.join(modules_parts_output, '%s.js' % module_name)) as f:
                 for line in f:
                     output.write(line)
         output.write(wrapper[1])
@@ -588,35 +611,28 @@ def __get_bundle_wrapper(bundle_name, modules, file_name='', performance_monitor
                    "window.performance.now():+new Date()-window.anychart_%s_init_start).toFixed(5),'ms');" \
                    "delete window.anychart_%s_init_start;" % (bundle_name, bundle_name, bundle_name)
     source_mapping = ('//# sourceMappingURL=%s.map' % file_name) if debug_files else ''
-    header = '''/**
- * AnyChart is lightweight robust charting library with great API and Docs,
- * that works with your stack and has tons of chart types and features.
- *
- * This file contains following modules: %s
- * Version: %s (%s)
- * License: http://www.anychart.com/buy/
- * Contact: sales@anychart.com
- * Copyright: AnyChart.com %s. All rights reserved.
- */
-''' % (', '.join(modules), __get_build_version(), time.strftime('%Y-%m-%d'), time.strftime('%Y'))
+
+    f = open(BINARIES_WRAPPER_START, 'r')
+    start = f.read()
+    f.close()
+
+    f = open(BINARIES_WRAPPER_END, 'r')
+    end = f.read()
+    f.close()
+
     core_check = '' \
         if any(map(lambda item: __get_modules_config()['parts'][item].get('skipCoreCheck', False), modules)) \
         else "throw Error('anychart-base.min.js module should be included first');"
-    start = "%s(function(global,factory){" \
-            "if(typeof module==='object'&&typeof module.exports==='object'){" \
-            "var wrapper=function(w){" \
-            "if(!w.document){throw Error('AnyChart requires a window with a document');}" \
-            "factory.call(w,w,w.document);" \
-            "w.anychart.getGlobal=function(){return w;};" \
-            "return w.anychart;};" \
-            "module.exports=global.document?wrapper(global):wrapper;" \
-            "}else{" \
-            "factory.call(global,window,document)" \
-            "}})(typeof window!=='undefined'?window:this,function(window,document,opt_noGlobal){" \
-            "var $,_,$_=window.anychart;%s" \
-            "if($_&&(_=$_._)){$=$_.$}else{%s$={};_={}}" % \
-            (header, perf_start, core_check)
-    end = '%s$_=window.anychart;$_.$=$;$_._=_})%s' % (perf_end, source_mapping)
+
+    start = start % (
+        ', '.join(modules),
+        __get_build_version(),
+        time.strftime('%Y-%m-%d'),
+        time.strftime('%Y'),
+        perf_start,
+        core_check
+    )
+    end = end % (perf_end, source_mapping)
 
     return start, end
 
@@ -626,10 +642,10 @@ def __get_bundle_wrapper(bundle_name, modules, file_name='', performance_monitor
 # ======================================================================================================================
 # Themes building
 # ======================================================================================================================
-def build_theme(theme):
-    min_file_name = os.path.join(OUT_PATH, theme + '.min.js')
-    file_name = os.path.join(OUT_PATH, theme + '.js')
-    __compile(__get_theme_entry_point(theme), min_file_name, flag_file='checks.flags')
+def build_theme(theme, output):
+    min_file_name = os.path.join(output, theme + '.min.js')
+    file_name = os.path.join(output, theme + '.js')
+    __compile(__get_theme_entry_point(theme), min_file_name, flag_file=CHECKS_FLAGS)
     try:
         import jsbeautifier
         res = jsbeautifier.beautify_file(min_file_name)
@@ -651,13 +667,16 @@ def __compile_project(*args, **kwargs):
     __build_deps()
 
     checks = kwargs['check_only']
+    output = os.path.join(PROJECT_PATH, kwargs['output']) if kwargs['output'] else OUT_PATH
+
+    __create_dir_if_not_exists(output)
 
     builds = kwargs['build'] or ['bundle']
     print '\n%s AnyChart\nVersion: %s' % ('Checking' if checks else 'Building', __get_build_version())
     for build_name, build in __get_builds().iteritems():
         if build_name in builds:
             __make_build(build_name, build, checks, kwargs['theme'], kwargs['develop'],
-                         kwargs['performance_monitoring'], kwargs['manifest'], kwargs['debug_files'])
+                         kwargs['performance_monitoring'], kwargs['manifest'], kwargs['debug_files'], output=output)
 
     if not checks:
         print '\nBuilding bundles\n'
@@ -667,18 +686,14 @@ def __compile_project(*args, **kwargs):
         for bundle_name, bundle in bundles.iteritems():
             if all(map(lambda module_name: __get_build_name(module_configs[module_name]) in builds, bundle['parts'])):
                 __make_bundle(bundle_name, bundle['parts'], kwargs['develop'], kwargs['performance_monitoring'],
-                              kwargs['debug_files'], kwargs['gzip'])
+                              kwargs['debug_files'], kwargs['gzip'], output=output)
                 built_bundles[bundle_name] = bundle['parts']
             else:
                 print 'Skipping bundle "%s"' % bundle_name
         for build_name, build in __get_builds().iteritems():
             if build_name in builds:
-                # for name in build:
-                #     __make_bundle('anychart-' + name, [name], kwargs['develop'], kwargs['performance_monitoring'],
-                #                   kwargs['debug_files'], kwargs['gzip'])
-                #     built_bundles['anychart-' + name] = [name]
                 __make_bundle('anychart-' + build_name, build, kwargs['develop'], kwargs['performance_monitoring'],
-                              kwargs['debug_files'], kwargs['gzip'])
+                              kwargs['debug_files'], kwargs['gzip'], output=output)
                 built_bundles['anychart-' + build_name] = build
 
         modules_json = {'parts': {}, 'modules': {}}
@@ -686,7 +701,15 @@ def __compile_project(*args, **kwargs):
             modules_json['parts'][part] = {'deps': part_config.get('deps', [])}
         for bundle, parts in built_bundles.iteritems():
             modules_json['modules'][bundle] = {'parts': parts}
-        with open(MODULES_CONFIG_OUT_PATH, 'w') as f:
+            if bundle in bundles:
+                if 'type' in bundles[bundle]: modules_json['modules'][bundle]['type'] = bundles[bundle]['type']
+                if 'name' in bundles[bundle]: modules_json['modules'][bundle]['name'] = bundles[bundle]['name']
+                if 'icon' in bundles[bundle]: modules_json['modules'][bundle]['icon'] = bundles[bundle]['icon']
+                modules_json['modules'][bundle]['size'] = __get_gzip_file_size(
+                    os.path.join(output, bundle + '.min.js'))
+        modules_json['themes'] = __get_modules_config()['themes']
+
+        with open(os.path.join(output, 'modules.json'), 'w') as f:
             f.write(json.dumps(modules_json))
 
     print ''
@@ -715,31 +738,37 @@ def __build_deps(*args, **kwargs):
 @sync_required(needs_jsb=True)
 @needs_out_dir
 @stopwatch()
-def __build_theme(*args, **kwargs):
+def __build_themes(*args, **kwargs):
     themes = kwargs['themes'] if len(kwargs['themes']) > 0 else __get_themes_list()
+    output = os.path.join(PROJECT_PATH, kwargs['output']) if kwargs['output'] else OUT_PATH
     text = 'Building %s theme'
+
     if len(themes) > 1:
         print 'Building themes (%i items)' % len(themes)
         text = '  ' + text
         func = stopwatch('    ')(build_theme)
     else:
         func = build_theme
+
     for theme in themes:
         print text % theme
-        func(theme)
+        func(theme, output)
 
 
 @sync_required(needs_lesscpy=True)
 @needs_out_dir
 @stopwatch()
 def __compile_css(*args, **kwargs):
+    output = os.path.join(PROJECT_PATH, kwargs['output']) if kwargs['output'] else OUT_PATH
+    __create_dir_if_not_exists(output)
+
     try:
         import lesscpy
 
         print 'Compiling AnyChart UI css'
         css_src_path = os.path.join(PROJECT_PATH, 'css', 'anychart.less')
-        css_out_path = os.path.join(OUT_PATH, 'anychart-ui.css')
-        css_min_out_path = os.path.join(OUT_PATH, 'anychart-ui.min.css')
+        css_out_path = os.path.join(output, 'anychart-ui.css')
+        css_min_out_path = os.path.join(output, 'anychart-ui.min.css')
 
         # Less
         with open(css_out_path, 'w') as f:
@@ -767,15 +796,16 @@ def __stat(*args, **kwargs):
     build_name = 'bundle'
     theme_name = 'defaultTheme'
     modules = __get_builds()[build_name]
+    modules_parts_output = os.path.join(OUT_PATH, 'parts')
 
     print '\nBuilding size statistics report to %s' % STAT_REPORT_OUT_PATH
 
     print '  Building manifests (%s items)' % len(modules)
 
-    __create_dir_if_not_exists(MODULES_OUT_DIR)
+    __create_dir_if_not_exists(modules_parts_output)
     files_list_file_name = os.path.join(OUT_PATH, '%s.files.list' % build_name)
     additional_flags = [
-        '--module_output_path_prefix "%s%s"' % (MODULES_OUT_DIR, os.path.sep),
+        '--module_output_path_prefix "%s%s"' % (modules_parts_output, os.path.sep),
         '--rename_prefix_namespace="$"',
         '--rewrite_polyfills="false"',
         '--formatting="PRINT_INPUT_DELIMITER"',
@@ -799,7 +829,7 @@ def __stat(*args, **kwargs):
 
     if not kwargs['skip_building']:
         with open(files_list_file_name, 'w') as files_list:
-            with open(os.path.join(PROJECT_PATH, 'checks.flags'), 'r') as checks:
+            with open(CHECKS_FLAGS, 'r') as checks:
                 for line in checks:
                     files_list.write(line)
             files_list.write('\n'.join(map(lambda f: '--js="%s"' % f, all_files)))
@@ -907,11 +937,10 @@ def __stat(*args, **kwargs):
 def __exec_main_script():
     # root parser
     parser = argparse.ArgumentParser()
-    parser.set_defaults(compile_css=False,
-                        gzip=False)
+    parser.set_defaults(compile_css=False, gzip=False)
     subparsers = parser.add_subparsers(help='AnyChart framework build script commands:')
 
-    # create the parser for the 'compile' command
+    # region ---- create parser for the 'compile' command
     compile_parser = subparsers.add_parser('compile', help='compile project or project modules')
     compile_parser.set_defaults(action=__compile_project,
                                 sources=False,
@@ -952,6 +981,10 @@ def __exec_main_script():
     compile_parser.add_argument('-c', '--check_only',
                                 action='store_true',
                                 help='only compilation checks are applied - no output is generated')
+    compile_parser.add_argument('-o', '--output',
+                                dest='output',
+                                action='store',
+                                help='Output directory')
 
     # compile_parser.add_argument('-m', '--module',
     #                             metavar='',
@@ -960,19 +993,27 @@ def __exec_main_script():
     #                             help='specify modules to compile, can be specified multiple times. '
     #                                  'Possible modules values: %s' % ', '.join(__get_macro_modules_list().keys()))
 
-    # create the parser for the 'theme' command
+    # endregion
+
+    # region ---- create parser for the 'themes' command
     themes_parser = subparsers.add_parser('themes',
                                           help='build standalone theme file by name. Default value is "defaultTheme"')
-    themes_parser.set_defaults(action=__build_theme,
+    themes_parser.set_defaults(action=__build_themes,
                                themes=[])
+    themes_parser.add_argument('-o', '--output',
+                               dest='output',
+                               action='store',
+                               help='Output directory')
+
     themes_parser.add_argument('-n', '--name',
                                dest='themes',
                                action='append',
                                help='name of the theme, default value is "defaultTheme". '
                                     'Can be passed multiple times.\nPossible values are: %s. '
                                     % ', '.join(__get_themes_list()))
+    # endregion
 
-    # create the parser for the 'libs' command
+    # region --- create parser for the 'libs' command
     libs_parser = subparsers.add_parser('libs', help='download project requirements')
     libs_parser.set_defaults(action=__sync_libs,
                              skip_less=False,
@@ -983,22 +1024,32 @@ def __exec_main_script():
     libs_parser.add_argument('-sb', '--skip_jsb',
                              action='store_true',
                              help='skip jsbeautifier installing')
+    # endregion
 
-    # create the parser for the 'deps' command
+    # region ---- create the parser for the 'deps' command
     subparsers.add_parser('deps', help='generate deps.js file') \
         .set_defaults(action=__build_deps)
+    # endregion
 
-    # create the parser for the 'css' command
-    subparsers.add_parser('css', help='compile AnyChart UI css') \
-        .set_defaults(action=__compile_css)
+    # region ---- create the parser for the 'css' command
+    css_parser = subparsers.add_parser('css', help='compile AnyChart UI css')
 
-    # create the parser for the 'css' command
+    css_parser.set_defaults(action=__compile_css)
+
+    css_parser.add_argument('-o', '--output',
+                            dest='output',
+                            action='store',
+                            help='Output directory')
+    # endregion
+
+    # region ---- create the parser for the 'stat' command
     stat_parser = subparsers.add_parser('stat', help='build size statistics report')
     stat_parser.set_defaults(action=__stat,
                              skip_build=False)
     stat_parser.add_argument('-s', '--skip_building',
                              action='store_true',
                              help='skip building stat-min')
+    # endregion
 
     params = parser.parse_args()
     params.action(**vars(params))
