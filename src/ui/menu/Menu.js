@@ -1,5 +1,5 @@
 goog.provide('anychart.ui.menu.Menu');
-
+goog.require('goog.dom');
 goog.require('goog.ui.Menu');
 
 
@@ -63,7 +63,7 @@ anychart.ui.menu.Menu.prototype.createDom = function() {
   anychart.ui.menu.Menu.superClass_.createDom.call(this);
 
   this.scrollableContainer_ = this.getDomHelper().createDom(goog.dom.TagName.DIV, anychart.ui.menu.Menu.CSS_CLASS_SCROLLABLE);
-  this.getDomHelper().insertChildAt(this.getElement(), this.scrollableContainer_, 0);
+  goog.dom.insertChildAt(this.getElement(), this.scrollableContainer_, 0);
 };
 
 

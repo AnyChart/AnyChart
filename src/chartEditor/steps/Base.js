@@ -421,8 +421,8 @@ anychart.chartEditorModule.steps.Base.prototype.createDom = function() {
           goog.dom.TagName.DIV, goog.getCssName(className, 'content')),
       this.progressEl_);
 
-  element.appendChild(this.asideEl_);
-  element.appendChild(this.contentWrapperEl_);
+  goog.dom.appendChild(element, this.asideEl_);
+  goog.dom.appendChild(element, this.contentWrapperEl_);
 };
 
 
@@ -476,7 +476,7 @@ anychart.chartEditorModule.steps.Base.prototype.updateProgressList_ = function()
       goog.dom.classlist.enable(itemEl, goog.getCssName('anychart-disabled'), !this.enableNextStep_);
     }
 
-    this.progressListEl_.appendChild(itemEl);
+    goog.dom.appendChild(this.progressListEl_, itemEl);
   }
 };
 

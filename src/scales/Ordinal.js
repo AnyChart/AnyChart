@@ -137,7 +137,8 @@ anychart.scales.Ordinal.prototype.values = function(opt_values, var_args) {
       this.extendDataRange.apply(this, /** @type {Array} */(opt_values));
     else
       this.extendDataRange.apply(this, arguments);
-    this.checkScaleChanged(false);
+    if (this.checkScaleChanged(true))
+      this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REAPPLICATION);
   }
   return this;
 };

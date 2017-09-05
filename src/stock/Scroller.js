@@ -1317,6 +1317,7 @@ anychart.stockModule.Scroller.prototype.getPixelBounds = function() {
 anychart.stockModule.Scroller.prototype.xScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.xScale_ = opt_value;
+    // this.xScale_.listenSignals(this.invalidateScaleDependend, this);
     this.invalidateScaleDependend();
     return this;
   }
