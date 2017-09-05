@@ -731,7 +731,7 @@ anychart.core.GridBase.prototype.drawInternal = function() {
 
   if (isOrdinal && goog.isDef(tickVal)) {
     if (this.getOption('drawLastLine')) drawLine.call(this, 1, pixelShift);
-    path = this.getFillElement(i);
+    path = this.getFillElement(i - 1);
     if (path) {
       drawInterlace.call(this, 1, ratio, path, pixelShift);
     }
