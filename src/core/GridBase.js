@@ -537,7 +537,7 @@ anychart.core.GridBase.prototype.createFillElement = function() {
   var path = acgraph.path();
   path
       .parent(this.rootLayer)
-      .zIndex(3)
+      .zIndex(0)
       .stroke('none');
   this.registerDisposable(path);
   return path;
@@ -592,7 +592,7 @@ anychart.core.GridBase.prototype.getFillElement = function(index) {
  */
 anychart.core.GridBase.prototype.lineElement = function(opt_isMajor) {
   this.lineElementInternal = /** @type {!acgraph.vector.Path} */(this.lineElementInternal ?
-      this.lineElementInternal : acgraph.path().parent(this.rootLayer));
+      this.lineElementInternal : acgraph.path().parent(this.rootLayer).zIndex(1));
   this.registerDisposable(this.lineElementInternal);
   return this.lineElementInternal;
 };
@@ -872,9 +872,9 @@ anychart.core.GridBase.prototype.setupByJSON = function(config, opt_default) {
 anychart.core.GridBase.prototype.disposeInternal = function() {
   this.axis_ = null;
   this.owner_ = null;
-  goog.object.forEach(this.fillMap, function(value, key) {
+  goog.object.forEach(this.fillMap, function(value, key, obj) {
     value.dispose();
-    this.fillMap[key] = null;
+    obj[key] = null;
   });
   this.fillMap = null;
 

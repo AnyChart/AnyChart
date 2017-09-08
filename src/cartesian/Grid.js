@@ -145,6 +145,7 @@ anychart.standalones.grids.linear = function() {
 
   proto = anychart.standalones.grids.Linear.prototype;
   goog.exportSymbol('anychart.standalones.grids.linear', anychart.standalones.grids.linear);
+  proto['layout'] = proto.layout;
   proto['draw'] = proto.draw;
   proto['parentBounds'] = proto.parentBounds;
   proto['container'] = proto.container;

@@ -1367,7 +1367,7 @@ anychart.stockModule.Plot.prototype.xGrid = function(opt_indexOrValue, opt_value
   if (!grid) {
     grid = new anychart.stockModule.Grid();
     grid.setOwner(this);
-    grid.setDefaultLayout(anychart.enums.Layout.HORIZONTAL);
+    grid.setDefaultLayout(anychart.enums.Layout.VERTICAL);
     grid.setup(this.defaultGridSettings_);
     this.xGrids_[index] = grid;
     this.registerDisposable(grid);
@@ -1439,7 +1439,7 @@ anychart.stockModule.Plot.prototype.xMinorGrid = function(opt_indexOrValue, opt_
   if (!grid) {
     grid = new anychart.stockModule.Grid();
     grid.setOwner(this);
-    grid.setDefaultLayout(anychart.enums.Layout.HORIZONTAL);
+    grid.setDefaultLayout(anychart.enums.Layout.VERTICAL);
     grid.setup(this.defaultMinorGridSettings_);
     this.xMinorGrids_[index] = grid;
     this.registerDisposable(grid);

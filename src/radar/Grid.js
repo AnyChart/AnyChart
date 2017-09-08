@@ -319,6 +319,7 @@ anychart.standalones.grids.radar = function() {
 (function() {
   var proto = anychart.standalones.grids.Radar.prototype;
   goog.exportSymbol('anychart.standalones.grids.radar', anychart.standalones.grids.radar);
+  proto['layout'] = proto.layout;
   proto['draw'] = proto.draw;
   proto['parentBounds'] = proto.parentBounds;
   proto['container'] = proto.container;

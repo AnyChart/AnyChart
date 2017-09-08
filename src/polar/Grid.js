@@ -274,6 +274,7 @@ anychart.standalones.grids.polar = function() {
 (function() {
   var proto = anychart.standalones.grids.Polar.prototype;
   goog.exportSymbol('anychart.standalones.grids.polar', anychart.standalones.grids.polar);
+  proto['layout'] = proto.layout;
   proto['draw'] = proto.draw;
   proto['parentBounds'] = proto.parentBounds;
   proto['container'] = proto.container;
