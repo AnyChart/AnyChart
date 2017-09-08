@@ -100,7 +100,8 @@ def __ensure_installed(module_name, version=None):
     except ImportError:
         print 'Installing ' + module_name
         commands = ['python', '-m', 'pip', 'install',
-                    module_name if version is None else '%s==%s' % (module_name, version)]
+                    module_name if version is None else '%s==%s' % (module_name, version),
+                    '--user']
         try:
             subprocess.call(commands)
         except StandardError:
