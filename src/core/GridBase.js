@@ -536,8 +536,8 @@ anychart.core.GridBase.prototype.axesLinesSpace = function(opt_spaceOrTopOrTopAn
 anychart.core.GridBase.prototype.createFillElement = function() {
   var path = acgraph.path();
   path
-      .parent(this.rootLayer)
-      .zIndex(0)
+      .parent(/** @type {acgraph.vector.ILayer} */(this.container()))
+      .zIndex(/** @type {number} */(this.zIndex()))
       .stroke('none');
   this.registerDisposable(path);
   return path;
@@ -592,7 +592,8 @@ anychart.core.GridBase.prototype.getFillElement = function(index) {
  */
 anychart.core.GridBase.prototype.lineElement = function(opt_isMajor) {
   this.lineElementInternal = /** @type {!acgraph.vector.Path} */(this.lineElementInternal ?
-      this.lineElementInternal : acgraph.path().parent(this.rootLayer).zIndex(1));
+      this.lineElementInternal :
+      acgraph.path());
   this.registerDisposable(this.lineElementInternal);
   return this.lineElementInternal;
 };
@@ -755,19 +756,21 @@ anychart.core.GridBase.prototype.draw = function() {
   if (!this.checkScale() || !this.checkDrawingNeeded())
     return this;
 
-  if (!this.rootLayer) {
-    this.rootLayer = acgraph.layer();
-  }
-
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
     var zIndex = /** @type {number} */(this.zIndex());
-    this.rootLayer.zIndex(zIndex);
+    this.lineElement().zIndex(zIndex + 0.00001);
+    goog.object.forEach(this.fillMap, function(path, key, obj) {
+      path.zIndex(zIndex);
+    });
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
     var container = /** @type {acgraph.vector.ILayer} */(this.container());
-    this.rootLayer.parent(container);
+    this.lineElement().parent(container);
+    goog.object.forEach(this.fillMap, function(path, key, obj) {
+      path.parent(container);
+    });
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
@@ -787,7 +790,10 @@ anychart.core.GridBase.prototype.draw = function() {
 
 /** @inheritDoc */
 anychart.core.GridBase.prototype.remove = function() {
-  if (this.rootLayer) this.rootLayer.parent(null);
+  this.lineElement().parent(null);
+  goog.object.forEach(this.fillMap, function(path, key, obj) {
+    path.parent(null);
+  });
 };
 
 
