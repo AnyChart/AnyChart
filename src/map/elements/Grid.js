@@ -96,6 +96,16 @@ anychart.mapModule.elements.Grid.prototype.lineElement = function(opt_isMajor) {
 };
 
 
+/** @inheritDoc */
+anychart.mapModule.elements.Grid.prototype.createFillElement = function() {
+  var path = acgraph.path();
+  path
+      .parent(/** @type {acgraph.vector.ILayer} */(this.rootLayer))
+      .zIndex(3)
+      .stroke('none');
+  this.registerDisposable(path);
+  return path;
+};
 //endregion
 //region --- Interactivity
 /**
@@ -110,6 +120,27 @@ anychart.mapModule.elements.Grid.prototype.updateOnZoomOrMove = function(tx) {
 
 //endregion
 //region --- Drawing
+/** @inheritDoc */
+anychart.mapModule.elements.Grid.prototype.beforeDraw = function() {
+  if (!this.rootLayer)
+    this.rootLayer = acgraph.layer();
+};
+
+
+/** @inheritDoc */
+anychart.mapModule.elements.Grid.prototype.applyContainer = function() {
+  var container = /** @type {acgraph.vector.ILayer} */(this.container());
+  this.rootLayer.parent(container);
+};
+
+
+/** @inheritDoc */
+anychart.mapModule.elements.Grid.prototype.applyZIndex = function() {
+  var zIndex = /** @type {number} */(this.zIndex());
+  this.rootLayer.zIndex(zIndex);
+};
+
+
 /**
  * Draw horizontal line.
  * @param {number} value Tick value to draw grid line.

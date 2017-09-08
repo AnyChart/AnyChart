@@ -63,9 +63,7 @@ anychart.core.GridBase = function() {
   this.palette_ = null;
 
   /**
-   *
    * @type {Object.<string, acgraph.vector.Path>}
-   * @private
    */
   this.fillMap = {};
 
@@ -749,6 +747,36 @@ anychart.core.GridBase.prototype.applyAppearance = function() {
 
 
 /**
+ * Something that will be doing before drawing.
+ */
+anychart.core.GridBase.prototype.beforeDraw = goog.nullFunction;
+
+
+/**
+ * Applying container.
+ */
+anychart.core.GridBase.prototype.applyContainer = function() {
+  var container = /** @type {acgraph.vector.ILayer} */(this.container());
+  this.lineElement().parent(container);
+  goog.object.forEach(this.fillMap, function(path, key, obj) {
+    path.parent(container);
+  });
+};
+
+
+/**
+ * Applying z-index
+ */
+anychart.core.GridBase.prototype.applyZIndex = function() {
+  var zIndex = /** @type {number} */(this.zIndex());
+  this.lineElement().zIndex(zIndex + 0.00001);
+  goog.object.forEach(this.fillMap, function(path, key, obj) {
+    path.zIndex(zIndex);
+  });
+};
+
+
+    /**
  * Drawing.
  * @return {anychart.core.GridBase} An instance of {@link anychart.core.GridBase} class for method chaining.
  */
@@ -756,21 +784,15 @@ anychart.core.GridBase.prototype.draw = function() {
   if (!this.checkScale() || !this.checkDrawingNeeded())
     return this;
 
+  this.beforeDraw();
+
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
-    var zIndex = /** @type {number} */(this.zIndex());
-    this.lineElement().zIndex(zIndex + 0.00001);
-    goog.object.forEach(this.fillMap, function(path, key, obj) {
-      path.zIndex(zIndex);
-    });
+    this.applyZIndex();
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
-    var container = /** @type {acgraph.vector.ILayer} */(this.container());
-    this.lineElement().parent(container);
-    goog.object.forEach(this.fillMap, function(path, key, obj) {
-      path.parent(container);
-    });
+    this.applyContainer();
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
