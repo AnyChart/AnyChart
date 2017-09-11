@@ -559,7 +559,7 @@ anychart.core.GridBase.prototype.clearFillElements = function() {
  */
 anychart.core.GridBase.prototype.getFillElement = function(index) {
   var fill = /** @type {acgraph.vector.Fill|Function} */(this.getOption('fill'));
-  var fill_, result, hashFill;
+  var fill_, result;
   if (goog.isFunction(fill)) {
     var context = {
       'index': index,
@@ -572,9 +572,7 @@ anychart.core.GridBase.prototype.getFillElement = function(index) {
     fill_ = fill;
   }
 
-  var sFill = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(fill_));
-  hashFill = goog.isString(sFill) ? sFill : JSON.stringify(sFill);
-  result = hashFill in this.fillMap ? this.fillMap[hashFill] : (this.fillMap[hashFill] = this.createFillElement());
+  result = index in this.fillMap ? this.fillMap[index.toString()] : (this.fillMap[index.toString()] = this.createFillElement());
   result.fill(/** @type {acgraph.vector.Fill} */(fill_));
 
   return result;
