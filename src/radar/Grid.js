@@ -230,7 +230,7 @@ anychart.radarModule.Grid.prototype.drawInternal = function() {
     }
 
     //draw last line on ordinal
-    path = this.getFillElement(i);
+    path = this.getFillElement(i - 1);
     angle = goog.math.standardAngle(startAngle);
     angleRad = angle * Math.PI / 180;
     x = Math.round(this.cx_ + this.radius_ * Math.cos(angleRad));
@@ -261,12 +261,12 @@ anychart.radarModule.Grid.prototype.drawInternal = function() {
 
       ratio = yScale.transform(leftTick);
 
-      if (i != 0)
+      if (i)
         path = this.getFillElement(i - 1);
       if (i == ticksArrLen - 1) {
         if (isOrdinal) {
           this.drawInterlaceCircuit(ratio, prevRatio, path);
-          path = this.getFillElement(i - 1);
+          path = this.getFillElement(i);
           this.drawInterlaceCircuit(yScale.transform(rightTick, 1), ratio, path);
           this.drawLineCircuit(ratio);
           if (this.getOption('drawLastLine')) this.drawLineCircuit(yScale.transform(rightTick, 1));

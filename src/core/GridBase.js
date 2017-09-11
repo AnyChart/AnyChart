@@ -573,6 +573,7 @@ anychart.core.GridBase.prototype.getFillElement = function(index) {
   }
 
   result = index in this.fillMap ? this.fillMap[index.toString()] : (this.fillMap[index.toString()] = this.createFillElement());
+  console.log(fill_, index);
   result.fill(/** @type {acgraph.vector.Fill} */(fill_));
 
   return result;

@@ -186,7 +186,7 @@ anychart.polarModule.Grid.prototype.drawInternal = function() {
     }
 
     //draw last line on ordinal
-    path = this.getFillElement(i);
+    path = this.getFillElement(i - 1);
     angle = goog.math.standardAngle(startAngle);
     angleRad = angle * Math.PI / 180;
     x = Math.round(this.cx_ + this.radius_ * Math.cos(angleRad));
