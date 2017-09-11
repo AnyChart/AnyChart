@@ -197,10 +197,12 @@ anychart.stockModule.Grid.prototype.drawInternal = function() {
 
   //draw last line on ordinal
   if (isOrdinal && goog.isDef(tickVal)) {
-    if (this.getOption('drawLastLine')) drawLine.call(this, 1, needsShift);
+    ratio = scale.inverted() ? 0 : 1;
+    if (this.getOption('drawLastLine'))
+      drawLine.call(this, ratio, needsShift);
     path = this.getFillElement(i - 1);
     if (path) {
-      drawInterlace.call(this, 1, ratio, path, needsShift);
+      drawInterlace.call(this, ratio, prevRatio, path, needsShift);
     }
   }
 };

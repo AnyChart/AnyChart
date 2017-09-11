@@ -422,7 +422,7 @@ anychart.core.ChartWithAxes.prototype.xMinorGrid = function(opt_indexOrValue, op
   if (!grid) {
     grid = this.createGridInstance();
     grid.setOwner(this);
-    grid.setDefaultLayout(this.isVerticalInternal ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
+    grid.setDefaultLayout(this.isVerticalInternal ? anychart.enums.Layout.HORIZONTAL : anychart.enums.Layout.VERTICAL);
     grid.setup(this.defaultMinorGridSettings());
     this.xMinorGrids_[index] = grid;
     this.registerDisposable(grid);

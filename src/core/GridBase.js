@@ -698,7 +698,8 @@ anychart.core.GridBase.prototype.drawInternal = function() {
 
   // zeroTick
   if (mode3d && this.isHorizontal()) {
-    drawLine.call(this, 0, pixelShift);
+    ratio = scale.inverted() ? 1 : 0;
+    drawLine.call(this, ratio, pixelShift);
   }
 
   for (var i = 0, count = ticksArray.length; i < count; i++) {
@@ -727,10 +728,11 @@ anychart.core.GridBase.prototype.drawInternal = function() {
   }
 
   if (isOrdinal && goog.isDef(tickVal)) {
-    if (this.getOption('drawLastLine')) drawLine.call(this, 1, pixelShift);
+    ratio = scale.inverted() ? 0 : 1;
+    if (this.getOption('drawLastLine')) drawLine.call(this, ratio, pixelShift);
     path = this.getFillElement(i - 1);
     if (path) {
-      drawInterlace.call(this, 1, ratio, path, pixelShift);
+      drawInterlace.call(this, ratio, prevRatio, path, pixelShift);
     }
   }
 };
