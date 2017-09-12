@@ -1817,6 +1817,12 @@ anychart.core.Chart.prototype.serialize = function() {
 
   json['credits'] = this.credits().serialize();
 
+  var exports;
+  if (this.exports_)
+    exports = this.exports().serialize();
+  if (exports && !goog.object.isEmpty(exports))
+    json['exports'] = exports;
+
   anychart.core.settings.serialize(this, anychart.core.Chart.PROPERTY_DESCRIPTORS, json);
   return json;
 };
@@ -1871,6 +1877,9 @@ anychart.core.Chart.prototype.setupByJSON = function(config, opt_default) {
     this.contextMenu(config['contextMenu']);
 
   this.credits(config['credits']);
+
+  if (config['exports'])
+    this.exports(config['exports']);
 
   anychart.core.settings.deserialize(this, anychart.core.Chart.PROPERTY_DESCRIPTORS, config);
 };
@@ -3093,6 +3102,29 @@ anychart.core.Chart.prototype.selectByRect = function(marqueeFinishEvent) {
 //
 //------------------------------------------------------------------------------
 /**
+ * Chart exports settings.
+ * @param {Object=} opt_value .
+ * @return {anychart.core.Chart|anychart.exportsModule.Exports}
+ */
+anychart.core.Chart.prototype.exports = function(opt_value) {
+  var exports = goog.global['anychart']['exports'];
+  if (exports) {
+    if (!this.exports_)
+      this.exports_ = exports.create();
+  } else {
+    anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Exporting']);
+  }
+
+  if (goog.isDef(opt_value) && this.exports_) {
+    this.exports_.setupByJSON(opt_value);
+    return this;
+  }
+
+  return this.exports_;
+};
+
+
+/**
  * Extract headers from chart data set or stock storage.
  * @param {anychart.data.Set|anychart.stockModule.data.TableStorage} dataSet
  * @param {Object} headers Object with headers.
@@ -3558,7 +3590,7 @@ anychart.core.Chart.prototype.saveAsXml = function(opt_filename) {
   var exports = goog.global['anychart']['exports'];
   if (exports) {
     var xml = /** @type {string} */(this.toXml(false));
-    exports['saveAsXml'](xml, opt_filename);
+    exports.saveAsXml(this, xml, opt_filename);
   } else {
     anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Exporting']);
   }
@@ -3573,7 +3605,7 @@ anychart.core.Chart.prototype.saveAsJson = function(opt_filename) {
   var exports = goog.global['anychart']['exports'];
   if (exports) {
     var json = /** @type {string} */(this.toJson(true));
-    exports['saveAsJson'](json, opt_filename);
+    exports.saveAsJson(this, json, opt_filename);
   } else {
     anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Exporting']);
   }
@@ -3590,7 +3622,7 @@ anychart.core.Chart.prototype.saveAsCsv = function(opt_chartDataExportMode, opt_
   var exports = goog.global['anychart']['exports'];
   if (exports) {
     var csv = this.toCsv(opt_chartDataExportMode, opt_csvSettings);
-    exports['saveAsCsv'](csv, opt_filename);
+    exports.saveAsCsv(this, csv, opt_filename);
   } else {
     anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Exporting']);
   }
@@ -3610,7 +3642,7 @@ anychart.core.Chart.prototype.saveAsXlsx = function(opt_chartDataExportMode, opt
       'columnsSeparator': ',',
       'ignoreFirstRow': false
     });
-    exports['saveAsXlsx'](csv, opt_filename);
+    exports.saveAsXlsx(this, csv, opt_filename);
   } else {
     anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Exporting']);
   }
@@ -3679,6 +3711,7 @@ anychart.core.Chart.prototype.id = function(opt_value) {
   proto['saveAsXlsx'] = proto.saveAsXlsx;
   proto['saveAsXml'] = proto.saveAsXml;
   proto['saveAsJson'] = proto.saveAsJson;
+  proto['exports'] = proto.exports;
   proto['toCsv'] = proto.toCsv;
   proto['toA11yTable'] = proto.toA11yTable;
   proto['toHtmlTable'] = proto.toHtmlTable;
