@@ -188,7 +188,7 @@ anychart.mapModule.elements.Grid.prototype.drawLineLongitude = function(value, l
  * @param {number} precision Grid precision.
  * @protected
  */
-anychart.mapModule.elements.Grid.prototype.drawLineLLatitude = function(value, line, shift, precision) {
+anychart.mapModule.elements.Grid.prototype.drawLineLatitude = function(value, line, shift, precision) {
   var scale = this.scale_;
   var xy;
 
@@ -420,6 +420,12 @@ anychart.mapModule.elements.Grid.prototype.applyAppearance = function() {
 
 
 /** @inheritDoc */
+anychart.mapModule.elements.Grid.prototype.remove = function() {
+  if (this.rootLayer) this.rootLayer.parent(null);
+};
+
+
+/** @inheritDoc */
 anychart.mapModule.elements.Grid.prototype.drawInternal = function() {
   var scale = /** @type {anychart.mapModule.scales.Geo} */(this.scale_);
 
@@ -443,7 +449,7 @@ anychart.mapModule.elements.Grid.prototype.drawInternal = function() {
       minorTicks = scale.xMinorTicks();
       precision = precision[1];
       scaleMaximum = /** @type {number} */(scale.maximumX());
-      layout = [this.drawLineLLatitude, this.drawInterlaceLatitude];
+      layout = [this.drawLineLatitude, this.drawInterlaceLatitude];
     }
 
     var ticksArray = ticks.get();

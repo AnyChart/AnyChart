@@ -572,7 +572,7 @@ anychart.core.GridBase.prototype.getFillElement = function(index) {
     fill_ = fill;
   }
 
-  result = index in this.fillMap ? this.fillMap[index.toString()] : (this.fillMap[index.toString()] = this.createFillElement());
+  result = index.toString() in this.fillMap ? this.fillMap[index.toString()] : (this.fillMap[index.toString()] = this.createFillElement());
   result.fill(/** @type {acgraph.vector.Fill} */(fill_));
 
   return result;
@@ -786,16 +786,6 @@ anychart.core.GridBase.prototype.draw = function() {
 
   this.beforeDraw();
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
-    this.applyZIndex();
-    this.markConsistent(anychart.ConsistencyState.Z_INDEX);
-  }
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
-    this.applyContainer();
-    this.markConsistent(anychart.ConsistencyState.CONTAINER);
-  }
-
   if (this.hasInvalidationState(anychart.ConsistencyState.GRIDS_POSITION | anychart.ConsistencyState.BOUNDS)) {
     this.drawInternal();
     this.markConsistent(anychart.ConsistencyState.GRIDS_POSITION | anychart.ConsistencyState.BOUNDS);
@@ -804,6 +794,16 @@ anychart.core.GridBase.prototype.draw = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     this.applyAppearance();
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
+    this.applyZIndex();
+    this.markConsistent(anychart.ConsistencyState.Z_INDEX);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
+    this.applyContainer();
+    this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
   return this;

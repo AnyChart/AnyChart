@@ -1349,6 +1349,17 @@ anychart.stockModule.Plot.prototype.getAxisByIndex = function(index) {
 
 
 /**
+ * Return z-index for grid.
+ * @param {boolean} isMajor .
+ * @return {number}
+ */
+anychart.stockModule.Plot.prototype.getGridZIndex = function(isMajor) {
+  var themeSettings = isMajor ? this.defaultGridSettings_ : this.defaultMinorGridSettings_;
+  return themeSettings['zIndex'] + goog.array.concat(this.xGrids_, this.yGrids_, this.xMinorGrids_, this.yMinorGrids_).length * 0.001;
+};
+
+
+/**
  * @param {(Object|boolean|null|number)=} opt_indexOrValue Grid settings.
  * @param {(Object|boolean|null)=} opt_value Grid settings to set.
  * @return {!(anychart.stockModule.Grid|anychart.stockModule.Plot)} Grid instance by index or itself for method chaining.
@@ -1369,6 +1380,7 @@ anychart.stockModule.Plot.prototype.xGrid = function(opt_indexOrValue, opt_value
     grid.setOwner(this);
     grid.setDefaultLayout(anychart.enums.Layout.VERTICAL);
     grid.setup(this.defaultGridSettings_);
+    grid.zIndex(this.getGridZIndex(true));
     this.xGrids_[index] = grid;
     this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal_, this);
@@ -1405,6 +1417,7 @@ anychart.stockModule.Plot.prototype.yGrid = function(opt_indexOrValue, opt_value
     grid.setOwner(this);
     grid.setDefaultLayout(anychart.enums.Layout.HORIZONTAL);
     grid.setup(this.defaultGridSettings_);
+    grid.zIndex(this.getGridZIndex(true));
     this.yGrids_[index] = grid;
     this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal_, this);
@@ -1441,6 +1454,7 @@ anychart.stockModule.Plot.prototype.xMinorGrid = function(opt_indexOrValue, opt_
     grid.setOwner(this);
     grid.setDefaultLayout(anychart.enums.Layout.VERTICAL);
     grid.setup(this.defaultMinorGridSettings_);
+    grid.zIndex(this.getGridZIndex(false));
     this.xMinorGrids_[index] = grid;
     this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal_, this);
@@ -1476,6 +1490,7 @@ anychart.stockModule.Plot.prototype.yMinorGrid = function(opt_indexOrValue, opt_
     grid.setOwner(this);
     grid.setDefaultLayout(anychart.enums.Layout.HORIZONTAL);
     grid.setup(this.defaultMinorGridSettings_);
+    grid.zIndex(this.getGridZIndex(false));
     this.yMinorGrids_[index] = grid;
     this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal_, this);

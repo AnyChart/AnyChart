@@ -329,6 +329,17 @@ anychart.core.ChartWithAxes.prototype.createGridInstance = function() {
 
 
 /**
+ * Return z-index for grid.
+ * @param {boolean} isMajor .
+ * @return {number}
+ */
+anychart.core.ChartWithAxes.prototype.getGridZIndex = function(isMajor) {
+  var themeSettings = isMajor ? this.defaultGridSettings() : this.defaultMinorGridSettings();
+  return themeSettings['zIndex'] + goog.array.concat(this.xGrids_, this.yGrids_, this.xMinorGrids_, this.yMinorGrids_).length * 0.001;
+};
+
+
+/**
  * Getter/setter for xGrid.
  * @param {(Object|boolean|null|number)=} opt_indexOrValue Grid settings.
  * @param {(Object|boolean|null)=} opt_value Grid settings to set.
@@ -350,6 +361,7 @@ anychart.core.ChartWithAxes.prototype.xGrid = function(opt_indexOrValue, opt_val
     grid.setOwner(this);
     grid.setDefaultLayout(this.isVerticalInternal ? anychart.enums.Layout.HORIZONTAL : anychart.enums.Layout.VERTICAL);
     grid.setup(this.defaultGridSettings());
+    grid.zIndex(this.getGridZIndex(true));
     this.xGrids_[index] = grid;
     this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal, this);
@@ -387,6 +399,7 @@ anychart.core.ChartWithAxes.prototype.yGrid = function(opt_indexOrValue, opt_val
     grid.setOwner(this);
     grid.setDefaultLayout(this.isVerticalInternal ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
     grid.setup(this.defaultGridSettings());
+    grid.zIndex(this.getGridZIndex(true));
     this.yGrids_[index] = grid;
     this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal, this);
@@ -424,6 +437,7 @@ anychart.core.ChartWithAxes.prototype.xMinorGrid = function(opt_indexOrValue, op
     grid.setOwner(this);
     grid.setDefaultLayout(this.isVerticalInternal ? anychart.enums.Layout.HORIZONTAL : anychart.enums.Layout.VERTICAL);
     grid.setup(this.defaultMinorGridSettings());
+    grid.zIndex(this.getGridZIndex(false));
     this.xMinorGrids_[index] = grid;
     this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal, this);
@@ -461,6 +475,7 @@ anychart.core.ChartWithAxes.prototype.yMinorGrid = function(opt_indexOrValue, op
     grid.setOwner(this);
     grid.setDefaultLayout(this.isVerticalInternal ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
     grid.setup(this.defaultMinorGridSettings());
+    grid.zIndex(this.getGridZIndex(false));
     this.yMinorGrids_[index] = grid;
     this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal, this);

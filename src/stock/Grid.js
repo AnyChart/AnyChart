@@ -139,6 +139,7 @@ anychart.stockModule.Grid.prototype.drawInternal = function() {
   var isMinor = this.getOption('isMinor');
   if (isStock) {
     ticksArray = (/** @type {anychart.stockModule.scales.Scatter} */(scale)).getTicks().toArray(!isMinor);
+    ticksArray = goog.array.concat(NaN, ticksArray, NaN);
   } else if (isOrdinal) {
     ticksArray = (/** @type {anychart.scales.Ordinal} */(scale)).ticks().get();
   } else if (isMinor) {
@@ -170,10 +171,17 @@ anychart.stockModule.Grid.prototype.drawInternal = function() {
   for (var i = 0, count = ticksArray.length; i < count; i++) {
     var tickVal = ticksArray[i];
     if (goog.isArray(tickVal)) tickVal = tickVal[0];
-    if (isStock)
-      ratio = (/** @type {anychart.stockModule.scales.Scatter} */(scale)).transformAligned(tickVal);
-    else
+    if (isStock) {
+      if (!i) {
+        ratio = 0;
+      } else if (i == count - 1) {
+        ratio = 1;
+      } else {
+        ratio = (/** @type {anychart.stockModule.scales.Scatter} */(scale)).transformAligned(tickVal);
+      }
+    } else {
       ratio = scale.transform(tickVal);
+    }
 
     if (i) {
       path = this.getFillElement(i - 1);
@@ -211,7 +219,7 @@ anychart.stockModule.Grid.prototype.drawInternal = function() {
 //endregion
 //region --- Exports
 (function() {
-  var proto = anychart.cartesianModule.Grid.prototype;
+  var proto = anychart.stockModule.Grid.prototype;
   proto['isHorizontal'] = proto.isHorizontal;
   proto['scale'] = proto.scale;
   proto['axis'] = proto.axis;

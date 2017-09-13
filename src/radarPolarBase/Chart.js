@@ -128,6 +128,17 @@ anychart.radarPolarBaseModule.Chart.prototype.createGridInstance = goog.abstract
 
 
 /**
+ * Return z-index for grid.
+ * @param {boolean} isMajor .
+ * @return {number}
+ */
+anychart.radarPolarBaseModule.Chart.prototype.getGridZIndex = function(isMajor) {
+  var themeSettings = isMajor ? this.defaultGridSettings() : this.defaultMinorGridSettings();
+  return themeSettings['zIndex'] + goog.array.concat(this.xGrids_, this.yGrids_, this.xMinorGrids_, this.yMinorGrids_).length * 0.001;
+};
+
+
+/**
  * Getter/setter for x grid.
  * @param {(Object|boolean|null|number)=} opt_indexOrValue Grid settings.
  * @param {(Object|boolean|null)=} opt_value Grid settings to set.
@@ -149,6 +160,7 @@ anychart.radarPolarBaseModule.Chart.prototype.xGrid = function(opt_indexOrValue,
     grid.setOwner(this);
     grid.setDefaultLayout(anychart.enums.RadialGridLayout.RADIAL);
     grid.setup(this.defaultGridSettings());
+    grid.zIndex(this.getGridZIndex(true));
     this.xGrids_[index] = grid;
     this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal, this);
@@ -186,6 +198,7 @@ anychart.radarPolarBaseModule.Chart.prototype.yGrid = function(opt_indexOrValue,
     grid.setOwner(this);
     grid.setDefaultLayout(anychart.enums.RadialGridLayout.CIRCUIT);
     grid.setup(this.defaultGridSettings());
+    grid.zIndex(this.getGridZIndex(true));
     this.yGrids_[index] = grid;
     this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal, this);
@@ -223,6 +236,7 @@ anychart.radarPolarBaseModule.Chart.prototype.xMinorGrid = function(opt_indexOrV
     grid.setOwner(this);
     grid.setDefaultLayout(anychart.enums.RadialGridLayout.RADIAL);
     grid.setup(this.defaultMinorGridSettings());
+    grid.zIndex(this.getGridZIndex(false));
     this.xMinorGrids_[index] = grid;
     this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal, this);
@@ -260,6 +274,7 @@ anychart.radarPolarBaseModule.Chart.prototype.yMinorGrid = function(opt_indexOrV
     grid.setOwner(this);
     grid.setDefaultLayout(anychart.enums.RadialGridLayout.CIRCUIT);
     grid.setup(this.defaultMinorGridSettings());
+    grid.zIndex(this.getGridZIndex(false));
     this.yMinorGrids_[index] = grid;
     this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal, this);
