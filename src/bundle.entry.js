@@ -13,7 +13,7 @@ goog.require('anychart.circularGaugeModule.entry');
 goog.require('anychart.colorScalesModule.entry');
 goog.require('anychart.core.entry');
 goog.require('anychart.dataAdapterModule.entry');
-goog.require('anychart.exports.entry');
+goog.require('anychart.exportsModule.entry');
 goog.require('anychart.ganttModule.entry');
 goog.require('anychart.heatmapModule.entry');
 goog.require('anychart.linearGaugeModule.entry');
