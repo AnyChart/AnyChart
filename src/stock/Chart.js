@@ -2278,7 +2278,8 @@ anychart.stockModule.Chart.prototype.doMWScroll_ = function() {
  */
 anychart.stockModule.Chart.contextMenuItems = {
   // Item 'Keep Only'.
-  startZoomMarquee: {
+  'start-zoom-marquee': {
+    'index': 8,
     'text': 'Start zoom marquee',
     'eventType': 'anychart.startZoomMarquee',
     'action': function(context) {
@@ -2290,21 +2291,22 @@ anychart.stockModule.Chart.contextMenuItems = {
 
 /**
  * Menu map.
- * @type {Object.<string, Array.<anychart.ui.ContextMenu.Item>>}
+ * @type {Object.<string, Object.<string, anychart.ui.ContextMenu.Item>>}
  */
 anychart.stockModule.Chart.contextMenuMap = {
   // Stock 'Default menu'. (will be added to 'main')
-  stock: [
-    anychart.stockModule.Chart.contextMenuItems.startZoomMarquee,
-    anychart.core.Chart.contextMenuItems.startSelectMarquee,
-    null
-  ]
+  'stock': {
+    'start-zoom-marquee': anychart.stockModule.Chart.contextMenuItems['start-zoom-marquee'],
+    'start-select-marquee': anychart.core.Chart.contextMenuItems['start-select-marquee'],
+    'stock-specific-separator': {'index': 9.4}
+  }
 };
 
 
 /** @inheritDoc */
 anychart.stockModule.Chart.prototype.specificContextMenuItems = function(items, context, isPointContext) {
-  return /** @type {Array.<anychart.ui.ContextMenu.Item>} */(goog.array.concat(anychart.utils.recursiveClone(anychart.stockModule.Chart.contextMenuMap.stock), items));
+  goog.object.extend(items, /** @type {Object} */ (anychart.utils.recursiveClone(anychart.stockModule.Chart.contextMenuMap['stock'])));
+  return items;
 };
 
 

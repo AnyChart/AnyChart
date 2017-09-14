@@ -83,6 +83,7 @@ anychart.core.ChartWithOrthogonalScales = function(categorizeData) {
   function beforeInvalidation() {
     this.invalidateWidthBasedSeries();
   }
+
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['barGroupsPadding',
       anychart.ConsistencyState.SERIES_CHART_SERIES | anychart.ConsistencyState.BOUNDS,
@@ -612,7 +613,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateXScales = function() 
             var drawingPlan = drawingPlans[i];
             var meta = drawingPlan.data[+index].meta;
             if (!anychart.core.series.filterPointAbsenceReason(meta['missing'],
-                anychart.core.series.PointAbsenceReason.EXCLUDED_OR_ARTIFICIAL))
+                    anychart.core.series.PointAbsenceReason.EXCLUDED_OR_ARTIFICIAL))
               return false;
           }
           return true;
@@ -1720,23 +1721,27 @@ anychart.core.ChartWithOrthogonalScales.prototype.doAnimation = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.ChartWithOrthogonalScales.prototype.specificContextMenuItems = function(items, context, isPointContext) {
-  var newItems = /** @type {Array.<anychart.ui.ContextMenu.Item>} */(goog.array.concat(
-      anychart.utils.recursiveClone(isPointContext ?
-          anychart.core.ChartWithOrthogonalScales.contextMenuMap.chartWithSeriesPoint :
-          anychart.core.ChartWithOrthogonalScales.contextMenuMap.chartWithSeriesDefault),
-      anychart.utils.recursiveClone(anychart.core.Chart.contextMenuMap.selectMarquee),
-      items));
+  var newItems = {};
+
+  goog.object.extend(newItems, /** @type {Object} */ (anychart.utils.recursiveClone(isPointContext ?
+      anychart.core.ChartWithOrthogonalScales.contextMenuMap['chart-with-series-point'] :
+      anychart.core.ChartWithOrthogonalScales.contextMenuMap['chart-with-series-default'])),
+      /** @type {Object} */ (anychart.utils.recursiveClone(anychart.core.Chart.contextMenuMap['select-marquee'])),
+      items
+  );
+
 
   var excludedPoints = this.getExcludedPoints();
-  var excludedPointsItem = isPointContext ? newItems[1] : newItems[0];
-  excludedPointsItem['subMenu'].length = 0;
+  var excludedPointsItem = newItems['excluded-points'];
+  excludedPointsItem['subMenu'] = {};
   excludedPointsItem['enabled'] = false;
+  var pointItemIndex = 10;
 
   if (excludedPoints.length) {
-    var footer = [null, anychart.core.ChartWithOrthogonalScales.contextMenuItems.includeAllPoints];
-    var excludedPointsModel = [];
+    var excludedPointsModel = {};
     var seriesType;
 
+    pointItemIndex += .01;
     for (var i = 0; i < excludedPoints.length; i++) {
       seriesType = excludedPoints[i].getSeries().seriesType();
       var value;
@@ -1764,15 +1769,22 @@ anychart.core.ChartWithOrthogonalScales.prototype.specificContextMenuItems = fun
         value = excludedPoints[i].get('value');
       }
 
-      excludedPointsModel.push({
+      excludedPointsModel['excluded-point-' + i] = { //TODO (A.Kudryavtsev): Maybe set name like 'text' field.
+        'index': pointItemIndex,
         'text': excludedPoints[i].getSeries().name() + ': ' + value,
         'eventType': 'anychart.include',
         'scrollable': true,
         'action': goog.bind(excludedPoints[i].getSeries().includePoint, excludedPoints[i].getSeries(), excludedPoints[i].getIndex())
-      });
+      };
     }
 
-    excludedPointsItem['subMenu'] = excludedPointsModel.concat(footer);
+    excludedPointsModel['excluded-points-separator'] = {'index': pointItemIndex + 10};
+    var includeAllItem = anychart.utils.recursiveClone(anychart.core.ChartWithOrthogonalScales.contextMenuItems['include-all-points']);
+    includeAllItem['index'] = pointItemIndex + 20;
+    excludedPointsModel['include-all-points'] = includeAllItem;
+    excludedPointsItem['subMenu'] = excludedPointsModel;
+
+    // excludedPointsItem['subMenu'] = excludedPointsModel.concat(footer);
     excludedPointsItem['enabled'] = true;
   }
 
@@ -1803,7 +1815,8 @@ anychart.core.ChartWithOrthogonalScales.prototype.getExcludedPoints = function()
  */
 anychart.core.ChartWithOrthogonalScales.contextMenuItems = {
   // Item 'Exclude Point'.
-  excludePoint: {
+  'exclude-point': {
+    'index': 7,
     'text': 'Exclude',
     'eventType': 'anychart.exclude',
     'action': function(context) {
@@ -1821,31 +1834,16 @@ anychart.core.ChartWithOrthogonalScales.contextMenuItems = {
   },
 
   // Item-subMenu 'Excluded Points'.
-  excludedPoints: {
+  'excluded-points': {
+    'index': 8,
     'text': 'Include',
     'subMenu': [],
     'enabled': false
   },
 
-  // Item 'Include all points'.
-  includeAllPoints: {
-    'text': 'Include All',
-    'eventType': 'anychart.includeAll',
-    'action': function(context) {
-      context['chart'].suspendSignalsDispatching();
-      var series, i;
-      var allSeries = context['chart'].getAllSeries();
-      for (i = 0; i < allSeries.length; i++) {
-        series = allSeries[i];
-        if (!goog.isFunction(series.includeAllPoints)) continue;
-        series.includeAllPoints();
-      }
-      context['chart'].resumeSignalsDispatching(true);
-    }
-  },
-
   // Item 'Keep Only'.
-  keepOnly: {
+  'keep-only': {
+    'index': 9,
     'text': 'Keep only',
     'eventType': 'anychart.keepOnly',
     'action': function(context) {
@@ -1862,27 +1860,47 @@ anychart.core.ChartWithOrthogonalScales.contextMenuItems = {
       }
       context['chart'].resumeSignalsDispatching(true);
     }
+  },
+
+  // Item 'Include all points'.
+  'include-all-points': {
+    'index': 30,
+    'text': 'Include All',
+    'eventType': 'anychart.includeAll',
+    'action': function(context) {
+      context['chart'].suspendSignalsDispatching();
+      var series, i;
+      var allSeries = context['chart'].getAllSeries();
+      for (i = 0; i < allSeries.length; i++) {
+        series = allSeries[i];
+        if (!goog.isFunction(series.includeAllPoints)) continue;
+        series.includeAllPoints();
+      }
+      context['chart'].resumeSignalsDispatching(true);
+    }
   }
+
+
 };
 
 
 /**
  * Menu map.
- * @type {Object.<string, Array.<anychart.ui.ContextMenu.Item>>}
+ * @type {Object.<string, Object.<string, anychart.ui.ContextMenu.Item>>}
  */
 anychart.core.ChartWithOrthogonalScales.contextMenuMap = {
   // Cartesian 'Default menu'. (will be added to 'main')
-  chartWithSeriesDefault: [
-    anychart.core.ChartWithOrthogonalScales.contextMenuItems.excludedPoints,
-    null
-  ],
+  'chart-with-series-default': {
+    'excluded-points': anychart.core.ChartWithOrthogonalScales.contextMenuItems['excluded-points'],
+    'exclude-points-separator': {'index': 8.5}
+  },
   // Cartesian 'Point menu'. (will be added to 'main')
-  chartWithSeriesPoint: [
-    anychart.core.ChartWithOrthogonalScales.contextMenuItems.excludePoint,
-    anychart.core.ChartWithOrthogonalScales.contextMenuItems.excludedPoints,
-    anychart.core.ChartWithOrthogonalScales.contextMenuItems.keepOnly,
-    null
-  ]
+  'chart-with-series-point': {
+    'exclude-point': anychart.core.ChartWithOrthogonalScales.contextMenuItems['exclude-point'],
+    'excluded-points': anychart.core.ChartWithOrthogonalScales.contextMenuItems['excluded-points'],
+    'keep-only': anychart.core.ChartWithOrthogonalScales.contextMenuItems['keep-only'],
+    'chart-with-series-point-separator': {'index': 9.2}
+  }
 };
 
 
