@@ -79,8 +79,6 @@ anychart.radarPolarBaseModule.Grid.prototype.yScale = function(opt_value) {
     return this;
   } else if (this.yScale_) {
     return this.yScale_;
-  } else if (this.axis_ && this.axis_ instanceof anychart.radarPolarBaseModule.RadialAxis) {
-    return /** @type {anychart.scales.Base} */ (this.axis_.scale());
   } else if (this.getOwner()) {
     return /** @type {anychart.scales.Base} */ (this.getOwner().yScale());
   } else {
@@ -126,8 +124,6 @@ anychart.radarPolarBaseModule.Grid.prototype.xScale = function(opt_value) {
     return this;
   } else if (this.xScale_) {
     return this.xScale_;
-  } else if (this.axis_ && this.axis_.scale) {
-    return /** @type {anychart.scales.Ordinal} */(this.axis_.scale());
   } else if (this.getOwner()) {
     return /** @type {anychart.scales.Ordinal} */ (this.getOwner().xScale());
   } else {
