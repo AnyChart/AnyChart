@@ -1661,7 +1661,7 @@ anychart.ganttModule.BaseGrid.prototype.drawRowFills_ = function() {
  * @private
  */
 anychart.ganttModule.BaseGrid.prototype.mouseWheelHandler_ = function(e) {
-  if (goog.global['anychart']['ui']['ContextMenu']) {
+  if (anychart.window['anychart']['ui']['ContextMenu']) {
     if (this.interactivityHandler.contextMenu) {
       var menu = this.interactivityHandler.contextMenu();
       if (menu.isVisible()) menu.hide();
@@ -1679,7 +1679,7 @@ anychart.ganttModule.BaseGrid.prototype.mouseWheelHandler_ = function(e) {
     dy = dy * 15;
   }
 
-  var denyBodyScrollLeft = !goog.global['document']['body']['scrollLeft'];
+  var denyBodyScrollLeft = !anychart.document['body']['scrollLeft'];
   var horizontalScroll = this.horizontalScrollBar();
   var verticalScroll = this.controller.getScrollBar();
 
@@ -2061,7 +2061,7 @@ anychart.ganttModule.BaseGrid.prototype.editStructureHighlight = function(opt_st
     previewPath.clear();
   }
   if (goog.isDef(opt_cursor))
-    goog.style.setStyle(goog.global['document']['body'], 'cursor', opt_cursor);
+    goog.style.setStyle(anychart.document['body'], 'cursor', opt_cursor);
 
 };
 
@@ -2080,12 +2080,12 @@ anychart.ganttModule.BaseGrid.prototype.initMouseFeatures = function() {
       var mouseWheelEvent = goog.events.MouseWheelHandler.EventType.MOUSEWHEEL;
       goog.events.listen(this.mwh_, mouseWheelEvent, this.mouseWheelHandler_, false, this);
 
-      goog.events.listen(window, 'unload', function(e) {
+      goog.events.listen(anychart.window, 'unload', function(e) {
         goog.events.unlisten(ths.mwh_, mouseWheelEvent, ths.mouseWheelHandler_, false, this);
       });
     }
 
-    goog.events.listen(document, goog.events.EventType.MOUSEMOVE, this.docMouseMoveListener_, false, this);
+    goog.events.listen(anychart.document, goog.events.EventType.MOUSEMOVE, this.docMouseMoveListener_, false, this);
   }
 };
 

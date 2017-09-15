@@ -44,7 +44,7 @@ anychart.stockModule.data.TableComputer = function(mapping, index) {
    * @type {*}
    * @private
    */
-  this.context_ = goog.global;
+  this.context_ = anychart.window;
 
   /**
    * Function that is called at the start of the calculation process.

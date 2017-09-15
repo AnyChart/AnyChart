@@ -2059,7 +2059,7 @@ anychart.ganttModule.TimeLine.prototype.editPreviewDragStart_ = function(e) {
   this.getEditStartConnectorPath_().clear();
   this.getEditFinishConnectorPath_().clear();
 
-  goog.style.setStyle(goog.global['document']['body'], 'cursor', acgraph.vector.Cursor.EW_RESIZE);
+  goog.style.setStyle(anychart.document['body'], 'cursor', acgraph.vector.Cursor.EW_RESIZE);
 };
 
 
@@ -2170,7 +2170,7 @@ anychart.ganttModule.TimeLine.prototype.editPreviewEnd_ = function(e) {
     clearInterval(this.scrollInterval);
     this.scrollInterval = null;
   }
-  goog.style.setStyle(goog.global['document']['body'], 'cursor', ''); //TODO (A.Kudryavtsev): Do we reset old CSS cursor here?
+  goog.style.setStyle(anychart.document['body'], 'cursor', ''); //TODO (A.Kudryavtsev): Do we reset old CSS cursor here?
 };
 
 
@@ -2245,7 +2245,7 @@ anychart.ganttModule.TimeLine.prototype.editRightThumbDragStart_ = function(e) {
   this.getEditStartConnectorPath_().clear();
   this.getEditFinishConnectorPath_().clear();
 
-  goog.style.setStyle(goog.global['document']['body'], 'cursor', 'col-resize');
+  goog.style.setStyle(anychart.document['body'], 'cursor', 'col-resize');
   this.editPreviewPath_.cursor(/** @type {acgraph.vector.Cursor} */ ('col-resize'));
 };
 
@@ -2266,7 +2266,7 @@ anychart.ganttModule.TimeLine.prototype.editLeftThumbDragStart_ = function(e) {
   this.getEditStartConnectorPath_().clear();
   this.getEditFinishConnectorPath_().clear();
 
-  goog.style.setStyle(goog.global['document']['body'], 'cursor', 'col-resize');
+  goog.style.setStyle(anychart.document['body'], 'cursor', 'col-resize');
   this.editPreviewPath_.cursor(/** @type {acgraph.vector.Cursor} */ ('col-resize'));
 
 };
@@ -2452,7 +2452,7 @@ anychart.ganttModule.TimeLine.prototype.editThumbDragEnd_ = function(e) {
     this.scrollInterval = null;
   }
 
-  goog.style.setStyle(goog.global['document']['body'], 'cursor', '');
+  goog.style.setStyle(anychart.document['body'], 'cursor', '');
   this.editPreviewPath_.cursor(acgraph.vector.Cursor.EW_RESIZE);
 };
 

@@ -2489,7 +2489,7 @@ anychart.tableModule.Table.prototype.toCsv = function(opt_csvSettings) {
  * @param {string=} opt_filename file name to save.
  */
 anychart.tableModule.Table.prototype.saveAsXlsx = function(opt_filename) {
-  var exports = goog.global['anychart']['exports'];
+  var exports = anychart.window['anychart']['exports'];
   if (exports) {
     var csv = this.toCsv({
       'rowsSeparator': '\n',
@@ -2509,7 +2509,7 @@ anychart.tableModule.Table.prototype.saveAsXlsx = function(opt_filename) {
  * @param {string=} opt_filename file name to save.
  */
 anychart.tableModule.Table.prototype.saveAsCsv = function(opt_csvSettings, opt_filename) {
-  var exports = goog.global['anychart']['exports'];
+  var exports = anychart.window['anychart']['exports'];
   if (exports) {
     var csv = this.toCsv(opt_csvSettings);
     exports['saveAsCsv'](csv, opt_filename);

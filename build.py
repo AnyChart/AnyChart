@@ -536,7 +536,7 @@ def __make_build(build_name, modules, checks_only=False, theme_name='none', dev_
         module_def = '--module %s:%s%s' % \
                      (module_name, len(module_files), '' if len(module_deps) == 0 else ':' + ','.join(module_deps))
         normalized_module_name = module_name.replace('-', '_')
-        module_wrapper = '--module_wrapper %s:"if(!_.%s){_.%s=1;(function($){%s})($)}"' % \
+        module_wrapper = '--module_wrapper %s:"if(!_.%s){_.%s=1;(function($){%s}).call(this,$)}"' % \
                          (module_name, normalized_module_name, normalized_module_name, '%s')
         additional_flags.append(module_def)
         additional_flags.append(module_wrapper)

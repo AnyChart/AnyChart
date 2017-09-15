@@ -21,7 +21,7 @@ goog.require('goog.events');
  */
 anychart.bindingModule.exec = function(targetOrPath, pathOrValue, opt_valueOrPathArgs, var_args) {
   if (goog.isString(targetOrPath)) {
-    var args = [window];
+    var args = [anychart.window];
     for (var i = 0; i < arguments.length; i++) {
       args.push(arguments[i]);
     }
@@ -132,7 +132,7 @@ anychart.bindingModule.applyPath_ = function(target, path, pathArguments, opt_la
     message += '\'';
     if (args) message += ' with arguments [' + args + ']';
 
-    var console = goog.global['console'];
+    var console = anychart.window['console'];
     if (console) {
       var log = console['warn'] || console['log'];
       if (typeof log != 'object') {
@@ -179,7 +179,7 @@ anychart.bindingModule.init = function(opt_value) {
     goog.events.listen(element, event, anychart.bindingModule.onElementChange_, false);
 
     var chartId = element.getAttribute('ac-chart-id');
-    var chart = window['anychart']['getChartById'](chartId);
+    var chart = anychart.window['anychart']['getChartById'](chartId);
     goog.events.listen(chart, 'chartdraw',
         function() {
           anychart.bindingModule.setRealValue_(element);
@@ -208,7 +208,7 @@ anychart.bindingModule.onElementChange_ = function(event) {
 
   var element = /** @type {!HTMLInputElement} */(event.target);
   var chartId = event.target.getAttribute('ac-chart-id');
-  var chart = window['anychart']['getChartById'](chartId);
+  var chart = anychart.window['anychart']['getChartById'](chartId);
   var key = event.target.getAttribute('ac-key');
 
   if (chartId && chart && key) {
@@ -222,7 +222,7 @@ anychart.bindingModule.onElementChange_ = function(event) {
         value = !!value;
         break;
       case goog.dom.InputType.DATE:
-        value = window['anychart']['format']['parseDateTime'](value, 'yyyy-MM-dd');
+        value = anychart.window['anychart']['format']['parseDateTime'](value, 'yyyy-MM-dd');
         break;
     }
 
@@ -242,7 +242,7 @@ anychart.bindingModule.setRealValue_ = function(element) {
   type = type.toLowerCase();
 
   var chartId = element.getAttribute('ac-chart-id');
-  var chart = window['anychart']['getChartById'](chartId);
+  var chart = anychart.window['anychart']['getChartById'](chartId);
   var key = element.getAttribute('ac-key');
 
   if (chartId && chart && key) {
@@ -268,7 +268,7 @@ anychart.bindingModule.setRealValue_ = function(element) {
           }
           break;
         case goog.dom.InputType.DATE:
-          value = window['anychart']['format']['dateTime'](value, 'yyyy-MM-dd');
+          value = anychart.window['anychart']['format']['dateTime'](value, 'yyyy-MM-dd');
           break;
         default:
           value = goog.isBoolean(value) ? value : String(value);
