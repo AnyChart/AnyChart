@@ -1514,6 +1514,11 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="selected_element_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="selected_connector_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="labels" type="core.LabelsFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="base_labels" type="core.LabelsFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="parent_labels" type="core.LabelsFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="baseline_labels" type="core.LabelsFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="progress_labels" type="core.LabelsFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="milestone_labels" type="core.LabelsFactory"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="markers" type="core.MarkersFactory"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="connector_preview_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="edit_preview_fill" type="Fill"/>

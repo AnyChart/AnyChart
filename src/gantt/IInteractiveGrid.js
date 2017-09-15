@@ -119,7 +119,7 @@ anychart.ganttModule.IInteractiveGrid.prototype.deleteKeyHandler = function(e) {
 
 /**
  * Creates gantt format provider.
- * @param {anychart.treeDataModule.Tree.DataItem} dataItem - Data item.
+ * @param {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} dataItem - Data item.
  * @param {Object=} opt_period - Optional current period.
  * @param {number=} opt_periodIndex - Period index. Required is opt_period is set.
  * @return {Object} - Gantt context provider.
