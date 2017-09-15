@@ -36,14 +36,14 @@ anychart.annotationsModule.FibonacciArc.prototype.type = anychart.enums.Annotati
 //
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
-anychart.annotationsModule.FibonacciArc.prototype.drawLevel = function(levelIndex, levelValue, path, hoverPath,
+anychart.annotationsModule.FibonacciArc.prototype.drawLevel = function(levelIndex, levelRatio, path, hoverPath,
                                                                       mainFactory, stateFactory, drawLabels, strokeThickness) {
   var sx = this.coords['xAnchor'];
   var sy = this.coords['valueAnchor'];
   var ex = this.coords['secondXAnchor'];
   var ey = this.coords['secondValueAnchor'];
-  var lx = ex + levelValue * (sx - ex);
-  var ly = ey + levelValue * (sy - ey);
+  var lx = ex + levelRatio * (sx - ex);
+  var ly = ey + levelRatio * (sy - ey);
   var r = anychart.math.vectorLength(lx, ly, ex, ey);
   if (ly < ey) {
     path.circularArc(ex, ey, r, r, 180, 180);
@@ -54,15 +54,20 @@ anychart.annotationsModule.FibonacciArc.prototype.drawLevel = function(levelInde
   }
   if (drawLabels) {
     var position, anchor;
-    if (ly < ey) {
-      position = {'x': ex, 'y': ey - r};
-      anchor = anychart.enums.Anchor.CENTER_TOP;
-    } else {
-      position = {'x': ex, 'y': ey + r};
+    var y;
+    if (sy < ey) {
+      y = ey - r;
       anchor = anychart.enums.Anchor.CENTER_BOTTOM;
+    } else {
+      y = ey + r;
+      anchor = anychart.enums.Anchor.CENTER_TOP;
     }
-    this.drawLabel(levelIndex, mainFactory, stateFactory, this.createFormatProvider(levelValue),
-        {'value': position}, {'anchor': anchor});
+    position = {
+      'x': ex,
+      'y': y
+    };
+    this.drawLabel(levelIndex, mainFactory, stateFactory, this.createFormatProvider(levelRatio, this.getValueFromPixY(y), false),
+        {'value': position}, anchor);
   }
 };
 

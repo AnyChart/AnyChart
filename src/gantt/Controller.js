@@ -264,6 +264,10 @@ anychart.ganttModule.Controller.prototype.dataInvalidated_ = function(event) {
    */
   if (event.hasSignal(anychart.Signal.DATA_CHANGED)) state |= anychart.ConsistencyState.CONTROLLER_DATA;
 
+  if (this.dataGrid_ && this.timeline_) {
+    this.timeline_.interactivityHandler.invalidate(anychart.ConsistencyState.CHART_LABELS);
+  }
+
   this.invalidate(state, signal);
 };
 
@@ -797,6 +801,10 @@ anychart.ganttModule.Controller.prototype.data = function(opt_value) {
       this.expandedItemsTraverser_.traverseChildrenCondition(this.traverseChildrenCondition_);
       if (this.timeline_)
         this.timeline_.scale().reset();
+
+      if (this.dataGrid_ && this.timeline_) {
+        this.timeline_.interactivityHandler.invalidate(anychart.ConsistencyState.CHART_LABELS);
+      }
 
       this.invalidate(anychart.ConsistencyState.CONTROLLER_DATA, anychart.Signal.NEEDS_REAPPLICATION);
     }

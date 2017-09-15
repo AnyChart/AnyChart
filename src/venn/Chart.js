@@ -757,7 +757,7 @@ anychart.vennModule.Chart.prototype.data = function(opt_value, opt_csvSettings) 
         this.data_ = (this.parentViewToDispose_ = new anychart.data.Set(
             (goog.isArray(opt_value) || goog.isString(opt_value)) ? opt_value : null, opt_csvSettings)).mapAs();
       this.data_.listenSignals(this.dataInvalidated_, this);
-      this.invalidate(anychart.ConsistencyState.VENN_DATA | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.VENN_DATA | anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.CHART_LABELS, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -771,7 +771,7 @@ anychart.vennModule.Chart.prototype.data = function(opt_value, opt_csvSettings) 
  * @private
  */
 anychart.vennModule.Chart.prototype.dataInvalidated_ = function(event) {
-  this.invalidate(anychart.ConsistencyState.VENN_DATA, anychart.Signal.NEEDS_REDRAW);
+  this.invalidate(anychart.ConsistencyState.VENN_DATA | anychart.ConsistencyState.CHART_LABELS, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -1692,6 +1692,15 @@ anychart.vennModule.Chart.prototype.drawMarker_ = function(state, iterator) {
     marker.draw();
   }
 
+};
+
+
+//endregion
+//region -- No data
+/** @inheritDoc */
+anychart.vennModule.Chart.prototype.isNoData = function() {
+  var rowsCount = this.getIterator().getRowsCount();
+  return (!rowsCount);
 };
 
 

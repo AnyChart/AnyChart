@@ -1,6 +1,7 @@
 goog.provide('anychart.annotationsModule.FibonacciBase');
 goog.require('anychart.annotationsModule.Base');
 goog.require('anychart.core.ui.LabelsFactory');
+goog.require('anychart.format.Context');
 
 
 
@@ -403,14 +404,55 @@ anychart.annotationsModule.FibonacciBase.prototype.labelsInvalidated_ = function
 
 /**
  * Creates label format provider.
- * @param {number} levelValue
+ * @param {number} levelRatio
+ * @param {*} levelValue
+ * @param {boolean} isX
+ * @return {!anychart.format.Context}
+ */
+anychart.annotationsModule.FibonacciBase.prototype.createFormatProvider = function(levelRatio, levelValue, isX) {
+  if (!this.pointProvider_)
+    this.pointProvider_ = new anychart.format.Context();
+
+  this.pointProvider_.propagate({
+    'annotation': {
+      value: this,
+      type: anychart.enums.TokenType.UNKNOWN
+    },
+    'level': {
+      value: levelRatio,
+      type: anychart.enums.TokenType.NUMBER
+    },
+    'levelValue': {
+      value: levelValue,
+      type: isX ? anychart.enums.TokenType.DATE_TIME : anychart.enums.TokenType.NUMBER
+    }
+  });
+
+  return this.pointProvider_;
+};
+
+
+/**
+ * @param {number} pixY
  * @return {*}
  */
-anychart.annotationsModule.FibonacciBase.prototype.createFormatProvider = function(levelValue) {
-  return {
-    'level': levelValue
-  };
+anychart.annotationsModule.FibonacciBase.prototype.getValueFromPixY = function(pixY) {
+  var bounds = this.getPlot().getPlotBounds();
+  var ratio = 1 - (pixY - bounds.top) / bounds.height;
+  return this.yScale().inverseTransform(ratio);
 };
+
+
+/**
+ * @param {number} pixY
+ * @return {*}
+ */
+anychart.annotationsModule.FibonacciBase.prototype.getValueFromPixX = function(pixY) {
+  var bounds = this.getPlot().getPlotBounds();
+  var ratio = (pixY - bounds.left) / bounds.width;
+  return this.xScale().inverseTransform(ratio);
+};
+
 
 
 /**
@@ -420,9 +462,9 @@ anychart.annotationsModule.FibonacciBase.prototype.createFormatProvider = functi
  * @param {anychart.core.ui.LabelsFactory} stateFactory
  * @param {*} formatProvider
  * @param {*} positionProvider
- * @param {?Object=} opt_settings
+ * @param {anychart.enums.Anchor=} opt_autoAnchor
  */
-anychart.annotationsModule.FibonacciBase.prototype.drawLabel = function(index, mainFactory, stateFactory, formatProvider, positionProvider, opt_settings) {
+anychart.annotationsModule.FibonacciBase.prototype.drawLabel = function(index, mainFactory, stateFactory, formatProvider, positionProvider, opt_autoAnchor) {
   if (formatProvider && positionProvider) {
     var element = mainFactory.getLabel(/** @type {number} */(index));
     if (element) {
@@ -433,8 +475,18 @@ anychart.annotationsModule.FibonacciBase.prototype.drawLabel = function(index, m
     }
     element.resetSettings();
     element.currentLabelsFactory(stateFactory);
-    element.setSettings(opt_settings);
+    if (opt_autoAnchor)
+      element.autoAnchor(opt_autoAnchor);
     element.draw();
+    var bounds = mainFactory.measureWithTransform(element);
+    if (bounds && bounds.length) {
+      var path = this.paths[1];
+      path.moveTo(bounds[0], bounds[1]);
+      for (var i = 2; i < bounds.length; i += 2) {
+        path.lineTo(bounds[i], bounds[i + 1]);
+      }
+      path.close();
+    }
   } else {
     mainFactory.clear(index);
   }

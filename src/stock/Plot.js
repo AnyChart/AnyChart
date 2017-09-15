@@ -6,6 +6,7 @@ goog.require('anychart.core.VisualBaseWithBounds');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.Background');
 goog.require('anychart.core.ui.Crosshair');
+goog.require('anychart.core.ui.Label');
 goog.require('anychart.core.ui.Legend');
 goog.require('anychart.enums');
 goog.require('anychart.format.Context');
@@ -200,6 +201,7 @@ anychart.stockModule.Plot.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.STOCK_PLOT_PALETTE |
     anychart.ConsistencyState.STOCK_PLOT_ANNOTATIONS |
     anychart.ConsistencyState.STOCK_PLOT_LEGEND |
+    anychart.ConsistencyState.STOCK_PLOT_NO_DATA_LABEL |
     anychart.ConsistencyState.AXES_CHART_CROSSHAIR;
 
 
@@ -637,7 +639,8 @@ anychart.stockModule.Plot.prototype.removeSeriesAt = function(index) {
     goog.array.splice(this.series_, index, 1);
     goog.dispose(series);
     this.invalidate(anychart.ConsistencyState.STOCK_PLOT_SERIES |
-        anychart.ConsistencyState.STOCK_PLOT_LEGEND,
+        anychart.ConsistencyState.STOCK_PLOT_LEGEND |
+        anychart.ConsistencyState.STOCK_PLOT_NO_DATA_LABEL,
         anychart.Signal.NEEDS_REDRAW);
     anychart.globalLock.unlock();
   }
@@ -656,7 +659,8 @@ anychart.stockModule.Plot.prototype.removeAllSeries = function() {
     this.series_ = [];
     goog.disposeAll(series);
     this.invalidate(anychart.ConsistencyState.STOCK_PLOT_SERIES |
-        anychart.ConsistencyState.STOCK_PLOT_LEGEND,
+        anychart.ConsistencyState.STOCK_PLOT_LEGEND |
+        anychart.ConsistencyState.STOCK_PLOT_NO_DATA_LABEL,
         anychart.Signal.NEEDS_REDRAW);
     anychart.globalLock.unlock();
   }
@@ -1141,7 +1145,8 @@ anychart.stockModule.Plot.prototype.invalidateRedrawable = function(doInvalidate
       anychart.ConsistencyState.STOCK_PLOT_AXES |
       anychart.ConsistencyState.STOCK_PLOT_DT_AXIS |
       anychart.ConsistencyState.STOCK_PLOT_GRIDS |
-      anychart.ConsistencyState.STOCK_PLOT_LEGEND);
+      anychart.ConsistencyState.STOCK_PLOT_LEGEND |
+      anychart.ConsistencyState.STOCK_PLOT_NO_DATA_LABEL);
 };
 
 
@@ -1658,6 +1663,17 @@ anychart.stockModule.Plot.prototype.draw = function() {
     crosshair.resumeSignalsDispatching(false);
 
     this.markConsistent(anychart.ConsistencyState.AXES_CHART_CROSSHAIR);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.STOCK_PLOT_NO_DATA_LABEL)) {
+    var noDataLabel = /** @type {anychart.core.ui.Label} */ (this.noDataLabel());
+    noDataLabel.suspendSignalsDispatching();
+    noDataLabel.container(this.rootLayer_);
+    noDataLabel.parentBounds(this.seriesBounds_);
+    noDataLabel['visible'](this.isNoData());
+    noDataLabel.resumeSignalsDispatching(false);
+    noDataLabel.draw();
+    this.markConsistent(anychart.ConsistencyState.STOCK_PLOT_NO_DATA_LABEL);
   }
 
   this.resumeSignalsDispatching(false);
@@ -2385,6 +2401,67 @@ anychart.stockModule.Plot.prototype.paletteInvalidated_ = function(event) {
 
 
 //endregion
+//region --- No data
+/**
+ * No data label invalidation handler.
+ * @param {anychart.SignalEvent} e
+ * @private
+ */
+anychart.stockModule.Plot.prototype.noDataLabelInvalidated_ = function(e) {
+  if (e.hasSignal(anychart.Signal.NEEDS_REDRAW))
+    this.invalidate(anychart.ConsistencyState.STOCK_PLOT_NO_DATA_LABEL, anychart.Signal.NEEDS_REDRAW);
+};
+
+
+/**
+ * Getter/eetter for no data label.
+ * @param {Object=} opt_value
+ * @return {anychart.stockModule.Plot|anychart.core.ui.Label}
+ */
+anychart.stockModule.Plot.prototype.noDataLabel = function(opt_value) {
+  if (!this.noDataLabel_) {
+    this.noDataLabel_ = new anychart.core.ui.Label();
+    this.noDataLabel_.listenSignals(this.noDataLabelInvalidated_, this);
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.noDataLabel_.setup(opt_value);
+    return this;
+  }
+  return this.noDataLabel_;
+};
+
+
+/**
+ * Whether series is visible on a plot.
+ * @param {anychart.stockModule.Series} series
+ * @return {boolean}
+ */
+anychart.stockModule.Plot.prototype.isSeriesVisible = function(series) {
+  var rowsCount = series.data() ? series.getDetachedIterator().getRowsCount() : 0;
+  var enabled = /** @type {boolean} */(series.enabled());
+  return enabled && !!rowsCount;
+};
+
+
+/**
+ * Is there no data on the plot.
+ * @return {boolean}
+ */
+anychart.stockModule.Plot.prototype.isNoData = function() {
+  var countDisabled = 0;
+  var len = this.series_.length;
+  for (var i = 0; i < len; i++) {
+    if (!this.isSeriesVisible(this.series_[i]))
+      countDisabled++;
+    else
+      break;
+  }
+  return (countDisabled == len);
+};
+
+
+//endregion
 //region Serialization / deserialization / disposing
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -2497,6 +2574,7 @@ anychart.stockModule.Plot.prototype.serialize = function() {
 
   json['defaultSeriesType'] = this.defaultSeriesType();
   json['background'] = this.background().serialize();
+  json['noDataLabel'] = this.noDataLabel().serialize();
 
   axesIds.push(goog.getUid(this.xAxis()));
   json['xAxis'] = this.xAxis().serialize();
@@ -2570,6 +2648,7 @@ anychart.stockModule.Plot.prototype.setupByJSON = function(config, opt_default) 
   this.markerPalette(config['markerPalette']);
   this.hatchFillPalette(config['hatchFillPalette']);
 
+  this.noDataLabel(config['noDataLabel']);
   this.background(config['background']);
 
   this.xAxis(config['xAxis']);
@@ -2884,4 +2963,5 @@ anychart.stockModule.Plot.Dragger.prototype.limitY = function(y) {
   proto['markerPalette'] = proto.markerPalette;
   proto['hatchFillPalette'] = proto.hatchFillPalette;
   proto['annotations'] = proto.annotations;
+  proto['noDataLabel'] = proto.noDataLabel;
 })();

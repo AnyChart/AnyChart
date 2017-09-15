@@ -675,6 +675,18 @@ anychart.getFeatureOrError = function(modulePath, error, opt_ifNotFromTheme) {
 };
 
 
+/**
+ * @param {Object} proto
+ * @param {string} methodName
+ * @param {string} error
+ * @return {!Function}
+ */
+anychart.getMethodOrError = function(proto, methodName, error) {
+  var target = /** @type {Function} */(proto[methodName]);
+  return target ? target : anychart.createNFIMError(error);
+};
+
+
 //endregion
 //region ------- Charts tracking
 
@@ -849,4 +861,22 @@ goog.exportSymbol('anychart.data.loadGoogleSpreadsheet', anychart.getFeatureOrEr
 (function() {
   var proto = acgraph.vector.Stage.prototype;
   proto['credits'] = proto.credits;
+  proto['saveAsPNG'] = anychart.getMethodOrError(proto, 'saveAsPng', 'Exporting');
+  proto['saveAsJPG'] = anychart.getMethodOrError(proto, 'saveAsJpg', 'Exporting');
+  proto['saveAsPDF'] = anychart.getMethodOrError(proto, 'saveAsPdf', 'Exporting');
+  proto['saveAsSVG'] = anychart.getMethodOrError(proto, 'saveAsSvg', 'Exporting');
+  proto['saveAsPng'] = anychart.getMethodOrError(proto, 'saveAsPng', 'Exporting');
+  proto['saveAsJpg'] = anychart.getMethodOrError(proto, 'saveAsJpg', 'Exporting');
+  proto['saveAsPdf'] = anychart.getMethodOrError(proto, 'saveAsPdf', 'Exporting');
+  proto['saveAsSvg'] = anychart.getMethodOrError(proto, 'saveAsSvg', 'Exporting');
+  proto['shareAsPng'] = anychart.getMethodOrError(proto, 'shareAsPng', 'Exporting');
+  proto['shareAsJpg'] = anychart.getMethodOrError(proto, 'shareAsJpg', 'Exporting');
+  proto['shareAsPdf'] = anychart.getMethodOrError(proto, 'shareAsPdf', 'Exporting');
+  proto['shareAsSvg'] = anychart.getMethodOrError(proto, 'shareAsSvg', 'Exporting');
+  proto['getPngBase64String'] = anychart.getMethodOrError(proto, 'getPngBase64String', 'Exporting');
+  proto['getJpgBase64String'] = anychart.getMethodOrError(proto, 'getJpgBase64String', 'Exporting');
+  proto['getSvgBase64String'] = anychart.getMethodOrError(proto, 'getSvgBase64String', 'Exporting');
+  proto['getPdfBase64String'] = anychart.getMethodOrError(proto, 'getPdfBase64String', 'Exporting');
+  proto['print'] = anychart.getMethodOrError(proto, 'print', 'Exporting');
+  proto['toSvg'] = anychart.getMethodOrError(proto, 'toSvg', 'Exporting');
 })();

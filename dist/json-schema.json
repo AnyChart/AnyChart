@@ -144,6 +144,12 @@
             ]
           }
         },
+        "noDataLabel": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.Label"}
+          ]
+        },
         "credits": {
           "oneOf": [
             {"$ref": "#/definitions/disable"},

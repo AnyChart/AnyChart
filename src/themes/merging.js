@@ -679,7 +679,13 @@ anychart.themes.merging.mergingMap_ = (function() {
             '.resourceList'
           ]]
         ], '.background'],
-        "chart.defaultQuarterSettings"
+        'chart.defaultQuarterSettings'
+      ]
+    },
+    {
+      defaultObj: 'chart.defaultLabelSettings',
+      targets: [
+        'defaultNoDataLabel'
       ]
     },
     {
@@ -1017,6 +1023,12 @@ anychart.themes.merging.mergingMap_ = (function() {
             'vertical'
           ], 'ScrollBar']
         ]]
+      ]
+    },
+    {
+      defaultObj: 'defaultNoDataLabel',
+      targets: [
+        [['chart', 'stock.defaultPlotSettings'], '.noDataLabel']
       ]
     },
     {
@@ -1367,6 +1379,29 @@ anychart.themes.merging.mergingMap_ = (function() {
         'choropleth',
         'connector',
         [['bubble', 'marker', 'seat'], 'Map']
+      ]
+    },
+    {
+      defaultObj: 'heatMap.defaultAnnotationSettings.base',
+      targets: [
+        ['heatMap.defaultAnnotationSettings.', [
+          'ray',
+          'line',
+          [['infinite', 'vertical', 'horizontal'], 'Line'],
+          'rectangle',
+          'ellipse',
+          'triangle',
+          'trendChannel',
+          'andrewsPitchfork',
+          ['fibonacci', [
+            'Fan',
+            'Arc',
+            'Retracement',
+            'Timezones'
+          ]],
+          'marker',
+          'label'
+        ]]
       ]
     },
     {

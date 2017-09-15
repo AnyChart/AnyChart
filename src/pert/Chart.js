@@ -564,7 +564,7 @@ anychart.pertModule.Chart.prototype.data = function(opt_data, opt_fillMethod, op
       this.data_ = new anychart.treeDataModule.Tree(opt_data, opt_fillMethod, opt_deps);
     }
     this.data_.listenSignals(this.dataInvalidated_, this);
-    this.invalidate(anychart.ConsistencyState.PERT_DATA, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.PERT_DATA | anychart.ConsistencyState.CHART_LABELS, anychart.Signal.NEEDS_REDRAW);
     return this;
   }
   return this.data_;
@@ -588,7 +588,7 @@ anychart.pertModule.Chart.prototype.resizeHandler = function(evt) {
  * @private
  */
 anychart.pertModule.Chart.prototype.dataInvalidated_ = function(event) {
-  this.invalidate(anychart.ConsistencyState.PERT_DATA, anychart.Signal.NEEDS_REDRAW);
+  this.invalidate(anychart.ConsistencyState.PERT_DATA | anychart.ConsistencyState.CHART_LABELS, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -2915,6 +2915,16 @@ anychart.pertModule.Chart.prototype.labelsEnabled_ = function(labelsFactory, def
   return goog.isBoolean(/** @type {anychart.core.ui.LabelsFactory} */ (labelsFactory).enabled()) ?
       /** @type {boolean} */ (/** @type {anychart.core.ui.LabelsFactory} */ (labelsFactory).enabled()) :
       defaultVal;
+};
+
+
+//endregion
+//region -- No Data
+/** @inheritDoc */
+anychart.pertModule.Chart.prototype.isNoData = function() {
+  if (!this.data_)
+    return true;
+  return (!this.data_.numChildren());
 };
 
 

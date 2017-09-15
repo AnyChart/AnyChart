@@ -49,8 +49,8 @@ anychart.annotationsModule.FibonacciTimezones.prototype.drawLevel = function(lev
     hoverPath.moveTo(x, t).lineTo(x, b);
     if (drawLabels) {
       var position = {'value': {'x': x, 'y': b}};
-      this.drawLabel(levelIndex, mainFactory, stateFactory, this.createFormatProvider(levelValue), position,
-          {'anchor': anychart.enums.Anchor.LEFT_BOTTOM});
+      this.drawLabel(levelIndex, mainFactory, stateFactory, this.createFormatProvider(levelValue, this.getValueFromPixX(x), true), position,
+          anychart.enums.Anchor.LEFT_BOTTOM);
     }
   }
 };

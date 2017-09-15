@@ -1816,7 +1816,9 @@ anychart.mapModule.Chart.prototype.normalizeSeriesType = function(type) {
 /** @inheritDoc */
 anychart.mapModule.Chart.prototype.seriesInvalidated = function(event) {
   var state = 0;
-
+  if (event.hasSignal(anychart.Signal.ENABLED_STATE_CHANGED)) {
+    state |= anychart.ConsistencyState.CHART_LABELS;
+  }
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
     state = anychart.ConsistencyState.SERIES_CHART_SERIES;
     if ((/** @type {anychart.mapModule.Series} */(event['target'])).needsUpdateMapAppearance())
@@ -1834,7 +1836,8 @@ anychart.mapModule.Chart.prototype.seriesInvalidated = function(event) {
   if (event.hasSignal(anychart.Signal.DATA_CHANGED)) {
     state |= anychart.ConsistencyState.SERIES_CHART_SERIES |
         anychart.ConsistencyState.CHART_LEGEND |
-        anychart.ConsistencyState.MAP_LABELS;
+        anychart.ConsistencyState.MAP_LABELS |
+        anychart.ConsistencyState.CHART_LABELS;
     if ((/** @type {anychart.mapModule.Series} */(event['target'])).needsUpdateMapAppearance())
       state |= anychart.ConsistencyState.APPEARANCE;
     for (var i = this.seriesList.length; i--;)

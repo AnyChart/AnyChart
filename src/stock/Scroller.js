@@ -1310,6 +1310,15 @@ anychart.stockModule.Scroller.prototype.getPixelBounds = function() {
 
 
 /**
+ * Returns current scroller pixel bounds.
+ * @return {!anychart.math.Rect}
+ */
+anychart.stockModule.Scroller.prototype.getPlotBounds = function() {
+  return this.getPixelBounds();
+};
+
+
+/**
  * INTERNAL x scale getter/setter. Managed by stock chart.
  * @param {anychart.stockModule.scales.Scatter=} opt_value
  * @return {anychart.stockModule.scales.Scatter|anychart.stockModule.Scroller}
