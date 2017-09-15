@@ -4984,8 +4984,6 @@ anychart.ganttModule.TimeLine.prototype.setupByJSON = function(config, opt_defau
 
   if ('scale' in config) this.scale_.setup(config['scale']);
 
-  debugger;
-
   this.labels().setupInternal(!!opt_default, config['labels']);
   this.baseLabels().setupInternal(!!opt_default, config['baseLabels']);
   this.baselineLabels().setupInternal(!!opt_default, config['baselineLabels']);
