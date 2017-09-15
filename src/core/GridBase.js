@@ -769,7 +769,7 @@ anychart.core.GridBase.prototype.applyContainer = function() {
  */
 anychart.core.GridBase.prototype.applyZIndex = function() {
   var zIndex = /** @type {number} */(this.zIndex());
-  this.lineElement().zIndex(zIndex + 0.00001);
+  this.lineElement().zIndex(zIndex + 0.03);
   goog.object.forEach(this.fillMap, function(path, key, obj) {
     path.zIndex(zIndex);
   });
