@@ -90,13 +90,13 @@ anychart.fromJsonFile = function(url, opt_onSuccessOrContainer, opt_onError, opt
  * @private
  */
 anychart.getChartCreationMethod_ = function(name, opt_onError, opt_context) {
-  var win = goog.dom.getWindow();
-  var anychart = win['anychart'];
-  if (!anychart) {
+  var win = anychart.window;
+  var any = win['anychart'];
+  if (!any) {
     if (opt_onError) opt_onError.call(opt_context, 500, 'AnyChart in not present on the page.');
     return null;
   }
-  var fn = anychart[name];
+  var fn = any[name];
   if (!fn) {
     if (opt_onError) opt_onError.call(opt_context, 500, goog.string.subs('anychart.%s is not available.', name));
     return null;
@@ -393,7 +393,7 @@ anychart.dataAdapterModule.entry.processAsJson_ = function(xhr) {
  */
 anychart.dataAdapterModule.entry.processAsXml_ = function(xhr) {
   var xml = xhr.getResponseXml();
-  var json = window['anychart']['utils']['xml2json'](xml);
+  var json = anychart.window['anychart']['utils']['xml2json'](xml);
   return [json['data']];
 };
 

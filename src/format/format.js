@@ -377,7 +377,7 @@ anychart.format.dateTimeSymbolsCache_ = {};
  */
 anychart.format.getLocale = function(locale) {
   if (!goog.isObject(locale)) {
-    locale = goog.global['anychart']['format']['locales'][String(locale)];
+    locale = anychart.window['anychart']['format']['locales'][String(locale)];
   }
   return locale || null;
 };

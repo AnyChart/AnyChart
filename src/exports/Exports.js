@@ -179,7 +179,7 @@ anychart.exportsModule.Exports.prototype.applyDefaults = function() {
   };
 
   this.facebook_ = {
-    'caption': window['location']['hostname'],
+    'caption': anychart.window['location'] ? anychart.window['location']['hostname'] : '',
     'link': undefined,
     'name': undefined,
     'description': undefined,

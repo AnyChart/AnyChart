@@ -116,7 +116,7 @@ anychart.stockModule.Chart = function(opt_allowPointSettings) {
    * Annotations module exports, if it is included. Also used in Plots.
    * @type {{ChartController:Function, PlotController:Function}|undefined}
    */
-  this.annotationsModule = goog.global['anychart']['annotations'];
+  this.annotationsModule = anychart.window['anychart']['annotations'];
 
   /**
    * Default annotation settings.
@@ -2191,11 +2191,11 @@ anychart.stockModule.Chart.prototype.handleMouseWheel_ = function(e) {
           this.mwZoomStart_ = start;
           this.mwZoomEnd_ = end;
           if (goog.isDef(this.mwScrollFrame_)) {
-            window.cancelAnimationFrame(this.mwScrollFrame_);
+            anychart.window.cancelAnimationFrame(this.mwScrollFrame_);
             this.mwScrollAction_();
           }
           if (!goog.isDef(this.mwZoomFrame_)) {
-            this.mwZoomFrame_ = window.requestAnimationFrame(this.mwZoomAction_);
+            this.mwZoomFrame_ = anychart.window.requestAnimationFrame(this.mwZoomAction_);
           }
         }
       }
@@ -2211,11 +2211,11 @@ anychart.stockModule.Chart.prototype.handleMouseWheel_ = function(e) {
           this.mwScrollRatio_ = ratio;
           this.mwScrollAnchor_ = anchor;
           if (goog.isDef(this.mwZoomFrame_)) {
-            window.cancelAnimationFrame(this.mwZoomFrame_);
+            anychart.window.cancelAnimationFrame(this.mwZoomFrame_);
             this.mwZoomAction_();
           }
           if (!goog.isDef(this.mwScrollFrame_)) {
-            this.mwScrollFrame_ = window.requestAnimationFrame(this.mwScrollAction_);
+            this.mwScrollFrame_ = anychart.window.requestAnimationFrame(this.mwScrollAction_);
           }
         }
       }

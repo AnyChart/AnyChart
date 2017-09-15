@@ -79,9 +79,9 @@ anychart.chartEditorModule.group.ChartType.isReferenceValuesPresent = function(v
     var name = /** @type {number|string} */(values[i]);
     for (var j = 0, m = model.dataMappings.length; j < m; j++) {
       var mapping = model.dataMappings[j];
-      var presentInArrayMapping = mapping['getArrayMapping']() != window['anychart']['data']['Mapping']['DEFAULT_ARRAY_MAPPING'] &&
+      var presentInArrayMapping = mapping['getArrayMapping']() != anychart.window['anychart']['data']['Mapping']['DEFAULT_ARRAY_MAPPING'] &&
           mapping['getArrayMapping']()[name];
-      var presentInObjectMapping = mapping['getObjectMapping']() != window['anychart']['data']['Mapping']['DEFAULT_OBJECT_MAPPING'] &&
+      var presentInObjectMapping = mapping['getObjectMapping']() != anychart.window['anychart']['data']['Mapping']['DEFAULT_OBJECT_MAPPING'] &&
           mapping['getObjectMapping']()[name];
 
       result = result && (presentInArrayMapping || presentInObjectMapping);

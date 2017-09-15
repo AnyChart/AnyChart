@@ -2009,7 +2009,7 @@ anychart.stockModule.Plot.prototype.handlePlotMouseOverAndMove_ = function(e) {
       this.frameHighlightY_ = e['clientY'];
       this.crosshair().xLabelAutoEnabled(this.isLastPlot_);
       if (!goog.isDef(this.frame_))
-        this.frame_ = window.requestAnimationFrame(this.frameAction_);
+        this.frame_ = anychart.window.requestAnimationFrame(this.frameAction_);
     }
   }
 };
@@ -2024,7 +2024,7 @@ anychart.stockModule.Plot.prototype.handlePlotMouseOut_ = function(e) {
   this.dispatchEvent(acgraph.events.EventType.MOUSEOUT);
   this.frameHighlightRatio_ = NaN;
   if (!goog.isDef(this.frame_))
-    this.frame_ = window.requestAnimationFrame(this.frameAction_);
+    this.frame_ = anychart.window.requestAnimationFrame(this.frameAction_);
 };
 
 
@@ -2757,7 +2757,7 @@ anychart.stockModule.Plot.Dragger.prototype.dragStartHandler_ = function(e) {
  */
 anychart.stockModule.Plot.Dragger.prototype.dragEndHandler_ = function(e) {
   if (goog.isDef(this.frame_)) {
-    window.cancelAnimationFrame(this.frame_);
+    anychart.window.cancelAnimationFrame(this.frame_);
     this.frameAction_(0);
   }
   this.plot_.chart_.dragEnd();
@@ -2781,8 +2781,8 @@ anychart.stockModule.Plot.Dragger.prototype.defaultAction = function(x, y) {
   this.frameRatio_ = x / this.plot_.seriesBounds_.width;
   this.frameAnchor_ = this.anchor_;
   if (goog.isDef(this.frame_))
-    window.cancelAnimationFrame(this.frame_);
-  this.frame_ = window.requestAnimationFrame(this.frameAction_);
+    anychart.window.cancelAnimationFrame(this.frame_);
+  this.frame_ = anychart.window.requestAnimationFrame(this.frameAction_);
 };
 
 

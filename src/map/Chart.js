@@ -813,10 +813,10 @@ anychart.mapModule.Chart.prototype.controlsInteractivity_ = function() {
           var newScrollY = scrollEl.scrollTop;
           setTimeout(function() {
             if (scrollEl.scrollLeft == newScrollX && scrollEl.scrollTop == newScrollY)
-              window.scrollTo(scrollX, scrollY);
+              anychart.window.scrollTo(scrollX, scrollY);
           }, 0);
         } else {
-          window.scrollTo(scrollX, scrollY);
+          anychart.window.scrollTo(scrollX, scrollY);
         }
       }
     };
@@ -2081,7 +2081,7 @@ anychart.mapModule.Chart.prototype.geoData = function(opt_data) {
     if (goog.isString(opt_data) && !goog.string.startsWith(opt_data, '<')) {
       this.geoDataStringName_ = opt_data;
       var configPath = opt_data.split('.');
-      opt_data = goog.dom.getWindow();
+      opt_data = anychart.window;
       for (var i = 0, len = configPath.length; i < len; i++) {
         opt_data = opt_data[configPath[i]];
       }
@@ -2852,7 +2852,7 @@ anychart.mapModule.Chart.prototype.calculate = function() {
 
     if (goog.isDefAndNotNull(geoData)) {
       geoData = goog.isString(this.geoData_) && !goog.string.startsWith(/** @type {string} */(geoData), '<') ?
-          goog.dom.getWindow()['anychart']['maps'][this.geoData_] : this.geoData_;
+          anychart.window['anychart']['maps'][this.geoData_] : this.geoData_;
 
       if (goog.isString(geoData) && goog.string.startsWith(geoData, '<') || goog.dom.isNodeLike(geoData)) {
         this.parser = anychart.mapModule.utils.GeoSVGParser.getInstance();
@@ -3368,7 +3368,7 @@ anychart.mapModule.Chart.prototype.drawContent = function(bounds) {
             this != this.getCurrentScene() ? true : this.getRootScene().dispatchEvent(this.createZoomEvent(anychart.enums.EventType.ZOOM_START));
 
         if (allowZoom) {
-          if (goog.global['anychart']['ui']['ContextMenu']) {
+          if (anychart.window['anychart']['ui']['ContextMenu']) {
             var contextMenu = this.contextMenu();
             if (contextMenu.isVisible()) contextMenu.hide();
           }

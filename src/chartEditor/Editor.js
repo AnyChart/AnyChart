@@ -44,8 +44,8 @@ anychart.chartEditorModule.Editor = function(opt_domHelper) {
    * @private
    */
   this.sharedModel_ = /** @type {anychart.chartEditorModule.steps.Base.Model} */({
-    window: goog.dom.getWindow(),
-    anychart: /** @type {Object} */(goog.dom.getWindow()['anychart']),
+    window: anychart.window,
+    anychart: /** @type {Object} */(anychart.window['anychart']),
 
     currentStep: null,
     steps: [],
@@ -599,14 +599,14 @@ anychart.chartEditorModule.Editor.prototype.updateStepsDescriptors_ = function()
  * @param {...Array} var_args Raw data set.
  */
 anychart.chartEditorModule.Editor.prototype.data = function(var_args) {
-  if (!goog.isDef(window['anychart']['data'])) return;
+  if (!goog.isDef(anychart.window['anychart']['data'])) return;
   if (!arguments.length) return;
   this.resetSharedModel_();
 
   for (var i = 0; i < arguments.length; i++) {
     var dataSet = arguments[i];
     if (goog.isArrayLike(dataSet))
-      dataSet = window['anychart']['data']['set'](dataSet);
+      dataSet = anychart.window['anychart']['data']['set'](dataSet);
 
     if (dataSet['mapAs']) {
       this.sharedModel_.dataSets.push({

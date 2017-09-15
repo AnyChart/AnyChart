@@ -122,7 +122,7 @@ anychart.mapModule.projections.getProjection = function(projection) {
       break;
     default:
       try {
-        if (window['proj4']) {
+        if (anychart.window['proj4']) {
           projection_ = new anychart.mapModule.projections.Proj4Wrapper(/** @type {string} */(projection));
         } else {
           projection_ = new anychart.mapModule.projections.Base();
@@ -168,6 +168,6 @@ anychart.mapModule.projections.isBaseProjection = function(projectionStr) {
     case anychart.enums.MapProjections.AUGUST:
       return false;
     default:
-      return !window['proj4'];
+      return !anychart.window['proj4'];
   }
 };

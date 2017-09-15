@@ -290,7 +290,7 @@ anychart.core.reporting.getWarningDescription_ = function(code, opt_arguments) {
  * @private
  */
 anychart.core.reporting.callLog_ = function(name, message, opt_exception) {
-  var console = goog.global['console'];
+  var console = anychart.window['console'];
   if (console) {
     var log = console[name] || console['log'];
     if (typeof log != 'object') {

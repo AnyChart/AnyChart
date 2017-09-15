@@ -2110,7 +2110,7 @@ anychart.resourceModule.Chart.Dragger.prototype.dragStartHandler_ = function(e) 
  */
 anychart.resourceModule.Chart.Dragger.prototype.dragEndHandler_ = function(e) {
   if (goog.isDef(this.frame_)) {
-    window.cancelAnimationFrame(this.frame_);
+    anychart.window.cancelAnimationFrame(this.frame_);
     this.frameAction_(0);
   }
   this.chart_.dragEnd_();
@@ -2136,8 +2136,8 @@ anychart.resourceModule.Chart.Dragger.prototype.defaultAction = function(x, y) {
   this.frameX_ = -x;
   this.frameY_ = -y;
   if (goog.isDef(this.frame_))
-    window.cancelAnimationFrame(this.frame_);
-  this.frame_ = window.requestAnimationFrame(this.frameAction_);
+    anychart.window.cancelAnimationFrame(this.frame_);
+  this.frame_ = anychart.window.requestAnimationFrame(this.frameAction_);
 };
 
 

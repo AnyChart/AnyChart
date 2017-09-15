@@ -33,7 +33,7 @@ anychart.core.ui.StageCredits = function(stage, disabledByDefault) {
    * @type {boolean}
    * @private
    */
-  this.onAnyChartDomain_ = anychart.core.ui.StageCredits.DOMAIN_REGEXP.test(goog.dom.getWindow().location.hostname);
+  this.onAnyChartDomain_ = anychart.core.ui.StageCredits.DOMAIN_REGEXP.test(anychart.window.location.hostname);
 
   /**
    * Default enabled value is determined by the domain regexp and the constructor param.
@@ -194,7 +194,7 @@ anychart.core.ui.StageCredits.prototype.invalidate = function(state, opt_dispatc
  * @private
  */
 anychart.core.ui.StageCredits.prototype.addProtocol_ = function(url) {
-  return ('https:' == goog.dom.getWindow().location.protocol ? 'https://' : 'http://') + url;
+  return ('https:' == anychart.window.location.protocol ? 'https://' : 'http://') + url;
 };
 
 

@@ -75,7 +75,7 @@ anychart.chartEditorModule.group.Theme.parseThemes_ = function() {
   if (!anychart.chartEditorModule.group.Theme.themes) {
     anychart.chartEditorModule.group.Theme.themes = [];
     var name, theme;
-    var ns = window['anychart']['themes'];
+    var ns = anychart.window['anychart']['themes'];
     for (var i in ns) {
       theme = ns[i];
       if (i == 'merging' || !theme['chart']) continue;
@@ -90,7 +90,7 @@ anychart.chartEditorModule.group.Theme.parseThemes_ = function() {
 anychart.chartEditorModule.group.Theme.parsePalettes_ = function() {
   if (!anychart.chartEditorModule.group.Theme.palettes) {
     anychart.chartEditorModule.group.Theme.palettes = [];
-    var ns = window['anychart']['palettes'];
+    var ns = anychart.window['anychart']['palettes'];
     var name, palette;
     for (var i in ns) {
       palette = ns[i];
@@ -196,7 +196,7 @@ anychart.chartEditorModule.group.Theme.prototype.update = function() {
   var chart = this.model.chart;
 
   // update theme
-  var win = goog.dom.getWindow();
+  var win = anychart.window;
   var ac = win['anychart'];
   var appliedTheme = ac['theme']();
   appliedTheme = appliedTheme[0] ? appliedTheme[0] : appliedTheme;
