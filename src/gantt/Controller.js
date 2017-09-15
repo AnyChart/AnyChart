@@ -398,6 +398,12 @@ anychart.ganttModule.Controller.prototype.autoCalcItem_ = function(item, current
       .meta('depth', currentDepth)
       .meta('index', this.linearIndex_++);
 
+  var itemProgressValue = item.get(anychart.enums.GanttDataFields.PROGRESS_VALUE);
+  if (goog.isDef(itemProgressValue)) {
+    itemProgressValue = anychart.utils.isPercent(itemProgressValue) ? parseFloat(itemProgressValue) / 100 : +itemProgressValue;
+    item.meta('progressValue', itemProgressValue);
+  }
+
   var collapsed = item.get(anychart.enums.GanttDataFields.COLLAPSED);
   if (goog.isBoolean(collapsed)) {
     item.meta(anychart.enums.GanttDataFields.COLLAPSED, collapsed);
@@ -436,9 +442,13 @@ anychart.ganttModule.Controller.prototype.autoCalcItem_ = function(item, current
           child.meta(anychart.enums.GanttDataFields.ACTUAL_END) :
           (child.meta('autoEnd') || childStart);
 
-      var childProgress = goog.isDef(child.get(anychart.enums.GanttDataFields.PROGRESS_VALUE)) ?
-          anychart.utils.normalizeSize(/** @type {number} */(child.get(anychart.enums.GanttDataFields.PROGRESS_VALUE)), 1) :
-          (child.meta('autoProgress') || 0);
+      var progressValue = child.get(anychart.enums.GanttDataFields.PROGRESS_VALUE);
+      if (goog.isDef(progressValue)) {
+        progressValue = anychart.utils.isPercent(progressValue) ? parseFloat(progressValue) / 100 : +progressValue;
+      }
+
+      var childProgress = goog.isDef(progressValue) ? progressValue : (child.meta('autoProgress') || 0);
+      child.meta('progressValue', childProgress);
 
       if (isNaN(resultStart)) {
         resultStart = childStart;

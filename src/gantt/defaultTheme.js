@@ -30,112 +30,73 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       }
     },
     'timeline': {
-      'isStandalone': false
+      'isStandalone': false,
+      'labels': {
+        'padding': [0, 4, 0, 4]
+      }
     }
   },
 
   'ganttResource': {
     'dataGrid': {
       'tooltip': {
-        /**
-         * @this {*}
-         * @return {string}
-         */
-        'titleFormat': function() {
-          return this['name'] || '';
-        },
-        /**
-         * @this {*}
-         * @return {string}
-         */
-        'format': function() {
-          var startDate = this['minPeriodDate'];
-          var endDate = this['maxPeriodDate'];
-          return (startDate ? 'Start Date: ' + anychart.format.dateTime(startDate) : '') +
-              (endDate ? '\nEnd Date: ' + anychart.format.dateTime(endDate) : '');
-        }
+        'titleFormat': '{%Name}',
+        'format': 'Start Date: {%start}\nEnd Date: {%end}'
       }
     },
     'timeline': {
       'tooltip': {
-        /**
-         * @this {*}
-         * @return {string}
-         */
-        'titleFormat': function() {
-          return this['name'] || '';
-        },
-        /**
-         * @this {*}
-         * @return {string}
-         */
-        'format': function() {
-          var startDate = this['periodStart'] || this['minPeriodDate'];
-          var endDate = this['periodEnd'] || this['maxPeriodDate'];
-          return (startDate ? 'Start Date: ' + anychart.format.dateTime(startDate) : '') +
-              (endDate ? '\nEnd Date: ' + anychart.format.dateTime(endDate) : '');
-        }
+        'titleFormat': '{%Name}',
+        'format': 'Start Date: {%start}\nEnd Date: {%end}'
+      },
+      'labels': {
+        'format': 'Progress Label',
+        'position': 'center',
+        'anchor': 'center',
+        'enabled': false
       }
     }
   },
   'ganttProject': {
     'dataGrid': {
       'tooltip': {
-        /**
-         * @this {*}
-         * @return {string}
-         */
-        'titleFormat': function() {
-          return this['name'] || '';
-        },
-        /**
-         * @this {*}
-         * @return {string}
-         */
-        'format': function() {
-          var startDate = this['actualStart'] || this['autoStart'];
-          var endDate = this['actualEnd'] || this['autoEnd'];
-          var progress = this['progressValue'];
-
-          if (progress === void 0) {
-            var auto = this['autoProgress'] * 100;
-            progress = (Math.round(auto * 100) / 100 || 0) + '%';
-          }
-
-          return (startDate ? 'Start Date: ' + anychart.format.dateTime(startDate) : '') +
-              (endDate ? '\nEnd Date: ' + anychart.format.dateTime(endDate) : '') +
-              (progress ? '\nComplete: ' + progress : '');
-        }
+        'titleFormat': '{%Name}',
+        'format': 'Start Date: {%actualStart}\nEnd Date: {%actualEnd}\nComplete: {%progress}'
       }
     },
     'timeline': {
       'tooltip': {
-        /**
-         * @this {*}
-         * @return {string}
-         */
-        'titleFormat': function() {
-          return this['name'] || '';
-        },
-        /**
-         * @this {*}
-         * @return {string}
-         */
-        'format': function() {
-          var startDate = this['actualStart'] || this['autoStart'];
-          var endDate = this['actualEnd'] || this['autoEnd'];
-          var progress = this['progressValue'];
-
-          if (progress === void 0) {
-            var auto = this['autoProgress'] * 100;
-            progress = (Math.round(auto * 100) / 100 || 0) + '%';
-          }
-
-          return (startDate ? 'Start Date: ' + anychart.format.dateTime(startDate) : '') +
-              (endDate ? '\nEnd Date: ' + anychart.format.dateTime(endDate) : '') +
-              (progress ? '\nComplete: ' + progress : '');
-
-        }
+        'titleFormat': '{%Name}',
+        'format': 'Start Date: {%actualStart}\nEnd Date: {%actualEnd}\nComplete: {%progress}'
+      },
+      'baseLabels': {
+        'format': '{%Progress}',
+        'position': 'right-center',
+        'anchor': 'left-center',
+        'enabled': null
+      },
+      'baselineLabels': {
+        'position': 'center',
+        'fontColor': '#fff',
+        'anchor': 'center',
+        'format': 'Baseline Label',
+        'enabled': false
+      },
+      'parentLabels': {
+        'format': '{%Progress}',
+        'position': 'right-center',
+        'anchor': 'left-center',
+        'enabled': null
+      },
+      'milestoneLabels': {
+        'format': '{%Name}',
+        'anchor': 'left-center',
+        'position': 'right-center',
+        'enabled': null
+      },
+      'progressLabels': {
+        'format': '{%Progress}',
+        'enabled': false
       }
     }
   }
@@ -144,53 +105,14 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
 goog.mixin(goog.global['anychart']['themes']['defaultTheme']['standalones'], {
   'projectTimeline': {
     'tooltip': {
-      /**
-       * @this {*}
-       * @return {string}
-       */
-      'titleFormat': function() {
-        return this['name'] || '';
-      },
-      /**
-       * @this {*}
-       * @return {string}
-       */
-      'format': function() {
-        var startDate = this['actualStart'] || this['autoStart'];
-        var endDate = this['actualEnd'] || this['autoEnd'];
-        var progress = this['progressValue'];
-
-        if (progress === void 0) {
-          var auto = this['autoProgress'] * 100;
-          progress = (Math.round(auto * 100) / 100 || 0) + '%';
-        }
-
-        return (startDate ? 'Start Date: ' + anychart.format.dateTime(startDate) : '') +
-            (endDate ? '\nEnd Date: ' + anychart.format.dateTime(endDate) : '') +
-            (progress ? '\nComplete: ' + progress : '');
-
-      }
+      'titleFormat': '{%Name}',
+      'format': 'Start Date: {%actualStart}\nEnd Date: {%actualEnd}\nComplete: {%progress}'
     }
   },
   'resourceTimeline': {
     'tooltip': {
-      /**
-       * @this {*}
-       * @return {string}
-       */
-      'titleFormat': function() {
-        return this['name'] || '';
-      },
-      /**
-       * @this {*}
-       * @return {string}
-       */
-      'format': function() {
-        var startDate = this['periodStart'] || this['minPeriodDate'];
-        var endDate = this['periodEnd'] || this['maxPeriodDate'];
-        return (startDate ? 'Start Date: ' + anychart.format.dateTime(startDate) : '') +
-            (endDate ? '\nEnd Date: ' + anychart.format.dateTime(endDate) : '');
-      }
+      'titleFormat': '{%Name}',
+      'format': 'Start Date: {%start}\nEnd Date: {%end}'
     }
   },
   'dataGrid': {
