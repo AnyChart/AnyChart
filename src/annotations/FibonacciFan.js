@@ -135,10 +135,8 @@ anychart.annotationsModule.FibonacciFan.prototype.drawLevel = function(levelInde
 
   if (drawLabels && this.pixelBoundsCache.left <= x1 && x1 <= this.pixelBoundsCache.getRight()) {
     var position = {'value': {'x': x1, 'y': y}};
-    this.drawLabel(levelIndex, mainFactory, stateFactory, this.createFormatProvider(levelValue), position,
-        {
-          'anchor': x1 < x2 ? anychart.enums.Anchor.RIGHT_CENTER : anychart.enums.Anchor.LEFT_CENTER
-        });
+    this.drawLabel(levelIndex, mainFactory, stateFactory, this.createFormatProvider(levelValue, this.getValueFromPixY(y), false), position,
+        x1 < x2 ? anychart.enums.Anchor.RIGHT_CENTER : anychart.enums.Anchor.LEFT_CENTER);
   }
 };
 
@@ -183,10 +181,8 @@ anychart.annotationsModule.FibonacciFan.prototype.drawTimeLevel = function(level
 
   if (drawLabels && this.pixelBoundsCache.left <= x && x <= this.pixelBoundsCache.getRight()) {
     var position = {'value': {'x': x, 'y': y1}};
-    this.drawLabel(levelIndex, mainFactory, stateFactory, this.createFormatProvider(levelValue), position,
-        {
-          'anchor': y1 < y2 ? anychart.enums.Anchor.CENTER_BOTTOM : anychart.enums.Anchor.CENTER_TOP
-        });
+    this.drawLabel(levelIndex, mainFactory, stateFactory, this.createFormatProvider(levelValue, this.getValueFromPixX(x), true), position,
+        y1 < y2 ? anychart.enums.Anchor.CENTER_BOTTOM : anychart.enums.Anchor.CENTER_TOP);
   }
 };
 

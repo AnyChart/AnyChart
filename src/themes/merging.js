@@ -1368,6 +1368,29 @@ anychart.themes.merging.mergingMap_ = (function() {
       ]
     },
     {
+      defaultObj: 'heatMap.defaultAnnotationSettings.base',
+      targets: [
+        ['heatMap.defaultAnnotationSettings.', [
+          'ray',
+          'line',
+          [['infinite', 'vertical', 'horizontal'], 'Line'],
+          'rectangle',
+          'ellipse',
+          'triangle',
+          'trendChannel',
+          'andrewsPitchfork',
+          ['fibonacci', [
+            'Fan',
+            'Arc',
+            'Retracement',
+            'Timezones'
+          ]],
+          'marker',
+          'label'
+        ]]
+      ]
+    },
+    {
       defaultObj: 'stock.defaultAnnotationSettings.base',
       targets: [
         ['stock.defaultAnnotationSettings.', [
