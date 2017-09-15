@@ -3647,7 +3647,7 @@ anychart.core.series.Base.prototype.getContextProviderValues = function(provider
       type: anychart.enums.TokenType.NUMBER
     },
     'x': {
-      value: rowInfo.get('x'),
+      value: rowInfo.getX(),
       type: anychart.enums.TokenType.STRING
     },
     'seriesName': {

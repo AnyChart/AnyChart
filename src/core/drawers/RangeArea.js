@@ -62,6 +62,10 @@ anychart.core.drawers.RangeArea.prototype.yValueNames = (function () { return ['
 
 
 /** @inheritDoc */
+anychart.core.drawers.RangeArea.prototype.valueFieldName = 'high';
+
+
+/** @inheritDoc */
 anychart.core.drawers.RangeArea.prototype.drawFirstPoint = function(point, state) {
   var shapes = this.shapesManager.getShapesGroup(this.seriesState);
   var x = /** @type {number} */(point.meta('x'));

@@ -19,6 +19,8 @@ goog.require('anychart.enums');
 anychart.mapModule.elements.Grid = function() {
   anychart.mapModule.elements.Grid.base(this, 'constructor');
 
+  delete this.themeSettings['enabled'];
+
   /**
    * Parent title.
    * @type {anychart.mapModule.elements.GridSettings}
@@ -255,44 +257,6 @@ anychart.mapModule.elements.Grid.prototype.SIMPLE_PROPS_DESCRIPTORS = (function(
   return map;
 })();
 anychart.core.settings.populate(anychart.mapModule.elements.Grid, anychart.mapModule.elements.Grid.prototype.SIMPLE_PROPS_DESCRIPTORS);
-
-
-/** @inheritDoc */
-anychart.mapModule.elements.Grid.prototype.enabled = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.ownSettings['enabled'] != opt_value) {
-      this.ownSettings['enabled'] = opt_value;
-      this.invalidate(anychart.ConsistencyState.ENABLED, this.getEnableChangeSignals());
-      if (this.ownSettings['enabled']) {
-        this.doubleSuspension = false;
-        this.resumeSignalsDispatching(true);
-      } else {
-        if (isNaN(this.suspendedDispatching)) {
-          this.suspendSignalsDispatching();
-        } else {
-          this.doubleSuspension = true;
-        }
-      }
-    }
-    return this;
-  } else {
-    return /** @type {boolean} */(this.getOption('enabled'));
-  }
-};
-
-
-/** @inheritDoc */
-anychart.mapModule.elements.Grid.prototype.zIndex = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var val = +opt_value || 0;
-    if (this.ownSettings['zIndex'] != val) {
-      this.ownSettings['zIndex'] = val;
-      this.invalidate(anychart.ConsistencyState.Z_INDEX, anychart.Signal.NEEDS_REDRAW | anychart.Signal.Z_INDEX_STATE_CHANGED);
-    }
-    return this;
-  }
-  return /** @type {number} */(goog.isDef(this.getOwnOption('zIndex')) ? this.getOwnOption('zIndex') : goog.isDef(this.autoZIndex) ? this.autoZIndex : this.getOption('zIndex'));
-};
 
 
 //endregion
@@ -839,54 +803,26 @@ anychart.mapModule.elements.Grid.prototype.draw = function() {
  * @param {!Object} config
  */
 anychart.mapModule.elements.Grid.prototype.setThemeSettings = function(config) {
-  for (var name in this.SIMPLE_PROPS_DESCRIPTORS) {
-    var val = config[name];
-    if (goog.isDef(val))
-      this.themeSettings[name] = val;
-  }
-  if ('enabled' in config) this.themeSettings['enabled'] = config['enabled'];
-  if ('zIndex' in config) this.themeSettings['zIndex'] = config['zIndex'];
+  anychart.core.settings.copy(this.themeSettings, this.SIMPLE_PROPS_DESCRIPTORS, config);
 };
 
 
 /** @inheritDoc */
 anychart.mapModule.elements.Grid.prototype.serialize = function() {
-  var json = {};
-
-  var zIndex = anychart.core.Base.prototype.getOption.call(this, 'zIndex');
-  if (goog.isDef(zIndex))
-    json['zIndex'] = zIndex;
-
-  var enabled = anychart.core.Base.prototype.getOption.call(this, 'enabled');
-  json['enabled'] = goog.isDef(enabled) ? enabled : null;
-
+  var json = anychart.mapModule.elements.Grid.base(this, 'serialize');
   anychart.core.settings.serialize(this, this.SIMPLE_PROPS_DESCRIPTORS, json, 'Map grids props');
-
   return json;
 };
 
 
 /** @inheritDoc */
-anychart.mapModule.elements.Grid.prototype.setupSpecial = function(isDefault, var_args) {
-  var arg0 = arguments[1];
-  if (goog.isBoolean(arg0) || goog.isNull(arg0)) {
-    if (isDefault)
-      this.themeSettings['enabled'] = !!arg0;
-    else
-      this.enabled(!!arg0);
-    return true;
-  }
-  return false;
-};
-
-
-/** @inheritDoc */
 anychart.mapModule.elements.Grid.prototype.setupByJSON = function(config, opt_default) {
+  anychart.mapModule.elements.Grid.base(this, 'setupByJSON', config, opt_default);
+
   if (opt_default) {
     this.setThemeSettings(config);
   } else {
     anychart.core.settings.deserialize(this, this.SIMPLE_PROPS_DESCRIPTORS, config);
-    anychart.mapModule.elements.Grid.base(this, 'setupByJSON', config);
   }
 };
 
@@ -905,9 +841,8 @@ anychart.mapModule.elements.Grid.prototype.disposeInternal = function() {
 //endregion
 //region --- Exports
 //exports
-(function() {
-  var proto = anychart.mapModule.elements.Grid.prototype;
-  proto['enabled'] = proto.enabled;
+// (function() {
+  // var proto = anychart.mapModule.elements.Grid.prototype;
   // proto['zIndex'] = proto.zIndex;
   // proto['stroke'] = proto.stroke;
   // proto['minorStroke'] = proto.minorStroke;
@@ -915,5 +850,5 @@ anychart.mapModule.elements.Grid.prototype.disposeInternal = function() {
   // proto['drawLastLine'] = proto.drawLastLine;
   // proto['oddFill'] = proto.oddFill;
   // proto['evenFill'] = proto.evenFill;
-})();
+// })();
 //endregion

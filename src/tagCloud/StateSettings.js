@@ -151,11 +151,7 @@ anychart.tagCloudModule.StateSettings.prototype.getOption = anychart.core.settin
  * @param {!Object} config
  */
 anychart.tagCloudModule.StateSettings.prototype.setThemeSettings = function(config) {
-  for (var name in this.SIMPLE_PROPS_DESCRIPTORS) {
-    var val = config[name];
-    if (goog.isDef(val))
-      this.themeSettings[name] = val;
-  }
+  anychart.core.settings.copy(this.themeSettings, this.SIMPLE_PROPS_DESCRIPTORS, config);
 };
 
 

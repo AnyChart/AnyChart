@@ -379,7 +379,7 @@ anychart.linearGaugeModule.Chart.prototype.createPointerByType_ = function(type,
     }
     instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(index)));
     instance.setParentEventTarget(this);
-    instance.setup(config);
+    instance.setupInternal(true, config);
     instance.listenSignals(this.pointerInvalidated_, this);
     this.invalidate(anychart.ConsistencyState.BOUNDS |
         anychart.ConsistencyState.GAUGE_POINTERS |

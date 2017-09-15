@@ -1148,6 +1148,7 @@ anychart.mapModule.elements.Callout.prototype.draw = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.CALLOUT_LABELS)) {
     this.handlerLayer.clear();
     this.calculateLabels();
+    this.labels().invalidate(anychart.ConsistencyState.Z_INDEX);
     this.labels().draw();
     for (var i = 0, len = this.labels().labelsCount(); i < len; i++) {
       var label = this.labels().getLabel(i);
@@ -1157,6 +1158,8 @@ anychart.mapModule.elements.Callout.prototype.draw = function() {
       // if (connector)
       //   connector.clip(this.chart.getPlotBounds());
     }
+
+
     this.markConsistent(anychart.ConsistencyState.CALLOUT_LABELS);
   }
 

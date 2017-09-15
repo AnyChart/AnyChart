@@ -60,6 +60,10 @@ anychart.core.drawers.RangeColumn.prototype.yValueNames = (function () { return 
 
 
 /** @inheritDoc */
+anychart.core.drawers.RangeColumn.prototype.valueFieldName = 'high';
+
+
+/** @inheritDoc */
 anychart.core.drawers.RangeColumn.prototype.drawSubsequentPoint = function(point, state) {
   var shapes = this.shapesManager.getShapesGroup(state);
   var x = /** @type {number} */(point.meta('x'));

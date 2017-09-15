@@ -2107,17 +2107,13 @@ anychart.tagCloudModule.Chart.prototype.isNoData = function() {
  * @param {!Object} config
  */
 anychart.tagCloudModule.Chart.prototype.setThemeSettings = function(config) {
-  for (var name in this.SIMPLE_PROPS_DESCRIPTORS) {
-    var val = config[name];
-    if (goog.isDef(val))
-      this.themeSettings[name] = val;
-  }
+  anychart.core.settings.copy(this.themeSettings, this.SIMPLE_PROPS_DESCRIPTORS, config);
 };
 
 
 /** @inheritDoc */
 anychart.tagCloudModule.Chart.prototype.setupByJSON = function(config, opt_default) {
-  anychart.tagCloudModule.Chart.base(this, 'setupByJSON', config);
+  anychart.tagCloudModule.Chart.base(this, 'setupByJSON', config, opt_default);
 
   if (opt_default) {
     this.setThemeSettings(config);

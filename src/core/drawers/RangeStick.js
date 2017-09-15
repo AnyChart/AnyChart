@@ -66,6 +66,10 @@ anychart.core.drawers.RangeStick.prototype.yValueNames = (function () { return [
 
 
 /** @inheritDoc */
+anychart.core.drawers.RangeStick.prototype.valueFieldName = 'high';
+
+
+/** @inheritDoc */
 anychart.core.drawers.RangeStick.prototype.drawSubsequentPoint = function(point, state) {
   var shapes = /** @type {Object.<acgraph.vector.Path>} */(this.shapesManager.getShapesGroup(state));
   this.drawPoint_(point, shapes);

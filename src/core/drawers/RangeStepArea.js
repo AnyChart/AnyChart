@@ -62,6 +62,10 @@ anychart.core.drawers.RangeStepArea.prototype.yValueNames = (function () { retur
 
 
 /** @inheritDoc */
+anychart.core.drawers.RangeStepArea.prototype.valueFieldName = 'high';
+
+
+/** @inheritDoc */
 anychart.core.drawers.RangeStepArea.prototype.startDrawing = function(shapeManager) {
   anychart.core.drawers.RangeStepArea.base(this, 'startDrawing', shapeManager);
   this.direction_ = /** @type {anychart.enums.StepDirection} */ (this.series.getOption('stepDirection') || anychart.enums.StepDirection.CENTER);

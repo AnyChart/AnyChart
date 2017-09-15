@@ -62,10 +62,10 @@ anychart.scales.Linear.prototype.comparisonMode_ = anychart.enums.ScaleCompariso
 
 
 /**
- * @type {anychart.enums.ScaleCompareWithMode|number}
+ * @type {anychart.enums.DataSource|number}
  * @private
  */
-anychart.scales.Linear.prototype.compareWith_ = anychart.enums.ScaleCompareWithMode.FIRST_VISIBLE;
+anychart.scales.Linear.prototype.compareWith_ = anychart.enums.DataSource.FIRST_VISIBLE;
 
 
 /** @inheritDoc */
@@ -212,12 +212,12 @@ anychart.scales.Linear.prototype.comparisonMode = function(opt_value) {
 
 /**
  * Getter and setter for date which should be used as a changes zero for series.
- * @param {(string|anychart.enums.ScaleCompareWithMode|number|Date)=} opt_value
- * @return {anychart.enums.ScaleCompareWithMode|number|anychart.scales.Linear}
+ * @param {(string|anychart.enums.DataSource|number|Date)=} opt_value
+ * @return {anychart.enums.DataSource|number|anychart.scales.Linear}
  */
 anychart.scales.Linear.prototype.compareWith = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeScaleCompareWithModeMode(opt_value) || anychart.utils.normalizeTimestamp(opt_value);
+    opt_value = anychart.enums.normalizeDataSource(opt_value);
     if (this.compareWith_ != opt_value) {
       this.compareWith_ = opt_value;
       this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION | anychart.Signal.NEEDS_RECALCULATION);
