@@ -551,7 +551,8 @@ anychart.linearGaugeModule.Chart.prototype.data = function(opt_value, opt_csvSet
 
       this.invalidatePointers();
       this.invalidate(anychart.ConsistencyState.GAUGE_POINTERS |
-          anychart.ConsistencyState.GAUGE_SCALE,
+          anychart.ConsistencyState.GAUGE_SCALE |
+          anychart.ConsistencyState.CHART_LABELS,
           anychart.Signal.NEEDS_REDRAW |
           anychart.Signal.NEEDS_RECALCULATION);
     }
@@ -579,7 +580,7 @@ anychart.linearGaugeModule.Chart.prototype.invalidatePointers = function() {
 anychart.linearGaugeModule.Chart.prototype.dataInvalidated_ = function(e) {
   if (e.hasSignal(anychart.Signal.DATA_CHANGED)) {
     this.invalidatePointers();
-    var state = anychart.ConsistencyState.GAUGE_SCALE | anychart.ConsistencyState.GAUGE_POINTERS;
+    var state = anychart.ConsistencyState.GAUGE_SCALE | anychart.ConsistencyState.GAUGE_POINTERS | anychart.ConsistencyState.CHART_LABELS;
     var signal = anychart.Signal.NEEDS_REDRAW;
     this.invalidate(state, signal);
   }
@@ -1137,6 +1138,24 @@ anychart.linearGaugeModule.Chart.prototype.drawContent = function(bounds) {
   anychart.performance.end('Linear gauge scale bars drawing');
 
   anychart.core.Base.resumeSignalsDispatchingFalse(this.axes_, this.pointers_, this.scaleBars_);
+};
+
+
+//endregion
+//region --- NO DATA LABEL ---
+/** @inheritDoc */
+anychart.linearGaugeModule.Chart.prototype.isNoData = function() {
+  var rowsCount = this.getIterator().getRowsCount();
+  var countDisabled = 0;
+  var len = this.pointers_.length;
+  for (var i = 0; i < len; i++) {
+    var pointer = this.pointers_[i];
+    if (pointer && !pointer.enabled())
+      countDisabled++;
+    else
+      break;
+  }
+  return (!rowsCount || !len || (countDisabled == len));
 };
 
 

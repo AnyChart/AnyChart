@@ -1176,6 +1176,24 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'zIndex': 50
   },
 
+  'defaultNoDataLabel': {
+    'padding': {},
+    'disablePointerEvents': true,
+    'background': {
+      'zIndex': 0,
+      'enabled': false,
+      'disablePointerEvents': true
+    },
+    'fontFamily': 'Arial',
+    'fontColor': 'black',
+    'fontWeight': 'bold',
+    'fontSize': 15,
+    'position': 'center',
+    'anchor': 'center',
+    'zIndex': 999999,
+    'text': 'NO DATA'
+  },
+
   'stageCredits': {
     'text': 'AnyChart',
     'url': 'https://www.anychart.com/?utm_source=registered',

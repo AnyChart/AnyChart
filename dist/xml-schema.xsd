@@ -28,6 +28,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="legend" type="core.Legend"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="credits" type="core.Credits"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="chart_labels" type="core.Label_list"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="no_data_label" type="core.Label"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="animation" type="utils.Animation"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="interactivity" type="utils.Interactivity"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="context_menu" type="utils.ContextMenu"/>
@@ -274,6 +275,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="legend" type="core.Legend"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="credits" type="core.Credits"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="chart_labels" type="core.Label_list"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="no_data_label" type="core.Label"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="animation" type="utils.Animation"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="interactivity" type="utils.Interactivity"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="context_menu" type="utils.ContextMenu"/>
@@ -341,6 +343,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="animation" type="utils.Animation"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="credits" type="core.Credits"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="chart_labels" type="core.Label_list"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="no_data_label" type="core.Label"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="interactivity" type="utils.Interactivity"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="context_menu" type="utils.ContextMenu"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="select_marquee_fill" type="Fill"/>
@@ -391,6 +394,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="legend" type="core.Legend"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="credits" type="core.Credits"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="chart_labels" type="core.Label_list"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="no_data_label" type="core.Label"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="animation" type="utils.Animation"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="crs_animation" type="utils.Animation"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="interactivity" type="utils.MapInteractivity"/>

@@ -372,6 +372,8 @@ anychart.mekkoModule.Chart.prototype.calculateCategoriesScales = function() {
     var rightWeights = [];
     var rightIndex = this.drawingPlans[0].data.length - 1;
     for (var i = 0; i < this.drawingPlans.length; i++) {
+      if (!this.drawingPlans[i].data.length)
+        continue;
       if (!this.drawingPlans[i].data[0].meta['missing']) {
         leftValues.push(this.drawingPlans[i].series.name());
         leftWeights.push(this.drawingPlans[i].data[0].data['value']);

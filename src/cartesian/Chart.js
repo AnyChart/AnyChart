@@ -338,6 +338,20 @@ anychart.cartesianModule.Chart.prototype.seriesConfig = (function() {
 anychart.core.ChartWithSeries.generateSeriesConstructors(anychart.cartesianModule.Chart, anychart.cartesianModule.Chart.prototype.seriesConfig);
 
 
+//region --- No Data
+/** @inheritDoc */
+anychart.cartesianModule.Chart.prototype.isSeriesVisible = function(series) {
+  var enabled = /** @type {boolean} */(series.enabled());
+  var excluded = series.getExcludedIndexesInternal();
+  var visible = true;
+  var rowsCount = series.data() ? series.data().getRowsCount() : 0;
+  if (!rowsCount || (rowsCount == excluded.length))
+    visible = false;
+  return (enabled && visible);
+};
+//endregion
+
+
 /**
  * Returns a chart instance with initial settings (no axes, grids, titles, legend and so on).<br/>
  * <b>Note:</b> To get a chart with initial settings use:

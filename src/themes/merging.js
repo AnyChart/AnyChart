@@ -679,7 +679,13 @@ anychart.themes.merging.mergingMap_ = (function() {
             '.resourceList'
           ]]
         ], '.background'],
-        "chart.defaultQuarterSettings"
+        'chart.defaultQuarterSettings'
+      ]
+    },
+    {
+      defaultObj: 'chart.defaultLabelSettings',
+      targets: [
+        'defaultNoDataLabel'
       ]
     },
     {
@@ -1015,6 +1021,12 @@ anychart.themes.merging.mergingMap_ = (function() {
             'vertical'
           ], 'ScrollBar']
         ]]
+      ]
+    },
+    {
+      defaultObj: 'defaultNoDataLabel',
+      targets: [
+        [['chart', 'stock.defaultPlotSettings'], '.noDataLabel']
       ]
     },
     {

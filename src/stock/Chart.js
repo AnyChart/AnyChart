@@ -2549,6 +2549,7 @@ anychart.stockModule.Chart.prototype.disposeInternal = function() {
 /** @inheritDoc */
 anychart.stockModule.Chart.prototype.serialize = function() {
   var json = anychart.stockModule.Chart.base(this, 'serialize');
+  delete json['noDataLabel'];
   json['grouping'] = this.grouping().serialize();
   json['scrollerGrouping'] = this.scrollerGrouping().serialize();
   json['xScale'] = this.xScale().serialize();

@@ -307,7 +307,8 @@ anychart.circularGaugeModule.Chart.prototype.data = function(opt_value, opt_csvS
 
       this.invalidatePointerBounds();
       this.invalidate(anychart.ConsistencyState.GAUGE_POINTERS |
-          anychart.ConsistencyState.GAUGE_SCALE,
+          anychart.ConsistencyState.GAUGE_SCALE |
+          anychart.ConsistencyState.CHART_LABELS,
           anychart.Signal.NEEDS_REDRAW |
           anychart.Signal.NEEDS_RECALCULATION);
     }
@@ -328,7 +329,8 @@ anychart.circularGaugeModule.Chart.prototype.dataInvalidated_ = function(e) {
     this.invalidatePointerBounds();
     this.invalidate(
         anychart.ConsistencyState.GAUGE_POINTERS |
-        anychart.ConsistencyState.GAUGE_SCALE,
+        anychart.ConsistencyState.GAUGE_SCALE |
+        anychart.ConsistencyState.CHART_LABELS,
         anychart.Signal.NEEDS_REDRAW |
         anychart.Signal.NEEDS_RECALCULATION);
   }
@@ -1202,6 +1204,30 @@ anychart.circularGaugeModule.Chart.prototype.drawContent = function(bounds) {
 };
 
 
+//region --- No data label
+/**
+ * Is there no data on the chart.
+ * @return {boolean}
+ */
+anychart.circularGaugeModule.Chart.prototype.isNoData = function() {
+  var rowsCount = this.getIterator().getRowsCount();
+  var countDisabled = 0;
+  var pointers = goog.array.concat(this.bars_, this.markers_, this.needles_, this.knobs_);
+  var len = pointers.length;
+  for (var i = 0; i < len; i++) {
+    var pointer = pointers[i];
+    if (pointer && !pointer.enabled())
+      countDisabled++;
+    else
+      break;
+  }
+  return (!rowsCount || !len || (countDisabled == len));
+};
+
+
+//endregion
+
+
 /** @inheritDoc */
 anychart.circularGaugeModule.Chart.prototype.setupByJSON = function(config, opt_default) {
   anychart.circularGaugeModule.Chart.base(this, 'setupByJSON', config, opt_default);
@@ -1366,4 +1392,5 @@ anychart.circularGaugeModule.Chart.prototype.getDefaultThemeObj = function() {
   proto['range'] = proto.range;
 
   proto['getType'] = proto.getType;
+  proto['noDataLabel'] = proto.noDataLabel;
 })();

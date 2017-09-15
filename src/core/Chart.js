@@ -662,6 +662,48 @@ anychart.core.Chart.prototype.setLabelSettings = function(label, bounds) {
 
 
 //endregion
+//region --- No data label
+/**
+ * No data label invalidation handler.
+ * @param {anychart.SignalEvent} e
+ * @private
+ */
+anychart.core.Chart.prototype.noDataLabelInvalidated_ = function(e) {
+  if (e.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
+    this.invalidate(anychart.ConsistencyState.CHART_LABELS, anychart.Signal.NEEDS_REDRAW);
+  }
+};
+
+
+/**
+ * Getter/eetter for no data label.
+ * @param {Object=} opt_value
+ * @return {anychart.core.Chart|anychart.core.ui.Label}
+ */
+anychart.core.Chart.prototype.noDataLabel = function(opt_value) {
+  if (!this.noDataLabel_) {
+    this.noDataLabel_ = this.createChartLabel();
+    this.noDataLabel_.listenSignals(this.noDataLabelInvalidated_, this);
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.noDataLabel_.setup(opt_value);
+    return this;
+  }
+  return this.noDataLabel_;
+};
+
+
+/**
+ * Is there no data on the chart.
+ * @return {boolean}
+ */
+anychart.core.Chart.prototype.isNoData = function() {
+  return false;
+};
+
+
+//endregion
 //region --- Calculations and statistics
 //------------------------------------------------------------------------------
 //
@@ -1533,6 +1575,7 @@ anychart.core.Chart.prototype.drawInternal = function() {
   anychart.performance.end('Chart.calculateBounds()');
   anychart.performance.start('Chart.drawContent()');
   this.drawContent(this.contentBounds);
+
   this.specialDraw(this.getPlotBounds());
 
   anychart.performance.end('Chart.drawContent()');
@@ -1559,6 +1602,15 @@ anychart.core.Chart.prototype.drawInternal = function() {
         label.draw();
       }
     }
+
+    var noDataLabel = /** @type {anychart.core.ui.Label} */ (this.noDataLabel());
+    noDataLabel.suspendSignalsDispatching();
+    noDataLabel.container(this.rootElement);
+    this.setLabelSettings(noDataLabel, this.contentBounds);
+    noDataLabel['visible'](this.isNoData());
+    noDataLabel.resumeSignalsDispatching(false);
+    noDataLabel.draw();
+
     this.markConsistent(anychart.ConsistencyState.CHART_LABELS);
   }
 
@@ -1847,6 +1899,7 @@ anychart.core.Chart.prototype.serialize = function() {
   json['bounds'] = this.bounds().serialize();
   json['animation'] = this.animation().serialize();
   json['tooltip'] = this.tooltip().serialize();
+  json['noDataLabel'] = this.noDataLabel().serialize();
   if (this.contextMenu_) {
     json['contextMenu'] = this.contextMenu()['serialize']();
   }
@@ -1903,6 +1956,7 @@ anychart.core.Chart.prototype.setupByJSON = function(config, opt_default) {
   this.right(config['right']);
   this.bottom(config['bottom']);
   this.animation(config['animation']);
+  this.noDataLabel(config['noDataLabel']);
 
   if ('tooltip' in config)
     this.tooltip().setupInternal(!!opt_default, config['tooltip']);
@@ -1923,10 +1977,11 @@ anychart.core.Chart.prototype.setupByJSON = function(config, opt_default) {
 
 /** @inheritDoc */
 anychart.core.Chart.prototype.disposeInternal = function() {
-  goog.disposeAll(this.animation_, this.a11y_, this.tooltip_);
+  goog.disposeAll(this.animation_, this.a11y_, this.tooltip_, this.noDataLabel_);
   this.animation_ = null;
   this.a11y_ = null;
   this.tooltip_ = null;
+  this.noDataLabel_ = null;
 
   anychart.core.Chart.base(this, 'disposeInternal');
 

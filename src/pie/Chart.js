@@ -511,7 +511,8 @@ anychart.pieModule.Chart.prototype.redefineView_ = function() {
       anychart.ConsistencyState.PIE_LABELS |
       anychart.ConsistencyState.CHART_LEGEND |
       anychart.ConsistencyState.A11Y |
-      anychart.ConsistencyState.PIE_DATA,
+      anychart.ConsistencyState.PIE_DATA |
+      anychart.ConsistencyState.CHART_LABELS,
       anychart.Signal.NEEDS_REDRAW |
       anychart.Signal.DATA_CHANGED
   );
@@ -2844,7 +2845,8 @@ anychart.pieModule.Chart.prototype.dataInvalidated_ = function(event) {
         anychart.ConsistencyState.APPEARANCE |
         anychart.ConsistencyState.CHART_LEGEND |
         anychart.ConsistencyState.A11Y |
-        anychart.ConsistencyState.PIE_DATA,
+        anychart.ConsistencyState.PIE_DATA |
+        anychart.ConsistencyState.CHART_LABELS,
         anychart.Signal.NEEDS_REDRAW |
         anychart.Signal.DATA_CHANGED
     );
@@ -4175,6 +4177,13 @@ anychart.pieModule.Chart.prototype.createPositionProvider = function() {
 
     return {'value': {'angle': angle, 'radius': dR}};
   }
+};
+
+
+/** @inheritDoc */
+anychart.pieModule.Chart.prototype.isNoData = function() {
+  var rowsCount = this.getIterator().getRowsCount();
+  return (!rowsCount);
 };
 
 

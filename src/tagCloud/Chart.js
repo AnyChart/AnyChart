@@ -952,7 +952,7 @@ anychart.tagCloudModule.Chart.prototype.data = function(opt_value, opt_settings)
             (goog.isArray(opt_value) || goog.isString(opt_value)) ? opt_value : null, opt_settings)).mapAs();
       }
       this.data_.listenSignals(this.dataInvalidated_, this);
-      this.invalidate(anychart.ConsistencyState.TAG_CLOUD_DATA, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.TAG_CLOUD_DATA | anychart.ConsistencyState.CHART_LABELS, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -966,7 +966,7 @@ anychart.tagCloudModule.Chart.prototype.data = function(opt_value, opt_settings)
  * @private
  */
 anychart.tagCloudModule.Chart.prototype.dataInvalidated_ = function(event) {
-  this.invalidate(anychart.ConsistencyState.TAG_CLOUD_DATA, anychart.Signal.NEEDS_REDRAW);
+  this.invalidate(anychart.ConsistencyState.TAG_CLOUD_DATA | anychart.ConsistencyState.CHART_LABELS, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -2088,6 +2088,15 @@ anychart.tagCloudModule.Chart.prototype.drawContent = function(bounds) {
 
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
+};
+
+
+//endregion
+//region --- No data
+/** @inheritDoc */
+anychart.tagCloudModule.Chart.prototype.isNoData = function() {
+  var rowsCount = this.getIterator().getRowsCount();
+  return (!rowsCount);
 };
 
 

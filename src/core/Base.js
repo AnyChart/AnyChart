@@ -192,6 +192,7 @@ anychart.ConsistencyState = {
   BACKGROUND_POINTER_EVENTS: 1 << 6,
   //---------------------------------- LABEL STATES (VB) ---------------------------------
   LABEL_BACKGROUND: 1 << 6,
+  LABEL_VISIBILITY: 1 << 7,
   //---------------------------------- LABELS FACTORY STATES (VB) ---------------------------------
   LABELS_FACTORY_BACKGROUND: 1 << 6,
   LABELS_FACTORY_HANDLERS: 1 << 7,
@@ -265,6 +266,7 @@ anychart.ConsistencyState = {
   STOCK_PLOT_LEGEND: 1 << 11,
   STOCK_PLOT_PALETTE: 1 << 12,
   STOCK_PLOT_ANNOTATIONS: 1 << 13,
+  STOCK_PLOT_NO_DATA_LABEL: 1 << 14,
   //---------------------------------- STOCK DATETIME AXIS (VB) ----------------------------------------
   STOCK_DTAXIS_BACKGROUND: 1 << 6,
   //---------------------------------- STOCK SCROLLER (SCROLLER) ----------------------------------------

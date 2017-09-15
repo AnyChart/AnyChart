@@ -518,7 +518,7 @@ anychart.resourceModule.Chart.prototype.data = function(opt_value, opt_csvSettin
         this.data_ = (this.parentViewToDispose_ = new anychart.data.Set(
             (goog.isArray(opt_value) || goog.isString(opt_value)) ? opt_value : null, opt_csvSettings)).mapAs();
       this.data_.listenSignals(this.dataInvalidated_, this);
-      this.invalidate(anychart.ConsistencyState.RESOURCE_DATA, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.RESOURCE_DATA | anychart.ConsistencyState.CHART_LABELS, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -809,7 +809,7 @@ anychart.resourceModule.Chart.prototype.resourceList = function(opt_value) {
  */
 anychart.resourceModule.Chart.prototype.dataInvalidated_ = function(e) {
   if (e.hasSignal(anychart.Signal.DATA_CHANGED)) {
-    this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.CHART_LABELS, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -1915,6 +1915,18 @@ anychart.resourceModule.Chart.prototype.getResource = function(index) {
 
 
 //endregion
+//region --- No data label
+/**
+ * Is there no data on the chart.
+ * @return {boolean}
+ */
+anychart.resourceModule.Chart.prototype.isNoData = function() {
+  var rowsCount = this.getDataIterator().getRowsCount();
+  return (!rowsCount);
+};
+
+
+//endregion
 //region --- Serialization / Deserialization / Disposing
 //------------------------------------------------------------------------------
 //
@@ -2277,6 +2289,7 @@ anychart.resourceModule.Chart.ActivityIterator.prototype.meta = function(name, o
   proto['select'] = proto.select;
   proto['selectPoint'] = proto.selectPoint;
   proto['unselect'] = proto.unselect;
+  proto['noDataLabel'] = proto.noDataLabel;
   // auto generated
   //proto['pixPerHour'] = proto.pixPerHour;
   //proto['minRowHeight'] = proto.minRowHeight;

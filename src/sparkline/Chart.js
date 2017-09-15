@@ -838,7 +838,7 @@ anychart.sparklineModule.Chart.prototype.data = function(opt_value, opt_csvSetti
       this.data_ = this.parentView_;
       this.data_.listenSignals(this.dataInvalidated_, this);
       if (this.series_)
-        this.series_.invalidate(anychart.ConsistencyState.APPEARANCE,
+        this.series_.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.CHART_LABELS,
             anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW | anychart.Signal.DATA_CHANGED);
     }
     return this;
@@ -874,7 +874,7 @@ anychart.sparklineModule.Chart.prototype.getReferenceScaleValues = function() {
  */
 anychart.sparklineModule.Chart.prototype.dataInvalidated_ = function(e) {
   if (e.hasSignal(anychart.Signal.DATA_CHANGED)) {
-    this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.DATA_CHANGED);
+    this.invalidate(anychart.ConsistencyState.CHART_LABELS, anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.DATA_CHANGED);
   }
 };
 
@@ -935,6 +935,9 @@ anychart.sparklineModule.Chart.prototype.createSeriesByType_ = function(type) {
  */
 anychart.sparklineModule.Chart.prototype.seriesInvalidated_ = function(event) {
   var state = 0;
+  if (event.hasSignal(anychart.Signal.ENABLED_STATE_CHANGED)) {
+    state |= anychart.ConsistencyState.CHART_LABELS;
+  }
   if (event.hasSignal(anychart.Signal.NEEDS_UPDATE_A11Y)) {
     state = anychart.ConsistencyState.A11Y;
   }
@@ -942,7 +945,7 @@ anychart.sparklineModule.Chart.prototype.seriesInvalidated_ = function(event) {
     state = anychart.ConsistencyState.SPARK_SERIES;
   }
   if (event.hasSignal(anychart.Signal.DATA_CHANGED)) {
-    state |= anychart.ConsistencyState.SPARK_SERIES;
+    state |= anychart.ConsistencyState.SPARK_SERIES | anychart.ConsistencyState.CHART_LABELS;
     this.invalidateSeries_();
   }
   if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION)) {
@@ -2226,6 +2229,20 @@ anychart.sparklineModule.Chart.prototype.invalidateSeries_ = function() {
 };
 
 
+//region --- No data label
+/**
+ * Is there no data on the chart.
+ * @return {boolean}
+ */
+anychart.sparklineModule.Chart.prototype.isNoData = function() {
+  var rowsCount = this.getIterator().getRowsCount();
+  return (!rowsCount || !(this.series_ && this.series_.enabled()));
+};
+
+
+//endregion
+
+
 /** @inheritDoc */
 anychart.sparklineModule.Chart.prototype.setupByJSON = function(config, opt_default) {
   anychart.sparklineModule.Chart.base(this, 'setupByJSON', config, opt_default);
@@ -2626,4 +2643,5 @@ anychart.chartTypesMap[anychart.enums.ChartTypes.SPARKLINE] = anychart.sparkline
   proto['stroke'] = proto.stroke;
 
   proto['getType'] = proto.getType;
+  proto['noDataLabel'] = proto.noDataLabel;
 })();
