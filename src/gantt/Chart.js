@@ -260,17 +260,34 @@ anychart.ganttModule.Chart.prototype.createFormatProvider = function(item, opt_p
           item.getMeta(anychart.enums.GanttDataFields.PERIODS, opt_periodIndex, anychart.enums.GanttDataFields.END) :
           void 0, type: anychart.enums.TokenType.DATE_TIME
     };
+    values['start'] = {value: values['periodStart'].value || values['minPeriodDate'].value, type: anychart.enums.TokenType.DATE_TIME};
+    values['end'] = {value: values['periodEnd'].value || values['maxPeriodDate'].value, type: anychart.enums.TokenType.DATE_TIME};
   } else {
     values['actualStart'] = {value: item.meta(anychart.enums.GanttDataFields.ACTUAL_START), type: anychart.enums.TokenType.DATE_TIME};
     values['actualEnd'] = {value: item.meta(anychart.enums.GanttDataFields.ACTUAL_END), type: anychart.enums.TokenType.DATE_TIME};
+
     var isParent = !!item.numChildren();
     var progressValue = isParent ?
         item.meta(anychart.enums.GanttDataFields.PROGRESS_VALUE) || item.get(anychart.enums.GanttDataFields.PROGRESS_VALUE) :
         item.get(anychart.enums.GanttDataFields.PROGRESS_VALUE);
+
     values['progressValue'] = {value: progressValue, type: anychart.enums.TokenType.PERCENT};
     values['autoStart'] = {value: isParent ? item.meta('autoStart') : void 0, type: anychart.enums.TokenType.DATE_TIME};
     values['autoEnd'] = {value: isParent ? item.meta('autoEnd') : void 0, type: anychart.enums.TokenType.DATE_TIME};
     values['autoProgress'] = {value: isParent ? item.meta('autoProgress') : void 0, type: anychart.enums.TokenType.PERCENT};
+
+    var progress = item.meta(anychart.enums.GanttDataFields.PROGRESS_VALUE);
+    var progressPresents = goog.isDef(progress);
+    var autoProgress = item.meta('autoProgress');
+    var autoProgressPresents = goog.isDef(autoProgress);
+    var resultProgress = progressPresents ? progress : (autoProgressPresents ? autoProgress : 0);
+    resultProgress = anychart.utils.isPercent(resultProgress) ? parseFloat(resultProgress) / 100 : Number(resultProgress);
+    values['progress'] = {value: resultProgress, type: anychart.enums.TokenType.PERCENT};
+
+    if (goog.isDef(item.get(anychart.enums.GanttDataFields.BASELINE_START)))
+      values['baselineStart'] = {value: item.get(anychart.enums.GanttDataFields.BASELINE_START), type: anychart.enums.TokenType.DATE_TIME};
+    if (goog.isDef(item.get(anychart.enums.GanttDataFields.BASELINE_END)))
+      values['baselineEnd'] = {value: item.get(anychart.enums.GanttDataFields.BASELINE_END), type: anychart.enums.TokenType.DATE_TIME};
   }
 
   this.formatProvider_

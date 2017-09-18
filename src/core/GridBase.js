@@ -826,13 +826,7 @@ anychart.core.GridBase.prototype.remove = function() {
  * @param {!Object} config
  */
 anychart.core.GridBase.prototype.setThemeSettings = function(config) {
-  for (var name in this.SIMPLE_PROPS_DESCRIPTORS) {
-    var val = config[name];
-    if (goog.isDef(val))
-      this.themeSettings[name] = val;
-  }
-  if ('enabled' in config) this.themeSettings['enabled'] = config['enabled'];
-  if ('zIndex' in config) this.themeSettings['zIndex'] = config['zIndex'];
+  anychart.core.settings.copy(this.themeSettings, this.SIMPLE_PROPS_DESCRIPTORS, config);
 };
 
 
@@ -847,7 +841,8 @@ anychart.core.GridBase.prototype.serialize = function() {
     json['zIndex'] = zIndex;
 
   var enabled = anychart.core.Base.prototype.getOption.call(this, 'enabled');
-  json['enabled'] = goog.isDef(enabled) ? enabled : null;
+  if (goog.isDef(enabled))
+    json['enabled'] = goog.isDef(enabled) ? enabled : null;
 
   anychart.core.settings.serialize(this, this.SIMPLE_PROPS_DESCRIPTORS, json, 'Map grids props');
 

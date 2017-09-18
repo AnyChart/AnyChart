@@ -18,6 +18,8 @@ goog.require('anychart.utils');
 anychart.mapModule.elements.AxisTicks = function() {
   anychart.mapModule.elements.AxisTicks.base(this, 'constructor');
 
+  delete this.themeSettings['enabled'];
+
   /**
    * Ticks enabled.
    * @type {anychart.enums.Orientation}
@@ -192,30 +194,6 @@ anychart.mapModule.elements.AxisTicks.prototype.SIMPLE_PROPS_DESCRIPTORS = (func
   return map;
 })();
 anychart.core.settings.populate(anychart.mapModule.elements.AxisTicks, anychart.mapModule.elements.AxisTicks.prototype.SIMPLE_PROPS_DESCRIPTORS);
-
-
-/** @inheritDoc */
-anychart.mapModule.elements.AxisTicks.prototype.enabled = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.ownSettings['enabled'] != opt_value) {
-      var enabled = this.ownSettings['enabled'] = opt_value;
-      this.dispatchSignal(this.getEnableChangeSignals());
-      if (enabled) {
-        this.doubleSuspension = false;
-        this.resumeSignalsDispatching(true);
-      } else {
-        if (isNaN(this.suspendedDispatching)) {
-          this.suspendSignalsDispatching();
-        } else {
-          this.doubleSuspension = true;
-        }
-      }
-    }
-    return this;
-  } else {
-    return /** @type {boolean} */(this.getOption('enabled'));
-  }
-};
 
 
 //endregion
@@ -449,54 +427,26 @@ anychart.mapModule.elements.AxisTicks.prototype.drawTick = function(value) {
  * @param {!Object} config
  */
 anychart.mapModule.elements.AxisTicks.prototype.setThemeSettings = function(config) {
-  for (var name in this.SIMPLE_PROPS_DESCRIPTORS) {
-    var val = config[name];
-    if (goog.isDef(val))
-      this.themeSettings[name] = val;
-  }
-  if ('enabled' in config) this.themeSettings['enabled'] = config['enabled'];
-  if ('zIndex' in config) this.themeSettings['zIndex'] = config['zIndex'];
-};
-
-
-/** @inheritDoc */
-anychart.mapModule.elements.AxisTicks.prototype.setupSpecial = function(isDefault, var_args) {
-  var arg0 = arguments[1];
-  if (goog.isBoolean(arg0) || goog.isNull(arg0)) {
-    if (isDefault)
-      this.themeSettings['enabled'] = !!arg0;
-    else
-      this.enabled(!!arg0);
-    return true;
-  }
-  return false;
+  anychart.core.settings.copy(this.themeSettings, this.SIMPLE_PROPS_DESCRIPTORS, config);
 };
 
 
 /** @inheritDoc */
 anychart.mapModule.elements.AxisTicks.prototype.setupByJSON = function(config, opt_default) {
+  anychart.mapModule.elements.AxisTicks.base(this, 'setupByJSON', config, opt_default);
+
   if (opt_default) {
     this.setThemeSettings(config);
   } else {
     anychart.core.settings.deserialize(this, this.SIMPLE_PROPS_DESCRIPTORS, config);
-    anychart.mapModule.elements.AxisTicks.base(this, 'setupByJSON', config);
   }
 };
 
 
 /** @inheritDoc */
 anychart.mapModule.elements.AxisTicks.prototype.serialize = function() {
-  var json = {};
-
-  var zIndex = anychart.core.Base.prototype.getOption.call(this, 'zIndex');
-  if (goog.isDef(zIndex))
-    json['zIndex'] = zIndex;
-
-  var enabled = anychart.core.Base.prototype.getOption.call(this, 'enabled');
-  json['enabled'] = goog.isDef(enabled) ? enabled : null;
-
+  var json = anychart.mapModule.elements.AxisTicks.base(this, 'serialize');
   anychart.core.settings.serialize(this, this.SIMPLE_PROPS_DESCRIPTORS, json, 'Map axis ticks props');
-
   return json;
 };
 

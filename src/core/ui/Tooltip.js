@@ -31,6 +31,8 @@ goog.require('goog.object');
 anychart.core.ui.Tooltip = function(capability) {
   anychart.core.ui.Tooltip.base(this, 'constructor');
 
+  delete this.themeSettings['enabled'];
+
   /**
    * Tooltip's capability.
    * Used to separate chart's tooltip functionality from series' tooltip and from other.
@@ -2198,49 +2200,14 @@ anychart.core.ui.Tooltip.prototype.getHighPriorityResolutionChain = function() {
  * @param {!Object} config
  */
 anychart.core.ui.Tooltip.prototype.setThemeSettings = function(config) {
-  var name;
-  for (name in this.TEXT_PROPERTY_DESCRIPTORS) {
-    var val = config[name];
-    if (goog.isDef(val))
-      this.themeSettings[name] = val;
-  }
-  for (name in this.TOOLTIP_SIMPLE_DESCRIPTORS) {
-    var val = config[name];
-    if (goog.isDef(val))
-      this.themeSettings[name] = val;
-  }
-  if ('enabled' in config) this.themeSettings['enabled'] = config['enabled'];
-};
-
-
-/** @inheritDoc */
-anychart.core.ui.Tooltip.prototype.enabled = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.ownSettings['enabled'] != opt_value) {
-      this.ownSettings['enabled'] = opt_value;
-      this.invalidate(anychart.ConsistencyState.ENABLED,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED | anychart.Signal.ENABLED_STATE_CHANGED);
-      if (this.ownSettings['enabled']) {
-        this.doubleSuspension = false;
-        this.resumeSignalsDispatching(true);
-      } else {
-        if (isNaN(this.suspendedDispatching)) {
-          this.suspendSignalsDispatching();
-        } else {
-          this.doubleSuspension = true;
-        }
-      }
-    }
-    return this;
-  } else {
-    return /** @type {boolean} */(this.getOption('enabled'));
-  }
+  anychart.core.settings.copy(this.themeSettings, this.TEXT_PROPERTY_DESCRIPTORS, config);
+  anychart.core.settings.copy(this.themeSettings, this.TOOLTIP_SIMPLE_DESCRIPTORS, config);
 };
 
 
 /** @inheritDoc */
 anychart.core.ui.Tooltip.prototype.serialize = function() {
-  var json = {};
+  var json = anychart.core.ui.Tooltip.base(this, 'serialize');
 
   anychart.core.settings.serialize(this, this.TEXT_PROPERTY_DESCRIPTORS, json);
   anychart.core.settings.serialize(this, this.TOOLTIP_SIMPLE_DESCRIPTORS, json);
@@ -2267,18 +2234,14 @@ anychart.core.ui.Tooltip.prototype.serialize = function() {
   if (goog.isDef(this.hideDelay_))
     json['hideDelay'] = this.hideDelay_;
 
-  if (goog.isDef(this.zIndex()))
-    json['zIndex'] = this.zIndex();
-
-  if (this.hasOwnOption('enabled'))
-    json['enabled'] = this.ownSettings['enabled'];
-
   return json;
 };
 
 
 /** @inheritDoc */
 anychart.core.ui.Tooltip.prototype.setupByJSON = function(config, opt_default) {
+  anychart.core.ui.Tooltip.base(this, 'setupByJSON', config, opt_default);
+
   if (opt_default) {
     this.setThemeSettings(config);
   } else {
@@ -2296,9 +2259,6 @@ anychart.core.ui.Tooltip.prototype.setupByJSON = function(config, opt_default) {
   contentConfig['position'] = contentConfig['position'] ? contentConfig['position'] : anychart.enums.Position.LEFT_TOP;
   contentConfig['anchor'] = contentConfig['anchor'] ? contentConfig['anchor'] : anychart.enums.Anchor.LEFT_TOP;
   this.contentInternal(contentConfig);
-
-  this.zIndex(config['zIndex']);
-  this.enabled(config['enabled']);
 };
 
 
@@ -2365,7 +2325,6 @@ anychart.core.ui.Tooltip.prototype.disposeInternal = function() {
   proto['separator'] = proto.separator;
   proto['background'] = proto.background;
   proto['padding'] = proto.padding;
-  proto['enabled'] = proto.enabled;
   proto['hide'] = proto.hide;
   proto['hideDelay'] = proto.hideDelay;
   proto['textSettings'] = proto.textSettings;

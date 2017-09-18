@@ -49,6 +49,8 @@ anychart.core.VisualBase = function() {
    */
   this.eventsHandler = new goog.events.EventHandler(this);
 
+  this.themeSettings['enabled'] = true;
+
   this.invalidate(anychart.ConsistencyState.ALL);
 };
 goog.inherits(anychart.core.VisualBase, anychart.core.Base);
@@ -81,14 +83,6 @@ anychart.core.VisualBase.prototype.parentBounds_ = null;
 
 
 /**
- * Z index of the element.
- * @type {number}
- * @private
- */
-anychart.core.VisualBase.prototype.zIndex_;
-
-
-/**
  * Double suspension flag.
  * @type {boolean}
  * @protected
@@ -101,15 +95,7 @@ anychart.core.VisualBase.prototype.doubleSuspension;
  * @type {number}
  * @protected
  */
-anychart.core.VisualBase.prototype.autoZIndex = 0;
-
-
-/**
- * Whether element is enabled or not.
- * @type {?boolean}
- * @private
- */
-anychart.core.VisualBase.prototype.enabled_ = true;
+anychart.core.VisualBase.prototype.autoZIndex;
 
 
 /**
@@ -119,7 +105,8 @@ anychart.core.VisualBase.prototype.enabled_ = true;
 anychart.core.VisualBase.prototype.SUPPORTED_SIGNALS =
     anychart.Signal.NEEDS_REDRAW |
     anychart.Signal.BOUNDS_CHANGED |
-    anychart.Signal.ENABLED_STATE_CHANGED;
+    anychart.Signal.ENABLED_STATE_CHANGED |
+    anychart.Signal.Z_INDEX_STATE_CHANGED;
 
 
 /**
@@ -359,13 +346,16 @@ anychart.core.VisualBase.prototype.createStage = function() {
 anychart.core.VisualBase.prototype.zIndex = function(opt_value) {
   if (goog.isDef(opt_value)) {
     var val = +opt_value || 0;
-    if (this.zIndex_ != val) {
-      this.zIndex_ = val;
-      this.invalidate(anychart.ConsistencyState.Z_INDEX, anychart.Signal.NEEDS_REDRAW);
+    if (this.ownSettings['zIndex'] != val) {
+      this.ownSettings['zIndex'] = val;
+      this.invalidate(anychart.ConsistencyState.Z_INDEX, anychart.Signal.NEEDS_REDRAW | anychart.Signal.Z_INDEX_STATE_CHANGED);
     }
     return this;
   }
-  return goog.isDef(this.zIndex_) ? this.zIndex_ : this.autoZIndex;
+  return /** @type {number} */(this.hasOwnOption('zIndex') ?
+      this.ownSettings['zIndex'] :
+      goog.isDef(this.autoZIndex) ?
+          this.autoZIndex : this.themeSettings['zIndex']);
 };
 
 
@@ -385,23 +375,22 @@ anychart.core.VisualBase.prototype.setAutoZIndex = function(value) {
  */
 anychart.core.VisualBase.prototype.enabled = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.enabled_ != opt_value) {
-      this.enabled_ = opt_value;
+    if (this.ownSettings['enabled'] !== opt_value) {
+      this.ownSettings['enabled'] = opt_value;
       this.invalidate(anychart.ConsistencyState.ENABLED, this.getEnableChangeSignals());
-      if (this.enabled_) {
-        this.doubleSuspension = false;
-        this.resumeSignalsDispatching(true);
-      } else {
-        if (isNaN(this.suspendedDispatching)) {
-          this.suspendSignalsDispatching();
-        } else {
-          this.doubleSuspension = true;
+      if (this.ownSettings['enabled']) {
+        if (this.suspendedByEnable) {
+          this.resumeSignalsDispatching(true);
         }
+        this.suspendedByEnable = false;
+      } else {
+        this.suspendSignalsDispatching();
+        this.suspendedByEnable = true;
       }
     }
     return this;
   } else {
-    return this.enabled_;
+    return /** @type {boolean} */(this.getOption('enabled'));
   }
 };
 
@@ -418,18 +407,19 @@ anychart.core.VisualBase.prototype.getEnableChangeSignals = function() {
 
 /** @inheritDoc */
 anychart.core.VisualBase.prototype.resumeSignalsDispatching = function(doDispatch) {
-  var doSpecial = this.doubleSuspension && this.suspensionLevel == 1;
+  var doSpecial = this.suspendedByEnable && this.suspensionLevel == 2;
   var realSignals;
   if (doSpecial) {
     realSignals = this.suspendedDispatching;
     this.suspendedDispatching = this.getEnableChangeSignals();
-    this.doubleSuspension = false;
+    this.suspensionLevel--;
   }
   anychart.core.VisualBase.base(this, 'resumeSignalsDispatching', doDispatch);
   if (doSpecial) {
     this.suspendSignalsDispatching();
-    if (realSignals)
+    if (realSignals) {
       this.dispatchSignal(realSignals);
+    }
   }
 
   return this;
@@ -920,9 +910,15 @@ anychart.core.VisualBase.prototype.shareWithPinterest = function(opt_linkOrOptio
 /** @inheritDoc */
 anychart.core.VisualBase.prototype.serialize = function() {
   var json = anychart.core.VisualBase.base(this, 'serialize');
-  json['enabled'] = this.enabled();
-  if (goog.isDef(this.zIndex_))
-    json['zIndex'] = this.zIndex();
+
+  var zIndex = anychart.core.Base.prototype.getOption.call(this, 'zIndex');
+  if (goog.isDef(zIndex))
+    json['zIndex'] = zIndex;
+
+  var enabled = anychart.core.Base.prototype.getOption.call(this, 'enabled');
+  if (goog.isDef(enabled))
+    json['enabled'] = enabled;
+
   return json;
 };
 
@@ -931,7 +927,10 @@ anychart.core.VisualBase.prototype.serialize = function() {
 anychart.core.VisualBase.prototype.setupSpecial = function(isDefault, var_args) {
   var arg0 = arguments[1];
   if (goog.isBoolean(arg0) || goog.isNull(arg0)) {
-    this.enabled(!!arg0);
+    if (isDefault)
+      this.themeSettings['enabled'] = !!arg0;
+    else
+      this.enabled(!!arg0);
     return true;
   }
   return false;
@@ -942,9 +941,14 @@ anychart.core.VisualBase.prototype.setupSpecial = function(isDefault, var_args) 
 anychart.core.VisualBase.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.VisualBase.base(this, 'setupByJSON', config, opt_default);
 
-  var enabled = config['enabled'];
-  this.enabled(goog.isDefAndNotNull(enabled) ? enabled : !goog.isDef(enabled) ? true : undefined);
-  this.zIndex(config['zIndex']);
+  if (opt_default) {
+    if ('enabled' in config) this.themeSettings['enabled'] = config['enabled'];
+    if ('zIndex' in config) this.themeSettings['zIndex'] = config['zIndex'];
+  } else {
+    var enabled = config['enabled'];
+    this.enabled(goog.isDefAndNotNull(enabled) ? enabled : !goog.isDef(enabled) ? true : undefined);
+    this.zIndex(config['zIndex']);
+  }
 };
 
 

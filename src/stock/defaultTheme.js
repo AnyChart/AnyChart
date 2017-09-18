@@ -410,6 +410,20 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         },
         'scale': 0
       },
+      'defaultPriceIndicatorSettings': {
+        'label': {
+          'enabled': true,
+          'background': {
+            'enabled': true,
+            'fill': '#000'
+          },
+          'fontColor': '#fff',
+          'padding': [2, 9],
+          'hAlign': 'center',
+          'fontSize': '11px'
+        },
+        'stroke': 'black'
+      },
       'xAxis': {
         'enabled': true,
         'orientation': 'bottom',

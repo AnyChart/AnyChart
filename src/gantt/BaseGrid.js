@@ -589,15 +589,30 @@ anychart.ganttModule.BaseGrid.prototype.createFormatProvider = function(item, op
           item.getMeta(anychart.enums.GanttDataFields.PERIODS, opt_periodIndex, anychart.enums.GanttDataFields.END) :
           void 0, type: anychart.enums.TokenType.DATE_TIME
     };
+    values['start'] = {value: values['periodStart'].value || values['minPeriodDate'].value, type: anychart.enums.TokenType.DATE_TIME};
+    values['end'] = {value: values['periodEnd'].value || values['maxPeriodDate'].value, type: anychart.enums.TokenType.DATE_TIME};
   } else {
     values['actualStart'] = {value: item.meta(anychart.enums.GanttDataFields.ACTUAL_START), type: anychart.enums.TokenType.DATE_TIME};
     values['actualEnd'] = {value: item.meta(anychart.enums.GanttDataFields.ACTUAL_END), type: anychart.enums.TokenType.DATE_TIME};
-    values['progressValue'] = {value: item.meta(anychart.enums.GanttDataFields.PROGRESS_VALUE), type: anychart.enums.TokenType.PERCENT};
+    values['progressValue'] = {value: item.get(anychart.enums.GanttDataFields.PROGRESS_VALUE), type: anychart.enums.TokenType.PERCENT};
 
     var isParent = !!item.numChildren();
     values['autoStart'] = {value: isParent ? item.meta('autoStart') : void 0, type: anychart.enums.TokenType.DATE_TIME};
     values['autoEnd'] = {value: isParent ? item.meta('autoEnd') : void 0, type: anychart.enums.TokenType.DATE_TIME};
     values['autoProgress'] = {value: isParent ? item.meta('autoProgress') : void 0, type: anychart.enums.TokenType.PERCENT};
+
+    var progress = item.meta(anychart.enums.GanttDataFields.PROGRESS_VALUE);
+    var progressPresents = goog.isDef(progress);
+    var autoProgress = item.meta('autoProgress');
+    var autoProgressPresents = goog.isDef(autoProgress);
+    var resultProgress = progressPresents ? progress : (autoProgressPresents ? autoProgress : 0);
+    resultProgress = anychart.utils.isPercent(resultProgress) ? parseFloat(resultProgress) / 100 : Number(resultProgress);
+    values['progress'] = {value: resultProgress, type: anychart.enums.TokenType.PERCENT};
+
+    if (goog.isDef(item.get(anychart.enums.GanttDataFields.BASELINE_START)))
+      values['baselineStart'] = {value: item.get(anychart.enums.GanttDataFields.BASELINE_START), type: anychart.enums.TokenType.DATE_TIME};
+    if (goog.isDef(item.get(anychart.enums.GanttDataFields.BASELINE_END)))
+      values['baselineEnd'] = {value: item.get(anychart.enums.GanttDataFields.BASELINE_END), type: anychart.enums.TokenType.DATE_TIME};
   }
 
   this.formatProvider_
@@ -2595,6 +2610,27 @@ goog.inherits(anychart.ganttModule.BaseGrid.Element, acgraph.vector.Path);
 
 
 /**
+ * Resets fields.
+ */
+anychart.ganttModule.BaseGrid.Element.prototype.reset = function() {
+  this.fill(null).stroke(null).clear();
+  this.currBounds = null;
+  this.type = void 0;
+  if (this.label) {
+    this.label.resetSettings();
+    this.label.enabled(false);
+    this.label.draw();
+  }
+  this.label = null;
+  this.labelPointSettings = null;
+  this.typeLabels = null;
+  this.item = null;
+  this.period = null;
+  this.periodIndex = void 0;
+};
+
+
+/**
  * Type of element. In current implementation (21 Jul 2015) can be one of timeline's bars type.
  * @type {anychart.enums.TLElementTypes|undefined}
  */
@@ -2606,4 +2642,47 @@ anychart.ganttModule.BaseGrid.Element.prototype.type;
  * @type {?anychart.math.Rect}
  */
 anychart.ganttModule.BaseGrid.Element.prototype.currBounds = null;
+
+
+/**
+ * Related element label.
+ * @type {?anychart.core.ui.LabelsFactory.Label}
+ */
+anychart.ganttModule.BaseGrid.Element.prototype.label = null;
+
+
+/**
+ * Related element label point settings.
+ * @type {?Object}
+ */
+anychart.ganttModule.BaseGrid.Element.prototype.labelPointSettings = null;
+
+
+/**
+ * Related element labels factory that contains settings by element type.
+ * Storing this field allows to avoid detecting related labels factory by type.
+ * @type {?anychart.core.ui.LabelsFactory}
+ */
+anychart.ganttModule.BaseGrid.Element.prototype.typeLabels = null;
+
+
+/**
+ * Related tree data item.
+ * @type {?(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)}
+ */
+anychart.ganttModule.BaseGrid.Element.prototype.item = null;
+
+
+/**
+ * Related period object.
+ * @type {?Object}
+ */
+anychart.ganttModule.BaseGrid.Element.prototype.period = null;
+
+
+/**
+ * Related period object.
+ * @type {number|undefined}
+ */
+anychart.ganttModule.BaseGrid.Element.prototype.periodIndex = void 0;
 

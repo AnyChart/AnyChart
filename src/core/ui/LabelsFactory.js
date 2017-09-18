@@ -30,6 +30,7 @@ goog.require('goog.math.Coordinate');
 anychart.core.ui.LabelsFactory = function() {
   this.suspendSignalsDispatching();
   anychart.core.ui.LabelsFactory.base(this, 'constructor');
+  delete this.themeSettings['enabled'];
 
   /**
    * Labels background settings.
@@ -329,14 +330,13 @@ anychart.core.settings.populate(anychart.core.ui.LabelsFactory, anychart.core.ui
 anychart.core.ui.LabelsFactory.prototype.enabled = function(opt_value) {
   if (goog.isDef(opt_value)) {
     var prevEnabledState = this.getOption('enabled');
-    this.ownSettings['enabled'] = opt_value;
     if (!goog.isNull(opt_value)) {
       if (goog.isNull(prevEnabledState) && !!opt_value) {
         this.invalidate(anychart.ConsistencyState.ENABLED, this.getEnableChangeSignals());
       }
       anychart.core.ui.LabelsFactory.base(this, 'enabled', /** @type {boolean} */(opt_value));
     } else {
-      anychart.core.ui.LabelsFactory.base(this, 'enabled', true);
+      anychart.core.ui.LabelsFactory.base(this, 'enabled', opt_value);
       this.markConsistent(anychart.ConsistencyState.ENABLED);
     }
     return this;
@@ -1131,7 +1131,9 @@ anychart.core.ui.LabelsFactory.prototype.callFormat = function(formatter, provid
     if (!goog.isDef(this.formatCallsCache_[opt_cacheIndex])) {
       if (goog.isDef(provider) && provider['series']) {
         var series = /** @type {{getIterator: Function}} */ (provider['series']);
-        series.getIterator().select(goog.isDef(provider['index']) ? provider['index'] : opt_cacheIndex);
+        var iterator = series.getIterator();
+        if (goog.isFunction(iterator.select))
+          iterator.select(goog.isDef(provider['index']) ? provider['index'] : opt_cacheIndex);
       }
       this.formatCallsCache_[opt_cacheIndex] = formatter.call(provider, provider);
     }
@@ -1237,7 +1239,6 @@ anychart.core.ui.LabelsFactory.prototype.serialize = function() {
 anychart.core.ui.LabelsFactory.prototype.setupByJSON = function(config, opt_default) {
   var enabledState = this.enabled();
   anychart.core.ui.LabelsFactory.base(this, 'setupByJSON', config, opt_default);
-
   if (opt_default) {
     anychart.core.settings.deserialize(this.themeSettings, this.TEXT_DESCRIPTORS, config);
     anychart.core.settings.deserialize(this.themeSettings, this.SIMPLE_PROPS_DESCRIPTORS, config);
@@ -1267,6 +1268,7 @@ anychart.core.ui.LabelsFactory.prototype.setupByJSON = function(config, opt_defa
  */
 anychart.core.ui.LabelsFactory.Label = function() {
   anychart.core.ui.LabelsFactory.Label.base(this, 'constructor');
+  delete this.themeSettings['enabled'];
 
   /**
    * Label index.
@@ -1562,7 +1564,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.checkInvalidationState = function
       if (settings.hasInvalidationState(state))
         return true;
     }
-  }) || this.hasInvalidationState(state));
+  }, true) || this.hasInvalidationState(state));
 };
 
 
@@ -2006,7 +2008,18 @@ anychart.core.ui.LabelsFactory.Label.prototype.getFinalSettings = function(value
     });
     return {width: adjustByWidth, height: adjustByHeight};
   } else {
-    return this.resolveSetting_(value);
+    var finalSetting = this.resolveSetting_(value);
+    var result;
+    if (value == 'padding') {
+      result = new anychart.core.utils.Padding();
+      result.setup(finalSetting);
+    } else if (value == 'background') {
+      result = new anychart.core.ui.Background();
+      result.setup(finalSetting);
+    } else {
+      result = finalSetting;
+    }
+    return result;
   }
 };
 
@@ -2019,21 +2032,27 @@ anychart.core.ui.LabelsFactory.Label.prototype.getFinalSettings = function(value
  * @private
  */
 anychart.core.ui.LabelsFactory.Label.prototype.iterateDrawingPlans_ = function(handler, opt_invert) {
-  var iterator = opt_invert ? goog.array.findRight : goog.array.find;
+  var iterator = opt_invert ? goog.array.forEachRight : goog.array.forEach;
 
   var result = void 0;
-  var ths = this;
 
   iterator(this.getDrawingPlan(), function(state, i) {
-    var stateSettings = goog.isString(state) ? state == 'auto' ? ths.autoSettings : ths.states_[state] : state;
+    var stateSettings = goog.isString(state) ? state == 'auto' ? this.autoSettings : this.states_[state] : state;
 
     if (!stateSettings)
       return;
 
-    result = handler.call(ths, state, stateSettings, i);
-    if (goog.isDef(result))
-      return true;
-  });
+    var result_ = handler.call(this, state, stateSettings, i);
+    if (goog.isDef(result_)) {
+      if (goog.isObject(result_) && !goog.isFunction(result_)) {
+        if (goog.isDefAndNotNull(result))
+          opt_invert ? goog.object.extend(result, result_) : goog.object.extend(result_, result);
+        result = result_;
+      } else {
+        result = result_;
+      }
+    }
+  }, this);
 
   return result;
 };
@@ -2063,12 +2082,13 @@ anychart.core.ui.LabelsFactory.Label.prototype.resolveSetting_ = function(field,
         setting = settings[field];
       }
     }
-
+    if (setting && goog.isFunction(setting.serialize)) {
+      setting = setting.serialize();
+    }
     if (opt_handler && goog.isDef(setting))
       setting = opt_handler(setting);
-
     return setting;
-  });
+  }, true);
 };
 
 
@@ -2474,7 +2494,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.draw = function() {
         if (parentBounds)
           return parentBounds;
       }
-    }));
+    }, true));
 
     if (!this.finalParentBounds) {
       if (factory.container()) {
@@ -2595,7 +2615,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.draw = function() {
             if (goog.isDef(settings.autoSettings['fontSize']))
               return settings.autoSettings['fontSize'];
           }
-        });
+        }, true);
       }
 
       this.suspendSignalsDispatching();

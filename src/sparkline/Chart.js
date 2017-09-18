@@ -2375,12 +2375,12 @@ anychart.sparklineModule.Chart.prototype.setupByJSON = function(config, opt_defa
   this.minHatchFill(config['minHatchFill']);
   this.negativeHatchFill(config['negativeHatchFill']);
   this.hatchFill(config['hatchFill']);
-  if (config['lastMarkers']) this.lastMarkers().setupByJSON(config['lastMarkers']);
-  if (config['firstMarkers']) this.firstMarkers().setupByJSON(config['firstMarkers']);
-  if (config['maxMarkers']) this.maxMarkers().setupByJSON(config['maxMarkers']);
-  if (config['minMarkers']) this.minMarkers().setupByJSON(config['minMarkers']);
-  if (config['negativeMarkers']) this.negativeMarkers().setupByJSON(config['negativeMarkers']);
-  if (config['markers']) this.markers().setupByJSON(config['markers']);
+  if (config['lastMarkers']) this.lastMarkers().setupInternal(!!opt_default, config['lastMarkers']);
+  if (config['firstMarkers']) this.firstMarkers().setupInternal(!!opt_default, config['firstMarkers']);
+  if (config['maxMarkers']) this.maxMarkers().setupInternal(!!opt_default, config['maxMarkers']);
+  if (config['minMarkers']) this.minMarkers().setupInternal(!!opt_default, config['minMarkers']);
+  if (config['negativeMarkers']) this.negativeMarkers().setupInternal(!!opt_default, config['negativeMarkers']);
+  if (config['markers']) this.markers().setupInternal(!!opt_default, config['markers']);
   if (config['firstLabels']) this.firstLabels().setupInternal(!!opt_default, config['firstLabels']);
   if (config['lastLabels']) this.lastLabels().setupInternal(!!opt_default, config['lastLabels']);
   if (config['maxLabels']) this.maxLabels().setupInternal(!!opt_default, config['maxLabels']);

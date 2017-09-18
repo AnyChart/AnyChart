@@ -160,15 +160,7 @@ anychart.stockModule.Series.prototype.updateComparisonZero = function() {
   if (this.supportsComparison() && !this.planIsStacked() && (scale instanceof anychart.scales.Linear)) {
     var mode = /** @type {anychart.enums.ScaleComparisonMode} */(scale.comparisonMode());
     if (mode != anychart.enums.ScaleComparisonMode.NONE) {
-      var changesFrom = /** @type {anychart.enums.ScaleCompareWithMode|number} */(scale.compareWith());
-      if (changesFrom == anychart.enums.ScaleCompareWithMode.FIRST_VISIBLE) {
-        row = this.data_.getFirstVisibleRow();
-      } else {
-        row = this.data_.getRowFromMainStorage(
-            changesFrom == anychart.enums.ScaleCompareWithMode.SERIES_START ?
-                undefined :
-                /** @type {number} */(changesFrom));
-      }
+      row = this.data_.getRowByDataSource(/** @type {anychart.enums.DataSource|number} */(scale.compareWith()));
     }
   }
   // if we have found a row to get value from - we cast it to number

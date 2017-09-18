@@ -231,33 +231,37 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'fontSize': 13,
         'text': 'Axis title',
         'fontColor': anychart.core.defaultTheme.fontColorBright,
-        'zIndex': 35
+        'zIndex': 10
       },
       'labels': {
         'enabled': true,
         'padding': 2,
         'rotation': null,
         'fontSize': 10,
-        'anchor': 'auto'
+        'anchor': 'auto',
+        'zIndex': 5
       },
       'minorLabels': {
         'padding': 2,
         'rotation': null,
         'fontSize': 9,
-        'anchor': null
+        'anchor': null,
+        'zIndex': 4
       },
       'overlapMode': 'no-overlap',
       'ticks': {
         'enabled': true,
         'length': 5,
         'position': 'outside',
-        'stroke': anychart.core.defaultTheme.colorStrokeNormal
+        'stroke': anychart.core.defaultTheme.colorStrokeNormal,
+        'zIndex': 3
       },
       'minorTicks': {
         'enabled': false,
         'length': 2,
         'position': 'outside',
-        'stroke': anychart.core.defaultTheme.colorStrokeNormal
+        'stroke': anychart.core.defaultTheme.colorStrokeNormal,
+        'zIndex': 2
       },
       'drawFirstLabel': true,
       'drawLastLabel': true,

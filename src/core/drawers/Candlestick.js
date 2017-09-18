@@ -62,6 +62,10 @@ anychart.core.drawers.Candlestick.prototype.yValueNames = (function () { return 
 
 
 /** @inheritDoc */
+anychart.core.drawers.Candlestick.prototype.valueFieldName = 'close';
+
+
+/** @inheritDoc */
 anychart.core.drawers.Candlestick.prototype.drawSubsequentPoint = function(point, state) {
   var rising = Number(point.get('open')) < Number(point.get('close'));
   var name, hatchName;
