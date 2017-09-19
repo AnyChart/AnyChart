@@ -17,6 +17,7 @@ import traceback
 import collections
 import time
 import re
+import json
 
 # region --- Project paths
 # ======================================================================================================================
@@ -60,6 +61,8 @@ CHECKS_FLAGS = os.path.join(PROJECT_PATH, 'bin', 'checks.flags')
 COMMON_FLAGS = os.path.join(PROJECT_PATH, 'bin', 'common.flags')
 BINARIES_WRAPPER_START = os.path.join(PROJECT_PATH, 'bin', 'binaries_wrapper_start.txt')
 BINARIES_WRAPPER_END = os.path.join(PROJECT_PATH, 'bin', 'binaries_wrapper_end.txt')
+GIT_CONTRIBUTORS_URL = 'https://api.github.com/repos/anychart/anychart/contributors?anon=1'
+GIT_COMPARE_URL_TEMPLATE = 'https://api.github.com/repos/AnyChart/AnyChart/compare/master...%s'
 
 
 # endregion
@@ -242,15 +245,32 @@ def __get_version():
 
 @memoize
 def __get_build_version():
-    # get commits count from git repo
-    p = subprocess.Popen(
-        ['git', 'rev-list', 'HEAD', '--count'],
+    # get current branch name
+    name_p = subprocess.Popen(
+        ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         cwd=PROJECT_PATH)
-    (output, err) = p.communicate()
-    commit_count = output.strip()
-    return '%s.%s' % (__get_version(), commit_count)
+    (name_output, name_err) = name_p.communicate()
+    branch_name = name_output.strip()
+    if branch_name == 'HEAD':
+        branch_name = os.environ['TRAVIS_BRANCH']
+
+    #see https://anychart.atlassian.net/browse/DVF-3193
+    contributors_response = urllib.urlopen(GIT_CONTRIBUTORS_URL)
+    contributors_data = json.loads(contributors_response.read())
+    contributions = 0
+    for contributor in contributors_data:
+        contributions += contributor['contributions']
+
+    git_compare_url = GIT_COMPARE_URL_TEMPLATE % (branch_name)
+    compare_response = urllib.urlopen(git_compare_url)
+    compare_data = json.loads(compare_response.read())
+    behind_by = compare_data['behind_by']
+    ahead_by = compare_data['ahead_by']
+    diff = contributions - behind_by + ahead_by
+
+    return '%s.%s' % (__get_version(), diff)
 
 
 @memoize
