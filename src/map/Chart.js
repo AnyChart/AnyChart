@@ -5248,6 +5248,7 @@ anychart.mapModule.Chart.prototype.disposeInternal = function() {
   // proto['minZoomLevel'] = proto.minZoomLevel;
   // proto['overlapMode'] = proto.overlapMode;
   proto['toGeoJSON'] = proto.toGeoJSON;
+  proto['toCsv'] = proto.toCsv;
   //series constructors generated automatically
   // proto['choropleth'] = proto.choropleth;
   // proto['bubble'] = proto.bubble;
