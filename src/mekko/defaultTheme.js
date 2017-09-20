@@ -76,6 +76,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       {
         'type': 'linear',
         'stackMode': 'percent',
+        'stackDirection': 'direct',
         'minimumGap': 0,
         'maximumGap': 0
       },

@@ -49,6 +49,13 @@ anychart.scales.Base = function() {
    * @private
    */
   this.stackMode_ = anychart.enums.ScaleStackMode.NONE;
+
+  /**
+   * Stack direction.
+   * @type {anychart.enums.ScaleStackDirection}
+   * @private
+   */
+  this.stackDirection_ = anychart.enums.ScaleStackDirection.DIRECT;
 };
 goog.inherits(anychart.scales.Base, anychart.core.Base);
 
@@ -305,6 +312,26 @@ anychart.scales.Base.prototype.stackMode = function(opt_value) {
     return this;
   }
   return this.canBeStacked ? this.stackMode_ : anychart.enums.ScaleStackMode.NONE;
+};
+
+
+/**
+ * Getter/setter for stackDirection.
+ * Accepts 'none', 'value', 'percent'.
+ * @param {(anychart.enums.ScaleStackDirection|string)=} opt_value Stack direction if used as a setter.
+ * @return {!anychart.scales.Base|anychart.enums.ScaleStackDirection} StackDirection or itself for method chaining.
+ */
+anychart.scales.Base.prototype.stackDirection = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var res = anychart.enums.normalizeScaleStackDirection(opt_value);
+    if (this.stackDirection_ != res) {
+      this.stackDirection_ = res;
+      if (this.stackMode() != anychart.enums.ScaleStackMode.NONE)
+        this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION | anychart.Signal.NEEDS_RECALCULATION);
+    }
+    return this;
+  }
+  return this.stackDirection_;
 };
 
 

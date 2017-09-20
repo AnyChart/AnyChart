@@ -2738,6 +2738,8 @@ anychart.stockModule.Plot.prototype.serialize = function() {
 
   anychart.core.settings.serialize(this, anychart.stockModule.Plot.PROPERTY_DESCRIPTORS, json);
 
+  anychart.core.settings.serialize(this, anychart.stockModule.Plot.PROPERTY_DESCRIPTORS, json);
+
   scalesIds[goog.getUid(this.yScale())] = this.yScale().serialize();
   scales.push(scalesIds[goog.getUid(this.yScale())]);
   json['yScale'] = scales.length - 1;

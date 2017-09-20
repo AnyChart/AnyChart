@@ -716,6 +716,7 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
         'interval': NaN
       },
       'stackMode': 'none',
+      'stackDirection': 'direct',
       'stickToZero': true
     },
     'ordinal': {

@@ -1487,6 +1487,27 @@ anychart.enums.normalizeDataSource = function(value) {
 };
 
 
+/**
+ * @enum {string}
+ */
+anychart.enums.ScaleStackDirection = {
+  DIRECT: 'direct',
+  REVERSE: 'reverse'
+};
+
+
+/**
+ * Normalizes scale stack direction.
+ * @param {*} value - Stack direction to normalize.
+ * @param {anychart.enums.ScaleStackDirection=} opt_default - Custom default value (defaults to DIRECT).
+ * @return {anychart.enums.ScaleStackDirection} - Normalized value.
+ */
+anychart.enums.normalizeScaleStackDirection = function(value, opt_default) {
+  return /** @type {anychart.enums.ScaleStackDirection} */(anychart.enums.normalize(anychart.enums.ScaleStackDirection, value,
+      opt_default || anychart.enums.ScaleStackDirection.DIRECT));
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  ScatterTicksMode

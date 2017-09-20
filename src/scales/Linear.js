@@ -279,6 +279,7 @@ anychart.scales.Linear.prototype.serialize = function() {
   json['ticks'] = this.ticks().serialize();
   json['minorTicks'] = this.minorTicks().serialize();
   json['stackMode'] = this.stackMode();
+  json['stackDirection'] = this.stackDirection();
   json['stickToZero'] = this.stickToZero();
   return json;
 };
@@ -290,6 +291,7 @@ anychart.scales.Linear.prototype.setupByJSON = function(config, opt_default) {
   this.ticks(config['ticks']);
   this.minorTicks(config['minorTicks']);
   this.stackMode(config['stackMode']);
+  this.stackDirection(config['stackDirection']);
   this.stickToZero(config['stickToZero']);
 };
 
@@ -326,6 +328,7 @@ anychart.scales.linear = function() {
   proto['ticks'] = proto.ticks;//doc|ex
   proto['minorTicks'] = proto.minorTicks;//doc|ex
   proto['stackMode'] = proto.stackMode;//inherited
+  proto['stackDirection'] = proto.stackDirection;//inherited
   proto['stickToZero'] = proto.stickToZero;
   proto['softMinimum'] = proto.softMinimum;
   proto['softMaximum'] = proto.softMaximum;

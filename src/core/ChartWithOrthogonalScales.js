@@ -824,7 +824,9 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateYScales = function() 
         drawingPlans = drawingPlansByYScale[yScaleUid];
         yScale = this.yScales[yScaleUid];
         var stackMode = this.getYScaleStackMode(yScale);
+        var stackDirection = /** @type {anychart.enums.ScaleStackDirection} */ (this.yScale().stackDirection());
         var yScaleStacked = stackMode != anychart.enums.ScaleStackMode.NONE;
+        var stackIsDirect = stackDirection == anychart.enums.ScaleStackDirection.DIRECT;
         var yScalePercentStacked = stackMode == anychart.enums.ScaleStackMode.PERCENT;
         var stack, stackVal;
         if (yScaleStacked) {
@@ -847,8 +849,9 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateYScales = function() 
             });
           }
         }
+
         for (i = 0; i < drawingPlans.length; i++) {
-          drawingPlan = drawingPlans[i];
+          drawingPlan = drawingPlans[stackIsDirect ? drawingPlans.length - i - 1 : i];
           series = /** @type {anychart.core.series.Cartesian} */(drawingPlan.series);
           drawingPlan.firstIndex = firstIndex;
           drawingPlan.lastIndex = lastIndex;
