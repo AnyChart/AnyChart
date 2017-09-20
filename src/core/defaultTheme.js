@@ -965,8 +965,14 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'isMinor': false,
     'drawFirstLine': true,
     'drawLastLine': true,
-    'oddFill': 'none',
-    'evenFill': 'none',
+    /**
+     * @this {*}
+     * @return {*}
+     */
+    'fill': function() {
+      return this['palette'].itemAt(this['index']);
+    },
+    'palette': ['none'],
     'stroke': anychart.core.defaultTheme.colorStrokeNormal,
     'scale': 1,
     'zIndex': 11

@@ -3516,7 +3516,7 @@ anychart.mapModule.Chart.prototype.drawContent = function(bounds) {
       for (i = 0, len = grids.length; i < len; i++) {
         grid = grids[i];
         grid.suspendSignalsDispatching();
-        grid.setScale(/** @type {anychart.mapModule.scales.Geo} */(this.scale()));
+        grid.scale(/** @type {anychart.mapModule.scales.Geo} */(this.scale()));
         grid.container(this.rootElement);
         grid.draw();
         grid.resumeSignalsDispatching(false);

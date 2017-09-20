@@ -106,13 +106,25 @@ anychart.stockModule.Plot = function(chart) {
    * @type {Array.<anychart.stockModule.Grid>}
    * @private
    */
-  this.grids_ = [];
+  this.xGrids_ = [];
 
   /**
    * @type {Array.<anychart.stockModule.Grid>}
    * @private
    */
-  this.minorGrids_ = [];
+  this.yGrids_ = [];
+
+  /**
+   * @type {Array.<anychart.stockModule.Grid>}
+   * @private
+   */
+  this.xMinorGrids_ = [];
+
+  /**
+   * @type {Array.<anychart.stockModule.Grid>}
+   * @private
+   */
+  this.yMinorGrids_ = [];
 
   /**
    * @type {acgraph.vector.Rect}
@@ -1138,13 +1150,9 @@ anychart.stockModule.Plot.prototype.invalidateRedrawable = function(doInvalidate
   }
 
   var grid;
-  for (i = 0; i < this.grids_.length; i++) {
-    grid = this.grids_[i];
-    if (grid)
-      grid.invalidate(anychart.ConsistencyState.GRIDS_POSITION);
-  }
-  for (i = 0; i < this.minorGrids_.length; i++) {
-    grid = this.minorGrids_[i];
+  var grids = goog.array.concat(this.xGrids_, this.yGrids_, this.xMinorGrids_, this.yMinorGrids_);
+  for (i = 0; i < grids.length; i++) {
+    grid = grids[i];
     if (grid)
       grid.invalidate(anychart.ConsistencyState.GRIDS_POSITION);
   }
@@ -1417,11 +1425,22 @@ anychart.stockModule.Plot.prototype.getAxisByIndex = function(index) {
 
 
 /**
+ * Return z-index for grid.
+ * @param {boolean} isMajor .
+ * @return {number}
+ */
+anychart.stockModule.Plot.prototype.getGridZIndex = function(isMajor) {
+  var themeSettings = isMajor ? this.defaultGridSettings_ : this.defaultMinorGridSettings_;
+  return themeSettings['zIndex'] + goog.array.concat(this.xGrids_, this.yGrids_, this.xMinorGrids_, this.yMinorGrids_).length * 0.001;
+};
+
+
+/**
  * @param {(Object|boolean|null|number)=} opt_indexOrValue Grid settings.
  * @param {(Object|boolean|null)=} opt_value Grid settings to set.
  * @return {!(anychart.stockModule.Grid|anychart.stockModule.Plot)} Grid instance by index or itself for method chaining.
  */
-anychart.stockModule.Plot.prototype.grid = function(opt_indexOrValue, opt_value) {
+anychart.stockModule.Plot.prototype.xGrid = function(opt_indexOrValue, opt_value) {
   var index, value;
   index = anychart.utils.toNumber(opt_indexOrValue);
   if (isNaN(index)) {
@@ -1431,13 +1450,51 @@ anychart.stockModule.Plot.prototype.grid = function(opt_indexOrValue, opt_value)
     index = /** @type {number} */(opt_indexOrValue);
     value = opt_value;
   }
-  var grid = this.grids_[index];
+  var grid = this.xGrids_[index];
   if (!grid) {
     grid = new anychart.stockModule.Grid();
-    grid.setPlot(this);
+    grid.setOwner(this);
+    grid.setDefaultLayout(anychart.enums.Layout.VERTICAL);
+    grid.setup(this.defaultGridSettings_);
+    grid.zIndex(this.getGridZIndex(true));
+    this.xGrids_[index] = grid;
+    this.registerDisposable(grid);
+    grid.listenSignals(this.onGridSignal_, this);
+    this.invalidate(anychart.ConsistencyState.STOCK_PLOT_GRIDS, anychart.Signal.NEEDS_REDRAW);
+  }
+
+  if (goog.isDef(value)) {
+    grid.setup(value);
+    return this;
+  } else {
+    return grid;
+  }
+};
+
+
+/**
+ * @param {(Object|boolean|null|number)=} opt_indexOrValue Grid settings.
+ * @param {(Object|boolean|null)=} opt_value Grid settings to set.
+ * @return {!(anychart.stockModule.Grid|anychart.stockModule.Plot)} Grid instance by index or itself for method chaining.
+ */
+anychart.stockModule.Plot.prototype.yGrid = function(opt_indexOrValue, opt_value) {
+  var index, value;
+  index = anychart.utils.toNumber(opt_indexOrValue);
+  if (isNaN(index)) {
+    index = 0;
+    value = opt_indexOrValue;
+  } else {
+    index = /** @type {number} */(opt_indexOrValue);
+    value = opt_value;
+  }
+  var grid = this.yGrids_[index];
+  if (!grid) {
+    grid = new anychart.stockModule.Grid();
+    grid.setOwner(this);
     grid.setDefaultLayout(anychart.enums.Layout.HORIZONTAL);
     grid.setup(this.defaultGridSettings_);
-    this.grids_[index] = grid;
+    grid.zIndex(this.getGridZIndex(true));
+    this.yGrids_[index] = grid;
     this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal_, this);
     this.invalidate(anychart.ConsistencyState.STOCK_PLOT_GRIDS, anychart.Signal.NEEDS_REDRAW);
@@ -1457,7 +1514,7 @@ anychart.stockModule.Plot.prototype.grid = function(opt_indexOrValue, opt_value)
  * @param {(Object|boolean|null)=} opt_value Minor grid settings to set.
  * @return {!(anychart.stockModule.Grid|anychart.stockModule.Plot)} Minor grid instance by index or itself for method chaining.
  */
-anychart.stockModule.Plot.prototype.minorGrid = function(opt_indexOrValue, opt_value) {
+anychart.stockModule.Plot.prototype.xMinorGrid = function(opt_indexOrValue, opt_value) {
   var index, value;
   index = anychart.utils.toNumber(opt_indexOrValue);
   if (isNaN(index)) {
@@ -1467,13 +1524,50 @@ anychart.stockModule.Plot.prototype.minorGrid = function(opt_indexOrValue, opt_v
     index = /** @type {number} */(opt_indexOrValue);
     value = opt_value;
   }
-  var grid = this.minorGrids_[index];
+  var grid = this.xMinorGrids_[index];
   if (!grid) {
     grid = new anychart.stockModule.Grid();
-    grid.setPlot(this);
+    grid.setOwner(this);
+    grid.setDefaultLayout(anychart.enums.Layout.VERTICAL);
+    grid.setup(this.defaultMinorGridSettings_);
+    grid.zIndex(this.getGridZIndex(false));
+    this.xMinorGrids_[index] = grid;
+    this.registerDisposable(grid);
+    grid.listenSignals(this.onGridSignal_, this);
+    this.invalidate(anychart.ConsistencyState.STOCK_PLOT_GRIDS, anychart.Signal.NEEDS_REDRAW);
+  }
+
+  if (goog.isDef(value)) {
+    grid.setup(value);
+    return this;
+  } else {
+    return grid;
+  }
+};
+
+/**
+ * @param {(Object|boolean|null|number)=} opt_indexOrValue Minor grid settings.
+ * @param {(Object|boolean|null)=} opt_value Minor grid settings to set.
+ * @return {!(anychart.stockModule.Grid|anychart.stockModule.Plot)} Minor grid instance by index or itself for method chaining.
+ */
+anychart.stockModule.Plot.prototype.yMinorGrid = function(opt_indexOrValue, opt_value) {
+  var index, value;
+  index = anychart.utils.toNumber(opt_indexOrValue);
+  if (isNaN(index)) {
+    index = 0;
+    value = opt_indexOrValue;
+  } else {
+    index = /** @type {number} */(opt_indexOrValue);
+    value = opt_value;
+  }
+  var grid = this.yMinorGrids_[index];
+  if (!grid) {
+    grid = new anychart.stockModule.Grid();
+    grid.setOwner(this);
     grid.setDefaultLayout(anychart.enums.Layout.HORIZONTAL);
     grid.setup(this.defaultMinorGridSettings_);
-    this.minorGrids_[index] = grid;
+    grid.zIndex(this.getGridZIndex(false));
+    this.yMinorGrids_[index] = grid;
     this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal_, this);
     this.invalidate(anychart.ConsistencyState.STOCK_PLOT_GRIDS, anychart.Signal.NEEDS_REDRAW);
@@ -1572,7 +1666,7 @@ anychart.stockModule.Plot.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.STOCK_PLOT_GRIDS)) {
     /** @type {Array.<anychart.stockModule.Grid>} */
-    var grids = goog.array.concat(this.grids_, this.minorGrids_);
+    var grids = goog.array.concat(this.xGrids_, this.yGrids_, this.xMinorGrids_, this.yMinorGrids_);
     for (i = 0; i < grids.length; i++) {
       var grid = grids[i];
       if (grid) {
@@ -2501,75 +2595,21 @@ anychart.stockModule.Plot.prototype.disposeInternal = function() {
 };
 
 
-/** @inheritDoc */
-anychart.stockModule.Plot.prototype.serialize = function() {
-  var json = anychart.stockModule.Plot.base(this, 'serialize');
-  var scalesIds = {};
-  var scales = [];
-  var axesIds = [];
-
-  var scale;
-  var config;
-  var objId;
-  var i;
-  var axisId;
-  var axis;
-  var axisIndex;
-  var axisScale;
-  var axisOrientation;
-  var isHorizontal;
-
-  scalesIds[goog.getUid(this.yScale())] = this.yScale().serialize();
-  scales.push(scalesIds[goog.getUid(this.yScale())]);
-  json['yScale'] = scales.length - 1;
-
-  json['defaultSeriesType'] = this.defaultSeriesType();
-  json['noDataLabel'] = this.noDataLabel().serialize();
-  json['background'] = this.background().serialize();
-
-  axesIds.push(goog.getUid(this.xAxis()));
-  json['xAxis'] = this.xAxis().serialize();
-
-  json['palette'] = this.palette().serialize();
-  json['markerPalette'] = this.markerPalette().serialize();
-  json['hatchFillPalette'] = this.hatchFillPalette().serialize();
-  json['crosshair'] = this.crosshair().serialize();
-
-  var yAxes = [];
-  for (i = 0; i < this.yAxes_.length; i++) {
-    var yAxis = this.yAxes_[i];
-    config = yAxis.serialize();
-    scale = yAxis.scale();
-    if (scale) {
-      objId = goog.getUid(scale);
-      if (!scalesIds[objId]) {
-        scalesIds[objId] = scale.serialize();
-        scales.push(scalesIds[objId]);
-        config['scale'] = scales.length - 1;
-      } else {
-        config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
-      }
-    }
-    axesIds.push(goog.getUid(yAxis));
-
-    yAxes.push(config);
-  }
-  if (yAxes.length)
-    json['yAxes'] = yAxes;
-
-  var priceIndicators = [];
-  for (i = 0; i < this.priceIndicators_.length; i++) {
-    var priceIndicator = this.priceIndicators_[i];
-    if (priceIndicator)
-      priceIndicators[i] = priceIndicator.serialize();
-  }
-  if (priceIndicators.length)
-    json['priceIndicators'] = priceIndicators;
-
-
+/**
+ * Grids serialization.
+ * @param {string} propName
+ * @param {Array.<anychart.stockModule.Grid>} list
+ * @param {!Object} json
+ * @param {Array.<Object>} scales
+ * @param {Object} scalesIds
+ * @param {Array} axesIds
+ * @private
+ */
+anychart.stockModule.Plot.prototype.serializeGrids_ = function(propName, list, json, scales, scalesIds, axesIds) {
+  var i, scale, objId, config, axis, axisId, axisIndex, axisScale, isHorizontal, axisOrientation;
   var grids = [];
-  for (i = 0; i < this.grids_.length; i++) {
-    var grid = this.grids_[i];
+  for (i = 0; i < list.length; i++) {
+    var grid = list[i];
     if (grid) {
       config = grid.serialize();
       scale = grid.scale();
@@ -2616,30 +2656,73 @@ anychart.stockModule.Plot.prototype.serialize = function() {
     }
   }
   if (grids.length)
-    json['grids'] = grids;
+    json[propName] = grids;
+};
 
-  var minorGrids = [];
-  for (i = 0; i < this.minorGrids_.length; i++) {
-    var minorGrid = this.minorGrids_[i];
-    if (minorGrid) {
-      config = minorGrid.serialize();
-      scale = minorGrid.scale();
-      if (scale) {
-        objId = goog.getUid(scale);
-        if (!scalesIds[objId]) {
-          scalesIds[objId] = scale.serialize();
-          scales.push(scalesIds[objId]);
-          config['scale'] = scales.length - 1;
-        } else {
-          config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
-        }
+
+/** @inheritDoc */
+anychart.stockModule.Plot.prototype.serialize = function() {
+  var json = anychart.stockModule.Plot.base(this, 'serialize');
+  var scalesIds = {};
+  var scales = [];
+  var axesIds = [];
+
+  var scale;
+  var config;
+  var objId;
+  var i;
+
+  scalesIds[goog.getUid(this.yScale())] = this.yScale().serialize();
+  scales.push(scalesIds[goog.getUid(this.yScale())]);
+  json['yScale'] = scales.length - 1;
+
+  json['defaultSeriesType'] = this.defaultSeriesType();
+  json['background'] = this.background().serialize();
+  json['noDataLabel'] = this.noDataLabel().serialize();
+
+  axesIds.push(goog.getUid(this.xAxis()));
+  json['xAxis'] = this.xAxis().serialize();
+
+  json['palette'] = this.palette().serialize();
+  json['markerPalette'] = this.markerPalette().serialize();
+  json['hatchFillPalette'] = this.hatchFillPalette().serialize();
+  json['crosshair'] = this.crosshair().serialize();
+
+  var yAxes = [];
+  for (i = 0; i < this.yAxes_.length; i++) {
+    var yAxis = this.yAxes_[i];
+    config = yAxis.serialize();
+    scale = yAxis.scale();
+    if (scale) {
+      objId = goog.getUid(scale);
+      if (!scalesIds[objId]) {
+        scalesIds[objId] = scale.serialize();
+        scales.push(scalesIds[objId]);
+        config['scale'] = scales.length - 1;
+      } else {
+        config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
       }
-      minorGrids.push(config);
     }
-  }
-  if (minorGrids.length)
-    json['minorGrids'] = minorGrids;
+    axesIds.push(goog.getUid(yAxis));
 
+    yAxes.push(config);
+  }
+  if (yAxes.length)
+    json['yAxes'] = yAxes;
+
+  var priceIndicators = [];
+  for (i = 0; i < this.priceIndicators_.length; i++) {
+    var priceIndicator = this.priceIndicators_[i];
+    if (priceIndicator)
+      priceIndicators[i] = priceIndicator.serialize();
+  }
+  if (priceIndicators.length)
+    json['priceIndicators'] = priceIndicators;
+
+  this.serializeGrids_('xGrids', this.xGrids_, json, scales, scalesIds, axesIds);
+  this.serializeGrids_('yGrids', this.yGrids_, json, scales, scalesIds, axesIds);
+  this.serializeGrids_('xMinorGrids', this.xMinorGrids_, json, scales, scalesIds, axesIds);
+  this.serializeGrids_('yMinorGrids', this.yMinorGrids_, json, scales, scalesIds, axesIds);
 
   var series = [];
   for (i = 0; i < this.series_.length; i++) {
@@ -2743,24 +2826,42 @@ anychart.stockModule.Plot.prototype.setupByJSON = function(config, opt_default) 
   if ('defaultPriceIndicatorSettings' in config)
     this.setDefaultPriceIndicatorSettings(config['defaultPriceIndicatorSettings']);
 
-  var grids = config['grids'];
-  if (goog.isArray(grids)) {
-    for (i = 0; i < grids.length; i++) {
-      json = grids[i];
-      this.grid(i, json);
-      if (goog.isObject(json) && 'scale' in json && json['scale'] > 1) this.grid(i).scale(scalesInstances[json['scale']]);
+  var xGrids = config['xGrids'];
+  if (goog.isArray(xGrids)) {
+    for (i = 0; i < xGrids.length; i++) {
+      json = xGrids[i];
+      this.xGrid(i, json);
+      if (goog.isObject(json) && 'scale' in json && json['scale'] > 1) this.xGrid(i).scale(scalesInstances[json['scale']]);
+    }
+  }
+
+  var yGrids = config['yGrids'];
+  if (goog.isArray(yGrids)) {
+    for (i = 0; i < yGrids.length; i++) {
+      json = yGrids[i];
+      this.yGrid(i, json);
+      if (goog.isObject(json) && 'scale' in json && json['scale'] > 1) this.yGrid(i).scale(scalesInstances[json['scale']]);
     }
   }
 
   if ('defaultMinorGridSettings' in config)
     this.setDefaultMinorGridSettings(config['defaultMinorGridSettings']);
 
-  var minorGrids = config['minorGrids'];
-  if (goog.isArray(minorGrids)) {
-    for (i = 0; i < minorGrids.length; i++) {
-      json = minorGrids[i];
-      this.minorGrid(i, json);
-      if (goog.isObject(json) && 'scale' in json && json['scale'] > 1) this.minorGrid(i).scale(scalesInstances[json['scale']]);
+  var xMinorGrids = config['xMinorGrids'];
+  if (goog.isArray(xMinorGrids)) {
+    for (i = 0; i < xMinorGrids.length; i++) {
+      json = xMinorGrids[i];
+      this.xMinorGrid(i, json);
+      if (goog.isObject(json) && 'scale' in json && json['scale'] > 1) this.xMinorGrid(i).scale(scalesInstances[json['scale']]);
+    }
+  }
+
+  var yMinorGrids = config['yMinorGrids'];
+  if (goog.isArray(yMinorGrids)) {
+    for (i = 0; i < yMinorGrids.length; i++) {
+      json = yMinorGrids[i];
+      this.yMinorGrid(i, json);
+      if (goog.isObject(json) && 'scale' in json && json['scale'] > 1) this.yMinorGrid(i).scale(scalesInstances[json['scale']]);
     }
   }
 
@@ -2953,8 +3054,10 @@ anychart.stockModule.Plot.Dragger.prototype.limitY = function(y) {
   proto['yScale'] = proto.yScale;
   proto['yAxis'] = proto.yAxis;
   proto['xAxis'] = proto.xAxis;
-  proto['grid'] = proto.grid;
-  proto['minorGrid'] = proto.minorGrid;
+  proto['xGrid'] = proto.xGrid;
+  proto['yGrid'] = proto.yGrid;
+  proto['xMinorGrid'] = proto.xMinorGrid;
+  proto['yMinorGrid'] = proto.yMinorGrid;
   proto['defaultSeriesType'] = proto.defaultSeriesType;
   proto['addSeries'] = proto.addSeries;
   proto['getSeriesAt'] = proto.getSeriesAt;

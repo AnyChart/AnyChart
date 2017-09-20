@@ -1,7 +1,7 @@
 goog.provide('anychart.cartesian3dModule.Grid');
 goog.provide('anychart.standalones.grids.Linear3d');
 goog.require('acgraph');
-goog.require('anychart.core.Grid');
+goog.require('anychart.core.GridBase');
 goog.require('anychart.core.IStandaloneBackend');
 
 
@@ -9,26 +9,17 @@ goog.require('anychart.core.IStandaloneBackend');
 /**
  * Grid.
  * @constructor
- * @extends {anychart.core.Grid}
+ * @extends {anychart.core.GridBase}
  * @implements {anychart.core.IStandaloneBackend}
  */
 anychart.cartesian3dModule.Grid = function() {
   anychart.cartesian3dModule.Grid.base(this, 'constructor');
 };
-goog.inherits(anychart.cartesian3dModule.Grid, anychart.core.Grid);
+goog.inherits(anychart.cartesian3dModule.Grid, anychart.core.GridBase);
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Line drawing.
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Draw horizontal line.
- * @param {number} ratio Scale ratio to draw grid line.
- * @param {number} shift Grid line pixel shift.
- * @protected
- */
+//region --- Drawing
+/** @inheritDoc */
 anychart.cartesian3dModule.Grid.prototype.drawLineHorizontal = function(ratio, shift) {
   var parentBounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
   /** @type {number}*/
@@ -45,12 +36,7 @@ anychart.cartesian3dModule.Grid.prototype.drawLineHorizontal = function(ratio, s
 };
 
 
-/**
- * Draw vertical line.
- * @param {number} ratio Scale ratio to draw grid line.
- * @param {number} shift Grid line pixel shift.
- * @protected
- */
+/** @inheritDoc */
 anychart.cartesian3dModule.Grid.prototype.drawLineVertical = function(ratio, shift) {
   var parentBounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
   /** @type {number}*/
@@ -67,21 +53,8 @@ anychart.cartesian3dModule.Grid.prototype.drawLineVertical = function(ratio, shi
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Interlaced drawing.
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Draw horizontal line.
- * @param {number} ratio Scale ratio to draw grid interlace.
- * @param {number} prevRatio Previous scale ratio to draw grid interlace.
- * @param {string} fillSettings Interlace fill settings.
- * @param {acgraph.vector.Path} path Layer to draw interlace.
- * @param {number} shift Grid line pixel shift.
- * @protected
- */
-anychart.cartesian3dModule.Grid.prototype.drawInterlaceHorizontal = function(ratio, prevRatio, fillSettings, path, shift) {
+/** @inheritDoc */
+anychart.cartesian3dModule.Grid.prototype.drawInterlaceHorizontal = function(ratio, prevRatio, path, shift) {
   if (!isNaN(prevRatio)) {
     var parentBounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
     var y1, y2, checkIndex;
@@ -103,16 +76,8 @@ anychart.cartesian3dModule.Grid.prototype.drawInterlaceHorizontal = function(rat
 };
 
 
-/**
- * Draw horizontal line.
- * @param {number} ratio Scale ratio to draw grid interlace.
- * @param {number} prevRatio Previous scale ratio to draw grid interlace.
- * @param {string} fillSettings Interlace fill settings.
- * @param {acgraph.vector.Path} path Layer to draw interlace.
- * @param {number} shift Grid line pixel shift.
- * @protected
- */
-anychart.cartesian3dModule.Grid.prototype.drawInterlaceVertical = function(ratio, prevRatio, fillSettings, path, shift) {
+/** @inheritDoc */
+anychart.cartesian3dModule.Grid.prototype.drawInterlaceVertical = function(ratio, prevRatio, path, shift) {
   if (!isNaN(prevRatio)) {
     var parentBounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
     var x1, x2, checkIndex;
@@ -134,6 +99,7 @@ anychart.cartesian3dModule.Grid.prototype.drawInterlaceVertical = function(ratio
 };
 
 
+//endregion
 //region --- Standalone
 //------------------------------------------------------------------------------
 //
@@ -145,7 +111,6 @@ anychart.cartesian3dModule.Grid.prototype.drawInterlaceVertical = function(ratio
  * @extends {anychart.cartesian3dModule.Grid}
  */
 anychart.standalones.grids.Linear3d = function() {
-  anychart.standalones.grids.Linear3d.base(this, 'constructor');
   anychart.standalones.grids.Linear3d.base(this, 'constructor');
 };
 goog.inherits(anychart.standalones.grids.Linear3d, anychart.cartesian3dModule.Grid);
@@ -164,11 +129,19 @@ anychart.standalones.grids.linear3d = function() {
 
 
 //endregion
-//exports
+//region --- Exports
 (function() {
-  var proto = anychart.standalones.grids.Linear.prototype;
-  goog.exportSymbol('anychart.standalones.grids.linear', anychart.standalones.grids.linear);
+  var proto = anychart.cartesian3dModule.Grid.prototype;
+  proto['isHorizontal'] = proto.isHorizontal;
+  proto['scale'] = proto.scale;
+  proto['axis'] = proto.axis;
+  // proto['isMinor'] = proto.isMinor;
+
+  proto = anychart.standalones.grids.Linear3d.prototype;
+  goog.exportSymbol('anychart.standalones.grids.linear3d', anychart.standalones.grids.linear3d);
+  proto['layout'] = proto.layout;
   proto['draw'] = proto.draw;
   proto['parentBounds'] = proto.parentBounds;
   proto['container'] = proto.container;
 })();
+//endregion

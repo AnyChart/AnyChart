@@ -4,7 +4,7 @@ goog.require('anychart'); // otherwise we can't use anychart.chartTypesMap objec
 goog.require('anychart.colorScalesModule.Ordinal');
 goog.require('anychart.core.Axis');
 goog.require('anychart.core.CartesianBase');
-goog.require('anychart.core.Grid');
+goog.require('anychart.core.GridBase');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.ChartScroller');
 goog.require('anychart.core.utils.IZoomableChart');
@@ -841,7 +841,8 @@ anychart.heatmapModule.Chart.prototype.disposeInternal = function() {
 (function() {
   var proto = anychart.heatmapModule.Chart.prototype;
   proto['getType'] = proto.getType;
-  proto['grid'] = proto.grid;
+  proto['xGrid'] = proto.xGrid;
+  proto['yGrid'] = proto.yGrid;
   proto['xAxis'] = proto.xAxis;
   proto['yAxis'] = proto.yAxis;
   proto['xScale'] = proto.xScale;
