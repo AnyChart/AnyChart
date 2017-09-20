@@ -463,21 +463,35 @@ anychart.paretoModule.Chart.prototype.createSeriesInstance = function(type, conf
 
 //endregion
 //region --- Scales
-/** @inheritDoc */
-anychart.paretoModule.Chart.prototype.checkXScaleType = function(scale) {
-  var res = (scale instanceof anychart.scales.Ordinal) && !scale.isColorScale();
-  if (!res)
-    anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['Pareto chart xScale', 'ordinal']);
-  return res;
+/**
+ * @return {anychart.scales.Base.ScaleTypes}
+ */
+anychart.paretoModule.Chart.prototype.getXScaleAllowedTypes = function() {
+  return anychart.scales.Base.ScaleTypes.ORDINAL;
 };
 
 
-/** @inheritDoc */
-anychart.paretoModule.Chart.prototype.checkYScaleType = function(scale) {
-  var res = (scale instanceof anychart.scales.ScatterBase) && !scale.isColorScale();
-  if (!res)
-    anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['Pareto chart yScale', 'scatter', 'linear, log']);
-  return res;
+/**
+ * @return {Array}
+ */
+anychart.paretoModule.Chart.prototype.getXScaleWrongTypeError = function() {
+  return ['Pareto chart xScale', 'ordinal'];
+};
+
+
+/**
+ * @return {anychart.scales.Base.ScaleTypes}
+ */
+anychart.paretoModule.Chart.prototype.getYScaleAllowedTypes = function() {
+  return anychart.scales.Base.ScaleTypes.SCATTER;
+};
+
+
+/**
+ * @return {Array}
+ */
+anychart.paretoModule.Chart.prototype.getYScaleWrongTypeError = function() {
+  return ['Pareto chart yScale', 'scatter', 'linear, log'];
 };
 
 

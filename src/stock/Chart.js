@@ -791,12 +791,20 @@ anychart.stockModule.Chart.prototype.getSelectedRange = function() {
 /**
  * Stock chart X scale getter and setter. It is a misconfiguration if you use it as a setter with anything but a string.
  * We can consider a warning for that.
- * @param {string=} opt_value
+ * @param {(string|Object)=} opt_value
  * @return {anychart.stockModule.scales.Scatter|anychart.stockModule.Chart}
  */
 anychart.stockModule.Chart.prototype.xScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    var askedForScatter = anychart.stockModule.scales.Scatter.askedForScatter(opt_value);
+    var newType;
+    if (goog.isString(opt_value)) {
+      newType = opt_value;
+    } else if (goog.isObject(opt_value)) {
+      // for now only the type of the scale can be changed by the object setter
+      newType = opt_value['type'];
+    }
+    newType = String(newType).toLowerCase();
+    var askedForScatter = newType == 'scatter';
     var currIsScatter = this.xScale_ && !(this.xScale_ instanceof anychart.stockModule.scales.Ordinal);
     if (askedForScatter != currIsScatter) {
       if (askedForScatter) {

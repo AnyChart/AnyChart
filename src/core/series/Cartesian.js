@@ -184,20 +184,24 @@ anychart.core.series.Cartesian.prototype.getCategoryWidth = function(opt_categor
 
 /**
  * Getter/setter for xScale.
- * @param {anychart.scales.Base=} opt_value Value to set.
+ * @param {(anychart.scales.Base|Object|anychart.enums.ScaleTypes)=} opt_value Value to set.
  * @return {(anychart.scales.Base|!anychart.core.series.Cartesian)} Series X Scale or itself for chaining call.
  */
 anychart.core.series.Cartesian.prototype.xScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (!(opt_value instanceof anychart.scales.Base))
-      opt_value = null;
-    if (this.xScale_ != opt_value) {
+    if (opt_value) {
+      var val = anychart.scales.Base.setupScale(this.xScale_, opt_value, null,
+          anychart.scales.Base.ScaleTypes.ALL_DEFAULT, null, this.scaleInvalidated, this);
+      if (val) {
+        var dispatch = this.xScale_ == val;
+        this.xScale_ = /** @type {anychart.scales.Base} */(val);
+        this.xScale_.resumeSignalsDispatching(dispatch);
+      }
+    } else if (this.xScale_) {
       if (this.xScale_)
         this.xScale_.unlistenSignals(this.scaleInvalidated, this);
-      this.xScale_ = opt_value;
-      if (this.xScale_)
-        this.xScale_.listenSignals(this.scaleInvalidated, this);
-      this.invalidate(anychart.ConsistencyState.APPEARANCE,
+      this.xScale_ = null;
+      this.invalidate(anychart.ConsistencyState.SERIES_POINTS,
           anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW);
     }
     return this;

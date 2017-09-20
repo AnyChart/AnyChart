@@ -395,16 +395,17 @@ anychart.polarModule.Axis.prototype.fill = function(opt_fillOrColorOrKeys, opt_o
 
 
 /**
- * @param {anychart.scales.Base=} opt_value Scale.
+ * @param {(anychart.scales.Base|anychart.enums.ScaleTypes|Object)=} opt_value Scale.
  * @return {anychart.scales.Base|!anychart.polarModule.Axis} Axis scale or itself for method chaining.
  */
 anychart.polarModule.Axis.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.scale_ != opt_value) {
-      this.scale_ = opt_value;
-      this.scale_.listenSignals(this.scaleInvalidated_, this);
-      this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-      this.dropBoundsCache_();
+    var val = anychart.scales.Base.setupScale(this.scale_, opt_value, null,
+        anychart.scales.Base.ScaleTypes.ALL_DEFAULT, null, this.scaleInvalidated_, this);
+    if (val) {
+      var dispatch = this.scale_ == val;
+      this.scale_ = /** @type {anychart.scales.Base} */(val);
+      this.scale_.resumeSignalsDispatching(dispatch);
     }
     return this;
   } else {

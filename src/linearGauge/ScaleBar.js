@@ -137,20 +137,19 @@ anychart.linearGaugeModule.ScaleBar.prototype.scaleInvalidated_ = function(event
 
 /**
  * Getter/setter for led color scale.
- * @param {(anychart.colorScalesModule.Linear|anychart.colorScalesModule.Ordinal)=} opt_value Led color scale.
+ * @param {(anychart.colorScalesModule.Linear|anychart.colorScalesModule.Ordinal|Object|anychart.enums.ScaleTypes)=} opt_value Led color scale.
  * @return {anychart.linearGaugeModule.ScaleBar|anychart.colorScalesModule.Linear|anychart.colorScalesModule.Ordinal} color scale or self for chaining.
  */
 anychart.linearGaugeModule.ScaleBar.prototype.colorScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.colorScale_ != opt_value) {
-      if (this.colorScale_)
-        this.colorScale_.unlistenSignals(this.colorScaleInvalidated_, this);
-      this.colorScale_ = opt_value;
-      if (this.colorScale_)
-        this.colorScale_.listenSignals(this.colorScaleInvalidated_, this);
+    var val = anychart.scales.Base.setupScale(this.colorScale_, opt_value, null,
+        anychart.scales.Base.ScaleTypes.COLOR_SCALES, null, this.colorScaleInvalidated_, this);
+    if (val) {
+      this.colorScale_ = /** @type {anychart.scales.Base} */(val);
+      var dispatch = this.colorScale_ == val;
       this.fill_ = null;
       this.stroke_ = null;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+      this.colorScale_.resumeSignalsDispatching(dispatch);
     }
     return this;
   }

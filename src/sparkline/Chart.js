@@ -645,16 +645,15 @@ anychart.sparklineModule.Chart.prototype.iterator_;
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Getter/setter for xScale.
- * @param {(anychart.enums.ScaleTypes|anychart.scales.Base)=} opt_value X Scale to set.
+ * @param {(anychart.enums.ScaleTypes|Object|anychart.scales.Base)=} opt_value X Scale to set.
  * @return {!(anychart.scales.Base|anychart.sparklineModule.Chart)} Default chart scale value or itself for method chaining.
  */
 anychart.sparklineModule.Chart.prototype.xScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (goog.isString(opt_value)) {
-      opt_value = anychart.scales.Base.fromString(opt_value, true);
-    }
-    if (this.xScale_ != opt_value) {
-      this.xScale_ = opt_value;
+    var val = anychart.scales.Base.setupScale(this.xScale_, opt_value, null, anychart.scales.Base.ScaleTypes.ALL_DEFAULT);
+    if (val) {
+      this.xScale_ = val;
+      this.xScale_.resumeSignalsDispatching(false);
       this.invalidate(anychart.ConsistencyState.SPARK_SCALES, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
@@ -669,16 +668,15 @@ anychart.sparklineModule.Chart.prototype.xScale = function(opt_value) {
 
 /**
  * Getter/setter for yScale.
- * @param {(anychart.enums.ScaleTypes|anychart.scales.Base)=} opt_value Y Scale to set.
+ * @param {(anychart.enums.ScaleTypes|Object|anychart.scales.Base)=} opt_value Y Scale to set.
  * @return {!(anychart.scales.Base|anychart.sparklineModule.Chart)} Default chart scale value or itself for method chaining.
  */
 anychart.sparklineModule.Chart.prototype.yScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (goog.isString(opt_value)) {
-      opt_value = anychart.scales.Base.fromString(opt_value, false);
-    }
-    if (this.yScale_ != opt_value) {
-      this.yScale_ = opt_value;
+    var val = anychart.scales.Base.setupScale(this.yScale_, opt_value, null, anychart.scales.Base.ScaleTypes.ALL_DEFAULT);
+    if (val) {
+      this.yScale_ = val;
+      this.yScale_.resumeSignalsDispatching(false);
       this.invalidate(anychart.ConsistencyState.SPARK_SCALES, anychart.Signal.NEEDS_REDRAW);
     }
     return this;

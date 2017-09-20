@@ -1390,19 +1390,23 @@ anychart.core.series.Base.prototype.getXScale = function() {
 
 /**
  * Getter/setter for yScale.
- * @param {anychart.scales.Base=} opt_value Value to set.
+ * @param {(anychart.scales.Base|Object|anychart.enums.ScaleTypes)=} opt_value Value to set.
  * @return {(anychart.scales.Base|anychart.core.series.Base)} Series Y Scale or itself for chaining call.
  */
 anychart.core.series.Base.prototype.yScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (!(opt_value instanceof anychart.scales.Base))
-      opt_value = null;
-    if (this.yScale_ != opt_value) {
+    if (opt_value) {
+      var val = anychart.scales.Base.setupScale(this.yScale_, opt_value, null,
+          anychart.scales.Base.ScaleTypes.ALL_DEFAULT, null, this.scaleInvalidated, this);
+      if (val) {
+        var dispatch = this.yScale_ == val;
+        this.yScale_ = /** @type {anychart.scales.Base} */(val);
+        this.yScale_.resumeSignalsDispatching(dispatch);
+      }
+    } else if (this.yScale_) {
       if (this.yScale_)
         this.yScale_.unlistenSignals(this.scaleInvalidated, this);
-      this.yScale_ = opt_value;
-      if (this.yScale_)
-        this.yScale_.listenSignals(this.scaleInvalidated, this);
+      this.yScale_ = null;
       this.invalidate(anychart.ConsistencyState.SERIES_POINTS,
           anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW);
     }

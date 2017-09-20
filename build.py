@@ -266,8 +266,9 @@ def __get_build_version():
     git_compare_url = GIT_COMPARE_URL_TEMPLATE % (branch_name)
     compare_response = urllib.urlopen(git_compare_url)
     compare_data = json.loads(compare_response.read())
-    behind_by = compare_data['behind_by']
-    ahead_by = compare_data['ahead_by']
+
+    behind_by = compare_data.get('behind_by', 0)
+    ahead_by = compare_data.get('ahead_by', 0)
     diff = contributions - behind_by + ahead_by
 
     return '%s.%s' % (__get_version(), diff)

@@ -128,33 +128,24 @@ anychart.mekkoModule.Chart.prototype.seriesInvalidated = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Getter/setter for firstCategoriesScale.
- * @param {anychart.scales.Ordinal=} opt_value Ordinal scale to set.
+ * @param {(anychart.scales.Ordinal|anychart.enums.ScaleTypes|Object)=} opt_value Ordinal scale to set.
  * @return {!(anychart.scales.Ordinal|anychart.mekkoModule.Chart)}
  */
 anychart.mekkoModule.Chart.prototype.firstCategoriesScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.scales.Ordinal && this.firstCategoriesScale_ != opt_value) {
-      if (this.firstCategoriesScale_)
-        this.firstCategoriesScale_.unlistenSignals(this.categoriesScaleInvalidated, this);
-      this.firstCategoriesScale_ = opt_value;
-      if (this.firstCategoriesScale_)
-        this.firstCategoriesScale_.listenSignals(this.categoriesScaleInvalidated, this);
-
-      var state = anychart.ConsistencyState.SCALE_CHART_SCALES |
-          anychart.ConsistencyState.SCALE_CHART_Y_SCALES |
-          anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS;
-      if ((this.allowLegendCategoriesMode() && this.legend().itemsSourceMode() == anychart.enums.LegendItemsSourceMode.CATEGORIES) ||
-          this.barmekkoMode_) {
-        state |= anychart.ConsistencyState.CHART_LEGEND;
-      }
-      this.invalidate(state, anychart.Signal.NEEDS_REDRAW | anychart.ConsistencyState.MEKKO_CATEGORY_SCALE);
+    var val = /** @type {?anychart.scales.Ordinal} */(anychart.scales.Base.setupScale(this.firstCategoriesScale_, opt_value, anychart.enums.ScaleTypes.ORDINAL,
+        anychart.scales.Base.ScaleTypes.ORDINAL, null, this.categoriesScaleInvalidated, this));
+    if (val) {
+      var dispatch = this.firstCategoriesScale_ == val;
+      this.firstCategoriesScale_ = val;
+      this.firstCategoriesScale_.resumeSignalsDispatching(dispatch);
     }
     return this;
   }
-
   if (!this.firstCategoriesScale_) {
-    this.firstCategoriesScale_ = /** @type {anychart.scales.Ordinal} */(this.createScaleByType('ordinal', true, false));
-    this.firstCategoriesScale_.listenSignals(this.categoriesScaleInvalidated, this);
+    this.firstCategoriesScale_ = /** @type {anychart.scales.Ordinal} */(anychart.scales.Base.setupScale(this.firstCategoriesScale_, {}, anychart.enums.ScaleTypes.ORDINAL,
+        anychart.scales.Base.ScaleTypes.ORDINAL, null, this.categoriesScaleInvalidated, this));
+    this.firstCategoriesScale_.resumeSignalsDispatching(false);
   }
   return /** @type {!anychart.scales.Ordinal} */(this.firstCategoriesScale_);
 };
@@ -162,29 +153,24 @@ anychart.mekkoModule.Chart.prototype.firstCategoriesScale = function(opt_value) 
 
 /**
  * Getter/setter for lastCategoriesScale.
- * @param {anychart.scales.Ordinal=} opt_value Ordinal scale to set.
+ * @param {(anychart.scales.Ordinal|anychart.enums.ScaleTypes|Object)=} opt_value Ordinal scale to set.
  * @return {!(anychart.scales.Ordinal|anychart.mekkoModule.Chart)}
  */
 anychart.mekkoModule.Chart.prototype.lastCategoriesScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.scales.Ordinal && this.lastCategoriesScale_ != opt_value) {
-      if (this.lastCategoriesScale_)
-        this.lastCategoriesScale_.unlistenSignals(this.categoriesScaleInvalidated, this);
-      this.lastCategoriesScale_ = opt_value;
-      if (this.lastCategoriesScale_)
-        this.lastCategoriesScale_.listenSignals(this.categoriesScaleInvalidated, this);
-
-      var state = anychart.ConsistencyState.SCALE_CHART_SCALES |
-          anychart.ConsistencyState.SCALE_CHART_Y_SCALES |
-          anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS;
-      this.invalidate(state, anychart.Signal.NEEDS_REDRAW | anychart.ConsistencyState.MEKKO_CATEGORY_SCALE);
+    var val = /** @type {?anychart.scales.Ordinal} */(anychart.scales.Base.setupScale(this.lastCategoriesScale_, opt_value, anychart.enums.ScaleTypes.ORDINAL,
+        anychart.scales.Base.ScaleTypes.ORDINAL, null, this.categoriesScaleInvalidated, this));
+    if (val) {
+      var dispatch = this.lastCategoriesScale_ == val;
+      this.lastCategoriesScale_ = val;
+      this.lastCategoriesScale_.resumeSignalsDispatching(dispatch);
     }
     return this;
   }
-
   if (!this.lastCategoriesScale_) {
-    this.lastCategoriesScale_ = /** @type {anychart.scales.Ordinal} */(this.createScaleByType('ordinal', true, false));
-    this.lastCategoriesScale_.listenSignals(this.categoriesScaleInvalidated, this);
+    this.lastCategoriesScale_ = /** @type {anychart.scales.Ordinal} */(anychart.scales.Base.setupScale(this.lastCategoriesScale_, {}, anychart.enums.ScaleTypes.ORDINAL,
+        anychart.scales.Base.ScaleTypes.ORDINAL, null, this.categoriesScaleInvalidated, this));
+    this.lastCategoriesScale_.resumeSignalsDispatching(false);
   }
   return /** @type {!anychart.scales.Ordinal} */(this.lastCategoriesScale_);
 };
@@ -211,12 +197,43 @@ anychart.mekkoModule.Chart.prototype.categoriesScaleInvalidated = function(event
 };
 
 
-/** @inheritDoc */
-anychart.mekkoModule.Chart.prototype.checkXScaleType = function(scale) {
-  var res = (scale instanceof anychart.scales.Ordinal) && !scale.isColorScale();
-  if (!res)
-    anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['Mekko chart X scale', 'ordinal']);
-  return res;
+/**
+ * @return {anychart.scales.Base.ScaleTypes}
+ */
+anychart.mekkoModule.Chart.prototype.getXScaleAllowedTypes = function() {
+  return anychart.scales.Base.ScaleTypes.ORDINAL;
+};
+
+
+/**
+ * @return {Array}
+ */
+anychart.mekkoModule.Chart.prototype.getXScaleWrongTypeError = function() {
+  return ['Mekko chart X scale', 'ordinal'];
+};
+
+
+/**
+ * @return {anychart.enums.ScaleTypes}
+ */
+anychart.mekkoModule.Chart.prototype.getYScaleDefaultType = function() {
+  return anychart.enums.ScaleTypes.LINEAR;
+};
+
+
+/**
+ * @return {anychart.scales.Base.ScaleTypes}
+ */
+anychart.mekkoModule.Chart.prototype.getYScaleAllowedTypes = function() {
+  return anychart.scales.Base.ScaleTypes.ALL_DEFAULT;
+};
+
+
+/**
+ * @return {Array}
+ */
+anychart.mekkoModule.Chart.prototype.getYScaleWrongTypeError = function() {
+  return ['Chart scale', 'ordinal, linear, log, datetime'];
 };
 
 

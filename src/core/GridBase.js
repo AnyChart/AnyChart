@@ -443,11 +443,11 @@ anychart.core.GridBase.prototype.getOwner = function() {
  */
 anychart.core.GridBase.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.scale_ != opt_value) {
-      this.scale_ = opt_value;
-      (/** @type {anychart.core.Base} */(this.scale_)).listenSignals(this.scaleInvalidated, this);
-      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION | anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    var val = anychart.scales.Base.setupScale(this.scale_, opt_value, null, anychart.scales.Base.ScaleTypes.ALL_DEFAULT, null, this.scaleInvalidated, this);
+    if (val) {
+      var dispatch = this.scale_ == val;
+      this.scale_ = val;
+      val.resumeSignalsDispatching(dispatch);
     }
     return this;
   } else {

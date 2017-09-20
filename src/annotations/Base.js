@@ -266,19 +266,22 @@ anychart.annotationsModule.Base.prototype.getPlot = function() {
 
 /**
  * Getter/setter for an yScale.
- * @param {anychart.scales.Base=} opt_value
+ * @param {(anychart.scales.Base|Object|anychart.enums.ScaleTypes)=} opt_value
  * @return {anychart.annotationsModule.Base|anychart.scales.Base}
  */
 anychart.annotationsModule.Base.prototype.yScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = opt_value || null;
-    if (this.yScale_ != opt_value) {
-      if (this.yScale_)
+    var val = anychart.scales.Base.setupScale(this.yScale_, opt_value, null, anychart.scales.Base.ScaleTypes.ALL_DEFAULT, null, this.scaleSignalHandler_, this);
+    if (val || goog.isNull(opt_value)) {
+      var dispatch = this.yScale_ == val;
+      if (!val)
         this.yScale_.unlistenSignals(this.scaleSignalHandler_, this);
-      this.yScale_ = opt_value;
-      if (this.yScale_)
-        this.yScale_.listenSignals(this.scaleSignalHandler_, this);
-      this.invalidate(anychart.ConsistencyState.ANNOTATIONS_ANCHORS, anychart.Signal.NEEDS_REDRAW);
+      this.yScale_ = val;
+      if (val) {
+        val.resumeSignalsDispatching(dispatch);
+      } else {
+        this.invalidate(anychart.ConsistencyState.ANNOTATIONS_ANCHORS, anychart.Signal.NEEDS_REDRAW);
+      }
     }
     return this;
   }
@@ -288,19 +291,25 @@ anychart.annotationsModule.Base.prototype.yScale = function(opt_value) {
 
 /**
  * Getter/setter for an yScale.
- * @param {anychart.scales.Base|anychart.stockModule.scales.Scatter=} opt_value
+ * @param {(anychart.scales.Base|anychart.stockModule.scales.Scatter|Object|anychart.enums.ScaleTypes)=} opt_value
  * @return {anychart.annotationsModule.Base|anychart.scales.Base|anychart.stockModule.scales.Scatter}
  */
 anychart.annotationsModule.Base.prototype.xScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = opt_value || null;
-    if (this.xScale_ != opt_value) {
-      if (this.xScale_)
+    var scType = opt_value && goog.isFunction(opt_value.getType) && opt_value.getType();
+    var stockScale = scType == anychart.enums.ScaleTypes.STOCK_SCATTER_DATE_TIME || scType == anychart.enums.ScaleTypes.STOCK_ORDINAL_DATE_TIME;
+    var val = stockScale ? opt_value :
+        anychart.scales.Base.setupScale(this.yScale_, opt_value, null, anychart.scales.Base.ScaleTypes.ALL_DEFAULT, null, this.scaleSignalHandler_, this);
+    if (val || goog.isNull(opt_value)) {
+      var dispatch = this.xScale_ == val;
+      if (!val)
         (/** @type {anychart.core.Base} */(this.xScale_)).unlistenSignals(this.scaleSignalHandler_, this);
-      this.xScale_ = opt_value;
-      if (this.xScale_)
-        this.xScale_.listenSignals(this.scaleSignalHandler_, this);
-      this.invalidate(anychart.ConsistencyState.ANNOTATIONS_ANCHORS, anychart.Signal.NEEDS_REDRAW);
+      this.xScale_ = /** @type {anychart.scales.Base|anychart.stockModule.scales.Scatter} */(val);
+      if (stockScale || !val) {
+        this.invalidate(anychart.ConsistencyState.ANNOTATIONS_ANCHORS, anychart.Signal.NEEDS_REDRAW);
+      } else {
+        val.resumeSignalsDispatching(dispatch);
+      }
     }
     return this;
   }

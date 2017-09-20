@@ -537,23 +537,21 @@ anychart.core.Axis.prototype.setDefaultOrientation = function(value) {
 
 /**
  * Getter/setter for scale.
- * @param {anychart.scales.Base=} opt_value Scale.
+ * @param {(anychart.scales.Base|Object|anychart.enums.ScaleTypes)=} opt_value Scale.
  * @return {anychart.scales.Base|!anychart.core.Axis} Axis scale or itself for method chaining.
  */
 anychart.core.Axis.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.internalScale != opt_value) {
-      if (this.internalScale)
-        this.internalScale.unlistenSignals(this.scaleInvalidated_, this);
-      this.internalScale = opt_value;
-      if (this.internalScale)
-        this.internalScale.listenSignals(this.scaleInvalidated_, this);
+    var val = anychart.scales.Base.setupScale(this.internalScale, opt_value, null, anychart.scales.Base.ScaleTypes.ALL_DEFAULT, null, this.scaleInvalidated_, this);
+    if (val) {
+      var dispatch = this.internalScale == val;
+      this.internalScale = val;
       this.dropStaggeredLabelsCache_();
       this.dropOverlappedLabelsCache_();
       this.dropBoundsCache();
       this.labels().clear();
       this.minorLabels().clear();
-      this.invalidate(this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      val.resumeSignalsDispatching(dispatch);
     }
     return this;
   } else {

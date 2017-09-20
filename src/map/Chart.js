@@ -1984,18 +1984,26 @@ anychart.mapModule.Chart.prototype.getPlotBounds = function() {
 //region --- Geo settings
 /**
  * Map scale.
- * @param {anychart.mapModule.scales.Geo=} opt_value Scale to set.
+ * @param {(anychart.mapModule.scales.Geo|Object)=} opt_value Scale to set.
  * @return {!(anychart.mapModule.scales.Geo|anychart.mapModule.Chart)} Default chart scale value or itself for method chaining.
  */
 anychart.mapModule.Chart.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.scale_ != opt_value) {
-      if (this.scale_)
-        this.scale_.unlistenSignals(this.geoScaleInvalidated_, this);
-      this.scale_ = opt_value;
-      this.scale_.listenSignals(this.geoScaleInvalidated_, this);
+    if (opt_value && opt_value instanceof anychart.mapModule.scales.Geo) {
+      if (this.scale_ != opt_value) {
+        if (this.scale_)
+          this.scale_.unlistenSignals(this.geoScaleInvalidated_, this);
+        this.scale_ = opt_value;
+        this.scale_.listenSignals(this.geoScaleInvalidated_, this);
 
-      this.invalidate(anychart.ConsistencyState.MAP_SCALE, anychart.Signal.NEEDS_REDRAW);
+        this.invalidate(anychart.ConsistencyState.MAP_SCALE, anychart.Signal.NEEDS_REDRAW);
+      }
+    } else {
+      if (!this.scale_) {
+        this.scale_ = new anychart.mapModule.scales.Geo();
+        this.scale_.listenSignals(this.geoScaleInvalidated_, this);
+      }
+      this.scale_.setup(opt_value);
     }
     return this;
   } else {

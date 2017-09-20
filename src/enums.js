@@ -2197,7 +2197,8 @@ anychart.enums.ScaleTypes = {
   ORDINAL_COLOR: 'ordinal-color',
   LINEAR_COLOR: 'linear-color',
   STOCK_SCATTER_DATE_TIME: 'stock-scatter-date-time',
-  STOCK_ORDINAL_DATE_TIME: 'stock-ordinal-date-time'
+  STOCK_ORDINAL_DATE_TIME: 'stock-ordinal-date-time',
+  GANTT: 'gantt'
 };
 
 

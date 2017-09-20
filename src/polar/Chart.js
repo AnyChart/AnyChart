@@ -206,9 +206,11 @@ anychart.polarModule.Chart.prototype.allowLegendCategoriesMode = function() {
 };
 
 
-/** @inheritDoc */
-anychart.polarModule.Chart.prototype.createScaleByType = function(value, isXScale, returnNullOnError) {
-  return anychart.scales.Base.fromString(value, returnNullOnError ? null : false);
+/**
+ * @return {anychart.enums.ScaleTypes}
+ */
+anychart.polarModule.Chart.prototype.getXScaleDefaultType = function() {
+  return anychart.enums.ScaleTypes.LINEAR;
 };
 
 

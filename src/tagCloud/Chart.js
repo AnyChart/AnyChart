@@ -990,22 +990,17 @@ anychart.tagCloudModule.Chart.prototype.angles = function(opt_value) {
 
 /**
  * Tags rotation angles.
- * @param {(anychart.enums.ScaleTypes|anychart.scales.Base)=} opt_value .
+ * @param {(anychart.enums.ScaleTypes|Object|anychart.scales.Base)=} opt_value .
  * @return {anychart.scales.Base|anychart.tagCloudModule.Chart}
  */
 anychart.tagCloudModule.Chart.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (goog.isString(opt_value)) {
-      opt_value = anychart.scales.Base.fromString(opt_value, false);
-    }
-    if (opt_value instanceof anychart.scales.Linear && this.scale_ != opt_value) {
-      if (this.scale_)
-        this.scale_.unlistenSignals(this.scaleInvalidated, this);
-      this.scale_ = opt_value;
-      if (this.scale_)
-        this.scale_.listenSignals(this.scaleInvalidated, this);
-
-      this.invalidate(anychart.ConsistencyState.TAG_CLOUD_SCALE, anychart.Signal.NEEDS_REDRAW);
+    var val = anychart.scales.Base.setupScale(this.scale_, opt_value, null,
+        anychart.scales.Base.ScaleTypes.SCATTER, null, this.scaleInvalidated, this);
+    if (val) {
+      var dispatch = this.scale_ == val;
+      this.scale_ = /** @type {anychart.scales.Linear} */(val);
+      this.scale_.resumeSignalsDispatching(dispatch);
     }
     return this;
   }
@@ -1025,22 +1020,25 @@ anychart.tagCloudModule.Chart.prototype.scaleInvalidated = function(event) {
 
 /**
  * Color scale.
- * @param {(anychart.colorScalesModule.Linear|anychart.colorScalesModule.Ordinal)=} opt_value Scale to set.
+ * @param {(anychart.colorScalesModule.Linear|anychart.colorScalesModule.Ordinal|Object|anychart.enums.ScaleTypes)=} opt_value Scale to set.
  * @return {anychart.colorScalesModule.Ordinal|anychart.colorScalesModule.Linear|anychart.tagCloudModule.Chart} Default chart color scale value or itself for
  * method chaining.
  */
 anychart.tagCloudModule.Chart.prototype.colorScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.colorScale_ != opt_value) {
-      if (this.colorScale_)
-        this.colorScale_.unlistenSignals(this.colorScaleInvalidated_, this);
-      this.colorScale_ = opt_value;
-      if (this.colorScale_)
-        this.colorScale_.listenSignals(this.colorScaleInvalidated_, this);
-
+    if (goog.isNull(opt_value) && this.colorScale_) {
+      this.colorScale_ = null;
       this.invalidate(anychart.ConsistencyState.TAG_CLOUD_COLOR_SCALE,
           anychart.Signal.NEEDS_REDRAW |
           anychart.Signal.NEED_UPDATE_COLOR_RANGE);
+    } else {
+      var val = anychart.scales.Base.setupScale(this.colorScale_, opt_value, null,
+          anychart.scales.Base.ScaleTypes.COLOR_SCALES, null, this.colorScaleInvalidated_, this);
+      if (val) {
+        var dispatch = this.colorScale_ == val;
+        this.colorScale_ = val;
+        this.colorScale_.resumeSignalsDispatching(dispatch);
+      }
     }
     return this;
   }

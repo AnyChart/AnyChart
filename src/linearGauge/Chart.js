@@ -808,20 +808,16 @@ anychart.linearGaugeModule.Chart.prototype.onAxisSignal_ = function(event) {
 
 /**
  * Getter/setter for scale.
- * @param {(anychart.enums.ScaleTypes|anychart.scales.ScatterBase)=} opt_value X Scale to set.
+ * @param {(anychart.scales.ScatterBase|Object|anychart.enums.ScaleTypes)=} opt_value X Scale to set.
  * @return {!(anychart.scales.ScatterBase|anychart.linearGaugeModule.Chart)} Default chart scale value or itself for method chaining.
  */
 anychart.linearGaugeModule.Chart.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (goog.isString(opt_value)) {
-      opt_value = /** @type {anychart.scales.ScatterBase} */ (anychart.scales.Base.fromString(opt_value, false));
-    }
-    if (!(opt_value instanceof anychart.scales.ScatterBase)) {
-      anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['Linear gauge scale', 'scatter', 'linear, log']);
-      return this;
-    }
-    if (this.scale_ != opt_value) {
-      this.scale_ = opt_value;
+    var val = anychart.scales.Base.setupScale(this.scale_, opt_value, anychart.enums.ScaleTypes.LINEAR,
+        anychart.scales.Base.ScaleTypes.SCATTER, ['Linear gauge scale', 'scatter', 'linear, log']);
+    if (val) {
+      this.scale_ = val;
+      this.scale_.resumeSignalsDispatching(false);
       this.invalidate(anychart.ConsistencyState.GAUGE_SCALE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
