@@ -170,6 +170,42 @@ anychart.data.Set.prototype.simpleValuesSeen_ = false;
 
 
 /**
+ * Processes the data to get this.largestSeenRowLength_ and this.objectFieldsSeen_.
+ * @param {IArrayLike} val - Data value.
+ * @private
+ * @return {!Array} - Processed.
+ */
+anychart.data.Set.prototype.processData_ = function(val) {
+  var data = [];
+  for (var i = 0; i < val.length; i++) {
+    var row = val[i];
+    var dataRow;
+    if (goog.isArray(row)) {
+      var valuesLength = row.length;
+      if (this.largestSeenRowLength_ < valuesLength) {
+        this.largestSeenRowLength_ = valuesLength;
+      }
+      dataRow = goog.array.slice(row, 0);
+    } else if (goog.isObject(row)) { // we are sure that this is object in this case so we can avoid double checking
+      if (!this.objectFieldsSeen_) {
+        this.objectFieldsSeen_ = {};
+      }
+      dataRow = {};
+      for (var j in row) {
+        dataRow[j] = row[j];
+        this.objectFieldsSeen_[j] = true;
+      }
+    } else {
+      this.simpleValuesSeen_ = true;
+      dataRow = row;
+    }
+    data.push(dataRow);
+  }
+  return data;
+};
+
+
+/**
  * Getter/setter for data.
  * @param {(Array|string)=} opt_value .
  * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_settings If CSV string is passed, you
@@ -183,42 +219,7 @@ anychart.data.Set.prototype.data = function(opt_value, opt_settings) {
       opt_value = anychart.data.parseText(opt_value, opt_settings);
 
     if (goog.isArrayLike(opt_value)) {
-      var data = [];
-      for (var i = 0; i < opt_value.length; i++) {
-        var row = opt_value[i];
-        var dataRow;
-        if (goog.isArray(row)) {
-          var valuesLength = row.length;
-          if (this.largestSeenRowLength_ < valuesLength) {
-            // if (this.objectFieldsSeen_) {
-            //   // if we have seen objects, than we have converted the largestSeenRowLength_ representation to the fields
-            //   // map already and now we should add fields to that representation
-            //   for (i = this.largestSeenRowLength_; i < valuesLength; i++) {
-            //     this.objectFieldsSeen_[i] = true;
-            //   }
-            // }
-            this.largestSeenRowLength_ = valuesLength;
-          }
-          dataRow = goog.array.slice(row, 0);
-        } else if (goog.isObject(row)) { // we are sure that this is object in this case so we can avoid double checking
-          if (!this.objectFieldsSeen_) {
-            this.objectFieldsSeen_ = {};
-            // for (i = 0; i < this.largestSeenRowLength_; i++) {
-            //   this.objectFieldsSeen_[i] = true;
-            // }
-          }
-          dataRow = {};
-          for (var j in row) {
-            dataRow[j] = row[j];
-            this.objectFieldsSeen_[j] = true;
-          }
-        } else {
-          this.simpleValuesSeen_ = true;
-          dataRow = row;
-        }
-        data.push(dataRow);
-      }
-      this.storage_ = data;
+      this.storage_ = this.processData_(opt_value);
       this.dispatchSignal(anychart.Signal.DATA_CHANGED);
     } else {
       if (this.storage_ && this.storage_.length > 0) {
@@ -289,7 +290,7 @@ anychart.data.Set.prototype.row = function(rowIndex, opt_value) {
  */
 anychart.data.Set.prototype.append = function(var_args) {
   anychart.globalLock.lock();
-  this.storage_.push.apply(this.storage_, arguments);
+  this.storage_.push.apply(this.storage_, this.processData_(arguments));
   this.dispatchSignal(anychart.Signal.DATA_CHANGED);
   anychart.globalLock.unlock();
   return this;
@@ -314,7 +315,7 @@ anychart.data.Set.prototype.append = function(var_args) {
  */
 anychart.data.Set.prototype.insert = function(row, opt_index) {
   anychart.globalLock.lock();
-  goog.array.insertAt(this.storage_, row, opt_index);
+  goog.array.insertAt(this.storage_, this.processData_([row])[0], opt_index);
   this.dispatchSignal(anychart.Signal.DATA_CHANGED);
   anychart.globalLock.unlock();
   return this;
