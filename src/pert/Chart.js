@@ -9,6 +9,7 @@ goog.require('anychart.pertModule.CriticalPath');
 goog.require('anychart.pertModule.Milestones');
 goog.require('anychart.pertModule.Tasks');
 goog.require('anychart.treeDataModule.Tree');
+goog.require('anychart.treeDataModule.utils');
 goog.require('goog.array');
 
 
@@ -411,12 +412,6 @@ anychart.pertModule.Chart.ARROW_BOTTOM = 3;
 /** @inheritDoc */
 anychart.pertModule.Chart.prototype.getType = function() {
   return anychart.enums.ChartTypes.PERT;
-};
-
-
-/** @inheritDoc */
-anychart.pertModule.Chart.prototype.usesTreeData = function() {
-  return true;
 };
 
 
@@ -2935,6 +2930,13 @@ anychart.pertModule.Chart.prototype.isNoData = function() {
 //  Serialization / deserialization / disposing
 //
 //----------------------------------------------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.pertModule.Chart.prototype.toCsv = function(opt_chartDataExportMode, opt_csvSettings) {
+  return anychart.treeDataModule.utils.toCsv(
+      /** @type {anychart.treeDataModule.Tree|anychart.treeDataModule.View} */(this.data()), opt_csvSettings);
+};
+
+
 /** @inheritDoc */
 anychart.pertModule.Chart.prototype.disposeInternal = function() {
   this.startActivities_.length = 0;

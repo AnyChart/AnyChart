@@ -9,6 +9,7 @@ goog.require('anychart.ganttModule.IInteractiveGrid');
 goog.require('anychart.ganttModule.Splitter');
 goog.require('anychart.ganttModule.TimeLine');
 goog.require('anychart.treeDataModule.Tree');
+goog.require('anychart.treeDataModule.utils');
 
 
 
@@ -210,12 +211,6 @@ anychart.ganttModule.Chart.Z_INDEX_DG_TL = 5;
  * @type {number}
  */
 anychart.ganttModule.Chart.Z_INDEX_SCROLL = 20;
-
-
-/** @inheritDoc */
-anychart.ganttModule.Chart.prototype.usesTreeData = function() {
-  return true;
-};
 
 
 /** @inheritDoc */
@@ -1048,6 +1043,13 @@ anychart.ganttModule.Chart.prototype.drawContent = function(bounds) {
     this.markConsistent(anychart.ConsistencyState.GANTT_POSITION);
   }
 
+};
+
+
+/** @inheritDoc */
+anychart.ganttModule.Chart.prototype.toCsv = function(opt_chartDataExportMode, opt_csvSettings) {
+  return anychart.treeDataModule.utils.toCsv(
+      /** @type {anychart.treeDataModule.Tree|anychart.treeDataModule.View} */(this.data()), opt_csvSettings);
 };
 
 

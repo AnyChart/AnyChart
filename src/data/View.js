@@ -5,6 +5,7 @@
 goog.provide('anychart.data.View');
 
 goog.require('anychart.core.Base');
+goog.require('anychart.data.IDataSource');
 goog.require('anychart.data.IView');
 goog.require('anychart.data.Iterator');
 goog.require('anychart.enums');
@@ -20,6 +21,7 @@ goog.require('anychart.enums');
  * @implements {anychart.data.IView}
  * @name anychart.data.View
  * @extends {anychart.core.Base}
+ * @implements {anychart.data.IDataSource}
  */
 anychart.data.View = function(parentView) {
   anychart.data.View.base(this, 'constructor');
@@ -284,6 +286,16 @@ anychart.data.View.prototype.row = function(rowIndex, opt_value) {
 
 
 /**
+ * Returns row by index.
+ * @param {number} rowIndex
+ * @return {*}
+ */
+anychart.data.View.prototype.getRow = function(rowIndex) {
+  return this.row(rowIndex);
+};
+
+
+/**
  * Returns the number of the rows in the current view.
  * @example <t>lineChart</t>
  *  var data = anychart.data.set([
@@ -326,6 +338,16 @@ anychart.data.View.prototype.getRowMapping = function(rowIndex) {
  */
 anychart.data.View.prototype.getDataSets = function() {
   return this.parentView.getDataSets();
+};
+
+
+/** @inheritDoc */
+anychart.data.View.prototype.populateObjWithKnownFields = function(result, resultLength) {
+  var sets = this.getDataSets();
+  for (var i = 0; i < sets.length; i++) {
+    resultLength = sets[i].populateObjWithKnownFields(result, resultLength);
+  }
+  return resultLength;
 };
 
 

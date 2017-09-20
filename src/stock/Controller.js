@@ -224,6 +224,15 @@ anychart.stockModule.Controller.prototype.deregisterSource = function(selectable
 
 
 /**
+ * Returns all involved tables.
+ * @return {Object.<anychart.stockModule.data.Table>}
+ */
+anychart.stockModule.Controller.prototype.getAllTables = function() {
+  return this.tables_;
+};
+
+
+/**
  * Refreshes full data range boundaries.
  * @return {boolean} Returns true if the full range have changed.
  */

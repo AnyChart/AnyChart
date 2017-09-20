@@ -1696,6 +1696,32 @@ anychart.vennModule.Chart.prototype.drawMarker_ = function(state, iterator) {
 
 
 //endregion
+//region --- CSV
+//------------------------------------------------------------------------------
+//
+//  CSV
+//
+//------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.vennModule.Chart.prototype.getCsvGrouperColumn = function() {
+  return ['x'];
+};
+
+
+/** @inheritDoc */
+anychart.vennModule.Chart.prototype.getCsvGrouperValue = function(iterator) {
+  return iterator.get('x');
+};
+
+
+/** @inheritDoc */
+anychart.vennModule.Chart.prototype.getCsvGrouperAlias = function(iterator) {
+  var res = iterator.get('name');
+  return goog.isString(res) ? res : null;
+};
+
+
+//endregion
 //region -- No data
 /** @inheritDoc */
 anychart.vennModule.Chart.prototype.isNoData = function() {

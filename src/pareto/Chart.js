@@ -498,24 +498,25 @@ anychart.paretoModule.Chart.prototype.getYScaleWrongTypeError = function() {
 //endregion
 //region --- CSV
 /** @inheritDoc */
-anychart.paretoModule.Chart.prototype.createSpecificCsvHeaders = function(headers, headersLength, scatterPolar) {
-  headers['value'] = headersLength++;
-  headers['CF'] = headersLength++;
-  headers['RF'] = headersLength++;
-  return headersLength;
+anychart.paretoModule.Chart.prototype.getDataHolders = function() {
+  return [this];
 };
 
 
 /** @inheritDoc */
-anychart.paretoModule.Chart.prototype.onBeforeRowsValuesSpreading = function(seriesData, csvRows, headers, rowIndex, groupingField) {
-  var seriesMapping = seriesData.getRowMapping(rowIndex);
-  var isParetoMapping = seriesMapping instanceof anychart.paretoModule.Mapping;
+anychart.paretoModule.Chart.prototype.getCsvColumns = function(dataHolder) {
+  return ['value', 'CF', 'RF'];
+};
 
-  if (isParetoMapping) {
-    csvRows[groupingField][headers['value']] = seriesMapping.getValue(rowIndex);
-    csvRows[groupingField][headers['CF']] = seriesMapping.getCumulativeFrequency(rowIndex);
-    csvRows[groupingField][headers['RF']] = seriesMapping.getRelativeFrequency(rowIndex);
-  }
+
+/** @inheritDoc */
+anychart.paretoModule.Chart.prototype.populateCsvRow = function(row, names, iterator, headers) {
+  var rowIndex = iterator.getIndex();
+  var mapping = this.paretoView.getRowMapping(rowIndex);
+  // bad-bad hardcode((
+  row[1] = mapping.getValue(rowIndex);
+  row[2] = mapping.getCumulativeFrequency(rowIndex);
+  row[3] = mapping.getRelativeFrequency(rowIndex);
 };
 
 
@@ -527,6 +528,19 @@ anychart.paretoModule.Chart.prototype.drawContent = function(bounds) {
     this.updateScales();
   }
   return anychart.paretoModule.Chart.base(this, 'drawContent', bounds);
+};
+
+
+//endregion
+//region --- CSV
+//------------------------------------------------------------------------------
+//
+//  CSV
+//
+//------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.paretoModule.Chart.prototype.getCsvSourceXScale = function(series) {
+  return /** @type {anychart.scales.IXScale} */(this.xScale());
 };
 
 

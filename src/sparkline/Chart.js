@@ -30,6 +30,8 @@ goog.require('anychart.sparklineModule.series.Base');
 anychart.sparklineModule.Chart = function(opt_data, opt_csvSettings) {
   anychart.sparklineModule.Chart.base(this, 'constructor');
 
+  this.getCsvExportRow = this.getCsvExportRowScatter;
+
   /**
    * Interactivity state.
    * @type {anychart.core.utils.InteractivityState}
@@ -2227,6 +2229,32 @@ anychart.sparklineModule.Chart.prototype.invalidateSeries_ = function() {
 };
 
 
+//region --- CSV
+//------------------------------------------------------------------------------
+//
+//  CSV
+//
+//------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.sparklineModule.Chart.prototype.getCsvGrouperColumn = function() {
+  return ['x'];
+};
+
+
+/** @inheritDoc */
+anychart.sparklineModule.Chart.prototype.getCsvGrouperValue = function(iterator) {
+  return iterator.get('x');
+};
+
+
+/** @inheritDoc */
+anychart.sparklineModule.Chart.prototype.getCsvGrouperAlias = function(iterator) {
+  var res = iterator.get('name');
+  return goog.isString(res) ? res : null;
+};
+
+
+//endregion
 //region --- No data label
 /**
  * Is there no data on the chart.

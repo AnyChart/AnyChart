@@ -214,6 +214,12 @@ anychart.circularGaugeModule.Chart.prototype.getAllSeries = function() {
 };
 
 
+/** @inheritDoc */
+anychart.circularGaugeModule.Chart.prototype.getDataHolders = function() {
+  return [this];
+};
+
+
 /**
  * @inheritDoc
  */

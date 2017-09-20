@@ -17,7 +17,7 @@ goog.require('anychart.cartesian3dModule.drawers.Column');
  * anychart.area3d([1.3, 2, 1.4], [1.1, 1.6, 1.3])
  *   .container(stage).draw();
  * @param {...(anychart.data.View|anychart.data.Set|Array)} var_args Area chart data.
- * @return {anychart.cartesian3dModule.Chart} Chart with defaults for area series.
+ * @return {anychart.cartesian3dModule.Chart} Chart with defaults for area series. 
  */
 anychart.area3d = function(var_args) {
   var chart = new anychart.cartesian3dModule.Chart();
