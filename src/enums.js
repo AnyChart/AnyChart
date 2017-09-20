@@ -1468,7 +1468,7 @@ anychart.enums.normalizeScaleComparisonMode = anychart.enums.normalizeScaleStack
  * Enum for predefined part of LinearScale.chagnesFrom() acceptable values.
  * @enum {string}
  */
-anychart.enums.DataSource = {
+anychart.enums.ComparisonDataSource = {
   SERIES_START: 'series-start',
   FIRST_VISIBLE: 'first-visible',
   SERIES_END: 'series-end',
@@ -1479,10 +1479,10 @@ anychart.enums.DataSource = {
 /**
  * Normalize passed data source value.
  * @param {*} value
- * @return {anychart.enums.DataSource|number}
+ * @return {anychart.enums.ComparisonDataSource|number}
  */
 anychart.enums.normalizeDataSource = function(value) {
-  return /** @type {anychart.enums.DataSource|number} */(anychart.enums.normalize(anychart.enums.DataSource, value, null) ||
+  return /** @type {anychart.enums.ComparisonDataSource|number} */(anychart.enums.normalize(anychart.enums.ComparisonDataSource, value, null) ||
       anychart.utils.normalizeTimestamp(value));
 };
 

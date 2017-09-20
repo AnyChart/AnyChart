@@ -160,7 +160,7 @@ anychart.stockModule.Series.prototype.updateComparisonZero = function() {
   if (this.supportsComparison() && !this.planIsStacked() && (scale instanceof anychart.scales.Linear)) {
     var mode = /** @type {anychart.enums.ScaleComparisonMode} */(scale.comparisonMode());
     if (mode != anychart.enums.ScaleComparisonMode.NONE) {
-      row = this.data_.getRowByDataSource(/** @type {anychart.enums.DataSource|number} */(scale.compareWith()));
+      row = this.data_.getRowByDataSource(/** @type {anychart.enums.ComparisonDataSource|number} */(scale.compareWith()));
     }
   }
   // if we have found a row to get value from - we cast it to number

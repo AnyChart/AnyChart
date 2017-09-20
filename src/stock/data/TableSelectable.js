@@ -294,20 +294,20 @@ anychart.stockModule.data.TableSelectable.prototype.getLastRowFromMainStorage = 
 
 /**
  * Returns data row.
- * @param {anychart.enums.DataSource|number} dataSource .
+ * @param {anychart.enums.ComparisonDataSource|number} dataSource .
  * @param {string=} opt_fieldName .
  * @return {?anychart.stockModule.data.TableSelectable.RowProxy}
  */
 anychart.stockModule.data.TableSelectable.prototype.getRowByDataSource = function(dataSource, opt_fieldName) {
   /** @type {?anychart.stockModule.data.TableSelectable.RowProxy} */
   var row;
-  if (dataSource == anychart.enums.DataSource.FIRST_VISIBLE) {
+  if (dataSource == anychart.enums.ComparisonDataSource.FIRST_VISIBLE) {
     row = this.getFirstVisibleRow();
-  } else if (dataSource == anychart.enums.DataSource.LAST_VISIBLE) {
+  } else if (dataSource == anychart.enums.ComparisonDataSource.LAST_VISIBLE) {
     row = this.getLastVisibleRow();
-  } else if (dataSource == anychart.enums.DataSource.SERIES_START) {
+  } else if (dataSource == anychart.enums.ComparisonDataSource.SERIES_START) {
     row = this.getFirstRowFromMainStorage(opt_fieldName);
-  } else if (dataSource == anychart.enums.DataSource.SERIES_END) {
+  } else if (dataSource == anychart.enums.ComparisonDataSource.SERIES_END) {
     row = this.getLastRowFromMainStorage(opt_fieldName);
   } else {
     row = this.getRowFromMainStorage(/** @type {number} */(dataSource));

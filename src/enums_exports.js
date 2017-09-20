@@ -250,8 +250,8 @@ goog.exportSymbol('anychart.enums.ScaleComparisonMode.NONE', anychart.enums.Scal
 goog.exportSymbol('anychart.enums.ScaleComparisonMode.VALUE', anychart.enums.ScaleComparisonMode.VALUE);
 goog.exportSymbol('anychart.enums.ScaleComparisonMode.PERCENT', anychart.enums.ScaleComparisonMode.PERCENT);
 
-goog.exportSymbol('anychart.enums.DataSource.SERIES_START', anychart.enums.DataSource.SERIES_START);
-goog.exportSymbol('anychart.enums.DataSource.FIRST_VISIBLE', anychart.enums.DataSource.FIRST_VISIBLE);
+goog.exportSymbol('anychart.enums.ComparisonDataSource.SERIES_START', anychart.enums.ComparisonDataSource.SERIES_START);
+goog.exportSymbol('anychart.enums.ComparisonDataSource.FIRST_VISIBLE', anychart.enums.ComparisonDataSource.FIRST_VISIBLE);
 
 goog.exportSymbol('anychart.enums.ScatterTicksMode.LINEAR', anychart.enums.ScatterTicksMode.LINEAR);
 goog.exportSymbol('anychart.enums.ScatterTicksMode.LOGARITHMIC', anychart.enums.ScatterTicksMode.LOGARITHMIC);

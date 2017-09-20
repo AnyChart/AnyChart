@@ -62,10 +62,10 @@ anychart.scales.Linear.prototype.comparisonMode_ = anychart.enums.ScaleCompariso
 
 
 /**
- * @type {anychart.enums.DataSource|number}
+ * @type {anychart.enums.ComparisonDataSource|number}
  * @private
  */
-anychart.scales.Linear.prototype.compareWith_ = anychart.enums.DataSource.FIRST_VISIBLE;
+anychart.scales.Linear.prototype.compareWith_ = anychart.enums.ComparisonDataSource.FIRST_VISIBLE;
 
 
 /** @inheritDoc */
@@ -212,8 +212,8 @@ anychart.scales.Linear.prototype.comparisonMode = function(opt_value) {
 
 /**
  * Getter and setter for date which should be used as a changes zero for series.
- * @param {(string|anychart.enums.DataSource|number|Date)=} opt_value
- * @return {anychart.enums.DataSource|number|anychart.scales.Linear}
+ * @param {(string|anychart.enums.ComparisonDataSource|number|Date)=} opt_value
+ * @return {anychart.enums.ComparisonDataSource|number|anychart.scales.Linear}
  */
 anychart.scales.Linear.prototype.compareWith = function(opt_value) {
   if (goog.isDef(opt_value)) {
