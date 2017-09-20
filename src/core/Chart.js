@@ -1203,7 +1203,7 @@ anychart.core.Chart.contextMenuItems = {
     'index': 80,
     'iconClass': 'ac ac-cog',
     'text': 'AnyChart ' + (anychart.VERSION ?
-        goog.string.subs.apply(null, ['v%s.%s.%s'].concat(anychart.VERSION.split('.'))) :
+        goog.string.subs.apply(null, ['v%s.%s.%s.%s'].concat(anychart.VERSION.split('.'))) :
         ' develop version'),
     'href': 'https://anychart.com'
   },
