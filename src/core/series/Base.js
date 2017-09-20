@@ -634,12 +634,16 @@ anychart.core.series.Base.prototype.seriesType = function(opt_value) {
  * @param {boolean=} opt_reapplyClip Reapply clip and zIndex config.
  */
 anychart.core.series.Base.prototype.applyConfig = function(config, opt_reapplyClip) {
+  var newDrawer = /** @type {!anychart.core.drawers.Base} */(new anychart.core.drawers.AvailableDrawers[config.drawerType](this));
   if (this.config) {
     if (this.rootLayer) {
       // if prev config used own root and the next one doesn't - we should dispose the root layer
       if (!this.check(anychart.core.drawers.Capabilities.USES_CONTAINER_AS_ROOT) &&
-          this.check(anychart.core.drawers.Capabilities.USES_CONTAINER_AS_ROOT, config)) {
+          this.check(anychart.core.drawers.Capabilities.USES_CONTAINER_AS_ROOT, config, newDrawer)) {
         goog.dispose(this.rootLayer);
+        this.rootLayer = null;
+      } else if (this.check(anychart.core.drawers.Capabilities.USES_CONTAINER_AS_ROOT) &&
+          !this.check(anychart.core.drawers.Capabilities.USES_CONTAINER_AS_ROOT, config, newDrawer)) {
         this.rootLayer = null;
       }
     }
@@ -650,7 +654,7 @@ anychart.core.series.Base.prototype.applyConfig = function(config, opt_reapplyCl
   this.legendProvider = null;
 
   goog.dispose(this.drawer);
-  this.drawer = /** @type {!anychart.core.drawers.Base} */(new anychart.core.drawers.AvailableDrawers[config.drawerType](this));
+  this.drawer = newDrawer;
 
   this.recreateShapeManager();
 

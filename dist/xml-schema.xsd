@@ -3034,6 +3034,7 @@
             <xsd:enumeration value="heat-map"/>
             <xsd:enumeration value="tree-map"/>
             <xsd:enumeration value="line"/>
+            <xsd:enumeration value="line-3d"/>
             <xsd:enumeration value="vertical-line"/>
             <xsd:enumeration value="marker"/>
             <xsd:enumeration value="pie"/>
@@ -3302,6 +3303,7 @@
             <xsd:enumeration value="candlestick"/>
             <xsd:enumeration value="column"/>
             <xsd:enumeration value="line"/>
+            <xsd:enumeration value="line-2d"/>
             <xsd:enumeration value="vertical-line"/>
             <xsd:enumeration value="marker"/>
             <xsd:enumeration value="vertical-marker"/>

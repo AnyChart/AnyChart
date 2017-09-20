@@ -114,31 +114,38 @@ anychart.core.shapeManagers.FRONT_HATCH_SHAPES_ZINDEX = 8 * anychart.core.shapeM
 
 
 /**
+ * Z index shift for the front shapes of 3D series.
+ * @const {number}
+ */
+anychart.core.shapeManagers.BEFORE_FRONT_HATCH_SHAPES_ZINDEX = 9 * anychart.core.shapeManagers.ZINDEX_STEP;
+
+
+/**
  * Z index shift for the labels.
  * @const {number}
  */
-anychart.core.shapeManagers.LABELS_ZINDEX = 9 * anychart.core.shapeManagers.ZINDEX_STEP;
+anychart.core.shapeManagers.LABELS_ZINDEX = 10 * anychart.core.shapeManagers.ZINDEX_STEP;
 
 
 /**
  * Z index shift for the outlier markers.
  * @const {number}
  */
-anychart.core.shapeManagers.OUTLIERS_ZINDEX = 10 * anychart.core.shapeManagers.ZINDEX_STEP;
+anychart.core.shapeManagers.OUTLIERS_ZINDEX = 11 * anychart.core.shapeManagers.ZINDEX_STEP;
 
 
 /**
  * Z index shift for the markers.
  * @const {number}
  */
-anychart.core.shapeManagers.MARKERS_ZINDEX = 11 * anychart.core.shapeManagers.ZINDEX_STEP;
+anychart.core.shapeManagers.MARKERS_ZINDEX = 12 * anychart.core.shapeManagers.ZINDEX_STEP;
 
 
 /**
  * Z index shift for the map labels.
  * @const {number}
  */
-anychart.core.shapeManagers.LABELS_OVER_MARKERS_ZINDEX = 12 * anychart.core.shapeManagers.ZINDEX_STEP;
+anychart.core.shapeManagers.LABELS_OVER_MARKERS_ZINDEX = 13 * anychart.core.shapeManagers.ZINDEX_STEP;
 
 
 /**
@@ -166,6 +173,20 @@ anychart.core.shapeManagers.pathStrokeConfig = {
   strokeNames: ['stroke', 'hoverStroke', 'selectStroke'],
   isHatchFill: false,
   zIndex: anychart.core.shapeManagers.STROKE_SHAPES_ZINDEX
+};
+
+
+/**
+ * Template shape config for easy reusage.
+ * @const {anychart.core.shapeManagers.ShapeConfig}
+ */
+anychart.core.shapeManagers.pathStrokeTopZIndexConfig = {
+  name: 'stroke',
+  shapeType: anychart.enums.ShapeType.PATH,
+  fillNames: null,
+  strokeNames: ['stroke', 'hoverStroke', 'selectStroke'],
+  isHatchFill: false,
+  zIndex: anychart.core.shapeManagers.BEFORE_FRONT_HATCH_SHAPES_ZINDEX
 };
 
 
@@ -572,6 +593,20 @@ anychart.core.shapeManagers.pathTop3DHatchConfig = {
   strokeNames: null,
   isHatchFill: true,
   zIndex: anychart.core.shapeManagers.TOP_HATCH_SHAPES_ZINDEX
+};
+
+
+/**
+ * Template shape config for easy reusage.
+ * @const {anychart.core.shapeManagers.ShapeConfig}
+ */
+anychart.core.shapeManagers.pathLine3DConfig = {
+  name: 'path',
+  shapeType: anychart.enums.ShapeType.PATH,
+  fillNames: null,
+  strokeNames: null,
+  isHatchFill: false,
+  zIndex: anychart.core.shapeManagers.FILL_SHAPES_ZINDEX
 };
 
 

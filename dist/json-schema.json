@@ -228,7 +228,7 @@
         {"$ref": "#/definitions/anychart.core.SeparateChart"}
       ],
       "properties": {
-        "type": {"enum": ["cartesian", "cartesian-3d", "area", "vertical-area", "area-3d", "bar", "bar-3d", "box", "bubble", "column", "column-3d", "financial", "line", "vertical-line", "marker", "jump-line", "stick", "pareto", "hilo", "waterfall"]},
+        "type": {"enum": ["cartesian", "cartesian-3d", "area", "vertical-area", "area-3d", "bar", "bar-3d", "box", "bubble", "column", "column-3d", "financial", "line", "line-3d", "vertical-line", "marker", "jump-line", "stick", "pareto", "hilo", "waterfall"]},
         "grids": {
           "type": "array",
           "items": {
@@ -494,6 +494,7 @@
             "column-3d",
             "financial",
             "line",
+            "line-3d",
             "vertical-line",
             "marker",
             "jump-line",
@@ -2799,6 +2800,7 @@
             "candlestick",
             "column",
             "line",
+            "line-2d",
             "vertical-line",
             "marker",
             "vertical-marker",

@@ -4,7 +4,6 @@ goog.provide('anychart.cartesian3dModule.defaultTheme');
 goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
   // merges with nothing
   'cartesian3dBase': {
-    'defaultSeriesType': 'column',
     'zAngle': 45,
     'zAspect': '50%',
     'zDistribution': false,
@@ -12,15 +11,45 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'defaultSeriesSettings': {
       'base': {
         'stroke': 'none',
+        'hoverStroke': 'none',
+        'selectStroke': 'none',
         'fill': anychart.core.defaultTheme.returnSourceColor,
-        'hoverStroke': anychart.core.defaultTheme.returnSourceColor,
         'hoverFill': anychart.core.defaultTheme.returnLightenSourceColor,
-        'selectStroke': anychart.core.defaultTheme.returnSourceColor,
         'selectFill': anychart.core.defaultTheme.defaultSelectSolidColor,
         'tooltip': {
           'anchor': 'left-top',
           'position': 'left-top'
         }
+      },
+      'area': {
+        'hoverMarkers': {
+          'enabled': true
+        },
+        'selectMarkers': {
+          'enabled': true
+        }
+      },
+      'bar': {
+        'isVertical': true
+      },
+      'line': {
+        'hoverMarkers': {
+          'enabled': true
+        },
+        'selectMarkers': {
+          'enabled': true
+        }
+      },
+      'line2d': {
+        'hoverMarkers': {
+          'enabled': true
+        },
+        'selectMarkers': {
+          'enabled': true
+        },
+        'stroke': anychart.core.defaultTheme.returnSourceColor,
+        'hoverStroke': anychart.core.defaultTheme.returnLightenSourceColor,
+        'selectStroke': anychart.core.defaultTheme.defaultSelectSolidColor
       }
     }
   },
@@ -37,6 +66,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
   },
   // merge with column
   'column3d': {
+    'defaultSeriesType': 'column',
     'grids': [
       {},
       {
@@ -48,6 +78,21 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
   },
   // merge with area
   'area3d': {
+    'defaultSeriesType': 'area',
+    'zDistribution': true,
+    'zPadding': 5,
+    'grids': [
+      {},
+      {
+        'enabled': true,
+        'layout': 'vertical',
+        'scale': 0
+      }
+    ]
+  },
+  // merge with area
+  'line3d': {
+    'defaultSeriesType': 'line',
     'zDistribution': true,
     'zPadding': 5,
     'grids': [
@@ -60,5 +105,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     ]
   },
   // merge with cartesian
-  'cartesian3d': {}
+  'cartesian3d': {
+    'defaultSeriesType': 'column'
+  }
 });

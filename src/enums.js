@@ -32,6 +32,7 @@ anychart.enums.ChartTypes = {
   FINANCIAL: 'financial',
   FUNNEL: 'funnel',
   LINE: 'line',
+  LINE_3D: 'line-3d',
   VERTICAL_LINE: 'vertical-line',
   MARKER: 'marker',
   PIE: 'pie',
@@ -1702,7 +1703,9 @@ anychart.enums.normalizeCartesianSeriesType = function(value, opt_default) {
 anychart.enums.Cartesian3dSeriesType = {
   AREA: 'area',
   BAR: 'bar',
-  COLUMN: 'column'
+  COLUMN: 'column',
+  LINE: 'line',
+  LINE_2D: 'line-2d'
 };
 
 
@@ -4473,7 +4476,8 @@ anychart.enums.SeriesDrawerTypes = {
   MEKKO: 29,
   HEAT_MAP: 30,
   RANGE_STICK: 31,
-  WATERFALL: 32
+  WATERFALL: 32,
+  LINE_3D: 33
 };
 
 
