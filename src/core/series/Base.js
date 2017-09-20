@@ -65,6 +65,7 @@ anychart.core.series.Base = function(chart, plot, type, config) {
   this.autoSettings = {};
   this.autoSettings['pointWidth'] = '90%';
   this.autoSettings['isVertical'] = this.chart.isVertical();
+  this.autoSettings['minPointLength'] = 0;
 
   /**
    * Series clip.
@@ -251,6 +252,16 @@ anychart.core.series.Base = function(chart, plot, type, config) {
       anychart.ConsistencyState.SERIES_POINTS,
       anychart.Signal.NEEDS_REDRAW,
       anychart.core.drawers.Capabilities.IS_WIDTH_BASED],
+    ['maxPointWidth',
+      anychart.ConsistencyState.SERIES_POINTS,
+      anychart.Signal.NEEDS_REDRAW,
+      anychart.core.drawers.Capabilities.IS_WIDTH_BASED],
+    ['minPointLength',
+      anychart.ConsistencyState.SERIES_POINTS,
+      anychart.Signal.NEEDS_REDRAW,
+      anychart.core.drawers.Capabilities.IS_WIDTH_BASED,
+      this.resetSharedStack
+    ],
     ['connectMissingPoints',
       anychart.ConsistencyState.SERIES_POINTS,
       anychart.Signal.NEEDS_REDRAW,
@@ -1003,6 +1014,15 @@ anychart.core.series.Base.prototype.isDiscreteBased = function() {
 
 
 /**
+ * Tests whether series point supports min length option.
+ * @return {boolean}
+ */
+anychart.core.series.Base.prototype.isMinPointLengthBased = function() {
+  return this.isDiscreteBased() && this.isWidthBased();
+};
+
+
+/**
  * Tester if the series is area based (area, area3d).
  * @return {boolean}
  */
@@ -1060,11 +1080,19 @@ anychart.core.series.Base.prototype.hasComplexZero = function() {
  * @return {number} Point width.
  */
 anychart.core.series.Base.prototype.getPixelPointWidth = function() {
-  if (this.isWidthBased())
-    return anychart.utils.normalizeSize(/** @type {(number|string)} */(this.getOption('pointWidth')),
-        this.getCategoryWidth());
-  else
-    return 0;
+  var pointPixelSize = 0;
+  if (this.isWidthBased()) {
+    var pointWidth = this.getInheritedOption('pointWidth');
+    pointPixelSize = anychart.utils.normalizeSize(/** @type {(number|string)} */(pointWidth), this.getCategoryWidth());
+
+    var maxPointWidth = this.getInheritedOption('maxPointWidth');
+    if (goog.isDefAndNotNull(maxPointWidth)) {
+      var maxPointPixelSize = anychart.utils.normalizeSize(/** @type {(number|string)} */(maxPointWidth), this.getCategoryWidth());
+      pointPixelSize = Math.min(pointPixelSize, maxPointPixelSize);
+    }
+  }
+
+  return pointPixelSize;
 };
 
 
@@ -1929,6 +1957,33 @@ anychart.core.series.Base.prototype.getOption = function(name) {
 
 
 /**
+ * Gets option like resolution chain.
+ * TODO (A.Kudryavtsev): Remove this method on settings inheritance implementation.
+ * @param {string} name - Option name.
+ * @return {*}
+ */
+anychart.core.series.Base.prototype.getInheritedOption = function(name) {
+  var result;
+  if (goog.isDefAndNotNull(this.ownSettings[name])) {
+    result = this.ownSettings[name];
+  } else if (goog.isDefAndNotNull(/** @type {anychart.core.Base} */ (this.plot).ownSettings[name])) {
+    result = /** @type {anychart.core.Base} */ (this.plot).ownSettings[name];
+  } else if (goog.isDefAndNotNull(/** @type {anychart.core.Base} */ (this.chart).ownSettings[name])) {
+    result = /** @type {anychart.core.Base} */ (this.chart).ownSettings[name];
+  } else if (goog.isDefAndNotNull(this.themeSettings[name])) {
+    result = this.themeSettings[name];
+  } else if (goog.isDefAndNotNull(/** @type {anychart.core.Base} */ (this.plot).themeSettings[name])) {
+    result = /** @type {anychart.core.Base} */ (this.plot).themeSettings[name];
+  } else if (goog.isDefAndNotNull(/** @type {anychart.core.Base} */ (this.chart).themeSettings[name])) {
+    result = /** @type {anychart.core.Base} */ (this.chart).themeSettings[name];
+  } else {
+    result = this.autoSettings[name];
+  }
+  return result;
+};
+
+
+/**
  * Returns proper settings due to the state if point settings are supported by the series.
  * @param {string} name
  * @param {anychart.data.IRowInfo} point
@@ -2752,6 +2807,24 @@ anychart.core.series.Base.prototype.planIsXScaleInverted = function() {
 };
 
 
+/**
+ * Resets point's meta shared object anchors..
+ */
+anychart.core.series.Base.prototype.resetSharedStack = function() {
+  if (this.planIsStacked() && this.isMinPointLengthBased()) {
+    var iterator = this.getIterator();
+    iterator.reset();
+    while (iterator.advance()) {
+      var shared = iterator.meta('shared');
+      if (shared) {
+        shared.positiveAnchor = NaN;
+        shared.negativeAnchor = NaN;
+      }
+    }
+  }
+};
+
+
 //endregion
 //region --- Drawing points
 //----------------------------------------------------------------------------------------------------------------------
@@ -3398,6 +3471,80 @@ anychart.core.series.Base.prototype.makePointsMetaFromMap = function(rowInfo, ma
 
 
 /**
+ * Applies min point length settings for stacked plan.
+ * @param {anychart.data.IRowInfo} rowInfo
+ * @param {Array.<string>} yNames
+ * @param {Array.<string|number>} yColumns
+ * @param {number} pointMissing
+ * @param {number} xRatio
+ * @return {number} - pointMissing updated value.
+ * @protected
+ */
+anychart.core.series.Base.prototype.makeMinPointLengthStackedMeta = function(rowInfo, yNames, yColumns, pointMissing, xRatio) {
+  if (!rowInfo.meta('missing')) {
+    var shared = rowInfo.meta('shared');
+
+    var y = /** @type {number} */ (rowInfo.meta('value'));
+    var zero = /** @type {number} */ (rowInfo.meta('zero'));
+    var diff = Math.abs(y - zero);
+    var height = Math.max(diff, this.minPointLengthCache_);
+
+    var newZero, newY;
+    if (zero >= y) {
+      height = -height;
+      if (isNaN(shared.positiveAnchor)) {//Drawing first point.
+        shared.positiveAnchor = zero + height;
+        newZero = zero;
+        newY = shared.positiveAnchor;
+      } else {
+        newZero = Math.min(zero, shared.positiveAnchor);
+        newY = newZero + height;
+        shared.positiveAnchor = newY;
+      }
+    } else {
+      if (isNaN(shared.negativeAnchor)) {//Drawing first point.
+        shared.negativeAnchor = zero + height;
+        newZero = zero;
+        newY = shared.negativeAnchor;
+      } else {
+        newZero = Math.max(zero, shared.negativeAnchor);
+        newY = newZero + height;
+        shared.negativeAnchor = newY;
+      }
+    }
+
+    rowInfo.meta('value', newY);
+    rowInfo.meta('zero', newZero);
+  }
+  return pointMissing;
+};
+
+
+/**
+ * Applies min point length settings for unstacked plan.
+ * @param {anychart.data.IRowInfo} rowInfo
+ * @param {Array.<string>} yNames
+ * @param {Array.<string|number>} yColumns
+ * @param {number} pointMissing
+ * @param {number} xRatio
+ * @return {number} - pointMissing updated value.
+ * @protected
+ */
+anychart.core.series.Base.prototype.makeMinPointLengthUnstackedMeta = function(rowInfo, yNames, yColumns, pointMissing, xRatio) {
+  if (!rowInfo.meta('missing')) {
+    var y = /** @type {number} */ (rowInfo.meta('value'));
+    var zero = /** @type {number} */ (rowInfo.meta('zero'));
+    var diff = Math.abs(y - zero);
+    var height = Math.max(diff, this.minPointLengthCache_);
+    if (zero >= y)
+      height = -height;
+    rowInfo.meta('value', zero + height);
+  }
+  return pointMissing;
+};
+
+
+/**
  * Prepares Stacked part of point meta.
  * @param {anychart.data.IRowInfo} rowInfo
  * @param {Array.<string>} yNames
@@ -3528,6 +3675,17 @@ anychart.core.series.Base.prototype.prepareMetaMakers = function(yNames, yColumn
     this.metaMakers.push(this.makeUnstackedMeta);
     if (this.needsZero()) {
       this.metaMakers.push(this.makeZeroMeta);
+    }
+  }
+  if (this.isMinPointLengthBased() && this.yScale().stackMode() != anychart.enums.ScaleStackMode.PERCENT) {
+    var minPointLength = /** @type {string|number} */ (this.getInheritedOption('minPointLength'));
+    var isVertical = /** @type {boolean} */ (this.getOption('isVertical'));
+    var dimension = isVertical ? this.pixelBoundsCache.width : this.pixelBoundsCache.height;
+    this.minPointLengthCache_ = Math.abs(anychart.utils.normalizeSize(minPointLength, dimension));
+    if (this.planIsStacked()) {
+      this.metaMakers.push(this.makeMinPointLengthStackedMeta);
+    } else {
+      this.metaMakers.push(this.makeMinPointLengthUnstackedMeta);
     }
   }
   if (this.isSizeBased()) {
@@ -4206,6 +4364,18 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'pointWidth',
+      anychart.core.settings.numberOrPercentNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'maxPointWidth',
+      anychart.core.settings.numberOrPercentNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'minPointLength',
       anychart.core.settings.numberOrPercentNormalizer);
 
   anychart.core.settings.createDescriptor(

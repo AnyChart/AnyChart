@@ -68,7 +68,10 @@ anychart.core.ChartWithSeries = function() {
   this.dataBounds = null;
 
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
-    ['defaultSeriesType', 0, 0]
+    ['defaultSeriesType', 0, 0],
+    ['pointWidth', anychart.ConsistencyState.SERIES_CHART_SERIES, anychart.Signal.NEEDS_REDRAW, 0, this.invalidateWidthBasedSeries],
+    ['maxPointWidth', anychart.ConsistencyState.SERIES_CHART_SERIES, anychart.Signal.NEEDS_REDRAW, 0, this.invalidateWidthBasedSeries],
+    ['minPointLength', anychart.ConsistencyState.SERIES_CHART_SERIES, anychart.Signal.NEEDS_REDRAW, 0, this.resetSeriesStack]
   ]);
 };
 goog.inherits(anychart.core.ChartWithSeries, anychart.core.SeparateChart);
@@ -200,6 +203,21 @@ anychart.core.ChartWithSeries.PROPERTY_DESCRIPTORS = (function() {
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'defaultSeriesType',
       seriesTypeNormalizer);
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'pointWidth',
+      anychart.utils.normalizeNumberOrPercent);
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'maxPointWidth',
+      anychart.utils.normalizeNumberOrPercent);
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'minPointLength',
+      anychart.utils.normalizeNumberOrPercent);
 
   return map;
 })();
@@ -583,6 +601,21 @@ anychart.core.ChartWithSeries.prototype.minBubbleSize = function(opt_value) {
     return this;
   }
   return this.minBubbleSize_;
+};
+
+
+/**
+ * Resets series shared stack.
+ * @param {boolean=} opt_skipInvalidation - Whether to skip width based series invalidation.
+ */
+anychart.core.ChartWithSeries.prototype.resetSeriesStack = function(opt_skipInvalidation) {
+  for (var i = 0; i < this.seriesList.length; i++) {
+    var series = this.seriesList[i];
+    if (series)
+      series.resetSharedStack();
+  }
+  if (!opt_skipInvalidation)
+    this.invalidateWidthBasedSeries();
 };
 
 
@@ -1080,6 +1113,7 @@ anychart.core.ChartWithSeries.prototype.drawSeries = function(opt_topAxisPadding
       this.seriesList[i].draw();
     }
     this.afterSeriesDraw();
+    this.resetSeriesStack(true);
 
     this.markConsistent(anychart.ConsistencyState.SERIES_CHART_SERIES);
     anychart.core.Base.resumeSignalsDispatchingFalse(this.seriesList);
@@ -1197,7 +1231,11 @@ anychart.core.ChartWithSeries.prototype.isNoData = function() {
 anychart.core.ChartWithSeries.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.ChartWithSeries.base(this, 'setupByJSON', config, opt_default);
 
-  anychart.core.settings.deserialize(this, anychart.core.ChartWithSeries.PROPERTY_DESCRIPTORS, config);
+  if (opt_default) {
+    anychart.core.settings.copy(this.themeSettings, anychart.core.ChartWithSeries.PROPERTY_DESCRIPTORS, config);
+  } else {
+    anychart.core.settings.deserialize(this, anychart.core.ChartWithSeries.PROPERTY_DESCRIPTORS, config);
+  }
   this.minBubbleSize(config['minBubbleSize']);
   this.maxBubbleSize(config['maxBubbleSize']);
   this.palette(config['palette']);

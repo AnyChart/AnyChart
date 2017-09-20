@@ -1065,6 +1065,15 @@ anychart.stockModule.Chart.prototype.drawContent = function(bounds) {
 anychart.stockModule.Chart.prototype.valueStacking_ = function(scale, point, stack, val, prevStack, prevVal) {
   this.percentStacking_(scale, point, stack, val, prevStack, prevVal);
   var positive = val >= 0;
+
+  stack.shared = stack.shared || {
+    positiveAnchor: NaN,
+    negativeAnchor: NaN
+  };
+
+  if (!point.meta('shared'))
+    point.meta('shared', stack.shared);
+
   if (stack.prevMissing) {
     if (positive) {
       point.meta('stackedZeroPrev', stack.prevPositive);

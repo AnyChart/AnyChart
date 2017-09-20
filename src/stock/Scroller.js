@@ -1272,6 +1272,18 @@ anychart.stockModule.Scroller.prototype.seriesInvalidated_ = function(e) {
 
 
 /**
+ * Resets series shared stack.
+ */
+anychart.stockModule.Scroller.prototype.resetSeriesStack = function() {
+  for (var i = 0; i < this.series_.length; i++) {
+    var series = this.series_[i];
+    if (series)
+      series.resetSharedStack();
+  }
+};
+
+
+/**
  * Invalidates all series.
  * @private
  */
@@ -1557,6 +1569,7 @@ anychart.stockModule.Scroller.prototype.draw = function() {
         series.resumeSignalsDispatching(false);
       }
     }
+    this.resetSeriesStack();
     this.markConsistent(anychart.ConsistencyState.STOCK_SCROLLER_SERIES);
   }
 

@@ -4,6 +4,7 @@ goog.require('anychart.core.Axis');
 goog.require('anychart.core.IPlot');
 goog.require('anychart.core.VisualBaseWithBounds');
 goog.require('anychart.core.reporting');
+goog.require('anychart.core.settings');
 goog.require('anychart.core.ui.Background');
 goog.require('anychart.core.ui.Crosshair');
 goog.require('anychart.core.ui.Label');
@@ -159,6 +160,13 @@ anychart.stockModule.Plot = function(chart) {
   }, this);
 
   this.defaultSeriesType(anychart.enums.StockSeriesType.LINE);
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['pointWidth', anychart.ConsistencyState.STOCK_PLOT_SERIES, anychart.Signal.NEEDS_REDRAW, 0, this.invalidateWidthBasedSeries],
+    ['maxPointWidth', anychart.ConsistencyState.STOCK_PLOT_SERIES, anychart.Signal.NEEDS_REDRAW, 0, this.invalidateWidthBasedSeries],
+    ['minPointLength', anychart.ConsistencyState.STOCK_PLOT_SERIES, anychart.Signal.NEEDS_REDRAW, 0, this.resetSeriesStack]
+  ]);
+
 };
 goog.inherits(anychart.stockModule.Plot, anychart.core.VisualBaseWithBounds);
 
@@ -261,6 +269,34 @@ anychart.stockModule.Plot.ZINDEX_PRICE_INDICATOR = 150;
  * @type {number}
  */
 anychart.stockModule.Plot.ZINDEX_BACKGROUND = 1;
+
+
+/**
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.stockModule.Plot.PROPERTY_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'pointWidth',
+      anychart.utils.normalizeNumberOrPercent);
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'maxPointWidth',
+      anychart.utils.normalizeNumberOrPercent);
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'minPointLength',
+      anychart.utils.normalizeNumberOrPercent);
+
+  return map;
+})();
+anychart.core.settings.populate(anychart.stockModule.Plot, anychart.stockModule.Plot.PROPERTY_DESCRIPTORS);
 
 
 //region Series-related methods
@@ -1122,6 +1158,33 @@ anychart.stockModule.Plot.prototype.setDefaultPriceIndicatorSettings = function(
 
 
 /**
+ * Invalidates APPEARANCE for all width-based series.
+ * @protected
+ */
+anychart.stockModule.Plot.prototype.invalidateWidthBasedSeries = function() {
+  for (var i = this.series_.length; i--;) {
+    if (this.series_[i].isWidthBased())
+      this.series_[i].invalidate(anychart.ConsistencyState.SERIES_POINTS);
+  }
+};
+
+
+/**
+ * Resets series shared stack.
+ * @param {boolean=} opt_skipInvalidation - Whether to skip width based series invalidation.
+ */
+anychart.stockModule.Plot.prototype.resetSeriesStack = function(opt_skipInvalidation) {
+  for (var i = 0; i < this.series_.length; i++) {
+    var series = this.series_[i];
+    if (series)
+      series.resetSharedStack();
+  }
+  if (!opt_skipInvalidation)
+    this.invalidateWidthBasedSeries();
+};
+
+
+/**
  * Invalidates plot series. Doesn't dispatch anything.
  * @param {boolean} doInvalidateBounds
  * @param {boolean=} opt_skipLegend
@@ -1708,6 +1771,7 @@ anychart.stockModule.Plot.prototype.draw = function() {
         series.resumeSignalsDispatching(false);
       }
     }
+    this.resetSeriesStack(true);
     this.markConsistent(anychart.ConsistencyState.STOCK_PLOT_SERIES);
   }
 
@@ -2672,6 +2736,8 @@ anychart.stockModule.Plot.prototype.serialize = function() {
   var objId;
   var i;
 
+  anychart.core.settings.serialize(this, anychart.stockModule.Plot.PROPERTY_DESCRIPTORS, json);
+
   scalesIds[goog.getUid(this.yScale())] = this.yScale().serialize();
   scales.push(scalesIds[goog.getUid(this.yScale())]);
   json['yScale'] = scales.length - 1;
@@ -2754,6 +2820,12 @@ anychart.stockModule.Plot.prototype.serialize = function() {
 anychart.stockModule.Plot.prototype.setupByJSON = function(config, opt_default) {
   anychart.stockModule.Plot.base(this, 'setupByJSON', config, opt_default);
   var i, json, scale;
+
+  if (opt_default) {
+    anychart.core.settings.copy(this.themeSettings, anychart.stockModule.Plot.PROPERTY_DESCRIPTORS, config);
+  } else {
+    anychart.core.settings.deserialize(this, anychart.stockModule.Plot.PROPERTY_DESCRIPTORS, config);
+  }
 
   this.defaultSeriesType(config['defaultSeriesType']);
 

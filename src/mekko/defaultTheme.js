@@ -102,7 +102,8 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       'annotationsList': [],
       'zIndex': 2000
     },
-    'pointsPadding': 0
+    'pointsPadding': 0,
+    'maxPointWidth': '100%'
   },
   // merge with mekko
   'mosaic': {

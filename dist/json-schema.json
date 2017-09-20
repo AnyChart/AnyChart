@@ -446,7 +446,28 @@
         "zAngle": {"type": ["number"]},
         "zAspect": {"type": ["number", "string"]},
         "zPadding": {"type": ["number"]},
-        "zDistribution": {"type": ["boolean"]}
+        "zDistribution": {"type": ["boolean"]},
+        "pointWidth": {
+          "type": [
+            "string",
+            "number",
+            "null"
+          ]
+        },
+        "maxPointWidth": {
+          "type": [
+            "string",
+            "number",
+            "null"
+          ]
+        },
+        "minPointLength": {
+          "type": [
+            "string",
+            "number",
+            "null"
+          ]
+        }
       },
       "required": ["type"]
     },
@@ -2828,6 +2849,20 @@
           ]
         },
         "pointWidth": {
+          "type": [
+            "string",
+            "number",
+            "null"
+          ]
+        },
+        "maxPointWidth": {
+          "type": [
+            "string",
+            "number",
+            "null"
+          ]
+        },
+        "minPointLength": {
           "type": [
             "string",
             "number",
