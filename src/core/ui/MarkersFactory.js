@@ -43,6 +43,7 @@ anychart.core.ui.MarkersFactory = function(opt_isNonInteractive, opt_crispEdges)
   this.suspendSignalsDispatching();
   anychart.core.ui.MarkersFactory.base(this, 'constructor');
 
+  delete this.themeSettings['enabled'];
 
   /**
    * If the markers factory should try to draw markers crisply by passing an additional param to the drawers.
@@ -785,7 +786,10 @@ anychart.core.ui.MarkersFactory.prototype.getRootLayer = function() {
 /** @inheritDoc */
 anychart.core.ui.MarkersFactory.prototype.serialize = function() {
   var json = anychart.core.ui.MarkersFactory.base(this, 'serialize');
-  if (goog.isNull(json['enabled'])) delete json['enabled'];
+  delete json['enabled'];
+  var enabledState = this.enabled();
+  if (goog.isDefAndNotNull(enabledState))
+    json['enabled'] = enabledState;
   if (goog.isDef(this.disablePointerEvents())) json['disablePointerEvents'] = this.disablePointerEvents();
   if (this.changedSettings['position']) json['position'] = this.position();
   if (this.changedSettings['anchor']) json['anchor'] = this.anchor();
@@ -868,6 +872,8 @@ anychart.core.ui.MarkersFactory.prototype.makeBrowserEvent = function(e) {
  */
 anychart.core.ui.MarkersFactory.Marker = function() {
   anychart.core.ui.MarkersFactory.Marker.base(this, 'constructor');
+
+  delete this.themeSettings['enabled'];
 
   /**
    * Label index.
@@ -1485,6 +1491,10 @@ anychart.core.ui.MarkersFactory.Marker.prototype.applyDefaultsForSingle_ = funct
 /** @inheritDoc */
 anychart.core.ui.MarkersFactory.Marker.prototype.serialize = function() {
   var json = anychart.core.ui.MarkersFactory.Marker.base(this, 'serialize');
+  delete json['enabled'];
+  var enabledState = this.enabled();
+  if (goog.isDefAndNotNull(enabledState))
+    json['enabled'] = enabledState;
   if (goog.isDef(this.position())) json['position'] = this.position();
   if (goog.isDef(this.rotation())) json['rotation'] = isNaN(this.rotation()) ? null : this.rotation();
   if (goog.isDef(this.anchor())) json['anchor'] = this.anchor();
@@ -1494,7 +1504,6 @@ anychart.core.ui.MarkersFactory.Marker.prototype.serialize = function() {
   if (goog.isDef(this.size())) json['size'] = this.size();
   if (goog.isDef(this.fill())) json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill()));
   if (goog.isDef(this.stroke())) json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
-  if (!goog.isDef(this.enabled())) delete json['enabled'];
 
   return json;
 };

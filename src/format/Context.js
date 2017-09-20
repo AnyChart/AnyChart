@@ -1,5 +1,6 @@
 goog.provide('anychart.format.Context');
 
+goog.require('anychart.base');
 goog.require('anychart.core.BaseContext');
 goog.require('anychart.format');
 
@@ -16,10 +17,10 @@ goog.require('anychart.format');
  * @constructor
  * @extends {anychart.core.BaseContext}
  */
-window['anychart']['format']['Context'] = function(opt_values, opt_dataSource, opt_statisticsSources) {
-  window['anychart']['format']['Context'].base(this, 'constructor', opt_values, opt_dataSource, opt_statisticsSources);
+anychart.window['anychart']['format']['Context'] = function(opt_values, opt_dataSource, opt_statisticsSources) {
+  anychart.window['anychart']['format']['Context'].base(this, 'constructor', opt_values, opt_dataSource, opt_statisticsSources);
 };
-goog.inherits(window['anychart']['format']['Context'], anychart.core.BaseContext);
+goog.inherits(anychart.window['anychart']['format']['Context'], anychart.core.BaseContext);
 
 
 
@@ -34,7 +35,7 @@ goog.inherits(window['anychart']['format']['Context'], anychart.core.BaseContext
  * @constructor
  * @extends {anychart.core.BaseContext}
  */
-anychart.format.Context = goog.global['anychart']['format']['Context'];
+anychart.format.Context = anychart.window['anychart']['format']['Context'];
 
 
 //exports

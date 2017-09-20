@@ -144,6 +144,12 @@
             ]
           }
         },
+        "noDataLabel": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.Label"}
+          ]
+        },
         "credits": {
           "oneOf": [
             {"$ref": "#/definitions/disable"},
@@ -4132,6 +4138,11 @@
         "selectedElementStroke": {"$ref": "#/definitions/stroke"},
         "selectedConnectorStroke": {"$ref": "#/definitions/stroke"},
         "labels": {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"},
+        "baseLabels": {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"},
+        "parentLabels": {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"},
+        "milestoneLabels": {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"},
+        "baselineLabels": {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"},
+        "progressLabels": {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"},
         "markers": {"$ref": "#/definitions/anychart.core.ui.MarkersFactory"},
         "header": {"$ref": "#/definitions/anychart.core.ui.TimelineHeader"},
         "connectorPreviewStroke": {"$ref": "#/definitions/stroke"},

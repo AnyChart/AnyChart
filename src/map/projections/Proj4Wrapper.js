@@ -20,7 +20,7 @@ anychart.mapModule.projections.Proj4Wrapper = function(projectionStr) {
    * @type {Function}
    * @private
    */
-  this.proj4_ = window['proj4'];
+  this.proj4_ = anychart.window['proj4'];
 };
 goog.inherits(anychart.mapModule.projections.Proj4Wrapper, anychart.mapModule.projections.Base);
 

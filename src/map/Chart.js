@@ -813,10 +813,10 @@ anychart.mapModule.Chart.prototype.controlsInteractivity_ = function() {
           var newScrollY = scrollEl.scrollTop;
           setTimeout(function() {
             if (scrollEl.scrollLeft == newScrollX && scrollEl.scrollTop == newScrollY)
-              window.scrollTo(scrollX, scrollY);
+              anychart.window.scrollTo(scrollX, scrollY);
           }, 0);
         } else {
-          window.scrollTo(scrollX, scrollY);
+          anychart.window.scrollTo(scrollX, scrollY);
         }
       }
     };
@@ -1816,7 +1816,9 @@ anychart.mapModule.Chart.prototype.normalizeSeriesType = function(type) {
 /** @inheritDoc */
 anychart.mapModule.Chart.prototype.seriesInvalidated = function(event) {
   var state = 0;
-
+  if (event.hasSignal(anychart.Signal.ENABLED_STATE_CHANGED)) {
+    state |= anychart.ConsistencyState.CHART_LABELS;
+  }
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
     state = anychart.ConsistencyState.SERIES_CHART_SERIES;
     if ((/** @type {anychart.mapModule.Series} */(event['target'])).needsUpdateMapAppearance())
@@ -1834,7 +1836,8 @@ anychart.mapModule.Chart.prototype.seriesInvalidated = function(event) {
   if (event.hasSignal(anychart.Signal.DATA_CHANGED)) {
     state |= anychart.ConsistencyState.SERIES_CHART_SERIES |
         anychart.ConsistencyState.CHART_LEGEND |
-        anychart.ConsistencyState.MAP_LABELS;
+        anychart.ConsistencyState.MAP_LABELS |
+        anychart.ConsistencyState.CHART_LABELS;
     if ((/** @type {anychart.mapModule.Series} */(event['target'])).needsUpdateMapAppearance())
       state |= anychart.ConsistencyState.APPEARANCE;
     for (var i = this.seriesList.length; i--;)
@@ -2078,7 +2081,7 @@ anychart.mapModule.Chart.prototype.geoData = function(opt_data) {
     if (goog.isString(opt_data) && !goog.string.startsWith(opt_data, '<')) {
       this.geoDataStringName_ = opt_data;
       var configPath = opt_data.split('.');
-      opt_data = goog.dom.getWindow();
+      opt_data = anychart.window;
       for (var i = 0, len = configPath.length; i < len; i++) {
         opt_data = opt_data[configPath[i]];
       }
@@ -2849,7 +2852,7 @@ anychart.mapModule.Chart.prototype.calculate = function() {
 
     if (goog.isDefAndNotNull(geoData)) {
       geoData = goog.isString(this.geoData_) && !goog.string.startsWith(/** @type {string} */(geoData), '<') ?
-          goog.dom.getWindow()['anychart']['maps'][this.geoData_] : this.geoData_;
+          anychart.window['anychart']['maps'][this.geoData_] : this.geoData_;
 
       if (goog.isString(geoData) && goog.string.startsWith(geoData, '<') || goog.dom.isNodeLike(geoData)) {
         this.parser = anychart.mapModule.utils.GeoSVGParser.getInstance();
@@ -3365,7 +3368,7 @@ anychart.mapModule.Chart.prototype.drawContent = function(bounds) {
             this != this.getCurrentScene() ? true : this.getRootScene().dispatchEvent(this.createZoomEvent(anychart.enums.EventType.ZOOM_START));
 
         if (allowZoom) {
-          if (goog.global['anychart']['ui']['ContextMenu']) {
+          if (anychart.window['anychart']['ui']['ContextMenu']) {
             var contextMenu = this.contextMenu();
             if (contextMenu.isVisible()) contextMenu.hide();
           }

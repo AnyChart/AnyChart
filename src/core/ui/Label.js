@@ -27,8 +27,51 @@ goog.require('anychart.core.ui.LabelBase');
  */
 anychart.core.ui.Label = function() {
   anychart.core.ui.Label.base(this, 'constructor');
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['visible', anychart.ConsistencyState.LABEL_VISIBILITY, anychart.Signal.NEEDS_REDRAW]
+  ]);
+  this.themeSettings['visible'] = true;
 };
 goog.inherits(anychart.core.ui.Label, anychart.core.ui.LabelBase);
+
+
+/**
+ * Supported consistency states.
+ * @type {number}
+ */
+anychart.core.ui.Label.prototype.SUPPORTED_CONSISTENCY_STATES =
+    anychart.core.ui.LabelBase.prototype.SUPPORTED_CONSISTENCY_STATES |
+        anychart.ConsistencyState.LABEL_VISIBILITY;
+
+
+/**
+ * Descriptors.
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.core.ui.Label.DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'visible',
+      anychart.core.settings.booleanNormalizer);
+  return map;
+})();
+anychart.core.settings.populate(anychart.core.ui.Label, anychart.core.ui.Label.DESCRIPTORS);
+
+
+/** @inheritDoc */
+anychart.core.ui.Label.prototype.draw = function() {
+  if (!this.checkDrawingNeeded())
+    return this;
+  anychart.core.ui.Label.base(this, 'draw');
+  if (this.hasInvalidationState(anychart.ConsistencyState.LABEL_VISIBILITY)) {
+    this.getRootLayer().visible(/** @type {boolean} */(this.getOption('visible')));
+    this.markConsistent(anychart.ConsistencyState.LABEL_VISIBILITY);
+  }
+  return this;
+};
 
 
 

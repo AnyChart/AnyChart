@@ -952,7 +952,7 @@ anychart.tagCloudModule.Chart.prototype.data = function(opt_value, opt_settings)
             (goog.isArray(opt_value) || goog.isString(opt_value)) ? opt_value : null, opt_settings)).mapAs();
       }
       this.data_.listenSignals(this.dataInvalidated_, this);
-      this.invalidate(anychart.ConsistencyState.TAG_CLOUD_DATA, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.TAG_CLOUD_DATA | anychart.ConsistencyState.CHART_LABELS, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -966,7 +966,7 @@ anychart.tagCloudModule.Chart.prototype.data = function(opt_value, opt_settings)
  * @private
  */
 anychart.tagCloudModule.Chart.prototype.dataInvalidated_ = function(event) {
-  this.invalidate(anychart.ConsistencyState.TAG_CLOUD_DATA, anychart.Signal.NEEDS_REDRAW);
+  this.invalidate(anychart.ConsistencyState.TAG_CLOUD_DATA | anychart.ConsistencyState.CHART_LABELS, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -2092,23 +2092,28 @@ anychart.tagCloudModule.Chart.prototype.drawContent = function(bounds) {
 
 
 //endregion
+//region --- No data
+/** @inheritDoc */
+anychart.tagCloudModule.Chart.prototype.isNoData = function() {
+  var rowsCount = this.getIterator().getRowsCount();
+  return (!rowsCount);
+};
+
+
+//endregion
 //region --- Setup and Dispose
 /**
  * Sets default settings.
  * @param {!Object} config
  */
 anychart.tagCloudModule.Chart.prototype.setThemeSettings = function(config) {
-  for (var name in this.SIMPLE_PROPS_DESCRIPTORS) {
-    var val = config[name];
-    if (goog.isDef(val))
-      this.themeSettings[name] = val;
-  }
+  anychart.core.settings.copy(this.themeSettings, this.SIMPLE_PROPS_DESCRIPTORS, config);
 };
 
 
 /** @inheritDoc */
 anychart.tagCloudModule.Chart.prototype.setupByJSON = function(config, opt_default) {
-  anychart.tagCloudModule.Chart.base(this, 'setupByJSON', config);
+  anychart.tagCloudModule.Chart.base(this, 'setupByJSON', config, opt_default);
 
   if (opt_default) {
     this.setThemeSettings(config);

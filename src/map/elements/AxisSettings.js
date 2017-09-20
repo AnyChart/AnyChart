@@ -470,11 +470,7 @@ anychart.mapModule.elements.AxisSettings.prototype.ticksInvalidated_ = function(
  * @param {!Object} config
  */
 anychart.mapModule.elements.AxisSettings.prototype.setThemeSettings = function(config) {
-  for (var name in this.SIMPLE_PROPS_DESCRIPTORS) {
-    var val = config[name];
-    if (goog.isDef(val))
-      this.themeSettings[name] = val;
-  }
+  anychart.core.settings.copy(this.themeSettings, this.SIMPLE_PROPS_DESCRIPTORS, config);
 };
 
 
@@ -522,18 +518,27 @@ anychart.mapModule.elements.AxisSettings.prototype.setupByJSON = function(config
 /** @inheritDoc */
 anychart.mapModule.elements.AxisSettings.prototype.serialize = function() {
   var json = {};
+  var axisSettings;
 
   if (this.leftAxis_) {
-    json['left'] = this.leftAxis_.serialize();
+    axisSettings = this.leftAxis_.serialize();
+    if (!goog.object.isEmpty(axisSettings))
+      json['left'] = axisSettings;
   }
   if (this.topAxis_) {
-    json['top'] = this.topAxis_.serialize();
+    axisSettings = this.topAxis_.serialize();
+    if (!goog.object.isEmpty(axisSettings))
+      json['top'] = axisSettings;
   }
   if (this.rightAxis_) {
-    json['right'] = this.rightAxis_.serialize();
+    axisSettings = this.rightAxis_.serialize();
+    if (!goog.object.isEmpty(axisSettings))
+      json['right'] = axisSettings;
   }
   if (this.bottomAxis_) {
-    json['bottom'] = this.bottomAxis_.serialize();
+    axisSettings = this.bottomAxis_.serialize();
+    if (!goog.object.isEmpty(axisSettings))
+      json['bottom'] = axisSettings;
   }
 
   json['title'] = this.title_.serialize();

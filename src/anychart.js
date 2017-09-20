@@ -39,7 +39,23 @@ goog.forwardDeclare('anychart.core.Chart');
  * @namespace
  * @name anychart.graphics
  */
-anychart.graphics = goog.global['acgraph'];
+anychart.graphics = anychart.window['acgraph'];
+
+
+/**
+ * Get/Set global object.
+ * @param {Window=} opt_value Global context.
+ * @return {Window} .
+ */
+anychart.global = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    goog.global = opt_value;
+
+    anychart.window = opt_value;
+    anychart.document = opt_value['document'];
+  }
+  return goog.global;
+};
 
 
 /**
@@ -313,7 +329,7 @@ anychart.fromXml = function(xmlConfig) {
 //  Default font settings
 //
 //----------------------------------------------------------------------------------------------------------------------
-goog.global['anychart'] = goog.global['anychart'] || {};
+anychart.window['anychart'] = anychart.window['anychart'] || {};
 
 
 /**
@@ -321,8 +337,8 @@ goog.global['anychart'] = goog.global['anychart'] || {};
  * @type {string|number}
  *
  */
-//goog.global['anychart']['fontSize'] = '12px';
-goog.global['anychart']['fontSize'] = '13px';
+//anychart.window['anychart']['fontSize'] = '12px';
+anychart.window['anychart']['fontSize'] = '13px';
 
 
 /**
@@ -330,8 +346,8 @@ goog.global['anychart']['fontSize'] = '13px';
  * @type {string}
  *
  */
-//goog.global['anychart']['fontColor'] = '#000';
-goog.global['anychart']['fontColor'] = '#7c868e'; //colorAxisFont
+//anychart.window['anychart']['fontColor'] = '#000';
+anychart.window['anychart']['fontColor'] = '#7c868e'; //colorAxisFont
 
 
 /**
@@ -339,8 +355,8 @@ goog.global['anychart']['fontColor'] = '#7c868e'; //colorAxisFont
  * @type {string}
  *
  */
-//goog.global['anychart']['fontFamily'] = 'Arial';
-goog.global['anychart']['fontFamily'] = "'Verdana', Helvetica, Arial, sans-serif";
+//anychart.window['anychart']['fontFamily'] = 'Arial';
+anychart.window['anychart']['fontFamily'] = "'Verdana', Helvetica, Arial, sans-serif";
 
 
 /**
@@ -348,7 +364,7 @@ goog.global['anychart']['fontFamily'] = "'Verdana', Helvetica, Arial, sans-serif
  * @type {string}
  *
  */
-goog.global['anychart']['textDirection'] = acgraph.vector.Text.Direction.LTR;
+anychart.window['anychart']['textDirection'] = acgraph.vector.Text.Direction.LTR;
 
 
 //endregion
@@ -376,7 +392,7 @@ anychart.onDocumentLoad = function(func, opt_scope) {
   }
   anychart.documentLoadCallbacks_.push([func, opt_scope]);
 
-  goog.events.listen(goog.global, goog.events.EventType.LOAD, function() {
+  goog.events.listen(anychart.window, goog.events.EventType.LOAD, function() {
     for (var i = 0, count = anychart.documentLoadCallbacks_.length; i < count; i++) {
       var item = anychart.documentLoadCallbacks_[i];
       item[0].apply(item[1]);
@@ -391,8 +407,8 @@ anychart.onDocumentLoad = function(func, opt_scope) {
  * @private
  */
 anychart.attachDomEvents_ = function() {
-  var window = goog.global;
-  var document = window['document'];
+  var window = anychart.window;
+  var document = anychart.document;
 
   // goog.events.EventType.DOMCONTENTLOADED - for browsers that support DOMContentLoaded event. IE9+
   // goog.events.EventType.READYSTATECHANGE - for IE9-
@@ -408,8 +424,8 @@ anychart.attachDomEvents_ = function() {
  * @private
  */
 anychart.detachDomEvents_ = function() {
-  var window = goog.global;
-  var document = window['document'];
+  var window = anychart.window;
+  var document = anychart.document;
 
   acgraph.events.unlisten(document, [goog.events.EventType.DOMCONTENTLOADED, goog.events.EventType.READYSTATECHANGE], anychart.completed_, false);
   acgraph.events.unlisten(/** @type {EventTarget}*/ (window), goog.events.EventType.LOAD, anychart.completed_, false);
@@ -422,9 +438,9 @@ anychart.detachDomEvents_ = function() {
  * @private
  */
 anychart.completed_ = function(event) {
-  var document = goog.global['document'];
+  var document = anychart.document;
   // readyState === "complete" is good enough for us to call the dom ready in oldIE
-  if (document.addEventListener || window['event']['type'] === 'load' || document['readyState'] === 'complete') {
+  if (document.addEventListener || anychart.window['event']['type'] === 'load' || document['readyState'] === 'complete') {
     anychart.detachDomEvents_();
     anychart.ready_(event);
   }
@@ -450,7 +466,7 @@ anychart.ready_ = function(event) {
     return;
   }
 
-  var document = goog.global['document'];
+  var document = anychart.document;
 
   // Make sure the document body at least exists in case IE gets a little overzealous (ticket #5443).
   if (!document['body']) {
@@ -477,6 +493,9 @@ anychart.ready_ = function(event) {
  * @param {*=} opt_scope Function call context.
  */
 anychart.onDocumentReady = function(func, opt_scope) {
+  if (anychart.window['isNodeJS'])
+    anychart.isReady_ = true;
+
   if (anychart.isReady_) {
     func.call(opt_scope);
   }
@@ -486,9 +505,8 @@ anychart.onDocumentReady = function(func, opt_scope) {
   }
   anychart.documentReadyCallbacks_.push([func, opt_scope]);
 
-  var document = goog.global['document'];
 
-  if (document['readyState'] === 'complete') {
+  if (anychart.document['readyState'] === 'complete') {
     setTimeout(anychart.ready_, 1);
   } else {
     anychart.attachDomEvents_();
@@ -600,12 +618,12 @@ anychart.getFullTheme = function(root) {
   anychart.performance.start('Theme compilation');
   var i;
   if (!anychart.themeClones_.length) {
-    anychart.themeClones_.push(goog.global['anychart']['themes'][anychart.DEFAULT_THEME] || {});
+    anychart.themeClones_.push(anychart.window['anychart']['themes'][anychart.DEFAULT_THEME] || {});
     anychart.mergedThemeClones_.push(anychart.themeClones_[0]);
   }
   for (i = anychart.themeClones_.length - 1; i < anychart.themes_.length; i++) {
     var themeToMerge = anychart.themes_[i];
-    var clone = anychart.utils.recursiveClone(goog.isString(themeToMerge) ? goog.global['anychart']['themes'][themeToMerge] : themeToMerge);
+    var clone = anychart.utils.recursiveClone(goog.isString(themeToMerge) ? anychart.window['anychart']['themes'][themeToMerge] : themeToMerge);
     anychart.themeClones_.push(goog.isObject(clone) ? clone : {});
     anychart.mergedThemeClones_.push({});
   }
@@ -666,12 +684,24 @@ anychart.createNFIMError = function(featureName, opt_ifNotFromTheme) {
  */
 anychart.getFeatureOrError = function(modulePath, error, opt_ifNotFromTheme) {
   var path = modulePath.split('.');
-  var target = window;
+  var target = anychart.window;
   for (var i = 0; i < path.length; i++) {
     target = target[path[i]];
     if (!target) return anychart.createNFIMError(error, opt_ifNotFromTheme);
   }
   return /** @type {!Function} */(target);
+};
+
+
+/**
+ * @param {Object} proto
+ * @param {string} methodName
+ * @param {string} error
+ * @return {!Function}
+ */
+anychart.getMethodOrError = function(proto, methodName, error) {
+  var target = /** @type {Function} */(proto[methodName]);
+  return target ? target : anychart.createNFIMError(error);
 };
 
 
@@ -755,6 +785,7 @@ goog.exportSymbol('anychart.onDocumentReady', anychart.onDocumentReady);//doc|ex
 goog.exportSymbol('anychart.licenseKey', anychart.licenseKey);//doc|ex
 goog.exportSymbol('anychart.theme', anychart.theme);
 goog.exportSymbol('anychart.appendTheme', anychart.appendTheme);
+goog.exportSymbol('anychart.global', anychart.global);
 goog.exportSymbol('anychart.getChartById', anychart.getChartById);
 goog.exportSymbol('anychart.area', anychart.getFeatureOrError('anychart.area', 'Area chart'));
 goog.exportSymbol('anychart.area3d', anychart.getFeatureOrError('anychart.area3d', '3D Area chart'));
@@ -849,4 +880,22 @@ goog.exportSymbol('anychart.data.loadGoogleSpreadsheet', anychart.getFeatureOrEr
 (function() {
   var proto = acgraph.vector.Stage.prototype;
   proto['credits'] = proto.credits;
+  proto['saveAsPNG'] = anychart.getMethodOrError(proto, 'saveAsPng', 'Exporting');
+  proto['saveAsJPG'] = anychart.getMethodOrError(proto, 'saveAsJpg', 'Exporting');
+  proto['saveAsPDF'] = anychart.getMethodOrError(proto, 'saveAsPdf', 'Exporting');
+  proto['saveAsSVG'] = anychart.getMethodOrError(proto, 'saveAsSvg', 'Exporting');
+  proto['saveAsPng'] = anychart.getMethodOrError(proto, 'saveAsPng', 'Exporting');
+  proto['saveAsJpg'] = anychart.getMethodOrError(proto, 'saveAsJpg', 'Exporting');
+  proto['saveAsPdf'] = anychart.getMethodOrError(proto, 'saveAsPdf', 'Exporting');
+  proto['saveAsSvg'] = anychart.getMethodOrError(proto, 'saveAsSvg', 'Exporting');
+  proto['shareAsPng'] = anychart.getMethodOrError(proto, 'shareAsPng', 'Exporting');
+  proto['shareAsJpg'] = anychart.getMethodOrError(proto, 'shareAsJpg', 'Exporting');
+  proto['shareAsPdf'] = anychart.getMethodOrError(proto, 'shareAsPdf', 'Exporting');
+  proto['shareAsSvg'] = anychart.getMethodOrError(proto, 'shareAsSvg', 'Exporting');
+  proto['getPngBase64String'] = anychart.getMethodOrError(proto, 'getPngBase64String', 'Exporting');
+  proto['getJpgBase64String'] = anychart.getMethodOrError(proto, 'getJpgBase64String', 'Exporting');
+  proto['getSvgBase64String'] = anychart.getMethodOrError(proto, 'getSvgBase64String', 'Exporting');
+  proto['getPdfBase64String'] = anychart.getMethodOrError(proto, 'getPdfBase64String', 'Exporting');
+  proto['print'] = anychart.getMethodOrError(proto, 'print', 'Exporting');
+  proto['toSvg'] = anychart.getMethodOrError(proto, 'toSvg', 'Exporting');
 })();

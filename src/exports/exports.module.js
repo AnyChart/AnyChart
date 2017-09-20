@@ -1,205 +1,52 @@
-goog.provide('anychart.exports.entry');
-
+goog.provide('anychart.exportsModule.entry');
 goog.require('acgraph.exporting');
 goog.require('anychart');
+goog.require('anychart.base');
 goog.require('anychart.core.Chart');
 goog.require('anychart.core.VisualBase');
+goog.require('anychart.exportsModule.Exports');
 goog.require('anychart.utils');
 goog.require('goog.dom');
 
 
-/**
- @namespace
- @name anychart.exports
- */
+
+anychart.exports = new anychart.exportsModule.Exports();
+anychart.exports.applyDefaults();
 
 
 /**
- * File name for exported files.
- * @type {string}
- * @private
+ * Creates exports settings object.
+ * @return {anychart.exportsModule.Exports}
  */
-anychart.exports.filename_ = 'anychart';
-
-
-/**
- * Dimensions for exported images and pdf-s.
- * @type {Object}
- * @private
- */
-anychart.exports.image_ = {
-  'width': undefined,
-  'height': undefined
+anychart.exports.create = function() {
+  return new anychart.exportsModule.Exports();
 };
 
 
+//region --- Utils
 /**
- * Facebook sharing settings.
- * @type {Object}
- * @private
+ * Settings resolver.
+ * @param {*} target .
+ * @param {string} name .
+ * @return {!Object}
  */
-anychart.exports.facebook_ = {
-  'caption': window['location']['hostname'],
-  'link': undefined,
-  'name': undefined,
-  'description': undefined,
-  'appId': 1167712323282103,
-  'width': 1200,
-  'height': 630
-};
+anychart.exports.getFinalSettings = function(target, name) {
+  var targetSettings = target['exports'] ? target['exports']()[name]() : void 0;
+  var globalSettings = goog.global['anychart']['exports'][name]();
 
-
-/**
- * Twitter sharing settings.
- * @type {Object}
- * @private
- */
-anychart.exports.twitter_ = {
-  'url': 'https://export.anychart.com/sharing/twitter',
-  'width': 1024,
-  'height': 800
-};
-
-
-/**
- * LinkedIn sharing settings.
- * @type {Object}
- * @private
- */
-anychart.exports.linkedIn_ = {
-  'caption': 'AnyChart',
-  'description': undefined,
-  'width': 1200,
-  'height': 630
-};
-
-
-/**
- * Pinterest sharing settings.
- * @type {Object}
- * @private
- */
-anychart.exports.pinterest_ = {
-  'link': undefined,
-  'description': undefined,
-  'width': 1200,
-  'height': 800
-};
-
-
-/**
- * Get/set file name for exported files.
- * @param {string=} opt_value New file name.
- * @return {string} Current file name.
- */
-anychart.exports.filename = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    anychart.exports.filename_ = opt_value;
+  var resultSettings;
+  if (goog.typeOf(targetSettings) == 'object') {
+    resultSettings = anychart.utils.decomposeArguments(globalSettings, targetSettings, globalSettings);
+  } else {
+    resultSettings = goog.isDef(targetSettings) ? targetSettings : globalSettings;
   }
-  return anychart.exports.filename_;
+
+  return resultSettings;
 };
 
 
-/**
- * Get/set dimensions for exported images and pdf-s.
- * @param {(string|Object)=} opt_widthOrOptions New image or pdf width. Or object with options.
- * @param {string=} opt_height New image or pdf height.
- * @return {Object} Current image dimensions.
- */
-anychart.exports.image = function(opt_widthOrOptions, opt_height) {
-  anychart.exports.image_ = anychart.utils.decomposeArguments({
-    'width': opt_widthOrOptions,
-    'height': opt_height
-  }, opt_widthOrOptions, anychart.exports.image_);
-
-  return anychart.exports.image_;
-};
-
-
-/**
- * Get/set facebook sharing settings.
- * @param {(string|Object)=} opt_captionOrOptions Caption for main link or object with options.
- * @param {string=} opt_link Url of the link attached to publication.
- * @param {string=} opt_name Title for the attached link.
- * @param {string=} opt_description Description for the attached link.
- * @param {string=} opt_width Image width.
- * @param {string=} opt_height Image height.
- * @param {string=} opt_appId Facebook application id.
- * @return {Object} Current settings.
- */
-anychart.exports.facebook = function(opt_captionOrOptions, opt_link, opt_name, opt_description, opt_width, opt_height, opt_appId) {
-  anychart.exports.facebook_ = anychart.utils.decomposeArguments({
-    'caption': opt_captionOrOptions,
-    'link': opt_link,
-    'name': opt_name,
-    'description': opt_description,
-    'width': opt_width,
-    'height': opt_height,
-    'appId': opt_appId
-  }, opt_captionOrOptions, anychart.exports.facebook_);
-
-  return anychart.exports.facebook_;
-};
-
-
-/**
- * Get/set facebook sharing settings.
- * @param {(string|Object)=} opt_urlOrOptions Twitter sharing application export server url or object with options.
- * @param {string=} opt_width Image width.
- * @param {string=} opt_height Image height.
- * @return {Object} Current settings.
- */
-anychart.exports.twitter = function(opt_urlOrOptions, opt_width, opt_height) {
-  anychart.exports.twitter_ = anychart.utils.decomposeArguments({
-    'url': opt_urlOrOptions,
-    'width': opt_width,
-    'height': opt_height
-  }, opt_urlOrOptions, anychart.exports.twitter_);
-
-  return anychart.exports.twitter_;
-};
-
-
-/**
- * Get/set LinkedIn sharing settings.
- * @param {(string|Object)=} opt_captionOrOptions Caption for publication or object with options.
- * @param {string=} opt_description Description.
- * @param {string=} opt_width Image width.
- * @param {string=} opt_height Image height.
- * @return {Object} Current settings.
- */
-anychart.exports.linkedin = function(opt_captionOrOptions, opt_description, opt_width, opt_height) {
-  anychart.exports.linkedIn_ = anychart.utils.decomposeArguments({
-    'caption': opt_captionOrOptions,
-    'description': opt_description,
-    'width': opt_width,
-    'height': opt_height
-  }, opt_captionOrOptions, anychart.exports.linkedIn_);
-
-  return anychart.exports.linkedIn_;
-};
-
-
-/**
- * Get/set Pinterest sharing settings.
- * @param {(string|Object)=} opt_linkOrOptions Attached link or object with options.
- * @param {string=} opt_description Description.
- * @param {string=} opt_width Image width.
- * @param {string=} opt_height Image height.
- * @return {Object} Current settings.
- */
-anychart.exports.pinterest = function(opt_linkOrOptions, opt_description, opt_width, opt_height) {
-  anychart.exports.pinterest_ = anychart.utils.decomposeArguments({
-    'link': opt_linkOrOptions,
-    'description': opt_description,
-    'width': opt_width,
-    'height': opt_height
-  }, opt_linkOrOptions, anychart.exports.pinterest_);
-
-  return anychart.exports.pinterest_;
-};
-
-
+//endregion
+//region --- Saving
 /**
  Sets and returns an address export server script, which is used to export to an image
  or PDF.
@@ -210,15 +57,9 @@ anychart.exports.pinterest = function(opt_linkOrOptions, opt_description, opt_wi
  @param {string=} opt_address Export server script URL.
  @return {string} Export server script URL.
  */
-anychart.exports.server = goog.global['acgraph']['server'];
+anychart.exports.server = anychart.window['acgraph']['server'];
 
 
-
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Export.
-//
-//----------------------------------------------------------------------------------------------------------------------
 /**
  * Saves the current visual state into PNG file.
  * @example <t>lineChart</t>
@@ -232,24 +73,26 @@ anychart.exports.server = goog.global['acgraph']['server'];
  *   .listen('click', function(){
  *      chart.saveAsPng();
  *   });
+ * @param {?anychart.core.VisualBase} target
  * @param {?acgraph.vector.ILayer} container
  * @param {(number|Object)=} opt_widthOrOptions Image width or object with options.
  * @param {number=} opt_height Image height.
  * @param {number=} opt_quality Image quality in ratio 0-1.
  * @param {string=} opt_filename file name to save.
  */
-anychart.exports.saveAsPng = function(container, opt_widthOrOptions, opt_height, opt_quality, opt_filename) {
+anychart.exports.saveAsPng = function(target, container, opt_widthOrOptions, opt_height, opt_quality, opt_filename) {
   var stage = container ? container.getStage() : null;
   if (stage) {
+    var imageSettings = anychart.exports.getFinalSettings(target, 'image');
     var args = anychart.utils.decomposeArguments({
       'width': opt_widthOrOptions,
       'height': opt_height,
       'quality': opt_quality,
       'filename': opt_filename
     }, opt_widthOrOptions, {
-      'width': anychart.exports.image()['width'],
-      'height': anychart.exports.image()['height'],
-      'filename': anychart.exports.filename()
+      'width': imageSettings['width'],
+      'height': imageSettings['height'],
+      'filename': anychart.exports.getFinalSettings(target, 'filename')
     });
 
     stage.saveAsPng(args['width'], args['height'], args['quality'], args['filename']);
@@ -270,6 +113,7 @@ anychart.exports.saveAsPng = function(container, opt_widthOrOptions, opt_height,
  *   .listen('click', function(){
  *      chart.saveAsJpg();
  *   });
+ * @param {?anychart.core.VisualBase} target
  * @param {?acgraph.vector.ILayer} container
  * @param {(number|Object)=} opt_widthOrOptions Image width or object with options.
  * @param {number=} opt_height Image height.
@@ -277,9 +121,10 @@ anychart.exports.saveAsPng = function(container, opt_widthOrOptions, opt_height,
  * @param {boolean=} opt_forceTransparentWhite Define, should we force transparent to white background.
  * @param {string=} opt_filename file name to save.
  */
-anychart.exports.saveAsJpg = function(container, opt_widthOrOptions, opt_height, opt_quality, opt_forceTransparentWhite, opt_filename) {
+anychart.exports.saveAsJpg = function(target, container, opt_widthOrOptions, opt_height, opt_quality, opt_forceTransparentWhite, opt_filename) {
   var stage = container ? container.getStage() : null;
   if (stage) {
+    var imageSettings = anychart.exports.getFinalSettings(target, 'image');
     var args = anychart.utils.decomposeArguments(
         {
           'width': opt_widthOrOptions,
@@ -289,9 +134,9 @@ anychart.exports.saveAsJpg = function(container, opt_widthOrOptions, opt_height,
           'filename': opt_filename
         },
         opt_widthOrOptions, {
-          'width': anychart.exports.image()['width'],
-          'height': anychart.exports.image()['height'],
-          'filename': anychart.exports.filename()
+          'width': imageSettings['width'],
+          'height': imageSettings['height'],
+          'filename': anychart.exports.getFinalSettings(target, 'filename')
         });
 
     stage.saveAsJpg(args['width'], args['height'], args['quality'], args['forceTransparentWhite'], args['filename']);
@@ -312,6 +157,7 @@ anychart.exports.saveAsJpg = function(container, opt_widthOrOptions, opt_height,
  *   .listen('click', function(){
  *      chart.saveAsPdf();
  *   });
+ * @param {?anychart.core.VisualBase} target
  * @param {?acgraph.vector.ILayer} container
  * @param {(number|string|Object)=} opt_paperSizeOrWidthOrOptions Any paper format like 'a0', 'tabloid', 'b4', etc or width, or object with options.
  * @param {(number|boolean)=} opt_landscapeOrHeight Define, is landscape or pdf height.
@@ -319,9 +165,10 @@ anychart.exports.saveAsJpg = function(container, opt_widthOrOptions, opt_height,
  * @param {number=} opt_y Offset Y.
  * @param {string=} opt_filename file name to save.
  */
-anychart.exports.saveAsPdf = function(container, opt_paperSizeOrWidthOrOptions, opt_landscapeOrHeight, opt_x, opt_y, opt_filename) {
+anychart.exports.saveAsPdf = function(target, container, opt_paperSizeOrWidthOrOptions, opt_landscapeOrHeight, opt_x, opt_y, opt_filename) {
   var stage = container ? container.getStage() : null;
   if (stage) {
+    var imageSettings = anychart.exports.getFinalSettings(target, 'image');
     var args = anychart.utils.decomposeArguments(
         {
           'paperSize': opt_paperSizeOrWidthOrOptions,
@@ -333,9 +180,9 @@ anychart.exports.saveAsPdf = function(container, opt_paperSizeOrWidthOrOptions, 
           'filename': opt_filename
         },
         opt_paperSizeOrWidthOrOptions, {
-          'width': anychart.exports.image()['width'],
-          'height': anychart.exports.image()['height'],
-          'filename': anychart.exports.filename()
+          'width': imageSettings['width'],
+          'height': imageSettings['height'],
+          'filename': anychart.exports.getFinalSettings(target, 'filename')
         });
 
     stage.saveAsPdf(args['paperSize'] || args['width'], args['landscape'] || args['height'], args['x'], args['y'], args['filename']);
@@ -356,14 +203,16 @@ anychart.exports.saveAsPdf = function(container, opt_paperSizeOrWidthOrOptions, 
  *   .listen('click', function(){
  *      chart.saveAsSvg();
  *   });
+ * @param {?anychart.core.VisualBase} target
  * @param {?acgraph.vector.ILayer} container
  * @param {(string|number|Object)=} opt_paperSizeOrWidthOrOptions Paper Size or width or object with options.
  * @param {(boolean|string)=} opt_landscapeOrHeight Landscape or height.
  * @param {string=} opt_filename file name to save.
  */
-anychart.exports.saveAsSvg = function(container, opt_paperSizeOrWidthOrOptions, opt_landscapeOrHeight, opt_filename) {
+anychart.exports.saveAsSvg = function(target, container, opt_paperSizeOrWidthOrOptions, opt_landscapeOrHeight, opt_filename) {
   var stage = container ? container.getStage() : null;
   if (stage) {
+    var imageSettings = anychart.exports.getFinalSettings(target, 'image');
     var args = anychart.utils.decomposeArguments(
         {
           'paperSize': opt_paperSizeOrWidthOrOptions,
@@ -373,9 +222,9 @@ anychart.exports.saveAsSvg = function(container, opt_paperSizeOrWidthOrOptions, 
           'filename': opt_filename
         },
         opt_paperSizeOrWidthOrOptions, {
-          'width': anychart.exports.image()['width'],
-          'height': anychart.exports.image()['height'],
-          'filename': anychart.exports.filename()
+          'width': imageSettings['width'],
+          'height': imageSettings['height'],
+          'filename': anychart.exports.getFinalSettings(target, 'filename')
         });
 
     stage.saveAsSvg(args['paperSize'] || args['width'], args['landscape'] || args['height'], args['filename']);
@@ -385,14 +234,16 @@ anychart.exports.saveAsSvg = function(container, opt_paperSizeOrWidthOrOptions, 
 
 /**
  * Returns SVG string if type of content SVG otherwise returns empty string.
+ * @param {?anychart.core.VisualBase} target
  * @param {?acgraph.vector.ILayer} container
  * @param {(string|number|Object)=} opt_paperSizeOrWidthOrOptions Paper Size or width or object of options.
  * @param {(boolean|string)=} opt_landscapeOrHeight Landscape or height.
  * @return {string}
  */
-anychart.exports.toSvg = function(container, opt_paperSizeOrWidthOrOptions, opt_landscapeOrHeight) {
+anychart.exports.toSvg = function(target, container, opt_paperSizeOrWidthOrOptions, opt_landscapeOrHeight) {
   var stage = container ? container.getStage() : null;
   if (stage) {
+    var imageSettings = anychart.exports.getFinalSettings(target, 'image');
     var args = anychart.utils.decomposeArguments(
         {
           'paperSize': opt_paperSizeOrWidthOrOptions,
@@ -401,8 +252,8 @@ anychart.exports.toSvg = function(container, opt_paperSizeOrWidthOrOptions, opt_
           'height': opt_landscapeOrHeight
         },
         opt_paperSizeOrWidthOrOptions, {
-          'width': anychart.exports.image()['width'],
-          'height': anychart.exports.image()['height']
+          'width': imageSettings['width'],
+          'height': imageSettings['height']
         });
 
     return stage.toSvg(args['paperSize'] || args['width'], args['landscape'] || args['height']);
@@ -411,9 +262,75 @@ anychart.exports.toSvg = function(container, opt_paperSizeOrWidthOrOptions, opt_
 };
 
 
-//region --- SHARING ---
+/**
+ * Saves chart config as XML document.
+ * @param {?anychart.core.VisualBase} target
+ * @param {string} xml
+ * @param {string=} opt_filename file name to save.
+ */
+anychart.exports.saveAsXml = function(target, xml, opt_filename) {
+  var options = {};
+  options['file-name'] = opt_filename || anychart.exports.getFinalSettings(target, 'filename');
+  options['data'] = xml;
+  options['dataType'] = 'xml';
+  options['responseType'] = 'file';
+  acgraph.sendRequestToExportServer(acgraph.exportServer + '/xml', options);
+};
+
+
+/**
+ * Saves chart config as XML document.
+ * @param {?anychart.core.VisualBase} target
+ * @param {string} json
+ * @param {string=} opt_filename file name to save.
+ */
+anychart.exports.saveAsJson = function(target, json, opt_filename) {
+  var options = {};
+  options['file-name'] = opt_filename || anychart.exports.getFinalSettings(target, 'filename');
+  options['data'] = json;
+  options['dataType'] = 'json';
+  options['responseType'] = 'file';
+  acgraph.sendRequestToExportServer(acgraph.exportServer + '/json', options);
+};
+
+
+/**
+ * Saves chart data as csv.
+ * @param {?anychart.core.VisualBase} target
+ * @param {string} csv
+ * @param {string=} opt_filename file name to save.
+ */
+anychart.exports.saveAsCsv = function(target, csv, opt_filename) {
+  var options = {};
+  options['file-name'] = opt_filename || anychart.exports.getFinalSettings(target, 'filename');
+  options['data'] = csv;
+  options['dataType'] = 'csv';
+  options['responseType'] = 'file';
+  acgraph.sendRequestToExportServer(acgraph.exportServer + '/csv', options);
+};
+
+
+/**
+ * Saves chart data as excel document.
+ * @param {?anychart.core.VisualBase} target
+ * @param {string} csv
+ * @param {string=} opt_filename file name to save.
+ */
+anychart.exports.saveAsXlsx = function(target, csv, opt_filename) {
+  var options = {};
+  options['file-name'] = opt_filename || anychart.exports.getFinalSettings(target, 'filename');
+  options['data'] = csv;
+  options['dataType'] = 'xlsx';
+  options['responseType'] = 'file';
+  acgraph.sendRequestToExportServer(acgraph.exportServer + '/xlsx', options);
+};
+
+
+//endregion
+//region --- Sharing
 /**
  * Share container's stage as png and return link to shared image.
+ * @param {?anychart.core.VisualBase} target
  * @param {?acgraph.vector.ILayer} container
  * @param {(function(string)|Object)} onSuccessOrOptions Function that will be called when sharing will complete or object with options.
  * @param {function(string)=} opt_onError Function that will be called when sharing will complete.
@@ -423,9 +340,10 @@ anychart.exports.toSvg = function(container, opt_paperSizeOrWidthOrOptions, opt_
  * @param {number=} opt_quality Image quality in ratio 0-1.
  * @param {string=} opt_filename file name to save.
  */
-anychart.exports.shareAsPng = function(container, onSuccessOrOptions, opt_onError, opt_asBase64, opt_width, opt_height, opt_quality, opt_filename) {
+anychart.exports.shareAsPng = function(target, container, onSuccessOrOptions, opt_onError, opt_asBase64, opt_width, opt_height, opt_quality, opt_filename) {
   var stage = container ? container.getStage() : null;
   if (stage) {
+    var imageSettings = anychart.exports.getFinalSettings(target, 'image');
     var args = anychart.utils.decomposeArguments(
         {
           'onSuccess': onSuccessOrOptions,
@@ -437,9 +355,9 @@ anychart.exports.shareAsPng = function(container, onSuccessOrOptions, opt_onErro
           'filename': opt_filename
         },
         onSuccessOrOptions, {
-          'width': anychart.exports.image()['width'],
-          'height': anychart.exports.image()['height'],
-          'filename': anychart.exports.filename()
+          'width': imageSettings['width'],
+          'height': imageSettings['height'],
+          'filename': anychart.exports.getFinalSettings(target, 'filename')
         });
 
     stage.shareAsPng(args['onSuccess'], args['onError'], args['asBase64'], args['width'], args['height'], args['quality'], args['filename']);
@@ -449,6 +367,7 @@ anychart.exports.shareAsPng = function(container, onSuccessOrOptions, opt_onErro
 
 /**
  * Share container's stage as jpg and return link to shared image.
+ * @param {?anychart.core.VisualBase} target
  * @param {?acgraph.vector.ILayer} container
  * @param {(function(string)|Object)} onSuccessOrOptions Function that will be called when sharing will complete or object with options.
  * @param {function(string)=} opt_onError Function that will be called when sharing will complete.
@@ -459,10 +378,11 @@ anychart.exports.shareAsPng = function(container, onSuccessOrOptions, opt_onErro
  * @param {boolean=} opt_forceTransparentWhite Define, should we force transparent to white background.
  * @param {string=} opt_filename file name to save.
  */
-anychart.exports.shareAsJpg = function(container, onSuccessOrOptions, opt_onError, opt_asBase64, opt_width, opt_height, opt_quality, opt_forceTransparentWhite, opt_filename) {
+anychart.exports.shareAsJpg = function(target, container, onSuccessOrOptions, opt_onError, opt_asBase64, opt_width, opt_height, opt_quality, opt_forceTransparentWhite, opt_filename) {
   var stage = container ? container.getStage() : null;
 
   if (stage) {
+    var imageSettings = anychart.exports.getFinalSettings(target, 'image');
     var args = anychart.utils.decomposeArguments(
         {
           'onSuccess': onSuccessOrOptions,
@@ -475,9 +395,9 @@ anychart.exports.shareAsJpg = function(container, onSuccessOrOptions, opt_onErro
           'filename': opt_filename
         },
         onSuccessOrOptions, {
-          'width': anychart.exports.image()['width'],
-          'height': anychart.exports.image()['height'],
-          'filename': anychart.exports.filename()
+          'width': imageSettings['width'],
+          'height': imageSettings['height'],
+          'filename': anychart.exports.getFinalSettings(target, 'filename')
         });
 
     stage.shareAsJpg(args['onSuccess'], args['onError'], args['asBase64'], args['width'], args['height'], args['quality'], args['forceTransparentWhite'], args['filename']);
@@ -487,6 +407,7 @@ anychart.exports.shareAsJpg = function(container, onSuccessOrOptions, opt_onErro
 
 /**
  * Share container's stage as svg and return link to shared image.
+ * @param {?anychart.core.VisualBase} target
  * @param {?acgraph.vector.ILayer} container
  * @param {(function(string)|Object)} onSuccessOrOptions Function that will be called when sharing will complete or object with options.
  * @param {function(string)=} opt_onError Function that will be called when sharing will complete.
@@ -495,10 +416,11 @@ anychart.exports.shareAsJpg = function(container, onSuccessOrOptions, opt_onErro
  * @param {(boolean|string)=} opt_landscapeOrHeight Landscape or height.
  * @param {string=} opt_filename file name to save.
  */
-anychart.exports.shareAsSvg = function(container, onSuccessOrOptions, opt_onError, opt_asBase64, opt_paperSizeOrWidth, opt_landscapeOrHeight, opt_filename) {
+anychart.exports.shareAsSvg = function(target, container, onSuccessOrOptions, opt_onError, opt_asBase64, opt_paperSizeOrWidth, opt_landscapeOrHeight, opt_filename) {
   var stage = container ? container.getStage() : null;
 
   if (stage) {
+    var imageSettings = anychart.exports.getFinalSettings(target, 'image');
     var args = anychart.utils.decomposeArguments(
         {
           'onSuccess': onSuccessOrOptions,
@@ -511,9 +433,9 @@ anychart.exports.shareAsSvg = function(container, onSuccessOrOptions, opt_onErro
           'filename': opt_filename
         },
         onSuccessOrOptions, {
-          'width': anychart.exports.image()['width'],
-          'height': anychart.exports.image()['height'],
-          'filename': anychart.exports.filename()
+          'width': imageSettings['width'],
+          'height': imageSettings['height'],
+          'filename': anychart.exports.getFinalSettings(target, 'filename')
         });
 
     stage.shareAsSvg(args['onSuccess'], args['onError'], args['asBase64'], args['paperSize'] || args['width'], args['landscape'] || args['height'], args['filename']);
@@ -523,6 +445,7 @@ anychart.exports.shareAsSvg = function(container, onSuccessOrOptions, opt_onErro
 
 /**
  * Share container's stage as pdf and return link to shared pdf document.
+ * @param {?anychart.core.VisualBase} target
  * @param {?acgraph.vector.ILayer} container
  * @param {(function(string)|Object)} onSuccessOrOptions Function that will be called when sharing will complete or object with options.
  * @param {function(string)=} opt_onError Function that will be called when sharing will complete.
@@ -533,10 +456,11 @@ anychart.exports.shareAsSvg = function(container, onSuccessOrOptions, opt_onErro
  * @param {number=} opt_y Offset Y.
  * @param {string=} opt_filename file name to save.
  */
-anychart.exports.shareAsPdf = function(container, onSuccessOrOptions, opt_onError, opt_asBase64, opt_paperSizeOrWidth, opt_landscapeOrHeight, opt_x, opt_y, opt_filename) {
+anychart.exports.shareAsPdf = function(target, container, onSuccessOrOptions, opt_onError, opt_asBase64, opt_paperSizeOrWidth, opt_landscapeOrHeight, opt_x, opt_y, opt_filename) {
   var stage = container ? container.getStage() : null;
 
   if (stage) {
+    var imageSettings = anychart.exports.getFinalSettings(target, 'image');
     var args = anychart.utils.decomposeArguments(
         {
           'onSuccess': onSuccessOrOptions,
@@ -550,9 +474,9 @@ anychart.exports.shareAsPdf = function(container, onSuccessOrOptions, opt_onErro
           'y': opt_y,
           'filename': opt_filename
         }, onSuccessOrOptions, {
-          'width': anychart.exports.image()['width'],
-          'height': anychart.exports.image()['height'],
-          'filename': anychart.exports.filename()
+          'width': imageSettings['width'],
+          'height': imageSettings['height'],
+          'filename': anychart.exports.getFinalSettings(target, 'filename')
         });
 
     stage.shareAsPdf(
@@ -570,6 +494,7 @@ anychart.exports.shareAsPdf = function(container, onSuccessOrOptions, opt_onErro
 
 /**
  * Returns base64 string for png.
+ * @param {?anychart.core.VisualBase} target
  * @param {?acgraph.vector.ILayer} container
  * @param {(function(string)|Object)} onSuccessOrOptions Function that will be called when sharing will complete or object with options.
  * @param {function(string)=} opt_onError Function that will be called when sharing will complete.
@@ -577,10 +502,11 @@ anychart.exports.shareAsPdf = function(container, onSuccessOrOptions, opt_onErro
  * @param {number=} opt_height Image height.
  * @param {number=} opt_quality Image quality in ratio 0-1.
  */
-anychart.exports.getPngBase64String = function(container, onSuccessOrOptions, opt_onError, opt_width, opt_height, opt_quality) {
+anychart.exports.getPngBase64String = function(target, container, onSuccessOrOptions, opt_onError, opt_width, opt_height, opt_quality) {
   var stage = container ? container.getStage() : null;
 
   if (stage) {
+    var imageSettings = anychart.exports.getFinalSettings(target, 'image');
     var args = anychart.utils.decomposeArguments(
         {
           'onSuccess': onSuccessOrOptions,
@@ -590,8 +516,8 @@ anychart.exports.getPngBase64String = function(container, onSuccessOrOptions, op
           'quality': opt_quality
         },
         onSuccessOrOptions, {
-          'width': anychart.exports.image()['width'],
-          'height': anychart.exports.image()['height']
+          'width': imageSettings['width'],
+          'height': imageSettings['height']
         });
 
     stage.getPngBase64String(args['onSuccess'], args['onError'], args['width'], args['height'], args['quality']);
@@ -601,6 +527,7 @@ anychart.exports.getPngBase64String = function(container, onSuccessOrOptions, op
 
 /**
  * Returns base64 string for jpg.
+ * @param {?anychart.core.VisualBase} target
  * @param {?acgraph.vector.ILayer} container
  * @param {(function(string)|Object)} onSuccessOrOptions Function that will be called when sharing will complete or object with options.
  * @param {function(string)=} opt_onError Function that will be called when sharing will complete.
@@ -609,10 +536,11 @@ anychart.exports.getPngBase64String = function(container, onSuccessOrOptions, op
  * @param {number=} opt_quality Image quality in ratio 0-1.
  * @param {boolean=} opt_forceTransparentWhite Define, should we force transparent to white background.
  */
-anychart.exports.getJpgBase64String = function(container, onSuccessOrOptions, opt_onError, opt_width, opt_height, opt_quality, opt_forceTransparentWhite) {
+anychart.exports.getJpgBase64String = function(target, container, onSuccessOrOptions, opt_onError, opt_width, opt_height, opt_quality, opt_forceTransparentWhite) {
   var stage = container ? container.getStage() : null;
 
   if (stage) {
+    var imageSettings = anychart.exports.getFinalSettings(target, 'image');
     var args = anychart.utils.decomposeArguments(
         {
           'onSuccess': onSuccessOrOptions,
@@ -623,8 +551,8 @@ anychart.exports.getJpgBase64String = function(container, onSuccessOrOptions, op
           'forceTransparentWhite': opt_forceTransparentWhite
         },
         onSuccessOrOptions, {
-          'width': anychart.exports.image()['width'],
-          'height': anychart.exports.image()['height']
+          'width': imageSettings['width'],
+          'height': imageSettings['height']
         });
 
     stage.getJpgBase64String(args['onSuccess'], args['onError'], args['width'], args['height'], args['quality'], args['forceTransparentWhite']);
@@ -634,16 +562,18 @@ anychart.exports.getJpgBase64String = function(container, onSuccessOrOptions, op
 
 /**
  * Returns base64 string for svg.
+ * @param {?anychart.core.VisualBase} target
  * @param {?acgraph.vector.ILayer} container
  * @param {(function(string)|Object)} onSuccessOrOptions Function that will be called when sharing will complete or object with options.
  * @param {function(string)=} opt_onError Function that will be called when sharing will complete.
  * @param {(string|number)=} opt_paperSizeOrWidth Paper Size or width.
  * @param {(boolean|string)=} opt_landscapeOrHeight Landscape or height.
  */
-anychart.exports.getSvgBase64String = function(container, onSuccessOrOptions, opt_onError, opt_paperSizeOrWidth, opt_landscapeOrHeight) {
+anychart.exports.getSvgBase64String = function(target, container, onSuccessOrOptions, opt_onError, opt_paperSizeOrWidth, opt_landscapeOrHeight) {
   var stage = container ? container.getStage() : null;
 
   if (stage) {
+    var imageSettings = anychart.exports.getFinalSettings(target, 'image');
     var args = anychart.utils.decomposeArguments(
         {
           'onSuccess': onSuccessOrOptions,
@@ -654,8 +584,8 @@ anychart.exports.getSvgBase64String = function(container, onSuccessOrOptions, op
           'height': opt_landscapeOrHeight
         },
         onSuccessOrOptions, {
-          'width': anychart.exports.image()['width'],
-          'height': anychart.exports.image()['height']
+          'width': imageSettings['width'],
+          'height': imageSettings['height']
         });
 
     stage.getSvgBase64String(args['onSuccess'], args['onError'], args['paperSize'] || args['width'], args['landscape'] || args['height']);
@@ -665,6 +595,7 @@ anychart.exports.getSvgBase64String = function(container, onSuccessOrOptions, op
 
 /**
  * Returns base64 string for pdf.
+ * @param {?anychart.core.VisualBase} target
  * @param {?acgraph.vector.ILayer} container
  * @param {(function(string)|Object)} onSuccessOrOptions Function that will be called when sharing will complete or object with options.
  * @param {function(string)=} opt_onError Function that will be called when sharing will complete.
@@ -673,10 +604,11 @@ anychart.exports.getSvgBase64String = function(container, onSuccessOrOptions, op
  * @param {number=} opt_x Offset X.
  * @param {number=} opt_y Offset Y.
  */
-anychart.exports.getPdfBase64String = function(container, onSuccessOrOptions, opt_onError, opt_paperSizeOrWidth, opt_landscapeOrHeight, opt_x, opt_y) {
+anychart.exports.getPdfBase64String = function(target, container, onSuccessOrOptions, opt_onError, opt_paperSizeOrWidth, opt_landscapeOrHeight, opt_x, opt_y) {
   var stage = container ? container.getStage() : null;
 
   if (stage) {
+    var imageSettings = anychart.exports.getFinalSettings(target, 'image');
     /**
      * @type {Object} args
      */
@@ -692,8 +624,8 @@ anychart.exports.getPdfBase64String = function(container, onSuccessOrOptions, op
           'y': opt_y
         },
         onSuccessOrOptions, {
-          'width': anychart.exports.image()['width'],
-          'height': anychart.exports.image()['height']
+          'width': imageSettings['width'],
+          'height': imageSettings['height']
         });
 
     stage.getPdfBase64String(args['onSuccess'], args['onError'], args['paperSize'] || args['width'], args['landscape'] || args['height'], args['x'], args['y']);
@@ -701,14 +633,14 @@ anychart.exports.getPdfBase64String = function(container, onSuccessOrOptions, op
 };
 
 
-//endregion
 /**
  * Print all element on related stage.
+ * @param {?anychart.core.VisualBase} target
  * @param {?acgraph.vector.ILayer} container
  * @param {(acgraph.vector.PaperSize|Object)=} opt_paperSizeOrOptions Paper size or object with options/
  * @param {boolean=} opt_landscape
  */
-anychart.exports.print = function(container, opt_paperSizeOrOptions, opt_landscape) {
+anychart.exports.print = function(target, container, opt_paperSizeOrOptions, opt_landscape) {
   var stage = container ? container.getStage() : null;
   if (stage) {
     var args = anychart.utils.decomposeArguments(
@@ -725,14 +657,15 @@ anychart.exports.print = function(container, opt_paperSizeOrOptions, opt_landsca
 
 /**
  * Opens Facebook sharing dialog.
+ * @param {?anychart.core.VisualBase} target
  * @param {?acgraph.vector.ILayer} container
  * @param {(string|Object)=} opt_captionOrOptions Caption for main link. If not set hostname will be used. Or object with options.
  * @param {string=} opt_link Url of the link attached to publication.
  * @param {string=} opt_name Title for the attached link. If not set hostname or opt_link url will be used.
  * @param {string=} opt_description Description for the attached link.
  */
-anychart.exports.shareWithFacebook = function(container, opt_captionOrOptions, opt_link, opt_name, opt_description) {
-  var exportOptions = anychart.exports.facebook();
+anychart.exports.shareWithFacebook = function(target, container, opt_captionOrOptions, opt_link, opt_name, opt_description) {
+  var exportOptions = anychart.exports.getFinalSettings(target, 'facebook');
   var args = anychart.utils.decomposeArguments({
     'caption': opt_captionOrOptions,
     'link': opt_link,
@@ -744,8 +677,7 @@ anychart.exports.shareWithFacebook = function(container, opt_captionOrOptions, o
   var h = 550;
   var left = Number((screen.width / 2) - (w / 2));
   var top = Number((screen.height / 2) - (h / 2));
-  var window = goog.dom.getWindow();
-  var popup = window.open('', '_blank', 'scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
+  var popup = anychart.window.open('', '_blank', 'scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
 
   var onSuccess = function(imgUrl) {
     var urlBase = 'https://www.facebook.com/dialog/feed';
@@ -780,16 +712,17 @@ anychart.exports.shareWithFacebook = function(container, opt_captionOrOptions, o
 
   var imageWidth = exportOptions['width'];
   var imageHeight = exportOptions['height'];
-  anychart.exports.shareAsPng(container, onSuccess, undefined, false, imageWidth, imageHeight);
+  anychart.exports.shareAsPng(target, container, onSuccess, undefined, false, imageWidth, imageHeight);
 };
 
 
 /**
  * Opens Twitter sharing dialog.
+ * @param {?anychart.core.VisualBase} target
  * @param {?acgraph.vector.ILayer} container
  */
-anychart.exports.shareWithTwitter = function(container) {
-  var exportOptions = anychart.exports.twitter();
+anychart.exports.shareWithTwitter = function(target, container) {
+  var exportOptions = anychart.exports.getFinalSettings(target, 'twitter');
   var w = 600;
   var h = 520;
   var left = Number((screen.width / 2) - (w / 2));
@@ -826,9 +759,8 @@ anychart.exports.shareWithTwitter = function(container) {
   }
 
   if (goog.isDef(mapForm) && goog.isDef(dataInput)) {
-    dataInput.value = anychart.exports.toSvg(container, exportOptions['width'], exportOptions['height']);
-    var window = goog.dom.getWindow();
-    var mapWindow = window.open('', 'Map', 'status=0,title=0,height=520,width=600,scrollbars=1, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
+    dataInput.value = anychart.exports.toSvg(target, container, exportOptions['width'], exportOptions['height']);
+    var mapWindow = anychart.window.open('', 'Map', 'status=0,title=0,height=520,width=600,scrollbars=1, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
     if (mapWindow) mapForm.submit();
   }
 };
@@ -836,12 +768,13 @@ anychart.exports.shareWithTwitter = function(container) {
 
 /**
  * Opens LinkedIn sharing dialog.
+ * @param {?anychart.core.VisualBase} target
  * @param {?acgraph.vector.ILayer} container
  * @param {(string|Object)=} opt_captionOrOptions Caption for publication. If not set 'AnyChart' will be used. Or object with options.
  * @param {string=} opt_description Description. If not set opt_caption will be used.
  */
-anychart.exports.shareWithLinkedIn = function(container, opt_captionOrOptions, opt_description) {
-  var exportOptions = anychart.exports.linkedin();
+anychart.exports.shareWithLinkedIn = function(target, container, opt_captionOrOptions, opt_description) {
+  var exportOptions = anychart.exports.getFinalSettings(target, 'linkedin');
   var args = anychart.utils.decomposeArguments({
     'caption': opt_captionOrOptions,
     'description': opt_description
@@ -851,8 +784,7 @@ anychart.exports.shareWithLinkedIn = function(container, opt_captionOrOptions, o
   var h = 520;
   var left = Number((screen.width / 2) - (w / 2));
   var top = Number((screen.height / 2) - (h / 2));
-  var window = goog.dom.getWindow();
-  var popup = window.open('', '_blank', 'scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
+  var popup = anychart.window.open('', '_blank', 'scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
 
   var onSuccess = function(imgUrl) {
     var urlBase = 'https://www.linkedin.com/shareArticle';
@@ -876,18 +808,19 @@ anychart.exports.shareWithLinkedIn = function(container, opt_captionOrOptions, o
     popup.location.href = urlBase + '?' + options;
   };
 
-  anychart.exports.shareAsPng(container, onSuccess, undefined, false, exportOptions['width'], exportOptions['height']);
+  anychart.exports.shareAsPng(target, container, onSuccess, undefined, false, exportOptions['width'], exportOptions['height']);
 };
 
 
 /**
  * Opens Pinterest sharing dialog.
+ * @param {?anychart.core.VisualBase} target
  * @param {?acgraph.vector.ILayer} container
  * @param {(string|Object)=} opt_linkOrOptions Attached link. If not set, the image url will be used. Or object with options.
  * @param {string=} opt_description Description.
  */
-anychart.exports.shareWithPinterest = function(container, opt_linkOrOptions, opt_description) {
-  var exportOptions = anychart.exports.pinterest();
+anychart.exports.shareWithPinterest = function(target, container, opt_linkOrOptions, opt_description) {
+  var exportOptions = anychart.exports.getFinalSettings(target, 'pinterest');
   var args = anychart.utils.decomposeArguments({
     'link': opt_linkOrOptions,
     'description': opt_description
@@ -897,8 +830,7 @@ anychart.exports.shareWithPinterest = function(container, opt_linkOrOptions, opt
   var h = 520;
   var left = Number((screen.width / 2) - (w / 2));
   var top = Number((screen.height / 2) - (h / 2));
-  var window = goog.dom.getWindow();
-  var popup = window.open('', '_blank', 'scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
+  var popup = anychart.window.open('', '_blank', 'scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
 
   var onSuccess = function(imgUrl) {
     var urlBase = 'https://pinterest.com/pin/create/link';
@@ -923,102 +855,11 @@ anychart.exports.shareWithPinterest = function(container, opt_linkOrOptions, opt
     popup.location.href = urlBase + '?' + options;
   };
 
-  anychart.exports.shareAsPng(container, onSuccess, undefined, false, exportOptions['width'], exportOptions['height']);
+  anychart.exports.shareAsPng(target, container, onSuccess, undefined, false, exportOptions['width'], exportOptions['height']);
 };
-
-
-/**
- * Saves chart config as XML document.
- * @param {string} xml
- * @param {string=} opt_filename file name to save.
- */
-anychart.exports.saveAsXml = function(xml, opt_filename) {
-  var options = {};
-  options['file-name'] = opt_filename || anychart.exports.filename();
-  options['data'] = xml;
-  options['dataType'] = 'xml';
-  options['responseType'] = 'file';
-  acgraph.sendRequestToExportServer(acgraph.exportServer + '/xml', options);
-};
-
-
-/**
- * Saves chart config as XML document.
- * @param {string} json
- * @param {string=} opt_filename file name to save.
- */
-anychart.exports.saveAsJson = function(json, opt_filename) {
-  var options = {};
-  options['file-name'] = opt_filename || anychart.exports.filename();
-  options['data'] = json;
-  options['dataType'] = 'json';
-  options['responseType'] = 'file';
-  acgraph.sendRequestToExportServer(acgraph.exportServer + '/json', options);
-};
-
-
-/**
- * Saves chart data as csv.
- * @param {string} csv
- * @param {string=} opt_filename file name to save.
- */
-anychart.exports.saveAsCsv = function(csv, opt_filename) {
-  var options = {};
-  options['file-name'] = opt_filename || anychart.exports.filename();
-  options['data'] = csv;
-  options['dataType'] = 'csv';
-  options['responseType'] = 'file';
-  acgraph.sendRequestToExportServer(acgraph.exportServer + '/csv', options);
-};
-
-
-/**
- * Saves chart data as excel document.
- * @param {string} csv
- * @param {string=} opt_filename file name to save.
- */
-anychart.exports.saveAsXlsx = function(csv, opt_filename) {
-  var options = {};
-  options['file-name'] = opt_filename || anychart.exports.filename();
-  options['data'] = csv;
-  options['dataType'] = 'xlsx';
-  options['responseType'] = 'file';
-  acgraph.sendRequestToExportServer(acgraph.exportServer + '/xlsx', options);
-};
+//endregion
 
 
 //exports
-(function() {
-  var obj = {
-    'filename': anychart.exports.filename,
-    'image': anychart.exports.image,
-    'facebook': anychart.exports.facebook,
-    'twitter': anychart.exports.twitter,
-    'linkedin': anychart.exports.linkedin,
-    'pinterest': anychart.exports.pinterest,
-    'server': anychart.exports.server,
-    'saveAsPng': anychart.exports.saveAsPng,
-    'saveAsJpg': anychart.exports.saveAsJpg,
-    'saveAsPdf': anychart.exports.saveAsPdf,
-    'saveAsSvg': anychart.exports.saveAsSvg,
-    'toSvg': anychart.exports.toSvg,
-    'shareAsPng': anychart.exports.shareAsPng,
-    'shareAsJpg': anychart.exports.shareAsJpg,
-    'shareAsSvg': anychart.exports.shareAsSvg,
-    'shareAsPdf': anychart.exports.shareAsPdf,
-    'getPngBase64String': anychart.exports.getPngBase64String,
-    'getJpgBase64String': anychart.exports.getJpgBase64String,
-    'getSvgBase64String': anychart.exports.getSvgBase64String,
-    'getPdfBase64String': anychart.exports.getPdfBase64String,
-    'print': anychart.exports.print,
-    'shareWithFacebook': anychart.exports.shareWithFacebook,
-    'shareWithTwitter': anychart.exports.shareWithTwitter,
-    'shareWithLinkedIn': anychart.exports.shareWithLinkedIn,
-    'shareWithPinterest': anychart.exports.shareWithPinterest,
-    'saveAsXml': anychart.exports.saveAsXml,
-    'saveAsJson': anychart.exports.saveAsJson,
-    'saveAsCsv': anychart.exports.saveAsCsv,
-    'saveAsXlsx': anychart.exports.saveAsXlsx
-  };
-  goog.exportSymbol('anychart.exports', obj);
-})();
+goog.exportSymbol('anychart.exports', anychart.exports);
+goog.exportSymbol('anychart.exports.server', anychart.exports.server);

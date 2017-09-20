@@ -292,7 +292,8 @@ anychart.core.ChartWithSeries.prototype.createSeriesByType = function(type, data
         anychart.ConsistencyState.CHART_LEGEND |
         anychart.ConsistencyState.SCALE_CHART_SCALES |
         anychart.ConsistencyState.SCALE_CHART_Y_SCALES |
-        anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS,
+        anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS |
+        anychart.ConsistencyState.CHART_LABELS,
         anychart.Signal.NEEDS_REDRAW);
   } else {
     series = null;
@@ -393,7 +394,8 @@ anychart.core.ChartWithSeries.prototype.removeSeriesAt = function(index) {
         anychart.ConsistencyState.CHART_LEGEND |
         anychart.ConsistencyState.SCALE_CHART_SCALES |
         anychart.ConsistencyState.SCALE_CHART_Y_SCALES |
-        anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS,
+        anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS |
+        anychart.ConsistencyState.CHART_LABELS,
         anychart.Signal.NEEDS_REDRAW);
     this.resumeSignalsDispatching(true);
     anychart.globalLock.unlock();
@@ -419,7 +421,8 @@ anychart.core.ChartWithSeries.prototype.removeAllSeries = function() {
         anychart.ConsistencyState.CHART_LEGEND |
         anychart.ConsistencyState.SCALE_CHART_SCALES |
         anychart.ConsistencyState.SCALE_CHART_Y_SCALES |
-        anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS,
+        anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS |
+        anychart.ConsistencyState.CHART_LABELS,
         anychart.Signal.NEEDS_REDRAW);
     this.resumeSignalsDispatching(true);
     // When we deleting ALL series, we should clear this statuses, cause they are loss the actuality
@@ -441,6 +444,9 @@ anychart.core.ChartWithSeries.prototype.removeAllSeries = function() {
  */
 anychart.core.ChartWithSeries.prototype.seriesInvalidated = function(event) {
   var state = 0;
+  if (event.hasSignal(anychart.Signal.ENABLED_STATE_CHANGED)) {
+    state |= anychart.ConsistencyState.CHART_LABELS;
+  }
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
     state = anychart.ConsistencyState.SERIES_CHART_SERIES;
   }
@@ -448,7 +454,9 @@ anychart.core.ChartWithSeries.prototype.seriesInvalidated = function(event) {
     state = anychart.ConsistencyState.A11Y;
   }
   if (event.hasSignal(anychart.Signal.DATA_CHANGED)) {
+    state |= anychart.ConsistencyState.CHART_LABELS;
     if (this.legend().itemsSourceMode() == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
+      // CHART_LABELS invalidation for no data label.
       state |= anychart.ConsistencyState.CHART_LEGEND;
     }
     this.invalidateAnnotations();
@@ -955,6 +963,7 @@ anychart.core.ChartWithSeries.prototype.data = function(opt_value) {
       }
     } while (usedColsCount <= colsCount);
 
+    this.invalidate(anychart.ConsistencyState.CHART_LABELS);
     this.resumeSignalsDispatching(true);
     return this;
   } else {
@@ -1140,6 +1149,38 @@ anychart.core.ChartWithSeries.prototype.createLegendItemsProvider = function(sou
     }
   }
   return data;
+};
+
+
+//endregion
+//region --- No Data
+/**
+ * Whether series enabled.
+ * @param {anychart.core.series.Cartesian} series
+ * @return {boolean}
+ */
+anychart.core.ChartWithSeries.prototype.isSeriesVisible = function(series) {
+  var enabled = /** @type {boolean} */(series.enabled());
+  var excluded = series.getExcludedIndexesInternal();
+  var visible = true;
+  var rowsCount = series.data() ? series.data().getRowsCount() : 0;
+  if (!rowsCount || (rowsCount == excluded.length))
+    visible = false;
+  return (enabled && visible);
+};
+
+
+/** @inheritDoc */
+anychart.core.ChartWithSeries.prototype.isNoData = function() {
+  var countDisabled = 0;
+  var len = this.seriesList.length;
+  for (var i = 0; i < len; i++) {
+    if (!this.isSeriesVisible(this.seriesList[i]))
+      countDisabled++;
+    else
+      break;
+  }
+  return (countDisabled == len);
 };
 
 

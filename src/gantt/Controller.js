@@ -264,6 +264,10 @@ anychart.ganttModule.Controller.prototype.dataInvalidated_ = function(event) {
    */
   if (event.hasSignal(anychart.Signal.DATA_CHANGED)) state |= anychart.ConsistencyState.CONTROLLER_DATA;
 
+  if (this.dataGrid_ && this.timeline_) {
+    this.timeline_.interactivityHandler.invalidate(anychart.ConsistencyState.CHART_LABELS);
+  }
+
   this.invalidate(state, signal);
 };
 
@@ -394,6 +398,12 @@ anychart.ganttModule.Controller.prototype.autoCalcItem_ = function(item, current
       .meta('depth', currentDepth)
       .meta('index', this.linearIndex_++);
 
+  var itemProgressValue = item.get(anychart.enums.GanttDataFields.PROGRESS_VALUE);
+  if (goog.isDef(itemProgressValue)) {
+    itemProgressValue = anychart.utils.isPercent(itemProgressValue) ? parseFloat(itemProgressValue) / 100 : +itemProgressValue;
+    item.meta('progressValue', itemProgressValue);
+  }
+
   var collapsed = item.get(anychart.enums.GanttDataFields.COLLAPSED);
   if (goog.isBoolean(collapsed)) {
     item.meta(anychart.enums.GanttDataFields.COLLAPSED, collapsed);
@@ -432,9 +442,13 @@ anychart.ganttModule.Controller.prototype.autoCalcItem_ = function(item, current
           child.meta(anychart.enums.GanttDataFields.ACTUAL_END) :
           (child.meta('autoEnd') || childStart);
 
-      var childProgress = goog.isDef(child.get(anychart.enums.GanttDataFields.PROGRESS_VALUE)) ?
-          anychart.utils.normalizeSize(/** @type {number} */(child.get(anychart.enums.GanttDataFields.PROGRESS_VALUE)), 1) :
-          (child.meta('autoProgress') || 0);
+      var progressValue = child.get(anychart.enums.GanttDataFields.PROGRESS_VALUE);
+      if (goog.isDef(progressValue)) {
+        progressValue = anychart.utils.isPercent(progressValue) ? parseFloat(progressValue) / 100 : +progressValue;
+      }
+
+      var childProgress = goog.isDef(progressValue) ? progressValue : (child.meta('autoProgress') || 0);
+      child.meta('progressValue', childProgress);
 
       if (isNaN(resultStart)) {
         resultStart = childStart;
@@ -797,6 +811,10 @@ anychart.ganttModule.Controller.prototype.data = function(opt_value) {
       this.expandedItemsTraverser_.traverseChildrenCondition(this.traverseChildrenCondition_);
       if (this.timeline_)
         this.timeline_.scale().reset();
+
+      if (this.dataGrid_ && this.timeline_) {
+        this.timeline_.interactivityHandler.invalidate(anychart.ConsistencyState.CHART_LABELS);
+      }
 
       this.invalidate(anychart.ConsistencyState.CONTROLLER_DATA, anychart.Signal.NEEDS_REAPPLICATION);
     }

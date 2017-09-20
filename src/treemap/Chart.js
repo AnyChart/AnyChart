@@ -676,7 +676,7 @@ anychart.treemapModule.Chart.prototype.data = function(opt_value, opt_fillMethod
     } else {
       this.data_ = new anychart.treeDataModule.Tree(opt_value, opt_fillMethod);
     }
-    this.invalidate(anychart.ConsistencyState.TREEMAP_DATA, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.TREEMAP_DATA | anychart.ConsistencyState.CHART_LABELS, anychart.Signal.NEEDS_REDRAW);
     return this;
   }
   return this.data_;
@@ -2734,33 +2734,50 @@ anychart.treemapModule.Chart.prototype.specificContextMenuItems = function(items
     node = tag['node'];
   }
 
-  var specificItems = [];
+  var specificItems = {};
 
   var isHeader = node.meta(anychart.treemapModule.Chart.DataFields.TYPE) == anychart.treemapModule.Chart.NodeType.HEADER;
   var canDrillDown = node.numChildren() && !(isHeader && this.isRootNode(node));
   if (canDrillDown) {
-    specificItems.push({
+    specificItems['drilldown-to'] = {
+      'index': 7, //TODO (A.Kudryavtsev): check index!!!
       'text': 'Drilldown To',
       'eventType': 'anychart.drillTo',
       'action': goog.bind(this.doDrillChange, this, node)
-    });
+    };
   }
 
   var canDrillUp = !this.isTreeRoot(this.getRootNode());
   if (canDrillUp)
-    specificItems.push({
+    specificItems['drill-up'] = {
+      'index': 7,
       'text': 'Drill Up',
       'eventType': 'anychart.drillUp',
       'action': goog.bind(this.doDrillChange, this, this.getRootNode().getParent())
-    });
+    };
 
-  if (specificItems.length)
-    specificItems.push(null);
+  if (!goog.object.isEmpty(specificItems))
+    specificItems['drill-separator'] = {'index': 7.1};
 
-  return /** @type {Array.<anychart.ui.ContextMenu.Item>} */(goog.array.concat(
-      specificItems,
-      anychart.utils.recursiveClone(anychart.core.Chart.contextMenuMap.selectMarquee),
-      items));
+  goog.object.extend(specificItems,
+      /** @type {Object} */ (anychart.utils.recursiveClone(anychart.core.Chart.contextMenuMap['select-marquee'])),
+      items);
+
+  return /** @type {Object.<string, anychart.ui.ContextMenu.Item>} */(specificItems);
+};
+
+
+/** @inheritDoc */
+anychart.treemapModule.Chart.prototype.isNoData = function() {
+  this.ensureDataPrepared();
+  if (!this.rootNode_) {
+    return true;
+  } else {
+    var size = /** @type {number} */(this.rootNode_.meta(anychart.treemapModule.Chart.DataFields.SIZE));
+    var value = /** @type {number} */(this.rootNode_.meta(anychart.treemapModule.Chart.DataFields.VALUE));
+    var missing = /** @type {boolean} */(this.rootNode_.meta(anychart.treemapModule.Chart.DataFields.MISSING));
+    return (missing || (!size && !value));
+  }
 };
 
 

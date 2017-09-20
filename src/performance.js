@@ -1,5 +1,7 @@
 goog.provide('anychart.performance');
 
+goog.require('anychart.base');
+
 
 /**
  * Returns the number of milliseconds passed since an event in past. Returns fractional milliseconds, if possible.
@@ -7,8 +9,8 @@ goog.provide('anychart.performance');
  * @return {number}
  */
 anychart.performance.relativeNow = (
-    goog.global['performance'] && goog.isFunction(goog.global['performance']['now']) ?
-        goog.bind(goog.global['performance']['now'], goog.global['performance']) :
+    anychart.window['performance'] && goog.isFunction(anychart.window['performance']['now']) ?
+        goog.bind(anychart.window['performance']['now'], anychart.window['performance']) :
         goog.now);
 
 
@@ -154,7 +156,7 @@ anychart.performance.buildTree_ = function() {
 anychart.performance.printTree = function(opt_level, opt_collapsed) {
   opt_level = opt_level || 0;
   if (!anychart.PERFORMANCE_MONITORING) return;
-  var console = goog.global['console'];
+  var console = anychart.window['console'];
   var groupStart, groupEnd, log, level = 0;
   if (console) {
     log = console['log'];

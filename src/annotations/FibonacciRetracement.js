@@ -36,7 +36,7 @@ anychart.annotationsModule.FibonacciRetracement.prototype.type = anychart.enums.
 //
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
-anychart.annotationsModule.FibonacciRetracement.prototype.drawLevel = function(levelIndex, levelValue, path, hoverPath,
+anychart.annotationsModule.FibonacciRetracement.prototype.drawLevel = function(levelIndex, levelRatio, path, hoverPath,
                                                                               mainFactory, stateFactory, drawLabels, strokeThickness) {
   var x1 = this.coords['xAnchor'];
   var y1 = this.coords['valueAnchor'];
@@ -44,7 +44,7 @@ anychart.annotationsModule.FibonacciRetracement.prototype.drawLevel = function(l
   var y2 = this.coords['secondValueAnchor'];
   var sx = Math.min(x1, x2);
   var baseHeight = y1 - y2;
-  var y = anychart.utils.applyPixelShift(y2 + baseHeight * levelValue, strokeThickness);
+  var y = anychart.utils.applyPixelShift(y2 + baseHeight * levelRatio, strokeThickness);
   var line = anychart.math.clipRayByRect(sx, y, sx + 10, y, this.pixelBoundsCache);
   if (line) {
     path.moveTo(line[0], line[1]).lineTo(line[2], line[3]);
@@ -53,7 +53,7 @@ anychart.annotationsModule.FibonacciRetracement.prototype.drawLevel = function(l
 
   if (drawLabels) {
     var position = {'value': {'x': sx, 'y': y}};
-    this.drawLabel(levelIndex, mainFactory, stateFactory, this.createFormatProvider(levelValue), position, undefined);
+    this.drawLabel(levelIndex, mainFactory, stateFactory, this.createFormatProvider(levelRatio, this.getValueFromPixY(y), false), position);
   }
 };
 

@@ -1176,10 +1176,28 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'zIndex': 50
   },
 
+  'defaultNoDataLabel': {
+    'padding': {},
+    'disablePointerEvents': true,
+    'background': {
+      'zIndex': 0,
+      'enabled': false,
+      'disablePointerEvents': true
+    },
+    'fontFamily': 'Arial',
+    'fontColor': 'black',
+    'fontWeight': 'bold',
+    'fontSize': 15,
+    'position': 'center',
+    'anchor': 'center',
+    'zIndex': 999999,
+    'text': 'NO DATA'
+  },
+
   'stageCredits': {
     'text': 'AnyChart',
     'url': 'https://www.anychart.com/?utm_source=registered',
-    'alt': 'AnyChart - JavaScript Charts designed to be embedded and integrated',
+    'alt': 'AnyChart - JavaScript Charts designed to be embedded and integrated{{anychart-version}}',
     'imgAlt': 'AnyChart - JavaScript Charts',
     'logoSrc': 'https://static.anychart.com/logo.png'
   },

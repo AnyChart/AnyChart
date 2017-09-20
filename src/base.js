@@ -46,6 +46,20 @@ anychart.PERFORMANCE_MONITORING = true;
 
 
 /**
+ * Global object
+ * @type {Window}
+ */
+anychart.window = goog.global;
+
+
+/**
+ * Document object
+ * @type {Document}
+ */
+anychart.document = anychart.window['document'];
+
+
+/**
  * Set default css name mapping for anychart ui.
  */
 goog.setCssNameMapping({

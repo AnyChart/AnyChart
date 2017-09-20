@@ -329,7 +329,8 @@ anychart.pyramidFunnelModule.Chart.prototype.data = function(opt_value, opt_csvS
           anychart.ConsistencyState.PYRAMID_FUNNEL_LABELS |
           anychart.ConsistencyState.PYRAMID_FUNNEL_MARKERS |
           anychart.ConsistencyState.CHART_LEGEND |
-          anychart.ConsistencyState.PYRAMID_FUNNEL_DATA,
+          anychart.ConsistencyState.PYRAMID_FUNNEL_DATA |
+          anychart.ConsistencyState.CHART_LABELS,
           anychart.Signal.NEEDS_REDRAW |
           anychart.Signal.DATA_CHANGED
       );
@@ -352,7 +353,8 @@ anychart.pyramidFunnelModule.Chart.prototype.dataInvalidated_ = function(event) 
         anychart.ConsistencyState.PYRAMID_FUNNEL_LABELS |
         anychart.ConsistencyState.PYRAMID_FUNNEL_MARKERS |
         anychart.ConsistencyState.CHART_LEGEND |
-        anychart.ConsistencyState.PYRAMID_FUNNEL_DATA,
+        anychart.ConsistencyState.PYRAMID_FUNNEL_DATA |
+        anychart.ConsistencyState.CHART_LABELS,
         anychart.Signal.NEEDS_REDRAW |
         anychart.Signal.DATA_CHANGED
     );
@@ -3323,6 +3325,13 @@ anychart.pyramidFunnelModule.Chart.prototype.hoverMode = function(opt_value) {
     return this;
   }
   return /** @type {anychart.enums.HoverMode}*/(this.hoverMode_);
+};
+
+
+/** @inheritDoc */
+anychart.pyramidFunnelModule.Chart.prototype.isNoData = function() {
+  var rowsCount = this.getIterator().getRowsCount();
+  return (!rowsCount);
 };
 
 

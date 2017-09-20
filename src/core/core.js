@@ -118,6 +118,12 @@ anychart.core.IPlot.prototype.getAllSeries = function() {};
 anychart.core.IPlot.prototype.defaultSeriesSettings = function(opt_value) {};
 
 
+/**
+ * @return {anychart.math.Rect}
+ */
+anychart.core.IPlot.prototype.getPlotBounds = function() {};
+
+
 
 //endregion
 //region I3DProvider

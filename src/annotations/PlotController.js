@@ -329,7 +329,7 @@ anychart.annotationsModule.PlotController.prototype.handleDrawingMouseOver_ = fu
   } else {
     this.drawingOverlayRect_.listen(acgraph.events.EventType.MOUSEOUT, this.handleDrawingMouseOut_, false, this);
     this.drawingOverlayRect_.listen(acgraph.events.EventType.MOUSEDOWN, this.handleDrawingMouseDown_, false, this);
-    acgraph.events.listen(goog.global, acgraph.events.EventType.MOUSEMOVE, this.handleDrawingMouseMove_, false, this);
+    acgraph.events.listen(anychart.window, acgraph.events.EventType.MOUSEMOVE, this.handleDrawingMouseMove_, false, this);
 
     e.stopPropagation();
     e.stopWrapperPropagation();
@@ -365,7 +365,7 @@ anychart.annotationsModule.PlotController.prototype.handleDrawingMouseOut_ = fun
   this.mouseIsOut = true;
 
   if (!this.inDraggingDraw) {
-    acgraph.events.unlisten(goog.global, acgraph.events.EventType.MOUSEMOVE, this.handleDrawingMouseMove_, false, this);
+    acgraph.events.unlisten(anychart.window, acgraph.events.EventType.MOUSEMOVE, this.handleDrawingMouseMove_, false, this);
 
     var annotation = this.controller_.getSelectedAnnotation();
     annotation.removeLastPoint();
@@ -382,7 +382,7 @@ anychart.annotationsModule.PlotController.prototype.handleDrawingMouseOut_ = fun
  * @private
  */
 anychart.annotationsModule.PlotController.prototype.handleDrawingMouseDown_ = function(e) {
-  acgraph.events.listen(goog.global, acgraph.events.EventType.MOUSEUP, this.handleDrawingMouseUp_, false, this);
+  acgraph.events.listen(anychart.window, acgraph.events.EventType.MOUSEUP, this.handleDrawingMouseUp_, false, this);
 
   e.stopPropagation();
   e.stopWrapperPropagation();
@@ -405,7 +405,7 @@ anychart.annotationsModule.PlotController.prototype.handleDrawingMouseDown_ = fu
  * @private
  */
 anychart.annotationsModule.PlotController.prototype.handleDrawingMouseUp_ = function(e) {
-  acgraph.events.unlisten(goog.global, acgraph.events.EventType.MOUSEUP, this.handleDrawingMouseUp_, false, this);
+  acgraph.events.unlisten(anychart.window, acgraph.events.EventType.MOUSEUP, this.handleDrawingMouseUp_, false, this);
 
   e.stopPropagation();
   e.preventDefault();
@@ -505,8 +505,8 @@ anychart.annotationsModule.PlotController.prototype.setupDrawing = function(acti
     if (!active && this.drawingOverlayRect_) {
       this.drawingOverlayRect_.unlisten(acgraph.events.EventType.MOUSEOUT, this.handleDrawingMouseOut_, false, this);
       this.drawingOverlayRect_.unlisten(acgraph.events.EventType.MOUSEDOWN, this.handleDrawingMouseDown_, false, this);
-      acgraph.events.unlisten(goog.global, acgraph.events.EventType.MOUSEUP, this.handleDrawingMouseMove_, false, this);
-      acgraph.events.unlisten(goog.global, acgraph.events.EventType.MOUSEMOVE, this.handleDrawingMouseMove_, false, this);
+      acgraph.events.unlisten(anychart.window, acgraph.events.EventType.MOUSEUP, this.handleDrawingMouseMove_, false, this);
+      acgraph.events.unlisten(anychart.window, acgraph.events.EventType.MOUSEMOVE, this.handleDrawingMouseMove_, false, this);
     }
     this.invalidate(anychart.ConsistencyState.ANNOTATIONS_CONTROLLER_DRAWING_MODE, anychart.Signal.NEEDS_REDRAW);
   }

@@ -248,7 +248,7 @@ anychart.chartEditorModule.Controller.getset = function(model, key, opt_value, o
     var message = 'Could not apply key \'' + key + '\'';
     if (arg) message += ' with argument [' + arg + ']';
 
-    var logger = goog.global['console'];
+    var logger = anychart.window['console'];
     if (logger) {
       var log = logger['warn'] || logger['log'];
       if (typeof log != 'object') {
@@ -361,10 +361,10 @@ anychart.chartEditorModule.Controller.prototype.getBuildCode = function() {
   for (i = 0, count = this.model_.dataMappings.length; i < count; i++) {
     var mapping = this.model_.dataMappings[i];
     var dataSet = mapping['getDataSets']()[0];
-    var arrayMapping = mapping['getArrayMapping']() == window['anychart']['data']['Mapping']['DEFAULT_ARRAY_MAPPING'] ?
+    var arrayMapping = mapping['getArrayMapping']() == anychart.window['anychart']['data']['Mapping']['DEFAULT_ARRAY_MAPPING'] ?
         'undefined' :
         stringify(mapping['getArrayMapping']());
-    var objectMapping = mapping['getObjectMapping']() == window['anychart']['data']['Mapping']['DEFAULT_OBJECT_MAPPING'] ?
+    var objectMapping = mapping['getObjectMapping']() == anychart.window['anychart']['data']['Mapping']['DEFAULT_OBJECT_MAPPING'] ?
         'undefined' :
         stringify(mapping['getObjectMapping']());
     fMappings += subs('var mapping%s=dataSet%s.mapAs(%s,%s);', i, this.indexOfDataSet(dataSet), arrayMapping, objectMapping);
@@ -423,7 +423,7 @@ anychart.chartEditorModule.Controller.settingsMapToString = function(map, model)
 
     if (settingsCanByApplyed) {
       if (goog.isObject(rawValue)) {
-        value = window['JSON']['stringify'](value);
+        value = anychart.window['JSON']['stringify'](value);
       } else if (goog.isString(rawValue)) {
         value = '"' + value + '"';
       }

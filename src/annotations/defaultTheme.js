@@ -72,7 +72,10 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme']['chart'], {
         0.5,
         0.618,
         1
-      ]
+      ],
+      'labels': {
+        'anchor': null
+      }
     },
     'fibonacciArc': {
       'levels': [
@@ -82,7 +85,10 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme']['chart'], {
         0.618,
         0.764,
         1
-      ]
+      ],
+      'labels': {
+        'anchor': null
+      }
     },
     'fibonacciRetracement': {
       'levels': [
@@ -146,7 +152,10 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme']['chart'], {
         14930352,
         24157817,
         39088169
-      ]
+      ],
+      'labels': {
+        'anchor': 'left-bottom'
+      }
     },
     'marker': {
       'markerType': 'arrow-up',

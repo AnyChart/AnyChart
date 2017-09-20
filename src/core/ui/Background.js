@@ -26,6 +26,8 @@ goog.require('goog.array');
 anychart.core.ui.Background = function() {
   anychart.core.ui.Background.base(this, 'constructor');
 
+  delete this.themeSettings['enabled'];
+
   /**
    * Parent.
    * @type {anychart.core.ui.Background}
@@ -134,44 +136,6 @@ anychart.core.ui.Background.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
   return map;
 })();
 anychart.core.settings.populate(anychart.core.ui.Background, anychart.core.ui.Background.prototype.SIMPLE_PROPS_DESCRIPTORS);
-
-
-/** @inheritDoc */
-anychart.core.ui.Background.prototype.enabled = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.ownSettings['enabled'] != opt_value) {
-      var enabled = this.ownSettings['enabled'] = opt_value;
-      this.invalidate(anychart.ConsistencyState.ENABLED, this.getEnableChangeSignals());
-      if (enabled) {
-        this.doubleSuspension = false;
-        this.resumeSignalsDispatching(true);
-      } else {
-        if (isNaN(this.suspendedDispatching)) {
-          this.suspendSignalsDispatching();
-        } else {
-          this.doubleSuspension = true;
-        }
-      }
-    }
-    return this;
-  } else {
-    return /** @type {boolean} */(this.getOption('enabled'));
-  }
-};
-
-
-/** @inheritDoc */
-anychart.core.ui.Background.prototype.zIndex = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var val = +opt_value || 0;
-    if (this.ownSettings['zIndex'] != val) {
-      this.ownSettings['zIndex'] = val;
-      this.invalidate(anychart.ConsistencyState.Z_INDEX, anychart.Signal.NEEDS_REDRAW | anychart.Signal.Z_INDEX_STATE_CHANGED);
-    }
-    return this;
-  }
-  return /** @type {number} */(goog.isDef(this.getOwnOption('zIndex')) ? this.getOwnOption('zIndex') : goog.isDef(this.autoZIndex) ? this.autoZIndex : this.getOption('zIndex'));
-};
 
 
 //endregion
@@ -695,28 +659,14 @@ anychart.core.ui.Background.prototype.getRemainingBounds = function() {
  * @param {!Object} config
  */
 anychart.core.ui.Background.prototype.setThemeSettings = function(config) {
-  for (var name in this.SIMPLE_PROPS_DESCRIPTORS) {
-    var val = config[name];
-    if (goog.isDef(val))
-      this.themeSettings[name] = val;
-  }
-  if ('enabled' in config) this.themeSettings['enabled'] = config['enabled'];
-  if ('zIndex' in config) this.themeSettings['zIndex'] = config['zIndex'];
+  anychart.core.settings.copy(this.themeSettings, this.SIMPLE_PROPS_DESCRIPTORS, config);
   if ('corners' in config) this.themeSettings['corners'] = this.cornersFormatter_(config['corners']);
 };
 
 
 /** @inheritDoc */
 anychart.core.ui.Background.prototype.serialize = function() {
-  var json = {};
-
-  var zIndex = anychart.core.Base.prototype.getOption.call(this, 'zIndex');
-  if (goog.isDef(zIndex))
-    json['zIndex'] = zIndex;
-
-  var enabled = anychart.core.Base.prototype.getOption.call(this, 'enabled');
-  if (goog.isDef(enabled))
-    json['enabled'] = enabled;
+  var json = anychart.core.ui.Background.base(this, 'serialize');
 
   anychart.core.settings.serialize(this, this.SIMPLE_PROPS_DESCRIPTORS, json, 'Background');
 
@@ -765,12 +715,13 @@ anychart.core.ui.Background.prototype.setupSpecial = function(isDefault, var_arg
 
 /** @inheritDoc */
 anychart.core.ui.Background.prototype.setupByJSON = function(config, opt_default) {
+  anychart.core.ui.Background.base(this, 'setupByJSON', config, opt_default);
+
   if (opt_default) {
     this.setThemeSettings(config);
   } else {
     anychart.core.settings.deserialize(this, this.SIMPLE_PROPS_DESCRIPTORS, config);
     this.corners(config['corners']);
-    anychart.core.ui.Background.base(this, 'setupByJSON', config);
   }
 };
 

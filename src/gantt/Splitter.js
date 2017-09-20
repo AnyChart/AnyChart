@@ -149,7 +149,7 @@ anychart.ganttModule.Splitter = function() {
    * @type {string}
    * @private
    */
-  this.cursorBackup_ = goog.style.getStyle(goog.global['document']['body'], 'cursor');
+  this.cursorBackup_ = goog.style.getStyle(anychart.document['body'], 'cursor');
 
 
   /**
@@ -781,7 +781,7 @@ anychart.ganttModule.Splitter.prototype.getBottomBounds = function() {
  */
 anychart.ganttModule.Splitter.prototype.globalCursor_ = function(opt_isVertical, opt_clear) {
   var cursor = opt_isVertical ? acgraph.vector.Cursor.E_RESIZE : acgraph.vector.Cursor.N_RESIZE;
-  goog.style.setStyle(goog.global['document']['body'], 'cursor', opt_clear ? this.cursorBackup_ : cursor);
+  goog.style.setStyle(anychart.document['body'], 'cursor', opt_clear ? this.cursorBackup_ : cursor);
 
   //TODO (A.Kudryavtsev): Check: Some old browsers don't change cursor over the stage if cursor was changed globally.
   //TODO (A.Kudryavtsev): In this case something like this can be used: this.base_.parent().cursor(opt_clear ? acgraph.vector.Cursor.DEFAULT : cursor);
@@ -875,7 +875,7 @@ anychart.ganttModule.Splitter.prototype.dragStartHandler_ = function() {
   this.getDragPreview_().visible(true);
   var isVertical = this.isVertical_();
 
-  this.cursorBackup_ = goog.style.getStyle(goog.global['document']['body'], 'cursor');
+  this.cursorBackup_ = goog.style.getStyle(anychart.document['body'], 'cursor');
 
   if (isVertical) {
     this.dragPreview_ //It is initiated already.
@@ -1234,7 +1234,7 @@ anychart.core.ui.SimpleSplitter = function() {
    * @type {string}
    * @private
    */
-  this.cursorBackup_ = goog.style.getStyle(goog.global['document']['body'], 'cursor');
+  this.cursorBackup_ = goog.style.getStyle(anychart.document['body'], 'cursor');
 
   /**
    * Center line stroke.
@@ -1442,7 +1442,7 @@ anychart.core.ui.SimpleSplitter.prototype.getRightBounds = function() {
  * @private
  */
 anychart.core.ui.SimpleSplitter.prototype.globalCursor_ = function(opt_clear) {
-  goog.style.setStyle(goog.global['document']['body'], 'cursor',
+  goog.style.setStyle(anychart.document['body'], 'cursor',
       opt_clear ? this.cursorBackup_ : acgraph.vector.Cursor.E_RESIZE);
 
   //TODO (A.Kudryavtsev): Check: Some old browsers don't change cursor over the stage if cursor was changed globally.
@@ -1470,7 +1470,7 @@ anychart.core.ui.SimpleSplitter.prototype.getBase_ = function() {
  */
 anychart.core.ui.SimpleSplitter.prototype.dragStartHandler_ = function() {
   this.dragging_ = true;
-  this.cursorBackup_ = goog.style.getStyle(goog.global['document']['body'], 'cursor');
+  this.cursorBackup_ = goog.style.getStyle(anychart.document['body'], 'cursor');
   this.getDragPreview_().clear();
 };
 

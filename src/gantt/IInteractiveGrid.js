@@ -119,7 +119,7 @@ anychart.ganttModule.IInteractiveGrid.prototype.deleteKeyHandler = function(e) {
 
 /**
  * Creates gantt format provider.
- * @param {anychart.treeDataModule.Tree.DataItem} dataItem - Data item.
+ * @param {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} dataItem - Data item.
  * @param {Object=} opt_period - Optional current period.
  * @param {number=} opt_periodIndex - Period index. Required is opt_period is set.
  * @return {Object} - Gantt context provider.
@@ -142,3 +142,11 @@ anychart.ganttModule.IInteractiveGrid.prototype.defaultRowHeight = function(opt_
  */
 anychart.ganttModule.IInteractiveGrid.prototype.container = function(opt_value) {};
 
+
+/**
+ * Sets consistency state to an element {@link anychart.ConsistencyState}.
+ * @param {anychart.ConsistencyState|number} state State(s) to be set.
+ * @param {(anychart.Signal|number)=} opt_signal Signal(s) to be sent to listener, if states have been set.
+ * @return {number} Actually modified consistency states.
+ */
+anychart.ganttModule.IInteractiveGrid.prototype.invalidate = function(state, opt_signal) {};

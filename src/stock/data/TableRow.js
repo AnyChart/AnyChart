@@ -63,6 +63,24 @@ anychart.stockModule.data.TableRow.instancesCount_ = 0;
 
 
 /**
+ * Returns current column value.
+ * @param {number|string} column
+ * @return {*}
+ */
+anychart.stockModule.data.TableRow.prototype.getValue = function(column) {
+  var value;
+  if (goog.isNumber(column) && column < 0) {
+    if (this.computedValues)
+      value = this.computedValues[~column];
+  } else {
+    value = this.values[column];
+  }
+
+  return value;
+};
+
+
+/**
  * Comparator for strong sort of table items.
  * @param {anychart.stockModule.data.TableRow} i1
  * @param {anychart.stockModule.data.TableRow} i2

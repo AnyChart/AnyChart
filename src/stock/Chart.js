@@ -116,7 +116,7 @@ anychart.stockModule.Chart = function(opt_allowPointSettings) {
    * Annotations module exports, if it is included. Also used in Plots.
    * @type {{ChartController:Function, PlotController:Function}|undefined}
    */
-  this.annotationsModule = goog.global['anychart']['annotations'];
+  this.annotationsModule = anychart.window['anychart']['annotations'];
 
   /**
    * Default annotation settings.
@@ -2191,11 +2191,11 @@ anychart.stockModule.Chart.prototype.handleMouseWheel_ = function(e) {
           this.mwZoomStart_ = start;
           this.mwZoomEnd_ = end;
           if (goog.isDef(this.mwScrollFrame_)) {
-            window.cancelAnimationFrame(this.mwScrollFrame_);
+            anychart.window.cancelAnimationFrame(this.mwScrollFrame_);
             this.mwScrollAction_();
           }
           if (!goog.isDef(this.mwZoomFrame_)) {
-            this.mwZoomFrame_ = window.requestAnimationFrame(this.mwZoomAction_);
+            this.mwZoomFrame_ = anychart.window.requestAnimationFrame(this.mwZoomAction_);
           }
         }
       }
@@ -2211,11 +2211,11 @@ anychart.stockModule.Chart.prototype.handleMouseWheel_ = function(e) {
           this.mwScrollRatio_ = ratio;
           this.mwScrollAnchor_ = anchor;
           if (goog.isDef(this.mwZoomFrame_)) {
-            window.cancelAnimationFrame(this.mwZoomFrame_);
+            anychart.window.cancelAnimationFrame(this.mwZoomFrame_);
             this.mwZoomAction_();
           }
           if (!goog.isDef(this.mwScrollFrame_)) {
-            this.mwScrollFrame_ = window.requestAnimationFrame(this.mwScrollAction_);
+            this.mwScrollFrame_ = anychart.window.requestAnimationFrame(this.mwScrollAction_);
           }
         }
       }
@@ -2278,7 +2278,8 @@ anychart.stockModule.Chart.prototype.doMWScroll_ = function() {
  */
 anychart.stockModule.Chart.contextMenuItems = {
   // Item 'Keep Only'.
-  startZoomMarquee: {
+  'start-zoom-marquee': {
+    'index': 8,
     'text': 'Start zoom marquee',
     'eventType': 'anychart.startZoomMarquee',
     'action': function(context) {
@@ -2290,21 +2291,22 @@ anychart.stockModule.Chart.contextMenuItems = {
 
 /**
  * Menu map.
- * @type {Object.<string, Array.<anychart.ui.ContextMenu.Item>>}
+ * @type {Object.<string, Object.<string, anychart.ui.ContextMenu.Item>>}
  */
 anychart.stockModule.Chart.contextMenuMap = {
   // Stock 'Default menu'. (will be added to 'main')
-  stock: [
-    anychart.stockModule.Chart.contextMenuItems.startZoomMarquee,
-    anychart.core.Chart.contextMenuItems.startSelectMarquee,
-    null
-  ]
+  'stock': {
+    'start-zoom-marquee': anychart.stockModule.Chart.contextMenuItems['start-zoom-marquee'],
+    'start-select-marquee': anychart.core.Chart.contextMenuItems['start-select-marquee'],
+    'stock-specific-separator': {'index': 9.4}
+  }
 };
 
 
 /** @inheritDoc */
 anychart.stockModule.Chart.prototype.specificContextMenuItems = function(items, context, isPointContext) {
-  return /** @type {Array.<anychart.ui.ContextMenu.Item>} */(goog.array.concat(anychart.utils.recursiveClone(anychart.stockModule.Chart.contextMenuMap.stock), items));
+  goog.object.extend(items, /** @type {Object} */ (anychart.utils.recursiveClone(anychart.stockModule.Chart.contextMenuMap['stock'])));
+  return items;
 };
 
 
@@ -2547,6 +2549,7 @@ anychart.stockModule.Chart.prototype.disposeInternal = function() {
 /** @inheritDoc */
 anychart.stockModule.Chart.prototype.serialize = function() {
   var json = anychart.stockModule.Chart.base(this, 'serialize');
+  delete json['noDataLabel'];
   json['grouping'] = this.grouping().serialize();
   json['scrollerGrouping'] = this.scrollerGrouping().serialize();
   json['xScale'] = this.xScale().serialize();

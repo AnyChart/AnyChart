@@ -1619,7 +1619,7 @@ goog.inherits(anychart.core.ui.Scroller.Dragger, goog.fx.Dragger);
  */
 anychart.core.ui.Scroller.Dragger.prototype.dragEndHandler_ = function(e) {
   if (goog.isDef(this.frame_)) {
-    window.cancelAnimationFrame(this.frame_);
+    anychart.window.cancelAnimationFrame(this.frame_);
     this.frameAction_(0);
   }
 };
@@ -1648,7 +1648,7 @@ anychart.core.ui.Scroller.Dragger.prototype.computeInitialPosition = function() 
 anychart.core.ui.Scroller.Dragger.prototype.defaultAction = function(x, y) {
   this.lastCoord_ = this.scroller_.isHorizontal() ? x : y;
   if (!goog.isDef(this.frame_))
-    this.frame_ = window.requestAnimationFrame(this.frameAction_);
+    this.frame_ = anychart.window.requestAnimationFrame(this.frameAction_);
 };
 
 

@@ -262,11 +262,7 @@ anychart.mapModule.elements.GridSettings.prototype.horizontal = function(opt_val
  * @param {!Object} config
  */
 anychart.mapModule.elements.GridSettings.prototype.setThemeSettings = function(config) {
-  for (var name in this.SIMPLE_PROPS_DESCRIPTORS) {
-    var val = config[name];
-    if (goog.isDef(val))
-      this.themeSettings[name] = val;
-  }
+  anychart.core.settings.copy(this.themeSettings, this.SIMPLE_PROPS_DESCRIPTORS, config);
 };
 
 
@@ -305,12 +301,17 @@ anychart.mapModule.elements.GridSettings.prototype.setupByJSON = function(config
 /** @inheritDoc */
 anychart.mapModule.elements.GridSettings.prototype.serialize = function() {
   var json = {};
+  var gridSettings;
 
   if (this.verticalGrid_) {
-    json['vertical'] = this.verticalGrid_.serialize();
+    gridSettings = this.verticalGrid_.serialize();
+    if (!goog.object.isEmpty(gridSettings))
+      json['vertical'] = gridSettings;
   }
   if (this.horizontalGrid_) {
-    json['horizontal'] = this.horizontalGrid_.serialize();
+    gridSettings = this.horizontalGrid_.serialize();
+    if (!goog.object.isEmpty(gridSettings))
+      json['horizontal'] = gridSettings;
   }
 
   anychart.core.settings.serialize(this, this.SIMPLE_PROPS_DESCRIPTORS, json, 'Map grids props');

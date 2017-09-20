@@ -60,6 +60,10 @@ anychart.core.drawers.OHLC.prototype.yValueNames = (function () { return ['open'
 
 
 /** @inheritDoc */
+anychart.core.drawers.OHLC.prototype.valueFieldName = 'close';
+
+
+/** @inheritDoc */
 anychart.core.drawers.OHLC.prototype.drawSubsequentPoint = function(point, state) {
   var rising = Number(point.get('open')) < Number(point.get('close'));
   var name = rising ? 'rising' : 'falling';
