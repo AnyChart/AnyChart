@@ -103,17 +103,18 @@ Please, take a look at [webpack and typescript integration](https://github.com/a
 ## Using AnyChart with ECMAScript 6
 You can use AnyChart in your ECMAScript 6 projects over two ways:
 
-### Plain ECMAScript 6
+#### Plain ECMAScript 6
 To add AnyChart on a page use `<script>` section with `type="module"` attribute. 
+```
 <script type="module">
     import '_localpath_to_anychart/anychart-bundle.min.js'
     
     // regular AnyChart code here
-    // ...
 </script>
+```
 For more details, take a look at [AnyChart ES6](https://github.com/anychart-integrations/anychart-es6-example) example.
 
-### Bundling tools and Module Loaders
+#### Bundling tools and Module Loaders
 You can use AnyChart with any bundling tool or module loader such as WebPack, Browserify, Require.js and others.
 For more details, take a look at [AnyChart Webpack](https://github.com/anychart-integrations/anychart-es6-webpack) example.
 
