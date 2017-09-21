@@ -284,6 +284,7 @@ anychart.themes.merging.demerge = function(target, defaultObj) {
   target = anychart.themes.merging.demerge_(target, defaultObj);
   target = anychart.themes.merging.demergeMultiple_(target, defaultObj);
   target = anychart.themes.merging.demergeScales_(target, defaultObj);
+  target = anychart.themes.merging.demergeCredits_(target);
   return anychart.themes.merging.demergeTyped_(target, defaultObj);
 };
 
@@ -407,6 +408,26 @@ anychart.themes.merging.demergeScales_ = function(target, defaultObj) {
           targetPart[i] = anychart.themes.merging.demerge_(targetPart[i], defaultArray[i]) || {};
         }
       }
+    }
+  }
+  return target;
+};
+
+
+/**
+ * Demerges credits.
+ * @param {*} target
+ * @return {*}
+ * @private
+ */
+anychart.themes.merging.demergeCredits_ = function(target) {
+  var targetType = goog.typeOf(target['chart']['credits']);
+  var defaultType = goog.typeOf(anychart.getFullTheme('stageCredits'));
+  if (targetType == 'object' && defaultType == 'object') {
+    var defVal = anychart.getFullTheme('stageCredits');
+    var val = anychart.themes.merging.demerge_(target['chart']['credits'], defVal);
+    if (goog.isDef(val)) {
+      target['chart']['credits'] = val;
     }
   }
   return target;
@@ -1765,7 +1786,8 @@ anychart.themes.merging.nonMergableEntities_ = (function() {
     'palette': anychart.themes.merging.NonMergableEntityTypes_.PALETTE,
     'fill': anychart.themes.merging.NonMergableEntityTypes_.FILL,
     'stroke': anychart.themes.merging.NonMergableEntityTypes_.STROKE,
-    'hatchFill': anychart.themes.merging.NonMergableEntityTypes_.HATCH_FILL
+    'hatchFill': anychart.themes.merging.NonMergableEntityTypes_.HATCH_FILL,
+    'hatchFillPalette': anychart.themes.merging.NonMergableEntityTypes_.HATCH_PALETTE
   };
 
   populate([[
@@ -1775,7 +1797,6 @@ anychart.themes.merging.nonMergableEntities_ = (function() {
   ], 'Scale'], anychart.themes.merging.NonMergableEntityTypes_.SCALE);
   populate([[
     'range',
-    'hatchFill',
     'marker'
   ], 'Palette'], anychart.themes.merging.NonMergableEntityTypes_.PALETTE);
   populate([[
@@ -1827,7 +1848,8 @@ anychart.themes.merging.nonMergableEntities_ = (function() {
       'edElement',
       'Negative',
       'Rising',
-      'Falling'
+      'Falling',
+      'Marquee'
     ]]
   ], 'Fill'], anychart.themes.merging.NonMergableEntityTypes_.FILL);
   populate([[
@@ -1910,7 +1932,8 @@ anychart.themes.merging.nonMergableEntities_ = (function() {
       'edFalling',
       'Median',
       'Stem',
-      'Whisker'
+      'Whisker',
+      'Marquee'
     ]]
   ], 'Stroke'], anychart.themes.merging.NonMergableEntityTypes_.STROKE);
 
