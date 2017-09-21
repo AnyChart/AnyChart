@@ -100,6 +100,23 @@ AnyChart provides wide variety of [plugins](https://www.anychart.com/plugins/) f
 You can use AnyChart in your TypeScript projects - we have definition file for our library which you can find in [distribution folder](https://github.com/AnyChart/anychart/tree/master/dist/index.d.ts).
 Please, take a look at [webpack and typescript integration](https://github.com/anychart-integrations/webpack-typescript-example) example for more details.
 
+## Using AnyChart with ECMAScript 6
+You can use AnyChart in your ECMAScript 6 projects over two ways:
+
+### Plain ECMAScript 6
+To add AnyChart on a page use `<script>` section with `type="module"` attribute. 
+<script type="module">
+    import '_localpath_to_anychart/anychart-bundle.min.js'
+    
+    // regular AnyChart code here
+    // ...
+</script>
+For more details, take a look at [AnyChart ES6](https://github.com/anychart-integrations/anychart-es6-example) example.
+
+### Bundling tools and Module Loaders
+You can use AnyChart with any bundling tool or module loader such as WebPack, Browserify, Require.js and others.
+For more details, take a look at [AnyChart Webpack](https://github.com/anychart-integrations/anychart-es6-webpack) example.
+
 ## Technical Integrations
 
 AnyChart can run on any platform and with any database. [These samples](https://www.anychart.com/integrations/) were created to demonstrate how AnyChart can be easily integrated into your environment.
