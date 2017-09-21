@@ -1424,6 +1424,16 @@ anychart.stockModule.Scroller.prototype.yScale = function(opt_value) {
       var dispatch = this.yScale_ == val;
       this.yScale_ = /** @type {anychart.scales.ScatterBase} */(val);
       this.yScale_.resumeSignalsDispatching(dispatch);
+      if (!dispatch) {
+        for (var i = 0; i < this.series_.length; i++) {
+          var series = this.series_[i];
+          if (series && series.enabled() && series.yScale() == this.yScale_) {
+            series.invalidate(anychart.ConsistencyState.SERIES_POINTS);
+            this.invalidate(anychart.ConsistencyState.STOCK_SCROLLER_SERIES);
+          }
+        }
+        this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
+      }
     }
     return this;
   } else {

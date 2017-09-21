@@ -287,6 +287,10 @@ anychart.radarModule.Axis.prototype.scale = function(opt_value) {
       var dispatch = this.scale_ == val;
       this.scale_ = /** @type {anychart.scales.Linear} */(val);
       this.scale_.resumeSignalsDispatching(dispatch);
+      if (!dispatch) {
+        this.dropBoundsCache_();
+        this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      }
     }
     return this;
   } else {

@@ -172,11 +172,11 @@ anychart.core.axisMarkers.TextBase.prototype.scaleInternal = function(opt_value)
     if (val) {
       var dispatch = this.scale_ == val;
       this.scale_ = /** @type {anychart.scales.Base|anychart.ganttModule.Scale} */(val);
-      if (ganttScale)
+      if (!ganttScale)
+        val.resumeSignalsDispatching(dispatch);
+      if (!dispatch)
         this.invalidate(anychart.ConsistencyState.BOUNDS,
             anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-      else
-        val.resumeSignalsDispatching(dispatch);
     }
     return this;
   } else {

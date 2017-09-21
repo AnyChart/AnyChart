@@ -743,8 +743,19 @@ anychart.colorScalesModule.ui.ColorRange.prototype.hideMarker = function() {
 
 /** @inheritDoc */
 anychart.colorScalesModule.ui.ColorRange.prototype.scale = function(opt_value) {
-  var scale = this.internalScale || this.getTempScale();
-  if (goog.isDef(opt_value) && scale && (scale != opt_value) && (scale.getType() != opt_value.getType())) {
+  return anychart.colorScalesModule.ui.ColorRange.base(this, 'scale', opt_value) || this.getTempScale();
+};
+
+
+/** @inheritDoc */
+anychart.colorScalesModule.ui.ColorRange.prototype.getAllowedScaleTypes = function() {
+  return anychart.scales.Base.ScaleTypes.COLOR_SCALES;
+};
+
+
+/** @inheritDoc */
+anychart.colorScalesModule.ui.ColorRange.prototype.scaleInvalidated = function(e) {
+  if (e.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
     if (this.line) {
       this.line.removeAllListeners();
       this.line.parent(null);
@@ -753,7 +764,7 @@ anychart.colorScalesModule.ui.ColorRange.prototype.scale = function(opt_value) {
     if (this.lines)
       this.lines.length = 0;
   }
-  return anychart.colorScalesModule.ui.ColorRange.base(this, 'scale', opt_value) || this.getTempScale();
+  anychart.colorScalesModule.ui.ColorRange.base(this, 'scaleInvalidated', e);
 };
 
 

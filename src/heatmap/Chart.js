@@ -315,6 +315,9 @@ anychart.heatmapModule.Chart.prototype.colorScale = function(opt_value) {
         var dispatch = this.colorScale_ == val;
         this.colorScale_ = val;
         this.colorScale_.resumeSignalsDispatching(dispatch);
+        if (!dispatch)
+          this.invalidate(anychart.ConsistencyState.HEATMAP_COLOR_SCALE | anychart.ConsistencyState.CHART_LEGEND,
+              anychart.Signal.NEEDS_REDRAW);
       }
     }
     return this;

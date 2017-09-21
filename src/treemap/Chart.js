@@ -1374,6 +1374,9 @@ anychart.treemapModule.Chart.prototype.colorScale = function(opt_value) {
           this.hintColorScale_ = null;
 
         this.colorScale_.resumeSignalsDispatching(dispatch);
+        if (!dispatch)
+          this.invalidate(anychart.ConsistencyState.TREEMAP_COLOR_SCALE | anychart.ConsistencyState.CHART_LEGEND,
+              anychart.Signal.NEEDS_REDRAW);
       }
     }
     return this;

@@ -150,6 +150,8 @@ anychart.linearGaugeModule.ScaleBar.prototype.colorScale = function(opt_value) {
       this.fill_ = null;
       this.stroke_ = null;
       this.colorScale_.resumeSignalsDispatching(dispatch);
+      if (!dispatch)
+        this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }

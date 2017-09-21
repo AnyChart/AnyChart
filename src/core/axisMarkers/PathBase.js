@@ -135,12 +135,11 @@ anychart.core.axisMarkers.PathBase.prototype.scaleInternal = function(opt_value)
       if (!val)
         this.scale_.unlistenSignals(this.scaleInvalidated, this);
       this.scale_ = /** @type {anychart.ganttModule.Scale|anychart.scales.Base} */(val);
-      if (ganttScale || !val) {
+      if (val && !ganttScale)
+        val.resumeSignalsDispatching(dispatch);
+      if (!dispatch)
         this.invalidate(anychart.ConsistencyState.BOUNDS,
             anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-      } else {
-        val.resumeSignalsDispatching(dispatch);
-      }
     }
     return this;
   } else {

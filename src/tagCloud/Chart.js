@@ -1001,6 +1001,8 @@ anychart.tagCloudModule.Chart.prototype.scale = function(opt_value) {
       var dispatch = this.scale_ == val;
       this.scale_ = /** @type {anychart.scales.Linear} */(val);
       this.scale_.resumeSignalsDispatching(dispatch);
+      if (!dispatch)
+        this.invalidate(anychart.ConsistencyState.TAG_CLOUD_SCALE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -1038,6 +1040,10 @@ anychart.tagCloudModule.Chart.prototype.colorScale = function(opt_value) {
         var dispatch = this.colorScale_ == val;
         this.colorScale_ = val;
         this.colorScale_.resumeSignalsDispatching(dispatch);
+        if (!dispatch) {
+          this.invalidate(anychart.ConsistencyState.TAG_CLOUD_COLOR_SCALE,
+              anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_COLOR_RANGE);
+        }
       }
     }
     return this;

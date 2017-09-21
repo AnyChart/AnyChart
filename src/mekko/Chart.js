@@ -139,6 +139,16 @@ anychart.mekkoModule.Chart.prototype.firstCategoriesScale = function(opt_value) 
       var dispatch = this.firstCategoriesScale_ == val;
       this.firstCategoriesScale_ = val;
       this.firstCategoriesScale_.resumeSignalsDispatching(dispatch);
+      if (!dispatch) {
+        var state = anychart.ConsistencyState.SCALE_CHART_SCALES |
+            anychart.ConsistencyState.SCALE_CHART_Y_SCALES |
+            anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS;
+        if ((this.allowLegendCategoriesMode() && this.legend().itemsSourceMode() == anychart.enums.LegendItemsSourceMode.CATEGORIES) ||
+            this.barmekkoMode_) {
+          state |= anychart.ConsistencyState.CHART_LEGEND;
+        }
+        this.invalidate(state, anychart.Signal.NEEDS_REDRAW | anychart.ConsistencyState.MEKKO_CATEGORY_SCALE);
+      }
     }
     return this;
   }
@@ -164,6 +174,12 @@ anychart.mekkoModule.Chart.prototype.lastCategoriesScale = function(opt_value) {
       var dispatch = this.lastCategoriesScale_ == val;
       this.lastCategoriesScale_ = val;
       this.lastCategoriesScale_.resumeSignalsDispatching(dispatch);
+      if (!dispatch) {
+        var state = anychart.ConsistencyState.SCALE_CHART_SCALES |
+            anychart.ConsistencyState.SCALE_CHART_Y_SCALES |
+            anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS;
+        this.invalidate(state, anychart.Signal.NEEDS_REDRAW | anychart.ConsistencyState.MEKKO_CATEGORY_SCALE);
+      }
     }
     return this;
   }

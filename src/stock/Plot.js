@@ -1335,6 +1335,10 @@ anychart.stockModule.Plot.prototype.yScale = function(opt_value) {
       var dispatch = this.yScale_ == val;
       this.yScale_ = /** @type {anychart.scales.ScatterBase} */(val);
       this.yScale_.resumeSignalsDispatching(dispatch);
+      if (!dispatch) {
+        this.invalidateRedrawable(false);
+        this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
+      }
     }
     return this;
   } else {

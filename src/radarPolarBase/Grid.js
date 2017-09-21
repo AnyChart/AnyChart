@@ -76,6 +76,10 @@ anychart.radarPolarBaseModule.Grid.prototype.yScale = function(opt_value) {
       var dispatch = this.yScale_ == val;
       this.yScale_ = /** @type {anychart.scales.Base} */(val);
       this.yScale_.resumeSignalsDispatching(dispatch);
+      if (!dispatch) {
+        this.invalidate(anychart.ConsistencyState.GRIDS_POSITION | anychart.ConsistencyState.BOUNDS,
+            anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      }
     }
     return this;
   } else if (this.yScale_) {
@@ -122,6 +126,10 @@ anychart.radarPolarBaseModule.Grid.prototype.xScale = function(opt_value) {
       var dispatch = this.xScale_ == val;
       this.xScale_ = /** @type {anychart.scales.Ordinal} */(val);
       this.xScale_.resumeSignalsDispatching(dispatch);
+      if (!dispatch) {
+        this.invalidate(anychart.ConsistencyState.GRIDS_POSITION | anychart.ConsistencyState.BOUNDS,
+            anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      }
     }
     return this;
   } else if (this.xScale_) {

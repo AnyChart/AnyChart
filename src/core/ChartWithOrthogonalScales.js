@@ -222,7 +222,16 @@ anychart.core.ChartWithOrthogonalScales.prototype.xScale = function(opt_value) {
     if (val) {
       var dispatch = this.xScale_ == val;
       this.xScale_ = val;
-      this.xScale_.resumeSignalsDispatching(dispatch);
+      val.resumeSignalsDispatching(dispatch);
+
+      if (!dispatch) {
+        var state = anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS;
+        if (this.allowLegendCategoriesMode() &&
+            this.legend().itemsSourceMode() == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
+          state |= anychart.ConsistencyState.CHART_LEGEND;
+        }
+        this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
+      }
     }
     return this;
   }
@@ -271,6 +280,8 @@ anychart.core.ChartWithOrthogonalScales.prototype.yScale = function(opt_value) {
       var dispatch = this.yScale_ == val;
       this.yScale_ = val;
       this.yScale_.resumeSignalsDispatching(dispatch);
+      if (!dispatch)
+        this.invalidate(anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }

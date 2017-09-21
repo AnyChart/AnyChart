@@ -196,6 +196,9 @@ anychart.core.series.Cartesian.prototype.xScale = function(opt_value) {
         var dispatch = this.xScale_ == val;
         this.xScale_ = /** @type {anychart.scales.Base} */(val);
         this.xScale_.resumeSignalsDispatching(dispatch);
+        if (!dispatch)
+          this.invalidate(anychart.ConsistencyState.SERIES_POINTS,
+              anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW);
       }
     } else if (this.xScale_) {
       if (this.xScale_)

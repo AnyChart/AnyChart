@@ -1402,6 +1402,9 @@ anychart.core.series.Base.prototype.yScale = function(opt_value) {
         var dispatch = this.yScale_ == val;
         this.yScale_ = /** @type {anychart.scales.Base} */(val);
         this.yScale_.resumeSignalsDispatching(dispatch);
+        if (!dispatch)
+          this.invalidate(anychart.ConsistencyState.SERIES_POINTS,
+              anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW);
       }
     } else if (this.yScale_) {
       if (this.yScale_)

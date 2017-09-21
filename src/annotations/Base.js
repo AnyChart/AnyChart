@@ -279,7 +279,8 @@ anychart.annotationsModule.Base.prototype.yScale = function(opt_value) {
       this.yScale_ = val;
       if (val) {
         val.resumeSignalsDispatching(dispatch);
-      } else {
+      }
+      if (!dispatch) {
         this.invalidate(anychart.ConsistencyState.ANNOTATIONS_ANCHORS, anychart.Signal.NEEDS_REDRAW);
       }
     }
@@ -305,10 +306,10 @@ anychart.annotationsModule.Base.prototype.xScale = function(opt_value) {
       if (!val)
         (/** @type {anychart.core.Base} */(this.xScale_)).unlistenSignals(this.scaleSignalHandler_, this);
       this.xScale_ = /** @type {anychart.scales.Base|anychart.stockModule.scales.Scatter} */(val);
-      if (stockScale || !val) {
-        this.invalidate(anychart.ConsistencyState.ANNOTATIONS_ANCHORS, anychart.Signal.NEEDS_REDRAW);
-      } else {
+      if (val && !stockScale)
         val.resumeSignalsDispatching(dispatch);
+      if (!dispatch) {
+        this.invalidate(anychart.ConsistencyState.ANNOTATIONS_ANCHORS, anychart.Signal.NEEDS_REDRAW);
       }
     }
     return this;

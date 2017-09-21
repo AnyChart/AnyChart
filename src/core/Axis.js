@@ -542,7 +542,9 @@ anychart.core.Axis.prototype.setDefaultOrientation = function(value) {
  */
 anychart.core.Axis.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    var val = anychart.scales.Base.setupScale(this.internalScale, opt_value, null, anychart.scales.Base.ScaleTypes.ALL_DEFAULT, null, this.scaleInvalidated_, this);
+    var val = anychart.scales.Base.setupScale(
+        /** @type {anychart.scales.Base} */(this.scale()),
+        opt_value, null, this.getAllowedScaleTypes(), null, this.scaleInvalidated, this);
     if (val) {
       var dispatch = this.internalScale == val;
       this.internalScale = val;
@@ -552,6 +554,8 @@ anychart.core.Axis.prototype.scale = function(opt_value) {
       this.labels().clear();
       this.minorLabels().clear();
       val.resumeSignalsDispatching(dispatch);
+      if (!dispatch)
+        this.invalidate(this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   } else {
@@ -561,11 +565,20 @@ anychart.core.Axis.prototype.scale = function(opt_value) {
 
 
 /**
+ * @return {anychart.scales.Base.ScaleTypes}
+ * @protected
+ */
+anychart.core.Axis.prototype.getAllowedScaleTypes = function() {
+  return anychart.scales.Base.ScaleTypes.ALL_DEFAULT;
+};
+
+
+/**
  * Internal ticks invalidation handler.
  * @param {anychart.SignalEvent} event Event object.
- * @private
+ * @protected
  */
-anychart.core.Axis.prototype.scaleInvalidated_ = function(event) {
+anychart.core.Axis.prototype.scaleInvalidated = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
     this.dropStaggeredLabelsCache_();
     this.dropOverlappedLabelsCache_();
@@ -2199,7 +2212,7 @@ anychart.core.Axis.prototype.disposeInternal = function() {
   anychart.core.Axis.base(this, 'disposeInternal');
 
   if (this.internalScale)
-    this.internalScale.unlistenSignals(this.scaleInvalidated_, this);
+    this.internalScale.unlistenSignals(this.scaleInvalidated, this);
   delete this.internalScale;
   this.labelsBounds_ = null;
   this.minorLabelsBounds_ = null;

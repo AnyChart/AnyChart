@@ -448,6 +448,11 @@ anychart.core.GridBase.prototype.scale = function(opt_value) {
       var dispatch = this.scale_ == val;
       this.scale_ = val;
       val.resumeSignalsDispatching(dispatch);
+      if (!dispatch)
+        this.invalidate(
+            anychart.ConsistencyState.BOUNDS |
+            anychart.ConsistencyState.APPEARANCE,
+            anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   } else {

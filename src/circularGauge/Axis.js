@@ -174,6 +174,8 @@ anychart.circularGaugeModule.Axis.prototype.scale = function(opt_value) {
       var dispatch = this.scale_ == val;
       this.scale_ = val;
       val.resumeSignalsDispatching(dispatch);
+      if (!dispatch)
+        this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEEDS_REAPPLICATION);
     }
     return this;
   } else {
