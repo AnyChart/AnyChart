@@ -3,7 +3,6 @@ goog.require('anychart.color');
 goog.require('anychart.format');
 
 
-
 //region --- Aux
 //------------------------------------------------------------------------------
 //
@@ -1157,8 +1156,10 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
       'autoHide': false,
       'fill': '#E9E9E9',
       'stroke': '#7c868e',
-      'hoverFill': '#ffffff',
-      'hoverStroke': anychart.core.defaultTheme.defaultHoverColor
+      'hovered': {
+        'fill': '#ffffff',
+        'stroke': anychart.core.defaultTheme.defaultHoverColor
+      }
     },
     'inverted': false,
     'zIndex': 35
@@ -1293,49 +1294,55 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
           },
           'zIndex': 0
         },
-        'hatchFill': false,
-        'hoverHatchFill': null,
-        'selectHatchFill': null,
-        'labels': {
-          'enabled': null,
-          'anchor': 'auto',
-          'position': 'value'
+        'normal': {
+          'fill': anychart.core.defaultTheme.returnSourceColor65,
+          'stroke': anychart.core.defaultTheme.returnStrokeSourceColor,
+          'lowStroke': anychart.core.defaultTheme.returnStrokeSourceColor,
+          'highStroke': anychart.core.defaultTheme.returnStrokeSourceColor,
+          'hatchFill': false,
+          'labels': {
+            'enabled': null,
+            'anchor': 'auto',
+            'position': 'value'
+          },
+          'markers': {
+            'enabled': false,
+            'disablePointerEvents': false,
+            'position': 'value',
+            'positionFormatter': anychart.core.defaultTheme.returnValue,
+            'size': 4
+          }
         },
-        'hoverLabels': {'enabled': null},
-        'selectLabels': {'enabled': null},
-        'markers': {
-          'enabled': false,
-          'disablePointerEvents': false,
-          'position': 'value',
-          'positionFormatter': anychart.core.defaultTheme.returnValue,
-          'size': 4
+        'hovered': {
+          'fill': anychart.core.defaultTheme.returnSourceColor,
+          'stroke': anychart.core.defaultTheme.returnLightenStrokeSourceColor,
+          'lowStroke': anychart.core.defaultTheme.returnLightenStrokeSourceColor,
+          'highStroke': anychart.core.defaultTheme.returnLightenStrokeSourceColor,
+          'hatchFill': null,
+          'labels': {'enabled': null},
+          'markers': {
+            'enabled': null,
+            'size': 6
+          }
         },
-        'hoverMarkers': {
-          'enabled': null,
-          'size': 6
-        },
-        'selectMarkers': {
-          'enabled': null,
+        'selected': {
           'fill': anychart.core.defaultTheme.defaultSelectColor,
-          'stroke': anychart.core.defaultTheme.defaultSelectStroke,
-          'size': 6
+          'stroke': anychart.core.defaultTheme.defaultSelectColor,
+          'lowStroke': anychart.core.defaultTheme.defaultSelectColor,
+          'highStroke': anychart.core.defaultTheme.defaultSelectColor,
+          'hatchFill': null,
+          'labels': {'enabled': null},
+          'markers': {
+            'enabled': null,
+            'fill': anychart.core.defaultTheme.defaultSelectColor,
+            'stroke': anychart.core.defaultTheme.defaultSelectStroke,
+            'size': 6
+          }
         },
         'legendItem': {
           'enabled': true,
           'iconType': 'square'
         },
-        'fill': anychart.core.defaultTheme.returnSourceColor65,
-        'hoverFill': anychart.core.defaultTheme.returnSourceColor,
-        'selectFill': anychart.core.defaultTheme.defaultSelectColor,
-        'stroke': anychart.core.defaultTheme.returnStrokeSourceColor,
-        'hoverStroke': anychart.core.defaultTheme.returnLightenStrokeSourceColor,
-        'selectStroke': anychart.core.defaultTheme.defaultSelectColor,
-        'lowStroke': anychart.core.defaultTheme.returnStrokeSourceColor,
-        'hoverLowStroke': anychart.core.defaultTheme.returnLightenStrokeSourceColor,
-        'selectLowStroke': anychart.core.defaultTheme.defaultSelectColor,
-        'highStroke': anychart.core.defaultTheme.returnStrokeSourceColor,
-        'hoverHighStroke': anychart.core.defaultTheme.returnLightenStrokeSourceColor,
-        'selectHighStroke': anychart.core.defaultTheme.defaultSelectColor,
         'clip': true,
         'color': null,
         'xScale': null,
@@ -1361,86 +1368,104 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
         }
       },
       'marker': {
-        'fill': anychart.core.defaultTheme.returnSourceColor,
-        'stroke': anychart.core.defaultTheme.returnStrokeWithThickness,
-        'hoverFill': anychart.core.defaultTheme.returnLightenSourceColor,
-        'hoverStroke': anychart.core.defaultTheme.returnStrokeWithThickness,
-        'selectFill': anychart.core.defaultTheme.defaultSelectColor,
-        'selectStroke': anychart.core.defaultTheme.defaultSelectStroke,
-        'size': 4,
-        'hoverSize': 6,
-        'selectSize': 6,
+        'normal': {
+          'fill': anychart.core.defaultTheme.returnSourceColor,
+          'stroke': anychart.core.defaultTheme.returnStrokeWithThickness,
+          'size': 4,
+          'labels': {
+            'offsetY': 3
+          }
+        },
+        'hovered': {
+          'fill': anychart.core.defaultTheme.returnLightenSourceColor,
+          'stroke': anychart.core.defaultTheme.returnStrokeWithThickness,
+          'size': 6
+        },
+        'selected': {
+          'fill': anychart.core.defaultTheme.defaultSelectColor,
+          'stroke': anychart.core.defaultTheme.defaultSelectStroke,
+          'size': 6
+        },
         'legendItem': {
           'iconStroke': 'none'
-        },
-        'labels': {
-          'offsetY': 3
         }
       },
       'bubble': {
-        'fill': anychart.core.defaultTheme.returnSourceColor70,
-        'hoverFill': anychart.core.defaultTheme.returnSourceColor50,
+        'normal': {
+          'fill': anychart.core.defaultTheme.returnSourceColor70,
+          /**
+           * @this {*}
+           * @return {*}
+           */
+          'negativeFill': function() {
+            return anychart.color.darken(anychart.color.darken(anychart.color.darken(this['sourceColor'])));
+          },
+          /**
+           * @this {*}
+           * @return {*}
+           */
+          'negativeStroke': function() {
+            return anychart.color.darken(anychart.color.darken(anychart.color.darken(anychart.color.darken((this['sourceColor'])))));
+          },
+          'negativeHatchFill': false,
+          'labels': {
+            'anchor': 'center'
+          }
+        },
+        'hovered': {
+          'fill': anychart.core.defaultTheme.returnSourceColor50,
+          /**
+           * @this {*}
+           * @return {*}
+           */
+          'negativeFill': function() {
+            return anychart.color.darken(anychart.color.darken(anychart.color.darken(anychart.color.darken(this['sourceColor']))));
+          },
+          /**
+           * @this {*}
+           * @return {*}
+           */
+          'negativeStroke': function() {
+            return anychart.color.darken(anychart.color.darken(anychart.color.darken(anychart.color.darken(anychart.color.darken(this['sourceColor'])))));
+          },
+          'negativeHatchFill': null
+        },
+        'selected': {
+          /**
+           * @this {*}
+           * @return {*}
+           */
+          'negativeFill': function() {
+            return anychart.color.darken(anychart.color.darken(anychart.color.darken(this['sourceColor'])));
+          },
+          /**
+           * @this {*}
+           * @return {*}
+           */
+          'negativeStroke': function() {
+            return anychart.color.darken(anychart.color.darken(anychart.color.darken(anychart.color.darken(this['sourceColor']))));
+          },
+          'negativeHatchFill': null
+        },
         'displayNegative': false,
-        /**
-         * @this {*}
-         * @return {*}
-         */
-        'negativeFill': function() {
-          return anychart.color.darken(anychart.color.darken(anychart.color.darken(this['sourceColor'])));
-        },
-        /**
-         * @this {*}
-         * @return {*}
-         */
-        'hoverNegativeFill': function() {
-          return anychart.color.darken(anychart.color.darken(anychart.color.darken(anychart.color.darken(this['sourceColor']))));
-        },
-        /**
-         * @this {*}
-         * @return {*}
-         */
-        'selectNegativeFill': function() {
-          return anychart.color.darken(anychart.color.darken(anychart.color.darken(this['sourceColor'])));
-        },
-        /**
-         * @this {*}
-         * @return {*}
-         */
-        'negativeStroke': function() {
-          return anychart.color.darken(anychart.color.darken(anychart.color.darken(anychart.color.darken((this['sourceColor'])))));
-        },
-        /**
-         * @this {*}
-         * @return {*}
-         */
-        'hoverNegativeStroke': function() {
-          return anychart.color.darken(anychart.color.darken(anychart.color.darken(anychart.color.darken(anychart.color.darken(this['sourceColor'])))));
-        },
-        /**
-         * @this {*}
-         * @return {*}
-         */
-        'selectNegativeStroke': function() {
-          return anychart.color.darken(anychart.color.darken(anychart.color.darken(anychart.color.darken(this['sourceColor']))));
-        },
-        'negativeHatchFill': false,
-        'hoverNegativeHatchFill': null,
-        'selectNegativeHatchFill': null,
         'legendItem': {
           'iconStroke': 'none'
-        },
-        'labels': {
-          'anchor': 'center'
         }
       },
       'areaLike': {
-        'fill': anychart.core.defaultTheme.returnSourceColor65,
-        'hoverFill': anychart.core.defaultTheme.returnSourceColor65,
-        'hoverMarkers': {
-          'enabled': true
+        'normal': {
+          'fill': anychart.core.defaultTheme.returnSourceColor65
         },
-        'selectMarkers': {
-          'enabled': true
+        'hovered': {
+          'fill': anychart.core.defaultTheme.returnSourceColor65,
+          'markers': {
+            'enabled': true
+          }
+        },
+        'selected': {
+          'markers': {
+            'enabled': true
+          }
         },
         'legendItem': {
           'iconStroke': 'none'
@@ -1448,90 +1473,115 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
         'stepDirection': 'center'
       },
       'barLike': {
-        'fill': anychart.core.defaultTheme.returnSourceColor85,
-        'hoverFill': anychart.core.defaultTheme.returnSourceColor65,
+        'normal': {
+          'fill': anychart.core.defaultTheme.returnSourceColor85
+        },
+        'hovered': {
+          'fill': anychart.core.defaultTheme.returnSourceColor65
+        },
         'legendItem': {
           'iconStroke': 'none'
         }
       },
       'lineLike': {
-        'hoverMarkers': {
-          'enabled': true
+        'hovered': {
+          'markers': {
+            'enabled': true
+          }
         },
-        'selectMarkers': {
-          'enabled': true
+        'selected': {
+          'markers': {
+            'enabled': true
+          }
         },
         'stepDirection': 'center'
       },
       'rangeLike': {
-        'labels': {
-          'format': anychart.core.defaultTheme.returnRangeLabelsContentFormatter,
-          'position': 'high'
-        },
-        'markers': {
-          'position': 'high'
+        'normal': {
+          'labels': {
+            'format': anychart.core.defaultTheme.returnRangeLabelsContentFormatter,
+            'position': 'high'
+          },
+          'markers': {
+            'position': 'high'
+          }
         },
         'tooltip': {
           'format': anychart.core.defaultTheme.returnRangeTooltipContentFormatter
         }
       },
       'candlestick': {
-        'risingFill': anychart.core.defaultTheme.risingColor,
-        'risingStroke': anychart.core.defaultTheme.risingColor,
-        'hoverRisingFill': anychart.core.defaultTheme.returnLightenSourceColor,
-        'hoverRisingStroke': anychart.core.defaultTheme.returnDarkenSourceColor,
-        'fallingFill': anychart.core.defaultTheme.fallingColor,
-        'fallingStroke': anychart.core.defaultTheme.fallingColor,
-        'hoverFallingFill': anychart.core.defaultTheme.returnLightenSourceColor,
-        'hoverFallingStroke': anychart.core.defaultTheme.returnDarkenSourceColor,
-
-        'risingHatchFill': false,
-        'hoverRisingHatchFill': null,
-        'selectRisingHatchFill': null,
-        'fallingHatchFill': false,
-        'hoverFallingHatchFill': null,
-        'selectFallingHatchFill': null,
-        'selectFallingFill': anychart.core.defaultTheme.defaultSelectColor,
-        'selectRisingFill': anychart.core.defaultTheme.defaultSelectColor,
-        'selectRisingStroke': anychart.core.defaultTheme.defaultSelectColor,
-        'selectFallingStroke': anychart.core.defaultTheme.defaultSelectColor,
+        'normal': {
+          'risingFill': anychart.core.defaultTheme.risingColor,
+          'risingStroke': anychart.core.defaultTheme.risingColor,
+          'fallingFill': anychart.core.defaultTheme.fallingColor,
+          'fallingStroke': anychart.core.defaultTheme.fallingColor,
+          'risingHatchFill': false,
+          'fallingHatchFill': false,
+          'markers': {
+            'position': 'high'
+          },
+          'labels': {
+            'position': 'high',
+            'format': anychart.core.defaultTheme.returnX
+          }
+        },
+        'hovered': {
+          'risingFill': anychart.core.defaultTheme.returnLightenSourceColor,
+          'risingStroke': anychart.core.defaultTheme.returnDarkenSourceColor,
+          'fallingFill': anychart.core.defaultTheme.returnLightenSourceColor,
+          'fallingStroke': anychart.core.defaultTheme.returnDarkenSourceColor,
+          'risingHatchFill': null,
+          'fallingHatchFill': null
+        },
+        'selected': {
+          'risingFill': anychart.core.defaultTheme.defaultSelectColor,
+          'risingStroke': anychart.core.defaultTheme.defaultSelectColor,
+          'fallingFill': anychart.core.defaultTheme.defaultSelectColor,
+          'fallingStroke': anychart.core.defaultTheme.defaultSelectColor,
+          'risingHatchFill': null,
+          'fallingHatchFill': null
+        },
         'tooltip': {
           'format': anychart.core.defaultTheme.OHLCTooltipFormatter
-        },
-        'markers': {
-          'position': 'high'
-        },
-        'labels': {
-          'position': 'high',
-          'format': anychart.core.defaultTheme.returnX
         }
       },
       'column': {
         'isVertical': false,
-        'labels': {
-          'offsetY': 3
+        'normal': {
+          'labels': {
+            'offsetY': 3
+          }
         }
       },
       'ohlc': {
-        'risingStroke': anychart.core.defaultTheme.risingColor,
-        'hoverRisingStroke': anychart.core.defaultTheme.returnDarkenSourceColor,
-        'fallingStroke': anychart.core.defaultTheme.fallingColor,
-        'hoverFallingStroke': anychart.core.defaultTheme.returnDarkenSourceColor,
-        'selectRisingStroke': '3 ' + anychart.core.defaultTheme.defaultSelectColor,
-        'selectFallingStroke': '3 ' + anychart.core.defaultTheme.defaultSelectColor,
+        'normal': {
+          'risingStroke': anychart.core.defaultTheme.risingColor,
+          'fallingStroke': anychart.core.defaultTheme.fallingColor,
+          'markers': {
+            'position': 'high'
+          },
+          'labels': {
+            'position': 'high',
+            'format': anychart.core.defaultTheme.returnX
+          }
+        },
+        'hovered': {
+          'risingStroke': anychart.core.defaultTheme.returnDarkenSourceColor,
+          'fallingStroke': anychart.core.defaultTheme.returnDarkenSourceColor
+        },
+        'selected': {
+          'risingStroke': '3 ' + anychart.core.defaultTheme.defaultSelectColor,
+          'fallingStroke': '3 ' + anychart.core.defaultTheme.defaultSelectColor
+        },
         'tooltip': {
           'format': anychart.core.defaultTheme.OHLCTooltipFormatter
-        },
-        'markers': {
-          'position': 'high'
-        },
-        'labels': {
-          'position': 'high',
-          'format': anychart.core.defaultTheme.returnX
         }
       },
       'stick': {
-        'stroke': anychart.core.defaultTheme.returnStrokeSourceColor1
+        'normal': {
+          'stroke': anychart.core.defaultTheme.returnStrokeSourceColor1
+        }
       },
       'jumpLine': {
         'pointWidth': '100%',
@@ -1549,10 +1599,15 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
       'titleFormat': anychart.core.defaultTheme.chartA11yTitleFormatter,
       'mode': 'chart-elements'
     },
-    'labels': {'enabled': false},
-    'hoverLabels': {'enabled': null},
-    'selectLabels': {'enabled': null},
-
+    'normal': {
+      'labels': {'enabled': false}
+    },
+    'hovered': {
+      'labels': {'enabled': null}
+    },
+    'selected': {
+      'labels': {'enabled': null}
+    },
     'crossing': {
       'stroke': 'none'
     },
@@ -1608,14 +1663,18 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
   'cartesianBase': {
     'defaultSeriesSettings': {
       'base': {
-        'labels': {
-          'format': anychart.core.defaultTheme.VALUE_TOKEN_DECIMALS_COUNT_2
+        'normal': {
+          'labels': {
+            'format': anychart.core.defaultTheme.VALUE_TOKEN_DECIMALS_COUNT_2
+          }
         }
       },
       'bar': {
         'isVertical': true,
-        'labels': {
-          'offsetY': 3
+        'normal': {
+          'labels': {
+            'offsetY': 3
+          }
         },
         'tooltip': {
           'anchor': 'left-top'
@@ -1634,59 +1693,67 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
         }
       },
       'rangeBar': {
-        'isVertical': true,
-        'labels': {
-          'offsetY': 3
-        }
+        'normal': {
+          'labels': {
+            'offsetY': 3
+          }
+        },
+        'isVertical': true
       },
       'box': {
-        'medianStroke': anychart.core.defaultTheme.returnDarkenSourceColor,
-        'hoverMedianStroke': anychart.core.defaultTheme.returnSourceColor,
-        'selectMedianStroke': anychart.core.defaultTheme.defaultSelectColor,
-        'stemStroke': anychart.core.defaultTheme.returnDarkenSourceColor,
-        'hoverStemStroke': anychart.core.defaultTheme.returnSourceColor,
-        'selectStemStroke': anychart.core.defaultTheme.defaultSelectColor,
-        'whiskerStroke': anychart.core.defaultTheme.returnDarkenSourceColor,
-        'hoverWhiskerStroke': anychart.core.defaultTheme.returnDarkenSourceColor,
-        'selectWhiskerStroke': anychart.core.defaultTheme.defaultSelectColor,
-        'whiskerWidth': 0,
-        'hoverWhiskerWidth': null,
-        'selectWhiskerWidth': null,
-        'outlierMarkers': {
-          'enabled': true,
-          'disablePointerEvents': false,
-          'position': 'center',
-          'rotation': 0,
-          'anchor': 'center',
-          'offsetX': 0,
-          'offsetY': 0,
-          'type': 'circle',
-          'size': 3,
-          'positionFormatter': anychart.core.defaultTheme.returnValue
+        'normal': {
+          'medianStroke': anychart.core.defaultTheme.returnDarkenSourceColor,
+          'stemStroke': anychart.core.defaultTheme.returnDarkenSourceColor,
+          'whiskerStroke': anychart.core.defaultTheme.returnDarkenSourceColor,
+          'whiskerWidth': 0,
+          'outlierMarkers': {
+            'enabled': true,
+            'disablePointerEvents': false,
+            'position': 'center',
+            'rotation': 0,
+            'anchor': 'center',
+            'offsetX': 0,
+            'offsetY': 0,
+            'type': 'circle',
+            'size': 3,
+            'positionFormatter': anychart.core.defaultTheme.returnValue
+          },
+          'markers': {
+            'position': 'median'
+          },
+          'labels': {
+            'position': 'highest',
+            /**
+             * @this {*}
+             * @return {*}
+             */
+            'format': function() {
+              return 'Highest: ' + anychart.core.defaultTheme.locNum(this['highest']) + '\n' +
+                  'Median: ' + anychart.core.defaultTheme.locNum(this['median']) + '\n' +
+                  'Lowest: ' + anychart.core.defaultTheme.locNum(this['lowest']);
+            }
+          }
         },
-        'hoverOutlierMarkers': {
-          'enabled': null,
-          'size': 4
+        'hovered': {
+          'medianStroke': anychart.core.defaultTheme.returnSourceColor,
+          'stemStroke': anychart.core.defaultTheme.returnSourceColor,
+          'whiskerStroke': anychart.core.defaultTheme.returnDarkenSourceColor,
+          'whiskerWidth': null,
+          'outlierMarkers': {
+            'enabled': null,
+            'size': 4
+          }
         },
-        'selectOutlierMarkers': {
-          'enabled': null,
-          'size': 4,
-          'fill': anychart.core.defaultTheme.defaultSelectColor,
-          'stroke': anychart.core.defaultTheme.defaultSelectStroke
-        },
-        'markers': {
-          'position': 'median'
-        },
-        'labels': {
-          'position': 'highest',
-          /**
-           * @this {*}
-           * @return {*}
-           */
-          'format': function() {
-            return 'Highest: ' + anychart.core.defaultTheme.locNum(this['highest']) + '\n' +
-                'Median: ' + anychart.core.defaultTheme.locNum(this['median']) + '\n' +
-                'Lowest: ' + anychart.core.defaultTheme.locNum(this['lowest']);
+        'selected': {
+          'medianStroke': anychart.core.defaultTheme.defaultSelectColor,
+          'stemStroke': anychart.core.defaultTheme.defaultSelectColor,
+          'whiskerStroke': anychart.core.defaultTheme.defaultSelectColor,
+          'whiskerWidth': null,
+          'outlierMarkers': {
+            'enabled': null,
+            'size': 4,
+            'fill': anychart.core.defaultTheme.defaultSelectColor,
+            'stroke': anychart.core.defaultTheme.defaultSelectStroke
           }
         },
         'tooltip': {
@@ -1783,12 +1850,52 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'animation': {
       'duration': 500
     },
-    'fill': anychart.core.defaultTheme.returnSourceColor,
-    'stroke': 'none',
-    'hoverFill': anychart.core.defaultTheme.returnLightenSourceColor,
-    'hoverStroke': anychart.core.defaultTheme.returnSourceColor,
-    'selectFill': anychart.core.defaultTheme.defaultSelectColor,
-    'selectStroke': anychart.core.defaultTheme.defaultSelectStroke,
+    'normal': {
+      'fill': anychart.core.defaultTheme.returnSourceColor,
+      'stroke': 'none',
+      'hatchFill': null,
+      'labels': {
+        'enabled': true,
+        'fontColor': null,
+        'position': 'inside',
+        'disablePointerEvents': false,
+        'autoRotate': false,
+        'zIndex': 34,
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'format': function() {
+          return this['name'] ? this['name'] : this['x'];
+        }
+      },
+      'markers': {
+        'enabled': false,
+        'position': 'center',
+        'positionFormatter': anychart.core.defaultTheme.returnValue,
+        'zIndex': 33
+      }
+    },
+    'hovered': {
+      'fill': anychart.core.defaultTheme.returnLightenSourceColor,
+      'stroke': anychart.core.defaultTheme.returnSourceColor,
+      'labels': {
+        'enabled': null
+      },
+      'markers': {
+        'enabled': null
+      }
+    },
+    'selected': {
+      'fill': anychart.core.defaultTheme.defaultSelectColor,
+      'stroke': anychart.core.defaultTheme.defaultSelectStroke,
+      'labels': {
+        'enabled': null
+      },
+      'markers': {
+        'enabled': null
+      }
+    },
     'connectorStroke': anychart.core.defaultTheme.colorStrokeNormal,
     'overlapMode': 'no-overlap',
     'connectorLength': 20,
@@ -1796,23 +1903,7 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'neckWidth': null,
     'neckHeight': null,
     'pointsPadding': 0,
-    'hatchFill': null,
     'forceHoverLabels': false,
-    'labels': {
-      'enabled': true,
-      'fontColor': null,
-      'position': 'inside',
-      'disablePointerEvents': false,
-      'autoRotate': false,
-      'zIndex': 34,
-      /**
-       * @this {*}
-       * @return {*}
-       */
-      'format': function() {
-        return this['name'] ? this['name'] : this['x'];
-      }
-    },
     'outsideLabels': {
       'disablePointerEvents': false,
       'autoColor': anychart.core.defaultTheme.fontColorBright
@@ -1821,33 +1912,10 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
       'disablePointerEvents': true,
       'autoColor': anychart.core.defaultTheme.fontColorReversedNormal
     },
-    'hoverLabels': {
-      'enabled': null
-    },
-    'selectLabels': {
-      'enabled': null
-    },
     'legend': {
       'enabled': true,
-      'padding': {
-        'top': 10,
-        'right': 10,
-        'bottom': 0,
-        'left': 10
-      },
+      'padding': {'top': 10, 'right': 10, 'bottom': 0, 'left': 10},
       'position': 'bottom'
-    },
-    'markers': {
-      'enabled': false,
-      'position': 'center',
-      'positionFormatter': anychart.core.defaultTheme.returnValue,
-      'zIndex': 33
-    },
-    'hoverMarkers': {
-      'enabled': null
-    },
-    'selectMarkers': {
-      'enabled': null
     },
     'tooltip': {
       'title': {'enabled': true},

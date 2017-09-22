@@ -19,10 +19,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       'fontVariant': 'normal',
       'fontWeight': 'normal',
       /**
-       * @this {{
-       *    sourceColor: (acgraph.vector.SolidFill|string),
-       *    scaledColor: (acgraph.vector.SolidFill|string|undefined),
-       * }}
+       * @this {*}
        * @return {*}
        */
       'fill': function() {

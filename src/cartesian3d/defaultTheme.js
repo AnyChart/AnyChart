@@ -10,46 +10,66 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'zPadding': 10,
     'defaultSeriesSettings': {
       'base': {
-        'stroke': 'none',
-        'hoverStroke': 'none',
-        'selectStroke': 'none',
-        'fill': anychart.core.defaultTheme.returnSourceColor,
-        'hoverFill': anychart.core.defaultTheme.returnLightenSourceColor,
-        'selectFill': anychart.core.defaultTheme.defaultSelectSolidColor,
+        'normal': {
+          'stroke': 'none',
+          'fill': anychart.core.defaultTheme.returnSourceColor
+        },
+        'hovered': {
+          'stroke': 'none',
+          'fill': anychart.core.defaultTheme.returnLightenSourceColor
+        },
+        'selected': {
+          'stroke': 'none',
+          'fill': anychart.core.defaultTheme.defaultSelectSolidColor
+        },
         'tooltip': {
           'anchor': 'left-top',
           'position': 'left-top'
         }
       },
       'area': {
-        'hoverMarkers': {
-          'enabled': true
+        'hovered': {
+          'markers': {
+            'enabled': true
+          }
         },
-        'selectMarkers': {
-          'enabled': true
+        'selected': {
+          'markers': {
+            'enabled': true
+          }
         }
       },
       'bar': {
         'isVertical': true
       },
       'line': {
-        'hoverMarkers': {
-          'enabled': true
+        'hovered': {
+          'markers': {
+            'enabled': true
+          }
         },
-        'selectMarkers': {
-          'enabled': true
+        'selected': {
+          'markers': {
+            'enabled': true
+          }
         }
       },
       'line2d': {
-        'hoverMarkers': {
-          'enabled': true
+        'normal': {
+          'stroke': anychart.core.defaultTheme.returnSourceColor
         },
-        'selectMarkers': {
-          'enabled': true
+        'hovered': {
+          'stroke': anychart.core.defaultTheme.returnLightenSourceColor,
+          'markers': {
+            'enabled': true
+          }
         },
-        'stroke': anychart.core.defaultTheme.returnSourceColor,
-        'hoverStroke': anychart.core.defaultTheme.returnLightenSourceColor,
-        'selectStroke': anychart.core.defaultTheme.defaultSelectSolidColor
+        'selected': {
+          'stroke': anychart.core.defaultTheme.defaultSelectSolidColor,
+          'markers': {
+            'enabled': true
+          }
+        }
       }
     }
   },

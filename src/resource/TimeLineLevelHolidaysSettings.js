@@ -79,6 +79,12 @@ anychart.resourceModule.TimeLineLevelHolidaysSettings.prototype.SUPPORTED_SIGNAL
 anychart.resourceModule.TimeLineLevelHolidaysSettings.prototype.getOption = anychart.core.settings.getOption;
 
 
+/** @inheritDoc */
+anychart.resourceModule.TimeLineLevelHolidaysSettings.prototype.isResolvable = function() {
+  return true;
+};
+
+
 //endregion
 //region --- IResolvable implementation
 /** @inheritDoc */

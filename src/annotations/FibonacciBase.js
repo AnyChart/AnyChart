@@ -42,9 +42,7 @@ anychart.annotationsModule.FibonacciBase = function(chartController) {
    * @return {acgraph.vector.Stroke}
    */
   this.levelsStrokeResolver = /** @type {function(anychart.annotationsModule.Base,number,number=):acgraph.vector.Stroke} */(
-      anychart.annotationsModule.Base.getColorResolver(
-          ['stroke', 'hoverStroke', 'selectStroke'],
-          anychart.enums.ColorType.STROKE));
+      anychart.annotationsModule.Base.getColorResolver('stroke', anychart.enums.ColorType.STROKE, true));
 
   /**
    * Trend stroke resolver.
@@ -54,9 +52,7 @@ anychart.annotationsModule.FibonacciBase = function(chartController) {
    * @return {acgraph.vector.Stroke}
    */
   this.trendResolver = /** @type {function(anychart.annotationsModule.Base,number,number=):acgraph.vector.Stroke} */(
-      anychart.annotationsModule.Base.getColorResolver(
-          ['trend', 'hoverTrend', 'selectTrend'],
-          anychart.enums.ColorType.STROKE));
+      anychart.annotationsModule.Base.getColorResolver('trend', anychart.enums.ColorType.STROKE, true));
 
   /**
    * This is a flag that is setup in labels invalidation processing and that means that the labels should be redrawn
@@ -68,15 +64,13 @@ anychart.annotationsModule.FibonacciBase = function(chartController) {
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.annotationsModule.X_ANCHOR_DESCRIPTORS_META);
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.annotationsModule.VALUE_ANCHOR_DESCRIPTORS_META);
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.annotationsModule.SECOND_ANCHOR_POINT_DESCRIPTORS_META);
-  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.annotationsModule.STROKE_DESCRIPTORS_META);
-  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.annotationsModule.TREND_DESCRIPTORS_META);
+  this.normal_.setOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK, anychart.core.StateSettings.DEFAULT_LABELS_AFTER_INIT_CALLBACK);
 };
 goog.inherits(anychart.annotationsModule.FibonacciBase, anychart.annotationsModule.Base);
+anychart.core.settings.populateAliases(anychart.annotationsModule.FibonacciBase, ['stroke', 'trend', 'labels'], 'normal');
 anychart.core.settings.populate(anychart.annotationsModule.FibonacciBase, anychart.annotationsModule.X_ANCHOR_DESCRIPTORS);
 anychart.core.settings.populate(anychart.annotationsModule.FibonacciBase, anychart.annotationsModule.VALUE_ANCHOR_DESCRIPTORS);
 anychart.core.settings.populate(anychart.annotationsModule.FibonacciBase, anychart.annotationsModule.SECOND_ANCHOR_POINT_DESCRIPTORS);
-anychart.core.settings.populate(anychart.annotationsModule.FibonacciBase, anychart.annotationsModule.STROKE_DESCRIPTORS);
-anychart.core.settings.populate(anychart.annotationsModule.FibonacciBase, anychart.annotationsModule.TREND_DESCRIPTORS);
 
 
 //region Properties
@@ -125,6 +119,19 @@ anychart.annotationsModule.FibonacciBase.prototype.levels = function(opt_values)
     return this;
   }
   return goog.array.slice(this.levelsInternal, 0);
+};
+
+
+//endregion
+//region State settings
+/** @inheritDoc */
+anychart.annotationsModule.FibonacciBase.prototype.getNormalDescriptorsMeta = function() {
+  var base = anychart.annotationsModule.FibonacciBase.base(this, 'getNormalDescriptorsMeta');
+  return goog.array.concat(
+      base,
+      anychart.annotationsModule.LABELS_DESCRIPTORS_META,
+      anychart.annotationsModule.STROKE_TREND_DESCRIPTORS_META,
+      anychart.annotationsModule.LABELS_DESCRIPTORS_META);
 };
 
 
@@ -188,8 +195,8 @@ anychart.annotationsModule.FibonacciBase.prototype.resolveCustomPreDrawingStates
 
   if (this.hasInvalidationState(anychart.ConsistencyState.ANNOTATIONS_LABELS)) {
     this.shouldDrawLabels = false;
-    var factory = /** @type {anychart.core.ui.LabelsFactory} */(this.labels());
-    var stateFactoriesEnabled = /** @type {boolean} */(this.hoverLabels().enabled() || /** @type {anychart.core.ui.LabelsFactory} */(this.selectLabels()).enabled());
+    var factory = /** @type {anychart.core.ui.LabelsFactory} */(this.normal().labels());
+    var stateFactoriesEnabled = /** @type {boolean} */(this.hovered().labels().enabled() || /** @type {anychart.core.ui.LabelsFactory} */(this.selected().labels()).enabled());
     factory.suspendSignalsDispatching();
     if (this.anchorsWithLastPoint == anychart.annotationsModule.AnchorSupport.TWO_POINTS &&
         ((factory.enabled() !== false) || stateFactoriesEnabled)) {
@@ -234,12 +241,12 @@ anychart.annotationsModule.FibonacciBase.prototype.drawTwoPointsShape = function
     this.levelPaths[i].clear();
   }
 
-  var mainFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.labels());
+  var mainFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.normal().labels());
   var stateFactory;
   if (!!(this.state & anychart.PointState.SELECT)) {
-    stateFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.selectLabels());
+    stateFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.selected().labels());
   } else if (!!(this.state & anychart.PointState.HOVER)) {
-    stateFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.hoverLabels());
+    stateFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.hovered().labels());
   } else {
     stateFactory = null;
   }
@@ -322,74 +329,6 @@ anychart.annotationsModule.FibonacciBase.prototype.getColorResolutionContext = f
 
 //endregion
 //region Labels
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Labels
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Getter/setter for labels.
- * @param {(Object|boolean|null|string)=} opt_value Series data labels settings.
- * @return {!(anychart.core.ui.LabelsFactory|anychart.annotationsModule.FibonacciBase)} Labels instance or itself for chaining call.
- */
-anychart.annotationsModule.FibonacciBase.prototype.labels = function(opt_value) {
-  if (!this.labels_) {
-    this.labels_ = new anychart.core.ui.LabelsFactory();
-    this.labels_.setParentEventTarget(this);
-    this.labels_.listenSignals(this.labelsInvalidated_, this);
-  }
-
-  if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !('enabled' in opt_value))
-      opt_value['enabled'] = true;
-    this.labels_.setup(opt_value);
-    return this;
-  }
-  return this.labels_;
-};
-
-
-/**
- * Getter/setter for hoverLabels.
- * @param {(Object|boolean|null|string)=} opt_value Series data labels settings.
- * @return {!(anychart.core.ui.LabelsFactory|anychart.annotationsModule.FibonacciBase)} Labels instance or itself for chaining call.
- */
-anychart.annotationsModule.FibonacciBase.prototype.hoverLabels = function(opt_value) {
-  if (!this.hoverLabels_) {
-    this.hoverLabels_ = new anychart.core.ui.LabelsFactory();
-    // don't listen to it, for it will be reapplied at the next hover
-  }
-
-  if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !('enabled' in opt_value))
-      opt_value['enabled'] = true;
-    this.hoverLabels_.setup(opt_value);
-    return this;
-  }
-  return this.hoverLabels_;
-};
-
-
-/**
- * @param {(Object|boolean|null|string)=} opt_value Series data labels settings.
- * @return {!(anychart.core.ui.LabelsFactory|anychart.annotationsModule.FibonacciBase)} Labels instance or itself for chaining call.
- */
-anychart.annotationsModule.FibonacciBase.prototype.selectLabels = function(opt_value) {
-  if (!this.selectLabels_) {
-    this.selectLabels_ = new anychart.core.ui.LabelsFactory();
-    // don't listen to it, for it will be reapplied at the next hover
-  }
-
-  if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !('enabled' in opt_value))
-      opt_value['enabled'] = true;
-    this.selectLabels_.setup(opt_value);
-    return this;
-  }
-  return this.selectLabels_;
-};
-
-
 /**
  * Listener for labels invalidation.
  * @param {anychart.SignalEvent} event Invalidation event.
@@ -504,9 +443,6 @@ anychart.annotationsModule.FibonacciBase.prototype.drawLabel = function(index, m
 anychart.annotationsModule.FibonacciBase.prototype.setDefaultSettings = function(value) {
   anychart.annotationsModule.FibonacciBase.base(this, 'setDefaultSettings', value);
   this.levels(value['levels']);
-  this.labels().setup(value['labels']);
-  this.hoverLabels().setup(value['hoverLabels']);
-  this.selectLabels().setup(value['selectLabels']);
 };
 
 
@@ -515,15 +451,9 @@ anychart.annotationsModule.FibonacciBase.prototype.serialize = function() {
   var json = anychart.annotationsModule.FibonacciBase.base(this, 'serialize');
 
   json['levels'] = this.levels();
-  anychart.core.settings.serialize(this, anychart.annotationsModule.TREND_DESCRIPTORS, json, 'Annotation');
-  anychart.core.settings.serialize(this, anychart.annotationsModule.STROKE_DESCRIPTORS, json, 'Annotation');
   anychart.core.settings.serialize(this, anychart.annotationsModule.X_ANCHOR_DESCRIPTORS, json, 'Annotation');
   anychart.core.settings.serialize(this, anychart.annotationsModule.VALUE_ANCHOR_DESCRIPTORS, json, 'Annotation');
   anychart.core.settings.serialize(this, anychart.annotationsModule.SECOND_ANCHOR_POINT_DESCRIPTORS, json, 'Annotation');
-
-  json['labels'] = this.labels().serialize();
-  json['hoverLabels'] = this.hoverLabels().serialize();
-  json['selectLabels'] = this.selectLabels().serialize();
 
   return json;
 };
@@ -531,19 +461,11 @@ anychart.annotationsModule.FibonacciBase.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.annotationsModule.FibonacciBase.prototype.setupByJSON = function(config, opt_default) {
-
+  anychart.annotationsModule.FibonacciBase.base(this, 'setupByJSON', config, opt_default);
   this.levels(config['levels']);
-  anychart.core.settings.deserialize(this, anychart.annotationsModule.TREND_DESCRIPTORS, config);
-  anychart.core.settings.deserialize(this, anychart.annotationsModule.STROKE_DESCRIPTORS, config);
   anychart.core.settings.deserialize(this, anychart.annotationsModule.X_ANCHOR_DESCRIPTORS, config);
   anychart.core.settings.deserialize(this, anychart.annotationsModule.VALUE_ANCHOR_DESCRIPTORS, config);
   anychart.core.settings.deserialize(this, anychart.annotationsModule.SECOND_ANCHOR_POINT_DESCRIPTORS, config);
-
-  this.labels().setupInternal(!!opt_default, config['labels']);
-  this.hoverLabels().setupInternal(!!opt_default, config['hoverLabels']);
-  this.selectLabels().setupInternal(!!opt_default, config['selectLabels']);
-
-  anychart.annotationsModule.FibonacciBase.base(this, 'setupByJSON', config, opt_default);
 };
 
 
@@ -565,7 +487,7 @@ anychart.annotationsModule.FibonacciBase.prototype.disposeInternal = function() 
 (function() {
   var proto = anychart.annotationsModule.FibonacciBase.prototype;
   proto['levels'] = proto.levels;
-  proto['labels'] = proto.labels;
-  proto['hoverLabels'] = proto.hoverLabels;
-  proto['selectLabels'] = proto.selectLabels;
+  //proto['labels'] = proto.labels;
+  //proto['hoverLabels'] = proto.hoverLabels;
+  //proto['selectLabels'] = proto.selectLabels;
 })();

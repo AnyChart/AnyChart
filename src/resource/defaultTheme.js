@@ -24,24 +24,30 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       'enabled': false
     },
     'activities': {
-      'labels': {
-        'enabled': true,
-        'anchor': 'left-top',
-        'fontColor': '#F4F4F4',
-        'format': '{%name} ({%hoursPerDayRounded}h)',
-        'position': 'left-top'
+      'normal': {
+        'labels': {
+          'enabled': true,
+          'anchor': 'left-top',
+          'fontColor': '#F4F4F4',
+          'format': '{%name} ({%hoursPerDayRounded}h)',
+          'position': 'left-top'
+        },
+        'fill': '#1976d2',
+        'stroke': null,
+        'hatchFill': false
       },
-      'hoverLabels': {'enabled': null},
-      'selectLabels': {'enabled': null},
-      'fill': '#1976d2',
-      'hoverFill': anychart.core.defaultTheme.returnLightenSourceColor,
-      'selectFill': anychart.core.defaultTheme.defaultSelectSolidColor,
-      'stroke': null,
-      'hoverStroke': anychart.core.defaultTheme.returnSourceColor,
-      'selectStroke': anychart.core.defaultTheme.returnSourceColor,
-      'hatchFill': false,
-      'hoverHatchFill': null,
-      'selectHatchFill': null
+      'hovered': {
+        'labels': {'enabled': null},
+        'fill': anychart.core.defaultTheme.returnLightenSourceColor,
+        'stroke': anychart.core.defaultTheme.returnSourceColor,
+        'hatchFill': null
+      },
+      'selected': {
+        'labels': {'enabled': null},
+        'fill': anychart.core.defaultTheme.defaultSelectSolidColor,
+        'stroke': anychart.core.defaultTheme.returnSourceColor,
+        'hatchFill': null
+      }
     },
     'resourceList': {
       'oddFill': 'none',

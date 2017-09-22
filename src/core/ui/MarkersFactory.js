@@ -788,7 +788,7 @@ anychart.core.ui.MarkersFactory.prototype.serialize = function() {
   var json = anychart.core.ui.MarkersFactory.base(this, 'serialize');
   delete json['enabled'];
   var enabledState = this.enabled();
-  if (goog.isDefAndNotNull(enabledState))
+  if (goog.isDef(enabledState))
     json['enabled'] = enabledState;
   if (goog.isDef(this.disablePointerEvents())) json['disablePointerEvents'] = this.disablePointerEvents();
   if (this.changedSettings['position']) json['position'] = this.position();

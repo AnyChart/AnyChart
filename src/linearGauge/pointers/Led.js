@@ -230,7 +230,7 @@ anychart.linearGaugeModule.pointers.Led.prototype.colorizePointer = function(poi
     this.colorsToPath_[color].stroke('none').fill(color);
   }
 
-  var hatch = this.getFinalHatchFill(true, pointerState);
+  var hatch = /** @type {acgraph.vector.Fill} */ (this.hatchFillResolver(this, pointerState, false));
   this.hatch.stroke('none').fill(hatch);
 };
 

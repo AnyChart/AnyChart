@@ -357,6 +357,12 @@ anychart.core.ui.Title.prototype.getSignal = function(fieldName) {
 };
 
 
+/** @inheritDoc */
+anychart.core.ui.Title.prototype.isResolvable = function() {
+  return true;
+};
+
+
 //endregion
 //region -- Parental relations
 /**

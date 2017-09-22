@@ -722,10 +722,6 @@ anychart.themes.merging.mergingMap_ = (function() {
           ]],
           'DataGrid.defaultColumnSettings.cellTextSettings'
         ]],
-        [[
-          'chart',
-          'map'
-        ], '.defaultSeriesSettings.base.labels'],
         'standalones.labelsFactory',
         ['map.axesSettings.', [
           [[
@@ -733,27 +729,32 @@ anychart.themes.merging.mergingMap_ = (function() {
             'minorL'
           ], 'abels']
         ]],
-        'treeMap.headers',
-        'linearGauge.defaultPointerSettings.base.label',
         [[
-          'chart.defaultAnnotationSettings.base',
-          'pieFunnelPyramidBase',
           'pert.milestones',
           ['resource.', [
             'activities',
             'conflicts'
-          ]],
-          [['tree', 'heat'], 'Map'],
-          'venn'
+          ]]
         ], '.labels'],
         ['pert.tasks.', [[['upper', 'lower'], 'Labels']]],
-        'stock.defaultPlotSettings.defaultPriceIndicatorSettings.label'
+        'stock.defaultPlotSettings.defaultPriceIndicatorSettings.label',
+        'treeMap.normal.headers',
+        [[
+          'venn',
+          'pieFunnelPyramidBase',
+          [['heat', 'tree'], 'Map'],
+          [[
+            'chart.defaultAnnotation',
+            'linearGauge.defaultPointer',
+            [['chart', 'map'], '.defaultSeries']
+          ], 'Settings.base']
+        ], '.normal.labels']
       ]
     },
     {
-      defaultObj: 'chart.labels',
+      defaultObj: 'chart.normal.labels',
       targets: [
-        'chart.defaultSeriesSettings.base.labels'
+        'chart.defaultSeriesSettings.base.normal.labels'
       ]
     },
     {
@@ -778,23 +779,17 @@ anychart.themes.merging.mergingMap_ = (function() {
     {
       defaultObj: 'defaultMarkerFactory',
       targets: [
+        'defaultTimeline.markers',
+        'standalones.markersFactory',
         [[
+          'venn',
+          'pieFunnelPyramidBase',
+          [['heat', 'tree'], 'Map'],
           [[
             'chart.defaultAnnotation',
-            [[
-              'chart',
-              'map'
-            ], '.defaultSeries']
-          ], 'Settings.base'],
-          'pieFunnelPyramidBase',
-          'defaultTimeline',
-          [[
-            'tree',
-            'heat'
-          ], 'Map'],
-          'venn'
-        ], '.markers'],
-        'standalones.markersFactory'
+            [['chart', 'map'], '.defaultSeries']
+          ], 'Settings.base']
+        ], '.normal.markers']
       ]
     },
     {
@@ -1365,6 +1360,42 @@ anychart.themes.merging.mergingMap_ = (function() {
             'c', 'rangeC'
           ], 'olumn']
         ]]
+      ]
+    },
+    {
+      defaultObj: 'chart.normal.labels',
+      targets: [
+        'sparkline.labels'
+      ]
+    },
+    {
+      defaultObj: 'chart.normal.markers',
+      targets: [
+        'sparkline.markers'
+      ]
+    },
+    {
+      defaultObj: 'chart.defaultSeriesSettings.base.normal',
+      targets: [
+        'sparkline.defaultSeriesSettings.base'
+      ]
+    },
+    {
+      defaultObj: 'chart.defaultSeriesSettings.area.normal',
+      targets: [
+        'sparkline.defaultSeriesSettings.area'
+      ]
+    },
+    {
+      defaultObj: 'chart.defaultSeriesSettings.line.normal',
+      targets: [
+        'sparkline.defaultSeriesSettings.line'
+      ]
+    },
+    {
+      defaultObj: 'chart.defaultSeriesSettings.column.normal',
+      targets: [
+        'sparkline.defaultSeriesSettings.column'
       ]
     },
     {

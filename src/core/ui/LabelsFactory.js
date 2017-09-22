@@ -666,6 +666,12 @@ anychart.core.ui.LabelsFactory.prototype.getOwnAndAutoOption = function(name) {
 };
 
 
+/** @inheritDoc */
+anychart.core.ui.LabelsFactory.prototype.isResolvable = function() {
+  return true;
+};
+
+
 //endregion
 //region --- Settings management
 /**
@@ -1210,7 +1216,7 @@ anychart.core.ui.LabelsFactory.prototype.disposeInternal = function() {
 /** @inheritDoc */
 anychart.core.ui.LabelsFactory.prototype.serialize = function() {
   var json = anychart.core.ui.LabelsFactory.base(this, 'serialize');
-  if (goog.isNull(json['enabled']) || !goog.isDef(json['enabled'])) delete json['enabled'];
+  if (!goog.isDef(json['enabled'])) delete json['enabled'];
 
   var val;
   if (this.hasOwnOption('background')) {
@@ -1939,6 +1945,12 @@ anychart.core.ui.LabelsFactory.Label.prototype.getOwnAndAutoOption = anychart.co
 
 /** @inheritDoc */
 anychart.core.ui.LabelsFactory.Label.prototype.getThemeOption = anychart.core.ui.LabelsFactory.Label.prototype.getOwnOption;
+
+
+/** @inheritDoc */
+anychart.core.ui.LabelsFactory.Label.prototype.isResolvable = function() {
+  return true;
+};
 
 
 //endregion

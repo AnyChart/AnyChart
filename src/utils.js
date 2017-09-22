@@ -954,6 +954,16 @@ anychart.utils.trim = function(str) {
 
 
 /**
+ * Decapitalize string.
+ * @param {string=} str
+ * @return {string} Decapitalized string.
+ */
+anychart.utils.decapitalize = function(str) {
+  return String(str.charAt(0)).toLowerCase() + String(str.substr(1));
+};
+
+
+/**
  * Checks whether separator is valid.
  * Throws an error if invalid.
  * @param {string} separator

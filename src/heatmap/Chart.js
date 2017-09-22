@@ -112,18 +112,9 @@ anychart.heatmapModule.Chart.prototype.seriesConfig = (function() {
  * @const {Array.<string>}
  */
 anychart.heatmapModule.Chart.PROXY_METHODS = ([
-  'fill',
-  'hoverFill',
-  'selectFill',
-  'stroke',
-  'hoverStroke',
-  'selectStroke',
-  'hatchFill',
-  'hoverHatchFill',
-  'selectHatchFill',
-  'markers',
-  'hoverMarkers',
-  'selectMarkers'
+  'normal',
+  'hovered',
+  'selected'
 ]);
 
 
@@ -162,6 +153,7 @@ anychart.heatmapModule.Chart.REVERSE_PROXY_METHODS = ([
     anychart.heatmapModule.Chart.prototype[name] = goog.partial(proxy, name);
   }
 })();
+anychart.core.settings.populateAliases(anychart.heatmapModule.Chart, ['fill', 'stroke', 'hatchFill', 'labels', 'markers'], 'normal');
 
 
 /** @inheritDoc */

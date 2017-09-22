@@ -2153,6 +2153,12 @@ anychart.core.ui.Tooltip.prototype.check = function(flags) {
 };
 
 
+/** @inheritDoc */
+anychart.core.ui.Tooltip.prototype.isResolvable = function() {
+  return true;
+};
+
+
 //endregion
 //region -- IResolvable implementation
 /** @inheritDoc */

@@ -79,9 +79,11 @@ anychart.core.shapeManagers.Base = function(series, config, interactive, opt_sha
 
   for (var i = 0; i < config.length; i++) {
     var shapeConfig = config[i];
-    var fill = anychart.color.getColorResolver(shapeConfig.fillNames,
-        shapeConfig.isHatchFill ? anychart.enums.ColorType.HATCH_FILL : anychart.enums.ColorType.FILL);
-    var stroke = anychart.color.getColorResolver(shapeConfig.strokeNames, anychart.enums.ColorType.STROKE);
+    var fill = anychart.color.getColorResolver(shapeConfig.fillName,
+        shapeConfig.isHatchFill ? anychart.enums.ColorType.HATCH_FILL : anychart.enums.ColorType.FILL,
+        shapeConfig.canBeHoveredSelected, shapeConfig.scrollerSelected);
+    var stroke = anychart.color.getColorResolver(shapeConfig.strokeName,
+        anychart.enums.ColorType.STROKE, shapeConfig.canBeHoveredSelected, shapeConfig.scrollerSelected);
     var type = shapeConfig.shapeType;
     var val = String(type).toLowerCase();
     var cls;

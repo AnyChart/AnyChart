@@ -1,5 +1,6 @@
 //region --- Requiring and Providing
 goog.provide('anychart.mapModule.elements.Callout');
+goog.require('anychart.core.StateSettings');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.ui.Background');
 goog.require('anychart.core.ui.LabelsFactory');
@@ -34,11 +35,28 @@ anychart.mapModule.elements.Callout = function() {
 
   this.bindHandlersToComponent(this);
 
+  var normalHoveredSelectedDescriptorsMeta = {};
+  anychart.core.settings.createDescriptorsMeta(normalHoveredSelectedDescriptorsMeta, [
+    ['labels', 0, 0]
+  ]);
+  this.normal_ = new anychart.core.StateSettings(this, normalHoveredSelectedDescriptorsMeta, anychart.PointState.NORMAL);
+  this.normal_.setOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK, anychart.core.StateSettings.DEFAULT_LABELS_AFTER_INIT_CALLBACK);
+
+  function afterInitCallback(factory) {
+    factory.enabled(null);
+  }
+  this.hovered_ = new anychart.core.StateSettings(this, normalHoveredSelectedDescriptorsMeta, anychart.PointState.HOVER);
+  this.hovered_.setOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK, afterInitCallback);
+
+  this.selected_ = new anychart.core.StateSettings(this, normalHoveredSelectedDescriptorsMeta, anychart.PointState.SELECT);
+  this.selected_.setOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK, afterInitCallback);
+
   this.ALL_VISUAL_STATES = anychart.ConsistencyState.CALLOUT_TITLE |
       anychart.ConsistencyState.CALLOUT_LABELS |
       anychart.ConsistencyState.CALLOUT_BACKGROUND;
 };
 goog.inherits(anychart.mapModule.elements.Callout, anychart.core.VisualBase);
+anychart.core.settings.populateAliases(anychart.mapModule.elements.Callout, ['labels'], 'normal');
 
 
 //region --- Class constants
@@ -83,76 +101,53 @@ anychart.mapModule.elements.Callout.ZINDEX_CALLOUT_BACKGROUND = 0;
 
 //endregion
 //region --- Settings
+/**
+ * Normal state settings.
+ * @param {!Object=} opt_value
+ * @return {anychart.core.StateSettings|anychart.mapModule.elements.Callout}
+ */
+anychart.mapModule.elements.Callout.prototype.normal = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.normal_.setup(opt_value);
+    return this;
+  }
+  return this.normal_;
+};
+
+
+/**
+ * Hovered state settings.
+ * @param {!Object=} opt_value
+ * @return {anychart.core.StateSettings|anychart.mapModule.elements.Callout}
+ */
+anychart.mapModule.elements.Callout.prototype.hovered = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.hovered_.setup(opt_value);
+    return this;
+  }
+  return this.hovered_;
+};
+
+
+/**
+ * Selected state settings.
+ * @param {!Object=} opt_value
+ * @return {anychart.core.StateSettings|anychart.mapModule.elements.Callout}
+ */
+anychart.mapModule.elements.Callout.prototype.selected = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.selected_.setup(opt_value);
+    return this;
+  }
+  return this.selected_;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Labels.
 //
 //----------------------------------------------------------------------------------------------------------------------
-/**
- * Getter/setter for labels.
- * @param {(Object|boolean|null)=} opt_value Axis labels.
- * @return {!(anychart.core.ui.LabelsFactory|anychart.mapModule.elements.Callout)} Axis labels of itself for method chaining.
- */
-anychart.mapModule.elements.Callout.prototype.labels = function(opt_value) {
-  if (!this.labels_) {
-    this.labels_ = new anychart.core.ui.LabelsFactory();
-    this.labels_.setParentEventTarget(this);
-    this.labels_.listenSignals(this.labelsInvalidated_, this);
-    this.registerDisposable(this.labels_);
-  }
-
-  if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !('enabled' in opt_value))
-      opt_value['enabled'] = true;
-    this.labels_.setup(opt_value);
-    return this;
-  }
-  return this.labels_;
-};
-
-
-/**
- * Gets or sets callout hover labels.
- * @param {(Object|boolean|null)=} opt_value Labels settings.
- * @return {!(anychart.core.ui.LabelsFactory|anychart.mapModule.elements.Callout)} Labels instance or itself for chaining call.
- */
-anychart.mapModule.elements.Callout.prototype.hoverLabels = function(opt_value) {
-  if (!this.hoverLabels_) {
-    this.hoverLabels_ = new anychart.core.ui.LabelsFactory();
-    this.hoverLabels_.enabled(null);
-  }
-
-  if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !('enabled' in opt_value))
-      opt_value['enabled'] = true;
-    this.hoverLabels_.setup(opt_value);
-    return this;
-  }
-  return this.hoverLabels_;
-};
-
-
-/**
- * Gets or sets callout select labels.
- * @param {(Object|boolean|null)=} opt_value Labels settings.
- * @return {!(anychart.core.ui.LabelsFactory|anychart.mapModule.elements.Callout)} Labels instance or itself for chaining call.
- */
-anychart.mapModule.elements.Callout.prototype.selectLabels = function(opt_value) {
-  if (!this.selectLabels_) {
-    this.selectLabels_ = new anychart.core.ui.LabelsFactory();
-    this.selectLabels_.enabled(null);
-  }
-
-  if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !('enabled' in opt_value))
-      opt_value['enabled'] = true;
-    this.selectLabels_.setup(opt_value);
-    return this;
-  }
-  return this.selectLabels_;
-};
-
-
 /**
  * Internal label invalidation handler.
  * @param {anychart.SignalEvent} event Event object.
@@ -407,8 +402,8 @@ anychart.mapModule.elements.Callout.prototype.titleInvalidated_ = function(event
  * @return {anychart.mapModule.elements.Callout}
  */
 anychart.mapModule.elements.Callout.prototype.updateOnZoomOrMove = function() {
-  for (var i = 0, len = this.labels().labelsCount(); i < len; i++) {
-    var label = this.labels().getLabel(i);
+  for (var i = 0, len = this.normal().labels().labelsCount(); i < len; i++) {
+    var label = this.normal().labels().getLabel(i);
     var connector = label.getConnectorElement();
 
     var item = this.processedItems_[i];
@@ -835,15 +830,19 @@ anychart.mapModule.elements.Callout.prototype.configureSeriesLabel = function(la
   var selected = series.state.isStateContains(pointState, anychart.PointState.SELECT);
   var hovered = !selected && series.state.isStateContains(pointState, anychart.PointState.HOVER);
   var currentLabelsFactory, pointLabel, stateLabel;
-  var parentLabelsFactory = series.labels();
+  var parentLabelsFactory = series.normal().labels();
 
   pointLabel = iterator.get('label');
   if (selected) {
-    stateLabel = iterator.get('selectLabel');
-    currentLabelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(series.selectLabels());
+    stateLabel = iterator.get('selected');
+    stateLabel = stateLabel ? stateLabel['label'] : void 0;
+    stateLabel = anychart.utils.getFirstDefinedValue(stateLabel, iterator.get('selectLabel'));
+    currentLabelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(series.selected().labels());
   } else if (hovered) {
-    stateLabel = iterator.get('hoverLabel');
-    currentLabelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(series.hoverLabels());
+    stateLabel = iterator.get('hovered');
+    stateLabel = stateLabel ? stateLabel['label'] : void 0;
+    stateLabel = anychart.utils.getFirstDefinedValue(stateLabel, iterator.get('hoverLabel'));
+    currentLabelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(series.hovered().labels());
   } else {
     stateLabel = null;
     currentLabelsFactory = null;
@@ -886,16 +885,17 @@ anychart.mapModule.elements.Callout.prototype.configureLabel = function(item, la
   var hovered = !selected && series.state.isStateContains(pointState, anychart.PointState.HOVER);
   var calloutLabelsFactory;
 
+  var labels = this.normal().labels();
   if (selected) {
-    calloutLabelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.selectLabels());
+    calloutLabelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.selected().labels());
   } else if (hovered) {
-    calloutLabelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.hoverLabels());
+    calloutLabelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.hovered().labels());
   } else {
-    calloutLabelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.labels());
+    calloutLabelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(labels);
   }
 
-  var parentSettings = this.labels().getChangedSettings();
-  parentSettings['enabled'] = this.labels().enabled();
+  var parentSettings = labels.getChangedSettings();
+  parentSettings['enabled'] = labels.enabled();
 
   var currentSettings = calloutLabelsFactory.getChangedSettings();
   currentSettings['enabled'] = goog.isNull(calloutLabelsFactory.enabled()) ? parentSettings['enabled'] : calloutLabelsFactory.enabled();
@@ -949,7 +949,7 @@ anychart.mapModule.elements.Callout.prototype.configureLabel = function(item, la
  * Calculates labels.
  */
 anychart.mapModule.elements.Callout.prototype.calculateLabels = function() {
-  var labels = this.labels();
+  var labels = this.normal().labels();
   if (!labels.container()) labels.container(/** @type {acgraph.vector.ILayer} */(this.container()));
   labels.parentBounds(/** @type {anychart.math.Rect} */(this.parentBounds()));
   labels.clear();
@@ -1018,6 +1018,7 @@ anychart.mapModule.elements.Callout.prototype.draw = function() {
   if (!this.checkDrawingNeeded())
     return this;
 
+  var labels = this.normal().labels();
   if (!this.chart && this.processedItems_ && this.processedItems_.length) {
     this.chart = this.processedItems_[0].getChart();
 
@@ -1039,7 +1040,7 @@ anychart.mapModule.elements.Callout.prototype.draw = function() {
           for (var j = 0, len_ = points.length; j < len_; j++) {
             var point = points[j];
             if (item.getIndex() == point['index']) {
-              label = this.configureLabel(item, this.labels().getLabel(k), series.state.getPointStateByIndex(index));
+              label = this.configureLabel(item, labels.getLabel(k), series.state.getPointStateByIndex(index));
               label.draw();
               label.parentLabelsFactory().dropCallsCache();
               found = true;
@@ -1048,7 +1049,7 @@ anychart.mapModule.elements.Callout.prototype.draw = function() {
           }
 
           if (!found && item.state == anychart.PointState.HOVER) {
-            label = this.configureLabel(item, this.labels().getLabel(k), anychart.PointState.NORMAL);
+            label = this.configureLabel(item, labels.getLabel(k), anychart.PointState.NORMAL);
             label.draw();
             label.parentLabelsFactory().dropCallsCache();
           }
@@ -1074,7 +1075,7 @@ anychart.mapModule.elements.Callout.prototype.draw = function() {
           for (var j = 0, len_ = points.length; j < len_; j++) {
             var point = points[j];
             if (item.getIndex() == point['index']) {
-              label = this.configureLabel(item, this.labels().getLabel(k), series.state.getPointStateByIndex(index));
+              label = this.configureLabel(item, labels.getLabel(k), series.state.getPointStateByIndex(index));
               label.draw();
               label.parentLabelsFactory().dropCallsCache();
               found = true;
@@ -1083,7 +1084,7 @@ anychart.mapModule.elements.Callout.prototype.draw = function() {
           }
 
           if (!found && series.state.isStateContains(item.state, anychart.PointState.SELECT)) {
-            label = this.configureLabel(item, this.labels().getLabel(k), series.state.getPointStateByIndex(index));
+            label = this.configureLabel(item, labels.getLabel(k), series.state.getPointStateByIndex(index));
             label.draw();
             label.parentLabelsFactory().dropCallsCache();
           }
@@ -1106,13 +1107,13 @@ anychart.mapModule.elements.Callout.prototype.draw = function() {
   }
 
   this.title().suspendSignalsDispatching();
-  this.labels().suspendSignalsDispatching();
+  labels.suspendSignalsDispatching();
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
     var zIndex = /** @type {number} */(this.zIndex());
     this.layer.zIndex(zIndex);
     this.title().zIndex(anychart.mapModule.elements.Callout.ZINDEX_CALLOUT_TITLE);
-    this.labels().zIndex(anychart.mapModule.elements.Callout.ZINDEX_CALLOUT_LABELS);
+    labels.zIndex(anychart.mapModule.elements.Callout.ZINDEX_CALLOUT_LABELS);
     this.background().zIndex(anychart.mapModule.elements.Callout.ZINDEX_CALLOUT_BACKGROUND);
     this.handlerLayer.zIndex(anychart.mapModule.elements.Callout.ZINDEX_CALLOUT_LABELS + .1);
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
@@ -1122,7 +1123,7 @@ anychart.mapModule.elements.Callout.prototype.draw = function() {
     var container = /** @type {acgraph.vector.ILayer} */(this.container());
     this.layer.parent(container);
     this.title().container(this.layer);
-    this.labels().container(this.layer);
+    labels.container(this.layer);
     this.background().container(this.layer);
     this.handlerLayer.parent(this.layer);
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
@@ -1148,10 +1149,10 @@ anychart.mapModule.elements.Callout.prototype.draw = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.CALLOUT_LABELS)) {
     this.handlerLayer.clear();
     this.calculateLabels();
-    this.labels().invalidate(anychart.ConsistencyState.Z_INDEX);
-    this.labels().draw();
-    for (var i = 0, len = this.labels().labelsCount(); i < len; i++) {
-      var label = this.labels().getLabel(i);
+    labels.invalidate(anychart.ConsistencyState.Z_INDEX);
+    labels.draw();
+    for (var i = 0, len = labels.labelsCount(); i < len; i++) {
+      var label = labels.getLabel(i);
       label.parentLabelsFactory().dropCallsCache();
       //todo (blackart) don't remove
       // var connector = label.getConnectorElement();
@@ -1164,7 +1165,7 @@ anychart.mapModule.elements.Callout.prototype.draw = function() {
   }
 
   this.title().resumeSignalsDispatching(false);
-  this.labels().resumeSignalsDispatching(false);
+  labels.resumeSignalsDispatching(false);
 
   return this;
 };
@@ -1185,15 +1186,9 @@ anychart.mapModule.elements.Callout.prototype.serialize = function() {
   json['title'] = this.title().serialize();
   json['background'] = this.background().serialize();
 
-  json['labels'] = this.labels().serialize();
-  json['hoverLabels'] = this.hoverLabels().getChangedSettings();
-  json['selectLabels'] = this.selectLabels().getChangedSettings();
-  if (goog.isNull(json['hoverLabels']['enabled'])) {
-    delete json['hoverLabels']['enabled'];
-  }
-  if (goog.isNull(json['selectLabels']['enabled'])) {
-    delete json['selectLabels']['enabled'];
-  }
+  json['normal'] = this.normal_.serialize();
+  json['hovered'] = this.hovered_.serialize();
+  json['selected'] = this.selected_.serialize();
 
   json['width'] = this.width();
   json['length'] = this.length();
@@ -1228,9 +1223,10 @@ anychart.mapModule.elements.Callout.prototype.setupByJSON = function(config, opt
   if ('margin' in config)
     this.margin(config['margin']);
 
-  this.labels().setupInternal(!!opt_default, config['labels']);
-  this.hoverLabels().setupInternal(!!opt_default, config['hoverLabels']);
-  this.selectLabels().setupInternal(!!opt_default, config['selectLabels']);
+  this.normal_.setupInternal(!!opt_default, config);
+  this.normal_.setupInternal(!!opt_default, config['normal']);
+  this.hovered_.setupInternal(!!opt_default, config['hovered']);
+  this.selected_.setupInternal(!!opt_default, config['selected']);
 
   this.width(config['width']);
   this.length(config['length']);
@@ -1263,9 +1259,9 @@ anychart.mapModule.elements.Callout.prototype.disposeInternal = function() {
 (function() {
   var proto = anychart.mapModule.elements.Callout.prototype;
   proto['title'] = proto.title;
-  proto['labels'] = proto.labels;
-  proto['hoverLabels'] = proto.hoverLabels;
-  proto['selectLabels'] = proto.selectLabels;
+  proto['normal'] = proto.normal;
+  proto['hovered'] = proto.hovered;
+  proto['selected'] = proto.selected;
   proto['background'] = proto.background;
   proto['padding'] = proto.padding;
   proto['margin'] = proto.margin;

@@ -574,7 +574,7 @@ anychart.linearGaugeModule.Chart.prototype.data = function(opt_value, opt_csvSet
  */
 anychart.linearGaugeModule.Chart.prototype.invalidatePointers = function() {
   for (var i = this.pointers_.length; i--;)
-    this.pointers_[i].invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.GAUGE_POINTER_LABEL);
+    this.pointers_[i].invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.GAUGE_POINTER_LABELS);
 };
 
 

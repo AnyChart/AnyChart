@@ -103,6 +103,12 @@ anychart.mapModule.elements.GridSettings.prototype.SUPPORTED_SIGNALS =
 anychart.mapModule.elements.GridSettings.prototype.getOption = anychart.core.settings.getOption;
 
 
+/** @inheritDoc */
+anychart.mapModule.elements.GridSettings.prototype.isResolvable = function() {
+  return true;
+};
+
+
 //endregion
 //region --- IResolvable implementation
 /** @inheritDoc */

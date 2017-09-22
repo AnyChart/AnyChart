@@ -30,9 +30,7 @@
 //    * @private
 //    */
 //   this.strokeResolver_ = /** @type {function(anychart.annotationsModule.Base,number):acgraph.vector.Stroke} */(
-//       anychart.annotationsModule.Base.getColorResolver(
-//           ['stroke', 'hoverStroke', 'selectStroke'],
-//           anychart.enums.ColorType.STROKE));
+//       anychart.annotationsModule.Base.getColorResolver('stroke', anychart.enums.ColorType.STROKE, true));
 //
 //   /**
 //    * Fill resolver.
@@ -42,9 +40,7 @@
 //    * @private
 //    */
 //   this.fillResolver_ = /** @type {function(anychart.annotationsModule.Base,number):acgraph.vector.Fill} */(
-//       anychart.annotationsModule.Base.getColorResolver(
-//           ['fill', 'hoverFill', 'selectFill'],
-//           anychart.enums.ColorType.FILL));
+//       anychart.annotationsModule.Base.getColorResolver('fill', anychart.enums.ColorType.FILL, true));
 //
 //   /**
 //    * Hatch fill resolver.
@@ -54,9 +50,7 @@
 //    * @private
 //    */
 //   this.hatchFillResolver_ = /** @type {function(anychart.annotationsModule.Base,number):acgraph.vector.PatternFill} */(
-//       anychart.annotationsModule.Base.getColorResolver(
-//           ['hatchFill', 'hoverHatchFill', 'selectHatchFill'],
-//           anychart.enums.ColorType.HATCH_FILL));
+//       anychart.annotationsModule.Base.getColorResolver('hatchFill', anychart.enums.ColorType.HATCH_FILL, true));
 // };
 // goog.inherits(anychart.annotationsModule.Label, anychart.annotationsModule.Base);
 // anychart.core.settings.populate(anychart.annotationsModule.Label, anychart.annotationsModule.X_ANCHOR_DESCRIPTORS);

@@ -19,25 +19,28 @@ anychart.mapModule.drawers.Connector = function(series) {
    * @private
    */
   this.curvatureGetter_ = anychart.core.series.Base.getSettingsResolver(
-      ['curvature'],
+      'curvature',
       anychart.utils.toNumber,
-      ['curvature']);
+      false,
+      'curvature');
   /**
    * @type {function(anychart.core.series.Base, anychart.data.IRowInfo, number):*}
    * @private
    */
   this.startSizeGetter_ = anychart.core.series.Base.getSettingsResolver(
-      ['startSize'],
+      'startSize',
       anychart.core.settings.numberNormalizer,
-      ['startSize']);
+      false,
+      'startSize');
   /**
    * @type {function(anychart.core.series.Base, anychart.data.IRowInfo, number):*}
    * @private
    */
   this.endSizeGetter_ = anychart.core.series.Base.getSettingsResolver(
-      ['endSize'],
+      'endSize',
       anychart.core.settings.numberNormalizer,
-      ['endSize']);
+      false,
+      'endSize');
 
   /**
    * Width of path for handle events. Used for cases when base connector path very narrow.

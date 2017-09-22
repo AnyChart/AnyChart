@@ -36,16 +36,20 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         }
       },
       'bubble': {
-        'labels': {
-          'anchor': 'center'
+        'normal': {
+          'negativeFill': anychart.core.defaultTheme.returnDarkenSourceColor,
+          'negativeStroke': anychart.core.defaultTheme.returnDarkenSourceColor,
+          'negativeHatchFill': null,
+          'labels': {
+            'anchor': 'center'
+          }
+        },
+        'hovered': {
+          'negativeFill': anychart.core.defaultTheme.returnDarkenSourceColor,
+          'negativeStroke': anychart.core.defaultTheme.returnDarkenSourceColor,
+          'negativeHatchFill': undefined
         },
         'displayNegative': false,
-        'negativeFill': anychart.core.defaultTheme.returnDarkenSourceColor,
-        'hoverNegativeFill': anychart.core.defaultTheme.returnDarkenSourceColor,
-        'negativeStroke': anychart.core.defaultTheme.returnDarkenSourceColor,
-        'hoverNegativeStroke': anychart.core.defaultTheme.returnDarkenSourceColor,
-        'negativeHatchFill': null,
-        'hoverNegativeHatchFill': undefined,
         'hatchFill': false,
         'tooltip': {
           /**
@@ -61,9 +65,15 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'connectMissingPoints': false
       },
       'marker': {
-        'size': 5,
-        'hoverSize': 7,
-        'selectSize': 7
+        'normal': {
+          'size': 5
+        },
+        'hovered': {
+          'size': 7
+        },
+        'selected': {
+          'size': 7
+        }
       }
     },
     'defaultAnnotationSettings': {},

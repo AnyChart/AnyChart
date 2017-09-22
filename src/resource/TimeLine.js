@@ -385,6 +385,12 @@ anychart.resourceModule.TimeLine.prototype.hasOwnOption = function(name) {
 };
 
 
+/** @inheritDoc */
+anychart.resourceModule.TimeLine.prototype.isResolvable = function() {
+  return true;
+};
+
+
 //endregion
 //region --- IResolvable implementation
 /** @inheritDoc */

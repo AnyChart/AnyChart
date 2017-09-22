@@ -164,154 +164,43 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'grouping': {},
     'scrollerGrouping': {
       'levels': [
-        {
-          'unit': 'millisecond',
-          'count': 1
-        },
-        {
-          'unit': 'millisecond',
-          'count': 2
-        },
-        {
-          'unit': 'millisecond',
-          'count': 5
-        },
-        {
-          'unit': 'millisecond',
-          'count': 10
-        },
-        {
-          'unit': 'millisecond',
-          'count': 25
-        },
-        {
-          'unit': 'millisecond',
-          'count': 50
-        },
-        {
-          'unit': 'millisecond',
-          'count': 100
-        },
-        {
-          'unit': 'millisecond',
-          'count': 250
-        },
-        {
-          'unit': 'millisecond',
-          'count': 500
-        },
-        {
-          'unit': 'second',
-          'count': 1
-        },
-        {
-          'unit': 'second',
-          'count': 2
-        },
-        {
-          'unit': 'second',
-          'count': 5
-        },
-        {
-          'unit': 'second',
-          'count': 10
-        },
-        {
-          'unit': 'second',
-          'count': 20
-        },
-        {
-          'unit': 'second',
-          'count': 30
-        },
-        {
-          'unit': 'minute',
-          'count': 1
-        },
-        {
-          'unit': 'minute',
-          'count': 2
-        },
-        {
-          'unit': 'minute',
-          'count': 5
-        },
-        {
-          'unit': 'minute',
-          'count': 10
-        },
-        {
-          'unit': 'minute',
-          'count': 20
-        },
-        {
-          'unit': 'minute',
-          'count': 30
-        },
-        {
-          'unit': 'hour',
-          'count': 1
-        },
-        {
-          'unit': 'hour',
-          'count': 2
-        },
-        {
-          'unit': 'hour',
-          'count': 3
-        },
-        {
-          'unit': 'hour',
-          'count': 4
-        },
-        {
-          'unit': 'hour',
-          'count': 6
-        },
-        {
-          'unit': 'hour',
-          'count': 12
-        },
-        {
-          'unit': 'day',
-          'count': 1
-        },
-        {
-          'unit': 'day',
-          'count': 2
-        },
-        {
-          'unit': 'day',
-          'count': 4
-        },
-        {
-          'unit': 'week',
-          'count': 1
-        },
-        {
-          'unit': 'week',
-          'count': 2
-        },
-        {
-          'unit': 'month',
-          'count': 1
-        },
-        {
-          'unit': 'month',
-          'count': 2
-        },
-        {
-          'unit': 'month',
-          'count': 3
-        },
-        {
-          'unit': 'month',
-          'count': 6
-        },
-        {
-          'unit': 'year',
-          'count': 1
-        }
+        {'unit': 'millisecond', 'count': 1},
+        {'unit': 'millisecond', 'count': 2},
+        {'unit': 'millisecond', 'count': 5},
+        {'unit': 'millisecond', 'count': 10},
+        {'unit': 'millisecond', 'count': 25},
+        {'unit': 'millisecond', 'count': 50},
+        {'unit': 'millisecond', 'count': 100},
+        {'unit': 'millisecond', 'count': 250},
+        {'unit': 'millisecond', 'count': 500},
+        {'unit': 'second', 'count': 1},
+        {'unit': 'second', 'count': 2},
+        {'unit': 'second', 'count': 5},
+        {'unit': 'second', 'count': 10},
+        {'unit': 'second', 'count': 20},
+        {'unit': 'second', 'count': 30},
+        {'unit': 'minute', 'count': 1},
+        {'unit': 'minute', 'count': 2},
+        {'unit': 'minute', 'count': 5},
+        {'unit': 'minute', 'count': 10},
+        {'unit': 'minute', 'count': 20},
+        {'unit': 'minute', 'count': 30},
+        {'unit': 'hour', 'count': 1},
+        {'unit': 'hour', 'count': 2},
+        {'unit': 'hour', 'count': 3},
+        {'unit': 'hour', 'count': 4},
+        {'unit': 'hour', 'count': 6},
+        {'unit': 'hour', 'count': 12},
+        {'unit': 'day', 'count': 1},
+        {'unit': 'day', 'count': 2},
+        {'unit': 'day', 'count': 4},
+        {'unit': 'week', 'count': 1},
+        {'unit': 'week', 'count': 2},
+        {'unit': 'month', 'count': 1},
+        {'unit': 'month', 'count': 2},
+        {'unit': 'month', 'count': 3},
+        {'unit': 'month', 'count': 6},
+        {'unit': 'year', 'count': 1}
       ],
       'maxVisiblePoints': NaN,
       'minPixPerPoint': 1
@@ -334,19 +223,27 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
           'legendItem': {'iconStroke': 'none'}
         },
         'areaLike': {
-          'hoverMarkers': {
-            'enabled': null
+          'hovered': {
+            'markers': {
+              'enabled': null
+            }
           },
-          'selectMarkers': {
-            'enabled': null
+          'selected': {
+            'markers': {
+              'enabled': null
+            }
           }
         },
         'lineLike': {
-          'hoverMarkers': {
-            'enabled': null
+          'hovered': {
+            'markers': {
+              'enabled': null
+            }
           },
-          'selectMarkers': {
-            'enabled': null
+          'selected': {
+            'markers': {
+              'enabled': null
+            }
           }
         },
         'rangeLike': {
@@ -360,10 +257,14 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
           }
         },
         'column': {
-          'stroke': 'none'
+          'normal': {
+            'stroke': 'none'
+          }
         },
         'rangeColumn': {
-          'stroke': 'none'
+          'normal': {
+            'stroke': 'none'
+          }
         },
         'ohlc': {
           'tooltip': {
@@ -446,7 +347,8 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
            * @return {string}
            */
           'format': function() {
-            return anychart.format.dateTime(this['tickValue'], anychart.format.getDateTimeFormat(anychart.format.getIntervalIdentifier(this['majorIntervalUnit'])));
+            var date = this['tickValue'];
+            return anychart.format.dateTime(date, anychart.format.getDateTimeFormat(anychart.format.getIntervalIdentifier(this['majorIntervalUnit'])));
           }
         },
         'minorLabels': {
@@ -464,7 +366,8 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
            * @return {string}
            */
           'format': function() {
-            return anychart.format.dateTime(this['tickValue'], anychart.format.getDateTimeFormat(anychart.format.getIntervalIdentifier(this['minorIntervalUnit'], this['majorIntervalUnit'])));
+            var date = this['tickValue'];
+            return anychart.format.dateTime(date, anychart.format.getDateTimeFormat(anychart.format.getIntervalIdentifier(this['minorIntervalUnit'], this['majorIntervalUnit'])));
           }
         }
       },
@@ -479,7 +382,8 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
          * @return {*}
          */
         'titleFormat': function() {
-          return anychart.format.dateTime(this['value'], anychart.format.getDateTimeFormat(anychart.format.getIntervalIdentifier(this['dataIntervalUnit'], undefined, 'full')));
+          var date = this['value'];
+          return anychart.format.dateTime(date, anychart.format.getDateTimeFormat(anychart.format.getIntervalIdentifier(this['dataIntervalUnit'], void 0, 'full')));
         },
         'align': 'left',
         'padding': 10,
@@ -551,51 +455,79 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'scroller': {
       'defaultSeriesSettings': {
         'base': {
-          'fill': anychart.stockModule.defaultTheme.stockScrollerUnselected,
-          'selectFill': anychart.core.defaultTheme.returnSourceColor,
-          'stroke': anychart.stockModule.defaultTheme.stockScrollerUnselected,
-          'selectStroke': anychart.core.defaultTheme.returnSourceColor,
-          'lowStroke': anychart.stockModule.defaultTheme.stockScrollerUnselected,
-          'selectLowStroke': anychart.core.defaultTheme.returnSourceColor,
-          'highStroke': anychart.stockModule.defaultTheme.stockScrollerUnselected,
-          'selectHighStroke': anychart.core.defaultTheme.returnSourceColor,
+          'normal': {
+            'fill': anychart.stockModule.defaultTheme.stockScrollerUnselected,
+            'stroke': anychart.stockModule.defaultTheme.stockScrollerUnselected,
+            'lowStroke': anychart.stockModule.defaultTheme.stockScrollerUnselected,
+            'highStroke': anychart.stockModule.defaultTheme.stockScrollerUnselected
+          },
+          'selected': {
+            'fill': anychart.core.defaultTheme.returnSourceColor,
+            'stroke': anychart.core.defaultTheme.returnSourceColor,
+            'lowStroke': anychart.core.defaultTheme.returnSourceColor,
+            'highStroke': anychart.core.defaultTheme.returnSourceColor
+          },
           'pointWidth': '75%'
         },
         'marker': {
-          'fill': anychart.stockModule.defaultTheme.stockScrollerUnselected,
-          'stroke': anychart.stockModule.defaultTheme.stockScrollerUnselected,
-          'selectFill': anychart.core.defaultTheme.returnSourceColor,
-          'selectStroke': anychart.core.defaultTheme.returnSourceColor
+          'normal': {
+            'fill': anychart.stockModule.defaultTheme.stockScrollerUnselected,
+            'stroke': anychart.stockModule.defaultTheme.stockScrollerUnselected
+          },
+          'selected': {
+            'fill': anychart.core.defaultTheme.returnSourceColor,
+            'stroke': anychart.core.defaultTheme.returnSourceColor
+          }
         },
         'areaLike': {
-          'fill': anychart.stockModule.defaultTheme.stockScrollerUnselected
+          'normal': {
+            'fill': anychart.stockModule.defaultTheme.stockScrollerUnselected
+          }
         },
         'barLike': {
-          'fill': anychart.stockModule.defaultTheme.stockScrollerUnselected
+          'normal': {
+            'fill': anychart.stockModule.defaultTheme.stockScrollerUnselected
+          }
         },
         'candlestick': {
-          'risingFill': anychart.stockModule.defaultTheme.stockScrollerUnselected,
-          'risingStroke': anychart.stockModule.defaultTheme.stockScrollerUnselected,
-          'fallingFill': anychart.stockModule.defaultTheme.stockScrollerUnselected,
-          'fallingStroke': anychart.stockModule.defaultTheme.stockScrollerUnselected,
-          'selectFallingFill': anychart.core.defaultTheme.fallingColor,
-          'selectRisingFill': anychart.core.defaultTheme.risingColor,
-          'selectRisingStroke': anychart.core.defaultTheme.risingColor,
-          'selectFallingStroke': anychart.core.defaultTheme.fallingColor
+          'normal': {
+            'risingFill': anychart.stockModule.defaultTheme.stockScrollerUnselected,
+            'risingStroke': anychart.stockModule.defaultTheme.stockScrollerUnselected,
+            'fallingFill': anychart.stockModule.defaultTheme.stockScrollerUnselected,
+            'fallingStroke': anychart.stockModule.defaultTheme.stockScrollerUnselected
+          },
+          'selected': {
+            'risingFill': anychart.core.defaultTheme.risingColor,
+            'risingStroke': anychart.core.defaultTheme.risingColor,
+            'fallingFill': anychart.core.defaultTheme.fallingColor,
+            'fallingStroke': anychart.core.defaultTheme.fallingColor
+          }
         },
         'ohlc': {
-          'risingStroke': anychart.stockModule.defaultTheme.stockScrollerUnselected,
-          'fallingStroke': anychart.stockModule.defaultTheme.stockScrollerUnselected,
-          'selectRisingStroke': anychart.core.defaultTheme.risingColor,
-          'selectFallingStroke': anychart.core.defaultTheme.fallingColor
+          'normal': {
+            'risingStroke': anychart.stockModule.defaultTheme.stockScrollerUnselected,
+            'fallingStroke': anychart.stockModule.defaultTheme.stockScrollerUnselected
+          },
+          'selected': {
+            'risingStroke': anychart.core.defaultTheme.risingColor,
+            'fallingStroke': anychart.core.defaultTheme.fallingColor
+          }
         },
         'stick': {
-          'stroke': anychart.stockModule.defaultTheme.stockScrollerUnselected,
-          'selectStroke': anychart.core.defaultTheme.returnStrokeSourceColor1
+          'normal': {
+            'stroke': anychart.stockModule.defaultTheme.stockScrollerUnselected
+          },
+          'selected': {
+            'stroke': anychart.core.defaultTheme.returnStrokeSourceColor1
+          }
         },
         'jumpLine': {
-          'stroke': anychart.stockModule.defaultTheme.stockScrollerUnselected,
-          'selectStroke': anychart.core.defaultTheme.returnStrokeSourceColor1
+          'normal': {
+            'stroke': anychart.stockModule.defaultTheme.stockScrollerUnselected
+          },
+          'selected': {
+            'stroke': anychart.core.defaultTheme.returnStrokeSourceColor1
+          }
         }
       },
       'enabled': true,
@@ -624,7 +556,8 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
            * @return {string}
            */
           'format': function() {
-            return anychart.format.dateTime(this['tickValue'], anychart.format.getDateTimeFormat(anychart.format.getIntervalIdentifier(this['majorIntervalUnit'])));
+            var date = this['tickValue'];
+            return anychart.format.dateTime(date, anychart.format.getDateTimeFormat(anychart.format.getIntervalIdentifier(this['majorIntervalUnit'])));
           }
         },
         'minorLabels': {
@@ -637,7 +570,8 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
            * @return {string}
            */
           'format': function() {
-            return anychart.format.dateTime(this['tickValue'], anychart.format.getDateTimeFormat(anychart.format.getIntervalIdentifier(this['minorIntervalUnit'], this['majorIntervalUnit'])));
+            var date = this['tickValue'];
+            return anychart.format.dateTime(date, anychart.format.getDateTimeFormat(anychart.format.getIntervalIdentifier(this['minorIntervalUnit'], this['majorIntervalUnit'])));
           }
         },
         'zIndex': 75
@@ -654,12 +588,16 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
        * @return {*}
        */
       'titleFormat': function() {
-        return anychart.format.dateTime(this['hoveredDate'],
+        var date = this['hoveredDate'];
+        return anychart.format.dateTime(date,
             anychart.format.getDateTimeFormat(
                 anychart.format.getIntervalIdentifier(
-                    this['dataIntervalUnit'], undefined, 'full'
+                    this['dataIntervalUnit'], void 0, 'full'
                 )));
       }
+    },
+    'a11y': {
+      'titleFormat': anychart.core.defaultTheme.chartA11yTitleFormatter
     },
     'zoomMarqueeFill': '#d3d3d3 0.4',
     'zoomMarqueeStroke': '#d3d3d3',

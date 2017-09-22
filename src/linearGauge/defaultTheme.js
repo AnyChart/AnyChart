@@ -74,64 +74,81 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'legendItem': {
           'enabled': true
         },
-        'label': {
-          'zIndex': 0,
-          'position': 'center-top'
+        'normal': {
+          'stroke': anychart.core.defaultTheme.returnStrokeSourceColor,
+          'fill': anychart.core.defaultTheme.returnSourceColor,
+          'hatchFill': null,
+          'labels': {
+            'zIndex': 0,
+            'position': 'center-top'
+          }
         },
-        'hoverLabel': {
-          'enabled': null
+        'hovered': {
+          'stroke': anychart.core.defaultTheme.returnLightenStrokeSourceColor,
+          'fill': anychart.core.defaultTheme.returnLightenSourceColor,
+          'labels': {
+            'enabled': null
+          }
         },
-        'selectLabel': {
-          'enabled': null
-        },
-        'stroke': anychart.core.defaultTheme.returnStrokeSourceColor,
-        'hoverStroke': anychart.core.defaultTheme.returnLightenStrokeSourceColor,
-        'selectStroke': anychart.core.defaultTheme.returnDarkenSourceColor,
-        'fill': anychart.core.defaultTheme.returnSourceColor,
-        'hoverFill': anychart.core.defaultTheme.returnLightenSourceColor,
-        'selectFill': anychart.core.defaultTheme.returnDarkenSourceColor
+        'selected': {
+          'stroke': anychart.core.defaultTheme.returnDarkenSourceColor,
+          'fill': anychart.core.defaultTheme.returnDarkenSourceColor,
+          'labels': {
+            'enabled': null
+          }
+        }
       },
       'bar': {},
       'rangeBar': {
-        'label': {
-          /**
-           * @this {*}
-           * @return {*}
-           */
-          'format': function() {
-            return anychart.core.defaultTheme.locNum(this['high']);
+        'normal': {
+          'labels': {
+            /**
+             * @this {*}
+             * @return {*}
+             */
+            'format': function() {
+              return anychart.core.defaultTheme.locNum(this['high']);
+            }
           }
         }
       },
       'marker': {'width': '3%'},
       'tank': {
-        'emptyFill': '#fff 0.3',
-        'hoverEmptyFill': anychart.core.defaultTheme.returnSourceColor,
-        'selectEmptyFill': anychart.core.defaultTheme.returnSourceColor,
-        'emptyHatchFill': null
+        'normal': {
+          'emptyFill': '#fff 0.3',
+          'emptyHatchFill': null
+        },
+        'hovered': {
+          'emptyFill': anychart.core.defaultTheme.returnSourceColor
+        },
+        'selected': {
+          'emptyFill': anychart.core.defaultTheme.returnSourceColor
+        }
       },
       'thermometer': {
-        /**
-         * @this {*}
-         * @return {*}
-         */
-        'fill': function() {
-          var sourceColor = this['sourceColor'];
-          var dark = anychart.color.darken(sourceColor);
-          var key1 = {
-            'color': dark
-          };
-          var key2 = {
-            'color': sourceColor
-          };
-          var key3 = {
-            'color': dark
-          };
-          var isVertical = this['isVertical'];
-          return {
-            'angle': isVertical ? 0 : 90,
-            'keys': [key1, key2, key3]
-          };
+        'normal': {
+          /**
+           * @this {*}
+           * @return {*}
+           */
+          'fill': function() {
+            var sourceColor = this['sourceColor'];
+            var dark = anychart.color.darken(sourceColor);
+            var key1 = {
+              'color': dark
+            };
+            var key2 = {
+              'color': sourceColor
+            };
+            var key3 = {
+              'color': dark
+            };
+            var isVertical = this['isVertical'];
+            return {
+              'angle': isVertical ? 0 : 90,
+              'keys': [key1, key2, key3]
+            };
+          }
         },
         'width': '3%',
         'bulbRadius': '120%',
@@ -141,6 +158,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         /**
          * @param {acgraph.vector.SolidFill|string} color
          * @return {*}
+         * @this {*}
          */
         'dimmer': function(color) {
           return anychart.color.darken(color);

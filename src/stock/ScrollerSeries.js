@@ -47,37 +47,6 @@ anychart.stockModule.ScrollerSeries = function(scroller, type, config) {
 goog.inherits(anychart.stockModule.ScrollerSeries, anychart.stockModule.Series);
 
 
-//region Legacy
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Legacy
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * @type {Function}
- */
-anychart.stockModule.ScrollerSeries.prototype['selectedFill'] = anychart.core.series.Base.prototype['selectFill'];
-
-
-/**
- * @type {Function}
- */
-anychart.stockModule.ScrollerSeries.prototype['selectedStroke'] = anychart.core.series.Base.prototype['selectStroke'];
-
-
-/**
- * @type {Function}
- */
-anychart.stockModule.ScrollerSeries.prototype['selectedRisingStroke'] = anychart.core.series.Base.prototype['selectRisingStroke'];
-
-
-/**
- * @type {Function}
- */
-anychart.stockModule.ScrollerSeries.prototype['selectedFallingStroke'] = anychart.core.series.Base.prototype['selectFallingStroke'];
-
-
-//endregion
 //region Config
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -242,23 +211,4 @@ anychart.stockModule.ScrollerSeries.prototype.applyZIndex = function() {
 };
 
 
-//endregion
-//region Serialization/Deserialization
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Serialization/Deserialization
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * @inheritDoc
- */
-anychart.stockModule.ScrollerSeries.prototype.setupByJSON = function(config, opt_default) {
-  anychart.stockModule.ScrollerSeries.base(this, 'setupByJSON', config, opt_default);
-
-  // Legacy
-  this['selectedFill'](config['selectFill']);
-  this['selectedStroke'](config['selectStroke']);
-  this['selectedRisingStroke'](config['selectRisingStroke']);
-  this['selectedFallingStroke'](config['selectFallingStroke']);
-};
 //endregion

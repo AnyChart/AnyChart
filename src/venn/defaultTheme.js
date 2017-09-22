@@ -19,71 +19,83 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       'mode': 'chart-elements'
     },
     'color': '#64b5f6',
-    'fill': anychart.core.defaultTheme.returnSourceColor50,
-    'hoverFill': anychart.core.defaultTheme.returnLightenSourceColor50,
-    'selectFill': anychart.core.defaultTheme.defaultSelectColor,
-    'tooltip': {
-      'titleFormat': '{%Name}',
-      'format': 'Value: {%Value}'
-    },
-    'stroke': 'none',
-    'hoverStroke': 'none',
-    'hatchFill': false,
-    'hoverHatchFill': false,
-    'selectHatchFill': false,
-    'selectStroke': 'none',
-    'labels': {
-      'fontColor': '#f4f4f4',
-      'format': '{%Name}',
-      'enabled': true,
-      'disablePointerEvents': true,
-      'zIndex': 100,
-      'fontWeight': 'bold'
-    },
-    'hoverLabels': {
-      'enabled': null
-    },
-    'selectLabels': {
-      'enabled': null
-    },
-    'markers': {
-      'enabled': false,
-      'zIndex': 99,
-      'disablePointerEvents': true,
-      'stroke': 'none'
-    },
-    'hoverMarkers': {
-      'enabled': null
-    },
-    'selectMarkers': {
-      'enabled': null
-    },
-    'intersections': {
-      'fill': '#fff 0.00001',
-      'hoverFill': '#fff 0.5',
-      'selectFill': anychart.core.defaultTheme.defaultSelectColor,
+    'normal': {
+      'fill': anychart.core.defaultTheme.returnSourceColor50,
       'stroke': 'none',
-      'hoverStroke': 'none',
-      'selectStroke': 'none',
+      'hatchFill': false,
       'labels': {
-        'fontWeight': 'normal',
-        'format': '{%Value}',
-        'enabled': null
+        'fontColor': '#f4f4f4',
+        'format': '{%Name}',
+        'enabled': true,
+        'disablePointerEvents': true,
+        'zIndex': 100,
+        'fontWeight': 'bold'
       },
-      'hoverLabels': {
-        'enabled': null
-      },
-      'selectLabels': {
+      'markers': {
+        'enabled': false,
+        'zIndex': 99,
+        'disablePointerEvents': true,
+        'stroke': 'none'
+      }
+    },
+    'hovered': {
+      'fill': anychart.core.defaultTheme.returnLightenSourceColor50,
+      'stroke': 'none',
+      'hatchFill': false,
+      'labels': {
         'enabled': null
       },
       'markers': {
         'enabled': null
-      },
-      'hoverMarkers': {
+      }
+    },
+    'selected': {
+      'fill': anychart.core.defaultTheme.defaultSelectColor,
+      'stroke': 'none',
+      'hatchFill': false,
+      'labels': {
         'enabled': null
       },
-      'selectMarkers': {
+      'markers': {
         'enabled': null
+      }
+    },
+    'tooltip': {
+      'titleFormat': '{%Name}',
+      'format': 'Value: {%Value}'
+    },
+    'intersections': {
+      'normal': {
+        'fill': '#fff 0.00001',
+        'stroke': 'none',
+        'labels': {
+          'fontWeight': 'normal',
+          'format': '{%Value}',
+          'enabled': null
+        },
+        'markers': {
+          'enabled': null
+        }
+      },
+      'hovered': {
+        'fill': '#fff 0.5',
+        'stroke': 'none',
+        'labels': {
+          'enabled': null
+        },
+        'hoverMarkers': {
+          'enabled': null
+        }
+      },
+      'selected': {
+        'fill': anychart.core.defaultTheme.defaultSelectColor,
+        'stroke': 'none',
+        'labels': {
+          'enabled': null
+        },
+        'markers': {
+          'enabled': null
+        }
       },
       'tooltip': {
         'titleFormat': '{%Name}'
@@ -95,12 +107,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       'tooltip': {
         'enabled': false
       },
-      'padding': {
-        'top': 10,
-        'right': 10,
-        'bottom': 0,
-        'left': 10
-      },
+      'padding': {'top': 10, 'right': 10, 'bottom': 0, 'left': 10},
       'position': 'bottom'
     }
   }

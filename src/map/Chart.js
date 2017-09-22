@@ -3089,7 +3089,7 @@ anychart.mapModule.Chart.prototype.calculate = function() {
         series.statistics(anychart.enums.Statistics.SUM, sum);
         series.statistics(anychart.enums.Statistics.AVERAGE, average);
         series.statistics(anychart.enums.Statistics.POINTS_COUNT, pointsCount);
-        var seriesStrokeThickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(series.getOption('stroke')));
+        var seriesStrokeThickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(series['stroke']()));
         if (seriesStrokeThickness > this.maxStrokeThickness_) {
           this.maxStrokeThickness_ = seriesStrokeThickness;
         }

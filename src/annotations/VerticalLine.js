@@ -30,15 +30,12 @@ anychart.annotationsModule.VerticalLine = function(chartController) {
    * @private
    */
   this.strokeResolver_ = /** @type {function(anychart.annotationsModule.Base,number):acgraph.vector.Stroke} */(
-      anychart.annotationsModule.Base.getColorResolver(
-          ['stroke', 'hoverStroke', 'selectStroke'],
-          anychart.enums.ColorType.STROKE));
+      anychart.annotationsModule.Base.getColorResolver('stroke', anychart.enums.ColorType.STROKE, true));
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.annotationsModule.X_ANCHOR_DESCRIPTORS_META);
-  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.annotationsModule.STROKE_DESCRIPTORS_META);
 };
 goog.inherits(anychart.annotationsModule.VerticalLine, anychart.annotationsModule.Base);
+anychart.core.settings.populateAliases(anychart.annotationsModule.VerticalLine, ['stroke'], 'normal');
 anychart.core.settings.populate(anychart.annotationsModule.VerticalLine, anychart.annotationsModule.X_ANCHOR_DESCRIPTORS);
-anychart.core.settings.populate(anychart.annotationsModule.VerticalLine, anychart.annotationsModule.STROKE_DESCRIPTORS);
 anychart.annotationsModule.AnnotationTypes[anychart.enums.AnnotationTypes.VERTICAL_LINE] = anychart.annotationsModule.VerticalLine;
 
 
@@ -57,6 +54,15 @@ anychart.annotationsModule.VerticalLine.prototype.type = anychart.enums.Annotati
  * @type {anychart.annotationsModule.AnchorSupport}
  */
 anychart.annotationsModule.VerticalLine.prototype.SUPPORTED_ANCHORS = anychart.annotationsModule.AnchorSupport.X;
+
+
+//endregion
+//region State settings
+/** @inheritDoc */
+anychart.annotationsModule.VerticalLine.prototype.getNormalDescriptorsMeta = function() {
+  var base = anychart.annotationsModule.VerticalLine.base(this, 'getNormalDescriptorsMeta');
+  return goog.array.concat(base, anychart.annotationsModule.STROKE_DESCRIPTORS_META);
+};
 
 
 //endregion
@@ -113,21 +119,15 @@ anychart.annotationsModule.VerticalLine.prototype.colorize = function(state) {
 /** @inheritDoc */
 anychart.annotationsModule.VerticalLine.prototype.serialize = function() {
   var json = anychart.annotationsModule.VerticalLine.base(this, 'serialize');
-
-  anychart.core.settings.serialize(this, anychart.annotationsModule.STROKE_DESCRIPTORS, json, 'Annotation');
   anychart.core.settings.serialize(this, anychart.annotationsModule.X_ANCHOR_DESCRIPTORS, json, 'Annotation');
-
   return json;
 };
 
 
 /** @inheritDoc */
 anychart.annotationsModule.VerticalLine.prototype.setupByJSON = function(config, opt_default) {
-
-  anychart.core.settings.deserialize(this, anychart.annotationsModule.STROKE_DESCRIPTORS, config);
-  anychart.core.settings.deserialize(this, anychart.annotationsModule.X_ANCHOR_DESCRIPTORS, config);
-
   anychart.annotationsModule.VerticalLine.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.settings.deserialize(this, anychart.annotationsModule.X_ANCHOR_DESCRIPTORS, config);
 };
 
 
