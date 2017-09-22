@@ -380,6 +380,7 @@ anychart.scales.Base.ScaleTypes = {
   LOG: 2,
   SCATTER: 3,
   DATE_TIME: 4,
+  SCATTER_OR_DATE_TIME: 7,
   ORDINAL: 8,
   ALL_DEFAULT: 15,
   ORDINAL_COLOR: 16,
