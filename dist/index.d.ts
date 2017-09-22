@@ -1,4 +1,4 @@
-// Type definitions for anychart
+// Type definitions for anychart 8.0.0
 // Project: http://anychart.com/
 // Definitions by: AnyChart <http://anychart.com>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyType
