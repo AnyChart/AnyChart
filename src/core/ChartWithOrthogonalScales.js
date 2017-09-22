@@ -183,7 +183,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.getXScaleAllowedTypes = functi
  * @return {Array}
  */
 anychart.core.ChartWithOrthogonalScales.prototype.getXScaleWrongTypeError = function() {
-  return ['Chart scale', 'ordinal, linear, log, datetime'];
+  return ['Chart scale', 'ordinal, linear, log, date-time'];
 };
 
 

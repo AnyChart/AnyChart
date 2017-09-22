@@ -158,7 +158,7 @@ anychart.radarModule.Chart.prototype.getYScaleAllowedTypes = function() {
  * @return {Array}
  */
 anychart.radarModule.Chart.prototype.getYScaleWrongTypeError = function() {
-  return ['Chart scale', 'ordinal, linear, log, datetime'];
+  return ['Chart scale', 'ordinal, linear, log, date-time'];
 };
 
 

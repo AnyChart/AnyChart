@@ -582,6 +582,7 @@ goog.addDependency('../../../../src/waterfall/defaultTheme.js', ['anychart.water
 goog.addDependency('../../../../src/waterfall/waterfall.module.js', ['anychart.waterfallModule.entry'], ['anychart.waterfallModule.Chart', 'anychart.waterfallModule.Drawer'], false);
 goog.addDependency('../../../graphicsjs/src/acgraph.js', ['acgraph'], ['acgraph.compatibility', 'acgraph.vector', 'acgraph.vector.Circle', 'acgraph.vector.Clip', 'acgraph.vector.Ellipse', 'acgraph.vector.HatchFill', 'acgraph.vector.Image', 'acgraph.vector.Layer', 'acgraph.vector.Path', 'acgraph.vector.PatternFill', 'acgraph.vector.Rect', 'acgraph.vector.Renderer', 'acgraph.vector.SimpleText', 'acgraph.vector.Text', 'acgraph.vector.UnmanagedLayer', 'acgraph.vector.primitives', 'acgraph.vector.svg', 'goog.cssom', 'goog.dom', 'goog.userAgent'], false);
 goog.addDependency('../../../graphicsjs/src/compatibility.js', ['acgraph.compatibility'], [], false);
+goog.addDependency('../../../graphicsjs/src/entry.js', ['acgraphentry'], ['acgraph', 'acgraph.exporting', 'acgraph.vector.vml'], false);
 goog.addDependency('../../../graphicsjs/src/error.js', ['acgraph.error'], [], false);
 goog.addDependency('../../../graphicsjs/src/events/BrowserEvent.js', ['acgraph.events.BrowserEvent'], ['goog.events.Event'], false);
 goog.addDependency('../../../graphicsjs/src/events/Dragger.js', ['acgraph.events.DragEvent', 'acgraph.events.Dragger'], ['acgraph.math', 'goog.fx.DragEvent', 'goog.fx.Dragger', 'goog.math.Rect'], false);

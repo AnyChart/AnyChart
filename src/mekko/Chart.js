@@ -249,7 +249,7 @@ anychart.mekkoModule.Chart.prototype.getYScaleAllowedTypes = function() {
  * @return {Array}
  */
 anychart.mekkoModule.Chart.prototype.getYScaleWrongTypeError = function() {
-  return ['Chart scale', 'ordinal, linear, log, datetime'];
+  return ['Chart scale', 'ordinal, linear, log, date-time'];
 };
 
 
