@@ -1,6 +1,8 @@
 goog.provide('anychart.pertModule.VisualElements');
 
 goog.require('anychart.core.Base');
+goog.require('anychart.core.StateSettings');
+goog.require('anychart.core.settings');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.Tooltip');
 
@@ -10,69 +12,12 @@ goog.require('anychart.core.ui.Tooltip');
  * Pert visual element settings collector.
  * @constructor
  * @extends {anychart.core.Base}
+ * @implements {anychart.core.settings.IObjectWithSettings}
+ * @implements {anychart.core.settings.IResolvable}
  */
 anychart.pertModule.VisualElements = function() {
   anychart.pertModule.VisualElements.base(this, 'constructor');
 
-  /**
-   * @type {acgraph.vector.Fill}
-   * @private
-   */
-  this.color_;
-
-  /**
-   * @type {acgraph.vector.Fill|Function}
-   * @private
-   */
-  this.fill_;
-
-  /**
-   * @type {acgraph.vector.Fill|Function}
-   * @private
-   */
-  this.hoverFill_;
-
-  /**
-   * @type {acgraph.vector.Fill|Function}
-   * @private
-   */
-  this.selectFill_;
-
-  /**
-   * @type {acgraph.vector.Stroke|Function}
-   * @private
-   */
-  this.stroke_;
-
-  /**
-   * @type {acgraph.vector.Stroke|Function}
-   * @private
-   */
-  this.hoverStroke_;
-
-  /**
-   * @type {acgraph.vector.Stroke|Function}
-   * @private
-   */
-  this.selectStroke_;
-
-  /**
-   * @type {anychart.core.ui.LabelsFactory}
-   * @private
-   */
-  this.labels_;
-
-  /**
-   * @type {anychart.core.ui.LabelsFactory}
-   * @private
-   */
-  this.hoverLabels_;
-
-  /**
-   * @type {anychart.core.ui.LabelsFactory}
-   * @private
-   */
-  this.selectLabels_;
 
   /**
    * @type {anychart.core.ui.Tooltip}
@@ -94,8 +39,32 @@ anychart.pertModule.VisualElements = function() {
    */
   this.parent_ = null;
 
+  /**
+   * Resolution chain cache.
+   * @type {?Array.<Object|null|undefined>}
+   * @private
+   */
+  this.resolutionChainCache_ = null;
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['color', 0, anychart.Signal.NEEDS_REDRAW_APPEARANCE]
+  ]);
+
+  var descriptorsMap = {};
+  anychart.core.settings.createDescriptorsMeta(descriptorsMap, [
+    ['fill', 0, anychart.Signal.NEEDS_REDRAW_APPEARANCE],
+    ['stroke', 0, anychart.Signal.NEEDS_REDRAW_APPEARANCE],
+    ['labels', 0, 0]
+  ]);
+  this.normal_ = new anychart.core.StateSettings(this, descriptorsMap, anychart.PointState.NORMAL);
+  this.normal_.setOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK, this.labelsAfterInitCallback);
+  this.hovered_ = new anychart.core.StateSettings(this, descriptorsMap, anychart.PointState.HOVER);
+  this.hovered_.setOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK, this.labelsAfterInitCallback);
+  this.selected_ = new anychart.core.StateSettings(this, descriptorsMap, anychart.PointState.SELECT);
+  this.selected_.setOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK, this.labelsAfterInitCallback);
 };
 goog.inherits(anychart.pertModule.VisualElements, anychart.core.Base);
+anychart.core.settings.populateAliases(anychart.pertModule.VisualElements, ['fill', 'stroke', 'labels'], 'normal');
 
 
 /**
@@ -118,13 +87,100 @@ anychart.pertModule.VisualElements.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.pertModule.VisualElements.PROPERTY_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+  anychart.core.settings.createDescriptor(map,
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
+      'color',
+      anychart.core.settings.fillNormalizer);
+  return map;
+})();
+anychart.core.settings.populate(anychart.pertModule.VisualElements, anychart.pertModule.VisualElements.PROPERTY_DESCRIPTORS);
+
+
+//region --- IObjectWithSettings implementation
+/**
+ * @override
+ * @param {string} name
+ * @return {*}
+ */
+anychart.pertModule.VisualElements.prototype.getOption = anychart.core.settings.getOption;
+
+
+/** @inheritDoc */
+anychart.pertModule.VisualElements.prototype.isResolvable = function() {
+  return true;
+};
+
+
+/** @inheritDoc */
+anychart.pertModule.VisualElements.prototype.getParentState = function(stateType) {
+  var parent = this.parent();
+  if (parent) {
+    var state = !!(stateType & anychart.PointState.SELECT) ? 'selected' : !!(stateType & anychart.PointState.HOVER) ? 'hovered' : 'normal';
+    return parent[state]();
+  }
+  return null;
+};
+
+
+//endregion
+//region --- IResolvable + Parent implementation
+/** @inheritDoc */
+anychart.pertModule.VisualElements.prototype.resolutionChainCache = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.resolutionChainCache_ = opt_value;
+  }
+  return this.resolutionChainCache_;
+};
+
+
+/** @inheritDoc */
+anychart.pertModule.VisualElements.prototype.getResolutionChain = anychart.core.settings.getResolutionChain;
+
+
+/** @inheritDoc */
+anychart.pertModule.VisualElements.prototype.getLowPriorityResolutionChain = function() {
+  var sett = [this.themeSettings];
+  if (this.parent_) {
+    sett = goog.array.concat(sett, this.parent_.getLowPriorityResolutionChain());
+  }
+  return sett;
+};
+
+
+/** @inheritDoc */
+anychart.pertModule.VisualElements.prototype.getHighPriorityResolutionChain = function() {
+  var sett = [this.ownSettings];
+  if (this.parent_) {
+    sett = goog.array.concat(sett, this.parent_.getHighPriorityResolutionChain());
+  }
+  return sett;
+};
+
+
+/**
  * Gets/sets parent settings object.
  * @param {anychart.pertModule.VisualElements=} opt_value - Value.
  * @return {?anychart.pertModule.VisualElements} - Current parent object.
  */
 anychart.pertModule.VisualElements.prototype.parent = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    this.parent_ = opt_value;
+    if (this.parent_ != opt_value) {
+      if (goog.isNull(opt_value)) {
+        //this.parent_ is not null here.
+        this.parent_.unlistenSignals(this.parentInvalidated_, this);
+        this.parent_ = null;
+      } else {
+        if (this.parent_)
+          this.parent_.unlistenSignals(this.parentInvalidated_, this);
+        this.parent_ = opt_value;
+        this.parent_.listenSignals(this.parentInvalidated_, this);
+      }
+    }
     return this;
   }
   return this.parent_;
@@ -132,105 +188,78 @@ anychart.pertModule.VisualElements.prototype.parent = function(opt_value) {
 
 
 /**
- * Getter/setter for color.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.pertModule.VisualElements} .
+ * .
+ * @param {anychart.SignalEvent} e
+ * @private
  */
-anychart.pertModule.VisualElements.prototype.color = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (val != this.color_) {
-      this.color_ = val;
-      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW_APPEARANCE);
-    }
+anychart.pertModule.VisualElements.prototype.parentInvalidated_ = function(e) {
+  var state = 0;
+  var signal = 0;
+
+  if (e.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
+    state |= anychart.ConsistencyState.APPEARANCE;
+    signal |= anychart.Signal.NEEDS_REDRAW;
+  }
+
+  if (e.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
+    state |= anychart.ConsistencyState.BOUNDS;
+    signal |= anychart.Signal.BOUNDS_CHANGED;
+  }
+
+  if (e.hasSignal(anychart.Signal.ENABLED_STATE_CHANGED)) {
+    state |= anychart.ConsistencyState.ENABLED;
+    signal |= anychart.Signal.NEEDS_REDRAW;
+  }
+
+  this.resolutionChainCache_ = null;
+
+  this.invalidate(state, signal);
+};
+
+
+//endregion
+//region --- States
+/**
+ * Normal state settings.
+ * @param {!Object=} opt_value
+ * @return {anychart.core.StateSettings|anychart.pertModule.VisualElements}
+ */
+anychart.pertModule.VisualElements.prototype.normal = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.normal_.setup(opt_value);
     return this;
   }
-  return this.color_ || (this.parent_ ? this.parent_.color() : 'none');
+  return this.normal_;
 };
 
 
 /**
- * Getter/setter for fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.pertModule.VisualElements|Function} .
+ * Hovered state settings.
+ * @param {!Object=} opt_value
+ * @return {anychart.core.StateSettings|anychart.pertModule.VisualElements}
  */
-anychart.pertModule.VisualElements.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = goog.isFunction(opt_fillOrColorOrKeys) ?
-        opt_fillOrColorOrKeys :
-        acgraph.vector.normalizeFill.apply(null, arguments);
-    if (val != this.fill_) {
-      this.fill_ = val;
-      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW_APPEARANCE);
-    }
+anychart.pertModule.VisualElements.prototype.hovered = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.hovered_.setup(opt_value);
     return this;
   }
-  return this.fill_ || (this.parent_ ? this.parent_.fill() : 'none');
+  return this.hovered_;
 };
 
 
 /**
- * Getter/setter for hoverFill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.pertModule.VisualElements|Function} .
+ * Selected state settings.
+ * @param {!Object=} opt_value
+ * @return {anychart.core.StateSettings|anychart.pertModule.VisualElements}
  */
-anychart.pertModule.VisualElements.prototype.hoverFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = goog.isFunction(opt_fillOrColorOrKeys) ?
-        opt_fillOrColorOrKeys :
-        acgraph.vector.normalizeFill.apply(null, arguments);
-    if (val != this.hoverFill_) {
-      this.hoverFill_ = val;
-      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW_APPEARANCE);
-    }
+anychart.pertModule.VisualElements.prototype.selected = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.selected_.setup(opt_value);
     return this;
   }
-  return this.hoverFill_ || (this.parent_ ? this.parent_.hoverFill() : 'none');
+  return this.selected_;
 };
-
-
-/**
- * Getter/setter for selectFill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.pertModule.VisualElements|Function} .
- */
-anychart.pertModule.VisualElements.prototype.selectFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = goog.isFunction(opt_fillOrColorOrKeys) ?
-        opt_fillOrColorOrKeys :
-        acgraph.vector.normalizeFill.apply(null, arguments);
-    if (val != this.selectFill_) {
-      this.selectFill_ = val;
-      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW_APPEARANCE);
-    }
-    return this;
-  }
-  return this.selectFill_ || (this.parent_ ? this.parent_.selectFill() : 'none');
-};
+//endregion
 
 
 /**
@@ -240,103 +269,7 @@ anychart.pertModule.VisualElements.prototype.selectFill = function(opt_fillOrCol
  * @return {!acgraph.vector.Fill} - Final fill.
  */
 anychart.pertModule.VisualElements.prototype.getFinalFill = function(state, provider) {
-  var result;
-  var fill;
-
-  switch (state) {
-    case anychart.PointState.HOVER:
-      fill = this.hoverFill();
-      break;
-    case anychart.PointState.SELECT:
-      fill = this.selectFill();
-      break;
-    default:
-      fill = this.fill();
-  }
-
-  result = fill;
-
-  if (goog.isFunction(fill)) {
-    provider['sourceColor'] = this.color();
-    result = fill.call(provider);
-  }
-
-  return result;
-};
-
-
-/**
- * Getter/setter for stroke settings.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.pertModule.VisualElements|acgraph.vector.Stroke|Function} .
- */
-anychart.pertModule.VisualElements.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var stroke = goog.isFunction(opt_strokeOrFill) ?
-        opt_strokeOrFill :
-        acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (stroke != this.stroke_) {
-      this.stroke_ = stroke;
-      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW_APPEARANCE);
-    }
-    return this;
-  }
-  return this.stroke_ || (this.parent_ ? this.parent_.stroke() : 'none');
-};
-
-
-/**
- * Getter/setter for hover stroke settings.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.pertModule.VisualElements|acgraph.vector.Stroke|Function} .
- */
-anychart.pertModule.VisualElements.prototype.hoverStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var stroke = goog.isFunction(opt_strokeOrFill) ?
-        opt_strokeOrFill :
-        acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (stroke != this.hoverStroke_) {
-      this.hoverStroke_ = stroke;
-      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW_APPEARANCE);
-    }
-    return this;
-  }
-  return this.hoverStroke_ || (this.parent_ ? this.parent_.hoverStroke() : 'none');
-};
-
-
-/**
- * Getter/setter for select stroke settings.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness - Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.pertModule.VisualElements|acgraph.vector.Stroke|Function} .
- */
-anychart.pertModule.VisualElements.prototype.selectStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var stroke = goog.isFunction(opt_strokeOrFill) ?
-        opt_strokeOrFill :
-        acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (stroke != this.selectStroke_) {
-      this.selectStroke_ = stroke;
-      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW_APPEARANCE);
-    }
-    return this;
-  }
-  return this.selectStroke_ || (this.parent_ ? this.parent_.selectStroke() : 'none');
+  return /** @type {!acgraph.vector.Fill} */ (this.resolveColor('fill', state, provider));
 };
 
 
@@ -347,94 +280,36 @@ anychart.pertModule.VisualElements.prototype.selectStroke = function(opt_strokeO
  * @return {!acgraph.vector.Stroke} - Final stroke.
  */
 anychart.pertModule.VisualElements.prototype.getFinalStroke = function(state, provider) {
+  return /** @type {!acgraph.vector.Stroke} */ (this.resolveColor('stroke', state, provider));
+};
+
+
+/**
+ * Resolves fill/stroke.
+ * @param {string} colorType
+ * @param {number} state
+ * @param {anychart.format.Context} provider
+ * @return {!acgraph.vector.Stroke|!acgraph.vector.Fill}
+ */
+anychart.pertModule.VisualElements.prototype.resolveColor = function(colorType, state, provider) {
   var result;
-  var stroke;
+  var stateObject = state == 0 ? this.normal_ : state == 1 ? this.hovered_ : this.selected_;
+  result = stateObject.getOption(colorType);
 
-  switch (state) {
-    case anychart.PointState.HOVER:
-      stroke = this.hoverStroke();
-      break;
-    case anychart.PointState.SELECT:
-      stroke = this.selectStroke();
-      break;
-    default:
-      stroke = this.stroke();
+  if (goog.isFunction(result)) {
+    provider['sourceColor'] = this.getOption('color');
+    result = result.call(provider);
   }
 
-  result = stroke;
-
-  if (goog.isFunction(stroke)) {
-    provider['sourceColor'] = this.color();
-    result = stroke.call(provider);
-  }
-
-  return result;
+  return /** @type {!acgraph.vector.Stroke|!acgraph.vector.Fill} */ (result);
 };
 
 
 /**
- * Gets or sets labels settings.
- * @param {(Object|boolean|null)=} opt_value - Labels settings.
- * @return {!(anychart.core.ui.LabelsFactory|anychart.pertModule.VisualElements)} - Labels instance or itself for chaining call.
+ * @param {anychart.core.ui.LabelsFactory} factory
  */
-anychart.pertModule.VisualElements.prototype.labels = function(opt_value) {
-  if (!this.labels_) {
-    this.labels_ = new anychart.core.ui.LabelsFactory();
-    this.labels_.listenSignals(this.labelsInvalidated, this);
-    this.registerDisposable(this.labels_);
-  }
-
-  if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !('enabled' in opt_value))
-      opt_value['enabled'] = true;
-    this.labels_.setup(opt_value);
-    return this;
-  }
-  return this.labels_;
-};
-
-
-/**
- * Gets or sets select labels settings.
- * @param {(Object|boolean|null)=} opt_value - Labels settings.
- * @return {!(anychart.core.ui.LabelsFactory|anychart.pertModule.VisualElements)} - Labels instance or itself for chaining call.
- */
-anychart.pertModule.VisualElements.prototype.selectLabels = function(opt_value) {
-  if (!this.selectLabels_) {
-    this.selectLabels_ = new anychart.core.ui.LabelsFactory();
-    this.selectLabels_.listenSignals(this.labelsInvalidated, this);
-    this.registerDisposable(this.selectLabels_);
-  }
-
-  if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !('enabled' in opt_value))
-      opt_value['enabled'] = true;
-    this.selectLabels_.setup(opt_value);
-    return this;
-  }
-  return this.selectLabels_;
-};
-
-
-/**
- * Gets or sets hover labels settings.
- * @param {(Object|boolean|null)=} opt_value - Labels settings.
- * @return {!(anychart.core.ui.LabelsFactory|anychart.pertModule.VisualElements)} - Labels instance or itself for chaining call.
- */
-anychart.pertModule.VisualElements.prototype.hoverLabels = function(opt_value) {
-  if (!this.hoverLabels_) {
-    this.hoverLabels_ = new anychart.core.ui.LabelsFactory();
-    this.hoverLabels_.listenSignals(this.labelsInvalidated, this);
-    this.registerDisposable(this.hoverLabels_);
-  }
-
-  if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !('enabled' in opt_value))
-      opt_value['enabled'] = true;
-    this.hoverLabels_.setup(opt_value);
-    return this;
-  }
-  return this.hoverLabels_;
+anychart.pertModule.VisualElements.prototype.labelsAfterInitCallback = function(factory) {
+  factory.listenSignals(this.labelsInvalidated, this);
 };
 
 
@@ -502,7 +377,7 @@ anychart.pertModule.VisualElements.prototype.labelsContainer = function(opt_valu
   if (goog.isDef(opt_value)) {
     if (this.labelsContainer_ != opt_value) {
       this.labelsContainer_ = opt_value;
-      this.labels().container(this.labelsContainer_);
+      this.normal_.labels().container(this.labelsContainer_);
     }
     return this;
   }
@@ -515,7 +390,7 @@ anychart.pertModule.VisualElements.prototype.labelsContainer = function(opt_valu
  * @return {anychart.pertModule.VisualElements}
  */
 anychart.pertModule.VisualElements.prototype.drawLabels = function() {
-  this.labels().draw();
+  this.normal_.labels().draw();
   return this;
 };
 
@@ -525,7 +400,7 @@ anychart.pertModule.VisualElements.prototype.drawLabels = function() {
  * @return {anychart.pertModule.VisualElements}
  */
 anychart.pertModule.VisualElements.prototype.clearLabels = function() {
-  this.labels().clear();
+  this.normal_.labels().clear();
   return this;
 };
 
@@ -536,7 +411,7 @@ anychart.pertModule.VisualElements.prototype.clearLabels = function() {
  * @return {anychart.pertModule.VisualElements}
  */
 anychart.pertModule.VisualElements.prototype.setLabelsParentEventTarget = function(parentEventTarget) {
-  this.labels().setParentEventTarget(parentEventTarget);
+  this.normal_.labels().setParentEventTarget(parentEventTarget);
   return this;
 };
 
@@ -567,91 +442,11 @@ anychart.pertModule.VisualElements.prototype.setLabelsParentEventTarget = functi
 /** @inheritDoc */
 anychart.pertModule.VisualElements.prototype.serialize = function() {
   var json = anychart.pertModule.VisualElements.base(this, 'serialize');
+  anychart.core.settings.serialize(this, anychart.pertModule.VisualElements.PROPERTY_DESCRIPTORS, json, 'Pert visual element');
 
-  if (goog.isDef(this.color_))
-    json['color'] = anychart.color.serialize(this.color_);
-
-  if (goog.isFunction(this['fill'])) {
-    if (goog.isFunction(this.fill())) {
-      anychart.core.reporting.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          ['Pert element fill']
-      );
-    } else {
-      if (this.fill_) json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.fill_));
-    }
-  }
-
-  if (goog.isFunction(this['hoverFill'])) {
-    if (goog.isFunction(this.hoverFill())) {
-      anychart.core.reporting.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          ['Pert element hoverFill']
-      );
-    } else {
-      if (this.hoverFill_) json['hoverFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.hoverFill_));
-    }
-  }
-
-  if (goog.isFunction(this['selectFill'])) {
-    if (goog.isFunction(this.selectFill())) {
-      anychart.core.reporting.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          ['Pert element selectFill']
-      );
-    } else {
-      if (this.selectFill_) json['selectFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.selectFill_));
-    }
-  }
-
-  if (goog.isFunction(this['stroke'])) {
-    if (goog.isFunction(this.stroke())) {
-      anychart.core.reporting.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          ['Pert element stroke']
-      );
-    } else {
-      if (this.stroke_) json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */ (this.stroke_));
-    }
-  }
-
-  if (goog.isFunction(this['hoverStroke'])) {
-    if (goog.isFunction(this.hoverStroke())) {
-      anychart.core.reporting.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          ['Pert element hoverStroke']
-      );
-    } else {
-      if (this.hoverStroke_) json['hoverStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */ (this.hoverStroke_));
-    }
-  }
-
-  if (goog.isFunction(this['selectStroke'])) {
-    if (goog.isFunction(this.selectStroke())) {
-      anychart.core.reporting.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          ['Pert element selectStroke']
-      );
-    } else {
-      if (this.selectStroke_) json['selectStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */ (this.selectStroke_));
-    }
-  }
-
-  json['labels'] = this.labels().serialize();
-  json['selectLabels'] = this.selectLabels().getChangedSettings();
-  json['hoverLabels'] = this.hoverLabels().getChangedSettings();
-  if (goog.isNull(json['hoverLabels']['enabled'])) {
-    delete json['hoverLabels']['enabled'];
-  }
-  if (goog.isNull(json['selectLabels']['enabled'])) {
-    delete json['selectLabels']['enabled'];
-  }
+  json['normal'] = this.normal_.serialize();
+  json['hovered'] = this.hovered_.serialize();
+  json['selected'] = this.selected_.serialize();
 
   json['tooltip'] = this.tooltip().serialize();
 
@@ -663,20 +458,23 @@ anychart.pertModule.VisualElements.prototype.serialize = function() {
 anychart.pertModule.VisualElements.prototype.setupByJSON = function(config, opt_default) {
   anychart.pertModule.VisualElements.base(this, 'setupByJSON', config, opt_default);
 
-  this.color(config['color']);
+  anychart.core.settings.deserialize(this, anychart.pertModule.VisualElements.PROPERTY_DESCRIPTORS, config);
 
-  this.fill(config['fill']);
-  this.hoverFill(config['hoverFill']);
-  this.selectFill(config['selectFill']);
-
-  this.stroke(config['stroke']);
-  this.hoverStroke(config['hoverStroke']);
-  this.selectStroke(config['selectStroke']);
-
-  this.labels().setupInternal(!!opt_default, config['labels']);
-  this.hoverLabels().setupInternal(!!opt_default, config['hoverLabels']);
-  this.selectLabels().setupInternal(!!opt_default, config['selectLabels']);
+  this.normal_.setupInternal(!!opt_default, config);
+  this.normal_.setupInternal(!!opt_default, config['normal']);
+  this.hovered_.setupInternal(!!opt_default, config['hovered']);
+  this.selected_.setupInternal(!!opt_default, config['selected']);
 
   if ('tooltip' in config)
     this.tooltip().setupInternal(!!opt_default, config['tooltip']);
 };
+
+(function() {
+  var proto = anychart.pertModule.VisualElements.prototype;
+  //auto
+  //proto['color'] = proto.color;
+  proto['tooltip'] = proto.tooltip;
+  proto['normal'] = proto.normal;
+  proto['hovered'] = proto.hovered;
+  proto['selected'] = proto.selected;
+})();

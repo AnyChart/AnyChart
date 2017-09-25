@@ -255,195 +255,6 @@ anychart.annotationsModule.THIRD_ANCHOR_POINT_DESCRIPTORS_META = (function() {
 
 
 /**
- * Properties that should be defined in annotation prototype to support stroke.
- * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
- */
-anychart.annotationsModule.STROKE_DESCRIPTORS = (function() {
-  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
-  var map = {};
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'stroke',
-      anychart.core.settings.strokeOrFunctionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'hoverStroke',
-      anychart.core.settings.strokeOrFunctionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'selectStroke',
-      anychart.core.settings.strokeOrFunctionNormalizer);
-
-  return map;
-})();
-
-
-/**
- * Properties meta.
- * @type {!Array.<Array>}
- */
-anychart.annotationsModule.STROKE_DESCRIPTORS_META = (function() {
-  return [
-    ['stroke', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.ANNOTATIONS_SHAPES, anychart.Signal.NEEDS_REDRAW],
-    ['hoverStroke', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.ANNOTATIONS_SHAPES, anychart.Signal.NEEDS_REDRAW],
-    ['selectStroke', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.ANNOTATIONS_SHAPES, anychart.Signal.NEEDS_REDRAW]
-  ];
-})();
-
-
-/**
- * Properties that should be defined in annotation prototype to support trend stroke.
- * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
- */
-anychart.annotationsModule.TREND_DESCRIPTORS = (function() {
-  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
-  var map = {};
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'trend',
-      anychart.core.settings.strokeOrFunctionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'hoverTrend',
-      anychart.core.settings.strokeOrFunctionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'selectTrend',
-      anychart.core.settings.strokeOrFunctionNormalizer);
-
-  return map;
-})();
-
-
-/**
- * Properties meta.
- * @type {!Array.<Array>}
- */
-anychart.annotationsModule.TREND_DESCRIPTORS_META = (function() {
-  return [
-    ['trend', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
-    ['hoverTrend', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
-    ['selectTrend', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW]
-  ];
-})();
-
-
-/**
- * Properties that should be defined in annotation prototype to support grid strokes.
- * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
- */
-anychart.annotationsModule.GRID_DESCRIPTORS = (function() {
-  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
-  var map = {};
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'grid',
-      anychart.core.settings.strokeOrFunctionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'hoverGrid',
-      anychart.core.settings.strokeOrFunctionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'selectGrid',
-      anychart.core.settings.strokeOrFunctionNormalizer);
-
-  return map;
-})();
-
-
-/**
- * Properties meta.
- * @type {!Array.<Array>}
- */
-anychart.annotationsModule.GRID_DESCRIPTORS_META = (function() {
-  return [
-    ['grid', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
-    ['hoverGrid', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
-    ['selectGrid', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW]
-  ];
-})();
-
-
-/**
- * Properties that should be defined in annotation prototype to support fill.
- * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
- */
-anychart.annotationsModule.FILL_DESCRIPTORS = (function() {
-  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
-  var map = {};
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'fill',
-      anychart.core.settings.fillOrFunctionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'hoverFill',
-      anychart.core.settings.fillOrFunctionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'selectFill',
-      anychart.core.settings.fillOrFunctionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'hatchFill',
-      anychart.core.settings.hatchFillOrFunctionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'hoverHatchFill',
-      anychart.core.settings.hatchFillOrFunctionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'selectHatchFill',
-      anychart.core.settings.hatchFillOrFunctionNormalizer);
-
-  return map;
-})();
-
-
-/**
- * Properties meta.
- * @type {!Array.<Array>}
- */
-anychart.annotationsModule.FILL_DESCRIPTORS_META = (function() {
-  return [
-    ['fill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
-    ['hoverFill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
-    ['selectFill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
-    ['hatchFill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
-    ['hoverHatchFill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
-    ['selectHatchFill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW]
-  ];
-})();
-
-
-/**
  * Properties that should be defined in annotation prototype to support marker annotation settings.
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
@@ -474,24 +285,6 @@ anychart.annotationsModule.MARKER_DESCRIPTORS = (function() {
       'offsetY',
       anychart.core.settings.numberNormalizer);
 
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'size',
-      anychart.core.settings.numberNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'hoverSize',
-      anychart.core.settings.numberNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'selectSize',
-      anychart.core.settings.numberNormalizer);
-
   return map;
 })();
 
@@ -505,10 +298,125 @@ anychart.annotationsModule.MARKER_DESCRIPTORS_META = (function() {
     ['markerType', anychart.ConsistencyState.ANNOTATIONS_SHAPES, anychart.Signal.NEEDS_REDRAW],
     ['anchor', anychart.ConsistencyState.ANNOTATIONS_SHAPES, anychart.Signal.NEEDS_REDRAW],
     ['offsetX', anychart.ConsistencyState.ANNOTATIONS_SHAPES, anychart.Signal.NEEDS_REDRAW],
-    ['offsetY', anychart.ConsistencyState.ANNOTATIONS_SHAPES, anychart.Signal.NEEDS_REDRAW],
-    ['size', anychart.ConsistencyState.ANNOTATIONS_SHAPES, anychart.Signal.NEEDS_REDRAW],
-    ['hoverSize', anychart.ConsistencyState.ANNOTATIONS_SHAPES, anychart.Signal.NEEDS_REDRAW],
-    ['selectSize', anychart.ConsistencyState.ANNOTATIONS_SHAPES, anychart.Signal.NEEDS_REDRAW]
+    ['offsetY', anychart.ConsistencyState.ANNOTATIONS_SHAPES, anychart.Signal.NEEDS_REDRAW]
   ];
 })();
+
+
+//endregion
+//region Descriptors state meta
+//region --- STROKE
+/**
+ * Properties meta.
+ * @type {!Array.<Array>}
+ */
+anychart.annotationsModule.STROKE_DESCRIPTORS_META = (function() {
+  return [
+    ['stroke', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.ANNOTATIONS_SHAPES, anychart.Signal.NEEDS_REDRAW]
+  ];
+})();
+
+
+//endregion
+//region --- TREND
+/**
+ * Properties meta.
+ * @type {!Array.<Array>}
+ */
+anychart.annotationsModule.TREND_DESCRIPTORS_META = (function() {
+  return [
+    ['trend', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW]
+  ];
+})();
+
+
+//endregion
+//region --- GRID
+/**
+ * Properties meta.
+ * @type {!Array.<Array>}
+ */
+anychart.annotationsModule.GRID_DESCRIPTORS_META = (function() {
+  return [
+    ['grid', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW]
+  ];
+})();
+
+
+//endregion
+//region --- FILL
+/**
+ * Properties meta.
+ * @type {!Array.<Array>}
+ */
+anychart.annotationsModule.FILL_DESCRIPTORS_META = (function() {
+  return [
+    ['fill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['hatchFill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW]
+  ];
+})();
+
+
+//endregion
+//region --- MARKERS
+/**
+ * Properties meta.
+ * @type {!Array.<Array>}
+ */
+anychart.annotationsModule.MARKER_DESCRIPTORS_STATE_META = (function() {
+  return [
+    ['size', anychart.ConsistencyState.ANNOTATIONS_SHAPES, anychart.Signal.NEEDS_REDRAW]
+  ];
+})();
+
+
+//endregion
+//region --- FILL STROKE
+/**
+ * Properties meta.
+ * @type {!Array.<Array>}
+ */
+anychart.annotationsModule.FILL_STROKE_DESCRIPTORS_META = (function() {
+  return goog.array.concat(anychart.annotationsModule.FILL_DESCRIPTORS_META, anychart.annotationsModule.STROKE_DESCRIPTORS_META);
+})();
+
+
+//endregion
+//region --- STROKE TREND
+/**
+ * Properties meta.
+ * @type {!Array.<Array>}
+ */
+anychart.annotationsModule.STROKE_TREND_DESCRIPTORS_META = (function() {
+  return goog.array.concat(anychart.annotationsModule.STROKE_DESCRIPTORS_META, anychart.annotationsModule.TREND_DESCRIPTORS_META);
+})();
+
+
+//endregion
+//region --- LABELS
+/**
+ * Properties meta.
+ * @type {!Array.<Array>}
+ */
+anychart.annotationsModule.LABELS_DESCRIPTORS_META = (function() {
+  return [
+    ['labels', 0, 0]
+  ];
+})();
+
+
+//endregion
+//region --- MARKERS
+/**
+ * Properties meta.
+ * @type {!Array.<Array>}
+ */
+anychart.annotationsModule.MARKERS_DESCRIPTORS_META = (function() {
+  return [
+    ['markers', 0, 0]
+  ];
+})();
+
+
+//endregion
 //endregion

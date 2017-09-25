@@ -3,6 +3,7 @@ goog.provide('anychart.vennModule.Chart');
 goog.require('anychart.core.IShapeManagerUser');
 goog.require('anychart.core.Point');
 goog.require('anychart.core.SeparateChart');
+goog.require('anychart.core.StateSettings');
 goog.require('anychart.core.settings');
 goog.require('anychart.core.shapeManagers');
 goog.require('anychart.core.ui.LabelsFactory');
@@ -92,20 +93,40 @@ anychart.vennModule.Chart = function(opt_data, opt_csvSettings) {
 
   this.bindHandlersToComponent(this, this.handleMouseOverAndMove, this.handleMouseOut, null, this.handleMouseOverAndMove, null, this.handleMouseDown);
 
-  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
-    ['dataSeparator', anychart.ConsistencyState.VENN_DATA, anychart.Signal.NEEDS_REDRAW],
+  var normalDescriptorsMeta = {};
+  anychart.core.settings.createDescriptorsMeta(normalDescriptorsMeta, [
     ['fill', anychart.ConsistencyState.VENN_APPEARANCE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW],
-    ['hoverFill', anychart.ConsistencyState.VENN_APPEARANCE, anychart.Signal.NEEDS_REDRAW],
-    ['selectFill', anychart.ConsistencyState.VENN_APPEARANCE, anychart.Signal.NEEDS_REDRAW],
     ['hatchFill', anychart.ConsistencyState.VENN_APPEARANCE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW],
-    ['hoverHatchFill', anychart.ConsistencyState.VENN_APPEARANCE, anychart.Signal.NEEDS_REDRAW],
-    ['selectHatchFill', anychart.ConsistencyState.VENN_APPEARANCE, anychart.Signal.NEEDS_REDRAW],
     ['stroke', anychart.ConsistencyState.VENN_APPEARANCE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW],
-    ['hoverStroke', anychart.ConsistencyState.VENN_APPEARANCE, anychart.Signal.NEEDS_REDRAW],
-    ['selectStroke', anychart.ConsistencyState.VENN_APPEARANCE, anychart.Signal.NEEDS_REDRAW]
+    ['labels', 0, 0],
+    ['markers', 0, 0]
+  ]);
+  this.normal_ = new anychart.core.StateSettings(this, normalDescriptorsMeta, anychart.PointState.NORMAL);
+  this.normal_.setOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK, anychart.core.StateSettings.DEFAULT_LABELS_AFTER_INIT_CALLBACK);
+  this.normal_.setOption(anychart.core.StateSettings.MARKERS_AFTER_INIT_CALLBACK, anychart.core.StateSettings.DEFAULT_MARKERS_AFTER_INIT_CALLBACK);
+
+  var descriptorsMeta = {};
+  anychart.core.settings.createDescriptorsMeta(descriptorsMeta, [
+    ['fill', anychart.ConsistencyState.VENN_APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['hatchFill', anychart.ConsistencyState.VENN_APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['stroke', anychart.ConsistencyState.VENN_APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['labels', 0, 0],
+    ['markers', 0, 0]
+  ]);
+  this.hovered_ = new anychart.core.StateSettings(this, descriptorsMeta, anychart.PointState.HOVER);
+  this.selected_ = new anychart.core.StateSettings(this, descriptorsMeta, anychart.PointState.SELECT);
+  function markAllConsistent(factory) {
+    factory.markConsistent(anychart.ConsistencyState.ALL);
+  }
+  this.hovered_.setOption(anychart.core.StateSettings.MARKERS_AFTER_INIT_CALLBACK, markAllConsistent);
+  this.selected_.setOption(anychart.core.StateSettings.MARKERS_AFTER_INIT_CALLBACK, markAllConsistent);
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['dataSeparator', anychart.ConsistencyState.VENN_DATA, anychart.Signal.NEEDS_REDRAW]
   ]);
 };
 goog.inherits(anychart.vennModule.Chart, anychart.core.SeparateChart);
+anychart.core.settings.populateAliases(anychart.vennModule.Chart, ['fill', 'stroke', 'hatchFill', 'labels', 'markers'], 'normal');
 
 
 //region -- Private fields
@@ -173,6 +194,48 @@ anychart.vennModule.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
 anychart.vennModule.Chart.DataReflection;
 
 
+/**
+ * Normal state settings.
+ * @param {!Object=} opt_value
+ * @return {anychart.core.StateSettings|anychart.vennModule.Chart}
+ */
+anychart.vennModule.Chart.prototype.normal = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.normal_.setup(opt_value);
+    return this;
+  }
+  return this.normal_;
+};
+
+
+/**
+ * Hovered state settings.
+ * @param {!Object=} opt_value
+ * @return {anychart.core.StateSettings|anychart.vennModule.Chart}
+ */
+anychart.vennModule.Chart.prototype.hovered = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.hovered_.setup(opt_value);
+    return this;
+  }
+  return this.hovered_;
+};
+
+
+/**
+ * Selected state settings.
+ * @param {!Object=} opt_value
+ * @return {anychart.core.StateSettings|anychart.vennModule.Chart}
+ */
+anychart.vennModule.Chart.prototype.selected = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.selected_.setup(opt_value);
+    return this;
+  }
+  return this.selected_;
+};
+
+
 //endregion
 //region -- Series-like behaviour
 /** @inheritDoc */
@@ -215,7 +278,7 @@ anychart.vennModule.Chart.prototype.applyAppearanceToSeries = function(pointStat
  * Simple descriptors.
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.vennModule.Chart.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
+anychart.vennModule.Chart.SIMPLE_PROPS_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
   anychart.core.settings.createDescriptor(
@@ -224,63 +287,9 @@ anychart.vennModule.Chart.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
       'dataSeparator',
       anychart.core.settings.stringNormalizer);
 
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'fill',
-      anychart.core.settings.fillOrFunctionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'hoverFill',
-      anychart.core.settings.fillOrFunctionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'selectFill',
-      anychart.core.settings.fillOrFunctionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'hatchFill',
-      anychart.core.settings.hatchFillOrFunctionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'hoverHatchFill',
-      anychart.core.settings.hatchFillOrFunctionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'selectHatchFill',
-      anychart.core.settings.hatchFillOrFunctionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'stroke',
-      anychart.core.settings.strokeOrFunctionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'hoverStroke',
-      anychart.core.settings.strokeOrFunctionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'selectStroke',
-      anychart.core.settings.strokeOrFunctionNormalizer);
-
   return map;
 })();
-anychart.core.settings.populate(anychart.vennModule.Chart, anychart.vennModule.Chart.prototype.SIMPLE_PROPS_DESCRIPTORS);
+anychart.core.settings.populate(anychart.vennModule.Chart, anychart.vennModule.Chart.SIMPLE_PROPS_DESCRIPTORS);
 
 
 //endregion
@@ -300,13 +309,25 @@ anychart.vennModule.Chart.prototype.getIterator = function() {
 
 
 /** @inheritDoc */
-anychart.vennModule.Chart.prototype.resolveOption = function(name, point, normalizer, opt_seriesName) {
+anychart.vennModule.Chart.prototype.resolveOption = function(name, state, point, normalizer, scrollerSelected, opt_seriesName, opt_ignorePointSettings) {
   var iterator = this.getIterator();
-  var source = this;
-  if (iterator.meta('isIntersection'))
-    source = this.intersections();
-  //TODO (A.Kudryavtsev): Rework it to resolution chain.
-  var val = point.get(name) || source.getOwnOption(name) || this.getOwnOption(name) || source.getThemeOption(name) || this.getThemeOption(name);
+  var source = /** @type {anychart.vennModule.Chart|anychart.vennModule.Intersections} */ (iterator.meta('isIntersection') ? this.intersections() : this);
+  var val;
+  var stateObject = state == 0 ? this.normal_ : state == 1 ? this.hovered_ : this.selected_;
+  var sourceStateObject = state == 0 ? source.normal() : state == 1 ? source.hovered() : source.selected();
+  if (opt_ignorePointSettings) {
+    return stateObject.getOption(name);
+  } else {
+    var pointStateName = state == 0 ? 'normal' : state == 1 ? 'hovered' : 'selected';
+    var pointStateObject = point.get(pointStateName);
+    val = anychart.utils.getFirstDefinedValue(
+        goog.isDef(pointStateObject) ? pointStateObject[name] : void 0,
+        point.get(anychart.color.getPrefixedColorName(state, name)),
+        sourceStateObject.getOwnOption(name),
+        stateObject.getOwnOption(name),
+        sourceStateObject.getThemeOption(name),
+        stateObject.getThemeOption(name));
+  }
   if (goog.isDef(val))
     val = normalizer(val);
   return val;
@@ -464,69 +485,6 @@ anychart.vennModule.Chart.prototype.paletteInvalidated_ = function(event) {
 //endregion
 //region -- Labels
 /**
- * Getter/setter for labels.
- * @param {(Object|boolean|null)=} opt_value .
- * @return {!(anychart.core.ui.LabelsFactory|anychart.vennModule.Chart)} .
- */
-anychart.vennModule.Chart.prototype.labels = function(opt_value) {
-  if (!this.labels_) {
-    this.labels_ = new anychart.core.ui.LabelsFactory();
-
-    this.labels_.listenSignals(this.labelsInvalidated_, this);
-    this.labels_.setParentEventTarget(this);
-  }
-
-  if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !('enabled' in opt_value))
-      opt_value['enabled'] = true;
-    this.labels_.setup(opt_value);
-    return this;
-  }
-  return this.labels_;
-};
-
-
-/**
- * Getter/setter for series hover data labels.
- * @param {(Object|boolean|null)=} opt_value chart hover data labels settings.
- * @return {!(anychart.core.ui.LabelsFactory|anychart.vennModule.Chart)} Labels instance or itself for chaining call.
- */
-anychart.vennModule.Chart.prototype.hoverLabels = function(opt_value) {
-  if (!this.hoverLabels_) {
-    this.hoverLabels_ = new anychart.core.ui.LabelsFactory();
-  }
-
-  if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !('enabled' in opt_value))
-      opt_value['enabled'] = true;
-    this.hoverLabels_.setup(opt_value);
-    return this;
-  }
-  return this.hoverLabels_;
-};
-
-
-/**
- * Getter/setter for series select data labels.
- * @param {(Object|boolean|null)=} opt_value chart hover data labels settings.
- * @return {!(anychart.core.ui.LabelsFactory|anychart.vennModule.Chart)} Labels instance or itself for chaining call.
- */
-anychart.vennModule.Chart.prototype.selectLabels = function(opt_value) {
-  if (!this.selectLabels_) {
-    this.selectLabels_ = new anychart.core.ui.LabelsFactory();
-  }
-
-  if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !('enabled' in opt_value))
-      opt_value['enabled'] = true;
-    this.selectLabels_.setup(opt_value);
-    return this;
-  }
-  return this.selectLabels_;
-};
-
-
-/**
  * Internal label invalidation handler.
  * @param {anychart.SignalEvent} event Event object.
  * @private
@@ -540,71 +498,6 @@ anychart.vennModule.Chart.prototype.labelsInvalidated_ = function(event) {
 
 //endregion
 //region -- Markers
-/**
- * Getter/setter for markers.
- * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
- * @return {!(anychart.core.ui.MarkersFactory|anychart.vennModule.Chart)} Markers instance or itself for chaining call.
- */
-anychart.vennModule.Chart.prototype.markers = function(opt_value) {
-  if (!this.markers_) {
-    this.markers_ = new anychart.core.ui.MarkersFactory();
-    this.markers_.setParentEventTarget(this);
-    this.markers_.listenSignals(this.markersInvalidated_, this);
-  }
-
-  if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !('enabled' in opt_value))
-      opt_value['enabled'] = true;
-    this.markers_.setup(opt_value);
-    return this;
-  }
-  return this.markers_;
-};
-
-
-/**
- * Getter/setter for hoverMarkers.
- * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
- * @return {!(anychart.core.ui.MarkersFactory|anychart.vennModule.Chart)} Markers instance or itself for chaining call.
- */
-anychart.vennModule.Chart.prototype.hoverMarkers = function(opt_value) {
-  if (!this.hoverMarkers_) {
-    this.hoverMarkers_ = new anychart.core.ui.MarkersFactory();
-    this.hoverMarkers_.markConsistent(anychart.ConsistencyState.ALL);
-    // don't listen to it, for it will be reapplied at the next hover
-  }
-
-  if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !('enabled' in opt_value))
-      opt_value['enabled'] = true;
-    this.hoverMarkers_.setup(opt_value);
-    return this;
-  }
-  return this.hoverMarkers_;
-};
-
-
-/**
- * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
- * @return {!(anychart.core.ui.MarkersFactory|anychart.vennModule.Chart)} Markers instance or itself for chaining call.
- */
-anychart.vennModule.Chart.prototype.selectMarkers = function(opt_value) {
-  if (!this.selectMarkers_) {
-    this.selectMarkers_ = new anychart.core.ui.MarkersFactory();
-    this.selectMarkers_.markConsistent(anychart.ConsistencyState.ALL);
-    // don't listen to it, for it will be reapplied at the next hover
-  }
-
-  if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !('enabled' in opt_value))
-      opt_value['enabled'] = true;
-    this.selectMarkers_.setup(opt_value);
-    return this;
-  }
-  return this.selectMarkers_;
-};
-
-
 /**
  * Listener for markers invalidation.
  * @param {anychart.SignalEvent} event Invalidation event.
@@ -652,9 +545,9 @@ anychart.vennModule.Chart.prototype.createLegendItemsProvider = function(sourceM
       if (!goog.isString(itemText)) {
         itemText = String(goog.isDef(iterator.get('name')) ? iterator.get('name') : iterator.get('x'));
       }
-      var fillResolver = anychart.color.getColorResolver(['fill'], anychart.enums.ColorType.FILL);
-      var strokeResolver = anychart.color.getColorResolver(['stroke'], anychart.enums.ColorType.STROKE);
-      var hatchFillResolver = anychart.color.getColorResolver(['hatchFill'], anychart.enums.ColorType.HATCH_FILL);
+      var fillResolver = anychart.color.getColorResolver('fill', anychart.enums.ColorType.FILL, false);
+      var strokeResolver = anychart.color.getColorResolver('stroke', anychart.enums.ColorType.STROKE, false);
+      var hatchFillResolver = anychart.color.getColorResolver('hatchFill', anychart.enums.ColorType.HATCH_FILL, false);
       var intersectionFill;
 
       if (iterator.meta('isIntersection')) {
@@ -669,7 +562,7 @@ anychart.vennModule.Chart.prototype.createLegendItemsProvider = function(sourceM
           'pointValue': iterator.get('value'),
           'series': this
         },
-        'iconType': this.markers().enabled() ? iterator.meta('paletteMarkerType') : anychart.enums.LegendItemIconType.SQUARE,
+        'iconType': this.normal().markers().enabled() ? iterator.meta('paletteMarkerType') : anychart.enums.LegendItemIconType.SQUARE,
         'text': itemText,
         'iconStroke': iterator.get('stroke') || strokeResolver(this, anychart.PointState.NORMAL, true),
         'iconFill': iterator.get('fill') || intersectionFill || fillResolver(this, anychart.PointState.NORMAL, true),
@@ -1309,8 +1202,8 @@ anychart.vennModule.Chart.prototype.updatePaletteFill_ = function() {
       var set;
       var isIntersection = false;
       var tooltip = this.tooltip();
-      var fillResolver = anychart.color.getColorResolver(['fill'], anychart.enums.ColorType.FILL);
-      // var hatchFillResolver = anychart.color.getColorResolver(['hatchFill'], anychart.enums.ColorType.HATCH_FILL);
+      var fillResolver = anychart.color.getColorResolver('fill', anychart.enums.ColorType.FILL, false);
+      // var hatchFillResolver = anychart.color.getColorResolver('hatchFill', anychart.enums.ColorType.HATCH_FILL);
       if (sets.length == 1) { //Main circle, not an intersection.
         var color = this.palette().itemAt(i);
         iterator.meta('paletteFill', color);
@@ -1331,7 +1224,12 @@ anychart.vennModule.Chart.prototype.updatePaletteFill_ = function() {
         isIntersection = true;
         tooltip = this.intersections().tooltip();
       }
-      iterator.meta('hatchFillPaletteFill', iterator.get('hatchFill') || this.hatchFillPalette().itemAt(i));
+      var pointStateObject = iterator.get('normal');
+      var hatchFillPaletteFill = anychart.utils.getFirstDefinedValue(
+          goog.isDef(pointStateObject) ? pointStateObject['hatchFill'] : void 0,
+          iterator.get('hatchFill'),
+          this.hatchFillPalette().itemAt(i));
+      iterator.meta('hatchFillPaletteFill', hatchFillPaletteFill);
       iterator.meta('isIntersection', isIntersection);
       iterator.meta('paletteMarkerType', this.markerPalette().itemAt(i));
       iterator.meta('tooltip', tooltip);
@@ -1398,9 +1296,9 @@ anychart.vennModule.Chart.prototype.drawContent = function(bounds) {
 
     var textCenter, positionProvider;
     if (this.hasInvalidationState(anychart.ConsistencyState.VENN_LABELS)) {
-      this.labels().clear();
-
-      this.labels().container(this.rootElement);
+      var labels = this.normal().labels();
+      labels.clear();
+      labels.container(this.rootElement);
 
       for (i = 0; i < this.dataReflections_.length; i++) {
         refl = this.dataReflections_[i];
@@ -1415,19 +1313,20 @@ anychart.vennModule.Chart.prototype.drawContent = function(bounds) {
             'y': bounds.top + textCenter.y
           }
         };
-        var label = this.labels().add(labelsFormatProvider, positionProvider, iteratorIndex);
+        var label = labels.add(labelsFormatProvider, positionProvider, iteratorIndex);
         iterator.meta('label', label);
         this.drawLabel_(this.state.getPointStateByIndex(iteratorIndex), iterator);
       }
 
-      this.labels().draw();
+      labels.draw();
       this.intersections().markLabelsConsistent();
       this.markConsistent(anychart.ConsistencyState.VENN_LABELS);
     }
 
     if (this.hasInvalidationState(anychart.ConsistencyState.VENN_MARKERS)) {
-      this.markers().container(this.rootElement);
-      this.markers().clear();
+      var markers = this.normal().markers();
+      markers.container(this.rootElement);
+      markers.clear();
 
       for (i = 0; i < this.dataReflections_.length; i++) {
         refl = this.dataReflections_[i];
@@ -1441,12 +1340,12 @@ anychart.vennModule.Chart.prototype.drawContent = function(bounds) {
             'y': bounds.top + textCenter.y + 0.5
           }
         };
-        var marker = this.markers().add(positionProvider, iteratorIndex);
+        var marker = markers.add(positionProvider, iteratorIndex);
         iterator.meta('marker', marker);
         this.drawMarker_(this.state.getPointStateByIndex(iteratorIndex), iterator);
       }
 
-      this.markers().draw();
+      markers.draw();
       this.intersections().markMarkersConsistent();
       this.markConsistent(anychart.ConsistencyState.VENN_MARKERS);
     }
@@ -1524,29 +1423,35 @@ anychart.vennModule.Chart.prototype.drawArc_ = function(path, stats, bounds) {
 anychart.vennModule.Chart.prototype.drawLabel_ = function(state, iterator) {
   var label = /** @type {anychart.core.ui.LabelsFactory.Label} */ (iterator.meta('label'));
   if (label && !iterator.meta('isMissing')) {
-    var source = iterator.meta('isIntersection') ? this.intersections() : this;
+    var source = /** @type {anychart.vennModule.Chart|anychart.vennModule.Intersections} */ (iterator.meta('isIntersection') ? this.intersections() : this);
     state = anychart.core.utils.InteractivityState.clarifyState(state);
 
     var hovered = this.state.isStateContains(state, anychart.PointState.HOVER);
     var selected = this.state.isStateContains(state, anychart.PointState.SELECT);
 
-    var pointLabel = iterator.get('label') || null;
-    var hoverLabel = iterator.get('hoverLabel') || null;
-    var selectLabel = iterator.get('selectLabel') || null;
+    var pointNormalLabel = iterator.get('normal');
+    pointNormalLabel = goog.isDef(pointNormalLabel) ? pointNormalLabel['label'] : void 0;
+    var pointHoveredLabel = iterator.get('hovered');
+    pointHoveredLabel = goog.isDef(pointHoveredLabel) ? pointHoveredLabel['label'] : void 0;
+    var pointSelectedLabel = iterator.get('selected');
+    pointSelectedLabel = goog.isDef(pointSelectedLabel) ? pointSelectedLabel['label'] : void 0;
+    var pointLabel = anychart.utils.getFirstDefinedValue(pointNormalLabel, iterator.get('label'), null);
+    var hoverLabel = anychart.utils.getFirstDefinedValue(pointHoveredLabel, iterator.get('hoverLabel'), null);
+    var selectLabel = anychart.utils.getFirstDefinedValue(pointSelectedLabel, iterator.get('selectLabel'), null);
 
     var pointState = selected ? selectLabel : hovered ? hoverLabel : null;
     var pointNormal = pointLabel;
 
-    var intersectionsState = selected ? source.selectLabels() : hovered ? source.hoverLabels() : null;
-    var intersectionsNormal = source.labels();
+    var intersectionsState = selected ? source.selected().labels() : hovered ? source.hovered().labels() : null;
+    var intersectionsNormal = source.normal().labels();
 
-    var chartState = selected ? this.selectLabels() : hovered ? this.hoverLabels() : null;
-    var chartNormal = this.labels();
+    var chartState = selected ? this.selected().labels() : hovered ? this.hovered().labels() : null;
+    var chartNormal = this.normal().labels();
 
-    var intersectionsStateTheme = selected ? source.selectLabels().themeSettings : hovered ? source.hoverLabels().themeSettings : null;
-    var intersectionsNormalTheme = source.labels().themeSettings;
-    var chartStateTheme = selected ? this.selectLabels().themeSettings : hovered ? this.hoverLabels().themeSettings : null;
-    var chartNormalTheme = this.labels().themeSettings;
+    var intersectionsStateTheme = selected ? source.selected().labels().themeSettings : hovered ? source.hovered().labels().themeSettings : null;
+    var intersectionsNormalTheme = source.normal().labels().themeSettings;
+    var chartStateTheme = selected ? this.selected().labels().themeSettings : hovered ? this.hovered().labels().themeSettings : null;
+    var chartNormalTheme = this.normal().labels().themeSettings;
 
     var pointStateLabelsEnabled = pointState && goog.isDef(pointState['enabled']) ? pointState['enabled'] : null;
     var normalPointLabelsEnabled = pointNormal && goog.isDef(pointNormal['enabled']) ? pointNormal['enabled'] : null;
@@ -1618,16 +1523,23 @@ anychart.vennModule.Chart.prototype.drawMarker_ = function(state, iterator) {
 
   if (marker && !iterator.meta('isMissing')) {
     var isIntersection = !!iterator.meta('isIntersection');
-    var source = isIntersection ? this.intersections() : this;
-    var chartFactory = this.markers();
+    var source = /** @type {anychart.vennModule.Chart|anychart.vennModule.Intersections} */ (isIntersection ? this.intersections() : this);
+    var chartFactory = this.normal().markers();
     state = anychart.core.utils.InteractivityState.clarifyState(state);
 
     var hovered = this.state.isStateContains(state, anychart.PointState.HOVER);
     var selected = this.state.isStateContains(state, anychart.PointState.SELECT);
 
-    var pointMarker = iterator.get('marker') || {};
-    var hoverMarker = iterator.get('hoverMarker');
-    var selectMarker = iterator.get('selectMarker');
+    var pointNormalMarker = iterator.get('normal');
+    pointNormalMarker = goog.isDef(pointNormalMarker) ? pointNormalMarker['marker'] : void 0;
+    var pointHoveredMarker = iterator.get('hovered');
+    pointHoveredMarker = goog.isDef(pointHoveredMarker) ? pointHoveredMarker['marker'] : void 0;
+    var pointSelectedMarker = iterator.get('selected');
+    pointSelectedMarker = goog.isDef(pointSelectedMarker) ? pointSelectedMarker['marker'] : void 0;
+    var pointMarker = anychart.utils.getFirstDefinedValue(pointNormalMarker, iterator.get('marker'), {});
+    var hoverMarker = anychart.utils.getFirstDefinedValue(pointHoveredMarker, iterator.get('hoverMarker'));
+    var selectMarker = anychart.utils.getFirstDefinedValue(pointSelectedMarker, iterator.get('selectMarker'));
+
     if (selected) {
       goog.object.extend(/** @type {Object} */ (pointMarker), /** @type {Object} */ (selectMarker) || {});
     } else if (hovered) {
@@ -1636,8 +1548,8 @@ anychart.vennModule.Chart.prototype.drawMarker_ = function(state, iterator) {
     var extendedPointMarker = pointMarker;
 
     var pointState = selected ? selectMarker : hovered ? hoverMarker : pointMarker;
-    var sourceState = selected ? source.selectMarkers() : hovered ? source.hoverMarkers() : source.markers();
-    var chartState = selected ? this.selectMarkers() : hovered ? this.hoverMarkers() : this.markers();
+    var sourceState = selected ? source.selected().markers() : hovered ? source.hovered().markers() : source.normal().markers();
+    var chartState = selected ? this.selected().markers() : hovered ? this.hovered().markers() : this.normal().markers();
 
     var pointMarkersEnabled = pointState && goog.isDef(pointState['enabled']) ? pointState['enabled'] : null;
     var sourceMarkersEnabled = sourceState.enabled();
@@ -1655,10 +1567,10 @@ anychart.vennModule.Chart.prototype.drawMarker_ = function(state, iterator) {
     }
 
     if (draw) {
-      var chartNormalMarkerConfig = this.markers().serialize();
-      var chartStateMarkerConfig = selected ? this.selectMarkers().serialize() : hovered ? this.hoverMarkers().serialize() : {};
+      var chartNormalMarkerConfig = this.normal().markers().serialize();
+      var chartStateMarkerConfig = selected ? this.selected().markers().serialize() : hovered ? this.hovered().markers().serialize() : {};
 
-      var intersectionNormalConfig = isIntersection ? this.intersections().markers().serialize() : {};
+      var intersectionNormalConfig = isIntersection ? this.intersections().normal().markers().serialize() : {};
       var intersectionStateConfig = isIntersection ? sourceState.serialize() : {};
 
       goog.object.extend(/** @type {Object} */ (chartNormalMarkerConfig), /** @type {Object} */ (chartStateMarkerConfig),
@@ -1696,6 +1608,32 @@ anychart.vennModule.Chart.prototype.drawMarker_ = function(state, iterator) {
 
 
 //endregion
+//region --- CSV
+//------------------------------------------------------------------------------
+//
+//  CSV
+//
+//------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.vennModule.Chart.prototype.getCsvGrouperColumn = function() {
+  return ['x'];
+};
+
+
+/** @inheritDoc */
+anychart.vennModule.Chart.prototype.getCsvGrouperValue = function(iterator) {
+  return iterator.get('x');
+};
+
+
+/** @inheritDoc */
+anychart.vennModule.Chart.prototype.getCsvGrouperAlias = function(iterator) {
+  var res = iterator.get('name');
+  return goog.isString(res) ? res : null;
+};
+
+
+//endregion
 //region -- No data
 /** @inheritDoc */
 anychart.vennModule.Chart.prototype.isNoData = function() {
@@ -1711,7 +1649,7 @@ anychart.vennModule.Chart.prototype.isNoData = function() {
  * @param {!Object} config
  */
 anychart.vennModule.Chart.prototype.setThemeSettings = function(config) {
-  anychart.core.settings.copy(this.themeSettings, this.SIMPLE_PROPS_DESCRIPTORS, config);
+  anychart.core.settings.copy(this.themeSettings, anychart.vennModule.Chart.SIMPLE_PROPS_DESCRIPTORS, config);
 };
 
 
@@ -1719,18 +1657,14 @@ anychart.vennModule.Chart.prototype.setThemeSettings = function(config) {
 anychart.vennModule.Chart.prototype.serialize = function() {
   var json = anychart.vennModule.Chart.base(this, 'serialize');
 
-  anychart.core.settings.serialize(this, this.SIMPLE_PROPS_DESCRIPTORS, json, 'Venn');
+  anychart.core.settings.serialize(this, anychart.vennModule.Chart.SIMPLE_PROPS_DESCRIPTORS, json, 'Venn');
 
   json['type'] = this.getType();
   json['data'] = this.data().serialize();
 
-  json['labels'] = this.labels().serialize();
-  json['selectLabels'] = this.selectLabels().serialize();
-  json['hoverLabels'] = this.hoverLabels().serialize();
-
-  json['markers'] = this.markers().serialize();
-  json['selectMarkers'] = this.selectMarkers().serialize();
-  json['hoverMarkers'] = this.hoverMarkers().serialize();
+  json['normal'] = this.normal().serialize();
+  json['hovered'] = this.hovered().serialize();
+  json['selected'] = this.selected().serialize();
 
   json['palette'] = this.palette().serialize();
   json['hatchFillPalette'] = this.hatchFillPalette().serialize();
@@ -1748,21 +1682,18 @@ anychart.vennModule.Chart.prototype.setupByJSON = function(config, opt_default) 
   if (opt_default)
     this.setThemeSettings(config);
   else
-    anychart.core.settings.deserialize(this, this.SIMPLE_PROPS_DESCRIPTORS, config);
+    anychart.core.settings.deserialize(this, anychart.vennModule.Chart.SIMPLE_PROPS_DESCRIPTORS, config);
 
   this.data(config['data']);
 
-  this.labels().setupInternal(!!opt_default, config['labels']);
-  this.hoverLabels().setupInternal(!!opt_default, config['hoverLabels']);
-  this.selectLabels().setupInternal(!!opt_default, config['selectLabels']);
+  this.normal_.setupInternal(!!opt_default, config);
+  this.normal_.setupInternal(!!opt_default, config['normal']);
+  this.hovered_.setupInternal(!!opt_default, config['hovered']);
+  this.selected_.setupInternal(!!opt_default, config['selected']);
 
   this.palette().setupInternal(!!opt_default, config['palette']);
   this.markerPalette().setupInternal(!!opt_default, config['markerPalette']);
   this.hatchFillPalette().setupInternal(!!opt_default, config['hatchFillPalette']);
-
-  this.markers().setupInternal(!!opt_default, config['markers']);
-  this.hoverMarkers().setupInternal(!!opt_default, config['hoverMarkers']);
-  this.selectMarkers().setupInternal(!!opt_default, config['selectMarkers']);
 
   this.intersections().setupInternal(!!opt_default, config['intersections']);
 };
@@ -1777,13 +1708,9 @@ anychart.vennModule.Chart.prototype.setupByJSON = function(config, opt_default) 
   proto['getType'] = proto.getType;
   proto['intersections'] = proto.intersections;
 
-  proto['labels'] = proto.labels;
-  proto['hoverLabels'] = proto.hoverLabels;
-  proto['selectLabels'] = proto.selectLabels;
-
-  proto['markers'] = proto.markers;
-  proto['hoverMarkers'] = proto.hoverMarkers;
-  proto['selectMarkers'] = proto.selectMarkers;
+  proto['normal'] = proto.normal;
+  proto['hovered'] = proto.hovered;
+  proto['selected'] = proto.selected;
 
   proto['palette'] = proto.palette;
   proto['hatchFillPalette'] = proto.hatchFillPalette;

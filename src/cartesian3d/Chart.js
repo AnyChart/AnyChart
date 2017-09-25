@@ -9,11 +9,14 @@ goog.require('anychart.cartesian3dModule.axisMarkers.Range');
 goog.require('anychart.cartesian3dModule.axisMarkers.Text');
 goog.require('anychart.cartesian3dModule.drawers.Area');
 goog.require('anychart.cartesian3dModule.drawers.Column');
+goog.require('anychart.cartesian3dModule.drawers.Line');
 goog.require('anychart.core.CartesianBase');
 goog.require('anychart.core.I3DProvider');
+goog.require('anychart.core.drawers.Line');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.settings');
 goog.require('anychart.enums');
+goog.require('goog.array');
 goog.require('goog.color');
 
 
@@ -44,6 +47,13 @@ anychart.cartesian3dModule.Chart = function() {
   this.setType(anychart.enums.ChartTypes.CARTESIAN_3D);
 };
 goog.inherits(anychart.cartesian3dModule.Chart, anychart.core.CartesianBase);
+
+
+/**
+ * Line-like series should have bigger zIndex value than other series.
+ * @type {number}
+ */
+anychart.cartesian3dModule.Chart.ZINDEX_2D_LINE_SERIES = 32;
 
 
 /**
@@ -108,8 +118,7 @@ anychart.cartesian3dModule.Chart.prototype.handleMouseEvent = function(event) {
  */
 anychart.cartesian3dModule.Chart.areaPostProcessor = function(series, shapes, pointState) {
   var frontFill, topFill, rightFill, bottomFill, backFill, leftFill;
-  var resolver = anychart.color.getColorResolver(
-      ['fill', 'hoverFill', 'selectFill'], anychart.enums.ColorType.FILL);
+  var resolver = anychart.color.getColorResolver('fill', anychart.enums.ColorType.FILL, true);
   var fill = resolver(series, pointState);
   var opacity = goog.isObject(fill) ? fill['opacity'] : 1;
   var color = goog.isObject(fill) ? fill['color'] : fill;
@@ -164,8 +173,7 @@ anychart.cartesian3dModule.Chart.areaPostProcessor = function(series, shapes, po
  */
 anychart.cartesian3dModule.Chart.barColumnPostProcessor = function(series, shapes, pointState) {
   var frontFill, topFill, rightFill, bottomFill, backFill, leftFill;
-  var resolver = anychart.color.getColorResolver(
-      ['fill', 'hoverFill', 'selectFill'], anychart.enums.ColorType.FILL);
+  var resolver = anychart.color.getColorResolver('fill', anychart.enums.ColorType.FILL, true);
   var fill = resolver(series, pointState);
   var opacity = goog.isObject(fill) ? fill['opacity'] : 1;
   var color = goog.isObject(fill) ? fill['color'] : fill;
@@ -207,6 +215,46 @@ anychart.cartesian3dModule.Chart.barColumnPostProcessor = function(series, shape
   shapes['top'].fill(/** @type {!acgraph.vector.Fill} */({'color': topFill, 'opacity': opacity}));
   shapes['front'].fill(/** @type {!acgraph.vector.Fill} */(frontFill));
 };
+
+
+/**
+ * Coloring post processor for Line 3D series.
+ * @param {anychart.core.series.Base} series
+ * @param {Object.<string, acgraph.vector.Shape>} shapes
+ * @param {number|anychart.PointState} pointState
+ */
+anychart.cartesian3dModule.Chart.linePostProcessor = function(series, shapes, pointState) {
+  var pathStroke;
+  var resolver = anychart.color.getColorResolver(
+      'fill', anychart.enums.ColorType.FILL, true);
+  var stroke = resolver(series, pointState);
+  var opacity = goog.isObject(stroke) ? stroke['opacity'] : 1;
+  var color = goog.isObject(stroke) ? stroke['color'] : stroke;
+  var parsedColor = anychart.color.parseColor(color);
+
+  if (goog.isNull(parsedColor)) {
+    pathStroke = 'none';
+  } else {
+    color = parsedColor.hex;
+    var rgbColor = goog.color.hexToRgb(color);
+    var rgbDarken03 = goog.color.darken(rgbColor, .3);
+    var darkBlendedColor2 = goog.color.rgbArrayToHex(goog.color.blend(rgbColor, rgbDarken03, .7));
+
+    pathStroke = /** @type {string} */(anychart.color.lighten(darkBlendedColor2, .2));
+  }
+
+  shapes['path']
+      .fill({
+        'color': pathStroke,
+        'opacity': opacity
+      })
+      // fix for batik (DVF-2068)
+      .stroke({
+        'color': pathStroke,
+        'thickness': 0.8
+      });
+};
+
 
 
 /**
@@ -282,6 +330,30 @@ anychart.cartesian3dModule.Chart.prototype.seriesConfig = (function() {
     anchoredPositionTop: 'value',
     anchoredPositionBottom: 'zero'
   };
+  res[anychart.enums.Cartesian3dSeriesType.LINE] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.LINE_3D,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathLine3DConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: anychart.cartesian3dModule.Chart.linePostProcessor,
+    capabilities: capabilities,
+    anchoredPositionTop: 'value',
+    anchoredPositionBottom: 'value'
+  };
+  res[anychart.enums.Cartesian3dSeriesType.LINE_2D] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.LINE,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathStrokeTopZIndexConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities | anychart.core.series.Capabilities.ALLOW_ERROR,
+    anchoredPositionTop: 'value',
+    anchoredPositionBottom: 'value'
+  };
   return res;
 })();
 anychart.core.ChartWithSeries.generateSeriesConstructors(anychart.cartesian3dModule.Chart, anychart.cartesian3dModule.Chart.prototype.seriesConfig);
@@ -311,6 +383,12 @@ anychart.chartTypesMap[anychart.enums.ChartTypes.CARTESIAN_3D] = anychart.cartes
 
 
 /** @inheritDoc */
+anychart.cartesian3dModule.Chart.prototype.normalizeSeriesType = function(type) {
+  return anychart.enums.normalizeCartesian3dSeriesType(type);
+};
+
+
+/** @inheritDoc */
 anychart.cartesian3dModule.Chart.prototype.isMode3d = function() {
   return true;
 };
@@ -326,7 +404,8 @@ anychart.cartesian3dModule.Chart.prototype.getX3DDistributionShift = function(se
   if (seriesIsStacked || !this.getOption('zDistribution')) {
     x3dShift = 0;
   } else {
-    var seriesCount = this.getSeriesCount();
+    var seriesCount = this.get3DSeriesCount_();
+    seriesIndex = this.get3DSeriesIndex_(seriesIndex);
     var drawIndex = seriesCount - seriesIndex - 1;
     x3dShift = (this.getX3DShift(seriesIsStacked) + this.zPaddingXShift) * drawIndex;
   }
@@ -344,7 +423,8 @@ anychart.cartesian3dModule.Chart.prototype.getY3DDistributionShift = function(se
   if (seriesIsStacked || !this.getOption('zDistribution')) {
     y3dShift = 0;
   } else {
-    var seriesCount = this.getSeriesCount();
+    var seriesCount = this.get3DSeriesCount_();
+    seriesIndex = this.get3DSeriesIndex_(seriesIndex);
     var drawIndex = seriesCount - seriesIndex - 1;
     y3dShift = (this.getY3DShift(seriesIsStacked) + this.zPaddingYShift) * drawIndex;
   }
@@ -357,7 +437,7 @@ anychart.cartesian3dModule.Chart.prototype.getY3DDistributionShift = function(se
  * @return {number}
  */
 anychart.cartesian3dModule.Chart.prototype.getX3DShift = function(seriesIsStacked) {
-  var seriesCount = this.getSeriesCount();
+  var seriesCount = this.get3DSeriesCount_();
   var zPaddingShift = this.zPaddingXShift;
   var seriesShift = this.x3dShift;
   if (!seriesIsStacked && this.getOption('zDistribution')) {
@@ -372,7 +452,7 @@ anychart.cartesian3dModule.Chart.prototype.getX3DShift = function(seriesIsStacke
  * @return {number}
  */
 anychart.cartesian3dModule.Chart.prototype.getY3DShift = function(seriesIsStacked) {
-  var seriesCount = this.getSeriesCount();
+  var seriesCount = this.get3DSeriesCount_();
   var zPaddingShift = this.zPaddingYShift;
   var seriesShift = this.y3dShift;
   if (!seriesIsStacked && this.getOption('zDistribution')) {
@@ -507,21 +587,47 @@ anychart.cartesian3dModule.Chart.prototype.prepare3d = function() {
   for (var i = 0; i < allSeries.length; i++) {
     series = allSeries[i];
     if (series && series.enabled()) {
-      // if (series.planIsStacked() && series.supportsMarkers()) {
-      //   var inc = i * anychart.core.CartesianBase.ZINDEX_INCREMENT_MULTIPLIER;
-      //   series.markers().setAutoZIndex(anychart.core.CartesianBase.ZINDEX_MARKER + inc);
-      // }
-
-      if (series.isDiscreteBased()) {
-        var iterator = series.getResetIterator();
-        while (iterator.advance()) {
-          this.setSeriesPointZIndex_(/** @type {anychart.core.series.Cartesian} */(series));
+      if (series.check(anychart.core.drawers.Capabilities.IS_3D_BASED)) {
+        if (series.isDiscreteBased()) {
+          var iterator = series.getResetIterator();
+          while (iterator.advance()) {
+            this.setSeriesPointZIndex_(/** @type {anychart.core.series.Cartesian} */(series));
+          }
+        } else if (series.supportsStack()) {
+          this.lastEnabledAreaSeriesMap[series.getScalesPairIdentifier()] = i;
         }
       } else {
-        this.lastEnabledAreaSeriesMap[series.getScalesPairIdentifier()] = i;
+        series.setAutoZIndex(series.autoIndex() * anychart.core.ChartWithSeries.ZINDEX_INCREMENT_MULTIPLIER + anychart.cartesian3dModule.Chart.ZINDEX_2D_LINE_SERIES);
       }
     }
   }
+};
+
+
+/**
+ * @return {number}
+ * @private
+ */
+anychart.cartesian3dModule.Chart.prototype.get3DSeriesCount_ = function() {
+  return goog.array.count(this.seriesList, function(series) {
+    return !!(series && series.enabled() && series.check(anychart.core.drawers.Capabilities.IS_3D_BASED));
+  });
+};
+
+
+/**
+ * @param {number} index
+ * @return {number}
+ * @private
+ */
+anychart.cartesian3dModule.Chart.prototype.get3DSeriesIndex_ = function(index) {
+  var res = 0;
+  for (var i = 0, len = Math.min(this.seriesList.length - 1, index); i <= len; i++) {
+    var series = this.seriesList[i];
+    if (series && series.enabled() && series.check(anychart.core.drawers.Capabilities.IS_3D_BASED))
+      res++;
+  }
+  return res - 1;
 };
 
 
@@ -529,7 +635,7 @@ anychart.cartesian3dModule.Chart.prototype.prepare3d = function() {
 anychart.cartesian3dModule.Chart.prototype.getContentAreaBounds = function(bounds) {
   var contentAreaBounds = bounds.clone().round();
   var boundsWithoutAxes = this.getBoundsWithoutAxes(contentAreaBounds);
-  var seriesCount = this.getSeriesCount();
+  var seriesCount = this.get3DSeriesCount_();
 
   var zAngle = /** @type {number} */ (this.getOption('zAngle'));
   var zAspect = /** @type {number} */ (this.getOption('zAspect'));
@@ -692,6 +798,8 @@ anychart.cartesian3dModule.Chart.prototype.setupByJSON = function(config, opt_de
   // proto['area'] = proto.area;
   // proto['bar'] = proto.bar;
   // proto['column'] = proto.column;
+  // proto['line'] = proto.line;
+  // proto['line2d'] = proto.line2d;
   proto['lineMarker'] = proto.lineMarker;
   proto['rangeMarker'] = proto.rangeMarker;
   proto['textMarker'] = proto.textMarker;

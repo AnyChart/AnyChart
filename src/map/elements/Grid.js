@@ -62,6 +62,23 @@ anychart.core.settings.populate(anychart.mapModule.elements.Grid, anychart.mapMo
 //endregion
 //region --- Settings
 /** @inheritDoc */
+anychart.mapModule.elements.Grid.prototype.scale = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.scale_ != opt_value) {
+      if (this.scale_)
+        this.scale_.unlistenSignals(this.scaleInvalidated, this);
+      this.scale_ = /** @type {anychart.mapModule.scales.Geo} */(opt_value);
+      if (this.scale_)
+        this.scale_.listenSignals(this.scaleInvalidated, this);
+      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION | anychart.ConsistencyState.BOUNDS,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+  }
+  return /** @type {?anychart.mapModule.scales.Geo} */(this.scale_ || this.axis_ && this.axis_.scale() || null);
+};
+
+
+/** @inheritDoc */
 anychart.mapModule.elements.Grid.prototype.scaleInvalidated = function(event) {
   var signal = 0;
   if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION))

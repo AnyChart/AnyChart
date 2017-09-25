@@ -287,15 +287,6 @@ anychart.core.Chart.prototype.isMode3d = function() {
 
 
 /**
- * Whether chart uses anychart.treeDataModule.Tree as data source.
- * @return {boolean}
- */
-anychart.core.Chart.prototype.usesTreeData = function() {
-  return false;
-};
-
-
-/**
  * Whether chart supports tooltip.
  * @return {boolean}
  */
@@ -3222,220 +3213,280 @@ anychart.core.Chart.prototype.exports = function(opt_value) {
 
 
 /**
- * Extract headers from chart data set or stock storage.
- * @param {anychart.data.Set|anychart.stockModule.data.TableStorage} dataSet
- * @param {Object} headers Object with headers.
- * @param {number} headersLength Headers length.
- * @return {number} headers length.
+ * Returns an array of objects that contain data.
+ * @return {Array.<{data: function():anychart.data.IDataSource}>}
  */
-anychart.core.Chart.prototype.extractHeaders = function(dataSet, headers, headersLength) {
-  var column;
-  for (var i = 0, len = dataSet.getRowsCount(); i < len; i++) {
-    var row = dataSet.row(i);
-
-    if (goog.isArray(row)) {
-      for (column = 0; column < row.length; column++)
-        if (!(column in headers))
-          headers[column] = headersLength++;
-    } else if (goog.isObject(row)) {
-      for (column in row)
-        if (!(column in headers))
-          headers[column] = headersLength++;
-    } else {
-      if (!('value' in headers))
-        headers['value'] = headersLength++;
-    }
-  }
-  return headersLength;
+anychart.core.Chart.prototype.getDataHolders = function() {
+  return /** @type {Array.<{data: function():anychart.data.IDataSource}>} */(this.getAllSeries());
 };
 
 
 /**
- * Escapes values.
- * @param {Array} row Array of values.
- * @param {string} colSep Columns separator.
- * @param {string} rowSep Rows separator.
+ * @return {Array.<anychart.data.IDataSource>}
  */
-anychart.core.Chart.prototype.escapeValuesInRow = function(row, colSep, rowSep) {
-  var i;
-  var value;
-  var len = row.length;
-  for (i = 0; i < len; i++) {
-    if (!goog.isDef(value = row[i]))
-      continue;
-    if (!goog.isString(value))
-      value = String(value);
-    if (value.indexOf(colSep) != -1) {
-      value = value.split('"').join('""');
-      value = '"' + value + '"';
-    } else if (value.indexOf(rowSep) != -1) {
-      value = value.split('"').join('""');
-      value = '"' + value + '"';
-    }
-    row[i] = value;
-  }
+anychart.core.Chart.prototype.getRawCsvDataSources = function() {
+  var res = goog.array.concat.apply(null, goog.array.map(
+      /** @type {Array} */(this.getDataHolders()),
+      function(item) {
+        return item.data().getDataSets();
+      }));
+  goog.array.removeDuplicates(res, res, anychart.utils.hash);
+  return res;
 };
 
 
 /**
- * Creates data suitable to create csv.
- * @param {Object} node Node.
- * @param {Array} rawData Raw data.
- * @param {Object} headers Hash map of seen columns.
- * @param {number} headersLength length of headers.
- * @param {?(string|number)} parentId Parent ID.
- * @param {?(string|number)} originalParent original parent id.
- * @private
- */
-anychart.core.Chart.prototype.makeObject_ = function(node, rawData, headers, headersLength, parentId, originalParent) {
-  var data = goog.object.clone(node['treeDataItemData']);
-  if (!goog.isDef(data['id'])) {
-    this.missedIds_++;
-    this.idStatus_ = -1;
-  }
-  data['parent'] = [this.nodesCount_, parentId, originalParent];
-  parentId = this.nodesCount_++;
-  rawData.push(data);
-  for (var key in data) {
-    if (!(key in headers))
-      headers[key] = headersLength++;
-  }
-  var children = node['children'];
-  if (children && children.length) {
-    for (var i = 0, len = children.length; i < len; i++)
-      this.makeObject_(children[i], rawData, headers, headersLength, parentId, data['id']);
-  }
-};
-
-
-/**
- * Returns CSV string with tree data.
- * @param {Object.<string, (string|boolean|undefined)>=} opt_csvSettings CSV settings.
- * @return {string} CSV string.
- * @private
- */
-anychart.core.Chart.prototype.toTreeDataCsv_ = function(opt_csvSettings) {
-  var settings = goog.isObject(opt_csvSettings) ? opt_csvSettings : {};
-  var rowsSeparator = settings['rowsSeparator'] || '\n';
-  anychart.utils.checkSeparator(rowsSeparator);
-  var columnsSeparator = settings['columnsSeparator'] || ',';
-  anychart.utils.checkSeparator(columnsSeparator);
-  var ignoreFirstRow = settings['ignoreFirstRow'] || false;
-
-  var data = (/** @type {{data:Function}} */(this)).data();
-
-  var serialized = data.serialize();
-  var roots = serialized['children'];
-
-  var rawData = [];
-  var headers = {};
-  var i, j;
-  /**
-   * -1 means there is at least one missing id, so use auto generated id|parent and save original id|parent
-   *  0 means there is no id at all use auto generated id|parent without original
-   *  1 means there are all ids in tree, so do not use auto generated - use original id|parent
-   * @type {number}
-   * @private
-   */
-  this.idStatus_ = 1;
-  this.missedIds_ = 0;
-  this.nodesCount_ = 0;
-  headers['id'] = 0;
-  headers['parent'] = 1;
-  for (i = 0; i < roots.length; i++) {
-    this.makeObject_(roots[i], rawData, headers, 2, null, null);
-  }
-  if (this.missedIds_ === this.nodesCount_) {
-    this.idStatus_ = 0;
-  } else if (this.missedIds_ === 0) {
-    this.idStatus_ = 1;
-  }
-
-  var key;
-  var columns = [];
-
-  for (key in headers)
-    columns[headers[key]] = key;
-
-  var rowArray;
-  var rowStrings = [];
-  var row;
-  var column;
-  var parent;
-  var finalValue;
-  var id, parentId;
-  if (this.idStatus_ < 0) {
-    headers['__original_id__'] = columns.length;
-    headers['__original_parent__'] = columns.length + 1;
-    columns.push('__original_id__', '__original_parent__');
-  }
-
-  if (!ignoreFirstRow)
-    rowStrings.push(columns.join(columnsSeparator));
-  for (i = 0; i < rawData.length; i++) {
-    rowArray = new Array(columns.length);
-    row = rawData[i];
-    // parent - array with
-    // 0 - auto generated id
-    // 1 - auto generated parent id
-    // 2 - original parent id
-    parent = row['parent'];
-
-    if (this.idStatus_ <= 0) {
-      id = parent[0];
-      parentId = parent[1];
-    } else {
-      id = row['id'];
-      parentId = parent[2];
-    }
-
-    for (j = 0; j < columns.length; j++) {
-      column = columns[j];
-      finalValue = goog.isObject(row[column]) ? goog.json.serialize(row[column]) : row[column];
-
-      if (column === 'id')
-        rowArray[j] = id;
-
-      else if (column === 'parent')
-        rowArray[j] = goog.isNull(parentId) ? undefined : parentId;
-
-      else if (column === '__original_parent__')
-        rowArray[j] = parent[2];
-
-      else if (column === '__original_id__')
-        rowArray[j] = row['id'];
-
-      else
-        rowArray[j] = finalValue;
-    }
-    this.escapeValuesInRow(rowArray, columnsSeparator, rowsSeparator);
-    rowStrings.push(rowArray.join(columnsSeparator));
-  }
-  return rowStrings.join(rowsSeparator);
-};
-
-
-/**
- * Creates additional headers for specific csv.
- * @param {Object} headers Headers.
- * @param {number} headersLength Current length.
- * @param {boolean} scatterPolar Scatter or polar.
- * @return {number} Headers length.
- */
-anychart.core.Chart.prototype.createSpecificCsvHeaders = function(headers, headersLength, scatterPolar) {
-  return headersLength;
-};
-
-
-/**
- * Method called each iteration over each series data when generating specific csv.
- * @param {anychart.data.View} seriesData
- * @param {Object} csvRows
+ * @param {Array} targetCsvRow
+ * @param {*} dataRow
  * @param {Object} headers
- * @param {number} rowIndex
- * @param {string|number} groupingField
+ * @protected
  */
-anychart.core.Chart.prototype.onBeforeRowsValuesSpreading = function(seriesData, csvRows, headers, rowIndex, groupingField) {};
+anychart.core.Chart.prototype.populateRawCsvRow = function(targetCsvRow, dataRow, headers) {
+  var column;
+  if (goog.isArray(dataRow)) {
+    for (column = 0; column < dataRow.length; column++)
+      populate(targetCsvRow, dataRow[column], headers[column]);
+  } else if (goog.isObject(dataRow)) {
+    for (column in dataRow)
+      populate(targetCsvRow, dataRow[column], headers[column]);
+  } else {
+    populate(targetCsvRow, dataRow, headers['value']);
+  }
+
+  function populate(resultRow, val, index) {
+    resultRow[index] = goog.isObject(val) ? goog.json.serialize(val) : val;
+  }
+};
+
+
+/**
+ * Gets data for RAW toCsv mode.
+ * @return {{headers: Array.<string>, data: Array.<Array.<*>>}}
+ * @protected
+ */
+anychart.core.Chart.prototype.getRawCsvData = function() {
+  var dataSources = this.getRawCsvDataSources();
+
+  var headers = {};
+  var headersLength = 0;
+  var needsDataSourceNumber = dataSources.length > 1;
+  if (needsDataSourceNumber) {
+    headers['#'] = headersLength++;
+  }
+  var i;
+  for (i = 0; i < dataSources.length; i++) {
+    headersLength = dataSources[i].populateObjWithKnownFields(headers, headersLength);
+  }
+
+  var csvHeaders = [];
+  for (var header in headers)
+    csvHeaders[headers[header]] = header;
+
+  var csvData = [];
+  for (i = 0; i < dataSources.length; i++) {
+    var dataSource = dataSources[i];
+    for (var j = 0, len = dataSource.getRowsCount(); j < len; j++) {
+      var csvRow = new Array(headersLength);
+      this.populateRawCsvRow(csvRow, dataSource.getRow(j), headers);
+
+      if (needsDataSourceNumber)
+        csvRow[0] = i;
+      csvData.push(csvRow);
+    }
+  }
+  return {headers: csvHeaders, data: csvData};
+};
+
+
+/**
+ * @param {anychart.enums.ChartDataExportMode} mode
+ * @param {*} series
+ * @param {*} x
+ * @return {boolean}
+ * @protected
+ */
+anychart.core.Chart.prototype.shouldAddCsvRow = function(mode, series, x) {
+  return true;
+};
+
+
+/**
+ * @return {Array.<string>}
+ * @protected
+ */
+anychart.core.Chart.prototype.getCsvGrouperColumn = function() {
+  return [];
+};
+
+
+/**
+ * @param {anychart.data.IRowInfo} iterator
+ * @return {*}
+ * @protected
+ */
+anychart.core.Chart.prototype.getCsvGrouperValue = function(iterator) {
+  return iterator.getIndex();
+};
+
+
+/**
+ * @param {anychart.data.IRowInfo} iterator
+ * @param {*} dataHolder
+ * @return {?string}
+ * @protected
+ */
+anychart.core.Chart.prototype.getCsvGrouperAlias = function(iterator, dataHolder) {
+  return null;
+};
+
+
+/**
+ * Gets y value names from the *series*.
+ * @param {*} dataHolder
+ * @return {Array}
+ */
+anychart.core.Chart.prototype.getCsvColumns = function(dataHolder) {
+  return (dataHolder instanceof anychart.core.series.Base) ? dataHolder.getYValueNames() : ['value'];
+};
+
+
+/**
+ * Wraps passed field name with the series id.
+ * @param {string} name
+ * @param {*} dataHolder
+ * @param {number} index
+ * @param {number} columnsCount
+ * @return {string}
+ */
+anychart.core.Chart.prototype.prefixCsvColumnName = function(name, dataHolder, index, columnsCount) {
+  return ((dataHolder instanceof anychart.core.series.Base) ? dataHolder.name() : ('series' + String(index))) +
+      ((columnsCount > 1) ? (' (' + name + ')') : '');
+};
+
+
+/**
+ * @param {*} x
+ * @param {?string} xAlias
+ * @param {Array.<Array>} data
+ * @param {Object.<number>} xValues
+ * @param {string} id
+ * @param {number} index
+ * @return {Array}
+ * @protected
+ */
+anychart.core.Chart.prototype.getCsvExportRow = function(x, xAlias, data, xValues, id, index) {
+  var xHash = anychart.utils.hash(x);
+  var rowIndex;
+  if (xHash in xValues) {
+    rowIndex = xValues[xHash];
+  } else {
+    rowIndex = xValues[xHash] = data.length;
+    data.push([xAlias || String(x)]);
+  }
+  return data[rowIndex];
+};
+
+
+/**
+ * @param {*} x
+ * @param {?string} xAlias
+ * @param {Array.<Array>} data
+ * @param {Object.<number>} xValues
+ * @param {string} id
+ * @param {number} index
+ * @return {Array}
+ * @protected
+ */
+anychart.core.Chart.prototype.getCsvExportRowScatter = function(x, xAlias, data, xValues, id, index) {
+  var xHash = id + index;
+  var rowIndex;
+  if (xHash in xValues) {
+    rowIndex = xValues[xHash];
+  } else {
+    rowIndex = xValues[xHash] = data.length;
+    data.push([xAlias || String(x)]);
+  }
+  return data[rowIndex];
+};
+
+
+/**
+ * @param {*} dataHolder
+ * @param {anychart.enums.ChartDataExportMode} mode
+ * @return {anychart.data.IIterator}
+ * @protected
+ */
+anychart.core.Chart.prototype.getCsvIterator = function(dataHolder, mode) {
+  return goog.isFunction(dataHolder.getIterator) ? dataHolder.getIterator() : dataHolder.data().getIterator();
+};
+
+
+/**
+ * @param {*} dataHolder
+ * @return {string}
+ * @protected
+ */
+anychart.core.Chart.prototype.identifyCsvDataHolder = function(dataHolder) {
+  return anychart.utils.hash(dataHolder.data().getDataSets()[0]);
+};
+
+
+/**
+ * @param {Array} row
+ * @param {Array} names
+ * @param {anychart.data.IRowInfo} iterator
+ * @param {Array} headers
+ * @protected
+ */
+anychart.core.Chart.prototype.populateCsvRow = function(row, names, iterator, headers) {
+  for (var i = 0; i < names.length; i++) {
+    row[i + headers.length] = iterator.get(names[i]);
+  }
+};
+
+
+/**
+ * Gets data for DEFAULT toCsv mode.
+ * @param {anychart.enums.ChartDataExportMode} mode
+ * @return {{headers: Array.<string>, data: Array.<Array.<*>>}}
+ */
+anychart.core.Chart.prototype.getCsvData = function(mode) {
+  var dataHolders = this.getDataHolders();
+  var headers = this.getCsvGrouperColumn();
+  var xValues = {};
+  var j;
+  var data = [];
+  for (var i = 0; i < dataHolders.length; i++) {
+    var dataHolder = dataHolders[i];
+    var names = this.getCsvColumns(dataHolder);
+    if (names.length) {
+      var iterator = this.getCsvIterator(dataHolder, mode);
+      iterator.reset();
+      var holderId = this.identifyCsvDataHolder(dataHolder);
+      while (iterator.advance()) {
+        var grouper = this.getCsvGrouperValue(iterator);
+        if (this.shouldAddCsvRow(mode, dataHolder, grouper)) {
+          var row = this.getCsvExportRow(
+              grouper,
+              this.getCsvGrouperAlias(iterator, dataHolder),
+              data,
+              xValues,
+              holderId,
+              iterator.getIndex());
+          this.populateCsvRow(row, names, iterator, headers);
+        }
+      }
+      if (dataHolders.length > 1) {
+        for (j = 0; j < names.length; j++) {
+          headers.push(this.prefixCsvColumnName(names[j], dataHolder, i + 1, names.length));
+        }
+      } else {
+        headers.push.apply(headers, names);
+      }
+    }
+  }
+  return {headers: headers, data: data};
+};
 
 
 /**
@@ -3445,188 +3496,11 @@ anychart.core.Chart.prototype.onBeforeRowsValuesSpreading = function(seriesData,
  * @return {string} CSV string.
  */
 anychart.core.Chart.prototype.toCsv = function(opt_chartDataExportMode, opt_csvSettings) {
-  if (this.usesTreeData())
-    return this.toTreeDataCsv_(opt_csvSettings);
-
   opt_chartDataExportMode = anychart.enums.normalizeChartDataExportMode(opt_chartDataExportMode);
-  var rawData = (opt_chartDataExportMode == anychart.enums.ChartDataExportMode.RAW);
-  var type = this.getType();
-  var scatterPolar = (type == anychart.enums.ChartTypes.SCATTER ||
-      type == anychart.enums.ChartTypes.POLAR ||
-      type == anychart.enums.ChartTypes.QUADRANT);
-  var settings = goog.isObject(opt_csvSettings) ? opt_csvSettings : {};
-  var rowsSeparator = settings['rowsSeparator'] || '\n';
-  anychart.utils.checkSeparator(rowsSeparator);
-  var columnsSeparator = settings['columnsSeparator'] || ',';
-  anychart.utils.checkSeparator(columnsSeparator);
-  var ignoreFirstRow = settings['ignoreFirstRow'] || false;
-
-  var isGauge =
-      type == anychart.enums.GaugeTypes.CIRCULAR |
-      type == anychart.enums.GaugeTypes.LINEAR |
-      type == anychart.enums.GaugeTypes.BULLET |
-      type == anychart.enums.GaugeTypes.THERMOMETER |
-      type == anychart.enums.GaugeTypes.TANK |
-      type == anychart.enums.GaugeTypes.LED;
-  var seriesList = isGauge ? [this] : this.getAllSeries();
-  var seriesListLength = seriesList.length;
-  var series;
-  var seriesData;
-  var seriesDataSets;
-  var i, j, len, uid;
-  var dataSet = null;
-  var dataSets = {};
-  var csvHeaders = [];
-  var dataSetsCount = 0;
-
-  for (i = 0; i < seriesListLength; i++) {
-    series = /** @type {anychart.core.series.Base|anychart.core.ChartWithSeries|anychart.resourceModule.Chart|
-        anychart.pyramidFunnelModule.Chart|anychart.vennModule.Chart|anychart.linearGaugeModule.Chart|anychart.bulletModule.Chart|
-        anychart.treemapModule.Chart|anychart.tagCloudModule.Chart|anychart.sparklineModule.Chart|anychart.ganttModule.Chart|
-        anychart.pertModule.Chart|anychart.circularGaugeModule.Chart} */ (seriesList[i]);
-    seriesData = /** @type {anychart.data.View} */ (series.data());
-    seriesDataSets = seriesData.getDataSets();
-    for (j = 0, len = seriesDataSets.length; j < len; j++) {
-      dataSet = seriesDataSets[j];
-      uid = goog.getUid(dataSet);
-      if (!(uid in dataSets)) {
-        dataSets[uid] = dataSet;
-        dataSetsCount++;
-      }
-    }
-  }
-  var needCountDataSets = dataSetsCount > 1;
-  var csvStrings;
-  var headers, header;
-  var headersLength = 0;
-  var finalValue;
-
-  if (rawData) {
-    headers = {};
-    if (needCountDataSets) {
-      headers['#'] = headersLength++;
-    }
-    for (uid in dataSets) {
-      dataSet = dataSets[uid];
-      headersLength = this.extractHeaders(dataSet, headers, headersLength);
-    }
-
-    var dataSetNumber = 0;
-    csvStrings = [];
-    if (!ignoreFirstRow) {
-      csvHeaders = [];
-      for (header in headers)
-        csvHeaders[headers[header]] = header;
-      csvStrings.push(csvHeaders.join(columnsSeparator));
-    }
-    for (uid in dataSets) {
-      dataSet = dataSets[uid];
-      var column;
-      var columnIndex;
-
-      for (i = 0, len = dataSet.getRowsCount(); i < len; i++) {
-        var csvRow = new Array(headersLength);
-        var row = dataSet.row(i);
-        if (goog.isArray(row)) {
-          for (column = 0; column < row.length; column++) {
-            columnIndex = headers[column];
-            finalValue = goog.isObject(row[column]) ? goog.json.serialize(row[column]) : row[column];
-            csvRow[columnIndex] = finalValue;
-          }
-        } else if (goog.isObject(row)) {
-          for (column in row) {
-            columnIndex = headers[column];
-            finalValue = goog.isObject(row[column]) ? goog.json.serialize(row[column]) : row[column];
-            csvRow[columnIndex] = finalValue;
-          }
-        } else {
-          columnIndex = headers['value'];
-          csvRow[columnIndex] = row;
-        }
-
-        if (needCountDataSets)
-          csvRow[0] = dataSetNumber;
-        this.escapeValuesInRow(csvRow, columnsSeparator, rowsSeparator);
-        csvStrings.push(csvRow.join(columnsSeparator));
-      }
-      dataSetNumber++;
-    }
-    return csvStrings.join(rowsSeparator);
-  } else {
-    //x, 0_0, 0_1, 0_2, 1_0, 1_1
-    //p1, 1, p1, 10, p1, 20'
-    headers = {};
-    if (!scatterPolar) {
-      headers['x'] = headersLength++;
-    }
-    headersLength = this.createSpecificCsvHeaders(headers, headersLength, scatterPolar);
-    var seriesPrefix;
-    var csvRows = {};
-    var iterator;
-    var k;
-    var prefixed;
-    var groupingField;
-    for (i = 0; i < seriesListLength; i++) {
-      series = seriesList[i];
-      seriesPrefix = seriesListLength > 1 ? goog.isFunction(series.id) ? series.id() + '_' : ('series_' + i + '_') : '';
-      seriesData = series.data();
-      iterator = seriesData.getIterator();
-      while (iterator.advance()) {
-        k = iterator.getIndex();
-        groupingField = /** @type {number|string} */ (scatterPolar ? k : iterator.get('x'));
-
-        if (!csvRows[groupingField]) {
-          csvRows[groupingField] = [];
-          if (!scatterPolar)
-            csvRows[groupingField][0] = groupingField;
-        }
-
-        this.onBeforeRowsValuesSpreading(seriesData, csvRows, headers, k, groupingField);
-
-        row = seriesData.row(k);
-
-        if (goog.isArray(row)) {
-          for (column = 0; column < row.length; column++) {
-            prefixed = seriesPrefix + column;
-            if (!(prefixed in headers)) {
-              headers[prefixed] = headersLength++;
-            }
-            columnIndex = headers[prefixed];
-            finalValue = goog.isObject(row[column]) ? goog.json.serialize(row[column]) : row[column];
-            csvRows[groupingField][columnIndex] = finalValue;
-          }
-        } else if (goog.isObject(row)) {
-          for (column in row) {
-            prefixed = seriesPrefix + column;
-            if (!(prefixed in headers)) {
-              headers[prefixed] = headersLength++;
-            }
-            columnIndex = headers[prefixed];
-            finalValue = goog.isObject(row[column]) ? goog.json.serialize(row[column]) : row[column];
-            csvRows[groupingField][columnIndex] = finalValue;
-          }
-        } else {
-          prefixed = seriesPrefix + 'value';
-          if (!(prefixed in headers)) {
-            headers[prefixed] = headersLength++;
-          }
-          columnIndex = headers[prefixed];
-          csvRows[groupingField][columnIndex] = row;
-        }
-      }
-    }
-    csvStrings = [];
-    for (header in headers) {
-      csvHeaders[headers[header]] = header;
-    }
-    if (!ignoreFirstRow)
-      csvStrings.push(csvHeaders.join(columnsSeparator));
-    for (row in csvRows) {
-      this.escapeValuesInRow(csvRows[row], columnsSeparator, rowsSeparator);
-      csvStrings.push(csvRows[row].join(columnsSeparator));
-    }
-    return csvStrings.join(rowsSeparator);
-  }
+  var result = (opt_chartDataExportMode == anychart.enums.ChartDataExportMode.RAW) ?
+    this.getRawCsvData() :
+    this.getCsvData(opt_chartDataExportMode);
+  return anychart.utils.serializeCsv(result.headers, result.data, opt_csvSettings);
 };
 
 

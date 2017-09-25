@@ -155,6 +155,12 @@ anychart.core.ui.Background.prototype.getSignal = function(fieldName) {
 };
 
 
+/** @inheritDoc */
+anychart.core.ui.Background.prototype.isResolvable = function() {
+  return true;
+};
+
+
 //endregion
 //region -- IResolvable implementation
 /** @inheritDoc */

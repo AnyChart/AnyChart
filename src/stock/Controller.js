@@ -85,7 +85,11 @@ anychart.stockModule.Controller = function() {
     preFirstIndex: NaN,
     lastIndex: NaN,
     postLastIndex: NaN,
-    minDistance: NaN
+    minDistance: NaN,
+    startKeyRatio: NaN,
+    endKeyRatio: NaN,
+    startIndexRatio: NaN,
+    endIndexRatio: NaN
   };
 
   /**
@@ -102,7 +106,11 @@ anychart.stockModule.Controller = function() {
     preFirstIndex: NaN,
     lastIndex: NaN,
     postLastIndex: NaN,
-    minDistance: NaN
+    minDistance: NaN,
+    startKeyRatio: NaN,
+    endKeyRatio: NaN,
+    startIndexRatio: NaN,
+    endIndexRatio: NaN
   };
 
   /**
@@ -224,6 +232,15 @@ anychart.stockModule.Controller.prototype.deregisterSource = function(selectable
 
 
 /**
+ * Returns all involved tables.
+ * @return {Object.<anychart.stockModule.data.Table>}
+ */
+anychart.stockModule.Controller.prototype.getAllTables = function() {
+  return this.tables_;
+};
+
+
+/**
  * Refreshes full data range boundaries.
  * @return {boolean} Returns true if the full range have changed.
  */
@@ -250,27 +267,57 @@ anychart.stockModule.Controller.prototype.refreshFullRange = function() {
  *    2 - scroller selection update;
  *    3 - both updated.
  * @param {number} newPixelWidth
+ * @param {boolean} preserveSelectedRange
+ * @param {anychart.stockModule.scales.Scatter} scale
+ * @param {anychart.stockModule.scales.Scatter} scrollerScale
  * @return {number}
  */
-anychart.stockModule.Controller.prototype.refreshSelection = function(newPixelWidth) {
+anychart.stockModule.Controller.prototype.refreshSelection = function(newPixelWidth, preserveSelectedRange, scale, scrollerScale) {
   this.refreshFullRange();
+  this.updateFullScaleRange(scrollerScale);
+  this.updateFullScaleRange(scale);
   var alignedFirst = this.getFirstKey();
   var alignedLast = this.getLastKey();
 
   // we check main registry change in this manner, because there can be attempts to update main registry before
   // selection refreshing.
   var mainRegistryUpdated = this.hasInvalidationState(anychart.ConsistencyState.STOCK_DATA);
-
   this.currentPixelWidth_ = newPixelWidth;
 
+  var result = 0;
+  var scrollerSelectionChanged = this.select_(
+      alignedFirst,
+      alignedLast,
+      this.scrollerGrouping_,
+      this.scrollerSources_,
+      this.currentScrollerRegistry_,
+      this.currentScrollerSelection_,
+      mainRegistryUpdated);
+  if (scrollerSelectionChanged) {
+    this.currentScrollerRegistry_ = scrollerSelectionChanged[0];
+    this.currentScrollerSelection_ = scrollerSelectionChanged[1];
+    var interval = this.scrollerGrouping_.getCurrentDataInterval();
+    scrollerScale.setCurrentRange(
+        this.currentScrollerSelection_.startKey, this.currentScrollerSelection_.endKey,
+        interval['unit'], interval['count']);
+    result += 2;
+  }
+
   var startKey = this.currentSelection_.startKey;
-  if (isNaN(startKey) || (this.currentSelectionSticksLeft() && !isNaN(alignedFirst)))
-    startKey = alignedFirst;
   var endKey = this.currentSelection_.endKey;
-  if (isNaN(endKey) || (this.currentSelectionSticksRight() && !isNaN(alignedLast)))
+  if ((!preserveSelectedRange || this.currentSelectionSticksLeft() || this.currentSelectionSticksRight()) &&
+      !isNaN(this.currentStartKeyRatio_) &&
+      !isNaN(this.currentEndKeyRatio_) &&
+      !isNaN(alignedFirst) &&
+      !isNaN(alignedLast)) {
+    startKey = scrollerScale.inverseTransform(this.currentStartKeyRatio_);
+    endKey = scrollerScale.inverseTransform(this.currentEndKeyRatio_);
+  }
+  if (isNaN(startKey))
+    startKey = alignedFirst;
+  if (isNaN(endKey))
     endKey = alignedLast;
 
-  var result = 0;
   if (!isNaN(startKey)) {
     var selectionChanged = this.select_(
         startKey,
@@ -284,22 +331,11 @@ anychart.stockModule.Controller.prototype.refreshSelection = function(newPixelWi
       this.currentRegistry_ = selectionChanged[0];
       this.currentSelection_ = selectionChanged[1];
       result += 1;
-    }
-
-    var scrollerSelectionChanged = this.select_(
-        alignedFirst,
-        alignedLast,
-        this.scrollerGrouping_,
-        this.scrollerSources_,
-        this.currentScrollerRegistry_,
-        this.currentScrollerSelection_,
-        mainRegistryUpdated);
-    if (scrollerSelectionChanged) {
-      this.currentScrollerRegistry_ = scrollerSelectionChanged[0];
-      this.currentScrollerSelection_ = scrollerSelectionChanged[1];
-      result += 2;
+      this.updateCurrentScaleRange(scale);
     }
   }
+  this.currentStartKeyRatio_ = scrollerScale.transform(this.currentSelection_.startKey);
+  this.currentEndKeyRatio_ = scrollerScale.transform(this.currentSelection_.endKey);
 
   this.markConsistent(anychart.ConsistencyState.STOCK_DATA);
   return result;
@@ -310,9 +346,10 @@ anychart.stockModule.Controller.prototype.refreshSelection = function(newPixelWi
  * Selects a data range between two keys. Returns true, whether the new select updated anything.
  * @param {number} startKey
  * @param {number} endKey
+ * @param {anychart.stockModule.scales.Scatter} scrollerScale
  * @return {boolean}
  */
-anychart.stockModule.Controller.prototype.select = function(startKey, endKey) {
+anychart.stockModule.Controller.prototype.select = function(startKey, endKey, scrollerScale) {
   if (isNaN(startKey)) startKey = this.currentSelection_.startKey;
   if (isNaN(endKey)) endKey = this.currentSelection_.endKey;
 
@@ -332,6 +369,8 @@ anychart.stockModule.Controller.prototype.select = function(startKey, endKey) {
   if (result) {
     this.currentRegistry_ = result[0];
     this.currentSelection_ = result[1];
+    this.currentStartKeyRatio_ = scrollerScale.transform(this.currentSelection_.startKey);
+    this.currentEndKeyRatio_ = scrollerScale.transform(this.currentSelection_.endKey);
   }
   return !!result;
 };
@@ -386,9 +425,7 @@ anychart.stockModule.Controller.prototype.select_ = function(startKey, endKey, g
   }
 
   // updating registry
-  var registryUpdated = (registry == this.mainRegistry_) ?
-      mainRegistryUpdated :
-      this.updateRegistrySources_(registry, interval);
+  var registryUpdated = this.updateRegistrySources_(registry, interval) || mainRegistryUpdated;
 
   if (selectionRangeChanged || registry != currentRegistry || registryUpdated) {
     // initializing selection
@@ -529,19 +566,11 @@ anychart.stockModule.Controller.prototype.updateMainRegistry = function() {
 /**
  * Updates current range for scale.
  * @param {anychart.stockModule.scales.Scatter} scale
- * @param {boolean} forScroller
  */
-anychart.stockModule.Controller.prototype.updateCurrentScaleRange = function(scale, forScroller) {
-  var selection, interval;
-  if (forScroller) {
-    selection = this.currentScrollerSelection_;
-    interval = this.scrollerGrouping().getCurrentDataInterval();
-  } else {
-    selection = this.currentSelection_;
-    interval = this.grouping().getCurrentDataInterval();
-  }
+anychart.stockModule.Controller.prototype.updateCurrentScaleRange = function(scale) {
+  var interval = this.grouping().getCurrentDataInterval();
   scale.setCurrentRange(
-      selection.startKey, selection.endKey,
+      this.currentSelection_.startKey, this.currentSelection_.endKey,
       interval['unit'], interval['count']);
 };
 

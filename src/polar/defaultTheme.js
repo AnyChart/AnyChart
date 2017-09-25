@@ -59,6 +59,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'yScale': 1,
     'barsPadding': 0,
     'barGroupsPadding': 0,
+    'maxPointWidth': '100%',
     'a11y': {
       'titleFormat': anychart.core.defaultTheme.scatterA11yTitleFormatter
     }

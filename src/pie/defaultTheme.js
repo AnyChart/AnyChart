@@ -2,7 +2,6 @@ goog.provide('anychart.pieModule.defaultTheme');
 
 
 goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
-// merge with pieFunnelPyramidBase
   'pie': {
     'animation': {
       'duration': 2000
@@ -19,8 +18,10 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'outsideLabelsCriticalAngle': 60,
     'outsideLabelsSpace': 30,
     'insideLabelsOffset': '50%',
-    'labels': {
-      'format': anychart.core.defaultTheme.PERCENT_VALUE_TOKEN + '%'
+    'normal': {
+      'labels': {
+        'format': anychart.core.defaultTheme.PERCENT_VALUE_TOKEN + '%'
+      }
     },
     'a11y': {
       'titleFormat': anychart.core.defaultTheme.pieA11yTitleFormatter

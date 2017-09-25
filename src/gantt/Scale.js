@@ -201,6 +201,14 @@ anychart.ganttModule.Scale.DEFAULT_ZOOM_FACTOR = 1.25;
 
 
 /**
+ * @return {anychart.enums.ScaleTypes}
+ */
+anychart.ganttModule.Scale.prototype.getType = function() {
+  return anychart.enums.ScaleTypes.GANTT;
+};
+
+
+/**
  * Creates function that returns formatted string by pattern.
  * @param {string} pattern - Pattern.
  * @param {string=} opt_template - Template to create a resulting string.

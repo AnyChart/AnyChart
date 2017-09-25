@@ -398,6 +398,15 @@ anychart.stockModule.data.Table.prototype.getRightMostFieldByComputerIndex = fun
 };
 
 
+/**
+ * Returns a DT pattern used to parse X values of the table.
+ * @return {string}
+ */
+anychart.stockModule.data.Table.prototype.getDTPatten = function() {
+  return this.storage_.getDTPattern() || 'yyyy-MM-ddTHH:mm:ss.SSS';
+};
+
+
 /** @inheritDoc */
 anychart.stockModule.data.Table.prototype.disposeInternal = function() {
   this.suspendSignalsDispatching();

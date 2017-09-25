@@ -119,20 +119,27 @@ anychart.core.axisMarkers.PathBase.prototype.layout = goog.abstractMethod;
 /**
  * Getter/setter for default scale.
  * Works with instances of anychart.scales.Base only.
- * @param {(anychart.scales.Base|anychart.ganttModule.Scale)=} opt_value - Scale.
+ * @param {(anychart.scales.Base|anychart.ganttModule.Scale|Object|anychart.enums.ScaleTypes)=} opt_value - Scale.
  * @return {anychart.scales.Base|anychart.ganttModule.Scale|!anychart.core.axisMarkers.PathBase} - Axis scale or
  *  itself for method chaining.
  */
 anychart.core.axisMarkers.PathBase.prototype.scaleInternal = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.scale_ != opt_value) {
-      if (this.scale_)
+    var scType = opt_value && goog.isFunction(opt_value.getType) && opt_value.getType();
+    var ganttScale = scType == anychart.enums.ScaleTypes.GANTT;
+    var val = ganttScale ?
+        (opt_value == this.scale_ ? null : opt_value) :
+        anychart.scales.Base.setupScale(/** @type {anychart.scales.Base} */(this.scale_), opt_value, null, anychart.scales.Base.ScaleTypes.ALL_DEFAULT, null, this.scaleInvalidated, this);
+    if (val || (goog.isNull(opt_value) && this.scale_)) {
+      var dispatch = this.scale_ == val;
+      if (!val)
         this.scale_.unlistenSignals(this.scaleInvalidated, this);
-      this.scale_ = opt_value;
-      if (this.scale_)
-        this.scale_.listenSignals(this.scaleInvalidated, this);
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      this.scale_ = /** @type {anychart.ganttModule.Scale|anychart.scales.Base} */(val);
+      if (val && !ganttScale)
+        val.resumeSignalsDispatching(dispatch);
+      if (!dispatch)
+        this.invalidate(anychart.ConsistencyState.BOUNDS,
+            anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   } else {

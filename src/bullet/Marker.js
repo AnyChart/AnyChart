@@ -226,15 +226,19 @@ anychart.bulletModule.Marker.prototype.isHorizontal = function() {
 
 /**
  * Getter/setter for bullet marker scale.
- * @param {anychart.scales.Base=} opt_value Scale.
+ * @param {(anychart.scales.Base|Object|anychart.enums.ScaleTypes)=} opt_value Scale.
  * @return {(anychart.scales.Base|!anychart.bulletModule.Marker)}
  */
 anychart.bulletModule.Marker.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.scale_ != opt_value) {
-      this.scale_ = opt_value;
-      this.scale_.listenSignals(this.onScaleSignal_, this);
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    var val = anychart.scales.Base.setupScale(this.scale_, opt_value, null,
+        anychart.scales.Base.ScaleTypes.SCATTER, null, this.onScaleSignal_, this);
+    if (val) {
+      var dispatch = this.scale_ == val;
+      this.scale_ = val;
+      val.resumeSignalsDispatching(dispatch);
+      if (!dispatch)
+        this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   }

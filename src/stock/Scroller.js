@@ -1272,6 +1272,18 @@ anychart.stockModule.Scroller.prototype.seriesInvalidated_ = function(e) {
 
 
 /**
+ * Resets series shared stack.
+ */
+anychart.stockModule.Scroller.prototype.resetSeriesStack = function() {
+  for (var i = 0; i < this.series_.length; i++) {
+    var series = this.series_[i];
+    if (series)
+      series.resetSharedStack();
+  }
+};
+
+
+/**
  * Invalidates all series.
  * @private
  */
@@ -1401,32 +1413,27 @@ anychart.stockModule.Scroller.prototype.isVertical = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Default plot Y scale getter/setter.
- * @param {(anychart.enums.ScatterScaleTypes|anychart.scales.ScatterBase)=} opt_value Y Scale to set.
+ * @param {(anychart.enums.ScatterScaleTypes|Object|anychart.scales.ScatterBase)=} opt_value Y Scale to set.
  * @return {!(anychart.scales.ScatterBase|anychart.stockModule.Scroller)} Default chart scale value or itself for method chaining.
  */
 anychart.stockModule.Scroller.prototype.yScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (goog.isString(opt_value)) {
-      opt_value = anychart.scales.ScatterBase.fromString(opt_value, false);
-    }
-    if (!(opt_value instanceof anychart.scales.ScatterBase)) {
-      anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['Scatter chart scales', 'scatter', 'linear, log']);
-      return this;
-    }
-    if (this.yScale_ != opt_value) {
-      if (this.yScale_)
-        this.yScale_.unlistenSignals(this.yScaleInvalidated, this);
-      this.yScale_ = opt_value;
-      if (this.yScale_)
-        this.yScale_.listenSignals(this.yScaleInvalidated, this);
-      for (var i = 0; i < this.series_.length; i++) {
-        var series = this.series_[i];
-        if (series && series.enabled() && series.yScale() == this.yScale_) {
-          series.invalidate(anychart.ConsistencyState.SERIES_POINTS);
-          this.invalidate(anychart.ConsistencyState.STOCK_SCROLLER_SERIES);
+    var val = anychart.scales.Base.setupScale(this.yScale_, opt_value, null,
+        anychart.scales.Base.ScaleTypes.SCATTER, ['Scroller Y scale', 'scatter', 'linear, log'], this.yScaleInvalidated, this);
+    if (val) {
+      var dispatch = this.yScale_ == val;
+      this.yScale_ = /** @type {anychart.scales.ScatterBase} */(val);
+      this.yScale_.resumeSignalsDispatching(dispatch);
+      if (!dispatch) {
+        for (var i = 0; i < this.series_.length; i++) {
+          var series = this.series_[i];
+          if (series && series.enabled() && series.yScale() == this.yScale_) {
+            series.invalidate(anychart.ConsistencyState.SERIES_POINTS);
+            this.invalidate(anychart.ConsistencyState.STOCK_SCROLLER_SERIES);
+          }
         }
+        this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
       }
-      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   } else {
@@ -1557,6 +1564,7 @@ anychart.stockModule.Scroller.prototype.draw = function() {
         series.resumeSignalsDispatching(false);
       }
     }
+    this.resetSeriesStack();
     this.markConsistent(anychart.ConsistencyState.STOCK_SCROLLER_SERIES);
   }
 

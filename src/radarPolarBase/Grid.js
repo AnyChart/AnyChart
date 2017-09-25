@@ -65,16 +65,21 @@ anychart.radarPolarBaseModule.Grid.prototype.getLayoutByAxis = function(axis) {
 //region --- Infrastructure
 /**
  * Getter/setter for yScale.
- * @param {anychart.scales.Base=} opt_value Scale.
+ * @param {(anychart.scales.Base|anychart.enums.ScaleTypes|Object)=} opt_value Scale.
  * @return {anychart.scales.Base|!anychart.radarPolarBaseModule.Grid} Axis yScale or itself for method chaining.
  */
 anychart.radarPolarBaseModule.Grid.prototype.yScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.yScale_ != opt_value) {
-      this.yScale_ = opt_value;
-      this.yScale_.listenSignals(this.yScaleInvalidated_, this);
-      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION | anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    var val = anychart.scales.Base.setupScale(this.yScale_, opt_value, null,
+        anychart.scales.Base.ScaleTypes.ALL_DEFAULT, null, this.yScaleInvalidated_, this);
+    if (val) {
+      var dispatch = this.yScale_ == val;
+      this.yScale_ = /** @type {anychart.scales.Base} */(val);
+      this.yScale_.resumeSignalsDispatching(dispatch);
+      if (!dispatch) {
+        this.invalidate(anychart.ConsistencyState.GRIDS_POSITION | anychart.ConsistencyState.BOUNDS,
+            anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      }
     }
     return this;
   } else if (this.yScale_) {
@@ -110,16 +115,21 @@ anychart.radarPolarBaseModule.Grid.prototype.yScaleInvalidated_ = function(event
 
 /**
  * Getter/setter for xScale.
- * @param {anychart.scales.Ordinal=} opt_value Scale.
+ * @param {(anychart.scales.Ordinal|anychart.enums.ScaleTypes|Object)=} opt_value Scale.
  * @return {anychart.scales.Ordinal|!anychart.radarPolarBaseModule.Grid} Axis xScale or itself for method chaining.
  */
 anychart.radarPolarBaseModule.Grid.prototype.xScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.xScale_ != opt_value) {
-      this.xScale_ = opt_value;
-      this.xScale_.listenSignals(this.xScaleInvalidated_, this);
-      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION | anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    var val = anychart.scales.Base.setupScale(this.xScale_, opt_value, null,
+        anychart.scales.Base.ScaleTypes.ORDINAL, null, this.xScaleInvalidated_, this);
+    if (val) {
+      var dispatch = this.xScale_ == val;
+      this.xScale_ = /** @type {anychart.scales.Ordinal} */(val);
+      this.xScale_.resumeSignalsDispatching(dispatch);
+      if (!dispatch) {
+        this.invalidate(anychart.ConsistencyState.GRIDS_POSITION | anychart.ConsistencyState.BOUNDS,
+            anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      }
     }
     return this;
   } else if (this.xScale_) {
@@ -147,6 +157,7 @@ anychart.radarPolarBaseModule.Grid.prototype.xScaleInvalidated_ = function(event
   signal |= anychart.Signal.BOUNDS_CHANGED;
 
   var state = anychart.ConsistencyState.BOUNDS |
+      anychart.ConsistencyState.GRIDS_POSITION |
       anychart.ConsistencyState.APPEARANCE;
 
   this.invalidate(state, signal);

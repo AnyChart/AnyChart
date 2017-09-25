@@ -164,71 +164,83 @@ anychart.core.ChartWithOrthogonalScales.prototype.allowLegendCategoriesMode = fu
 
 
 /**
- * Checks x scale type.
- * @param {*} scale
- * @return {boolean}
+ * @return {anychart.enums.ScaleTypes}
  */
-anychart.core.ChartWithOrthogonalScales.prototype.checkXScaleType = function(scale) {
-  var res = (scale instanceof anychart.scales.Base) && !scale.isColorScale();
-  if (!res)
-    anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['Chart scale', 'ordinal, linear, log, datetime']);
-  return res;
+anychart.core.ChartWithOrthogonalScales.prototype.getXScaleDefaultType = function() {
+  return anychart.enums.ScaleTypes.ORDINAL;
 };
 
 
 /**
- * Checks y scale type.
- * @param {*} scale
- * @return {boolean}
+ * @return {anychart.scales.Base.ScaleTypes}
  */
-anychart.core.ChartWithOrthogonalScales.prototype.checkYScaleType = anychart.core.ChartWithOrthogonalScales.prototype.checkXScaleType;
+anychart.core.ChartWithOrthogonalScales.prototype.getXScaleAllowedTypes = function() {
+  return anychart.scales.Base.ScaleTypes.ALL_DEFAULT;
+};
 
 
 /**
- * Creates scale by passed type.
- * @param {string} value
- * @param {boolean} isXScale
- * @param {boolean} returnNullOnError
- * @return {anychart.scales.Base}
+ * @return {Array}
  */
-anychart.core.ChartWithOrthogonalScales.prototype.createScaleByType = function(value, isXScale, returnNullOnError) {
-  return anychart.scales.Base.fromString(value, returnNullOnError ? null : isXScale);
+anychart.core.ChartWithOrthogonalScales.prototype.getXScaleWrongTypeError = function() {
+  return ['Chart scale', 'ordinal, linear, log, date-time'];
+};
+
+
+/**
+ * @return {anychart.enums.ScaleTypes}
+ */
+anychart.core.ChartWithOrthogonalScales.prototype.getYScaleDefaultType = function() {
+  return anychart.enums.ScaleTypes.LINEAR;
+};
+
+
+/**
+ * @return {anychart.scales.Base.ScaleTypes}
+ */
+anychart.core.ChartWithOrthogonalScales.prototype.getYScaleAllowedTypes = function() {
+  return this.getXScaleAllowedTypes();
+};
+
+
+/**
+ * @return {Array}
+ */
+anychart.core.ChartWithOrthogonalScales.prototype.getYScaleWrongTypeError = function() {
+  return this.getXScaleWrongTypeError();
 };
 
 
 /**
  * Getter/setter for xScale.
- * @param {(anychart.enums.ScaleTypes|anychart.scales.Base)=} opt_value X Scale to set.
+ * @param {(anychart.enums.ScaleTypes|Object|anychart.scales.Base)=} opt_value X Scale to set.
  * @return {!(anychart.scales.Base|anychart.core.ChartWithOrthogonalScales)} Default chart scale value or itself for method chaining.
  */
 anychart.core.ChartWithOrthogonalScales.prototype.xScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (goog.isString(opt_value)) {
-      opt_value = this.createScaleByType(opt_value, true, true);
-    }
-    if (this.checkXScaleType(opt_value) && this.xScale_ != opt_value) {
-      if (this.xScale_)
-        this.xScale_.unlistenSignals(this.xScaleInvalidated, this);
-      this.xScale_ = opt_value;
-      if (this.xScale_)
-        this.xScale_.listenSignals(this.xScaleInvalidated, this);
+    var val = anychart.scales.Base.setupScale(this.xScale_, opt_value, null, this.getXScaleAllowedTypes(), this.getXScaleWrongTypeError(), this.xScaleInvalidated, this);
+    if (val) {
+      var dispatch = this.xScale_ == val;
+      this.xScale_ = val;
+      val.resumeSignalsDispatching(dispatch);
 
-      var state = anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS;
-      if (this.allowLegendCategoriesMode() &&
-          this.legend().itemsSourceMode() == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
-        state |= anychart.ConsistencyState.CHART_LEGEND;
+      if (!dispatch) {
+        var state = anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS;
+        if (this.allowLegendCategoriesMode() &&
+            this.legend().itemsSourceMode() == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
+          state |= anychart.ConsistencyState.CHART_LEGEND;
+        }
+        this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
       }
-      this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
-  } else {
-    if (!this.xScale_) {
-      // should create default scale
-      this.xScale_ = this.createScaleByType('', true, false);
-      this.xScale_.listenSignals(this.xScaleInvalidated, this);
-    }
-    return /** @type {!anychart.scales.Base} */(this.xScale_);
   }
+  if (!this.xScale_) {
+    // should create default xScale
+    this.xScale_ = anychart.scales.Base.setupScale(this.xScale_, {}, this.getXScaleDefaultType(), this.getXScaleAllowedTypes(), null, this.xScaleInvalidated, this);
+    this.xScale_.resumeSignalsDispatching(false);
+  }
+  return /** @type {!anychart.scales.Base} */(this.xScale_);
 };
 
 
@@ -258,31 +270,27 @@ anychart.core.ChartWithOrthogonalScales.prototype.xScaleInvalidated = function(e
 
 /**
  * Getter/setter for yScale.
- * @param {(anychart.enums.ScaleTypes|anychart.scales.Base)=} opt_value Y Scale to set.
+ * @param {(anychart.enums.ScaleTypes|Object|anychart.scales.Base)=} opt_value Y Scale to set.
  * @return {!(anychart.scales.Base|anychart.core.ChartWithOrthogonalScales)} Default chart scale value or itself for method chaining.
  */
 anychart.core.ChartWithOrthogonalScales.prototype.yScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (goog.isString(opt_value)) {
-      opt_value = this.createScaleByType(opt_value, false, true);
-    }
-    if (this.checkYScaleType(opt_value) && this.yScale_ != opt_value) {
-      if (this.yScale_)
-        this.yScale_.unlistenSignals(this.yScaleInvalidated, this);
-      this.yScale_ = opt_value;
-      if (this.yScale_)
-        this.yScale_.listenSignals(this.yScaleInvalidated, this);
-
-      this.invalidate(anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS, anychart.Signal.NEEDS_REDRAW);
+    var val = anychart.scales.Base.setupScale(this.yScale_, opt_value, null, this.getYScaleAllowedTypes(), this.getYScaleWrongTypeError(), this.yScaleInvalidated, this);
+    if (val) {
+      var dispatch = this.yScale_ == val;
+      this.yScale_ = val;
+      this.yScale_.resumeSignalsDispatching(dispatch);
+      if (!dispatch)
+        this.invalidate(anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
-  } else {
-    if (!this.yScale_) {
-      this.yScale_ = this.createScaleByType('', false, false);
-      this.yScale_.listenSignals(this.yScaleInvalidated, this);
-    }
-    return /** @type {!anychart.scales.Base} */(this.yScale_);
   }
+  if (!this.yScale_) {
+    // should create default yScale
+    this.yScale_ = anychart.scales.Base.setupScale(this.yScale_, {}, this.getYScaleDefaultType(), this.getYScaleAllowedTypes(), null, this.yScaleInvalidated, this);
+    this.yScale_.resumeSignalsDispatching(false);
+  }
+  return /** @type {!anychart.scales.Base} */(this.yScale_);
 };
 
 
@@ -824,7 +832,9 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateYScales = function() 
         drawingPlans = drawingPlansByYScale[yScaleUid];
         yScale = this.yScales[yScaleUid];
         var stackMode = this.getYScaleStackMode(yScale);
+        var stackDirection = /** @type {anychart.enums.ScaleStackDirection} */ (this.yScale().stackDirection());
         var yScaleStacked = stackMode != anychart.enums.ScaleStackMode.NONE;
+        var stackIsDirect = stackDirection == anychart.enums.ScaleStackDirection.DIRECT;
         var yScalePercentStacked = stackMode == anychart.enums.ScaleStackMode.PERCENT;
         var stack, stackVal;
         if (yScaleStacked) {
@@ -839,12 +849,17 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateYScales = function() 
               nextNegative: 0,
               prevMissing: false,
               nextMissing: false,
-              missing: false
+              missing: false,
+              shared: {
+                positiveAnchor: NaN,
+                negativeAnchor: NaN
+              }
             });
           }
         }
+
         for (i = 0; i < drawingPlans.length; i++) {
-          drawingPlan = drawingPlans[i];
+          drawingPlan = drawingPlans[stackIsDirect ? drawingPlans.length - i - 1 : i];
           series = /** @type {anychart.core.series.Cartesian} */(drawingPlan.series);
           drawingPlan.firstIndex = firstIndex;
           drawingPlan.lastIndex = lastIndex;
@@ -855,6 +870,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateYScales = function() 
             for (j = firstIndex; j <= lastIndex; j++) {
               point = data[j];
               stackVal = stack[j - firstIndex];
+              point.meta['shared'] = stackVal.shared;
               point.meta['stackedMissing'] = stackVal.missing;
               if (anychart.core.series.filterPointAbsenceReason(point.meta['missing'],
                       anychart.core.series.PointAbsenceReason.ANY_BUT_RANGE)) {
@@ -2127,6 +2143,40 @@ anychart.core.ChartWithOrthogonalScales.prototype.selectByRect = function(marque
       pointsForSeries[i]['series'].selectPointInternal(pointsForSeries[i]['pointsInRect'], append);
     }
   }
+};
+
+
+//endregion
+//region --- CSV
+//------------------------------------------------------------------------------
+//
+//  CSV
+//
+//------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.core.ChartWithOrthogonalScales.prototype.getCsvExportRow = function(x, xAlias, data, xValues, id, index) {
+  return this.categorizeData ?
+    anychart.core.ChartWithOrthogonalScales.base(this, 'getCsvExportRow', x, xAlias, data, xValues, id, index) :
+    this.getCsvExportRowScatter(x, xAlias, data, xValues, id, index);
+};
+
+
+/** @inheritDoc */
+anychart.core.ChartWithOrthogonalScales.prototype.getCsvGrouperColumn = function() {
+  return ['x'];
+};
+
+
+/** @inheritDoc */
+anychart.core.ChartWithOrthogonalScales.prototype.getCsvGrouperValue = function(iterator) {
+  return iterator.get('x');
+};
+
+
+/** @inheritDoc */
+anychart.core.ChartWithOrthogonalScales.prototype.getCsvGrouperAlias = function(iterator) {
+  var res = iterator.get('name');
+  return goog.isString(res) ? res : null;
 };
 
 

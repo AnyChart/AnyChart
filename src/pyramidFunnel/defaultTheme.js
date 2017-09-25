@@ -9,8 +9,10 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'neckWidth': '30%',
     'neckHeight': '25%',
     'reversed': true,
-    'labels': {
-      'position': 'outside-left-in-column'
+    'normal': {
+      'labels': {
+        'position': 'outside-left-in-column'
+      }
     }
   },
   'pyramid': {
@@ -20,8 +22,10 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'legend': {
       'inverted': true
     },
-    'labels': {
-      'position': 'outside-left-in-column'
+    'normal': {
+      'labels': {
+        'position': 'outside-left-in-column'
+      }
     },
     'reversed': false
   }

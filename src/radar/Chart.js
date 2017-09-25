@@ -122,33 +122,43 @@ anychart.radarModule.Chart.prototype.createXAxisInstance = function() {
 };
 
 
-/** @inheritDoc */
-anychart.radarModule.Chart.prototype.checkXScaleType = function(scale) {
-  var res = (scale instanceof anychart.scales.Ordinal) && !scale.isColorScale();
-  if (!res)
-    anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['Radar chart X scale', 'ordinal']);
-  return res;
+/**
+ * @return {anychart.scales.Base.ScaleTypes}
+ */
+anychart.radarModule.Chart.prototype.getXScaleAllowedTypes = function() {
+  return anychart.scales.Base.ScaleTypes.ORDINAL;
 };
 
 
-/** @inheritDoc */
-anychart.radarModule.Chart.prototype.checkYScaleType = function(scale) {
-  var res = (scale instanceof anychart.scales.Base) && !scale.isColorScale();
-  if (!res)
-    anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['Chart scale', 'ordinal, linear, log, datetime']);
-  return res;
+/**
+ * @return {Array}
+ */
+anychart.radarModule.Chart.prototype.getXScaleWrongTypeError = function() {
+  return ['Radar chart X scale', 'ordinal'];
 };
 
 
-/** @inheritDoc */
-anychart.radarModule.Chart.prototype.createScaleByType = function(value, isXScale, returnNullOnError) {
-  if (isXScale) {
-    value = String(value).toLowerCase();
-    return (returnNullOnError && value != 'ordinal' && value != 'ord' && value != 'discrete') ?
-        null :
-        anychart.scales.ordinal();
-  }
-  return anychart.scales.Base.fromString(value, false);
+/**
+ * @return {anychart.enums.ScaleTypes}
+ */
+anychart.radarModule.Chart.prototype.getYScaleDefaultType = function() {
+  return anychart.enums.ScaleTypes.LINEAR;
+};
+
+
+/**
+ * @return {anychart.scales.Base.ScaleTypes}
+ */
+anychart.radarModule.Chart.prototype.getYScaleAllowedTypes = function() {
+  return anychart.scales.Base.ScaleTypes.ALL_DEFAULT;
+};
+
+
+/**
+ * @return {Array}
+ */
+anychart.radarModule.Chart.prototype.getYScaleWrongTypeError = function() {
+  return ['Chart scale', 'ordinal, linear, log, date-time'];
 };
 
 

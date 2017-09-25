@@ -1,7 +1,9 @@
 goog.provide('anychart.treemapModule.Chart');
 
 goog.require('anychart.colorScalesModule.ui.ColorRange');
+goog.require('anychart.core.IShapeManagerUser');
 goog.require('anychart.core.SeparateChart');
+goog.require('anychart.core.StateSettings');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.settings');
 goog.require('anychart.core.ui.LabelsFactory');
@@ -11,6 +13,7 @@ goog.require('anychart.core.utils.InteractivityState');
 goog.require('anychart.core.utils.TypedLayer');
 goog.require('anychart.format.Context');
 goog.require('anychart.treeDataModule.Tree');
+goog.require('anychart.treeDataModule.utils');
 goog.require('anychart.treemapModule.ArrayIterator');
 goog.require('anychart.treemapModule.Point');
 goog.require('anychart.utils');
@@ -23,6 +26,7 @@ goog.require('anychart.utils');
  * @param {anychart.enums.TreeFillingMethod=} opt_fillMethod - Fill method.
  * @extends {anychart.core.SeparateChart}
  * @implements {anychart.core.utils.IInteractiveSeries}
+ * @implements {anychart.core.IShapeManagerUser}
  * @constructor
  */
 anychart.treemapModule.Chart = function(opt_data, opt_fillMethod) {
@@ -82,6 +86,42 @@ anychart.treemapModule.Chart = function(opt_data, opt_fillMethod) {
 
   this.data(opt_data, opt_fillMethod);
 
+  var normalDescriptorsMeta = {};
+  anychart.core.settings.createDescriptorsMeta(normalDescriptorsMeta, [
+    ['fill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND],
+    ['stroke', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND],
+    ['hatchFill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND],
+    ['labels', 0, 0],
+    ['markers', 0, 0],
+    ['headers', 0, 0]
+  ]);
+  this.normal_ = new anychart.core.StateSettings(this, normalDescriptorsMeta, anychart.PointState.NORMAL);
+  this.normal_.setOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK, anychart.core.StateSettings.DEFAULT_LABELS_AFTER_INIT_CALLBACK);
+  this.normal_.setOption(anychart.core.StateSettings.MARKERS_AFTER_INIT_CALLBACK, /** @this {anychart.treemapModule.Chart} */ function(factory) {
+    factory.setParentEventTarget(this);
+    factory.setAutoType(anychart.enums.MarkerType.STAR5);
+    factory.listenSignals(this.markersInvalidated_, this);
+  });
+
+  var hoveredSelectedDescriptorsMeta = {};
+  anychart.core.settings.createDescriptorsMeta(hoveredSelectedDescriptorsMeta, [
+    ['fill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND],
+    ['stroke', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND],
+    ['hatchFill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND],
+    ['labels', 0, 0],
+    ['markers', 0, 0]
+  ]);
+
+  this.selected_ = new anychart.core.StateSettings(this, hoveredSelectedDescriptorsMeta, anychart.PointState.SELECT);
+  function factoryEnabledNull(factory) {
+    factory.enabled(null);
+  }
+  this.selected_.setOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK, factoryEnabledNull);
+
+  this.hovered_ = new anychart.core.StateSettings(this, hoveredSelectedDescriptorsMeta, anychart.PointState.HOVER);
+  this.hovered_.setMeta('headers', [0, 0]);
+  this.hovered_.setOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK, factoryEnabledNull);
+
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['maxDepth',
       anychart.ConsistencyState.CHART_LEGEND | anychart.ConsistencyState.TREEMAP_NODE_TYPES | anychart.ConsistencyState.APPEARANCE,
@@ -97,6 +137,7 @@ anychart.treemapModule.Chart = function(opt_data, opt_fillMethod) {
   ]);
 };
 goog.inherits(anychart.treemapModule.Chart, anychart.core.SeparateChart);
+anychart.core.settings.populateAliases(anychart.treemapModule.Chart, ['fill', 'stroke', 'hatchFill', 'labels', 'markers', 'headers'], 'normal');
 
 
 /**
@@ -124,12 +165,6 @@ anychart.treemapModule.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.APPEARANCE;
 
 
-/** @inheritDoc */
-anychart.treemapModule.Chart.prototype.usesTreeData = function() {
-  return true;
-};
-
-
 /**
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
@@ -139,63 +174,27 @@ anychart.treemapModule.Chart.PROPERTY_DESCRIPTORS = (function() {
   function maxDepthNormalizer(opt_value) {
     return anychart.utils.normalizeToNaturalNumber(opt_value, 1, false);
   }
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'maxDepth',
-      maxDepthNormalizer);
   function hintDepthNormalizer(opt_value) {
     return anychart.utils.normalizeToNaturalNumber(opt_value, 0, false);
   }
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'hintDepth',
-      hintDepthNormalizer);
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'hintOpacity',
-      anychart.core.settings.ratioNormalizer);
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'maxHeadersHeight',
-      anychart.core.settings.asIsNormalizer);
   function sortNormalizer(opt_value) {
     return anychart.enums.normalizeSort(opt_value, anychart.enums.Sort.DESC);
   }
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'sort',
-      sortNormalizer);
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'headersDisplayMode',
-      anychart.enums.normalizeLabelsDisplayMode);
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'labelsDisplayMode',
-      anychart.enums.normalizeLabelsDisplayMode);
 
-  return map;
-})();
-
-
-/**
- * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
- */
-anychart.treemapModule.Chart.COLOR_DESCRIPTORS = (function() {
-  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
-  var map = {};
+  anychart.core.settings.createDescriptors(map, [
+    // chart properties
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'maxDepth', maxDepthNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'hintDepth', hintDepthNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'hintOpacity', anychart.core.settings.ratioNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'maxHeadersHeight', anychart.core.settings.asIsNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'sort', sortNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'headersDisplayMode', anychart.enums.normalizeLabelsDisplayMode],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'labelsDisplayMode', anychart.enums.normalizeLabelsDisplayMode]
+  ]);
 
   return map;
 })();
 anychart.core.settings.populate(anychart.treemapModule.Chart, anychart.treemapModule.Chart.PROPERTY_DESCRIPTORS);
-anychart.core.settings.populate(anychart.treemapModule.Chart, anychart.treemapModule.Chart.COLOR_DESCRIPTORS);
 
 
 /** @inheritDoc */
@@ -1149,24 +1148,44 @@ anychart.treemapModule.Chart.prototype.getRootNode = function() {
 
 
 /**
- * Getter/setter for point header labels.
- * @param {(Object|boolean|null)=} opt_value Point headers settings.
- * @return {!(anychart.core.ui.LabelsFactory|anychart.treemapModule.Chart)} Labels instance or self for chaining.
+ * Normal state settings.
+ * @param {!Object=} opt_value
+ * @return {anychart.core.StateSettings|anychart.treemapModule.Chart}
  */
-anychart.treemapModule.Chart.prototype.headers = function(opt_value) {
-  if (!this.headers_) {
-    this.headers_ = new anychart.core.ui.LabelsFactory();
-    this.headers_.setParentEventTarget(this);
-    this.headers_.listenSignals(this.headersInvalidated_, this);
-  }
-
+anychart.treemapModule.Chart.prototype.normal = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !('enabled' in opt_value))
-      opt_value['enabled'] = true;
-    this.headers_.setup(opt_value);
+    this.normal_.setup(opt_value);
     return this;
   }
-  return this.headers_;
+  return this.normal_;
+};
+
+
+/**
+ * Hovered state settings.
+ * @param {!Object=} opt_value
+ * @return {anychart.core.StateSettings|anychart.treemapModule.Chart}
+ */
+anychart.treemapModule.Chart.prototype.hovered = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.hovered_.setup(opt_value);
+    return this;
+  }
+  return this.hovered_;
+};
+
+
+/**
+ * Selected state settings.
+ * @param {!Object=} opt_value
+ * @return {anychart.core.StateSettings|anychart.treemapModule.Chart}
+ */
+anychart.treemapModule.Chart.prototype.selected = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.selected_.setup(opt_value);
+    return this;
+  }
+  return this.selected_;
 };
 
 
@@ -1183,49 +1202,6 @@ anychart.treemapModule.Chart.prototype.headersInvalidated_ = function(event) {
 
 
 /**
- * Getter/setter for point hover header labels.
- * @param {(Object|boolean|null)=} opt_value Point hover headers settings.
- * @return {!(anychart.core.ui.LabelsFactory|anychart.treemapModule.Chart)} Labels instance or self for chaining.
- */
-anychart.treemapModule.Chart.prototype.hoverHeaders = function(opt_value) {
-  if (!this.hoverHeaders_) {
-    this.hoverHeaders_ = new anychart.core.ui.LabelsFactory();
-    this.hoverHeaders_.enabled(null);
-  }
-
-  if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !('enabled' in opt_value))
-      opt_value['enabled'] = true;
-    this.hoverHeaders_.setup(opt_value);
-    return this;
-  }
-  return this.hoverHeaders_;
-};
-
-
-/**
- * Getter/setter for point labels.
- * @param {(Object|boolean|null)=} opt_value Point labels settings.
- * @return {!(anychart.core.ui.LabelsFactory|anychart.treemapModule.Chart)} Labels instance or self for chaining.
- */
-anychart.treemapModule.Chart.prototype.labels = function(opt_value) {
-  if (!this.labels_) {
-    this.labels_ = new anychart.core.ui.LabelsFactory();
-    this.labels_.setParentEventTarget(this);
-    this.labels_.listenSignals(this.labelsInvalidated_, this);
-  }
-
-  if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !('enabled' in opt_value))
-      opt_value['enabled'] = true;
-    this.labels_.setup(opt_value);
-    return this;
-  }
-  return this.labels_;
-};
-
-
-/**
  * Listener for labels invalidation.
  * @param {anychart.SignalEvent} event Invalidation event.
  * @private
@@ -1234,71 +1210,6 @@ anychart.treemapModule.Chart.prototype.labelsInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
     this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
   }
-};
-
-
-/**
- * Getter/setter for point hover labels.
- * @param {(Object|boolean|null)=} opt_value Point hover labels settings.
- * @return {!(anychart.core.ui.LabelsFactory|anychart.treemapModule.Chart)} Labels instance or self for chaining.
- */
-anychart.treemapModule.Chart.prototype.hoverLabels = function(opt_value) {
-  if (!this.hoverLabels_) {
-    this.hoverLabels_ = new anychart.core.ui.LabelsFactory();
-    this.hoverLabels_.enabled(null);
-  }
-
-  if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !('enabled' in opt_value))
-      opt_value['enabled'] = true;
-    this.hoverLabels_.setup(opt_value);
-    return this;
-  }
-  return this.hoverLabels_;
-};
-
-
-/**
- * Getter/setter for point select labels.
- * @param {(Object|boolean|null)=} opt_value Point select labels settings.
- * @return {!(anychart.core.ui.LabelsFactory|anychart.treemapModule.Chart)} Labels instance or self for chaining.
- */
-anychart.treemapModule.Chart.prototype.selectLabels = function(opt_value) {
-  if (!this.selectLabels_) {
-    this.selectLabels_ = new anychart.core.ui.LabelsFactory();
-    this.selectLabels_.enabled(null);
-  }
-
-  if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !('enabled' in opt_value))
-      opt_value['enabled'] = true;
-    this.selectLabels_.setup(opt_value);
-    return this;
-  }
-  return this.selectLabels_;
-};
-
-
-/**
- * Getter/setter for point markers.
- * @param {(Object|boolean|null|string)=} opt_value Point markers settings.
- * @return {!(anychart.core.ui.MarkersFactory|anychart.treemapModule.Chart)} Markers instance or self for chaining.
- */
-anychart.treemapModule.Chart.prototype.markers = function(opt_value) {
-  if (!this.markers_) {
-    this.markers_ = new anychart.core.ui.MarkersFactory();
-    this.markers_.setParentEventTarget(this);
-    this.markers_.setAutoType(anychart.enums.MarkerType.STAR5);
-    this.markers_.listenSignals(this.markersInvalidated_, this);
-  }
-
-  if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !('enabled' in opt_value))
-      opt_value['enabled'] = true;
-    this.markers_.setup(opt_value);
-    return this;
-  }
-  return this.markers_;
 };
 
 
@@ -1315,68 +1226,33 @@ anychart.treemapModule.Chart.prototype.markersInvalidated_ = function(event) {
 
 
 /**
- * Getter/setter for point markers.
- * @param {(Object|boolean|null|string)=} opt_value Point hover markers settings.
- * @return {!(anychart.core.ui.MarkersFactory|anychart.treemapModule.Chart)} Markers instance or self for chaining.
- */
-anychart.treemapModule.Chart.prototype.hoverMarkers = function(opt_value) {
-  if (!this.hoverMarkers_) {
-    this.hoverMarkers_ = new anychart.core.ui.MarkersFactory();
-    // don't listen to it, for it will be reapplied at the next hover
-  }
-
-  if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !('enabled' in opt_value))
-      opt_value['enabled'] = true;
-    this.hoverMarkers_.setup(opt_value);
-    return this;
-  }
-  return this.hoverMarkers_;
-};
-
-
-/**
- * @param {(Object|boolean|null|string)=} opt_value Series select markers settings.
- * @return {!(anychart.core.ui.MarkersFactory|anychart.treemapModule.Chart)} Markers instance or self for chaining.
- */
-anychart.treemapModule.Chart.prototype.selectMarkers = function(opt_value) {
-  if (!this.selectMarkers_) {
-    this.selectMarkers_ = new anychart.core.ui.MarkersFactory();
-    // don't listen to it, for it will be reapplied at the next hover
-  }
-
-  if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !('enabled' in opt_value))
-      opt_value['enabled'] = true;
-    this.selectMarkers_.setup(opt_value);
-    return this;
-  }
-  return this.selectMarkers_;
-};
-
-
-/**
  * Color scale.
- * @param {(anychart.colorScalesModule.Ordinal|anychart.colorScalesModule.Linear)=} opt_value
+ * @param {(anychart.colorScalesModule.Ordinal|anychart.colorScalesModule.Linear|Object|anychart.enums.ScaleTypes)=} opt_value
  * @return {anychart.treemapModule.Chart|anychart.colorScalesModule.Ordinal|anychart.colorScalesModule.Linear}
  */
 anychart.treemapModule.Chart.prototype.colorScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.colorScale_ != opt_value) {
-      if (this.colorScale_)
-        this.colorScale_.unlistenSignals(this.colorScaleInvalidated_, this);
-      this.colorScale_ = opt_value;
-      if (this.colorScale_)
-        this.colorScale_.listenSignals(this.colorScaleInvalidated_, this);
-
-      goog.dispose(this.hintColorScale_);
-      if (this.colorScale_)
-        this.hintColorScale_ = /** @type {anychart.colorScalesModule.Ordinal|anychart.colorScalesModule.Linear} */ (anychart.scales.Base.fromString(this.colorScale_.getType(), null));
-      else
-        this.hintColorScale_ = null;
-
+    if (goog.isNull(opt_value) && this.colorScale_) {
+      this.colorScale_ = null;
       this.invalidate(anychart.ConsistencyState.TREEMAP_COLOR_SCALE | anychart.ConsistencyState.CHART_LEGEND,
           anychart.Signal.NEEDS_REDRAW);
+    } else {
+      var val = anychart.scales.Base.setupScale(this.colorScale_, opt_value, null,
+          anychart.scales.Base.ScaleTypes.COLOR_SCALES, null, this.colorScaleInvalidated_, this);
+      if (val) {
+        var dispatch = this.colorScale_ == val;
+        this.colorScale_ = val;
+        goog.dispose(this.hintColorScale_);
+        if (this.colorScale_)
+          this.hintColorScale_ = /** @type {anychart.colorScalesModule.Ordinal|anychart.colorScalesModule.Linear} */ (anychart.scales.Base.fromString(this.colorScale_.getType(), null));
+        else
+          this.hintColorScale_ = null;
+
+        this.colorScale_.resumeSignalsDispatching(dispatch);
+        if (!dispatch)
+          this.invalidate(anychart.ConsistencyState.TREEMAP_COLOR_SCALE | anychart.ConsistencyState.CHART_LEGEND,
+              anychart.Signal.NEEDS_REDRAW);
+      }
     }
     return this;
   }
@@ -1438,213 +1314,6 @@ anychart.treemapModule.Chart.prototype.colorRangeInvalidated_ = function(event) 
   }
   // if there are no signals, !state and nothing happens.
   this.invalidate(state, signal);
-};
-
-
-/**
- * Getter/setter for fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.treemapModule.Chart|Function} .
- */
-anychart.treemapModule.Chart.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var fill = goog.isFunction(opt_fillOrColorOrKeys) ?
-        opt_fillOrColorOrKeys :
-        acgraph.vector.normalizeFill.apply(null, arguments);
-    if (fill != this.fill_) {
-      this.fill_ = fill;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
-    }
-    return this;
-  }
-  return this.fill_;
-};
-
-
-/**
- * Getter/setter for hoverFill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.treemapModule.Chart|Function} .
- */
-anychart.treemapModule.Chart.prototype.hoverFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    this.hoverFill_ = goog.isFunction(opt_fillOrColorOrKeys) ?
-        opt_fillOrColorOrKeys :
-        acgraph.vector.normalizeFill.apply(null, arguments);
-    return this;
-  }
-  return this.hoverFill_;
-};
-
-
-/**
- * Getter/setter for selectFill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.treemapModule.Chart|Function} .
- */
-anychart.treemapModule.Chart.prototype.selectFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    this.selectFill_ = goog.isFunction(opt_fillOrColorOrKeys) ?
-        opt_fillOrColorOrKeys :
-        acgraph.vector.normalizeFill.apply(null, arguments);
-    return this;
-  }
-  return this.selectFill_;
-};
-
-
-/**
- * Getter/setter for stroke.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.treemapModule.Chart|acgraph.vector.Stroke|Function} .
- */
-anychart.treemapModule.Chart.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var stroke = goog.isFunction(opt_strokeOrFill) ?
-        opt_strokeOrFill :
-        acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (stroke != this.stroke_) {
-      this.stroke_ = stroke;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
-    }
-    return this;
-  }
-  return this.stroke_;
-};
-
-
-/**
- * Getter/setter for current hover stroke settings.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.treemapModule.Chart|acgraph.vector.Stroke|Function} .
- */
-anychart.treemapModule.Chart.prototype.hoverStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    this.hoverStroke_ = goog.isFunction(opt_strokeOrFill) ?
-        opt_strokeOrFill :
-        acgraph.vector.normalizeStroke.apply(null, arguments);
-    return this;
-  }
-  return this.hoverStroke_;
-};
-
-
-/**
- * Getter/setter for current select stroke settings.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.treemapModule.Chart|acgraph.vector.Stroke|Function} .
- */
-anychart.treemapModule.Chart.prototype.selectStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    this.selectStroke_ = goog.isFunction(opt_strokeOrFill) ?
-        opt_strokeOrFill :
-        acgraph.vector.normalizeStroke.apply(null, arguments);
-    return this;
-  }
-  return this.selectStroke_;
-};
-
-
-/**
- * Getter/setter for hatchFill.
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.treemapModule.Chart|Function|boolean} Hatch fill.
- */
-anychart.treemapModule.Chart.prototype.hatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrTypeOrState)) {
-    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
-        opt_patternFillOrTypeOrState :
-        acgraph.vector.normalizeHatchFill.apply(null, arguments);
-
-    if (hatchFill != this.hatchFill_) {
-      this.hatchFill_ = hatchFill;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
-    }
-    return this;
-  }
-  return this.hatchFill_;
-};
-
-
-/**
- * Getter/setter for hoverHatchFill.
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.treemapModule.Chart|Function|boolean} Hatch fill.
- */
-anychart.treemapModule.Chart.prototype.hoverHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrTypeOrState)) {
-    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
-        opt_patternFillOrTypeOrState :
-        acgraph.vector.normalizeHatchFill.apply(null, arguments);
-
-    if (hatchFill !== this.hoverHatchFill_)
-      this.hoverHatchFill_ = hatchFill;
-    return this;
-  }
-  return this.hoverHatchFill_;
-};
-
-
-/**
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.treemapModule.Chart|Function|boolean} Hatch fill.
- */
-anychart.treemapModule.Chart.prototype.selectHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrTypeOrState)) {
-    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
-        opt_patternFillOrTypeOrState :
-        acgraph.vector.normalizeHatchFill.apply(null, arguments);
-
-    if (hatchFill !== this.selectHatchFill_)
-      this.selectHatchFill_ = hatchFill;
-    return this;
-  }
-  return this.selectHatchFill_;
 };
 
 
@@ -1771,23 +1440,30 @@ anychart.treemapModule.Chart.prototype.getLabelsAnchor = function(pointState, is
   var hoverLabelType = 'hoverLabel';
   var selectLabelType = 'selectLabel';
   if (isHeader) {
-    factory = this.headers();
-    hoverFactory = this.hoverHeaders();
+    factory = this.normal().headers();
+    hoverFactory = this.hovered().headers();
     selectFactory = null;
     labelType = 'header';
     hoverLabelType = 'hoverHeader';
     selectLabelType = null;
   } else {
-    factory = this.labels();
-    hoverFactory = this.hoverLabels();
-    selectFactory = this.selectLabels();
+    factory = this.normal().labels();
+    hoverFactory = this.hovered().labels();
+    selectFactory = this.selected().labels();
   }
   var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
   var hovered = !selected && this.state.isStateContains(pointState, anychart.PointState.HOVER);
 
-  var pointLabel = node.get(labelType);
-  var hoverPointLabel = hovered ? node.get(hoverLabelType) : null;
-  var selectPointLabel = selected ? node.get(selectLabelType) : null;
+  var pointNormalLabel = node.get('normal');
+  pointNormalLabel = goog.isDef(pointNormalLabel) ? pointNormalLabel[labelType] : void 0;
+  var pointHoveredLabel = node.get('hovered');
+  pointHoveredLabel = goog.isDef(pointHoveredLabel) ? pointHoveredLabel[labelType] : void 0;
+  var pointSelectedLabel = node.get('selected');
+  pointSelectedLabel = goog.isDef(pointSelectedLabel) ? (isHeader ? void 0 : pointSelectedLabel[labelType]) : void 0;
+
+  var pointLabel = anychart.utils.getFirstDefinedValue(pointNormalLabel, node.get(labelType));
+  var hoverPointLabel = hovered ? anychart.utils.getFirstDefinedValue(pointHoveredLabel, node.get(hoverLabelType)) : null;
+  var selectPointLabel = selected ? anychart.utils.getFirstDefinedValue(pointSelectedLabel, node.get(selectLabelType)) : null;
 
   var labelAnchor = pointLabel && pointLabel['anchor'] ? pointLabel['anchor'] : null;
   var labelHoverAnchor = hoverPointLabel && hoverPointLabel['anchor'] ? hoverPointLabel['anchor'] : null;
@@ -1838,17 +1514,28 @@ anychart.treemapModule.Chart.prototype.getMarkersPosition = function(pointState)
   var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
   var hovered = !selected && this.state.isStateContains(pointState, anychart.PointState.HOVER);
 
-  var pointMarker = node.get('marker');
-  var hoverPointMarker = node.get('hoverMarker');
-  var selectPointMarker = node.get('selectMarker');
+  var markerType = 'marker';
+  var hoverMarkerType = 'hoverMarker';
+  var selectMarkerType = 'selectMarker';
+
+  var pointNormalMarker = node.get('normal');
+  pointNormalMarker = goog.isDef(pointNormalMarker) ? pointNormalMarker[markerType] : void 0;
+  var pointHoveredMarker = node.get('hovered');
+  pointHoveredMarker = goog.isDef(pointHoveredMarker) ? pointHoveredMarker[markerType] : void 0;
+  var pointSelectedMarker = node.get('selected');
+  pointSelectedMarker = goog.isDef(pointSelectedMarker) ? pointSelectedMarker[markerType] : void 0;
+
+  var pointMarker = anychart.utils.getFirstDefinedValue(pointNormalMarker, node.get(markerType), null);
+  var hoverPointMarker = anychart.utils.getFirstDefinedValue(pointHoveredMarker, node.get(hoverMarkerType), null);
+  var selectPointMarker = anychart.utils.getFirstDefinedValue(pointSelectedMarker, node.get(selectMarkerType), null);
 
   var markerPosition = pointMarker && pointMarker['position'] ? pointMarker['position'] : null;
   var markerHoverPosition = hoverPointMarker && hoverPointMarker['position'] ? hoverPointMarker['position'] : null;
   var markerSelectPosition = selectPointMarker && selectPointMarker['position'] ? selectPointMarker['position'] : null;
 
-  return (hovered && (markerHoverPosition || this.hoverMarkers().position())) ||
-      (selected && (markerSelectPosition || this.selectMarkers().position())) ||
-      markerPosition || this.markers().position();
+  return (hovered && (markerHoverPosition || this.hovered().markers().position())) ||
+      (selected && (markerSelectPosition || this.selected().markers().position())) ||
+      markerPosition || this.normal().markers().position();
 };
 
 
@@ -1867,21 +1554,36 @@ anychart.treemapModule.Chart.prototype.drawMarker_ = function(pointState) {
   var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
   var hovered = !selected && this.state.isStateContains(pointState, anychart.PointState.HOVER);
 
+  var markers = this.normal().markers();
+  var hoverMarkers = this.hovered().markers();
+  var selectMarkers = this.selected().markers();
+
   var index = /** @type {number} */ (node.meta('index'));
-  var markersFactory = /** @type {anychart.core.ui.MarkersFactory} */ (this.markers());
+  var markersFactory = /** @type {anychart.core.ui.MarkersFactory} */ (markers);
   if (selected) {
-    markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(this.selectMarkers());
+    markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(selectMarkers);
   } else if (hovered) {
-    markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(this.hoverMarkers());
+    markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(hoverMarkers);
   } else {
-    markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(this.markers());
+    markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(markers);
   }
 
-  var pointMarker = node.get('marker');
-  var hoverPointMarker = node.get('hoverMarker');
-  var selectPointMarker = node.get('selectMarker');
+  var markerType = 'marker';
+  var hoverMarkerType = 'hoverMarker';
+  var selectMarkerType = 'selectMarker';
 
-  var marker = this.markers().getMarker(index);
+  var pointNormalMarker = node.get('normal');
+  pointNormalMarker = goog.isDef(pointNormalMarker) ? pointNormalMarker[markerType] : void 0;
+  var pointHoveredMarker = node.get('hovered');
+  pointHoveredMarker = goog.isDef(pointHoveredMarker) ? pointHoveredMarker[markerType] : void 0;
+  var pointSelectedMarker = node.get('selected');
+  pointSelectedMarker = goog.isDef(pointSelectedMarker) ? pointSelectedMarker[markerType] : void 0;
+
+  var pointMarker = anychart.utils.getFirstDefinedValue(pointNormalMarker, node.get(markerType));
+  var hoverPointMarker = anychart.utils.getFirstDefinedValue(pointHoveredMarker, node.get(hoverMarkerType));
+  var selectPointMarker = anychart.utils.getFirstDefinedValue(pointSelectedMarker, node.get(selectMarkerType));
+
+  var marker = markers.getMarker(index);
 
   var markerEnabledState = pointMarker && goog.isDef(pointMarker['enabled']) ? pointMarker['enabled'] : null;
   var markerHoverEnabledState = hoverPointMarker && goog.isDef(hoverPointMarker['enabled']) ? hoverPointMarker['enabled'] : null;
@@ -1890,21 +1592,21 @@ anychart.treemapModule.Chart.prototype.drawMarker_ = function(pointState) {
   var isDraw = hovered || selected ?
       hovered ?
           goog.isNull(markerHoverEnabledState) ?
-              this.hoverMarkers_ && goog.isNull(this.hoverMarkers_.enabled()) ?
+              hoverMarkers && goog.isNull(hoverMarkers.enabled()) ?
                   goog.isNull(markerEnabledState) ?
-                      this.markers_.enabled() :
+                      markers.enabled() :
                       markerEnabledState :
-                  this.hoverMarkers_.enabled() :
+                  hoverMarkers.enabled() :
               markerHoverEnabledState :
           goog.isNull(markerSelectEnabledState) ?
-              this.selectMarkers_ && goog.isNull(this.selectMarkers_.enabled()) ?
+              selectMarkers && goog.isNull(selectMarkers.enabled()) ?
                   goog.isNull(markerEnabledState) ?
-                      this.markers_.enabled() :
+                      markers.enabled() :
                       markerEnabledState :
-                  this.selectMarkers_.enabled() :
+                  selectMarkers.enabled() :
               markerSelectEnabledState :
       goog.isNull(markerEnabledState) ?
-          this.markers_.enabled() :
+          markers.enabled() :
           markerEnabledState;
   if (isDraw) {
     var position = this.getMarkersPosition(pointState);
@@ -1912,7 +1614,7 @@ anychart.treemapModule.Chart.prototype.drawMarker_ = function(pointState) {
     if (marker) {
       marker.positionProvider(positionProvider);
     } else {
-      marker = this.markers().add(positionProvider, index);
+      marker = markers.add(positionProvider, index);
     }
 
     marker.resetSettings();
@@ -1921,7 +1623,7 @@ anychart.treemapModule.Chart.prototype.drawMarker_ = function(pointState) {
     marker.draw();
     //return marker;
   } else if (marker) {
-    this.markers().clear(marker.getIndex());
+    markers.clear(marker.getIndex());
   }
 };
 
@@ -1966,16 +1668,16 @@ anychart.treemapModule.Chart.prototype.configureLabel = function(pointState, isH
   var selectLabelType = 'selectLabel';
 
   if (isHeader) {
-    factory = this.headers();
-    hoverFactory = this.hoverHeaders();
+    factory = this.normal().headers();
+    hoverFactory = this.hovered().headers();
     selectFactory = null;
     labelType = 'header';
     hoverLabelType = 'hoverHeader';
     selectLabelType = null;
   } else {
-    factory = this.labels();
-    hoverFactory = this.hoverLabels();
-    selectFactory = this.selectLabels();
+    factory = this.normal().labels();
+    hoverFactory = this.hovered().labels();
+    selectFactory = this.selected().labels();
   }
 
   var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
@@ -1992,9 +1694,16 @@ anychart.treemapModule.Chart.prototype.configureLabel = function(pointState, isH
     labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(factory);
   }
 
-  var pointLabel = node.get(labelType);
-  var hoverPointLabel = hovered ? node.get(hoverLabelType) : null;
-  var selectPointLabel = selected ? node.get(selectLabelType) : null;
+  var pointNormalLabel = node.get('normal');
+  pointNormalLabel = goog.isDef(pointNormalLabel) ? pointNormalLabel[labelType] : void 0;
+  var pointHoveredLabel = node.get('hovered');
+  pointHoveredLabel = goog.isDef(pointHoveredLabel) ? pointHoveredLabel[labelType] : void 0;
+  var pointSelectedLabel = node.get('selected');
+  pointSelectedLabel = goog.isDef(pointSelectedLabel) ? (isHeader ? void 0 : pointSelectedLabel[labelType]) : void 0;
+
+  var pointLabel = anychart.utils.getFirstDefinedValue(pointNormalLabel, node.get(labelType));
+  var hoverPointLabel = hovered ? anychart.utils.getFirstDefinedValue(pointHoveredLabel, node.get(hoverLabelType)) : null;
+  var selectPointLabel = selected ? anychart.utils.getFirstDefinedValue(pointSelectedLabel, node.get(selectLabelType)) : null;
 
   var labelEnabledState = pointLabel && goog.isDef(pointLabel['enabled']) ? pointLabel['enabled'] : null;
   var labelSelectEnabledState = selectPointLabel && goog.isDef(selectPointLabel['enabled']) ? selectPointLabel['enabled'] : null;
@@ -2070,13 +1779,13 @@ anychart.treemapModule.Chart.prototype.drawLabel_ = function(pointState) {
   var hoverFactory;
   var selectFactory;
   if (isHeader) {
-    factory = this.headers();
-    hoverFactory = this.hoverHeaders();
+    factory = this.normal().headers();
+    hoverFactory = this.hovered().headers();
     selectFactory = null;
   } else {
-    factory = this.labels();
-    hoverFactory = this.hoverLabels();
-    selectFactory = this.selectLabels();
+    factory = this.normal().labels();
+    hoverFactory = this.hovered().labels();
+    selectFactory = this.selected().labels();
   }
   var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
   var hovered = !selected && this.state.isStateContains(pointState, anychart.PointState.HOVER);
@@ -2219,7 +1928,7 @@ anychart.treemapModule.Chart.prototype.drawNodeBox_ = function(pointState) {
   shiftedBounds.height = h - dt - dh;
   box.setBounds(shiftedBounds);
 
-  var needHatch = this.hatchFill() || this.hoverHatchFill() || this.selectHatchFill();
+  var needHatch = this.normal_.getOption('hatchFill') || this.hovered_.getOption('hatchFill') || this.selected_.getOption('hatchFill');
   if (needHatch) {
     var hatchBox = this.hatchLayer_.genNextChild();
     hatchBox.deserialize(box.serialize());
@@ -2234,6 +1943,57 @@ anychart.treemapModule.Chart.prototype.drawNodeBox_ = function(pointState) {
 };
 
 
+/** @inheritDoc */
+anychart.treemapModule.Chart.prototype.getAutoHatchFill = function() {
+  return /** @type {acgraph.vector.HatchFill} */ (acgraph.vector.normalizeHatchFill(/** @type {string} */(anychart.getFullTheme('hatchFillPalette.items.0'))));
+};
+
+
+/** @inheritDoc */
+anychart.treemapModule.Chart.prototype.getHatchFillResolutionContext = function(opt_ignorePointSettings) {
+  var iterator = this.getIterator();
+  var source = this.getAutoHatchFill();
+  return {
+    'index': iterator.getIndex(),
+    'sourceHatchFill': source
+  };
+};
+
+
+/** @inheritDoc */
+anychart.treemapModule.Chart.prototype.getColorResolutionContext = function(opt_baseColor, opt_ignorePointSettings, opt_ignoreColorScale) {
+  var node = /** @type {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} */ (this.getIterator().getItem());
+  var sourceColor = opt_baseColor || anychart.getFullTheme('palette.items.0');
+  return {
+    'value': node.meta(anychart.treemapModule.Chart.DataFields.VALUE),
+    'sourceColor': sourceColor,
+    'colorScale': this.colorScale()
+  };
+};
+
+
+/** @inheritDoc */
+anychart.treemapModule.Chart.prototype.resolveOption = function(name, state, point, normalizer, scrollerSelected, opt_seriesName, opt_ignorePointSettings) {
+  var val;
+  var stateObject = state == 0 ? this.normal_ : state == 1 ? this.hovered_ : this.selected_;
+  var stateValue = stateObject.getOption(name);
+  if (opt_ignorePointSettings) {
+    val = stateValue;
+  } else {
+    var node = /** @type {anychart.treeDataModule.Tree.DataItem} */(point.currentRow);
+    var pointStateName = state == 0 ? 'normal' : state == 1 ? 'hovered' : 'selected';
+    var pointStateObject = point.get(pointStateName);
+    val = anychart.utils.getFirstDefinedValue(
+        goog.isDef(pointStateObject) ? pointStateObject[name] : void 0,
+        node.get(anychart.color.getPrefixedColorName(state, name)),
+        stateValue);
+  }
+  if (goog.isDef(val))
+    val = normalizer(val);
+  return val;
+};
+
+
 /**
  * Colorize shape.
  * @param {anychart.PointState|number} pointState Point state.
@@ -2245,12 +2005,15 @@ anychart.treemapModule.Chart.prototype.colorizeShape = function(pointState) {
   if (shape) {
     var type = node.meta(anychart.treemapModule.Chart.DataFields.TYPE);
     var value = node.meta(anychart.treemapModule.Chart.DataFields.VALUE);
-    var fill = this.getFinalFill(true, pointState);
+    var fillResolver = anychart.color.getColorResolver('fill', anychart.enums.ColorType.FILL, true);
+    var fill = /** @type {acgraph.vector.Fill} */ (fillResolver(this, pointState, false));
     if (type == anychart.treemapModule.Chart.NodeType.RECT) {
       fill = anychart.color.setOpacity(fill, /** @type {number} */ (this.getOption('hintOpacity')), true);
     } else if (type == anychart.treemapModule.Chart.NodeType.HINT_LEAF)
       fill = this.hintColorScale_ ? this.hintColorScale_.valueToColor(value) : fill;
-    shape.stroke(this.getFinalStroke(true, pointState));
+    var strokeResolver = anychart.color.getColorResolver('stroke', anychart.enums.ColorType.STROKE, true);
+    var stroke = /** @type {acgraph.vector.Stroke} */ (strokeResolver(this, pointState, false));
+    shape.stroke(stroke);
     shape.fill(fill);
   }
 };
@@ -2264,152 +2027,12 @@ anychart.treemapModule.Chart.prototype.applyHatchFill = function(pointState) {
   var node = /** @type {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} */ (this.getIterator().getItem());
   var hatchFillShape = node.meta(anychart.treemapModule.Chart.DataFields.HATCH_SHAPE);
   if (goog.isDefAndNotNull(hatchFillShape)) {
+    var hatchFillResolver = anychart.color.getColorResolver('hatchFill', anychart.enums.ColorType.HATCH_FILL, true);
+    var hatchFill = hatchFillResolver(this, pointState, false);
     hatchFillShape
         .stroke(null)
-        .fill(this.getFinalHatchFill(true, pointState));
+        .fill(hatchFill);
   }
-};
-
-
-/**
- * Final fill.
- * @param {boolean} usePointSettings Whether to use point settings.
- * @param {anychart.PointState|number} pointState Point state.
- * @return {!acgraph.vector.Fill} Fill.
- */
-anychart.treemapModule.Chart.prototype.getFinalFill = function(usePointSettings, pointState) {
-  var node = /** @type {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} */ (this.getIterator().getItem());
-  var normalColor = /** @type {acgraph.vector.Fill|Function} */((usePointSettings && node.get('fill')) || this.fill());
-
-  var result;
-  if (this.state.isStateContains(pointState, anychart.PointState.SELECT)) {
-    result = this.normalizeColor(node,
-        /** @type {acgraph.vector.Fill|Function} */(
-        (usePointSettings && node.get('selectFill')) || this.selectFill() || normalColor),
-        normalColor);
-  } else if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
-    result = this.normalizeColor(node,
-        /** @type {acgraph.vector.Fill|Function} */(
-        (usePointSettings && node.get('hoverFill')) || this.hoverFill() || normalColor),
-        normalColor);
-  } else {
-    result = this.normalizeColor(node, normalColor);
-  }
-
-  return acgraph.vector.normalizeFill(/** @type {!acgraph.vector.Fill} */(result));
-};
-
-
-/**
- * Final stroke.
- * @param {boolean} usePointSettings Whether to use point settings.
- * @param {anychart.PointState|number} pointState Point state.
- * @return {!acgraph.vector.Stroke} Stroke.
- */
-anychart.treemapModule.Chart.prototype.getFinalStroke = function(usePointSettings, pointState) {
-  var node = /** @type {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} */ (this.getIterator().getItem());
-  var normalColor = /** @type {acgraph.vector.Fill|Function} */((usePointSettings && node.get('stroke')) || this.stroke());
-
-  var result;
-  if (this.state.isStateContains(pointState, anychart.PointState.SELECT)) {
-    result = this.normalizeColor(node,
-        /** @type {acgraph.vector.Fill|Function} */(
-        (usePointSettings && node.get('selectStroke')) || this.selectStroke() || normalColor),
-        normalColor);
-  } else if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
-    result = this.normalizeColor(node,
-        /** @type {acgraph.vector.Fill|Function} */(
-        (usePointSettings && node.get('hoverStroke')) || this.hoverStroke() || normalColor),
-        normalColor);
-  } else {
-    result = this.normalizeColor(node, normalColor);
-  }
-
-  return acgraph.vector.normalizeStroke(/** @type {!acgraph.vector.Stroke} */(result));
-};
-
-
-/**
- * Final hatch fill.
- * @param {boolean} usePointSettings Whether to use point settings.
- * @param {anychart.PointState|number} pointState Point state.
- * @return {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} Hatch fill.
- */
-anychart.treemapModule.Chart.prototype.getFinalHatchFill = function(usePointSettings, pointState) {
-  var node = /** @type {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} */ (this.getIterator().getItem());
-  var normalHatchFill = /** @type {acgraph.vector.HatchFill|Function} */((usePointSettings && node.get('hatchFill')) || this.hatchFill());
-
-  var hatchFill;
-  if (this.state.isStateContains(pointState, anychart.PointState.SELECT)) {
-    hatchFill = (usePointSettings && node.get('selectHatchFill')) || this.selectHatchFill() || normalHatchFill;
-  } else if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
-    hatchFill = (usePointSettings && node.get('hoverHatchFill')) || this.hoverHatchFill() || normalHatchFill;
-  } else {
-    hatchFill = normalHatchFill;
-  }
-
-  return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */(
-      this.normalizeHatchFill(
-          /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|boolean|string} */(hatchFill)));
-};
-
-
-/**
- * Gets final normalized fill or stroke color.
- * @param {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} node .
- * @param {acgraph.vector.Fill|acgraph.vector.Stroke|Function} color Normal state color.
- * @param {...(acgraph.vector.Fill|acgraph.vector.Stroke|Function)} var_args .
- * @return {!(acgraph.vector.Fill|acgraph.vector.Stroke)} Normalized color.
- * @protected
- */
-anychart.treemapModule.Chart.prototype.normalizeColor = function(node, color, var_args) {
-  var fill;
-  var sourceColor;
-  if (goog.isFunction(color)) {
-    if (arguments.length > 2) {
-      var args = [node];
-      for (var i = 2; i < arguments.length; i++)
-        args.push(arguments[i]);
-      sourceColor = this.normalizeColor.apply(this, args);
-    } else {
-      sourceColor = anychart.getFullTheme('palette.items.0');
-    }
-    var scope = {
-      'value': node.meta(anychart.treemapModule.Chart.DataFields.VALUE),
-      'sourceColor': sourceColor,
-      'colorScale': this.colorScale()
-    };
-    fill = color.call(scope);
-  } else
-    fill = color;
-  return fill;
-};
-
-
-/**
- * Gets final normalized hatch fill.
- * @param {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|boolean|string} hatchFill Hatch fill.
- * @return {acgraph.vector.HatchFill|acgraph.vector.PatternFill} fill.
- * @protected
- */
-anychart.treemapModule.Chart.prototype.normalizeHatchFill = function(hatchFill) {
-  var fill;
-  var index = this.getIterator().getIndex();
-  var autoHatch;
-  if (goog.isFunction(hatchFill)) {
-    autoHatch = /** @type {string} */(anychart.getFullTheme('hatchFillPalette.items.0'));
-    var sourceHatchFill = acgraph.vector.normalizeHatchFill(autoHatch);
-    var scope = {
-      'index': index,
-      'sourceHatchFill': sourceHatchFill
-    };
-    fill = acgraph.vector.normalizeHatchFill(hatchFill.call(scope));
-  } else if (goog.isBoolean(hatchFill)) {
-    autoHatch = /** @type {string} */(anychart.getFullTheme('hatchFillPalette.items.0'));
-    fill = hatchFill ? acgraph.vector.normalizeHatchFill(autoHatch) : null;
-  } else
-    fill = acgraph.vector.normalizeHatchFill(hatchFill);
-  return fill;
 };
 
 
@@ -2423,7 +2046,8 @@ anychart.treemapModule.Chart.prototype.normalizeHatchFill = function(hatchFill) 
 anychart.treemapModule.Chart.prototype.calculateHeaderBounds_ = function(node, bounds) {
   var index = /** @type {number} */ (node.meta('index'));
   var header = /** @type {?(Object|undefined)} */ (node.get('header'));
-  var noHeader = this.noHeader_(header, this.headers());
+  var headers = this.normal().headers();
+  var noHeader = this.noHeader_(header, headers);
   if (noHeader)
     return anychart.math.rect(bounds.left, bounds.top, bounds.width, 0);
   header = header || {};
@@ -2433,7 +2057,7 @@ anychart.treemapModule.Chart.prototype.calculateHeaderBounds_ = function(node, b
   this.getIterator().select(index);
   var formatProvider = this.createFormatProvider();
   var maxHeadersHeight = anychart.utils.normalizeSize(/** @type {number|string} */(this.getOption('maxHeadersHeight')), bounds.height);
-  var rect = this.headers().measure(formatProvider, undefined, header);
+  var rect = headers.measure(formatProvider, undefined, header);
   if (rect.height > maxHeadersHeight)
     rect.height = maxHeadersHeight;
   return anychart.math.rect(bounds.left, bounds.top, bounds.width, rect.height);
@@ -2556,6 +2180,13 @@ anychart.treemapModule.Chart.prototype.ensureDataPrepared = function() {
 };
 
 
+/** @inheritDoc */
+anychart.treemapModule.Chart.prototype.toCsv = function(opt_chartDataExportMode, opt_csvSettings) {
+  return anychart.treeDataModule.utils.toCsv(
+      /** @type {anychart.treeDataModule.Tree|anychart.treeDataModule.View} */(this.data()), opt_csvSettings);
+};
+
+
 /**
  * Calculate data and scale.
  */
@@ -2623,6 +2254,7 @@ anychart.treemapModule.Chart.prototype.drawContent = function(bounds) {
       this.invalidate(anychart.ConsistencyState.BOUNDS);
     }
   }
+  var normal = this.normal();
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     if (this.colorRange_) {
       this.colorRange_.parentBounds(bounds.clone().round());
@@ -2632,8 +2264,8 @@ anychart.treemapModule.Chart.prototype.drawContent = function(bounds) {
     }
     if (this.dataLayer_)
       this.dataLayer_.clip(this.dataBounds_);
-    if (this.headers_)
-      this.headers_['clip'](this.dataBounds_);
+    if (normal.headers())
+      normal.headers()['clip'](this.dataBounds_);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.TREEMAP_COLOR_RANGE)) {
@@ -2659,10 +2291,10 @@ anychart.treemapModule.Chart.prototype.drawContent = function(bounds) {
       this.dataLayer_.zIndex(30);
       this.dataLayer_.parent(this.rootElement);
 
-      this.headers().container(this.rootElement).zIndex(41);
-      this.headers()['clip'](this.dataBounds_);
-      this.labels().container(this.rootElement).zIndex(40);
-      this.markers().container(this.rootElement).zIndex(40);
+      normal.headers().container(this.rootElement).zIndex(41);
+      normal.headers()['clip'](this.dataBounds_);
+      normal.labels().container(this.rootElement).zIndex(40);
+      normal.markers().container(this.rootElement).zIndex(40);
     }
 
     if (this.hatchLayer_) {
@@ -2677,9 +2309,9 @@ anychart.treemapModule.Chart.prototype.drawContent = function(bounds) {
       this.hatchLayer_.disablePointerEvents(true);
     }
 
-    this.headers().clear();
-    this.labels().clear();
-    this.markers().clear();
+    normal.headers().clear();
+    normal.labels().clear();
+    normal.markers().clear();
 
     var sort = /** @type {anychart.enums.Sort} */ (this.getOption('sort'));
     if (sort == anychart.enums.Sort.DESC) {
@@ -2690,9 +2322,9 @@ anychart.treemapModule.Chart.prototype.drawContent = function(bounds) {
 
     this.drawNode_(this.rootNode_, this.dataBounds_, 0);
 
-    this.headers().draw();
-    this.labels().draw();
-    this.markers().draw();
+    normal.headers().draw();
+    normal.labels().draw();
+    normal.markers().draw();
     this.markConsistent(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.TREEMAP_HINT_OPACITY);
   }
 
@@ -2704,7 +2336,8 @@ anychart.treemapModule.Chart.prototype.drawContent = function(bounds) {
       if (type == anychart.treemapModule.Chart.NodeType.RECT) {
         var shape = iterator.meta(anychart.treemapModule.Chart.DataFields.SHAPE);
         if (shape) {
-          var fill = this.getFinalFill(true, anychart.PointState.NORMAL);
+          var fillResolver = anychart.color.getColorResolver('fill', anychart.enums.ColorType.FILL, false);
+          var fill = /** @type {acgraph.vector.Fill} */ (fillResolver(this, anychart.PointState.NORMAL, false));
           fill = anychart.color.setOpacity(fill, /** @type {number} */ (this.getOption('hintOpacity')), true);
           shape.fill(fill);
         }
@@ -2805,7 +2438,6 @@ anychart.treemapModule.Chart.prototype.setupByJSON = function(config, opt_defaul
   }
 
   anychart.core.settings.deserialize(this, anychart.treemapModule.Chart.PROPERTY_DESCRIPTORS, config);
-  anychart.core.settings.deserialize(this, anychart.treemapModule.Chart.COLOR_DESCRIPTORS, config);
   this.hoverMode(config['hoverMode']);
   this.selectionMode(config['selectionMode']);
 
@@ -2814,29 +2446,10 @@ anychart.treemapModule.Chart.prototype.setupByJSON = function(config, opt_defaul
   if ('drillTo' in config)
     this.drillTo(config['drillTo']);
 
-
-  this.fill(config['fill']);
-  this.hoverFill(config['hoverFill']);
-  this.selectFill(config['selectFill']);
-
-  this.stroke(config['stroke']);
-  this.hoverStroke(config['hoverStroke']);
-  this.selectStroke(config['selectStroke']);
-
-  this.hatchFill(config['hatchFill']);
-  this.selectHatchFill(config['selectHatchFill']);
-  this.hoverHatchFill(config['hoverHatchFill']);
-
-  this.headers().setup(config['headers']);
-  this.hoverHeaders().setup(config['hoverHeaders']);
-
-  this.labels().setupInternal(!!opt_default, config['labels']);
-  this.hoverLabels().setupInternal(!!opt_default, config['hoverLabels']);
-  this.selectLabels().setupInternal(!!opt_default, config['selectLabels']);
-
-  this.markers().setup(config['markers']);
-  this.hoverMarkers().setup(config['hoverMarkers']);
-  this.selectMarkers().setup(config['selectMarkers']);
+  this.normal_.setupInternal(!!opt_default, config);
+  this.normal_.setupInternal(!!opt_default, config['normal']);
+  this.hovered_.setupInternal(!!opt_default, config['hovered']);
+  this.selected_.setupInternal(!!opt_default, config['selected']);
 };
 
 
@@ -2849,98 +2462,6 @@ anychart.treemapModule.Chart.prototype.serialize = function() {
   }
 
   json['type'] = this.getType();
-
-  if (goog.isFunction(this.fill())) {
-    anychart.core.reporting.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Series fill']
-    );
-  } else {
-    json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.fill()));
-  }
-
-  if (goog.isFunction(this.hoverFill())) {
-    anychart.core.reporting.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Series hoverFill']
-    );
-  } else {
-    json['hoverFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverFill()));
-  }
-
-  if (goog.isFunction(this.selectFill())) {
-    anychart.core.reporting.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Series selectFill']
-    );
-  } else {
-    json['selectFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.selectFill()));
-  }
-
-  if (goog.isFunction(this.stroke())) {
-    anychart.core.reporting.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Series stroke']
-    );
-  } else {
-    json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.stroke()));
-  }
-
-  if (goog.isFunction(this.hoverStroke())) {
-    anychart.core.reporting.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Series hoverStroke']
-    );
-  } else {
-    json['hoverStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.hoverStroke()));
-  }
-
-  if (goog.isFunction(this.selectStroke())) {
-    anychart.core.reporting.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Series selectStroke']
-    );
-  } else {
-    json['selectStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.selectStroke()));
-  }
-
-  if (goog.isFunction(this.hatchFill())) {
-    anychart.core.reporting.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Series hatchFill']
-    );
-  } else {
-    json['hatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hatchFill()));
-  }
-
-  if (goog.isFunction(this.hoverHatchFill())) {
-    anychart.core.reporting.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Series hoverHatchFill']
-    );
-  } else {
-    json['hoverHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/
-        (this.hoverHatchFill()));
-  }
-
-  if (goog.isFunction(this.selectHatchFill())) {
-    anychart.core.reporting.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Series selectHatchFill']
-    );
-  } else {
-    json['selectHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/
-        (this.selectHatchFill()));
-  }
 
   var data = this.data();
   if (data)
@@ -2958,25 +2479,11 @@ anychart.treemapModule.Chart.prototype.serialize = function() {
 
   json['colorRange'] = this.colorRange().serialize();
 
-  anychart.core.settings.serialize(this, anychart.treemapModule.Chart.PROPERTY_DESCRIPTORS, json);
-  anychart.core.settings.serialize(this, anychart.treemapModule.Chart.COLOR_DESCRIPTORS, json);
+  anychart.core.settings.serialize(this, anychart.treemapModule.Chart.PROPERTY_DESCRIPTORS, json, 'TreeMap');
 
-  json['labels'] = this.labels().serialize();
-  json['hoverLabels'] = this.hoverLabels().getChangedSettings();
-  json['selectLabels'] = this.selectLabels().getChangedSettings();
-  if (goog.isNull(json['hoverLabels']['enabled'])) {
-    delete json['hoverLabels']['enabled'];
-  }
-  if (goog.isNull(json['selectLabels']['enabled'])) {
-    delete json['selectLabels']['enabled'];
-  }
-
-  json['headers'] = this.headers().serialize();
-  json['hoverHeaders'] = this.hoverHeaders().serialize();
-
-  json['markers'] = this.markers().serialize();
-  json['hoverMarkers'] = this.hoverMarkers().serialize();
-  json['selectMarkers'] = this.selectMarkers().serialize();
+  json['normal'] = this.normal().serialize();
+  json['hovered'] = this.hovered().serialize();
+  json['selected'] = this.selected().serialize();
 
   return {'chart': json};
 };
@@ -2984,18 +2491,10 @@ anychart.treemapModule.Chart.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.treemapModule.Chart.prototype.disposeInternal = function() {
-  goog.disposeAll(this.headers_, this.hoverHeaders_, this.labels_, this.hoverLabels_, this.selectLabels_, this.markers_, this.hoverMarkers_, this.selectMarkers_);
-  this.headers_ = null;
-  this.hoverHeaders_ = null;
-
-  this.labels_ = null;
-  this.hoverLabels_ = null;
-  this.selectLabels_ = null;
-
-  this.markers_ = null;
-  this.hoverMarkers_ = null;
-  this.selectMarkers_ = null;
-
+  goog.disposeAll(this.normal_, this.hovered_, this.selected_);
+  this.normal_ = null;
+  this.hovered_ = null;
+  this.selected_ = null;
   anychart.treemapModule.Chart.base(this, 'disposeInternal');
 };
 
@@ -3017,32 +2516,12 @@ anychart.treemapModule.Chart.prototype.disposeInternal = function() {
   // proto['headersDisplayMode'] = proto.headersDisplayMode;
   // proto['labelsDisplayMode'] = proto.labelsDisplayMode;
 
-  proto['headers'] = proto.headers;
-  proto['hoverHeaders'] = proto.hoverHeaders;
-
-
-  proto['labels'] = proto.labels;
-  proto['hoverLabels'] = proto.hoverLabels;
-  proto['selectLabels'] = proto.selectLabels;
-
-  proto['markers'] = proto.markers;
-  proto['hoverMarkers'] = proto.hoverMarkers;
-  proto['selectMarkers'] = proto.selectMarkers;
+  proto['normal'] = proto.normal;
+  proto['hovered'] = proto.hovered;
+  proto['selected'] = proto.selected;
 
   proto['colorScale'] = proto.colorScale;
   proto['colorRange'] = proto.colorRange;
-
-  proto['fill'] = proto.fill;
-  proto['hoverFill'] = proto.hoverFill;
-  proto['selectFill'] = proto.selectFill;
-
-  proto['stroke'] = proto.stroke;
-  proto['hoverStroke'] = proto.hoverStroke;
-  proto['selectStroke'] = proto.selectStroke;
-
-  proto['hatchFill'] = proto.hatchFill;
-  proto['hoverHatchFill'] = proto.hoverHatchFill;
-  proto['selectHatchFill'] = proto.selectHatchFill;
 
   proto['drillTo'] = proto.drillTo;
   proto['drillUp'] = proto.drillUp;

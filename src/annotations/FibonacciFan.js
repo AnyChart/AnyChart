@@ -36,13 +36,10 @@ anychart.annotationsModule.FibonacciFan = function(chartController) {
    * @return {acgraph.vector.Stroke}
    */
   this.gridResolver = /** @type {function(anychart.annotationsModule.Base,number,number=):acgraph.vector.Stroke} */(
-      anychart.annotationsModule.Base.getColorResolver(
-          ['grid', 'hoverGrid', 'selectGrid'],
-          anychart.enums.ColorType.STROKE));
-  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.annotationsModule.GRID_DESCRIPTORS_META);
+      anychart.annotationsModule.Base.getColorResolver('grid', anychart.enums.ColorType.STROKE, true));
 };
 goog.inherits(anychart.annotationsModule.FibonacciFan, anychart.annotationsModule.FibonacciBase);
-anychart.core.settings.populate(anychart.annotationsModule.FibonacciFan, anychart.annotationsModule.GRID_DESCRIPTORS);
+anychart.core.settings.populateAliases(anychart.annotationsModule.FibonacciFan, ['grid'], 'normal');
 anychart.annotationsModule.AnnotationTypes[anychart.enums.AnnotationTypes.FIBONACCI_FAN] = anychart.annotationsModule.FibonacciFan;
 
 
@@ -79,6 +76,15 @@ anychart.annotationsModule.FibonacciFan.prototype.timeLevels = function(opt_valu
     return this;
   }
   return goog.array.slice(this.timeLevels_, 0);
+};
+
+
+//endregion
+//region State settings
+/** @inheritDoc */
+anychart.annotationsModule.FibonacciFan.prototype.getNormalDescriptorsMeta = function() {
+  var base = anychart.annotationsModule.FibonacciFan.base(this, 'getNormalDescriptorsMeta');
+  return goog.array.concat(base, anychart.annotationsModule.GRID_DESCRIPTORS_META);
 };
 
 
@@ -281,21 +287,15 @@ anychart.annotationsModule.FibonacciFan.prototype.setDefaultSettings = function(
 /** @inheritDoc */
 anychart.annotationsModule.FibonacciFan.prototype.serialize = function() {
   var json = anychart.annotationsModule.FibonacciFan.base(this, 'serialize');
-
   json['timeLevels'] = this.timeLevels();
-  anychart.core.settings.serialize(this, anychart.annotationsModule.GRID_DESCRIPTORS, json, 'Annotation');
-
   return json;
 };
 
 
 /** @inheritDoc */
 anychart.annotationsModule.FibonacciFan.prototype.setupByJSON = function(config, opt_default) {
-
-  this.timeLevels(config['timeLevels']);
-  anychart.core.settings.deserialize(this, anychart.annotationsModule.GRID_DESCRIPTORS, config);
-
   anychart.annotationsModule.FibonacciFan.base(this, 'setupByJSON', config, opt_default);
+  this.timeLevels(config['timeLevels']);
 };
 
 

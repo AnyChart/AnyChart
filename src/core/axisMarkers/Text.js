@@ -41,7 +41,7 @@ anychart.core.axisMarkers.Text.prototype.SUPPORTED_CONSISTENCY_STATES =
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Getter/setter for scale.
- * @param {anychart.scales.Base=} opt_value Scale.
+ * @param {(anychart.scales.Base|Object|anychart.enums.ScaleTypes)=} opt_value Scale.
  * @return {anychart.scales.Base|!anychart.core.axisMarkers.Text} Axis scale or itself for method chaining.
  */
 anychart.core.axisMarkers.Text.prototype.scale = function(opt_value) {

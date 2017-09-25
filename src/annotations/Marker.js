@@ -32,9 +32,7 @@ anychart.annotationsModule.Marker = function(chartController) {
    * @private
    */
   this.strokeResolver_ = /** @type {function(anychart.annotationsModule.Base,number):acgraph.vector.Stroke} */(
-      anychart.annotationsModule.Base.getColorResolver(
-          ['stroke', 'hoverStroke', 'selectStroke'],
-          anychart.enums.ColorType.STROKE));
+      anychart.annotationsModule.Base.getColorResolver('stroke', anychart.enums.ColorType.STROKE, true));
 
   /**
    * Fill resolver.
@@ -44,9 +42,7 @@ anychart.annotationsModule.Marker = function(chartController) {
    * @private
    */
   this.fillResolver_ = /** @type {function(anychart.annotationsModule.Base,number):acgraph.vector.Fill} */(
-      anychart.annotationsModule.Base.getColorResolver(
-          ['fill', 'hoverFill', 'selectFill'],
-          anychart.enums.ColorType.FILL));
+      anychart.annotationsModule.Base.getColorResolver('fill', anychart.enums.ColorType.FILL, true));
 
   /**
    * Hatch fill resolver.
@@ -56,20 +52,15 @@ anychart.annotationsModule.Marker = function(chartController) {
    * @private
    */
   this.hatchFillResolver_ = /** @type {function(anychart.annotationsModule.Base,number):acgraph.vector.PatternFill} */(
-      anychart.annotationsModule.Base.getColorResolver(
-          ['hatchFill', 'hoverHatchFill', 'selectHatchFill'],
-          anychart.enums.ColorType.HATCH_FILL));
+      anychart.annotationsModule.Base.getColorResolver('hatchFill', anychart.enums.ColorType.HATCH_FILL, true));
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.annotationsModule.X_ANCHOR_DESCRIPTORS_META);
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.annotationsModule.VALUE_ANCHOR_DESCRIPTORS_META);
-  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.annotationsModule.STROKE_DESCRIPTORS_META);
-  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.annotationsModule.FILL_DESCRIPTORS_META);
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.annotationsModule.MARKER_DESCRIPTORS_META);
 };
 goog.inherits(anychart.annotationsModule.Marker, anychart.annotationsModule.Base);
+anychart.core.settings.populateAliases(anychart.annotationsModule.Marker, ['stroke', 'fill', 'hatchFill', 'size'], 'normal');
 anychart.core.settings.populate(anychart.annotationsModule.Marker, anychart.annotationsModule.X_ANCHOR_DESCRIPTORS);
 anychart.core.settings.populate(anychart.annotationsModule.Marker, anychart.annotationsModule.VALUE_ANCHOR_DESCRIPTORS);
-anychart.core.settings.populate(anychart.annotationsModule.Marker, anychart.annotationsModule.STROKE_DESCRIPTORS);
-anychart.core.settings.populate(anychart.annotationsModule.Marker, anychart.annotationsModule.FILL_DESCRIPTORS);
 anychart.core.settings.populate(anychart.annotationsModule.Marker, anychart.annotationsModule.MARKER_DESCRIPTORS);
 anychart.annotationsModule.AnnotationTypes[anychart.enums.AnnotationTypes.MARKER] = anychart.annotationsModule.Marker;
 
@@ -89,6 +80,16 @@ anychart.annotationsModule.Marker.prototype.type = anychart.enums.AnnotationType
  * @type {anychart.annotationsModule.AnchorSupport}
  */
 anychart.annotationsModule.Marker.prototype.SUPPORTED_ANCHORS = anychart.annotationsModule.AnchorSupport.ONE_POINT;
+
+
+//endregion
+//region State settings
+/** @inheritDoc */
+anychart.annotationsModule.Marker.prototype.getNormalDescriptorsMeta = function() {
+  return goog.array.concat(
+      anychart.annotationsModule.FILL_STROKE_DESCRIPTORS_META,
+      anychart.annotationsModule.MARKER_DESCRIPTORS_STATE_META);
+};
 
 
 //endregion
@@ -130,11 +131,11 @@ anychart.annotationsModule.Marker.prototype.ensureCreated = function() {
 anychart.annotationsModule.Marker.prototype.drawOnePointShape = function(x, y) {
   var size;
   if (!!(this.state & anychart.PointState.SELECT)) {
-    size = this.getOption('selectSize');
+    size = this.selected_.getOption('size');
   } else if (!!(this.state & anychart.PointState.HOVER)) {
-    size = this.getOption('hoverSize');
+    size = this.hovered_.getOption('size');
   }
-  size = /** @type {number} */(isNaN(size) ? this.getOption('size') : size);
+  size = /** @type {number} */(isNaN(size) ? this.normal_.getOption('size') : size);
   var drawer = anychart.utils.getMarkerDrawer(this.getOption('markerType'));
   var anchor = /** @type {anychart.enums.Anchor} */(this.getOption('anchor'));
   var position = {x: x, y: y};
@@ -201,8 +202,6 @@ anychart.annotationsModule.Marker.prototype.serialize = function() {
   var json = anychart.annotationsModule.Marker.base(this, 'serialize');
 
   anychart.core.settings.serialize(this, anychart.annotationsModule.MARKER_DESCRIPTORS, json, 'Annotation');
-  anychart.core.settings.serialize(this, anychart.annotationsModule.FILL_DESCRIPTORS, json, 'Annotation');
-  anychart.core.settings.serialize(this, anychart.annotationsModule.STROKE_DESCRIPTORS, json, 'Annotation');
   anychart.core.settings.serialize(this, anychart.annotationsModule.X_ANCHOR_DESCRIPTORS, json, 'Annotation');
   anychart.core.settings.serialize(this, anychart.annotationsModule.VALUE_ANCHOR_DESCRIPTORS, json, 'Annotation');
 
@@ -212,14 +211,11 @@ anychart.annotationsModule.Marker.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.annotationsModule.Marker.prototype.setupByJSON = function(config, opt_default) {
+  anychart.annotationsModule.Marker.base(this, 'setupByJSON', config, opt_default);
 
   anychart.core.settings.deserialize(this, anychart.annotationsModule.MARKER_DESCRIPTORS, config);
-  anychart.core.settings.deserialize(this, anychart.annotationsModule.FILL_DESCRIPTORS, config);
-  anychart.core.settings.deserialize(this, anychart.annotationsModule.STROKE_DESCRIPTORS, config);
   anychart.core.settings.deserialize(this, anychart.annotationsModule.X_ANCHOR_DESCRIPTORS, config);
   anychart.core.settings.deserialize(this, anychart.annotationsModule.VALUE_ANCHOR_DESCRIPTORS, config);
-
-  anychart.annotationsModule.Marker.base(this, 'setupByJSON', config, opt_default);
 };
 
 

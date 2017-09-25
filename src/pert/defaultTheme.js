@@ -28,36 +28,37 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'milestones': {
       'shape': 'circle',
       'size': '5%',
-      'labels': {
-        'enabled': true,
-        'anchor': 'left-top',
-        'vAlign': 'middle',
-        'hAlign': 'center',
-        'fontColor': '#fff',
-        'disablePointerEvents': true,
-        'format': anychart.core.defaultTheme.returnMilestoneName
+      'normal': {
+        'labels': {
+          'enabled': true,
+          'anchor': 'left-top',
+          'vAlign': 'middle',
+          'hAlign': 'center',
+          'fontColor': '#fff',
+          'disablePointerEvents': true,
+          'format': anychart.core.defaultTheme.returnMilestoneName
+        },
+        'fill': anychart.core.defaultTheme.returnSourceColor85,
+        'stroke': 'none'
       },
-      'hoverLabels': {
-        'enabled': null,
-        'fontColor': '#fff',
-        'fontOpacity': 1
+      'hovered': {
+        'labels': {
+          'enabled': null,
+          'fontColor': '#fff',
+          'fontOpacity': 1
+        },
+        'fill': anychart.core.defaultTheme.returnLightenSourceColor,
+        'stroke': anychart.core.defaultTheme.returnThickenedStrokeSourceColor
       },
-      'selectLabels': {
-        'enabled': null,
-        'fontWeight': 'bold'
+      'selected': {
+        'labels': {
+          'enabled': null,
+          'fontWeight': 'bold'
+        },
+        'fill': anychart.core.defaultTheme.defaultSelectColor,
+        'stroke': anychart.core.defaultTheme.defaultSelectColor
       },
-
       'color': '#64b5f6',
-
-      'fill': anychart.core.defaultTheme.returnSourceColor85,
-      'stroke': 'none',
-
-      'hoverFill': anychart.core.defaultTheme.returnLightenSourceColor,
-      'hoverStroke': anychart.core.defaultTheme.returnThickenedStrokeSourceColor,
-
-      'selectFill': anychart.core.defaultTheme.defaultSelectColor,
-      'selectStroke': anychart.core.defaultTheme.defaultSelectColor,
-
       'tooltip': {
         'title': {'enabled': true},
         'separator': {'enabled': true},
@@ -99,67 +100,68 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     },
     'tasks': {
       'color': '#64b5f6',
-
-      'fill': anychart.core.defaultTheme.returnSourceColor85,
-      'stroke': anychart.core.defaultTheme.returnSourceColor85,
-
-      'hoverFill': anychart.core.defaultTheme.returnLightenSourceColor,
-      'hoverStroke': anychart.core.defaultTheme.returnThickenedStrokeSourceColor,
-
-      'selectFill': anychart.core.defaultTheme.defaultSelectColor,
-      'selectStroke': anychart.core.defaultTheme.defaultSelectColor,
-
-      'dummyFill': anychart.core.defaultTheme.returnSourceColor85,
-      'dummyStroke': anychart.core.defaultTheme.returnDashedStrokeSourceColor,
-
-      'upperLabels': {
-        'enabled': true,
-        'anchor': 'center-bottom',
-        'vAlign': 'bottom',
-        'hAlign': 'center',
-        'fontSize': 10,
-        'contColor': '#333',
-        'padding': {
-          'top': 1,
-          'right': 10,
-          'bottom': 1,
-          'left': 10
+      'normal': {
+        'fill': anychart.core.defaultTheme.returnSourceColor85,
+        'stroke': anychart.core.defaultTheme.returnSourceColor85,
+        'dummyFill': anychart.core.defaultTheme.returnSourceColor85,
+        'dummyStroke': anychart.core.defaultTheme.returnDashedStrokeSourceColor,
+        'upperLabels': {
+          'enabled': true,
+          'anchor': 'center-bottom',
+          'vAlign': 'bottom',
+          'hAlign': 'center',
+          'fontSize': 10,
+          'contColor': '#333',
+          'padding': {
+            'top': 1,
+            'right': 10,
+            'bottom': 1,
+            'left': 10
+          },
+          /**
+           * @this {*}
+           * @return {*}
+           */
+          'format': function() {
+            return this['name'];
+          }
         },
-        /**
-         * @this {*}
-         * @return {*}
-         */
-        'format': function() {
-          return this['name'];
+        'lowerLabels': {
+          'enabled': true,
+          'anchor': 'center-top',
+          'vAlign': 'top',
+          'hAlign': 'center',
+          'fontSize': 9,
+          'fontOpacity': 0.5,
+          'contColor': '#333',
+          'padding': {
+            'top': 1,
+            'right': 5,
+            'bottom': 1,
+            'left': 5
+          },
+          /**
+           * @this {*}
+           * @return {*}
+           */
+          'format': function() {
+            return 't: ' + anychart.core.defaultTheme.locNum(this['duration']);
+          }
         }
       },
-      'hoverUpperLabels': {'fontWeight': 'bold'},
-      'selectUpperLabels': {'fontWeight': 'bold'},
-
-      'lowerLabels': {
-        'enabled': true,
-        'anchor': 'center-top',
-        'vAlign': 'top',
-        'hAlign': 'center',
-        'fontSize': 9,
-        'fontOpacity': 0.5,
-        'contColor': '#333',
-        'padding': {
-          'top': 1,
-          'right': 5,
-          'bottom': 1,
-          'left': 5
-        },
-        /**
-         * @this {*}
-         * @return {*}
-         */
-        'format': function() {
-          return 't: ' + anychart.core.defaultTheme.locNum(this['duration']);
-        }
+      'hovered': {
+        'fill': anychart.core.defaultTheme.returnLightenSourceColor,
+        'stroke': anychart.core.defaultTheme.returnThickenedStrokeSourceColor,
+        'upperLabels': {'fontWeight': 'bold'},
+        'lowerLabels': {'fontWeight': 'bold'}
       },
-      'hoverLowerLabels': {'fontWeight': 'bold'},
-      'selectLowerLabels': {'fontWeight': 'bold'},
+      'selected': {
+        'fill': anychart.core.defaultTheme.defaultSelectColor,
+        'stroke': anychart.core.defaultTheme.defaultSelectColor,
+        'upperLabels': {'fontWeight': 'bold'},
+        'lowerLabels': {'fontWeight': 'bold'}
+      },
+
       'tooltip': {
         'title': {'enabled': true},
         'separator': {'enabled': true},
@@ -187,8 +189,10 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'criticalPath': {
       'tasks': {
         'color': '#e06666',
-        'lowerLabels': {},
-        'upperLabels': {}
+        'normal': {
+          'lowerLabels': {},
+          'upperLabels': {}
+        }
       }
     }
   }

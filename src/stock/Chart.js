@@ -17,6 +17,7 @@ goog.require('anychart.stockModule.scales.IKeyIndexTransformer');
 goog.require('anychart.stockModule.scales.Ordinal');
 goog.require('anychart.stockModule.scales.Scatter');
 goog.require('anychart.utils');
+goog.require('goog.array');
 goog.require('goog.events.MouseWheelHandler');
 
 
@@ -55,6 +56,12 @@ anychart.stockModule.Chart = function(opt_allowPointSettings) {
    */
   this.dataController_ = new anychart.stockModule.Controller();
   this.dataController_.listenSignals(this.dataControllerInvalidated_, this);
+
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this.preserveSelectedRangeOnDataUpdate_ = false;
 
   /**
    * Common X scale of all series of the chart.
@@ -791,12 +798,20 @@ anychart.stockModule.Chart.prototype.getSelectedRange = function() {
 /**
  * Stock chart X scale getter and setter. It is a misconfiguration if you use it as a setter with anything but a string.
  * We can consider a warning for that.
- * @param {string=} opt_value
+ * @param {(string|Object)=} opt_value
  * @return {anychart.stockModule.scales.Scatter|anychart.stockModule.Chart}
  */
 anychart.stockModule.Chart.prototype.xScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    var askedForScatter = anychart.stockModule.scales.Scatter.askedForScatter(opt_value);
+    var newType;
+    if (goog.isString(opt_value)) {
+      newType = opt_value;
+    } else if (goog.isObject(opt_value)) {
+      // for now only the type of the scale can be changed by the object setter
+      newType = opt_value['type'];
+    }
+    newType = String(newType).toLowerCase();
+    var askedForScatter = newType == 'scatter';
     var currIsScatter = this.xScale_ && !(this.xScale_ instanceof anychart.stockModule.scales.Ordinal);
     if (askedForScatter != currIsScatter) {
       if (askedForScatter) {
@@ -849,6 +864,21 @@ anychart.stockModule.Chart.prototype.scrollerGrouping = function(opt_value) {
 };
 
 
+/**
+ * If the selected range absolute date start and absolute date end should be preserved on data update.
+ * If false - the ratio of start and end points relative to the whole range is preserved.
+ * @param {boolean=} opt_value
+ * @return {anychart.stockModule.Chart|boolean}
+ */
+anychart.stockModule.Chart.prototype.preserveSelectedRangeOnDataUpdate = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.preserveSelectedRangeOnDataUpdate_ = !!opt_value;
+    return this;
+  }
+  return this.preserveSelectedRangeOnDataUpdate_;
+};
+
+
 //endregion
 //region Infrastructure methods
 //----------------------------------------------------------------------------------------------------------------------
@@ -878,12 +908,13 @@ anychart.stockModule.Chart.prototype.setDefaultPlotSettings = function(value) {
  */
 anychart.stockModule.Chart.prototype.selectRangeInternal_ = function(start, end) {
   var xScale = /** @type {!anychart.stockModule.scales.Scatter} */(this.xScale());
+  var scrollerXScale = /** @type {!anychart.stockModule.scales.Scatter} */(this.scroller().xScale());
   if (this.dataController_.refreshFullRange()) {
     this.dataController_.updateFullScaleRange(xScale);
-    this.dataController_.updateFullScaleRange(/** @type {!anychart.stockModule.scales.Scatter} */(this.scroller().xScale()));
+    this.dataController_.updateFullScaleRange(scrollerXScale);
   }
-  if (this.dataController_.select(start, end)) {
-    this.dataController_.updateCurrentScaleRange(xScale, false);
+  if (this.dataController_.select(start, end, scrollerXScale)) {
+    this.dataController_.updateCurrentScaleRange(xScale);
     this.invalidateRedrawable();
   }
 };
@@ -973,6 +1004,8 @@ anychart.stockModule.Chart.prototype.getPlotsCount = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.stockModule.Chart.prototype.drawContent = function(bounds) {
+  var i, plot;
+
   if (this.annotationsModule)
     this.annotations().ready(true);
 
@@ -989,15 +1022,20 @@ anychart.stockModule.Chart.prototype.drawContent = function(bounds) {
     anychart.performance.start('Stock data calc');
     var xScale = /** @type {anychart.stockModule.scales.Scatter} */(this.xScale());
     var scrollerXScale = /** @type {anychart.stockModule.scales.Scatter} */(this.scroller().xScale());
-    var changed = this.dataController_.refreshSelection(this.minPlotsDrawingWidth_);
-    this.dataController_.updateFullScaleRange(xScale);
-    this.dataController_.updateFullScaleRange(scrollerXScale);
+    var changed = this.dataController_.refreshSelection(
+        this.minPlotsDrawingWidth_,
+        this.inDrag_ || this.preserveSelectedRangeOnDataUpdate_,
+        xScale, scrollerXScale);
     if (!!(changed & 1)) {
-      this.dataController_.updateCurrentScaleRange(xScale, false);
       this.invalidateRedrawable();
+      for (i = 0; i < this.plots_.length; i++) {
+        plot = this.plots_[i];
+        if (plot) {
+          plot.refreshDragAnchor();
+        }
+      }
     }
     if (!!(changed & 2)) {
-      this.dataController_.updateCurrentScaleRange(scrollerXScale, true);
       this.scroller_.invalidateScaleDependend();
       this.invalidate(anychart.ConsistencyState.STOCK_SCROLLER);
     }
@@ -1027,8 +1065,8 @@ anychart.stockModule.Chart.prototype.drawContent = function(bounds) {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.STOCK_PLOTS_APPEARANCE)) {
     anychart.performance.start('Stock drawing plots');
-    for (var i = 0; i < this.plots_.length; i++) {
-      var plot = this.plots_[i];
+    for (i = 0; i < this.plots_.length; i++) {
+      plot = this.plots_[i];
       if (plot) {
         plot
             .container(this.rootElement)
@@ -1065,6 +1103,15 @@ anychart.stockModule.Chart.prototype.drawContent = function(bounds) {
 anychart.stockModule.Chart.prototype.valueStacking_ = function(scale, point, stack, val, prevStack, prevVal) {
   this.percentStacking_(scale, point, stack, val, prevStack, prevVal);
   var positive = val >= 0;
+
+  stack.shared = stack.shared || {
+    positiveAnchor: NaN,
+    negativeAnchor: NaN
+  };
+
+  if (!point.meta('shared'))
+    point.meta('shared', stack.shared);
+
   if (stack.prevMissing) {
     if (positive) {
       point.meta('stackedZeroPrev', stack.prevPositive);
@@ -2435,6 +2482,31 @@ anychart.stockModule.Chart.prototype.getDragAnchor = function() {
 
 
 /**
+ * Refreshes drag anchor.
+ * @param {anychart.stockModule.Chart.DragAnchor} anchor
+ */
+anychart.stockModule.Chart.prototype.refreshDragAnchor = function(anchor) {
+  var controller = this.dataController_;
+  var vf = controller.getFirstKey();
+  var vl = controller.getLastKey();
+  var vfi = this.getIndexByKey(vf);
+  var vli = this.getIndexByKey(vl);
+  var fs = controller.getFirstSelectedKey();
+  var ls = controller.getLastSelectedKey();
+  var fsi = controller.getFirstSelectedIndex();//this.getIndexByKey(fs);
+  var lsi = controller.getLastSelectedIndex();//this.getIndexByKey(ls);
+  anchor.firstKey = fs;
+  anchor.lastKey = ls;
+  anchor.firstIndex = fsi;
+  anchor.lastIndex = lsi;
+  anchor.minKey = vf;
+  anchor.maxKey = vl;
+  anchor.minIndex = vfi;
+  anchor.maxIndex = vli;
+};
+
+
+/**
  * Drags the chart to passed position. If opt_source passed - dispatches with that source instead of plot drag.
  * @param {number} ratio
  * @param {anychart.stockModule.Chart.DragAnchor} anchor
@@ -2465,8 +2537,6 @@ anychart.stockModule.Chart.prototype.dragToRatio = function(ratio, anchor, opt_s
     anchor.lastIndex = this.getIndexByKey(anchor.lastKey);
     anchor.minIndex = this.getIndexByKey(anchor.minKey);
     anchor.maxIndex = this.getIndexByKey(anchor.maxKey);
-    // anchor.minKey = this.dataController_.getFirstKey();
-    // anchor.maxKey = this.dataController_.getLastKey();
     this.dispatchRangeChange_(
         anychart.enums.EventType.SELECTED_RANGE_CHANGE,
         opt_source || anychart.enums.StockRangeChangeSource.PLOT_DRAG);
@@ -2505,6 +2575,7 @@ anychart.stockModule.Chart.prototype.askDragStart = function() {
       anychart.enums.EventType.SELECTED_RANGE_CHANGE_START,
       anychart.enums.StockRangeChangeSource.PLOT_DRAG);
   if (res) {
+    this.inDrag_ = true;
     this.preventHighlight();
     goog.style.setStyle(document['body'], 'cursor', acgraph.vector.Cursor.EW_RESIZE);
   }
@@ -2516,6 +2587,7 @@ anychart.stockModule.Chart.prototype.askDragStart = function() {
  * Notifies the chart, that the drag process has ended.
  */
 anychart.stockModule.Chart.prototype.dragEnd = function() {
+  this.inDrag_ = false;
   goog.style.setStyle(document['body'], 'cursor', '');
   this.dispatchRangeChange_(
       anychart.enums.EventType.SELECTED_RANGE_CHANGE_FINISH,
@@ -2616,279 +2688,89 @@ anychart.stock = function(opt_allowPointSettings) {
 
 
 /** @inheritDoc */
-anychart.stockModule.Chart.prototype.extractHeaders = function(storage, headers, headersLength) {
-  var i;
-  var knownFields = storage.getKnownFields();
-  if (goog.isNumber(knownFields)) {
-    for (i = 0; i < knownFields; i++)
-      if (!(i in headers))
-        headers[i] = headersLength++;
-  } else {
-    for (i in knownFields)
-      if (!(i in headers))
-        headers[i] = headersLength++;
+anychart.stockModule.Chart.prototype.getRawCsvDataSources = function() {
+  var tables = this.dataController_.getAllTables();
+  var res = [];
+  for (var i in tables) {
+    res.push(tables[i].getStorage());
   }
-  return headersLength;
+  return res;
 };
 
 
 /** @inheritDoc */
-anychart.stockModule.Chart.prototype.toCsv = function(opt_chartDataExportMode, opt_csvSettings) {
-  opt_chartDataExportMode = anychart.enums.normalizeChartDataExportMode(opt_chartDataExportMode);
-  var rawData = (opt_chartDataExportMode == anychart.enums.ChartDataExportMode.RAW);
-  var groupedData = (opt_chartDataExportMode == anychart.enums.ChartDataExportMode.GROUPED);
-  var settings = goog.isObject(opt_csvSettings) ? opt_csvSettings : {};
-  var rowsSeparator = settings['rowsSeparator'] || '\n';
-  anychart.utils.checkSeparator(rowsSeparator);
-  var columnsSeparator = settings['columnsSeparator'] || ',';
-  anychart.utils.checkSeparator(columnsSeparator);
-  var ignoreFirstRow = settings['ignoreFirstRow'] || false;
+anychart.stockModule.Chart.prototype.getCsvGrouperColumn = function() {
+  return ['_', 'x'];
+};
 
-  var plot;
-  var i, j, k;
-  var len;
-  var series;
-  var seriesList;
-  var seriesListLength;
-  var seriesData;
-  var seriesDataTable;
-  var uid;
-  var storage;
-  var storages;
 
-  storages = {};
-  var storagesCount = 0;
-  for (k = 0, len = this.plots_.length; k < len; k++) {
-    plot = this.plots_[k];
-    if (plot) {
-      seriesList = plot.getAllSeries();
-      seriesListLength = seriesList.length;
-
-      for (i = 0; i < seriesListLength; i++) {
-        series = seriesList[i];
-        seriesData = series.getSelectableData();
-        seriesDataTable = seriesData.getMapping().getTable();
-        storage = seriesDataTable.getStorage();
-        uid = goog.getUid(storage);
-        if (!(uid in storages)) {
-          storages[uid] = storage;
-          storagesCount++;
-        }
-      }
-    }
-  }
-
-  var csvHeaders;
-  var header;
-  var headers;
-  var headersLength = 0;
-  var columnToIndex;
-  var csvStrings;
-  var finalValue;
-  var value;
-
-  if (rawData) {
-    var needCountStorages = storagesCount > 1;
-    headers = {};
-    if (needCountStorages) {
-      headers['#'] = headersLength++;
-    }
-
-    for (uid in storages) {
-      storage = storages[uid];
-      headersLength = this.extractHeaders(storage, headers, headersLength);
-    }
-
-    csvStrings = [];
-
-    if (!ignoreFirstRow) {
-      csvHeaders = [];
-      for (header in headers)
-        csvHeaders[headers[header]] = header;
-      csvStrings.push(csvHeaders.join(columnsSeparator));
-    }
-
-    var storageNumber = 0;
-    var column, columnIndex;
-    for (uid in storages) {
-      storage = storages[uid];
-
-      for (i = 0, len = storage.getRowsCount(); i < len; i++) {
-        var csvRow = new Array(headersLength);
-        var row = storage.getRow(i).values;
-        for (column in row) {
-          columnIndex = headers[column];
-          finalValue = goog.isObject(row[column]) ? goog.json.serialize(row[column]) : row[column];
-          csvRow[columnIndex] = finalValue;
-        }
-        if (needCountStorages)
-          csvRow[0] = storageNumber;
-        this.escapeValuesInRow(csvRow, columnsSeparator, rowsSeparator);
-        csvStrings.push(csvRow.join(columnsSeparator));
-      }
-      storageNumber++;
-    }
-    return csvStrings.join(rowsSeparator);
+/** @inheritDoc */
+anychart.stockModule.Chart.prototype.getCsvExportRow = function(x, xAlias, data, xValues, id, index) {
+  var xHash = anychart.utils.hash(x);
+  var rowIndex;
+  if (xHash in xValues) {
+    rowIndex = xValues[xHash];
   } else {
-    var plotPrefix;
-    var seriesPrefix;
-    var x;
-    var fields, field;
-    var csvRows = {};
-    csvHeaders = [];
-    headers = [];
-    var prefixed;
-    if (groupedData) {
-      csvHeaders.push('x');
-      for (k = 0, len = this.plots_.length; k < len; k++) {
-        plotPrefix = this.plots_.length > 1 ? ('plot_' + k + '_') : '';
-        plot = this.plots_[k];
-        if (plot) {
-          seriesList = plot.getAllSeries();
-          seriesListLength = seriesList.length;
-
-          for (i = 0; i < seriesListLength; i++) {
-            seriesPrefix = seriesListLength > 1 ? ('series_' + i + '_') : '';
-            series = seriesList[i];
-            if (series) {
-              seriesData = series.getSelectableData();
-              headers = [];
-              fields = seriesData.getMapping().getFieldsInternal();
-              for (field in fields) {
-                headers.push(plotPrefix + seriesPrefix + field);
-              }
-              csvHeaders = goog.array.concat(csvHeaders, headers);
-            }
-          }
-        }
-      }
-
-      columnToIndex = {};
-      for (i = 0, len = csvHeaders.length; i < len; i++) {
-        columnToIndex[csvHeaders[i]] = i;
-      }
-
-      var mapping;
-      csvRows = {};
-      for (k = 0, len = this.plots_.length; k < len; k++) {
-        plotPrefix = this.plots_.length > 1 ? ('plot_' + k + '_') : '';
-        plot = this.plots_[k];
-        if (plot) {
-          seriesList = plot.getAllSeries();
-          seriesListLength = seriesList.length;
-          seriesPrefix = seriesListLength > 1 ? 'series_' : '';
-
-          for (i = 0; i < seriesListLength; i++) {
-            seriesPrefix = seriesListLength > 1 ? ('series_' + i + '_') : '';
-            series = seriesList[i];
-            if (series) {
-              seriesData = series.getSelectableData();
-              mapping = seriesData.getMapping();
-              fields = mapping.getFieldsInternal();
-
-              var iterator = seriesData.getExportingIterator();
-              while (iterator.advance()) {
-                x = iterator.getKey();
-
-                if (!csvRows[x]) {
-                  csvRows[x] = new Array(csvHeaders.length);
-                  csvRows[x][0] = x;
-                }
-                for (field in fields) {
-                  prefixed = plotPrefix + seriesPrefix + field;
-                  columnIndex = columnToIndex[prefixed];
-                  value = iterator.get(field);
-                  finalValue = goog.isObject(value) ? goog.json.serialize(value) : value;
-                  csvRows[x][columnIndex] = finalValue;
-                }
-              }
-            }
-          }
-        }
-      }
-      // show grouped data
-      // join by X
-      // all columns in mapping
-    } else {
-      csvHeaders.push('x');
-      headers = {};
-      headersLength = 1;
-      for (k = 0, len = this.plots_.length; k < len; k++) {
-        plotPrefix = this.plots_.length > 1 ? ('plot_' + k + '_') : '';
-        plot = this.plots_[k];
-        if (plot) {
-          seriesList = plot.getAllSeries();
-          seriesListLength = seriesList.length;
-
-          for (i = 0; i < seriesListLength; i++) {
-            seriesPrefix = seriesListLength > 1 ? ('series_' + i + '_') : '';
-            series = seriesList[i];
-            if (series) {
-              seriesData = series.getSelectableData();
-              storage = seriesData.getMapping().getTable().getStorage();
-              headersLength = this.extractHeaders(storage, headers, headersLength);
-              for (header in headers) {
-                csvHeaders[headers[header]] = plotPrefix + seriesPrefix + header;
-              }
-              headers = {};
-            }
-          }
-        }
-      }
-
-      var values;
-      for (k = 0, len = this.plots_.length; k < len; k++) {
-        plotPrefix = this.plots_.length > 1 ? ('plot_' + k + '_') : '';
-        plot = this.plots_[k];
-        if (plot) {
-          seriesList = plot.getAllSeries();
-          seriesListLength = seriesList.length;
-
-          for (i = 0; i < seriesListLength; i++) {
-            seriesPrefix = seriesListLength > 1 ? ('series_' + i + '_') : '';
-            series = seriesList[i];
-            if (series) {
-              seriesData = series.getSelectableData();
-              storage = seriesData.getMapping().getTable().getStorage();
-              for (j = 0; j < storage.getRowsCount(); j++) {
-                row = storage.getRow(j);
-                values = row.values;
-                x = row.key;
-                if (!csvRows[x]) {
-                  csvRows[x] = new Array(csvHeaders.length);
-                  csvRows[x][0] = x;
-                }
-                for (column in values) {
-                  prefixed = plotPrefix + seriesPrefix + column;
-                  columnIndex = goog.array.indexOf(csvHeaders, prefixed);
-                  finalValue = goog.isObject(values[column]) ? goog.json.serialize(values[column]) : values[column];
-                  csvRows[x][columnIndex] = finalValue;
-                }
-              }
-            }
-          }
-        }
-      }
-      // show all data
-      // join by X
-      // all columns in tables
-    }
-    csvStrings = [];
-    if (!ignoreFirstRow)
-      csvStrings.push(csvHeaders.join(columnsSeparator));
-    if (goog.isArray(csvRows)) {
-      for (i = 0; i < csvRows.length; i++) {
-        this.escapeValuesInRow(csvRows[i], columnsSeparator, rowsSeparator);
-        csvStrings.push(csvRows[i].join(columnsSeparator));
-      }
-    } else {
-      for (row in csvRows) {
-        this.escapeValuesInRow(csvRows[row], columnsSeparator, rowsSeparator);
-        csvStrings.push(csvRows[row].join(columnsSeparator));
-      }
-    }
-    return csvStrings.join(rowsSeparator);
+    rowIndex = xValues[xHash] = data.length;
+    data.push([x, xAlias]);
   }
+  return data[rowIndex];
+};
+
+
+/** @inheritDoc */
+anychart.stockModule.Chart.prototype.populateRawCsvRow = function(targetCsvRow, dataRow, headers) {
+  anychart.stockModule.Chart.base(this, 'populateRawCsvRow', targetCsvRow, (/** @type {anychart.stockModule.data.TableRow} */(dataRow)).values, headers);
+};
+
+
+/** @inheritDoc */
+anychart.stockModule.Chart.prototype.getCsvGrouperValue = function(iterator) {
+  return iterator.getX();
+};
+
+
+/** @inheritDoc */
+anychart.stockModule.Chart.prototype.getCsvGrouperAlias = function(iterator, dataHolder) {
+  var pattern = dataHolder.getSelectableData().getMapping().getTable().getDTPatten();
+  return anychart.format.dateTime(/** @type {number} */(iterator.getX()), pattern);
+};
+
+
+/** @inheritDoc */
+anychart.stockModule.Chart.prototype.getCsvIterator = function(dataHolder, mode) {
+  var res;
+  var series = /** @type {anychart.stockModule.Series} */(dataHolder);
+  switch (mode) {
+    case anychart.enums.ChartDataExportMode.SELECTED:
+      res = series.getDetachedIterator();
+      break;
+    case anychart.enums.ChartDataExportMode.GROUPED:
+      res = series.getSelectableData().getExportingIterator();
+      break;
+    default: // anychart.enums.ChartDataExportMode.DEFAULT
+      res = series.getSelectableData().getMapping().createSelectable().getIteratorInternal(false);
+      break;
+  }
+  return res;
+};
+
+
+/** @inheritDoc */
+anychart.stockModule.Chart.prototype.identifyCsvDataHolder = function(dataHolder) {
+  return '';
+};
+
+
+/** @inheritDoc */
+anychart.stockModule.Chart.prototype.getCsvData = function(mode) {
+  var res = anychart.stockModule.Chart.base(this, 'getCsvData', mode);
+  res.headers.shift();
+  res.data.sort(function(a, b) {
+    return /** @type {number} */(a[0]) - /** @type {number} */(b[0]);
+  });
+  goog.array.forEach(res.data, function(item) { item.shift(); });
+  return res;
 };
 
 
@@ -2904,7 +2786,6 @@ anychart.stockModule.Chart.prototype.toCsv = function(opt_chartDataExportMode, o
   proto['getSelectedRange'] = proto.getSelectedRange;
   proto['getType'] = proto.getType;
   proto['legend'] = proto.legend;
-  proto['toCsv'] = proto.toCsv;
   proto['grouping'] = proto.grouping;
   proto['scrollerGrouping'] = proto.scrollerGrouping;
   proto['annotations'] = proto.annotations;
@@ -2914,4 +2795,5 @@ anychart.stockModule.Chart.prototype.toCsv = function(opt_chartDataExportMode, o
   // proto['zoomMarqueeFill'] = proto.zoomMarqueeFill;
   // proto['zoomMarqueeStroke'] = proto.zoomMarqueeStroke;
   proto['interactivity'] = proto.interactivity;
+  proto['preserveSelectedRangeOnDataUpdate'] = proto.preserveSelectedRangeOnDataUpdate;
 })();

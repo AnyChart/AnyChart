@@ -954,15 +954,83 @@ anychart.utils.trim = function(str) {
 
 
 /**
+ * Decapitalize string.
+ * @param {string=} str
+ * @return {string} Decapitalized string.
+ */
+anychart.utils.decapitalize = function(str) {
+  return String(str.charAt(0)).toLowerCase() + String(str.substr(1));
+};
+
+
+/**
  * Checks whether separator is valid.
  * Throws an error if invalid.
  * @param {string} separator
+ * @return {boolean}
  */
 anychart.utils.checkSeparator = function(separator) {
+  var res = true;
   if (separator.indexOf('\"') != -1) {
     anychart.core.reporting.error(anychart.enums.ErrorCode.CSV_DOUBLE_QUOTE_IN_SEPARATOR);
-    throw new Error('Double quotes in separator are not allowed');
+    res = false;
   }
+  return res;
+};
+
+
+
+/**
+ * Escapes values.
+ * @param {Array} row Array of values.
+ * @param {string} colSep
+ * @param {string} rowSep
+ * @param {number} length
+ * @return {string}
+ * @private
+ */
+anychart.utils.toCsvRow_ = function(row, colSep, rowSep, length) {
+  for (var i = 0; i < length; i++) {
+    var value = row[i];
+    if (goog.isDefAndNotNull(value)) {
+      if (!goog.isString(value))
+        value = String(value);
+      if (value.indexOf(colSep) != -1 || value.indexOf(rowSep) != -1) {
+        value = value.split('"').join('""');
+        value = '"' + value + '"';
+      }
+    } else {
+      value = '';
+    }
+    row[i] = value;
+  }
+  return row.join(colSep);
+};
+
+
+/**
+ * Serializes table to a CSV string.
+ * @param {Array} headers
+ * @param {Array.<Array>} data
+ * @param {*} settings
+ * @return {string}
+ */
+anychart.utils.serializeCsv = function(headers, data, settings) {
+  var rowSep = (settings && settings['rowsSeparator']) || '\n';
+  var colSep = (settings && settings['columnsSeparator']) || ',';
+  var noHeader = (settings && settings['ignoreFirstRow']) || false;
+  if (!anychart.utils.checkSeparator(rowSep) || !anychart.utils.checkSeparator(colSep))
+    return '';
+
+  var strings = [];
+  if (!noHeader) {
+    strings.push(anychart.utils.toCsvRow_(headers, colSep, rowSep, headers.length));
+  }
+
+  for (var i = 0; i < data.length; i++) {
+    strings.push(anychart.utils.toCsvRow_(data[i], colSep, rowSep, headers.length));
+  }
+  return strings.join(rowSep);
 };
 
 
@@ -1182,7 +1250,7 @@ anychart.utils.json2xml = function(json, opt_rootNodeName, opt_returnAsXmlNode) 
   var root = anychart.utils.json2xml_(json, opt_rootNodeName || 'anychart', result);
   if (root) {
     if (!opt_rootNodeName)
-      root.setAttribute('xmlns', 'http://anychart.com/schemas/7.14.3/xml-schema.xsd');
+      root.setAttribute('xmlns', 'http://anychart.com/schemas/8.0.0/xml-schema.xsd');
     result.appendChild(root);
   }
   return opt_returnAsXmlNode ? result : goog.dom.xml.serialize(result);
