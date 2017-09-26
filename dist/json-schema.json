@@ -3929,7 +3929,8 @@
         "minorTicks": {"$ref": "#/definitions/anychart.scales.ScatterTicks"},
         "stackMode": {"$ref": "#/definitions/anychart.enums.ScaleStackMode"},
         "stackDirection": {"$ref": "#/definitions/anychart.enums.ScaleStackDirection"},
-        "stickToZero": {"type": "boolean"}
+        "stickToZero": {"type": "boolean"},
+        "comparisonMode": {"$ref": "#/definitions/anychart.enums.ScaleComparisonMode"}
       }
     },
     "anychart.scales.LinearColor": {
@@ -5422,6 +5423,13 @@
       ]
     },
     "anychart.enums.ScaleStackMode": {
+      "enum": [
+        "none",
+        "value",
+        "percent"
+      ]
+    },
+    "anychart.enums.ScaleComparisonMode": {
       "enum": [
         "none",
         "value",

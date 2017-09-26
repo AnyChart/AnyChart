@@ -281,6 +281,7 @@ anychart.scales.Linear.prototype.serialize = function() {
   json['stackMode'] = this.stackMode();
   json['stackDirection'] = this.stackDirection();
   json['stickToZero'] = this.stickToZero();
+  json['comparisonMode'] = this.comparisonMode();
   return json;
 };
 
@@ -293,6 +294,7 @@ anychart.scales.Linear.prototype.setupByJSON = function(config, opt_default) {
   this.stackMode(config['stackMode']);
   this.stackDirection(config['stackDirection']);
   this.stickToZero(config['stickToZero']);
+  this.comparisonMode(config['comparisonMode']);
 };
 
 

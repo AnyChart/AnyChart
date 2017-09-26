@@ -1019,7 +1019,7 @@ anychart.utils.serializeCsv = function(headers, data, settings) {
   var rowSep = (settings && settings['rowsSeparator']) || '\n';
   var colSep = (settings && settings['columnsSeparator']) || ',';
   var noHeader = (settings && settings['ignoreFirstRow']) || false;
-  if (!anychart.utils.checkSeparator(rowSep) || !anychart.utils.checkSeparator(colSep))
+  if (!data.length || !anychart.utils.checkSeparator(rowSep) || !anychart.utils.checkSeparator(colSep))
     return '';
 
   var strings = [];
