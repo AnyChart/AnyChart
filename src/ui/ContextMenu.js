@@ -506,7 +506,7 @@ anychart.ui.ContextMenu.prototype.makeLevel_ = function(menu, model) {
  * @private
  */
 anychart.ui.ContextMenu.prototype.addItemToMenu_ = function(menu, item) {
-  menu instanceof anychart.ui.menu.SubMenu ? menu.addItem(item) : menu.addChild(item, true);
+  anychart.utils.instanceOf(menu, anychart.ui.menu.SubMenu) ? menu.addItem(item) : menu.addChild(item, true);
 };
 
 

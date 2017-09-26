@@ -199,7 +199,7 @@ anychart.stockModule.data.Table.prototype.mapAs = function(opt_fields) {
  */
 anychart.stockModule.data.Table.prototype.createComputer = function(opt_mappingSettingsOrMapping) {
   var mapping;
-  if (opt_mappingSettingsOrMapping instanceof anychart.stockModule.data.TableMapping) {
+  if (anychart.utils.instanceOf(opt_mappingSettingsOrMapping, anychart.stockModule.data.TableMapping)) {
     mapping = /** @type {anychart.stockModule.data.TableMapping} */(opt_mappingSettingsOrMapping);
     if (mapping.getTable() != this) {
       anychart.core.reporting.error(anychart.enums.ErrorCode.TABLE_MAPPING_DIFFERENT_TABLE);

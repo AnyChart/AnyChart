@@ -439,7 +439,7 @@ anychart.treemapModule.Chart.prototype.doAdditionActionsOnMouseOut = function() 
 
 /** @inheritDoc */
 anychart.treemapModule.Chart.prototype.checkIfColorRange = function(target) {
-  return target instanceof anychart.colorScalesModule.ui.ColorRange;
+  return anychart.utils.instanceOf(target, anychart.colorScalesModule.ui.ColorRange);
 };
 
 
@@ -471,7 +471,7 @@ anychart.treemapModule.Chart.prototype.doDrillChange = function(node, opt_event)
 /** @inheritDoc */
 anychart.treemapModule.Chart.prototype.handleMouseDown = function(event) {
   if (event['button'] != acgraph.events.BrowserEvent.MouseButton.LEFT) return;
-  var legendOrColorRange = event['target'] instanceof anychart.core.ui.Legend || this.checkIfColorRange(event['target']);
+  var legendOrColorRange = anychart.utils.instanceOf(event['target'], anychart.core.ui.Legend) || this.checkIfColorRange(event['target']);
   /*
     Because this method also handles legend item click and color range item click
     we should prevent this click behaviour to avoid drilldown
@@ -480,7 +480,7 @@ anychart.treemapModule.Chart.prototype.handleMouseDown = function(event) {
   var tag = anychart.utils.extractTag(event['domTarget']);
 
   var series, index;
-  if (event['target'] instanceof anychart.core.ui.LabelsFactory || event['target'] instanceof anychart.core.ui.MarkersFactory) {
+  if (anychart.utils.instanceOf(event['target'], anychart.core.ui.LabelsFactory) || anychart.utils.instanceOf(event['target'], anychart.core.ui.MarkersFactory)) {
     var parent = event['target'].getParentEventTarget();
     if (parent.isSeries && parent.isSeries())
       series = parent;
@@ -669,11 +669,11 @@ anychart.treemapModule.Chart.prototype.resetDataVars = function() {
  */
 anychart.treemapModule.Chart.prototype.data = function(opt_value, opt_fillMethod) {
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.treeDataModule.Tree || opt_value instanceof anychart.treeDataModule.View) {
+    if (anychart.utils.instanceOf(opt_value, anychart.treeDataModule.Tree) || anychart.utils.instanceOf(opt_value, anychart.treeDataModule.View)) {
       if (opt_value != this.data_)
-        this.data_ = opt_value;
+        this.data_ = /** @type {anychart.treeDataModule.Tree|anychart.treeDataModule.View} */(opt_value);
     } else {
-      this.data_ = new anychart.treeDataModule.Tree(opt_value, opt_fillMethod);
+      this.data_ = new anychart.treeDataModule.Tree(/** @type {Array.<Object>} */(opt_value), opt_fillMethod);
     }
     this.invalidate(anychart.ConsistencyState.TREEMAP_DATA | anychart.ConsistencyState.CHART_LABELS, anychart.Signal.NEEDS_REDRAW);
     return this;
@@ -695,7 +695,7 @@ anychart.treemapModule.Chart.prototype.drillTo = function(target) {
   this.ensureDataPrepared();
   var node = null;
   var data;
-  if (target instanceof anychart.treeDataModule.Tree.DataItem || target instanceof anychart.treeDataModule.View.DataItem) {
+  if (anychart.utils.instanceOf(target, anychart.treeDataModule.Tree.DataItem) || anychart.utils.instanceOf(target, anychart.treeDataModule.View.DataItem)) {
     // trying to drill by node
     node = target;
   } else if (goog.isArray(target)) {
@@ -815,7 +815,7 @@ anychart.treemapModule.Chart.prototype.createLegendItemsProvider = function(sour
   this.calculate();
   if (sourceMode == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
     var scale = this.colorScale();
-    if (scale && scale instanceof anychart.colorScalesModule.Ordinal) {
+    if (scale && anychart.utils.instanceOf(scale, anychart.colorScalesModule.Ordinal)) {
       var ranges = scale.getProcessedRanges();
       for (i = 0, count = ranges.length; i < count; i++) {
         var range = ranges[i];
@@ -1112,7 +1112,7 @@ anychart.treemapModule.Chart.prototype.getAspect = function(points, dWidth, dHei
  * @return {boolean} Is node root.
  */
 anychart.treemapModule.Chart.prototype.isTreeRoot = function(node) {
-  if (node instanceof anychart.treeDataModule.View.DataItem)
+  if (anychart.utils.instanceOf(node, anychart.treeDataModule.View.DataItem))
     node = node.getDataItem();
   return node == node.tree().getChildAt(0);
 };
@@ -2215,7 +2215,7 @@ anychart.treemapModule.Chart.prototype.calculate = function() {
         this.colorScale_.resetDataRange();
         this.colorScale_.extendDataRange.apply(this.colorScale_, this.nodeValues_);
       }
-      if (this.colorScale_ instanceof anychart.colorScalesModule.Ordinal)
+      if (anychart.utils.instanceOf(this.colorScale_, anychart.colorScalesModule.Ordinal))
         this.colorScale_.ticks().markInvalid();
       this.hintColorScale_.setup(this.colorScale_.serialize());
     }
@@ -2361,7 +2361,7 @@ anychart.treemapModule.Chart.prototype.resizeHandler = function(e) {
 anychart.treemapModule.Chart.prototype.specificContextMenuItems = function(items, context, isPointContext) {
   var tag = anychart.utils.extractTag(context['event']['domTarget']);
   var node;
-  if (context['target'] instanceof anychart.core.ui.LabelsFactory || context['target'] instanceof anychart.core.ui.MarkersFactory) {
+  if (anychart.utils.instanceOf(context['target'], anychart.core.ui.LabelsFactory) || anychart.utils.instanceOf(context['target'], anychart.core.ui.MarkersFactory)) {
     node = this.linearNodes_[/** @type {number} */(tag)];
   } else {
     node = tag['node'];

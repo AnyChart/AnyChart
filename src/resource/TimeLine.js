@@ -610,7 +610,7 @@ anychart.resourceModule.TimeLine.prototype.labelsConfiguration = function(row, c
   var settings = holiday ? this.holidaysLabelSettings[row] : this.weekdaysLabelSettings[row];
 
   var padding = settings['padding'];
-  if (padding && !(padding instanceof anychart.core.utils.Padding)) {
+  if (padding && !(anychart.utils.instanceOf(padding, anychart.core.utils.Padding))) {
     if (!this.tempPadding_) this.tempPadding_ = new anychart.core.utils.Padding();
     this.tempPadding_.setup(settings['padding']);
     padding = this.tempPadding_;

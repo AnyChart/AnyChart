@@ -425,7 +425,7 @@ anychart.heatmapModule.Series.prototype.getContextProviderValues = function(prov
   if (colorScale) {
     var value = rowInfo.get('heat');
 
-    if (colorScale instanceof anychart.colorScalesModule.Ordinal) {
+    if (anychart.utils.instanceOf(colorScale, anychart.colorScalesModule.Ordinal)) {
       var range = colorScale.getRangeByValue(/** @type {number} */(value));
       if (range) {
         var colorRange = {

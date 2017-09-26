@@ -278,7 +278,7 @@ anychart.data.csv.Parser.prototype.parse = function(data, opt_itemsProcessor, op
       this.itemsProcessor_.processRow();
     this.itemsProcessor_.progress(this.currPos_);
     this.itemsProcessor_.finish();
-    if (this.itemsProcessor_ instanceof anychart.data.csv.DefaultItemsProcessor)
+    if (anychart.utils.instanceOf(this.itemsProcessor_, anychart.data.csv.DefaultItemsProcessor))
       return (/** @type {anychart.data.csv.DefaultItemsProcessor} */(this.itemsProcessor_)).getData();
   }
   return null;

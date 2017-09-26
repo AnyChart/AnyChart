@@ -701,7 +701,7 @@ anychart.core.axisMarkers.TextBase.prototype.setupByJSON = function(config, opt_
       if (this.chart_) {
         this.axis((/** @type {anychart.core.CartesianBase} */(this.chart_)).getAxisByIndex(ax));
       }
-    } else if (ax instanceof anychart.core.Axis) {
+    } else if (anychart.utils.instanceOf(ax, anychart.core.Axis)) {
       this.axis(ax);
     }
   }

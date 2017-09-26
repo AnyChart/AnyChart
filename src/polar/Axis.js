@@ -492,7 +492,7 @@ anychart.polarModule.Axis.prototype.calculateAxisBounds_ = function() {
         .parentBounds(parentBounds);
 
     if (scale && this.radius_ && this.enabled()) {
-      var isOrdinal = scale instanceof anychart.scales.Ordinal;
+      var isOrdinal = anychart.utils.instanceOf(scale, anychart.scales.Ordinal);
       var majorLabelsEnabled = this.labels().enabled();
       var minorLabelsEnabled = this.minorLabels().enabled();
       var lineThickness = acgraph.vector.getThickness(this.stroke_);
@@ -1023,11 +1023,11 @@ anychart.polarModule.Axis.prototype.getLabelsFormatProvider_ = function(index, v
 
   var labelText, labelValue;
   var addRange = true;
-  if (scale instanceof anychart.scales.Ordinal) {
+  if (anychart.utils.instanceOf(scale, anychart.scales.Ordinal)) {
     labelText = scale.ticks().names()[index];
     labelValue = value;
     addRange = false;
-  } else if (scale instanceof anychart.scales.DateTime) {
+  } else if (anychart.utils.instanceOf(scale, anychart.scales.DateTime)) {
     labelText = anychart.format.date(/** @type {number} */(value));
     labelValue = value;
   } else {
@@ -1082,7 +1082,7 @@ anychart.polarModule.Axis.prototype.calcLabelTextPath = function(label, index, t
   var pxPerDegree = (2 * Math.PI * radius) / 360;
   var startAngle, endAngle;
 
-  if (scale instanceof anychart.scales.Ordinal) {
+  if (anychart.utils.instanceOf(scale, anychart.scales.Ordinal)) {
     startAngle = this.startAngle_ - 90 + this.getRatio_(index, ticksArr, scale, 0) * 360;
     endAngle = this.startAngle_ - 90 + this.getRatio_(index, ticksArr, scale, 1) * 360;
 
@@ -1216,7 +1216,7 @@ anychart.polarModule.Axis.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.AXIS_TICKS)) {
-    var isOrdinal = this.scale() instanceof anychart.scales.Ordinal;
+    var isOrdinal = anychart.utils.instanceOf(this.scale(), anychart.scales.Ordinal);
     var lineThickness = acgraph.vector.getThickness(this.stroke_);
     var ticks = /** @type {anychart.radarPolarBaseModule.RadialAxisTicks} */(this.ticks());
     ticks.draw();

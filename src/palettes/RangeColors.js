@@ -288,7 +288,7 @@ anychart.palettes.RangeColors.prototype.setupSpecial = function(isDefault, var_a
     this.count(arg0.length);
     return true;
   }
-  if (arg0 instanceof anychart.palettes.RangeColors) {
+  if (anychart.utils.instanceOf(arg0, anychart.palettes.RangeColors)) {
     this.items(/** @type {Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradientFill|acgraph.vector.RadialGradientFill|Array.<acgraph.vector.GradientKey>|Array.<string>} */(arg0.items()));
     this.count(/** @type {number} */(arg0.count()));
     return true;

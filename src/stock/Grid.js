@@ -133,8 +133,8 @@ anychart.stockModule.Grid.prototype.drawInternal = function() {
   var path;
   var ratio;
   var prevRatio = NaN;
-  var isOrdinal = scale instanceof anychart.scales.Ordinal;
-  var isStock = scale instanceof anychart.stockModule.scales.Scatter;
+  var isOrdinal = anychart.utils.instanceOf(scale, anychart.scales.Ordinal);
+  var isStock = anychart.utils.instanceOf(scale, anychart.stockModule.scales.Scatter);
   var ticksArray;
   var isMinor = this.getOption('isMinor');
   if (isStock) {

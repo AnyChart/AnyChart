@@ -329,7 +329,7 @@ anychart.color.equals = function(color1, color2) {
  */
 anychart.color.serialize = function(color) {
   var result;
-  if (color instanceof acgraph.vector.HatchFill) {
+  if (anychart.utils.instanceOf(color, acgraph.vector.HatchFill)) {
     var hf = /** @type {acgraph.vector.HatchFill} */(color);
     result = {
       'type': hf.type,
@@ -337,7 +337,7 @@ anychart.color.serialize = function(color) {
       'thickness': hf.thickness,
       'size': hf.size
     };
-  } else if (color instanceof acgraph.vector.PatternFill) {
+  } else if (anychart.utils.instanceOf(color, acgraph.vector.PatternFill)) {
     result = color.serialize();
   } else if (goog.isObject(color)) {
     result = /** @type {Object} */(anychart.utils.recursiveClone(color));

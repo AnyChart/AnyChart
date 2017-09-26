@@ -42,7 +42,7 @@ anychart.math.Coordinate;
  * @return {goog.math.Coordinate} Normalized to goog.math.Coordinate value.
  */
 anychart.math.normalizeCoordinate = function(value) {
-  if (value instanceof goog.math.Coordinate) {
+  if (anychart.utils.instanceOf(value, goog.math.Coordinate)) {
     return /** @type {goog.math.Coordinate} */(value);
   } else {
     if (goog.isArray(value)) {

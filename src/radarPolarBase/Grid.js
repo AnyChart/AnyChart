@@ -56,7 +56,7 @@ anychart.radarPolarBaseModule.Grid.prototype.normalizeLayout = function(layout) 
 
 /** @inheritDoc */
 anychart.radarPolarBaseModule.Grid.prototype.getLayoutByAxis = function(axis) {
-  var isCircuit = axis instanceof anychart.radarPolarBaseModule.RadialAxis;
+  var isCircuit = anychart.utils.instanceOf(axis, anychart.radarPolarBaseModule.RadialAxis);
   return isCircuit ? anychart.enums.RadialGridLayout.CIRCUIT : anychart.enums.RadialGridLayout.RADIAL;
 };
 

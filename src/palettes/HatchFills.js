@@ -106,7 +106,7 @@ anychart.palettes.HatchFills.prototype.setupSpecial = function(isDefault, var_ar
     this.items(arg0);
     return true;
   }
-  if (arg0 instanceof anychart.palettes.HatchFills) {
+  if (anychart.utils.instanceOf(arg0, anychart.palettes.HatchFills)) {
     this.items(/** @type {Array.<acgraph.vector.HatchFill|acgraph.vector.HatchFill.HatchFillType|acgraph.vector.PatternFill>} */(arg0.items()));
     return true;
   }

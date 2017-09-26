@@ -1159,9 +1159,9 @@ anychart.standalones.ResourceList.prototype.data = function(opt_value, opt_csvSe
     if (this.rawData_ !== opt_value) {
       this.rawData_ = opt_value;
       goog.dispose(this.parentViewToDispose_); // disposing a view created by the series if any;
-      if (opt_value instanceof anychart.data.View)
+      if (anychart.utils.instanceOf(opt_value, anychart.data.View))
         this.data_ = this.parentViewToDispose_ = opt_value.derive(); // deriving a view to avoid interference with other view users
-      else if (opt_value instanceof anychart.data.Set)
+      else if (anychart.utils.instanceOf(opt_value, anychart.data.Set))
         this.data_ = this.parentViewToDispose_ = opt_value.mapAs();
       else
         this.data_ = (this.parentViewToDispose_ = new anychart.data.Set(

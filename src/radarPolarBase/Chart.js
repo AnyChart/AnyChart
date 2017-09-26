@@ -629,7 +629,7 @@ anychart.radarPolarBaseModule.Chart.prototype.getSeriesStatus = function(event) 
       } else {
         index = series.data().findClosestByX(
             anychart.utils.toNumber(value),
-            series.xScale() instanceof anychart.scales.Ordinal);
+            anychart.utils.instanceOf(series.xScale(), anychart.scales.Ordinal));
       }
 
       iterator = series.getDetachedIterator();
@@ -755,7 +755,7 @@ anychart.radarPolarBaseModule.Chart.prototype.serializeGrid_ = function(item, sc
     var axisIndex = goog.array.indexOf(axesIds, goog.getUid(axis));
     if (axisIndex < 0) { //axis presents but not found in existing axes. Taking scale and layout from it.
       if (!('layout' in config)) {
-        config['layout'] = axis instanceof anychart.radarPolarBaseModule.RadialAxis ?
+        config['layout'] = anychart.utils.instanceOf(axis, anychart.radarPolarBaseModule.RadialAxis) ?
             anychart.enums.RadialGridLayout.CIRCUIT :
             anychart.enums.RadialGridLayout.RADIAL;
       }

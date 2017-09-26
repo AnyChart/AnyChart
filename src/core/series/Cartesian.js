@@ -172,7 +172,7 @@ anychart.core.series.Cartesian.prototype.applyDefaultsToElements = function(defa
 /** @inheritDoc */
 anychart.core.series.Cartesian.prototype.getCategoryWidth = function(opt_categoryIndex) {
   var ratio;
-  if (goog.isDef(opt_categoryIndex) && this.xScale() instanceof anychart.scales.Ordinal) {
+  if (goog.isDef(opt_categoryIndex) && anychart.utils.instanceOf(this.xScale(), anychart.scales.Ordinal)) {
     ratio = this.xScale().weightRatios()[opt_categoryIndex];
   } else {
     ratio = this.xScale().getPointWidthRatio();
@@ -326,9 +326,9 @@ anychart.core.series.Cartesian.prototype.data = function(opt_value, opt_csvSetti
     if (this.rawData !== opt_value) {
       this.rawData = opt_value;
       goog.dispose(this.parentViewToDispose); // disposing a view created by the series if any;
-      if (opt_value instanceof anychart.data.View)
+      if (anychart.utils.instanceOf(opt_value, anychart.data.View))
         this.parentView = this.parentViewToDispose = opt_value.derive(); // deriving a view to avoid interference with other view users
-      else if (opt_value instanceof anychart.data.Set)
+      else if (anychart.utils.instanceOf(opt_value, anychart.data.Set))
         this.parentView = this.parentViewToDispose = opt_value.mapAs();
       else
         this.parentView = (this.parentViewToDispose = new anychart.data.Set(
@@ -678,13 +678,13 @@ anychart.core.series.Cartesian.prototype.getDrawingData = function(data, dataPus
       }
     }
   }
-  if (yScale instanceof anychart.scales.Ordinal) {
+  if (anychart.utils.instanceOf(yScale, anychart.scales.Ordinal)) {
     name = yScale.getNamesField();
     if (name && dataSource.checkFieldExist(name))
       additionalNames.push(name);
   }
   var xScale = /** @type {anychart.scales.Base} */ (this.xScale());
-  if (xScale instanceof anychart.scales.Ordinal) {
+  if (anychart.utils.instanceOf(xScale, anychart.scales.Ordinal)) {
     name = xScale.getNamesField();
     if (name && dataSource.checkFieldExist(name))
       additionalNames.push(name);
@@ -1011,7 +1011,7 @@ anychart.core.series.Cartesian.prototype.findInRangeByX = function(minValue, max
     return res;
   } else {
     var xScale = this.xScale();
-    var isOrdinal = xScale instanceof anychart.scales.Ordinal;
+    var isOrdinal = anychart.utils.instanceOf(xScale, anychart.scales.Ordinal);
     if (isOrdinal) {
       minValue = xScale.getIndexByValue(minValue);
       maxValue = xScale.getIndexByValue(maxValue);
@@ -1054,7 +1054,7 @@ anychart.core.series.Cartesian.prototype.getPointsInRect = function(left, top, w
 anychart.core.series.Cartesian.prototype.pointIsInRect = function(point, left, top, width, height) {
   var shapes;
   var result = false;
-  if (this.shapeManager instanceof anychart.core.shapeManagers.PerPoint &&
+  if (anychart.utils.instanceOf(this.shapeManager, anychart.core.shapeManagers.PerPoint) &&
       (shapes = /** @type {Object.<acgraph.vector.Element>} */(point.meta(this.shapeManager.shapesFieldName)))) {
     result = this.drawer.checkShapesInRect(shapes, left, top, width, height);
   } else {

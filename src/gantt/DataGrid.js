@@ -491,7 +491,7 @@ anychart.ganttModule.DataGrid.prototype.column = function(opt_indexOrValue, opt_
   }
 
   if (goog.isDef(value)) {
-    column.setup(value instanceof anychart.ganttModule.DataGrid.Column ? value.serialize() : value);
+    column.setup(anychart.utils.instanceOf(value, anychart.ganttModule.DataGrid.Column) ? value.serialize() : value);
     if (column.enabled()) column.container(this.getContentLayer());
     this.columns_[index] = column;
     this.addSplitter_();
@@ -1216,7 +1216,7 @@ anychart.ganttModule.DataGrid.Column.prototype.cellTextSettings = function(opt_v
 
   if (goog.isDef(opt_value)) {
     var redraw = true;
-    if (opt_value instanceof anychart.core.ui.LabelsFactory) {
+    if (anychart.utils.instanceOf(opt_value, anychart.core.ui.LabelsFactory)) {
       this.labelsFactory_.setup(opt_value.serialize());
     } else if (goog.isObject(opt_value)) {
       this.labelsFactory_.setup(opt_value);

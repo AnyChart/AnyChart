@@ -549,14 +549,14 @@ anychart.pertModule.Chart.prototype.applyTooltipSettings_ = function(opt_setting
  */
 anychart.pertModule.Chart.prototype.data = function(opt_data, opt_fillMethod, opt_deps) {
   if (goog.isDef(opt_data)) {
-    if (opt_data instanceof anychart.treeDataModule.Tree || opt_data instanceof anychart.treeDataModule.View) {
+    if (anychart.utils.instanceOf(opt_data, anychart.treeDataModule.Tree) || anychart.utils.instanceOf(opt_data, anychart.treeDataModule.View)) {
       if (this.data_ != opt_data) {
         if (this.data_) this.data_.unlistenSignals(this.dataInvalidated_, this);
-        this.data_ = opt_data;
+        this.data_ = /** @type {anychart.treeDataModule.Tree|anychart.treeDataModule.View} */(opt_data);
       }
     } else {
       if (this.data_) this.data_.unlistenSignals(this.dataInvalidated_, this);
-      this.data_ = new anychart.treeDataModule.Tree(opt_data, opt_fillMethod, opt_deps);
+      this.data_ = new anychart.treeDataModule.Tree(/** @type {Array.<Object>} */(opt_data), opt_fillMethod, opt_deps);
     }
     this.data_.listenSignals(this.dataInvalidated_, this);
     this.invalidate(anychart.ConsistencyState.PERT_DATA | anychart.ConsistencyState.CHART_LABELS, anychart.Signal.NEEDS_REDRAW);
@@ -942,13 +942,13 @@ anychart.pertModule.Chart.prototype.clickHandler_ = function(event) {
   var domTarget = /** @type {acgraph.vector.Element} */ (event['domTarget']);
   var tag = domTarget.tag;
 
-  if (event['target'] instanceof anychart.core.ui.LabelsFactory) {
+  if (anychart.utils.instanceOf(event['target'], anychart.core.ui.LabelsFactory)) {
     var labelIndex = event['labelIndex'];
     var l = event['target'].getLabel(labelIndex);
     tag = l.tag;
   }
 
-  if ((domTarget instanceof acgraph.vector.Element)) {
+  if ((anychart.utils.instanceOf(domTarget, acgraph.vector.Element))) {
     if (tag) {
       if (goog.isDefAndNotNull(tag['m'])) {
         milestone = tag['m'];

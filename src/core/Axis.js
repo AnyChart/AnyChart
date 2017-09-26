@@ -823,7 +823,7 @@ anychart.core.Axis.prototype.getOverlappedLabels_ = function(opt_bounds) {
         var k = -1;
         var isLabels = this.labels().enabled();
 
-        if (scale instanceof anychart.scales.ScatterBase) {
+        if (anychart.utils.instanceOf(scale, anychart.scales.ScatterBase)) {
           var scaleMinorTicksArr = scale.minorTicks().get();
           i = 0;
           j = 0;
@@ -926,7 +926,7 @@ anychart.core.Axis.prototype.getOverlappedLabels_ = function(opt_bounds) {
             }
           }
           if (!isMinorLabels) minorLabels = false;
-        } else if (scale instanceof anychart.scales.Base) {
+        } else if (anychart.utils.instanceOf(scale, anychart.scales.Base)) {
           for (i = 0; i < ticksArrLen; i++) {
             if (isLabels) {
               if ((!i && this.drawFirstLabel()) || (i == ticksArrLen - 1 && this.drawLastLabel()) || (i != 0 && i != ticksArrLen - 1))
@@ -1248,7 +1248,7 @@ anychart.core.Axis.prototype.getSize = function(parentBounds, length) {
   var scale = /** @type {anychart.scales.ScatterBase|anychart.scales.Ordinal} */(this.scale());
 
   var isLabels = /** @type {boolean} */(labels.enabled() && goog.isDef(scale));
-  var isMinorLabels = /** @type {boolean} */(minorLabels.enabled() && goog.isDef(scale) && scale instanceof anychart.scales.ScatterBase);
+  var isMinorLabels = /** @type {boolean} */(minorLabels.enabled() && goog.isDef(scale) && anychart.utils.instanceOf(scale, anychart.scales.ScatterBase));
 
   var width = this.isHorizontal() ? length : 0;
   var height = this.isHorizontal() ? 0 : length;
@@ -1461,7 +1461,7 @@ anychart.core.Axis.prototype.getPixelBounds = function() {
  * @private
  */
 anychart.core.Axis.prototype.getLabelBounds_ = function(index, isMajor, ticksArray, opt_parentBounds) {
-  if (!isMajor && this.scale() && !(this.scale() instanceof anychart.scales.ScatterBase))
+  if (!isMajor && this.scale() && !(anychart.utils.instanceOf(this.scale(), anychart.scales.ScatterBase)))
     return null;
 
   var boundsCache = isMajor ? this.labelsBounds_ : this.minorLabelsBounds_;
@@ -1685,12 +1685,12 @@ anychart.core.Axis.prototype.getLabelsFormatProvider = function(index, value) {
   var labelText, labelValue;
   var valueType = anychart.enums.TokenType.NUMBER;
   var addRange = true;
-  if (scale instanceof anychart.scales.Ordinal) {
+  if (anychart.utils.instanceOf(scale, anychart.scales.Ordinal)) {
     labelText = scale.ticks().names()[index];
     labelValue = value;
     valueType = anychart.enums.TokenType.STRING;
     addRange = false;
-  } else if (scale instanceof anychart.scales.DateTime) {
+  } else if (anychart.utils.instanceOf(scale, anychart.scales.DateTime)) {
     labelText = anychart.format.date(/** @type {number} */(value));
     valueType = anychart.enums.TokenType.STRING; //Not DATE_TIME because it's already formatted.
     labelValue = value;
@@ -2009,7 +2009,7 @@ anychart.core.Axis.prototype.draw = function() {
     var stroke = this.stroke();
     lineThickness = !stroke || anychart.utils.isNone(stroke) ? 0 : stroke['thickness'] ? parseFloat(stroke['thickness']) : 1;
 
-    if (scale instanceof anychart.scales.ScatterBase) {
+    if (anychart.utils.instanceOf(scale, anychart.scales.ScatterBase)) {
       overlappedLabels = this.calcLabels_();
 
       if (goog.isObject(overlappedLabels)) {

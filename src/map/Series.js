@@ -880,7 +880,7 @@ anychart.mapModule.Series.prototype.applyAppearanceToPoint = function(pointState
         if (goog.isDef(feature.domElement)) {
           this.getChart().featureTraverser(feature, function(shape) {
             var element = shape.domElement;
-            if (!element || !(element instanceof acgraph.vector.Shape))
+            if (!element || !(anychart.utils.instanceOf(element, acgraph.vector.Shape)))
               return;
 
             iterator.meta('currentPointElement', shape);

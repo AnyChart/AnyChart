@@ -452,7 +452,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateXScales = function() 
       drawingPlans = this.drawingPlansByXScale[uid];
       if (!drawingPlans)
         this.drawingPlansByXScale[uid] = drawingPlans = [];
-      if (xScale instanceof anychart.scales.Ordinal) {
+      if (anychart.utils.instanceOf(xScale, anychart.scales.Ordinal)) {
         var xHashMap, xArray;
         var restricted = !xScale.needsAutoCalc();
         if (drawingPlans.length) {
@@ -470,7 +470,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateXScales = function() 
         }
         drawingPlan = series.getOrdinalDrawingPlan(xHashMap, xArray, restricted);
       } else {
-        drawingPlan = series.getScatterDrawingPlan(true, xScale instanceof anychart.scales.DateTime);
+        drawingPlan = series.getScatterDrawingPlan(true, anychart.utils.instanceOf(xScale, anychart.scales.DateTime));
       }
       drawingPlans.push(drawingPlan);
       this.drawingPlans.push(drawingPlan);
@@ -489,7 +489,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateXScales = function() 
       // equalizing drawing plans and populating them with missing points
       if (drawingPlans.length > 1) {
         drawingPlan = drawingPlans[drawingPlans.length - 1];
-        if (xScale instanceof anychart.scales.Ordinal) {
+        if (anychart.utils.instanceOf(xScale, anychart.scales.Ordinal)) {
           var lastPlanXArray = drawingPlan.xArray;
           // we need to populate other series data with missing points to the length of the last array
           for (i = 0; i < drawingPlans.length - 1; i++) {
@@ -629,7 +629,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateXScales = function() 
       }
       drawingPlan = drawingPlans[0];
       if (xScale.needsAutoCalc()) {
-        if (xScale instanceof anychart.scales.Ordinal) {
+        if (anychart.utils.instanceOf(xScale, anychart.scales.Ordinal)) {
           if (hasExcludes) {
             xHashMap = {};
             xArray = [];
@@ -684,7 +684,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateXScales = function() 
           }
         }
       }
-      if (xScale instanceof anychart.scales.Ordinal) {
+      if (anychart.utils.instanceOf(xScale, anychart.scales.Ordinal)) {
         var namesField = xScale.getNamesField();
         // retrieving names
         if (namesField) {
@@ -789,7 +789,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateYScales = function() 
       data = this.drawingPlansByXScale[xScaleUid][0].data;
       var dataLength = data.length;
       var xScale = this.xScales[xScaleUid];
-      if (xScale instanceof anychart.scales.Ordinal) {
+      if (anychart.utils.instanceOf(xScale, anychart.scales.Ordinal)) {
         if (dataLength) {
           firstIndex = goog.math.clamp(Math.floor(this.getZoomStartRatio() * dataLength - 1), 0, dataLength - 1);
           lastIndex = goog.math.clamp(Math.ceil(this.getZoomEndRatio() * dataLength + 1), 0, dataLength - 1);
@@ -1070,10 +1070,10 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateXYScales = function()
       if (!series || !series.enabled()) continue;
       xScale = /** @type {anychart.scales.Base} */(series.xScale());
       yScale = /** @type {anychart.scales.Base} */(series.yScale());
-      if (xScale instanceof anychart.scales.Ordinal) {
+      if (anychart.utils.instanceOf(xScale, anychart.scales.Ordinal)) {
         drawingPlan = series.getOrdinalDrawingPlan({}, [], false, true);
       } else {
-        drawingPlan = series.getScatterDrawingPlan(false, xScale instanceof anychart.scales.DateTime);
+        drawingPlan = series.getScatterDrawingPlan(false, anychart.utils.instanceOf(xScale, anychart.scales.DateTime));
       }
       series = /** @type {anychart.core.series.Cartesian} */(drawingPlan.series);
       var seriesExcludes = series.getExcludedIndexesInternal();
@@ -1184,7 +1184,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateScalesMinMaxStatistic
   var xScaleMax;
   for (i = 0; i < xScales.length; i++) {
     scale = xScales[i];
-    if (scale instanceof anychart.scales.ScatterBase) {
+    if (anychart.utils.instanceOf(scale, anychart.scales.ScatterBase)) {
       if (!goog.isDef(xScaleMin)) {
         xScaleMin = scale.minimum();
         xScaleMax = scale.maximum();
@@ -1199,7 +1199,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateScalesMinMaxStatistic
   var yScaleMax;
   for (i = 0; i < yScales.length; i++) {
     scale = yScales[i];
-    if (scale instanceof anychart.scales.ScatterBase) {
+    if (anychart.utils.instanceOf(scale, anychart.scales.ScatterBase)) {
       if (!goog.isDef(yScaleMin)) {
         yScaleMin = scale.minimum();
         yScaleMax = scale.maximum();
@@ -1590,7 +1590,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.distributeSeries = function() 
     // spreading column and bar series to the total width of X categories
     for (xId in this.drawingPlansByXScale) {
       // no need to do this if the scale is not ordinal
-      if (!(this.xScales[xId] instanceof anychart.scales.Ordinal || this.xScales[xId] instanceof anychart.scales.DateTime))
+      if (!(anychart.utils.instanceOf(this.xScales[xId], anychart.scales.Ordinal) || anychart.utils.instanceOf(this.xScales[xId], anychart.scales.DateTime)))
         continue;
       drawingPlansOfScale = this.drawingPlansByXScale[xId];
       // Our task is to calculate the number of column and bar clusters.
@@ -1962,7 +1962,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.getByXInfo = function(clientX,
         var tmp = series.findX(value);
         indexes = tmp >= 0 ? [tmp] : [];
       } else {
-        indexes = series.data().findClosestByX(value, series.xScale() instanceof anychart.scales.Ordinal);
+        indexes = series.data().findClosestByX(value, anychart.utils.instanceOf(series.xScale(), anychart.scales.Ordinal));
       }
       iterator = series.getIterator();
       var minLength = Infinity;
