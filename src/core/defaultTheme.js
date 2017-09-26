@@ -1154,8 +1154,10 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'thumbs': {
       'enabled': true,
       'autoHide': false,
-      'fill': '#E9E9E9',
-      'stroke': '#7c868e',
+      'normal': {
+        'fill': '#E9E9E9',
+        'stroke': '#7c868e'
+      },
       'hovered': {
         'fill': '#ffffff',
         'stroke': anychart.core.defaultTheme.defaultHoverColor
