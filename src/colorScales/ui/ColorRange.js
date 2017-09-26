@@ -70,6 +70,20 @@ anychart.colorScalesModule.ui.ColorRange.prototype.getLine = function() {
 
 
 /**
+ * Removes this.line from DOM.
+ */
+anychart.colorScalesModule.ui.ColorRange.prototype.removeLines = function() {
+  if (this.line) {
+    this.line.removeAllListeners();
+    this.line.remove();
+    this.line = null;
+  }
+  if (this.lines)
+    this.lines.length = 0;
+};
+
+
+/**
  * Getter/setter color line size.
  * @param {number=} opt_value
  * @return {number|anychart.colorScalesModule.ui.ColorRange}
@@ -756,13 +770,7 @@ anychart.colorScalesModule.ui.ColorRange.prototype.getAllowedScaleTypes = functi
 /** @inheritDoc */
 anychart.colorScalesModule.ui.ColorRange.prototype.scaleInvalidated = function(e) {
   if (e.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
-    if (this.line) {
-      this.line.removeAllListeners();
-      this.line.parent(null);
-      this.line = null;
-    }
-    if (this.lines)
-      this.lines.length = 0;
+    this.removeLines();
   }
   anychart.colorScalesModule.ui.ColorRange.base(this, 'scaleInvalidated', e);
 };

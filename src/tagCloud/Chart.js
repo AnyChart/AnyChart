@@ -1026,6 +1026,7 @@ anychart.tagCloudModule.Chart.prototype.colorScale = function(opt_value) {
         this.colorScale_ = val;
         this.colorScale_.resumeSignalsDispatching(dispatch);
         if (!dispatch) {
+          this.colorRange().removeLines();
           this.invalidate(anychart.ConsistencyState.TAG_CLOUD_COLOR_SCALE,
               anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_COLOR_RANGE);
         }
