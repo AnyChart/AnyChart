@@ -421,13 +421,15 @@ anychart.themes.merging.demergeScales_ = function(target, defaultObj) {
  * @private
  */
 anychart.themes.merging.demergeCredits_ = function(target) {
-  var targetType = goog.typeOf(target['chart']['credits']);
+  var trgt = target['chart'] || target['gauge'] || target['gantt'] || target['map'];
+  if (!trgt) return target;
+  var targetType = goog.typeOf(trgt['credits']);
   var defaultType = goog.typeOf(anychart.getFullTheme('stageCredits'));
   if (targetType == 'object' && defaultType == 'object') {
     var defVal = anychart.getFullTheme('stageCredits');
-    var val = anychart.themes.merging.demerge_(target['chart']['credits'], defVal);
+    var val = anychart.themes.merging.demerge_(trgt['credits'], defVal);
     if (goog.isDef(val)) {
-      target['chart']['credits'] = val;
+      trgt['credits'] = val;
     }
   }
   return target;
