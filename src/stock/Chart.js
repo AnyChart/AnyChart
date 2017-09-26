@@ -2705,7 +2705,7 @@ anychart.stockModule.Chart.prototype.getCsvGrouperColumn = function() {
 
 
 /** @inheritDoc */
-anychart.stockModule.Chart.prototype.getCsvExportRow = function(x, xAlias, data, xValues, id, index) {
+anychart.stockModule.Chart.prototype.getCsvExportRow = function(x, xAlias, data, xValues, id, index, seriesXValues) {
   var xHash = anychart.utils.hash(x);
   var rowIndex;
   if (xHash in xValues) {

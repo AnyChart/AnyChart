@@ -2154,10 +2154,10 @@ anychart.core.ChartWithOrthogonalScales.prototype.selectByRect = function(marque
 //
 //------------------------------------------------------------------------------
 /** @inheritDoc */
-anychart.core.ChartWithOrthogonalScales.prototype.getCsvExportRow = function(x, xAlias, data, xValues, id, index) {
+anychart.core.ChartWithOrthogonalScales.prototype.getCsvExportRow = function(x, xAlias, data, xValues, id, index, seriesXValues) {
   return this.categorizeData ?
-    anychart.core.ChartWithOrthogonalScales.base(this, 'getCsvExportRow', x, xAlias, data, xValues, id, index) :
-    this.getCsvExportRowScatter(x, xAlias, data, xValues, id, index);
+    anychart.core.ChartWithOrthogonalScales.base(this, 'getCsvExportRow', x, xAlias, data, xValues, id, index, seriesXValues) :
+    this.getCsvExportRowScatter(x, xAlias, data, xValues, id, index, seriesXValues);
 };
 
 
