@@ -444,16 +444,23 @@ anychart.core.GridBase.prototype.getOwner = function() {
 
 /**
  * Getter/setter for scale.
- * @param {(anychart.scales.IXScale|anychart.scales.IGeoScale)=} opt_value Scale.
+ * @param {(anychart.scales.IXScale|anychart.scales.IGeoScale|anychart.stockModule.scales.Scatter|anychart.scales.Base)=} opt_value Scale.
  * @return {anychart.scales.IXScale|anychart.scales.IGeoScale|!anychart.core.GridBase} Axis scale or itself for method chaining.
  */
 anychart.core.GridBase.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    var val = anychart.scales.Base.setupScale(this.scale_, opt_value, null, anychart.scales.Base.ScaleTypes.ALL_DEFAULT, null, this.scaleInvalidated, this);
-    if (val) {
+    var scType = opt_value && goog.isFunction(opt_value.getType) && opt_value.getType();
+    var stockScale = (scType == anychart.enums.ScaleTypes.STOCK_SCATTER_DATE_TIME) || (scType == anychart.enums.ScaleTypes.STOCK_ORDINAL_DATE_TIME);
+    var val = /** @type {anychart.stockModule.scales.Scatter|anychart.scales.Base} */(stockScale ?
+        (opt_value == this.scale_ ? null : opt_value) :
+        anychart.scales.Base.setupScale(this.scale_, opt_value, null, anychart.scales.Base.ScaleTypes.ALL_DEFAULT, null, this.scaleInvalidated, this));
+    if (val || (goog.isNull(opt_value) && this.scale_)) {
       var dispatch = this.scale_ == val;
-      this.scale_ = val;
-      val.resumeSignalsDispatching(dispatch);
+      if (!val)
+        this.scale_.unlistenSignals(this.scaleInvalidated, this);
+      this.scale_ = /** @type {anychart.stockModule.scales.Scatter|anychart.scales.Base} */(val);
+      if (val && !stockScale)
+        val.resumeSignalsDispatching(dispatch);
       if (!dispatch)
         this.invalidate(
             anychart.ConsistencyState.BOUNDS |
