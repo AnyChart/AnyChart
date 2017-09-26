@@ -219,7 +219,7 @@
           ]
         },
         "type": {"enum": ["cartesian", "cartesian-3d", "area", "vertical-area", "area-3d", "bar", "bar-3d", "box", "bubble", "column", "column-3d", "financial", "line", "line-3d", "vertical-line", "marker", "jump-line", "stick", "pareto", "hilo", "waterfall"]},
-        "grids": {
+        "xGrids": {
           "type": "array",
           "items": {
             "oneOf": [
@@ -228,7 +228,25 @@
             ]
           }
         },
-        "minorGrids": {
+        "yGrids": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {"$ref": "#/definitions/disable"},
+              {"$ref": "#/definitions/anychart.core.grids.Linear"}
+            ]
+          }
+        },
+        "xMinorGrids": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {"$ref": "#/definitions/disable"},
+              {"$ref": "#/definitions/anychart.core.grids.Linear"}
+            ]
+          }
+        },
+        "yMinorGrids": {
           "type": "array",
           "items": {
             "oneOf": [
@@ -343,30 +361,7 @@
           },
           "items": {"$ref": "#/definitions/acgraph.vector.HatchFill.HatchFillType"}
         },
-        "palette": {
-          "type": [
-            "object",
-            "array"
-          ],
-          "properties": {
-            "type": {
-              "enum": [
-                "distinct",
-                "range"
-              ]
-            },
-            "items": {
-              "type": ["array"],
-              "items": {"$ref": "#/definitions/fill"}
-            },
-            "count": {
-              "type": "number"
-            }
-          },
-          "items": {
-            "type": "string"
-          }
-        },
+        "palette": {"$ref": "#/definitions/palette"},
         "scales": {
           "type": [
             "object",
@@ -529,30 +524,7 @@
       "properties": {
         "type": {"enum": ["funnel"]},
         "data": {"$ref": "#/definitions/data"},
-        "palette": {
-          "type": [
-            "object",
-            "array"
-          ],
-          "properties": {
-            "type": {
-              "enum": [
-                "distinct",
-                "range"
-              ]
-            },
-            "items": {
-              "type": ["array"],
-              "items": {"$ref": "#/definitions/fill"}
-            },
-            "count": {
-              "type": "number"
-            }
-          },
-          "items": {
-            "type": "string"
-          }
-        },
+        "palette": {"$ref": "#/definitions/palette"},
         "hatchFillPalette": {
           "type": [
             "object",
@@ -653,30 +625,7 @@
             {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
           ]
         },
-        "palette": {
-          "type": [
-            "object",
-            "array"
-          ],
-          "properties": {
-            "type": {
-              "enum": [
-                "distinct",
-                "range"
-              ]
-            },
-            "items": {
-              "type": ["array"],
-              "items": {"$ref": "#/definitions/fill"}
-            },
-            "count": {
-              "type": "number"
-            }
-          },
-          "items": {
-            "type": "string"
-          }
-        },
+        "palette": {"$ref": "#/definitions/palette"},
         "hatchFillPalette": {
           "type": [
             "object",
@@ -752,7 +701,7 @@
       ],
       "properties": {
         "type": {"enum": ["polar"]},
-        "grids": {
+        "xGrids": {
           "type": "array",
           "items": {
             "oneOf": [
@@ -761,7 +710,25 @@
             ]
           }
         },
-        "minorGrids": {
+        "yGrids": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {"$ref": "#/definitions/disable"},
+              {"$ref": "#/definitions/anychart.core.grids.Polar"}
+            ]
+          }
+        },
+        "xMinorGrids": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {"$ref": "#/definitions/disable"},
+              {"$ref": "#/definitions/anychart.core.grids.Polar"}
+            ]
+          }
+        },
+        "yMinorGrids": {
           "type": "array",
           "items": {
             "oneOf": [
@@ -821,30 +788,7 @@
           },
           "items": {"$ref": "#/definitions/acgraph.vector.HatchFill.HatchFillType"}
         },
-        "palette": {
-          "type": [
-            "object",
-            "array"
-          ],
-          "properties": {
-            "type": {
-              "enum": [
-                "distinct",
-                "range"
-              ]
-            },
-            "items": {
-              "type": ["array"],
-              "items": {"$ref": "#/definitions/fill"}
-            },
-            "count": {
-              "type": "number"
-            }
-          },
-          "items": {
-            "type": "string"
-          }
-        },
+        "palette": {"$ref": "#/definitions/palette"},
         "scales": {
           "type": [
             "object",
@@ -934,7 +878,7 @@
       ],
       "properties": {
         "type": {"enum": ["radar"]},
-        "grids": {
+        "xGrids": {
           "type": "array",
           "items": {
             "oneOf": [
@@ -943,7 +887,25 @@
             ]
           }
         },
-        "minorGrids": {
+        "yGrids": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {"$ref": "#/definitions/disable"},
+              {"$ref": "#/definitions/anychart.core.grids.Radar"}
+            ]
+          }
+        },
+        "xMinorGrids": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {"$ref": "#/definitions/disable"},
+              {"$ref": "#/definitions/anychart.core.grids.Radar"}
+            ]
+          }
+        },
+        "yMinorGrids": {
           "type": "array",
           "items": {
             "oneOf": [
@@ -1000,30 +962,7 @@
           },
           "items": {"$ref": "#/definitions/acgraph.vector.HatchFill.HatchFillType"}
         },
-        "palette": {
-          "type": [
-            "object",
-            "array"
-          ],
-          "properties": {
-            "type": {
-              "enum": [
-                "distinct",
-                "range"
-              ]
-            },
-            "items": {
-              "type": ["array"],
-              "items": {"$ref": "#/definitions/fill"}
-            },
-            "count": {
-              "type": "number"
-            }
-          },
-          "items": {
-            "type": "string"
-          }
-        },
+        "palette": {"$ref": "#/definitions/palette"},
         "scales": {
           "type": [
             "object",
@@ -1096,7 +1035,7 @@
       ],
       "properties": {
         "type": {"enum": ["scatter", "quadrant"]},
-        "grids": {
+        "xGrids": {
           "type": "array",
           "items": {
             "oneOf": [
@@ -1105,7 +1044,25 @@
             ]
           }
         },
-        "minorGrids": {
+        "yGrids": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {"$ref": "#/definitions/disable"},
+              {"$ref": "#/definitions/anychart.core.grids.Linear"}
+            ]
+          }
+        },
+        "xMinorGrids": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {"$ref": "#/definitions/disable"},
+              {"$ref": "#/definitions/anychart.core.grids.Linear"}
+            ]
+          }
+        },
+        "yMinorGrids": {
           "type": "array",
           "items": {
             "oneOf": [
@@ -1195,30 +1152,7 @@
           },
           "items": {"$ref": "#/definitions/acgraph.vector.HatchFill.HatchFillType"}
         },
-        "palette": {
-          "type": [
-            "object",
-            "array"
-          ],
-          "properties": {
-            "type": {
-              "enum": [
-                "distinct",
-                "range"
-              ]
-            },
-            "items": {
-              "type": ["array"],
-              "items": {"$ref": "#/definitions/fill"}
-            },
-            "count": {
-              "type": "number"
-            }
-          },
-          "items": {
-            "type": "string"
-          }
-        },
+        "palette": {"$ref": "#/definitions/palette"},
         "scales": {
           "type": [
             "object",
@@ -1322,30 +1256,7 @@
           },
           "items": {"$ref": "#/definitions/acgraph.vector.HatchFill.HatchFillType"}
         },
-        "palette": {
-          "type": [
-            "object",
-            "array"
-          ],
-          "properties": {
-            "type": {
-              "enum": [
-                "distinct",
-                "range"
-              ]
-            },
-            "items": {
-              "type": ["array"],
-              "items": {"$ref": "#/definitions/fill"}
-            },
-            "count": {
-              "type": "number"
-            }
-          },
-          "items": {
-            "type": "string"
-          }
-        },
+        "palette": {"$ref": "#/definitions/palette"},
         "tooltip": {
           "oneOf": [
             {"$ref": "#/definitions/disable"},
@@ -1691,7 +1602,16 @@
       "properties": {
         "type": {"enum": ["heat-map"]},
         "data": {"$ref": "#/definitions/data"},
-        "grids": {
+        "xGrids": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {"$ref": "#/definitions/disable"},
+              {"$ref": "#/definitions/anychart.core.grids.Linear"}
+            ]
+          }
+        },
+        "yGrids": {
           "type": "array",
           "items": {
             "oneOf": [
@@ -1939,30 +1859,7 @@
           ]
         },
         "colorRange": {"$ref": "#/definitions/anychart.core.ui.ColorRange"},
-        "palette": {
-          "type": [
-            "object",
-            "array"
-          ],
-          "properties": {
-            "type": {
-              "enum": [
-                "distinct",
-                "range"
-              ]
-            },
-            "items": {
-              "type": ["array"],
-              "items": {"$ref": "#/definitions/fill"}
-            },
-            "count": {
-              "type": "number"
-            }
-          },
-          "items": {
-            "type": "string"
-          }
-        }
+        "palette": {"$ref": "#/definitions/palette"}
       },
       "required": ["type"]
     },
@@ -2157,30 +2054,7 @@
           "type": "string"
         },
         "layout": {"$ref": "#/definitions/anychart.enums.Layout"},
-        "palette": {
-          "type": [
-            "object",
-            "array"
-          ],
-          "properties": {
-            "type": {
-              "enum": [
-                "distinct",
-                "range"
-              ]
-            },
-            "items": {
-              "type": ["array"],
-              "items": {"$ref": "#/definitions/fill"}
-            },
-            "count": {
-              "type": "number"
-            }
-          },
-          "items": {
-            "type": "string"
-          }
-        },
+        "palette": {"$ref": "#/definitions/palette"},
         "markerPalette": {
           "type": [
             "object",
@@ -2305,30 +2179,7 @@
           },
           "items": {"$ref": "#/definitions/acgraph.vector.HatchFill.HatchFillType"}
         },
-        "palette": {
-          "type": [
-            "object",
-            "array"
-          ],
-          "properties": {
-            "type": {
-              "enum": [
-                "distinct",
-                "range"
-              ]
-            },
-            "items": {
-              "type": ["array"],
-              "items": {"$ref": "#/definitions/fill"}
-            },
-            "count": {
-              "type": "number"
-            }
-          },
-          "items": {
-            "type": "string"
-          }
-        },
+        "palette": {"$ref": "#/definitions/palette"},
 
         "unboundRegions": {"$ref": "#/definitions/anychart.core.utils.UnboundRegionsSettings"},
         "colorRange": {"$ref": "#/definitions/anychart.core.ui.ColorRange"},
@@ -2417,7 +2268,7 @@
       ],
       "properties": {
         "type": {"enum": ["mekko", "mosaic", "barmekko"]},
-        "grids": {
+        "xGrids": {
           "type": "array",
           "items": {
             "oneOf": [
@@ -2426,7 +2277,25 @@
             ]
           }
         },
-        "minorGrids": {
+        "yGrids": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {"$ref": "#/definitions/disable"},
+              {"$ref": "#/definitions/anychart.core.grids.Linear"}
+            ]
+          }
+        },
+        "xMinorGrids": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {"$ref": "#/definitions/disable"},
+              {"$ref": "#/definitions/anychart.core.grids.Linear"}
+            ]
+          }
+        },
+        "yMinorGrids": {
           "type": "array",
           "items": {
             "oneOf": [
@@ -2503,30 +2372,7 @@
           },
           "items": {"$ref": "#/definitions/acgraph.vector.HatchFill.HatchFillType"}
         },
-        "palette": {
-          "type": [
-            "object",
-            "array"
-          ],
-          "properties": {
-            "type": {
-              "enum": [
-                "distinct",
-                "range"
-              ]
-            },
-            "items": {
-              "type": ["array"],
-              "items": {"$ref": "#/definitions/fill"}
-            },
-            "count": {
-              "type": "number"
-            }
-          },
-          "items": {
-            "type": "string"
-          }
-        },
+        "palette": {"$ref": "#/definitions/palette"},
         "scales": {
           "type": [
             "object",
@@ -4380,9 +4226,8 @@
       ],
       "properties": {
         "stroke": {"$ref": "#/definitions/stroke"},
-        "layout": {"$ref": "#/definitions/anychart.enums.Layout"},
-        "oddFill": {"$ref": "#/definitions/fill"},
-        "evenFill": {"$ref": "#/definitions/fill"},
+        "fill": {"$ref": "#/definitions/fill"},
+        "palette": {"$ref": "#/definitions/palette"},
         "drawFirstLine": {
           "type": ["boolean"]
         },
@@ -4404,9 +4249,8 @@
       ],
       "properties": {
         "stroke": {"$ref": "#/definitions/stroke"},
-        "layout": {"$ref": "#/definitions/anychart.enums.RadialGridLayout"},
-        "oddFill": {"$ref": "#/definitions/fill"},
-        "evenFill": {"$ref": "#/definitions/fill"},
+        "fill": {"$ref": "#/definitions/fill"},
+        "palette": {"$ref": "#/definitions/palette"},
         "drawLastLine": {
           "type": ["boolean"]
         },
@@ -4425,9 +4269,8 @@
       ],
       "properties": {
         "stroke": {"$ref": "#/definitions/stroke"},
-        "layout": {"$ref": "#/definitions/anychart.enums.RadialGridLayout"},
-        "oddFill": {"$ref": "#/definitions/fill"},
-        "evenFill": {"$ref": "#/definitions/fill"},
+        "fill": {"$ref": "#/definitions/fill"},
+        "palette": {"$ref": "#/definitions/palette"},
         "drawLastLine": {
           "type": ["boolean"]
         },
@@ -4447,8 +4290,8 @@
       "properties": {
         "stroke": {"$ref": "#/definitions/stroke"},
         "minorStroke": {"$ref": "#/definitions/stroke"},
-        "oddFill": {"$ref": "#/definitions/fill"},
-        "evenFill": {"$ref": "#/definitions/fill"},
+        "fill": {"$ref": "#/definitions/fill"},
+        "palette": {"$ref": "#/definitions/palette"},
         "drawFirstLine": {
           "type": ["boolean"]
         },
@@ -4465,8 +4308,8 @@
       "properties": {
         "stroke": {"$ref": "#/definitions/stroke"},
         "minorStroke": {"$ref": "#/definitions/stroke"},
-        "oddFill": {"$ref": "#/definitions/fill"},
-        "evenFill": {"$ref": "#/definitions/fill"},
+        "fill": {"$ref": "#/definitions/fill"},
+        "palette": {"$ref": "#/definitions/palette"},
         "drawFirstLine": {
           "type": ["boolean"]
         },
@@ -6119,7 +5962,6 @@
       }
     },
 
-
     "intersections": {
       "type": "object",
       "properties": {
@@ -6467,6 +6309,30 @@
             "maximum": 1
           }
         }
+      }
+    },
+    "palette": {
+      "type": [
+        "object",
+        "array"
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "distinct",
+            "range"
+          ]
+        },
+        "items": {
+          "type": ["array"],
+          "items": {"$ref": "#/definitions/fill"}
+        },
+        "count": {
+          "type": "number"
+        }
+      },
+      "items": {
+        "type": "string"
       }
     }
   }

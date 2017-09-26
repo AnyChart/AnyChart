@@ -40,8 +40,10 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="palette" type="palettes.Colors"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="hatch_fill_palette" type="palettes.HatchFills"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="marker_palette" type="palettes.Markers"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="grids" type="Grid_list"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="minor_grids" type="Grid_list"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="x_grids" type="Grid_list"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="y_grids" type="Grid_list"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="x_minor_grids" type="Grid_list"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="y_minor_grids" type="Grid_list"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="scales" type="Scale_list"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="x_scale" type="Scale"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="y_scale" type="Scale"/>
@@ -1008,16 +1010,14 @@
 
     <xsd:complexType name="Grid">
         <xsd:all>
-            <xsd:element minOccurs="0" maxOccurs="1" name="odd_fill" type="Fill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="even_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="palette" type="palettes.Colors"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
         </xsd:all>
         <xsd:attribute name="is_minor" type="simple.Bool"/>
-        <xsd:attribute name="layout" type="enums.GridLayout"/>
         <xsd:attribute name="draw_first_line" type="simple.Bool" default="true"/>
         <xsd:attribute name="draw_last_line" type="simple.Bool" default="true"/>
-        <xsd:attribute name="odd_fill" type="xsd:string"/>
-        <xsd:attribute name="even_fill" type="xsd:string"/>
+        <xsd:attribute name="fill" type="xsd:string"/>
         <xsd:attribute name="stroke" type="xsd:string"/>
         <xsd:attribute name="scale" type="simple.ScaleRef"/>
         <xsd:attribute name="x_scale" type="simple.ScaleRef"/>
@@ -1034,15 +1034,14 @@
 
     <xsd:complexType name="core.grids.Map">
         <xsd:all>
-            <xsd:element minOccurs="0" maxOccurs="1" name="odd_fill" type="Fill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="even_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="palette" type="palettes.Colors"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="minor_stroke" type="Stroke"/>
         </xsd:all>
         <xsd:attribute name="draw_first_line" type="simple.Bool" default="true"/>
         <xsd:attribute name="draw_last_line" type="simple.Bool" default="true"/>
-        <xsd:attribute name="odd_fill" type="xsd:string"/>
-        <xsd:attribute name="even_fill" type="xsd:string"/>
+        <xsd:attribute name="fill" type="xsd:string"/>
         <xsd:attribute name="stroke" type="xsd:string"/>
         <xsd:attribute name="minor_stroke" type="xsd:string"/>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
@@ -1050,8 +1049,8 @@
 
     <xsd:complexType name="core.grids.MapSettings">
         <xsd:all>
-            <xsd:element minOccurs="0" maxOccurs="1" name="odd_fill" type="Fill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="even_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="palette" type="palettes.Colors"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="minor_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="vertical" type="core.grids.Map"/>
@@ -1061,8 +1060,7 @@
         <xsd:attribute name="horizontal" type="simple.Bool" default="false"/>
         <xsd:attribute name="draw_first_line" type="simple.Bool" default="true"/>
         <xsd:attribute name="draw_last_line" type="simple.Bool" default="true"/>
-        <xsd:attribute name="odd_fill" type="xsd:string"/>
-        <xsd:attribute name="even_fill" type="xsd:string"/>
+        <xsd:attribute name="fill" type="xsd:string"/>
         <xsd:attribute name="stroke" type="xsd:string"/>
         <xsd:attribute name="minor_stroke" type="xsd:string"/>
         <xsd:attributeGroup ref="attrs.VisualBase"/>

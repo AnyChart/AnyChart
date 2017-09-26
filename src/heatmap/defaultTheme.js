@@ -104,6 +104,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       },
       'stroke': '1 #ffffff',
       'labels': {
+        'disablePointerEvents': true,
         'enabled': true,
         'fontSize': 11,
         'adjustFontSize': {

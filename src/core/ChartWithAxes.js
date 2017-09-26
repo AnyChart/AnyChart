@@ -1528,10 +1528,10 @@ anychart.core.ChartWithAxes.prototype.setupByJSONWithScales = function(config, s
   if (this.annotationsModule_)
     this.annotations(config['annotations']);
 
-  this.setupElementsWithScales(config['grids'], this.xGrid, scalesInstances);
-  this.setupElementsWithScales(config['grids'], this.yGrid, scalesInstances);
-  this.setupElementsWithScales(config['minorGrids'], this.xMinorGrid, scalesInstances);
-  this.setupElementsWithScales(config['minorGrids'], this.yMinorGrid, scalesInstances);
+  this.setupElementsWithScales(config['xGrids'], this.xGrid, scalesInstances);
+  this.setupElementsWithScales(config['yGrids'], this.yGrid, scalesInstances);
+  this.setupElementsWithScales(config['xMinorGrids'], this.xMinorGrid, scalesInstances);
+  this.setupElementsWithScales(config['yMinorGrids'], this.yMinorGrid, scalesInstances);
   this.setupElementsWithScales(config['xAxes'], this.xAxis, scalesInstances);
   this.setupElementsWithScales(config['yAxes'], this.yAxis, scalesInstances);
   this.setupElementsWithScales(config['lineAxesMarkers'], this.lineMarker, scalesInstances);

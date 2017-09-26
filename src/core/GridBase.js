@@ -845,15 +845,15 @@ anychart.core.GridBase.prototype.setThemeSettings = function(config) {
 anychart.core.GridBase.prototype.serialize = function() {
   var json = {};
 
-  json['palette'] = this.palette().serialize();
+  if (this.palette_)
+    json['palette'] = this.palette_.serialize();
 
   var zIndex = anychart.core.Base.prototype.getOption.call(this, 'zIndex');
   if (goog.isDef(zIndex))
     json['zIndex'] = zIndex;
 
   var enabled = anychart.core.Base.prototype.getOption.call(this, 'enabled');
-  if (goog.isDef(enabled))
-    json['enabled'] = goog.isDef(enabled) ? enabled : null;
+  json['enabled'] = goog.isDef(enabled) ? enabled : null;
 
   anychart.core.settings.serialize(this, this.SIMPLE_PROPS_DESCRIPTORS, json, 'Map grids props');
 
@@ -888,7 +888,8 @@ anychart.core.GridBase.prototype.setupByJSON = function(config, opt_default) {
     }
   }
 
-  this.palette(config['palette']);
+  if (config['palette'])
+    this.palette(config['palette']);
 
   if (opt_default) {
     this.setThemeSettings(config);

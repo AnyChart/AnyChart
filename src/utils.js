@@ -1378,10 +1378,14 @@ anychart.utils.getNodeNames_ = function(arrayPropName) {
       return ['range_axes_markers', 'range_axes_marker'];
     case 'textAxesMarkers':
       return ['text_axes_markers', 'text_axes_marker'];
-    case 'grids':
-      return ['grids', 'grid'];
-    case 'minorGrids':
-      return ['minor_grids', 'grid'];
+    case 'xGrids':
+      return ['x_grids', 'grid'];
+    case 'yGrids':
+      return ['y_grids', 'grid'];
+    case 'xMinorGrids':
+      return ['x_minor_grids', 'grid'];
+    case 'yMinorGrids':
+      return ['y_minor_grids', 'grid'];
     case 'xAxes':
       return ['x_axes', 'axis'];
     case 'yAxes':
@@ -1471,10 +1475,14 @@ anychart.utils.getArrayPropName_ = function(nodeName) {
       return ['rangeAxesMarkers', 'rangeAxesMarker'];
     case 'textAxesMarkers':
       return ['textAxesMarkers', 'textAxesMarker'];
-    case 'grids':
-      return ['grids', 'grid'];
-    case 'minorGrids':
-      return ['minorGrids', 'grid'];
+    case 'xGrids':
+      return ['xGrids', 'grid'];
+    case 'yGrids':
+      return ['yGrids', 'grid'];
+    case 'xMinorGrids':
+      return ['xMinorGrids', 'grid'];
+    case 'yMinorGrids':
+      return ['yMinorGrids', 'grid'];
     case 'xAxes':
       return ['xAxes', 'axis'];
     case 'yAxes':

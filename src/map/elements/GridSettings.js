@@ -359,8 +359,9 @@ anychart.mapModule.elements.GridSettings.prototype.setupByJSON = function(config
     anychart.core.settings.deserialize(this, this.SIMPLE_PROPS_DESCRIPTORS, config);
     this.setOption('enabled', 'enabled' in config ? config['enabled'] : true);
   }
+  if (config['palette'])
+    this.palette(config['palette']);
 
-  this.palette(config['palette']);
   this.horizontal().setupInternal(!!opt_default, config['horizontal']);
   this.vertical().setupInternal(!!opt_default, config['vertical']);
 
@@ -383,7 +384,8 @@ anychart.mapModule.elements.GridSettings.prototype.serialize = function() {
     if (!goog.object.isEmpty(gridSettings))
       json['horizontal'] = gridSettings;
   }
-  json['palette'] = this.palette().serialize();
+  if (this.palette_)
+    json['palette'] = this.palette_.serialize();
 
   anychart.core.settings.serialize(this, this.SIMPLE_PROPS_DESCRIPTORS, json, 'Map grids props');
 
@@ -393,7 +395,10 @@ anychart.mapModule.elements.GridSettings.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.mapModule.elements.GridSettings.prototype.disposeInternal = function() {
+  goog.disposeAll(this.verticalGrid_, this.horizontalGrid_, this.palette_);
+  this.map_ = null;
 
+  anychart.mapModule.elements.GridSettings.base(this, 'disposeInternal');
 };
 
 

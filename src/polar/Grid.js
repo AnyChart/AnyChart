@@ -239,6 +239,9 @@ anychart.polarModule.Grid.prototype.drawInternal = function() {
 
 //endregion
 //region --- Standalone
+
+
+
 //------------------------------------------------------------------------------
 //
 //  Standalone
