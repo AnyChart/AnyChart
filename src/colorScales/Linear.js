@@ -124,7 +124,7 @@ anychart.colorScalesModule.Linear.prototype.normalizeColors_ = function(var_args
  * @return {!(Array.<Object>|anychart.colorScalesModule.Linear)}
  */
 anychart.colorScalesModule.Linear.prototype.colors = function(var_args) {
-  if (arguments.length > 0) {
+  if (arguments.length > 0 && goog.isDef(arguments[0])) {
     var colors = this.normalizeColors_.apply(this, arguments);
     var equal = this.colors_ && colors.length == this.colors_.length;
     if (equal) {
