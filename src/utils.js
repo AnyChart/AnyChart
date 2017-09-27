@@ -131,7 +131,7 @@ anychart.utils.compareNumericDesc = function(a, b) {
  */
 anychart.utils.extractTag = function(target) {
   var tag;
-  while (target instanceof acgraph.vector.Element) {
+  while (anychart.utils.instanceOf(target, acgraph.vector.Element)) {
     tag = target.tag;
     if (goog.isDef(tag)) {
       return tag;
@@ -150,7 +150,7 @@ anychart.utils.extractTag = function(target) {
  */
 anychart.utils.checkIfParent = function(parent, target) {
   if (!parent) return false;
-  while (target instanceof goog.events.EventTarget && target != parent) {
+  while (anychart.utils.instanceOf(target, goog.events.EventTarget) && target != parent) {
     target = target.getParentEventTarget();
   }
   return target == parent;
@@ -2306,6 +2306,15 @@ anychart.utils.decomposeArguments = function(namedArguments, opt_options, opt_de
 
   return result;
 };
+
+
+/**
+ * Safe instanceof.
+ * @param {*} object
+ * @param {*} constructor
+ * @return {boolean}
+ */
+anychart.utils.instanceOf = acgraph.utils.instanceOf;
 
 //exports
 goog.exportSymbol('anychart.utils.printUtilsBoolean', anychart.utils.printUtilsBoolean);

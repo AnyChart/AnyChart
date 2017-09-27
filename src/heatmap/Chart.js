@@ -342,7 +342,7 @@ anychart.heatmapModule.Chart.prototype.createLegendItemsProvider = function(sour
     // we need to calculate statistics
     this.calculate();
     var scale = this.colorScale();
-    if (scale && scale instanceof anychart.colorScalesModule.Ordinal) {
+    if (scale && anychart.utils.instanceOf(scale, anychart.colorScalesModule.Ordinal)) {
       var series = this.series_;
       var ranges = scale.getProcessedRanges();
       for (i = 0, count = ranges.length; i < count; i++) {

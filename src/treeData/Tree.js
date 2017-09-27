@@ -298,7 +298,7 @@ anychart.treeDataModule.Tree.prototype.fillAsParentPointer_ = function(data) {
         searchResult = this.search(anychart.enums.GanttDataFields.ID, id);
 
         if (searchResult) {
-          found = (searchResult instanceof anychart.treeDataModule.Tree.DataItem) ? searchResult : searchResult[0];
+          found = (anychart.utils.instanceOf(searchResult, anychart.treeDataModule.Tree.DataItem)) ? searchResult : searchResult[0];
           goog.array.insertAt(uitems, found, pos);
           found.meta('nc', true);
           anychart.core.reporting.warning(anychart.enums.WarningCode.DUPLICATED_DATA_ITEM, null, [id]);
@@ -321,7 +321,7 @@ anychart.treeDataModule.Tree.prototype.fillAsParentPointer_ = function(data) {
       if (index < 0) {
         searchResult = this.search(anychart.enums.GanttDataFields.ID, parentId);
         if (searchResult) {
-          found = (searchResult instanceof anychart.treeDataModule.Tree.DataItem) ? searchResult : searchResult[0];
+          found = (anychart.utils.instanceOf(searchResult, anychart.treeDataModule.Tree.DataItem)) ? searchResult : searchResult[0];
           found.addChildWithoutIndexing(tdi);
         } else {
           this.roots_.push(tdi);
@@ -763,7 +763,7 @@ anychart.treeDataModule.Tree.prototype.addChild = function(child) {
  */
 anychart.treeDataModule.Tree.prototype.addChildAt = function(child, index) {
   var treeView = null;
-  if (child instanceof anychart.treeDataModule.View.DataItem) {
+  if (anychart.utils.instanceOf(child, anychart.treeDataModule.View.DataItem)) {
     treeView = child.getTreeView();
     child = child.getDataItem();
   }
@@ -776,7 +776,7 @@ anychart.treeDataModule.Tree.prototype.addChildAt = function(child, index) {
   var dispatchMove = true;
 
   var oldTree = null;
-  if (child instanceof anychart.treeDataModule.Tree.DataItem) {
+  if (anychart.utils.instanceOf(child, anychart.treeDataModule.Tree.DataItem)) {
     oldTree = child.tree();
     if (oldTree && oldTree != this) {
       sourceTree = oldTree;
@@ -878,7 +878,7 @@ anychart.treeDataModule.Tree.prototype.removeChild = function(child) {
  * @return {number} - Index of child.
  */
 anychart.treeDataModule.Tree.prototype.indexOfChild = function(child) {
-  if (child instanceof anychart.treeDataModule.View.DataItem)
+  if (anychart.utils.instanceOf(child, anychart.treeDataModule.View.DataItem))
     child = child.getDataItem();
   return goog.array.indexOf(this.roots_, child);
 };
@@ -1637,7 +1637,7 @@ anychart.treeDataModule.Tree.DataItem.prototype.addChild = function(child) {
  */
 anychart.treeDataModule.Tree.DataItem.prototype.addChildAt = function(child, index) {
   var treeView = null;
-  if (child instanceof anychart.treeDataModule.View.DataItem) {
+  if (anychart.utils.instanceOf(child, anychart.treeDataModule.View.DataItem)) {
     treeView = child.getTreeView();
     child = child.getDataItem();
   }
@@ -1650,7 +1650,7 @@ anychart.treeDataModule.Tree.DataItem.prototype.addChildAt = function(child, ind
 
   var dispatchMove = true;
 
-  if (child instanceof anychart.treeDataModule.Tree.DataItem) {
+  if (anychart.utils.instanceOf(child, anychart.treeDataModule.Tree.DataItem)) {
     oldTree = child.tree();
     if (oldTree && oldTree != this.tree_) {
       sourceTree = oldTree;
@@ -1816,7 +1816,7 @@ anychart.treeDataModule.Tree.DataItem.prototype.removeChildren = function() {
  * @return {number} - Index of child.
  */
 anychart.treeDataModule.Tree.DataItem.prototype.indexOfChild = function(child) {
-  if (child instanceof anychart.treeDataModule.View.DataItem)
+  if (anychart.utils.instanceOf(child, anychart.treeDataModule.View.DataItem))
     child = child.getDataItem();
   return goog.array.indexOf(this.children_, child);
 };

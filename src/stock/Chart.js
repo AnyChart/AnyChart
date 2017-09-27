@@ -812,7 +812,7 @@ anychart.stockModule.Chart.prototype.xScale = function(opt_value) {
     }
     newType = String(newType).toLowerCase();
     var askedForScatter = newType == 'scatter';
-    var currIsScatter = this.xScale_ && !(this.xScale_ instanceof anychart.stockModule.scales.Ordinal);
+    var currIsScatter = this.xScale_ && !(anychart.utils.instanceOf(this.xScale_, anychart.stockModule.scales.Ordinal));
     if (askedForScatter != currIsScatter) {
       if (askedForScatter) {
         this.xScale_ = new anychart.stockModule.scales.Scatter(this);
@@ -2184,7 +2184,7 @@ anychart.stockModule.Chart.prototype.handleMouseWheel_ = function(e) {
             last,
             start,
             end;
-        var ordinal = this.xScale() instanceof anychart.stockModule.scales.Ordinal;
+        var ordinal = anychart.utils.instanceOf(this.xScale(), anychart.stockModule.scales.Ordinal);
         first = this.dataController_.getFirstKey();
         last = this.dataController_.getLastKey();
         if (ordinal) {
@@ -2515,7 +2515,7 @@ anychart.stockModule.Chart.prototype.refreshDragAnchor = function(anchor) {
 anychart.stockModule.Chart.prototype.dragToRatio = function(ratio, anchor, opt_source) {
   var scale = this.xScale();
   var valueDiff, range, start, end;
-  if (scale instanceof anychart.stockModule.scales.Ordinal) {
+  if (anychart.utils.instanceOf(scale, anychart.stockModule.scales.Ordinal)) {
     range = anchor.lastIndex - anchor.firstIndex;
     valueDiff = ratio * range;
     start = this.getKeyByIndex(anchor.firstIndex - valueDiff);
@@ -2553,7 +2553,7 @@ anychart.stockModule.Chart.prototype.dragToRatio = function(ratio, anchor, opt_s
 anychart.stockModule.Chart.prototype.limitDragRatio = function(ratio, anchor) {
   var scale = this.xScale();
   var range, start, end;
-  if (scale instanceof anychart.stockModule.scales.Ordinal) {
+  if (anychart.utils.instanceOf(scale, anychart.stockModule.scales.Ordinal)) {
     range = anchor.lastIndex - anchor.firstIndex;
     start = (anchor.minIndex - anchor.firstIndex) / range;
     end = (anchor.maxIndex - anchor.firstIndex) / range;

@@ -105,7 +105,7 @@ anychart.core.utils.OrdinalZoom.prototype.ensureSetupApplied = function() {
   this.chart_.ensureScalesReadyForZoom();
   if (this.setup_) {
     var scale = this.setup_.scale || this.chart_.getDefaultScale(this.isXZoom_);
-    if (this.setup_.count && (scale instanceof anychart.scales.Ordinal)) {
+    if (this.setup_.count && (anychart.utils.instanceOf(scale, anychart.scales.Ordinal))) {
       var length = this.setup_.count / (/** @type {anychart.scales.Ordinal} */(scale)).values().length;
       if (this.setup_.fromEnd)
         this.setTo(1 - length, 1);
@@ -243,12 +243,12 @@ anychart.core.utils.OrdinalZoom.prototype.setup = function(var_args) {
         this.setToValues(
             json['startValue'],
             json['endValue'],
-            json['scale'] instanceof anychart.scales.Base ? json['scale'] : undefined);
+            anychart.utils.instanceOf(json['scale'], anychart.scales.Base) ? json['scale'] : undefined);
       } else if (goog.isDef(json['pointsCount'])) {
         this.setToPointsCount(
             json['pointsCount'],
             json['fromEnd'],
-            json['scale'] instanceof anychart.scales.Base ? json['scale'] : undefined);
+            anychart.utils.instanceOf(json['scale'], anychart.scales.Base) ? json['scale'] : undefined);
       } else {
         this.setTo(json['startRatio'], json['endRatio']);
       }

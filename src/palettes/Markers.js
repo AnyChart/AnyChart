@@ -110,7 +110,7 @@ anychart.palettes.Markers.prototype.setupSpecial = function(isDefault, var_args)
     this.items(arg0);
     return true;
   }
-  if (arg0 instanceof anychart.palettes.Markers) {
+  if (anychart.utils.instanceOf(arg0, anychart.palettes.Markers)) {
     this.items(/** @type {Array.<string>} */(arg0.items()));
     return true;
   }

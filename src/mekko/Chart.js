@@ -262,7 +262,7 @@ anychart.mekkoModule.Chart.prototype.allowLegendCategoriesMode = function() {
 /** @inheritDoc */
 anychart.mekkoModule.Chart.prototype.createLegendItemsProvider = function(sourceMode, itemsFormat) {
   if (this.barmekkoMode_ && this.getSeriesCount() == 1 &&
-      this.xScale() instanceof anychart.scales.Ordinal) {
+      anychart.utils.instanceOf(this.xScale(), anychart.scales.Ordinal)) {
     // we need to calculate statistics
     this.calculate();
     /**

@@ -133,7 +133,7 @@ anychart.polarModule.Grid.prototype.drawInternal = function() {
   var startAngle = this.startAngle() - 90;
 
   if (this.isRadial()) {
-    isOrdinal = xScale instanceof anychart.scales.Ordinal;
+    isOrdinal = anychart.utils.instanceOf(xScale, anychart.scales.Ordinal);
     ticks = (this.getOption('isMinor') && !isOrdinal) ? xScale.minorTicks() : xScale.ticks();
     ticksArray = ticks.get();
     ticksArrLen = ticksArray.length;
@@ -193,7 +193,7 @@ anychart.polarModule.Grid.prototype.drawInternal = function() {
     y = Math.round(this.cy_ + this.radius_ * Math.sin(angleRad));
     this.drawInterlaceRadial(angle, sweep, x, y, prevX, prevY, path);
   } else {
-    isOrdinal = yScale instanceof anychart.scales.Ordinal;
+    isOrdinal = anychart.utils.instanceOf(yScale, anychart.scales.Ordinal);
     ticks = isOrdinal ? yScale.ticks() : this.getOption('isMinor') ? yScale.minorTicks() : yScale.ticks();
     ticksArray = ticks.get();
     ticksArrLen = ticksArray.length;

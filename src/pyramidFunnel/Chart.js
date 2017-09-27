@@ -339,11 +339,11 @@ anychart.pyramidFunnelModule.Chart.prototype.data = function(opt_value, opt_csvS
          * @type {anychart.data.View}
          */
         var parentView;
-        if (opt_value instanceof anychart.data.View) {
+        if (anychart.utils.instanceOf(opt_value, anychart.data.View)) {
           parentView = opt_value;
           this.parentViewToDispose_ = null;
         } else {
-          if (opt_value instanceof anychart.data.Set)
+          if (anychart.utils.instanceOf(opt_value, anychart.data.Set))
             parentView = (this.parentViewToDispose_ = opt_value).mapAs();
           else if (goog.isArray(opt_value) || goog.isString(opt_value))
             parentView = (this.parentViewToDispose_ = new anychart.data.Set(opt_value, opt_csvSettings)).mapAs();
@@ -454,11 +454,11 @@ anychart.pyramidFunnelModule.Chart.prototype.colorizePoint_ = function(pointStat
  * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|anychart.pyramidFunnelModule.Chart)} .
  */
 anychart.pyramidFunnelModule.Chart.prototype.palette = function(opt_value) {
-  if (opt_value instanceof anychart.palettes.RangeColors) {
-    this.setupPalette_(anychart.palettes.RangeColors, opt_value);
+  if (anychart.utils.instanceOf(opt_value, anychart.palettes.RangeColors)) {
+    this.setupPalette_(anychart.palettes.RangeColors, /** @type {anychart.palettes.RangeColors} */(opt_value));
     return this;
-  } else if (opt_value instanceof anychart.palettes.DistinctColors) {
-    this.setupPalette_(anychart.palettes.DistinctColors, opt_value);
+  } else if (anychart.utils.instanceOf(opt_value, anychart.palettes.DistinctColors)) {
+    this.setupPalette_(anychart.palettes.DistinctColors, /** @type {anychart.palettes.DistinctColors} */(opt_value));
     return this;
   } else if (goog.isObject(opt_value) && opt_value['type'] == 'range') {
     this.setupPalette_(anychart.palettes.RangeColors);
@@ -524,7 +524,7 @@ anychart.pyramidFunnelModule.Chart.prototype.hatchFillPalette = function(opt_val
  * @private
  */
 anychart.pyramidFunnelModule.Chart.prototype.setupPalette_ = function(cls, opt_cloneFrom) {
-  if (this.palette_ instanceof cls) {
+  if (anychart.utils.instanceOf(this.palette_, cls)) {
     if (opt_cloneFrom)
       this.palette_.setup(opt_cloneFrom);
   } else {
@@ -674,7 +674,7 @@ anychart.pyramidFunnelModule.Chart.prototype.drawContent = function(bounds) {
       this.hatchLayer_.zIndex(anychart.pyramidFunnelModule.Chart.ZINDEX_HATCH_FILL).disablePointerEvents(true);
     }
 
-    if (this.palette_ && this.palette_ instanceof anychart.palettes.RangeColors) {
+    if (this.palette_ && anychart.utils.instanceOf(this.palette_, anychart.palettes.RangeColors)) {
       this.palette_.count(iterator.getRowsCount());
     }
 

@@ -97,7 +97,7 @@ anychart.linearGaugeModule.ScaleBar.prototype.to = function(opt_value) {
  */
 anychart.linearGaugeModule.ScaleBar.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (!(opt_value instanceof anychart.scales.ScatterBase)) {
+    if (!(anychart.utils.instanceOf(opt_value, anychart.scales.ScatterBase))) {
       anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['ScaleBar scale', 'scatter', 'linear, log']);
       return this;
     }
@@ -527,7 +527,7 @@ anychart.linearGaugeModule.ScaleBar.prototype.draw = function() {
       colors = colorScale.colors();
     var inverted = this.scale().inverted();
     var path, fill, stroke;
-    if (colorScale instanceof anychart.colorScalesModule.Linear) {
+    if (anychart.utils.instanceOf(colorScale, anychart.colorScalesModule.Linear)) {
       var offsets = goog.array.map(colors, function(color) {
         return color['offset'];
       });
@@ -555,7 +555,7 @@ anychart.linearGaugeModule.ScaleBar.prototype.draw = function() {
           .close();
       path.fill(fill).stroke('none');
       path.clip(this.clipPath_);
-    } else if (colorScale instanceof anychart.colorScalesModule.Ordinal) {
+    } else if (anychart.utils.instanceOf(colorScale, anychart.colorScalesModule.Ordinal)) {
       if (colorScale.needsAutoCalc())
         colorScale.startAutoCalc().extendDataRange(0, 1).finishAutoCalc();
       var ranges = colorScale.getProcessedRanges();

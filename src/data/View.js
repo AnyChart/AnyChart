@@ -261,7 +261,7 @@ anychart.data.View.prototype.sort = function(fieldName, opt_comparatorOrOrder) {
 anychart.data.View.prototype.concat = function(otherView) {
   if (goog.isArray(otherView))
     otherView = new anychart.data.Set(/** @type {!Array} */(otherView));
-  if (otherView instanceof anychart.data.Set)
+  if (anychart.utils.instanceOf(otherView, anychart.data.Set))
     otherView = (/** @type {!anychart.data.Set} */(otherView)).mapAs();
   var result = new anychart.data.ConcatView(this, /** @type {!anychart.data.IView} */(otherView));
   this.registerDisposable(result);
@@ -690,7 +690,7 @@ anychart.data.View.prototype.getMappings = function() {
  * @private
  */
 anychart.data.View.prototype.serializeValue_ = function(val) {
-  if (val instanceof Date)
+  if (anychart.utils.instanceOf(val, Date))
     val = val.getTime();
   if (!goog.isDef(val) || (goog.isNumber(val) && isNaN(val)))
     val = null;
@@ -744,7 +744,7 @@ anychart.data.View.prototype.serializeRow = function(index) {
         for (i = 0; i < map.length; i++) {
           if (map[i] in row) {
             val = row[map[i]];
-            if (val instanceof Date)
+            if (anychart.utils.instanceOf(val, Date))
               val = val.getTime();
             if (!goog.isDef(val) || (goog.isNumber(val) && isNaN(val)))
               val = null;

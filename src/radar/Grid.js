@@ -244,7 +244,7 @@ anychart.radarModule.Grid.prototype.drawInternal = function() {
     }
     this.drawInterlaceRadial(x, y, cx, cy, prevX, prevY, path);
   } else {
-    isOrdinal = yScale instanceof anychart.scales.Ordinal;
+    isOrdinal = anychart.utils.instanceOf(yScale, anychart.scales.Ordinal);
     ticks = isOrdinal ? yScale.ticks() : this.getOption('isMinor') ? yScale.minorTicks() : yScale.ticks();
     ticksArray = ticks.get();
     ticksArrLen = ticksArray.length;

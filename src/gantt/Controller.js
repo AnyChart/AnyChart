@@ -802,7 +802,7 @@ anychart.ganttModule.Controller.prototype.getMaxDate = function() {
  */
 anychart.ganttModule.Controller.prototype.data = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if ((this.data_ != opt_value) && (opt_value instanceof anychart.treeDataModule.Tree || opt_value instanceof anychart.treeDataModule.View)) {
+    if ((this.data_ != opt_value) && (anychart.utils.instanceOf(opt_value, anychart.treeDataModule.Tree) || anychart.utils.instanceOf(opt_value, anychart.treeDataModule.View))) {
       if (this.data_) this.data_.unlistenSignals(this.dataInvalidated_, this); //Stop listening old tree.
       this.data_ = opt_value;
       this.data_.listenSignals(this.dataInvalidated_, this);

@@ -71,7 +71,7 @@ anychart.ganttModule.BaseGrid = function(opt_controller, opt_isResource) {
    */
   this.controller = null;
 
-  if (opt_controller && opt_controller instanceof anychart.ganttModule.Controller) {
+  if (opt_controller && anychart.utils.instanceOf(opt_controller, anychart.ganttModule.Controller)) {
     this.controller = opt_controller;
     this.isStandalone = false;
   } else {
@@ -1433,7 +1433,7 @@ anychart.ganttModule.BaseGrid.prototype.editStructurePreviewDashStroke = functio
  * @private
  */
 anychart.ganttModule.BaseGrid.prototype.dragMouseDown_ = function(e) {
-  if (e.currentTarget instanceof acgraph.vector.Element && !this.scrollDragger) {
+  if (anychart.utils.instanceOf(e.currentTarget, acgraph.vector.Element) && !this.scrollDragger) {
     this.scrollDragger = new anychart.ganttModule.BaseGrid.Dragger(this.base_, this);
     this.registerDisposable(this.scrollDragger);
     //this.scrollDragger.listen(goog.fx.Dragger.EventType.START, this.dragStartHandler_, false, this);
@@ -2296,7 +2296,7 @@ anychart.ganttModule.BaseGrid.prototype.rowUnselect = function(event) {
 anychart.ganttModule.BaseGrid.prototype.data = function(opt_value) {
   var data = /** @type {?anychart.treeDataModule.Tree} */ (this.controller.data());
   if (goog.isDef(opt_value)) {
-    if ((opt_value != data) && (opt_value instanceof anychart.treeDataModule.Tree)) {
+    if ((opt_value != data) && (anychart.utils.instanceOf(opt_value, anychart.treeDataModule.Tree))) {
       this.controller.data(opt_value); //This will invalidate position.
     }
     return this;

@@ -392,17 +392,17 @@ anychart.chartEditorModule.comboBox.Base.prototype.setItemVisibilityFromToken_ =
 
   for (var i = 0, n = this.menu_.getChildCount(); i < n; i++) {
     var item = this.menu_.getChildAt(i);
-    if (item instanceof goog.ui.MenuSeparator) {
+    if (anychart.utils.instanceOf(item, goog.ui.MenuSeparator)) {
       // Ensure that separators are only shown if there is at least one visible
       // item before them.
       item.setVisible(isVisibleItem);
       isVisibleItem = false;
-    } else if (item instanceof goog.ui.MenuItem) {
+    } else if (anychart.utils.instanceOf(item, goog.ui.MenuItem)) {
       if (!item.isVisible() && !recheckHidden) continue;
 
       var caption = item.getCaption();
       var visible = !this.useTypeahead_ || // anychart fixed
-          this.isItemSticky_(item) ||
+          this.isItemSticky_(/** @type {goog.ui.MenuItem} */(item)) ||
           caption && this.matchFunction_(caption.toLowerCase(), token);
       if (this.useTypeahead_ && // anychart fixed
           typeof item.setFormatFromToken == 'function') {
@@ -416,7 +416,7 @@ anychart.chartEditorModule.comboBox.Base.prototype.setItemVisibilityFromToken_ =
       isVisibleItem = item.isVisible() || isVisibleItem;
     }
 
-    if (!(item instanceof goog.ui.MenuSeparator) && item.isVisible()) {
+    if (!anychart.utils.instanceOf(item, goog.ui.MenuSeparator) && item.isVisible()) {
       count++;
     }
   }

@@ -467,9 +467,9 @@ anychart.scales.Base.setupScale = function(currentScale, opt_newScaleSetupValue,
     config = instance = null;
     if (goog.isString(opt_newScaleSetupValue)) {
       type = opt_newScaleSetupValue || currentType;
-    } else if (opt_newScaleSetupValue instanceof anychart.scales.Base) {
+    } else if (anychart.utils.instanceOf(opt_newScaleSetupValue, anychart.scales.Base)) {
       type = opt_newScaleSetupValue.getType();
-      instance = opt_newScaleSetupValue;
+      instance = /** @type {anychart.scales.Base} */(opt_newScaleSetupValue);
     } else if (goog.isObject(opt_newScaleSetupValue)) {
       type = opt_newScaleSetupValue['type'] || currentType || opt_defaultScaleType;
       config = opt_newScaleSetupValue;
@@ -502,7 +502,7 @@ anychart.scales.Base.setupScale = function(currentScale, opt_newScaleSetupValue,
         anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, opt_errorParams);
     }
   }
-  return result;
+  return /** @type {anychart.scales.Base} */(result);
 };
 
 

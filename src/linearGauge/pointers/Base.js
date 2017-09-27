@@ -276,7 +276,7 @@ anychart.linearGaugeModule.pointers.Base.prototype.layout = function(opt_value) 
  */
 anychart.linearGaugeModule.pointers.Base.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (!(opt_value instanceof anychart.scales.ScatterBase)) {
+    if (!(anychart.utils.instanceOf(opt_value, anychart.scales.ScatterBase))) {
       anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['Pointer scale', 'scatter', 'linear, log']);
       return this;
     }
