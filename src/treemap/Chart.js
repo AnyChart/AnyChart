@@ -2372,9 +2372,9 @@ anychart.treemapModule.Chart.prototype.specificContextMenuItems = function(items
   var isHeader = node.meta(anychart.treemapModule.Chart.DataFields.TYPE) == anychart.treemapModule.Chart.NodeType.HEADER;
   var canDrillDown = node.numChildren() && !(isHeader && this.isRootNode(node));
   if (canDrillDown) {
-    specificItems['drilldown-to'] = {
+    specificItems['drill-down-to'] = {
       'index': 7, //TODO (A.Kudryavtsev): check index!!!
-      'text': 'Drilldown To',
+      'text': 'Drill down',
       'eventType': 'anychart.drillTo',
       'action': goog.bind(this.doDrillChange, this, node)
     };
@@ -2382,15 +2382,15 @@ anychart.treemapModule.Chart.prototype.specificContextMenuItems = function(items
 
   var canDrillUp = !this.isTreeRoot(this.getRootNode());
   if (canDrillUp)
-    specificItems['drill-up'] = {
+    specificItems['drill-down-up'] = {
       'index': 7,
-      'text': 'Drill Up',
+      'text': 'Drill up',
       'eventType': 'anychart.drillUp',
       'action': goog.bind(this.doDrillChange, this, this.getRootNode().getParent())
     };
 
   if (!goog.object.isEmpty(specificItems))
-    specificItems['drill-separator'] = {'index': 7.1};
+    specificItems['drill-down-separator'] = {'index': 7.1};
 
   goog.object.extend(specificItems,
       /** @type {Object} */ (anychart.utils.recursiveClone(anychart.core.Chart.contextMenuMap['select-marquee'])),
