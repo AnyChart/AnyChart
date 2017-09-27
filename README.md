@@ -287,3 +287,4 @@ The `dist` folder contains binaries and JSON/XML Schemas.
 ## License
 
 [© AnyChart.com - JavaScript charts](https://www.anychart.com). All rights reserved.
+[![](https://ga-beacon.appspot.com/UA-228820-4/AnyChart?pixel&useReferer)](https://github.com/igrigorik/ga-beacon)
