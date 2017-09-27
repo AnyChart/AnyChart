@@ -1807,9 +1807,9 @@ anychart.core.ChartWithOrthogonalScales.prototype.specificContextMenuItems = fun
     }
 
     excludedPointsModel['excluded-points-separator'] = {'index': pointItemIndex + 10};
-    var includeAllItem = anychart.utils.recursiveClone(anychart.core.ChartWithOrthogonalScales.contextMenuItems['include-all-points']);
+    var includeAllItem = anychart.utils.recursiveClone(anychart.core.ChartWithOrthogonalScales.contextMenuItems['exclude-points-include-all']);
     includeAllItem['index'] = pointItemIndex + 20;
-    excludedPointsModel['include-all-points'] = includeAllItem;
+    excludedPointsModel['exclude-points-include-all'] = includeAllItem;
     excludedPointsItem['subMenu'] = excludedPointsModel;
 
     // excludedPointsItem['subMenu'] = excludedPointsModel.concat(footer);
