@@ -3174,13 +3174,6 @@
         </xsd:restriction>
     </xsd:simpleType>
 
-    <xsd:simpleType name="enums.ScaleStackDirection">
-        <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="direct"/>
-            <xsd:enumeration value="reverse"/>
-        </xsd:restriction>
-    </xsd:simpleType>
-
     <xsd:simpleType name="enums.ScaleComparisonMode">
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="none"/>
