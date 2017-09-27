@@ -503,7 +503,9 @@ anychart.core.ui.Tooltip.prototype.padding = function(opt_spaceOrTopOrTopAndBott
  */
 anychart.core.ui.Tooltip.prototype.onPaddingSignal_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
-    this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    this.contentBounds_ = null;
+    this.instantPosition_ = null;
+    this.invalidate(anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -1340,6 +1342,7 @@ anychart.core.ui.Tooltip.prototype.updateForceInvalidation = function() {
   this.title().needsForceSignalsDispatching(forceInvalidation);
   this.separator().needsForceSignalsDispatching(forceInvalidation);
   this.background().needsForceSignalsDispatching(forceInvalidation);
+  this.padding().needsForceSignalsDispatching(forceInvalidation);
 };
 
 
