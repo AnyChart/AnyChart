@@ -2669,5 +2669,5 @@ anychart.chartTypesMap[anychart.enums.ChartTypes.SPARKLINE] = anychart.sparkline
   proto['stroke'] = proto.stroke;
 
   proto['getType'] = proto.getType;
-  proto['noDataLabel'] = proto.noDataLabel;
+  proto['noData'] = proto.noData;
 })();

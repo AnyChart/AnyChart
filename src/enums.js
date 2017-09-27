@@ -1,6 +1,7 @@
 goog.provide('anychart.enums');
 
 
+
 /**
  @namespace
  @name anychart.enums
@@ -1418,7 +1419,10 @@ anychart.enums.EventType = {
 
   SELECT_MARQUEE_START: 'selectmarqueestart',
   SELECT_MARQUEE_CHANGE: 'selectmarqueechange',
-  SELECT_MARQUEE_FINISH: 'selectmarqueefinish'
+  SELECT_MARQUEE_FINISH: 'selectmarqueefinish',
+
+  // data changed event for no data label
+  DATA_CHANGED: 'datachanged'
 };
 
 

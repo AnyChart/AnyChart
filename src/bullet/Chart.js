@@ -797,5 +797,5 @@ anychart.bulletModule.Chart.prototype.setupByJSON = function(config, opt_default
   proto['range'] = proto.range;//doc|ex
   proto['isHorizontal'] = proto.isHorizontal;//doc
   proto['getType'] = proto.getType;//doc
-  proto['noDataLabel'] = proto.noDataLabel;
+  proto['noData'] = proto.noData;
 })();

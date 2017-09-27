@@ -2310,7 +2310,7 @@ anychart.resourceModule.Chart.prototype.toCsv = function(opt_chartDataExportMode
   proto['select'] = proto.select;
   proto['selectPoint'] = proto.selectPoint;
   proto['unselect'] = proto.unselect;
-  proto['noDataLabel'] = proto.noDataLabel;
+  proto['noData'] = proto.noData;
   // auto generated
   //proto['pixPerHour'] = proto.pixPerHour;
   //proto['minRowHeight'] = proto.minRowHeight;

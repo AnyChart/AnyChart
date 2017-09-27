@@ -1188,7 +1188,8 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
 
   'defaultNoDataLabel': {
     'padding': {},
-    'disablePointerEvents': true,
+    'disablePointerEvents': false,
+    'enabled': false,
     'background': {
       'zIndex': 0,
       'enabled': false,
@@ -1201,7 +1202,7 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'position': 'center',
     'anchor': 'center',
     'zIndex': 999999,
-    'text': 'NO DATA'
+    'text': 'No data.'
   },
 
   'stageCredits': {

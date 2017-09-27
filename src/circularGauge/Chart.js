@@ -1398,5 +1398,5 @@ anychart.circularGaugeModule.Chart.prototype.getDefaultThemeObj = function() {
   proto['range'] = proto.range;
 
   proto['getType'] = proto.getType;
-  proto['noDataLabel'] = proto.noDataLabel;
+  proto['noData'] = proto.noData;
 })();
