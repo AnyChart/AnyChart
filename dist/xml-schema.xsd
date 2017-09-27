@@ -2030,6 +2030,7 @@
         <xsd:attribute name="inverted" type="simple.Bool" default="false"/>
         <xsd:attribute name="stick_to_zero" type="simple.Bool"/>
         <xsd:attribute name="stack_mode" type="enums.ScaleStackMode" default="none"/>
+        <xsd:attribute name="comparison_mode" type="enums.ScaleComparisonMode" default="none"/>
         <xsd:attribute name="stack_direction" type="enums.ScaleStackDirection" default="direct"/>
         <xsd:attribute name="log_base" type="xsd:double" default="10"/>
         <xsd:attribute name="minimum" type="simple.DoubleOrNull" default="null"/>
