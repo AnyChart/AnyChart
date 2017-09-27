@@ -82,7 +82,10 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'layout': 'horizontal',
         'scale': 0
       }
-    ]
+    ],
+    'yScale': {
+      'stackDirection': 'reverse'
+    }
   },
   // merge with column
   'column3d': {

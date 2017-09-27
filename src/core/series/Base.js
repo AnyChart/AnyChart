@@ -282,7 +282,7 @@ anychart.core.series.Base = function(chart, plot, type, config) {
       anychart.core.drawers.Capabilities.IS_WIDTH_BASED],
     ['minPointLength',
       anychart.ConsistencyState.SERIES_POINTS,
-      anychart.Signal.NEEDS_REDRAW,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEEDS_RECALCULATION,
       anychart.core.drawers.Capabilities.IS_WIDTH_BASED,
       this.resetSharedStack
     ],
@@ -2757,6 +2757,22 @@ anychart.core.series.Base.prototype.planIsXScaleInverted = function() {
 
 
 /**
+ * Resets point shared field.
+ * @param {?anychart.data.IRowInfo} point
+ * @private
+ */
+anychart.core.series.Base.prototype.resetPointStack_ = function(point) {
+  if (point) {
+    var shared = point.meta('shared');
+    if (shared) {
+      shared.positiveAnchor = NaN;
+      shared.negativeAnchor = NaN;
+    }
+  }
+};
+
+
+/**
  * Resets point's meta shared object anchors..
  */
 anychart.core.series.Base.prototype.resetSharedStack = function() {
@@ -2764,12 +2780,10 @@ anychart.core.series.Base.prototype.resetSharedStack = function() {
     var iterator = this.getIterator();
     iterator.reset();
     while (iterator.advance()) {
-      var shared = iterator.meta('shared');
-      if (shared) {
-        shared.positiveAnchor = NaN;
-        shared.negativeAnchor = NaN;
-      }
+      this.resetPointStack_(iterator);
     }
+    this.resetPointStack_(this.getPreFirstPoint());
+    this.resetPointStack_(this.getPostLastPoint());
   }
 };
 
@@ -3438,11 +3452,22 @@ anychart.core.series.Base.prototype.makeMinPointLengthStackedMeta = function(row
 
     var y = /** @type {number} */ (rowInfo.meta('value'));
     var zero = /** @type {number} */ (rowInfo.meta('zero'));
+    var rawVal = rowInfo.get('value');
+    var val = Number(rowInfo.get('value'));
+    //Condition below also fixes XML restoration.
+    var isZero = goog.isNull(rawVal) ? false : (!isNaN(val) && val == 0); //Draw zero to positive side. Considers closure compiler obfuscation.
     var diff = Math.abs(y - zero);
     var height = Math.max(diff, this.minPointLengthCache_);
 
     var newZero, newY;
-    if (zero >= y) {
+    var positive = zero >= y;
+    if (isZero) {
+      var isVertical = /** @type {boolean} */ (this.getOption('isVertical'));
+      var inverted = this.yScale().inverted();
+      positive = !(isVertical ^ inverted);
+    }
+
+    if (positive) {
       height = -height;
       if (isNaN(shared.positiveAnchor)) {//Drawing first point.
         shared.positiveAnchor = zero + height;
@@ -3486,11 +3511,49 @@ anychart.core.series.Base.prototype.makeMinPointLengthUnstackedMeta = function(r
   if (!rowInfo.meta('missing')) {
     var y = /** @type {number} */ (rowInfo.meta('value'));
     var zero = /** @type {number} */ (rowInfo.meta('zero'));
+    var rawVal = rowInfo.get('value');
+    var val = Number(rowInfo.get('value'));
+    //Condition below also fixes XML restoration.
+    var isZero = goog.isNull(rawVal) ? false : (!isNaN(val) && val == 0); //Draw zero to positive side. Considers closure compiler obfuscation.
     var diff = Math.abs(y - zero);
     var height = Math.max(diff, this.minPointLengthCache_);
-    if (zero >= y)
+
+    var positive = zero >= y;
+    if (isZero) {
+      var isVertical = /** @type {boolean} */ (this.getOption('isVertical'));
+      var inverted = this.yScale().inverted();
+      positive = !(isVertical ^ inverted);
+    }
+
+    if (positive)
       height = -height;
     rowInfo.meta('value', zero + height);
+  }
+  return pointMissing;
+};
+
+
+/**
+ * Applies min point length settings for ranged plan.
+ * @param {anychart.data.IRowInfo} rowInfo
+ * @param {Array.<string>} yNames
+ * @param {Array.<string|number>} yColumns
+ * @param {number} pointMissing
+ * @param {number} xRatio
+ * @return {number} - pointMissing updated value.
+ * @protected
+ */
+anychart.core.series.Base.prototype.makeMinPointLengthRangedMeta = function(rowInfo, yNames, yColumns, pointMissing, xRatio) {
+  if (!rowInfo.meta('missing')) {
+    var high = /** @type {number} */(rowInfo.meta('high'));
+    var low = /** @type {number} */(rowInfo.meta('low'));
+    var center = (high + low) / 2;
+    var diff = Math.abs(low - high);
+    var height = Math.max(diff, this.minPointLengthCache_) / 2;
+    if (high >= low)
+      height = -height;
+    rowInfo.meta('high', center - height);
+    rowInfo.meta('low', center + height);
   }
   return pointMissing;
 };
@@ -3634,7 +3697,11 @@ anychart.core.series.Base.prototype.prepareMetaMakers = function(yNames, yColumn
     var isVertical = /** @type {boolean} */ (this.getOption('isVertical'));
     var dimension = isVertical ? this.pixelBoundsCache.width : this.pixelBoundsCache.height;
     this.minPointLengthCache_ = Math.abs(anychart.utils.normalizeSize(minPointLength, dimension));
-    if (this.planIsStacked()) {
+
+    var isRangeSeries = this.check(anychart.core.drawers.Capabilities.IS_RANGE_BASED | anychart.core.drawers.Capabilities.IS_OHLC_BASED);
+    if (isRangeSeries) {
+      this.metaMakers.push(this.makeMinPointLengthRangedMeta);
+    } else if (this.planIsStacked()) {
       this.metaMakers.push(this.makeMinPointLengthStackedMeta);
     } else {
       this.metaMakers.push(this.makeMinPointLengthUnstackedMeta);
@@ -4012,6 +4079,18 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'pointWidth',
+      anychart.core.settings.numberOrPercentNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'maxPointWidth',
+      anychart.core.settings.numberOrPercentNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'minPointLength',
       anychart.core.settings.numberOrPercentNormalizer);
 
   anychart.core.settings.createDescriptor(

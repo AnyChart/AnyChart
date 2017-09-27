@@ -1125,9 +1125,7 @@ anychart.core.ChartWithSeries.prototype.drawSeries = function(opt_topAxisPadding
     }
 
     this.beforeSeriesDraw();
-    for (i = 0; i < this.seriesList.length; i++) {
-      this.seriesList[i].draw();
-    }
+    this.drawSeriesInOrder();
     this.afterSeriesDraw();
     this.resetSeriesStack(true);
 
@@ -1135,6 +1133,17 @@ anychart.core.ChartWithSeries.prototype.drawSeries = function(opt_topAxisPadding
     anychart.core.Base.resumeSignalsDispatchingFalse(this.seriesList);
   }
   anychart.performance.end('Series drawing');
+};
+
+
+/**
+ * Draws series in correct order.
+ * @protected
+ */
+anychart.core.ChartWithSeries.prototype.drawSeriesInOrder = function() {
+  for (var i = 0; i < this.seriesList.length; i++) {
+    this.seriesList[i].draw();
+  }
 };
 
 

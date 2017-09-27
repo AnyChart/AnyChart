@@ -571,6 +571,18 @@ anychart.stockModule.Chart.prototype.legend = function(opt_value) {
  * @return {!(anychart.stockModule.Plot|anychart.stockModule.Chart)}
  */
 anychart.stockModule.Chart.prototype.plot = function(opt_indexOrValue, opt_value) {
+  return this.plotInternal(opt_indexOrValue, opt_value, !goog.isDef(opt_value));
+};
+
+
+/**
+ * Plots internal getter/setter. Considers theme settings.
+ * @param {(Object|boolean|null|number)=} opt_indexOrValue
+ * @param {(Object|boolean|null)=} opt_value
+ * @param {boolean=} opt_default - .
+ * @return {!(anychart.stockModule.Plot|anychart.stockModule.Chart)}
+ */
+anychart.stockModule.Chart.prototype.plotInternal = function(opt_indexOrValue, opt_value, opt_default) {
   var index, value;
   index = anychart.utils.toNumber(opt_indexOrValue);
   if (isNaN(index)) {
@@ -587,7 +599,7 @@ anychart.stockModule.Chart.prototype.plot = function(opt_indexOrValue, opt_value
 
     plot.crosshair().parent(/** @type {anychart.core.ui.Crosshair} */ (this.crosshair()));
     if (goog.isDef(this.defaultPlotSettings_))
-      plot.setup(this.defaultPlotSettings_);
+      plot.setupInternal(!!opt_default, this.defaultPlotSettings_);
     plot.setParentEventTarget(this);
     this.plots_[index] = plot;
     plot.listenSignals(this.plotInvalidated_, this);
@@ -603,7 +615,7 @@ anychart.stockModule.Chart.prototype.plot = function(opt_indexOrValue, opt_value
   }
 
   if (goog.isDef(value)) {
-    plot.setup(value);
+    plot.setupInternal(!!opt_default, value);
     return this;
   } else {
     return plot;
@@ -1328,11 +1340,14 @@ anychart.stockModule.Chart.prototype.calculateScales_ = function() {
   for (i = 0; i < this.plots_.length; i++) {
     var plot = /** @type {anychart.stockModule.Plot} */(this.plots_[i]);
     if (plot && plot.enabled()) {
+      var stackDirection = /** @type {anychart.enums.ScaleStackDirection} */ (plot.yScale().stackDirection());
+      var stackIsDirect = stackDirection == anychart.enums.ScaleStackDirection.DIRECT;
+
       seriesList = plot.getAllSeries();
       stacksByScale = {};
       hasPercentStacks = false;
       for (j = 0; j < seriesList.length; j++) {
-        series = seriesList[j];
+        series = seriesList[stackIsDirect ? seriesList.length - j - 1 : j];
         series.updateComparisonZero();
         scale = /** @type {anychart.scales.Base} */(series.yScale());
         if (scale.needsAutoCalc()) {
@@ -2653,7 +2668,7 @@ anychart.stockModule.Chart.prototype.setupByJSON = function(config, opt_default)
   json = config['plots'];
   if (goog.isArray(json)) {
     for (var i = 0; i < json.length; i++) {
-      this.plot(i, json[i]);
+      this.plotInternal(i, json[i], opt_default);
     }
   }
 

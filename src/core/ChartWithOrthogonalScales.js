@@ -150,6 +150,18 @@ anychart.core.ChartWithOrthogonalScales.PROPERTY_DESCRIPTORS = (function() {
 anychart.core.settings.populate(anychart.core.ChartWithOrthogonalScales, anychart.core.ChartWithOrthogonalScales.PROPERTY_DESCRIPTORS);
 
 
+/**
+ * @inheritDoc
+ */
+anychart.core.ChartWithOrthogonalScales.prototype.drawSeriesInOrder = function() {
+  var stackDirection = /** @type {anychart.enums.ScaleStackDirection} */ (this.yScale().stackDirection());
+  var stackIsDirect = stackDirection == anychart.enums.ScaleStackDirection.DIRECT;
+  for (var i = 0; i < this.seriesList.length; i++) {
+    this.seriesList[stackIsDirect ? this.seriesList.length - i - 1 : i].draw();
+  }
+};
+
+
 //endregion
 //region --- Scales
 //----------------------------------------------------------------------------------------------------------------------
