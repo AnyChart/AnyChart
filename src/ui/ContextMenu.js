@@ -9,6 +9,7 @@ goog.require('anychart.ui.menu.SubMenu');
 goog.require('goog.array');
 goog.require('goog.dom.classlist');
 goog.require('goog.object');
+goog.require('goog.positioning.ViewportClientPosition');
 goog.require('goog.ui.MenuSeparator');
 goog.require('goog.ui.PopupMenu');
 
@@ -383,11 +384,23 @@ anychart.ui.ContextMenu.prototype.detach = function(opt_target, opt_capture) {
  */
 anychart.ui.ContextMenu.prototype.show = function(x, y) {
   if ((this.itemsReady_ && !goog.object.isEmpty(this.items())) || this.prepareItems_(null, this.chart_)) {
+    var stage = this.chart_ ? this.chart_.container().getStage() : null;
+    var container = (stage && stage.fullScreen()) ? stage.getDomWrapper() : anychart.document.body;
+    if (!this.wrapper_)
+      this.wrapper_ = /** @type {Element} */(goog.dom.createDom('div', {'id': 'anychart-menu-wrapper'}));
+    if (this.wrapper_.parentNode != container)
+      container.appendChild(this.wrapper_);
+
     if (!this.isInDocument()) {
-      this.render();
+      this.render(this.wrapper_);
     }
     this.makeMenu_();
-    this.showMenu({}, x, y);
+
+    var position = new goog.positioning.ViewportClientPosition(x, y);
+    position.setLastResortOverflow(
+        goog.positioning.Overflow.ADJUST_X_EXCEPT_OFFSCREEN |
+        goog.positioning.Overflow.ADJUST_Y_EXCEPT_OFFSCREEN);
+    this.showWithPosition(position);
   }
 };
 
@@ -589,6 +602,7 @@ anychart.ui.ContextMenu.prototype.disposeInternal = function() {
   this.contextTarget_ = null;
   this.chart_ = null;
   this.extraClassNames_ = null;
+  this.wrapper_ = null;
 
   anychart.ui.ContextMenu.base(this, 'disposeInternal');
 };
