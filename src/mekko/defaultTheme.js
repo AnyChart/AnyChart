@@ -143,7 +143,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
            * @return {*}
            */
           'fill': function() {
-            var color = this['chart']['getSeriesCount']() > 1 ? this['sourceColor'] : this['chart']['palette']()['itemAt'](this['iterator'].currentIndex);
+            var color = this['chart']['getSeriesCount']() > 1 ? this['sourceColor'] : this['chart']['palette']()['itemAt'](this['iterator'].getIndex());
             color = color ? color : this['sourceColor'];
             return anychart.color.setOpacity(color, 0.85, true);
           },
@@ -152,7 +152,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
            * @return {*}
            */
           'stroke': function() {
-            var color = this['chart']['getSeriesCount']() > 1 ? this['sourceColor'] : this['chart']['palette']()['itemAt'](this['iterator'].currentIndex);
+            var color = this['chart']['getSeriesCount']() > 1 ? this['sourceColor'] : this['chart']['palette']()['itemAt'](this['iterator'].getIndex());
             color = color ? color : this['sourceColor'];
             return anychart.color.setThickness(color, 1);
           },
@@ -173,7 +173,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
            * @return {*}
            */
           'fill': function() {
-            var color = this['chart']['getSeriesCount']() > 1 ? this['sourceColor'] : this['chart']['palette']()['itemAt'](this['iterator'].currentIndex);
+            var color = this['chart']['getSeriesCount']() > 1 ? this['sourceColor'] : this['chart']['palette']()['itemAt'](this['iterator'].getIndex());
             color = color ? color : this['sourceColor'];
             return anychart.color.setOpacity(color, 0.65, true);
           }
