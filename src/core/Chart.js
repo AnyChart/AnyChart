@@ -32,6 +32,7 @@ goog.require('anychart.utils');
 goog.require('goog.array');
 goog.require('goog.dom');
 goog.require('goog.dom.classlist');
+goog.require('goog.dom.fullscreen');
 goog.require('goog.events.EventHandler');
 goog.require('goog.fx.Dragger');
 goog.require('goog.json.hybrid');
@@ -995,6 +996,8 @@ anychart.core.Chart.prototype.contextMenuItemsProvider = function(context) {
   if (anychart.window['anychart']['exports']) {
     goog.object.extend(items, /** @type {Object} */ (anychart.utils.recursiveClone(anychart.core.Chart.contextMenuMap['exporting'])));
   }
+  if (goog.dom.fullscreen.isSupported() && context['chart'])
+    goog.object.extend(items, /** @type {Object} */ (anychart.utils.recursiveClone(anychart.core.Chart.contextMenuMap[context['chart'].fullScreen() ? 'full-screen-exit' : 'full-screen-enter'])));
   goog.object.extend(items, /** @type {Object} */ (anychart.utils.recursiveClone(anychart.core.Chart.contextMenuMap['main'])));
 
   if (anychart.DEVELOP) {
@@ -1052,7 +1055,7 @@ anychart.core.Chart.prototype.getSelectedPoints = function() {
  */
 anychart.core.Chart.contextMenuItems = {
   // Item 'Print Chart'.
-  'start-select-marquee': {
+  'select-marquee-start': {
     'index': 9.3,
     'text': 'Start selection marquee',
     'eventType': 'anychart.startSelectMarquee',
@@ -1062,12 +1065,12 @@ anychart.core.Chart.contextMenuItems = {
   },
 
   // Item 'Export as ...'.
-  'export-as': {
+  'save-chart-as': {
     'index': 10,
     'text': 'Save chart as...',
     'iconClass': 'ac ac-file-image-o',
     'subMenu': {
-      'export-as-png': {
+      'save-chart-as-png': {
         'index': 10,
         'text': '.png',
         'iconClass': 'ac ac-file-image-o',
@@ -1076,7 +1079,7 @@ anychart.core.Chart.contextMenuItems = {
           context['chart'].saveAsPng();
         }
       },
-      'export-as-jpg': {
+      'save-chart-as-jpg': {
         'index': 20,
         'text': '.jpg',
         'iconClass': 'ac ac-file-image-o',
@@ -1085,7 +1088,7 @@ anychart.core.Chart.contextMenuItems = {
           context['chart'].saveAsJpg();
         }
       },
-      'export-as-pdf': {
+      'save-chart-as-pdf': {
         'index': 30,
         'text': '.pdf',
         'iconClass': 'ac ac-file-pdf-o',
@@ -1094,7 +1097,7 @@ anychart.core.Chart.contextMenuItems = {
           context['chart'].saveAsPdf();
         }
       },
-      'export-as-svg': {
+      'save-chart-as-svg': {
         'index': 40,
         'text': '.svg',
         'iconClass': 'ac ac-file-code-o',
@@ -1112,7 +1115,7 @@ anychart.core.Chart.contextMenuItems = {
     'text': 'Save data as...',
     'iconClass': 'ac ac-save',
     'subMenu': {
-      'save-as-text': {
+      'save-data-as-text': {
         'index': 10,
         'text': '.csv',
         'iconClass': 'ac ac-file-excel-o',
@@ -1121,7 +1124,7 @@ anychart.core.Chart.contextMenuItems = {
           context['chart'].saveAsCsv();
         }
       },
-      'save-as-xlsx': {
+      'save-data-as-xlsx': {
         'index': 20,
         'text': '.xlsx',
         'iconClass': 'ac ac-file-excel-o',
@@ -1190,6 +1193,23 @@ anychart.core.Chart.contextMenuItems = {
   },
 
   // Item-link to our site.
+  'full-screen-enter': {
+    'index': 60,
+    'text': 'Enter full screen',
+    'action': function(context) {
+      context['chart'].fullScreen(true);
+    }
+  },
+
+  'full-screen-exit': {
+    'index': 60,
+    'text': 'Exit full screen',
+    'action': function(context) {
+      context['chart'].fullScreen(false);
+    }
+  },
+
+  // Item-link to our site.
   'about': {
     'index': 80,
     'iconClass': 'ac ac-cog',
@@ -1250,17 +1270,25 @@ anychart.core.Chart.contextMenuItems = {
 anychart.core.Chart.contextMenuMap = {
   // Menu 'Default menu'.
   'exporting': {
-    'export-as': anychart.core.Chart.contextMenuItems['export-as'],
+    'save-chart-as': anychart.core.Chart.contextMenuItems['save-chart-as'],
     'save-data-as': anychart.core.Chart.contextMenuItems['save-data-as'],
     'share-with': anychart.core.Chart.contextMenuItems['share-with'],
     'print-chart': anychart.core.Chart.contextMenuItems['print-chart'],
     'exporting-separator': {'index': 51}
   },
+  'full-screen-enter': {
+    'full-screen-enter': anychart.core.Chart.contextMenuItems['full-screen-enter'],
+    'full-screen-separator': {'index': 61}
+  },
+  'full-screen-exit': {
+    'full-screen-exit': anychart.core.Chart.contextMenuItems['full-screen-exit'],
+    'full-screen-separator': {'index': 61}
+  },
   'main': {
     'about': anychart.core.Chart.contextMenuItems['about']
   },
   'select-marquee': {
-    'start-select-marquee': anychart.core.Chart.contextMenuItems['start-select-marquee'],
+    'select-marquee-start': anychart.core.Chart.contextMenuItems['select-marquee-start'],
     'select-marquee-separator': {'index': 9.4}
   }
 };
@@ -3200,6 +3228,41 @@ anychart.core.Chart.prototype.selectByRect = function(marqueeFinishEvent) {
 
 
 //endregion
+//region --- Full screen
+//------------------------------------------------------------------------------
+//
+//  Full screen
+//
+//------------------------------------------------------------------------------
+/**
+ * Getter/Setter for the full screen mode.
+ * @param {boolean=} opt_value
+ * @return {anychart.core.Chart|boolean}
+ */
+anychart.core.Chart.prototype.fullScreen = function(opt_value) {
+  var container = this.container();
+  var stage = container ? container.getStage() : null;
+  if (goog.isDef(opt_value)) {
+    if (stage)
+      stage.fullScreen(opt_value);
+    return this;
+  }
+  return stage ? /** @type {boolean} */(stage.fullScreen()) : false;
+};
+
+
+/**
+ * Tester for the full screen support.
+ * @return {boolean}
+ */
+anychart.core.Chart.prototype.isFullScreenAvailable = function() {
+  var container = this.container();
+  var stage = container ? container.getStage() : null;
+  return stage ? /** @type {boolean} */(stage.isFullScreenAvailable()) : false;
+};
+
+
+//endregion
 //region --- Exporting/Sharing/Data serialization
 //------------------------------------------------------------------------------
 //
@@ -3732,5 +3795,7 @@ anychart.core.Chart.prototype.id = function(opt_value) {
   proto['inMarquee'] = proto.inMarquee;
   proto['cancelMarquee'] = proto.cancelMarquee;
   proto['id'] = proto.id;
+  proto['fullScreen'] = proto.fullScreen;
+  proto['isFullScreenAvailable'] = proto.isFullScreenAvailable;
 })();
 

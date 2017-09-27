@@ -1760,7 +1760,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.specificContextMenuItems = fun
 
 
   var excludedPoints = this.getExcludedPoints();
-  var excludedPointsItem = newItems['excluded-points'];
+  var excludedPointsItem = newItems['exclude-points-list'];
   excludedPointsItem['subMenu'] = {};
   excludedPointsItem['enabled'] = false;
   var pointItemIndex = 10;
@@ -1797,7 +1797,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.specificContextMenuItems = fun
         value = excludedPoints[i].get('value');
       }
 
-      excludedPointsModel['excluded-point-' + i] = { //TODO (A.Kudryavtsev): Maybe set name like 'text' field.
+      excludedPointsModel['exclude-points-point-' + i] = { //TODO (A.Kudryavtsev): Maybe set name like 'text' field.
         'index': pointItemIndex,
         'text': excludedPoints[i].getSeries().name() + ': ' + value,
         'eventType': 'anychart.include',
@@ -1843,7 +1843,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.getExcludedPoints = function()
  */
 anychart.core.ChartWithOrthogonalScales.contextMenuItems = {
   // Item 'Exclude Point'.
-  'exclude-point': {
+  'exclude-points-point': {
     'index': 7,
     'text': 'Exclude',
     'eventType': 'anychart.exclude',
@@ -1862,7 +1862,7 @@ anychart.core.ChartWithOrthogonalScales.contextMenuItems = {
   },
 
   // Item-subMenu 'Excluded Points'.
-  'excluded-points': {
+  'exclude-points-list': {
     'index': 8,
     'text': 'Include',
     'subMenu': [],
@@ -1870,7 +1870,7 @@ anychart.core.ChartWithOrthogonalScales.contextMenuItems = {
   },
 
   // Item 'Keep Only'.
-  'keep-only': {
+  'exclude-points-keep-only': {
     'index': 9,
     'text': 'Keep only',
     'eventType': 'anychart.keepOnly',
@@ -1891,9 +1891,9 @@ anychart.core.ChartWithOrthogonalScales.contextMenuItems = {
   },
 
   // Item 'Include all points'.
-  'include-all-points': {
+  'exclude-points-include-all': {
     'index': 30,
-    'text': 'Include All',
+    'text': 'Include all',
     'eventType': 'anychart.includeAll',
     'action': function(context) {
       context['chart'].suspendSignalsDispatching();
@@ -1919,14 +1919,14 @@ anychart.core.ChartWithOrthogonalScales.contextMenuItems = {
 anychart.core.ChartWithOrthogonalScales.contextMenuMap = {
   // Cartesian 'Default menu'. (will be added to 'main')
   'chart-with-series-default': {
-    'excluded-points': anychart.core.ChartWithOrthogonalScales.contextMenuItems['excluded-points'],
+    'exclude-points-list': anychart.core.ChartWithOrthogonalScales.contextMenuItems['exclude-points-list'],
     'exclude-points-separator': {'index': 8.5}
   },
   // Cartesian 'Point menu'. (will be added to 'main')
   'chart-with-series-point': {
-    'exclude-point': anychart.core.ChartWithOrthogonalScales.contextMenuItems['exclude-point'],
-    'excluded-points': anychart.core.ChartWithOrthogonalScales.contextMenuItems['excluded-points'],
-    'keep-only': anychart.core.ChartWithOrthogonalScales.contextMenuItems['keep-only'],
+    'exclude-points-point': anychart.core.ChartWithOrthogonalScales.contextMenuItems['exclude-points-point'],
+    'exclude-points-list': anychart.core.ChartWithOrthogonalScales.contextMenuItems['exclude-points-list'],
+    'exclude-points-keep-only': anychart.core.ChartWithOrthogonalScales.contextMenuItems['exclude-points-keep-only'],
     'chart-with-series-point-separator': {'index': 9.2}
   }
 };

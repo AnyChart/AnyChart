@@ -2340,7 +2340,7 @@ anychart.stockModule.Chart.prototype.doMWScroll_ = function() {
  */
 anychart.stockModule.Chart.contextMenuItems = {
   // Item 'Keep Only'.
-  'start-zoom-marquee': {
+  'zoom-marquee-start': {
     'index': 8,
     'text': 'Start zoom marquee',
     'eventType': 'anychart.startZoomMarquee',
@@ -2358,8 +2358,8 @@ anychart.stockModule.Chart.contextMenuItems = {
 anychart.stockModule.Chart.contextMenuMap = {
   // Stock 'Default menu'. (will be added to 'main')
   'stock': {
-    'start-zoom-marquee': anychart.stockModule.Chart.contextMenuItems['start-zoom-marquee'],
-    'start-select-marquee': anychart.core.Chart.contextMenuItems['start-select-marquee'],
+    'zoom-marquee-start': anychart.stockModule.Chart.contextMenuItems['zoom-marquee-start'],
+    'select-marquee-start': anychart.core.Chart.contextMenuItems['select-marquee-start'],
     'stock-specific-separator': {'index': 9.4}
   }
 };
