@@ -77,7 +77,6 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       },
       'baselineLabels': {
         'position': 'center',
-        'fontColor': '#fff',
         'anchor': 'center',
         'format': 'Baseline Label',
         'enabled': false
