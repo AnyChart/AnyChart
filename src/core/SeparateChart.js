@@ -272,7 +272,7 @@ anychart.core.SeparateChart.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.core.SeparateChart.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.SeparateChart.base(this, 'setupByJSON', config, opt_default);
-  this.legend().setupInternal(!!opt_default, config['legend']);
+  this.legend(config['legend']);
   this.interactivity(config['interactivity']);
 };
 
