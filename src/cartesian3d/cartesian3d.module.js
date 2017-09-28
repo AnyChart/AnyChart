@@ -99,7 +99,7 @@ anychart.line3d = function(var_args) {
 
   return chart;
 };
-anychart.chartTypesMap[anychart.enums.ChartTypes.AREA_3D] = anychart.area3d;
+anychart.chartTypesMap[anychart.enums.ChartTypes.LINE_3D] = anychart.line3d;
 
 
 //exports
