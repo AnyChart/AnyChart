@@ -79,6 +79,14 @@ anychart.stockModule.data.TableSelectable.prototype.resetMeta_ = function() {
 
 
 /**
+ * @return {number}
+ */
+anychart.stockModule.data.TableSelectable.prototype.getFullPointsCount = function() {
+  return this.currentStorage_.getRowsCount();
+};
+
+
+/**
  * Searches asked key with asked mode and returns an object that allows values fetching.
  * @param {number} key
  * @param {anychart.enums.TableSearchMode=} opt_mode

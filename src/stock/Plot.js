@@ -2625,9 +2625,9 @@ anychart.stockModule.Plot.prototype.noData = function(opt_value) {
  * @return {boolean}
  */
 anychart.stockModule.Plot.prototype.isSeriesVisible = function(series) {
-  var rowsCount = series.data() ? series.getDetachedIterator().getRowsCount() : 0;
-  var enabled = /** @type {boolean} */(series.enabled());
-  return enabled && !!rowsCount;
+  var data = series.getSelectableData();
+  var rowsCount = data ? data.getFullPointsCount() : 0;
+  return !!(series.enabled() && rowsCount);
 };
 
 
