@@ -542,7 +542,7 @@ anychart.cartesian3dModule.Chart.prototype.createTextMarkerInstance = function()
  */
 anychart.cartesian3dModule.Chart.prototype.setSeriesPointZIndex_ = function(series) {
   var seriesIndex = series.getIndex();
-  var inc = seriesIndex * anychart.core.ChartWithSeries.ZINDEX_INCREMENT_MULTIPLIER;
+  var inc = seriesIndex * anychart.core.series.Base.ZINDEX_INCREMENT_MULTIPLIER;
   var iterator = series.getIterator();
   var value = anychart.utils.toNumber(iterator.get('value'));
   var zIndex = anychart.core.ChartWithSeries.ZINDEX_SERIES;
