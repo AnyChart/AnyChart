@@ -319,6 +319,7 @@ anychart.core.utils.Error.prototype.xErrorStroke = function(opt_strokeOrFill, op
         acgraph.vector.normalizeStroke.apply(null, arguments);
     if (stroke != this.xErrorStroke_) {
       this.xErrorStroke_ = stroke;
+      this.xErrorStrokeIsDefault_ = false;
       this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
     }
     return this;
@@ -344,6 +345,7 @@ anychart.core.utils.Error.prototype.valueErrorStroke = function(opt_strokeOrFill
         acgraph.vector.normalizeStroke.apply(null, arguments);
     if (stroke != this.valueErrorStroke_) {
       this.valueErrorStroke_ = stroke;
+      this.valueErrorStrokeIsDefault_ = false;
       this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
     }
     return this;
@@ -598,22 +600,24 @@ anychart.core.utils.Error.prototype.serialize = function() {
   json['valueErrorWidth'] = this.valueErrorWidth();
   if (goog.isFunction(this['xErrorStroke'])) {
     if (goog.isFunction(this.xErrorStroke())) {
-      anychart.core.reporting.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          ['x error stroke']
-      );
+      if (!this.xErrorStrokeIsDefault_)
+        anychart.core.reporting.warning(
+            anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+            null,
+            ['x error stroke']
+        );
     } else {
       json['xErrorStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.xErrorStroke()));
     }
   }
   if (goog.isFunction(this['valueErrorStroke'])) {
     if (goog.isFunction(this.valueErrorStroke())) {
-      anychart.core.reporting.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          ['value error stroke']
-      );
+      if (!this.valueErrorStrokeIsDefault_)
+        anychart.core.reporting.warning(
+            anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+            null,
+            ['value error stroke']
+        );
     } else {
       json['valueErrorStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.valueErrorStroke()));
     }
@@ -661,6 +665,7 @@ anychart.core.utils.Error.prototype.setupByJSON = function(config, opt_default) 
   this.valueErrorWidth(config['valueErrorWidth']);
   this.xErrorStroke(config['xErrorStroke']);
   this.valueErrorStroke(config['valueErrorStroke']);
+  this.valueErrorStrokeIsDefault_ = this.xErrorStrokeIsDefault_ = !!opt_default;
 };
 
 

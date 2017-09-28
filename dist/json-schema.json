@@ -4424,7 +4424,7 @@
         "anchor": {
           "oneOf": [
             {"$ref": "#/definitions/anychart.enums.Anchor"},
-            {"type": ["null"]}
+            {"type": "null"}
           ]
         },
         "position": {"$ref": "#/definitions/anychart.enums.Anchor"},

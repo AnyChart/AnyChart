@@ -1667,8 +1667,21 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'defaultSeriesSettings': {
       'base': {
         'normal': {
+          'outlierMarkers': {
+            'enabled': null
+          },
           'labels': {
             'format': anychart.core.defaultTheme.VALUE_TOKEN_DECIMALS_COUNT_2
+          }
+        },
+        'hovered': {
+          'outlierMarkers': {
+            'enabled': null
+          }
+        },
+        'selected': {
+          'outlierMarkers': {
+            'enabled': null
           }
         }
       },

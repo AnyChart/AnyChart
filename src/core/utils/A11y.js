@@ -82,6 +82,7 @@ anychart.core.utils.A11y.prototype.enabled = function(opt_value) {
 anychart.core.utils.A11y.prototype.titleFormat = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.titleFormat_ != opt_value) {
+      this.titleFormatIsDefault_ = false;
       this.titleFormat_ = opt_value;
       this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
     }
@@ -150,11 +151,12 @@ anychart.core.utils.A11y.prototype.serialize = function() {
   json['enabled'] = this.enabled_;
 
   if (goog.isFunction(this.titleFormat())) {
-    anychart.core.reporting.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['A11y titleFormat']
-    );
+    if (!this.titleFormatIsDefault_)
+      anychart.core.reporting.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          ['A11y titleFormat']
+      );
   } else if (this.titleFormat_) {
     json['titleFormat'] = this.titleFormat_;
   }
@@ -183,6 +185,7 @@ anychart.core.utils.A11y.prototype.setupByJSON = function(json, opt_default) {
   anychart.core.utils.A11y.base(this, 'setupByJSON', json, opt_default);
   this.enabled('enabled' in json ? json['enabled'] : true);
   this.titleFormat(json['titleFormat']);
+  this.titleFormatIsDefault_ = opt_default;
 };
 
 

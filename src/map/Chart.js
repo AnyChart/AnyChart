@@ -1785,7 +1785,7 @@ anychart.mapModule.Chart.prototype.onCrosshairSignal_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.mapModule.Chart.prototype.getBaseSeriesZIndex = function(series) {
-  return series.isChoropleth() ?
+  return (/** @type {anychart.mapModule.Series} */(series)).isChoropleth() ?
       anychart.mapModule.Chart.ZINDEX_CHOROPLETH_SERIES :
       anychart.core.ChartWithSeries.ZINDEX_SERIES;
 };

@@ -307,7 +307,6 @@ anychart.core.series.Base = function(chart, plot, type, config) {
   this.applyConfig(config, true);
 };
 goog.inherits(anychart.core.series.Base, anychart.core.VisualBaseWithBounds);
-
 anychart.core.settings.populateAliases(anychart.core.series.Base, [
   'fill',
   'negativeFill',
@@ -330,6 +329,14 @@ anychart.core.settings.populateAliases(anychart.core.series.Base, [
   'type',
   'size'
 ], 'normal');
+
+
+
+/**
+ * Z-index increment multiplier.
+ * @type {number}
+ */
+anychart.core.series.Base.ZINDEX_INCREMENT_MULTIPLIER = 0.00001;
 
 
 /**
@@ -751,6 +758,8 @@ anychart.core.series.Base.prototype.applyConfig = function(config, opt_reapplyCl
   // here should markers/labels/errors/outliers setup be
 
   this.renderingSettings_.setDefaults();
+
+  this.setupAutoZIndex();
 };
 
 
@@ -779,11 +788,11 @@ anychart.core.series.Base.prototype.recreateShapeManager = function() {
  */
 anychart.core.series.Base.prototype.applyDefaultsToElements = function(defaults, opt_resetLegendItem, opt_default, opt_reapplyClip) {
   if (this.supportsError())
-    this.error().setup(defaults['error']);
+    this.error().setupInternal(!!opt_default, defaults['error']);
 
   if (opt_resetLegendItem)
     this.legendItem().reset();
-  this.legendItem().setup(defaults['legendItem']);
+  this.legendItem().setupInternal(!!opt_default, defaults['legendItem']);
 
   if ('tooltip' in defaults) {
     this.tooltip().setupInternal(!!opt_default, defaults['tooltip']);
@@ -797,7 +806,7 @@ anychart.core.series.Base.prototype.applyDefaultsToElements = function(defaults,
     this.zIndex(defaults['zIndex']);
   }
 
-  this.a11y(defaults['a11y'] || this.plot.defaultSeriesSettings()['a11y']);
+  this.a11y().setupInternal(!!opt_default, defaults['a11y'] || this.plot.defaultSeriesSettings()['a11y']);
 };
 
 
@@ -855,6 +864,15 @@ anychart.core.series.Base.prototype.autoIndex = function(opt_value) {
     return this;
   }
   return this.autoIndex_;
+};
+
+
+/**
+ * Setups auto zIndex value based on series type and plot preferences.
+ */
+anychart.core.series.Base.prototype.setupAutoZIndex = function() {
+  var inc = this.autoIndex_ * anychart.core.series.Base.ZINDEX_INCREMENT_MULTIPLIER;
+  this.setAutoZIndex(this.plot.getBaseSeriesZIndex(this) + inc);
 };
 
 

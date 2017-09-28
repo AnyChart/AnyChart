@@ -160,13 +160,6 @@ anychart.core.ChartWithSeries.ZINDEX_SERIES = 30;
 anychart.core.ChartWithSeries.ZINDEX_LINE_SERIES = 31;
 
 
-/**
- * Z-index increment multiplier.
- * @type {number}
- */
-anychart.core.ChartWithSeries.ZINDEX_INCREMENT_MULTIPLIER = 0.00001;
-
-
 //endregion
 //region --- Series infrastructure methods
 //----------------------------------------------------------------------------------------------------------------------
@@ -276,7 +269,7 @@ anychart.core.ChartWithSeries.prototype.createSeriesInstance = goog.abstractMeth
 
 /**
  * Returns base series z-index.
- * @param {anychart.core.series.Cartesian|anychart.mapModule.Series} series .
+ * @param {anychart.core.series.Base} series .
  * @return {number}
  */
 anychart.core.ChartWithSeries.prototype.getBaseSeriesZIndex = function(series) {
@@ -294,11 +287,9 @@ anychart.core.ChartWithSeries.prototype.setupSeries = function(series) {
   var lastSeries = this.seriesList[this.seriesList.length - 1];
   var index = lastSeries ? /** @type {number} */(lastSeries.autoIndex()) + 1 : 0;
   this.seriesList.push(series);
-  var inc = index * anychart.core.ChartWithSeries.ZINDEX_INCREMENT_MULTIPLIER;
-  var seriesZIndex = this.getBaseSeriesZIndex(series) + inc;
 
   series.autoIndex(index);
-  series.setAutoZIndex(seriesZIndex);
+  series.setupAutoZIndex();
   series.setAutoColor(this.palette().itemAt(index));
   series.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(index)));
   series.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(index)));

@@ -116,6 +116,20 @@ anychart.stockModule.Scroller.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
+ * Series z-index in chart root layer.
+ * @type {number}
+ */
+anychart.stockModule.Scroller.ZINDEX_SERIES = 30;
+
+
+/**
+ * Line-like series should have bigger zIndex value than other series.
+ * @type {number}
+ */
+anychart.stockModule.Scroller.ZINDEX_LINE_SERIES = 31;
+
+
+/**
  * @inheritDoc
  */
 anychart.stockModule.Scroller.prototype.supportsTooltip = function() {
@@ -1211,6 +1225,18 @@ anychart.stockModule.Scroller.prototype.ensureStatisticsReady = goog.nullFunctio
 
 
 /**
+ * Returns base series z-index.
+ * @param {anychart.core.series.Base} series .
+ * @return {number}
+ */
+anychart.stockModule.Scroller.prototype.getBaseSeriesZIndex = function(series) {
+  return series.isLineBased() ?
+      anychart.stockModule.Scroller.ZINDEX_LINE_SERIES :
+      anychart.stockModule.Scroller.ZINDEX_SERIES;
+};
+
+
+/**
  * @param {string} type Series type.
  * @param {(anychart.stockModule.data.TableMapping|anychart.stockModule.data.Table|Array.<Array.<*>>|string)=} opt_data
  * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_mappingSettings
@@ -1233,14 +1259,10 @@ anychart.stockModule.Scroller.prototype.createSeriesByType = function(type, opt_
     var lastSeries = this.series_[this.series_.length - 1];
     var index = lastSeries ? /** @type {number} */(lastSeries.autoIndex()) + 1 : 0;
     this.series_.push(series);
-    var inc = index * anychart.stockModule.Plot.ZINDEX_INCREMENT_MULTIPLIER;
-    var seriesZIndex = (series.isLineBased() ?
-            anychart.stockModule.Plot.ZINDEX_LINE_SERIES :
-            anychart.stockModule.Plot.ZINDEX_SERIES) + inc;
 
     series.autoIndex(index);
     series.data(opt_data || null, opt_mappingSettings, opt_csvSettings);
-    series.setAutoZIndex(seriesZIndex);
+    series.setupAutoZIndex();
     series.clip(true);
     series.setAutoPointWidth(.9);
     series.setAutoColor(this.palette().itemAt(index));

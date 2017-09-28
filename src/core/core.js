@@ -151,6 +151,14 @@ anychart.core.IPlot.prototype.defaultSeriesSettings = function(opt_value) {};
 anychart.core.IPlot.prototype.getPlotBounds = function() {};
 
 
+/**
+ * Returns base series z-index.
+ * @param {anychart.core.series.Base} series .
+ * @return {number}
+ */
+anychart.core.IPlot.prototype.getBaseSeriesZIndex = function(series) {};
+
+
 
 //endregion
 //region I3DProvider

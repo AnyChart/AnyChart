@@ -1995,7 +1995,7 @@ anychart.core.Chart.prototype.setupByJSON = function(config, opt_default) {
   if ('tooltip' in config)
     this.tooltip().setupInternal(!!opt_default, config['tooltip']);
 
-  this.a11y(config['a11y']);
+  this.a11y().setupInternal(!!opt_default, config['a11y']);
 
   if (goog.isDef(config['contextMenu']))
     this.contextMenu(config['contextMenu']);
