@@ -744,10 +744,9 @@ anychart.ganttModule.Chart.prototype.splitter = function(opt_value) {
     this.registerDisposable(this.splitter_);
     this.splitter_.zIndex(anychart.ganttModule.Chart.Z_INDEX_SPLITTER);
 
-    var ths = this;
     this.splitter_.listenSignals(function() {
-      ths.splitter_.draw();
-    }, this.splitter_);
+      this.splitter_.draw();
+    }, this);
 
     this.splitter_//TODO (A.Kudryavtsev): Move this settings to theme.
         .suspendSignalsDispatching()
@@ -760,6 +759,7 @@ anychart.ganttModule.Chart.prototype.splitter = function(opt_value) {
         .considerSplitterWidth(true)
         .resumeSignalsDispatching(false);
 
+    var ths = this;
     this.splitter_.listen(anychart.enums.EventType.SPLITTER_CHANGE, function() {
       //This also stores current position for case if dg is being disabled.
       //Here we don't check if newPosition == oldPosition because it is handled by splitter.
@@ -988,6 +988,7 @@ anychart.ganttModule.Chart.prototype.drawContent = function(bounds) {
       this.splitter().position(dgRatio);
       this.splitter().handlePositionChange(true);
       this.markConsistent(anychart.ConsistencyState.GANTT_SPLITTER_POSITION);
+      this.invalidate(anychart.ConsistencyState.BOUNDS);
     }
   }
 
