@@ -43,6 +43,8 @@ cd ./dist/
 
 # don't download docs/demos and remove geodata for dev builds to reduce folder size
 if [ "${TRAVIS_BRANCH}" = "master" ]; then
+    echo Downloading docs and demos
+
     # download docs
     wget https://docs.anychart.com/download -O docs.zip
     unzip -q docs.zip -d docs

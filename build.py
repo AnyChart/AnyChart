@@ -747,6 +747,8 @@ def __compile_project(*args, **kwargs):
                 if 'type' in bundles[bundle]: modules_json['modules'][bundle]['type'] = bundles[bundle]['type']
                 if 'name' in bundles[bundle]: modules_json['modules'][bundle]['name'] = bundles[bundle]['name']
                 if 'icon' in bundles[bundle]: modules_json['modules'][bundle]['icon'] = bundles[bundle]['icon']
+                if 'docs' in bundles[bundle]: modules_json['modules'][bundle]['docs'] = bundles[bundle]['docs']
+                if 'desc' in bundles[bundle]: modules_json['modules'][bundle]['desc'] = bundles[bundle]['desc']
                 modules_json['modules'][bundle]['size'] = __get_gzip_file_size(
                     os.path.join(output, bundle + '.min.js'))
         modules_json['themes'] = __get_modules_config()['themes']
