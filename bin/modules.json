@@ -463,6 +463,8 @@
     "anychart-annotations": {
       "type": "feature",
       "name": "Drawing Annotations",
+      "desc": "Drawings and Annotations Module.",
+      "docs": "",
       "icon": "/products/anystock/history/images/stock_drawing_tools.svg",
       "parts": [
         "annotations",
@@ -472,6 +474,8 @@
     "anychart-chart-editor": {
       "type": "feature",
       "name": "Chart Editor",
+      "desc": "AnyChart Chart Editor module.",
+      "docs": "",
       "icon": "/_design/img/upload/charts/types/area-chart.svg",
       "parts": [
         "chart-editor"
@@ -480,6 +484,8 @@
     "anychart-data-adapter": {
       "type": "feature",
       "name": "Data Adapter",
+      "desc": "AnyChart Data Adapter module.",
+      "docs": "",
       "icon": "/_design/img/upload/charts/types/area-chart.svg",
       "parts": [
         "data-adapter"
@@ -488,6 +494,8 @@
     "anychart-exports": {
       "type": "feature",
       "name": "Exports",
+      "desc": "Export to CSV, Excel, PNG, JPG and PDF module.",
+      "docs": "",
       "icon": "/_design/img/upload/charts/types/area-chart.svg",
       "parts": [
         "exports"
@@ -496,6 +504,8 @@
     "anychart-table": {
       "type": "feature",
       "name": "Table UI",
+      "desc": "AnyChart Table UI element.",
+      "docs": "",
       "icon": "/_design/img/upload/charts/types/area-chart.svg",
       "parts": [
         "table"
@@ -504,6 +514,8 @@
     "anychart-ui": {
       "type": "feature",
       "name": "Common UI",
+      "desc": "Context menu, range picker, range selector and preloader module.",
+      "docs": "",
       "icon": "/_design/img/upload/charts/types/area-chart.svg",
       "parts": [
         "ui"
@@ -512,6 +524,8 @@
     "anychart-ui-binding": {
       "type": "feature",
       "name": "UI Binding",
+      "desc": "UI Binding module is a set of utilities to bind HTML5 UI elements to chart settings.",
+      "docs": "",
       "icon": "/_design/img/upload/charts/types/area-chart.svg",
       "parts": [
         "binding"
@@ -520,6 +534,8 @@
     "anychart-vml": {
       "type": "feature",
       "name": "VML Renderer",
+      "desc": "Module that enabled VML support for old browsers.",
+      "docs": "",
       "icon": "/_design/img/upload/charts/types/area-chart.svg",
       "parts": [
         "vml"
@@ -529,6 +545,8 @@
     "anychart-bullet": {
       "type": "chart-type",
       "name": "Bullet Charts",
+      "desc": "Bullet charts module.",
+      "docs": "",
       "icon": "/_design/img/upload/charts/types/bullet-chart.svg",
       "parts": [
         "bullet",
@@ -537,7 +555,9 @@
     },
     "anychart-cartesian-3d": {
       "type": "chart-type",
-      "name": "3D Cartesian Charts",
+      "name": "Basic 3D Cartesian Charts",
+      "desc": "Basic 3D Cartesian charts module.",
+      "docs": "",
       "icon": "/_design/img/upload/charts/types/area-chart.svg",
       "parts": [
         "cartesian-3d",
@@ -547,6 +567,8 @@
     "anychart-circular-gauge": {
       "type": "chart-type",
       "name": "Circular Gauges",
+      "desc": "Circular gauges module.",
+      "docs": "",
       "icon": "/_design/img/upload/charts/types/circular-gauge.svg",
       "parts": [
         "circular-gauge",
@@ -556,6 +578,8 @@
     "anychart-linear-gauge": {
       "type": "chart-type",
       "name": "Linear Gauges",
+      "desc": "Linear gauges module.",
+      "docs": "",
       "icon": "/_design/img/upload/charts/types/vertical-gauge-1.svg",
       "parts": [
         "color-scales",
@@ -567,6 +591,8 @@
     "anychart-mekko": {
       "type": "chart-type",
       "name": "Mekko Charts",
+      "desc": "Mekko charts module.",
+      "docs": "",
       "icon": "/_design/img/upload/charts/types/mosaic-chart.svg",
       "parts": [
         "mekko",
@@ -576,6 +602,8 @@
     "anychart-pareto": {
       "type": "chart-type",
       "name": "Pareto Chart",
+      "desc": "Pareto chart module.",
+      "docs": "",
       "icon": "/_design/img/upload/charts/types/pareto-chart.svg",
       "parts": [
         "pareto",
@@ -585,6 +613,8 @@
     "anychart-pyramid-funnel": {
       "type": "chart-type",
       "name": "Pyramid and Funnel Charts",
+      "desc": "Pyramid and Funnel charts module.",
+      "docs": "",
       "icon": "/_design/img/upload/charts/types/funnel-chart.svg",
       "parts": [
         "pyramid-funnel",
@@ -594,6 +624,8 @@
     "anychart-resource": {
       "type": "chart-type",
       "name": "Resource Chart",
+      "desc": "Resource chart module.",
+      "docs": "",
       "icon": "/_design/img/upload/charts/types/area-chart.svg",
       "parts": [
         "resource",
@@ -603,6 +635,8 @@
     "anychart-sparkline": {
       "type": "chart-type",
       "name": "Sparkline Charts",
+      "desc": "Sparkline charts module.",
+      "docs": "",
       "icon": "/_design/img/upload/charts/types/sparkline-chart-1.svg",
       "parts": [
         "sparkline",
@@ -612,6 +646,8 @@
     "anychart-stock": {
       "type": "chart-type",
       "name": "Stock Charts",
+      "desc": "Stock charts module.",
+      "docs": "",
       "icon": "/_design/img/upload/charts/types/stock-chart.svg",
       "parts": [
         "stock",
@@ -621,6 +657,8 @@
     "anychart-venn": {
       "type": "chart-type",
       "name": "Venn Diagram",
+      "desc": "Venn diagram module.",
+      "docs": "",
       "icon": "/_design/img/upload/charts/types/venn-diagram.svg",
       "parts": [
         "venn",
@@ -630,6 +668,8 @@
     "anychart-waterfall": {
       "type": "chart-type",
       "name": "Waterfall Chart",
+      "desc": "Waterfall charts module.",
+      "docs": "",
       "icon": "/_design/img/upload/charts/types/waterfall-chart.svg",
       "parts": [
         "waterfall",
@@ -638,7 +678,9 @@
     },
     "anychart-cartesian": {
       "type": "chart-type",
-      "name": "Cartesian Charts",
+      "name": "Basic Cartesian Charts",
+      "desc": "Basic Cartesian charts (Bar, Line, Column, etc.) module.",
+      "docs": "",
       "icon": "/_design/img/upload/charts/types/area-chart.svg",
       "parts": [
         "cartesian",
@@ -647,7 +689,9 @@
     },
     "anychart-scatter": {
       "type": "chart-type",
-      "name": "Scatter Charts",
+      "name": "Scatter Cartesian Charts",
+      "desc": "Scatter Cartesian charts module.",
+      "docs": "",
       "icon": "/_design/img/upload/charts/types/dot-marker-chart.svg",
       "parts": [
         "cartesian",
@@ -659,6 +703,8 @@
     "anychart-pie": {
       "type": "chart-type",
       "name": "Pie and Donut Charts",
+      "desc": "Pie and Donut charts module.",
+      "docs": "",
       "icon": "/_design/img/upload/charts/types/pie-chart.svg",
       "parts": [
         "pie",
@@ -668,6 +714,8 @@
     "anychart-radar": {
       "type": "chart-type",
       "name": "Radar Charts",
+      "desc": "Radar charts module.",
+      "docs": "",
       "icon": "/_design/img/upload/charts/types/radar-chart-1.svg",
       "parts": [
         "radar-polar-base",
@@ -678,6 +726,8 @@
     "anychart-polar": {
       "type": "chart-type",
       "name": "Polar Charts",
+      "desc": "Polar charts module.",
+      "docs": "",
       "icon": "/_design/img/upload/charts/types/polar-polyline-chart.svg",
       "parts": [
         "radar-polar-base",
@@ -688,6 +738,8 @@
     "anychart-gantt": {
       "type": "chart-type",
       "name": "Gantt Charts",
+      "desc": "Gantt and Gantt Resource charts module.",
+      "docs": "",
       "icon": "/_design/img/upload/charts/types/gantt-chart.svg",
       "parts": [
         "tree-data",
@@ -698,6 +750,8 @@
     "anychart-heatmap": {
       "type": "chart-type",
       "name": "Heatmap Chart",
+      "desc": "Heatmap сhart module.",
+      "docs": "",
       "icon": "/_design/img/upload/charts/types/heatmap-chart.svg",
       "parts": [
         "color-scales",
@@ -709,6 +763,8 @@
     "anychart-map": {
       "type": "chart-type",
       "name": "Geo Maps",
+      "desc": "Geo Maps chart module. Does not contain map geo data, only engine.",
+      "docs": "",
       "icon": "/_design/img/upload/charts/types/choropleth-map.svg",
       "parts": [
         "color-scales",
@@ -719,7 +775,9 @@
     },
     "anychart-pert": {
       "type": "chart-type",
-      "name": "Pert Chart",
+      "name": "PERT Chart",
+      "desc": "PERT chart module.",
+      "docs": "",
       "icon": "/_design/img/upload/charts/types/pert-chart.svg",
       "parts": [
         "tree-data",
@@ -729,7 +787,9 @@
     },
     "anychart-tag-cloud": {
       "type": "chart-type",
-      "name": "Tag Cloud (Word Cloud)",
+      "name": "Tag Cloud",
+      "desc": "Tag Cloud (Word Cloud) Chart module.",
+      "docs": "",
       "icon": "/_design/img/upload/charts/types/tag-cloud.svg",
       "parts": [
         "color-scales",
@@ -741,6 +801,8 @@
     "anychart-treemap": {
       "type": "chart-type",
       "name": "Treemap",
+      "desc": "Treemap charts module.",
+      "docs": "",
       "icon": "/_design/img/upload/charts/types/treemap-chart.svg",
       "parts": [
         "tree-data",
