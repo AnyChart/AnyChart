@@ -395,6 +395,30 @@ anychart.mekkoModule.Chart.prototype.calculate = function() {
 
 
 /**
+ * Processes a plan.
+ * @param {Object} plan
+ * @param {number} rightIndex
+ * @param {Array} leftValues
+ * @param {Array} leftWeights
+ * @param {Array} rightValues
+ * @param {Array} rightWeights
+ * @private
+ */
+anychart.mekkoModule.Chart.prototype.processDrawingPlan_ = function(plan, rightIndex, leftValues, leftWeights, rightValues, rightWeights) {
+  if (plan.data.length) {
+    if (!plan.data[0].meta['missing']) {
+      leftValues.push(plan.series.name());
+      leftWeights.push(plan.data[0].data['value']);
+    }
+    if (!plan.data[rightIndex].meta['missing']) {
+      rightValues.push(plan.series.name());
+      rightWeights.push(plan.data[rightIndex].data['value']);
+    }
+  }
+};
+
+
+/**
  * Left and right categories scales values and weights calculation.
  */
 anychart.mekkoModule.Chart.prototype.calculateCategoriesScales = function() {
@@ -404,16 +428,14 @@ anychart.mekkoModule.Chart.prototype.calculateCategoriesScales = function() {
     var leftWeights = [];
     var rightWeights = [];
     var rightIndex = this.drawingPlans[0].data.length - 1;
-    for (var i = 0; i < this.drawingPlans.length; i++) {
-      if (!this.drawingPlans[i].data.length)
-        continue;
-      if (!this.drawingPlans[i].data[0].meta['missing']) {
-        leftValues.push(this.drawingPlans[i].series.name());
-        leftWeights.push(this.drawingPlans[i].data[0].data['value']);
+    var i;
+    if (this.yScale().stackDirection() == anychart.enums.ScaleStackDirection.DIRECT) {
+      for (i = this.drawingPlans.length; i--;) {
+        this.processDrawingPlan_(this.drawingPlans[i], rightIndex, leftValues, leftWeights, rightValues, rightWeights);
       }
-      if (!this.drawingPlans[i].data[rightIndex].meta['missing']) {
-        rightValues.push(this.drawingPlans[i].series.name());
-        rightWeights.push(this.drawingPlans[i].data[rightIndex].data['value']);
+    } else {
+      for (i = 0; i < this.drawingPlans.length; i++) {
+        this.processDrawingPlan_(this.drawingPlans[i], rightIndex, leftValues, leftWeights, rightValues, rightWeights);
       }
     }
 
