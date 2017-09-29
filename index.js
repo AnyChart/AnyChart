@@ -1,1 +1,1 @@
-module.exports = require('./dist/anychart-bundle.min.js');
+module.exports = require('./dist/js/anychart-bundle.min.js');

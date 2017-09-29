@@ -246,32 +246,46 @@ def __get_version():
 @memoize
 def __get_build_version():
     # get current branch name
-    name_p = subprocess.Popen(
+    (name_output, name_err) = subprocess.Popen(
         ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
-        cwd=PROJECT_PATH)
-    (name_output, name_err) = name_p.communicate()
+        cwd=PROJECT_PATH).communicate()
     branch_name = name_output.strip()
+
     if branch_name == 'HEAD':
         branch_name = os.environ['TRAVIS_BRANCH']
 
-    #see https://anychart.atlassian.net/browse/DVF-3193
-    contributors_response = urllib.urlopen(GIT_CONTRIBUTORS_URL)
-    contributors_data = json.loads(contributors_response.read())
-    contributions = 0
-    for contributor in contributors_data:
-        contributions += contributor['contributions']
+        #see https://anychart.atlassian.net/browse/DVF-3193
+        contributors_response = urllib.urlopen(GIT_CONTRIBUTORS_URL)
+        contributors_data = json.loads(contributors_response.read())
+        contributions = 0
+        for contributor in contributors_data:
+            contributions += contributor['contributions']
 
-    git_compare_url = GIT_COMPARE_URL_TEMPLATE % (branch_name)
-    compare_response = urllib.urlopen(git_compare_url)
-    compare_data = json.loads(compare_response.read())
+        git_compare_url = GIT_COMPARE_URL_TEMPLATE % branch_name
+        compare_response = urllib.urlopen(git_compare_url)
+        compare_data = json.loads(compare_response.read())
 
-    behind_by = compare_data.get('behind_by', 0)
-    ahead_by = compare_data.get('ahead_by', 0)
-    diff = contributions - behind_by + ahead_by
+        behind_by = compare_data.get('behind_by', 0)
+        ahead_by = compare_data.get('ahead_by', 0)
+        commits_count = contributions - behind_by + ahead_by
+    else:
+        (count_output, name_err) = subprocess.Popen(
+            ['git', 'rev-list', 'HEAD', '--count'],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            cwd=PROJECT_PATH).communicate()
+        commits_count = count_output.strip()
 
-    return '%s.%s' % (__get_version(), diff)
+    return '%s.%s' % (__get_version(), commits_count)
+
+
+def __print_version(*args, **kwargs):
+    if kwargs['commits_count']:
+        print __get_build_version()
+    else:
+        print __get_version()
 
 
 @memoize
@@ -1078,6 +1092,15 @@ def __exec_main_script():
     stat_parser.add_argument('-s', '--skip_building',
                              action='store_true',
                              help='skip building stat-min')
+    # endregion
+
+    # region ---- create the parser for the 'version' command
+    stat_parser = subparsers.add_parser('version', help='Print AnyChart version')
+    stat_parser.set_defaults(action=__print_version,
+                             commits_count=False)
+    stat_parser.add_argument('-c', '--commits_count',
+                             action='store_true',
+                             help="Don't show commits count")
     # endregion
 
     params = parser.parse_args()
