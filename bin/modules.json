@@ -463,8 +463,8 @@
     "anychart-annotations": {
       "type": "feature",
       "name": "Drawing Annotations",
-      "desc": "Drawings and Annotations Module.",
-      "docs": "",
+      "desc": "Drawings and annotations module.",
+      "docs": "https://docs.anychart.com/Stock_Charts/Drawing_Tools_and_Annotations/",
       "icon": "/products/anystock/history/images/stock_drawing_tools.svg",
       "parts": [
         "annotations",
@@ -474,7 +474,7 @@
     "anychart-chart-editor": {
       "type": "feature",
       "name": "Chart Editor",
-      "desc": "AnyChart Chart Editor module.",
+      "desc": "AnyChart chart editor module.",
       "docs": "",
       "icon": "/_design/img/upload/charts/types/area-chart.svg",
       "parts": [
@@ -484,8 +484,8 @@
     "anychart-data-adapter": {
       "type": "feature",
       "name": "Data Adapter",
-      "desc": "AnyChart Data Adapter module.",
-      "docs": "",
+      "desc": "AnyChart data adapter module.",
+      "docs": "https://docs.anychart.com/Working_with_Data/Data_Adapter/",
       "icon": "/_design/img/upload/charts/types/area-chart.svg",
       "parts": [
         "data-adapter"
@@ -495,7 +495,7 @@
       "type": "feature",
       "name": "Exports",
       "desc": "Export to CSV, Excel, PNG, JPG and PDF module.",
-      "docs": "",
+      "docs": "https://docs.anychart.com/Common_Settings/Exports",
       "icon": "/_design/img/upload/charts/types/area-chart.svg",
       "parts": [
         "exports"
@@ -504,7 +504,7 @@
     "anychart-table": {
       "type": "feature",
       "name": "Table UI",
-      "desc": "AnyChart Table UI element.",
+      "desc": "AnyChart table UI element.",
       "docs": "",
       "icon": "/_design/img/upload/charts/types/area-chart.svg",
       "parts": [
@@ -534,7 +534,7 @@
     "anychart-vml": {
       "type": "feature",
       "name": "VML Renderer",
-      "desc": "Module that enabled VML support for old browsers.",
+      "desc": "Module that enables VML support for old browsers.",
       "docs": "",
       "icon": "/_design/img/upload/charts/types/area-chart.svg",
       "parts": [
@@ -546,7 +546,7 @@
       "type": "chart-type",
       "name": "Bullet Charts",
       "desc": "Bullet charts module.",
-      "docs": "",
+      "docs": "https://docs.anychart.com/Basic_Charts/Bullet_Chart",
       "icon": "/_design/img/upload/charts/types/bullet-chart.svg",
       "parts": [
         "bullet",
@@ -556,8 +556,8 @@
     "anychart-cartesian-3d": {
       "type": "chart-type",
       "name": "Basic 3D Cartesian Charts",
-      "desc": "Basic 3D Cartesian charts module.",
-      "docs": "",
+      "desc": "Basic 3D cartesian charts module.",
+      "docs": "https://docs.anychart.com/Basic_Charts/3D/",
       "icon": "/_design/img/upload/charts/types/area-chart.svg",
       "parts": [
         "cartesian-3d",
@@ -568,7 +568,7 @@
       "type": "chart-type",
       "name": "Circular Gauges",
       "desc": "Circular gauges module.",
-      "docs": "",
+      "docs": "https://docs.anychart.com/Gauges/Circular_Gauge",
       "icon": "/_design/img/upload/charts/types/circular-gauge.svg",
       "parts": [
         "circular-gauge",
@@ -579,7 +579,7 @@
       "type": "chart-type",
       "name": "Linear Gauges",
       "desc": "Linear gauges module.",
-      "docs": "",
+      "docs": "https://docs.anychart.com/Gauges/Linear_Gauge",
       "icon": "/_design/img/upload/charts/types/vertical-gauge-1.svg",
       "parts": [
         "color-scales",
@@ -592,7 +592,7 @@
       "type": "chart-type",
       "name": "Mekko Charts",
       "desc": "Mekko charts module.",
-      "docs": "",
+      "docs": "https://docs.anychart.com/Basic_Charts/Marimekko_Chart/Mekko_Chart",
       "icon": "/_design/img/upload/charts/types/mosaic-chart.svg",
       "parts": [
         "mekko",
@@ -603,7 +603,7 @@
       "type": "chart-type",
       "name": "Pareto Chart",
       "desc": "Pareto chart module.",
-      "docs": "",
+      "docs": "https://docs.anychart.com/Basic_Charts/Pareto_Chart",
       "icon": "/_design/img/upload/charts/types/pareto-chart.svg",
       "parts": [
         "pareto",
@@ -613,7 +613,7 @@
     "anychart-pyramid-funnel": {
       "type": "chart-type",
       "name": "Pyramid and Funnel Charts",
-      "desc": "Pyramid and Funnel charts module.",
+      "desc": "Pyramid and funnel charts module.",
       "docs": "",
       "icon": "/_design/img/upload/charts/types/funnel-chart.svg",
       "parts": [
@@ -625,7 +625,7 @@
       "type": "chart-type",
       "name": "Resource Chart",
       "desc": "Resource chart module.",
-      "docs": "",
+      "docs": "https://docs.anychart.com/beta/Resource_Chart",
       "icon": "/_design/img/upload/charts/types/area-chart.svg",
       "parts": [
         "resource",
@@ -636,7 +636,7 @@
       "type": "chart-type",
       "name": "Sparkline Charts",
       "desc": "Sparkline charts module.",
-      "docs": "",
+      "docs": "https://docs.anychart.com/Basic_Charts/Sparkline_Chart",
       "icon": "/_design/img/upload/charts/types/sparkline-chart-1.svg",
       "parts": [
         "sparkline",
@@ -647,7 +647,7 @@
       "type": "chart-type",
       "name": "Stock Charts",
       "desc": "Stock charts module.",
-      "docs": "",
+      "docs": "https://docs.anychart.com/Stock_Charts/",
       "icon": "/_design/img/upload/charts/types/stock-chart.svg",
       "parts": [
         "stock",
@@ -658,7 +658,7 @@
       "type": "chart-type",
       "name": "Venn Diagram",
       "desc": "Venn diagram module.",
-      "docs": "",
+      "docs": "https://docs.anychart.com/Basic_Charts/Venn_Diagram",
       "icon": "/_design/img/upload/charts/types/venn-diagram.svg",
       "parts": [
         "venn",
@@ -669,7 +669,7 @@
       "type": "chart-type",
       "name": "Waterfall Chart",
       "desc": "Waterfall charts module.",
-      "docs": "",
+      "docs": "https://docs.anychart.com/Basic_Charts/Waterfall_Chart",
       "icon": "/_design/img/upload/charts/types/waterfall-chart.svg",
       "parts": [
         "waterfall",
@@ -679,7 +679,7 @@
     "anychart-cartesian": {
       "type": "chart-type",
       "name": "Basic Cartesian Charts",
-      "desc": "Basic Cartesian charts (Bar, Line, Column, etc.) module.",
+      "desc": "Basic cartesian charts (Bar, Line, Column, etc.) module.",
       "docs": "",
       "icon": "/_design/img/upload/charts/types/area-chart.svg",
       "parts": [
@@ -690,8 +690,8 @@
     "anychart-scatter": {
       "type": "chart-type",
       "name": "Scatter Cartesian Charts",
-      "desc": "Scatter Cartesian charts module.",
-      "docs": "",
+      "desc": "Scatter cartesian charts module.",
+      "docs": "https://docs.anychart.com/Basic_Charts/Scatter_Plot/",
       "icon": "/_design/img/upload/charts/types/dot-marker-chart.svg",
       "parts": [
         "cartesian",
@@ -703,8 +703,8 @@
     "anychart-pie": {
       "type": "chart-type",
       "name": "Pie and Donut Charts",
-      "desc": "Pie and Donut charts module.",
-      "docs": "",
+      "desc": "Pie and donut charts module.",
+      "docs": "https://docs.anychart.com/Basic_Charts/Pie_Chart",
       "icon": "/_design/img/upload/charts/types/pie-chart.svg",
       "parts": [
         "pie",
@@ -715,7 +715,7 @@
       "type": "chart-type",
       "name": "Radar Charts",
       "desc": "Radar charts module.",
-      "docs": "",
+      "docs": "https://docs.anychart.com/Basic_Charts/Radar_Plot/",
       "icon": "/_design/img/upload/charts/types/radar-chart-1.svg",
       "parts": [
         "radar-polar-base",
@@ -727,7 +727,7 @@
       "type": "chart-type",
       "name": "Polar Charts",
       "desc": "Polar charts module.",
-      "docs": "",
+      "docs": "https://docs.anychart.com/Basic_Charts/Polar_Plot/",
       "icon": "/_design/img/upload/charts/types/polar-polyline-chart.svg",
       "parts": [
         "radar-polar-base",
@@ -738,8 +738,8 @@
     "anychart-gantt": {
       "type": "chart-type",
       "name": "Gantt Charts",
-      "desc": "Gantt and Gantt Resource charts module.",
-      "docs": "",
+      "desc": "Gantt and gantt resource charts module.",
+      "docs": "https://docs.anychart.com/Gantt_Chart/",
       "icon": "/_design/img/upload/charts/types/gantt-chart.svg",
       "parts": [
         "tree-data",
@@ -751,7 +751,7 @@
       "type": "chart-type",
       "name": "Heatmap Chart",
       "desc": "Heatmap сhart module.",
-      "docs": "",
+      "docs": "https://docs.anychart.com/Basic_Charts/Heat_Map_Chart",
       "icon": "/_design/img/upload/charts/types/heatmap-chart.svg",
       "parts": [
         "color-scales",
@@ -764,7 +764,7 @@
       "type": "chart-type",
       "name": "Geo Maps",
       "desc": "Geo Maps chart module. Does not contain map geo data, only engine.",
-      "docs": "",
+      "docs": "https://docs.anychart.com/Maps/",
       "icon": "/_design/img/upload/charts/types/choropleth-map.svg",
       "parts": [
         "color-scales",
@@ -777,7 +777,7 @@
       "type": "chart-type",
       "name": "PERT Chart",
       "desc": "PERT chart module.",
-      "docs": "",
+      "docs": "https://docs.anychart.com/PERT_Chart/",
       "icon": "/_design/img/upload/charts/types/pert-chart.svg",
       "parts": [
         "tree-data",
@@ -788,8 +788,8 @@
     "anychart-tag-cloud": {
       "type": "chart-type",
       "name": "Tag Cloud",
-      "desc": "Tag Cloud (Word Cloud) Chart module.",
-      "docs": "",
+      "desc": "Tag cloud (word Cloud) chart module.",
+      "docs": "https://docs.anychart.com/Basic_Charts/Tag_Cloud",
       "icon": "/_design/img/upload/charts/types/tag-cloud.svg",
       "parts": [
         "color-scales",
@@ -802,7 +802,7 @@
       "type": "chart-type",
       "name": "Treemap",
       "desc": "Treemap charts module.",
-      "docs": "",
+      "docs": "https://docs.anychart.com/Basic_Charts/Treemap_Chart",
       "icon": "/_design/img/upload/charts/types/treemap-chart.svg",
       "parts": [
         "tree-data",
@@ -814,21 +814,21 @@
     }
   },
   "themes": {
-    "coffee": {"name": "Coffee", "desc": "Coffee", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
-    "dark_blue": {"name": "Dark Blue", "desc": "Dark Blue Theme.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
-    "dark_earth": {"name": "Dark Earth", "desc": "Dark Earth Theme.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
-    "dark_glamour": {"name": "Dark Glamour", "desc": "Dark Glamour Theme.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
-    "dark_provence": {"name": "Dark Provence", "desc": "Dark Provence Theme.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
-    "dark_turquoise": {"name": "Dark Turquoise", "desc": "Dark Turquoise Theme.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
-    "light_blue": {"name": "Light Blue", "desc": "Light Blue Theme.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
-    "light_earth": {"name": "Light Earth", "desc": "Light Earth Theme.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
-    "light_glamour": {"name": "Light Glamour", "desc": "Light Glamour Theme.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
-    "light_provence": {"name": "Light Provence", "desc": "Light Provence Theme.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
-    "light_turquoise": {"name": "Light Turquoise", "desc": "Light Turquoise Theme.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
-    "monochrome": {"name": "Monochrome", "desc": "Monochrome Theme.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
-    "morning": {"name": "Morning", "desc": "Morning Theme.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
-    "pastel": {"name": "Pastel", "desc": "Pastel Theme.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
-    "sea": {"name": "Sea", "desc": "Sea Theme.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
-    "wines": {"name": "Wines", "desc": "Wines Theme.", "icon": "/_design/img/upload/charts/types/area-chart.svg"}
+    "coffee": {"name": "Coffee", "desc": "Coffee Theme. Dimmed brown and brownish colors.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "dark_blue": {"name": "Dark Blue", "desc": "Dark Blue Theme. Dimmed blue and blueish colors.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "dark_earth": {"name": "Dark Earth", "desc": "Dark Earth Theme. Dimmed green and orange colors.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "dark_glamour": {"name": "Dark Glamour", "desc": "Dark Glamour Theme. Dark backgrounds and vibrant pink and magenta.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "dark_provence": {"name": "Dark Provence", "desc": "Dark Provence Theme. Dark backgrounds and soft colors.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "dark_turquoise": {"name": "Dark Turquoise", "desc": "Dark Turquoise Theme. Dark backgrounds and and soft turquoise colors.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "light_blue": {"name": "Light Blue", "desc": "Light Blue Theme. ", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "light_earth": {"name": "Light Earth", "desc": "Light Earth Theme. Dimmed light blue and blueish colors.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "light_glamour": {"name": "Light Glamour", "desc": "Light Glamour Theme. Light backgrounds and vibrant pink and magenta.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "light_provence": {"name": "Light Provence", "desc": "Light Provence Theme. Light backgrounds and soft colors.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "light_turquoise": {"name": "Light Turquoise", "desc": "Light Turquoise Theme. Light backgrounds and and soft turquoise colors.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "monochrome": {"name": "Monochrome", "desc": "Monochrome Theme. Light background and grayish colors.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "morning": {"name": "Morning", "desc": "Morning Theme. Light background and vivid colors.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "pastel": {"name": "Pastel", "desc": "Pastel Theme. Light background and pastel colors.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "sea": {"name": "Sea", "desc": "Sea Theme. Light background and thalassian palette.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "wines": {"name": "Wines", "desc": "Wines Theme. Dark background and lively colors.", "icon": "/_design/img/upload/charts/types/area-chart.svg"}
   }
 }
