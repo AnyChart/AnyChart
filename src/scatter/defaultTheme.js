@@ -92,8 +92,10 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       }
     },
     'series': [],
-    'grids': [],
-    'minorGrids': [],
+    'xGrids': [],
+    'yGrids': [],
+    'xMinorGrids': [],
+    'yMinorGrids': [],
     'xAxes': [{}],
     'yAxes': [{}],
     'lineAxesMarkers': [],

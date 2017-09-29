@@ -75,11 +75,12 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
   },
   // merge with area
   'bar3d': {
-    'grids': [
-      {},
+    'xGrids': [
+      {}
+    ],
+    'yGrids': [
       {
         'enabled': true,
-        'layout': 'horizontal',
         'scale': 0
       }
     ],
@@ -90,13 +91,14 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
   // merge with column
   'column3d': {
     'defaultSeriesType': 'column',
-    'grids': [
-      {},
+    'xGrids': [
       {
         'enabled': true,
-        'layout': 'vertical',
         'scale': 0
       }
+    ],
+    'yGrids': [
+      {}
     ]
   },
   // merge with area
@@ -104,13 +106,14 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'defaultSeriesType': 'area',
     'zDistribution': true,
     'zPadding': 5,
-    'grids': [
-      {},
+    'xGrids': [
       {
         'enabled': true,
-        'layout': 'vertical',
         'scale': 0
       }
+    ],
+    'yGrids': [
+      {}
     ]
   },
   // merge with area
@@ -118,13 +121,14 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'defaultSeriesType': 'line',
     'zDistribution': true,
     'zPadding': 5,
-    'grids': [
-      {},
+    'xGrids': [
       {
         'enabled': true,
-        'layout': 'vertical',
         'scale': 0
       }
+    ],
+    'yGrids': [
+      {}
     ]
   },
   // merge with cartesian

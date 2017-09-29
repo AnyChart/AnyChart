@@ -31,7 +31,8 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       'orientation': 'top'
     }],
     'yAxes': [{}],
-    'grids': [],
+    'xGrids': [],
+    'yGrids': [],
     'tooltip': {
       'enabled': true,
       'title': {

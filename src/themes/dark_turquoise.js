@@ -226,7 +226,8 @@ goog.provide('anychart.themes.dark_turquoise');
         }
       },
       'xAxes': [{}],
-      'grids': [],
+      'xGrids': [],
+      'yGrids': [],
       'yAxes': []
     },
     'financial': {

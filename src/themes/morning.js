@@ -202,7 +202,8 @@ goog.provide('anychart.themes.morning');
         }
       },
       'xAxes': [{}],
-      'grids': [],
+      'xGrids': [],
+      'yGrids': [],
       'yAxes': []
     },
     'financial': {

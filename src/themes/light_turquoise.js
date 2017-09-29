@@ -185,7 +185,8 @@ goog.provide('anychart.themes.light_turquoise');
         }
       },
       'xAxes': [{}],
-      'grids': [],
+      'xGrids': [],
+      'yGrids': [],
       'yAxes': []
     },
     'financial': {
