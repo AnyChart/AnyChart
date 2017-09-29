@@ -305,7 +305,8 @@ anychart.stockModule.Controller.prototype.refreshSelection = function(newPixelWi
 
   var startKey = this.currentSelection_.startKey;
   var endKey = this.currentSelection_.endKey;
-  if ((!preserveSelectedRange || this.currentSelectionSticksLeft() || this.currentSelectionSticksRight()) &&
+  if (mainRegistryUpdated &&
+      (!preserveSelectedRange || this.currentSelectionSticksLeft() || this.currentSelectionSticksRight()) &&
       !isNaN(this.currentStartKeyRatio_) &&
       !isNaN(this.currentEndKeyRatio_) &&
       !isNaN(alignedFirst) &&

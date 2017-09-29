@@ -814,21 +814,21 @@
     }
   },
   "themes": {
-    "coffee": {"name": "Coffee", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
-    "dark_blue": {"name": "Dark Blue", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
-    "dark_earth": {"name": "Dark Earth", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
-    "dark_glamour": {"name": "Dark Glamour", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
-    "dark_provence": {"name": "Dark Provence", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
-    "dark_turquoise": {"name": "Dark Turquoise", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
-    "light_blue": {"name": "Light Blue", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
-    "light_earth": {"name": "Light Earth", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
-    "light_glamour": {"name": "Light Glamour", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
-    "light_provence": {"name": "Light Provence", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
-    "light_turquoise": {"name": "Light Turquoise", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
-    "monochrome": {"name": "Monochrome", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
-    "morning": {"name": "Morning", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
-    "pastel": {"name": "Pastel", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
-    "sea": {"name": "Sea", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
-    "wines": {"name": "Wines", "icon": "/_design/img/upload/charts/types/area-chart.svg"}
+    "coffee": {"name": "Coffee", "desc": "Coffee", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "dark_blue": {"name": "Dark Blue", "desc": "Dark Blue Theme.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "dark_earth": {"name": "Dark Earth", "desc": "Dark Earth Theme.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "dark_glamour": {"name": "Dark Glamour", "desc": "Dark Glamour Theme.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "dark_provence": {"name": "Dark Provence", "desc": "Dark Provence Theme.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "dark_turquoise": {"name": "Dark Turquoise", "desc": "Dark Turquoise Theme.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "light_blue": {"name": "Light Blue", "desc": "Light Blue Theme.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "light_earth": {"name": "Light Earth", "desc": "Light Earth Theme.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "light_glamour": {"name": "Light Glamour", "desc": "Light Glamour Theme.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "light_provence": {"name": "Light Provence", "desc": "Light Provence Theme.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "light_turquoise": {"name": "Light Turquoise", "desc": "Light Turquoise Theme.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "monochrome": {"name": "Monochrome", "desc": "Monochrome Theme.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "morning": {"name": "Morning", "desc": "Morning Theme.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "pastel": {"name": "Pastel", "desc": "Pastel Theme.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "sea": {"name": "Sea", "desc": "Sea Theme.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "wines": {"name": "Wines", "desc": "Wines Theme.", "icon": "/_design/img/upload/charts/types/area-chart.svg"}
   }
 }

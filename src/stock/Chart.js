@@ -1021,12 +1021,9 @@ anychart.stockModule.Chart.prototype.drawContent = function(bounds) {
   if (this.annotationsModule)
     this.annotations().ready(true);
 
-  var forcePreserveSelectedRange = false;
-
   // anychart.core.Base.suspendSignalsDispatching(this.plots_, this.scroller_);
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     this.distributeBounds_(bounds);
-    forcePreserveSelectedRange = !this.hasInvalidationState(anychart.ConsistencyState.STOCK_DATA);
     this.invalidate(anychart.ConsistencyState.STOCK_DATA);
     // we do not mark BOUNDS consistent, since the chart becomes unresizable in that case
     //this.markConsistent(anychart.ConsistencyState.BOUNDS);
@@ -1039,7 +1036,7 @@ anychart.stockModule.Chart.prototype.drawContent = function(bounds) {
     var scrollerXScale = /** @type {anychart.stockModule.scales.Scatter} */(this.scroller().xScale());
     var changed = this.dataController_.refreshSelection(
         this.minPlotsDrawingWidth_,
-        forcePreserveSelectedRange || this.inDrag_ || this.preserveSelectedRangeOnDataUpdate_,
+        this.inDrag_ || this.preserveSelectedRangeOnDataUpdate_,
         xScale, scrollerXScale);
     if (!!(changed & 1)) {
       this.invalidateRedrawable();
