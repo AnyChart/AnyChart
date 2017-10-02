@@ -273,32 +273,35 @@ anychart.core.settings.createTextPropertiesDescriptors = function() {
  * @param {number} nonBoundsState - State to invalidate without bounds.
  * @param {number} boundsChangedSignal - Signal for changed bounds.
  * @param {number} nonBoundsSignal - Signal for non-bounds changes.
+ * @param {Function=} opt_boundsStateBeforeInvalidationHook - .
  */
-anychart.core.settings.createTextPropertiesDescriptorsMeta = function(map, invalidateBoundsState, nonBoundsState, boundsChangedSignal, nonBoundsSignal) {
+anychart.core.settings.createTextPropertiesDescriptorsMeta = function(map, invalidateBoundsState,
+                                                                      nonBoundsState, boundsChangedSignal, nonBoundsSignal,
+                                                                      opt_boundsStateBeforeInvalidationHook) {
   anychart.core.settings.createDescriptorsMeta(map, [
-    ['minFontSize', invalidateBoundsState, boundsChangedSignal],
-    ['maxFontSize', invalidateBoundsState, boundsChangedSignal],
-    ['adjustFontSize', invalidateBoundsState, boundsChangedSignal],
-    ['fontSize', invalidateBoundsState, boundsChangedSignal],
-    ['fontFamily', invalidateBoundsState, boundsChangedSignal],
+    ['minFontSize', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
+    ['maxFontSize', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
+    ['adjustFontSize', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
+    ['fontSize', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
+    ['fontFamily', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
     ['fontColor', nonBoundsState, nonBoundsSignal],
     ['fontOpacity', nonBoundsState, nonBoundsSignal],
-    ['fontDecoration', invalidateBoundsState, boundsChangedSignal],
-    ['fontStyle', invalidateBoundsState, boundsChangedSignal],
-    ['fontVariant', invalidateBoundsState, boundsChangedSignal],
-    ['fontWeight', invalidateBoundsState, boundsChangedSignal],
-    ['letterSpacing', invalidateBoundsState, boundsChangedSignal],
-    ['textDirection', invalidateBoundsState, boundsChangedSignal],
-    ['lineHeight', invalidateBoundsState, boundsChangedSignal],
-    ['textIndent', invalidateBoundsState, boundsChangedSignal],
-    ['vAlign', invalidateBoundsState, boundsChangedSignal],
-    ['hAlign', invalidateBoundsState, boundsChangedSignal],
-    ['wordWrap', invalidateBoundsState, boundsChangedSignal],
-    ['wordBreak', invalidateBoundsState, boundsChangedSignal],
-    ['textOverflow', invalidateBoundsState, boundsChangedSignal],
+    ['fontDecoration', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
+    ['fontStyle', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
+    ['fontVariant', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
+    ['fontWeight', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
+    ['letterSpacing', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
+    ['textDirection', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
+    ['lineHeight', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
+    ['textIndent', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
+    ['vAlign', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
+    ['hAlign', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
+    ['wordWrap', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
+    ['wordBreak', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
+    ['textOverflow', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
     ['selectable', nonBoundsState, nonBoundsSignal],
     ['disablePointerEvents', nonBoundsState, nonBoundsSignal],
-    ['useHtml', nonBoundsState, nonBoundsSignal]
+    ['useHtml', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook]
   ]);
 };
 
