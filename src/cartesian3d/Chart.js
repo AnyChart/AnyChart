@@ -597,7 +597,7 @@ anychart.cartesian3dModule.Chart.prototype.prepare3d = function() {
           this.lastEnabledAreaSeriesMap[series.getScalesPairIdentifier()] = i;
         }
       } else {
-        series.setAutoZIndex(series.autoIndex() * anychart.core.ChartWithSeries.ZINDEX_INCREMENT_MULTIPLIER + anychart.cartesian3dModule.Chart.ZINDEX_2D_LINE_SERIES);
+        series.setAutoZIndex(series.autoIndex() * anychart.core.series.Base.ZINDEX_INCREMENT_MULTIPLIER + anychart.cartesian3dModule.Chart.ZINDEX_2D_LINE_SERIES);
       }
     }
   }
@@ -657,7 +657,7 @@ anychart.cartesian3dModule.Chart.prototype.getContentAreaBounds = function(bound
     var series;
     for (var i = 0; i < allSeries.length; i++) {
       series = allSeries[i];
-      if (series && series.enabled()) {
+      if (series && series.enabled() && series.check(anychart.core.drawers.Capabilities.IS_3D_BASED)) {
         var xScale = series.xScale();
         var catCount = xScale.getType() == anychart.enums.ScaleTypes.ORDINAL ? xScale.values().length : series.getIterator().getRowsCount();
         var catWidthRatio = 1 / catCount;
