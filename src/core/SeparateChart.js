@@ -282,5 +282,5 @@ anychart.core.SeparateChart.prototype.setupByJSON = function(config, opt_default
   var proto = anychart.core.SeparateChart.prototype;
   proto['legend'] = proto.legend;//doc|ex
   proto['interactivity'] = proto.interactivity;
-  proto['noDataLabel'] = proto.noDataLabel;
+  proto['noData'] = proto.noData;
 })();

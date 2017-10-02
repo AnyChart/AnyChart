@@ -246,31 +246,46 @@ def __get_version():
 @memoize
 def __get_build_version():
     # get current branch name
-    name_p = subprocess.Popen(
+    (name_output, name_err) = subprocess.Popen(
         ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
-        cwd=PROJECT_PATH)
-    (name_output, name_err) = name_p.communicate()
+        cwd=PROJECT_PATH).communicate()
     branch_name = name_output.strip()
+
     if branch_name == 'HEAD':
         branch_name = os.environ['TRAVIS_BRANCH']
 
-    #see https://anychart.atlassian.net/browse/DVF-3193
-    contributors_response = urllib.urlopen(GIT_CONTRIBUTORS_URL)
-    contributors_data = json.loads(contributors_response.read())
-    contributions = 0
-    for contributor in contributors_data:
-        contributions += contributor['contributions']
+        #see https://anychart.atlassian.net/browse/DVF-3193
+        contributors_response = urllib.urlopen(GIT_CONTRIBUTORS_URL)
+        contributors_data = json.loads(contributors_response.read())
+        contributions = 0
+        for contributor in contributors_data:
+            contributions += contributor['contributions']
 
-    git_compare_url = GIT_COMPARE_URL_TEMPLATE % (branch_name)
-    compare_response = urllib.urlopen(git_compare_url)
-    compare_data = json.loads(compare_response.read())
-    behind_by = compare_data['behind_by']
-    ahead_by = compare_data['ahead_by']
-    diff = contributions - behind_by + ahead_by
+        git_compare_url = GIT_COMPARE_URL_TEMPLATE % branch_name
+        compare_response = urllib.urlopen(git_compare_url)
+        compare_data = json.loads(compare_response.read())
 
-    return '%s.%s' % (__get_version(), diff)
+        behind_by = compare_data.get('behind_by', 0)
+        ahead_by = compare_data.get('ahead_by', 0)
+        commits_count = contributions - behind_by + ahead_by
+    else:
+        (count_output, name_err) = subprocess.Popen(
+            ['git', 'rev-list', 'HEAD', '--count'],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            cwd=PROJECT_PATH).communicate()
+        commits_count = count_output.strip()
+
+    return '%s.%s' % (__get_version(), commits_count)
+
+
+def __print_version(*args, **kwargs):
+    if kwargs['commits_count']:
+        print __get_build_version()
+    else:
+        print __get_version()
 
 
 @memoize
@@ -352,9 +367,7 @@ def __call_console_commands(commands):
     p = subprocess.Popen(commands, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     (output, err) = p.communicate()
     p.poll()
-    if len(output) > 0:
-        print output
-    return p.returncode
+    return p.returncode, output
 
 
 def __compile(entry_point=None, output=None, js_files=True, level="ADVANCED_OPTIMIZATIONS", theme=None,
@@ -569,9 +582,11 @@ def __make_build(build_name, modules, checks_only=False, theme_name='none', dev_
         files_list.write('\n'.join(map(lambda f: '--js="%s"' % f, all_files)))
 
     print '  %s module binaries' % ('Checking' if checks_only else 'Building')
-    if __compile(js_files=False, version=True, dev_edition=dev_edition, perf_mon=perf_mon,
-                 additional_params=additional_flags, checks_only=checks_only,
-                 debug_files=build_name if debug_files else None, flag_file=files_list_file_name):
+    (err_code, errors) = __compile(js_files=False, version=True, dev_edition=dev_edition, perf_mon=perf_mon,
+                                   additional_params=additional_flags, checks_only=checks_only,
+                                   debug_files=build_name if debug_files else None, flag_file=files_list_file_name)
+    if err_code:
+        print errors
         sys.exit(1)
 
     if gen_manifest:
@@ -585,11 +600,13 @@ def __make_build(build_name, modules, checks_only=False, theme_name='none', dev_
     else:
         os.remove(files_list_file_name)
 
+    return errors
+
 
 @stopwatch()
 def __make_bundle(bundle_name, modules, dev_edition=False, perf_mon=False, debug_files=False, gzip=False, stat=False,
                   output=OUT_PATH):
-    print output
+    print ''
     modules_parts_output = os.path.join(output, 'parts')
     file_name = os.path.join(output, '%s.min.js' % bundle_name)
 
@@ -666,7 +683,9 @@ def __get_bundle_wrapper(bundle_name, modules, file_name='', performance_monitor
 def build_theme(theme, output):
     min_file_name = os.path.join(output, theme + '.min.js')
     file_name = os.path.join(output, theme + '.js')
-    __compile(__get_theme_entry_point(theme), min_file_name, flag_file=CHECKS_FLAGS)
+    (err, output) = __compile(__get_theme_entry_point(theme), min_file_name, flag_file=CHECKS_FLAGS)
+    if len(output) > 0:
+        print output
     try:
         import jsbeautifier
         res = jsbeautifier.beautify_file(min_file_name)
@@ -694,10 +713,12 @@ def __compile_project(*args, **kwargs):
 
     builds = kwargs['build'] or ['bundle']
     print '\n%s AnyChart\nVersion: %s' % ('Checking' if checks else 'Building', __get_build_version())
+    compile_errors = ''
     for build_name, build in __get_builds().iteritems():
         if build_name in builds:
-            __make_build(build_name, build, checks, kwargs['theme'], kwargs['develop'],
-                         kwargs['performance_monitoring'], kwargs['manifest'], kwargs['debug_files'], output=output)
+            compile_errors += __make_build(build_name, build, checks, kwargs['theme'], kwargs['develop'],
+                                           kwargs['performance_monitoring'], kwargs['manifest'], kwargs['debug_files'],
+                                           output=output)
 
     if not checks:
         print '\nBuilding bundles\n'
@@ -726,6 +747,8 @@ def __compile_project(*args, **kwargs):
                 if 'type' in bundles[bundle]: modules_json['modules'][bundle]['type'] = bundles[bundle]['type']
                 if 'name' in bundles[bundle]: modules_json['modules'][bundle]['name'] = bundles[bundle]['name']
                 if 'icon' in bundles[bundle]: modules_json['modules'][bundle]['icon'] = bundles[bundle]['icon']
+                if 'docs' in bundles[bundle]: modules_json['modules'][bundle]['docs'] = bundles[bundle]['docs']
+                if 'desc' in bundles[bundle]: modules_json['modules'][bundle]['desc'] = bundles[bundle]['desc']
                 modules_json['modules'][bundle]['size'] = __get_gzip_file_size(
                     os.path.join(output, bundle + '.min.js'))
         modules_json['themes'] = __get_modules_config()['themes']
@@ -734,6 +757,7 @@ def __compile_project(*args, **kwargs):
             f.write(json.dumps(modules_json))
 
     print ''
+    print compile_errors
 
 
 @stopwatch()
@@ -1070,6 +1094,15 @@ def __exec_main_script():
     stat_parser.add_argument('-s', '--skip_building',
                              action='store_true',
                              help='skip building stat-min')
+    # endregion
+
+    # region ---- create the parser for the 'version' command
+    stat_parser = subparsers.add_parser('version', help='Print AnyChart version')
+    stat_parser.set_defaults(action=__print_version,
+                             commits_count=False)
+    stat_parser.add_argument('-c', '--commits_count',
+                             action='store_true',
+                             help="Don't show commits count")
     # endregion
 
     params = parser.parse_args()

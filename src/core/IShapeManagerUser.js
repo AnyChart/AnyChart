@@ -26,14 +26,17 @@ anychart.core.IShapeManagerUser.prototype.getIterator = function() {};
 
 
 /**
- * Returns proper settings due to the state if point settings are supported by the series.
+ * Returns proper settings due to the state if point settings are supported by the IShapeManagerUser.
  * @param {string} name
+ * @param {number} state
  * @param {anychart.data.IRowInfo} point
  * @param {Function} normalizer
+ * @param {boolean} scrollerSelected
  * @param {string=} opt_seriesName - series option name if differs from point names.
+ * @param {boolean=} opt_ignorePointSettings
  * @return {*}
  */
-anychart.core.IShapeManagerUser.prototype.resolveOption = function(name, point, normalizer, opt_seriesName) {};
+anychart.core.IShapeManagerUser.prototype.resolveOption = function(name, state, point, normalizer, scrollerSelected, opt_seriesName, opt_ignorePointSettings) {};
 
 
 /**

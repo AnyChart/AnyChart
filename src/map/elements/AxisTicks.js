@@ -85,6 +85,12 @@ anychart.mapModule.elements.AxisTicks.prototype.SUPPORTED_CONSISTENCY_STATES = a
 anychart.mapModule.elements.AxisTicks.prototype.getOption = anychart.core.settings.getOption;
 
 
+/** @inheritDoc */
+anychart.mapModule.elements.AxisTicks.prototype.isResolvable = function() {
+  return true;
+};
+
+
 //endregion
 //region --- IResolvable implementation
 /** @inheritDoc */

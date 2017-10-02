@@ -317,33 +317,44 @@ anychart.mapModule.Series.prototype.getLabelsPosition = function(pointState) {
 
   var iterator = this.getIterator();
 
-  var pointLabel = iterator.get('label');
-  var hoverPointLabel = hovered ? iterator.get('hoverLabel') : null;
-  var selectPointLabel = selected ? iterator.get('selectLabel') : null;
+  var pointLabel = iterator.get('normal');
+  pointLabel = goog.isDef(pointLabel) ? pointLabel['label'] : void 0;
+  var hoverPointLabel = iterator.get('hovered');
+  hoverPointLabel = goog.isDef(hoverPointLabel) ? hoverPointLabel['label'] : void 0;
+  var selectPointLabel = iterator.get('selected');
+  selectPointLabel = goog.isDef(selectPointLabel) ? selectPointLabel['label'] : void 0;
+
+  pointLabel = anychart.utils.getFirstDefinedValue(pointLabel, iterator.get('label'));
+  hoverPointLabel = hovered ? anychart.utils.getFirstDefinedValue(hoverPointLabel, iterator.get('hoverLabel')) : null;
+  selectPointLabel = selected ? anychart.utils.getFirstDefinedValue(selectPointLabel, iterator.get('selectLabel')) : null;
 
   var labelPosition = pointLabel && goog.isDef(pointLabel['position']) ? pointLabel['position'] : void 0;
   var labelHoverPosition = hoverPointLabel && goog.isDef(hoverPointLabel['position']) ? hoverPointLabel['position'] : void 0;
   var labelSelectPosition = selectPointLabel && goog.isDef(selectPointLabel['position']) ? selectPointLabel['position'] : void 0;
 
+  var labels = this.normal().labels();
+  var hoverLabels = this.hovered().labels();
+  var selectLabels = this.selected().labels();
+
   return /** @type {string} */(hovered || selected ?
       hovered ?
           goog.isDef(labelHoverPosition) ?
               labelHoverPosition :
-              goog.isDef(this.hoverLabels().getOption('position')) ?
-                  this.hoverLabels().getOption('position') :
+              goog.isDef(hoverLabels.getOption('position')) ?
+                  hoverLabels.getOption('position') :
                   goog.isDef(labelPosition) ?
                       labelPosition :
-                      this.labels().getOption('position') :
+                      labels.getOption('position') :
           goog.isDef(labelSelectPosition) ?
               labelSelectPosition :
-              goog.isDef(this.selectLabels().getOption('position')) ?
-                  this.selectLabels().getOption('position') :
+              goog.isDef(selectLabels.getOption('position')) ?
+                  selectLabels.getOption('position') :
                   goog.isDef(labelPosition) ?
                       labelPosition :
-                      this.labels().getOption('position') :
+                      labels.getOption('position') :
       goog.isDef(labelPosition) ?
           labelPosition :
-          this.labels().getOption('position'));
+          labels.getOption('position'));
 };
 
 
@@ -360,20 +371,29 @@ anychart.mapModule.Series.prototype.getLabelBounds = function(index, opt_pointSt
 
   var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
   var hovered = !selected && this.state.isStateContains(pointState, anychart.PointState.HOVER);
-  var isDraw, pointLabel, stateLabel, labelEnabledState, stateLabelEnabledState;
+  var isDraw, stateLabel, labelEnabledState, stateLabelEnabledState;
 
-  pointLabel = iterator.get('label');
+  var pointLabel = iterator.get('normal');
+  pointLabel = goog.isDef(pointLabel) ? pointLabel['label'] : void 0;
+  pointLabel = anychart.utils.getFirstDefinedValue(pointLabel, iterator.get('label'));
+
   labelEnabledState = pointLabel && goog.isDef(pointLabel['enabled']) ? pointLabel['enabled'] : null;
-  var parentLabelsFactory = this.labels();
+  var parentLabelsFactory = this.normal().labels();
   var currentLabelsFactory = null;
   if (selected) {
-    stateLabel = iterator.get('selectLabel');
+    stateLabel = iterator.get('selected');
+    stateLabel = goog.isDef(stateLabel) ? stateLabel['label'] : void 0;
+    stateLabel = anychart.utils.getFirstDefinedValue(stateLabel, iterator.get('selectLabel'));
+
     stateLabelEnabledState = stateLabel && goog.isDef(stateLabel['enabled']) ? stateLabel['enabled'] : null;
-    currentLabelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.selectLabels());
+    currentLabelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.selected().labels());
   } else if (hovered) {
-    stateLabel = iterator.get('hoverLabel');
+    stateLabel = iterator.get('hovered');
+    stateLabel = goog.isDef(stateLabel) ? stateLabel['label'] : void 0;
+    stateLabel = anychart.utils.getFirstDefinedValue(stateLabel, iterator.get('hoverLabel'));
+
     stateLabelEnabledState = stateLabel && goog.isDef(stateLabel['enabled']) ? stateLabel['enabled'] : null;
-    currentLabelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.hoverLabels());
+    currentLabelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.hovered().labels());
   } else {
     stateLabel = null;
   }
@@ -792,12 +812,21 @@ anychart.mapModule.Series.prototype.applyZoomMoveTransform = function() {
   }
 
   if (this.supportsMarkers()) {
-    var pointMarker = iterator.get('marker');
-    var hoverPointMarker = iterator.get('hoverMarker');
-    var selectPointMarker = iterator.get('selectMarker');
+    var pointMarker = iterator.get('normal');
+    pointMarker = goog.isDef(pointMarker) ? pointMarker['marker'] : void 0;
+    var hoverPointMarker = iterator.get('hovered');
+    hoverPointMarker = goog.isDef(hoverPointMarker) ? hoverPointMarker['marker'] : void 0;
+    var selectPointMarker = iterator.get('selected');
+    selectPointMarker = goog.isDef(selectPointMarker) ? selectPointMarker['marker'] : void 0;
 
-    var marker = this.markers().getMarker(index);
+    pointMarker = anychart.utils.getFirstDefinedValue(pointMarker, iterator.get('marker'));
+    hoverPointMarker = anychart.utils.getFirstDefinedValue(hoverPointMarker, iterator.get('hoverMarker'));
+    selectPointMarker = anychart.utils.getFirstDefinedValue(selectPointMarker, iterator.get('selectMarker'));
 
+    var markers = this.normal().markers();
+    var hoverMarkers = this.hovered().markers();
+    var selectMarkers = this.selected().markers();
+    var marker = markers.getMarker(index);
     var markerEnabledState = pointMarker && goog.isDef(pointMarker['enabled']) ? pointMarker['enabled'] : null;
     var markerHoverEnabledState = hoverPointMarker && goog.isDef(hoverPointMarker['enabled']) ? hoverPointMarker['enabled'] : null;
     var markerSelectEnabledState = selectPointMarker && goog.isDef(selectPointMarker['enabled']) ? selectPointMarker['enabled'] : null;
@@ -805,21 +834,21 @@ anychart.mapModule.Series.prototype.applyZoomMoveTransform = function() {
     isDraw = hovered || selected ?
         hovered ?
             goog.isNull(markerHoverEnabledState) ?
-                this.hoverMarkers() && goog.isNull(this.hoverMarkers().enabled()) ?
+                hoverMarkers && goog.isNull(hoverMarkers.enabled()) ?
                     goog.isNull(markerEnabledState) ?
-                        this.markers().enabled() :
+                        markers.enabled() :
                         markerEnabledState :
-                    this.hoverMarkers().enabled() :
+                    hoverMarkers.enabled() :
                 markerHoverEnabledState :
             goog.isNull(markerSelectEnabledState) ?
-                this.selectMarkers() && goog.isNull(this.selectMarkers().enabled()) ?
+                selectMarkers && goog.isNull(selectMarkers.enabled()) ?
                     goog.isNull(markerEnabledState) ?
-                        this.markers().enabled() :
+                        markers.enabled() :
                         markerEnabledState :
-                    this.selectMarkers().enabled() :
+                    selectMarkers.enabled() :
                 markerSelectEnabledState :
         goog.isNull(markerEnabledState) ?
-            this.markers().enabled() :
+            markers.enabled() :
             markerEnabledState;
 
     if (isDraw) {
@@ -829,7 +858,7 @@ anychart.mapModule.Series.prototype.applyZoomMoveTransform = function() {
     }
   }
 
-  var label = this.labels().getLabel(index);
+  var label = this.normal().labels().getLabel(index);
   isDraw = label && label.getDomElement() && label.positionProvider() && label.getFinalSettings('enabled');
   if (isDraw) {
     this.applyZoomMoveTransformToLabel(label, pointState);
@@ -851,7 +880,7 @@ anychart.mapModule.Series.prototype.applyAppearanceToPoint = function(pointState
         if (goog.isDef(feature.domElement)) {
           this.getChart().featureTraverser(feature, function(shape) {
             var element = shape.domElement;
-            if (!element || !(element instanceof acgraph.vector.Shape))
+            if (!element || !(anychart.utils.instanceOf(element, acgraph.vector.Shape)))
               return;
 
             iterator.meta('currentPointElement', shape);
@@ -1002,8 +1031,9 @@ anychart.mapModule.Series.prototype.getLegendItemData = function(itemsFormat) {
     itemText = this.name();
 
   if (json['iconType'] == anychart.enums.LegendItemIconType.MARKER && this.supportsMarkers()) {
-    json['iconFill'] = this.markers().fill();
-    json['iconStroke'] = this.markers().stroke();
+    var markers = this.normal().markers();
+    json['iconFill'] = markers.fill();
+    json['iconStroke'] = markers.stroke();
   }
 
   json['iconType'] = this.getLegendIconType(json['iconType'], format);
@@ -1610,13 +1640,22 @@ anychart.mapModule.Series.prototype.getMarkersPosition = function(pointState) {
   var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
   var hovered = !selected && this.state.isStateContains(pointState, anychart.PointState.HOVER);
 
-  var pointMarker = iterator.get('marker');
-  var hoverPointMarker = iterator.get('hoverMarker');
-  var selectPointMarker = iterator.get('selectMarker');
+  var pointMarker = iterator.get('normal');
+  pointMarker = goog.isDef(pointMarker) ? pointMarker['marker'] : void 0;
+  var hoverPointMarker = iterator.get('hovered');
+  hoverPointMarker = goog.isDef(hoverPointMarker) ? hoverPointMarker['marker'] : void 0;
+  var selectPointMarker = iterator.get('selected');
+  selectPointMarker = goog.isDef(selectPointMarker) ? selectPointMarker['marker'] : void 0;
 
-  var markerPosition = pointMarker && goog.isDef(pointMarker['position']) ? pointMarker['position'] : this.markers().position();
-  var markerHoverPosition = hoverPointMarker && goog.isDef(hoverPointMarker['position']) ? hoverPointMarker['position'] : goog.isDef(this.hoverMarkers().position()) ? this.hoverMarkers().position() : markerPosition;
-  var markerSelectPosition = selectPointMarker && goog.isDef(selectPointMarker['position']) ? selectPointMarker['position'] : goog.isDef(this.selectMarkers().position()) ? this.hoverMarkers().position() : markerPosition;
+  pointMarker = anychart.utils.getFirstDefinedValue(pointMarker, iterator.get('marker'));
+  hoverPointMarker = anychart.utils.getFirstDefinedValue(hoverPointMarker, iterator.get('hoverMarker'));
+  selectPointMarker = anychart.utils.getFirstDefinedValue(selectPointMarker, iterator.get('selectMarker'));
+
+  var markerPosition = pointMarker && goog.isDef(pointMarker['position']) ? pointMarker['position'] : this.normal().markers().position();
+  var hoveredPosition = this.hovered().markers().position();
+  var markerHoverPosition = hoverPointMarker && goog.isDef(hoverPointMarker['position']) ? hoverPointMarker['position'] : goog.isDef(hoveredPosition) ? hoveredPosition : markerPosition;
+  var selectedPosition = this.selected().markers().position();
+  var markerSelectPosition = selectPointMarker && goog.isDef(selectPointMarker['position']) ? selectPointMarker['position'] : goog.isDef(selectedPosition) ? selectedPosition : markerPosition;
 
   return hovered ? markerHoverPosition : selected ? markerSelectPosition : markerPosition;
 };

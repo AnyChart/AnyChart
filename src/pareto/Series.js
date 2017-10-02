@@ -51,7 +51,7 @@ anychart.paretoModule.Series.prototype.getContextProviderValues = function(provi
       goog.isDef(values['index']) &&
       (index = Number(values['index'].value)) > -1) {
     var paretoMapping = /** @type {anychart.data.Mapping} */ (data.getRowMapping(index));
-    if ((paretoMapping instanceof anychart.paretoModule.Mapping) || (paretoMapping instanceof anychart.paretoModule.SeriesMapping)) {
+    if ((anychart.utils.instanceOf(paretoMapping, anychart.paretoModule.Mapping)) || (anychart.utils.instanceOf(paretoMapping, anychart.paretoModule.SeriesMapping))) {
       values['cf'] = {value: paretoMapping.getCumulativeFrequency(index), type: anychart.enums.TokenType.NUMBER};
       values['rf'] = {value: paretoMapping.getRelativeFrequency(index), type: anychart.enums.TokenType.NUMBER};
     }
@@ -94,7 +94,7 @@ anychart.paretoModule.Series.prototype.getCFRF = function(index) {
   var data = this.data();
   if (goog.isDef(data)) {
     var paretoMapping = /** @type {anychart.data.Mapping} */ (data.getRowMapping(index));
-    if ((paretoMapping instanceof anychart.paretoModule.Mapping) || (paretoMapping instanceof anychart.paretoModule.SeriesMapping)) {
+    if ((anychart.utils.instanceOf(paretoMapping, anychart.paretoModule.Mapping)) || (anychart.utils.instanceOf(paretoMapping, anychart.paretoModule.SeriesMapping))) {
       rv = {};
       rv['cf'] = paretoMapping.getCumulativeFrequency(index);
       rv['rf'] = paretoMapping.getRelativeFrequency(index);

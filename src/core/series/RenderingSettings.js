@@ -51,8 +51,10 @@ goog.inherits(anychart.core.series.RenderingSettings, anychart.core.Base);
  * @typedef {{
  *   name: string,
  *   shapeType: anychart.enums.ShapeType,
- *   fillNames: ?Array.<string>,
- *   strokeNames: ?Array.<string>,
+ *   fillName: ?string,
+ *   strokeName: ?string,
+ *   canBeHoveredSelected: boolean,
+ *   scrollerSelected: (boolean|undefined),
  *   isHatchFill: boolean,
  *   zIndex: number
  * }}
@@ -183,8 +185,10 @@ anychart.core.series.RenderingSettings.prototype.shapes = function(opt_value) {
           return {
             name: String(item['name']),
             shapeType: String(item['shapeType']),
-            fillNames: goog.isArray(item['fillNames']) ? item['fillNames'] : null,
-            strokeNames: goog.isArray(item['strokeNames']) ? item['strokeNames'] : null,
+            fillName: item['fillName'],
+            strokeName: item['strokeName'],
+            canBeHoveredSelected: !!item['canBeHoveredSelected'],
+            scrollerSelected: !!item['scrollerSelected'],
             isHatchFill: !!item['isHatchFill'],
             zIndex: +item['zIndex'] || 0
           };
@@ -198,8 +202,10 @@ anychart.core.series.RenderingSettings.prototype.shapes = function(opt_value) {
         return {
           'name': item.name,
           'shapeType': item.shapeType,
-          'fillNames': item.fillNames,
-          'strokeNames': item.strokeNames,
+          'fillName': item.fillName,
+          'strokeName': item.strokeName,
+          'canBeHoveredSelected': item.canBeHoveredSelected,
+          'scrollerSelected': item.scrollerSelected,
           'isHatchFill': item.isHatchFill,
           'zIndex': item.zIndex
         };

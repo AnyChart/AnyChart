@@ -5,6 +5,7 @@
 goog.provide('anychart.data.View');
 
 goog.require('anychart.core.Base');
+goog.require('anychart.data.IDataSource');
 goog.require('anychart.data.IView');
 goog.require('anychart.data.Iterator');
 goog.require('anychart.enums');
@@ -20,6 +21,7 @@ goog.require('anychart.enums');
  * @implements {anychart.data.IView}
  * @name anychart.data.View
  * @extends {anychart.core.Base}
+ * @implements {anychart.data.IDataSource}
  */
 anychart.data.View = function(parentView) {
   anychart.data.View.base(this, 'constructor');
@@ -259,7 +261,7 @@ anychart.data.View.prototype.sort = function(fieldName, opt_comparatorOrOrder) {
 anychart.data.View.prototype.concat = function(otherView) {
   if (goog.isArray(otherView))
     otherView = new anychart.data.Set(/** @type {!Array} */(otherView));
-  if (otherView instanceof anychart.data.Set)
+  if (anychart.utils.instanceOf(otherView, anychart.data.Set))
     otherView = (/** @type {!anychart.data.Set} */(otherView)).mapAs();
   var result = new anychart.data.ConcatView(this, /** @type {!anychart.data.IView} */(otherView));
   this.registerDisposable(result);
@@ -280,6 +282,16 @@ anychart.data.View.prototype.row = function(rowIndex, opt_value) {
     return this.parentView.row.apply(this.parentView, arguments);
   }
   return rowIndex; // undefined
+};
+
+
+/**
+ * Returns row by index.
+ * @param {number} rowIndex
+ * @return {*}
+ */
+anychart.data.View.prototype.getRow = function(rowIndex) {
+  return this.row(rowIndex);
 };
 
 
@@ -326,6 +338,16 @@ anychart.data.View.prototype.getRowMapping = function(rowIndex) {
  */
 anychart.data.View.prototype.getDataSets = function() {
   return this.parentView.getDataSets();
+};
+
+
+/** @inheritDoc */
+anychart.data.View.prototype.populateObjWithKnownFields = function(result, resultLength) {
+  var sets = this.getDataSets();
+  for (var i = 0; i < sets.length; i++) {
+    resultLength = sets[i].populateObjWithKnownFields(result, resultLength);
+  }
+  return resultLength;
 };
 
 
@@ -668,7 +690,7 @@ anychart.data.View.prototype.getMappings = function() {
  * @private
  */
 anychart.data.View.prototype.serializeValue_ = function(val) {
-  if (val instanceof Date)
+  if (anychart.utils.instanceOf(val, Date))
     val = val.getTime();
   if (!goog.isDef(val) || (goog.isNumber(val) && isNaN(val)))
     val = null;
@@ -722,7 +744,7 @@ anychart.data.View.prototype.serializeRow = function(index) {
         for (i = 0; i < map.length; i++) {
           if (map[i] in row) {
             val = row[map[i]];
-            if (val instanceof Date)
+            if (anychart.utils.instanceOf(val, Date))
               val = val.getTime();
             if (!goog.isDef(val) || (goog.isNumber(val) && isNaN(val)))
               val = null;

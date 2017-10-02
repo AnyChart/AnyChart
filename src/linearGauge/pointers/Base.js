@@ -1,7 +1,8 @@
 goog.provide('anychart.linearGaugeModule.pointers.Base');
 
+goog.require('anychart.core.IShapeManagerUser');
+goog.require('anychart.core.StateSettings');
 goog.require('anychart.core.VisualBase');
-goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.utils.IInteractiveSeries');
 goog.require('anychart.core.utils.LegendItemSettings');
 goog.require('anychart.core.utils.LinearGaugeInteractivityState');
@@ -15,6 +16,7 @@ goog.require('anychart.format.Context');
  * @param {number} dataIndex Pointer data index.
  * @extends {anychart.core.VisualBase}
  * @implements {anychart.core.utils.IInteractiveSeries}
+ * @implements {anychart.core.IShapeManagerUser}
  * @constructor
  */
 anychart.linearGaugeModule.pointers.Base = function(gauge, dataIndex) {
@@ -67,9 +69,34 @@ anychart.linearGaugeModule.pointers.Base = function(gauge, dataIndex) {
    * States that should be invalidated when bounds method is called.
    * @type {number}
    */
-  this.BOUNDS_DEPENDENT_STATES = anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.GAUGE_POINTER_LABEL;
+  this.BOUNDS_DEPENDENT_STATES = anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.GAUGE_POINTER_LABELS;
+
+  var normalDescriptorsMeta = {};
+  anychart.core.settings.createDescriptorsMeta(normalDescriptorsMeta, [
+    ['fill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND],
+    ['stroke', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND],
+    ['hatchFill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND],
+    ['labels', 0, 0]
+  ]);
+  this.normal_ = new anychart.core.StateSettings(this, normalDescriptorsMeta, anychart.PointState.NORMAL);
+  this.normal_.setOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK, anychart.core.StateSettings.DEFAULT_LABELS_AFTER_INIT_CALLBACK);
+
+  var hoveredSelectedDescriptorsMeta = {};
+  anychart.core.settings.createDescriptorsMeta(hoveredSelectedDescriptorsMeta, [
+    ['fill', 0, 0],
+    ['stroke', 0, 0],
+    ['hatchFill', 0, 0],
+    ['labels', 0, 0]
+  ]);
+  this.hovered_ = new anychart.core.StateSettings(this, hoveredSelectedDescriptorsMeta, anychart.PointState.HOVER);
+  this.selected_ = new anychart.core.StateSettings(this, hoveredSelectedDescriptorsMeta, anychart.PointState.SELECT);
+
+  this.fillResolver = anychart.color.getColorResolver('fill', anychart.enums.ColorType.FILL, true);
+  this.strokeResolver = anychart.color.getColorResolver('stroke', anychart.enums.ColorType.STROKE, true);
+  this.hatchFillResolver = anychart.color.getColorResolver('hatchFill', anychart.enums.ColorType.HATCH_FILL, true);
 };
 goog.inherits(anychart.linearGaugeModule.pointers.Base, anychart.core.VisualBase);
+anychart.core.settings.populateAliases(anychart.linearGaugeModule.pointers.Base, ['fill', 'stroke', 'hatchFill', 'labels'], 'normal');
 
 
 //region --- STATES / SIGNALS ---
@@ -89,7 +116,7 @@ anychart.linearGaugeModule.pointers.Base.prototype.SUPPORTED_SIGNALS =
 anychart.linearGaugeModule.pointers.Base.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.APPEARANCE |
-    anychart.ConsistencyState.GAUGE_POINTER_LABEL;
+    anychart.ConsistencyState.GAUGE_POINTER_LABELS;
 
 
 //endregion
@@ -249,7 +276,7 @@ anychart.linearGaugeModule.pointers.Base.prototype.layout = function(opt_value) 
  */
 anychart.linearGaugeModule.pointers.Base.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (!(opt_value instanceof anychart.scales.ScatterBase)) {
+    if (!(anychart.utils.instanceOf(opt_value, anychart.scales.ScatterBase))) {
       anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['Pointer scale', 'scatter', 'linear, log']);
       return this;
     }
@@ -319,72 +346,13 @@ anychart.linearGaugeModule.pointers.Base.prototype.getEndRatio = function() {
 
 
 /**
- * Pointer label.
- * @param {(anychart.core.ui.LabelsFactory|Object)=} opt_value Pointer label.
- * @return {anychart.core.ui.LabelsFactory|anychart.linearGaugeModule.pointers.Base} Label or self for chaining.
- */
-anychart.linearGaugeModule.pointers.Base.prototype.label = function(opt_value) {
-  if (!this.label_) {
-    this.label_ = new anychart.core.ui.LabelsFactory();
-    this.label_.setParentEventTarget(this);
-    this.label_.listenSignals(this.onLabelSignal_, this);
-  }
-  if (goog.isDef(opt_value)) {
-    this.label_.setup(opt_value);
-    this.invalidate(anychart.ConsistencyState.GAUGE_POINTER_LABEL, anychart.Signal.NEEDS_REDRAW);
-    return this;
-  }
-  return this.label_;
-};
-
-
-/**
- * Pointer hover label.
- * @param {(anychart.core.ui.LabelsFactory|Object)=} opt_value Pointer label.
- * @return {anychart.core.ui.LabelsFactory|anychart.linearGaugeModule.pointers.Base} Label or self for chaining.
- */
-anychart.linearGaugeModule.pointers.Base.prototype.hoverLabel = function(opt_value) {
-  if (!this.hoverLabel_) {
-    this.hoverLabel_ = new anychart.core.ui.LabelsFactory();
-  }
-  if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !('enabled' in opt_value))
-      opt_value['enabled'] = true;
-    this.hoverLabel_.setup(opt_value);
-    return this;
-  }
-  return this.hoverLabel_;
-};
-
-
-/**
- * Pointer select label.
- * @param {(anychart.core.ui.LabelsFactory|Object)=} opt_value Pointer label.
- * @return {anychart.core.ui.LabelsFactory|anychart.linearGaugeModule.pointers.Base} Label or self for chaining.
- */
-anychart.linearGaugeModule.pointers.Base.prototype.selectLabel = function(opt_value) {
-  if (!this.selectLabel_) {
-    this.selectLabel_ = new anychart.core.ui.LabelsFactory();
-  }
-
-  if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !('enabled' in opt_value))
-      opt_value['enabled'] = true;
-    this.selectLabel_.setup(opt_value);
-    return this;
-  }
-  return this.selectLabel_;
-};
-
-
-/**
  * Label invalidation handler.
  * @param {anychart.SignalEvent} e Signal.
  * @private
  */
-anychart.linearGaugeModule.pointers.Base.prototype.onLabelSignal_ = function(e) {
+anychart.linearGaugeModule.pointers.Base.prototype.labelsInvalidated_ = function(e) {
   if (e.hasSignal(anychart.Signal.NEEDS_REDRAW))
-    this.invalidate(anychart.ConsistencyState.GAUGE_POINTER_LABEL, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.GAUGE_POINTER_LABELS, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -397,8 +365,103 @@ anychart.linearGaugeModule.pointers.Base.prototype.createLabelContextProvider = 
 };
 
 
+/**
+ * Normal state settings.
+ * @param {!Object=} opt_value
+ * @return {anychart.core.StateSettings|anychart.linearGaugeModule.pointers.Base}
+ */
+anychart.linearGaugeModule.pointers.Base.prototype.normal = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.normal_.setup(opt_value);
+    return this;
+  }
+  return this.normal_;
+};
+
+
+/**
+ * Hovered state settings.
+ * @param {!Object=} opt_value
+ * @return {anychart.core.StateSettings|anychart.linearGaugeModule.pointers.Base}
+ */
+anychart.linearGaugeModule.pointers.Base.prototype.hovered = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.hovered_.setup(opt_value);
+    return this;
+  }
+  return this.hovered_;
+};
+
+
+/**
+ * Selected state settings.
+ * @param {!Object=} opt_value
+ * @return {anychart.core.StateSettings|anychart.linearGaugeModule.pointers.Base}
+ */
+anychart.linearGaugeModule.pointers.Base.prototype.selected = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.selected_.setup(opt_value);
+    return this;
+  }
+  return this.selected_;
+};
+
+
 //endregion
-//region --- COLOR/HATCH ---
+//region --- COLORING ---
+/** @inheritDoc */
+anychart.linearGaugeModule.pointers.Base.prototype.resolveOption = function(name, state, point, normalizer, scrollerSelected, opt_seriesName, opt_ignorePointSettings) {
+  var val;
+  var stateObject = state == 0 ? this.normal_ : state == 1 ? this.hovered_ : this.selected_;
+  var stateValue = stateObject.getOption(name);
+  if (opt_ignorePointSettings) {
+    val = stateValue;
+  } else {
+    var pointStateName = state == 0 ? 'normal' : state == 1 ? 'hovered' : 'selected';
+    var pointStateObject = point.get(pointStateName);
+    val = anychart.utils.getFirstDefinedValue(
+        goog.isDef(pointStateObject) ? pointStateObject[name] : void 0,
+        point.get(anychart.color.getPrefixedColorName(state, name)),
+        stateValue);
+  }
+  if (goog.isDef(val))
+    val = normalizer(val);
+  return val;
+};
+
+
+/** @inheritDoc */
+anychart.linearGaugeModule.pointers.Base.prototype.getAutoHatchFill = function() {
+  return this.autoHatchFill || acgraph.vector.normalizeHatchFill(anychart.linearGaugeModule.pointers.Base.DEFAULT_HATCH_FILL_TYPE);
+};
+
+
+/** @inheritDoc */
+anychart.linearGaugeModule.pointers.Base.prototype.getHatchFillResolutionContext = function(opt_ignorePointSettings) {
+  var index = this.getIterator().getIndex();
+  var isVertical = this.isVertical();
+  var sourceHatchFill = this.getAutoHatchFill();
+  return {
+    'index': index,
+    'isVertical': isVertical,
+    'sourceHatchFill': sourceHatchFill
+  };
+};
+
+
+/** @inheritDoc */
+anychart.linearGaugeModule.pointers.Base.prototype.getColorResolutionContext = function(opt_baseColor, opt_ignorePointSettings, opt_ignoreColorScale) {
+  var index = this.getIterator().getIndex();
+  var isVertical = this.isVertical();
+  var sourceColor = opt_baseColor || this.color();
+  return {
+    'index': index,
+    'isVertical': isVertical,
+    'sourceColor': sourceColor
+  };
+};
+
+
 /**
  * Getter/setter for current pointers color.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
@@ -429,368 +492,6 @@ anychart.linearGaugeModule.pointers.Base.prototype.color = function(opt_fillOrCo
  */
 anychart.linearGaugeModule.pointers.Base.prototype.setAutoColor = function(value) {
   this.autoColor_ = value;
-};
-
-
-/**
- * Gets final normalized fill or stroke color.
- * @param {acgraph.vector.Fill|acgraph.vector.Stroke|Function} color Normal state color.
- * @param {...(acgraph.vector.Fill|acgraph.vector.Stroke|Function)} var_args .
- * @return {!(acgraph.vector.Fill|acgraph.vector.Stroke)} Normalized color.
- * @protected
- */
-anychart.linearGaugeModule.pointers.Base.prototype.normalizeColor = function(color, var_args) {
-  var fill;
-  if (goog.isFunction(color)) {
-    var sourceColor = arguments.length > 1 ?
-        this.normalizeColor.apply(this, goog.array.slice(arguments, 1)) :
-        this.color();
-    var scope = {
-      'index': this.getIterator().getIndex(),
-      'sourceColor': sourceColor,
-      'isVertical': this.isVertical()
-    };
-    fill = color.call(scope);
-  } else
-    fill = color;
-  return fill;
-};
-
-
-/**
- * Pointer fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {(!anychart.linearGaugeModule.pointers.Base|acgraph.vector.Fill|Function)} .
- */
-anychart.linearGaugeModule.pointers.Base.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var fill = goog.isFunction(opt_fillOrColorOrKeys) ?
-        opt_fillOrColorOrKeys :
-        acgraph.vector.normalizeFill.apply(null, arguments);
-    if (fill != this.fill_) {
-      this.fill_ = fill;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
-    }
-    return this;
-  }
-  return this.fill_;
-};
-
-
-/**
- * Pointer hover fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {(!anychart.linearGaugeModule.pointers.Base|acgraph.vector.Fill|Function)} .
- */
-anychart.linearGaugeModule.pointers.Base.prototype.hoverFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    this.hoverFill_ = goog.isFunction(opt_fillOrColorOrKeys) ?
-        opt_fillOrColorOrKeys :
-        acgraph.vector.normalizeFill.apply(null, arguments);
-    return this;
-  }
-  return this.hoverFill_;
-};
-
-
-/**
- * Pointer select fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {(!anychart.linearGaugeModule.pointers.Base|acgraph.vector.Fill|Function)} .
- */
-anychart.linearGaugeModule.pointers.Base.prototype.selectFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    this.selectFill_ = goog.isFunction(opt_fillOrColorOrKeys) ?
-        opt_fillOrColorOrKeys :
-        acgraph.vector.normalizeFill.apply(null, arguments);
-    return this;
-  }
-  return this.selectFill_;
-};
-
-
-/**
- * Method that gets final fill color for the pointer, with all fallbacks taken into account.
- * @param {boolean} usePointSettings If point settings should count too (iterator questioning).
- * @param {anychart.PointState|number} pointState Point state.
- * @return {!acgraph.vector.Fill} Final hover stroke for the current row.
- * @protected
- */
-anychart.linearGaugeModule.pointers.Base.prototype.getFinalFill = function(usePointSettings, pointState) {
-  var iterator = this.getIterator();
-  iterator.select(/** @type {number} */ (this.dataIndex()));
-  var normalColor = /** @type {acgraph.vector.Fill|Function} */((usePointSettings && iterator.get('fill')) || this.fill());
-  var result;
-  if (this.state.isStateContains(pointState, anychart.PointState.SELECT)) {
-    result = this.normalizeColor(
-        /** @type {acgraph.vector.Fill|Function} */(
-        (usePointSettings && iterator.get('selectFill')) || this.selectFill() || normalColor),
-        normalColor);
-  } else if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
-    result = this.normalizeColor(
-        /** @type {acgraph.vector.Fill|Function} */(
-        (usePointSettings && iterator.get('hoverFill')) || this.hoverFill() || normalColor),
-        normalColor);
-  } else {
-    result = this.normalizeColor(normalColor);
-  }
-
-  return acgraph.vector.normalizeFill(/** @type {!acgraph.vector.Fill} */(result));
-};
-
-
-/**
- * Pointer stroke.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|Function|string|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {(!anychart.linearGaugeModule.pointers.Base|acgraph.vector.Stroke|Function)} .
- */
-anychart.linearGaugeModule.pointers.Base.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var stroke = goog.isFunction(opt_strokeOrFill) ?
-        opt_strokeOrFill :
-        acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (stroke != this.stroke_) {
-      this.stroke_ = stroke;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
-    }
-    return this;
-  }
-  return this.stroke_;
-};
-
-
-/**
- * Pointer hover stroke.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|Function|string|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {(!anychart.linearGaugeModule.pointers.Base|acgraph.vector.Stroke|Function)} .
- */
-anychart.linearGaugeModule.pointers.Base.prototype.hoverStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    this.hoverStroke_ = goog.isFunction(opt_strokeOrFill) ?
-        opt_strokeOrFill :
-        acgraph.vector.normalizeStroke.apply(null, arguments);
-    return this;
-  }
-  return this.hoverStroke_;
-};
-
-
-/**
- * Pointer select stroke.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|Function|string|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {(!anychart.linearGaugeModule.pointers.Base|acgraph.vector.Stroke|Function)} .
- */
-anychart.linearGaugeModule.pointers.Base.prototype.selectStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    this.selectStroke_ = goog.isFunction(opt_strokeOrFill) ?
-        opt_strokeOrFill :
-        acgraph.vector.normalizeStroke.apply(null, arguments);
-    return this;
-  }
-  return this.selectStroke_;
-};
-
-
-/**
- * Method that gets final stroke color for the pointer, with all fallbacks taken into account.
- * @param {boolean} usePointSettings If point settings should count too (iterator questioning).
- * @param {anychart.PointState|number} pointState Point state.
- * @return {!acgraph.vector.Stroke} Final hover stroke for the current row.
- * @protected
- */
-anychart.linearGaugeModule.pointers.Base.prototype.getFinalStroke = function(usePointSettings, pointState) {
-  var iterator = this.getIterator();
-  iterator.select(/** @type {number} */ (this.dataIndex()));
-  var normalColor = /** @type {acgraph.vector.Stroke|Function} */((usePointSettings && iterator.get('stroke')) || this.stroke());
-  var result;
-  if (this.state.isStateContains(pointState, anychart.PointState.SELECT)) {
-    result = this.normalizeColor(
-        /** @type {acgraph.vector.Stroke|Function} */(
-        (usePointSettings && iterator.get('selectStroke')) || this.selectStroke() || normalColor),
-        normalColor);
-  } else if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
-    result = this.normalizeColor(
-        /** @type {acgraph.vector.Stroke|Function} */(
-        (usePointSettings && iterator.get('hoverStroke')) || this.hoverStroke() || normalColor),
-        normalColor);
-  } else {
-    result = this.normalizeColor(normalColor);
-  }
-
-  return acgraph.vector.normalizeStroke(/** @type {!acgraph.vector.Stroke} */(result));
-};
-
-
-/**
- * Pointer hatch fill.
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|acgraph.vector.HatchFill.HatchFillType|
- * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.linearGaugeModule.pointers.Base|boolean} Hatch fill.
- */
-anychart.linearGaugeModule.pointers.Base.prototype.hatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrTypeOrState)) {
-    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
-        opt_patternFillOrTypeOrState :
-        acgraph.vector.normalizeHatchFill.apply(null, arguments);
-
-    if (hatchFill != this.hatchFill_) {
-      this.hatchFill_ = hatchFill;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
-    }
-    return this;
-  }
-  return this.hatchFill_;
-};
-
-
-/**
- * Pointer hover hatch fill.
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|acgraph.vector.HatchFill.HatchFillType|
- * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.linearGaugeModule.pointers.Base|boolean} Hatch fill.
- */
-anychart.linearGaugeModule.pointers.Base.prototype.hoverHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrTypeOrState)) {
-    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
-        opt_patternFillOrTypeOrState :
-        acgraph.vector.normalizeHatchFill.apply(null, arguments);
-
-    if (hatchFill !== this.hoverHatchFill_)
-      this.hoverHatchFill_ = hatchFill;
-    return this;
-  }
-  return this.hoverHatchFill_;
-};
-
-
-/**
- * Pointer select hatch fill.
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|acgraph.vector.HatchFill.HatchFillType|
- * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.linearGaugeModule.pointers.Base|boolean} Hatch fill.
- */
-anychart.linearGaugeModule.pointers.Base.prototype.selectHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrTypeOrState)) {
-    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
-        opt_patternFillOrTypeOrState :
-        acgraph.vector.normalizeHatchFill.apply(null, arguments);
-
-    if (hatchFill !== this.selectHatchFill_)
-      this.selectHatchFill_ = hatchFill;
-    return this;
-  }
-  return this.selectHatchFill_;
-};
-
-
-/**
- * Method that gets the final hatch fill for a pointer, with all fallbacks taken into account.
- * @param {boolean} usePointSettings If point settings should count too (iterator questioning).
- * @param {anychart.PointState|number} pointState Point state.
- * @return {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} Final hatch fill.
- */
-anychart.linearGaugeModule.pointers.Base.prototype.getFinalHatchFill = function(usePointSettings, pointState) {
-  var iterator = this.getIterator();
-  iterator.select(/** @type {number} */ (this.dataIndex()));
-
-  var normalHatchFill;
-  if (usePointSettings && goog.isDef(iterator.get('hatchFill'))) {
-    normalHatchFill = iterator.get('hatchFill');
-  } else {
-    normalHatchFill = this.hatchFill();
-  }
-
-  var hatchFill;
-  if (this.state.isStateContains(pointState, anychart.PointState.SELECT)) {
-    if (usePointSettings && goog.isDef(iterator.get('selectHatchFill'))) {
-      hatchFill = iterator.get('selectHatchFill');
-    } else if (goog.isDef(this.selectHatchFill())) {
-      hatchFill = this.selectHatchFill();
-    } else {
-      hatchFill = normalHatchFill;
-    }
-  } else if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
-    if (usePointSettings && goog.isDef(iterator.get('hoverHatchFill'))) {
-      hatchFill = iterator.get('hoverHatchFill');
-    } else if (goog.isDef(this.hoverHatchFill())) {
-      hatchFill = this.hoverHatchFill();
-    } else {
-      hatchFill = normalHatchFill;
-    }
-  } else {
-    hatchFill = normalHatchFill;
-  }
-  return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */(
-      this.normalizeHatchFill(
-          /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|boolean|string} */(hatchFill)));
-};
-
-
-/**
- * Gets final normalized pattern/hatch fill.
- * @param {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|string|boolean} hatchFill Normal state hatch fill.
- * @return {acgraph.vector.HatchFill|acgraph.vector.PatternFill} Normalized hatch fill.
- * @protected
- */
-anychart.linearGaugeModule.pointers.Base.prototype.normalizeHatchFill = function(hatchFill) {
-  var fill;
-  var index = this.getIterator().getIndex();
-  if (goog.isFunction(hatchFill)) {
-    var sourceHatchFill = this.autoHatchFill ||
-        acgraph.vector.normalizeHatchFill(anychart.linearGaugeModule.pointers.Base.DEFAULT_HATCH_FILL_TYPE);
-    var scope = {
-      'index': index,
-      'sourceHatchFill': sourceHatchFill,
-      'isVertical': this.isVertical()
-    };
-    fill = acgraph.vector.normalizeHatchFill(hatchFill.call(scope));
-  } else if (goog.isBoolean(hatchFill)) {
-    fill = hatchFill ? this.autoHatchFill : null;
-  } else
-    fill = acgraph.vector.normalizeHatchFill(hatchFill);
-  return fill;
 };
 
 
@@ -968,33 +669,44 @@ anychart.linearGaugeModule.pointers.Base.prototype.getLabelsPosition = function(
 
   var iterator = this.getIterator();
 
-  var pointLabel = iterator.get('label');
-  var hoverPointLabel = hovered ? iterator.get('hoverLabel') : null;
-  var selectPointLabel = selected ? iterator.get('selectLabel') : null;
+  var pointNormalLabel = iterator.get('normal');
+  pointNormalLabel = goog.isDef(pointNormalLabel) ? pointNormalLabel['label'] : void 0;
+  var pointHoveredLabel = iterator.get('hovered');
+  pointHoveredLabel = goog.isDef(pointHoveredLabel) ? pointHoveredLabel['label'] : void 0;
+  var pointSelectedLabel = iterator.get('selected');
+  pointSelectedLabel = goog.isDef(pointSelectedLabel) ? pointSelectedLabel['label'] : void 0;
+
+  var pointLabel = anychart.utils.getFirstDefinedValue(pointNormalLabel, iterator.get('label'));
+  var hoverPointLabel = hovered ? anychart.utils.getFirstDefinedValue(pointHoveredLabel, iterator.get('hoverLabel')) : null;
+  var selectPointLabel = selected ? anychart.utils.getFirstDefinedValue(pointSelectedLabel, iterator.get('selectLabel')) : null;
 
   var labelPosition = pointLabel && pointLabel['position'] ? pointLabel['position'] : null;
   var labelHoverPosition = hoverPointLabel && hoverPointLabel['position'] ? hoverPointLabel['position'] : null;
   var labelSelectPosition = selectPointLabel && selectPointLabel['position'] ? selectPointLabel['position'] : null;
 
+  var labels = this.normal().labels();
+  var hoverLabels = this.hovered().labels();
+  var selectLabels = this.selected().labels();
+
   return /** @type {string} */(hovered || selected ?
       hovered ?
           labelHoverPosition ?
               labelHoverPosition :
-              this.hoverLabel().getOption('position') ?
-                  this.hoverLabel().getOption('position') :
+              hoverLabels.getOption('position') ?
+                  hoverLabels.getOption('position') :
                   labelPosition ?
                       labelPosition :
-                      this.label().getOption('position') :
+                      labels.getOption('position') :
           labelSelectPosition ?
               labelSelectPosition :
-              this.selectLabel().getOption('position') ?
-                  this.selectLabel().getOption('position') :
+              selectLabels.getOption('position') ?
+                  selectLabels.getOption('position') :
                   labelPosition ?
                       labelPosition :
-                      this.label().getOption('position') :
+                      labels.getOption('position') :
       labelPosition ?
           labelPosition :
-          this.label().getOption('position'));
+          labels.getOption('position'));
 };
 
 
@@ -1036,9 +748,9 @@ anychart.linearGaugeModule.pointers.Base.prototype.getLegendItemData = function(
     'meta': /** @type {Object} */ ({}),
     'text': /** @type {string} */ (itemText),
     'iconEnabled': true,
-    'iconStroke': this.getFinalStroke(false, anychart.PointState.NORMAL),
-    'iconFill': this.getFinalFill(false, anychart.PointState.NORMAL),
-    'iconHatchFill': this.getFinalHatchFill(false, anychart.PointState.NORMAL),
+    'iconStroke': /** @type {acgraph.vector.Stroke} */ (this.strokeResolver(this, anychart.PointState.NORMAL, true)),
+    'iconFill': /** @type {acgraph.vector.Fill} */ (this.fillResolver(this, anychart.PointState.NORMAL, true)),
+    'iconHatchFill': /** @type {acgraph.vector.PatternFill|acgraph.vector.HatchFill} */ (this.hatchFillResolver(this, anychart.PointState.NORMAL, true)),
     'disabled': !this.enabled()
   };
   goog.object.extend(ret, json);
@@ -1114,8 +826,8 @@ anychart.linearGaugeModule.pointers.Base.prototype.onLegendItemSignal = function
 anychart.linearGaugeModule.pointers.Base.prototype.remove = function() {
   if (this.rootLayer)
     this.rootLayer.parent(null);
-  if (this.label_)
-    this.label_.remove();
+  if (this.normal().labels())
+    this.normal().labels().remove();
 };
 
 
@@ -1136,9 +848,9 @@ anychart.linearGaugeModule.pointers.Base.prototype.drawHorizontal = goog.nullFun
  * @param {number|anychart.PointState} pointerState Pointer state.
  */
 anychart.linearGaugeModule.pointers.Base.prototype.colorizePointer = function(pointerState) {
-  var fill = this.getFinalFill(true, pointerState);
-  var stroke = this.getFinalStroke(true, pointerState);
-  var hatch = this.getFinalHatchFill(true, pointerState);
+  var fill = /** @type {acgraph.vector.Fill} */ (this.fillResolver(this, pointerState, false));
+  var stroke = /** @type {acgraph.vector.Stroke} */ (this.strokeResolver(this, pointerState, false));
+  var hatch = /** @type {acgraph.vector.Fill} */ (this.hatchFillResolver(this, pointerState, false));
 
   this.path.fill(fill);
   this.path.stroke(stroke);
@@ -1175,19 +887,29 @@ anychart.linearGaugeModule.pointers.Base.prototype.drawLabel = function(pointerS
   var selected = this.state.isStateContains(pointerState, anychart.PointState.SELECT);
   var hovered = !selected && this.state.isStateContains(pointerState, anychart.PointState.HOVER);
 
+  var labels = this.normal().labels();
+  var hoverLabels = this.hovered().labels();
+  var selectLabels = this.selected().labels();
   var labelsFactory;
   if (selected) {
-    labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.selectLabel());
+    labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(selectLabels);
   } else if (hovered) {
-    labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.hoverLabel());
+    labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(hoverLabels);
   } else {
     labelsFactory = null;
   }
 
-  var label = this.label().getLabel(0);
-  var pointLabel = iterator.get('label');
-  var hoverPointLabel = hovered ? iterator.get('hoverLabel') : null;
-  var selectPointLabel = selected ? iterator.get('selectLabel') : null;
+  var label = this.normal().labels().getLabel(0);
+  var pointNormalLabel = iterator.get('normal');
+  pointNormalLabel = goog.isDef(pointNormalLabel) ? pointNormalLabel['label'] : void 0;
+  var pointHoveredLabel = iterator.get('hovered');
+  pointHoveredLabel = goog.isDef(pointHoveredLabel) ? pointHoveredLabel['label'] : void 0;
+  var pointSelectedLabel = iterator.get('selected');
+  pointSelectedLabel = goog.isDef(pointSelectedLabel) ? pointSelectedLabel['label'] : void 0;
+
+  var pointLabel = anychart.utils.getFirstDefinedValue(pointNormalLabel, iterator.get('label'));
+  var hoverPointLabel = hovered ? anychart.utils.getFirstDefinedValue(pointHoveredLabel, iterator.get('hoverLabel')) : null;
+  var selectPointLabel = selected ? anychart.utils.getFirstDefinedValue(pointSelectedLabel, iterator.get('selectLabel')) : null;
 
   var labelEnabledState = pointLabel && goog.isDef(pointLabel['enabled']) ? pointLabel['enabled'] : null;
   var labelSelectEnabledState = selectPointLabel && goog.isDef(selectPointLabel['enabled']) ? selectPointLabel['enabled'] : null;
@@ -1196,21 +918,21 @@ anychart.linearGaugeModule.pointers.Base.prototype.drawLabel = function(pointerS
   isDraw = hovered || selected ?
       hovered ?
           goog.isNull(labelHoverEnabledState) ?
-              goog.isNull(this.hoverLabel().enabled()) ?
+              goog.isNull(hoverLabels.enabled()) ?
                   goog.isNull(labelEnabledState) ?
-                      this.label().enabled() :
+                      labels.enabled() :
                       labelEnabledState :
-                  this.hoverLabel().enabled() :
+                  hoverLabels.enabled() :
               labelHoverEnabledState :
           goog.isNull(labelSelectEnabledState) ?
-              goog.isNull(this.selectLabel().enabled()) ?
+              goog.isNull(selectLabels.enabled()) ?
                   goog.isNull(labelEnabledState) ?
-                      this.label().enabled() :
+                      labels.enabled() :
                       labelEnabledState :
-                  this.selectLabel().enabled() :
+                  selectLabels.enabled() :
               labelSelectEnabledState :
       goog.isNull(labelEnabledState) ?
-          this.label().enabled() :
+          labels.enabled() :
           labelEnabledState;
 
   if (isDraw) {
@@ -1219,11 +941,11 @@ anychart.linearGaugeModule.pointers.Base.prototype.drawLabel = function(pointerS
     var positionProvider = {'value': anychart.utils.getCoordinateByAnchor(bounds, position)};
     var formatProvider = this.createLabelContextProvider();
     if (label) {
-      this.label().dropCallsCache(0);
+      labels.dropCallsCache(0);
       label.formatProvider(formatProvider);
       label.positionProvider(positionProvider);
     } else {
-      label = this.label().add(formatProvider, positionProvider, 0);
+      label = labels.add(formatProvider, positionProvider, 0);
     }
 
     label.resetSettings();
@@ -1231,7 +953,7 @@ anychart.linearGaugeModule.pointers.Base.prototype.drawLabel = function(pointerS
     label.setSettings(/** @type {Object} */(pointLabel), /** @type {Object} */(hovered ? hoverPointLabel : selectPointLabel));
     label.draw();
   } else if (label) {
-    this.label().clear(label.getIndex());
+    labels.clear(label.getIndex());
   }
 };
 
@@ -1251,17 +973,18 @@ anychart.linearGaugeModule.pointers.Base.prototype.draw = function() {
     this.bindHandlersToGraphics(this.rootLayer);
   }
 
+  var labels = this.normal().labels();
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
     this.rootLayer.zIndex(/** @type {number} */ (this.zIndex()));
-    if (this.label_)
-      this.label_.zIndex(/** @type {number} */ (this.zIndex()));
+    if (labels)
+      labels.zIndex(/** @type {number} */ (this.zIndex()));
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
     this.rootLayer.parent(container);
-    if (this.label_)
-      this.label_.container(container);
+    if (labels)
+      labels.container(container);
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
@@ -1282,14 +1005,14 @@ anychart.linearGaugeModule.pointers.Base.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.GAUGE_POINTER_LABEL)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.GAUGE_POINTER_LABELS)) {
     if (iterator.select(/** @type {number} */ (this.dataIndex()))) {
       this.drawLabel(this.state.getPointStateByIndex(/** @type {number} */ (0)));
-      this.label().draw();
+      labels.draw();
     } else {
-      this.label().clear();
+      labels.clear();
     }
-    this.markConsistent(anychart.ConsistencyState.GAUGE_POINTER_LABEL);
+    this.markConsistent(anychart.ConsistencyState.GAUGE_POINTER_LABELS);
   }
 
   return this;
@@ -1589,9 +1312,6 @@ anychart.linearGaugeModule.pointers.Base.prototype.serialize = function() {
   json['width'] = this.width();
   json['offset'] = this.offset();
   json['dataIndex'] = this.dataIndex();
-  json['label'] = this.label().serialize();
-  json['hoverLabel'] = this.hoverLabel().getChangedSettings();
-  json['selectLabel'] = this.selectLabel().getChangedSettings();
   json['legendItem'] = this.legendItem().serialize();
 
   if (this.id_)
@@ -1602,92 +1322,9 @@ anychart.linearGaugeModule.pointers.Base.prototype.serialize = function() {
 
   if (this.color_)
     json['color'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.color_));
-  if (goog.isFunction(this.fill())) {
-    anychart.core.reporting.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Pointer fill']
-    );
-  } else {
-    json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.fill()));
-  }
-  if (goog.isFunction(this.hoverFill())) {
-    anychart.core.reporting.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Pointer hoverFill']
-    );
-  } else {
-    json['hoverFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverFill()));
-  }
-  if (goog.isFunction(this.selectFill())) {
-    anychart.core.reporting.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Pointer selectFill']
-    );
-  } else {
-    json['selectFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.selectFill()));
-  }
-  if (goog.isFunction(this.stroke())) {
-    anychart.core.reporting.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Pointer stroke']
-    );
-  } else {
-    json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.stroke()));
-  }
-  if (goog.isFunction(this.hoverStroke())) {
-    anychart.core.reporting.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Pointer hoverStroke']
-    );
-  } else {
-    json['hoverStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.hoverStroke()));
-  }
-  if (goog.isFunction(this.selectStroke())) {
-    anychart.core.reporting.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Pointer selectStroke']
-    );
-  } else {
-    json['selectStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.selectStroke()));
-  }
-  if (goog.isFunction(this.hatchFill())) {
-    anychart.core.reporting.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Pointer hatchFill']
-    );
-  } else {
-    if (goog.isDef(this.hatchFill()))
-      json['hatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hatchFill()));
-  }
-  if (goog.isFunction(this.hoverHatchFill())) {
-    anychart.core.reporting.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Pointer hoverHatchFill']
-    );
-  } else {
-    if (goog.isDef(this.hoverHatchFill()))
-      json['hoverHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/
-          (this.hoverHatchFill()));
-  }
-  if (goog.isFunction(this.selectHatchFill())) {
-    anychart.core.reporting.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Pointer selectHatchFill']
-    );
-  } else {
-    if (goog.isDef(this.selectHatchFill()))
-      json['selectHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/
-          (this.selectHatchFill()));
-  }
+  json['normal'] = this.normal().serialize();
+  json['hovered'] = this.hovered().serialize();
+  json['selected'] = this.selected().serialize();
   return json;
 };
 
@@ -1702,23 +1339,13 @@ anychart.linearGaugeModule.pointers.Base.prototype.setupByJSON = function(config
   this.width(config['width']);
   this.offset(config['offset']);
   this.dataIndex(config['dataIndex']);
-  this.label().setupInternal(!!opt_default, config['label']);
-  this.hoverLabel().setupInternal(!!opt_default, config['hoverLabel']);
-  this.selectLabel().setupInternal(!!opt_default, config['selectLabel']);
   this.legendItem().setup(config['legendItem']);
 
   this.color(config['color']);
-  this.fill(config['fill']);
-  this.hoverFill(config['hoverFill']);
-  this.selectFill(config['selectFill']);
-
-  this.stroke(config['stroke']);
-  this.hoverStroke(config['hoverStroke']);
-  this.selectStroke(config['selectStroke']);
-
-  this.hatchFill(config['hatchFill']);
-  this.hoverHatchFill(config['hoverHatchFill']);
-  this.selectHatchFill(config['selectHatchFill']);
+  this.normal_.setupInternal(!!opt_default, config);
+  this.normal_.setupInternal(!!opt_default, config['normal']);
+  this.hovered_.setupInternal(!!opt_default, config['hovered']);
+  this.selected_.setupInternal(!!opt_default, config['selected']);
 };
 
 
@@ -1735,10 +1362,10 @@ anychart.linearGaugeModule.pointers.Base.prototype.disposeInternal = function() 
     this.scale_.unlistenSignals(this.scaleInvalidated, this);
   this.scale_ = null;
 
-  goog.disposeAll(this.label_, this.hoverLabel_, this.selectLabel_);
-  this.label_ = null;
-  this.hoverLabel_ = null;
-  this.selectLabel_ = null;
+  goog.disposeAll(this.normal_, this.hovered_, this.selected_);
+  this.normal_ = null;
+  this.hovered_ = null;
+  this.selected_ = null;
 
   goog.dispose(this.legendItem_);
   this.legendItem_ = null;
@@ -1756,18 +1383,11 @@ anychart.linearGaugeModule.pointers.Base.prototype.disposeInternal = function() 
   proto['dataIndex'] = proto.dataIndex;
   proto['getGauge'] = proto.getGauge;
   proto['color'] = proto.color;
-  proto['fill'] = proto.fill;
-  proto['hoverFill'] = proto.hoverFill;
-  proto['selectFill'] = proto.selectFill;
-  proto['stroke'] = proto.stroke;
-  proto['hoverStroke'] = proto.hoverStroke;
-  proto['selectStroke'] = proto.selectStroke;
-  proto['hatchFill'] = proto.hatchFill;
-  proto['hoverHatchFill'] = proto.hoverHatchFill;
-  proto['selectHatchFill'] = proto.selectHatchFill;
-  proto['label'] = proto.label;
-  proto['hoverLabel'] = proto.hoverLabel;
-  proto['selectLabel'] = proto.selectLabel;
+
+  proto['normal'] = proto.normal;
+  proto['hovered'] = proto.hovered;
+  proto['selected'] = proto.selected;
+
   proto['width'] = proto.width;
   proto['offset'] = proto.offset;
   proto['hover'] = proto.hoverPoint;

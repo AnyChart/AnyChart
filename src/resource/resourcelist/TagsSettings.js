@@ -104,8 +104,7 @@ anychart.resourceModule.resourceList.TagsSettings.prototype.serialize = function
 
 /** @inheritDoc */
 anychart.resourceModule.resourceList.TagsSettings.prototype.disposeInternal = function() {
-  goog.dispose(this.padding_);
-  goog.dispose(this.background_);
+  goog.disposeAll(this.padding_, this.background_);
   anychart.resourceModule.resourceList.TagsSettings.base(this, 'disposeInternal');
 };
 

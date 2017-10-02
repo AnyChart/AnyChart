@@ -1,6 +1,7 @@
 goog.provide('anychart.data.Set');
 
 goog.require('anychart.core.Base');
+goog.require('anychart.data.IDataSource');
 goog.require('anychart.data.IView');
 goog.require('anychart.data.Mapping');
 goog.require('anychart.data.csv.Parser');
@@ -122,6 +123,7 @@ goog.require('goog.array');
  *    here as a hash map.
  * @constructor
  * @implements {anychart.data.IView}
+ * @implements {anychart.data.IDataSource}
  * @extends {anychart.core.Base}
  */
 anychart.data.Set = function(opt_data, opt_settings) {
@@ -170,6 +172,72 @@ anychart.data.Set.prototype.simpleValuesSeen_ = false;
 
 
 /**
+ * Recursively adds complex object to seen fields.
+ * {hovered: { markers: {fill: 'red'} }} will be added as
+ * hovered: {
+ *   markers: {
+ *     fill : true
+ *   }
+ * }
+ * So afterwards you can check the existance of the field with
+ * checkFieldExist('hovered.markers') or checkFieldExist('hovered.markers.fill')
+ * @param {string} fieldName
+ * @param {Object} dataRow
+ * @param {Object} fieldsSeen
+ */
+anychart.data.Set.prototype.recursivelyAddSeenFields = function(fieldName, dataRow, fieldsSeen) {
+  var seen = fieldsSeen[fieldName] = {};
+  var row = dataRow[fieldName];
+  for (var i in row) {
+    if (goog.typeOf(row[i]) == 'object')
+      this.recursivelyAddSeenFields(i, row, seen);
+    else
+      seen[i] = true;
+  }
+};
+
+
+/**
+ * Processes the data to get this.largestSeenRowLength_ and this.objectFieldsSeen_.
+ * @param {IArrayLike} val - Data value.
+ * @private
+ * @return {!Array} - Processed.
+ */
+anychart.data.Set.prototype.processData_ = function(val) {
+  var data = [];
+  for (var i = 0; i < val.length; i++) {
+    var row = val[i];
+    var dataRow;
+    if (goog.isArray(row)) {
+      var valuesLength = row.length;
+      if (this.largestSeenRowLength_ < valuesLength) {
+        this.largestSeenRowLength_ = valuesLength;
+      }
+      dataRow = goog.array.slice(row, 0);
+    } else if (goog.isObject(row)) { // we are sure that this is object in this case so we can avoid double checking
+      if (!this.objectFieldsSeen_) {
+        this.objectFieldsSeen_ = {};
+      }
+      dataRow = {};
+      for (var j in row) {
+        dataRow[j] = row[j];
+        if (goog.typeOf(row[j]) == 'object') {
+          this.recursivelyAddSeenFields(j, row, this.objectFieldsSeen_);
+        } else {
+          this.objectFieldsSeen_[j] = true;
+        }
+      }
+    } else {
+      this.simpleValuesSeen_ = true;
+      dataRow = row;
+    }
+    data.push(dataRow);
+  }
+  return data;
+};
+
+
+/**
  * Getter/setter for data.
  * @param {(Array|string)=} opt_value .
  * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_settings If CSV string is passed, you
@@ -183,42 +251,7 @@ anychart.data.Set.prototype.data = function(opt_value, opt_settings) {
       opt_value = anychart.data.parseText(opt_value, opt_settings);
 
     if (goog.isArrayLike(opt_value)) {
-      var data = [];
-      for (var i = 0; i < opt_value.length; i++) {
-        var row = opt_value[i];
-        var dataRow;
-        if (goog.isArray(row)) {
-          var valuesLength = row.length;
-          if (this.largestSeenRowLength_ < valuesLength) {
-            // if (this.objectFieldsSeen_) {
-            //   // if we have seen objects, than we have converted the largestSeenRowLength_ representation to the fields
-            //   // map already and now we should add fields to that representation
-            //   for (i = this.largestSeenRowLength_; i < valuesLength; i++) {
-            //     this.objectFieldsSeen_[i] = true;
-            //   }
-            // }
-            this.largestSeenRowLength_ = valuesLength;
-          }
-          dataRow = goog.array.slice(row, 0);
-        } else if (goog.isObject(row)) { // we are sure that this is object in this case so we can avoid double checking
-          if (!this.objectFieldsSeen_) {
-            this.objectFieldsSeen_ = {};
-            // for (i = 0; i < this.largestSeenRowLength_; i++) {
-            //   this.objectFieldsSeen_[i] = true;
-            // }
-          }
-          dataRow = {};
-          for (var j in row) {
-            dataRow[j] = row[j];
-            this.objectFieldsSeen_[j] = true;
-          }
-        } else {
-          this.simpleValuesSeen_ = true;
-          dataRow = row;
-        }
-        data.push(dataRow);
-      }
-      this.storage_ = data;
+      this.storage_ = this.processData_(opt_value);
       this.dispatchSignal(anychart.Signal.DATA_CHANGED);
     } else {
       if (this.storage_ && this.storage_.length > 0) {
@@ -268,6 +301,16 @@ anychart.data.Set.prototype.row = function(rowIndex, opt_value) {
 
 
 /**
+ * Returns row by index.
+ * @param {number} rowIndex
+ * @return {*}
+ */
+anychart.data.Set.prototype.getRow = function(rowIndex) {
+  return this.row(rowIndex);
+};
+
+
+/**
  * Appends new rows to the set. Each argument is a row that will be appended to the Set.
  * @example
  * var chart = anychart.column();
@@ -289,7 +332,7 @@ anychart.data.Set.prototype.row = function(rowIndex, opt_value) {
  */
 anychart.data.Set.prototype.append = function(var_args) {
   anychart.globalLock.lock();
-  this.storage_.push.apply(this.storage_, arguments);
+  this.storage_.push.apply(this.storage_, this.processData_(arguments));
   this.dispatchSignal(anychart.Signal.DATA_CHANGED);
   anychart.globalLock.unlock();
   return this;
@@ -314,7 +357,7 @@ anychart.data.Set.prototype.append = function(var_args) {
  */
 anychart.data.Set.prototype.insert = function(row, opt_index) {
   anychart.globalLock.lock();
-  goog.array.insertAt(this.storage_, row, opt_index);
+  goog.array.insertAt(this.storage_, this.processData_([row])[0], opt_index);
   this.dispatchSignal(anychart.Signal.DATA_CHANGED);
   anychart.globalLock.unlock();
   return this;
@@ -390,18 +433,61 @@ anychart.data.Set.prototype.getMappings = function() {
 anychart.data.Set.prototype.checkFieldExist = function(nameOrColumn) {
   if (goog.isNumber(nameOrColumn))
     return this.largestSeenRowLength_ > nameOrColumn;
-  return !!(this.objectFieldsSeen_ && this.objectFieldsSeen_[nameOrColumn]);
+  if (!this.objectFieldsSeen_)
+    return false;
+  var rv = this.objectFieldsSeen_;
+  var path = nameOrColumn.split('.');
+  var seen = true;
+  for (var i = 0; i < path.length; i++) {
+    if (goog.isDef(rv[path[i]]))
+      rv = rv[path[i]];
+    else {
+      seen = false;
+      break;
+    }
+  }
+  return seen;
 };
 
 
 /**
- * Set field as seen.
- * @param {string} fieldName Field name.
+ * Populates passed object with field names known to the storage and returns the new number of fields in it.
+ * @param {Object} result
+ * @param {number} resultLength
+ * @return {number}
  */
-anychart.data.Set.prototype.addSeenField = function(fieldName) {
+anychart.data.Set.prototype.populateObjWithKnownFields = function(result, resultLength) {
+  var i;
+  for (i = 0; i < this.largestSeenRowLength_; i++) {
+    populate(i);
+  }
+  if (this.objectFieldsSeen_)
+    for (i in this.objectFieldsSeen_)
+      populate(i);
+  if (this.simpleValuesSeen_) {
+    populate('value');
+  }
+  return resultLength;
+
+  function populate(i) {
+    if (!(i in result))
+      result[i] = resultLength++;
+  }
+};
+
+
+/**
+ * Set field as seen. (Recursively in case of complex object)
+ * @param {string} fieldName Field name.
+ * @param {!Object} dataRow Data row.
+ */
+anychart.data.Set.prototype.addSeenField = function(fieldName, dataRow) {
   if (!this.objectFieldsSeen_)
     this.objectFieldsSeen_ = {};
-  this.objectFieldsSeen_[fieldName] = true;
+  if (goog.typeOf(dataRow[fieldName]) == 'object')
+    this.recursivelyAddSeenFields(fieldName, dataRow, this.objectFieldsSeen_);
+  else
+    this.objectFieldsSeen_[fieldName] = true;
 };
 
 

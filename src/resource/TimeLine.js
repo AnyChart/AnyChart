@@ -385,6 +385,12 @@ anychart.resourceModule.TimeLine.prototype.hasOwnOption = function(name) {
 };
 
 
+/** @inheritDoc */
+anychart.resourceModule.TimeLine.prototype.isResolvable = function() {
+  return true;
+};
+
+
 //endregion
 //region --- IResolvable implementation
 /** @inheritDoc */
@@ -604,7 +610,7 @@ anychart.resourceModule.TimeLine.prototype.labelsConfiguration = function(row, c
   var settings = holiday ? this.holidaysLabelSettings[row] : this.weekdaysLabelSettings[row];
 
   var padding = settings['padding'];
-  if (padding && !(padding instanceof anychart.core.utils.Padding)) {
+  if (padding && !(anychart.utils.instanceOf(padding, anychart.core.utils.Padding))) {
     if (!this.tempPadding_) this.tempPadding_ = new anychart.core.utils.Padding();
     this.tempPadding_.setup(settings['padding']);
     padding = this.tempPadding_;

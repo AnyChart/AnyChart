@@ -11,14 +11,12 @@ before_install:
   - ./build.py libs
   - pip install maxcdn --user
 
-script: 
-  - ./build.py compile
-  - ./build.py css
-  - ls -lah /home/travis/build/AnyChart/AnyChart/out/
-
-after_success:
+script:
   - echo -e "//registry.npmjs.org/:_authToken=$NPM_TOKEN\n" >> ~/.npmrc
   - echo -e "Host $STATIC_HOST\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
-  - ./bin/export_version.sh
-  - ./bin/upload_dev_files.sh
-  - ./bin/upload_release_files.sh
+  - git rev-parse HEAD >> ./dist/commit-hash.txt
+  - ./bin/make_build.sh
+
+
+after_success:
+  - curl -X POST $TESTS_HOST/ci_test --data "branch=$TRAVIS_BRANCH&commit=$TRAVIS_COMMIT"

@@ -68,6 +68,42 @@ anychart.core.utils.GlobalTooltipContainer.GLOBAL_STAGE_DOM_ELEMENT_STYLE = {
 
 
 /**
+ * Global stage.getDomWrapper() style.
+ * @type {Object}
+ * @const
+ */
+anychart.core.utils.GlobalTooltipContainer.LOCAL_STAGE_WRAPPER_STYLE_VML = {
+  'position': 'fixed',
+  'left': 0,
+  'top': 0,
+  'opacity': 1,
+  'width': '1px',
+  'height': '1px'
+};
+
+
+
+/**
+ * Global stage.domElement() style.
+ * @type {Object}
+ * @const
+ */
+anychart.core.utils.GlobalTooltipContainer.GLOBAL_STAGE_DOM_ELEMENT_STYLE_VML = {
+  'position': 'fixed',
+  'left': 0,
+  'top': 0,
+  'opacity': 1,
+  'pointer-events': 'none',
+  'overflow': '',
+  'display': '',
+  'width': '',
+  'height': ''
+};
+
+
+
+
+/**
  * @inheritDoc
  */
 anychart.core.utils.GlobalTooltipContainer.prototype.applyStyle = function() {
@@ -77,8 +113,13 @@ anychart.core.utils.GlobalTooltipContainer.prototype.applyStyle = function() {
   } else {
     goog.style.setStyle(this.getRoot(), anychart.core.utils.GlobalTooltipContainer.GLOBAL_CONTAINER_STYLE);
   }
-  goog.style.setStyle(this.getStage().getDomWrapper(), anychart.core.utils.LocalTooltipContainer.LOCAL_STAGE_WRAPPER_STYLE);
-  goog.style.setStyle(this.getStage().domElement(), anychart.core.utils.GlobalTooltipContainer.GLOBAL_STAGE_DOM_ELEMENT_STYLE);
+  if (acgraph.type() == acgraph.StageType.SVG) {
+    goog.style.setStyle(this.getStage().getDomWrapper(), anychart.core.utils.LocalTooltipContainer.LOCAL_STAGE_WRAPPER_STYLE);
+    goog.style.setStyle(this.getStage().domElement(), anychart.core.utils.GlobalTooltipContainer.GLOBAL_STAGE_DOM_ELEMENT_STYLE);
+  } else {
+    goog.style.setStyle(this.getStage().getDomWrapper(), anychart.core.utils.GlobalTooltipContainer.LOCAL_STAGE_WRAPPER_STYLE_VML);
+    goog.style.setStyle(this.getStage().domElement(), anychart.core.utils.GlobalTooltipContainer.GLOBAL_STAGE_DOM_ELEMENT_STYLE_VML);
+  }
   this.updateStageSize();
 };
 
@@ -87,8 +128,10 @@ anychart.core.utils.GlobalTooltipContainer.prototype.applyStyle = function() {
  * Updates stage size.
  */
 anychart.core.utils.GlobalTooltipContainer.prototype.updateStageSize = function() {
-  var newSize = this.bufferedVsm_.getSize();
-  this.getStage().resize(newSize.width, newSize.height);
+  if (acgraph.type() == acgraph.StageType.SVG) {
+    var newSize = this.bufferedVsm_.getSize();
+    this.getStage().resize(newSize.width, newSize.height);
+  }
 };
 
 

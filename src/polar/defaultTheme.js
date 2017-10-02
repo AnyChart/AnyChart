@@ -44,7 +44,8 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'startAngle': 0,
     'innerRadius': 0,
     'sortPointsByX': false,
-    'grids': [{}, {'layout': 'circuit'}],
+    'xGrids': [{}],
+    'yGrids': [{}],
     'minorGrids': [],
     'scales': [
       {
@@ -58,6 +59,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'yScale': 1,
     'barsPadding': 0,
     'barGroupsPadding': 0,
+    'maxPointWidth': '100%',
     'a11y': {
       'titleFormat': anychart.core.defaultTheme.scatterA11yTitleFormatter
     }

@@ -4,7 +4,7 @@ goog.require('anychart'); // otherwise we can't use anychart.chartTypesMap objec
 goog.require('anychart.colorScalesModule.Ordinal');
 goog.require('anychart.core.Axis');
 goog.require('anychart.core.CartesianBase');
-goog.require('anychart.core.Grid');
+goog.require('anychart.core.GridBase');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.ChartScroller');
 goog.require('anychart.core.utils.IZoomableChart');
@@ -112,18 +112,9 @@ anychart.heatmapModule.Chart.prototype.seriesConfig = (function() {
  * @const {Array.<string>}
  */
 anychart.heatmapModule.Chart.PROXY_METHODS = ([
-  'fill',
-  'hoverFill',
-  'selectFill',
-  'stroke',
-  'hoverStroke',
-  'selectStroke',
-  'hatchFill',
-  'hoverHatchFill',
-  'selectHatchFill',
-  'markers',
-  'hoverMarkers',
-  'selectMarkers'
+  'normal',
+  'hovered',
+  'selected'
 ]);
 
 
@@ -162,6 +153,7 @@ anychart.heatmapModule.Chart.REVERSE_PROXY_METHODS = ([
     anychart.heatmapModule.Chart.prototype[name] = goog.partial(proxy, name);
   }
 })();
+anychart.core.settings.populateAliases(anychart.heatmapModule.Chart, ['fill', 'stroke', 'hatchFill', 'labels', 'markers'], 'normal');
 
 
 /** @inheritDoc */
@@ -265,12 +257,27 @@ anychart.heatmapModule.Chart.prototype.scrollerChangeHandler = function(e) {
 };
 
 
-/** @inheritDoc */
-anychart.heatmapModule.Chart.prototype.checkXScaleType = function(scale) {
-  var res = (scale instanceof anychart.scales.Ordinal) && !scale.isColorScale();
-  if (!res)
-    anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['HeatMap chart scale', 'ordinal']);
-  return res;
+/**
+ * @return {anychart.scales.Base.ScaleTypes}
+ */
+anychart.heatmapModule.Chart.prototype.getXScaleAllowedTypes = function() {
+  return anychart.scales.Base.ScaleTypes.ORDINAL;
+};
+
+
+/**
+ * @return {Array}
+ */
+anychart.heatmapModule.Chart.prototype.getXScaleWrongTypeError = function() {
+  return ['HeatMap chart scale', 'ordinal'];
+};
+
+
+/**
+ * @return {anychart.enums.ScaleTypes}
+ */
+anychart.heatmapModule.Chart.prototype.getYScaleDefaultType = function() {
+  return anychart.enums.ScaleTypes.ORDINAL;
 };
 
 
@@ -282,35 +289,28 @@ anychart.heatmapModule.Chart.prototype.onGridSignal = function(event) {
 };
 
 
-/** @inheritDoc */
-anychart.heatmapModule.Chart.prototype.checkYScaleType = anychart.heatmapModule.Chart.prototype.checkXScaleType;
-
-
-/** @inheritDoc */
-anychart.heatmapModule.Chart.prototype.createScaleByType = function(value, isXScale, returnNullOnError) {
-  value = String(value).toLowerCase();
-  return (returnNullOnError && value != 'ordinal' && value != 'ord' && value != 'discrete') ?
-      null :
-      anychart.scales.ordinal();
-};
-
-
 /**
  * Color scale.
- * @param {anychart.colorScalesModule.Ordinal=} opt_value
+ * @param {(anychart.colorScalesModule.Ordinal|Object|anychart.enums.ScaleTypes)=} opt_value
  * @return {anychart.heatmapModule.Chart|anychart.colorScalesModule.Ordinal}
  */
 anychart.heatmapModule.Chart.prototype.colorScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.colorScale_ != opt_value) {
-      if (this.colorScale_)
-        this.colorScale_.unlistenSignals(this.colorScaleInvalidated_, this);
-      this.colorScale_ = opt_value;
-      if (this.colorScale_)
-        this.colorScale_.listenSignals(this.colorScaleInvalidated_, this);
-
+    if (goog.isNull(opt_value) && this.colorScale_) {
+      this.colorScale_ = null;
       this.invalidate(anychart.ConsistencyState.HEATMAP_COLOR_SCALE | anychart.ConsistencyState.CHART_LEGEND,
           anychart.Signal.NEEDS_REDRAW);
+    } else {
+      var val = anychart.scales.Base.setupScale(this.colorScale_, opt_value, null, anychart.scales.Base.ScaleTypes.COLOR_SCALES,
+          ['HeatMap chart color scale', 'ordinal-color, linear-color'], this.colorScaleInvalidated_, this);
+      if (val) {
+        var dispatch = this.colorScale_ == val;
+        this.colorScale_ = val;
+        this.colorScale_.resumeSignalsDispatching(dispatch);
+        if (!dispatch)
+          this.invalidate(anychart.ConsistencyState.HEATMAP_COLOR_SCALE | anychart.ConsistencyState.CHART_LEGEND,
+              anychart.Signal.NEEDS_REDRAW);
+      }
     }
     return this;
   }
@@ -342,7 +342,7 @@ anychart.heatmapModule.Chart.prototype.createLegendItemsProvider = function(sour
     // we need to calculate statistics
     this.calculate();
     var scale = this.colorScale();
-    if (scale && scale instanceof anychart.colorScalesModule.Ordinal) {
+    if (scale && anychart.utils.instanceOf(scale, anychart.colorScalesModule.Ordinal)) {
       var series = this.series_;
       var ranges = scale.getProcessedRanges();
       for (i = 0, count = ranges.length; i < count; i++) {
@@ -719,6 +719,65 @@ anychart.heatmapModule.Chart.prototype.select = function(opt_indexOrIndexes) {
 };
 
 
+/** @inheritDoc */
+anychart.heatmapModule.Chart.prototype.getCsvData = function(mode) {
+  this.calculate();
+
+  var selected = mode == anychart.enums.ChartDataExportMode.SELECTED;
+  var tmp = this.getScaleHashes_(/** @type {anychart.scales.Ordinal} */(this.xScale()), selected);
+  var xValues = tmp.values;
+  var xNames = tmp.names;
+  tmp = this.getScaleHashes_(/** @type {anychart.scales.Ordinal} */(this.yScale()), selected);
+  var yValues = tmp.values;
+  var yNames = tmp.names;
+
+  var data = [];
+  for (var i = 0; i < yNames.length; i++) {
+    data.push([yNames[i]]);
+  }
+
+  var iterator = this.series_.getDetachedIterator();
+  while (iterator.advance()) {
+    var x = xValues[anychart.utils.hash(iterator.get('x'))];
+    var y = yValues[anychart.utils.hash(iterator.get('y'))];
+    var value = String(iterator.get('heat'));
+    if (!isNaN(x) && !isNaN(y)) {
+      // mind names column
+      data[y][x + 1] = value;
+    }
+  }
+
+  xNames.unshift('#');
+  return {headers: xNames, data: data};
+};
+
+
+/**
+ * @param {anychart.scales.Ordinal} scale
+ * @param {boolean} filterByZoom
+ * @return {{values: Object.<number>, names: Array.<string>}}
+ * @private
+ */
+anychart.heatmapModule.Chart.prototype.getScaleHashes_ = function(scale, filterByZoom) {
+  var result = {};
+  var index = 0;
+  var values = /** @type {Array} */(scale.values());
+  var names = [];
+  if (values) {
+    for (var i = 0; i < values.length; i++) {
+      var value = values[i];
+      var left = scale.transform(value, 0);
+      var right = scale.transform(value, 1);
+      if (!filterByZoom || (Math.min(left, right) <= 1 && Math.max(left, right) >= 0)) {
+        result[anychart.utils.hash(value)] = index++;
+        names.push(String(value));
+      }
+    }
+  }
+  return {values: result, names: names};
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Setup
@@ -841,7 +900,8 @@ anychart.heatmapModule.Chart.prototype.disposeInternal = function() {
 (function() {
   var proto = anychart.heatmapModule.Chart.prototype;
   proto['getType'] = proto.getType;
-  proto['grid'] = proto.grid;
+  proto['xGrid'] = proto.xGrid;
+  proto['yGrid'] = proto.yGrid;
   proto['xAxis'] = proto.xAxis;
   proto['yAxis'] = proto.yAxis;
   proto['xScale'] = proto.xScale;

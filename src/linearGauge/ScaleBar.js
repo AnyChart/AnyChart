@@ -97,7 +97,7 @@ anychart.linearGaugeModule.ScaleBar.prototype.to = function(opt_value) {
  */
 anychart.linearGaugeModule.ScaleBar.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (!(opt_value instanceof anychart.scales.ScatterBase)) {
+    if (!(anychart.utils.instanceOf(opt_value, anychart.scales.ScatterBase))) {
       anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['ScaleBar scale', 'scatter', 'linear, log']);
       return this;
     }
@@ -137,20 +137,21 @@ anychart.linearGaugeModule.ScaleBar.prototype.scaleInvalidated_ = function(event
 
 /**
  * Getter/setter for led color scale.
- * @param {(anychart.colorScalesModule.Linear|anychart.colorScalesModule.Ordinal)=} opt_value Led color scale.
+ * @param {(anychart.colorScalesModule.Linear|anychart.colorScalesModule.Ordinal|Object|anychart.enums.ScaleTypes)=} opt_value Led color scale.
  * @return {anychart.linearGaugeModule.ScaleBar|anychart.colorScalesModule.Linear|anychart.colorScalesModule.Ordinal} color scale or self for chaining.
  */
 anychart.linearGaugeModule.ScaleBar.prototype.colorScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.colorScale_ != opt_value) {
-      if (this.colorScale_)
-        this.colorScale_.unlistenSignals(this.colorScaleInvalidated_, this);
-      this.colorScale_ = opt_value;
-      if (this.colorScale_)
-        this.colorScale_.listenSignals(this.colorScaleInvalidated_, this);
+    var val = anychart.scales.Base.setupScale(this.colorScale_, opt_value, null,
+        anychart.scales.Base.ScaleTypes.COLOR_SCALES, null, this.colorScaleInvalidated_, this);
+    if (val) {
+      this.colorScale_ = /** @type {anychart.scales.Base} */(val);
+      var dispatch = this.colorScale_ == val;
       this.fill_ = null;
       this.stroke_ = null;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+      this.colorScale_.resumeSignalsDispatching(dispatch);
+      if (!dispatch)
+        this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -526,7 +527,7 @@ anychart.linearGaugeModule.ScaleBar.prototype.draw = function() {
       colors = colorScale.colors();
     var inverted = this.scale().inverted();
     var path, fill, stroke;
-    if (colorScale instanceof anychart.colorScalesModule.Linear) {
+    if (anychart.utils.instanceOf(colorScale, anychart.colorScalesModule.Linear)) {
       var offsets = goog.array.map(colors, function(color) {
         return color['offset'];
       });
@@ -554,7 +555,7 @@ anychart.linearGaugeModule.ScaleBar.prototype.draw = function() {
           .close();
       path.fill(fill).stroke('none');
       path.clip(this.clipPath_);
-    } else if (colorScale instanceof anychart.colorScalesModule.Ordinal) {
+    } else if (anychart.utils.instanceOf(colorScale, anychart.colorScalesModule.Ordinal)) {
       if (colorScale.needsAutoCalc())
         colorScale.startAutoCalc().extendDataRange(0, 1).finishAutoCalc();
       var ranges = colorScale.getProcessedRanges();

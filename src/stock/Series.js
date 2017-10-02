@@ -97,7 +97,7 @@ goog.inherits(anychart.stockModule.Series, anychart.core.series.Base);
 /** @inheritDoc */
 anychart.stockModule.Series.prototype.getCategoryWidth = function(opt_categoryIndex) {
   var xScale = this.getXScale();
-  if (xScale instanceof anychart.stockModule.scales.Ordinal)
+  if (anychart.utils.instanceOf(xScale, anychart.stockModule.scales.Ordinal))
     return this.pixelBoundsCache.width / (xScale.getMaximumIndex() - xScale.getMinimumIndex());
   else {
     var minDistance = (/** @type {anychart.core.IGroupingProvider} */(this.chart)).getCurrentMinDistance();
@@ -157,10 +157,10 @@ anychart.stockModule.Series.prototype.updateComparisonZero = function() {
   /** @type {?anychart.stockModule.data.TableSelectable.RowProxy} */
   var row;
   var scale = this.yScale();
-  if (this.supportsComparison() && !this.planIsStacked() && (scale instanceof anychart.scales.Linear)) {
+  if (this.supportsComparison() && !this.planIsStacked() && (anychart.utils.instanceOf(scale, anychart.scales.Linear))) {
     var mode = /** @type {anychart.enums.ScaleComparisonMode} */(scale.comparisonMode());
     if (mode != anychart.enums.ScaleComparisonMode.NONE) {
-      row = this.data_.getRowByDataSource(/** @type {anychart.enums.DataSource|number} */(scale.compareWith()));
+      row = this.data_.getRowByDataSource(/** @type {anychart.enums.ComparisonDataSource|number} */(scale.compareWith()));
     }
   }
   // if we have found a row to get value from - we cast it to number
@@ -212,15 +212,15 @@ anychart.stockModule.Series.prototype.data = function(opt_value, opt_mappingSett
     this.dataSource_ = opt_value;
 
     // creating data table if needed
-    if (!(opt_value instanceof anychart.stockModule.data.Table) && !(opt_value instanceof anychart.stockModule.data.TableMapping)) {
+    if (!(anychart.utils.instanceOf(opt_value, anychart.stockModule.data.Table)) && !(anychart.utils.instanceOf(opt_value, anychart.stockModule.data.TableMapping))) {
       data = new anychart.stockModule.data.Table();
       if (opt_value)
-        data.addData(opt_value, false, opt_csvSettings);
+        data.addData(/** @type {!(Array.<Array.<*>>|string)} */(opt_value), false, opt_csvSettings);
       this.dataToDispose_ = opt_value = data;
     }
 
     // creating data mapping if needed
-    if (opt_value instanceof anychart.stockModule.data.Table) {
+    if (anychart.utils.instanceOf(opt_value, anychart.stockModule.data.Table)) {
       opt_value = opt_value.mapAs(opt_mappingSettings);
       if (!opt_mappingSettings) {
         opt_value.addField('value', 1, anychart.enums.AggregationType.AVERAGE);
@@ -236,7 +236,7 @@ anychart.stockModule.Series.prototype.data = function(opt_value, opt_mappingSett
     }
 
     // applying passed value if it is suitable.
-    if (opt_value instanceof anychart.stockModule.data.TableMapping) {
+    if (anychart.utils.instanceOf(opt_value, anychart.stockModule.data.TableMapping)) {
       this.data_ = opt_value.createSelectable();
       this.registerDataSource();
     } else {
@@ -533,7 +533,7 @@ anychart.stockModule.Series.prototype.getLegendIconColor = function(legendItemJs
         name = rising ? 'risingFill' : 'fallingFill';
       }
     }
-    var resolver = anychart.color.getColorResolver([name], colorType);
+    var resolver = anychart.color.getColorResolver(name, colorType, false);
     return resolver(this, anychart.PointState.NORMAL, true);
   } else {
     return anychart.stockModule.Series.base(this, 'getLegendIconColor', legendItemJson, colorType, baseColor, context);

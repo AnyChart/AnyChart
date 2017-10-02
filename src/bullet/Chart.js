@@ -126,9 +126,9 @@ anychart.bulletModule.Chart.prototype.data = function(opt_value, opt_csvSettings
   if (goog.isDef(opt_value)) {
     if (this.rawData_ !== opt_value) {
       this.rawData_ = opt_value;
-      if (opt_value instanceof anychart.data.View) {
+      if (anychart.utils.instanceOf(opt_value, anychart.data.View)) {
         this.data_ = opt_value.derive(); // deriving a view to avoid interference with other view users
-      } else if (opt_value instanceof anychart.data.Set) {
+      } else if (anychart.utils.instanceOf(opt_value, anychart.data.Set)) {
         this.data_ = opt_value.mapAs();
       } else {
         opt_value = goog.isArray(opt_value) || goog.isString(opt_value) ? opt_value : null;
@@ -198,7 +198,7 @@ anychart.bulletModule.Chart.prototype.isHorizontal = function() {
 
 /**
  * Getter/setter for bullet scale.
- * @param {(anychart.scales.Base|anychart.enums.ScaleTypes)=} opt_value Scale to set.
+ * @param {(anychart.scales.Base|Object|anychart.enums.ScaleTypes)=} opt_value Scale to set.
  * @return {!(anychart.scales.Base|anychart.bulletModule.Chart)} Default chart scale value or itself for method chaining.
  */
 anychart.bulletModule.Chart.prototype.scale = function(opt_value) {
@@ -210,11 +210,11 @@ anychart.bulletModule.Chart.prototype.scale = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (goog.isString(opt_value)) {
-      opt_value = anychart.scales.Base.fromString(opt_value, false);
-    }
-    if (this.scale_ != opt_value) {
-      this.scale_ = opt_value;
+    var val = anychart.scales.Base.setupScale(this.scale_, opt_value, anychart.enums.ScaleTypes.LINEAR,
+        anychart.scales.Base.ScaleTypes.SCATTER);
+    if (val) {
+      this.scale_ = val;
+      val.resumeSignalsDispatching(false);
       this.invalidate(
           anychart.ConsistencyState.BULLET_SCALES |
           anychart.ConsistencyState.BULLET_AXES |
@@ -797,5 +797,5 @@ anychart.bulletModule.Chart.prototype.setupByJSON = function(config, opt_default
   proto['range'] = proto.range;//doc|ex
   proto['isHorizontal'] = proto.isHorizontal;//doc
   proto['getType'] = proto.getType;//doc
-  proto['noDataLabel'] = proto.noDataLabel;
+  proto['noData'] = proto.noData;
 })();

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsd:schema
         xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-        targetNamespace="http://anychart.com/schemas/7.14.3/xml-schema.xsd"
-        xmlns="http://anychart.com/schemas/7.14.3/xml-schema.xsd"
+        targetNamespace="http://anychart.com/schemas/8.0.0/xml-schema.xsd"
+        xmlns="http://anychart.com/schemas/8.0.0/xml-schema.xsd"
         elementFormDefault="qualified">
 
     <xsd:element name="anychart" type="Anychart"/>
@@ -40,8 +40,10 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="palette" type="palettes.Colors"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="hatch_fill_palette" type="palettes.HatchFills"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="marker_palette" type="palettes.Markers"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="grids" type="Grid_list"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="minor_grids" type="Grid_list"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="x_grids" type="Grid_list"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="y_grids" type="Grid_list"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="x_minor_grids" type="Grid_list"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="y_minor_grids" type="Grid_list"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="scales" type="Scale_list"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="x_scale" type="Scale"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="y_scale" type="Scale"/>
@@ -49,9 +51,9 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="a11y" type="utils.A11y"/>
             <!-- charts.TagCloud elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="angles" type="Angle_list"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="normal" type="anychart.core.TagCloudStateSettings"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hovered" type="anychart.core.TagCloudStateSettings"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="selected" type="anychart.core.TagCloudStateSettings"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="normal" type="core.StateSettings"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="hovered" type="core.StateSettings"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="selected" type="core.StateSettings"/>
             <!-- charts.Bullet elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="range_palette" type="palettes.Colors"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="scale" type="Scale"/>
@@ -69,22 +71,11 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="y_axis" type="core.axes.Radial"/>
             <!-- charts.Pie and charts.Funnel and charts.Pyramid elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="labels" type="core.LabelsFactory"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_labels" type="core.LabelsFactory"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_labels" type="core.LabelsFactory"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="tooltip" type="core.Tooltip"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="connector_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="hatch_fill" type="HatchFill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_hatch_fill" type="HatchFill"/>
-            <!-- charts.Funnel and charts.Pyramid elements -->
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_markers" type="core.MarkersFactory"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_markers" type="core.MarkersFactory"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_fill" type="Fill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_stroke" type="Stroke"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_hatch_fill" type="HatchFill"/>
             <!-- charts.Sparkline elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="clip" type="utils.Rect"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="last_fill" type="Fill"/>
@@ -115,7 +106,6 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="y_scroller" type="core.ChartScroller"/>
             <!-- charts.TreeMap elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="headers" type="core.LabelsFactory"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_headers" type="core.LabelsFactory"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="color_range" type="core.ColorRange"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="drill_to" type="DrillToList"/>
             <!-- new Cartesian elements -->
@@ -160,6 +150,8 @@
         <xsd:attribute name="bars_padding" type="xsd:double" default="0.1"/>
         <xsd:attribute name="min_bubble_size" type="simple.NumberOrPercent" default="5%"/>
         <xsd:attribute name="max_bubble_size" type="simple.NumberOrPercent" default="20%"/>
+        <xsd:attribute name="max_point_width" type="simple.NumberOrPercentOrNull" default="90%"/>
+        <xsd:attribute name="min_point_length" type="simple.NumberOrPercentOrNull" default="0"/>
         <xsd:attribute name="x_scale" type="simple.ChartScaleRef"/>
         <xsd:attribute name="y_scale" type="simple.ChartScaleRef"/>
         <!-- charts.Cartesian3d attrs -->
@@ -174,11 +166,6 @@
         <!-- charts.Funnel and charts.Pyramid attrs -->
         <xsd:attribute name="base_width" type="simple.NumberOrPercent" default="90%"/>
         <xsd:attribute name="points_padding" type="simple.NumberOrPercent" default="5"/>
-        <xsd:attribute name="hover_markers" type="simple.MarkerType"/>
-        <xsd:attribute name="select_markers" type="simple.MarkerType"/>
-        <xsd:attribute name="select_fill" type="xsd:string"/>
-        <xsd:attribute name="select_stroke" type="xsd:string"/>
-        <xsd:attribute name="select_hatch_fill" type="simple.HatchFill" default="false"/>
         <!-- chart.Polar and charts.Radar common attrs -->
         <xsd:attribute name="start_angle" type="xsd:double" default="0"/>
         <xsd:attribute name="sort_points_by_x" type="xsd:boolean" default="false"/>
@@ -188,8 +175,6 @@
         <!-- charts.Pie attrs -->
         <!--<xsd:attribute name="group" type="xsd:boolean"/> NO SUPPORT IN XML YET-->
         <xsd:attribute name="labels" type="simple.BoolOrNull"/>
-        <xsd:attribute name="hover_labels" type="simple.BoolOrNull"/>
-        <xsd:attribute name="select_labels" type="simple.BoolOrNull"/>
         <xsd:attribute name="tooltip" type="simple.BoolOrNull" default="true"/>
         <xsd:attribute name="sort" type="enums.Sort" default="none"/>
         <xsd:attribute name="radius" type="simple.NumberOrPercent" default="100%"/>
@@ -204,11 +189,8 @@
         <xsd:attribute name="connector_stroke" type="xsd:string" default="black 0.3"/>
         <xsd:attribute name="mode3d" type="xsd:boolean"/>
         <xsd:attribute name="fill" type="xsd:string"/>
-        <xsd:attribute name="hover_fill" type="xsd:string"/>
         <xsd:attribute name="stroke" type="xsd:string"/>
-        <xsd:attribute name="hover_stroke" type="xsd:string"/>
         <xsd:attribute name="hatch_fill" type="simple.HatchFill" default="false"/>
-        <xsd:attribute name="hover_hatch_fill" type="simple.HatchFill" default="false"/>
         <xsd:attribute name="force_hover_labels" type="simple.Bool" default="false"/>
         <!-- charts.Pyramid attrs -->
         <xsd:attribute name="reversed" type="simple.Bool" default="false"/>
@@ -245,7 +227,6 @@
         <!-- charts.TreeMap elements -->
         <xsd:attribute name="headers_display_mode" type="enums.LabelsDisplayMode" default="clip"/>
         <xsd:attribute name="headers" type="simple.BoolOrNull"/>
-        <xsd:attribute name="hover_headers" type="simple.BoolOrNull"/>
         <xsd:attribute name="max_depth" type="xsd:unsignedInt"/>
         <xsd:attribute name="hint_depth" type="xsd:unsignedInt"/>
         <xsd:attribute name="hint_opacity" type="simple.Ratio"/>
@@ -399,10 +380,11 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="crs_animation" type="utils.Animation"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="interactivity" type="utils.MapInteractivity"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="context_menu" type="utils.ContextMenu"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="normal" type="core.StateSettings"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="hovered" type="core.StateSettings"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="selected" type="core.StateSettings"/>
 
             <xsd:element minOccurs="0" maxOccurs="1" name="labels" type="core.LabelsFactory"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_labels" type="core.LabelsFactory"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_labels" type="core.LabelsFactory"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="select_marquee_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="select_marquee_stroke" type="Stroke"/>
             <!-- Common elements -->
@@ -437,8 +419,6 @@
         <xsd:attribute name="animation" type="simple.Bool" default="false"/>
         <xsd:attribute name="context_menu" type="simple.Bool" default="true"/>
         <xsd:attribute name="labels" type="simple.BoolOrNull"/>
-        <xsd:attribute name="hover_labels" type="simple.BoolOrNull"/>
-        <xsd:attribute name="select_labels" type="simple.BoolOrNull"/>
         <xsd:attribute name="select_marquee_fill" type="xsd:string"/>
         <xsd:attribute name="select_marquee_stroke" type="xsd:string"/>
         <!-- Map attrs -->
@@ -459,20 +439,12 @@
         <xsd:all>
             <!-- Base series -->
             <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_fill" type="Fill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_stroke" type="Stroke"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="hatch_fill" type="HatchFill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_hatch_fill" type="HatchFill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_hatch_fill" type="HatchFill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="color" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="meta" type="Meta"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="data" type="Data"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="labels" type="core.LabelsFactory"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_labels" type="core.LabelsFactory"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_labels" type="core.LabelsFactory"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="tooltip" type="core.Tooltip"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="clip" type="utils.Rect"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="error" type="utils.Error"/>
@@ -483,81 +455,45 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="a11y" type="utils.A11y"/>
             <!-- BaseWithMarkers series -->
             <xsd:element minOccurs="0" maxOccurs="1" name="markers" type="core.MarkersFactory"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_markers" type="core.MarkersFactory"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_markers" type="core.MarkersFactory"/>
             <!-- Bubble series -->
             <xsd:element minOccurs="0" maxOccurs="1" name="negative_fill" type="Fill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_negative_fill" type="Fill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_negative_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="negative_stroke" type="Stroke"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_negative_stroke" type="Stroke"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_negative_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="negative_hatch_fill" type="HatchFill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_negative_hatch_fill" type="HatchFill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_negative_hatch_fill" type="HatchFill"/>
             <!-- Candlestick series -->
             <xsd:element minOccurs="0" maxOccurs="1" name="rising_fill" type="Fill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_rising_fill" type="Fill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_rising_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="rising_hatch_fill" type="HatchFill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_rising_hatch_fill" type="HatchFill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_rising_hatch_fill" type="HatchFill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="falling_fill" type="Fill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_falling_fill" type="Fill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_falling_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="falling_hatch_fill" type="HatchFill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_falling_hatch_fill" type="HatchFill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_falling_hatch_fill" type="HatchFill"/>
             <!-- ContinuousRangeBase series -->
             <xsd:element minOccurs="0" maxOccurs="1" name="high_stroke" type="Stroke"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_high_stroke" type="Stroke"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_high_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="low_stroke" type="Stroke"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_low_stroke" type="Stroke"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_low_stroke" type="Stroke"/>
             <!-- OHLC series -->
             <xsd:element minOccurs="0" maxOccurs="1" name="rising_stroke" type="Stroke"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_rising_stroke" type="Stroke"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_rising_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="falling_stroke" type="Stroke"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_falling_stroke" type="Stroke"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_falling_stroke" type="Stroke"/>
             <!-- Box series -->
             <xsd:element minOccurs="0" maxOccurs="1" name="median_stroke" type="Stroke"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_median_stroke" type="Stroke"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_median_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="stem_stroke" type="Stroke"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_stem_stroke" type="Stroke"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_stem_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="whisker_stroke" type="Stroke"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_whisker_stroke" type="Stroke"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_whisker_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="outlier_markers" type="core.MarkersFactory"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_outlier_markers" type="core.MarkersFactory"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_outlier_markers" type="core.MarkersFactory"/>
             <!-- Choropleth series -->
             <xsd:element minOccurs="0" maxOccurs="1" name="color_scale" type="ColorScale"/>
+            <!-- States -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="normal" type="core.StateSettings"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="hovered" type="core.StateSettings"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="selected" type="core.StateSettings"/>
         </xsd:all>
         <!-- Base series -->
         <xsd:attribute name="is_vertical" type="simple.BoolOrNull"/>
         <xsd:attribute name="series_type" type="enums.SeriesTypes"/>
         <xsd:attribute name="fill" type="xsd:string"/>
-        <xsd:attribute name="hover_fill" type="xsd:string"/>
-        <xsd:attribute name="select_fill" type="xsd:string"/>
         <xsd:attribute name="stroke" type="xsd:string"/>
-        <xsd:attribute name="hover_stroke" type="xsd:string"/>
-        <xsd:attribute name="select_stroke" type="xsd:string"/>
         <xsd:attribute name="hatch_fill" type="simple.HatchFill"/>
-        <xsd:attribute name="hover_hatch_fill" type="simple.HatchFill"/>
-        <xsd:attribute name="select_hatch_fill" type="simple.HatchFill"/>
         <xsd:attribute name="color" type="xsd:string"/>
         <xsd:attribute name="x_point_position" type="simple.Ratio"/>
         <xsd:attribute name="name" type="xsd:string"/>
         <xsd:attribute name="id" type="xsd:string"/>
         <xsd:attribute name="autoIndex" type="xsd:unsignedInt"/>
         <xsd:attribute name="labels" type="simple.BoolOrNull" default="false"/>
-        <xsd:attribute name="hover_labels" type="simple.BoolOrNull" default="false"/>
-        <xsd:attribute name="select_labels" type="simple.BoolOrNull" default="false"/>
         <xsd:attribute name="tooltip" type="simple.BoolOrNull" default="true"/>
         <xsd:attribute name="clip" type="simple.Bool" default="true"/>
         <xsd:attribute name="error" type="simple.NumberOrPercentOrNullOrBool" default="true"/>
@@ -567,78 +503,42 @@
         <xsd:attribute name="selection_mode" type="enums.SelectionMode" />
         <!-- BaseWithMarkers series -->
         <xsd:attribute name="markers" type="simple.MarkerType"/>
-        <xsd:attribute name="hover_markers" type="simple.MarkerType"/>
-        <xsd:attribute name="select_markers" type="simple.MarkerType"/>
         <!-- Bubble series -->
         <xsd:attribute name="minimum_size" type="simple.NumberOrPercent" default="10%"/>
         <xsd:attribute name="maximum_size" type="simple.NumberOrPercent" default="95%"/>
         <xsd:attribute name="display_negative" type="simple.Bool" default="true"/>
         <xsd:attribute name="negative_fill" type="xsd:string"/>
-        <xsd:attribute name="hover_negative_fill" type="xsd:string"/>
-        <xsd:attribute name="select_negative_fill" type="xsd:string"/>
         <xsd:attribute name="negative_stroke" type="xsd:string"/>
-        <xsd:attribute name="hover_negative_stroke" type="xsd:string"/>
-        <xsd:attribute name="select_negative_stroke" type="xsd:string"/>
         <xsd:attribute name="negative_hatch_fill" type="simple.HatchFill"/>
-        <xsd:attribute name="hover_negative_hatch_fill" type="simple.HatchFill"/>
-        <xsd:attribute name="select_negative_hatch_fill" type="simple.HatchFill"/>
         <!-- Candlestick series -->
         <xsd:attribute name="rising_fill" type="xsd:string"/>
-        <xsd:attribute name="hover_rising_fill" type="xsd:string"/>
-        <xsd:attribute name="select_rising_fill" type="xsd:string"/>
         <xsd:attribute name="rising_hatch_fill" type="simple.HatchFill"/>
-        <xsd:attribute name="hover_rising_hatch_fill" type="simple.HatchFill"/>
-        <xsd:attribute name="select_rising_hatch_fill" type="simple.HatchFill"/>
         <xsd:attribute name="falling_fill" type="xsd:string"/>
-        <xsd:attribute name="hover_falling_fill" type="xsd:string"/>
-        <xsd:attribute name="select_falling_fill" type="xsd:string"/>
         <xsd:attribute name="falling_hatch_fill" type="simple.HatchFill"/>
-        <xsd:attribute name="hover_falling_hatch_fill" type="simple.HatchFill"/>
-        <xsd:attribute name="select_falling_hatch_fill" type="simple.HatchFill"/>
         <!-- ContinuousSeriesBase series -->
         <xsd:attribute name="connect_missing_points" type="simple.Bool" default="false"/>
         <!-- ContinuousRangeBase series -->
         <xsd:attribute name="high_stroke" type="xsd:string"/>
-        <xsd:attribute name="hover_high_stroke" type="xsd:string"/>
-        <xsd:attribute name="select_high_stroke" type="xsd:string"/>
         <xsd:attribute name="low_stroke" type="xsd:string"/>
-        <xsd:attribute name="hover_low_stroke" type="xsd:string"/>
-        <xsd:attribute name="select_low_stroke" type="xsd:string"/>
         <!-- Marker series -->
         <xsd:attribute name="size" type="xsd:double"/>
-        <xsd:attribute name="hover_size" type="xsd:double"/>
-        <xsd:attribute name="select_size" type="xsd:double"/>
         <xsd:attribute name="type" type="enums.MarkerType"/>
-        <xsd:attribute name="hover_type" type="enums.MarkerType"/>
-        <xsd:attribute name="select_type" type="enums.MarkerType"/>
         <!-- OHLC series -->
         <xsd:attribute name="rising_stroke" type="xsd:string"/>
-        <xsd:attribute name="hover_rising_stroke" type="xsd:string"/>
-        <xsd:attribute name="select_rising_stroke" type="xsd:string"/>
         <xsd:attribute name="falling_stroke" type="xsd:string"/>
-        <xsd:attribute name="hover_falling_stroke" type="xsd:string"/>
-        <xsd:attribute name="select_falling_stroke" type="xsd:string"/>
         <!-- WidthBased series -->
         <xsd:attribute name="point_width" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="max_point_width" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="min_point_length" type="simple.NumberOrPercentOrNull"/>
         <!-- Polar ContinuousBase series -->
         <xsd:attribute name="closed" type="simple.Bool" default="true"/>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
         <!-- Box series -->
         <xsd:attribute name="median_stroke" type="xsd:string"/>
-        <xsd:attribute name="hover_median_stroke" type="xsd:string"/>
-        <xsd:attribute name="select_median_stroke" type="xsd:string"/>
         <xsd:attribute name="stem_stroke" type="xsd:string"/>
-        <xsd:attribute name="hover_stem_stroke" type="xsd:string"/>
-        <xsd:attribute name="select_stem_stroke" type="xsd:string"/>
         <xsd:attribute name="whisker_stroke" type="xsd:string"/>
-        <xsd:attribute name="hover_whisker_stroke" type="xsd:string"/>
-        <xsd:attribute name="select_whisker_stroke" type="xsd:string"/>
         <xsd:attribute name="whisker_width" type="simple.NumberOrPercentOrNull"/>
-        <xsd:attribute name="hover_whisker_width" type="simple.NumberOrPercentOrNull"/>
-        <xsd:attribute name="select_whisker_width" type="simple.NumberOrPercentOrNull"/>
         <xsd:attribute name="outlier_markers" type="simple.MarkerType"/>
-        <xsd:attribute name="hover_outlier_markers" type="simple.MarkerType"/>
-        <xsd:attribute name="select_outlier_markers" type="simple.MarkerType"/>
         <!-- Step series -->
         <xsd:attribute name="step_direction" type="enums.StepDirection"/>
         <!-- Map series -->
@@ -670,6 +570,86 @@
             <xsd:any processContents="skip"/>
         </xsd:sequence>
         <xsd:anyAttribute processContents="skip"/>
+    </xsd:complexType>
+
+    <!-- core types -->
+    <xsd:complexType name="core.StateSettings">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="negative_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="rising_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="falling_fill" type="Fill"/>
+
+            <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="low_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="high_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="negative_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="rising_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="falling_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="median_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="stem_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="whisker_stroke" type="Stroke"/>
+
+            <xsd:element minOccurs="0" maxOccurs="1" name="hatch_fill" type="HatchFill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="negative_hatch_fill" type="HatchFill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="rising_hatch_fill" type="HatchFill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="falling_hatch_fill" type="HatchFill"/>
+            <!-- annotations -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="trend" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="grid" type="Stroke"/>
+            <!-- linear gauge tank -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="empty_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="empty_hatch_fill" type="HatchFill"/>
+            <!-- pert tasks -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="dummy_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="dummy_stroke" type="Stroke"/>
+            <!-- factories -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="labels" type="core.LabelsFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="markers" type="core.MarkersFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="outlier_markers" type="core.MarkersFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="headers" type="core.LabelsFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="upper_labels" type="core.LabelsFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="lower_labels" type="core.LabelsFactory"/>
+        </xsd:all>
+        <xsd:attribute name="labels" type="simple.BoolOrNull"/>
+        <xsd:attribute name="markers" type="simple.MarkerType"/>
+        <xsd:attribute name="outlier_markers" type="simple.MarkerType"/>
+        <xsd:attribute name="headers" type="simple.BoolOrNull"/>
+        <xsd:attribute name="upper_labels" type="simple.BoolOrNull" default="true"/>
+        <xsd:attribute name="lower_labels" type="simple.BoolOrNull" default="true"/>
+
+        <xsd:attribute name="fill" type="xsd:string" />
+        <xsd:attribute name="negative_fill" type="xsd:string" />
+        <xsd:attribute name="rising_fill" type="xsd:string" />
+        <xsd:attribute name="falling_fill" type="xsd:string" />
+        <xsd:attribute name="stroke" type="xsd:string" />
+        <xsd:attribute name="low_stroke" type="xsd:string" />
+        <xsd:attribute name="high_stroke" type="xsd:string" />
+        <xsd:attribute name="negative_stroke" type="xsd:string" />
+        <xsd:attribute name="rising_stroke" type="xsd:string" />
+        <xsd:attribute name="falling_stroke" type="xsd:string" />
+        <xsd:attribute name="median_stroke" type="xsd:string" />
+        <xsd:attribute name="stem_stroke" type="xsd:string" />
+        <xsd:attribute name="whisker_stroke" type="xsd:string" />
+        <xsd:attribute name="hatch_fill" type="simple.HatchFill" />
+        <xsd:attribute name="negative_hatch_fill" type="simple.HatchFill" />
+        <xsd:attribute name="rising_hatch_fill" type="simple.HatchFill" />
+        <xsd:attribute name="falling_hatch_fill" type="simple.HatchFill" />
+        <xsd:attribute name="trend" type="xsd:string" />
+        <xsd:attribute name="grid" type="xsd:string" />
+        <xsd:attribute name="empty_fill" type="xsd:string" />
+        <xsd:attribute name="empty_hatch_fill" type="simple.HatchFill" />
+        <xsd:attribute name="whisker_width" type="xsd:string" />
+        <xsd:attribute name="type" type="enums.MarkerType" />
+        <xsd:attribute name="size" type="xsd:double" />
+        <xsd:attribute name="dummy_fill" type="xsd:string" />
+        <xsd:attribute name="dummy_stroke" type="xsd:string" />
+        <!-- tag cloud -->
+        <xsd:attribute name="font_size" type="xsd:string"/>
+        <xsd:attribute name="font_family" type="xsd:string"/>
+        <xsd:attribute name="font_style" type="enums.FontStyle"/>
+        <xsd:attribute name="font_variant" type="enums.FontVariant"/>
+        <xsd:attribute name="font_weight" type="xsd:string"/>
     </xsd:complexType>
 
     <!-- data complex types -->
@@ -998,18 +978,6 @@
         <xsd:attributeGroup ref="attrs.VisualBase"/>
     </xsd:complexType>
 
-    <xsd:complexType name="anychart.core.TagCloudStateSettings">
-        <xsd:all>
-            <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill"/>
-        </xsd:all>
-        <xsd:attribute name="font_size" type="xsd:string"/>
-        <xsd:attribute name="fill" type="xsd:string"/>
-        <xsd:attribute name="font_family" type="xsd:string"/>
-        <xsd:attribute name="font_style" type="enums.FontStyle"/>
-        <xsd:attribute name="font_variant" type="enums.FontVariant"/>
-        <xsd:attribute name="font_weight" type="xsd:string"/>
-    </xsd:complexType>
-
     <xsd:complexType name="core.axisMarkers.Text_list">
         <xsd:sequence minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="text_axes_marker" type="core.axisMarkers.Text"/>
@@ -1042,16 +1010,14 @@
 
     <xsd:complexType name="Grid">
         <xsd:all>
-            <xsd:element minOccurs="0" maxOccurs="1" name="odd_fill" type="Fill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="even_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="palette" type="palettes.Colors"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
         </xsd:all>
         <xsd:attribute name="is_minor" type="simple.Bool"/>
-        <xsd:attribute name="layout" type="enums.GridLayout"/>
         <xsd:attribute name="draw_first_line" type="simple.Bool" default="true"/>
         <xsd:attribute name="draw_last_line" type="simple.Bool" default="true"/>
-        <xsd:attribute name="odd_fill" type="xsd:string"/>
-        <xsd:attribute name="even_fill" type="xsd:string"/>
+        <xsd:attribute name="fill" type="xsd:string"/>
         <xsd:attribute name="stroke" type="xsd:string"/>
         <xsd:attribute name="scale" type="simple.ScaleRef"/>
         <xsd:attribute name="x_scale" type="simple.ScaleRef"/>
@@ -1068,15 +1034,14 @@
 
     <xsd:complexType name="core.grids.Map">
         <xsd:all>
-            <xsd:element minOccurs="0" maxOccurs="1" name="odd_fill" type="Fill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="even_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="palette" type="palettes.Colors"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="minor_stroke" type="Stroke"/>
         </xsd:all>
         <xsd:attribute name="draw_first_line" type="simple.Bool" default="true"/>
         <xsd:attribute name="draw_last_line" type="simple.Bool" default="true"/>
-        <xsd:attribute name="odd_fill" type="xsd:string"/>
-        <xsd:attribute name="even_fill" type="xsd:string"/>
+        <xsd:attribute name="fill" type="xsd:string"/>
         <xsd:attribute name="stroke" type="xsd:string"/>
         <xsd:attribute name="minor_stroke" type="xsd:string"/>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
@@ -1084,8 +1049,8 @@
 
     <xsd:complexType name="core.grids.MapSettings">
         <xsd:all>
-            <xsd:element minOccurs="0" maxOccurs="1" name="odd_fill" type="Fill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="even_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="palette" type="palettes.Colors"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="minor_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="vertical" type="core.grids.Map"/>
@@ -1095,8 +1060,7 @@
         <xsd:attribute name="horizontal" type="simple.Bool" default="false"/>
         <xsd:attribute name="draw_first_line" type="simple.Bool" default="true"/>
         <xsd:attribute name="draw_last_line" type="simple.Bool" default="true"/>
-        <xsd:attribute name="odd_fill" type="xsd:string"/>
-        <xsd:attribute name="even_fill" type="xsd:string"/>
+        <xsd:attribute name="fill" type="xsd:string"/>
         <xsd:attribute name="stroke" type="xsd:string"/>
         <xsd:attribute name="minor_stroke" type="xsd:string"/>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
@@ -1984,6 +1948,8 @@
         <xsd:attribute name="inverted" type="simple.Bool" default="false"/>
         <xsd:attribute name="stick_to_zero" type="simple.Bool"/>
         <xsd:attribute name="stack_mode" type="enums.ScaleStackMode" default="none"/>
+        <xsd:attribute name="comparison_mode" type="enums.ScaleComparisonMode" default="none"/>
+        <xsd:attribute name="stack_direction" type="enums.ScaleStackDirection" default="direct"/>
         <xsd:attribute name="log_base" type="xsd:double" default="10"/>
         <xsd:attribute name="names" type="xsd:string" default="name"/>
         <xsd:attribute name="minimum" type="simple.DoubleOrNull" default="null"/>
@@ -2008,6 +1974,7 @@
         <xsd:attribute name="names" type="xsd:string" default="name"/>
         <xsd:attribute name="stick_to_zero" type="simple.Bool"/>
         <xsd:attribute name="stack_mode" type="enums.ScaleStackMode" default="none"/>
+        <xsd:attribute name="stack_direction" type="enums.ScaleStackDirection" default="direct"/>
         <xsd:attribute name="log_base" type="xsd:double" default="10"/>
         <xsd:attribute name="minimum" type="simple.DoubleOrNull" default="null"/>
         <xsd:attribute name="maximum" type="simple.DoubleOrNull" default="null"/>
@@ -2063,6 +2030,8 @@
         <xsd:attribute name="inverted" type="simple.Bool" default="false"/>
         <xsd:attribute name="stick_to_zero" type="simple.Bool"/>
         <xsd:attribute name="stack_mode" type="enums.ScaleStackMode" default="none"/>
+        <xsd:attribute name="comparison_mode" type="enums.ScaleComparisonMode" default="none"/>
+        <xsd:attribute name="stack_direction" type="enums.ScaleStackDirection" default="direct"/>
         <xsd:attribute name="log_base" type="xsd:double" default="10"/>
         <xsd:attribute name="minimum" type="simple.DoubleOrNull" default="null"/>
         <xsd:attribute name="maximum" type="simple.DoubleOrNull" default="null"/>
@@ -2084,6 +2053,7 @@
         <xsd:attribute name="inverted" type="simple.Bool" default="false"/>
         <xsd:attribute name="stick_to_zero" type="simple.Bool"/>
         <xsd:attribute name="stack_mode" type="enums.ScaleStackMode" default="none"/>
+        <xsd:attribute name="stack_direction" type="enums.ScaleStackDirection" default="direct"/>
         <xsd:attribute name="log_base" type="xsd:double" default="10"/>
         <xsd:attribute name="minimum" type="simple.DoubleOrNull" default="null"/>
         <xsd:attribute name="maximum" type="simple.DoubleOrNull" default="null"/>
@@ -2358,43 +2328,24 @@
         <xsd:all>
             <xsd:element minOccurs="0" maxOccurs="1" name="color" type="Fill" />
             <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill" />
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_fill" type="Fill" />
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_fill" type="Fill" />
             <xsd:element minOccurs="0" maxOccurs="1" name="empty_fill" type="Fill" />
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_empty_fill" type="Fill" />
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_empty_fill" type="Fill" />
             <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke" />
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_stroke" type="Stroke" />
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_stroke" type="Stroke" />
             <xsd:element minOccurs="0" maxOccurs="1" name="hatch_fill" type="HatchFill" />
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_hatch_fill" type="HatchFill" />
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_hatch_fill" type="HatchFill" />
             <xsd:element minOccurs="0" maxOccurs="1" name="empty_hatch_fill" type="HatchFill" />
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_empty_hatch_fill" type="HatchFill" />
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_empty_hatch_fill" type="HatchFill" />
             <xsd:element minOccurs="0" maxOccurs="1" name="legend_item" type="utils.LegendItemSettings" />
             <xsd:element minOccurs="0" maxOccurs="1" name="label" type="core.LabelsFactory" />
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_label" type="core.LabelsFactory" />
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_label" type="core.LabelsFactory" />
             <xsd:element minOccurs="0" maxOccurs="1" name="color_scale" type="LinearOrdinalColorScale" />
             <xsd:element minOccurs="0" maxOccurs="1" name="scale" type="Scale" />
+            <xsd:element minOccurs="0" maxOccurs="1" name="normal" type="core.StateSettings"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="hovered" type="core.StateSettings"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="selected" type="core.StateSettings"/>
         </xsd:all>
         <xsd:attribute name="color" type="xsd:string"/>
         <xsd:attribute name="fill" type="xsd:string"/>
-        <xsd:attribute name="hover_fill" type="xsd:string"/>
-        <xsd:attribute name="select_fill" type="xsd:string"/>
         <xsd:attribute name="empty_fill" type="xsd:string"/>
-        <xsd:attribute name="hover_empty_fill" type="xsd:string"/>
-        <xsd:attribute name="select_empty_fill" type="xsd:string"/>
         <xsd:attribute name="stroke" type="xsd:string"/>
-        <xsd:attribute name="hover_stroke" type="xsd:string"/>
-        <xsd:attribute name="select_stroke" type="xsd:string"/>
         <xsd:attribute name="hatch_fill" type="simple.HatchFill"/>
-        <xsd:attribute name="hover_hatch_fill" type="simple.HatchFill"/>
-        <xsd:attribute name="select_hatch_fill" type="simple.HatchFill"/>
         <xsd:attribute name="empty_hatch_fill" type="simple.HatchFill"/>
-        <xsd:attribute name="hover_empty_hatch_fill" type="simple.HatchFill"/>
-        <xsd:attribute name="select_empty_hatch_fill" type="simple.HatchFill"/>
         <xsd:attribute name="pointer_type" type="enums.LinearGaugePointerType" />
         <xsd:attribute name="id" type="xsd:string"/>
         <xsd:attribute name="auto_index" type="xsd:unsignedInt"/>
@@ -2513,15 +2464,14 @@
     <xsd:complexType name="core.ScrollerThumbs">
         <xsd:all>
             <xsd:element name="fill" type="Fill" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="hover_fill" type="Fill" minOccurs="0" maxOccurs="1"/>
             <xsd:element name="stroke" type="Stroke" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="hover_stroke" type="Stroke" minOccurs="0" maxOccurs="1"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="normal" type="core.StateSettings"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="hovered" type="core.StateSettings"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="selected" type="core.StateSettings"/>
         </xsd:all>
         <xsd:attribute name="enabled" type="simple.BoolOrNull"/>
         <xsd:attribute name="fill" type="xsd:string"/>
-        <xsd:attribute name="hover_fill" type="xsd:string"/>
         <xsd:attribute name="stroke" type="xsd:string"/>
-        <xsd:attribute name="hover_stroke" type="xsd:string"/>
         <xsd:attribute name="auto_hide" type="simple.Bool" default="false"/>
     </xsd:complexType>
 
@@ -2529,27 +2479,18 @@
         <xsd:all>
             <xsd:element name="color" type="Fill" minOccurs="0" maxOccurs="1"/>
             <xsd:element name="fill" type="Fill" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="hover_fill" type="Fill" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="select_fill" type="Fill" minOccurs="0" maxOccurs="1"/>
             <xsd:element name="stroke" type="Stroke" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="hover_stroke" type="Stroke" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="select_stroke" type="Stroke" minOccurs="0" maxOccurs="1"/>
             <xsd:element name="labels" type="core.LabelsFactory" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="hover_labels" type="core.LabelsFactory" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="select_labels" type="core.LabelsFactory" minOccurs="0" maxOccurs="1"/>
             <xsd:element name="tooltip" type="core.Tooltip" minOccurs="0" maxOccurs="1"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="normal" type="core.StateSettings"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="hovered" type="core.StateSettings"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="selected" type="core.StateSettings"/>
         </xsd:all>
         <xsd:attribute name="enabled" type="simple.BoolOrNull"/>
         <xsd:attribute name="color" type="xsd:string"/>
         <xsd:attribute name="fill" type="xsd:string"/>
-        <xsd:attribute name="hover_fill" type="xsd:string"/>
-        <xsd:attribute name="select_fill" type="xsd:string"/>
         <xsd:attribute name="stroke" type="xsd:string"/>
-        <xsd:attribute name="hover_stroke" type="xsd:string"/>
-        <xsd:attribute name="select_stroke" type="xsd:string"/>
         <xsd:attribute name="labels" type="simple.BoolOrNull" default="true"/>
-        <xsd:attribute name="hover_labels" type="simple.BoolOrNull" default="true"/>
-        <xsd:attribute name="select_labels" type="simple.BoolOrNull" default="true"/>
         <xsd:attribute name="shape" type="xsd:string" default="circle"/>
         <xsd:attribute name="size" type="simple.NumberOrPercent"/>
         <xsd:attribute name="tooltip" type="simple.BoolOrNull" default="true"/>
@@ -2559,38 +2500,25 @@
         <xsd:all>
             <xsd:element name="color" type="Fill" minOccurs="0" maxOccurs="1"/>
             <xsd:element name="fill" type="Fill" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="hover_fill" type="Fill" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="select_fill" type="Fill" minOccurs="0" maxOccurs="1"/>
             <xsd:element name="stroke" type="Stroke" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="hover_stroke" type="Stroke" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="select_stroke" type="Stroke" minOccurs="0" maxOccurs="1"/>
             <xsd:element name="dummy_fill" type="Fill" minOccurs="0" maxOccurs="1"/>
             <xsd:element name="dummy_stroke" type="Stroke" minOccurs="0" maxOccurs="1"/>
 
             <xsd:element name="upper_labels" type="core.LabelsFactory" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="hover_upper_labels" type="core.LabelsFactory" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="select_upper_labels" type="core.LabelsFactory" minOccurs="0" maxOccurs="1"/>
             <xsd:element name="lower_labels" type="core.LabelsFactory" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="hover_lower_labels" type="core.LabelsFactory" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="select_lower_labels" type="core.LabelsFactory" minOccurs="0" maxOccurs="1"/>
             <xsd:element name="tooltip" type="core.Tooltip" minOccurs="0" maxOccurs="1"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="normal" type="core.StateSettings"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="hovered" type="core.StateSettings"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="selected" type="core.StateSettings"/>
         </xsd:all>
         <xsd:attribute name="color" type="xsd:string"/>
         <xsd:attribute name="enabled" type="simple.BoolOrNull"/>
         <xsd:attribute name="fill" type="xsd:string"/>
-        <xsd:attribute name="hover_fill" type="xsd:string"/>
-        <xsd:attribute name="select_fill" type="xsd:string"/>
         <xsd:attribute name="stroke" type="xsd:string"/>
-        <xsd:attribute name="hover_stroke" type="xsd:string"/>
-        <xsd:attribute name="select_stroke" type="xsd:string"/>
         <xsd:attribute name="dummy_fill" type="xsd:string"/>
         <xsd:attribute name="dummy_stroke" type="xsd:string"/>
         <xsd:attribute name="upper_labels" type="simple.BoolOrNull" default="true"/>
-        <xsd:attribute name="hover_upper_labels" type="simple.BoolOrNull" default="true"/>
-        <xsd:attribute name="select_upper_labels" type="simple.BoolOrNull" default="true"/>
         <xsd:attribute name="lower_labels" type="simple.BoolOrNull" default="true"/>
-        <xsd:attribute name="hover_lower_labels" type="simple.BoolOrNull" default="true"/>
-        <xsd:attribute name="select_lower_labels" type="simple.BoolOrNull" default="true"/>
         <xsd:attribute name="tooltip" type="simple.BoolOrNull" default="true"/>
     </xsd:complexType>
 
@@ -2598,47 +2526,24 @@
     <xsd:complexType name="core.Intersections">
         <xsd:all>
             <xsd:element name="fill" type="Fill" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="hover_fill" type="Fill" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="select_fill" type="Fill" minOccurs="0" maxOccurs="1"/>
-
             <xsd:element name="stroke" type="Stroke" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="hover_stroke" type="Stroke" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="select_stroke" type="Stroke" minOccurs="0" maxOccurs="1"/>
-
-            <xsd:element minOccurs="0" maxOccurs="1" name="hatch_fill" type="HatchFill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_hatch_fill" type="HatchFill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_hatch_fill" type="HatchFill"/>
+            <xsd:element name="hatch_fill" minOccurs="0" maxOccurs="1" type="HatchFill"/>
 
             <xsd:element name="labels" type="core.LabelsFactory" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="hover_labels" type="core.LabelsFactory" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="select_labels" type="core.LabelsFactory" minOccurs="0" maxOccurs="1"/>
-
             <xsd:element name="markers" type="core.MarkersFactory" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="hover_markers" type="core.MarkersFactory" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="select_markers" type="core.MarkersFactory" minOccurs="0" maxOccurs="1"/>
 
             <xsd:element name="tooltip" type="core.Tooltip" minOccurs="0" maxOccurs="1"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="normal" type="core.StateSettings"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="hovered" type="core.StateSettings"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="selected" type="core.StateSettings"/>
         </xsd:all>
         <xsd:attribute name="enabled" type="simple.BoolOrNull"/>
         <xsd:attribute name="fill" type="xsd:string"/>
-        <xsd:attribute name="hover_fill" type="xsd:string"/>
-        <xsd:attribute name="select_fill" type="xsd:string"/>
-
         <xsd:attribute name="stroke" type="xsd:string"/>
-        <xsd:attribute name="hover_stroke" type="xsd:string"/>
-        <xsd:attribute name="select_stroke" type="xsd:string"/>
-
         <xsd:attribute name="hatch_fill" type="xsd:string"/>
-        <xsd:attribute name="hover_hatch_fill" type="xsd:string"/>
-        <xsd:attribute name="select_hatch_fill" type="xsd:string"/>
 
         <xsd:attribute name="labels" type="simple.BoolOrNull" default="true"/>
-        <xsd:attribute name="hover_labels" type="simple.BoolOrNull" default="true"/>
-        <xsd:attribute name="select_labels" type="simple.BoolOrNull" default="true"/>
-
         <xsd:attribute name="markers" type="simple.BoolOrNull" default="true"/>
-        <xsd:attribute name="hover_markers" type="simple.BoolOrNull" default="true"/>
-        <xsd:attribute name="select_markers" type="simple.BoolOrNull" default="true"/>
         <xsd:attribute name="tooltip" type="simple.BoolOrNull" default="true"/>
     </xsd:complexType>
 
@@ -3026,6 +2931,7 @@
             <xsd:enumeration value="heat-map"/>
             <xsd:enumeration value="tree-map"/>
             <xsd:enumeration value="line"/>
+            <xsd:enumeration value="line-3d"/>
             <xsd:enumeration value="vertical-line"/>
             <xsd:enumeration value="marker"/>
             <xsd:enumeration value="pie"/>
@@ -3268,6 +3174,21 @@
         </xsd:restriction>
     </xsd:simpleType>
 
+    <xsd:simpleType name="enums.ScaleComparisonMode">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="none"/>
+            <xsd:enumeration value="value"/>
+            <xsd:enumeration value="percent"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="enums.ScaleStackDirection">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="direct"/>
+            <xsd:enumeration value="reverse"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
     <xsd:simpleType name="enums.ScatterTicksMode">
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="linear"/>
@@ -3287,6 +3208,7 @@
             <xsd:enumeration value="candlestick"/>
             <xsd:enumeration value="column"/>
             <xsd:enumeration value="line"/>
+            <xsd:enumeration value="line-2d"/>
             <xsd:enumeration value="vertical-line"/>
             <xsd:enumeration value="marker"/>
             <xsd:enumeration value="vertical-marker"/>

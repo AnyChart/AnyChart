@@ -23,13 +23,25 @@ anychart.radarPolarBaseModule.Chart = function(categorizeData) {
    * @type {Array.<anychart.radarModule.Grid|anychart.polarModule.Grid>}
    * @private
    */
-  this.grids_ = [];
+  this.xGrids_ = [];
 
   /**
    * @type {Array.<anychart.radarModule.Grid|anychart.polarModule.Grid>}
    * @private
    */
-  this.minorGrids_ = [];
+  this.yGrids_ = [];
+
+  /**
+   * @type {Array.<anychart.radarModule.Grid|anychart.polarModule.Grid>}
+   * @private
+   */
+  this.xMinorGrids_ = [];
+
+  /**
+   * @type {Array.<anychart.radarModule.Grid|anychart.polarModule.Grid>}
+   * @private
+   */
+  this.yMinorGrids_ = [];
 
   function beforeInvalidation() {
     for (var i = 0; i < this.seriesList.length; i++) {
@@ -116,12 +128,23 @@ anychart.radarPolarBaseModule.Chart.prototype.createGridInstance = goog.abstract
 
 
 /**
- * Getter/setter for grid.
+ * Return z-index for grid.
+ * @param {boolean} isMajor .
+ * @return {number}
+ */
+anychart.radarPolarBaseModule.Chart.prototype.getGridZIndex = function(isMajor) {
+  var themeSettings = isMajor ? this.defaultGridSettings() : this.defaultMinorGridSettings();
+  return themeSettings['zIndex'] + goog.array.concat(this.xGrids_, this.yGrids_, this.xMinorGrids_, this.yMinorGrids_).length * 0.001;
+};
+
+
+/**
+ * Getter/setter for x grid.
  * @param {(Object|boolean|null|number)=} opt_indexOrValue Grid settings.
  * @param {(Object|boolean|null)=} opt_value Grid settings to set.
  * @return {!(anychart.radarModule.Grid|anychart.polarModule.Grid|anychart.radarPolarBaseModule.Chart)} Grid instance by index or itself for method chaining.
  */
-anychart.radarPolarBaseModule.Chart.prototype.grid = function(opt_indexOrValue, opt_value) {
+anychart.radarPolarBaseModule.Chart.prototype.xGrid = function(opt_indexOrValue, opt_value) {
   var index, value;
   index = anychart.utils.toNumber(opt_indexOrValue);
   if (isNaN(index)) {
@@ -131,13 +154,14 @@ anychart.radarPolarBaseModule.Chart.prototype.grid = function(opt_indexOrValue, 
     index = /** @type {number} */(opt_indexOrValue);
     value = opt_value;
   }
-  var grid = this.grids_[index];
+  var grid = this.xGrids_[index];
   if (!grid) {
     grid = this.createGridInstance();
-    grid.setChart(this);
+    grid.setOwner(this);
     grid.setDefaultLayout(anychart.enums.RadialGridLayout.RADIAL);
     grid.setup(this.defaultGridSettings());
-    this.grids_[index] = grid;
+    grid.zIndex(this.getGridZIndex(true));
+    this.xGrids_[index] = grid;
     this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal, this);
     this.invalidate(anychart.ConsistencyState.AXES_CHART_GRIDS, anychart.Signal.NEEDS_REDRAW);
@@ -153,12 +177,12 @@ anychart.radarPolarBaseModule.Chart.prototype.grid = function(opt_indexOrValue, 
 
 
 /**
- * Getter/setter for minorGrid.
- * @param {(Object|boolean|null|number)=} opt_indexOrValue Minor grid settings.
- * @param {(Object|boolean|null)=} opt_value Minor grid settings to set.
- * @return {!(anychart.radarModule.Grid|anychart.polarModule.Grid|anychart.radarPolarBaseModule.Chart)} Minor grid instance by index or itself for method chaining.
+ * Getter/setter for y grid.
+ * @param {(Object|boolean|null|number)=} opt_indexOrValue Grid settings.
+ * @param {(Object|boolean|null)=} opt_value Grid settings to set.
+ * @return {!(anychart.radarModule.Grid|anychart.polarModule.Grid|anychart.radarPolarBaseModule.Chart)} Grid instance by index or itself for method chaining.
  */
-anychart.radarPolarBaseModule.Chart.prototype.minorGrid = function(opt_indexOrValue, opt_value) {
+anychart.radarPolarBaseModule.Chart.prototype.yGrid = function(opt_indexOrValue, opt_value) {
   var index, value;
   index = anychart.utils.toNumber(opt_indexOrValue);
   if (isNaN(index)) {
@@ -168,13 +192,90 @@ anychart.radarPolarBaseModule.Chart.prototype.minorGrid = function(opt_indexOrVa
     index = /** @type {number} */(opt_indexOrValue);
     value = opt_value;
   }
-  var grid = this.minorGrids_[index];
+  var grid = this.yGrids_[index];
   if (!grid) {
     grid = this.createGridInstance();
-    grid.setChart(this);
+    grid.setOwner(this);
+    grid.setDefaultLayout(anychart.enums.RadialGridLayout.CIRCUIT);
+    grid.setup(this.defaultGridSettings());
+    grid.zIndex(this.getGridZIndex(true));
+    this.yGrids_[index] = grid;
+    this.registerDisposable(grid);
+    grid.listenSignals(this.onGridSignal, this);
+    this.invalidate(anychart.ConsistencyState.AXES_CHART_GRIDS, anychart.Signal.NEEDS_REDRAW);
+  }
+
+  if (goog.isDef(value)) {
+    grid.setup(value);
+    return this;
+  } else {
+    return grid;
+  }
+};
+
+
+/**
+ * Getter/setter for x minorGrid.
+ * @param {(Object|boolean|null|number)=} opt_indexOrValue Minor grid settings.
+ * @param {(Object|boolean|null)=} opt_value Minor grid settings to set.
+ * @return {!(anychart.radarModule.Grid|anychart.polarModule.Grid|anychart.radarPolarBaseModule.Chart)} Minor grid instance by index or itself for method chaining.
+ */
+anychart.radarPolarBaseModule.Chart.prototype.xMinorGrid = function(opt_indexOrValue, opt_value) {
+  var index, value;
+  index = anychart.utils.toNumber(opt_indexOrValue);
+  if (isNaN(index)) {
+    index = 0;
+    value = opt_indexOrValue;
+  } else {
+    index = /** @type {number} */(opt_indexOrValue);
+    value = opt_value;
+  }
+  var grid = this.xMinorGrids_[index];
+  if (!grid) {
+    grid = this.createGridInstance();
+    grid.setOwner(this);
+    grid.setDefaultLayout(anychart.enums.RadialGridLayout.RADIAL);
+    grid.setup(this.defaultMinorGridSettings());
+    grid.zIndex(this.getGridZIndex(false));
+    this.xMinorGrids_[index] = grid;
+    this.registerDisposable(grid);
+    grid.listenSignals(this.onGridSignal, this);
+    this.invalidate(anychart.ConsistencyState.AXES_CHART_GRIDS, anychart.Signal.NEEDS_REDRAW);
+  }
+
+  if (goog.isDef(value)) {
+    grid.setup(value);
+    return this;
+  } else {
+    return grid;
+  }
+};
+
+
+/**
+ * Getter/setter for y minorGrid.
+ * @param {(Object|boolean|null|number)=} opt_indexOrValue Minor grid settings.
+ * @param {(Object|boolean|null)=} opt_value Minor grid settings to set.
+ * @return {!(anychart.radarModule.Grid|anychart.polarModule.Grid|anychart.radarPolarBaseModule.Chart)} Minor grid instance by index or itself for method chaining.
+ */
+anychart.radarPolarBaseModule.Chart.prototype.yMinorGrid = function(opt_indexOrValue, opt_value) {
+  var index, value;
+  index = anychart.utils.toNumber(opt_indexOrValue);
+  if (isNaN(index)) {
+    index = 0;
+    value = opt_indexOrValue;
+  } else {
+    index = /** @type {number} */(opt_indexOrValue);
+    value = opt_value;
+  }
+  var grid = this.yMinorGrids_[index];
+  if (!grid) {
+    grid = this.createGridInstance();
+    grid.setOwner(this);
     grid.setDefaultLayout(anychart.enums.RadialGridLayout.CIRCUIT);
     grid.setup(this.defaultMinorGridSettings());
-    this.minorGrids_[index] = grid;
+    grid.zIndex(this.getGridZIndex(false));
+    this.yMinorGrids_[index] = grid;
     this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal, this);
     this.invalidate(anychart.ConsistencyState.AXES_CHART_GRIDS, anychart.Signal.NEEDS_REDRAW);
@@ -399,7 +500,7 @@ anychart.radarPolarBaseModule.Chart.prototype.drawContent = function(bounds) {
 
   var innerRadius = /** @type {string|number} */ (this.getOption('innerRadius'));
   if (this.hasInvalidationState(anychart.ConsistencyState.AXES_CHART_GRIDS)) {
-    var grids = goog.array.concat(this.grids_, this.minorGrids_);
+    var grids = goog.array.concat(this.xGrids_, this.yGrids_, this.xMinorGrids_, this.yMinorGrids_);
 
     for (i = 0, count = grids.length; i < count; i++) {
       var grid = grids[i];
@@ -528,7 +629,7 @@ anychart.radarPolarBaseModule.Chart.prototype.getSeriesStatus = function(event) 
       } else {
         index = series.data().findClosestByX(
             anychart.utils.toNumber(value),
-            series.xScale() instanceof anychart.scales.Ordinal);
+            anychart.utils.instanceOf(series.xScale(), anychart.scales.Ordinal));
       }
 
       iterator = series.getDetachedIterator();
@@ -585,8 +686,10 @@ anychart.radarPolarBaseModule.Chart.prototype.setupByJSONWithScales = function(c
   this.defaultGridSettings(config['defaultGridSettings']);
   this.defaultMinorGridSettings(config['defaultMinorGridSettings']);
 
-  this.setupElementsWithScales(config['grids'], this.grid, scalesInstances);
-  this.setupElementsWithScales(config['minorGrids'], this.minorGrid, scalesInstances);
+  this.setupElementsWithScales(config['xGrids'], this.xGrid, scalesInstances);
+  this.setupElementsWithScales(config['yGrids'], this.yGrid, scalesInstances);
+  this.setupElementsWithScales(config['xMinorGrids'], this.xMinorGrid, scalesInstances);
+  this.setupElementsWithScales(config['yMinorGrids'], this.yMinorGrid, scalesInstances);
 
   var json = config['xAxis'];
   this.xAxis().setupInternal(!!opt_default, json);
@@ -610,8 +713,10 @@ anychart.radarPolarBaseModule.Chart.prototype.serializeWithScales = function(jso
   json['xAxis'] = this.serializeAxis_(/** @type {anychart.radarModule.Axis|anychart.polarModule.Axis} */(this.xAxis()), scales, scaleIds, axesIds);
   json['yAxis'] = this.serializeAxis_(/** @type {anychart.radarPolarBaseModule.RadialAxis} */(this.yAxis()), scales, scaleIds, axesIds);
 
-  this.serializeElementsWithScales(json, 'grids', this.grids_, this.serializeGrid_, scales, scaleIds, axesIds);
-  this.serializeElementsWithScales(json, 'minorGrids', this.minorGrids_, this.serializeGrid_, scales, scaleIds, axesIds);
+  this.serializeElementsWithScales(json, 'xGrids', this.xGrids_, this.serializeGrid_, scales, scaleIds, axesIds);
+  this.serializeElementsWithScales(json, 'yGrids', this.yGrids_, this.serializeGrid_, scales, scaleIds, axesIds);
+  this.serializeElementsWithScales(json, 'xMinorGrids', this.xMinorGrids_, this.serializeGrid_, scales, scaleIds, axesIds);
+  this.serializeElementsWithScales(json, 'yMinorGrids', this.yMinorGrids_, this.serializeGrid_, scales, scaleIds, axesIds);
 };
 
 
@@ -650,7 +755,7 @@ anychart.radarPolarBaseModule.Chart.prototype.serializeGrid_ = function(item, sc
     var axisIndex = goog.array.indexOf(axesIds, goog.getUid(axis));
     if (axisIndex < 0) { //axis presents but not found in existing axes. Taking scale and layout from it.
       if (!('layout' in config)) {
-        config['layout'] = axis instanceof anychart.radarPolarBaseModule.RadialAxis ?
+        config['layout'] = anychart.utils.instanceOf(axis, anychart.radarPolarBaseModule.RadialAxis) ?
             anychart.enums.RadialGridLayout.CIRCUIT :
             anychart.enums.RadialGridLayout.RADIAL;
       }
@@ -677,8 +782,10 @@ anychart.radarPolarBaseModule.Chart.prototype.serializeGrid_ = function(item, sc
   var proto = anychart.radarPolarBaseModule.Chart.prototype;
   proto['xScale'] = proto.xScale;//doc|ex
   proto['yScale'] = proto.yScale;//doc|ex
-  proto['grid'] = proto.grid;//doc|ex
-  proto['minorGrid'] = proto.minorGrid;//doc|ex
+  proto['xGrid'] = proto.xGrid;//doc|ex
+  proto['yGrid'] = proto.yGrid;//doc|ex
+  proto['xMinorGrid'] = proto.xMinorGrid;//doc|ex
+  proto['yMinorGrid'] = proto.yMinorGrid;//doc|ex
   proto['xAxis'] = proto.xAxis;//doc|ex
   proto['yAxis'] = proto.yAxis;//doc|ex
   proto['getSeries'] = proto.getSeries;//doc|ex

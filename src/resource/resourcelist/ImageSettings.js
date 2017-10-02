@@ -30,35 +30,13 @@ goog.inherits(anychart.resourceModule.resourceList.ImageSettings, anychart.resou
 anychart.resourceModule.resourceList.ImageSettings.PROPERTY_DESCRIPTORS = (function() {
   var map = {};
 
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'size',
-      anychart.core.settings.numberOrPercentNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'borderRadius',
-      anychart.core.settings.arrayNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'opacity',
-      anychart.core.settings.ratioNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'align',
-      anychart.core.settings.stringNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'fittingMode',
-      anychart.core.settings.stringNormalizer);
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'size', anychart.core.settings.numberOrPercentNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'borderRadius', anychart.core.settings.arrayNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'opacity', anychart.core.settings.ratioNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'align', anychart.core.settings.stringNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'fittingMode', anychart.core.settings.stringNormalizer]
+  ]);
 
   return map;
 })();

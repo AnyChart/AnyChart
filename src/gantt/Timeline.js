@@ -1569,7 +1569,7 @@ anychart.ganttModule.TimeLine.prototype.labels = function(opt_value) {
 
   if (goog.isDef(opt_value)) {
     var redraw = true;
-    if (opt_value instanceof anychart.core.ui.LabelsFactory) {
+    if (anychart.utils.instanceOf(opt_value, anychart.core.ui.LabelsFactory)) {
       this.labelsFactory_.setup(opt_value.serialize());
     } else if (goog.isObject(opt_value)) {
       this.labelsFactory_.setup(opt_value);
@@ -1706,7 +1706,7 @@ anychart.ganttModule.TimeLine.prototype.markers = function(opt_value) {
 
   if (goog.isDef(opt_value)) {
     var redraw = true;
-    if (opt_value instanceof anychart.core.ui.MarkersFactory) {
+    if (anychart.utils.instanceOf(opt_value, anychart.core.ui.MarkersFactory)) {
       this.markersFactory_.setup(opt_value.serialize());
     } else if (goog.isObject(opt_value)) {
       this.markersFactory_.setup(opt_value);
@@ -2695,8 +2695,8 @@ anychart.ganttModule.TimeLine.prototype.getConnectorInteractivityEvent_ = functi
 anychart.ganttModule.TimeLine.prototype.patchConnectorEvent_ = function(evt) {
   if (evt && evt['originalEvent']) {
     var orig = evt['originalEvent'];
-    var domTarget = (orig instanceof acgraph.events.BrowserEvent) ? orig['target'] : orig['domTarget'];
-    if (domTarget && domTarget instanceof anychart.ganttModule.BaseGrid.Element && domTarget.type == anychart.enums.TLElementTypes.CONNECTOR) {
+    var domTarget = (anychart.utils.instanceOf(orig, acgraph.events.BrowserEvent)) ? orig['target'] : orig['domTarget'];
+    if (domTarget && anychart.utils.instanceOf(domTarget, anychart.ganttModule.BaseGrid.Element) && domTarget.type == anychart.enums.TLElementTypes.CONNECTOR) {
       var connector = /** @type {anychart.ganttModule.BaseGrid.Element} */ (domTarget);
       var connEvent = this.getConnectorInteractivityEvent_(orig);
       for (var key in connector.meta)
@@ -2741,7 +2741,7 @@ anychart.ganttModule.TimeLine.prototype.addMouseMoveAndOver = function(evt) {
     var domTarget = orig['domTarget'];
     if (this.editable) {
       var el;
-      if (domTarget && domTarget instanceof anychart.ganttModule.BaseGrid.Element) {
+      if (domTarget && anychart.utils.instanceOf(domTarget, anychart.ganttModule.BaseGrid.Element)) {
         el = /** @type {anychart.ganttModule.BaseGrid.Element} */ (domTarget);
         var dataItem = evt['item'];
         var id = dataItem.get(anychart.enums.GanttDataFields.ID);
@@ -2988,13 +2988,13 @@ anychart.ganttModule.TimeLine.prototype.mouseDown = function(evt) {
  */
 anychart.ganttModule.TimeLine.prototype.addConnector = function(startItem, targetItem, opt_type, opt_startPeriodIndex, opt_targetPeriodIndex) {
   opt_type = opt_type || anychart.enums.ConnectorType.FINISH_START;
-  if (!((startItem instanceof anychart.treeDataModule.Tree.DataItem) || (startItem instanceof anychart.treeDataModule.View.DataItem))) {
+  if (!((anychart.utils.instanceOf(startItem, anychart.treeDataModule.Tree.DataItem)) || (anychart.utils.instanceOf(startItem, anychart.treeDataModule.View.DataItem)))) {
     var soughtStart = this.controller.data().searchItems(anychart.enums.GanttDataFields.ID, /** @type {number|string} */ (startItem));
     startItem = soughtStart.length ? soughtStart[0] : null;
   }
   if (!startItem) return this; //TODO (A.Kudryavtsev): Add warning?
 
-  if (!((targetItem instanceof anychart.treeDataModule.Tree.DataItem) || (targetItem instanceof anychart.treeDataModule.View.DataItem))) {
+  if (!((anychart.utils.instanceOf(targetItem, anychart.treeDataModule.Tree.DataItem)) || (anychart.utils.instanceOf(targetItem, anychart.treeDataModule.View.DataItem)))) {
     var soughtTarget = this.controller.data().searchItems(anychart.enums.GanttDataFields.ID, /** @type {number|string} */ (targetItem));
     targetItem = soughtTarget.length ? soughtTarget[0] : null;
   }
@@ -3138,7 +3138,7 @@ anychart.ganttModule.TimeLine.prototype.addMouseUp = function(evt) {
       var destinationPeriodIndex = evt['periodIndex'];
       var originalEvent = evt['originalEvent'];
       var domTarget = originalEvent['domTarget'];
-      if (domTarget instanceof anychart.ganttModule.BaseGrid.Element && domTarget.type != anychart.enums.TLElementTypes.BASELINE) {
+      if (anychart.utils.instanceOf(domTarget, anychart.ganttModule.BaseGrid.Element) && domTarget.type != anychart.enums.TLElementTypes.BASELINE) {
         var left = originalEvent.clientX - this.container().getStage().getClientPosition().x;
         var elBounds = domTarget.currBounds;
         var dropRatio = (left - elBounds.left) / elBounds.width;
@@ -3470,7 +3470,7 @@ anychart.ganttModule.TimeLine.prototype.drawTimelineElements_ = function() {
  * @private
  */
 anychart.ganttModule.TimeLine.prototype.drawBar_ = function(bounds, item, type, opt_field, opt_period) {
-  // var isTreeDataItem = item instanceof anychart.treeDataModule.Tree.DataItem || item instanceof anychart.treeDataModule.View.DataItem; //If item is tree data item. Else: item is period (raw object).
+  // var isTreeDataItem = anychart.utils.instanceOf(item, anychart.treeDataModule.Tree.DataItem) || anychart.utils.instanceOf(item, anychart.treeDataModule.View.DataItem); //If item is tree data item. Else: item is period (raw object).
   var isTreeDataItem = !opt_period;
 
   var settings; //It is always a raw object.

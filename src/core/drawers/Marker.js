@@ -19,16 +19,18 @@ anychart.core.drawers.Marker = function(series) {
    * @private
    */
   this.typeGetter_ = anychart.core.series.Base.getSettingsResolver(
-      ['type', 'hoverType', 'selectType'],
-      anychart.core.settings.markerTypeNormalizer);
+      'type',
+      anychart.core.settings.markerTypeNormalizer,
+      true);
   /**
    * @type {function(anychart.core.series.Base, anychart.data.IRowInfo, number):*}
    * @private
    */
   this.sizeGetter_ = anychart.core.series.Base.getSettingsResolver(
-      ['markerSize', 'hoverMarkerSize', 'selectMarkerSize'],
+      'markerSize',
       anychart.core.settings.numberNormalizer,
-      ['size', 'hoverSize', 'selectSize']);
+      true,
+      'size');
 };
 goog.inherits(anychart.core.drawers.Marker, anychart.core.drawers.Base);
 anychart.core.drawers.AvailableDrawers[anychart.enums.SeriesDrawerTypes.MARKER] = anychart.core.drawers.Marker;

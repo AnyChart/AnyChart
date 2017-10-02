@@ -102,7 +102,7 @@ anychart.core.axisMarkers.Line.prototype.setDefaultLayout = function(value) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Getter/setter for scale.
- * @param {anychart.scales.Base=} opt_value Scale.
+ * @param {(anychart.scales.Base|Object|anychart.enums.ScaleTypes)=} opt_value Scale.
  * @return {anychart.scales.Base|!anychart.core.axisMarkers.Line} Axis scale or itself for method chaining.
  */
 anychart.core.axisMarkers.Line.prototype.scale = function(opt_value) {

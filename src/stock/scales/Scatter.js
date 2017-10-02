@@ -581,25 +581,6 @@ anychart.stockModule.scales.Scatter.prototype.normalizeTicksRow_ = function(val)
 
 
 /**
- * Returns true if passed string indicates Scatter scale.
- * @param {string} type
- * @return {boolean}
- */
-anychart.stockModule.scales.Scatter.askedForScatter = function(type) {
-  type = (type + '').toLowerCase();
-  switch (type) {
-    case 'linear':
-    case 'scatter':
-    case 'datetime':
-    case 'simple':
-      return true;
-    default:
-      return false;
-  }
-};
-
-
-/**
  * Array of default tick settings.
  * @type {anychart.stockModule.scales.Scatter.TicksSettings}
  * @private

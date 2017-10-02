@@ -30,19 +30,16 @@ anychart.annotationsModule.Ray = function(chartController) {
    * @private
    */
   this.strokeResolver_ = /** @type {function(anychart.annotationsModule.Base,number):acgraph.vector.Stroke} */(
-      anychart.annotationsModule.Base.getColorResolver(
-          ['stroke', 'hoverStroke', 'selectStroke'],
-          anychart.enums.ColorType.STROKE));
+      anychart.annotationsModule.Base.getColorResolver('stroke', anychart.enums.ColorType.STROKE, true));
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.annotationsModule.X_ANCHOR_DESCRIPTORS_META);
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.annotationsModule.VALUE_ANCHOR_DESCRIPTORS_META);
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.annotationsModule.SECOND_ANCHOR_POINT_DESCRIPTORS_META);
-  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.annotationsModule.STROKE_DESCRIPTORS_META);
 };
 goog.inherits(anychart.annotationsModule.Ray, anychart.annotationsModule.Base);
+anychart.core.settings.populateAliases(anychart.annotationsModule.Ray, ['stroke'], 'normal');
 anychart.core.settings.populate(anychart.annotationsModule.Ray, anychart.annotationsModule.X_ANCHOR_DESCRIPTORS);
 anychart.core.settings.populate(anychart.annotationsModule.Ray, anychart.annotationsModule.VALUE_ANCHOR_DESCRIPTORS);
 anychart.core.settings.populate(anychart.annotationsModule.Ray, anychart.annotationsModule.SECOND_ANCHOR_POINT_DESCRIPTORS);
-anychart.core.settings.populate(anychart.annotationsModule.Ray, anychart.annotationsModule.STROKE_DESCRIPTORS);
 anychart.annotationsModule.AnnotationTypes[anychart.enums.AnnotationTypes.RAY] = anychart.annotationsModule.Ray;
 
 
@@ -61,6 +58,15 @@ anychart.annotationsModule.Ray.prototype.type = anychart.enums.AnnotationTypes.R
  * @type {anychart.annotationsModule.AnchorSupport}
  */
 anychart.annotationsModule.Ray.prototype.SUPPORTED_ANCHORS = anychart.annotationsModule.AnchorSupport.TWO_POINTS;
+
+
+//endregion
+//region State settings
+/** @inheritDoc */
+anychart.annotationsModule.Ray.prototype.getNormalDescriptorsMeta = function() {
+  var base = anychart.annotationsModule.Ray.base(this, 'getNormalDescriptorsMeta');
+  return goog.array.concat(base, anychart.annotationsModule.STROKE_DESCRIPTORS_META);
+};
 
 
 //endregion
@@ -150,7 +156,6 @@ anychart.annotationsModule.Ray.prototype.checkVisible = function() {
 anychart.annotationsModule.Ray.prototype.serialize = function() {
   var json = anychart.annotationsModule.Ray.base(this, 'serialize');
 
-  anychart.core.settings.serialize(this, anychart.annotationsModule.STROKE_DESCRIPTORS, json, 'Annotation');
   anychart.core.settings.serialize(this, anychart.annotationsModule.X_ANCHOR_DESCRIPTORS, json, 'Annotation');
   anychart.core.settings.serialize(this, anychart.annotationsModule.VALUE_ANCHOR_DESCRIPTORS, json, 'Annotation');
   anychart.core.settings.serialize(this, anychart.annotationsModule.SECOND_ANCHOR_POINT_DESCRIPTORS, json, 'Annotation');
@@ -161,13 +166,11 @@ anychart.annotationsModule.Ray.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.annotationsModule.Ray.prototype.setupByJSON = function(config, opt_default) {
+  anychart.annotationsModule.Ray.base(this, 'setupByJSON', config, opt_default);
 
-  anychart.core.settings.deserialize(this, anychart.annotationsModule.STROKE_DESCRIPTORS, config);
   anychart.core.settings.deserialize(this, anychart.annotationsModule.X_ANCHOR_DESCRIPTORS, config);
   anychart.core.settings.deserialize(this, anychart.annotationsModule.VALUE_ANCHOR_DESCRIPTORS, config);
   anychart.core.settings.deserialize(this, anychart.annotationsModule.SECOND_ANCHOR_POINT_DESCRIPTORS, config);
-
-  anychart.annotationsModule.Ray.base(this, 'setupByJSON', config, opt_default);
 };
 
 

@@ -329,7 +329,7 @@ anychart.color.equals = function(color1, color2) {
  */
 anychart.color.serialize = function(color) {
   var result;
-  if (color instanceof acgraph.vector.HatchFill) {
+  if (anychart.utils.instanceOf(color, acgraph.vector.HatchFill)) {
     var hf = /** @type {acgraph.vector.HatchFill} */(color);
     result = {
       'type': hf.type,
@@ -337,7 +337,7 @@ anychart.color.serialize = function(color) {
       'thickness': hf.thickness,
       'size': hf.size
     };
-  } else if (color instanceof acgraph.vector.PatternFill) {
+  } else if (anychart.utils.instanceOf(color, acgraph.vector.PatternFill)) {
     result = color.serialize();
   } else if (goog.isObject(color)) {
     result = /** @type {Object} */(anychart.utils.recursiveClone(color));
@@ -517,15 +517,21 @@ anychart.color.colorResolversCache = {};
 
 /**
  * Returns a color resolver for passed color names and type.
- * @param {(Array.<string>|null|boolean)} colorNames
+ * @param {(string|null|boolean)} colorName
  * @param {anychart.enums.ColorType} colorType
+ * @param {boolean} canBeHoveredSelected Whether need to resolve hovered selected colors
+ * @param {boolean=} opt_scrollerSelected Whether color get for scroller selected
  * @return {function(anychart.core.IShapeManagerUser, number, boolean=, boolean=):acgraph.vector.AnyColor}
  */
-anychart.color.getColorResolver = function(colorNames, colorType) {
+anychart.color.getColorResolver = function(colorName, colorType, canBeHoveredSelected, opt_scrollerSelected) {
   var result;
-  if (!colorNames) return anychart.color.getNullColor;
-  if (goog.isArray(colorNames)) {
-    var hash = colorType + '|' + colorNames.join('|');
+  if (!colorName) return anychart.color.getNullColor;
+  if (!goog.isString(colorName)) {
+    result = anychart.color.colorResolversCache['transparent'];
+    if (!result)
+      result = anychart.color.colorResolversCache['transparent'] = function() { return anychart.color.TRANSPARENT_HANDLER; };
+  } else {
+    var hash = colorType + '|' + colorName + '|' + canBeHoveredSelected + (opt_scrollerSelected ? '|' + opt_scrollerSelected : '');
     result = anychart.color.colorResolversCache[hash];
     if (!result) {
       /** @type {!Function} */
@@ -543,12 +549,8 @@ anychart.color.getColorResolver = function(colorNames, colorType) {
           break;
       }
       anychart.color.colorResolversCache[hash] = result = goog.partial(anychart.color.getColor,
-          colorNames, normalizerFunc, colorType == anychart.enums.ColorType.HATCH_FILL);
+          colorName, normalizerFunc, colorType == anychart.enums.ColorType.HATCH_FILL, canBeHoveredSelected, !!opt_scrollerSelected);
     }
-  } else {
-    result = anychart.color.colorResolversCache['transparent'];
-    if (!result)
-      result = anychart.color.colorResolversCache['transparent'] = function() { return anychart.color.TRANSPARENT_HANDLER; };
   }
   return result;
 };
@@ -565,23 +567,22 @@ anychart.color.getNullColor = function() {
 
 /**
  * Returns final color or hatch fill for passed params.
- * @param {Array.<string>} colorNames
+ * @param {string} colorName
  * @param {!Function} normalizer
  * @param {boolean} isHatchFill
+ * @param {boolean} canBeHoveredSelected
+ * @param {boolean} scrollerSelected
  * @param {anychart.core.IShapeManagerUser} series
  * @param {number} state
  * @param {boolean=} opt_ignorePointSettings
  * @param {boolean=} opt_ignoreColorScale
  * @return {acgraph.vector.Fill|acgraph.vector.Stroke|acgraph.vector.PatternFill}
  */
-anychart.color.getColor = function(colorNames, normalizer, isHatchFill, series, state, opt_ignorePointSettings, opt_ignoreColorScale) {
+anychart.color.getColor = function(colorName, normalizer, isHatchFill, canBeHoveredSelected, scrollerSelected, series, state, opt_ignorePointSettings, opt_ignoreColorScale) {
   var stateColor, context;
-  state = Math.min(state & (anychart.PointState.HOVER | anychart.PointState.SELECT),
-      anychart.PointState.SELECT);
-  if (state != anychart.PointState.NORMAL && colorNames.length > 1) {
-    stateColor = opt_ignorePointSettings ?
-        series.getOption(colorNames[state]) :
-        series.resolveOption(colorNames[state], series.getIterator(), normalizer);
+  state = anychart.core.utils.InteractivityState.clarifyState(state);
+  if (state != anychart.PointState.NORMAL && canBeHoveredSelected) {
+    stateColor = series.resolveOption(colorName, state, series.getIterator(), normalizer, scrollerSelected, void 0, opt_ignorePointSettings);
     if (isHatchFill && stateColor === true)
       stateColor = normalizer(series.getAutoHatchFill());
     if (goog.isDef(stateColor)) {
@@ -594,9 +595,7 @@ anychart.color.getColor = function(colorNames, normalizer, isHatchFill, series, 
     }
   }
   // we can get here only if state color is undefined or is a function
-  var color = opt_ignorePointSettings ?
-      series.getOption(colorNames[0]) :
-      series.resolveOption(colorNames[0], series.getIterator(), normalizer);
+  var color = series.resolveOption(colorName, 0, series.getIterator(), normalizer, scrollerSelected, void 0, opt_ignorePointSettings);
   if (isHatchFill && color === true)
     color = normalizer(series.getAutoHatchFill());
   if (goog.isFunction(color)) {
@@ -613,6 +612,22 @@ anychart.color.getColor = function(colorNames, normalizer, isHatchFill, series, 
     color = normalizer(stateColor.call(context, context));
   }
   return /** @type {acgraph.vector.Fill|acgraph.vector.Stroke|acgraph.vector.PatternFill} */(color);
+};
+
+
+/**
+ * Prefix color name depends on state.
+ * (0 = ''; 1 = 'hover'; 2 = 'select').
+ * @param {anychart.PointState|number} state
+ * @param {string} normalColorName Normal color name.
+ * @return {string} Prefixed color name.
+ */
+anychart.color.getPrefixedColorName = function(state, normalColorName) {
+  var prefix = state ? state == 1 ? 'hover' : 'select' : '';
+  if (state) {
+    normalColorName = normalColorName.charAt(0).toUpperCase() + normalColorName.substr(1);
+  }
+  return state ? (prefix + normalColorName) : normalColorName;
 };
 
 

@@ -106,7 +106,7 @@ anychart.data.Mapping.prototype.setInternal = function(row, fieldName, value) {
     var result = anychart.utils.mapObject(/** @type {!Object} */(row), fieldName, this.mapping_[fieldName], value);
     // result will be undefined if there no such field in row, but row will have property because it will be set.
     if ((result === void 0) && row.hasOwnProperty(fieldName)) {
-      this.parentView.addSeenField(fieldName);
+      this.parentView.addSeenField(fieldName, row);
     }
   } else if (goog.array.indexOf(anychart.data.Mapping.DEFAULT_SIMPLE_ROW_MAPPING, fieldName) > -1) {
     if (anychart.DEVELOP && (goog.isArray(value) || goog.isObject(value)))

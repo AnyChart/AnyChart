@@ -30,9 +30,7 @@ anychart.annotationsModule.Rectangle = function(chartController) {
    * @private
    */
   this.strokeResolver_ = /** @type {function(anychart.annotationsModule.Base,number):acgraph.vector.Stroke} */(
-      anychart.annotationsModule.Base.getColorResolver(
-          ['stroke', 'hoverStroke', 'selectStroke'],
-          anychart.enums.ColorType.STROKE));
+      anychart.annotationsModule.Base.getColorResolver('stroke', anychart.enums.ColorType.STROKE, true));
 
   /**
    * Fill resolver.
@@ -42,9 +40,7 @@ anychart.annotationsModule.Rectangle = function(chartController) {
    * @private
    */
   this.fillResolver_ = /** @type {function(anychart.annotationsModule.Base,number):acgraph.vector.Fill} */(
-      anychart.annotationsModule.Base.getColorResolver(
-          ['fill', 'hoverFill', 'selectFill'],
-          anychart.enums.ColorType.FILL));
+      anychart.annotationsModule.Base.getColorResolver('fill', anychart.enums.ColorType.FILL, true));
 
   /**
    * Hatch fill resolver.
@@ -54,21 +50,16 @@ anychart.annotationsModule.Rectangle = function(chartController) {
    * @private
    */
   this.hatchFillResolver_ = /** @type {function(anychart.annotationsModule.Base,number):acgraph.vector.PatternFill} */(
-      anychart.annotationsModule.Base.getColorResolver(
-          ['hatchFill', 'hoverHatchFill', 'selectHatchFill'],
-          anychart.enums.ColorType.HATCH_FILL));
+      anychart.annotationsModule.Base.getColorResolver('hatchFill', anychart.enums.ColorType.HATCH_FILL, true));
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.annotationsModule.X_ANCHOR_DESCRIPTORS_META);
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.annotationsModule.VALUE_ANCHOR_DESCRIPTORS_META);
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.annotationsModule.SECOND_ANCHOR_POINT_DESCRIPTORS_META);
-  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.annotationsModule.STROKE_DESCRIPTORS_META);
-  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.annotationsModule.FILL_DESCRIPTORS_META);
 };
 goog.inherits(anychart.annotationsModule.Rectangle, anychart.annotationsModule.Base);
+anychart.core.settings.populateAliases(anychart.annotationsModule.Rectangle, ['fill', 'hatchFill', 'stroke'], 'normal');
 anychart.core.settings.populate(anychart.annotationsModule.Rectangle, anychart.annotationsModule.X_ANCHOR_DESCRIPTORS);
 anychart.core.settings.populate(anychart.annotationsModule.Rectangle, anychart.annotationsModule.VALUE_ANCHOR_DESCRIPTORS);
 anychart.core.settings.populate(anychart.annotationsModule.Rectangle, anychart.annotationsModule.SECOND_ANCHOR_POINT_DESCRIPTORS);
-anychart.core.settings.populate(anychart.annotationsModule.Rectangle, anychart.annotationsModule.STROKE_DESCRIPTORS);
-anychart.core.settings.populate(anychart.annotationsModule.Rectangle, anychart.annotationsModule.FILL_DESCRIPTORS);
 anychart.annotationsModule.AnnotationTypes[anychart.enums.AnnotationTypes.RECTANGLE] = anychart.annotationsModule.Rectangle;
 
 
@@ -87,6 +78,15 @@ anychart.annotationsModule.Rectangle.prototype.type = anychart.enums.AnnotationT
  * @type {anychart.annotationsModule.AnchorSupport}
  */
 anychart.annotationsModule.Rectangle.prototype.SUPPORTED_ANCHORS = anychart.annotationsModule.AnchorSupport.TWO_POINTS;
+
+
+//endregion
+//region State settings
+/** @inheritDoc */
+anychart.annotationsModule.Rectangle.prototype.getNormalDescriptorsMeta = function() {
+  var base = anychart.annotationsModule.Rectangle.base(this, 'getNormalDescriptorsMeta');
+  return goog.array.concat(base, anychart.annotationsModule.FILL_STROKE_DESCRIPTORS_META);
+};
 
 
 //endregion
@@ -164,8 +164,6 @@ anychart.annotationsModule.Rectangle.prototype.colorize = function(state) {
 anychart.annotationsModule.Rectangle.prototype.serialize = function() {
   var json = anychart.annotationsModule.Rectangle.base(this, 'serialize');
 
-  anychart.core.settings.serialize(this, anychart.annotationsModule.FILL_DESCRIPTORS, json, 'Annotation');
-  anychart.core.settings.serialize(this, anychart.annotationsModule.STROKE_DESCRIPTORS, json, 'Annotation');
   anychart.core.settings.serialize(this, anychart.annotationsModule.X_ANCHOR_DESCRIPTORS, json, 'Annotation');
   anychart.core.settings.serialize(this, anychart.annotationsModule.VALUE_ANCHOR_DESCRIPTORS, json, 'Annotation');
   anychart.core.settings.serialize(this, anychart.annotationsModule.SECOND_ANCHOR_POINT_DESCRIPTORS, json, 'Annotation');
@@ -176,14 +174,11 @@ anychart.annotationsModule.Rectangle.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.annotationsModule.Rectangle.prototype.setupByJSON = function(config, opt_default) {
+  anychart.annotationsModule.Rectangle.base(this, 'setupByJSON', config, opt_default);
 
-  anychart.core.settings.deserialize(this, anychart.annotationsModule.FILL_DESCRIPTORS, config);
-  anychart.core.settings.deserialize(this, anychart.annotationsModule.STROKE_DESCRIPTORS, config);
   anychart.core.settings.deserialize(this, anychart.annotationsModule.X_ANCHOR_DESCRIPTORS, config);
   anychart.core.settings.deserialize(this, anychart.annotationsModule.VALUE_ANCHOR_DESCRIPTORS, config);
   anychart.core.settings.deserialize(this, anychart.annotationsModule.SECOND_ANCHOR_POINT_DESCRIPTORS, config);
-
-  anychart.annotationsModule.Rectangle.base(this, 'setupByJSON', config, opt_default);
 };
 
 

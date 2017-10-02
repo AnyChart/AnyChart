@@ -34,7 +34,8 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     },
     'startAngle': 0,
     'innerRadius': 0,
-    'grids': [{}, {'layout': 'circuit'}],
+    'xGrids': [{}],
+    'yGrids': [{}],
     'minorGrids': [],
     'scales': [
       {

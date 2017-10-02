@@ -252,8 +252,8 @@ anychart.core.VisualBase.prototype.makeBrowserEvent = function(e) {
  * @protected
  */
 anychart.core.VisualBase.prototype.getOwnerElement = function(target) {
-  while (target instanceof acgraph.vector.Element) {
-    if (target.tag instanceof anychart.core.VisualBase) {
+  while (anychart.utils.instanceOf(target, acgraph.vector.Element)) {
+    if (anychart.utils.instanceOf(target.tag, anychart.core.VisualBase)) {
       return /** @type {anychart.core.VisualBase} */(target.tag);
     }
     target = (/** @type {acgraph.vector.Element} */(target)).parent();
@@ -477,7 +477,7 @@ anychart.core.VisualBase.prototype.parentBounds = function(opt_boundsOrLeft, opt
         this.parentBounds_ = null;
         this.invalidateParentBounds();
       }
-    } else if (opt_boundsOrLeft instanceof anychart.math.Rect) {
+    } else if (anychart.utils.instanceOf(opt_boundsOrLeft, anychart.math.Rect)) {
       left = opt_boundsOrLeft.left;
       top = opt_boundsOrLeft.top;
       width = opt_boundsOrLeft.width;

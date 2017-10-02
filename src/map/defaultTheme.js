@@ -7,55 +7,60 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'defaultCalloutSettings': {},
     'defaultSeriesSettings': {
       'base': {
-        /**
-         * @this {*}
-         * @return {*}
-         */
-        'fill': function() {
-          return this['scaledColor'] || this['sourceColor'];
-        },
-        'hoverFill': anychart.core.defaultTheme.defaultHoverColor,
-        'selectFill': anychart.core.defaultTheme.defaultSelectColor,
-        'stroke': anychart.core.defaultTheme.returnDarkenSourceColor,
-        'hoverStroke': {
-          'thickness': 0.5,
-          'color': '#545f69'
-        },
-        'selectStroke': {
-          'thickness': 0.5,
-          'color': '#545f69'
-        },
-        'hatchFill': false,
-        'labels': {
-          'anchor': 'center-bottom',
-          'enabled': null,
-          'adjustFontSize': {
-            'width': true,
-            'height': true
-          },
+        'normal': {
           /**
            * @this {*}
            * @return {*}
            */
-          'format': function() {
-            return this['getData']('name') ||
-                this['name'] ||
-                this['getData']('id') ||
-                ('lat: ' + this['lat'] + '\nlong: ' + this['long']);
+          'fill': function() {
+            return this['scaledColor'] || this['sourceColor'];
+          },
+          'stroke': anychart.core.defaultTheme.returnDarkenSourceColor,
+          'hatchFill': false,
+          'labels': {
+            'anchor': 'center-bottom',
+            'enabled': null,
+            'adjustFontSize': {
+              'width': true,
+              'height': true
+            },
+            /**
+             * @this {*}
+             * @return {*}
+             */
+            'format': function() {
+              if (this['getData']('name')) {
+                return this['getData']('name');
+              } else if (this['name']) {
+                return this['name'];
+              } else if (this['getData']('id')) {
+                return this['getData']('id');
+              } else {
+                return 'lat: ' + this['lat'] + '\nlong: ' + this['long'];
+              }
+            }
+          },
+          'markers': {
+            'enabled': false,
+            'disablePointerEvents': false
           }
         },
-        'hoverLabels': {
-          'enabled': null
+        'hovered': {
+          'fill': anychart.core.defaultTheme.defaultHoverColor,
+          'stroke': {'thickness': 0.5, 'color': '#545f69'},
+          'labels': {
+            'enabled': null
+          },
+          'markers': {'enabled': null}
         },
-        'selectLabels': {
-          'enabled': null
+        'selected': {
+          'fill': anychart.core.defaultTheme.defaultSelectColor,
+          'stroke': {'thickness': 0.5, 'color': '#545f69'},
+          'labels': {
+            'enabled': null
+          },
+          'markers': {'enabled': null}
         },
-        'markers': {
-          'enabled': false,
-          'disablePointerEvents': false
-        },
-        'hoverMarkers': {'enabled': null},
-        'selectMarkers': {'enabled': null},
         'color': null,
         'tooltip': {
           /**
@@ -63,7 +68,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
            * @return {*}
            */
           'titleFormat': function() {
-            return this['getData']('name') || this['name'] || 'Tooltip title';
+            return this['name'] || this['getData']('name') || 'Tooltip title';
           },
           /**
            * @this {*}
@@ -81,12 +86,14 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'clip': false
       },
       'choropleth': {
-        'labels': {
-          'fontColor': anychart.core.defaultTheme.fontColorDark,
-          'anchor': 'center'
-        },
-        'markers': {
-          'anchor': null
+        'normal': {
+          'labels': {
+            'fontColor': anychart.core.defaultTheme.fontColorDark,
+            'anchor': 'center'
+          },
+          'markers': {
+            'anchor': null
+          }
         },
         'colorScale': {}
       },
@@ -94,47 +101,49 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'startSize': 0,
         'endSize': 0,
         'curvature': .3,
-        /**
-         * @this {*}
-         * @return {*}
-         */
-        'stroke': function() {
-          return {
-            'thickness': 2,
-            'color': this['sourceColor'],
-            'lineJoin': 'round'
-          };
-        },
-        'hoverStroke': anychart.core.defaultTheme.returnLightenSourceColor,
-        'selectStroke': '2 ' + anychart.core.defaultTheme.defaultSelectColor,
-        'markers': {
-          'position': 'middle',
-          'enabled': true,
-          'size': 15,
-          'stroke': '1.5 #f7f7f7',
-          'rotation': null,
-          'anchor': null,
-          'type': 'arrowhead'
-        },
-        'hoverMarkers': {
-          'stroke': '1.5 #f7f7f7',
-          'size': 15
-        },
-        'selectMarkers': {
-          'fill': anychart.core.defaultTheme.defaultSelectColor,
-          'stroke': '1.5 #f7f7f7',
-          'size': 15
-        },
-        'labels': {
-          'enabled': false,
-          'position': 'middle',
-          'anchor': null,
+        'normal': {
           /**
            * @this {*}
            * @return {*}
            */
-          'format': function() {
-            return 'from: ' + this['startPoint']['lat'] + ',' + this['startPoint']['long'] + '\nto: ' + this['endPoint']['lat'] + ',' + this['endPoint']['long'];
+          'stroke': function() {
+            return {'thickness': 2, 'color': this['sourceColor'], 'lineJoin': 'round'};
+          },
+          'markers': {
+            'position': 'middle',
+            'enabled': true,
+            'size': 15,
+            'stroke': '1.5 #f7f7f7',
+            'rotation': null,
+            'anchor': null,
+            'type': 'arrowhead'
+          },
+          'labels': {
+            'enabled': false,
+            'position': 'middle',
+            'anchor': null,
+            /**
+             * @this {*}
+             * @return {*}
+             */
+            'format': function() {
+              return 'from: ' + this['startPoint']['lat'] + ',' + this['startPoint']['long'] + '\nto: ' + this['endPoint']['lat'] + ',' + this['endPoint']['long'];
+            }
+          }
+        },
+        'hovered': {
+          'stroke': anychart.core.defaultTheme.returnLightenSourceColor,
+          'markers': {
+            'stroke': '1.5 #f7f7f7',
+            'size': 15
+          }
+        },
+        'selected': {
+          'stroke': '2 ' + anychart.core.defaultTheme.defaultSelectColor,
+          'markers': {
+            'fill': anychart.core.defaultTheme.defaultSelectColor,
+            'stroke': '1.5 #f7f7f7',
+            'size': 15
           }
         },
         'tooltip': {
@@ -154,21 +163,24 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         }
       },
       'bubble': {
-        /**
-         * @this {*}
-         * @return {*}
-         */
-        'stroke': function() {
-          return {
-            'thickness': 2,
-            'color': anychart.color.darken(this['sourceColor'])
-          };
+        'normal': {
+          /**
+           * @this {*}
+           * @return {*}
+           */
+          'stroke': function() {
+            return {'thickness': 2, 'color': anychart.color.darken(this['sourceColor'])};
+          },
+          'labels': {
+            'anchor': 'center'
+          }
         },
-        'labels': {
-          'anchor': 'center'
+        'hovered': {
+          'fill': anychart.core.defaultTheme.defaultHoverColor
         },
-        'hoverFill': anychart.core.defaultTheme.defaultHoverColor,
-        'selectFill': anychart.core.defaultTheme.defaultSelectColor,
+        'selected': {
+          'fill': anychart.core.defaultTheme.defaultSelectColor
+        },
         'tooltip': {
           /**
            * @this {*}
@@ -188,14 +200,20 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         }
       },
       'marker': {
-        'labels': {
-          'enabled': true
+        'normal': {
+          'labels': {
+            'enabled': true
+          }
         },
-        'hoverLabels': {
-          'fontWeight': 'bold'
+        'hovered': {
+          'labels': {
+            'fontWeight': 'bold'
+          }
         },
-        'selectLabels': {
-          'fontWeight': 'bold'
+        'selected': {
+          'labels': {
+            'fontWeight': 'bold'
+          }
         },
         'tooltip': {
           /**
@@ -269,11 +287,6 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     },
     'gridsSettings': {
       'enabled': false,
-      'drawFirstLine': true,
-      'drawLastLine': true,
-      'oddFill': 'none',
-      'evenFill': 'none',
-      'stroke': anychart.core.defaultTheme.colorStrokeNormal,
       'minorStroke': 'none',
       'zIndex': 5
     },
@@ -289,11 +302,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'axisIndex': 3
       }
     },
-    'unboundRegions': {
-      'enabled': true,
-      'fill': '#F7F7F7',
-      'stroke': '#e0e0e0'
-    },
+    'unboundRegions': {'enabled': true, 'fill': '#F7F7F7', 'stroke': '#e0e0e0'},
     'maxBubbleSize': '20%',
     'minBubbleSize': '5%',
     'geoIdField': 'id',
@@ -305,7 +314,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         for (var i = 0, len = seriesStatus.length; i < len; i++) {
           var status = seriesStatus[i];
           if (!status['points'].length) continue;
-          result += 'Series ' + status['series'].getIndex() + ':\n';
+          result += 'Series ' + status['series']['getIndex']() + ':\n';
           for (var j = 0, len_ = status['points'].length; j < len_; j++) {
             var point = status['points'][j];
             result += 'id: ' + point['id'] + ' index: ' + point['index'];

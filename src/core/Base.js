@@ -240,7 +240,7 @@ anychart.ConsistencyState = {
   GAUGE_PALETTE: 1 << 21,
   GAUGE_HATCH_FILL_PALETTE: 1 << 22,
   GAUGE_SCALE_BAR: 1 << 23,
-  GAUGE_POINTER_LABEL: 1 << 13, // reset knob state for linear gauge, cause it doesn't need it
+  GAUGE_POINTER_LABELS: 1 << 13, // reset knob state for linear gauge, cause it doesn't need it
   //---------------------------------- TABLE (VB) ---------------------------------------------
   TABLE_CELL_BOUNDS: 1 << 6,
   TABLE_OVERLAP: 1 << 7,
@@ -481,7 +481,7 @@ anychart.core.Base.prototype.suspendedDispatching = NaN;
 anychart.core.Base.prototype.suspensionLevel = 0;
 
 
-//region --- IObjectWithSettings
+//region --- IObjectWithSettings implementation
 /** @inheritDoc */
 anychart.core.Base.prototype.getOwnOption = function(name) {
   return this.ownSettings[name];
@@ -550,6 +550,18 @@ anychart.core.Base.prototype.getHookContext = function(fieldName) {
 anychart.core.Base.prototype.getHook = function(fieldName) {
   var meta = this.descriptorsMeta[fieldName];
   return meta ? (meta.beforeInvalidationHook || goog.nullFunction) : goog.nullFunction;
+};
+
+
+/** @inheritDoc */
+anychart.core.Base.prototype.isResolvable = function() {
+  return false;
+};
+
+
+/** @inheritDoc */
+anychart.core.Base.prototype.getParentState = function() {
+  return null;
 };
 
 
@@ -790,7 +802,7 @@ anychart.core.Base.suspendSignalsDispatching = function(var_args) {
     var obj = arguments[i];
     if (goog.isArray(obj))
       anychart.core.Base.suspendSignalsDispatching.apply(null, obj);
-    else if (obj instanceof anychart.core.Base)
+    else if (anychart.utils.instanceOf(obj, anychart.core.Base))
       (/** @type {anychart.core.Base} */(obj)).suspendSignalsDispatching();
   }
 };
@@ -805,7 +817,7 @@ anychart.core.Base.resumeSignalsDispatchingTrue = function(var_args) {
     var obj = arguments[i];
     if (goog.isArray(obj))
       anychart.core.Base.resumeSignalsDispatchingTrue.apply(null, obj);
-    else if (obj instanceof anychart.core.Base)
+    else if (anychart.utils.instanceOf(obj, anychart.core.Base))
       (/** @type {anychart.core.Base} */(obj)).resumeSignalsDispatching(true);
   }
 };
@@ -820,7 +832,7 @@ anychart.core.Base.resumeSignalsDispatchingFalse = function(var_args) {
     var obj = arguments[i];
     if (goog.isArray(obj))
       anychart.core.Base.resumeSignalsDispatchingFalse.apply(null, obj);
-    else if (obj instanceof anychart.core.Base)
+    else if (anychart.utils.instanceOf(obj, anychart.core.Base))
       (/** @type {anychart.core.Base} */(obj)).resumeSignalsDispatching(false);
   }
 };

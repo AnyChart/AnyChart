@@ -140,7 +140,8 @@ anychart.core.ui.Tooltip = function(capability) {
       anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
       anychart.ConsistencyState.TOOLTIP_CONTENT | anychart.ConsistencyState.TOOLTIP_TITLE,
       anychart.Signal.NEEDS_REDRAW,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.Signal.NEEDS_REDRAW,
+      this.resetBoundsCache);
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['width',
       anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
@@ -503,7 +504,8 @@ anychart.core.ui.Tooltip.prototype.padding = function(opt_spaceOrTopOrTopAndBott
  */
 anychart.core.ui.Tooltip.prototype.onPaddingSignal_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
-    this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    this.resetBoundsCache();
+    this.invalidate(anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -517,6 +519,7 @@ anychart.core.ui.Tooltip.prototype.background = function(opt_value) {
   if (!this.background_) {
     this.background_ = new anychart.core.ui.Background();
     this.background_.listenSignals(this.backgroundInvalidated_, this);
+    this.background_.setParentEventTarget(this);
     this.registerDisposable(this.background_);
   }
 
@@ -570,7 +573,7 @@ anychart.core.ui.Tooltip.prototype.title = function(opt_value) {
  */
 anychart.core.ui.Tooltip.prototype.onTitleSignal_ = function(event) {
   if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
-    this.contentBounds_ = null;
+    this.resetBoundsCache();
     this.invalidate(anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE, anychart.Signal.NEEDS_REDRAW);
   } else if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
     this.invalidate(anychart.ConsistencyState.TOOLTIP_TITLE, anychart.Signal.NEEDS_REDRAW);
@@ -587,6 +590,7 @@ anychart.core.ui.Tooltip.prototype.separator = function(opt_value) {
   if (!this.separator_) {
     this.separator_ = new anychart.core.ui.Separator();
     this.separator_.listenSignals(this.onSeparatorSignal_, this);
+    this.separator_.setParentEventTarget(this);
     this.registerDisposable(this.separator_);
   }
 
@@ -606,8 +610,7 @@ anychart.core.ui.Tooltip.prototype.separator = function(opt_value) {
  */
 anychart.core.ui.Tooltip.prototype.onSeparatorSignal_ = function(event) {
   if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
-    this.contentBounds_ = null;
-    this.instantPosition_ = null;
+    this.resetBoundsCache();
     this.invalidate(anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE, anychart.Signal.NEEDS_REDRAW);
   } else if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
     this.invalidate(anychart.ConsistencyState.TOOLTIP_SEPARATOR, anychart.Signal.NEEDS_REDRAW);
@@ -1256,12 +1259,20 @@ anychart.core.ui.Tooltip.prototype.contentInternal = function(opt_value) {
  */
 anychart.core.ui.Tooltip.prototype.onContentSignal_ = function(event) {
   if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
-    this.contentBounds_ = null;
-    this.instantPosition_ = null;
+    this.resetBoundsCache();
     this.invalidate(anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE, anychart.Signal.NEEDS_REDRAW);
   } else if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
     this.invalidate(anychart.ConsistencyState.TOOLTIP_CONTENT, anychart.Signal.NEEDS_REDRAW);
   }
+};
+
+
+/**
+ * Resets content bounds and position cache.
+ */
+anychart.core.ui.Tooltip.prototype.resetBoundsCache = function() {
+  this.contentBounds_ = null;
+  this.instantPosition_ = null;
 };
 
 
@@ -1338,6 +1349,7 @@ anychart.core.ui.Tooltip.prototype.updateForceInvalidation = function() {
   this.title().needsForceSignalsDispatching(forceInvalidation);
   this.separator().needsForceSignalsDispatching(forceInvalidation);
   this.background().needsForceSignalsDispatching(forceInvalidation);
+  this.padding().needsForceSignalsDispatching(forceInvalidation);
 };
 
 
@@ -1346,7 +1358,6 @@ anychart.core.ui.Tooltip.prototype.updateForceInvalidation = function() {
  * @return {!anychart.math.Rect} Tooltip pixel bounds.
  */
 anychart.core.ui.Tooltip.prototype.getPixelBounds = function() {
-  this.contentBounds_ = null;
   this.instantPosition_ = null;
   this.calculatePosition_(); //also calculate content bounds, because it needs it.
   return new anychart.math.Rect(
@@ -1515,10 +1526,18 @@ anychart.core.ui.Tooltip.prototype.calculateContentBounds_ = function() {
     var separator = /** @type {anychart.core.ui.Separator} */(this.separator());
     var content = /** @type {anychart.core.ui.Label} */(this.contentInternal());
 
+    title.suspendSignalsDispatching();
+    separator.suspendSignalsDispatching();
+    content.suspendSignalsDispatching();
+
     var tWidth, tHeight;
     if (!widthIsSet || !heightIsSet) { //auto width and height calculation.
       if (title.enabled()) {
-        title.parentBounds(null);
+        if (acgraph.type() == acgraph.StageType.SVG) {
+          title.parentBounds(null);
+        } else {
+          title.parentBounds(this.chart_ && this.chart_.container() ? this.chart_.container().getStage().getBounds() : null);
+        }
         var titleWidth = title.getOption('width');
         var titleHasOwnWidth = goog.isDefAndNotNull(title.getOwnOption('width'));
         var titleHeight = title.getOption('height');
@@ -1635,6 +1654,10 @@ anychart.core.ui.Tooltip.prototype.calculateContentBounds_ = function() {
     result.top = 0;
 
     this.contentBounds_ = result;
+
+    title.resumeSignalsDispatching(false);
+    separator.resumeSignalsDispatching(false);
+    content.resumeSignalsDispatching(false);
   }
 };
 
@@ -1822,7 +1845,7 @@ anychart.core.ui.Tooltip.prototype.getContainer_ = function(tooltip) {
 anychart.core.ui.Tooltip.prototype.setContainerToTooltip_ = function(tooltip) {
   if (tooltip.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
     var tc;
-    if (tooltip.useGlobalContainer_()) {
+    if (tooltip.useGlobalContainer_() || acgraph.type() == acgraph.StageType.VML) {
       tc = anychart.core.utils.GlobalTooltipContainer.getInstance();
       if (this.tooltipContainer_ && this.tooltipContainer_.isLocal())
         tooltip.tooltipContainer_.container(null);
@@ -2149,6 +2172,12 @@ anychart.core.ui.Tooltip.prototype.check = function(flags) {
   if (goog.isDef(flags)) {
     return !!(flags & this.capability);
   }
+  return true;
+};
+
+
+/** @inheritDoc */
+anychart.core.ui.Tooltip.prototype.isResolvable = function() {
   return true;
 };
 

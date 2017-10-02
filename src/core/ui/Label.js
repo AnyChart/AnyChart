@@ -30,6 +30,7 @@ anychart.core.ui.Label = function() {
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['visible', anychart.ConsistencyState.LABEL_VISIBILITY, anychart.Signal.NEEDS_REDRAW]
   ]);
+  // should always be true for labels that are not "no data" label.
   this.themeSettings['visible'] = true;
 };
 goog.inherits(anychart.core.ui.Label, anychart.core.ui.LabelBase);
@@ -59,6 +60,14 @@ anychart.core.ui.Label.DESCRIPTORS = (function() {
   return map;
 })();
 anychart.core.settings.populate(anychart.core.ui.Label, anychart.core.ui.Label.DESCRIPTORS);
+
+
+/** @inheritDoc */
+anychart.core.ui.Label.prototype.setupByJSON = function(config, opt_default) {
+  anychart.core.ui.Label.base(this, 'setupByJSON', config, opt_default);
+  if (!!opt_default)
+    anychart.core.settings.deserialize(this, anychart.core.ui.Label.DESCRIPTORS, config);
+};
 
 
 /** @inheritDoc */

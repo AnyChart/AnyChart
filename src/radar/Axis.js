@@ -2,6 +2,7 @@ goog.provide('anychart.radarModule.Axis');
 goog.provide('anychart.standalones.axes.Radar');
 goog.require('acgraph');
 goog.require('anychart.color');
+goog.require('anychart.core.IAxis');
 goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.reporting');
@@ -20,6 +21,7 @@ goog.require('anychart.scales.Base');
  * @constructor
  * @extends {anychart.core.VisualBase}
  * @implements {anychart.core.IStandaloneBackend}
+ * @implements {anychart.core.IAxis}
  */
 anychart.radarModule.Axis = function() {
   this.suspendSignalsDispatching();
@@ -274,15 +276,21 @@ anychart.radarModule.Axis.prototype.stroke = function(opt_strokeOrFill, opt_thic
 
 
 /**
- * @param {anychart.scales.Base=} opt_value Scale.
+ * @param {(anychart.scales.Base|anychart.enums.ScaleTypes|Object)=} opt_value Scale.
  * @return {anychart.scales.Base|!anychart.radarModule.Axis} Axis scale or itself for method chaining.
  */
 anychart.radarModule.Axis.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.scale_ != opt_value) {
-      this.scale_ = opt_value;
-      this.scale_.listenSignals(this.scaleInvalidated_, this);
-      this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    var val = anychart.scales.Base.setupScale(this.scale_, opt_value, null,
+        anychart.scales.Base.ScaleTypes.ALL_DEFAULT, null, this.scaleInvalidated_, this);
+    if (val) {
+      var dispatch = this.scale_ == val;
+      this.scale_ = /** @type {anychart.scales.Linear} */(val);
+      this.scale_.resumeSignalsDispatching(dispatch);
+      if (!dispatch) {
+        this.dropBoundsCache_();
+        this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      }
     }
     return this;
   } else {
@@ -649,11 +657,11 @@ anychart.radarModule.Axis.prototype.getLabelsFormatProvider_ = function(index, v
 
   var labelText, labelValue;
   var addRange = true;
-  if (scale instanceof anychart.scales.Ordinal) {
+  if (anychart.utils.instanceOf(scale, anychart.scales.Ordinal)) {
     labelText = scale.ticks().names()[index];
     labelValue = value;
     addRange = false;
-  } else if (scale instanceof anychart.scales.DateTime) {
+  } else if (anychart.utils.instanceOf(scale, anychart.scales.DateTime)) {
     labelText = anychart.format.date(/** @type {number} */(value));
     labelValue = value;
   } else {

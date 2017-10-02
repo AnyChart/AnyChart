@@ -4,13 +4,13 @@ goog.require('acgraph.vector.SimpleText');
 goog.require('anychart.colorScalesModule.ui.ColorRange');
 goog.require('anychart.core.Point');
 goog.require('anychart.core.SeparateChart');
+goog.require('anychart.core.StateSettings');
 goog.require('anychart.core.settings');
 goog.require('anychart.core.utils.IInteractiveSeries');
 goog.require('anychart.core.utils.InteractivityState');
 goog.require('anychart.data.Set');
 goog.require('anychart.enums');
 goog.require('anychart.format.Context');
-goog.require('anychart.tagCloudModule.StateSettings');
 //endregion
 
 
@@ -61,26 +61,31 @@ anychart.tagCloudModule.Chart = function(opt_data, opt_settings) {
    */
   this.maxFontSize = NaN;
 
-  /**
-   * @type {anychart.tagCloudModule.StateSettings}
-   * @private
-   */
-  this.normal_ = new anychart.tagCloudModule.StateSettings();
-  this.normal_.listenSignals(this.normalStateListener_, this);
+  var descriptorsOverride = [anychart.core.settings.descriptors.FILL_FUNCTION_SIMPLE];
 
-  /**
-   * @type {anychart.tagCloudModule.StateSettings}
-   * @private
-   */
-  this.hovered_ = new anychart.tagCloudModule.StateSettings();
-  this.hovered_.listenSignals(this.normalStateListener_, this);
+  var normalDescriptorsMeta = {};
+  anychart.core.settings.createDescriptorsMeta(normalDescriptorsMeta, [
+    ['fill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['fontFamily', anychart.ConsistencyState.TAG_CLOUD_TAGS | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW],
+    ['fontStyle', anychart.ConsistencyState.TAG_CLOUD_TAGS | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW],
+    ['fontVariant', anychart.ConsistencyState.TAG_CLOUD_TAGS | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW],
+    ['fontWeight', anychart.ConsistencyState.TAG_CLOUD_TAGS | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW],
+    ['fontSize', anychart.ConsistencyState.TAG_CLOUD_TAGS | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW]
+  ]);
 
-  /**
-   * @type {anychart.tagCloudModule.StateSettings}
-   * @private
-   */
-  this.selected_ = new anychart.tagCloudModule.StateSettings();
-  this.selected_.listenSignals(this.normalStateListener_, this);
+  var hoveredSelectedDescriptorsMeta = {};
+  anychart.core.settings.createDescriptorsMeta(hoveredSelectedDescriptorsMeta, [
+    ['fill', 0, 0],
+    ['fontFamily', 0, 0],
+    ['fontStyle', 0, 0],
+    ['fontVariant', 0, 0],
+    ['fontWeight', 0, 0],
+    ['fontSize', 0, 0]
+  ]);
+
+  this.normal_ = new anychart.core.StateSettings(this, normalDescriptorsMeta, anychart.PointState.NORMAL, descriptorsOverride);
+  this.hovered_ = new anychart.core.StateSettings(this, hoveredSelectedDescriptorsMeta, anychart.PointState.HOVER, descriptorsOverride);
+  this.selected_ = new anychart.core.StateSettings(this, hoveredSelectedDescriptorsMeta, anychart.PointState.SELECT, descriptorsOverride);
 
   /**
    * Scale.
@@ -111,6 +116,8 @@ anychart.tagCloudModule.Chart = function(opt_data, opt_settings) {
   ]);
 };
 goog.inherits(anychart.tagCloudModule.Chart, anychart.core.SeparateChart);
+anychart.core.settings.populateAliases(anychart.tagCloudModule.Chart, [
+  'fill', 'fontFamily', 'fontStyle', 'fontVariant', 'fontWeight', 'fontSize'], 'normal');
 
 
 /**
@@ -170,35 +177,13 @@ anychart.tagCloudModule.Chart.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
 
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'mode',
-      anychart.enums.normalizeTagCloudMode);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'fromAngle',
-      anychart.core.settings.numberNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'toAngle',
-      anychart.core.settings.numberNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'anglesCount',
-      anychart.core.settings.numberNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'textSpacing',
-      anychart.core.settings.numberNormalizer);
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'mode', anychart.enums.normalizeTagCloudMode],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'fromAngle', anychart.core.settings.numberNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'toAngle', anychart.core.settings.numberNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'anglesCount', anychart.core.settings.numberNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'textSpacing', anychart.core.settings.numberNormalizer]
+  ]);
 
   return map;
 })();
@@ -336,11 +321,11 @@ anychart.tagCloudModule.Chart.prototype.data_;
  * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|anychart.tagCloudModule.Chart)} .
  */
 anychart.tagCloudModule.Chart.prototype.palette = function(opt_value) {
-  if (opt_value instanceof anychart.palettes.RangeColors) {
-    this.setupPalette_(anychart.palettes.RangeColors, opt_value);
+  if (anychart.utils.instanceOf(opt_value, anychart.palettes.RangeColors)) {
+    this.setupPalette_(anychart.palettes.RangeColors, /** @type {anychart.palettes.RangeColors} */(opt_value));
     return this;
-  } else if (opt_value instanceof anychart.palettes.DistinctColors) {
-    this.setupPalette_(anychart.palettes.DistinctColors, opt_value);
+  } else if (anychart.utils.instanceOf(opt_value, anychart.palettes.DistinctColors)) {
+    this.setupPalette_(anychart.palettes.DistinctColors, /** @type {anychart.palettes.DistinctColors} */(opt_value));
     return this;
   } else if (goog.isObject(opt_value) && opt_value['type'] == 'range') {
     this.setupPalette_(anychart.palettes.RangeColors);
@@ -361,7 +346,7 @@ anychart.tagCloudModule.Chart.prototype.palette = function(opt_value) {
  * @private
  */
 anychart.tagCloudModule.Chart.prototype.setupPalette_ = function(cls, opt_cloneFrom) {
-  if (this.palette_ instanceof cls) {
+  if (anychart.utils.instanceOf(this.palette_, cls)) {
     if (opt_cloneFrom)
       this.palette_.setup(opt_cloneFrom);
   } else {
@@ -412,7 +397,7 @@ anychart.tagCloudModule.Chart.prototype.getColorResolutionContext = function(opt
   ctx['category'] = category;
 
   if (colorScale) {
-    var valueForScale = colorScale instanceof anychart.colorScalesModule.Ordinal && goog.isDef(category) ?
+    var valueForScale = anychart.utils.instanceOf(colorScale, anychart.colorScalesModule.Ordinal) && goog.isDef(category) ?
         category : value;
 
     if (this.colorScale_ || goog.isDef(category))
@@ -551,7 +536,7 @@ anychart.tagCloudModule.Chart.prototype.doAdditionActionsOnMouseOverAndMove = fu
     iterator.select(index);
     var colorScale = this.getColorScale();
     var value;
-    if (colorScale instanceof anychart.colorScalesModule.Ordinal) {
+    if (anychart.utils.instanceOf(colorScale, anychart.colorScalesModule.Ordinal)) {
       value = iterator.meta(this.categoryFieldName);
     } else {
       value = iterator.get(this.referenceValueNames[1]);
@@ -943,9 +928,9 @@ anychart.tagCloudModule.Chart.prototype.data = function(opt_value, opt_settings)
     if (this.rawData_ !== opt_value) {
       this.rawData_ = opt_value;
       goog.dispose(this.parentViewToDispose_); // disposing a view created by the series if any;
-      if (opt_value instanceof anychart.data.View)
+      if (anychart.utils.instanceOf(opt_value, anychart.data.View))
         this.data_ = this.parentViewToDispose_ = opt_value.derive(); // deriving a view to avoid interference with other view users
-      else if (opt_value instanceof anychart.data.Set)
+      else if (anychart.utils.instanceOf(opt_value, anychart.data.Set))
         this.data_ = this.parentViewToDispose_ = opt_value.mapAs();
       else {
         this.data_ = (this.parentViewToDispose_ = new anychart.data.Set(
@@ -990,22 +975,19 @@ anychart.tagCloudModule.Chart.prototype.angles = function(opt_value) {
 
 /**
  * Tags rotation angles.
- * @param {(anychart.enums.ScaleTypes|anychart.scales.Base)=} opt_value .
+ * @param {(anychart.enums.ScaleTypes|Object|anychart.scales.Base)=} opt_value .
  * @return {anychart.scales.Base|anychart.tagCloudModule.Chart}
  */
 anychart.tagCloudModule.Chart.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (goog.isString(opt_value)) {
-      opt_value = anychart.scales.Base.fromString(opt_value, false);
-    }
-    if (opt_value instanceof anychart.scales.Linear && this.scale_ != opt_value) {
-      if (this.scale_)
-        this.scale_.unlistenSignals(this.scaleInvalidated, this);
-      this.scale_ = opt_value;
-      if (this.scale_)
-        this.scale_.listenSignals(this.scaleInvalidated, this);
-
-      this.invalidate(anychart.ConsistencyState.TAG_CLOUD_SCALE, anychart.Signal.NEEDS_REDRAW);
+    var val = anychart.scales.Base.setupScale(this.scale_, opt_value, null,
+        anychart.scales.Base.ScaleTypes.SCATTER, null, this.scaleInvalidated, this);
+    if (val) {
+      var dispatch = this.scale_ == val;
+      this.scale_ = /** @type {anychart.scales.Linear} */(val);
+      this.scale_.resumeSignalsDispatching(dispatch);
+      if (!dispatch)
+        this.invalidate(anychart.ConsistencyState.TAG_CLOUD_SCALE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -1025,22 +1007,30 @@ anychart.tagCloudModule.Chart.prototype.scaleInvalidated = function(event) {
 
 /**
  * Color scale.
- * @param {(anychart.colorScalesModule.Linear|anychart.colorScalesModule.Ordinal)=} opt_value Scale to set.
+ * @param {(anychart.colorScalesModule.Linear|anychart.colorScalesModule.Ordinal|Object|anychart.enums.ScaleTypes)=} opt_value Scale to set.
  * @return {anychart.colorScalesModule.Ordinal|anychart.colorScalesModule.Linear|anychart.tagCloudModule.Chart} Default chart color scale value or itself for
  * method chaining.
  */
 anychart.tagCloudModule.Chart.prototype.colorScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.colorScale_ != opt_value) {
-      if (this.colorScale_)
-        this.colorScale_.unlistenSignals(this.colorScaleInvalidated_, this);
-      this.colorScale_ = opt_value;
-      if (this.colorScale_)
-        this.colorScale_.listenSignals(this.colorScaleInvalidated_, this);
-
+    if (goog.isNull(opt_value) && this.colorScale_) {
+      this.colorScale_ = null;
       this.invalidate(anychart.ConsistencyState.TAG_CLOUD_COLOR_SCALE,
           anychart.Signal.NEEDS_REDRAW |
           anychart.Signal.NEED_UPDATE_COLOR_RANGE);
+    } else {
+      var val = anychart.scales.Base.setupScale(this.colorScale_, opt_value, null,
+          anychart.scales.Base.ScaleTypes.COLOR_SCALES, null, this.colorScaleInvalidated_, this);
+      if (val) {
+        var dispatch = this.colorScale_ == val;
+        this.colorScale_ = val;
+        this.colorScale_.resumeSignalsDispatching(dispatch);
+        if (!dispatch) {
+          this.colorRange().removeLines();
+          this.invalidate(anychart.ConsistencyState.TAG_CLOUD_COLOR_SCALE,
+              anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_COLOR_RANGE);
+        }
+      }
     }
     return this;
   }
@@ -1064,11 +1054,11 @@ anychart.tagCloudModule.Chart.prototype.colorScaleInvalidated_ = function(event)
 /**
  * Normal state settings.
  * @param {!Object=} opt_value .
- * @return {anychart.tagCloudModule.StateSettings|anychart.tagCloudModule.Chart}
+ * @return {anychart.core.StateSettings|anychart.tagCloudModule.Chart}
  */
 anychart.tagCloudModule.Chart.prototype.normal = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    this.normal_.setupByJSON(opt_value);
+    this.normal_.setup(opt_value);
     return this;
   }
   return this.normal_;
@@ -1076,32 +1066,13 @@ anychart.tagCloudModule.Chart.prototype.normal = function(opt_value) {
 
 
 /**
- * Internal normal state invalidation handler.
- * @param {anychart.SignalEvent} e Event object.
- * @private
- */
-anychart.tagCloudModule.Chart.prototype.normalStateListener_ = function(e) {
-  var state = 0;
-  var signal = anychart.Signal.NEEDS_REDRAW;
-
-  if (e.hasSignal(anychart.Signal.BOUNDS_CHANGED))
-    state |= anychart.ConsistencyState.TAG_CLOUD_TAGS | anychart.ConsistencyState.BOUNDS;
-
-  if (e.hasSignal(anychart.Signal.NEEDS_REDRAW_APPEARANCE))
-    state |= anychart.ConsistencyState.APPEARANCE;
-
-  this.invalidate(state, signal);
-};
-
-
-/**
  * Hovered state settings.
  * @param {!Object=} opt_value .
- * @return {anychart.tagCloudModule.StateSettings|anychart.tagCloudModule.Chart}
+ * @return {anychart.core.StateSettings|anychart.tagCloudModule.Chart}
  */
 anychart.tagCloudModule.Chart.prototype.hovered = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    this.hovered_.setupByJSON(opt_value);
+    this.hovered_.setup(opt_value);
     return this;
   }
   return this.hovered_;
@@ -1111,11 +1082,11 @@ anychart.tagCloudModule.Chart.prototype.hovered = function(opt_value) {
 /**
  * Selected state settings.
  * @param {!Object=} opt_value .
- * @return {anychart.tagCloudModule.StateSettings|anychart.tagCloudModule.Chart}
+ * @return {anychart.core.StateSettings|anychart.tagCloudModule.Chart}
  */
 anychart.tagCloudModule.Chart.prototype.selected = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    this.selected_.setupByJSON(opt_value);
+    this.selected_.setup(opt_value);
     return this;
   }
   return this.selected_;
@@ -1194,7 +1165,7 @@ anychart.tagCloudModule.Chart.prototype.createLegendItemsProvider = function(sou
   var series, scale;
   if (sourceMode == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
     series = this;
-    scale = this.getColorScale() instanceof anychart.colorScalesModule.Ordinal ? this.getColorScale() : void 0;
+    scale = anychart.utils.instanceOf(this.getColorScale(), anychart.colorScalesModule.Ordinal) ? this.getColorScale() : void 0;
 
     if (scale) {
       var ranges = scale.getProcessedRanges();
@@ -1710,7 +1681,7 @@ anychart.tagCloudModule.Chart.prototype.calcScale = function() {
   var category = iterator.get('category');
   var index = iterator.getIndex();
 
-  if (colorScale instanceof anychart.colorScalesModule.Ordinal && goog.isDef(category)) {
+  if (anychart.utils.instanceOf(colorScale, anychart.colorScalesModule.Ordinal) && goog.isDef(category)) {
     var valueForScale = category;
     iterator.meta('category', category);
 
@@ -2092,6 +2063,38 @@ anychart.tagCloudModule.Chart.prototype.drawContent = function(bounds) {
 
 
 //endregion
+//region --- CSV
+//------------------------------------------------------------------------------
+//
+//  CSV
+//
+//------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.tagCloudModule.Chart.prototype.getCsvGrouperColumn = function() {
+  return ['x'];
+};
+
+
+/** @inheritDoc */
+anychart.tagCloudModule.Chart.prototype.getCsvGrouperValue = function(iterator) {
+  return iterator.get('x');
+};
+
+
+/** @inheritDoc */
+anychart.tagCloudModule.Chart.prototype.getCsvGrouperAlias = function(iterator) {
+  var res = iterator.get('name');
+  return goog.isString(res) ? res : null;
+};
+
+
+/** @inheritDoc */
+anychart.tagCloudModule.Chart.prototype.getCsvColumns = function(dataHolder) {
+  return this.data().checkFieldExist('category') ? ['value', 'category'] : ['value'];
+};
+
+
+//endregion
 //region --- No data
 /** @inheritDoc */
 anychart.tagCloudModule.Chart.prototype.isNoData = function() {
@@ -2154,12 +2157,10 @@ anychart.tagCloudModule.Chart.prototype.setupByJSON = function(config, opt_defau
   this.angles(config['angles']);
   this.palette(config['palette']);
   this.colorRange().setupInternal(!!opt_default, config['colorRange']);
-  if (config['normal'])
-    this.normal_.setupByJSON(config['normal'], opt_default);
-  if (config['hovered'])
-    this.hovered_.setupByJSON(config['hovered'], opt_default);
-  if (config['selected'])
-    this.selected_.setupByJSON(config['selected'], opt_default);
+  this.normal_.setupInternal(!!opt_default, config);
+  this.normal_.setupInternal(!!opt_default, config['normal']);
+  this.hovered_.setupInternal(!!opt_default, config['hovered']);
+  this.selected_.setupInternal(!!opt_default, config['selected']);
 };
 
 

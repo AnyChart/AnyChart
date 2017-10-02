@@ -30,21 +30,18 @@ anychart.annotationsModule.AndrewsPitchfork = function(chartController) {
    * @private
    */
   this.strokeResolver_ = /** @type {function(anychart.annotationsModule.Base,number):acgraph.vector.Stroke} */(
-      anychart.annotationsModule.Base.getColorResolver(
-          ['stroke', 'hoverStroke', 'selectStroke'],
-          anychart.enums.ColorType.STROKE));
+      anychart.annotationsModule.Base.getColorResolver('stroke', anychart.enums.ColorType.STROKE, true));
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.annotationsModule.X_ANCHOR_DESCRIPTORS_META);
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.annotationsModule.VALUE_ANCHOR_DESCRIPTORS_META);
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.annotationsModule.SECOND_ANCHOR_POINT_DESCRIPTORS_META);
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.annotationsModule.THIRD_ANCHOR_POINT_DESCRIPTORS_META);
-  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.annotationsModule.STROKE_DESCRIPTORS_META);
 };
 goog.inherits(anychart.annotationsModule.AndrewsPitchfork, anychart.annotationsModule.Base);
+anychart.core.settings.populateAliases(anychart.annotationsModule.AndrewsPitchfork, ['stroke'], 'normal');
 anychart.core.settings.populate(anychart.annotationsModule.AndrewsPitchfork, anychart.annotationsModule.X_ANCHOR_DESCRIPTORS);
 anychart.core.settings.populate(anychart.annotationsModule.AndrewsPitchfork, anychart.annotationsModule.VALUE_ANCHOR_DESCRIPTORS);
 anychart.core.settings.populate(anychart.annotationsModule.AndrewsPitchfork, anychart.annotationsModule.SECOND_ANCHOR_POINT_DESCRIPTORS);
 anychart.core.settings.populate(anychart.annotationsModule.AndrewsPitchfork, anychart.annotationsModule.THIRD_ANCHOR_POINT_DESCRIPTORS);
-anychart.core.settings.populate(anychart.annotationsModule.AndrewsPitchfork, anychart.annotationsModule.STROKE_DESCRIPTORS);
 anychart.annotationsModule.AnnotationTypes[anychart.enums.AnnotationTypes.ANDREWS_PITCHFORK] = anychart.annotationsModule.AndrewsPitchfork;
 
 
@@ -63,6 +60,15 @@ anychart.annotationsModule.AndrewsPitchfork.prototype.type = anychart.enums.Anno
  * @type {anychart.annotationsModule.AnchorSupport}
  */
 anychart.annotationsModule.AndrewsPitchfork.prototype.SUPPORTED_ANCHORS = anychart.annotationsModule.AnchorSupport.THREE_POINTS;
+
+
+//endregion
+//region State settings
+/** @inheritDoc */
+anychart.annotationsModule.AndrewsPitchfork.prototype.getNormalDescriptorsMeta = function() {
+  var base = anychart.annotationsModule.AndrewsPitchfork.base(this, 'getNormalDescriptorsMeta');
+  return goog.array.concat(base, anychart.annotationsModule.STROKE_DESCRIPTORS_META);
+};
 
 
 //endregion
@@ -192,7 +198,6 @@ anychart.annotationsModule.AndrewsPitchfork.prototype.checkVisible = function() 
 anychart.annotationsModule.AndrewsPitchfork.prototype.serialize = function() {
   var json = anychart.annotationsModule.AndrewsPitchfork.base(this, 'serialize');
 
-  anychart.core.settings.serialize(this, anychart.annotationsModule.STROKE_DESCRIPTORS, json, 'Annotation');
   anychart.core.settings.serialize(this, anychart.annotationsModule.X_ANCHOR_DESCRIPTORS, json, 'Annotation');
   anychart.core.settings.serialize(this, anychart.annotationsModule.VALUE_ANCHOR_DESCRIPTORS, json, 'Annotation');
   anychart.core.settings.serialize(this, anychart.annotationsModule.SECOND_ANCHOR_POINT_DESCRIPTORS, json, 'Annotation');
@@ -205,7 +210,6 @@ anychart.annotationsModule.AndrewsPitchfork.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.annotationsModule.AndrewsPitchfork.prototype.setupByJSON = function(config, opt_default) {
 
-  anychart.core.settings.deserialize(this, anychart.annotationsModule.STROKE_DESCRIPTORS, config);
   anychart.core.settings.deserialize(this, anychart.annotationsModule.X_ANCHOR_DESCRIPTORS, config);
   anychart.core.settings.deserialize(this, anychart.annotationsModule.VALUE_ANCHOR_DESCRIPTORS, config);
   anychart.core.settings.deserialize(this, anychart.annotationsModule.SECOND_ANCHOR_POINT_DESCRIPTORS, config);

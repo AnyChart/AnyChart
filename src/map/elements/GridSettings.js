@@ -19,7 +19,7 @@ anychart.mapModule.elements.GridSettings = function(map) {
 
   /**
    * Parent title.
-   * @type {anychart.mapModule.elements.AxisSettings}
+   * @type {anychart.core.settings.IResolvable}
    * @private
    */
   this.parent_ = null;
@@ -45,13 +45,19 @@ anychart.mapModule.elements.GridSettings = function(map) {
    */
   this.resolutionChainCache_ = null;
 
+  /**
+   * Palette for series colors.
+   * @type {anychart.palettes.RangeColors|anychart.palettes.DistinctColors}
+   * @private
+   */
+  this.palette_ = null;
+
   this.markConsistent(anychart.ConsistencyState.ALL);
 
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['stroke', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
     ['minorStroke', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
-    ['oddFill', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
-    ['evenFill', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
+    ['fill', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
     ['drawFirstLine', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
     ['drawLastLine', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
     ['enabled', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.ENABLED_STATE_CHANGED],
@@ -95,6 +101,12 @@ anychart.mapModule.elements.GridSettings.prototype.SUPPORTED_SIGNALS =
  * @return {*}
  */
 anychart.mapModule.elements.GridSettings.prototype.getOption = anychart.core.settings.getOption;
+
+
+/** @inheritDoc */
+anychart.mapModule.elements.GridSettings.prototype.isResolvable = function() {
+  return true;
+};
 
 
 //endregion
@@ -156,14 +168,8 @@ anychart.mapModule.elements.GridSettings.prototype.SIMPLE_PROPS_DESCRIPTORS = (f
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'oddFill',
-      anychart.core.settings.fillNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'evenFill',
-      anychart.core.settings.fillNormalizer);
+      'fill',
+      anychart.core.settings.fillOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
@@ -195,6 +201,69 @@ anychart.core.settings.populate(anychart.mapModule.elements.GridSettings, anycha
 
 
 //endregion
+//region --- Palette
+/**
+ * Getter/setter for palette.
+ * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|Object|Array.<string>)=} opt_value .
+ * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|anychart.mapModule.elements.GridSettings)} .
+ */
+anychart.mapModule.elements.GridSettings.prototype.palette = function(opt_value) {
+  if (anychart.utils.instanceOf(opt_value, anychart.palettes.RangeColors)) {
+    this.setupPalette_(anychart.palettes.RangeColors, /** @type {anychart.palettes.RangeColors} */(opt_value));
+    return this;
+  } else if (anychart.utils.instanceOf(opt_value, anychart.palettes.DistinctColors)) {
+    this.setupPalette_(anychart.palettes.DistinctColors, /** @type {anychart.palettes.DistinctColors} */(opt_value));
+    return this;
+  } else if (goog.isObject(opt_value) && opt_value['type'] == 'range') {
+    this.setupPalette_(anychart.palettes.RangeColors);
+  } else if (goog.isObject(opt_value) || this.palette_ == null)
+    this.setupPalette_(anychart.palettes.DistinctColors);
+
+  if (goog.isDef(opt_value)) {
+    this.palette_.setup(opt_value);
+    return this;
+  }
+  return /** @type {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors)} */(this.palette_);
+};
+
+
+/**
+ * @param {Function} cls Palette constructor.
+ * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors)=} opt_cloneFrom Settings to clone from.
+ * @private
+ */
+anychart.mapModule.elements.GridSettings.prototype.setupPalette_ = function(cls, opt_cloneFrom) {
+  if (anychart.utils.instanceOf(this.palette_, cls)) {
+    if (opt_cloneFrom)
+      this.palette_.setup(opt_cloneFrom);
+  } else {
+    // we dispatch only if we replace existing palette.
+    var doDispatch = !!this.palette_;
+    goog.dispose(this.palette_);
+    this.palette_ = new cls();
+    if (opt_cloneFrom)
+      this.palette_.setup(opt_cloneFrom);
+    this.palette_.listenSignals(this.paletteInvalidated_, this);
+    this.registerDisposable(this.palette_);
+    if (doDispatch)
+      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
+  }
+};
+
+
+/**
+ * Internal palette invalidation handler.
+ * @param {anychart.SignalEvent} event Event object.
+ * @private
+ */
+anychart.mapModule.elements.GridSettings.prototype.paletteInvalidated_ = function(event) {
+  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
+    this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
+  }
+};
+
+
+//endregion
 //region --- Grids
 /**
  * Return all exist grids.
@@ -213,7 +282,7 @@ anychart.mapModule.elements.GridSettings.prototype.getItems = function() {
 anychart.mapModule.elements.GridSettings.prototype.vertical = function(opt_value) {
   if (!this.verticalGrid_) {
     this.verticalGrid_ = new anychart.mapModule.elements.Grid();
-    this.verticalGrid_.layout(anychart.enums.Layout.VERTICAL);
+    this.verticalGrid_.setDefaultLayout(anychart.enums.Layout.VERTICAL);
     this.verticalGrid_.parent(this);
     var zIndex = this.getOption('zIndex') + this.grids_.length * anychart.mapModule.Chart.ZINDEX_INCREMENT_MULTIPLIER;
     this.verticalGrid_.setAutoZIndex(/** @type {number} */(zIndex));
@@ -238,7 +307,7 @@ anychart.mapModule.elements.GridSettings.prototype.vertical = function(opt_value
 anychart.mapModule.elements.GridSettings.prototype.horizontal = function(opt_value) {
   if (!this.horizontalGrid_) {
     this.horizontalGrid_ = new anychart.mapModule.elements.Grid();
-    this.horizontalGrid_.layout(anychart.enums.Layout.HORIZONTAL);
+    this.horizontalGrid_.setDefaultLayout(anychart.enums.Layout.HORIZONTAL);
     this.horizontalGrid_.parent(this);
     var zIndex = this.getOption('zIndex') + this.grids_.length * anychart.mapModule.Chart.ZINDEX_INCREMENT_MULTIPLIER;
     this.horizontalGrid_.setAutoZIndex(/** @type {number} */(zIndex));
@@ -290,6 +359,8 @@ anychart.mapModule.elements.GridSettings.prototype.setupByJSON = function(config
     anychart.core.settings.deserialize(this, this.SIMPLE_PROPS_DESCRIPTORS, config);
     this.setOption('enabled', 'enabled' in config ? config['enabled'] : true);
   }
+  if (config['palette'])
+    this.palette(config['palette']);
 
   this.horizontal().setupInternal(!!opt_default, config['horizontal']);
   this.vertical().setupInternal(!!opt_default, config['vertical']);
@@ -313,6 +384,8 @@ anychart.mapModule.elements.GridSettings.prototype.serialize = function() {
     if (!goog.object.isEmpty(gridSettings))
       json['horizontal'] = gridSettings;
   }
+  if (this.palette_)
+    json['palette'] = this.palette_.serialize();
 
   anychart.core.settings.serialize(this, this.SIMPLE_PROPS_DESCRIPTORS, json, 'Map grids props');
 
@@ -322,7 +395,10 @@ anychart.mapModule.elements.GridSettings.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.mapModule.elements.GridSettings.prototype.disposeInternal = function() {
+  goog.disposeAll(this.verticalGrid_, this.horizontalGrid_, this.palette_);
+  this.map_ = null;
 
+  anychart.mapModule.elements.GridSettings.base(this, 'disposeInternal');
 };
 
 
@@ -331,8 +407,10 @@ anychart.mapModule.elements.GridSettings.prototype.disposeInternal = function() 
 //exports
 (function() {
   var proto = anychart.mapModule.elements.GridSettings.prototype;
+
   proto['horizontal'] = proto.horizontal;
   proto['vertical'] = proto.vertical;
+  proto['palette'] = proto.palette;
   //descriptors
   // proto['enabled'] = proto.enabled;
   // proto['zIndex'] = proto.zIndex;
@@ -340,8 +418,7 @@ anychart.mapModule.elements.GridSettings.prototype.disposeInternal = function() 
   // proto['minorStroke'] = proto.minorStroke;
   // proto['drawFirstLine'] = proto.drawFirstLine;
   // proto['drawLastLine'] = proto.drawLastLine;
-  // proto['oddFill'] = proto.oddFill;
-  // proto['evenFill'] = proto.evenFill;
+  // proto['fill'] = proto.fill;
 })();
 //endregion
 

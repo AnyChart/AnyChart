@@ -152,7 +152,7 @@ anychart.core.utils.Bounds.prototype.maxHeight_ = null;
  */
 anychart.core.utils.Bounds.prototype.toRect = function(opt_parentLeftOrRect, opt_parentTop, opt_parentWidth, opt_parentHeight) {
   var parentBounds;
-  if (opt_parentLeftOrRect instanceof anychart.math.Rect) {
+  if (anychart.utils.instanceOf(opt_parentLeftOrRect, anychart.math.Rect)) {
     parentBounds = /** @type {anychart.math.Rect} */(opt_parentLeftOrRect);
     opt_parentLeftOrRect = anychart.utils.toNumber(parentBounds.left);
     opt_parentTop = anychart.utils.toNumber(parentBounds.top);
@@ -571,7 +571,7 @@ anychart.core.utils.Bounds.prototype.setupSpecial = function(isDefault, var_args
   var left, top, right, bottom, width, height, minWidth, minHeight, maxWidth, maxHeight;
   var operable = false;
   var arg0 = arguments[1];
-  if (arg0 instanceof anychart.core.utils.Bounds) {
+  if (anychart.utils.instanceOf(arg0, anychart.core.utils.Bounds)) {
     left = arg0.left_;
     top = arg0.top_;
     width = arg0.width_;
@@ -583,7 +583,7 @@ anychart.core.utils.Bounds.prototype.setupSpecial = function(isDefault, var_args
     right = arg0.right_;
     bottom = arg0.bottom_;
     operable = true;
-  } else if (arg0 instanceof anychart.math.Rect) {
+  } else if (anychart.utils.instanceOf(arg0, anychart.math.Rect)) {
     left = arg0.left;
     top = arg0.top;
     width = arg0.width;

@@ -224,7 +224,7 @@ anychart.core.ui.CircularLabelsFactory.prototype.measureWithoutAutoRotate = func
  */
 anychart.core.ui.CircularLabelsFactory.prototype.measureWithTransform = function(formatProviderOrLabel, opt_positionProvider, opt_settings, opt_cacheIndex) {
   var rotation, anchor, angle;
-  if (formatProviderOrLabel instanceof anychart.core.ui.CircularLabelsFactory.Label) {
+  if (anychart.utils.instanceOf(formatProviderOrLabel, anychart.core.ui.CircularLabelsFactory.Label)) {
     angle = (formatProviderOrLabel.positionProvider() ? formatProviderOrLabel.positionProvider()['value']['angle'] : 0) || 0;
     rotation = formatProviderOrLabel.getRotation(angle);
     anchor = formatProviderOrLabel.getFinalSettings('anchor');

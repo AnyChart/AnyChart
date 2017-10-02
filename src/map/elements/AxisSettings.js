@@ -96,6 +96,12 @@ anychart.mapModule.elements.AxisSettings.prototype.SUPPORTED_SIGNALS =
 anychart.mapModule.elements.AxisSettings.prototype.getOption = anychart.core.settings.getOption;
 
 
+/** @inheritDoc */
+anychart.mapModule.elements.AxisSettings.prototype.isResolvable = function() {
+  return true;
+};
+
+
 //endregion
 //region --- IResolvable implementation
 /** @inheritDoc */

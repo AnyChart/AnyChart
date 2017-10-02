@@ -510,9 +510,9 @@ anychart.resourceModule.Chart.prototype.data = function(opt_value, opt_csvSettin
     if (this.rawData_ !== opt_value) {
       this.rawData_ = opt_value;
       goog.dispose(this.parentViewToDispose_); // disposing a view created by the series if any;
-      if (opt_value instanceof anychart.data.View)
+      if (anychart.utils.instanceOf(opt_value, anychart.data.View))
         this.data_ = this.parentViewToDispose_ = opt_value.derive(); // deriving a view to avoid interference with other view users
-      else if (opt_value instanceof anychart.data.Set)
+      else if (anychart.utils.instanceOf(opt_value, anychart.data.Set))
         this.data_ = this.parentViewToDispose_ = opt_value.mapAs();
       else
         this.data_ = (this.parentViewToDispose_ = new anychart.data.Set(
@@ -2257,6 +2257,27 @@ anychart.resourceModule.Chart.ActivityIterator.prototype.meta = function(name, o
 
 
 //endregion
+//region --- CSV
+//------------------------------------------------------------------------------
+//
+//  CSV
+//
+//------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.resourceModule.Chart.prototype.getDataHolders = function() {
+  return [this];
+};
+
+
+/** @inheritDoc */
+anychart.resourceModule.Chart.prototype.toCsv = function(opt_chartDataExportMode, opt_csvSettings) {
+  // only RAW is supported
+  var result = this.getRawCsvData();
+  return anychart.utils.serializeCsv(result.headers, result.data, opt_csvSettings);
+};
+
+
+//endregion
 //region --- Exports
 //------------------------------------------------------------------------------
 //
@@ -2289,7 +2310,7 @@ anychart.resourceModule.Chart.ActivityIterator.prototype.meta = function(name, o
   proto['select'] = proto.select;
   proto['selectPoint'] = proto.selectPoint;
   proto['unselect'] = proto.unselect;
-  proto['noDataLabel'] = proto.noDataLabel;
+  proto['noData'] = proto.noData;
   // auto generated
   //proto['pixPerHour'] = proto.pixPerHour;
   //proto['minRowHeight'] = proto.minRowHeight;

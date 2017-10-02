@@ -164,21 +164,18 @@ anychart.circularGaugeModule.Axis.prototype.overlapMode_;
 
 /**
  * Scale.
- * @param {(anychart.enums.GaugeScaleTypes|anychart.scales.Linear|anychart.scales.Logarithmic)=} opt_value Scale to set.
+ * @param {(anychart.enums.GaugeScaleTypes|anychart.scales.Linear|Object)=} opt_value Scale to set.
  * @return {anychart.scales.Linear|anychart.scales.Logarithmic|anychart.circularGaugeModule.Axis} Axis scale value or itself for method chaining.
  */
 anychart.circularGaugeModule.Axis.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (goog.isString(opt_value)) {
-      opt_value = this.getGaugeScale_(opt_value);
-    }
-    if (this.scale_ != opt_value) {
-      if (this.scale_)
-        this.scale_.unlistenSignals(this.scaleInvalidated_, this);
-
-      this.scale_ = opt_value;
-      this.scale_.listenSignals(this.scaleInvalidated_, this);
-      this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEEDS_REAPPLICATION);
+    var val = anychart.scales.Base.setupScale(this.scale_, opt_value, null, anychart.scales.Base.ScaleTypes.SCATTER, null, this.scaleInvalidated_, this);
+    if (val) {
+      var dispatch = this.scale_ == val;
+      this.scale_ = val;
+      val.resumeSignalsDispatching(dispatch);
+      if (!dispatch)
+        this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEEDS_REAPPLICATION);
     }
     return this;
   } else {

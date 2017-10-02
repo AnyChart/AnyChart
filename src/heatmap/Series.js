@@ -25,8 +25,8 @@ goog.require('anychart.utils');
 anychart.heatmapModule.Series = function(chart, plot, type, config, sortedMode) {
   anychart.heatmapModule.Series.base(this, 'constructor', chart, plot, type, config, sortedMode);
 
-  this.labels().adjustFontSizeMode('same');
-  this.labels().setParentEventTarget(this);
+  this.normal().labels().adjustFontSizeMode('same');
+  this.normal().labels().setParentEventTarget(this);
 
   /**
    * Stroke resolver.
@@ -34,33 +34,14 @@ anychart.heatmapModule.Series = function(chart, plot, type, config, sortedMode) 
    * @private
    */
   this.strokeResolver_ = /** @type {function(anychart.core.series.Base, number, boolean=, boolean=):acgraph.vector.Stroke} */(
-      anychart.color.getColorResolver(
-      ['stroke', 'hoverStroke', 'selectStroke'], anychart.enums.ColorType.STROKE));
-  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
-    ['stroke',
-      anychart.ConsistencyState.SERIES_POINTS,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
-      anychart.core.series.Capabilities.ANY]
+      anychart.color.getColorResolver('stroke', anychart.enums.ColorType.STROKE, true));
+  this.normal_.setMeta('stroke', [
+    anychart.ConsistencyState.SERIES_POINTS,
+    anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND,
+    anychart.core.series.Capabilities.ANY
   ]);
 };
 goog.inherits(anychart.heatmapModule.Series, anychart.core.series.Cartesian);
-
-
-/**
- * Properties that should be defined in series.Base prototype.
- * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
- */
-anychart.heatmapModule.Series.PROPERTY_DESCRIPTORS = (function() {
-  var map = {};
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'stroke',
-      anychart.core.settings.strokeOrFunctionNormalizer);
-  return map;
-})();
-// populating series base prototype with properties
-anychart.core.settings.populate(anychart.heatmapModule.Series, anychart.heatmapModule.Series.PROPERTY_DESCRIPTORS);
 
 
 /**
@@ -81,27 +62,6 @@ anychart.heatmapModule.Series.prototype.TOKEN_ALIASES = (function() {
 
 
 /** @inheritDoc */
-anychart.heatmapModule.Series.prototype.labels = function(opt_value) {
-  var res = (/** @type {anychart.heatmapModule.Chart} */(this.chart)).labels(opt_value);
-  return goog.isDef(opt_value) ? this : /** @type {!anychart.core.ui.LabelsFactory} */(res);
-};
-
-
-/** @inheritDoc */
-anychart.heatmapModule.Series.prototype.hoverLabels = function(opt_value) {
-  var res = (/** @type {anychart.heatmapModule.Chart} */(this.chart)).hoverLabels(opt_value);
-  return goog.isDef(opt_value) ? this : /** @type {!anychart.core.ui.LabelsFactory} */(res);
-};
-
-
-/** @inheritDoc */
-anychart.heatmapModule.Series.prototype.selectLabels = function(opt_value) {
-  var res = (/** @type {anychart.heatmapModule.Chart} */(this.chart)).selectLabels(opt_value);
-  return goog.isDef(opt_value) ? this : /** @type {!anychart.core.ui.LabelsFactory} */(res);
-};
-
-
-/** @inheritDoc */
 anychart.heatmapModule.Series.prototype.tooltip = function(opt_value) {
   var res = (/** @type {anychart.heatmapModule.Chart} */(this.chart)).tooltip(opt_value);
   return goog.isDef(opt_value) ? this : /** @type {!anychart.core.ui.Tooltip} */(res);
@@ -118,7 +78,7 @@ anychart.heatmapModule.Series.prototype.tooltip = function(opt_value) {
  */
 anychart.heatmapModule.Series.prototype.calcMinFontSize_ = function(point, pointState, prefix, minFontSize) {
   var label = this.drawFactoryElement(
-      [this.labels, this.hoverLabels, this.selectLabels],
+      [this.normal().labels, this.hovered().labels, this.selected().labels],
       null,
       ['label', 'hoverLabel', 'selectLabel'],
       this.planHasPointLabels(),
@@ -154,9 +114,9 @@ anychart.heatmapModule.Series.prototype.calcMinFontSize_ = function(point, point
 
 /** @inheritDoc */
 anychart.heatmapModule.Series.prototype.additionalLabelsInitialize = function() {
-  var labels = /** @type {anychart.core.ui.LabelsFactory} */(this.labels());
-  var hoverLabels = /** @type {anychart.core.ui.LabelsFactory} */(this.hoverLabels());
-  var selectLabels = /** @type {anychart.core.ui.LabelsFactory} */(this.selectLabels());
+  var labels = /** @type {anychart.core.ui.LabelsFactory} */(this.normal().labels());
+  var hoverLabels = /** @type {anychart.core.ui.LabelsFactory} */(this.hovered().labels());
+  var selectLabels = /** @type {anychart.core.ui.LabelsFactory} */(this.selected().labels());
 
   var labelsEnabled = /** @type {boolean} */(labels.enabled());
   var hoverLabelsEnabled = labelsEnabled || /** @type {boolean} */(hoverLabels.enabled());
@@ -333,7 +293,7 @@ anychart.heatmapModule.Series.prototype.createPositionProviderByGeometry = funct
 anychart.heatmapModule.Series.prototype.drawLabel = function(point, pointState, pointStateChanged) {
   var displayMode = (/** @type {anychart.heatmapModule.Chart} */(this.chart)).getOption('labelsDisplayMode');
   var label = this.drawFactoryElement(
-      [this.labels, this.hoverLabels, this.selectLabels],
+      [this.normal().labels, this.hovered().labels, this.selected().labels],
       null,
       ['label', 'hoverLabel', 'selectLabel'],
       this.planHasPointLabels(),
@@ -357,18 +317,19 @@ anychart.heatmapModule.Series.prototype.drawLabel = function(point, pointState, 
     var width = /** @type {number} */(point.meta(prefix + 'Width'));
     var height = /** @type {number} */(point.meta(prefix + 'Height'));
     var cellBounds = anychart.math.rect(x, y, width, height);
+    var labels = this.normal().labels();
 
     if (displayMode == anychart.enums.LabelsDisplayMode.DROP) {
       var mergedSettings = label.getMergedSettings();
       mergedSettings['width'] = null;
       mergedSettings['height'] = null;
-      var bounds = this.labels().measure(label.formatProvider(), label.positionProvider(), mergedSettings);
+      var bounds = labels.measure(label.formatProvider(), label.positionProvider(), mergedSettings);
       // we allow 0.5 pixel bounds overlap to allow better labels positioning
       if (cellBounds.left > bounds.left + .5 ||
           cellBounds.getRight() < bounds.getRight() - .5 ||
           cellBounds.top > bounds.top + .5 ||
           cellBounds.getBottom() < bounds.getBottom() - .5) {
-        this.labels().clear(label.getIndex());
+        labels.clear(label.getIndex());
         label = null;
       }
     }
@@ -383,7 +344,7 @@ anychart.heatmapModule.Series.prototype.drawLabel = function(point, pointState, 
         if (pointStateChanged)
           label.draw();
       } else {
-        this.labels().clear(label.getIndex());
+        labels.clear(label.getIndex());
       }
     }
   }
@@ -464,7 +425,7 @@ anychart.heatmapModule.Series.prototype.getContextProviderValues = function(prov
   if (colorScale) {
     var value = rowInfo.get('heat');
 
-    if (colorScale instanceof anychart.colorScalesModule.Ordinal) {
+    if (anychart.utils.instanceOf(colorScale, anychart.colorScalesModule.Ordinal)) {
       var range = colorScale.getRangeByValue(/** @type {number} */(value));
       if (range) {
         var colorRange = {
@@ -492,26 +453,8 @@ anychart.heatmapModule.Series.prototype.getColorResolutionContext = function(opt
 };
 
 
-/** @inheritDoc */
-anychart.heatmapModule.Series.prototype.serialize = function() {
-  var json = anychart.heatmapModule.Series.base(this, 'serialize');
-  anychart.core.settings.serialize(this, anychart.heatmapModule.Series.PROPERTY_DESCRIPTORS, json);
-  return json;
-};
-
-
-/** @inheritDoc */
-anychart.heatmapModule.Series.prototype.setupByJSON = function(config, opt_default) {
-  anychart.core.settings.deserialize(this, anychart.heatmapModule.Series.PROPERTY_DESCRIPTORS, config);
-  anychart.heatmapModule.Series.base(this, 'setupByJSON', config, opt_default);
-};
-
-
 //exports
 (function() {
   var proto = anychart.heatmapModule.Series.prototype;
   proto['tooltip'] = proto.tooltip;
-  proto['labels'] = proto.labels;
-  proto['hoverLabels'] = proto.hoverLabels;
-  proto['selectLabels'] = proto.selectLabels;
 })();

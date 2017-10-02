@@ -1,7 +1,7 @@
 {
   "name": "AnyChart",
   "description": "Robust JavaScript/HTML5 Chart library for any project",
-  "main": "./dist/anychart-bundle.min.js",
+  "main": "./dist/js/anychart-bundle.min.js",
   "authors": [
     "Roman Lubushkin <roman.lubushkin@anychart.com>",
     "Alexander Kudryavtsev <alexander.kudryavtsev@anychart.com>",

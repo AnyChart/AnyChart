@@ -2,7 +2,9 @@ goog.provide('anychart.pieModule.Chart');
 
 goog.require('anychart.animations.AnimationSerialQueue');
 goog.require('anychart.color');
+goog.require('anychart.core.IShapeManagerUser');
 goog.require('anychart.core.SeparateChart');
+goog.require('anychart.core.StateSettings');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.settings');
 goog.require('anychart.core.ui.CircularLabelsFactory');
@@ -30,6 +32,7 @@ goog.require('goog.labs.userAgent.device');
  * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @extends {anychart.core.SeparateChart}
  * @implements {anychart.core.utils.IInteractiveSeries}
+ * @implements {anychart.core.IShapeManagerUser}
  * @constructor
  */
 anychart.pieModule.Chart = function(opt_data, opt_csvSettings) {
@@ -50,12 +53,6 @@ anychart.pieModule.Chart = function(opt_data, opt_csvSettings) {
    * @private
    */
   this.groupedPointFilter_ = null;
-
-  /**
-   * @type {anychart.core.ui.CircularLabelsFactory}
-   * @private
-   */
-  this.labels_ = null;
 
   /**
    * Pie chart default palette.
@@ -98,7 +95,7 @@ anychart.pieModule.Chart = function(opt_data, opt_csvSettings) {
    * @type {acgraph.vector.Fill|Function}
    * @private
    */
-  this.aquaStylfill_ = (function() {
+  this.aquaStyleFill_ = (function() {
     var color = this['sourceColor'];
     var aquaStyleObj = this['aquaStyleObj'];
     return /** @type {acgraph.vector.Fill} */({
@@ -114,56 +111,6 @@ anychart.pieModule.Chart = function(opt_data, opt_csvSettings) {
       'mode': aquaStyleObj['mode']
     });
   });
-
-  /**
-   * Default fill function.
-   * this {{index:number, sourceColor: acgraph.vector.Fill, aquaStyleObj: acgraph.vector.Fill}}
-   * return {acgraph.vector.Fill} Fill for a pie slice.
-   * @type {acgraph.vector.Fill|Function}
-   * @private
-   */
-  this.fill_ = null;
-
-  /**
-   * Default stroke function.
-   * this {{index:number, sourceColor: acgraph.vector.Stroke}}
-   * return {acgraph.vector.Stroke} Stroke for a pie slice.
-   * @type {acgraph.vector.Stroke|Function}
-   * @private
-   */
-  this.stroke_ = null;
-
-  /**
-   * Default fill function for hover state.
-   * this {{index:number, sourceColor: acgraph.vector.Fill, aquaStyleObj: acgraph.vector.Fill}}
-   * return {acgraph.vector.Fill} Fill for a pie slice in hover state.
-   * @type {acgraph.vector.Fill|Function}
-   * @private
-   */
-  this.hoverFill_ = null;
-
-  /**
-   * Default stroke function for hover state.
-   * this {{index:number, sourceColor: acgraph.vector.Stroke}}
-   * return {acgraph.vector.Stroke} Stroke for a pie slice in hover state.
-   * @type {acgraph.vector.Stroke|Function}
-   * @private
-   */
-  this.hoverStroke_ = null;
-
-  /**
-   * Hatch fill.
-   * @type {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|boolean}
-   * @private
-   */
-  this.hatchFill_ = null;
-
-  /**
-   * Hover hatch fill.
-   * @type {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|boolean}
-   * @private
-   */
-  this.hoverHatchFill_;
 
   /**
    * @type {!anychart.data.Iterator}
@@ -218,9 +165,85 @@ anychart.pieModule.Chart = function(opt_data, opt_csvSettings) {
     ['mode3d', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.PIE_LABELS, anychart.Signal.NEEDS_REDRAW]
   ]);
 
+  var normalDescriptorsMeta = {};
+  anychart.core.settings.createDescriptorsMeta(normalDescriptorsMeta, [
+    ['fill',
+      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.CHART_LEGEND,
+      anychart.Signal.NEEDS_REDRAW],
+    ['stroke',
+      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.CHART_LEGEND,
+      anychart.Signal.NEEDS_REDRAW],
+    ['hatchFill',
+      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.CHART_LEGEND,
+      anychart.Signal.NEEDS_REDRAW],
+    ['labels', 0, 0]
+  ]);
+  function pieFillNormalizer(args) {
+    var isAqua = false;
+    if (goog.isString(args[0])) {
+      args[0] = args[0].toLowerCase();
+      isAqua = args[0] == 'aquastyle';
+    }
+    if (this.getOption('mode3d') && isAqua) {
+      return this.getOption('fill');
+    }
+    return goog.isFunction(args[0]) || isAqua ?
+        args[0] :
+        acgraph.vector.normalizeFill.apply(null, args);
+  }
+  var descriptorsOverride = [
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'fill', pieFillNormalizer]
+  ];
+  this.normal_ = new anychart.core.StateSettings(this, normalDescriptorsMeta, anychart.PointState.NORMAL, descriptorsOverride);
+  this.normal_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.CIRCULAR_LABELS_CONSTRUCTOR);
+  this.normal_.setOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK, /** @this {anychart.pieModule.Chart} */ function(factory) {
+    factory.listenSignals(this.labelsInvalidated_, this);
+    factory.setParentEventTarget(this);
+    this.invalidate(anychart.ConsistencyState.PIE_LABELS, anychart.Signal.NEEDS_REDRAW);
+  });
+
+  var hoveredDescriptorsMeta = {};
+  anychart.core.settings.createDescriptorsMeta(hoveredDescriptorsMeta, [
+    ['fill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['stroke', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['hatchFill', 0, 0],
+    ['labels', 0, 0]
+  ]);
+  this.hovered_ = new anychart.core.StateSettings(this, hoveredDescriptorsMeta, anychart.PointState.HOVER);
+  this.hovered_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.CIRCULAR_LABELS_CONSTRUCTOR);
+
   this.resumeSignalsDispatching(false);
 };
 goog.inherits(anychart.pieModule.Chart, anychart.core.SeparateChart);
+anychart.core.settings.populateAliases(anychart.pieModule.Chart, ['fill', 'stroke', 'hatchFill'], 'normal');
+
+
+/**
+ * Normal state settings.
+ * @param {!Object=} opt_value
+ * @return {anychart.core.StateSettings|anychart.pieModule.Chart}
+ */
+anychart.pieModule.Chart.prototype.normal = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.normal_.setup(opt_value);
+    return this;
+  }
+  return this.normal_;
+};
+
+
+/**
+ * Hovered state settings.
+ * @param {!Object=} opt_value
+ * @return {anychart.core.StateSettings|anychart.pieModule.Chart}
+ */
+anychart.pieModule.Chart.prototype.hovered = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.hovered_.setup(opt_value);
+    return this;
+  }
+  return this.hovered_;
+};
 
 
 /**
@@ -473,11 +496,11 @@ anychart.pieModule.Chart.prototype.data = function(opt_value, opt_csvSettings) {
 
         /** @type {anychart.data.View} */
         var parentView;
-        if (opt_value instanceof anychart.data.View) {
+        if (anychart.utils.instanceOf(opt_value, anychart.data.View)) {
           parentView = opt_value;
           this.parentViewToDispose_ = null;
         } else {
-          if (opt_value instanceof anychart.data.Set)
+          if (anychart.utils.instanceOf(opt_value, anychart.data.Set))
             parentView = (this.parentViewToDispose_ = opt_value).mapAs();
           else
             parentView = (this.parentViewToDispose_ = new anychart.data.Set(
@@ -588,11 +611,11 @@ anychart.pieModule.Chart.prototype.prepareData_ = function(data) {
  * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|anychart.pieModule.Chart)} .
  */
 anychart.pieModule.Chart.prototype.palette = function(opt_value) {
-  if (opt_value instanceof anychart.palettes.RangeColors) {
-    this.setupPalette_(anychart.palettes.RangeColors, opt_value);
+  if (anychart.utils.instanceOf(opt_value, anychart.palettes.RangeColors)) {
+    this.setupPalette_(anychart.palettes.RangeColors, /** @type {anychart.palettes.RangeColors} */(opt_value));
     return this;
-  } else if (opt_value instanceof anychart.palettes.DistinctColors) {
-    this.setupPalette_(anychart.palettes.DistinctColors, opt_value);
+  } else if (anychart.utils.instanceOf(opt_value, anychart.palettes.DistinctColors)) {
+    this.setupPalette_(anychart.palettes.DistinctColors, /** @type {anychart.palettes.DistinctColors} */(opt_value));
     return this;
   } else if (goog.isObject(opt_value) && opt_value['type'] == 'range') {
     this.setupPalette_(anychart.palettes.RangeColors);
@@ -614,7 +637,7 @@ anychart.pieModule.Chart.prototype.palette = function(opt_value) {
  * @private
  */
 anychart.pieModule.Chart.prototype.setupPalette_ = function(cls, opt_cloneFrom) {
-  if (this.palette_ instanceof cls) {
+  if (anychart.utils.instanceOf(this.palette_, cls)) {
     if (opt_cloneFrom)
       this.palette_.setup(opt_cloneFrom);
   } else {
@@ -661,259 +684,162 @@ anychart.pieModule.Chart.prototype.hatchFillPalette = function(opt_value) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter/setter for fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.pieModule.Chart|Function} .
+ * Cache of resolver functions.
+ * @type {Object.<string, Function>}
+ * @private
  */
-anychart.pieModule.Chart.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var isAqua = false;
-    if (goog.isString(opt_fillOrColorOrKeys)) {
-      opt_fillOrColorOrKeys = opt_fillOrColorOrKeys.toLowerCase();
-      isAqua = opt_fillOrColorOrKeys == 'aquastyle';
-    }
+anychart.pieModule.Chart.colorResolversCache_ = {};
 
-    // 3d mode does not have aqua style.
-    if (this.getOption('mode3d') && isAqua) {
-      return this;
-    }
 
-    var fill = goog.isFunction(opt_fillOrColorOrKeys) || isAqua ?
-        opt_fillOrColorOrKeys :
-        acgraph.vector.normalizeFill.apply(null, arguments);
-    if (fill != this.fill_) {
-      this.fill_ = /** @type {acgraph.vector.Fill}*/(fill);
-      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
+/**
+ * Returns a color resolver for passed color names and type.
+ * @param {(string|null|boolean)} colorName
+ * @param {anychart.enums.ColorType} colorType
+ * @param {boolean} canBeHoveredSelected Whether need to resolve hovered selected colors
+ * @return {Function}
+ */
+anychart.pieModule.Chart.getColorResolver = function(colorName, colorType, canBeHoveredSelected) {
+  if (!colorName) return anychart.color.getNullColor;
+  var hash = colorType + '|' + colorName + '|' + canBeHoveredSelected;
+  var result = anychart.pieModule.Chart.colorResolversCache_[hash];
+  if (!result) {
+    /** @type {!Function} */
+    var normalizerFunc;
+    switch (colorType) {
+      case anychart.enums.ColorType.STROKE:
+        normalizerFunc = anychart.core.settings.strokeOrFunctionSimpleNormalizer;
+        break;
+      case anychart.enums.ColorType.HATCH_FILL:
+        normalizerFunc = anychart.core.settings.hatchFillOrFunctionSimpleNormalizer;
+        break;
+      default:
+      case anychart.enums.ColorType.FILL:
+        normalizerFunc = anychart.core.settings.fillOrFunctionSimpleNormalizer;
+        break;
     }
-    return this;
+    anychart.pieModule.Chart.colorResolversCache_[hash] = result = goog.partial(anychart.pieModule.Chart.getColor_,
+        colorName, normalizerFunc, colorType == anychart.enums.ColorType.HATCH_FILL, canBeHoveredSelected);
   }
-  return this.fill_;
+  return result;
 };
 
 
 /**
- * Getter/setter for the pie slices fill in the hover state.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.pieModule.Chart|Function} .
+ *
+ * @param {string} colorName
+ * @param {Function} normalizer
+ * @param {boolean} isHatchFill
+ * @param {boolean} canBeHoveredSelected Whether need to resolve hovered selected colors
+ * @param {anychart.pieModule.Chart} pie
+ * @param {number} state
+ * @param {boolean=} opt_ignorePointSettings
+ * @return {*}
+ * @private
  */
-anychart.pieModule.Chart.prototype.hoverFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var fill = goog.isFunction(opt_fillOrColorOrKeys) ?
-        opt_fillOrColorOrKeys :
-        acgraph.vector.normalizeFill.apply(null, arguments);
-    if (fill != this.hoverFill_) {
-      this.hoverFill_ = fill;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+anychart.pieModule.Chart.getColor_ = function(colorName, normalizer, isHatchFill, canBeHoveredSelected, pie, state, opt_ignorePointSettings) {
+  var stateColor, context;
+  //state = anychart.core.utils.InteractivityState.clarifyState(state);
+  if (state != anychart.PointState.NORMAL && canBeHoveredSelected) {
+    stateColor = pie.resolveOption(colorName, state, pie.getIterator(), normalizer, false, void 0, opt_ignorePointSettings);
+    if (isHatchFill && stateColor === true)
+      stateColor = normalizer(pie.getAutoHatchFill());
+    if (goog.isDef(stateColor)) {
+      if (!goog.isFunction(stateColor))
+        return /** @type {acgraph.vector.Fill|acgraph.vector.Stroke|acgraph.vector.PatternFill} */(stateColor);
+      else if (isHatchFill) { // hatch fills set as function some why cannot nest by initial implementation
+        context = pie.getHatchFillResolutionContext(opt_ignorePointSettings);
+        return /** @type {acgraph.vector.PatternFill} */(normalizer(stateColor.call(context, context)));
+      }
     }
-    return this;
   }
-  return this.hoverFill_;
+  // we can get here only if state color is undefined or is a function
+  var color = pie.resolveOption(colorName, 0, pie.getIterator(), normalizer, false, void 0, opt_ignorePointSettings);
+  var isAqua = goog.isString(color) && color == 'aquastyle';
+  if (isHatchFill && color === true)
+    color = normalizer(pie.getAutoHatchFill());
+  if (goog.isFunction(color)) {
+    context = isHatchFill ?
+        pie.getHatchFillResolutionContext(opt_ignorePointSettings) :
+        pie.getColorResolutionContext(void 0, opt_ignorePointSettings);
+    color = /** @type {acgraph.vector.Fill|acgraph.vector.Stroke|acgraph.vector.PatternFill} */(normalizer(color.call(context, context)));
+  }
+  if (isAqua) {
+    color = pie.resolveAquaStyle();
+  }
+  if (stateColor) { // it is a function and not a hatch fill here
+    context = pie.getColorResolutionContext(
+        /** @type {acgraph.vector.Fill|acgraph.vector.Stroke} */(color),
+        opt_ignorePointSettings);
+    color = normalizer(stateColor.call(context, context));
+  }
+  return /** @type {acgraph.vector.Fill|acgraph.vector.Stroke|acgraph.vector.PatternFill} */(color);
 };
 
 
-/**
- * Method that gets final fill color for the current point, with all fallbacks taken into account.
- * @param {boolean} usePointSettings If point settings should count too (iterator questioning).
- * @param {anychart.PointState|number} pointState Point state.
- * @return {!acgraph.vector.Fill} Final hover fill for the current slice.
- * @protected
- */
-anychart.pieModule.Chart.prototype.getFinalFill = function(usePointSettings, pointState) {
+/** @inheritDoc */
+anychart.pieModule.Chart.prototype.resolveOption = function(name, state, point, normalizer, scrollerSelected, opt_seriesName, opt_ignorePointSettings) {
+  var val;
+  var hasHoverState = !!(state & anychart.PointState.HOVER);
+  var stateObject = hasHoverState ? this.hovered_ : this.normal_;
+  var stateValue = stateObject.getOption(name);
+  if (opt_ignorePointSettings) {
+    val = stateValue;
+  } else {
+    var pointStateName = hasHoverState ? 'hovered' : 'normal';
+    var pointStateObject = point.get(pointStateName);
+    val = anychart.utils.getFirstDefinedValue(
+        goog.isDef(pointStateObject) ? pointStateObject[name] : void 0,
+        point.get(anychart.color.getPrefixedColorName(state, name)),
+        stateValue);
+  }
+  if (goog.isDef(val))
+    val = normalizer(val);
+  return val;
+};
+
+
+/** @inheritDoc */
+anychart.pieModule.Chart.prototype.getAutoHatchFill = function() {
+  return /** @type {acgraph.vector.HatchFill} */ (
+      acgraph.vector.normalizeHatchFill(this.hatchFillPalette().itemAt(this.getIterator().getIndex()) ||
+      anychart.pieModule.Chart.DEFAULT_HATCH_FILL_TYPE));
+};
+
+
+/** @inheritDoc */
+anychart.pieModule.Chart.prototype.getHatchFillResolutionContext = function(opt_ignorePointSettings) {
   var iterator = this.getIterator();
-  var normalColor = /** @type {acgraph.vector.Fill|Function} */((usePointSettings && iterator.get('fill')) || this.fill());
-
-  var result;
-  if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
-    result = this.normalizeColor(
-        /** @type {acgraph.vector.Fill|Function} */(
-        (usePointSettings && iterator.get('hoverFill')) || this.hoverFill() || normalColor),
-        normalColor);
-  } else {
-    result = this.normalizeColor(normalColor);
-  }
-
-  return acgraph.vector.normalizeFill(/** @type {!acgraph.vector.Fill} */(result));
+  var index = iterator.getIndex();
+  return {
+    'index': index,
+    'sourceHatchFill': this.getAutoHatchFill(),
+    'iterator': iterator
+  };
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Stroke.
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Getter/setter for stroke.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.pieModule.Chart|acgraph.vector.Stroke|Function} .
- */
-anychart.pieModule.Chart.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var stroke = goog.isFunction(opt_strokeOrFill) ?
-        opt_strokeOrFill :
-        acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (stroke != this.stroke_) {
-      this.stroke_ = stroke;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.stroke_;
-};
-
-
-/**
- * Getter/setter for hoverStroke.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.pieModule.Chart|acgraph.vector.Stroke|Function} .
- */
-anychart.pieModule.Chart.prototype.hoverStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var stroke = goog.isFunction(opt_strokeOrFill) ?
-        opt_strokeOrFill :
-        acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (stroke != this.hoverStroke_) {
-      this.hoverStroke_ = stroke;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.hoverStroke_;
-};
-
-
-/**
- * Method that gets final stroke color for the current point, with all fallbacks taken into account.
- * @param {boolean} usePointSettings If point settings should count too (iterator questioning).
- * @param {anychart.PointState|number} pointState Point state.
- * @return {!acgraph.vector.Stroke} Final hover stroke for the current slice.
- * @protected
- */
-anychart.pieModule.Chart.prototype.getFinalStroke = function(usePointSettings, pointState) {
+/** @inheritDoc */
+anychart.pieModule.Chart.prototype.getColorResolutionContext = function(opt_baseColor, opt_ignorePointSettings, opt_ignoreColorScale) {
   var iterator = this.getIterator();
-  var normalColor = /** @type {acgraph.vector.Stroke|Function} */((usePointSettings && iterator.get('stroke')) || this.stroke());
-
-  var result;
-  if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
-    result = this.normalizeColor(
-        /** @type {acgraph.vector.Stroke|Function} */(
-        (usePointSettings && iterator.get('hoverStroke')) || this.hoverStroke() || normalColor),
-        normalColor);
-  } else {
-    result = this.normalizeColor(normalColor);
-  }
-
-  return acgraph.vector.normalizeStroke(/** @type {!acgraph.vector.Stroke} */(result));
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  HatchFill.
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Getter/setter for hatchFill.
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.pieModule.Chart|Function|boolean} Hatch fill.
- */
-anychart.pieModule.Chart.prototype.hatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrTypeOrState)) {
-    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
-        opt_patternFillOrTypeOrState :
-        acgraph.vector.normalizeHatchFill.apply(null, arguments);
-
-    if (hatchFill != this.hatchFill_) {
-      this.hatchFill_ = hatchFill;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return /** @type {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|boolean} */ (this.hatchFill_);
+  return {
+    'index': iterator.getIndex(),
+    'sourceColor': opt_baseColor || this.palette().itemAt(iterator.getIndex()) || 'blue',
+    'iterator': iterator
+  };
 };
 
 
 /**
- * Getter/setter for hoverHatchFill.
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.pieModule.Chart|Function|boolean} Hatch fill.
+ * Returns aqua resolution context.
+ * @return {acgraph.vector.AnyColor}
  */
-anychart.pieModule.Chart.prototype.hoverHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrTypeOrState)) {
-    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
-        opt_patternFillOrTypeOrState :
-        acgraph.vector.normalizeHatchFill.apply(null, arguments);
-
-    if (this.hoverHatchFill_ != hatchFill)
-      this.hoverHatchFill_ = hatchFill;
-
-    return this;
-  }
-  return /** @type {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|boolean} */ (this.hoverHatchFill_);
-};
-
-
-/**
- * Method that gets the final hatch fill for a current point, with all fallbacks taken into account.
- * @param {boolean} usePointSettings If point settings should count too (iterator questioning).
- * @param {anychart.PointState|number} pointState .
- * @return {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} Final hatch fill for the current row.
- */
-anychart.pieModule.Chart.prototype.getFinalHatchFill = function(usePointSettings, pointState) {
+anychart.pieModule.Chart.prototype.resolveAquaStyle = function() {
   var iterator = this.getIterator();
-
-  var normalHatchFill;
-  if (usePointSettings && goog.isDef(iterator.get('hatchFill'))) {
-    normalHatchFill = iterator.get('hatchFill');
-  } else {
-    normalHatchFill = this.hatchFill();
-  }
-
-  var hatchFill;
-  if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
-    if (usePointSettings && goog.isDef(iterator.get('hoverHatchFill'))) {
-      hatchFill = iterator.get('hoverHatchFill');
-    } else if (goog.isDef(this.hoverHatchFill())) {
-      hatchFill = this.hoverHatchFill();
-    } else {
-      hatchFill = normalHatchFill;
-    }
-  } else {
-    hatchFill = normalHatchFill;
-  }
-
-  return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */(
-      this.normalizeHatchFill(
-          /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|boolean|string} */(hatchFill)));
+  var context = {
+    'aquaStyleObj': this.aquaStyleObj_,
+    'sourceColor': this.palette().itemAt(iterator.getIndex())
+  };
+  return this.aquaStyleFill_.call(context);
 };
 
 
@@ -1019,52 +945,14 @@ anychart.core.settings.populate(anychart.pieModule.Chart, anychart.pieModule.Cha
 /**
  * Getter/setter for labels.
  * @param {(Object|boolean|null)=} opt_value .
- * @return {!(anychart.core.ui.CircularLabelsFactory|anychart.pieModule.Chart)} .
+ * @return {anychart.core.ui.CircularLabelsFactory|anychart.pieModule.Chart} .
  */
 anychart.pieModule.Chart.prototype.labels = function(opt_value) {
-  if (!this.labels_) {
-    this.labels_ = new anychart.core.ui.CircularLabelsFactory();
-    this.labels_.setOption('format', function() {
-      return (this['value'] * 100 / this.getStat(anychart.enums.Statistics.SUM)).toFixed(1) + '%';
-    });
-    this.labels_.setOption('positionFormatter', function() {
-      return this['value'];
-    });
-
-    this.labels_.listenSignals(this.labelsInvalidated_, this);
-    this.labels_.setParentEventTarget(this);
-    this.registerDisposable(this.labels_);
-    this.invalidate(anychart.ConsistencyState.PIE_LABELS, anychart.Signal.NEEDS_REDRAW);
-  }
-
   if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !('enabled' in opt_value))
-      opt_value['enabled'] = true;
-    this.labels_.setup(opt_value);
+    this.normal_.labels(opt_value);
     return this;
   }
-  return this.labels_;
-};
-
-
-/**
- * Getter/setter for hoverLabels.
- * @param {(Object|boolean|null)=} opt_value pie hover data labels settings.
- * @return {!(anychart.core.ui.CircularLabelsFactory|anychart.pieModule.Chart)} Labels instance or itself for chaining call.
- */
-anychart.pieModule.Chart.prototype.hoverLabels = function(opt_value) {
-  if (!this.hoverLabels_) {
-    this.hoverLabels_ = new anychart.core.ui.CircularLabelsFactory();
-    this.registerDisposable(this.hoverLabels_);
-  }
-
-  if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !('enabled' in opt_value))
-      opt_value['enabled'] = true;
-    this.hoverLabels_.setup(opt_value);
-    return this;
-  }
-  return this.hoverLabels_;
+  return /** @type {anychart.core.ui.CircularLabelsFactory} */ (this.normal_.labels());
 };
 
 
@@ -1276,7 +1164,7 @@ anychart.pieModule.Chart.prototype.calculate_ = function(bounds) {
   labels.parentBounds(this.pieBounds_);
   labels.resumeSignalsDispatching(false);
 
-  this.hoverLabels()
+  this.hovered().labels()
       .parentBounds(this.pieBounds_);
 };
 
@@ -1308,7 +1196,7 @@ anychart.pieModule.Chart.prototype.normalizeColor = function(color, var_args) {
       'aquaStyleObj': this.aquaStyleObj_,
       'sourceColor': this.palette().itemAt(index)
     };
-    fill = this.aquaStylfill_.call(scope);
+    fill = this.aquaStyleFill_.call(scope);
   } else if (goog.isFunction(color)) {
     sourceColor = arguments.length > 1 ?
         this.normalizeColor.apply(this, goog.array.slice(arguments, 1)) :
@@ -1326,36 +1214,10 @@ anychart.pieModule.Chart.prototype.normalizeColor = function(color, var_args) {
 
 
 /**
- * Gets final normalized pattern/hatch fill.
- * @param {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|boolean|string} hatchFill Normal state hatch fill.
- * @return {acgraph.vector.HatchFill|acgraph.vector.PatternFill} Normalized hatch fill.
- * @protected
- */
-anychart.pieModule.Chart.prototype.normalizeHatchFill = function(hatchFill) {
-  var fill;
-  var index = this.getIterator().getIndex();
-  if (goog.isFunction(hatchFill)) {
-    var sourceHatchFill = acgraph.vector.normalizeHatchFill(
-        /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(index)));
-    var scope = {
-      'index': index,
-      'sourceHatchFill': sourceHatchFill,
-      'iterator': this.getIterator()
-    };
-    fill = acgraph.vector.normalizeHatchFill(hatchFill.call(scope));
-  } else if (goog.isBoolean(hatchFill)) {
-    fill = hatchFill ? /** @type {acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(index)) : null;
-  } else
-    fill = acgraph.vector.normalizeHatchFill(hatchFill);
-  return fill;
-};
-
-
-/**
  * @inheritDoc
  */
 anychart.pieModule.Chart.prototype.beforeDraw = function() {
-  if (this.palette_ && this.palette_ instanceof anychart.palettes.RangeColors) {
+  if (this.palette_ && anychart.utils.instanceOf(this.palette_, anychart.palettes.RangeColors)) {
     this.palette_.count(this.getIterator().getRowsCount());
   }
 };
@@ -1466,7 +1328,7 @@ anychart.pieModule.Chart.prototype.drawContent = function(bounds) {
 
 
   if (this.hasInvalidationState(anychart.ConsistencyState.PIE_LABELS)) {
-    if (!this.labels().container()) this.labels_.container(this.rootElement);
+    if (!this.labels().container()) this.labels().container(this.rootElement);
     this.labels().clear();
     if (this.connectorsLayer_) {
       this.connectorsLayer_.clear();
@@ -1537,7 +1399,9 @@ anychart.pieModule.Chart.prototype.updatePointOnAnimate = function(point) {
     this.getIterator().select(point.getIndex());
     hatchSlice.clear();
     hatchSlice.deserialize(slice.serialize());
-    hatchSlice.stroke(null).fill(this.getFinalHatchFill(true, this.state.getPointStateByIndex(point.getIndex())));
+    var hatchFillResolver = anychart.pieModule.Chart.getColorResolver('hatchFill', anychart.enums.ColorType.HATCH_FILL, true);
+    var hatchFill = hatchFillResolver(this, this.state.getPointStateByIndex(point.getIndex()), false);
+    hatchSlice.stroke(null).fill(hatchFill);
   }
 };
 
@@ -1994,11 +1858,22 @@ anychart.pieModule.Chart.prototype.get3DFillColor_ = function(pointState) {
   var iterator = this.getIterator();
   var index = iterator.getIndex();
 
-  var normalColor = /** @type {acgraph.vector.Fill|Function} */(iterator.get('fill') || this.fill());
+  var pointStateObject = iterator.get('normal');
+  var normalColor = /** @type {acgraph.vector.Fill|Function} */(anychart.utils.getFirstDefinedValue(
+      goog.isDef(pointStateObject) ? pointStateObject['fill'] : void 0,
+      iterator.get('fill'),
+      this.fill()));
+
   var rawColor;
   if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
+    var hoverFill;
+    pointStateObject = iterator.get('hovered');
+    hoverFill = anychart.utils.getFirstDefinedValue(
+        goog.isDef(pointStateObject) ? pointStateObject['fill'] : void 0,
+        iterator.get('hoverFill'),
+        normalColor);
     rawColor = this.normalizeColor(
-        /** @type {acgraph.vector.Fill|Function} */(iterator.get('hoverFill') || normalColor), normalColor);
+        /** @type {acgraph.vector.Fill|Function} */(hoverFill), normalColor);
   } else {
     rawColor = this.normalizeColor(normalColor);
   }
@@ -2598,12 +2473,19 @@ anychart.pieModule.Chart.prototype.drawOutsideLabel_ = function(pointState, opt_
   var iterator = this.getIterator();
 
   var hovered = this.state.isStateContains(pointState, anychart.PointState.HOVER);
-  var sliceLabel = iterator.get('label');
-  var hoverSliceLabel = hovered ? iterator.get('hoverLabel') : null;
+
+  var sliceLabel = iterator.get('normal');
+  sliceLabel = goog.isDef(sliceLabel) ? sliceLabel['label'] : void 0;
+  var hoverSliceLabel = iterator.get('hovered');
+  hoverSliceLabel = goog.isDef(hoverSliceLabel) ? hoverSliceLabel['label'] : void 0;
+
+  sliceLabel = anychart.utils.getFirstDefinedValue(sliceLabel, iterator.get('label'));
+  hoverSliceLabel = hovered ? anychart.utils.getFirstDefinedValue(hoverSliceLabel, iterator.get('hoverLabel')) : null;
 
   var index = iterator.getIndex();
 
-  var labelsFactory = /** @type {anychart.core.ui.CircularLabelsFactory} */(hovered ? this.hoverLabels() : null);
+  var hoverLabels = this.hovered().labels();
+  var labelsFactory = /** @type {anychart.core.ui.CircularLabelsFactory} */(hovered ? hoverLabels : null);
 
   var label = this.labels().getLabel(index);
 
@@ -2612,13 +2494,13 @@ anychart.pieModule.Chart.prototype.drawOutsideLabel_ = function(pointState, opt_
 
   var isDraw = hovered ?
       goog.isNull(labelHoverEnabledState) ?
-          goog.isNull(this.hoverLabels().enabled()) ?
+          goog.isNull(hoverLabels.enabled()) ?
               goog.isNull(labelEnabledState) ?
                   (label && goog.isDef(label.enabled())) ?
                       label.enabled() :
                       this.labels().enabled() :
                   labelEnabledState :
-              this.hoverLabels().enabled() :
+              hoverLabels.enabled() :
           labelHoverEnabledState :
       goog.isNull(labelEnabledState) ?
           (label && goog.isDef(label.enabled())) ?
@@ -2682,10 +2564,18 @@ anychart.pieModule.Chart.prototype.drawLabel_ = function(pointState, opt_updateC
   var hovered = this.state.isStateContains(pointState, anychart.PointState.HOVER);
 
   var iterator = this.getIterator();
-  var sliceLabel = iterator.get('label');
-  var hoverSliceLabel = hovered ? iterator.get('hoverLabel') : null;
+
+  var sliceLabel = iterator.get('normal');
+  sliceLabel = goog.isDef(sliceLabel) ? sliceLabel['label'] : void 0;
+  var hoverSliceLabel = iterator.get('hovered');
+  hoverSliceLabel = goog.isDef(hoverSliceLabel) ? hoverSliceLabel['label'] : void 0;
+
+  sliceLabel = anychart.utils.getFirstDefinedValue(sliceLabel, iterator.get('label'));
+  hoverSliceLabel = hovered ? anychart.utils.getFirstDefinedValue(hoverSliceLabel, iterator.get('hoverLabel')) : null;
+
   var index = iterator.getIndex();
-  var labelsFactory = /** @type {anychart.core.ui.CircularLabelsFactory} */(hovered ? this.hoverLabels() : null);
+  var hoverLabels = this.hovered().labels();
+  var labelsFactory = /** @type {anychart.core.ui.CircularLabelsFactory} */(hovered ? hoverLabels : null);
 
   var label = this.labels().getLabel(index);
 
@@ -2747,11 +2637,11 @@ anychart.pieModule.Chart.prototype.drawLabel_ = function(pointState, opt_updateC
 
   var isDraw = hovered ?
       goog.isNull(labelHoverEnabledState) ?
-          goog.isNull(this.hoverLabels().enabled()) ?
+          goog.isNull(hoverLabels.enabled()) ?
               goog.isNull(labelEnabledState) ?
                   this.labels().enabled() :
                   labelEnabledState :
-              this.hoverLabels().enabled() :
+              hoverLabels.enabled() :
           labelHoverEnabledState :
       goog.isNull(labelEnabledState) ?
           this.labels().enabled() :
@@ -2779,7 +2669,7 @@ anychart.pieModule.Chart.prototype.drawLabel_ = function(pointState, opt_updateC
       }
     }
   } else if (label) {
-    this.labels_.clear(label.getIndex());
+    this.labels().clear(label.getIndex());
   }
   return /** @type {anychart.core.ui.CircularLabelsFactory.Label}*/(label);
 };
@@ -2798,17 +2688,20 @@ anychart.pieModule.Chart.prototype.colorizeSlice = function(pointState) {
   } else {
     var slice = /** @type {acgraph.vector.Path} */ (this.getIterator().meta('slice'));
     if (goog.isDef(slice)) {
-      var fill = this.getFinalFill(true, pointState);
-      if (this.isRadialGradientMode_(fill) && goog.isNull(fill.mode)) {
-        fill = /** @type {!acgraph.vector.Fill} */(goog.object.clone(/** @type {Object} */(fill)));
-        fill.mode = this.pieBounds_ ? this.pieBounds_ : null;
+      var fillResolver = anychart.pieModule.Chart.getColorResolver('fill', anychart.enums.ColorType.FILL, true);
+      var fillColor = fillResolver(this, pointState, false, true);
+      if (this.isRadialGradientMode_(fillColor) && goog.isNull(fillColor.mode)) {
+        //fillColor = /** @type {!acgraph.vector.Fill} */(goog.object.clone(/** @type {Object} */(fillColor)));
+        fillColor.mode = this.pieBounds_ ? this.pieBounds_ : null;
       }
-      slice.fill(fill);
+      slice.fill(fillColor);
 
-      fill = this.getFinalStroke(true, pointState);
-      if (this.isRadialGradientMode_(fill) && goog.isNull(fill.mode))
-        fill.mode = this.pieBounds_ ? this.pieBounds_ : null;
-      slice.stroke(fill);
+      var strokeResolver = anychart.pieModule.Chart.getColorResolver('stroke', anychart.enums.ColorType.STROKE, true);
+      var strokeColor = strokeResolver(this, pointState, false, true);
+      if (this.isRadialGradientMode_(strokeColor) && goog.isNull(strokeColor.mode)) {
+        strokeColor.mode = this.pieBounds_ ? this.pieBounds_ : null;
+      }
+      slice.stroke(strokeColor);
 
       this.applyHatchFill(pointState);
     }
@@ -2826,9 +2719,11 @@ anychart.pieModule.Chart.prototype.colorizeSlice = function(pointState) {
 anychart.pieModule.Chart.prototype.applyHatchFill = function(pointState, opt_pathName) {
   var hatchSlice = /** @type {acgraph.vector.Path} */(this.getIterator().meta(opt_pathName || 'hatchSlice'));
   if (goog.isDefAndNotNull(hatchSlice)) {
+    var hatchFillResolver = anychart.pieModule.Chart.getColorResolver('hatchFill', anychart.enums.ColorType.HATCH_FILL, true);
+    var hatchFill = hatchFillResolver(this, pointState, false);
     hatchSlice
         .stroke(null)
-        .fill(this.getFinalHatchFill(true, pointState));
+        .fill(hatchFill);
   }
 };
 
@@ -3140,7 +3035,7 @@ anychart.pieModule.Chart.prototype.createLegendItemsProvider = function(sourceMo
   var data = [];
   var iterator = this.getIterator().reset();
   var index;
-  var isAqua = (this.fill() == 'aquastyle');
+  var isAqua = (this.normal_.getOption('fill') == 'aquastyle');
   if (isAqua) {
     /** @type {Object} */
     var aquaStyleObj = this.aquaStyleObj_;
@@ -3164,6 +3059,11 @@ anychart.pieModule.Chart.prototype.createLegendItemsProvider = function(sourceMo
         itemText = String(goog.isDef(iterator.get('name')) ? iterator.get('name') : iterator.get('x'));
     }
     var mode3d = this.getOption('mode3d');
+
+    var fillResolver = anychart.pieModule.Chart.getColorResolver('fill', anychart.enums.ColorType.FILL, false);
+    var strokeResolver = anychart.pieModule.Chart.getColorResolver('stroke', anychart.enums.ColorType.STROKE, false);
+    var hatchFillResolver = anychart.pieModule.Chart.getColorResolver('hatchFill', anychart.enums.ColorType.HATCH_FILL, false);
+
     var obj = {
       'enabled': true,
       'meta': {
@@ -3172,9 +3072,9 @@ anychart.pieModule.Chart.prototype.createLegendItemsProvider = function(sourceMo
       },
       'iconType': anychart.enums.LegendItemIconType.SQUARE,
       'text': itemText,
-      'iconStroke': mode3d ? this.get3DStrokeColor() : this.getFinalStroke(true, anychart.PointState.NORMAL),
-      'iconFill': mode3d ? this.get3DFillColor_(anychart.PointState.NORMAL) : this.getFinalFill(true, anychart.PointState.NORMAL),
-      'iconHatchFill': this.getFinalHatchFill(true, anychart.PointState.NORMAL)
+      'iconStroke': mode3d ? this.get3DStrokeColor() : /** @type {acgraph.vector.Stroke} */ (strokeResolver(this, anychart.PointState.NORMAL, false)),
+      'iconFill': mode3d ? this.get3DFillColor_(anychart.PointState.NORMAL) : /** @type {acgraph.vector.Fill} */ (fillResolver(this, anychart.PointState.NORMAL, false)),
+      'iconHatchFill': /** @type {acgraph.vector.HatchFill} */ (hatchFillResolver(this, anychart.PointState.NORMAL, false))
     };
     goog.object.extend(obj, legendItem);
     obj['sourceUid'] = goog.getUid(this);
@@ -3362,7 +3262,7 @@ anychart.pieModule.Chart.prototype.selectPoint = function(indexOrIndexes) {
   // for float tooltip and exploded checking
   this.getIterator().select(indexOrIndexes[0] || indexOrIndexes);
 
-  if (iterator.meta('exploded')) {
+  if (!iterator.meta('exploded')) {
     this.state.addPointState(anychart.PointState.SELECT, indexOrIndexes);
   } else {
     this.state.removePointState(anychart.PointState.SELECT, indexOrIndexes);
@@ -3593,7 +3493,7 @@ anychart.pieModule.Chart.prototype.getLabelBounds = function(label) {
   if (!this.labelsBoundsCache_) this.labelsBoundsCache_ = [];
   var index = label.getIndex();
   if (!this.labelsBoundsCache_[index])
-    this.labelsBoundsCache_[index] = anychart.math.Rect.fromCoordinateBox(this.labels_.measureWithTransform(label));
+    this.labelsBoundsCache_[index] = anychart.math.Rect.fromCoordinateBox(this.labels().measureWithTransform(label));
 
   return this.labelsBoundsCache_[index];
 };
@@ -4192,16 +4092,13 @@ anychart.pieModule.Chart.prototype.serialize = function() {
   var json = anychart.pieModule.Chart.base(this, 'serialize');
   json['type'] = this.getType();
   json['data'] = this.data().serialize();
-  json['labels'] = this.labels().serialize();
-  json['hoverLabels'] = this.hoverLabels().getChangedSettings();
-  if (goog.isNull(json['hoverLabels']['enabled'])) {
-    delete json['hoverLabels']['enabled'];
-  }
   json['palette'] = this.palette().serialize();
   json['hatchFillPalette'] = this.hatchFillPalette().serialize();
   json['tooltip'] = this.tooltip().serialize();
 
   anychart.core.settings.serialize(this, anychart.pieModule.Chart.PROPERTY_DESCRIPTORS, json, 'Pie');
+  json['normal'] = this.normal_.serialize();
+  json['hovered'] = this.hovered_.serialize();
 
   // The values of group() function can be function or null or 'none'. So we don't serialize it anyway.
   //if (goog.isFunction(this['group'])) {
@@ -4215,73 +4112,7 @@ anychart.pieModule.Chart.prototype.serialize = function() {
   //    json['group'] = this.group();
   //  }
   //}
-  if (goog.isFunction(this['fill'])) {
-    if (goog.isFunction(this.fill())) {
-      anychart.core.reporting.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          ['Pie fill']
-      );
-    } else {
-      json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.fill()));
-    }
-  }
-  if (goog.isFunction(this['hoverFill'])) {
-    if (goog.isFunction(this.hoverFill())) {
-      anychart.core.reporting.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          ['Pie hoverFill']
-      );
-    } else {
-      json['hoverFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverFill()));
-    }
-  }
-  if (goog.isFunction(this['stroke'])) {
-    if (goog.isFunction(this.stroke())) {
-      anychart.core.reporting.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          ['Pie stroke']
-      );
-    } else {
-      json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.stroke()));
-    }
-  }
-  if (goog.isFunction(this['hoverStroke'])) {
-    if (goog.isFunction(this.hoverStroke())) {
-      anychart.core.reporting.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          ['Pie hoverStroke']
-      );
-    } else {
-      json['hoverStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.hoverStroke()));
-    }
-  }
-  if (goog.isFunction(this['hatchFill'])) {
-    if (goog.isFunction(this.hatchFill())) {
-      anychart.core.reporting.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          ['Pie hatchFill']
-      );
-    } else {
-      json['hatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hatchFill()));
-    }
-  }
-  if (goog.isFunction(this['hoverHatchFill'])) {
-    if (goog.isFunction(this.hoverHatchFill())) {
-      anychart.core.reporting.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          ['Pie hoverHatchFill']
-      );
-    } else {
-      json['hoverHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/
-          (this.hoverHatchFill()));
-    }
-  }
+
   return {'chart': json};
 };
 
@@ -4291,8 +4122,7 @@ anychart.pieModule.Chart.prototype.setupByJSON = function(config, opt_default) {
   anychart.pieModule.Chart.base(this, 'setupByJSON', config, opt_default);
   this.group(config['group']);
   this.data(config['data']);
-  this.labels().setupInternal(!!opt_default, config['labels']);
-  this.hoverLabels().setupInternal(!!opt_default, config['hoverLabels']);
+
   this.palette(config['palette']);
   this.hatchFillPalette(config['hatchFillPalette']);
 
@@ -4300,12 +4130,9 @@ anychart.pieModule.Chart.prototype.setupByJSON = function(config, opt_default) {
     this.tooltip().setupInternal(!!opt_default, config['tooltip']);
 
   anychart.core.settings.deserialize(this, anychart.pieModule.Chart.PROPERTY_DESCRIPTORS, config);
-  this.fill(config['fill']);
-  this.stroke(config['stroke']);
-  this.hoverFill(config['hoverFill']);
-  this.hoverStroke(config['hoverStroke']);
-  this.hatchFill(config['hatchFill']);
-  this.hoverHatchFill(config['hoverHatchFill']);
+  this.normal_.setupInternal(!!opt_default, config);
+  this.normal_.setupInternal(!!opt_default, config['normal']);
+  this.hovered_.setupInternal(!!opt_default, config['hovered']);
 };
 
 
@@ -4699,7 +4526,7 @@ anychart.pieModule.Chart.PieOutsideLabelsDomain.prototype.calculate = function()
  * @inheritDoc
  */
 anychart.pieModule.Chart.prototype.disposeInternal = function() {
-  goog.dispose(this.animationQueue_);
+  goog.disposeAll(this.animationQueue_, this.normal_, this.hovered_);
   anychart.pieModule.Chart.base(this, 'disposeInternal');
 };
 
@@ -4725,18 +4552,11 @@ anychart.pieModule.Chart.prototype.disposeInternal = function() {
   proto['group'] = proto.group;//doc|ex|non-tr
   proto['data'] = proto.data;//doc|ex|
   proto['labels'] = proto.labels;//doc|ex
-  proto['hoverLabels'] = proto.hoverLabels;//doc|ex
   proto['getCenterPoint'] = proto.getCenterPoint;//doc|ex
   proto['getPixelRadius'] = proto.getPixelRadius;//doc|need-ex
   proto['getPixelInnerRadius'] = proto.getPixelInnerRadius;//doc|need-ex
   proto['getPixelExplode'] = proto.getPixelExplode;
   proto['palette'] = proto.palette;//doc|ex
-  proto['fill'] = proto.fill;//doc|ex
-  proto['stroke'] = proto.stroke;//doc|ex
-  proto['hoverFill'] = proto.hoverFill;//doc|ex
-  proto['hoverStroke'] = proto.hoverStroke;//doc|ex
-  proto['hatchFill'] = proto.hatchFill;//doc|ex
-  proto['hoverHatchFill'] = proto.hoverHatchFill;//doc|ex
   proto['explodeSlice'] = proto.explodeSlice;//doc|ex
   proto['explodeSlices'] = proto.explodeSlices;
   proto['tooltip'] = proto.tooltip;//doc|ex
@@ -4746,4 +4566,7 @@ anychart.pieModule.Chart.prototype.disposeInternal = function() {
   proto['unhover'] = proto.unhover;
   proto['getPoint'] = proto.getPoint;
   proto['toCsv'] = proto.toCsv;
+
+  proto['normal'] = proto.normal;
+  proto['hovered'] = proto.hovered;
 })();

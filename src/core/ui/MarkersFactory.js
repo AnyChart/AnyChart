@@ -788,7 +788,7 @@ anychart.core.ui.MarkersFactory.prototype.serialize = function() {
   var json = anychart.core.ui.MarkersFactory.base(this, 'serialize');
   delete json['enabled'];
   var enabledState = this.enabled();
-  if (goog.isDefAndNotNull(enabledState))
+  if (goog.isDef(enabledState))
     json['enabled'] = enabledState;
   if (goog.isDef(this.disablePointerEvents())) json['disablePointerEvents'] = this.disablePointerEvents();
   if (this.changedSettings['position']) json['position'] = this.position();
@@ -853,9 +853,9 @@ anychart.core.ui.MarkersFactory.prototype.makeBrowserEvent = function(e) {
   var res = anychart.core.ui.MarkersFactory.base(this, 'makeBrowserEvent', e);
   var target = res['domTarget'];
   var tag;
-  while (target instanceof acgraph.vector.Element) {
+  while (anychart.utils.instanceOf(target, acgraph.vector.Element)) {
     tag = target.tag;
-    if (tag instanceof anychart.core.VisualBase || !anychart.utils.isNaN(tag))
+    if (anychart.utils.instanceOf(tag, anychart.core.VisualBase) || !anychart.utils.isNaN(tag))
       break;
     target = target.parent();
   }

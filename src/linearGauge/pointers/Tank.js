@@ -77,8 +77,25 @@ anychart.linearGaugeModule.pointers.Tank = function(gauge, dataIndex) {
    * @private
    */
   this.emptyHatch_ = null;
+
+  var normalMeta = [
+    ['emptyFill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND],
+    ['emptyHatchFill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND]
+  ];
+  this.normal_.addMeta(normalMeta);
+
+  var hoveredSelectedMeta = [
+    ['emptyFill', 0, 0],
+    ['emptyHatchFill', 0, 0]
+  ];
+  this.hovered_.addMeta(hoveredSelectedMeta);
+  this.selected_.addMeta(hoveredSelectedMeta);
+
+  this.emptyFillResolver = anychart.color.getColorResolver('emptyFill', anychart.enums.ColorType.FILL, true);
+  this.emptyHatchFillResolver = anychart.color.getColorResolver('emptyHatchFill', anychart.enums.ColorType.HATCH_FILL, true);
 };
 goog.inherits(anychart.linearGaugeModule.pointers.Tank, anychart.linearGaugeModule.pointers.Base);
+anychart.core.settings.populateAliases(anychart.linearGaugeModule.pointers.Tank, ['emptyFill', 'emptyHatchFill'], 'normal');
 
 
 //region --- PROPERTIES ---
@@ -409,227 +426,12 @@ anychart.linearGaugeModule.pointers.Tank.BULB_SHADE_FILL = /** @type {acgraph.ve
 });
 
 
-/**
- * Tank empty part hover fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {(!anychart.linearGaugeModule.pointers.Base|acgraph.vector.Fill|Function)} .
- */
-anychart.linearGaugeModule.pointers.Tank.prototype.hoverEmptyFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    this.hoverEmptyFill_ = goog.isFunction(opt_fillOrColorOrKeys) ?
-        opt_fillOrColorOrKeys :
-        acgraph.vector.normalizeFill.apply(null, arguments);
-    return this;
-  }
-  return this.hoverEmptyFill_;
-};
-
-
-/**
- * Tank empty part select fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {(!anychart.linearGaugeModule.pointers.Base|acgraph.vector.Fill|Function)} .
- */
-anychart.linearGaugeModule.pointers.Tank.prototype.selectEmptyFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    this.selectEmptyFill_ = goog.isFunction(opt_fillOrColorOrKeys) ?
-        opt_fillOrColorOrKeys :
-        acgraph.vector.normalizeFill.apply(null, arguments);
-    return this;
-  }
-  return this.selectEmptyFill_;
-};
-
-
-/**
- * Tank empty part fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {(!anychart.linearGaugeModule.pointers.Base|acgraph.vector.Fill|Function)} .
- */
-anychart.linearGaugeModule.pointers.Tank.prototype.emptyFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var fill = goog.isFunction(opt_fillOrColorOrKeys) ?
-        opt_fillOrColorOrKeys :
-        acgraph.vector.normalizeFill.apply(null, arguments);
-    if (fill != this.emptyFill_) {
-      this.emptyFill_ = fill;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
-    }
-    return this;
-  }
-  return this.emptyFill_;
-};
-
-
-/**
- * Method that gets final fill color for empty part of the pointer, with all fallbacks taken into account.
- * @param {boolean} usePointSettings If point settings should count too (iterator questioning).
- * @param {anychart.PointState|number} pointState Point state.
- * @return {!acgraph.vector.Fill} Final hover stroke for the current row.
- * @protected
- */
-anychart.linearGaugeModule.pointers.Tank.prototype.getFinalEmptyFill = function(usePointSettings, pointState) {
-  var iterator = this.getIterator();
-  iterator.select(/** @type {number} */ (this.dataIndex()));
-  var normalColor = /** @type {acgraph.vector.Fill|Function} */((usePointSettings && iterator.get('emptyFill')) || this.emptyFill());
-
-  var result;
-  if (this.state.isStateContains(pointState, anychart.PointState.SELECT)) {
-    result = this.normalizeColor(
-        /** @type {acgraph.vector.Fill|Function} */(
-        (usePointSettings && iterator.get('selectEmptyFill')) || this.selectEmptyFill() || normalColor),
-        normalColor);
-  } else if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
-    result = this.normalizeColor(
-        /** @type {acgraph.vector.Fill|Function} */(
-        (usePointSettings && iterator.get('hoverEmptyFill')) || this.hoverEmptyFill() || normalColor),
-        normalColor);
-  } else {
-    result = this.normalizeColor(normalColor);
-  }
-
-  return acgraph.vector.normalizeFill(/** @type {!acgraph.vector.Fill} */(result));
-};
-
-
-/**
- * Pointer empty part hatch fill.
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|acgraph.vector.HatchFill.HatchFillType|
- * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.linearGaugeModule.pointers.Base|boolean} Hatch fill.
- */
-anychart.linearGaugeModule.pointers.Tank.prototype.emptyHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrTypeOrState)) {
-    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
-        opt_patternFillOrTypeOrState :
-        acgraph.vector.normalizeHatchFill.apply(null, arguments);
-
-    if (hatchFill != this.emptyHatchFill_) {
-      this.emptyHatchFill_ = hatchFill;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
-    }
-    return this;
-  }
-  return this.emptyHatchFill_;
-};
-
-
-/**
- * Pointer empty part hover hatch fill.
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|acgraph.vector.HatchFill.HatchFillType|
- * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.linearGaugeModule.pointers.Base|boolean} Hatch fill.
- */
-anychart.linearGaugeModule.pointers.Tank.prototype.hoverEmptyHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrTypeOrState)) {
-    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
-        opt_patternFillOrTypeOrState :
-        acgraph.vector.normalizeHatchFill.apply(null, arguments);
-
-    if (hatchFill !== this.hoverEmptyHatchFill_)
-      this.hoverEmptyHatchFill_ = hatchFill;
-    return this;
-  }
-  return this.hoverEmptyHatchFill_;
-};
-
-
-/**
- * Pointer empty part select hatch fill.
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|acgraph.vector.HatchFill.HatchFillType|
- * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.linearGaugeModule.pointers.Base|boolean} Hatch fill.
- */
-anychart.linearGaugeModule.pointers.Tank.prototype.selectEmptyHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrTypeOrState)) {
-    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
-        opt_patternFillOrTypeOrState :
-        acgraph.vector.normalizeHatchFill.apply(null, arguments);
-
-    if (hatchFill !== this.selectEmptyHatchFill_)
-      this.selectEmptyHatchFill_ = hatchFill;
-    return this;
-  }
-  return this.selectEmptyHatchFill_;
-};
-
-
-/**
- * Method that gets the final hatch fill for an empty part of the pointer, with all fallbacks taken into account.
- * @param {boolean} usePointSettings If point settings should count too (iterator questioning).
- * @param {anychart.PointState|number} pointState Point state.
- * @return {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} Final hatch fill.
- */
-anychart.linearGaugeModule.pointers.Tank.prototype.getFinalEmptyHatchFill = function(usePointSettings, pointState) {
-  var iterator = this.getIterator();
-  iterator.select(/** @type {number} */ (this.dataIndex()));
-
-  var normalHatchFill;
-  if (usePointSettings && goog.isDef(iterator.get('emptyHatchFill'))) {
-    normalHatchFill = iterator.get('emptyHatchFill');
-  } else {
-    normalHatchFill = this.emptyHatchFill();
-  }
-
-  var hatchFill;
-  if (this.state.isStateContains(pointState, anychart.PointState.SELECT)) {
-    if (usePointSettings && goog.isDef(iterator.get('selectEmptyHatchFill'))) {
-      hatchFill = iterator.get('selectEmptyHatchFill');
-    } else if (goog.isDef(this.selectEmptyHatchFill())) {
-      hatchFill = this.selectEmptyHatchFill();
-    } else {
-      hatchFill = normalHatchFill;
-    }
-  } else if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
-    if (usePointSettings && goog.isDef(iterator.get('hoverEmptyHatchFill'))) {
-      hatchFill = iterator.get('hoverEmptyHatchFill');
-    } else if (goog.isDef(this.hoverEmptyHatchFill())) {
-      hatchFill = this.hoverEmptyHatchFill();
-    } else {
-      hatchFill = normalHatchFill;
-    }
-  } else {
-    hatchFill = normalHatchFill;
-  }
-  return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */(
-      this.normalizeHatchFill(
-          /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|boolean|string} */(hatchFill)));
-};
-
-
 /** @inheritDoc */
 anychart.linearGaugeModule.pointers.Tank.prototype.colorizePointer = function(pointerState) {
   var isVertical = this.isVertical();
   var angle = isVertical ? 0 : 90;
 
-  var color = this.getFinalFill(true, pointerState);
+  var color = /** @type {acgraph.vector.Fill} */ (this.fillResolver(this, pointerState, false));
   var colorDarken = anychart.color.darken(color);
   var colorLighten = anychart.color.lighten(color);
   var fill = /** @type {acgraph.vector.Fill} */ ({
@@ -666,7 +468,7 @@ anychart.linearGaugeModule.pointers.Tank.prototype.colorizePointer = function(po
   this.bodyBottomShadePath_.stroke(anychart.linearGaugeModule.pointers.Tank.SHADE);
 
   ////////////////////
-  var emptyColor = this.getFinalEmptyFill(true, pointerState);
+  var emptyColor = /** @type {acgraph.vector.Fill} */ (this.emptyFillResolver(this, pointerState, false));
   colorDarken = anychart.color.darken(emptyColor);
   colorLighten = anychart.color.lighten(emptyColor);
   var opacity = anychart.color.getOpacity(emptyColor);
@@ -701,11 +503,11 @@ anychart.linearGaugeModule.pointers.Tank.prototype.colorizePointer = function(po
   this.bulbTopBlurPath_.fill(fill);
   this.bulbTopBlurPath_.stroke('none');
 
-  var hatch = this.getFinalHatchFill(true, pointerState);
+  var hatch = /** @type {acgraph.vector.Fill} */ (this.hatchFillResolver(this, pointerState, false));
   this.hatch.fill(hatch);
   this.hatch.stroke('none');
 
-  hatch = this.getFinalEmptyHatchFill(true, pointerState);
+  hatch = /** @type {acgraph.vector.Fill} */ (this.emptyHatchFillResolver(this, pointerState, false));
   this.emptyHatch_.fill(hatch);
   this.emptyHatch_.stroke('none');
 };
@@ -713,88 +515,6 @@ anychart.linearGaugeModule.pointers.Tank.prototype.colorizePointer = function(po
 
 //endregion
 //region --- JSON/DISPOSING ---
-/** @inheritDoc */
-anychart.linearGaugeModule.pointers.Tank.prototype.serialize = function() {
-  var json = anychart.linearGaugeModule.pointers.Tank.base(this, 'serialize');
-
-  if (goog.isFunction(this.emptyFill())) {
-    anychart.core.reporting.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Pointer emptyFill']
-    );
-  } else {
-    json['emptyFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.emptyFill()));
-  }
-  if (goog.isFunction(this.hoverEmptyFill())) {
-    anychart.core.reporting.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Pointer hoverEmptyFill']
-    );
-  } else {
-    json['hoverEmptyFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverEmptyFill()));
-  }
-  if (goog.isFunction(this.selectEmptyFill())) {
-    anychart.core.reporting.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Pointer selectEmptyFill']
-    );
-  } else {
-    json['selectEmptyFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.selectEmptyFill()));
-  }
-
-  if (goog.isFunction(this.emptyHatchFill())) {
-    anychart.core.reporting.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Pointer emptyHatchFill']
-    );
-  } else {
-    if (goog.isDef(this.emptyHatchFill()))
-      json['emptyHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.emptyHatchFill()));
-  }
-  if (goog.isFunction(this.hoverEmptyHatchFill())) {
-    anychart.core.reporting.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Pointer hoverEmptyHatchFill']
-    );
-  } else {
-    if (goog.isDef(this.hoverEmptyHatchFill()))
-      json['hoverEmptyHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/
-          (this.hoverEmptyHatchFill()));
-  }
-  if (goog.isFunction(this.selectEmptyHatchFill())) {
-    anychart.core.reporting.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Pointer selectEmptyHatchFill']
-    );
-  } else {
-    if (goog.isDef(this.selectEmptyHatchFill()))
-      json['selectEmptyHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/
-          (this.selectEmptyHatchFill()));
-  }
-  return json;
-};
-
-
-/** @inheritDoc */
-anychart.linearGaugeModule.pointers.Tank.prototype.setupByJSON = function(config, opt_default) {
-  anychart.linearGaugeModule.pointers.Tank.base(this, 'setupByJSON', config, opt_default);
-
-  this.emptyFill(config['emptyFill']);
-  this.hoverEmptyFill(config['hoverEmptyFill']);
-  this.selectEmptyFill(config['selectEmptyFill']);
-
-  this.emptyHatchFill(config['emptyHatchFill']);
-  this.hoverEmptyHatchFill(config['hoverEmptyHatchFill']);
-  this.selectEmptyHatchFill(config['selectEmptyHatchFill']);
-};
-
-
 /** @inheritDoc */
 anychart.linearGaugeModule.pointers.Tank.prototype.disposeInternal = function() {
   // we do not need to dispose this paths, because they will be disposed on parent's layer disposing.
@@ -816,14 +536,3 @@ anychart.linearGaugeModule.pointers.Tank.prototype.disposeInternal = function() 
   anychart.linearGaugeModule.pointers.Tank.base(this, 'disposeInternal');
 };
 //endregion
-
-//exports
-(function() {
-  var proto = anychart.linearGaugeModule.pointers.Tank.prototype;
-  proto['emptyFill'] = proto.emptyFill;
-  proto['hoverEmptyFill'] = proto.hoverEmptyFill;
-  proto['selectEmptyFill'] = proto.selectEmptyFill;
-  proto['emptyHatchFill'] = proto.emptyHatchFill;
-  proto['hoverEmptyHatchFill'] = proto.hoverEmptyHatchFill;
-  proto['selectEmptyHatchFill'] = proto.selectEmptyHatchFill;
-})();

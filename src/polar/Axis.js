@@ -2,6 +2,7 @@ goog.provide('anychart.polarModule.Axis');
 goog.provide('anychart.standalones.axes.Polar');
 goog.require('acgraph');
 goog.require('anychart.color');
+goog.require('anychart.core.IAxis');
 goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.reporting');
@@ -19,6 +20,7 @@ goog.require('anychart.radarPolarBaseModule.RadialAxisTicks');
  * @constructor
  * @extends {anychart.core.VisualBase}
  * @implements {anychart.core.IStandaloneBackend}
+ * @implements {anychart.core.IAxis}
  */
 anychart.polarModule.Axis = function() {
   this.suspendSignalsDispatching();
@@ -393,16 +395,21 @@ anychart.polarModule.Axis.prototype.fill = function(opt_fillOrColorOrKeys, opt_o
 
 
 /**
- * @param {anychart.scales.Base=} opt_value Scale.
+ * @param {(anychart.scales.Base|anychart.enums.ScaleTypes|Object)=} opt_value Scale.
  * @return {anychart.scales.Base|!anychart.polarModule.Axis} Axis scale or itself for method chaining.
  */
 anychart.polarModule.Axis.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.scale_ != opt_value) {
-      this.scale_ = opt_value;
-      this.scale_.listenSignals(this.scaleInvalidated_, this);
-      this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-      this.dropBoundsCache_();
+    var val = anychart.scales.Base.setupScale(this.scale_, opt_value, null,
+        anychart.scales.Base.ScaleTypes.ALL_DEFAULT, null, this.scaleInvalidated_, this);
+    if (val) {
+      var dispatch = this.scale_ == val;
+      this.scale_ = /** @type {anychart.scales.Base} */(val);
+      this.scale_.resumeSignalsDispatching(dispatch);
+      if (!dispatch) {
+        this.dropBoundsCache_();
+        this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      }
     }
     return this;
   } else {
@@ -485,7 +492,7 @@ anychart.polarModule.Axis.prototype.calculateAxisBounds_ = function() {
         .parentBounds(parentBounds);
 
     if (scale && this.radius_ && this.enabled()) {
-      var isOrdinal = scale instanceof anychart.scales.Ordinal;
+      var isOrdinal = anychart.utils.instanceOf(scale, anychart.scales.Ordinal);
       var majorLabelsEnabled = this.labels().enabled();
       var minorLabelsEnabled = this.minorLabels().enabled();
       var lineThickness = acgraph.vector.getThickness(this.stroke_);
@@ -1016,11 +1023,11 @@ anychart.polarModule.Axis.prototype.getLabelsFormatProvider_ = function(index, v
 
   var labelText, labelValue;
   var addRange = true;
-  if (scale instanceof anychart.scales.Ordinal) {
+  if (anychart.utils.instanceOf(scale, anychart.scales.Ordinal)) {
     labelText = scale.ticks().names()[index];
     labelValue = value;
     addRange = false;
-  } else if (scale instanceof anychart.scales.DateTime) {
+  } else if (anychart.utils.instanceOf(scale, anychart.scales.DateTime)) {
     labelText = anychart.format.date(/** @type {number} */(value));
     labelValue = value;
   } else {
@@ -1075,7 +1082,7 @@ anychart.polarModule.Axis.prototype.calcLabelTextPath = function(label, index, t
   var pxPerDegree = (2 * Math.PI * radius) / 360;
   var startAngle, endAngle;
 
-  if (scale instanceof anychart.scales.Ordinal) {
+  if (anychart.utils.instanceOf(scale, anychart.scales.Ordinal)) {
     startAngle = this.startAngle_ - 90 + this.getRatio_(index, ticksArr, scale, 0) * 360;
     endAngle = this.startAngle_ - 90 + this.getRatio_(index, ticksArr, scale, 1) * 360;
 
@@ -1209,7 +1216,7 @@ anychart.polarModule.Axis.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.AXIS_TICKS)) {
-    var isOrdinal = this.scale() instanceof anychart.scales.Ordinal;
+    var isOrdinal = anychart.utils.instanceOf(this.scale(), anychart.scales.Ordinal);
     var lineThickness = acgraph.vector.getThickness(this.stroke_);
     var ticks = /** @type {anychart.radarPolarBaseModule.RadialAxisTicks} */(this.ticks());
     ticks.draw();

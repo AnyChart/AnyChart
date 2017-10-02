@@ -1,7 +1,9 @@
 goog.provide('anychart.core.ui.Scroller');
 goog.provide('anychart.standalones.Scroller');
 goog.require('acgraph');
+goog.require('anychart.core.Base');
 goog.require('anychart.core.IStandaloneBackend');
+goog.require('anychart.core.StateSettings');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.utils.Padding');
 goog.require('anychart.enums');
@@ -716,7 +718,7 @@ anychart.core.ui.Scroller.prototype.draw = function() {
         break;
     }
 
-    if (!this.thumbs().autoHide())
+    if (!this.thumbs().getOption('autoHide'))
       this.showThumbs_();
 
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
@@ -1041,7 +1043,7 @@ anychart.core.ui.Scroller.prototype.mouseOut_ = function(e) {
  */
 anychart.core.ui.Scroller.prototype.thumbMouseOver_ = function(e) {
   var target = e['target'];
-  if (target instanceof acgraph.vector.Path) {
+  if (anychart.utils.instanceOf(target, acgraph.vector.Path)) {
     if (target == this.startThumb_) {
       this.colorizeThumb_(this.startThumb_, this.startThumbHovered_ = true);
     } else if (target == this.endThumb_) {
@@ -1058,7 +1060,7 @@ anychart.core.ui.Scroller.prototype.thumbMouseOver_ = function(e) {
  */
 anychart.core.ui.Scroller.prototype.thumbMouseOut_ = function(e) {
   var target = e['target'];
-  if (target instanceof acgraph.vector.Path) {
+  if (anychart.utils.instanceOf(target, acgraph.vector.Path)) {
     if (target == this.startThumb_) {
       this.colorizeThumb_(this.startThumb_, this.startThumbHovered_ = false);
     } else if (target == this.endThumb_) {
@@ -1074,7 +1076,7 @@ anychart.core.ui.Scroller.prototype.thumbMouseOut_ = function(e) {
  * @private
  */
 anychart.core.ui.Scroller.prototype.thumbOrRangeMouseDown_ = function(e) {
-  if (e.currentTarget instanceof acgraph.vector.Element) {
+  if (anychart.utils.instanceOf(e.currentTarget, acgraph.vector.Element)) {
     var target = (/** @type {acgraph.vector.Element} */(e.currentTarget));
     var dragger;
     if (target == this.startThumb_ && !this.startThumbDragger_) {
@@ -1182,7 +1184,7 @@ anychart.core.ui.Scroller.prototype.showThumbs_ = function() {
  * @private
  */
 anychart.core.ui.Scroller.prototype.maybeHideThumbs_ = function() {
-  if (this.thumbsShown_ && this.thumbs().autoHide() && !this.isDragging_ && !this.mouseOnScroller_) {
+  if (this.thumbsShown_ && this.thumbs().getOption('autoHide') && !this.isDragging_ && !this.mouseOnScroller_) {
     this.rootLayer.removeChild(/** @type {!acgraph.vector.Path} */(this.startThumb_));
     this.rootLayer.removeChild(/** @type {!acgraph.vector.Path} */(this.endThumb_));
     this.thumbsShown_ = false;
@@ -1198,7 +1200,7 @@ anychart.core.ui.Scroller.prototype.prepareThumbs_ = function() {
   var thicknessHalf = (Math.max(acgraph.vector.getThickness(this.selectedRangeOutlineStroke_), 5) - 1) / 2;
   if (this.isHorizontal()) {
     var top = this.pixelBoundsCache.top;
-    if (this.thumbs().enabled()) {
+    if (this.thumbs().getOption('enabled')) {
       var y = top + this.pixelBoundsCache.height / 2;
       this.startThumb_.clear()
           .moveTo(-4, y - 6)
@@ -1245,7 +1247,7 @@ anychart.core.ui.Scroller.prototype.prepareThumbs_ = function() {
     }
   } else {
     var left = this.pixelBoundsCache.left;
-    if (this.thumbs().enabled()) {
+    if (this.thumbs().getOption('enabled')) {
       var x = left + this.pixelBoundsCache.width / 2;
       this.startThumb_.clear()
           .moveTo(x - 6, -4)
@@ -1303,13 +1305,13 @@ anychart.core.ui.Scroller.prototype.prepareThumbs_ = function() {
 anychart.core.ui.Scroller.prototype.colorizeThumb_ = function(thumb, isHovered) {
   var thumbs = this.thumbs();
   var fill, stroke;
-  if (thumbs.enabled()) {
+  if (thumbs.getOption('enabled')) {
     if (isHovered) {
-      fill = /** @type {acgraph.vector.Fill} */(thumbs.hoverFill());
-      stroke = /** @type {acgraph.vector.Stroke} */(thumbs.hoverStroke());
+      fill = /** @type {acgraph.vector.Fill} */(thumbs.hovered().getOption('fill'));
+      stroke = /** @type {acgraph.vector.Stroke} */(thumbs.hovered().getOption('stroke'));
     } else {
-      fill = /** @type {acgraph.vector.Fill} */(thumbs.fill());
-      stroke = /** @type {acgraph.vector.Stroke} */(thumbs.stroke());
+      fill = /** @type {acgraph.vector.Fill} */(thumbs.normal().getOption('fill'));
+      stroke = /** @type {acgraph.vector.Stroke} */(thumbs.normal().getOption('stroke'));
     }
   } else {
     fill = anychart.color.TRANSPARENT_HANDLER;
@@ -1669,256 +1671,113 @@ anychart.core.ui.Scroller.Dragger.prototype.limitY = function(y) {
  * Thumbs settings. Doesn't draw anything, just contains settings and notifies the scroller about their change.
  * @param {!anychart.core.ui.Scroller} scroller
  * @constructor
+ * @extends {anychart.core.Base}
  */
 anychart.core.ui.Scroller.Thumbs = function(scroller) {
+  anychart.core.ui.Scroller.Thumbs.base(this, 'constructor');
   /**
    * @type {!anychart.core.ui.Scroller}
    * @private
    */
   this.scroller_ = scroller;
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['enabled', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['autoHide', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW]
+  ]);
+
+  var descriptorsMeta = {};
+  anychart.core.settings.createDescriptorsMeta(descriptorsMeta, [
+    ['fill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['stroke', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW]
+  ]);
+
+  this.normal_ = new anychart.core.StateSettings(this, descriptorsMeta, anychart.PointState.NORMAL);
+  this.hovered_ = new anychart.core.StateSettings(this, descriptorsMeta, anychart.PointState.NORMAL);
+};
+goog.inherits(anychart.core.ui.Scroller.Thumbs, anychart.core.Base);
+anychart.core.settings.populateAliases(anychart.core.ui.Scroller.Thumbs, ['fill', 'stroke'], 'normal');
+
+
+/** @inheritDoc */
+anychart.core.ui.Scroller.Thumbs.prototype.invalidate = function(state, opt_signal) {
+  return this.scroller_.invalidate(state, opt_signal);
 };
 
 
 /**
- * Whether thumbs are enabled.
- * @type {boolean}
- * @private
+ * Normal state settings.
+ * @param {!Object=} opt_value
+ * @return {anychart.core.StateSettings|anychart.core.ui.Scroller.Thumbs}
  */
-anychart.core.ui.Scroller.Thumbs.prototype.enabled_;
-
-
-/**
- * Whether the thumbs should hide on scroller mouse out.
- * @type {boolean}
- * @private
- */
-anychart.core.ui.Scroller.Thumbs.prototype.autoHide_;
-
-
-/**
- * Thumbs fill color.
- * @type {acgraph.vector.Fill}
- * @private
- */
-anychart.core.ui.Scroller.Thumbs.prototype.fill_;
-
-
-/**
- * Thumbs stroke color.
- * @type {acgraph.vector.Stroke}
- * @private
- */
-anychart.core.ui.Scroller.Thumbs.prototype.stroke_;
-
-
-/**
- * Thumbs hover fill color.
- * @type {acgraph.vector.Fill}
- * @private
- */
-anychart.core.ui.Scroller.Thumbs.prototype.hoverFill_;
-
-
-/**
- * Thumbs hover stroke color.
- * @type {acgraph.vector.Stroke}
- * @private
- */
-anychart.core.ui.Scroller.Thumbs.prototype.hoverStroke_;
-
-
-/**
- * Whether the thumbs should be drawn.
- * @param {boolean=} opt_value
- * @return {boolean|anychart.core.ui.Scroller.Thumbs}
- */
-anychart.core.ui.Scroller.Thumbs.prototype.enabled = function(opt_value) {
+anychart.core.ui.Scroller.Thumbs.prototype.normal = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = !!opt_value;
-    if (this.enabled_ != opt_value) {
-      this.enabled_ = opt_value;
-      this.scroller_.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
+    this.normal_.setup(opt_value);
     return this;
   }
-  return this.enabled_;
+  return this.normal_;
 };
 
 
 /**
- * Whether the thumbs should be hidden on scroller mouse out event.
- * @param {boolean=} opt_value
- * @return {boolean|anychart.core.ui.Scroller.Thumbs}
+ * Hovered state settings.
+ * @param {!Object=} opt_value
+ * @return {anychart.core.StateSettings|anychart.core.ui.Scroller.Thumbs}
  */
-anychart.core.ui.Scroller.Thumbs.prototype.autoHide = function(opt_value) {
+anychart.core.ui.Scroller.Thumbs.prototype.hovered = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = !!opt_value;
-    if (this.autoHide_ != opt_value) {
-      this.autoHide_ = opt_value;
-      this.scroller_.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
+    this.hovered_.setup(opt_value);
     return this;
   }
-  return this.autoHide_;
+  return this.hovered_;
 };
 
 
 /**
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.core.ui.Scroller.Thumbs} .
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.core.ui.Scroller.Thumbs.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx,
-    opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var fill = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (!anychart.color.equals(this.thumbFill_, fill)) {
-      this.thumbFill_ = fill;
-      this.scroller_.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.thumbFill_;
-};
+anychart.core.ui.Scroller.Thumbs.PROPERTY_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  anychart.core.settings.createDescriptors(map, [
+    // chart properties
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'enabled', anychart.core.settings.asIsNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'autoHide', anychart.core.settings.asIsNormalizer]
+  ]);
+
+  return map;
+})();
+anychart.core.settings.populate(anychart.core.ui.Scroller.Thumbs, anychart.core.ui.Scroller.Thumbs.PROPERTY_DESCRIPTORS);
 
 
-/**
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {acgraph.vector.Stroke|anychart.core.ui.Scroller.Thumbs} .
- */
-anychart.core.ui.Scroller.Thumbs.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern,
-    opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (!anychart.color.equals(stroke, this.thumbStroke_)) {
-      this.thumbStroke_ = stroke;
-      this.scroller_.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.thumbStroke_;
-};
-
-
-/**
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.core.ui.Scroller.Thumbs} .
- */
-anychart.core.ui.Scroller.Thumbs.prototype.hoverFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx,
-    opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var fill = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (!anychart.color.equals(this.thumbHoverFill_, fill)) {
-      this.thumbHoverFill_ = fill;
-      this.scroller_.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.thumbHoverFill_;
-};
-
-
-/**
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {acgraph.vector.Stroke|anychart.core.ui.Scroller.Thumbs} .
- */
-anychart.core.ui.Scroller.Thumbs.prototype.hoverStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern,
-    opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (!anychart.color.equals(stroke, this.thumbHoverStroke_)) {
-      this.thumbHoverStroke_ = stroke;
-      this.scroller_.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.thumbHoverStroke_;
-};
-
-
-/**
- * @return {!Object}
- */
+/** @inheritDoc */
 anychart.core.ui.Scroller.Thumbs.prototype.serialize = function() {
   var json = {};
-  json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill()));
-  json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
-  json['hoverFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.hoverFill()));
-  json['hoverStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.hoverStroke()));
-  json['enabled'] = this.enabled();
-  json['autoHide'] = this.autoHide();
+  json['normal'] = this.normal().serialize();
+  json['hovered'] = this.hovered().serialize();
+  anychart.core.settings.serialize(this, anychart.core.ui.Scroller.Thumbs.PROPERTY_DESCRIPTORS, json, 'Scroller thumbs');
   return json;
 };
 
 
-/**
- * @param {Object} config
- * @param {boolean=} opt_default
- */
+/** @inheritDoc */
 anychart.core.ui.Scroller.Thumbs.prototype.setupByJSON = function(config, opt_default) {
-  this.enabled('enabled' in config ? !!config['enabled'] : true);
-  this.fill(config['fill']);
-  this.stroke(config['stroke']);
-  this.hoverFill(config['hoverFill']);
-  this.hoverStroke(config['hoverStroke']);
-  this.autoHide(config['autoHide']);
+  this.normal_.setupInternal(!!opt_default, config);
+  this.normal_.setupInternal(!!opt_default, config['normal']);
+  this.hovered_.setupInternal(!!opt_default, config['hovered']);
+  anychart.core.settings.deserialize(this, anychart.core.ui.Scroller.Thumbs.PROPERTY_DESCRIPTORS, config);
 };
 
 
-/**
- * @param {boolean} isDefault
- * @param {...*} var_args
- * @return {boolean}
- */
+/** @inheritDoc */
 anychart.core.ui.Scroller.Thumbs.prototype.setupSpecial = function(isDefault, var_args) {
   var arg0 = arguments[1];
   if (goog.isBoolean(arg0) || goog.isNull(arg0)) {
-    this.enabled(!!arg0);
+    this['enabled'](!!arg0);
     return true;
   }
   return false;
-};
-
-
-/**
- * Setups the element using passed configuration value. It can be a JSON object or a special value that setups
- * instances of descendant classes.
- * Note: this method only changes element properties if they are supposed to be changed by the config value -
- * it doesn't reset other properties to their defaults.
- * @param {boolean} isDefault
- * @param {...(Object|Array|number|string|undefined|boolean|null)} var_args Arguments to setup the instance.
- * @return {anychart.core.ui.Scroller.Thumbs} Returns itself for chaining.
- */
-anychart.core.ui.Scroller.Thumbs.prototype.setupInternal = function(isDefault, var_args) {
-  var arg0 = arguments[1];
-  if (goog.isDef(arg0)) {
-    // in fact only the first argument value
-    if (!this.setupSpecial(isDefault, arg0) && goog.isObject(arg0)) {
-      this.setupByJSON(arg0, isDefault);
-    }
-  }
-  return this;
 };
 
 
@@ -2008,12 +1867,11 @@ anychart.standalones.scroller = function() {
   proto['autoHide'] = proto.autoHide;
 
   proto = anychart.core.ui.Scroller.Thumbs.prototype;
-  proto['enabled'] = proto.enabled;
-  proto['autoHide'] = proto.autoHide;
-  proto['fill'] = proto.fill;
-  proto['stroke'] = proto.stroke;
-  proto['hoverFill'] = proto.hoverFill;
-  proto['hoverStroke'] = proto.hoverStroke;
+  proto['normal'] = proto.normal;
+  proto['hovered'] = proto.hovered;
+  // auto generated
+  // proto['fill'] = proto.fill;
+  // proto['stroke'] = proto.stroke;
 
   proto = anychart.standalones.Scroller.prototype;
   goog.exportSymbol('anychart.standalones.scroller', anychart.standalones.scroller);

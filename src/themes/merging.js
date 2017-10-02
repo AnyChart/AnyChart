@@ -284,6 +284,7 @@ anychart.themes.merging.demerge = function(target, defaultObj) {
   target = anychart.themes.merging.demerge_(target, defaultObj);
   target = anychart.themes.merging.demergeMultiple_(target, defaultObj);
   target = anychart.themes.merging.demergeScales_(target, defaultObj);
+  target = anychart.themes.merging.demergeCredits_(target);
   return anychart.themes.merging.demergeTyped_(target, defaultObj);
 };
 
@@ -406,6 +407,30 @@ anychart.themes.merging.demergeScales_ = function(target, defaultObj) {
         for (i = 0; i < len; i++) {
           targetPart[i] = anychart.themes.merging.demerge_(targetPart[i], defaultArray[i]) || {};
         }
+      }
+    }
+  }
+  return target;
+};
+
+
+/**
+ * Demerges credits.
+ * @param {*} target
+ * @return {*}
+ * @private
+ */
+anychart.themes.merging.demergeCredits_ = function(target) {
+  if (target) {
+    var trgt = target['chart'] || target['gauge'] || target['gantt'] || target['map'];
+    if (!trgt) return target;
+    var targetType = goog.typeOf(trgt['credits']);
+    var defaultType = goog.typeOf(anychart.getFullTheme('stageCredits'));
+    if (targetType == 'object' && defaultType == 'object') {
+      var defVal = anychart.getFullTheme('stageCredits');
+      var val = anychart.themes.merging.demerge_(trgt['credits'], defVal);
+      if (goog.isDef(val)) {
+        trgt['credits'] = val;
       }
     }
   }
@@ -701,10 +726,6 @@ anychart.themes.merging.mergingMap_ = (function() {
           ]],
           'DataGrid.defaultColumnSettings.cellTextSettings'
         ]],
-        [[
-          'chart',
-          'map'
-        ], '.defaultSeriesSettings.base.labels'],
         'standalones.labelsFactory',
         ['map.axesSettings.', [
           [[
@@ -712,27 +733,32 @@ anychart.themes.merging.mergingMap_ = (function() {
             'minorL'
           ], 'abels']
         ]],
-        'treeMap.headers',
-        'linearGauge.defaultPointerSettings.base.label',
         [[
-          'chart.defaultAnnotationSettings.base',
-          'pieFunnelPyramidBase',
           'pert.milestones',
           ['resource.', [
             'activities',
             'conflicts'
-          ]],
-          [['tree', 'heat'], 'Map'],
-          'venn'
+          ]]
         ], '.labels'],
         ['pert.tasks.', [[['upper', 'lower'], 'Labels']]],
-        'stock.defaultPlotSettings.defaultPriceIndicatorSettings.label'
+        'stock.defaultPlotSettings.defaultPriceIndicatorSettings.label',
+        'treeMap.normal.headers',
+        [[
+          'venn',
+          'pieFunnelPyramidBase',
+          [['heat', 'tree'], 'Map'],
+          [[
+            'chart.defaultAnnotation',
+            'linearGauge.defaultPointer',
+            [['chart', 'map'], '.defaultSeries']
+          ], 'Settings.base']
+        ], '.normal.labels']
       ]
     },
     {
-      defaultObj: 'chart.labels',
+      defaultObj: 'chart.normal.labels',
       targets: [
-        'chart.defaultSeriesSettings.base.labels'
+        'chart.defaultSeriesSettings.base.normal.labels'
       ]
     },
     {
@@ -757,23 +783,17 @@ anychart.themes.merging.mergingMap_ = (function() {
     {
       defaultObj: 'defaultMarkerFactory',
       targets: [
+        'defaultTimeline.markers',
+        'standalones.markersFactory',
         [[
+          'venn',
+          'pieFunnelPyramidBase',
+          [['heat', 'tree'], 'Map'],
           [[
             'chart.defaultAnnotation',
-            [[
-              'chart',
-              'map'
-            ], '.defaultSeries']
-          ], 'Settings.base'],
-          'pieFunnelPyramidBase',
-          'defaultTimeline',
-          [[
-            'tree',
-            'heat'
-          ], 'Map'],
-          'venn'
-        ], '.markers'],
-        'standalones.markersFactory'
+            [['chart', 'map'], '.defaultSeries']
+          ], 'Settings.base']
+        ], '.normal.markers']
       ]
     },
     {
@@ -878,8 +898,10 @@ anychart.themes.merging.mergingMap_ = (function() {
             'radar',
             'heatMap',
             'stock.defaultPlotSettings'
+
           ], '.default']
         ], 'GridSettings'],
+        'map.gridsSettings',
         ['standalones.', [
           [[
             'linear',
@@ -1040,7 +1062,7 @@ anychart.themes.merging.mergingMap_ = (function() {
         'bullet',
         'map',
         'sparkline',
-        [['cartesian', 'pieFunnelPyramid', 'gantt'], 'Base'],
+        [[['cartesian', ['', '3d']], 'pieFunnelPyramid', 'gantt'], 'Base'],
         ['stock', ['', '.defaultPlotSettings']],
         [['heat', 'tree'], 'Map'],
         [['circular', 'linear'], 'Gauge'],
@@ -1186,7 +1208,9 @@ anychart.themes.merging.mergingMap_ = (function() {
         ['cartesian3dBase.defaultSeriesSettings.', [
           'bar',
           'column',
-          'area'
+          'area',
+          'line',
+          'line2d'
         ]]
       ]
     },
@@ -1197,6 +1221,7 @@ anychart.themes.merging.mergingMap_ = (function() {
           'area',
           'bar',
           'column',
+          'line',
           'cartesian'
         ], '3d']
       ]
@@ -1215,7 +1240,9 @@ anychart.themes.merging.mergingMap_ = (function() {
     },
     {
       defaultObj: 'area',
-      targets: ['area3d']
+      targets: [
+        [['area', 'line'], '3d']
+      ]
     },
     {
       defaultObj: 'mekko.defaultSeriesSettings.base',
@@ -1337,6 +1364,42 @@ anychart.themes.merging.mergingMap_ = (function() {
             'c', 'rangeC'
           ], 'olumn']
         ]]
+      ]
+    },
+    {
+      defaultObj: 'chart.normal.labels',
+      targets: [
+        'sparkline.labels'
+      ]
+    },
+    {
+      defaultObj: 'chart.normal.markers',
+      targets: [
+        'sparkline.markers'
+      ]
+    },
+    {
+      defaultObj: 'chart.defaultSeriesSettings.base.normal',
+      targets: [
+        'sparkline.defaultSeriesSettings.base'
+      ]
+    },
+    {
+      defaultObj: 'chart.defaultSeriesSettings.area.normal',
+      targets: [
+        'sparkline.defaultSeriesSettings.area'
+      ]
+    },
+    {
+      defaultObj: 'chart.defaultSeriesSettings.line.normal',
+      targets: [
+        'sparkline.defaultSeriesSettings.line'
+      ]
+    },
+    {
+      defaultObj: 'chart.defaultSeriesSettings.column.normal',
+      targets: [
+        'sparkline.defaultSeriesSettings.column'
       ]
     },
     {
@@ -1758,7 +1821,8 @@ anychart.themes.merging.nonMergableEntities_ = (function() {
     'palette': anychart.themes.merging.NonMergableEntityTypes_.PALETTE,
     'fill': anychart.themes.merging.NonMergableEntityTypes_.FILL,
     'stroke': anychart.themes.merging.NonMergableEntityTypes_.STROKE,
-    'hatchFill': anychart.themes.merging.NonMergableEntityTypes_.HATCH_FILL
+    'hatchFill': anychart.themes.merging.NonMergableEntityTypes_.HATCH_FILL,
+    'hatchFillPalette': anychart.themes.merging.NonMergableEntityTypes_.HATCH_PALETTE
   };
 
   populate([[
@@ -1768,7 +1832,6 @@ anychart.themes.merging.nonMergableEntities_ = (function() {
   ], 'Scale'], anychart.themes.merging.NonMergableEntityTypes_.SCALE);
   populate([[
     'range',
-    'hatchFill',
     'marker'
   ], 'Palette'], anychart.themes.merging.NonMergableEntityTypes_.PALETTE);
   populate([[
@@ -1820,7 +1883,8 @@ anychart.themes.merging.nonMergableEntities_ = (function() {
       'edElement',
       'Negative',
       'Rising',
-      'Falling'
+      'Falling',
+      'Marquee'
     ]]
   ], 'Fill'], anychart.themes.merging.NonMergableEntityTypes_.FILL);
   populate([[
@@ -1903,7 +1967,8 @@ anychart.themes.merging.nonMergableEntities_ = (function() {
       'edFalling',
       'Median',
       'Stem',
-      'Whisker'
+      'Whisker',
+      'Marquee'
     ]]
   ], 'Stroke'], anychart.themes.merging.NonMergableEntityTypes_.STROKE);
 
