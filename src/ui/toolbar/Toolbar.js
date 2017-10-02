@@ -83,25 +83,3 @@ anychart.ui.toolbar.Toolbar.prototype.draw = function() {
   }
   return this;
 };
-
-
-/**
- * Constructor function for toolbar.
- * @return {anychart.ui.toolbar.Toolbar}
- * @deprecated Since 7.10.0. Use anychart.ui.ganttToolbar() instead.
- */
-anychart.toolbar = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.toolbar()', 'anychart.ui.ganttToolbar()', null, 'Constructor'], true);
-  return new anychart.ui.toolbar.Toolbar();
-};
-
-
-//exports
-/** @suppress {deprecated} */
-(function() {
-  var proto = anychart.ui.toolbar.Toolbar.prototype;
-  goog.exportSymbol('anychart.toolbar', anychart.toolbar);
-  proto['container'] = proto.container;
-  proto['target'] = proto.target;
-  proto['draw'] = proto.draw;
-})();

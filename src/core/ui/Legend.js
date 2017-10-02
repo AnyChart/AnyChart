@@ -1,5 +1,6 @@
 //region --- Requiring and Providing
 goog.provide('anychart.core.ui.Legend');
+goog.provide('anychart.standalones.Legend');
 goog.require('acgraph.vector.Text.TextOverflow');
 goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.Text');
@@ -312,13 +313,13 @@ anychart.core.ui.Legend.prototype.sourceEquals = function(sourceArray) {
 
 /**
  * Getter/setter for items source.
- * @param {(anychart.core.SeparateChart|anychart.core.stock.Plot|Array.<anychart.core.SeparateChart|anychart.core.stock.Plot>)=} opt_value Items source.
- * @return {(anychart.core.SeparateChart|anychart.core.stock.Plot|Array.<anychart.core.SeparateChart|anychart.core.stock.Plot>|anychart.core.ui.Legend)} Items source or self for chaining.
+ * @param {(anychart.core.SeparateChart|anychart.stockModule.Plot|Array.<anychart.core.SeparateChart|anychart.stockModule.Plot>)=} opt_value Items source.
+ * @return {(anychart.core.SeparateChart|anychart.stockModule.Plot|Array.<anychart.core.SeparateChart|anychart.stockModule.Plot>|anychart.core.ui.Legend)} Items source or self for chaining.
  */
 anychart.core.ui.Legend.prototype.itemsSource = function(opt_value) {
   if (goog.isDef(opt_value)) {
     opt_value = goog.isArray(opt_value) ?
-        goog.array.slice(/** @type {Array.<anychart.core.SeparateChart|anychart.core.stock.Plot>} */ (opt_value), 0) :
+        goog.array.slice(/** @type {Array.<anychart.core.SeparateChart|anychart.stockModule.Plot>} */ (opt_value), 0) :
         goog.isNull(opt_value) ?
             opt_value : [opt_value];
     if (!this.sourceEquals(opt_value)) {
@@ -384,18 +385,6 @@ anychart.core.ui.Legend.prototype.itemsFormat = function(opt_value) {
     return this;
   }
   return this.itemsFormat_;
-};
-
-
-/**
- * Getter/setter for items text formatter.
- * @param {(string|Function)=} opt_value Items text formatter function.
- * @return {(Function|string|anychart.core.ui.Legend)} Items text formatter function or self for chaining.
- * @deprecated Since 7.13.1. Use 'itemsFormat' instead.
- */
-anychart.core.ui.Legend.prototype.itemsTextFormatter = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['itemsTextFormatter()', 'itemsFormat()'], true);
-  return this.itemsFormat(opt_value);
 };
 
 
@@ -595,18 +584,6 @@ anychart.core.ui.Legend.prototype.titleInvalidated_ = function(event) {
   }
   // If there are no signals, the !state and nothing happens.
   this.invalidate(state, signal);
-};
-
-
-/**
- * If set, formats title. Currently supported in Stock only.
- * @param {?(Function|string)=} opt_value
- * @return {Function|string|anychart.core.ui.Legend}
- * @deprecated Since 7.13.1. Use 'titleFormat' instead.
- */
-anychart.core.ui.Legend.prototype.titleFormatter = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['titleFormatter', 'titleFormat'], true);
-  return this.titleFormat(opt_value);
 };
 
 
@@ -1135,7 +1112,7 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
   var margin = this.margin();
   var padding = this.padding();
 
-  var width, height, orientation, fullWidth, fullHeight, left = 0, top = 0;
+  var width, height, fullWidth, fullHeight, left = 0, top = 0;
 
   var maxWidth, maxHeight;
   if (parentBounds) {
@@ -1395,8 +1372,6 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
     var pageWidth = contentAreaWidth;
     var pageHeight = contentAreaHeight;
 
-    orientation = paginator.orientation();
-
     if (paginator.getFinalEnabled()) {
       if (paginatorIsHorizontal) {
         pageHeight = contentAreaHeight - paginatorBounds.height;
@@ -1646,7 +1621,7 @@ anychart.core.ui.Legend.prototype.createItemsFromSource_ = function() {
     var source;
     var items = [];
     for (var i = 0; i < this.itemsSourceInternal.length; i++) {
-      source = /** @type {anychart.core.SeparateChart|anychart.core.stock.Plot} */ (this.itemsSourceInternal[i]);
+      source = /** @type {anychart.core.SeparateChart|anychart.stockModule.Plot} */ (this.itemsSourceInternal[i]);
       if (!goog.isNull(source) && goog.isFunction(source.createLegendItemsProvider))
         items = goog.array.concat(items, source.createLegendItemsProvider(this.itemsSourceMode_, this.itemsFormat_));
     }
@@ -1718,7 +1693,7 @@ anychart.core.ui.Legend.prototype.initializeLegendItems_ = function(items) {
             itemSourceKey == items[i]['sourceKey']) {
           item.clear();
           item.setup(items[i]);
-          item.applyTextSettings(item.getTextElement(), false);
+          item.applyFontColor();
           item.setItemIndexToLayer(this.inverted_ ? items.length - 1 - i : i);
           break;
         }
@@ -1740,6 +1715,8 @@ anychart.core.ui.Legend.prototype.initializeLegendItems_ = function(items) {
       item.container(this.itemsLayer_);
       items[i]['enabled'] = false;
       item.setup(items[i]);
+      if (!item.hasOwnOption('text'))
+        item.ownSettings['text'] = 'Legend Item';
       item.applyTextSettings(item.getTextElement(), true);
       item.setItemIndexToLayer(this.inverted_ ? items.length - 1 - i : i);
 
@@ -1869,7 +1846,7 @@ anychart.core.ui.Legend.prototype.draw = function() {
   this.clearLastDrawedPage_();
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     // Reset items width (needs when container was resized) for DVF-2119
-    if (this.items_ && this.textOverflow() == acgraph.vector.Text.TextOverflow.ELLIPSIS) {
+    if (this.items_ && this.getOption('textOverflow') == acgraph.vector.Text.TextOverflow.ELLIPSIS) {
       for (var i = 0, len = this.items_.length; i < len; i++) {
         this.items_[i].parentBounds(null);
         this.items_[i].getTextElement().width(null);
@@ -2194,7 +2171,7 @@ anychart.core.ui.Legend.prototype.handleMouseOver_ = function(event) {
   var evt = this.makePointEvent_(event);
   if (evt && this.dispatchEvent(evt)) {
     var item = this.items_ && this.items_[evt['itemIndex']];
-    var source = /** @type {anychart.core.SeparateChart|anychart.core.stock.Plot} */(evt['itemSource']);
+    var source = /** @type {anychart.core.SeparateChart|anychart.stockModule.Plot} */(evt['itemSource']);
     if (item) {
       if (source && goog.isFunction(source.legendItemOver)) {
         source.legendItemOver(item, event);
@@ -2226,7 +2203,7 @@ anychart.core.ui.Legend.prototype.handleMouseOut_ = function(event) {
   var evt = this.makePointEvent_(event);
   if (evt && this.dispatchEvent(evt)) {
     var item = this.items_ && this.items_[evt['itemIndex']];
-    var source = /** @type {anychart.core.SeparateChart|anychart.core.stock.Plot} */(evt['itemSource']);
+    var source = /** @type {anychart.core.SeparateChart|anychart.stockModule.Plot} */(evt['itemSource']);
     if (item) {
       if (source && goog.isFunction(source.legendItemOut)) {
         source.legendItemOut(item, event);
@@ -2247,7 +2224,7 @@ anychart.core.ui.Legend.prototype.handleMouseClick_ = function(event) {
   var evt = this.makePointEvent_(event);
   if (evt && this.dispatchEvent(evt)) {
     var item = this.items_ && this.items_[evt['itemIndex']];
-    var source = /** @type {anychart.core.SeparateChart|anychart.core.stock.Plot} */(evt['itemSource']);
+    var source = /** @type {anychart.core.SeparateChart|anychart.stockModule.Plot} */(evt['itemSource']);
     if (item && source && goog.isFunction(source.legendItemClick))
       source.legendItemClick.call(source, item, event);
   }
@@ -2308,7 +2285,7 @@ anychart.core.ui.Legend.prototype.makePointEvent_ = function(event) {
   var item = this.items_[itemIndex];
   if (item && this.itemsSourceInternal) {
     for (var i = 0; i < this.itemsSourceInternal.length; i++) {
-      var source = /** @type {anychart.core.SeparateChart|anychart.core.stock.Plot} */ (this.itemsSourceInternal[i]);
+      var source = /** @type {anychart.core.SeparateChart|anychart.stockModule.Plot} */ (this.itemsSourceInternal[i]);
       if (goog.getUid(source) == item.sourceUid() &&
           goog.isFunction(source.legendItemCanInteractInMode) &&
           source.legendItemCanInteractInMode(this.itemsSourceMode_)) {
@@ -2364,10 +2341,7 @@ anychart.core.ui.Legend.prototype.serialize = function() {
 };
 
 
-/**
- * @inheritDoc
- * @suppress {deprecated}
- */
+/** @inheritDoc */
 anychart.core.ui.Legend.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.ui.Legend.base(this, 'setupByJSON', config, opt_default);
 
@@ -2384,8 +2358,6 @@ anychart.core.ui.Legend.prototype.setupByJSON = function(config, opt_default) {
     this.margin(config['margin']);
 
   this.titleFormat(config['titleFormat']);
-  if ('titleFormatter' in config)
-    this.titleFormatter(config['titleFormatter']);
   this.titleSeparator(config['titleSeparator']);
   this.paginator(config['paginator']);
 
@@ -2397,9 +2369,6 @@ anychart.core.ui.Legend.prototype.setupByJSON = function(config, opt_default) {
   this.itemsSourceMode(config['itemsSourceMode']);
   this.items(config['items']);
   this.itemsFormat(config['itemsFormat']);
-  if ('itemsTextFormatter' in config) {
-    this.itemsTextFormatter(config['itemsTextFormatter']);
-  }
   this.itemsFormatter(config['itemsFormatter']);
   this.iconTextSpacing(config['iconTextSpacing']);
   this.iconSize(config['iconSize']);
@@ -2429,10 +2398,127 @@ anychart.core.ui.Legend.prototype.disposeInternal = function() {
 };
 
 
+
+//endregion
+//region --- Standalone
+//------------------------------------------------------------------------------
+//
+//  Standalone
+//
+//------------------------------------------------------------------------------
+/**
+ * @constructor
+ * @extends {anychart.core.ui.Legend}
+ */
+anychart.standalones.Legend = function() {
+  anychart.standalones.Legend.base(this, 'constructor');
+};
+goog.inherits(anychart.standalones.Legend, anychart.core.ui.Legend);
+anychart.core.makeStandalone(anychart.standalones.Legend, anychart.core.ui.Legend);
+
+
+//region --- STANDALONE ---
+/**
+ * Define, is one of the bounds settings set in percent.
+ * @return {boolean} Is one of the bounds settings set in percent.
+ */
+anychart.standalones.Legend.prototype.dependsOnContainerSize = function() {
+  //TODO(AntonKagakin): should be reworked to getOption
+  var width = this.width();
+  var height = this.height();
+  return anychart.utils.isPercent(width) || anychart.utils.isPercent(height) || goog.isNull(width) || goog.isNull(height);
+};
+
+
+//endregion
+/**
+ * Removes signal listeners.
+ * @private
+ */
+anychart.standalones.Legend.prototype.unlistenStockPlots_ = function() {
+  if (!this.itemsSourceInternal) return;
+  var source;
+  for (var i = 0; i < this.itemsSourceInternal.length; i++) {
+    source = this.itemsSourceInternal[i];
+    if (source.needsInteractiveLegendUpdate && source.needsInteractiveLegendUpdate()) {
+      source.unlistenSignals(this.onStockPlotSignal_, source);
+    }
+  }
+};
+
+
+/**
+ * Adds signal listeners on stock plots.
+ * @private
+ */
+anychart.standalones.Legend.prototype.listenStockPlots_ = function() {
+  if (!this.itemsSourceInternal) return;
+  var source;
+  for (var i = 0; i < this.itemsSourceInternal.length; i++) {
+    source = this.itemsSourceInternal[i];
+    if (source.needsInteractiveLegendUpdate && source.needsInteractiveLegendUpdate()) {
+      source.listenSignals(this.onStockPlotSignal_, this);
+    }
+  }
+};
+
+
+/**
+ * @param {anychart.SignalEvent} event
+ * @private
+ */
+anychart.standalones.Legend.prototype.onStockPlotSignal_ = function(event) {
+  if (event.hasSignal(anychart.Signal.NEED_UPDATE_LEGEND)) {
+    this.suspendSignalsDispatching();
+    var plot = /** @type {anychart.stockModule.Plot} */ (event.target);
+    var autoText = plot.getLegendAutoText(/** @type {string|Function} */ (this.titleFormat()));
+    if (!goog.isNull(autoText))
+      this.title().autoText(autoText);
+    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.LEGEND_RECREATE_ITEMS);
+    if (this.container())
+      this.draw();
+    this.resumeSignalsDispatching(false);
+  }
+};
+
+
+/**
+ * Getter/setter for items source.
+ * @param {(anychart.core.SeparateChart|anychart.stockModule.Plot|Array.<anychart.core.SeparateChart|anychart.stockModule.Plot>)=} opt_value Items source.
+ * @return {(anychart.core.SeparateChart|anychart.stockModule.Plot|Array.<anychart.core.SeparateChart|anychart.stockModule.Plot>|anychart.core.ui.Legend)} Items source or self for chaining.
+ */
+anychart.standalones.Legend.prototype.itemsSource = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = goog.isArray(opt_value) ?
+        goog.array.slice(/** @type {Array.<anychart.core.SeparateChart|anychart.stockModule.Plot>} */ (opt_value), 0) :
+        goog.isNull(opt_value) ?
+            opt_value : [opt_value];
+    if (!this.sourceEquals(opt_value)) {
+      this.unlistenStockPlots_();
+      this.itemsSourceInternal = opt_value;
+      this.listenStockPlots_();
+      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.LEGEND_RECREATE_ITEMS, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.itemsSourceInternal;
+};
+
+
+/**
+ * Constructor function.
+ * @return {!anychart.standalones.Legend}
+ */
+anychart.standalones.legend = function() {
+  var legend = new anychart.standalones.Legend();
+  legend.setup(anychart.getFullTheme('standalones.legend'));
+  return legend;
+};
+
+
 //endregion
 //region --- Exports
 //exports
-/** @suppress {deprecated} */
 (function() {
   var proto = anychart.core.ui.Legend.prototype;
   proto['itemsLayout'] = proto.itemsLayout;
@@ -2440,7 +2526,6 @@ anychart.core.ui.Legend.prototype.disposeInternal = function() {
   proto['items'] = proto.items;
   proto['itemsFormatter'] = proto.itemsFormatter;
   proto['itemsFormat'] = proto.itemsFormat;
-  proto['itemsTextFormatter'] = proto.itemsTextFormatter;
   proto['itemsSourceMode'] = proto.itemsSourceMode;
   proto['inverted'] = proto.inverted;
   proto['hoverCursor'] = proto.hoverCursor;
@@ -2450,7 +2535,6 @@ anychart.core.ui.Legend.prototype.disposeInternal = function() {
   proto['padding'] = proto.padding;
   proto['background'] = proto.background;
   proto['title'] = proto.title;
-  proto['titleFormatter'] = proto.titleFormatter;
   proto['titleFormat'] = proto.titleFormat;
   proto['titleSeparator'] = proto.titleSeparator;
   proto['paginator'] = proto.paginator;
@@ -2465,5 +2549,12 @@ anychart.core.ui.Legend.prototype.disposeInternal = function() {
   proto['drag'] = proto.drag;
   proto['getRemainingBounds'] = proto.getRemainingBounds;
   proto['getPixelBounds'] = proto.getPixelBounds;
+
+  proto = anychart.standalones.Legend.prototype;
+  goog.exportSymbol('anychart.standalones.legend', anychart.standalones.legend);
+  proto['draw'] = proto.draw;
+  proto['parentBounds'] = proto.parentBounds;
+  proto['container'] = proto.container;
+  proto['itemsSource'] = proto.itemsSource;
 })();
 //endregion

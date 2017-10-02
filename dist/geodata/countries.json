@@ -1,0 +1,1633 @@
+{
+  "countries": {
+    "afghanistan": {
+      "country": "afghanistan",
+      "shp": "afghanistan.zip",
+      "svg": "afghanistan.svg",
+      "json": "afghanistan.json",
+      "js": "afghanistan.js",
+      "topo_js": "afghanistan.topo.js",
+      "topo_json": "afghanistan.topo.json"
+    },
+    "libya": {
+      "country": "libya",
+      "shp": "libya.zip",
+      "svg": "libya.svg",
+      "json": "libya.json",
+      "js": "libya.js",
+      "topo_js": "libya.topo.js",
+      "topo_json": "libya.topo.json"
+    },
+    "aland": {
+      "country": "aland",
+      "shp": "aland.zip",
+      "svg": "aland.svg",
+      "json": "aland.json",
+      "js": "aland.js",
+      "topo_js": "aland.topo.js",
+      "topo_json": "aland.topo.json"
+    },
+    "liechtenstein": {
+      "country": "liechtenstein",
+      "shp": "liechtenstein.zip",
+      "svg": "liechtenstein.svg",
+      "json": "liechtenstein.json",
+      "js": "liechtenstein.js",
+      "topo_js": "liechtenstein.topo.js",
+      "topo_json": "liechtenstein.topo.json"
+    },
+    "albania": {
+      "country": "albania",
+      "shp": "albania.zip",
+      "svg": "albania.svg",
+      "json": "albania.json",
+      "js": "albania.js",
+      "topo_js": "albania.topo.js",
+      "topo_json": "albania.topo.json"
+    },
+    "lithuania": {
+      "country": "lithuania",
+      "shp": "lithuania.zip",
+      "svg": "lithuania.svg",
+      "json": "lithuania.json",
+      "js": "lithuania.js",
+      "topo_js": "lithuania.topo.js",
+      "topo_json": "lithuania.topo.json"
+    },
+    "algeria": {
+      "country": "algeria",
+      "shp": "algeria.zip",
+      "svg": "algeria.svg",
+      "json": "algeria.json",
+      "js": "algeria.js",
+      "topo_js": "algeria.topo.js",
+      "topo_json": "algeria.topo.json"
+    },
+    "luxembourg": {
+      "country": "luxembourg",
+      "shp": "luxembourg.zip",
+      "svg": "luxembourg.svg",
+      "json": "luxembourg.json",
+      "js": "luxembourg.js",
+      "topo_js": "luxembourg.topo.js",
+      "topo_json": "luxembourg.topo.json"
+    },
+    "andorra": {
+      "country": "andorra",
+      "shp": "andorra.zip",
+      "svg": "andorra.svg",
+      "json": "andorra.json",
+      "js": "andorra.js",
+      "topo_js": "andorra.topo.js",
+      "topo_json": "andorra.topo.json"
+    },
+    "macedonia": {
+      "country": "macedonia",
+      "shp": "macedonia.zip",
+      "svg": "macedonia.svg",
+      "json": "macedonia.json",
+      "js": "macedonia.js",
+      "topo_js": "macedonia.topo.js",
+      "topo_json": "macedonia.topo.json"
+    },
+    "angola": {
+      "country": "angola",
+      "shp": "angola.zip",
+      "svg": "angola.svg",
+      "json": "angola.json",
+      "js": "angola.js",
+      "topo_js": "angola.topo.js",
+      "topo_json": "angola.topo.json"
+    },
+    "madagascar": {
+      "country": "madagascar",
+      "shp": "madagascar.zip",
+      "svg": "madagascar.svg",
+      "json": "madagascar.json",
+      "js": "madagascar.js",
+      "topo_js": "madagascar.topo.js",
+      "topo_json": "madagascar.topo.json"
+    },
+    "anguilla": {
+      "country": "anguilla",
+      "shp": "anguilla.zip",
+      "svg": "anguilla.svg",
+      "json": "anguilla.json",
+      "js": "anguilla.js",
+      "topo_js": "anguilla.topo.js",
+      "topo_json": "anguilla.topo.json"
+    },
+    "malawi": {
+      "country": "malawi",
+      "shp": "malawi.zip",
+      "svg": "malawi.svg",
+      "json": "malawi.json",
+      "js": "malawi.js",
+      "topo_js": "malawi.topo.js",
+      "topo_json": "malawi.topo.json"
+    },
+    "argentina": {
+      "country": "argentina",
+      "shp": "argentina.zip",
+      "svg": "argentina.svg",
+      "json": "argentina.json",
+      "js": "argentina.js",
+      "topo_js": "argentina.topo.js",
+      "topo_json": "argentina.topo.json"
+    },
+    "malaysia": {
+      "country": "malaysia",
+      "shp": "malaysia.zip",
+      "svg": "malaysia.svg",
+      "json": "malaysia.json",
+      "js": "malaysia.js",
+      "topo_js": "malaysia.topo.js",
+      "topo_json": "malaysia.topo.json"
+    },
+    "armenia": {
+      "country": "armenia",
+      "shp": "armenia.zip",
+      "svg": "armenia.svg",
+      "json": "armenia.json",
+      "js": "armenia.js",
+      "topo_js": "armenia.topo.js",
+      "topo_json": "armenia.topo.json"
+    },
+    "mali": {
+      "country": "mali",
+      "shp": "mali.zip",
+      "svg": "mali.svg",
+      "json": "mali.json",
+      "js": "mali.js",
+      "topo_js": "mali.topo.js",
+      "topo_json": "mali.topo.json"
+    },
+    "australia": {
+      "country": "australia",
+      "shp": "australia.zip",
+      "svg": "australia.svg",
+      "json": "australia.json",
+      "js": "australia.js",
+      "topo_js": "australia.topo.js",
+      "topo_json": "australia.topo.json"
+    },
+    "malta": {
+      "country": "malta",
+      "shp": "malta.zip",
+      "svg": "malta.svg",
+      "json": "malta.json",
+      "js": "malta.js",
+      "topo_js": "malta.topo.js",
+      "topo_json": "malta.topo.json"
+    },
+    "austria": {
+      "country": "austria",
+      "shp": "austria.zip",
+      "svg": "austria.svg",
+      "json": "austria.json",
+      "js": "austria.js",
+      "topo_js": "austria.topo.js",
+      "topo_json": "austria.topo.json"
+    },
+    "mauritania": {
+      "country": "mauritania",
+      "shp": "mauritania.zip",
+      "svg": "mauritania.svg",
+      "json": "mauritania.json",
+      "js": "mauritania.js",
+      "topo_js": "mauritania.topo.js",
+      "topo_json": "mauritania.topo.json"
+    },
+    "azerbaijan": {
+      "country": "azerbaijan",
+      "shp": "azerbaijan.zip",
+      "svg": "azerbaijan.svg",
+      "json": "azerbaijan.json",
+      "js": "azerbaijan.js",
+      "topo_js": "azerbaijan.topo.js",
+      "topo_json": "azerbaijan.topo.json"
+    },
+    "mexico": {
+      "country": "mexico",
+      "shp": "mexico.zip",
+      "svg": "mexico.svg",
+      "json": "mexico.json",
+      "js": "mexico.js",
+      "topo_js": "mexico.topo.js",
+      "topo_json": "mexico.topo.json"
+    },
+    "bangladesh": {
+      "country": "bangladesh",
+      "shp": "bangladesh.zip",
+      "svg": "bangladesh.svg",
+      "json": "bangladesh.json",
+      "js": "bangladesh.js",
+      "topo_js": "bangladesh.topo.js",
+      "topo_json": "bangladesh.topo.json"
+    },
+    "moldova": {
+      "country": "moldova",
+      "shp": "moldova.zip",
+      "svg": "moldova.svg",
+      "json": "moldova.json",
+      "js": "moldova.js",
+      "topo_js": "moldova.topo.js",
+      "topo_json": "moldova.topo.json"
+    },
+    "barbados": {
+      "country": "barbados",
+      "shp": "barbados.zip",
+      "svg": "barbados.svg",
+      "json": "barbados.json",
+      "js": "barbados.js",
+      "topo_js": "barbados.topo.js",
+      "topo_json": "barbados.topo.json"
+    },
+    "mongolia": {
+      "country": "mongolia",
+      "shp": "mongolia.zip",
+      "svg": "mongolia.svg",
+      "json": "mongolia.json",
+      "js": "mongolia.js",
+      "topo_js": "mongolia.topo.js",
+      "topo_json": "mongolia.topo.json"
+    },
+    "belarus": {
+      "country": "belarus",
+      "shp": "belarus.zip",
+      "svg": "belarus.svg",
+      "json": "belarus.json",
+      "js": "belarus.js",
+      "topo_js": "belarus.topo.js",
+      "topo_json": "belarus.topo.json"
+    },
+    "montenegro": {
+      "country": "montenegro",
+      "shp": "montenegro.zip",
+      "svg": "montenegro.svg",
+      "json": "montenegro.json",
+      "js": "montenegro.js",
+      "topo_js": "montenegro.topo.js",
+      "topo_json": "montenegro.topo.json"
+    },
+    "belgium": {
+      "country": "belgium",
+      "shp": "belgium.zip",
+      "svg": "belgium.svg",
+      "json": "belgium.json",
+      "js": "belgium.js",
+      "topo_js": "belgium.topo.js",
+      "topo_json": "belgium.topo.json"
+    },
+    "montserrat": {
+      "country": "montserrat",
+      "shp": "montserrat.zip",
+      "svg": "montserrat.svg",
+      "json": "montserrat.json",
+      "js": "montserrat.js",
+      "topo_js": "montserrat.topo.js",
+      "topo_json": "montserrat.topo.json"
+    },
+    "belize": {
+      "country": "belize",
+      "shp": "belize.zip",
+      "svg": "belize.svg",
+      "json": "belize.json",
+      "js": "belize.js",
+      "topo_js": "belize.topo.js",
+      "topo_json": "belize.topo.json"
+    },
+    "morocco": {
+      "country": "morocco",
+      "shp": "morocco.zip",
+      "svg": "morocco.svg",
+      "json": "morocco.json",
+      "js": "morocco.js",
+      "topo_js": "morocco.topo.js",
+      "topo_json": "morocco.topo.json"
+    },
+    "benin": {
+      "country": "benin",
+      "shp": "benin.zip",
+      "svg": "benin.svg",
+      "json": "benin.json",
+      "js": "benin.js",
+      "topo_js": "benin.topo.js",
+      "topo_json": "benin.topo.json"
+    },
+    "mozambique": {
+      "country": "mozambique",
+      "shp": "mozambique.zip",
+      "svg": "mozambique.svg",
+      "json": "mozambique.json",
+      "js": "mozambique.js",
+      "topo_js": "mozambique.topo.js",
+      "topo_json": "mozambique.topo.json"
+    },
+    "bermuda": {
+      "country": "bermuda",
+      "shp": "bermuda.zip",
+      "svg": "bermuda.svg",
+      "json": "bermuda.json",
+      "js": "bermuda.js",
+      "topo_js": "bermuda.topo.js",
+      "topo_json": "bermuda.topo.json"
+    },
+    "myanmar": {
+      "country": "myanmar",
+      "shp": "myanmar.zip",
+      "svg": "myanmar.svg",
+      "json": "myanmar.json",
+      "js": "myanmar.js",
+      "topo_js": "myanmar.topo.js",
+      "topo_json": "myanmar.topo.json"
+    },
+    "bhutan": {
+      "country": "bhutan",
+      "shp": "bhutan.zip",
+      "svg": "bhutan.svg",
+      "json": "bhutan.json",
+      "js": "bhutan.js",
+      "topo_js": "bhutan.topo.js",
+      "topo_json": "bhutan.topo.json"
+    },
+    "namibia": {
+      "country": "namibia",
+      "shp": "namibia.zip",
+      "svg": "namibia.svg",
+      "json": "namibia.json",
+      "js": "namibia.js",
+      "topo_js": "namibia.topo.js",
+      "topo_json": "namibia.topo.json"
+    },
+    "bolivia": {
+      "country": "bolivia",
+      "shp": "bolivia.zip",
+      "svg": "bolivia.svg",
+      "json": "bolivia.json",
+      "js": "bolivia.js",
+      "topo_js": "bolivia.topo.js",
+      "topo_json": "bolivia.topo.json"
+    },
+    "nauru": {
+      "country": "nauru",
+      "shp": "nauru.zip",
+      "svg": "nauru.svg",
+      "json": "nauru.json",
+      "js": "nauru.js",
+      "topo_js": "nauru.topo.js",
+      "topo_json": "nauru.topo.json"
+    },
+    "bosnia_and_herzegovina": {
+      "country": "bosnia_and_herzegovina",
+      "shp": "bosnia_and_herzegovina.zip",
+      "svg": "bosnia_and_herzegovina.svg",
+      "json": "bosnia_and_herzegovina.json",
+      "js": "bosnia_and_herzegovina.js",
+      "topo_js": "bosnia_and_herzegovina.topo.js",
+      "topo_json": "bosnia_and_herzegovina.topo.json"
+    },
+    "nepal": {
+      "country": "nepal",
+      "shp": "nepal.zip",
+      "svg": "nepal.svg",
+      "json": "nepal.json",
+      "js": "nepal.js",
+      "topo_js": "nepal.topo.js",
+      "topo_json": "nepal.topo.json"
+    },
+    "botswana": {
+      "country": "botswana",
+      "shp": "botswana.zip",
+      "svg": "botswana.svg",
+      "json": "botswana.json",
+      "js": "botswana.js",
+      "topo_js": "botswana.topo.js",
+      "topo_json": "botswana.topo.json"
+    },
+    "new_caledonia": {
+      "country": "new_caledonia",
+      "shp": "new_caledonia.zip",
+      "svg": "new_caledonia.svg",
+      "json": "new_caledonia.json",
+      "js": "new_caledonia.js",
+      "topo_js": "new_caledonia.topo.js",
+      "topo_json": "new_caledonia.topo.json"
+    },
+    "brazil": {
+      "country": "brazil",
+      "shp": "brazil.zip",
+      "svg": "brazil.svg",
+      "json": "brazil.json",
+      "js": "brazil.js",
+      "topo_js": "brazil.topo.js",
+      "topo_json": "brazil.topo.json"
+    },
+    "nicaragua": {
+      "country": "nicaragua",
+      "shp": "nicaragua.zip",
+      "svg": "nicaragua.svg",
+      "json": "nicaragua.json",
+      "js": "nicaragua.js",
+      "topo_js": "nicaragua.topo.js",
+      "topo_json": "nicaragua.topo.json"
+    },
+    "brunei": {
+      "country": "brunei",
+      "shp": "brunei.zip",
+      "svg": "brunei.svg",
+      "json": "brunei.json",
+      "js": "brunei.js",
+      "topo_js": "brunei.topo.js",
+      "topo_json": "brunei.topo.json"
+    },
+    "niger": {
+      "country": "niger",
+      "shp": "niger.zip",
+      "svg": "niger.svg",
+      "json": "niger.json",
+      "js": "niger.js",
+      "topo_js": "niger.topo.js",
+      "topo_json": "niger.topo.json"
+    },
+    "bulgaria": {
+      "country": "bulgaria",
+      "shp": "bulgaria.zip",
+      "svg": "bulgaria.svg",
+      "json": "bulgaria.json",
+      "js": "bulgaria.js",
+      "topo_js": "bulgaria.topo.js",
+      "topo_json": "bulgaria.topo.json"
+    },
+    "nigeria": {
+      "country": "nigeria",
+      "shp": "nigeria.zip",
+      "svg": "nigeria.svg",
+      "json": "nigeria.json",
+      "js": "nigeria.js",
+      "topo_js": "nigeria.topo.js",
+      "topo_json": "nigeria.topo.json"
+    },
+    "burkina_faso": {
+      "country": "burkina_faso",
+      "shp": "burkina_faso.zip",
+      "svg": "burkina_faso.svg",
+      "json": "burkina_faso.json",
+      "js": "burkina_faso.js",
+      "topo_js": "burkina_faso.topo.js",
+      "topo_json": "burkina_faso.topo.json"
+    },
+    "north_korea": {
+      "country": "north_korea",
+      "shp": "north_korea.zip",
+      "svg": "north_korea.svg",
+      "json": "north_korea.json",
+      "js": "north_korea.js",
+      "topo_js": "north_korea.topo.js",
+      "topo_json": "north_korea.topo.json"
+    },
+    "burundi": {
+      "country": "burundi",
+      "shp": "burundi.zip",
+      "svg": "burundi.svg",
+      "json": "burundi.json",
+      "js": "burundi.js",
+      "topo_js": "burundi.topo.js",
+      "topo_json": "burundi.topo.json"
+    },
+    "oman": {
+      "country": "oman",
+      "shp": "oman.zip",
+      "svg": "oman.svg",
+      "json": "oman.json",
+      "js": "oman.js",
+      "topo_js": "oman.topo.js",
+      "topo_json": "oman.topo.json"
+    },
+    "cambodia": {
+      "country": "cambodia",
+      "shp": "cambodia.zip",
+      "svg": "cambodia.svg",
+      "json": "cambodia.json",
+      "js": "cambodia.js",
+      "topo_js": "cambodia.topo.js",
+      "topo_json": "cambodia.topo.json"
+    },
+    "pakistan": {
+      "country": "pakistan",
+      "shp": "pakistan.zip",
+      "svg": "pakistan.svg",
+      "json": "pakistan.json",
+      "js": "pakistan.js",
+      "topo_js": "pakistan.topo.js",
+      "topo_json": "pakistan.topo.json"
+    },
+    "cameroon": {
+      "country": "cameroon",
+      "shp": "cameroon.zip",
+      "svg": "cameroon.svg",
+      "json": "cameroon.json",
+      "js": "cameroon.js",
+      "topo_js": "cameroon.topo.js",
+      "topo_json": "cameroon.topo.json"
+    },
+    "panama": {
+      "country": "panama",
+      "shp": "panama.zip",
+      "svg": "panama.svg",
+      "json": "panama.json",
+      "js": "panama.js",
+      "topo_js": "panama.topo.js",
+      "topo_json": "panama.topo.json"
+    },
+    "canada": {
+      "country": "canada",
+      "shp": "canada.zip",
+      "svg": "canada.svg",
+      "json": "canada.json",
+      "js": "canada.js",
+      "topo_js": "canada.topo.js",
+      "topo_json": "canada.topo.json"
+    },
+    "papua_new_guinea": {
+      "country": "papua_new_guinea",
+      "shp": "papua_new_guinea.zip",
+      "svg": "papua_new_guinea.svg",
+      "json": "papua_new_guinea.json",
+      "js": "papua_new_guinea.js",
+      "topo_js": "papua_new_guinea.topo.js",
+      "topo_json": "papua_new_guinea.topo.json"
+    },
+    "central_african_republic": {
+      "country": "central_african_republic",
+      "shp": "central_african_republic.zip",
+      "svg": "central_african_republic.svg",
+      "json": "central_african_republic.json",
+      "js": "central_african_republic.js",
+      "topo_js": "central_african_republic.topo.js",
+      "topo_json": "central_african_republic.topo.json"
+    },
+    "paraguay": {
+      "country": "paraguay",
+      "shp": "paraguay.zip",
+      "svg": "paraguay.svg",
+      "json": "paraguay.json",
+      "js": "paraguay.js",
+      "topo_js": "paraguay.topo.js",
+      "topo_json": "paraguay.topo.json"
+    },
+    "chad": {
+      "country": "chad",
+      "shp": "chad.zip",
+      "svg": "chad.svg",
+      "json": "chad.json",
+      "js": "chad.js",
+      "topo_js": "chad.topo.js",
+      "topo_json": "chad.topo.json"
+    },
+    "peru": {
+      "country": "peru",
+      "shp": "peru.zip",
+      "svg": "peru.svg",
+      "json": "peru.json",
+      "js": "peru.js",
+      "topo_js": "peru.topo.js",
+      "topo_json": "peru.topo.json"
+    },
+    "chile": {
+      "country": "chile",
+      "shp": "chile.zip",
+      "svg": "chile.svg",
+      "json": "chile.json",
+      "js": "chile.js",
+      "topo_js": "chile.topo.js",
+      "topo_json": "chile.topo.json"
+    },
+    "philippines": {
+      "country": "philippines",
+      "shp": "philippines.zip",
+      "svg": "philippines.svg",
+      "json": "philippines.json",
+      "js": "philippines.js",
+      "topo_js": "philippines.topo.js",
+      "topo_json": "philippines.topo.json"
+    },
+    "china": {
+      "country": "china",
+      "shp": "china.zip",
+      "svg": "china.svg",
+      "json": "china.json",
+      "js": "china.js",
+      "topo_js": "china.topo.js",
+      "topo_json": "china.topo.json"
+    },
+    "poland": {
+      "country": "poland",
+      "shp": "poland.zip",
+      "svg": "poland.svg",
+      "json": "poland.json",
+      "js": "poland.js",
+      "topo_js": "poland.topo.js",
+      "topo_json": "poland.topo.json"
+    },
+    "colombia": {
+      "country": "colombia",
+      "shp": "colombia.zip",
+      "svg": "colombia.svg",
+      "json": "colombia.json",
+      "js": "colombia.js",
+      "topo_js": "colombia.topo.js",
+      "topo_json": "colombia.topo.json"
+    },
+    "qatar": {
+      "country": "qatar",
+      "shp": "qatar.zip",
+      "svg": "qatar.svg",
+      "json": "qatar.json",
+      "js": "qatar.js",
+      "topo_js": "qatar.topo.js",
+      "topo_json": "qatar.topo.json"
+    },
+    "costa_rica": {
+      "country": "costa_rica",
+      "shp": "costa_rica.zip",
+      "svg": "costa_rica.svg",
+      "json": "costa_rica.json",
+      "js": "costa_rica.js",
+      "topo_js": "costa_rica.topo.js",
+      "topo_json": "costa_rica.topo.json"
+    },
+    "republic_of_serbia": {
+      "country": "republic_of_serbia",
+      "shp": "republic_of_serbia.zip",
+      "svg": "republic_of_serbia.svg",
+      "json": "republic_of_serbia.json",
+      "js": "republic_of_serbia.js",
+      "topo_js": "republic_of_serbia.topo.js",
+      "topo_json": "republic_of_serbia.topo.json"
+    },
+    "croatia": {
+      "country": "croatia",
+      "shp": "croatia.zip",
+      "svg": "croatia.svg",
+      "json": "croatia.json",
+      "js": "croatia.js",
+      "topo_js": "croatia.topo.js",
+      "topo_json": "croatia.topo.json"
+    },
+    "republic_of_the_congo": {
+      "country": "republic_of_the_congo",
+      "shp": "republic_of_the_congo.zip",
+      "svg": "republic_of_the_congo.svg",
+      "json": "republic_of_the_congo.json",
+      "js": "republic_of_the_congo.js",
+      "topo_js": "republic_of_the_congo.topo.js",
+      "topo_json": "republic_of_the_congo.topo.json"
+    },
+    "cuba": {
+      "country": "cuba",
+      "shp": "cuba.zip",
+      "svg": "cuba.svg",
+      "json": "cuba.json",
+      "js": "cuba.js",
+      "topo_js": "cuba.topo.js",
+      "topo_json": "cuba.topo.json"
+    },
+    "romania": {
+      "country": "romania",
+      "shp": "romania.zip",
+      "svg": "romania.svg",
+      "json": "romania.json",
+      "js": "romania.js",
+      "topo_js": "romania.topo.js",
+      "topo_json": "romania.topo.json"
+    },
+    "cyprus": {
+      "country": "cyprus",
+      "shp": "cyprus.zip",
+      "svg": "cyprus.svg",
+      "json": "cyprus.json",
+      "js": "cyprus.js",
+      "topo_js": "cyprus.topo.js",
+      "topo_json": "cyprus.topo.json"
+    },
+    "rwanda": {
+      "country": "rwanda",
+      "shp": "rwanda.zip",
+      "svg": "rwanda.svg",
+      "json": "rwanda.json",
+      "js": "rwanda.js",
+      "topo_js": "rwanda.topo.js",
+      "topo_json": "rwanda.topo.json"
+    },
+    "czech_republic": {
+      "country": "czech_republic",
+      "shp": "czech_republic.zip",
+      "svg": "czech_republic.svg",
+      "json": "czech_republic.json",
+      "js": "czech_republic.js",
+      "topo_js": "czech_republic.topo.js",
+      "topo_json": "czech_republic.topo.json"
+    },
+    "s._sudan": {
+      "country": "s._sudan",
+      "shp": "s._sudan.zip",
+      "svg": "s._sudan.svg",
+      "json": "s._sudan.json",
+      "js": "s._sudan.js",
+      "topo_js": "s._sudan.topo.js",
+      "topo_json": "s._sudan.topo.json"
+    },
+    "democratic_republic_of_the_congo": {
+      "country": "democratic_republic_of_the_congo",
+      "shp": "democratic_republic_of_the_congo.zip",
+      "svg": "democratic_republic_of_the_congo.svg",
+      "json": "democratic_republic_of_the_congo.json",
+      "js": "democratic_republic_of_the_congo.js",
+      "topo_js": "democratic_republic_of_the_congo.topo.js",
+      "topo_json": "democratic_republic_of_the_congo.topo.json"
+    },
+    "saint_kitts_and_nevis": {
+      "country": "saint_kitts_and_nevis",
+      "shp": "saint_kitts_and_nevis.zip",
+      "svg": "saint_kitts_and_nevis.svg",
+      "json": "saint_kitts_and_nevis.json",
+      "js": "saint_kitts_and_nevis.js",
+      "topo_js": "saint_kitts_and_nevis.topo.js",
+      "topo_json": "saint_kitts_and_nevis.topo.json"
+    },
+    "denmark": {
+      "country": "denmark",
+      "shp": "denmark.zip",
+      "svg": "denmark.svg",
+      "json": "denmark.json",
+      "js": "denmark.js",
+      "topo_js": "denmark.topo.js",
+      "topo_json": "denmark.topo.json"
+    },
+    "saint_lucia": {
+      "country": "saint_lucia",
+      "shp": "saint_lucia.zip",
+      "svg": "saint_lucia.svg",
+      "json": "saint_lucia.json",
+      "js": "saint_lucia.js",
+      "topo_js": "saint_lucia.topo.js",
+      "topo_json": "saint_lucia.topo.json"
+    },
+    "djibouti": {
+      "country": "djibouti",
+      "shp": "djibouti.zip",
+      "svg": "djibouti.svg",
+      "json": "djibouti.json",
+      "js": "djibouti.js",
+      "topo_js": "djibouti.topo.js",
+      "topo_json": "djibouti.topo.json"
+    },
+    "saint_pierre_and_miquelon": {
+      "country": "saint_pierre_and_miquelon",
+      "shp": "saint_pierre_and_miquelon.zip",
+      "svg": "saint_pierre_and_miquelon.svg",
+      "json": "saint_pierre_and_miquelon.json",
+      "js": "saint_pierre_and_miquelon.js",
+      "topo_js": "saint_pierre_and_miquelon.topo.js",
+      "topo_json": "saint_pierre_and_miquelon.topo.json"
+    },
+    "dominica": {
+      "country": "dominica",
+      "shp": "dominica.zip",
+      "svg": "dominica.svg",
+      "json": "dominica.json",
+      "js": "dominica.js",
+      "topo_js": "dominica.topo.js",
+      "topo_json": "dominica.topo.json"
+    },
+    "saint_vincent_and_the_grenadines": {
+      "country": "saint_vincent_and_the_grenadines",
+      "shp": "saint_vincent_and_the_grenadines.zip",
+      "svg": "saint_vincent_and_the_grenadines.svg",
+      "json": "saint_vincent_and_the_grenadines.json",
+      "js": "saint_vincent_and_the_grenadines.js",
+      "topo_js": "saint_vincent_and_the_grenadines.topo.js",
+      "topo_json": "saint_vincent_and_the_grenadines.topo.json"
+    },
+    "dominican_republic": {
+      "country": "dominican_republic",
+      "shp": "dominican_republic.zip",
+      "svg": "dominican_republic.svg",
+      "json": "dominican_republic.json",
+      "js": "dominican_republic.js",
+      "topo_js": "dominican_republic.topo.js",
+      "topo_json": "dominican_republic.topo.json"
+    },
+    "samoa": {
+      "country": "samoa",
+      "shp": "samoa.zip",
+      "svg": "samoa.svg",
+      "json": "samoa.json",
+      "js": "samoa.js",
+      "topo_js": "samoa.topo.js",
+      "topo_json": "samoa.topo.json"
+    },
+    "east_timor": {
+      "country": "east_timor",
+      "shp": "east_timor.zip",
+      "svg": "east_timor.svg",
+      "json": "east_timor.json",
+      "js": "east_timor.js",
+      "topo_js": "east_timor.topo.js",
+      "topo_json": "east_timor.topo.json"
+    },
+    "san_marino": {
+      "country": "san_marino",
+      "shp": "san_marino.zip",
+      "svg": "san_marino.svg",
+      "json": "san_marino.json",
+      "js": "san_marino.js",
+      "topo_js": "san_marino.topo.js",
+      "topo_json": "san_marino.topo.json"
+    },
+    "ecuador": {
+      "country": "ecuador",
+      "shp": "ecuador.zip",
+      "svg": "ecuador.svg",
+      "json": "ecuador.json",
+      "js": "ecuador.js",
+      "topo_js": "ecuador.topo.js",
+      "topo_json": "ecuador.topo.json"
+    },
+    "saudi_arabia": {
+      "country": "saudi_arabia",
+      "shp": "saudi_arabia.zip",
+      "svg": "saudi_arabia.svg",
+      "json": "saudi_arabia.json",
+      "js": "saudi_arabia.js",
+      "topo_js": "saudi_arabia.topo.js",
+      "topo_json": "saudi_arabia.topo.json"
+    },
+    "egypt": {
+      "country": "egypt",
+      "shp": "egypt.zip",
+      "svg": "egypt.svg",
+      "json": "egypt.json",
+      "js": "egypt.js",
+      "topo_js": "egypt.topo.js",
+      "topo_json": "egypt.topo.json"
+    },
+    "senegal": {
+      "country": "senegal",
+      "shp": "senegal.zip",
+      "svg": "senegal.svg",
+      "json": "senegal.json",
+      "js": "senegal.js",
+      "topo_js": "senegal.topo.js",
+      "topo_json": "senegal.topo.json"
+    },
+    "el_salvador": {
+      "country": "el_salvador",
+      "shp": "el_salvador.zip",
+      "svg": "el_salvador.svg",
+      "json": "el_salvador.json",
+      "js": "el_salvador.js",
+      "topo_js": "el_salvador.topo.js",
+      "topo_json": "el_salvador.topo.json"
+    },
+    "sierra_leone": {
+      "country": "sierra_leone",
+      "shp": "sierra_leone.zip",
+      "svg": "sierra_leone.svg",
+      "json": "sierra_leone.json",
+      "js": "sierra_leone.js",
+      "topo_js": "sierra_leone.topo.js",
+      "topo_json": "sierra_leone.topo.json"
+    },
+    "eritrea": {
+      "country": "eritrea",
+      "shp": "eritrea.zip",
+      "svg": "eritrea.svg",
+      "json": "eritrea.json",
+      "js": "eritrea.js",
+      "topo_js": "eritrea.topo.js",
+      "topo_json": "eritrea.topo.json"
+    },
+    "singapore": {
+      "country": "singapore",
+      "shp": "singapore.zip",
+      "svg": "singapore.svg",
+      "json": "singapore.json",
+      "js": "singapore.js",
+      "topo_js": "singapore.topo.js",
+      "topo_json": "singapore.topo.json"
+    },
+    "estonia": {
+      "country": "estonia",
+      "shp": "estonia.zip",
+      "svg": "estonia.svg",
+      "json": "estonia.json",
+      "js": "estonia.js",
+      "topo_js": "estonia.topo.js",
+      "topo_json": "estonia.topo.json"
+    },
+    "slovakia": {
+      "country": "slovakia",
+      "shp": "slovakia.zip",
+      "svg": "slovakia.svg",
+      "json": "slovakia.json",
+      "js": "slovakia.js",
+      "topo_js": "slovakia.topo.js",
+      "topo_json": "slovakia.topo.json"
+    },
+    "ethiopia": {
+      "country": "ethiopia",
+      "shp": "ethiopia.zip",
+      "svg": "ethiopia.svg",
+      "json": "ethiopia.json",
+      "js": "ethiopia.js",
+      "topo_js": "ethiopia.topo.js",
+      "topo_json": "ethiopia.topo.json"
+    },
+    "slovenia": {
+      "country": "slovenia",
+      "shp": "slovenia.zip",
+      "svg": "slovenia.svg",
+      "json": "slovenia.json",
+      "js": "slovenia.js",
+      "topo_js": "slovenia.topo.js",
+      "topo_json": "slovenia.topo.json"
+    },
+    "finland": {
+      "country": "finland",
+      "shp": "finland.zip",
+      "svg": "finland.svg",
+      "json": "finland.json",
+      "js": "finland.js",
+      "topo_js": "finland.topo.js",
+      "topo_json": "finland.topo.json"
+    },
+    "solomon_islands": {
+      "country": "solomon_islands",
+      "shp": "solomon_islands.zip",
+      "svg": "solomon_islands.svg",
+      "json": "solomon_islands.json",
+      "js": "solomon_islands.js",
+      "topo_js": "solomon_islands.topo.js",
+      "topo_json": "solomon_islands.topo.json"
+    },
+    "france": {
+      "country": "france",
+      "shp": "france.zip",
+      "svg": "france.svg",
+      "json": "france.json",
+      "js": "france.js",
+      "topo_js": "france.topo.js",
+      "topo_json": "france.topo.json"
+    },
+    "somalia": {
+      "country": "somalia",
+      "shp": "somalia.zip",
+      "svg": "somalia.svg",
+      "json": "somalia.json",
+      "js": "somalia.js",
+      "topo_js": "somalia.topo.js",
+      "topo_json": "somalia.topo.json"
+    },
+    "gabon": {
+      "country": "gabon",
+      "shp": "gabon.zip",
+      "svg": "gabon.svg",
+      "json": "gabon.json",
+      "js": "gabon.js",
+      "topo_js": "gabon.topo.js",
+      "topo_json": "gabon.topo.json"
+    },
+    "south_africa": {
+      "country": "south_africa",
+      "shp": "south_africa.zip",
+      "svg": "south_africa.svg",
+      "json": "south_africa.json",
+      "js": "south_africa.js",
+      "topo_js": "south_africa.topo.js",
+      "topo_json": "south_africa.topo.json"
+    },
+    "gambia": {
+      "country": "gambia",
+      "shp": "gambia.zip",
+      "svg": "gambia.svg",
+      "json": "gambia.json",
+      "js": "gambia.js",
+      "topo_js": "gambia.topo.js",
+      "topo_json": "gambia.topo.json"
+    },
+    "south_korea": {
+      "country": "south_korea",
+      "shp": "south_korea.zip",
+      "svg": "south_korea.svg",
+      "json": "south_korea.json",
+      "js": "south_korea.js",
+      "topo_js": "south_korea.topo.js",
+      "topo_json": "south_korea.topo.json"
+    },
+    "georgia": {
+      "country": "georgia",
+      "shp": "georgia.zip",
+      "svg": "georgia.svg",
+      "json": "georgia.json",
+      "js": "georgia.js",
+      "topo_js": "georgia.topo.js",
+      "topo_json": "georgia.topo.json"
+    },
+    "spain": {
+      "country": "spain",
+      "shp": "spain.zip",
+      "svg": "spain.svg",
+      "json": "spain.json",
+      "js": "spain.js",
+      "topo_js": "spain.topo.js",
+      "topo_json": "spain.topo.json"
+    },
+    "germany": {
+      "country": "germany",
+      "shp": "germany.zip",
+      "svg": "germany.svg",
+      "json": "germany.json",
+      "js": "germany.js",
+      "topo_js": "germany.topo.js",
+      "topo_json": "germany.topo.json"
+    },
+    "sri_lanka": {
+      "country": "sri_lanka",
+      "shp": "sri_lanka.zip",
+      "svg": "sri_lanka.svg",
+      "json": "sri_lanka.json",
+      "js": "sri_lanka.js",
+      "topo_js": "sri_lanka.topo.js",
+      "topo_json": "sri_lanka.topo.json"
+    },
+    "ghana": {
+      "country": "ghana",
+      "shp": "ghana.zip",
+      "svg": "ghana.svg",
+      "json": "ghana.json",
+      "js": "ghana.js",
+      "topo_js": "ghana.topo.js",
+      "topo_json": "ghana.topo.json"
+    },
+    "sudan": {
+      "country": "sudan",
+      "shp": "sudan.zip",
+      "svg": "sudan.svg",
+      "json": "sudan.json",
+      "js": "sudan.js",
+      "topo_js": "sudan.topo.js",
+      "topo_json": "sudan.topo.json"
+    },
+    "greece": {
+      "country": "greece",
+      "shp": "greece.zip",
+      "svg": "greece.svg",
+      "json": "greece.json",
+      "js": "greece.js",
+      "topo_js": "greece.topo.js",
+      "topo_json": "greece.topo.json"
+    },
+    "suriname": {
+      "country": "suriname",
+      "shp": "suriname.zip",
+      "svg": "suriname.svg",
+      "json": "suriname.json",
+      "js": "suriname.js",
+      "topo_js": "suriname.topo.js",
+      "topo_json": "suriname.topo.json"
+    },
+    "greenland": {
+      "country": "greenland",
+      "shp": "greenland.zip",
+      "svg": "greenland.svg",
+      "json": "greenland.json",
+      "js": "greenland.js",
+      "topo_js": "greenland.topo.js",
+      "topo_json": "greenland.topo.json"
+    },
+    "swaziland": {
+      "country": "swaziland",
+      "shp": "swaziland.zip",
+      "svg": "swaziland.svg",
+      "json": "swaziland.json",
+      "js": "swaziland.js",
+      "topo_js": "swaziland.topo.js",
+      "topo_json": "swaziland.topo.json"
+    },
+    "guatemala": {
+      "country": "guatemala",
+      "shp": "guatemala.zip",
+      "svg": "guatemala.svg",
+      "json": "guatemala.json",
+      "js": "guatemala.js",
+      "topo_js": "guatemala.topo.js",
+      "topo_json": "guatemala.topo.json"
+    },
+    "sweden": {
+      "country": "sweden",
+      "shp": "sweden.zip",
+      "svg": "sweden.svg",
+      "json": "sweden.json",
+      "js": "sweden.js",
+      "topo_js": "sweden.topo.js",
+      "topo_json": "sweden.topo.json"
+    },
+    "guinea": {
+      "country": "guinea",
+      "shp": "guinea.zip",
+      "svg": "guinea.svg",
+      "json": "guinea.json",
+      "js": "guinea.js",
+      "topo_js": "guinea.topo.js",
+      "topo_json": "guinea.topo.json"
+    },
+    "switzerland": {
+      "country": "switzerland",
+      "shp": "switzerland.zip",
+      "svg": "switzerland.svg",
+      "json": "switzerland.json",
+      "js": "switzerland.js",
+      "topo_js": "switzerland.topo.js",
+      "topo_json": "switzerland.topo.json"
+    },
+    "guinea_bissau": {
+      "country": "guinea_bissau",
+      "shp": "guinea_bissau.zip",
+      "svg": "guinea_bissau.svg",
+      "json": "guinea_bissau.json",
+      "js": "guinea_bissau.js",
+      "topo_js": "guinea_bissau.topo.js",
+      "topo_json": "guinea_bissau.topo.json"
+    },
+    "syria": {
+      "country": "syria",
+      "shp": "syria.zip",
+      "svg": "syria.svg",
+      "json": "syria.json",
+      "js": "syria.js",
+      "topo_js": "syria.topo.js",
+      "topo_json": "syria.topo.json"
+    },
+    "guyana": {
+      "country": "guyana",
+      "shp": "guyana.zip",
+      "svg": "guyana.svg",
+      "json": "guyana.json",
+      "js": "guyana.js",
+      "topo_js": "guyana.topo.js",
+      "topo_json": "guyana.topo.json"
+    },
+    "taiwan": {
+      "country": "taiwan",
+      "shp": "taiwan.zip",
+      "svg": "taiwan.svg",
+      "json": "taiwan.json",
+      "js": "taiwan.js",
+      "topo_js": "taiwan.topo.js",
+      "topo_json": "taiwan.topo.json"
+    },
+    "haiti": {
+      "country": "haiti",
+      "shp": "haiti.zip",
+      "svg": "haiti.svg",
+      "json": "haiti.json",
+      "js": "haiti.js",
+      "topo_js": "haiti.topo.js",
+      "topo_json": "haiti.topo.json"
+    },
+    "tajikistan": {
+      "country": "tajikistan",
+      "shp": "tajikistan.zip",
+      "svg": "tajikistan.svg",
+      "json": "tajikistan.json",
+      "js": "tajikistan.js",
+      "topo_js": "tajikistan.topo.js",
+      "topo_json": "tajikistan.topo.json"
+    },
+    "honduras": {
+      "country": "honduras",
+      "shp": "honduras.zip",
+      "svg": "honduras.svg",
+      "json": "honduras.json",
+      "js": "honduras.js",
+      "topo_js": "honduras.topo.js",
+      "topo_json": "honduras.topo.json"
+    },
+    "thailand": {
+      "country": "thailand",
+      "shp": "thailand.zip",
+      "svg": "thailand.svg",
+      "json": "thailand.json",
+      "js": "thailand.js",
+      "topo_js": "thailand.topo.js",
+      "topo_json": "thailand.topo.json"
+    },
+    "hong_kong_s.a.r": {
+      "country": "hong_kong_s.a.r",
+      "shp": "hong_kong_s.a.r.zip",
+      "svg": "hong_kong_s.a.r.svg",
+      "json": "hong_kong_s.a.r.json",
+      "js": "hong_kong_s.a.r.js",
+      "topo_js": "hong_kong_s.a.r.topo.js",
+      "topo_json": "hong_kong_s.a.r.topo.json"
+    },
+    "the_bahamas": {
+      "country": "the_bahamas",
+      "shp": "the_bahamas.zip",
+      "svg": "the_bahamas.svg",
+      "json": "the_bahamas.json",
+      "js": "the_bahamas.js",
+      "topo_js": "the_bahamas.topo.js",
+      "topo_json": "the_bahamas.topo.json"
+    },
+    "hungary": {
+      "country": "hungary",
+      "shp": "hungary.zip",
+      "svg": "hungary.svg",
+      "json": "hungary.json",
+      "js": "hungary.js",
+      "topo_js": "hungary.topo.js",
+      "topo_json": "hungary.topo.json"
+    },
+    "togo": {
+      "country": "togo",
+      "shp": "togo.zip",
+      "svg": "togo.svg",
+      "json": "togo.json",
+      "js": "togo.js",
+      "topo_js": "togo.topo.js",
+      "topo_json": "togo.topo.json"
+    },
+    "iceland": {
+      "country": "iceland",
+      "shp": "iceland.zip",
+      "svg": "iceland.svg",
+      "json": "iceland.json",
+      "js": "iceland.js",
+      "topo_js": "iceland.topo.js",
+      "topo_json": "iceland.topo.json"
+    },
+    "trinidad_and_tobago": {
+      "country": "trinidad_and_tobago",
+      "shp": "trinidad_and_tobago.zip",
+      "svg": "trinidad_and_tobago.svg",
+      "json": "trinidad_and_tobago.json",
+      "js": "trinidad_and_tobago.js",
+      "topo_js": "trinidad_and_tobago.topo.js",
+      "topo_json": "trinidad_and_tobago.topo.json"
+    },
+    "india": {
+      "country": "india",
+      "shp": "india.zip",
+      "svg": "india.svg",
+      "json": "india.json",
+      "js": "india.js",
+      "topo_js": "india.topo.js",
+      "topo_json": "india.topo.json"
+    },
+    "tunisia": {
+      "country": "tunisia",
+      "shp": "tunisia.zip",
+      "svg": "tunisia.svg",
+      "json": "tunisia.json",
+      "js": "tunisia.js",
+      "topo_js": "tunisia.topo.js",
+      "topo_json": "tunisia.topo.json"
+    },
+    "indonesia": {
+      "country": "indonesia",
+      "shp": "indonesia.zip",
+      "svg": "indonesia.svg",
+      "json": "indonesia.json",
+      "js": "indonesia.js",
+      "topo_js": "indonesia.topo.js",
+      "topo_json": "indonesia.topo.json"
+    },
+    "turkey": {
+      "country": "turkey",
+      "shp": "turkey.zip",
+      "svg": "turkey.svg",
+      "json": "turkey.json",
+      "js": "turkey.js",
+      "topo_js": "turkey.topo.js",
+      "topo_json": "turkey.topo.json"
+    },
+    "iran": {
+      "country": "iran",
+      "shp": "iran.zip",
+      "svg": "iran.svg",
+      "json": "iran.json",
+      "js": "iran.js",
+      "topo_js": "iran.topo.js",
+      "topo_json": "iran.topo.json"
+    },
+    "turkmenistan": {
+      "country": "turkmenistan",
+      "shp": "turkmenistan.zip",
+      "svg": "turkmenistan.svg",
+      "json": "turkmenistan.json",
+      "js": "turkmenistan.js",
+      "topo_js": "turkmenistan.topo.js",
+      "topo_json": "turkmenistan.topo.json"
+    },
+    "iraq": {
+      "country": "iraq",
+      "shp": "iraq.zip",
+      "svg": "iraq.svg",
+      "json": "iraq.json",
+      "js": "iraq.js",
+      "topo_js": "iraq.topo.js",
+      "topo_json": "iraq.topo.json"
+    },
+    "turks_and_caicos_islands": {
+      "country": "turks_and_caicos_islands",
+      "shp": "turks_and_caicos_islands.zip",
+      "svg": "turks_and_caicos_islands.svg",
+      "json": "turks_and_caicos_islands.json",
+      "js": "turks_and_caicos_islands.js",
+      "topo_js": "turks_and_caicos_islands.topo.js",
+      "topo_json": "turks_and_caicos_islands.topo.json"
+    },
+    "ireland": {
+      "country": "ireland",
+      "shp": "ireland.zip",
+      "svg": "ireland.svg",
+      "json": "ireland.json",
+      "js": "ireland.js",
+      "topo_js": "ireland.topo.js",
+      "topo_json": "ireland.topo.json"
+    },
+    "uganda": {
+      "country": "uganda",
+      "shp": "uganda.zip",
+      "svg": "uganda.svg",
+      "json": "uganda.json",
+      "js": "uganda.js",
+      "topo_js": "uganda.topo.js",
+      "topo_json": "uganda.topo.json"
+    },
+    "israel": {
+      "country": "israel",
+      "shp": "israel.zip",
+      "svg": "israel.svg",
+      "json": "israel.json",
+      "js": "israel.js",
+      "topo_js": "israel.topo.js",
+      "topo_json": "israel.topo.json"
+    },
+    "ukraine": {
+      "country": "ukraine",
+      "shp": "ukraine.zip",
+      "svg": "ukraine.svg",
+      "json": "ukraine.json",
+      "js": "ukraine.js",
+      "topo_js": "ukraine.topo.js",
+      "topo_json": "ukraine.topo.json"
+    },
+    "italy": {
+      "country": "italy",
+      "shp": "italy.zip",
+      "svg": "italy.svg",
+      "json": "italy.json",
+      "js": "italy.js",
+      "topo_js": "italy.topo.js",
+      "topo_json": "italy.topo.json"
+    },
+    "united_arab_emirates": {
+      "country": "united_arab_emirates",
+      "shp": "united_arab_emirates.zip",
+      "svg": "united_arab_emirates.svg",
+      "json": "united_arab_emirates.json",
+      "js": "united_arab_emirates.js",
+      "topo_js": "united_arab_emirates.topo.js",
+      "topo_json": "united_arab_emirates.topo.json"
+    },
+    "ivory_coast": {
+      "country": "ivory_coast",
+      "shp": "ivory_coast.zip",
+      "svg": "ivory_coast.svg",
+      "json": "ivory_coast.json",
+      "js": "ivory_coast.js",
+      "topo_js": "ivory_coast.topo.js",
+      "topo_json": "ivory_coast.topo.json"
+    },
+    "united_kingdom": {
+      "country": "united_kingdom",
+      "shp": "united_kingdom.zip",
+      "svg": "united_kingdom.svg",
+      "json": "united_kingdom.json",
+      "js": "united_kingdom.js",
+      "topo_js": "united_kingdom.topo.js",
+      "topo_json": "united_kingdom.topo.json"
+    },
+    "jamaica": {
+      "country": "jamaica",
+      "shp": "jamaica.zip",
+      "svg": "jamaica.svg",
+      "json": "jamaica.json",
+      "js": "jamaica.js",
+      "topo_js": "jamaica.topo.js",
+      "topo_json": "jamaica.topo.json"
+    },
+    "united_republic_of_tanzania": {
+      "country": "united_republic_of_tanzania",
+      "shp": "united_republic_of_tanzania.zip",
+      "svg": "united_republic_of_tanzania.svg",
+      "json": "united_republic_of_tanzania.json",
+      "js": "united_republic_of_tanzania.js",
+      "topo_js": "united_republic_of_tanzania.topo.js",
+      "topo_json": "united_republic_of_tanzania.topo.json"
+    },
+    "japan": {
+      "country": "japan",
+      "shp": "japan.zip",
+      "svg": "japan.svg",
+      "json": "japan.json",
+      "js": "japan.js",
+      "topo_js": "japan.topo.js",
+      "topo_json": "japan.topo.json"
+    },
+    "united_states_of_america": {
+      "country": "united_states_of_america",
+      "shp": "united_states_of_america.zip",
+      "svg": "united_states_of_america.svg",
+      "json": "united_states_of_america.json",
+      "js": "united_states_of_america.js",
+      "topo_js": "united_states_of_america.topo.js",
+      "topo_json": "united_states_of_america.topo.json"
+    },
+    "jordan": {
+      "country": "jordan",
+      "shp": "jordan.zip",
+      "svg": "jordan.svg",
+      "json": "jordan.json",
+      "js": "jordan.js",
+      "topo_js": "jordan.topo.js",
+      "topo_json": "jordan.topo.json"
+    },
+    "united_states_virgin_islands": {
+      "country": "united_states_virgin_islands",
+      "shp": "united_states_virgin_islands.zip",
+      "svg": "united_states_virgin_islands.svg",
+      "json": "united_states_virgin_islands.json",
+      "js": "united_states_virgin_islands.js",
+      "topo_js": "united_states_virgin_islands.topo.js",
+      "topo_json": "united_states_virgin_islands.topo.json"
+    },
+    "kazakhstan": {
+      "country": "kazakhstan",
+      "shp": "kazakhstan.zip",
+      "svg": "kazakhstan.svg",
+      "json": "kazakhstan.json",
+      "js": "kazakhstan.js",
+      "topo_js": "kazakhstan.topo.js",
+      "topo_json": "kazakhstan.topo.json"
+    },
+    "uruguay": {
+      "country": "uruguay",
+      "shp": "uruguay.zip",
+      "svg": "uruguay.svg",
+      "json": "uruguay.json",
+      "js": "uruguay.js",
+      "topo_js": "uruguay.topo.js",
+      "topo_json": "uruguay.topo.json"
+    },
+    "kenya": {
+      "country": "kenya",
+      "shp": "kenya.zip",
+      "svg": "kenya.svg",
+      "json": "kenya.json",
+      "js": "kenya.js",
+      "topo_js": "kenya.topo.js",
+      "topo_json": "kenya.topo.json"
+    },
+    "uzbekistan": {
+      "country": "uzbekistan",
+      "shp": "uzbekistan.zip",
+      "svg": "uzbekistan.svg",
+      "json": "uzbekistan.json",
+      "js": "uzbekistan.js",
+      "topo_js": "uzbekistan.topo.js",
+      "topo_json": "uzbekistan.topo.json"
+    },
+    "kuwait": {
+      "country": "kuwait",
+      "shp": "kuwait.zip",
+      "svg": "kuwait.svg",
+      "json": "kuwait.json",
+      "js": "kuwait.js",
+      "topo_js": "kuwait.topo.js",
+      "topo_json": "kuwait.topo.json"
+    },
+    "vanuatu": {
+      "country": "vanuatu",
+      "shp": "vanuatu.zip",
+      "svg": "vanuatu.svg",
+      "json": "vanuatu.json",
+      "js": "vanuatu.js",
+      "topo_js": "vanuatu.topo.js",
+      "topo_json": "vanuatu.topo.json"
+    },
+    "kyrgyzstan": {
+      "country": "kyrgyzstan",
+      "shp": "kyrgyzstan.zip",
+      "svg": "kyrgyzstan.svg",
+      "json": "kyrgyzstan.json",
+      "js": "kyrgyzstan.js",
+      "topo_js": "kyrgyzstan.topo.js",
+      "topo_json": "kyrgyzstan.topo.json"
+    },
+    "venezuela": {
+      "country": "venezuela",
+      "shp": "venezuela.zip",
+      "svg": "venezuela.svg",
+      "json": "venezuela.json",
+      "js": "venezuela.js",
+      "topo_js": "venezuela.topo.js",
+      "topo_json": "venezuela.topo.json"
+    },
+    "laos": {
+      "country": "laos",
+      "shp": "laos.zip",
+      "svg": "laos.svg",
+      "json": "laos.json",
+      "js": "laos.js",
+      "topo_js": "laos.topo.js",
+      "topo_json": "laos.topo.json"
+    },
+    "vietnam": {
+      "country": "vietnam",
+      "shp": "vietnam.zip",
+      "svg": "vietnam.svg",
+      "json": "vietnam.json",
+      "js": "vietnam.js",
+      "topo_js": "vietnam.topo.js",
+      "topo_json": "vietnam.topo.json"
+    },
+    "latvia": {
+      "country": "latvia",
+      "shp": "latvia.zip",
+      "svg": "latvia.svg",
+      "json": "latvia.json",
+      "js": "latvia.js",
+      "topo_js": "latvia.topo.js",
+      "topo_json": "latvia.topo.json"
+    },
+    "yemen": {
+      "country": "yemen",
+      "shp": "yemen.zip",
+      "svg": "yemen.svg",
+      "json": "yemen.json",
+      "js": "yemen.js",
+      "topo_js": "yemen.topo.js",
+      "topo_json": "yemen.topo.json"
+    },
+    "lebanon": {
+      "country": "lebanon",
+      "shp": "lebanon.zip",
+      "svg": "lebanon.svg",
+      "json": "lebanon.json",
+      "js": "lebanon.js",
+      "topo_js": "lebanon.topo.js",
+      "topo_json": "lebanon.topo.json"
+    },
+    "zambia": {
+      "country": "zambia",
+      "shp": "zambia.zip",
+      "svg": "zambia.svg",
+      "json": "zambia.json",
+      "js": "zambia.js",
+      "topo_js": "zambia.topo.js",
+      "topo_json": "zambia.topo.json"
+    },
+    "lesotho": {
+      "country": "lesotho",
+      "shp": "lesotho.zip",
+      "svg": "lesotho.svg",
+      "json": "lesotho.json",
+      "js": "lesotho.js",
+      "topo_js": "lesotho.topo.js",
+      "topo_json": "lesotho.topo.json"
+    },
+    "zimbabwe": {
+      "country": "zimbabwe",
+      "shp": "zimbabwe.zip",
+      "svg": "zimbabwe.svg",
+      "json": "zimbabwe.json",
+      "js": "zimbabwe.js",
+      "topo_js": "zimbabwe.topo.js",
+      "topo_json": "zimbabwe.topo.json"
+    },
+    "liberia": {
+      "country": "liberia",
+      "shp": "liberia.zip",
+      "svg": "liberia.svg",
+      "json": "liberia.json",
+      "js": "liberia.js",
+      "topo_js": "liberia.topo.js",
+      "topo_json": "liberia.topo.json"
+    }
+  }
+}

@@ -1,5 +1,5 @@
 goog.provide('anychart.scales.DateTimeTicks');
-goog.forwardDeclare('anychart.scales.StockOrdinalDateTime');
+goog.forwardDeclare('anychart.stockModule.scales.Ordinal');
 goog.require('anychart.core.Base');
 goog.require('goog.array');
 goog.require('goog.date.Interval');
@@ -9,7 +9,7 @@ goog.require('goog.date.UtcDateTime');
 
 /**
  * Scale ticks.
- * @param {!(anychart.scales.DateTime|anychart.scales.StockScatterDateTime)} scale Scale to ask for a setup.
+ * @param {!(anychart.scales.DateTime|anychart.stockModule.scales.Scatter)} scale Scale to ask for a setup.
  * @constructor
  * @extends {anychart.core.Base}
  */
@@ -18,7 +18,7 @@ anychart.scales.DateTimeTicks = function(scale) {
 
   /**
    * Scale reference to get setup from in emergency situations.
-   * @type {!(anychart.scales.DateTime|anychart.scales.StockScatterDateTime)}
+   * @type {!(anychart.scales.DateTime|anychart.stockModule.scales.Scatter)}
    * @protected
    */
   this.scale = scale;

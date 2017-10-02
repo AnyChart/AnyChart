@@ -8,8 +8,10 @@ goog.provide('anychart.core.Chart');
 goog.require('acgraph');
 goog.require('acgraph.events.BrowserEvent');
 goog.require('anychart.compatibility');
+goog.require('anychart.core.NoDataSettings');
 goog.require('anychart.core.VisualBaseWithBounds');
 goog.require('anychart.core.reporting');
+goog.require('anychart.core.settings.IObjectWithSettings');
 goog.require('anychart.core.ui.Background');
 goog.require('anychart.core.ui.ChartCredits');
 goog.require('anychart.core.ui.Label');
@@ -22,17 +24,19 @@ goog.require('anychart.core.utils.Interactivity');
 goog.require('anychart.core.utils.InteractivityState');
 goog.require('anychart.core.utils.Margin');
 goog.require('anychart.core.utils.Padding');
-goog.require('anychart.exports');
 goog.require('anychart.format.Context');
 goog.require('anychart.math.Rect');
 goog.require('anychart.performance');
 goog.require('anychart.themes.merging');
 goog.require('anychart.utils');
+goog.require('goog.array');
 goog.require('goog.dom');
 goog.require('goog.dom.classlist');
+goog.require('goog.dom.fullscreen');
 goog.require('goog.events.EventHandler');
 goog.require('goog.fx.Dragger');
 goog.require('goog.json.hybrid');
+goog.require('goog.object');
 
 goog.forwardDeclare('anychart.ui.ContextMenu');
 goog.forwardDeclare('anychart.ui.ContextMenu.PrepareItemsContext');
@@ -132,14 +136,14 @@ anychart.core.Chart = function() {
 
 
   /**
-   * X shift (in pixels) for 3D mode. Calculated in anychart.charts.Cartesian3d.
+   * X shift (in pixels) for 3D mode. Calculated in anychart.cartesian3dModule.Chart.
    * @type {number}
    */
   this.x3dShift = 0;
 
 
   /**
-   * Y shift (in pixels) for 3D mode. Calculated in anychart.charts.Cartesian3d.
+   * Y shift (in pixels) for 3D mode. Calculated in anychart.cartesian3dModule.Chart.
    * @type {number}
    */
   this.y3dShift = 0;
@@ -198,6 +202,32 @@ anychart.core.Chart = function() {
   this.id_ = null;
 
   this.invalidate(anychart.ConsistencyState.ALL);
+
+  //region Init descriptors meta
+  /**
+   * @this {anychart.core.Chart}
+   */
+  function selectMarqueeFillBeforeInvalidation() {
+    if (this.inMarquee()) {
+      this.interactivityRect.fill(/** @type {acgraph.vector.Fill} */ (this.getOption('selectMarqueeFill')));
+    }
+  }
+
+  /**
+   * @this {anychart.core.Chart}
+   */
+  function selectMarqueeStrokeBeforeInvalidation() {
+    if (this.inMarquee()) {
+      this.interactivityRect.stroke(/** @type {acgraph.vector.Stroke} */ (this.getOption('selectMarqueeStroke')));
+    }
+  }
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['selectMarqueeFill', 0, 0, 0, selectMarqueeFillBeforeInvalidation],
+    ['selectMarqueeStroke', 0, 0, 0, selectMarqueeStrokeBeforeInvalidation]
+  ]);
+  //endregion
+
   this.resumeSignalsDispatching(false);
 };
 goog.inherits(anychart.core.Chart, anychart.core.VisualBaseWithBounds);
@@ -259,15 +289,6 @@ anychart.core.Chart.prototype.isMode3d = function() {
 
 
 /**
- * Whether chart uses anychart.data.Tree as data source.
- * @return {boolean}
- */
-anychart.core.Chart.prototype.usesTreeData = function() {
-  return false;
-};
-
-
-/**
  * Whether chart supports tooltip.
  * @return {boolean}
  */
@@ -289,7 +310,7 @@ anychart.core.Chart.prototype.legend = function(opt_value) {
 
 /**
  * Internal public method. Returns all chart series.
- * @return {!Array.<anychart.core.series.Base|anychart.core.linearGauge.pointers.Base>}
+ * @return {!Array.<anychart.core.series.Base|anychart.linearGaugeModule.pointers.Base>}
  */
 anychart.core.Chart.prototype.getAllSeries = goog.abstractMethod;
 
@@ -615,7 +636,6 @@ anychart.core.Chart.prototype.defaultLabelSettings = function(opt_value) {
 /**
  * Creates chart label.
  * @return {anychart.core.ui.Label} Label instance.
- * @protected
  */
 anychart.core.Chart.prototype.createChartLabel = function() {
   return new anychart.core.ui.Label();
@@ -630,6 +650,56 @@ anychart.core.Chart.prototype.createChartLabel = function() {
  */
 anychart.core.Chart.prototype.setLabelSettings = function(label, bounds) {
   label.parentBounds(bounds);
+};
+
+
+//endregion
+//region --- No data label
+/**
+ * No data label invalidation handler.
+ * @param {anychart.SignalEvent} e
+ * @private
+ */
+anychart.core.Chart.prototype.noDataSettingsInvalidated_ = function(e) {
+  if (e.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
+    this.invalidate(anychart.ConsistencyState.CHART_LABELS, anychart.Signal.NEEDS_REDRAW);
+  }
+};
+
+
+/**
+ *  No data settings.
+ *  @param {Object=} opt_value
+ *  @return {anychart.core.Chart|anychart.core.NoDataSettings} noData settings or self for chaining.
+ */
+anychart.core.Chart.prototype.noData = function(opt_value) {
+  if (!this.noDataSettings_) {
+    this.noDataSettings_ = new anychart.core.NoDataSettings(this);
+    this.noDataSettings_.listenSignals(this.noDataSettingsInvalidated_, this);
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.noDataSettings_.setup(opt_value);
+    return this;
+  }
+  return this.noDataSettings_;
+};
+
+
+/**
+ * Is there no data on the chart.
+ * @return {boolean}
+ */
+anychart.core.Chart.prototype.isNoData = function() {
+  return false;
+};
+
+
+/**
+ * @return {boolean}
+ */
+anychart.core.Chart.prototype.supportsNoData = function() {
+  return true;
 };
 
 
@@ -885,7 +955,7 @@ anychart.core.Chart.prototype.useUnionTooltipAsSingle = function() {
 anychart.core.Chart.prototype.contextMenu = function(opt_value) {
   if (!this.contextMenu_) {
     // suppress NO_FEATURE_IN_MODULE warning
-    this.contextMenu_ = goog.global['anychart']['ui']['contextMenu'](!!goog.isObject(opt_value) && opt_value['fromTheme']);
+    this.contextMenu_ = anychart.window['anychart']['ui']['contextMenu'](!!goog.isObject(opt_value) && opt_value['fromTheme']);
     if (this.contextMenu_) {
       this.registerDisposable(this.contextMenu_);
       this.contextMenu_['itemsProvider'](this.contextMenuItemsProvider);
@@ -918,7 +988,7 @@ anychart.core.Chart.prototype.getVersionHistoryLink = function() {
  * Default context menu items provider.
  * @param {anychart.ui.ContextMenu.PrepareItemsContext} context Context object.
  * @this {anychart.ui.ContextMenu.PrepareItemsContext}
- * @return {Array.<anychart.ui.ContextMenu.Item>}
+ * @return {Object.<string, anychart.ui.ContextMenu.Item>}
  * @protected
  */
 anychart.core.Chart.prototype.contextMenuItemsProvider = function(context) {
@@ -930,31 +1000,35 @@ anychart.core.Chart.prototype.contextMenuItemsProvider = function(context) {
       meta.series['seriesType'] && goog.isDef(meta.index);
   var isPointContext = isSeries || (parentEventTarget && parentEventTarget['seriesType']);
 
-  var items = /** @type {Array.<anychart.ui.ContextMenu.Item>} */ (anychart.utils.recursiveClone(anychart.core.Chart.contextMenuMap.main));
+  var items = {};
+  if (anychart.window['anychart']['exports']) {
+    goog.object.extend(items, /** @type {Object} */ (anychart.utils.recursiveClone(anychart.core.Chart.contextMenuMap['exporting'])));
+  }
+  if (goog.dom.fullscreen.isSupported() && context['chart'])
+    goog.object.extend(items, /** @type {Object} */ (anychart.utils.recursiveClone(anychart.core.Chart.contextMenuMap[context['chart'].fullScreen() ? 'full-screen-exit' : 'full-screen-enter'])));
+  goog.object.extend(items, /** @type {Object} */ (anychart.utils.recursiveClone(anychart.core.Chart.contextMenuMap['main'])));
 
   if (anychart.DEVELOP) {
     // prepare version link (specific to each product)
-    var versionHistoryItem = /** @type {anychart.ui.ContextMenu.Item} */(anychart.utils.recursiveClone(anychart.core.Chart.contextMenuItems.versionHistory));
+    var versionHistoryItem = /** @type {anychart.ui.ContextMenu.Item} */(anychart.utils.recursiveClone(anychart.core.Chart.contextMenuItems['version-history']));
     versionHistoryItem['href'] = context['chart'].getVersionHistoryLink() + '?version=' + anychart.VERSION;
 
-    items.push(
-        null,
-        anychart.core.Chart.contextMenuItems.saveConfigAs,
-        anychart.core.Chart.contextMenuItems.linkToHelp,
-        versionHistoryItem
-    );
+    items['version-history-separator'] = {'index': 81};
+    items['save-config-as'] = anychart.utils.recursiveClone(anychart.core.Chart.contextMenuItems['save-config-as']);
+    items['link-to-help'] = anychart.utils.recursiveClone(anychart.core.Chart.contextMenuItems['link-to-help']);
+    items['version-history'] = versionHistoryItem;
   }
 
-  return context['chart'].specificContextMenuItems(anychart.utils.recursiveClone(items), context, isPointContext);
+  return context['chart'].specificContextMenuItems(items, context, isPointContext);
 };
 
 
 /**
  * Specific set context menu items to chart.
- * @param {Array.<anychart.ui.ContextMenu.Item>} items Default items provided from chart.
+ * @param {Object.<string, anychart.ui.ContextMenu.Item>} items Default items provided from chart.
  * @param {anychart.ui.ContextMenu.PrepareItemsContext} context Context object.
  * @param {boolean} isPointContext
- * @return {Array.<anychart.ui.ContextMenu.Item>}
+ * @return {Object.<string, anychart.ui.ContextMenu.Item>}
  * @protected
  */
 anychart.core.Chart.prototype.specificContextMenuItems = function(items, context, isPointContext) {
@@ -988,120 +1062,136 @@ anychart.core.Chart.prototype.getSelectedPoints = function() {
  * @type {Object.<string, anychart.ui.ContextMenu.Item>}
  */
 anychart.core.Chart.contextMenuItems = {
+  // Item 'Print Chart'.
+  'select-marquee-start': {
+    'index': 9.3,
+    'text': 'Start selection marquee',
+    'eventType': 'anychart.startSelectMarquee',
+    'action': function(context) {
+      context['chart'].startSelectMarquee(false);
+    }
+  },
+
   // Item 'Export as ...'.
-  exportAs: {
+  'save-chart-as': {
+    'index': 10,
     'text': 'Save chart as...',
     'iconClass': 'ac ac-file-image-o',
-    'subMenu': [{
-      'text': '.png',
-      'iconClass': 'ac ac-file-image-o',
-      'eventType': 'anychart.saveAsPng',
-      'action': function(context) {
-        context['chart'].saveAsPng();
+    'subMenu': {
+      'save-chart-as-png': {
+        'index': 10,
+        'text': '.png',
+        'iconClass': 'ac ac-file-image-o',
+        'eventType': 'anychart.saveAsPng',
+        'action': function(context) {
+          context['chart'].saveAsPng();
+        }
+      },
+      'save-chart-as-jpg': {
+        'index': 20,
+        'text': '.jpg',
+        'iconClass': 'ac ac-file-image-o',
+        'eventType': 'anychart.saveAsJpg',
+        'action': function(context) {
+          context['chart'].saveAsJpg();
+        }
+      },
+      'save-chart-as-pdf': {
+        'index': 30,
+        'text': '.pdf',
+        'iconClass': 'ac ac-file-pdf-o',
+        'eventType': 'anychart.saveAsPdf',
+        'action': function(context) {
+          context['chart'].saveAsPdf();
+        }
+      },
+      'save-chart-as-svg': {
+        'index': 40,
+        'text': '.svg',
+        'iconClass': 'ac ac-file-code-o',
+        'eventType': 'anychart.saveAsSvg',
+        'action': function(context) {
+          context['chart'].saveAsSvg();
+        }
       }
-    }, {
-      'text': '.jpg',
-      'iconClass': 'ac ac-file-image-o',
-      'eventType': 'anychart.saveAsJpg',
-      'action': function(context) {
-        context['chart'].saveAsJpg();
-      }
-    }, {
-      'text': '.pdf',
-      'iconClass': 'ac ac-file-pdf-o',
-      'eventType': 'anychart.saveAsPdf',
-      'action': function(context) {
-        context['chart'].saveAsPdf();
-      }
-    }, {
-      'text': '.svg',
-      'iconClass': 'ac ac-file-code-o',
-      'eventType': 'anychart.saveAsSvg',
-      'action': function(context) {
-        context['chart'].saveAsSvg();
-      }
-    }]
+    }
   },
 
   // Item 'Save data as...'.
-  saveDataAs: {
+  'save-data-as': {
+    'index': 20,
     'text': 'Save data as...',
     'iconClass': 'ac ac-save',
-    'subMenu': [{
-      'text': '.csv',
-      'iconClass': 'ac ac-file-excel-o',
-      'eventType': 'anychart.saveAsCsv',
-      'action': function(context) {
-        context['chart'].saveAsCsv();
+    'subMenu': {
+      'save-data-as-text': {
+        'index': 10,
+        'text': '.csv',
+        'iconClass': 'ac ac-file-excel-o',
+        'eventType': 'anychart.saveAsCsv',
+        'action': function(context) {
+          context['chart'].saveAsCsv();
+        }
+      },
+      'save-data-as-xlsx': {
+        'index': 20,
+        'text': '.xlsx',
+        'iconClass': 'ac ac-file-excel-o',
+        'eventType': 'anychart.saveAsXlsx',
+        'action': function(context) {
+          context['chart'].saveAsXlsx();
+        }
       }
-    }, {
-      'text': '.xlsx',
-      'iconClass': 'ac ac-file-excel-o',
-      'eventType': 'anychart.saveAsXlsx',
-      'action': function(context) {
-        context['chart'].saveAsXlsx();
-      }
-    }]
+    }
   },
 
   // Item 'Share with...'.
-  shareWith: {
+  'share-with': {
+    'index': 30,
     'text': 'Share with...',
     'iconClass': 'ac ac-net',
-    'subMenu': [{
-      'text': 'Facebook',
-      'iconClass': 'ac ac-facebook',
-      'eventType': 'anychart.shareWithFacebook',
-      'action': function(context) {
-        context['chart'].shareWithFacebook();
+    'subMenu': {
+      'share-with-facebook': {
+        'index': 10,
+        'text': 'Facebook',
+        'iconClass': 'ac ac-facebook',
+        'eventType': 'anychart.shareWithFacebook',
+        'action': function(context) {
+          context['chart'].shareWithFacebook();
+        }
+      },
+      'share-with-twitter': {
+        'index': 20,
+        'text': 'Twitter',
+        'iconClass': 'ac ac-twitter',
+        'eventType': 'anychart.shareWithTwitter',
+        'action': function(context) {
+          context['chart'].shareWithTwitter();
+        }
+      },
+      'share-with-linkedin': {
+        'index': 30,
+        'text': 'LinkedIn',
+        'iconClass': 'ac ac-linkedin',
+        'eventType': 'anychart.shareWithLinkedIn',
+        'action': function(context) {
+          context['chart'].shareWithLinkedIn();
+        }
+      },
+      'share-with-pinterest': {
+        'index': 40,
+        'text': 'Pinterest',
+        'iconClass': 'ac ac-pinterest',
+        'eventType': 'anychart.shareWithPinterest',
+        'action': function(context) {
+          context['chart'].shareWithPinterest();
+        }
       }
-    }, {
-      'text': 'Twitter',
-      'iconClass': 'ac ac-twitter',
-      'eventType': 'anychart.shareWithTwitter',
-      'action': function(context) {
-        context['chart'].shareWithTwitter();
-      }
-    }, {
-      'text': 'LinkedIn',
-      'iconClass': 'ac ac-linkedin',
-      'eventType': 'anychart.shareWithLinkedIn',
-      'action': function(context) {
-        context['chart'].shareWithLinkedIn();
-      }
-    }, {
-      'text': 'Pinterest',
-      'iconClass': 'ac ac-pinterest',
-      'eventType': 'anychart.shareWithPinterest',
-      'action': function(context) {
-        context['chart'].shareWithPinterest();
-      }
-    }]
-  },
-
-  // Item 'Save config as..'.
-  saveConfigAs: {
-    'text': 'Save config as...',
-    'iconClass': 'ac ac-save',
-    'subMenu': [{
-      'text': '.json',
-      'iconClass': 'ac ac-file-code-o',
-      'eventType': 'anychart.saveAsJson',
-      'action': function(context) {
-        context['chart'].saveAsJson();
-      }
-    }, {
-      'text': '.xml',
-      'iconClass': 'ac ac-file-code-o',
-      'eventType': 'anychart.saveAsXml',
-      'action': function(context) {
-        context['chart'].saveAsXml();
-      }
-    }]
+    }
   },
 
   // Item 'Print Chart'.
-  printChart: {
+  'print-chart': {
+    'index': 50,
     'text': 'Print',
     'iconClass': 'ac ac-print',
     'eventType': 'anychart.print',
@@ -1110,57 +1200,105 @@ anychart.core.Chart.contextMenuItems = {
     }
   },
 
-  // Item 'Print Chart'.
-  startSelectMarquee: {
-    'text': 'Start selection marquee',
-    'eventType': 'anychart.startSelectMarquee',
+  // Item-link to our site.
+  'full-screen-enter': {
+    'index': 60,
+    'text': 'Enter full screen',
     'action': function(context) {
-      context['chart'].startSelectMarquee(false);
+      context['chart'].fullScreen(true);
     }
   },
 
-  // Item-link to version history.
-  versionHistory: {
-    'text': 'Version History',
-    'href': ''
+  'full-screen-exit': {
+    'index': 60,
+    'text': 'Exit full screen',
+    'action': function(context) {
+      context['chart'].fullScreen(false);
+    }
   },
 
   // Item-link to our site.
-  about: {
+  'about': {
+    'index': 80,
     'iconClass': 'ac ac-cog',
     'text': 'AnyChart ' + (anychart.VERSION ?
-        goog.string.subs.apply(null, ['v%s.%s.%s'].concat(anychart.VERSION.split('.'))) :
+        goog.string.subs.apply(null, ['v%s.%s.%s.%s'].concat(anychart.VERSION.split('.'))) :
         ' develop version'),
     'href': 'https://anychart.com'
   },
 
+  // Item 'Save config as..'.
+  'save-config-as': {
+    'index': 100,
+    'text': 'Save config as...',
+    'iconClass': 'ac ac-save',
+    'subMenu': {
+      'save-config-as-json': {
+        'index': 10,
+        'text': '.json',
+        'iconClass': 'ac ac-file-code-o',
+        'eventType': 'anychart.saveAsJson',
+        'action': function(context) {
+          context['chart'].saveAsJson();
+        }
+      },
+      'save-config-as-xml': {
+        'index': 20,
+        'text': '.xml',
+        'iconClass': 'ac ac-file-code-o',
+        'eventType': 'anychart.saveAsXml',
+        'action': function(context) {
+          context['chart'].saveAsXml();
+        }
+      }
+    }
+  },
+
   // Item 'Link to help'.
-  linkToHelp: {
+  'link-to-help': {
+    'index': 110,
     'iconClass': 'ac ac-question',
     'text': 'Need help? Go to support center!',
     'href': 'https://anychart.com/support'
+  },
+
+  // Item-link to version history.
+  'version-history': {
+    'index': 120,
+    'text': 'Version History',
+    'href': ''
   }
 };
 
 
 /**
  * Menu map.
- * @type {Object.<string, Array.<anychart.ui.ContextMenu.Item>>}
+ * @type {Object.<string, Object.<string, anychart.ui.ContextMenu.Item>>}
  */
 anychart.core.Chart.contextMenuMap = {
   // Menu 'Default menu'.
-  main: [
-    anychart.core.Chart.contextMenuItems.exportAs,
-    anychart.core.Chart.contextMenuItems.saveDataAs,
-    anychart.core.Chart.contextMenuItems.shareWith,
-    anychart.core.Chart.contextMenuItems.printChart,
-    null,
-    anychart.core.Chart.contextMenuItems.about
-  ],
-  selectMarquee: [
-    anychart.core.Chart.contextMenuItems.startSelectMarquee,
-    null
-  ]
+  'exporting': {
+    'save-chart-as': anychart.core.Chart.contextMenuItems['save-chart-as'],
+    'save-data-as': anychart.core.Chart.contextMenuItems['save-data-as'],
+    'share-with': anychart.core.Chart.contextMenuItems['share-with'],
+    'print-chart': anychart.core.Chart.contextMenuItems['print-chart'],
+    'exporting-separator': {'index': 51}
+  },
+  'full-screen-enter': {
+    'full-screen-enter': anychart.core.Chart.contextMenuItems['full-screen-enter'],
+    'full-screen-separator': {'index': 61}
+  },
+  'full-screen-exit': {
+    'full-screen-exit': anychart.core.Chart.contextMenuItems['full-screen-exit'],
+    'full-screen-separator': {'index': 61}
+  },
+  'main': {
+    'about': anychart.core.Chart.contextMenuItems['about']
+  },
+  'select-marquee': {
+    'select-marquee-start': anychart.core.Chart.contextMenuItems['select-marquee-start'],
+    'select-marquee-separator': {'index': 9.4}
+  }
 };
 
 
@@ -1406,6 +1544,22 @@ anychart.core.Chart.prototype.drawInternal = function() {
 
   this.suspendSignalsDispatching();
 
+  var noDataLabel = /** @type {anychart.core.ui.Label} */ (this.noData().label());
+  if (this.supportsNoData()) {
+    var noData = this.isNoData();
+    // checking for root layer to avoid dispatching on the first draw
+    var doDispatch = noDataLabel['visible']() !== noData && this.rootElement;
+    if (doDispatch) {
+      var noDataEvent = {
+        'type': anychart.enums.EventType.DATA_CHANGED,
+        'chart': this,
+        'hasData': !noData
+      };
+      noData = this.dispatchEvent(noDataEvent) && noData;
+    }
+    noDataLabel['visible'](noData);
+  }
+
   //create root element only if draw is called
   if (!this.rootElement) {
     this.rootElement = acgraph.layer();
@@ -1464,6 +1618,7 @@ anychart.core.Chart.prototype.drawInternal = function() {
   anychart.performance.end('Chart.calculateBounds()');
   anychart.performance.start('Chart.drawContent()');
   this.drawContent(this.contentBounds);
+
   this.specialDraw(this.getPlotBounds());
 
   anychart.performance.end('Chart.drawContent()');
@@ -1486,10 +1641,17 @@ anychart.core.Chart.prototype.drawInternal = function() {
         label.suspendSignalsDispatching();
         if (!label.container() && label.enabled()) label.container(this.rootElement);
         this.setLabelSettings(label, totalBounds);
-        label.resumeSignalsDispatching(false);
         label.draw();
+        label.resumeSignalsDispatching(false);
       }
     }
+
+    noDataLabel.suspendSignalsDispatching();
+    noDataLabel.container(this.rootElement);
+    this.setLabelSettings(noDataLabel, this.contentBounds);
+    noDataLabel.draw();
+    noDataLabel.resumeSignalsDispatching(false);
+
     this.markConsistent(anychart.ConsistencyState.CHART_LABELS);
   }
 
@@ -1506,11 +1668,17 @@ anychart.core.Chart.prototype.drawInternal = function() {
 
   this.resumeSignalsDispatching(false);
 
+  var id = acgraph.utils.IdGenerator.getInstance().identify(this, 'chart');
+  this.rootElement.id(id);
+
   if (manualSuspend) {
     anychart.performance.start('Stage resume');
     stage.resume();
     anychart.performance.end('Stage resume');
   }
+
+  if (stage)
+    stage.getCharts()[id] = this;
 
   this.dispatchDetachedEvent({
     'type': anychart.enums.EventType.CHART_DRAW,
@@ -1665,6 +1833,31 @@ anychart.core.Chart.prototype.invalidateHandler_ = function(event) {
 
 
 //endregion
+//region --- Descriptors
+/**
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.core.Chart.PROPERTY_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
+      'selectMarqueeFill',
+      anychart.core.settings.fillNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
+      'selectMarqueeStroke',
+      anychart.core.settings.strokeNormalizer);
+  return map;
+})();
+anychart.core.settings.populate(anychart.core.Chart, anychart.core.Chart.PROPERTY_DESCRIPTORS);
+
+
+//endregion
 //region --- Ser/Deser/Json/XML/Dispose
 //------------------------------------------------------------------------------
 //
@@ -1679,28 +1872,22 @@ anychart.core.Chart.prototype.invalidateHandler_ = function(event) {
  * For the moment we have no way around this "nice feature" of the compiler.
  * @param {boolean=} opt_stringify Return as JSON as string.
  *  Note: stringifying ignores this flag.
- * @param {boolean=} opt_includeTheme If the current theme properties should be included into the result.
  * @return {*} Chart JSON.
  */
-anychart.core.Chart.prototype.toJson = function(opt_stringify, opt_includeTheme) {
+anychart.core.Chart.prototype.toJson = function(opt_stringify) {
   var data = this.isDisposed() ? {} : this.serialize();
-  if (!opt_includeTheme) {
-    data = /** @type {!Object} */(anychart.themes.merging.demerge(data, this.getDefaultThemeObj())) || {};
-  }
-  return opt_stringify ?
-      goog.json.hybrid.stringify(data) :
-      data;
+  data = /** @type {!Object} */(anychart.themes.merging.demerge(data, this.getDefaultThemeObj())) || {};
+  return opt_stringify ? goog.json.hybrid.stringify(data) : data;
 };
 
 
 /**
  * Return chart configuration as XML string or XMLNode.
  * @param {boolean=} opt_asXmlNode Return XML as XMLNode.
- * @param {boolean=} opt_includeTheme If the current theme properties should be included into the result.
  * @return {string|Node} Chart configuration.
  */
-anychart.core.Chart.prototype.toXml = function(opt_asXmlNode, opt_includeTheme) {
-  return anychart.utils.json2xml(/** @type {Object} */(this.toJson(false, opt_includeTheme)), '', opt_asXmlNode);
+anychart.core.Chart.prototype.toXml = function(opt_asXmlNode) {
+  return anychart.utils.json2xml(/** @type {Object} */(this.toJson(false)), '', opt_asXmlNode);
 };
 
 
@@ -1714,14 +1901,14 @@ anychart.core.Chart.prototype.getNormalizedType_ = function() {
   switch (type.toLowerCase()) {
     case 'map':
       return 'map';
-    case 'ganttresource':
-    case 'ganttproject':
+    case 'gantt-resource':
+    case 'gantt-project':
       return 'gantt';
-    case 'circular':
-    case 'lineargauge':
-    case 'thermometergauge':
-    case 'tankgauge':
-    case 'ledgauge':
+    case 'circular-gauge':
+    case 'linear-gauge':
+    case 'thermometer':
+    case 'tank':
+    case 'led':
       return 'gauge';
     default:
       return 'chart';
@@ -1759,14 +1946,20 @@ anychart.core.Chart.prototype.serialize = function() {
   json['bounds'] = this.bounds().serialize();
   json['animation'] = this.animation().serialize();
   json['tooltip'] = this.tooltip().serialize();
+  json['noDataLabel'] = this.noData().label().serialize();
   if (this.contextMenu_) {
     json['contextMenu'] = this.contextMenu()['serialize']();
   }
 
   json['credits'] = this.credits().serialize();
 
-  json['selectMarqueeFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.selectMarqueeFill()));
-  json['selectMarqueeStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.selectMarqueeStroke()));
+  var exports;
+  if (this.exports_)
+    exports = this.exports().serialize();
+  if (exports && !goog.object.isEmpty(exports))
+    json['exports'] = exports;
+
+  anychart.core.settings.serialize(this, anychart.core.Chart.PROPERTY_DESCRIPTORS, json);
   return json;
 };
 
@@ -1810,6 +2003,7 @@ anychart.core.Chart.prototype.setupByJSON = function(config, opt_default) {
   this.right(config['right']);
   this.bottom(config['bottom']);
   this.animation(config['animation']);
+  this.noData().label().setupInternal(!!opt_default, config['noDataLabel']);
 
   if ('tooltip' in config)
     this.tooltip().setupInternal(!!opt_default, config['tooltip']);
@@ -1821,17 +2015,20 @@ anychart.core.Chart.prototype.setupByJSON = function(config, opt_default) {
 
   this.credits(config['credits']);
 
-  this.selectMarqueeFill(config['selectMarqueeFill']);
-  this.selectMarqueeStroke(config['selectMarqueeStroke']);
+  if (config['exports'])
+    this.exports(config['exports']);
+
+  anychart.core.settings.deserialize(this, anychart.core.Chart.PROPERTY_DESCRIPTORS, config);
 };
 
 
 /** @inheritDoc */
 anychart.core.Chart.prototype.disposeInternal = function() {
-  goog.disposeAll(this.animation_, this.a11y_, this.tooltip_);
+  goog.disposeAll(this.animation_, this.a11y_, this.tooltip_, this.noDataSettings_);
   this.animation_ = null;
   this.a11y_ = null;
   this.tooltip_ = null;
+  this.noDataSettings_ = null;
 
   anychart.core.Chart.base(this, 'disposeInternal');
 
@@ -1854,12 +2051,12 @@ anychart.core.Chart.prototype.handleMouseEvent = function(event) {
   var tag = anychart.utils.extractTag(event['domTarget']);
   var index;
 
-  if (event['target'] instanceof anychart.core.ui.LabelsFactory || event['target'] instanceof anychart.core.ui.MarkersFactory) {
+  if (anychart.utils.instanceOf(event['target'], anychart.core.ui.LabelsFactory) || anychart.utils.instanceOf(event['target'], anychart.core.ui.MarkersFactory)) {
     var parent = event['target'].getParentEventTarget();
     if (parent.isSeries && parent.isSeries())
       series = parent;
     index = tag;
-  } else if (event['target'] instanceof anychart.core.ui.Legend) {
+  } else if (anychart.utils.instanceOf(event['target'], anychart.core.ui.Legend)) {
     if (tag) {
       series = tag.series;
       index = tag.index;
@@ -2013,7 +2210,7 @@ anychart.core.Chart.prototype.getPoint = goog.abstractMethod;
  * Returns points by event.
  * @param {anychart.core.MouseEvent} event
  * @return {?Array.<{
- *    series: (anychart.core.series.Base|anychart.core.linearGauge.pointers.Base),
+ *    series: (anychart.core.series.Base|anychart.linearGaugeModule.pointers.Base),
  *    points: Array.<number>,
  *    lastPoint: (number|undefined),
  *    nearestPointToCursor: (Object.<number>|undefined)
@@ -2045,9 +2242,9 @@ anychart.core.Chart.prototype.handleMouseOverAndMove = function(event) {
   var interactivity = this.interactivity();
 
   var tag = anychart.utils.extractTag(event['domTarget']);
-  var index;
+  var index, parent;
   var forbidTooltip = false;
-  var isTargetLegendOrColorRange = event['target'] instanceof anychart.core.ui.Legend || this.checkIfColorRange(event['target']);
+  var isTargetLegendOrColorRange = anychart.utils.instanceOf(event['target'], anychart.core.ui.Legend) || this.checkIfColorRange(event['target']);
 
   if (isTargetLegendOrColorRange) {
     if (goog.isDef(tag)) {
@@ -2067,8 +2264,15 @@ anychart.core.Chart.prototype.handleMouseOverAndMove = function(event) {
       }
       forbidTooltip = true;
     }
-  } else if (event['target'] instanceof anychart.core.ui.LabelsFactory || event['target'] instanceof anychart.core.ui.MarkersFactory) {
-    var parent = event['target'].getParentEventTarget();
+  } else if (anychart.utils.instanceOf(event['target'], anychart.core.ui.LabelsFactory)
+      || anychart.utils.instanceOf(event['target'], anychart.core.ui.MarkersFactory)
+      || anychart.utils.instanceOf(event['target'], anychart.core.ui.Tooltip)) {
+    parent = event['target'].getParentEventTarget();
+    if (parent.isSeries && parent.isSeries())
+      series = parent;
+    index = tag;
+  } else if ((event['target'].getParentEventTarget && anychart.utils.instanceOf(event['target'].getParentEventTarget(), anychart.core.ui.Tooltip))) {
+    parent = event['target'].getParentEventTarget().getParentEventTarget();
     if (parent.isSeries && parent.isSeries())
       series = parent;
     index = tag;
@@ -2086,8 +2290,8 @@ anychart.core.Chart.prototype.handleMouseOverAndMove = function(event) {
       if (interactivity.hoverMode() == anychart.enums.HoverMode.SINGLE) {
 
         var whetherNeedHoverIndex = goog.isArray(index) && !goog.array.every(index, function(el) {
-          return series.state.hasPointStateByPointIndex(anychart.PointState.HOVER, el);
-        }, this);
+              return series.state.hasPointStateByPointIndex(anychart.PointState.HOVER, el);
+            }, this);
 
         if (whetherNeedHoverIndex || (!series.state.hasPointStateByPointIndex(anychart.PointState.HOVER, index) && !isNaN(index))) {
           if (goog.isFunction(series.hoverPoint))
@@ -2105,6 +2309,7 @@ anychart.core.Chart.prototype.handleMouseOverAndMove = function(event) {
             });
 
           if (eventSeriesStatus.length) {
+            series.getIterator().select(eventSeriesStatus[0].nearestPointToCursor.index);
             this.dispatchEvent(this.makeInteractivityPointEvent('hovered', event, eventSeriesStatus, false, forbidTooltip));
             this.prevHoverSeriesStatus = eventSeriesStatus.length ? eventSeriesStatus : null;
           }
@@ -2156,7 +2361,7 @@ anychart.core.Chart.prototype.handleMouseOverAndMove = function(event) {
         this.prevHoverSeriesStatus = seriesStatus.length ? seriesStatus : null;
       }
     } else {
-      if (!(event['target'] instanceof anychart.core.ui.Legend)) {
+      if (!(anychart.utils.instanceOf(event['target'], anychart.core.ui.Legend))) {
         this.unhover();
         if (this.prevHoverSeriesStatus)
           this.dispatchEvent(this.makeInteractivityPointEvent('hovered', event, this.prevHoverSeriesStatus, true));
@@ -2178,12 +2383,12 @@ anychart.core.Chart.prototype.handleMouseOut = function(event) {
   var forbidTooltip = false;
 
   var series, index;
-  if (event['target'] instanceof anychart.core.ui.LabelsFactory || event['target'] instanceof anychart.core.ui.MarkersFactory) {
+  if (anychart.utils.instanceOf(event['target'], anychart.core.ui.LabelsFactory) || anychart.utils.instanceOf(event['target'], anychart.core.ui.MarkersFactory)) {
     var parent = event['target'].getParentEventTarget();
     if (parent.isSeries && parent.isSeries())
       series = parent;
     index = tag;
-  } else if (event['target'] instanceof anychart.core.ui.Legend || this.checkIfColorRange(event['target'])) {
+  } else if (anychart.utils.instanceOf(event['target'], anychart.core.ui.Legend) || this.checkIfColorRange(event['target'])) {
     if (tag) {
       if (tag.points_) {
         series = tag.points_.series;
@@ -2211,8 +2416,9 @@ anychart.core.Chart.prototype.handleMouseOut = function(event) {
       var prevIndex = anychart.utils.toNumber(goog.isObject(prevTag) ? prevTag.index : prevTag);
 
       var ifParent = anychart.utils.checkIfParent(/** @type {!goog.events.EventTarget} */(series), event['relatedTarget']);
+      var isParentTooltip = acgraph.type() == acgraph.StageType.VML && series.tooltip && anychart.utils.checkIfParent(series.tooltip(), event['relatedTarget']);
 
-      if ((!ifParent || (prevIndex != index)) && series.dispatchEvent(evt)) {
+      if ((!ifParent || (prevIndex != index)) && series.dispatchEvent(evt) && !isParentTooltip) {
         if (hoverMode == anychart.enums.HoverMode.SINGLE && (!isNaN(index) || goog.isArray(index))) {
           series.unhover();
           this.doAdditionActionsOnMouseOut();
@@ -2275,9 +2481,9 @@ anychart.core.Chart.prototype.onMouseDown = function(event) {
   var tag = anychart.utils.extractTag(event['domTarget']);
 
   var isColorRange = this.checkIfColorRange(event['target']);
-  var isLegend = event['target'] instanceof anychart.core.ui.Legend;
-  var isLabelsFactory = event['target'] instanceof anychart.core.ui.LabelsFactory;
-  var isMarkersFactory = event['target'] instanceof anychart.core.ui.MarkersFactory;
+  var isLegend = anychart.utils.instanceOf(event['target'], anychart.core.ui.Legend);
+  var isLabelsFactory = anychart.utils.instanceOf(event['target'], anychart.core.ui.LabelsFactory);
+  var isMarkersFactory = anychart.utils.instanceOf(event['target'], anychart.core.ui.MarkersFactory);
   var isTargetLegendOrColorRange = isLegend || isColorRange;
 
   var series, s, index, points;
@@ -2765,8 +2971,8 @@ anychart.core.Chart.prototype.irDrawingMouseDownHandler_ = function(e) {
   var rect, rectIndex;
   var container = /** @type {acgraph.vector.ILayer} */(this.container());
   var cp = container.getStage().getClientPosition();
-  var startX = e.clientX - cp.x;
-  var startY = e.clientY - cp.y;
+  var startX = e['clientX'] - cp.x;
+  var startY = e['clientY'] - cp.y;
   if ((e.type != acgraph.events.EventType.MOUSEDOWN || e.getOriginalEvent().isMouseActionButton()) &&
       (rectIndex = this.getIRDrawingBoundsIndex_(e['clientX'], e['clientY'])) &&
       (!this.irOnStart_ || this.irOnStart_(rectIndex - 1, startX, startY, 0, 0, e) !== false)) {
@@ -2894,59 +3100,8 @@ anychart.core.Chart.IRDragger.prototype.defaultAction = function(x, y) {};
 anychart.core.Chart.prototype.startSelectMarquee = function(opt_repeat) {
   this.preventMouseDownInteractivity =
       this.startIRDrawing(this.onSelectMarqueeStart, this.onSelectMarqueeChange, this.onSelectMarqueeFinish, this.getSelectMarqueeBounds(),
-          false, undefined, opt_repeat, this.selectMarqueeStroke_, this.selectMarqueeFill_);
+          false, undefined, opt_repeat, /** @type {acgraph.vector.Stroke} */ (this.getOption('selectMarqueeStroke')), /** @type {acgraph.vector.Fill} */ (this.getOption('selectMarqueeFill')));
   return this;
-};
-
-
-/**
- * Getter/setter for select marquee fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.core.Chart} .
- */
-anychart.core.Chart.prototype.selectMarqueeFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var fill = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (fill != this.selectMarqueeFill_) {
-      this.selectMarqueeFill_ = fill;
-      if (this.inMarquee()) {
-        this.interactivityRect.fill(this.selectMarqueeFill_);
-      }
-    }
-    return this;
-  }
-  return this.selectMarqueeFill_;
-};
-
-
-/**
- * Getter/setter for select marquee stroke.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.core.Chart|acgraph.vector.Stroke} .
- */
-anychart.core.Chart.prototype.selectMarqueeStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (stroke != this.selectMarqueeStroke_) {
-      this.selectMarqueeStroke_ = stroke;
-      if (this.inMarquee()) {
-        this.interactivityRect.stroke(this.selectMarqueeStroke_);
-      }
-    }
-    return this;
-  }
-  return this.selectMarqueeStroke_;
 };
 
 
@@ -3086,6 +3241,41 @@ anychart.core.Chart.prototype.selectByRect = function(marqueeFinishEvent) {
 
 
 //endregion
+//region --- Full screen
+//------------------------------------------------------------------------------
+//
+//  Full screen
+//
+//------------------------------------------------------------------------------
+/**
+ * Getter/Setter for the full screen mode.
+ * @param {boolean=} opt_value
+ * @return {anychart.core.Chart|boolean}
+ */
+anychart.core.Chart.prototype.fullScreen = function(opt_value) {
+  var container = this.container();
+  var stage = container ? container.getStage() : null;
+  if (goog.isDef(opt_value)) {
+    if (stage)
+      stage.fullScreen(opt_value);
+    return this;
+  }
+  return stage ? /** @type {boolean} */(stage.fullScreen()) : false;
+};
+
+
+/**
+ * Tester for the full screen support.
+ * @return {boolean}
+ */
+anychart.core.Chart.prototype.isFullScreenAvailable = function() {
+  var container = this.container();
+  var stage = container ? container.getStage() : null;
+  return stage ? /** @type {boolean} */(stage.isFullScreenAvailable()) : false;
+};
+
+
+//endregion
 //region --- Exporting/Sharing/Data serialization
 //------------------------------------------------------------------------------
 //
@@ -3093,220 +3283,316 @@ anychart.core.Chart.prototype.selectByRect = function(marqueeFinishEvent) {
 //
 //------------------------------------------------------------------------------
 /**
- * Extract headers from chart data set or stock storage.
- * @param {anychart.data.Set|anychart.data.TableStorage} dataSet
- * @param {Object} headers Object with headers.
- * @param {number} headersLength Headers length.
- * @return {number} headers length.
+ * Chart exports settings.
+ * @param {Object=} opt_value .
+ * @return {anychart.core.Chart|anychart.exportsModule.Exports}
  */
-anychart.core.Chart.prototype.extractHeaders = function(dataSet, headers, headersLength) {
-  var column;
-  for (var i = 0, len = dataSet.getRowsCount(); i < len; i++) {
-    var row = dataSet.row(i);
-
-    if (goog.isArray(row)) {
-      for (column = 0; column < row.length; column++)
-        if (!(column in headers))
-          headers[column] = headersLength++;
-    } else if (goog.isObject(row)) {
-      for (column in row)
-        if (!(column in headers))
-          headers[column] = headersLength++;
-    } else {
-      if (!('value' in headers))
-        headers['value'] = headersLength++;
-    }
+anychart.core.Chart.prototype.exports = function(opt_value) {
+  var exports = goog.global['anychart']['exports'];
+  if (exports) {
+    if (!this.exports_)
+      this.exports_ = exports.create();
+  } else {
+    anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Exporting']);
   }
-  return headersLength;
+
+  if (goog.isDef(opt_value) && this.exports_) {
+    this.exports_.setupByJSON(opt_value);
+    return this;
+  }
+
+  return this.exports_;
 };
 
 
 /**
- * Escapes values.
- * @param {Array} row Array of values.
- * @param {string} colSep Columns separator.
- * @param {string} rowSep Rows separator.
+ * Returns an array of objects that contain data.
+ * @return {Array.<{data: function():anychart.data.IDataSource}>}
  */
-anychart.core.Chart.prototype.escapeValuesInRow = function(row, colSep, rowSep) {
-  var i;
-  var value;
-  var len = row.length;
-  for (i = 0; i < len; i++) {
-    if (!goog.isDef(value = row[i]))
-      continue;
-    if (!goog.isString(value))
-      value = String(value);
-    if (value.indexOf(colSep) != -1) {
-      value = value.split('"').join('""');
-      value = '"' + value + '"';
-    } else if (value.indexOf(rowSep) != -1) {
-      value = value.split('"').join('""');
-      value = '"' + value + '"';
-    }
-    row[i] = value;
-  }
+anychart.core.Chart.prototype.getDataHolders = function() {
+  return /** @type {Array.<{data: function():anychart.data.IDataSource}>} */(this.getAllSeries());
 };
 
 
 /**
- * Creates data suitable to create csv.
- * @param {Object} node Node.
- * @param {Array} rawData Raw data.
- * @param {Object} headers Hash map of seen columns.
- * @param {number} headersLength length of headers.
- * @param {?(string|number)} parentId Parent ID.
- * @param {?(string|number)} originalParent original parent id.
- * @private
+ * @return {Array.<anychart.data.IDataSource>}
  */
-anychart.core.Chart.prototype.makeObject_ = function(node, rawData, headers, headersLength, parentId, originalParent) {
-  var data = goog.object.clone(node['treeDataItemData']);
-  if (!goog.isDef(data['id'])) {
-    this.missedIds_++;
-    this.idStatus_ = -1;
-  }
-  data['parent'] = [this.nodesCount_, parentId, originalParent];
-  parentId = this.nodesCount_++;
-  rawData.push(data);
-  for (var key in data) {
-    if (!(key in headers))
-      headers[key] = headersLength++;
-  }
-  var children = node['children'];
-  if (children && children.length) {
-    for (var i = 0, len = children.length; i < len; i++)
-      this.makeObject_(children[i], rawData, headers, headersLength, parentId, data['id']);
-  }
+anychart.core.Chart.prototype.getRawCsvDataSources = function() {
+  var res = goog.array.concat.apply(null, goog.array.map(
+      /** @type {Array} */(this.getDataHolders()),
+      function(item) {
+        return item.data().getDataSets();
+      }));
+  goog.array.removeDuplicates(res, res, anychart.utils.hash);
+  return res;
 };
 
 
 /**
- * Returns CSV string with tree data.
- * @param {Object.<string, (string|boolean|undefined)>=} opt_csvSettings CSV settings.
- * @return {string} CSV string.
- * @private
- */
-anychart.core.Chart.prototype.toTreeDataCsv_ = function(opt_csvSettings) {
-  var settings = goog.isObject(opt_csvSettings) ? opt_csvSettings : {};
-  var rowsSeparator = settings['rowsSeparator'] || '\n';
-  anychart.utils.checkSeparator(rowsSeparator);
-  var columnsSeparator = settings['columnsSeparator'] || ',';
-  anychart.utils.checkSeparator(columnsSeparator);
-  var ignoreFirstRow = settings['ignoreFirstRow'] || false;
-
-  var data = (/** @type {{data:Function}} */(this)).data();
-
-  var serialized = data.serialize();
-  var roots = serialized['children'];
-
-  var rawData = [];
-  var headers = {};
-  var i, j;
-  /**
-   * -1 means there is at least one missing id, so use auto generated id|parent and save original id|parent
-   *  0 means there is no id at all use auto generated id|parent without original
-   *  1 means there are all ids in tree, so do not use auto generated - use original id|parent
-   * @type {number}
-   * @private
-   */
-  this.idStatus_ = 1;
-  this.missedIds_ = 0;
-  this.nodesCount_ = 0;
-  headers['id'] = 0;
-  headers['parent'] = 1;
-  for (i = 0; i < roots.length; i++) {
-    this.makeObject_(roots[i], rawData, headers, 2, null, null);
-  }
-  if (this.missedIds_ === this.nodesCount_) {
-    this.idStatus_ = 0;
-  } else if (this.missedIds_ === 0) {
-    this.idStatus_ = 1;
-  }
-
-  var key;
-  var columns = [];
-
-  for (key in headers)
-    columns[headers[key]] = key;
-
-  var rowArray;
-  var rowStrings = [];
-  var row;
-  var column;
-  var parent;
-  var finalValue;
-  var id, parentId;
-  if (this.idStatus_ < 0) {
-    headers['__original_id__'] = columns.length;
-    headers['__original_parent__'] = columns.length + 1;
-    columns.push('__original_id__', '__original_parent__');
-  }
-
-  if (!ignoreFirstRow)
-    rowStrings.push(columns.join(columnsSeparator));
-  for (i = 0; i < rawData.length; i++) {
-    rowArray = new Array(columns.length);
-    row = rawData[i];
-    // parent - array with
-    // 0 - auto generated id
-    // 1 - auto generated parent id
-    // 2 - original parent id
-    parent = row['parent'];
-
-    if (this.idStatus_ <= 0) {
-      id = parent[0];
-      parentId = parent[1];
-    } else {
-      id = row['id'];
-      parentId = parent[2];
-    }
-
-    for (j = 0; j < columns.length; j++) {
-      column = columns[j];
-      finalValue = goog.isObject(row[column]) ? goog.json.serialize(row[column]) : row[column];
-
-      if (column === 'id')
-        rowArray[j] = id;
-
-      else if (column === 'parent')
-        rowArray[j] = goog.isNull(parentId) ? undefined : parentId;
-
-      else if (column === '__original_parent__')
-        rowArray[j] = parent[2];
-
-      else if (column === '__original_id__')
-        rowArray[j] = row['id'];
-
-      else
-        rowArray[j] = finalValue;
-    }
-    this.escapeValuesInRow(rowArray, columnsSeparator, rowsSeparator);
-    rowStrings.push(rowArray.join(columnsSeparator));
-  }
-  return rowStrings.join(rowsSeparator);
-};
-
-
-/**
- * Creates additional headers for specific csv.
- * @param {Object} headers Headers.
- * @param {number} headersLength Current length.
- * @param {boolean} scatterPolar Scatter or polar.
- * @return {number} Headers length.
- */
-anychart.core.Chart.prototype.createSpecificCsvHeaders = function(headers, headersLength, scatterPolar) {
-  return headersLength;
-};
-
-
-/**
- * Method called each iteration over each series data when generating specific csv.
- * @param {anychart.data.View} seriesData
- * @param {Object} csvRows
+ * @param {Array} targetCsvRow
+ * @param {*} dataRow
  * @param {Object} headers
- * @param {number} rowIndex
- * @param {string|number} groupingField
+ * @protected
  */
-anychart.core.Chart.prototype.onBeforeRowsValuesSpreading = function(seriesData, csvRows, headers, rowIndex, groupingField) {};
+anychart.core.Chart.prototype.populateRawCsvRow = function(targetCsvRow, dataRow, headers) {
+  var column;
+  if (goog.isArray(dataRow)) {
+    for (column = 0; column < dataRow.length; column++)
+      populate(targetCsvRow, dataRow[column], headers[column]);
+  } else if (goog.isObject(dataRow)) {
+    for (column in dataRow)
+      populate(targetCsvRow, dataRow[column], headers[column]);
+  } else {
+    populate(targetCsvRow, dataRow, headers['value']);
+  }
+
+  function populate(resultRow, val, index) {
+    resultRow[index] = goog.isObject(val) ? goog.json.serialize(val) : val;
+  }
+};
+
+
+/**
+ * Gets data for RAW toCsv mode.
+ * @return {{headers: Array.<string>, data: Array.<Array.<*>>}}
+ * @protected
+ */
+anychart.core.Chart.prototype.getRawCsvData = function() {
+  var dataSources = this.getRawCsvDataSources();
+
+  var headers = {};
+  var headersLength = 0;
+  var needsDataSourceNumber = dataSources.length > 1;
+  if (needsDataSourceNumber) {
+    headers['#'] = headersLength++;
+  }
+  var i;
+  for (i = 0; i < dataSources.length; i++) {
+    headersLength = dataSources[i].populateObjWithKnownFields(headers, headersLength);
+  }
+
+  var csvHeaders = [];
+  for (var header in headers)
+    csvHeaders[headers[header]] = header;
+
+  var csvData = [];
+  for (i = 0; i < dataSources.length; i++) {
+    var dataSource = dataSources[i];
+    for (var j = 0, len = dataSource.getRowsCount(); j < len; j++) {
+      var csvRow = new Array(headersLength);
+      this.populateRawCsvRow(csvRow, dataSource.getRow(j), headers);
+
+      if (needsDataSourceNumber)
+        csvRow[0] = i;
+      csvData.push(csvRow);
+    }
+  }
+  return {headers: csvHeaders, data: csvData};
+};
+
+
+/**
+ * @param {anychart.enums.ChartDataExportMode} mode
+ * @param {*} series
+ * @param {*} x
+ * @return {boolean}
+ * @protected
+ */
+anychart.core.Chart.prototype.shouldAddCsvRow = function(mode, series, x) {
+  return true;
+};
+
+
+/**
+ * @return {Array.<string>}
+ * @protected
+ */
+anychart.core.Chart.prototype.getCsvGrouperColumn = function() {
+  return [];
+};
+
+
+/**
+ * @param {anychart.data.IRowInfo} iterator
+ * @return {*}
+ * @protected
+ */
+anychart.core.Chart.prototype.getCsvGrouperValue = function(iterator) {
+  return iterator.getIndex();
+};
+
+
+/**
+ * @param {anychart.data.IRowInfo} iterator
+ * @param {*} dataHolder
+ * @return {?string}
+ * @protected
+ */
+anychart.core.Chart.prototype.getCsvGrouperAlias = function(iterator, dataHolder) {
+  return null;
+};
+
+
+/**
+ * Gets y value names from the *series*.
+ * @param {*} dataHolder
+ * @return {Array}
+ */
+anychart.core.Chart.prototype.getCsvColumns = function(dataHolder) {
+  return (anychart.utils.instanceOf(dataHolder, anychart.core.series.Base)) ? dataHolder.getYValueNames() : ['value'];
+};
+
+
+/**
+ * Wraps passed field name with the series id.
+ * @param {string} name
+ * @param {*} dataHolder
+ * @param {number} index
+ * @param {number} columnsCount
+ * @return {string}
+ */
+anychart.core.Chart.prototype.prefixCsvColumnName = function(name, dataHolder, index, columnsCount) {
+  return ((anychart.utils.instanceOf(dataHolder, anychart.core.series.Base)) ? dataHolder.name() : ('series' + String(index))) +
+      ((columnsCount > 1) ? (' (' + name + ')') : '');
+};
+
+
+/**
+ * @param {*} x
+ * @param {?string} xAlias
+ * @param {Array.<Array>} data
+ * @param {Object.<number>} xValues
+ * @param {string} id
+ * @param {number} index
+ * @param {Object} seriesXValues
+ * @return {Array}
+ * @protected
+ */
+anychart.core.Chart.prototype.getCsvExportRow = function(x, xAlias, data, xValues, id, index, seriesXValues) {
+  var xHash = anychart.utils.hash(x);
+  var rowIndex;
+  if (xHash in xValues) {
+    rowIndex = xValues[xHash];
+  } else {
+    rowIndex = xValues[xHash] = data.length;
+    data.push([xAlias || String(x)]);
+  }
+  return data[rowIndex];
+};
+
+
+/**
+ * @param {*} x
+ * @param {?string} xAlias
+ * @param {Array.<Array>} data
+ * @param {Object.<number>} xValues
+ * @param {string} id
+ * @param {number} index
+ * @param {Object} seriesXValues
+ * @return {Array}
+ * @protected
+ */
+anychart.core.Chart.prototype.getCsvExportRowScatter = function(x, xAlias, data, xValues, id, index, seriesXValues) {
+  var xHash = anychart.utils.hash(x);
+  var rowIndex;
+  if (xHash in seriesXValues) {
+    var i = 1;
+    var newHash;
+    do {
+      newHash = xHash + '_' + i.toString();
+    } while (newHash in seriesXValues);
+    xHash = newHash;
+  }
+  seriesXValues[xHash] = true;
+  if (xHash in xValues) {
+    rowIndex = xValues[xHash];
+  } else {
+    rowIndex = xValues[xHash] = data.length;
+    data.push([xAlias || String(x)]);
+  }
+  return data[rowIndex];
+};
+
+
+/**
+ * @param {*} dataHolder
+ * @param {anychart.enums.ChartDataExportMode} mode
+ * @return {anychart.data.IIterator}
+ * @protected
+ */
+anychart.core.Chart.prototype.getCsvIterator = function(dataHolder, mode) {
+  return goog.isFunction(dataHolder.getIterator) ? dataHolder.getIterator() : dataHolder.data().getIterator();
+};
+
+
+/**
+ * @param {*} dataHolder
+ * @return {string}
+ * @protected
+ */
+anychart.core.Chart.prototype.identifyCsvDataHolder = function(dataHolder) {
+  return anychart.utils.hash(dataHolder.data().getDataSets()[0]);
+};
+
+
+/**
+ * @param {Array} row
+ * @param {Array} names
+ * @param {anychart.data.IRowInfo} iterator
+ * @param {Array} headers
+ * @protected
+ */
+anychart.core.Chart.prototype.populateCsvRow = function(row, names, iterator, headers) {
+  for (var i = 0; i < names.length; i++) {
+    row[i + headers.length] = iterator.get(names[i]);
+  }
+};
+
+
+/**
+ * Gets data for DEFAULT toCsv mode.
+ * @param {anychart.enums.ChartDataExportMode} mode
+ * @return {{headers: Array.<string>, data: Array.<Array.<*>>}}
+ */
+anychart.core.Chart.prototype.getCsvData = function(mode) {
+  var dataHolders = this.getDataHolders();
+  var headers = this.getCsvGrouperColumn();
+  var xValues = {};
+  var j;
+  var data = [];
+  for (var i = 0; i < dataHolders.length; i++) {
+    var dataHolder = dataHolders[i];
+    var names = this.getCsvColumns(dataHolder);
+    if (names.length) {
+      var iterator = this.getCsvIterator(dataHolder, mode);
+      iterator.reset();
+      var holderId = this.identifyCsvDataHolder(dataHolder);
+      var seriesXValues = {};
+      while (iterator.advance()) {
+        var grouper = this.getCsvGrouperValue(iterator);
+        if (this.shouldAddCsvRow(mode, dataHolder, grouper)) {
+          var row = this.getCsvExportRow(
+              grouper,
+              this.getCsvGrouperAlias(iterator, dataHolder),
+              data,
+              xValues,
+              holderId,
+              iterator.getIndex(),
+              seriesXValues);
+          this.populateCsvRow(row, names, iterator, headers);
+        }
+      }
+      if (dataHolders.length > 1) {
+        for (j = 0; j < names.length; j++) {
+          headers.push(this.prefixCsvColumnName(names[j], dataHolder, i + 1, names.length));
+        }
+      } else {
+        headers.push.apply(headers, names);
+      }
+    }
+  }
+  return {headers: headers, data: data};
+};
 
 
 /**
@@ -3316,188 +3602,11 @@ anychart.core.Chart.prototype.onBeforeRowsValuesSpreading = function(seriesData,
  * @return {string} CSV string.
  */
 anychart.core.Chart.prototype.toCsv = function(opt_chartDataExportMode, opt_csvSettings) {
-  if (this.usesTreeData())
-    return this.toTreeDataCsv_(opt_csvSettings);
-
   opt_chartDataExportMode = anychart.enums.normalizeChartDataExportMode(opt_chartDataExportMode);
-  var rawData = (opt_chartDataExportMode == anychart.enums.ChartDataExportMode.RAW);
-  var type = this.getType();
-  var scatterPolar = (type == anychart.enums.ChartTypes.SCATTER ||
-      type == anychart.enums.ChartTypes.POLAR ||
-      type == anychart.enums.ChartTypes.QUADRANT);
-  var settings = goog.isObject(opt_csvSettings) ? opt_csvSettings : {};
-  var rowsSeparator = settings['rowsSeparator'] || '\n';
-  anychart.utils.checkSeparator(rowsSeparator);
-  var columnsSeparator = settings['columnsSeparator'] || ',';
-  anychart.utils.checkSeparator(columnsSeparator);
-  var ignoreFirstRow = settings['ignoreFirstRow'] || false;
-
-  var isGauge =
-      type == anychart.enums.GaugeTypes.CIRCULAR |
-      type == anychart.enums.GaugeTypes.LINEAR |
-      type == anychart.enums.GaugeTypes.BULLET |
-      type == anychart.enums.GaugeTypes.THERMOMETER |
-      type == anychart.enums.GaugeTypes.TANK |
-      type == anychart.enums.GaugeTypes.LED;
-  var seriesList = isGauge ? [this] : this.getAllSeries();
-  var seriesListLength = seriesList.length;
-  var series;
-  var seriesData;
-  var seriesDataSets;
-  var i, j, len, uid;
-  var dataSet = null;
-  var dataSets = {};
-  var csvHeaders = [];
-  var dataSetsCount = 0;
-
-  for (i = 0; i < seriesListLength; i++) {
-    series = /** @type {anychart.core.series.Base|anychart.core.ChartWithSeries|anychart.charts.Resource|
-        anychart.core.PyramidFunnelBase|anychart.charts.Venn|anychart.charts.LinearGauge|anychart.charts.Bullet|
-        anychart.charts.TreeMap|anychart.charts.TagCloud|anychart.charts.Sparkline|anychart.charts.Gantt|
-        anychart.charts.Pert|anychart.charts.CircularGauge} */ (seriesList[i]);
-    seriesData = /** @type {anychart.data.View} */ (series.data());
-    seriesDataSets = seriesData.getDataSets();
-    for (j = 0, len = seriesDataSets.length; j < len; j++) {
-      dataSet = seriesDataSets[j];
-      uid = goog.getUid(dataSet);
-      if (!(uid in dataSets)) {
-        dataSets[uid] = dataSet;
-        dataSetsCount++;
-      }
-    }
-  }
-  var needCountDataSets = dataSetsCount > 1;
-  var csvStrings;
-  var headers, header;
-  var headersLength = 0;
-  var finalValue;
-
-  if (rawData) {
-    headers = {};
-    if (needCountDataSets) {
-      headers['#'] = headersLength++;
-    }
-    for (uid in dataSets) {
-      dataSet = dataSets[uid];
-      headersLength = this.extractHeaders(dataSet, headers, headersLength);
-    }
-
-    var dataSetNumber = 0;
-    csvStrings = [];
-    if (!ignoreFirstRow) {
-      csvHeaders = [];
-      for (header in headers)
-        csvHeaders[headers[header]] = header;
-      csvStrings.push(csvHeaders.join(columnsSeparator));
-    }
-    for (uid in dataSets) {
-      dataSet = dataSets[uid];
-      var column;
-      var columnIndex;
-
-      for (i = 0, len = dataSet.getRowsCount(); i < len; i++) {
-        var csvRow = new Array(headersLength);
-        var row = dataSet.row(i);
-        if (goog.isArray(row)) {
-          for (column = 0; column < row.length; column++) {
-            columnIndex = headers[column];
-            finalValue = goog.isObject(row[column]) ? goog.json.serialize(row[column]) : row[column];
-            csvRow[columnIndex] = finalValue;
-          }
-        } else if (goog.isObject(row)) {
-          for (column in row) {
-            columnIndex = headers[column];
-            finalValue = goog.isObject(row[column]) ? goog.json.serialize(row[column]) : row[column];
-            csvRow[columnIndex] = finalValue;
-          }
-        } else {
-          columnIndex = headers['value'];
-          csvRow[columnIndex] = row;
-        }
-
-        if (needCountDataSets)
-          csvRow[0] = dataSetNumber;
-        this.escapeValuesInRow(csvRow, columnsSeparator, rowsSeparator);
-        csvStrings.push(csvRow.join(columnsSeparator));
-      }
-      dataSetNumber++;
-    }
-    return csvStrings.join(rowsSeparator);
-  } else {
-    //x, 0_0, 0_1, 0_2, 1_0, 1_1
-    //p1, 1, p1, 10, p1, 20'
-    headers = {};
-    if (!scatterPolar) {
-      headers['x'] = headersLength++;
-    }
-    headersLength = this.createSpecificCsvHeaders(headers, headersLength, scatterPolar);
-    var seriesPrefix;
-    var csvRows = {};
-    var iterator;
-    var x, k;
-    var prefixed;
-    var groupingField;
-    for (i = 0; i < seriesListLength; i++) {
-      series = seriesList[i];
-      seriesPrefix = seriesListLength > 1 ? goog.isFunction(series.id) ? series.id() + '_' : ('series_' + i + '_') : '';
-      seriesData = series.data();
-      iterator = seriesData.getIterator();
-      while (iterator.advance()) {
-        k = iterator.getIndex();
-        groupingField = /** @type {number|string} */ (scatterPolar ? k : iterator.get('x'));
-
-        if (!csvRows[groupingField]) {
-          csvRows[groupingField] = [];
-          if (!scatterPolar)
-            csvRows[groupingField][0] = groupingField;
-        }
-
-        this.onBeforeRowsValuesSpreading(seriesData, csvRows, headers, k, groupingField);
-
-        row = seriesData.row(k);
-
-        if (goog.isArray(row)) {
-          for (column = 0; column < row.length; column++) {
-            prefixed = seriesPrefix + column;
-            if (!(prefixed in headers)) {
-              headers[prefixed] = headersLength++;
-            }
-            columnIndex = headers[prefixed];
-            finalValue = goog.isObject(row[column]) ? goog.json.serialize(row[column]) : row[column];
-            csvRows[groupingField][columnIndex] = finalValue;
-          }
-        } else if (goog.isObject(row)) {
-          for (column in row) {
-            prefixed = seriesPrefix + column;
-            if (!(prefixed in headers)) {
-              headers[prefixed] = headersLength++;
-            }
-            columnIndex = headers[prefixed];
-            finalValue = goog.isObject(row[column]) ? goog.json.serialize(row[column]) : row[column];
-            csvRows[groupingField][columnIndex] = finalValue;
-          }
-        } else {
-          prefixed = seriesPrefix + 'value';
-          if (!(prefixed in headers)) {
-            headers[prefixed] = headersLength++;
-          }
-          columnIndex = headers[prefixed];
-          csvRows[groupingField][columnIndex] = row;
-        }
-      }
-    }
-    csvStrings = [];
-    for (header in headers) {
-      csvHeaders[headers[header]] = header;
-    }
-    if (!ignoreFirstRow)
-      csvStrings.push(csvHeaders.join(columnsSeparator));
-    for (row in csvRows) {
-      this.escapeValuesInRow(csvRows[row], columnsSeparator, rowsSeparator);
-      csvStrings.push(csvRows[row].join(columnsSeparator));
-    }
-    return csvStrings.join(rowsSeparator);
-  }
+  var result = (opt_chartDataExportMode == anychart.enums.ChartDataExportMode.RAW) ?
+    this.getRawCsvData() :
+    this.getCsvData(opt_chartDataExportMode);
+  return anychart.utils.serializeCsv(result.headers, result.data, opt_csvSettings);
 };
 
 
@@ -3552,33 +3661,31 @@ anychart.core.Chart.prototype.toA11yTable = function(opt_title, opt_asString) {
 
 /**
  * Saves chart config as XML document.
- * @param {boolean=} opt_includeTheme If the current theme properties should be included into the result.
  * @param {string=} opt_filename file name to save.
  */
-anychart.core.Chart.prototype.saveAsXml = function(opt_includeTheme, opt_filename) {
-  var xml = /** @type {string} */(this.toXml(false, opt_includeTheme));
-  var options = {};
-  options['file-name'] = opt_filename || anychart.exports.filename();
-  options['data'] = xml;
-  options['dataType'] = 'xml';
-  options['responseType'] = 'file';
-  acgraph.sendRequestToExportServer(acgraph.exportServer + '/xml', options);
+anychart.core.Chart.prototype.saveAsXml = function(opt_filename) {
+  var exports = anychart.window['anychart']['exports'];
+  if (exports) {
+    var xml = /** @type {string} */(this.toXml(false));
+    exports.saveAsXml(this, xml, opt_filename);
+  } else {
+    anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Exporting']);
+  }
 };
 
 
 /**
  * Saves chart config as XML document.
- * @param {boolean=} opt_includeTheme If the current theme properties should be included into the result.
  * @param {string=} opt_filename file name to save.
  */
-anychart.core.Chart.prototype.saveAsJson = function(opt_includeTheme, opt_filename) {
-  var json = /** @type {string} */(this.toJson(true, opt_includeTheme));
-  var options = {};
-  options['file-name'] = opt_filename || anychart.exports.filename();
-  options['data'] = json;
-  options['dataType'] = 'json';
-  options['responseType'] = 'file';
-  acgraph.sendRequestToExportServer(acgraph.exportServer + '/json', options);
+anychart.core.Chart.prototype.saveAsJson = function(opt_filename) {
+  var exports = anychart.window['anychart']['exports'];
+  if (exports) {
+    var json = /** @type {string} */(this.toJson(true));
+    exports.saveAsJson(this, json, opt_filename);
+  } else {
+    anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Exporting']);
+  }
 };
 
 
@@ -3589,13 +3696,13 @@ anychart.core.Chart.prototype.saveAsJson = function(opt_includeTheme, opt_filena
  * @param {string=} opt_filename file name to save.
  */
 anychart.core.Chart.prototype.saveAsCsv = function(opt_chartDataExportMode, opt_csvSettings, opt_filename) {
-  var csv = this.toCsv(opt_chartDataExportMode, opt_csvSettings);
-  var options = {};
-  options['file-name'] = opt_filename || anychart.exports.filename();
-  options['data'] = csv;
-  options['dataType'] = 'csv';
-  options['responseType'] = 'file';
-  acgraph.sendRequestToExportServer(acgraph.exportServer + '/csv', options);
+  var exports = anychart.window['anychart']['exports'];
+  if (exports) {
+    var csv = this.toCsv(opt_chartDataExportMode, opt_csvSettings);
+    exports.saveAsCsv(this, csv, opt_filename);
+  } else {
+    anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Exporting']);
+  }
 };
 
 
@@ -3605,217 +3712,17 @@ anychart.core.Chart.prototype.saveAsCsv = function(opt_chartDataExportMode, opt_
  * @param {string=} opt_filename file name to save.
  */
 anychart.core.Chart.prototype.saveAsXlsx = function(opt_chartDataExportMode, opt_filename) {
-  var csv = this.toCsv(opt_chartDataExportMode, {
-    'rowsSeparator': '\n',
-    'columnsSeparator': ',',
-    'ignoreFirstRow': false
-  });
-  var options = {};
-  options['file-name'] = opt_filename || anychart.exports.filename();
-  options['data'] = csv;
-  options['dataType'] = 'xlsx';
-  options['responseType'] = 'file';
-  acgraph.sendRequestToExportServer(acgraph.exportServer + '/xlsx', options);
-};
-
-
-/**
- * Opens Facebook sharing dialog.
- * @param {(string|Object)=} opt_captionOrOptions Caption for main link. If not set hostname will be used. Or object with options.
- * @param {string=} opt_link Url of the link attached to publication.
- * @param {string=} opt_name Title for the attached link. If not set hostname or opt_link url will be used.
- * @param {string=} opt_description Description for the attached link.
- */
-anychart.core.Chart.prototype.shareWithFacebook = function(opt_captionOrOptions, opt_link, opt_name, opt_description) {
-  var exportOptions = anychart.exports.facebook();
-  var args = anychart.utils.decomposeArguments({
-    'caption': opt_captionOrOptions,
-    'link': opt_link,
-    'name': opt_name,
-    'description': opt_description
-  }, opt_captionOrOptions, exportOptions);
-
-  var w = 550;
-  var h = 550;
-  var left = Number((screen.width / 2) - (w / 2));
-  var top = Number((screen.height / 2) - (h / 2));
-  var window = goog.dom.getWindow();
-  var popup = window.open('', '_blank', 'scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
-
-  var onSuccess = function(imgUrl) {
-    var urlBase = 'https://www.facebook.com/dialog/feed';
-
-    // Dialog options described here https://developers.facebook.com/docs/sharing/reference/feed-dialog
-    var urlOptions = {
-      'app_id': exportOptions['appId'],
-      'display': 'popup',
-      'picture': imgUrl
-    };
-
-    urlOptions['caption'] = args['caption'];
-
-    if (args['link']) {
-      urlOptions['link'] = args['link'];
-
-      if (args['name']) {
-        urlOptions['name'] = args['name'];
-      }
-      if (args['description']) {
-        urlOptions['description'] = args['description'];
-      }
-    }
-
-    var options = '';
-    for (var k in urlOptions) {
-      options += options ? '&' : '';
-      options += k + '=' + urlOptions[k];
-    }
-    popup.location.href = urlBase + '?' + options;
-  };
-
-  var imageWidth = exportOptions['width'];
-  var imageHeight = exportOptions['height'];
-  this.shareAsPng(onSuccess, undefined, false, imageWidth, imageHeight);
-};
-
-
-/**
- * Opens Twitter sharing dialog.
- */
-anychart.core.Chart.prototype.shareWithTwitter = function() {
-  var exportOptions = anychart.exports.twitter();
-  var w = 600;
-  var h = 520;
-  var left = Number((screen.width / 2) - (w / 2));
-  var top = Number((screen.height / 2) - (h / 2));
-  var formClass = 'ac-share-twitter-form';
-  var dataInputClass = 'ac-share-twitter-data-input';
-
-  var mapForm;
-  var dataInput;
-  var el = goog.dom.getElementsByTagNameAndClass(goog.dom.TagName.INPUT, dataInputClass);
-  if (el.length > 0) {
-    dataInput = el[0];
-    mapForm = goog.dom.getElementsByTagNameAndClass(goog.dom.TagName.FORM, formClass)[0];
+  var exports = anychart.window['anychart']['exports'];
+  if (exports) {
+    var csv = this.toCsv(opt_chartDataExportMode, {
+      'rowsSeparator': '\n',
+      'columnsSeparator': ',',
+      'ignoreFirstRow': false
+    });
+    exports.saveAsXlsx(this, csv, opt_filename);
   } else {
-    mapForm = goog.dom.createElement(goog.dom.TagName.FORM);
-    goog.dom.classlist.add(mapForm, formClass);
-    mapForm.target = 'Map';
-    mapForm.method = 'POST';
-    mapForm.action = exportOptions['url'];
-
-    dataInput = goog.dom.createElement(goog.dom.TagName.INPUT);
-    goog.dom.classlist.add(dataInput, dataInputClass);
-    dataInput.type = 'hidden';
-    dataInput.name = 'data';
-
-    var dataTypeInput = goog.dom.createElement(goog.dom.TagName.INPUT);
-    dataTypeInput.type = 'hidden';
-    dataTypeInput.name = 'dataType';
-    dataTypeInput.value = 'svg';
-
-    goog.dom.appendChild(mapForm, dataInput);
-    goog.dom.appendChild(mapForm, dataTypeInput);
-    goog.dom.appendChild(goog.dom.getElementsByTagName(goog.dom.TagName.BODY)[0], mapForm);
+    anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Exporting']);
   }
-
-  if (goog.isDef(mapForm) && goog.isDef(dataInput)) {
-    dataInput.value = this.toSvg(exportOptions['width'], exportOptions['height']);
-    var window = goog.dom.getWindow();
-    var mapWindow = window.open('', 'Map', 'status=0,title=0,height=520,width=600,scrollbars=1, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
-    if (mapWindow) mapForm.submit();
-  }
-};
-
-
-/**
- * Opens LinkedIn sharing dialog.
- * @param {(string|Object)=} opt_captionOrOptions Caption for publication. If not set 'AnyChart' will be used. Or object with options.
- * @param {string=} opt_description Description. If not set opt_caption will be used.
- */
-anychart.core.Chart.prototype.shareWithLinkedIn = function(opt_captionOrOptions, opt_description) {
-  var exportOptions = anychart.exports.linkedin();
-  var args = anychart.utils.decomposeArguments({
-    'caption': opt_captionOrOptions,
-    'description': opt_description
-  }, opt_captionOrOptions, exportOptions);
-
-  var w = 550;
-  var h = 520;
-  var left = Number((screen.width / 2) - (w / 2));
-  var top = Number((screen.height / 2) - (h / 2));
-  var window = goog.dom.getWindow();
-  var popup = window.open('', '_blank', 'scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
-
-  var onSuccess = function(imgUrl) {
-    var urlBase = 'https://www.linkedin.com/shareArticle';
-
-    // Dialog options described here https://developer.linkedin.com/docs/share-on-linkedin
-    var urlOptions = {
-      'mini': 'true',
-      'url' : imgUrl
-    };
-
-    urlOptions['title'] = args['caption'];
-    if (args['description']) {
-      urlOptions['summary'] = args['description'];
-    }
-
-    var options = '';
-    for (var k in urlOptions) {
-      options += options ? '&' : '';
-      options += k + '=' + urlOptions[k];
-    }
-    popup.location.href = urlBase + '?' + options;
-  };
-
-  this.shareAsPng(onSuccess, undefined, false, exportOptions['width'], exportOptions['height']);
-};
-
-
-/**
- * Opens Pinterest sharing dialog.
- * @param {(string|Object)=} opt_linkOrOptions Attached link. If not set, the image url will be used. Or object with options.
- * @param {string=} opt_description Description.
- */
-anychart.core.Chart.prototype.shareWithPinterest = function(opt_linkOrOptions, opt_description) {
-  var exportOptions = anychart.exports.pinterest();
-  var args = anychart.utils.decomposeArguments({
-    'link': opt_linkOrOptions,
-    'description': opt_description
-  }, opt_linkOrOptions, exportOptions);
-
-  var w = 550;
-  var h = 520;
-  var left = Number((screen.width / 2) - (w / 2));
-  var top = Number((screen.height / 2) - (h / 2));
-  var window = goog.dom.getWindow();
-  var popup = window.open('', '_blank', 'scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
-
-  var onSuccess = function(imgUrl) {
-    var urlBase = 'https://pinterest.com/pin/create/link';
-    var urlOptions = {
-      'media' : imgUrl
-    };
-
-    if (args['link']) {
-      urlOptions['url'] = args['link'];
-    }
-
-    if (args['description']) {
-      urlOptions['description'] = args['description'];
-    }
-
-    var options = '';
-    for (var k in urlOptions) {
-      options += options ? '&' : '';
-      options += k + '=' + urlOptions[k];
-    }
-
-    popup.location.href = urlBase + '?' + options;
-  };
-
-  this.shareAsPng(onSuccess, undefined, false, exportOptions['width'], exportOptions['height']);
 };
 
 
@@ -3881,6 +3788,7 @@ anychart.core.Chart.prototype.id = function(opt_value) {
   proto['saveAsXlsx'] = proto.saveAsXlsx;
   proto['saveAsXml'] = proto.saveAsXml;
   proto['saveAsJson'] = proto.saveAsJson;
+  proto['exports'] = proto.exports;
   proto['toCsv'] = proto.toCsv;
   proto['toA11yTable'] = proto.toA11yTable;
   proto['toHtmlTable'] = proto.toHtmlTable;
@@ -3894,10 +3802,13 @@ anychart.core.Chart.prototype.id = function(opt_value) {
   proto['shareWithLinkedIn'] = proto.shareWithLinkedIn;
   proto['shareWithPinterest'] = proto.shareWithPinterest;
   proto['startSelectMarquee'] = proto.startSelectMarquee;
-  proto['selectMarqueeFill'] = proto.selectMarqueeFill;
-  proto['selectMarqueeStroke'] = proto.selectMarqueeStroke;
+  // auto generated
+  // proto['selectMarqueeFill'] = proto.selectMarqueeFill;
+  // proto['selectMarqueeStroke'] = proto.selectMarqueeStroke;
   proto['inMarquee'] = proto.inMarquee;
   proto['cancelMarquee'] = proto.cancelMarquee;
   proto['id'] = proto.id;
+  proto['fullScreen'] = proto.fullScreen;
+  proto['isFullScreenAvailable'] = proto.isFullScreenAvailable;
 })();
 

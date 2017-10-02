@@ -377,7 +377,7 @@ anychart.format.dateTimeSymbolsCache_ = {};
  */
 anychart.format.getLocale = function(locale) {
   if (!goog.isObject(locale)) {
-    locale = goog.global['anychart']['format']['locales'][String(locale)];
+    locale = anychart.window['anychart']['format']['locales'][String(locale)];
   }
   return locale || null;
 };
@@ -634,7 +634,6 @@ anychart.format.outputTimezone = function(opt_value) {
  * @return {?Date} - Parsed date or null if got wrong input value.
  */
 anychart.format.parseDateTime = function(value, opt_format, opt_baseDate, opt_locale) {
-  var locales = goog.global['anychart']['format']['locales'];
   if (goog.isDateLike(value)) {
     return /** @type {Date} */ (value);
   } else if (goog.isNumber(value)) {
@@ -882,7 +881,7 @@ anychart.format.time = function(date, opt_timeZone, opt_locale) {
  * @return {string}
  */
 anychart.format.dateTime = function(date, opt_format, opt_timeZone, opt_locale) {
-  date = (date instanceof Date) ? date : new Date(date);
+  date = (anychart.utils.instanceOf(date, Date)) ? date : new Date(date);
   if (isNaN(date.getTime())) return String(date);
 
   var locale = anychart.format.getDateTimeLocale(opt_locale) ||
@@ -907,7 +906,7 @@ anychart.format.dateTime = function(date, opt_format, opt_timeZone, opt_locale) 
   }
   var timeZone = anychart.format.UTCTimeZoneCache_[opt_timeZone];
 
-  return formatter.format(date, timeZone);
+  return formatter.format(/** @type {Date} */(date), timeZone);
 };
 
 

@@ -1,0 +1,15 @@
+--charset UTF-8
+
+--process_closure_primitives
+
+--dependency_mode STRICT
+
+--language_in ECMASCRIPT3
+--language_out ECMASCRIPT3
+
+--extra_annotation_name "includeDoc"
+--extra_annotation_name "illustration"
+--extra_annotation_name "illustrationDesc"
+--extra_annotation_name "ignoreDoc"
+--extra_annotation_name "propertyDoc"
+--extra_annotation_name "shortDescription"

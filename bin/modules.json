@@ -1,0 +1,834 @@
+{
+  "parts": {
+    "annotations": {
+      "entry": "anychart.annotationsModule.entry",
+      "deps": [
+        "core"
+      ]
+    },
+    "binding": {
+      "entry": "anychart.bindingModule.entry",
+      "deps": [
+        "core"
+      ]
+    },
+    "bullet": {
+      "entry": "anychart.bulletModule.entry",
+      "deps": [
+        "core"
+      ]
+    },
+    "cartesian": {
+      "entry": "anychart.cartesianModule.entry",
+      "deps": [
+        "core"
+      ]
+    },
+    "cartesian-3d": {
+      "entry": "anychart.cartesian3dModule.entry",
+      "deps": [
+        "core",
+        "cartesian"
+      ]
+    },
+    "chart-editor": {
+      "entry": "anychart.chartEditorModule.entry",
+      "deps": [
+        "core",
+        "ui"
+      ]
+    },
+    "circular-gauge": {
+      "entry": "anychart.circularGaugeModule.entry",
+      "deps": [
+        "core"
+      ]
+    },
+    "color-scales": {
+      "entry": "anychart.colorScalesModule.entry",
+      "deps": [
+        "core"
+      ]
+    },
+    "core": {
+      "skipCoreCheck": true,
+      "entry": "anychart.core.entry",
+      "deps": []
+    },
+    "data-adapter": {
+      "entry": "anychart.dataAdapterModule.entry",
+      "deps": [
+        "core",
+        "exports"
+      ]
+    },
+    "exports": {
+      "entry": "anychart.exportsModule.entry",
+      "deps": [
+        "core"
+      ]
+    },
+    "gantt-part": {
+      "entry": "anychart.ganttModule.entry",
+      "deps": [
+        "core",
+        "tree-data"
+      ]
+    },
+    "heatmap-part": {
+      "entry": "anychart.heatmapModule.entry",
+      "deps": [
+        "core",
+        "color-scales"
+      ]
+    },
+    "linear-gauge-part": {
+      "entry": "anychart.linearGaugeModule.entry",
+      "deps": [
+        "core",
+        "color-scales"
+      ]
+    },
+    "map-part": {
+      "entry": "anychart.mapModule.entry",
+      "deps": [
+        "core",
+        "color-scales"
+      ]
+    },
+    "mekko": {
+      "entry": "anychart.mekkoModule.entry",
+      "deps": [
+        "core",
+        "cartesian"
+      ]
+    },
+    "pareto": {
+      "entry": "anychart.paretoModule.entry",
+      "deps": [
+        "core",
+        "cartesian"
+      ]
+    },
+    "pert": {
+      "entry": "anychart.pertModule.entry",
+      "deps": [
+        "core",
+        "tree-data"
+      ]
+    },
+    "pie": {
+      "entry": "anychart.pieModule.entry",
+      "deps": [
+        "core"
+      ]
+    },
+    "polar-part": {
+      "entry": "anychart.polarModule.entry",
+      "deps": [
+        "core",
+        "radar-polar-base"
+      ]
+    },
+    "pyramid-funnel": {
+      "entry": "anychart.pyramidFunnelModule.entry",
+      "deps": [
+        "core"
+      ]
+    },
+    "radar-part": {
+      "entry": "anychart.radarModule.entry",
+      "deps": [
+        "core",
+        "radar-polar-base"
+      ]
+    },
+    "radar-polar-base": {
+      "entry": "anychart.radarPolarBaseModule.entry",
+      "deps": [
+        "core",
+        "cartesian"
+      ]
+    },
+    "resource": {
+      "entry": "anychart.resourceModule.entry",
+      "deps": [
+        "core"
+      ]
+    },
+    "scatter": {
+      "entry": "anychart.scatterModule.entry",
+      "deps": [
+        "core",
+        "cartesian"
+      ]
+    },
+    "sparkline": {
+      "entry": "anychart.sparklineModule.entry",
+      "deps": [
+        "core"
+      ]
+    },
+    "stock": {
+      "entry": "anychart.stockModule.entry",
+      "deps": [
+        "core"
+      ]
+    },
+    "table": {
+      "entry": "anychart.tableModule.entry",
+      "deps": [
+        "core"
+      ]
+    },
+    "tag-cloud-part": {
+      "entry": "anychart.tagCloudModule.entry",
+      "deps": [
+        "core",
+        "color-scales"
+      ]
+    },
+    "tree-data": {
+      "entry": "anychart.treeDataModule.entry",
+      "deps": [
+        "core"
+      ]
+    },
+    "treemap-part": {
+      "entry": "anychart.treemapModule.entry",
+      "deps": [
+        "core",
+        "tree-data",
+        "color-scales"
+      ]
+    },
+    "ui": {
+      "entry": "anychart.ui.entry",
+      "deps": [
+        "core"
+      ]
+    },
+    "venn": {
+      "entry": "anychart.vennModule.entry",
+      "deps": [
+        "core"
+      ]
+    },
+    "vml": {
+      "entry": "acgraph.vector.vml",
+      "deps": [
+        "core"
+      ]
+    },
+    "waterfall": {
+      "entry": "anychart.waterfallModule.entry",
+      "deps": [
+        "core",
+        "cartesian"
+      ]
+    },
+    "theme-annotations": {
+      "entry": "anychart.annotationsModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-bullet": {
+      "entry": "anychart.bulletModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-cartesian": {
+      "entry": "anychart.cartesianModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-cartesian-3d": {
+      "entry": "anychart.cartesian3dModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-circular-gauge": {
+      "entry": "anychart.circularGaugeModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-color-scales": {
+      "entry": "anychart.colorScalesModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-core": {
+      "entry": "anychart.core.defaultTheme",
+      "deps": [
+        "core"
+      ]
+    },
+    "theme-gantt": {
+      "entry": "anychart.ganttModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-heatmap": {
+      "entry": "anychart.heatmapModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-linear-gauge": {
+      "entry": "anychart.linearGaugeModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-map": {
+      "entry": "anychart.mapModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-mekko": {
+      "entry": "anychart.mekkoModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-pareto": {
+      "entry": "anychart.paretoModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-pert": {
+      "entry": "anychart.pertModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-pie": {
+      "entry": "anychart.pieModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-polar": {
+      "entry": "anychart.polarModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-pyramid-funnel": {
+      "entry": "anychart.pyramidFunnelModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-radar": {
+      "entry": "anychart.radarModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-resource": {
+      "entry": "anychart.resourceModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-scatter": {
+      "entry": "anychart.scatterModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-sparkline": {
+      "entry": "anychart.sparklineModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-stock": {
+      "entry": "anychart.stockModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-tag-cloud": {
+      "entry": "anychart.tagCloudModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-treemap": {
+      "entry": "anychart.treemapModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-venn": {
+      "entry": "anychart.vennModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-waterfall": {
+      "entry": "anychart.waterfallModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    }
+  },
+  "modules": {
+    "anychart-base": {
+      "type": "required",
+      "parts": [
+        "core",
+        "theme-core",
+        "pie",
+        "theme-pie",
+        "cartesian",
+        "theme-cartesian",
+        "scatter",
+        "theme-scatter"
+      ]
+    },
+    "anychart-core": {
+      "type": "required",
+      "parts": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "anychart-default-theme": {
+      "type": "required",
+      "parts": [
+        "theme-core",
+        "theme-annotations",
+        "theme-bullet",
+        "theme-cartesian",
+        "theme-cartesian-3d",
+        "theme-circular-gauge",
+        "theme-gantt",
+        "theme-heatmap",
+        "theme-linear-gauge",
+        "theme-map",
+        "theme-mekko",
+        "theme-pareto",
+        "theme-pert",
+        "theme-pie",
+        "theme-polar",
+        "theme-pyramid-funnel",
+        "theme-radar",
+        "theme-resource",
+        "theme-scatter",
+        "theme-sparkline",
+        "theme-stock",
+        "theme-tag-cloud",
+        "theme-treemap",
+        "theme-venn",
+        "theme-waterfall"
+      ]
+    },
+    "anychart-annotations": {
+      "type": "feature",
+      "name": "Drawing Annotations",
+      "desc": "Drawings and annotations module.",
+      "docs": "https://docs.anychart.com/Stock_Charts/Drawing_Tools_and_Annotations/",
+      "icon": "/products/anystock/history/images/stock_drawing_tools.svg",
+      "parts": [
+        "annotations",
+        "theme-annotations"
+      ]
+    },
+    "anychart-chart-editor": {
+      "type": "feature",
+      "name": "Chart Editor",
+      "desc": "AnyChart chart editor module.",
+      "docs": "",
+      "icon": "/_design/img/upload/charts/types/area-chart.svg",
+      "parts": [
+        "chart-editor"
+      ]
+    },
+    "anychart-data-adapter": {
+      "type": "feature",
+      "name": "Data Adapter",
+      "desc": "AnyChart data adapter module.",
+      "docs": "https://docs.anychart.com/Working_with_Data/Data_Adapter/",
+      "icon": "/_design/img/upload/charts/types/area-chart.svg",
+      "parts": [
+        "data-adapter"
+      ]
+    },
+    "anychart-exports": {
+      "type": "feature",
+      "name": "Exports",
+      "desc": "Export to CSV, Excel, PNG, JPG and PDF module.",
+      "docs": "https://docs.anychart.com/Common_Settings/Exports",
+      "icon": "/_design/img/upload/charts/types/area-chart.svg",
+      "parts": [
+        "exports"
+      ]
+    },
+    "anychart-table": {
+      "type": "feature",
+      "name": "Table UI",
+      "desc": "AnyChart table UI element.",
+      "docs": "",
+      "icon": "/_design/img/upload/charts/types/area-chart.svg",
+      "parts": [
+        "table"
+      ]
+    },
+    "anychart-ui": {
+      "type": "feature",
+      "name": "Common UI",
+      "desc": "Context menu, range picker, range selector and preloader module.",
+      "docs": "",
+      "icon": "/_design/img/upload/charts/types/area-chart.svg",
+      "parts": [
+        "ui"
+      ]
+    },
+    "anychart-ui-binding": {
+      "type": "feature",
+      "name": "UI Binding",
+      "desc": "UI Binding module is a set of utilities to bind HTML5 UI elements to chart settings.",
+      "docs": "",
+      "icon": "/_design/img/upload/charts/types/area-chart.svg",
+      "parts": [
+        "binding"
+      ]
+    },
+    "anychart-vml": {
+      "type": "feature",
+      "name": "VML Renderer",
+      "desc": "Module that enables VML support for old browsers.",
+      "docs": "",
+      "icon": "/_design/img/upload/charts/types/area-chart.svg",
+      "parts": [
+        "vml"
+      ]
+    },
+
+    "anychart-bullet": {
+      "type": "chart-type",
+      "name": "Bullet Charts",
+      "desc": "Bullet charts module.",
+      "docs": "https://docs.anychart.com/Basic_Charts/Bullet_Chart",
+      "icon": "/_design/img/upload/charts/types/bullet-chart.svg",
+      "parts": [
+        "bullet",
+        "theme-bullet"
+      ]
+    },
+    "anychart-cartesian-3d": {
+      "type": "chart-type",
+      "name": "Basic 3D Cartesian Charts",
+      "desc": "Basic 3D cartesian charts module.",
+      "docs": "https://docs.anychart.com/Basic_Charts/3D/",
+      "icon": "/_design/img/upload/charts/types/area-chart.svg",
+      "parts": [
+        "cartesian-3d",
+        "theme-cartesian-3d"
+      ]
+    },
+    "anychart-circular-gauge": {
+      "type": "chart-type",
+      "name": "Circular Gauges",
+      "desc": "Circular gauges module.",
+      "docs": "https://docs.anychart.com/Gauges/Circular_Gauge",
+      "icon": "/_design/img/upload/charts/types/circular-gauge.svg",
+      "parts": [
+        "circular-gauge",
+        "theme-circular-gauge"
+      ]
+    },
+    "anychart-linear-gauge": {
+      "type": "chart-type",
+      "name": "Linear Gauges",
+      "desc": "Linear gauges module.",
+      "docs": "https://docs.anychart.com/Gauges/Linear_Gauge",
+      "icon": "/_design/img/upload/charts/types/vertical-gauge-1.svg",
+      "parts": [
+        "color-scales",
+        "theme-color-scales",
+        "linear-gauge-part",
+        "theme-linear-gauge"
+      ]
+    },
+    "anychart-mekko": {
+      "type": "chart-type",
+      "name": "Mekko Charts",
+      "desc": "Mekko charts module.",
+      "docs": "https://docs.anychart.com/Basic_Charts/Marimekko_Chart/Mekko_Chart",
+      "icon": "/_design/img/upload/charts/types/mosaic-chart.svg",
+      "parts": [
+        "mekko",
+        "theme-mekko"
+      ]
+    },
+    "anychart-pareto": {
+      "type": "chart-type",
+      "name": "Pareto Chart",
+      "desc": "Pareto chart module.",
+      "docs": "https://docs.anychart.com/Basic_Charts/Pareto_Chart",
+      "icon": "/_design/img/upload/charts/types/pareto-chart.svg",
+      "parts": [
+        "pareto",
+        "theme-pareto"
+      ]
+    },
+    "anychart-pyramid-funnel": {
+      "type": "chart-type",
+      "name": "Pyramid and Funnel Charts",
+      "desc": "Pyramid and funnel charts module.",
+      "docs": "",
+      "icon": "/_design/img/upload/charts/types/funnel-chart.svg",
+      "parts": [
+        "pyramid-funnel",
+        "theme-pyramid-funnel"
+      ]
+    },
+    "anychart-resource": {
+      "type": "chart-type",
+      "name": "Resource Chart",
+      "desc": "Resource chart module.",
+      "docs": "https://docs.anychart.com/beta/Resource_Chart",
+      "icon": "/_design/img/upload/charts/types/area-chart.svg",
+      "parts": [
+        "resource",
+        "theme-resource"
+      ]
+    },
+    "anychart-sparkline": {
+      "type": "chart-type",
+      "name": "Sparkline Charts",
+      "desc": "Sparkline charts module.",
+      "docs": "https://docs.anychart.com/Basic_Charts/Sparkline_Chart",
+      "icon": "/_design/img/upload/charts/types/sparkline-chart-1.svg",
+      "parts": [
+        "sparkline",
+        "theme-sparkline"
+      ]
+    },
+    "anychart-stock": {
+      "type": "chart-type",
+      "name": "Stock Charts",
+      "desc": "Stock charts module.",
+      "docs": "https://docs.anychart.com/Stock_Charts/",
+      "icon": "/_design/img/upload/charts/types/stock-chart.svg",
+      "parts": [
+        "stock",
+        "theme-stock"
+      ]
+    },
+    "anychart-venn": {
+      "type": "chart-type",
+      "name": "Venn Diagram",
+      "desc": "Venn diagram module.",
+      "docs": "https://docs.anychart.com/Basic_Charts/Venn_Diagram",
+      "icon": "/_design/img/upload/charts/types/venn-diagram.svg",
+      "parts": [
+        "venn",
+        "theme-venn"
+      ]
+    },
+    "anychart-waterfall": {
+      "type": "chart-type",
+      "name": "Waterfall Chart",
+      "desc": "Waterfall charts module.",
+      "docs": "https://docs.anychart.com/Basic_Charts/Waterfall_Chart",
+      "icon": "/_design/img/upload/charts/types/waterfall-chart.svg",
+      "parts": [
+        "waterfall",
+        "theme-waterfall"
+      ]
+    },
+    "anychart-cartesian": {
+      "type": "chart-type",
+      "name": "Basic Cartesian Charts",
+      "desc": "Basic cartesian charts (Bar, Line, Column, etc.) module.",
+      "docs": "",
+      "icon": "/_design/img/upload/charts/types/area-chart.svg",
+      "parts": [
+        "cartesian",
+        "theme-cartesian"
+      ]
+    },
+    "anychart-scatter": {
+      "type": "chart-type",
+      "name": "Scatter Cartesian Charts",
+      "desc": "Scatter cartesian charts module.",
+      "docs": "https://docs.anychart.com/Basic_Charts/Scatter_Plot/",
+      "icon": "/_design/img/upload/charts/types/dot-marker-chart.svg",
+      "parts": [
+        "cartesian",
+        "theme-cartesian",
+        "scatter",
+        "theme-scatter"
+      ]
+    },
+    "anychart-pie": {
+      "type": "chart-type",
+      "name": "Pie and Donut Charts",
+      "desc": "Pie and donut charts module.",
+      "docs": "https://docs.anychart.com/Basic_Charts/Pie_Chart",
+      "icon": "/_design/img/upload/charts/types/pie-chart.svg",
+      "parts": [
+        "pie",
+        "theme-pie"
+      ]
+    },
+    "anychart-radar": {
+      "type": "chart-type",
+      "name": "Radar Charts",
+      "desc": "Radar charts module.",
+      "docs": "https://docs.anychart.com/Basic_Charts/Radar_Plot/",
+      "icon": "/_design/img/upload/charts/types/radar-chart-1.svg",
+      "parts": [
+        "radar-polar-base",
+        "radar-part",
+        "theme-radar"
+      ]
+    },
+    "anychart-polar": {
+      "type": "chart-type",
+      "name": "Polar Charts",
+      "desc": "Polar charts module.",
+      "docs": "https://docs.anychart.com/Basic_Charts/Polar_Plot/",
+      "icon": "/_design/img/upload/charts/types/polar-polyline-chart.svg",
+      "parts": [
+        "radar-polar-base",
+        "polar-part",
+        "theme-polar"
+      ]
+    },
+    "anychart-gantt": {
+      "type": "chart-type",
+      "name": "Gantt Charts",
+      "desc": "Gantt and gantt resource charts module.",
+      "docs": "https://docs.anychart.com/Gantt_Chart/",
+      "icon": "/_design/img/upload/charts/types/gantt-chart.svg",
+      "parts": [
+        "tree-data",
+        "gantt-part",
+        "theme-gantt"
+      ]
+    },
+    "anychart-heatmap": {
+      "type": "chart-type",
+      "name": "Heatmap Chart",
+      "desc": "Heatmap сhart module.",
+      "docs": "https://docs.anychart.com/Basic_Charts/Heat_Map_Chart",
+      "icon": "/_design/img/upload/charts/types/heatmap-chart.svg",
+      "parts": [
+        "color-scales",
+        "theme-color-scales",
+        "heatmap-part",
+        "theme-heatmap"
+      ]
+    },
+    "anychart-map": {
+      "type": "chart-type",
+      "name": "Geo Maps",
+      "desc": "Geo Maps chart module. Does not contain map geo data, only engine.",
+      "docs": "https://docs.anychart.com/Maps/",
+      "icon": "/_design/img/upload/charts/types/choropleth-map.svg",
+      "parts": [
+        "color-scales",
+        "theme-color-scales",
+        "map-part",
+        "theme-map"
+      ]
+    },
+    "anychart-pert": {
+      "type": "chart-type",
+      "name": "PERT Chart",
+      "desc": "PERT chart module.",
+      "docs": "https://docs.anychart.com/PERT_Chart/",
+      "icon": "/_design/img/upload/charts/types/pert-chart.svg",
+      "parts": [
+        "tree-data",
+        "pert",
+        "theme-pert"
+      ]
+    },
+    "anychart-tag-cloud": {
+      "type": "chart-type",
+      "name": "Tag Cloud",
+      "desc": "Tag cloud (word Cloud) chart module.",
+      "docs": "https://docs.anychart.com/Basic_Charts/Tag_Cloud",
+      "icon": "/_design/img/upload/charts/types/tag-cloud.svg",
+      "parts": [
+        "color-scales",
+        "theme-color-scales",
+        "tag-cloud-part",
+        "theme-tag-cloud"
+      ]
+    },
+    "anychart-treemap": {
+      "type": "chart-type",
+      "name": "Treemap",
+      "desc": "Treemap charts module.",
+      "docs": "https://docs.anychart.com/Basic_Charts/Treemap_Chart",
+      "icon": "/_design/img/upload/charts/types/treemap-chart.svg",
+      "parts": [
+        "tree-data",
+        "color-scales",
+        "theme-color-scales",
+        "treemap-part",
+        "theme-treemap"
+      ]
+    }
+  },
+  "themes": {
+    "coffee": {"name": "Coffee", "desc": "Coffee Theme. Dimmed brown and brownish colors.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "dark_blue": {"name": "Dark Blue", "desc": "Dark Blue Theme. Dimmed blue and blueish colors.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "dark_earth": {"name": "Dark Earth", "desc": "Dark Earth Theme. Dimmed green and orange colors.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "dark_glamour": {"name": "Dark Glamour", "desc": "Dark Glamour Theme. Dark backgrounds and vibrant pink and magenta.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "dark_provence": {"name": "Dark Provence", "desc": "Dark Provence Theme. Dark backgrounds and soft colors.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "dark_turquoise": {"name": "Dark Turquoise", "desc": "Dark Turquoise Theme. Dark backgrounds and and soft turquoise colors.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "light_blue": {"name": "Light Blue", "desc": "Light Blue Theme. ", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "light_earth": {"name": "Light Earth", "desc": "Light Earth Theme. Dimmed light blue and blueish colors.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "light_glamour": {"name": "Light Glamour", "desc": "Light Glamour Theme. Light backgrounds and vibrant pink and magenta.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "light_provence": {"name": "Light Provence", "desc": "Light Provence Theme. Light backgrounds and soft colors.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "light_turquoise": {"name": "Light Turquoise", "desc": "Light Turquoise Theme. Light backgrounds and and soft turquoise colors.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "monochrome": {"name": "Monochrome", "desc": "Monochrome Theme. Light background and grayish colors.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "morning": {"name": "Morning", "desc": "Morning Theme. Light background and vivid colors.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "pastel": {"name": "Pastel", "desc": "Pastel Theme. Light background and pastel colors.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "sea": {"name": "Sea", "desc": "Sea Theme. Light background and thalassian palette.", "icon": "/_design/img/upload/charts/types/area-chart.svg"},
+    "wines": {"name": "Wines", "desc": "Wines Theme. Dark background and lively colors.", "icon": "/_design/img/upload/charts/types/area-chart.svg"}
+  }
+}

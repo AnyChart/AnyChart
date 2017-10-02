@@ -26,14 +26,14 @@ anychart.core.axisMarkers.PathBase = function() {
 
   /**
    * Current scale.
-   * @type {anychart.scales.Base|anychart.scales.GanttDateTime}
+   * @type {anychart.scales.Base|anychart.ganttModule.Scale}
    * @private
    */
   this.scale_;
 
   /**
    * Assigned axis.
-   * @type {anychart.core.axes.Linear}
+   * @type {anychart.core.Axis}
    * @private
    */
   this.axis_ = null;
@@ -119,25 +119,35 @@ anychart.core.axisMarkers.PathBase.prototype.layout = goog.abstractMethod;
 /**
  * Getter/setter for default scale.
  * Works with instances of anychart.scales.Base only.
- * @param {(anychart.scales.Base|anychart.scales.GanttDateTime)=} opt_value - Scale.
- * @return {anychart.scales.Base|anychart.scales.GanttDateTime|!anychart.core.axisMarkers.PathBase} - Axis scale or
+ * @param {(anychart.scales.Base|anychart.ganttModule.Scale|Object|anychart.enums.ScaleTypes)=} opt_value - Scale.
+ * @return {anychart.scales.Base|anychart.ganttModule.Scale|!anychart.core.axisMarkers.PathBase} - Axis scale or
  *  itself for method chaining.
  */
 anychart.core.axisMarkers.PathBase.prototype.scaleInternal = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.scale_ != opt_value) {
-      if (this.scale_)
+    var scType = opt_value && goog.isFunction(opt_value.getType) && opt_value.getType();
+    var ganttScale = scType == anychart.enums.ScaleTypes.GANTT;
+    var val = ganttScale ?
+        (opt_value == this.scale_ ? null : opt_value) :
+        anychart.scales.Base.setupScale(/** @type {anychart.scales.Base} */(this.scale_), opt_value, null, anychart.scales.Base.ScaleTypes.ALL_DEFAULT, null, this.scaleInvalidated, this);
+    if (val || (goog.isNull(opt_value) && this.scale_)) {
+      var dispatch = this.scale_ == val;
+      var listenForGantt = (ganttScale && !this.scale_);
+      if (!val)
         this.scale_.unlistenSignals(this.scaleInvalidated, this);
-      this.scale_ = opt_value;
-      if (this.scale_)
+      this.scale_ = /** @type {anychart.ganttModule.Scale|anychart.scales.Base} */(val);
+      if (listenForGantt)
         this.scale_.listenSignals(this.scaleInvalidated, this);
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      if (val && !ganttScale)
+        val.resumeSignalsDispatching(dispatch);
+      if (!dispatch)
+        this.invalidate(anychart.ConsistencyState.BOUNDS,
+            anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   } else {
     if (this.scale_) {
-      return /** @type {anychart.scales.Base|anychart.scales.GanttDateTime} */ (this.scale_);
+      return /** @type {anychart.scales.Base|anychart.ganttModule.Scale} */ (this.scale_);
     } else {
       if (this.axis_)
         return /** @type {?anychart.scales.Base} */ (this.axis_.scale());
@@ -201,8 +211,8 @@ anychart.core.axisMarkers.PathBase.prototype.axisInvalidated_ = function(event) 
 
 /**
  * Sets axis for marker.
- * @param {anychart.core.axes.Linear=} opt_value - Value to be set.
- * @return {(anychart.core.axes.Linear|anychart.core.axisMarkers.PathBase)} - Current value or itself for method chaining.
+ * @param {anychart.core.Axis=} opt_value - Value to be set.
+ * @return {(anychart.core.Axis|anychart.core.axisMarkers.PathBase)} - Current value or itself for method chaining.
  */
 anychart.core.axisMarkers.PathBase.prototype.axis = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -323,7 +333,7 @@ anychart.core.axisMarkers.PathBase.prototype.draw = function() {
  * @return {anychart.core.axisMarkers.PathBase} - Itself for method chaining.
  */
 anychart.core.axisMarkers.PathBase.prototype.drawLine = function() {
-  var scale = /** @type {anychart.scales.Base|anychart.scales.GanttDateTime} */ (this.scale());
+  var scale = /** @type {anychart.scales.Base|anychart.ganttModule.Scale} */ (this.scale());
 
   if (!scale) { //Here we can get null.
     anychart.core.reporting.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
@@ -365,7 +375,7 @@ anychart.core.axisMarkers.PathBase.prototype.drawLine = function() {
 anychart.core.axisMarkers.PathBase.prototype.drawRange = function() {
   var range = /** @type {anychart.core.axisMarkers.PathBase.Range} */ (this.val);
 
-  var scale = /** @type {anychart.scales.Base|anychart.scales.GanttDateTime} */ (this.scale());
+  var scale = /** @type {anychart.scales.Base|anychart.ganttModule.Scale} */ (this.scale());
 
   if (!scale) { //Here we can get null.
     anychart.core.reporting.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
@@ -467,7 +477,7 @@ anychart.core.axisMarkers.PathBase.prototype.setupByJSON = function(config, opt_
       if (this.chart_) {
         this.axis((/** @type {anychart.core.CartesianBase} */(this.chart_)).getAxisByIndex(ax));
       }
-    } else if (ax instanceof anychart.core.axes.Linear) {
+    } else if (anychart.utils.instanceOf(ax, anychart.core.Axis)) {
       this.axis(ax);
     }
   }

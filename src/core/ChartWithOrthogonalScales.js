@@ -2,7 +2,6 @@ goog.provide('anychart.core.ChartWithOrthogonalScales');
 
 goog.require('anychart.animations');
 goog.require('anychart.core.ChartWithSeries');
-goog.require('anychart.core.IChart');
 goog.require('anychart.core.IPlot');
 goog.require('anychart.scales');
 goog.require('goog.array');
@@ -13,7 +12,6 @@ goog.require('goog.array');
  * A base class for the chart with series.
  * @constructor
  * @extends {anychart.core.ChartWithSeries}
- * @implements {anychart.core.IChart}
  * @implements {anychart.core.IPlot}
  * @param {boolean} categorizeData
  */
@@ -24,7 +22,7 @@ anychart.core.ChartWithOrthogonalScales = function(categorizeData) {
    * If true, all default chart elements layout is swapped.
    * @type {boolean}
    */
-  this.barChartMode = false;
+  this.isVerticalInternal = false;
 
   /**
    * If series data should be sorted and joined
@@ -51,17 +49,8 @@ anychart.core.ChartWithOrthogonalScales = function(categorizeData) {
    */
   this.hasStackedSeries = false;
 
-  /**
-   * @type {number}
-   * @private
-   */
-  this.barGroupsPadding_ = 0;
-
-  /**
-   * @type {number}
-   * @private
-   */
-  this.barsPadding_ = 0;
+  this.setOption('barGroupsPadding', 0);
+  this.setOption('barsPadding', 0);
 
   /**
    * Y scales hash map by uid.
@@ -90,6 +79,23 @@ anychart.core.ChartWithOrthogonalScales = function(categorizeData) {
    * @protected
    */
   this.drawingPlansByXScale = {};
+
+  function beforeInvalidation() {
+    this.invalidateWidthBasedSeries();
+  }
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['barGroupsPadding',
+      anychart.ConsistencyState.SERIES_CHART_SERIES | anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED,
+      0,
+      beforeInvalidation],
+    ['barsPadding',
+      anychart.ConsistencyState.SERIES_CHART_SERIES | anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED,
+      0,
+      beforeInvalidation]
+  ]);
 };
 goog.inherits(anychart.core.ChartWithOrthogonalScales, anychart.core.ChartWithSeries);
 
@@ -121,40 +127,38 @@ anychart.core.ChartWithOrthogonalScales.prototype.SUPPORTED_CONSISTENCY_STATES =
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter/setter for barGroupsPadding.
- * @param {number=} opt_value .
- * @return {number|anychart.core.ChartWithOrthogonalScales} .
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.core.ChartWithOrthogonalScales.prototype.barGroupsPadding = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.barGroupsPadding_ != +opt_value) {
-      this.barGroupsPadding_ = +opt_value;
-      this.invalidateWidthBasedSeries();
-      this.invalidate(anychart.ConsistencyState.SERIES_CHART_SERIES | anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.barGroupsPadding_;
-};
+anychart.core.ChartWithOrthogonalScales.PROPERTY_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'barGroupsPadding',
+      anychart.utils.toNumber);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'barsPadding',
+      anychart.utils.toNumber);
+
+  return map;
+})();
+anychart.core.settings.populate(anychart.core.ChartWithOrthogonalScales, anychart.core.ChartWithOrthogonalScales.PROPERTY_DESCRIPTORS);
 
 
 /**
- * Getter/setter for barsPadding.
- * @param {number=} opt_value .
- * @return {number|anychart.core.ChartWithOrthogonalScales} .
+ * @inheritDoc
  */
-anychart.core.ChartWithOrthogonalScales.prototype.barsPadding = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.barsPadding_ != +opt_value) {
-      this.barsPadding_ = +opt_value;
-      this.invalidateWidthBasedSeries();
-      this.invalidate(anychart.ConsistencyState.SERIES_CHART_SERIES | anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
+anychart.core.ChartWithOrthogonalScales.prototype.drawSeriesInOrder = function() {
+  var stackDirection = /** @type {anychart.enums.ScaleStackDirection} */ (this.yScale().stackDirection());
+  var stackIsDirect = stackDirection == anychart.enums.ScaleStackDirection.DIRECT;
+  for (var i = 0; i < this.seriesList.length; i++) {
+    this.seriesList[stackIsDirect ? this.seriesList.length - i - 1 : i].draw();
   }
-  return this.barsPadding_;
 };
 
 
@@ -172,71 +176,83 @@ anychart.core.ChartWithOrthogonalScales.prototype.allowLegendCategoriesMode = fu
 
 
 /**
- * Checks x scale type.
- * @param {*} scale
- * @return {boolean}
+ * @return {anychart.enums.ScaleTypes}
  */
-anychart.core.ChartWithOrthogonalScales.prototype.checkXScaleType = function(scale) {
-  var res = (scale instanceof anychart.scales.Base) && !scale.isColorScale();
-  if (!res)
-    anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['Chart scale', 'ordinal, linear, log, datetime']);
-  return res;
+anychart.core.ChartWithOrthogonalScales.prototype.getXScaleDefaultType = function() {
+  return anychart.enums.ScaleTypes.ORDINAL;
 };
 
 
 /**
- * Checks y scale type.
- * @param {*} scale
- * @return {boolean}
+ * @return {anychart.scales.Base.ScaleTypes}
  */
-anychart.core.ChartWithOrthogonalScales.prototype.checkYScaleType = anychart.core.ChartWithOrthogonalScales.prototype.checkXScaleType;
+anychart.core.ChartWithOrthogonalScales.prototype.getXScaleAllowedTypes = function() {
+  return anychart.scales.Base.ScaleTypes.ALL_DEFAULT;
+};
 
 
 /**
- * Creates scale by passed type.
- * @param {string} value
- * @param {boolean} isXScale
- * @param {boolean} returnNullOnError
- * @return {anychart.scales.Base}
+ * @return {Array}
  */
-anychart.core.ChartWithOrthogonalScales.prototype.createScaleByType = function(value, isXScale, returnNullOnError) {
-  return anychart.scales.Base.fromString(value, returnNullOnError ? null : isXScale);
+anychart.core.ChartWithOrthogonalScales.prototype.getXScaleWrongTypeError = function() {
+  return ['Chart scale', 'ordinal, linear, log, date-time'];
+};
+
+
+/**
+ * @return {anychart.enums.ScaleTypes}
+ */
+anychart.core.ChartWithOrthogonalScales.prototype.getYScaleDefaultType = function() {
+  return anychart.enums.ScaleTypes.LINEAR;
+};
+
+
+/**
+ * @return {anychart.scales.Base.ScaleTypes}
+ */
+anychart.core.ChartWithOrthogonalScales.prototype.getYScaleAllowedTypes = function() {
+  return this.getXScaleAllowedTypes();
+};
+
+
+/**
+ * @return {Array}
+ */
+anychart.core.ChartWithOrthogonalScales.prototype.getYScaleWrongTypeError = function() {
+  return this.getXScaleWrongTypeError();
 };
 
 
 /**
  * Getter/setter for xScale.
- * @param {(anychart.enums.ScaleTypes|anychart.scales.Base)=} opt_value X Scale to set.
+ * @param {(anychart.enums.ScaleTypes|Object|anychart.scales.Base)=} opt_value X Scale to set.
  * @return {!(anychart.scales.Base|anychart.core.ChartWithOrthogonalScales)} Default chart scale value or itself for method chaining.
  */
 anychart.core.ChartWithOrthogonalScales.prototype.xScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (goog.isString(opt_value)) {
-      opt_value = this.createScaleByType(opt_value, true, true);
-    }
-    if (this.checkXScaleType(opt_value) && this.xScale_ != opt_value) {
-      if (this.xScale_)
-        this.xScale_.unlistenSignals(this.xScaleInvalidated, this);
-      this.xScale_ = opt_value;
-      if (this.xScale_)
-        this.xScale_.listenSignals(this.xScaleInvalidated, this);
+    var val = anychart.scales.Base.setupScale(this.xScale_, opt_value, null, this.getXScaleAllowedTypes(), this.getXScaleWrongTypeError(), this.xScaleInvalidated, this);
+    if (val) {
+      var dispatch = this.xScale_ == val;
+      this.xScale_ = val;
+      val.resumeSignalsDispatching(dispatch);
 
-      var state = anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS;
-      if (this.allowLegendCategoriesMode() &&
-          this.legend().itemsSourceMode() == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
-        state |= anychart.ConsistencyState.CHART_LEGEND;
+      if (!dispatch) {
+        var state = anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS;
+        if (this.allowLegendCategoriesMode() &&
+            this.legend().itemsSourceMode() == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
+          state |= anychart.ConsistencyState.CHART_LEGEND;
+        }
+        this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
       }
-      this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
-  } else {
-    if (!this.xScale_) {
-      // should create default scale
-      this.xScale_ = this.createScaleByType('', true, false);
-      this.xScale_.listenSignals(this.xScaleInvalidated, this);
-    }
-    return /** @type {!anychart.scales.Base} */(this.xScale_);
   }
+  if (!this.xScale_) {
+    // should create default xScale
+    this.xScale_ = anychart.scales.Base.setupScale(this.xScale_, {}, this.getXScaleDefaultType(), this.getXScaleAllowedTypes(), null, this.xScaleInvalidated, this);
+    this.xScale_.resumeSignalsDispatching(false);
+  }
+  return /** @type {!anychart.scales.Base} */(this.xScale_);
 };
 
 
@@ -266,31 +282,27 @@ anychart.core.ChartWithOrthogonalScales.prototype.xScaleInvalidated = function(e
 
 /**
  * Getter/setter for yScale.
- * @param {(anychart.enums.ScaleTypes|anychart.scales.Base)=} opt_value Y Scale to set.
+ * @param {(anychart.enums.ScaleTypes|Object|anychart.scales.Base)=} opt_value Y Scale to set.
  * @return {!(anychart.scales.Base|anychart.core.ChartWithOrthogonalScales)} Default chart scale value or itself for method chaining.
  */
 anychart.core.ChartWithOrthogonalScales.prototype.yScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (goog.isString(opt_value)) {
-      opt_value = this.createScaleByType(opt_value, false, true);
-    }
-    if (this.checkYScaleType(opt_value) && this.yScale_ != opt_value) {
-      if (this.yScale_)
-        this.yScale_.unlistenSignals(this.yScaleInvalidated, this);
-      this.yScale_ = opt_value;
-      if (this.yScale_)
-        this.yScale_.listenSignals(this.yScaleInvalidated, this);
-
-      this.invalidate(anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS, anychart.Signal.NEEDS_REDRAW);
+    var val = anychart.scales.Base.setupScale(this.yScale_, opt_value, null, this.getYScaleAllowedTypes(), this.getYScaleWrongTypeError(), this.yScaleInvalidated, this);
+    if (val) {
+      var dispatch = this.yScale_ == val;
+      this.yScale_ = val;
+      this.yScale_.resumeSignalsDispatching(dispatch);
+      if (!dispatch)
+        this.invalidate(anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
-  } else {
-    if (!this.yScale_) {
-      this.yScale_ = this.createScaleByType('', false, false);
-      this.yScale_.listenSignals(this.yScaleInvalidated, this);
-    }
-    return /** @type {!anychart.scales.Base} */(this.yScale_);
   }
+  if (!this.yScale_) {
+    // should create default yScale
+    this.yScale_ = anychart.scales.Base.setupScale(this.yScale_, {}, this.getYScaleDefaultType(), this.getYScaleAllowedTypes(), null, this.yScaleInvalidated, this);
+    this.yScale_.resumeSignalsDispatching(false);
+  }
+  return /** @type {!anychart.scales.Base} */(this.yScale_);
 };
 
 
@@ -385,7 +397,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.makeScaleMaps = function() {
     anychart.core.Base.suspendSignalsDispatching(this.seriesList);
     var i, series;
     var seriesCount = this.seriesList.length;
-    var changed = false;
+    var changed = !seriesCount;
     var xScales = {};
     var yScales = {};
     for (i = 0; i < seriesCount; i++) {
@@ -452,7 +464,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateXScales = function() 
       drawingPlans = this.drawingPlansByXScale[uid];
       if (!drawingPlans)
         this.drawingPlansByXScale[uid] = drawingPlans = [];
-      if (xScale instanceof anychart.scales.Ordinal) {
+      if (anychart.utils.instanceOf(xScale, anychart.scales.Ordinal)) {
         var xHashMap, xArray;
         var restricted = !xScale.needsAutoCalc();
         if (drawingPlans.length) {
@@ -470,7 +482,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateXScales = function() 
         }
         drawingPlan = series.getOrdinalDrawingPlan(xHashMap, xArray, restricted);
       } else {
-        drawingPlan = series.getScatterDrawingPlan(true, xScale instanceof anychart.scales.DateTime);
+        drawingPlan = series.getScatterDrawingPlan(true, anychart.utils.instanceOf(xScale, anychart.scales.DateTime));
       }
       drawingPlans.push(drawingPlan);
       this.drawingPlans.push(drawingPlan);
@@ -489,7 +501,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateXScales = function() 
       // equalizing drawing plans and populating them with missing points
       if (drawingPlans.length > 1) {
         drawingPlan = drawingPlans[drawingPlans.length - 1];
-        if (xScale instanceof anychart.scales.Ordinal) {
+        if (anychart.utils.instanceOf(xScale, anychart.scales.Ordinal)) {
           var lastPlanXArray = drawingPlan.xArray;
           // we need to populate other series data with missing points to the length of the last array
           for (i = 0; i < drawingPlans.length - 1; i++) {
@@ -621,7 +633,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateXScales = function() 
             var drawingPlan = drawingPlans[i];
             var meta = drawingPlan.data[+index].meta;
             if (!anychart.core.series.filterPointAbsenceReason(meta['missing'],
-                anychart.core.series.PointAbsenceReason.EXCLUDED_OR_ARTIFICIAL))
+                    anychart.core.series.PointAbsenceReason.EXCLUDED_OR_ARTIFICIAL))
               return false;
           }
           return true;
@@ -629,7 +641,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateXScales = function() 
       }
       drawingPlan = drawingPlans[0];
       if (xScale.needsAutoCalc()) {
-        if (xScale instanceof anychart.scales.Ordinal) {
+        if (anychart.utils.instanceOf(xScale, anychart.scales.Ordinal)) {
           if (hasExcludes) {
             xHashMap = {};
             xArray = [];
@@ -684,7 +696,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateXScales = function() 
           }
         }
       }
-      if (xScale instanceof anychart.scales.Ordinal) {
+      if (anychart.utils.instanceOf(xScale, anychart.scales.Ordinal)) {
         var namesField = xScale.getNamesField();
         // retrieving names
         if (namesField) {
@@ -710,6 +722,13 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateXScales = function() 
       if (xScale.needsAutoCalc())
         xScale.finishAutoCalc();
     }
+
+    //This action correctly resets scale domain when all series are removed.
+    if (goog.object.isEmpty(this.xScales) && this.xScale().needsAutoCalc()) {
+      this.xScale().startAutoCalc();
+      this.xScale().finishAutoCalc();
+    }
+
     this.markConsistent(anychart.ConsistencyState.SCALE_CHART_SCALES);
     anychart.performance.end('X scales and drawing plan calculation');
   }
@@ -782,7 +801,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateYScales = function() 
       data = this.drawingPlansByXScale[xScaleUid][0].data;
       var dataLength = data.length;
       var xScale = this.xScales[xScaleUid];
-      if (xScale instanceof anychart.scales.Ordinal) {
+      if (anychart.utils.instanceOf(xScale, anychart.scales.Ordinal)) {
         if (dataLength) {
           firstIndex = goog.math.clamp(Math.floor(this.getZoomStartRatio() * dataLength - 1), 0, dataLength - 1);
           lastIndex = goog.math.clamp(Math.ceil(this.getZoomEndRatio() * dataLength + 1), 0, dataLength - 1);
@@ -825,7 +844,9 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateYScales = function() 
         drawingPlans = drawingPlansByYScale[yScaleUid];
         yScale = this.yScales[yScaleUid];
         var stackMode = this.getYScaleStackMode(yScale);
+        var stackDirection = /** @type {anychart.enums.ScaleStackDirection} */ (this.yScale().stackDirection());
         var yScaleStacked = stackMode != anychart.enums.ScaleStackMode.NONE;
+        var stackIsDirect = stackDirection == anychart.enums.ScaleStackDirection.DIRECT;
         var yScalePercentStacked = stackMode == anychart.enums.ScaleStackMode.PERCENT;
         var stack, stackVal;
         if (yScaleStacked) {
@@ -840,12 +861,17 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateYScales = function() 
               nextNegative: 0,
               prevMissing: false,
               nextMissing: false,
-              missing: false
+              missing: false,
+              shared: {
+                positiveAnchor: NaN,
+                negativeAnchor: NaN
+              }
             });
           }
         }
+
         for (i = 0; i < drawingPlans.length; i++) {
-          drawingPlan = drawingPlans[i];
+          drawingPlan = drawingPlans[stackIsDirect ? drawingPlans.length - i - 1 : i];
           series = /** @type {anychart.core.series.Cartesian} */(drawingPlan.series);
           drawingPlan.firstIndex = firstIndex;
           drawingPlan.lastIndex = lastIndex;
@@ -856,6 +882,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateYScales = function() 
             for (j = firstIndex; j <= lastIndex; j++) {
               point = data[j];
               stackVal = stack[j - firstIndex];
+              point.meta['shared'] = stackVal.shared;
               point.meta['stackedMissing'] = stackVal.missing;
               if (anychart.core.series.filterPointAbsenceReason(point.meta['missing'],
                       anychart.core.series.PointAbsenceReason.ANY_BUT_RANGE)) {
@@ -1012,6 +1039,11 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateYScales = function() 
         yScale.finishAutoCalc();
     }
 
+    //This action correctly resets scale domain when all series are removed.
+    if (goog.object.isEmpty(this.yScales) && this.yScale().needsAutoCalc()) {
+      this.yScale().startAutoCalc();
+      this.yScale().finishAutoCalc();
+    }
 
     this.invalidate(anychart.ConsistencyState.SCALE_CHART_STATISTICS | anychart.ConsistencyState.SCALE_CHART_SCALES_STATISTICS);
     this.markConsistent(anychart.ConsistencyState.SCALE_CHART_Y_SCALES);
@@ -1050,10 +1082,10 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateXYScales = function()
       if (!series || !series.enabled()) continue;
       xScale = /** @type {anychart.scales.Base} */(series.xScale());
       yScale = /** @type {anychart.scales.Base} */(series.yScale());
-      if (xScale instanceof anychart.scales.Ordinal) {
+      if (anychart.utils.instanceOf(xScale, anychart.scales.Ordinal)) {
         drawingPlan = series.getOrdinalDrawingPlan({}, [], false, true);
       } else {
-        drawingPlan = series.getScatterDrawingPlan(false, xScale instanceof anychart.scales.DateTime);
+        drawingPlan = series.getScatterDrawingPlan(false, anychart.utils.instanceOf(xScale, anychart.scales.DateTime));
       }
       series = /** @type {anychart.core.series.Cartesian} */(drawingPlan.series);
       var seriesExcludes = series.getExcludedIndexesInternal();
@@ -1164,7 +1196,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateScalesMinMaxStatistic
   var xScaleMax;
   for (i = 0; i < xScales.length; i++) {
     scale = xScales[i];
-    if (scale instanceof anychart.scales.ScatterBase) {
+    if (anychart.utils.instanceOf(scale, anychart.scales.ScatterBase)) {
       if (!goog.isDef(xScaleMin)) {
         xScaleMin = scale.minimum();
         xScaleMax = scale.maximum();
@@ -1179,7 +1211,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateScalesMinMaxStatistic
   var yScaleMax;
   for (i = 0; i < yScales.length; i++) {
     scale = yScales[i];
-    if (scale instanceof anychart.scales.ScatterBase) {
+    if (anychart.utils.instanceOf(scale, anychart.scales.ScatterBase)) {
       if (!goog.isDef(yScaleMin)) {
         yScaleMin = scale.minimum();
         yScaleMax = scale.maximum();
@@ -1570,7 +1602,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.distributeSeries = function() 
     // spreading column and bar series to the total width of X categories
     for (xId in this.drawingPlansByXScale) {
       // no need to do this if the scale is not ordinal
-      if (!(this.xScales[xId] instanceof anychart.scales.Ordinal || this.xScales[xId] instanceof anychart.scales.DateTime))
+      if (!(anychart.utils.instanceOf(this.xScales[xId], anychart.scales.Ordinal) || anychart.utils.instanceOf(this.xScales[xId], anychart.scales.DateTime)))
         continue;
       drawingPlansOfScale = this.drawingPlansByXScale[xId];
       // Our task is to calculate the number of column and bar clusters.
@@ -1631,10 +1663,12 @@ anychart.core.ChartWithOrthogonalScales.prototype.distributeClusters = function(
   var currPosition;
   var barWidthRatio;
 
+  var barsPadding = /** @type {number} */ (this.getOption('barsPadding'));
+  var barGroupsPadding = /** @type {number} */ (this.getOption('barGroupsPadding'));
   if (numClusters > 0) {
-    numClusters = numClusters + (numClusters - 1) * this.barsPadding_ + this.barGroupsPadding_;
+    numClusters = numClusters + (numClusters - 1) * barsPadding + barGroupsPadding;
     barWidthRatio = 1 / numClusters;
-    currPosition = barWidthRatio * this.barGroupsPadding_ / 2;
+    currPosition = barWidthRatio * barGroupsPadding / 2;
     seenScales = {};
     for (var i = 0; i < drawingPlansOfScale.length; i++) {
       wSeries = drawingPlansOfScale[i].series;
@@ -1643,7 +1677,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.distributeClusters = function(
         if (this.getYScaleStackMode(scale) == anychart.enums.ScaleStackMode.NONE) {
           wSeries.setAutoXPointPosition(currPosition + barWidthRatio / 2);
           wSeries.setAutoPointWidth(barWidthRatio);
-          currPosition += barWidthRatio * (1 + this.barsPadding_);
+          currPosition += barWidthRatio * (1 + barsPadding);
         } else {
           id = goog.getUid(scale);
           if (id in seenScales) {
@@ -1653,7 +1687,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.distributeClusters = function(
             wSeries.setAutoXPointPosition(currPosition + barWidthRatio / 2);
             wSeries.setAutoPointWidth(barWidthRatio);
             seenScales[id] = currPosition;
-            currPosition += barWidthRatio * (1 + this.barsPadding_);
+            currPosition += barWidthRatio * (1 + barsPadding);
           }
         }
       }
@@ -1715,23 +1749,27 @@ anychart.core.ChartWithOrthogonalScales.prototype.doAnimation = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.ChartWithOrthogonalScales.prototype.specificContextMenuItems = function(items, context, isPointContext) {
-  var newItems = /** @type {Array.<anychart.ui.ContextMenu.Item>} */(goog.array.concat(
-      anychart.utils.recursiveClone(isPointContext ?
-          anychart.core.ChartWithOrthogonalScales.contextMenuMap.chartWithSeriesPoint :
-          anychart.core.ChartWithOrthogonalScales.contextMenuMap.chartWithSeriesDefault),
-      anychart.utils.recursiveClone(anychart.core.Chart.contextMenuMap.selectMarquee),
-      items));
+  var newItems = {};
+
+  goog.object.extend(newItems, /** @type {Object} */ (anychart.utils.recursiveClone(isPointContext ?
+      anychart.core.ChartWithOrthogonalScales.contextMenuMap['chart-with-series-point'] :
+      anychart.core.ChartWithOrthogonalScales.contextMenuMap['chart-with-series-default'])),
+      /** @type {Object} */ (anychart.utils.recursiveClone(anychart.core.Chart.contextMenuMap['select-marquee'])),
+      items
+  );
+
 
   var excludedPoints = this.getExcludedPoints();
-  var excludedPointsItem = isPointContext ? newItems[1] : newItems[0];
-  excludedPointsItem['subMenu'].length = 0;
+  var excludedPointsItem = newItems['exclude-points-list'];
+  excludedPointsItem['subMenu'] = {};
   excludedPointsItem['enabled'] = false;
+  var pointItemIndex = 10;
 
   if (excludedPoints.length) {
-    var footer = [null, anychart.core.ChartWithOrthogonalScales.contextMenuItems.includeAllPoints];
-    var excludedPointsModel = [];
+    var excludedPointsModel = {};
     var seriesType;
 
+    pointItemIndex += .01;
     for (var i = 0; i < excludedPoints.length; i++) {
       seriesType = excludedPoints[i].getSeries().seriesType();
       var value;
@@ -1759,15 +1797,22 @@ anychart.core.ChartWithOrthogonalScales.prototype.specificContextMenuItems = fun
         value = excludedPoints[i].get('value');
       }
 
-      excludedPointsModel.push({
+      excludedPointsModel['exclude-points-point-' + i] = { //TODO (A.Kudryavtsev): Maybe set name like 'text' field.
+        'index': pointItemIndex,
         'text': excludedPoints[i].getSeries().name() + ': ' + value,
         'eventType': 'anychart.include',
         'scrollable': true,
         'action': goog.bind(excludedPoints[i].getSeries().includePoint, excludedPoints[i].getSeries(), excludedPoints[i].getIndex())
-      });
+      };
     }
 
-    excludedPointsItem['subMenu'] = excludedPointsModel.concat(footer);
+    excludedPointsModel['excluded-points-separator'] = {'index': pointItemIndex + 10};
+    var includeAllItem = anychart.utils.recursiveClone(anychart.core.ChartWithOrthogonalScales.contextMenuItems['exclude-points-include-all']);
+    includeAllItem['index'] = pointItemIndex + 20;
+    excludedPointsModel['exclude-points-include-all'] = includeAllItem;
+    excludedPointsItem['subMenu'] = excludedPointsModel;
+
+    // excludedPointsItem['subMenu'] = excludedPointsModel.concat(footer);
     excludedPointsItem['enabled'] = true;
   }
 
@@ -1798,7 +1843,8 @@ anychart.core.ChartWithOrthogonalScales.prototype.getExcludedPoints = function()
  */
 anychart.core.ChartWithOrthogonalScales.contextMenuItems = {
   // Item 'Exclude Point'.
-  excludePoint: {
+  'exclude-points-point': {
+    'index': 7,
     'text': 'Exclude',
     'eventType': 'anychart.exclude',
     'action': function(context) {
@@ -1816,31 +1862,16 @@ anychart.core.ChartWithOrthogonalScales.contextMenuItems = {
   },
 
   // Item-subMenu 'Excluded Points'.
-  excludedPoints: {
+  'exclude-points-list': {
+    'index': 8,
     'text': 'Include',
     'subMenu': [],
     'enabled': false
   },
 
-  // Item 'Include all points'.
-  includeAllPoints: {
-    'text': 'Include All',
-    'eventType': 'anychart.includeAll',
-    'action': function(context) {
-      context['chart'].suspendSignalsDispatching();
-      var series, i;
-      var allSeries = context['chart'].getAllSeries();
-      for (i = 0; i < allSeries.length; i++) {
-        series = allSeries[i];
-        if (!goog.isFunction(series.includeAllPoints)) continue;
-        series.includeAllPoints();
-      }
-      context['chart'].resumeSignalsDispatching(true);
-    }
-  },
-
   // Item 'Keep Only'.
-  keepOnly: {
+  'exclude-points-keep-only': {
+    'index': 9,
     'text': 'Keep only',
     'eventType': 'anychart.keepOnly',
     'action': function(context) {
@@ -1857,27 +1888,47 @@ anychart.core.ChartWithOrthogonalScales.contextMenuItems = {
       }
       context['chart'].resumeSignalsDispatching(true);
     }
+  },
+
+  // Item 'Include all points'.
+  'exclude-points-include-all': {
+    'index': 30,
+    'text': 'Include all',
+    'eventType': 'anychart.includeAll',
+    'action': function(context) {
+      context['chart'].suspendSignalsDispatching();
+      var series, i;
+      var allSeries = context['chart'].getAllSeries();
+      for (i = 0; i < allSeries.length; i++) {
+        series = allSeries[i];
+        if (!goog.isFunction(series.includeAllPoints)) continue;
+        series.includeAllPoints();
+      }
+      context['chart'].resumeSignalsDispatching(true);
+    }
   }
+
+
 };
 
 
 /**
  * Menu map.
- * @type {Object.<string, Array.<anychart.ui.ContextMenu.Item>>}
+ * @type {Object.<string, Object.<string, anychart.ui.ContextMenu.Item>>}
  */
 anychart.core.ChartWithOrthogonalScales.contextMenuMap = {
   // Cartesian 'Default menu'. (will be added to 'main')
-  chartWithSeriesDefault: [
-    anychart.core.ChartWithOrthogonalScales.contextMenuItems.excludedPoints,
-    null
-  ],
+  'chart-with-series-default': {
+    'exclude-points-list': anychart.core.ChartWithOrthogonalScales.contextMenuItems['exclude-points-list'],
+    'exclude-points-separator': {'index': 8.5}
+  },
   // Cartesian 'Point menu'. (will be added to 'main')
-  chartWithSeriesPoint: [
-    anychart.core.ChartWithOrthogonalScales.contextMenuItems.excludePoint,
-    anychart.core.ChartWithOrthogonalScales.contextMenuItems.excludedPoints,
-    anychart.core.ChartWithOrthogonalScales.contextMenuItems.keepOnly,
-    null
-  ]
+  'chart-with-series-point': {
+    'exclude-points-point': anychart.core.ChartWithOrthogonalScales.contextMenuItems['exclude-points-point'],
+    'exclude-points-list': anychart.core.ChartWithOrthogonalScales.contextMenuItems['exclude-points-list'],
+    'exclude-points-keep-only': anychart.core.ChartWithOrthogonalScales.contextMenuItems['exclude-points-keep-only'],
+    'chart-with-series-point-separator': {'index': 9.2}
+  }
 };
 
 
@@ -1888,13 +1939,82 @@ anychart.core.ChartWithOrthogonalScales.contextMenuMap = {
 //  Interactivity
 //
 //----------------------------------------------------------------------------------------------------------------------
+/**
+ * Gets points info considering interactivity by X.
+ * @param {number} clientX - .
+ * @param {number} clientY - .
+ * @return {?Array.<Object>} - .
+ */
+anychart.core.ChartWithOrthogonalScales.prototype.getByXInfo = function(clientX, clientY) {
+  var bounds = this.dataBounds || anychart.math.rect(0, 0, 0, 0);
+  var minX = bounds.left;
+  var minY = bounds.top;
+  var rangeX = bounds.width;
+  var rangeY = bounds.height;
+
+  var containerOffset = this.container().getStage().getClientPosition();
+  var x = clientX - containerOffset.x;
+  var y = clientY - containerOffset.y;
+
+  var ratio = ((this.isVerticalInternal) ? ((rangeY - (y - minY)) / rangeY) : ((x - minX) / rangeX));
+  if (x < minX || x > minX + rangeX || y < minY || y > minY + rangeY)
+    return null;
+
+  var points = [];
+
+  var value, iterator;
+  var i, len, series, names;
+  var indexes;
+
+  for (i = 0, len = this.seriesList.length; i < len; i++) {
+    series = this.seriesList[i];
+    if (series && series.enabled()) {
+      value = series.xScale().inverseTransform(ratio);
+      if (this.categorizeData) {
+        var tmp = series.findX(value);
+        indexes = tmp >= 0 ? [tmp] : [];
+      } else {
+        indexes = series.data().findClosestByX(value, anychart.utils.instanceOf(series.xScale(), anychart.scales.Ordinal));
+      }
+      iterator = series.getIterator();
+      var minLength = Infinity;
+      var minLengthIndex;
+      if (indexes.length) {
+        for (var j = 0; j < indexes.length; j++) {
+          if (iterator.select(indexes[j])) {
+            var pixX = /** @type {number} */(iterator.meta('x'));
+            names = series.getYValueNames();
+            for (var k = 0; k < names.length; k++) {
+              var pixY = /** @type {number} */(iterator.meta(names[k]));
+              var length = anychart.math.vectorLength(pixX, pixY, x, y);
+              if (length < minLength) {
+                minLength = length;
+                minLengthIndex = indexes[j];
+              }
+            }
+          }
+        }
+
+        points.push({
+          series: series,
+          points: indexes,
+          lastPoint: indexes[indexes.length - 1],
+          nearestPointToCursor: {index: minLengthIndex, distance: minLength}
+        });
+      }
+    }
+  }
+  return /** @type {Array.<Object>} */(points);
+};
+
+
 /** @inheritDoc */
 anychart.core.ChartWithOrthogonalScales.prototype.getSeriesStatus = function(event) {
   var bounds = this.dataBounds || anychart.math.rect(0, 0, 0, 0);
   var clientX = event['clientX'];
   var clientY = event['clientY'];
 
-  var value, index, iterator;
+  var index, iterator;
 
   var containerOffset = this.container().getStage().getClientPosition();
 
@@ -1916,7 +2036,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.getSeriesStatus = function(eve
   if (interactivity.hoverMode() == anychart.enums.HoverMode.BY_SPOT) {
     var spotRadius = interactivity.spotRadius();
     var minRatio, maxRatio;
-    if (this.barChartMode) {
+    if (this.isVerticalInternal) {
       minRatio = (rangeY - (y - spotRadius - minY)) / rangeY;
       maxRatio = (rangeY - (y + spotRadius - minY)) / rangeY;
 
@@ -1977,47 +2097,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.getSeriesStatus = function(eve
       }
     }
   } else if (this.interactivity().hoverMode() == anychart.enums.HoverMode.BY_X) {
-    var ratio = ((this.barChartMode) ?
-        ((rangeY - (y - minY)) / rangeY) :
-        ((x - minX) / rangeX));
-
-    for (i = 0, len = this.seriesList.length; i < len; i++) {
-      series = this.seriesList[i];
-      if (series && series.enabled()) {
-        value = series.xScale().inverseTransform(ratio);
-        if (this.categorizeData) {
-          var tmp = series.findX(value);
-          indexes = tmp >= 0 ? [tmp] : [];
-        } else {
-          indexes = series.data().findClosestByX(value, series.xScale() instanceof anychart.scales.Ordinal);
-        }
-        iterator = series.getIterator();
-        minLength = Infinity;
-        if (indexes.length) {
-          for (j = 0; j < indexes.length; j++) {
-            if (iterator.select(indexes[j])) {
-              pixX = /** @type {number} */(iterator.meta('x'));
-              names = series.getYValueNames();
-              for (k = 0; k < names.length; k++) {
-                pixY = /** @type {number} */(iterator.meta(names[k]));
-                length = anychart.math.vectorLength(pixX, pixY, x, y);
-                if (length < minLength) {
-                  minLength = length;
-                  minLengthIndex = indexes[j];
-                }
-              }
-            }
-          }
-
-          points.push({
-            series: series,
-            points: indexes,
-            lastPoint: indexes[indexes.length - 1],
-            nearestPointToCursor: {index: minLengthIndex, distance: minLength}
-          });
-        }
-      }
-    }
+    points = this.getByXInfo(clientX, clientY);
   }
 
   return /** @type {Array.<Object>} */(points);
@@ -2079,6 +2159,40 @@ anychart.core.ChartWithOrthogonalScales.prototype.selectByRect = function(marque
 
 
 //endregion
+//region --- CSV
+//------------------------------------------------------------------------------
+//
+//  CSV
+//
+//------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.core.ChartWithOrthogonalScales.prototype.getCsvExportRow = function(x, xAlias, data, xValues, id, index, seriesXValues) {
+  return this.categorizeData ?
+    anychart.core.ChartWithOrthogonalScales.base(this, 'getCsvExportRow', x, xAlias, data, xValues, id, index, seriesXValues) :
+    this.getCsvExportRowScatter(x, xAlias, data, xValues, id, index, seriesXValues);
+};
+
+
+/** @inheritDoc */
+anychart.core.ChartWithOrthogonalScales.prototype.getCsvGrouperColumn = function() {
+  return ['x'];
+};
+
+
+/** @inheritDoc */
+anychart.core.ChartWithOrthogonalScales.prototype.getCsvGrouperValue = function(iterator) {
+  return iterator.get('x');
+};
+
+
+/** @inheritDoc */
+anychart.core.ChartWithOrthogonalScales.prototype.getCsvGrouperAlias = function(iterator) {
+  var res = iterator.get('name');
+  return goog.isString(res) ? res : null;
+};
+
+
+//endregion
 //region --- Serialization / Deserialization / Disposing
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -2090,6 +2204,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.selectByRect = function(marque
  */
 anychart.core.ChartWithOrthogonalScales.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.ChartWithOrthogonalScales.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.settings.deserialize(this, anychart.core.ChartWithOrthogonalScales.PROPERTY_DESCRIPTORS, config);
 
   var type = this.getType();
   var i, json, scale;
@@ -2164,6 +2279,8 @@ anychart.core.ChartWithOrthogonalScales.prototype.serialize = function() {
   var scaleIds = {};
   var scales = [];
 
+  anychart.core.settings.serialize(this, anychart.core.ChartWithOrthogonalScales.PROPERTY_DESCRIPTORS, json);
+
   this.serializeScale(json, 'xScale', /** @type {anychart.scales.Base} */(this.xScale()), scales, scaleIds);
   this.serializeScale(json, 'yScale', /** @type {anychart.scales.Base} */(this.yScale()), scales, scaleIds);
 
@@ -2221,7 +2338,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.setupSeriesByJSON = function(c
   if (goog.isArray(series)) {
     for (i = 0; i < series.length; i++) {
       json = series[i];
-      var seriesType = json['seriesType'] || this.defaultSeriesType();
+      var seriesType = json['seriesType'] || this.getOption('defaultSeriesType');
       var data = json['data'];
       var seriesInst = this.createSeriesByType(seriesType, data);
       if (seriesInst) {
@@ -2247,13 +2364,11 @@ anychart.core.ChartWithOrthogonalScales.prototype.setupSeriesByJSON = function(c
  */
 anychart.core.ChartWithOrthogonalScales.prototype.serializeSeries = function(json, scales, scaleIds) {
   var i;
-  var scale;
   var config;
   var seriesList = [];
   for (i = 0; i < this.seriesList.length; i++) {
     var series = this.seriesList[i];
     config = series.serialize();
-    scale = series.xScale();
     this.serializeScale(config, 'xScale', /** @type {anychart.scales.Base} */(series.xScale()), scales, scaleIds);
     this.serializeScale(config, 'yScale', /** @type {anychart.scales.Base} */(series.yScale()), scales, scaleIds);
     seriesList.push(config);

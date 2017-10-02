@@ -1,4 +1,5 @@
 goog.provide('anychart.core.ui.Label');
+goog.provide('anychart.standalones.Label');
 goog.require('anychart.core.ui.LabelBase');
 
 
@@ -15,7 +16,7 @@ goog.require('anychart.core.ui.LabelBase');
  *   <li>{@link anychart.core.ui.Label#parentBounds}</li>
  * </ul>
  * @example <c>Creating an autonomous label.</c><t>simple-h100</t>
- * anychart.ui.label()
+ * anychart.standalones.label()
  *     .text('My custom Label')
  *     .fontSize(27)
  *     .background(null)
@@ -26,51 +27,94 @@ goog.require('anychart.core.ui.LabelBase');
  */
 anychart.core.ui.Label = function() {
   anychart.core.ui.Label.base(this, 'constructor');
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['visible', anychart.ConsistencyState.LABEL_VISIBILITY, anychart.Signal.NEEDS_REDRAW]
+  ]);
+  // should always be true for labels that are not "no data" label.
+  this.themeSettings['visible'] = true;
 };
 goog.inherits(anychart.core.ui.Label, anychart.core.ui.LabelBase);
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Utils.
-//
-//----------------------------------------------------------------------------------------------------------------------
-/** @inheritDoc */
-anychart.core.ui.Label.prototype.serialize = function() {
-  var json = anychart.core.ui.Label.base(this, 'serialize');
-  if (goog.isDef(this.position()))
-    json['position'] = this.position();
-  return json;
-};
+/**
+ * Supported consistency states.
+ * @type {number}
+ */
+anychart.core.ui.Label.prototype.SUPPORTED_CONSISTENCY_STATES =
+    anychart.core.ui.LabelBase.prototype.SUPPORTED_CONSISTENCY_STATES |
+        anychart.ConsistencyState.LABEL_VISIBILITY;
+
+
+/**
+ * Descriptors.
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.core.ui.Label.DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'visible',
+      anychart.core.settings.booleanNormalizer);
+  return map;
+})();
+anychart.core.settings.populate(anychart.core.ui.Label, anychart.core.ui.Label.DESCRIPTORS);
 
 
 /** @inheritDoc */
 anychart.core.ui.Label.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.ui.Label.base(this, 'setupByJSON', config, opt_default);
-  this.position(config['position']);
+  if (!!opt_default)
+    anychart.core.settings.deserialize(this, anychart.core.ui.Label.DESCRIPTORS, config);
 };
 
 
 /** @inheritDoc */
-anychart.core.ui.Label.prototype.disposeInternal = function() {
-  anychart.core.ui.Label.base(this, 'disposeInternal');
+anychart.core.ui.Label.prototype.draw = function() {
+  if (!this.checkDrawingNeeded())
+    return this;
+  anychart.core.ui.Label.base(this, 'draw');
+  if (this.hasInvalidationState(anychart.ConsistencyState.LABEL_VISIBILITY)) {
+    this.getRootLayer().visible(/** @type {boolean} */(this.getOption('visible')));
+    this.markConsistent(anychart.ConsistencyState.LABEL_VISIBILITY);
+  }
+  return this;
+};
+
+
+
+/**
+ * @constructor
+ * @extends {anychart.core.ui.Label}
+ */
+anychart.standalones.Label = function() {
+  anychart.standalones.Label.base(this, 'constructor');
+};
+goog.inherits(anychart.standalones.Label, anychart.core.ui.Label);
+anychart.core.makeStandalone(anychart.standalones.Label, anychart.core.ui.Label);
+
+
+/**
+ * Constructor function.
+ * @return {!anychart.standalones.Label}
+ */
+anychart.standalones.label = function() {
+  var label = new anychart.standalones.Label();
+  label.setup(anychart.getFullTheme('standalones.label'));
+  return label;
 };
 
 
 //exports
 (function() {
   var proto = anychart.core.ui.Label.prototype;
-  proto['position'] = proto.position;
   proto['background'] = proto.background;
   proto['padding'] = proto.padding;
-  proto['width'] = proto.width;
-  proto['height'] = proto.height;
-  proto['anchor'] = proto.anchor;
-  proto['offsetX'] = proto.offsetX;
-  proto['offsetY'] = proto.offsetY;
-  proto['text'] = proto.text;
-  proto['minFontSize'] = proto.minFontSize;
-  proto['maxFontSize'] = proto.maxFontSize;
-  proto['adjustFontSize'] = proto.adjustFontSize;
-  proto['rotation'] = proto.rotation;
+
+  proto = anychart.standalones.Label.prototype;
+  goog.exportSymbol('anychart.standalones.label', anychart.standalones.label);
+  proto['draw'] = proto.draw;
+  proto['parentBounds'] = proto.parentBounds;
+  proto['container'] = proto.container;
 })();

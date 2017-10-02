@@ -6,7 +6,10 @@ goog.provide('anychart.ui.ContextMenu.PrepareItemsContext');
 goog.require('anychart.enums');
 goog.require('anychart.ui.menu.Item');
 goog.require('anychart.ui.menu.SubMenu');
+goog.require('goog.array');
 goog.require('goog.dom.classlist');
+goog.require('goog.object');
+goog.require('goog.positioning.ViewportClientPosition');
 goog.require('goog.ui.MenuSeparator');
 goog.require('goog.ui.PopupMenu');
 
@@ -14,6 +17,7 @@ goog.forwardDeclare('anychart.core.Chart');
 goog.forwardDeclare('anychart.core.MouseEvent');
 goog.forwardDeclare('anychart.core.Point');
 goog.forwardDeclare('anychart.core.VisualBase');
+goog.forwardDeclare('anychart.format');
 
 
 
@@ -63,10 +67,10 @@ anychart.ui.ContextMenu = function() {
   /**
    * Items formatter.
    * This function allows you to change provided menu items and change their order.
-   * @param {Array.<anychart.ui.ContextMenu.Item>} items Provided menu items.
+   * @param {Object.<string, anychart.ui.ContextMenu.Item>} items Provided menu items.
    * @param {anychart.ui.ContextMenu.PrepareItemsContext} context Context object.
-   * @this {Array.<anychart.ui.ContextMenu.Item>}
-   * @return {Array.<anychart.ui.ContextMenu.Item>}
+   * @this {Object.<string, anychart.ui.ContextMenu.Item>}
+   * @return {Object.<string, anychart.ui.ContextMenu.Item>}
    * @private
    */
   this.itemsFormatter_ = function(items, context) {
@@ -79,16 +83,16 @@ anychart.ui.ContextMenu = function() {
    * Function allows you to specify the initial set of items depending on context.
    * @param {anychart.ui.ContextMenu.PrepareItemsContext} context Context object.
    * @this {anychart.ui.ContextMenu.PrepareItemsContext}
-   * @return {Array.<anychart.ui.ContextMenu.Item>}
+   * @return {Object.<string, anychart.ui.ContextMenu.Item>}
    * @private
    */
   this.itemsProvider_ = function(context) {
-    return [];
+    return {};
   };
 
 
   // Set default empty menu.
-  this.setModel([]);
+  this.setModel({});
 
   /**
    * Wrapper for method .show() for async usage.
@@ -209,19 +213,19 @@ anychart.ui.ContextMenu.prototype.removeClassName = function(className) {
 
 /**
  * Getter/setter for current context menu items.
- * @param {Array.<anychart.ui.ContextMenu.Item>=} opt_value Items.
- * @return {(Array.<anychart.ui.ContextMenu.Item>|anychart.ui.ContextMenu)} Context menu items or self for chaining.
+ * @param {Object.<string, anychart.ui.ContextMenu.Item>=} opt_value Items.
+ * @return {(Object.<string, anychart.ui.ContextMenu.Item>|anychart.ui.ContextMenu)} Context menu items or self for chaining.
  */
 anychart.ui.ContextMenu.prototype.items = function(opt_value) {
-  if (goog.isArray(opt_value)) {
+  if (goog.isDefAndNotNull(opt_value)) {
     this.itemsProvider(function() {
-      return /** @type {Array<anychart.ui.ContextMenu.Item>} */ (opt_value);
+      return /** @type {Object.<string, anychart.ui.ContextMenu.Item>} */ (opt_value);
     });
     if (!opt_value.length) this.hide();
     this.setModel(opt_value);
     return this;
   }
-  return /** @type {Array.<anychart.ui.ContextMenu.Item>} */ (this.getModel());
+  return /** @type {Object.<string, anychart.ui.ContextMenu.Item>} */ (this.getModel());
 };
 
 
@@ -229,9 +233,9 @@ anychart.ui.ContextMenu.prototype.items = function(opt_value) {
  * Getter/setter for items provider.
  * Items provider called before items formatter.
  * @param {function(this:anychart.ui.ContextMenu.PrepareItemsContext,
- *     anychart.ui.ContextMenu.PrepareItemsContext):Array.<anychart.ui.ContextMenu.Item>=} opt_value Formatter function.
+ *     anychart.ui.ContextMenu.PrepareItemsContext):Object.<string, anychart.ui.ContextMenu.Item>=} opt_value Formatter function.
  * @return {(function(this:anychart.ui.ContextMenu.PrepareItemsContext,
- *     anychart.ui.ContextMenu.PrepareItemsContext):Array.<anychart.ui.ContextMenu.Item>|anychart.ui.ContextMenu)} Formatter function or self for chaining.
+ *     anychart.ui.ContextMenu.PrepareItemsContext):Object.<string, anychart.ui.ContextMenu.Item>|anychart.ui.ContextMenu)} Formatter function or self for chaining.
  */
 anychart.ui.ContextMenu.prototype.itemsProvider = function(opt_value) {
   if (goog.isFunction(opt_value)) {
@@ -247,10 +251,10 @@ anychart.ui.ContextMenu.prototype.itemsProvider = function(opt_value) {
 
 /**
  * Getter/setter for items formatter.
- * @param {function(this:Array.<anychart.ui.ContextMenu.Item>, Array.<anychart.ui.ContextMenu.Item>,
- *     anychart.ui.ContextMenu.PrepareItemsContext):Array.<anychart.ui.ContextMenu.Item>=} opt_value Formatter function.
- * @return {(function(this:Array.<anychart.ui.ContextMenu.Item>, Array.<anychart.ui.ContextMenu.Item>,
- *     anychart.ui.ContextMenu.PrepareItemsContext):Array.<anychart.ui.ContextMenu.Item>|anychart.ui.ContextMenu)} Formatter function or self for chaining.
+ * @param {function(this:Object.<string, anychart.ui.ContextMenu.Item>, Object.<string, anychart.ui.ContextMenu.Item>,
+ *     anychart.ui.ContextMenu.PrepareItemsContext):Object.<string, anychart.ui.ContextMenu.Item>=} opt_value - Formatter function.
+ * @return {(function(this:Object.<string, anychart.ui.ContextMenu.Item>, Object.<string, anychart.ui.ContextMenu.Item>,
+ *     anychart.ui.ContextMenu.PrepareItemsContext):Object.<string, anychart.ui.ContextMenu.Item>|anychart.ui.ContextMenu)} - Formatter function or self for chaining.
  */
 anychart.ui.ContextMenu.prototype.itemsFormatter = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -273,7 +277,7 @@ anychart.ui.ContextMenu.prototype.handleContextMenu_ = function(e) {
   this.contextTarget_ = e['target'];
   this.prepareItems_(e, this.contextTarget_);
 
-  if (!goog.isArray(this.items()) || !this.items().length) return;
+  if (!goog.isObject(this.items()) || goog.object.isEmpty(this.items())) return;
   goog.isFunction(e['getOriginalEvent']) ? e['getOriginalEvent']().preventDefault() : e.preventDefault();
 
   if (this.chart_ && goog.isFunction(this.chart_['getType']) && this.chart_['getType']() == anychart.enums.MapTypes.MAP) {
@@ -307,13 +311,13 @@ anychart.ui.ContextMenu.prototype.prepareItems_ = function(event, target) {
   }
 
   // Flow: itemsProvider -> itemsFormatter -> items -> render
-  var providedItems = goog.array.clone(this.itemsProvider_.call(context, context));
+  var providedItems = /** @type {Object.<string, anychart.ui.ContextMenu.Item>} */ (anychart.utils.recursiveClone(this.itemsProvider_.call(context, context)));
   var formattedItems = this.itemsFormatter_.call(providedItems, providedItems, context);
   this.setModel(formattedItems);
 
   this.itemsReady_ = true;
 
-  return !!formattedItems.length;
+  return !goog.object.isEmpty(formattedItems);
 };
 
 
@@ -379,12 +383,24 @@ anychart.ui.ContextMenu.prototype.detach = function(opt_target, opt_capture) {
  * @param {number} y The client-Y associated with the show event.
  */
 anychart.ui.ContextMenu.prototype.show = function(x, y) {
-  if ((this.itemsReady_ && this.items().length) || this.prepareItems_(null, this.chart_)) {
+  if ((this.itemsReady_ && !goog.object.isEmpty(this.items())) || this.prepareItems_(null, this.chart_)) {
+    var stage = this.chart_ ? this.chart_.container().getStage() : null;
+    var container = (stage && stage.fullScreen()) ? stage.getDomWrapper() : anychart.document.body;
+    if (!this.wrapper_)
+      this.wrapper_ = /** @type {Element} */(goog.dom.createDom('div', {'id': 'anychart-menu-wrapper'}));
+    if (this.wrapper_.parentNode != container)
+      container.appendChild(this.wrapper_);
+
     if (!this.isInDocument()) {
-      this.render();
+      this.render(this.wrapper_);
     }
     this.makeMenu_();
-    this.showMenu({}, x, y);
+
+    var position = new goog.positioning.ViewportClientPosition(x, y);
+    position.setLastResortOverflow(
+        goog.positioning.Overflow.ADJUST_X_EXCEPT_OFFSCREEN |
+        goog.positioning.Overflow.ADJUST_Y_EXCEPT_OFFSCREEN);
+    this.showWithPosition(position);
   }
 };
 
@@ -395,7 +411,7 @@ anychart.ui.ContextMenu.prototype.show = function(x, y) {
  */
 anychart.ui.ContextMenu.prototype.makeMenu_ = function() {
   this.clear_();
-  this.makeLevel_(this, /** @type {Array.<anychart.ui.ContextMenu.Item>} */ (this.items()));
+  this.makeLevel_(this, /** @type {Object.<string, anychart.ui.ContextMenu.Item>} */ (this.items()));
 };
 
 
@@ -414,28 +430,52 @@ anychart.ui.ContextMenu.prototype.clear_ = function() {
 
 
 /**
+ * Context menu item comparison function.
+ * @param {anychart.ui.ContextMenu.Item} item1 - .
+ * @param {anychart.ui.ContextMenu.Item} item2 - .
+ * @return {number}
+ * @private
+ */
+anychart.ui.ContextMenu.prototype.itemSort_ = function(item1, item2) {
+  if (!goog.isNumber(item1['index'])) return 1;
+  if (!goog.isNumber(item2['index'])) return -1;
+  return item1['index'] - item2['index'] || 1; //Avoid item replacement.
+};
+
+
+/**
  * To make one level of menu. Recursive function.
  * @param {anychart.ui.ContextMenu|anychart.ui.menu.Menu|anychart.ui.menu.SubMenu} menu
- * @param {Array.<anychart.ui.ContextMenu.Item>} model
+ * @param {Object.<string, anychart.ui.ContextMenu.Item>} model
  * @private
  */
 anychart.ui.ContextMenu.prototype.makeLevel_ = function(menu, model) {
   var itemData;
-  for (var i = 0; i < model.length; i++) {
-    itemData = model[i];
+  var sortedModel = [];
+
+  for (var key in model) {
+    var modelItem = model[key];
+    if (model.hasOwnProperty(key))
+      goog.array.binaryInsert(sortedModel, modelItem, this.itemSort_);
+  }
+
+  for (var i = 0; i < sortedModel.length; i++) {
+    itemData = sortedModel[i];
 
     // Prepare classNames array
     if (goog.isDefAndNotNull(itemData)) {
       var classNames = goog.isString(itemData['classNames']) ? itemData['classNames'].split(' ') : itemData['classNames'] || [];
     }
 
+    var itemText = anychart.format.getMessage(itemData['text']) || '';
+
     // treat as separator
-    if (!goog.isDefAndNotNull(itemData)) {
+    if (!itemData['text']) {
       this.addItemToMenu_(menu, new goog.ui.MenuSeparator());
 
-    // treat as subMenu
+      // treat as subMenu
     } else if (itemData['subMenu']) {
-      var subMenu = new anychart.ui.menu.SubMenu(itemData['text']);
+      var subMenu = new anychart.ui.menu.SubMenu(itemText);
       if (classNames.length) subMenu.addClassName(classNames.join(' '));
       if (goog.isBoolean(itemData['enabled'])) subMenu.setEnabled(itemData['enabled']);
 
@@ -444,7 +484,7 @@ anychart.ui.ContextMenu.prototype.makeLevel_ = function(menu, model) {
 
       if (goog.isDef(itemData['iconClass'])) this.setIconTo_(subMenu, itemData['iconClass']);
 
-    // treat as menu item
+      // treat as menu item
     } else {
       var menuItemText;
       if (itemData['href']) {
@@ -452,11 +492,11 @@ anychart.ui.ContextMenu.prototype.makeLevel_ = function(menu, model) {
             {
               'href': itemData['href'],
               'target': itemData['target'] || '_blank'
-            }, itemData['text'] || '');
+            }, itemText);
 
         classNames.unshift('anychart-menuitem-link');
       } else {
-        menuItemText = itemData['text'] || '';
+        menuItemText = itemText;
       }
 
       var menuItem = new anychart.ui.menu.Item(menuItemText, itemData);
@@ -479,7 +519,7 @@ anychart.ui.ContextMenu.prototype.makeLevel_ = function(menu, model) {
  * @private
  */
 anychart.ui.ContextMenu.prototype.addItemToMenu_ = function(menu, item) {
-  menu instanceof anychart.ui.menu.SubMenu ? menu.addItem(item) : menu.addChild(item, true);
+  anychart.utils.instanceOf(menu, anychart.ui.menu.SubMenu) ? menu.addItem(item) : menu.addChild(item, true);
 };
 
 
@@ -536,21 +576,22 @@ anychart.ui.ContextMenu.ActionContext;
 
 
 /**
- * Hint: null|undefined - it is separator.
+ * Hint: if text is empty or null or undefined - it is separator.
  *
  * @typedef {{
  *  text: string,
+ *  index: number,
  *  href: string,
  *  target: string,
  *  eventType: string,
  *  action: function(this:anychart.ui.ContextMenu.ActionContext, anychart.ui.ContextMenu.ActionContext),
  *  iconClass: string,
- *  subMenu: Array.<anychart.ui.ContextMenu.Item>,
+ *  subMenu: Object.<string, anychart.ui.ContextMenu.Item>,
  *  enabled: boolean,
  *  scrollable: boolean,
  *  classNames: (string|Array.<string>),
  *  meta: *
- * }|null|undefined}
+ * }}
  */
 anychart.ui.ContextMenu.Item;
 
@@ -561,6 +602,7 @@ anychart.ui.ContextMenu.prototype.disposeInternal = function() {
   this.contextTarget_ = null;
   this.chart_ = null;
   this.extraClassNames_ = null;
+  this.wrapper_ = null;
 
   anychart.ui.ContextMenu.base(this, 'disposeInternal');
 };

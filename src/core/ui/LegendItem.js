@@ -41,7 +41,7 @@ anychart.core.ui.LegendItem = function() {
   this.nonNullableStrokes_ = {
     'line': 'black',
     'spline': 'black',
-    'stepline': 'black',
+    'step-line': 'black',
     'ohlc': 'black',
     'candlestick': 'black'
   };
@@ -54,7 +54,7 @@ anychart.core.ui.LegendItem = function() {
   this.shouldBeNullFills_ = {
     'line': true,
     'spline': true,
-    'stepline': true,
+    'step-line': true,
     'ohlc': true
   };
 
@@ -72,9 +72,14 @@ anychart.core.ui.LegendItem = function() {
     'fontColor': '#999'
   };
 
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['text', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED]
+  ]);
+
   this.applyDefaults();
 };
 goog.inherits(anychart.core.ui.LegendItem, anychart.core.Text);
+anychart.core.settings.populate(anychart.core.ui.LegendItem, anychart.core.Text.TEXT_DESCRIPTORS);
 
 
 //region --- Class definitions
@@ -469,25 +474,6 @@ anychart.core.ui.LegendItem.prototype.iconSize = function(opt_value) {
     return this;
   }
   return this.iconSize_;
-};
-
-
-/**
- * Getter/setter for legend item text.
- * @param {string=} opt_value Legend item text.
- * @return {(string|anychart.core.ui.LegendItem)} Legend item text or self for method chaining.
- */
-anychart.core.ui.LegendItem.prototype.text = function(opt_value) {
-  return /** @type {!anychart.core.ui.LegendItem|string} */(this.textSettings('text', opt_value));
-};
-
-
-/** @inheritDoc */
-anychart.core.ui.LegendItem.prototype.fontColor = function(opt_value) {
-  if (goog.isDef(opt_value))
-    this.originalFontColor_ = opt_value;
-
-  return anychart.core.ui.LegendItem.base(this, 'fontColor', opt_value);
 };
 
 
@@ -893,19 +879,6 @@ anychart.core.ui.LegendItem.prototype.draw = function() {
 
 //endregion
 //region --- Aplying appearance
-/** @inheritDoc */
-anychart.core.ui.LegendItem.prototype.applyTextSettings = function(textElement, isInitial) {
-  if (isInitial || 'text' in this.changedSettings || 'useHtml' in this.changedSettings) {
-    if (!!this.settingsObj['useHtml'])
-      textElement.htmlText(this.settingsObj['text']);
-    else
-      textElement.text(this.settingsObj['text']);
-  }
-  anychart.core.ui.LegendItem.base(this, 'applyTextSettings', textElement, isInitial);
-  this.changedSettings = {};
-};
-
-
 /**
  * Applies hover settings to item. Used by the Legend.
  * @param {boolean} hover Whether item is hovered.
@@ -930,15 +903,19 @@ anychart.core.ui.LegendItem.prototype.applyHover = function(hover) {
  * @private
  */
 anychart.core.ui.LegendItem.prototype.applyFontColor_ = function(hover, opt_isInitial) {
-  if (!this.disabled_) {
-    if (!this.originalFontColor_)
-      this.originalFontColor_ = this.fontColor();
-
-    this.textSettings('fontColor', hover ? anychart.color.lighten(this.originalFontColor_) : this.originalFontColor_);
-  } else {
-    this.textSettings('fontColor', this.disabledState_['fontColor']);
-  }
   this.applyTextSettings(/** @type {!acgraph.vector.Text} */(this.textElement_), !!opt_isInitial);
+  var colorOption = /** @type {(acgraph.vector.Fill|acgraph.vector.Stroke)} */ (this.getOption('fontColor'));
+  var fontColor = this.disabled_ ? this.disabledState_['fontColor'] : hover ? anychart.color.lighten(colorOption) : colorOption;
+  this.textElement_.color(fontColor);
+};
+
+
+/**
+ * Public implementation for external access.
+ * @param {boolean=} opt_isInitial - Whether settings applied first time.
+ */
+anychart.core.ui.LegendItem.prototype.applyFontColor = function(opt_isInitial) {
+  this.applyFontColor_(this.hovered_, opt_isInitial);
 };
 
 
@@ -1196,8 +1173,6 @@ anychart.core.ui.LegendItem.prototype.applyDefaults = function() {
    */
   this.iconTextSpacing_ = 5;
 
-  // legend item default text
-  this.settingsObj['text'] = 'Legend Item';
 };
 
 
@@ -1209,8 +1184,8 @@ anychart.core.ui.LegendItem.prototype.clear = function() {
   this.suspendSignalsDispatching();
   this.dropPixelBounds();
   this.applyDefaults();
-  this.settingsObj = {};
-  this.changedSettings = {};
+  this.ownSettings = {};
+  this.resolutionChainCache(null);
   this.prevSourceKey = this.sourceKey();
   this.prevSourceUid = this.sourceUid();
   this.sourceUid(NaN);
@@ -1370,4 +1345,23 @@ anychart.core.ui.LegendItem.prototype.disposeInternal = function() {
 //endregion
 //region --- Exports
 //exports
+(function() {
+  // Used only in a standalone
+  var proto = anychart.core.ui.LegendItem.prototype;
+  proto['x'] = proto.x;
+  proto['y'] = proto.y;
+  proto['iconType'] = proto.iconType;
+  proto['iconFill'] = proto.iconFill;
+  proto['iconStroke'] = proto.iconStroke;
+  proto['iconHatchFill'] = proto.iconHatchFill;
+  proto['iconTextSpacing'] = proto.iconTextSpacing;
+  proto['maxWidth'] = proto.maxWidth;
+  proto['maxHeight'] = proto.maxHeight;
+  proto['text'] = proto.text;
+  proto['getTextElement'] = proto.getTextElement;
+  proto['getContentBounds'] = proto.getContentBounds;
+  proto['getWidth'] = proto.getWidth;
+  proto['getHeight'] = proto.getHeight;
+  proto['draw'] = proto.draw;
+})();
 //endregion

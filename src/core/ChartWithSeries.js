@@ -1,7 +1,8 @@
 goog.provide('anychart.core.ChartWithSeries');
 
+goog.require('anychart.core.IChart');
 goog.require('anychart.core.SeparateChart');
-goog.require('anychart.core.annotations');
+goog.require('anychart.core.StateSettings');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.palettes.DistinctColors');
@@ -16,6 +17,7 @@ goog.require('goog.array');
  * A base class for the chart with series.
  * @constructor
  * @extends {anychart.core.SeparateChart}
+ * @implements {anychart.core.IChart}
  */
 anychart.core.ChartWithSeries = function() {
   anychart.core.ChartWithSeries.base(this, 'constructor');
@@ -65,6 +67,34 @@ anychart.core.ChartWithSeries = function() {
    * @protected
    */
   this.dataBounds = null;
+
+  var normalDescriptorsMeta = {};
+  anychart.core.settings.createDescriptorsMeta(normalDescriptorsMeta, [
+    ['labels', 0, 0]
+  ]);
+  this.normal_ = new anychart.core.StateSettings(this, normalDescriptorsMeta, anychart.PointState.NORMAL);
+  this.normal_.setOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK, /** @this {anychart.core.ChartWithSeries} */ function(factory) {
+    factory.markConsistent(anychart.ConsistencyState.ALL);
+    factory.listenSignals(this.labelsInvalidated_, this);
+  });
+
+  var descriptorsMeta = {};
+  anychart.core.settings.createDescriptorsMeta(descriptorsMeta, [
+    ['labels', 0, 0]
+  ]);
+  this.hovered_ = new anychart.core.StateSettings(this, descriptorsMeta, anychart.PointState.HOVER);
+
+  anychart.core.settings.createDescriptorsMeta(descriptorsMeta, [
+    ['labels', 0, 0]
+  ]);
+  this.selected_ = new anychart.core.StateSettings(this, descriptorsMeta, anychart.PointState.SELECT);
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['defaultSeriesType', 0, 0],
+    ['pointWidth', anychart.ConsistencyState.SERIES_CHART_SERIES, anychart.Signal.NEEDS_REDRAW, 0, this.invalidateWidthBasedSeries],
+    ['maxPointWidth', anychart.ConsistencyState.SERIES_CHART_SERIES, anychart.Signal.NEEDS_REDRAW, 0, this.invalidateWidthBasedSeries],
+    ['minPointLength', anychart.ConsistencyState.SERIES_CHART_SERIES, anychart.Signal.NEEDS_REDRAW, 0, this.resetSeriesStack]
+  ]);
 };
 goog.inherits(anychart.core.ChartWithSeries, anychart.core.SeparateChart);
 
@@ -93,7 +123,7 @@ anychart.core.ChartWithSeries.prototype.SUPPORTED_CONSISTENCY_STATES =
  * @param {!Object} configs
  */
 anychart.core.ChartWithSeries.generateSeriesConstructors = function(chartConstructor, configs) {
-  var proto = chartConstructor.prototype;
+  var prototype = chartConstructor.prototype;
   var methodsGenerator = function(name) {
     return function(data, opt_csvSettings) {
       return this.createSeriesByType(
@@ -103,6 +133,7 @@ anychart.core.ChartWithSeries.generateSeriesConstructors = function(chartConstru
     };
   };
   for (var i in configs) {
+    var methodName = anychart.utils.toCamelCase(i);
     /**
      * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
      * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
@@ -110,7 +141,7 @@ anychart.core.ChartWithSeries.generateSeriesConstructors = function(chartConstru
      * @return {anychart.core.series.Cartesian}
      * @this {anychart.core.ChartWithSeries}
      */
-    proto[i] = methodsGenerator(i);
+    prototype[methodName] = methodsGenerator(i);
   }
 };
 
@@ -129,13 +160,6 @@ anychart.core.ChartWithSeries.ZINDEX_SERIES = 30;
 anychart.core.ChartWithSeries.ZINDEX_LINE_SERIES = 31;
 
 
-/**
- * Z-index increment multiplier.
- * @type {number}
- */
-anychart.core.ChartWithSeries.ZINDEX_INCREMENT_MULTIPLIER = 0.00001;
-
-
 //endregion
 //region --- Series infrastructure methods
 //----------------------------------------------------------------------------------------------------------------------
@@ -147,7 +171,7 @@ anychart.core.ChartWithSeries.ZINDEX_INCREMENT_MULTIPLIER = 0.00001;
  * Series config for the chart.
  * @type {!Object.<string, anychart.core.series.TypeConfig>}
  */
-anychart.core.ChartWithSeries.prototype.seriesConfig = ({});
+anychart.core.ChartWithSeries.prototype.seriesConfig = (function () { return {}; })();
 
 
 /**
@@ -175,36 +199,44 @@ anychart.core.ChartWithSeries.prototype.normalizeSeriesType = function(type) {
 
 
 /**
- * Getter/setter for defaultSeriesType.
- * @param {(
- *    string |
- *    anychart.enums.CartesianSeriesType |
- *    anychart.enums.ScatterSeriesType |
- *    anychart.enums.RadarSeriesType |
- *    anychart.enums.PolarSeriesType |
- *    anychart.enums.MapSeriesType |
- *    anychart.enums.MekkoSeriesType |
- *    anychart.enums.WaterfallSeriesType
- * )=} opt_value Default series type.
- * @return {
- *    anychart.core.ChartWithSeries |
- *    anychart.enums.CartesianSeriesType |
- *    anychart.enums.ScatterSeriesType |
- *    anychart.enums.RadarSeriesType |
- *    anychart.enums.PolarSeriesType |
- *    anychart.enums.MapSeriesType |
- *    anychart.enums.MekkoSeriesType |
- *    anychart.enums.WaterfallSeriesType
- * } Default series type or self for chaining.
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.core.ChartWithSeries.prototype.defaultSeriesType = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = this.normalizeSeriesType(opt_value);
-    this.defaultSeriesType_ = opt_value;
-    return this;
+anychart.core.ChartWithSeries.PROPERTY_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  /**
+   * @this {anychart.core.ChartWithSeries}
+   * @param {*=} opt_value
+   * @return {string}
+   */
+  function seriesTypeNormalizer(opt_value) {
+    return this.normalizeSeriesType(opt_value);
   }
-  return this.defaultSeriesType_;
-};
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'defaultSeriesType',
+      seriesTypeNormalizer);
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'pointWidth',
+      anychart.utils.normalizeNumberOrPercent);
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'maxPointWidth',
+      anychart.utils.normalizeNumberOrPercent);
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'minPointLength',
+      anychart.utils.normalizeNumberOrPercent);
+
+  return map;
+})();
+anychart.core.settings.populate(anychart.core.ChartWithSeries, anychart.core.ChartWithSeries.PROPERTY_DESCRIPTORS);
 
 
 /**
@@ -237,7 +269,7 @@ anychart.core.ChartWithSeries.prototype.createSeriesInstance = goog.abstractMeth
 
 /**
  * Returns base series z-index.
- * @param {anychart.core.series.Cartesian|anychart.core.series.Map} series .
+ * @param {anychart.core.series.Base} series .
  * @return {number}
  */
 anychart.core.ChartWithSeries.prototype.getBaseSeriesZIndex = function(series) {
@@ -249,17 +281,15 @@ anychart.core.ChartWithSeries.prototype.getBaseSeriesZIndex = function(series) {
 
 /**
  * Setup series.
- * @param {!(anychart.core.series.Cartesian|anychart.core.series.Map)} series .
+ * @param {!(anychart.core.series.Cartesian|anychart.mapModule.Series)} series .
  */
 anychart.core.ChartWithSeries.prototype.setupSeries = function(series) {
   var lastSeries = this.seriesList[this.seriesList.length - 1];
   var index = lastSeries ? /** @type {number} */(lastSeries.autoIndex()) + 1 : 0;
   this.seriesList.push(series);
-  var inc = index * anychart.core.ChartWithSeries.ZINDEX_INCREMENT_MULTIPLIER;
-  var seriesZIndex = this.getBaseSeriesZIndex(series) + inc;
 
   series.autoIndex(index);
-  series.setAutoZIndex(seriesZIndex);
+  series.setupAutoZIndex();
   series.setAutoColor(this.palette().itemAt(index));
   series.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(index)));
   series.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(index)));
@@ -293,7 +323,8 @@ anychart.core.ChartWithSeries.prototype.createSeriesByType = function(type, data
         anychart.ConsistencyState.CHART_LEGEND |
         anychart.ConsistencyState.SCALE_CHART_SCALES |
         anychart.ConsistencyState.SCALE_CHART_Y_SCALES |
-        anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS,
+        anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS |
+        anychart.ConsistencyState.CHART_LABELS,
         anychart.Signal.NEEDS_REDRAW);
   } else {
     series = null;
@@ -310,7 +341,7 @@ anychart.core.ChartWithSeries.prototype.createSeriesByType = function(type, data
  */
 anychart.core.ChartWithSeries.prototype.addSeries = function(var_args) {
   var rv = [];
-  var type = /** @type {string} */ (this.defaultSeriesType());
+  var type = /** @type {string} */ (this.getOption('defaultSeriesType'));
   var count = arguments.length;
   this.suspendSignalsDispatching();
   if (!count)
@@ -394,7 +425,8 @@ anychart.core.ChartWithSeries.prototype.removeSeriesAt = function(index) {
         anychart.ConsistencyState.CHART_LEGEND |
         anychart.ConsistencyState.SCALE_CHART_SCALES |
         anychart.ConsistencyState.SCALE_CHART_Y_SCALES |
-        anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS,
+        anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS |
+        anychart.ConsistencyState.CHART_LABELS,
         anychart.Signal.NEEDS_REDRAW);
     this.resumeSignalsDispatching(true);
     anychart.globalLock.unlock();
@@ -420,7 +452,8 @@ anychart.core.ChartWithSeries.prototype.removeAllSeries = function() {
         anychart.ConsistencyState.CHART_LEGEND |
         anychart.ConsistencyState.SCALE_CHART_SCALES |
         anychart.ConsistencyState.SCALE_CHART_Y_SCALES |
-        anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS,
+        anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS |
+        anychart.ConsistencyState.CHART_LABELS,
         anychart.Signal.NEEDS_REDRAW);
     this.resumeSignalsDispatching(true);
     // When we deleting ALL series, we should clear this statuses, cause they are loss the actuality
@@ -442,6 +475,9 @@ anychart.core.ChartWithSeries.prototype.removeAllSeries = function() {
  */
 anychart.core.ChartWithSeries.prototype.seriesInvalidated = function(event) {
   var state = 0;
+  if (event.hasSignal(anychart.Signal.ENABLED_STATE_CHANGED)) {
+    state |= anychart.ConsistencyState.CHART_LABELS;
+  }
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
     state = anychart.ConsistencyState.SERIES_CHART_SERIES;
   }
@@ -449,7 +485,9 @@ anychart.core.ChartWithSeries.prototype.seriesInvalidated = function(event) {
     state = anychart.ConsistencyState.A11Y;
   }
   if (event.hasSignal(anychart.Signal.DATA_CHANGED)) {
+    state |= anychart.ConsistencyState.CHART_LABELS;
     if (this.legend().itemsSourceMode() == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
+      // CHART_LABELS invalidation for no data label.
       state |= anychart.ConsistencyState.CHART_LEGEND;
     }
     this.invalidateAnnotations();
@@ -502,21 +540,16 @@ anychart.core.ChartWithSeries.prototype.invalidateSizeBasedSeries = function() {
 
 /**
  * Returns if the chart is vertical.
- * @return {boolean}
+ * @param {boolean=} opt_value
+ * @return {!(boolean|anychart.core.ChartWithSeries)}
  */
-anychart.core.ChartWithSeries.prototype.isVertical = function() {
-  return false;
+anychart.core.ChartWithSeries.prototype.isVertical = function(opt_value) {
+  return goog.isDef(opt_value) ? this : false;
 };
 
 
-/**
- * Annotations plot-level controller.
- * @param {Array.<anychart.enums.AnnotationTypes|anychart.core.annotations.AnnotationJSONFormat>=} opt_annotationsList
- * @return {anychart.core.ChartWithSeries|anychart.core.annotations.PlotController}
- */
-anychart.core.ChartWithSeries.prototype.annotations = function(opt_annotationsList) {
-  return null;
-};
+/** @inheritDoc */
+anychart.core.ChartWithSeries.prototype.xScale = function() {};
 
 
 /**
@@ -539,12 +572,6 @@ anychart.core.ChartWithSeries.prototype.distributeSeries = function() {};
 anychart.core.ChartWithSeries.prototype.allowLegendCategoriesMode = function() {
   return true;
 };
-
-
-/**
- * A hook to invalidate annotations, if needed.
- */
-anychart.core.ChartWithSeries.prototype.invalidateAnnotations = goog.nullFunction;
 
 
 //endregion
@@ -590,6 +617,21 @@ anychart.core.ChartWithSeries.prototype.minBubbleSize = function(opt_value) {
 };
 
 
+/**
+ * Resets series shared stack.
+ * @param {boolean=} opt_skipInvalidation - Whether to skip width based series invalidation.
+ */
+anychart.core.ChartWithSeries.prototype.resetSeriesStack = function(opt_skipInvalidation) {
+  for (var i = 0; i < this.seriesList.length; i++) {
+    var series = this.seriesList[i];
+    if (series)
+      series.resetSharedStack();
+  }
+  if (!opt_skipInvalidation)
+    this.invalidateWidthBasedSeries();
+};
+
+
 //endregion
 //region --- Series interaction
 /**
@@ -618,11 +660,11 @@ anychart.core.ChartWithSeries.prototype.invalidateSeriesLabels = function() {
  * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|anychart.core.ChartWithSeries)} .
  */
 anychart.core.ChartWithSeries.prototype.palette = function(opt_value) {
-  if (opt_value instanceof anychart.palettes.RangeColors) {
-    this.setupPalette_(anychart.palettes.RangeColors, opt_value);
+  if (anychart.utils.instanceOf(opt_value, anychart.palettes.RangeColors)) {
+    this.setupPalette_(anychart.palettes.RangeColors, /** @type {anychart.palettes.RangeColors} */(opt_value));
     return this;
-  } else if (opt_value instanceof anychart.palettes.DistinctColors) {
-    this.setupPalette_(anychart.palettes.DistinctColors, opt_value);
+  } else if (anychart.utils.instanceOf(opt_value, anychart.palettes.DistinctColors)) {
+    this.setupPalette_(anychart.palettes.DistinctColors, /** @type {anychart.palettes.DistinctColors} */(opt_value));
     return this;
   } else if (goog.isObject(opt_value) && opt_value['type'] == 'range') {
     this.setupPalette_(anychart.palettes.RangeColors);
@@ -687,7 +729,7 @@ anychart.core.ChartWithSeries.prototype.hatchFillPalette = function(opt_value) {
  * @private
  */
 anychart.core.ChartWithSeries.prototype.setupPalette_ = function(cls, opt_cloneFrom) {
-  if (this.palette_ instanceof cls) {
+  if (anychart.utils.instanceOf(this.palette_, cls)) {
     if (opt_cloneFrom)
       this.palette_.setup(opt_cloneFrom);
   } else {
@@ -749,64 +791,58 @@ anychart.core.ChartWithSeries.prototype.hatchFillPaletteInvalidated_ = function(
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter/setter for current series data labels.
- * @param {(Object|boolean|null)=} opt_value Series data labels settings.
- * @return {!(anychart.core.ui.LabelsFactory|anychart.core.ChartWithSeries)} Labels instance or itself for chaining call.
+ * Getter/setter for labels.
+ * @param {(Object|boolean|null)=} opt_value .
+ * @return {anychart.core.ui.LabelsFactory|anychart.core.ChartWithSeries} .
  */
 anychart.core.ChartWithSeries.prototype.labels = function(opt_value) {
-  if (!this.labels_) {
-    this.labels_ = new anychart.core.ui.LabelsFactory();
-    this.labels_.markConsistent(anychart.ConsistencyState.ALL);
-    this.labels_.listenSignals(this.labelsInvalidated_, this);
-  }
-
   if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !('enabled' in opt_value))
-      opt_value['enabled'] = true;
-    this.labels_.setup(opt_value);
+    this.normal_.labels(opt_value);
     return this;
   }
-  return this.labels_;
+  return /** @type {anychart.core.ui.LabelsFactory} */ (this.normal_.labels());
 };
 
 
 /**
- * Gets or sets series hover data labels.
- * @param {(Object|boolean|null)=} opt_value Series data labels settings.
- * @return {!(anychart.core.ui.LabelsFactory|anychart.core.ChartWithSeries)} Labels instance or itself for chaining call.
+ * Normal state settings.
+ * @param {!Object=} opt_value
+ * @return {anychart.core.StateSettings|anychart.core.ChartWithSeries}
  */
-anychart.core.ChartWithSeries.prototype.hoverLabels = function(opt_value) {
-  if (!this.hoverLabels_) {
-    this.hoverLabels_ = new anychart.core.ui.LabelsFactory();
-  }
-
+anychart.core.ChartWithSeries.prototype.normal = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !('enabled' in opt_value))
-      opt_value['enabled'] = true;
-    this.hoverLabels_.setup(opt_value);
+    this.normal_.setup(opt_value);
     return this;
   }
-  return this.hoverLabels_;
+  return this.normal_;
 };
 
 
 /**
- * Gets or sets series select data labels.
- * @param {(Object|boolean|null)=} opt_value Series data labels settings.
- * @return {!(anychart.core.ui.LabelsFactory|anychart.core.ChartWithSeries)} Labels instance or itself for chaining call.
+ * Hovered state settings.
+ * @param {!Object=} opt_value
+ * @return {anychart.core.StateSettings|anychart.core.ChartWithSeries}
  */
-anychart.core.ChartWithSeries.prototype.selectLabels = function(opt_value) {
-  if (!this.selectLabels_) {
-    this.selectLabels_ = new anychart.core.ui.LabelsFactory();
-  }
-
+anychart.core.ChartWithSeries.prototype.hovered = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !('enabled' in opt_value))
-      opt_value['enabled'] = true;
-    this.selectLabels_.setup(opt_value);
+    this.hovered_.setup(opt_value);
     return this;
   }
-  return this.selectLabels_;
+  return this.hovered_;
+};
+
+
+/**
+ * Selected state settings.
+ * @param {!Object=} opt_value
+ * @return {anychart.core.StateSettings|anychart.core.ChartWithSeries}
+ */
+anychart.core.ChartWithSeries.prototype.selected = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.selected_.setup(opt_value);
+    return this;
+  }
+  return this.selected_;
 };
 
 
@@ -817,7 +853,7 @@ anychart.core.ChartWithSeries.prototype.selectLabels = function(opt_value) {
  */
 anychart.core.ChartWithSeries.prototype.labelsInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    this.labels_.markConsistent(anychart.ConsistencyState.ALL);
+    this.normal().labels().markConsistent(anychart.ConsistencyState.ALL);
     this.invalidateSeriesLabels();
     this.invalidate(anychart.ConsistencyState.SERIES_CHART_SERIES, anychart.Signal.NEEDS_REDRAW);
   }
@@ -867,25 +903,25 @@ anychart.core.ChartWithSeries.seriesReferenceValues = {
   'column': ['value'],
   'spline': ['value'],
   'marker': ['value'],
-  'stepArea': ['value'],
-  'stepLine:': ['value'],
-  'splineArea': ['value'],
-  'jumpLine': ['value'],
+  'step-area': ['value'],
+  'step-line:': ['value'],
+  'spline-area': ['value'],
+  'jump-line': ['value'],
   'stick': ['value'],
   'mekko': ['value'],
   'bubble': ['value', 'size'],
-  'rangeBar': ['high', 'low'],
-  'rangeArea': ['high', 'low'],
-  'rangeColumn': ['high', 'low'],
-  'rangeStepArea': ['high', 'low'],
-  'rangeSplineArea': ['high', 'low'],
+  'range-bar': ['high', 'low'],
+  'range-area': ['high', 'low'],
+  'range-column': ['high', 'low'],
+  'range-step-area': ['high', 'low'],
+  'range-spline-area': ['high', 'low'],
   'ohlc': ['open', 'high', 'low', 'close'],
   'candlestick': ['open', 'high', 'low', 'close'],
   'box': ['lowest', 'q1', 'median', 'q3', 'highest'],
   'connector': ['points'],
   'choropleth': ['id', 'value'],
-  'markerMap': ['id', 'long', 'lat'],
-  'bubbleMap': ['id', 'long', 'lat', 'size'],
+  'marker-map': ['id', 'long', 'lat'],
+  'bubble-map': ['id', 'long', 'lat', 'size'],
   'hilo': ['high', 'low'],
   'waterfall': ['value']
 };
@@ -909,8 +945,8 @@ anychart.core.ChartWithSeries.prototype.data = function(opt_value) {
     } else this.rawData_ = opt_value;
 
     /** @type {anychart.data.Set} */
-    var dataSet = opt_value instanceof anychart.data.Set ?
-        opt_value :
+    var dataSet = anychart.utils.instanceOf(opt_value, anychart.data.Set) ?
+        /** @type {anychart.data.Set} */(opt_value) :
         anychart.data.set(this.rawData_);
 
     // define cols count
@@ -950,7 +986,7 @@ anychart.core.ChartWithSeries.prototype.data = function(opt_value) {
       seriesIndex++;
     }
 
-    var type = /** @type {string} */(this.defaultSeriesType());
+    var type = /** @type {string} */(this.getOption('defaultSeriesType'));
     names = anychart.core.ChartWithSeries.seriesReferenceValues[type];
 
     do {
@@ -967,6 +1003,7 @@ anychart.core.ChartWithSeries.prototype.data = function(opt_value) {
       }
     } while (usedColsCount <= colsCount);
 
+    this.invalidate(anychart.ConsistencyState.CHART_LABELS);
     this.resumeSignalsDispatching(true);
     return this;
   } else {
@@ -1079,15 +1116,25 @@ anychart.core.ChartWithSeries.prototype.drawSeries = function(opt_topAxisPadding
     }
 
     this.beforeSeriesDraw();
-    for (i = 0; i < this.seriesList.length; i++) {
-      this.seriesList[i].draw();
-    }
+    this.drawSeriesInOrder();
     this.afterSeriesDraw();
+    this.resetSeriesStack(true);
 
     this.markConsistent(anychart.ConsistencyState.SERIES_CHART_SERIES);
     anychart.core.Base.resumeSignalsDispatchingFalse(this.seriesList);
   }
   anychart.performance.end('Series drawing');
+};
+
+
+/**
+ * Draws series in correct order.
+ * @protected
+ */
+anychart.core.ChartWithSeries.prototype.drawSeriesInOrder = function() {
+  for (var i = 0; i < this.seriesList.length; i++) {
+    this.seriesList[i].draw();
+  }
 };
 
 
@@ -1109,7 +1156,7 @@ anychart.core.ChartWithSeries.prototype.createLegendItemsProvider = function(sou
   this.calculate();
   if (this.allowLegendCategoriesMode() &&
       sourceMode == anychart.enums.LegendItemsSourceMode.CATEGORIES &&
-      (this.xScale() instanceof anychart.scales.Ordinal)) {
+      (anychart.utils.instanceOf(this.xScale(), anychart.scales.Ordinal))) {
     var names = this.xScale().names();
 
     if (goog.isFunction(itemsFormat)) {
@@ -1156,6 +1203,38 @@ anychart.core.ChartWithSeries.prototype.createLegendItemsProvider = function(sou
 
 
 //endregion
+//region --- No Data
+/**
+ * Whether series enabled.
+ * @param {anychart.core.series.Cartesian} series
+ * @return {boolean}
+ */
+anychart.core.ChartWithSeries.prototype.isSeriesVisible = function(series) {
+  var enabled = /** @type {boolean} */(series.enabled());
+  var excluded = series.getExcludedIndexesInternal();
+  var visible = true;
+  var rowsCount = series.data() ? series.data().getRowsCount() : 0;
+  if (!rowsCount || (rowsCount == excluded.length))
+    visible = false;
+  return (enabled && visible);
+};
+
+
+/** @inheritDoc */
+anychart.core.ChartWithSeries.prototype.isNoData = function() {
+  var countDisabled = 0;
+  var len = this.seriesList.length;
+  for (var i = 0; i < len; i++) {
+    if (!this.isSeriesVisible(this.seriesList[i]))
+      countDisabled++;
+    else
+      break;
+  }
+  return (countDisabled == len);
+};
+
+
+//endregion
 //region --- Serialization / Deserialization / Disposing
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1168,16 +1247,21 @@ anychart.core.ChartWithSeries.prototype.createLegendItemsProvider = function(sou
 anychart.core.ChartWithSeries.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.ChartWithSeries.base(this, 'setupByJSON', config, opt_default);
 
-  this.defaultSeriesType(config['defaultSeriesType']);
+  if (opt_default) {
+    anychart.core.settings.copy(this.themeSettings, anychart.core.ChartWithSeries.PROPERTY_DESCRIPTORS, config);
+  } else {
+    anychart.core.settings.deserialize(this, anychart.core.ChartWithSeries.PROPERTY_DESCRIPTORS, config);
+  }
   this.minBubbleSize(config['minBubbleSize']);
   this.maxBubbleSize(config['maxBubbleSize']);
   this.palette(config['palette']);
   this.markerPalette(config['markerPalette']);
   this.hatchFillPalette(config['hatchFillPalette']);
 
-  this.labels().setupInternal(!!opt_default, config['labels']);
-  this.hoverLabels().setupInternal(!!opt_default, config['hoverLabels']);
-  this.selectLabels().setupInternal(!!opt_default, config['selectLabels']);
+  this.normal_.setupInternal(!!opt_default, config);
+  this.normal_.setupInternal(!!opt_default, config['normal']);
+  this.hovered_.setupInternal(!!opt_default, config['hovered']);
+  this.selected_.setupInternal(!!opt_default, config['selected']);
 };
 
 
@@ -1187,22 +1271,16 @@ anychart.core.ChartWithSeries.prototype.setupByJSON = function(config, opt_defau
 anychart.core.ChartWithSeries.prototype.serialize = function() {
   var json = anychart.core.ChartWithSeries.base(this, 'serialize');
 
-  json['defaultSeriesType'] = this.defaultSeriesType();
+  anychart.core.settings.serialize(this, anychart.core.ChartWithSeries.PROPERTY_DESCRIPTORS, json);
   json['minBubbleSize'] = this.minBubbleSize();
   json['maxBubbleSize'] = this.maxBubbleSize();
   json['palette'] = this.palette().serialize();
   json['markerPalette'] = this.markerPalette().serialize();
   json['hatchFillPalette'] = this.hatchFillPalette().serialize();
 
-  json['labels'] = this.labels().serialize();
-  json['hoverLabels'] = this.hoverLabels().getChangedSettings();
-  json['selectLabels'] = this.selectLabels().getChangedSettings();
-  if (goog.isNull(json['hoverLabels']['enabled'])) {
-    delete json['hoverLabels']['enabled'];
-  }
-  if (goog.isNull(json['selectLabels']['enabled'])) {
-    delete json['selectLabels']['enabled'];
-  }
+  json['normal'] = this.normal().serialize();
+  json['hovered'] = this.hovered().serialize();
+  json['selected'] = this.selected().serialize();
 
   return json;
 };
@@ -1217,7 +1295,7 @@ anychart.core.ChartWithSeries.prototype.disposeInternal = function() {
   goog.disposeAll(this.palette_, this.markerPalette_, this.hatchFillPalette_);
   this.palette_ = this.markerPalette_ = this.hatchFillPalette_ = null;
 
-  goog.disposeAll(this.labels_, this.hoverLabels_, this.selectLabels_);
+  goog.disposeAll(this.normal_, this.hovered_, this.selected_);
 
   anychart.core.ChartWithSeries.base(this, 'disposeInternal');
 };
@@ -1228,10 +1306,13 @@ anychart.core.ChartWithSeries.prototype.disposeInternal = function() {
 //exports
 (function() {
   var proto = anychart.core.ChartWithSeries.prototype;
-
+  // auto generated
+  // proto['defaultSeriesType'] = proto.defaultSeriesType;
   proto['labels'] = proto.labels;
-  proto['hoverLabels'] = proto.hoverLabels;
-  proto['selectLabels'] = proto.selectLabels;
+  proto['normal'] = proto.normal;
+  proto['hovered'] = proto.hovered;
+  proto['selected'] = proto.selected;
+  proto['isVertical'] = proto.isVertical;
 })();
 
 

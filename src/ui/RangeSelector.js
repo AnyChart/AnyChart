@@ -9,7 +9,7 @@ goog.require('goog.ui.Component');
 goog.require('goog.ui.Component.EventType');
 goog.require('goog.ui.SelectionModel');
 
-goog.forwardDeclare('anychart.charts.Stock');
+goog.forwardDeclare('anychart.stockModule.Chart');
 
 
 
@@ -23,7 +23,7 @@ anychart.ui.RangeSelector = function() {
 
   /**
    * Stock chart.
-   * @type {?anychart.charts.Stock}
+   * @type {?anychart.stockModule.Chart}
    * @private
    */
   this.target_ = null;
@@ -51,40 +51,40 @@ anychart.ui.RangeSelector = function() {
   this.ranges_ = [];
 
   this.ranges([{
-    'type': 'Unit',
+    'type': anychart.enums.StockRangeType.UNIT,
     'unit': 'Day',
     'count': 10,
     'text': '10D'
   },{
-    'type': 'Unit',
+    'type': anychart.enums.StockRangeType.UNIT,
     'unit': 'Month',
     'count': 1,
     'text': '1M'
   },{
-    'type': 'Unit',
+    'type': anychart.enums.StockRangeType.UNIT,
     'unit': 'Month',
     'count': 3,
     'text': '3M'
   },{
-    'type': 'YTD',
+    'type': anychart.enums.StockRangeType.YTD,
     'text': 'YTD'
   },{
-    'type': 'Unit',
+    'type': anychart.enums.StockRangeType.UNIT,
     'unit': 'Year',
     'count': 1,
     'text': '1Y'
   },{
-    'type': 'Unit',
+    'type': anychart.enums.StockRangeType.UNIT,
     'unit': 'Year',
     'count': 2,
     'text': '2Y'
   },{
-    'type': 'Unit',
+    'type': anychart.enums.StockRangeType.UNIT,
     'unit': 'Year',
     'count': 5,
     'text': '5Y'
   },{
-    'type': 'Max',
+    'type': anychart.enums.StockRangeType.MAX,
     'text': 'MAX'
   }]);
 
@@ -140,7 +140,7 @@ anychart.ui.RangeSelector.Range;
 
 /**
  * Set stock chart for Range Selector.
- * @param {anychart.charts.Stock} chart
+ * @param {anychart.stockModule.Chart} chart
  */
 anychart.ui.RangeSelector.prototype.target = function(chart) {
   this.target_ = chart;
@@ -220,7 +220,7 @@ anychart.ui.RangeSelector.prototype.createDomInternal_ = function() {
         goog.ui.INLINE_BLOCK_CLASSNAME,
         goog.getCssName('anychart-input-label')
       ],
-      window['anychart']['format']['getMessage'](this.zoomLabelText_));
+      anychart.window['anychart']['format']['getMessage'](this.zoomLabelText_));
   goog.dom.appendChild(element, this.zoomLabel_);
 };
 
@@ -287,7 +287,7 @@ anychart.ui.RangeSelector.prototype.zoomLabelText = function(opt_value) {
     if (this.zoomLabelText_ != opt_value) {
       this.zoomLabelText_ = opt_value;
       if (this.zoomLabel_)
-        goog.dom.setTextContent(this.zoomLabel_, window['anychart']['format']['getMessage'](this.zoomLabelText_));
+        goog.dom.setTextContent(this.zoomLabel_, anychart.window['anychart']['format']['getMessage'](this.zoomLabelText_));
     }
     return this;
   }
@@ -306,14 +306,14 @@ anychart.ui.RangeSelector.prototype.isStockChart_ = function(chart) {
 
 
 /**
- * @param {(anychart.charts.Stock|Element)=} opt_parentElement Optional parent element or stock chart to render the
+ * @param {(anychart.stockModule.Chart|Element)=} opt_parentElement Optional parent element or stock chart to render the
  *    range picker into.
  * @return {Element|undefined}
  * @private
  */
 anychart.ui.RangeSelector.prototype.extractChartContainer_ = function(opt_parentElement) {
   if (this.isStockChart_(opt_parentElement)) {
-    this.target(/** @type {anychart.charts.Stock} */(opt_parentElement));
+    this.target(/** @type {anychart.stockModule.Chart} */(opt_parentElement));
     this.insideChart_ = true;
     var stage = this.target_['container']() ? this.target_['container']()['getStage']() : null;
     if (stage && stage['container']()) {
@@ -327,7 +327,7 @@ anychart.ui.RangeSelector.prototype.extractChartContainer_ = function(opt_parent
 
 
 /**
- * @param {(anychart.charts.Stock|Element)=} opt_parentElement Optional parent element or stock chart to render the range picker into.
+ * @param {(anychart.stockModule.Chart|Element)=} opt_parentElement Optional parent element or stock chart to render the range picker into.
  * @private
  */
 anychart.ui.RangeSelector.prototype.delayedRenderOnChartDraw_ = function(opt_parentElement) {
@@ -336,7 +336,7 @@ anychart.ui.RangeSelector.prototype.delayedRenderOnChartDraw_ = function(opt_par
 
 
 /**
- * @param {(anychart.charts.Stock|Element)=} opt_parentElement Optional parent element or stock chart to render the
+ * @param {(anychart.stockModule.Chart|Element)=} opt_parentElement Optional parent element or stock chart to render the
  *    range selector into.
  * @override
  */
@@ -398,8 +398,8 @@ anychart.ui.RangeSelector.prototype.handleButtonAction_ = function(e) {
     this.target_['selectRange'](type, true);
 
   } else {
-    var fromParsed = window['anychart']['format']['parseDateTime'](descriptor['startDate']);
-    var toParsed = window['anychart']['format']['parseDateTime'](descriptor['endDate']);
+    var fromParsed = anychart.window['anychart']['format']['parseDateTime'](descriptor['startDate']);
+    var toParsed = anychart.window['anychart']['format']['parseDateTime'](descriptor['endDate']);
 
     if (fromParsed && toParsed) {
       this.target_['selectRange'](fromParsed, toParsed, true);

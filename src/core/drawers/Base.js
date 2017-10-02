@@ -75,7 +75,7 @@ anychart.core.drawers.Base.prototype.flags = (
  * Y values list that are required by this drawer.
  * @type {Array.<string>}
  */
-anychart.core.drawers.Base.prototype.yValueNames = (['value']);
+anychart.core.drawers.Base.prototype.yValueNames = (function() { return ['value']; })();
 
 
 /**
@@ -90,7 +90,7 @@ anychart.core.drawers.Base.prototype.valueFieldName = 'value';
  * This is checked before on drawing start.
  * @type {Object.<string, anychart.enums.ShapeType>}
  */
-anychart.core.drawers.Base.prototype.requiredShapes = ({});
+anychart.core.drawers.Base.prototype.requiredShapes = (function() { return {}; })();
 
 
 /**
@@ -114,7 +114,7 @@ anychart.core.drawers.Base.prototype.getYValueNames = function() {
 anychart.core.drawers.Base.prototype.checkShapesInRect = function(shapes, left, top, width, height) {
   for (var shapeName in shapes) {
     var shape = /** @type {acgraph.vector.Element} */(shapes[shapeName]);
-    if (shape instanceof acgraph.vector.Element) {
+    if (anychart.utils.instanceOf(shape, acgraph.vector.Element)) {
       var bounds = shape.getBounds();
       if (bounds.left <= left + width && left <= bounds.left + bounds.width &&
           bounds.top <= top + height && top <= bounds.top + bounds.height) {

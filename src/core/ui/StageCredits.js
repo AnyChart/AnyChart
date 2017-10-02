@@ -33,7 +33,7 @@ anychart.core.ui.StageCredits = function(stage, disabledByDefault) {
    * @type {boolean}
    * @private
    */
-  this.onAnyChartDomain_ = anychart.core.ui.StageCredits.DOMAIN_REGEXP.test(goog.dom.getWindow().location.hostname);
+  this.onAnyChartDomain_ = anychart.core.ui.StageCredits.DOMAIN_REGEXP.test(anychart.window.location.hostname);
 
   /**
    * Default enabled value is determined by the domain regexp and the constructor param.
@@ -194,7 +194,7 @@ anychart.core.ui.StageCredits.prototype.invalidate = function(state, opt_dispatc
  * @private
  */
 anychart.core.ui.StageCredits.prototype.addProtocol_ = function(url) {
-  return ('https:' == goog.dom.getWindow().location.protocol ? 'https://' : 'http://') + url;
+  return ('https:' == anychart.window.location.protocol ? 'https://' : 'http://') + url;
 };
 
 
@@ -387,9 +387,14 @@ anychart.core.ui.StageCredits.prototype.render = function() {
   }
 
   if (this.hasInvalidationState(anychart.core.ui.StageCredits.States.URL_ALT)) {
+    var version = anychart.VERSION ?
+        goog.string.subs.apply(null, [', v%s.%s.%s.%s'].concat(anychart.VERSION.split('.'))) :
+        '';
+    var defaultTitle = 'AnyChart - JavaScript Charts designed to be embedded and integrated{{anychart-version}}';
+    var title = valid ? this.alt() : defaultTitle;
     goog.dom.setProperties(this.a_, {
       'href': valid ? this.url() : 'https://www.anychart.com/?utm_source=trial',
-      'title': valid ? this.alt() : 'AnyChart - JavaScript Charts designed to be embedded and integrated',
+      'title': title.replace('{{anychart-version}}', version),
       'target': '_blank'
     });
     goog.dom.setProperties(this.image_, {

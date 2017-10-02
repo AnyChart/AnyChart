@@ -62,7 +62,11 @@ anychart.core.drawers.RangeStick.prototype.startDrawing = function(shapeManager)
 
 
 /** @inheritDoc */
-anychart.core.drawers.RangeStick.prototype.yValueNames = (['low', 'high']);
+anychart.core.drawers.RangeStick.prototype.yValueNames = (function () { return ['low', 'high']; })();
+
+
+/** @inheritDoc */
+anychart.core.drawers.RangeStick.prototype.valueFieldName = 'high';
 
 
 /** @inheritDoc */

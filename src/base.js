@@ -3,6 +3,8 @@
  */
 
 goog.provide('anychart.base');
+// temporary, for modules compatibility
+goog.require('goog.labs.userAgent.device');
 
 
 /**
@@ -41,6 +43,20 @@ anychart.DEFAULT_THEME = 'defaultTheme';
  * @define {boolean} Replaced on compile time.
  */
 anychart.PERFORMANCE_MONITORING = true;
+
+
+/**
+ * Global object
+ * @type {Window}
+ */
+anychart.window = goog.global;
+
+
+/**
+ * Document object
+ * @type {Document}
+ */
+anychart.document = anychart.window['document'];
 
 
 /**

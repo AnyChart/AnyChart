@@ -1,0 +1,10 @@
+/**
+ * AnyChart is lightweight robust charting library with great API and Docs, that works with your stack and has tons of chart types and features.
+ *
+ * Modules: %s
+ * Version: %s (%s)
+ * License: http://www.anychart.com/buy/
+ * Contact: sales@anychart.com
+ * Copyright: AnyChart.com %s. All rights reserved.
+ */
+(function(global,factory){if(typeof module==='object'&&typeof module.exports==='object'){var wrapper=function(w){if(!w.document){throw Error('AnyChart requires a window with a document');}factory.call(w,w,w.document);w.acgraph.isNodeJS=true;return w.anychart;};module.exports=global.document?wrapper(global):wrapper;}else{factory.call(global,window,document)}})(typeof window!=='undefined'?window:this,function(window,document,opt_noGlobal){var $,_,$_=this.anychart;%sif($_&&(_=$_._)){$=$_.$}else{%s$={};_={}}

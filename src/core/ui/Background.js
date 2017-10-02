@@ -1,5 +1,6 @@
 //region --- Requiring and Providing
 goog.provide('anychart.core.ui.Background');
+goog.provide('anychart.standalones.Background');
 goog.require('acgraph');
 goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.VisualBaseWithBounds');
@@ -20,35 +21,19 @@ goog.require('goog.array');
  * @extends {anychart.core.VisualBaseWithBounds}
  * @implements {anychart.core.IStandaloneBackend}
  * @constructor
- * @implements {anychart.core.settings.IObjectWithSettings}
  * @implements {anychart.core.settings.IResolvable}
  */
 anychart.core.ui.Background = function() {
   anychart.core.ui.Background.base(this, 'constructor');
 
-  /**
-   * Theme settings.
-   * @type {Object}
-   */
-  this.themeSettings = {};
+  delete this.themeSettings['enabled'];
 
   /**
-   * Own settings (Settings set by user with API).
-   * @type {Object}
-   */
-  this.ownSettings = {};
-
-  /**
-   * Parent title.
+   * Parent.
    * @type {anychart.core.ui.Background}
    * @private
    */
   this.parent_ = null;
-
-  /**
-   * @type {boolean}
-   */
-  this.forceInvalidate = false;
 
   /**
    * Resolution chain cache.
@@ -56,6 +41,17 @@ anychart.core.ui.Background = function() {
    * @private
    */
   this.resolutionChainCache_ = null;
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['fill', anychart.ConsistencyState.APPEARANCE],
+    ['stroke', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS],
+    ['topStroke', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS],
+    ['rightStroke', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS],
+    ['bottomStroke', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS],
+    ['leftStroke', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS],
+    ['disablePointerEvents', anychart.ConsistencyState.BACKGROUND_POINTER_EVENTS],
+    ['cornerType', anychart.ConsistencyState.BOUNDS]
+  ]);
 };
 goog.inherits(anychart.core.ui.Background, anychart.core.VisualBaseWithBounds);
 
@@ -93,141 +89,74 @@ anychart.core.ui.Background.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'fill',
-      anychart.core.settings.fillNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.fillNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'stroke',
-      anychart.core.settings.strokeNormalizer,
-      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.strokeNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'topStroke',
-      anychart.core.settings.strokeNormalizer,
-      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.strokeNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'rightStroke',
-      anychart.core.settings.strokeNormalizer,
-      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.strokeNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'bottomStroke',
-      anychart.core.settings.strokeNormalizer,
-      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.strokeNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'leftStroke',
-      anychart.core.settings.strokeNormalizer,
-      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.strokeNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'disablePointerEvents',
-      anychart.core.settings.booleanNormalizer,
-      anychart.ConsistencyState.BACKGROUND_POINTER_EVENTS,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.booleanNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'cornerType',
-      anychart.enums.normalizeBackgroundCornerType,
-      anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.enums.normalizeBackgroundCornerType);
 
   return map;
 })();
 anychart.core.settings.populate(anychart.core.ui.Background, anychart.core.ui.Background.prototype.SIMPLE_PROPS_DESCRIPTORS);
 
 
-/** @inheritDoc */
-anychart.core.ui.Background.prototype.enabled = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.ownSettings['enabled'] != opt_value) {
-      var enabled = this.ownSettings['enabled'] = opt_value;
-      this.invalidate(anychart.ConsistencyState.ENABLED, this.getEnableChangeSignals());
-      if (enabled) {
-        this.doubleSuspension = false;
-        this.resumeSignalsDispatching(true);
-      } else {
-        if (isNaN(this.suspendedDispatching)) {
-          this.suspendSignalsDispatching();
-        } else {
-          this.doubleSuspension = true;
-        }
-      }
-    }
-    return this;
-  } else {
-    return /** @type {boolean} */(this.getOption('enabled'));
-  }
-};
-
-
-/** @inheritDoc */
-anychart.core.ui.Background.prototype.zIndex = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var val = +opt_value || 0;
-    if (this.ownSettings['zIndex'] != val) {
-      this.ownSettings['zIndex'] = val;
-      this.invalidate(anychart.ConsistencyState.Z_INDEX, anychart.Signal.NEEDS_REDRAW | anychart.Signal.Z_INDEX_STATE_CHANGED);
-    }
-    return this;
-  }
-  return /** @type {number} */(goog.isDef(this.getOwnOption('zIndex')) ? this.getOwnOption('zIndex') : goog.isDef(this.autoZIndex) ? this.autoZIndex : this.getOption('zIndex'));
-};
-
-
 //endregion
 //region -- IObjectWithSettings implementation
-/** @inheritDoc */
-anychart.core.ui.Background.prototype.getOwnOption = function(name) {
-  return this.ownSettings[name];
-};
-
-
-/** @inheritDoc */
-anychart.core.ui.Background.prototype.hasOwnOption = function(name) {
-  return goog.isDef(this.ownSettings[name]);
-};
-
-
-/** @inheritDoc */
-anychart.core.ui.Background.prototype.getThemeOption = function(name) {
-  return this.themeSettings[name];
-};
-
-
-/** @inheritDoc */
+/**
+ * @override
+ * @param {string} name
+ * @return {*}
+ */
 anychart.core.ui.Background.prototype.getOption = anychart.core.settings.getOption;
 
 
 /** @inheritDoc */
-anychart.core.ui.Background.prototype.setOption = function(name, value) {
-  this.ownSettings[name] = value;
+anychart.core.ui.Background.prototype.getSignal = function(fieldName) {
+  // all props invalidates with NEEDS_REDRAW
+  return anychart.Signal.NEEDS_REDRAW;
 };
 
 
 /** @inheritDoc */
-anychart.core.ui.Background.prototype.check = function(flags) {
+anychart.core.ui.Background.prototype.isResolvable = function() {
   return true;
 };
 
@@ -310,15 +239,6 @@ anychart.core.ui.Background.prototype.corners = function(opt_value) {
   } else {
     return /** @type {Array.<number|string>} */(this.getOption('corners'));
   }
-};
-
-
-/**
- * Whether needs force invalidation.
- * @return {boolean}
- */
-anychart.core.ui.Background.prototype.needsForceInvalidation = function() {
-  return this.forceInvalidate;
 };
 
 
@@ -738,17 +658,6 @@ anychart.core.ui.Background.prototype.getRemainingBounds = function() {
 };
 
 
-/**
- * @inheritDoc
- */
-anychart.core.ui.Background.prototype.invalidate = function(state, opt_signal) {
-  var effective = anychart.core.ui.Background.base(this, 'invalidate', state, opt_signal);
-  if (!effective && this.needsForceInvalidation())
-    this.dispatchSignal(opt_signal || 0);
-  return effective;
-};
-
-
 //endregion
 //region -- Serialize, deserialize, dispose
 /**
@@ -756,39 +665,14 @@ anychart.core.ui.Background.prototype.invalidate = function(state, opt_signal) {
  * @param {!Object} config
  */
 anychart.core.ui.Background.prototype.setThemeSettings = function(config) {
-  for (var name in this.SIMPLE_PROPS_DESCRIPTORS) {
-    var val = config[name];
-    if (goog.isDef(val))
-      this.themeSettings[name] = val;
-  }
-  if ('enabled' in config) this.themeSettings['enabled'] = config['enabled'];
-  if ('zIndex' in config) this.themeSettings['zIndex'] = config['zIndex'];
+  anychart.core.settings.copy(this.themeSettings, this.SIMPLE_PROPS_DESCRIPTORS, config);
   if ('corners' in config) this.themeSettings['corners'] = this.cornersFormatter_(config['corners']);
 };
 
 
 /** @inheritDoc */
 anychart.core.ui.Background.prototype.serialize = function() {
-  var json = {};
-
-  var zIndex;
-  if (this.hasOwnOption('zIndex')) {
-    zIndex = this.getOwnOption('zIndex');
-  }
-  if (!goog.isDef(zIndex)) {
-    zIndex = this.getThemeOption('zIndex');
-  }
-  if (goog.isDef(zIndex)) json['zIndex'] = zIndex;
-
-  var enabled;
-  if (this.hasOwnOption('enabled')) {
-    enabled = this.getOwnOption('enabled');
-  }
-  if (!goog.isDef(enabled)) {
-    enabled = this.getThemeOption('enabled');
-  }
-  if (goog.isDef(enabled))
-    json['enabled'] = enabled;
+  var json = anychart.core.ui.Background.base(this, 'serialize');
 
   anychart.core.settings.serialize(this, this.SIMPLE_PROPS_DESCRIPTORS, json, 'Background');
 
@@ -837,12 +721,13 @@ anychart.core.ui.Background.prototype.setupSpecial = function(isDefault, var_arg
 
 /** @inheritDoc */
 anychart.core.ui.Background.prototype.setupByJSON = function(config, opt_default) {
+  anychart.core.ui.Background.base(this, 'setupByJSON', config, opt_default);
+
   if (opt_default) {
     this.setThemeSettings(config);
   } else {
     anychart.core.settings.deserialize(this, this.SIMPLE_PROPS_DESCRIPTORS, config);
     this.corners(config['corners']);
-    anychart.core.ui.Background.base(this, 'setupByJSON', config);
   }
 };
 
@@ -875,6 +760,29 @@ anychart.core.ui.Background.prototype.disposeInternal = function() {
 };
 
 
+
+/**
+ * @constructor
+ * @extends {anychart.core.ui.Background}
+ */
+anychart.standalones.Background = function() {
+  anychart.standalones.Background.base(this, 'constructor');
+};
+goog.inherits(anychart.standalones.Background, anychart.core.ui.Background);
+anychart.core.makeStandalone(anychart.standalones.Background, anychart.core.ui.Background);
+
+
+/**
+ * Constructor function.
+ * @return {!anychart.standalones.Background}
+ */
+anychart.standalones.background = function() {
+  var background = new anychart.standalones.Background();
+  background.setupInternal(true, anychart.getFullTheme('standalones.background'));
+  return background;
+};
+
+
 //endregion
 //exports
 (function() {
@@ -887,4 +795,10 @@ anychart.core.ui.Background.prototype.disposeInternal = function() {
   // proto['leftStroke'] = proto.leftStroke;
   // proto['cornerType'] = proto.cornerType;//in docs/final
   proto['corners'] = proto.corners;//in docs/final
+
+  proto = anychart.standalones.Background.prototype;
+  goog.exportSymbol('anychart.standalones.background', anychart.standalones.background);
+  proto['draw'] = proto.draw;
+  proto['parentBounds'] = proto.parentBounds;
+  proto['container'] = proto.container;
 })();

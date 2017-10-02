@@ -1,5 +1,7 @@
 goog.provide('anychart.core.ui.MarkersFactory');
 goog.provide('anychart.core.ui.MarkersFactory.Marker');
+goog.provide('anychart.standalones.MarkersFactory');
+goog.provide('anychart.standalones.MarkersFactory.Marker');
 goog.require('acgraph.math');
 goog.require('anychart.color');
 goog.require('anychart.core.IStandaloneBackend');
@@ -22,7 +24,7 @@ goog.require('goog.math.Coordinate');
  * </ul>
  * Also you can access any marker from the set and change it:
  * @example <t>simple-h100</t>
- * var MMarker = anychart.ui.markersFactory()
+ * var MMarker = anychart.standalones.markersFactory()
  *     .type('star5')
  *     .size(27)
  *     .fill('blue')
@@ -41,6 +43,7 @@ anychart.core.ui.MarkersFactory = function(opt_isNonInteractive, opt_crispEdges)
   this.suspendSignalsDispatching();
   anychart.core.ui.MarkersFactory.base(this, 'constructor');
 
+  delete this.themeSettings['enabled'];
 
   /**
    * If the markers factory should try to draw markers crisply by passing an additional param to the drawers.
@@ -783,7 +786,10 @@ anychart.core.ui.MarkersFactory.prototype.getRootLayer = function() {
 /** @inheritDoc */
 anychart.core.ui.MarkersFactory.prototype.serialize = function() {
   var json = anychart.core.ui.MarkersFactory.base(this, 'serialize');
-  if (goog.isNull(json['enabled'])) delete json['enabled'];
+  delete json['enabled'];
+  var enabledState = this.enabled();
+  if (goog.isDef(enabledState))
+    json['enabled'] = enabledState;
   if (goog.isDef(this.disablePointerEvents())) json['disablePointerEvents'] = this.disablePointerEvents();
   if (this.changedSettings['position']) json['position'] = this.position();
   if (this.changedSettings['anchor']) json['anchor'] = this.anchor();
@@ -847,9 +853,9 @@ anychart.core.ui.MarkersFactory.prototype.makeBrowserEvent = function(e) {
   var res = anychart.core.ui.MarkersFactory.base(this, 'makeBrowserEvent', e);
   var target = res['domTarget'];
   var tag;
-  while (target instanceof acgraph.vector.Element) {
+  while (anychart.utils.instanceOf(target, acgraph.vector.Element)) {
     tag = target.tag;
-    if (tag instanceof anychart.core.VisualBase || !anychart.utils.isNaN(tag))
+    if (anychart.utils.instanceOf(tag, anychart.core.VisualBase) || !anychart.utils.isNaN(tag))
       break;
     target = target.parent();
   }
@@ -866,6 +872,8 @@ anychart.core.ui.MarkersFactory.prototype.makeBrowserEvent = function(e) {
  */
 anychart.core.ui.MarkersFactory.Marker = function() {
   anychart.core.ui.MarkersFactory.Marker.base(this, 'constructor');
+
+  delete this.themeSettings['enabled'];
 
   /**
    * Label index.
@@ -1483,6 +1491,10 @@ anychart.core.ui.MarkersFactory.Marker.prototype.applyDefaultsForSingle_ = funct
 /** @inheritDoc */
 anychart.core.ui.MarkersFactory.Marker.prototype.serialize = function() {
   var json = anychart.core.ui.MarkersFactory.Marker.base(this, 'serialize');
+  delete json['enabled'];
+  var enabledState = this.enabled();
+  if (goog.isDefAndNotNull(enabledState))
+    json['enabled'] = enabledState;
   if (goog.isDef(this.position())) json['position'] = this.position();
   if (goog.isDef(this.rotation())) json['rotation'] = isNaN(this.rotation()) ? null : this.rotation();
   if (goog.isDef(this.anchor())) json['anchor'] = this.anchor();
@@ -1492,7 +1504,6 @@ anychart.core.ui.MarkersFactory.Marker.prototype.serialize = function() {
   if (goog.isDef(this.size())) json['size'] = this.size();
   if (goog.isDef(this.fill())) json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill()));
   if (goog.isDef(this.stroke())) json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
-  if (!goog.isDef(this.enabled())) delete json['enabled'];
 
   return json;
 };
@@ -1517,6 +1528,53 @@ anychart.core.ui.MarkersFactory.Marker.prototype.setupByJSON = function(config, 
 };
 
 
+
+//region --- Standalone
+//------------------------------------------------------------------------------
+//
+//  Standalone
+//
+//------------------------------------------------------------------------------
+/**
+ * @constructor
+ * @extends {anychart.core.ui.MarkersFactory}
+ */
+anychart.standalones.MarkersFactory = function() {
+  anychart.standalones.MarkersFactory.base(this, 'constructor');
+};
+goog.inherits(anychart.standalones.MarkersFactory, anychart.core.ui.MarkersFactory);
+anychart.core.makeStandalone(anychart.standalones.MarkersFactory, anychart.core.ui.MarkersFactory);
+
+
+/** @inheritDoc */
+anychart.standalones.MarkersFactory.prototype.createMarker = function() {
+  return new anychart.standalones.MarkersFactory.Marker();
+};
+
+
+
+/**
+ * @constructor
+ * @extends {anychart.core.ui.MarkersFactory.Marker}
+ */
+anychart.standalones.MarkersFactory.Marker = function() {
+  anychart.standalones.MarkersFactory.Marker.base(this, 'constructor');
+};
+goog.inherits(anychart.standalones.MarkersFactory.Marker, anychart.core.ui.MarkersFactory.Marker);
+
+
+/**
+ * Constructor function.
+ * @return {!anychart.standalones.MarkersFactory}
+ */
+anychart.standalones.markersFactory = function() {
+  var factory = new anychart.standalones.MarkersFactory();
+  factory.setup(anychart.getFullTheme('standalones.markersFactory'));
+  return factory;
+};
+
+
+//endregion
 //exports
 (function() {
   var proto = anychart.core.ui.MarkersFactory.prototype;
@@ -1544,5 +1602,20 @@ anychart.core.ui.MarkersFactory.Marker.prototype.setupByJSON = function(config, 
   proto['size'] = proto.size;
   proto['fill'] = proto.fill;
   proto['stroke'] = proto.stroke;
+
+  proto = anychart.standalones.MarkersFactory.prototype;
+  goog.exportSymbol('anychart.standalones.markersFactory', anychart.standalones.markersFactory);
+  proto['draw'] = proto.draw;
+  proto['parentBounds'] = proto.parentBounds;
+  proto['container'] = proto.container;
+  proto['add'] = proto.add;
+  proto['clear'] = proto.clear;
+  proto['measure'] = proto.measure;
+
+  proto = anychart.standalones.MarkersFactory.Marker.prototype;
+  proto['enabled'] = proto.enabled;
+  proto['draw'] = proto.draw;
+  proto['clear'] = proto.clear;
+  proto['getIndex'] = proto.getIndex;
 })();
 

@@ -5,6 +5,7 @@
  */
 
 goog.provide('anychart.core.I3DProvider');
+goog.provide('anychart.core.IAxis');
 goog.provide('anychart.core.IChart');
 goog.provide('anychart.core.IChartWithAnnotations');
 goog.provide('anychart.core.IGroupingProvider');
@@ -15,6 +16,32 @@ goog.forwardDeclare('anychart.core.series.TypeConfig');
 
 
 
+//region IAxis
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  IAxis
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * @interface
+ */
+anychart.core.IAxis = function() {};
+
+
+/**
+ * @return {anychart.scales.IXScale|anychart.core.IAxis}
+ */
+anychart.core.IAxis.prototype.scale = function() {};
+
+
+/**
+ * @param {(Object|boolean|null)=} opt_value Axis labels.
+ * @return {anychart.core.ui.LabelsFactory|anychart.core.IAxis}
+ */
+anychart.core.IAxis.prototype.labels = function(opt_value) {};
+
+
+//endregion
 //region IChart
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -77,10 +104,11 @@ anychart.core.IChart.prototype.supportsTooltip = function() {};
 
 
 /**
- * Getter for an isVertical property.
- * @return {boolean}
+ * Getter/setter for isVertical property.
+ * @param {boolean=} opt_value
+ * @return {!(boolean|anychart.core.IChart)}
  */
-anychart.core.IChart.prototype.isVertical = function() {};
+anychart.core.IChart.prototype.isVertical = function(opt_value) {};
 
 
 
@@ -115,6 +143,20 @@ anychart.core.IPlot.prototype.getAllSeries = function() {};
  * @return {Object}
  */
 anychart.core.IPlot.prototype.defaultSeriesSettings = function(opt_value) {};
+
+
+/**
+ * @return {anychart.math.Rect}
+ */
+anychart.core.IPlot.prototype.getPlotBounds = function() {};
+
+
+/**
+ * Returns base series z-index.
+ * @param {anychart.core.series.Base} series .
+ * @return {number}
+ */
+anychart.core.IPlot.prototype.getBaseSeriesZIndex = function(series) {};
 
 
 
@@ -216,7 +258,7 @@ anychart.core.IGroupingProvider.prototype.getCurrentMinDistance = function() {};
 
 
 /**
- * @return {anychart.core.IGroupingProvider|anychart.core.stock.Grouping}
+ * @return {anychart.core.IGroupingProvider|anychart.stockModule.Grouping}
  */
 anychart.core.IGroupingProvider.prototype.grouping = function() {};
 

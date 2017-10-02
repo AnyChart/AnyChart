@@ -6,7 +6,7 @@ goog.require('anychart.ui.button.Base');
 goog.require('goog.ui.Component');
 goog.require('goog.ui.Component.EventType');
 
-goog.forwardDeclare('anychart.charts.Map');
+goog.forwardDeclare('anychart.mapModule.Chart');
 //endregion
 
 
@@ -21,7 +21,7 @@ anychart.ui.Zoom = function() {
 
   /**
    * Map chart.
-   * @type {?anychart.charts.Map}
+   * @type {?anychart.mapModule.Chart}
    * @private
    */
   this.target_ = null;
@@ -35,7 +35,7 @@ anychart.ui.Zoom.CSS_CLASS = goog.getCssName('anychart-zoom');
 
 /**
  * Set Map chart for Range Selector.
- * @param {anychart.charts.Map} chart
+ * @param {anychart.mapModule.Chart} chart
  */
 anychart.ui.Zoom.prototype.target = function(chart) {
   this.target_ = chart;
@@ -104,14 +104,14 @@ anychart.ui.Zoom.prototype.isMapChart_ = function(chart) {
 
 
 /**
- * @param {(anychart.charts.Map|Element)=} opt_parentElement Optional parent element or Map chart to render the
+ * @param {(anychart.mapModule.Chart|Element)=} opt_parentElement Optional parent element or Map chart to render the
  *    range picker into.
  * @return {Element|undefined}
  * @private
  */
 anychart.ui.Zoom.prototype.extractChartContainer_ = function(opt_parentElement) {
   if (this.isMapChart_(opt_parentElement)) {
-    this.target(/** @type {anychart.charts.Map} */(opt_parentElement));
+    this.target(/** @type {anychart.mapModule.Chart} */(opt_parentElement));
     var stage = this.target_['container']() ? this.target_['container']()['getStage']() : null;
     if (stage && stage['container']()) {
       opt_parentElement = stage['container']();
@@ -124,7 +124,7 @@ anychart.ui.Zoom.prototype.extractChartContainer_ = function(opt_parentElement) 
 
 
 /**
- * @param {(anychart.charts.Map|Element)=} opt_parentElement Optional parent element or Map chart to render the range picker into.
+ * @param {(anychart.mapModule.Chart|Element)=} opt_parentElement Optional parent element or Map chart to render the range picker into.
  * @private
  */
 anychart.ui.Zoom.prototype.delayedRenderOnChartDraw_ = function(opt_parentElement) {
@@ -133,7 +133,7 @@ anychart.ui.Zoom.prototype.delayedRenderOnChartDraw_ = function(opt_parentElemen
 
 
 /**
- * @param {(anychart.charts.Map|Element)=} opt_parentElement Optional parent element or Map chart to render the
+ * @param {(anychart.mapModule.Chart|Element)=} opt_parentElement Optional parent element or Map chart to render the
  *    range selector into.
  * @override
  */

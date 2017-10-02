@@ -1,4 +1,5 @@
 goog.provide('anychart.core.ui.Title');
+goog.provide('anychart.standalones.Title');
 goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.settings');
@@ -29,7 +30,7 @@ goog.require('goog.math.AffineTransform');
  * @illustrationDesc
  * Title occupies the whole part of a container (depending on the orientation by the width or the height).
  * @example <c>Self-sufficient title.</c><t>simple-h100</t>
- * anychart.ui.title()
+ * anychart.standalones.title()
  *     .text('My custom Title')
  *     .fontSize(27)
  *     .height('100')
@@ -38,12 +39,13 @@ goog.require('goog.math.AffineTransform');
  *     .draw();
  * @constructor
  * @extends {anychart.core.VisualBase}
- * @implements {anychart.core.settings.IObjectWithSettings}
  * @implements {anychart.core.settings.IResolvable}
  * @implements {anychart.core.IStandaloneBackend}
  */
 anychart.core.ui.Title = function() {
   anychart.core.ui.Title.base(this, 'constructor');
+
+  delete this.themeSettings['enabled'];
 
   /**
    * Text element.
@@ -147,21 +149,6 @@ anychart.core.ui.Title = function() {
    */
   this.transformation_ = null;
 
-
-  /**
-   * Theme settings.
-   * @type {Object}
-   */
-  this.themeSettings = {};
-
-
-  /**
-   * Own settings (Settings set by user with API).
-   * @type {Object}
-   */
-  this.ownSettings = {};
-
-
   /**
    * Auto values of settings set by external controller.
    * @type {!Object}
@@ -179,11 +166,6 @@ anychart.core.ui.Title = function() {
 
 
   /**
-   * @type {boolean}
-   */
-  this.forceInvalidate = false;
-
-  /**
    * Auto text.
    * @type {string}
    * @private
@@ -196,6 +178,20 @@ anychart.core.ui.Title = function() {
    * @private
    */
   this.resolutionChainCache_ = null;
+
+  anychart.core.settings.createTextPropertiesDescriptorsMeta(this.descriptorsMeta,
+      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
+      anychart.ConsistencyState.APPEARANCE,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED,
+      anychart.Signal.NEEDS_REDRAW);
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['width', anychart.ConsistencyState.BOUNDS],
+    ['height', anychart.ConsistencyState.BOUNDS],
+    ['align', anychart.ConsistencyState.BOUNDS],
+    ['orientation', anychart.ConsistencyState.BOUNDS],
+    ['rotation', anychart.ConsistencyState.BOUNDS],
+    ['text', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS]
+  ]);
 };
 goog.inherits(anychart.core.ui.Title, anychart.core.VisualBase);
 
@@ -227,12 +223,7 @@ anychart.core.ui.Title.prototype.SUPPORTED_CONSISTENCY_STATES =
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
 anychart.core.ui.Title.prototype.TEXT_DESCRIPTORS =
-    anychart.core.settings.createTextPropertiesDescriptors(
-        anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
-        anychart.ConsistencyState.APPEARANCE,
-        anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED,
-        anychart.Signal.NEEDS_REDRAW
-    );
+    anychart.core.settings.createTextPropertiesDescriptors();
 anychart.core.settings.populate(anychart.core.ui.Title, anychart.core.ui.Title.prototype.TEXT_DESCRIPTORS);
 
 
@@ -248,49 +239,37 @@ anychart.core.ui.Title.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'width',
-      anychart.core.settings.numberOrPercentNormalizer,
-      anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      anychart.core.settings.numberOrPercentNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'height',
-      anychart.core.settings.numberOrPercentNormalizer,
-      anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      anychart.core.settings.numberOrPercentNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'align',
-      anychart.enums.normalizeAlign,
-      anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      anychart.enums.normalizeAlign);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'orientation',
-      anychart.enums.normalizeOrientation,
-      anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      anychart.enums.normalizeOrientation);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'rotation',
-      anychart.core.settings.numberNormalizer,
-      anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      anychart.core.settings.numberNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'text',
-      anychart.core.settings.stringNormalizer,
-      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      anychart.core.settings.stringNormalizer);
 
   return map;
 })();
@@ -358,35 +337,28 @@ anychart.core.ui.Title.prototype.getHighPriorityResolutionChain = function() {
 //endregion
 //region -- IObjectWithSettings implementation
 /** @inheritDoc */
-anychart.core.ui.Title.prototype.getOwnOption = function(name) {
-  return this.ownSettings[name];
-};
-
-
-/** @inheritDoc */
 anychart.core.ui.Title.prototype.hasOwnOption = function(name) {
   return goog.isDefAndNotNull(this.ownSettings[name]);
 };
 
 
-/** @inheritDoc */
-anychart.core.ui.Title.prototype.getThemeOption = function(name) {
-  return this.themeSettings[name];
-};
-
-
-/** @inheritDoc */
+/**
+ * @override
+ * @param {string} name
+ * @return {*}
+ */
 anychart.core.ui.Title.prototype.getOption = anychart.core.settings.getOption;
 
 
 /** @inheritDoc */
-anychart.core.ui.Title.prototype.setOption = function(name, value) {
-  this.ownSettings[name] = value;
+anychart.core.ui.Title.prototype.getSignal = function(fieldName) {
+  // all props invalidates with NEEDS_REDRAW | BOUNDS_CHANGED
+  return anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED;
 };
 
 
 /** @inheritDoc */
-anychart.core.ui.Title.prototype.check = function(flags) {
+anychart.core.ui.Title.prototype.isResolvable = function() {
   return true;
 };
 
@@ -626,26 +598,6 @@ anychart.core.ui.Title.prototype.autoText = function(opt_value) {
 };
 
 
-/**
- * @inheritDoc
- */
-anychart.core.ui.Title.prototype.invalidate = function(state, opt_signal) {
-  var effective = anychart.core.ui.Title.base(this, 'invalidate', state, opt_signal);
-  if (!effective && this.needsForceInvalidation())
-    this.dispatchSignal(opt_signal || 0);
-  return effective;
-};
-
-
-/**
- * Whether needs force invalidation.
- * @return {boolean}
- */
-anychart.core.ui.Title.prototype.needsForceInvalidation = function() {
-  return this.forceInvalidate;
-};
-
-
 //endregion
 //region -- Draw, remove
 /**
@@ -750,12 +702,12 @@ anychart.core.ui.Title.prototype.remove = function() {
  * Returns the remaining (after title placement) part of the container.
  * @example <t>simple-h100</t>
  * // Placing the first title on the top of the Stage.
- * var title1 = anychart.ui.title()
+ * var title1 = anychart.standalones.title()
  *     .text('First title')
  *     .container(stage)
  *     .draw();
  * // Placing the second title over the remaining part - under the first title.
- * anychart.ui.title()
+ * anychart.standalones.title()
  *     .text('Second title')
  *     .container(stage)
  *     .parentBounds(title1.getRemainingBounds())
@@ -838,7 +790,8 @@ anychart.core.ui.Title.prototype.applyTextSettings = function(isInitial) {
   this.text_.fontFamily(/** @type {string} */ (this.getOption('fontFamily')));
   this.text_.color(/** @type {string} */ (this.getOption('fontColor')));
   this.text_.direction(/** @type {string} */ (this.getOption('textDirection')));
-  this.text_.textWrap(/** @type {string} */ (this.getOption('textWrap')));
+  this.text_.wordBreak(/** @type {string} */ (this.getOption('wordBreak')));
+  this.text_.wordWrap(/** @type {string} */ (this.getOption('wordWrap')));
   this.text_.opacity(/** @type {number} */ (this.getOption('fontOpacity')));
   this.text_.decoration(/** @type {string} */ (this.getOption('fontDecoration')));
   this.text_.fontStyle(/** @type {string} */ (this.getOption('fontStyle')));
@@ -1103,48 +1056,13 @@ anychart.core.ui.Title.prototype.clear = function() {
 
 //endregion
 //region -- Serialization
-/** @inheritDoc */
-anychart.core.ui.Title.prototype.enabled = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.ownSettings['enabled'] != opt_value) {
-      this.ownSettings['enabled'] = opt_value;
-      this.invalidate(anychart.ConsistencyState.ENABLED,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED | anychart.Signal.ENABLED_STATE_CHANGED);
-      if (this.ownSettings['enabled']) {
-        this.doubleSuspension = false;
-        this.resumeSignalsDispatching(true);
-      } else {
-        if (isNaN(this.suspendedDispatching)) {
-          this.suspendSignalsDispatching();
-        } else {
-          this.doubleSuspension = true;
-        }
-      }
-    }
-    return this;
-  } else {
-    return /** @type {boolean} */(this.getOption('enabled'));
-  }
-};
-
-
 /**
  * Sets default settings.
  * @param {!Object} config
  */
 anychart.core.ui.Title.prototype.setThemeSettings = function(config) {
-  for (var name in this.TEXT_DESCRIPTORS) {
-    var val = config[name];
-    if (goog.isDef(val))
-      this.themeSettings[name] = val;
-  }
-  for (var name in this.SIMPLE_PROPS_DESCRIPTORS) {
-    var val = config[name];
-    if (goog.isDef(val))
-      this.themeSettings[name] = val;
-  }
-  if ('enabled' in config) this.themeSettings['enabled'] = config['enabled'];
-  if ('zIndex' in config) this.themeSettings['zIndex'] = config['zIndex'];
+  anychart.core.settings.copy(this.themeSettings, this.TEXT_DESCRIPTORS, config);
+  anychart.core.settings.copy(this.themeSettings, this.SIMPLE_PROPS_DESCRIPTORS, config);
 };
 
 
@@ -1152,22 +1070,11 @@ anychart.core.ui.Title.prototype.setThemeSettings = function(config) {
 anychart.core.ui.Title.prototype.serialize = function() {
   var json = {};
 
-  var zIndex;
-  if (this.hasOwnOption('zIndex')) {
-    zIndex = this.getOwnOption('zIndex');
-  }
-  if (!goog.isDef(zIndex)) {
-    zIndex = this.getThemeOption('zIndex');
-  }
-  if (goog.isDef(zIndex)) json['zIndex'] = zIndex;
+  var zIndex = anychart.core.Base.prototype.getOption.call(this, 'zIndex');
+  if (goog.isDef(zIndex))
+    json['zIndex'] = zIndex;
 
-  var enabled;
-  if (this.hasOwnOption('enabled')) {
-    enabled = this.getOwnOption('enabled');
-  }
-  if (!goog.isDef(enabled)) {
-    enabled = this.getThemeOption('enabled');
-  }
+  var enabled = anychart.core.Base.prototype.getOption.call(this, 'enabled');
   if (goog.isDef(enabled))
     json['enabled'] = enabled;
 
@@ -1213,12 +1120,13 @@ anychart.core.ui.Title.prototype.setupSpecial = function(isDefault, var_args) {
 
 /** @inheritDoc */
 anychart.core.ui.Title.prototype.setupByJSON = function(config, opt_default) {
+  anychart.core.ui.Title.base(this, 'setupByJSON', config, opt_default);
+
   if (opt_default) {
     this.setThemeSettings(config);
   } else {
     anychart.core.settings.deserialize(this, this.TEXT_DESCRIPTORS, config);
     anychart.core.settings.deserialize(this, this.SIMPLE_PROPS_DESCRIPTORS, config);
-    anychart.core.ui.Title.base(this, 'setupByJSON', config);
   }
 
   if ('background' in config)
@@ -1230,12 +1138,53 @@ anychart.core.ui.Title.prototype.setupByJSON = function(config, opt_default) {
   if ('margin' in config)
     this.margin(config['margin']);
 };
-//endregion
 
+
+
+//endregion
+//region --- Standalone
+//------------------------------------------------------------------------------
+//
+//  Standalone
+//
+//------------------------------------------------------------------------------
+/**
+ * @constructor
+ * @extends {anychart.core.ui.Title}
+ */
+anychart.standalones.Title = function() {
+  anychart.standalones.Title.base(this, 'constructor');
+};
+goog.inherits(anychart.standalones.Title, anychart.core.ui.Title);
+anychart.core.makeStandalone(anychart.standalones.Title, anychart.core.ui.Title);
+
+
+//region --- STANDALONE ---
+/** @inheritDoc */
+anychart.standalones.Title.prototype.dependsOnContainerSize = function() {
+  //TODO(AntonKagakin): should be reworked to getOption
+  var width = this.width();
+  var height = this.height();
+  return anychart.utils.isPercent(width) || anychart.utils.isPercent(height) || goog.isNull(width) || goog.isNull(height);
+};
+
+
+//endregion
+/**
+ * Constructor function.
+ * @return {!anychart.standalones.Title}
+ */
+anychart.standalones.title = function() {
+  var title = new anychart.standalones.Title();
+  title.setupInternal(true, anychart.getFullTheme('standalones.title'));
+  return title;
+};
+
+
+//endregion
 //exports
 (function() {
   var proto = anychart.core.ui.Title.prototype;
-  proto['enabled'] = proto.enabled;
   // proto['fontSize'] = proto.fontSize;
   // proto['fontFamily'] = proto.fontFamily;
   // proto['fontColor'] = proto.fontColor;
@@ -1250,7 +1199,7 @@ anychart.core.ui.Title.prototype.setupByJSON = function(config, opt_default) {
   // proto['textIndent'] = proto.textIndent;
   // proto['vAlign'] = proto.vAlign;
   // proto['hAlign'] = proto.hAlign;
-  // proto['textWrap'] = proto.textWrap;
+  // proto['wordWrap'] = proto.wordWrap;
   // proto['textOverflow'] = proto.textOverflow;
   // proto['selectable'] = proto.selectable;
   // proto['disablePointerEvents'] = proto.disablePointerEvents;
@@ -1266,4 +1215,10 @@ anychart.core.ui.Title.prototype.setupByJSON = function(config, opt_default) {
   // proto['align'] = proto.align;
   // proto['orientation'] = proto.orientation;
   proto['getRemainingBounds'] = proto.getRemainingBounds;
+
+  proto = anychart.standalones.Title.prototype;
+  goog.exportSymbol('anychart.standalones.title', anychart.standalones.title);
+  proto['draw'] = proto.draw;
+  proto['parentBounds'] = proto.parentBounds;
+  proto['container'] = proto.container;
 })();

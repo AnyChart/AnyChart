@@ -250,23 +250,12 @@ anychart.ui.ganttToolbar = function() {
 };
 
 
-/**
- * Constructor function for gantt toolbar.
- * @return {anychart.ui.GanttToolbar}
- * @deprecated Since 7.10.0. Use anychart.ui.ganttToolbar() instead.
- */
-anychart.ganttToolbar = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.ganttToolbar()', 'anychart.ui.ganttToolbar()', null, 'Constructor'], true);
-  return new anychart.ui.GanttToolbar();
-};
-
-
 //exports
-/** @suppress {deprecated} */
 (function() {
-  var proto = anychart.ui.GanttToolbar.prototype;
   goog.exportSymbol('anychart.ui.ganttToolbar', anychart.ui.ganttToolbar);
-  goog.exportSymbol('anychart.ganttToolbar', anychart.ganttToolbar);
+  var proto = anychart.ui.GanttToolbar.prototype;
   proto['draw'] = proto.draw;
   proto['printPaperSizes'] = proto.printPaperSizes;
+  proto['container'] = proto.container;
+  proto['target'] = proto.target;
 })();

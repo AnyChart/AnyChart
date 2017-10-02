@@ -62,10 +62,10 @@ anychart.scales.Linear.prototype.comparisonMode_ = anychart.enums.ScaleCompariso
 
 
 /**
- * @type {anychart.enums.ScaleCompareWithMode|number}
+ * @type {anychart.enums.ComparisonDataSource|number}
  * @private
  */
-anychart.scales.Linear.prototype.compareWith_ = anychart.enums.ScaleCompareWithMode.FIRST_VISIBLE;
+anychart.scales.Linear.prototype.compareWith_ = anychart.enums.ComparisonDataSource.FIRST_VISIBLE;
 
 
 /** @inheritDoc */
@@ -212,12 +212,12 @@ anychart.scales.Linear.prototype.comparisonMode = function(opt_value) {
 
 /**
  * Getter and setter for date which should be used as a changes zero for series.
- * @param {(string|anychart.enums.ScaleCompareWithMode|number|Date)=} opt_value
- * @return {anychart.enums.ScaleCompareWithMode|number|anychart.scales.Linear}
+ * @param {(string|anychart.enums.ComparisonDataSource|number|Date)=} opt_value
+ * @return {anychart.enums.ComparisonDataSource|number|anychart.scales.Linear}
  */
 anychart.scales.Linear.prototype.compareWith = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeScaleCompareWithModeMode(opt_value) || anychart.utils.normalizeTimestamp(opt_value);
+    opt_value = anychart.enums.normalizeDataSource(opt_value);
     if (this.compareWith_ != opt_value) {
       this.compareWith_ = opt_value;
       this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION | anychart.Signal.NEEDS_RECALCULATION);
@@ -279,7 +279,9 @@ anychart.scales.Linear.prototype.serialize = function() {
   json['ticks'] = this.ticks().serialize();
   json['minorTicks'] = this.minorTicks().serialize();
   json['stackMode'] = this.stackMode();
+  json['stackDirection'] = this.stackDirection();
   json['stickToZero'] = this.stickToZero();
+  json['comparisonMode'] = this.comparisonMode();
   return json;
 };
 
@@ -290,7 +292,9 @@ anychart.scales.Linear.prototype.setupByJSON = function(config, opt_default) {
   this.ticks(config['ticks']);
   this.minorTicks(config['minorTicks']);
   this.stackMode(config['stackMode']);
+  this.stackDirection(config['stackDirection']);
   this.stickToZero(config['stickToZero']);
+  this.comparisonMode(config['comparisonMode']);
 };
 
 
@@ -326,6 +330,7 @@ anychart.scales.linear = function() {
   proto['ticks'] = proto.ticks;//doc|ex
   proto['minorTicks'] = proto.minorTicks;//doc|ex
   proto['stackMode'] = proto.stackMode;//inherited
+  proto['stackDirection'] = proto.stackDirection;//inherited
   proto['stickToZero'] = proto.stickToZero;
   proto['softMinimum'] = proto.softMinimum;
   proto['softMaximum'] = proto.softMaximum;

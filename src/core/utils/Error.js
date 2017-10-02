@@ -398,8 +398,8 @@ anychart.core.utils.Error.prototype.drawVerticalErrorLine_ = function(path, lowe
  * @return {boolean} Availability.
  */
 anychart.core.utils.Error.supportsErrorForScale = function(scale) {
-  return (scale instanceof anychart.scales.ScatterBase) &&
-      !(scale instanceof anychart.scales.DateTime) &&
+  return (anychart.utils.instanceOf(scale, anychart.scales.ScatterBase)) &&
+      !(anychart.utils.instanceOf(scale, anychart.scales.DateTime)) &&
       (scale.stackMode() == anychart.enums.ScaleStackMode.NONE);
 };
 
@@ -492,7 +492,7 @@ anychart.core.utils.Error.prototype.getErrorStroke = function(horizontal) {
 /**
  * Returns array of [lowerError, upperError].
  * @param {boolean} horizontal is error horizontal (x error).
- * @return {Array.<number, number>} Array of lower and upper errors value.
+ * @return {Array.<number>} Array of lower and upper errors value.
  */
 anychart.core.utils.Error.prototype.getErrorValues = function(horizontal) {
   if (!this.series_.supportsError())
@@ -712,7 +712,7 @@ anychart.core.utils.ISeriesWithError.prototype.getErrorPath = function(stroke) {
 /**
  * Returns array of [lowerError, upperError].
  * @param {boolean} horizontal is error horizontal (x error).
- * @return {Array.<number, number>} Array of lower and upper errors value.
+ * @return {Array.<number>} Array of lower and upper errors value.
  */
 anychart.core.utils.ISeriesWithError.prototype.getErrorValues = function(horizontal) {};
 

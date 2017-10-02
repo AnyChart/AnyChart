@@ -13,11 +13,12 @@ goog.require('anychart.utils');
  * Class for a separator element.
  * @constructor
  * @extends {anychart.core.VisualBase}
- * @implements {anychart.core.settings.IObjectWithSettings}
  * @implements {anychart.core.settings.IResolvable}
  */
 anychart.core.ui.Separator = function() {
   anychart.core.ui.Separator.base(this, 'constructor');
+
+  delete this.themeSettings['enabled'];
 
   /**
    * Path of the separator.
@@ -61,28 +62,11 @@ anychart.core.ui.Separator = function() {
   this.pixelBounds_ = null;
 
   /**
-   * Theme settings.
-   * @type {Object}
-   */
-  this.themeSettings = {};
-
-  /**
-   * Own settings (Settings set by user with API).
-   * @type {Object}
-   */
-  this.ownSettings = {};
-
-  /**
    * Parent separator.
    * @type {anychart.core.ui.Separator}
    * @private
    */
   this.parent_ = null;
-
-  /**
-   * @type {boolean}
-   */
-  this.forceInvalidate = false;
 
   /**
    * Resolution chain cache.
@@ -111,6 +95,14 @@ anychart.core.ui.Separator = function() {
   this.drawer(drawer);
 
   this.invalidate(anychart.ConsistencyState.ALL);
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['fill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['stroke', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['width', anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['height', anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['orientation', anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED]
+  ]);
 };
 goog.inherits(anychart.core.ui.Separator, anychart.core.VisualBase);
 
@@ -147,41 +139,31 @@ anychart.core.ui.Separator.prototype.SIMPLE_SEPARATOR_DESCRIPTORS = (function() 
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'fill',
-      anychart.core.settings.fillOrFunctionNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.fillOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'stroke',
-      anychart.core.settings.strokeOrFunctionNormalizer,
-      anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.core.settings.strokeOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'width',
-      anychart.core.settings.numberOrPercentNormalizer,
-      anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      anychart.core.settings.numberOrPercentNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'height',
-      anychart.core.settings.numberOrPercentNormalizer,
-      anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      anychart.core.settings.numberOrPercentNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'orientation',
-      anychart.enums.normalizeOrientation,
-      anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.APPEARANCE,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      anychart.enums.normalizeOrientation);
 
   return map;
 })();
@@ -191,35 +173,21 @@ anychart.core.settings.populate(anychart.core.ui.Separator, anychart.core.ui.Sep
 //endregion
 //region -- IObjectWithSettings implementation
 /** @inheritDoc */
-anychart.core.ui.Separator.prototype.getOwnOption = function(name) {
-  return this.ownSettings[name];
-};
-
-
-/** @inheritDoc */
 anychart.core.ui.Separator.prototype.hasOwnOption = function(name) {
   return goog.isDefAndNotNull(this.ownSettings[name]);
 };
 
 
-/** @inheritDoc */
-anychart.core.ui.Separator.prototype.getThemeOption = function(name) {
-  return this.themeSettings[name];
-};
-
-
-/** @inheritDoc */
+/**
+ * @override
+ * @param {string} name
+ * @return {*}
+ */
 anychart.core.ui.Separator.prototype.getOption = anychart.core.settings.getOption;
 
 
 /** @inheritDoc */
-anychart.core.ui.Separator.prototype.setOption = function(name, value) {
-  this.ownSettings[name] = value;
-};
-
-
-/** @inheritDoc */
-anychart.core.ui.Separator.prototype.check = function(flags) {
+anychart.core.ui.Separator.prototype.isResolvable = function() {
   return true;
 };
 
@@ -314,15 +282,6 @@ anychart.core.ui.Separator.prototype.parentInvalidated_ = function(e) {
 
 
 //endregion
-/**
- * Whether needs force invalidation.
- * @return {boolean}
- */
-anychart.core.ui.Separator.prototype.needsForceInvalidation = function() {
-  return this.forceInvalidate;
-};
-
-
 /** @inheritDoc */
 anychart.core.ui.Separator.prototype.invalidateParentBounds = function() {
   this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.APPEARANCE,
@@ -478,9 +437,6 @@ anychart.core.ui.Separator.prototype.getRemainingBounds = function() {
  * @private
  */
 anychart.core.ui.Separator.prototype.calculateSeparatorBounds_ = function() {
-  var container = /** @type {acgraph.vector.ILayer} */(this.container());
-  var stage = container ? container.getStage() : null;
-
   var margin = this.margin();
 
   /** @type {anychart.math.Rect} */
@@ -611,64 +567,9 @@ anychart.core.ui.Separator.prototype.isHorizontal = function() {
 };
 
 
-/**
- * @inheritDoc
- */
-anychart.core.ui.Separator.prototype.invalidate = function(state, opt_signal) {
-  var effective = anychart.core.ui.Separator.base(this, 'invalidate', state, opt_signal);
-  if (!effective && this.needsForceInvalidation())
-    this.dispatchSignal(opt_signal || 0);
-  return effective;
-};
-
-
-/** @inheritDoc */
-anychart.core.ui.Separator.prototype.enabled = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.ownSettings['enabled'] != opt_value) {
-      this.ownSettings['enabled'] = opt_value;
-      this.invalidate(anychart.ConsistencyState.ENABLED,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED | anychart.Signal.ENABLED_STATE_CHANGED);
-      if (this.ownSettings['enabled']) {
-        this.doubleSuspension = false;
-        this.resumeSignalsDispatching(true);
-      } else {
-        if (isNaN(this.suspendedDispatching)) {
-          this.suspendSignalsDispatching();
-        } else {
-          this.doubleSuspension = true;
-        }
-      }
-    }
-    return this;
-  } else {
-    return /** @type {boolean} */(this.getOption('enabled'));
-  }
-};
-
-
 /** @inheritDoc */
 anychart.core.ui.Separator.prototype.serialize = function() {
-  var json = {};
-
-  var zIndex;
-  if (this.hasOwnOption('zIndex')) {
-    zIndex = this.getOwnOption('zIndex');
-  }
-  if (!goog.isDef(zIndex)) {
-    zIndex = this.getThemeOption('zIndex');
-  }
-  if (goog.isDef(zIndex)) json['zIndex'] = zIndex;
-
-  var enabled;
-  if (this.hasOwnOption('enabled')) {
-    enabled = this.getOwnOption('enabled');
-  }
-  if (!goog.isDef(enabled)) {
-    enabled = this.getThemeOption('enabled');
-  }
-  if (goog.isDef(enabled))
-    json['enabled'] = enabled;
+  var json = anychart.core.ui.Separator.base(this, 'serialize');
 
   anychart.core.settings.serialize(this, this.SIMPLE_SEPARATOR_DESCRIPTORS, json, 'Separator');
 
@@ -682,10 +583,11 @@ anychart.core.ui.Separator.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.ui.Separator.prototype.setupByJSON = function(config, opt_default) {
+  anychart.core.ui.Separator.base(this, 'setupByJSON', config, opt_default);
+
   anychart.core.settings.deserialize(this, this.SIMPLE_SEPARATOR_DESCRIPTORS, config);
+
   this.margin().setupInternal(!!opt_default, config['margin']);
-  this.zIndex(config['zIndex']);
-  this.enabled(config['enabled']);
 };
 
 

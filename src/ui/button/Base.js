@@ -81,6 +81,6 @@ anychart.ui.button.Base.prototype.setIcon_ = function() {
 /** @override */
 anychart.ui.button.Base.prototype.createDom = function() {
   anychart.ui.button.Base.base(this, 'createDom');
-
+  goog.dom.setProperties(this.getElement(), {'type': 'button'});
   this.setIcon_();
 };

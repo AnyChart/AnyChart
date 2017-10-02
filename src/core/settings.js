@@ -15,69 +15,111 @@ goog.require('goog.math');
  *    handler: number,
  *    propName: string,
  *    normalizer: Function,
- *    capabilityCheck: number,
- *    consistency: (anychart.ConsistencyState|number),
- *    signal: (anychart.Signal|number)
- * }|{
- *    handler: number,
- *    propName: string,
- *    normalizer: Function,
- *    consistency: (anychart.ConsistencyState|number),
- *    signal: (anychart.Signal|number)
- * }|{
- *    handler: number,
- *    propName: string,
- *    normalizer: Function,
- *    consistency: (anychart.ConsistencyState|number),
- *    signal: (anychart.Signal|number),
- *    deprecatedPropName: string
+ *    deprecatedPropName: (string|undefined)
  * }}
  */
 anychart.core.settings.PropertyDescriptor;
+
+
+/**
+ * Property descriptor meta.
+ * @typedef {{
+ *   consistency: number,
+ *   signal: number,
+ *   capabilities: number,
+ *   beforeInvalidationHook: Function,
+ *   context: *
+ * }}
+ */
+anychart.core.settings.PropertyDescriptorMeta;
 
 
 //region Creating descriptors
 /**
  * Creates descriptor.
  * @param {!Object.<string, anychart.core.settings.PropertyDescriptor>} map
- * @param {anychart.enums.PropertyHandlerType} handler - Handler type.
+ * @param {anychart.enums.PropertyHandlerType|Array} descriptorOrHandler - Handler type.
  * @param {string} propName - Property name.
  * @param {Function} normalizer - Normalizer function.
+ * @param {string=} opt_methodName - Deprecated prop name.
+ * @return {anychart.core.settings.PropertyDescriptor}
+ */
+anychart.core.settings.createDescriptor = function(map, descriptorOrHandler, propName, normalizer, opt_methodName) {
+  if (goog.isArray(descriptorOrHandler))
+    return anychart.core.settings.createDescriptor.apply(null, goog.array.concat(map, descriptorOrHandler));
+  else {
+    /**
+     * @type {anychart.core.settings.PropertyDescriptor}
+     */
+    var descriptor = {
+      handler: /** @type {number} */ (descriptorOrHandler),
+      propName: propName,
+      normalizer: normalizer
+    };
+    var methodName = propName;
+    if (goog.isDef(opt_methodName)) {
+      methodName = descriptor.deprecatedPropName = opt_methodName;
+    }
+    map[methodName] = descriptor;
+  }
+  return descriptor;
+};
+
+
+/**
+ * @param {!Object.<anychart.core.settings.PropertyDescriptor>} map
+ * @param {!Array.<Array>} descriptors Descriptors.
+ * @return {!Object.<anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.core.settings.createDescriptors = function(map, descriptors) {
+  var diff = {};
+  for (var i = 0; i < descriptors.length; i++) {
+    diff[descriptors[i][1]] = anychart.core.settings.createDescriptor.apply(null, goog.array.concat(map, descriptors[i]));
+  }
+  return diff;
+};
+
+
+/**
+ * @param {!Object.<string, anychart.core.settings.PropertyDescriptorMeta>} map
+ * @param {string} propName
  * @param {number} consistency - Consistency to set.
  * @param {number} signal - Signal.
- * @param {number=} opt_check - Check function.
- * @param {string=} opt_methodName - Deprecated prop name.
+ * @param {number=} opt_capabilities - Check function.
+ * @param {Function=} opt_beforeInvalidationHook
+ * @param {*=} opt_hookContext
  */
-anychart.core.settings.createDescriptor = function(map, handler, propName, normalizer, consistency, signal, opt_check, opt_methodName) {
-  /**
-   * @type {anychart.core.settings.PropertyDescriptor}
-   */
-  var descriptor = {
-    handler: handler,
-    propName: propName,
-    normalizer: normalizer,
+anychart.core.settings.createDescriptorMeta = function(map, propName, consistency, signal, opt_capabilities, opt_beforeInvalidationHook, opt_hookContext) {
+  var meta = {
     consistency: consistency,
     signal: signal
   };
-  if (goog.isDef(opt_check))
-    descriptor.capabilityCheck = opt_check;
-  var methodName = propName;
-  if (goog.isDef(opt_methodName)) {
-    methodName = descriptor.deprecatedPropName = opt_methodName;
+  if (goog.isDef(opt_capabilities))
+    meta.capabilities = opt_capabilities;
+  if (goog.isDef(opt_beforeInvalidationHook) && goog.isFunction(opt_beforeInvalidationHook)) {
+    meta.beforeInvalidationHook = opt_beforeInvalidationHook;
+    meta.context = opt_hookContext;
   }
-  map[methodName] = descriptor;
+  map[propName] = meta;
+};
+
+
+/**
+ * @param {!Object.<string, anychart.core.settings.PropertyDescriptorMeta>} map
+ * @param {!Array.<Array>} metas
+ */
+anychart.core.settings.createDescriptorsMeta = function(map, metas) {
+  for (var i = 0; i < metas.length; i++) {
+    anychart.core.settings.createDescriptorMeta.apply(null, goog.array.concat(map, metas[i]));
+  }
 };
 
 
 /**
  * Creates text properties descriptors.
- * @param {number} invalidateBoundsState - State to invalidate bounds.
- * @param {number} nonBoundsState - State to invalidate without bounds.
- * @param {number} boundsChangedSignal - Signal for changed bounds.
- * @param {number} nonBoundsSignal - Signal for non-bounds changes.
  * @return {!Object.<string, anychart.core.settings.PropertyDescriptor>} - Descriptors map.
  */
-anychart.core.settings.createTextPropertiesDescriptors = function(invalidateBoundsState, nonBoundsState, boundsChangedSignal, nonBoundsSignal) {
+anychart.core.settings.createTextPropertiesDescriptors = function() {
 
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
@@ -86,179 +128,181 @@ anychart.core.settings.createTextPropertiesDescriptors = function(invalidateBoun
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'minFontSize',
-      anychart.core.settings.numberOrStringNormalizer,
-      invalidateBoundsState,
-      boundsChangedSignal);
+      anychart.core.settings.numberOrStringNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'maxFontSize',
-      anychart.core.settings.numberOrStringNormalizer,
-      invalidateBoundsState,
-      boundsChangedSignal);
+      anychart.core.settings.numberOrStringNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'adjustFontSize',
-      anychart.core.settings.adjustFontSizeNormalizer,
-      invalidateBoundsState,
-      boundsChangedSignal);
+      anychart.core.settings.adjustFontSizeNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'fontSize',
-      anychart.core.settings.numberOrStringNormalizer,
-      invalidateBoundsState,
-      boundsChangedSignal);
+      anychart.core.settings.numberOrStringNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'fontFamily',
-      anychart.core.settings.stringNormalizer,
-      invalidateBoundsState,
-      boundsChangedSignal);
+      anychart.core.settings.stringNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'fontColor',
-      anychart.core.settings.stringOrNullNormalizer,
-      nonBoundsState,
-      nonBoundsSignal);
+      anychart.core.settings.stringOrNullNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'fontOpacity',
-      anychart.core.settings.numberNormalizer,
-      nonBoundsState,
-      nonBoundsSignal);
+      anychart.core.settings.numberNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'fontDecoration',
-      anychart.enums.normalizeFontDecoration,
-      invalidateBoundsState,
-      boundsChangedSignal);
+      anychart.enums.normalizeFontDecoration);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'fontStyle',
-      anychart.enums.normalizeFontStyle,
-      invalidateBoundsState,
-      boundsChangedSignal);
+      anychart.enums.normalizeFontStyle);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'fontVariant',
-      anychart.enums.normalizeFontVariant,
-      invalidateBoundsState,
-      boundsChangedSignal);
+      anychart.enums.normalizeFontVariant);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'fontWeight',
-      anychart.core.settings.numberOrStringNormalizer,
-      invalidateBoundsState,
-      boundsChangedSignal);
+      anychart.core.settings.numberOrStringNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'letterSpacing',
-      anychart.core.settings.numberOrStringNormalizer,
-      invalidateBoundsState,
-      boundsChangedSignal);
+      anychart.core.settings.numberOrStringNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'textDirection',
-      anychart.enums.normalizeTextDirection,
-      invalidateBoundsState,
-      boundsChangedSignal);
+      anychart.enums.normalizeTextDirection);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'lineHeight',
-      anychart.core.settings.numberOrStringNormalizer,
-      invalidateBoundsState,
-      boundsChangedSignal);
+      anychart.core.settings.numberOrStringNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'textIndent',
-      anychart.core.settings.numberNormalizer,
-      invalidateBoundsState,
-      boundsChangedSignal);
+      anychart.core.settings.numberNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'vAlign',
-      anychart.enums.normalizeVAlign,
-      invalidateBoundsState,
-      boundsChangedSignal);
+      anychart.enums.normalizeVAlign);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'hAlign',
-      anychart.enums.normalizeHAlign,
-      invalidateBoundsState,
-      boundsChangedSignal);
+      anychart.enums.normalizeHAlign);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'textWrap',
-      anychart.enums.normalizeTextWrap,
-      invalidateBoundsState,
-      boundsChangedSignal);
+      'wordWrap',
+      anychart.core.settings.asIsNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'wordBreak',
+      anychart.core.settings.asIsNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'textOverflow',
-      anychart.core.settings.stringNormalizer,
-      invalidateBoundsState,
-      boundsChangedSignal);
+      anychart.core.settings.stringNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'selectable',
-      anychart.core.settings.booleanNormalizer,
-      nonBoundsState,
-      nonBoundsSignal);
+      anychart.core.settings.booleanNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'disablePointerEvents',
-      anychart.core.settings.booleanNormalizer,
-      nonBoundsState,
-      nonBoundsSignal);
+      anychart.core.settings.booleanNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'useHtml',
-      anychart.core.settings.booleanNormalizer,
-      nonBoundsState,
-      nonBoundsSignal);
+      anychart.core.settings.booleanNormalizer);
 
   return map;
+};
+
+
+/**
+ * Creates text properties descriptors.
+ * @param {!Object.<string, anychart.core.settings.PropertyDescriptorMeta>} map - Map with descriptors meta.
+ * @param {number} invalidateBoundsState - State to invalidate bounds.
+ * @param {number} nonBoundsState - State to invalidate without bounds.
+ * @param {number} boundsChangedSignal - Signal for changed bounds.
+ * @param {number} nonBoundsSignal - Signal for non-bounds changes.
+ * @param {Function=} opt_boundsStateBeforeInvalidationHook - .
+ */
+anychart.core.settings.createTextPropertiesDescriptorsMeta = function(map, invalidateBoundsState,
+                                                                      nonBoundsState, boundsChangedSignal, nonBoundsSignal,
+                                                                      opt_boundsStateBeforeInvalidationHook) {
+  anychart.core.settings.createDescriptorsMeta(map, [
+    ['minFontSize', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
+    ['maxFontSize', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
+    ['adjustFontSize', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
+    ['fontSize', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
+    ['fontFamily', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
+    ['fontColor', nonBoundsState, nonBoundsSignal],
+    ['fontOpacity', nonBoundsState, nonBoundsSignal],
+    ['fontDecoration', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
+    ['fontStyle', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
+    ['fontVariant', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
+    ['fontWeight', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
+    ['letterSpacing', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
+    ['textDirection', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
+    ['lineHeight', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
+    ['textIndent', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
+    ['vAlign', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
+    ['hAlign', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
+    ['wordWrap', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
+    ['wordBreak', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
+    ['textOverflow', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
+    ['selectable', nonBoundsState, nonBoundsSignal],
+    ['disablePointerEvents', nonBoundsState, nonBoundsSignal],
+    ['useHtml', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook]
+  ]);
 };
 
 
@@ -281,10 +325,31 @@ anychart.core.settings.populate = function(classConstructor, descriptors) {
         anychart.core.settings.handlersMap[descriptor.handler],
         descriptor.propName,
         descriptor.deprecatedPropName,
-        descriptor.normalizer,
-        descriptor.capabilityCheck,
-        descriptor.consistency,
-        descriptor.signal);
+        descriptor.normalizer);
+  }
+};
+
+
+/**
+ * Populate aliases.
+ * @param {!Function} classConstructor
+ * @param {Array.<string>} aliases
+ * @param {string} aliasTo
+ */
+anychart.core.settings.populateAliases = function(classConstructor, aliases, aliasTo) {
+  for (var i = 0; i < aliases.length; i++) {
+    var alias = aliases[i];
+    classConstructor.prototype[alias] = (function(propName) {
+      return function(args) {
+        var calledAlias = this[aliasTo]();
+        if (goog.isDef(arguments[0])) {
+          //aliasTo[propName].apply(aliasTo, arguments);
+          calledAlias[propName].apply(calledAlias, arguments);
+          return this;
+        }
+        return calledAlias[propName]();
+      };
+    })(alias);
   }
 };
 
@@ -312,10 +377,12 @@ anychart.core.settings.deserialize = function(target, descriptors, config) {
  * @param {!Object.<anychart.core.settings.PropertyDescriptor>} descriptors
  * @param {!Object} json
  * @param {string=} opt_warningPrefix
+ * @param {Object.<anychart.core.settings.PropertyDescriptorMeta>=} opt_descriptorsMeta
  */
-anychart.core.settings.serialize = function(target, descriptors, json, opt_warningPrefix) {
+anychart.core.settings.serialize = function(target, descriptors, json, opt_warningPrefix, opt_descriptorsMeta) {
   var name, val, descriptor;
-  for (name in descriptors) {
+  var list = goog.isDef(opt_descriptorsMeta) ? opt_descriptorsMeta : descriptors;
+  for (name in list) {
     val = undefined;
     descriptor = descriptors[name];
     if (target.hasOwnOption(name)) {
@@ -328,7 +395,7 @@ anychart.core.settings.serialize = function(target, descriptors, json, opt_warni
         );
       }
     }
-    if (!goog.isDef(val) && target.check(descriptor.capabilityCheck)) {
+    if (!goog.isDef(val) && target.check(/** @type {number} */ (target.getCapabilities(name)))) {
       val = target.getThemeOption(name);
     }
     if (goog.isDef(val) && !goog.isFunction(val)) {
@@ -377,19 +444,19 @@ anychart.core.settings.copy = function(target, descriptors, config) {
  * @param {string} fieldName
  * @param {string} deprecatedFieldName
  * @param {function(*):*} normalizer
- * @param {number} supportCheck - set to anychart.core.series.Capabilities.ANY to invalidate in any case.
- * @param {anychart.ConsistencyState|number} consistencyState
- * @param {anychart.Signal|number} signal
  * @param {*=} opt_value
  * @return {*|anychart.core.settings.IObjectWithSettings}
  * @this {anychart.core.settings.IObjectWithSettings}
  */
-anychart.core.settings.simpleHandler = function(fieldName, deprecatedFieldName, normalizer, supportCheck, consistencyState, signal, opt_value) {
+anychart.core.settings.simpleHandler = function(fieldName, deprecatedFieldName, normalizer, opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = normalizer(opt_value);
+    opt_value = normalizer.call(this, opt_value);
     if (this.getOwnOption(fieldName) !== opt_value) {
       this.setOption(fieldName, opt_value);
-      if (this.check(supportCheck)) {
+      if (this.check(/** @type {number} */ (this.getCapabilities(fieldName)))) {
+        this.getHook(fieldName).call(this.getHookContext(fieldName));
+        var signal = this.getSignal(fieldName);
+        var consistencyState = this.getConsistencyState(fieldName);
         if (consistencyState) {
           this.invalidate(consistencyState, signal);
         } else {
@@ -408,16 +475,13 @@ anychart.core.settings.simpleHandler = function(fieldName, deprecatedFieldName, 
  * @param {string} fieldName
  * @param {string} deprecatedFieldName
  * @param {function(*):*} normalizer
- * @param {number} supportCheck - set to anychart.core.series.Capabilities.ANY to invalidate in any case.
- * @param {anychart.ConsistencyState|number} consistencyState
- * @param {anychart.Signal|number} signal
  * @param {*=} opt_value
  * @return {*|anychart.core.settings.IObjectWithSettings}
  * @this {anychart.core.settings.IObjectWithSettings}
  */
-anychart.core.settings.simpleDeprecatedHandler = function(fieldName, deprecatedFieldName, normalizer, supportCheck, consistencyState, signal, opt_value) {
+anychart.core.settings.simpleDeprecatedHandler = function(fieldName, deprecatedFieldName, normalizer, opt_value) {
   anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, [deprecatedFieldName + '()', fieldName + '()'], true);
-  return anychart.core.settings.simpleHandler.call(this, fieldName, deprecatedFieldName, normalizer, supportCheck, consistencyState, signal, opt_value);
+  return anychart.core.settings.simpleHandler.call(this, fieldName, deprecatedFieldName, normalizer, opt_value);
 };
 
 
@@ -427,31 +491,32 @@ anychart.core.settings.simpleDeprecatedHandler = function(fieldName, deprecatedF
  * @param {string} fieldName
  * @param {string} deprecatedFieldName
  * @param {function(Array):*} arrayNormalizer
- * @param {number} supportCheck - set to anychart.core.series.Capabilities.ANY to invalidate in any case.
- * @param {anychart.ConsistencyState|number} consistencyState
- * @param {anychart.Signal|number} signal
  * @param {*=} opt_value
  * @param {...*} var_args
  * @return {*|anychart.core.settings.IObjectWithSettings}
  * @this {anychart.core.settings.IObjectWithSettings}
  */
-anychart.core.settings.multiArgsHandler = function(fieldName, deprecatedFieldName, arrayNormalizer, supportCheck, consistencyState, signal, opt_value, var_args) {
+anychart.core.settings.multiArgsHandler = function(fieldName, deprecatedFieldName, arrayNormalizer, opt_value, var_args) {
   if (goog.isDef(opt_value)) {
     // Copying using loop to avoid deop due to passing arguments object to
     // function. This is faster in many JS engines as of late 2014.
     var args = [];
-    for (var i = 6; i < arguments.length; i++) {
+    for (var i = 3; i < arguments.length; i++) {
       args.push(arguments[i]);
     }
-    opt_value = arrayNormalizer(args);
+    opt_value = arrayNormalizer.call(this, args);
     if (this.getOwnOption(fieldName) !== opt_value) {
       this.setOption(fieldName, opt_value);
-      if (this.check(supportCheck))
-        if (consistencyState == anychart.ConsistencyState.ONLY_DISPATCHING) {
-          this.dispatchSignal(signal);
-        } else {
+      if (this.check(/** @type {number} */ (this.getCapabilities(fieldName)))) {
+        this.getHook(fieldName).call(this.getHookContext(fieldName));
+        var signal = this.getSignal(fieldName);
+        var consistencyState = this.getConsistencyState(fieldName);
+        if (consistencyState) {
           this.invalidate(consistencyState, signal);
+        } else {
+          this.dispatchSignal(signal);
         }
+      }
     }
     return this;
   }
@@ -465,17 +530,14 @@ anychart.core.settings.multiArgsHandler = function(fieldName, deprecatedFieldNam
  * @param {string} fieldName
  * @param {string} deprecatedFieldName
  * @param {function(Array):*} arrayNormalizer
- * @param {number} supportCheck - set to anychart.core.series.Capabilities.ANY to invalidate in any case.
- * @param {anychart.ConsistencyState|number} consistencyState
- * @param {anychart.Signal|number} signal
  * @param {*=} opt_value
  * @param {...*} var_args
  * @return {*|anychart.core.settings.IObjectWithSettings}
  * @this {anychart.core.settings.IObjectWithSettings}
  */
-anychart.core.settings.multiArgsDeprecatedHandler = function(fieldName, deprecatedFieldName, arrayNormalizer, supportCheck, consistencyState, signal, opt_value, var_args) {
+anychart.core.settings.multiArgsDeprecatedHandler = function(fieldName, deprecatedFieldName, arrayNormalizer, opt_value, var_args) {
   anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, [deprecatedFieldName + '()', fieldName + '()'], true);
-  return anychart.core.settings.multiArgsHandler(fieldName, deprecatedFieldName, arrayNormalizer, supportCheck, consistencyState, signal, opt_value, var_args);
+  return anychart.core.settings.multiArgsHandler.apply(this, arguments);
 };
 
 
@@ -805,6 +867,71 @@ anychart.core.settings.arrayNormalizer = function(args) {
 anychart.core.settings.functionNormalizer = function(val) {
   return goog.isFunction(val) ? val : null;
 };
+
+
+//endregion
+//region Descriptors
+/**
+ * @type {!Object.<string, Array>}
+ */
+anychart.core.settings.descriptors = (function() {
+  var map = {};
+
+  map.FILL = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'fill', anychart.core.settings.fillNormalizer];
+  map.FILL_FUNCTION = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'fill', anychart.core.settings.fillOrFunctionNormalizer];
+  map.FILL_FUNCTION_SIMPLE = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'fill', anychart.core.settings.fillOrFunctionSimpleNormalizer];
+  map.NEGATIVE_FILL = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'negativeFill', anychart.core.settings.fillOrFunctionNormalizer];
+  map.RISING_FILL = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'risingFill', anychart.core.settings.fillOrFunctionNormalizer];
+  map.FALLING_FILL = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'fallingFill', anychart.core.settings.fillOrFunctionNormalizer];
+
+  map.STROKE = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'stroke', anychart.core.settings.strokeNormalizer];
+  map.STROKE_FUNCTION = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'stroke', anychart.core.settings.strokeOrFunctionNormalizer];
+  map.STROKE_FUNCTION_SIMPLE = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'stroke', anychart.core.settings.strokeOrFunctionSimpleNormalizer];
+  map.LOW_STROKE = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'lowStroke', anychart.core.settings.strokeOrFunctionNormalizer];
+  map.HIGH_STROKE = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'highStroke', anychart.core.settings.strokeOrFunctionNormalizer];
+  map.NEGATIVE_STROKE = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'negativeStroke', anychart.core.settings.strokeOrFunctionNormalizer];
+  map.RISING_STROKE = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'risingStroke', anychart.core.settings.strokeOrFunctionNormalizer];
+  map.FALLING_STROKE = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'fallingStroke', anychart.core.settings.strokeOrFunctionNormalizer];
+  map.MEDIAN_STROKE = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'medianStroke', anychart.core.settings.strokeOrFunctionNormalizer];
+  map.STEM_STROKE = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'stemStroke', anychart.core.settings.strokeOrFunctionNormalizer];
+  map.WHISKER_STROKE = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'whiskerStroke', anychart.core.settings.strokeOrFunctionNormalizer];
+
+  map.HATCH_FILL = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'hatchFill', anychart.core.settings.hatchFillNormalizer];
+  map.HATCH_FILL_FUNCTION = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'hatchFill', anychart.core.settings.hatchFillOrFunctionNormalizer];
+  map.HATCH_FILL_FUNCTION_SIMPLE = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'hatchFill', anychart.core.settings.hatchFillOrFunctionSimpleNormalizer];
+  map.NEGATIVE_HATCH_FILL = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'negativeHatchFill', anychart.core.settings.hatchFillOrFunctionNormalizer];
+  map.RISING_HATCH_FILL = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'risingHatchFill', anychart.core.settings.hatchFillOrFunctionNormalizer];
+  map.FALLING_HATCH_FILL = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'fallingHatchFill', anychart.core.settings.hatchFillOrFunctionNormalizer];
+
+  // box series
+  map.WHISKER_WIDTH = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'whiskerWidth', anychart.core.settings.numberOrPercentNormalizer];
+
+  // marker series
+  map.TYPE = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'type', anychart.core.settings.markerTypeNormalizer];
+  map.SIZE = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'size', anychart.core.settings.numberNormalizer];
+
+  // annotations
+  map.TREND = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'trend', anychart.core.settings.strokeOrFunctionNormalizer];
+  map.GRID = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'grid', anychart.core.settings.strokeOrFunctionNormalizer];
+
+  // linear gauge tank pointer
+  map.EMPTY_FILL = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'emptyFill', anychart.core.settings.fillOrFunctionNormalizer];
+  map.EMPTY_HATCH_FILL = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'emptyHatchFill', anychart.core.settings.hatchFillOrFunctionNormalizer];
+
+  // tag cloud state descriptors
+  map.FONT_FAMILY = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'fontFamily', anychart.core.settings.stringNormalizer];
+  map.FONT_STYLE = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'fontStyle', anychart.enums.normalizeFontStyle];
+  map.FONT_VARIANT = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'fontVariant', anychart.enums.normalizeFontVariant];
+  map.FONT_WEIGHT = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'fontWeight', anychart.core.settings.numberOrStringNormalizer];
+  map.FONT_SIZE = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'fontSize', anychart.core.settings.numberOrPercentOrNullOrFunctionNormalizer];
+  // pert tasks
+  map.DUMMY_FILL = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'dummyFill', anychart.core.settings.fillOrFunctionNormalizer];
+  map.DUMMY_STROKE = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'dummyStroke', anychart.core.settings.strokeOrFunctionNormalizer];
+
+  return map;
+})();
+
+
 //endregion
 
 
@@ -871,6 +998,46 @@ anychart.core.settings.IObjectWithSettings.prototype.check = function(flags) {};
 
 
 /**
+ * Returns capabilities that should be checked after option change.
+ * @param {string} fieldName
+ * @return {number|undefined} Capabilities
+ */
+anychart.core.settings.IObjectWithSettings.prototype.getCapabilities = function(fieldName) {};
+
+
+/**
+ * Returns state that should be invalidated after option changed and capabilities check has passed.
+ * @param {string} fieldName
+ * @return {anychart.ConsistencyState|number}
+ */
+anychart.core.settings.IObjectWithSettings.prototype.getConsistencyState = function(fieldName) {};
+
+
+/**
+ * Returns signal that should be dispatched after option changed and capabilities check has passed.
+ * @param {string} fieldName
+ * @return {number} Signal to dispatch
+ */
+anychart.core.settings.IObjectWithSettings.prototype.getSignal = function(fieldName) {};
+
+
+/**
+ * Returns hook context.
+ * @param {string} fieldName
+ * @return {*} Before invalidation hook.
+ */
+anychart.core.settings.IObjectWithSettings.prototype.getHookContext = function(fieldName) {};
+
+
+/**
+ * Returns hook that should be called before invalidation.
+ * @param {string} fieldName
+ * @return {Function} Before invalidation hook.
+ */
+anychart.core.settings.IObjectWithSettings.prototype.getHook = function(fieldName) {};
+
+
+/**
  * Sets consistency state to an element {@link anychart.ConsistencyState}.
  * @param {anychart.ConsistencyState|number} state State(s) to be set.
  * @param {(anychart.Signal|number)=} opt_signal Signal(s) to be sent to listener, if states have been set.
@@ -888,6 +1055,21 @@ anychart.core.settings.IObjectWithSettings.prototype.invalidate = function(state
  * @param {boolean=} opt_force Force to dispatch signal.
  */
 anychart.core.settings.IObjectWithSettings.prototype.dispatchSignal = function(state, opt_force) {};
+
+
+/**
+ * Whether implementation of IObjectWithSettings implements IResolvable also.
+ * @return {boolean}
+ */
+anychart.core.settings.IObjectWithSettings.prototype.isResolvable = function() {};
+
+
+/**
+ * Returns parent state for state holder by type.
+ * @param {anychart.PointState|number} stateType
+ * @return {anychart.core.StateSettings}
+ */
+anychart.core.settings.IObjectWithSettings.prototype.getParentState = function(stateType) {};
 //endregion
 
 

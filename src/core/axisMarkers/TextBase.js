@@ -1,9 +1,9 @@
 goog.provide('anychart.core.axisMarkers.TextBase');
 
 goog.require('acgraph.math');
+goog.require('anychart.core.Axis');
 goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.Text');
-goog.require('anychart.core.axes.Linear');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.utils.Padding');
 goog.require('anychart.enums');
@@ -30,7 +30,7 @@ anychart.core.axisMarkers.TextBase = function() {
 
   /**
    * Current scale.
-   * @type {anychart.scales.Base|anychart.scales.GanttDateTime}
+   * @type {anychart.scales.Base|anychart.ganttModule.Scale}
    * @private
    */
   this.scale_;
@@ -44,7 +44,7 @@ anychart.core.axisMarkers.TextBase = function() {
 
   /**
    * Assigned axis.
-   * @type {anychart.core.axes.Linear}
+   * @type {anychart.core.Axis}
    * @private
    */
   this.axis_ = null;
@@ -110,8 +110,12 @@ anychart.core.axisMarkers.TextBase = function() {
    */
   this.defaultLayout_ = anychart.enums.Layout.HORIZONTAL;
 
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['text', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED]
+  ]);
 };
 goog.inherits(anychart.core.axisMarkers.TextBase, anychart.core.Text);
+anychart.core.settings.populate(anychart.core.axisMarkers.TextBase, anychart.core.Text.TEXT_DESCRIPTORS);
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -130,9 +134,7 @@ anychart.core.axisMarkers.TextBase.prototype.SUPPORTED_SIGNALS =
  * @type {number}
  */
 anychart.core.axisMarkers.TextBase.prototype.SUPPORTED_CONSISTENCY_STATES =
-    anychart.core.Text.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.APPEARANCE |
-    anychart.ConsistencyState.BOUNDS;
+    anychart.core.Text.prototype.SUPPORTED_CONSISTENCY_STATES;
 
 
 /**
@@ -156,29 +158,29 @@ anychart.core.axisMarkers.TextBase.prototype.getChart = function() {
 /**
  * Getter/setter for default scale.
  * Works with instances of anychart.scales.Base only.
- * @param {(anychart.scales.Base|anychart.scales.GanttDateTime)=} opt_value - Scale.
- * @return {anychart.scales.Base|anychart.scales.GanttDateTime|!anychart.core.axisMarkers.TextBase} - Axis scale or
+ * @param {(anychart.scales.Base|anychart.ganttModule.Scale|Object|anychart.enums.ScaleTypes)=} opt_value - Scale.
+ * @return {anychart.scales.Base|anychart.ganttModule.Scale|!anychart.core.axisMarkers.TextBase} - Axis scale or
  * itself for method chaining.
  */
 anychart.core.axisMarkers.TextBase.prototype.scaleInternal = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.scale_ != opt_value) {
-      if (this.scale_)
-        this.scale_.unlistenSignals(this.scaleInvalidated, this);
-      this.scale_ = opt_value;
-      this.scale_.listenSignals(this.scaleInvalidated, this);
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    var scType = opt_value && goog.isFunction(opt_value.getType) && opt_value.getType();
+    var ganttScale = scType == anychart.enums.ScaleTypes.GANTT;
+    var val = ganttScale ?
+        (opt_value == this.scale_ ? null : opt_value) :
+        anychart.scales.Base.setupScale(/** @type {anychart.scales.Base} */(this.scale_), opt_value, null, anychart.scales.Base.ScaleTypes.ALL_DEFAULT, null, this.scaleInvalidated, this);
+    if (val) {
+      var dispatch = this.scale_ == val;
+      this.scale_ = /** @type {anychart.scales.Base|anychart.ganttModule.Scale} */(val);
+      if (!ganttScale)
+        val.resumeSignalsDispatching(dispatch);
+      if (!dispatch)
+        this.invalidate(anychart.ConsistencyState.BOUNDS,
+            anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   } else {
-    if (this.scale_) {
-      return /** @type {anychart.scales.Base|anychart.scales.GanttDateTime} */ (this.scale_);
-    } else {
-      if (this.axis_)
-        return /** @type {?anychart.scales.Base} */ (this.axis_.scale());
-      return null;
-    }
+    return this.scale_ || (this.axis_ && /** @type {?anychart.scales.Base} */ (this.axis_.scale())) || null;
   }
 };
 
@@ -216,8 +218,8 @@ anychart.core.axisMarkers.TextBase.prototype.axisInvalidated_ = function(event) 
 
 /**
  * Sets axis for marker.
- * @param {anychart.core.axes.Linear=} opt_value - Value to be set.
- * @return {(anychart.core.axes.Linear|anychart.core.axisMarkers.TextBase)} - Current value or itself for method chaining.
+ * @param {anychart.core.Axis=} opt_value - Value to be set.
+ * @return {(anychart.core.Axis|anychart.core.axisMarkers.TextBase)} - Current value or itself for method chaining.
  */
 anychart.core.axisMarkers.TextBase.prototype.axis = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -371,16 +373,6 @@ anychart.core.axisMarkers.TextBase.prototype.anchor = function(opt_value) {
 //  Settings.
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Get/Set text marker settings.
- * @param {(string)=} opt_value TextMarker text settings.
- * @return {string|anychart.core.axisMarkers.TextBase} TextMarker line settings or TextMarker instance for method chaining.
- */
-anychart.core.axisMarkers.TextBase.prototype.text = function(opt_value) {
-  return /** @type {anychart.core.axisMarkers.TextBase|string} */(this.textSettings('text', opt_value));
-};
-
-
-/**
  * Getter/setter for scale.
  * @param {*=} opt_value - Value to be set.
  * @return {*} - Current value or itself for method chaining.
@@ -469,19 +461,6 @@ anychart.core.axisMarkers.TextBase.prototype.height = function(opt_value) {
     return this;
   }
   return this.height_;
-};
-
-
-/** @inheritDoc */
-anychart.core.axisMarkers.TextBase.prototype.applyTextSettings = function(textElement, isInitial) {
-  if (isInitial || 'text' in this.changedSettings || 'useHtml' in this.changedSettings) {
-    if (!!this.settingsObj['useHtml'])
-      textElement.htmlText(this.settingsObj['text']);
-    else
-      textElement.text(this.settingsObj['text']);
-  }
-  anychart.core.axisMarkers.TextBase.base(this, 'applyTextSettings', textElement, isInitial);
-  this.changedSettings = {};
 };
 
 
@@ -684,13 +663,13 @@ anychart.core.axisMarkers.TextBase.prototype.disposeInternal = function() {
 /** @inheritDoc */
 anychart.core.axisMarkers.TextBase.prototype.serialize = function() {
   var json = anychart.core.axisMarkers.TextBase.base(this, 'serialize');
+  anychart.core.settings.serialize(this, anychart.core.Text.TEXT_DESCRIPTORS, json, 'Text Base');
   json['anchor'] = this.anchor();
   json['align'] = this.align();
   if (this.layout_) json['layout'] = this.layout_;
   json['rotation'] = this.rotation();
   json['offsetX'] = this.offsetX();
   json['offsetY'] = this.offsetY();
-  json['text'] = this.text();
   json['height'] = this.height();
   json['width'] = this.width();
   return json;
@@ -700,13 +679,19 @@ anychart.core.axisMarkers.TextBase.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.core.axisMarkers.TextBase.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.axisMarkers.TextBase.base(this, 'setupByJSON', config, opt_default);
+
+  if (opt_default) {
+    anychart.core.settings.copy(this.themeSettings, anychart.core.Text.TEXT_DESCRIPTORS, config);
+  } else {
+    anychart.core.settings.deserialize(this, anychart.core.Text.TEXT_DESCRIPTORS, config);
+  }
+
   this.anchor(config['anchor']);
   this.align(config['align']);
   if ('layout' in config && config['layout']) this.layout(config['layout']);
   this.rotation(config['rotation']);
   this.offsetX(config['offsetX']);
   this.offsetY(config['offsetY']);
-  this.text(config['text']);
   this.height(config['height']);
   this.width(config['width']);
 
@@ -716,7 +701,7 @@ anychart.core.axisMarkers.TextBase.prototype.setupByJSON = function(config, opt_
       if (this.chart_) {
         this.axis((/** @type {anychart.core.CartesianBase} */(this.chart_)).getAxisByIndex(ax));
       }
-    } else if (ax instanceof anychart.core.axes.Linear) {
+    } else if (anychart.utils.instanceOf(ax, anychart.core.Axis)) {
       this.axis(ax);
     }
   }

@@ -7,7 +7,7 @@ goog.require('goog.events.KeyHandler');
 goog.require('goog.ui.Component');
 goog.require('goog.ui.LabelInput');
 
-goog.forwardDeclare('anychart.charts.Stock');
+goog.forwardDeclare('anychart.stockModule.Chart');
 
 
 
@@ -21,7 +21,7 @@ anychart.ui.RangePicker = function() {
 
   /**
    * Stock chart.
-   * @type {?anychart.charts.Stock}
+   * @type {?anychart.stockModule.Chart}
    * @private
    */
   this.target_ = null;
@@ -118,7 +118,7 @@ anychart.ui.RangePicker.DEFAULT_HEIGHT = 21;
 
 /**
  * Set stock chart for Range Picker.
- * @param {anychart.charts.Stock} chart
+ * @param {anychart.stockModule.Chart} chart
  */
 anychart.ui.RangePicker.prototype.target = function(chart) {
   this.target_ = chart;
@@ -140,11 +140,11 @@ anychart.ui.RangePicker.prototype.changeSelectedRange_ = function(range) {
 /** @private */
 anychart.ui.RangePicker.prototype.update_ = function() {
   if (this.fromInput_) {
-    this.fromInput_.setValue(window['anychart']['format']['dateTime'](this.fromValue_, this.format()));
+    this.fromInput_.setValue(anychart.window['anychart']['format']['dateTime'](this.fromValue_, this.format()));
   }
 
   if (this.toInput_) {
-    this.toInput_.setValue(window['anychart']['format']['dateTime'](this.toValue_, this.format()));
+    this.toInput_.setValue(anychart.window['anychart']['format']['dateTime'](this.toValue_, this.format()));
   }
 };
 
@@ -159,7 +159,7 @@ anychart.ui.RangePicker.prototype.format = function(opt_format) {
     this.format_ = opt_format;
     this.update_();
   }
-  return this.format_ || window['anychart']['format']['outputDateTimeFormat']();
+  return this.format_ || anychart.window['anychart']['format']['outputDateTimeFormat']();
 };
 
 
@@ -183,7 +183,7 @@ anychart.ui.RangePicker.prototype.createDomInternal_ = function() {
         goog.ui.INLINE_BLOCK_CLASSNAME,
         goog.getCssName('anychart-input-label')
       ],
-      window['anychart']['format']['getMessage'](this.fromLabelText_));
+      anychart.window['anychart']['format']['getMessage'](this.fromLabelText_));
   goog.dom.appendChild(element, this.fromLabel_);
 
   this.fromInput_ = new goog.ui.LabelInput(/*'From date'*/);
@@ -201,7 +201,7 @@ anychart.ui.RangePicker.prototype.createDomInternal_ = function() {
         goog.ui.INLINE_BLOCK_CLASSNAME,
         goog.getCssName('anychart-input-label')
       ],
-      window['anychart']['format']['getMessage'](this.toLabelText_));
+      anychart.window['anychart']['format']['getMessage'](this.toLabelText_));
   goog.dom.appendChild(element, this.toLabel_);
 
   this.toInput_ = new goog.ui.LabelInput(/*'To date'*/);
@@ -235,14 +235,14 @@ anychart.ui.RangePicker.prototype.isStockChart_ = function(chart) {
 
 
 /**
- * @param {(anychart.charts.Stock|Element)=} opt_parentElement Optional parent element or stock chart to render the
+ * @param {(anychart.stockModule.Chart|Element)=} opt_parentElement Optional parent element or stock chart to render the
  *    range picker into.
  * @return {Element|undefined}
  * @private
  */
 anychart.ui.RangePicker.prototype.extractChartContainer_ = function(opt_parentElement) {
   if (this.isStockChart_(opt_parentElement)) {
-    this.target(/** @type {anychart.charts.Stock} */(opt_parentElement));
+    this.target(/** @type {anychart.stockModule.Chart} */(opt_parentElement));
     this.insideChart_ = true;
     var stage = this.target_['container']() ? this.target_['container']()['getStage']() : null;
     if (stage && stage['container']()) {
@@ -256,7 +256,7 @@ anychart.ui.RangePicker.prototype.extractChartContainer_ = function(opt_parentEl
 
 
 /**
- * @param {(anychart.charts.Stock|Element)=} opt_parentElement Optional parent element or stock chart to render the range picker into.
+ * @param {(anychart.stockModule.Chart|Element)=} opt_parentElement Optional parent element or stock chart to render the range picker into.
  * @private
  */
 anychart.ui.RangePicker.prototype.delayedRenderOnChartDraw_ = function(opt_parentElement) {
@@ -285,7 +285,7 @@ anychart.ui.RangePicker.prototype.fromLabelText = function(opt_value) {
     if (this.fromLabelText_ != opt_value) {
       this.fromLabelText_ = opt_value;
       if (this.fromLabel_)
-        goog.dom.setTextContent(this.fromLabel_, window['anychart']['format']['getMessage'](this.fromLabelText_));
+        goog.dom.setTextContent(this.fromLabel_, anychart.window['anychart']['format']['getMessage'](this.fromLabelText_));
     }
     return this;
   }
@@ -303,7 +303,7 @@ anychart.ui.RangePicker.prototype.toLabelText = function(opt_value) {
     if (this.toLabelText_ != opt_value) {
       this.toLabelText_ = opt_value;
       if (this.toLabel_)
-        goog.dom.setTextContent(this.toLabel_, window['anychart']['format']['getMessage'](this.toLabelText_));
+        goog.dom.setTextContent(this.toLabel_, anychart.window['anychart']['format']['getMessage'](this.toLabelText_));
     }
     return this;
   }
@@ -312,7 +312,7 @@ anychart.ui.RangePicker.prototype.toLabelText = function(opt_value) {
 
 
 /**
- * @param {(anychart.charts.Stock|Element)=} opt_parentElement Optional parent element or stock chart to render the
+ * @param {(anychart.stockModule.Chart|Element)=} opt_parentElement Optional parent element or stock chart to render the
  *    range picker into.
  * @override
  */
@@ -373,8 +373,8 @@ anychart.ui.RangePicker.prototype.onInputBlur_ = function() {
   var from = this.fromInput_.getValue();
   var to = this.toInput_.getValue();
   var dateFormat = this.format();
-  var fromParsed = window['anychart']['format']['parseDateTime'](from, dateFormat);
-  var toParsed = window['anychart']['format']['parseDateTime'](to, dateFormat);
+  var fromParsed = anychart.window['anychart']['format']['parseDateTime'](from, dateFormat);
+  var toParsed = anychart.window['anychart']['format']['parseDateTime'](to, dateFormat);
 
   if (fromParsed && toParsed) {
     var fromTimeStamp = fromParsed.getTime();
@@ -396,8 +396,8 @@ anychart.ui.RangePicker.prototype.onInputBlur_ = function() {
   }
 
   // Reset values when time is wrong or time was flipped.
-  this.fromInput_.setValue(window['anychart']['format']['dateTime'](this.fromValue_, this.format()));
-  this.toInput_.setValue(window['anychart']['format']['dateTime'](this.toValue_, this.format()));
+  this.fromInput_.setValue(anychart.window['anychart']['format']['dateTime'](this.fromValue_, this.format()));
+  this.toInput_.setValue(anychart.window['anychart']['format']['dateTime'](this.toValue_, this.format()));
 };
 
 

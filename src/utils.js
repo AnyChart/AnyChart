@@ -38,10 +38,9 @@ goog.require('goog.object');
  * @param {string} field Field name.
  * @param {?Array.<string>} mapping Mapping.
  * @param {*=} opt_setValue Value to set.
- * @param {boolean=} opt_setToFirstByMapping If true, sets value to the first fieldName by mapping.
  * @return {*} Current or previous value.
  */
-anychart.utils.mapObject = function(obj, field, mapping, opt_setValue, opt_setToFirstByMapping) {
+anychart.utils.mapObject = function(obj, field, mapping, opt_setValue) {
   if (mapping) {
     for (var i = 0; i < mapping.length; i++) {
       var propName = mapping[i];
@@ -53,7 +52,7 @@ anychart.utils.mapObject = function(obj, field, mapping, opt_setValue, opt_setTo
   }
   if (arguments.length > 3) {
     var result = obj[field];
-    obj[(mapping && opt_setToFirstByMapping) ? mapping[0] : field] = opt_setValue;
+    obj[field] = opt_setValue;
     return result;
   }
   return obj[field];
@@ -132,7 +131,7 @@ anychart.utils.compareNumericDesc = function(a, b) {
  */
 anychart.utils.extractTag = function(target) {
   var tag;
-  while (target instanceof acgraph.vector.Element) {
+  while (anychart.utils.instanceOf(target, acgraph.vector.Element)) {
     tag = target.tag;
     if (goog.isDef(tag)) {
       return tag;
@@ -151,7 +150,7 @@ anychart.utils.extractTag = function(target) {
  */
 anychart.utils.checkIfParent = function(parent, target) {
   if (!parent) return false;
-  while (target instanceof goog.events.EventTarget && target != parent) {
+  while (anychart.utils.instanceOf(target, goog.events.EventTarget) && target != parent) {
     target = target.getParentEventTarget();
   }
   return target == parent;
@@ -341,23 +340,6 @@ anychart.utils.normalizeTimestamp = function(value) {
     result = Number(value);
   }
   return result;
-};
-
-
-/**
- * Formats incoming timestamp as 'yyyy.MM.dd'.
- * @param {number|string} timestamp - Timestamp.
- * @return {string} - Formatted date.
- * @deprecated Since 7.9.0. Use anychart.format.dateTime instead.
- */
-anychart.utils.defaultDateFormatter = function(timestamp) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.utils.defaultDateFormatter', 'anychart.format.dateTime'], true);
-  if (goog.isNumber(timestamp) || goog.isString(timestamp)) {
-    var formatter = new goog.i18n.DateTimeFormat('yyyy.MM.dd');
-    return formatter.format(new goog.date.UtcDateTime(new Date(+timestamp)));
-  } else {
-    return '';
-  }
 };
 
 
@@ -972,15 +954,83 @@ anychart.utils.trim = function(str) {
 
 
 /**
+ * Decapitalize string.
+ * @param {string=} str
+ * @return {string} Decapitalized string.
+ */
+anychart.utils.decapitalize = function(str) {
+  return String(str.charAt(0)).toLowerCase() + String(str.substr(1));
+};
+
+
+/**
  * Checks whether separator is valid.
  * Throws an error if invalid.
  * @param {string} separator
+ * @return {boolean}
  */
 anychart.utils.checkSeparator = function(separator) {
+  var res = true;
   if (separator.indexOf('\"') != -1) {
     anychart.core.reporting.error(anychart.enums.ErrorCode.CSV_DOUBLE_QUOTE_IN_SEPARATOR);
-    throw new Error('Double quotes in separator are not allowed');
+    res = false;
   }
+  return res;
+};
+
+
+
+/**
+ * Escapes values.
+ * @param {Array} row Array of values.
+ * @param {string} colSep
+ * @param {string} rowSep
+ * @param {number} length
+ * @return {string}
+ * @private
+ */
+anychart.utils.toCsvRow_ = function(row, colSep, rowSep, length) {
+  for (var i = 0; i < length; i++) {
+    var value = row[i];
+    if (goog.isDefAndNotNull(value)) {
+      if (!goog.isString(value))
+        value = String(value);
+      if (value.indexOf(colSep) != -1 || value.indexOf(rowSep) != -1) {
+        value = value.split('"').join('""');
+        value = '"' + value + '"';
+      }
+    } else {
+      value = '';
+    }
+    row[i] = value;
+  }
+  return row.join(colSep);
+};
+
+
+/**
+ * Serializes table to a CSV string.
+ * @param {Array} headers
+ * @param {Array.<Array>} data
+ * @param {*} settings
+ * @return {string}
+ */
+anychart.utils.serializeCsv = function(headers, data, settings) {
+  var rowSep = (settings && settings['rowsSeparator']) || '\n';
+  var colSep = (settings && settings['columnsSeparator']) || ',';
+  var noHeader = (settings && settings['ignoreFirstRow']) || false;
+  if (!data.length || !anychart.utils.checkSeparator(rowSep) || !anychart.utils.checkSeparator(colSep))
+    return '';
+
+  var strings = [];
+  if (!noHeader) {
+    strings.push(anychart.utils.toCsvRow_(headers, colSep, rowSep, headers.length));
+  }
+
+  for (var i = 0; i < data.length; i++) {
+    strings.push(anychart.utils.toCsvRow_(data[i], colSep, rowSep, headers.length));
+  }
+  return strings.join(rowSep);
 };
 
 
@@ -1112,7 +1162,7 @@ anychart.utils.xml2json = function(xml) {
         } else if ((!goog.isNull(subnode) || anychart.utils.isNullNodeAllowed(subNodeName)) && !resultIsArray) {
           onlyText = false;
           var names;
-          name = anychart.utils.toCamelCase(subNodeName);
+          name = anychart.utils.toCamelCase(subNodeName, true);
           if (names = anychart.utils.getArrayPropName_(name)) {
             var element = subnode[names[1]];
             if (!goog.isArray(element)) {
@@ -1150,7 +1200,7 @@ anychart.utils.xml2json = function(xml) {
          */
         if (name == 'xmlns' || name == anychart.utils.ARRAY_IDENTIFIER_ATTR_NAME_) continue;
 
-        name = anychart.utils.toCamelCase(attr.nodeName);
+        name = anychart.utils.toCamelCase(attr.nodeName, true);
 
         if (!(name in result)) {
           val = attr.value;
@@ -1200,7 +1250,7 @@ anychart.utils.json2xml = function(json, opt_rootNodeName, opt_returnAsXmlNode) 
   var root = anychart.utils.json2xml_(json, opt_rootNodeName || 'anychart', result);
   if (root) {
     if (!opt_rootNodeName)
-      root.setAttribute('xmlns', 'http://anychart.com/schemas/7.14.3/xml-schema.xsd');
+      root.setAttribute('xmlns', 'http://anychart.com/schemas/8.0.0/xml-schema.xsd');
     result.appendChild(root);
   }
   return opt_returnAsXmlNode ? result : goog.dom.xml.serialize(result);
@@ -1328,10 +1378,14 @@ anychart.utils.getNodeNames_ = function(arrayPropName) {
       return ['range_axes_markers', 'range_axes_marker'];
     case 'textAxesMarkers':
       return ['text_axes_markers', 'text_axes_marker'];
-    case 'grids':
-      return ['grids', 'grid'];
-    case 'minorGrids':
-      return ['minor_grids', 'grid'];
+    case 'xGrids':
+      return ['x_grids', 'grid'];
+    case 'yGrids':
+      return ['y_grids', 'grid'];
+    case 'xMinorGrids':
+      return ['x_minor_grids', 'grid'];
+    case 'yMinorGrids':
+      return ['y_minor_grids', 'grid'];
     case 'xAxes':
       return ['x_axes', 'axis'];
     case 'yAxes':
@@ -1421,10 +1475,14 @@ anychart.utils.getArrayPropName_ = function(nodeName) {
       return ['rangeAxesMarkers', 'rangeAxesMarker'];
     case 'textAxesMarkers':
       return ['textAxesMarkers', 'textAxesMarker'];
-    case 'grids':
-      return ['grids', 'grid'];
-    case 'minorGrids':
-      return ['minorGrids', 'grid'];
+    case 'xGrids':
+      return ['xGrids', 'grid'];
+    case 'yGrids':
+      return ['yGrids', 'grid'];
+    case 'xMinorGrids':
+      return ['xMinorGrids', 'grid'];
+    case 'yMinorGrids':
+      return ['yMinorGrids', 'grid'];
     case 'xAxes':
       return ['xAxes', 'axis'];
     case 'yAxes':
@@ -1504,13 +1562,15 @@ anychart.utils.isNullNodeAllowed = function(name) {
 
 /**
  * Converts a string from selector-case to camelCase (e.g. from
- * "multi-part-string" to "multiPartString"), useful for converting
+ * "multi-part-string" or "multi_part_string" to "multiPartString"), useful for converting
  * CSS selectors and HTML dataset keys to their equivalent JS properties.
  * @param {string} str The string in selector-case form.
+ * @param {boolean=} opt_onlyUnderscores Remove only underscores. For xml attributes.
  * @return {string} The string in camelCase form.
  */
-anychart.utils.toCamelCase = function(str) {
-  return String(str).replace(/_([a-z])/g, function(all, match) {
+anychart.utils.toCamelCase = function(str, opt_onlyUnderscores) {
+  var pattern = opt_onlyUnderscores ? /[_]([a-z])/g : /[-_]([a-z|\d])/g;
+  return String(str).replace(pattern, function(all, match) {
     return match.toUpperCase();
   });
 };
@@ -1619,29 +1679,6 @@ anychart.utils.UTCTimeZoneCache_;
 
 
 /**
- * Formats date by pattern.
- * @param {number|Date} date UTC timestamp or Date object.
- * @param {string} pattern
- * @return {string}
- * @deprecated Since 7.9.0. Use anychart.format.dateTime instead.
- */
-anychart.utils.formatDateTime = function(date, pattern) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.utils.formatDateTime', 'anychart.format.dateTime'], true);
-  /** @type {goog.i18n.DateTimeFormat} */
-  var formatter;
-  if (pattern in anychart.utils.formatDateTimeCache_)
-    formatter = anychart.utils.formatDateTimeCache_[pattern];
-  else
-    formatter = anychart.utils.formatDateTimeCache_[pattern] = new goog.i18n.DateTimeFormat(pattern);
-
-  if (!anychart.utils.UTCTimeZoneCache_)
-    anychart.utils.UTCTimeZoneCache_ = goog.i18n.TimeZone.createTimeZone(0);
-
-  return formatter.format(goog.isNumber(date) ? new Date(date) : date, anychart.utils.UTCTimeZoneCache_);
-};
-
-
-/**
  * Global tooltips registry. Used to make anychart.utils.hideTooltips() work correctly.
  * @type {Object.<anychart.core.ui.Tooltip>}
  */
@@ -1742,10 +1779,10 @@ anychart.utils.INTERVAL_ESTIMATIONS = [
 
 
 /**
- * Returns an array of [unit: anychart.enums.Interval, count: number] with estimation of the data interval passed.
+ * Returns an object of [unit: anychart.enums.Interval, count: number] with estimation of the data interval passed.
  * Interval must be a valid number (not a NaN).
  * @param {number} interval
- * @return {!{unit: anychart.enums.Interval, count: number}} }
+ * @return {!{unit: anychart.enums.Interval, count: number}}
  */
 anychart.utils.estimateInterval = function(interval) {
   interval = Math.floor(interval);
@@ -1850,17 +1887,17 @@ anychart.utils.getMarkerDrawer = function(type) {
       return acgraph.vector.primitives.star10;
     case 'diamond':
       return acgraph.vector.primitives.diamond;
-    case 'triangleup':
+    case 'triangle-up':
       return acgraph.vector.primitives.triangleUp;
-    case 'triangledown':
+    case 'triangle-down':
       return acgraph.vector.primitives.triangleDown;
-    case 'triangleright':
+    case 'triangle-right':
       return acgraph.vector.primitives.triangleRight;
-    case 'triangleleft':
+    case 'triangle-left':
       return acgraph.vector.primitives.triangleLeft;
     case 'cross':
       return acgraph.vector.primitives.cross;
-    case 'diagonalcross':
+    case 'diagonal-cross':
       return acgraph.vector.primitives.diagonalCross;
     case 'circle':
       return function(path, x, y, radius) {
@@ -1930,7 +1967,7 @@ anychart.utils.getMarkerDrawer = function(type) {
 
             return path;
           }));
-    case 'vline':
+    case 'v-line':
     case 'line':
       return (
           /**
@@ -1972,7 +2009,7 @@ anychart.utils.getMarkerDrawer = function(type) {
 
             return path;
           }));
-    case 'arrowup':
+    case 'arrow-up':
       return (
           /**
            * @param {!acgraph.vector.Path} path
@@ -2016,7 +2053,7 @@ anychart.utils.getMarkerDrawer = function(type) {
             path.close();
             return path;
           }));
-    case 'arrowdown':
+    case 'arrow-down':
       return (
           /**
            * @param {!acgraph.vector.Path} path
@@ -2060,7 +2097,7 @@ anychart.utils.getMarkerDrawer = function(type) {
             path.close();
             return path;
           }));
-    case 'arrowleft':
+    case 'arrow-left':
       return (
           /**
            * @param {!acgraph.vector.Path} path
@@ -2104,7 +2141,7 @@ anychart.utils.getMarkerDrawer = function(type) {
             path.close();
             return path;
           }));
-    case 'arrowright':
+    case 'arrow-right':
       return (
           /**
            * @param {!acgraph.vector.Path} path
@@ -2270,11 +2307,18 @@ anychart.utils.decomposeArguments = function(namedArguments, opt_options, opt_de
   return result;
 };
 
+
+/**
+ * Safe instanceof.
+ * @param {*} object
+ * @param {*} constructor
+ * @return {boolean}
+ */
+anychart.utils.instanceOf = acgraph.utils.instanceOf;
+
 //exports
 goog.exportSymbol('anychart.utils.printUtilsBoolean', anychart.utils.printUtilsBoolean);
 goog.exportSymbol('anychart.utils.xml2json', anychart.utils.xml2json);
 goog.exportSymbol('anychart.utils.json2xml', anychart.utils.json2xml);
-goog.exportSymbol('anychart.utils.defaultDateFormatter', anychart.utils.defaultDateFormatter);
-goog.exportSymbol('anychart.utils.formatDateTime', anychart.utils.formatDateTime);
 goog.exportSymbol('anychart.utils.hideTooltips', anychart.utils.hideTooltips);
 goog.exportSymbol('anychart.utils.htmlTableFromCsv', anychart.utils.htmlTableFromCsv);

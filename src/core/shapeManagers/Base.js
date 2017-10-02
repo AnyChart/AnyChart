@@ -79,9 +79,11 @@ anychart.core.shapeManagers.Base = function(series, config, interactive, opt_sha
 
   for (var i = 0; i < config.length; i++) {
     var shapeConfig = config[i];
-    var fill = anychart.color.getColorResolver(shapeConfig.fillNames,
-        shapeConfig.isHatchFill ? anychart.enums.ColorType.HATCH_FILL : anychart.enums.ColorType.FILL);
-    var stroke = anychart.color.getColorResolver(shapeConfig.strokeNames, anychart.enums.ColorType.STROKE);
+    var fill = anychart.color.getColorResolver(shapeConfig.fillName,
+        shapeConfig.isHatchFill ? anychart.enums.ColorType.HATCH_FILL : anychart.enums.ColorType.FILL,
+        shapeConfig.canBeHoveredSelected, shapeConfig.scrollerSelected);
+    var stroke = anychart.color.getColorResolver(shapeConfig.strokeName,
+        anychart.enums.ColorType.STROKE, shapeConfig.canBeHoveredSelected, shapeConfig.scrollerSelected);
     var type = shapeConfig.shapeType;
     var val = String(type).toLowerCase();
     var cls;
@@ -271,7 +273,7 @@ anychart.core.shapeManagers.Base.prototype.clearShapes = function() {
     for (i = 0; i < shapes.length; i++) {
       shape = shapes[i];
       shape.parent(null);
-      if (shape instanceof acgraph.vector.Path) {
+      if (anychart.utils.instanceOf(shape, acgraph.vector.Path)) {
         shape.clear();
         shape.setTransformationMatrix(1, 0, 0, 1, 0, 0);
       }
@@ -303,7 +305,7 @@ anychart.core.shapeManagers.Base.prototype.getShapesGroup = function(state, opt_
   for (var name in names) {
     var descriptor = names[name];
     if (descriptor.shapeType == anychart.enums.ShapeType.NONE && opt_shape) {
-      if (opt_shape instanceof acgraph.vector.Shape)
+      if (anychart.utils.instanceOf(opt_shape, acgraph.vector.Shape))
         res[name] = this.configureShape(name, state, indexOrGlobal, opt_baseZIndex || 0, opt_shape);
     } else {
       res[name] = this.createShape(name, state, indexOrGlobal, opt_baseZIndex || 0);

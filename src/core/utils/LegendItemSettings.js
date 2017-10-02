@@ -13,9 +13,32 @@ anychart.core.utils.LegendItemSettings = function() {
   anychart.core.utils.LegendItemSettings.base(this, 'constructor');
 
   // Remove all default text settings that was set by anychart.core.Text
-  this.settingsObj = {};
+  this.ownSettings = {};
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['text', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED]
+  ]);
 };
 goog.inherits(anychart.core.utils.LegendItemSettings, anychart.core.Text);
+
+
+/**
+ * Text descriptors. Adds text() method if needed.
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.core.utils.LegendItemSettings.TEXT_FUNCTION_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'text',
+      anychart.core.settings.stringOrFunctionNormalizer);
+
+  return map;
+})();
+anychart.core.settings.populate(anychart.core.utils.LegendItemSettings, anychart.core.utils.LegendItemSettings.TEXT_FUNCTION_DESCRIPTORS);
 
 
 /**
@@ -30,7 +53,7 @@ anychart.core.utils.LegendItemSettings.prototype.markAllConsistent = function() 
  * Resets LegendItemSettings class properties.
  */
 anychart.core.utils.LegendItemSettings.prototype.reset = function() {
-  this.settingsObj = {};
+  this.ownSettings = {};
   this.iconTextSpacing_ = undefined;
   this.iconEnabled_ = undefined;
   this.iconType_ = undefined;
@@ -267,34 +290,12 @@ anychart.core.utils.LegendItemSettings.prototype.iconSize = function(opt_value) 
 
 
 /**
- * Getter/setter for legend item text.
- * @param {string=} opt_value Legend item text.
- * @return {(string|Function|anychart.core.utils.LegendItemSettings)} Legend item text or self for method chaining.
- */
-anychart.core.utils.LegendItemSettings.prototype.text = function(opt_value) {
-  return /** @type {!anychart.core.utils.LegendItemSettings|string} */(this.textSettings('text', opt_value));
-};
-
-
-/**
- * Getter/setter for legend item format.
- * @param {(string|Function)=} opt_value Legend item text.
- * @return {(string|Function|anychart.core.utils.LegendItemSettings)} Legend item text formatter or self for method chaining.
- * @deprecated Since 7.13.1. Use 'format' instead.
- */
-anychart.core.utils.LegendItemSettings.prototype.textFormatter = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['textFormatter()', 'format()'], true);
-  return this.format(opt_value);
-};
-
-
-/**
  * Getter/setter for legend item format.
  * @param {(string|Function)=} opt_value Legend item text.
  * @return {(string|Function|anychart.core.utils.LegendItemSettings)} Legend item text formatter or self for method chaining.
  */
 anychart.core.utils.LegendItemSettings.prototype.format = function(opt_value) {
-  return /** @type {!anychart.core.utils.LegendItemSettings|string|Function} */(this.textSettings('text', opt_value));
+  return /** @type {!anychart.core.utils.LegendItemSettings|string|Function} */(this['text'](opt_value));
 };
 
 
@@ -325,8 +326,10 @@ anychart.core.utils.LegendItemSettings.prototype.getJSON = function() {
   var json = anychart.core.Text.prototype.serialize.call(this);
   if (goog.isDef(this.iconTextSpacing()))
     json['iconTextSpacing'] = this.iconTextSpacing();
-  if (goog.isDef(this.text()))
-    json['text'] = this.text();
+
+  var text = this.getOption('text');
+  if (goog.isDef(text))
+    json['text'] = text;
   if (goog.isDef(this.iconEnabled()))
     json['iconEnabled'] = this.iconEnabled();
   if (goog.isDef(this.iconType()))
@@ -354,10 +357,11 @@ anychart.core.utils.LegendItemSettings.prototype.getJSON = function() {
 /** @inheritDoc */
 anychart.core.utils.LegendItemSettings.prototype.serialize = function() {
   var json = anychart.core.utils.LegendItemSettings.base(this, 'serialize');
+
+  anychart.core.settings.serialize(this, anychart.core.Text.TEXT_DESCRIPTORS, json, 'Legend Item Settings');
+
   if (goog.isDef(this.iconTextSpacing()))
     json['iconTextSpacing'] = this.iconTextSpacing();
-  if (goog.isString(this.text()))
-    json['text'] = this.text();
   if (goog.isDef(this.iconEnabled()))
     json['iconEnabled'] = this.iconEnabled();
   if (goog.isDef(this.iconSize()))
@@ -434,6 +438,13 @@ anychart.core.utils.LegendItemSettings.prototype.serialize = function() {
 anychart.core.utils.LegendItemSettings.prototype.setupByJSON = function(config, opt_default) {
   this.suspendSignalsDispatching();
   anychart.core.utils.LegendItemSettings.base(this, 'setupByJSON', config, opt_default);
+
+  if (opt_default) {
+    anychart.core.settings.copy(this.themeSettings, anychart.core.utils.LegendItemSettings.TEXT_FUNCTION_DESCRIPTORS, config);
+  } else {
+    anychart.core.settings.deserialize(this, anychart.core.utils.LegendItemSettings.TEXT_FUNCTION_DESCRIPTORS, config);
+  }
+
   this.iconTextSpacing(config['iconTextSpacing']);
   this.iconEnabled(config['iconEnabled']);
   this.iconType(config['iconType']);
@@ -444,14 +455,12 @@ anychart.core.utils.LegendItemSettings.prototype.setupByJSON = function(config, 
   this.iconMarkerFill(config['iconMarkerFill']);
   this.iconMarkerStroke(config['iconMarkerStroke']);
   this.iconSize(config['iconSize']);
-  this.text(config['text']);
   this.disabled(config['disabled']);
   this.resumeSignalsDispatching(true);
 };
 
 
 //exports
-/** @suppress {deprecated} */
 (function() {
   var proto = anychart.core.utils.LegendItemSettings.prototype;
   proto['iconTextSpacing'] = proto.iconTextSpacing;
@@ -464,8 +473,6 @@ anychart.core.utils.LegendItemSettings.prototype.setupByJSON = function(config, 
   proto['iconMarkerFill'] = proto.iconMarkerFill;
   proto['iconMarkerStroke'] = proto.iconMarkerStroke;
   proto['iconSize'] = proto.iconSize;
-  proto['text'] = proto.text;
   proto['format'] = proto.format;
-  proto['textFormatter'] = proto.textFormatter;
   proto['disabled'] = proto.disabled;
 })();
