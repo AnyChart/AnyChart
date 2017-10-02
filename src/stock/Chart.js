@@ -1007,6 +1007,12 @@ anychart.stockModule.Chart.prototype.getPlotsCount = function() {
 };
 
 
+/** @inheritDoc */
+anychart.stockModule.Chart.prototype.supportsNoData = function() {
+  return false;
+};
+
+
 //endregion
 //region Drawing
 //----------------------------------------------------------------------------------------------------------------------
