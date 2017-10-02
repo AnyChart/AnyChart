@@ -41,7 +41,7 @@ anychart.vennModule.Chart = function(opt_data, opt_csvSettings) {
    */
   this.iterator_ = null;
 
-  this.data(opt_data, opt_csvSettings);
+  this.data(opt_data || null, opt_csvSettings);
 
   /**
    * Data wrapper from anychart data sets to venn algorithm format.
@@ -522,7 +522,7 @@ anychart.vennModule.Chart.prototype.createLegendItemsProvider = function(sourceM
    */
   var data = [];
 
-  if (!this.data_)
+  if (this.isNoData())
     return data;
 
   this.calculate();
@@ -1140,7 +1140,7 @@ anychart.vennModule.Chart.prototype.findMissings_ = function() {
 
 /** @inheritDoc */
 anychart.vennModule.Chart.prototype.calculate = function() {
-  if (this.hasInvalidationState(anychart.ConsistencyState.VENN_DATA) && this.data_) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.VENN_DATA) && !this.isNoData()) {
     this.invalidate(anychart.ConsistencyState.VENN_APPEARANCE);
     this.findMissings_();
     this.dataReflections_.length = 0;

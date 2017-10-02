@@ -1544,8 +1544,8 @@ anychart.core.Chart.prototype.drawInternal = function() {
 
   this.suspendSignalsDispatching();
 
+  var noDataLabel = /** @type {anychart.core.ui.Label} */ (this.noData().label());
   if (this.supportsNoData()) {
-    var noDataLabel = /** @type {anychart.core.ui.Label} */ (this.noData().label());
     var noData = this.isNoData();
     // checking for root layer to avoid dispatching on the first draw
     var doDispatch = noDataLabel['visible']() !== noData && this.rootElement;
