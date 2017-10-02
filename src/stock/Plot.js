@@ -1668,6 +1668,20 @@ anychart.stockModule.Plot.prototype.draw = function() {
 
   this.suspendSignalsDispatching();
 
+  var noDataLabel = /** @type {anychart.core.ui.Label} */ (this.noData().label());
+  var noData = this.isNoData();
+  // checking for root layer to avoid dispatching on the first draw
+  var doDispatch = noDataLabel['visible']() !== noData && this.rootLayer_;
+  if (doDispatch) {
+    var noDataEvent = {
+      'type': anychart.enums.EventType.DATA_CHANGED,
+      'chart': this,
+      'hasData': !noData
+    };
+    noData = this.dispatchEvent(noDataEvent) && noData;
+  }
+  noDataLabel['visible'](noData);
+
   this.ensureVisualReady_();
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
@@ -1814,22 +1828,11 @@ anychart.stockModule.Plot.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.STOCK_PLOT_NO_DATA_LABEL)) {
-    var noDataLabel = /** @type {anychart.core.ui.Label} */ (this.noData().label());
     noDataLabel.suspendSignalsDispatching();
     noDataLabel.container(this.rootLayer_);
     noDataLabel.parentBounds(this.seriesBounds_);
-    var noData = this.isNoData();
-    var doDispatch = noDataLabel['visible']() !== noData;
-    if (doDispatch) {
-      var noDataEvent = {
-        'type': anychart.enums.EventType.DATA_CHANGED,
-        'chart': this,
-        'hasData': !noData
-      };
-      noDataLabel['visible'](this.dispatchEvent(noDataEvent) && noData);
-    }
-    noDataLabel.resumeSignalsDispatching(false);
     noDataLabel.draw();
+    noDataLabel.resumeSignalsDispatching(false);
 
     this.markConsistent(anychart.ConsistencyState.STOCK_PLOT_NO_DATA_LABEL);
   }

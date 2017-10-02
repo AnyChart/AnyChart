@@ -245,7 +245,8 @@ anychart.waterfallModule.Chart.prototype.getFirstNonNaNSeries_ = function(drawin
  */
 anychart.waterfallModule.Chart.prototype.getLastNonNaNSeries_ = function(drawingPlans, index) {
   for (var i = drawingPlans.length; i--;) {
-    if (!drawingPlans[i].data[index].meta['missing'])
+    var data = drawingPlans[i].data;
+    if (data.length && !data[index].meta['missing'])
       return i;
   }
   return NaN;

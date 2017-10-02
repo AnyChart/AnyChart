@@ -695,6 +695,14 @@ anychart.core.Chart.prototype.isNoData = function() {
 };
 
 
+/**
+ * @return {boolean}
+ */
+anychart.core.Chart.prototype.supportsNoData = function() {
+  return true;
+};
+
+
 //endregion
 //region --- Calculations and statistics
 //------------------------------------------------------------------------------
@@ -1536,6 +1544,22 @@ anychart.core.Chart.prototype.drawInternal = function() {
 
   this.suspendSignalsDispatching();
 
+  var noDataLabel = /** @type {anychart.core.ui.Label} */ (this.noData().label());
+  if (this.supportsNoData()) {
+    var noData = this.isNoData();
+    // checking for root layer to avoid dispatching on the first draw
+    var doDispatch = noDataLabel['visible']() !== noData && this.rootElement;
+    if (doDispatch) {
+      var noDataEvent = {
+        'type': anychart.enums.EventType.DATA_CHANGED,
+        'chart': this,
+        'hasData': !noData
+      };
+      noData = this.dispatchEvent(noDataEvent) && noData;
+    }
+    noDataLabel['visible'](noData);
+  }
+
   //create root element only if draw is called
   if (!this.rootElement) {
     this.rootElement = acgraph.layer();
@@ -1617,27 +1641,16 @@ anychart.core.Chart.prototype.drawInternal = function() {
         label.suspendSignalsDispatching();
         if (!label.container() && label.enabled()) label.container(this.rootElement);
         this.setLabelSettings(label, totalBounds);
-        label.resumeSignalsDispatching(false);
         label.draw();
+        label.resumeSignalsDispatching(false);
       }
     }
 
-    var noDataLabel = /** @type {anychart.core.ui.Label} */ (this.noData().label());
     noDataLabel.suspendSignalsDispatching();
     noDataLabel.container(this.rootElement);
     this.setLabelSettings(noDataLabel, this.contentBounds);
-    var noData = this.isNoData();
-    var doDispatch = noDataLabel['visible']() !== noData;
-    if (doDispatch) {
-      var noDataEvent = {
-        'type': anychart.enums.EventType.DATA_CHANGED,
-        'chart': this,
-        'hasData': !noData
-      };
-      noDataLabel['visible'](this.dispatchEvent(noDataEvent) && noData);
-    }
-    noDataLabel.resumeSignalsDispatching(false);
     noDataLabel.draw();
+    noDataLabel.resumeSignalsDispatching(false);
 
     this.markConsistent(anychart.ConsistencyState.CHART_LABELS);
   }

@@ -1193,7 +1193,8 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'background': {
       'zIndex': 0,
       'enabled': false,
-      'disablePointerEvents': true
+      'visible': false,
+      'disablePointerEvents': false
     },
     'fontFamily': 'Arial',
     'fontColor': 'black',
