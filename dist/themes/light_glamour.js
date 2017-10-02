@@ -106,8 +106,7 @@
                     bottom: 3,
                     left: 3
                 },
-                fill: "#d7cacc",
-                hoverFill: "#d7cacc"
+                fill: "#d7cacc"
             }
         },
         defaultScroller: {
@@ -116,8 +115,10 @@
             thumbs: {
                 fill: "#f4efef",
                 stroke: "#d7cacc",
-                hoverFill: "#d7cacc",
-                hoverStroke: "#beafb1"
+                hovered: {
+                    fill: "#d7cacc",
+                    stroke: "#beafb1"
+                }
             }
         },
         defaultLegend: {
@@ -126,26 +127,38 @@
         chart: {
             defaultSeriesSettings: {
                 candlestick: {
-                    risingFill: "#f8bbd0",
-                    risingStroke: "#f8bbd0",
-                    hoverRisingFill: d,
-                    hoverRisingStroke: c,
-                    fallingFill: "#880e4f",
-                    fallingStroke: "#880e4f",
-                    hoverFallingFill: d,
-                    hoverFallingStroke: c,
-                    selectRisingStroke: "3 #f8bbd0",
-                    selectFallingStroke: "3 #880e4f",
-                    selectRisingFill: "#333333 0.85",
-                    selectFallingFill: "#333333 0.85"
+                    normal: {
+                        risingFill: "#f8bbd0",
+                        risingStroke: "#f8bbd0",
+                        fallingFill: "#880e4f",
+                        fallingStroke: "#880e4f"
+                    },
+                    hovered: {
+                        risingFill: d,
+                        risingStroke: c,
+                        fallingFill: d,
+                        fallingStroke: c
+                    },
+                    selected: {
+                        risingStroke: "3 #f8bbd0",
+                        fallingStroke: "3 #880e4f",
+                        risingFill: "#333333 0.85",
+                        fallingFill: "#333333 0.85"
+                    }
                 },
                 ohlc: {
-                    risingStroke: "#f8bbd0",
-                    hoverRisingStroke: c,
-                    fallingStroke: "#880e4f",
-                    hoverFallingStroke: c,
-                    selectRisingStroke: "3 #f8bbd0",
-                    selectFallingStroke: "3 #880e4f"
+                    normal: {
+                        risingStroke: "#f8bbd0",
+                        fallingStroke: "#880e4f"
+                    },
+                    hovered: {
+                        risingStroke: c,
+                        fallingStroke: c
+                    },
+                    selected: {
+                        risingStroke: "3 #f8bbd0",
+                        fallingStroke: "3 #880e4f"
+                    }
                 }
             },
             title: {
@@ -159,8 +172,10 @@
             }
         },
         pieFunnelPyramidBase: {
-            labels: {
-                fontColor: null
+            normal: {
+                labels: {
+                    fontColor: null
+                }
             },
             connectorStroke: "#ffcdd2",
             outsideLabels: {
@@ -178,20 +193,28 @@
             },
             defaultSeriesSettings: {
                 base: {
-                    stroke: c,
-                    labels: {
-                        fontColor: "#212121"
+                    normal: {
+                        stroke: c,
+                        labels: {
+                            fontColor: "#212121"
+                        }
                     }
                 },
                 connector: {
-                    markers: {
-                        stroke: "1.5 #ece1e3"
+                    normal: {
+                        markers: {
+                            stroke: "1.5 #ece1e3"
+                        }
                     },
-                    hoverMarkers: {
-                        stroke: "1.5 #ece1e3"
+                    hovered: {
+                        markers: {
+                            stroke: "1.5 #ece1e3"
+                        }
                     },
-                    selectMarkers: {
-                        stroke: "1.5 #ece1e3"
+                    selected: {
+                        markers: {
+                            stroke: "1.5 #ece1e3"
+                        }
                     }
                 }
             }
@@ -254,28 +277,34 @@
             }
         },
         treeMap: {
-            headers: {
-                background: {
-                    enabled: !0,
-                    fill: "#f4efef",
-                    stroke: "#ece1e3"
+            normal: {
+                headers: {
+                    background: {
+                        enabled: !0,
+                        fill: "#f4efef",
+                        stroke: "#ece1e3"
+                    }
+                },
+                labels: {
+                    fontColor: "#212121"
+                },
+                stroke: "#ece1e3"
+            },
+            hovered: {
+                headers: {
+                    fontColor: "#5d1b3e",
+                    background: {
+                        fill: "#ece1e3",
+                        stroke: "#ece1e3"
+                    }
                 }
             },
-            hoverHeaders: {
-                fontColor: "#5d1b3e",
-                background: {
-                    fill: "#ece1e3",
-                    stroke: "#ece1e3"
-                }
-            },
-            labels: {
-                fontColor: "#212121"
-            },
-            selectLabels: {
-                fontColor: "#fafafa"
-            },
-            stroke: "#ece1e3",
-            selectStroke: "2 #eceff1"
+            selected: {
+                labels: {
+                    fontColor: "#fafafa"
+                },
+                stroke: "2 #eceff1"
+            }
         },
         stock: {
             padding: [20, 30, 20, 60],
@@ -293,24 +322,34 @@
                 outlineStroke: "#d7cacc",
                 defaultSeriesSettings: {
                     base: {
-                        selectFill: a,
-                        selectStroke: a
+                        selected: {
+                            fill: a,
+                            stroke: a
+                        }
                     },
                     candlestick: {
-                        risingFill: "#999 0.6",
-                        risingStroke: "#999 0.6",
-                        fallingFill: "#999 0.6",
-                        fallingStroke: "#999 0.6",
-                        selectRisingStroke: a,
-                        selectFallingStroke: a,
-                        selectRisingFill: a,
-                        selectFallingFill: a
+                        normal: {
+                            risingFill: "#999 0.6",
+                            risingStroke: "#999 0.6",
+                            fallingFill: "#999 0.6",
+                            fallingStroke: "#999 0.6"
+                        },
+                        selected: {
+                            risingStroke: a,
+                            fallingStroke: a,
+                            risingFill: a,
+                            fallingFill: a
+                        }
                     },
                     ohlc: {
-                        risingStroke: "#999 0.6",
-                        fallingStroke: "#999 0.6",
-                        selectRisingStroke: a,
-                        selectFallingStroke: a
+                        normal: {
+                            risingStroke: "#999 0.6",
+                            fallingStroke: "#999 0.6"
+                        },
+                        selected: {
+                            risingStroke: a,
+                            fallingStroke: a
+                        }
                     }
                 }
             }

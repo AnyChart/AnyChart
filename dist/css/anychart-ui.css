@@ -1970,6 +1970,11 @@
  height: 13px;
  padding: 3px 4px;
  width: 90px;
+ font-weight: normal;
+}
+.anychart-range-picker .anychart-input-label {
+ margin-bottom: 0;
+ font-weight: normal;
 }
 .anychart-range-selector {
  font-family: Arial, sans-serif;
@@ -1984,6 +1989,8 @@
 .anychart-range-selector .anychart-input-label {
  margin-right: 5px;
  vertical-align: middle;
+ margin-bottom: 0;
+ font-weight: normal;
 }
 .anychart-range-selector .anychart-button {
  height: 21px;
