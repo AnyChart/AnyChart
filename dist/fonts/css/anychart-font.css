@@ -4,11 +4,11 @@
  */
 @font-face {
   font-family: 'anychart';
-  src:  url('../fonts/anychart.eot?uw3b3e');
-  src:  url('../fonts/anychart.eot?uw3b3e#iefix') format('embedded-opentype'),
-    url('../fonts/anychart.ttf?uw3b3e') format('truetype'),
-    url('../fonts/anychart.woff?uw3b3e') format('woff'),
-    url('../fonts/anychart.svg?uw3b3e#anychart') format('svg');
+  src:  url('../fonts/anychart-font.eot?uw3b3e');
+  src:  url('../fonts/anychart-font.eot?uw3b3e#iefix') format('embedded-opentype'),
+    url('../fonts/anychart-font.ttf?uw3b3e') format('truetype'),
+    url('../fonts/anychart-font.woff?uw3b3e') format('woff'),
+    url('../fonts/anychart-font.svg?uw3b3e#anychart') format('svg');
   font-weight: normal;
   font-style: normal;
 }
