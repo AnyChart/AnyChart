@@ -736,6 +736,7 @@ anychart.core.series.Base.prototype.applyConfig = function(config, opt_reapplyCl
   goog.dispose(this.drawer);
   this.drawer = newDrawer;
 
+  this.suspendSignalsDispatching();
   this.recreateShapeManager();
 
   this.themeSettings = this.plot.defaultSeriesSettings()[anychart.utils.toCamelCase(this.type_)] || {};
@@ -752,7 +753,6 @@ anychart.core.series.Base.prototype.applyConfig = function(config, opt_reapplyCl
 
   this.autoSettings['xPointPosition'] = 0.5;
 
-  this.suspendSignalsDispatching();
   this.applyDefaultsToElements(this.themeSettings, true, true, opt_reapplyClip);
   this.resumeSignalsDispatching(false);
   // here should markers/labels/errors/outliers setup be
