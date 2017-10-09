@@ -2134,6 +2134,7 @@ anychart.core.ui.Tooltip.prototype.parentInvalidated_ = function(e) {
   if (e.hasSignal(anychart.Signal.BOUNDS_CHANGED) || e.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
     state |= anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE;
     signal |= anychart.Signal.BOUNDS_CHANGED;
+    this.resetBoundsCache();
   }
 
   if (e.hasSignal(anychart.Signal.ENABLED_STATE_CHANGED)) {

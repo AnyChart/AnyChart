@@ -77,9 +77,7 @@ fi
 scp installation-package.zip $STATIC_HOST_SSH_STRING:/apps/static/cdn/releases/${VERSION}/installation-package.zip
 
 # copy unzip release files and copy to latest
-ssh $STATIC_HOST_SSH_STRING "
-    unzip -q -o /apps/static/cdn/releases/${VERSION}/installation-package.zip -d /apps/static/cdn/releases/${VERSION}/ &&
-    mv /apps/static/cdn/releases/${VERSION}/installation-package.zip /apps/static/cdn/releases/${VERSION}/anychart-installation-package-${VERSION}.zip"
+ssh $STATIC_HOST_SSH_STRING "unzip -q -o /apps/static/cdn/releases/${VERSION}/installation-package.zip -d /apps/static/cdn/releases/${VERSION}/"
 
 # copy legacy files by version and latest
 ssh $STATIC_HOST_SSH_STRING "
