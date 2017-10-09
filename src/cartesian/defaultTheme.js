@@ -35,8 +35,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       },
       {
         'type': 'linear',
-        'stackDirection': 'reverse',
-        'softMinimum': 0
+        'stackDirection': 'reverse'
       }
     ],
     'tooltip': {
