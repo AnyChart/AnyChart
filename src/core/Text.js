@@ -233,7 +233,7 @@ anychart.core.Text.TEXT_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'text',
-      anychart.core.settings.stringNormalizer);
+      anychart.core.settings.stringOrNullNormalizer);
 
   return map;
 })();
