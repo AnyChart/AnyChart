@@ -1040,7 +1040,7 @@ anychart.core.ui.Scroller.prototype.mouseOut_ = function(e) {
  */
 anychart.core.ui.Scroller.prototype.thumbMouseOver_ = function(e) {
   var target = e['target'];
-  if (target instanceof acgraph.vector.Path) {
+  if (acgraph.utils.instanceOf(target, acgraph.vector.Path)) {
     if (target == this.startThumb_) {
       this.colorizeThumb_(this.startThumb_, this.startThumbHovered_ = true);
     } else if (target == this.endThumb_) {
@@ -1057,7 +1057,7 @@ anychart.core.ui.Scroller.prototype.thumbMouseOver_ = function(e) {
  */
 anychart.core.ui.Scroller.prototype.thumbMouseOut_ = function(e) {
   var target = e['target'];
-  if (target instanceof acgraph.vector.Path) {
+  if (acgraph.utils.instanceOf(target, acgraph.vector.Path)) {
     if (target == this.startThumb_) {
       this.colorizeThumb_(this.startThumb_, this.startThumbHovered_ = false);
     } else if (target == this.endThumb_) {
@@ -1073,7 +1073,7 @@ anychart.core.ui.Scroller.prototype.thumbMouseOut_ = function(e) {
  * @private
  */
 anychart.core.ui.Scroller.prototype.thumbOrRangeMouseDown_ = function(e) {
-  if (e.currentTarget instanceof acgraph.vector.Element) {
+  if (acgraph.utils.instanceOf(e.currentTarget, acgraph.vector.Element)) {
     var target = (/** @type {acgraph.vector.Element} */(e.currentTarget));
     var dragger;
     if (target == this.startThumb_ && !this.startThumbDragger_) {

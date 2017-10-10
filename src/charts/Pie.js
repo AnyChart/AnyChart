@@ -488,11 +488,11 @@ anychart.charts.Pie.prototype.data = function(opt_value, opt_csvSettings) {
 
         /** @type {anychart.data.View} */
         var parentView;
-        if (opt_value instanceof anychart.data.View) {
+        if (acgraph.utils.instanceOf(opt_value, anychart.data.View)) {
           parentView = opt_value;
           this.parentViewToDispose_ = null;
         } else {
-          if (opt_value instanceof anychart.data.Set)
+          if (acgraph.utils.instanceOf(opt_value, anychart.data.Set))
             parentView = (this.parentViewToDispose_ = opt_value).mapAs();
           else
             parentView = (this.parentViewToDispose_ = new anychart.data.Set(
@@ -599,11 +599,11 @@ anychart.charts.Pie.prototype.prepareData_ = function(data) {
  * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|anychart.charts.Pie)} .
  */
 anychart.charts.Pie.prototype.palette = function(opt_value) {
-  if (opt_value instanceof anychart.palettes.RangeColors) {
-    this.setupPalette_(anychart.palettes.RangeColors, opt_value);
+  if (acgraph.utils.instanceOf(opt_value, anychart.palettes.RangeColors)) {
+    this.setupPalette_(anychart.palettes.RangeColors, /** @type {anychart.palettes.RangeColors} */(opt_value));
     return this;
-  } else if (opt_value instanceof anychart.palettes.DistinctColors) {
-    this.setupPalette_(anychart.palettes.DistinctColors, opt_value);
+  } else if (acgraph.utils.instanceOf(opt_value, anychart.palettes.DistinctColors)) {
+    this.setupPalette_(anychart.palettes.DistinctColors, /** @type {anychart.palettes.DistinctColors} */(opt_value));
     return this;
   } else if (goog.isObject(opt_value) && opt_value['type'] == 'range') {
     this.setupPalette_(anychart.palettes.RangeColors);
@@ -625,7 +625,7 @@ anychart.charts.Pie.prototype.palette = function(opt_value) {
  * @private
  */
 anychart.charts.Pie.prototype.setupPalette_ = function(cls, opt_cloneFrom) {
-  if (this.palette_ instanceof cls) {
+  if (acgraph.utils.instanceOf(this.palette_, cls)) {
     if (opt_cloneFrom)
       this.palette_.setup(opt_cloneFrom);
   } else {
@@ -1495,7 +1495,7 @@ anychart.charts.Pie.prototype.normalizeHatchFill = function(hatchFill) {
  * @inheritDoc
  */
 anychart.charts.Pie.prototype.beforeDraw = function() {
-  if (this.palette_ && this.palette_ instanceof anychart.palettes.RangeColors) {
+  if (this.palette_ && acgraph.utils.instanceOf(this.palette_, anychart.palettes.RangeColors)) {
     this.palette_.count(this.getIterator().getRowsCount());
   }
 };

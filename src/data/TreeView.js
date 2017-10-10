@@ -58,7 +58,7 @@ anychart.data.TreeView.prototype.SUPPORTED_SIGNALS =
 anychart.data.TreeView.prototype.onTreeEvent_ = function(e) {
   var newEvent = {};
   goog.object.extend(newEvent, e);
-  if (newEvent['dataItem'] && newEvent['dataItem'] instanceof anychart.data.Tree.DataItem)
+  if (newEvent['dataItem'] && acgraph.utils.instanceOf(newEvent['dataItem'], anychart.data.Tree.DataItem))
     newEvent['dataItem'] = newEvent['dataItem'].getWrapper(this);
   this.dispatchEvent(newEvent);
 };

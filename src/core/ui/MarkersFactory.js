@@ -847,9 +847,9 @@ anychart.core.ui.MarkersFactory.prototype.makeBrowserEvent = function(e) {
   var res = anychart.core.ui.MarkersFactory.base(this, 'makeBrowserEvent', e);
   var target = res['domTarget'];
   var tag;
-  while (target instanceof acgraph.vector.Element) {
+  while (acgraph.utils.instanceOf(target, acgraph.vector.Element)) {
     tag = target.tag;
-    if (tag instanceof anychart.core.VisualBase || !anychart.utils.isNaN(tag))
+    if (acgraph.utils.instanceOf(tag, anychart.core.VisualBase) || !anychart.utils.isNaN(tag))
       break;
     target = target.parent();
   }

@@ -49,7 +49,7 @@ anychart.core.settings.populate(anychart.core.series.Polar, anychart.core.series
 /** @inheritDoc */
 anychart.core.series.Polar.prototype.getCategoryWidth = function(opt_categoryIndex) {
   var ratio;
-  if (goog.isDef(opt_categoryIndex) && this.xScale() instanceof anychart.scales.Ordinal) {
+  if (goog.isDef(opt_categoryIndex) && acgraph.utils.instanceOf(this.xScale(), anychart.scales.Ordinal)) {
     ratio = this.xScale().weightRatios()[opt_categoryIndex];
   } else {
     ratio = this.xScale().getPointWidthRatio();

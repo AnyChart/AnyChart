@@ -494,7 +494,7 @@ anychart.core.axes.Polar.prototype.calculateAxisBounds_ = function() {
         .parentBounds(parentBounds);
 
     if (scale && this.radius_ && this.enabled()) {
-      var isOrdinal = scale instanceof anychart.scales.Ordinal;
+      var isOrdinal = acgraph.utils.instanceOf(scale, anychart.scales.Ordinal);
       var majorLabelsEnabled = this.labels().enabled();
       var minorLabelsEnabled = this.minorLabels().enabled();
       var lineThickness = acgraph.vector.getThickness(this.stroke_);
@@ -928,11 +928,11 @@ anychart.core.axes.Polar.prototype.getLabelsFormatProvider_ = function(index, va
 
   var labelText, labelValue;
   var addRange = true;
-  if (scale instanceof anychart.scales.Ordinal) {
+  if (acgraph.utils.instanceOf(scale, anychart.scales.Ordinal)) {
     labelText = scale.ticks().names()[index];
     labelValue = value;
     addRange = false;
-  } else if (scale instanceof anychart.scales.DateTime) {
+  } else if (acgraph.utils.instanceOf(scale, anychart.scales.DateTime)) {
     labelText = anychart.format.date(/** @type {number} */(value));
     labelValue = value;
   } else {
@@ -1059,7 +1059,7 @@ anychart.core.axes.Polar.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.AXIS_TICKS)) {
-    var isOrdinal = this.scale() instanceof anychart.scales.Ordinal;
+    var isOrdinal = acgraph.utils.instanceOf(this.scale(), anychart.scales.Ordinal);
     var lineThickness = acgraph.vector.getThickness(this.stroke_);
     var ticks = /** @type {anychart.core.axes.RadialTicks} */(this.ticks());
     ticks.draw();

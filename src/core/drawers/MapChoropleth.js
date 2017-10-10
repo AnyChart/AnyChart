@@ -74,7 +74,7 @@ anychart.core.drawers.MapChoropleth.prototype.drawSubsequentPoint = function(poi
     if (goog.isDef(feature.domElement)) {
       this.series.getChart().featureTraverser(feature, function(shape) {
         var element = shape.domElement;
-        if (!element || !(element instanceof acgraph.vector.Shape))
+        if (!element || !(acgraph.utils.instanceOf(element, acgraph.vector.Shape)))
           return;
 
         element.visible(true);

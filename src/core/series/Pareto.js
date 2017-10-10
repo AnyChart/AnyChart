@@ -51,7 +51,7 @@ anychart.core.series.Pareto.prototype.getContextProviderValues = function(provid
       goog.isDef(values['index']) &&
       (index = Number(values['index'].value)) > -1) {
     var paretoMapping = /** @type {anychart.data.Mapping} */ (data.getRowMapping(index));
-    if ((paretoMapping instanceof anychart.data.ParetoMapping) || (paretoMapping instanceof anychart.data.ParetoSeriesMapping)) {
+    if ((acgraph.utils.instanceOf(paretoMapping, anychart.data.ParetoMapping)) || (acgraph.utils.instanceOf(paretoMapping, anychart.data.ParetoSeriesMapping))) {
       values['cf'] = {value: paretoMapping.getCumulativeFrequency(index), type: anychart.enums.TokenType.NUMBER};
       values['rf'] = {value: paretoMapping.getRelativeFrequency(index), type: anychart.enums.TokenType.NUMBER};
     }
@@ -94,7 +94,7 @@ anychart.core.series.Pareto.prototype.getCFRF = function(index) {
   var data = this.data();
   if (goog.isDef(data)) {
     var paretoMapping = /** @type {anychart.data.Mapping} */ (data.getRowMapping(index));
-    if ((paretoMapping instanceof anychart.data.ParetoMapping) || (paretoMapping instanceof anychart.data.ParetoSeriesMapping)) {
+    if ((acgraph.utils.instanceOf(paretoMapping, anychart.data.ParetoMapping)) || (acgraph.utils.instanceOf(paretoMapping, anychart.data.ParetoSeriesMapping))) {
       rv = {};
       rv['cf'] = paretoMapping.getCumulativeFrequency(index);
       rv['rf'] = paretoMapping.getRelativeFrequency(index);

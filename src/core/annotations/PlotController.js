@@ -282,9 +282,9 @@ anychart.core.annotations.PlotController.prototype.handleAnnotationMouseOver_ = 
   var tag;
   // we suppose that if we have caught the event on the annotation, than it is editable
   // because otherwise it should have had a disablePointerEvents(false) on its layer
-  while (target instanceof acgraph.vector.Element) {
+  while (acgraph.utils.instanceOf(target, acgraph.vector.Element)) {
     tag = target.tag;
-    if (tag instanceof anychart.core.annotations.Base) {
+    if (acgraph.utils.instanceOf(tag, anychart.core.annotations.Base)) {
       this.controller_.hover(/** @type {anychart.core.annotations.Base} */(tag));
       return;
     }
@@ -1177,11 +1177,11 @@ anychart.core.annotations.PlotController.AnchorDragger.prototype.extractTarget =
   var tag, anchorId = NaN;
   // we suppose that if we have caught the event on the annotation, than it is editable
   // because otherwise it should have had a disablePointerEvents(false) on its layer
-  while (target instanceof acgraph.vector.Element) {
+  while (acgraph.utils.instanceOf(target, acgraph.vector.Element)) {
     tag = target.tag;
     if (!anychart.utils.isNaN(tag)) {
       anchorId = anychart.utils.toNumber(tag);
-    } else if (tag instanceof anychart.core.annotations.Base) {
+    } else if (acgraph.utils.instanceOf(tag, anychart.core.annotations.Base)) {
       this.annotation_ = tag;
       if (isNaN(anchorId))
         anchorId = -1;

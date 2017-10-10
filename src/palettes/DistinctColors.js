@@ -142,7 +142,7 @@ anychart.palettes.DistinctColors.prototype.setupSpecial = function(isDefault, va
     this.items(arg0);
     return true;
   }
-  if (arg0 instanceof anychart.palettes.DistinctColors) {
+  if (acgraph.utils.instanceOf(arg0, anychart.palettes.DistinctColors)) {
     this.items(/** @type {Array.<acgraph.vector.Fill>} */(arg0.items()));
     return true;
   }

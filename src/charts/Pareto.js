@@ -50,9 +50,9 @@ anychart.charts.Pareto.prototype.data = function(opt_value, opt_csvSettings) {
     if (this.rawData !== opt_value) {
       this.rawData = opt_value;
       goog.dispose(this.parentViewToDispose); // disposing a view created by the chart if any;
-      if (opt_value instanceof anychart.data.View)
+      if (acgraph.utils.instanceOf(opt_value, anychart.data.View))
         this.parentView = this.parentViewToDispose = opt_value.derive(); // deriving a view to avoid interference with other view users
-      else if (opt_value instanceof anychart.data.Set)
+      else if (acgraph.utils.instanceOf(opt_value, anychart.data.Set))
         this.parentView = this.parentViewToDispose = opt_value.mapAs();
       else
         this.parentView = (this.parentViewToDispose = new anychart.data.Set(
@@ -465,7 +465,7 @@ anychart.charts.Pareto.prototype.createSeriesInstance = function(type, config) {
 //region --- Scales
 /** @inheritDoc */
 anychart.charts.Pareto.prototype.checkXScaleType = function(scale) {
-  var res = (scale instanceof anychart.scales.Ordinal) && !scale.isColorScale();
+  var res = (acgraph.utils.instanceOf(scale, anychart.scales.Ordinal)) && !scale.isColorScale();
   if (!res)
     anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['Pareto chart xScale', 'ordinal']);
   return res;
@@ -474,7 +474,7 @@ anychart.charts.Pareto.prototype.checkXScaleType = function(scale) {
 
 /** @inheritDoc */
 anychart.charts.Pareto.prototype.checkYScaleType = function(scale) {
-  var res = (scale instanceof anychart.scales.ScatterBase) && !scale.isColorScale();
+  var res = (acgraph.utils.instanceOf(scale, anychart.scales.ScatterBase)) && !scale.isColorScale();
   if (!res)
     anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['Pareto chart yScale', 'scatter', 'linear, log']);
   return res;
@@ -495,7 +495,7 @@ anychart.charts.Pareto.prototype.createSpecificCsvHeaders = function(headers, he
 /** @inheritDoc */
 anychart.charts.Pareto.prototype.onBeforeRowsValuesSpreading = function(seriesData, csvRows, headers, rowIndex, groupingField) {
   var seriesMapping = seriesData.getRowMapping(rowIndex);
-  var isParetoMapping = seriesMapping instanceof anychart.data.ParetoMapping;
+  var isParetoMapping = acgraph.utils.instanceOf(seriesMapping, anychart.data.ParetoMapping);
 
   if (isParetoMapping) {
     csvRows[groupingField][headers['value']] = seriesMapping.getValue(rowIndex);

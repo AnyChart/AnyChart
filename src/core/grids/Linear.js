@@ -586,7 +586,7 @@ anychart.core.grids.Linear.prototype.draw = function() {
     var path;
     var ratio;
     var prevRatio = NaN;
-    var isOrdinal = this.scale() instanceof anychart.scales.Ordinal;
+    var isOrdinal = acgraph.utils.instanceOf(this.scale(), anychart.scales.Ordinal);
     var ticks = isOrdinal ? scale.ticks() : this.isMinor() ? scale.minorTicks() : scale.ticks();
     var ticksArray = ticks.get();
 
@@ -769,7 +769,7 @@ anychart.core.grids.Linear.prototype.setupByJSON = function(config, opt_default)
       if (this.chart_) {
         this.axis((/** @type {anychart.core.CartesianBase} */(this.chart_)).getAxisByIndex(ax));
       }
-    } else if (ax instanceof anychart.core.axes.Linear) {
+    } else if (acgraph.utils.instanceOf(ax, anychart.core.axes.Linear)) {
       this.axis(ax);
     }
   }

@@ -418,11 +418,11 @@ anychart.charts.Venn.prototype.getColorResolutionContext = function(opt_baseColo
  * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|anychart.charts.Venn)} .
  */
 anychart.charts.Venn.prototype.palette = function(opt_value) {
-  if (opt_value instanceof anychart.palettes.RangeColors) {
-    this.setupPalette_(anychart.palettes.RangeColors, opt_value);
+  if (acgraph.utils.instanceOf(opt_value, anychart.palettes.RangeColors)) {
+    this.setupPalette_(anychart.palettes.RangeColors, /** @type {anychart.palettes.RangeColors} */(opt_value));
     return this;
-  } else if (opt_value instanceof anychart.palettes.DistinctColors) {
-    this.setupPalette_(anychart.palettes.DistinctColors, opt_value);
+  } else if (acgraph.utils.instanceOf(opt_value, anychart.palettes.DistinctColors)) {
+    this.setupPalette_(anychart.palettes.DistinctColors, /** @type {anychart.palettes.DistinctColors} */(opt_value));
     return this;
   } else if (goog.isObject(opt_value) && opt_value['type'] == 'range') {
     this.setupPalette_(anychart.palettes.RangeColors);
@@ -444,7 +444,7 @@ anychart.charts.Venn.prototype.palette = function(opt_value) {
  * @private
  */
 anychart.charts.Venn.prototype.setupPalette_ = function(cls, opt_cloneFrom) {
-  if (this.palette_ instanceof cls) {
+  if (acgraph.utils.instanceOf(this.palette_, cls)) {
     if (opt_cloneFrom)
       this.palette_.setup(opt_cloneFrom);
   } else {
@@ -808,9 +808,9 @@ anychart.charts.Venn.prototype.data = function(opt_value, opt_csvSettings) {
     if (this.rawData_ !== opt_value) {
       this.rawData_ = opt_value;
       goog.dispose(this.parentViewToDispose_); // disposing a view created by the series if any;
-      if (opt_value instanceof anychart.data.View)
+      if (acgraph.utils.instanceOf(opt_value, anychart.data.View))
         this.data_ = this.parentViewToDispose_ = opt_value.derive(); // deriving a view to avoid interference with other view users
-      else if (opt_value instanceof anychart.data.Set)
+      else if (acgraph.utils.instanceOf(opt_value, anychart.data.Set))
         this.data_ = this.parentViewToDispose_ = opt_value.mapAs();
       else
         this.data_ = (this.parentViewToDispose_ = new anychart.data.Set(

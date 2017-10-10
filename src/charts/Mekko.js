@@ -133,7 +133,7 @@ anychart.charts.Mekko.prototype.seriesInvalidated = function(event) {
  */
 anychart.charts.Mekko.prototype.firstCategoriesScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.scales.Ordinal && this.firstCategoriesScale_ != opt_value) {
+    if (acgraph.utils.instanceOf(opt_value, anychart.scales.Ordinal) && this.firstCategoriesScale_ != opt_value) {
       if (this.firstCategoriesScale_)
         this.firstCategoriesScale_.unlistenSignals(this.categoriesScaleInvalidated, this);
       this.firstCategoriesScale_ = opt_value;
@@ -167,7 +167,7 @@ anychart.charts.Mekko.prototype.firstCategoriesScale = function(opt_value) {
  */
 anychart.charts.Mekko.prototype.lastCategoriesScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.scales.Ordinal && this.lastCategoriesScale_ != opt_value) {
+    if (acgraph.utils.instanceOf(opt_value, anychart.scales.Ordinal) && this.lastCategoriesScale_ != opt_value) {
       if (this.lastCategoriesScale_)
         this.lastCategoriesScale_.unlistenSignals(this.categoriesScaleInvalidated, this);
       this.lastCategoriesScale_ = opt_value;
@@ -213,7 +213,7 @@ anychart.charts.Mekko.prototype.categoriesScaleInvalidated = function(event) {
 
 /** @inheritDoc */
 anychart.charts.Mekko.prototype.checkXScaleType = function(scale) {
-  var res = (scale instanceof anychart.scales.Ordinal) && !scale.isColorScale();
+  var res = (acgraph.utils.instanceOf(scale, anychart.scales.Ordinal)) && !scale.isColorScale();
   if (!res)
     anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['Mekko chart X scale', 'ordinal']);
   return res;
@@ -229,7 +229,7 @@ anychart.charts.Mekko.prototype.allowLegendCategoriesMode = function() {
 /** @inheritDoc */
 anychart.charts.Mekko.prototype.createLegendItemsProvider = function(sourceMode, itemsFormat) {
   if (this.barmekkoMode_ && this.getSeriesCount() == 1 &&
-      this.xScale() instanceof anychart.scales.Ordinal) {
+      acgraph.utils.instanceOf(this.xScale(), anychart.scales.Ordinal)) {
     // we need to calculate statistics
     this.calculate();
     /**

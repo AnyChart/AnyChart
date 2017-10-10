@@ -132,7 +132,7 @@ anychart.utils.compareNumericDesc = function(a, b) {
  */
 anychart.utils.extractTag = function(target) {
   var tag;
-  while (target instanceof acgraph.vector.Element) {
+  while (acgraph.utils.instanceOf(target, acgraph.vector.Element)) {
     tag = target.tag;
     if (goog.isDef(tag)) {
       return tag;
@@ -151,7 +151,7 @@ anychart.utils.extractTag = function(target) {
  */
 anychart.utils.checkIfParent = function(parent, target) {
   if (!parent) return false;
-  while (target instanceof goog.events.EventTarget && target != parent) {
+  while (acgraph.utils.instanceOf(target, goog.events.EventTarget) && target != parent) {
     target = target.getParentEventTarget();
   }
   return target == parent;

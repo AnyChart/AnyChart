@@ -296,14 +296,14 @@ anychart.core.gauge.pointers.Base.prototype.gauge = function(opt_gauge) {
 /** @inheritDoc */
 anychart.core.gauge.pointers.Base.prototype.remove = function() {
   if (this.domElement) {
-    if (this.domElement instanceof acgraph.vector.Path)
+    if (acgraph.utils.instanceOf(this.domElement, acgraph.vector.Path))
       this.domElement.parent(null);
     else
       this.domElement.container(null);
   }
 
   if (this.hatchFillElement) {
-    if (this.hatchFillElement instanceof acgraph.vector.Path)
+    if (acgraph.utils.instanceOf(this.hatchFillElement, acgraph.vector.Path))
       this.hatchFillElement.parent(null);
     else
       this.hatchFillElement.container(null);
@@ -350,13 +350,13 @@ anychart.core.gauge.pointers.Base.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
-    if (this.domElement instanceof acgraph.vector.Path)
+    if (acgraph.utils.instanceOf(this.domElement, acgraph.vector.Path))
       this.domElement.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
     else
       this.domElement.container(/** @type {acgraph.vector.ILayer} */(this.container()));
 
     if (this.hatchFillElement) {
-      if (this.hatchFillElement instanceof acgraph.vector.Path)
+      if (acgraph.utils.instanceOf(this.hatchFillElement, acgraph.vector.Path))
         this.hatchFillElement.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
       else
         this.hatchFillElement.container(/** @type {acgraph.vector.ILayer} */(this.container()));

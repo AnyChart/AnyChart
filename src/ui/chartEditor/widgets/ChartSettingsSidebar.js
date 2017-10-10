@@ -81,7 +81,7 @@ anychart.ui.chartEditor.ChartSettingsSideBar.prototype.update = function(list, m
       var cls = anychart.ui.chartEditor.ChartSettingsSideBar.ClsMap[name];
 
       if (cls) {
-        if (instance && instance instanceof cls) {
+        if (instance && acgraph.utils.instanceOf(instance, cls)) {
           instance.update(model);
         } else {
           goog.dispose(instance);

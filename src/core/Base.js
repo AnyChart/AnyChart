@@ -669,7 +669,7 @@ anychart.core.Base.suspendSignalsDispatching = function(var_args) {
     var obj = arguments[i];
     if (goog.isArray(obj))
       anychart.core.Base.suspendSignalsDispatching.apply(null, obj);
-    else if (obj instanceof anychart.core.Base)
+    else if (acgraph.utils.instanceOf(obj, anychart.core.Base))
       (/** @type {anychart.core.Base} */(obj)).suspendSignalsDispatching();
   }
 };
@@ -684,7 +684,7 @@ anychart.core.Base.resumeSignalsDispatchingTrue = function(var_args) {
     var obj = arguments[i];
     if (goog.isArray(obj))
       anychart.core.Base.resumeSignalsDispatchingTrue.apply(null, obj);
-    else if (obj instanceof anychart.core.Base)
+    else if (acgraph.utils.instanceOf(obj, anychart.core.Base))
       (/** @type {anychart.core.Base} */(obj)).resumeSignalsDispatching(true);
   }
 };
@@ -699,7 +699,7 @@ anychart.core.Base.resumeSignalsDispatchingFalse = function(var_args) {
     var obj = arguments[i];
     if (goog.isArray(obj))
       anychart.core.Base.resumeSignalsDispatchingFalse.apply(null, obj);
-    else if (obj instanceof anychart.core.Base)
+    else if (acgraph.utils.instanceOf(obj, anychart.core.Base))
       (/** @type {anychart.core.Base} */(obj)).resumeSignalsDispatching(false);
   }
 };

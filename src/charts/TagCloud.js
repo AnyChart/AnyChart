@@ -433,11 +433,11 @@ anychart.charts.TagCloud.prototype.data_;
  * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|anychart.charts.TagCloud)} .
  */
 anychart.charts.TagCloud.prototype.palette = function(opt_value) {
-  if (opt_value instanceof anychart.palettes.RangeColors) {
-    this.setupPalette_(anychart.palettes.RangeColors, opt_value);
+  if (acgraph.utils.instanceOf(opt_value, anychart.palettes.RangeColors)) {
+    this.setupPalette_(anychart.palettes.RangeColors, /** @type {anychart.palettes.RangeColors} */(opt_value));
     return this;
-  } else if (opt_value instanceof anychart.palettes.DistinctColors) {
-    this.setupPalette_(anychart.palettes.DistinctColors, opt_value);
+  } else if (acgraph.utils.instanceOf(opt_value, anychart.palettes.DistinctColors)) {
+    this.setupPalette_(anychart.palettes.DistinctColors, /** @type {anychart.palettes.DistinctColors} */(opt_value));
     return this;
   } else if (goog.isObject(opt_value) && opt_value['type'] == 'range') {
     this.setupPalette_(anychart.palettes.RangeColors);
@@ -458,7 +458,7 @@ anychart.charts.TagCloud.prototype.palette = function(opt_value) {
  * @private
  */
 anychart.charts.TagCloud.prototype.setupPalette_ = function(cls, opt_cloneFrom) {
-  if (this.palette_ instanceof cls) {
+  if (acgraph.utils.instanceOf(this.palette_, cls)) {
     if (opt_cloneFrom)
       this.palette_.setup(opt_cloneFrom);
   } else {
@@ -509,7 +509,7 @@ anychart.charts.TagCloud.prototype.getColorResolutionContext = function(opt_base
   ctx['category'] = category;
 
   if (colorScale) {
-    var valueForScale = colorScale instanceof anychart.scales.OrdinalColor && goog.isDef(category) ?
+    var valueForScale = acgraph.utils.instanceOf(colorScale, anychart.scales.OrdinalColor) && goog.isDef(category) ?
         category : value;
 
     if (this.colorScale_ || goog.isDef(category))
@@ -648,7 +648,7 @@ anychart.charts.TagCloud.prototype.doAdditionActionsOnMouseOverAndMove = functio
     iterator.select(index);
     var colorScale = this.getColorScale();
     var value;
-    if (colorScale instanceof anychart.scales.OrdinalColor) {
+    if (acgraph.utils.instanceOf(colorScale, anychart.scales.OrdinalColor)) {
       value = iterator.meta(this.categoryFieldName);
     } else {
       value = iterator.get(this.referenceValueNames[1]);
@@ -1040,9 +1040,9 @@ anychart.charts.TagCloud.prototype.data = function(opt_value, opt_settings) {
     if (this.rawData_ !== opt_value) {
       this.rawData_ = opt_value;
       goog.dispose(this.parentViewToDispose_); // disposing a view created by the series if any;
-      if (opt_value instanceof anychart.data.View)
+      if (acgraph.utils.instanceOf(opt_value, anychart.data.View))
         this.data_ = this.parentViewToDispose_ = opt_value.derive(); // deriving a view to avoid interference with other view users
-      else if (opt_value instanceof anychart.data.Set)
+      else if (acgraph.utils.instanceOf(opt_value, anychart.data.Set))
         this.data_ = this.parentViewToDispose_ = opt_value.mapAs();
       else {
         this.data_ = (this.parentViewToDispose_ = new anychart.data.Set(
@@ -1095,10 +1095,10 @@ anychart.charts.TagCloud.prototype.scale = function(opt_value) {
     if (goog.isString(opt_value)) {
       opt_value = anychart.scales.Base.fromString(opt_value, false);
     }
-    if (opt_value instanceof anychart.scales.Linear && this.scale_ != opt_value) {
+    if (acgraph.utils.instanceOf(opt_value, anychart.scales.Linear) && this.scale_ != opt_value) {
       if (this.scale_)
         this.scale_.unlistenSignals(this.scaleInvalidated, this);
-      this.scale_ = opt_value;
+      this.scale_ = /** @type {anychart.scales.Linear} */(opt_value);
       if (this.scale_)
         this.scale_.listenSignals(this.scaleInvalidated, this);
 
@@ -1291,7 +1291,7 @@ anychart.charts.TagCloud.prototype.createLegendItemsProvider = function(sourceMo
   var series, scale;
   if (sourceMode == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
     series = this;
-    scale = this.getColorScale() instanceof anychart.scales.OrdinalColor ? this.getColorScale() : void 0;
+    scale = acgraph.utils.instanceOf(this.getColorScale(), anychart.scales.OrdinalColor) ? this.getColorScale() : void 0;
 
     if (scale) {
       var ranges = scale.getProcessedRanges();
@@ -1807,7 +1807,7 @@ anychart.charts.TagCloud.prototype.calcScale = function() {
   var category = iterator.get('category');
   var index = iterator.getIndex();
 
-  if (colorScale instanceof anychart.scales.OrdinalColor && goog.isDef(category)) {
+  if (acgraph.utils.instanceOf(colorScale, anychart.scales.OrdinalColor) && goog.isDef(category)) {
     var valueForScale = category;
     iterator.meta('category', category);
 

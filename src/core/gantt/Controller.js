@@ -788,7 +788,7 @@ anychart.core.gantt.Controller.prototype.getMaxDate = function() {
  */
 anychart.core.gantt.Controller.prototype.data = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if ((this.data_ != opt_value) && (opt_value instanceof anychart.data.Tree || opt_value instanceof anychart.data.TreeView)) {
+    if ((this.data_ != opt_value) && (acgraph.utils.instanceOf(opt_value, anychart.data.Tree) || acgraph.utils.instanceOf(opt_value, anychart.data.TreeView))) {
       if (this.data_) this.data_.unlistenSignals(this.dataInvalidated_, this); //Stop listening old tree.
       this.data_ = opt_value;
       this.data_.listenSignals(this.dataInvalidated_, this);

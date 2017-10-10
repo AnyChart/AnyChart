@@ -96,7 +96,7 @@ goog.inherits(anychart.core.series.Stock, anychart.core.series.Base);
 /** @inheritDoc */
 anychart.core.series.Stock.prototype.getCategoryWidth = function(opt_categoryIndex) {
   var xScale = this.getXScale();
-  if (xScale instanceof anychart.scales.StockOrdinalDateTime)
+  if (acgraph.utils.instanceOf(xScale, anychart.scales.StockOrdinalDateTime))
     return this.pixelBoundsCache.width / (xScale.getMaximumIndex() - xScale.getMinimumIndex());
   else {
     var minDistance = (/** @type {anychart.core.IGroupingProvider} */(this.chart)).getCurrentMinDistance();
@@ -156,7 +156,7 @@ anychart.core.series.Stock.prototype.updateComparisonZero = function() {
   /** @type {?anychart.data.TableSelectable.RowProxy} */
   var row;
   var scale = this.yScale();
-  if (this.supportsComparison() && !this.planIsStacked() && (scale instanceof anychart.scales.Linear)) {
+  if (this.supportsComparison() && !this.planIsStacked() && (acgraph.utils.instanceOf(scale, anychart.scales.Linear))) {
     var mode = /** @type {anychart.enums.ScaleComparisonMode} */(scale.comparisonMode());
     if (mode != anychart.enums.ScaleComparisonMode.NONE) {
       var changesFrom = /** @type {anychart.enums.ScaleCompareWithMode|number} */(scale.compareWith());
@@ -219,15 +219,15 @@ anychart.core.series.Stock.prototype.data = function(opt_value, opt_mappingSetti
     this.dataSource_ = opt_value;
 
     // creating data table if needed
-    if (!(opt_value instanceof anychart.data.Table) && !(opt_value instanceof anychart.data.TableMapping)) {
+    if (!(acgraph.utils.instanceOf(opt_value, anychart.data.Table)) && !(acgraph.utils.instanceOf(opt_value, anychart.data.TableMapping))) {
       data = new anychart.data.Table();
       if (opt_value)
-        data.addData(opt_value, false, opt_csvSettings);
+        data.addData(/** @type {!(Array|string)} */(opt_value), false, opt_csvSettings);
       this.dataToDispose_ = opt_value = data;
     }
 
     // creating data mapping if needed
-    if (opt_value instanceof anychart.data.Table) {
+    if (acgraph.utils.instanceOf(opt_value, anychart.data.Table)) {
       opt_value = opt_value.mapAs(opt_mappingSettings);
       if (!opt_mappingSettings) {
         opt_value.addField('value', 1, anychart.enums.AggregationType.AVERAGE);
@@ -243,7 +243,7 @@ anychart.core.series.Stock.prototype.data = function(opt_value, opt_mappingSetti
     }
 
     // applying passed value if it is suitable.
-    if (opt_value instanceof anychart.data.TableMapping) {
+    if (acgraph.utils.instanceOf(opt_value, anychart.data.TableMapping)) {
       this.data_ = opt_value.createSelectable();
       this.registerDataSource();
     } else {

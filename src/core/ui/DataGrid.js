@@ -491,7 +491,7 @@ anychart.core.ui.DataGrid.prototype.column = function(opt_indexOrValue, opt_valu
   }
 
   if (goog.isDef(value)) {
-    column.setup(value instanceof anychart.core.ui.DataGrid.Column ? value.serialize() : value);
+    column.setup(acgraph.utils.instanceOf(value, anychart.core.ui.DataGrid.Column) ? value.serialize() : value);
     if (column.enabled()) column.container(this.getContentLayer());
     this.columns_[index] = column;
     this.addSplitter_();
@@ -1229,7 +1229,7 @@ anychart.core.ui.DataGrid.Column.prototype.cellTextSettings = function(opt_value
 
   if (goog.isDef(opt_value)) {
     var redraw = true;
-    if (opt_value instanceof anychart.core.ui.LabelsFactory) {
+    if (acgraph.utils.instanceOf(opt_value, anychart.core.ui.LabelsFactory)) {
       this.labelsFactory_.setup(opt_value.serialize());
     } else if (goog.isObject(opt_value)) {
       this.labelsFactory_.setup(opt_value);

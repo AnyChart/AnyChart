@@ -920,7 +920,6 @@ anychart.core.ui.Title.prototype.calcActualBounds_ = function() {
   this.text_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
   textBounds = this.text_.getBounds();
 
-
   var width = this.hasOwnOption('width') ? this.getOwnOption('width') : (this.autoWidth_ || null);
   if (goog.isNull(width)) {
     this.textWidth_ = textBounds.width;

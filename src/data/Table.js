@@ -199,7 +199,7 @@ anychart.data.Table.prototype.mapAs = function(opt_fields) {
  */
 anychart.data.Table.prototype.createComputer = function(opt_mappingSettingsOrMapping) {
   var mapping;
-  if (opt_mappingSettingsOrMapping instanceof anychart.data.TableMapping) {
+  if (acgraph.utils.instanceOf(opt_mappingSettingsOrMapping, anychart.data.TableMapping)) {
     mapping = /** @type {anychart.data.TableMapping} */(opt_mappingSettingsOrMapping);
     if (mapping.getTable() != this) {
       anychart.core.reporting.error(anychart.enums.ErrorCode.TABLE_MAPPING_DIFFERENT_TABLE);

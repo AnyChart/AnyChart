@@ -230,7 +230,7 @@ anychart.charts.Sparkline.prototype.getSeriesStatus = function(event) {
 
   var ratio = (x - minX) / rangeX;
   value = this.xScale().inverseTransform(ratio);
-  var indexes = this.data().findClosestByX(value, this.xScale() instanceof anychart.scales.Ordinal);
+  var indexes = this.data().findClosestByX(value, acgraph.utils.instanceOf(this.xScale(), anychart.scales.Ordinal));
   index = indexes.length ? indexes[0] : NaN;
 
   var iterator = this.getIterator();
@@ -814,9 +814,9 @@ anychart.charts.Sparkline.prototype.data = function(opt_value, opt_csvSettings) 
     if (this.rawData_ !== opt_value) {
       this.rawData_ = opt_value;
       goog.dispose(this.parentViewToDispose_); // disposing a view created by the series if any;
-      if (opt_value instanceof anychart.data.View)
+      if (acgraph.utils.instanceOf(opt_value, anychart.data.View))
         this.parentView_ = this.parentViewToDispose_ = opt_value.derive(); // deriving a view to avoid interference with other view users
-      else if (opt_value instanceof anychart.data.Set)
+      else if (acgraph.utils.instanceOf(opt_value, anychart.data.Set))
         this.parentView_ = this.parentViewToDispose_ = opt_value.mapAs();
       else
         this.parentView_ = (this.parentViewToDispose_ = new anychart.data.Set(
@@ -1529,7 +1529,7 @@ anychart.charts.Sparkline.prototype.mergeFactorySettings_ = function(settings, f
   for (var i = settings.length; i--;) {
     var setting = settings[i];
     if (setting) {
-      var isJson = !(setting instanceof anychart.core.VisualBase);
+      var isJson = !(acgraph.utils.instanceOf(setting, anychart.core.VisualBase));
       var enabled = isJson ? setting['enabled'] : setting['enabled']();
       //if (!isDefinedEnabledState) isDefinedEnabledState = goog.isBoolean(enabled);
       if (enabled /*|| (isDefinedEnabledState && !goog.isBoolean(enabled))*/) {
@@ -1537,7 +1537,7 @@ anychart.charts.Sparkline.prototype.mergeFactorySettings_ = function(settings, f
           var field = fields[j];
           var value = isJson ? setting[field] : setting[field]();
           if (goog.isDef(value))
-            res[field] = value instanceof anychart.core.Base ? value.serialize() : value;
+            res[field] = acgraph.utils.instanceOf(value, anychart.core.Base) ? value.serialize() : value;
         }
       }
     }
@@ -1561,12 +1561,12 @@ anychart.charts.Sparkline.prototype.mergeFactorySettingsEasy_ = function(setting
   for (var i = settings.length; i--;) {
     var setting = settings[i];
     if (setting) {
-      var isJson = !(setting instanceof anychart.core.VisualBase);
+      var isJson = !(acgraph.utils.instanceOf(setting, anychart.core.VisualBase));
       for (var j = 0, fieldsCount = fields.length; j < fieldsCount; j++) {
         var field = fields[j];
         var value = isJson ? setting[field] : setting[field]();
         if (goog.isDef(value))
-          res[field] = value instanceof anychart.core.Base ? value.serialize() : value;
+          res[field] = acgraph.utils.instanceOf(value, anychart.core.Base) ? value.serialize() : value;
       }
     }
   }
@@ -2415,7 +2415,7 @@ anychart.charts.Sparkline.prototype.serialize = function() {
   json['type'] = anychart.enums.ChartTypes.SPARKLINE;
 
   json['seriesType'] = this.type();
-  json['clip'] = (this.clip_ instanceof anychart.math.Rect) ? this.clip_.serialize() : this.clip_;
+  json['clip'] = (acgraph.utils.instanceOf(this.clip_, anychart.math.Rect)) ? this.clip_.serialize() : this.clip_;
   json['data'] = this.data().serialize();
   json['connectMissingPoints'] = this.connectMissingPoints();
   json['pointWidth'] = this.pointWidth();

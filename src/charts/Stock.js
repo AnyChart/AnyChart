@@ -768,7 +768,7 @@ anychart.charts.Stock.prototype.getSelectedRange = function() {
 anychart.charts.Stock.prototype.xScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
     var askedForScatter = anychart.scales.StockScatterDateTime.askedForScatter(opt_value);
-    var currIsScatter = this.xScale_ && !(this.xScale_ instanceof anychart.scales.StockOrdinalDateTime);
+    var currIsScatter = this.xScale_ && !(acgraph.utils.instanceOf(this.xScale_, anychart.scales.StockOrdinalDateTime));
     if (askedForScatter != currIsScatter) {
       if (askedForScatter) {
         this.xScale_ = new anychart.scales.StockScatterDateTime(this);
@@ -2061,7 +2061,7 @@ anychart.charts.Stock.prototype.handleMouseWheel_ = function(e) {
             last,
             start,
             end;
-        var ordinal = this.xScale() instanceof anychart.scales.StockOrdinalDateTime;
+        var ordinal = acgraph.utils.instanceOf(this.xScale(), anychart.scales.StockOrdinalDateTime);
         first = this.dataController_.getFirstKey();
         last = this.dataController_.getLastKey();
         if (ordinal) {
@@ -2365,7 +2365,7 @@ anychart.charts.Stock.prototype.getDragAnchor = function() {
 anychart.charts.Stock.prototype.dragToRatio = function(ratio, anchor, opt_source) {
   var scale = this.xScale();
   var valueDiff, range, start, end;
-  if (scale instanceof anychart.scales.StockOrdinalDateTime) {
+  if (acgraph.utils.instanceOf(scale, anychart.scales.StockOrdinalDateTime)) {
     range = anchor.lastIndex - anchor.firstIndex;
     valueDiff = ratio * range;
     start = this.getKeyByIndex(anchor.firstIndex - valueDiff);
@@ -2405,7 +2405,7 @@ anychart.charts.Stock.prototype.dragToRatio = function(ratio, anchor, opt_source
 anychart.charts.Stock.prototype.limitDragRatio = function(ratio, anchor) {
   var scale = this.xScale();
   var range, start, end;
-  if (scale instanceof anychart.scales.StockOrdinalDateTime) {
+  if (acgraph.utils.instanceOf(scale, anychart.scales.StockOrdinalDateTime)) {
     range = anchor.lastIndex - anchor.firstIndex;
     start = (anchor.minIndex - anchor.firstIndex) / range;
     end = (anchor.maxIndex - anchor.firstIndex) / range;

@@ -257,7 +257,7 @@ anychart.charts.HeatMap.prototype.scrollerChangeHandler = function(e) {
 
 /** @inheritDoc */
 anychart.charts.HeatMap.prototype.checkXScaleType = function(scale) {
-  var res = (scale instanceof anychart.scales.Ordinal) && !scale.isColorScale();
+  var res = (acgraph.utils.instanceOf(scale, anychart.scales.Ordinal)) && !scale.isColorScale();
   if (!res)
     anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['HeatMap chart scale', 'ordinal']);
   return res;
@@ -332,7 +332,7 @@ anychart.charts.HeatMap.prototype.createLegendItemsProvider = function(sourceMod
     // we need to calculate statistics
     this.calculate();
     var scale = this.colorScale();
-    if (scale && scale instanceof anychart.scales.OrdinalColor) {
+    if (scale && acgraph.utils.instanceOf(scale, anychart.scales.OrdinalColor)) {
       var series = this.series_;
       var ranges = scale.getProcessedRanges();
       for (i = 0, count = ranges.length; i < count; i++) {

@@ -247,11 +247,11 @@ anychart.charts.LinearGauge.prototype.markerPaletteInvalidated_ = function(event
  * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|anychart.charts.LinearGauge)} .
  */
 anychart.charts.LinearGauge.prototype.palette = function(opt_value) {
-  if (opt_value instanceof anychart.palettes.RangeColors) {
-    this.setupPalette_(anychart.palettes.RangeColors, opt_value);
+  if (acgraph.utils.instanceOf(opt_value, anychart.palettes.RangeColors)) {
+    this.setupPalette_(anychart.palettes.RangeColors, /** @type {anychart.palettes.RangeColors} */(opt_value));
     return this;
-  } else if (opt_value instanceof anychart.palettes.DistinctColors) {
-    this.setupPalette_(anychart.palettes.DistinctColors, opt_value);
+  } else if (acgraph.utils.instanceOf(opt_value, anychart.palettes.DistinctColors)) {
+    this.setupPalette_(anychart.palettes.DistinctColors, /** @type {anychart.palettes.DistinctColors} */(opt_value));
     return this;
   } else if (goog.isObject(opt_value) && opt_value['type'] == 'range') {
     this.setupPalette_(anychart.palettes.RangeColors);
@@ -272,7 +272,7 @@ anychart.charts.LinearGauge.prototype.palette = function(opt_value) {
  * @private
  */
 anychart.charts.LinearGauge.prototype.setupPalette_ = function(cls, opt_cloneFrom) {
-  if (this.palette_ instanceof cls) {
+  if (acgraph.utils.instanceOf(this.palette_, cls)) {
     if (opt_cloneFrom)
       this.palette_.setup(opt_cloneFrom);
   } else {
@@ -386,7 +386,7 @@ anychart.charts.LinearGauge.prototype.createPointerByType_ = function(type, data
     instance.setAutoZIndex(pointerZIndex);
     instance.autoIndex(index);
     instance.setAutoColor(this.palette().itemAt(index));
-    if (instance instanceof anychart.core.linearGauge.pointers.Marker) {
+    if (acgraph.utils.instanceOf(instance, anychart.core.linearGauge.pointers.Marker)) {
       instance.autoType(/** @type {anychart.enums.MarkerType} */ (this.markerPalette().itemAt(this.markersCount_++)));
     }
     instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(index)));
@@ -550,9 +550,9 @@ anychart.charts.LinearGauge.prototype.data = function(opt_value, opt_csvSettings
       this.rawData_ = opt_value;
       goog.dispose(this.parentViewToDispose_);
       this.iterator_ = null;
-      if (opt_value instanceof anychart.data.View)
+      if (acgraph.utils.instanceOf(opt_value, anychart.data.View))
         this.parentView_ = this.parentViewToDispose_ = opt_value.derive();
-      else if (opt_value instanceof anychart.data.Set)
+      else if (acgraph.utils.instanceOf(opt_value, anychart.data.Set))
         this.parentView_ = this.parentViewToDispose_ = opt_value.mapAs();
       else
         this.parentView_ = (this.parentViewToDispose_ = new anychart.data.Set(
@@ -827,7 +827,7 @@ anychart.charts.LinearGauge.prototype.scale = function(opt_value) {
     if (goog.isString(opt_value)) {
       opt_value = /** @type {anychart.scales.ScatterBase} */ (anychart.scales.Base.fromString(opt_value, false));
     }
-    if (!(opt_value instanceof anychart.scales.ScatterBase)) {
+    if (!(acgraph.utils.instanceOf(opt_value, anychart.scales.ScatterBase))) {
       anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['Linear gauge scale', 'scatter', 'linear, log']);
       return this;
     }
@@ -957,7 +957,7 @@ anychart.charts.LinearGauge.prototype.beforeDraw = function() {
       var index = /** @type {number} */(pointer.autoIndex());
       pointer.setAutoColor(this.palette().itemAt(index));
       pointer.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(index)));
-      if (pointer instanceof anychart.core.linearGauge.pointers.Marker) {
+      if (acgraph.utils.instanceOf(pointer, anychart.core.linearGauge.pointers.Marker)) {
         pointer.autoType(/** @type {anychart.enums.MarkerType} */ (this.markerPalette().itemAt(markersCount++)));
       }
     }
@@ -988,7 +988,7 @@ anychart.charts.LinearGauge.prototype.beforeDraw = function() {
     item.layout(/** @type {anychart.enums.Layout} */ (this.layout()));
     if (!item.scale())
       item.scale(/** @type {anychart.scales.ScatterBase} */ (this.scale()));
-    if (item instanceof anychart.core.linearGauge.pointers.Marker) {
+    if (acgraph.utils.instanceOf(item, anychart.core.linearGauge.pointers.Marker)) {
       if (String(item.autoType()).toLowerCase().indexOf('triangle') != -1) {
         item.autoType(isVertical ? anychart.enums.MarkerType.TRIANGLE_LEFT : anychart.enums.MarkerType.TRIANGLE_UP);
       }

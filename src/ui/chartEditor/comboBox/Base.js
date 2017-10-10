@@ -392,12 +392,12 @@ anychart.ui.chartEditor.comboBox.Base.prototype.setItemVisibilityFromToken_ = fu
 
   for (var i = 0, n = this.menu_.getChildCount(); i < n; i++) {
     var item = this.menu_.getChildAt(i);
-    if (item instanceof goog.ui.MenuSeparator) {
+    if (acgraph.utils.instanceOf(item, goog.ui.MenuSeparator)) {
       // Ensure that separators are only shown if there is at least one visible
       // item before them.
       item.setVisible(isVisibleItem);
       isVisibleItem = false;
-    } else if (item instanceof goog.ui.MenuItem) {
+    } else if (acgraph.utils.instanceOf(item, goog.ui.MenuItem)) {
       if (!item.isVisible() && !recheckHidden) continue;
 
       var caption = item.getCaption();
@@ -416,7 +416,7 @@ anychart.ui.chartEditor.comboBox.Base.prototype.setItemVisibilityFromToken_ = fu
       isVisibleItem = item.isVisible() || isVisibleItem;
     }
 
-    if (!(item instanceof goog.ui.MenuSeparator) && item.isVisible()) {
+    if (!(acgraph.utils.instanceOf(item, goog.ui.MenuSeparator)) && item.isVisible()) {
       count++;
     }
   }

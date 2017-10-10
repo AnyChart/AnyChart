@@ -1339,19 +1339,19 @@ anychart.core.ui.Table.prototype.checkContent_ = function() {
     if (this.contentToClear_) {
       while (this.contentToClear_.length) {
         content = this.contentToClear_.pop();
-        if (content instanceof acgraph.vector.Element) {
+        if (acgraph.utils.instanceOf(content, acgraph.vector.Element)) {
           content.remove();
         } else {
           content.suspendSignalsDispatching();
-          if (content instanceof anychart.core.ui.LabelsFactory.Label) {
+          if (acgraph.utils.instanceOf(content, anychart.core.ui.LabelsFactory.Label)) {
             label = /** @type {anychart.core.ui.LabelsFactory.Label} */(content);
             if (label.parentLabelsFactory())
               label.parentLabelsFactory().clear(label.getIndex());
-          } else if (content instanceof anychart.core.ui.MarkersFactory.Marker) {
+          } else if (acgraph.utils.instanceOf(content, anychart.core.ui.MarkersFactory.Marker)) {
             marker = /** @type {anychart.core.ui.MarkersFactory.Marker} */(content);
             if (marker.parentMarkersFactory())
               marker.parentMarkersFactory().clear(marker.getIndex());
-          } else if (content instanceof anychart.core.VisualBase) {
+          } else if (acgraph.utils.instanceOf(content, anychart.core.VisualBase)) {
             if (content.isChart && content.isChart()) {
               chart = /** @type {anychart.core.Chart} */(content);
               chart.autoRedraw(chart.originalAutoRedraw);
@@ -1370,14 +1370,14 @@ anychart.core.ui.Table.prototype.checkContent_ = function() {
     for (var i = 0; i < cellsCount; i++) {
       cell = this.cells_[i];
       if (!isNaN(cell.overlapper) && (content = cell.realContent)) {
-        if (content instanceof acgraph.vector.Layer) {
+        if (acgraph.utils.instanceOf(content, acgraph.vector.Layer)) {
           content.removeChildren();
           goog.dispose(content);
         } else {
           content.suspendSignalsDispatching();
           content.unlistenSignals(this.handleContentInvalidation_);
-          if (content instanceof anychart.core.ui.LabelsFactory.Label ||
-              content instanceof anychart.core.ui.MarkersFactory.Marker) {
+          if (acgraph.utils.instanceOf(content, anychart.core.ui.LabelsFactory.Label) ||
+              acgraph.utils.instanceOf(content, anychart.core.ui.MarkersFactory.Marker)) {
             content.enabled(false);
           } else if (content.isChart && content.isChart()) {
             chart = /** @type {anychart.core.Chart} */(content);
@@ -1400,7 +1400,7 @@ anychart.core.ui.Table.prototype.checkContent_ = function() {
       for (var col = 0; col < this.colsCount_; col++) {
         cell = this.cells_[row * this.colsCount_ + col];
         content = cell.realContent;
-        var contentIsGraphicsElement = content instanceof acgraph.vector.Element;
+        var contentIsGraphicsElement = acgraph.utils.instanceOf(content, acgraph.vector.Element);
         if (content) {
           var rowObj = this.rows_ && this.rows_[row];
           var colObj = this.cols_ && this.cols_[col];
@@ -1458,7 +1458,7 @@ anychart.core.ui.Table.prototype.checkContent_ = function() {
               content.clip(bounds);
             } else {
               content.container(this.contentLayer_);
-              if (content instanceof anychart.core.ui.LabelsFactory.Label) {
+              if (acgraph.utils.instanceOf(content, anychart.core.ui.LabelsFactory.Label)) {
                 label = /** @type {anychart.core.ui.LabelsFactory.Label} */(content);
                 label.positionProvider({
                   'value': {
@@ -1491,7 +1491,7 @@ anychart.core.ui.Table.prototype.checkContent_ = function() {
                   label.positionProvider(positionProvider);
                   label.draw();
                 }
-              } else if (content instanceof anychart.core.ui.MarkersFactory.Marker) {
+              } else if (acgraph.utils.instanceOf(content, anychart.core.ui.MarkersFactory.Marker)) {
                 marker = /** @type {anychart.core.ui.MarkersFactory.Marker} */(content);
                 position = /** @type {string} */(
                     marker.position() ||
@@ -1500,7 +1500,7 @@ anychart.core.ui.Table.prototype.checkContent_ = function() {
                 positionProvider = {'value': anychart.utils.getCoordinateByAnchor(bounds, position)};
                 marker.positionProvider(positionProvider);
                 marker.draw();
-              } else if (content instanceof anychart.core.VisualBase) {
+              } else if (acgraph.utils.instanceOf(content, anychart.core.VisualBase)) {
                 if (content.isChart && content.isChart()) {
                   chart = /** @type {anychart.core.Chart} */(content);
                   chart.originalAutoRedraw = /** @type {boolean} */(chart.autoRedraw());
@@ -2128,7 +2128,7 @@ anychart.core.ui.Table.prototype.getCellBounds = function(row, col, rowSpan, col
   this.checkTable_();
   this.checkSizes_();
   var tableBounds = this.getPixelBounds();
-  var outBounds = opt_outBounds instanceof anychart.math.Rect ? opt_outBounds : new anychart.math.Rect(0, 0, 0, 0);
+  var outBounds = acgraph.utils.instanceOf(opt_outBounds, anychart.math.Rect) ? opt_outBounds : new anychart.math.Rect(0, 0, 0, 0);
   var start = (this.colRights_[col - 1] + 1) || 0;
   var end = this.colRights_[Math.min(col + colSpan, this.colsCount_) - 1];
   outBounds.width = end - start;

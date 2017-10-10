@@ -460,7 +460,7 @@ anychart.core.series.HeatMap.prototype.getContextProviderValues = function(provi
   if (colorScale) {
     var value = rowInfo.get('heat');
 
-    if (colorScale instanceof anychart.scales.OrdinalColor) {
+    if (acgraph.utils.instanceOf(colorScale, anychart.scales.OrdinalColor)) {
       var range = colorScale.getRangeByValue(/** @type {number} */(value));
       if (range) {
         var colorRange = {

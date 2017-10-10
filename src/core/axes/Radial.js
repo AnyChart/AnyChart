@@ -509,7 +509,7 @@ anychart.core.axes.Radial.prototype.getOverlappedLabels_ = function(opt_bounds) 
         var k = -1;
         var isLabels = this.labels().enabled();
 
-        if (scale instanceof anychart.scales.ScatterBase) {
+        if (acgraph.utils.instanceOf(scale, anychart.scales.ScatterBase)) {
           var scaleMinorTicksArr = scale.minorTicks().get();
           i = 0;
           j = 0;
@@ -605,7 +605,7 @@ anychart.core.axes.Radial.prototype.getOverlappedLabels_ = function(opt_bounds) 
             }
           }
           if (!isMinorLabels) minorLabels = false;
-        } else if (scale instanceof anychart.scales.Ordinal) {
+        } else if (acgraph.utils.instanceOf(scale, anychart.scales.Ordinal)) {
           for (i = 0; i < ticksArrLen; i++) {
             if (isLabels) {
               bounds1 = this.getLabelBounds_(i, true);
@@ -752,7 +752,7 @@ anychart.core.axes.Radial.prototype.getLabelPositionOffsetForAngle_ = function(a
 
   var scale = this.scale();
   var offset = {x: 0, y: 0};
-  if (scale instanceof anychart.scales.ScatterBase) {
+  if (acgraph.utils.instanceOf(scale, anychart.scales.ScatterBase)) {
     if (!angle) {
       offset.x -= width / 2;
     } else if (angle > 0 && angle < 90) {
@@ -774,7 +774,7 @@ anychart.core.axes.Radial.prototype.getLabelPositionOffsetForAngle_ = function(a
       offset.y += height / 2;
       offset.x -= width / 2;
     }
-  } else if (scale instanceof anychart.scales.Ordinal) {
+  } else if (acgraph.utils.instanceOf(scale, anychart.scales.Ordinal)) {
     if (!angle) {
       offset.x -= width / 2;
     } else if (angle > 0 && angle < 45) {
@@ -1012,11 +1012,11 @@ anychart.core.axes.Radial.prototype.getLabelsFormatProvider_ = function(index, v
 
   var labelText, labelValue;
   var addRange = true;
-  if (scale instanceof anychart.scales.Ordinal) {
+  if (acgraph.utils.instanceOf(scale, anychart.scales.Ordinal)) {
     labelText = scale.ticks().names()[index];
     labelValue = value;
     addRange = false;
-  } else if (scale instanceof anychart.scales.DateTime) {
+  } else if (acgraph.utils.instanceOf(scale, anychart.scales.DateTime)) {
     labelText = anychart.format.date(/** @type {number} */(value));
     labelValue = value;
   } else {
@@ -1166,7 +1166,7 @@ anychart.core.axes.Radial.prototype.draw = function() {
   var ticksArrLen = scaleTicksArr.length;
   var tickVal, ratio, drawLabel, drawTick;
 
-  if (scale instanceof anychart.scales.ScatterBase) {
+  if (acgraph.utils.instanceOf(scale, anychart.scales.ScatterBase)) {
     if (ticksDrawer || labelsDrawer || minorTicksDrawer || minorLabelsDrawer) {
       overlappedLabels = this.calcLabels_();
 
@@ -1217,7 +1217,7 @@ anychart.core.axes.Radial.prototype.draw = function() {
       }
       if (minorLabelsDrawer) this.minorLabels().draw();
     }
-  } else if (scale instanceof anychart.scales.Ordinal) {
+  } else if (acgraph.utils.instanceOf(scale, anychart.scales.Ordinal)) {
     if (ticksDrawer || labelsDrawer) {
       var labelsStates = this.calcLabels_();
       needDrawLabels = goog.isObject(labelsStates) ? labelsStates.labels : !overlappedLabels;

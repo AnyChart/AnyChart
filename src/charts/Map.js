@@ -1039,12 +1039,12 @@ anychart.charts.Map.prototype.onMouseDown = function(event) {
     if (drillDownMap) {
       var tag = anychart.utils.extractTag(event['domTarget']);
       var series, index;
-      if (event['target'] instanceof anychart.core.ui.LabelsFactory || event['target'] instanceof anychart.core.ui.MarkersFactory) {
+      if (acgraph.utils.instanceOf(event['target'], anychart.core.ui.LabelsFactory) || acgraph.utils.instanceOf(event['target'], anychart.core.ui.MarkersFactory)) {
         var parent = event['target'].getParentEventTarget();
         if (parent.isSeries && parent.isSeries())
           series = parent;
         index = tag;
-      } else if (event['target'] instanceof anychart.core.ui.Legend || this.checkIfColorRange(event['target'])) {
+      } else if (acgraph.utils.instanceOf(event['target'], anychart.core.ui.Legend) || this.checkIfColorRange(event['target'])) {
         if (tag) {
           if (tag.points_) {
             series = tag.points_.series;
@@ -1065,7 +1065,7 @@ anychart.charts.Map.prototype.onMouseDown = function(event) {
 
         var map = drillDownMap[pointId];
         if (map) {
-          if (map instanceof anychart.charts.Map) {
+          if (acgraph.utils.instanceOf(map, anychart.charts.Map)) {
             this.drillTo(pointId, map);
           } else if (goog.isObject(map)) {
             var map_ = this.internalDrillDownMap[pointId];
@@ -1095,12 +1095,12 @@ anychart.charts.Map.prototype.handleMouseOut = function(event) {
   var forbidTooltip = false;
 
   var series, index;
-  if (event['target'] instanceof anychart.core.ui.LabelsFactory || event['target'] instanceof anychart.core.ui.MarkersFactory) {
+  if (acgraph.utils.instanceOf(event['target'], anychart.core.ui.LabelsFactory) || acgraph.utils.instanceOf(event['target'], anychart.core.ui.MarkersFactory)) {
     var parent = event['target'].getParentEventTarget();
     if (parent.isSeries && parent.isSeries())
       series = parent;
     index = tag;
-  } else if (event['target'] instanceof anychart.core.ui.Legend || scene.checkIfColorRange(event['target'])) {
+  } else if (acgraph.utils.instanceOf(event['target'], anychart.core.ui.Legend) || scene.checkIfColorRange(event['target'])) {
     if (tag) {
       if (tag.points_) {
         series = tag.points_.series;
@@ -1275,7 +1275,7 @@ anychart.charts.Map.prototype.touchMoveHandler = function(e) {
 
 /** @inheritDoc */
 anychart.charts.Map.prototype.getSeriesStatus = function(event) {
-  if (event['target'] instanceof anychart.core.ui.Legend) {
+  if (acgraph.utils.instanceOf(event['target'], anychart.core.ui.Legend)) {
     var tag = anychart.utils.extractTag(event['domTarget']);
     return tag.points;
   }
@@ -1595,7 +1595,7 @@ anychart.charts.Map.prototype.colorRangeInvalidated_ = function(event) {
 
 /** @inheritDoc */
 anychart.charts.Map.prototype.checkIfColorRange = function(target) {
-  return target instanceof anychart.core.ui.ColorRange;
+  return acgraph.utils.instanceOf(target, anychart.core.ui.ColorRange);
 };
 
 
@@ -1948,10 +1948,10 @@ anychart.charts.Map.prototype.clearLayer_ = function(layer) {
   var children = layer.removeChildren();
   for (var i = 0, len = children.length; i < len; i++) {
     var child = children[i];
-    if (child instanceof acgraph.vector.Path) {
-      this.clearPath_(child);
-    } else if (child instanceof acgraph.vector.Layer) {
-      this.clearLayer_(child);
+    if (acgraph.utils.instanceOf(child, acgraph.vector.Path)) {
+      this.clearPath_(/** @type {!acgraph.vector.Element} */(child));
+    } else if (acgraph.utils.instanceOf(child, acgraph.vector.Layer)) {
+      this.clearLayer_(/** @type {!acgraph.vector.Layer} */(child));
     }
   }
 };
@@ -3598,7 +3598,7 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
         path.visible(true);
         path.removeAllListeners();
         delete path.tag;
-        if (path instanceof acgraph.vector.Shape) {
+        if (acgraph.utils.instanceOf(path, acgraph.vector.Shape)) {
           path
               .fill(this.unboundRegionsSettings_.fill())
               .stroke(this.unboundRegionsSettings_.stroke());
@@ -4896,13 +4896,13 @@ anychart.charts.Map.prototype.createLegendItemsProvider = function(sourceMode, i
     }
   } else if (sourceMode == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
     if (this.colorRange_ && this.colorRange_.enabled() && this.colorRange_.target() &&
-        this.colorRange_.scale() instanceof anychart.scales.OrdinalColor) {
+        acgraph.utils.instanceOf(this.colorRange_.scale(), anychart.scales.OrdinalColor)) {
       scale = this.colorRange_.scale();
       series = this.colorRange_.target();
     } else {
       for (i = 0, count = this.seriesList.length; i < count; i++) {
         series = this.seriesList[i];
-        if (series.colorScale() instanceof anychart.scales.OrdinalColor) {
+        if (acgraph.utils.instanceOf(series.colorScale(), anychart.scales.OrdinalColor)) {
           scale = series.colorScale();
           break;
         }
@@ -5280,7 +5280,7 @@ anychart.charts.Map.prototype.serialize = function() {
     json['drillDownMap'] = {};
     goog.object.forEach(this.drilldownMap_, function(value, key) {
       var mapJson;
-      if (value instanceof anychart.charts.Map) {
+      if (acgraph.utils.instanceOf(value, anychart.charts.Map)) {
         mapJson = value.serialize();
       } else {
         mapJson = value;

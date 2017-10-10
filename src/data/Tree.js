@@ -298,7 +298,7 @@ anychart.data.Tree.prototype.fillAsParentPointer_ = function(data) {
         searchResult = this.search(anychart.enums.GanttDataFields.ID, id);
 
         if (searchResult) {
-          found = (searchResult instanceof anychart.data.Tree.DataItem) ? searchResult : searchResult[0];
+          found = (acgraph.utils.instanceOf(searchResult, anychart.data.Tree.DataItem)) ? searchResult : searchResult[0];
           goog.array.insertAt(uitems, found, pos);
           found.meta('nc', true);
           anychart.core.reporting.warning(anychart.enums.WarningCode.DUPLICATED_DATA_ITEM, null, [id]);
@@ -321,7 +321,7 @@ anychart.data.Tree.prototype.fillAsParentPointer_ = function(data) {
       if (index < 0) {
         searchResult = this.search(anychart.enums.GanttDataFields.ID, parentId);
         if (searchResult) {
-          found = (searchResult instanceof anychart.data.Tree.DataItem) ? searchResult : searchResult[0];
+          found = (acgraph.utils.instanceOf(searchResult, anychart.data.Tree.DataItem)) ? searchResult : searchResult[0];
           found.addChildWithoutIndexing(tdi);
         } else {
           this.roots_.push(tdi);
@@ -762,7 +762,7 @@ anychart.data.Tree.prototype.addChild = function(child) {
  */
 anychart.data.Tree.prototype.addChildAt = function(child, index) {
   var treeView = null;
-  if (child instanceof anychart.data.TreeView.DataItem) {
+  if (acgraph.utils.instanceOf(child, anychart.data.TreeView.DataItem)) {
     treeView = child.getTreeView();
     child = child.getDataItem();
   }
@@ -775,7 +775,7 @@ anychart.data.Tree.prototype.addChildAt = function(child, index) {
   var dispatchMove = true;
 
   var oldTree = null;
-  if (child instanceof anychart.data.Tree.DataItem) {
+  if (acgraph.utils.instanceOf(child, anychart.data.Tree.DataItem)) {
     oldTree = child.tree();
     if (oldTree && oldTree != this) {
       sourceTree = oldTree;
@@ -877,7 +877,7 @@ anychart.data.Tree.prototype.removeChild = function(child) {
  * @return {number} - Index of child.
  */
 anychart.data.Tree.prototype.indexOfChild = function(child) {
-  if (child instanceof anychart.data.TreeView.DataItem)
+  if (acgraph.utils.instanceOf(child, anychart.data.TreeView.DataItem))
     child = child.getDataItem();
   return goog.array.indexOf(this.roots_, child);
 };
@@ -1636,7 +1636,7 @@ anychart.data.Tree.DataItem.prototype.addChild = function(child) {
  */
 anychart.data.Tree.DataItem.prototype.addChildAt = function(child, index) {
   var treeView = null;
-  if (child instanceof anychart.data.TreeView.DataItem) {
+  if (acgraph.utils.instanceOf(child, anychart.data.TreeView.DataItem)) {
     treeView = child.getTreeView();
     child = child.getDataItem();
   }
@@ -1649,7 +1649,7 @@ anychart.data.Tree.DataItem.prototype.addChildAt = function(child, index) {
 
   var dispatchMove = true;
 
-  if (child instanceof anychart.data.Tree.DataItem) {
+  if (acgraph.utils.instanceOf(child, anychart.data.Tree.DataItem)) {
     oldTree = child.tree();
     if (oldTree && oldTree != this.tree_) {
       sourceTree = oldTree;
@@ -1815,7 +1815,7 @@ anychart.data.Tree.DataItem.prototype.removeChildren = function() {
  * @return {number} - Index of child.
  */
 anychart.data.Tree.DataItem.prototype.indexOfChild = function(child) {
-  if (child instanceof anychart.data.TreeView.DataItem)
+  if (acgraph.utils.instanceOf(child, anychart.data.TreeView.DataItem))
     child = child.getDataItem();
   return goog.array.indexOf(this.children_, child);
 };

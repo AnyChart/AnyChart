@@ -167,7 +167,7 @@ anychart.data.TableStorage.prototype.update = function() {
       return;
     }
     var computers = this.table.getComputers();
-    var aggregated = this instanceof anychart.data.TableAggregatedStorage;
+    var aggregated = acgraph.utils.instanceOf(this, anychart.data.TableAggregatedStorage);
     for (var i = 0; i < computers.length; i++) {
       if (this.lastComputedColumn <= this.table.getRightMostFieldByComputerIndex(i)) { // if not - the computer is OK
         var computer = computers[i];

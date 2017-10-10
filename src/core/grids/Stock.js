@@ -156,7 +156,7 @@ anychart.core.grids.Stock.prototype.layout = function(opt_value) {
     return this.layout_;
   } else if (this.axis_) {
     var isHorizontal = false;
-    if (this.axis_ instanceof anychart.core.axes.Linear) {
+    if (acgraph.utils.instanceOf(this.axis_, anychart.core.axes.Linear)) {
       var axisOrientation = this.axis_.orientation();
       isHorizontal = (axisOrientation == anychart.enums.Orientation.LEFT || axisOrientation == anychart.enums.Orientation.RIGHT);
     }
@@ -565,8 +565,8 @@ anychart.core.grids.Stock.prototype.draw = function() {
     var path;
     var ratio;
     var prevRatio = NaN;
-    var isOrdinal = scale instanceof anychart.scales.Ordinal;
-    var isStock = scale instanceof anychart.scales.StockScatterDateTime;
+    var isOrdinal = acgraph.utils.instanceOf(scale, anychart.scales.Ordinal);
+    var isStock = acgraph.utils.instanceOf(scale, anychart.scales.StockScatterDateTime);
     var ticksArray;
     if (isStock) {
       ticksArray = (/** @type {anychart.scales.StockScatterDateTime} */(scale)).getTicks().toArray(!this.isMinor_);
@@ -751,7 +751,7 @@ anychart.core.grids.Stock.prototype.setupByJSON = function(config, opt_default) 
       if (this.plot_) {
         this.axis((/** @type {anychart.core.stock.Plot} */(this.plot_)).getAxisByIndex(ax));
       }
-    } else if (ax instanceof anychart.core.axes.StockDateTime || ax instanceof anychart.core.axes.Linear) {
+    } else if (acgraph.utils.instanceOf(ax, anychart.core.axes.StockDateTime) || acgraph.utils.instanceOf(ax, anychart.core.axes.Linear)) {
       this.axis(ax);
     }
   }

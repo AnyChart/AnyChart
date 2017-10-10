@@ -367,13 +367,13 @@ anychart.charts.Gantt.prototype.scrollInvalidated_ = function(event) {
  */
 anychart.charts.Gantt.prototype.data = function(opt_value, opt_fillMethod) {
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.data.Tree || opt_value instanceof anychart.data.TreeView) {
+    if (acgraph.utils.instanceOf(opt_value, anychart.data.Tree) || acgraph.utils.instanceOf(opt_value, anychart.data.TreeView)) {
       if (this.data_ != opt_value) {
-        this.data_ = opt_value;
+        this.data_ = /** @type {anychart.data.Tree|anychart.data.TreeView} */(opt_value);
         this.invalidate(anychart.ConsistencyState.GANTT_DATA, anychart.Signal.NEEDS_REDRAW);
       }
     } else {
-      this.data_ = new anychart.data.Tree(opt_value, opt_fillMethod);
+      this.data_ = new anychart.data.Tree(/** @type {Array.<Object>} */(opt_value), opt_fillMethod);
       this.invalidate(anychart.ConsistencyState.GANTT_DATA, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
@@ -899,7 +899,7 @@ anychart.charts.Gantt.prototype.rowMouseMove = function(event) {
     this.highlight(event['hoveredIndex'], event['startY'], event['endY']);
 
     var tooltip;
-    if (target instanceof anychart.core.ui.DataGrid) {
+    if (acgraph.utils.instanceOf(target, anychart.core.ui.DataGrid)) {
       tooltip = /** @type {anychart.core.ui.Tooltip} */(this.dg_.tooltip());
     } else {
       tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tl_.tooltip());

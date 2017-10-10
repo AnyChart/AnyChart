@@ -882,7 +882,7 @@ anychart.format.time = function(date, opt_timeZone, opt_locale) {
  * @return {string}
  */
 anychart.format.dateTime = function(date, opt_format, opt_timeZone, opt_locale) {
-  date = (date instanceof Date) ? date : new Date(date);
+  date = acgraph.utils.instanceOf(date, Date) ? date : new Date(date);
   if (isNaN(date.getTime())) return String(date);
 
   var locale = anychart.format.getDateTimeLocale(opt_locale) ||
@@ -907,7 +907,7 @@ anychart.format.dateTime = function(date, opt_format, opt_timeZone, opt_locale) 
   }
   var timeZone = anychart.format.UTCTimeZoneCache_[opt_timeZone];
 
-  return formatter.format(date, timeZone);
+  return formatter.format(/** @type {Date} */(date), timeZone);
 };
 
 

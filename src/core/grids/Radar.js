@@ -185,7 +185,7 @@ anychart.core.grids.Radar.prototype.layout = function(opt_value) {
   } else if (this.layout_) {
     return this.layout_;
   } else if (this.axis_) {
-    var isCircuit = this.axis_ instanceof anychart.core.axes.Radial;
+    var isCircuit = acgraph.utils.instanceOf(this.axis_, anychart.core.axes.Radial);
     return isCircuit ? anychart.enums.RadialGridLayout.CIRCUIT : anychart.enums.RadialGridLayout.RADIAL;
   } else {
     return this.defaultLayout_;
@@ -212,7 +212,7 @@ anychart.core.grids.Radar.prototype.yScale = function(opt_value) {
     return this;
   } else if (this.yScale_) {
     return this.yScale_;
-  } else if (this.axis_ && this.axis_ instanceof anychart.core.axes.Radial) {
+  } else if (this.axis_ && acgraph.utils.instanceOf(this.axis_, anychart.core.axes.Radial)) {
     return /** @type {anychart.scales.Base} */ (this.axis_.scale());
   } else if (this.chart_) {
     return /** @type {anychart.scales.Base} */ (this.chart_.yScale());
@@ -259,7 +259,7 @@ anychart.core.grids.Radar.prototype.xScale = function(opt_value) {
     return this;
   } else if (this.xScale_) {
     return this.xScale_;
-  } else if (this.axis_ && this.axis_ instanceof anychart.core.axes.Radar) {
+  } else if (this.axis_ && acgraph.utils.instanceOf(this.axis_, anychart.core.axes.Radar)) {
     return /** @type {anychart.scales.Ordinal} */(this.axis_.scale());
   } else if (this.chart_) {
     return /** @type {anychart.scales.Ordinal} */ (this.chart_.xScale());
@@ -754,7 +754,7 @@ anychart.core.grids.Radar.prototype.draw = function() {
       }
       this.drawInterlaceRadial(x, y, cx, cy, prevX, prevY, layer);
     } else {
-      isOrdinal = yScale instanceof anychart.scales.Ordinal;
+      isOrdinal = acgraph.utils.instanceOf(yScale, anychart.scales.Ordinal);
       ticks = isOrdinal ? yScale.ticks() : this.isMinor() ? yScale.minorTicks() : yScale.ticks();
       ticksArray = ticks.get();
       ticksArrLen = ticksArray.length;
@@ -914,7 +914,7 @@ anychart.core.grids.Radar.prototype.setupByJSON = function(config, opt_default) 
       if (this.chart_) {
         this.axis(/** @type {anychart.core.axes.Radar|anychart.core.axes.Radial} */(this.chart_.getAxisByIndex(ax)));
       }
-    } else if (ax instanceof anychart.core.axes.Radial || ax instanceof anychart.core.axes.Radar) {
+    } else if (acgraph.utils.instanceOf(ax, anychart.core.axes.Radial) || acgraph.utils.instanceOf(ax, anychart.core.axes.Radar)) {
       this.axis(ax);
     }
   }

@@ -271,9 +271,9 @@ anychart.charts.CircularGauge.prototype.data = function(opt_value, opt_csvSettin
     if (this.rawData_ !== opt_value) {
       this.rawData_ = opt_value;
       goog.dispose(this.parentViewToDispose_); // disposing a view created by the series if any;
-      if (opt_value instanceof anychart.data.View)
+      if (acgraph.utils.instanceOf(opt_value, anychart.data.View))
         this.parentView_ = this.parentViewToDispose_ = opt_value.derive(); // deriving a view to avoid interference with other view users
-      else if (opt_value instanceof anychart.data.Set)
+      else if (acgraph.utils.instanceOf(opt_value, anychart.data.Set))
         this.parentView_ = this.parentViewToDispose_ = opt_value.mapAs();
       else
         this.parentView_ = (this.parentViewToDispose_ = new anychart.data.Set(
@@ -1150,7 +1150,7 @@ anychart.charts.CircularGauge.prototype.drawContent = function(bounds) {
           iterator.select(pointer.dataIndex());
           axis = this.axes_[axisIndex];
           axis.scale().extendDataRange(iterator.get('value'));
-          if (pointer instanceof anychart.core.gauge.pointers.Bar)
+          if (acgraph.utils.instanceOf(pointer, anychart.core.gauge.pointers.Bar))
             axis.scale().extendDataRange(0);
         }
       }
