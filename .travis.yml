@@ -7,9 +7,10 @@ git:
   depth: 1
 
 before_install:
+  - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
   - git submodule update --init
-  - ./build.py libs
   - pip install maxcdn --user
+  - ./build.py libs
 
 script:
   - echo -e "//registry.npmjs.org/:_authToken=$NPM_TOKEN\n" >> ~/.npmrc
