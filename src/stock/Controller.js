@@ -314,9 +314,9 @@ anychart.stockModule.Controller.prototype.refreshSelection = function(newPixelWi
     startKey = scrollerScale.inverseTransform(this.currentStartKeyRatio_);
     endKey = scrollerScale.inverseTransform(this.currentEndKeyRatio_);
   }
-  if (isNaN(startKey))
+  if (isNaN(startKey) || (this.currentSelectionSticksLeft() && !isNaN(alignedFirst)))
     startKey = alignedFirst;
-  if (isNaN(endKey))
+  if (isNaN(endKey) || (this.currentSelectionSticksRight() && !isNaN(alignedLast)))
     endKey = alignedLast;
 
   if (!isNaN(startKey)) {
