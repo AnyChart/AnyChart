@@ -1,7 +1,6 @@
-// Type definitions for anychart
+// Type definitions for anychart v7.14.4
 // Project: http://anychart.com/
-// Definitions by: AnyChart <http://anychart.com>
-// Definitions: https://github.com/DefinitelyTyped/DefinitelyType
+// Definitions by: AnyChart <https://www.anychart.com>
 declare namespace anychart {
     const DEVELOP: boolean;
     const VERSION: string;

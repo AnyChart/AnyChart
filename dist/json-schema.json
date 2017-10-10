@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema",
-  "description": "AnyChart 7 JSON schema, version 7.14.3",
+  "description": "AnyChart JSON schema, version 7.14.4",
   "type": "object",
   "properties": {
     "chart": {
