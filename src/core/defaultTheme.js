@@ -1588,8 +1588,7 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
         }
       },
       'jumpLine': {
-        'pointWidth': '100%',
-        'maxPointWidth': '100%'
+        'pointWidth': '100%'
       },
       'hilo': {
         'pointWidth': 1
@@ -1660,7 +1659,7 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'selectMarqueeFill': '#d3d3d3 0.4',
     'selectMarqueeStroke': '#d3d3d3',
 
-    'maxPointWidth': '90%',
+    'maxPointWidth': '100%',
     'minPointLength': 0
   },
 
