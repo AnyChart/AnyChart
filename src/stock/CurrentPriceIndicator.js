@@ -315,7 +315,7 @@ anychart.stockModule.CurrentPriceIndicator.prototype.series = function(opt_value
     if (this.series_ !== opt_value) {
       this.seriesId_ = seriesId;
       this.series_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
+      this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.CONTAINER,
           anychart.Signal.NEEDS_REDRAW);
     }
     return this;
@@ -378,7 +378,6 @@ anychart.stockModule.CurrentPriceIndicator.prototype.draw = function() {
 
   if (!seriesValue) {
     this.remove();
-    this.invalidate(anychart.ConsistencyState.CONTAINER);
     return this;
   }
 
