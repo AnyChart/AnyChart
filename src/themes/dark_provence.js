@@ -232,10 +232,10 @@ goog.provide('anychart.themes.dark_provence');
             }
           },
           'hovered': {
-            'fill': '#b0bec5',
+            'fill': '#b0bec5'
           },
           'selected': {
-            'stroke': '1.5 #fafafa',
+            'stroke': '1.5 #fafafa'
           }
         },
         'connector': {

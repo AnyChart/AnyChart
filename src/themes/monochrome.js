@@ -343,7 +343,7 @@ goog.provide('anychart.themes.monochrome');
               'risingFill': stockScrollerUnselected,
               'risingStroke': stockScrollerUnselected,
               'fallingFill': stockScrollerUnselected,
-              'fallingStroke': stockScrollerUnselected,
+              'fallingStroke': stockScrollerUnselected
             },
             'selected': {
               'risingStroke': returnSourceColor60,

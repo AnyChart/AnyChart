@@ -342,7 +342,7 @@ goog.provide('anychart.themes.light_turquoise');
               'risingFill': stockScrollerUnselected,
               'risingStroke': stockScrollerUnselected,
               'fallingFill': stockScrollerUnselected,
-              'fallingStroke': stockScrollerUnselected,
+              'fallingStroke': stockScrollerUnselected
             },
             'selected': {
               'risingStroke': returnSourceColor50,
