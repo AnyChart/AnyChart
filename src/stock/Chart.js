@@ -2365,7 +2365,7 @@ anychart.stockModule.Chart.contextMenuMap = {
   // Stock 'Default menu'. (will be added to 'main')
   'stock': {
     'zoom-marquee-start': anychart.stockModule.Chart.contextMenuItems['zoom-marquee-start'],
-    'select-marquee-start': anychart.core.Chart.contextMenuItems['select-marquee-start'],
+    //'select-marquee-start': anychart.core.Chart.contextMenuItems['select-marquee-start'],
     'stock-specific-separator': {'index': 9.4}
   }
 };
