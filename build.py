@@ -253,9 +253,9 @@ def __get_build_version():
         cwd=PROJECT_PATH).communicate()
     branch_name = name_output.strip()
 
-    if branch_name == 'HEAD':
-        branch_name = os.environ['TRAVIS_BRANCH']
+    travis_branch = os.environ.get('TRAVIS_BRANCH') if branch_name == 'HEAD' else None
 
+    if travis_branch is not None:
         #see https://anychart.atlassian.net/browse/DVF-3193
         contributors_response = urllib.urlopen(GIT_CONTRIBUTORS_URL)
         contributors_data = json.loads(contributors_response.read())
@@ -263,7 +263,7 @@ def __get_build_version():
         for contributor in contributors_data:
             contributions += contributor['contributions']
 
-        git_compare_url = GIT_COMPARE_URL_TEMPLATE % branch_name
+        git_compare_url = GIT_COMPARE_URL_TEMPLATE % travis_branch
         compare_response = urllib.urlopen(git_compare_url)
         compare_data = json.loads(compare_response.read())
 
