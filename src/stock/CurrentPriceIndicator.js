@@ -315,7 +315,7 @@ anychart.stockModule.CurrentPriceIndicator.prototype.series = function(opt_value
     if (this.series_ !== opt_value) {
       this.seriesId_ = seriesId;
       this.series_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
+      this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.CONTAINER,
           anychart.Signal.NEEDS_REDRAW);
     }
     return this;
@@ -367,21 +367,22 @@ anychart.stockModule.CurrentPriceIndicator.prototype.draw = function() {
   if (!this.rootLayer)
     this.rootLayer = acgraph.layer();
 
-  var labelFormatProvider;
-  var line = this.getLine();
+  var labelFormatProvider, seriesValue, isSeriesOHLCBased;
   var series = this.series_ || this.plot_.getSeriesAt(0);
-  var isSeriesOHLCBased = !!(series.drawer.flags & anychart.core.drawers.Capabilities.IS_OHLC_BASED);
-  var fieldValue = this.getOption('valueField') || series.drawer.valueFieldName;
-
-  var stroke = /** @type {acgraph.vector.Stroke} */(this.getOption('stroke'));
-  this.row_ = series.getSelectableData().getRowByDataSource(this.getOption('value'), fieldValue);
-  var seriesValue = this.row_ ? this.row_.get(fieldValue) : null;
+  if (series && !series.isDisposed()) {
+    var fieldValue = this.getOption('valueField') || series.drawer.valueFieldName;
+    isSeriesOHLCBased = !!(series.drawer.flags & anychart.core.drawers.Capabilities.IS_OHLC_BASED);
+    this.row_ = series.getSelectableData().getRowByDataSource(this.getOption('value'), fieldValue);
+    seriesValue = this.row_ ? this.row_.get(fieldValue) : null;
+  }
 
   if (!seriesValue) {
     this.remove();
-    this.invalidate(anychart.ConsistencyState.CONTAINER);
     return this;
   }
+
+  var line = this.getLine();
+  var stroke = /** @type {acgraph.vector.Stroke} */(this.getOption('stroke'));
 
   var axis = this.axis_ || this.plot_.yAxis(0);
   var yScale = axis.scale();

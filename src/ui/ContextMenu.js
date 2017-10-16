@@ -63,6 +63,13 @@ anychart.ui.ContextMenu = function() {
    */
   this.itemsReady_ = false;
 
+  /**
+   * Wrapper element to render elements to.
+   * @type {Element}
+   * @private
+   */
+  this.wrapper_ = /** @type {Element} */(goog.dom.createDom('div', {'id': 'anychart-menu-wrapper'}));
+
 
   /**
    * Items formatter.
@@ -386,8 +393,6 @@ anychart.ui.ContextMenu.prototype.show = function(x, y) {
   if ((this.itemsReady_ && !goog.object.isEmpty(this.items())) || this.prepareItems_(null, this.chart_)) {
     var stage = this.chart_ ? this.chart_.container().getStage() : null;
     var container = (stage && stage.fullScreen()) ? stage.getDomWrapper() : anychart.document.body;
-    if (!this.wrapper_)
-      this.wrapper_ = /** @type {Element} */(goog.dom.createDom('div', {'id': 'anychart-menu-wrapper'}));
     if (this.wrapper_.parentNode != container)
       container.appendChild(this.wrapper_);
 
@@ -475,7 +480,7 @@ anychart.ui.ContextMenu.prototype.makeLevel_ = function(menu, model) {
 
       // treat as subMenu
     } else if (itemData['subMenu']) {
-      var subMenu = new anychart.ui.menu.SubMenu(itemText);
+      var subMenu = new anychart.ui.menu.SubMenu(itemText, this.wrapper_);
       if (classNames.length) subMenu.addClassName(classNames.join(' '));
       if (goog.isBoolean(itemData['enabled'])) subMenu.setEnabled(itemData['enabled']);
 

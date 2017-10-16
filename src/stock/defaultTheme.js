@@ -270,12 +270,6 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
           'tooltip': {
             'format': anychart.stockModule.defaultTheme.StockOHLCTooltipFormatter
           }
-        },
-        'stick': {
-          'maxPointWidth': '100%'
-        },
-        'jumpLine': {
-          'maxPointWidth': '100%'
         }
       },
       'defaultGridSettings': {

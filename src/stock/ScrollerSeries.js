@@ -211,4 +211,12 @@ anychart.stockModule.ScrollerSeries.prototype.applyZIndex = function() {
 };
 
 
+/** @inheritDoc */
+anychart.stockModule.ScrollerSeries.prototype.disposeInternal = function() {
+  this.remove();
+
+  anychart.stockModule.ScrollerSeries.base(this, 'disposeInternal');
+};
+
+
 //endregion

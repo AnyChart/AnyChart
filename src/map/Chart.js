@@ -2894,7 +2894,7 @@ anychart.mapModule.Chart.prototype.calculate = function() {
         tx_.srcCrs = tx_.crs;
         tx_.curProj = anychart.mapModule.projections.getProjection(tx_.crs);
         tx_.srcProj = anychart.mapModule.projections.getProjection(tx_.srcCrs);
-        tx_.scale = goog.isDef(value['scale']) ? parseFloat(value['scale']) : 1;
+        tx_.scale = value['scale'] || defaultTx.scale || 1;
         tx_.xoffset = goog.isDef(value['xoffset']) ? parseFloat(value['xoffset']) : 0;
         tx_.yoffset = goog.isDef(value['yoffset']) ? parseFloat(value['yoffset']) : 0;
         if (goog.isDef(value['heatZone'])) {

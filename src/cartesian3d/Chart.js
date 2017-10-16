@@ -584,8 +584,12 @@ anychart.cartesian3dModule.Chart.prototype.prepare3d = function() {
   this.lastEnabledAreaSeriesMap = {};
   var allSeries = this.getAllSeries();
   var series;
+  var stackDirection = /** @type {anychart.enums.ScaleStackDirection} */ (this.yScale().stackDirection());
+  var stackIsDirect = stackDirection == anychart.enums.ScaleStackDirection.DIRECT;
+
   for (var i = 0; i < allSeries.length; i++) {
-    series = allSeries[i];
+    var actualIndex = stackIsDirect ? allSeries.length - i - 1 : i;
+    series = allSeries[actualIndex];
     if (series && series.enabled()) {
       if (series.check(anychart.core.drawers.Capabilities.IS_3D_BASED)) {
         if (series.isDiscreteBased()) {
@@ -594,7 +598,7 @@ anychart.cartesian3dModule.Chart.prototype.prepare3d = function() {
             this.setSeriesPointZIndex_(/** @type {anychart.core.series.Cartesian} */(series));
           }
         } else if (series.supportsStack()) {
-          this.lastEnabledAreaSeriesMap[series.getScalesPairIdentifier()] = i;
+          this.lastEnabledAreaSeriesMap[series.getScalesPairIdentifier()] = actualIndex;
         }
       } else {
         series.setAutoZIndex(series.autoIndex() * anychart.core.series.Base.ZINDEX_INCREMENT_MULTIPLIER + anychart.cartesian3dModule.Chart.ZINDEX_2D_LINE_SERIES);

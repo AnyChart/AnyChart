@@ -838,8 +838,9 @@ anychart.sparklineModule.Chart.prototype.data = function(opt_value, opt_csvSetti
       this.data_ = this.parentView_;
       this.data_.listenSignals(this.dataInvalidated_, this);
       if (this.series_)
-        this.series_.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.CHART_LABELS,
+        this.series_.invalidate(anychart.ConsistencyState.APPEARANCE,
             anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW | anychart.Signal.DATA_CHANGED);
+      this.invalidate(anychart.ConsistencyState.CHART_LABELS, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -874,7 +875,10 @@ anychart.sparklineModule.Chart.prototype.getReferenceScaleValues = function() {
  */
 anychart.sparklineModule.Chart.prototype.dataInvalidated_ = function(e) {
   if (e.hasSignal(anychart.Signal.DATA_CHANGED)) {
-    this.invalidate(anychart.ConsistencyState.CHART_LABELS, anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.DATA_CHANGED);
+    if (this.series_)
+      this.series_.invalidate(anychart.ConsistencyState.APPEARANCE,
+          anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW | anychart.Signal.DATA_CHANGED);
+    this.invalidate(anychart.ConsistencyState.CHART_LABELS, anychart.Signal.NEEDS_REDRAW);
   }
 };
 

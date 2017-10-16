@@ -2511,7 +2511,7 @@ anychart.pieModule.Chart.prototype.drawOutsideLabel_ = function(pointState, opt_
   var enabled;
   var wasNoLabel;
   var anchor;
-  var formatProvider = this.createFormatProvider();
+  var formatProvider = this.createFormatProvider(true);
   var positionProvider = this.createPositionProvider();
   if (isDraw) {
     if (wasNoLabel = !label) {

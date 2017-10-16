@@ -22,23 +22,21 @@ goog.require('goog.ui.MenuItem');
  * @param {goog.ui.ControlContent} content Text caption or DOM structure to
  *     display as the content of the submenu (use to add icons or styling to
  *     menus).
- * @param {*=} opt_model Data/model associated with the menu item.
- * @param {goog.dom.DomHelper=} opt_domHelper Optional dom helper used for dom
- *     interactions.
- * @param {goog.ui.MenuItemRenderer=} opt_renderer Renderer used to render or
- *     decorate the component; defaults to {@link anychart.ui.menu.SubMenuRenderer}.
+ * @param {Element=} opt_wrapper Wrapper element.
  * @constructor
  * @extends {goog.ui.MenuItem}
  */
-anychart.ui.menu.SubMenu = function(content, opt_model, opt_domHelper, opt_renderer) {
+anychart.ui.menu.SubMenu = function(content, opt_wrapper) {
   /*
     TODO (A.Kudryavtsev):
     We can't extend goog.ui.SubMenu because we can't access private (not @protected) field subMenu_ and override
     method goog.ui.SubMenu.prototype.getMenu() to make it return instance of anychart.core.ui.toolbar.Menu.
     That's why we have a copy of goog.ui.SubMenu class here.
    */
-  anychart.ui.menu.SubMenu.base(this, 'constructor', content, opt_model, opt_domHelper,
-      opt_renderer || anychart.ui.menu.SubMenuRenderer.getInstance());
+  anychart.ui.menu.SubMenu.base(this, 'constructor', content, undefined, undefined,
+      anychart.ui.menu.SubMenuRenderer.getInstance());
+
+  this.wrapper_ = opt_wrapper || null;
 };
 goog.inherits(anychart.ui.menu.SubMenu, goog.ui.MenuItem);
 goog.tagUnsealableClass(anychart.ui.menu.SubMenu);
@@ -142,6 +140,7 @@ anychart.ui.menu.SubMenu.prototype.exitDocument = function() {
 
 /** @override */
 anychart.ui.menu.SubMenu.prototype.disposeInternal = function() {
+  this.wrapper_ = null;
   if (this.subMenu_ && !this.externalSubMenu_) {
     this.subMenu_.dispose();
   }
@@ -399,7 +398,7 @@ anychart.ui.menu.SubMenu.prototype.setSubMenuVisible_ = function(visible) {
     if (visible) {
       // Lazy-render menu when first shown, if needed.
       if (!subMenu.isInDocument()) {
-        subMenu.render();
+        subMenu.render(this.wrapper_);
       }
       subMenu.setHighlightedIndex(-1);
     }
