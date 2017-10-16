@@ -1781,6 +1781,15 @@ anychart.core.ui.Scroller.Thumbs.prototype.setupSpecial = function(isDefault, va
 };
 
 
+/** @inheritDoc */
+anychart.core.ui.Scroller.Thumbs.prototype.disposeInternal = function() {
+  goog.disposeAll(this.normal_, this.hovered_);
+  this.normal_ = null;
+  this.hovered_ = null;
+  anychart.core.ui.Scroller.Thumbs.base(this, 'disposeInternal');
+};
+
+
 
 //region --- Standalone
 //------------------------------------------------------------------------------
