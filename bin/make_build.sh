@@ -63,24 +63,24 @@ zip -q -r installation-package.zip *
 
 # ensure release paths exists and clean
 # as far as cdn always serve removed content, we are free to clean entire folder
-ssh $STATIC_HOST_SSH_STRING "
+ssh -i ~/.ssh/id_rsa $STATIC_HOST_SSH_STRING "
 mkdir -p /apps/static/cdn/releases/${VERSION} &&
 rm -rf /apps/static/cdn/releases/${VERSION}/*"
 
 if [ "${TRAVIS_BRANCH}" = "master" ]; then
-    ssh $STATIC_HOST_SSH_STRING "
+    ssh -i ~/.ssh/id_rsa  $STATIC_HOST_SSH_STRING "
     mkdir -p /apps/static/cdn/releases &&
     rm -rf /apps/static/cdn/releases/latest"
 fi
 
 # upload content
-scp installation-package.zip $STATIC_HOST_SSH_STRING:/apps/static/cdn/releases/${VERSION}/installation-package.zip
+scp -i ~/.ssh/id_rsa installation-package.zip $STATIC_HOST_SSH_STRING:/apps/static/cdn/releases/${VERSION}/anychart-installation-package-${VERSION}.zip
 
 # copy unzip release files and copy to latest
-ssh $STATIC_HOST_SSH_STRING "unzip -q -o /apps/static/cdn/releases/${VERSION}/installation-package.zip -d /apps/static/cdn/releases/${VERSION}/"
+ssh -i ~/.ssh/id_rsa $STATIC_HOST_SSH_STRING "unzip -q -o /apps/static/cdn/releases/${VERSION}/installation-package.zip -d /apps/static/cdn/releases/${VERSION}/"
 
 # copy legacy files by version and latest
-ssh $STATIC_HOST_SSH_STRING "
+ssh -i ~/.ssh/id_rsa $STATIC_HOST_SSH_STRING "
 rm -rf /apps/static/cdn/js/${VERSION} &&
 cp -r /apps/static/cdn/releases/${VERSION}/js /apps/static/cdn/js/${VERSION} &&
 rm -rf /apps/static/cdn/css/${VERSION} &&
@@ -93,7 +93,7 @@ cp /apps/static/cdn/releases/${VERSION}/xml-schema.xsd /apps/static/cdn/schemas/
 
 # copy DEV legacy files by version
 if [ "${TRAVIS_BRANCH}" != "master" ]; then
-    ssh $STATIC_HOST_SSH_STRING "
+    ssh -i ~/.ssh/id_rsa $STATIC_HOST_SSH_STRING "
     rm -rf /apps/static/js/${VERSION} &&
     cp -r /apps/static/cdn/releases/${VERSION}/js /apps/static/js/${VERSION} &&
     cp /apps/static/cdn/releases/${VERSION}/commit-hash.txt /apps/static/js/${VERSION}/commit-hash.txt &&
