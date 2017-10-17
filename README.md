@@ -1,4 +1,4 @@
-[<img src="https://cdn.anychart.com/images/logo-transparent-segoe.png?2" width="234px" alt="AnyChart - Robust JavaScript/HTML5 Chart library for any project">](https://www.anychart.com)
+[<img src="https://.anychart.com/images/logo-transparent-segoe.png?2" width="234px" alt="AnyChart - Robust JavaScript/HTML5 Chart library for any project">](https://www.anychart.com)
 
 AnyChart Data Visualization Framework
 =========
@@ -29,11 +29,11 @@ All binaries are located in [dist](https://github.com/AnyChart/AnyChart/tree/mas
 
 #### CDN
 
-If you don't want to download and host AnyChart yourself, you can include it from the AnyChart CDN (Content Delivery Network): [https://cdn.anychart.com/](https://cdn.anychart.com/) 
+If you don't want to download and host AnyChart yourself, you can include it from the AnyChart CDN (Content Delivery Network): [https://www.anychart.com/download/cdn](https://www.anychart.com/download/cdn) 
 
 ```html
 <head>
-<script src="https://cdn.anychart.com/js/latest/anychart-bundle.min.js"></script>
+<script src="https://cdn.anychart.com/releases/8.0.1/js/anychart-bundle.min.js"></script>
 </head>
 ```
 
@@ -53,7 +53,7 @@ The fastest way to start with AnyChart is to include framework into a webpage an
 <!doctype html>
 <body>
 <div id="container" style="width: 500px; height: 400px;"></div>
-<script src="https://cdn.anychart.com/js/latest/anychart-bundle.min.js" type="text/javascript"></script>
+<script src="https://cdn.anychart.com/releases/8.0.1/js/anychart-bundle.min.js" type="text/javascript"></script>
 <script>
     anychart.onDocumentReady(function() {
         // create a pie chart
