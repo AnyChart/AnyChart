@@ -12,7 +12,7 @@ addons:
   - static.anychart.com
 
 before_install:
-  - openssl aes-256-cbc -K $encrypted_70c31ee585ad_key -iv $encrypted_70c31ee585ad_iv -in bin/anychart-deploy-key.enc -out bin/.travis/anychart-deploy-key -d
+  - openssl aes-256-cbc -K $encrypted_70c31ee585ad_key -iv $encrypted_70c31ee585ad_iv -in bin/anychart-deploy-key.enc -out bin/anychart-deploy-key -d
   - cp bin/anychart-deploy-key ~/.ssh/id_rsa
   - chmod 600 ~/.ssh/id_rsa
   - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
