@@ -81,7 +81,7 @@ scp -i ~/.ssh/id_rsa installation-package.zip $STATIC_HOST_SSH_STRING:/apps/stat
 # copy unzip release files and copy to latest
 ssh -i ~/.ssh/id_rsa $STATIC_HOST_SSH_STRING "unzip -q -o /apps/static/cdn/releases/${VERSION}/anychart-installation-package-${VERSION}.zip -d /apps/static/cdn/releases/${VERSION}/"
 
-# copy legacy files by version and latest
+# copy legacy files by version
 ssh -i ~/.ssh/id_rsa $STATIC_HOST_SSH_STRING "
 rm -rf /apps/static/cdn/js/${VERSION} &&
 cp -r /apps/static/cdn/releases/${VERSION}/js /apps/static/cdn/js/${VERSION} &&
@@ -101,6 +101,13 @@ if [ "${TRAVIS_BRANCH}" != "master" ]; then
     cp /apps/static/cdn/releases/${VERSION}/commit-hash.txt /apps/static/js/${VERSION}/commit-hash.txt &&
     rm -rf /apps/static/css/${VERSION} &&
     cp -r /apps/static/cdn/releases/${VERSION}/css /apps/static/css/${VERSION}"
+fi
+
+# copy CAT legacy files by branch name
+if [ "${VERSION}" != "${TRAVIS_BRANCH}" ]; then
+    ssh -i ~/.ssh/id_rsa  $STATIC_HOST_SSH_STRING "
+    rm -rf /apps/static/cdn/releases/${TRAVIS_BRANCH} &&
+    cp -r /apps/static/cdn/releases/${VERSION} /apps/static/cdn/releases/${TRAVIS_BRANCH}"
 fi
 
 # drop cdn cache for uploaded files
