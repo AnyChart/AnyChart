@@ -43,6 +43,14 @@ anychart.core.utils.TokenParser.parse = function(format) {
     'useNegativeSign': 'useBracketsForNegative',
     'trailingZeros': 'zeroFillDecimals'
   };
+  var tokenTypeMap = {
+    'number': anychart.enums.TokenType.NUMBER,
+    'string': anychart.enums.TokenType.STRING,
+    'datetime': anychart.enums.TokenType.DATE_TIME,
+    'date': anychart.enums.TokenType.DATE,
+    'time': anychart.enums.TokenType.TIME,
+    'percent': anychart.enums.TokenType.PERCENT
+  };
 
   function trimKeys(params) {
     var del = [];
@@ -137,20 +145,37 @@ anychart.core.utils.TokenParser.parse = function(format) {
     var value = provider.getTokenValueInternal(token);
     if (!goog.isDef(value))
       return '';
-    var type = provider.getTokenTypeInternal(token);
+    params = params || {};
+
+    var isDateTime = goog.isDef(params['dateTimeFormat']) || goog.isDef(params['timeZone']);
+
+    if (params['type'])
+      params['type'] = anychart.utils.trim(params['type']);
+
+    var type = tokenTypeMap[String(params['type']).toLowerCase()] ||
+        (isDateTime ? anychart.enums.TokenType.DATE_TIME : provider.getTokenTypeInternal(token));
+
     switch (type) {
       case anychart.enums.TokenType.UNKNOWN:
         return '';
+
       case anychart.enums.TokenType.STRING:
         return String(value);
+
       case anychart.enums.TokenType.DATE_TIME:
-        params = params || {};
         return anychart.format.dateTime(value, params['dateTimeFormat'], params['timeZone']);
+
+      case anychart.enums.TokenType.DATE:
+        return anychart.format.date(value, params['timeZone']);
+
+      case anychart.enums.TokenType.TIME:
+        return anychart.format.time(value, params['timeZone']);
+
       case anychart.enums.TokenType.NUMBER:
-        params = params || {};
         return anychart.format.number(value, params['decimalsCount'], params['decimalPoint'],
             params['groupsSeparator'], params['scale'], params['zeroFillDecimals'], params['scaleSuffixSeparator'],
             params['useBracketsForNegative']);
+
       case anychart.enums.TokenType.PERCENT:
         return anychart.utils.normalizeToPercent(anychart.math.round(value * 100, 2));
     }
