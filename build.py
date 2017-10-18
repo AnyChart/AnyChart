@@ -286,6 +286,8 @@ def __get_build_version():
 def __print_version(*args, **kwargs):
     if kwargs['commits_count']:
         print __get_build_version()
+    elif kwargs['major_only']:
+        print __get_version().split('.')[0]
     else:
         print __get_version()
 
@@ -1102,6 +1104,9 @@ def __exec_main_script():
     stat_parser = subparsers.add_parser('version', help='Print AnyChart version')
     stat_parser.set_defaults(action=__print_version,
                              commits_count=False)
+    stat_parser.add_argument('-m', '--major_only',
+                             action='store_true',
+                             help="Show only major version")
     stat_parser.add_argument('-c', '--commits_count',
                              action='store_true',
                              help="Don't show commits count")

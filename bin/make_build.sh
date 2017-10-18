@@ -2,6 +2,7 @@
 
 COMMIT_HASH=$(git rev-parse --short HEAD)
 BUILD_VERSION=$(python build.py version)
+MAJOR_VERSION=$(python build.py version -m)
 
 if [ "${TRAVIS_BRANCH}" = "master" ]; then
     VERSION=${BUILD_VERSION}
@@ -18,9 +19,10 @@ else
     VERSION=${TRAVIS_BRANCH}
 fi
 
+echo Major: ${MAJOR_VERSION}
 echo Version: ${VERSION}
 echo Branch: ${TRAVIS_BRANCH}
-echo Commit: ${COMMIT_HASH}
+echo Commit Hash: ${COMMIT_HASH}
 
 # we can build release files only in case of dev release
 if [ "${TRAVIS_BRANCH}" != "master" ]; then
@@ -69,8 +71,8 @@ rm -rf /apps/static/cdn/releases/${VERSION}/*"
 
 if [ "${TRAVIS_BRANCH}" = "master" ]; then
     ssh -i ~/.ssh/id_rsa  $STATIC_HOST_SSH_STRING "
-    mkdir -p /apps/static/cdn/releases &&
-    rm -rf /apps/static/cdn/releases/latest"
+    rm -rf /apps/static/cdn/releases/${MAJOR_VERSION}.x.x &&
+    cp -r /apps/static/cdn/releases/${VERSION} /apps/static/cdn/releases/${MAJOR_VERSION}.x.x"
 fi
 
 # upload content
