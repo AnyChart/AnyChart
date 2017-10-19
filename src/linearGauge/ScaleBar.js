@@ -145,8 +145,8 @@ anychart.linearGaugeModule.ScaleBar.prototype.colorScale = function(opt_value) {
     var val = anychart.scales.Base.setupScale(this.colorScale_, opt_value, null,
         anychart.scales.Base.ScaleTypes.COLOR_SCALES, null, this.colorScaleInvalidated_, this);
     if (val) {
-      this.colorScale_ = /** @type {anychart.scales.Base} */(val);
       var dispatch = this.colorScale_ == val;
+      this.colorScale_ = /** @type {anychart.scales.Base} */(val);
       this.fill_ = null;
       this.stroke_ = null;
       this.colorScale_.resumeSignalsDispatching(dispatch);

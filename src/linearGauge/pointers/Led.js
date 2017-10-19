@@ -379,18 +379,25 @@ anychart.linearGaugeModule.pointers.Led.prototype.count = function(opt_value) {
 
 /**
  * Getter/setter for led color scale.
- * @param {(anychart.colorScalesModule.Linear|anychart.colorScalesModule.Ordinal)=} opt_value Led color scale.
+ * @param {(anychart.colorScalesModule.Linear|anychart.colorScalesModule.Ordinal|Object|anychart.enums.ScaleTypes)=} opt_value Led color scale.
  * @return {anychart.linearGaugeModule.pointers.Led} Color scale or self for chaining.
  */
 anychart.linearGaugeModule.pointers.Led.prototype.colorScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.colorScale_ != opt_value) {
-      if (this.colorScale_)
-        this.colorScale_.unlistenSignals(this.colorScaleInvalidated_, this);
-      this.colorScale_ = opt_value;
-      if (this.colorScale_)
-        this.colorScale_.listenSignals(this.colorScaleInvalidated_, this);
+    if (goog.isNull(opt_value) && this.colorScale_) {
+      this.colorScale_ = null;
       this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.GAUGE_COLOR_SCALE, anychart.Signal.NEEDS_REDRAW);
+    } else {
+      var val = anychart.scales.Base.setupScale(this.colorScale_, opt_value, null,
+          anychart.scales.Base.ScaleTypes.COLOR_SCALES, null, this.colorScaleInvalidated_, this);
+      if (val) {
+        var dispatch = this.colorScale_ == val;
+        this.colorScale_ = val;
+        this.colorScale_.resumeSignalsDispatching(dispatch);
+        if (!dispatch) {
+          this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.GAUGE_COLOR_SCALE, anychart.Signal.NEEDS_REDRAW);
+        }
+      }
     }
     return this;
   }

@@ -144,21 +144,28 @@ anychart.mapModule.Series.prototype.seriesPoints;
 //region --- Coloring
 /**
  * Color scale.
- * @param {(anychart.colorScalesModule.Linear|anychart.colorScalesModule.Ordinal)=} opt_value Scale to set.
+ * @param {(anychart.colorScalesModule.Linear|anychart.colorScalesModule.Ordinal|Object|anychart.enums.ScaleTypes)=} opt_value Scale to set.
  * @return {anychart.colorScalesModule.Ordinal|anychart.colorScalesModule.Linear|anychart.mapModule.Series} Default chart color scale value or itself for
  * method chaining.
  */
 anychart.mapModule.Series.prototype.colorScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.colorScale_ != opt_value) {
-      if (this.colorScale_)
-        this.colorScale_.unlistenSignals(this.colorScaleInvalidated_, this);
-      this.colorScale_ = opt_value;
-      if (this.colorScale_)
-        this.colorScale_.listenSignals(this.colorScaleInvalidated_, this);
-
+    if (goog.isNull(opt_value) && this.colorScale_) {
+      this.colorScale_ = null;
       this.invalidate(anychart.ConsistencyState.MAP_COLOR_SCALE,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_COLOR_RANGE);
+    } else {
+      var val = anychart.scales.Base.setupScale(this.colorScale_, opt_value, null,
+          anychart.scales.Base.ScaleTypes.COLOR_SCALES, null, this.colorScaleInvalidated_, this);
+      if (val) {
+        var dispatch = this.colorScale_ == val;
+        this.colorScale_ = val;
+        this.colorScale_.resumeSignalsDispatching(dispatch);
+        if (!dispatch) {
+          this.invalidate(anychart.ConsistencyState.MAP_COLOR_SCALE,
+              anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_COLOR_RANGE);
+        }
+      }
     }
     return this;
   }
