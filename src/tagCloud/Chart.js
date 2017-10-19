@@ -1837,7 +1837,7 @@ anychart.tagCloudModule.Chart.prototype.calculate = function() {
     var pointsCount = this.normalizedData.length;
     var sum = 0;
 
-    this.normalizedData.forEach(function(t) {
+    this.normalizedData.forEach(function(t, i) {
       var state = anychart.core.utils.InteractivityState.clarifyState(this.state.getPointStateByIndex(t.rowIndex));
       iterator.select(t.rowIndex);
 
@@ -1853,7 +1853,7 @@ anychart.tagCloudModule.Chart.prototype.calculate = function() {
       t.weight = /** @type {number|string} */(fontWeight);
       t.fill = fill;
 
-      t.rotate = arrAngles[t.value % anglesCount];
+      t.rotate = arrAngles[i % anglesCount];
       t.sizeRatio = t.value / maxValue;
 
       sum += t.value;
