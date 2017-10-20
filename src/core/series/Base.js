@@ -3036,6 +3036,7 @@ anychart.core.series.Base.prototype.draw = function() {
       // main points drawing cycle
       iterator.reset();
       while (iterator.advance()) {
+        iterator.meta('destinationValue', NaN); //for animation-after-draw purposes.
         state = this.getPointState(iterator.getIndex());
         this.makePointMeta(iterator, yValueNames, columns);
         this.drawPoint(iterator, state);

@@ -24,7 +24,10 @@ anychart.animations.BubbleAnimation.prototype.update = function() {
   // we would use variable number of arguments per point - from zero to five
   while (iterator.advance()) {
     if (!iterator.meta('missing')) {
-      var size = /** @type {number} */(iterator.meta('size'));
+      if (isNaN(iterator.meta('destinationValue'))) {
+        iterator.meta('destinationValue', iterator.meta('size'));
+      }
+      var size = /** @type {number} */(iterator.meta('destinationValue'));
       // we need this to make the drawer choose appropriate shape.
       this.startPoint.push(size < 0 ? -1e-5 : 0);
       this.endPoint.push(size);

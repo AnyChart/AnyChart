@@ -738,9 +738,10 @@ anychart.pyramidFunnelModule.Chart.prototype.drawContent = function(bounds) {
     }
 
     if (this.drawnConnectors_) {
-      for (var i in this.drawnConnectors_) {
-        if (this.drawnConnectors_.hasOwnProperty(i))
-          this.drawnConnectors_[i].stroke(this.getOption('connectorStroke'));
+      for (var i = 0; i < this.drawnConnectors_.length; i++) {
+        var conn = this.drawnConnectors_[i];
+        if (conn)
+          conn.stroke(this.getOption('connectorStroke'));
       }
     }
 
@@ -1056,9 +1057,13 @@ anychart.pyramidFunnelModule.Chart.prototype.updateLabelsOnAnimate = function(la
   labels.draw();
   labels.resumeSignalsDispatching(false);
   if (isOutside && this.drawnConnectors_) {
-    for (var i in this.drawnConnectors_) {
-      if (this.drawnConnectors_.hasOwnProperty(i))
-        this.drawnConnectors_[i].stroke(anychart.color.setOpacity(/** @type {acgraph.vector.Stroke} */ (this.getOption('connectorStroke')), connectorOpacity));
+    for (var i = 0; i < this.drawnConnectors_.length; i++) {
+      var conn = this.drawnConnectors_[i];
+      if (conn) {
+        var ownStroke = /** @type {acgraph.vector.Stroke} */ (this.getOption('connectorStroke'));
+        var opacity = anychart.color.setOpacity(ownStroke, connectorOpacity);
+        conn.stroke(opacity);
+      }
     }
   }
 };
@@ -1083,6 +1088,8 @@ anychart.pyramidFunnelModule.Chart.prototype.doAnimation = function() {
       this.animationQueue_.add(/** @type {goog.fx.TransitionBase} */ (pyramidFunnelLabelAnimation));
 
       this.animationQueue_.listen(goog.fx.Transition.EventType.BEGIN, function() {
+        this.connStrokeBackup_ = this.getOption('connectorStroke');
+        this.setOption('connectorStroke', 'none');
         this.ignoreMouseEvents(true);
         this.dispatchDetachedEvent({
           'type': anychart.enums.EventType.ANIMATION_START,
@@ -1091,6 +1098,7 @@ anychart.pyramidFunnelModule.Chart.prototype.doAnimation = function() {
       }, false, this);
 
       this.animationQueue_.listen(goog.fx.Transition.EventType.END, function() {
+        this.setOption('connectorStroke', this.connStrokeBackup_);
         this.ignoreMouseEvents(false);
         this.dispatchDetachedEvent({
           'type': anychart.enums.EventType.ANIMATION_END,
