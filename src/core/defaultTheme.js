@@ -2183,8 +2183,7 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
       'separator': {
         'enabled': true
       },
-      'zIndex': 100,
-      'allowLeaveChart': false
+      'zIndex': 100
     },
     'labels': {
       'enabled': true,

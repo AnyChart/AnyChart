@@ -1689,9 +1689,9 @@ anychart.ganttModule.BaseGrid.prototype.mouseWheelHandler_ = function(e) {
   var scrollsVertically = Math.abs(dy) > 0;
   var scrollsHorizontally = Math.abs(dx) > 0;
 
-  if (goog.userAgent.WINDOWS) {
-    dx = dx * 15;
-    dy = dy * 15;
+  if (goog.userAgent.WINDOWS || goog.userAgent.GECKO) {
+    dx = dx * 18;
+    dy = dy * 18;
   }
 
   var denyBodyScrollLeft = !anychart.document['body']['scrollLeft'];

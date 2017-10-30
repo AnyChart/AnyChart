@@ -1791,6 +1791,8 @@ anychart.ganttModule.DataGrid.Button = function(dataGrid) {
     this.draw();
   });
 
+  this.setParentEventTarget(this.dataGrid_);
+
 };
 goog.inherits(anychart.ganttModule.DataGrid.Button, anychart.core.ui.Button);
 

@@ -25,8 +25,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       'isStandalone': false,
       'backgroundFill': 'none',
       'tooltip': {
-        'zIndex': 100,
-        'allowLeaveChart': false
+        'zIndex': 100
       }
     },
     'timeline': {
