@@ -372,7 +372,7 @@ anychart.ganttModule.Scale.prototype.setDataRange = function(min, max) {
 
 
 /**
- * Gets minimum and maximum dates set for scale.
+ * Gets minimum and maximum visible dates set for scale.
  * @return {{min: number, max: number}}
  */
 anychart.ganttModule.Scale.prototype.getRange = function() {
@@ -1172,6 +1172,8 @@ anychart.ganttModule.Scale.prototype.setupByJSON = function(config, opt_default)
   proto['maximum'] = proto.maximum;
   proto['softMinimum'] = proto.softMinimum;
   proto['softMaximum'] = proto.softMaximum;
+  proto['getRange'] = proto.getRange;
+  proto['getTotalRange'] = proto.getTotalRange;
   // proto['zoomIn'] = proto.zoomIn;
   // proto['zoomOut'] = proto.zoomOut;
   // proto['zoomTo'] = proto.zoomTo;
