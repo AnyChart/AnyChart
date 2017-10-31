@@ -3,6 +3,8 @@ goog.provide('anychart.core.ui.Crosshair');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.settings');
 goog.require('anychart.core.ui.CrosshairLabel');
+goog.require('anychart.core.utils.TokenParser');
+goog.require('anychart.format.Context');
 goog.require('goog.array');
 
 
@@ -668,7 +670,9 @@ anychart.core.ui.Crosshair.prototype.drawLabel_ = function(axis, mouseX, mouseY,
     var ratio = scale.transform(scale.inverseTransform(providedRatio), .5); //aligning
 
     var provider = this.getLabelsFormatProvider(axis, isHorizontal ? ratio : 1 - ratio);
-    var labelFormat = label.format() || anychart.utils.DEFAULT_FORMATTER;
+    var labelFormat = /** @type {string|Function} */(label.getOption('format') || anychart.utils.DEFAULT_FORMATTER);
+    if (goog.isString(labelFormat))
+      labelFormat = anychart.core.utils.TokenParser.getInstance().getFormat(labelFormat);
     label.text(labelFormat.call(provider, provider));
     var labelPosition = this.getLabelPosition_(axis, label, side, start, ratio);
     label.x(/** @type {number}*/(labelPosition.x)).y(/** @type {number}*/(labelPosition.y));
@@ -819,6 +823,7 @@ anychart.core.ui.Crosshair.prototype.getLabelsFormatProvider = function(axis, ra
   var scaleValue = scale.inverseTransform(ratio);
 
   var labelText;
+  var labelType = anychart.enums.TokenType.NUMBER;
   switch (scaleType) {
     case anychart.enums.ScaleTypes.LINEAR:
     case anychart.enums.ScaleTypes.LOG:
@@ -826,22 +831,27 @@ anychart.core.ui.Crosshair.prototype.getLabelsFormatProvider = function(axis, ra
       break;
     case anychart.enums.ScaleTypes.ORDINAL:
       labelText = String(scaleValue);
+      labelType = anychart.enums.TokenType.STRING;
       break;
     case anychart.enums.ScaleTypes.STOCK_SCATTER_DATE_TIME:
     case anychart.enums.ScaleTypes.STOCK_ORDINAL_DATE_TIME:
     case anychart.enums.ScaleTypes.DATE_TIME:
       labelText = anychart.format.date(scaleValue);
+      labelType = anychart.enums.TokenType.STRING; // date already formatted
       break;
   }
 
-  return {
-    'value': labelText,
-    'rawValue': scaleValue,
-    'max': scale.max ? scale.max : null,
-    'min': scale.min ? scale.min : null,
-    'scale': scale,
-    'tickValue': scaleValue
+  var values = {
+    'value': {value: labelText, type: labelType}, // because labelText - already formatted value
+    'rawValue': {value: scaleValue, type: anychart.enums.TokenType.NUMBER},
+    'max': {value: goog.isDef(scale.max) ? scale.max : null, type: anychart.enums.TokenType.NUMBER},
+    'min': {value: goog.isDef(scale.min) ? scale.min : null, type: anychart.enums.TokenType.NUMBER},
+    'scale': {value: scale, type: anychart.enums.TokenType.UNKNOWN},
+    'tickValue': {value: scaleValue, type: anychart.enums.TokenType.NUMBER}
   };
+
+  var context = new anychart.format.Context(values);
+  return context.propagate();
 };
 
 

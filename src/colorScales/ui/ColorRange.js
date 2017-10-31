@@ -253,8 +253,8 @@ anychart.colorScalesModule.ui.ColorRange.prototype.getLabelsFormatProvider = fun
   provider['index'] = index;
   provider['value'] = labelText;
   provider['tickValue'] = labelValue;
-  provider['max'] = scale.max ? scale.max : null;
-  provider['min'] = scale.min ? scale.min : null;
+  provider['max'] = goog.isDef(scale.max) ? scale.max : null;
+  provider['min'] = goog.isDef(scale.min) ? scale.min : null;
   provider['scale'] = scale;
 
   return provider;

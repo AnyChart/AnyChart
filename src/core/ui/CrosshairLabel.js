@@ -61,7 +61,7 @@ anychart.core.ui.CrosshairLabel.DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'format',
-      anychart.core.settings.functionNormalizer);
+      anychart.core.settings.stringOrFunctionNormalizer);
 
   return map;
 })();
