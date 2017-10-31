@@ -2284,7 +2284,7 @@ anychart.core.Chart.prototype.handleMouseOverAndMove = function(event) {
   if (series && !series.isDisposed() && series.enabled() && goog.isFunction(series.makePointEvent)) {
     var evt = series.makePointEvent(event);
 
-    if (series.supportsOutliers && series.supportsOutliers() && goog.isNumber(evt['pointIndex']))
+    if (goog.isDefAndNotNull(evt) && goog.isNumber(evt['pointIndex']) && !isNaN(evt['pointIndex']))
       index = evt['pointIndex'];
     if (evt && ((anychart.utils.checkIfParent(/** @type {!goog.events.EventTarget} */(series), event['relatedTarget'])) || series.dispatchEvent(evt))) {
       if (interactivity.hoverMode() == anychart.enums.HoverMode.SINGLE) {

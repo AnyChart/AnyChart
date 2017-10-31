@@ -813,11 +813,11 @@ anychart.core.ui.LabelsFactory.prototype.add = function(formatProvider, position
 
     if (goog.isDef(index)) {
       this.labels_[index] = label;
-      label.setIndex(index);
     } else {
       this.labels_.push(label);
-      label.setIndex(this.labels_.length - 1);
+      index = this.labels_.length - 1;
     }
+    label.setIndex(index);
   }
 
   label.formatProvider(formatProvider);

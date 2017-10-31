@@ -84,6 +84,9 @@ anychart.treemapModule.Chart = function(opt_data, opt_fillMethod) {
    */
   this.state = new anychart.core.utils.InteractivityState(this);
 
+  this.labelToPointIndex_ = {};
+  this.markerToPointIndex_ = {};
+
   this.data(opt_data, opt_fillMethod);
 
   var normalDescriptorsMeta = {};
@@ -156,8 +159,6 @@ anychart.treemapModule.Chart.prototype.SUPPORTED_SIGNALS =
 anychart.treemapModule.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.SeparateChart.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.TREEMAP_DATA |
-    anychart.ConsistencyState.TREEMAP_LABELS |
-    anychart.ConsistencyState.TREEMAP_MARKERS |
     anychart.ConsistencyState.TREEMAP_COLOR_SCALE |
     anychart.ConsistencyState.TREEMAP_COLOR_RANGE |
     anychart.ConsistencyState.TREEMAP_NODE_TYPES |
@@ -349,6 +350,31 @@ anychart.treemapModule.Chart.prototype.makeBrowserEvent = function(e) {
 
 
 /**
+ * @param {number} labelIndex
+ * @param {boolean} isHeader
+ * @return {?number}
+ * @private
+ */
+anychart.treemapModule.Chart.prototype.getPointIndexByLabelIndex_ = function(labelIndex, isHeader) {
+  if (goog.isDef(labelIndex) && this.labelToPointIndex_)
+    return this.labelToPointIndex_[(isHeader ? 'h' : 'l') + labelIndex];
+  return null;
+};
+
+
+/**
+ * @param {number} markerIndex
+ * @return {?number}
+ * @private
+ */
+anychart.treemapModule.Chart.prototype.getPointIndexByMarkerIndex_ = function(markerIndex) {
+  if (goog.isDef(markerIndex) && this.markerToPointIndex_)
+    return this.markerToPointIndex_[markerIndex];
+  return null;
+};
+
+
+/**
  * Patches the original source event to maintain pointIndex support for
  * browser events.
  * @param {anychart.core.MouseEvent} event
@@ -386,9 +412,9 @@ anychart.treemapModule.Chart.prototype.makePointEvent = function(event) {
   if ('pointIndex' in event) {
     pointIndex = event['pointIndex'];
   } else if ('labelIndex' in event) {
-    pointIndex = event['labelIndex'];
+    pointIndex = this.getPointIndexByLabelIndex_(event['labelIndex'], event['target'] === this.normal().headers());
   } else if ('markerIndex' in event) {
-    pointIndex = event['markerIndex'];
+    pointIndex = this.getPointIndexByMarkerIndex_(event['markerIndex']);
   }
   pointIndex = anychart.utils.toNumber(pointIndex);
   event['pointIndex'] = pointIndex;
@@ -480,11 +506,18 @@ anychart.treemapModule.Chart.prototype.handleMouseDown = function(event) {
   var tag = anychart.utils.extractTag(event['domTarget']);
 
   var series, index;
-  if (anychart.utils.instanceOf(event['target'], anychart.core.ui.LabelsFactory) || anychart.utils.instanceOf(event['target'], anychart.core.ui.MarkersFactory)) {
+  var isLabels = anychart.utils.instanceOf(event['target'], anychart.core.ui.LabelsFactory);
+  var isMarkers = anychart.utils.instanceOf(event['target'], anychart.core.ui.MarkersFactory);
+  if (isLabels || isMarkers) {
     var parent = event['target'].getParentEventTarget();
     if (parent.isSeries && parent.isSeries())
       series = parent;
-    index = tag;
+    if (isLabels) {
+      var isHeader = (event['target'] === this.normal().headers());
+      index = this.labelToPointIndex_[(isHeader ? 'h' : 'l') + tag];
+    } else if (isMarkers) {
+      index = this.markerToPointIndex_[tag];
+    }
   } else {
     series = tag && tag.series;
     index = goog.isNumber(tag.index) ? tag.index : event['pointIndex'];
@@ -649,9 +682,26 @@ anychart.treemapModule.Chart.SORT_ASC = function(node1, node2) {
 
 
 /**
+ *  Reset label and marker indexes meta.
+ */
+anychart.treemapModule.Chart.prototype.resetIndexMeta = function() {
+  for (var i = 0; i < this.linearNodes_.length; i++) {
+    var node = this.linearNodes_[i];
+    if (node) {
+      node.meta('labelIndex', void 0);
+      node.meta('markerIndex', void 0);
+    }
+  }
+  this.labelToPointIndex_ = {};
+  this.markerToPointIndex_ = {};
+};
+
+
+/**
  * Resets data variables.
  */
 anychart.treemapModule.Chart.prototype.resetDataVars = function() {
+  this.resetIndexMeta();
   this.linearIndex_ = 0;
   this.linearNodes_ = [];
   this.drawingNodes_ = [];
@@ -669,16 +719,34 @@ anychart.treemapModule.Chart.prototype.resetDataVars = function() {
  */
 anychart.treemapModule.Chart.prototype.data = function(opt_value, opt_fillMethod) {
   if (goog.isDef(opt_value)) {
-    if (anychart.utils.instanceOf(opt_value, anychart.treeDataModule.Tree) || anychart.utils.instanceOf(opt_value, anychart.treeDataModule.View)) {
-      if (opt_value != this.data_)
+    if (anychart.utils.instanceOf(opt_value, anychart.treeDataModule.Tree) ||
+        anychart.utils.instanceOf(opt_value, anychart.treeDataModule.View)) {
+      if (opt_value != this.data_) {
+        if (this.data_)
+          this.data_.unlistenSignals(this.dataInvalidated_, this);
         this.data_ = /** @type {anychart.treeDataModule.Tree|anychart.treeDataModule.View} */(opt_value);
+        this.data_.listenSignals(this.dataInvalidated_, this);
+      }
     } else {
+      if (this.data_)
+        this.data_.unlistenSignals(this.dataInvalidated_, this);
       this.data_ = new anychart.treeDataModule.Tree(/** @type {Array.<Object>} */(opt_value), opt_fillMethod);
+      this.data_.listenSignals(this.dataInvalidated_, this);
     }
     this.invalidate(anychart.ConsistencyState.TREEMAP_DATA | anychart.ConsistencyState.CHART_LABELS, anychart.Signal.NEEDS_REDRAW);
     return this;
   }
   return this.data_;
+};
+
+
+/**
+ * @param {anychart.SignalEvent} event
+ * @private
+ */
+anychart.treemapModule.Chart.prototype.dataInvalidated_ = function(event) {
+  if (event.hasSignal(anychart.Signal.DATA_CHANGED))
+    this.invalidate(anychart.ConsistencyState.TREEMAP_DATA | anychart.ConsistencyState.CHART_LABELS, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -1412,14 +1480,14 @@ anychart.treemapModule.Chart.prototype.createTooltipContextProvider = function()
 
 /**
  * Creates position provider for point.
- * @param {anychart.enums.Anchor} anchor Label anchor.
+ * @param {anychart.enums.Position} position Label position.
  * @return {*} Position provider.
  */
-anychart.treemapModule.Chart.prototype.createPositionProvider = function(anchor) {
+anychart.treemapModule.Chart.prototype.createPositionProvider = function(position) {
   var bounds = /** @type {anychart.math.Rect} */ (this.getIterator().meta(anychart.treemapModule.Chart.DataFields.POINT_BOUNDS));
-  anchor = anychart.enums.normalizeAnchor(anchor);
+  position = anychart.enums.normalizePosition(position);
   return {
-    'value': anychart.utils.getCoordinateByAnchor(bounds, anchor)
+    'value': anychart.utils.getCoordinateByAnchor(bounds, position)
   };
 };
 
@@ -1428,9 +1496,10 @@ anychart.treemapModule.Chart.prototype.createPositionProvider = function(anchor)
  * Returns label/header anchor value.
  * @param {anychart.PointState|number} pointState Point state.
  * @param {boolean} isHeader whether factory should be for headers.
- * @return {anychart.enums.Anchor} Labels or headers anchor.
+ * @param {string} type Position or anchor.
+ * @return {anychart.enums.Anchor|anychart.enums.Position} Labels or headers anchor/position.
  */
-anychart.treemapModule.Chart.prototype.getLabelsAnchor = function(pointState, isHeader) {
+anychart.treemapModule.Chart.prototype.getLabelsAnchorOrPosition = function(pointState, isHeader, type) {
   var node = /** @type {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} */ (this.getIterator().getItem());
 
   var factory;
@@ -1465,29 +1534,29 @@ anychart.treemapModule.Chart.prototype.getLabelsAnchor = function(pointState, is
   var hoverPointLabel = hovered ? anychart.utils.getFirstDefinedValue(pointHoveredLabel, node.get(hoverLabelType)) : null;
   var selectPointLabel = selected ? anychart.utils.getFirstDefinedValue(pointSelectedLabel, node.get(selectLabelType)) : null;
 
-  var labelAnchor = pointLabel && pointLabel['anchor'] ? pointLabel['anchor'] : null;
-  var labelHoverAnchor = hoverPointLabel && hoverPointLabel['anchor'] ? hoverPointLabel['anchor'] : null;
-  var labelSelectAnchor = selectPointLabel && selectPointLabel['anchor'] ? selectPointLabel['anchor'] : null;
+  var labelAnchor = pointLabel && pointLabel[type] ? pointLabel[type] : null;
+  var labelHoverAnchor = hoverPointLabel && hoverPointLabel[type] ? hoverPointLabel[type] : null;
+  var labelSelectAnchor = selectPointLabel && selectPointLabel[type] ? selectPointLabel[type] : null;
 
   return /** @type {anychart.enums.Anchor} */(hovered || selected ?
       hovered ?
           labelHoverAnchor ?
               labelHoverAnchor :
-              hoverFactory.getOption('anchor') ?
-                  hoverFactory.getOption('anchor') :
+              hoverFactory.getOption(type) ?
+                  hoverFactory.getOption(type) :
                   labelAnchor ?
                       labelAnchor :
-                      factory.getOption('anchor') :
+                      factory.getOption(type) :
           labelSelectAnchor ?
               labelSelectAnchor :
-              selectFactory.getOption('anchor') ?
-                  selectFactory.getOption('anchor') :
+              selectFactory.getOption(type) ?
+                  selectFactory.getOption(type) :
                   labelAnchor ?
                       labelAnchor :
-                      factory.getOption('anchor') :
+                      factory.getOption(type) :
       labelAnchor ?
           labelAnchor :
-          factory.getOption('anchor'));
+          factory.getOption(type));
 };
 
 
@@ -1558,7 +1627,6 @@ anychart.treemapModule.Chart.prototype.drawMarker_ = function(pointState) {
   var hoverMarkers = this.hovered().markers();
   var selectMarkers = this.selected().markers();
 
-  var index = /** @type {number} */ (node.meta('index'));
   var markersFactory = /** @type {anychart.core.ui.MarkersFactory} */ (markers);
   if (selected) {
     markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(selectMarkers);
@@ -1583,7 +1651,8 @@ anychart.treemapModule.Chart.prototype.drawMarker_ = function(pointState) {
   var hoverPointMarker = anychart.utils.getFirstDefinedValue(pointHoveredMarker, node.get(hoverMarkerType));
   var selectPointMarker = anychart.utils.getFirstDefinedValue(pointSelectedMarker, node.get(selectMarkerType));
 
-  var marker = markers.getMarker(index);
+  var markerIndex = /** @type {number} */(node.meta('markerIndex'));
+  var marker = goog.isDef(markerIndex) ? markers.getMarker(markerIndex) : null;
 
   var markerEnabledState = pointMarker && goog.isDef(pointMarker['enabled']) ? pointMarker['enabled'] : null;
   var markerHoverEnabledState = hoverPointMarker && goog.isDef(hoverPointMarker['enabled']) ? hoverPointMarker['enabled'] : null;
@@ -1614,7 +1683,9 @@ anychart.treemapModule.Chart.prototype.drawMarker_ = function(pointState) {
     if (marker) {
       marker.positionProvider(positionProvider);
     } else {
-      marker = markers.add(positionProvider, index);
+      marker = markers.add(positionProvider);
+      node.meta('markerIndex', marker.getIndex());
+      this.markerToPointIndex_[marker.getIndex()] = node.meta('index');
     }
 
     marker.resetSettings();
@@ -1624,17 +1695,8 @@ anychart.treemapModule.Chart.prototype.drawMarker_ = function(pointState) {
     //return marker;
   } else if (marker) {
     markers.clear(marker.getIndex());
+    node.meta('markerIndex', void 0);
   }
-};
-
-
-/**
- * Empty text formatter.
- * Need to control enabled=false behaviour on headers labels.
- * @return {string} Empty string.
- */
-anychart.treemapModule.Chart.EMPTY_TEXT_FORMATTER = function() {
-  return '';
 };
 
 
@@ -1646,7 +1708,9 @@ anychart.treemapModule.Chart.EMPTY_TEXT_FORMATTER = function() {
  * @private
  */
 anychart.treemapModule.Chart.prototype.noHeader_ = function(setting, factory) {
-  return /** @type {boolean} */ (!(setting && goog.isDefAndNotNull(setting['enabled'])) && (goog.isNull(setting) || (setting && goog.isDef(setting['enabled']) && setting['enabled'] === null) || factory.enabled() === null));
+  var disabledData = goog.isNull(setting) || (setting && goog.isDef(setting['enabled']) && !setting['enabled']) || (goog.isBoolean(setting) && !setting);
+  var disabledFactory = !factory.enabled();
+  return /** @type {boolean} */(disabledData || disabledFactory);
 };
 
 
@@ -1683,7 +1747,8 @@ anychart.treemapModule.Chart.prototype.configureLabel = function(pointState, isH
   var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
   var hovered = !selected && this.state.isStateContains(pointState, anychart.PointState.HOVER);
 
-  var label = factory.getLabel(index);
+  var labelIndex = /** @type {number} */(node.meta('labelIndex'));
+  var label = goog.isDef(labelIndex) ? factory.getLabel(labelIndex) : null;
 
   var labelsFactory, stateFactory = null;
   if (selected) {
@@ -1733,15 +1798,17 @@ anychart.treemapModule.Chart.prototype.configureLabel = function(pointState, isH
             labelEnabledState;
 
   if (isDraw) {
-    var anchor = this.getLabelsAnchor(pointState, isHeader);
-    var positionProvider = this.createPositionProvider(anchor);
+    var position = /** @type {anychart.enums.Position} */(this.getLabelsAnchorOrPosition(pointState, isHeader, 'position'));
+    var positionProvider = this.createPositionProvider(position);
     var formatProvider = this.createFormatProvider();
     if (label) {
       factory.dropCallsCache(index);
       label.formatProvider(formatProvider);
       label.positionProvider(positionProvider);
     } else {
-      label = factory.add(formatProvider, positionProvider, index);
+      label = factory.add(formatProvider, positionProvider);
+      node.meta('labelIndex', label.getIndex());
+      this.labelToPointIndex_[(isHeader ? 'h' : 'l') + label.getIndex()] = node.meta('index');
     }
 
     label.resetSettings();
@@ -1750,6 +1817,7 @@ anychart.treemapModule.Chart.prototype.configureLabel = function(pointState, isH
     return label;
   } else if (label) {
     factory.clear(label.getIndex());
+    node.meta('labelIndex', void 0);
   }
 
   return null;
@@ -1763,8 +1831,7 @@ anychart.treemapModule.Chart.prototype.configureLabel = function(pointState, isH
  */
 anychart.treemapModule.Chart.prototype.drawLabel_ = function(pointState) {
   var node = /** @type {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} */ (this.getIterator().getItem());
-  var bounds = /** @type {anychart.math.Rect} */ (node.meta(anychart.treemapModule.Chart.DataFields.POINT_BOUNDS));
-  var index = /** @type {number} */ (node.meta('index'));
+  var pointBounds = /** @type {anychart.math.Rect} */ (node.meta(anychart.treemapModule.Chart.DataFields.POINT_BOUNDS));
   var type = node.meta(anychart.treemapModule.Chart.DataFields.TYPE);
   var isHeader;
 
@@ -1776,27 +1843,10 @@ anychart.treemapModule.Chart.prototype.drawLabel_ = function(pointState) {
     return;
 
   var factory;
-  var hoverFactory;
-  var selectFactory;
   if (isHeader) {
     factory = this.normal().headers();
-    hoverFactory = this.hovered().headers();
-    selectFactory = null;
   } else {
     factory = this.normal().labels();
-    hoverFactory = this.hovered().labels();
-    selectFactory = this.selected().labels();
-  }
-  var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
-  var hovered = !selected && this.state.isStateContains(pointState, anychart.PointState.HOVER);
-  /** @type {anychart.core.ui.LabelsFactory} */
-  var labelsFactory;
-  if (selected) {
-    labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(selectFactory);
-  } else if (hovered) {
-    labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(hoverFactory);
-  } else {
-    labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(factory);
   }
 
   var displayMode = isHeader ? this.getOption('headersDisplayMode') : this.getOption('labelsDisplayMode');
@@ -1807,8 +1857,8 @@ anychart.treemapModule.Chart.prototype.drawLabel_ = function(pointState) {
     var needAdjust = (mergedSettings['adjustByHeight'] || mergedSettings['adjustByHeight']);
     if (needAdjust && factory.adjustFontSizeMode() == anychart.enums.AdjustFontSizeMode.SAME) {
       fontSize = /** @type {number} */ (label.calculateFontSize(
-          bounds.width,
-          bounds.height,
+          pointBounds.width,
+          pointBounds.height,
           mergedSettings['minFontSize'],
           mergedSettings['maxFontSize'],
           mergedSettings['adjustByWidth'],
@@ -1827,58 +1877,32 @@ anychart.treemapModule.Chart.prototype.drawLabel_ = function(pointState) {
     var measuredBounds = factory.measure(label.formatProvider(), label.positionProvider(), mergedSettings);
     //measuredBounds = mergedSettings['padding'].widenBounds(measuredBounds);
 
-    var outOfCellBounds = !(bounds.left <= measuredBounds.left &&
-            bounds.getRight() >= measuredBounds.getRight() &&
-            bounds.top <= measuredBounds.top &&
-            bounds.getBottom() >= measuredBounds.getBottom());
-
-    var dropText = false;
-    var format;
-    if (outOfCellBounds) {
-      if (displayMode == anychart.enums.LabelsDisplayMode.DROP) {
-        if (isHeader) {
-          dropText = true;
-          format = labelsFactory.getFormat();
-          labelsFactory['format'](anychart.treemapModule.Chart.EMPTY_TEXT_FORMATTER);
-          label['width'](bounds.width);
-          label['height'](bounds.height);
-        } else
-          factory.clear(index);
-      } else {
-        if (label.width() != measuredBounds.width || label.height() != measuredBounds.height) {
-          label.dropMergedSettings();
-          label['width'](bounds.width);
-          label['height'](bounds.height);
-        }
-      }
-    } else {
-      label['width'](bounds.width);
-      label['height'](bounds.height);
-    }
-
-    if (displayMode != anychart.enums.LabelsDisplayMode.ALWAYS_SHOW) {
-      label['clip'](bounds);
-    } else {
-      label['clip'](null);
-    }
+    var outOfCellBounds = !(pointBounds.left <= measuredBounds.left &&
+            pointBounds.getRight() >= measuredBounds.getRight() &&
+            pointBounds.top <= measuredBounds.top &&
+            pointBounds.getBottom() >= measuredBounds.getBottom());
 
     if (isHeader) {
-      var emptyText = false;
-      if (goog.isDef(label.enabled()) && !hovered) {
-        emptyText = !label.enabled();
-      } else {
-        emptyText = !labelsFactory.enabled();
-      }
-      if (emptyText) {
-        format = labelsFactory.getFormat();
-        labelsFactory['format'](anychart.treemapModule.Chart.EMPTY_TEXT_FORMATTER);
-        label.enabled(true);
+      label['width'](pointBounds.width);
+      label['height'](pointBounds.height);
+    }
+
+    if (outOfCellBounds) {
+      if (displayMode == anychart.enums.LabelsDisplayMode.DROP) {
+        factory.clear(label.getIndex());
+        node.meta('labelIndex', void 0);
+        label = null;
       }
     }
 
-    label.draw();
-    if (dropText || emptyText) {
-      labelsFactory.setFormat(/** @type {?Function} */ (format));
+    if (label) {
+      if (displayMode != anychart.enums.LabelsDisplayMode.ALWAYS_SHOW) {
+        label['clip'](pointBounds);
+      } else {
+        label['clip'](null);
+      }
+
+      label.draw();
     }
   }
 };
@@ -2312,6 +2336,7 @@ anychart.treemapModule.Chart.prototype.drawContent = function(bounds) {
     normal.headers().clear();
     normal.labels().clear();
     normal.markers().clear();
+    this.resetIndexMeta();
 
     var sort = /** @type {anychart.enums.Sort} */ (this.getOption('sort'));
     if (sort == anychart.enums.Sort.DESC) {
