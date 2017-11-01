@@ -1755,6 +1755,32 @@ anychart.charts.Venn.prototype.drawMarker_ = function(state, iterator) {
 
 
 //endregion
+//region --- CSV
+//------------------------------------------------------------------------------
+//
+//  CSV
+//
+//------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.charts.Venn.prototype.getCsvGrouperColumn = function() {
+  return ['x'];
+};
+
+
+/** @inheritDoc */
+anychart.charts.Venn.prototype.getCsvGrouperValue = function(iterator) {
+  return iterator.get('x');
+};
+
+
+/** @inheritDoc */
+anychart.charts.Venn.prototype.getCsvGrouperAlias = function(iterator) {
+  var res = iterator.get('name');
+  return goog.isString(res) ? res : null;
+};
+
+
+//endregion
 //region -- Serialization/Deserialization
 /**
  * Sets default settings.

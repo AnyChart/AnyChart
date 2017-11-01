@@ -7,6 +7,7 @@ goog.require('anychart.core.pert.Tasks');
 goog.require('anychart.core.ui.Tooltip');
 goog.require('anychart.core.utils.TypedLayer');
 goog.require('anychart.data.Tree');
+goog.require('anychart.data.treeUtils');
 goog.require('anychart.format.Context');
 goog.require('goog.array');
 
@@ -425,12 +426,6 @@ anychart.charts.Pert.ARROW_BOTTOM = 3;
 /** @inheritDoc */
 anychart.charts.Pert.prototype.getType = function() {
   return anychart.enums.ChartTypes.PERT;
-};
-
-
-/** @inheritDoc */
-anychart.charts.Pert.prototype.usesTreeData = function() {
-  return true;
 };
 
 
@@ -2955,6 +2950,13 @@ anychart.charts.Pert.prototype.labelsEnabled_ = function(labelsFactory, defaultV
 //  Serialization / deserialization / disposing
 //
 //----------------------------------------------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.charts.Pert.prototype.toCsv = function(opt_chartDataExportMode, opt_csvSettings) {
+  return anychart.data.treeUtils.toCsv(
+      /** @type {anychart.data.Tree|anychart.data.TreeView} */(this.data()), opt_csvSettings);
+};
+
+
 /** @inheritDoc */
 anychart.charts.Pert.prototype.disposeInternal = function() {
   this.startActivities_.length = 0;

@@ -1,6 +1,7 @@
 goog.provide('anychart.data.Set');
 
 goog.require('anychart.core.Base');
+goog.require('anychart.data.IDataSource');
 goog.require('anychart.data.IView');
 goog.require('anychart.data.Mapping');
 goog.require('anychart.data.csv.Parser');
@@ -122,6 +123,7 @@ goog.require('goog.array');
  *    here as a hash map.
  * @constructor
  * @implements {anychart.data.IView}
+ * @implements {anychart.data.IDataSource}
  * @extends {anychart.core.Base}
  */
 anychart.data.Set = function(opt_data, opt_settings) {
@@ -340,6 +342,16 @@ anychart.data.Set.prototype.row = function(rowIndex, opt_value) {
 
 
 /**
+ * Returns row by index.
+ * @param {number} rowIndex
+ * @return {*}
+ */
+anychart.data.Set.prototype.getRow = function(rowIndex) {
+  return this.row(rowIndex);
+};
+
+
+/**
  * Appends new rows to the set. Each argument is a row that will be appended to the Set.
  * @example
  * var chart = anychart.column();
@@ -463,6 +475,32 @@ anychart.data.Set.prototype.checkFieldExist = function(nameOrColumn) {
   if (goog.isNumber(nameOrColumn))
     return this.largestSeenRowLength_ > nameOrColumn;
   return !!(this.objectFieldsSeen_ && this.objectFieldsSeen_[nameOrColumn]);
+};
+
+
+/**
+ * Populates passed object with field names known to the storage and returns the new number of fields in it.
+ * @param {Object} result
+ * @param {number} resultLength
+ * @return {number}
+ */
+anychart.data.Set.prototype.populateObjWithKnownFields = function(result, resultLength) {
+  var i;
+  for (i = 0; i < this.largestSeenRowLength_; i++) {
+    populate(i);
+  }
+  if (this.objectFieldsSeen_)
+    for (i in this.objectFieldsSeen_)
+      populate(i);
+  if (this.simpleValuesSeen_) {
+    populate('value');
+  }
+  return resultLength;
+
+  function populate(i) {
+    if (!(i in result))
+      result[i] = resultLength++;
+  }
 };
 
 

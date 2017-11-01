@@ -3,6 +3,7 @@ goog.provide('anychart.data.TableMainStorage');
 goog.provide('anychart.data.TableStorage');
 
 goog.require('anychart.core.reporting');
+goog.require('anychart.data.IDataSource');
 goog.require('anychart.data.TableRow');
 goog.require('anychart.data.csv.Parser');
 goog.require('anychart.data.csv.TableItemsProcessor');
@@ -16,6 +17,7 @@ goog.require('goog.array');
  * Table storage representation.
  * @param {!anychart.data.Table} table Table reference.
  * @constructor
+ * @implements {anychart.data.IDataSource}
  */
 anychart.data.TableStorage = function(table) {
   /**
@@ -509,6 +511,31 @@ anychart.data.TableStorage.prototype.getKnownFields = goog.abstractMethod;
 
 
 /**
+ * Populates passed object with field names known to the storage and returns the new number of fields in it.
+ * @param {Object} result
+ * @param {number} resultLength
+ * @return {number}
+ */
+anychart.data.TableStorage.prototype.populateObjWithKnownFields = function(result, resultLength) {
+  var i;
+  var knownFields = this.getKnownFields();
+  if (goog.isNumber(knownFields)) {
+    for (i = 0; i < knownFields; i++)
+      populate(i);
+  } else {
+    for (i in knownFields)
+      populate(i);
+  }
+  return resultLength;
+
+  function populate(i) {
+    if (!(i in result))
+      result[i] = resultLength++;
+  }
+};
+
+
+/**
  * Returns table row by index.
  * @param {number} index
  * @return {anychart.data.TableRow}
@@ -924,6 +951,15 @@ anychart.data.TableMainStorage = function(table, opt_keyColumn, opt_dateTimePatt
   this.objectFieldsSeen_ = null;
 };
 goog.inherits(anychart.data.TableMainStorage, anychart.data.TableStorage);
+
+
+/**
+ * Returns a DT pattern used to parse X values of the storage.
+ * @return {string|null|undefined}
+ */
+anychart.data.TableMainStorage.prototype.getDTPattern = function() {
+  return this.dtPattern_;
+};
 
 
 /**

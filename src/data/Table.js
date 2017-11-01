@@ -398,6 +398,15 @@ anychart.data.Table.prototype.getRightMostFieldByComputerIndex = function(index)
 };
 
 
+/**
+ * Returns a DT pattern used to parse X values of the table.
+ * @return {string}
+ */
+anychart.data.Table.prototype.getDTPatten = function() {
+  return this.storage_.getDTPattern() || 'yyyy-MM-ddTHH:mm:ss.SSS';
+};
+
+
 /** @inheritDoc */
 anychart.data.Table.prototype.disposeInternal = function() {
   this.suspendSignalsDispatching();

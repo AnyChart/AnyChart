@@ -361,6 +361,12 @@ anychart.charts.LinearGauge.prototype.getAllSeries = function() {
 };
 
 
+/** @inheritDoc */
+anychart.charts.LinearGauge.prototype.getDataHolders = function() {
+  return [this];
+};
+
+
 /**
  * Creates pointer.
  * @param {string} type Pointer type.

@@ -2079,6 +2079,40 @@ anychart.core.ChartWithOrthogonalScales.prototype.selectByRect = function(marque
 
 
 //endregion
+//region --- CSV
+//------------------------------------------------------------------------------
+//
+//  CSV
+//
+//------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.core.ChartWithOrthogonalScales.prototype.getCsvExportRow = function(x, xAlias, data, xValues, id, index) {
+  return this.categorizeData ?
+    anychart.core.ChartWithOrthogonalScales.base(this, 'getCsvExportRow', x, xAlias, data, xValues, id, index) :
+    this.getCsvExportRowScatter(x, xAlias, data, xValues, id, index);
+};
+
+
+/** @inheritDoc */
+anychart.core.ChartWithOrthogonalScales.prototype.getCsvGrouperColumn = function() {
+  return ['x'];
+};
+
+
+/** @inheritDoc */
+anychart.core.ChartWithOrthogonalScales.prototype.getCsvGrouperValue = function(iterator) {
+  return iterator.get('x');
+};
+
+
+/** @inheritDoc */
+anychart.core.ChartWithOrthogonalScales.prototype.getCsvGrouperAlias = function(iterator) {
+  var res = iterator.get('name');
+  return goog.isString(res) ? res : null;
+};
+
+
+//endregion
 //region --- Serialization / Deserialization / Disposing
 //----------------------------------------------------------------------------------------------------------------------
 //
