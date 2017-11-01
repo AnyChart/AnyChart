@@ -4450,6 +4450,9 @@
       "properties": {
         "axisIndex": {
           "type": "number"
+        },
+        "format": {
+          "type": "string"
         }
       }
     },

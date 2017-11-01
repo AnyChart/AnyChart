@@ -1156,6 +1156,7 @@
         <xsd:attribute name="adjust_font_size" type="simple.Bool" default="false"/>
         <xsd:attribute name="rotation" type="xsd:double" default="0"/>
         <xsd:attribute name="axis_index" type="xsd:double" default="0"/>
+        <xsd:attribute name="format" type="xsd:string" default="0"/>
         <xsd:attributeGroup ref="attrs.TextSettings"/>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
     </xsd:complexType>
