@@ -875,8 +875,15 @@ anychart.core.ui.LabelBase.prototype.setupByJSON = function(config, opt_default)
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.ui.LabelBase.prototype.disposeInternal = function() {
-  goog.dispose(this.padding_);
-  goog.dispose(this.background_);
-  goog.dispose(this.textElement);
+  goog.disposeAll(
+      this.padding_,
+      this.background_,
+      this.textElement,
+      this.rootLayer_);
+
+  delete this.padding_;
+  delete this.background_;
+  delete this.textElement;
+  delete this.rootLayer_;
   anychart.core.ui.LabelBase.base(this, 'disposeInternal');
 };

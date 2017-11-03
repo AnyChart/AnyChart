@@ -33,20 +33,6 @@ anychart.core.ui.LabelsFactory = function() {
   delete this.themeSettings['enabled'];
 
   /**
-   * Labels background settings.
-   * @type {anychart.core.ui.Background}
-   * @private
-   */
-  this.background_ = null;
-
-  /**
-   * Labels padding settings.
-   * @type {anychart.core.utils.Padding}
-   * @private
-   */
-  this.padding_ = null;
-
-  /**
    * Labels layer.
    * @type {acgraph.vector.Layer}
    * @private
@@ -1199,15 +1185,15 @@ anychart.core.ui.LabelsFactory.prototype.disposeInternal = function() {
       this.freeToUseLabelsPool_,
       this.measureCustomLabel_,
       this.layer_,
-      this.background_,
-      this.padding_);
+      this.ownSettings['background'],
+      this.ownSettings['padding']);
 
   this.labels_ = null;
   this.freeToUseLabelsPool_ = null;
   this.measureCustomLabel_ = null;
   this.layer_ = null;
-  this.background_ = null;
-  this.padding_ = null;
+  this.ownSettings['background'] = null;
+  this.ownSettings['padding'] = null;
 
   anychart.core.ui.LabelsFactory.base(this, 'disposeInternal');
 };

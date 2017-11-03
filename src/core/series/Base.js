@@ -4283,7 +4283,8 @@ anychart.core.series.Base.prototype.disposeInternal = function() {
       this.selected_,
       this.tooltipInternal,
       this.legendItem_,
-      this.error_
+      this.error_,
+      this.renderingSettings_
   );
   this.rootLayer = null;
   this.errorPaths_ = null;
@@ -4299,6 +4300,7 @@ anychart.core.series.Base.prototype.disposeInternal = function() {
   delete this.tooltipInternal;
   delete this.legendItem_;
   delete this.error_;
+  delete this.renderingSettings_;
   anychart.core.series.Base.base(this, 'disposeInternal');
 };
 

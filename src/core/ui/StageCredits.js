@@ -537,8 +537,9 @@ anychart.core.ui.StageCredits.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.ui.StageCredits.prototype.disposeInternal = function() {
-  var imageLoader = acgraph.getRenderer().getImageLoader();
-  if (imageLoader) {
+  if (acgraph.getRenderer().isImageLoader()) {
+    var imageLoader = acgraph.getRenderer().getImageLoader();
+
     goog.events.unlisten(imageLoader, goog.events.EventType.LOAD, this.onImageLoadHandler_, false, this);
     goog.events.unlisten(imageLoader, goog.net.EventType.COMPLETE, this.onImageCompleteHandler_, false, this);
     goog.events.unlisten(imageLoader, goog.net.EventType.ERROR, this.onImageErrorHandler_, false, this);
