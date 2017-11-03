@@ -480,7 +480,10 @@ anychart.core.settings.simpleHandler = function(fieldName, deprecatedFieldName, 
  * @this {anychart.core.settings.IObjectWithSettings}
  */
 anychart.core.settings.simpleDeprecatedHandler = function(fieldName, deprecatedFieldName, normalizer, opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, [deprecatedFieldName + '()', fieldName + '()'], true);
+  if (fieldName)
+    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, [deprecatedFieldName + '()', fieldName + '()'], true);
+  else
+    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED_WITHOUT_REPLACEMENT, null, [deprecatedFieldName + '()'], true);
   return anychart.core.settings.simpleHandler.call(this, fieldName, deprecatedFieldName, normalizer, opt_value);
 };
 
@@ -536,7 +539,10 @@ anychart.core.settings.multiArgsHandler = function(fieldName, deprecatedFieldNam
  * @this {anychart.core.settings.IObjectWithSettings}
  */
 anychart.core.settings.multiArgsDeprecatedHandler = function(fieldName, deprecatedFieldName, arrayNormalizer, opt_value, var_args) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, [deprecatedFieldName + '()', fieldName + '()'], true);
+  if (fieldName)
+    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, [deprecatedFieldName + '()', fieldName + '()'], true);
+  else
+    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED_WITHOUT_REPLACEMENT, null, [deprecatedFieldName + '()'], true);
   return anychart.core.settings.multiArgsHandler.apply(this, arguments);
 };
 

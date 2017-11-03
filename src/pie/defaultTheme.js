@@ -16,7 +16,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'startAngle': 0,
     'explode': 15,
     'outsideLabelsCriticalAngle': 60,
-    'outsideLabelsSpace': 30,
+    // 'outsideLabelsSpace': 30,
     'insideLabelsOffset': '50%',
     'normal': {
       'labels': {

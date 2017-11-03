@@ -234,6 +234,9 @@ anychart.core.reporting.getWarningDescription_ = function(code, opt_arguments) {
       return (opt_arguments[3] || 'Method') + ' ' + opt_arguments[0] + ' is deprecated. Use ' + opt_arguments[1] + ' instead' +
           (opt_arguments[2] ? (opt_arguments[2] + '.') : '.');
 
+    case anychart.enums.WarningCode.DEPRECATED_WITHOUT_REPLACEMENT:
+      return (opt_arguments[3] || 'Method') + ' ' + opt_arguments[0] + ' is deprecated.';
+
     case anychart.enums.WarningCode.MISSING_PROJ4:
       return 'The projection that used cannot work correctly without Proj4. Please include Proj4 binary (https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.3.15/proj4.js) into your page, or use another projection';
 
