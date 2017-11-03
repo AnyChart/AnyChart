@@ -209,6 +209,15 @@ anychart.core.defaultTheme.returnValue = function() {
  * @this {*}
  * @return {*}
  */
+anychart.core.defaultTheme.returnValueAsIs = function() {
+  return this['value'];
+};
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
 anychart.core.defaultTheme.notRoundedValue = function() {
   return anychart.core.defaultTheme.locNum(this['value'], 10);
 };
@@ -2232,6 +2241,7 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
           'anchor': 'left-top',
           'fontSize': 10,
           'vAlign': 'middle',
+          'format': anychart.core.defaultTheme.returnValueAsIs,
           'padding': {
             'top': 0,
             'right': 5,
@@ -2251,6 +2261,7 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
           'anchor': 'left-top',
           'fontSize': 10,
           'vAlign': 'middle',
+          'format': anychart.core.defaultTheme.returnValueAsIs,
           'padding': {
             'top': 0,
             'right': 5,
@@ -2270,6 +2281,7 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
           'anchor': 'left-top',
           'fontSize': 10,
           'vAlign': 'middle',
+          'format': anychart.core.defaultTheme.returnValueAsIs,
           'padding': {
             'top': 0,
             'right': 5,
