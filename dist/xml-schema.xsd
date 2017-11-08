@@ -134,6 +134,7 @@
         <xsd:attribute name="context_menu" type="simple.Bool" default="true"/>
         <xsd:attribute name="select_marquee_fill" type="xsd:string"/>
         <xsd:attribute name="select_marquee_stroke" type="xsd:string"/>
+        <xsd:attribute name="auto_redraw" type="xsd:boolean"/>
         <!-- charts.TagCloud elements -->
         <xsd:attribute name="mode" type="xsd:string"/>
         <xsd:attribute name="angles_count" type="xsd:double"/>

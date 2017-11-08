@@ -1227,6 +1227,7 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'enabled': true,
     'padding': {'top': 10, 'right': 20, 'bottom': 15, 'left': 10},
     'margin': 0,
+    'autoRedraw': true,
     'background': {'enabled': true, 'zIndex': 1},
     'contextMenu': {
       'fromTheme': true, // suppress NO_FEATURE_IN_MODULE warning

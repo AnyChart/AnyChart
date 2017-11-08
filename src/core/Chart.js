@@ -1735,9 +1735,9 @@ anychart.core.Chart.prototype.specialDraw = function(bounds) {};
 
 
 /**
- * Define auto resize settings.
+ * Flag whether to automatically call chart.draw() on any changes or not.
  * @param {boolean=} opt_value
- * @return {!(boolean|anychart.core.Chart)} Auto resize settings or itself for chaining call.
+ * @return {!(boolean|anychart.core.Chart)} - Current value or itself for chaining.
  */
 anychart.core.Chart.prototype.autoRedraw = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -1746,6 +1746,8 @@ anychart.core.Chart.prototype.autoRedraw = function(opt_value) {
       this.autoRedrawIsSet_ = false;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      if (this.autoRedraw_)
+        this.draw();
     }
     return this;
   } else {
@@ -1935,6 +1937,8 @@ anychart.core.Chart.prototype.serialize = function() {
   json['margin'] = this.margin().serialize();
   json['padding'] = this.padding().serialize();
   json['a11y'] = this.a11y().serialize();
+  if (goog.isDef(this.autoRedraw_))
+    json['autoRedraw'] = this.autoRedraw_;
   var labels = [];
   for (var i = 0; i < this.chartLabels_.length; i++) {
     if (this.chartLabels_[i])
@@ -1966,6 +1970,10 @@ anychart.core.Chart.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.Chart.prototype.setupByJSON = function(config, opt_default) {
+  //Set this before another manipulations.
+  if ('autoRedraw' in config)
+    this.autoRedraw_ = config['autoRedraw']; //don't use method this.autoRedraw() to avoid calling draw().
+
   anychart.core.Chart.base(this, 'setupByJSON', config, opt_default);
 
   if ('defaultLabelSettings' in config)
@@ -1982,7 +1990,6 @@ anychart.core.Chart.prototype.setupByJSON = function(config, opt_default) {
 
   if ('margin' in config)
     this.margin(config['margin']);
-
 
   var labels = config['chartLabels'];
   if (goog.isArray(labels)) {
@@ -3759,6 +3766,7 @@ anychart.core.Chart.prototype.id = function(opt_value) {
   var proto = anychart.core.Chart.prototype;
   proto['a11y'] = proto.a11y;
   proto['animation'] = proto.animation;
+  proto['autoRedraw'] = proto.autoRedraw;
   proto['title'] = proto.title;//doc|ex
   proto['background'] = proto.background;//doc|ex
   proto['margin'] = proto.margin;//doc|ex

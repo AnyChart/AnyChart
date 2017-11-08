@@ -122,6 +122,7 @@
         },
         "margin": {"$ref": "#/definitions/anychart.core.utils.Space"},
         "padding": {"$ref": "#/definitions/anychart.core.utils.Space"},
+        "autoRedraw": {"$ref": "boolean"},
         "title": {
           "oneOf": [
             {"type": "string"},
