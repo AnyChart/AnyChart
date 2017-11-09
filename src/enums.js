@@ -3218,8 +3218,9 @@ anychart.enums.normalizeGaugeScaleTypes = function(value) {
  * @enum {string}
  */
 anychart.enums.ChartDataExportMode = {
+  DEFAULT: 'default',
   RAW: 'raw',
-  SPECIFIC: 'specific',
+  SELECTED: 'selected',
   GROUPED: 'grouped'
 };
 
@@ -3236,13 +3237,13 @@ anychart.enums.normalizeChartDataExportMode = function(opt_value) {
   switch (opt_value) {
     case 'raw':
       return anychart.enums.ChartDataExportMode.RAW;
-    case 'specific':
-      return anychart.enums.ChartDataExportMode.SPECIFIC;
+    case 'selected':
+      return anychart.enums.ChartDataExportMode.SELECTED;
     case 'grouped':
       return anychart.enums.ChartDataExportMode.GROUPED;
   }
 
-  return anychart.enums.ChartDataExportMode.SPECIFIC;
+  return anychart.enums.ChartDataExportMode.DEFAULT;
 };
 
 
@@ -6838,8 +6839,9 @@ goog.exportSymbol('anychart.enums.Statistics.Y_SCALES_MIN', anychart.enums.Stati
 goog.exportSymbol('anychart.enums.Statistics.Y_SCALES_MAX', anychart.enums.Statistics.Y_SCALES_MAX);
 
 goog.exportSymbol('anychart.enums.ChartDataExportMode.RAW', anychart.enums.ChartDataExportMode.RAW);
-goog.exportSymbol('anychart.enums.ChartDataExportMode.SPECIFIC', anychart.enums.ChartDataExportMode.SPECIFIC);
+goog.exportSymbol('anychart.enums.ChartDataExportMode.SELECTED', anychart.enums.ChartDataExportMode.SELECTED);
 goog.exportSymbol('anychart.enums.ChartDataExportMode.GROUPED', anychart.enums.ChartDataExportMode.GROUPED);
+goog.exportSymbol('anychart.enums.ChartDataExportMode.DEFAULT', anychart.enums.ChartDataExportMode.DEFAULT);
 
 goog.exportSymbol('anychart.enums.MapSeriesType.CHOROPLETH', anychart.enums.MapSeriesType.CHOROPLETH);
 goog.exportSymbol('anychart.enums.MapSeriesType.BUBBLE', anychart.enums.MapSeriesType.BUBBLE);

@@ -2340,6 +2340,27 @@ anychart.charts.Resource.ActivityIterator.prototype.meta = function(name, opt_va
 
 
 //endregion
+//region --- CSV
+//------------------------------------------------------------------------------
+//
+//  CSV
+//
+//------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.charts.Resource.prototype.getDataHolders = function() {
+  return [this];
+};
+
+
+/** @inheritDoc */
+anychart.charts.Resource.prototype.toCsv = function(opt_chartDataExportMode, opt_csvSettings) {
+  // only RAW is supported
+  var result = this.getRawCsvData();
+  return anychart.utils.serializeCsv(result.headers, result.data, opt_csvSettings);
+};
+
+
+//endregion
 //region --- Exports
 //------------------------------------------------------------------------------
 //

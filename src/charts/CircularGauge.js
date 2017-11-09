@@ -191,6 +191,12 @@ anychart.charts.CircularGauge.prototype.getAllSeries = function() {
 };
 
 
+/** @inheritDoc */
+anychart.charts.CircularGauge.prototype.getDataHolders = function() {
+  return [this];
+};
+
+
 /**
  * @inheritDoc
  */

@@ -5069,6 +5069,14 @@ anychart.charts.Map.prototype.legendItemOut = function(item, event) {
 
 //endregion
 //region --- Setup and Dispose
+/** @inheritDoc */
+anychart.charts.Map.prototype.toCsv = function(opt_chartDataExportMode, opt_csvSettings) {
+  // only RAW is supported
+  var result = this.getRawCsvData();
+  return anychart.utils.serializeCsv(result.headers, result.data, opt_csvSettings);
+};
+
+
 /**
  * Exports map to GeoJSON format.
  * @return {Object}
@@ -5328,6 +5336,7 @@ anychart.charts.Map.prototype.disposeInternal = function() {
   proto['unboundRegions'] = proto.unboundRegions;
   proto['geoIdField'] = proto.geoIdField;
   proto['toGeoJSON'] = proto.toGeoJSON;
+  proto['toCsv'] = proto.toCsv;
   //series constructors generated automatically
   // proto['choropleth'] = proto.choropleth;
   // proto['bubble'] = proto.bubble;

@@ -29,6 +29,8 @@ goog.require('anychart.scales');
 anychart.charts.Sparkline = function(opt_data, opt_csvSettings) {
   anychart.charts.Sparkline.base(this, 'constructor');
 
+  this.getCsvExportRow = this.getCsvExportRowScatter;
+
   /**
    * Interactivity state.
    * @type {anychart.core.utils.InteractivityState}
@@ -2241,6 +2243,34 @@ anychart.charts.Sparkline.prototype.invalidateSeries_ = function() {
   if (this.series_)
     this.series_.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
 };
+
+
+//region --- CSV
+//------------------------------------------------------------------------------
+//
+//  CSV
+//
+//------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.charts.Sparkline.prototype.getCsvGrouperColumn = function() {
+  return ['x'];
+};
+
+
+/** @inheritDoc */
+anychart.charts.Sparkline.prototype.getCsvGrouperValue = function(iterator) {
+  return iterator.get('x');
+};
+
+
+/** @inheritDoc */
+anychart.charts.Sparkline.prototype.getCsvGrouperAlias = function(iterator) {
+  var res = iterator.get('name');
+  return goog.isString(res) ? res : null;
+};
+
+
+//endregion
 
 
 /** @inheritDoc */

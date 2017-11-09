@@ -11,6 +11,7 @@ goog.require('anychart.core.utils.IInteractiveSeries');
 goog.require('anychart.core.utils.InteractivityState');
 goog.require('anychart.core.utils.TypedLayer');
 goog.require('anychart.data.Tree');
+goog.require('anychart.data.treeUtils');
 goog.require('anychart.format.Context');
 goog.require('anychart.utils');
 
@@ -107,12 +108,6 @@ anychart.charts.TreeMap.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.TREEMAP_NODE_TYPES |
     anychart.ConsistencyState.TREEMAP_HINT_OPACITY |
     anychart.ConsistencyState.APPEARANCE;
-
-
-/** @inheritDoc */
-anychart.charts.TreeMap.prototype.usesTreeData = function() {
-  return true;
-};
 
 
 /** @inheritDoc */
@@ -2596,6 +2591,14 @@ anychart.charts.TreeMap.prototype.ensureDataPrepared = function() {
     this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.TREEMAP_NODE_TYPES | anychart.ConsistencyState.TREEMAP_COLOR_SCALE);
   }
 };
+
+
+/** @inheritDoc */
+anychart.charts.TreeMap.prototype.toCsv = function(opt_chartDataExportMode, opt_csvSettings) {
+  return anychart.data.treeUtils.toCsv(
+      /** @type {anychart.data.Tree|anychart.data.TreeView} */(this.data()), opt_csvSettings);
+};
+
 
 
 /**

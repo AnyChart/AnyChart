@@ -712,6 +712,71 @@ anychart.charts.HeatMap.prototype.select = function(opt_indexOrIndexes) {
 };
 
 
+/** @inheritDoc */
+anychart.charts.HeatMap.prototype.getCsvData = function(mode) {
+  this.calculate();
+
+  var selected = mode == anychart.enums.ChartDataExportMode.SELECTED;
+  var tmp = this.getScaleHashes_(/** @type {anychart.scales.Ordinal} */(this.xScale()), selected);
+  var xValues = tmp.values;
+  var xNames = tmp.names;
+  tmp = this.getScaleHashes_(/** @type {anychart.scales.Ordinal} */(this.yScale()), selected);
+  var yValues = tmp.values;
+  var yNames = tmp.names;
+
+  var data = [];
+  for (var i = 0; i < yNames.length; i++) {
+    data.push([yNames[i]]);
+  }
+
+  var iterator = this.series_.getDetachedIterator();
+  while (iterator.advance()) {
+    var x = xValues[anychart.utils.hash(iterator.get('x'))];
+    var y = yValues[anychart.utils.hash(iterator.get('y'))];
+    var value = String(iterator.get('heat'));
+    if (!isNaN(x) && !isNaN(y)) {
+      // mind names column
+      data[y][x + 1] = value;
+    }
+  }
+
+  xNames.unshift('#');
+  return {
+    headers: xNames,
+    data: data
+  };
+};
+
+
+/**
+ * @param {anychart.scales.Ordinal} scale
+ * @param {boolean} filterByZoom
+ * @return {{values: Object.<number>, names: Array.<string>}}
+ * @private
+ */
+anychart.charts.HeatMap.prototype.getScaleHashes_ = function(scale, filterByZoom) {
+  var result = {};
+  var index = 0;
+  var values = /** @type {Array} */(scale.values());
+  var names = [];
+  if (values) {
+    for (var i = 0; i < values.length; i++) {
+      var value = values[i];
+      var left = scale.transform(value, 0);
+      var right = scale.transform(value, 1);
+      if (!filterByZoom || (Math.min(left, right) <= 1 && Math.max(left, right) >= 0)) {
+        result[anychart.utils.hash(value)] = index++;
+        names.push(String(value));
+      }
+    }
+  }
+  return {
+    values: result,
+    names: names
+  };
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Setup
