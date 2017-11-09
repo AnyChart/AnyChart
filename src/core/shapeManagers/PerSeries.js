@@ -10,11 +10,12 @@ goog.require('anychart.core.shapeManagers.Base');
  * @param {boolean} interactive
  * @param {?string=} opt_shapesFieldName
  * @param {?function(anychart.core.IShapeManagerUser, Object.<string, acgraph.vector.Shape>, number)=} opt_postProcessor
+ * @param {boolean=} opt_disableStrokeScaling
  * @constructor
  * @extends {anychart.core.shapeManagers.Base}
  */
-anychart.core.shapeManagers.PerSeries = function(series, config, interactive, opt_shapesFieldName, opt_postProcessor) {
-  anychart.core.shapeManagers.PerSeries.base(this, 'constructor', series, config, interactive, opt_shapesFieldName, opt_postProcessor);
+anychart.core.shapeManagers.PerSeries = function(series, config, interactive, opt_shapesFieldName, opt_postProcessor, opt_disableStrokeScaling) {
+  anychart.core.shapeManagers.PerSeries.base(this, 'constructor', series, config, interactive, opt_shapesFieldName, opt_postProcessor, opt_disableStrokeScaling);
 
   /**
    * Shapes.

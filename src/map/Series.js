@@ -48,6 +48,8 @@ anychart.mapModule.Series = function(chart, plot, type, config, sortedMode) {
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_OVERLAP,
       anychart.core.drawers.Capabilities.ANY]
   ]);
+
+  this.disableStrokeScaling = true;
 };
 goog.inherits(anychart.mapModule.Series, anychart.core.series.Cartesian);
 

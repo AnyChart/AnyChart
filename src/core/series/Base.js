@@ -129,6 +129,13 @@ anychart.core.series.Base = function(chart, plot, type, config) {
   this.metaMakers = [];
 
   /**
+   * Whether to disable stroke scaling.
+   * @type {boolean}
+   * @protected
+   */
+  this.disableStrokeScaling = false;
+
+  /**
    * Renderer.
    * @type {anychart.core.series.RenderingSettings}
    * @private
@@ -776,7 +783,8 @@ anychart.core.series.Base.prototype.recreateShapeManager = function() {
       this.renderingSettings_.getShapesConfig(),
       this.check(anychart.core.series.Capabilities.ALLOW_INTERACTIVITY),
       null,
-      this.config.postProcessor);
+      this.config.postProcessor,
+      this.disableStrokeScaling);
 };
 
 
