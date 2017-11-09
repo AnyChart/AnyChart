@@ -2218,7 +2218,7 @@ anychart.core.Chart.prototype.handleMouseOut = function(event) {
       var prevIndex = anychart.utils.toNumber(goog.isObject(prevTag) ? prevTag.index : prevTag);
 
       var ifParent = anychart.utils.checkIfParent(/** @type {!goog.events.EventTarget} */(series), event['relatedTarget']);
-      var isParentTooltip = anychart.utils.checkIfParent(series.tooltip(), event['relatedTarget']) || acgraph.type() == acgraph.StageType.SVG;
+      var isParentTooltip = acgraph.type() == acgraph.StageType.VML && series.tooltip && anychart.utils.checkIfParent(series.tooltip(), event['relatedTarget']);
 
       if ((!ifParent || (prevIndex != index)) && series.dispatchEvent(evt) && !isParentTooltip) {
         if (hoverMode == anychart.enums.HoverMode.SINGLE && (!isNaN(index) || goog.isArray(index))) {
