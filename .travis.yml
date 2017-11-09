@@ -19,7 +19,8 @@ before_install:
 
 install:
   - git submodule update --init
-  - pip install maxcdn --user
+  - pip install requests --user --upgrade
+  - pip install maxcdn --user --upgrade
   - ./build.py libs
 
 cache: pip

@@ -411,7 +411,10 @@
   },
   "modules": {
     "anychart-base": {
-      "type": "required",
+      "type": "bundle",
+      "name": "AnyChart Base",
+      "desc": "AnyChart Base is a handy module that contains: Core, Pie/Donut, Basic cartesian charts and Scatter",
+      "docs": "https://docs.anychart.com/Quick_Start/Modules#base",
       "parts": [
         "core",
         "theme-core",
@@ -424,14 +427,17 @@
       ]
     },
     "anychart-core": {
-      "type": "required",
+      "type": "core",
+      "name": "AnyChart Core Module",
+      "desc": "AnyChart Core is the core of engine, it is needed whenever you use any module (except Bundle and Base).",
+      "docs": "https://docs.anychart.com/Quick_Start/Modules#core",
       "parts": [
         "core",
         "theme-core"
       ]
     },
     "anychart-default-theme": {
-      "type": "required",
+      "type": "internal",
       "parts": [
         "theme-core",
         "theme-annotations",
