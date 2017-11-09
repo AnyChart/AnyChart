@@ -3465,17 +3465,19 @@ anychart.ganttModule.TimeLine.prototype.drawTimelineElements_ = function() {
  * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} item - Related tree data item.
  * @param {anychart.enums.TLElementTypes} type - Type of bar.
  * @param {anychart.enums.GanttDataFields=} opt_field - Field that contains a setting for fill, stroke, labels and markers.
- * @param {Object=} opt_period - Period for resources timeline.
+ * @param {number=} opt_periodIndex - Period index for resources timeline.
  * @return {!acgraph.vector.Element} - Bar itself.
  * @private
  */
-anychart.ganttModule.TimeLine.prototype.drawBar_ = function(bounds, item, type, opt_field, opt_period) {
-  // var isTreeDataItem = anychart.utils.instanceOf(item, anychart.treeDataModule.Tree.DataItem) || anychart.utils.instanceOf(item, anychart.treeDataModule.View.DataItem); //If item is tree data item. Else: item is period (raw object).
-  var isTreeDataItem = !opt_period;
+anychart.ganttModule.TimeLine.prototype.drawBar_ = function(bounds, item, type, opt_field, opt_periodIndex) {
+  var isTreeDataItem = !goog.isDef(opt_periodIndex);
+  var period = {};
+  if (!isTreeDataItem)
+    period = item.get(anychart.enums.GanttDataFields.PERIODS)[opt_periodIndex];
 
   var settings; //It is always a raw object.
   if (opt_field) {
-    settings = isTreeDataItem ? item.get(opt_field) : opt_period[opt_field];
+    settings = isTreeDataItem ? item.get(opt_field) : period[opt_field];
   } else {
     /*
       Here field is not specified.
@@ -3483,14 +3485,14 @@ anychart.ganttModule.TimeLine.prototype.drawBar_ = function(bounds, item, type, 
       If it is not tree data item (it is period - actually a raw object), it contains all visual settings in itself.
       TODO (A.Kudryavtsev): Bad english.
      */
-    settings = isTreeDataItem ? null : opt_period;
+    settings = isTreeDataItem ? null : period;
   }
 
   var isParent = false;
   var isProgress = false;
   var selectedBar = isTreeDataItem ?
       (this.selectedItem == item) :
-      (this.selectedPeriodId_ == opt_period[anychart.enums.GanttDataFields.ID]);
+      (this.selectedPeriodId_ == period[anychart.enums.GanttDataFields.ID]);
 
   var zIndex, defaultFill, defaultStroke;
 
@@ -3515,6 +3517,15 @@ anychart.ganttModule.TimeLine.prototype.drawBar_ = function(bounds, item, type, 
         this.controller.data().suspendSignalsDispatching();//this.controller.data() can be Tree or TreeView.
         item.meta('relBounds', bounds);
         this.controller.data().resumeSignalsDispatching(false);
+      } else {
+        if (!goog.isArray(item.meta('periodBounds'))) {
+          this.controller.data().suspendSignalsDispatching();//this.controller.data() can be Tree or TreeView.
+          item.setMeta('periodBounds', []);
+          this.controller.data().resumeSignalsDispatching(false);
+        }
+        this.controller.data().suspendSignalsDispatching();//this.controller.data() can be Tree or TreeView.
+        item.setMeta('periodBounds', opt_periodIndex, bounds);
+        this.controller.data().resumeSignalsDispatching(false);
       }
   }
 
@@ -3529,8 +3540,13 @@ anychart.ganttModule.TimeLine.prototype.drawBar_ = function(bounds, item, type, 
   bar.typeLabels = this.getLabelsFactoryByType_(type);
   bar.labelPointSettings = settings ? settings['label'] : null;
 
-  bar.tag = isTreeDataItem ? item.get(anychart.enums.GanttDataFields.ID) : opt_period[anychart.enums.GanttDataFields.ID];
+  bar.tag = isTreeDataItem ? item.get(anychart.enums.GanttDataFields.ID) : period[anychart.enums.GanttDataFields.ID];
   bar.type = type;
+
+  if (!isTreeDataItem) {
+    bar.period = period;
+    bar.periodIndex = opt_periodIndex;
+  }
 
   var lineThickness = anychart.utils.extractThickness(/** @type {acgraph.vector.Stroke} */ (stroke));
 
@@ -3703,7 +3719,6 @@ anychart.ganttModule.TimeLine.prototype.drawAsPeriods_ = function(dataItem, tota
   var periods = /** @type {Array.<Object>} */(dataItem.get(anychart.enums.GanttDataFields.PERIODS));
   if (periods) {
     for (var j = 0; j < periods.length; j++) {
-      var period = periods[j];
       var start = dataItem.getMeta(anychart.enums.GanttDataFields.PERIODS, j, anychart.enums.GanttDataFields.START);
       var end = dataItem.getMeta(anychart.enums.GanttDataFields.PERIODS, j, anychart.enums.GanttDataFields.END);
 
@@ -3716,7 +3731,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsPeriods_ = function(dataItem, tota
           var right = this.pixelBoundsCache.left + this.pixelBoundsCache.width * endRatio;
           var height = itemHeight * anychart.ganttModule.TimeLine.DEFAULT_HEIGHT_REDUCTION;
           var top = totalTop + (itemHeight - height) / 2;
-          this.drawBar_(new anychart.math.Rect(left, top, (right - left), height), dataItem, anychart.enums.TLElementTypes.PERIOD, void 0, period);
+          this.drawBar_(new anychart.math.Rect(left, top, (right - left), height), dataItem, anychart.enums.TLElementTypes.PERIOD, void 0, j);
         }
       }
     }
@@ -4602,12 +4617,8 @@ anychart.ganttModule.TimeLine.prototype.specialInvalidated = function() {
  */
 anychart.ganttModule.TimeLine.prototype.positionFinal = function() {
   if (this.redrawPosition || this.redrawHeader) {
-    this.labels().suspendSignalsDispatching();
-    this.labels().clear();
     this.drawTimelineElements_();
-    this.drawLabels_();
-    this.labels().resumeSignalsDispatching(false);
-    this.labels().draw();
+    this.drawLabels_(void 0, true);
 
     this.redrawHeader = false;
 
@@ -4629,24 +4640,26 @@ anychart.ganttModule.TimeLine.prototype.positionFinal = function() {
 
 /**
  * Draws labels.
+ * @param {anychart.SignalEvent=} opt_event - Event object.
+ * @param {boolean=} opt_skipDrawing - Whether to skip labels suspension and this.labels().draw().
  * @private
  */
-anychart.ganttModule.TimeLine.prototype.drawLabels_ = function() {
+anychart.ganttModule.TimeLine.prototype.drawLabels_ = function(opt_event, opt_skipDrawing) {
   this.labels().suspendSignalsDispatching();
+  this.labels().clear();
   for (var i = 0; i < this.visElements_.length; i++) {
     var el = this.visElements_[i];
     if (el.type == anychart.enums.TLElementTypes.CONNECTOR || !el.item)
       continue;
 
-    if (!el.label) {
-      el.label = this.labels().add(this.createFormatProvider(el.item, el.period, el.periodIndex), {
-        'value': {
-          'x': 0,
-          'y': 0
-        }
-      });
+    var context = this.createFormatProvider(el.item, el.period, el.periodIndex);
+    el.label = this.labels().add(context, {
+      'value': {
+        'x': 0,
+        'y': 0
+      }
+    });
 
-    }
     var pointLabels = el.labelPointSettings;
     var typeLabels = el.typeLabels;
     var normalLabels = this.labels();
@@ -4682,10 +4695,15 @@ anychart.ganttModule.TimeLine.prototype.drawLabels_ = function() {
       var position = anychart.enums.normalizeAnchor(el.label.getFinalSettings('position'));
       var positionProvider = {'value': anychart.utils.getCoordinateByAnchor(el.currBounds, position)};
       el.label.positionProvider(positionProvider);
-      el.label.formatProvider(this.createFormatProvider(el.item, el.period, el.periodIndex));
+
+      var values = context.values();
+      values['label'] = {value: el.label, type: anychart.enums.TokenType.UNKNOWN};
+      context.propagate();
+
+      el.label.formatProvider(context);
 
       this.controller.data().suspendSignalsDispatching();//this.controller.data() can be Tree or TreeView.
-      el.item.meta('labelBounds', this.labels().measure(el.label, positionProvider));
+      el.item.meta('label', el.label);
       this.controller.data().resumeSignalsDispatching(false);
     } else {
       el.label.enabled(false);
@@ -4693,7 +4711,8 @@ anychart.ganttModule.TimeLine.prototype.drawLabels_ = function() {
     el.label.draw();
   }
 
-  this.labels().resumeSignalsDispatching(true);
+  this.labels().resumeSignalsDispatching(!opt_skipDrawing);
+  this.labels().draw();
   this.baseLabels().markConsistent(anychart.ConsistencyState.ALL);
   this.baselineLabels().markConsistent(anychart.ConsistencyState.ALL);
   this.parentLabels().markConsistent(anychart.ConsistencyState.ALL);

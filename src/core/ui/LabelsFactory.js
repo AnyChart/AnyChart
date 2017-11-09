@@ -201,6 +201,14 @@ anychart.core.ui.LabelsFactory.HANDLED_EVENT_TYPES_ = {
 anychart.core.ui.LabelsFactory.HANDLED_EVENT_TYPES_CAPTURE_SHIFT_ = 12;
 
 
+/**
+ * Factory to measure plain text with styles.
+ * NOTE: Do not export!
+ * @type {?anychart.core.ui.LabelsFactory}
+ */
+anychart.core.ui.LabelsFactory.measureТехtFactory = null;
+
+
 //endregion
 //region --- Settings
 /**
@@ -1942,6 +1950,31 @@ anychart.core.ui.LabelsFactory.Label.prototype.isResolvable = function() {
 //endregion
 //region --- Settings manipulations
 /**
+ * Measures plain text on label's settings. NOTE: avoid using string tokens.
+ * @param {string} text - Text to measure.
+ * @return {anychart.math.Rect}
+ */
+anychart.core.ui.LabelsFactory.Label.prototype.measureWithText = function(text) {
+  var factory;
+  if (this.factory_) {
+    factory = this.factory_;
+  } else {
+    if (!anychart.core.ui.LabelsFactory.measureTextFactory) {
+      anychart.core.ui.LabelsFactory.measureTextFactory = new anychart.core.ui.LabelsFactory();
+      anychart.core.ui.LabelsFactory.measureTextFactory.setOption('positionFormatter', function() {
+        return this['value'];
+      });
+    }
+    factory = anychart.core.ui.LabelsFactory.measureTextFactory;
+  }
+
+  var sett = this.getMergedSettings();
+  sett['format'] = String(text);
+  return factory.measure({}, this.positionProvider(), sett);
+};
+
+
+/**
  * Reset settings.
  */
 anychart.core.ui.LabelsFactory.Label.prototype.resetSettings = function() {
@@ -2848,6 +2881,7 @@ anychart.standalones.labelsFactory = function() {
   proto['padding'] = proto.padding;
   proto['background'] = proto.background;
   proto['clear'] = proto.clear;
+  proto['measureWithText'] = proto.measureWithText;
   proto['draw'] = proto.draw;
   // proto['autoAnchor'] = proto.autoAnchor;//don't public
   // proto['autoRotation'] = proto.autoRotation;//don't public

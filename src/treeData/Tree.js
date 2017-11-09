@@ -937,7 +937,7 @@ anychart.treeDataModule.Tree.prototype.serialize = function() {
   json['children'] = [];
   for (var i = 0; i < this.numChildren(); i++) {
     var root = this.getChildAt(i);
-    json['children'].push(root.serialize());
+    json['children'].push(root.serialize([]));
   }
 
   json['index'] = [];
@@ -951,14 +951,18 @@ anychart.treeDataModule.Tree.prototype.serialize = function() {
 
 /**
  * Serializes tree without meta information.
+ * @param {Array.<string>=} opt_exceptions - Array of field names that will be in meta anyway.
+ *  If is undefined, no meta will be stored.
+ *  If array is empty, all meta will be stored.
+ *  If array is not empty, only values will be stored.
  * @return {!Object} Serialized JSON object.
  */
-anychart.treeDataModule.Tree.prototype.serializeWithoutMeta = function() {
+anychart.treeDataModule.Tree.prototype.serializeWithoutMeta = function(opt_exceptions) {
   var json = {};
   json['children'] = [];
   for (var i = 0; i < this.numChildren(); i++) {
     var root = this.getChildAt(i);
-    json['children'].push(root.serialize(false));
+    json['children'].push(root.serialize(opt_exceptions));
   }
 
   json['index'] = [];
@@ -1902,20 +1906,35 @@ anychart.treeDataModule.Tree.DataItem.prototype.isChildOf = function(potentialPa
 
 /**
  * Serializes tree data item with its children.
- * @param {boolean=} opt_addMeta [true] Whether to add meta to tree.
+ * @param {Array.<string>=} opt_exceptions - Array of field names that will be in meta anyway.
+ *  If is undefined, no meta will be stored.
+ *  If array is empty, all meta will be stored.
+ *  If array is not empty, only values will be stored.
  * @return {anychart.treeDataModule.Tree.SerializedDataItem} - Serialized tree data item.
  */
-anychart.treeDataModule.Tree.DataItem.prototype.serialize = function(opt_addMeta) {
+anychart.treeDataModule.Tree.DataItem.prototype.serialize = function(opt_exceptions) {
   var result = {
-    'treeDataItemData': this.data_
+    'treeDataItemData': goog.object.clone(this.data_)
   };
-  if (opt_addMeta !== false)
-    result['treeDataItemMeta'] = this.meta_;
+  if (goog.isDef(opt_exceptions)) {
+    var meta, l;
+    if (l = opt_exceptions.length) {
+      meta = {};
+      for (var k = 0; k < l; k++) {
+        var name = opt_exceptions[k];
+        if (this.meta_.hasOwnProperty(name))
+          meta[name] = this.meta_[name];
+      }
+    } else {
+      meta = goog.object.clone(this.meta_);
+    }
+    result['treeDataItemMeta'] = meta;
+  }
 
   for (var i = 0, len = this.numChildren(); i < len; i++) {
     var child = this.getChildAt(i);
     if (!result.children) result.children = [];
-    result.children.push(child.serialize(opt_addMeta));
+    result.children.push(child.serialize(opt_exceptions));
   }
 
   return result;

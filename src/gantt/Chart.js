@@ -584,27 +584,30 @@ anychart.ganttModule.Chart.prototype.fitToTask = function(taskId) {
 
       if (bounds.width > 0) {
         var relatedBounds = task.meta('relBounds');
-        var labelBounds = task.meta('labelBounds');
-        if (relatedBounds && labelBounds) {
-          var labelLefter = labelBounds.left < relatedBounds.left;
-          var labelRighter = labelBounds.left + labelBounds.width > relatedBounds.left + relatedBounds.width;
+        var label = task.meta('label');
+        if (label) {
+          var labelBounds = this.tl_.labels().measure(label, label.positionProvider());
+          if (relatedBounds && labelBounds) {
+            var labelLefter = labelBounds.left < relatedBounds.left;
+            var labelRighter = labelBounds.left + labelBounds.width > relatedBounds.left + relatedBounds.width;
 
-          var leftVal, rightVal;
-          if (labelBounds.width < bounds.width) {
-            var enlargeRatio = bounds.width / (bounds.width - labelBounds.width);
-            if (labelLefter && !labelRighter) {
-              leftVal = this.tl_.scale().ratioToTimestamp(1 - enlargeRatio);
-              rightVal = this.tl_.scale().ratioToTimestamp(1);
-            }
-            if (labelRighter && !labelLefter) {
+            var leftVal, rightVal;
+            if (labelBounds.width < bounds.width) {
+              var enlargeRatio = bounds.width / (bounds.width - labelBounds.width);
+              if (labelLefter && !labelRighter) {
+                leftVal = this.tl_.scale().ratioToTimestamp(1 - enlargeRatio);
+                rightVal = this.tl_.scale().ratioToTimestamp(1);
+              }
+              if (labelRighter && !labelLefter) {
+                leftVal = this.tl_.scale().ratioToTimestamp(0);
+                rightVal = this.tl_.scale().ratioToTimestamp(enlargeRatio);
+              }
+            } else {
               leftVal = this.tl_.scale().ratioToTimestamp(0);
-              rightVal = this.tl_.scale().ratioToTimestamp(enlargeRatio);
+              rightVal = this.tl_.scale().ratioToTimestamp(labelBounds.width / bounds.width);
             }
-          } else {
-            leftVal = this.tl_.scale().ratioToTimestamp(0);
-            rightVal = this.tl_.scale().ratioToTimestamp(labelBounds.width / bounds.width);
+            this.getTimeline().getScale().setRange(leftVal, rightVal); //this will redraw timeline second time.
           }
-          this.getTimeline().getScale().setRange(leftVal, rightVal); //this will redraw timeline second time.
         }
       }
     }
