@@ -2243,11 +2243,13 @@ anychart.core.series.Base.prototype.drawFactoryElement = function(seriesFactoryG
     chartStateFactory = null;
   } else {
     state = anychart.core.utils.InteractivityState.clarifyState(state);
-
+    var pointStateElement;
     if (this.supportsPointSettings() && hasPointOverrides) {
-      pointOverride = point.get(overrideNames[0]);
+      pointStateElement = point.get('normal');
+      pointStateElement = pointStateElement ? pointStateElement[overrideNames[0]] : void 0;
+      pointOverride = anychart.utils.getFirstDefinedValue(pointStateElement, point.get(overrideNames[0]));
       if (state != anychart.PointState.NORMAL) {
-        var pointStateElement = (state == anychart.PointState.HOVER) ? point.get('hovered') : point.get('selected');
+        pointStateElement = (state == anychart.PointState.HOVER) ? point.get('hovered') : point.get('selected');
         pointStateElement = pointStateElement ? pointStateElement[overrideNames[0]] : void 0;
         statePointOverride = anychart.utils.getFirstDefinedValue(pointStateElement, point.get(overrideNames[state]));
       }

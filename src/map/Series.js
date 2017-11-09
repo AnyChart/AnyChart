@@ -1204,18 +1204,28 @@ anychart.mapModule.Series.prototype.drawSingleFactoryElement = function(factory,
     element.state('chartNormalTheme', chartNormalFactory ? chartNormalFactory.themeSettings : null);
   } else {
     element.currentMarkersFactory(seriesStateFactory || factory);
-    element.setSettings(/** @type {Object} */(pointOverride), /** @type {Object} */(statePointOverride));
+
+    pointOverride = goog.object.clone(/** @type {Object} */(pointOverride || {}));
+    statePointOverride = goog.object.clone(/** @type {Object} */(statePointOverride || {}));
+    var val;
     var rotation = /** @type {number} */(element.getFinalSettings('rotation'));
-    if (!goog.isDef(rotation) || goog.isNull(rotation) || isNaN(rotation)) {
-      var autoRotation = {'rotation': /** @type {number} */(this.getIterator().meta('markerRotation'))};
-      element.setSettings(autoRotation, autoRotation);
+    if ((!goog.isDef(rotation) || goog.isNull(rotation) || isNaN(rotation))) {
+      val = /** @type {number} */(this.getIterator().meta('markerRotation'));
+      if (!('rotation' in pointOverride))
+        pointOverride['rotation'] = val;
+      if (!('rotation' in statePointOverride))
+        statePointOverride['rotation'] = val;
     }
 
     var anchor = /** @type {anychart.enums.Anchor} */(element.getFinalSettings('anchor'));
-    if (!goog.isDef(anchor) || goog.isNull(anchor)) {
-      var autoAnchor = {'anchor': /** @type {anychart.enums.Anchor} */(this.getIterator().meta('markerAnchor'))};
-      element.setSettings(autoAnchor, autoAnchor);
+    if ((!goog.isDef(anchor) || goog.isNull(anchor))) {
+      val = /** @type {anychart.enums.Anchor} */(this.getIterator().meta('markerAnchor'));
+      if (!('anchor' in pointOverride))
+        pointOverride['anchor'] = val;
+      if (!('anchor' in statePointOverride))
+        statePointOverride['anchor'] = val;
     }
+    element.setSettings(/** @type {Object} */(pointOverride), /** @type {Object} */(statePointOverride));
   }
 
   if (callDraw)

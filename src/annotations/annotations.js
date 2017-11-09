@@ -57,27 +57,17 @@ anychart.annotationsModule.AnnotationTypes = {};
  *    thirdXAnchor: number,
  *    thirdValueAnchor: number,
  *    stroke: (acgraph.vector.Stroke|Function),
- *    hoverStroke: (acgraph.vector.Stroke|Function),
- *    selectStroke: (acgraph.vector.Stroke|Function),
  *    trend: (acgraph.vector.Stroke|Function),
- *    hoverTrend: (acgraph.vector.Stroke|Function),
- *    selectTrend: (acgraph.vector.Stroke|Function),
  *    grid: (acgraph.vector.Stroke|Function),
- *    hoverGrid: (acgraph.vector.Stroke|Function),
- *    selectGrid: (acgraph.vector.Stroke|Function),
  *    fill: (acgraph.vector.Fill|Function),
- *    hoverFill: (acgraph.vector.Fill|Function),
- *    selectFill: (acgraph.vector.Fill|Function),
  *    hatchFill: (acgraph.vector.PatternFill|Function),
- *    hoverHatchFill: (acgraph.vector.PatternFill|Function),
- *    selectHatchFill: (acgraph.vector.PatternFill|Function),
+ *    size: number,
+ *    hovered: anychart.core.StateSettings,
+ *    selected: anychart.core.StateSettings,
  *    markerType: anychart.enums.MarkerType,
  *    anchor: anychart.enums.Anchor,
  *    offsetX: number,
- *    offsetY: number,
- *    size: number,
- *    hoverSize: number,
- *    selectSize: number
+ *    offsetY: number
  * }}
  */
 anychart.annotationsModule.AnnotationJSONFormat;

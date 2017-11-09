@@ -392,7 +392,8 @@ anychart.core.ui.MarkersFactory.prototype.setAutoType = function(value) {
  */
 anychart.core.ui.MarkersFactory.prototype.size = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.size_ != opt_value) {
+    opt_value = anychart.utils.toNumber(opt_value);
+    if (!isNaN(opt_value) && this.size_ != opt_value) {
       this.size_ = opt_value;
       this.changedSettings['size'] = true;
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
@@ -1102,7 +1103,8 @@ anychart.core.ui.MarkersFactory.Marker.prototype.type = function(opt_value) {
  */
 anychart.core.ui.MarkersFactory.Marker.prototype.size = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.settingsObj['size'] != opt_value) {
+    opt_value = anychart.utils.toNumber(opt_value);
+    if (!isNaN(opt_value) && this.settingsObj['size'] != opt_value) {
       this.settingsObj['size'] = opt_value;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }

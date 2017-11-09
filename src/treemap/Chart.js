@@ -2006,7 +2006,7 @@ anychart.treemapModule.Chart.prototype.resolveOption = function(name, state, poi
   } else {
     var node = /** @type {anychart.treeDataModule.Tree.DataItem} */(point.currentRow);
     var pointStateName = state == 0 ? 'normal' : state == 1 ? 'hovered' : 'selected';
-    var pointStateObject = point.get(pointStateName);
+    var pointStateObject = node.get(pointStateName);
     val = anychart.utils.getFirstDefinedValue(
         goog.isDef(pointStateObject) ? pointStateObject[name] : void 0,
         node.get(anychart.color.getPrefixedColorName(state, name)),
