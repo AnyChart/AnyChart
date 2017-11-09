@@ -2,6 +2,7 @@ goog.provide('anychart.annotationsModule.FibonacciFan');
 goog.require('anychart.annotationsModule');
 goog.require('anychart.annotationsModule.FibonacciBase');
 goog.require('anychart.enums');
+goog.require('anychart.format.Context');
 
 
 
@@ -228,13 +229,57 @@ anychart.annotationsModule.FibonacciFan.prototype.getColorResolutionContext = fu
     'sourceColor': opt_baseColor || this.getOption('color') || 'blue'
   };
   if (goog.isDef(opt_level)) {
-    if (opt_level >= this.levelsInternal.length) {
-      res['timeLevel'] = this.timeLevels_[opt_level - this.levelsInternal.length];
+    res['isTimeLevel'] = opt_level >= this.levelsInternal.length;
+    var levelRatio = res['isTimeLevel'] ? this.timeLevels_[opt_level - this.levelsInternal.length] : this.levelsInternal[opt_level];
+    res['levelRatio'] = levelRatio;
+    if (res['isTimeLevel']) {
+      res['timeLevel'] = levelRatio;
     } else {
-      res['level'] = this.levelsInternal[opt_level];
+      res['level'] = levelRatio;
     }
   }
   return res;
+};
+
+
+/**
+ * Creates label format provider.
+ * @param {number} levelRatio
+ * @param {*} levelValue
+ * @param {boolean} isX
+ * @return {!anychart.format.Context}
+ */
+anychart.annotationsModule.FibonacciFan.prototype.createFormatProvider = function(levelRatio, levelValue, isX) {
+  if (!this.pointProvider_)
+    this.pointProvider_ = new anychart.format.Context();
+
+  var context = {
+    'annotation': {
+      value: this,
+      type: anychart.enums.TokenType.UNKNOWN
+    },
+    'level': {
+      value: levelRatio,
+      type: anychart.enums.TokenType.NUMBER
+    },
+    'levelRatio': {
+      value: levelRatio,
+      type: anychart.enums.TokenType.NUMBER
+    },
+    'levelValue': {
+      value: levelValue,
+      type: isX ? anychart.enums.TokenType.DATE_TIME : anychart.enums.TokenType.NUMBER
+    }
+  };
+
+  context['isTimeLevel'] = {
+    value: isX,
+    type: anychart.enums.TokenType.UNKNOWN
+  };
+
+  this.pointProvider_.propagate(context);
+
+  return this.pointProvider_;
 };
 
 
