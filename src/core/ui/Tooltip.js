@@ -690,11 +690,13 @@ anychart.core.ui.Tooltip.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
+    this.resetBoundsCache();
     this.calculateContentBounds_();
     var cBounds = /** @type {!anychart.math.Rect} */ (this.contentBounds_);
     this.boundsWithoutPadding_ = this.padding().tightenBounds(cBounds);
     this.titleRemainingBounds_ = null;
     this.separatorRemainingBounds_ = null;
+    this.invalidate(anychart.ConsistencyState.TOOLTIP_BACKGROUND);
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 
