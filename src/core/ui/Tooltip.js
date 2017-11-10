@@ -537,6 +537,7 @@ anychart.core.ui.Tooltip.prototype.padding = function(opt_spaceOrTopOrTopAndBott
  */
 anychart.core.ui.Tooltip.prototype.onPaddingSignal_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
+    this.resetBoundsCache();
     this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
   }
 };
@@ -552,7 +553,6 @@ anychart.core.ui.Tooltip.prototype.background = function(opt_value) {
     this.background_ = new anychart.core.ui.Background();
     this.background_.listenSignals(this.backgroundInvalidated_, this);
     this.background_.setParentEventTarget(this);
-
     this.registerDisposable(this.background_);
   }
 
@@ -606,7 +606,7 @@ anychart.core.ui.Tooltip.prototype.title = function(opt_value) {
  */
 anychart.core.ui.Tooltip.prototype.onTitleSignal_ = function(event) {
   if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
-    this.contentBounds_ = null;
+    this.resetBoundsCache();
     this.invalidate(anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE, anychart.Signal.NEEDS_REDRAW);
   } else if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
     this.invalidate(anychart.ConsistencyState.TOOLTIP_TITLE, anychart.Signal.NEEDS_REDRAW);
@@ -643,8 +643,7 @@ anychart.core.ui.Tooltip.prototype.separator = function(opt_value) {
  */
 anychart.core.ui.Tooltip.prototype.onSeparatorSignal_ = function(event) {
   if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
-    this.contentBounds_ = null;
-    this.instantPosition_ = null;
+    this.resetBoundsCache();
     this.invalidate(anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE, anychart.Signal.NEEDS_REDRAW);
   } else if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
     this.invalidate(anychart.ConsistencyState.TOOLTIP_SEPARATOR, anychart.Signal.NEEDS_REDRAW);
@@ -1306,12 +1305,20 @@ anychart.core.ui.Tooltip.prototype.content = function(opt_value) {
  */
 anychart.core.ui.Tooltip.prototype.onContentSignal_ = function(event) {
   if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
-    this.contentBounds_ = null;
-    this.instantPosition_ = null;
+    this.resetBoundsCache();
     this.invalidate(anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE, anychart.Signal.NEEDS_REDRAW);
   } else if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
     this.invalidate(anychart.ConsistencyState.TOOLTIP_CONTENT, anychart.Signal.NEEDS_REDRAW);
   }
+};
+
+
+/**
+ * Resets content bounds and position cache.
+ */
+anychart.core.ui.Tooltip.prototype.resetBoundsCache = function() {
+  this.contentBounds_ = null;
+  this.instantPosition_ = null;
 };
 
 
@@ -1389,6 +1396,7 @@ anychart.core.ui.Tooltip.prototype.updateForceInvalidation = function() {
   this.title().forceInvalidate = forceInvalidation;
   this.separator().forceInvalidate = forceInvalidation;
   this.background().forceInvalidate = forceInvalidation;
+  this.padding().forceInvalidate = forceInvalidation;
 };
 
 
@@ -2184,6 +2192,7 @@ anychart.core.ui.Tooltip.prototype.parentInvalidated_ = function(e) {
   if (e.hasSignal(anychart.Signal.BOUNDS_CHANGED) || e.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
     state |= anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE;
     signal |= anychart.Signal.BOUNDS_CHANGED;
+    this.resetBoundsCache();
   }
 
   if (e.hasSignal(anychart.Signal.ENABLED_STATE_CHANGED)) {
