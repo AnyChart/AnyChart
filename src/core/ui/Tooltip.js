@@ -696,7 +696,7 @@ anychart.core.ui.Tooltip.prototype.draw = function() {
     this.boundsWithoutPadding_ = this.padding().tightenBounds(cBounds);
     this.titleRemainingBounds_ = null;
     this.separatorRemainingBounds_ = null;
-    this.invalidate(anychart.ConsistencyState.TOOLTIP_BACKGROUND);
+    this.invalidate(anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE);
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 
