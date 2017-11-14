@@ -3228,7 +3228,7 @@ anychart.core.Chart.prototype.getCsvGrouperAlias = function(iterator, dataHolder
  * @return {Array}
  */
 anychart.core.Chart.prototype.getCsvColumns = function(dataHolder) {
-  return (dataHolder instanceof anychart.core.series.Base) ? dataHolder.getYValueNames() : ['value'];
+  return goog.isFunction(dataHolder.getYValueNames) ? dataHolder.getYValueNames() : ['value'];
 };
 
 
@@ -3241,7 +3241,7 @@ anychart.core.Chart.prototype.getCsvColumns = function(dataHolder) {
  * @return {string}
  */
 anychart.core.Chart.prototype.prefixCsvColumnName = function(name, dataHolder, index, columnsCount) {
-  return ((dataHolder instanceof anychart.core.series.Base) ? dataHolder.name() : ('series' + String(index))) +
+  return (goog.isFunction(dataHolder.name) ? dataHolder.name() : ('series' + String(index))) +
       ((columnsCount > 1) ? (' (' + name + ')') : '');
 };
 
