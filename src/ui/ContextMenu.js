@@ -3,6 +3,7 @@ goog.provide('anychart.ui.ContextMenu.ActionContext');
 goog.provide('anychart.ui.ContextMenu.Item');
 goog.provide('anychart.ui.ContextMenu.PrepareItemsContext');
 
+goog.require('acgraph');
 goog.require('anychart.enums');
 goog.require('anychart.ui.menu.Item');
 goog.require('anychart.ui.menu.SubMenu');
