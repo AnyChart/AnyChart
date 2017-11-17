@@ -6,9 +6,16 @@
 
 goog.provide('anychart.dataAdapterModule.entry');
 goog.require('anychart.base');
+goog.require('anychart.core.reporting');
+goog.require('anychart.enums');
 goog.require('goog.Uri');
 goog.require('goog.dom');
 goog.require('goog.net.XhrIo');
+
+
+if (!anychart.window['anychart']['exports']) {
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Exporting']);
+}
 
 
 // region ---- loading config via XhrIo

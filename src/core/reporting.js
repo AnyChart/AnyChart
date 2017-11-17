@@ -54,7 +54,7 @@ anychart.core.reporting.getErrorDescription_ = function(code, opt_arguments) {
       return 'Table.contents() accepts only an Array of Arrays as it\'s first argument.';
 
     case anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE:
-      return 'Feature "' + opt_arguments[0] + '" is not supported in this module. See modules list for details.';
+      return 'Feature "' + opt_arguments[0] + '" is not supported in this module. See modules list at https://docs.anychart.com/Quick_Start/Modules for details.';
 
     case anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE:
       return opt_arguments[0] + ' should be only ' + opt_arguments[1] + ' type' + (opt_arguments[2] ? ' (' + opt_arguments[2] + ').' : '.');
