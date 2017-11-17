@@ -5,6 +5,11 @@ AnyChart Data Visualization Framework
 
 AnyChart is a flexible JavaScript (HTML5, SVG, VML) charting framework that fits any solution in need of data visualization.
 
+[![Travis](https://img.shields.io/travis/AnyChart/AnyChart.svg)](https://travis-ci.org/AnyChart/AnyChart)
+[![GitHub release](https://img.shields.io/github/release/AnyChart/AnyChart.svg)](https://github.com/AnyChart/AnyChart/releases)
+[![npm](https://img.shields.io/npm/v/anychart.svg)](https://www.npmjs.com/package/anychart)
+[![Downloads](https://img.shields.io/npm/dt/anychart.svg)](https://www.anychart.com/download/)
+
 ## Table of Contents
 
 * [Download and install](#download-and-install)
