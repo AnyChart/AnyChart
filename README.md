@@ -1,4 +1,9 @@
-[<img src="https://cdn.anychart.com/images/logo-transparent-segoe.png?2" width="234px" alt="AnyChart - Robust JavaScript/HTML5 Chart library for any project">](https://www.anychart.com)
+[<img src="https://cdn.anychart.com/images/logo-transparent-segoe.png?2" align="left" width="234px" alt="AnyChart - Robust JavaScript/HTML5 Chart library for any project">](https://www.anychart.com)
+<img src="https://img.shields.io/travis/AnyChart/AnyChart.svg" align="left">
+<img src="https://img.shields.io/github/release/AnyChart/AnyChart.svg" align="left">
+<img src="https://img.shields.io/npm/v/anychart.svg" align="left">
+<img src="https://img.shields.io/npm/dt/anychart.svg" align="left">
+
 
 AnyChart Data Visualization Framework
 =========
