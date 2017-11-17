@@ -92,7 +92,7 @@ anychart.core.utils.TokenParser.parse = function(format) {
                 return index % 2 != 0;
               };
               var arrFactors = goog.array.filter(arr[0].split(/\(([ \w\+\-]*)\)/), filter);
-              var arrSuffixes = goog.array.filter(arr[1].split(/\(([ \w]*)\)/), filter);
+              var arrSuffixes = goog.array.filter(arr[1].split(/\(([^\)]*)\)/), filter);
               arrFactors = goog.array.map(arrFactors, function(item) {
                 return +item;
               });
