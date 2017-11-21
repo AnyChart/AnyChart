@@ -767,7 +767,7 @@ def __get_bundle_wrapper(bundle_name, modules, file_name='', performance_monitor
 
     core_check = '' \
         if any(map(lambda item: __get_modules_config()['parts'][item].get('skipCoreCheck', False), modules)) \
-        else "throw Error('anychart-base.min.js module should be included first');"
+        else "throw Error('anychart-base.min.js module should be included first. See modules explanation at https://docs.anychart.com/Quick_Start/Modules for details');"
 
     start = start % (
         ', '.join(modules),
