@@ -236,7 +236,7 @@ goog.addDependency('../../../../src/data/csv/DefaultItemsProcessor.js', ['anycha
 goog.addDependency('../../../../src/data/csv/IItemsProcessor.js', ['anychart.data.csv.IItemsProcessor'], [], false);
 goog.addDependency('../../../../src/data/csv/Parser.js', ['anychart.data.csv.Parser'], ['anychart.core.reporting', 'anychart.data.csv.DefaultItemsProcessor', 'anychart.data.csv.IItemsProcessor', 'goog.Disposable'], false);
 goog.addDependency('../../../../src/data/data.js', ['anychart.data'], ['anychart.data.ConcatView', 'anychart.data.FilterView', 'anychart.data.Set', 'anychart.data.SortView', 'anychart.data.csv.Parser', 'anychart.enums'], false);
-goog.addDependency('../../../../src/dataAdapter/data-adapter.module.js', ['anychart.dataAdapterModule.entry'], ['anychart.base', 'anychart.core.reporting', 'anychart.enums', 'goog.Uri', 'goog.dom', 'goog.net.XhrIo'], false);
+goog.addDependency('../../../../src/dataAdapter/data-adapter.module.js', ['anychart.dataAdapterModule.entry'], ['anychart.base', 'anychart.core.reporting', 'anychart.enums', 'anychart.exportsModule.entry', 'goog.Uri', 'goog.dom', 'goog.net.XhrIo'], false);
 goog.addDependency('../../../../src/enums.js', ['anychart.enums'], [], false);
 goog.addDependency('../../../../src/exports/Exports.js', ['anychart.exportsModule.Exports'], [], false);
 goog.addDependency('../../../../src/exports/exports.module.js', ['anychart.exportsModule.entry'], ['acgraph.exporting', 'anychart', 'anychart.base', 'anychart.core.Chart', 'anychart.core.VisualBase', 'anychart.exportsModule.Exports', 'anychart.utils', 'goog.dom'], false);

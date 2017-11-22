@@ -8,6 +8,7 @@ goog.provide('anychart.dataAdapterModule.entry');
 goog.require('anychart.base');
 goog.require('anychart.core.reporting');
 goog.require('anychart.enums');
+goog.require('anychart.exportsModule.entry');
 goog.require('goog.Uri');
 goog.require('goog.dom');
 goog.require('goog.net.XhrIo');
