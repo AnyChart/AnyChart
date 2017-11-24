@@ -33,7 +33,7 @@ if [ "${TRAVIS_BRANCH}" = "master" ]; then
     NPM_VERSION_INFO=$(npm view anychart@${VERSION})
 
     # check contains "message": "Not Found"
-    GITHUB_RELEASE_INFO=$(curl https://api.github.com/repos/AnyChart/AnyChart/releases/tags/v7.14.8?access_token=${GITHUB_TOKEN})
+    GITHUB_RELEASE_INFO=$(curl https://api.github.com/repos/AnyChart/AnyChart/releases/tags/v${VERSION}?access_token=${GITHUB_TOKEN})
 
     # check contains "name": "v8.0.0"
     GITHUB_TAG_INFO=$(curl https://api.github.com/repos/AnyChart/AnyChart/tags?access_token=${GITHUB_TOKEN})
@@ -218,7 +218,7 @@ if [ "${TRAVIS_BRANCH}" = "master" ]; then
     echo Create latest version
     ssh -i ~/.ssh/id_rsa  $STATIC_HOST_SSH_STRING "
     rm -rf /apps/static/cdn/releases/${MAJOR_VERSION}.x.x &&
-    cp -r /apps/static/cdn/releases/${VERSION} /apps/static/cdn/releases/${MAJOR_VERSION}.x.x"
+    cp -r /apps/static/cdn/releases/${VERSION} /apps/static/cdn/releases/v${MAJOR_VERSION}"
 fi
 # ---- Create latest version (release builds only) ---------------------------------------------------------------------
 
