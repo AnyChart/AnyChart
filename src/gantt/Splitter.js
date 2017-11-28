@@ -1469,6 +1469,7 @@ anychart.core.ui.SimpleSplitter.prototype.getBase_ = function() {
  * @private
  */
 anychart.core.ui.SimpleSplitter.prototype.dragStartHandler_ = function() {
+  this.dispatchEvent(anychart.enums.EventType.DRAG_START);
   this.dragging_ = true;
   this.cursorBackup_ = goog.style.getStyle(anychart.document['body'], 'cursor');
   this.getDragPreview_().clear();
@@ -1498,6 +1499,8 @@ anychart.core.ui.SimpleSplitter.prototype.dragHandler_ = function() {
       .clear()
       .moveTo(newLeft, this.pixelBoundsCache_.top)
       .lineTo(newLeft, this.pixelBoundsCache_.top + this.pixelBoundsCache_.height);
+
+  this.dispatchEvent(anychart.enums.EventType.DRAG);
 };
 
 
@@ -1514,6 +1517,7 @@ anychart.core.ui.SimpleSplitter.prototype.dragEndHandler_ = function() {
   if (!this.mouseOver_) this.globalCursor_(true);
 
   this.position(currentBounds.left + this.dragAreaLength_ - this.pixelBoundsCache_.left);
+  this.dispatchEvent(anychart.enums.EventType.DRAG_END);
 };
 
 

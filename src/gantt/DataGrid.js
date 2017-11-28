@@ -456,6 +456,9 @@ anychart.ganttModule.DataGrid.prototype.addSplitter_ = function() {
     }, newSplitter);
     newSplitter.listen(anychart.enums.EventType.SPLITTER_CHANGE, goog.bind(this.splitterChangedHandler_, this, columnsCount - 1));
     newSplitter.listen(acgraph.events.EventType.DBLCLICK, goog.bind(this.splitterDblClickHandler_, this, columnsCount - 1));
+    newSplitter.listen(anychart.enums.EventType.DRAG_START, goog.bind(this.denyDragging, this, true));
+    newSplitter.listen(anychart.enums.EventType.DRAG, goog.bind(this.denyDragging, this, true));
+    newSplitter.listen(anychart.enums.EventType.DRAG_END, goog.bind(this.denyDragging, this, false));
     this.splitters_.push(newSplitter);
   }
 };

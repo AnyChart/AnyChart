@@ -998,6 +998,11 @@ anychart.ganttModule.BaseGrid.prototype.editing = function(opt_value) {
     if (this.editable != opt_value) {
       this.editable = opt_value;
 
+      if (this.editable)
+        goog.events.listen(anychart.document, goog.events.EventType.MOUSEMOVE, this.docMouseMoveListener_, false, this);
+      else
+        goog.events.unlisten(anychart.document, goog.events.EventType.MOUSEMOVE, this.docMouseMoveListener_, false, this);
+
       //for Timeline instance this state wil initiate connectors redraw (will set new cursors for connectors).
       this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
     }
@@ -1465,7 +1470,7 @@ anychart.ganttModule.BaseGrid.prototype.dragStartHandler_ = function(e) {
  */
 anychart.ganttModule.BaseGrid.prototype.dragHandler_ = function(e) {
   this.dragging = true;
-  if (this.editable) {
+  if (this.editable && !this.denyDragScrolling) {
     this.interactive = false;
     this.interactivityHandler.highlight();
     this.tooltip().hide();
@@ -1506,7 +1511,7 @@ anychart.ganttModule.BaseGrid.prototype.dragHandler_ = function(e) {
  * @private
  */
 anychart.ganttModule.BaseGrid.prototype.dragEndHandler_ = function(e) {
-  if (this.editable) {
+  if (this.editable && !this.denyDragScrolling) {
     var evt = this.getInteractivityEvent(e);
 
     this.addDragMouseUp(evt);
@@ -2102,7 +2107,8 @@ anychart.ganttModule.BaseGrid.prototype.initMouseFeatures = function() {
       });
     }
 
-    goog.events.listen(anychart.document, goog.events.EventType.MOUSEMOVE, this.docMouseMoveListener_, false, this);
+    this.horizontalScrollBar().listen(anychart.enums.EventType.SCROLLING, goog.bind(this.denyDragging, this, true));
+    this.horizontalScrollBar().listen(anychart.enums.EventType.SCROLL_END, goog.bind(this.denyDragging, this, false));
   }
 };
 
@@ -2131,7 +2137,7 @@ anychart.ganttModule.BaseGrid.prototype.docMouseMoveListener_ = function(e) {
     if (mouseY < top || mouseY > bottom) this.scrollOffsetY = mouseY - top;
 
     var ths = this;
-    if (this.dragging && !this.scrollInterval) {
+    if (this.dragging && !this.scrollInterval && !this.denyDragScrolling) {
       this.scrollInterval = setInterval(function() {
         ths.mouseOutMove(e);
       }, anychart.ganttModule.BaseGrid.TIMER_STEP);
@@ -2146,7 +2152,7 @@ anychart.ganttModule.BaseGrid.prototype.docMouseMoveListener_ = function(e) {
  */
 anychart.ganttModule.BaseGrid.prototype.initKeysFeatures = function() {
   if (!this.interactivityHandler.altKeyHandler) {
-    this.interactivityHandler.altKeyHandler = new anychart.ganttModule.BaseGrid.KeyHandler(this.interactivityHandler, document);
+    this.interactivityHandler.altKeyHandler = new anychart.ganttModule.BaseGrid.KeyHandler(this.interactivityHandler, anychart.document);
     this.registerDisposable(this.interactivityHandler.altKeyHandler);
 
     acgraph.events.listen(this.interactivityHandler.altKeyHandler, 'key', function(e) {
@@ -2159,6 +2165,14 @@ anychart.ganttModule.BaseGrid.prototype.initKeysFeatures = function() {
       }
     }, false, this.interactivityHandler);
   }
+};
+
+
+/**
+ * @param {boolean} value
+ */
+anychart.ganttModule.BaseGrid.prototype.denyDragging = function(value) {
+  this.denyDragScrolling = value;
 };
 
 
@@ -2508,6 +2522,9 @@ anychart.ganttModule.BaseGrid.prototype.setupByJSON = function(config, opt_defau
 anychart.ganttModule.BaseGrid.Dragger = function(target, grid) {
   anychart.ganttModule.BaseGrid.Dragger.base(this, 'constructor', target.domElement());
 
+  /**
+   * @type {anychart.ganttModule.BaseGrid}
+   */
   this.grid = grid;
 
   /**
@@ -2542,7 +2559,7 @@ anychart.ganttModule.BaseGrid.Dragger.prototype.computeInitialPosition = functio
  * @override
  */
 anychart.ganttModule.BaseGrid.Dragger.prototype.defaultAction = function(x, y) {
-  if (this.grid.interactivityHandler.altKey || !this.grid.editable) {
+  if (this.grid.interactivityHandler.altKey || (!this.grid.editable && !this.grid.denyDragScrolling)) {
     var dX = this.x - x;
     var dY = this.y - y;
 
