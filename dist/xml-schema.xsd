@@ -1557,6 +1557,27 @@
         <xsd:attribute name="edit_start_connector_marker_vertical_offset" type="xsd:double"/>
         <xsd:attribute name="edit_finish_connector_marker_vertical_offset" type="xsd:double"/>
         <xsd:attribute name="edit_interval_width" type="xsd:double"/>
+
+        <xsd:attribute name="base_bar_height" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="base_bar_anchor" type="xsd:string"/>
+        <xsd:attribute name="base_bar_position" type="xsd:string"/>
+        <xsd:attribute name="base_bar_offset" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="baseline_bar_height" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="baseline_bar_anchor" type="xsd:string"/>
+        <xsd:attribute name="baseline_bar_position" type="xsd:string"/>
+        <xsd:attribute name="baseline_bar_offset" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="parent_bar_height" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="parent_bar_anchor" type="xsd:string"/>
+        <xsd:attribute name="parent_bar_position" type="xsd:string"/>
+        <xsd:attribute name="parent_bar_offset" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="progress_bar_height" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="progress_bar_anchor" type="xsd:string"/>
+        <xsd:attribute name="progress_bar_position" type="xsd:string"/>
+        <xsd:attribute name="progress_bar_offset" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="milestone_height" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="milestone_anchor" type="xsd:string"/>
+        <xsd:attribute name="milestone_position" type="xsd:string"/>
+        <xsd:attribute name="milestone_offset" type="simple.NumberOrPercentOrNull"/>
     </xsd:complexType>
 
     <xsd:complexType name="core.ColorRange">

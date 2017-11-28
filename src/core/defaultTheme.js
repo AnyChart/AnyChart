@@ -2170,6 +2170,16 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'editFinishConnectorMarkerVerticalOffset': 0,
     'editIntervalWidth': 3,
 
+    'baseBarAnchor': 'auto',
+    'baseBarPosition': 'left-center',
+    'baseBarOffset': 0,
+    'baseBarHeight': '70%',
+    'parentBarHeight': '40%',
+    'progressBarHeight': '100%',
+    'progressBarPosition': 'left-center',
+    'progressBarAnchor': 'left-center',
+    //all another settings should be set to 'null' for serialization demerging purposes
+
     'baselineFill': '#d5ebfc',
     'baselineStroke': '#bfd1e0',
     'parentFill': '#455a64',

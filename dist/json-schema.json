@@ -3834,7 +3834,28 @@
         "editFinishConnectorMarkerHorizontalOffset": {"type": "number"},
         "editStartConnectorMarkerVerticalOffset": {"type": "number"},
         "editFinishConnectorMarkerVerticalOffset": {"type": "number"},
-        "editIntervalWidth": {"type": "number"}
+        "editIntervalWidth": {"type": "number"},
+
+        "baseBarHeight": {"type": ["number", "string"]},
+        "baseBarAnchor": {"type": "string"},
+        "baseBarPosition": {"type": "string"},
+        "baseBarOffset": {"type": ["number", "string"]},
+        "baselineBarHeight": {"type": ["number", "string"]},
+        "baselineBarAnchor": {"type": "string"},
+        "baselineBarPosition": {"type": "string"},
+        "baselineBarOffset": {"type": ["number", "string"]},
+        "parentBarHeight": {"type": ["number", "string"]},
+        "parentBarAnchor": {"type": "string"},
+        "parentBarPosition": {"type": "string"},
+        "parentBarOffset": {"type": ["number", "string"]},
+        "progressBarHeight": {"type": ["number", "string"]},
+        "progressBarAnchor": {"type": "string"},
+        "progressBarPosition": {"type": "string"},
+        "progressBarOffset": {"type": ["number", "string"]},
+        "milestoneHeight": {"type": ["number", "string"]},
+        "milestoneAnchor": {"type": "string"},
+        "milestonePosition": {"type": "string"},
+        "milestoneOffset": {"type": ["number", "string"]}
       }
     },
 
