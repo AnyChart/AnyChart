@@ -277,12 +277,17 @@ anychart.mapModule.scales.GeoTicks.prototype.setupAsMajor = function(min, max, o
         //    anychart.utils.alignRight(currentInterval, val3),
         //    anychart.utils.alignRight(currentInterval, val5),
         //    anychart.utils.alignRight(currentInterval, val6));
-        currentInterval = Math.min(
-            anychart.utils.alignRight(currentInterval, val1),
-            anychart.utils.alignRight(currentInterval, val2),
-            anychart.utils.alignRight(currentInterval, val3),
-            anychart.utils.alignRight(currentInterval, val5),
-            anychart.utils.alignRight(currentInterval, val6));
+
+        var alignedValue1 = anychart.utils.alignRight(currentInterval, val1) || Infinity;
+        var alignedValue2 = anychart.utils.alignRight(currentInterval, val2) || Infinity;
+        var alignedValue3 = anychart.utils.alignRight(currentInterval, val3) || Infinity;
+        var alignedValue5 = anychart.utils.alignRight(currentInterval, val5) || Infinity;
+        var alignedValue6 = anychart.utils.alignRight(currentInterval, val6) || Infinity;
+
+        var alignedMin = Math.min(alignedValue1, alignedValue2, alignedValue3, alignedValue5, alignedValue6);
+        if (alignedMin && isFinite(alignedMin))
+          currentInterval = alignedMin;
+
         var tmpDiff1 = anychart.math.specialRound(anychart.utils.alignLeft(min, currentInterval, this.base_)) - min;
         tmpDiff1 *= tmpDiff1;
         var tmpDiff2 = anychart.math.specialRound(anychart.utils.alignRight(max, currentInterval, this.base_)) - max;
@@ -295,21 +300,22 @@ anychart.mapModule.scales.GeoTicks.prototype.setupAsMajor = function(min, max, o
         }
       }
     }
-    interval = Math.max(interval, 1e-7);
-    var desiredMin = anychart.math.specialRound(anychart.utils.alignLeft(min, interval, this.base_));
+
+    var precision = anychart.math.getPrecision(interval);
+    var desiredMin = anychart.math.specialRound(anychart.utils.alignLeft(min, interval, this.base_, precision));
     if (opt_canModifyMin) {
       result[0] = min = desiredMin;
     } else if (min - desiredMin > 1e-7) {
       ticks.push(min);
       result[2] = desiredMin;
     }
-    var desiredMax = anychart.math.specialRound(anychart.utils.alignRight(max, interval, this.base_));
+    var desiredMax = anychart.math.specialRound(anychart.utils.alignRight(max, interval, this.base_, precision));
     if (opt_canModifyMax) {
       result[1] = max = desiredMax;
     } else if (desiredMax - max > 1e-7) {
       result[3] = desiredMax;
     }
-    for (var j = anychart.math.specialRound(anychart.utils.alignRight(min, interval, this.base_));
+    for (var j = anychart.math.specialRound(anychart.utils.alignRight(min, interval, this.base_, precision));
          j <= max;
          j = anychart.math.specialRound(j + interval)) {
       ticks.push(j);

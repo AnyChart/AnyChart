@@ -168,7 +168,7 @@ anychart.core.defaultTheme.VALUE_TOKEN_DECIMALS_COUNT_2 = '{%Value}{decimalsCoun
 /**
  * @const {string}
  */
-anychart.core.defaultTheme.VALUE_TOKEN_DECIMALS_COUNT_10 = '{%Value}{decimalsCount:10}';
+anychart.core.defaultTheme.VALUE_TOKEN_DECIMALS_COUNT_10 = '{%Value}';
 
 
 /**
@@ -211,15 +211,6 @@ anychart.core.defaultTheme.returnValue = function() {
  */
 anychart.core.defaultTheme.returnValueAsIs = function() {
   return this['value'];
-};
-
-
-/**
- * @this {*}
- * @return {*}
- */
-anychart.core.defaultTheme.notRoundedValue = function() {
-  return anychart.core.defaultTheme.locNum(this['value'], 10);
 };
 
 
@@ -944,12 +935,12 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     },
     'labels': {
       'enabled': true,
-      'format': anychart.core.defaultTheme.notRoundedValue,
+      'format': anychart.core.defaultTheme.returnValue,
       'zIndex': 35
     },
     'minorLabels': {
       'fontSize': 9,
-      'format': anychart.core.defaultTheme.notRoundedValue,
+      'format': anychart.core.defaultTheme.returnValue,
       'zIndex': 35
     },
     'ticks': {
