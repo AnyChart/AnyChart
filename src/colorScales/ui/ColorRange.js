@@ -1,12 +1,15 @@
 goog.provide('anychart.colorScalesModule.ui.ColorRange');
 goog.provide('anychart.standalones.ColorRange');
+
 goog.require('anychart.colorScalesModule.Linear');
 goog.require('anychart.colorScalesModule.Ordinal');
 goog.require('anychart.colorScalesModule.ui.ColorRangeTicks');
 goog.require('anychart.core.Axis');
 goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.ui.MarkersFactory');
+goog.require('anychart.format.Context');
 goog.require('anychart.math.Rect');
+
 goog.forwardDeclare('anychart.mapModule.Series');
 goog.forwardDeclare('anychart.treemapModule.Chart');
 
@@ -229,35 +232,39 @@ anychart.colorScalesModule.ui.ColorRange.prototype.calculateRangeRegions_ = func
 anychart.colorScalesModule.ui.ColorRange.prototype.getLabelsFormatProvider = function(index, value) {
   var scale = this.scale();
 
-  var provider = {};
-  var labelText, labelValue;
+  var labelText, labelValue, labelType;
+  var values = {};
   if (anychart.utils.instanceOf(scale, anychart.colorScalesModule.Linear)) {
     labelText = parseFloat(value);
     labelValue = parseFloat(value);
+    labelType = anychart.enums.TokenType.NUMBER;
   } else if (anychart.utils.instanceOf(scale, anychart.colorScalesModule.Ordinal)) {
     labelText = scale.ticks().names()[index];
     labelValue = value;
+    labelType = anychart.enums.TokenType.STRING;
 
     var range = scale.getRangeByValue(/** @type {number} */(value));
     if (range) {
-      provider['colorRange'] = {
+      values['colorRange'] = {value: {
         'color': range.color,
         'end': range.end,
         'name': range.name,
         'start': range.start,
         'index': range.sourceIndex
-      };
+      }, type: anychart.enums.TokenType.UNKNOWN};
     }
   }
 
-  provider['index'] = index;
-  provider['value'] = labelText;
-  provider['tickValue'] = labelValue;
-  provider['max'] = goog.isDef(scale.max) ? scale.max : null;
-  provider['min'] = goog.isDef(scale.min) ? scale.min : null;
-  provider['scale'] = scale;
+  values['index'] = {value: index, type: anychart.enums.TokenType.NUMBER};
+  values['value'] = {value: labelText, type: labelType};
+  values['tickValue'] = {value: labelValue, type: anychart.enums.TokenType.NUMBER};
+  values['max'] = {value: goog.isDef(scale.max) ? scale.max : null, type: anychart.enums.TokenType.NUMBER};
+  values['min'] = {value: goog.isDef(scale.min) ? scale.min : null, type: anychart.enums.TokenType.NUMBER};
+  values['scale'] = {value: scale, type: anychart.enums.TokenType.UNKNOWN};
 
-  return provider;
+  var context = new anychart.format.Context(values);
+
+  return context.propagate();
 };
 
 
