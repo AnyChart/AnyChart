@@ -210,18 +210,20 @@ anychart.colorScalesModule.ui.ColorRange.prototype.targetInvalidated_ = function
  * @private
  */
 anychart.colorScalesModule.ui.ColorRange.prototype.calculateRangeRegions_ = function() {
-  var scale = this.scale();
-  if (scale && anychart.utils.instanceOf(scale, anychart.colorScalesModule.Ordinal)) {
-    this.rangeRegions_ = {};
-    var target = /** @type {anychart.mapModule.Series|anychart.treemapModule.Chart|anychart.tagCloudModule.Chart} */ (this.target_);
-    var iterator = /** @type {anychart.mapModule.Series|anychart.treemapModule.Chart|anychart.tagCloudModule.Chart} */(target).getResetIterator();
-    while (iterator.advance()) {
-      var category = goog.isDef(target.categoryFieldName) ? iterator.meta(target.categoryFieldName) : null;
-      var pointValue = category || iterator.get(target.drawer ? target.drawer.valueFieldName : target.referenceValueNames[1]);
-      var range = scale.getRangeByValue(/** @type {number} */(pointValue));
-      if (range) {
-        if (!this.rangeRegions_[range.sourceIndex]) this.rangeRegions_[range.sourceIndex] = [];
-        this.rangeRegions_[range.sourceIndex].push(iterator.getIndex());
+  if (this.target_) {
+    var scale = this.scale();
+    if (scale && anychart.utils.instanceOf(scale, anychart.colorScalesModule.Ordinal)) {
+      this.rangeRegions_ = {};
+      var target = /** @type {anychart.mapModule.Series|anychart.treemapModule.Chart|anychart.tagCloudModule.Chart} */ (this.target_);
+      var iterator = /** @type {anychart.mapModule.Series|anychart.treemapModule.Chart|anychart.tagCloudModule.Chart} */(target).getResetIterator();
+      while (iterator.advance()) {
+        var category = goog.isDef(target.categoryFieldName) ? iterator.meta(target.categoryFieldName) : null;
+        var pointValue = category || iterator.get(target.drawer ? target.drawer.valueFieldName : target.referenceValueNames[1]);
+        var range = scale.getRangeByValue(/** @type {number} */(pointValue));
+        if (range) {
+          if (!this.rangeRegions_[range.sourceIndex]) this.rangeRegions_[range.sourceIndex] = [];
+          this.rangeRegions_[range.sourceIndex].push(iterator.getIndex());
+        }
       }
     }
   }
@@ -703,52 +705,54 @@ anychart.colorScalesModule.ui.ColorRange.prototype.calcSize = function(maxLabelS
  * @param {number} value Value.
  */
 anychart.colorScalesModule.ui.ColorRange.prototype.showMarker = function(value) {
-  // if (isNaN(+value)) return;
+  if (this.target_) {
+    // if (isNaN(+value)) return;
 
-  var scale = this.scale();
-  var target = /** @type {anychart.mapModule.Series|anychart.tagCloudModule.Chart} */(this.target_);
-  var targetScale = target.colorScale() || (target.getColorScale ? target.getColorScale() : void 0);
-  var isMarker = this.marker_ && this.marker_.enabled();
-  var isTarget = target && target.enabled() && targetScale == scale;
+    var scale = this.scale();
+    var target = /** @type {anychart.mapModule.Series|anychart.tagCloudModule.Chart} */(this.target_);
+    var targetScale = target.colorScale() || (target.getColorScale ? target.getColorScale() : void 0);
+    var isMarker = this.marker_ && this.marker_.enabled();
+    var isTarget = target.enabled() && targetScale == scale;
 
-  if (this.enabled() && isMarker && scale && isTarget) {
-    var lineBounds = this.line.getBounds();
-    var ratio = goog.math.clamp(this.scale().transform(value, .5), 0, 1);
+    if (this.enabled() && isMarker && scale && isTarget) {
+      var lineBounds = this.line.getBounds();
+      var ratio = goog.math.clamp(this.scale().transform(value, .5), 0, 1);
 
-    if (isNaN(ratio)) return;
+      if (isNaN(ratio)) return;
 
-    var orientation = this.orientation();
-    var x, y, rotation;
-    switch (orientation) {
-      case anychart.enums.Orientation.TOP:
-        x = lineBounds.left + lineBounds.width * ratio;
-        y = lineBounds.top + lineBounds.height + this.marker_.size();
-        rotation = 180;
-        break;
-      case anychart.enums.Orientation.BOTTOM:
-        x = lineBounds.left + lineBounds.width * ratio;
-        y = lineBounds.top - this.marker_.size();
-        rotation = 0;
-        break;
-      case anychart.enums.Orientation.LEFT:
-        x = lineBounds.left + lineBounds.width + this.marker_.size();
-        y = lineBounds.top + lineBounds.height - (lineBounds.height * ratio);
-        rotation = 90;
-        break;
-      case anychart.enums.Orientation.RIGHT:
-        x = lineBounds.left - this.marker_.size();
-        y = lineBounds.top + lineBounds.height - (lineBounds.height * ratio);
-        rotation = -90;
-        break;
+      var orientation = this.orientation();
+      var x, y, rotation;
+      switch (orientation) {
+        case anychart.enums.Orientation.TOP:
+          x = lineBounds.left + lineBounds.width * ratio;
+          y = lineBounds.top + lineBounds.height + this.marker_.size();
+          rotation = 180;
+          break;
+        case anychart.enums.Orientation.BOTTOM:
+          x = lineBounds.left + lineBounds.width * ratio;
+          y = lineBounds.top - this.marker_.size();
+          rotation = 0;
+          break;
+        case anychart.enums.Orientation.LEFT:
+          x = lineBounds.left + lineBounds.width + this.marker_.size();
+          y = lineBounds.top + lineBounds.height - (lineBounds.height * ratio);
+          rotation = 90;
+          break;
+        case anychart.enums.Orientation.RIGHT:
+          x = lineBounds.left - this.marker_.size();
+          y = lineBounds.top + lineBounds.height - (lineBounds.height * ratio);
+          rotation = -90;
+          break;
+      }
+
+      this.marker_
+          .suspendSignalsDispatching()
+          .rotation(rotation)
+          .positionProvider({'value': {x: x, y: y}})
+          .resumeSignalsDispatching(false)
+          .draw();
+      this.marker_.getDomElement().visible(true);
     }
-
-    this.marker_
-        .suspendSignalsDispatching()
-        .rotation(rotation)
-        .positionProvider({'value': {x: x, y: y}})
-        .resumeSignalsDispatching(false)
-        .draw();
-    this.marker_.getDomElement().visible(true);
   }
 };
 
@@ -831,31 +835,126 @@ anychart.colorScalesModule.ui.ColorRange.prototype.draw = function() {
  * @param {anychart.core.MouseEvent} event .
  */
 anychart.colorScalesModule.ui.ColorRange.prototype.handleMouseClick = function(event) {
-  var scale = this.scale();
-  var target = /** @type {anychart.mapModule.Series|anychart.treemapModule.Chart|anychart.tagCloudModule.Chart} */(this.target_);
-  var targetScale = target.colorScale() || target.getColorScale();
+  if (this.target_) {
+    var scale = this.scale();
+    var target = /** @type {anychart.mapModule.Series|anychart.treemapModule.Chart|anychart.tagCloudModule.Chart} */(this.target_);
+    var targetScale = target.colorScale() || (target.getColorScale ? target.getColorScale() : void 0);
 
-  if (this.enabled() && scale && target && target.enabled() && targetScale == scale) {
-    var lineBounds = this.line.getBounds();
-    var x, y, min, ratio, value;
-    if (this.isHorizontal()) {
-      x = event['clientX'];
-      min = lineBounds.left + this.container().getStage().getClientPosition().x;
-      ratio = (x - min) / lineBounds.width;
-    } else {
-      y = event['clientY'];
-      min = lineBounds.top + this.container().getStage().getClientPosition().y;
-      ratio = (lineBounds.height - (y - min)) / lineBounds.height;
-    }
+    if (this.enabled() && scale && target.enabled() && targetScale == scale) {
+      var lineBounds = this.line.getBounds();
+      var x, y, min, ratio, value;
+      if (this.isHorizontal()) {
+        x = event['clientX'];
+        min = lineBounds.left + this.container().getStage().getClientPosition().x;
+        ratio = (x - min) / lineBounds.width;
+      } else {
+        y = event['clientY'];
+        min = lineBounds.top + this.container().getStage().getClientPosition().y;
+        ratio = (lineBounds.height - (y - min)) / lineBounds.height;
+      }
 
-    value = /** @type {number} */(scale.inverseTransform(ratio));
-    if (!(event.metaKey || event.shiftKey) && target.map) {
-      target.map.unselect();
+      value = /** @type {number} */(scale.inverseTransform(ratio));
+      if (!(event.metaKey || event.shiftKey) && target.map) {
+        target.map.unselect();
+      }
+      var iterator, pointValue, points, chart, interactivity;
+      if (anychart.utils.instanceOf(scale, anychart.colorScalesModule.Ordinal)) {
+        var range = scale.getRangeByValue(/** @type {string|number} */(value));
+        if (scale && target) {
+          points = this.rangeRegions_[range.sourceIndex];
+          chart = /** @type {anychart.core.SeparateChart} */(target.getChart());
+          interactivity = /** @type {anychart.core.utils.Interactivity} */(chart.interactivity());
+          if (interactivity.hoverMode() == anychart.enums.HoverMode.SINGLE) {
+            this.points_ = {
+              series: target,
+              points: points
+            };
+          } else {
+            this.points_ = [{
+              series: target,
+              points: points,
+              lastPoint: points[points.length - 1],
+              nearestPointToCursor: {index: points[points.length - 1], distance: 0}
+            }];
+          }
+        }
+
+      } else if (anychart.utils.instanceOf(scale, anychart.colorScalesModule.Linear)) {
+        iterator = target.getResetIterator();
+        var minLength = Infinity;
+        var targetValue = NaN;
+        var scaleMin = /** @type {number} */(scale.minimum());
+        var scaleMax = /** @type {number} */(scale.maximum());
+        while (iterator.advance()) {
+          pointValue = /** @type {number} */(iterator.get(target.drawer ? target.drawer.valueFieldName : target.referenceValueNames[1]));
+          pointValue = goog.math.clamp(pointValue, scaleMin, scaleMax);
+          var currLength = Math.abs(value - pointValue);
+          if (minLength > currLength) {
+            minLength = currLength;
+            targetValue = pointValue;
+          }
+        }
+
+        points = [];
+        iterator = target.getResetIterator();
+        value = targetValue;
+
+        while (iterator.advance()) {
+          pointValue = /** @type {number} */(iterator.get(target.drawer ? target.drawer.valueFieldName : target.referenceValueNames[1]));
+          pointValue = goog.math.clamp(pointValue, scaleMin, scaleMax);
+          if (pointValue == value)
+            points.push(iterator.getIndex());
+        }
+
+        if (scale && target) {
+          chart = /** @type {anychart.core.SeparateChart} */(target.getChart());
+          interactivity = /** @type {anychart.core.utils.Interactivity} */(chart.interactivity());
+          if (interactivity.hoverMode() == anychart.enums.HoverMode.SINGLE) {
+            this.points_ = {
+              series: target,
+              points: points
+            };
+          } else {
+            this.points_ = [{
+              series: target,
+              points: points,
+              lastPoint: points[points.length - 1],
+              nearestPointToCursor: {index: points[points.length - 1], distance: 0}
+            }];
+          }
+        }
+      }
     }
-    var iterator, pointValue, points, chart, interactivity;
-    if (anychart.utils.instanceOf(scale, anychart.colorScalesModule.Ordinal)) {
-      var range = scale.getRangeByValue(/** @type {string|number} */(value));
-      if (scale && target) {
+  }
+};
+
+
+/**
+ * @param {anychart.core.MouseEvent} event .
+ */
+anychart.colorScalesModule.ui.ColorRange.prototype.handleMouseOverAndMove = function(event) {
+  if (this.target_) {
+    var scale = this.scale();
+    var target = /** @type {anychart.mapModule.Series|anychart.treemapModule.Chart|anychart.tagCloudModule.Chart} */(this.target_);
+    var targetScale = target.colorScale() || (target.getColorScale ? target.getColorScale() : void 0);
+
+    if (this.enabled() && scale && target.enabled() && targetScale == scale) {
+      var lineBounds = this.line.getBounds();
+      var x, y, min, ratio, value;
+      if (this.isHorizontal()) {
+        x = event['clientX'];
+        min = lineBounds.left + this.container().getStage().getClientPosition().x;
+        ratio = (x - min) / lineBounds.width;
+      } else {
+        y = event['clientY'];
+        min = lineBounds.top + this.container().getStage().getClientPosition().y;
+        ratio = (lineBounds.height - (y - min)) / lineBounds.height;
+      }
+
+      var iterator, pointValue, points, chart, interactivity;
+      value = /** @type {number} */(scale.inverseTransform(ratio));
+      if (anychart.utils.instanceOf(scale, anychart.colorScalesModule.Ordinal)) {
+        var range = scale.getRangeByValue(/** @type {string|number} */(value));
         points = this.rangeRegions_[range.sourceIndex];
         chart = /** @type {anychart.core.SeparateChart} */(target.getChart());
         interactivity = /** @type {anychart.core.utils.Interactivity} */(chart.interactivity());
@@ -872,157 +971,67 @@ anychart.colorScalesModule.ui.ColorRange.prototype.handleMouseClick = function(e
             nearestPointToCursor: {index: points[points.length - 1], distance: 0}
           }];
         }
-      }
+      } else if (anychart.utils.instanceOf(scale, anychart.colorScalesModule.Linear) && target) {
+        iterator = target.getResetIterator();
+        var minLength = Infinity;
+        var targetValue = NaN;
+        var scaleMin = /** @type {number} */(scale.minimum());
+        var scaleMax = /** @type {number} */(scale.maximum());
 
-    } else if (anychart.utils.instanceOf(scale, anychart.colorScalesModule.Linear)) {
-      iterator = target.getResetIterator();
-      var minLength = Infinity;
-      var targetValue = NaN;
-      var scaleMin = /** @type {number} */(scale.minimum());
-      var scaleMax = /** @type {number} */(scale.maximum());
-      while (iterator.advance()) {
-        pointValue = /** @type {number} */(iterator.get(target.drawer ? target.drawer.valueFieldName : target.referenceValueNames[1]));
-        pointValue = goog.math.clamp(pointValue, scaleMin, scaleMax);
-        var currLength = Math.abs(value - pointValue);
-        if (minLength > currLength) {
-          minLength = currLength;
-          targetValue = pointValue;
-        }
-      }
-
-      points = [];
-      iterator = target.getResetIterator();
-      value = targetValue;
-
-      while (iterator.advance()) {
-        pointValue = /** @type {number} */(iterator.get(target.drawer ? target.drawer.valueFieldName : target.referenceValueNames[1]));
-        pointValue = goog.math.clamp(pointValue, scaleMin, scaleMax);
-        if (pointValue == value)
-          points.push(iterator.getIndex());
-      }
-
-      if (scale && target) {
-        chart = /** @type {anychart.core.SeparateChart} */(target.getChart());
-        interactivity = /** @type {anychart.core.utils.Interactivity} */(chart.interactivity());
-        if (interactivity.hoverMode() == anychart.enums.HoverMode.SINGLE) {
-          this.points_ = {
-            series: target,
-            points: points
-          };
-        } else {
-          this.points_ = [{
-            series: target,
-            points: points,
-            lastPoint: points[points.length - 1],
-            nearestPointToCursor: {index: points[points.length - 1], distance: 0}
-          }];
-        }
-      }
-    }
-  }
-};
-
-
-/**
- * @param {anychart.core.MouseEvent} event .
- */
-anychart.colorScalesModule.ui.ColorRange.prototype.handleMouseOverAndMove = function(event) {
-  var scale = this.scale();
-  var target = /** @type {anychart.mapModule.Series|anychart.treemapModule.Chart|anychart.tagCloudModule.Chart} */(this.target_);
-  var targetScale = target.colorScale() || target.getColorScale();
-  if (this.enabled() && scale && target && target.enabled() && targetScale == scale) {
-    var lineBounds = this.line.getBounds();
-    var x, y, min, ratio, value;
-    if (this.isHorizontal()) {
-      x = event['clientX'];
-      min = lineBounds.left + this.container().getStage().getClientPosition().x;
-      ratio = (x - min) / lineBounds.width;
-    } else {
-      y = event['clientY'];
-      min = lineBounds.top + this.container().getStage().getClientPosition().y;
-      ratio = (lineBounds.height - (y - min)) / lineBounds.height;
-    }
-
-    var iterator, pointValue, points, chart, interactivity;
-    value = /** @type {number} */(scale.inverseTransform(ratio));
-    if (anychart.utils.instanceOf(scale, anychart.colorScalesModule.Ordinal)) {
-      var range = scale.getRangeByValue(/** @type {string|number} */(value));
-      points = this.rangeRegions_[range.sourceIndex];
-      chart = /** @type {anychart.core.SeparateChart} */(target.getChart());
-      interactivity = /** @type {anychart.core.utils.Interactivity} */(chart.interactivity());
-      if (interactivity.hoverMode() == anychart.enums.HoverMode.SINGLE) {
-        this.points_ = {
-          series: target,
-          points: points
-        };
-      } else {
-        this.points_ = [{
-          series: target,
-          points: points,
-          lastPoint: points[points.length - 1],
-          nearestPointToCursor: {index: points[points.length - 1], distance: 0}
-        }];
-      }
-    } else if (anychart.utils.instanceOf(scale, anychart.colorScalesModule.Linear) && target) {
-      iterator = target.getResetIterator();
-      var minLength = Infinity;
-      var targetValue = NaN;
-      var scaleMin = /** @type {number} */(scale.minimum());
-      var scaleMax = /** @type {number} */(scale.maximum());
-
-      while (iterator.advance()) {
-        pointValue = /** @type {number} */(iterator.get(target.drawer ? target.drawer.valueFieldName : target.referenceValueNames[1]));
-        pointValue = goog.math.clamp(pointValue, scaleMin, scaleMax);
-        var currLength = Math.abs(value - pointValue);
-        if (minLength > currLength) {
-          minLength = currLength;
-          targetValue = pointValue;
-        }
-      }
-
-      points = [];
-      iterator = target.getResetIterator();
-      value = targetValue;
-      while (iterator.advance()) {
-        pointValue = /** @type {number} */(iterator.get(target.drawer ? target.drawer.valueFieldName : target.referenceValueNames[1]));
-        pointValue = goog.math.clamp(pointValue, scaleMin, scaleMax);
-        if (pointValue == value)
-          points.push(iterator.getIndex());
-      }
-
-      if (scale && target) {
-        chart = /** @type {anychart.core.SeparateChart} */(target.getChart());
-        interactivity = /** @type {anychart.core.utils.Interactivity} */(chart.interactivity());
-        if (interactivity.hoverMode() == anychart.enums.HoverMode.SINGLE) {
-          var dispatchUnhover = this.points_ && !goog.array.every(points, function(el) {
-            return goog.array.contains(this.points_.points, el);
-          }, this);
-
-          if (dispatchUnhover) {
-            var nearestPointIndex = this.points_.points[this.points_.points.length - 1];
-            chart.dispatchEvent(chart.makeInteractivityPointEvent('hovered', event, [{
-              series: target,
-              points: [],
-              nearestPointToCursor: {index: nearestPointIndex, distance: 0}
-            }], false));
+        while (iterator.advance()) {
+          pointValue = /** @type {number} */(iterator.get(target.drawer ? target.drawer.valueFieldName : target.referenceValueNames[1]));
+          pointValue = goog.math.clamp(pointValue, scaleMin, scaleMax);
+          var currLength = Math.abs(value - pointValue);
+          if (minLength > currLength) {
+            minLength = currLength;
+            targetValue = pointValue;
           }
-
-          this.points_ = {
-            series: target,
-            points: points
-          };
-        } else {
-          this.points_ = [{
-            series: target,
-            points: points,
-            lastPoint: points[points.length - 1],
-            nearestPointToCursor: {index: points[points.length - 1], distance: 0}
-          }];
         }
-      }
 
+        points = [];
+        iterator = target.getResetIterator();
+        value = targetValue;
+        while (iterator.advance()) {
+          pointValue = /** @type {number} */(iterator.get(target.drawer ? target.drawer.valueFieldName : target.referenceValueNames[1]));
+          pointValue = goog.math.clamp(pointValue, scaleMin, scaleMax);
+          if (pointValue == value)
+            points.push(iterator.getIndex());
+        }
+
+        if (scale && target) {
+          chart = /** @type {anychart.core.SeparateChart} */(target.getChart());
+          interactivity = /** @type {anychart.core.utils.Interactivity} */(chart.interactivity());
+          if (interactivity.hoverMode() == anychart.enums.HoverMode.SINGLE) {
+            var dispatchUnhover = this.points_ && !goog.array.every(points, function(el) {
+                  return goog.array.contains(this.points_.points, el);
+                }, this);
+
+            if (dispatchUnhover) {
+              var nearestPointIndex = this.points_.points[this.points_.points.length - 1];
+              chart.dispatchEvent(chart.makeInteractivityPointEvent('hovered', event, [{
+                series: target,
+                points: [],
+                nearestPointToCursor: {index: nearestPointIndex, distance: 0}
+              }], false));
+            }
+
+            this.points_ = {
+              series: target,
+              points: points
+            };
+          } else {
+            this.points_ = [{
+              series: target,
+              points: points,
+              lastPoint: points[points.length - 1],
+              nearestPointToCursor: {index: points[points.length - 1], distance: 0}
+            }];
+          }
+        }
+
+      }
+      this.showMarker(value);
     }
-    this.showMarker(value);
   }
 };
 
