@@ -136,13 +136,6 @@ anychart.ganttModule.BaseGrid = function(opt_controller, opt_isResource) {
   this.eventsRect_ = null;
 
   /**
-   * Background fill.
-   * @type {acgraph.vector.Fill}
-   * @private
-   */
-  this.backgroundFill_;
-
-  /**
    * Cells layer. Contains a grid itself.
    * @type {acgraph.vector.Layer}
    * @private
@@ -264,41 +257,6 @@ anychart.ganttModule.BaseGrid = function(opt_controller, opt_isResource) {
   this.selectedPath_ = null;
 
   /**
-   * Odd fill.
-   * @type {?acgraph.vector.Fill}
-   * @private
-   */
-  this.rowOddFill_;
-
-  /**
-   * Even fill.
-   * @type {?acgraph.vector.Fill}
-   * @private
-   */
-  this.rowEvenFill_;
-
-  /**
-   * Default rows fill.
-   * @type {acgraph.vector.Fill}
-   * @private
-   */
-  this.rowFill_;
-
-  /**
-   * Default hover fill.
-   * @type {acgraph.vector.Fill}
-   * @private
-   */
-  this.hoverFill_;
-
-  /**
-   * Default row selected fill.
-   * @type {acgraph.vector.Fill}
-   * @private
-   */
-  this.rowSelectedFill_;
-
-  /**
    * Contains the sequence of heights of grid. Used to quickly calculate this.hoveredIndex on mouse over event
    * for row highlighting purposes.
    * @type {Array.<number>}
@@ -412,6 +370,18 @@ anychart.ganttModule.BaseGrid = function(opt_controller, opt_isResource) {
   this.bindHandlersToComponent(this, this.handleMouseOverAndMove_, this.handleMouseOut_, this.handleMouseClick_,
       this.handleMouseOverAndMove_, this.handleAll_);
 
+  function beforeRowFillInvalidation() {
+    this.setOption('rowOddFill', null);
+    this.setOption('rowEvenFill', null);
+  }
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['backgroundFill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['rowFill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW, void 0, beforeRowFillInvalidation],
+    ['rowEvenFill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['rowOddFill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['rowHoverFill', 0, 0],
+    ['rowSelectedFill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW]
+  ]);
 };
 goog.inherits(anychart.ganttModule.BaseGrid, anychart.core.VisualBaseWithBounds);
 
@@ -1153,7 +1123,7 @@ anychart.ganttModule.BaseGrid.prototype.getEvenPath = function() {
 anychart.ganttModule.BaseGrid.prototype.getHoverPath = function() {
   if (!this.hoverPath_) {
     this.hoverPath_ = /** @type {acgraph.vector.Path} */ (this.getCellsLayer().path());
-    this.hoverPath_.stroke(null).fill(this.hoverFill_).zIndex(2);
+    this.hoverPath_.stroke(null)/*.fill(/!** @type {acgraph.vector.Fill} *!/(this.getOption('rowHoverFill')))*/.zIndex(2);
     this.registerDisposable(this.hoverPath_);
   }
   return this.hoverPath_;
@@ -1167,7 +1137,7 @@ anychart.ganttModule.BaseGrid.prototype.getHoverPath = function() {
 anychart.ganttModule.BaseGrid.prototype.getSelectedPath = function() {
   if (!this.selectedPath_) {
     this.selectedPath_ = /** @type {acgraph.vector.Path} */ (this.getCellsLayer().path());
-    this.selectedPath_.stroke(null).fill(this.rowSelectedFill_).zIndex(3);
+    this.selectedPath_.stroke(null)/*.fill(/!** @type {acgraph.vector.Fill} *!/(this.getOption('rowSelectedFill')))*/.zIndex(3);
     this.registerDisposable(this.selectedPath_);
   }
   return this.selectedPath_;
@@ -1216,155 +1186,339 @@ anychart.ganttModule.BaseGrid.prototype.getHeaderSeparationPath = function() {
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Decoration.
-//
-//----------------------------------------------------------------------------------------------------------------------
+//region --- Coloring
 /**
- * Gets/sets a default rows fill. Resets odd fill and even fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.ganttModule.BaseGrid|string} - Current value or itself for method chaining.
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.ganttModule.BaseGrid.prototype.rowFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.rowFill_), val)) {
-      this.rowFill_ = val;
-      this.rowOddFill_ = null;
-      this.rowEvenFill_ = null;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+anychart.ganttModule.BaseGrid.COLOR_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+  anychart.core.settings.createDescriptors(map, [
+    // grid coloring
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'backgroundFill', anychart.core.settings.fillNormalizer],
+
+    // row coloring
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'rowFill', anychart.core.settings.fillNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'rowEvenFill', anychart.core.settings.fillNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'rowOddFill', anychart.core.settings.fillNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'rowHoverFill', anychart.core.settings.fillOrFunctionNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'rowSelectedFill', anychart.core.settings.fillOrFunctionNormalizer]
+  ]);
+  return map;
+})();
+anychart.core.settings.populate(anychart.ganttModule.BaseGrid, anychart.ganttModule.BaseGrid.COLOR_DESCRIPTORS);
+
+
+/**
+ * Annotations cache of resolver functions.
+ * @type {Object.<string, function(anychart.ganttModule.BaseGrid, number, (anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)=, (anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)=, anychart.enums.ConnectorType=, number=, number=):(acgraph.vector.Fill|acgraph.vector.Stroke|acgraph.vector.PatternFill)>}
+ * @private
+ */
+anychart.ganttModule.BaseGrid.colorResolversCache_ = {};
+
+
+/**
+ * Returns a color resolver for passed color names and type.
+ * @param {(string|null|boolean)} colorName
+ * @param {anychart.enums.ColorType} colorType
+ * @param {boolean} canBeHoveredSelected Whether need to resolve hovered selected colors
+ * @return {function(anychart.ganttModule.BaseGrid, number, (anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)=, (anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)=, anychart.enums.ConnectorType=, number=, number=):acgraph.vector.AnyColor}
+ */
+anychart.ganttModule.BaseGrid.getColorResolver = function(colorName, colorType, canBeHoveredSelected) {
+  if (!colorName) return anychart.color.getNullColor;
+  var hash = colorType + '|' + colorName + '|' + canBeHoveredSelected;
+  var result = anychart.ganttModule.BaseGrid.colorResolversCache_[hash];
+  if (!result) {
+    /** @type {!Function} */
+    var normalizerFunc;
+    switch (colorType) {
+      case anychart.enums.ColorType.STROKE:
+        normalizerFunc = anychart.core.settings.strokeOrFunctionSimpleNormalizer;
+        break;
+      case anychart.enums.ColorType.HATCH_FILL:
+        normalizerFunc = anychart.core.settings.hatchFillOrFunctionSimpleNormalizer;
+        break;
+      default:
+      case anychart.enums.ColorType.FILL:
+        normalizerFunc = anychart.core.settings.fillOrFunctionSimpleNormalizer;
+        break;
     }
-    return this;
+    anychart.ganttModule.BaseGrid.colorResolversCache_[hash] = result = goog.partial(anychart.ganttModule.BaseGrid.getColor_,
+        colorName, normalizerFunc, colorType == anychart.enums.ColorType.HATCH_FILL, canBeHoveredSelected);
   }
-  return this.rowFill_;
+  return result;
 };
 
 
 /**
- * Gets/sets row odd fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.ganttModule.BaseGrid|string} - Current value or itself for method chaining.
+ * Returns final color or hatch fill for passed params.
+ * @param {string} colorName
+ * @param {!Function} normalizer
+ * @param {boolean} isHatchFill
+ * @param {boolean} canBeHoveredSelected
+ * @param {anychart.ganttModule.BaseGrid} baseGrid
+ * @param {number} state
+ * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)=} opt_dataItem
+ * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)=} opt_dataItemTo
+ * @param {anychart.enums.ConnectorType=} opt_connType
+ * @param {number=} opt_periodIndex
+ * @param {number=} opt_periodIndexTo
+ * @return {acgraph.vector.Fill|acgraph.vector.Stroke|acgraph.vector.PatternFill}
+ * @private
  */
-anychart.ganttModule.BaseGrid.prototype.rowOddFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.rowOddFill_), val)) {
-      this.rowOddFill_ = val;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+anychart.ganttModule.BaseGrid.getColor_ = function(colorName, normalizer, isHatchFill, canBeHoveredSelected, baseGrid, state, opt_dataItem,  opt_dataItemTo, opt_connType, opt_periodIndex, opt_periodIndexTo) {
+  var stateColor, context;
+  state = anychart.core.utils.InteractivityState.clarifyState(state);
+  if (canBeHoveredSelected && (state != anychart.PointState.NORMAL)) {
+    stateColor = baseGrid.resolveOption(colorName, state, normalizer);
+    if (isHatchFill && stateColor === true)
+      stateColor = normalizer(baseGrid.getAutoHatchFill());
+    if (goog.isDef(stateColor)) {
+      if (!goog.isFunction(stateColor))
+        return /** @type {acgraph.vector.Fill|acgraph.vector.Stroke|acgraph.vector.PatternFill} */(stateColor);
+      else if (isHatchFill) { // hatch fills set as function some why cannot nest by initial implementation
+        context = baseGrid.getHatchFillResolutionContext();
+        return /** @type {acgraph.vector.PatternFill} */(normalizer(stateColor.call(context, context)));
+      }
     }
-    return this;
   }
-  return this.rowOddFill_;
+  // we can get here only if state color is undefined or is a function
+  var color = baseGrid.resolveOption(colorName, 0, normalizer);
+  if (isHatchFill && color === true)
+    color = normalizer(baseGrid.getAutoHatchFill());
+  if (goog.isFunction(color)) {
+    context = isHatchFill ?
+        baseGrid.getHatchFillResolutionContext() :
+        baseGrid.getColorResolutionContext(colorName, opt_dataItem, opt_dataItemTo, opt_connType, opt_periodIndex, opt_periodIndexTo);
+    color = /** @type {acgraph.vector.Fill|acgraph.vector.Stroke|acgraph.vector.PatternFill} */(normalizer(color.call(context, context)));
+  }
+  if (stateColor) { // it is a function and not a hatch fill here
+    context = baseGrid.getColorResolutionContext(colorName, opt_dataItem, opt_dataItemTo, opt_connType);
+    color = normalizer(stateColor.call(context, context));
+  }
+  return /** @type {acgraph.vector.Fill|acgraph.vector.Stroke|acgraph.vector.PatternFill} */(color);
 };
 
 
 /**
- * Gets/sets row even fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.ganttModule.BaseGrid|string} - Current value or itself for method chaining.
+ * Implements option inheritance from base bar settings.
+ * @param {string} name - .
+ * @param {string} defaultName - .
+ * @return {*}
  */
-anychart.ganttModule.BaseGrid.prototype.rowEvenFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.rowEvenFill_), val)) {
-      this.rowEvenFill_ = val;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.rowEvenFill_;
+anychart.ganttModule.BaseGrid.prototype.getInheritedOption = function(name, defaultName) {
+  var val = this.getOption(name);
+  return goog.isDefAndNotNull(val) ? val : this.getOption(defaultName);
 };
 
 
 /**
- * Gets/sets row hover fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.ganttModule.BaseGrid|string} - Current value or itself for method chaining.
+ * Resolve annotation color option.
+ * @param {string} name
+ * @param {number} state
+ * @param {Function} normalizer
+ * @return {*}
  */
-anychart.ganttModule.BaseGrid.prototype.rowHoverFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.hoverFill_), val)) {
-      //NOTE: this value will be applied on mouse event. That's why we do not invalidate anything.
-      this.hoverFill_ = val;
-    }
-    return this;
+anychart.ganttModule.BaseGrid.prototype.resolveOption = function(name, state, normalizer) {
+  if (name == 'rowSelectedFill' || name == 'rowHoverFill' || name == 'selectedElementFill' || name == 'selectedElementStroke') {
+    return normalizer(this.getOption(name));
+  } else {
+    var isFill = goog.string.contains(name, 'Fill');
+    var defaultName = isFill ? 'baseFill' : 'baseStroke';
+    return normalizer(this.getInheritedOption(name, defaultName));
   }
-  return this.hoverFill_;
 };
 
 
 /**
- * Gets/sets row selected fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.ganttModule.BaseGrid|string} - Current value or itself for method chaining.
+ * Returns source color for colorName.
+ * @param {string} colorName
+ * @param {anychart.palettes.RangeColors|anychart.palettes.DistinctColors} palette
+ * @return {acgraph.vector.AnyColor}
  */
-anychart.ganttModule.BaseGrid.prototype.rowSelectedFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.rowSelectedFill_), val)) {
-      this.rowSelectedFill_ = val;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
+anychart.ganttModule.BaseGrid.prototype.getSourceColorFor = function(colorName, palette) {
+  var sourceColor;
+  switch (colorName) {
+    case 'baseFill':
+      sourceColor = palette.itemAt(0);
+      break;
+    case 'baseStroke':
+      sourceColor = anychart.color.lighten(palette.itemAt(0));
+      break;
+    case 'progressFill':
+      sourceColor = palette.itemAt(1);
+      break;
+    case 'progressStroke':
+      sourceColor = {
+        'color': '#fff',
+        'opacity': 0.00001
+      };
+      break;
+    case 'baselineFill':
+      sourceColor = anychart.color.lighten(palette.itemAt(1), 0.7);
+      break;
+    case 'baselineStroke':
+      sourceColor = anychart.color.darken(anychart.color.lighten(palette.itemAt(1), 0.7));
+      break;
+    case 'parentFill':
+      sourceColor = palette.itemAt(4);
+      break;
+    case 'parentStroke':
+      sourceColor = anychart.color.lighten(palette.itemAt(4));
+      break;
+    case 'milestoneFill':
+      sourceColor = palette.itemAt(9);
+      break;
+    case 'milestoneStroke':
+      sourceColor = anychart.color.darken(palette.itemAt(9));
+      break;
+    case 'selectedElementFill':
+      sourceColor = palette.itemAt(2);
+      break;
+    case 'selectedElementStroke':
+      sourceColor = anychart.color.darken(palette.itemAt(2));
+      break;
+    case 'selectedConnectorStroke':
+      sourceColor = anychart.color.setThickness(/** @type {acgraph.vector.Stroke} */(anychart.color.lighten(palette.itemAt(2))), 2);
+      break;
+    case 'rowHoverFill':
+      sourceColor = anychart.getFullTheme('ganttBase.defaultRowHoverFill');
+      break;
+    case 'rowSelectedFill':
+      sourceColor = anychart.getFullTheme('ganttBase.defaultRowSelectedFill');
+      break;
+    default:
+      sourceColor = 'blue';
   }
-  return this.rowSelectedFill_;
+  return /** @type {acgraph.vector.AnyColor} */(sourceColor);
 };
 
 
 /**
- * Gets/sets background fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.ganttModule.BaseGrid|string} - Current value or itself for method chaining.
+ * Returns color resolution context.
+ * This context is used to resolve a fill or stroke set as a function for current point.
+ * @param {string} colorName
+ * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)=} opt_dataItem
+ * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)=} opt_dataItemTo
+ * @param {anychart.enums.ConnectorType=} opt_connType
+ * @param {number=} opt_periodIndex
+ * @param {number=} opt_periodIndexTo
+ * @return {Object}
  */
-anychart.ganttModule.BaseGrid.prototype.backgroundFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.backgroundFill_), val)) {
-      this.backgroundFill_ = val;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+anychart.ganttModule.BaseGrid.prototype.getColorResolutionContext = function(colorName, opt_dataItem, opt_dataItemTo, opt_connType, opt_periodIndex, opt_periodIndexTo) {
+  var palette = (/** @type {anychart.ganttModule.IInteractiveGrid} */(this.interactivityHandler)).palette();
+  var sourceColor = this.getSourceColorFor(colorName, /** @type {anychart.palettes.RangeColors|anychart.palettes.DistinctColors} */ (palette));
+  var rv = {
+    'sourceColor': sourceColor
+  };
+  if (goog.isDefAndNotNull(opt_dataItem)) {
+    if (goog.isDef(opt_connType)) {
+      rv['fromItem'] = opt_dataItem;
+      rv['fromItemIndex'] = opt_dataItem.meta('index');
+      rv['toItem'] = opt_dataItemTo;
+      rv['toItemIndex'] = opt_dataItemTo.meta('index');
+      rv['connType'] = opt_connType;
+    } else {
+      rv['item'] = opt_dataItem;
+      rv['itemIndex'] = opt_dataItem.meta('index');
     }
+
+    if (goog.isDef(opt_periodIndex)) {
+      if (goog.isDef(opt_periodIndexTo)) {
+        var fromPeriod = opt_dataItem.get(anychart.enums.GanttDataFields.PERIODS)[opt_periodIndex];
+        var toPeriod = opt_dataItemTo.get(anychart.enums.GanttDataFields.PERIODS)[opt_periodIndexTo];
+        rv['fromPeriod'] = fromPeriod;
+        rv['fromPeriodIndex'] = opt_periodIndex;
+        rv['toPeriod'] = toPeriod;
+        rv['toPeriodIndex'] = opt_periodIndexTo;
+      } else {
+        var period = opt_dataItem.get(anychart.enums.GanttDataFields.PERIODS)[opt_periodIndex];
+        rv['period'] = period;
+        rv['periodIndex'] = opt_periodIndex;
+      }
+    }
+  }
+  return rv;
+};
+
+
+/**
+ * Returns hatch fill resolution context.
+ * This context is used to resolve a hatch fill set as a function for current point.
+ * @return {Object}
+ */
+anychart.ganttModule.BaseGrid.prototype.getHatchFillResolutionContext = function() {
+  return {
+    'sourceHatchFill': this.getAutoHatchFill()
+  };
+};
+
+
+/**
+ * Returns default hatch fill.
+ * @return {acgraph.vector.PatternFill}
+ */
+anychart.ganttModule.BaseGrid.prototype.getAutoHatchFill = function() {
+  return /*this.autoHatchFill || */acgraph.vector.normalizeHatchFill(acgraph.vector.HatchFill.HatchFillType.DIAGONAL_BRICK);
+};
+
+
+/** @inheritDoc */
+anychart.ganttModule.BaseGrid.prototype.palette = function(opt_value) {
+  if (anychart.utils.instanceOf(opt_value, anychart.palettes.RangeColors)) {
+    this.setupPalette_(anychart.palettes.RangeColors, /** @type {anychart.palettes.RangeColors} */(opt_value));
+    return this;
+  } else if (anychart.utils.instanceOf(opt_value, anychart.palettes.DistinctColors)) {
+    this.setupPalette_(anychart.palettes.DistinctColors, /** @type {anychart.palettes.DistinctColors} */(opt_value));
+    return this;
+  } else if (goog.isObject(opt_value) && opt_value['type'] == 'range') {
+    this.setupPalette_(anychart.palettes.RangeColors);
+  } else if (goog.isObject(opt_value) || this.palette_ == null)
+    this.setupPalette_(anychart.palettes.DistinctColors);
+
+  if (goog.isDef(opt_value)) {
+    this.palette_.setup(opt_value);
     return this;
   }
-  return this.backgroundFill_;
+
+  return /** @type {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors)} */(this.palette_);
 };
+
+
+/**
+ * @param {Function} cls Palette constructor.
+ * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors)=} opt_cloneFrom Settings to clone from.
+ * @private
+ */
+anychart.ganttModule.BaseGrid.prototype.setupPalette_ = function(cls, opt_cloneFrom) {
+  if (anychart.utils.instanceOf(this.palette_, cls)) {
+    if (opt_cloneFrom)
+      this.palette_.setup(opt_cloneFrom);
+  } else {
+    // we dispatch only if we replace existing palette.
+    var doDispatch = !!this.palette_;
+    goog.dispose(this.palette_);
+    this.palette_ = new cls();
+    if (opt_cloneFrom)
+      this.palette_.setup(opt_cloneFrom);
+    this.palette_.listenSignals(this.paletteInvalidated_, this);
+    if (doDispatch)
+      this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
+  }
+};
+
+
+/**
+ * Internal palette invalidation handler.
+ * @param {anychart.SignalEvent} event Event object.
+ * @private
+ */
+anychart.ganttModule.BaseGrid.prototype.paletteInvalidated_ = function(event) {
+  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
+    this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
+  }
+};
+//endregion
 
 
 /**
@@ -1842,7 +1996,7 @@ anychart.ganttModule.BaseGrid.prototype.drawInternal = function(positionRecalcul
     this.bgRect_ = this.base_.rect();
     this.registerDisposable(this.bgRect_);
     this.bgRect_
-        .fill(this.backgroundFill_)
+        .fill(/** @type {acgraph.vector.Fill} */(this.getOption('backgroundFill')))
         .stroke(null)
         .zIndex(anychart.ganttModule.BaseGrid.BG_RECT_Z_INDEX);
 
@@ -1957,10 +2111,16 @@ anychart.ganttModule.BaseGrid.prototype.drawInternal = function(positionRecalcul
 
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    this.bgRect_.fill(this.backgroundFill_);
-    this.getOddPath().fill(this.rowOddFill_ || this.rowFill_);
-    this.getEvenPath().fill(this.rowEvenFill_ || this.rowFill_);
-    this.getSelectedPath().fill(this.rowSelectedFill_);
+    this.bgRect_.fill(/** @type {acgraph.vector.Fill} */(this.getOption('backgroundFill')));
+    var rowFill = this.getOption('rowFill');
+    var rowOddFill = this.getOption('rowOddFill');
+    rowOddFill = anychart.utils.isNone(rowOddFill) ? rowFill : rowOddFill;
+    var rowEvenFill = this.getOption('rowEvenFill');
+    rowEvenFill = anychart.utils.isNone(rowEvenFill) ? rowFill : rowEvenFill;
+    this.getOddPath().fill(/** @type {acgraph.vector.Fill} */(rowOddFill));
+    this.getEvenPath().fill(/** @type {acgraph.vector.Fill} */(rowEvenFill));
+    var rowSelectedFill = anychart.ganttModule.BaseGrid.getColorResolver('rowSelectedFill', anychart.enums.ColorType.FILL, false)(this, 0, this.selectedItem);
+    this.getSelectedPath().fill(/** @type {acgraph.vector.Fill} */(rowSelectedFill));
 
     var rowStrokeColor;
     if (goog.isString(this.rowStroke_)) {
@@ -2045,9 +2205,11 @@ anychart.ganttModule.BaseGrid.prototype.highlight = function(opt_index, opt_star
   }
 
   if (draw) {
+    var dataItem = this.getVisibleItems()[/** @type {number} */ (opt_index)];
+    var fill = anychart.ganttModule.BaseGrid.getColorResolver('rowHoverFill', anychart.enums.ColorType.FILL, false)(this, 0, dataItem);
     this.getHoverPath()
         .clear()
-        .fill(this.hoverFill_)
+        .fill(/** @type {acgraph.vector.Fill} */(fill))
         .moveTo(this.pixelBoundsCache.left, this.hoverStartY_)
         .lineTo(this.pixelBoundsCache.left + this.pixelBoundsCache.width, this.hoverStartY_)
         .lineTo(this.pixelBoundsCache.left + this.pixelBoundsCache.width, this.hoverEndY_)
@@ -2438,6 +2600,7 @@ anychart.ganttModule.BaseGrid.prototype.verticalOffset = function(opt_value) {
  * @inheritDoc
  */
 anychart.ganttModule.BaseGrid.prototype.disposeInternal = function() {
+  goog.dispose(this.palette_);
   anychart.ganttModule.BaseGrid.base(this, 'disposeInternal');
   goog.events.unlisten(document, goog.events.EventType.MOUSEMOVE, this.docMouseMoveListener_, false, this);
 };
@@ -2456,17 +2619,14 @@ anychart.ganttModule.BaseGrid.prototype.serialize = function() {
   if (this.isStandalone) {
     json['controller'] = this.controller.serialize();
     json['defaultRowHeight'] = this.defaultRowHeight();
+    json['palette'] = this.palette().serialize();
   }
 
-  json['backgroundFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.backgroundFill_));
+  anychart.core.settings.serialize(this, anychart.ganttModule.BaseGrid.COLOR_DESCRIPTORS, json);
+
   json['rowStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */ (this.rowStroke_));
   json['headerHeight'] = this.headerHeight_;
   json['headerHeight'] = this.defaultRowHeight();
-  json['rowOddFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.rowOddFill_));
-  json['rowEvenFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.rowEvenFill_));
-  json['rowFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.rowFill_));
-  json['hoverFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.hoverFill_));
-  json['rowSelectedFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.rowSelectedFill_));
   json['editStructurePreviewFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.editStructurePreviewFill_));
   json['editStructurePreviewStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */ (this.editStructurePreviewStroke_));
   json['editStructurePreviewDashStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */ (this.editStructurePreviewDashStroke_));
@@ -2490,15 +2650,12 @@ anychart.ganttModule.BaseGrid.prototype.setupByJSON = function(config, opt_defau
     this.createController();
     this.controller.setup(config['controller']);
     this.defaultRowHeight(config['defaultRowHeight']);
+    this.palette(config['palette']);
   }
 
-  this.backgroundFill(config['backgroundFill']);
+  anychart.core.settings.deserialize(this, anychart.ganttModule.BaseGrid.COLOR_DESCRIPTORS, config, opt_default);
+
   this.rowStroke(config['rowStroke']);
-  this.rowFill(config['rowFill']);
-  this.rowOddFill(config['rowOddFill']);
-  this.rowEvenFill(config['rowEvenFill']);
-  this.rowHoverFill(config['hoverFill']);
-  this.rowSelectedFill(config['rowSelectedFill']);
 
   if ('tooltip' in config)
     this.tooltip().setupInternal(!!opt_default, config['tooltip']);
@@ -2512,6 +2669,7 @@ anychart.ganttModule.BaseGrid.prototype.setupByJSON = function(config, opt_defau
 
 
 
+//region --- Base Grid Dragger
 /**
  * Dragger.
  * @param {acgraph.vector.Element} target - Target element.
@@ -2581,6 +2739,8 @@ anychart.ganttModule.BaseGrid.Dragger.prototype.reset = function() {
 
 
 
+//endregion
+//region --- Base Grid KeyHandler
 /**
  * Key handler.
  * @param {anychart.ganttModule.IInteractiveGrid} grid - Base grid itself.
@@ -2610,6 +2770,8 @@ anychart.ganttModule.BaseGrid.KeyHandler.prototype.resetState = function() {
 
 
 
+//endregion
+//region --- Base Grid Element
 /**
  * Actually is a path to be drawn on drawLayer.
  * Used to draw some elements as Timeline's bars with additional data.
@@ -2704,4 +2866,4 @@ anychart.ganttModule.BaseGrid.Element.prototype.period = null;
  * @type {number|undefined}
  */
 anychart.ganttModule.BaseGrid.Element.prototype.periodIndex = void 0;
-
+//endregion

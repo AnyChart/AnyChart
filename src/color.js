@@ -581,7 +581,7 @@ anychart.color.getNullColor = function() {
 anychart.color.getColor = function(colorName, normalizer, isHatchFill, canBeHoveredSelected, scrollerSelected, series, state, opt_ignorePointSettings, opt_ignoreColorScale) {
   var stateColor, context;
   state = anychart.core.utils.InteractivityState.clarifyState(state);
-  if (state != anychart.PointState.NORMAL && canBeHoveredSelected) {
+  if (canBeHoveredSelected && (state != anychart.PointState.NORMAL)) {
     stateColor = series.resolveOption(colorName, state, series.getIterator(), normalizer, scrollerSelected, void 0, opt_ignorePointSettings);
     if (isHatchFill && stateColor === true)
       stateColor = normalizer(series.getAutoHatchFill());

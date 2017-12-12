@@ -113,16 +113,16 @@ anychart.ganttModule.Chart = function(opt_isResourcesChart) {
    */
   function rowHoverFillBeforeInvalidation() {
     //rowHoverFill does not invalidate anything. Here's no need to suspend it.
-    this.getTimeline().rowHoverFill(/** @type {acgraph.vector.Fill} */ (this.getOption('rowHoverFill')));
-    this.getDataGrid_().rowHoverFill(/** @type {acgraph.vector.Fill} */ (this.getOption('rowHoverFill')));
+    this.getTimeline()['rowHoverFill'](/** @type {acgraph.vector.Fill} */ (this.getOption('rowHoverFill')));
+    this.getDataGrid_()['rowHoverFill'](/** @type {acgraph.vector.Fill} */ (this.getOption('rowHoverFill')));
   }
   /**
    * @this {anychart.ganttModule.Chart}
    */
   function rowSelectedFillBeforeInvalidation() {
     anychart.core.Base.suspendSignalsDispatching(this.getTimeline(), this.getDataGrid_());
-    this.tl_.rowSelectedFill(/** @type {acgraph.vector.Fill} */ (this.getOption('rowSelectedFill')));
-    this.dg_.rowSelectedFill(/** @type {acgraph.vector.Fill} */ (this.getOption('rowSelectedFill')));
+    this.tl_['rowSelectedFill'](/** @type {acgraph.vector.Fill} */ (this.getOption('rowSelectedFill')));
+    this.dg_['rowSelectedFill'](/** @type {acgraph.vector.Fill} */ (this.getOption('rowSelectedFill')));
     anychart.core.Base.resumeSignalsDispatchingTrue(this.dg_, this.tl_);
   }
   /**
@@ -130,8 +130,8 @@ anychart.ganttModule.Chart = function(opt_isResourcesChart) {
    */
   function columnStrokeBeforeInvalidation() {
     anychart.core.Base.suspendSignalsDispatching(this.getTimeline(), this.getDataGrid_());
-    this.dg_.columnStroke(/** @type {acgraph.vector.Stroke} */ (this.getOption('columnStroke')));
-    this.tl_.columnStroke(/** @type {acgraph.vector.Stroke} */ (this.getOption('columnStroke')));
+    this.dg_['columnStroke'](/** @type {acgraph.vector.Stroke} */ (this.getOption('columnStroke')));
+    this.tl_['columnStroke'](/** @type {acgraph.vector.Stroke} */ (this.getOption('columnStroke')));
     anychart.core.Base.resumeSignalsDispatchingTrue(this.dg_, this.tl_);
   }
   /**
@@ -425,13 +425,13 @@ anychart.ganttModule.Chart.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'rowHoverFill',
-      anychart.core.settings.fillNormalizer);
+      anychart.core.settings.fillOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'rowSelectedFill',
-      anychart.core.settings.fillNormalizer);
+      anychart.core.settings.fillOrFunctionNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
@@ -457,7 +457,7 @@ anychart.core.settings.populate(anychart.ganttModule.Chart, anychart.ganttModule
 anychart.ganttModule.Chart.prototype.getDataGrid_ = function() {
   if (!this.dg_) {
     this.dg_ = new anychart.ganttModule.DataGrid(this.controller_);
-    this.dg_.backgroundFill(null);
+    this.dg_.setOption('backgroundFill', null);
     this.dg_.zIndex(anychart.ganttModule.Chart.Z_INDEX_DG_TL);
     this.dg_.interactivityHandler = this;
     this.registerDisposable(this.dg_);
@@ -500,7 +500,7 @@ anychart.ganttModule.Chart.prototype.dataGrid = function(opt_enabled) {
 anychart.ganttModule.Chart.prototype.getTimeline = function() {
   if (!this.tl_) {
     this.tl_ = new anychart.ganttModule.TimeLine(this.controller_, this.isResourcesChart_);
-    this.tl_.backgroundFill(null);
+    this.tl_.setOption('backgroundFill', null);
     this.tl_.zIndex(anychart.ganttModule.Chart.Z_INDEX_DG_TL);
     this.tl_.interactivityHandler = this;
     this.registerDisposable(this.tl_);
@@ -1065,6 +1065,74 @@ anychart.ganttModule.Chart.prototype.isNoData = function() {
 };
 
 
+/**
+ * Getter/setter for palette.
+ * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|Object|Array.<string>)=} opt_value .
+ * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|anychart.ganttModule.Chart)} .
+ */
+anychart.ganttModule.Chart.prototype.palette = function(opt_value) {
+  if (anychart.utils.instanceOf(opt_value, anychart.palettes.RangeColors)) {
+    this.setupPalette_(anychart.palettes.RangeColors, /** @type {anychart.palettes.RangeColors} */(opt_value));
+    return this;
+  } else if (anychart.utils.instanceOf(opt_value, anychart.palettes.DistinctColors)) {
+    this.setupPalette_(anychart.palettes.DistinctColors, /** @type {anychart.palettes.DistinctColors} */(opt_value));
+    return this;
+  } else if (goog.isObject(opt_value) && opt_value['type'] == 'range') {
+    this.setupPalette_(anychart.palettes.RangeColors);
+  } else if (goog.isObject(opt_value) || this.palette_ == null)
+    this.setupPalette_(anychart.palettes.DistinctColors);
+
+  if (goog.isDef(opt_value)) {
+    this.palette_.setup(opt_value);
+    return this;
+  }
+
+  return /** @type {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors)} */(this.palette_);
+};
+
+
+/**
+ * @param {Function} cls Palette constructor.
+ * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors)=} opt_cloneFrom Settings to clone from.
+ * @private
+ */
+anychart.ganttModule.Chart.prototype.setupPalette_ = function(cls, opt_cloneFrom) {
+  if (anychart.utils.instanceOf(this.palette_, cls)) {
+    if (opt_cloneFrom)
+      this.palette_.setup(opt_cloneFrom);
+  } else {
+    // we dispatch only if we replace existing palette.
+    var doDispatch = !!this.palette_;
+    goog.dispose(this.palette_);
+    this.palette_ = new cls();
+    if (opt_cloneFrom)
+      this.palette_.setup(opt_cloneFrom);
+    this.palette_.listenSignals(this.paletteInvalidated_, this);
+    if (doDispatch) {
+      this.getDataGrid_().invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW);
+      this.getTimeline().invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW);
+      // runs controller
+      this.invalidate(anychart.ConsistencyState.GANTT_POSITION, anychart.Signal.NEEDS_REDRAW);
+    }
+  }
+};
+
+
+/**
+ * Internal palette invalidation handler.
+ * @param {anychart.SignalEvent} event Event object.
+ * @private
+ */
+anychart.ganttModule.Chart.prototype.paletteInvalidated_ = function(event) {
+  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
+    this.getDataGrid_().invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW);
+    this.getTimeline().invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW);
+    // runs controller
+    this.invalidate(anychart.ConsistencyState.GANTT_POSITION, anychart.Signal.NEEDS_REDRAW);
+  }
+};
+
+
 /** @inheritDoc */
 anychart.ganttModule.Chart.prototype.serialize = function() {
   var json = anychart.ganttModule.Chart.base(this, 'serialize');
@@ -1077,6 +1145,7 @@ anychart.ganttModule.Chart.prototype.serialize = function() {
   json['controller'] = this.controller_.serialize();
   json['dataGrid'] = this.dataGrid().serialize();
   json['timeline'] = this.getTimeline().serialize();
+  json['palette'] = this.palette().serialize();
 
   return {'gantt': json};
 };
@@ -1089,6 +1158,7 @@ anychart.ganttModule.Chart.prototype.setupByJSON = function(config, opt_default)
   if ('controller' in config) this.controller_.setupByJSON(config['controller'], opt_default);
 
   this.data(/** @type {anychart.treeDataModule.Tree} */ (this.controller_.data()));
+  this.palette(config['palette']);
 
   anychart.core.settings.deserialize(this, anychart.ganttModule.Chart.PROPERTY_DESCRIPTORS, config);
   this.defaultRowHeight(config['defaultRowHeight']);
@@ -1097,6 +1167,13 @@ anychart.ganttModule.Chart.prototype.setupByJSON = function(config, opt_default)
   if ('dataGrid' in config) this.dataGrid().setupByJSON(config['dataGrid'], opt_default);
   if ('timeline' in config) this.getTimeline().setupByJSON(config['timeline'], opt_default);
 
+};
+
+
+/** @inheritDoc */
+anychart.ganttModule.Chart.prototype.disposeInternal = function() {
+  goog.dispose(this.palette_);
+  anychart.ganttModule.Chart.base(this, 'disposeInternal');
 };
 
 
@@ -1123,6 +1200,7 @@ anychart.ganttModule.Chart.prototype.setupByJSON = function(config, opt_default)
   proto['toCsv'] = proto.toCsv;
   proto['xScale'] = proto.xScale;
   proto['defaultRowHeight'] = proto.defaultRowHeight;
+  proto['palette'] = proto.palette;
 
   // auto generated
   // proto['rowHoverFill'] = proto.rowHoverFill;

@@ -322,6 +322,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="padding" type="utils.Space"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="tooltip" type="core.Tooltip"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="legend" type="core.Legend"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="palette" type="palettes.Colors"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="animation" type="utils.Animation"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="credits" type="core.Credits"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="chart_labels" type="core.Label_list"/>
@@ -1405,7 +1406,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="row_odd_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="row_even_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="row_fill" type="Fill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="row_hover_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="row_selected_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="edit_structure_preview_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="edit_structure_preview_stroke" type="Stroke"/>
@@ -1423,7 +1424,7 @@
         <xsd:attribute name="row_odd_fill" type="xsd:string"/>
         <xsd:attribute name="row_even_fill" type="xsd:string"/>
         <xsd:attribute name="row_fill" type="xsd:string"/>
-        <xsd:attribute name="hover_fill" type="xsd:string"/>
+        <xsd:attribute name="row_hover_fill" type="xsd:string"/>
         <xsd:attribute name="row_selected_fill" type="xsd:string"/>
         <xsd:attribute name="horizontal_offset" type="xsd:double" default="0"/>
         <xsd:attribute name="default_row_height" type="xsd:double"/>
@@ -1462,7 +1463,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="row_odd_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="row_even_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="row_fill" type="Fill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="row_hover_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="row_selected_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="base_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="base_stroke" type="Stroke"/>
@@ -1517,7 +1518,7 @@
         <xsd:attribute name="row_odd_fill" type="xsd:string"/>
         <xsd:attribute name="row_even_fill" type="xsd:string"/>
         <xsd:attribute name="row_fill" type="xsd:string"/>
-        <xsd:attribute name="hover_fill" type="xsd:string"/>
+        <xsd:attribute name="row_hover_fill" type="xsd:string"/>
         <xsd:attribute name="row_selected_fill" type="xsd:string"/>
         <xsd:attribute name="base_fill" type="xsd:string"/>
         <xsd:attribute name="base_stroke" type="xsd:string"/>

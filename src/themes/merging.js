@@ -858,7 +858,8 @@ anychart.themes.merging.mergingMap_ = (function() {
       targets: [
         [[
           'chart',
-          'stock.scroller'
+          'stock.scroller',
+          ['default', ['DataGrid', 'Timeline']]
         ], '.palette']
       ]
     },

@@ -1344,7 +1344,7 @@ anychart.treemapModule.Chart.prototype.colorScaleInvalidated_ = function(event) 
 /**
  * Getter/setter for color range.
  * @param {Object=} opt_value Color range settings to set.
- * @return {!(anychart.colorScalesModule.ui.ColorRange|anychart.treemapModule.Chart)} Return current chart markers palette or itself for chaining call.
+ * @return {!(anychart.colorScalesModule.ui.ColorRange|anychart.treemapModule.Chart)} Return current chart color range or itself for chaining call.
  */
 anychart.treemapModule.Chart.prototype.colorRange = function(opt_value) {
   if (!this.colorRange_) {

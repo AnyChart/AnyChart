@@ -60,7 +60,7 @@ anychart.core.ui.LabelBase = function() {
     ['rotation', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
     ['adjustFontSize', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
     ['minFontSize', 0, 0, 0, this.minMaxBeforeInvalidationHook],
-    ['minFontSize', 0, 0, 0, this.minMaxBeforeInvalidationHook]
+    ['maxFontSize', 0, 0, 0, this.minMaxBeforeInvalidationHook]
   ]);
 
 
