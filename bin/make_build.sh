@@ -225,7 +225,11 @@ fi
 
 # ---- Drop CDN cache for uploaded files (for all builds) --------------------------------------------------------------
 echo Dropping CDN cache
-python ./bin/drop_cdn_cache.py ${VERSION} ${CDN_ALIASE} ${CDN_CONSUMER_KEY} ${CDN_CONSUMER_SECRET} ${CDN_ZONE_ID}
+if [ "${TRAVIS_BRANCH}" = "develop" ]; then
+    python ./bin/drop_cdn_cache.py ${TRAVIS_BRANCH} ${CDN_ALIASE} ${CDN_CONSUMER_KEY} ${CDN_CONSUMER_SECRET} ${CDN_ZONE_ID}
+else
+    python ./bin/drop_cdn_cache.py ${VERSION} ${CDN_ALIASE} ${CDN_CONSUMER_KEY} ${CDN_CONSUMER_SECRET} ${CDN_ZONE_ID}
+fi
 # ---- Drop CDN cache for uploaded files (for all builds) --------------------------------------------------------------
 
 
