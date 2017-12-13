@@ -158,6 +158,11 @@ anychart.core.defaultTheme.waterfallRisingStroke = '#467fac';
  */
 anychart.core.defaultTheme.waterfallFallingStroke = '#a74c00';
 
+/**
+ * @const {string}
+ */
+anychart.core.defaultTheme.ganttDefaultStroke = '#cecece';
+
 
 /**
  * @const {string}
@@ -168,7 +173,7 @@ anychart.core.defaultTheme.VALUE_TOKEN_DECIMALS_COUNT_2 = '{%Value}{decimalsCoun
 /**
  * @const {string}
  */
-anychart.core.defaultTheme.VALUE_TOKEN_DECIMALS_COUNT_10 = '{%Value}{decimalsCount:10}';
+anychart.core.defaultTheme.VALUE_TOKEN_DECIMALS_COUNT_10 = '{%Value}';
 
 
 /**
@@ -211,15 +216,6 @@ anychart.core.defaultTheme.returnValue = function() {
  */
 anychart.core.defaultTheme.returnValueAsIs = function() {
   return this['value'];
-};
-
-
-/**
- * @this {*}
- * @return {*}
- */
-anychart.core.defaultTheme.notRoundedValue = function() {
-  return anychart.core.defaultTheme.locNum(this['value'], 10);
 };
 
 
@@ -944,12 +940,12 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     },
     'labels': {
       'enabled': true,
-      'format': anychart.core.defaultTheme.notRoundedValue,
+      'format': anychart.core.defaultTheme.returnValue,
       'zIndex': 35
     },
     'minorLabels': {
       'fontSize': 9,
-      'format': anychart.core.defaultTheme.notRoundedValue,
+      'format': anychart.core.defaultTheme.returnValue,
       'zIndex': 35
     },
     'ticks': {
@@ -1986,14 +1982,18 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
   'defaultDataGrid': {
     'isStandalone': true,
     'headerHeight': 25,
-    'backgroundFill': '#fff',
-    'columnStroke': '#cecece',
-    'rowStroke': '#cecece',
+
+    'backgroundFill': 'none',
+    'columnStroke': anychart.core.defaultTheme.ganttDefaultStroke,
+
+    'rowHoverFill': anychart.core.defaultTheme.returnSourceColor,
+    'rowSelectedFill': anychart.core.defaultTheme.returnSourceColor,
+
+    'rowStroke': anychart.core.defaultTheme.ganttDefaultStroke,
     'rowOddFill': '#fff',
     'rowEvenFill': '#fff',
     'rowFill': '#fff',
-    'hoverFill': '#F8FAFB',
-    'rowSelectedFill': '#ebf1f4',
+
     'zIndex': 5,
     'editing': false,
     'editStructurePreviewFill': {
@@ -2101,15 +2101,19 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
 
   'defaultTimeline': {
     'isStandalone': true,
-    'columnStroke': '#cecece',
-    'rowStroke': '#cecece',
+
+    'columnStroke': anychart.core.defaultTheme.ganttDefaultStroke,
     'backgroundFill': 'none',
+
+    'rowHoverFill': anychart.core.defaultTheme.returnSourceColor,
+    'rowSelectedFill': anychart.core.defaultTheme.returnSourceColor,
+    'selectedElementFill': anychart.core.defaultTheme.returnSourceColor,
+    'selectedElementStroke': anychart.core.defaultTheme.returnSourceColor,
+
+    'rowStroke': anychart.core.defaultTheme.ganttDefaultStroke,
     'rowOddFill': '#fff',
     'rowEvenFill': '#fff',
     'rowFill': '#fff',
-
-    'hoverFill': '#F8FAFB',
-    'rowSelectedFill': '#ebf1f4',
 
     'zIndex': 5,
     'headerHeight': 70,
@@ -2152,14 +2156,6 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
       'dash': '4 4'
     },
 
-    'baseFill': '#7ec1f5',
-    'baseStroke': '#74b2e2',
-    'progressFill': '#1976d2',
-    'progressStroke': {
-      'color': '#fff',
-      'opacity': 0.00001
-    },
-
     'editStartConnectorMarkerType': 'circle',
     'editStartConnectorMarkerSize': 10,
     'editStartConnectorMarkerHorizontalOffset': 0,
@@ -2170,17 +2166,21 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'editFinishConnectorMarkerVerticalOffset': 0,
     'editIntervalWidth': 3,
 
-    'baselineFill': '#d5ebfc',
-    'baselineStroke': '#bfd1e0',
-    'parentFill': '#455a64',
-    'parentStroke': '#2f3f46',
-    'milestoneFill': '#ffa000',
-    'milestoneStroke': '#d26104',
+    'baseFill': anychart.core.defaultTheme.returnSourceColor,
+    'baseStroke': anychart.core.defaultTheme.returnSourceColor,
+
+    'baseBarAnchor': 'auto',
+    'baseBarPosition': 'left-center',
+    'baseBarOffset': 0,
+    'baseBarHeight': '70%',
+    'parentBarHeight': '40%',
+    'progressBarHeight': '100%',
+    'progressBarPosition': 'left-center',
+    'progressBarAnchor': 'left-center',
+    //all another settings should be set to 'null' for serialization demerging purposes
+
     'connectorFill': '#545f69',
     'connectorStroke': '#545f69',
-    'selectedElementFill': '#ef6c00',
-    'selectedElementStroke': '#bc5704',
-    'selectedConnectorStroke': '2 #bc5704',
     'baselineAbove': false,
     'tooltip': {
       'padding': 5,
@@ -2232,11 +2232,11 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     },
     'header': {
       'backgroundFill': '#cecece',
-      'levelsSeparationStroke': '#cecece',
+      'levelsSeparationStroke': anychart.core.defaultTheme.ganttDefaultStroke,
 
       'topLevel': {
         'tileFill': '#f7f7f7',
-        'tilesSeparationStroke': '#cecece',
+        'tilesSeparationStroke': anychart.core.defaultTheme.ganttDefaultStroke,
         'labels': {
           'enabled': true,
           'anchor': 'left-top',
@@ -2256,7 +2256,7 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
 
       'midLevel': {
         'tileFill': '#f7f7f7',
-        'tilesSeparationStroke': '#cecece',
+        'tilesSeparationStroke': anychart.core.defaultTheme.ganttDefaultStroke,
         'labels': {
           'enabled': true,
           'anchor': 'left-top',
@@ -2276,7 +2276,7 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
 
       'lowLevel': {
         'tileFill': '#f7f7f7',
-        'tilesSeparationStroke': '#cecece',
+        'tilesSeparationStroke': anychart.core.defaultTheme.ganttDefaultStroke,
         'labels': {
           'enabled': true,
           'anchor': 'left-top',

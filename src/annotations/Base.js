@@ -1032,7 +1032,7 @@ anychart.annotationsModule.Base.getColorResolver = function(colorName, colorType
 anychart.annotationsModule.Base.getColor_ = function(colorName, normalizer, isHatchFill, canBeHoveredSelected, annotation, state, opt_level) {
   var stateColor, context;
   state = anychart.core.utils.InteractivityState.clarifyState(state);
-  if (state != anychart.PointState.NORMAL && canBeHoveredSelected) {
+  if (canBeHoveredSelected && (state != anychart.PointState.NORMAL)) {
     stateColor = annotation.resolveOption(colorName, state, normalizer);
     if (isHatchFill && stateColor === true)
       stateColor = normalizer(annotation.getAutoHatchFill());

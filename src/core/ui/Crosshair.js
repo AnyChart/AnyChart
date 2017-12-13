@@ -827,7 +827,7 @@ anychart.core.ui.Crosshair.prototype.getLabelsFormatProvider = function(axis, ra
   switch (scaleType) {
     case anychart.enums.ScaleTypes.LINEAR:
     case anychart.enums.ScaleTypes.LOG:
-      labelText = anychart.format.parseNumber(scaleValue);
+      labelText = scaleValue;
       break;
     case anychart.enums.ScaleTypes.ORDINAL:
       labelText = String(scaleValue);

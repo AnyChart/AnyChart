@@ -62,7 +62,11 @@ anychart.math.normalizeCoordinate = function(value) {
  * @return {number} The rounded number.
  */
 anychart.math.round = function(num, opt_digitsCount) {
-  var tmp = Math.pow(10, opt_digitsCount || 0);
+  var digitsCount = Math.floor(Math.log(Math.abs(num)) * Math.LOG10E);
+
+  //Note: 14 here is a number of digits stored in floating-point number.
+  //      The higher precision is 16 (max for JS floating), but 14 fixes last two digits.
+  var tmp = Math.pow(10, Math.min(opt_digitsCount || 0, 14 - digitsCount));
   return Math.round(num * tmp) / tmp || 0;
 };
 

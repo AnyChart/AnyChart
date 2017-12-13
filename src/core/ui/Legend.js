@@ -1622,8 +1622,12 @@ anychart.core.ui.Legend.prototype.createItemsFromSource_ = function() {
     var items = [];
     for (var i = 0; i < this.itemsSourceInternal.length; i++) {
       source = /** @type {anychart.core.SeparateChart|anychart.stockModule.Plot} */ (this.itemsSourceInternal[i]);
-      if (!goog.isNull(source) && goog.isFunction(source.createLegendItemsProvider))
-        items = goog.array.concat(items, source.createLegendItemsProvider(this.itemsSourceMode_, this.itemsFormat_));
+      if (!goog.isNull(source) && goog.isFunction(source.createLegendItemsProvider)) {
+        var format = this.itemsFormat_;
+        if (goog.isString(format))
+          format = anychart.core.utils.TokenParser.getInstance().getFormat(format);
+        items = goog.array.concat(items, source.createLegendItemsProvider(this.itemsSourceMode_, format));
+      }
     }
     return items;
   } else
@@ -2429,7 +2433,7 @@ anychart.standalones.Legend.prototype.dependsOnContainerSize = function() {
   return anychart.utils.isPercent(width) || anychart.utils.isPercent(height) || goog.isNull(width) || goog.isNull(height);
 };
 
-
+ 
 //endregion
 /**
  * Removes signal listeners.

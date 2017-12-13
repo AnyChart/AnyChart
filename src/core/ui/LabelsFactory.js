@@ -206,7 +206,7 @@ anychart.core.ui.LabelsFactory.HANDLED_EVENT_TYPES_CAPTURE_SHIFT_ = 12;
  * NOTE: Do not export!
  * @type {?anychart.core.ui.LabelsFactory}
  */
-anychart.core.ui.LabelsFactory.measureТехtFactory = null;
+anychart.core.ui.LabelsFactory.measureTextFactory = null;
 
 
 //endregion

@@ -111,8 +111,8 @@ anychart.cartesian3dModule.drawers.Column.prototype.updateZIndex = function(zInd
 
 /** @inheritDoc */
 anychart.cartesian3dModule.drawers.Column.prototype.drawSubsequentPoint = function(point, state) {
-  var zIndex = /** @type {number} */(point.meta('zIndex'));
-  var shapes = this.shapesManager.getShapesGroup(state, null, zIndex + point.getIndex() * 1e-8);
+  var zIndex = /** @type {number} */(point.meta('zIndex')) + (/** @type {number} */ (point.meta('directIndex')) + point.getIndex()) * 1e-8;
+  var shapes = this.shapesManager.getShapesGroup(state, null, zIndex);
   this.drawPoint_(point, /** @type {Object.<acgraph.vector.Path>} */(shapes));
 };
 

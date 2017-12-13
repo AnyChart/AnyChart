@@ -879,9 +879,7 @@ anychart.ganttModule.ScrollBar.prototype.mouseOverOpacity = function(opt_value) 
 anychart.ganttModule.ScrollBar.prototype.getBase_ = function() {
   if (!this.base_) {
     this.base_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
-
     this.bindHandlersToGraphics(this.base_, this.baseMouseOverHandler_, this.baseMouseOutHandler_, this.baseClickHandler_);
-
     this.registerDisposable(this.base_);
   }
   return this.base_;
@@ -1060,21 +1058,23 @@ anychart.ganttModule.ScrollBar.prototype.sliderMouseUpHandler_ = function(event)
 
 /**
  * Drag handler.
- * @param {Event} e - Event.
+ * @param {goog.fx.DragEvent} e - Event.
  * @private
  */
 anychart.ganttModule.ScrollBar.prototype.dragHandler_ = function(e) {
   this.drawWrapper_(true);
+  this.dispatchEvent(anychart.enums.EventType.SCROLLING);
 };
 
 
 /**
  * Drag end handler.
- * @param {Event} e - Event.
+ * @param {goog.fx.DragEvent} e - Event.
  * @private
  */
 anychart.ganttModule.ScrollBar.prototype.dragEndHandler_ = function(e) {
   this.drawWrapper_(false);
+  this.dispatchEvent(anychart.enums.EventType.SCROLL_END);
 };
 
 
@@ -1468,11 +1468,13 @@ anychart.ganttModule.ScrollBar.prototype.dispatchScrollEvent_ = function(opt_sou
       this.tid_ = -1;
     }
 
-    var event = new anychart.ganttModule.ScrollBar.ScrollEvent(ths);
-    event['startRatio'] = this.startRatio_;
-    event['endRatio'] = this.endRatio_;
-    event['visibleBounds'] = this.visibleBounds_;
-    event['source'] = opt_source || 'user_action';
+    var event = {
+      'type': anychart.enums.EventType.SCROLL_CHANGE,
+      'startRatio': this.startRatio_,
+      'endRatio': this.endRatio_,
+      'visibleBounds': this.visibleBounds_,
+      'source': opt_source || 'user_action'
+    };
 
     this.tid_ = setTimeout(function() {
       ths.dispatchEvent(event);
@@ -1557,48 +1559,6 @@ anychart.ganttModule.ScrollBar.prototype.setupByJSON = function(config, opt_defa
 
 
 
-//region --- ScrollBar.ScrollEvent ---
-/**
- * Custom scroll event.
- * @param {Object=} opt_target - Reference to the target.
- * @constructor
- * @extends {goog.events.Event}
- */
-anychart.ganttModule.ScrollBar.ScrollEvent = function(opt_target) {
-  anychart.ganttModule.ScrollBar.ScrollEvent.base(this, 'constructor', anychart.enums.EventType.SCROLL_CHANGE, opt_target);
-};
-goog.inherits(anychart.ganttModule.ScrollBar.ScrollEvent, goog.events.Event);
-
-
-/**
- * Start ratio.
- * @type {number}
- */
-anychart.ganttModule.ScrollBar.ScrollEvent.prototype['startRatio'] = 0;
-
-
-/**
- * End ratio.
- * @type {number}
- */
-anychart.ganttModule.ScrollBar.ScrollEvent.prototype['endRatio'] = 0;
-
-
-/**
- * Visible bounds.
- * @type {?anychart.math.Rect}
- */
-anychart.ganttModule.ScrollBar.ScrollEvent.prototype['visibleBounds'] = null;
-
-
-/**
- * Visible bounds.
- * @type {string}
- */
-anychart.ganttModule.ScrollBar.ScrollEvent.prototype['source'] = '';
-
-
-//endregion
 //exports
 (function() {
   var proto = anychart.ganttModule.ScrollBar.prototype;

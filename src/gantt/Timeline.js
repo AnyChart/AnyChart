@@ -31,15 +31,6 @@ anychart.ganttModule.TimeLine = function(opt_controller, opt_isResources) {
   anychart.ganttModule.TimeLine.base(this, 'constructor', opt_controller, opt_isResources);
 
   /**
-   * Cell border settings.
-   * NOTE: This field differs from DG's columnStroke_ and its setter has another functionality
-   * and invalidates another states.
-   * @type {acgraph.vector.Stroke}
-   * @private
-   */
-  this.columnStroke_;
-
-  /**
    * Labels factory.
    * @type {anychart.core.ui.LabelsFactory}
    * @private
@@ -180,119 +171,6 @@ anychart.ganttModule.TimeLine = function(opt_controller, opt_isResources) {
    * @private
    */
   this.editConnectorThumbStroke_;
-
-  /**
-   * Base fill.
-   * @type {acgraph.vector.Fill}
-   * @private
-   */
-  this.baseFill_;
-
-  /**
-   * Base stroke.
-   * @type {acgraph.vector.Stroke}
-   * @private
-   */
-  this.baseStroke_;
-
-  /**
-   * Baseline fill.
-   * @type {acgraph.vector.Fill}
-   * @private
-   */
-  this.baselineFill_;
-
-  /**
-   * Base stroke.
-   * @type {acgraph.vector.Stroke}
-   * @private
-   */
-  this.baselineStroke_;
-
-  /**
-   * Progress fill.
-   * @type {acgraph.vector.Fill}
-   * @private
-   */
-  this.progressFill_;
-
-  /**
-   * Progress stroke.
-   * @type {acgraph.vector.Stroke}
-   * @private
-   */
-  this.progressStroke_;
-
-
-  /**
-   * Milestone fill.
-   * @type {acgraph.vector.Fill}
-   * @private
-   */
-  this.milestoneFill_;
-
-  /**
-   * milestone stroke.
-   * @type {acgraph.vector.Stroke}
-   * @private
-   */
-  this.milestoneStroke_;
-
-
-  /**
-   * Parent fill.
-   * @type {acgraph.vector.Fill}
-   * @private
-   */
-  this.parentFill_;
-
-
-  /**
-   * Parent stroke.
-   * @type {acgraph.vector.Stroke}
-   * @private
-   */
-  this.parentStroke_;
-
-
-  /**
-   * Selected element fill.
-   * @type {acgraph.vector.Fill}
-   * @private
-   */
-  this.selectedElementFill_;
-
-
-  /**
-   * Selected element stroke.
-   * @type {!acgraph.vector.Stroke}
-   * @private
-   */
-  this.selectedElementStroke_;
-
-
-  /**
-   * Selected element stroke.
-   * @type {!acgraph.vector.Stroke}
-   * @private
-   */
-  this.selectedConnectorStroke_;
-
-
-  /**
-   * Connector arrow fill.
-   * @type {acgraph.vector.Fill}
-   * @private
-   */
-  this.connectorFill_;
-
-
-  /**
-   * Connector line stroke.
-   * @type {acgraph.vector.Stroke}
-   * @private
-   */
-  this.connectorStroke_;
 
   /**
    * Selected period.
@@ -561,6 +439,103 @@ anychart.ganttModule.TimeLine = function(opt_controller, opt_isResources) {
    */
   this.progressLabels_ = null;
 
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    //Base bar
+    ['baseBarHeight',
+      anychart.ConsistencyState.GRIDS_POSITION,
+      anychart.Signal.NEEDS_REDRAW],
+    ['baseBarAnchor',
+      anychart.ConsistencyState.GRIDS_POSITION,
+      anychart.Signal.NEEDS_REDRAW],
+    ['baseBarPosition',
+      anychart.ConsistencyState.GRIDS_POSITION,
+      anychart.Signal.NEEDS_REDRAW],
+    ['baseBarOffset',
+      anychart.ConsistencyState.GRIDS_POSITION,
+      anychart.Signal.NEEDS_REDRAW],
+
+    //Parent bar
+    ['parentBarHeight',
+      anychart.ConsistencyState.GRIDS_POSITION,
+      anychart.Signal.NEEDS_REDRAW],
+    ['parentBarAnchor',
+      anychart.ConsistencyState.GRIDS_POSITION,
+      anychart.Signal.NEEDS_REDRAW],
+    ['parentBarPosition',
+      anychart.ConsistencyState.GRIDS_POSITION,
+      anychart.Signal.NEEDS_REDRAW],
+    ['parentBarOffset',
+      anychart.ConsistencyState.GRIDS_POSITION,
+      anychart.Signal.NEEDS_REDRAW],
+
+    //Baseine bar
+    ['baselineBarHeight',
+      anychart.ConsistencyState.GRIDS_POSITION,
+      anychart.Signal.NEEDS_REDRAW],
+    ['baselineBarAnchor',
+      anychart.ConsistencyState.GRIDS_POSITION,
+      anychart.Signal.NEEDS_REDRAW],
+    ['baselineBarPosition',
+      anychart.ConsistencyState.GRIDS_POSITION,
+      anychart.Signal.NEEDS_REDRAW],
+    ['baselineBarOffset',
+      anychart.ConsistencyState.GRIDS_POSITION,
+      anychart.Signal.NEEDS_REDRAW],
+
+    //Progress bar
+    ['progressBarHeight',
+      anychart.ConsistencyState.GRIDS_POSITION,
+      anychart.Signal.NEEDS_REDRAW],
+    ['progressBarAnchor',
+      anychart.ConsistencyState.GRIDS_POSITION,
+      anychart.Signal.NEEDS_REDRAW],
+    ['progressBarPosition',
+      anychart.ConsistencyState.GRIDS_POSITION,
+      anychart.Signal.NEEDS_REDRAW],
+    ['progressBarOffset',
+      anychart.ConsistencyState.GRIDS_POSITION,
+      anychart.Signal.NEEDS_REDRAW],
+
+    //Milestones
+    ['milestoneHeight',
+      anychart.ConsistencyState.GRIDS_POSITION,
+      anychart.Signal.NEEDS_REDRAW],
+    ['milestoneAnchor',
+      anychart.ConsistencyState.GRIDS_POSITION,
+      anychart.Signal.NEEDS_REDRAW],
+    ['milestonePosition',
+      anychart.ConsistencyState.GRIDS_POSITION,
+      anychart.Signal.NEEDS_REDRAW],
+    ['milestoneOffset',
+      anychart.ConsistencyState.GRIDS_POSITION,
+      anychart.Signal.NEEDS_REDRAW]
+  ]);
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    // timeline coloring
+    ['columnStroke', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+
+    // elements coloring
+    ['connectorFill', anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW],
+    ['connectorStroke', anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW],
+    ['selectedConnectorStroke', anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW],
+
+    // element's fills and strokes
+    ['baseFill', anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW],
+    ['baseStroke', anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW],
+    ['baselineFill', anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW],
+    ['baselineStroke', anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW],
+    ['milestoneFill', anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW],
+    ['milestoneStroke', anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW],
+    ['parentFill', anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW],
+    ['parentStroke', anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW],
+    ['progressFill', anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW],
+    ['progressStroke', anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW],
+    ['selectedElementFill', anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW],
+    ['selectedElementStroke', anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW]
+  ]);
+
   this.controller.timeline(this);
 };
 goog.inherits(anychart.ganttModule.TimeLine, anychart.ganttModule.BaseGrid);
@@ -582,6 +557,253 @@ anychart.ganttModule.TimeLine.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.TIMELINE_SCALES;
 
 
+//region -- Normalisers adaptation
+/**
+ * Timeline specific anchor normalizer.
+ * @param {*} value - Value to normalize.
+ * @return {?anychart.enums.Anchor}
+ */
+anychart.ganttModule.TimeLine.normalizeAnchor = function(value) {
+  if (goog.isNull(value))
+    return null;
+
+  value = anychart.enums.normalizeAnchor(value, anychart.enums.Anchor.LEFT_CENTER);
+  if (value == anychart.enums.Anchor.AUTO)
+    return anychart.enums.Anchor.AUTO;
+  if (anychart.utils.isTopAnchor(value))
+    return anychart.enums.Anchor.LEFT_TOP;
+  if (anychart.utils.isBottomAnchor(value))
+    return anychart.enums.Anchor.LEFT_BOTTOM;
+  return anychart.enums.Anchor.LEFT_CENTER;
+};
+
+
+/**
+ * Timeline specific position normalizer.
+ * @param {*} value - Value to normalize.
+ * @return {?anychart.enums.Position}
+ */
+anychart.ganttModule.TimeLine.normalizePosition = function(value) {
+  if (goog.isNull(value))
+    return null;
+
+  value = /** @type {anychart.enums.Anchor} */ (anychart.enums.normalizePosition(value, anychart.enums.Position.LEFT_CENTER));
+  if (anychart.utils.isTopAnchor(value))
+    return anychart.enums.Position.LEFT_TOP;
+  if (anychart.utils.isBottomAnchor(value))
+    return anychart.enums.Position.LEFT_BOTTOM;
+  return anychart.enums.Position.LEFT_CENTER;
+};
+
+
+/**
+ * Implements option inheritance from base bar settings.
+ * @param {string} name - .
+ * @param {string} defaultName - .
+ * @return {*}
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.getInheritedOption_ = function(name, defaultName) {
+  var val = this.getOption(name);
+  return /** @type {anychart.enums.Anchor} */ (goog.isDefAndNotNull(val) ? val : this.getOption(defaultName));
+};
+
+
+/**
+ *
+ * @param {number} anchoredTop
+ * @param {number} barHeight
+ * @param {anychart.enums.Anchor} anchor
+ * @private
+ * @return {number}
+ */
+anychart.ganttModule.TimeLine.prototype.fixBarTop_ = function(anchoredTop, barHeight, anchor) {
+  var verticalOffset;
+  if (anychart.utils.isTopAnchor(anchor))
+    verticalOffset = 0;
+  else if (anychart.utils.isBottomAnchor(anchor))
+    verticalOffset = -barHeight;
+  else
+    verticalOffset = -barHeight / 2;
+
+  return anchoredTop + verticalOffset;
+};
+
+
+/**
+ * Resolves anchor by position and bar type.
+ * NOTE: anychart.enums.TLElementTypes.BASE here is the same as anychart.enums.TLElementTypes.BASE.
+ * @param {anychart.enums.Position} position - Position.
+ * @param {anychart.enums.TLElementTypes} type - Timeline element type.
+ * @param {boolean=} opt_considerBaseline - Whether to consider baseline.
+ * @return {anychart.enums.Anchor}
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.resolveAutoAnchorByType_ = function(position, type, opt_considerBaseline) {
+  var anchor = /** @type {anychart.enums.Anchor} */ (position);
+  switch (type) {
+    case anychart.enums.TLElementTypes.BASE:
+      if (opt_considerBaseline && position == anychart.enums.Position.LEFT_CENTER) {
+        anchor = this.baselineAbove() ? anychart.enums.Anchor.LEFT_TOP : anychart.enums.Anchor.LEFT_BOTTOM;
+      }
+      break;
+    case anychart.enums.TLElementTypes.PARENT:
+      anchor = anychart.utils.isTopAnchor(/** @type {anychart.enums.Anchor} */ (position)) ?
+          anychart.enums.Anchor.LEFT_TOP :
+          anychart.enums.Anchor.LEFT_BOTTOM;
+      if (opt_considerBaseline && position == anychart.enums.Position.LEFT_CENTER) {
+        anchor = this.baselineAbove() ? anychart.enums.Anchor.LEFT_TOP : anychart.enums.Anchor.LEFT_BOTTOM;
+      }
+      break;
+    case anychart.enums.TLElementTypes.BASELINE:
+      if (position == anychart.enums.Position.LEFT_CENTER)
+        anchor = this.baselineAbove() ? anychart.enums.Anchor.LEFT_BOTTOM : anychart.enums.Anchor.LEFT_TOP;
+  }
+
+  return /** @type {anychart.enums.Anchor} */ (anchor);
+};
+
+
+//endregion
+//region -- Descriptors.
+/**
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.ganttModule.TimeLine.DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  //Base bar
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'baseBarHeight',
+      anychart.core.settings.numberOrPercentNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'baseBarAnchor',
+      anychart.ganttModule.TimeLine.normalizeAnchor);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'baseBarPosition',
+      anychart.ganttModule.TimeLine.normalizePosition);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'baseBarOffset',
+      anychart.core.settings.numberOrPercentNormalizer);
+
+  //Parent bar
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'parentBarHeight',
+      anychart.core.settings.numberOrPercentNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'parentBarAnchor',
+      anychart.ganttModule.TimeLine.normalizeAnchor);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'parentBarPosition',
+      anychart.ganttModule.TimeLine.normalizePosition);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'parentBarOffset',
+      anychart.core.settings.numberOrPercentNormalizer);
+
+  //Baseline bar
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'baselineBarHeight',
+      anychart.core.settings.numberOrPercentNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'baselineBarAnchor',
+      anychart.ganttModule.TimeLine.normalizeAnchor);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'baselineBarPosition',
+      anychart.ganttModule.TimeLine.normalizePosition);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'baselineBarOffset',
+      anychart.core.settings.numberOrPercentNormalizer);
+
+  //Progress bar
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'progressBarHeight',
+      anychart.core.settings.numberOrPercentNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'progressBarAnchor',
+      anychart.ganttModule.TimeLine.normalizeAnchor);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'progressBarPosition',
+      anychart.ganttModule.TimeLine.normalizePosition);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'progressBarOffset',
+      anychart.core.settings.numberOrPercentNormalizer);
+
+  //Milestones
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'milestoneHeight',
+      anychart.core.settings.numberOrPercentNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'milestoneAnchor',
+      anychart.ganttModule.TimeLine.normalizeAnchor);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'milestonePosition',
+      anychart.ganttModule.TimeLine.normalizePosition);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'milestoneOffset',
+      anychart.core.settings.numberOrPercentNormalizer);
+
+  return map;
+})();
+anychart.core.settings.populate(anychart.ganttModule.TimeLine, anychart.ganttModule.TimeLine.DESCRIPTORS);
+
+
+//endregion
 /**
  * Default timeline header height.
  * @type {number}
@@ -667,21 +889,6 @@ anychart.ganttModule.TimeLine.DEFAULT_HEIGHT_REDUCTION = 0.7;
 
 
 /**
- * This constant means that bar will have height = PARENT_HEIGHT_REDUCTION * this.height;
- * @type {number}
- */
-anychart.ganttModule.TimeLine.PARENT_HEIGHT_REDUCTION = 0.4;
-
-
-/**
- * This constant means that progress bar will have height = PROGRESS_HEIGHT_REDUCTION * barHeight;
- * barHeight is height of bar that progress belongs to.
- * @type {number}
- */
-anychart.ganttModule.TimeLine.PROGRESS_HEIGHT_REDUCTION = 1;
-
-
-/**
  * Edit preview path z-index.
  * @type {number}
  */
@@ -742,6 +949,46 @@ anychart.ganttModule.TimeLine.EDIT_CORNER_HEIGHT = 5;
  * @type {number}
  */
 anychart.ganttModule.TimeLine.EDIT_CONNECTOR_RADIUS = 5;
+
+
+//region --- Coloring
+/**
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.ganttModule.TimeLine.COLOR_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+  anychart.core.settings.createDescriptors(map, [
+    // timeline coloring
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'columnStroke', anychart.core.settings.strokeNormalizer],
+
+    // connectors
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'connectorFill', anychart.core.settings.fillOrFunctionNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'connectorStroke', anychart.core.settings.strokeOrFunctionNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'selectedConnectorStroke', anychart.core.settings.strokeOrFunctionNormalizer],
+
+    // elements coloring
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'baseFill', anychart.core.settings.fillOrFunctionNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'baseStroke', anychart.core.settings.strokeOrFunctionNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'baselineFill', anychart.core.settings.fillOrFunctionNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'baselineStroke', anychart.core.settings.strokeOrFunctionNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'milestoneFill', anychart.core.settings.fillOrFunctionNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'milestoneStroke', anychart.core.settings.strokeOrFunctionNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'parentFill', anychart.core.settings.fillOrFunctionNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'parentStroke', anychart.core.settings.strokeOrFunctionNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'progressFill', anychart.core.settings.fillOrFunctionNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'progressStroke', anychart.core.settings.strokeOrFunctionNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'progressFill', anychart.core.settings.fillOrFunctionNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'progressStroke', anychart.core.settings.strokeOrFunctionNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'selectedElementFill', anychart.core.settings.fillOrFunctionNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'selectedElementStroke', anychart.core.settings.strokeOrFunctionNormalizer]
+  ]);
+  return map;
+})();
+anychart.core.settings.populate(anychart.ganttModule.TimeLine, anychart.ganttModule.TimeLine.COLOR_DESCRIPTORS);
+
+
+//endregion
 
 
 /**
@@ -1007,388 +1254,6 @@ anychart.ganttModule.TimeLine.prototype.editConnectorThumbStroke = function(opt_
     return this;
   }
   return this.editConnectorThumbStroke_ || 'none';
-};
-
-
-/**
- * Gets/sets base fill.
- * Base fill is a fill of simple time bar on timeline.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.ganttModule.TimeLine|string} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.baseFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.baseFill_), val)) {
-      this.baseFill_ = val;
-      this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.baseFill_ || 'none';
-};
-
-
-/**
- * Gets/sets a base stroke.
- * Base stroke is a stroke of simple time bar on timeline.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill .
- * @param {number=} opt_thickness .
- * @param {string=} opt_dashpattern .
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin .
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap .
- * @return {acgraph.vector.Stroke|anychart.ganttModule.TimeLine|string} - Current value or itself for chaining.
- */
-anychart.ganttModule.TimeLine.prototype.baseStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (!anychart.color.equals(this.baseStroke_, val)) {
-      this.baseStroke_ = val;
-      this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.baseStroke_ || 'none';
-};
-
-
-/**
- * Gets/sets baseline fill.
- * Baseline fill is a fill of baseline bar on timeline.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.ganttModule.TimeLine|string} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.baselineFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.baselineFill_), val)) {
-      this.baselineFill_ = val;
-      this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.baselineFill_ || 'none';
-};
-
-
-/**
- * Gets/sets a baseline stroke.
- * Baseline stroke is a stroke of baseline bar on timeline.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill .
- * @param {number=} opt_thickness .
- * @param {string=} opt_dashpattern .
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin .
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap .
- * @return {acgraph.vector.Stroke|anychart.ganttModule.TimeLine|string} - Current value or itself for chaining.
- */
-anychart.ganttModule.TimeLine.prototype.baselineStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (!anychart.color.equals(this.baselineStroke_, val)) {
-      this.baselineStroke_ = val;
-      this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.baselineStroke_ || 'none';
-};
-
-
-/**
- * Gets/sets progress bar fill.
- * Progress fill is a fill of progress bar on timeline.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.ganttModule.TimeLine|string} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.progressFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.progressFill_), val)) {
-      this.progressFill_ = val;
-      this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.progressFill_ || 'none';
-};
-
-
-/**
- * Gets/sets a progress bar stroke.
- * Progress stroke is a stroke of progress bar on timeline.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill .
- * @param {number=} opt_thickness .
- * @param {string=} opt_dashpattern .
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin .
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap .
- * @return {acgraph.vector.Stroke|anychart.ganttModule.TimeLine|string} - Current value or itself for chaining.
- */
-anychart.ganttModule.TimeLine.prototype.progressStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (!anychart.color.equals(this.progressStroke_, val)) {
-      this.progressStroke_ = val;
-      this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.progressStroke_ || 'none';
-};
-
-
-/**
- * Gets/sets a milestone fill.
- * Milestone fill is a fill of milestone on timeline.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.ganttModule.TimeLine|string} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.milestoneFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.milestoneFill_), val)) {
-      this.milestoneFill_ = val;
-      this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.milestoneFill_ || 'none';
-};
-
-
-/**
- * Gets/sets a milestone stroke.
- * Milestone stroke is a stroke of milestone on timeline.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill .
- * @param {number=} opt_thickness .
- * @param {string=} opt_dashpattern .
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin .
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap .
- * @return {acgraph.vector.Stroke|anychart.ganttModule.TimeLine|string} - Current value or itself for chaining.
- */
-anychart.ganttModule.TimeLine.prototype.milestoneStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (!anychart.color.equals(this.milestoneStroke_, val)) {
-      this.milestoneStroke_ = val;
-      this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.milestoneStroke_ || 'none';
-};
-
-
-/**
- * Gets/sets a parent fill.
- * Parent fill is a fill of summary (parent) task bar on timeline.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.ganttModule.TimeLine|string} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.parentFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.parentFill_), val)) {
-      this.parentFill_ = val;
-      this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.parentFill_ || 'none';
-};
-
-
-/**
- * Gets/sets a parent stroke.
- * Parent stroke is a stroke of summary (parent) task bar on timeline.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill .
- * @param {number=} opt_thickness .
- * @param {string=} opt_dashpattern .
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin .
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap .
- * @return {acgraph.vector.Stroke|anychart.ganttModule.TimeLine|string} - Current value or itself for chaining.
- */
-anychart.ganttModule.TimeLine.prototype.parentStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (!anychart.color.equals(this.parentStroke_, val)) {
-      this.parentStroke_ = val;
-      this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.parentStroke_ || 'none';
-};
-
-
-/**
- * Gets/sets a connector arrow fill.
- * Connector fill is a fill of arrow of connector on timeline.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.ganttModule.TimeLine|string} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.connectorFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.connectorFill_), val)) {
-      this.connectorFill_ = val;
-      this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.connectorFill_ || 'none';
-};
-
-
-/**
- * Gets/sets a connector stroke.
- * Connector stroke is a stroke of connector's line on timeline.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill .
- * @param {number=} opt_thickness .
- * @param {string=} opt_dashpattern .
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin .
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap .
- * @return {acgraph.vector.Stroke|anychart.ganttModule.TimeLine|string} - Current value or itself for chaining.
- */
-anychart.ganttModule.TimeLine.prototype.connectorStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (!anychart.color.equals(this.connectorStroke_, val)) {
-      this.connectorStroke_ = val;
-      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.connectorStroke_ || 'none';
-};
-
-
-/**
- * Gets/sets selected element fill.
- * Selected element fill is fill of selected element (whole data item or period) on timeline.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.ganttModule.TimeLine|string} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.selectedElementFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.selectedElementFill_), val)) {
-      this.selectedElementFill_ = val;
-      this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.selectedElementFill_ || 'none';
-};
-
-
-/**
- * Gets/sets selected element stroke.
- * Selected element stroke is stroke of selected element (whole data item or period) on timeline.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill .
- * @param {number=} opt_thickness .
- * @param {string=} opt_dashpattern .
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin .
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap .
- * @return {acgraph.vector.Stroke|anychart.ganttModule.TimeLine|string} - Current value or itself for chaining.
- */
-anychart.ganttModule.TimeLine.prototype.selectedElementStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (!anychart.color.equals(this.selectedElementStroke_, val)) {
-      this.selectedElementStroke_ = val;
-      this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.selectedElementStroke_ || 'none';
-};
-
-
-/**
- * Gets/sets selected connector stroke.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill .
- * @param {number=} opt_thickness .
- * @param {string=} opt_dashpattern .
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin .
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap .
- * @return {acgraph.vector.Stroke|anychart.ganttModule.TimeLine|string} - Current value or itself for chaining.
- */
-anychart.ganttModule.TimeLine.prototype.selectedConnectorStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (!anychart.color.equals(this.selectedConnectorStroke_, val)) {
-      this.selectedConnectorStroke_ = val;
-      this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.selectedConnectorStroke_ || 'none';
-};
-
-
-/**
- * Gets/sets column stroke.
- * @param {(acgraph.vector.Stroke|string)=} opt_value - Value to be set.
- * @return {(string|acgraph.vector.Stroke|anychart.ganttModule.TimeLine)} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.columnStroke = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
-
-    //TODO (A.Kudryavtsev): In current moment (15 June 2015) method anychart.color.equals works pretty bad.
-    //TODO (A.Kudryavtsev): That's why here I check thickness as well.
-    var oldThickness = anychart.utils.extractThickness(this.columnStroke_);
-    var newThickness = anychart.utils.extractThickness(val);
-
-    if (!anychart.color.equals(this.columnStroke_, val) || newThickness != oldThickness) {
-      this.columnStroke_ = val;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.columnStroke_;
 };
 
 
@@ -1752,7 +1617,7 @@ anychart.ganttModule.TimeLine.prototype.getSeparationPath_ = function() {
   if (!this.separationPath_) {
     this.separationPath_ = /** @type {acgraph.vector.Path} */ (this.getClipLayer().path());
     this.separationPath_.zIndex(6);
-    this.separationPath_.stroke(this.columnStroke_);
+    this.separationPath_.stroke(/** @type {acgraph.vector.Stroke} */(anychart.ganttModule.BaseGrid.getColorResolver('columnStroke', anychart.enums.ColorType.STROKE, false)(this, 0)));
     this.registerDisposable(this.separationPath_);
   }
   return this.separationPath_;
@@ -3495,24 +3360,30 @@ anychart.ganttModule.TimeLine.prototype.drawBar_ = function(bounds, item, type, 
       (this.selectedPeriodId_ == period[anychart.enums.GanttDataFields.ID]);
 
   var zIndex, defaultFill, defaultStroke;
+  var resolver = anychart.ganttModule.BaseGrid.getColorResolver;
 
   switch (opt_field) {
     case anychart.enums.GanttDataFields.BASELINE:
       zIndex = anychart.ganttModule.TimeLine.BASELINE_Z_INDEX;
-      defaultFill = this.baselineFill_;
-      defaultStroke = this.baselineStroke_;
+      defaultFill = resolver('baselineFill', anychart.enums.ColorType.FILL, false)(this, 0, item);
+      defaultStroke = resolver('baselineStroke', anychart.enums.ColorType.STROKE, false)(this, 0, item);
       break;
     case anychart.enums.GanttDataFields.PROGRESS:
       zIndex = anychart.ganttModule.TimeLine.PROGRESS_Z_INDEX;
-      defaultFill = this.progressFill_;
-      defaultStroke = this.progressStroke_;
+      defaultFill = resolver('progressFill', anychart.enums.ColorType.FILL, false)(this, 0, item);
+      defaultStroke = resolver('progressStroke', anychart.enums.ColorType.STROKE, false)(this, 0, item);
       isProgress = true;
       break;
     default:
       zIndex = anychart.ganttModule.TimeLine.BASE_Z_INDEX;
       isParent = (isTreeDataItem && item.numChildren());
-      defaultFill = isParent ? this.parentFill_ : this.baseFill_;
-      defaultStroke = isParent ? this.parentStroke_ : this.baseStroke_;
+      if (isParent) {
+        defaultFill = resolver('parentFill', anychart.enums.ColorType.FILL, false)(this, 0, item);
+        defaultStroke = resolver('parentStroke', anychart.enums.ColorType.STROKE, false)(this, 0, item);
+      } else {
+        defaultFill = resolver('baseFill', anychart.enums.ColorType.FILL, false)(this, 0, item, void 0, void 0, opt_periodIndex);
+        defaultStroke = resolver('baseStroke', anychart.enums.ColorType.STROKE, false)(this, 0, item, void 0, void 0, opt_periodIndex);
+      }
       if (isTreeDataItem) {
         this.controller.data().suspendSignalsDispatching();//this.controller.data() can be Tree or TreeView.
         item.meta('relBounds', bounds);
@@ -3579,6 +3450,11 @@ anychart.ganttModule.TimeLine.prototype.drawBar_ = function(bounds, item, type, 
   }
   bar.close();
 
+  if (selectedBar) {
+    var selectedElementFill = resolver('selectedElementFill', anychart.enums.ColorType.FILL, false)(this, 0, this.selectedItem, void 0, void 0, opt_periodIndex);
+    var selectedElementStroke = resolver('selectedElementStroke', anychart.enums.ColorType.STROKE, false)(this, 0, this.selectedItem, void 0, void 0, opt_periodIndex);
+  }
+
   if (settings) {
     var rawStartMarker = settings[anychart.enums.GanttDataFields.START_MARKER];
     if (rawStartMarker) {
@@ -3598,19 +3474,19 @@ anychart.ganttModule.TimeLine.prototype.drawBar_ = function(bounds, item, type, 
 
     var fill;
     if (selectedBar) {
-      fill = this.selectedElementFill_;
-      stroke = this.selectedElementStroke_;
+      fill = selectedElementFill;
+      stroke = selectedElementStroke;
     } else {
       fill = goog.isDef(settings[anychart.enums.GanttDataFields.FILL]) ?
           acgraph.vector.normalizeFill(settings[anychart.enums.GanttDataFields.FILL]) :
           defaultFill;
     }
 
-    bar.fill(fill).stroke(stroke);
+    bar.fill(/** @type {acgraph.vector.Fill} */(fill)).stroke(/** @type {acgraph.vector.Stroke} */(stroke));
   } else { //Default coloring.
     bar
-        .fill(selectedBar ? this.selectedElementFill_ : defaultFill)
-        .stroke(selectedBar ? this.selectedElementStroke_ : defaultStroke);
+        .fill(/** @type {acgraph.vector.Fill} */(selectedBar ? selectedElementFill : defaultFill))
+        .stroke(/** @type {acgraph.vector.Stroke} */(selectedBar ? selectedElementStroke : defaultStroke));
   }
 
   return bar;
@@ -3709,6 +3585,72 @@ anychart.ganttModule.TimeLine.prototype.drawProjectTimeline_ = function() {
 
 
 /**
+ * Gets bar bounds.
+ * @param {anychart.enums.TLElementTypes} type - Bar type.
+ * @param {anychart.math.Rect} itemBounds - Full item bounds. Left and width must be taken
+ *  from scale transformed values, top and height are values from item's position in grid.
+ * @param {boolean=} opt_considerBaseline - Whether to consider baseline appearance in itemBounds.
+ * @return {anychart.math.Rect} - Bar bounds considering anchor/position settings.
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.getBarBounds_ = function(type, itemBounds, opt_considerBaseline) {
+  var optionHeight, barHeight, anchor, position, offset, offsetNorm;
+  var heightOptionName, anchorOptionName, positionOptionName, offsetOptionName;
+  var fixParentHeight = false;
+  switch (type) {
+    case anychart.enums.TLElementTypes.PERIOD:
+    case anychart.enums.TLElementTypes.BASE:
+      heightOptionName = 'baseBarHeight';
+      anchorOptionName = 'baseBarAnchor';
+      positionOptionName = 'baseBarPosition';
+      offsetOptionName = 'baseBarOffset';
+      break;
+    case anychart.enums.TLElementTypes.PARENT:
+      heightOptionName = 'parentBarHeight';
+      anchorOptionName = 'parentBarAnchor';
+      positionOptionName = 'parentBarPosition';
+      offsetOptionName = 'parentBarOffset';
+      fixParentHeight = true;
+      break;
+    case anychart.enums.TLElementTypes.BASELINE:
+      heightOptionName = 'baselineBarHeight';
+      anchorOptionName = 'baselineBarAnchor';
+      positionOptionName = 'baselineBarPosition';
+      offsetOptionName = 'baselineBarOffset';
+      break;
+    case anychart.enums.TLElementTypes.MILESTONE:
+      heightOptionName = 'milestoneHeight';
+      anchorOptionName = 'milestoneAnchor';
+      positionOptionName = 'milestonePosition';
+      offsetOptionName = 'milestoneOffset';
+      break;
+    case anychart.enums.TLElementTypes.PROGRESS:
+      heightOptionName = 'progressBarHeight';
+      anchorOptionName = 'progressBarAnchor';
+      positionOptionName = 'progressBarPosition';
+      offsetOptionName = 'progressBarOffset';
+      break;
+  }
+
+  optionHeight = /** @type {string|number} */ (this.getInheritedOption_(/** @type {string} */ (heightOptionName), 'baseBarHeight'));
+  var height = opt_considerBaseline || fixParentHeight ? itemBounds.height / 2 : itemBounds.height;
+  barHeight = anychart.utils.normalizeSize(optionHeight, height);
+  anchor = /** @type {anychart.enums.Anchor} */ (this.getInheritedOption_(/** @type {string} */ (anchorOptionName), 'baseBarAnchor'));
+  position = /** @type {anychart.enums.Position} */ (this.getInheritedOption_(/** @type {string} */ (positionOptionName), 'baseBarPosition'));
+  offset = /** @type {number|string} */ (this.getInheritedOption_(/** @type {string} */ (offsetOptionName), 'baseBarOffset'));
+  offsetNorm = anychart.utils.normalizeSize(offset, itemBounds.height);
+
+  if (anchor == anychart.enums.Anchor.AUTO) {
+    anchor = this.resolveAutoAnchorByType_(position, type, opt_considerBaseline);
+  }
+
+  var coord = anychart.utils.getCoordinateByAnchor(itemBounds, position);
+  var top = this.fixBarTop_(coord.y, barHeight, anchor) + offsetNorm;
+  return new anychart.math.Rect(coord.x, top, itemBounds.width, barHeight);
+};
+
+
+/**
  * Draws data item as periods.
  * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} dataItem - Current tree data item.
  * @param {number} totalTop - Pixel value of total top. Is needed to place item correctly.
@@ -3729,9 +3671,26 @@ anychart.ganttModule.TimeLine.prototype.drawAsPeriods_ = function(dataItem, tota
         if (endRatio > 0 && startRatio < 1) { //Is visible
           var left = this.pixelBoundsCache.left + this.pixelBoundsCache.width * startRatio;
           var right = this.pixelBoundsCache.left + this.pixelBoundsCache.width * endRatio;
-          var height = itemHeight * anychart.ganttModule.TimeLine.DEFAULT_HEIGHT_REDUCTION;
-          var top = totalTop + (itemHeight - height) / 2;
-          this.drawBar_(new anychart.math.Rect(left, top, (right - left), height), dataItem, anychart.enums.TLElementTypes.PERIOD, void 0, j);
+          var width = right - left;
+
+          var optionHeight = /** @type {string|number} */ (this.getOption('baseBarHeight'));
+          var height = anychart.utils.normalizeSize(optionHeight, itemHeight);
+
+          var itemBounds = new anychart.math.Rect(left, totalTop, width, itemHeight);
+          var anchor = /** @type {anychart.enums.Anchor} */ (this.getOption('baseBarAnchor'));
+          var position = /** @type {anychart.enums.Position} */ (this.getOption('baseBarPosition'));
+          if (anchor == anychart.enums.Anchor.AUTO) {
+            anchor = this.resolveAutoAnchorByType_(position, anychart.enums.TLElementTypes.PERIOD);
+          }
+
+          var offset = /** @type {number|string} */ (this.getOption('baseBarOffset'));
+          var offsetNorm = anychart.utils.normalizeSize(offset, itemHeight);
+
+          var coord = anychart.utils.getCoordinateByAnchor(itemBounds, position);
+          var top = this.fixBarTop_(coord.y, height, anchor) + offsetNorm;
+          var bounds = new anychart.math.Rect(coord.x, top, width, height);
+
+          this.drawBar_(bounds, dataItem, anychart.enums.TLElementTypes.PERIOD, void 0, j);
         }
       }
     }
@@ -3765,44 +3724,84 @@ anychart.ganttModule.TimeLine.prototype.drawAsBaseline_ = function(dataItem, tot
     var b = this.pixelBoundsCache;
     var actualLeft = b.left + b.width * actualStartRatio;
     var actualRight = b.left + b.width * actualEndRatio;
-    var actualTop = totalTop + itemHeight * (1 - anychart.ganttModule.TimeLine.DEFAULT_HEIGHT_REDUCTION) / 2;
-    var actualHeight = itemHeight * anychart.ganttModule.TimeLine.DEFAULT_HEIGHT_REDUCTION / 2;
+    var actualWidth = actualRight - actualLeft;
+
+    var isParent = !!dataItem.numChildren();
+    var actualItemBounds = new anychart.math.Rect(actualLeft, totalTop, actualWidth, itemHeight);
+    var actualType = isParent ? anychart.enums.TLElementTypes.PARENT : anychart.enums.TLElementTypes.BASE;
+    var actualBounds = this.getBarBounds_(actualType, actualItemBounds, true);
 
     var baselineLeft = b.left + b.width * baselineStartRatio;
     var baselineRight = b.left + b.width * baselineEndRatio;
-    var baselineTop = actualTop + actualHeight;
-    var baselineHeight = actualHeight;
+    var baselineWidth = baselineRight - baselineLeft;
+    var baselineItemBounds = new anychart.math.Rect(baselineLeft, totalTop, baselineWidth, itemHeight);
+    var baselineBounds = this.getBarBounds_(anychart.enums.TLElementTypes.BASELINE, baselineItemBounds, true);
 
-    if (this.baselineAbove_) {
-      var tmp = actualTop;
-      actualTop = baselineTop;
-      baselineTop = tmp;
-    }
+    this.fixBaselineBarsPositioning_(actualBounds, baselineBounds, isParent);
+    this.drawBar_(actualBounds, dataItem, actualType, anychart.enums.GanttDataFields.ACTUAL);
+    this.drawBar_(baselineBounds, dataItem, anychart.enums.TLElementTypes.BASELINE, anychart.enums.GanttDataFields.BASELINE);
 
-    var actualBounds = new anychart.math.Rect(actualLeft, actualTop, (actualRight - actualLeft), actualHeight);
-
-    var actualBarType = dataItem.numChildren() ? anychart.enums.TLElementTypes.PARENT : anychart.enums.TLElementTypes.BASE;
-    this.drawBar_(actualBounds, dataItem, actualBarType, anychart.enums.GanttDataFields.ACTUAL);
-
-    this.drawBar_(new anychart.math.Rect(baselineLeft, baselineTop, (baselineRight - baselineLeft), baselineHeight),
-        dataItem, anychart.enums.TLElementTypes.BASELINE, anychart.enums.GanttDataFields.BASELINE);
-
-    var progressHeight = actualHeight * anychart.ganttModule.TimeLine.PROGRESS_HEIGHT_REDUCTION;
-    var progressTop = actualTop + (actualHeight - progressHeight) / 2;
-
-    var progressValue = goog.isDef(dataItem.meta('progressValue')) ?
-        dataItem.meta('progressValue') :
+    var progressValue = goog.isDef(dataItem.meta(anychart.enums.GanttDataFields.PROGRESS_VALUE)) ?
+        dataItem.meta(anychart.enums.GanttDataFields.PROGRESS_VALUE) :
         dataItem.meta('autoProgress');
 
-    if (progressValue) { //Draw progress.
-      var progressWidth = /** @type {number} */ (progressValue) * (actualRight - actualLeft);
-      var progressBar = this.drawBar_(new anychart.math.Rect(actualLeft, progressTop, progressWidth, progressHeight), dataItem,
-          anychart.enums.TLElementTypes.PROGRESS, anychart.enums.GanttDataFields.PROGRESS);
-      progressBar.currBounds = new anychart.math.Rect(actualLeft, progressTop, progressWidth, progressHeight);
+    if (goog.isDefAndNotNull(progressValue)) { //Draw progress.
+      var progressWidth = /** @type {number} */ (progressValue) * actualBounds.width;
+      var progressItemBounds = new anychart.math.Rect(actualBounds.left, actualBounds.top, progressWidth, actualBounds.height);
+      var progressBounds = this.getBarBounds_(anychart.enums.TLElementTypes.PROGRESS, progressItemBounds);
+      var progressBar = this.drawBar_(progressBounds, dataItem, anychart.enums.TLElementTypes.PROGRESS, anychart.enums.GanttDataFields.PROGRESS);
+      progressBar.currBounds = progressBounds;
     }
-
   }
+};
 
+
+/**
+ * Fixes bars positioning considering baseline.
+ * Allows to avoid bar and baseline intersection for auto anchor case.
+ * @param {anychart.math.Rect} barBounds - .
+ * @param {anychart.math.Rect} baselineBounds - .
+ * @param {boolean=} opt_isParent - .
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.fixBaselineBarsPositioning_ = function(barBounds, baselineBounds, opt_isParent) {
+  var barAnchorName = opt_isParent ? 'parentBarAnchor' : 'baseBarAnchor';
+  var barPositionName = opt_isParent ? 'parentBarPosition' : 'baseBarPosition';
+  var barAnchor = /** @type {anychart.enums.Anchor} */ (this.getInheritedOption_(barAnchorName, 'baseBarAnchor'));
+  var barPosition = /** @type {anychart.enums.Position} */ (this.getInheritedOption_(barPositionName, 'baseBarPosition'));
+  var baselineAnchor = /** @type {anychart.enums.Anchor} */ (this.getInheritedOption_('baselineBarAnchor', 'baseBarAnchor'));
+  var baselinePosition = /** @type {anychart.enums.Position} */ (this.getInheritedOption_('baselineBarPosition', 'baseBarPosition'));
+
+  if ((barAnchor == baselineAnchor) && (barPosition == baselinePosition)) {
+    var barType = opt_isParent ? anychart.enums.TLElementTypes.PARENT : anychart.enums.TLElementTypes.BASE;
+    if (barAnchor == anychart.enums.Anchor.AUTO)
+      barAnchor = this.resolveAutoAnchorByType_(barPosition, barType, true);
+    if (baselineAnchor == anychart.enums.Anchor.AUTO)
+      baselineAnchor = this.resolveAutoAnchorByType_(baselinePosition, anychart.enums.TLElementTypes.BASELINE, true);
+
+    var baselineStroke = anychart.ganttModule.BaseGrid.getColorResolver('baselineStroke', anychart.enums.ColorType.STROKE, false);
+    var barStroke = anychart.ganttModule.BaseGrid.getColorResolver((opt_isParent ? 'parentStroke' : 'baseStroke'), anychart.enums.ColorType.STROKE, false);
+
+    var barStrokeThickness = anychart.utils.extractThickness(/** @type {acgraph.vector.Stroke|string} */ (barStroke)) / 2;
+    var baselineStrokeThickness = anychart.utils.extractThickness(/** @type {acgraph.vector.Stroke|string} */ (baselineStroke)) / 2;
+    var strokes = barStrokeThickness + baselineStrokeThickness;
+
+    if (barAnchor == baselineAnchor) {
+      if (this.baselineAbove()) {
+        if (anychart.utils.isTopAnchor(barAnchor)) {
+          barBounds.top += (baselineBounds.height + strokes);
+        } else {
+          baselineBounds.top -= (barBounds.height + strokes);
+        }
+      } else {
+        if (anychart.utils.isTopAnchor(barAnchor)) {
+          baselineBounds.top += (barBounds.height + strokes);
+        } else {
+          barBounds.top -= (baselineBounds.height + strokes);
+        }
+      }
+    }
+  }
 };
 
 
@@ -3824,28 +3823,26 @@ anychart.ganttModule.TimeLine.prototype.drawAsParent_ = function(dataItem, total
   var endRatio = this.scale_.timestampToRatio(actualEnd);
 
   if (endRatio > 0 && startRatio < 1) { //Is visible
-    var left = this.pixelBoundsCache.left + this.pixelBoundsCache.width * startRatio;
-    var right = this.pixelBoundsCache.left + this.pixelBoundsCache.width * endRatio;
-    var top = totalTop + itemHeight * (1 - anychart.ganttModule.TimeLine.DEFAULT_HEIGHT_REDUCTION) / 2;
-    var height = itemHeight * anychart.ganttModule.TimeLine.PARENT_HEIGHT_REDUCTION;
+    var b = this.pixelBoundsCache;
+    var actualLeft = b.left + b.width * startRatio;
+    var actualRight = b.left + b.width * endRatio;
+    var actualWidth = actualRight - actualLeft;
+    var actualItemBounds = new anychart.math.Rect(actualLeft, totalTop, actualWidth, itemHeight);
+    var actualBounds = this.getBarBounds_(anychart.enums.TLElementTypes.PARENT, actualItemBounds);
 
-    var bounds = new anychart.math.Rect(left, top, (right - left), height);
-    this.drawBar_(bounds, dataItem, anychart.enums.TLElementTypes.PARENT, anychart.enums.GanttDataFields.ACTUAL);
-
-    var progressHeight = height * anychart.ganttModule.TimeLine.PROGRESS_HEIGHT_REDUCTION;
-    var progressTop = top + (height - progressHeight) / 2;
+    this.drawBar_(actualBounds, dataItem, anychart.enums.TLElementTypes.PARENT, anychart.enums.GanttDataFields.ACTUAL);
 
     var progressValue = goog.isDef(dataItem.meta(anychart.enums.GanttDataFields.PROGRESS_VALUE)) ?
         dataItem.meta(anychart.enums.GanttDataFields.PROGRESS_VALUE) :
         dataItem.meta('autoProgress');
 
-    if (progressValue) { //Draw progress.
-      var progressWidth = /** @type {number} */ (progressValue) * (right - left);
-      var progressBar = this.drawBar_(new anychart.math.Rect(left, progressTop, progressWidth, progressHeight), dataItem, anychart.enums.TLElementTypes.PROGRESS,
-          anychart.enums.GanttDataFields.PROGRESS);
-      progressBar.currBounds = new anychart.math.Rect(left, progressTop, progressWidth, progressHeight);
+    if (goog.isDefAndNotNull(progressValue)) { //Draw progress.
+      var progressWidth = /** @type {number} */ (progressValue) * actualWidth;
+      var progressItemBounds = new anychart.math.Rect(actualBounds.left, actualBounds.top, progressWidth, actualBounds.height);
+      var progressBounds = this.getBarBounds_(anychart.enums.TLElementTypes.PROGRESS, progressItemBounds);
+      var progressBar = this.drawBar_(progressBounds, dataItem, anychart.enums.TLElementTypes.PROGRESS, anychart.enums.GanttDataFields.PROGRESS);
+      progressBar.currBounds = progressBounds;
     }
-
   }
 };
 
@@ -3869,23 +3866,25 @@ anychart.ganttModule.TimeLine.prototype.drawAsProgress_ = function(dataItem, tot
   var endRatio = this.scale_.timestampToRatio(actualEnd);
 
   if (endRatio > 0 && startRatio < 1) { //Is visible
-    var left = this.pixelBoundsCache.left + this.pixelBoundsCache.width * startRatio;
-    var right = this.pixelBoundsCache.left + this.pixelBoundsCache.width * endRatio;
-    var height = itemHeight * anychart.ganttModule.TimeLine.DEFAULT_HEIGHT_REDUCTION;
-    var top = totalTop + (itemHeight - height) / 2;
+    var b = this.pixelBoundsCache;
+    var actualLeft = b.left + b.width * startRatio;
+    var actualRight = b.left + b.width * endRatio;
+    var actualWidth = actualRight - actualLeft;
+    var actualItemBounds = new anychart.math.Rect(actualLeft, totalTop, actualWidth, itemHeight);
+    var actualBounds = this.getBarBounds_(anychart.enums.TLElementTypes.BASE, actualItemBounds);
 
-    var bounds = new anychart.math.Rect(left, top, (right - left), height);
-    this.drawBar_(bounds, dataItem, anychart.enums.TLElementTypes.BASE, anychart.enums.GanttDataFields.ACTUAL);
+    this.drawBar_(actualBounds, dataItem, anychart.enums.TLElementTypes.BASE, anychart.enums.GanttDataFields.ACTUAL);
 
-    var progressHeight = height * anychart.ganttModule.TimeLine.PROGRESS_HEIGHT_REDUCTION;
-    var progressTop = top + (height - progressHeight) / 2;
-    var progressValue = parseFloat(dataItem.get(anychart.enums.GanttDataFields.PROGRESS_VALUE));
+    var progressValue = goog.isDef(dataItem.meta(anychart.enums.GanttDataFields.PROGRESS_VALUE)) ?
+        dataItem.meta(anychart.enums.GanttDataFields.PROGRESS_VALUE) :
+        dataItem.meta('autoProgress');
 
-    if (progressValue) { //Draw progress.
-      var progressWidth = progressValue * (right - left) / 100;
-      var progressBar = this.drawBar_(new anychart.math.Rect(left, progressTop, progressWidth, progressHeight), dataItem, anychart.enums.TLElementTypes.PROGRESS,
-          anychart.enums.GanttDataFields.PROGRESS);
-      progressBar.currBounds = new anychart.math.Rect(left, top, progressWidth, progressHeight);
+    if (goog.isDefAndNotNull(progressValue)) { //Draw progress.
+      var progressWidth = /** @type {number} */ (progressValue) * actualWidth;
+      var progressItemBounds = new anychart.math.Rect(actualBounds.left, actualBounds.top, progressWidth, actualBounds.height);
+      var progressBounds = this.getBarBounds_(anychart.enums.TLElementTypes.PROGRESS, progressItemBounds);
+      var progressBar = this.drawBar_(progressBounds, dataItem, anychart.enums.TLElementTypes.PROGRESS, anychart.enums.GanttDataFields.PROGRESS);
+      progressBar.currBounds = progressBounds;
     }
 
   }
@@ -3907,20 +3906,23 @@ anychart.ganttModule.TimeLine.prototype.drawAsMilestone_ = function(dataItem, to
 
     var stroke = /** @type {acgraph.vector.Stroke} */ (settings && goog.isDef(settings[anychart.enums.GanttDataFields.STROKE]) ?
         acgraph.vector.normalizeStroke(settings[anychart.enums.GanttDataFields.STROKE]) :
-        this.milestoneStroke_);
+        anychart.ganttModule.BaseGrid.getColorResolver('milestoneStroke', anychart.enums.ColorType.STROKE, false)(this, 0, dataItem));
 
     var lineThickness = anychart.utils.isNone(stroke) ? 0 :
         goog.isString(stroke) ? 1 :
             stroke['thickness'] ? stroke['thickness'] : 1;
 
     var pixelShift = (lineThickness % 2 && acgraph.type() === acgraph.StageType.SVG) ? 0.5 : 0;
+    var optionHeight = /** @type {string|number} */ (this.getInheritedOption_('milestoneHeight', 'baseBarHeight'));
+    var height = anychart.utils.normalizeSize(optionHeight, itemHeight);
 
+    var halfHeight = Math.round(height / 2);
 
-    var halfHeight = Math.round(itemHeight * anychart.ganttModule.TimeLine.DEFAULT_HEIGHT_REDUCTION / 2);
     var centerLeft = Math.round(this.pixelBoundsCache.left + this.pixelBoundsCache.width * ratio) + pixelShift;
-    var centerTop = Math.round(totalTop + itemHeight / 2) + pixelShift;
+    var itemBounds = new anychart.math.Rect(centerLeft - halfHeight, totalTop, height, itemHeight);
+    var bounds = this.getBarBounds_(anychart.enums.TLElementTypes.MILESTONE, itemBounds);
+    var centerTop = Math.round(bounds.top + bounds.height / 2) + pixelShift;
 
-    //var milestone = this.getDrawLayer().genNextChild();
     var milestone = this.genElement_();
 
     milestone.tag = dataItem.get(anychart.enums.GanttDataFields.ID);
@@ -3932,7 +3934,6 @@ anychart.ganttModule.TimeLine.prototype.drawAsMilestone_ = function(dataItem, to
     var top = centerTop - halfHeight;
     var right = centerLeft + halfHeight;
     var bottom = centerTop + halfHeight;
-    var diagonal = halfHeight + halfHeight;
     milestone
         .zIndex(anychart.ganttModule.TimeLine.BASE_Z_INDEX)
         .moveTo(left, centerTop) //left corner
@@ -3941,7 +3942,6 @@ anychart.ganttModule.TimeLine.prototype.drawAsMilestone_ = function(dataItem, to
         .lineTo(centerLeft, bottom) //bottom corner
         .close();
 
-    var bounds = new anychart.math.Rect(left, top, diagonal, diagonal);
     milestone.currBounds = bounds;
 
     this.controller.data().suspendSignalsDispatching();//this.controller.data() can be Tree or TreeView.
@@ -3949,27 +3949,55 @@ anychart.ganttModule.TimeLine.prototype.drawAsMilestone_ = function(dataItem, to
     this.controller.data().resumeSignalsDispatching(false);
 
     var isSelected = dataItem == this.selectedItem;
-
+    var resolver = anychart.ganttModule.BaseGrid.getColorResolver;
+    if (isSelected) {
+      var selectedElementFill = resolver('selectedElementFill', anychart.enums.ColorType.FILL, false)(this, 0, this.selectedItem);
+      var selectedElementStroke = resolver('selectedElementStroke', anychart.enums.ColorType.STROKE, false)(this, 0, this.selectedItem);
+    }
+    var milestoneFill = resolver('milestoneFill', anychart.enums.ColorType.FILL, false)(this, 0, dataItem);
+    var milestoneStroke = resolver('milestoneStroke', anychart.enums.ColorType.STROKE, false)(this, 0, dataItem);
     if (settings) {
       var fill;
       if (isSelected) {
-        fill = this.selectedElementFill_;
-        stroke = this.selectedElementStroke_;
-
+        fill = selectedElementFill;
+        stroke = selectedElementStroke;
       } else {
         fill = goog.isDef(settings[anychart.enums.GanttDataFields.FILL]) ?
             acgraph.vector.normalizeFill(settings[anychart.enums.GanttDataFields.FILL]) :
-            this.milestoneFill_;
+            milestoneFill;
       }
 
-      milestone.fill(fill).stroke(stroke);
+      milestone.fill(/** @type {acgraph.vector.Fill} */(fill)).stroke(/** @type {acgraph.vector.Stroke} */(stroke));
     } else {
       milestone
-          .fill(isSelected ? this.selectedElementFill_ : this.milestoneFill_)
-          .stroke(isSelected ? this.selectedElementStroke_ : this.milestoneStroke_);
+          .fill(/** @type {acgraph.vector.Fill} */(isSelected ? selectedElementFill : milestoneFill))
+          .stroke(/** @type {acgraph.vector.Stroke} */(isSelected ? selectedElementStroke : milestoneStroke));
     }
 
   }
+};
+
+
+/**
+ * Actual top here means top pixel dimension of row on screen (including the row hidden by scroll).
+ * @param {number} index - Linear index of item in controller's visible items.
+ * @return {number}
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.getItemActualTop_ = function(index) {
+  var totalTop = /** @type {number} */ (this.pixelBoundsCache.top + this.headerHeight() + 1);
+  var heightCache = this.controller.getHeightCache();
+  var startIndex = this.controller.startIndex();
+  var verticalOffset = this.controller.verticalOffset();
+
+  //relativeHeight in this case is height of rows hidden over the top line of visible area (this.pixelBoundsCache)
+  var relativeHeight = startIndex ? heightCache[startIndex - 1] : 0;
+  relativeHeight += verticalOffset;
+
+  //Lines below turn heights got from controller to Y-coordinates on screen.
+  var relativeTop = index ? heightCache[index - 1] : 0;
+
+  return (relativeTop - relativeHeight) + totalTop;
 };
 
 
@@ -3984,22 +4012,9 @@ anychart.ganttModule.TimeLine.prototype.drawAsMilestone_ = function(dataItem, to
  * @private
  */
 anychart.ganttModule.TimeLine.prototype.getItemBounds_ = function(index, opt_period, opt_periodIndex) {
-  var totalTop = /** @type {number} */ (this.pixelBoundsCache.top + this.headerHeight() + 1);
-  var heightCache = this.controller.getHeightCache();
-  var startIndex = this.controller.startIndex();
+  var actualTop = this.getItemActualTop_(index);
   var visibleItems = this.controller.getVisibleItems();
-  var verticalOffset = this.controller.verticalOffset();
-
-  //relativeHeight in this case is height of rows hidden over the top line of visible area (this.pixelBoundsCache)
-  var relativeHeight = startIndex ? heightCache[startIndex - 1] : 0;
-  relativeHeight += verticalOffset;
-
   var item = visibleItems[index];
-
-  //Lines below turn heights got from controller to Y-coordinates on screen.
-  var relativeTop = index ? heightCache[index - 1] : 0;
-
-  var actualTop = (relativeTop - relativeHeight) + totalTop;
   var rowHeight = this.controller.getItemHeight(item);
 
   var actStart = goog.isNumber(item.meta(anychart.enums.GanttDataFields.ACTUAL_START)) ?
@@ -4019,9 +4034,13 @@ anychart.ganttModule.TimeLine.prototype.getItemBounds_ = function(index, opt_per
       actEnd;
 
   var milestoneHalfWidth = 0;
-  if (isNaN(endTimestamp) || startTimestamp == endTimestamp) {
+  var isMilestone = false;
+  if (anychart.ganttModule.BaseGrid.isMilestone(item)) {
+    isMilestone = true;
     endTimestamp = startTimestamp;
-    milestoneHalfWidth = rowHeight * anychart.ganttModule.TimeLine.DEFAULT_HEIGHT_REDUCTION / 2;
+    var optionHeight = /** @type {string|number} */ (this.getInheritedOption_('milestoneHeight', 'baseBarHeight'));
+    var mHeight = anychart.utils.normalizeSize(optionHeight, rowHeight);
+    milestoneHalfWidth = Math.round(mHeight / 2);
   }
 
   if (isNaN(endTimestamp) || isNaN(startTimestamp)) {
@@ -4032,19 +4051,25 @@ anychart.ganttModule.TimeLine.prototype.getItemBounds_ = function(index, opt_per
     var right = this.scale_.timestampToRatio(endTimestamp) * this.pixelBoundsCache.width +
         this.pixelBoundsCache.left + milestoneHalfWidth;
 
+    var itemBounds = new anychart.math.Rect(left, actualTop, (right - left), rowHeight);
 
     if (!this.controller.isResources()) {
-      if (item.get(anychart.enums.GanttDataFields.BASELINE_START) &&
-          item.get(anychart.enums.GanttDataFields.BASELINE_END)) {
-        rowHeight = this.baselineAbove_ ?
-            (rowHeight * (2 + anychart.ganttModule.TimeLine.DEFAULT_HEIGHT_REDUCTION) / 2) :
-            (rowHeight * (1 - anychart.ganttModule.TimeLine.DEFAULT_HEIGHT_REDUCTION / 2));
+      if (isMilestone) {
+        return this.getBarBounds_(anychart.enums.TLElementTypes.MILESTONE, itemBounds);
+      } else if (goog.isDef(item.get(anychart.enums.GanttDataFields.BASELINE_START)) &&
+          goog.isDef(item.get(anychart.enums.GanttDataFields.BASELINE_END))) {
+        var type = item.numChildren() ? anychart.enums.TLElementTypes.PARENT : anychart.enums.TLElementTypes.BASE;
+        var barBounds = this.getBarBounds_(type, itemBounds, true);
+        var baselineBounds = this.getBarBounds_(anychart.enums.TLElementTypes.BASELINE, itemBounds, true);
+        this.fixBaselineBarsPositioning_(barBounds, baselineBounds, !!item.numChildren());
+        return barBounds;
       } else if (item.numChildren()) {
-        rowHeight = rowHeight * (1 - anychart.ganttModule.TimeLine.DEFAULT_HEIGHT_REDUCTION + anychart.ganttModule.TimeLine.PARENT_HEIGHT_REDUCTION);
+        return this.getBarBounds_(anychart.enums.TLElementTypes.PARENT, itemBounds);
+      } else {
+        return this.getBarBounds_(anychart.enums.TLElementTypes.BASE, itemBounds);
       }
     }
-
-    return new anychart.math.Rect(left, actualTop, (right - left), rowHeight);
+    return this.getBarBounds_(anychart.enums.TLElementTypes.PERIOD, itemBounds);
   }
 };
 
@@ -4075,19 +4100,26 @@ anychart.ganttModule.TimeLine.prototype.connectItems_ = function(from, to, opt_c
   var fromItem = visibleItems[fromIndex];
   var toItem = visibleItems[toIndex];
 
-  var fromBounds = this.getItemBounds_(fromIndex, from['period'], from['periodIndex']);
-  var toBounds = this.getItemBounds_(toIndex, to['period'], to['periodIndex']);
+  var fromBounds = this.getItemBounds_(fromIndex, from['period'], fromPeriodIndex);
+  var toBounds = this.getItemBounds_(toIndex, to['period'], toPeriodIndex);
+  var toRowHeight = this.controller.getItemHeight(toItem);
 
   if (fromBounds && toBounds) {
     var fill, stroke;
 
+    if (!(opt_connSettings && opt_connSettings[anychart.enums.GanttDataFields.FILL])) {
+      var connectorFill = anychart.ganttModule.BaseGrid.getColorResolver('connectorFill', anychart.enums.ColorType.FILL, false)(this, 0, fromItem, toItem, opt_connType, fromPeriodIndex, toPeriodIndex);
+    }
+    if (!(opt_connSettings && opt_connSettings[anychart.enums.GanttDataFields.STROKE])) {
+      var connectorStroke = anychart.ganttModule.BaseGrid.getColorResolver('connectorStroke', anychart.enums.ColorType.STROKE, false)(this, 0, fromItem, toItem, opt_connType, fromPeriodIndex, toPeriodIndex);
+    }
     fill = (opt_connSettings && opt_connSettings[anychart.enums.GanttDataFields.FILL]) ?
         acgraph.vector.normalizeFill(opt_connSettings[anychart.enums.GanttDataFields.FILL]) :
-        this.connectorFill_;
+        connectorFill;
 
     stroke = (opt_connSettings && opt_connSettings[anychart.enums.GanttDataFields.STROKE]) ?
         acgraph.vector.normalizeStroke(opt_connSettings[anychart.enums.GanttDataFields.STROKE]) :
-        this.connectorStroke_;
+        connectorStroke;
 
     var drawPreview = goog.isDefAndNotNull(opt_path);
 
@@ -4101,9 +4133,9 @@ anychart.ganttModule.TimeLine.prototype.connectItems_ = function(from, to, opt_c
     var segmentTop0; //Util variable, temporary segment Y-coordinate storage.
     var aboveSequence = true; //If 'from' bar is above the 'to' bar.
 
-    var lineThickness = anychart.utils.extractThickness(stroke);
-
+    var lineThickness = anychart.utils.extractThickness(/** @type {acgraph.vector.Stroke} */(stroke));
     var pixelShift = (lineThickness % 2 && acgraph.type() === acgraph.StageType.SVG) ? 0.5 : 0;
+    var toActualTop;
 
     switch ((opt_connType + '').toLowerCase()) {
       case anychart.enums.ConnectorType.FINISH_FINISH:
@@ -4142,14 +4174,14 @@ anychart.ganttModule.TimeLine.prototype.connectItems_ = function(from, to, opt_c
 
           segmentLeft0 = fromLeft - am;
           segmentLeft1 = toLeft + am + size;
-          segmentTop0 = Math.round(aboveSequence ? toBounds.top : toBounds.top + toBounds.height) + pixelShift;
+          toActualTop = this.getItemActualTop_(toIndex);
+          segmentTop0 = Math.round(aboveSequence ? toActualTop : toActualTop + toRowHeight) + pixelShift;
 
           path = this.drawSegment_(fromLeft, fromTop, segmentLeft0, fromTop, path);
           path = this.drawSegment_(segmentLeft0, fromTop, segmentLeft0, segmentTop0, path);
           path = this.drawSegment_(segmentLeft0, segmentTop0, segmentLeft1, segmentTop0, path);
           path = this.drawSegment_(segmentLeft1, segmentTop0, segmentLeft1, toTop, path);
           path = this.drawSegment_(segmentLeft1, toTop, toLeft, toTop, path);
-
         }
 
         arrow = this.drawArrow_(toLeft, toTop, orientation, arrow);
@@ -4201,8 +4233,10 @@ anychart.ganttModule.TimeLine.prototype.connectItems_ = function(from, to, opt_c
           }
 
         } else { //if toLeft < fromLeft
-          extraEndY = Math.round(toBounds.top + toBounds.height / 2) + pixelShift;
-          segmentTop0 = Math.round((toBounds.top > fromBounds.top) ? toBounds.top : (toBounds.top + toBounds.height)) + pixelShift;
+          extraEndY = Math.round(toBounds.top + toBounds.height / 2);
+          toActualTop = this.getItemActualTop_(toIndex) + pixelShift;
+
+          segmentTop0 = Math.round((toBounds.top > fromBounds.top) ? toActualTop : (toActualTop + toRowHeight)) + pixelShift;
           segmentLeft0 = fromLeft + am;
           segmentLeft1 = toLeft - am - size;
 
@@ -4237,6 +4271,9 @@ anychart.ganttModule.TimeLine.prototype.connectItems_ = function(from, to, opt_c
       }
     }
 
+    var selectedConnectorStroke;
+    if (connectorHighlight)
+      selectedConnectorStroke = /** @type {acgraph.vector.Stroke} */(anychart.ganttModule.BaseGrid.getColorResolver('selectedConnectorStroke', anychart.enums.ColorType.STROKE, false)(this, 0, fromItem, toItem, opt_connType, fromPeriodIndex, toPeriodIndex));
     if (path && !drawPreview) {
       path.stroke(/** @type {acgraph.vector.Stroke} */ (stroke));
       path.tag = void 0; //Tooltip will not appear on connector mouse over.
@@ -4245,7 +4282,7 @@ anychart.ganttModule.TimeLine.prototype.connectItems_ = function(from, to, opt_c
       path.cursor(this.editable ? acgraph.vector.Cursor.POINTER : acgraph.vector.Cursor.DEFAULT);
       meta['path'] = path;
       path.meta = meta;
-      path.stroke(connectorHighlight ? this.selectedConnectorStroke_ : /** @type {acgraph.vector.Stroke} */ (stroke));
+      path.stroke(connectorHighlight ? selectedConnectorStroke : /** @type {acgraph.vector.Stroke} */ (stroke));
     }
     if (arrow && !drawPreview) {
       arrow.fill(/** @type {acgraph.vector.Fill} */ (fill)).stroke(/** @type {acgraph.vector.Stroke} */ (stroke));
@@ -4255,7 +4292,7 @@ anychart.ganttModule.TimeLine.prototype.connectItems_ = function(from, to, opt_c
       arrow.cursor(this.editable ? acgraph.vector.Cursor.POINTER : acgraph.vector.Cursor.DEFAULT);
       meta['arrow'] = arrow;
       arrow.meta = meta;
-      arrow.stroke(connectorHighlight ? this.selectedConnectorStroke_ : /** @type {acgraph.vector.Stroke} */ (stroke));
+      arrow.stroke(connectorHighlight ? selectedConnectorStroke : /** @type {acgraph.vector.Stroke} */ (stroke));
     }
   }
 };
@@ -4527,7 +4564,7 @@ anychart.ganttModule.TimeLine.prototype.boundsInvalidated = function() {
  * @override
  */
 anychart.ganttModule.TimeLine.prototype.appearanceInvalidated = function() {
-  this.getSeparationPath_().stroke(this.columnStroke_);
+  this.getSeparationPath_().stroke(/** @type {acgraph.vector.Stroke} */(anychart.ganttModule.BaseGrid.getColorResolver('columnStroke', anychart.enums.ColorType.STROKE, false)(this, 0)));
 
   this.getEditConnectorPreviewPath_()
       .stroke(this.connectorPreviewStroke_);
@@ -4897,6 +4934,8 @@ anychart.ganttModule.TimeLine.prototype.scale = function(opt_value) {
 anychart.ganttModule.TimeLine.prototype.serialize = function() {
   var json = anychart.ganttModule.TimeLine.base(this, 'serialize');
 
+  anychart.core.settings.serialize(this, anychart.ganttModule.TimeLine.DESCRIPTORS, json);
+
   json['scale'] = this.scale_.serialize();
 
   json['labels'] = this.labels().serialize();
@@ -4926,25 +4965,10 @@ anychart.ganttModule.TimeLine.prototype.serialize = function() {
 
   json['header'] = this.header().serialize();
 
-  json['columnStroke'] = anychart.color.serialize(this.columnStroke_);
 
   json['baselineAbove'] = this.baselineAbove_;
 
-  json['baseFill'] = anychart.color.serialize(this.baseFill_);
-  json['baseStroke'] = anychart.color.serialize(this.baseStroke_);
-  json['baselineFill'] = anychart.color.serialize(this.baselineFill_);
-  json['baselineStroke'] = anychart.color.serialize(this.baselineStroke_);
-  json['milestoneFill'] = anychart.color.serialize(this.milestoneFill_);
-  json['milestoneStroke'] = anychart.color.serialize(this.milestoneStroke_);
-  json['parentFill'] = anychart.color.serialize(this.parentFill_);
-  json['parentStroke'] = anychart.color.serialize(this.parentStroke_);
-  json['progressFill'] = anychart.color.serialize(this.progressFill_);
-  json['progressStroke'] = anychart.color.serialize(this.progressStroke_);
-  json['connectorFill'] = anychart.color.serialize(this.connectorFill_);
-  json['connectorStroke'] = anychart.color.serialize(this.connectorStroke_);
-  json['selectedElementFill'] = anychart.color.serialize(this.selectedElementFill_);
-  json['selectedElementStroke'] = anychart.color.serialize(this.selectedElementStroke_);
-  json['selectedConnectorStroke'] = anychart.color.serialize(this.selectedConnectorStroke_);
+  anychart.core.settings.serialize(this, anychart.ganttModule.TimeLine.COLOR_DESCRIPTORS, json);
 
   json['connectorPreviewStroke'] = anychart.color.serialize(this.connectorPreviewStroke_);
   json['editPreviewFill'] = anychart.color.serialize(this.editPreviewFill_);
@@ -5001,6 +5025,12 @@ anychart.ganttModule.TimeLine.prototype.serialize = function() {
 anychart.ganttModule.TimeLine.prototype.setupByJSON = function(config, opt_default) {
   anychart.ganttModule.TimeLine.base(this, 'setupByJSON', config, opt_default);
 
+  if (opt_default) {
+    anychart.core.settings.copy(this.themeSettings, anychart.ganttModule.TimeLine.DESCRIPTORS, config);
+  } else {
+    anychart.core.settings.deserialize(this, anychart.ganttModule.TimeLine.DESCRIPTORS, config);
+  }
+
   if ('scale' in config) this.scale_.setup(config['scale']);
 
   this.labels().setupInternal(!!opt_default, config['labels']);
@@ -5013,24 +5043,9 @@ anychart.ganttModule.TimeLine.prototype.setupByJSON = function(config, opt_defau
   if ('markers' in config) this.markers(config['markers']);
   if ('header' in config) this.header(config['header']);
 
-  this.columnStroke(config['columnStroke']);
   this.baselineAbove(config['baselineAbove']);
 
-  this.baseFill(config['baseFill']);
-  this.baseStroke(config['baseStroke']);
-  this.baselineFill(config['baselineFill']);
-  this.baselineStroke(config['baselineStroke']);
-  this.milestoneFill(config['milestoneFill']);
-  this.milestoneStroke(config['milestoneStroke']);
-  this.parentFill(config['parentFill']);
-  this.parentStroke(config['parentStroke']);
-  this.progressFill(config['progressFill']);
-  this.progressStroke(config['progressStroke']);
-  this.connectorFill(config['connectorFill']);
-  this.connectorStroke(config['connectorStroke']);
-  this.selectedElementFill(config['selectedElementFill']);
-  this.selectedElementStroke(config['selectedElementStroke']);
-  this.selectedConnectorStroke(config['selectedConnectorStroke']);
+  anychart.core.settings.deserialize(this, anychart.ganttModule.TimeLine.COLOR_DESCRIPTORS, config, opt_default);
 
   this.connectorPreviewStroke(config['connectorPreviewStroke']);
   this.editPreviewFill(config['editPreviewFill']);
@@ -5444,33 +5459,53 @@ anychart.standalones.resourceTimeline = function() {
 //exports
 (function() {
   var proto = anychart.ganttModule.TimeLine.prototype;
-  proto['backgroundFill'] = proto.backgroundFill;
-  proto['columnStroke'] = proto.columnStroke;
-  proto['rowFill'] = proto.rowFill;
-  proto['rowEvenFill'] = proto.rowEvenFill;
-  proto['rowOddFill'] = proto.rowOddFill;
-  proto['rowHoverFill'] = proto.rowHoverFill;
-  proto['rowSelectedFill'] = proto.rowSelectedFill;
+  // auto generated
+  //proto['backgroundFill'] = proto.backgroundFill;
+  //proto['columnStroke'] = proto.columnStroke;
+
+  // row coloring
+  //proto['rowFill'] = proto.rowFill;
+  //proto['rowEvenFill'] = proto.rowEvenFill;
+  //proto['rowOddFill'] = proto.rowOddFill;
+  //proto['rowHoverFill'] = proto.rowHoverFill;
+  //proto['rowSelectedFill'] = proto.rowSelectedFill;
+
+  // bar coloring
+  //proto['baseFill'] = proto.baseFill;
+  //proto['baseStroke'] = proto.baseStroke;
+
+  // baseline coloring
+  //proto['baselineFill'] = proto.baselineFill;
+  //proto['baselineStroke'] = proto.baselineStroke;
+
+  // milestone coloring
+  //proto['milestoneFill'] = proto.milestoneFill;
+  //proto['milestoneStroke'] = proto.milestoneStroke;
+
+  // parent bar coloring
+  //proto['parentFill'] = proto.parentFill;
+  //proto['parentStroke'] = proto.parentStroke;
+
+  // progress bar coloring
+  //proto['progressFill'] = proto.progressFill;
+  //proto['progressStroke'] = proto.progressStroke;
+
+  // connector coloring
+  //proto['connectorFill'] = proto.connectorFill;
+  //proto['connectorStroke'] = proto.connectorStroke;
+  //proto['selectedConnectorStroke'] = proto.selectedConnectorStroke;
+
+  // full bar stack coloring (bar progress parent milestone)
+  //proto['selectedElementFill'] = proto.selectedElementFill;
+  //proto['selectedElementStroke'] = proto.selectedElementStroke;
+
+
   proto['editing'] = proto.editing;
 
   proto['baselineAbove'] = proto.baselineAbove;
 
   proto['horizontalScrollBar'] = proto.horizontalScrollBar;
   proto['verticalScrollBar'] = proto.verticalScrollBar;
-  proto['baseFill'] = proto.baseFill;
-  proto['baseStroke'] = proto.baseStroke;
-  proto['baselineFill'] = proto.baselineFill;
-  proto['baselineStroke'] = proto.baselineStroke;
-  proto['milestoneFill'] = proto.milestoneFill;
-  proto['milestoneStroke'] = proto.milestoneStroke;
-  proto['parentFill'] = proto.parentFill;
-  proto['parentStroke'] = proto.parentStroke;
-  proto['progressFill'] = proto.progressFill;
-  proto['progressStroke'] = proto.progressStroke;
-  proto['connectorFill'] = proto.connectorFill;
-  proto['connectorStroke'] = proto.connectorStroke;
-  proto['selectedElementFill'] = proto.selectedElementFill;
-  proto['selectedElementStroke'] = proto.selectedElementStroke;
   proto['tooltip'] = proto.tooltip;
 
   proto['labels'] = proto.labels;
@@ -5521,9 +5556,9 @@ anychart.standalones.resourceTimeline = function() {
   proto['parentBounds'] = proto.parentBounds;
   proto['container'] = proto.container;
   proto['rowStroke'] = proto.rowStroke;
-  proto['backgroundFill'] = proto.backgroundFill;
   proto['headerHeight'] = proto.headerHeight;
   proto['defaultRowHeight'] = proto.defaultRowHeight;
+  proto['palette'] = proto.palette;
 
   proto = anychart.standalones.ResourceTimeline.prototype;
   proto['draw'] = proto.draw;
@@ -5531,7 +5566,7 @@ anychart.standalones.resourceTimeline = function() {
   proto['parentBounds'] = proto.parentBounds;
   proto['container'] = proto.container;
   proto['rowStroke'] = proto.rowStroke;
-  proto['backgroundFill'] = proto.backgroundFill;
   proto['headerHeight'] = proto.headerHeight;
   proto['defaultRowHeight'] = proto.defaultRowHeight;
+  proto['palette'] = proto.palette;
 })();

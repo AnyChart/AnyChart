@@ -1061,6 +1061,7 @@ anychart.annotationsModule.PlotController.prototype.fromXml = function(config) {
 anychart.annotationsModule.PlotController.prototype.annotationsJson_ = function(opt_list) {
   if (goog.isDef(opt_list)) {
     goog.disposeAll(this.annotations_);
+    this.annotations_.length = 0;
     if (goog.isArray(opt_list)) {
       for (var i = 0; i < opt_list.length; i++) {
         this.bindAnnotation(this.controller_.createAnnotationByType(opt_list[i]), true);

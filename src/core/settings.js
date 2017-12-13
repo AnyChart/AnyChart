@@ -356,17 +356,22 @@ anychart.core.settings.populateAliases = function(classConstructor, aliases, ali
 
 /**
  * Deserializes passed config to a target using descriptors.
- * @param {!(anychart.core.settings.IObjectWithSettings|Object)} target
+ * @param {!(anychart.core.settings.IObjectWithSettings|Object|anychart.core.Base)} target
  * @param {!Object.<anychart.core.settings.PropertyDescriptor>} descriptors
  * @param {!Object} config
+ * @param {boolean=} opt_default
  */
-anychart.core.settings.deserialize = function(target, descriptors, config) {
-  for (var name in descriptors) {
-    var val = config[name];
-    if (goog.isDef(val))
-      target.getOption ?
-          target[name](val) :
-          target[name] = val;
+anychart.core.settings.deserialize = function(target, descriptors, config, opt_default) {
+  if (opt_default && target.themeSettings) {
+    anychart.core.settings.copy(target.themeSettings, descriptors, config);
+  } else {
+    for (var name in descriptors) {
+      var val = config[name];
+      if (goog.isDef(val))
+        target.getOption ?
+            target[name](val) :
+            target[name] = val;
+    }
   }
 };
 
