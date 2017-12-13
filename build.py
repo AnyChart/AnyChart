@@ -772,7 +772,7 @@ def __get_bundle_wrapper(bundle_name, modules, file_name='', performance_monitor
     start = start % (
         ', '.join(modules),
         __get_build_version(),
-        time.strftime('%Y-%m-%d'),
+        time.strftime('%Y-%m-%d %H:%M'),
         time.strftime('%Y'),
         perf_start,
         core_check
