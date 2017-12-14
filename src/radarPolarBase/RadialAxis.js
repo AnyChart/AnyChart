@@ -1003,7 +1003,7 @@ anychart.radarPolarBaseModule.RadialAxis.prototype.drawLabel_ = function(index, 
   var x = bounds.left + bounds.width / 2;
   var y = bounds.top + bounds.height / 2;
 
-  var positionProvider = {'value': {x: x, y: y}};
+  var positionProvider = {'value': {'x': x, 'y': y}};
   labels.add(formatProvider, positionProvider, index);
 };
 

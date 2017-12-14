@@ -13,6 +13,7 @@ goog.require('anychart.stockModule.Controller');
 goog.require('anychart.stockModule.Interactivity');
 goog.require('anychart.stockModule.Plot');
 goog.require('anychart.stockModule.Scroller');
+goog.require('anychart.stockModule.eventMarkers.ChartController');
 goog.require('anychart.stockModule.scales.IKeyIndexTransformer');
 goog.require('anychart.stockModule.scales.Ordinal');
 goog.require('anychart.stockModule.scales.Scatter');
@@ -118,6 +119,13 @@ anychart.stockModule.Chart = function(opt_allowPointSettings) {
    * @private
    */
   this.annotations_ = null;
+
+  /**
+   * Event markers chart-level controller.
+   * @type {anychart.stockModule.eventMarkers.ChartController}
+   * @private
+   */
+  this.eventMarkers_ = null;
 
   /**
    * Annotations module exports, if it is included. Also used in Plots.
@@ -913,6 +921,20 @@ anychart.stockModule.Chart.prototype.setDefaultPlotSettings = function(value) {
 
 
 /**
+ * Returns an array of params to pass to eventMarkers table getIterator() method.
+ * @param {boolean=} opt_full
+ * @return {Array} [coIterator, fromOrNaN, toOrNaN]
+ */
+anychart.stockModule.Chart.prototype.getEventMarkersIteratorParams = function(opt_full) {
+  return [
+    this.dataController_.getCoIterator(false, false, true),
+    opt_full ? NaN : this.dataController_.getFirstSelectedKey(),
+    opt_full ? NaN : this.dataController_.getLastSelectedKey()
+  ];
+};
+
+
+/**
  * Internal function to select a range.
  * @param {number} start
  * @param {number} end
@@ -1103,6 +1125,9 @@ anychart.stockModule.Chart.prototype.drawContent = function(bounds) {
 
     this.mouseWheelHandler_.listen('mousewheel', this.handleMouseWheel_, false, this);
   }
+
+  this.eventMarkers().markConsistent(anychart.ConsistencyState.ALL);
+  this.eventMarkers().normal().connector().markConsistent(anychart.ConsistencyState.ALL);
 
   // anychart.core.Base.resumeSignalsDispatchingFalse(this.plots_, this.scroller_);
 };
@@ -1776,6 +1801,46 @@ anychart.stockModule.Chart.prototype.defaultAnnotationSettings = function(opt_va
     return this;
   }
   return this.defaultAnnotationSettings_;
+};
+
+
+//endregion
+//region --- Event markers
+//------------------------------------------------------------------------------
+//
+//  Event markers
+//
+//------------------------------------------------------------------------------
+/**
+ * Event markers controller getter-setter.
+ * @param {(Object|boolean|null)=} opt_value
+ * @return {anychart.stockModule.eventMarkers.ChartController|anychart.stockModule.Chart}
+ */
+anychart.stockModule.Chart.prototype.eventMarkers = function(opt_value) {
+  if (!this.eventMarkers_) {
+    this.eventMarkers_ = new anychart.stockModule.eventMarkers.ChartController(this);
+    this.eventMarkers_.setParentEventTarget(this);
+    this.eventMarkers_.listenSignals(this.eventMarkersInvalidated_, this);
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.eventMarkers_.setup(opt_value);
+    return this;
+  }
+  return this.eventMarkers_;
+};
+
+
+/**
+ * @param {anychart.SignalEvent} e
+ * @private
+ */
+anychart.stockModule.Chart.prototype.eventMarkersInvalidated_ = function(e) {
+  this.suspendSignalsDispatching();
+  for (var i = 0; i < this.plots_.length; i++) {
+    this.plots_[i].eventMarkers().invalidate(anychart.ConsistencyState.EVENT_MARKERS_DATA, anychart.Signal.NEEDS_REDRAW);
+  }
+  this.resumeSignalsDispatching(true);
 };
 
 
@@ -2627,10 +2692,11 @@ anychart.stockModule.Chart.prototype.dragEnd = function() {
 /** @inheritDoc */
 anychart.stockModule.Chart.prototype.disposeInternal = function() {
   // plot annotations should be disposed before chart annotations
-  goog.disposeAll(this.plots_, this.scroller_, this.dataController_, this.annotations_, this.mouseWheelHandler_);
+  goog.disposeAll(this.plots_, this.scroller_, this.dataController_, this.annotations_, this.eventMarkers_, this.mouseWheelHandler_);
   this.plots_ = null;
   this.scroller_ = null;
   this.annotations_ = null;
+  this.eventMarkers_ = null;
   this.mouseWheelHandler_ = null;
   delete this.dataController_;
   delete this.defaultAnnotationSettings_;
@@ -2651,6 +2717,7 @@ anychart.stockModule.Chart.prototype.serialize = function() {
     return element ? element.serialize() : null;
   });
   json['crosshair'] = this.crosshair().serialize();
+  json['eventMarkers'] = this.eventMarkers().serialize();
 
   anychart.core.settings.serialize(this, anychart.stockModule.Chart.PROPERTY_DESCRIPTORS, json);
   json['interactivity'] = this.interactivity().serialize();
@@ -2684,6 +2751,10 @@ anychart.stockModule.Chart.prototype.setupByJSON = function(config, opt_default)
 
   if ('defaultAnnotationSettings' in config)
     this.defaultAnnotationSettings(config['defaultAnnotationSettings']);
+
+  json = config['eventMarkers'];
+  if (json)
+    this.eventMarkers().setupInternal(!!opt_default, json);
 
   json = config['selectedRange'];
   if (goog.isObject(json)) {
@@ -2810,6 +2881,7 @@ anychart.stockModule.Chart.prototype.getCsvData = function(mode) {
   proto['grouping'] = proto.grouping;
   proto['scrollerGrouping'] = proto.scrollerGrouping;
   proto['annotations'] = proto.annotations;
+  proto['eventMarkers'] = proto.eventMarkers;
   proto['getPlotsCount'] = proto.getPlotsCount;
   proto['startZoomMarquee'] = proto.startZoomMarquee;
   // auto generated

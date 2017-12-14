@@ -3367,7 +3367,6 @@ anychart.core.series.Base.prototype.getPostLastPoint = function() {
  * @param {number} ratio
  * @param {boolean} xDirection
  * @return {number}
- * @protected
  */
 anychart.core.series.Base.prototype.applyRatioToBounds = function(ratio, xDirection) {
   var min, range;

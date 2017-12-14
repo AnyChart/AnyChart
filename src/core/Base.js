@@ -268,6 +268,7 @@ anychart.ConsistencyState = {
   STOCK_PLOT_ANNOTATIONS: 1 << 13,
   STOCK_PLOT_PRICE_INDICATORS: 1 << 14,
   STOCK_PLOT_NO_DATA_LABEL: 1 << 15,
+  STOCK_PLOT_EVENT_MARKERS: 1 << 16,
   //---------------------------------- PRICE INDICATOR STATES (VB) ---------------------------------
   STOCK_PRICE_INDICATOR_LABEL: 1 << 6,
   //---------------------------------- STOCK DATETIME AXIS (VB) ----------------------------------------
@@ -353,6 +354,8 @@ anychart.ConsistencyState = {
   //----------------------------- QUARTER (BACKGROUND) -----------------------------
   QUARTER_TITLE: 1 << 7,
   QUARTER_LABELS: 1 << 8,
+  //----------------------------- EVENT MARKERS (VB) -----------------------------
+  EVENT_MARKERS_DATA: 1 << 6,
   /**
    * Combination of all states.
    */

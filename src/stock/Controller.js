@@ -449,11 +449,12 @@ anychart.stockModule.Controller.prototype.select_ = function(startKey, endKey, g
  * Returns registry iterator if registry is not in sync mode. Internal method.
  * @param {boolean} scroller
  * @param {boolean=} opt_exportingData
+ * @param {boolean=} opt_force If true, returns the coIterator even for a sync mode of the registry.
  * @return {anychart.stockModule.Registry.Iterator}
  */
-anychart.stockModule.Controller.prototype.getCoIterator = function(scroller, opt_exportingData) {
+anychart.stockModule.Controller.prototype.getCoIterator = function(scroller, opt_exportingData, opt_force) {
   var registry = scroller ? this.currentScrollerRegistry_ : this.currentRegistry_;
-  if (registry.isInSyncMode())
+  if (registry.isInSyncMode() && !opt_force)
     return null;
   var selection;
   if (opt_exportingData) {

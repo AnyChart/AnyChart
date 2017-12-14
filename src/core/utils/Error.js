@@ -723,7 +723,6 @@ anychart.core.utils.ISeriesWithError.prototype.getErrorValues = function(horizon
  * @param {number} ratio .
  * @param {boolean} horizontal .
  * @return {number} .
- * @protected
  */
 anychart.core.utils.ISeriesWithError.prototype.applyRatioToBounds = function(ratio, horizontal) {};
 

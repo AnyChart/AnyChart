@@ -652,7 +652,8 @@ anychart.themes.merging.mergingMap_ = (function() {
           'textAxisMarker'
         ]],
         [['standalones', 'resource'],
-          '.resourceList.baseSettings']
+          '.resourceList.baseSettings'],
+        'stock.eventMarkers.normal'
       ]
     },
     {
@@ -840,7 +841,8 @@ anychart.themes.merging.mergingMap_ = (function() {
           ['pert.', [
             'milestones',
             'tasks'
-          ]]
+          ]],
+          'stock.eventMarkers'
         ], '.tooltip']
       ]
     },

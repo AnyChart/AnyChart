@@ -350,6 +350,22 @@ anychart.color.serialize = function(color) {
 };
 
 
+/**
+ * Returns color hash. If it equals the other color hash, than these colors are equal.
+ * @param {acgraph.vector.Fill|acgraph.vector.Stroke} color
+ * @return {string}
+ */
+anychart.color.hash = function(color) {
+  // var result;
+  // if (anychart.utils.instanceOf(color, acgraph.vector.PatternFill)) {
+  //   result = goog.getUid(color);
+  // } else if (goog.isObject(color)) {
+  //   result =
+  // }
+  return goog.isObject(color) ? 'o' + goog.getUid(color) : (typeof color).charAt(0) + color;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Color.

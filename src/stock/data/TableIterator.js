@@ -353,6 +353,12 @@ anychart.stockModule.data.TableIterator.ICoIterator.prototype.advance = function
 anychart.stockModule.data.TableIterator.ICoIterator.prototype.reset = function() {};
 
 
+/**
+ * @return {number}
+ */
+anychart.stockModule.data.TableIterator.ICoIterator.prototype.getRowsCount = function() {};
+
+
 //proto['getColumn'] = proto.getColumn;
 
 //exports

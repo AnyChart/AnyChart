@@ -788,6 +788,85 @@ anychart.enums.normalizeAnyMarkerType = function(value) {
 };
 
 
+//region --- Event markers properties
+//------------------------------------------------------------------------------
+//
+//  Event markers properties
+//
+//------------------------------------------------------------------------------
+/**
+ * Markers type.
+ * @enum {string}
+ */
+anychart.enums.EventMarkerType = {
+  CIRCLE: 'circle',
+  RECT: 'rect',
+  PIN: 'pin',
+  FLAG: 'flag'
+};
+
+
+/**
+ * Method to get event marker drawer.
+ * @param {*} value Marker type.
+ * @param {anychart.enums.EventMarkerType=} opt_default Default marker type. Defaults to anychart.enums.EventMarkerType.CIRCLE.
+ * @return {anychart.enums.EventMarkerType} Normalized marker type.
+ */
+anychart.enums.normalizeEventMarkerType = function(value, opt_default) {
+  return /** @type {anychart.enums.EventMarkerType} */(anychart.enums.normalize(anychart.enums.EventMarkerType, value,
+      opt_default || anychart.enums.EventMarkerType.CIRCLE));
+};
+
+
+/**
+ * Event marker direction enum.
+ * @enum {string}
+ */
+anychart.enums.EventMarkerDirection = {
+  UP: 'up',
+  DOWN: 'down',
+  AUTO: 'auto'
+};
+
+
+/**
+ * Method to get event marker direction.
+ * @param {*} value
+ * @param {anychart.enums.EventMarkerDirection=} opt_default
+ * @return {anychart.enums.EventMarkerDirection}
+ */
+anychart.enums.normalizeEventMarkerDirection = function(value, opt_default) {
+  return /** @type {anychart.enums.EventMarkerDirection} */(anychart.enums.normalize(anychart.enums.EventMarkerDirection, value,
+      opt_default || anychart.enums.EventMarkerDirection.AUTO));
+};
+
+
+/**
+ * Event marker position enum.
+ * @enum {string}
+ */
+anychart.enums.EventMarkerPosition = {
+  SERIES: 'series',
+  SERIES_POSITIVE: 'series-positive',
+  SERIES_NEGATIVE: 'series-negative',
+  ZERO: 'zero',
+  AXIS: 'axis'
+};
+
+
+/**
+ * Method to get event marker position.
+ * @param {*} value
+ * @param {anychart.enums.EventMarkerPosition=} opt_default
+ * @return {anychart.enums.EventMarkerPosition}
+ */
+anychart.enums.normalizeEventMarkerPosition = function(value, opt_default) {
+  return /** @type {anychart.enums.EventMarkerPosition} */(anychart.enums.normalize(anychart.enums.EventMarkerPosition, value,
+      opt_default || anychart.enums.EventMarkerPosition.AXIS));
+};
+
+
+//endregion
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  MapAsTableMode
@@ -1354,6 +1433,17 @@ anychart.enums.EventType = {
   LEGEND_ITEM_MOUSE_UP: 'legenditemmouseup',
   LEGEND_ITEM_CLICK: 'legenditemclick',
   LEGEND_ITEM_DBLCLICK: 'legenditemdblclick',
+
+  EVENT_MARKER_MOUSE_OUT: 'eventmarkermouseout',
+  EVENT_MARKER_MOUSE_OVER: 'eventmarkermouseover',
+  EVENT_MARKER_MOUSE_MOVE: 'eventmarkermousemove',
+  EVENT_MARKER_MOUSE_DOWN: 'eventmarkermousedown',
+  EVENT_MARKER_MOUSE_UP: 'eventmarkermouseup',
+  EVENT_MARKER_CLICK: 'eventmarkerclick',
+  EVENT_MARKER_DBLCLICK: 'eventmarkerdblclick',
+
+  EVENT_MARKERS_HOVER: 'eventmarkershover',
+  EVENT_MARKERS_SELECT: 'eventmarkersselect',
 
   DRAG: 'drag',
   DRAG_START: 'dragstart',

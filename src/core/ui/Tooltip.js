@@ -795,7 +795,7 @@ anychart.core.ui.Tooltip.prototype.showAsSingle_ = function(points, clientX, cli
  * @private
  */
 anychart.core.ui.Tooltip.prototype.setPositionForSingle_ = function(tooltip, clientX, clientY, opt_series) {
-  var manager = tooltip.parent() ? tooltip.parent() : this;
+  var manager = tooltip.parent() ? this.getTooltipParent_(tooltip) : this;
 
   var x, y, pixelBounds, anchoredPositionCoordinate;
   var positionMode = manager.getOption('positionMode') || anychart.enums.TooltipPositionMode.FLOAT;
@@ -1827,13 +1827,27 @@ anychart.core.ui.Tooltip.prototype.getContainer_ = function(tooltip) {
   } else if (tooltip.chart()) {
     container = tooltip.chart().container();
   } else if (tooltip.parent()) {
-    if (tooltip.parent().containerProvider()) {
-      container = tooltip.parent().containerProvider().container();
-    } else if (tooltip.parent().chart()) {
-      container = tooltip.parent().chart().container();
+    tooltip = this.getTooltipParent_(tooltip);
+    if (tooltip.containerProvider()) {
+      container = tooltip.containerProvider().container();
+    } else if (tooltip.chart()) {
+      container = tooltip.chart().container();
     }
   }
   return container;
+};
+
+
+/**
+ * @param {anychart.core.ui.Tooltip} tooltip
+ * @return {anychart.core.ui.Tooltip}
+ * @private
+ */
+anychart.core.ui.Tooltip.prototype.getTooltipParent_ = function(tooltip) {
+  while (tooltip.parent()) {
+    tooltip = tooltip.parent();
+  }
+  return tooltip;
 };
 
 
