@@ -1142,6 +1142,14 @@ anychart.annotationsModule.Base.prototype.markersInvalidated_ = function(event) 
 
 
 /**
+ * Sets type for anchor markers.
+ * @param {anychart.core.ui.MarkersFactory.Marker} marker Marker.
+ * @param {number} index Marker index.
+ */
+anychart.annotationsModule.Base.prototype.setMarkerCursor = goog.nullFunction;
+
+
+/**
  * Draws element(s) for point.
  * @param {anychart.PointState|number} state
  * @private
@@ -1182,6 +1190,7 @@ anychart.annotationsModule.Base.prototype.drawMarkers_ = function(state) {
       element.currentMarkersFactory(stateFactory || mainFactory);
       element.setSettings();
       element.draw();
+      this.setMarkerCursor(element, i);
     }
   } else {
     mainFactory.clear();

@@ -7,7 +7,7 @@ goog.require('anychart.annotationsModule.FibonacciRetracement');
 goog.require('anychart.annotationsModule.FibonacciTimezones');
 goog.require('anychart.annotationsModule.HorizontalLine');
 goog.require('anychart.annotationsModule.InfiniteLine');
-// goog.require('anychart.annotationsModule.Label');
+goog.require('anychart.annotationsModule.Label');
 goog.require('anychart.annotationsModule.Line');
 goog.require('anychart.annotationsModule.Marker');
 goog.require('anychart.annotationsModule.Ray');
@@ -924,18 +924,18 @@ anychart.annotationsModule.PlotController.prototype.marker = function(opt_config
 };
 
 
-// /**
-//  * Creates and returns a label annotation.
-//  * @param {Object=} opt_config
-//  * @return {anychart.annotationsModule.Label}
-//  */
-// anychart.annotationsModule.PlotController.prototype.label = function(opt_config) {
-//   var annotation = /** @type {anychart.annotationsModule.Label} */(
-//       this.controller_.createAnnotationByType(anychart.enums.AnnotationTypes.LABEL));
-//   annotation.setup(opt_config);
-//   this.bindAnnotation(annotation, true);
-//   return annotation;
-// };
+/**
+ * Creates and returns a label annotation.
+ * @param {Object=} opt_config
+ * @return {anychart.annotationsModule.Label}
+ */
+anychart.annotationsModule.PlotController.prototype.label = function(opt_config) {
+  var annotation = /** @type {anychart.annotationsModule.Label} */(
+      this.controller_.createAnnotationByType(anychart.enums.AnnotationTypes.LABEL));
+  annotation.setup(opt_config);
+  this.bindAnnotation(annotation, true);
+  return annotation;
+};
 
 
 //endregion
@@ -1268,7 +1268,7 @@ anychart.annotationsModule.PlotController.AnchorDragger.prototype.handleDragEnd_
   proto['fibonacciRetracement'] = proto.fibonacciRetracement;
   proto['fibonacciTimezones'] = proto.fibonacciTimezones;
   proto['marker'] = proto.marker;
-  // proto['label'] = proto.label;
+  proto['label'] = proto.label;
   proto['fromJson'] = proto.fromJson;
   proto['toJson'] = proto.toJson;
   proto['fromXml'] = proto.fromXml;

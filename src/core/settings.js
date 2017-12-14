@@ -701,6 +701,16 @@ anychart.core.settings.numberNormalizer = function(val) {
 /**
  * Single arg normalizer for number params.
  * @param {*} val
+ * @return {?number}
+ */
+anychart.core.settings.numberOrNullNormalizer = function(val) {
+  return goog.isNull(val) ? val : Number(val);
+};
+
+
+/**
+ * Single arg normalizer for number params.
+ * @param {*} val
  * @return {number|string}
  */
 anychart.core.settings.numberOrZeroNormalizer = function(val) {
@@ -908,6 +918,10 @@ anychart.core.settings.descriptors = (function() {
   map.FONT_VARIANT = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'fontVariant', anychart.enums.normalizeFontVariant];
   map.FONT_WEIGHT = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'fontWeight', anychart.core.settings.numberOrStringNormalizer];
   map.FONT_SIZE = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'fontSize', anychart.core.settings.numberOrPercentOrNullOrFunctionNormalizer];
+  // other text settings
+  map.FONT_COLOR = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'fontColor', anychart.core.settings.stringOrNullNormalizer];
+  map.FONT_OPACITY = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'fontOpacity', anychart.core.settings.numberNormalizer];
+  map.FONT_DECORATION = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'fontDecoration', anychart.enums.normalizeFontDecoration];
   // pert tasks
   map.DUMMY_FILL = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'dummyFill', anychart.core.settings.fillOrFunctionNormalizer];
   map.DUMMY_STROKE = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'dummyStroke', anychart.core.settings.strokeOrFunctionNormalizer];

@@ -293,6 +293,51 @@ anychart.annotationsModule.MARKER_DESCRIPTORS_META = (function() {
 })();
 
 
+/**
+ * Properties that should be defined in annotation prototype to support label annotation settings.
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.annotationsModule.LABEL_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = anychart.core.settings.createTextPropertiesDescriptors();
+  // delete this properties because they are state properties (for proper serialization/deserialization)
+  delete map['fontFamily'];
+  delete map['fontStyle'];
+  delete map['fontVariant'];
+  delete map['fontWeight'];
+  delete map['fontSize'];
+  delete map['fontColor'];
+  delete map['fontOpacity'];
+
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'text', anychart.core.settings.stringNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'anchor', anychart.enums.normalizeAnchor],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'offsetX', anychart.core.settings.numberNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'offsetY', anychart.core.settings.numberNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'width', anychart.core.settings.numberOrNullNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'height', anychart.core.settings.numberOrNullNormalizer]
+  ]);
+
+  return map;
+})();
+
+
+/**
+ * Properties meta.
+ * @type {!Array.<Array>}
+ */
+anychart.annotationsModule.LABEL_DESCRIPTORS_META = (function() {
+  return [
+    ['text', anychart.ConsistencyState.ANNOTATIONS_SHAPES, anychart.Signal.NEEDS_REDRAW],
+    ['anchor', anychart.ConsistencyState.ANNOTATIONS_SHAPES, anychart.Signal.NEEDS_REDRAW],
+    ['offsetX', anychart.ConsistencyState.ANNOTATIONS_SHAPES, anychart.Signal.NEEDS_REDRAW],
+    ['offsetY', anychart.ConsistencyState.ANNOTATIONS_SHAPES, anychart.Signal.NEEDS_REDRAW],
+    ['width', anychart.ConsistencyState.ANNOTATIONS_SHAPES, anychart.Signal.NEEDS_REDRAW],
+    ['height', anychart.ConsistencyState.ANNOTATIONS_SHAPES, anychart.Signal.NEEDS_REDRAW]
+  ];
+})();
+
+
 //endregion
 //region Descriptors state meta
 //region --- STROKE
@@ -348,7 +393,7 @@ anychart.annotationsModule.FILL_DESCRIPTORS_META = (function() {
 
 
 //endregion
-//region --- MARKERS
+//region --- MARKER
 /**
  * Properties meta.
  * @type {!Array.<Array>}
@@ -356,6 +401,26 @@ anychart.annotationsModule.FILL_DESCRIPTORS_META = (function() {
 anychart.annotationsModule.MARKER_DESCRIPTORS_STATE_META = (function() {
   return [
     ['size', anychart.ConsistencyState.ANNOTATIONS_SHAPES, anychart.Signal.NEEDS_REDRAW]
+  ];
+})();
+
+
+//endregion
+//region --- LABEL
+/**
+ * Properties meta.
+ * @type {!Array.<Array>}
+ */
+anychart.annotationsModule.LABEL_DESCRIPTORS_STATE_META = (function() {
+  return [
+    ['fontFamily', anychart.ConsistencyState.ANNOTATIONS_SHAPES, anychart.Signal.NEEDS_REDRAW],
+    ['fontStyle', anychart.ConsistencyState.ANNOTATIONS_SHAPES, anychart.Signal.NEEDS_REDRAW],
+    ['fontVariant', anychart.ConsistencyState.ANNOTATIONS_SHAPES, anychart.Signal.NEEDS_REDRAW],
+    ['fontWeight', anychart.ConsistencyState.ANNOTATIONS_SHAPES, anychart.Signal.NEEDS_REDRAW],
+    ['fontSize', anychart.ConsistencyState.ANNOTATIONS_SHAPES, anychart.Signal.NEEDS_REDRAW],
+    ['fontColor', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['fontOpacity', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['fontDecoration', anychart.ConsistencyState.ANNOTATIONS_SHAPES, anychart.Signal.NEEDS_REDRAW]
   ];
 })();
 

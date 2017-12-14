@@ -653,7 +653,8 @@ anychart.themes.merging.mergingMap_ = (function() {
         ]],
         [['standalones', 'resource'],
           '.resourceList.baseSettings'],
-        'stock.eventMarkers.normal'
+        'stock.eventMarkers.normal',
+        'chart.defaultAnnotationSettings.label'
       ]
     },
     {
@@ -683,6 +684,7 @@ anychart.themes.merging.mergingMap_ = (function() {
           ]],
           ['chart', [
             '',
+            '.defaultAnnotationSettings.label',
             [[
               '',
               '.defaultQuarterSettings'
