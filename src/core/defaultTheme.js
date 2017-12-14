@@ -1,6 +1,7 @@
 goog.provide('anychart.core.defaultTheme');
 goog.require('anychart.color');
 goog.require('anychart.format');
+goog.require('anychart.math');
 
 
 //region --- Aux
@@ -1099,7 +1100,20 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'y': 0,
     'axisIndex': 0,
     'anchor': null,
-    'format': anychart.core.defaultTheme.returnValue,
+    /**
+     * @return {*}
+     * @this {*}
+     */
+    'format': function() {
+      var scale = this['scale'];
+      var type = scale.getType();
+      var prec = NaN;
+      if (type == 'linear' || type == 'log') {
+        var ticks = (/** @type {anychart.scales.Linear} */(scale)).ticks().getInternal();
+        prec = anychart.math.getPrecision(anychart.math.specialRound(ticks[1] - ticks[0]));
+      }
+      return anychart.core.defaultTheme.locNum(this['value'], isNaN(prec) ? undefined : prec);
+    },
     'enabled': true,
     'fontSize': 12,
     'minFontSize': 8,
