@@ -235,6 +235,20 @@ anychart.scales.Linear.prototype.applyComparison = function(value, comparisonZer
 
 
 /**
+ * Returns full comparison info.
+ * @param {*} value
+ * @param {number} comparisonZero
+ * @return {{change: *, percent: *}}
+ */
+anychart.scales.Linear.prototype.getFullComparison = function(value, comparisonZero) {
+  return {
+    change: this.makeValuesComparison_(value, comparisonZero),
+    percent: this.makePercentComparison_(value, comparisonZero)
+  };
+};
+
+
+/**
  * Polymorphic function to calculate NONE comparison.
  * @param {*} value
  * @param {number} comparisonZero
