@@ -604,7 +604,7 @@ goog.addDependency('../../../graphicsjs/src/utils/IdGenerator.js', ['acgraph.uti
 goog.addDependency('../../../graphicsjs/src/utils/exporting.js', ['acgraph.utils.exporting'], ['goog.Timer', 'goog.dom', 'goog.style'], false);
 goog.addDependency('../../../graphicsjs/src/utils/utils.js', ['acgraph.utils'], ['goog.userAgent'], false);
 goog.addDependency('../../../graphicsjs/src/vector/Circle.js', ['acgraph.vector.Circle'], ['acgraph.utils.IdGenerator', 'acgraph.vector.Ellipse'], false);
-goog.addDependency('../../../graphicsjs/src/vector/Clip.js', ['acgraph.vector.Clip'], ['acgraph.vector.Circle', 'acgraph.vector.ILayer', 'acgraph.vector.Path', 'acgraph.vector.Rect', 'goog.Disposable', 'goog.array', 'goog.math.Rect'], false);
+goog.addDependency('../../../graphicsjs/src/vector/Clip.js', ['acgraph.vector.Clip'], ['acgraph.vector.ILayer', 'goog.Disposable', 'goog.array', 'goog.math.Rect'], false);
 goog.addDependency('../../../graphicsjs/src/vector/Defs.js', ['acgraph.vector.Defs'], ['acgraph.vector.HatchFill', 'acgraph.vector.ILayer', 'acgraph.vector.LinearGradient', 'acgraph.vector.PatternFill', 'acgraph.vector.RadialGradient', 'goog.Disposable', 'goog.math.Rect'], false);
 goog.addDependency('../../../graphicsjs/src/vector/Element.js', ['acgraph.vector.Element', 'acgraph.vector.Element.DirtyState'], ['acgraph.error', 'acgraph.events', 'acgraph.events.Dragger', 'acgraph.utils.IdGenerator', 'acgraph.vector', 'goog.events.EventTarget', 'goog.events.Listenable', 'goog.math.AffineTransform', 'goog.math.Rect'], false);
 goog.addDependency('../../../graphicsjs/src/vector/Ellipse.js', ['acgraph.vector.Ellipse'], ['acgraph.utils.IdGenerator', 'acgraph.vector.Shape', 'goog.math.Coordinate', 'goog.math.Rect'], false);

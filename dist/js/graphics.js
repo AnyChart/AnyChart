@@ -10445,6 +10445,7 @@ acgraph.vector.Clip.prototype.addChild = function(child) {
   child.remove();
   child.setParent(this);
   this.needUpdateClip_();
+  child.notifyPrevParent(true);
   return this;
 };
 acgraph.vector.Clip.prototype.removeChild = function(element) {
@@ -10454,6 +10455,7 @@ acgraph.vector.Clip.prototype.removeChild = function(element) {
     goog.dom.removeNode(dom);
   }
   this.needUpdateClip_();
+  element.notifyPrevParent(false);
   return element;
 };
 acgraph.vector.Clip.prototype.getFullTransformation = function() {
@@ -11836,7 +11838,8 @@ acgraph.vector.HatchFill.prototype.rectHelper_ = function(w, h, opt_l, opt_t) {
   this.rect(opt_l || 0, opt_t || 0, w, h).fill(this.color).stroke("none");
 };
 acgraph.vector.HatchFill.prototype.pathHelper_ = function(opt_filled) {
-  return (opt_filled ? this.path().fill(this.color).stroke("none") : this.path().fill("none").stroke(this.color, this.thickness));
+  var path = (opt_filled ? this.path().fill(this.color).stroke("none") : this.path().fill("none").stroke(this.color, this.thickness));
+  return (path);
 };
 acgraph.vector.HatchFill.prototype.onePixelRects_ = function(positions, opt_color) {
   var path = this.path().fill(opt_color || this.color).stroke("none");
@@ -11860,10 +11863,10 @@ acgraph.vector.HatchFill.prototype.getElementTypePrefix = function() {
   return acgraph.utils.IdGenerator.ElementTypePrefix.HATCH_FILL;
 };
 acgraph.vector.HatchFill.prototype.disposeInternal = function() {
-  goog.base(this, "disposeInternal");
   if (this.getStage()) {
     this.getStage().getDefs().removeHatchFill(this);
   }
+  goog.base(this, "disposeInternal");
 };
 (function() {
   var proto = acgraph.vector.HatchFill.prototype;
@@ -12542,10 +12545,13 @@ acgraph.vector.Renderer.prototype.isImageLoading = function() {
   return false;
 };
 acgraph.vector.Renderer.prototype.getImageLoader = function() {
-  if (!this.imageLoader_) {
+  if (!this.imageLoader_ || this.imageLoader_.isDisposed()) {
     this.imageLoader_ = new goog.net.ImageLoader((goog.global["document"]["body"]));
   }
   return this.imageLoader_;
+};
+acgraph.vector.Renderer.prototype.isImageLoader = function() {
+  return !!(this.imageLoader_ && !this.imageLoader_.isDisposed());
 };
 acgraph.vector.Renderer.prototype.setTransformation = goog.abstractMethod;
 acgraph.vector.Renderer.prototype.setPathTransformation = goog.abstractMethod;
@@ -13542,6 +13548,7 @@ acgraph.vector.Text.prototype.htmlText = function(opt_value) {
 };
 acgraph.vector.Text.prototype.init_ = function() {
   if (this.segments_.length != 0) {
+    goog.disposeAll(this.segments_, this.textLines_);
     this.textLines_ = [];
     this.segments_ = [];
   }
@@ -14200,7 +14207,6 @@ acgraph.vector.Text.prototype.disposeInternal = function() {
   delete this.segments_;
   delete this.textLines_;
   delete this.bounds;
-  delete this.bounds;
   goog.base(this, "disposeInternal");
 };
 (function() {
@@ -14209,6 +14215,7 @@ acgraph.vector.Text.prototype.disposeInternal = function() {
   proto["text"] = proto.text;
   proto["style"] = proto.style;
   proto["htmlText"] = proto.htmlText;
+  proto["path"] = proto.path;
   proto["x"] = proto.x;
   proto["y"] = proto.y;
   proto["fontSize"] = proto.fontSize;
@@ -15442,7 +15449,8 @@ acgraph.vector.svg.Renderer.prototype.setPathProperties = function(path) {
   }
 };
 acgraph.vector.svg.Renderer.prototype.createClip_ = function(element, clipElement) {
-  var defs = (element.getStage().getDefs());
+  var stage = element.getStage();
+  var defs = (stage.getDefs());
   var clipDomElement = defs.getClipPathElement(clipElement);
   var id = acgraph.utils.IdGenerator.getInstance().identify(clipDomElement, acgraph.utils.IdGenerator.ElementTypePrefix.CLIP);
   var clipShapeElement;
@@ -17060,9 +17068,22 @@ acgraph.vector.Defs.prototype.setDirtyState = goog.nullFunction;
 acgraph.vector.Defs.prototype.disposeInternal = function() {
   goog.dom.removeNode(this.domElement_);
   this.domElement_ = null;
-  goog.disposeAll(this.linearGradients_);
-  goog.disposeAll(this.radialGradients_);
-  goog.disposeAll(this.imageFills_);
+  goog.object.forEach(this.linearGradients_, function(v) {
+    goog.dispose(v);
+  });
+  goog.object.forEach(this.radialGradients_, function(v) {
+    goog.dispose(v);
+  });
+  goog.object.forEach(this.imageFills_, function(v) {
+    goog.dispose(v);
+  });
+  goog.object.forEach(this.hatchFills_, function(v) {
+    goog.dispose(v);
+  });
+  this.linearGradients_ = null;
+  this.radialGradients_ = null;
+  this.imageFills_ = null;
+  this.hatchFills_ = null;
   delete this.stage;
 };
 goog.provide("goog.dom.classlist");
@@ -17595,7 +17616,7 @@ acgraph.vector.Stage.prototype.checkSize = function(opt_directCall, opt_silent) 
       this.dispatchEvent(acgraph.vector.Stage.EventType.STAGE_RESIZE);
     }
   }
-  if (this.container_ && isDynamicSize && !goog.global["isNodeJS"]) {
+  if (this.container_ && isDynamicSize && !goog.global["acgraph"]["isNodeJS"]) {
     this.checkSizeTimer_ = setTimeout(this.checkSize, this.maxResizeDelay_);
   }
 };
@@ -17747,8 +17768,9 @@ acgraph.vector.Stage.prototype.finishRendering_ = function() {
   var isImageLoading = acgraph.getRenderer().isImageLoading();
   if (imageLoader && isImageLoading) {
     if (!this.imageLoadingListener_) {
-      this.imageLoadingListener_ = goog.events.listenOnce(imageLoader, goog.net.EventType.COMPLETE, function(e) {
-        this.imageLoadingListener_ = null;
+      this.imageLoadingListener_ = true;
+      goog.events.listenOnce(imageLoader, goog.net.EventType.COMPLETE, function(e) {
+        this.imageLoadingListener_ = false;
         if (!this.isRendering_) {
           this.dispatchEvent(acgraph.vector.Stage.EventType.STAGE_RENDERED);
         }
@@ -17965,13 +17987,20 @@ acgraph.vector.Stage.prototype.dispose = function() {
 };
 acgraph.vector.Stage.prototype.disposeInternal = function() {
   acgraph.vector.Stage.base(this, "disposeInternal");
+  goog.object.forEach(this.charts, function(value, key, arr) {
+    value.remove();
+    delete arr[value];
+  });
   goog.dispose(this.eventHandler_);
   this.eventHandler_ = null;
-  goog.dispose(this.rootLayer_);
-  this.renderInternal();
-  delete this.rootLayer_;
   goog.dispose(this.defs_);
   delete this.defs_;
+  goog.dispose(this.rootLayer_);
+  this.renderInternal();
+  this.rootLayer_.finalizeDisposing();
+  delete this.rootLayer_;
+  var id = acgraph.utils.IdGenerator.getInstance().identify(this, acgraph.utils.IdGenerator.ElementTypePrefix.STAGE);
+  delete goog.global["acgraph"].stages[id];
   acgraph.unregister(this);
   goog.dom.removeNode(this.internalContainer_);
   this.container_ = null;
