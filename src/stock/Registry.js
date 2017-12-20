@@ -272,11 +272,11 @@ anychart.stockModule.Registry.prototype.getIterator = function(firstKey, lastKey
  * @return {!anychart.stockModule.Registry.Iterator}
  */
 anychart.stockModule.Registry.prototype.getIteratorFast = function(firstIndex, lastIndex) {
-  var index = Math.max(0, Math.floor(lastIndex));
-  var lastItem = this.keys_.length > index ? this.keys_[index] : null;
-  index = Math.max(0, Math.ceil(firstIndex));
-  var firstItem = this.keys_.length > index ? this.keys_[index] : null;
-  return new anychart.stockModule.Registry.Iterator(index, firstItem, lastItem);
+  lastIndex = Math.max(0, Math.floor(lastIndex));
+  var lastItem = this.keys_.length > lastIndex ? this.keys_[lastIndex] : null;
+  firstIndex = Math.max(0, Math.ceil(firstIndex));
+  var firstItem = this.keys_.length > firstIndex ? this.keys_[firstIndex] : null;
+  return new anychart.stockModule.Registry.Iterator(firstIndex, firstItem, lastItem, Math.min(lastIndex, this.keys_.length - 1) - Math.min(firstIndex, this.keys_.length));
 };
 
 
@@ -589,11 +589,12 @@ anychart.stockModule.Registry.prototype.getKeysCount = function() {
  * Registry iterator. Should be used only if the registry is not in single-source mode.
  * @param {number} firstIndex
  * @param {anychart.stockModule.Registry.Item} firstItem
- * @param {anychart.stockModule.Registry.Item=} opt_lastItem
+ * @param {anychart.stockModule.Registry.Item} lastItem
+ * @param {number} rowsCount
  * @constructor
  * @implements {anychart.stockModule.data.TableIterator.ICoIterator}
  */
-anychart.stockModule.Registry.Iterator = function(firstIndex, firstItem, opt_lastItem) {
+anychart.stockModule.Registry.Iterator = function(firstIndex, firstItem, lastItem, rowsCount) {
   /**
    * Special Item that contains only the reference to the first node for "pre first" iterator position.
    * @type {!anychart.stockModule.Registry.Item}
@@ -609,7 +610,13 @@ anychart.stockModule.Registry.Iterator = function(firstIndex, firstItem, opt_las
    * @type {anychart.stockModule.Registry.Item}
    * @private
    */
-  this.stop_ = opt_lastItem ? opt_lastItem.next : null;
+  this.stop_ = lastItem ? lastItem.next : null;
+
+  /**
+   * @type {number}
+   * @private
+   */
+  this.rowsCount_ = rowsCount;
 
   this.reset();
 };
@@ -677,4 +684,12 @@ anychart.stockModule.Registry.Iterator.prototype.currentKey = function() {
  */
 anychart.stockModule.Registry.Iterator.prototype.currentIndex = function() {
   return this.currentIndex_;
+};
+
+
+/**
+ * @return {number}
+ */
+anychart.stockModule.Registry.Iterator.prototype.getRowsCount = function() {
+  return this.rowsCount_;
 };

@@ -48,6 +48,8 @@ anychart.mapModule.Series = function(chart, plot, type, config, sortedMode) {
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_OVERLAP,
       anychart.core.drawers.Capabilities.ANY]
   ]);
+
+  this.disableStrokeScaling = true;
 };
 goog.inherits(anychart.mapModule.Series, anychart.core.series.Cartesian);
 
@@ -144,21 +146,28 @@ anychart.mapModule.Series.prototype.seriesPoints;
 //region --- Coloring
 /**
  * Color scale.
- * @param {(anychart.colorScalesModule.Linear|anychart.colorScalesModule.Ordinal)=} opt_value Scale to set.
+ * @param {(anychart.colorScalesModule.Linear|anychart.colorScalesModule.Ordinal|Object|anychart.enums.ScaleTypes)=} opt_value Scale to set.
  * @return {anychart.colorScalesModule.Ordinal|anychart.colorScalesModule.Linear|anychart.mapModule.Series} Default chart color scale value or itself for
  * method chaining.
  */
 anychart.mapModule.Series.prototype.colorScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.colorScale_ != opt_value) {
-      if (this.colorScale_)
-        this.colorScale_.unlistenSignals(this.colorScaleInvalidated_, this);
-      this.colorScale_ = opt_value;
-      if (this.colorScale_)
-        this.colorScale_.listenSignals(this.colorScaleInvalidated_, this);
-
+    if (goog.isNull(opt_value) && this.colorScale_) {
+      this.colorScale_ = null;
       this.invalidate(anychart.ConsistencyState.MAP_COLOR_SCALE,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_COLOR_RANGE);
+    } else {
+      var val = anychart.scales.Base.setupScale(this.colorScale_, opt_value, null,
+          anychart.scales.Base.ScaleTypes.COLOR_SCALES, null, this.colorScaleInvalidated_, this);
+      if (val) {
+        var dispatch = this.colorScale_ == val;
+        this.colorScale_ = val;
+        this.colorScale_.resumeSignalsDispatching(dispatch);
+        if (!dispatch) {
+          this.invalidate(anychart.ConsistencyState.MAP_COLOR_SCALE,
+              anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_COLOR_RANGE);
+        }
+      }
     }
     return this;
   }
@@ -867,7 +876,7 @@ anychart.mapModule.Series.prototype.applyZoomMoveTransform = function() {
 
 
 /** @inheritDoc */
-anychart.mapModule.Series.prototype.applyAppearanceToPoint = function(pointState) {
+anychart.mapModule.Series.prototype.applyAppearanceToPoint = function(pointState, opt_value) {
   var iterator = this.getIterator();
   if (this.isDiscreteBased()) {
     if (this.isChoropleth()) {
@@ -908,8 +917,13 @@ anychart.mapModule.Series.prototype.applyAppearanceToPoint = function(pointState
     this.drawMarker(iterator, pointState, true);
   if (this.check(anychart.core.series.Capabilities.SUPPORTS_LABELS))
     this.drawLabel(iterator, pointState, true);
+
+  return opt_value;
 };
 
+
+/** @inheritDoc */
+anychart.mapModule.Series.prototype.getStartValueForAppearanceReduction = goog.nullFunction;
 
 //endregion
 //region --- Drawing
@@ -1197,18 +1211,28 @@ anychart.mapModule.Series.prototype.drawSingleFactoryElement = function(factory,
     element.state('chartNormalTheme', chartNormalFactory ? chartNormalFactory.themeSettings : null);
   } else {
     element.currentMarkersFactory(seriesStateFactory || factory);
-    element.setSettings(/** @type {Object} */(pointOverride), /** @type {Object} */(statePointOverride));
+
+    pointOverride = goog.object.clone(/** @type {Object} */(pointOverride || {}));
+    statePointOverride = goog.object.clone(/** @type {Object} */(statePointOverride || {}));
+    var val;
     var rotation = /** @type {number} */(element.getFinalSettings('rotation'));
-    if (!goog.isDef(rotation) || goog.isNull(rotation) || isNaN(rotation)) {
-      var autoRotation = {'rotation': /** @type {number} */(this.getIterator().meta('markerRotation'))};
-      element.setSettings(autoRotation, autoRotation);
+    if ((!goog.isDef(rotation) || goog.isNull(rotation) || isNaN(rotation))) {
+      val = /** @type {number} */(this.getIterator().meta('markerRotation'));
+      if (!('rotation' in pointOverride))
+        pointOverride['rotation'] = val;
+      if (!('rotation' in statePointOverride))
+        statePointOverride['rotation'] = val;
     }
 
     var anchor = /** @type {anychart.enums.Anchor} */(element.getFinalSettings('anchor'));
-    if (!goog.isDef(anchor) || goog.isNull(anchor)) {
-      var autoAnchor = {'anchor': /** @type {anychart.enums.Anchor} */(this.getIterator().meta('markerAnchor'))};
-      element.setSettings(autoAnchor, autoAnchor);
+    if ((!goog.isDef(anchor) || goog.isNull(anchor))) {
+      val = /** @type {anychart.enums.Anchor} */(this.getIterator().meta('markerAnchor'));
+      if (!('anchor' in pointOverride))
+        pointOverride['anchor'] = val;
+      if (!('anchor' in statePointOverride))
+        statePointOverride['anchor'] = val;
     }
+    element.setSettings(/** @type {Object} */(pointOverride), /** @type {Object} */(statePointOverride));
   }
 
   if (callDraw)

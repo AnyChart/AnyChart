@@ -13,6 +13,7 @@ goog.require('anychart.animations.Animation');
  */
 anychart.animations.ClipAnimation = function(series, duration, opt_acc) {
   anychart.animations.ClipAnimation.base(this, 'constructor', series, [0, 0], [0, 0], duration, opt_acc);
+  this.animationDestination = NaN;
 };
 goog.inherits(anychart.animations.ClipAnimation, anychart.animations.Animation);
 
@@ -42,16 +43,22 @@ anychart.animations.ClipAnimation.prototype.update = function() {
       this.startPoint[0] += this.clipBounds_.height;
     this.startPoint[1] = 0;
 
+    if (isNaN(this.animationDestination)) {
+      this.animationDestination = this.clipBounds_.height;
+    }
     this.endPoint[0] = this.clipBounds_.top;
-    this.endPoint[1] = this.clipBounds_.height;
+    this.endPoint[1] = this.animationDestination;
   } else {
     this.startPoint[0] = this.clipBounds_.left;
     if (this.series.xScale().inverted())
       this.startPoint[0] += this.clipBounds_.width;
     this.startPoint[1] = 0;
 
+    if (isNaN(this.animationDestination)) {
+      this.animationDestination = this.clipBounds_.width;
+    }
     this.endPoint[0] = this.clipBounds_.left;
-    this.endPoint[1] = this.clipBounds_.width;
+    this.endPoint[1] = this.animationDestination;
   }
 };
 
@@ -79,4 +86,5 @@ anychart.animations.ClipAnimation.prototype.onEnd = function() {
     this.clipBounds_.width = this.coords[1];
   }
   this.series.applyClip(this.clipBounds_);
+  this.animationDestination = NaN;
 };

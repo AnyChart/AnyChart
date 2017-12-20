@@ -58,14 +58,24 @@ anychart.core.utils.IInteractiveSeries.prototype.applyAppearanceToSeries = funct
 /**
  * Apply appearance to point.
  * @param {anychart.PointState|number} pointState
+ * @param {*=} opt_value
+ * @return {*}
  */
-anychart.core.utils.IInteractiveSeries.prototype.applyAppearanceToPoint = function(pointState) {};
+anychart.core.utils.IInteractiveSeries.prototype.applyAppearanceToPoint = function(pointState, opt_value) {};
+
+
+/**
+ * Returns start value for appearance reduction.
+ * @return {*}
+ */
+anychart.core.utils.IInteractiveSeries.prototype.getStartValueForAppearanceReduction = function() {};
 
 
 /**
  * Finalization point appearance. For drawing labels and markers.
+ * @param {*=} opt_value
  */
-anychart.core.utils.IInteractiveSeries.prototype.finalizePointAppearance = function() {};
+anychart.core.utils.IInteractiveSeries.prototype.finalizePointAppearance = function(opt_value) {};
 
 
 /**

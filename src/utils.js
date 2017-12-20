@@ -558,16 +558,14 @@ anychart.utils.isRightAnchor = function(anchor) {
  * @param {number} value Value to align.
  * @param {number} interval Value to align by.
  * @param {number=} opt_base Optional base value to calculate from. Defaults to 0.
+ * @param {number=} opt_precision - Precision. Defaults to 7, minimal value is 7.
  * @return {number} Aligned value.
  */
-anychart.utils.alignLeft = function(value, interval, opt_base) {
+anychart.utils.alignLeft = function(value, interval, opt_base, opt_precision) {
   opt_base = opt_base || 0;
-  var mod = anychart.math.round((value - opt_base) % interval, 7);
-  if (mod < 0)
-    mod += interval;
-  if (mod >= interval) // ECMAScript float representation... try (0.5 % 0.1).
-    mod -= interval;
-  return anychart.math.round(value - mod, 7);
+  var precision = opt_precision >= 7 ? opt_precision : 7;
+  var times = Math.floor(anychart.math.round((value - opt_base) / interval, precision));
+  return anychart.math.round(interval * times + opt_base, precision);
 };
 
 
@@ -576,18 +574,14 @@ anychart.utils.alignLeft = function(value, interval, opt_base) {
  * @param {number} value Value to align.
  * @param {number} interval Value to align by.
  * @param {number=} opt_base Optional base value to calculate from. Defaults to 0.
+ * @param {number=} opt_precision - Precision. Defaults to 7, minimal value is 7.
  * @return {number} Aligned value.
  */
-anychart.utils.alignRight = function(value, interval, opt_base) {
+anychart.utils.alignRight = function(value, interval, opt_base, opt_precision) {
   opt_base = opt_base || 0;
-  var mod = anychart.math.round((value - opt_base) % interval, 7);
-  if (mod >= interval) // ECMAScript float representation... try (0.5 % 0.1).
-    mod -= interval;
-  if (!mod)
-    return anychart.math.round(value, 7);
-  else if (mod < 0)
-    mod += interval;
-  return anychart.math.round(value + interval - mod, 7);
+  var precision = opt_precision >= 7 ? opt_precision : 7;
+  var times = Math.ceil(anychart.math.round((value - opt_base) / interval, precision));
+  return anychart.math.round(interval * times + opt_base, precision);
 };
 
 
@@ -1250,7 +1244,7 @@ anychart.utils.json2xml = function(json, opt_rootNodeName, opt_returnAsXmlNode) 
   var root = anychart.utils.json2xml_(json, opt_rootNodeName || 'anychart', result);
   if (root) {
     if (!opt_rootNodeName)
-      root.setAttribute('xmlns', 'http://anychart.com/schemas/8.0.1/xml-schema.xsd');
+      root.setAttribute('xmlns', 'http://anychart.com/schemas/8.1.0/xml-schema.xsd');
     result.appendChild(root);
   }
   return opt_returnAsXmlNode ? result : goog.dom.xml.serialize(result);

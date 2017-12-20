@@ -738,9 +738,10 @@ anychart.pyramidFunnelModule.Chart.prototype.drawContent = function(bounds) {
     }
 
     if (this.drawnConnectors_) {
-      for (var i in this.drawnConnectors_) {
-        if (this.drawnConnectors_.hasOwnProperty(i))
-          this.drawnConnectors_[i].stroke(this.getOption('connectorStroke'));
+      for (var i = 0; i < this.drawnConnectors_.length; i++) {
+        var conn = this.drawnConnectors_[i];
+        if (conn)
+          conn.stroke(this.getOption('connectorStroke'));
       }
     }
 
@@ -1056,9 +1057,13 @@ anychart.pyramidFunnelModule.Chart.prototype.updateLabelsOnAnimate = function(la
   labels.draw();
   labels.resumeSignalsDispatching(false);
   if (isOutside && this.drawnConnectors_) {
-    for (var i in this.drawnConnectors_) {
-      if (this.drawnConnectors_.hasOwnProperty(i))
-        this.drawnConnectors_[i].stroke(anychart.color.setOpacity(/** @type {acgraph.vector.Stroke} */ (this.getOption('connectorStroke')), connectorOpacity));
+    for (var i = 0; i < this.drawnConnectors_.length; i++) {
+      var conn = this.drawnConnectors_[i];
+      if (conn) {
+        var ownStroke = /** @type {acgraph.vector.Stroke} */ (this.getOption('connectorStroke'));
+        var opacity = anychart.color.setOpacity(ownStroke, connectorOpacity);
+        conn.stroke(opacity);
+      }
     }
   }
 };
@@ -1083,6 +1088,8 @@ anychart.pyramidFunnelModule.Chart.prototype.doAnimation = function() {
       this.animationQueue_.add(/** @type {goog.fx.TransitionBase} */ (pyramidFunnelLabelAnimation));
 
       this.animationQueue_.listen(goog.fx.Transition.EventType.BEGIN, function() {
+        this.connStrokeBackup_ = this.getOption('connectorStroke');
+        this.setOption('connectorStroke', 'none');
         this.ignoreMouseEvents(true);
         this.dispatchDetachedEvent({
           'type': anychart.enums.EventType.ANIMATION_START,
@@ -1091,6 +1098,7 @@ anychart.pyramidFunnelModule.Chart.prototype.doAnimation = function() {
       }, false, this);
 
       this.animationQueue_.listen(goog.fx.Transition.EventType.END, function() {
+        this.setOption('connectorStroke', this.connStrokeBackup_);
         this.ignoreMouseEvents(false);
         this.dispatchDetachedEvent({
           'type': anychart.enums.EventType.ANIMATION_END,
@@ -1279,7 +1287,7 @@ anychart.pyramidFunnelModule.Chart.prototype.getPoint = function(index) {
   if (iter.select(index) &&
       point.exists() && !this.isMissing_(value = /** @type {number} */(point.get('value')))) {
 
-    var val = value / /** @type {number} */(this.getStat(anychart.enums.Statistics.SUM)) * 100;
+    var val = anychart.math.round(value / /** @type {number} */(this.getStat(anychart.enums.Statistics.SUM)) * 100, 2);
     point.statistics(anychart.enums.Statistics.PERCENT_VALUE, val);
     point.statistics(anychart.enums.Statistics.Y_PERCENT_OF_TOTAL, val);
   }
@@ -1546,20 +1554,21 @@ anychart.pyramidFunnelModule.Chart.prototype.unselect = function(opt_indexOrInde
 //  Apply appearance.
 //
 //----------------------------------------------------------------------------------------------------------------------
-/**
- * Apply appearance to point.
- * @param {anychart.PointState|number} pointState
- */
-anychart.pyramidFunnelModule.Chart.prototype.applyAppearanceToPoint = function(pointState) {
+/** @inheritDoc */
+anychart.pyramidFunnelModule.Chart.prototype.applyAppearanceToPoint = function(pointState, opt_value) {
   this.colorizePoint_(pointState);
   this.applyHatchFill(pointState);
   this.drawMarker(pointState);
+
+  return opt_value;
 };
 
 
-/**
- * Finalization point appearance. For drawing labels and markers.
- */
+/** @inheritDoc */
+anychart.pyramidFunnelModule.Chart.prototype.getStartValueForAppearanceReduction = goog.nullFunction;
+
+
+/** @inheritDoc */
 anychart.pyramidFunnelModule.Chart.prototype.finalizePointAppearance = goog.nullFunction;
 
 
@@ -2985,7 +2994,7 @@ anychart.pyramidFunnelModule.Chart.prototype.calculate = function() {
     this.statistics(anychart.enums.Statistics.MIN, min);
     this.statistics(anychart.enums.Statistics.MAX, max);
     this.statistics(anychart.enums.Statistics.SUM, sum);
-    this.statistics(anychart.enums.Statistics.AVERAGE, avg);
+    this.statistics(anychart.enums.Statistics.AVERAGE, anychart.math.round(avg || NaN, anychart.math.getPrecision(sum || 0)));
 
     this.markConsistent(anychart.ConsistencyState.PYRAMID_FUNNEL_DATA);
   }

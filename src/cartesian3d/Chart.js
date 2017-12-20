@@ -538,43 +538,47 @@ anychart.cartesian3dModule.Chart.prototype.createTextMarkerInstance = function()
 /**
  * Set zIndex for point.
  * @param {anychart.core.series.Cartesian} series
+ * @param {number} directIndex
  * @private
  */
-anychart.cartesian3dModule.Chart.prototype.setSeriesPointZIndex_ = function(series) {
-  var seriesIndex = series.getIndex();
-  var inc = seriesIndex * anychart.core.series.Base.ZINDEX_INCREMENT_MULTIPLIER;
+anychart.cartesian3dModule.Chart.prototype.setSeriesPointZIndex_ = function(series, directIndex) {
   var iterator = series.getIterator();
+  var inc = directIndex * anychart.core.series.Base.ZINDEX_INCREMENT_MULTIPLIER;
   var value = anychart.utils.toNumber(iterator.get('value'));
   var zIndex = anychart.core.ChartWithSeries.ZINDEX_SERIES;
+  var yMult = this.yScale().inverted() ? -1 : 1;
+  var xMult = this.xScale().inverted() ? 1 : -1;
 
-  if (value > 0) {
+
+  if (value >= 0) {
     if (/** @type {boolean} */(series.getOption('isVertical'))) {
       if (!series.planIsStacked()) {
         if (this.getOption('zDistribution')) {
           zIndex += inc;
         } else {
-          zIndex -= inc;
+          zIndex -= (inc * xMult * yMult);
         }
       } else {
-        zIndex += inc;
+        zIndex += (inc * yMult);
       }
     } else {
-      zIndex += inc;
+      zIndex += (inc * yMult);
     }
 
   } else if (value < 0) {
     if (/** @type {boolean} */(series.getOption('isVertical'))) {
-      zIndex -= inc;
+      zIndex -= (inc * xMult * yMult);
     } else {
       if (!series.planIsStacked()) {
         zIndex += inc;
       } else {
-        zIndex -= inc;
+        zIndex -= (inc * yMult);
       }
     }
   }
 
   iterator.meta('zIndex', zIndex);
+  iterator.meta('directIndex', directIndex);
 };
 
 
@@ -584,18 +588,20 @@ anychart.cartesian3dModule.Chart.prototype.prepare3d = function() {
   this.lastEnabledAreaSeriesMap = {};
   var allSeries = this.getAllSeries();
   var series;
+  var isStacked = /** @type {anychart.enums.ScaleStackMode} */ (this.yScale().stackMode()) != anychart.enums.ScaleStackMode.NONE;
   var stackDirection = /** @type {anychart.enums.ScaleStackDirection} */ (this.yScale().stackDirection());
   var stackIsDirect = stackDirection == anychart.enums.ScaleStackDirection.DIRECT;
 
   for (var i = 0; i < allSeries.length; i++) {
-    var actualIndex = stackIsDirect ? allSeries.length - i - 1 : i;
+    var directIndex = allSeries.length - i - 1;
+    var actualIndex = isStacked && stackIsDirect ? directIndex : i;
     series = allSeries[actualIndex];
     if (series && series.enabled()) {
       if (series.check(anychart.core.drawers.Capabilities.IS_3D_BASED)) {
         if (series.isDiscreteBased()) {
           var iterator = series.getResetIterator();
           while (iterator.advance()) {
-            this.setSeriesPointZIndex_(/** @type {anychart.core.series.Cartesian} */(series));
+            this.setSeriesPointZIndex_(/** @type {anychart.core.series.Cartesian} */(series), i);
           }
         } else if (series.supportsStack()) {
           this.lastEnabledAreaSeriesMap[series.getScalesPairIdentifier()] = actualIndex;

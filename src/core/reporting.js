@@ -54,7 +54,7 @@ anychart.core.reporting.getErrorDescription_ = function(code, opt_arguments) {
       return 'Table.contents() accepts only an Array of Arrays as it\'s first argument.';
 
     case anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE:
-      return 'Feature "' + opt_arguments[0] + '" is not supported in this module. See modules list for details.';
+      return 'Feature "' + opt_arguments[0] + '" is not supported in this module. See modules list at https://docs.anychart.com/Quick_Start/Modules for details.';
 
     case anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE:
       return opt_arguments[0] + ' should be only ' + opt_arguments[1] + ' type' + (opt_arguments[2] ? ' (' + opt_arguments[2] + ').' : '.');
@@ -233,6 +233,9 @@ anychart.core.reporting.getWarningDescription_ = function(code, opt_arguments) {
     case anychart.enums.WarningCode.DEPRECATED:
       return (opt_arguments[3] || 'Method') + ' ' + opt_arguments[0] + ' is deprecated. Use ' + opt_arguments[1] + ' instead' +
           (opt_arguments[2] ? (opt_arguments[2] + '.') : '.');
+
+    case anychart.enums.WarningCode.DEPRECATED_WITHOUT_REPLACEMENT:
+      return (opt_arguments[3] || 'Method') + ' ' + opt_arguments[0] + ' is deprecated.';
 
     case anychart.enums.WarningCode.MISSING_PROJ4:
       return 'The projection that used cannot work correctly without Proj4. Please include Proj4 binary (https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.3.15/proj4.js) into your page, or use another projection';

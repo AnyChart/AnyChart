@@ -1623,25 +1623,25 @@ anychart.resourceModule.Chart.prototype.applyAppearanceToSeries = function(point
 };
 
 
-/**
- * Apply appearance to point.
- * @param {anychart.PointState|number} pointState
- */
-anychart.resourceModule.Chart.prototype.applyAppearanceToPoint = function(pointState) {
+/** @inheritDoc */
+anychart.resourceModule.Chart.prototype.applyAppearanceToPoint = function(pointState, opt_value) {
   var iter = this.getIterator();
   var resourceIndex = iter.getResourceIndex();
   var activityIndex = iter.getActivityIndex();
   var vLineThickness = acgraph.vector.getThickness(
       /** @type {acgraph.vector.Stroke} */(this.grid_.getOption('verticalStroke')));
   this.resources_[resourceIndex].updateActivity(activityIndex, /** @type {anychart.PointState} */(pointState), this.resourcesLayer_, vLineThickness);
+
+  return opt_value;
 };
 
 
-/**
- * Finalization point appearance. For drawing labels and markers.
- */
-anychart.resourceModule.Chart.prototype.finalizePointAppearance = function() {
-};
+/** @inheritDoc */
+anychart.resourceModule.Chart.prototype.finalizePointAppearance = goog.nullFunction;
+
+
+/** @inheritDoc */
+anychart.resourceModule.Chart.prototype.getStartValueForAppearanceReduction = goog.nullFunction;
 
 
 /** @inheritDoc */

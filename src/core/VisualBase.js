@@ -314,9 +314,13 @@ anychart.core.VisualBase.prototype.container = function(opt_value) {
 
       // we dispose old stage here, because we want everything to be transfered from it to the new stage.
       if (toDispose)
-        anychart.globalLock.onUnlock(function() {
-          goog.dispose(toDispose);
-        });
+          anychart.globalLock.onUnlock(function() {
+            if (toDispose.getCharts) {
+              var id = acgraph.utils.IdGenerator.getInstance().identify(this, 'chart');
+              delete toDispose.getCharts()[id];
+            }
+            goog.dispose(toDispose);
+        }, this);
     }
     return this;
   }

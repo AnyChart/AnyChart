@@ -1,5 +1,6 @@
 goog.provide('anychart.tableModule.Table');
 goog.require('acgraph');
+goog.require('anychart.color');
 goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.VisualBaseWithBounds');
 goog.require('anychart.core.reporting');
@@ -1881,7 +1882,7 @@ anychart.tableModule.Table.prototype.resetFillPaths_ = function() {
  * @private
  */
 anychart.tableModule.Table.prototype.getBorderPath_ = function(stroke) {
-  var hash = anychart.utils.hash(stroke);
+  var hash = anychart.color.hash(stroke);
   if (hash in this.borderPaths_)
     return this.borderPaths_[hash];
   else {
@@ -1908,7 +1909,7 @@ anychart.tableModule.Table.prototype.getBorderPath_ = function(stroke) {
  * @private
  */
 anychart.tableModule.Table.prototype.getFillPath_ = function(fill) {
-  var hash = anychart.utils.hash(fill);
+  var hash = anychart.color.hash(fill);
   if (hash in this.fillPaths_)
     return this.fillPaths_[hash];
   else {

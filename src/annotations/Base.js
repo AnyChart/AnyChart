@@ -1032,7 +1032,7 @@ anychart.annotationsModule.Base.getColorResolver = function(colorName, colorType
 anychart.annotationsModule.Base.getColor_ = function(colorName, normalizer, isHatchFill, canBeHoveredSelected, annotation, state, opt_level) {
   var stateColor, context;
   state = anychart.core.utils.InteractivityState.clarifyState(state);
-  if (state != anychart.PointState.NORMAL && canBeHoveredSelected) {
+  if (canBeHoveredSelected && (state != anychart.PointState.NORMAL)) {
     stateColor = annotation.resolveOption(colorName, state, normalizer);
     if (isHatchFill && stateColor === true)
       stateColor = normalizer(annotation.getAutoHatchFill());
@@ -1142,6 +1142,14 @@ anychart.annotationsModule.Base.prototype.markersInvalidated_ = function(event) 
 
 
 /**
+ * Sets type for anchor markers.
+ * @param {anychart.core.ui.MarkersFactory.Marker} marker Marker.
+ * @param {number} index Marker index.
+ */
+anychart.annotationsModule.Base.prototype.setMarkerCursor = goog.nullFunction;
+
+
+/**
  * Draws element(s) for point.
  * @param {anychart.PointState|number} state
  * @private
@@ -1182,6 +1190,7 @@ anychart.annotationsModule.Base.prototype.drawMarkers_ = function(state) {
       element.currentMarkersFactory(stateFactory || mainFactory);
       element.setSettings();
       element.draw();
+      this.setMarkerCursor(element, i);
     }
   } else {
     mainFactory.clear();

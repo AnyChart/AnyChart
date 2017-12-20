@@ -174,6 +174,26 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme']['chart'], {
       'offsetX': 0,
       'offsetY': 0
     },
-    'label': {}
+    'label': {
+      'text': 'Label',
+      'offsetX': 0,
+      'offsetY': 0,
+      'anchor': 'left-top',
+      'hAlign': 'start',
+      'vAlign': 'top',
+      'width': null,
+      'height': null,
+      'background': {
+        'enabled': true,
+        'fill': '#eee 0.4',
+        'stroke': anychart.color.darken('#eee')
+      },
+      'padding': 5,
+      'normal': {
+        'markers': {
+          'size': 3
+        }
+      }
+    }
   }
 });

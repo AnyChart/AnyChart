@@ -3,7 +3,7 @@
  *
  * Modules: %s
  * Version: %s (%s)
- * License: http://www.anychart.com/buy/
+ * License: https://www.anychart.com/buy/
  * Contact: sales@anychart.com
  * Copyright: AnyChart.com %s. All rights reserved.
  */

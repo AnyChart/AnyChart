@@ -20,9 +20,9 @@ anychart.palettes.HatchFills = function() {
   this.hatchFills_ = [];
 
   // Initialize default marker palette using all marker types framework supports.
-  for (var key in acgraph.vector.HatchFill.HatchFillType) {
-    this.hatchFills_.push(acgraph.vector.normalizeHatchFill(acgraph.vector.HatchFill.HatchFillType[key]));
-  }
+  // for (var key in acgraph.vector.HatchFill.HatchFillType) {
+  //   this.hatchFills_.push(acgraph.vector.normalizeHatchFill(acgraph.vector.HatchFill.HatchFillType[key]));
+  // }
 };
 goog.inherits(anychart.palettes.HatchFills, anychart.core.Base);
 
@@ -141,9 +141,7 @@ anychart.palettes.HatchFills.prototype.disposeInternal = function() {
  */
 anychart.palettes.hatchFills = function(opt_value, var_args) {
   var palette = new anychart.palettes.HatchFills();
-  if (goog.isDef(opt_value)) {
-    palette.items.apply(palette, arguments);
-  }
+  palette.items.apply(palette, goog.isDef(opt_value) ? arguments : goog.object.getValues(acgraph.vector.HatchFill.HatchFillType));
   return palette;
 };
 

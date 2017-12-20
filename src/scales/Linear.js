@@ -74,6 +74,14 @@ anychart.scales.Linear.prototype.getType = function() {
 };
 
 
+/** @inheritDoc */
+anychart.scales.Linear.prototype.roundToTicksPrecision = function(value, opt_addPrec) {
+  var ticks = this.ticks().getInternal();
+  var prec = anychart.math.getPrecision(anychart.math.specialRound(ticks[1] - ticks[0]));
+  return anychart.math.round(Number(value), Math.max(prec, 0) + (isNaN(opt_addPrec) ? 0 : Number(opt_addPrec)));
+};
+
+
 /**
  * Gets or sets a set of scale ticks in terms of data values.
  * @param {(Object|Array)=} opt_value An array of ticks to set.
@@ -231,6 +239,20 @@ anychart.scales.Linear.prototype.compareWith = function(opt_value) {
 /** @inheritDoc */
 anychart.scales.Linear.prototype.applyComparison = function(value, comparisonZero) {
   return this.applyComparison_(value, comparisonZero);
+};
+
+
+/**
+ * Returns full comparison info.
+ * @param {*} value
+ * @param {number} comparisonZero
+ * @return {{change: *, percent: *}}
+ */
+anychart.scales.Linear.prototype.getFullComparison = function(value, comparisonZero) {
+  return {
+    change: this.makeValuesComparison_(value, comparisonZero),
+    percent: this.makePercentComparison_(value, comparisonZero)
+  };
 };
 
 

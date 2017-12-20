@@ -1735,9 +1735,9 @@ anychart.core.Chart.prototype.specialDraw = function(bounds) {};
 
 
 /**
- * Define auto resize settings.
+ * Flag whether to automatically call chart.draw() on any changes or not.
  * @param {boolean=} opt_value
- * @return {!(boolean|anychart.core.Chart)} Auto resize settings or itself for chaining call.
+ * @return {!(boolean|anychart.core.Chart)} - Current value or itself for chaining.
  */
 anychart.core.Chart.prototype.autoRedraw = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -1746,6 +1746,8 @@ anychart.core.Chart.prototype.autoRedraw = function(opt_value) {
       this.autoRedrawIsSet_ = false;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      if (this.autoRedraw_)
+        this.draw();
     }
     return this;
   } else {
@@ -1935,6 +1937,8 @@ anychart.core.Chart.prototype.serialize = function() {
   json['margin'] = this.margin().serialize();
   json['padding'] = this.padding().serialize();
   json['a11y'] = this.a11y().serialize();
+  if (goog.isDef(this.autoRedraw_))
+    json['autoRedraw'] = this.autoRedraw_;
   var labels = [];
   for (var i = 0; i < this.chartLabels_.length; i++) {
     if (this.chartLabels_[i])
@@ -1966,6 +1970,10 @@ anychart.core.Chart.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.Chart.prototype.setupByJSON = function(config, opt_default) {
+  //Set this before another manipulations.
+  if ('autoRedraw' in config)
+    this.autoRedraw_ = config['autoRedraw']; //don't use method this.autoRedraw() to avoid calling draw().
+
   anychart.core.Chart.base(this, 'setupByJSON', config, opt_default);
 
   if ('defaultLabelSettings' in config)
@@ -1982,7 +1990,6 @@ anychart.core.Chart.prototype.setupByJSON = function(config, opt_default) {
 
   if ('margin' in config)
     this.margin(config['margin']);
-
 
   var labels = config['chartLabels'];
   if (goog.isArray(labels)) {
@@ -2024,11 +2031,12 @@ anychart.core.Chart.prototype.setupByJSON = function(config, opt_default) {
 
 /** @inheritDoc */
 anychart.core.Chart.prototype.disposeInternal = function() {
-  goog.disposeAll(this.animation_, this.a11y_, this.tooltip_, this.noDataSettings_);
+  goog.disposeAll(this.animation_, this.a11y_, this.tooltip_, this.noDataSettings_, this.interactivity_);
   this.animation_ = null;
   this.a11y_ = null;
   this.tooltip_ = null;
   this.noDataSettings_ = null;
+  this.interactivity_ = null;
 
   anychart.core.Chart.base(this, 'disposeInternal');
 
@@ -2284,7 +2292,7 @@ anychart.core.Chart.prototype.handleMouseOverAndMove = function(event) {
   if (series && !series.isDisposed() && series.enabled() && goog.isFunction(series.makePointEvent)) {
     var evt = series.makePointEvent(event);
 
-    if (series.supportsOutliers && series.supportsOutliers() && goog.isNumber(evt['pointIndex']))
+    if (goog.isDefAndNotNull(evt) && goog.isNumber(evt['pointIndex']) && !isNaN(evt['pointIndex']))
       index = evt['pointIndex'];
     if (evt && ((anychart.utils.checkIfParent(/** @type {!goog.events.EventTarget} */(series), event['relatedTarget'])) || series.dispatchEvent(evt))) {
       if (interactivity.hoverMode() == anychart.enums.HoverMode.SINGLE) {
@@ -2476,6 +2484,8 @@ anychart.core.Chart.prototype.onMouseDown = function(event) {
 
   var seriesStatus, eventSeriesStatus, allSeries, alreadySelectedPoints, i;
   var controlKeyPressed = event.ctrlKey || event.metaKey;
+  var multiSelectOnClick = interactivity.multiSelectOnClick();
+  var multiSelectKeyPressed = controlKeyPressed || event.shiftKey || multiSelectOnClick;
   var clickWithControlOnSelectedSeries, equalsSelectedPoints;
 
   var tag = anychart.utils.extractTag(event['domTarget']);
@@ -2523,12 +2533,12 @@ anychart.core.Chart.prototype.onMouseDown = function(event) {
         alreadySelectedPoints = series.state.getIndexByPointState(anychart.PointState.SELECT);
         equalsSelectedPoints = alreadySelectedPoints.length == 1 && alreadySelectedPoints[0] == index;
 
-        if (!(controlKeyPressed || event.shiftKey) && equalsSelectedPoints)
+        if (!multiSelectKeyPressed && equalsSelectedPoints)
           return;
 
-        clickWithControlOnSelectedSeries = (controlKeyPressed || event.shiftKey) && series.state.isStateContains(series.state.getSeriesState(), anychart.PointState.SELECT);
-        var unselect = clickWithControlOnSelectedSeries || !(controlKeyPressed || event.shiftKey) ||
-            ((controlKeyPressed || event.shiftKey) && interactivity.selectionMode() != anychart.enums.SelectionMode.MULTI_SELECT);
+        clickWithControlOnSelectedSeries = multiSelectKeyPressed && series.state.isStateContains(series.state.getSeriesState(), anychart.PointState.SELECT);
+        var unselect = !multiSelectOnClick && (clickWithControlOnSelectedSeries || !multiSelectKeyPressed ||
+            (multiSelectKeyPressed && interactivity.selectionMode() != anychart.enums.SelectionMode.MULTI_SELECT));
 
         if (unselect) {
           this.unselect();
@@ -2576,7 +2586,7 @@ anychart.core.Chart.prototype.onMouseDown = function(event) {
           this.prevSelectSeriesStatus = eventSeriesStatus;
       }
     }
-  } else if (interactivity.hoverMode() == anychart.enums.HoverMode.SINGLE) {
+  } else if (interactivity.hoverMode() == anychart.enums.HoverMode.SINGLE && interactivity.unselectOnClickOutOfPoint()) {
     if (!isTargetLegendOrColorRange)
       this.unselect();
 
@@ -2617,10 +2627,10 @@ anychart.core.Chart.prototype.onMouseDown = function(event) {
         alreadySelectedPoints = series.state.getIndexByPointState(anychart.PointState.SELECT);
         equalsSelectedPoints = alreadySelectedPoints.length == 1 && alreadySelectedPoints[0] == nearest.nearestPointToCursor.index;
 
-        dispatchEvent = !equalsSelectedPoints || (equalsSelectedPoints && (controlKeyPressed || event.shiftKey));
+        dispatchEvent = !equalsSelectedPoints || (equalsSelectedPoints && multiSelectKeyPressed);
 
-        clickWithControlOnSelectedSeries = (controlKeyPressed || event.shiftKey) && series.state.isStateContains(series.state.getSeriesState(), anychart.PointState.SELECT);
-        if ((clickWithControlOnSelectedSeries || !(controlKeyPressed || event.shiftKey)) && !equalsSelectedPoints) {
+        clickWithControlOnSelectedSeries = multiSelectKeyPressed && series.state.isStateContains(series.state.getSeriesState(), anychart.PointState.SELECT);
+        if ((clickWithControlOnSelectedSeries || !multiSelectKeyPressed) && !equalsSelectedPoints) {
           series.unselect();
         }
         series.selectPoint(/** @type {number} */ (nearest.nearestPointToCursor.index), event);
@@ -2655,7 +2665,7 @@ anychart.core.Chart.prototype.onMouseDown = function(event) {
         }
       } else {
         var emptySeries = [];
-        if (!(controlKeyPressed || event.shiftKey)) {
+        if (!multiSelectKeyPressed) {
           allSeries = this.getAllSeries();
 
           for (i = 0; i < allSeries.length; i++) {
@@ -2701,8 +2711,8 @@ anychart.core.Chart.prototype.onMouseDown = function(event) {
           dispatchEvent = dispatchEvent || !equalsSelectedPoints;
 
           if (!equalsSelectedPoints) {
-            clickWithControlOnSelectedSeries = (controlKeyPressed || event.shiftKey) && series.state.isStateContains(series.state.getSeriesState(), anychart.PointState.SELECT);
-            if (clickWithControlOnSelectedSeries || !(controlKeyPressed || event.shiftKey) || series.selectionMode() == anychart.enums.SelectionMode.SINGLE_SELECT) {
+            clickWithControlOnSelectedSeries = multiSelectKeyPressed && series.state.isStateContains(series.state.getSeriesState(), anychart.PointState.SELECT);
+            if (clickWithControlOnSelectedSeries || !multiSelectKeyPressed || series.selectionMode() == anychart.enums.SelectionMode.SINGLE_SELECT) {
               series.unselect();
             }
             series.selectPoint(points, event);
@@ -3758,6 +3768,7 @@ anychart.core.Chart.prototype.id = function(opt_value) {
   var proto = anychart.core.Chart.prototype;
   proto['a11y'] = proto.a11y;
   proto['animation'] = proto.animation;
+  proto['autoRedraw'] = proto.autoRedraw;
   proto['title'] = proto.title;//doc|ex
   proto['background'] = proto.background;//doc|ex
   proto['margin'] = proto.margin;//doc|ex

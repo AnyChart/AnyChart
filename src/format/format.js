@@ -227,7 +227,7 @@ goog.exportSymbol('anychart.format.locales.default.dateTimeLocale', {
   }
 });
 goog.exportSymbol('anychart.format.locales.default.numberLocale', {
-  'decimalsCount': 1,
+  'decimalsCount': 10,
   'decimalPoint': '.',
   'groupsSeparator': '',
   'scale': false,
@@ -971,6 +971,7 @@ anychart.format.number = function(number, opt_decimalsCountOrLocale, opt_decimal
   if (scale === true)
     scale = anychart.format.DEFAULT_SCALE_;
 
+  number = Number(number);
   var negative = number < 0;
   if (negative)
     number = -number;

@@ -129,6 +129,13 @@ anychart.core.series.Base = function(chart, plot, type, config) {
   this.metaMakers = [];
 
   /**
+   * Whether to disable stroke scaling.
+   * @type {boolean}
+   * @protected
+   */
+  this.disableStrokeScaling = false;
+
+  /**
    * Renderer.
    * @type {anychart.core.series.RenderingSettings}
    * @private
@@ -776,7 +783,8 @@ anychart.core.series.Base.prototype.recreateShapeManager = function() {
       this.renderingSettings_.getShapesConfig(),
       this.check(anychart.core.series.Capabilities.ALLOW_INTERACTIVITY),
       null,
-      this.config.postProcessor);
+      this.config.postProcessor,
+      this.disableStrokeScaling);
 };
 
 
@@ -2243,11 +2251,13 @@ anychart.core.series.Base.prototype.drawFactoryElement = function(seriesFactoryG
     chartStateFactory = null;
   } else {
     state = anychart.core.utils.InteractivityState.clarifyState(state);
-
+    var pointStateElement;
     if (this.supportsPointSettings() && hasPointOverrides) {
-      pointOverride = point.get(overrideNames[0]);
+      pointStateElement = point.get('normal');
+      pointStateElement = pointStateElement ? pointStateElement[overrideNames[0]] : void 0;
+      pointOverride = anychart.utils.getFirstDefinedValue(pointStateElement, point.get(overrideNames[0]));
       if (state != anychart.PointState.NORMAL) {
-        var pointStateElement = (state == anychart.PointState.HOVER) ? point.get('hovered') : point.get('selected');
+        pointStateElement = (state == anychart.PointState.HOVER) ? point.get('hovered') : point.get('selected');
         pointStateElement = pointStateElement ? pointStateElement[overrideNames[0]] : void 0;
         statePointOverride = anychart.utils.getFirstDefinedValue(pointStateElement, point.get(overrideNames[state]));
       }
@@ -3036,6 +3046,7 @@ anychart.core.series.Base.prototype.draw = function() {
       // main points drawing cycle
       iterator.reset();
       while (iterator.advance()) {
+        iterator.meta('destinationValue', NaN); //for animation-after-draw purposes.
         state = this.getPointState(iterator.getIndex());
         this.makePointMeta(iterator, yValueNames, columns);
         this.drawPoint(iterator, state);
@@ -3356,7 +3367,6 @@ anychart.core.series.Base.prototype.getPostLastPoint = function() {
  * @param {number} ratio
  * @param {boolean} xDirection
  * @return {number}
- * @protected
  */
 anychart.core.series.Base.prototype.applyRatioToBounds = function(ratio, xDirection) {
   var min, range;
@@ -3613,6 +3623,29 @@ anychart.core.series.Base.prototype.makeStackedMeta = function(rowInfo, yNames, 
  * @return {number} - pointMissing updated value.
  * @protected
  */
+anychart.core.series.Base.prototype.makeComparisonMeta = function(rowInfo, yNames, yColumns, pointMissing, xRatio) {
+  var yScale = /** @type {anychart.scales.Linear} */(this.yScale());
+  for (var i = 0; i < yColumns.length; i++) {
+    var name = yNames[i];
+    var comparison = yScale.getFullComparison(rowInfo.getColumn(yColumns[i]), this.comparisonZero);
+    rowInfo.meta(name + 'Change', comparison.change);
+    rowInfo.meta(name + 'PercentChange', anychart.math.round(Number(comparison.percent), 2));
+    rowInfo.meta(name + 'RatioChange', Number(comparison.percent) / 100);
+  }
+  return pointMissing;
+};
+
+
+/**
+ * Prepares Unstacked part of point meta.
+ * @param {anychart.data.IRowInfo} rowInfo
+ * @param {Array.<string>} yNames
+ * @param {Array.<string|number>} yColumns
+ * @param {number} pointMissing
+ * @param {number} xRatio
+ * @return {number} - pointMissing updated value.
+ * @protected
+ */
 anychart.core.series.Base.prototype.makeUnstackedMeta = function(rowInfo, yNames, yColumns, pointMissing, xRatio) {
   var yScale = /** @type {anychart.scales.Base} */(this.yScale());
   var map = {};
@@ -3701,6 +3734,7 @@ anychart.core.series.Base.prototype.makeOutliersMeta = function(rowInfo, yNames,
  * @protected
  */
 anychart.core.series.Base.prototype.prepareMetaMakers = function(yNames, yColumns) {
+  var scale = /** @type {anychart.scales.Base} */(this.yScale());
   this.metaMakers.length = 0;
   if (this.planIsStacked()) {
     this.metaMakers.push(this.makeStackedMeta);
@@ -3708,6 +3742,10 @@ anychart.core.series.Base.prototype.prepareMetaMakers = function(yNames, yColumn
     this.metaMakers.push(this.makeUnstackedMeta);
     if (this.needsZero()) {
       this.metaMakers.push(this.makeZeroMeta);
+    }
+    if (anychart.utils.instanceOf(scale, anychart.scales.Linear) &&
+        (/** @type {anychart.scales.Linear} */(scale)).comparisonMode() != anychart.enums.ScaleComparisonMode.NONE) {
+      this.metaMakers.push(this.makeComparisonMeta);
     }
   }
   if (this.isMinPointLengthBased() && this.yScale().stackMode() != anychart.enums.ScaleStackMode.PERCENT) {
@@ -3732,7 +3770,6 @@ anychart.core.series.Base.prototype.prepareMetaMakers = function(yNames, yColumn
     this.metaMakers.push(this.makeOutliersMeta);
   }
   if (this.needsZero()) {
-    var scale = /** @type {anychart.scales.Base} */(this.yScale());
     this.zeroYRatio = goog.math.clamp((scale && scale.transform(0, 0.5)) || 0, 0, 1);
     this.zeroY = this.applyAxesLinesSpace(this.applyRatioToBounds(this.zeroYRatio, false));
   }
@@ -3823,7 +3860,8 @@ anychart.core.series.Base.prototype.getCustomTokenValues = function(rowInfo) {
  * @protected
  */
 anychart.core.series.Base.prototype.getContextProviderValues = function(provider, rowInfo) {
-  var scale = this.getXScale();
+  var xScale = this.getXScale();
+  var yScale = this.yScale();
   var values = {
     'chart': {
       value: this.getChart(),
@@ -3834,7 +3872,11 @@ anychart.core.series.Base.prototype.getContextProviderValues = function(provider
       type: anychart.enums.TokenType.UNKNOWN
     },
     'xScale': {
-      value: scale,
+      value: xScale,
+      type: anychart.enums.TokenType.UNKNOWN
+    },
+    'yScale': {
+      value: yScale,
       type: anychart.enums.TokenType.UNKNOWN
     },
     'index': {
@@ -3851,9 +3893,9 @@ anychart.core.series.Base.prototype.getContextProviderValues = function(provider
     }
   };
 
-  if (scale && goog.isFunction(scale.getType))
+  if (xScale && goog.isFunction(xScale.getType))
     values['xScaleType'] = {
-      value: scale.getType(),
+      value: xScale.getType(),
       type: anychart.enums.TokenType.STRING
     };
 
@@ -3893,13 +3935,29 @@ anychart.core.series.Base.prototype.getContextProviderValues = function(provider
     }
   }
 
+  var i, refName;
   var refValueNames = this.getYValueNames();
-  for (var i = 0; i < refValueNames.length; i++) {
-    var refName = refValueNames[i];
+  for (i = 0; i < refValueNames.length; i++) {
+    refName = refValueNames[i];
     values[refName] = {
       value: rowInfo.get(refName),
       type: anychart.enums.TokenType.NUMBER
     };
+  }
+
+  if (anychart.utils.instanceOf(yScale, anychart.scales.Linear) &&
+      (/** @type {anychart.scales.Linear} */(yScale)).comparisonMode() != anychart.enums.ScaleComparisonMode.NONE) {
+    var postfixes = ['Change', 'PercentChange', 'RatioChange'];
+    for (i = 0; i < refValueNames.length; i++) {
+      refName = refValueNames[i];
+      for (var j = 0; j < postfixes.length; j++) {
+        var name = refName + postfixes[j];
+        values[name] = {
+          value: rowInfo.meta(name),
+          type: anychart.enums.TokenType.NUMBER
+        };
+      }
+    }
   }
   return values;
 };
@@ -4282,7 +4340,8 @@ anychart.core.series.Base.prototype.disposeInternal = function() {
       this.selected_,
       this.tooltipInternal,
       this.legendItem_,
-      this.error_
+      this.error_,
+      this.renderingSettings_
   );
   this.rootLayer = null;
   this.errorPaths_ = null;
@@ -4298,6 +4357,7 @@ anychart.core.series.Base.prototype.disposeInternal = function() {
   delete this.tooltipInternal;
   delete this.legendItem_;
   delete this.error_;
+  delete this.renderingSettings_;
   anychart.core.series.Base.base(this, 'disposeInternal');
 };
 

@@ -27,7 +27,10 @@ anychart.animations.ColumnAnimation.prototype.update = function() {
   while (iterator.advance()) {
     if (!iterator.meta('missing')) {
       var x = /** @type {number} */(iterator.meta('x'));
-      var value = /** @type {number} */(iterator.meta('value'));
+      if (isNaN(iterator.meta('destinationValue'))) {
+        iterator.meta('destinationValue', iterator.meta('value'));
+      }
+      var value = /** @type {number} */(iterator.meta('destinationValue'));
       var zero = /** @type {number} */(iterator.meta('zero'));
       // we need this to make the drawer choose appropriate shape.
       this.startPoint.push(zero);

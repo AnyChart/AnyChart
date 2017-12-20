@@ -48,7 +48,10 @@ if __name__ == '__main__':
     paths += legacy_versioned_js + legacy_versioned_css
     paths += legacy_versioned_themes + legacy_schemas
 
-    pieces = list(split(paths, 250))
+    print "Invalidate following files:"
+    print paths
+
+    pieces = list(split(paths, 200))
     for piece in pieces:
         api = MaxCDN(cdn_alias, cdn_consumer_key, cdn_consumer_secret)
         api.purge(cdn_zone_id, piece)

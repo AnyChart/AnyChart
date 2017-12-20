@@ -14,7 +14,7 @@ anychart.stockModule.defaultTheme.stockScrollerUnselected = '#999 0.6';
  * @return {*}
  */
 anychart.stockModule.defaultTheme.StockSimpleTooltipFormatter = function() {
-  var val = anychart.core.defaultTheme.locNum(this['value']);
+  var val = anychart.core.defaultTheme.locNum(this['value'], this['defaultDecimalDigitsCount'] || undefined);
   return this['seriesName'] + ': ' + this['valuePrefix'] + val + this['valuePostfix'];
 };
 
@@ -24,9 +24,10 @@ anychart.stockModule.defaultTheme.StockSimpleTooltipFormatter = function() {
  * @return {*}
  */
 anychart.stockModule.defaultTheme.StockRangeTooltipFormatter = function() {
+  var digits = this['defaultDecimalDigitsCount'] || undefined;
   return this['seriesName'] + ':\n' +
-      '  High: ' + anychart.core.defaultTheme.locNum(this['high']) + '\n' +
-      '  Low: ' + anychart.core.defaultTheme.locNum(this['low']);
+      '  High: ' + anychart.core.defaultTheme.locNum(this['high'], digits) + '\n' +
+      '  Low: ' + anychart.core.defaultTheme.locNum(this['low'], digits);
 };
 
 
@@ -35,11 +36,12 @@ anychart.stockModule.defaultTheme.StockRangeTooltipFormatter = function() {
  * @return {*}
  */
 anychart.stockModule.defaultTheme.StockOHLCTooltipFormatter = function() {
+  var digits = this['defaultDecimalDigitsCount'] || undefined;
   return this['seriesName'] + ':\n' +
-      '  Open: ' + anychart.core.defaultTheme.locNum(this['open']) + '\n' +
-      '  High: ' + anychart.core.defaultTheme.locNum(this['high']) + '\n' +
-      '  Low: ' + anychart.core.defaultTheme.locNum(this['low']) + '\n' +
-      '  Close: ' + anychart.core.defaultTheme.locNum(this['close']);
+      '  Open: ' + anychart.core.defaultTheme.locNum(this['open'], digits) + '\n' +
+      '  High: ' + anychart.core.defaultTheme.locNum(this['high'], digits) + '\n' +
+      '  Low: ' + anychart.core.defaultTheme.locNum(this['low'], digits) + '\n' +
+      '  Close: ' + anychart.core.defaultTheme.locNum(this['close'], digits);
 };
 
 
@@ -452,6 +454,65 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     },
     'padding': [20, 30, 20, 60],
     'plots': [{}],
+    'eventMarkers': {
+      'normal': {
+        'type': 'circle',
+        'width': 22,
+        'height': 22,
+        'fill': '#515151',
+        'stroke': '#515151',
+        'fontColor': '#fff',
+        'adjustFontSize': true,
+        'minFontSize': 6,
+        'maxFontSize': 20,
+        'fontSize': null,
+        'format': 'A',
+        'hAlign': 'center',
+        'vAlign': 'middle',
+        'fontPadding': 2,
+        'connector': {
+          'length': 5,
+          'stroke': '#455a64'
+        }
+      },
+      'hovered': {
+        'fill': anychart.core.defaultTheme.returnLightenSourceColor
+      },
+      'selected': {
+        'fill': '#dd2c00'
+      },
+      'tooltip': {
+        'title': {
+          'fontColor': '#fff',
+          'enabled': true
+        },
+        /**
+         * @this {*}
+         * @returns {string}
+         */
+        'titleFormat': function() {
+          var date = anychart.format.dateTime(this['date'],
+              anychart.format.getDateTimeFormat(
+                  anychart.format.getIntervalIdentifier(
+                      this['dataIntervalUnit'], void 0, 'full'
+                  )));
+          return this['title'] ? this['title'] + ' (' + date + ')' : date;
+        },
+        /**
+         * @this {*}
+         * @returns {string}
+         */
+        'format': function() {
+          return this['description'] || this['symbol'];
+        },
+        'fontColor': '#fff',
+        'separator': true
+      },
+      'direction': 'auto',
+      'position': 'axis',
+      'seriesId': '0',
+      'fieldName': 'value'
+    },
     'scroller': {
       'defaultSeriesSettings': {
         'base': {

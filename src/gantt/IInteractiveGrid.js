@@ -136,6 +136,14 @@ anychart.ganttModule.IInteractiveGrid.prototype.defaultRowHeight = function(opt_
 
 
 /**
+ * Getter/setter for palette.
+ * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|Object|Array.<string>)=} opt_value .
+ * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|anychart.ganttModule.IInteractiveGrid)} .
+ */
+anychart.ganttModule.IInteractiveGrid.prototype.palette = function(opt_value) {};
+
+
+/**
  * Getter/setter for container.
  * @param {(acgraph.vector.ILayer|string|Element)=} opt_value .
  * @return {(acgraph.vector.ILayer|!anychart.core.VisualBase)} .

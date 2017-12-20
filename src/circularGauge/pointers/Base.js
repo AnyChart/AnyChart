@@ -408,24 +408,20 @@ anychart.circularGaugeModule.pointers.Base.prototype.createTooltipContextProvide
 };
 
 
-/**
- * Apply appearance to point.
- * @param {anychart.PointState|number} pointState
- */
+/** @inheritDoc */
 anychart.circularGaugeModule.pointers.Base.prototype.applyAppearanceToPoint = goog.nullFunction;
 
 
-/**
- * Finalization point appearance. For drawing labels and markers.
- */
+/** @inheritDoc */
 anychart.circularGaugeModule.pointers.Base.prototype.finalizePointAppearance = goog.nullFunction;
 
 
-/**
- * Apply appearance to series.
- * @param {anychart.PointState|number} pointState .
- */
+/** @inheritDoc */
 anychart.circularGaugeModule.pointers.Base.prototype.applyAppearanceToSeries = goog.nullFunction;
+
+
+/** @inheritDoc */
+anychart.circularGaugeModule.pointers.Base.prototype.getStartValueForAppearanceReduction = goog.nullFunction;
 
 
 //----------------------------------------------------------------------------------------------------------------------

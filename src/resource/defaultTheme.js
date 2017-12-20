@@ -12,7 +12,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'fontSize': '8pt',
         'padding': 0,
         'fontColor': '#F4F4F4',
-        'format': '{%hours}h ({%percent}%)'
+        'format': '{%hours}{decimalsCount:1}h ({%percent}{decimalsCount:2}%)'
       },
       'fill': '#dd2c00',
       'stroke': 'none',
@@ -29,7 +29,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
           'enabled': true,
           'anchor': 'left-top',
           'fontColor': '#F4F4F4',
-          'format': '{%name} ({%hoursPerDayRounded}h)',
+          'format': '{%name} ({%hoursPerDayRounded}{decimalsCount:1}h)',
           'position': 'left-top'
         },
         'fill': '#1976d2',

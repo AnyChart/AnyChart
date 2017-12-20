@@ -255,7 +255,7 @@ anychart.mapModule.utils.GeoSVGParser.prototype.convertLinearGradient = function
     y1_ = +opt_ref['y1'];
     x2_ = +opt_ref['x2'];
     y2_ = +opt_ref['y2'];
-    opacity_ = opt_ref['opacity'];
+    opacity_ = parseFloat(opt_ref['opacity']);
   }
 
   var units = node.getAttribute('gradientUnits') || units_;
@@ -264,13 +264,13 @@ anychart.mapModule.utils.GeoSVGParser.prototype.convertLinearGradient = function
   var y1_self = +node.getAttribute('y1');
   var x2_self = +node.getAttribute('x2');
   var y2_self = +node.getAttribute('y2');
-  var opacity_self = +node.getAttribute('opacity');
+  var opacity_self = parseFloat(node.getAttribute('opacity'));
 
   var x1 = goog.isDef(x1_self) ? x1_self : goog.isDef(x1_) ? x1_ : 0;
   var y1 = goog.isDef(y1_self) ? y1_self : goog.isDef(y1_) ? y1_ : 0;
   var x2 = goog.isDef(x2_self) ? x2_self : goog.isDef(x2_) ? x2_ : 0;
   var y2 = goog.isDef(y2_self) ? y2_self : goog.isDef(y2_) ? y2_ : 0;
-  var opacity = goog.isDef(opacity_self) ? opacity_self : goog.isDef(opacity_) ? opacity_ : 0;
+  var opacity = !isNaN(opacity_self) ? opacity_self : goog.isDef(opacity_) ? opacity_ : 1;
 
   x1 = anychart.math.round(x1, 7);
   y1 = anychart.math.round(y1, 7);
@@ -326,7 +326,7 @@ anychart.mapModule.utils.GeoSVGParser.prototype.convertRadialGradient = function
     cy_ = +opt_ref['cy'];
     fx_ = +opt_ref['fx'];
     fy_ = +opt_ref['fy'];
-    opacity_ = +opt_ref['opacity'];
+    opacity_ = parseFloat(opt_ref['opacity']);
   }
 
   var units = node.getAttribute('gradientUnits') || units_;
@@ -337,14 +337,14 @@ anychart.mapModule.utils.GeoSVGParser.prototype.convertRadialGradient = function
   var cy_self = +node.getAttribute('cy');
   var fx_self = +node.getAttribute('fx');
   var fy_self = +node.getAttribute('fy');
-  var opacity_self = node.getAttribute('opacity') || opacity_;
+  var opacity_self = parseFloat(node.getAttribute('opacity'));
 
   var r = goog.isDef(r_self) ? r_self : goog.isDef(r_) ? r_ : 0;
   var cx = goog.isDef(cx_self) ? cx_self : goog.isDef(cx_) ? cx_ : 0;
   var cy = goog.isDef(cy_self) ? cy_self : goog.isDef(cy_) ? cy_ : 0;
   var fx = goog.isDef(fx_self) ? fx_self : goog.isDef(fx_) ? fx_ : 0;
   var fy = goog.isDef(fy_self) ? fy_self : goog.isDef(fy_) ? fy_ : 0;
-  var opacity = goog.isDef(opacity_self) ? opacity_self : goog.isDef(opacity_) ? opacity_ : 0;
+  var opacity = !isNaN(opacity_self) ? opacity_self : goog.isDef(opacity_) ? opacity_ : 1;
 
   if (units && units.toLowerCase() == 'userspaceonuse') {
     var d = r * 2;

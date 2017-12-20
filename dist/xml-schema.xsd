@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsd:schema
         xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-        targetNamespace="http://anychart.com/schemas/8.0.1/xml-schema.xsd"
-        xmlns="http://anychart.com/schemas/8.0.1/xml-schema.xsd"
+        targetNamespace="http://anychart.com/schemas/8.1.0/xml-schema.xsd"
+        xmlns="http://anychart.com/schemas/8.1.0/xml-schema.xsd"
         elementFormDefault="qualified">
 
     <xsd:element name="anychart" type="Anychart"/>
@@ -76,6 +76,8 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="hatch_fill" type="HatchFill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="outline" type="core.Outline"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="center" type="core.Center"/>
             <!-- charts.Sparkline elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="clip" type="utils.Rect"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="last_fill" type="Fill"/>
@@ -134,6 +136,7 @@
         <xsd:attribute name="context_menu" type="simple.Bool" default="true"/>
         <xsd:attribute name="select_marquee_fill" type="xsd:string"/>
         <xsd:attribute name="select_marquee_stroke" type="xsd:string"/>
+        <xsd:attribute name="auto_redraw" type="xsd:boolean"/>
         <!-- charts.TagCloud elements -->
         <xsd:attribute name="mode" type="xsd:string"/>
         <xsd:attribute name="angles_count" type="xsd:double"/>
@@ -179,7 +182,7 @@
         <xsd:attribute name="sort" type="enums.Sort" default="none"/>
         <xsd:attribute name="radius" type="simple.NumberOrPercent" default="100%"/>
         <xsd:attribute name="inner_radius" type="simple.NumberOrPercent" default="0"/>
-        <xsd:attribute name="explode" type="simple.NumberOrPercent" default="15"/>
+        <xsd:attribute name="explode" type="simple.NumberOrPercent" default="5%"/>
         <xsd:attribute name="outside_labels_space" type="simple.NumberOrPercent" default="30%"/>
         <xsd:attribute name="inside_labels_offset" type="simple.NumberOrPercent" default="50%"/>
         <xsd:attribute name="overlap_mode" type="enums.LabelsOverlapMode" default="no-overlap"/>
@@ -192,6 +195,7 @@
         <xsd:attribute name="stroke" type="xsd:string"/>
         <xsd:attribute name="hatch_fill" type="simple.HatchFill" default="false"/>
         <xsd:attribute name="force_hover_labels" type="simple.Bool" default="false"/>
+        <xsd:attribute name="center" type="simple.StringOrBoolOrNull"/>
         <!-- charts.Pyramid attrs -->
         <xsd:attribute name="reversed" type="simple.Bool" default="false"/>
         <!-- charts.Sparkline elements -->
@@ -321,6 +325,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="padding" type="utils.Space"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="tooltip" type="core.Tooltip"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="legend" type="core.Legend"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="palette" type="palettes.Colors"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="animation" type="utils.Animation"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="credits" type="core.Credits"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="chart_labels" type="core.Label_list"/>
@@ -610,6 +615,8 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="headers" type="core.LabelsFactory"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="upper_labels" type="core.LabelsFactory"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="lower_labels" type="core.LabelsFactory"/>
+            <!-- pie -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="outline" type="core.Outline"/>
         </xsd:all>
         <xsd:attribute name="labels" type="simple.BoolOrNull"/>
         <xsd:attribute name="markers" type="simple.MarkerType"/>
@@ -650,6 +657,8 @@
         <xsd:attribute name="font_style" type="enums.FontStyle"/>
         <xsd:attribute name="font_variant" type="enums.FontVariant"/>
         <xsd:attribute name="font_weight" type="xsd:string"/>
+        <!-- pie -->
+        <xsd:attribute name="explode" type="simple.NumberOrPercent"/>
     </xsd:complexType>
 
     <!-- data complex types -->
@@ -1156,6 +1165,7 @@
         <xsd:attribute name="adjust_font_size" type="simple.Bool" default="false"/>
         <xsd:attribute name="rotation" type="xsd:double" default="0"/>
         <xsd:attribute name="axis_index" type="xsd:double" default="0"/>
+        <xsd:attribute name="format" type="xsd:string" default="0"/>
         <xsd:attributeGroup ref="attrs.TextSettings"/>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
     </xsd:complexType>
@@ -1392,6 +1402,28 @@
         <xsd:attribute name="corners_radius" type="xsd:double" />
     </xsd:complexType>
 
+    <xsd:complexType name="core.Outline">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill" />
+            <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke" />
+        </xsd:all>
+        <xsd:attribute name="enabled" type="simple.BoolOrNull" />
+        <xsd:attribute name="fill" type="xsd:string" />
+        <xsd:attribute name="stroke" type="xsd:string" />
+        <xsd:attribute name="width" type="simple.NumberOrPercent" />
+        <xsd:attribute name="offset" type="simple.NumberOrPercent" />
+    </xsd:complexType>
+
+    <xsd:complexType name="core.Center">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill" />
+            <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke" />
+            <xsd:element minOccurs="0" maxOccurs="1" name="content" type="Anychart" />
+        </xsd:all>
+        <xsd:attribute name="fill" type="xsd:string" />
+        <xsd:attribute name="stroke" type="xsd:string" />
+    </xsd:complexType>
+
     <xsd:complexType name="core.DataGrid">
         <xsd:all>
             <xsd:element minOccurs="0" maxOccurs="1" name="row_stroke" type="Stroke"/>
@@ -1403,7 +1435,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="row_odd_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="row_even_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="row_fill" type="Fill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="row_hover_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="row_selected_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="edit_structure_preview_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="edit_structure_preview_stroke" type="Stroke"/>
@@ -1421,7 +1453,7 @@
         <xsd:attribute name="row_odd_fill" type="xsd:string"/>
         <xsd:attribute name="row_even_fill" type="xsd:string"/>
         <xsd:attribute name="row_fill" type="xsd:string"/>
-        <xsd:attribute name="hover_fill" type="xsd:string"/>
+        <xsd:attribute name="row_hover_fill" type="xsd:string"/>
         <xsd:attribute name="row_selected_fill" type="xsd:string"/>
         <xsd:attribute name="horizontal_offset" type="xsd:double" default="0"/>
         <xsd:attribute name="default_row_height" type="xsd:double"/>
@@ -1460,7 +1492,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="row_odd_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="row_even_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="row_fill" type="Fill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="row_hover_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="row_selected_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="base_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="base_stroke" type="Stroke"/>
@@ -1515,7 +1547,7 @@
         <xsd:attribute name="row_odd_fill" type="xsd:string"/>
         <xsd:attribute name="row_even_fill" type="xsd:string"/>
         <xsd:attribute name="row_fill" type="xsd:string"/>
-        <xsd:attribute name="hover_fill" type="xsd:string"/>
+        <xsd:attribute name="row_hover_fill" type="xsd:string"/>
         <xsd:attribute name="row_selected_fill" type="xsd:string"/>
         <xsd:attribute name="base_fill" type="xsd:string"/>
         <xsd:attribute name="base_stroke" type="xsd:string"/>
@@ -1555,6 +1587,27 @@
         <xsd:attribute name="edit_start_connector_marker_vertical_offset" type="xsd:double"/>
         <xsd:attribute name="edit_finish_connector_marker_vertical_offset" type="xsd:double"/>
         <xsd:attribute name="edit_interval_width" type="xsd:double"/>
+
+        <xsd:attribute name="base_bar_height" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="base_bar_anchor" type="xsd:string"/>
+        <xsd:attribute name="base_bar_position" type="xsd:string"/>
+        <xsd:attribute name="base_bar_offset" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="baseline_bar_height" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="baseline_bar_anchor" type="xsd:string"/>
+        <xsd:attribute name="baseline_bar_position" type="xsd:string"/>
+        <xsd:attribute name="baseline_bar_offset" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="parent_bar_height" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="parent_bar_anchor" type="xsd:string"/>
+        <xsd:attribute name="parent_bar_position" type="xsd:string"/>
+        <xsd:attribute name="parent_bar_offset" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="progress_bar_height" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="progress_bar_anchor" type="xsd:string"/>
+        <xsd:attribute name="progress_bar_position" type="xsd:string"/>
+        <xsd:attribute name="progress_bar_offset" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="milestone_height" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="milestone_anchor" type="xsd:string"/>
+        <xsd:attribute name="milestone_position" type="xsd:string"/>
+        <xsd:attribute name="milestone_offset" type="simple.NumberOrPercentOrNull"/>
     </xsd:complexType>
 
     <xsd:complexType name="core.ColorRange">
@@ -1694,6 +1747,8 @@
         <xsd:attribute name="selection_mode" type="enums.SelectionMode"/>
         <xsd:attribute name="spot_radius" type="xsd:integer"/>
         <xsd:attribute name="allow_multi_series_selection" type="xsd:boolean"/>
+        <xsd:attribute name="multi_select_on_click" type="xsd:boolean"/>
+        <xsd:attribute name="unselect_on_click_out_of_point" type="xsd:boolean"/>
     </xsd:complexType>
 
     <xsd:complexType name="utils.MapInteractivity">
@@ -2144,6 +2199,7 @@
     </xsd:complexType>
 
     <xsd:complexType name="OrdinalColorRange">
+        <xsd:attribute name="equal" type="xsd:string"/>
         <xsd:attribute name="less" type="xsd:unsignedInt"/>
         <xsd:attribute name="greater" type="xsd:unsignedInt"/>
         <xsd:attribute name="from" type="xsd:unsignedInt"/>

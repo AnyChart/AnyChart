@@ -13,10 +13,11 @@ goog.require('goog.Disposable');
  * @param {boolean} interactive
  * @param {?string=} opt_shapesFieldName
  * @param {?function(anychart.core.IShapeManagerUser, Object.<string, acgraph.vector.Shape>, number)=} opt_postProcessor
+ * @param {boolean=} opt_disableStrokeScaling
  * @constructor
  * @extends {goog.Disposable}
  */
-anychart.core.shapeManagers.Base = function(series, config, interactive, opt_shapesFieldName, opt_postProcessor) {
+anychart.core.shapeManagers.Base = function(series, config, interactive, opt_shapesFieldName, opt_postProcessor, opt_disableStrokeScaling) {
   anychart.core.shapeManagers.Base.base(this, 'constructor');
 
   /**
@@ -76,6 +77,13 @@ anychart.core.shapeManagers.Base = function(series, config, interactive, opt_sha
    * @type {Object.<anychart.core.shapeManagers.Base.ShapeDescriptor>}
    */
   this.defs = {};
+
+  /**
+   * Whether to disable stroke scaling.
+   * @type {boolean}
+   * @private
+   */
+  this.disableStrokeScaling_ = !!opt_disableStrokeScaling;
 
   for (var i = 0; i < config.length; i++) {
     var shapeConfig = config[i];
@@ -236,7 +244,7 @@ anychart.core.shapeManagers.Base.prototype.configureShape = function(name, state
 
   shape.fill(fill);
   shape.stroke(stroke);
-  shape.disableStrokeScaling(true);
+  shape.disableStrokeScaling(this.disableStrokeScaling_);
   shape.zIndex(descriptor.zIndex + baseZIndex);
 
   if (this.addInterctivityInfo) {

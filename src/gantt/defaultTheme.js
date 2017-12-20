@@ -4,11 +4,13 @@ goog.provide('anychart.ganttModule.defaultTheme');
 goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
   // merge with chart
   'ganttBase': {
+    'defaultRowHoverFill': '#f8fafb',
+    'defaultRowSelectedFill': '#ebf1f4',
     'splitterPosition': '30%',
     'headerHeight': 70,
-    'rowHoverFill': '#F8FAFB',
-    'rowSelectedFill': '#ebf1f4',
     'rowStroke': '#cecece',
+    'rowHoverFill': anychart.core.defaultTheme.returnSourceColor,
+    'rowSelectedFill': anychart.core.defaultTheme.returnSourceColor,
     'editing': false,
     'title': {
       'enabled': false
@@ -25,8 +27,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       'isStandalone': false,
       'backgroundFill': 'none',
       'tooltip': {
-        'zIndex': 100,
-        'allowLeaveChart': false
+        'zIndex': 100
       }
     },
     'timeline': {

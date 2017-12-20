@@ -44,8 +44,8 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'enabled': true,
         'hAlign': 'center',
         'vAlign': 'middle',
-        'position': 'left-top',
-        'anchor': 'left-top',
+        'position': 'center',
+        'anchor': 'center',
         'fontColor': anychart.core.defaultTheme.fontColorDark,
         'format': anychart.core.defaultTheme.returnNameWithValue
       },
@@ -60,8 +60,8 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'enabled': true,
         'hAlign': 'center',
         'vAlign': 'middle',
-        'position': 'left-top',
-        'anchor': 'left-top',
+        'position': 'center',
+        'anchor': 'center',
         'background': {
           'enabled': true,
           'fill': '#F7F7F7',

@@ -652,7 +652,9 @@ anychart.themes.merging.mergingMap_ = (function() {
           'textAxisMarker'
         ]],
         [['standalones', 'resource'],
-          '.resourceList.baseSettings']
+          '.resourceList.baseSettings'],
+        'stock.eventMarkers.normal',
+        'chart.defaultAnnotationSettings.label'
       ]
     },
     {
@@ -682,6 +684,7 @@ anychart.themes.merging.mergingMap_ = (function() {
           ]],
           ['chart', [
             '',
+            '.defaultAnnotationSettings.label',
             [[
               '',
               '.defaultQuarterSettings'
@@ -840,7 +843,8 @@ anychart.themes.merging.mergingMap_ = (function() {
           ['pert.', [
             'milestones',
             'tasks'
-          ]]
+          ]],
+          'stock.eventMarkers'
         ], '.tooltip']
       ]
     },
@@ -858,7 +862,8 @@ anychart.themes.merging.mergingMap_ = (function() {
       targets: [
         [[
           'chart',
-          'stock.scroller'
+          'stock.scroller',
+          ['default', ['DataGrid', 'Timeline']]
         ], '.palette']
       ]
     },

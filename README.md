@@ -1,9 +1,15 @@
 [<img src="https://cdn.anychart.com/images/logo-transparent-segoe.png?2" width="234px" alt="AnyChart - Robust JavaScript/HTML5 Chart library for any project">](https://www.anychart.com)
+[<img alt="AnyChart Travis Build" src="https://img.shields.io/travis/AnyChart/AnyChart.svg" align="right">](https://travis-ci.org/AnyChart/AnyChart)
+[<img alt="AnyChart NPM Version" src="https://img.shields.io/npm/v/anychart.svg" align="right">](https://www.npmjs.com/package/anychart)
+[<img alt="AnyChart Releases" src="https://img.shields.io/github/release/AnyChart/AnyChart.svg" align="right">](https://www.anychart.com/products/anychart/history)
+[<img alt="AnyChart Download" src="https://img.shields.io/npm/dt/anychart.svg" align="right">](https://www.anychart.com/download/)
+
 
 AnyChart Data Visualization Framework
 =========
 
 AnyChart is a flexible JavaScript (HTML5, SVG, VML) charting framework that fits any solution in need of data visualization.
+
 
 ## Table of Contents
 

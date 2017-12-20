@@ -1065,10 +1065,16 @@ anychart.linearGaugeModule.pointers.Base.prototype.applyAppearanceToSeries = fun
 
 
 /** @inheritDoc */
-anychart.linearGaugeModule.pointers.Base.prototype.applyAppearanceToPoint = function(pointState) {
+anychart.linearGaugeModule.pointers.Base.prototype.applyAppearanceToPoint = function(pointState, opt_value) {
   this.colorizePointer(pointState);
   this.drawLabel(pointState);
+
+  return opt_value;
 };
+
+
+/** @inheritDoc */
+anychart.linearGaugeModule.pointers.Base.prototype.getStartValueForAppearanceReduction = goog.nullFunction;
 
 
 /** @inheritDoc */

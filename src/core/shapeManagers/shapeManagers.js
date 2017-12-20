@@ -1045,3 +1045,18 @@ anychart.core.shapeManagers.foreignPathFillConfig = {
   isHatchFill: false,
   zIndex: anychart.core.shapeManagers.FILL_SHAPES_ZINDEX
 };
+
+
+/**
+ * Template shape config for easy reusage.
+ * @const {anychart.core.shapeManagers.ShapeConfig}
+ */
+anychart.core.shapeManagers.pathEventMarkerHandlerConfig = {
+  name: 'overlay',
+  shapeType: anychart.enums.ShapeType.PATH,
+  fillName: true,
+  strokeName: true,
+  canBeHoveredSelected: false,
+  isHatchFill: false,
+  zIndex: anychart.core.shapeManagers.STROKE_SHAPES_ZINDEX
+};

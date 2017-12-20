@@ -832,7 +832,9 @@ anychart.mapModule.elements.Callout.prototype.configureSeriesLabel = function(la
   var currentLabelsFactory, pointLabel, stateLabel;
   var parentLabelsFactory = series.normal().labels();
 
-  pointLabel = iterator.get('label');
+  pointLabel = iterator.get('normal');
+  pointLabel = pointLabel ? pointLabel['label'] : void 0;
+  pointLabel = anychart.utils.getFirstDefinedValue(pointLabel, iterator.get('label'));
   if (selected) {
     stateLabel = iterator.get('selected');
     stateLabel = stateLabel ? stateLabel['label'] : void 0;

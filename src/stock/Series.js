@@ -42,6 +42,12 @@ anychart.stockModule.Series = function(chart, plot, type, config) {
   anychart.stockModule.Series.base(this, 'constructor', chart, plot, type, config);
 
   /**
+   * For formatters.
+   * @type {?number}
+   */
+  this.defaultDecimalDigitsCount = null;
+
+  /**
    * Series data interface.
    * @type {anychart.stockModule.data.TableSelectable}
    * @private
@@ -486,6 +492,17 @@ anychart.stockModule.Series.prototype.createLegendContextProvider = function() {
 };
 
 
+/** @inheritDoc */
+anychart.stockModule.Series.prototype.getContextProviderValues = function(provider, rowInfo) {
+  var result = anychart.stockModule.Series.base(this, 'getContextProviderValues', provider, rowInfo);
+  result['defaultDecimalDigitsCount'] = {
+    value: this.defaultDecimalDigitsCount,
+    type: anychart.enums.TokenType.NUMBER
+  };
+  return result;
+};
+
+
 /**
  * Returns current point for the legend.
  * @return {?anychart.stockModule.data.TableSelectable.RowProxy}
@@ -558,9 +575,10 @@ anychart.stockModule.Series.prototype.getLegendIconType = function(type, context
  * Formats number.
  * @param {*} val - Value to format.
  * @return {*} - Result.
+ * @private
  */
-anychart.stockModule.Series.prototype.localizeNumber = function(val) {
-  return (typeof val == 'number') ? anychart.format.number(val) : val;
+anychart.stockModule.Series.prototype.localizeNumber_ = function(val) {
+  return (typeof val == 'number') ? anychart.format.number(val, this.defaultDecimalDigitsCount || undefined) : val;
 };
 
 
@@ -570,17 +588,17 @@ anychart.stockModule.Series.prototype.getLegendItemText = function(context) {
   var result;
   if (this.check(anychart.core.drawers.Capabilities.IS_OHLC_BASED)) {
     missing = isNaN(context['high']) || isNaN(context['low']) || isNaN(context['open']) || isNaN(context['close']);
-    result = ': (O: ' + this.localizeNumber(context['open']) +
-        '; H: ' + this.localizeNumber(context['high']) +
-        '; L: ' + this.localizeNumber(context['low']) +
-        '; C: ' + this.localizeNumber(context['close']) + ')';
+    result = ': (O: ' + this.localizeNumber_(context['open']) +
+        '; H: ' + this.localizeNumber_(context['high']) +
+        '; L: ' + this.localizeNumber_(context['low']) +
+        '; C: ' + this.localizeNumber_(context['close']) + ')';
   } else if (this.check(anychart.core.drawers.Capabilities.IS_RANGE_BASED)) {
     missing = isNaN(context['high']) || isNaN(context['low']);
-    result = ': (H: ' + this.localizeNumber(context['high']) +
-        '; L: ' + this.localizeNumber(context['low']) + ')';
+    result = ': (H: ' + this.localizeNumber_(context['high']) +
+        '; L: ' + this.localizeNumber_(context['low']) + ')';
   } else {
     missing = isNaN(context['value']);
-    result = ': ' + this.localizeNumber(context['value']);
+    result = ': ' + this.localizeNumber_(context['value']);
   }
   return this.name() + (missing ? '' : result);
 };

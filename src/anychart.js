@@ -493,23 +493,22 @@ anychart.ready_ = function(event) {
  * @param {*=} opt_scope Function call context.
  */
 anychart.onDocumentReady = function(func, opt_scope) {
-  if (anychart.window['isNodeJS'])
+  if (anychart.window['isNodeJS']) {
     anychart.isReady_ = true;
-
+  }
   if (anychart.isReady_) {
     func.call(opt_scope);
-  }
-
-  if (!anychart.documentReadyCallbacks_) {
-    anychart.documentReadyCallbacks_ = [];
-  }
-  anychart.documentReadyCallbacks_.push([func, opt_scope]);
-
-
-  if (anychart.document['readyState'] === 'complete') {
-    setTimeout(anychart.ready_, 1);
   } else {
-    anychart.attachDomEvents_();
+    if (!anychart.documentReadyCallbacks_) {
+      anychart.documentReadyCallbacks_ = [];
+    }
+    anychart.documentReadyCallbacks_.push([func, opt_scope]);
+
+    if (anychart.document['readyState'] === 'complete') {
+      setTimeout(anychart.ready_, 1);
+    } else {
+      anychart.attachDomEvents_();
+    }
   }
 };
 

@@ -875,7 +875,7 @@ anychart.circularGaugeModule.Axis.prototype.getLabelsFormatProvider_ = function(
   var values = {
     'axis': {value: this, type: anychart.enums.TokenType.UNKNOWN},
     'index': {value: index, type: anychart.enums.TokenType.NUMBER},
-    'value': {value: parseFloat(value), type: anychart.enums.TokenType.NUMBER},
+    'value': {value: scale.roundToTicksPrecision(parseFloat(value)), type: anychart.enums.TokenType.NUMBER},
     'tickValue': {value: parseFloat(value), type: anychart.enums.TokenType.NUMBER},
     'max': {value: goog.isDef(scale.max) ? scale.max : null, type: anychart.enums.TokenType.NUMBER},
     'min': {value: goog.isDef(scale.min) ? scale.min : null, type: anychart.enums.TokenType.NUMBER},

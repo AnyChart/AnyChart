@@ -113,6 +113,7 @@ anychart.ConsistencyState = {
   //---------------------------------- PIE STATES (CHART) ---------------------------------
   PIE_LABELS: 1 << 12,
   PIE_DATA: 1 << 13,
+  PIE_CENTER_CONTENT: 1 << 14,
   //---------------------------------- SPARKLINE STATES (CHART) ---------------------------------
   SPARK_SCALES: 1 << 12,
   SPARK_SERIES: 1 << 13,
@@ -268,8 +269,10 @@ anychart.ConsistencyState = {
   STOCK_PLOT_ANNOTATIONS: 1 << 13,
   STOCK_PLOT_PRICE_INDICATORS: 1 << 14,
   STOCK_PLOT_NO_DATA_LABEL: 1 << 15,
+  STOCK_PLOT_EVENT_MARKERS: 1 << 16,
   //---------------------------------- PRICE INDICATOR STATES (VB) ---------------------------------
   STOCK_PRICE_INDICATOR_LABEL: 1 << 6,
+  STOCK_PRICE_INDICATOR_SERIES: 1 << 7,
   //---------------------------------- STOCK DATETIME AXIS (VB) ----------------------------------------
   STOCK_DTAXIS_BACKGROUND: 1 << 6,
   //---------------------------------- STOCK SCROLLER (SCROLLER) ----------------------------------------
@@ -277,12 +280,10 @@ anychart.ConsistencyState = {
   STOCK_SCROLLER_AXIS: 1 << 10,
   //---------------------------------- TREE MAP CHART (SEPARATE CHART) ----------------------------------
   TREEMAP_DATA: 1 << 12,
-  TREEMAP_LABELS: 1 << 13,
-  TREEMAP_MARKERS: 1 << 14,
-  TREEMAP_COLOR_SCALE: 1 << 15,
-  TREEMAP_NODE_TYPES: 1 << 16,
-  TREEMAP_COLOR_RANGE: 1 << 17,
-  TREEMAP_HINT_OPACITY: 1 << 18,
+  TREEMAP_COLOR_SCALE: 1 << 13,
+  TREEMAP_NODE_TYPES: 1 << 14,
+  TREEMAP_COLOR_RANGE: 1 << 15,
+  TREEMAP_HINT_OPACITY: 1 << 16,
   //---------------------------------- PERT CHART (SEPARATE CHART) ----------------------------------
   PERT_DATA: 1 << 12,
   PERT_CALCULATIONS: 1 << 13,
@@ -355,6 +356,8 @@ anychart.ConsistencyState = {
   //----------------------------- QUARTER (BACKGROUND) -----------------------------
   QUARTER_TITLE: 1 << 7,
   QUARTER_LABELS: 1 << 8,
+  //----------------------------- EVENT MARKERS (VB) -----------------------------
+  EVENT_MARKERS_DATA: 1 << 6,
   /**
    * Combination of all states.
    */
@@ -789,7 +792,12 @@ anychart.core.Base.prototype.setupSpecial = function(isDefault, var_args) {
  * @param {goog.events.EventLike} event Event object.
  */
 anychart.core.Base.prototype.dispatchDetachedEvent = function(event) {
-  setTimeout(goog.bind(this.dispatchEvent, this, event), 0);
+  var self = this;
+  var timeout = setTimeout(function() {
+    if (!self.isDisposed())
+      self.dispatchEvent(event);
+    clearTimeout(timeout);
+  }, 0);
 };
 
 

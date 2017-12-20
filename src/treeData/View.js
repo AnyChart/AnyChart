@@ -330,10 +330,14 @@ anychart.treeDataModule.View.prototype.serialize = function() {
 
 /**
  * Serializes tree without meta information.
+ * @param {Array.<string>=} opt_exceptions - Array of field names that will be in meta anyway.
+ *  If is undefined, no meta will be stored.
+ *  If array is empty, all meta will be stored.
+ *  If array is not empty, only values will be stored.
  * @return {!Object} Serialized JSON object.
  */
-anychart.treeDataModule.View.prototype.serializeWithoutMeta = function() {
-  var json = this.tree_.serializeWithoutMeta();
+anychart.treeDataModule.View.prototype.serializeWithoutMeta = function(opt_exceptions) {
+  var json = this.tree_.serializeWithoutMeta(opt_exceptions);
   json['mapping'] = this.mapping_;
   return json;
 };

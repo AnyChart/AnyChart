@@ -303,8 +303,8 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       }
     },
     'unboundRegions': {'enabled': true, 'fill': '#F7F7F7', 'stroke': '#e0e0e0'},
-    'maxBubbleSize': '20%',
-    'minBubbleSize': '5%',
+    'maxBubbleSize': '10%',
+    'minBubbleSize': '1%',
     'geoIdField': 'id',
     'interactivity': {
       'copyFormat': function() {

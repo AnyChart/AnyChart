@@ -5,6 +5,7 @@ goog.require('anychart.core.IGroupingProvider');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.ui.Background');
 goog.require('anychart.core.ui.LabelsFactory');
+goog.require('anychart.format.Context');
 goog.require('anychart.math.Rect');
 goog.require('anychart.stockModule.AxisTicks');
 
@@ -740,32 +741,70 @@ anychart.stockModule.Axis.prototype.getLabelBounds_ = function(value, isMajor, b
  */
 anychart.stockModule.Axis.prototype.getLabelsFormatProvider_ = function(value,
     majorUnit, majorUnitCount, minorUnit, minorUnitCount) {
-  var labelText;
-  var date = new Date(value);
-  var mm = date.getMonth() + 1;
-  var dd = date.getDate();
-  var yy = date.getFullYear();
 
-  mm = mm < 10 ? '0' + mm : '' + mm;
-  dd = dd < 10 ? '0' + dd : '' + dd;
-
-  labelText = mm + '-' + dd + '-' + yy;
+  var labelText = anychart.format.date(value);
 
   var grouping = this.groupingProvider_.grouping();
-  return {
-    'dataIntervalUnit': grouping.getCurrentDataInterval()['unit'],
-    'dataIntervalUnitCount': grouping.getCurrentDataInterval()['count'],
-    'dataIsGrouped': grouping.isGrouped(),
-    'majorIntervalUnit': majorUnit,
-    'majorIntervalUnitCount': minorUnitCount,
-    'minorIntervalUnit': minorUnit,
-    'minorIntervalUnitCount': minorUnitCount,
-    'value': labelText,
-    'tickValue': value,
-    'max': this.scale_.getMaximum(),
-    'min': this.scale_.getMinimum(),
-    'scale': this.scale_
+
+  var values = {
+    'dataIntervalUnit': {
+      value: grouping.getCurrentDataInterval()['unit'],
+      type: anychart.enums.TokenType.STRING
+    },
+    'dataIntervalUnitCount': {
+      value: grouping.getCurrentDataInterval()['count'],
+      type: anychart.enums.TokenType.NUMBER
+    },
+    'dataIsGrouped': {
+      value: grouping.isGrouped(),
+      type: anychart.enums.TokenType.STRING
+    },
+    'majorIntervalUnit': {
+      value: majorUnit,
+      type: anychart.enums.TokenType.STRING
+    },
+    'majorIntervalUnitCount': {
+      value: minorUnitCount,
+      type: anychart.enums.TokenType.NUMBER
+    },
+    'minorIntervalUnit': {
+      value: minorUnit,
+      type: anychart.enums.TokenType.STRING
+    },
+    'minorIntervalUnitCount': {
+      value: minorUnitCount,
+      type: anychart.enums.TokenType.NUMBER
+    },
+    'value': {
+      value: labelText,
+      type: anychart.enums.TokenType.STRING
+    },
+    'tickValue': {
+      value: value,
+      type: anychart.enums.TokenType.NUMBER
+    },
+    'max': {
+      value: this.scale_.getMaximum(),
+      type: anychart.enums.TokenType.NUMBER
+    },
+    'min': {
+      value: this.scale_.getMinimum(),
+      type: anychart.enums.TokenType.NUMBER
+    },
+    'scale': {
+      value: this.scale_,
+      type: anychart.enums.TokenType.UNKNOWN
+    }
   };
+
+  var aliases = {};
+  aliases[anychart.enums.StringToken.AXIS_SCALE_MAX] = 'max';
+  aliases[anychart.enums.StringToken.AXIS_SCALE_MIN] = 'min';
+
+  var context = new anychart.format.Context(values);
+  context.tokenAliases(aliases);
+
+  return context.propagate();
 };
 
 

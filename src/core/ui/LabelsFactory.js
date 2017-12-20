@@ -33,20 +33,6 @@ anychart.core.ui.LabelsFactory = function() {
   delete this.themeSettings['enabled'];
 
   /**
-   * Labels background settings.
-   * @type {anychart.core.ui.Background}
-   * @private
-   */
-  this.background_ = null;
-
-  /**
-   * Labels padding settings.
-   * @type {anychart.core.utils.Padding}
-   * @private
-   */
-  this.padding_ = null;
-
-  /**
    * Labels layer.
    * @type {acgraph.vector.Layer}
    * @private
@@ -213,6 +199,14 @@ anychart.core.ui.LabelsFactory.HANDLED_EVENT_TYPES_ = {
  * @private
  */
 anychart.core.ui.LabelsFactory.HANDLED_EVENT_TYPES_CAPTURE_SHIFT_ = 12;
+
+
+/**
+ * Factory to measure plain text with styles.
+ * NOTE: Do not export!
+ * @type {?anychart.core.ui.LabelsFactory}
+ */
+anychart.core.ui.LabelsFactory.measureTextFactory = null;
 
 
 //endregion
@@ -813,11 +807,11 @@ anychart.core.ui.LabelsFactory.prototype.add = function(formatProvider, position
 
     if (goog.isDef(index)) {
       this.labels_[index] = label;
-      label.setIndex(index);
     } else {
       this.labels_.push(label);
-      label.setIndex(this.labels_.length - 1);
+      index = this.labels_.length - 1;
     }
+    label.setIndex(index);
   }
 
   label.formatProvider(formatProvider);
@@ -1199,15 +1193,15 @@ anychart.core.ui.LabelsFactory.prototype.disposeInternal = function() {
       this.freeToUseLabelsPool_,
       this.measureCustomLabel_,
       this.layer_,
-      this.background_,
-      this.padding_);
+      this.ownSettings['background'],
+      this.ownSettings['padding']);
 
   this.labels_ = null;
   this.freeToUseLabelsPool_ = null;
   this.measureCustomLabel_ = null;
   this.layer_ = null;
-  this.background_ = null;
-  this.padding_ = null;
+  this.ownSettings['background'] = null;
+  this.ownSettings['padding'] = null;
 
   anychart.core.ui.LabelsFactory.base(this, 'disposeInternal');
 };
@@ -1955,6 +1949,31 @@ anychart.core.ui.LabelsFactory.Label.prototype.isResolvable = function() {
 
 //endregion
 //region --- Settings manipulations
+/**
+ * Measures plain text on label's settings. NOTE: avoid using string tokens.
+ * @param {string} text - Text to measure.
+ * @return {anychart.math.Rect}
+ */
+anychart.core.ui.LabelsFactory.Label.prototype.measureWithText = function(text) {
+  var factory;
+  if (this.factory_) {
+    factory = this.factory_;
+  } else {
+    if (!anychart.core.ui.LabelsFactory.measureTextFactory) {
+      anychart.core.ui.LabelsFactory.measureTextFactory = new anychart.core.ui.LabelsFactory();
+      anychart.core.ui.LabelsFactory.measureTextFactory.setOption('positionFormatter', function() {
+        return this['value'];
+      });
+    }
+    factory = anychart.core.ui.LabelsFactory.measureTextFactory;
+  }
+
+  var sett = this.getMergedSettings();
+  sett['format'] = String(text);
+  return factory.measure({}, this.positionProvider(), sett);
+};
+
+
 /**
  * Reset settings.
  */
@@ -2862,6 +2881,7 @@ anychart.standalones.labelsFactory = function() {
   proto['padding'] = proto.padding;
   proto['background'] = proto.background;
   proto['clear'] = proto.clear;
+  proto['measureWithText'] = proto.measureWithText;
   proto['draw'] = proto.draw;
   // proto['autoAnchor'] = proto.autoAnchor;//don't public
   // proto['autoRotation'] = proto.autoRotation;//don't public

@@ -67,7 +67,8 @@ goog.inherits(anychart.stockModule.CurrentPriceIndicator, anychart.core.VisualBa
 anychart.stockModule.CurrentPriceIndicator.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.APPEARANCE |
-    anychart.ConsistencyState.STOCK_PRICE_INDICATOR_LABEL;
+    anychart.ConsistencyState.STOCK_PRICE_INDICATOR_LABEL |
+    anychart.ConsistencyState.STOCK_PRICE_INDICATOR_SERIES;
 
 
 /**
@@ -160,7 +161,7 @@ anychart.stockModule.CurrentPriceIndicator.prototype.isLabelAnchorLeft = functio
 /**
  * Gets format provider for label.
  * @param {anychart.stockModule.Series} series
- * @param {anychart.core.Axis|anychart.mapModule.elements.Axis} axis
+ * @param {anychart.core.Axis} axis
  * @param {number} ratio
  * @return {Object} Labels format provider.
  * @protected
@@ -173,34 +174,28 @@ anychart.stockModule.CurrentPriceIndicator.prototype.getLabelsFormatProvider = f
   var scaleValue = scale.inverseTransform(ratio);
 
   var labelText;
+  var labelType = anychart.enums.TokenType.NUMBER;
   switch (scaleType) {
     case anychart.enums.ScaleTypes.LINEAR:
-      labelText = +parseFloat(scaleValue).toFixed(2);
-      break;
     case anychart.enums.ScaleTypes.LOG:
-      labelText = +scaleValue.toFixed(2);
+      labelText = scaleValue;
       break;
     case anychart.enums.ScaleTypes.ORDINAL:
       labelText = String(scaleValue);
+      labelType = anychart.enums.TokenType.STRING;
       break;
+    case anychart.enums.ScaleTypes.STOCK_SCATTER_DATE_TIME:
+    case anychart.enums.ScaleTypes.STOCK_ORDINAL_DATE_TIME:
     case anychart.enums.ScaleTypes.DATE_TIME:
-      var date = new Date(scaleValue);
-      var mm = date.getMonth() + 1;
-      var dd = date.getDate();
-      var yy = date.getFullYear();
-
-      mm = mm < 10 ? '0' + mm : '' + mm;
-      dd = dd < 10 ? '0' + dd : '' + dd;
-
-      labelText = mm + '-' + dd + '-' + yy;
-
+      labelText = anychart.format.date(/** @type {Date|number} */ (scaleValue));
+      labelType = anychart.enums.TokenType.STRING; // date already formatted
       break;
   }
 
   var values = {
     'series': {value: series, type: anychart.enums.TokenType.UNKNOWN},
     'axis': {value: axis, type: anychart.enums.TokenType.UNKNOWN},
-    'value': {value: labelText, type: anychart.enums.TokenType.NUMBER},
+    'value': {value: labelText, type: labelType},
     'tickValue': {value: scaleValue, type: anychart.enums.TokenType.NUMBER},
     'scale': {value: scale, type: anychart.enums.TokenType.UNKNOWN}
   };
@@ -315,7 +310,7 @@ anychart.stockModule.CurrentPriceIndicator.prototype.series = function(opt_value
     if (this.series_ !== opt_value) {
       this.seriesId_ = seriesId;
       this.series_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.CONTAINER,
+      this.invalidate(anychart.ConsistencyState.STOCK_PRICE_INDICATOR_SERIES | anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.CONTAINER,
           anychart.Signal.NEEDS_REDRAW);
     }
     return this;
@@ -353,6 +348,7 @@ anychart.stockModule.CurrentPriceIndicator.prototype.axis = function(opt_value) 
  */
 anychart.stockModule.CurrentPriceIndicator.prototype.remove = function() {
   this.rootLayer.parent(null);
+  this.invalidate(anychart.ConsistencyState.CONTAINER);
 };
 
 
@@ -375,6 +371,8 @@ anychart.stockModule.CurrentPriceIndicator.prototype.draw = function() {
     this.row_ = series.getSelectableData().getRowByDataSource(this.getOption('value'), fieldValue);
     seriesValue = this.row_ ? this.row_.get(fieldValue) : null;
   }
+
+  this.markConsistent(anychart.ConsistencyState.STOCK_PRICE_INDICATOR_SERIES);
 
   if (!seriesValue) {
     this.remove();

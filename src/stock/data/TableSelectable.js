@@ -93,7 +93,16 @@ anychart.stockModule.data.TableSelectable.prototype.getFullPointsCount = functio
  * @return {anychart.stockModule.data.TableSelectable.RowProxy}
  */
 anychart.stockModule.data.TableSelectable.prototype.search = function(key, opt_mode) {
-  var index = this.currentStorage_.searchIndex(key, anychart.enums.normalizeTableSearchMode(opt_mode));
+  return this.getAtIndex(this.currentStorage_.searchIndex(key, anychart.enums.normalizeTableSearchMode(opt_mode)));
+};
+
+
+/**
+ * Returns a from current storage row at index.
+ * @param {number} index
+ * @return {anychart.stockModule.data.TableSelectable.RowProxy}
+ */
+anychart.stockModule.data.TableSelectable.prototype.getAtIndex = function(index) {
   var row = this.currentStorage_.getRow(index);
   if (row)
     return new anychart.stockModule.data.TableSelectable.RowProxy(row, this.mapping_, !this.currentStorageIsMain_, index, this.metaData_[index]);
@@ -496,9 +505,10 @@ anychart.stockModule.data.TableSelectable.IController = function() {};
 /**
  * @param {boolean} fullRange
  * @param {boolean=} opt_exportingData
+ * @param {boolean=} opt_force
  * @return {anychart.stockModule.data.TableIterator.ICoIterator}
  */
-anychart.stockModule.data.TableSelectable.IController.prototype.getCoIterator = function(fullRange, opt_exportingData) {};
+anychart.stockModule.data.TableSelectable.IController.prototype.getCoIterator = function(fullRange, opt_exportingData, opt_force) {};
 
 
 /**

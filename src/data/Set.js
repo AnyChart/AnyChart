@@ -172,32 +172,6 @@ anychart.data.Set.prototype.simpleValuesSeen_ = false;
 
 
 /**
- * Recursively adds complex object to seen fields.
- * {hovered: { markers: {fill: 'red'} }} will be added as
- * hovered: {
- *   markers: {
- *     fill : true
- *   }
- * }
- * So afterwards you can check the existance of the field with
- * checkFieldExist('hovered.markers') or checkFieldExist('hovered.markers.fill')
- * @param {string} fieldName
- * @param {Object} dataRow
- * @param {Object} fieldsSeen
- */
-anychart.data.Set.prototype.recursivelyAddSeenFields = function(fieldName, dataRow, fieldsSeen) {
-  var seen = fieldsSeen[fieldName] = {};
-  var row = dataRow[fieldName];
-  for (var i in row) {
-    if (goog.typeOf(row[i]) == 'object')
-      this.recursivelyAddSeenFields(i, row, seen);
-    else
-      seen[i] = true;
-  }
-};
-
-
-/**
  * Processes the data to get this.largestSeenRowLength_ and this.objectFieldsSeen_.
  * @param {IArrayLike} val - Data value.
  * @private
@@ -221,11 +195,7 @@ anychart.data.Set.prototype.processData_ = function(val) {
       dataRow = {};
       for (var j in row) {
         dataRow[j] = row[j];
-        if (goog.typeOf(row[j]) == 'object') {
-          this.recursivelyAddSeenFields(j, row, this.objectFieldsSeen_);
-        } else {
-          this.objectFieldsSeen_[j] = true;
-        }
+        this.objectFieldsSeen_[j] = true;
       }
     } else {
       this.simpleValuesSeen_ = true;
@@ -433,20 +403,7 @@ anychart.data.Set.prototype.getMappings = function() {
 anychart.data.Set.prototype.checkFieldExist = function(nameOrColumn) {
   if (goog.isNumber(nameOrColumn))
     return this.largestSeenRowLength_ > nameOrColumn;
-  if (!this.objectFieldsSeen_)
-    return false;
-  var rv = this.objectFieldsSeen_;
-  var path = nameOrColumn.split('.');
-  var seen = true;
-  for (var i = 0; i < path.length; i++) {
-    if (goog.isDef(rv[path[i]]))
-      rv = rv[path[i]];
-    else {
-      seen = false;
-      break;
-    }
-  }
-  return seen;
+  return !!(this.objectFieldsSeen_ && this.objectFieldsSeen_[nameOrColumn.split('.')[0]]);
 };
 
 
@@ -479,15 +436,11 @@ anychart.data.Set.prototype.populateObjWithKnownFields = function(result, result
 /**
  * Set field as seen. (Recursively in case of complex object)
  * @param {string} fieldName Field name.
- * @param {!Object} dataRow Data row.
  */
-anychart.data.Set.prototype.addSeenField = function(fieldName, dataRow) {
+anychart.data.Set.prototype.addSeenField = function(fieldName) {
   if (!this.objectFieldsSeen_)
     this.objectFieldsSeen_ = {};
-  if (goog.typeOf(dataRow[fieldName]) == 'object')
-    this.recursivelyAddSeenFields(fieldName, dataRow, this.objectFieldsSeen_);
-  else
-    this.objectFieldsSeen_[fieldName] = true;
+  this.objectFieldsSeen_[fieldName] = true;
 };
 
 
