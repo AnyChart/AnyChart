@@ -4487,9 +4487,7 @@ anychart.pieModule.Chart.prototype.applyAppearanceToPoint = function(pointState,
     this.drawSlice_(pointState, true);
   }
 
-  if (!this.isOutsideLabels()) {
-    this.drawLabel_(pointState);
-  }
+  this.drawLabel_(pointState);
 
   return opt_value || (currentPointExplode != this.getExplode(pointState));
 };
