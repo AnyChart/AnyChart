@@ -231,7 +231,7 @@ fi
 if [ ${IS_RELEASE_BUILD} = "true" ]; then
     echo Create latest version
     ssh -i ~/.ssh/id_rsa  $STATIC_HOST_SSH_STRING "
-    rm -rf /apps/static/cdn/releases/${MAJOR_VERSION}.x.x &&
+    rm -rf /apps/static/cdn/releases/v${MAJOR_VERSION} &&
     cp -r /apps/static/cdn/releases/${VERSION} /apps/static/cdn/releases/v${MAJOR_VERSION}"
 fi
 # ---- Create latest version (release builds only) ---------------------------------------------------------------------
