@@ -8,7 +8,7 @@ IS_RC_BUILD=false
 IS_PREVIEW_BUILD=false
 IS_DEV_BUILD=false
 
-if [ ${IS_RELEASE_BUILD} = "true" ]; then
+if [ "${TRAVIS_BRANCH}" = "master" ]; then
     VERSION=${BUILD_VERSION}
     IS_RELEASE_BUILD=true
 elif [ "${TRAVIS_BRANCH}" = "develop" ]; then
@@ -32,6 +32,11 @@ INSTALL_PACKAGE_NAME=anychart-installation-package-${VERSION}.zip
 echo Version: ${VERSION}
 echo Branch: ${TRAVIS_BRANCH}
 echo Commit Hash: ${COMMIT_HASH}
+
+echo Is release build: ${IS_RELEASE_BUILD}
+echo Is RC build: ${IS_RC_BUILD}
+echo Is dev preview build: ${IS_PREVIEW_BUILD}
+echo Is develop build: ${IS_DEV_BUILD}
 # ---- Variables (for all builds) --------------------------------------------------------------------------------------
 
 
