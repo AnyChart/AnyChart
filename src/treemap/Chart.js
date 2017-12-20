@@ -242,7 +242,7 @@ anychart.treemapModule.Chart.prototype.isSizeBased = function() {
 
 
 /** @inheritDoc */
-anychart.treemapModule.Chart.prototype.applyAppearanceToPoint = function(pointState) {
+anychart.treemapModule.Chart.prototype.applyAppearanceToPoint = function(pointState, opt_value) {
   var node = /** @type {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} */ (this.getIterator().getItem());
   var missing = !goog.isDef(node) || node.meta(anychart.treemapModule.Chart.DataFields.MISSING);
   if (missing)
@@ -263,6 +263,8 @@ anychart.treemapModule.Chart.prototype.applyAppearanceToPoint = function(pointSt
   }
   this.drawLabel_(pointState);
   this.drawMarker_(pointState);
+
+  return opt_value;
 };
 
 
@@ -272,6 +274,10 @@ anychart.treemapModule.Chart.prototype.applyAppearanceToSeries = goog.nullFuncti
 
 /** @inheritDoc */
 anychart.treemapModule.Chart.prototype.finalizePointAppearance = goog.nullFunction;
+
+
+/** @inheritDoc */
+anychart.treemapModule.Chart.prototype.getStartValueForAppearanceReduction = goog.nullFunction;
 
 
 /** @inheritDoc */
@@ -1897,8 +1903,14 @@ anychart.treemapModule.Chart.prototype.drawLabel_ = function(pointState) {
 
     if (label) {
       if (displayMode != anychart.enums.LabelsDisplayMode.ALWAYS_SHOW) {
+        label['width'](pointBounds.width);
+        label['height'](pointBounds.height);
         label['clip'](pointBounds);
       } else {
+        if (!isHeader) {
+          label['width'](null);
+          label['height'](null);
+        }
         label['clip'](null);
       }
 

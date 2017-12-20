@@ -41,6 +41,18 @@ anychart.core.utils.Interactivity = function(parent) {
    * @private
    */
   this.spotRadius_;
+
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this.unselectOnClickOutOfPoint_;
+
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this.multiSelectOnClick_;
 };
 goog.inherits(anychart.core.utils.Interactivity, anychart.core.Base);
 
@@ -50,6 +62,40 @@ goog.inherits(anychart.core.utils.Interactivity, anychart.core.Base);
  * @type {number}
  */
 anychart.core.utils.Interactivity.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS_REAPPLICATION;
+
+
+/**
+ *
+ * @param {boolean=} opt_value .
+ * @return {anychart.core.utils.Interactivity|boolean}
+ */
+anychart.core.utils.Interactivity.prototype.multiSelectOnClick = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = !!opt_value;
+    if (opt_value != this.multiSelectOnClick_) {
+      this.multiSelectOnClick_ = opt_value;
+    }
+    return this;
+  }
+  return /** @type {boolean} */(this.multiSelectOnClick_);
+};
+
+
+/**
+ *
+ * @param {boolean=} opt_value .
+ * @return {anychart.core.utils.Interactivity|boolean}
+ */
+anychart.core.utils.Interactivity.prototype.unselectOnClickOutOfPoint = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = !!opt_value;
+    if (opt_value != this.unselectOnClickOutOfPoint_) {
+      this.unselectOnClickOutOfPoint_ = opt_value;
+    }
+    return this;
+  }
+  return /** @type {boolean} */(this.unselectOnClickOutOfPoint_);
+};
 
 
 /**
@@ -129,6 +175,8 @@ anychart.core.utils.Interactivity.prototype.setupByJSON = function(value, opt_de
   this.selectionMode(value['selectionMode']);
   this.spotRadius(value['spotRadius']);
   this.allowMultiSeriesSelection(value['allowMultiSeriesSelection']);
+  this.multiSelectOnClick(value['multiSelectOnClick']);
+  this.unselectOnClickOutOfPoint(value['unselectOnClickOutOfPoint']);
   this.parent_.resumeSignalsDispatching(true);
 };
 
@@ -143,6 +191,8 @@ anychart.core.utils.Interactivity.prototype.serialize = function() {
   json['selectionMode'] = this.selectionMode();
   json['spotRadius'] = this.spotRadius();
   json['allowMultiSeriesSelection'] = this.allowMultiSeriesSelection();
+  json['multiSelectOnClick'] = this.multiSelectOnClick();
+  json['unselectOnClickOutOfPoint'] = this.unselectOnClickOutOfPoint();
   return json;
 };
 
@@ -151,6 +201,8 @@ anychart.core.utils.Interactivity.prototype.serialize = function() {
 (function() {
   var proto = anychart.core.utils.Interactivity.prototype;
   //proto['allowMultiSeriesSelection'] = proto.allowMultiSeriesSelection;
+  proto['multiSelectOnClick'] = proto.multiSelectOnClick;
+  proto['unselectOnClickOutOfPoint'] = proto.unselectOnClickOutOfPoint;
   proto['hoverMode'] = proto.hoverMode;
   proto['selectionMode'] = proto.selectionMode;
   proto['spotRadius'] = proto.spotRadius;

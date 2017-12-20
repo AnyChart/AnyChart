@@ -342,6 +342,17 @@ anychart.scales.Base.prototype.stackDirection = function(opt_value) {
 anychart.scales.Base.prototype.getType = goog.abstractMethod;
 
 
+/**
+ * Rounds to ticks precision if available.
+ * @param {*} value
+ * @param {number=} opt_addPrec
+ * @return {number}
+ */
+anychart.scales.Base.prototype.roundToTicksPrecision = function(value, opt_addPrec) {
+  return Number(value);
+};
+
+
 /** @inheritDoc */
 anychart.scales.Base.prototype.serialize = function() {
   var json = anychart.scales.Base.base(this, 'serialize');

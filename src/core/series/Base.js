@@ -3629,7 +3629,7 @@ anychart.core.series.Base.prototype.makeComparisonMeta = function(rowInfo, yName
     var name = yNames[i];
     var comparison = yScale.getFullComparison(rowInfo.getColumn(yColumns[i]), this.comparisonZero);
     rowInfo.meta(name + 'Change', comparison.change);
-    rowInfo.meta(name + 'PercentChange', comparison.percent);
+    rowInfo.meta(name + 'PercentChange', anychart.math.round(Number(comparison.percent), 2));
     rowInfo.meta(name + 'RatioChange', Number(comparison.percent) / 100);
   }
   return pointMissing;

@@ -714,6 +714,9 @@ anychart.mapModule.Chart.prototype.controlsInteractivity_ = function() {
     }, false, this);
 
     this.isPreventDefault = goog.bind(function(e) {
+      if (!this.container())
+        return false;
+
       var containerPosition = this.container().getStage().getClientPosition();
       var be = e.getBrowserEvent ? e.getBrowserEvent() : e;
 
@@ -792,6 +795,9 @@ anychart.mapModule.Chart.prototype.controlsInteractivity_ = function() {
 
 
     this.mapClickHandler_ = function(e) {
+      if (!this.container() || !this.container().getStage())
+        return;
+
       var containerPosition = this.container().getStage().getClientPosition();
       var bounds = this.getPixelBounds();
 

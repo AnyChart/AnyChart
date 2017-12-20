@@ -1,3 +1,4 @@
+//region --- Requiring and Providing
 goog.provide('anychart.pieModule.Chart');
 
 goog.require('anychart.animations.AnimationSerialQueue');
@@ -10,7 +11,7 @@ goog.require('anychart.core.settings');
 goog.require('anychart.core.ui.CircularLabelsFactory');
 goog.require('anychart.core.ui.Tooltip');
 goog.require('anychart.core.utils.IInteractiveSeries');
-goog.require('anychart.core.utils.PieInteractivityState');
+goog.require('anychart.core.utils.InteractivityState');
 goog.require('anychart.core.utils.TypedLayer');
 goog.require('anychart.data.Set');
 goog.require('anychart.enums');
@@ -18,10 +19,12 @@ goog.require('anychart.format.Context');
 goog.require('anychart.math');
 goog.require('anychart.palettes');
 goog.require('anychart.pieModule.Animation');
+goog.require('anychart.pieModule.Center');
 goog.require('anychart.pieModule.DataView');
 goog.require('anychart.pieModule.LabelAnimation');
 goog.require('anychart.pieModule.Point');
 goog.require('goog.labs.userAgent.device');
+//endregion;
 
 
 
@@ -128,7 +131,7 @@ anychart.pieModule.Chart = function(opt_data, opt_csvSettings) {
    * Interactivity state.
    * @type {anychart.core.utils.InteractivityState}
    */
-  this.state = new anychart.core.utils.PieInteractivityState(this);
+  this.state = new anychart.core.utils.InteractivityState(this);
 
   this.data(opt_data || null, opt_csvSettings);
 
@@ -146,13 +149,7 @@ anychart.pieModule.Chart = function(opt_data, opt_csvSettings) {
     ['innerRadius', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW],
     ['startAngle', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.PIE_LABELS,
       anychart.Signal.NEEDS_REDRAW],
-    ['explode',
-      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.PIE_LABELS,
-      anychart.Signal.NEEDS_REDRAW],
     ['sort', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW, 0, sortBeforeInvalidation],
-    ['outsideLabelsSpace',
-      anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.PIE_LABELS,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
     ['insideLabelsOffset',
       anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.PIE_LABELS,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
@@ -167,6 +164,9 @@ anychart.pieModule.Chart = function(opt_data, opt_csvSettings) {
 
   var normalDescriptorsMeta = {};
   anychart.core.settings.createDescriptorsMeta(normalDescriptorsMeta, [
+    ['explode',
+      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.PIE_LABELS,
+      anychart.Signal.NEEDS_REDRAW],
     ['fill',
       anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.CHART_LEGEND,
       anychart.Signal.NEEDS_REDRAW],
@@ -176,7 +176,8 @@ anychart.pieModule.Chart = function(opt_data, opt_csvSettings) {
     ['hatchFill',
       anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.CHART_LEGEND,
       anychart.Signal.NEEDS_REDRAW],
-    ['labels', 0, 0]
+    ['labels', 0, 0],
+    ['outline', 0, 0]
   ]);
   function pieFillNormalizer(args) {
     var isAqua = false;
@@ -201,67 +202,45 @@ anychart.pieModule.Chart = function(opt_data, opt_csvSettings) {
     factory.setParentEventTarget(this);
     this.invalidate(anychart.ConsistencyState.PIE_LABELS, anychart.Signal.NEEDS_REDRAW);
   });
+  this.normal_.setOption(anychart.core.StateSettings.OUTLINE_AFTER_INIT_CALLBACK, /** @this {anychart.pieModule.Chart} */ function(instance) {
+    instance.listenSignals(this.outlineInvalidated_, this);
+    this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+  });
 
   var hoveredDescriptorsMeta = {};
   anychart.core.settings.createDescriptorsMeta(hoveredDescriptorsMeta, [
+    ['explode', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.PIE_LABELS,
+      anychart.Signal.NEEDS_REDRAW],
     ['fill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
     ['stroke', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
     ['hatchFill', 0, 0],
-    ['labels', 0, 0]
+    ['labels', 0, 0],
+    ['outline', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW]
   ]);
   this.hovered_ = new anychart.core.StateSettings(this, hoveredDescriptorsMeta, anychart.PointState.HOVER);
   this.hovered_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.CIRCULAR_LABELS_CONSTRUCTOR);
 
+  var selectedDescriptorsMeta = {};
+  anychart.core.settings.createDescriptorsMeta(selectedDescriptorsMeta, [
+    ['explode', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.PIE_LABELS,
+      anychart.Signal.NEEDS_REDRAW],
+    ['fill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['stroke', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['hatchFill', 0, 0],
+    ['labels', 0, 0],
+    ['outline', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW]
+  ]);
+  this.selected_ = new anychart.core.StateSettings(this, selectedDescriptorsMeta, anychart.PointState.SELECT);
+  this.selected_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.CIRCULAR_LABELS_CONSTRUCTOR);
+
   this.resumeSignalsDispatching(false);
 };
 goog.inherits(anychart.pieModule.Chart, anychart.core.SeparateChart);
-anychart.core.settings.populateAliases(anychart.pieModule.Chart, ['fill', 'stroke', 'hatchFill'], 'normal');
+anychart.core.settings.populateAliases(anychart.pieModule.Chart, ['fill', 'stroke', 'hatchFill', 'outline'], 'normal');
+anychart.core.settings.populateAliases(anychart.pieModule.Chart, ['explode'], 'selected');
 
 
-/**
- * Normal state settings.
- * @param {!Object=} opt_value
- * @return {anychart.core.StateSettings|anychart.pieModule.Chart}
- */
-anychart.pieModule.Chart.prototype.normal = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.normal_.setup(opt_value);
-    return this;
-  }
-  return this.normal_;
-};
-
-
-/**
- * Hovered state settings.
- * @param {!Object=} opt_value
- * @return {anychart.core.StateSettings|anychart.pieModule.Chart}
- */
-anychart.pieModule.Chart.prototype.hovered = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.hovered_.setup(opt_value);
-    return this;
-  }
-  return this.hovered_;
-};
-
-
-/**
- * Link to incoming raw data.
- * Used to avoid data reapplication on same data sets.
- * NOTE: If is disposable entity, should be disposed from the source, not from this class.
- * @type {?(anychart.data.View|anychart.data.Set|Array|string)}
- * @private
- */
-anychart.pieModule.Chart.prototype.rawData_;
-
-
-/** @inheritDoc */
-anychart.pieModule.Chart.prototype.getType = function() {
-  return /** @type {boolean} */ (this.getOption('mode3d')) ? anychart.enums.ChartTypes.PIE_3D : anychart.enums.ChartTypes.PIE;
-};
-
-
+//region --- Static props
 /**
  * @typedef {{
  *   index: number,
@@ -279,6 +258,13 @@ anychart.pieModule.Chart.prototype.getType = function() {
  * }}
  */
 anychart.pieModule.Chart.Side3D;
+
+
+/**
+ * Default hatch fill type.
+ * @type {acgraph.vector.HatchFill.HatchFillType|string}
+ */
+anychart.pieModule.Chart.DEFAULT_HATCH_FILL_TYPE = 'none';
 
 
 /**
@@ -321,6 +307,20 @@ anychart.pieModule.Chart.ZINDEX_HATCH_FILL = 31;
  * @type {number}
  */
 anychart.pieModule.Chart.ZINDEX_LABEL = 32;
+
+
+/**
+ * Center content bg z-index in root layer.
+ * @type {number}
+ */
+anychart.pieModule.Chart.ZINDEX_CENTER_CONTENT_BG = 20;
+
+
+/**
+ * Center content layer z-index in root layer.
+ * @type {number}
+ */
+anychart.pieModule.Chart.ZINDEX_CENTER_CONTENT_LAYER = 25;
 
 
 /**
@@ -388,64 +388,115 @@ anychart.pieModule.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.SeparateChart.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.APPEARANCE |
     anychart.ConsistencyState.PIE_LABELS |
+    anychart.ConsistencyState.PIE_CENTER_CONTENT |
     anychart.ConsistencyState.PIE_DATA;
 
 
 /**
- * Default hatch fill type.
- * @type {acgraph.vector.HatchFill.HatchFillType|string}
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.pieModule.Chart.DEFAULT_HATCH_FILL_TYPE = 'none';
-
-
-/** @inheritDoc */
-anychart.pieModule.Chart.prototype.doAnimation = function() {
-  if (!this.getOption('mode3d') && this.animation().enabled() && this.animation().duration() > 0) {
-    if (this.animationQueue_ && this.animationQueue_.isPlaying()) {
-      this.animationQueue_.update();
-    } else if (this.hasInvalidationState(anychart.ConsistencyState.CHART_ANIMATION)) {
-      goog.dispose(this.animationQueue_);
-      this.animationQueue_ = new anychart.animations.AnimationSerialQueue();
-      var duration = /** @type {number} */(this.animation().duration());
-      var pieDuration = duration * anychart.pieModule.Chart.PIE_ANIMATION_DURATION_RATIO;
-      var pieLabelDuration = duration * (1 - anychart.pieModule.Chart.PIE_ANIMATION_DURATION_RATIO);
-
-      var pieAnimation = new anychart.pieModule.Animation(this, pieDuration);
-      var pieLabelAnimation = new anychart.pieModule.LabelAnimation(this, pieLabelDuration);
-
-      this.animationQueue_.add(/** @type {goog.fx.TransitionBase} */ (pieAnimation));
-      this.animationQueue_.add(/** @type {goog.fx.TransitionBase} */ (pieLabelAnimation));
-
-      this.animationQueue_.listen(goog.fx.Transition.EventType.BEGIN, function() {
-        this.connStrokeBackup_ = this.getOption('connectorStroke');
-        this.setOption('connectorStroke', 'none');
-        this.ignoreMouseEvents(true);
-        this.dispatchDetachedEvent({
-          'type': anychart.enums.EventType.ANIMATION_START,
-          'chart': this
-        });
-      }, false, this);
-
-      this.animationQueue_.listen(goog.fx.Transition.EventType.END, function() {
-        this.setOption('connectorStroke', this.connStrokeBackup_);
-        this.ignoreMouseEvents(false);
-        this.dispatchDetachedEvent({
-          'type': anychart.enums.EventType.ANIMATION_END,
-          'chart': this
-        });
-      }, false, this);
-
-      this.animationQueue_.play(false);
-    }
+anychart.pieModule.Chart.PROPERTY_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'overlapMode',
+      anychart.enums.normalizeLabelsOverlapMode);
+  function radiusNormalizer(opt_value) {
+    return anychart.utils.normalizeNumberOrPercent(opt_value, '100%');
   }
-};
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'radius',
+      radiusNormalizer);
+  function innerRadiusNormalizer(opt_value) {
+    return goog.isFunction(opt_value) ? opt_value : anychart.utils.normalizeNumberOrPercent(opt_value);
+  }
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'innerRadius',
+      innerRadiusNormalizer);
+  function startAngleNormalizer(opt_value) {
+    return goog.math.standardAngle(anychart.utils.toNumber(opt_value) || 0);
+  }
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'startAngle',
+      startAngleNormalizer);
+  // function explodeNormalizer(opt_value) {
+  //   return anychart.utils.normalizeNumberOrPercent(opt_value, 15);
+  // }
+  // anychart.core.settings.createDescriptor(
+  //     map,
+  //     anychart.enums.PropertyHandlerType.SINGLE_ARG,
+  //     '',
+  //     explodeNormalizer,
+  //     'explode');
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'sort',
+      anychart.enums.normalizeSort);
+  function outsideLabelsSpaceNormalizer(opt_value) {
+    return anychart.utils.normalizeNumberOrPercent(opt_value, '30%');
+  }
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG_DEPRECATED,
+      '',
+      outsideLabelsSpaceNormalizer,
+      'outsideLabelsSpace');
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'insideLabelsOffset',
+      anychart.utils.normalizeNumberOrPercent);
+  function connectorLengthNormalizer(opt_value) {
+    return anychart.utils.normalizeNumberOrPercent(opt_value, '20%');
+  }
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'connectorLength',
+      connectorLengthNormalizer);
+  function criticalAngleNormalizer(opt_value) {
+    return goog.math.standardAngle(anychart.utils.normalizeSize(opt_value));
+  }
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'outsideLabelsCriticalAngle',
+      criticalAngleNormalizer);
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'forceHoverLabels',
+      anychart.core.settings.asIsNormalizer);
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
+      'connectorStroke',
+      anychart.core.settings.strokeNormalizer);
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'mode3d',
+      anychart.core.settings.booleanNormalizer);
+
+  return map;
+})();
+anychart.core.settings.populate(anychart.pieModule.Chart, anychart.pieModule.Chart.PROPERTY_DESCRIPTORS);
 
 
-/**
- * @inheritDoc
- */
-anychart.pieModule.Chart.prototype.getAllSeries = function() {
-  return [this];
+//endregion
+//region --- Interface methods
+/** @inheritDoc */
+anychart.pieModule.Chart.prototype.getType = function() {
+  return /** @type {boolean} */ (this.getOption('mode3d')) ? anychart.enums.ChartTypes.PIE_3D : anychart.enums.ChartTypes.PIE;
 };
 
 
@@ -473,6 +524,26 @@ anychart.pieModule.Chart.prototype.isSizeBased = function() {
 anychart.pieModule.Chart.prototype.isSeries = function() {
   return true;
 };
+
+
+/**
+ * @inheritDoc
+ */
+anychart.pieModule.Chart.prototype.getAllSeries = function() {
+  return [this];
+};
+
+
+//endregion
+//region --- Data
+/**
+ * Link to incoming raw data.
+ * Used to avoid data reapplication on same data sets.
+ * NOTE: If is disposable entity, should be disposed from the source, not from this class.
+ * @type {?(anychart.data.View|anychart.data.Set|Array|string)}
+ * @private
+ */
+anychart.pieModule.Chart.prototype.rawData_;
 
 
 /**
@@ -519,6 +590,28 @@ anychart.pieModule.Chart.prototype.data = function(opt_value, opt_csvSettings) {
     return this;
   }
   return this.view_;
+};
+
+
+/**
+ * Internal data invalidation handler.
+ * @param {anychart.SignalEvent} event Event object.
+ * @private
+ */
+anychart.pieModule.Chart.prototype.dataInvalidated_ = function(event) {
+  if (event.hasSignal(anychart.Signal.DATA_CHANGED)) {
+    this.invalidate(
+        anychart.ConsistencyState.PIE_LABELS |
+        anychart.ConsistencyState.APPEARANCE |
+        anychart.ConsistencyState.CHART_LEGEND |
+        anychart.ConsistencyState.A11Y |
+        anychart.ConsistencyState.PIE_DATA |
+        anychart.ConsistencyState.CHART_LABELS,
+        anychart.Signal.NEEDS_REDRAW |
+        anychart.Signal.DATA_CHANGED
+    );
+
+  }
 };
 
 
@@ -609,6 +702,29 @@ anychart.pieModule.Chart.prototype.prepareData_ = function(data) {
 
 
 /**
+ * Getter/setter for grouping.
+ * @param {(string|null|function(*):boolean)=} opt_value Filter function or disablt value (null, 'none').
+ * @return {(anychart.pieModule.Chart|function(*):boolean|null)} Current grouping function or self for method chaining.
+ */
+anychart.pieModule.Chart.prototype.group = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (goog.isFunction(opt_value) && opt_value != this.groupedPointFilter_) {
+      this.groupedPointFilter_ = opt_value;
+      this.redefineView_();
+    } else if (anychart.utils.isNone(opt_value)) {
+      this.groupedPointFilter_ = null;
+      this.redefineView_();
+    }
+    return this;
+  } else {
+    return this.groupedPointFilter_;
+  }
+};
+
+
+//endregion
+//region --- Palette
+/**
  * Getter/setter for palette.
  * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|Object|Array.<string>)=} opt_value .
  * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|anychart.pieModule.Chart)} .
@@ -681,11 +797,20 @@ anychart.pieModule.Chart.prototype.hatchFillPalette = function(opt_value) {
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Fill.
-//
-//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Internal palette invalidation handler.
+ * @param {anychart.SignalEvent} event Event object.
+ * @private
+ */
+anychart.pieModule.Chart.prototype.paletteInvalidated_ = function(event) {
+  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
+    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
+  }
+};
+
+
+//endregion
+//region --- Coloring
 /**
  * Cache of resolver functions.
  * @type {Object.<string, Function>}
@@ -736,10 +861,11 @@ anychart.pieModule.Chart.getColorResolver = function(colorName, colorType, canBe
  * @param {anychart.pieModule.Chart} pie
  * @param {number} state
  * @param {boolean=} opt_ignorePointSettings
+ * @param {(acgraph.vector.Fill|Function)=} opt_baseColor State where target will be get base color.
  * @return {*}
  * @private
  */
-anychart.pieModule.Chart.getColor_ = function(colorName, normalizer, isHatchFill, canBeHoveredSelected, pie, state, opt_ignorePointSettings) {
+anychart.pieModule.Chart.getColor_ = function(colorName, normalizer, isHatchFill, canBeHoveredSelected, pie, state, opt_ignorePointSettings, opt_baseColor) {
   var stateColor, context;
   //state = anychart.core.utils.InteractivityState.clarifyState(state);
   if (state != anychart.PointState.NORMAL && canBeHoveredSelected) {
@@ -757,13 +883,15 @@ anychart.pieModule.Chart.getColor_ = function(colorName, normalizer, isHatchFill
   }
   // we can get here only if state color is undefined or is a function
   var color = pie.resolveOption(colorName, 0, pie.getIterator(), normalizer, false, void 0, opt_ignorePointSettings);
+  var baseColor = goog.isDef(opt_baseColor) ? opt_baseColor : color;
+
   var isAqua = goog.isString(color) && color == 'aquastyle';
   if (isHatchFill && color === true)
     color = normalizer(pie.getAutoHatchFill());
   if (goog.isFunction(color)) {
     context = isHatchFill ?
         pie.getHatchFillResolutionContext(opt_ignorePointSettings) :
-        pie.getColorResolutionContext(void 0, opt_ignorePointSettings);
+        pie.getColorResolutionContext(/** @type {acgraph.vector.Fill|acgraph.vector.Stroke} */(baseColor), opt_ignorePointSettings);
     color = /** @type {acgraph.vector.Fill|acgraph.vector.Stroke|acgraph.vector.PatternFill} */(normalizer(color.call(context, context)));
   }
   if (isAqua) {
@@ -783,15 +911,23 @@ anychart.pieModule.Chart.getColor_ = function(colorName, normalizer, isHatchFill
 anychart.pieModule.Chart.prototype.resolveOption = function(name, state, point, normalizer, scrollerSelected, opt_seriesName, opt_ignorePointSettings) {
   var val;
   var hasHoverState = !!(state & anychart.PointState.HOVER);
-  var stateObject = hasHoverState ? this.hovered_ : this.normal_;
-  var stateValue = stateObject.getOption(name);
+  var hasSelectState = !!(state & anychart.PointState.SELECT);
+
+  var stateObject = hasSelectState ? this.selected_ : hasHoverState ? this.hovered_ : this.normal_;
+  var path = name.split('.');
+  var stateValue = goog.array.reduce(path, function(rval, val) {return rval[val]();}, stateObject);
+
   if (opt_ignorePointSettings) {
     val = stateValue;
   } else {
-    var pointStateName = hasHoverState ? 'hovered' : 'normal';
+    var pointStateName = hasSelectState ? 'selected' : hasHoverState ? 'hovered' : 'normal';
     var pointStateObject = point.get(pointStateName);
+    var pointStateValue = goog.isDef(pointStateObject) ?
+        goog.array.reduce(path, function(rval, val) {return rval ? rval[val] : rval;}, pointStateObject) :
+        void 0;
+
     val = anychart.utils.getFirstDefinedValue(
-        goog.isDef(pointStateObject) ? pointStateObject[name] : void 0,
+        pointStateValue,
         point.get(anychart.color.getPrefixedColorName(state, name)),
         stateValue);
   }
@@ -824,10 +960,17 @@ anychart.pieModule.Chart.prototype.getHatchFillResolutionContext = function(opt_
 /** @inheritDoc */
 anychart.pieModule.Chart.prototype.getColorResolutionContext = function(opt_baseColor, opt_ignorePointSettings, opt_ignoreColorScale) {
   var iterator = this.getIterator();
+  var pointFill;
+  if (!opt_ignorePointSettings) {
+    pointFill = iterator.get('fill');
+  }
   return {
     'index': iterator.getIndex(),
-    'sourceColor': opt_baseColor || this.palette().itemAt(iterator.getIndex()) || 'blue',
-    'iterator': iterator
+    'sourceColor': acgraph.vector.normalizeFill(/** @type {!acgraph.vector.Fill} */(
+        opt_baseColor || pointFill || this.palette().itemAt(iterator.getIndex()) || 'blue')),
+    'iterator': iterator,
+    'series': this,
+    'chart': this
   };
 };
 
@@ -843,366 +986,6 @@ anychart.pieModule.Chart.prototype.resolveAquaStyle = function() {
     'sourceColor': this.palette().itemAt(iterator.getIndex())
   };
   return this.aquaStyleFill_.call(context);
-};
-
-
-/**
- * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
- */
-anychart.pieModule.Chart.PROPERTY_DESCRIPTORS = (function() {
-  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
-  var map = {};
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'overlapMode',
-      anychart.enums.normalizeLabelsOverlapMode);
-  function radiusNormalizer(opt_value) {
-    return anychart.utils.normalizeNumberOrPercent(opt_value, '100%');
-  }
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'radius',
-      radiusNormalizer);
-  function innerRadiusNormalizer(opt_value) {
-    return goog.isFunction(opt_value) ? opt_value : anychart.utils.normalizeNumberOrPercent(opt_value);
-  }
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'innerRadius',
-      innerRadiusNormalizer);
-  function startAngleNormalizer(opt_value) {
-    return goog.math.standardAngle(anychart.utils.toNumber(opt_value) || 0);
-  }
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'startAngle',
-      startAngleNormalizer);
-  function explodeNormalizer(opt_value) {
-    return anychart.utils.normalizeNumberOrPercent(opt_value, 15);
-  }
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'explode',
-      explodeNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'sort',
-      anychart.enums.normalizeSort);
-  function outsideLabelsSpaceNormalizer(opt_value) {
-    return anychart.utils.normalizeNumberOrPercent(opt_value, '30%');
-  }
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG_DEPRECATED,
-      '',
-      outsideLabelsSpaceNormalizer,
-      'outsideLabelsSpace');
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'insideLabelsOffset',
-      anychart.utils.normalizeNumberOrPercent);
-  function connectorLengthNormalizer(opt_value) {
-    return anychart.utils.normalizeNumberOrPercent(opt_value, '20%');
-  }
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'connectorLength',
-      connectorLengthNormalizer);
-  function criticalAngleNormalizer(opt_value) {
-    return goog.math.standardAngle(anychart.utils.normalizeSize(opt_value));
-  }
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'outsideLabelsCriticalAngle',
-      criticalAngleNormalizer);
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'forceHoverLabels',
-      anychart.core.settings.asIsNormalizer);
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'connectorStroke',
-      anychart.core.settings.strokeNormalizer);
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'mode3d',
-      anychart.core.settings.booleanNormalizer);
-
-  return map;
-})();
-anychart.core.settings.populate(anychart.pieModule.Chart, anychart.pieModule.Chart.PROPERTY_DESCRIPTORS);
-
-
-/**
- * Getter/setter for labels.
- * @param {(Object|boolean|null)=} opt_value .
- * @return {anychart.core.ui.CircularLabelsFactory|anychart.pieModule.Chart} .
- */
-anychart.pieModule.Chart.prototype.labels = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.normal_.labels(opt_value);
-    return this;
-  }
-  return /** @type {anychart.core.ui.CircularLabelsFactory} */ (this.normal_.labels());
-};
-
-
-/**
- * Getter/setter for grouping.
- * @param {(string|null|function(*):boolean)=} opt_value Filter function or disablt value (null, 'none').
- * @return {(anychart.pieModule.Chart|function(*):boolean|null)} Current grouping function or self for method chaining.
- */
-anychart.pieModule.Chart.prototype.group = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (goog.isFunction(opt_value) && opt_value != this.groupedPointFilter_) {
-      this.groupedPointFilter_ = opt_value;
-      this.redefineView_();
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.groupedPointFilter_ = null;
-      this.redefineView_();
-    }
-    return this;
-  } else {
-    return this.groupedPointFilter_;
-  }
-};
-
-
-/**
- * Getter for the pie chart center point.<br/>
- * <b>Note:</b> Works only after {@link anychart.pieModule.Chart#draw} is called.
- * @example
- *  var pieInnerRadius = 40
- *  var pie = anychart.pie([10, 14, 8, 12])
- *      .container(stage)
- *      .innerRadius(pieInnerRadius+10)
- *      .draw();
- *  var pieCenter = pie.getCenterPoint();
- *  var labelBounds = anychart.math.rect(
- *      pieCenter.x - pieInnerRadius,
- *      pieCenter.y - pieInnerRadius,
- *      pieCenter.x + pieInnerRadius,
- *      pieCenter.y + pieInnerRadius
- *  );
- *  anychart.standalones.label()
- *      .text('Pie\ninner\nlabel')
- *      .parentBounds(labelBounds)
- *      .container(stage)
- *      .hAlign('center')
- *      .vAlign('center')
- *      .adjustFontSize(true)
- *      .width(2*pieInnerRadius)
- *      .height(2*pieInnerRadius)
- *      .draw();
- * @return {anychart.math.Coordinate} XY coordinate of the current pie chart center.
- */
-anychart.pieModule.Chart.prototype.getCenterPoint = function() {
-  return {'x': this.cx_, 'y': this.cy_};
-};
-
-
-/**
- * Getter for the current pie pixel outer radius.<br/>
- * <b>Note:</b> Works only after {@link anychart.pieModule.Chart#draw} is called.
- * @return {number} Pixel value of the pie radius.
- */
-anychart.pieModule.Chart.prototype.getPixelRadius = function() {
-  return this.radiusValue_;
-};
-
-
-/**
- * Getter for the current pie pixel inner radius.<br/>
- * <b>Note:</b> Works only after {@link anychart.pieModule.Chart#draw} is called.
- * @return {number} XY coordinate of the pie center.
- */
-anychart.pieModule.Chart.prototype.getPixelInnerRadius = function() {
-  return this.innerRadiusValue_;
-};
-
-
-/**
- * Getter for the current explode value.
- * @return {number}
- */
-anychart.pieModule.Chart.prototype.getPixelExplode = function() {
-  return this.explodeValue_;
-};
-
-
-/**
- * Internal getter for fixed gauge start angle. All for human comfort.
- * @return {number}
- */
-anychart.pieModule.Chart.prototype.getStartAngle = function() {
-  return /** @type {number} */ (this.getOption('startAngle')) + anychart.pieModule.Chart.DEFAULT_START_ANGLE;
-};
-
-
-/**
- * Explodes slice at index.
- * @example
- * var chart = anychart.pie([10, 12, 14, 46]);
- * chart.explodeSlice(2);
- * chart.container(stage).draw();
- * @param {number} index Pie slice index that should be exploded or not.
- * @param {boolean=} opt_explode [true] Whether to explode.
- * @return {anychart.pieModule.Chart} .
- */
-anychart.pieModule.Chart.prototype.explodeSlice = function(index, opt_explode) {
-  var iterator = this.getIterator();
-  if (iterator.select(index) && !this.isMissing_(iterator.get('value'))) {
-    this.clickSlice(goog.isDef(opt_explode) ? !!opt_explode : true);
-  }
-  return this;
-};
-
-
-/**
- * Explodes all slices.
- * @example
- * var chart = anychart.pie([10, 12, 14, 46]);
- * chart.explodeSlices(true);
- * chart.container(stage).draw();
- * @param {boolean|Array.<number>} value Whether to explode.
- * @return {anychart.pieModule.Chart} .
- */
-anychart.pieModule.Chart.prototype.explodeSlices = function(value) {
-  var iterator = this.getIterator().reset();
-
-  if (goog.isArray(value)) {
-    for (var i = 0, len = value.length; i < len; i++) {
-      var index = value[i];
-      if (iterator.select(index) && !this.isMissing_(iterator.get('value'))) {
-        this.clickSlice(true);
-      }
-    }
-  } else {
-    while (iterator.advance()) {
-      if (iterator.select(iterator.getIndex()) && !this.isMissing_(iterator.get('value'))) {
-        this.clickSlice(/** @type {boolean} */(value));
-      }
-    }
-  }
-
-  return this;
-};
-
-
-/**
- * Calculating common values for a pie plot.
- * @param {anychart.math.Rect} bounds Bounds of the content area.
- * @private
- */
-anychart.pieModule.Chart.prototype.calculate_ = function(bounds) {
-  var minWidthHeight = Math.min(bounds.width, bounds.height);
-  this.explodeValue_ = anychart.utils.normalizeSize(/** @type {number|string} */ (this.getOption('explode')), minWidthHeight);
-  var isLabelsEnabled = this.normal_.labels().enabled() || this.hovered_.labels().enabled();
-  var clampPie = this.isOutsideLabels() && isLabelsEnabled ? this.explodeValue_ : 0;
-
-  this.piePlotBounds_ = anychart.math.rect(
-      bounds.left + clampPie,
-      bounds.top + clampPie,
-      bounds.width - 2 * clampPie,
-      bounds.height - 2 * clampPie);
-
-  minWidthHeight -= 2 * clampPie;
-
-  this.radiusValue_ = Math.max(anychart.utils.normalizeSize(/** @type {number|string} */ (this.getOption('radius')), minWidthHeight), 0);
-  this.connectorLengthValue_ = anychart.utils.normalizeSize(/** @type {number|string} */ (this.getOption('connectorLength')), this.radiusValue_);
-  this.originalRadiusValue_ = this.radiusValue_;
-  this.labelsRadiusOffset_ = 0;
-
-  //todo Don't remove it, it can be useful (blackart)
-  //  this.recommendedLabelWidth_ = parseInt(
-  //      (bounds.width
-  //          - 2 * this.radiusValue_
-  //          - 2 * this.connectorLengthValue_
-  //          - 2 * anychart.pieModule.Chart.OUTSIDE_LABELS_CONNECTOR_SIZE_)
-  //      / 2);
-
-  this.cx_ = this.piePlotBounds_.left + this.piePlotBounds_.width / 2;
-  this.cy_ = this.piePlotBounds_.top + this.piePlotBounds_.height / 2;
-
-  //Calculate aqua style relative bounds.
-  var ac6_angle = goog.math.toRadians(-145);
-  var ac6_focalPoint = .5;
-  var defFx = .5;
-  var defFy = .5;
-  var r = Math.min(bounds.width, bounds.height) / 2;
-  var fx = (ac6_focalPoint * r * Math.cos(ac6_angle) / bounds.width) + defFx;
-  var fy = (ac6_focalPoint * r * Math.sin(ac6_angle) / bounds.height) + defFy;
-
-  if (bounds.width < 0) bounds.width = 0;
-  if (bounds.height < 0) bounds.height = 0;
-
-  this.aquaStyleObj_['fx'] = !isNaN(fx) && isFinite(fx) ? fx : 0;
-  this.aquaStyleObj_['fy'] = !isNaN(fy) && isFinite(fy) ? fy : 0;
-  this.aquaStyleObj_['mode'] = bounds;
-
-  this.updateBounds();
-};
-
-
-/**
- * Update bounds.
- */
-anychart.pieModule.Chart.prototype.updateBounds = function() {
-  this.radiusValue_ = Math.max(this.radiusValue_ - this.labelsRadiusOffset_, 0);
-
-  var innerRadius = /** @type {Function|string|number} */ (this.getOption('innerRadius'));
-  this.innerRadiusValue_ = goog.isFunction(innerRadius) ?
-      innerRadius(this.radiusValue_) :
-      anychart.utils.normalizeSize(innerRadius, this.radiusValue_);
-
-  /**
-   * Bounds of pie. (Not bounds of content area).
-   * Need for radial gradient to set correct bounds.
-   * @type {anychart.math.Rect}
-   * @private
-   */
-  this.pieBounds_ = new anychart.math.Rect(
-      this.cx_ - this.radiusValue_,
-      this.cy_ - this.radiusValue_,
-      this.radiusValue_ * 2,
-      this.radiusValue_ * 2);
-
-  var labels = this.labels();
-  labels.suspendSignalsDispatching();
-  labels.cx(this.cx_);
-  labels.cy(this.cy_);
-  labels.parentRadius(this.radiusValue_);
-  labels.startAngle(/** @type {number} */ (this.getOption('startAngle')));
-  labels.sweepAngle(360);
-  labels.parentBounds(this.pieBounds_);
-  labels.resumeSignalsDispatching(false);
-
-  this.hovered().labels()
-      .parentBounds(this.pieBounds_);
-};
-
-
-/**
- * Identifies fill or stroke as radial gradient.
- * @param {(acgraph.vector.Fill|acgraph.vector.Stroke)} fillOrStroke Fill or stroke.
- * @return {boolean} is fill or stroke radial gradient.
- * @private
- */
-anychart.pieModule.Chart.prototype.isRadialGradientMode_ = function(fillOrStroke) {
-  return goog.isObject(fillOrStroke) && fillOrStroke.hasOwnProperty('mode') && fillOrStroke.hasOwnProperty('cx');
 };
 
 
@@ -1240,12 +1023,1069 @@ anychart.pieModule.Chart.prototype.normalizeColor = function(color, var_args) {
 
 
 /**
+ * Colorizes shape in accordance to current slice colorization settings.
+ * Shape is get from current meta 'shape'.
+ * @param {anychart.PointState|number} pointState Point state.
+ * @protected
+ */
+anychart.pieModule.Chart.prototype.colorizeSlice = function(pointState) {
+  if (this.getOption('mode3d')) {
+    this.colorize3DSlice_(pointState);
+
+  } else {
+    var iterator = this.getIterator();
+    var slice = /** @type {acgraph.vector.Path} */ (iterator.meta('slice'));
+    if (goog.isDef(slice)) {
+      var fillResolver = anychart.pieModule.Chart.getColorResolver('fill', anychart.enums.ColorType.FILL, true);
+      var fillColor = fillResolver(this, pointState, false, null);
+      if (this.isRadialGradientMode_(fillColor) && goog.isNull(fillColor.mode)) {
+        //fillColor = /** @type {!acgraph.vector.Fill} */(goog.object.clone(/** @type {Object} */(fillColor)));
+        fillColor.mode = this.pieBounds_ ? this.pieBounds_ : null;
+      }
+      slice.fill(fillColor);
+
+      var strokeResolver = anychart.pieModule.Chart.getColorResolver('stroke', anychart.enums.ColorType.STROKE, true);
+      var strokeColor = strokeResolver(this, pointState, false, null);
+      if (this.isRadialGradientMode_(strokeColor) && goog.isNull(strokeColor.mode)) {
+        strokeColor.mode = this.pieBounds_ ? this.pieBounds_ : null;
+      }
+      slice.stroke(strokeColor);
+
+
+      var sliceOutline = /** @type {acgraph.vector.Path} */ (this.getIterator().meta('sliceOutline'));
+      if (sliceOutline) {
+        var outlineEnabled = this.resolveOption('outline.enabled', pointState, iterator, anychart.core.settings.boolOrNullNormalizer, false);
+        if (goog.isNull(outlineEnabled))
+          outlineEnabled = this.resolveOption('outline.enabled', 0, iterator, anychart.core.settings.boolOrNullNormalizer, false);
+
+        if (outlineEnabled) {
+          fillResolver = anychart.pieModule.Chart.getColorResolver('outline.fill', anychart.enums.ColorType.FILL, true);
+          var fillColor_ = fillResolver(this, 0, false, fillColor);
+          fillColor = fillResolver(this, pointState, false, fillColor_);
+          if (this.isRadialGradientMode_(fillColor) && goog.isNull(fillColor.mode)) {
+            //fillColor = /** @type {!acgraph.vector.Fill} */(goog.object.clone(/** @type {Object} */(fillColor)));
+            fillColor.mode = this.pieBounds_ ? this.pieBounds_ : null;
+          }
+
+          strokeResolver = anychart.pieModule.Chart.getColorResolver('outline.stroke', anychart.enums.ColorType.STROKE, true);
+          strokeColor = strokeResolver(this, pointState, false, strokeColor);
+          if (this.isRadialGradientMode_(strokeColor) && goog.isNull(strokeColor.mode)) {
+            strokeColor.mode = this.pieBounds_ ? this.pieBounds_ : null;
+          }
+        } else {
+          fillColor = strokeColor = 'none';
+        }
+
+        sliceOutline
+            .fill(fillColor)
+            .stroke(strokeColor);
+      }
+
+      this.applyHatchFill(pointState);
+    }
+  }
+};
+
+
+/**
+ * Apply hatch fill to shape in accordance to current point colorization settings.
+ * Shape is get from current meta 'hatchFillShape'.
+ * @param {(anychart.PointState|number)} pointState Point state.
+ * @param {string=} opt_pathName
+ * @protected
+ */
+anychart.pieModule.Chart.prototype.applyHatchFill = function(pointState, opt_pathName) {
+  var hatchSlice = /** @type {acgraph.vector.Path} */(this.getIterator().meta(opt_pathName || 'hatchSlice'));
+  if (goog.isDefAndNotNull(hatchSlice)) {
+    var hatchFillResolver = anychart.pieModule.Chart.getColorResolver('hatchFill', anychart.enums.ColorType.HATCH_FILL, true);
+    var hatchFill = hatchFillResolver(this, pointState, false);
+    hatchSlice
+        .stroke(null)
+        .fill(hatchFill);
+  }
+};
+
+
+//endregion
+//region --- Checkers
+/**
+ * Identifies fill or stroke as radial gradient.
+ * @param {(acgraph.vector.Fill|acgraph.vector.Stroke)} fillOrStroke Fill or stroke.
+ * @return {boolean} is fill or stroke radial gradient.
+ * @private
+ */
+anychart.pieModule.Chart.prototype.isRadialGradientMode_ = function(fillOrStroke) {
+  return goog.isObject(fillOrStroke) && fillOrStroke.hasOwnProperty('mode') && fillOrStroke.hasOwnProperty('cx');
+};
+
+
+/**
+ * Checks that value represents missing point.
+ * @param {*} value
+ * @return {boolean} Is value represents missing value.
+ * @private
+ */
+anychart.pieModule.Chart.prototype.isMissing_ = function(value) {
+  value = goog.isNull(value) ? NaN : +value;
+  return !(goog.isNumber(value) && !isNaN(value) && (value > 0));
+};
+
+
+/**
+ * @return {boolean} Define, is labels have outside position.
+ */
+anychart.pieModule.Chart.prototype.isOutsideLabels = function() {
+  return anychart.enums.normalizeSidePosition(this.labels().getOption('position')) == anychart.enums.SidePosition.OUTSIDE;
+};
+
+
+/** @inheritDoc */
+anychart.pieModule.Chart.prototype.isNoData = function() {
+  var rowsCount = this.getIterator().getRowsCount();
+  return (!rowsCount);
+};
+
+
+//endregion
+//region --- Center content
+/**
+ * Pie center settings.
+ * @param {Object=} opt_value
+ * @return {anychart.pieModule.Chart|anychart.pieModule.Center}
+ */
+anychart.pieModule.Chart.prototype.center = function(opt_value) {
+  if (!this.center_) {
+    this.center_ = new anychart.pieModule.Center(this);
+    this.center_.listenSignals(this.pieCenterInvalidated_, this);
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.center_.setup(opt_value);
+    return this;
+  }
+
+  return this.center_;
+};
+
+
+/**
+ * Pie center signal listener.
+ * @param {anychart.SignalEvent} event Event object.
+ * @private
+ */
+anychart.pieModule.Chart.prototype.pieCenterInvalidated_ = function(event) {
+  var state = 0, signal = 0;
+  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
+    state |= anychart.ConsistencyState.APPEARANCE;
+    signal |= anychart.Signal.NEEDS_REDRAW;
+  }
+
+  if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
+    state |= anychart.ConsistencyState.PIE_CENTER_CONTENT | anychart.ConsistencyState.BOUNDS;
+    signal |= anychart.Signal.NEEDS_REDRAW;
+  }
+
+  this.invalidate(state, signal);
+};
+
+
+//endregion
+//region --- Labels
+/**
+ * Getter/setter for labels.
+ * @param {(Object|boolean|null)=} opt_value .
+ * @return {anychart.core.ui.CircularLabelsFactory|anychart.pieModule.Chart} .
+ */
+anychart.pieModule.Chart.prototype.labels = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.normal_.labels(opt_value);
+    return this;
+  }
+  return /** @type {anychart.core.ui.CircularLabelsFactory} */ (this.normal_.labels());
+};
+
+
+/**
+ *
+ * @param {anychart.core.ui.CircularLabelsFactory.Label} label .
+ * @return {anychart.math.Rect}
+ */
+anychart.pieModule.Chart.prototype.getLabelBounds = function(label) {
+  if (!this.labelsBoundsCache_) this.labelsBoundsCache_ = [];
+  var index = label.getIndex();
+  if (!this.labelsBoundsCache_[index])
+    this.labelsBoundsCache_[index] = anychart.math.Rect.fromCoordinateBox(this.labels().measureWithTransform(label));
+
+  return this.labelsBoundsCache_[index];
+};
+
+
+/**
+ * Drop label bounds cache.
+ * @param {anychart.core.ui.CircularLabelsFactory.Label} label Label to drop bounds.
+ */
+anychart.pieModule.Chart.prototype.dropLabelBoundsCache = function(label) {
+  var index = label.getIndex();
+  if (this.labelsBoundsCache_) {
+    this.labelsBoundsCache_[index] = null;
+  }
+};
+
+
+/**
+ * Internal label invalidation handler.
+ * @param {anychart.SignalEvent} event Event object.
+ * @private
+ */
+anychart.pieModule.Chart.prototype.labelsInvalidated_ = function(event) {
+  var state = 0, signal = 0;
+  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
+    state |= anychart.ConsistencyState.PIE_LABELS;
+    signal |= anychart.Signal.NEEDS_REDRAW;
+  }
+
+  if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
+    state |= anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.PIE_LABELS;
+    signal |= anychart.Signal.BOUNDS_CHANGED | anychart.Signal.NEEDS_REDRAW;
+  }
+
+  this.invalidate(state, signal);
+};
+
+
+/**
+ * Internal label invalidation handler.
+ * @param {anychart.SignalEvent} event Event object.
+ * @private
+ */
+anychart.pieModule.Chart.prototype.outlineInvalidated_ = function(event) {
+  this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+};
+
+
+/**
+ * Create pie label format provider.
+ * @param {boolean=} opt_force create context provider forcibly.
+ * @return {Object} Object with info for labels formatting.
+ * @protected
+ */
+anychart.pieModule.Chart.prototype.createFormatProvider = function(opt_force) {
+  var iterator = this.getIterator();
+
+  if (!this.pointProvider_ || opt_force)
+    this.pointProvider_ = new anychart.format.Context();
+
+  this.pointProvider_
+      .dataSource(iterator)
+      .statisticsSources([this.getPoint(iterator.getIndex()), this]);
+
+  var values = { //TODO (A.Kudryavtsev): Check types!!!
+    'x': {value: iterator.get('x'), type: anychart.enums.TokenType.STRING},
+    'value': {value: iterator.get('value'), type: anychart.enums.TokenType.NUMBER},
+    'name': {value: iterator.get('name'), type: anychart.enums.TokenType.STRING},
+    'index': {value: iterator.getIndex(), type: anychart.enums.TokenType.NUMBER},
+    'chart': {value: this, type: anychart.enums.TokenType.UNKNOWN}
+  };
+
+  if (iterator.meta('groupedPoint')) {
+    values['name'] = {value: 'Other points', type: anychart.enums.TokenType.STRING};
+    values['groupedPoint'] = {value: true, type: anychart.enums.TokenType.STRING};
+    values['names'] = {value: iterator.meta('names'), type: anychart.enums.TokenType.UNKNOWN};
+    values['values'] = {value: iterator.meta('values'), type: anychart.enums.TokenType.UNKNOWN};
+  }
+
+  return this.pointProvider_.propagate(values);
+};
+
+
+/**
+ * Create column position provider.
+ * @return {Object} Object with info for labels formatting.
+ * @protected
+ */
+anychart.pieModule.Chart.prototype.createPositionProvider = function() {
+  var outside = this.isOutsideLabels();
+  var iterator = this.getIterator();
+  var start = /** @type {number} */ (iterator.meta('start'));
+  var sweep = /** @type {number} */ (iterator.meta('sweep'));
+  var singlePoint = (iterator.getRowsCount() == 1) || sweep == 360;
+  var pointState = this.state.getPointStateByIndex(iterator.getIndex());
+  var explode = this.getExplode(pointState);
+  var angle = start + sweep / 2;
+  var dR;
+  var outerXR;
+  var outerYR;
+  var innerXR;
+  var innerYR;
+  var xRadius;
+  var yRadius;
+
+  var mode3d = /** @type {boolean} */ (this.getOption('mode3d'));
+  var insideLabelsOffset = /** @type {number|string} */ (this.getOption('insideLabelsOffset'));
+  if (mode3d) {
+    if (outside) {
+      xRadius = this.radiusValue_ + this.connectorLengthValue_;
+      yRadius = this.get3DYRadius(this.radiusValue_) + this.connectorLengthValue_;
+
+      if (explode) {
+        xRadius += explode;
+        yRadius += this.get3DYRadius(explode);
+      }
+
+    } else {
+      outerXR = this.radiusValue_;
+      outerYR = this.get3DYRadius(this.radiusValue_);
+      innerXR = this.innerRadiusValue_;
+      innerYR = this.get3DYRadius(this.innerRadiusValue_);
+
+      if (singlePoint && !innerXR) {
+        xRadius = 0;
+        yRadius = 0;
+      } else {
+        xRadius = anychart.utils.normalizeSize(insideLabelsOffset, (innerXR + outerXR));
+        // support pixels value
+        if (anychart.utils.isPercent(insideLabelsOffset)) {
+          yRadius = anychart.utils.normalizeSize(insideLabelsOffset, (innerYR + outerYR));
+        } else {
+          yRadius = this.get3DYRadius(anychart.utils.normalizeSize(insideLabelsOffset, (innerYR + outerYR)));
+        }
+
+        if (explode) {
+          xRadius += explode;
+          yRadius += this.get3DYRadius(explode);
+        }
+      }
+    }
+
+    return {'value': {'angle': angle, 'radius': xRadius, 'radiusY': yRadius}};
+  } else {
+    if (outside) {
+      dR = this.radiusValue_ + this.connectorLengthValue_ + explode;
+    } else {
+      var radius = (singlePoint && !this.innerRadiusValue_) ? 0 : this.radiusValue_ - this.innerRadiusValue_;
+      dR = anychart.utils.normalizeSize(insideLabelsOffset, radius) + this.innerRadiusValue_ + explode;
+    }
+
+    return {'value': {'angle': angle, 'radius': dR}};
+  }
+};
+
+
+//endregion
+//region --- Calculating outside labels and connectors
+/**
+ * Init connector elements.
+ */
+anychart.pieModule.Chart.prototype.initConnectorElements = function() {
+  //region init connector elements
+  this.connectorAnchorCoords = [];
+  var mode3d = this.getOption('mode3d');
+  if (this.connectorsLayer_) {
+    this.connectorsLayer_.clear();
+    if (mode3d) this.connectorsLowerLayer_.clear();
+  } else {
+    this.connectorsLayer_ = new anychart.core.utils.TypedLayer(function() {
+      return acgraph.path();
+    }, function(child) {
+      (/** @type {acgraph.vector.Path} */ (child)).clear();
+    });
+    this.connectorsLayer_.parent(this.rootElement);
+    this.connectorsLayer_.zIndex(anychart.pieModule.Chart.ZINDEX_LABEL);
+
+    if (mode3d) {
+      this.connectorsLowerLayer_ = new anychart.core.utils.TypedLayer(function() {
+        return acgraph.path();
+      }, function(child) {
+        (/** @type {acgraph.vector.Path} */ (child)).clear();
+      });
+      this.connectorsLowerLayer_.parent(this.rootElement);
+      this.connectorsLowerLayer_.zIndex(anychart.pieModule.Chart.ZINDEX_CONNECTOR_LOWER_LAYER);
+    }
+  }
+  this.drawnConnectors_ = [];
+  var connectorStroke = /** @type {acgraph.vector.Stroke} */ (this.getOption('connectorStroke'));
+  if (!this.hoveredLabelConnectorPath_) {
+    // path for connector for label disabled by algorithm
+    this.hoveredLabelConnectorPath_ = this.rootElement.path();
+    this.hoveredLabelConnectorPath_.stroke(connectorStroke);
+  }
+  //endregion
+};
+
+
+/**
+ * Calculating outside labels.
+ */
+anychart.pieModule.Chart.prototype.calculateOutsideLabels = function() {
+  var iterator = this.getIterator();
+  var label, x0, y0, radius, isRightSide;
+  var connectorPath, connector;
+  var mode3d = this.getOption('mode3d');
+  var allowOverlap = this.getOption('overlapMode') == anychart.enums.LabelsOverlapMode.ALLOW_OVERLAP;
+
+  this.initConnectorElements();
+
+  //region calculate absolute labels position, sort labels, separation of the labels on the left and right side
+  var arr, explodeLevels, switchToRightSide, switchToLeftSide;
+  if (!allowOverlap) {
+    explodeLevels = {};
+    switchToRightSide = false;
+    switchToLeftSide = false;
+  }
+
+  iterator.reset();
+  while (iterator.advance()) {
+    if (this.isMissing_(iterator.get('value'))) continue;
+    var index = iterator.getIndex();
+    var pointState = this.state.getPointStateByIndex(index);
+
+    var start = /** @type {number} */ (iterator.meta('start'));
+    var sweep = /** @type {number} */ (iterator.meta('sweep'));
+
+    var angle = (start + sweep / 2) * Math.PI / 180;
+    var angleDeg = goog.math.standardAngle(goog.math.toDegrees(angle));
+
+    isRightSide = angleDeg < 90 || angleDeg > 270;
+
+    var center = this.getSliceCenterCoords(index);
+    radius = mode3d ? this.get3DYRadius(this.radiusValue_) : this.radiusValue_;
+
+    // coordinates of the point where the connector touches a pie
+    x0 = center[0] + this.radiusValue_ * Math.cos(angle);
+    y0 = center[1] + radius * Math.sin(angle);
+
+    if (mode3d) {
+      y0 += this.get3DHeight() / 2;
+    }
+
+    connector = isRightSide ?
+        anychart.pieModule.Chart.OUTSIDE_LABELS_CONNECTOR_SIZE_ :
+        -anychart.pieModule.Chart.OUTSIDE_LABELS_CONNECTOR_SIZE_;
+    iterator.meta('connector', connector);
+
+    this.connectorAnchorCoords[index * 2] = x0;
+    this.connectorAnchorCoords[index * 2 + 1] = y0;
+
+    var anchor = isRightSide ? anychart.enums.Position.LEFT_CENTER : anychart.enums.Position.RIGHT_CENTER;
+    iterator.meta('anchor', anchor);
+    label = this.drawLabel_(pointState, false);
+    this.dropLabelBoundsCache(label);
+
+    label.angle_ = angleDeg;
+
+    var explode = this.getExplode(pointState);
+    iterator.meta('explode', explode);
+
+    if (this.lableToDrop && goog.array.indexOf(this.lableToDrop, index) != -1) {
+      label.enabled(false);
+    }
+
+    if (allowOverlap) {
+      if (label && label.enabled() != false) {
+        index = label.getIndex();
+
+        this.dropLabelBoundsCache(label);
+        var bounds = this.getLabelBounds(label);
+        var boundsForCompare = explode ? this.contentBounds : this.piePlotBounds_;
+
+        this.labelsRadiusOffset_ = Math.max(
+            boundsForCompare.left - bounds.left,
+            bounds.getRight() - boundsForCompare.getRight(),
+            boundsForCompare.top - bounds.top,
+            bounds.getBottom() - boundsForCompare.getBottom(),
+            this.labelsRadiusOffset_);
+
+        if (!this.drawnConnectors_[index]) {
+          y0 = this.connectorAnchorCoords[index * 2 + 1] - this.get3DHeight() / 2;
+          if (mode3d && y0 < this.cy) {
+            connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLowerLayer_.genNextChild());
+          } else {
+            connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLayer_.genNextChild());
+          }
+          this.drawnConnectors_[index] = connectorPath;
+          connectorPath.stroke(/** @type {acgraph.vector.Stroke} */ (this.getOption('connectorStroke')));
+          this.drawConnectorLine(label, connectorPath);
+        }
+      }
+    } else {
+      var explodeLevel, left, right, left2, right2;
+      if (!(explodeLevel = explodeLevels[explode])) {
+        explodeLevel = [];
+        left = [];
+        right = [];
+        left2 = [];
+        right2 = [];
+        explodeLevel.push(left, right, left2, right2, explode);
+        explodeLevels[explode] = explodeLevel;
+      } else {
+        left = explodeLevel[0];
+        right = explodeLevel[1];
+        left2 = explodeLevel[2];
+        right2 = explodeLevel[3];
+      }
+
+      if (angleDeg > 270 && !switchToRightSide && (left.length || (left2 && left2.length))) {
+        switchToRightSide = true;
+      }
+
+      if (angleDeg > 90 && !switchToLeftSide && (right.length || (right2 && right2.length))) {
+        switchToLeftSide = true;
+      }
+
+      //Target array chosen.
+      if (isRightSide) {
+        arr = switchToRightSide ? right2 : right;
+      } else {
+        arr = switchToLeftSide ? left2 : left;
+      }
+      arr.push(label);
+    }
+  }
+  //endregion
+
+  this.indexOfMaxLabel = NaN;
+
+  if (!allowOverlap) {
+    //@todo (blackart) for debug purpose
+    // var ___name = 'cb_';
+    // if (!this[___name]) this[___name] = this.container().rect().zIndex(1000).stroke('green');
+    // this[___name].setBounds(this.contentBounds);
+    //
+    // var ___name = 'ppb_';
+    // if (!this[___name]) this[___name] = this.container().rect().zIndex(1000).stroke('blue');
+    // this[___name].setBounds(this.piePlotBounds_);
+
+    var labelsToCompare = [];
+    goog.array.forEachRight(/** @type {Array} */(goog.object.getValues(/** @type {Object} */(explodeLevels))), function(explodeLevel) {
+      var right = explodeLevel[3].concat(explodeLevel[1]);
+      var left = explodeLevel[2].concat(explodeLevel[0]);
+      var explode = explodeLevel[4];
+
+      this.calcDomain(left, false, labelsToCompare, explode);
+      this.calcDomain(right, true, labelsToCompare, explode);
+
+      labelsToCompare = labelsToCompare.concat(left, right);
+    }, this);
+  }
+
+  if (!this.maxLabelIndexesArr_)
+    this.maxLabelIndexesArr_ = [];
+
+  if (!this.lableToDrop)
+    this.lableToDrop = [];
+
+  index = this.indexOfMaxLabel;
+  if (goog.array.indexOf(this.maxLabelIndexesArr_, index) != -1) {
+    if (goog.array.peek(this.maxLabelIndexesArr_) != index) {
+      this.lableToDrop.push(index);
+      this.maxLabelIndexesArr_.length = 0;
+    }
+  } else {
+    this.maxLabelIndexesArr_.push(index);
+  }
+
+  this.labelsRadiusOffset_ = Math.round(this.labelsRadiusOffset_);
+};
+
+
+/**
+ * Calculate labels domain.
+ * @param {Array.<anychart.core.ui.CircularLabelsFactory.Label>} labels .
+ * @param {boolean} isRightSide .
+ * @param {Array.<anychart.core.ui.CircularLabelsFactory.Label>=} opt_labelsForComparing .
+ * @param {number=} opt_explode .
+ */
+anychart.pieModule.Chart.prototype.calcDomain = function(labels, isRightSide, opt_labelsForComparing, opt_explode) {
+  var i, len, droppedLabels, notIntersection, m, l, domainBounds, domain = null, label, bounds;
+  var iterator = this.getIterator();
+  var domains = [];
+  var labelsIterator = isRightSide ? goog.array.forEachRight : goog.array.forEach;
+
+  labelsIterator(labels, function(label) {
+    if (label && label.enabled() != false) {
+      iterator.select(label.getIndex());
+      label.formatProvider(this.createFormatProvider());
+      bounds = this.getLabelBounds(label);
+
+      if (!domain || (domain.isNotIntersect(bounds))) {
+        if (domain) domains.push(domain);
+        domain = new anychart.pieModule.Chart.PieOutsideLabelsDomain(isRightSide, this, domains, opt_explode || 0);
+        domain.addLabel(label);
+      } else {
+        domain.addLabel(label);
+      }
+    }
+  }, this);
+
+  if (domain) domains.push(domain);
+
+  for (i = 0, len = domains.length; i < len; i++) {
+    domain = domains[i];
+    if (domain && domain.droppedLabels) {
+      if (!droppedLabels) droppedLabels = [];
+      droppedLabels = goog.array.concat(droppedLabels, domain.droppedLabels);
+    }
+  }
+
+  domain = null;
+  if (droppedLabels) {
+    goog.array.sort(droppedLabels, function(a, b) {
+      return a.getIndex() > b.getIndex() ? 1 : a.getIndex() < b.getIndex() ? -1 : 0;
+    });
+
+    labelsIterator(droppedLabels, function(label) {
+      if (label) {
+        iterator.select(label.getIndex());
+        label.formatProvider(this.createFormatProvider());
+        bounds = this.getLabelBounds(label);
+
+        notIntersection = true;
+        for (m = 0, l = domains.length; m < l; m++) {
+          notIntersection = notIntersection && domains[m].isNotIntersect(bounds);
+        }
+
+        if (notIntersection) {
+          if (!domain) {
+            domain = new anychart.pieModule.Chart.PieOutsideLabelsDomain(isRightSide, this, [], opt_explode || 0);
+          }
+          domain.softAddLabel(label);
+          domainBounds = domain.getBounds();
+
+          notIntersection = true;
+          for (m = 0; m < l; m++) {
+            notIntersection = notIntersection && domains[m].isNotIntersect(domainBounds);
+          }
+
+          if (domain.isCriticalAngle || !notIntersection) {
+            domain.labels.pop().enabled(false);
+            domain.calcDomain();
+            domains.push(domain);
+            domain = null;
+          } else {
+            label.enabled(true);
+          }
+        } else {
+          if (domain) {
+            domains.push(domain);
+            domain = null;
+          }
+        }
+      }
+    }, this);
+
+    if (domain)
+      domains.push(domain);
+  }
+
+  var y0, connectorPath, index, k, z, labelsLen, labelsForComparingLen;
+  var mode3d = this.getOption('mode3d');
+  var connectorStroke = /** @type {acgraph.vector.Stroke} */ (this.getOption('connectorStroke'));
+
+  for (i = 0, len = domains.length; i < len; i++) {
+    domain = domains[i];
+    if (domain) {
+      domain.applyPositions();
+
+      for (k = 0, labelsLen = domain.labels.length; k < labelsLen; k++) {
+        label = domain.labels[k];
+        if (label && label.enabled() != false) {
+          this.dropLabelBoundsCache(label);
+          index = label.getIndex();
+          iterator.select(index);
+
+          bounds = this.getLabelBounds(label);
+          if (opt_labelsForComparing) {
+            var c_x0 = this.connectorAnchorCoords[index * 2];
+            var c_y0 = this.connectorAnchorCoords[index * 2 + 1];
+
+            var connector = /** @type {number} */(iterator.meta('connector'));
+            var positionProvider = label.positionProvider()['value'];
+
+            var angle = positionProvider['angle'];
+            var angleRad = goog.math.toRadians(angle);
+            var radius = positionProvider['radius'];
+
+            var c_x1 = this.cx + radius * Math.cos(angleRad) - connector;
+            var c_y1 = this.cy + radius * Math.sin(angleRad);
+
+            for (z = 0, labelsForComparingLen = opt_labelsForComparing.length; z < labelsForComparingLen; z++) {
+              var comparingLabel = opt_labelsForComparing[z];
+              this.dropLabelBoundsCache(comparingLabel);
+
+              var comparingBounds = this.getLabelBounds(comparingLabel);
+              var comparingLabelIndex = comparingLabel.getIndex();
+
+              var center = this.getSliceCenterCoords(comparingLabelIndex);
+              var cx = center[0], cy = center[1];
+
+              var start = /** @type {number} */ (iterator.meta('start'));
+              var sweep = /** @type {number} */ (iterator.meta('sweep'));
+
+              //Coords of comparing label connector
+              var cc_x0 = this.connectorAnchorCoords[comparingLabelIndex * 2];
+              var cc_y0 = this.connectorAnchorCoords[comparingLabelIndex * 2 + 1];
+
+              connector = /** @type {number} */(iterator.meta('connector'));
+              positionProvider = comparingLabel.positionProvider()['value'];
+
+              angle = positionProvider['angle'];
+              angleRad = goog.math.toRadians(angle);
+              radius = positionProvider['radius'];
+
+              var cc_x1 = this.cx + radius * Math.cos(angleRad) - connector;
+              var cc_y1 = this.cy + radius * Math.sin(angleRad);
+
+              //Coords of slice sides
+              angleRad = goog.math.toRadians(start);
+              var startSliceLinePointInner_x = cx + this.innerRadiusValue_ * Math.cos(angleRad);
+              var startSliceLinePointInner_y = cy + this.innerRadiusValue_ * Math.sin(angleRad);
+
+              var startSliceLinePointOuter_x = cx + this.radiusValue_ * Math.cos(angleRad);
+              var startSliceLinePointOuter_y = cy + this.radiusValue_ * Math.sin(angleRad);
+
+              angleRad = goog.math.toRadians(start + sweep);
+              var endSliceLinePointInner_x = cx + this.innerRadiusValue_ * Math.cos(angleRad);
+              var endSliceLinePointInner_y = cy + this.innerRadiusValue_ * Math.sin(angleRad);
+
+              var endSliceLinePointOuter_x = cx + this.radiusValue_ * Math.cos(angleRad);
+              var endSliceLinePointOuter_y = cy + this.radiusValue_ * Math.sin(angleRad);
+
+              var cbbox = bounds.toCoordinateBox();
+
+              var isIntersect =
+                  anychart.math.checkRectIntersection(cbbox, comparingBounds.toCoordinateBox()) ||
+                  anychart.math.checkRectIntersectionWithSegment(startSliceLinePointInner_x, startSliceLinePointInner_y, startSliceLinePointOuter_x, startSliceLinePointOuter_y, cbbox) ||
+                  anychart.math.checkRectIntersectionWithSegment(endSliceLinePointInner_x, endSliceLinePointInner_y, endSliceLinePointOuter_x, endSliceLinePointOuter_y, cbbox) ||
+                  anychart.math.checkRectIntersectionWithSegment(cc_x0, cc_y0, cc_x1, cc_y1, cbbox) ||
+                  anychart.math.checkSegmentsIntersection(c_x0, c_y0, c_x1, c_y1, startSliceLinePointInner_x, startSliceLinePointInner_y, startSliceLinePointOuter_x, startSliceLinePointOuter_y) ||
+                  anychart.math.checkSegmentsIntersection(c_x0, c_y0, c_x1, c_y1, endSliceLinePointInner_x, endSliceLinePointInner_y, endSliceLinePointOuter_x, endSliceLinePointOuter_y) ||
+                  anychart.math.checkSegmentsIntersection(cc_x0, cc_y0, cc_x1, cc_y1, c_x0, c_y0, c_x1, c_y1) ||
+                  anychart.math.checkRectIntersection(cbbox, [startSliceLinePointOuter_x, startSliceLinePointOuter_y, startSliceLinePointInner_x, startSliceLinePointInner_y]) ||
+                  anychart.math.checkRectIntersection(cbbox, [endSliceLinePointOuter_x, endSliceLinePointOuter_y, endSliceLinePointInner_x, endSliceLinePointInner_y]);
+
+              if (isIntersect) {
+                label.enabled(false);
+                break;
+              }
+            }
+          }
+
+          if (label.enabled() != false) {
+            if (this.recalculateBounds_) {
+              var boundsForCompare = opt_explode ? this.contentBounds : this.piePlotBounds_;
+
+              var labelsRadiusOffset = Math.max(
+                  boundsForCompare.left - bounds.left,
+                  bounds.getRight() - boundsForCompare.getRight(),
+                  boundsForCompare.top - bounds.top,
+                  bounds.getBottom() - boundsForCompare.getBottom()
+              );
+
+              if (labelsRadiusOffset > this.labelsRadiusOffset_) {
+                this.indexOfMaxLabel = index;
+              }
+
+              this.labelsRadiusOffset_ = Math.max(this.labelsRadiusOffset_, labelsRadiusOffset);
+            }
+
+            if (!this.drawnConnectors_[index]) {
+              y0 = this.connectorAnchorCoords[index * 2 + 1] - this.get3DHeight() / 2;
+              if (mode3d && y0 < this.cy) {
+                connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLowerLayer_.genNextChild());
+              } else {
+                connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLayer_.genNextChild());
+              }
+              this.drawnConnectors_[index] = connectorPath;
+              connectorPath.stroke(connectorStroke);
+              this.drawConnectorLine(label, connectorPath);
+            }
+          }
+        }
+      }
+    }
+  }
+};
+
+
+/**
+ * Defragmentation domain. If domain have critical angle then need defragment domain.
+ * @param {!anychart.pieModule.Chart.PieOutsideLabelsDomain} domain Domain to defragmentation.
+ */
+anychart.pieModule.Chart.prototype.domainDefragmentation = function(domain) {
+  var labels = domain.labels;
+  var sourcePieLabelsDomains = domain.pieLabelsDomains;
+  var i, len, label, bounds;
+  var prevDomain = sourcePieLabelsDomains[sourcePieLabelsDomains.length - 1];
+
+  if (prevDomain == domain) return;
+
+  var tmpDomain = null;
+  var tmpLabels = labels.slice();
+  var domainsLength = sourcePieLabelsDomains.length;
+  var domainExpanded = false;
+
+  for (i = 0, len = labels.length; i < len; i++) {
+    label = labels[i];
+    if (label) {
+      bounds = this.getLabelBounds(label);
+
+      if (!prevDomain || prevDomain.isNotIntersect(bounds)) {
+
+        if (!tmpDomain || tmpDomain.isNotIntersect(bounds)) {
+          if (tmpDomain) {
+            sourcePieLabelsDomains.push(tmpDomain);
+            prevDomain = tmpDomain;
+          }
+          var isRightSide = label['anchor']() == anychart.enums.Anchor.LEFT_CENTER;
+          tmpDomain = new anychart.pieModule.Chart.PieOutsideLabelsDomain(isRightSide, this, sourcePieLabelsDomains, domain.explode);
+          tmpDomain.softAddLabel(label);
+        } else {
+          tmpDomain.softAddLabel(label);
+
+          if (this.isCriticalAngle) {
+            label.enabled(false);
+            if (!tmpDomain.droppedLabels) tmpDomain.droppedLabels = [];
+            tmpDomain.droppedLabels.push(label);
+            tmpDomain.labels.pop();
+            tmpDomain.calcDomain();
+          } else if (prevDomain && tmpDomain && !prevDomain.isNotIntersect(tmpDomain.getBounds())) {
+            sourcePieLabelsDomains.pop();
+            tmpDomain.labels = goog.array.concat(prevDomain.labels, tmpDomain.labels);
+            prevDomain = null;
+            tmpDomain.calcDomain();
+
+            domainExpanded = true;
+          }
+        }
+      } else {
+        label.enabled(false);
+        if (tmpDomain) {
+          if (!tmpDomain.droppedLabels) tmpDomain.droppedLabels = [];
+          tmpDomain.droppedLabels.push(label);
+        }
+      }
+    }
+  }
+  if (tmpDomain) {
+    if (sourcePieLabelsDomains.length - domainsLength > 0 || domainExpanded) {
+      domain.labels = tmpDomain.labels;
+    } else {
+      tmpDomain.clearDroppedLabels();
+      if (tmpLabels.length != labels.length)
+        domain.labels = tmpLabels;
+    }
+  }
+};
+
+
+//endregion
+//region --- Drawing
+/**
+ * Calculating common values for a pie plot.
+ * @param {anychart.math.Rect} bounds Bounds of the content area.
+ * @private
+ */
+anychart.pieModule.Chart.prototype.calculateBounds_ = function(bounds) {
+  this.minWidthHeight_ = Math.min(bounds.width, bounds.height);
+
+  var normalExplode = this.getExplode(anychart.PointState.NORMAL, true);
+  var hoveredExplode = this.getExplode(anychart.PointState.HOVER, true);
+  var selectedExplode = this.getExplode(anychart.PointState.SELECT, true);
+
+  var maxExplode = Math.max(normalExplode, hoveredExplode || 0, selectedExplode || 0);
+
+  var iterator = this.getIterator();
+  iterator.reset();
+  while (iterator.advance()) {
+    normalExplode = this.getExplode(anychart.PointState.NORMAL);
+    hoveredExplode = this.getExplode(anychart.PointState.HOVER);
+    selectedExplode = this.getExplode(anychart.PointState.SELECT);
+    maxExplode = Math.max(normalExplode, hoveredExplode || 0, selectedExplode || 0, maxExplode);
+  }
+
+  var isLabelsEnabled = this.normal_.labels().enabled() || this.hovered_.labels().enabled() || this.selected_.labels().enabled();
+  var clampPie = (this.isOutsideLabels() && isLabelsEnabled ? maxExplode : 0);
+
+  this.piePlotBounds_ = anychart.math.rect(
+      bounds.left + clampPie,
+      bounds.top + clampPie,
+      bounds.width - 2 * clampPie,
+      bounds.height - 2 * clampPie);
+
+
+  var minWidthHeightOfPieBounds = this.minWidthHeight_ - 2 * clampPie;
+
+  // var ___name = 'ppb';
+  // if (!this[___name]) this[___name] = this.container().rect().zIndex(1000);
+  // this[___name].setBounds(this.piePlotBounds_);
+  //
+  // var ___name = 'bbounds';
+  // if (!this[___name]) this[___name] = this.container().rect().zIndex(1000);
+  // this[___name].setBounds(bounds);
+
+  this.radiusValue_ = Math.min(minWidthHeightOfPieBounds / 2, Math.max(anychart.utils.normalizeSize(/** @type {number|string} */ (this.getOption('radius')), minWidthHeightOfPieBounds), 0));
+  this.connectorLengthValue_ = anychart.utils.normalizeSize(/** @type {number|string} */ (this.getOption('connectorLength')), this.radiusValue_);
+
+  this.originalRadiusValue_ = this.radiusValue_;
+  this.labelsRadiusOffset_ = 0;
+
+  this.cx = this.piePlotBounds_.left + this.piePlotBounds_.width / 2;
+  this.cy = this.piePlotBounds_.top + this.piePlotBounds_.height / 2;
+
+  //Calculate aqua style relative bounds.
+  var ac6_angle = goog.math.toRadians(-145);
+  var ac6_focalPoint = .5;
+  var defFx = .5;
+  var defFy = .5;
+  var r = Math.min(bounds.width, bounds.height) / 2;
+  var fx = (ac6_focalPoint * r * Math.cos(ac6_angle) / bounds.width) + defFx;
+  var fy = (ac6_focalPoint * r * Math.sin(ac6_angle) / bounds.height) + defFy;
+
+  if (bounds.width < 0) bounds.width = 0;
+  if (bounds.height < 0) bounds.height = 0;
+
+  this.aquaStyleObj_['fx'] = !isNaN(fx) && isFinite(fx) ? fx : 0;
+  this.aquaStyleObj_['fy'] = !isNaN(fy) && isFinite(fy) ? fy : 0;
+  this.aquaStyleObj_['mode'] = bounds;
+
+  this.updateBounds();
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.pieModule.Chart.prototype.calculate = function() {
+  if (this.hasInvalidationState(anychart.ConsistencyState.PIE_DATA)) {
+    this.resetStatistics();
+
+    var iterator = this.data().getIterator();
+    var value;
+    var missingPoints = 0;
+    var min = Number.MAX_VALUE;
+    var max = -Number.MAX_VALUE;
+    var sum = 0;
+    while (iterator.advance()) {
+      value = /** @type {number|string|null|undefined} */ (iterator.get('value'));
+      // if missing
+      if (this.isMissing_(value)) {
+        missingPoints++;
+        continue;
+      }
+      value = +value;
+      min = Math.min(value, min);
+      max = Math.max(value, max);
+      sum += value;
+    }
+
+    var count = iterator.getRowsCount() - missingPoints; // do not count missing points
+    var avg;
+    if (!count) min = max = sum = avg = undefined;
+    else avg = sum / count;
+    this.statistics(anychart.enums.Statistics.COUNT, count);
+    this.statistics(anychart.enums.Statistics.MIN, min);
+    this.statistics(anychart.enums.Statistics.MAX, max);
+    this.statistics(anychart.enums.Statistics.SUM, sum);
+    this.statistics(anychart.enums.Statistics.AVERAGE, avg);
+
+    this.markConsistent(anychart.ConsistencyState.PIE_DATA);
+  }
+};
+
+
+/**
+ * Update bounds.
+ */
+anychart.pieModule.Chart.prototype.updateBounds = function() {
+  var labelRadiusOffset = Math.max(this.labelsRadiusOffset_, 0);
+  this.radiusValue_ = Math.max(this.radiusValue_ - labelRadiusOffset, 0);
+
+  var innerRadius = /** @type {Function|string|number} */ (this.getOption('innerRadius'));
+  this.innerRadiusValue_ = goog.isFunction(innerRadius) ?
+      innerRadius(this.radiusValue_) :
+      anychart.utils.normalizeSize(innerRadius, this.radiusValue_);
+
+  var innerRectSide = this.innerRadiusValue_ / Math.pow(2, .5) * 2;
+  var x = this.cx - innerRectSide / 2;
+  var y = this.cy - innerRectSide / 2;
+  this.centerContentBounds = anychart.math.rect(x, y, innerRectSide, innerRectSide);
+
+  /**
+   * Bounds of pie. (Not bounds of content area).
+   * Need for radial gradient to set correct bounds.
+   * @type {anychart.math.Rect}
+   * @private
+   */
+  this.pieBounds_ = new anychart.math.Rect(
+      this.cx - this.radiusValue_,
+      this.cy - this.radiusValue_,
+      this.radiusValue_ * 2,
+      this.radiusValue_ * 2);
+
+  var labels = this.labels();
+  labels.suspendSignalsDispatching();
+  labels.cx(this.cx);
+  labels.cy(this.cy);
+  labels.parentRadius(this.radiusValue_);
+  labels.startAngle(/** @type {number} */ (this.getOption('startAngle')));
+  labels.sweepAngle(360);
+  labels.parentBounds(this.pieBounds_);
+  labels.resumeSignalsDispatching(false);
+
+  this.hovered().labels()
+      .parentBounds(this.pieBounds_);
+};
+
+
+/**
+ * Change center content transformation.
+ * @param {anychart.math.Rect} contentBoundingBox .
+ */
+anychart.pieModule.Chart.prototype.transformCenterContent = function(contentBoundingBox) {
+  this.contentBoundingBox_ = contentBoundingBox;
+
+  var ratio = Math.min(this.centerContentBounds.width / this.contentBoundingBox_.width,
+      this.centerContentBounds.height / this.contentBoundingBox_.height);
+  if (!isFinite(ratio))
+    ratio = 0;
+
+  var txCenterContentWidth = ratio * this.contentBoundingBox_.width;
+  var txCenterContentHeight = ratio * this.contentBoundingBox_.height;
+
+  var dx = (this.centerContentBounds.left - this.contentBoundingBox_.left * ratio) + (this.centerContentBounds.width - txCenterContentWidth) / 2;
+  var dy = (this.centerContentBounds.top - this.contentBoundingBox_.top * ratio) + (this.centerContentBounds.height - txCenterContentHeight) / 2;
+
+  this.center_.contentLayer.setTransformationMatrix(ratio, 0, 0, ratio, dx, dy);
+};
+
+
+/**
  * @inheritDoc
  */
 anychart.pieModule.Chart.prototype.beforeDraw = function() {
   if (this.palette_ && anychart.utils.instanceOf(this.palette_, anychart.palettes.RangeColors)) {
     this.palette_.count(this.getIterator().getRowsCount());
   }
+};
+
+
+/**
+ * Listener for graphics elements rendering.
+ */
+anychart.pieModule.Chart.prototype.acgraphElemetnsListener = function() {
+  var ccbb = this.center_.realContent.getBounds();
+
+  if (!anychart.math.Rect.equals(ccbb, this.contentBoundingBox_)) {
+    this.transformCenterContent(ccbb);
+  }
+};
+
+
+/**
+ * Listener for graphics elements rendering.
+ */
+anychart.pieModule.Chart.prototype.chartsListener = function() {
+  this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -1257,8 +2097,7 @@ anychart.pieModule.Chart.prototype.drawContent = function(bounds) {
   this.calculate();
   this.labels().dropCallsCache();
   var iterator = this.getIterator();
-  var exploded;
-  var value;
+  var pointState, value;
   var rowsCount = iterator.getRowsCount();
   var mode3d = /** @type {boolean} */ (this.getOption('mode3d'));
 
@@ -1270,8 +2109,27 @@ anychart.pieModule.Chart.prototype.drawContent = function(bounds) {
   //   this.tooltip().container(/** @type {acgraph.vector.ILayer} */(this.container()));
   // }
 
+  if (this.hasInvalidationState(anychart.ConsistencyState.PIE_CENTER_CONTENT)) {
+    if (this.center_.contentLayer) {
+      this.center_.clearContent();
+      this.center_.contentLayer.parent(this.rootElement);
+      this.center_.contentLayer.zIndex(anychart.pieModule.Chart.ZINDEX_CENTER_CONTENT_LAYER);
+
+      if (this.center_.contentLayer) {
+        if (anychart.utils.instanceOf(this.center_.realContent, acgraph.vector.Element)) {
+          this.center_.contentLayer.getStage().listen(acgraph.vector.Stage.EventType.RENDER_FINISH,
+              this.acgraphElemetnsListener, false, this);
+        } else if (anychart.utils.instanceOf(this.center_.realContent, anychart.core.VisualBase)) {
+          this.center_.contentLayer.listen(anychart.enums.EventType.CHART_DRAW,
+              this.chartsListener, false, this);
+        }
+      }
+    }
+    this.markConsistent(anychart.ConsistencyState.PIE_CENTER_CONTENT);
+  }
+
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    this.calculate_(bounds);
+    this.calculateBounds_(bounds);
     this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.PIE_LABELS);
   }
 
@@ -1291,13 +2149,20 @@ anychart.pieModule.Chart.prototype.drawContent = function(bounds) {
       value = +value;
       sweep = value / /** @type {number} */ (this.getStat(anychart.enums.Statistics.SUM)) * 360;
 
-      iterator.meta('start', start).meta('sweep', sweep);
-      if (!goog.isDef(exploded = iterator.meta('exploded'))) {
-        exploded = !!iterator.get('exploded');
-        iterator.meta('exploded', exploded);
-        if (exploded)
-          this.state.setPointState(anychart.PointState.SELECT, iterator.getIndex());
+      var state = iterator.get('state');
+      state = state == 'selected' ? anychart.PointState.SELECT :
+          state == 'hovered' ? anychart.PointState.HOVER :
+          state == 'normal' ? anychart.PointState.NORMAL : NaN;
+
+      if (!isNaN(state)) {
+        this.state.setPointState(/** @type {anychart.PointState} */(state), iterator.getIndex());
       }
+
+      iterator
+          .meta('start', start)
+          .meta('sweep', sweep)
+          .meta('explode', this.getExplode(state));
+
       start += sweep;
     }
   }
@@ -1305,6 +2170,12 @@ anychart.pieModule.Chart.prototype.drawContent = function(bounds) {
   if (this.hasInvalidationState(anychart.ConsistencyState.PIE_LABELS)) {
     if (!this.labels().container()) this.labels().container(this.rootElement);
     this.labels().clear();
+    if (this.maxLabelIndexesArr_)
+      this.maxLabelIndexesArr_.length = 0;
+
+    if (this.lableToDrop)
+      this.lableToDrop.length = 0;
+
     if (this.connectorsLayer_) {
       this.connectorsLayer_.clear();
       if (mode3d) this.connectorsLowerLayer_.clear();
@@ -1317,19 +2188,22 @@ anychart.pieModule.Chart.prototype.drawContent = function(bounds) {
       this.labels().setAutoColor(themePart['autoColor']);
       this.labels()['disablePointerEvents'](themePart['disablePointerEvents']);
       if (this.isOutsideLabels()) {
-
         if (this.recalculateBounds_) {
           this.radiusValue_ = this.originalRadiusValue_;
-          this.labelsRadiusOffset_ = 0;
+          this.labelsRadiusOffset_ = Number.NEGATIVE_INFINITY;
         }
         this.calculateOutsideLabels();
 
         if (this.recalculateBounds_) {
           var iteration = 5;
-          for (; this.labelsRadiusOffset_ && iteration;) {
+          var error = 10;
+          //todo (blackart) for debug purpose
+          // console.log('iteration:', iteration, 'labels offset:', this.labelsRadiusOffset_, 'maxLabel:', this.indexOfMaxLabel, 'label for drop:', this.lableToDrop );
+
+          for (; this.labelsRadiusOffset_ && isFinite(this.labelsRadiusOffset_) && iteration && Math.abs(this.labelsRadiusOffset_) > error;) {
             this.updateBounds();
 
-            this.labelsRadiusOffset_ = 0;
+            this.labelsRadiusOffset_ = Number.NEGATIVE_INFINITY;
 
             this.labels().clear();
             if (this.connectorsLayer_) {
@@ -1340,13 +2214,17 @@ anychart.pieModule.Chart.prototype.drawContent = function(bounds) {
 
             this.calculateOutsideLabels();
             iteration--;
+            //todo (blackart) for debug purpose
+            // console.log('iteration:', iteration, 'labels offset:', this.labelsRadiusOffset_, 'maxLabel:', this.indexOfMaxLabel, 'label for drop:', this.lableToDrop );
           }
+
+          this.invalidate(anychart.ConsistencyState.BOUNDS);
         }
       } else {
         iterator.reset();
         while (iterator.advance()) {
           if (this.isMissing_(iterator.get('value'))) continue;
-          var pointState = this.state.seriesState | this.state.getPointStateByIndex(iterator.getIndex());
+          pointState = this.state.getPointStateByIndex(iterator.getIndex());
           var hovered = this.state.isStateContains(pointState, anychart.PointState.HOVER);
           this.drawLabel_(pointState, hovered);
         }
@@ -1361,6 +2239,22 @@ anychart.pieModule.Chart.prototype.drawContent = function(bounds) {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
+    var hasOutLine = this.normal_.outline().getOption('offset') || this.normal_.outline().getOption('width') ||
+        this.hovered_.outline().getOption('offset') || this.hovered_.outline().getOption('width') ||
+        this.selected_.outline().getOption('offset') ||  this.selected_.outline().getOption('width');
+
+    if (this.outlineLayer_) {
+      this.outlineLayer_.clear();
+    } else if (hasOutLine) {
+      this.outlineLayer_ = new anychart.core.utils.TypedLayer(function() {
+        return acgraph.path();
+      }, function(child) {
+        (/** @type {acgraph.vector.Path} */ (child)).clear();
+      });
+      this.outlineLayer_.zIndex(anychart.pieModule.Chart.ZINDEX_PIE);
+      this.outlineLayer_.parent(this.rootElement);
+    }
+
     if (this.dataLayer_) {
       this.dataLayer_.clear();
     } else {
@@ -1392,10 +2286,11 @@ anychart.pieModule.Chart.prototype.drawContent = function(bounds) {
     iterator.reset();
     while (iterator.advance()) {
       if (this.isMissing_(iterator.get('value'))) continue;
+      pointState = this.state.getPointStateByIndex(iterator.getIndex());
       if (mode3d) {
         this.prepare3DSlice_();
       } else {
-        this.drawSlice_();
+        this.drawSlice_(pointState);
       }
     }
 
@@ -1412,23 +2307,629 @@ anychart.pieModule.Chart.prototype.drawContent = function(bounds) {
       }
     }
 
+    if (this.innerRadiusValue_) {
+      var centerContentFill = /** @type {acgraph.vector.Stroke} */ (this.center_.getOption('fill'));
+      var centerContentStroke = /** @type {acgraph.vector.Stroke} */ (this.center_.getOption('stroke'));
+
+      if (!this.centerContentBg_)
+        this.centerContentBg_ = acgraph.circle();
+
+      var radius = this.innerRadiusValue_ - acgraph.vector.getThickness(centerContentStroke) / 2;
+
+      this.centerContentBg_
+          .parent(this.rootElement)
+          .zIndex(anychart.pieModule.Chart.ZINDEX_CENTER_CONTENT_BG)
+          .stroke(centerContentStroke)
+          .fill(centerContentFill)
+          .radius(radius);
+    } else if (this.centerContentBg_) {
+      this.centerContentBg_.parent(null);
+    }
+
     if (this.hoveredLabelConnectorPath_)
       this.hoveredLabelConnectorPath_.stroke(connectorStroke);
 
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
+    var realContent = this.center_.realContent;
+    var contentLayer = this.center_.contentLayer;
+    if (anychart.utils.instanceOf(realContent, acgraph.vector.Element)) {
+      var ccbb = realContent.getBounds();
+      this.transformCenterContent(ccbb);
+      contentLayer.clip(null);
+    } else if (anychart.utils.instanceOf(realContent, anychart.core.VisualBase)) {
+      realContent.parentBounds(this.centerContentBounds);
+      realContent.resumeSignalsDispatching(false);
+      realContent.draw();
+
+      contentLayer.setTransformationMatrix(1, 0, 0, 1, 0, 0);
+      contentLayer.clip(acgraph.circle(this.cx, this.cy, this.innerRadiusValue_ + 2));
+    }
+
+    if (this.centerContentBg_ && this.innerRadiusValue_) {
+      this.centerContentBg_
+          .centerX(this.cx)
+          .centerY(this.cy);
+    }
+  }
 };
 
 
 /**
- * Checks that value represents missing point.
- * @param {*} value
- * @return {boolean} Is value represents missing value.
+ * Draws outside label for a slice.
+ * @private
+ * @param {anychart.PointState|number} pointState Point state.
+ * @param {boolean=} opt_updateConnector Whether to update connector or not.
+ * @return {anychart.core.ui.CircularLabelsFactory.Label} Label.
+ */
+anychart.pieModule.Chart.prototype.drawOutsideLabel_ = function(pointState, opt_updateConnector) {
+  var iterator = this.getIterator();
+
+  var state = anychart.core.utils.InteractivityState.clarifyState(pointState);
+
+  var hovered = state == anychart.PointState.HOVER;
+  var selected = state == anychart.PointState.SELECT;
+
+  var mainFactory = this.labels();
+  var stateFactory = selected ? this.selected_.labels() : hovered ? this.hovered_.labels() : null;
+
+  var pointLabel = iterator.get('normal');
+  pointLabel = goog.isDef(pointLabel) ? pointLabel['label'] : void 0;
+
+  var statePointLabel = selected ? iterator.get('selected') : hovered ? iterator.get('hovered') : void 0;
+  statePointLabel = goog.isDef(statePointLabel) ? statePointLabel['label'] : void 0;
+
+  pointLabel = anychart.utils.getFirstDefinedValue(pointLabel, iterator.get('label'));
+  statePointLabel = selected ? anychart.utils.getFirstDefinedValue(statePointLabel, iterator.get('selectLabel')) :
+      hovered ? anychart.utils.getFirstDefinedValue(statePointLabel, iterator.get('hoverLabel')) : null;
+
+  var index = iterator.getIndex();
+
+  var label = mainFactory.getLabel(index);
+
+  var labelEnabled = pointLabel && goog.isDef(pointLabel['enabled']) ? pointLabel['enabled'] : null;
+  var stateLabelEnabled = statePointLabel && goog.isDef(statePointLabel['enabled']) ? statePointLabel['enabled'] : null;
+
+  var isDraw = (hovered || selected) ?
+      goog.isNull(stateLabelEnabled) ?
+          goog.isNull(stateFactory.enabled()) ?
+              goog.isNull(labelEnabled) ?
+                  (label && goog.isDef(label.enabled())) ?
+                      label.enabled() :
+                      mainFactory.enabled() :
+                  labelEnabled :
+              stateFactory.enabled() :
+          stateLabelEnabled :
+      goog.isNull(labelEnabled) ?
+          (label && goog.isDef(label.enabled())) ?
+              label.enabled() :
+              mainFactory.enabled() :
+          labelEnabled;
+
+  var enabled;
+  var wasNoLabel;
+  var anchor;
+  var formatProvider = this.createFormatProvider(true);
+  var positionProvider = this.createPositionProvider();
+  if (isDraw) {
+    if (wasNoLabel = !label) {
+      label = mainFactory.add(formatProvider, positionProvider, index);
+    }
+
+    // save enabled setting for label
+    enabled = label.enabled();
+
+    label.resetSettings();
+    label.currentLabelsFactory(/** @type {anychart.core.ui.LabelsFactory} */(stateFactory));
+    label.setSettings(/** @type {Object} */(pointLabel), /** @type {Object} */(statePointLabel));
+    label.enabled(/** @type {boolean} */(enabled));
+
+    anchor = iterator.meta('anchor');
+    if (goog.isDef(anchor))
+      label['anchor'](/** @type {string} */(anchor));
+
+    if (!wasNoLabel)
+      label.draw();
+
+  } else if (label) {
+    enabled = label.enabled();
+    label.clear();
+    label.enabled(/** @type {boolean} */(enabled));
+  } else {
+    label = mainFactory.add(formatProvider, positionProvider, index);
+    anchor = iterator.meta('anchor');
+    if (goog.isDef(anchor))
+      label['anchor'](/** @type {string} */(anchor));
+    label.enabled(false);
+  }
+  if (opt_updateConnector)
+    this.updateConnector_(/** @type {anychart.core.ui.CircularLabelsFactory.Label}*/(label), isDraw);
+  return /** @type {anychart.core.ui.CircularLabelsFactory.Label}*/(label);
+};
+
+
+/**
+ * Draws connector line for label.
+ * @param {anychart.core.ui.CircularLabelsFactory.Label} label Label.
+ * @param {acgraph.vector.Path} path Connector path element.
+ */
+anychart.pieModule.Chart.prototype.drawConnectorLine = function(label, path) {
+  var iterator = this.data().getIterator();
+  var index = label.getIndex();
+  var mode3d = /** @type {boolean} */ (this.getOption('mode3d'));
+
+  if (iterator.select(index)) {
+    var x0 = this.connectorAnchorCoords[index * 2];
+    var y0 = this.connectorAnchorCoords[index * 2 + 1];
+
+    var connector = /** @type {number} */(iterator.meta('connector'));
+    var positionProvider = label.positionProvider()['value'];
+
+    var offsetY = goog.isDef(label.getOption('offsetY')) ? label.getOption('offsetY') : this.labels().getOption('offsetY');
+    if (!offsetY) offsetY = 0;
+    var offsetRadius = anychart.utils.normalizeSize(/** @type {number|string} */(offsetY), this.radiusValue_);
+
+    var offsetX = goog.isDef(label.getOption('offsetX')) ? label.getOption('offsetX') : this.labels().getOption('offsetX');
+    if (!offsetX) offsetX = 0;
+    var offsetAngle = anychart.utils.normalizeSize(/** @type {number|string} */(offsetX), 360);
+
+    var angle = positionProvider['angle'] + offsetAngle;
+    var angleRad = goog.math.toRadians(angle);
+    var radius = positionProvider['radius'] + offsetRadius;
+    var radiusY = mode3d ? positionProvider['radiusY'] + offsetRadius : radius;
+
+    var x = this.cx + radius * Math.cos(angleRad) - connector;
+    var y = this.cy + radiusY * Math.sin(angleRad);
+
+    path.clear().moveTo(x0, y0).lineTo(x, y).lineTo(x + connector, y);
+  }
+};
+
+
+/**
+ * Show or hide connector for label.
+ * @param {anychart.core.ui.CircularLabelsFactory.Label} label Label.
+ * @param {boolean} show Whether to show connector ot not for label.
  * @private
  */
-anychart.pieModule.Chart.prototype.isMissing_ = function(value) {
-  value = goog.isNull(value) ? NaN : +value;
-  return !(goog.isNumber(value) && !isNaN(value) && (value > 0));
+anychart.pieModule.Chart.prototype.updateConnector_ = function(label, show) {
+  if (!label || !this.drawnConnectors_)
+    return;
+  var index = label.getIndex();
+  var path;
+  if (!(path = this.drawnConnectors_[index])) {
+    if (!show) {
+      this.hoveredLabelConnectorPath_.clear();
+    } else {
+      this.drawConnectorLine(label, this.hoveredLabelConnectorPath_);
+    }
+    return;
+  }
+
+  if (label && label.enabled() != false && show) {
+    this.drawConnectorLine(label, path);
+  } else
+    path.clear();
+};
+
+
+/**
+ * Draws label for a slice.
+ * @private
+ * @param {anychart.PointState|number} pointState Point state.
+ * @param {boolean=} opt_updateConnector Whether to update connector or not. Used only with outside labels.
+ * @return {anychart.core.ui.CircularLabelsFactory.Label} Label.
+ */
+anychart.pieModule.Chart.prototype.drawLabel_ = function(pointState, opt_updateConnector) {
+  if (this.isOutsideLabels())
+    return this.drawOutsideLabel_(pointState, opt_updateConnector);
+
+  pointState = anychart.core.utils.InteractivityState.clarifyState(pointState);
+
+  var hovered = pointState == anychart.PointState.HOVER;
+  var selected = pointState == anychart.PointState.SELECT;
+
+  var iterator = this.getIterator();
+
+  var mainFactory = this.labels();
+  var stateFactory = selected ? this.selected_.labels() : hovered ? this.hovered_.labels() : null;
+
+  var pointLabel = iterator.get('normal');
+  pointLabel = goog.isDef(pointLabel) ? pointLabel['label'] : void 0;
+
+  var statePointLabel = selected ? iterator.get('selected') : hovered ? iterator.get('hovered') : void 0;
+  statePointLabel = goog.isDef(statePointLabel) ? statePointLabel['label'] : void 0;
+
+  pointLabel = anychart.utils.getFirstDefinedValue(pointLabel, iterator.get('label'));
+  statePointLabel = selected ? anychart.utils.getFirstDefinedValue(statePointLabel, iterator.get('selectLabel')) :
+      hovered ? anychart.utils.getFirstDefinedValue(statePointLabel, iterator.get('hoverLabel')) : null;
+
+  var index = iterator.getIndex();
+  var label = mainFactory.getLabel(index);
+
+  var labelEnabled = pointLabel && goog.isDef(pointLabel['enabled']) ? pointLabel['enabled'] : null;
+  var stateLabelEnabled = statePointLabel && goog.isDef(statePointLabel['enabled']) ? statePointLabel['enabled'] : null;
+
+  var positionProvider = this.createPositionProvider();
+  var formatProvider = this.createFormatProvider(true);
+
+  var mode3d = /** @type {boolean} */ (this.getOption('mode3d'));
+
+  var isNotNormalState = hovered || selected;
+
+  var isFitToSlice = true;
+  if ((!isNotNormalState || (isNotNormalState && !this.getOption('forceHoverLabels'))) && this.getOption('overlapMode') != anychart.enums.LabelsOverlapMode.ALLOW_OVERLAP) {
+    var start = /** @type {number} */ (iterator.meta('start'));
+    var sweep = /** @type {number} */ (iterator.meta('sweep'));
+
+    var cx = this.cx;
+    var cy = this.cy;
+
+    var angle;
+    var explode = this.getExplode(pointState);
+    if (explode) {
+      angle = (start + sweep / 2) * Math.PI / 180;
+      var ex = explode * Math.cos(angle);
+      var ey = (mode3d ? this.get3DYRadius(explode) : explode) * Math.sin(angle);
+      cx += ex;
+      cy += ey;
+    }
+
+    angle = start * Math.PI / 180;
+    var ax = cx + this.radiusValue_ * Math.cos(angle);
+    var ay = cy + (mode3d ? this.get3DYRadius(this.radiusValue_) : this.radiusValue_) * Math.sin(angle);
+
+    angle = (start + sweep) * Math.PI / 180;
+    var bx = cx + this.radiusValue_ * Math.cos(angle);
+    var by = cy + (mode3d ? this.get3DYRadius(this.radiusValue_) : this.radiusValue_) * Math.sin(angle);
+
+    if (!this.measureLabel_) {
+      this.measureLabel_ = new anychart.core.ui.CircularLabelsFactory.Label();
+    } else {
+      this.measureLabel_.clear();
+    }
+    this.measureLabel_.formatProvider(formatProvider);
+    this.measureLabel_.positionProvider(positionProvider);
+    this.measureLabel_.resetSettings();
+    this.measureLabel_.parentLabelsFactory(this.labels());
+    this.measureLabel_.currentLabelsFactory(mainFactory);
+    this.measureLabel_.setSettings(/** @type {Object} */(pointLabel), /** @type {Object} */(statePointLabel));
+
+    var bounds = this.labels().measureWithTransform(this.measureLabel_, null, null, index);
+
+    var singlePiePoint = ((iterator.getRowsCount() == 1 || sweep == 360) && !this.innerRadiusValue_);
+    var notIntersectStartLine = singlePiePoint || !anychart.math.checkRectIntersectionWithSegment(ax, ay, cx, cy, bounds);
+    var notIntersectEndLine = singlePiePoint || !anychart.math.checkRectIntersectionWithSegment(cx, cy, bx, by, bounds);
+    var notIntersectPieOuterRadius = !anychart.math.checkForRectIsOutOfCircleBounds(cx, cy, this.radiusValue_, bounds);
+    var notIntersectPieInnerRadius = singlePiePoint || anychart.math.checkForRectIsOutOfCircleBounds(cx, cy, this.innerRadiusValue_, bounds);
+
+    isFitToSlice = notIntersectStartLine && notIntersectEndLine && notIntersectPieOuterRadius && notIntersectPieInnerRadius;
+  }
+
+  var isDraw = isNotNormalState ?
+      goog.isNull(stateLabelEnabled) ?
+          goog.isNull(stateFactory.enabled()) ?
+              goog.isNull(labelEnabled) ?
+                  mainFactory.enabled() :
+                  labelEnabled :
+              stateFactory.enabled() :
+          stateLabelEnabled :
+      goog.isNull(labelEnabled) ?
+          mainFactory.enabled() :
+          labelEnabled;
+
+  if (isDraw && isFitToSlice) {
+    if (label) {
+      label.formatProvider(formatProvider);
+      label.positionProvider(positionProvider);
+    } else {
+      label = mainFactory.add(formatProvider, positionProvider, index);
+    }
+
+    label.resetSettings();
+    label.currentLabelsFactory(/** @type {anychart.core.ui.LabelsFactory} */(stateFactory));
+    label.setSettings(/** @type {Object} */(pointLabel), /** @type {Object} */(statePointLabel));
+
+    //todo: this shit should be reworked when labelsFactory will be reworked
+    //if usual label isn't disabled and not drawn then it doesn't have container and hover label doesn't know nothing
+    //about its DOM element and trying to apply itself setting to it. But nothing will happen because container is empty.
+    if (hovered && !label.container() && mainFactory.getDomElement()) {
+      label.container(mainFactory.getDomElement());
+      if (!label.container().parent()) {
+        label.container().parent(/** @type {acgraph.vector.ILayer} */(mainFactory.container()));
+      }
+    }
+  } else if (label) {
+    mainFactory.clear(label.getIndex());
+  }
+  return /** @type {anychart.core.ui.CircularLabelsFactory.Label}*/(label);
+};
+
+
+/**
+ * Internal function for drawing a slice by arguments.
+ * @param {anychart.PointState|number} pointState Point state.
+ * @param {boolean=} opt_update Whether to update current slice.
+ * @return {boolean} True if point is drawn.
+ * @private
+ */
+anychart.pieModule.Chart.prototype.drawSlice_ = function(pointState, opt_update) {
+  var iterator = this.getIterator();
+
+  var index = /** @type {number} */ (iterator.getIndex());
+  var start = /** @type {number} */ (iterator.meta('start'));
+  var sweep = /** @type {number} */ (iterator.meta('sweep'));
+
+  /** @type {!acgraph.vector.Path} */
+  var slice;
+  /** @type {!acgraph.vector.Path} */
+  var sliceOutline;
+  /** @type {acgraph.vector.Path} */
+  var hatchSlice;
+  if (opt_update) {
+    slice = /** @type {!acgraph.vector.Path} */ (iterator.meta('slice'));
+    sliceOutline = /** @type {!acgraph.vector.Path} */ (iterator.meta('sliceOutline'));
+    hatchSlice = /** @type {acgraph.vector.Path} */ (iterator.meta('hatchSlice'));
+    if (slice) slice.clear();
+    if (hatchSlice) hatchSlice.clear();
+    if (sliceOutline) sliceOutline.clear();
+  } else {
+    if (this.dataLayer_) {
+      slice = /** @type {!acgraph.vector.Path} */(this.dataLayer_.genNextChild());
+      iterator.meta('slice', slice);
+    }
+    if (this.outlineLayer_) {
+      sliceOutline = /** @type {!acgraph.vector.Path} */(this.outlineLayer_.genNextChild());
+      iterator.meta('sliceOutline', sliceOutline);
+    }
+    if (this.hatchLayer_) {
+      hatchSlice = /** @type {acgraph.vector.Path} */(this.hatchLayer_.genNextChild());
+      iterator.meta('hatchSlice', hatchSlice);
+    }
+  }
+
+  if (slice) {
+    var normalizer = anychart.core.settings.numberOrPercentNormalizer;
+
+    var outlineOffset = this.resolveOption('outline.offset', pointState, iterator, normalizer, false) || 0;
+    var outlineWidth = this.resolveOption('outline.width', pointState, iterator, normalizer, false) || 0;
+
+    outlineOffset = anychart.utils.normalizeSize(/** @type {number|string} */(outlineOffset), this.radiusValue_);
+    outlineWidth = anychart.utils.normalizeSize(/** @type {number|string} */(outlineWidth), this.radiusValue_);
+
+    var explode = this.getExplode(pointState);
+    iterator.meta('explode', explode);
+
+    var angle = start + sweep / 2;
+    var cos = Math.cos(goog.math.toRadians(angle));
+    var sin = Math.sin(goog.math.toRadians(angle));
+    var ex = explode * cos;
+    var ey = explode * sin;
+
+    var outerSliceRadius = this.radiusValue_;
+    var innerOutlineRadius = outerSliceRadius + outlineOffset;
+    var outerOutlineRadius = outerSliceRadius + outlineOffset + outlineWidth;
+    if (sliceOutline) {
+      if (!outlineWidth) {
+        sliceOutline.clear();
+      } else {
+        acgraph.vector.primitives.donut(sliceOutline, this.cx + ex, this.cy + ey, outerOutlineRadius, innerOutlineRadius, start, sweep);
+      }
+    }
+    slice = acgraph.vector.primitives.donut(slice, this.cx + ex, this.cy + ey, outerSliceRadius, this.innerRadiusValue_, start, sweep);
+
+    slice.tag = {
+      series: this,
+      index: index
+    };
+
+    this.colorizeSlice(pointState);
+    if (hatchSlice) {
+      hatchSlice.deserialize(slice.serialize());
+      hatchSlice.tag = {
+        series: this,
+        index: index
+      };
+      this.applyHatchFill(pointState);
+    }
+  }
+
+  return true;
+};
+
+
+/**
+ * Draw front side.
+ * @param {number} cx
+ * @param {number} cy
+ * @param {number} outerR
+ * @param {number} startAngle
+ * @param {number} endAngle
+ * @param {number} sweep
+ * @param {anychart.PointState|number} pointState
+ * @param {boolean=} opt_update
+ * @return {acgraph.vector.Path}
+ * @private
+ */
+anychart.pieModule.Chart.prototype.drawFrontSide_ = function(cx, cy, outerR, startAngle, endAngle, sweep, pointState, opt_update) {
+  // there may be two front sides
+  var uniqueValue = '' + startAngle;
+  var pathName = 'frontPath' + uniqueValue;
+  var path = this.createPath_(pathName, opt_update);
+  if (!path) return null;
+
+  var outerXR = outerR;
+  var outerYR = this.get3DYRadius(outerR);
+
+  var h = this.get3DHeight();
+
+  if (endAngle < startAngle) endAngle += 360;
+
+  if (Math.abs(sweep) == 360) {
+    startAngle = 0;
+    endAngle = 180;
+  }
+
+  var radStartAngle = goog.math.toRadians(startAngle);
+  var radEndAngle = goog.math.toRadians(endAngle);
+
+  var startX = cx + outerXR * +Math.cos(radStartAngle).toFixed(5);
+  var startY = cy + outerYR * +Math.sin(radStartAngle).toFixed(5);
+
+  var endX = cx + outerXR * +Math.cos(radEndAngle).toFixed(5);
+  var endY = cy + outerYR * +Math.sin(radEndAngle).toFixed(5);
+
+  path.moveTo(startX, startY);
+  path.arcToByEndPoint(endX, endY, outerXR, outerYR, false, true);
+  path.lineTo(endX, endY + h);
+  path.arcToByEndPoint(startX, startY + h, outerXR, outerYR, false, false);
+  path.lineTo(startX, startY);
+  path.close();
+
+  this.colorize3DPath_(pathName, pointState);
+  return path;
+};
+
+
+/**
+ * Draw back side.
+ * @param {number} cx
+ * @param {number} cy
+ * @param {number} innerR
+ * @param {number} startAngle
+ * @param {number} endAngle
+ * @param {number} sweep
+ * @param {anychart.PointState|number} pointState
+ * @param {boolean=} opt_update
+ * @return {acgraph.vector.Path}
+ * @private
+ */
+anychart.pieModule.Chart.prototype.drawBackSide_ = function(cx, cy, innerR, startAngle, endAngle, sweep, pointState, opt_update) {
+  // there may be two back sides
+  var uniqueValue = '' + startAngle;
+  var pathName = 'backPath' + uniqueValue;
+  var path = this.createPath_(pathName, opt_update);
+  if (!path) return null;
+
+  var innerXR = innerR;
+  var innerYR = this.get3DYRadius(innerR);
+
+  var h = this.get3DHeight();
+
+  if (endAngle < startAngle) endAngle += 360;
+
+  if (Math.abs(sweep) == 360) {
+    startAngle = 180;
+    endAngle = 0;
+  }
+
+  var radStartAngle = goog.math.toRadians(startAngle);
+  var radEndAngle = goog.math.toRadians(endAngle);
+
+  var innerStartX = cx + innerXR * Math.cos(radStartAngle);
+  var innerStartY = cy + innerYR * Math.sin(radStartAngle);
+
+  var innerEndX = cx + innerXR * Math.cos(radEndAngle);
+  var innerEndY = cy + innerYR * Math.sin(radEndAngle);
+
+  path.moveTo(innerStartX, innerStartY);
+  path.arcToByEndPoint(innerEndX, innerEndY, innerXR, innerYR, false, true);
+  path.lineTo(innerEndX, innerEndY + h);
+  path.arcToByEndPoint(innerStartX, innerStartY + h, innerXR, innerYR, false, false);
+  path.lineTo(innerStartX, innerStartY);
+  path.close();
+
+  this.colorize3DPath_(pathName, pointState);
+  return path;
+};
+
+
+/**
+ * Draw simple (rect) side (start and end sides of pie).
+ * @param {!string} pathName
+ * @param {number} cx
+ * @param {number} cy
+ * @param {number} outerR
+ * @param {number} innerR
+ * @param {number} angle
+ * @param {anychart.PointState|number} pointState
+ * @param {boolean=} opt_update
+ * @return {acgraph.vector.Path}
+ * @private
+ */
+anychart.pieModule.Chart.prototype.drawSimpleSide_ = function(pathName, cx, cy, outerR, innerR, angle, pointState, opt_update) {
+  var outerXR = outerR;
+  var outerYR = this.get3DYRadius(outerR);
+  var innerXR = innerR;
+  var innerYR = this.get3DYRadius(innerR);
+
+  var radAngle = goog.math.toRadians(angle);
+
+  var h = this.get3DHeight();
+  var x1 = cx + innerXR * Math.cos(radAngle);
+  var x2 = cx + outerXR * Math.cos(radAngle);
+  var y1 = cy + innerYR * Math.sin(radAngle);
+  var y2 = cy + outerYR * Math.sin(radAngle);
+
+  var path = this.createPath_(pathName, opt_update);
+  if (!path) return null;
+
+  path.moveTo(x1, y1);
+  path.lineTo(x2, y2);
+  path.lineTo(x2, y2 + h);
+  path.lineTo(x1, y1 + h);
+  path.lineTo(x1, y1);
+  path.close();
+
+  this.colorize3DPath_(pathName, pointState);
+  return path;
+};
+
+
+//endregion
+//region --- Animation
+/** @inheritDoc */
+anychart.pieModule.Chart.prototype.doAnimation = function() {
+  if (!this.getOption('mode3d') && this.animation().enabled() && this.animation().duration() > 0) {
+    if (this.animationQueue_ && this.animationQueue_.isPlaying()) {
+      this.animationQueue_.update();
+    } else if (this.hasInvalidationState(anychart.ConsistencyState.CHART_ANIMATION)) {
+      goog.dispose(this.animationQueue_);
+      this.animationQueue_ = new anychart.animations.AnimationSerialQueue();
+      var duration = /** @type {number} */(this.animation().duration());
+      var pieDuration = duration * anychart.pieModule.Chart.PIE_ANIMATION_DURATION_RATIO;
+      var pieLabelDuration = duration * (1 - anychart.pieModule.Chart.PIE_ANIMATION_DURATION_RATIO);
+
+      var pieAnimation = new anychart.pieModule.Animation(this, pieDuration);
+      var pieLabelAnimation = new anychart.pieModule.LabelAnimation(this, pieLabelDuration);
+
+      this.animationQueue_.add(/** @type {goog.fx.TransitionBase} */ (pieAnimation));
+      this.animationQueue_.add(/** @type {goog.fx.TransitionBase} */ (pieLabelAnimation));
+
+      this.animationQueue_.listen(goog.fx.Transition.EventType.BEGIN, function() {
+        this.connStrokeBackup_ = this.getOption('connectorStroke');
+        this.setOption('connectorStroke', 'none');
+        this.ignoreMouseEvents(true);
+        this.dispatchDetachedEvent({
+          'type': anychart.enums.EventType.ANIMATION_START,
+          'chart': this
+        });
+      }, false, this);
+
+      this.animationQueue_.listen(goog.fx.Transition.EventType.END, function() {
+        this.setOption('connectorStroke', this.connStrokeBackup_);
+        this.ignoreMouseEvents(false);
+        this.dispatchDetachedEvent({
+          'type': anychart.enums.EventType.ANIMATION_END,
+          'chart': this
+        });
+      }, false, this);
+
+      this.animationQueue_.play(false);
+    }
+  }
 };
 
 
@@ -1443,17 +2944,18 @@ anychart.pieModule.Chart.prototype.updatePointOnAnimate = function(point) {
   var sweep = /** @type {number} */ (point.meta('sweep'));
   var radius = /** @type {number} */ (point.meta('radius'));
   var innerRadius = /** @type {number} */ (point.meta('innerRadius'));
-  var exploded = !!point.meta('exploded') && !(point.getRowsCount() == 1);
+  var pointState = this.state.getPointStateByIndex(point.getIndex());
+  var explode = this.getExplode(pointState);
 
-  if (exploded) {
+  if (explode) {
     var angle = start + sweep / 2;
     var cos = Math.cos(goog.math.toRadians(angle));
     var sin = Math.sin(goog.math.toRadians(angle));
-    var ex = this.explodeValue_ * cos;
-    var ey = this.explodeValue_ * sin;
-    slice = acgraph.vector.primitives.donut(slice, this.cx_ + ex, this.cy_ + ey, radius, innerRadius, start, sweep);
+    var ex = explode * cos;
+    var ey = explode * sin;
+    slice = acgraph.vector.primitives.donut(slice, this.cx + ex, this.cy + ey, radius, innerRadius, start, sweep);
   } else {
-    slice = acgraph.vector.primitives.donut(slice, this.cx_, this.cy_, radius, innerRadius, start, sweep);
+    slice = acgraph.vector.primitives.donut(slice, this.cx, this.cy, radius, innerRadius, start, sweep);
   }
 
   var hatchSlice = /** @type {!acgraph.vector.Path} */ (point.meta('hatchSlice'));
@@ -1462,7 +2964,7 @@ anychart.pieModule.Chart.prototype.updatePointOnAnimate = function(point) {
     hatchSlice.clear();
     hatchSlice.deserialize(slice.serialize());
     var hatchFillResolver = anychart.pieModule.Chart.getColorResolver('hatchFill', anychart.enums.ColorType.HATCH_FILL, true);
-    var hatchFill = hatchFillResolver(this, this.state.getPointStateByIndex(point.getIndex()), false);
+    var hatchFill = hatchFillResolver(this, this.state.getPointStateByIndex(point.getIndex()), false, null);
     hatchSlice.stroke(null).fill(hatchFill);
   }
 };
@@ -1493,99 +2995,8 @@ anychart.pieModule.Chart.prototype.updateLabelsOnAnimate = function(labelOpacity
 };
 
 
-/**
- * Internal function for drawinga slice by arguments.
- * @param {boolean=} opt_update Whether to update current slice.
- * @return {boolean} True if point is drawn.
- * @private
- */
-anychart.pieModule.Chart.prototype.drawSlice_ = function(opt_update) {
-  var iterator = this.getIterator();
-
-  var index = /** @type {number} */ (iterator.getIndex());
-  var start = /** @type {number} */ (iterator.meta('start'));
-  var sweep = /** @type {number} */ (iterator.meta('sweep'));
-  var exploded = !!iterator.meta('exploded') && !(iterator.getRowsCount() == 1);
-
-  /** @type {!acgraph.vector.Path} */
-  var slice;
-  /** @type {acgraph.vector.Path} */
-  var hatchSlice;
-  if (opt_update) {
-    slice = /** @type {!acgraph.vector.Path} */ (iterator.meta('slice'));
-    hatchSlice = /** @type {acgraph.vector.Path} */ (iterator.meta('hatchSlice'));
-    slice.clear();
-    if (hatchSlice) hatchSlice.clear();
-  } else {
-    slice = /** @type {!acgraph.vector.Path} */(this.dataLayer_.genNextChild());
-    iterator.meta('slice', slice);
-    hatchSlice = /** @type {acgraph.vector.Path} */(this.hatchLayer_.genNextChild());
-    iterator.meta('hatchSlice', hatchSlice);
-  }
-
-  if (exploded) {
-    var angle = start + sweep / 2;
-    var cos = Math.cos(goog.math.toRadians(angle));
-    var sin = Math.sin(goog.math.toRadians(angle));
-    var ex = this.explodeValue_ * cos;
-    var ey = this.explodeValue_ * sin;
-    slice = acgraph.vector.primitives.donut(slice, this.cx_ + ex, this.cy_ + ey, this.radiusValue_, this.innerRadiusValue_, start, sweep);
-  } else {
-    slice = acgraph.vector.primitives.donut(slice, this.cx_, this.cy_, this.radiusValue_, this.innerRadiusValue_, start, sweep);
-  }
-
-  slice.tag = {
-    series: this,
-    index: index
-  };
-  var pointState = this.state.getPointStateByIndex(iterator.getIndex());
-  this.colorizeSlice(pointState);
-  if (hatchSlice) {
-    hatchSlice.deserialize(slice.serialize());
-    hatchSlice.tag = {
-      series: this,
-      index: index
-    };
-    this.applyHatchFill(pointState);
-  }
-
-  return true;
-};
-
-
-/**
- * @param {(anychart.enums.SelectionMode|string|null)=} opt_value Selection mode.
- * @return {anychart.pieModule.Chart|anychart.enums.SelectionMode|null} .
- */
-/*TODO(AntonKagakin): Do not remove. For future interactivity improvement.
-anychart.pieModule.Chart.prototype.selectionMode = function(opt_value) {
-  return null;
-};*/
-
-
-/**
- * @param {(anychart.enums.HoverMode|string)=} opt_value Hover mode.
- * @return {anychart.pieModule.Chart|anychart.enums.HoverMode} .
- */
-anychart.pieModule.Chart.prototype.hoverMode = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeHoverMode(opt_value);
-    if (opt_value != this.hoverMode_) {
-      this.hoverMode_ = opt_value;
-    }
-    return this;
-  }
-  return /** @type {anychart.enums.HoverMode}*/(this.hoverMode_);
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  3D mode.
-//
-//----------------------------------------------------------------------------------------------------------------------
-
-
+//endregion
+//region --- 3D mode
 /**
  * Get minor semi-axes (minor radius) value.
  * @param {number} majorRadius
@@ -1614,6 +3025,8 @@ anychart.pieModule.Chart.prototype.get3DHeight = function() {
 anychart.pieModule.Chart.prototype.prepare3DSlice_ = function() {
   var iterator = this.getIterator();
   var index = iterator.getIndex();
+  var pointState = this.state.getPointStateByIndex(index);
+  var explode = this.getExplode(pointState);
 
   var start = /** @type {number} */ (iterator.meta('start'));
   var sweep = /** @type {number} */ (iterator.meta('sweep'));
@@ -1624,8 +3037,8 @@ anychart.pieModule.Chart.prototype.prepare3DSlice_ = function() {
   var angle = start + sweep / 2;
   var cos = Math.cos(goog.math.toRadians(angle));
   var sin = Math.sin(goog.math.toRadians(angle));
-  var ex = this.explodeValue_ * cos;
-  var ey = this.get3DYRadius(this.explodeValue_) * sin;
+  var ex = explode * cos;
+  var ey = this.get3DYRadius(explode) * sin;
 
   this.sides3D_.push({
     index: index,
@@ -1761,19 +3174,20 @@ anychart.pieModule.Chart.prototype.draw3DSlices_ = function(opt_sliceIndex, opt_
 anychart.pieModule.Chart.prototype.draw3DSlice_ = function(side, opt_update) {
   var iterator = this.getIterator();
   iterator.select(side.index);
-  var exploded = !!iterator.meta('exploded') && !(iterator.getRowsCount() == 1);
+  var pointState = this.state.getPointStateByIndex(side.index);
 
-  var cx = this.cx_;
-  var cy = this.cy_;
-  if (exploded) {
+  var explode = this.getExplode(pointState);
+  iterator.meta('explode', explode);
+
+  var cx = this.cx;
+  var cy = this.cy;
+  if (explode) {
     cx += side.ex;
     cy += side.ey;
   }
 
   var outerR = this.radiusValue_;
   var innerR = this.innerRadiusValue_;
-
-  var pointState = this.state.getPointStateByIndex(iterator.getIndex());
 
   switch (side.type) {
     case anychart.pieModule.Chart.Side3DType.TOP:
@@ -1805,7 +3219,7 @@ anychart.pieModule.Chart.prototype.draw3DSlice_ = function(side, opt_update) {
  * @param {number} sweep Sweep angle in degrees.
  * @param {(anychart.PointState|number)} pointState Point state.
  * @param {boolean=} opt_update
- * @return {!acgraph.vector.Path}
+ * @return {acgraph.vector.Path}
  * @private
  */
 anychart.pieModule.Chart.prototype.drawTopSide_ = function(cx, cy, outerR, innerR, start, sweep, pointState, opt_update) {
@@ -1820,6 +3234,7 @@ anychart.pieModule.Chart.prototype.drawTopSide_ = function(cx, cy, outerR, inner
   sweep = goog.math.clamp(sweep, -360, 360);
 
   var path = this.createPath_('topPath', opt_update);
+  if (!path) return null;
 
   // draw pie
   if (innerR <= 0) {
@@ -1878,7 +3293,7 @@ anychart.pieModule.Chart.prototype.createPath_ = function(pathName, opt_update) 
     path = /** @type {!acgraph.vector.Path} */ (iterator.meta(pathName));
     hatchPath = /** @type {!acgraph.vector.Path} */ (iterator.meta(hatchName));
 
-    path.clear();
+    if (path) path.clear();
     if (hatchPath) hatchPath.clear();
 
   } else {
@@ -1930,8 +3345,19 @@ anychart.pieModule.Chart.prototype.get3DFillColor_ = function(pointState) {
       iterator.get('fill'),
       this.fill()));
 
+  pointState = anychart.core.utils.InteractivityState.clarifyState(pointState);
+
   var rawColor;
-  if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
+  if (pointState == anychart.PointState.SELECT) {
+    var selectFill;
+    pointStateObject = iterator.get('selected');
+    selectFill = anychart.utils.getFirstDefinedValue(
+        goog.isDef(pointStateObject) ? pointStateObject['fill'] : void 0,
+        iterator.get('selectFill'),
+        normalColor);
+    rawColor = this.normalizeColor(
+        /** @type {acgraph.vector.Fill|Function} */(selectFill), normalColor);
+  } else if (pointState == anychart.PointState.HOVER) {
     var hoverFill;
     pointStateObject = iterator.get('hovered');
     hoverFill = anychart.utils.getFirstDefinedValue(
@@ -2004,20 +3430,21 @@ anychart.pieModule.Chart.prototype.colorize3DPath_ = function(pathName, pointSta
   var darkPathColor = goog.color.rgbArrayToHex(goog.color.blend(rgbColor, rgbDarken, .2));
   var darkSidesPathColor = goog.color.rgbArrayToHex(goog.color.blend(rgbColor, rgbDarken, .1));
 
-  var hovered = this.state.isStateContains(pointState, anychart.PointState.HOVER);
+  var state = anychart.core.utils.InteractivityState.clarifyState(pointState);
+  var hovered = state == anychart.PointState.HOVER;
+  var selected = hovered == anychart.PointState.SELECT;
 
   if (pathName == 'topPath') {
-
     fill = {
       'angle': -50,
       'keys': [{
         'position': 0,
         'opacity': 1,
-        'color': hovered ? anychart.color.lighten(color, .3) : color
+        'color': (hovered || selected) ? anychart.color.lighten(color, .3) : color
       }, {
         'position': 1,
         'opacity': 1,
-        'color': hovered ? anychart.color.lighten(topPathSecondColor, .2) : topPathSecondColor
+        'color': (hovered || selected) ? anychart.color.lighten(topPathSecondColor, .2) : topPathSecondColor
       }]
     };
 
@@ -2027,24 +3454,23 @@ anychart.pieModule.Chart.prototype.colorize3DPath_ = function(pathName, pointSta
       'keys': [{
         'position': 0,
         'opacity': 1,
-        'color': hovered ? anychart.color.lighten(color, .2) : anychart.color.lighten(color, .1)
+        'color': (hovered || selected) ? anychart.color.lighten(color, .2) : anychart.color.lighten(color, .1)
       }, {
         'position': .19,
         'opacity': 1,
-        'color': hovered ? anychart.color.lighten(frontSecondColor, .2) : frontSecondColor
+        'color': (hovered || selected) ? anychart.color.lighten(frontSecondColor, .2) : frontSecondColor
       }, {
         'position': 1,
         'opacity': 1,
-        'color': hovered ? anychart.color.lighten(frontThirdColor, .2) : frontThirdColor
+        'color': (hovered || selected) ? anychart.color.lighten(frontThirdColor, .2) : frontThirdColor
       }]
     };
-
   } else if (goog.string.startsWith(pathName, 'backPath')) {
-    fill = hovered ? anychart.color.lighten(darkPathColor, .2) : darkPathColor;
+    fill = (hovered || selected) ? anychart.color.lighten(darkPathColor, .2) : darkPathColor;
 
     // sides (start, end)
   } else {
-    fill = hovered ? anychart.color.lighten(darkSidesPathColor, .2) : darkSidesPathColor;
+    fill = (hovered || selected) ? anychart.color.lighten(darkSidesPathColor, .2) : darkSidesPathColor;
   }
 
   path.fill(fill);
@@ -2370,147 +3796,35 @@ anychart.pieModule.Chart.prototype.getBackSides_ = function(startAngle, endAngle
 };
 
 
+//endregion
+//region --- Utils
 /**
- * Draw front side.
- * @param {number} cx
- * @param {number} cy
- * @param {number} outerR
- * @param {number} startAngle
- * @param {number} endAngle
- * @param {number} sweep
- * @param {anychart.PointState|number} pointState
- * @param {boolean=} opt_update
- * @return {!acgraph.vector.Path}
- * @private
+ *
+ * @param {number} index
+ * @return {Array.<number>}
  */
-anychart.pieModule.Chart.prototype.drawFrontSide_ = function(cx, cy, outerR, startAngle, endAngle, sweep, pointState, opt_update) {
-  // there may be two front sides
-  var uniqueValue = '' + startAngle;
-  var pathName = 'frontPath' + uniqueValue;
-  var path = this.createPath_(pathName, opt_update);
+anychart.pieModule.Chart.prototype.getSliceCenterCoords = function(index) {
+  var iterator = this.getIterator();
+  iterator.select(index);
 
-  var outerXR = outerR;
-  var outerYR = this.get3DYRadius(outerR);
+  var cx = this.cx;
+  var cy = this.cy;
 
-  var h = this.get3DHeight();
+  var pointState = this.state.getPointStateByIndex(index);
+  var explode = this.getExplode(pointState);
+  if (explode) {
+    var mode3d = /** @type {boolean} */ (this.getOption('mode3d'));
+    var start = /** @type {number} */ (iterator.meta('start'));
+    var sweep = /** @type {number} */ (iterator.meta('sweep'));
 
-  if (endAngle < startAngle) endAngle += 360;
-
-  if (Math.abs(sweep) == 360) {
-    startAngle = 0;
-    endAngle = 180;
+    var angle = (start + sweep / 2) * Math.PI / 180;
+    var ex = explode * Math.cos(angle);
+    var ey = (mode3d ? this.get3DYRadius(explode) : explode) * Math.sin(angle);
+    cx += ex;
+    cy += ey;
   }
 
-  var radStartAngle = goog.math.toRadians(startAngle);
-  var radEndAngle = goog.math.toRadians(endAngle);
-
-  var startX = cx + outerXR * +Math.cos(radStartAngle).toFixed(5);
-  var startY = cy + outerYR * +Math.sin(radStartAngle).toFixed(5);
-
-  var endX = cx + outerXR * +Math.cos(radEndAngle).toFixed(5);
-  var endY = cy + outerYR * +Math.sin(radEndAngle).toFixed(5);
-
-  path.moveTo(startX, startY);
-  path.arcToByEndPoint(endX, endY, outerXR, outerYR, false, true);
-  path.lineTo(endX, endY + h);
-  path.arcToByEndPoint(startX, startY + h, outerXR, outerYR, false, false);
-  path.lineTo(startX, startY);
-  path.close();
-
-  this.colorize3DPath_(pathName, pointState);
-  return path;
-};
-
-
-/**
- * Draw back side.
- * @param {number} cx
- * @param {number} cy
- * @param {number} innerR
- * @param {number} startAngle
- * @param {number} endAngle
- * @param {number} sweep
- * @param {anychart.PointState|number} pointState
- * @param {boolean=} opt_update
- * @return {!acgraph.vector.Path}
- * @private
- */
-anychart.pieModule.Chart.prototype.drawBackSide_ = function(cx, cy, innerR, startAngle, endAngle, sweep, pointState, opt_update) {
-  // there may be two back sides
-  var uniqueValue = '' + startAngle;
-  var pathName = 'backPath' + uniqueValue;
-  var path = this.createPath_(pathName, opt_update);
-
-  var innerXR = innerR;
-  var innerYR = this.get3DYRadius(innerR);
-
-  var h = this.get3DHeight();
-
-  if (endAngle < startAngle) endAngle += 360;
-
-  if (Math.abs(sweep) == 360) {
-    startAngle = 180;
-    endAngle = 0;
-  }
-
-  var radStartAngle = goog.math.toRadians(startAngle);
-  var radEndAngle = goog.math.toRadians(endAngle);
-
-  var innerStartX = cx + innerXR * Math.cos(radStartAngle);
-  var innerStartY = cy + innerYR * Math.sin(radStartAngle);
-
-  var innerEndX = cx + innerXR * Math.cos(radEndAngle);
-  var innerEndY = cy + innerYR * Math.sin(radEndAngle);
-
-  path.moveTo(innerStartX, innerStartY);
-  path.arcToByEndPoint(innerEndX, innerEndY, innerXR, innerYR, false, true);
-  path.lineTo(innerEndX, innerEndY + h);
-  path.arcToByEndPoint(innerStartX, innerStartY + h, innerXR, innerYR, false, false);
-  path.lineTo(innerStartX, innerStartY);
-  path.close();
-
-  this.colorize3DPath_(pathName, pointState);
-  return path;
-};
-
-
-/**
- * Draw simple (rect) side (start and end sides of pie).
- * @param {!string} pathName
- * @param {number} cx
- * @param {number} cy
- * @param {number} outerR
- * @param {number} innerR
- * @param {number} angle
- * @param {anychart.PointState|number} pointState
- * @param {boolean=} opt_update
- * @return {!acgraph.vector.Path}
- * @private
- */
-anychart.pieModule.Chart.prototype.drawSimpleSide_ = function(pathName, cx, cy, outerR, innerR, angle, pointState, opt_update) {
-  var outerXR = outerR;
-  var outerYR = this.get3DYRadius(outerR);
-  var innerXR = innerR;
-  var innerYR = this.get3DYRadius(innerR);
-
-  var radAngle = goog.math.toRadians(angle);
-
-  var h = this.get3DHeight();
-  var x1 = cx + innerXR * Math.cos(radAngle);
-  var x2 = cx + outerXR * Math.cos(radAngle);
-  var y1 = cy + innerYR * Math.sin(radAngle);
-  var y2 = cy + outerYR * Math.sin(radAngle);
-
-  var path = this.createPath_(pathName, opt_update);
-  path.moveTo(x1, y1);
-  path.lineTo(x2, y2);
-  path.lineTo(x2, y2 + h);
-  path.lineTo(x1, y1 + h);
-  path.lineTo(x1, y1);
-  path.close();
-
-  this.colorize3DPath_(pathName, pointState);
-  return path;
+  return [cx, cy];
 };
 
 
@@ -2529,377 +3843,268 @@ anychart.pieModule.Chart.prototype.getCenterAngle_ = function(startAngle, endAng
 
 
 /**
- * Draws outside label for a slice.
- * @private
- * @param {anychart.PointState|number} pointState Point state.
- * @param {boolean=} opt_updateConnector Whether to update connector or not.
- * @return {anychart.core.ui.CircularLabelsFactory.Label} Label.
+ * Getter for the pie chart center point.<br/>
+ * <b>Note:</b> Works only after {@link anychart.pieModule.Chart#draw} is called.
+ * @example
+ *  var pieInnerRadius = 40
+ *  var pie = anychart.pie([10, 14, 8, 12])
+ *      .container(stage)
+ *      .innerRadius(pieInnerRadius+10)
+ *      .draw();
+ *  var pieCenter = pie.getCenterPoint();
+ *  var labelBounds = anychart.math.rect(
+ *      pieCenter.x - pieInnerRadius,
+ *      pieCenter.y - pieInnerRadius,
+ *      pieCenter.x + pieInnerRadius,
+ *      pieCenter.y + pieInnerRadius
+ *  );
+ *  anychart.standalones.label()
+ *      .text('Pie\ninner\nlabel')
+ *      .parentBounds(labelBounds)
+ *      .container(stage)
+ *      .hAlign('center')
+ *      .vAlign('center')
+ *      .adjustFontSize(true)
+ *      .width(2*pieInnerRadius)
+ *      .height(2*pieInnerRadius)
+ *      .draw();
+ * @return {anychart.math.Coordinate} XY coordinate of the current pie chart center.
+ * @deprecated since 8.2.0 use pie.center.getPoint() instead. DVF-3445
  */
-anychart.pieModule.Chart.prototype.drawOutsideLabel_ = function(pointState, opt_updateConnector) {
+anychart.pieModule.Chart.prototype.getCenterPoint = function() {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['getCenterPoint()', 'center().getPoint()'], true);
+  return this.center().getPoint();
+};
+
+
+/**
+ * Getter for the current pie pixel outer radius.<br/>
+ * <b>Note:</b> Works only after {@link anychart.pieModule.Chart#draw} is called.
+ * @return {number} Pixel value of the pie radius.
+ */
+anychart.pieModule.Chart.prototype.getPixelRadius = function() {
+  return this.radiusValue_;
+};
+
+
+/**
+ * Getter for the current pie pixel inner radius.<br/>
+ * <b>Note:</b> Works only after {@link anychart.pieModule.Chart#draw} is called.
+ * @return {number} XY coordinate of the pie center.
+ */
+anychart.pieModule.Chart.prototype.getPixelInnerRadius = function() {
+  return this.innerRadiusValue_;
+};
+
+
+/**
+ * Getter for the current explode value.
+ * @param {(number|anychart.PointState)=} opt_pointState .
+ * @return {number}
+ */
+anychart.pieModule.Chart.prototype.getPixelExplode = function(opt_pointState) {
+  return this.getExplode(opt_pointState);
+};
+
+
+/**
+ * Internal getter for fixed gauge start angle. All for human comfort.
+ * @return {number}
+ */
+anychart.pieModule.Chart.prototype.getStartAngle = function() {
+  return /** @type {number} */ (this.getOption('startAngle')) + anychart.pieModule.Chart.DEFAULT_START_ANGLE;
+};
+
+
+/** @inheritDoc */
+anychart.pieModule.Chart.prototype.getPoint = function(index) {
+  var point = new anychart.pieModule.Point(this, index);
+  var iter = this.getIterator();
+  var value;
+  if (iter.select(index) &&
+      point.exists() && !this.isMissing_(value = /** @type {number} */(point.get('value')))) {
+
+    var val = value / /** @type {number} */(this.getStat(anychart.enums.Statistics.SUM)) * 100;
+    point.statistics(anychart.enums.Statistics.PERCENT_VALUE, val);
+    point.statistics(anychart.enums.Statistics.Y_PERCENT_OF_TOTAL, val);
+  }
+
+  return point;
+};
+
+
+/**
+ * @param {(anychart.PointState|number)=} opt_pointState .
+ * @param {boolean=} opt_ignorePointSettings .
+ * @return {number}
+ */
+anychart.pieModule.Chart.prototype.getExplode = function(opt_pointState, opt_ignorePointSettings) {
+  var pointState = opt_pointState || 0;
   var iterator = this.getIterator();
 
-  var hovered = this.state.isStateContains(pointState, anychart.PointState.HOVER);
-
-  var sliceLabel = iterator.get('normal');
-  sliceLabel = goog.isDef(sliceLabel) ? sliceLabel['label'] : void 0;
-  var hoverSliceLabel = iterator.get('hovered');
-  hoverSliceLabel = goog.isDef(hoverSliceLabel) ? hoverSliceLabel['label'] : void 0;
-
-  sliceLabel = anychart.utils.getFirstDefinedValue(sliceLabel, iterator.get('label'));
-  hoverSliceLabel = hovered ? anychart.utils.getFirstDefinedValue(hoverSliceLabel, iterator.get('hoverLabel')) : null;
-
-  var index = iterator.getIndex();
-
-  var hoverLabels = this.hovered().labels();
-  var labelsFactory = /** @type {anychart.core.ui.CircularLabelsFactory} */(hovered ? hoverLabels : null);
-
-  var label = this.labels().getLabel(index);
-
-  var labelEnabledState = sliceLabel && goog.isDef(sliceLabel['enabled']) ? sliceLabel['enabled'] : null;
-  var labelHoverEnabledState = hoverSliceLabel && goog.isDef(hoverSliceLabel['enabled']) ? hoverSliceLabel['enabled'] : null;
-
-  var isDraw = hovered ?
-      goog.isNull(labelHoverEnabledState) ?
-          goog.isNull(hoverLabels.enabled()) ?
-              goog.isNull(labelEnabledState) ?
-                  (label && goog.isDef(label.enabled())) ?
-                      label.enabled() :
-                      this.labels().enabled() :
-                  labelEnabledState :
-              hoverLabels.enabled() :
-          labelHoverEnabledState :
-      goog.isNull(labelEnabledState) ?
-          (label && goog.isDef(label.enabled())) ?
-              label.enabled() :
-              this.labels().enabled() :
-          labelEnabledState;
-
-  var enabled;
-  var wasNoLabel;
-  var anchor;
-  var formatProvider = this.createFormatProvider(true);
-  var positionProvider = this.createPositionProvider();
-
-  if (isDraw) {
-    if (wasNoLabel = !label) {
-      label = this.labels().add(formatProvider, positionProvider, index);
-    }
-
-    // save enabled setting for label
-    enabled = label.enabled();
-
-    label.resetSettings();
-    label.currentLabelsFactory(labelsFactory);
-    label.setSettings(/** @type {Object} */(sliceLabel), /** @type {Object} */(hoverSliceLabel));
-    label.enabled(/** @type {boolean} */(enabled));
-
-    anchor = iterator.meta('anchor');
-    if (goog.isDef(anchor))
-      label['anchor'](/** @type {string} */(anchor));
-
-    if (!wasNoLabel)
-      label.draw();
-
-  } else if (label) {
-    enabled = label.enabled();
-    label.clear();
-    label.enabled(/** @type {boolean} */(enabled));
+  var singlePoint = iterator.getRowsCount() == 1;
+  var explode, explodeValue;
+  if (singlePoint) {
+    explodeValue = 0;
   } else {
-    label = this.labels().add(formatProvider, positionProvider, index);
-    anchor = iterator.meta('anchor');
-    if (goog.isDef(anchor))
-      label['anchor'](/** @type {string} */(anchor));
-    label.enabled(false);
+    explode = this.resolveOption('explode', pointState, iterator, anychart.core.settings.numberOrPercentNormalizer, false, void 0, opt_ignorePointSettings);
+    explodeValue = goog.isDef(explode) ? anychart.utils.normalizeSize(/** @type {number|string} */ (explode), this.minWidthHeight_) : 0;
   }
-  if (opt_updateConnector)
-    this.updateConnector_(/** @type {anychart.core.ui.CircularLabelsFactory.Label}*/(label), isDraw);
-  return /** @type {anychart.core.ui.CircularLabelsFactory.Label}*/(label);
+  return explodeValue;
 };
 
 
-/**
- * Draws label for a slice.
- * @private
- * @param {anychart.PointState|number} pointState Point state.
- * @param {boolean=} opt_updateConnector Whether to update connector or not. Used only with outside labels.
- * @return {anychart.core.ui.CircularLabelsFactory.Label} Label.
- */
-anychart.pieModule.Chart.prototype.drawLabel_ = function(pointState, opt_updateConnector) {
-  if (this.isOutsideLabels())
-    return this.drawOutsideLabel_(pointState, opt_updateConnector);
-
-  var hovered = this.state.isStateContains(pointState, anychart.PointState.HOVER);
-
-  var iterator = this.getIterator();
-
-  var sliceLabel = iterator.get('normal');
-  sliceLabel = goog.isDef(sliceLabel) ? sliceLabel['label'] : void 0;
-  var hoverSliceLabel = iterator.get('hovered');
-  hoverSliceLabel = goog.isDef(hoverSliceLabel) ? hoverSliceLabel['label'] : void 0;
-
-  sliceLabel = anychart.utils.getFirstDefinedValue(sliceLabel, iterator.get('label'));
-  hoverSliceLabel = hovered ? anychart.utils.getFirstDefinedValue(hoverSliceLabel, iterator.get('hoverLabel')) : null;
-
-  var index = iterator.getIndex();
-  var hoverLabels = this.hovered().labels();
-  var labelsFactory = /** @type {anychart.core.ui.CircularLabelsFactory} */(hovered ? hoverLabels : null);
-
-  var label = this.labels().getLabel(index);
-
-  var labelEnabledState = sliceLabel && goog.isDef(sliceLabel['enabled']) ? sliceLabel['enabled'] : null;
-  var labelHoverEnabledState = hoverSliceLabel && goog.isDef(hoverSliceLabel['enabled']) ? hoverSliceLabel['enabled'] : null;
-
-  var positionProvider = this.createPositionProvider();
-  var formatProvider = this.createFormatProvider(true);
-
-  var mode3d = /** @type {boolean} */ (this.getOption('mode3d'));
-  var isFitToSlice = true;
-  if ((!hovered || (hovered && !this.getOption('forceHoverLabels'))) && this.getOption('overlapMode') != anychart.enums.LabelsOverlapMode.ALLOW_OVERLAP) {
-    var start = /** @type {number} */ (iterator.meta('start'));
-    var sweep = /** @type {number} */ (iterator.meta('sweep'));
-
-    var cx = this.cx_;
-    var cy = this.cy_;
-
-    var angle;
-    var exploded = !!iterator.meta('exploded') && !(iterator.getRowsCount() == 1);
-    if (exploded) {
-      angle = (start + sweep / 2) * Math.PI / 180;
-      var ex = this.explodeValue_ * Math.cos(angle);
-      var ey = (mode3d ? this.get3DYRadius(this.explodeValue_) : this.explodeValue_) * Math.sin(angle);
-      cx += ex;
-      cy += ey;
+//endregion
+//region --- Legend
+/** @inheritDoc */
+anychart.pieModule.Chart.prototype.createLegendItemsProvider = function(sourceMode, itemsFormat) {
+  /**
+   * @type {!Array.<anychart.core.ui.Legend.LegendItemProvider>}
+   */
+  var data = [];
+  var iterator = this.getIterator().reset();
+  var index;
+  var isAqua = (this.normal_.getOption('fill') == 'aquastyle');
+  if (isAqua) {
+    /** @type {Object} */
+    var aquaStyleObj = this.aquaStyleObj_;
+    this.aquaStyleObj_ = {};
+  }
+  while (iterator.advance()) {
+    index = iterator.getIndex();
+    var legendItem = /** @type {Object} */ (iterator.get('legendItem') || {});
+    var itemText = null;
+    if (goog.isFunction(itemsFormat)) {
+      var format = this.createFormatProvider();
+      itemText = itemsFormat.call(format, format);
+      if (goog.isNumber(itemText))
+        itemText = String(itemText);
     }
-
-    angle = start * Math.PI / 180;
-    var ax = cx + this.radiusValue_ * Math.cos(angle);
-    var ay = cy + (mode3d ? this.get3DYRadius(this.radiusValue_) : this.radiusValue_) * Math.sin(angle);
-
-    angle = (start + sweep) * Math.PI / 180;
-    var bx = cx + this.radiusValue_ * Math.cos(angle);
-    var by = cy + (mode3d ? this.get3DYRadius(this.radiusValue_) : this.radiusValue_) * Math.sin(angle);
-
-    if (!this.measureLabel_) {
-      this.measureLabel_ = new anychart.core.ui.CircularLabelsFactory.Label();
-    } else {
-      this.measureLabel_.clear();
+    if (!goog.isString(itemText)) {
+      var isGrouped = !!iterator.meta('groupedPoint');
+      if (isGrouped)
+        itemText = 'Other points';
+      else
+        itemText = String(goog.isDef(iterator.get('name')) ? iterator.get('name') : iterator.get('x'));
     }
-    this.measureLabel_.formatProvider(formatProvider);
-    this.measureLabel_.positionProvider(positionProvider);
-    this.measureLabel_.resetSettings();
-    this.measureLabel_.parentLabelsFactory(this.labels());
-    this.measureLabel_.currentLabelsFactory(labelsFactory);
-    this.measureLabel_.setSettings(/** @type {Object} */(sliceLabel), /** @type {Object} */(hoverSliceLabel));
+    var mode3d = this.getOption('mode3d');
 
-    var bounds = this.labels().measureWithTransform(this.measureLabel_, null, null, index);
+    var fillResolver = anychart.pieModule.Chart.getColorResolver('fill', anychart.enums.ColorType.FILL, false);
+    var strokeResolver = anychart.pieModule.Chart.getColorResolver('stroke', anychart.enums.ColorType.STROKE, false);
+    var hatchFillResolver = anychart.pieModule.Chart.getColorResolver('hatchFill', anychart.enums.ColorType.HATCH_FILL, false);
 
-    var singlePiePoint = ((iterator.getRowsCount() == 1 || sweep == 360) && !this.innerRadiusValue_);
-    var notIntersectStartLine = singlePiePoint || !anychart.math.checkRectIntersectionWithSegment(ax, ay, cx, cy, bounds);
-    var notIntersectEndLine = singlePiePoint || !anychart.math.checkRectIntersectionWithSegment(cx, cy, bx, by, bounds);
-    var notIntersectPieOuterRadius = !anychart.math.checkForRectIsOutOfCircleBounds(cx, cy, this.radiusValue_, bounds);
-    var notIntersectPieInnerRadius = singlePiePoint || anychart.math.checkForRectIsOutOfCircleBounds(cx, cy, this.innerRadiusValue_, bounds);
-
-    isFitToSlice = notIntersectStartLine && notIntersectEndLine && notIntersectPieOuterRadius && notIntersectPieInnerRadius;
+    var obj = {
+      'enabled': true,
+      'meta': {
+        'pointIndex': index,
+        'pointValue': iterator.get('value')
+      },
+      'iconType': anychart.enums.LegendItemIconType.SQUARE,
+      'text': itemText,
+      'iconStroke': mode3d ? this.get3DStrokeColor() : /** @type {acgraph.vector.Stroke} */ (strokeResolver(this, anychart.PointState.NORMAL, false, null)),
+      'iconFill': mode3d ? this.get3DFillColor_(anychart.PointState.NORMAL) : /** @type {acgraph.vector.Fill} */ (fillResolver(this, anychart.PointState.NORMAL, false, null)),
+      'iconHatchFill': /** @type {acgraph.vector.HatchFill} */ (hatchFillResolver(this, anychart.PointState.NORMAL, false, null))
+    };
+    goog.object.extend(obj, legendItem);
+    obj['sourceUid'] = goog.getUid(this);
+    obj['sourceKey'] = index;
+    data.push(obj);
   }
-
-  var isDraw = hovered ?
-      goog.isNull(labelHoverEnabledState) ?
-          goog.isNull(hoverLabels.enabled()) ?
-              goog.isNull(labelEnabledState) ?
-                  this.labels().enabled() :
-                  labelEnabledState :
-              hoverLabels.enabled() :
-          labelHoverEnabledState :
-      goog.isNull(labelEnabledState) ?
-          this.labels().enabled() :
-          labelEnabledState;
-
-  if (isDraw && isFitToSlice) {
-    if (label) {
-      label.formatProvider(formatProvider);
-      label.positionProvider(positionProvider);
-    } else {
-      label = this.labels().add(formatProvider, positionProvider, index);
-    }
-
-    label.resetSettings();
-    label.currentLabelsFactory(labelsFactory);
-    label.setSettings(/** @type {Object} */(sliceLabel), /** @type {Object} */(hoverSliceLabel));
-
-    //todo: this shit should be reworked when labelsFactory will be reworked
-    //if usual label isn't disabled and not drawn then it doesn't have container and hover label doesn't know nothing
-    //about its DOM element and trying to apply itself setting to it. But nothing will happen because container is empty.
-    if (hovered && !label.container() && this.labels().getDomElement()) {
-      label.container(this.labels().getDomElement());
-      if (!label.container().parent()) {
-        label.container().parent(/** @type {acgraph.vector.ILayer} */(this.labels().container()));
-      }
-    }
-  } else if (label) {
-    this.labels().clear(label.getIndex());
-  }
-  return /** @type {anychart.core.ui.CircularLabelsFactory.Label}*/(label);
+  if (isAqua)
+    this.aquaStyleObj_ = aquaStyleObj;
+  return data;
 };
 
 
-/**
- * Colorizes shape in accordance to current slice colorization settings.
- * Shape is get from current meta 'shape'.
- * @param {anychart.PointState|number} pointState Point state.
- * @protected
- */
-anychart.pieModule.Chart.prototype.colorizeSlice = function(pointState) {
-  if (this.getOption('mode3d')) {
-    this.colorize3DSlice_(pointState);
+/** @inheritDoc */
+anychart.pieModule.Chart.prototype.legendItemCanInteractInMode = function(mode) {
+  return true;
+};
 
-  } else {
-    var slice = /** @type {acgraph.vector.Path} */ (this.getIterator().meta('slice'));
-    if (goog.isDef(slice)) {
-      var fillResolver = anychart.pieModule.Chart.getColorResolver('fill', anychart.enums.ColorType.FILL, true);
-      var fillColor = fillResolver(this, pointState, false, true);
-      if (this.isRadialGradientMode_(fillColor) && goog.isNull(fillColor.mode)) {
-        //fillColor = /** @type {!acgraph.vector.Fill} */(goog.object.clone(/** @type {Object} */(fillColor)));
-        fillColor.mode = this.pieBounds_ ? this.pieBounds_ : null;
-      }
-      slice.fill(fillColor);
 
-      var strokeResolver = anychart.pieModule.Chart.getColorResolver('stroke', anychart.enums.ColorType.STROKE, true);
-      var strokeColor = strokeResolver(this, pointState, false, true);
-      if (this.isRadialGradientMode_(strokeColor) && goog.isNull(strokeColor.mode)) {
-        strokeColor.mode = this.pieBounds_ ? this.pieBounds_ : null;
-      }
-      slice.stroke(strokeColor);
-
-      this.applyHatchFill(pointState);
-    }
+/** @inheritDoc */
+anychart.pieModule.Chart.prototype.legendItemClick = function(item, event) {
+  var sourceKey = item.sourceKey();
+  var iterator = this.data().getIterator();
+  if (iterator.select(/** @type {number} */ (sourceKey))) {
+    this.select(/** @type {number} */ (sourceKey));
   }
 };
 
 
-/**
- * Apply hatch fill to shape in accordance to current point colorization settings.
- * Shape is get from current meta 'hatchFillShape'.
- * @param {(anychart.PointState|number)} pointState Point state.
- * @param {string=} opt_pathName
- * @protected
- */
-anychart.pieModule.Chart.prototype.applyHatchFill = function(pointState, opt_pathName) {
-  var hatchSlice = /** @type {acgraph.vector.Path} */(this.getIterator().meta(opt_pathName || 'hatchSlice'));
-  if (goog.isDefAndNotNull(hatchSlice)) {
-    var hatchFillResolver = anychart.pieModule.Chart.getColorResolver('hatchFill', anychart.enums.ColorType.HATCH_FILL, true);
-    var hatchFill = hatchFillResolver(this, pointState, false);
-    hatchSlice
-        .stroke(null)
-        .fill(hatchFill);
-  }
-};
-
-
-/**
- * Internal data invalidation handler.
- * @param {anychart.SignalEvent} event Event object.
- * @private
- */
-anychart.pieModule.Chart.prototype.dataInvalidated_ = function(event) {
-  if (event.hasSignal(anychart.Signal.DATA_CHANGED)) {
-    this.invalidate(
-        anychart.ConsistencyState.PIE_LABELS |
-        anychart.ConsistencyState.APPEARANCE |
-        anychart.ConsistencyState.CHART_LEGEND |
-        anychart.ConsistencyState.A11Y |
-        anychart.ConsistencyState.PIE_DATA |
-        anychart.ConsistencyState.CHART_LABELS,
-        anychart.Signal.NEEDS_REDRAW |
-        anychart.Signal.DATA_CHANGED
-    );
-
-  }
-};
-
-
-/**
- * Internal label invalidation handler.
- * @param {anychart.SignalEvent} event Event object.
- * @private
- */
-anychart.pieModule.Chart.prototype.labelsInvalidated_ = function(event) {
-  var state = 0, signal = 0;
-  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    state |= anychart.ConsistencyState.PIE_LABELS;
-    signal |= anychart.Signal.NEEDS_REDRAW;
-  }
-
-  if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
-    state |= anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.PIE_LABELS;
-    signal |= anychart.Signal.BOUNDS_CHANGED | anychart.Signal.NEEDS_REDRAW;
-  }
-
-  this.invalidate(state, signal);
-};
-
-
-/**
- * Internal palette invalidation handler.
- * @param {anychart.SignalEvent} event Event object.
- * @private
- */
-anychart.pieModule.Chart.prototype.paletteInvalidated_ = function(event) {
-  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
-    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
-  }
-};
-
-
-/**
- * Explode or implode pie slice.
- * @protected
- * @param {boolean=} opt_explode Explode value to set.
- */
-anychart.pieModule.Chart.prototype.clickSlice = function(opt_explode) {
-  var iterator = this.getIterator();
-  // if only 1 point in Pie was drawn - forbid to explode it
-  if (iterator.getRowsCount() == 1 || iterator.meta('sweep') == 360)
+/** @inheritDoc */
+anychart.pieModule.Chart.prototype.legendItemOver = function(item, event) {
+  var sourceKey = item.sourceKey();
+  if (item && !goog.isDefAndNotNull(sourceKey) && !isNaN(sourceKey))
     return;
-  if (goog.isDef(opt_explode)) {
-    iterator.meta('exploded', opt_explode);
-  } else {
-    var exploded = iterator.meta('exploded');
-    iterator.meta('exploded', !exploded);
-  }
 
-  var start = /** @type {number} */ (iterator.meta('start'));
-  var sweep = /** @type {number} */ (iterator.meta('sweep'));
-  // if no information about slice in meta (e.g. no slice has drawn: call explodeSlice(_, _) before chart.draw()).
-  if (!goog.isDef(start) || !goog.isDef(sweep) || !sweep) return;
+  var tag = anychart.utils.extractTag(event['domTarget']);
+  if (tag)
+    tag.series = this;
+};
 
-  var index = iterator.getIndex();
-  if (this.getOption('mode3d')) {
-    this.draw3DSlices_(index, true);
+
+/** @inheritDoc */
+anychart.pieModule.Chart.prototype.legendItemOut = function(item, event) {
+  var sourceKey = item.sourceKey();
+
+  if (item && !goog.isDefAndNotNull(sourceKey) && !isNaN(sourceKey))
+    return;
+
+  var tag = anychart.utils.extractTag(event['domTarget']);
+  if (tag)
+    tag.series = this;
+};
+
+
+//endregion
+//region --- Interactivity
+/**
+ * Explodes slice at index.
+ * @example
+ * var chart = anychart.pie([10, 12, 14, 46]);
+ * chart.explodeSlice(2);
+ * chart.container(stage).draw();
+ * @param {number} index Pie slice index that should be exploded or not.
+ * @param {boolean=} opt_explode [true] Whether to explode.
+ * @return {anychart.pieModule.Chart} .
+ * @deprecated since 8.1.0 use select() instead. DVF-3404
+ */
+anychart.pieModule.Chart.prototype.explodeSlice = function(index, opt_explode) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['explodeSlice()', 'select()'], true);
+  var currentPointState = this.state.getPointStateByIndex(index);
+  if (opt_explode || !goog.isDef(opt_explode)) {
+      if (!this.state.isStateContains(currentPointState, anychart.PointState.SELECT))
+        this.select(index);
   } else {
-    this.drawSlice_(true);
+    this.unselect(index);
   }
-  if (this.isOutsideLabels()) {
-    this.recalculateBounds_ = false;
-    this.labels().suspendSignalsDispatching();
-    this.labels().clear();
-    this.calculateOutsideLabels();
-    this.labels().draw();
-    this.labels().resumeSignalsDispatching(true);
-    iterator.select(index);
-  }
-  // for support users pointClick changes
-  var pointState = this.state.seriesState | this.state.getPointStateByIndex(iterator.getIndex());
-  var hovered = this.state.isStateContains(pointState, anychart.PointState.HOVER);
-  this.drawLabel_(pointState, hovered);
-  this.labels().draw();
+  return this;
 };
 
 
 /**
- * @return {boolean} Define, is labels have outside position.
+ * Explodes all slices.
+ * @example
+ * var chart = anychart.pie([10, 12, 14, 46]);
+ * chart.explodeSlices(true);
+ * chart.container(stage).draw();
+ * @param {boolean|Array.<number>} value Whether to explode.
+ * @return {anychart.pieModule.Chart} .
+ * @deprecated since 8.1.0 use select() instead. DVF-3404
  */
-anychart.pieModule.Chart.prototype.isOutsideLabels = function() {
-  return anychart.enums.normalizeSidePosition(this.labels().getOption('position')) == anychart.enums.SidePosition.OUTSIDE;
+anychart.pieModule.Chart.prototype.explodeSlices = function(value) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['explodeSlices()', 'select()'], true);
+  if (goog.isBoolean(value)) {
+    if (value) {
+      this.select();
+    } else {
+      this.unselect();
+    }
+  } else {
+    this.select(value);
+  }
+  return this;
 };
 
 
@@ -2982,29 +4187,6 @@ anychart.pieModule.Chart.prototype.makeBrowserEvent = function(e) {
 };
 
 
-/**
- * Mouse click internal handler.
- * @param {anychart.core.MouseEvent} event Event object.
- */
-anychart.pieModule.Chart.prototype.handleMouseDown = function(event) {
-  var evt = this.makePointEvent(event);
-  if (!evt) return;
-
-  var index = evt['pointIndex'];
-  if (this.dispatchEvent(evt) && this.getIterator().select(index)) {
-    this.selectPoint(index);
-    var seriesStatus = {
-      series: this,
-      points: [index],
-      nearestPointToCursor: {index: index, distance: 0}
-    };
-    var selectedPointEvent = this.makeInteractivityPointEvent('selected', event, [seriesStatus]);
-    selectedPointEvent['currentPoint']['selected'] = !!this.getIterator().meta('exploded');
-    this.dispatchEvent(selectedPointEvent);
-  }
-};
-
-
 /** @inheritDoc */
 anychart.pieModule.Chart.prototype.handleMouseEvent = function(event) {
   var evt = this.makePointEvent(event);
@@ -3078,130 +4260,50 @@ anychart.pieModule.Chart.prototype.makePointEvent = function(event) {
 };
 
 
-/** @inheritDoc */
-anychart.pieModule.Chart.prototype.getPoint = function(index) {
-  var point = new anychart.pieModule.Point(this, index);
-  var iter = this.getIterator();
-  var value;
-  if (iter.select(index) &&
-      point.exists() && !this.isMissing_(value = /** @type {number} */(point.get('value')))) {
-
-    var val = value / /** @type {number} */(this.getStat(anychart.enums.Statistics.SUM)) * 100;
-    point.statistics(anychart.enums.Statistics.PERCENT_VALUE, val);
-    point.statistics(anychart.enums.Statistics.Y_PERCENT_OF_TOTAL, val);
+/**
+ * Normal state settings.
+ * @param {!Object=} opt_value
+ * @return {anychart.core.StateSettings|anychart.pieModule.Chart}
+ */
+anychart.pieModule.Chart.prototype.normal = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.normal_.setup(opt_value);
+    return this;
   }
-
-  return point;
+  return this.normal_;
 };
 
 
-/** @inheritDoc */
-anychart.pieModule.Chart.prototype.createLegendItemsProvider = function(sourceMode, itemsFormat) {
-  /**
-   * @type {!Array.<anychart.core.ui.Legend.LegendItemProvider>}
-   */
-  var data = [];
-  var iterator = this.getIterator().reset();
-  var index;
-  var isAqua = (this.normal_.getOption('fill') == 'aquastyle');
-  if (isAqua) {
-    /** @type {Object} */
-    var aquaStyleObj = this.aquaStyleObj_;
-    this.aquaStyleObj_ = {};
+/**
+ * Hovered state settings.
+ * @param {!Object=} opt_value
+ * @return {anychart.core.StateSettings|anychart.pieModule.Chart}
+ */
+anychart.pieModule.Chart.prototype.hovered = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.hovered_.setup(opt_value);
+    return this;
   }
-  while (iterator.advance()) {
-    index = iterator.getIndex();
-    var legendItem = /** @type {Object} */ (iterator.get('legendItem') || {});
-    var itemText = null;
-    if (goog.isFunction(itemsFormat)) {
-      var format = this.createFormatProvider();
-      itemText = itemsFormat.call(format, format);
-      if (goog.isNumber(itemText))
-        itemText = String(itemText);
+  return this.hovered_;
+};
+
+
+/**
+ * @param {(anychart.enums.HoverMode|string)=} opt_value Hover mode.
+ * @return {anychart.pieModule.Chart|anychart.enums.HoverMode} .
+ */
+anychart.pieModule.Chart.prototype.hoverMode = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.enums.normalizeHoverMode(opt_value);
+    if (opt_value != this.hoverMode_) {
+      this.hoverMode_ = opt_value;
     }
-    if (!goog.isString(itemText)) {
-      var isGrouped = !!iterator.meta('groupedPoint');
-      if (isGrouped)
-        itemText = 'Other points';
-      else
-        itemText = String(goog.isDef(iterator.get('name')) ? iterator.get('name') : iterator.get('x'));
-    }
-    var mode3d = this.getOption('mode3d');
-
-    var fillResolver = anychart.pieModule.Chart.getColorResolver('fill', anychart.enums.ColorType.FILL, false);
-    var strokeResolver = anychart.pieModule.Chart.getColorResolver('stroke', anychart.enums.ColorType.STROKE, false);
-    var hatchFillResolver = anychart.pieModule.Chart.getColorResolver('hatchFill', anychart.enums.ColorType.HATCH_FILL, false);
-
-    var obj = {
-      'enabled': true,
-      'meta': {
-        'pointIndex': index,
-        'pointValue': iterator.get('value')
-      },
-      'iconType': anychart.enums.LegendItemIconType.SQUARE,
-      'text': itemText,
-      'iconStroke': mode3d ? this.get3DStrokeColor() : /** @type {acgraph.vector.Stroke} */ (strokeResolver(this, anychart.PointState.NORMAL, false)),
-      'iconFill': mode3d ? this.get3DFillColor_(anychart.PointState.NORMAL) : /** @type {acgraph.vector.Fill} */ (fillResolver(this, anychart.PointState.NORMAL, false)),
-      'iconHatchFill': /** @type {acgraph.vector.HatchFill} */ (hatchFillResolver(this, anychart.PointState.NORMAL, false))
-    };
-    goog.object.extend(obj, legendItem);
-    obj['sourceUid'] = goog.getUid(this);
-    obj['sourceKey'] = index;
-    data.push(obj);
+    return this;
   }
-  if (isAqua)
-    this.aquaStyleObj_ = aquaStyleObj;
-  return data;
+  return /** @type {anychart.enums.HoverMode}*/(this.hoverMode_);
 };
 
 
-/** @inheritDoc */
-anychart.pieModule.Chart.prototype.legendItemCanInteractInMode = function(mode) {
-  return true;
-};
-
-
-/** @inheritDoc */
-anychart.pieModule.Chart.prototype.legendItemClick = function(item, event) {
-  var sourceKey = item.sourceKey();
-  var iterator = this.data().getIterator();
-  if (iterator.select(/** @type {number} */ (sourceKey))) {
-    var isExploded = !!iterator.meta('exploded');
-    this.explodeSlice(/** @type {number} */ (sourceKey), !isExploded);
-  }
-};
-
-
-/** @inheritDoc */
-anychart.pieModule.Chart.prototype.legendItemOver = function(item, event) {
-  var sourceKey = item.sourceKey();
-  if (item && !goog.isDefAndNotNull(sourceKey) && !isNaN(sourceKey))
-    return;
-
-  var tag = anychart.utils.extractTag(event['domTarget']);
-  if (tag)
-    tag.series = this;
-};
-
-
-/** @inheritDoc */
-anychart.pieModule.Chart.prototype.legendItemOut = function(item, event) {
-  var sourceKey = item.sourceKey();
-
-  if (item && !goog.isDefAndNotNull(sourceKey) && !isNaN(sourceKey))
-    return;
-
-  var tag = anychart.utils.extractTag(event['domTarget']);
-  if (tag)
-    tag.series = this;
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Hover.
-//
-//----------------------------------------------------------------------------------------------------------------------
 /**
  * If index is passed, hovers a point of the series by its index, else hovers all points of the series.
  * @param {(number|Array<number>)=} opt_indexOrIndexes Point index or array of indexes.
@@ -3220,15 +4322,15 @@ anychart.pieModule.Chart.prototype.hover = function(opt_indexOrIndexes) {
 /** @inheritDoc */
 anychart.pieModule.Chart.prototype.unhover = function(opt_indexOrIndexes) {
   if (!(this.state.hasPointState(anychart.PointState.HOVER) ||
-      this.state.isStateContains(this.state.getSeriesState(), anychart.PointState.HOVER)) || !this.enabled())
+          this.state.isStateContains(this.state.getSeriesState(), anychart.PointState.HOVER)) || !this.enabled())
     return;
 
-  var index;
-  if (goog.isDef(opt_indexOrIndexes))
-    index = opt_indexOrIndexes;
-  else
-    index = (this.state.seriesState == anychart.PointState.NORMAL ? NaN : undefined);
-  this.state.removePointState(anychart.PointState.HOVER, index);
+  if (goog.isDef(opt_indexOrIndexes)) {
+    this.state.removePointState(anychart.PointState.HOVER, opt_indexOrIndexes);
+  } else {
+    this.state.removePointState(anychart.PointState.HOVER, true);
+  }
+
 
   this.hideTooltip();
 };
@@ -3252,16 +4354,12 @@ anychart.pieModule.Chart.prototype.hoverPoint = function(index, opt_event) {
         this.state.removePointState(anychart.PointState.HOVER, hoveredPoints[i]);
       }
     }
-    this.state.addPointState(anychart.PointState.HOVER, index);
-    if (goog.isDef(opt_event))
-      this.showTooltip(opt_event);
-
-  } else if (goog.isNumber(index)) {
-    this.unhover();
-    this.state.addPointState(anychart.PointState.HOVER, index);
-    if (goog.isDef(opt_event))
-      this.showTooltip(opt_event);
   }
+
+  this.state.addPointState(anychart.PointState.HOVER, index);
+  if (goog.isDef(opt_event))
+    this.showTooltip(opt_event);
+
   return this;
 };
 
@@ -3274,9 +4372,39 @@ anychart.pieModule.Chart.prototype.hoverSeries = function() {
   if (!this.enabled())
     return this;
 
-  this.state.setPointState(anychart.PointState.HOVER);
+  this.state.setPointState(anychart.PointState.HOVER, true);
 
   return this;
+};
+
+
+/**
+ * Selected state settings.
+ * @param {!Object=} opt_value
+ * @return {anychart.core.StateSettings|anychart.pieModule.Chart}
+ */
+anychart.pieModule.Chart.prototype.selected = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.selected_.setup(opt_value);
+    return this;
+  }
+  return this.selected_;
+};
+
+
+/**
+ * @param {(anychart.enums.SelectionMode|string)=} opt_value Selection mode.
+ * @return {anychart.pieModule.Chart|anychart.enums.SelectionMode} .
+ */
+anychart.pieModule.Chart.prototype.selectionMode = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.enums.normalizeSelectMode(opt_value);
+    if (opt_value != this.selectMode_) {
+      this.selectMode_ = opt_value;
+    }
+    return this;
+  }
+  return /** @type {anychart.enums.SelectionMode}*/(this.selectMode_);
 };
 
 
@@ -3285,123 +4413,129 @@ anychart.pieModule.Chart.prototype.hoverSeries = function() {
  * @param {(number|Array.<number>)=} opt_indexOrIndexes Index or array of indexes of the point to select.
  * @return {!anychart.pieModule.Chart} {@link anychart.pieModule.Chart} instance for method chaining.
  */
-/*TODO(AntonKagakin): Do not remove. For future interactivity improvement.
 anychart.pieModule.Chart.prototype.select = function(opt_indexOrIndexes) {
   if (!this.enabled())
     return this;
 
   if (goog.isDef(opt_indexOrIndexes))
     this.selectPoint(opt_indexOrIndexes);
-  else
+  else {
     this.selectSeries();
+  }
 
   return this;
-};*/
+};
 
 
 /**
  * Selects all points of the chart. Use <b>unselect</b> method to unselect them.
  * @return {!anychart.pieModule.Chart} An instance of the {@link anychart.pieModule.Chart} class for method chaining.
  */
-/*TODO(AntonKagakin): Do not remove. For future interactivity improvement.
 anychart.pieModule.Chart.prototype.selectSeries = function() {
-  if (!this.enabled())
-    return this;
-
   //hide tooltip in any case
   this.hideTooltip();
 
-  this.state.setPointState(anychart.PointState.SELECT);
+  this.state.setPointState(anychart.PointState.SELECT, true);
 
   return this;
-};*/
+};
 
 
 /**
  * Select a point of the series by its index.
  * @param {number|Array<number>} indexOrIndexes Index of the point to hover.
+ * @param {anychart.core.MouseEvent=} opt_event Event that initiate point selecting.
  * @return {!anychart.pieModule.Chart}  {@link anychart.pieModule.Chart} instance for method chaining.
  */
-anychart.pieModule.Chart.prototype.selectPoint = function(indexOrIndexes) {
-  if (!this.enabled())
-    return this;
+anychart.pieModule.Chart.prototype.selectPoint = function(indexOrIndexes, opt_event) {
+  var unselect = !(opt_event && opt_event.shiftKey);
+  var changedState = unselect ? opt_event ? anychart.PointState.HOVER : anychart.PointState.NORMAL : void 0;
 
-  var iterator = this.getIterator();
-  // for float tooltip and exploded checking
-  this.getIterator().select(indexOrIndexes[0] || indexOrIndexes);
+  if (goog.isArray(indexOrIndexes)) {
+    if (!opt_event)
+      this.unselect();
 
-  if (!iterator.meta('exploded')) {
-    this.state.addPointState(anychart.PointState.SELECT, indexOrIndexes);
-  } else {
-    this.state.removePointState(anychart.PointState.SELECT, indexOrIndexes);
+    this.state.setPointState(anychart.PointState.SELECT, indexOrIndexes, changedState);
+  } else if (goog.isNumber(indexOrIndexes)) {
+    this.state.setPointState(anychart.PointState.SELECT, indexOrIndexes, changedState);
   }
-
-  this.clickSlice();
 
   return this;
 };
 
 
 /** @inheritDoc */
-/*TODO(AntonKagakin): Do not remove. For future interactivity improvement.
 anychart.pieModule.Chart.prototype.unselect = function(opt_indexOrIndexes) {
-  if (!this.enabled())
+  if (goog.isDef(opt_indexOrIndexes)) {
+    this.state.removePointState(anychart.PointState.SELECT, opt_indexOrIndexes);
+  } else {
+    this.state.removePointState(anychart.PointState.SELECT, true);
+  }
+};
+
+
+/** @inheritDoc */
+anychart.pieModule.Chart.prototype.applyAppearanceToPoint = function(pointState, opt_value) {
+  var iterator = this.getIterator();
+  var currentPointExplode = /** @type {number} */(iterator.meta('explode'));
+
+  var mode3d = /** @type {boolean} */ (this.getOption('mode3d'));
+  if (mode3d) {
+    this.prepare3DSlice_();
+    this.draw3DSlices_(iterator.getIndex(), true);
+  } else {
+    this.drawSlice_(pointState, true);
+  }
+
+  if (!this.isOutsideLabels()) {
+    this.drawLabel_(pointState);
+  }
+
+  return opt_value || (currentPointExplode != this.getExplode(pointState));
+};
+
+
+/** @inheritDoc */
+anychart.pieModule.Chart.prototype.finalizePointAppearance = function(opt_value) {
+  var iterator = this.getIterator();
+  var sweep = /** @type {number} */(iterator.meta('sweep'));
+  var value = /** @type {number|string|null|undefined} */(iterator.get('value'));
+  var currIndex = iterator.getIndex();
+
+  // if only 1 point in Pie was drawn - forbid to explode it
+  if (iterator.getRowsCount() == 1 || sweep == 360 || (this.isMissing_(value) && currIndex != iterator.getRowsCount()))
     return;
 
-  var index;
-  if (goog.isDef(opt_indexOrIndexes))
-    index = opt_indexOrIndexes;
-  else
-    index = (this.state.seriesState == anychart.PointState.NORMAL ? NaN : undefined);
-  this.state.removePointState(anychart.PointState.SELECT, index);
+  var explodeChanged = !!opt_value;
 
-  //---------------------------------------------------------------------
-  var iterator = this.getIterator();
-  iterator.reset();
-  while (iterator.advance()) {
-    this.drawLabel_(this.state.getPointStateByIndex(iterator.getIndex()));
+  if (explodeChanged) {
+    if (this.isOutsideLabels()) {
+      this.recalculateBounds_ = false;
+      this.labels().suspendSignalsDispatching();
+      this.labels().clear();
+      this.calculateOutsideLabels();
+      this.labels().draw();
+      this.labels().resumeSignalsDispatching(false);
+    } else {
+      this.labels().clear();
+      iterator.select(currIndex);
+    }
+  } else {
+    this.labels().draw();
   }
-};*/
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Interactivity section (Apply appearance).
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Apply appearance to point.
- * @param {anychart.PointState|number} pointState
- */
-anychart.pieModule.Chart.prototype.applyAppearanceToPoint = function(pointState) {
-  this.colorizeSlice(pointState);
-  this.drawLabel_(pointState, true);
 };
 
 
-/**
- * Finalization point appearance. For drawing labels and markers.
- */
-anychart.pieModule.Chart.prototype.finalizePointAppearance = function() {
-  this.labels().draw();
-};
+/** @inheritDoc */
+anychart.pieModule.Chart.prototype.applyAppearanceToSeries = goog.nullFunction;
 
 
-/**
- * Apply appearance to series.
- * @param {anychart.PointState|number} pointState .
- */
-anychart.pieModule.Chart.prototype.applyAppearanceToSeries = function(pointState) {
-  this.colorizeSlice(pointState);
-};
+/** @inheritDoc */
+anychart.pieModule.Chart.prototype.getStartValueForAppearanceReduction = goog.nullFunction;
 
 
+//endregion
 //region --- Tooltip
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Tooltip.
-//
-//----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.pieModule.Chart.prototype.createTooltip = function() {
   var tooltip = new anychart.core.ui.Tooltip(0);
@@ -3468,765 +4602,12 @@ anychart.pieModule.Chart.prototype.hideTooltip = function() {
 };
 
 
-//endregion
-
-
-/**
- * @inheritDoc
- */
-anychart.pieModule.Chart.prototype.calculate = function() {
-  if (this.hasInvalidationState(anychart.ConsistencyState.PIE_DATA)) {
-    this.resetStatistics();
-
-    var iterator = this.data().getIterator();
-    var value;
-    var missingPoints = 0;
-    var min = Number.MAX_VALUE;
-    var max = -Number.MAX_VALUE;
-    var sum = 0;
-    while (iterator.advance()) {
-      value = /** @type {number|string|null|undefined} */ (iterator.get('value'));
-      // if missing
-      if (this.isMissing_(value)) {
-        missingPoints++;
-        continue;
-      }
-      value = +value;
-      min = Math.min(value, min);
-      max = Math.max(value, max);
-      sum += value;
-    }
-
-    var count = iterator.getRowsCount() - missingPoints; // do not count missing points
-    var avg;
-    if (!count) min = max = sum = avg = undefined;
-    else avg = sum / count;
-    this.statistics(anychart.enums.Statistics.COUNT, count);
-    this.statistics(anychart.enums.Statistics.MIN, min);
-    this.statistics(anychart.enums.Statistics.MAX, max);
-    this.statistics(anychart.enums.Statistics.SUM, sum);
-    this.statistics(anychart.enums.Statistics.AVERAGE, avg);
-
-    this.markConsistent(anychart.ConsistencyState.PIE_DATA);
-  }
-};
-
-
-/**
- * Create pie label format provider.
- * @param {boolean=} opt_force create context provider forcibly.
- * @return {Object} Object with info for labels formatting.
- * @protected
- */
-anychart.pieModule.Chart.prototype.createFormatProvider = function(opt_force) {
-  var iterator = this.getIterator();
-
-  if (!this.pointProvider_ || opt_force)
-    this.pointProvider_ = new anychart.format.Context();
-
-  this.pointProvider_
-      .dataSource(iterator)
-      .statisticsSources([this.getPoint(iterator.getIndex()), this]);
-
-  var values = { //TODO (A.Kudryavtsev): Check types!!!
-    'x': {value: iterator.get('x'), type: anychart.enums.TokenType.STRING},
-    'value': {value: iterator.get('value'), type: anychart.enums.TokenType.NUMBER},
-    'name': {value: iterator.get('name'), type: anychart.enums.TokenType.STRING},
-    'index': {value: iterator.getIndex(), type: anychart.enums.TokenType.NUMBER},
-    'chart': {value: this, type: anychart.enums.TokenType.UNKNOWN}
-  };
-
-  if (iterator.meta('groupedPoint')) {
-    values['name'] = {value: 'Other points', type: anychart.enums.TokenType.STRING};
-    values['groupedPoint'] = {value: true, type: anychart.enums.TokenType.STRING};
-    values['names'] = {value: iterator.meta('names'), type: anychart.enums.TokenType.UNKNOWN};
-    values['values'] = {value: iterator.meta('values'), type: anychart.enums.TokenType.UNKNOWN};
-  }
-
-  return this.pointProvider_.propagate(values);
-};
-
-
 /**
  * Creates tooltip format provider.
  * @return {Object}
  */
 anychart.pieModule.Chart.prototype.createTooltipContextProvider = function() {
   return this.createFormatProvider();
-};
-
-
-/**
- *
- * @param {anychart.core.ui.CircularLabelsFactory.Label} label .
- * @return {anychart.math.Rect}
- */
-anychart.pieModule.Chart.prototype.getLabelBounds = function(label) {
-  if (!this.labelsBoundsCache_) this.labelsBoundsCache_ = [];
-  var index = label.getIndex();
-  if (!this.labelsBoundsCache_[index])
-    this.labelsBoundsCache_[index] = anychart.math.Rect.fromCoordinateBox(this.labels().measureWithTransform(label));
-
-  return this.labelsBoundsCache_[index];
-};
-
-
-/**
- * Drop label bounds cache.
- * @param {anychart.core.ui.CircularLabelsFactory.Label} label Label to drop bounds.
- */
-anychart.pieModule.Chart.prototype.dropLabelBoundsCache = function(label) {
-  var index = label.getIndex();
-  if (this.labelsBoundsCache_) {
-    this.labelsBoundsCache_[index] = null;
-  }
-};
-
-
-/**
- * Create column position provider.
- * @return {Object} Object with info for labels formatting.
- * @protected
- */
-anychart.pieModule.Chart.prototype.createPositionProvider = function() {
-  var outside = this.isOutsideLabels();
-  var iterator = this.getIterator();
-  var start = /** @type {number} */ (iterator.meta('start'));
-  var sweep = /** @type {number} */ (iterator.meta('sweep'));
-  var singlePoint = (iterator.getRowsCount() == 1) || sweep == 360;
-  var exploded = /** @type {boolean} */ (iterator.meta('exploded')) && !singlePoint;
-  var angle = start + sweep / 2;
-  var dR;
-  var outerXR;
-  var outerYR;
-  var innerXR;
-  var innerYR;
-  var xRadius;
-  var yRadius;
-
-  var mode3d = /** @type {boolean} */ (this.getOption('mode3d'));
-  var insideLabelsOffset = /** @type {number|string} */ (this.getOption('insideLabelsOffset'));
-  if (mode3d) {
-    if (outside) {
-      xRadius = this.radiusValue_ + this.connectorLengthValue_;
-      yRadius = this.get3DYRadius(this.radiusValue_) + this.connectorLengthValue_;
-
-      if (exploded) {
-        xRadius += this.explodeValue_;
-        yRadius += this.get3DYRadius(this.explodeValue_);
-      }
-
-    } else {
-      outerXR = this.radiusValue_;
-      outerYR = this.get3DYRadius(this.radiusValue_);
-      innerXR = this.innerRadiusValue_;
-      innerYR = this.get3DYRadius(this.innerRadiusValue_);
-
-      if (singlePoint && !innerXR) {
-        xRadius = 0;
-        yRadius = 0;
-      } else {
-        xRadius = anychart.utils.normalizeSize(insideLabelsOffset, (innerXR + outerXR));
-        // support pixels value
-        if (anychart.utils.isPercent(insideLabelsOffset)) {
-          yRadius = anychart.utils.normalizeSize(insideLabelsOffset, (innerYR + outerYR));
-        } else {
-          yRadius = this.get3DYRadius(anychart.utils.normalizeSize(insideLabelsOffset, (innerYR + outerYR)));
-        }
-
-        if (exploded) {
-          xRadius += this.explodeValue_;
-          yRadius += this.get3DYRadius(this.explodeValue_);
-        }
-      }
-    }
-
-    return {'value': {'angle': angle, 'radius': xRadius, 'radiusY': yRadius}};
-  } else {
-    if (outside) {
-      dR = (this.radiusValue_ + this.connectorLengthValue_) + (exploded ? this.explodeValue_ : 0);
-    } else {
-      var radius = singlePoint && !this.innerRadiusValue_ ? 0 : this.radiusValue_ - this.innerRadiusValue_;
-      dR = anychart.utils.normalizeSize(insideLabelsOffset, radius) +
-          this.innerRadiusValue_ + (exploded ? this.explodeValue_ : 0);
-    }
-
-    return {'value': {'angle': angle, 'radius': dR}};
-  }
-};
-
-
-/** @inheritDoc */
-anychart.pieModule.Chart.prototype.isNoData = function() {
-  var rowsCount = this.getIterator().getRowsCount();
-  return (!rowsCount);
-};
-
-
-//region --- Calculating outside labels and connectors
-/**
- * Init connector elements.
- */
-anychart.pieModule.Chart.prototype.initConnectorElements = function() {
-  //region init connector elements
-  this.connectorAnchorCoords = [];
-  var mode3d = this.getOption('mode3d');
-  if (this.connectorsLayer_) {
-    this.connectorsLayer_.clear();
-    if (mode3d) this.connectorsLowerLayer_.clear();
-  } else {
-    this.connectorsLayer_ = new anychart.core.utils.TypedLayer(function() {
-      return acgraph.path();
-    }, function(child) {
-      (/** @type {acgraph.vector.Path} */ (child)).clear();
-    });
-    this.connectorsLayer_.parent(this.rootElement);
-    this.connectorsLayer_.zIndex(anychart.pieModule.Chart.ZINDEX_LABEL);
-
-    if (mode3d) {
-      this.connectorsLowerLayer_ = new anychart.core.utils.TypedLayer(function() {
-        return acgraph.path();
-      }, function(child) {
-        (/** @type {acgraph.vector.Path} */ (child)).clear();
-      });
-      this.connectorsLowerLayer_.parent(this.rootElement);
-      this.connectorsLowerLayer_.zIndex(anychart.pieModule.Chart.ZINDEX_CONNECTOR_LOWER_LAYER);
-    }
-  }
-  this.drawnConnectors_ = [];
-  var connectorStroke = /** @type {acgraph.vector.Stroke} */ (this.getOption('connectorStroke'));
-  if (!this.hoveredLabelConnectorPath_) {
-    // path for connector for label disabled by algorithm
-    this.hoveredLabelConnectorPath_ = this.rootElement.path();
-    this.hoveredLabelConnectorPath_.stroke(connectorStroke);
-  }
-  //endregion
-};
-
-
-/**
- *
- * @param {number} index
- * @return {Array.<number>}
- */
-anychart.pieModule.Chart.prototype.getSliceCenterCoords = function(index) {
-  var iterator = this.getIterator();
-  iterator.select(index);
-
-  var cx = this.cx_;
-  var cy = this.cy_;
-
-  var exploded = /** @type {boolean} */ (iterator.meta('exploded')) && !(iterator.getRowsCount() == 1);
-  if (exploded) {
-    var mode3d = /** @type {boolean} */ (this.getOption('mode3d'));
-    var start = /** @type {number} */ (iterator.meta('start'));
-    var sweep = /** @type {number} */ (iterator.meta('sweep'));
-
-    var angle = (start + sweep / 2) * Math.PI / 180;
-    var ex = this.explodeValue_ * Math.cos(angle);
-    var ey = (mode3d ? this.get3DYRadius(this.explodeValue_) : this.explodeValue_) * Math.sin(angle);
-    cx += ex;
-    cy += ey;
-  }
-
-  return [cx, cy];
-};
-
-
-/**
- * Calculating outside labels.
- */
-anychart.pieModule.Chart.prototype.calculateOutsideLabels = function() {
-  var iterator = this.getIterator();
-  var label, x0, y0, radius, isRightSide;
-  var connectorPath, connector;
-  var mode3d = this.getOption('mode3d');
-
-  this.initConnectorElements();
-
-  //region calculate absolute labels position, sort labels, separation of the labels on the left and right side
-  var rightSideLabels = [], leftSideLabels = [], rightSideLabels2, leftSideLabels2;
-  var rightSideExplodedLabels = [], leftSideExplodedLabels = [], rightSideExplodedLabels2, leftSideExplodedLabels2;
-  var arr;
-
-  iterator.reset();
-  var switchToRightSide = false;
-  var switchToLeftSide = false;
-  while (iterator.advance()) {
-    if (this.isMissing_(iterator.get('value'))) continue;
-    var index = iterator.getIndex();
-    var start = /** @type {number} */ (iterator.meta('start'));
-    var sweep = /** @type {number} */ (iterator.meta('sweep'));
-    var exploded = /** @type {boolean} */ (iterator.meta('exploded')) && !(iterator.getRowsCount() == 1);
-    var angle = (start + sweep / 2) * Math.PI / 180;
-    var angleDeg = goog.math.standardAngle(goog.math.toDegrees(angle));
-
-    if (angleDeg > 270 && !switchToRightSide &&
-        (leftSideLabels.length != 0 || (leftSideLabels2 && leftSideLabels2.length != 0))) {
-      switchToRightSide = true;
-      rightSideLabels2 = [];
-      rightSideExplodedLabels2 = [];
-    }
-
-    if (angleDeg > 90 && !switchToLeftSide &&
-        (rightSideLabels.length != 0 || (rightSideLabels2 && rightSideLabels2.length != 0))) {
-      switchToLeftSide = true;
-      leftSideLabels2 = [];
-      leftSideExplodedLabels2 = [];
-    }
-
-    isRightSide = angleDeg < 90 || angleDeg > 270;
-
-    var center = this.getSliceCenterCoords(index);
-    radius = mode3d ? this.get3DYRadius(this.radiusValue_) : this.radiusValue_;
-
-    // coordinates of the point where the connector touches a pie
-    x0 = center[0] + this.radiusValue_ * Math.cos(angle);
-    y0 = center[1] + radius * Math.sin(angle);
-
-    if (mode3d) {
-      y0 += this.get3DHeight() / 2;
-    }
-
-    connector = isRightSide ?
-        anychart.pieModule.Chart.OUTSIDE_LABELS_CONNECTOR_SIZE_ :
-        -anychart.pieModule.Chart.OUTSIDE_LABELS_CONNECTOR_SIZE_;
-    iterator.meta('connector', connector);
-
-    this.connectorAnchorCoords[index * 2] = x0;
-    this.connectorAnchorCoords[index * 2 + 1] = y0;
-
-    var anchor = isRightSide ? anychart.enums.Position.LEFT_CENTER : anychart.enums.Position.RIGHT_CENTER;
-    iterator.meta('anchor', anchor);
-    label = this.drawLabel_(anychart.PointState.NORMAL, false);
-    this.dropLabelBoundsCache(label);
-
-    label.angle_ = angleDeg;
-
-    //Target array chosen.
-    if (isRightSide) {
-      if (switchToRightSide) {
-        arr = exploded ? rightSideExplodedLabels2 : rightSideLabels2;
-      } else {
-        arr = exploded ? rightSideExplodedLabels : rightSideLabels;
-      }
-    } else {
-      if (switchToRightSide) {
-        arr = exploded ? leftSideExplodedLabels2 : leftSideLabels2;
-      } else {
-        arr = exploded ? leftSideExplodedLabels : leftSideLabels;
-      }
-    }
-    arr.push(label);
-
-    if (this.getOption('overlapMode') == anychart.enums.LabelsOverlapMode.ALLOW_OVERLAP) {
-      if (label && label.enabled() != false) {
-        index = label.getIndex();
-
-        this.dropLabelBoundsCache(label);
-        var bounds = this.getLabelBounds(label);
-
-        var boundsForCompare = exploded ? this.contentBounds : this.piePlotBounds_;
-
-        this.labelsRadiusOffset_ = Math.max(
-            boundsForCompare.left - bounds.left,
-            bounds.getRight() - boundsForCompare.getRight(),
-            boundsForCompare.top - bounds.top,
-            bounds.getBottom() - boundsForCompare.getBottom(),
-            this.labelsRadiusOffset_);
-
-        if (!this.drawnConnectors_[index]) {
-          y0 = this.connectorAnchorCoords[index * 2 + 1] - this.get3DHeight() / 2;
-          if (mode3d && y0 < this.cy_) {
-            connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLowerLayer_.genNextChild());
-          } else {
-            connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLayer_.genNextChild());
-          }
-          this.drawnConnectors_[index] = connectorPath;
-          connectorPath.stroke(/** @type {acgraph.vector.Stroke} */ (this.getOption('connectorStroke')));
-          this.drawConnectorLine(label, connectorPath);
-        }
-      }
-
-    }
-  }
-  //endregion
-
-  rightSideLabels = rightSideLabels2 ?
-      rightSideLabels2.concat(rightSideLabels) : rightSideLabels;
-
-  rightSideExplodedLabels = rightSideExplodedLabels2 ?
-      rightSideExplodedLabels2.concat(rightSideExplodedLabels) : rightSideExplodedLabels;
-
-  leftSideLabels = leftSideLabels2 ?
-      leftSideLabels2.concat(leftSideLabels) : leftSideLabels;
-
-  leftSideExplodedLabels = leftSideExplodedLabels2 ?
-      leftSideExplodedLabels2.concat(leftSideExplodedLabels) : leftSideExplodedLabels;
-
-  if (this.getOption('overlapMode') != anychart.enums.LabelsOverlapMode.ALLOW_OVERLAP) {
-    // var ___name = 'cb_';
-    // if (!this[___name]) this[___name] = this.container().rect().zIndex(1000);
-    // this[___name].setBounds(this.contentBounds);
-    //
-    // var ___name = 'ppb_';
-    // if (!this[___name]) this[___name] = this.container().rect().zIndex(1000);
-    // this[___name].setBounds(this.piePlotBounds_);
-
-    
-    this.calcDomain(leftSideExplodedLabels, false, null, true);
-    this.calcDomain(rightSideExplodedLabels, true, null, true);
-
-    var explodedLabels = goog.array.concat(leftSideExplodedLabels, rightSideExplodedLabels);
-    this.calcDomain(leftSideLabels, false, explodedLabels, false);
-    this.calcDomain(rightSideLabels, true, explodedLabels, false);
-  }
-
-  this.labelsRadiusOffset_ = Math.round(this.labelsRadiusOffset_);
-};
-
-
-/**
- * Calculate labels domain.
- * @param {Array.<anychart.core.ui.CircularLabelsFactory.Label>} labels .
- * @param {boolean} isRightSide .
- * @param {Array.<anychart.core.ui.CircularLabelsFactory.Label>=} opt_labelsForComparing .
- * @param {boolean=} opt_exploded .
- */
-anychart.pieModule.Chart.prototype.calcDomain = function(labels, isRightSide, opt_labelsForComparing, opt_exploded) {
-  var i, len, bounds, droppedLabels, notIntersection, m, l, domainBounds, domain = null, label;
-  var iterator = this.getIterator();
-  var domains = [];
-  var labelsIterator = isRightSide ? goog.array.forEachRight : goog.array.forEach;
-
-  labelsIterator(labels, function(label) {
-    if (label) {
-      iterator.select(label.getIndex());
-      label.formatProvider(this.createFormatProvider());
-      bounds = this.getLabelBounds(label);
-
-      if (!domain || (domain.isNotIntersect(bounds))) {
-        if (domain) domains.push(domain);
-        domain = new anychart.pieModule.Chart.PieOutsideLabelsDomain(isRightSide, this, domains, !!opt_exploded);
-        domain.addLabel(label);
-      } else {
-        domain.addLabel(label);
-      }
-    }
-  }, this);
-
-  if (domain) domains.push(domain);
-
-  for (i = 0, len = domains.length; i < len; i++) {
-    domain = domains[i];
-    if (domain && domain.droppedLabels) {
-      if (!droppedLabels) droppedLabels = [];
-      droppedLabels = goog.array.concat(droppedLabels, domain.droppedLabels);
-    }
-  }
-
-  domain = null;
-  if (droppedLabels) {
-    goog.array.sort(droppedLabels, function(a, b) {
-      return a.getIndex() > b.getIndex() ? 1 : a.getIndex() < b.getIndex() ? -1 : 0;
-    });
-
-    labelsIterator(droppedLabels, function(label) {
-      if (label) {
-        iterator.select(label.getIndex());
-        label.formatProvider(this.createFormatProvider());
-        bounds = this.getLabelBounds(label);
-
-        notIntersection = true;
-        for (m = 0, l = domains.length; m < l; m++) {
-          notIntersection = notIntersection && domains[m].isNotIntersect(bounds);
-        }
-
-        if (notIntersection) {
-          if (!domain) {
-            domain = new anychart.pieModule.Chart.PieOutsideLabelsDomain(isRightSide, this, [], !!opt_exploded);
-          }
-          domain.softAddLabel(label);
-          domainBounds = domain.getBounds();
-
-          notIntersection = true;
-          for (m = 0; m < l; m++) {
-            notIntersection = notIntersection && domains[m].isNotIntersect(domainBounds);
-          }
-
-          if (domain.isCriticalAngle || !notIntersection) {
-            domain.labels.pop().enabled(false);
-            domain.calcDomain();
-            domains.push(domain);
-            domain = null;
-          } else {
-            label.enabled(true);
-          }
-        } else {
-          if (domain) {
-            domains.push(domain);
-            domain = null;
-          }
-        }
-      }
-    }, this);
-
-    if (domain)
-      domains.push(domain);
-  }
-
-  var y0, connectorPath, index, k, z, labelsLen, labelsForComparingLen;
-  var mode3d = this.getOption('mode3d');
-  var connectorStroke = /** @type {acgraph.vector.Stroke} */ (this.getOption('connectorStroke'));
-
-  for (i = 0, len = domains.length; i < len; i++) {
-    domain = domains[i];
-    if (domain) {
-      domain.applyPositions();
-
-      for (k = 0, labelsLen = domain.labels.length; k < labelsLen; k++) {
-        label = domain.labels[k];
-        this.dropLabelBoundsCache(label);
-        bounds = this.getLabelBounds(label);
-        index = label.getIndex();
-
-        if (opt_labelsForComparing && label && label.enabled() != false) {
-          var c_x0 = this.connectorAnchorCoords[index * 2];
-          var c_y0 = this.connectorAnchorCoords[index * 2 + 1];
-
-          var connector = /** @type {number} */(iterator.meta('connector'));
-          var positionProvider = label.positionProvider()['value'];
-
-          var angle = positionProvider['angle'];
-          var angleRad = goog.math.toRadians(angle);
-          var radius = positionProvider['radius'];
-
-          var c_x1 = this.cx_ + radius * Math.cos(angleRad) - connector;
-          var c_y1 = this.cy_ + radius * Math.sin(angleRad);
-
-          for (z = 0, labelsForComparingLen = opt_labelsForComparing.length; z < labelsForComparingLen; z++) {
-            var comparingLabel = opt_labelsForComparing[z];
-            this.dropLabelBoundsCache(comparingLabel);
-
-            var comparingBounds = this.getLabelBounds(comparingLabel);
-            var comparingLabelIndex = comparingLabel.getIndex();
-
-            var center = this.getSliceCenterCoords(comparingLabelIndex);
-            var cx = center[0], cy = center[1];
-
-            var start = /** @type {number} */ (iterator.meta('start'));
-            var sweep = /** @type {number} */ (iterator.meta('sweep'));
-
-            //Coords of comparing label connector
-            var cc_x0 = this.connectorAnchorCoords[comparingLabelIndex * 2];
-            var cc_y0 = this.connectorAnchorCoords[comparingLabelIndex * 2 + 1];
-
-            connector = /** @type {number} */(iterator.meta('connector'));
-            positionProvider = comparingLabel.positionProvider()['value'];
-
-            angle = positionProvider['angle'];
-            angleRad = goog.math.toRadians(angle);
-            radius = positionProvider['radius'];
-
-            var cc_x1 = this.cx_ + radius * Math.cos(angleRad) - connector;
-            var cc_y1 = this.cy_ + radius * Math.sin(angleRad);
-
-            //Coords of slice sides
-            angleRad = goog.math.toRadians(start);
-            var startSliceLinePointInner_x = cx + this.innerRadiusValue_ * Math.cos(angleRad);
-            var startSliceLinePointInner_y = cy + this.innerRadiusValue_ * Math.sin(angleRad);
-
-            var startSliceLinePointOuter_x = cx + this.radiusValue_ * Math.cos(angleRad);
-            var startSliceLinePointOuter_y = cy + this.radiusValue_ * Math.sin(angleRad);
-
-            angleRad = goog.math.toRadians(start + sweep);
-            var endSliceLinePointInner_x = cx + this.innerRadiusValue_ * Math.cos(angleRad);
-            var endSliceLinePointInner_y = cy + this.innerRadiusValue_ * Math.sin(angleRad);
-
-            var endSliceLinePointOuter_x = cx + this.radiusValue_ * Math.cos(angleRad);
-            var endSliceLinePointOuter_y = cy + this.radiusValue_ * Math.sin(angleRad);
-
-            var cbbox = bounds.toCoordinateBox();
-            var isIntersect =
-                anychart.math.checkRectIntersection(cbbox, comparingBounds.toCoordinateBox()) ||
-                anychart.math.checkRectIntersectionWithSegment(startSliceLinePointInner_x, startSliceLinePointInner_y, startSliceLinePointOuter_x, startSliceLinePointOuter_y, cbbox) ||
-                anychart.math.checkRectIntersectionWithSegment(endSliceLinePointInner_x, endSliceLinePointInner_y, endSliceLinePointOuter_x, endSliceLinePointOuter_y, cbbox) ||
-                anychart.math.checkRectIntersectionWithSegment(cc_x0, cc_y0, cc_x1, cc_y1, cbbox) ||
-                anychart.math.checkSegmentsIntersection(c_x0, c_y0, c_x1, c_y1, startSliceLinePointInner_x, startSliceLinePointInner_y, startSliceLinePointOuter_x, startSliceLinePointOuter_y) ||
-                anychart.math.checkSegmentsIntersection(c_x0, c_y0, c_x1, c_y1, endSliceLinePointInner_x, endSliceLinePointInner_y, endSliceLinePointOuter_x, endSliceLinePointOuter_y);
-
-            if (isIntersect) {
-              label.enabled(false);
-              break;
-            }
-          }
-        }
-
-        if (label && label.enabled() != false) {
-          if (this.recalculateBounds_) {
-            iterator.select(index);
-            var exploded = /** @type {boolean} */ (iterator.meta('exploded')) && !(iterator.getRowsCount() == 1);
-            var boundsForCompare = exploded ? this.contentBounds : this.piePlotBounds_;
-
-            this.labelsRadiusOffset_ = Math.max(
-                boundsForCompare.left - bounds.left,
-                bounds.getRight() - boundsForCompare.getRight(),
-                boundsForCompare.top - bounds.top,
-                bounds.getBottom() - boundsForCompare.getBottom(),
-                this.labelsRadiusOffset_);
-          }
-
-          if (!this.drawnConnectors_[index]) {
-            y0 = this.connectorAnchorCoords[index * 2 + 1] - this.get3DHeight() / 2;
-            if (mode3d && y0 < this.cy_) {
-              connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLowerLayer_.genNextChild());
-            } else {
-              connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLayer_.genNextChild());
-            }
-            this.drawnConnectors_[index] = connectorPath;
-            connectorPath.stroke(connectorStroke);
-            this.drawConnectorLine(label, connectorPath);
-          }
-        }
-      }
-    }
-  }
-};
-
-
-/**
- * Defragmentation domain. If domain have critical angle then need defragment domain.
- * @param {!anychart.pieModule.Chart.PieOutsideLabelsDomain} domain Domain to defragmentation.
- */
-anychart.pieModule.Chart.prototype.domainDefragmentation = function(domain) {
-  var labels = domain.labels;
-  var sourcePieLabelsDomains = domain.pieLabelsDomains;
-  var i, len, label, bounds;
-  var prevDomain = sourcePieLabelsDomains[sourcePieLabelsDomains.length - 1];
-
-  if (prevDomain == domain) return;
-
-  var tmpDomain = null;
-  var tmpLabels = labels.slice();
-  var domainsLength = sourcePieLabelsDomains.length;
-  var domainExpanded = false;
-
-  for (i = 0, len = labels.length; i < len; i++) {
-    label = labels[i];
-    if (label) {
-      bounds = this.getLabelBounds(label);
-
-      if (!prevDomain || prevDomain.isNotIntersect(bounds)) {
-
-        if (!tmpDomain || tmpDomain.isNotIntersect(bounds)) {
-          if (tmpDomain) {
-            sourcePieLabelsDomains.push(tmpDomain);
-            prevDomain = tmpDomain;
-          }
-          var isRightSide = label['anchor']() == anychart.enums.Anchor.LEFT_CENTER;
-          tmpDomain = new anychart.pieModule.Chart.PieOutsideLabelsDomain(isRightSide, this, sourcePieLabelsDomains, domain.exploded);
-          tmpDomain.softAddLabel(label);
-        } else {
-          tmpDomain.softAddLabel(label);
-
-          if (this.isCriticalAngle) {
-            label.enabled(false);
-            if (!tmpDomain.droppedLabels) tmpDomain.droppedLabels = [];
-            tmpDomain.droppedLabels.push(label);
-            tmpDomain.labels.pop();
-            tmpDomain.calcDomain();
-          } else if (prevDomain && tmpDomain && !prevDomain.isNotIntersect(tmpDomain.getBounds())) {
-            sourcePieLabelsDomains.pop();
-            tmpDomain.labels = goog.array.concat(prevDomain.labels, tmpDomain.labels);
-            prevDomain = null;
-            tmpDomain.calcDomain();
-
-            domainExpanded = true;
-          }
-        }
-      } else {
-        label.enabled(false);
-        if (tmpDomain) {
-          if (!tmpDomain.droppedLabels) tmpDomain.droppedLabels = [];
-          tmpDomain.droppedLabels.push(label);
-        }
-      }
-    }
-  }
-  if (tmpDomain) {
-    if (sourcePieLabelsDomains.length - domainsLength > 0 || domainExpanded) {
-      domain.labels = tmpDomain.labels;
-    } else {
-      tmpDomain.clearDroppedLabels();
-      if (tmpLabels.length != labels.length)
-        domain.labels = tmpLabels;
-    }
-  }
-};
-
-
-/**
- * Draws connector line for label.
- * @param {anychart.core.ui.CircularLabelsFactory.Label} label Label.
- * @param {acgraph.vector.Path} path Connector path element.
- */
-anychart.pieModule.Chart.prototype.drawConnectorLine = function(label, path) {
-  var iterator = this.data().getIterator();
-  var index = label.getIndex();
-  var mode3d = /** @type {boolean} */ (this.getOption('mode3d'));
-
-  if (iterator.select(index)) {
-    var x0 = this.connectorAnchorCoords[index * 2];
-    var y0 = this.connectorAnchorCoords[index * 2 + 1];
-
-    var connector = /** @type {number} */(iterator.meta('connector'));
-    var positionProvider = label.positionProvider()['value'];
-
-    var offsetY = goog.isDef(label.getOption('offsetY')) ? label.getOption('offsetY') : this.labels().getOption('offsetY');
-    if (!offsetY) offsetY = 0;
-    var offsetRadius = anychart.utils.normalizeSize(/** @type {number|string} */(offsetY), this.radiusValue_);
-
-    var offsetX = goog.isDef(label.getOption('offsetX')) ? label.getOption('offsetX') : this.labels().getOption('offsetX');
-    if (!offsetX) offsetX = 0;
-    var offsetAngle = anychart.utils.normalizeSize(/** @type {number|string} */(offsetX), 360);
-
-    var angle = positionProvider['angle'] + offsetAngle;
-    var angleRad = goog.math.toRadians(angle);
-    var radius = positionProvider['radius'] + offsetRadius;
-    var radiusY = mode3d ? positionProvider['radiusY'] + offsetRadius : radius;
-
-    var x = this.cx_ + radius * Math.cos(angleRad) - connector;
-    var y = this.cy_ + radiusY * Math.sin(angleRad);
-
-    path.clear().moveTo(x0, y0).lineTo(x, y).lineTo(x + connector, y);
-  }
-};
-
-
-/**
- * Show or hide connector for label.
- * @param {anychart.core.ui.CircularLabelsFactory.Label} label Label.
- * @param {boolean} show Whether to show connector ot not for label.
- * @private
- */
-anychart.pieModule.Chart.prototype.updateConnector_ = function(label, show) {
-  if (!label || !this.drawnConnectors_)
-    return;
-  var index = label.getIndex();
-  var path;
-  if (!(path = this.drawnConnectors_[index])) {
-    if (!show) {
-      this.hoveredLabelConnectorPath_.clear();
-    } else {
-      this.drawConnectorLine(label, this.hoveredLabelConnectorPath_);
-    }
-    return;
-  }
-
-  if (label && label.enabled() != false && show) {
-    this.drawConnectorLine(label, path);
-  } else
-    path.clear();
 };
 
 
@@ -4240,10 +4621,12 @@ anychart.pieModule.Chart.prototype.serialize = function() {
   json['palette'] = this.palette().serialize();
   json['hatchFillPalette'] = this.hatchFillPalette().serialize();
   json['tooltip'] = this.tooltip().serialize();
+  json['center'] = this.center().serialize();
 
   anychart.core.settings.serialize(this, anychart.pieModule.Chart.PROPERTY_DESCRIPTORS, json, 'Pie');
   json['normal'] = this.normal_.serialize();
   json['hovered'] = this.hovered_.serialize();
+  json['selected'] = this.selected_.serialize();
 
   // The values of group() function can be function or null or 'none'. So we don't serialize it anyway.
   //if (goog.isFunction(this['group'])) {
@@ -4258,6 +4641,7 @@ anychart.pieModule.Chart.prototype.serialize = function() {
   //  }
   //}
 
+
   return {'chart': json};
 };
 
@@ -4271,12 +4655,24 @@ anychart.pieModule.Chart.prototype.setupByJSON = function(config, opt_default) {
   this.palette(config['palette']);
   this.hatchFillPalette(config['hatchFillPalette']);
 
+  this.center().setupInternal(!!opt_default, config['center']);
+
   if ('tooltip' in config)
     this.tooltip().setupInternal(!!opt_default, config['tooltip']);
 
   anychart.core.settings.deserialize(this, anychart.pieModule.Chart.PROPERTY_DESCRIPTORS, config);
+  
+  this.selected_.setupInternal(!!opt_default, config['selected']);
+
+  if (goog.isDef(config['explode'])) {
+    config = goog.object.clone(config);
+    this.selected_.setupInternal(!!opt_default, {'explode': config['explode']});
+    delete config['explode'];
+  }
+
   this.normal_.setupInternal(!!opt_default, config);
   this.normal_.setupInternal(!!opt_default, config['normal']);
+
   this.hovered_.setupInternal(!!opt_default, config['hovered']);
 };
 
@@ -4285,7 +4681,7 @@ anychart.pieModule.Chart.prototype.setupByJSON = function(config, opt_default) {
  * @inheritDoc
  */
 anychart.pieModule.Chart.prototype.disposeInternal = function() {
-  goog.disposeAll(this.animationQueue_, this.normal_, this.hovered_);
+  goog.disposeAll(this.animationQueue_, this.normal_, this.hovered_, this.center_);
   anychart.pieModule.Chart.base(this, 'disposeInternal');
 };
 
@@ -4297,15 +4693,15 @@ anychart.pieModule.Chart.prototype.disposeInternal = function() {
  * @param {boolean} isRight .
  * @param {!anychart.pieModule.Chart} pie .
  * @param {Array.<anychart.pieModule.Chart.PieOutsideLabelsDomain>} domains .
- * @param {boolean} exploded .
+ * @param {number} explode .
  * @constructor
  */
-anychart.pieModule.Chart.PieOutsideLabelsDomain = function(isRight, pie, domains, exploded) {
+anychart.pieModule.Chart.PieOutsideLabelsDomain = function(isRight, pie, domains, explode) {
   /**
    *
-   * @type {boolean}
+   * @type {number}
    */
-  this.exploded = exploded;
+  this.explode = explode;
 
   /**
    *
@@ -4492,11 +4888,9 @@ anychart.pieModule.Chart.PieOutsideLabelsDomain.prototype.calcDomain = function(
   var sumPos = 0;
   this.dropBoundsCache();
 
-
-  var pieCenter = this.pie.getCenterPoint();
-  var piePxRadius = this.pie.getPixelRadius();
-  if (this.exploded)
-    piePxRadius += this.pie.getPixelExplode();
+  var explode = this.explode;
+  var pieCenter = this.pie.center().getPoint();
+  var piePxRadius = this.pie.getPixelRadius() + explode;
 
   var cx = pieCenter['x'], cy = pieCenter['y'];
   var bottomLabelsYLimit, topLabelsYLimit;
@@ -4537,7 +4931,7 @@ anychart.pieModule.Chart.PieOutsideLabelsDomain.prototype.calcDomain = function(
   this.labelsPositions.length = 0;
   var iterator = this.pie.data().getIterator();
   var nextLabelHeight;
-  var start, sweep, exploded, angle, dR, dRPie, y, y0, y1, x, x0, x1, connector;
+  var start, sweep, angle, dR, dRPie, y, y0, y1, x, x0, x1, connector;
   this.x = NaN;
   this.width = NaN;
   var rightBound, leftBound;
@@ -4552,11 +4946,11 @@ anychart.pieModule.Chart.PieOutsideLabelsDomain.prototype.calcDomain = function(
     labelBounds = this.pie.getLabelBounds(label);
     nextLabelHeight = (j == len - 1) ? 0 : this.pie.getLabelBounds(this.labels[j + 1]).height;
 
-    iterator.select(label.getIndex());
+    var index = label.getIndex();
+    iterator.select(index);
 
     start = /** @type {number} */ (iterator.meta('start'));
     sweep = /** @type {number} */ (iterator.meta('sweep'));
-    exploded = /** @type {boolean} */ (iterator.meta('exploded'));
 
     var offsetX = goog.isDef(label.getOption('offsetX')) ? label.getOption('offsetX') : this.pie.labels().getOption('offsetX');
     if (!offsetX) offsetX = 0;
@@ -4566,19 +4960,19 @@ anychart.pieModule.Chart.PieOutsideLabelsDomain.prototype.calcDomain = function(
     if (!offsetY) offsetY = 0;
     var offsetRadius = anychart.utils.normalizeSize(/** @type {number|string} */(offsetY), this.pie.radiusValue_);
 
-    angle = (start + sweep / 2 + offsetAngle) * Math.PI / 180;
+    angle = goog.math.toRadians(start + sweep / 2 + offsetAngle);
 
     connector = this.isRightSide ?
         anychart.pieModule.Chart.OUTSIDE_LABELS_CONNECTOR_SIZE_ :
         -anychart.pieModule.Chart.OUTSIDE_LABELS_CONNECTOR_SIZE_;
 
-    dRPie = this.pie.radiusValue_ + (exploded ? this.pie.explodeValue_ : 0);
-    dR = (this.pie.getPixelRadius() + this.pie.connectorLengthValue_) + (exploded ? this.pie.explodeValue_ : 0) + offsetRadius;
+    dRPie = this.pie.radiusValue_ + explode;
+    dR = (this.pie.getPixelRadius() + this.pie.connectorLengthValue_) + explode + offsetRadius;
 
     var dRYPie, dRY;
     if (mode3d) {
-      dRYPie = this.pie.get3DYRadius(this.pie.radiusValue_) + (exploded ? this.pie.get3DYRadius(this.pie.explodeValue_) : 0);
-      dRY = (this.pie.get3DYRadius(this.pie.getPixelRadius()) + this.pie.connectorLengthValue_) + (exploded ? this.pie.get3DYRadius(this.pie.explodeValue_) : 0) + this.pie.get3DYRadius(offsetRadius);
+      dRYPie = this.pie.get3DYRadius(this.pie.radiusValue_ + explode);
+      dRY = this.pie.get3DYRadius(this.pie.getPixelRadius() + explode + offsetRadius) + this.pie.connectorLengthValue_;
     } else {
       dRYPie = dRPie;
       dRY = dR;
@@ -4607,18 +5001,10 @@ anychart.pieModule.Chart.PieOutsideLabelsDomain.prototype.calcDomain = function(
     x1 = cx + dR * Math.cos(angle);
     y1 = cy + dRY * Math.sin(angle);
 
-    // var ___name = 'lbl_' + label.getIndex();
-    // if (!this.pie[___name]) this.pie[___name] = this.pie.container().circle().zIndex(1000);
-    // this.pie[___name].center({'x': x, 'y': y}).radius(1);
-
     //radius from center of pir to label position.
-    var realConnectorRadius = Math.floor(anychart.math.vectorLength(x, y, cx, cy));
+    var realConnectorRadius = Math.floor(anychart.math.vectorLength(x, y, cx, cy)) + offsetY;
+    var dAngle = Math.abs(acgraph.math.angleBetweenVectors(x - x0, y - y0, x1 - x0, y1 - y0));
 
-    // get connector radius before overlap correction
-    var normalConnector = (anychart.math.vectorLength(x0, y0, x1, y1)).toFixed(3);
-    // get connector radius after overlap correction
-    var txConnector = (anychart.math.vectorLength(x0, y0, x, y)).toFixed(3);
-    var dAngle = goog.math.toDegrees(Math.acos(normalConnector / txConnector));
     var isNotValidConnectorLength = leg < 0 || realConnectorRadius > dR;
 
     if (dAngle > this.maxAngle || isNaN(this.maxAngle) || isNotValidConnectorLength) {
@@ -4698,7 +5084,11 @@ anychart.pieModule.Chart.PieOutsideLabelsDomain.prototype.calculate = function()
 
 
 //endregion
+//region --- Exports
 //exports
+/**
+ * @suppress {deprecated}
+ */
 (function() {
   var proto = anychart.pieModule.Chart.prototype;
   // auto generated
@@ -4707,14 +5097,19 @@ anychart.pieModule.Chart.PieOutsideLabelsDomain.prototype.calculate = function()
   // proto['startAngle'] = proto.startAngle;//doc|ex
   // proto['explode'] = proto.explode;//doc/ex
   // proto['sort'] = proto.sort;//doc|ex
-  // proto['outsideLabelsSpace'] = proto.outsideLabelsSpace;//doc|ewx
   // proto['overlapMode'] = proto.overlapMode;
   // proto['insideLabelsOffset'] = proto.insideLabelsOffset;//doc|ewx
   // proto['connectorLength'] = proto.connectorLength;//doc|ex
   // proto['outsideLabelsCriticalAngle'] = proto.outsideLabelsCriticalAngle;//doc|ex
-  // proto['forceHoverLabels'] = proto.forceHoverLabels;
   // proto['connectorStroke'] = proto.connectorStroke;//doc|ex
   // proto['mode3d'] = proto.mode3d;
+  // proto['forceHoverLabels'] = proto.forceHoverLabels;
+  //deprecated
+  // proto['outsideLabelsSpace'] = proto.outsideLabelsSpace;//doc|ewx
+  proto['explodeSlice'] = proto.explodeSlice;//doc|ex
+  proto['explodeSlices'] = proto.explodeSlices;
+  //actual
+  proto['center'] = proto.center;
   proto['group'] = proto.group;//doc|ex|non-tr
   proto['data'] = proto.data;//doc|ex|
   proto['labels'] = proto.labels;//doc|ex
@@ -4723,16 +5118,20 @@ anychart.pieModule.Chart.PieOutsideLabelsDomain.prototype.calculate = function()
   proto['getPixelInnerRadius'] = proto.getPixelInnerRadius;//doc|need-ex
   proto['getPixelExplode'] = proto.getPixelExplode;
   proto['palette'] = proto.palette;//doc|ex
-  proto['explodeSlice'] = proto.explodeSlice;//doc|ex
-  proto['explodeSlices'] = proto.explodeSlices;
   proto['tooltip'] = proto.tooltip;//doc|ex
   proto['hatchFillPalette'] = proto.hatchFillPalette;
   proto['getType'] = proto.getType;
-  proto['hover'] = proto.hover;
-  proto['unhover'] = proto.unhover;
   proto['getPoint'] = proto.getPoint;
   proto['toCsv'] = proto.toCsv;
 
+  proto['hover'] = proto.hover;
+  proto['unhover'] = proto.unhover;
+
+  proto['select'] = proto.select;
+  proto['unselect'] = proto.unselect;
+
   proto['normal'] = proto.normal;
   proto['hovered'] = proto.hovered;
+  proto['selected'] = proto.selected;
 })();
+//endregion

@@ -513,6 +513,10 @@ anychart.sparklineModule.Chart.prototype.applyAppearanceToPoint = goog.nullFunct
 anychart.sparklineModule.Chart.prototype.finalizePointAppearance = goog.nullFunction;
 
 
+/** @inheritDoc */
+anychart.sparklineModule.Chart.prototype.getStartValueForAppearanceReduction = goog.nullFunction;
+
+
 /**
  * Getter/setter for marker default settings.
  * @param {Object=} opt_value Object with default series settings.

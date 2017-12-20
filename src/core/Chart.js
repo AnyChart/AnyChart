@@ -2484,6 +2484,8 @@ anychart.core.Chart.prototype.onMouseDown = function(event) {
 
   var seriesStatus, eventSeriesStatus, allSeries, alreadySelectedPoints, i;
   var controlKeyPressed = event.ctrlKey || event.metaKey;
+  var multiSelectOnClick = interactivity.multiSelectOnClick();
+  var multiSelectKeyPressed = controlKeyPressed || event.shiftKey || multiSelectOnClick;
   var clickWithControlOnSelectedSeries, equalsSelectedPoints;
 
   var tag = anychart.utils.extractTag(event['domTarget']);
@@ -2531,12 +2533,12 @@ anychart.core.Chart.prototype.onMouseDown = function(event) {
         alreadySelectedPoints = series.state.getIndexByPointState(anychart.PointState.SELECT);
         equalsSelectedPoints = alreadySelectedPoints.length == 1 && alreadySelectedPoints[0] == index;
 
-        if (!(controlKeyPressed || event.shiftKey) && equalsSelectedPoints)
+        if (!multiSelectKeyPressed && equalsSelectedPoints)
           return;
 
-        clickWithControlOnSelectedSeries = (controlKeyPressed || event.shiftKey) && series.state.isStateContains(series.state.getSeriesState(), anychart.PointState.SELECT);
-        var unselect = clickWithControlOnSelectedSeries || !(controlKeyPressed || event.shiftKey) ||
-            ((controlKeyPressed || event.shiftKey) && interactivity.selectionMode() != anychart.enums.SelectionMode.MULTI_SELECT);
+        clickWithControlOnSelectedSeries = multiSelectKeyPressed && series.state.isStateContains(series.state.getSeriesState(), anychart.PointState.SELECT);
+        var unselect = !multiSelectOnClick && (clickWithControlOnSelectedSeries || !multiSelectKeyPressed ||
+            (multiSelectKeyPressed && interactivity.selectionMode() != anychart.enums.SelectionMode.MULTI_SELECT));
 
         if (unselect) {
           this.unselect();
@@ -2584,7 +2586,7 @@ anychart.core.Chart.prototype.onMouseDown = function(event) {
           this.prevSelectSeriesStatus = eventSeriesStatus;
       }
     }
-  } else if (interactivity.hoverMode() == anychart.enums.HoverMode.SINGLE) {
+  } else if (interactivity.hoverMode() == anychart.enums.HoverMode.SINGLE && interactivity.unselectOnClickOutOfPoint()) {
     if (!isTargetLegendOrColorRange)
       this.unselect();
 
@@ -2625,10 +2627,10 @@ anychart.core.Chart.prototype.onMouseDown = function(event) {
         alreadySelectedPoints = series.state.getIndexByPointState(anychart.PointState.SELECT);
         equalsSelectedPoints = alreadySelectedPoints.length == 1 && alreadySelectedPoints[0] == nearest.nearestPointToCursor.index;
 
-        dispatchEvent = !equalsSelectedPoints || (equalsSelectedPoints && (controlKeyPressed || event.shiftKey));
+        dispatchEvent = !equalsSelectedPoints || (equalsSelectedPoints && multiSelectKeyPressed);
 
-        clickWithControlOnSelectedSeries = (controlKeyPressed || event.shiftKey) && series.state.isStateContains(series.state.getSeriesState(), anychart.PointState.SELECT);
-        if ((clickWithControlOnSelectedSeries || !(controlKeyPressed || event.shiftKey)) && !equalsSelectedPoints) {
+        clickWithControlOnSelectedSeries = multiSelectKeyPressed && series.state.isStateContains(series.state.getSeriesState(), anychart.PointState.SELECT);
+        if ((clickWithControlOnSelectedSeries || !multiSelectKeyPressed) && !equalsSelectedPoints) {
           series.unselect();
         }
         series.selectPoint(/** @type {number} */ (nearest.nearestPointToCursor.index), event);
@@ -2663,7 +2665,7 @@ anychart.core.Chart.prototype.onMouseDown = function(event) {
         }
       } else {
         var emptySeries = [];
-        if (!(controlKeyPressed || event.shiftKey)) {
+        if (!multiSelectKeyPressed) {
           allSeries = this.getAllSeries();
 
           for (i = 0; i < allSeries.length; i++) {
@@ -2709,8 +2711,8 @@ anychart.core.Chart.prototype.onMouseDown = function(event) {
           dispatchEvent = dispatchEvent || !equalsSelectedPoints;
 
           if (!equalsSelectedPoints) {
-            clickWithControlOnSelectedSeries = (controlKeyPressed || event.shiftKey) && series.state.isStateContains(series.state.getSeriesState(), anychart.PointState.SELECT);
-            if (clickWithControlOnSelectedSeries || !(controlKeyPressed || event.shiftKey) || series.selectionMode() == anychart.enums.SelectionMode.SINGLE_SELECT) {
+            clickWithControlOnSelectedSeries = multiSelectKeyPressed && series.state.isStateContains(series.state.getSeriesState(), anychart.PointState.SELECT);
+            if (clickWithControlOnSelectedSeries || !multiSelectKeyPressed || series.selectionMode() == anychart.enums.SelectionMode.SINGLE_SELECT) {
               series.unselect();
             }
             series.selectPoint(points, event);

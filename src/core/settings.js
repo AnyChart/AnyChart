@@ -940,6 +940,8 @@ anychart.core.settings.descriptors = (function() {
   map.FORMAT = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'format', anychart.core.settings.stringOrFunctionNormalizer];
   map.FONT_PADDING = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'fontPadding', anychart.core.settings.numberOrPercentNormalizer];
 
+  //pie
+  map.EXPLODE = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'explode', anychart.core.settings.numberOrPercentNormalizer];
 
   return map;
 })();

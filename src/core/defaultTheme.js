@@ -1100,20 +1100,7 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'y': 0,
     'axisIndex': 0,
     'anchor': null,
-    /**
-     * @return {*}
-     * @this {*}
-     */
-    'format': function() {
-      var scale = this['scale'];
-      var type = scale.getType();
-      var prec = NaN;
-      if (type == 'linear' || type == 'log') {
-        var ticks = (/** @type {anychart.scales.Linear} */(scale)).ticks().getInternal();
-        prec = anychart.math.getPrecision(anychart.math.specialRound(ticks[1] - ticks[0]));
-      }
-      return anychart.core.defaultTheme.locNum(this['value'], isNaN(prec) ? undefined : prec);
-    },
+    'format': anychart.core.defaultTheme.returnValue,
     'enabled': true,
     'fontSize': 12,
     'minFontSize': 8,
@@ -1259,7 +1246,9 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
       'hoverMode': 'single',
       'selectionMode': 'multi-select',
       'spotRadius': 2,
-      'allowMultiSeriesSelection': true
+      'allowMultiSeriesSelection': true,
+      'multiSelectOnClick': false,
+      'unselectOnClickOutOfPoint': true
     },
     'tooltip': {
       'displayMode': 'single',
@@ -1941,7 +1930,7 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'neckWidth': null,
     'neckHeight': null,
     'pointsPadding': 0,
-    'forceHoverLabels': false,
+    'forceHoverLabels': true,
     'outsideLabels': {
       'disablePointerEvents': false,
       'autoColor': anychart.core.defaultTheme.fontColorBright
@@ -2187,7 +2176,6 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'baseBarPosition': 'left-center',
     'baseBarOffset': 0,
     'baseBarHeight': '70%',
-    'parentBarHeight': '40%',
     'progressBarHeight': '100%',
     'progressBarPosition': 'left-center',
     'progressBarAnchor': 'left-center',

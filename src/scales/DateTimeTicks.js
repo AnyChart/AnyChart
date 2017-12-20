@@ -569,7 +569,7 @@ anychart.scales.DateTimeTicks.prototype.setupSpecial = function(isDefault, var_a
 anychart.scales.DateTimeTicks.prototype.setupByJSON = function(config, opt_default) {
   anychart.scales.DateTimeTicks.base(this, 'setupByJSON', config, opt_default);
   this.explicit_ = config['explicit'] || null;
-  this.count_ = goog.isNull(config['count']) ? NaN : Math.max(2, Math.ceil(config['count']));
+  this.count_ = Math.max(2, Math.ceil(anychart.utils.toNumber(config['count'])));
   this.interval_ = goog.isString(config['interval']) ? goog.date.Interval.fromIsoString(config['interval']) : null;
   this.autoTicks_ = null;
 };

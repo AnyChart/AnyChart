@@ -67,7 +67,8 @@ goog.inherits(anychart.stockModule.CurrentPriceIndicator, anychart.core.VisualBa
 anychart.stockModule.CurrentPriceIndicator.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.APPEARANCE |
-    anychart.ConsistencyState.STOCK_PRICE_INDICATOR_LABEL;
+    anychart.ConsistencyState.STOCK_PRICE_INDICATOR_LABEL |
+    anychart.ConsistencyState.STOCK_PRICE_INDICATOR_SERIES;
 
 
 /**
@@ -309,7 +310,7 @@ anychart.stockModule.CurrentPriceIndicator.prototype.series = function(opt_value
     if (this.series_ !== opt_value) {
       this.seriesId_ = seriesId;
       this.series_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.CONTAINER,
+      this.invalidate(anychart.ConsistencyState.STOCK_PRICE_INDICATOR_SERIES | anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.CONTAINER,
           anychart.Signal.NEEDS_REDRAW);
     }
     return this;
@@ -347,6 +348,7 @@ anychart.stockModule.CurrentPriceIndicator.prototype.axis = function(opt_value) 
  */
 anychart.stockModule.CurrentPriceIndicator.prototype.remove = function() {
   this.rootLayer.parent(null);
+  this.invalidate(anychart.ConsistencyState.CONTAINER);
 };
 
 
@@ -369,6 +371,8 @@ anychart.stockModule.CurrentPriceIndicator.prototype.draw = function() {
     this.row_ = series.getSelectableData().getRowByDataSource(this.getOption('value'), fieldValue);
     seriesValue = this.row_ ? this.row_.get(fieldValue) : null;
   }
+
+  this.markConsistent(anychart.ConsistencyState.STOCK_PRICE_INDICATOR_SERIES);
 
   if (!seriesValue) {
     this.remove();

@@ -52,8 +52,8 @@ anychart.paretoModule.Series.prototype.getContextProviderValues = function(provi
       (index = Number(values['index'].value)) > -1) {
     var paretoMapping = /** @type {anychart.data.Mapping} */ (data.getRowMapping(index));
     if ((anychart.utils.instanceOf(paretoMapping, anychart.paretoModule.Mapping)) || (anychart.utils.instanceOf(paretoMapping, anychart.paretoModule.SeriesMapping))) {
-      values['cf'] = {value: paretoMapping.getCumulativeFrequency(index), type: anychart.enums.TokenType.NUMBER};
-      values['rf'] = {value: paretoMapping.getRelativeFrequency(index), type: anychart.enums.TokenType.NUMBER};
+      values['cf'] = {value: anychart.math.round(paretoMapping.getCumulativeFrequency(index), 2), type: anychart.enums.TokenType.NUMBER};
+      values['rf'] = {value: anychart.math.round(paretoMapping.getRelativeFrequency(index), 2), type: anychart.enums.TokenType.NUMBER};
     }
   }
   return values;
@@ -96,8 +96,8 @@ anychart.paretoModule.Series.prototype.getCFRF = function(index) {
     var paretoMapping = /** @type {anychart.data.Mapping} */ (data.getRowMapping(index));
     if ((anychart.utils.instanceOf(paretoMapping, anychart.paretoModule.Mapping)) || (anychart.utils.instanceOf(paretoMapping, anychart.paretoModule.SeriesMapping))) {
       rv = {};
-      rv['cf'] = paretoMapping.getCumulativeFrequency(index);
-      rv['rf'] = paretoMapping.getRelativeFrequency(index);
+      rv['cf'] = anychart.math.round(paretoMapping.getCumulativeFrequency(index), 2);
+      rv['rf'] = anychart.math.round(paretoMapping.getRelativeFrequency(index), 2);
     }
   }
   return rv;

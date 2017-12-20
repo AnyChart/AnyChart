@@ -1287,7 +1287,7 @@ anychart.pyramidFunnelModule.Chart.prototype.getPoint = function(index) {
   if (iter.select(index) &&
       point.exists() && !this.isMissing_(value = /** @type {number} */(point.get('value')))) {
 
-    var val = value / /** @type {number} */(this.getStat(anychart.enums.Statistics.SUM)) * 100;
+    var val = anychart.math.round(value / /** @type {number} */(this.getStat(anychart.enums.Statistics.SUM)) * 100, 2);
     point.statistics(anychart.enums.Statistics.PERCENT_VALUE, val);
     point.statistics(anychart.enums.Statistics.Y_PERCENT_OF_TOTAL, val);
   }
@@ -1554,20 +1554,21 @@ anychart.pyramidFunnelModule.Chart.prototype.unselect = function(opt_indexOrInde
 //  Apply appearance.
 //
 //----------------------------------------------------------------------------------------------------------------------
-/**
- * Apply appearance to point.
- * @param {anychart.PointState|number} pointState
- */
-anychart.pyramidFunnelModule.Chart.prototype.applyAppearanceToPoint = function(pointState) {
+/** @inheritDoc */
+anychart.pyramidFunnelModule.Chart.prototype.applyAppearanceToPoint = function(pointState, opt_value) {
   this.colorizePoint_(pointState);
   this.applyHatchFill(pointState);
   this.drawMarker(pointState);
+
+  return opt_value;
 };
 
 
-/**
- * Finalization point appearance. For drawing labels and markers.
- */
+/** @inheritDoc */
+anychart.pyramidFunnelModule.Chart.prototype.getStartValueForAppearanceReduction = goog.nullFunction;
+
+
+/** @inheritDoc */
 anychart.pyramidFunnelModule.Chart.prototype.finalizePointAppearance = goog.nullFunction;
 
 
@@ -2993,7 +2994,7 @@ anychart.pyramidFunnelModule.Chart.prototype.calculate = function() {
     this.statistics(anychart.enums.Statistics.MIN, min);
     this.statistics(anychart.enums.Statistics.MAX, max);
     this.statistics(anychart.enums.Statistics.SUM, sum);
-    this.statistics(anychart.enums.Statistics.AVERAGE, avg);
+    this.statistics(anychart.enums.Statistics.AVERAGE, anychart.math.round(avg || NaN, anychart.math.getPrecision(sum || 0)));
 
     this.markConsistent(anychart.ConsistencyState.PYRAMID_FUNNEL_DATA);
   }

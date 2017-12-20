@@ -971,6 +971,7 @@ anychart.format.number = function(number, opt_decimalsCountOrLocale, opt_decimal
   if (scale === true)
     scale = anychart.format.DEFAULT_SCALE_;
 
+  number = Number(number);
   var negative = number < 0;
   if (negative)
     number = -number;

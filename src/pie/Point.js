@@ -37,29 +37,27 @@ anychart.pieModule.Point.prototype.getEndAngle = function() {
 };
 
 
-/** @inheritDoc */
-anychart.pieModule.Point.prototype.selected = function(opt_value) {
-  //TODO(AntonKagakin): pie chart cant select points in the new interactivity model
-  if (goog.isDef(opt_value)) {
-    this.getChart().explodeSlice(this.index, !!opt_value);
-    return this;
-  } else
-    return /** @type {boolean} */ (this.chart.data().meta(this.index, 'exploded'));
+/**
+ * Getter/setter for select point state.
+ * @param {boolean=} opt_value Select state to set.
+ * @return {(boolean|anychart.core.Point)} Select state of self for chaining.
+ * @deprecated since 8.1.0 use selected() instead. DVF-3404
+ */
+anychart.pieModule.Point.prototype.exploded = function(opt_value) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['exploded()', 'selected()'], true);
+  return this.selected(opt_value);
 };
 
 
-/**
- * Alias-method
- */
-anychart.pieModule.Point.prototype.exploded = anychart.pieModule.Point.prototype.selected;
-
-
 //exports
+/**
+ * @suppress {deprecated}
+ */
 (function() {
   var proto = anychart.pieModule.Point.prototype;
   proto['getStartAngle'] = proto.getStartAngle;
   proto['getEndAngle'] = proto.getEndAngle;
   proto['hovered'] = proto.hovered;
-  proto['selected'] = proto.selected;
+  proto['selected'] = proto.selected; //deprecated
   proto['exploded'] = proto.exploded;
 })();

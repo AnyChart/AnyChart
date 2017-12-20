@@ -5,6 +5,7 @@ goog.require('anychart.core.settings.IObjectWithSettings');
 goog.require('anychart.core.ui.CircularLabelsFactory');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.MarkersFactory');
+goog.require('anychart.core.ui.Outline');
 goog.require('anychart.core.utils.Connector');
 
 
@@ -108,6 +109,20 @@ anychart.core.StateSettings.CONNECTOR_AFTER_INIT_CALLBACK = 'connectorAfterInitC
 
 
 /**
+ * Option name for outline settings constructor.
+ * @type {string}
+ */
+anychart.core.StateSettings.OUTLINE_CONSTRUCTOR = 'outlineConstructor';
+
+
+/**
+ * Option name for outline after init callback.
+ * @type {string}
+ */
+anychart.core.StateSettings.OUTLINE_AFTER_INIT_CALLBACK = 'outlineAfterInitCallback';
+
+
+/**
  * Default labels factory constructor.
  * @this {*}
  * @return {anychart.core.ui.LabelsFactory}
@@ -189,6 +204,16 @@ anychart.core.StateSettings.DEFAULT_OUTLIER_MARKERS_AFTER_INIT_CALLBACK = functi
 anychart.core.StateSettings.DEFAULT_CONNECTOR_AFTER_INIT_CALLBACK = function(connector) {
   connector.listenSignals(this.connectorInvalidated_, this);
   connector.setParentEventTarget(/** @type {goog.events.EventTarget} */ (this));
+};
+
+
+/**
+ * Default outline settings constructor.
+ * @this {*}
+ * @return {anychart.core.ui.Outline}
+ */
+anychart.core.StateSettings.DEFAULT_OUTLINE_CONSTRUCTOR = function() {
+  return new anychart.core.ui.Outline();
 };
 
 
@@ -305,7 +330,9 @@ anychart.core.StateSettings.prototype.PROPERTY_DESCRIPTORS = (function() {
     descriptors.FONT_DECORATION,
     // pert tasks
     descriptors.DUMMY_FILL,
-    descriptors.DUMMY_STROKE
+    descriptors.DUMMY_STROKE,
+    // pie tasks
+    descriptors.EXPLODE
   ]);
 
   return map;
@@ -484,6 +511,27 @@ anychart.core.StateSettings.prototype.connector = function(opt_value) {
 };
 
 
+/**
+ * Outline.
+ * @param {Object=} opt_value
+ * @return {anychart.core.StateSettings|anychart.core.ui.Outline}
+ */
+anychart.core.StateSettings.prototype.outline = function(opt_value) {
+  if (!this.outline_) {
+    var outlineSettingsConstructor = /** @type {Function} */ (this.getOption(anychart.core.StateSettings.OUTLINE_CONSTRUCTOR)) || anychart.core.StateSettings.DEFAULT_OUTLINE_CONSTRUCTOR;
+    var afterInitCallback = /** @type {Function} */ (this.getOption(anychart.core.StateSettings.OUTLINE_AFTER_INIT_CALLBACK)) || goog.nullFunction;
+    this.outline_ = outlineSettingsConstructor();
+    afterInitCallback.call(this.stateHolder, this.outline_);
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.outline_.setup(opt_value);
+    return this;
+  }
+  return this.outline_;
+};
+
+
 //endregion
 //region --- State Fallbacks
 /**
@@ -549,6 +597,9 @@ anychart.core.StateSettings.prototype.serialize = function() {
   if (this.descriptorsMeta['connector'])
     json['connector'] = this.connector().serialize();
 
+  if (this.descriptorsMeta['outline'])
+    json['outline'] = this.outline().serialize();
+
   return json;
 };
 
@@ -601,12 +652,25 @@ anychart.core.StateSettings.prototype.setupByJSON = function(config, opt_default
   if (goog.isDef(this.descriptorsMeta['connector'])) {
     this.connector().setupInternal(!!opt_default, config['connector']);
   }
+
+  if (goog.isDef(this.descriptorsMeta['outline'])) {
+    // this.setEnabledTrue(config['outline']);
+    this.outline().setupInternal(!!opt_default, config['outline']);
+  }
 };
 
 
 /** @inheritDoc */
 anychart.core.StateSettings.prototype.disposeInternal = function() {
-  goog.disposeAll(this.labels_, this.headers_, this.lowerLabels_, this.markers_, this.outlierMarkers_, this.connector_);
+  goog.disposeAll(
+      this.labels_,
+      this.headers_,
+      this.lowerLabels_,
+      this.markers_,
+      this.outlierMarkers_,
+      this.outline_,
+      this.connector_
+  );
   delete this.connector_;
   anychart.core.StateSettings.base(this, 'disposeInternal');
 };
@@ -623,6 +687,7 @@ anychart.core.StateSettings.prototype.disposeInternal = function() {
   proto['markers'] = proto.markers;
   proto['outlierMarkers'] = proto.outlierMarkers;
   proto['connector'] = proto.connector;
+  proto['outline'] = proto.outline;
   proto['normal'] = proto.normal;
   proto['hovered'] = proto.hovered;
   proto['selected'] = proto.selected;

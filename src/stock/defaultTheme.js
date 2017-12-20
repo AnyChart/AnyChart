@@ -14,7 +14,7 @@ anychart.stockModule.defaultTheme.stockScrollerUnselected = '#999 0.6';
  * @return {*}
  */
 anychart.stockModule.defaultTheme.StockSimpleTooltipFormatter = function() {
-  var val = anychart.core.defaultTheme.locNum(this['value']);
+  var val = anychart.core.defaultTheme.locNum(this['value'], this['defaultDecimalDigitsCount'] || undefined);
   return this['seriesName'] + ': ' + this['valuePrefix'] + val + this['valuePostfix'];
 };
 
@@ -24,9 +24,10 @@ anychart.stockModule.defaultTheme.StockSimpleTooltipFormatter = function() {
  * @return {*}
  */
 anychart.stockModule.defaultTheme.StockRangeTooltipFormatter = function() {
+  var digits = this['defaultDecimalDigitsCount'] || undefined;
   return this['seriesName'] + ':\n' +
-      '  High: ' + anychart.core.defaultTheme.locNum(this['high']) + '\n' +
-      '  Low: ' + anychart.core.defaultTheme.locNum(this['low']);
+      '  High: ' + anychart.core.defaultTheme.locNum(this['high'], digits) + '\n' +
+      '  Low: ' + anychart.core.defaultTheme.locNum(this['low'], digits);
 };
 
 
@@ -35,11 +36,12 @@ anychart.stockModule.defaultTheme.StockRangeTooltipFormatter = function() {
  * @return {*}
  */
 anychart.stockModule.defaultTheme.StockOHLCTooltipFormatter = function() {
+  var digits = this['defaultDecimalDigitsCount'] || undefined;
   return this['seriesName'] + ':\n' +
-      '  Open: ' + anychart.core.defaultTheme.locNum(this['open']) + '\n' +
-      '  High: ' + anychart.core.defaultTheme.locNum(this['high']) + '\n' +
-      '  Low: ' + anychart.core.defaultTheme.locNum(this['low']) + '\n' +
-      '  Close: ' + anychart.core.defaultTheme.locNum(this['close']);
+      '  Open: ' + anychart.core.defaultTheme.locNum(this['open'], digits) + '\n' +
+      '  High: ' + anychart.core.defaultTheme.locNum(this['high'], digits) + '\n' +
+      '  Low: ' + anychart.core.defaultTheme.locNum(this['low'], digits) + '\n' +
+      '  Close: ' + anychart.core.defaultTheme.locNum(this['close'], digits);
 };
 
 

@@ -564,12 +564,8 @@ anychart.utils.isRightAnchor = function(anchor) {
 anychart.utils.alignLeft = function(value, interval, opt_base, opt_precision) {
   opt_base = opt_base || 0;
   var precision = opt_precision >= 7 ? opt_precision : 7;
-  var mod = anychart.math.round((value - opt_base) % interval, precision);
-  if (mod < 0)
-    mod += interval;
-  if (mod >= interval) // ECMAScript float representation... try (0.5 % 0.1).
-    mod -= interval;
-  return anychart.math.round(value - mod, precision);
+  var times = Math.floor(anychart.math.round((value - opt_base) / interval, precision));
+  return anychart.math.round(interval * times + opt_base, precision);
 };
 
 
@@ -584,14 +580,8 @@ anychart.utils.alignLeft = function(value, interval, opt_base, opt_precision) {
 anychart.utils.alignRight = function(value, interval, opt_base, opt_precision) {
   opt_base = opt_base || 0;
   var precision = opt_precision >= 7 ? opt_precision : 7;
-  var mod = anychart.math.round((value - opt_base) % interval, precision);
-  if (mod >= interval) // ECMAScript float representation... try (0.5 % 0.1).
-    mod -= interval;
-  if (!mod)
-    return anychart.math.round(value, precision);
-  else if (mod < 0)
-    mod += interval;
-  return anychart.math.round(value - mod + interval, precision);
+  var times = Math.ceil(anychart.math.round((value - opt_base) / interval, precision));
+  return anychart.math.round(interval * times + opt_base, precision);
 };
 
 
@@ -1254,7 +1244,7 @@ anychart.utils.json2xml = function(json, opt_rootNodeName, opt_returnAsXmlNode) 
   var root = anychart.utils.json2xml_(json, opt_rootNodeName || 'anychart', result);
   if (root) {
     if (!opt_rootNodeName)
-      root.setAttribute('xmlns', 'http://anychart.com/schemas/8.0.2/xml-schema.xsd');
+      root.setAttribute('xmlns', 'http://anychart.com/schemas/8.1.0/xml-schema.xsd');
     result.appendChild(root);
   }
   return opt_returnAsXmlNode ? result : goog.dom.xml.serialize(result);

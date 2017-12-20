@@ -383,7 +383,7 @@ anychart.scales.ScatterBase.prototype.determineScaleMinMax = function() {
   var applyGap = this.stackMode() != anychart.enums.ScaleStackMode.PERCENT;
   if (this.minimumModeAuto) {
     gap = applyGap ? this.minimumRangeBasedGap : 0;
-    this.min = this.dataRangeMin - range * gap;
+    this.min = anychart.math.specialRound(this.dataRangeMin - range * gap);
     if (!isNaN(this.softMin)) {
       if (range > 0)
         this.min = Math.min(this.min, this.softMin);
@@ -396,7 +396,7 @@ anychart.scales.ScatterBase.prototype.determineScaleMinMax = function() {
 
   if (this.maximumModeAuto) {
     gap = applyGap ? this.maximumRangeBasedGap : 0;
-    this.max = this.dataRangeMax + range * gap;
+    this.max = anychart.math.specialRound(this.dataRangeMax + range * gap);
     if (!isNaN(this.softMax)) {
       if (range > 0)
         this.max = Math.max(this.max, this.softMax);

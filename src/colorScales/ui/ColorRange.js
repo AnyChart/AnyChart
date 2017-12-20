@@ -237,12 +237,12 @@ anychart.colorScalesModule.ui.ColorRange.prototype.getLabelsFormatProvider = fun
   var labelText, labelValue, labelType;
   var values = {};
   if (anychart.utils.instanceOf(scale, anychart.colorScalesModule.Linear)) {
-    labelText = parseFloat(value);
     labelValue = parseFloat(value);
+    labelText = scale.roundToTicksPrecision(labelValue);
     labelType = anychart.enums.TokenType.NUMBER;
   } else if (anychart.utils.instanceOf(scale, anychart.colorScalesModule.Ordinal)) {
-    labelText = scale.ticks().names()[index];
     labelValue = value;
+    labelText = scale.ticks().names()[index];
     labelType = anychart.enums.TokenType.STRING;
 
     var range = scale.getRangeByValue(/** @type {number} */(value));
@@ -838,7 +838,7 @@ anychart.colorScalesModule.ui.ColorRange.prototype.handleMouseClick = function(e
   if (this.target_) {
     var scale = this.scale();
     var target = /** @type {anychart.mapModule.Series|anychart.treemapModule.Chart|anychart.tagCloudModule.Chart} */(this.target_);
-    var targetScale = target.colorScale() || (target.getColorScale ? target.getColorScale() : void 0);
+    var targetScale = target && (target.colorScale() || (target.getColorScale ? target.getColorScale() : void 0));
 
     if (this.enabled() && scale && target.enabled() && targetScale == scale) {
       var lineBounds = this.line.getBounds();

@@ -145,6 +145,7 @@ anychart.stockModule.indicators.Base.prototype.init = function() {
     var descriptor = this.series_[seriesId];
     if (!descriptor.series) {
       descriptor.series = this.plot_.createSeriesByType(descriptor.seriesType);
+      descriptor.series.defaultDecimalDigitsCount = 2;
       descriptor.mappingSet = false;
     }
     descriptor.series.suspendSignalsDispatching();

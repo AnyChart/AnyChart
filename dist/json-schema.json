@@ -1,100 +1,176 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema",
-  "description": "AnyChart JSON Schema, version 8.0.2",
-  "type": "object",
-  "properties": {
-    "chart": {
-      "type": "object",
-      "allOf": [
-        {"$ref": "#/definitions/anychart.core.VisualBase"},
-        {"$ref": "#/definitions/anychart.core.VisualBaseWithBounds"},
-        {"$ref": "#/definitions/anychart.core.Chart"}
-      ],
-      "oneOf": [
-        {"$ref": "#/definitions/anychart.charts.Bullet"},
-        {"$ref": "#/definitions/anychart.charts.Cartesian"},
-        {"$ref": "#/definitions/anychart.charts.Funnel"},
-        {"$ref": "#/definitions/anychart.charts.Pie"},
-        {"$ref": "#/definitions/anychart.charts.Polar"},
-        {"$ref": "#/definitions/anychart.charts.Pyramid"},
-        {"$ref": "#/definitions/anychart.charts.Radar"},
-        {"$ref": "#/definitions/anychart.charts.Scatter"},
-        {"$ref": "#/definitions/anychart.charts.Sparkline"},
-        {"$ref": "#/definitions/anychart.charts.HeatMap"},
-        {"$ref": "#/definitions/anychart.charts.TreeMap"},
-        {"$ref": "#/definitions/anychart.charts.Pert"},
-        {"$ref": "#/definitions/anychart.charts.Mekko"},
-        {"$ref": "#/definitions/anychart.charts.TagCloud"},
-        {"$ref": "#/definitions/anychart.charts.Venn"},
-        {"$ref": "#/definitions/anychart.charts.Waterfall"}
-      ],
-      "properties": {
-        "container": {
-          "type": "string"
-        },
-        "defaultSeriesType": {
-          "type": "string"
-        }
-      }
-    },
-    "gauge": {
-      "type": "object",
-      "allOf": [
-        {"$ref": "#/definitions/anychart.core.VisualBase"},
-        {"$ref": "#/definitions/anychart.core.VisualBaseWithBounds"},
-        {"$ref": "#/definitions/anychart.core.Chart"},
-        {"$ref": "#/definitions/anychart.core.SeparateChart"}
-      ],
-      "oneOf": [
-        {"$ref": "#/definitions/anychart.charts.CircularGauge"},
-        {"$ref": "#/definitions/anychart.charts.LinearGauge"}
-      ],
-      "properties": {
-        "container": {
-          "type": "string"
-        }
-      }
-    },
-    "gantt": {
-      "type": "object",
-      "allOf": [
-        {"$ref": "#/definitions/anychart.core.VisualBase"},
-        {"$ref": "#/definitions/anychart.core.VisualBaseWithBounds"},
-        {"$ref": "#/definitions/anychart.core.Chart"},
-        {"$ref": "#/definitions/anychart.core.SeparateChart"}
-      ],
-      "oneOf": [
-        {"$ref": "#/definitions/anychart.gantt.Resource"},
-        {"$ref": "#/definitions/anychart.gantt.Project"}
-      ],
-      "properties": {
-        "container": {
-          "type": "string"
-        }
-      }
-    },
-    "map": {
-      "type": "object",
-      "allOf": [
-        {"$ref": "#/definitions/anychart.core.VisualBase"},
-        {"$ref": "#/definitions/anychart.core.VisualBaseWithBounds"},
-        {"$ref": "#/definitions/anychart.core.Chart"},
-        {"$ref": "#/definitions/anychart.core.SeparateChart"}
-      ],
-      "oneOf": [
-        {"$ref": "#/definitions/anychart.charts.Map"}
-      ],
-      "properties": {
-        "container": {
-          "type": "string"
-        },
-        "defaultSeriesType": {
-          "type": "string"
-        }
-      }
-    }
-  },
+  "description": "AnyChart JSON Schema, version 8.1.0",
+  "$ref": "#/definitions/anychart",
   "definitions": {
+    "anychart": {
+      "type": "object",
+      "properties": {
+        "chart": {
+          "type": "object",
+          "allOf": [
+            {
+              "$ref": "#/definitions/anychart.core.VisualBase"
+            },
+            {
+              "$ref": "#/definitions/anychart.core.VisualBaseWithBounds"
+            },
+            {
+              "$ref": "#/definitions/anychart.core.Chart"
+            }
+          ],
+          "oneOf": [
+            {
+              "$ref": "#/definitions/anychart.charts.Bullet"
+            },
+            {
+              "$ref": "#/definitions/anychart.charts.Cartesian"
+            },
+            {
+              "$ref": "#/definitions/anychart.charts.Funnel"
+            },
+            {
+              "$ref": "#/definitions/anychart.charts.Pie"
+            },
+            {
+              "$ref": "#/definitions/anychart.charts.Polar"
+            },
+            {
+              "$ref": "#/definitions/anychart.charts.Pyramid"
+            },
+            {
+              "$ref": "#/definitions/anychart.charts.Radar"
+            },
+            {
+              "$ref": "#/definitions/anychart.charts.Scatter"
+            },
+            {
+              "$ref": "#/definitions/anychart.charts.Sparkline"
+            },
+            {
+              "$ref": "#/definitions/anychart.charts.HeatMap"
+            },
+            {
+              "$ref": "#/definitions/anychart.charts.TreeMap"
+            },
+            {
+              "$ref": "#/definitions/anychart.charts.Pert"
+            },
+            {
+              "$ref": "#/definitions/anychart.charts.Mekko"
+            },
+            {
+              "$ref": "#/definitions/anychart.charts.TagCloud"
+            },
+            {
+              "$ref": "#/definitions/anychart.charts.Venn"
+            },
+            {
+              "$ref": "#/definitions/anychart.charts.Waterfall"
+            }
+          ],
+          "properties": {
+            "container": {
+              "type": "string"
+            },
+            "defaultSeriesType": {
+              "type": "string"
+            }
+          }
+        },
+        "gauge": {
+          "type": "object",
+          "allOf": [
+            {
+              "$ref": "#/definitions/anychart.core.VisualBase"
+            },
+            {
+              "$ref": "#/definitions/anychart.core.VisualBaseWithBounds"
+            },
+            {
+              "$ref": "#/definitions/anychart.core.Chart"
+            },
+            {
+              "$ref": "#/definitions/anychart.core.SeparateChart"
+            }
+          ],
+          "oneOf": [
+            {
+              "$ref": "#/definitions/anychart.charts.CircularGauge"
+            },
+            {
+              "$ref": "#/definitions/anychart.charts.LinearGauge"
+            }
+          ],
+          "properties": {
+            "container": {
+              "type": "string"
+            }
+          }
+        },
+        "gantt": {
+          "type": "object",
+          "allOf": [
+            {
+              "$ref": "#/definitions/anychart.core.VisualBase"
+            },
+            {
+              "$ref": "#/definitions/anychart.core.VisualBaseWithBounds"
+            },
+            {
+              "$ref": "#/definitions/anychart.core.Chart"
+            },
+            {
+              "$ref": "#/definitions/anychart.core.SeparateChart"
+            }
+          ],
+          "oneOf": [
+            {
+              "$ref": "#/definitions/anychart.gantt.Resource"
+            },
+            {
+              "$ref": "#/definitions/anychart.gantt.Project"
+            }
+          ],
+          "properties": {
+            "container": {
+              "type": "string"
+            }
+          }
+        },
+        "map": {
+          "type": "object",
+          "allOf": [
+            {
+              "$ref": "#/definitions/anychart.core.VisualBase"
+            },
+            {
+              "$ref": "#/definitions/anychart.core.VisualBaseWithBounds"
+            },
+            {
+              "$ref": "#/definitions/anychart.core.Chart"
+            },
+            {
+              "$ref": "#/definitions/anychart.core.SeparateChart"
+            }
+          ],
+          "oneOf": [
+            {
+              "$ref": "#/definitions/anychart.charts.Map"
+            }
+          ],
+          "properties": {
+            "container": {
+              "type": "string"
+            },
+            "defaultSeriesType": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+
     "anychart.core.VisualBase": {
       "type": "object",
       "properties": {
@@ -1330,7 +1406,9 @@
         "connectorStroke": {"$ref": "#/definitions/stroke"},
         "stroke": {"$ref": "#/definitions/stroke"},
         "fill": {"$ref": "#/definitions/fill"},
-        "hatchFill": {"$ref": "#/definitions/hatchFillSet"}
+        "hatchFill": {"$ref": "#/definitions/hatchFillSet"},
+        "outline": {"$ref": "#/definitions/anychart.core.ui.Outline"},
+        "center": {"$ref": "#/definitions/anychart.pieModule.Center"}
       },
       "required": ["type"]
     },
@@ -4942,6 +5020,31 @@
         "cornersRadius": {"type": "number"}
       }
     },
+    "anychart.core.ui.Outline": {
+      "type": "object",
+      "properties": {
+        "enabled": {"$ref": "#/definitions/disable"},
+        "fill": {"$ref": "#/definitions/fill"},
+        "stroke": {"$ref": "#/definitions/stroke"},
+        "width": {"type": ["number", "string"]},
+        "offset": {"type": ["number", "string"]}
+      }
+    },
+    "anychart.pieModule.Center": {
+      "oneOf": [
+        {
+          "type": ["string", "boolean", "null"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "fill": {"$ref": "#/definitions/fill"},
+            "stroke": {"$ref": "#/definitions/stroke"},
+            "content": {"$ref": "#/definitions/anychart"}
+          }
+        }
+      ]
+    },
 
     "anychart.core.Text": {
       "type": "object",
@@ -5779,6 +5882,12 @@
         },
         "allowMultiSeriesSelection": {
           "type": "boolean"
+        },
+        "multiSelectOnClick": {
+          "type": "boolean"
+        },
+        "unselectOnClickOutOfPoint": {
+          "type": "boolean"
         }
       }
     },
@@ -5906,6 +6015,14 @@
           "oneOf": [
             {"$ref": "#/definitions/disable"},
             {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
+          ]
+        },
+
+        "outline": {"$ref": "#/definitions/anychart.core.ui.Outline"},
+        "explode": {
+          "type": [
+            "string",
+            "number"
           ]
         }
       }

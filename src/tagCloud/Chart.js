@@ -486,11 +486,8 @@ anychart.tagCloudModule.Chart.prototype.createTooltipContextProvider = function(
 anychart.tagCloudModule.Chart.prototype.applyAppearanceToSeries = function(pointState) {};
 
 
-/**
- * Apply appearance to point.
- * @param {anychart.PointState|number} pointState
- */
-anychart.tagCloudModule.Chart.prototype.applyAppearanceToPoint = function(pointState) {
+/** @inheritDoc */
+anychart.tagCloudModule.Chart.prototype.applyAppearanceToPoint = function(pointState, opt_value) {
   var iterator = this.getIterator();
   var item = iterator.meta('item');
 
@@ -523,7 +520,13 @@ anychart.tagCloudModule.Chart.prototype.applyAppearanceToPoint = function(pointS
 
   if (manualSuspend)
     stage.resume();
+
+  return opt_value;
 };
+
+
+/** @inheritDoc */
+anychart.tagCloudModule.Chart.prototype.getStartValueForAppearanceReduction = goog.nullFunction;
 
 
 /** @inheritDoc */
@@ -1831,6 +1834,7 @@ anychart.tagCloudModule.Chart.prototype.calculate = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.TAG_CLOUD_TAGS)) {
     arrAngles = this.angles_ ? this.angles_ : this.calculatedAngles_;
+    var zeroAngleIndex = Math.max(goog.array.indexOf(arrAngles, 0), 0);
     anglesCount = /** @type {number} */(arrAngles.length);
     maxValue = this.normalizedData.length ? this.normalizedData[0].value : NaN;
 
@@ -1853,8 +1857,7 @@ anychart.tagCloudModule.Chart.prototype.calculate = function() {
       t.weight = /** @type {number|string} */(fontWeight);
       t.fill = fill;
 
-      t.rotate = arrAngles[i % anglesCount];
-      t.sizeRatio = t.value / maxValue;
+      t.rotate = arrAngles[(i + zeroAngleIndex + anglesCount) % anglesCount];
 
       sum += t.value;
     }, this);

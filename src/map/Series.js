@@ -876,7 +876,7 @@ anychart.mapModule.Series.prototype.applyZoomMoveTransform = function() {
 
 
 /** @inheritDoc */
-anychart.mapModule.Series.prototype.applyAppearanceToPoint = function(pointState) {
+anychart.mapModule.Series.prototype.applyAppearanceToPoint = function(pointState, opt_value) {
   var iterator = this.getIterator();
   if (this.isDiscreteBased()) {
     if (this.isChoropleth()) {
@@ -917,8 +917,13 @@ anychart.mapModule.Series.prototype.applyAppearanceToPoint = function(pointState
     this.drawMarker(iterator, pointState, true);
   if (this.check(anychart.core.series.Capabilities.SUPPORTS_LABELS))
     this.drawLabel(iterator, pointState, true);
+
+  return opt_value;
 };
 
+
+/** @inheritDoc */
+anychart.mapModule.Series.prototype.getStartValueForAppearanceReduction = goog.nullFunction;
 
 //endregion
 //region --- Drawing

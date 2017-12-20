@@ -720,12 +720,17 @@ anychart.core.ui.Paginator.buttonInvalidated_ = function(event) {
  * @private
  */
 anychart.core.ui.Paginator.onClick_ = function(button) {
+  var currentPage = this.currentPage();
+  var pagesCount = this.getPagesCount();
+
   switch (button) {
     case this.previousButton_:
-      this.currentPage(this.currentPage() - 1);
+      if (currentPage > 0)
+        this.currentPage(currentPage - 1);
       break;
     case this.nextButton_:
-      this.currentPage(this.currentPage() + 1);
+      if (currentPage < pagesCount)
+        this.currentPage(currentPage + 1);
       break;
     default:
       throw Error('Something wrong with onClickListener!');
