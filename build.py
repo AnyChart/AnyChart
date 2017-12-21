@@ -982,13 +982,22 @@ def __compile_css(*args, **kwargs):
         css_out_path = os.path.join(output, 'anychart-ui.css')
         css_min_out_path = os.path.join(output, 'anychart-ui.min.css')
 
+        header = '\n'.join(['/*!',
+                            ' '.join([' * AnyChart is lightweight robust charting library with great API and Docs, '
+                                      'that works with your stack and has tons of chart types and features.']),
+                            ' * Version: %s',
+                            ' * License: https://www.anychart.com/buy/',
+                            ' * Contact: sales@anychart.com',
+                            ' * Copyright: AnyChart.com %s. All rights reserved.',
+                            ' */']) % (time.strftime('%Y-%m-%d %H:%M'), time.strftime('%Y')) + '\n'
+
         # Less
         with open(css_out_path, 'w') as f:
-            f.write(lesscpy.compile(css_src_path))
+            f.write(header + lesscpy.compile(css_src_path))
 
         # Minify
         with open(css_min_out_path, 'w') as f:
-            f.write(lesscpy.compile(css_src_path, xminify=True))
+            f.write(header + lesscpy.compile(css_src_path, xminify=True))
 
         if kwargs['gzip']:
             __gzip_file(css_out_path)
