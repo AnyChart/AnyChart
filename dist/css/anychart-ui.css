@@ -1,3 +1,10 @@
+/*!
+ * AnyChart is lightweight robust charting library with great API and Docs, that works with your stack and has tons of chart types and features.
+ * Version: 2018-01-16 11:24
+ * License: https://www.anychart.com/buy/
+ * Contact: sales@anychart.com
+ * Copyright: AnyChart.com 2018. All rights reserved.
+ */
 .anychart-ui-support {
  border-style: hidden;
 }
@@ -693,21 +700,18 @@
  -moz-transition: all 0.218s;
  -o-transition: all 0.218s;
  transition: all 0.218s;
- left: auto;
- right: 10px;
- margin-top: 2px;
- text-align: right;
  opacity: .5;
  filter: alpha(opacity=50);
- width: 0;
- height: 0;
+ position: absolute;
+ right: 0;
+ top: 2px;
  border-top: 5px solid transparent;
  border-bottom: 5px solid transparent;
  border-left: 5px solid #000000;
  font-size: 0;
- line-height: 0;
- display: block;
- float: right;
+}
+.anychart-menuitem-content {
+ position: relative;
 }
 .anychart-menuitem-highlight .anychart-submenu-arrow,
 .anychart-menuitem-hover .anychart-submenu-arrow {
@@ -1970,6 +1974,11 @@
  height: 13px;
  padding: 3px 4px;
  width: 90px;
+ font-weight: normal;
+}
+.anychart-range-picker .anychart-input-label {
+ margin-bottom: 0;
+ font-weight: normal;
 }
 .anychart-range-selector {
  font-family: Arial, sans-serif;
@@ -1984,6 +1993,8 @@
 .anychart-range-selector .anychart-input-label {
  margin-right: 5px;
  vertical-align: middle;
+ margin-bottom: 0;
+ font-weight: normal;
 }
 .anychart-range-selector .anychart-button {
  height: 21px;
