@@ -1256,7 +1256,7 @@ anychart.utils.json2xml = function(json, opt_rootNodeName, opt_returnAsXmlNode) 
  * @type {RegExp}
  * @private
  */
-anychart.utils.ACCEPTED_BY_ATTRIBUTE_ = /^[^<&"\n\r]*$/;
+anychart.utils.ACCEPTED_BY_ATTRIBUTE_ = /^[^<&"\n\r–]*$/;
 
 
 /**
