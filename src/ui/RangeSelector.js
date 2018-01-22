@@ -189,7 +189,7 @@ anychart.ui.RangeSelector.prototype.ranges = function(opt_ranges) {
   if (goog.isDef(opt_ranges) && goog.isArray(opt_ranges)) {
     this.ranges_ = goog.array.map(opt_ranges, function(range) {
       // Set default values
-      if (range['type'] == anychart.enums.StockRangeType.UNIT) {
+      if (range['type'] == anychart.enums.StockRangeType.UNIT || anychart.enums.StockRangeType.POINTS) {
         range['count'] = range['count'] || anychart.ui.RangeSelector.DEFAULT_UNIT_COUNT;
         range['anchor'] = anychart.enums.normalizeStockRangeAnchor(range['anchor']);
       }
@@ -390,6 +390,9 @@ anychart.ui.RangeSelector.prototype.handleButtonAction_ = function(e) {
 
   if (type == anychart.enums.StockRangeType.UNIT) {
     this.target_['selectRange'](descriptor['unit'], descriptor['count'], descriptor['anchor'], true);
+
+  } else if (type == anychart.enums.StockRangeType.POINTS) {
+    this.target_['selectRange'](anychart.enums.StockRangeType.POINTS, descriptor['count'], descriptor['anchor'], true);
 
   } else if (type == anychart.enums.StockRangeType.YTD ||
       type == anychart.enums.StockRangeType.QTD ||

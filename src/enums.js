@@ -3137,6 +3137,7 @@ anychart.enums.StockRangeChangeSource = {
  */
 anychart.enums.StockRangeType = {
   UNIT: 'unit',
+  POINTS: 'points',
   YTD: 'ytd',
   QTD: 'qtd',
   MTD: 'mtd',
