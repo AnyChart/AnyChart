@@ -2751,7 +2751,8 @@ anychart.stockModule.Plot.prototype.disposeInternal = function() {
       this.yAxes_,
       this.xAxis_,
       this.priceIndicators_,
-      this.noDataSettings_);
+      this.noDataSettings_,
+      this.rootLayer_);
 
   this.annotations_ = null;
   this.eventMarkers_ = null;
@@ -2763,16 +2764,19 @@ anychart.stockModule.Plot.prototype.disposeInternal = function() {
   this.xAxis_ = null;
   this.noDataSettings_ = null;
 
-  delete this.chart_;
   delete this.defaultSeriesSettings_;
   delete this.defaultGridSettings_;
   delete this.defaultMinorGridSettings_;
   delete this.defaultYAxisSettings_;
+  delete this.rootLayer_;
 
   goog.disposeAll(this.palette_, this.markerPalette_, this.hatchFillPalette_);
   this.palette_ = this.markerPalette_ = this.hatchFillPalette_ = null;
 
   anychart.stockModule.Plot.base(this, 'disposeInternal');
+
+  this.chart_.removePlotInternal(this);
+  delete this.chart_;
 };
 
 

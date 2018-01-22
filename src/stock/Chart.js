@@ -632,6 +632,17 @@ anychart.stockModule.Chart.prototype.plotInternal = function(opt_indexOrValue, o
 
 
 /**
+ * Plot remove endpoint.
+ * @param {anychart.stockModule.Plot} plot
+ */
+anychart.stockModule.Chart.prototype.removePlotInternal = function(plot) {
+  if (goog.array.remove(this.plots_, plot))
+    this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.STOCK_PLOTS_APPEARANCE,
+        anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+};
+
+
+/**
  * Scroller getter-setter.
  * @param {(Object|boolean|null)=} opt_value
  * @return {anychart.stockModule.Scroller|anychart.stockModule.Chart}
