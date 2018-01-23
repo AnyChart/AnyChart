@@ -171,7 +171,7 @@ anychart.stockModule.Series.prototype.updateComparisonZero = function() {
   }
   // if we have found a row to get value from - we cast it to number
   // if anything went wrong - we get 0 value and fail to make a comparison, which is a good result
-  this.comparisonZero = Number(row && row.get('value')) || 0;
+  this.comparisonZero = Number(row && row.get(this.drawer.valueFieldName)) || 0;
 };
 
 
