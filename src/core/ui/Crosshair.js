@@ -513,12 +513,12 @@ anychart.core.ui.Crosshair.prototype.canDrawForAxis = function(axis) {
 anychart.core.ui.Crosshair.prototype.handleMouseOverAndMove = function(e) {
   if (!this.enabled()) return;
 
-  var mouseY;
   var clientX = e['clientX'];
   var clientY = e['clientY'];
 
   var chartOffset = this.container().getStage().getClientPosition();
   var mouseX = clientX - chartOffset.x;
+  var mouseY = clientY - chartOffset.y;
 
   if (this.getOption('displayMode') == anychart.enums.CrosshairDisplayMode.STICKY) {
     var pointsData = this.interactivityTarget_.getByXInfo(clientX, clientY);
@@ -536,13 +536,16 @@ anychart.core.ui.Crosshair.prototype.handleMouseOverAndMove = function(e) {
       }
       var iterator = nearestSeries.getIterator();
       iterator.select(nearestIndex);
-      // mouseX = anychart.utils.toNumber(iterator.meta('x'));
+      var val = anychart.utils.toNumber(iterator.meta('x'));
+      if (this.interactivityTarget_.isVerticalInternal) {
+        mouseY = val;
+      } else {
+        mouseX = val;
+      }
     }
   }
 
   var bounds = this.parentBounds();
-
-  mouseY = clientY - chartOffset.y;
 
   if (mouseX >= bounds.getLeft() && mouseX <= bounds.getRight() &&
       mouseY >= bounds.getTop() && mouseY <= bounds.getBottom()) {
@@ -708,28 +711,6 @@ anychart.core.ui.Crosshair.prototype.autoHighlightX = function(x, opt_showXLabel
       this.xLabel_.container(null).remove();
     }
     this.drawLine_(this.xAxis_, x, opt_y || 0);
-  }
-};
-
-
-/**
- * Get the coordinate on the axis scale, given the type of scale.
- * @param {anychart.core.Axis|anychart.mapModule.elements.Axis|anychart.stockModule.Axis} axis
- * @param {number} ratio Current ratio.
- * @param {number} coord Current mouse coordinate.
- * @return {number}
- * @private
- */
-anychart.core.ui.Crosshair.prototype.prepareCoordinate_ = function(axis, ratio, coord) {
-  var bounds = this.parentBounds();
-  var scale = axis.scale();
-  var isOrdinal = scale.getType() == anychart.enums.ScaleTypes.ORDINAL;
-  var centerRatio = scale.transform(scale.inverseTransform(ratio), .5);
-
-  if (axis.isHorizontal()) {
-    return isOrdinal ? Math.round(bounds.left + centerRatio * bounds.width) : coord;
-  } else {
-    return isOrdinal ? Math.round(bounds.top + bounds.height - centerRatio * bounds.height) : coord;
   }
 };
 
