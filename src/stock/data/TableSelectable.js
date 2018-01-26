@@ -88,12 +88,12 @@ anychart.stockModule.data.TableSelectable.prototype.getFullPointsCount = functio
 
 /**
  * Searches asked key with asked mode and returns an object that allows values fetching.
- * @param {number} key
+ * @param {number|string|Date} key
  * @param {anychart.enums.TableSearchMode=} opt_mode
  * @return {anychart.stockModule.data.TableSelectable.RowProxy}
  */
 anychart.stockModule.data.TableSelectable.prototype.search = function(key, opt_mode) {
-  return this.getAtIndex(this.currentStorage_.searchIndex(key, anychart.enums.normalizeTableSearchMode(opt_mode)));
+  return this.getAtIndex(this.currentStorage_.searchIndex(anychart.utils.normalizeTimestamp(key), anychart.enums.normalizeTableSearchMode(opt_mode)));
 };
 
 
