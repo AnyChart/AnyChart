@@ -4020,7 +4020,8 @@ anychart.core.series.Base.prototype.createLegendContextProvider = function() {
 
   var values = {
     'series': {value: this, type: anychart.enums.TokenType.UNKNOWN},
-    'chart': {value: this.getChart(), type: anychart.enums.TokenType.UNKNOWN}
+    'chart': {value: this.getChart(), type: anychart.enums.TokenType.UNKNOWN},
+    'seriesName': {value: this.name(), type: anychart.enums.TokenType.STRING}
   };
   this.legendProvider_.statisticsSources([this, this.chart]);
 

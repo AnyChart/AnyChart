@@ -1256,6 +1256,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="paginator" type="core.Paginator"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="tooltip" type="core.Tooltip"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="items" type="LegendItemsList"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="items_format" type="simple.Text"/>
         </xsd:all>
         <xsd:attribute name="background" type="simple.StringOrBoolOrNull" default="true"/>
         <xsd:attribute name="title" type="simple.StringOrBoolOrNull" default="true"/>
@@ -1264,6 +1265,7 @@
         <xsd:attribute name="paginator" type="simple.BoolOrNull" default="false"/>
         <xsd:attribute name="tooltip" type="simple.BoolOrNull" default="true"/>
         <xsd:attribute name="items_layout" type="enums.LegendLayout" default="horizontal"/>
+        <xsd:attribute name="items_format" type="xsd:string" default="15"/>
         <xsd:attribute name="items_spacing" type="xsd:string" default="15"/>
         <xsd:attribute name="icon_text_spacing" type="xsd:string" default="5"/>
         <xsd:attribute name="icon_size" type="xsd:double"/>

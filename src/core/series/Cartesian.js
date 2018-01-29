@@ -337,7 +337,7 @@ anychart.core.series.Cartesian.prototype.data = function(opt_value, opt_csvSetti
       this.dataInternal.listenSignals(this.dataInvalidated_, this);
       // DATA is supported only in Bubble, so we invalidate only for it.
       this.invalidate(anychart.ConsistencyState.SERIES_POINTS | anychart.ConsistencyState.SERIES_DATA,
-          anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW | anychart.Signal.DATA_CHANGED);
+          anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW | anychart.Signal.DATA_CHANGED | anychart.Signal.NEED_UPDATE_LEGEND);
     }
     return this;
   }
@@ -353,7 +353,7 @@ anychart.core.series.Cartesian.prototype.data = function(opt_value, opt_csvSetti
 anychart.core.series.Cartesian.prototype.dataInvalidated_ = function(e) {
   if (e.hasSignal(anychart.Signal.DATA_CHANGED)) {
     this.invalidate(anychart.ConsistencyState.SERIES_POINTS | anychart.ConsistencyState.SERIES_DATA,
-        anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW | anychart.Signal.DATA_CHANGED);
+        anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW | anychart.Signal.DATA_CHANGED | anychart.Signal.NEED_UPDATE_LEGEND);
   }
 };
 
