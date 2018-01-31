@@ -288,7 +288,7 @@ anychart.scales.Linear.prototype.makeValuesComparison_ = function(value, compari
  * @private
  */
 anychart.scales.Linear.prototype.makePercentComparison_ = function(value, comparisonZero) {
-  return (anychart.utils.toNumber(value) - comparisonZero) / (comparisonZero || 1) * 100;
+  return (anychart.utils.toNumber(value) - comparisonZero) / Math.abs(comparisonZero || NaN) * 100;
 };
 
 

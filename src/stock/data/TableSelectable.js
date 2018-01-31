@@ -233,19 +233,47 @@ anychart.stockModule.data.TableSelectable.prototype.getPostLastRow = function() 
 
 /**
  * Returns the last row in current selection if there is one.
+ * @param {string=} opt_fieldName
  * @return {?anychart.stockModule.data.TableSelectable.RowProxy}
  */
-anychart.stockModule.data.TableSelectable.prototype.getLastVisibleRow = function() {
-  return this.wrapRow_(this.currentSelection_.lastRow, this.currentSelection_.lastIndex);
+anychart.stockModule.data.TableSelectable.prototype.getLastVisibleRow = function(opt_fieldName) {
+  var row = this.currentSelection_.lastRow;
+  var index = this.currentSelection_.lastIndex;
+  if (goog.isDef(opt_fieldName)) {
+    var column = this.currentStorageIsMain_ ?
+        this.mapping_.getSourceColumn(opt_fieldName) :
+        this.mapping_.getAggregateColumn(opt_fieldName);
+    while (row && row != this.currentSelection_.preFirstRow && isNaN(row.getValue(column))) {
+      row = row.prev;
+      index--;
+    }
+  }
+  if (row == this.currentSelection_.preFirstRow)
+    row = null;
+  return this.wrapRow_(row, index);
 };
 
 
 /**
  * Returns the first row in current selection if there is one.
+ * @param {string=} opt_fieldName
  * @return {?anychart.stockModule.data.TableSelectable.RowProxy}
  */
-anychart.stockModule.data.TableSelectable.prototype.getFirstVisibleRow = function() {
-  return this.wrapRow_(this.currentSelection_.firstRow, this.currentSelection_.firstIndex);
+anychart.stockModule.data.TableSelectable.prototype.getFirstVisibleRow = function(opt_fieldName) {
+  var row = this.currentSelection_.firstRow;
+  var index = this.currentSelection_.firstIndex;
+  if (goog.isDef(opt_fieldName)) {
+    var column = this.currentStorageIsMain_ ?
+        this.mapping_.getSourceColumn(opt_fieldName) :
+        this.mapping_.getAggregateColumn(opt_fieldName);
+    while (row && row != this.currentSelection_.postLastRow && isNaN(row.getValue(column))) {
+      row = row.next;
+      index++;
+    }
+  }
+  if (row == this.currentSelection_.postLastRow)
+    row = null;
+  return this.wrapRow_(row, index);
 };
 
 
@@ -276,7 +304,7 @@ anychart.stockModule.data.TableSelectable.prototype.getFirstRowFromMainStorage =
     var column = this.mapping_.getSourceColumn(opt_fieldName);
     for (var i = 0, len = mainStorage.getRowsCount(); i < len; i++) {
       row = mainStorage.getRow(i);
-      if (row.getValue(column))
+      if (!isNaN(row.getValue(column)))
         break;
     }
   } else {
@@ -299,7 +327,7 @@ anychart.stockModule.data.TableSelectable.prototype.getLastRowFromMainStorage = 
     var column = this.mapping_.getSourceColumn(opt_fieldName);
     for (var i = mainStorage.getRowsCount(); i--;) {
       row = mainStorage.getRow(i);
-      if (row.getValue(column))
+      if (!isNaN(row.getValue(column)))
         break;
     }
   } else {
@@ -319,9 +347,9 @@ anychart.stockModule.data.TableSelectable.prototype.getRowByDataSource = functio
   /** @type {?anychart.stockModule.data.TableSelectable.RowProxy} */
   var row;
   if (dataSource == anychart.enums.ComparisonDataSource.FIRST_VISIBLE) {
-    row = this.getFirstVisibleRow();
+    row = this.getFirstVisibleRow(opt_fieldName);
   } else if (dataSource == anychart.enums.ComparisonDataSource.LAST_VISIBLE) {
-    row = this.getLastVisibleRow();
+    row = this.getLastVisibleRow(opt_fieldName);
   } else if (dataSource == anychart.enums.ComparisonDataSource.SERIES_START) {
     row = this.getFirstRowFromMainStorage(opt_fieldName);
   } else if (dataSource == anychart.enums.ComparisonDataSource.SERIES_END) {
