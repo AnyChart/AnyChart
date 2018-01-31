@@ -79,7 +79,7 @@ anychart.heatmapModule.Series.prototype.tooltip = function(opt_value) {
 anychart.heatmapModule.Series.prototype.calcMinFontSize_ = function(point, pointState, prefix, minFontSize) {
   var label = this.drawFactoryElement(
       [this.normal().labels, this.hovered().labels, this.selected().labels],
-      null,
+      [],
       ['label', 'hoverLabel', 'selectLabel'],
       this.planHasPointLabels(),
       true,
@@ -294,7 +294,7 @@ anychart.heatmapModule.Series.prototype.drawLabel = function(point, pointState, 
   var displayMode = (/** @type {anychart.heatmapModule.Chart} */(this.chart)).getOption('labelsDisplayMode');
   var label = this.drawFactoryElement(
       [this.normal().labels, this.hovered().labels, this.selected().labels],
-      null,
+      [],
       ['label', 'hoverLabel', 'selectLabel'],
       this.planHasPointLabels(),
       true,
@@ -353,20 +353,22 @@ anychart.heatmapModule.Series.prototype.drawLabel = function(point, pointState, 
 
 
 /** @inheritDoc */
-anychart.heatmapModule.Series.prototype.setupLabelDrawingPlan = function(label, chartNormalFactory, seriesNormalFactory, chartStateFactory, seriesStateFactory, pointOverride, statePointOverride) {
-  label.state('pointState', goog.isObject(statePointOverride) ? statePointOverride : null, 0);
-  label.state('seriesState', seriesStateFactory, 1);
-  // label.state('chartState', chartStateFactory);
-  label.state('pointNormal', goog.isObject(pointOverride) ? pointOverride : null, 2);
-  label.state('seriesNormal', seriesNormalFactory, 3);
-  // label.state('chartNormal', chartNormalFactory);
-  label.state('autoOverride', label.ownSettings, 4);
-  label.state('autoFont', seriesStateFactory ? seriesStateFactory.autoSettings : seriesNormalFactory.autoSettings, 5);
-  label.state('seriesStateTheme', seriesStateFactory ? seriesStateFactory.themeSettings : null, 6);
-  // label.state('chartStateTheme', chartStateFactory ? chartStateFactory.themeSettings : null);
-  label.state('auto', label.autoSettings, 7);
-  label.state('seriesNormalTheme', seriesNormalFactory.themeSettings, 8);
-  // label.state('chartNormalTheme', chartNormalFactory ? chartNormalFactory.themeSettings : null);
+anychart.heatmapModule.Series.prototype.setupLabelDrawingPlan = function(label,
+                                                                         chartNormal, seriesNormal, pointNormal,
+                                                                         chartState, seriesState, pointState,
+                                                                         chartExtremumNormal, seriesExtremumNormal, pointExtremumNormal,
+                                                                         chartExtremumState, seriesExtremumState, pointExtremumState) {
+  label.stateOrder(this.extractSettings([
+    pointState, anychart.core.series.Base.ExtractSettingModes.PLAIN_OBJECT,
+    seriesState, anychart.core.series.Base.ExtractSettingModes.OWN_SETTINGS,
+    pointNormal, anychart.core.series.Base.ExtractSettingModes.PLAIN_OBJECT,
+    seriesNormal, anychart.core.series.Base.ExtractSettingModes.OWN_SETTINGS,
+    label, anychart.core.series.Base.ExtractSettingModes.OWN_SETTINGS,
+    seriesState || seriesNormal, anychart.core.series.Base.ExtractSettingModes.AUTO_SETTINGS,
+    seriesState, anychart.core.series.Base.ExtractSettingModes.THEME_SETTINGS,
+    label, anychart.core.series.Base.ExtractSettingModes.AUTO_SETTINGS,
+    seriesNormal, anychart.core.series.Base.ExtractSettingModes.THEME_SETTINGS
+  ]));
 };
 
 

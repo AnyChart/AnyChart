@@ -377,12 +377,13 @@ anychart.stockModule.data.TableSelectable.prototype.getMapping = function() {
 /**
  * Returns minimum value of the column  (includes only the visible range).
  * @param {number|string} column
+ * @param {boolean=} opt_onlyVisible
  * @return {number}
  */
-anychart.stockModule.data.TableSelectable.prototype.getColumnMin = function(column) {
+anychart.stockModule.data.TableSelectable.prototype.getColumnMin = function(column, opt_onlyVisible) {
   var res = (goog.isNumber(column) && column < 0) ?
-      this.currentSelection_.calcMins[~column] :
-      this.currentSelection_.mins[column];
+      (opt_onlyVisible ? this.currentSelection_.visibleCalcMins[~column] : this.currentSelection_.calcMins[~column]) :
+      (opt_onlyVisible ? this.currentSelection_.visibleMins[column] : this.currentSelection_.mins[column]);
   return goog.isDef(res) ? res : NaN;
 };
 
@@ -390,12 +391,13 @@ anychart.stockModule.data.TableSelectable.prototype.getColumnMin = function(colu
 /**
  * Returns maximum value of the column (includes only the visible range).
  * @param {number|string} column
+ * @param {boolean=} opt_onlyVisible
  * @return {number}
  */
-anychart.stockModule.data.TableSelectable.prototype.getColumnMax = function(column) {
+anychart.stockModule.data.TableSelectable.prototype.getColumnMax = function(column, opt_onlyVisible) {
   var res = (goog.isNumber(column) && column < 0) ?
-      this.currentSelection_.calcMaxs[~column] :
-      this.currentSelection_.maxs[column];
+      (opt_onlyVisible ? this.currentSelection_.visibleCalcMaxs[~column] : this.currentSelection_.calcMaxs[~column]) :
+      (opt_onlyVisible ? this.currentSelection_.visibleMaxs[column] : this.currentSelection_.maxs[column]);
   return goog.isDef(res) ? res : NaN;
 };
 
@@ -446,7 +448,11 @@ anychart.stockModule.data.TableSelectable.prototype.getExportingIterator = funct
     mins: {},
     maxs: {},
     calcMaxs: [],
-    calcMins: []
+    calcMins: [],
+    visibleMins: {},
+    visibleMaxs: {},
+    visibleCalcMins: [],
+    visibleCalcMaxs: []
   };
   return new anychart.stockModule.data.TableIterator(this.mapping_, selection, this.metaData_, !this.currentStorageIsMain_, coIterator);
 };

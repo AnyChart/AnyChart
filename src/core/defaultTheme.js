@@ -1318,6 +1318,9 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
             'anchor': 'auto',
             'position': 'value'
           },
+          'minLabels': {'enabled': null},
+          'maxLabels': {'enabled': null},
+          'outlierMarkers': {'enabled': null},
           'markers': {
             'enabled': false,
             'disablePointerEvents': false,
@@ -1333,6 +1336,9 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
           'highStroke': anychart.core.defaultTheme.returnLightenStrokeSourceColor,
           'hatchFill': null,
           'labels': {'enabled': null},
+          'minLabels': {'enabled': null},
+          'maxLabels': {'enabled': null},
+          'outlierMarkers': {'enabled': null},
           'markers': {
             'enabled': null,
             'size': 6
@@ -1345,6 +1351,9 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
           'highStroke': anychart.core.defaultTheme.defaultSelectColor,
           'hatchFill': null,
           'labels': {'enabled': null},
+          'minLabels': {'enabled': null},
+          'maxLabels': {'enabled': null},
+          'outlierMarkers': {'enabled': null},
           'markers': {
             'enabled': null,
             'fill': anychart.core.defaultTheme.defaultSelectColor,
@@ -1612,13 +1621,19 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
       'mode': 'chart-elements'
     },
     'normal': {
-      'labels': {'enabled': false}
+      'labels': {'enabled': false},
+      'minLabels': {'enabled': null},
+      'maxLabels': {'enabled': null}
     },
     'hovered': {
-      'labels': {'enabled': null}
+      'labels': {'enabled': null},
+      'minLabels': {'enabled': null},
+      'maxLabels': {'enabled': null}
     },
     'selected': {
-      'labels': {'enabled': null}
+      'labels': {'enabled': null},
+      'minLabels': {'enabled': null},
+      'maxLabels': {'enabled': null}
     },
     'crossing': {
       'stroke': 'none'
@@ -1676,21 +1691,8 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'defaultSeriesSettings': {
       'base': {
         'normal': {
-          'outlierMarkers': {
-            'enabled': null
-          },
           'labels': {
             'format': anychart.core.defaultTheme.VALUE_TOKEN_DECIMALS_COUNT_2
-          }
-        },
-        'hovered': {
-          'outlierMarkers': {
-            'enabled': null
-          }
-        },
-        'selected': {
-          'outlierMarkers': {
-            'enabled': null
           }
         }
       },

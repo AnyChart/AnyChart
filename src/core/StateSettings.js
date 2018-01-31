@@ -379,6 +379,7 @@ anychart.core.StateSettings.prototype.labels = function(opt_value) {
     var labelsFactoryConstructor = /** @type {Function} */ (this.getOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR)) || anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR;
     var afterInitCallback = /** @type {Function} */ (this.getOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK)) || goog.nullFunction;
     this.labels_ = labelsFactoryConstructor();
+    this.labels_.supportsEnabledSuspension = false;
     afterInitCallback.call(this.stateHolder, this.labels_);
   }
 
@@ -389,6 +390,56 @@ anychart.core.StateSettings.prototype.labels = function(opt_value) {
     return this;
   }
   return this.labels_;
+};
+
+
+/**
+ * Labels.
+ * @param {(Object|boolean|null)=} opt_value
+ * @return {anychart.core.StateSettings|anychart.core.ui.LabelsFactory|anychart.core.ui.CircularLabelsFactory}
+ */
+anychart.core.StateSettings.prototype.minLabels = function(opt_value) {
+  if (!this.minLabels_) {
+    var labelsFactoryConstructor = /** @type {Function} */ (this.getOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR)) || anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR;
+    var afterInitCallback = /** @type {Function} */ (this.getOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK)) || goog.nullFunction;
+    this.minLabels_ = labelsFactoryConstructor();
+    this.minLabels_.supportsEnabledSuspension = false;
+    afterInitCallback.call(this.stateHolder, this.minLabels_);
+    this.minLabels_.markConsistent(anychart.ConsistencyState.ALL);
+  }
+
+  if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
+    this.minLabels_.setup(opt_value);
+    return this;
+  }
+  return this.minLabels_;
+};
+
+
+/**
+ * Labels.
+ * @param {(Object|boolean|null)=} opt_value
+ * @return {anychart.core.StateSettings|anychart.core.ui.LabelsFactory|anychart.core.ui.CircularLabelsFactory}
+ */
+anychart.core.StateSettings.prototype.maxLabels = function(opt_value) {
+  if (!this.maxLabels_) {
+    var labelsFactoryConstructor = /** @type {Function} */ (this.getOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR)) || anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR;
+    var afterInitCallback = /** @type {Function} */ (this.getOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK)) || goog.nullFunction;
+    this.maxLabels_ = labelsFactoryConstructor();
+    this.maxLabels_.supportsEnabledSuspension = false;
+    afterInitCallback.call(this.stateHolder, this.maxLabels_);
+    this.maxLabels_.markConsistent(anychart.ConsistencyState.ALL);
+  }
+
+  if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
+    this.maxLabels_.setup(opt_value);
+    return this;
+  }
+  return this.maxLabels_;
 };
 
 
@@ -577,6 +628,12 @@ anychart.core.StateSettings.prototype.serialize = function() {
   if (this.descriptorsMeta['labels'])
     json['labels'] = this.labels().serialize();
 
+  if (this.descriptorsMeta['minLabels'])
+    json['minLabels'] = this.minLabels().serialize();
+
+  if (this.descriptorsMeta['maxLabels'])
+    json['maxLabels'] = this.maxLabels().serialize();
+
   if (this.descriptorsMeta['headers'])
     json['headers'] = this.headers().serialize();
 
@@ -624,6 +681,16 @@ anychart.core.StateSettings.prototype.setupByJSON = function(config, opt_default
     this.labels().setupInternal(!!opt_default, config['labels']);
   }
 
+  if (goog.isDef(this.descriptorsMeta['minLabels'])) {
+    this.setEnabledTrue(config['minLabels']);
+    this.minLabels().setupInternal(!!opt_default, config['minLabels']);
+  }
+
+  if (goog.isDef(this.descriptorsMeta['maxLabels'])) {
+    this.setEnabledTrue(config['maxLabels']);
+    this.maxLabels().setupInternal(!!opt_default, config['maxLabels']);
+  }
+
   if (goog.isDef(this.descriptorsMeta['headers'])) {
     this.setEnabledTrue(config['headers']);
     this.headers().setup(config['headers']);
@@ -664,6 +731,8 @@ anychart.core.StateSettings.prototype.setupByJSON = function(config, opt_default
 anychart.core.StateSettings.prototype.disposeInternal = function() {
   goog.disposeAll(
       this.labels_,
+      this.minLabels_,
+      this.maxLabels_,
       this.headers_,
       this.lowerLabels_,
       this.markers_,
@@ -681,6 +750,8 @@ anychart.core.StateSettings.prototype.disposeInternal = function() {
 (function() {
   var proto = anychart.core.StateSettings.prototype;
   proto['labels'] = proto.labels;
+  proto['minLabels'] = proto.minLabels;
+  proto['maxLabels'] = proto.maxLabels;
   proto['headers'] = proto.headers;
   proto['upperLabels'] = proto.upperLabels;
   proto['lowerLabels'] = proto.lowerLabels;

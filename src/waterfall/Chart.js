@@ -123,6 +123,7 @@ anychart.waterfallModule.Chart.prototype.postProcessStacking = function(drawingP
 
 /** @inheritDoc */
 anychart.waterfallModule.Chart.prototype.afterSeriesDraw = function() {
+  anychart.waterfallModule.Chart.base(this, 'afterSeriesDraw');
   if (!this.connectorPath_) {
     this.connectorPath_ = acgraph.path();
   } else {

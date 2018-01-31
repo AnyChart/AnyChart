@@ -797,7 +797,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateYScales = function() 
     }
     for (var xScaleUid in this.drawingPlansByYAndXScale_) {
       // calculating zoomed indexes
-      var firstIndex, lastIndex;
+      var firstIndex, lastIndex, firstInternalIndex, lastInternalIndex;
       data = this.drawingPlansByXScale[xScaleUid][0].data;
       var dataLength = data.length;
       var xScale = this.xScales[xScaleUid];
@@ -805,9 +805,10 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateYScales = function() 
         if (dataLength) {
           firstIndex = goog.math.clamp(Math.floor(this.getZoomStartRatio() * dataLength - 1), 0, dataLength - 1);
           lastIndex = goog.math.clamp(Math.ceil(this.getZoomEndRatio() * dataLength + 1), 0, dataLength - 1);
+          firstInternalIndex = goog.math.clamp(Math.floor(this.getZoomStartRatio() * dataLength + 0.5), 0, dataLength - 1);
+          lastInternalIndex = goog.math.clamp(Math.floor(this.getZoomEndRatio() * dataLength - 0.5), 0, dataLength - 1);
         } else {
-          firstIndex = NaN;
-          lastIndex = NaN;
+          firstIndex = lastIndex = firstInternalIndex = lastInternalIndex = NaN;
         }
       } else {
         var firstVal = /** @type {number} */(xScale.inverseTransform(0));
@@ -835,9 +836,10 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateYScales = function() 
             lastIndex = tmp;
           }
         } else {
-          firstIndex = NaN;
-          lastIndex = NaN;
+          firstIndex = lastIndex = NaN;
         }
+        firstInternalIndex = firstIndex;
+        lastInternalIndex = lastIndex;
       }
       drawingPlansByYScale = this.drawingPlansByYAndXScale_[xScaleUid];
       for (var yScaleUid in drawingPlansByYScale) {
@@ -876,6 +878,8 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateYScales = function() 
           drawingPlan.firstIndex = firstIndex;
           drawingPlan.lastIndex = lastIndex;
           drawingPlan.stacked = yScaleStacked && series.supportsStack();
+          drawingPlan.minYValue = Infinity;
+          drawingPlan.maxYValue = -Infinity;
           this.hasStackedSeries = this.hasStackedSeries || drawingPlan.stacked;
           data = drawingPlan.data;
           if (drawingPlan.stacked || yScalePercentStacked) {
@@ -889,6 +893,12 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateYScales = function() 
                 stackVal.missing = true;
               } else {
                 val = this.getPointStackingValue(point);
+                if (j >= firstInternalIndex && j <= lastInternalIndex) {
+                  if (drawingPlan.minYValue > val)
+                    drawingPlan.minYValue = val;
+                  if (drawingPlan.maxYValue < val)
+                    drawingPlan.maxYValue = val;
+                }
                 if (val >= 0) {
                   point.meta['stackedZero'] = stackVal.positive;
                   stackVal.positive += val;
@@ -969,6 +979,15 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateYScales = function() 
                   anychart.core.series.PointAbsenceReason.ANY_BUT_RANGE)) {
                 for (k = 0; k < names.length; k++) {
                   this.extendYScaleRange(yScale, point.data[names[k]]);
+                }
+                if (j >= firstInternalIndex && j <= lastInternalIndex) {
+                  for (k = 0; k < names.length; k++) {
+                    val = anychart.utils.toNumber(point.data[names[k]]);
+                    if (drawingPlan.minYValue > val)
+                      drawingPlan.minYValue = val;
+                    if (drawingPlan.maxYValue < val)
+                      drawingPlan.maxYValue = val;
+                  }
                 }
               }
             }
@@ -1087,6 +1106,8 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateXYScales = function()
       } else {
         drawingPlan = series.getScatterDrawingPlan(false, anychart.utils.instanceOf(xScale, anychart.scales.DateTime));
       }
+      drawingPlan.minYValue = Infinity;
+      drawingPlan.maxYValue = -Infinity;
       series = /** @type {anychart.core.series.Cartesian} */(drawingPlan.series);
       var seriesExcludes = series.getExcludedIndexesInternal();
       if (seriesExcludes.length) {
@@ -1114,9 +1135,21 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateXYScales = function()
             error = drawingPlan.series.error().getErrorValues(false);
             val = anychart.utils.toNumber(iterator.get('value'));
             yScale.extendDataRange(val - error[0], val + error[1]);
+            if (drawingPlan.minYValue > val)
+              drawingPlan.minYValue = val;
+            if (drawingPlan.maxYValue < val)
+              drawingPlan.maxYValue = val;
           } else {
             for (k = 0; k < names.length; k++) {
-              yScale.extendDataRange(iterator.get(names[k]));
+              val = iterator.get(names[k]);
+              yScale.extendDataRange(val);
+              val = anychart.utils.toNumber(val);
+              if (!isNaN(val)) {
+                if (drawingPlan.minYValue > val)
+                  drawingPlan.minYValue = val;
+                if (drawingPlan.maxYValue < val)
+                  drawingPlan.maxYValue = val;
+              }
             }
           }
         }

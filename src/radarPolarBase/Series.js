@@ -159,6 +159,7 @@ anychart.radarPolarBaseModule.Series.prototype.prepareAdditional = function() {
 /** @inheritDoc */
 anychart.radarPolarBaseModule.Series.prototype.prepareMetaMakers = function(yNames, yColumns) {
   anychart.radarPolarBaseModule.Series.base(this, 'prepareMetaMakers', yNames, yColumns);
+  this.metaMakers.push(this.makeXRatioMeta);
   if (this.needsZero() && !this.innerRadius) {
     var zero = this.ratiosToPixelPairs(0, [0]);
     this.zeroX = zero[0];
@@ -184,6 +185,22 @@ anychart.radarPolarBaseModule.Series.prototype.makeZeroMeta = function(rowInfo, 
     rowInfo.meta('zero', this.zeroY);
   }
   rowInfo.meta('zeroMissing', false);
+  return pointMissing;
+};
+
+
+/**
+ * Prepares xRatio part of point meta.
+ * @param {anychart.data.IRowInfo} rowInfo
+ * @param {Array.<string>} yNames
+ * @param {Array.<string|number>} yColumns
+ * @param {number} pointMissing
+ * @param {number} xRatio
+ * @return {number} - pointMissing updated value.
+ * @protected
+ */
+anychart.radarPolarBaseModule.Series.prototype.makeXRatioMeta = function(rowInfo, yNames, yColumns, pointMissing, xRatio) {
+  rowInfo.meta('xRatio', goog.math.modulo(xRatio, 1));
   return pointMissing;
 };
 

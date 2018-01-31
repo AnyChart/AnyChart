@@ -80,7 +80,9 @@ anychart.core.series.Cartesian.prototype.SUPPORTED_SIGNALS = anychart.core.serie
  *   hasPointErrors: (boolean|undefined),
  *   hasPointOutliers: (boolean|undefined),
  *   xHashMap: (Object.<number>|undefined),
- *   xArray: (Array|undefined)
+ *   xArray: (Array|undefined),
+ *   minYValue: (number|undefined),
+ *   maxYValue: (number|undefined)
  * }}
  */
 anychart.core.series.Cartesian.DrawingPlan;
@@ -179,6 +181,17 @@ anychart.core.series.Cartesian.prototype.getCategoryWidth = function(opt_categor
   }
   return (ratio || (this.xScale().getZoomFactor() / this.getIterator().getRowsCount())) *
       (this.getOption('isVertical') ? this.pixelBoundsCache.height : this.pixelBoundsCache.width);
+};
+
+
+
+/**
+ * Returns values, needed to be counted on in scale min/max determining.
+ * @param {boolean=} opt_skipOutOfRangeRows
+ * @return {!Array.<number>}
+ */
+anychart.core.series.Cartesian.prototype.getScaleReferenceValues = function(opt_skipOutOfRangeRows) {
+  return [this.drawingPlan.minYValue, this.drawingPlan.maxYValue];
 };
 
 
@@ -742,7 +755,13 @@ anychart.core.series.Cartesian.prototype.getDrawingData = function(data, dataPus
             dataSource.checkFieldExist('selected') ||
             dataSource.checkFieldExist('label') ||
             dataSource.checkFieldExist('hoverLabel') ||
-            dataSource.checkFieldExist('selectLabel')
+            dataSource.checkFieldExist('selectLabel') ||
+            dataSource.checkFieldExist('minLabel') ||
+            dataSource.checkFieldExist('hoverMinLabel') ||
+            dataSource.checkFieldExist('selectMinLabel') ||
+            dataSource.checkFieldExist('maxLabel') ||
+            dataSource.checkFieldExist('hoverMaxLabel') ||
+            dataSource.checkFieldExist('selectMaxLabel')
         ),
     hasPointMarkers: this.supportsMarkers() &&
         (

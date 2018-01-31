@@ -1496,7 +1496,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.state = function(name, opt_value,
     if (this.states_[name] != opt_value || goog.array.indexOf(drawingPlan, name) != opt_priority) {
       this.states_[name] = opt_value;
 
-      if (goog.array.indexOf(drawingPlan, name) == -1 && !goog.isDef(opt_priority))
+      if (!goog.isDef(opt_priority) && goog.array.indexOf(drawingPlan, name) == -1)
         opt_priority = drawingPlan.length;
 
       if (!isNaN(opt_priority))
@@ -2111,6 +2111,8 @@ anychart.core.ui.LabelsFactory.Label.prototype.resolveSetting_ = function(field,
         setting = this.normalizeAdjustFontSize(settings[field]);
       } else {
         setting = settings[field];
+        if (field == 'enabled' && goog.isNull(setting))
+          setting = undefined;
       }
     }
     if (setting && goog.isFunction(setting.serialize)) {

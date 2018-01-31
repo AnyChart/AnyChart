@@ -70,7 +70,9 @@ anychart.core.ChartWithSeries = function() {
 
   var normalDescriptorsMeta = {};
   anychart.core.settings.createDescriptorsMeta(normalDescriptorsMeta, [
-    ['labels', 0, 0]
+    ['labels', 0, 0],
+    ['minLabels', 0, 0],
+    ['maxLabels', 0, 0]
   ]);
   this.normal_ = new anychart.core.StateSettings(this, normalDescriptorsMeta, anychart.PointState.NORMAL);
   this.normal_.setOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK, /** @this {anychart.core.ChartWithSeries} */ function(factory) {
@@ -80,12 +82,16 @@ anychart.core.ChartWithSeries = function() {
 
   var descriptorsMeta = {};
   anychart.core.settings.createDescriptorsMeta(descriptorsMeta, [
-    ['labels', 0, 0]
+    ['labels', 0, 0],
+    ['minLabels', 0, 0],
+    ['maxLabels', 0, 0]
   ]);
   this.hovered_ = new anychart.core.StateSettings(this, descriptorsMeta, anychart.PointState.HOVER);
 
   anychart.core.settings.createDescriptorsMeta(descriptorsMeta, [
-    ['labels', 0, 0]
+    ['labels', 0, 0],
+    ['minLabels', 0, 0],
+    ['maxLabels', 0, 0]
   ]);
   this.selected_ = new anychart.core.StateSettings(this, descriptorsMeta, anychart.PointState.SELECT);
 
@@ -805,6 +811,34 @@ anychart.core.ChartWithSeries.prototype.labels = function(opt_value) {
 
 
 /**
+ * Getter/setter for labels.
+ * @param {(Object|boolean|null)=} opt_value .
+ * @return {anychart.core.ui.LabelsFactory|anychart.core.ChartWithSeries} .
+ */
+anychart.core.ChartWithSeries.prototype.minLabels = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.normal_.minLabels(opt_value);
+    return this;
+  }
+  return /** @type {anychart.core.ui.LabelsFactory} */ (this.normal_.minLabels());
+};
+
+
+/**
+ * Getter/setter for labels.
+ * @param {(Object|boolean|null)=} opt_value .
+ * @return {anychart.core.ui.LabelsFactory|anychart.core.ChartWithSeries} .
+ */
+anychart.core.ChartWithSeries.prototype.maxLabels = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.normal_.maxLabels(opt_value);
+    return this;
+  }
+  return /** @type {anychart.core.ui.LabelsFactory} */ (this.normal_.maxLabels());
+};
+
+
+/**
  * Normal state settings.
  * @param {!Object=} opt_value
  * @return {anychart.core.StateSettings|anychart.core.ChartWithSeries}
@@ -854,6 +888,8 @@ anychart.core.ChartWithSeries.prototype.selected = function(opt_value) {
 anychart.core.ChartWithSeries.prototype.labelsInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
     this.normal().labels().markConsistent(anychart.ConsistencyState.ALL);
+    this.normal().minLabels().markConsistent(anychart.ConsistencyState.ALL);
+    this.normal().maxLabels().markConsistent(anychart.ConsistencyState.ALL);
     this.invalidateSeriesLabels();
     this.invalidate(anychart.ConsistencyState.SERIES_CHART_SERIES, anychart.Signal.NEEDS_REDRAW);
   }
@@ -1309,6 +1345,8 @@ anychart.core.ChartWithSeries.prototype.disposeInternal = function() {
   // auto generated
   // proto['defaultSeriesType'] = proto.defaultSeriesType;
   proto['labels'] = proto.labels;
+  proto['minLabels'] = proto.minLabels;
+  proto['maxLabels'] = proto.maxLabels;
   proto['normal'] = proto.normal;
   proto['hovered'] = proto.hovered;
   proto['selected'] = proto.selected;

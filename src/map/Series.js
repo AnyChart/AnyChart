@@ -1154,6 +1154,12 @@ anychart.mapModule.Series.prototype.createLabelsContextProvider = function() {
 };
 
 
+/** @inheritDoc */
+anychart.mapModule.Series.prototype.needsExtremums = function() {
+  return false;
+};
+
+
 /**
  * Transform coords to pix values.
  * @param {number} xCoord X coordinate.
@@ -1179,8 +1185,12 @@ anychart.mapModule.Series.prototype.createFormatProvider = function(opt_force) {
 
 
 /** @inheritDoc */
-anychart.mapModule.Series.prototype.drawSingleFactoryElement = function(factory, index, positionProvider, formatProvider,
-    chartNormalFactory, seriesStateFactory, chartStateFactory, pointOverride, statePointOverride, callDraw, opt_position) {
+anychart.mapModule.Series.prototype.drawSingleFactoryElement = function(factories, settings, index, positionProvider, formatProvider, callDraw, opt_position) {
+  var factory = /** @type {anychart.core.ui.LabelsFactory|anychart.core.ui.MarkersFactory} */(factories[0]);
+  var seriesStateFactory = /** @type {anychart.core.ui.LabelsFactory|anychart.core.ui.MarkersFactory} */(factories[1]);
+  var pointOverride = factories[2];
+  var statePointOverride = factories[3];
+
   if (!positionProvider['value'])
     return null;
 
@@ -1198,17 +1208,8 @@ anychart.mapModule.Series.prototype.drawSingleFactoryElement = function(factory,
   element.resetSettings();
   if (formatProvider) {
     element.autoAnchor(/** @type {anychart.enums.Anchor} */(this.getIterator().meta('labelAnchor')));
-    element.state('pointState', goog.isDef(statePointOverride) ? statePointOverride : null);
-    element.state('seriesState', seriesStateFactory);
-    element.state('chartState', chartStateFactory);
-    element.state('pointNormal', goog.isDef(pointOverride) ? pointOverride : null);
-    element.state('seriesNormal', factory);
-    element.state('chartNormal', chartNormalFactory);
-    element.state('seriesStateTheme', seriesStateFactory ? seriesStateFactory.themeSettings : null);
-    element.state('chartStateTheme', chartStateFactory ? chartStateFactory.themeSettings : null);
-    element.state('auto', element.autoSettings);
-    element.state('seriesNormalTheme', factory.themeSettings);
-    element.state('chartNormalTheme', chartNormalFactory ? chartNormalFactory.themeSettings : null);
+    settings.unshift(element);
+    this.setupLabelDrawingPlan.apply(this, settings);
   } else {
     element.currentMarkersFactory(seriesStateFactory || factory);
 

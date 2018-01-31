@@ -68,32 +68,11 @@ anychart.stockModule.data.TableStorage = function(table) {
   this.lastComputedColumn = -1;
 
   /**
-   * Cache of mins for full range selection.
-   * @type {Object.<number>}
+   * Full range selection min/max cache.
+   * @type {Object}
    * @private
    */
-  this.fullRangeMinsCache_ = null;
-
-  /**
-   * Cache of maxs for full range selection.
-   * @type {Object.<number>}
-   * @private
-   */
-  this.fullRangeMaxsCache_ = null;
-
-  /**
-   * Cache of mins of calculated fields for full range selection.
-   * @type {Array.<number>}
-   * @private
-   */
-  this.fullRangeCalcMinsCache_ = null;
-
-  /**
-   * Cache of maxs of calculated fields for full range selection.
-   * @type {Array.<number>}
-   * @private
-   */
-  this.fullRangeCalcMaxsCache_ = null;
+  this.fullRangeCache_ = null;
 };
 
 
@@ -113,7 +92,11 @@ anychart.stockModule.data.TableStorage = function(table) {
  *   mins: !Object.<number>,
  *   maxs: !Object.<number>,
  *   calcMins: !Array.<number>,
- *   calcMaxs: !Array.<number>
+ *   calcMaxs: !Array.<number>,
+ *   visibleMins: !Object.<number>,
+ *   visibleMaxs: !Object.<number>,
+ *   visibleCalcMins: !Array.<number>,
+ *   visibleCalcMaxs: !Array.<number>
  * }}
  */
 anychart.stockModule.data.TableStorage.Selection;
@@ -149,8 +132,7 @@ anychart.stockModule.data.TableStorage.SEARCH_CACHE_SIZE = 2;
  * @protected
  */
 anychart.stockModule.data.TableStorage.prototype.dropCaches = function() {
-  this.fullRangeMaxsCache_ = this.fullRangeMinsCache_ = null;
-  this.fullRangeCalcMaxsCache_ = this.fullRangeCalcMinsCache_ = null;
+  this.fullRangeCache_ = null;
   this.selectionCache_.length = 0;
   this.selectionCachePointer_ = 0;
   this.searchCache_.length = 0;
@@ -230,6 +212,47 @@ anychart.stockModule.data.TableStorage.prototype.select = function(startKey, end
 
 
 /**
+ * Processes min/max over columns.
+ * @param {anychart.stockModule.data.TableRow} curr
+ * @param {number|Object} fields
+ * @param {!Object.<number>} mins
+ * @param {!Object.<number>} maxs
+ * @param {!Array.<number>} calcMins
+ * @param {!Array.<number>} calcMaxs
+ * @private
+ */
+anychart.stockModule.data.TableStorage.prototype.processMinMax_ = function(curr, fields, mins, maxs, calcMins, calcMaxs) {
+  var i,
+      val;
+  if (goog.isNumber(fields)) {
+    var len = Math.min((/** @type {Array} */(curr.values)).length, fields);
+    for (i = 0; i < len; i++) {
+      val = anychart.utils.toNumber(curr.values[i]);
+      if (val < mins[i]) // includes NaN checking
+        mins[i] = val;
+      if (val > maxs[i]) // includes NaN checking
+        maxs[i] = val;
+    }
+  } else {
+    for (i in fields) {
+      val = anychart.utils.toNumber(curr.values[i]);
+      if (val < mins[i]) // includes NaN checking
+        mins[i] = val;
+      if (val > maxs[i]) // includes NaN checking
+        maxs[i] = val;
+    }
+  }
+  for (i = 0; i <= this.lastComputedColumn; i++) { // if there are comp columns than row.computedValues is not null
+    val = anychart.utils.toNumber(curr.computedValues[i]);
+    if (val < calcMins[i])
+      calcMins[i] = val;
+    if (val > calcMaxs[i])
+      calcMaxs[i] = val;
+  }
+};
+
+
+/**
  * Returns selection object for asked keys range. Internal method - assumes that the user already knows the correct
  * storage index of asked keys - that allows to save one or two storage lookup passes.
  * @param {number} startKey
@@ -292,76 +315,45 @@ anychart.stockModule.data.TableStorage.prototype.selectFast = function(startKey,
 
   var fields = this.getKnownFields();
   var asArray = goog.isNumber(fields);
-  var mins = {};
-  var maxs = {};
-  var calcMins = [];
-  var calcMaxs = [];
-  var field, val;
+  var mins, maxs, calcMins, calcMaxs;
+  var extMins, extMaxs, extCalcMins, extCalcMaxs;
   if (preFirst || first || postLast) { // first and last can be null only in the same time, so no point to check last in addition
     var isFullRangeSelect = !preFirst && !postLast;
     // we have additional cache for full range selections
-    if (isFullRangeSelect && this.fullRangeMinsCache_) { // caches should exist only all at once
-      for (field in this.fullRangeMinsCache_) {
-        mins[field] = this.fullRangeMinsCache_[field];
-        maxs[field] = this.fullRangeMaxsCache_[field];
-      }
-      for (i = 0; i < this.fullRangeCalcMinsCache_.length; i++) {
-        calcMins.push(this.fullRangeCalcMinsCache_[i]);
-        calcMaxs.push(this.fullRangeCalcMaxsCache_[i]);
-      }
+    if (isFullRangeSelect && this.fullRangeCache_) { // caches should exist only all at once
+      mins = extMins = this.fullRangeCache_.mins;
+      maxs = extMaxs = this.fullRangeCache_.maxs;
+      calcMins = extCalcMins = this.fullRangeCache_.calcMins;
+      calcMaxs = extCalcMaxs = this.fullRangeCache_.calcMaxs;
     } else {
-      if (asArray) {
-        for (i = 0; i < fields; i++) {
-          mins[i] = Number.POSITIVE_INFINITY;
-          maxs[i] = Number.NEGATIVE_INFINITY;
-        }
-      } else {
-        for (i in fields) {
-          mins[i] = Number.POSITIVE_INFINITY;
-          maxs[i] = Number.NEGATIVE_INFINITY;
-        }
-      }
-      for (i = 0; i <= this.lastComputedColumn; i++) {
-        calcMins.push(Number.POSITIVE_INFINITY);
-        calcMaxs.push(Number.NEGATIVE_INFINITY);
-      }
+      mins = anychart.utils.getFilled(fields, Infinity, true);
+      maxs = anychart.utils.getFilled(fields, -Infinity, true);
+      calcMins = /** @type {!Array.<number>} */(anychart.utils.getFilled(this.lastComputedColumn + 1, Infinity));
+      calcMaxs = /** @type {!Array.<number>} */(anychart.utils.getFilled(this.lastComputedColumn + 1, -Infinity));
       /** @type {anychart.stockModule.data.TableRow} */
-      var curr = preFirst || first || postLast;
-      var finalRow = postLast ? postLast.next : postLast;
-      while (curr && curr != finalRow) {
-        if (asArray) {
-          var len = Math.min((/** @type {Array} */(curr.values)).length, fields);
-          for (i = 0; i < len; i++) {
-            val = anychart.utils.toNumber(curr.values[i]);
-            if (val < mins[i]) // includes NaN checking
-              mins[i] = val;
-            if (val > maxs[i]) // includes NaN checking
-              maxs[i] = val;
-          }
-        } else {
-          for (i in fields) {
-            val = anychart.utils.toNumber(curr.values[i]);
-            if (val < mins[i]) // includes NaN checking
-              mins[i] = val;
-            if (val > maxs[i]) // includes NaN checking
-              maxs[i] = val;
-          }
-        }
-        for (i = 0; i <= this.lastComputedColumn; i++) { // if there are comp columns than row.computedValues is not null
-          val = anychart.utils.toNumber(curr.computedValues[i]);
-          if (val < calcMins[i])
-            calcMins[i] = val;
-          if (val > calcMaxs[i])
-            calcMaxs[i] = val;
-        }
+      var curr = preFirst ? preFirst.next : first;
+      while (curr && curr != postLast) {
+        this.processMinMax_(curr, fields, mins, maxs, calcMins, calcMaxs);
         curr = curr.next;
       }
+      extMins = goog.object.clone(mins);
+      extMaxs = goog.object.clone(maxs);
+      extCalcMins = goog.array.slice(calcMins, 0);
+      extCalcMaxs = goog.array.slice(calcMaxs, 0);
+      if (preFirst)
+        this.processMinMax_(preFirst, fields, extMins, extMaxs, extCalcMins, extCalcMaxs);
+      if (postLast)
+        this.processMinMax_(postLast, fields, extMins, extMaxs, extCalcMins, extCalcMaxs);
       if (asArray) {
         for (i = 0; i < fields; i++) {
           if (mins[i] == Number.POSITIVE_INFINITY)
             mins[i] = NaN;
           if (maxs[i] == Number.NEGATIVE_INFINITY)
             maxs[i] = NaN;
+          if (extMins[i] == Number.POSITIVE_INFINITY)
+            extMins[i] = NaN;
+          if (extMaxs[i] == Number.NEGATIVE_INFINITY)
+            extMaxs[i] = NaN;
         }
       } else {
         for (i in fields) {
@@ -369,6 +361,10 @@ anychart.stockModule.data.TableStorage.prototype.selectFast = function(startKey,
             mins[i] = NaN;
           if (maxs[i] == Number.NEGATIVE_INFINITY)
             maxs[i] = NaN;
+          if (extMins[i] == Number.POSITIVE_INFINITY)
+            extMins[i] = NaN;
+          if (extMaxs[i] == Number.NEGATIVE_INFINITY)
+            extMaxs[i] = NaN;
         }
       }
       for (i = 0; i <= this.lastComputedColumn; i++) {
@@ -376,30 +372,24 @@ anychart.stockModule.data.TableStorage.prototype.selectFast = function(startKey,
           calcMins[i] = NaN;
         if (calcMaxs[i] == Number.NEGATIVE_INFINITY)
           calcMaxs[i] = NaN;
+        if (extCalcMins[i] == Number.POSITIVE_INFINITY)
+          extCalcMins[i] = NaN;
+        if (extCalcMaxs[i] == Number.NEGATIVE_INFINITY)
+          extCalcMaxs[i] = NaN;
       }
       // cache the results if it is a full range select
       if (isFullRangeSelect) {
-        this.fullRangeMinsCache_ = {};
-        this.fullRangeMaxsCache_ = {};
-        goog.mixin(this.fullRangeMinsCache_, mins);
-        goog.mixin(this.fullRangeMaxsCache_, maxs);
-        this.fullRangeCalcMinsCache_ = goog.array.slice(calcMins, 0);
-        this.fullRangeCalcMaxsCache_ = goog.array.slice(calcMaxs, 0);
+        this.fullRangeCache_ = {
+          mins: goog.object.clone(mins),
+          maxs: goog.object.clone(maxs),
+          calcMins: goog.array.slice(calcMins, 0),
+          calcMaxs: goog.array.slice(calcMaxs, 0)
+        };
       }
     }
   } else {
-    if (asArray) {
-      for (i = 0; i < fields; i++) {
-        mins[i] = maxs[i] = NaN;
-      }
-    } else {
-      for (i in fields) {
-        mins[i] = maxs[i] = NaN;
-      }
-    }
-    for (i = 0; i <= this.lastComputedColumn; i++) {
-      calcMins[i] = calcMaxs[i] = NaN;
-    }
+    mins = maxs = extMins = extMaxs = anychart.utils.getFilled(fields, NaN, true);
+    calcMins = calcMaxs = extCalcMins = extCalcMaxs = anychart.utils.getFilled(this.lastComputedColumn, NaN);
   }
 
   selection = {
@@ -413,10 +403,14 @@ anychart.stockModule.data.TableStorage.prototype.selectFast = function(startKey,
     firstRow: first,
     lastRow: last,
     postLastRow: postLast,
-    mins: mins,
-    maxs: maxs,
-    calcMaxs: calcMaxs,
-    calcMins: calcMins
+    mins: extMins,
+    maxs: extMaxs,
+    calcMaxs: extCalcMaxs,
+    calcMins: extCalcMins,
+    visibleMins: mins,
+    visibleMaxs: maxs,
+    visibleCalcMaxs: calcMaxs,
+    visibleCalcMins: calcMins
   };
   if (storageLength) {
     this.selectionCache_[this.selectionCachePointer_] = selection;

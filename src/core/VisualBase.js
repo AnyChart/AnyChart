@@ -51,6 +51,12 @@ anychart.core.VisualBase = function() {
 
   this.themeSettings['enabled'] = true;
 
+  /**
+   * If the instance should follow enabled double-suspension schema.
+   * @type {boolean}
+   */
+  this.supportsEnabledSuspension = true;
+
   this.invalidate(anychart.ConsistencyState.ALL);
 };
 goog.inherits(anychart.core.VisualBase, anychart.core.Base);
@@ -382,14 +388,16 @@ anychart.core.VisualBase.prototype.enabled = function(opt_value) {
     if (this.ownSettings['enabled'] !== opt_value) {
       this.ownSettings['enabled'] = opt_value;
       this.invalidate(anychart.ConsistencyState.ENABLED, this.getEnableChangeSignals());
-      if (this.ownSettings['enabled']) {
-        if (this.suspendedByEnable) {
-          this.resumeSignalsDispatching(true);
+      if (this.supportsEnabledSuspension) {
+        if (this.ownSettings['enabled']) {
+          if (this.suspendedByEnable) {
+            this.resumeSignalsDispatching(true);
+          }
+          this.suspendedByEnable = false;
+        } else {
+          this.suspendSignalsDispatching();
+          this.suspendedByEnable = true;
         }
-        this.suspendedByEnable = false;
-      } else {
-        this.suspendSignalsDispatching();
-        this.suspendedByEnable = true;
       }
     }
     return this;

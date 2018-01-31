@@ -266,7 +266,7 @@ anychart.stockModule.Chart.prototype.createSeriesConfig = function(allowColoring
       // anychart.core.series.Capabilities.ALLOW_POINT_SETTINGS |
       // anychart.core.series.Capabilities.ALLOW_ERROR |
       anychart.core.series.Capabilities.SUPPORTS_MARKERS |
-      // anychart.core.series.Capabilities.SUPPORTS_LABELS |
+      anychart.core.series.Capabilities.SUPPORTS_LABELS |
       0);
   capabilities |= (allowColoring && anychart.core.series.Capabilities.ALLOW_POINT_SETTINGS);
   var discreteShapeManager = allowColoring ? anychart.enums.ShapeManagerTypes.PER_POINT : anychart.enums.ShapeManagerTypes.PER_SERIES;

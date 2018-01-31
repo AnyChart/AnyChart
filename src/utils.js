@@ -847,6 +847,50 @@ anychart.utils.getFirstDefinedValue = function(var_args) {
 
 
 /**
+ * Returns first not-null argument.
+ * @param {...*} var_args .
+ * @return {*}
+ */
+anychart.utils.getFirstNotNullValue = function(var_args) {
+  for (var i = 0, len = arguments.length; i < len; i++) {
+    var a = arguments[i];
+    if (goog.isDefAndNotNull(a)) return a;
+  }
+};
+
+/**
+ * Returns first defined argument, recurse in arrays.
+ * @param {...*} var_args .
+ * @return {*}
+ */
+anychart.utils.getFirstDefinedValueRecursive = function(var_args) {
+  for (var i = 0, len = arguments.length; i < len; i++) {
+    var a = arguments[i];
+    if (goog.isArray(a))
+      a = anychart.utils.getFirstDefinedValueRecursive.apply(null, a);
+    if (goog.isDefAndNotNull(a))
+      return a;
+  }
+};
+
+
+/**
+ * Returns first not-null argument, recurse in arrays.
+ * @param {...*} var_args .
+ * @return {*}
+ */
+anychart.utils.getFirstNotNullValueRecursive = function(var_args) {
+  for (var i = 0, len = arguments.length; i < len; i++) {
+    var a = arguments[i];
+    if (goog.isArray(a))
+      a = anychart.utils.getFirstDefinedValueRecursive.apply(null, a);
+    if (goog.isDefAndNotNull(a))
+      return a;
+  }
+};
+
+
+/**
  * Does a recursive clone of an object.
  *
  * @param {*} obj Object to clone.
@@ -872,6 +916,30 @@ anychart.utils.recursiveClone = function(obj) {
   }
 
   return res;
+};
+
+
+/**
+ * Create and fills an array or object with value.
+ * @param {Object|number} fieldsOrLength
+ * @param {*} value
+ * @param {boolean=} opt_forceObject
+ * @return {!(Object|Array)}
+ */
+anychart.utils.getFilled = function(fieldsOrLength, value, opt_forceObject) {
+  var i, target;
+  if (goog.isNumber(fieldsOrLength)) {
+    target = opt_forceObject ? {} : [];
+    for (i = 0; i < fieldsOrLength; i++) {
+      target[i] = value;
+    }
+  } else {
+    target = {};
+    for (i in fieldsOrLength) {
+      target[i] = value;
+    }
+  }
+  return target;
 };
 
 

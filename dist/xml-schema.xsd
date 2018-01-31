@@ -610,6 +610,8 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="dummy_stroke" type="Stroke"/>
             <!-- factories -->
             <xsd:element minOccurs="0" maxOccurs="1" name="labels" type="core.LabelsFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="min_labels" type="core.LabelsFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="max_labels" type="core.LabelsFactory"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="markers" type="core.MarkersFactory"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="outlier_markers" type="core.MarkersFactory"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="headers" type="core.LabelsFactory"/>
@@ -619,6 +621,8 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="outline" type="core.Outline"/>
         </xsd:all>
         <xsd:attribute name="labels" type="simple.BoolOrNull"/>
+        <xsd:attribute name="min_labels" type="simple.BoolOrNull"/>
+        <xsd:attribute name="max_labels" type="simple.BoolOrNull"/>
         <xsd:attribute name="markers" type="simple.MarkerType"/>
         <xsd:attribute name="outlier_markers" type="simple.MarkerType"/>
         <xsd:attribute name="headers" type="simple.BoolOrNull"/>

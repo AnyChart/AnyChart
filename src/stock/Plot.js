@@ -2046,7 +2046,7 @@ anychart.stockModule.Plot.prototype.getLegendAutoText = function(legendFormatter
         'hoveredDate': {value: opt_titleValue, type: anychart.enums.TokenType.DATE_TIME},
         'dataIntervalUnit': {value: grouping.getCurrentDataInterval()['unit'], type: anychart.enums.TokenType.STRING},
         'dataIntervalUnitCount': {value: grouping.getCurrentDataInterval()['count'], type: anychart.enums.TokenType.NUMBER},
-        'isGrouped': {value: grouping.isGrouped()}
+        'isGrouped': {value: grouping.isGrouped(), type: anychart.enums.TokenType.UNKNOWN}
       };
       var context = (new anychart.format.Context(values)).propagate();
       return formatter.call(context, context);
