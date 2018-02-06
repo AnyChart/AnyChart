@@ -179,6 +179,60 @@ anychart.scales.DateTimeTicks.prototype.interval = function(opt_years, opt_month
 
 
 /**
+ * Returns interval unit (in case of manual-set mixed intervals like P1Y3M returns the biggest interval (year)).
+ * @return {?anychart.enums.Interval}
+ */
+anychart.scales.DateTimeTicks.prototype.getIntervalUnit = function() {
+  this.scale.calculate();
+  var interval = this.intervalValue_;
+  return interval && (
+      interval.years && anychart.enums.Interval.YEAR ||
+      interval.months && (
+          !(interval.months % 6) && anychart.enums.Interval.SEMESTER ||
+          !(interval.months % 3) && anychart.enums.Interval.QUARTER ||
+          anychart.enums.Interval.MONTH) ||
+      interval.days && (
+          !(interval.days % 7) && anychart.enums.Interval.WEEK ||
+          anychart.enums.Interval.DAY
+      ) ||
+      interval.hours && anychart.enums.Interval.HOUR ||
+      interval.minutes && anychart.enums.Interval.MINUTE ||
+      interval.seconds && (
+          !(interval.seconds % 1) && anychart.enums.Interval.SECOND ||
+          anychart.enums.Interval.MILLISECOND
+      )
+  ) || anychart.enums.Interval.MILLISECOND;
+};
+
+
+/**
+ * Returns interval unit count (in case of manual-set mixed intervals like P1Y3M returns the biggest interval count (1 year)).
+ * @return {number}
+ */
+anychart.scales.DateTimeTicks.prototype.getIntervalUnitCount = function() {
+  this.scale.calculate();
+  var interval = this.intervalValue_;
+  return interval && (
+      interval.years ||
+      interval.months && (
+          !(interval.months % 6) && (interval.months / 6) ||
+          !(interval.months % 3) && (interval.months / 3) ||
+          interval.months) ||
+      interval.days && (
+          !(interval.days % 7) && (interval.days / 7) ||
+          interval.days
+      ) ||
+      interval.hours ||
+      interval.minutes ||
+      interval.seconds && (
+          !(interval.seconds % 1) && interval.seconds ||
+          (interval.seconds * 1000)
+      )
+  ) || 0;
+};
+
+
+/**
  * Getter/setter for count.
  * @param {number=} opt_value Ticks interval value if used as a getter.
  * @return {(number|anychart.scales.DateTimeTicks)} Interval value or itself for method chaining.
@@ -311,10 +365,11 @@ anychart.scales.DateTimeTicks.prototype.setupAsMinor = function(min, max, adjust
       interval = this.calculateIntervals_(min, max, true);
     var date = new goog.date.UtcDateTime(new Date(adjustedMin));
     var endDate = new goog.date.UtcDateTime(new Date(adjustedMax));
-    for (var i = 0; goog.date.Date.compare(date, endDate) <= 0 && i < 150; date.add(interval), i++)
+    for (var i = 0; goog.date.Date.compare(date, endDate) <= 0 && i < this.scale.maxTicksCount(); date.add(interval), i++)
       ticks.push(date.getTime());
     this.autoTicks_ = ticks;
     this.count_ = backupCount;
+    this.intervalValue_ = interval;
   }
 };
 
@@ -347,12 +402,13 @@ anychart.scales.DateTimeTicks.prototype.setupAsMajor = function(min, max, opt_ca
       result[0] = min = anychart.utils.alignDateLeft(min, interval, 0);
     var date = new goog.date.UtcDateTime(new Date(min));
     var endDate = new goog.date.UtcDateTime(new Date(max));
-    for (var i = 0; goog.date.Date.compare(date, endDate) <= 0 && i < 150; date.add(interval), i++)
+    for (var i = 0; goog.date.Date.compare(date, endDate) <= 0 && i < this.scale.maxTicksCount(); date.add(interval), i++)
       ticks.push(date.getTime());
     if (opt_canModifyMax && goog.date.Date.compare(date, endDate) > 0)
       ticks.push(result[1] = date.getTime());
     this.autoTicks_ = ticks;
     this.count_ = backupCount;
+    this.intervalValue_ = interval;
   }
   return result;
 };
@@ -582,4 +638,6 @@ anychart.scales.DateTimeTicks.prototype.setupByJSON = function(config, opt_defau
   proto['count'] = proto.count;//doc|ex
   proto['set'] = proto.set;//doc|ex
   proto['get'] = proto.get;//doc|ex
+  proto['getIntervalUnit'] = proto.getIntervalUnit;
+  proto['getIntervalUnitCount'] = proto.getIntervalUnitCount;
 })();

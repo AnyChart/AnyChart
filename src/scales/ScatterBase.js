@@ -178,6 +178,46 @@ anychart.scales.ScatterBase.prototype.maximum = function(opt_value) {
 
 
 /**
+ * Getter/setter for a setting that turns minimum alignment by interval on or off.
+ * @param {boolean=} opt_value
+ * @return {boolean|anychart.scales.ScatterBase}
+ */
+anychart.scales.ScatterBase.prototype.alignMinimum = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = !!opt_value;
+    if (this.alignMinimumVal != opt_value) {
+      this.alignMinimumVal = opt_value;
+      if (this.minimumModeAuto) {
+        this.consistent = false;
+        this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REAPPLICATION);
+      }
+    }
+  }
+  return this.alignMinimumVal;
+};
+
+
+/**
+ * Getter/setter for a setting that turns maximum alignment by interval on or off.
+ * @param {boolean=} opt_value
+ * @return {boolean|anychart.scales.ScatterBase}
+ */
+anychart.scales.ScatterBase.prototype.alignMaximum = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = !!opt_value;
+    if (this.alignMaximumVal != opt_value) {
+      this.alignMaximumVal = opt_value;
+      if (this.maximumModeAuto) {
+        this.consistent = false;
+        this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REAPPLICATION);
+      }
+    }
+  }
+  return this.alignMaximumVal;
+};
+
+
+/**
  * Soft minimum getter and setter. If data range minimum is greater than soft minimum, the soft minimum value will
  * become the scale minimum.
  * @param {number=} opt_value
@@ -437,6 +477,9 @@ anychart.scales.ScatterBase.prototype.serialize = function() {
   json['maximumGap'] = this.maximumGap();
   json['softMinimum'] = isNaN(this.softMin) ? null : this.softMin;
   json['softMaximum'] = isNaN(this.softMax) ? null : this.softMax;
+  json['softMaximum'] = isNaN(this.softMax) ? null : this.softMax;
+  json['alignMinimum'] = this.alignMinimumVal;
+  json['alignMaximum'] = this.alignMaximumVal;
   json['maxTicksCount'] = this.maxTicksCount_;
   return json;
 };
@@ -451,6 +494,8 @@ anychart.scales.ScatterBase.prototype.setupByJSON = function(config, opt_default
   this.softMaximum(config['softMaximum']);
   this.minimum(config['minimum']);
   this.maximum(config['maximum']);
+  this.alignMinimum(config['alignMinimum']);
+  this.alignMaximum(config['alignMaximum']);
   this.maxTicksCount(config['maxTicksCount']);
 };
 

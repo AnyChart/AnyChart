@@ -2024,6 +2024,8 @@
         <xsd:attribute name="soft_maximum" type="simple.DoubleOrNull" default="null"/>
         <xsd:attribute name="minimum_gap" type="xsd:double" default="0.1"/>
         <xsd:attribute name="maximum_gap" type="xsd:double" default="0.1"/>
+        <xsd:attribute name="align_minimum" type="xsd:boolean"/>
+        <xsd:attribute name="align_maximum" type="xsd:boolean"/>
     </xsd:complexType>
 
     <xsd:complexType name="ColorScale">
@@ -2048,6 +2050,8 @@
         <xsd:attribute name="soft_maximum" type="simple.DoubleOrNull" default="null"/>
         <xsd:attribute name="minimum_gap" type="xsd:double" default="0.1"/>
         <xsd:attribute name="maximum_gap" type="xsd:double" default="0.1"/>
+        <xsd:attribute name="align_minimum" type="xsd:boolean"/>
+        <xsd:attribute name="align_maximum" type="xsd:boolean"/>
     </xsd:complexType>
 
     <xsd:complexType name="OrdinalColorScale">
@@ -2105,6 +2109,8 @@
         <xsd:attribute name="soft_maximum" type="simple.DoubleOrNull" default="null"/>
         <xsd:attribute name="minimum_gap" type="xsd:double" default="0.1"/>
         <xsd:attribute name="maximum_gap" type="xsd:double" default="0.1"/>
+        <xsd:attribute name="align_minimum" type="xsd:boolean"/>
+        <xsd:attribute name="align_maximum" type="xsd:boolean"/>
     </xsd:complexType>
 
     <xsd:complexType name="LinearOrdinalColorScale">
@@ -2127,6 +2133,8 @@
         <xsd:attribute name="soft_maximum" type="simple.DoubleOrNull" default="null"/>
         <xsd:attribute name="minimum_gap" type="xsd:double" default="0.1"/>
         <xsd:attribute name="maximum_gap" type="xsd:double" default="0.1"/>
+        <xsd:attribute name="align_minimum" type="xsd:boolean"/>
+        <xsd:attribute name="align_maximum" type="xsd:boolean"/>
         <xsd:attribute name="type" type="enums.ScaleTypes" default="linear-color"/>
         <xsd:attribute name="names" type="xsd:string" default="name"/>
     </xsd:complexType>

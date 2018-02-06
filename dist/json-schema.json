@@ -4026,6 +4026,12 @@
         "maximumGap": {
           "type": "number"
         },
+        "alignMinimum": {
+          "type": "boolean"
+        },
+        "alignMaximum": {
+          "type": "boolean"
+        },
         "minimum": {
           "type": [
             "number",

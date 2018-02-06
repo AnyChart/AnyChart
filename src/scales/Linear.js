@@ -147,8 +147,8 @@ anychart.scales.Linear.prototype.calculate = function() {
   anychart.scales.Linear.base(this, 'calculate');
 
   var setupResult = this.ticks().setupAsMajor(this.min, this.max,
-      this.minimumModeAuto && this.min != this.softMin,
-      this.maximumModeAuto && this.max != this.softMax,
+      this.minimumModeAuto && this.min != this.softMin && this.alignMinimumVal,
+      this.maximumModeAuto && this.max != this.softMax && this.alignMaximumVal,
       this.logBaseVal);
 
   if (this.minimumModeAuto)
@@ -356,6 +356,8 @@ anychart.scales.linear = function() {
   proto['stickToZero'] = proto.stickToZero;
   proto['softMinimum'] = proto.softMinimum;
   proto['softMaximum'] = proto.softMaximum;
+  proto['alignMinimum'] = proto.alignMinimum;
+  proto['alignMaximum'] = proto.alignMaximum;
   proto['minimumGap'] = proto.minimumGap;//doc|ex
   proto['maximumGap'] = proto.maximumGap;//doc|ex
   proto['comparisonMode'] = proto.comparisonMode;

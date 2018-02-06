@@ -1841,6 +1841,23 @@ anychart.utils.INTERVAL_ESTIMATIONS = [
 
 
 /**
+ *
+ * @param {anychart.enums.Interval} unit
+ * @param {number=} opt_count defaults to 1.
+ * @return {anychart.enums.Interval}
+ */
+anychart.utils.getParentInterval = function(unit, opt_count) {
+  opt_count = opt_count || 1;
+  var i = 0;
+  for (; i < anychart.utils.INTERVAL_ESTIMATIONS.length; i++) {
+    if (anychart.utils.INTERVAL_ESTIMATIONS[i].unit == unit)
+      break;
+  }
+  return anychart.utils.INTERVAL_ESTIMATIONS[goog.math.clamp(i - opt_count, 0, anychart.utils.INTERVAL_ESTIMATIONS.length)].unit;
+};
+
+
+/**
  * Returns an object of [unit: anychart.enums.Interval, count: number] with estimation of the data interval passed.
  * Interval must be a valid number (not a NaN).
  * @param {number} interval

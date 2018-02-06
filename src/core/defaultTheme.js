@@ -2,6 +2,7 @@ goog.provide('anychart.core.defaultTheme');
 goog.require('anychart.color');
 goog.require('anychart.format');
 goog.require('anychart.math');
+goog.require('anychart.utils');
 
 
 //region --- Aux
@@ -705,6 +706,8 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
       'maximumGap': 0.1,
       'softMinimum': null,
       'softMaximum': null,
+      'alignMinimum': true,
+      'alignMaximum': true,
       'ticks': {
         'mode': 'linear',
         'base': 0,
@@ -744,6 +747,10 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     },
     'dateTime': {
       'type': 'date-time',
+      'alignMinimum': false,
+      'alignMaximum': false,
+      'minimumGap': 0,
+      'maximumGap': 0,
       'ticks': {
         'count': 4
       },
@@ -1812,7 +1819,48 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
         'padding': {'top': 5, 'right': 0, 'bottom': 0, 'left': 0}
       },
       'labels': {
-        'format': anychart.core.defaultTheme.VALUE_TOKEN_DECIMALS_COUNT_10
+        /**
+         * @this {*}
+         * @return {string}
+         */
+        'format': function() {
+          var scale = this['scale'];
+          var value = this['tickValue'];
+          switch (scale.getType()) {
+            case 'ordinal':
+              return this['value'];
+            case 'date-time':
+              var unit = this['intervalUnit'];
+              return anychart.format.dateTime(value,
+                  anychart.format.getDateTimeFormat(
+                      anychart.format.getIntervalIdentifier(
+                          unit, unit, 'charts')));
+            default:
+              return anychart.format.number(this['value']);
+          }
+        }
+      },
+      'minorLabels': {
+        /**
+         * @this {*}
+         * @return {string}
+         */
+        'format': function() {
+          var scale = this['scale'];
+          var value = this['tickValue'];
+          switch (scale.getType()) {
+            case 'ordinal':
+              return this['value'];
+            case 'date-time':
+              var unit = this['minorIntervalUnit'];
+              return anychart.format.dateTime(value,
+                  anychart.format.getDateTimeFormat(
+                      anychart.format.getIntervalIdentifier(
+                          unit, anychart.utils.getParentInterval(unit), 'charts')));
+            default:
+              return anychart.format.number(this['value']);
+          }
+        }
       },
       'scale': 0
     },

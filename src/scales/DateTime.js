@@ -112,7 +112,7 @@ anychart.scales.DateTime.prototype.calculate = function() {
 
   anychart.scales.DateTime.base(this, 'calculate');
 
-  var newRange = this.ticks().setupAsMajor(this.min, this.max, this.minimumModeAuto, this.maximumModeAuto);
+  var newRange = this.ticks().setupAsMajor(this.min, this.max, this.minimumModeAuto && this.alignMinimumVal, this.maximumModeAuto && this.alignMaximumVal);
   this.minorTicks().setupAsMinor(this.min, this.max, newRange[0], newRange[1]);
   // adjusting range AFTER minors calc to avoid range selection change
   if (this.minimumModeAuto)
@@ -197,6 +197,8 @@ anychart.scales.dateTime = function() {
   proto['extendDataRange'] = proto.extendDataRange;//inherited
   proto['softMinimum'] = proto.softMinimum;
   proto['softMaximum'] = proto.softMaximum;
+  proto['alignMinimum'] = proto.alignMinimum;
+  proto['alignMaximum'] = proto.alignMaximum;
   proto['minimumGap'] = proto.minimumGap;//doc|ex
   proto['maximumGap'] = proto.maximumGap;//doc|ex
 })();
