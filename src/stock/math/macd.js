@@ -70,7 +70,9 @@ anychart.stockModule.math.macd.startFunction = function(context) {
  * @this {anychart.stockModule.math.macd.Context}
  */
 anychart.stockModule.math.macd.calculationFunction = function(row, context) {
-  var value = anychart.utils.toNumber(row.get('value'));
+  var value = row.get('value');
+  value = goog.isDef(value) ? value : row.get('close');
+  value = anychart.utils.toNumber(value);
   var rv = anychart.stockModule.math.macd.calculate(context, value);
   var macdResult = rv[0];
   var signalResult = rv[1];

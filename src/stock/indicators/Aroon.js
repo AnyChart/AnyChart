@@ -8,26 +8,22 @@ goog.require('anychart.utils');
 
 /**
  * Aroon indicator class.
- * @param {!(anychart.stockModule.Plot|anychart.stockModule.Scroller)} plot
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_period
- * @param {anychart.enums.StockSeriesType=} opt_upSeriesType
- * @param {anychart.enums.StockSeriesType=} opt_downSeriesType
+ * @param {Array} args [plot, mapping, opt_period, opt_upSeriesType, opt_downSeriesType]
  * @constructor
  * @extends {anychart.stockModule.indicators.Base}
  */
-anychart.stockModule.indicators.Aroon = function(plot, mapping, opt_period, opt_upSeriesType, opt_downSeriesType) {
-  anychart.stockModule.indicators.Aroon.base(this, 'constructor', plot, mapping);
+anychart.stockModule.indicators.Aroon = function(args) {
+  anychart.stockModule.indicators.Aroon.base(this, 'constructor', args);
 
   /**
    * Aroon period.
    * @type {number}
    * @private
    */
-  this.period_ = anychart.utils.normalizeToNaturalNumber(opt_period, 20, false);
+  this.period_ = anychart.utils.normalizeToNaturalNumber(args[2], 20, false);
 
-  this.declareSeries('upAroon', opt_upSeriesType);
-  this.declareSeries('downAroon', opt_downSeriesType);
+  this.declareSeries('upAroon', args[3]);
+  this.declareSeries('downAroon', args[4]);
   this.init();
 };
 goog.inherits(anychart.stockModule.indicators.Aroon, anychart.stockModule.indicators.Base);

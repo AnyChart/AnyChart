@@ -8,58 +8,50 @@ goog.require('anychart.utils');
 
 /**
  * Stochastic indicator class.
- * @param {!(anychart.stockModule.Plot|anychart.stockModule.Scroller)} plot
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_kPeriod [14] Indicator period. Defaults to 14.
- * @param {number=} opt_kMAPeriod [1] Indicator K smoothing period. Defaults to 1.
- * @param {number=} opt_dPeriod [3] Indicator D period. Defaults to 3.
- * @param {anychart.enums.MovingAverageType=} opt_kMAType [SMA] Indicator K smoothing type. Defaults to SMA.
- * @param {anychart.enums.MovingAverageType=} opt_dMAType [SMA] Indicator D smoothing type. Defaults to SMA.
- * @param {anychart.enums.StockSeriesType=} opt_kSeriesType
- * @param {anychart.enums.StockSeriesType=} opt_dSeriesType
+ * @param {Array} args [plot, mapping, opt_kPeriod, opt_kMAPeriod, opt_dPeriod, opt_kMAType, opt_dMAType, opt_kSeriesType, opt_dSeriesType]
  * @constructor
  * @extends {anychart.stockModule.indicators.Base}
  */
-anychart.stockModule.indicators.Stochastic = function(plot, mapping, opt_kPeriod, opt_kMAPeriod, opt_dPeriod, opt_kMAType, opt_dMAType, opt_kSeriesType, opt_dSeriesType) {
-  anychart.stockModule.indicators.Stochastic.base(this, 'constructor', plot, mapping);
+anychart.stockModule.indicators.Stochastic = function(args) {
+  anychart.stockModule.indicators.Stochastic.base(this, 'constructor', args);
 
   /**
    * K period.
    * @type {number}
    * @private
    */
-  this.kPeriod_ = anychart.utils.normalizeToNaturalNumber(opt_kPeriod, 14, false);
-
-  /**
-   * K smooth type.
-   * @type {anychart.enums.MovingAverageType}
-   * @private
-   */
-  this.kMAType_ = anychart.enums.normalizeMovingAverageType(opt_kMAType, anychart.enums.MovingAverageType.SMA);
+  this.kPeriod_ = anychart.utils.normalizeToNaturalNumber(args[2], 14, false);
 
   /**
    * K smoothing period.
    * @type {number}
    * @private
    */
-  this.kMAPeriod_ = anychart.utils.normalizeToNaturalNumber(opt_kMAPeriod, 1, false);
-
-  /**
-   * D smooth type.
-   * @type {anychart.enums.MovingAverageType}
-   * @private
-   */
-  this.dMAType_ = anychart.enums.normalizeMovingAverageType(opt_dPeriod, anychart.enums.MovingAverageType.SMA);
+  this.kMAPeriod_ = anychart.utils.normalizeToNaturalNumber(args[3], 1, false);
 
   /**
    * D smooth period.
    * @type {number}
    * @private
    */
-  this.dPeriod_ = anychart.utils.normalizeToNaturalNumber(opt_dPeriod, 3, false);
+  this.dPeriod_ = anychart.utils.normalizeToNaturalNumber(args[4], 3, false);
 
-  this.declareSeries('kSeries', opt_kSeriesType);
-  this.declareSeries('dSeries', opt_dSeriesType);
+  /**
+   * K smooth type.
+   * @type {anychart.enums.MovingAverageType}
+   * @private
+   */
+  this.kMAType_ = anychart.enums.normalizeMovingAverageType(args[5], anychart.enums.MovingAverageType.SMA);
+
+  /**
+   * D smooth type.
+   * @type {anychart.enums.MovingAverageType}
+   * @private
+   */
+  this.dMAType_ = anychart.enums.normalizeMovingAverageType(args[6], anychart.enums.MovingAverageType.SMA);
+
+  this.declareSeries('kSeries', args[7]);
+  this.declareSeries('dSeries', args[8]);
   this.init();
 };
 goog.inherits(anychart.stockModule.indicators.Stochastic, anychart.stockModule.indicators.Base);

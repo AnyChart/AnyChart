@@ -68,7 +68,9 @@ anychart.stockModule.math.ama.startFunction = function(context) {
  * @this {anychart.stockModule.math.ama.Context}
  */
 anychart.stockModule.math.ama.calculationFunction = function(row, context) {
-  var currValue = anychart.utils.toNumber(row.get('value'));
+  var currValue = row.get('value');
+  currValue = goog.isDef(currValue) ? currValue : row.get('close');
+  currValue = anychart.utils.toNumber(currValue);
   var missing = isNaN(currValue);
   var dequeuedValue;
   if (!missing)

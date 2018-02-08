@@ -8,24 +8,21 @@ goog.require('anychart.utils');
 
 /**
  * CCI indicator class.
- * @param {!(anychart.stockModule.Plot|anychart.stockModule.Scroller)} plot
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_period
- * @param {anychart.enums.StockSeriesType=} opt_seriesType
+ * @param {Array} args [plot, mapping, opt_period, opt_seriesType]
  * @constructor
  * @extends {anychart.stockModule.indicators.Base}
  */
-anychart.stockModule.indicators.CCI = function(plot, mapping, opt_period, opt_seriesType) {
-  anychart.stockModule.indicators.CCI.base(this, 'constructor', plot, mapping);
+anychart.stockModule.indicators.CCI = function(args) {
+  anychart.stockModule.indicators.CCI.base(this, 'constructor', args);
 
   /**
    * CCI period.
    * @type {number}
    * @private
    */
-  this.period_ = anychart.utils.normalizeToNaturalNumber(opt_period, 20, false);
+  this.period_ = anychart.utils.normalizeToNaturalNumber(args[2], 20, false);
 
-  this.declareSeries('main', opt_seriesType);
+  this.declareSeries('main', args[3]);
   this.init();
 };
 goog.inherits(anychart.stockModule.indicators.CCI, anychart.stockModule.indicators.Base);

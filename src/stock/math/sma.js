@@ -56,7 +56,9 @@ anychart.stockModule.math.sma.startFunction = function(context) {
  * @this {anychart.stockModule.math.sma.Context}
  */
 anychart.stockModule.math.sma.calculationFunction = function(row, context) {
-  var value = anychart.utils.toNumber(row.get('value'));
+  var value = row.get('value');
+  value = goog.isDef(value) ? value : row.get('close');
+  value = anychart.utils.toNumber(value);
   var result = anychart.stockModule.math.sma.calculate(context, value);
   row.set('result', result);
 };

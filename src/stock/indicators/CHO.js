@@ -8,40 +8,35 @@ goog.require('anychart.utils');
 
 /**
  * CHO indicator class.
- * @param {!(anychart.stockModule.Plot|anychart.stockModule.Scroller)} plot
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_fastPeriod [3] Indicator period. Defaults to 3.
- * @param {number=} opt_slowPeriod [10] Indicator period. Defaults to 10.
- * @param {string=} opt_maType [EMA] Indicator smoothing type. Defaults to EMA.
- * @param {anychart.enums.StockSeriesType=} opt_seriesType
+ * @param {Array} args [plot, mapping, opt_fastPeriod, opt_slowPeriod, opt_maType, opt_seriesType]
  * @constructor
  * @extends {anychart.stockModule.indicators.Base}
  */
-anychart.stockModule.indicators.CHO = function(plot, mapping, opt_fastPeriod, opt_slowPeriod, opt_maType, opt_seriesType) {
-  anychart.stockModule.indicators.CHO.base(this, 'constructor', plot, mapping);
+anychart.stockModule.indicators.CHO = function(args) {
+  anychart.stockModule.indicators.CHO.base(this, 'constructor', args);
 
   /**
    * Fast period.
    * @type {number}
    * @private
    */
-  this.fastPeriod_ = anychart.utils.normalizeToNaturalNumber(opt_fastPeriod, 3, false);
+  this.fastPeriod_ = anychart.utils.normalizeToNaturalNumber(args[2], 3, false);
 
   /**
    * Slow period.
    * @type {number}
    * @private
    */
-  this.slowPeriod_ = anychart.utils.normalizeToNaturalNumber(opt_slowPeriod, 10, false);
+  this.slowPeriod_ = anychart.utils.normalizeToNaturalNumber(args[3], 10, false);
 
   /**
    * K smooth type.
    * @type {anychart.enums.MovingAverageType}
    * @private
    */
-  this.maType_ = anychart.enums.normalizeMovingAverageType(opt_maType, anychart.enums.MovingAverageType.EMA);
+  this.maType_ = anychart.enums.normalizeMovingAverageType(args[4], anychart.enums.MovingAverageType.EMA);
 
-  this.declareSeries('main', opt_seriesType);
+  this.declareSeries('main', args[5]);
   this.init();
 };
 goog.inherits(anychart.stockModule.indicators.CHO, anychart.stockModule.indicators.Base);

@@ -881,304 +881,6 @@ anychart.stockModule.Scroller.prototype.getAllSeries = function() {
 
 
 /**
- * Creates ADL indicator on the scroller.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {anychart.enums.StockSeriesType=} opt_seriesType
- * @return {anychart.stockModule.indicators.ADL}
- */
-anychart.stockModule.Scroller.prototype.adl = function(mapping, opt_seriesType) {
-  var result = new anychart.stockModule.indicators.ADL(this, mapping, opt_seriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates AMA indicator on the scroller.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_period
- * @param {number=} opt_fastPeriod
- * @param {number=} opt_slowPeriod
- * @param {anychart.enums.StockSeriesType=} opt_seriesType
- * @return {anychart.stockModule.indicators.AMA}
- */
-anychart.stockModule.Scroller.prototype.ama = function(mapping, opt_period, opt_fastPeriod, opt_slowPeriod, opt_seriesType) {
-  var result = new anychart.stockModule.indicators.AMA(this, mapping, opt_period, opt_fastPeriod, opt_slowPeriod, opt_seriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates Aroon indicator on the scroller.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_period
- * @param {anychart.enums.StockSeriesType=} opt_upSeriesType
- * @param {anychart.enums.StockSeriesType=} opt_downSeriesType
- * @return {anychart.stockModule.indicators.Aroon}
- */
-anychart.stockModule.Scroller.prototype.aroon = function(mapping, opt_period, opt_upSeriesType, opt_downSeriesType) {
-  var result = new anychart.stockModule.indicators.Aroon(this, mapping, opt_period, opt_upSeriesType, opt_downSeriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates ATR indicator on the chart.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_period
- * @param {anychart.enums.StockSeriesType=} opt_seriesType
- * @return {anychart.stockModule.indicators.ATR}
- */
-anychart.stockModule.Scroller.prototype.atr = function(mapping, opt_period, opt_seriesType) {
-  var result = new anychart.stockModule.indicators.ATR(this, mapping, opt_period, opt_seriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates BBands indicator on the scroller.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_period [20] Sets moving average period value.
- * @param {number=} opt_deviation [2] Sets the multiplier applied to the moving average to compute upper and lower bands of the indicator.
- * @param {anychart.enums.StockSeriesType=} opt_middleSeriesType
- * @param {anychart.enums.StockSeriesType=} opt_upperSeriesType
- * @param {anychart.enums.StockSeriesType=} opt_lowerSeriesType
- * @return {anychart.stockModule.indicators.BBands}
- */
-anychart.stockModule.Scroller.prototype.bbands = function(mapping, opt_period, opt_deviation, opt_middleSeriesType, opt_upperSeriesType, opt_lowerSeriesType) {
-  var result = new anychart.stockModule.indicators.BBands(this, mapping, opt_period, opt_deviation, opt_middleSeriesType, opt_upperSeriesType, opt_lowerSeriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates BBands %B indicator on the chart.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_period [20] Sets moving average period value.
- * @param {number=} opt_deviation [2] Sets the multiplier applied to the moving average to compute upper and lower bands of the indicator.
- * @param {anychart.enums.StockSeriesType=} opt_seriesType
- * @return {anychart.stockModule.indicators.BBandsB}
- */
-anychart.stockModule.Scroller.prototype.bbandsB = function(mapping, opt_period, opt_deviation, opt_seriesType) {
-  var result = new anychart.stockModule.indicators.BBandsB(this, mapping, opt_period, opt_deviation, opt_seriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates BBands Width indicator on the chart.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_period [20] Sets moving average period value.
- * @param {number=} opt_deviation [2] Sets the multiplier applied to the moving average to compute upper and lower bands of the indicator.
- * @param {anychart.enums.StockSeriesType=} opt_seriesType
- * @return {anychart.stockModule.indicators.BBandsWidth}
- */
-anychart.stockModule.Scroller.prototype.bbandsWidth = function(mapping, opt_period, opt_deviation, opt_seriesType) {
-  var result = new anychart.stockModule.indicators.BBandsWidth(this, mapping, opt_period, opt_deviation, opt_seriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates CCI indicator on the scroller.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_period
- * @param {anychart.enums.StockSeriesType=} opt_seriesType
- * @return {anychart.stockModule.indicators.CCI}
- */
-anychart.stockModule.Scroller.prototype.cci = function(mapping, opt_period, opt_seriesType) {
-  var result = new anychart.stockModule.indicators.CCI(this, mapping, opt_period, opt_seriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates CHO indicator on the chart.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_fastPeriod [3] Indicator period. Defaults to 3.
- * @param {number=} opt_slowPeriod [10] Indicator period. Defaults to 10.
- * @param {string=} opt_maType [EMA] Indicator smoothing type. Defaults to EMA.
- * @param {anychart.enums.StockSeriesType=} opt_seriesType
- * @return {anychart.stockModule.indicators.CHO}
- */
-anychart.stockModule.Scroller.prototype.cho = function(mapping, opt_fastPeriod, opt_slowPeriod, opt_maType, opt_seriesType) {
-  var result = new anychart.stockModule.indicators.CHO(this, mapping, opt_fastPeriod, opt_slowPeriod, opt_maType, opt_seriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates CMF indicator on the chart.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_period
- * @param {anychart.enums.StockSeriesType=} opt_seriesType
- * @return {anychart.stockModule.indicators.CMF}
- */
-anychart.stockModule.Scroller.prototype.cmf = function(mapping, opt_period, opt_seriesType) {
-  var result = new anychart.stockModule.indicators.CMF(this, mapping, opt_period, opt_seriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates DMI indicator on the chart.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_period
- * @param {number=} opt_adxPeriod
- * @param {boolean=} opt_useWildersSmoothing
- * @param {anychart.enums.StockSeriesType=} opt_pdiSeriesType
- * @param {anychart.enums.StockSeriesType=} opt_ndiSeriesType
- * @param {anychart.enums.StockSeriesType=} opt_adxSeriesType
- * @return {anychart.stockModule.indicators.DMI}
- */
-anychart.stockModule.Scroller.prototype.dmi = function(mapping, opt_period, opt_adxPeriod, opt_useWildersSmoothing, opt_pdiSeriesType, opt_ndiSeriesType, opt_adxSeriesType) {
-  var result = new anychart.stockModule.indicators.DMI(this, mapping, opt_period, opt_adxPeriod, opt_useWildersSmoothing, opt_pdiSeriesType, opt_ndiSeriesType, opt_adxSeriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates EMA indicator on the chart.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_period
- * @param {anychart.enums.StockSeriesType=} opt_seriesType
- * @return {anychart.stockModule.indicators.EMA}
- */
-anychart.stockModule.Scroller.prototype.ema = function(mapping, opt_period, opt_seriesType) {
-  var result = new anychart.stockModule.indicators.EMA(this, mapping, opt_period, opt_seriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates KDJ indicator on the chart.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_kPeriod [14] Indicator period. Defaults to 14.
- * @param {number=} opt_kMAPeriod [5] Indicator K smoothing period. Defaults to 5.
- * @param {number=} opt_dPeriod [5] Indicator D period. Defaults to 5.
- * @param {anychart.enums.MovingAverageType=} opt_kMAType [EMA] Indicator K smoothing type. Defaults to EMA.
- * @param {anychart.enums.MovingAverageType=} opt_dMAType [EMA] Indicator D smoothing type. Defaults to EMA.
- * @param {number=} opt_kMultiplier [-2] K multiplier.
- * @param {number=} opt_dMultiplier [3] D multiplier.
- * @param {anychart.enums.StockSeriesType=} opt_kSeriesType
- * @param {anychart.enums.StockSeriesType=} opt_dSeriesType
- * @param {anychart.enums.StockSeriesType=} opt_jSeriesType
- * @return {anychart.stockModule.indicators.KDJ}
- */
-anychart.stockModule.Scroller.prototype.kdj = function(mapping, opt_kPeriod, opt_kMAPeriod, opt_dPeriod, opt_kMAType, opt_dMAType, opt_kMultiplier, opt_dMultiplier, opt_kSeriesType, opt_dSeriesType, opt_jSeriesType) {
-  var result = new anychart.stockModule.indicators.KDJ(this, mapping, opt_kPeriod, opt_kMAPeriod, opt_dPeriod, opt_kMAType, opt_dMAType, opt_kMultiplier, opt_dMultiplier, opt_kSeriesType, opt_dSeriesType, opt_jSeriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates MACD indicator on the chart.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_fastPeriod
- * @param {number=} opt_slowPeriod
- * @param {number=} opt_signalPeriod
- * @param {anychart.enums.StockSeriesType=} opt_macdSeriesType
- * @param {anychart.enums.StockSeriesType=} opt_signalSeriesType
- * @param {anychart.enums.StockSeriesType=} opt_histogramSeriesType
- * @return {anychart.stockModule.indicators.MACD}
- */
-anychart.stockModule.Scroller.prototype.macd = function(mapping, opt_fastPeriod, opt_slowPeriod, opt_signalPeriod,
-    opt_macdSeriesType, opt_signalSeriesType, opt_histogramSeriesType) {
-  var result = new anychart.stockModule.indicators.MACD(this, mapping, opt_fastPeriod, opt_slowPeriod, opt_signalPeriod,
-      opt_macdSeriesType, opt_signalSeriesType, opt_histogramSeriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates MMA indicator on the scroller.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_period
- * @param {anychart.enums.StockSeriesType=} opt_seriesType
- * @return {anychart.stockModule.indicators.MMA}
- */
-anychart.stockModule.Scroller.prototype.mma = function(mapping, opt_period, opt_seriesType) {
-  var result = new anychart.stockModule.indicators.MMA(this, mapping, opt_period, opt_seriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates RoC indicator on the chart.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_period
- * @param {anychart.enums.StockSeriesType=} opt_seriesType
- * @return {anychart.stockModule.indicators.RoC}
- */
-anychart.stockModule.Scroller.prototype.roc = function(mapping, opt_period, opt_seriesType) {
-  var result = new anychart.stockModule.indicators.RoC(this, mapping, opt_period, opt_seriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates RSI indicator on the chart.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_period
- * @param {anychart.enums.StockSeriesType=} opt_seriesType
- * @return {anychart.stockModule.indicators.RSI}
- */
-anychart.stockModule.Scroller.prototype.rsi = function(mapping, opt_period, opt_seriesType) {
-  var result = new anychart.stockModule.indicators.RSI(this, mapping, opt_period, opt_seriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates SMA indicator on the chart.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_period
- * @param {anychart.enums.StockSeriesType=} opt_seriesType
- * @return {anychart.stockModule.indicators.SMA}
- */
-anychart.stockModule.Scroller.prototype.sma = function(mapping, opt_period, opt_seriesType) {
-  var result = new anychart.stockModule.indicators.SMA(this, mapping, opt_period, opt_seriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates Stochastic indicator on the chart.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_kPeriod [14] Indicator period. Defaults to 14.
- * @param {number=} opt_kMAPeriod [1] Indicator K smoothing period. Defaults to 1.
- * @param {number=} opt_dPeriod [3] Indicator D period. Defaults to 3.
- * @param {anychart.enums.MovingAverageType=} opt_kMAType [SMA] Indicator K smoothing type. Defaults to SMA.
- * @param {anychart.enums.MovingAverageType=} opt_dMAType [SMA] Indicator D smoothing type. Defaults to SMA.
- * @param {anychart.enums.StockSeriesType=} opt_kSeriesType
- * @param {anychart.enums.StockSeriesType=} opt_dSeriesType
- * @return {anychart.stockModule.indicators.Stochastic}
- */
-anychart.stockModule.Scroller.prototype.stochastic = function(mapping, opt_kPeriod, opt_kMAPeriod, opt_dPeriod, opt_kMAType, opt_dMAType, opt_kSeriesType, opt_dSeriesType) {
-  var result = new anychart.stockModule.indicators.Stochastic(this, mapping, opt_kPeriod, opt_kMAPeriod, opt_dPeriod, opt_kMAType, opt_dMAType, opt_kSeriesType, opt_dSeriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
  * Getter/setter for series default settings.
  * @param {Object=} opt_value Object with default series settings.
  * @return {Object}
@@ -1316,6 +1018,11 @@ anychart.stockModule.Scroller.prototype.invalidateSeries_ = function() {
         anychart.ConsistencyState.SERIES_HATCH_FILL |
         anychart.ConsistencyState.BOUNDS);
 };
+
+
+//endregion
+//region Indicators
+anychart.stockModule.indicators.generateIndicatorsConstructors(anychart.stockModule.Scroller);
 
 
 //endregion
@@ -1902,23 +1609,28 @@ anychart.stockModule.Scroller.prototype.setupByJSON = function(config, opt_defau
   proto['removeAllSeries'] = proto.removeAllSeries;
   proto['palette'] = proto.palette;
   proto['hatchFillPalette'] = proto.hatchFillPalette;
-  proto['adl'] = proto.adl;
-  proto['ama'] = proto.ama;
-  proto['aroon'] = proto.aroon;
-  proto['atr'] = proto.atr;
-  proto['bbands'] = proto.bbands;
-  proto['bbandsB'] = proto.bbandsB;
-  proto['bbandsWidth'] = proto.bbandsWidth;
-  proto['cci'] = proto.cci;
-  proto['cho'] = proto.cho;
-  proto['cmf'] = proto.cmf;
-  proto['dmi'] = proto.dmi;
-  proto['ema'] = proto.ema;
-  proto['kdj'] = proto.kdj;
-  proto['macd'] = proto.macd;
-  proto['mma'] = proto.mma;
-  proto['roc'] = proto.roc;
-  proto['rsi'] = proto.rsi;
-  proto['sma'] = proto.sma;
-  proto['stochastic'] = proto.stochastic;
+  // auto generated methods
+  //proto['adl'] = proto.adl;
+  //proto['ama'] = proto.ama;
+  //proto['aroon'] = proto.aroon;
+  //proto['atr'] = proto.atr;
+  //proto['bbands'] = proto.bbands;
+  //proto['bbandsB'] = proto.bbandsB;
+  //proto['bbandsWidth'] = proto.bbandsWidth;
+  //proto['cci'] = proto.cci;
+  //proto['cho'] = proto.cho;
+  //proto['cmf'] = proto.cmf;
+  //proto['dmi'] = proto.dmi;
+  //proto['ema'] = proto.ema;
+  //proto['kdj'] = proto.kdj;
+  //proto['macd'] = proto.macd;
+  //proto['mfi'] = proto.mfi;
+  //proto['mma'] = proto.mma;
+  //proto['momentum'] = proto.momentum;
+  //proto['psar'] = proto.psar;
+  //proto['roc'] = proto.roc;
+  //proto['rsi'] = proto.rsi;
+  //proto['sma'] = proto.sma;
+  //proto['stochastic'] = proto.stochastic;
+  //proto['williamsR'] = proto.williamsR;
 })();

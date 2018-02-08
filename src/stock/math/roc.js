@@ -50,7 +50,9 @@ anychart.stockModule.math.roc.startFunction = function(context) {
  * @this {anychart.stockModule.math.roc.Context}
  */
 anychart.stockModule.math.roc.calculationFunction = function(row, context) {
-  var currValue = anychart.utils.toNumber(row.get('value'));
+  var currValue = row.get('value');
+  currValue = goog.isDef(currValue) ? currValue : row.get('close');
+  currValue = anychart.utils.toNumber(currValue);
   var missing = isNaN(currValue);
   if (!missing)
     context.queue.enqueue(currValue);

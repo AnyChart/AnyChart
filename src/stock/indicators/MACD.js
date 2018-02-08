@@ -8,45 +8,37 @@ goog.require('anychart.utils');
 
 /**
  * EMA indicator class.
- * @param {!(anychart.stockModule.Plot|anychart.stockModule.Scroller)} plot
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_fastPeriod
- * @param {number=} opt_slowPeriod
- * @param {number=} opt_signalPeriod
- * @param {anychart.enums.StockSeriesType=} opt_macdSeriesType
- * @param {anychart.enums.StockSeriesType=} opt_signalSeriesType
- * @param {anychart.enums.StockSeriesType=} opt_histogramSeriesType
+ * @param {Array} args [plot, mapping, opt_fastPeriod, opt_slowPeriod, opt_signalPeriod, opt_macdSeriesType, opt_signalSeriesType, opt_histogramSeriesType]
  * @constructor
  * @extends {anychart.stockModule.indicators.Base}
  */
-anychart.stockModule.indicators.MACD = function(plot, mapping, opt_fastPeriod, opt_slowPeriod, opt_signalPeriod,
-    opt_macdSeriesType, opt_signalSeriesType, opt_histogramSeriesType) {
-  anychart.stockModule.indicators.MACD.base(this, 'constructor', plot, mapping);
+anychart.stockModule.indicators.MACD = function(args) {
+  anychart.stockModule.indicators.MACD.base(this, 'constructor', args);
 
   /**
    * Fast period.
    * @type {number}
    * @private
    */
-  this.fastPeriod_ = anychart.utils.normalizeToNaturalNumber(opt_fastPeriod, 12, false);
+  this.fastPeriod_ = anychart.utils.normalizeToNaturalNumber(args[2], 12, false);
 
   /**
    * Slow period.
    * @type {number}
    * @private
    */
-  this.slowPeriod_ = anychart.utils.normalizeToNaturalNumber(opt_slowPeriod, 26, false);
+  this.slowPeriod_ = anychart.utils.normalizeToNaturalNumber(args[3], 26, false);
 
   /**
    *Ssignal period.
    * @type {number}
    * @private
    */
-  this.signalPeriod_ = anychart.utils.normalizeToNaturalNumber(opt_signalPeriod, 9, false);
+  this.signalPeriod_ = anychart.utils.normalizeToNaturalNumber(args[4], 9, false);
 
-  this.declareSeries('macd', opt_macdSeriesType);
-  this.declareSeries('signal', opt_signalSeriesType);
-  this.declareSeries('histogram', opt_histogramSeriesType, anychart.enums.StockSeriesType.COLUMN);
+  this.declareSeries('macd', args[5]);
+  this.declareSeries('signal', args[6]);
+  this.declareSeries('histogram', args[7], anychart.enums.StockSeriesType.COLUMN);
   this.init();
 };
 goog.inherits(anychart.stockModule.indicators.MACD, anychart.stockModule.indicators.Base);

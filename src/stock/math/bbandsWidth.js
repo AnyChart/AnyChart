@@ -65,7 +65,9 @@ anychart.stockModule.math.bbandsWidth.calculate = function(context, value) {
  * @this {anychart.stockModule.math.bbandsWidth.Context}
  */
 anychart.stockModule.math.bbandsWidth.calculationFunction = function(row, context) {
-  var value = anychart.utils.toNumber(row.get('value'));
+  var value = row.get('value');
+  value = goog.isDef(value) ? value : row.get('close');
+  value = anychart.utils.toNumber(value);
   row.set('result', anychart.stockModule.math.bbandsWidth.calculate(context, value));
 };
 

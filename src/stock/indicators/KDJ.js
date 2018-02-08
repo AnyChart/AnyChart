@@ -8,62 +8,51 @@ goog.require('anychart.utils');
 
 /**
  * KDJ indicator class.
- * @param {!(anychart.stockModule.Plot|anychart.stockModule.Scroller)} plot
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_kPeriod [14] Indicator period. Defaults to 14.
- * @param {number=} opt_kMAPeriod [5] Indicator K smoothing period. Defaults to 5.
- * @param {number=} opt_dPeriod [5] Indicator D period. Defaults to 5.
- * @param {anychart.enums.MovingAverageType=} opt_kMAType [EMA] Indicator K smoothing type. Defaults to EMA.
- * @param {anychart.enums.MovingAverageType=} opt_dMAType [EMA] Indicator D smoothing type. Defaults to EMA.
- * @param {number=} opt_kMultiplier [-2]. K multiplier.
- * @param {number=} opt_dMultiplier [3]. D multiplier.
- * @param {anychart.enums.StockSeriesType=} opt_kSeriesType
- * @param {anychart.enums.StockSeriesType=} opt_dSeriesType
- * @param {anychart.enums.StockSeriesType=} opt_jSeriesType
+ * @param {Array} args [plot, mapping, opt_kPeriod, opt_kMAPeriod, opt_dPeriod, opt_kMAType, opt_dMAType, opt_kMultiplier, opt_dMultiplier, opt_kSeriesType, opt_dSeriesType, opt_jSeriesType]
  * @constructor
  * @extends {anychart.stockModule.indicators.Base}
  */
-anychart.stockModule.indicators.KDJ = function(plot, mapping, opt_kPeriod, opt_kMAPeriod, opt_dPeriod, opt_kMAType, opt_dMAType, opt_kMultiplier, opt_dMultiplier, opt_kSeriesType, opt_dSeriesType, opt_jSeriesType) {
-  anychart.stockModule.indicators.KDJ.base(this, 'constructor', plot, mapping);
+anychart.stockModule.indicators.KDJ = function(args) {
+  anychart.stockModule.indicators.KDJ.base(this, 'constructor', args);
 
   /**
    * K period.
    * @type {number}
    * @private
    */
-  this.kPeriod_ = anychart.utils.normalizeToNaturalNumber(opt_kPeriod, 14, false);
-
-  /**
-   * K smooth type.
-   * @type {anychart.enums.MovingAverageType}
-   * @private
-   */
-  this.kMAType_ = anychart.enums.normalizeMovingAverageType(opt_kMAType, anychart.enums.MovingAverageType.EMA);
+  this.kPeriod_ = anychart.utils.normalizeToNaturalNumber(args[2], 14, false);
 
   /**
    * K smoothing period.
    * @type {number}
    * @private
    */
-  this.kMAPeriod_ = anychart.utils.normalizeToNaturalNumber(opt_kMAPeriod, 5, false);
-
-  /**
-   * D smooth type.
-   * @type {anychart.enums.MovingAverageType}
-   * @private
-   */
-  this.dMAType_ = anychart.enums.normalizeMovingAverageType(opt_dMAType, anychart.enums.MovingAverageType.EMA);
+  this.kMAPeriod_ = anychart.utils.normalizeToNaturalNumber(args[3], 5, false);
 
   /**
    * D smoothing period.
    * @type {number}
    * @private
    */
-  this.dPeriod_ = anychart.utils.normalizeToNaturalNumber(opt_dPeriod, 5, false);
+  this.dPeriod_ = anychart.utils.normalizeToNaturalNumber(args[4], 5, false);
+
+  /**
+   * K smooth type.
+   * @type {anychart.enums.MovingAverageType}
+   * @private
+   */
+  this.kMAType_ = anychart.enums.normalizeMovingAverageType(args[5], anychart.enums.MovingAverageType.EMA);
+
+  /**
+   * D smooth type.
+   * @type {anychart.enums.MovingAverageType}
+   * @private
+   */
+  this.dMAType_ = anychart.enums.normalizeMovingAverageType(args[6], anychart.enums.MovingAverageType.EMA);
 
   var mult;
 
-  mult = anychart.utils.toNumber(opt_kMultiplier);
+  mult = anychart.utils.toNumber(args[7]);
   /**
    * K multiplier.
    * @type {number}
@@ -71,7 +60,7 @@ anychart.stockModule.indicators.KDJ = function(plot, mapping, opt_kPeriod, opt_k
    */
   this.kMultiplier_ = isNaN(mult) ? -2 : mult;
 
-  mult = anychart.utils.toNumber(opt_dMultiplier);
+  mult = anychart.utils.toNumber(args[8]);
   /**
    * D multiplier.
    * @type {number}
@@ -79,9 +68,9 @@ anychart.stockModule.indicators.KDJ = function(plot, mapping, opt_kPeriod, opt_k
    */
   this.dMultiplier_ = isNaN(mult) ? 3 : mult;
 
-  this.declareSeries('kSeries', opt_kSeriesType);
-  this.declareSeries('dSeries', opt_dSeriesType);
-  this.declareSeries('jSeries', opt_jSeriesType);
+  this.declareSeries('kSeries', args[9]);
+  this.declareSeries('dSeries', args[10]);
+  this.declareSeries('jSeries', args[11]);
   this.init();
 };
 goog.inherits(anychart.stockModule.indicators.KDJ, anychart.stockModule.indicators.Base);

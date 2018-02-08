@@ -1865,6 +1865,42 @@ anychart.enums.normalizeStockSeriesType = function(value, opt_default) {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  StockIndicatorTypes
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * List of all series types.
+ * @enum {string}
+ */
+anychart.enums.StockIndicatorTypes = {
+  ADL: 'adl',
+  AMA: 'ama',
+  AROON: 'aroon',
+  ATR: 'atr',
+  BBANDS: 'bbands',
+  BBANDS_B: 'bbands-b',
+  BBANDS_WIDTH: 'bbands-width',
+  CCI: 'cci',
+  CHO: 'cho',
+  CMF: 'cmf',
+  DMI: 'dmi',
+  EMA: 'ema',
+  KDJ: 'kdj',
+  MACD: 'macd',
+  MFI: 'mfi',
+  MMA: 'mma',
+  MOMENTUM: 'momentum',
+  PSAR: 'psar',
+  ROC: 'roc',
+  RSI: 'rsi',
+  SMA: 'sma',
+  STOCHASTIC: 'stochastic',
+  WILLIAMS_R: 'williams-r'
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  MovingAverageType enum.
 //
 //----------------------------------------------------------------------------------------------------------------------
