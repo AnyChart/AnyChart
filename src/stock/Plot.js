@@ -1007,6 +1007,13 @@ anychart.stockModule.Plot.prototype.getPlotBounds = function() {
 };
 
 
+/** @inheritDoc */
+anychart.stockModule.Plot.prototype.getEnableChangeSignals = function() {
+  return anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED |
+      anychart.Signal.ENABLED_STATE_CHANGED | anychart.Signal.NEEDS_RECALCULATION;
+};
+
+
 //endregion
 //region Public getters, setters and methods
 //----------------------------------------------------------------------------------------------------------------------
@@ -1933,7 +1940,7 @@ anychart.stockModule.Plot.prototype.prepareHighlight = function(value) {
  * @param {number=} opt_y - .
  */
 anychart.stockModule.Plot.prototype.highlight = function(value, rawValue, hlSource, opt_y) {
-  if (!this.rootLayer_ || !this.seriesBounds_) return;
+  if (!this.rootLayer_ || !this.seriesBounds_ || !this.enabled()) return;
 
   var sticky = this.crosshair().getOption('displayMode') == anychart.enums.CrosshairDisplayMode.STICKY;
   var setValue = sticky ? value : rawValue;
@@ -1963,6 +1970,8 @@ anychart.stockModule.Plot.prototype.highlight = function(value, rawValue, hlSour
  * Removes plot highlight.
  */
 anychart.stockModule.Plot.prototype.unhighlight = function() {
+  if (!this.enabled()) return;
+
   this.highlightedValue_ = NaN;
 
   for (var i = 0; i < this.series_.length; i++) {
