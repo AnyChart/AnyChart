@@ -206,7 +206,7 @@ anychart.stockModule.data.TableSelectable.prototype.wrapRow_ = function(row, row
         this.mapping_,
         !this.currentStorageIsMain_,
         globalIndex,
-        this.metaData_[globalIndex]
+        this.metaData_[globalIndex] || {}
     );
   }
   return null;
