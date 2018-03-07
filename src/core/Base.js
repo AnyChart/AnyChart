@@ -188,7 +188,7 @@ anychart.ConsistencyState = {
   //---------------------------------- DATA GRID COLUMN STATES (VB) ---------------------------------
   DATA_GRID_COLUMN_TITLE: 1 << 6,
   DATA_GRID_COLUMN_POSITION: 1 << 7,
-  DATA_GRID_COLUMN_BUTTON_CURSOR: 1 << 8,
+  DATA_GRID_COLUMN_BUTTON: 1 << 8,
   //---------------------------------- BACKGROUND STATES (VB) ---------------------------------
   BACKGROUND_POINTER_EVENTS: 1 << 6,
   //---------------------------------- LABEL STATES (VB) ---------------------------------
@@ -401,6 +401,21 @@ anychart.PointState = {
   HOVER: 1,
   SELECT: 2,
   ALL: 0xFFFFFFFF
+};
+
+
+/**
+ * The list of state settings states.
+ * @enum {number}
+ */
+anychart.SettingsState = {
+  NORMAL: 0,
+  HOVERED: 1,
+  SELECTED: 2,
+  EXPANDED: 3,
+  COLLAPSED: 4,
+  PUSHED: 5,
+  DISABLED: 6
 };
 
 

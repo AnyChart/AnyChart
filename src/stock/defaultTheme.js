@@ -534,7 +534,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         },
         /**
          * @this {*}
-         * @returns {string}
+         * @return {string}
          */
         'titleFormat': function() {
           var date = anychart.format.dateTime(this['date'],
@@ -546,7 +546,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         },
         /**
          * @this {*}
-         * @returns {string}
+         * @return {string}
          */
         'format': function() {
           return this['description'] || this['symbol'];

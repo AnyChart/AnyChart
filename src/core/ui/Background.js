@@ -85,53 +85,17 @@ anychart.core.ui.Background.prototype.SUPPORTED_CONSISTENCY_STATES =
 anychart.core.ui.Background.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'fill',
-      anychart.core.settings.fillNormalizer);
 
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'stroke',
-      anychart.core.settings.strokeNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'topStroke',
-      anychart.core.settings.strokeNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'rightStroke',
-      anychart.core.settings.strokeNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'bottomStroke',
-      anychart.core.settings.strokeNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'leftStroke',
-      anychart.core.settings.strokeNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'disablePointerEvents',
-      anychart.core.settings.booleanNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'cornerType',
-      anychart.enums.normalizeBackgroundCornerType);
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'fill', anychart.core.settings.fillNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'stroke', anychart.core.settings.strokeNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'topStroke', anychart.core.settings.strokeNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'rightStroke', anychart.core.settings.strokeNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'bottomStroke', anychart.core.settings.strokeNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'leftStroke', anychart.core.settings.strokeNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'disablePointerEvents', anychart.core.settings.booleanNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'cornerType', anychart.enums.normalizeBackgroundCornerType]
+  ]);
 
   return map;
 })();

@@ -580,6 +580,7 @@
     <!-- core types -->
     <xsd:complexType name="core.StateSettings">
         <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="background" type="core.Background"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="negative_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="rising_fill" type="Fill"/>
@@ -1437,6 +1438,7 @@
 
     <xsd:complexType name="core.DataGrid">
         <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="buttons" type="ganttModule.DataGridButton"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="row_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="column_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="header_fill" type="Fill"/>
@@ -1471,6 +1473,12 @@
         <xsd:attribute name="edit_structure_preview_fill" type="xsd:string"/>
         <xsd:attribute name="edit_structure_preview_stroke" type="xsd:string"/>
         <xsd:attribute name="edit_structure_preview_dash_stroke" type="xsd:string"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="ganttModule.DataGridButton">
+        <xsd:attributeGroup ref="attrs.VisualBase"/>
+        <xsd:attribute name="size" type="xsd:double" />
+        <xsd:attribute name="cursor" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="Columns_list">

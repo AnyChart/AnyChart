@@ -11,6 +11,7 @@ goog.require('anychart.core.ui.Title');
 goog.require('anychart.enums');
 goog.require('anychart.ganttModule.BaseGrid');
 goog.require('anychart.ganttModule.Controller');
+goog.require('anychart.ganttModule.DataGridButton');
 goog.require('anychart.ganttModule.ScrollBar');
 goog.require('anychart.math.Rect');
 goog.require('anychart.treeDataModule.Tree');
@@ -839,12 +840,53 @@ anychart.ganttModule.DataGrid.prototype.mouseOutMove = function(event) {
 };
 
 
+/**
+ * Getter/setter for datagrid button settings.
+ * @param {Object=} opt_value
+ * @return {anychart.ganttModule.DataGrid|anychart.ganttModule.DataGridButton}
+ */
+anychart.ganttModule.DataGrid.prototype.buttons = function(opt_value) {
+  if (!this.buttons_) {
+    this.buttons_ = new anychart.ganttModule.DataGridButton(this);
+    this.buttons_.listenSignals(this.buttonsInvalidated_, this);
+  }
+  if (goog.isDef(opt_value)) {
+    this.buttons_.setup(opt_value);
+    return this;
+  }
+
+  return this.buttons_;
+};
+
+
+/**
+ * Buttons invalidation handler.
+ * @param {anychart.SignalEvent} e
+ * @private
+ */
+anychart.ganttModule.DataGrid.prototype.buttonsInvalidated_ = function(e) {
+  if (e.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
+    //var buttons = this.buttons();
+    //var json = buttons.serialize();
+    this.buttons().markConsistent(anychart.ConsistencyState.ALL);
+    this.positionInvalidated();
+  }
+};
+
+
 /** @inheritDoc */
 anychart.ganttModule.DataGrid.prototype.serialize = function() {
   var json = anychart.ganttModule.DataGrid.base(this, 'serialize');
 
   anychart.core.settings.serialize(this, anychart.ganttModule.DataGrid.COLOR_DESCRIPTORS, json);
   json['horizontalOffset'] = this.horizontalOffset();
+
+  json['buttons'] = this.buttons().serialize();
+  delete json['buttons']['normal'];
+  delete json['buttons']['hovered'];
+  delete json['buttons']['expanded'];
+  delete json['buttons']['collapsed'];
+  delete json['buttons']['padding'];
 
   json['columns'] = [];
 
@@ -866,6 +908,8 @@ anychart.ganttModule.DataGrid.prototype.setupByJSON = function(config, opt_defau
 
   anychart.core.settings.deserialize(this, anychart.ganttModule.DataGrid.COLOR_DESCRIPTORS, config, opt_default);
   this.horizontalOffset(config['horizontalOffset']);
+
+  this.buttons(config['buttons']);
 
   if ('defaultColumnSettings' in config)
     this.defaultColumnSettings(config['defaultColumnSettings']);
@@ -1027,7 +1071,7 @@ anychart.ganttModule.DataGrid.Column = function(dataGrid) {
 
   /**
    * Pool of collapse/expand buttons.
-   * @type {Array.<anychart.ganttModule.DataGrid.Button>}
+   * @type {Array.<anychart.ganttModule.DataGridButton>}
    * @private
    */
   this.buttons_ = [];
@@ -1060,7 +1104,7 @@ anychart.ganttModule.DataGrid.Column.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.APPEARANCE |
     anychart.ConsistencyState.DATA_GRID_COLUMN_TITLE |
     anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION |
-    anychart.ConsistencyState.DATA_GRID_COLUMN_BUTTON_CURSOR;
+    anychart.ConsistencyState.DATA_GRID_COLUMN_BUTTON;
 
 
 /**
@@ -1424,17 +1468,16 @@ anychart.ganttModule.DataGrid.Column.prototype.height = function(opt_value) {
  * Getter/setter for buttonCursor.
  * @param {(anychart.enums.Cursor|string)=} opt_value buttonCursor.
  * @return {anychart.enums.Cursor|anychart.ganttModule.DataGrid.Column} buttonCursor or self for chaining.
+ * @deprecated since 8.2.0. Use anychart.core.ui.DataGrid#buttons().cursor() instead
  */
 anychart.ganttModule.DataGrid.Column.prototype.buttonCursor = function(opt_value) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['buttonCursor()', 'dataGrid.buttons().cursor()'], true);
+  var buttons = this.dataGrid_.buttons();
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeCursor(opt_value, anychart.enums.Cursor.DEFAULT);
-    if (this.buttonCursor_ != opt_value) {
-      this.buttonCursor_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_BUTTON_CURSOR, anychart.Signal.NEEDS_REDRAW);
-    }
+    buttons['cursor'](opt_value);
     return this;
   }
-  return this.buttonCursor_;
+  return buttons['cursor'](opt_value);
 };
 
 
@@ -1480,6 +1523,17 @@ anychart.ganttModule.DataGrid.Column.prototype.calculateBounds = function() {
 
 
 /**
+ * Button invalidation handler.
+ * @param {anychart.SignalEvent} event
+ * @private
+ */
+anychart.ganttModule.DataGrid.Column.prototype.buttonInvalidated_ = function(event) {
+  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW))
+    this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_BUTTON, anychart.Signal.NEEDS_REDRAW);
+};
+
+
+/**
  * Draws data grid column.
  * @return {anychart.ganttModule.DataGrid.Column} - Itself for method chaining.
  */
@@ -1518,6 +1572,26 @@ anychart.ganttModule.DataGrid.Column.prototype.draw = function() {
       this.markConsistent(anychart.ConsistencyState.BOUNDS);
     }
 
+    var data, startIndex, endIndex, item, i, counter, button;
+    if (this.hasInvalidationState(anychart.ConsistencyState.DATA_GRID_COLUMN_BUTTON)) {
+      data = this.dataGrid_.getVisibleItems();
+      startIndex = /** @type {number} */(this.dataGrid_.startIndex());
+      endIndex = /** @type {number} */(this.dataGrid_.endIndex());
+      counter = -1;
+      for (i = startIndex; i <= endIndex; i++) {
+        item = data[i];
+        if (!item) break;
+
+        if (this.collapseExpandButtons_ && item.numChildren()) {
+          counter++;
+          button = this.buttons_[counter];
+          if (button)
+            button.draw();
+        }
+      }
+      this.markConsistent(anychart.ConsistencyState.DATA_GRID_COLUMN_BUTTON);
+    }
+
     if (this.hasInvalidationState(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION)) {
       var headerHeight = /** @type {number} */ (this.dataGrid_.headerHeight());
 
@@ -1538,9 +1612,9 @@ anychart.ganttModule.DataGrid.Column.prototype.draw = function() {
       this.title_.resumeSignalsDispatching(false);
       this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_TITLE);
 
-      var data = this.dataGrid_.getVisibleItems();
-      var startIndex = /** @type {number} */(this.dataGrid_.startIndex());
-      var endIndex = /** @type {number} */(this.dataGrid_.endIndex());
+      data = this.dataGrid_.getVisibleItems();
+      startIndex = /** @type {number} */(this.dataGrid_.startIndex());
+      endIndex = /** @type {number} */(this.dataGrid_.endIndex());
       var verticalOffset = this.dataGrid_.verticalOffset();
 
       var totalTop = this.pixelBoundsCache_.top + headerHeight + 1 - verticalOffset;
@@ -1557,9 +1631,12 @@ anychart.ganttModule.DataGrid.Column.prototype.draw = function() {
       var paddingBottom = anychart.utils.normalizeSize(/** @type {(number|string)} */ (this.cellTextSettings().padding().getOption('bottom')),
           this.pixelBoundsCache_.height);
 
-      var counter = -1;
-      for (var i = startIndex; i <= endIndex; i++) {
-        var item = data[i];
+      counter = -1;
+      var dataGridButtons = this.dataGrid_.buttons();
+      var buttonsJson = dataGridButtons.serialize();
+      dataGridButtons.markConsistent(anychart.ConsistencyState.ALL);
+      for (i = startIndex; i <= endIndex; i++) {
+        item = data[i];
         if (!item) break;
 
         var height = this.dataGrid_.controller.getItemHeight(item);
@@ -1569,30 +1646,33 @@ anychart.ganttModule.DataGrid.Column.prototype.draw = function() {
 
         if (this.collapseExpandButtons_ && item.numChildren()) {
           counter++;
-          addButton = anychart.ganttModule.DataGrid.DEFAULT_EXPAND_COLLAPSE_BUTTON_SIDE + anychart.ganttModule.DataGrid.DEFAULT_PADDING;
-          var button = this.buttons_[counter];
+          //addButton = anychart.ganttModule.DataGrid.DEFAULT_EXPAND_COLLAPSE_BUTTON_SIDE + anychart.ganttModule.DataGrid.DEFAULT_PADDING;
+          button = this.buttons_[counter];
           if (!button) {
-            button = new anychart.ganttModule.DataGrid.Button(this.dataGrid_);
+            button = new anychart.ganttModule.DataGridButton(this.dataGrid_);
             this.buttons_.push(button);
+            button.setupInternal(true, buttonsJson);
             button.zIndex(anychart.ganttModule.DataGrid.Column.BUTTONS_Z_INDEX);
             button.container(this.getCellsLayer_());
+            button.listenSignals(this.buttonInvalidated_, this);
           }
-
           button.suspendSignalsDispatching();
+          button.setup(buttonsJson);
+
+          addButton = (dataGridButtons.getOption('size') || 0) + anychart.ganttModule.DataGrid.DEFAULT_PADDING;
 
           var top = totalTop + ((height - anychart.ganttModule.DataGrid.DEFAULT_EXPAND_COLLAPSE_BUTTON_SIDE) / 2);
 
           var pixelShift = (acgraph.type() === acgraph.StageType.SVG) ? .5 : 0;
           button
               .enabled(true)
-              .cursor(/** @type {anychart.enums.Cursor} */ (this.buttonCursor()))
-              .collapsed(!!item.meta('collapsed'))
               .dataItemIndex(i)
               .parentBounds(this.pixelBoundsCache_)
               .position({
                 'x': Math.floor(this.pixelBoundsCache_.left + padding) + pixelShift,
                 'y': Math.floor(top) + pixelShift
-              });
+              })
+              .setState(!!item.meta('collapsed') ? anychart.SettingsState.COLLAPSED : anychart.SettingsState.EXPANDED);
 
           button.resumeSignalsDispatching(false);
           button.draw();
@@ -1641,17 +1721,6 @@ anychart.ganttModule.DataGrid.Column.prototype.draw = function() {
       this.markConsistent(anychart.ConsistencyState.DATA_GRID_COLUMN_TITLE);
     }
 
-    if (this.hasInvalidationState(anychart.ConsistencyState.DATA_GRID_COLUMN_BUTTON_CURSOR)) {
-      if (this.buttons_ && this.buttons_.length) {
-        for (i = 0; i < this.buttons_.length; i++) {
-          button = this.buttons_[i];
-          button.cursor(/** @type {anychart.enums.Cursor} */ (this.buttonCursor()));
-          if (button.enabled()) button.draw();
-        }
-      }
-      this.markConsistent(anychart.ConsistencyState.DATA_GRID_COLUMN_BUTTON_CURSOR);
-    }
-
     if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
       this.getBase_().zIndex(/** @type {number} */ (this.zIndex()));
       this.markConsistent(anychart.ConsistencyState.Z_INDEX);
@@ -1673,7 +1742,6 @@ anychart.ganttModule.DataGrid.Column.prototype.serialize = function() {
   json['depthPaddingMultiplier'] = this.depthPaddingMultiplier_;
   json['cellTextSettings'] = this.cellTextSettings().serialize();
   json['title'] = this.title_.serialize();
-  json['buttonCursor'] = this.buttonCursor_;
 
   if (this.format_ != this.defaultFormat_) {
     anychart.core.reporting.warning(
@@ -1704,7 +1772,6 @@ anychart.ganttModule.DataGrid.Column.prototype.setupByJSON = function(json, opt_
   this.collapseExpandButtons(json['collapseExpandButtons']);
   this.depthPaddingMultiplier(json['depthPaddingMultiplier']);
   this.cellTextSettings(json['cellTextSettings']);
-  this.buttonCursor(json['buttonCursor']);
 
   this.title(json['title']);
 
@@ -1879,6 +1946,9 @@ anychart.standalones.dataGrid = function() {
 
 
 //exports
+/**
+ * @suppress {deprecated}
+ */
 (function() {
   var proto = anychart.ganttModule.DataGrid.prototype;
 
@@ -1909,6 +1979,7 @@ anychart.standalones.dataGrid = function() {
   proto['editStructurePreviewFill'] = proto.editStructurePreviewFill;
   proto['editStructurePreviewStroke'] = proto.editStructurePreviewStroke;
   proto['editStructurePreviewDashStroke'] = proto.editStructurePreviewDashStroke;
+  proto['buttons'] = proto.buttons;
 
   proto = anychart.ganttModule.DataGrid.Column.prototype;
   proto['title'] = proto.title;
@@ -1934,4 +2005,5 @@ anychart.standalones.dataGrid = function() {
   proto['headerHeight'] = proto.headerHeight;
   proto['verticalScrollBar'] = proto.verticalScrollBar;
   proto['defaultRowHeight'] = proto.defaultRowHeight;
+  proto['buttons'] = proto.buttons;
 })();

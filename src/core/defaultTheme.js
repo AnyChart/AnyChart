@@ -1199,6 +1199,33 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'zIndex': 50
   },
 
+  'defaultButtonSettings': {
+    'padding': [3, 5],
+    'normal': {
+      'background': {
+        'enabled': true,
+        'stroke': '#dedede',
+        'fill': '#e7e7e7',
+        'corners': [0]
+      },
+      'text': 'Button',
+      'disablePointerEvents': true,
+      'selectable': false
+    },
+    'hovered': {
+      'background': {
+        'stroke': '#cecece',
+        'fill': '#eee'
+      }
+    },
+    'pushed': {
+      'background': {
+        'stroke': '#d0d0d0',
+        'fill': '#d9d9d9'
+      }
+    }
+  },
+
   'defaultNoDataLabel': {
     'padding': {},
     'disablePointerEvents': false,
@@ -2046,6 +2073,28 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'rowOddFill': '#fff',
     'rowEvenFill': '#fff',
     'rowFill': '#fff',
+
+    'buttons': {
+      'size': 15,
+      'padding': [0, 0, 0, 0],
+      'cursor': 'pointer',
+      'normal': {
+        'hAlign': 'center',
+        'vAlign': 'middle',
+        'fontColor': '#7c868e',
+        'fontSize': '10px'
+      },
+      'collapsed': {
+        'hAlign': 'center',
+        'vAlign': 'middle',
+        'text': '+'
+      },
+      'expanded': {
+        'hAlign': 'center',
+        'vAlign': 'middle',
+        'text': '-'
+      }
+    },
 
     'zIndex': 5,
     'editing': false,

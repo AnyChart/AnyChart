@@ -631,6 +631,7 @@ anychart.themes.merging.mergingMap_ = (function() {
         ['default', [
           'Title',
           'CrosshairLabel',
+          'ButtonSettings.normal',
           ['Tooltip', [
             '',
             '.contentInternal'
@@ -671,6 +672,7 @@ anychart.themes.merging.mergingMap_ = (function() {
         [[
           ['default', [
             'Title',
+            'ButtonSettings.normal',
             ['Tooltip', [
               '',
               '.contentInternal'
@@ -1055,6 +1057,12 @@ anychart.themes.merging.mergingMap_ = (function() {
       defaultObj: 'defaultNoDataLabel',
       targets: [
         [['chart', 'stock.defaultPlotSettings'], '.noDataLabel']
+      ]
+    },
+    {
+      defaultObj: 'defaultButtonSettings',
+      targets: [
+        'defaultDataGrid.buttons'
       ]
     },
     {

@@ -4993,6 +4993,18 @@
         "isChart": {"type": "boolean"}
       }
     },
+    "anychart.core.ui.NewButton": {
+      "type": "object",
+      "allOf": [{"$ref": "#/definitions/anychart.core.VisualBase"}],
+      "properties": {
+        "cursor": {"type": "string"},
+        "size": {"type": "number"}
+      }
+    },
+    "anychart.ganttModule.DataGridButton": {
+      "type": "object",
+      "allOf": [{"$ref": "#/definitions/anychart.core.ui.NewButton"}]
+    },
     "anychart.core.ui.DataGrid": {
       "type": "object",
       "allOf": [{"$ref": "#/definitions/anychart.core.VisualBase"}],
@@ -5020,7 +5032,8 @@
         "editStructurePreviewStroke": {"$ref": "#/definitions/stroke"},
         "editStructurePreviewDashStroke": {"$ref": "#/definitions/stroke"},
         "editing": {"type": "boolean"},
-        "horizontalScrollBar": {"$ref": "#/definitions/anychart.core.ui.ScrollBar"}
+        "horizontalScrollBar": {"$ref": "#/definitions/anychart.core.ui.ScrollBar"},
+        "buttons": {"$ref": "#/definitions/anychart.ganttModule.DataGridButton"}
       }
     },
     "anychart.core.ui.DataGrid.Column": {
@@ -6066,6 +6079,12 @@
           "type": [
             "string",
             "number"
+          ]
+        },
+        "background": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.Background"}
           ]
         }
       }

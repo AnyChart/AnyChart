@@ -2,6 +2,7 @@ goog.provide('anychart.core.StateSettings');
 goog.require('anychart.core.Base');
 goog.require('anychart.core.settings');
 goog.require('anychart.core.settings.IObjectWithSettings');
+goog.require('anychart.core.ui.Background');
 goog.require('anychart.core.ui.CircularLabelsFactory');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.MarkersFactory');
@@ -14,7 +15,7 @@ goog.require('anychart.core.utils.Connector');
  * Class representing state settings (normal, hovered, selected)
  * @param {anychart.core.settings.IObjectWithSettings} stateHolder State holder.
  * @param {!Object.<string, anychart.core.settings.PropertyDescriptorMeta>} descriptorsMeta Descriptors for state.
- * @param {anychart.PointState} stateType
+ * @param {anychart.PointState|anychart.SettingsState} stateType
  * @param {!Array.<Array>=} opt_descriptorsOverride
  * @constructor
  * @implements {anychart.core.settings.IResolvable}
@@ -34,7 +35,7 @@ anychart.core.StateSettings = function(stateHolder, descriptorsMeta, stateType, 
   this.descriptorsMeta = descriptorsMeta;
 
   /**
-   * @type {anychart.PointState}
+   * @type {anychart.PointState|anychart.SettingsState}
    */
   this.stateType = stateType;
 
@@ -109,6 +110,13 @@ anychart.core.StateSettings.CONNECTOR_AFTER_INIT_CALLBACK = 'connectorAfterInitC
 
 
 /**
+ * Option name for labels factory after init callback.
+ * @type {string}
+ */
+anychart.core.StateSettings.BACKGROUND_AFTER_INIT_CALLBACK = 'backgroundAfterInitCallback';
+
+
+/**
  * Option name for outline settings constructor.
  * @type {string}
  */
@@ -149,6 +157,16 @@ anychart.core.StateSettings.CIRCULAR_LABELS_CONSTRUCTOR = function() {
  */
 anychart.core.StateSettings.DEFAULT_MARKERS_CONSTRUCTOR = function() {
   return new anychart.core.ui.MarkersFactory();
+};
+
+
+/**
+ * Default outline settings constructor.
+ * @this {*}
+ * @return {anychart.core.ui.Outline}
+ */
+anychart.core.StateSettings.DEFAULT_OUTLINE_CONSTRUCTOR = function() {
+  return new anychart.core.ui.Outline();
 };
 
 
@@ -208,12 +226,12 @@ anychart.core.StateSettings.DEFAULT_CONNECTOR_AFTER_INIT_CALLBACK = function(con
 
 
 /**
- * Default outline settings constructor.
+ * Default background after init callback.
+ * @param {anychart.core.ui.Background} background
  * @this {*}
- * @return {anychart.core.ui.Outline}
  */
-anychart.core.StateSettings.DEFAULT_OUTLINE_CONSTRUCTOR = function() {
-  return new anychart.core.ui.Outline();
+anychart.core.StateSettings.DEFAULT_BACKGROUND_AFTER_INIT_CALLBACK = function(background) {
+  background.listenSignals(this.backgroundInvalidated_, this);
 };
 
 
@@ -364,6 +382,15 @@ anychart.core.StateSettings.prototype.addMeta = function(metas) {
   for (var i = 0; i < metas.length; i++) {
     anychart.core.settings.createDescriptorMeta.apply(null, goog.array.concat(this.descriptorsMeta, metas[i]));
   }
+};
+
+
+/**
+ *  Getter for state type.
+ *  @return {number}
+ */
+anychart.core.StateSettings.prototype.getState = function() {
+  return this.stateType;
 };
 
 
@@ -583,6 +610,26 @@ anychart.core.StateSettings.prototype.outline = function(opt_value) {
 };
 
 
+/**
+ * Background.
+ * @param {(Object|string|boolean|null)=} opt_value
+ * @return {anychart.core.StateSettings|anychart.core.ui.Background}
+ */
+anychart.core.StateSettings.prototype.background = function(opt_value) {
+  if (!this.background_) {
+    var afterInitCallback = /** @type {Function} */ (this.getOption(anychart.core.StateSettings.BACKGROUND_AFTER_INIT_CALLBACK)) || anychart.core.StateSettings.DEFAULT_BACKGROUND_AFTER_INIT_CALLBACK;
+    this.background_ = new anychart.core.ui.Background();
+    afterInitCallback.call(this.stateHolder, this.background_);
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.background_.setup(opt_value);
+    return this;
+  }
+  return this.background_;
+};
+
+
 //endregion
 //region --- State Fallbacks
 /**
@@ -657,6 +704,9 @@ anychart.core.StateSettings.prototype.serialize = function() {
   if (this.descriptorsMeta['outline'])
     json['outline'] = this.outline().serialize();
 
+  if (this.descriptorsMeta['background'])
+    json['background'] = this.background().serialize();
+
   return json;
 };
 
@@ -724,6 +774,11 @@ anychart.core.StateSettings.prototype.setupByJSON = function(config, opt_default
     // this.setEnabledTrue(config['outline']);
     this.outline().setupInternal(!!opt_default, config['outline']);
   }
+
+  if (goog.isDef(this.descriptorsMeta['background'])) {
+    this.background().setupInternal(!!opt_default, config['background']);
+    this.background().markConsistent(anychart.ConsistencyState.ALL);
+  }
 };
 
 
@@ -738,7 +793,8 @@ anychart.core.StateSettings.prototype.disposeInternal = function() {
       this.markers_,
       this.outlierMarkers_,
       this.outline_,
-      this.connector_
+      this.connector_,
+      this.background_
   );
   delete this.connector_;
   anychart.core.StateSettings.base(this, 'disposeInternal');
