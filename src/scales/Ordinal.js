@@ -413,12 +413,6 @@ anychart.scales.Ordinal.prototype.needsAutoCalc = function() {
 
 
 /** @inheritDoc */
-anychart.scales.Ordinal.prototype.getCategorisation = function() {
-  return this.values_;
-};
-
-
-/** @inheritDoc */
 anychart.scales.Ordinal.prototype.getPointWidthRatio = function() {
   return 1 / this.values_.length * this.getZoomFactor();
 };

@@ -70,17 +70,8 @@ anychart.colorScalesModule.Ordinal.prototype.getType = function() {
 
 
 /** @inheritDoc */
-anychart.colorScalesModule.Ordinal.prototype.inverted = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = !!opt_value;
-    if (this.isInverted != opt_value) {
-      this.isInverted = opt_value;
-      this.resetDataRange();
-      this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
-    }
-    return this;
-  }
-  return this.isInverted;
+anychart.colorScalesModule.Ordinal.prototype.inversionOrZoomChanged = function() {
+  this.resetDataRange();
 };
 
 
@@ -667,7 +658,6 @@ anychart.colorScalesModule.Ordinal.prototype.setupByJSON = function(config, opt_
   proto['ranges'] = proto.ranges;
   proto['names'] = proto.names;
   proto['ticks'] = proto.ticks;
-  proto['inverted'] = proto.inverted;
   proto['getRangeByValue'] = proto.getRangeByValue;
   proto['getProcessedRanges'] = proto.getProcessedRanges;
   proto['valueToColor'] = proto.valueToColor;

@@ -667,50 +667,7 @@ anychart.format.parseDateTime = function(value, opt_format, opt_baseDate, opt_lo
       return new Date(value);
     }
   } else if (goog.isString(value)) {
-    var format = (goog.isDef(opt_format) ? opt_format : anychart.format.inputDateTimeFormat_) || null;
-    if (format) {
-      var locale = anychart.format.getDateTimeLocale(opt_locale) ||
-          anychart.format.getDateTimeLocale(anychart.format.inputLocale_) ||
-          anychart.format.getDateTimeLocale('default');
-      var localeHash = goog.getUid(locale);
-      var parserCacheKey = format + localeHash;
-      /** @type {goog.i18n.DateTimeParse} */
-      var parser;
-      if (!(parserCacheKey in anychart.format.parseDateTimeCache_)) {
-        var symbols = anychart.format.localeToDateTimeSymbols_(locale);
-        anychart.format.parseDateTimeCache_[parserCacheKey] = new goog.i18n.DateTimeParse(format, symbols);
-      }
-      parser = anychart.format.parseDateTimeCache_[parserCacheKey];
-
-      var date = goog.isDateLike(opt_baseDate) ? /** @type {Date} */ (opt_baseDate) : anychart.format.inputBaseDate();
-
-      var hasNoTZInFormat = (format.replace(/'.+?'/g, '').search(/z+/i) == -1);
-      if (hasNoTZInFormat) {
-        date.setTime(date.getTime() + date.getTimezoneOffset() * 60000);
-      }
-
-      var valueLength = value.length;
-      var resultLength = parser.parse(value, date);
-
-      if (valueLength == resultLength) {//parsing successful.
-        if (hasNoTZInFormat) {
-          date.setTime(date.getTime() - date.getTimezoneOffset() * 60000);
-        }
-        return /** @type {Date} */ (date);
-      } else {
-        // anychart.core.reporting.warning(anychart.enums.WarningCode.PARSE_DATETIME, void 0, [value, resultLength], true);
-        return null;
-      }
-    } else { //falling back to anychart.utils.normalizeTimestamp -like behaviour
-      var numValue = +value;
-      var newDate = new Date(isNaN(numValue) ? value : numValue);
-      if (isNaN(newDate.getTime())) { //Got string not in ISO8601 format.
-        // anychart.core.reporting.warning(anychart.enums.WarningCode.PARSE_DATETIME, void 0, [value]);
-        return null; // Parsing error.
-      } else {
-        return newDate;
-      }
-    }
+    return anychart.format.parseDateTimeStr_(value, opt_format, opt_baseDate, opt_locale);
   } else {
     // anychart.core.reporting.warning(anychart.enums.WarningCode.PARSE_DATETIME, void 0, [value]);
     return null;
@@ -1057,6 +1014,87 @@ anychart.format.number = function(number, opt_decimalsCountOrLocale, opt_decimal
 };
 
 
+
+
+//endregion
+//region --- Utility
+//------------------------------------------------------------------------------
+//
+//  Utility
+//
+//------------------------------------------------------------------------------
+/**
+ * Parses input value to date.
+ * @param {string} value - Input value.
+ * @param {?string=} opt_format - Format to be parsed. If is undefined, anychart.format.inputDateTimeFormat will be used.
+ * @param {?Date=} opt_baseDate - Date object to hold the parsed date. Used for case if input value doesn't contain
+ *  information about year or month or something like that. If parsing process ends successfully, this object will
+ *  contain totally the same values of date time units as return value.
+ *  NOTE: If is not Date, Date.UTC(currentYear, currentMoth) will be used.
+ * @param {?(string|anychart.format.Locale)=} opt_locale - Locale to be used. If not set, anychart.format.inputLocale will
+ *  be used.
+ * @return {?Date} - Parsed date or null if got wrong input value.
+ * @private
+ */
+anychart.format.parseDateTimeStr_ = function(value, opt_format, opt_baseDate, opt_locale) {
+  var format = (goog.isDef(opt_format) ? opt_format : anychart.format.inputDateTimeFormat_) || null;
+  if (format) {
+    var locale = anychart.format.getDateTimeLocale(opt_locale) ||
+        anychart.format.getDateTimeLocale(anychart.format.inputLocale_) ||
+        anychart.format.getDateTimeLocale('default');
+    var localeHash = goog.getUid(locale);
+    var parserCacheKey = format + localeHash;
+    /** @type {goog.i18n.DateTimeParse} */
+    var parser;
+    if (!(parserCacheKey in anychart.format.parseDateTimeCache_)) {
+      var symbols = anychart.format.localeToDateTimeSymbols_(locale);
+      anychart.format.parseDateTimeCache_[parserCacheKey] = new goog.i18n.DateTimeParse(format, symbols);
+    }
+    parser = anychart.format.parseDateTimeCache_[parserCacheKey];
+
+    var date = goog.isDateLike(opt_baseDate) ? /** @type {Date} */ (opt_baseDate) : anychart.format.inputBaseDate();
+
+    var hasNoTZInFormat = (format.replace(/'.+?'/g, '').search(/z+/i) == -1);
+    if (hasNoTZInFormat) {
+      date.setTime(date.getTime() + date.getTimezoneOffset() * 60000);
+    }
+
+    var valueLength = value.length;
+    var resultLength = parser.parse(value, date);
+
+    if (valueLength == resultLength) {//parsing successful.
+      if (hasNoTZInFormat) {
+        date.setTime(date.getTime() - date.getTimezoneOffset() * 60000);
+      }
+      return /** @type {Date} */ (date);
+    } else {
+      // anychart.core.reporting.warning(anychart.enums.WarningCode.PARSE_DATETIME, void 0, [value, resultLength], true);
+      return null;
+    }
+  } else { //falling back to anychart.utils.normalizeTimestamp -like behaviour
+    var numValue = Number(value);
+    var newDate = new Date(isNaN(numValue) ? value : numValue);
+    if (isNaN(newDate.getTime())) { //Got string not in ISO8601 format.
+      // anychart.core.reporting.warning(anychart.enums.WarningCode.PARSE_DATETIME, void 0, [value]);
+      return null; // Parsing error.
+    } else {
+      return newDate;
+    }
+  }
+};
+
+
+/**
+ * Parses passed val with anychart.format.parseDateTime and returns the result as a number, not a Date object.
+ * @param {*} val
+ * @return {number}
+ */
+anychart.format.toTimestamp = function(val) {
+  if (goog.isString(val)) {
+    val = anychart.format.parseDateTimeStr_(val);
+  }
+  return Number(val);
+};
 
 
 //endregion

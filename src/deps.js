@@ -112,7 +112,7 @@ goog.addDependency('../../../../src/circularGauge/pointers/Knob.js', ['anychart.
 goog.addDependency('../../../../src/circularGauge/pointers/Marker.js', ['anychart.circularGaugeModule.pointers.Marker'], ['acgraph', 'anychart.circularGaugeModule.pointers.Base', 'anychart.core.reporting', 'anychart.core.ui.MarkersFactory', 'anychart.enums', 'anychart.utils'], false);
 goog.addDependency('../../../../src/circularGauge/pointers/Needle.js', ['anychart.circularGaugeModule.pointers.Needle'], ['acgraph', 'anychart.circularGaugeModule.pointers.Base', 'anychart.utils'], false);
 goog.addDependency('../../../../src/color.js', ['anychart.color'], ['acgraph', 'goog.color', 'goog.math'], false);
-goog.addDependency('../../../../src/colorScales/Linear.js', ['anychart.colorScalesModule.Linear'], ['anychart.enums', 'anychart.scales.ScatterBase', 'anychart.scales.ScatterTicks'], false);
+goog.addDependency('../../../../src/colorScales/Linear.js', ['anychart.colorScalesModule.Linear'], ['anychart.enums', 'anychart.scales.Continuous', 'anychart.scales.ScatterBase', 'anychart.scales.ScatterTicks'], false);
 goog.addDependency('../../../../src/colorScales/Ordinal.js', ['anychart.colorScalesModule.Ordinal'], ['anychart.colorScalesModule.OrdinalTicks', 'anychart.scales.Base'], false);
 goog.addDependency('../../../../src/colorScales/OrdinalTicks.js', ['anychart.colorScalesModule.OrdinalTicks'], ['anychart.scales.OrdinalTicks'], false);
 goog.addDependency('../../../../src/colorScales/colorScales.module.js', ['anychart.colorScalesModule', 'anychart.colorScalesModule.entry'], ['anychart.colorScalesModule.Linear', 'anychart.colorScalesModule.Ordinal', 'anychart.colorScalesModule.ui.ColorRange'], false);
@@ -409,15 +409,16 @@ goog.addDependency('../../../../src/resource/resourcelist/SettingsWithMargin.js'
 goog.addDependency('../../../../src/resource/resourcelist/TagsSettings.js', ['anychart.resourceModule.resourceList.TagsSettings'], ['anychart.core.ui.Background', 'anychart.core.utils.Padding', 'anychart.resourceModule.resourceList.TextSettings'], false);
 goog.addDependency('../../../../src/resource/resourcelist/TextSettings.js', ['anychart.resourceModule.resourceList.TextSettings'], ['anychart.core.settings', 'anychart.resourceModule.resourceList.SettingsWithMargin'], false);
 goog.addDependency('../../../../src/scales/Base.js', ['anychart.scales.Base'], ['anychart.core.Base', 'anychart.enums', 'anychart.scales.IXScale'], false);
-goog.addDependency('../../../../src/scales/DateTime.js', ['anychart.scales.DateTime'], ['anychart.enums', 'anychart.scales.DateTimeTicks', 'anychart.scales.ScatterBase'], false);
+goog.addDependency('../../../../src/scales/Continuous.js', ['anychart.scales.Continuous'], ['anychart.format', 'anychart.math', 'anychart.utils', 'goog.array'], false);
+goog.addDependency('../../../../src/scales/DateTime.js', ['anychart.scales.DateTime'], ['anychart.enums', 'anychart.scales.Continuous', 'anychart.scales.DateTimeTicks', 'anychart.scales.ScatterBase'], false);
 goog.addDependency('../../../../src/scales/DateTimeTicks.js', ['anychart.scales.DateTimeTicks'], ['anychart.core.Base', 'goog.array', 'goog.date.Interval', 'goog.date.UtcDateTime'], false);
 goog.addDependency('../../../../src/scales/IScale.js', ['anychart.scales.IGeoScale'], [], false);
 goog.addDependency('../../../../src/scales/IXScale.js', ['anychart.scales.IXScale'], [], false);
 goog.addDependency('../../../../src/scales/Linear.js', ['anychart.scales.Linear'], ['anychart.enums', 'anychart.scales.ScatterBase', 'anychart.scales.ScatterTicks'], false);
-goog.addDependency('../../../../src/scales/Logarithmic.js', ['anychart.scales.Logarithmic'], ['anychart.enums', 'anychart.math', 'anychart.scales.Linear'], false);
+goog.addDependency('../../../../src/scales/Logarithmic.js', ['anychart.scales.Logarithmic'], ['anychart.enums', 'anychart.math', 'anychart.scales.Continuous', 'anychart.scales.Linear'], false);
 goog.addDependency('../../../../src/scales/Ordinal.js', ['anychart.scales.Ordinal'], ['anychart.enums', 'anychart.scales.Base', 'anychart.scales.OrdinalTicks', 'goog.array'], false);
 goog.addDependency('../../../../src/scales/OrdinalTicks.js', ['anychart.scales.OrdinalTicks'], ['anychart.core.Base', 'goog.array'], false);
-goog.addDependency('../../../../src/scales/ScatterBase.js', ['anychart.scales.ScatterBase'], ['anychart.scales.Base'], false);
+goog.addDependency('../../../../src/scales/ScatterBase.js', ['anychart.scales.ScatterBase'], ['anychart.scales.Base', 'anychart.scales.Continuous'], false);
 goog.addDependency('../../../../src/scales/ScatterTicks.js', ['anychart.scales.ScatterTicks'], ['anychart.core.Base', 'anychart.enums', 'goog.array'], false);
 goog.addDependency('../../../../src/scales/scales.js', ['anychart.scales'], ['anychart.scales.DateTime', 'anychart.scales.Linear', 'anychart.scales.Logarithmic', 'anychart.scales.Ordinal'], false);
 goog.addDependency('../../../../src/scatter/Chart.js', ['anychart.scatterModule.Chart'], ['anychart', 'anychart.core.ChartWithAxes', 'anychart.core.series.Cartesian', 'anychart.enums'], false);

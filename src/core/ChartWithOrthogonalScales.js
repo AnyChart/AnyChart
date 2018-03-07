@@ -1036,7 +1036,8 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateYScales = function() 
                 var sum;
                 if (val >= 0) {
                   sum = stackVal.positive;
-                  this.extendYScaleRange(yScale, 100);
+                  if (val)
+                    this.extendYScaleRange(yScale, 100);
                 } else {
                   sum = -stackVal.negative;
                   this.extendYScaleRange(yScale, -100);

@@ -250,13 +250,29 @@ anychart.scales.ScatterTicks.prototype.mode = function(opt_value) {
  * @param {boolean=} opt_canModifyMin If the minimum can be modified.
  * @param {boolean=} opt_canModifyMax If the maximum can be modified.
  * @param {number=} opt_logBase Log base value for logarithmic scales. Defaults to 10.
- * @return {!Array} Array of two values: [newMin, newMax].
+ * @param {number=} opt_borderLog Log of non-linear border value for logarithmic scales. Defaults to 0.
+ * @return {Array} Array of two values: [newMin, newMax].
  */
-anychart.scales.ScatterTicks.prototype.setupAsMajor = function(min, max, opt_canModifyMin, opt_canModifyMax, opt_logBase) {
-  if (this.mode_ == anychart.enums.ScatterTicksMode.LOGARITHMIC)
-    return this.setupLogarithmic_(min, max, opt_logBase || 10, opt_canModifyMin, opt_canModifyMax);
-  else
-    return this.setupLinear_(min, max, opt_canModifyMin, opt_canModifyMax);
+anychart.scales.ScatterTicks.prototype.setupAsMajor = function(min, max, opt_canModifyMin, opt_canModifyMax, opt_logBase, opt_borderLog) {
+  var result;
+  if (this.explicit_) {
+    this.autoTicks_ = null;
+    result = [min, max];
+    if (opt_canModifyMin)
+      result[0] = Math.min(min, this.explicit_[0] || 0);
+    if (opt_canModifyMax)
+      result[1] = Math.max(max, this.explicit_[this.explicit_.length - 1] || 0);
+  } else {
+    var tmp;
+    if (this.mode_ == anychart.enums.ScatterTicksMode.LOGARITHMIC) {
+      tmp = this.setupLogarithmic_(min, max, opt_logBase || 10, opt_borderLog || 0, !!opt_canModifyMin, !!opt_canModifyMax);
+    } else {
+      tmp = this.setupLinear_(min, max, !!opt_canModifyMin, !!opt_canModifyMax, true, this.base_);
+    }
+    this.autoTicks_ = tmp.ticks;
+    result = tmp.result;
+  }
+  return result;
 };
 
 
@@ -274,8 +290,9 @@ anychart.scales.ScatterTicks.prototype.setupAsMajor = function(min, max, opt_can
  *    when maximum doesn't contain interval. We need to know the value that major interval calculator desired to be the
  *    maximum in that case, to correctly calculate the interval on the part from last aligned tick (which is
  *    values[values.length - 2] in that case) and the explicit maximum (which is the last value in values).
+ * @param {number=} opt_borderLog
  */
-anychart.scales.ScatterTicks.prototype.setupAsMinor = function(values, opt_logBase, opt_majorDesiredMin, opt_majorDesiredMax) {
+anychart.scales.ScatterTicks.prototype.setupAsMinor = function(values, opt_logBase, opt_majorDesiredMin, opt_majorDesiredMax, opt_borderLog) {
   if (this.explicit_) {
     this.autoTicks_ = null;
   } else {
@@ -310,7 +327,7 @@ anychart.scales.ScatterTicks.prototype.setupAsMinor = function(values, opt_logBa
     if (goog.isDef(opt_majorDesiredMin)) {
       min = values[0];
       max = values[1];
-      adder.call(this, min, max, opt_majorDesiredMin, max, opt_logBase);
+      adder.call(this, min, max, opt_majorDesiredMin, max, this.minCount_, opt_logBase, opt_borderLog || 0);
       start = 1;
     } else
       start = 0;
@@ -319,12 +336,12 @@ anychart.scales.ScatterTicks.prototype.setupAsMinor = function(values, opt_logBa
     for (var i = start; i <= end - 1; i++) {
       min = values[i];
       max = values[i + 1];
-      adder.call(this, min, max, min, max, opt_logBase);
+      adder.call(this, min, max, min, max, this.minCount_, opt_logBase, opt_borderLog || 0);
     }
     if (goog.isDef(opt_majorDesiredMax)) {
       min = values[end];
       max = values[end + 1];
-      adder.call(this, min, max, min, opt_majorDesiredMax, opt_logBase);
+      adder.call(this, min, max, min, opt_majorDesiredMax, this.minCount_, opt_logBase, opt_borderLog || 0);
     }
     this.interval_ = backupInterval;
     this.minCount_ = backupMinCount;
@@ -337,232 +354,177 @@ anychart.scales.ScatterTicks.prototype.setupAsMinor = function(values, opt_logBa
  * min and max values for the scale to adjust.
  * @param {number} min Minimum.
  * @param {number} max Maximum.
- * @param {boolean=} opt_canModifyMin If the minimum can be modified.
- * @param {boolean=} opt_canModifyMax If the maximum can be modified.
- * @return {!Array} Array of two to four values: [newMin, newMax, opt_desiredMin, opt_desiredMax]. Desired values can
- *    be absent.
- * @private
- */
-anychart.scales.ScatterTicks.prototype.setupLinear_ = function(min, max, opt_canModifyMin, opt_canModifyMax) {
-  this.autoTicks_ = null;
-  var result = [min, max];
-  if (this.explicit_) {
-    if (opt_canModifyMin)
-      result[0] = Math.min(min, this.explicit_[0] || 0);
-    if (opt_canModifyMax)
-      result[1] = Math.max(max, this.explicit_[this.explicit_.length - 1] || 0);
-  } else {
-    var ticks = [];
-    var interval = this.interval_;
-    var minCount = this.minCount_;
-    var maxCount = this.maxCount_;
-    if (!isNaN(interval) && ((max - min) / interval) > /** @type {number} */(this.scale_.maxTicksCount())) {
-      anychart.core.reporting.warning(anychart.enums.WarningCode.TOO_MANY_TICKS, null, [max - min, interval]);
-      interval = NaN;
-      minCount = 4;
-      maxCount = 6;
-    }
-    if (isNaN(interval)) {
-      var currentInterval = NaN, currentDiff = NaN;
-      for (var q = minCount; q <= maxCount; q++) {
-        var count = q - 1; // it should be valid here
-        var range = max - min;
-        currentInterval = anychart.math.specialRound(range / count);
-        //console.log(currentInterval);
-        // Here we can add other interval rounding options and choose the best
-        // For example, with fractional values powers of 2 give better result because they divide interval in 2, 4, 8,
-        // with big values: powers of 10 work better, and so long.
-        var log = Math.log(currentInterval);
-        var val1 = Math.pow(10, Math.floor(log * Math.LOG10E));
-        var val2 = Math.pow(10, Math.ceil(log * Math.LOG10E));
-        var val3 = (currentInterval < val1 + val1) ? val1 / 2 : Number.POSITIVE_INFINITY;
-        log = anychart.math.log(currentInterval / val2, 2);
-        var val5 = Math.pow(2, Math.floor(log)) * val2;
-        var val6 = Math.pow(2, Math.ceil(log)) * val2;
-
-        var alignedRight1 = anychart.utils.alignRight(currentInterval, val1) || Infinity;
-        var alignedRight2 = anychart.utils.alignRight(currentInterval, val2) || Infinity;
-        var alignedRight3 = anychart.utils.alignRight(currentInterval, val3) || Infinity;
-        var alignedRight5 = anychart.utils.alignRight(currentInterval, val5) || Infinity;
-        var alignedRight6 = anychart.utils.alignRight(currentInterval, val6) || Infinity;
-
-        var alignedMin = Math.min(alignedRight1, alignedRight2, alignedRight3, alignedRight5, alignedRight6);
-
-        //Here we can't allow currentInterval to be zero and Infinity.
-        if (alignedMin && isFinite(alignedMin))
-          currentInterval = alignedMin;
-
-        var tmpDiff1 = anychart.math.specialRound(anychart.utils.alignLeft(min, currentInterval, this.base_)) - min;
-        tmpDiff1 *= tmpDiff1;
-        var tmpDiff2 = anychart.math.specialRound(anychart.utils.alignRight(max, currentInterval, this.base_)) - max;
-        tmpDiff2 *= tmpDiff2;
-        var tmpDiff = tmpDiff1 + tmpDiff2;
-
-        if (isNaN(currentDiff) || tmpDiff < currentDiff) {
-          currentDiff = tmpDiff;
-          interval = currentInterval;
-        }
-      }
-    }
-
-    var precision = anychart.math.getPrecision(interval);
-    var desiredMin = anychart.math.specialRound(anychart.utils.alignLeft(min, interval, this.base_, precision), precision);
-    if (opt_canModifyMin)
-      result[0] = min = desiredMin;
-    else if (min - desiredMin > 1e-7) {
-      ticks.push(min);
-      result[2] = desiredMin;
-    }
-    var desiredMax = anychart.math.specialRound(anychart.utils.alignRight(max, interval, this.base_, precision), precision);
-    if (opt_canModifyMax)
-      result[1] = max = desiredMax;
-    else if (desiredMax - max > 1e-7) {
-      result[3] = desiredMax;
-    }
-
-    for (var j = anychart.math.specialRound(anychart.utils.alignRight(min, interval, this.base_, precision), precision);
-         j <= max;
-         j = anychart.math.specialRound(j + interval, precision)) {
-      ticks.push(j);
-    }
-
-    if (3 in result)
-      ticks.push(max);
-    this.autoTicks_ = ticks;
-  }
-  return result;
-};
-
-
-/**
- * Calculates ticks sequence and adjusts passed min and max to fit to it better if allowed. Returns an array of new
- * min and max values for the scale to adjust.
- * @param {number} min Minimum.
- * @param {number} max Maximum.
  * @param {number} logBase Log base value.
- * @param {boolean=} opt_canModifyMin If the minimum can be modified.
- * @param {boolean=} opt_canModifyMax If the maximum can be modified.
- * @return {!Array} Array of two values: [newMin, newMax].
+ * @param {number} borderLog
+ * @param {boolean} canModifyMin If the minimum can be modified.
+ * @param {boolean} canModifyMax If the maximum can be modified.
+ * @return {{ticks: Array.<number>, result: Array.<number>}}
  * @private
  */
-anychart.scales.ScatterTicks.prototype.setupLogarithmic_ = function(min, max, logBase, opt_canModifyMin, opt_canModifyMax) {
-  this.autoTicks_ = null;
-  var result = [min, max];
-  if (this.explicit_) {
-    if (opt_canModifyMin)
-      result[0] = Math.min(min, this.explicit_[0] || 0);
-    if (opt_canModifyMax)
-      result[1] = Math.max(max, this.explicit_[this.explicit_.length - 1] || 0);
+anychart.scales.ScatterTicks.prototype.setupLogarithmic_ = function(min, max, logBase, borderLog, canModifyMin, canModifyMax) {
+  var minLog = anychart.math.log(Math.abs(min), logBase);
+  var maxLog = anychart.math.log(Math.abs(max), logBase);
+  var minMaxProd = min * max;
+  var result;
+  var pow = function(x) {
+    return anychart.math.pow(logBase, x);
+  };
+  var negatePow = function(x) {
+    return -pow(x);
+  };
+  var func = function(x) {
+    return (x < 0) ?
+        -pow(-x + borderLog - 1) :
+        (x ?
+            pow(x + borderLog - 1) :
+            0);
+  };
+  var reverse = false;
+  if (minMaxProd > 0) {
+    if (min > 0) {
+      result = this.setupLinear_(minLog, maxLog, canModifyMin, canModifyMax);
+      func = pow;
+      borderLog = result.result[0];
+    } else {
+      result = this.setupLinear_(maxLog, minLog, canModifyMin, canModifyMax);
+      func = negatePow;
+      reverse = true;
+      borderLog = result.result[1];
+    }
+  } else if (minMaxProd < 0) {
+    maxLog -= borderLog - 1;
+    minLog -= borderLog - 1;
+    result = this.setupLinear_(-minLog, maxLog, canModifyMin, canModifyMax);
   } else {
-    min = anychart.math.log(min, logBase);
-    max = anychart.math.log(max, logBase);
-    var ticks = [];
-    var interval = this.interval_;
-    var minCount = this.minCount_;
-    var maxCount = this.maxCount_;
-    if (!isNaN(interval) && ((max - min) / interval) > /** @type {number} */(this.scale_.maxTicksCount())) {
-      anychart.core.reporting.warning(anychart.enums.WarningCode.TOO_MANY_TICKS, null, [max - min, interval]);
-      interval = NaN;
-      minCount = 4;
-      maxCount = 6;
+    // min max interval touches zero with either side
+    if (max) {
+      maxLog -= borderLog - 1;
+      result = this.setupLinear_(0, maxLog, canModifyMin, canModifyMax);
+    } else {
+      minLog -= borderLog - 1;
+      result = this.setupLinear_(-minLog, 0, canModifyMin, canModifyMax);
     }
-    if (isNaN(interval)) {
-      var currentInterval = NaN, currentDiff = NaN;
-      for (var q = minCount; q <= maxCount; q++) {
-        // calculating the interval here
-        var count = q - 1; // it should be valid here
-        var range = max - min;
-        currentInterval = anychart.math.specialRound(range / count);
-        // Here we can add other interval rounding options and choose the best
-        // All interval aligners are rounded, because we cannot show pretty intervals with non-round powers of logBase
-        // Because of that, this algorithm produces from 2 to count+1 ticks here:(
-        var log = Math.log(currentInterval);
-        var val1 = Math.ceil(Math.pow(10, Math.floor(log * Math.LOG10E)));
-        var val2 = Math.ceil(Math.pow(10, Math.ceil(log * Math.LOG10E)));
-        var val3 = Math.ceil(Math.pow(2, Math.floor(log * Math.LOG2E)));
-        var val4 = Math.ceil(Math.pow(2, Math.ceil(log * Math.LOG2E)));
-        var val5 = Math.ceil(val1 / 2);
-        var val6 = Math.ceil(val1 / 4);
-        var val7 = Math.ceil(val1 / 8);
-
-        var alignedVal1 = anychart.utils.alignRight(currentInterval, val1) || Infinity;
-        var alignedVal2 = anychart.utils.alignRight(currentInterval, val2) || Infinity;
-        var alignedVal3 = anychart.utils.alignRight(currentInterval, val3) || Infinity;
-        var alignedVal4 = anychart.utils.alignRight(currentInterval, val4) || Infinity;
-        var alignedVal5 = anychart.utils.alignRight(currentInterval, val5) || Infinity;
-        var alignedVal6 = anychart.utils.alignRight(currentInterval, val6) || Infinity;
-        var alignedVal7 = anychart.utils.alignRight(currentInterval, val7) || Infinity;
-
-        var alignedMin = Math.min(alignedVal1, alignedVal2, alignedVal3, alignedVal4, alignedVal5, alignedVal6, alignedVal7);
-
-        //Here we can't allow currentInterval to be zero and Infinity.
-        if (alignedMin && isFinite(alignedMin))
-          currentInterval = alignedMin;
-
-        var tmpDiff1 = anychart.math.specialRound(anychart.utils.alignLeft(min, currentInterval, this.base_)) - min;
-        tmpDiff1 *= tmpDiff1;
-        var tmpDiff2 = anychart.math.specialRound(anychart.utils.alignRight(max, currentInterval, this.base_)) - max;
-        tmpDiff2 *= tmpDiff2;
-        var tmpDiff = tmpDiff1 + tmpDiff2;
-        if (isNaN(currentDiff) || tmpDiff < currentDiff) {
-          currentDiff = tmpDiff;
-          interval = currentInterval;
-        }
-      }
-    }
-
-    var precision = anychart.math.getPrecision(interval);
-    var desiredMin = anychart.math.specialRound(anychart.utils.alignLeft(min, interval, this.base_, precision));
-    if (opt_canModifyMin) {
-      min = desiredMin;
-      result[0] = anychart.math.pow(logBase, desiredMin);
-    } else if (min - desiredMin > 1e-7) {
-      ticks.push(anychart.math.pow(logBase, min));
-      result[2] = anychart.math.pow(logBase, desiredMin);
-    }
-    var desiredMax = anychart.math.specialRound(anychart.utils.alignRight(max, interval, this.base_, precision));
-    if (opt_canModifyMax) {
-      max = desiredMax;
-      result[1] = anychart.math.pow(logBase, desiredMax);
-    } else if (desiredMax - max > 1e-7) {
-      result[3] = anychart.math.pow(logBase, desiredMax);
-    }
-    for (var j = anychart.math.specialRound(anychart.utils.alignRight(min, interval, this.base_, precision));
-         j <= max;
-         j = anychart.math.specialRound(j + interval)) {
-      ticks.push(anychart.math.pow(logBase, j));
-    }
-    if (3 in result)
-      ticks.push(anychart.math.pow(logBase, max));
-    this.autoTicks_ = ticks;
   }
+  result.ticks = goog.array.map(result.ticks, func);
+  result.result = goog.array.map(result.result, func);
+  if (reverse) {
+    result.ticks.reverse();
+    var tmp = result.result[0];
+    result.result[0] = result.result[1];
+    result.result[1] = tmp;
+    tmp = result.result[2];
+    result.result[2] = result.result[3];
+    result.result[3] = tmp;
+  }
+  result.result[4] = borderLog;
   return result;
 };
 
 
 /**
- * Adds a portion of ticks to this.autoTicks_. Just an optimisation.
- * @param {number} min Min of range where ticks should be placed.
- * @param {number} max Max of range where ticks should be placed.
- * @param {number} rangeMin Min for interval calculation.
- * @param {number} rangeMax Max for interval calculation.
+ * @param {number} min
+ * @param {number} max
+ * @param {boolean} canModifyMin
+ * @param {boolean} canModifyMax
+ * @param {boolean=} opt_allowFractionalTicks
+ * @param {number=} opt_base
+ * @return {{ticks: Array.<number>, result: Array.<number>}}
  * @private
  */
-anychart.scales.ScatterTicks.prototype.addMinorLinearTicksPortion_ = function(min, max, rangeMin, rangeMax) {
+anychart.scales.ScatterTicks.prototype.setupLinear_ = function(min, max, canModifyMin, canModifyMax, opt_allowFractionalTicks, opt_base) {
+  opt_base = opt_base || 0;
   var interval = this.interval_;
+  var minCount = this.minCount_;
+  var maxCount = this.maxCount_;
+  var range = max - min;
+  if (!isNaN(interval) && (range / interval) > /** @type {number} */(this.scale_.maxTicksCount())) {
+    anychart.core.reporting.warning(anychart.enums.WarningCode.TOO_MANY_TICKS, null, [range, interval]);
+    interval = NaN;
+    minCount = 4;
+    maxCount = 6;
+  }
   if (isNaN(interval)) {
-    var range = rangeMax - rangeMin;
-    interval = range / (this.minCount_ - 1);
+    var currentInterval = NaN,
+        currentDiff = NaN;
+    for (var q = minCount; q <= maxCount; q++) {
+      var count = q - 1; // it should be valid here
+      currentInterval = anychart.math.specialRound(range / count);
+      //console.log(currentInterval);
+      // Here we can add other interval rounding options and choose the best
+      // For example, with fractional values powers of 2 give better result because they divide interval in 2, 4, 8,
+      // with big values: powers of 10 work better, and so long.
+      var log = Math.log(currentInterval);
+      var floorPow10 = Math.pow(10, Math.floor(log * Math.LOG10E));
+      var ceilPow10 = Math.pow(10, Math.ceil(log * Math.LOG10E));
+      var log2 = anychart.math.log(currentInterval / ceilPow10, 2);
+      var intervals = [
+        floorPow10,
+        ceilPow10,
+        (currentInterval < floorPow10 + floorPow10) ? floorPow10 / 2 : Infinity,
+        Math.pow(2, Math.floor(log2)) * ceilPow10,
+        Math.pow(2, Math.ceil(log2)) * ceilPow10
+      ];
+
+      intervals = goog.array.map(intervals, function(x) {
+        return anychart.utils.alignRight(currentInterval, x) || Infinity;
+      });
+
+      if (!opt_allowFractionalTicks) {
+        intervals = goog.array.map(intervals, function(x) {
+          return (isFinite(x) && ~~x == x) ? x : Infinity;
+        });
+      }
+
+      var alignedMin = Math.min.apply(null, intervals);
+
+      //Here we can't allow currentInterval to be zero and Infinity.
+      if (alignedMin && isFinite(alignedMin)) {
+        currentInterval = alignedMin;
+      } else if (!opt_allowFractionalTicks) {
+        currentInterval = Math.round(currentInterval) || 1;
+      }
+
+      var tmpDiff1 = anychart.math.specialRound(anychart.utils.alignLeft(min, currentInterval, opt_base)) - min;
+      tmpDiff1 *= tmpDiff1;
+      var tmpDiff2 = anychart.math.specialRound(anychart.utils.alignRight(max, currentInterval, opt_base)) - max;
+      tmpDiff2 *= tmpDiff2;
+      var tmpDiff = tmpDiff1 + tmpDiff2;
+
+      if (isNaN(currentDiff) || tmpDiff < currentDiff) {
+        currentDiff = tmpDiff;
+        interval = currentInterval;
+      }
+    }
   }
-  interval = Math.max(interval, 1e-7);
-  /** @type {number|undefined} */
-  var lastVal = this.autoTicks_[this.autoTicks_.length - 1];
-  max = anychart.math.round(max, 7);
-  for (var i = anychart.math.round(min, 7); i <= max; i = anychart.math.round(i + interval, 7)) {
-    if (lastVal != i)
-      this.autoTicks_.push(i);
-    lastVal = i;
+
+  var result = [min, max];
+  var ticks = [];
+
+  var precision = anychart.math.getPrecision(interval);
+  var desiredMin = anychart.math.specialRound(anychart.utils.alignLeft(min, interval, opt_base, precision), precision);
+  if (canModifyMin)
+    result[0] = min = desiredMin;
+  else if (min - desiredMin > 1e-7) {
+    ticks.push(min);
+    result[2] = desiredMin;
   }
+  var desiredMax = anychart.math.specialRound(anychart.utils.alignRight(max, interval, opt_base, precision), precision);
+  if (canModifyMax)
+    result[1] = max = desiredMax;
+  else if (desiredMax - max > 1e-7) {
+    result[3] = desiredMax;
+  }
+
+  for (var j = anychart.math.specialRound(anychart.utils.alignRight(min, interval, opt_base, precision), precision);
+       j <= max;
+       j = anychart.math.specialRound(j + interval, precision)) {
+    ticks.push(j);
+  }
+
+  if (3 in result)
+    ticks.push(max);
+
+  return {ticks: ticks, result: result};
 };
 
 
@@ -572,28 +534,129 @@ anychart.scales.ScatterTicks.prototype.addMinorLinearTicksPortion_ = function(mi
  * @param {number} max Max of range where ticks should be placed.
  * @param {number} rangeMin Min for interval calculation.
  * @param {number} rangeMax Max for interval calculation.
+ * @param {number} count
  * @param {number} logBase
+ * @param {number} borderLog
  * @private
  */
-anychart.scales.ScatterTicks.prototype.addMinorLogarithmicTicksPortion_ = function(min, max, rangeMin, rangeMax, logBase) {
-  var interval = this.interval_;
-  min = anychart.math.log(min, logBase);
-  max = anychart.math.log(max, logBase);
-  rangeMin = anychart.math.log(rangeMin, logBase);
-  rangeMax = anychart.math.log(rangeMax, logBase);
-  if (isNaN(interval)) {
-    var range = rangeMax - rangeMin;
-    interval = range / (this.minCount_ - 1);
-  }
-  interval = Math.max(interval, 1e-7);
-  /** @type {number|undefined} */
-  var lastVal = this.autoTicks_[this.autoTicks_.length - 1];
+anychart.scales.ScatterTicks.prototype.addMinorLinearTicksPortion_ = function(min, max, rangeMin, rangeMax, count, logBase, borderLog) {
+  this.putLinearTicks_(
+      min,
+      max,
+      this.getLinearInterval_(rangeMin, rangeMax, count),
+      this.autoTicks_[this.autoTicks_.length - 1],
+      this.autoTicks_);
+};
+
+
+/**
+ * @param {number} min
+ * @param {number} max
+ * @param {number} interval
+ * @param {number} skipVal
+ * @param {Array.<number>=} opt_res
+ * @return {Array.<number>}
+ * @private
+ */
+anychart.scales.ScatterTicks.prototype.putLinearTicks_ = function(min, max, interval, skipVal, opt_res) {
+  var res = opt_res || [];
   max = anychart.math.round(max, 7);
   for (var i = anychart.math.round(min, 7); i <= max; i = anychart.math.round(i + interval, 7)) {
-    if (lastVal != i)
-      this.autoTicks_.push(anychart.math.pow(logBase, i));
-    lastVal = i;
+    if (skipVal != i)
+      res.push(i);
   }
+  return res;
+};
+
+
+/**
+ * @param {number} min
+ * @param {number} max
+ * @param {number} count
+ * @return {number}
+ * @private
+ */
+anychart.scales.ScatterTicks.prototype.getLinearInterval_ = function(min, max, count) {
+  var interval = this.interval_;
+  if (isNaN(interval)) {
+    var range = max - min;
+    interval = range / (count - 1);
+  }
+  return Math.max(interval, 1e-7);
+};
+
+
+/**
+ * Adds a portion of ticks to this.autoTicks_. Just an optimisation.
+ * @param {number} min Min of range where ticks should be placed.
+ * @param {number} max Max of range where ticks should be placed.
+ * @param {number} rangeMin Min for interval calculation.
+ * @param {number} rangeMax Max for interval calculation.
+ * @param {number} count
+ * @param {number} logBase
+ * @param {number} borderLog
+ * @private
+ */
+anychart.scales.ScatterTicks.prototype.addMinorLogarithmicTicksPortion_ = function(min, max, rangeMin, rangeMax, count, logBase, borderLog) {
+  var pow = function(x) {
+    return anychart.math.pow(logBase, x);
+  };
+  var negatePow = function(x) {
+    return -pow(x);
+  };
+  var func = function(x) {
+    return (x < 0) ?
+        -pow(-x + borderLog - 1) :
+        (x ?
+            pow(x + borderLog - 1) :
+            0);
+  };
+  var rangeMinLog = anychart.math.log(Math.abs(rangeMin), logBase);
+  var rangeMaxLog = anychart.math.log(Math.abs(rangeMax), logBase);
+  var minLog = anychart.math.log(Math.abs(min), logBase);
+  var maxLog = anychart.math.log(Math.abs(max), logBase);
+  var minMaxProd = rangeMin * rangeMax;
+
+  var result, interval;
+  var reverse = false;
+  if (minMaxProd > 0) {
+    if (min > 0) {
+      func = pow;
+    } else {
+      var tmp = rangeMaxLog;
+      rangeMaxLog = rangeMinLog;
+      rangeMinLog = tmp;
+      tmp = maxLog;
+      maxLog = minLog;
+      minLog = tmp;
+      func = negatePow;
+      reverse = true;
+    }
+  } else {
+    minLog = -(minLog - borderLog + 1);
+    maxLog -= borderLog - 1;
+    rangeMinLog = -(rangeMinLog - borderLog + 1);
+    rangeMaxLog -= borderLog - 1;
+    if (!minMaxProd) {
+      // min max interval touches zero with either side
+      if (max) {
+        rangeMinLog = 0;
+        minLog = 0;
+      } else {
+        rangeMaxLog = 0;
+        maxLog = 0;
+      }
+    }
+  }
+  interval = this.getLinearInterval_(rangeMinLog, rangeMaxLog, count);
+  result = this.putLinearTicks_(minLog, maxLog, interval, NaN);
+  result = goog.array.map(result, func);
+  if (reverse) {
+    result.reverse();
+  }
+  if (this.autoTicks_[this.autoTicks_.length - 1] == result[0])
+    result.shift();
+  this.autoTicks_ = goog.array.concat(this.autoTicks_, result);
 };
 
 

@@ -2,6 +2,7 @@ goog.provide('anychart.scales.Logarithmic');
 
 goog.require('anychart.enums');
 goog.require('anychart.math');
+goog.require('anychart.scales.Continuous');
 goog.require('anychart.scales.Linear');
 
 
@@ -43,66 +44,115 @@ anychart.scales.Logarithmic.prototype.getType = function() {
 
 
 /** @inheritDoc */
-anychart.scales.Logarithmic.prototype.transform = function(value, opt_subRangeRatio) {
-  this.calculate();
-  value = anychart.utils.toNumber(value);
-  var result = (anychart.math.log(value, this.logBaseVal) - this.transformedMin_) / this.range;
-  return this.applyZoomAndInverse(result);
-};
-
-
-/** @inheritDoc */
-anychart.scales.Logarithmic.prototype.inverseTransform = function(ratio) {
-  this.calculate();
-  ratio = this.reverseZoomAndInverse(ratio);
-  var x = (ratio * this.range + this.transformedMin_);
-  return anychart.math.pow(this.logBaseVal, x);
-};
-
-
-/** @inheritDoc */
-anychart.scales.Logarithmic.prototype.calculate = function() {
-  if (this.consistent) return;
-  anychart.scales.Logarithmic.base(this, 'calculate');
-  this.transformedMin_ = anychart.math.log(this.min, this.logBaseVal);
-  this.transformedMax_ = anychart.math.log(this.max, this.logBaseVal);
-  this.range = this.transformedMax_ - this.transformedMin_;
-};
-
-
-/** @inheritDoc */
-anychart.scales.Logarithmic.prototype.determineScaleMinMax = function() {
-  var logMax = anychart.math.log(this.dataRangeMax, this.logBaseVal);
-  var logMin = anychart.math.log(this.dataRangeMin, this.logBaseVal);
-  var range = logMax - logMin;
-  if (!range) {
-    this.dataRangeMin -= Math.E / 2;
-    this.dataRangeMax += Math.E / 2;
-    range = 1;
-  }
-  if (this.minimumModeAuto) {
-    this.transformedMin_ = logMin - range * this.minimumRangeBasedGap;
-    if (!isNaN(this.softMin)) {
-      var softMin = anychart.math.log(this.softMin, this.logBaseVal);
-      if (range > 0)
-        this.transformedMin_ = Math.min(this.transformedMin_, softMin);
-      else
-        this.transformedMin_ = Math.max(this.transformedMin_, softMin);
+anychart.scales.Logarithmic.prototype.setupTransformer = function() {
+  anychart.scales.Logarithmic.base(this, 'setupTransformer');
+  var min = this.min;
+  var max = this.max;
+  var logBase = /** @type {number} */(this.logBase());
+  var minLog = anychart.math.specialRound(anychart.math.log(Math.abs(min), logBase));
+  var maxLog = anychart.math.specialRound(anychart.math.log(Math.abs(max), logBase));
+  var border, helper, domain, range, span;
+  var minMaxProd = min * max;
+  var borderLog = this.borderLog;
+  border = anychart.math.pow(logBase, borderLog);
+  if (minMaxProd > 0) {
+    // min max interval doesn't touch or contain zero
+    helper = anychart.scales.Continuous.Interpolators[anychart.scales.Continuous.PieceType.LINEAR](minLog, maxLog);
+    if (max < 0) {
+      domain = [min, -border, border, -min];
+      range = [0, helper(borderLog), helper(borderLog - 2), helper(borderLog - 2 - minLog)];
+    } else { // min cannot be zero here
+      domain = [-max, -border, border, max];
+      range = [helper(borderLog - 2 - maxLog), helper(borderLog - 2), helper(borderLog), 1];
     }
-    this.min = anychart.math.pow(this.logBaseVal, this.transformedMin_);
+  } else if (minMaxProd < 0) {
+    // min max interval contains zero
+    span = maxLog - borderLog + minLog - borderLog + 2;
+    domain = [min, -border, border, max];
+    range = [0, (minLog - borderLog) / span, (minLog - borderLog + 2) / span, 1];
+  } else {
+    // min max interval touches zero with either side
+    span = maxLog - borderLog + minLog - borderLog + 1;
+    if (max) {
+      domain = [-max, -border, border, max];
+      range = [-(span + 1) / span, -1 / span, 1 / span, 1];
+    } else {
+      domain = [min, -border, border, -min];
+      range = [0, (span - 1) / span, (span + 1) / span, (span + span + 1) / span];
+    }
   }
 
-  if (this.maximumModeAuto) {
-    this.transformedMax_ = logMax + range * this.maximumRangeBasedGap;
-    if (!isNaN(this.softMax)) {
-      var softMax = anychart.math.log(this.softMax, this.logBaseVal);
-      if (range > 0)
-        this.transformedMax_ = Math.max(this.transformedMax_, softMax);
-      else
-        this.transformedMax_ = Math.min(this.transformedMax_, softMax);
+  var tmp = /** @type {Array.<number>} */(this.transformer.range());
+  helper = anychart.scales.Continuous.Deinterpolators[anychart.scales.Continuous.PieceType.LINEAR](tmp[0], tmp[1]);
+  range = goog.array.map(range, function(x) { return anychart.math.specialRound(x); });
+
+  this.transformer.domain(domain);
+  this.transformer.range(goog.array.map(range, helper));
+  this.transformer.types([
+    anychart.scales.Continuous.PieceType.LOG,
+    anychart.scales.Continuous.PieceType.LINEAR,
+    anychart.scales.Continuous.PieceType.LOG
+  ]);
+};
+
+
+/** @inheritDoc */
+anychart.scales.Logarithmic.prototype.applyGaps = function(min, max, canChangeMin, canChangeMax, stickToZero, round) {
+  var logBase = /** @type {number} */(this.logBase());
+  var minLog = anychart.math.log(Math.abs(min), logBase);
+  var maxLog = anychart.math.log(Math.abs(max), logBase);
+  var borderLog = Math.min(Math.floor(minLog), Math.floor(maxLog), 0);
+  var result;
+  if (canChangeMin || canChangeMax) {
+    var minMaxProd = min * max;
+    if (minMaxProd > 0) {
+      if (min > 0) {
+        result = anychart.scales.Logarithmic.base(this, 'applyGaps', minLog, maxLog, canChangeMin, canChangeMax, false, false);
+      } else {
+        result = anychart.scales.Logarithmic.base(this, 'applyGaps', maxLog, minLog, canChangeMax, canChangeMin, false, false);
+        var tmp = result.max;
+        result.max = result.min;
+        result.min = tmp;
+      }
+    } else if (minMaxProd < 0) {
+      // min max interval contains zero
+      if (maxLog - borderLog + minLog - borderLog < 2) {
+        borderLog--;
+      }
+      maxLog -= borderLog - 1;
+      minLog -= borderLog - 1;
+      result = anychart.scales.Logarithmic.base(this, 'applyGaps', -minLog, maxLog, canChangeMin, canChangeMax, false, false);
+      result.min = -result.min + borderLog - 1;
+      result.max += borderLog - 1;
+    } else {
+      // min max interval touches zero with either side
+      if (max) {
+        maxLog -= borderLog - 1;
+        result = anychart.scales.Logarithmic.base(this, 'applyGaps', 0, maxLog, false, canChangeMax, false, false);
+        result.max += borderLog - 1;
+      } else {
+        minLog -= borderLog - 1;
+        result = anychart.scales.Logarithmic.base(this, 'applyGaps', -minLog, 0, canChangeMin, false, false, false);
+        result.min = -result.min + borderLog - 1;
+      }
     }
-    this.max = anychart.math.pow(this.logBaseVal, this.transformedMax_);
+    result = {
+      max: anychart.math.pow(logBase, result.max) * goog.math.sign(max),
+      min: anychart.math.pow(logBase, result.min) * goog.math.sign(min),
+      borderLog: borderLog
+    };
+    if (round) {
+      result.min = anychart.math.specialRound(result.min);
+      result.max = anychart.math.specialRound(result.max);
+    }
+  } else {
+    result = {
+      min: min,
+      max: max,
+      borderLog: borderLog
+    };
   }
+  return result;
 };
 
 

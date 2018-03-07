@@ -388,11 +388,7 @@ anychart.resourceModule.Scale.prototype.inverseTransform = function() {
 //
 //------------------------------------------------------------------------------
 /** @inheritDoc */
-anychart.resourceModule.Scale.prototype.calculate = function() {
-  if (this.consistent) return;
-
-  anychart.resourceModule.Scale.base(this, 'calculate');
-
+anychart.resourceModule.Scale.prototype.setupTicks = function() {
   if (this.minimumModeAuto)
     this.min = anychart.utils.alignDateLeftByUnit(this.min, this.unit_, this.count_, 2000);
   if (this.maximumModeAuto) {

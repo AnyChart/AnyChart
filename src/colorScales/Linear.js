@@ -1,6 +1,7 @@
 goog.provide('anychart.colorScalesModule.Linear');
 
 goog.require('anychart.enums');
+goog.require('anychart.scales.Continuous');
 goog.require('anychart.scales.ScatterBase');
 goog.require('anychart.scales.ScatterTicks');
 
@@ -271,11 +272,7 @@ anychart.colorScalesModule.Linear.prototype.minorTicks = function(opt_value) {
 
 
 /** @inheritDoc */
-anychart.colorScalesModule.Linear.prototype.calculate = function() {
-  if (this.consistent) return;
-
-  anychart.colorScalesModule.Linear.base(this, 'calculate');
-
+anychart.colorScalesModule.Linear.prototype.setupTicks = function() {
   var setupResult = this.ticks().setupAsMajor(this.min, this.max,
       this.minimumModeAuto && this.min != this.softMin,
       this.maximumModeAuto && this.max != this.softMax,
@@ -287,8 +284,14 @@ anychart.colorScalesModule.Linear.prototype.calculate = function() {
   if (this.maximumModeAuto)
     this.max = setupResult[1]; // new max
 
-  this.minorTicks().setupAsMinor(this.ticks().getInternal(), this.logBaseVal, setupResult[2], setupResult[3]);
+  this.minorTicks().setupAsMinor(this.ticks().getInternal(), this.logBaseVal, setupResult[2], setupResult[3], this.borderLog);
+};
 
+
+/** @inheritDoc */
+anychart.colorScalesModule.Linear.prototype.setupTransformer = function() {
+  anychart.colorScalesModule.Linear.base(this, 'setupTransformer');
+  this.transformer.domain([this.min, this.max]);
   this.range = this.max - this.min;
 };
 

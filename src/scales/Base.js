@@ -32,16 +32,16 @@ anychart.scales.Base = function() {
   /**
    * Zoom factor.
    * @type {number}
-   * @private
+   * @protected
    */
-  this.zoomFactor_ = 1;
+  this.zoomFactor = 1;
 
   /**
    * Zoom start.
    * @type {number}
-   * @private
+   * @protected
    */
-  this.zoomStart_ = 0;
+  this.zoomStart = 0;
 
   /**
    * Stack mode.
@@ -67,15 +67,6 @@ goog.inherits(anychart.scales.Base, anychart.core.Base);
 anychart.scales.Base.prototype.SUPPORTED_SIGNALS =
     anychart.Signal.NEEDS_REAPPLICATION |
     anychart.Signal.NEEDS_RECALCULATION;
-
-
-/**
- * If the scale is a color scale.
- * @return {boolean}
- */
-anychart.scales.Base.prototype.isColorScale = function() {
-  return false;
-};
 
 
 /**
@@ -130,9 +121,10 @@ anychart.scales.Base.prototype.applyComparison = function(value, comparisonZero)
  * @param {number} start
  */
 anychart.scales.Base.prototype.setZoom = function(factor, start) {
-  if (this.zoomFactor_ == factor && this.zoomStart_ == start) return;
-  this.zoomFactor_ = factor;
-  this.zoomStart_ = start;
+  if (this.zoomFactor == factor && this.zoomStart == start) return;
+  this.zoomFactor = factor;
+  this.zoomStart = start;
+  this.inversionOrZoomChanged();
   this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
 };
 
@@ -142,7 +134,7 @@ anychart.scales.Base.prototype.setZoom = function(factor, start) {
  * @return {number}
  */
 anychart.scales.Base.prototype.getZoomFactor = function() {
-  return this.zoomFactor_;
+  return this.zoomFactor;
 };
 
 
@@ -152,7 +144,7 @@ anychart.scales.Base.prototype.getZoomFactor = function() {
  * @return {number}
  */
 anychart.scales.Base.prototype.applyZoomAndInverse = function(ratio) {
-  var result = (ratio - this.zoomStart_) * this.zoomFactor_;
+  var result = (ratio - this.zoomStart) * this.zoomFactor;
   return this.isInverted ? 1 - result : result;
 };
 
@@ -164,7 +156,7 @@ anychart.scales.Base.prototype.applyZoomAndInverse = function(ratio) {
  */
 anychart.scales.Base.prototype.reverseZoomAndInverse = function(ratio) {
   if (this.isInverted) ratio = 1 - ratio;
-  return ratio / this.zoomFactor_ + this.zoomStart_;
+  return ratio / this.zoomFactor + this.zoomStart;
 };
 
 
@@ -189,12 +181,19 @@ anychart.scales.Base.prototype.inverted = function(opt_value) {
     opt_value = !!opt_value;
     if (this.isInverted != opt_value) {
       this.isInverted = opt_value;
+      this.inversionOrZoomChanged();
       this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
     }
     return this;
   }
   return this.isInverted;
 };
+
+
+/**
+ * Just a hook.
+ */
+anychart.scales.Base.prototype.inversionOrZoomChanged = function() {};
 
 
 /**
@@ -265,15 +264,6 @@ anychart.scales.Base.prototype.extendDataRange = goog.abstractMethod;
  * @protected
  */
 anychart.scales.Base.prototype.resetDataRange = goog.abstractMethod;
-
-
-/**
- * @return {!Array.<*>|boolean} Returns categories array if the scale requires series to categorise their data.
- *    Returns null otherwise.
- */
-anychart.scales.Base.prototype.getCategorisation = function() {
-  return false;
-};
 
 
 /**

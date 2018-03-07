@@ -900,7 +900,7 @@ anychart.circularGaugeModule.Axis.prototype.getLabelsFormatProvider_ = function(
  * @private
  */
 anychart.circularGaugeModule.Axis.prototype.getAnchorForLabel_ = function(angle) {
-  angle = goog.math.standardAngle(angle);
+  angle = goog.math.standardAngle(anychart.math.specialRound(angle));
   var anchor = anychart.enums.Anchor.CENTER;
   var position = anychart.enums.normalizeGaugeSidePosition(this.labels().getOption('position'));
 

@@ -141,15 +141,21 @@ anychart.scales.Linear.prototype.stickToZero = function(opt_value) {
 
 
 /** @inheritDoc */
-anychart.scales.Linear.prototype.calculate = function() {
-  if (this.consistent) return;
+anychart.scales.Linear.prototype.setupTransformer = function() {
+  anychart.scales.Linear.base(this, 'setupTransformer');
+  this.transformer.domain([this.min, this.max]);
+};
 
-  anychart.scales.Linear.base(this, 'calculate');
 
+/** @inheritDoc */
+anychart.scales.Linear.prototype.setupTicks = function() {
   var setupResult = this.ticks().setupAsMajor(this.min, this.max,
       this.minimumModeAuto && this.min != this.softMin && this.alignMinimumVal,
       this.maximumModeAuto && this.max != this.softMax && this.alignMaximumVal,
-      this.logBaseVal);
+      this.logBaseVal, this.borderLog || 0);
+
+  if (!isNaN(setupResult[4]))
+    this.borderLog = setupResult[4];
 
   if (this.minimumModeAuto)
     this.min = setupResult[0]; // new min
@@ -157,9 +163,7 @@ anychart.scales.Linear.prototype.calculate = function() {
   if (this.maximumModeAuto)
     this.max = setupResult[1]; // new max
 
-  this.minorTicks().setupAsMinor(this.ticks().getInternal(), this.logBaseVal, setupResult[2], setupResult[3]);
-
-  this.range = this.max - this.min;
+  this.minorTicks().setupAsMinor(this.ticks().getInternal(), this.logBaseVal, setupResult[2], setupResult[3], this.borderLog);
 };
 
 

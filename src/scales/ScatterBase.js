@@ -1,6 +1,7 @@
 goog.provide('anychart.scales.ScatterBase');
 
 goog.require('anychart.scales.Base');
+goog.require('anychart.scales.Continuous');
 
 
 
@@ -32,6 +33,11 @@ anychart.scales.ScatterBase = function() {
    * @protected
    */
   this.dataRangeMax = 1;
+
+  /**
+   * @type {boolean}
+   */
+  this.seenData = true;
 
   /**
    * @type {boolean}
@@ -84,10 +90,11 @@ anychart.scales.ScatterBase = function() {
   this.softMax = NaN;
 
   /**
-   * @type {number}
+   * Transformer.
+   * @type {anychart.scales.Continuous}
    * @protected
    */
-  this.range = 1;
+  this.transformer = null;
 
   /**
    * If the scale is consistent. We can't use consistency states management due to the same behaviour for all scales.
@@ -303,6 +310,12 @@ anychart.scales.ScatterBase.prototype.maximumGap = function(opt_value) {
 };
 
 
+/** @inheritDoc */
+anychart.scales.ScatterBase.prototype.inversionOrZoomChanged = function() {
+  this.consistent = false;
+};
+
+
 /**
  * Resets scale data range if it needs auto calculation.
  * @return {!anychart.scales.ScatterBase} Itself for chaining.
@@ -313,6 +326,7 @@ anychart.scales.ScatterBase.prototype.resetDataRange = function() {
   this.oldDataRangeMax = this.dataRangeMax;
   this.dataRangeMin = Infinity;
   this.dataRangeMax = -Infinity;
+  this.seenData = false;
   this.consistent = false;
   return this;
 };
@@ -327,14 +341,18 @@ anychart.scales.ScatterBase.prototype.resetDataRange = function() {
 anychart.scales.ScatterBase.prototype.extendDataRange = function(var_args) {
   for (var i = 0; i < arguments.length; i++) {
     var value = +arguments[i];
-    if (isNaN(value)) value = parseFloat(arguments[i]);
-    if (value < this.dataRangeMin) {
-      this.dataRangeMin = value;
-      this.consistent = false;
-    }
-    if (value > this.dataRangeMax) {
-      this.dataRangeMax = value;
-      this.consistent = false;
+    if (isNaN(value))
+      value = parseFloat(arguments[i]);
+    if (!isNaN(value)) {
+      this.seenData = true;
+      if (value < this.dataRangeMin) {
+        this.dataRangeMin = value;
+        this.consistent = false;
+      }
+      if (value > this.dataRangeMax) {
+        this.dataRangeMax = value;
+        this.consistent = false;
+      }
     }
   }
   return this;
@@ -370,8 +388,7 @@ anychart.scales.ScatterBase.prototype.needsAutoCalc = function() {
  */
 anychart.scales.ScatterBase.prototype.transform = function(value, opt_subRangeRatio) {
   this.calculate();
-  value = anychart.utils.toNumber(value);
-  return this.applyZoomAndInverse((value - this.min) / this.range);
+  return Number(this.transformer.transform(value));
 };
 
 
@@ -380,9 +397,34 @@ anychart.scales.ScatterBase.prototype.transform = function(value, opt_subRangeRa
  * NOTE: THIS METHOD IS FOR INTERNAL USE IN THE SCALE AND TICKS ONLY. DO NOT PUBLISH IT.
  */
 anychart.scales.ScatterBase.prototype.calculate = function() {
-  if (this.consistent) return;
-  this.consistent = true;
-  this.determineScaleMinMax();
+  if (!this.consistent) {
+    this.consistent = true;
+    this.determineScaleMinMax();
+    this.setupTicks();
+    this.setupTransformer();
+  }
+};
+
+
+/**
+ * Should setup specific ticks.
+ */
+anychart.scales.ScatterBase.prototype.setupTicks = function() {};
+
+
+/**
+ * Should setup specific transformer.
+ */
+anychart.scales.ScatterBase.prototype.setupTransformer = function() {
+  if (!this.transformer) {
+    this.transformer = new anychart.scales.Continuous();
+  }
+  var offset = this.zoomStart * this.zoomFactor;
+  var range = [-offset, this.zoomFactor - offset];
+  if (this.isInverted) {
+    range.reverse();
+  }
+  this.transformer.range(range);
 };
 
 
@@ -391,61 +433,101 @@ anychart.scales.ScatterBase.prototype.calculate = function() {
  * @protected
  */
 anychart.scales.ScatterBase.prototype.determineScaleMinMax = function() {
-  if (!isFinite(this.dataRangeMax)) {
-    if (!isFinite(this.dataRangeMin)) {
-      this.dataRangeMin = 0;
-      this.dataRangeMax = 1;
+  var tmp;
+  var cannotChangeMin = !this.minimumModeAuto;
+  var cannotChangeMax = !this.maximumModeAuto;
+
+  var percentStack = this.stackMode() == anychart.enums.ScaleStackMode.PERCENT;
+
+  if (cannotChangeMin) {
+    this.extendDataRange(this.min);
+  }
+  if (cannotChangeMax) {
+    this.extendDataRange(this.max);
+  }
+  if (!this.seenData) {
+    // the only case - if both min and max are auto and there were no data
+    this.dataRangeMin = 0;
+    this.dataRangeMax = percentStack ? 100 : 1;
+  }
+
+  var min = cannotChangeMin ? this.min : this.dataRangeMin;
+  var max = cannotChangeMax ? this.max : this.dataRangeMax;
+  // invariants at this point:
+  // 1) min <= max
+  // 2) min < Infinity
+  // 3) max > -Infinity
+
+  if (!cannotChangeMin && min >= this.softMin) { // also handles NaN check
+    min = this.softMin;
+    cannotChangeMin = true;
+  }
+
+  if (!cannotChangeMax && max <= this.softMax) { // also handles NaN check
+    max = this.softMax;
+    cannotChangeMax = true;
+  }
+
+  if (anychart.math.roughlyEqual(min, max, 1e-7)) {
+    if (cannotChangeMax) {
+      min--;
+    } else if (cannotChangeMin) {
+      max++;
     } else {
-      this.dataRangeMax = this.dataRangeMin + 1;
+      min -= .5;
+      max += .5;
     }
-  } else if (!isFinite(this.dataRangeMin)) {
-    this.dataRangeMin = this.dataRangeMax - 1;
-  } else if (anychart.math.roughlyEqual(this.dataRangeMin, this.dataRangeMax, 1e-10)) {
-    this.dataRangeMin -= 0.5;
-    this.dataRangeMax += 0.5;
   }
 
-  var max = this.maximumModeAuto ?
-      (isNaN(this.softMax) ?
-          this.dataRangeMax :
-          Math.max(this.dataRangeMax, this.softMax)) :
-      this.max;
-  var min = this.minimumModeAuto ?
-      (isNaN(this.softMin) ?
-          this.dataRangeMin :
-          Math.min(this.dataRangeMin, this.softMin)) :
-      this.min;
-  var range = max - min;
-
-  if (Math.abs(range) < 1e-4 && !this.minimumModeAuto && !this.maximumModeAuto) this.max += 1e-4;
-
-  var gap;
-  var applyGap = this.stackMode() != anychart.enums.ScaleStackMode.PERCENT;
-  if (this.minimumModeAuto) {
-    gap = applyGap ? this.minimumRangeBasedGap : 0;
-    this.min = anychart.math.specialRound(this.dataRangeMin - range * gap);
-    if (!isNaN(this.softMin)) {
-      if (range > 0)
-        this.min = Math.min(this.min, this.softMin);
-      else
-        this.min = Math.max(this.min, this.softMin);
-    }
-    if (this.stickToZeroFlag && this.min < 0 && this.dataRangeMin >= 0 && this.min != this.softMin)
-      this.min = 0;
+  if (percentStack) {
+    cannotChangeMin = cannotChangeMax = true;
   }
 
-  if (this.maximumModeAuto) {
-    gap = applyGap ? this.maximumRangeBasedGap : 0;
-    this.max = anychart.math.specialRound(this.dataRangeMax + range * gap);
-    if (!isNaN(this.softMax)) {
-      if (range > 0)
-        this.max = Math.max(this.max, this.softMax);
-      else
-        this.max = Math.min(this.max, this.softMax);
+  tmp = this.applyGaps(min, max, !cannotChangeMin, !cannotChangeMax, this.stickToZeroFlag, true);
+  this.min = tmp.min;
+  this.max = tmp.max;
+  this.borderLog = tmp.borderLog || 0;
+};
+
+
+/**
+ * Applies gaps.
+ * @param {number} min
+ * @param {number} max
+ * @param {boolean} canChangeMin
+ * @param {boolean} canChangeMax
+ * @param {boolean} stickToZero
+ * @param {boolean} round
+ * @return {{max: number, min: number}}
+ * @protected
+ */
+anychart.scales.ScatterBase.prototype.applyGaps = function(min, max, canChangeMin, canChangeMax, stickToZero, round) {
+  if (canChangeMin || canChangeMax) {
+    var tmp;
+    var range = max - min;
+    if (canChangeMin) {
+      tmp = min - range * this.minimumRangeBasedGap;
+      if (stickToZero && (min * tmp <= 0)) {
+        tmp = 0;
+      } else if (round) {
+        tmp = anychart.math.specialRound(tmp);
+      }
+      min = tmp;
     }
-    if (this.stickToZeroFlag && this.max < 0 && this.dataRangeMax >= 0 && this.max != this.softMax)
-      this.max = 0;
+    if (canChangeMax) {
+      tmp = max + range * this.maximumRangeBasedGap;
+      if (stickToZero && (max * tmp <= 0)) {
+        tmp = 0;
+      } else if (round) {
+        tmp = anychart.math.specialRound(tmp);
+      }
+      max = tmp;
+    }
   }
+  return {
+    max: max,
+    min: min
+  };
 };
 
 
@@ -463,8 +545,7 @@ anychart.scales.ScatterBase.prototype.determineScaleMinMax = function() {
  */
 anychart.scales.ScatterBase.prototype.inverseTransform = function(ratio) {
   this.calculate();
-  ratio = this.reverseZoomAndInverse(ratio);
-  return ratio * this.range + this.min;
+  return this.transformer.inverseTransform(ratio);
 };
 
 
