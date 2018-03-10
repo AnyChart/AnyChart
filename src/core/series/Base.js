@@ -2214,26 +2214,26 @@ anychart.core.series.Base.prototype.extractSettings = function(settingsArray, op
     var obj = settingsArray[i];
     var res = undefined;
     var mode = settingsArray[i + 1];
-    if (mode == anychart.core.series.Base.ExtractSettingModes.PLAIN_VALUE) {
+    if (mode == anychart.utils.ExtractSettingModes.PLAIN_VALUE) {
       res = obj;
     } else if (obj) {
       switch (mode) {
-        case anychart.core.series.Base.ExtractSettingModes.OWN_SETTINGS:
+        case anychart.utils.ExtractSettingModes.OWN_SETTINGS:
           obj = obj.ownSettings;
           break;
-        case anychart.core.series.Base.ExtractSettingModes.THEME_SETTINGS:
+        case anychart.utils.ExtractSettingModes.THEME_SETTINGS:
           obj = obj.themeSettings;
           break;
-        case anychart.core.series.Base.ExtractSettingModes.AUTO_SETTINGS:
+        case anychart.utils.ExtractSettingModes.AUTO_SETTINGS:
           obj = obj.autoSettings;
           break;
       }
       if (opt_callProp) {
-        if (mode == anychart.core.series.Base.ExtractSettingModes.I_ROW_INFO) {
+        if (mode == anychart.utils.ExtractSettingModes.I_ROW_INFO) {
           res = obj.get(opt_callProp);
         } else {
           res = obj[opt_callProp];
-          if (mode == anychart.core.series.Base.ExtractSettingModes.CALL_METHOD)
+          if (mode == anychart.utils.ExtractSettingModes.CALL_METHOD)
             res = res ? res.call(obj) : undefined;
         }
       } else {
@@ -2243,21 +2243,6 @@ anychart.core.series.Base.prototype.extractSettings = function(settingsArray, op
     result.push(res);
   }
   return result;
-};
-
-
-/**
- * Extracting settings modes.
- * @enum {number}
- */
-anychart.core.series.Base.ExtractSettingModes = {
-  PLAIN_OBJECT: 0,
-  OWN_SETTINGS: 1,
-  THEME_SETTINGS: 2,
-  AUTO_SETTINGS: 3,
-  CALL_METHOD: 4,
-  I_ROW_INFO: 5,
-  PLAIN_VALUE: 6
 };
 
 
@@ -2343,19 +2328,19 @@ anychart.core.series.Base.prototype.drawFactoryElement = function(seriesFactoryG
       }
     }
     
-    isDraw = anychart.utils.getFirstNotNullValueRecursive(this.extractSettings([
-      pointExtremumState, anychart.core.series.Base.ExtractSettingModes.PLAIN_OBJECT,
-      pointState, anychart.core.series.Base.ExtractSettingModes.PLAIN_OBJECT,
-      seriesExtremumState, anychart.core.series.Base.ExtractSettingModes.CALL_METHOD,
-      seriesState, anychart.core.series.Base.ExtractSettingModes.CALL_METHOD,
-      chartExtremumState, anychart.core.series.Base.ExtractSettingModes.CALL_METHOD,
-      chartState, anychart.core.series.Base.ExtractSettingModes.CALL_METHOD,
-      pointExtremumNormal, anychart.core.series.Base.ExtractSettingModes.PLAIN_OBJECT,
-      pointNormal, anychart.core.series.Base.ExtractSettingModes.PLAIN_OBJECT,
-      seriesExtremumNormal, anychart.core.series.Base.ExtractSettingModes.CALL_METHOD,
-      seriesNormal, anychart.core.series.Base.ExtractSettingModes.CALL_METHOD,
-      chartExtremumNormal, anychart.core.series.Base.ExtractSettingModes.CALL_METHOD,
-      chartNormal, anychart.core.series.Base.ExtractSettingModes.CALL_METHOD
+    isDraw = anychart.utils.getFirstNotNullValueRecursive(anychart.utils.extractSettings([
+      pointExtremumState, anychart.utils.ExtractSettingModes.PLAIN_OBJECT,
+      pointState, anychart.utils.ExtractSettingModes.PLAIN_OBJECT,
+      seriesExtremumState, anychart.utils.ExtractSettingModes.CALL_METHOD,
+      seriesState, anychart.utils.ExtractSettingModes.CALL_METHOD,
+      chartExtremumState, anychart.utils.ExtractSettingModes.CALL_METHOD,
+      chartState, anychart.utils.ExtractSettingModes.CALL_METHOD,
+      pointExtremumNormal, anychart.utils.ExtractSettingModes.PLAIN_OBJECT,
+      pointNormal, anychart.utils.ExtractSettingModes.PLAIN_OBJECT,
+      seriesExtremumNormal, anychart.utils.ExtractSettingModes.CALL_METHOD,
+      seriesNormal, anychart.utils.ExtractSettingModes.CALL_METHOD,
+      chartExtremumNormal, anychart.utils.ExtractSettingModes.CALL_METHOD,
+      chartNormal, anychart.utils.ExtractSettingModes.CALL_METHOD
     ], 'enabled'));
   }
 
@@ -2383,34 +2368,34 @@ anychart.core.series.Base.prototype.drawFactoryElement = function(seriesFactoryG
       var position;
       if (isLabel) {
         position = anychart.utils.getFirstDefinedValueRecursive(
-            this.extractSettings([
-              pointExtremumState, anychart.core.series.Base.ExtractSettingModes.PLAIN_OBJECT,
-              pointState, anychart.core.series.Base.ExtractSettingModes.PLAIN_OBJECT,
-              seriesExtremumState, anychart.core.series.Base.ExtractSettingModes.OWN_SETTINGS,
-              seriesState, anychart.core.series.Base.ExtractSettingModes.OWN_SETTINGS,
-              chartExtremumState, anychart.core.series.Base.ExtractSettingModes.OWN_SETTINGS,
-              chartState, anychart.core.series.Base.ExtractSettingModes.OWN_SETTINGS,
-              pointExtremumNormal, anychart.core.series.Base.ExtractSettingModes.PLAIN_OBJECT,
-              pointNormal, anychart.core.series.Base.ExtractSettingModes.PLAIN_OBJECT,
-              seriesExtremumNormal, anychart.core.series.Base.ExtractSettingModes.OWN_SETTINGS,
-              seriesNormal, anychart.core.series.Base.ExtractSettingModes.OWN_SETTINGS,
-              chartExtremumNormal, anychart.core.series.Base.ExtractSettingModes.OWN_SETTINGS,
-              chartNormal, anychart.core.series.Base.ExtractSettingModes.OWN_SETTINGS,
-              seriesExtremumState, anychart.core.series.Base.ExtractSettingModes.THEME_SETTINGS,
-              seriesState, anychart.core.series.Base.ExtractSettingModes.THEME_SETTINGS,
-              chartState, anychart.core.series.Base.ExtractSettingModes.THEME_SETTINGS,
-              seriesExtremumNormal, anychart.core.series.Base.ExtractSettingModes.THEME_SETTINGS,
-              seriesNormal, anychart.core.series.Base.ExtractSettingModes.THEME_SETTINGS,
-              chartNormal, anychart.core.series.Base.ExtractSettingModes.THEME_SETTINGS
+            anychart.utils.extractSettings([
+              pointExtremumState, anychart.utils.ExtractSettingModes.PLAIN_OBJECT,
+              pointState, anychart.utils.ExtractSettingModes.PLAIN_OBJECT,
+              seriesExtremumState, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+              seriesState, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+              chartExtremumState, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+              chartState, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+              pointExtremumNormal, anychart.utils.ExtractSettingModes.PLAIN_OBJECT,
+              pointNormal, anychart.utils.ExtractSettingModes.PLAIN_OBJECT,
+              seriesExtremumNormal, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+              seriesNormal, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+              chartExtremumNormal, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+              chartNormal, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+              seriesExtremumState, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
+              seriesState, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
+              chartState, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
+              seriesExtremumNormal, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
+              seriesNormal, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
+              chartNormal, anychart.utils.ExtractSettingModes.THEME_SETTINGS
             ], 'position'),
             'auto');
       } else {
         position = anychart.utils.getFirstDefinedValueRecursive(
-            this.extractSettings([
-              pointState, anychart.core.series.Base.ExtractSettingModes.PLAIN_OBJECT,
-              seriesState, anychart.core.series.Base.ExtractSettingModes.CALL_METHOD,
-              pointNormal, anychart.core.series.Base.ExtractSettingModes.PLAIN_OBJECT,
-              seriesNormal, anychart.core.series.Base.ExtractSettingModes.CALL_METHOD
+            anychart.utils.extractSettings([
+              pointState, anychart.utils.ExtractSettingModes.PLAIN_OBJECT,
+              seriesState, anychart.utils.ExtractSettingModes.CALL_METHOD,
+              pointNormal, anychart.utils.ExtractSettingModes.PLAIN_OBJECT,
+              seriesNormal, anychart.utils.ExtractSettingModes.CALL_METHOD
             ], 'position'),
             'auto');
       }
@@ -2536,26 +2521,26 @@ anychart.core.series.Base.prototype.setupLabelDrawingPlan = function(label,
                                                                      chartState, seriesState, pointState,
                                                                      chartExtremumNormal, seriesExtremumNormal, pointExtremumNormal,
                                                                      chartExtremumState, seriesExtremumState, pointExtremumState) {
-  label.stateOrder(this.extractSettings([
-    pointExtremumState, anychart.core.series.Base.ExtractSettingModes.PLAIN_OBJECT,
-    pointState, anychart.core.series.Base.ExtractSettingModes.PLAIN_OBJECT,
-    seriesExtremumState, anychart.core.series.Base.ExtractSettingModes.OWN_SETTINGS,
-    seriesState, anychart.core.series.Base.ExtractSettingModes.OWN_SETTINGS,
-    chartExtremumState, anychart.core.series.Base.ExtractSettingModes.OWN_SETTINGS,
-    chartState, anychart.core.series.Base.ExtractSettingModes.OWN_SETTINGS,
-    pointExtremumNormal, anychart.core.series.Base.ExtractSettingModes.PLAIN_OBJECT,
-    pointNormal, anychart.core.series.Base.ExtractSettingModes.PLAIN_OBJECT,
-    seriesExtremumNormal, anychart.core.series.Base.ExtractSettingModes.OWN_SETTINGS,
-    seriesNormal, anychart.core.series.Base.ExtractSettingModes.OWN_SETTINGS,
-    chartExtremumNormal, anychart.core.series.Base.ExtractSettingModes.OWN_SETTINGS,
-    chartNormal, anychart.core.series.Base.ExtractSettingModes.OWN_SETTINGS,
-    seriesExtremumState, anychart.core.series.Base.ExtractSettingModes.THEME_SETTINGS,
-    seriesState, anychart.core.series.Base.ExtractSettingModes.THEME_SETTINGS,
-    chartState, anychart.core.series.Base.ExtractSettingModes.THEME_SETTINGS,
-    label, anychart.core.series.Base.ExtractSettingModes.AUTO_SETTINGS,
-    seriesExtremumNormal, anychart.core.series.Base.ExtractSettingModes.THEME_SETTINGS,
-    seriesNormal, anychart.core.series.Base.ExtractSettingModes.THEME_SETTINGS,
-    chartNormal, anychart.core.series.Base.ExtractSettingModes.THEME_SETTINGS
+  label.stateOrder(anychart.utils.extractSettings([
+    pointExtremumState, anychart.utils.ExtractSettingModes.PLAIN_OBJECT,
+    pointState, anychart.utils.ExtractSettingModes.PLAIN_OBJECT,
+    seriesExtremumState, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+    seriesState, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+    chartExtremumState, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+    chartState, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+    pointExtremumNormal, anychart.utils.ExtractSettingModes.PLAIN_OBJECT,
+    pointNormal, anychart.utils.ExtractSettingModes.PLAIN_OBJECT,
+    seriesExtremumNormal, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+    seriesNormal, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+    chartExtremumNormal, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+    chartNormal, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+    seriesExtremumState, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
+    seriesState, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
+    chartState, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
+    label, anychart.utils.ExtractSettingModes.AUTO_SETTINGS,
+    seriesExtremumNormal, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
+    seriesNormal, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
+    chartNormal, anychart.utils.ExtractSettingModes.THEME_SETTINGS
   ]));
 };
 

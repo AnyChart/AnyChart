@@ -570,7 +570,7 @@ anychart.mapModule.Chart.prototype.getType = function() {
 //endregion
 //region --- Interactivity
 /**
- * Conrols interactivity.
+ * Controls interactivity.
  * @private
  */
 anychart.mapModule.Chart.prototype.controlsInteractivity_ = function() {

@@ -325,7 +325,11 @@ anychart.core.ui.CircularLabelsFactory.Label.prototype.getRotation = function(an
 /** @inheritDoc */
 anychart.core.ui.CircularLabelsFactory.Label.prototype.drawLabel = function(bounds, parentBounds) {
   var positionFormatter = this.mergedSettings['positionFormatter'];
-  var anchor = anychart.core.ui.LabelsFactory.anchorNoAutoNormalizer(this.mergedSettings['anchor']) || anychart.enums.Anchor.LEFT_TOP;
+  var isTextByPath = !!this.textElement.path();
+  var anchor = isTextByPath ?
+      anychart.enums.Anchor.CENTER :
+      anychart.core.ui.LabelsFactory.anchorNoAutoNormalizer(this.mergedSettings['anchor']) || anychart.enums.Anchor.LEFT_TOP;
+
   var offsetX = this.mergedSettings['offsetX'] || 0;
   var offsetY = this.mergedSettings['offsetY'] || 0;
 
@@ -370,8 +374,7 @@ anychart.core.ui.CircularLabelsFactory.Label.prototype.drawLabel = function(boun
   var y = cy + goog.math.angleDy(angle, radiusY);
 
   var anchorCoordinate = anychart.utils.getCoordinateByAnchor(
-      new anychart.math.Rect(0, 0, bounds.width, bounds.height),
-      anchor);
+      new anychart.math.Rect(0, 0, bounds.width, bounds.height), anchor);
 
   x -= anchorCoordinate.x;
   y -= anchorCoordinate.y;

@@ -358,16 +358,16 @@ anychart.heatmapModule.Series.prototype.setupLabelDrawingPlan = function(label,
                                                                          chartState, seriesState, pointState,
                                                                          chartExtremumNormal, seriesExtremumNormal, pointExtremumNormal,
                                                                          chartExtremumState, seriesExtremumState, pointExtremumState) {
-  label.stateOrder(this.extractSettings([
-    pointState, anychart.core.series.Base.ExtractSettingModes.PLAIN_OBJECT,
-    seriesState, anychart.core.series.Base.ExtractSettingModes.OWN_SETTINGS,
-    pointNormal, anychart.core.series.Base.ExtractSettingModes.PLAIN_OBJECT,
-    seriesNormal, anychart.core.series.Base.ExtractSettingModes.OWN_SETTINGS,
-    label, anychart.core.series.Base.ExtractSettingModes.OWN_SETTINGS,
-    seriesState || seriesNormal, anychart.core.series.Base.ExtractSettingModes.AUTO_SETTINGS,
-    seriesState, anychart.core.series.Base.ExtractSettingModes.THEME_SETTINGS,
-    label, anychart.core.series.Base.ExtractSettingModes.AUTO_SETTINGS,
-    seriesNormal, anychart.core.series.Base.ExtractSettingModes.THEME_SETTINGS
+  label.stateOrder(anychart.utils.extractSettings([
+    pointState, anychart.utils.ExtractSettingModes.PLAIN_OBJECT,
+    seriesState, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+    pointNormal, anychart.utils.ExtractSettingModes.PLAIN_OBJECT,
+    seriesNormal, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+    label, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+    seriesState || seriesNormal, anychart.utils.ExtractSettingModes.AUTO_SETTINGS,
+    seriesState, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
+    label, anychart.utils.ExtractSettingModes.AUTO_SETTINGS,
+    seriesNormal, anychart.utils.ExtractSettingModes.THEME_SETTINGS
   ]));
 };
 

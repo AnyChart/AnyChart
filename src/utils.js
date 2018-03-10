@@ -27,6 +27,66 @@ goog.require('goog.object');
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
+ * Settings in format [obj, mode, obj, mode,...]
+ * Description 0 - plain object with settings, 1 -
+ * @param {Array} settingsArray
+ * @param {string=} opt_callProp
+ * @return {Array}
+ */
+anychart.utils.extractSettings = function(settingsArray, opt_callProp) {
+  var result = [];
+  for (var i = 0; i < settingsArray.length; i += 2) {
+    var obj = settingsArray[i];
+    var res = undefined;
+    var mode = settingsArray[i + 1];
+    if (mode == anychart.utils.ExtractSettingModes.PLAIN_VALUE) {
+      res = obj;
+    } else if (obj) {
+      switch (mode) {
+        case anychart.utils.ExtractSettingModes.OWN_SETTINGS:
+          obj = obj.ownSettings;
+          break;
+        case anychart.utils.ExtractSettingModes.THEME_SETTINGS:
+          obj = obj.themeSettings;
+          break;
+        case anychart.utils.ExtractSettingModes.AUTO_SETTINGS:
+          obj = obj.autoSettings;
+          break;
+      }
+      if (opt_callProp) {
+        if (mode == anychart.utils.ExtractSettingModes.I_ROW_INFO) {
+          res = obj.get(opt_callProp);
+        } else {
+          res = obj[opt_callProp];
+          if (mode == anychart.utils.ExtractSettingModes.CALL_METHOD)
+            res = res ? res.call(obj) : undefined;
+        }
+      } else {
+        res = obj;
+      }
+    }
+    result.push(res);
+  }
+  return result;
+};
+
+
+/**
+ * Extracting settings modes.
+ * @enum {number}
+ */
+anychart.utils.ExtractSettingModes = {
+  PLAIN_OBJECT: 0,
+  OWN_SETTINGS: 1,
+  THEME_SETTINGS: 2,
+  AUTO_SETTINGS: 3,
+  CALL_METHOD: 4,
+  I_ROW_INFO: 5,
+  PLAIN_VALUE: 6
+};
+
+
+/**
  * Gets or sets obj property, takes in account fields addresses.
  * Fields are first looked using mapping order, then - field order (e.g. mapping is empty).
  * If field can not be found - field is written.
@@ -1510,6 +1570,8 @@ anychart.utils.getNodeNames_ = function(arrayPropName) {
       return ['weights', 'weight'];
     case 'angles':
       return ['angles', 'angle'];
+    case 'levels':
+      return ['levels', 'level'];
   }
   return null;
 };
@@ -1607,6 +1669,8 @@ anychart.utils.getArrayPropName_ = function(nodeName) {
       return ['weights', 'weight'];
     case 'angles':
       return ['angles', 'angle'];
+    case 'levels':
+      return ['levels', 'level'];
   }
   return null;
 };

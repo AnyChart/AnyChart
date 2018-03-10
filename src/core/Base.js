@@ -278,12 +278,17 @@ anychart.ConsistencyState = {
   //---------------------------------- STOCK SCROLLER (SCROLLER) ----------------------------------------
   STOCK_SCROLLER_SERIES: 1 << 9,
   STOCK_SCROLLER_AXIS: 1 << 10,
-  //---------------------------------- TREE MAP CHART (SEPARATE CHART) ----------------------------------
-  TREEMAP_DATA: 1 << 12,
+  //---------------------------------- TREE CHART (CHART) ----------------------------------
+  TREE_DATA: 1 << 12,
+  //---------------------------------- TREE MAP CHART (TREE CHART) ----------------------------------
   TREEMAP_COLOR_SCALE: 1 << 13,
   TREEMAP_NODE_TYPES: 1 << 14,
   TREEMAP_COLOR_RANGE: 1 << 15,
   TREEMAP_HINT_OPACITY: 1 << 16,
+  //---------------------------------- SUNBURST_LABELS STATES (TREE CHART) ---------------------------------
+  SUNBURST_CENTER_CONTENT: 1 << 13,
+  SUNBURST_COLOR_SCALE: 1 << 14,
+  SUNBURST_CALCULATIONS: 1 << 15,
   //---------------------------------- PERT CHART (SEPARATE CHART) ----------------------------------
   PERT_DATA: 1 << 12,
   PERT_CALCULATIONS: 1 << 13,

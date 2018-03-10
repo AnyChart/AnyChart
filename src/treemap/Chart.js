@@ -2,7 +2,6 @@ goog.provide('anychart.treemapModule.Chart');
 
 goog.require('anychart.colorScalesModule.ui.ColorRange');
 goog.require('anychart.core.IShapeManagerUser');
-goog.require('anychart.core.SeparateChart');
 goog.require('anychart.core.StateSettings');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.settings');
@@ -12,10 +11,10 @@ goog.require('anychart.core.utils.IInteractiveSeries');
 goog.require('anychart.core.utils.InteractivityState');
 goog.require('anychart.core.utils.TypedLayer');
 goog.require('anychart.format.Context');
+goog.require('anychart.treeChartBase.ArrayIterator');
+goog.require('anychart.treeChartBase.Chart');
+goog.require('anychart.treeChartBase.Point');
 goog.require('anychart.treeDataModule.Tree');
-goog.require('anychart.treeDataModule.utils');
-goog.require('anychart.treemapModule.ArrayIterator');
-goog.require('anychart.treemapModule.Point');
 goog.require('anychart.utils');
 
 
@@ -24,43 +23,18 @@ goog.require('anychart.utils');
  * AnyChart TreeMap class.
  * @param {(anychart.treeDataModule.Tree|anychart.treeDataModule.View|Array.<Object>)=} opt_data - Data tree or raw data.
  * @param {anychart.enums.TreeFillingMethod=} opt_fillMethod - Fill method.
- * @extends {anychart.core.SeparateChart}
- * @implements {anychart.core.utils.IInteractiveSeries}
+ * @extends {anychart.treeChartBase.Chart}
  * @implements {anychart.core.IShapeManagerUser}
  * @constructor
  */
 anychart.treemapModule.Chart = function(opt_data, opt_fillMethod) {
-  anychart.treemapModule.Chart.base(this, 'constructor');
-
-  // need for ColorRange
-  this.referenceValueNames = ['x', 'value'];
+  anychart.treemapModule.Chart.base(this, 'constructor', opt_data, opt_fillMethod);
 
   /**
    * @type {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem}
    * @private
    */
   this.rootNode_ = null;
-
-  /**
-   * Linear index of tree's node.
-   * @type {number}
-   * @private
-   */
-  this.linearIndex_ = 0;
-
-  /**
-   * Array of nodes.
-   * @type {Array.<anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem>}
-   * @private
-   */
-  this.linearNodes_ = [];
-
-  /**
-   * Array of nodes.
-   * @type {Array.<anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem>}
-   * @private
-   */
-  this.drawingNodes_ = [];
 
   /**
    * Array of node values.
@@ -139,7 +113,7 @@ anychart.treemapModule.Chart = function(opt_data, opt_fillMethod) {
     ['labelsDisplayMode', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW]
   ]);
 };
-goog.inherits(anychart.treemapModule.Chart, anychart.core.SeparateChart);
+goog.inherits(anychart.treemapModule.Chart, anychart.treeChartBase.Chart);
 anychart.core.settings.populateAliases(anychart.treemapModule.Chart, ['fill', 'stroke', 'hatchFill', 'labels', 'markers', 'headers'], 'normal');
 
 
@@ -148,7 +122,7 @@ anychart.core.settings.populateAliases(anychart.treemapModule.Chart, ['fill', 's
  * @type {number}
  */
 anychart.treemapModule.Chart.prototype.SUPPORTED_SIGNALS =
-    anychart.core.SeparateChart.prototype.SUPPORTED_SIGNALS |
+    anychart.treeChartBase.Chart.prototype.SUPPORTED_SIGNALS |
     anychart.Signal.NEED_UPDATE_COLOR_RANGE;
 
 
@@ -157,13 +131,11 @@ anychart.treemapModule.Chart.prototype.SUPPORTED_SIGNALS =
  * @type {number}
  */
 anychart.treemapModule.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
-    anychart.core.SeparateChart.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.TREEMAP_DATA |
+    anychart.treeChartBase.Chart.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.TREEMAP_COLOR_SCALE |
     anychart.ConsistencyState.TREEMAP_COLOR_RANGE |
     anychart.ConsistencyState.TREEMAP_NODE_TYPES |
-    anychart.ConsistencyState.TREEMAP_HINT_OPACITY |
-    anychart.ConsistencyState.APPEARANCE;
+    anychart.ConsistencyState.TREEMAP_HINT_OPACITY;
 
 
 /**
@@ -204,43 +176,6 @@ anychart.treemapModule.Chart.prototype.getType = function() {
 };
 
 
-///  IInteractivitySeries INTERFACE IMPLEMENTATION ///
-/**
- * Returns iterator.
- * @return {!anychart.treemapModule.ArrayIterator}
- */
-anychart.treemapModule.Chart.prototype.getIterator = function() {
-  return this.iterator_ || this.getResetIterator();
-};
-
-
-/**
- * Returns reset iterator.
- * @return {!anychart.treemapModule.ArrayIterator}
- */
-anychart.treemapModule.Chart.prototype.getResetIterator = function() {
-  return this.iterator_ = new anychart.treemapModule.ArrayIterator(this.drawingNodes_);
-};
-
-
-/** @inheritDoc */
-anychart.treemapModule.Chart.prototype.isSeries = function() {
-  return true;
-};
-
-
-/** @inheritDoc */
-anychart.treemapModule.Chart.prototype.isDiscreteBased = function() {
-  return true;
-};
-
-
-/** @inheritDoc */
-anychart.treemapModule.Chart.prototype.isSizeBased = function() {
-  return false;
-};
-
-
 /** @inheritDoc */
 anychart.treemapModule.Chart.prototype.applyAppearanceToPoint = function(pointState, opt_value) {
   var node = /** @type {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} */ (this.getIterator().getItem());
@@ -249,7 +184,7 @@ anychart.treemapModule.Chart.prototype.applyAppearanceToPoint = function(pointSt
     return;
   var type = node.meta(anychart.treemapModule.Chart.DataFields.TYPE);
 
-  if (type == anychart.treemapModule.Chart.NodeType.HEADER) {
+  if (type == anychart.treeChartBase.Chart.NodeType.HEADER) {
     this.drawLabel_(pointState);
     return;
   }
@@ -265,93 +200,6 @@ anychart.treemapModule.Chart.prototype.applyAppearanceToPoint = function(pointSt
   this.drawMarker_(pointState);
 
   return opt_value;
-};
-
-
-/** @inheritDoc */
-anychart.treemapModule.Chart.prototype.applyAppearanceToSeries = goog.nullFunction;
-
-
-/** @inheritDoc */
-anychart.treemapModule.Chart.prototype.finalizePointAppearance = goog.nullFunction;
-
-
-/** @inheritDoc */
-anychart.treemapModule.Chart.prototype.getStartValueForAppearanceReduction = goog.nullFunction;
-
-
-/** @inheritDoc */
-anychart.treemapModule.Chart.prototype.hoverMode = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeHoverMode(opt_value);
-    if (opt_value != this.hoverMode_) {
-      this.hoverMode_ = opt_value;
-    }
-    return this;
-  }
-  return /** @type {anychart.enums.HoverMode}*/(this.hoverMode_);
-};
-
-
-/**
- * @param {(anychart.enums.SelectionMode|string|null)=} opt_value Selection mode.
- * @return {anychart.treemapModule.Chart|anychart.enums.SelectionMode|null} .
- */
-anychart.treemapModule.Chart.prototype.selectionMode = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? null : anychart.enums.normalizeSelectMode(opt_value);
-    if (opt_value != this.selectionMode_) {
-      this.selectionMode_ = opt_value;
-    }
-    return this;
-  }
-  return /** @type {anychart.enums.SelectionMode}*/(this.selectionMode_);
-};
-
-
-/**
- * Makes interactive.
- * @param {acgraph.vector.Element} element .
- * @protected
- */
-anychart.treemapModule.Chart.prototype.makeInteractive = function(element) {
-  if (!element) return;
-  var node = this.getIterator().getItem();
-  element.tag = {
-    series: this,
-    index: node.meta('index'),
-    node: node
-  };
-};
-
-
-/** @inheritDoc */
-anychart.treemapModule.Chart.prototype.makeBrowserEvent = function(e) {
-  var res = {
-    'type': e['type'],
-    'target': this,
-    'relatedTarget': this.getOwnerElement(e['relatedTarget']) || e['relatedTarget'],
-    'domTarget': e['target'],
-    'relatedDomTarget': e['relatedTarget'],
-    'offsetX': e['offsetX'],
-    'offsetY': e['offsetY'],
-    'clientX': e['clientX'],
-    'clientY': e['clientY'],
-    'screenX': e['screenX'],
-    'screenY': e['screenY'],
-    'button': e['button'],
-    'keyCode': e['keyCode'],
-    'charCode': e['charCode'],
-    'ctrlKey': e['ctrlKey'],
-    'altKey': e['altKey'],
-    'shiftKey': e['shiftKey'],
-    'metaKey': e['metaKey'],
-    'platformModifierKey': e['platformModifierKey'],
-    'state': e['state']
-  };
-  var tag = anychart.utils.extractTag(res['domTarget']);
-  res['pointIndex'] = anychart.utils.toNumber(tag.index);
-  return res;
 };
 
 
@@ -434,15 +282,6 @@ anychart.treemapModule.Chart.prototype.makePointEvent = function(event) {
     'originalEvent': event,
     'point': this.getPoint(pointIndex)
   };
-};
-
-
-/** @inheritDoc */
-anychart.treemapModule.Chart.prototype.getPoint = function(pointIndex) {
-  if (pointIndex in this.linearNodes_)
-    return new anychart.treemapModule.Point(this, this.linearNodes_[pointIndex]);
-  else
-    return null;
 };
 
 
@@ -546,56 +385,12 @@ anychart.treemapModule.Chart.prototype.handleMouseDown = function(event) {
 };
 
 
-/**
- * Creates crumbs to node from tree root.
- * @param {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} node Node.
- * @return {Array} Array of crumbs.
- */
-anychart.treemapModule.Chart.prototype.createCrumbsTo = function(node) {
-  var crumbs = [];
-  var cur = node;
-  while (cur = cur.getParent()) {
-    crumbs.unshift(this.getPoint(/** @type {number} */ (cur.meta('index'))));
-  }
-  crumbs.push(this.getPoint(/** @type {number} */ (node.meta('index'))));
-  return crumbs;
-};
-
-
-/**
- * Creates crumbs to current root.
- * @return {Array} Current path.
- */
+/** @inheritDoc */
 anychart.treemapModule.Chart.prototype.getDrilldownPath = function() {
   this.ensureDataPrepared();
   if (!this.rootNode_)
     return null;
   return this.createCrumbsTo(this.rootNode_);
-};
-
-
-/**
- * Selects a point of the series by its index.
- * @param {number|Array<number>} indexOrIndexes Index of the point to select.
- * @param {anychart.core.MouseEvent=} opt_event Event that initiate point selecting.
- * @return {!anychart.treemapModule.Chart} {@link anychart.treemapModule.Chart} instance for method chaining.
- */
-anychart.treemapModule.Chart.prototype.selectPoint = function(indexOrIndexes, opt_event) {
-  if (!this.enabled())
-    return this;
-
-  var unselect = !(opt_event && opt_event.shiftKey);
-
-  if (goog.isArray(indexOrIndexes)) {
-    if (!opt_event)
-      this.unselect();
-
-    this.state.setPointState(anychart.PointState.SELECT, indexOrIndexes, unselect ? anychart.PointState.HOVER : undefined);
-  } else if (goog.isNumber(indexOrIndexes)) {
-    this.state.setPointState(anychart.PointState.SELECT, indexOrIndexes, unselect ? anychart.PointState.HOVER : undefined);
-  }
-
-  return this;
 };
 
 
@@ -613,47 +408,6 @@ anychart.treemapModule.Chart.prototype.unselect = function(opt_indexOrIndexes) {
   else
     index = (this.state.seriesState == anychart.PointState.NORMAL ? NaN : undefined);
   this.state.removePointState(anychart.PointState.SELECT, index);
-};
-
-
-/**
- * Hovers a point of the series by its index.
- * @param {number|Array<number>} index Index of the point to hover.
- * @return {!anychart.treemapModule.Chart}  {@link anychart.treemapModule.Chart} instance for method chaining.
- */
-anychart.treemapModule.Chart.prototype.hoverPoint = function(index) {
-  if (!this.enabled())
-    return this;
-
-  if (goog.isArray(index)) {
-    var hoveredPoints = this.state.getIndexByPointState(anychart.PointState.HOVER);
-    for (var i = 0; i < hoveredPoints.length; i++) {
-      if (!goog.array.contains(index, hoveredPoints[i])) {
-        this.state.removePointState(anychart.PointState.HOVER, hoveredPoints[i]);
-      }
-    }
-    this.state.addPointState(anychart.PointState.HOVER, index);
-  } else if (goog.isNumber(index)) {
-    this.unhover();
-    this.state.addPointState(anychart.PointState.HOVER, index);
-  }
-  return this;
-};
-
-
-/** @inheritDoc */
-anychart.treemapModule.Chart.prototype.unhover = function(opt_indexOrIndexes) {
-  if (!(this.state.hasPointState(anychart.PointState.HOVER) ||
-      this.state.isStateContains(this.state.getSeriesState(), anychart.PointState.HOVER)) ||
-      !this.enabled())
-    return;
-
-  var index;
-  if (goog.isDef(opt_indexOrIndexes))
-    index = opt_indexOrIndexes;
-  else
-    index = (this.state.seriesState == anychart.PointState.NORMAL ? NaN : undefined);
-  this.state.removePointState(anychart.PointState.HOVER, index);
 };
 
 
@@ -691,8 +445,8 @@ anychart.treemapModule.Chart.SORT_ASC = function(node1, node2) {
  *  Reset label and marker indexes meta.
  */
 anychart.treemapModule.Chart.prototype.resetIndexMeta = function() {
-  for (var i = 0; i < this.linearNodes_.length; i++) {
-    var node = this.linearNodes_[i];
+  for (var i = 0; i < this.linearNodes.length; i++) {
+    var node = this.linearNodes[i];
     if (node) {
       node.meta('labelIndex', void 0);
       node.meta('markerIndex', void 0);
@@ -708,94 +462,12 @@ anychart.treemapModule.Chart.prototype.resetIndexMeta = function() {
  */
 anychart.treemapModule.Chart.prototype.resetDataVars = function() {
   this.resetIndexMeta();
-  this.linearIndex_ = 0;
-  this.linearNodes_ = [];
-  this.drawingNodes_ = [];
+    this.linearIndex = 0;
+  this.linearNodes = [];
+  this.drawingNodes = [];
   this.nodeValues_ = [];
   this.hintNodeValues_ = [];
   this.rootNode_ = null;
-};
-
-
-/**
- * Getter/setter for data.
- * @param {(anychart.treeDataModule.Tree|anychart.treeDataModule.View|Array.<Object>)=} opt_value - Data tree or raw data.
- * @param {anychart.enums.TreeFillingMethod=} opt_fillMethod - Fill method.
- * @return {*}
- */
-anychart.treemapModule.Chart.prototype.data = function(opt_value, opt_fillMethod) {
-  if (goog.isDef(opt_value)) {
-    if (anychart.utils.instanceOf(opt_value, anychart.treeDataModule.Tree) ||
-        anychart.utils.instanceOf(opt_value, anychart.treeDataModule.View)) {
-      if (opt_value != this.data_) {
-        if (this.data_)
-          this.data_.unlistenSignals(this.dataInvalidated_, this);
-        this.data_ = /** @type {anychart.treeDataModule.Tree|anychart.treeDataModule.View} */(opt_value);
-        this.data_.listenSignals(this.dataInvalidated_, this);
-      }
-    } else {
-      if (this.data_)
-        this.data_.unlistenSignals(this.dataInvalidated_, this);
-      this.data_ = new anychart.treeDataModule.Tree(/** @type {Array.<Object>} */(opt_value), opt_fillMethod);
-      this.data_.listenSignals(this.dataInvalidated_, this);
-    }
-    this.invalidate(anychart.ConsistencyState.TREEMAP_DATA | anychart.ConsistencyState.CHART_LABELS, anychart.Signal.NEEDS_REDRAW);
-    return this;
-  }
-  return this.data_;
-};
-
-
-/**
- * @param {anychart.SignalEvent} event
- * @private
- */
-anychart.treemapModule.Chart.prototype.dataInvalidated_ = function(event) {
-  if (event.hasSignal(anychart.Signal.DATA_CHANGED))
-    this.invalidate(anychart.ConsistencyState.TREEMAP_DATA | anychart.ConsistencyState.CHART_LABELS, anychart.Signal.NEEDS_REDRAW);
-};
-
-
-/**
- * Drills down to target.
- * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem|Array|string)} target Target to drill down to.
- */
-anychart.treemapModule.Chart.prototype.drillTo = function(target) {
-  if (this.prevHoverSeriesStatus) {
-    this.unhover();
-    this.dispatchEvent(this.makeInteractivityPointEvent('hovered', {'target': this}, this.prevHoverSeriesStatus, true));
-    this.prevHoverSeriesStatus = null;
-  }
-  this.ensureDataPrepared();
-  var node = null;
-  var data;
-  if (anychart.utils.instanceOf(target, anychart.treeDataModule.Tree.DataItem) || anychart.utils.instanceOf(target, anychart.treeDataModule.View.DataItem)) {
-    // trying to drill by node
-    node = target;
-  } else if (goog.isArray(target)) {
-    data = this.data();
-    // suppose user have only one root, or id in first root of tree
-    if (data && data.numChildren()) {
-      var result = data.getChildAt(0);
-      for (var i = 0; i < target.length; i++) {
-        if (result)
-          result = result.getChildAt(target[i]);
-        else
-          break;
-      }
-      if (result)
-        node = result;
-    }
-    // trying to drill by array
-  } else {
-    // assume we are trying to drill using id from tree
-    data = this.data();
-    // suppose user have only one root, or id in first root of tree
-    if (data && data.numChildren()) {
-      node = data.searchItems('id', target)[0];
-    }
-  }
-  this.setRootNode(node);
 };
 
 
@@ -914,24 +586,12 @@ anychart.treemapModule.Chart.prototype.createLegendItemsProvider = function(sour
 };
 
 
-/** @inheritDoc */
-anychart.treemapModule.Chart.prototype.getAllSeries = function() {
-  return [this];
-};
-
-
 /**
  * Dummy. Because of ColorRange.
  * @return {anychart.treemapModule.Chart} Returns self.
  */
 anychart.treemapModule.Chart.prototype.getChart = function() {
   return this;
-};
-
-
-/** @inheritDoc */
-anychart.treemapModule.Chart.prototype.getSeriesStatus = function(event) {
-  return [];
 };
 
 
@@ -948,19 +608,6 @@ anychart.treemapModule.Chart.DataFields = {
   MISSING: 'missing',
   SHAPE: 'shape',
   HATCH_SHAPE: 'hatchShape'
-};
-
-
-/**
- * TreeMap node types.
- * @enum {number}
- */
-anychart.treemapModule.Chart.NodeType = {
-  LEAF: 0,
-  HEADER: 1,
-  RECT: 2,
-  TRANSIENT: 3,
-  HINT_LEAF: 4
 };
 
 
@@ -984,9 +631,9 @@ anychart.treemapModule.Chart.prototype.isMissing = function(value) {
  */
 anychart.treemapModule.Chart.prototype.calculateNodeSize = function(node, depth) {
   node
-      .meta('index', this.linearIndex_++)
+      .meta('index', this.linearIndex++)
       .meta('depth', depth);
-  this.linearNodes_.push(node);
+  this.linearNodes.push(node);
   var size;
   var value;
   var numChildren = node.numChildren();
@@ -1208,7 +855,12 @@ anychart.treemapModule.Chart.prototype.isRootNode = function(node) {
  */
 anychart.treemapModule.Chart.prototype.setRootNode = function(node) {
   this.rootNode_ = node;
-  this.invalidate(anychart.ConsistencyState.CHART_LEGEND | anychart.ConsistencyState.TREEMAP_NODE_TYPES | anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEED_UPDATE_COLOR_RANGE | anychart.Signal.NEEDS_REDRAW);
+  this.invalidate(
+      anychart.ConsistencyState.CHART_LEGEND |
+      anychart.ConsistencyState.TREEMAP_NODE_TYPES |
+      anychart.ConsistencyState.APPEARANCE,
+      anychart.Signal.NEED_UPDATE_COLOR_RANGE |
+      anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -1218,48 +870,6 @@ anychart.treemapModule.Chart.prototype.setRootNode = function(node) {
  */
 anychart.treemapModule.Chart.prototype.getRootNode = function() {
   return this.rootNode_;
-};
-
-
-/**
- * Normal state settings.
- * @param {!Object=} opt_value
- * @return {anychart.core.StateSettings|anychart.treemapModule.Chart}
- */
-anychart.treemapModule.Chart.prototype.normal = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.normal_.setup(opt_value);
-    return this;
-  }
-  return this.normal_;
-};
-
-
-/**
- * Hovered state settings.
- * @param {!Object=} opt_value
- * @return {anychart.core.StateSettings|anychart.treemapModule.Chart}
- */
-anychart.treemapModule.Chart.prototype.hovered = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.hovered_.setup(opt_value);
-    return this;
-  }
-  return this.hovered_;
-};
-
-
-/**
- * Selected state settings.
- * @param {!Object=} opt_value
- * @return {anychart.core.StateSettings|anychart.treemapModule.Chart}
- */
-anychart.treemapModule.Chart.prototype.selected = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.selected_.setup(opt_value);
-    return this;
-  }
-  return this.selected_;
 };
 
 
@@ -1395,35 +1005,35 @@ anychart.treemapModule.Chart.prototype.colorRangeInvalidated_ = function(event) 
  * Gets node type depends on it's depth.
  * @param {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} node Data node.
  * @param {number} depth Depth.
- * @return {anychart.treemapModule.Chart.NodeType}
+ * @return {anychart.treeChartBase.Chart.NodeType}
  * @private
  */
 anychart.treemapModule.Chart.prototype.getNodeType_ = function(node, depth) {
   var numChildren = node.numChildren();
-  /** @type {!anychart.treemapModule.Chart.NodeType} */
+  /** @type {!anychart.treeChartBase.Chart.NodeType} */
   var type;
   var maxDepth = /** @type {number} */ (this.getOption('maxDepth'));
   var hintDepth = /** @type {number} */ (this.getOption('hintDepth'));
   var sumDepth = maxDepth + hintDepth;
   if (numChildren) {
     if (depth < maxDepth)
-      type = anychart.treemapModule.Chart.NodeType.HEADER;
+      type = anychart.treeChartBase.Chart.NodeType.HEADER;
     else if (depth == maxDepth) {
       if (!hintDepth)
-        type = anychart.treemapModule.Chart.NodeType.LEAF;
+        type = anychart.treeChartBase.Chart.NodeType.LEAF;
       else
-        type = anychart.treemapModule.Chart.NodeType.RECT;
+        type = anychart.treeChartBase.Chart.NodeType.RECT;
     } else if (depth > maxDepth) {
       if (depth == sumDepth)
-        type = anychart.treemapModule.Chart.NodeType.HINT_LEAF;
+        type = anychart.treeChartBase.Chart.NodeType.HINT_LEAF;
       else
-        type = anychart.treemapModule.Chart.NodeType.TRANSIENT;
+        type = anychart.treeChartBase.Chart.NodeType.TRANSIENT;
     }
   } else {
     if (depth <= maxDepth)
-      type = anychart.treemapModule.Chart.NodeType.LEAF;
+      type = anychart.treeChartBase.Chart.NodeType.LEAF;
     else
-      type = anychart.treemapModule.Chart.NodeType.HINT_LEAF;
+      type = anychart.treeChartBase.Chart.NodeType.HINT_LEAF;
   }
   node.meta(anychart.treemapModule.Chart.DataFields.TYPE, type);
   return type;
@@ -1623,7 +1233,7 @@ anychart.treemapModule.Chart.prototype.drawMarker_ = function(pointState) {
   var node = /** @type {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} */ (this.getIterator().getItem());
   var bounds = /** @type {anychart.math.Rect} */ (node.meta(anychart.treemapModule.Chart.DataFields.POINT_BOUNDS));
   var type = node.meta(anychart.treemapModule.Chart.DataFields.TYPE);
-  if (type != anychart.treemapModule.Chart.NodeType.LEAF && type != anychart.treemapModule.Chart.NodeType.RECT)
+  if (type != anychart.treeChartBase.Chart.NodeType.LEAF && type != anychart.treeChartBase.Chart.NodeType.RECT)
     return;
 
   var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
@@ -1841,9 +1451,9 @@ anychart.treemapModule.Chart.prototype.drawLabel_ = function(pointState) {
   var type = node.meta(anychart.treemapModule.Chart.DataFields.TYPE);
   var isHeader;
 
-  if (type == anychart.treemapModule.Chart.NodeType.LEAF || type == anychart.treemapModule.Chart.NodeType.RECT) {
+  if (type == anychart.treeChartBase.Chart.NodeType.LEAF || type == anychart.treeChartBase.Chart.NodeType.RECT) {
     isHeader = false;
-  } else if (type == anychart.treemapModule.Chart.NodeType.HEADER) {
+  } else if (type == anychart.treeChartBase.Chart.NodeType.HEADER) {
     isHeader = true;
   } else
     return;
@@ -1972,7 +1582,7 @@ anychart.treemapModule.Chart.prototype.drawNodeBox_ = function(pointState) {
     this.applyHatchFill(pointState);
   }
 
-  if (type != anychart.treemapModule.Chart.NodeType.HINT_LEAF) {
+  if (type != anychart.treeChartBase.Chart.NodeType.HINT_LEAF) {
     // type = RECT, LEAF
     this.makeInteractive(box);
   }
@@ -2043,9 +1653,9 @@ anychart.treemapModule.Chart.prototype.colorizeShape = function(pointState) {
     var value = node.meta(anychart.treemapModule.Chart.DataFields.VALUE);
     var fillResolver = anychart.color.getColorResolver('fill', anychart.enums.ColorType.FILL, true);
     var fill = /** @type {acgraph.vector.Fill} */ (fillResolver(this, pointState, false));
-    if (type == anychart.treemapModule.Chart.NodeType.RECT) {
+    if (type == anychart.treeChartBase.Chart.NodeType.RECT) {
       fill = anychart.color.setOpacity(fill, /** @type {number} */ (this.getOption('hintOpacity')), true);
-    } else if (type == anychart.treemapModule.Chart.NodeType.HINT_LEAF)
+    } else if (type == anychart.treeChartBase.Chart.NodeType.HINT_LEAF)
       fill = this.hintColorScale_ ? this.hintColorScale_.valueToColor(value) : fill;
     var strokeResolver = anychart.color.getColorResolver('stroke', anychart.enums.ColorType.STROKE, true);
     var stroke = /** @type {acgraph.vector.Stroke} */ (strokeResolver(this, pointState, false));
@@ -2123,17 +1733,17 @@ anychart.treemapModule.Chart.prototype.drawNode_ = function(node, bounds, depth)
 
   var type = node.meta(anychart.treemapModule.Chart.DataFields.TYPE);
 
-  if (type == anychart.treemapModule.Chart.NodeType.LEAF || type == anychart.treemapModule.Chart.NodeType.HINT_LEAF) {
+  if (type == anychart.treeChartBase.Chart.NodeType.LEAF || type == anychart.treeChartBase.Chart.NodeType.HINT_LEAF) {
     pointBounds = bounds.clone();
     node.meta(anychart.treemapModule.Chart.DataFields.POINT_BOUNDS, pointBounds);
   } else {
-    if (type == anychart.treemapModule.Chart.NodeType.HEADER) {
+    if (type == anychart.treeChartBase.Chart.NodeType.HEADER) {
       pointBounds = this.calculateHeaderBounds_(node, bounds);
       contentBounds = this.getBoundsForContent_(bounds, pointBounds);
       node.meta(anychart.treemapModule.Chart.DataFields.POINT_BOUNDS, pointBounds);
       node.meta(anychart.treemapModule.Chart.DataFields.CONTENT_BOUNDS, contentBounds);
     }
-    if (type == anychart.treemapModule.Chart.NodeType.RECT || type == anychart.treemapModule.Chart.NodeType.TRANSIENT) {
+    if (type == anychart.treeChartBase.Chart.NodeType.RECT || type == anychart.treeChartBase.Chart.NodeType.TRANSIENT) {
       pointBounds = bounds.clone();
       node.meta(anychart.treemapModule.Chart.DataFields.POINT_BOUNDS, pointBounds);
       node.meta(anychart.treemapModule.Chart.DataFields.CONTENT_BOUNDS, pointBounds);
@@ -2148,13 +1758,13 @@ anychart.treemapModule.Chart.prototype.drawNode_ = function(node, bounds, depth)
   var index = /** @type {number} */ (node.meta('index'));
   this.getIterator().select(index);
   var pointState = this.state.getPointStateByIndex(index);
-  if (type == anychart.treemapModule.Chart.NodeType.TRANSIENT) {
-  } else if (type == anychart.treemapModule.Chart.NodeType.HEADER) {
+  if (type == anychart.treeChartBase.Chart.NodeType.TRANSIENT) {
+  } else if (type == anychart.treeChartBase.Chart.NodeType.HEADER) {
     this.drawLabel_(pointState);
   } else {
     // type = RECT LEAF HINT_LEAF
     this.drawNodeBox_(pointState);
-    if (type != anychart.treemapModule.Chart.NodeType.HINT_LEAF) {
+    if (type != anychart.treeChartBase.Chart.NodeType.HINT_LEAF) {
       this.drawLabel_(pointState);
       this.drawMarker_(pointState);
     }
@@ -2174,7 +1784,7 @@ anychart.treemapModule.Chart.prototype.calculateNodeTypes_ = function(node, dept
   var hintDepth = /** @type {number} */ (this.getOption('hintDepth'));
   if (depth > maxDepth + hintDepth) return;
   var type = this.getNodeType_(node, depth);
-  this.drawingNodes_[/** @type {number} */(node.meta('index'))] = node;
+  this.drawingNodes[/** @type {number} */(node.meta('index'))] = node;
   var numChildren = node.numChildren();
   if (numChildren) {
     for (var i = 0; i < numChildren; i++) {
@@ -2182,9 +1792,9 @@ anychart.treemapModule.Chart.prototype.calculateNodeTypes_ = function(node, dept
     }
   }
   var value = /** @type {number} */(node.meta(anychart.treemapModule.Chart.DataFields.VALUE));
-  if (type == anychart.treemapModule.Chart.NodeType.LEAF || type == anychart.treemapModule.Chart.NodeType.RECT)
+  if (type == anychart.treeChartBase.Chart.NodeType.LEAF || type == anychart.treeChartBase.Chart.NodeType.RECT)
     this.nodeValues_.push(value);
-  else if (type == anychart.treemapModule.Chart.NodeType.HINT_LEAF)
+  else if (type == anychart.treeChartBase.Chart.NodeType.HINT_LEAF)
     this.hintNodeValues_.push(value);
 };
 
@@ -2193,9 +1803,9 @@ anychart.treemapModule.Chart.prototype.calculateNodeTypes_ = function(node, dept
  * Prepares tree data for treeMap.
  */
 anychart.treemapModule.Chart.prototype.ensureDataPrepared = function() {
-  if (this.hasInvalidationState(anychart.ConsistencyState.TREEMAP_DATA)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.TREE_DATA)) {
     this.resetDataVars();
-    this.markConsistent(anychart.ConsistencyState.TREEMAP_DATA);
+    this.markConsistent(anychart.ConsistencyState.TREE_DATA);
     var data = this.data();
     if (data) {
       var numChildren = data.numChildren();
@@ -2205,21 +1815,16 @@ anychart.treemapModule.Chart.prototype.ensureDataPrepared = function() {
       // no data case
       else if (!numChildren)
         return;
+
+      var firstChild = /** @type {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} */(data.getChildAt(0));
       if (!this.rootNode_)
-        this.rootNode_ = data.getChildAt(0);
-      this.calculateNodeSize(data.getChildAt(0), 0);
+        this.rootNode_ = firstChild;
+      this.calculateNodeSize(firstChild, 0);
     } else {
       return;
     }
     this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.TREEMAP_NODE_TYPES | anychart.ConsistencyState.TREEMAP_COLOR_SCALE);
   }
-};
-
-
-/** @inheritDoc */
-anychart.treemapModule.Chart.prototype.toCsv = function(opt_chartDataExportMode, opt_csvSettings) {
-  return anychart.treeDataModule.utils.toCsv(
-      /** @type {anychart.treeDataModule.Tree|anychart.treeDataModule.View} */(this.data()), opt_csvSettings);
 };
 
 
@@ -2234,7 +1839,7 @@ anychart.treemapModule.Chart.prototype.calculate = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.TREEMAP_NODE_TYPES)) {
     this.nodeValues_ = [];
     this.hintNodeValues_ = [];
-    this.drawingNodes_ = [];
+    this.drawingNodes = [];
     this.calculateNodeTypes_(this.rootNode_, 0);
     this.getResetIterator();
     this.markConsistent(anychart.ConsistencyState.TREEMAP_NODE_TYPES);
@@ -2370,7 +1975,7 @@ anychart.treemapModule.Chart.prototype.drawContent = function(bounds) {
     iterator.reset();
     while (iterator.advance()) {
       var type = iterator.meta(anychart.treemapModule.Chart.DataFields.TYPE);
-      if (type == anychart.treemapModule.Chart.NodeType.RECT) {
+      if (type == anychart.treeChartBase.Chart.NodeType.RECT) {
         var shape = iterator.meta(anychart.treemapModule.Chart.DataFields.SHAPE);
         if (shape) {
           var fillResolver = anychart.color.getColorResolver('fill', anychart.enums.ColorType.FILL, false);
@@ -2399,14 +2004,14 @@ anychart.treemapModule.Chart.prototype.specificContextMenuItems = function(items
   var tag = anychart.utils.extractTag(context['event']['domTarget']);
   var node;
   if (anychart.utils.instanceOf(context['target'], anychart.core.ui.LabelsFactory) || anychart.utils.instanceOf(context['target'], anychart.core.ui.MarkersFactory)) {
-    node = this.linearNodes_[/** @type {number} */(tag)];
+    node = this.linearNodes[/** @type {number} */(tag)];
   } else {
     node = tag['node'];
   }
 
   var specificItems = {};
 
-  var isHeader = node.meta(anychart.treemapModule.Chart.DataFields.TYPE) == anychart.treemapModule.Chart.NodeType.HEADER;
+  var isHeader = node.meta(anychart.treemapModule.Chart.DataFields.TYPE) == anychart.treeChartBase.Chart.NodeType.HEADER;
   var canDrillDown = node.numChildren() && !(isHeader && this.isRootNode(node));
   if (canDrillDown) {
     specificItems['drill-down-to'] = {
@@ -2457,9 +2062,6 @@ anychart.treemapModule.Chart.prototype.isNoData = function() {
 anychart.treemapModule.Chart.prototype.setupByJSON = function(config, opt_default) {
   anychart.treemapModule.Chart.base(this, 'setupByJSON', config, opt_default);
 
-  if ('treeData' in config)
-    this.data(anychart.treeDataModule.Tree.fromJson(config['treeData']));
-
   if ('colorScale' in config) {
     var json = config['colorScale'];
     var scale = null;
@@ -2480,13 +2082,6 @@ anychart.treemapModule.Chart.prototype.setupByJSON = function(config, opt_defaul
 
   if ('colorRange' in config)
     this.colorRange(config['colorRange']);
-  if ('drillTo' in config)
-    this.drillTo(config['drillTo']);
-
-  this.normal_.setupInternal(!!opt_default, config);
-  this.normal_.setupInternal(!!opt_default, config['normal']);
-  this.hovered_.setupInternal(!!opt_default, config['hovered']);
-  this.selected_.setupInternal(!!opt_default, config['selected']);
 };
 
 
@@ -2498,29 +2093,9 @@ anychart.treemapModule.Chart.prototype.serialize = function() {
     json['colorScale'] = this.colorScale().serialize();
   }
 
-  json['type'] = this.getType();
-
-  var data = this.data();
-  if (data)
-    json['treeData'] = data.serializeWithoutMeta();
-
-  var drillPath = this.getDrilldownPath();
-  var drillTo = [];
-  var parentNode;
-  for (var i = 1; i < drillPath.length; i++) {
-    parentNode = drillPath[i - 1].getNode();
-    drillTo[i - 1] = parentNode.indexOfChild(drillPath[i].getNode());
-  }
-  if (drillTo.length)
-    json['drillTo'] = drillTo;
-
   json['colorRange'] = this.colorRange().serialize();
 
   anychart.core.settings.serialize(this, anychart.treemapModule.Chart.PROPERTY_DESCRIPTORS, json, 'TreeMap');
-
-  json['normal'] = this.normal().serialize();
-  json['hovered'] = this.hovered().serialize();
-  json['selected'] = this.selected().serialize();
 
   return {'chart': json};
 };
@@ -2544,6 +2119,7 @@ anychart.treemapModule.Chart.prototype.disposeInternal = function() {
   proto['data'] = proto.data;
   proto['selectionMode'] = proto.selectionMode;
   proto['hoverMode'] = proto.hoverMode;
+
   // auto generated
   // proto['maxDepth'] = proto.maxDepth;
   // proto['hintDepth'] = proto.hintDepth;

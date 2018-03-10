@@ -1,5 +1,5 @@
 //region --- Requiring and Providing
-goog.provide('anychart.pieModule.Center');
+goog.provide('anychart.core.ui.Center');
 goog.require('anychart.core.Base');
 goog.require('anychart.core.settings');
 //endregion
@@ -8,23 +8,23 @@ goog.require('anychart.core.settings');
 
 /**
  * Map axes settings.
- * @param {!anychart.pieModule.Chart} pie .
+ * @param {!anychart.core.ICenterContentChart} chart .
  * @extends {anychart.core.Base}
  * @implements {anychart.core.settings.IResolvable}
  * @constructor
  */
-anychart.pieModule.Center = function(pie) {
-  anychart.pieModule.Center.base(this, 'constructor');
+anychart.core.ui.Center = function(chart) {
+  anychart.core.ui.Center.base(this, 'constructor');
 
   /**
    * Owner.
-   * @type {anychart.pieModule.Chart}
+   * @type {anychart.core.ICenterContentChart}
    */
-  this.pie = pie;
+  this.chart = chart;
 
   /**
    * Parent title.
-   * @type {anychart.pieModule.Center}
+   * @type {anychart.core.ui.Center}
    * @private
    */
   this.parent_ = null;
@@ -43,7 +43,7 @@ anychart.pieModule.Center = function(pie) {
     ['fill', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW]
   ]);
 };
-goog.inherits(anychart.pieModule.Center, anychart.core.Base);
+goog.inherits(anychart.core.ui.Center, anychart.core.Base);
 
 
 //region --- Internal properties
@@ -51,7 +51,7 @@ goog.inherits(anychart.pieModule.Center, anychart.core.Base);
  * Supported consistency states.
  * @type {number}
  */
-anychart.pieModule.Center.prototype.SUPPORTED_SIGNALS =
+anychart.core.ui.Center.prototype.SUPPORTED_SIGNALS =
     anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED;
 
 
@@ -62,11 +62,11 @@ anychart.pieModule.Center.prototype.SUPPORTED_SIGNALS =
  * @param {string} name
  * @return {*}
  */
-anychart.pieModule.Center.prototype.getOption = anychart.core.settings.getOption;
+anychart.core.ui.Center.prototype.getOption = anychart.core.settings.getOption;
 
 
 /** @inheritDoc */
-anychart.pieModule.Center.prototype.isResolvable = function() {
+anychart.core.ui.Center.prototype.isResolvable = function() {
   return true;
 };
 
@@ -74,7 +74,7 @@ anychart.pieModule.Center.prototype.isResolvable = function() {
 //endregion
 //region --- IResolvable implementation
 /** @inheritDoc */
-anychart.pieModule.Center.prototype.resolutionChainCache = function(opt_value) {
+anychart.core.ui.Center.prototype.resolutionChainCache = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.resolutionChainCache_ = opt_value;
   }
@@ -83,11 +83,11 @@ anychart.pieModule.Center.prototype.resolutionChainCache = function(opt_value) {
 
 
 /** @inheritDoc */
-anychart.pieModule.Center.prototype.getResolutionChain = anychart.core.settings.getResolutionChain;
+anychart.core.ui.Center.prototype.getResolutionChain = anychart.core.settings.getResolutionChain;
 
 
 /** @inheritDoc */
-anychart.pieModule.Center.prototype.getLowPriorityResolutionChain = function() {
+anychart.core.ui.Center.prototype.getLowPriorityResolutionChain = function() {
   var sett = [this.themeSettings];
   if (this.parent_) {
     sett = goog.array.concat(sett, this.parent_.getLowPriorityResolutionChain());
@@ -97,7 +97,7 @@ anychart.pieModule.Center.prototype.getLowPriorityResolutionChain = function() {
 
 
 /** @inheritDoc */
-anychart.pieModule.Center.prototype.getHighPriorityResolutionChain = function() {
+anychart.core.ui.Center.prototype.getHighPriorityResolutionChain = function() {
   var sett = [this.ownSettings];
   if (this.parent_) {
     sett = goog.array.concat(sett, this.parent_.getHighPriorityResolutionChain());
@@ -112,7 +112,7 @@ anychart.pieModule.Center.prototype.getHighPriorityResolutionChain = function() 
  * Simple properties descriptors.
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.pieModule.Center.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
+anychart.core.ui.Center.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
   anychart.core.settings.createDescriptor(
@@ -129,7 +129,7 @@ anychart.pieModule.Center.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
 
   return map;
 })();
-anychart.core.settings.populate(anychart.pieModule.Center, anychart.pieModule.Center.prototype.SIMPLE_PROPS_DESCRIPTORS);
+anychart.core.settings.populate(anychart.core.ui.Center, anychart.core.ui.Center.prototype.SIMPLE_PROPS_DESCRIPTORS);
 
 
 //endregion
@@ -137,9 +137,9 @@ anychart.core.settings.populate(anychart.pieModule.Center, anychart.pieModule.Ce
 /**
  * Content.
  * @param {(acgraph.vector.Element|anychart.core.VisualBase|Object)=} opt_value
- * @return {acgraph.vector.Element|anychart.core.VisualBase|anychart.pieModule.Center}
+ * @return {acgraph.vector.Element|anychart.core.VisualBase|anychart.core.ui.Center}
  */
-anychart.pieModule.Center.prototype.content = function(opt_value) {
+anychart.core.ui.Center.prototype.content = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.content_ != opt_value) {
       this.contentToClear = anychart.utils.instanceOf(opt_value, acgraph.vector.Element) ||
@@ -175,44 +175,23 @@ anychart.pieModule.Center.prototype.content = function(opt_value) {
 
 
 /**
- * Getter for the pie chart center point.<br/>
+ * Getter for the chart chart center point.<br/>
  * <b>Note:</b> Works only after {@link anychart.pieModule.Chart#draw} is called.
- * @example
- *  var pieInnerRadius = 40
- *  var pie = anychart.pie([10, 14, 8, 12])
- *      .container(stage)
- *      .innerRadius(pieInnerRadius+10)
- *      .draw();
- *  var pieCenter = pie.center().getPoint();
- *  var labelBounds = anychart.math.rect(
- *      pieCenter.x - pieInnerRadius,
- *      pieCenter.y - pieInnerRadius,
- *      pieCenter.x + pieInnerRadius,
- *      pieCenter.y + pieInnerRadius
- *  );
- *  anychart.standalones.label()
- *      .text('Pie\ninner\nlabel')
- *      .parentBounds(labelBounds)
- *      .container(stage)
- *      .hAlign('center')
- *      .vAlign('center')
- *      .adjustFontSize(true)
- *      .width(2*pieInnerRadius)
- *      .height(2*pieInnerRadius)
- *      .draw();
- * @return {anychart.math.Coordinate} XY coordinate of the current pie chart center.
+ * @return {anychart.math.Coordinate} XY coordinate of the current chart center.
  */
-anychart.pieModule.Center.prototype.getPoint = function() {
-  return {'x': this.pie.cx, 'y': this.pie.cy};
+anychart.core.ui.Center.prototype.getPoint = function() {
+  var centerCoords = this.chart.getCenterCoords();
+  return {'x': centerCoords[0], 'y': centerCoords[1]};
 };
 
 
 /**
- * Returns pie center content bounds.
+ * Returns chart center content bounds.
  * @return {anychart.math.Rect}
  */
-anychart.pieModule.Center.prototype.getBounds = function() {
-  return this.pie.centerContentBounds ? this.pie.centerContentBounds.clone() : anychart.math.rect(0, 0, 0, 0);
+anychart.core.ui.Center.prototype.getBounds = function() {
+  var centerContentBounds = this.chart.getCenterContentBounds();
+  return centerContentBounds ? centerContentBounds.clone() : anychart.math.rect(0, 0, 0, 0);
 };
 
 
@@ -221,11 +200,11 @@ anychart.pieModule.Center.prototype.getBounds = function() {
 /**
  * Clearing center content.
  */
-anychart.pieModule.Center.prototype.clearContent = function() {
+anychart.core.ui.Center.prototype.clearContent = function() {
   if (this.contentToClear) {
     var content = this.contentToClear;
     if (anychart.utils.instanceOf(content, acgraph.vector.Element)) {
-      this.contentLayer.getStage().unlisten(acgraph.vector.Stage.EventType.RENDER_FINISH, this.pie.acgraphElemetnsListener, false, this.pie);
+      this.contentLayer.getStage().unlisten(acgraph.vector.Stage.EventType.RENDER_FINISH, this.chart.acgraphElementsListener, false, this.chart);
       content.remove();
     } else {
       content.suspendSignalsDispatching();
@@ -241,7 +220,7 @@ anychart.pieModule.Center.prototype.clearContent = function() {
         content.container(null);
         content.remove();
       }
-      this.realContent.unlisten(anychart.enums.EventType.CHART_DRAW, this.pie.chartsListener, false, this.pie);
+      this.realContent.unlisten(anychart.enums.EventType.CHART_DRAW, this.chart.chartsListener, false, this.chart);
       content.resumeSignalsDispatching(false);
     }
     this.contentToClear = null;
@@ -255,13 +234,13 @@ anychart.pieModule.Center.prototype.clearContent = function() {
  * Sets default settings.
  * @param {!Object} config
  */
-anychart.pieModule.Center.prototype.setThemeSettings = function(config) {
+anychart.core.ui.Center.prototype.setThemeSettings = function(config) {
   anychart.core.settings.copy(this.themeSettings, this.SIMPLE_PROPS_DESCRIPTORS, config);
 };
 
 
 /** @inheritDoc */
-anychart.pieModule.Center.prototype.setupByJSON = function(config, opt_default) {
+anychart.core.ui.Center.prototype.setupByJSON = function(config, opt_default) {
   if (opt_default) {
     this.setThemeSettings(config);
   } else {
@@ -273,7 +252,7 @@ anychart.pieModule.Center.prototype.setupByJSON = function(config, opt_default) 
 
 
 /** @inheritDoc */
-anychart.pieModule.Center.prototype.serialize = function() {
+anychart.core.ui.Center.prototype.serialize = function() {
   var json = {};
 
   anychart.core.settings.serialize(this, this.SIMPLE_PROPS_DESCRIPTORS, json, 'Map axes props');
@@ -288,7 +267,7 @@ anychart.pieModule.Center.prototype.serialize = function() {
 /**
  * @inheritDoc
  */
-anychart.pieModule.Center.prototype.disposeInternal = function() {
+anychart.core.ui.Center.prototype.disposeInternal = function() {
   this.contentToClear = this.realContent;
   this.clearContent();
   this.content_ = null;
@@ -296,7 +275,7 @@ anychart.pieModule.Center.prototype.disposeInternal = function() {
   goog.disposeAll(this.contentLayer);
   this.contentLayer = null;
 
-  anychart.pieModule.Center.base(this, 'disposeInternal');
+  anychart.core.ui.Center.base(this, 'disposeInternal');
 };
 
 
@@ -304,7 +283,7 @@ anychart.pieModule.Center.prototype.disposeInternal = function() {
 //region --- Exports
 //exports
 (function() {
-  var proto = anychart.pieModule.Center.prototype;
+  var proto = anychart.core.ui.Center.prototype;
   // proto['stroke'] = proto.stroke;
   // proto['fill'] = proto.fill;
 

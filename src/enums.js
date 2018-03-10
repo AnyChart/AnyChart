@@ -60,7 +60,8 @@ anychart.enums.ChartTypes = {
   TAG_CLOUD: 'tag-cloud',
   VENN: 'venn',
   HILO: 'hilo',
-  WATERFALL: 'waterfall'
+  WATERFALL: 'waterfall',
+  SUNBURST: 'sunburst'
 };
 
 
@@ -958,6 +959,18 @@ anychart.enums.TreeFillingMethod = {
    * [/code]
    */
   AS_TABLE: 'as-table'
+};
+
+
+/**
+ * Sunburst calculating mode.
+ * @enum {string}
+ */
+anychart.enums.SunburstCalculationMode = {
+  ORDINAL_FROM_ROOT: 'ordinal-from-root',
+  ORDINAL_FROM_LEAVES: 'ordinal-from-leaves',
+  PARENT_DEPENDENT: 'parent-dependent',
+  PARENT_INDEPENDENT: 'parent-independent'
 };
 
 

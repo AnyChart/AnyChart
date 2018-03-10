@@ -25,3 +25,4 @@ goog.require('anychart.tagCloudModule.defaultTheme');
 goog.require('anychart.treemapModule.defaultTheme');
 goog.require('anychart.vennModule.defaultTheme');
 goog.require('anychart.waterfallModule.defaultTheme');
+goog.require('anychart.sunburstModule.defaultTheme');

@@ -123,6 +123,9 @@
             <!-- chart.Venn elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="data_separator" type="xsd:string"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="intersections" type="core.Intersections"/>
+            <!-- chart.Sunburst elements -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="levels" type="core.SunburstLevels"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="leaves" type="core.SunburstLevel"/>
         </xsd:all>
         <!-- core.Chart attrs -->
         <xsd:attributeGroup ref="attrs.VisualBase"/>
@@ -245,6 +248,8 @@
         <xsd:attribute name="data_separator" type="xsd:string"/>
         <!-- Waterfall attributes -->
         <xsd:attribute name="data_mode" type="enums.WaterfallDataMode"/>
+        <!-- chart.Sunburst elements -->
+        <xsd:attribute name="calculation_mode" type="enums.CalculationMode" default="ordinal-from-root"/>
     </xsd:complexType>
 
     <xsd:complexType name="Gauge">
@@ -2637,6 +2642,29 @@
         </xsd:all>
     </xsd:complexType>
 
+    <xsd:complexType name="core.SunburstLevels">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="level" type="core.sunburst.Level"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="core.sunburst.Level">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="level" type="core.SunburstLevel"/>
+        </xsd:all>
+        <xsd:attribute name="index" type="xsd:integer"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="core.SunburstLevel">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="normal" type="core.StateSettings"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="hovered" type="core.StateSettings"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="selected" type="core.StateSettings"/>
+        </xsd:all>
+        <xsd:attribute name="thickness" type="simple.NumberOrPercent"/>
+        <xsd:attribute name="enabled" type="simple.BoolOrNull"/>
+    </xsd:complexType>
+
     <xsd:complexType name="core.quadrant.Quarter">
         <xsd:all>
             <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill" />
@@ -3038,6 +3066,7 @@
             <xsd:enumeration value="venn"/>
             <xsd:enumeration value="hilo"/>
             <xsd:enumeration value="waterfall"/>
+            <xsd:enumeration value="sunburst"/>
         </xsd:restriction>
     </xsd:simpleType>
 
@@ -3151,6 +3180,15 @@
             <xsd:enumeration value="asc"/>
             <xsd:enumeration value="desc"/>
             <xsd:enumeration value="none"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="enums.CalculationMode">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="ordinal-from-root"/>
+            <xsd:enumeration value="ordinal-from-leaves"/>
+            <xsd:enumeration value="parent-dependent"/>
+            <xsd:enumeration value="parent-independent"/>
         </xsd:restriction>
     </xsd:simpleType>
 
