@@ -179,7 +179,7 @@ scp -i ~/.ssh/id_rsa dist/${INSTALL_PACKAGE_NAME} $STATIC_HOST_SSH_STRING:/apps/
 
 # unzip files
 echo Unzipping files
-ssh -i ~/.ssh/id_rsa $STATIC_HOST_SSH_STRING "unzip -q -o /apps/static/cdn/releases/${VERSION}/anychart-installation-package-${VERSION}.zip -d /apps/static/cdn/releases/${VERSION}/"
+ssh -i ~/.ssh/id_rsa $STATIC_HOST_SSH_STRING "unzip -q -o /apps/static/cdn/releases/${VERSION}/${INSTALL_PACKAGE_NAME} -d /apps/static/cdn/releases/${VERSION}/"
 
 ssh -i ~/.ssh/id_rsa $STATIC_HOST_SSH_STRING "
     cp /apps/static/cdn/releases/${VERSION}/js/modules.json /apps/static/cdn/releases/${VERSION}/index.json"
@@ -204,7 +204,8 @@ echo Copy CAT legacy files
 if [ "${VERSION}" != "${TRAVIS_BRANCH}" ]; then
     ssh -i ~/.ssh/id_rsa  $STATIC_HOST_SSH_STRING "
     rm -rf /apps/static/cdn/releases/${TRAVIS_BRANCH} &&
-    cp -r /apps/static/cdn/releases/${VERSION} /apps/static/cdn/releases/${TRAVIS_BRANCH}"
+    cp -r /apps/static/cdn/releases/${VERSION} /apps/static/cdn/releases/${TRAVIS_BRANCH} &&
+    mv /apps/static/cdn/releases/${TRAVIS_BRANCH}/${INSTALL_PACKAGE_NAME} /apps/static/cdn/releases/${TRAVIS_BRANCH}/anychart-installation-package-${TRAVIS_BRANCH}.zip"
 fi
 # ---- Copy dev legacy files (dev builds only) -------------------------------------------------------------------------
 
