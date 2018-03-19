@@ -4038,7 +4038,15 @@
         "milestoneHeight": {"type": ["number", "string"]},
         "milestoneAnchor": {"type": "string"},
         "milestonePosition": {"type": "string"},
-        "milestoneOffset": {"type": ["number", "string"]}
+        "milestoneOffset": {"type": ["number", "string"]},
+
+        "elements": {"$ref": "#/definitions/anychart.core.ui.GanttElementsBase"},
+        "tasks": {"$ref": "#/definitions/anychart.core.ui.GanttElementsBase"},
+        "groupingTasks": {"$ref": "#/definitions/anychart.core.ui.GanttElementsBase"},
+        "baselines": {"$ref": "#/definitions/anychart.core.ui.GanttElementsBase"},
+        "periods": {"$ref": "#/definitions/anychart.core.ui.GanttElementsBase"},
+        "progress": {"$ref": "#/definitions/anychart.core.ui.GanttElementsBase"},
+        "milestones": {"$ref": "#/definitions/anychart.core.ui.GanttElementsBase"}
       }
     },
 
@@ -4076,6 +4084,49 @@
         "tilesSeparationStroke": {"$ref": "#/definitions/stroke"},
         "tileFill": {"$ref": "#/definitions/fill"},
         "labels": {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
+      }
+    },
+
+    "anychart.core.ui.GanttElementsBase": {
+      "type": "object",
+      "allOf": [{"$ref": "#/definitions/anychart.core.VisualBase"}],
+      "properties": {
+        "rendering": {"$ref": "#/definitions/anychart.core.ui.GanttRenderingSettings"}
+      }
+    },
+
+    "anychart.core.ui.GanttRenderingSettings": {
+      "type": "object",
+      "allOf": [{"$ref": "#/definitions/anychart.core.VisualBase"}],
+      "properties": {
+        "shapes": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/anychart.core.ui.GanttShapes"}
+        }
+      }
+    },
+
+    "anychart.core.ui.GanttShapes": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "shapeType": {
+          "type": "string"
+        },
+        "fillName": {
+          "type": "string"
+        },
+        "strokeName": {
+          "type": "string"
+        },
+        "zIndex": {
+          "type": "number"
+        },
+        "disablePointerEvents": {
+          "type": "boolean"
+        }
       }
     },
 

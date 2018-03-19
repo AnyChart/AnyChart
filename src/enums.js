@@ -2070,16 +2070,17 @@ anychart.enums.normalizeGanttRangeAnchor = function(value, opt_default) {
 /**
  * Timeline visual element types.
  * In current time (21 Jul 2015) doesn't need to be exported.
- * @enum {number}
+ * @enum {string}
  */
 anychart.enums.TLElementTypes = {
-  PARENT: 0,
-  BASE: 1,
-  PROGRESS: 2,
-  BASELINE: 3,
-  MILESTONE: 4,
-  PERIOD: 5,
-  CONNECTOR: 6
+  ALL: 'all',
+  GROUPING_TASKS: 'grouping-tasks',
+  TASKS: 'tasks',
+  PROGRESS: 'progress',
+  BASELINES: 'baselines',
+  MILESTONES: 'milestones',
+  PERIODS: 'periods',
+  CONNECTORS: 'connectors'
 };
 
 
@@ -4652,6 +4653,16 @@ anychart.enums.ShapeType = {
   RECT: 'rect',
   ELLIPSE: 'ellipse',
   NONE: 'none'
+};
+
+
+/**
+ * Normalizes shape type.
+ * @param {anychart.enums.ShapeType|string} value - Shape type.
+ * @return {anychart.enums.ShapeType} - Normalized type.
+ */
+anychart.enums.normalizeShapeType = function(value) {
+  return /** @type {anychart.enums.ShapeType} */(anychart.enums.normalize(anychart.enums.ShapeType, value, anychart.enums.ShapeType.PATH));
 };
 
 

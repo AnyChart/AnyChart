@@ -118,16 +118,6 @@ anychart.ganttModule.IInteractiveGrid.prototype.deleteKeyHandler = function(e) {
 
 
 /**
- * Creates gantt format provider.
- * @param {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} dataItem - Data item.
- * @param {Object=} opt_period - Optional current period.
- * @param {number=} opt_periodIndex - Period index. Required is opt_period is set.
- * @return {Object} - Gantt context provider.
- */
-anychart.ganttModule.IInteractiveGrid.prototype.createFormatProvider = function(dataItem, opt_period, opt_periodIndex) {};
-
-
-/**
  * Gets/sets default row height.
  * @param {number=} opt_value - Default row height to set.
  * @return {number|anychart.ganttModule.IInteractiveGrid} - Current value or itself for chaining.

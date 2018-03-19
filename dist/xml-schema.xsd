@@ -1558,6 +1558,15 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="horizontal_scroll_bar" type="core.ScrollBar"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="vertical_scroll_bar" type="core.ScrollBar"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="header" type="TimelineHeader"/>
+
+            <!-- New Gantt API -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="elements" type="GanttElementBase"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="tasks" type="GanttElementBase"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="grouping_tasks" type="GanttElementBase"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="baselines" type="GanttElementBase"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="milestones" type="GanttElementBase"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="progress" type="GanttElementBase"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="periods" type="GanttElementBase"/>
         </xsd:all>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
         <xsd:attribute name="is_standalone" type="simple.Bool"/>
@@ -2273,7 +2282,6 @@
         <xsd:attributeGroup ref="attrs.VisualBase"/>
     </xsd:complexType>
 
-
     <xsd:complexType name="TimelineHeaderLevel">
         <xsd:all>
             <xsd:element minOccurs="0" maxOccurs="1" name="tile_fill" type="Fill"/>
@@ -2284,6 +2292,35 @@
         <xsd:attribute name="tiles_separation_stroke" type="xsd:string"/>
 
         <xsd:attributeGroup ref="attrs.VisualBase"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="GanttElementBase">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="rendering" type="GanttRenderingSettings"/>
+        </xsd:all>
+        <xsd:attributeGroup ref="attrs.VisualBase"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="GanttRenderingSettings">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="shapes" type="GanttShapes_list"/>
+        </xsd:all>
+        <xsd:attributeGroup ref="attrs.VisualBase"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="GanttShapes_list">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="shape" type="GanttShape"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="GanttShape">
+        <xsd:attribute name="name" type="xsd:string"/>
+        <xsd:attribute name="shape_type" type="xsd:string"/>
+        <xsd:attribute name="fill_name" type="xsd:string"/>
+        <xsd:attribute name="stroke_name" type="xsd:string"/>
+        <xsd:attribute name="z_index" type="xsd:double"/>
+        <xsd:attribute name="disable_pointer_events" type="simple.Bool"/>
     </xsd:complexType>
 
     <!-- Gauge elements -->

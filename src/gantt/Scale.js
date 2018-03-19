@@ -780,13 +780,22 @@ anychart.ganttModule.Scale.prototype.timestampToRatio = function(value) {
 /**
  * This method is added only for compatibility with line/range/text markers of gantt chart's timeline.
  * NOTE: Use timestampToRatio method instead.
- * TODO (A.Kudryavtsev): For reviewer: we have a method timestampToRatio because we also have ratioToTimestamp.
  * @param {*} value - Value to transform.
- * @param {number=} opt_subRangeRatio - This parameter will be completely ignored.
  * @return {number} - Value transformed to ratio scope. Returns NaN if scale range is not set.
  */
-anychart.ganttModule.Scale.prototype.transform = function(value, opt_subRangeRatio) {
+anychart.ganttModule.Scale.prototype.transform = function(value) {
   return this.timestampToRatio(value);
+};
+
+
+/**
+ * This method is added only for compatibility with line/range/text markers of gantt chart's timeline.
+ * NOTE: Use timestampToRatio method instead.
+ * @param {number} ratio - Ratio to transform.
+ * @return {number} - Ratio transformed to datetime.
+ */
+anychart.ganttModule.Scale.prototype.inverseTransform = function(ratio) {
+  return this.ratioToTimestamp(ratio);
 };
 
 
@@ -1174,6 +1183,8 @@ anychart.ganttModule.Scale.prototype.setupByJSON = function(config, opt_default)
   proto['softMaximum'] = proto.softMaximum;
   proto['getRange'] = proto.getRange;
   proto['getTotalRange'] = proto.getTotalRange;
+  proto['transform'] = proto.transform;
+  proto['inverseTransform'] = proto.inverseTransform;
   // proto['zoomIn'] = proto.zoomIn;
   // proto['zoomOut'] = proto.zoomOut;
   // proto['zoomTo'] = proto.zoomTo;
