@@ -300,7 +300,7 @@ anychart.treeDataModule.Tree.prototype.fillAsParentPointer_ = function(data) {
     tdis.push(dataItem);
 
     if (goog.isDefAndNotNull(id)) {
-      id = id + ''; //Treat ID value as string anyway.
+      id = String(id); //Treat ID value as string anyway.
       index = goog.array.binarySearch(uids, id, anychart.utils.compareAsc);
       if (index < 0) {
         var pos = ~index;
@@ -326,7 +326,7 @@ anychart.treeDataModule.Tree.prototype.fillAsParentPointer_ = function(data) {
     tdi = tdis[i]; //Tree data item.
     parentId = data[i][this.mapping_[anychart.enums.GanttDataFields.PARENT] || anychart.enums.GanttDataFields.PARENT];
     if (goog.isDefAndNotNull(parentId)) {
-      parentId = parentId + ''; //Treat ID value as string anyway.
+      parentId = String(parentId); //Treat ID value as string anyway.
       index = goog.array.binarySearch(uids, parentId, anychart.utils.compareAsc);
       if (index < 0) {
         searchResult = this.search(anychart.enums.GanttDataFields.ID, parentId);
@@ -527,7 +527,7 @@ anychart.treeDataModule.Tree.prototype.addToIndex = function(item, opt_field, op
      */
     var indexKeyValue = {key: item.get(/** @type {string} */ (opt_field)), value: item};
     if (this.isStringIndex_[/** @type {string} */ (opt_field)])
-      indexKeyValue.key = '' + indexKeyValue.key;
+      indexKeyValue.key = String(indexKeyValue.key);
     var index = goog.array.binarySearch(indexArr, indexKeyValue, this.comparisonFunction_);
 
     if (index < 0) { //Not found.
@@ -573,7 +573,7 @@ anychart.treeDataModule.Tree.prototype.removeFromIndex = function(item, opt_fiel
     //Looking in index array of key-value pairs for unique key.
     var indexKey = {key: item.get(/** @type {string} */ (opt_field))};
     if (this.isStringIndex_[/** @type {string} */ (opt_field)])
-      indexKey.key = '' + indexKey.key;
+      indexKey.key = String(indexKey.key);
     var index = goog.array.binarySearch(indexArr, indexKey, this.comparisonFunction_); //index here really can't be negative (value must exist). If not found - here's a bug.
     var found = indexArr[index]; //found {key:'', value:(TreeDataItem|Array)}-object. Value can be a tree data item or array.
     if (found) {
@@ -668,7 +668,7 @@ anychart.treeDataModule.Tree.prototype.search = function(soughtField, valueOrEva
         goog.array.binarySelect(this.index_[soughtField],
             /** @type {!Function} */ (valueOrEvaluator),
             /** @type {Object} */ (opt_comparisonFnOrEvaluatorContext)) :
-        goog.array.binarySearch(this.index_[soughtField], {key: isStringIndex ? '' + valueOrEvaluator : valueOrEvaluator},
+        goog.array.binarySearch(this.index_[soughtField], {key: isStringIndex ? String(valueOrEvaluator) : valueOrEvaluator},
             /** @type {!Function} */ (opt_comparisonFnOrEvaluatorContext) || /** @type {!Function} */ (this.comparisonFunction_));
 
     result = resultIndex >= 0 ? this.index_[soughtField][resultIndex].value : null;
@@ -735,7 +735,7 @@ anychart.treeDataModule.Tree.prototype.find = function(field, value) {
   var i, result;
   var isStringIndex = this.isStringIndex_[field];
   if (this.index_[field]) { //Fast search: index exists.
-    var resultIndex = goog.array.binarySearch(this.index_[field], {key: isStringIndex ? '' + value : value}, this.comparisonFunction_);
+    var resultIndex = goog.array.binarySearch(this.index_[field], {key: isStringIndex ? String(value) : value}, this.comparisonFunction_);
     result = resultIndex >= 0 ? this.index_[field][resultIndex].value : [];
     return (goog.isArray(result)) ? result : [result];
   } else { //Slow search without indexes: full passage.

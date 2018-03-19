@@ -5070,7 +5070,7 @@ anychart.mapModule.Chart.prototype.setupByJSON = function(config, opt_default) {
       if (!scales.hasOwnProperty(i)) continue;
       json = scales[i];
       var type = goog.isString(json) ? json : json['type'];
-      type = (type + '').toLowerCase();
+      type = String(type).toLowerCase();
       switch (type) {
         case anychart.enums.ScaleTypes.ORDINAL_COLOR:
           scale = anychart.scales.ordinalColor();

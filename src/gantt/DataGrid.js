@@ -242,7 +242,7 @@ anychart.ganttModule.DataGrid.prototype.getColumnFormatByName = function(formatN
  * @private
  */
 anychart.ganttModule.DataGrid.prototype.formatterAsIs_ = function(val) {
-  return goog.isDef(val) ? (val + '') : '';
+  return goog.isDef(val) ? String(val) : '';
 };
 
 
@@ -253,7 +253,7 @@ anychart.ganttModule.DataGrid.prototype.formatterAsIs_ = function(val) {
  * @private
  */
 anychart.ganttModule.DataGrid.prototype.formatterFinancial_ = function(val) {
-  return goog.isDef(val) ? (goog.isNumber(val) ? val.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,') : val + '') : '';
+  return goog.isDef(val) ? (goog.isNumber(val) ? val.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,') : String(val)) : '';
 };
 
 
@@ -284,7 +284,7 @@ anychart.ganttModule.DataGrid.prototype.createDateTimeFormatter_ = function(patt
       var dateTimeFormat = new goog.i18n.DateTimeFormat(pattern);
       return dateTimeFormat.format(new goog.date.UtcDateTime(new Date(value)));
     } else {
-      return goog.isDef(value) ? (value + '') : '';
+      return goog.isDef(value) ? String(value) : '';
     }
   };
 };

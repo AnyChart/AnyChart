@@ -39,8 +39,8 @@ goog.require('goog.json.hybrid');
 goog.require('goog.object');
 
 goog.forwardDeclare('anychart.ui.ContextMenu');
-goog.forwardDeclare('anychart.ui.ContextMenu.PrepareItemsContext');
 goog.forwardDeclare('anychart.ui.ContextMenu.Item');
+goog.forwardDeclare('anychart.ui.ContextMenu.PrepareItemsContext');
 
 
 

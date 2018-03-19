@@ -1,9 +1,9 @@
 goog.provide('anychart.scales.DateTimeTicks');
-goog.forwardDeclare('anychart.stockModule.scales.Ordinal');
 goog.require('anychart.core.Base');
 goog.require('goog.array');
 goog.require('goog.date.Interval');
 goog.require('goog.date.UtcDateTime');
+goog.forwardDeclare('anychart.stockModule.scales.Ordinal');
 
 
 

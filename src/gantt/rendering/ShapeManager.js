@@ -128,7 +128,8 @@ goog.inherits(anychart.ganttModule.rendering.ShapeManager, goog.Disposable);
  *   stroke: function(anychart.ganttModule.BaseGrid, number, (anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)=, (anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)=, anychart.enums.ConnectorType=, number=, number=):acgraph.vector.AnyColor,
  *   zIndex: number,
  *   cls: function():acgraph.vector.Shape,
- *   shapeType: string
+ *   shapeType: string,
+ *   disablePointerEvents: boolean
  * }}
  */
 anychart.ganttModule.rendering.ShapeManager.ShapeDescriptor;

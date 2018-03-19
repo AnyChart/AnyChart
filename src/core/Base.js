@@ -131,7 +131,7 @@ anychart.ConsistencyState = {
   MAP_AXES: 1 << 25,
   MAP_GRIDS: 1 << 26,
   MAP_CROSSHAIR: 1 << 27,
-  //---------------------------------- HEAT MAP STATES (CARTESIAN_BASE) ---------------------------------
+  //---------------------------------- HEAT MAP STATES (CARTESIAN) ---------------------------------
   HEATMAP_COLOR_SCALE: 1 << 30,
   HEATMAP_Y_SCROLLER: 1 << 31,
   //---------------------------------- MEKKO STATES (AXES_CHART) ---------------------------------

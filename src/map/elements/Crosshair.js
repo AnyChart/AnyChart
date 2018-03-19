@@ -312,8 +312,8 @@ anychart.mapModule.elements.Crosshair.prototype.drawLine = function(axis, line, 
  */
 anychart.mapModule.elements.Crosshair.prototype.drawLabel = function(axis, label, value) {
   var labelFormatProvider = this.getLabelsFormatProvider(axis, value);
-  var labelFormat = label.format() || anychart.utils.DEFAULT_FORMATTER;
-  label.text(labelFormat.call(labelFormatProvider, labelFormatProvider));
+  var labelFormat = label['format']() || anychart.utils.DEFAULT_FORMATTER;
+  label['text'](labelFormat.call(labelFormatProvider, labelFormatProvider));
 
   var positionCoords = axis.ticks().calcTick(value);
 
@@ -366,9 +366,9 @@ anychart.mapModule.elements.Crosshair.prototype.getLabelsFormatProvider = functi
   seconds = Math.floor(60 * ((60 * decimal) % 1));
 
   labelText = grad + '\u00B0';
-  if (seconds != 0 || (!seconds && minutes != 0)) {
-    minutes += '';
-    if (minutes.length == 1) minutes = '0' + minutes;
+  if (seconds || minutes) {
+    if (minutes < 10)
+      minutes = '0' + minutes;
     labelText += minutes + '\'';
   }
 

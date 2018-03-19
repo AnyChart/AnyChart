@@ -285,10 +285,10 @@ anychart.core.ui.Crosshair.prototype.xAxis = function(opt_value) {
     if (this.xAxis_ != opt_value) {
       this.suspendSignalsDispatching();
       // set format
-      if (!this.xLabel_.format() ||
-          (this.xAxis_ && this.xLabel_.format() == this.xAxis_.labels().getOption('format'))) {
+      if (!this.xLabel_['format']() ||
+          (this.xAxis_ && this.xLabel_['format']() == this.xAxis_.labels().getOption('format'))) {
 
-        this.xLabel_.format(/** @type {Function} */(opt_value.labels().getOption('format')));
+        this.xLabel_['format'](/** @type {Function} */(opt_value.labels().getOption('format')));
       }
 
       // set anchor
@@ -314,10 +314,10 @@ anychart.core.ui.Crosshair.prototype.yAxis = function(opt_value) {
     if (this.yAxis_ != opt_value) {
       this.suspendSignalsDispatching();
       // set format
-      if (!this.yLabel_.format() ||
-          (this.yAxis_ && this.yLabel_.format() == this.yAxis_.labels()['format']())) {
+      if (!this.yLabel_['format']() ||
+          (this.yAxis_ && this.yLabel_['format']() == this.yAxis_.labels()['format']())) {
 
-        this.yLabel_.format(/** @type {Function} */(opt_value.labels()['format']()));
+        this.yLabel_['format'](/** @type {Function} */(opt_value.labels()['format']()));
       }
 
       // set anchor

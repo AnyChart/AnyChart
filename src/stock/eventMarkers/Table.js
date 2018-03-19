@@ -82,7 +82,15 @@ anychart.stockModule.eventMarkers.Table.prototype.setData = function(value, opt_
 
   /**
    * Cache of the last selection.
-    * @type {?{fromIndex: number, toIndex: number, data: Array.<anychart.stockModule.eventMarkers.Table.DataItemAggregate>}}
+   * @type {?{
+   *    fromIndex: number,
+   *    toIndex: number,
+   *    data: Array.<anychart.stockModule.eventMarkers.Table.DataItemAggregate>,
+   *    lookups: Array.<number>,
+   *    firstIndex: number,
+   *    count: number,
+   *    pointsCount: number
+   * }}
    * @private
    */
   this.lastDataCache_ = null;

@@ -968,6 +968,7 @@ anychart.stockModule.Chart.prototype.getEventMarkersIteratorParams = function(op
  * @private
  */
 anychart.stockModule.Chart.prototype.selectRangeInternal_ = function(start, end) {
+  this.suspendSignalsDispatching();
   var xScale = /** @type {!anychart.stockModule.scales.Scatter} */(this.xScale());
   var scrollerXScale = /** @type {!anychart.stockModule.scales.Scatter} */(this.scroller().xScale());
   if (this.dataController_.refreshFullRange()) {
@@ -978,6 +979,7 @@ anychart.stockModule.Chart.prototype.selectRangeInternal_ = function(start, end)
     this.dataController_.updateCurrentScaleRange(xScale);
     this.invalidateRedrawable();
   }
+  this.resumeSignalsDispatching(true);
 };
 
 
@@ -2626,8 +2628,79 @@ anychart.stockModule.Chart.prototype.refreshDragAnchor = function(anchor) {
  * @param {anychart.enums.StockRangeChangeSource=} opt_source
  */
 anychart.stockModule.Chart.prototype.dragToRatio = function(ratio, anchor, opt_source) {
+  var params = this.getDragParamsIfChanged(ratio, anchor);
+  if (params) {
+    this.selectRangeByAnchor_(params[0], params[1], anchor, opt_source);
+  }
+};
+
+
+/**
+ *
+ * @param {number} start
+ * @param {number} end
+ * @param {anychart.stockModule.Chart.DragAnchor} anchor
+ * @param {anychart.enums.StockRangeChangeSource=} opt_source
+ * @private
+ */
+anychart.stockModule.Chart.prototype.selectRangeByAnchor_ = function(start, end, anchor, opt_source) {
+  if (this.dispatchRangeChange_(
+          anychart.enums.EventType.SELECTED_RANGE_BEFORE_CHANGE,
+          opt_source || anychart.enums.StockRangeChangeSource.PLOT_DRAG,
+          start, end)) {
+    this.selectRangeInternal_(start, end);
+    anchor.firstIndex = this.getIndexByKey(anchor.firstKey);
+    anchor.lastIndex = this.getIndexByKey(anchor.lastKey);
+    anchor.minIndex = this.getIndexByKey(anchor.minKey);
+    anchor.maxIndex = this.getIndexByKey(anchor.maxKey);
+    this.dispatchRangeChange_(
+        anychart.enums.EventType.SELECTED_RANGE_CHANGE,
+        opt_source || anychart.enums.StockRangeChangeSource.PLOT_DRAG);
+  }
+};
+
+
+/**
+ * Drags the chart to passed position. If opt_source passed - dispatches with that source instead of plot drag.
+ * @param {anychart.stockModule.Chart.DragAnchor} anchor
+ * @param {number} dXRatio
+ * @param {number} dDistanceRatio
+ * @param {anychart.enums.StockRangeChangeSource=} opt_source
+ */
+anychart.stockModule.Chart.prototype.pinchZoom = function(anchor, dXRatio, dDistanceRatio, opt_source) {
   var scale = this.xScale();
-  var valueDiff, range, start, end;
+  var valueDiff, range, rangeHalf, start, end;
+  dDistanceRatio = Math.min(dDistanceRatio, 1.9);
+  if (anychart.utils.instanceOf(scale, anychart.stockModule.scales.Ordinal)) {
+    range = anchor.lastIndex - anchor.firstIndex;
+    valueDiff = dXRatio * range;
+    rangeHalf = range * (1 - dDistanceRatio) / 2;
+    start = this.getKeyByIndex(anchor.firstIndex - valueDiff - rangeHalf);
+    end = this.getKeyByIndex(anchor.lastIndex - valueDiff + rangeHalf);
+  } else {
+    range = anchor.lastKey - anchor.firstKey;
+    valueDiff = dXRatio * range;
+    rangeHalf = range * (1 - dDistanceRatio) / 2;
+    start = anchor.firstKey - valueDiff - rangeHalf;
+    end = anchor.lastKey - valueDiff + rangeHalf;
+  }
+  if (start != this.dataController_.getFirstSelectedKey() || end != this.dataController_.getLastSelectedKey())
+    this.selectRangeByAnchor_(start, end, anchor, opt_source);
+};
+
+
+/**
+ * If new drag params differ from current position - returns new start/end keys.
+ * @param {number} ratio
+ * @param {anychart.stockModule.Chart.DragAnchor} anchor
+ * @return {?Array.<number>} [start, end]
+ */
+anychart.stockModule.Chart.prototype.getDragParamsIfChanged = function(ratio, anchor) {
+  var scale = this.xScale();
+  var valueDiff,
+      range,
+      start,
+      end;
   if (anychart.utils.instanceOf(scale, anychart.stockModule.scales.Ordinal)) {
     range = anchor.lastIndex - anchor.firstIndex;
     valueDiff = ratio * range;
@@ -2639,21 +2712,14 @@ anychart.stockModule.Chart.prototype.dragToRatio = function(ratio, anchor, opt_s
     start = anchor.firstKey - valueDiff;
     end = anchor.lastKey - valueDiff;
   }
-  if ((start != this.dataController_.getFirstSelectedKey() ||
-      end != this.dataController_.getLastSelectedKey()) &&
-      this.dispatchRangeChange_(
-          anychart.enums.EventType.SELECTED_RANGE_BEFORE_CHANGE,
-          opt_source || anychart.enums.StockRangeChangeSource.PLOT_DRAG,
-          Math.min(start, end), Math.max(start, end))) {
-    this.selectRangeInternal_(start, end);
-    anchor.firstIndex = this.getIndexByKey(anchor.firstKey);
-    anchor.lastIndex = this.getIndexByKey(anchor.lastKey);
-    anchor.minIndex = this.getIndexByKey(anchor.minKey);
-    anchor.maxIndex = this.getIndexByKey(anchor.maxKey);
-    this.dispatchRangeChange_(
-        anychart.enums.EventType.SELECTED_RANGE_CHANGE,
-        opt_source || anychart.enums.StockRangeChangeSource.PLOT_DRAG);
+  if (start > end) {
+    var tmp = start;
+    start = end;
+    end = tmp;
   }
+  return (start != this.dataController_.getFirstSelectedKey() || end != this.dataController_.getLastSelectedKey()) ?
+      [start, end] :
+      null;
 };
 
 

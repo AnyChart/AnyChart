@@ -4431,7 +4431,7 @@ anychart.ganttModule.TimeLine.prototype.connectItems_ = function(from, to, opt_c
     var pixelShift = (lineThickness % 2 && acgraph.type() === acgraph.StageType.SVG) ? 0.5 : 0;
     var toActualTop;
 
-    switch ((opt_connType + '').toLowerCase()) {
+    switch (String(opt_connType).toLowerCase()) {
       case anychart.enums.ConnectorType.FINISH_FINISH:
         fromLeft = Math.round(fromBounds.left + fromBounds.width) + pixelShift;
         fromTop = Math.round(fromBounds.top + fromBounds.height / 2) + pixelShift;

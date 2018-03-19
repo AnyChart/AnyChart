@@ -28,7 +28,8 @@ goog.require('goog.events.EventHandler');
  *   altKey: boolean,
  *   shiftKey: boolean,
  *   metaKey: boolean,
- *   platformModifierKey: boolean
+ *   platformModifierKey: boolean,
+ *   originalEvent: acgraph.events.BrowserEvent
  * }}
  */
 anychart.core.MouseEvent;
@@ -228,6 +229,7 @@ anychart.core.VisualBase.prototype.handleMouseEvent = function(e) {
 anychart.core.VisualBase.prototype.makeBrowserEvent = function(e) {
   return {
     'type': e['type'],
+    'originalEvent': e,
     'target': this,
     'relatedTarget': this.getOwnerElement(e['relatedTarget']) || e['relatedTarget'],
     'domTarget': e['target'],

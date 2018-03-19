@@ -162,7 +162,9 @@ anychart.tagCloudModule.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
  *   yoff: number,
  *   width: number,
  *   height: number,
- *   hasText: boolean
+ *   hasText: boolean,
+ *   textEl: (acgraph.vector.Element|undefined),
+ *   eHandler: (*|undefined)
  * }}
  */
 anychart.tagCloudModule.Chart.Tag;
@@ -716,28 +718,7 @@ anychart.tagCloudModule.Chart.prototype.makePointEvent = function(event) {
 
 /** @inheritDoc */
 anychart.tagCloudModule.Chart.prototype.makeBrowserEvent = function(e) {
-  var res = {
-    'type': e['type'],
-    'target': this,
-    'relatedTarget': this.getOwnerElement(e['relatedTarget']) || e['relatedTarget'],
-    'domTarget': e['target'],
-    'relatedDomTarget': e['relatedTarget'],
-    'offsetX': e['offsetX'],
-    'offsetY': e['offsetY'],
-    'clientX': e['clientX'],
-    'clientY': e['clientY'],
-    'screenX': e['screenX'],
-    'screenY': e['screenY'],
-    'button': e['button'],
-    'keyCode': e['keyCode'],
-    'charCode': e['charCode'],
-    'ctrlKey': e['ctrlKey'],
-    'altKey': e['altKey'],
-    'shiftKey': e['shiftKey'],
-    'metaKey': e['metaKey'],
-    'platformModifierKey': e['platformModifierKey'],
-    'state': e['state']
-  };
+  var res = anychart.core.VisualBase.prototype.makeBrowserEvent.call(this, e);
 
   var tag = anychart.utils.extractTag(res['domTarget']);
   var pointIndex = tag.index;
@@ -2056,7 +2037,7 @@ anychart.tagCloudModule.Chart.prototype.drawContent = function(bounds) {
     this.normalizedData.forEach(function(t) {
       var state = anychart.core.utils.InteractivityState.clarifyState(this.state.getPointStateByIndex(t.rowIndex));
       iterator.select(t.rowIndex);
-      if (t.drawed)
+      if (t.drawed && t.textEl)
         this.applyFill(t.textEl, acgraph.vector.normalizeFill(/** @type {acgraph.vector.Fill} */(this.resolveProperty('fill', state))));
     }, this);
 

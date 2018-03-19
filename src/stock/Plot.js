@@ -21,6 +21,7 @@ goog.require('anychart.stockModule.Series');
 goog.require('anychart.stockModule.eventMarkers.PlotController');
 goog.require('anychart.stockModule.indicators');
 goog.require('anychart.utils');
+goog.require('goog.events.BrowserEvent');
 goog.require('goog.fx.Dragger');
 
 
@@ -171,6 +172,19 @@ anychart.stockModule.Plot = function(chart) {
     } else {
       this.chart_.highlightAtRatio(this.frameHighlightRatio_, this.frameHighlightX_, this.frameHighlightY_, this);
     }
+  }, this);
+
+  /**
+   * @type {!function(number)}
+   * @private
+   */
+  this.zoomingFrameAction_ = goog.bind(function(time) {
+    this.zoomingFrame_ = undefined;
+    var anchor = this.zoomingFrameParams_.anchor;
+    var dx = this.zoomingFrameParams_.dx;
+    var dDistance = this.zoomingFrameParams_.dDistance;
+    this.zoomingFrameParams_ = null;
+    this.chart_.pinchZoom(anchor, dx, dDistance);
   }, this);
 
   this.defaultSeriesType(anychart.enums.StockSeriesType.LINE);
@@ -1627,6 +1641,8 @@ anychart.stockModule.Plot.prototype.ensureVisualReady_ = function() {
     this.eventsInterceptor_.stroke(null);
     this.eventsHandler.listenOnce(this.eventsInterceptor_, acgraph.events.EventType.MOUSEDOWN, this.initDragger_);
     this.eventsHandler.listenOnce(this.eventsInterceptor_, acgraph.events.EventType.TOUCHSTART, this.initDragger_);
+    this.eventsHandler.listen(this.eventsInterceptor_, acgraph.events.EventType.TOUCHSTART, this.handleTouchStart_);
+    this.eventsHandler.listen(this.eventsInterceptor_, acgraph.events.EventType.TOUCHEND, this.handleTouchEnd_);
     this.eventsHandler.listen(this.eventsInterceptor_, acgraph.events.EventType.MOUSEOVER, this.handlePlotMouseOverAndMove_);
     this.eventsHandler.listen(this.eventsInterceptor_, acgraph.events.EventType.MOUSEMOVE, this.handlePlotMouseOverAndMove_);
     this.eventsHandler.listen(this.eventsInterceptor_, acgraph.events.EventType.MOUSEOUT, this.handlePlotMouseOut_);
@@ -2002,6 +2018,9 @@ anychart.stockModule.Plot.prototype.refreshDragAnchor = function() {
   if (this.dragger_ && this.dragger_.isDragging()) {
     this.dragger_.refreshDragAnchor();
   }
+  if (this.zooming_) {
+    this.chart_.refreshDragAnchor(this.zooming_.anchor);
+  }
 };
 
 
@@ -2013,6 +2032,99 @@ anychart.stockModule.Plot.prototype.refreshDragAnchor = function() {
 anychart.stockModule.Plot.prototype.initDragger_ = function(e) {
   this.dragger_ = new anychart.stockModule.Plot.Dragger(this, this.eventsInterceptor_);
   this.dragger_.startDrag(e.getOriginalEvent());
+};
+
+
+/**
+ * Handles touch start.
+ * @param {acgraph.events.BrowserEvent} e
+ * @private
+ */
+anychart.stockModule.Plot.prototype.handleTouchStart_ = function(e) {
+  var googEvent = e.getOriginalEvent();
+  var touches = googEvent.getBrowserEvent()['touches'];
+  if (touches && touches.length > 1) {
+    this.dragger_.endDrag(googEvent);
+    if (touches.length == 2) {
+      var coords = [];
+      var ids = {};
+      for (var i = 0; i < 2; i++) {
+        var touch = touches[i];
+        coords[i + i] = touch['clientX'] !== undefined ? touch['clientX'] : touch['pageX'];
+        coords[i + i + 1] = touch['clientY'] !== undefined ? touch['clientY'] : touch['pageY'];
+        ids[touch['identifier']] = true;
+      }
+      this.zooming_ = {
+        anchor: this.chart_.getDragAnchor(),
+        x: (coords[0] + coords[2]) / 2,
+        y: (coords[1] + coords[3]) / 2,
+        distance: anychart.math.vectorLength.apply(null, coords),
+        ids: ids
+      };
+      goog.events.listen(anychart.document, goog.events.EventType.TOUCHMOVE, this.handleZoomMove_, {capture: true, passive: false}, this);
+      e.preventDefault();
+    }
+  }
+};
+
+
+/**
+ * Handles touchMove in zooming.
+ * @param {goog.events.BrowserEvent} e
+ * @private
+ */
+anychart.stockModule.Plot.prototype.handleZoomMove_ = function(e) {
+  var touches = e.getBrowserEvent()['touches'];
+  if (this.zooming_ && touches && touches.length > 1) {
+    var coords = [];
+    for (var i = 0; i < touches.length; i++) {
+      var touch = touches[i];
+      if (touch['identifier'] in this.zooming_.ids) {
+        coords[i + i] = touch['clientX'] !== undefined ? touch['clientX'] : touch['pageX'];
+        coords[i + i + 1] = touch['clientY'] !== undefined ? touch['clientY'] : touch['pageY'];
+      }
+    }
+    var x = (coords[0] + coords[2]) / 2;
+    var y = (coords[1] + coords[3]) / 2;
+    var distance = anychart.math.vectorLength.apply(null, coords);
+    this.zoomingFrameParams_ = {
+      anchor: this.zooming_.anchor,
+      x: x,
+      y: y,
+      distance: distance,
+      dx: (x - this.zooming_.x) / this.seriesBounds_.width,
+      dDistance: distance / this.zooming_.distance
+    };
+    if (!goog.isDef(this.zoomingFrame_))
+      this.zoomingFrame_ = anychart.window.requestAnimationFrame(this.zoomingFrameAction_);
+    e.preventDefault();
+  }
+};
+
+
+/**
+ * Handles touch start.
+ * @param {acgraph.events.BrowserEvent} e
+ * @private
+ */
+anychart.stockModule.Plot.prototype.handleTouchEnd_ = function(e) {
+  var googEvent = e.getOriginalEvent();
+  var browserEvent = googEvent.getBrowserEvent();
+  var touches = browserEvent['touches'];
+  if (touches.length == 1) {
+    goog.events.unlisten(anychart.document, goog.events.EventType.TOUCHMOVE, this.handleZoomMove_, {
+      capture: true,
+      passive: false
+    }, this);
+    var touch = touches[0];
+    var newEvent = new goog.events.BrowserEvent(browserEvent);
+    newEvent.clientX = touch['clientX'] !== undefined ? touch['clientX']: touch['pageX'];
+    newEvent.clientY = touch['clientY'] !== undefined ? touch['clientY']: touch['pageY'];
+    newEvent.screenX = touch['screenX'] || 0;
+    newEvent.screenY = touch['screenY'] || 0;
+    this.zooming_ = null;
+    this.dragger_.startDrag(newEvent);
+  }
 };
 
 
@@ -2857,6 +2969,7 @@ anychart.stockModule.Plot.Dragger = function(plot, target) {
   this.setHysteresis(3);
 
   this.listen(goog.fx.Dragger.EventType.START, this.dragStartHandler_, false, this);
+  this.listen(goog.fx.Dragger.EventType.BEFOREDRAG, this.beforeDragHandler_, false, this);
   this.listen(goog.fx.Dragger.EventType.END, this.dragEndHandler_, false, this);
 };
 goog.inherits(anychart.stockModule.Plot.Dragger, goog.fx.Dragger);
@@ -2898,6 +3011,17 @@ anychart.stockModule.Plot.Dragger.prototype.dragEndHandler_ = function(e) {
     this.frameAction_(0);
   }
   this.plot_.chart_.dragEnd();
+};
+
+
+/**
+ * Before drag handler.
+ * @param {goog.fx.DragEvent} e
+ * @return {boolean}
+ * @private
+ */
+anychart.stockModule.Plot.Dragger.prototype.beforeDragHandler_ = function(e) {
+  return !!this.plot_.chart_.getDragParamsIfChanged(e.left / this.plot_.seriesBounds_.width, this.anchor_);
 };
 
 

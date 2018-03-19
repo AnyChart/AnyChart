@@ -225,7 +225,7 @@ anychart.scales.ScatterTicks.prototype.getInternal = function() {
  */
 anychart.scales.ScatterTicks.prototype.mode = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = ('' + opt_value).toLowerCase();
+    opt_value = String(opt_value).toLowerCase();
     if (opt_value == 'log' || opt_value == anychart.enums.ScatterTicksMode.LOGARITHMIC)
       opt_value = anychart.enums.ScatterTicksMode.LOGARITHMIC;
     else

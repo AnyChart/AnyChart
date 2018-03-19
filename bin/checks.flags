@@ -22,7 +22,6 @@
 --jscomp_warning checkTypes
 --jscomp_warning checkVars
 --jscomp_warning closureDepMethodUsageChecks
---jscomp_warning commonJsModuleLoad
 --jscomp_warning conformanceViolations
 --jscomp_warning const
 --jscomp_warning constantProperty
@@ -37,7 +36,6 @@
 --jscomp_warning fileoverviewTags
 --jscomp_warning functionParams
 --jscomp_warning globalThis
---jscomp_warning inferredConstCheck
 --jscomp_warning internetExplorerChecks
 --jscomp_warning invalidCasts
 --jscomp_warning misplacedTypeAnnotation
@@ -68,5 +66,6 @@
 --jscomp_warning lintChecks
 
 --hide_warnings_for "libs/closure-library"
+--hide_warnings_for "src/chartEditor"
 --assume_function_wrapper
 --use_types_for_optimization true

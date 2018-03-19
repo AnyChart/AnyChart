@@ -2757,7 +2757,7 @@ anychart.pieModule.Chart.prototype.drawSlice_ = function(pointState, opt_update)
  */
 anychart.pieModule.Chart.prototype.drawFrontSide_ = function(cx, cy, outerR, startAngle, endAngle, sweep, pointState, opt_update) {
   // there may be two front sides
-  var uniqueValue = '' + startAngle;
+  var uniqueValue = String(startAngle);
   var pathName = 'frontPath' + uniqueValue;
   var path = this.createPath_(pathName, opt_update);
   if (!path) return null;
@@ -2810,7 +2810,7 @@ anychart.pieModule.Chart.prototype.drawFrontSide_ = function(cx, cy, outerR, sta
  */
 anychart.pieModule.Chart.prototype.drawBackSide_ = function(cx, cy, innerR, startAngle, endAngle, sweep, pointState, opt_update) {
   // there may be two back sides
-  var uniqueValue = '' + startAngle;
+  var uniqueValue = String(startAngle);
   var pathName = 'backPath' + uniqueValue;
   var path = this.createPath_(pathName, opt_update);
   if (!path) return null;
@@ -4160,28 +4160,7 @@ anychart.pieModule.Chart.prototype.getSeriesStatus = function(event) {
 
 /** @inheritDoc */
 anychart.pieModule.Chart.prototype.makeBrowserEvent = function(e) {
-  var res = {
-    'type': e['type'],
-    'target': this,
-    'relatedTarget': this.getOwnerElement(e['relatedTarget']) || e['relatedTarget'],
-    'domTarget': e['target'],
-    'relatedDomTarget': e['relatedTarget'],
-    'offsetX': e['offsetX'],
-    'offsetY': e['offsetY'],
-    'clientX': e['clientX'],
-    'clientY': e['clientY'],
-    'screenX': e['screenX'],
-    'screenY': e['screenY'],
-    'button': e['button'],
-    'keyCode': e['keyCode'],
-    'charCode': e['charCode'],
-    'ctrlKey': e['ctrlKey'],
-    'altKey': e['altKey'],
-    'shiftKey': e['shiftKey'],
-    'metaKey': e['metaKey'],
-    'platformModifierKey': e['platformModifierKey'],
-    'state': e['state']
-  };
+  var res = anychart.core.VisualBase.prototype.makeBrowserEvent.call(this, e);
 
   var tag = anychart.utils.extractTag(res['domTarget']);
   var pointIndex = tag.index;

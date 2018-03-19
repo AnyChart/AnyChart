@@ -2128,7 +2128,7 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
        */
       'format': function() {
         var name = this['name'];
-        return (name !== void 0) ? name + '' : '';
+        return (name !== void 0) ? String(name) : '';
       }
     },
     'defaultColumnSettings': {
@@ -2176,7 +2176,7 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
          */
         'format': function() {
           var val = this['item']['meta']('index');
-          return (val != null) ? (val + 1) + '' : '';
+          return (val != null) ? String(val + 1) : '';
         },
         'title': {
           'text': '#'
@@ -2192,7 +2192,7 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
          */
         'format': function() {
           var val = this['name'];
-          return (val != null) ? (val + '') : '';
+          return (val != null) ? String(val) : '';
         },
         'title': {
           'text': 'Name'
