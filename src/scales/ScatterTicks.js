@@ -561,9 +561,13 @@ anychart.scales.ScatterTicks.prototype.addMinorLinearTicksPortion_ = function(mi
 anychart.scales.ScatterTicks.prototype.putLinearTicks_ = function(min, max, interval, skipVal, opt_res) {
   var res = opt_res || [];
   max = anychart.math.round(max, 7);
-  for (var i = anychart.math.round(min, 7); i <= max; i = anychart.math.round(i + interval, 7)) {
+  var prev, i, iter = 0;
+  for (i = prev = anychart.math.round(min, 7); i <= max; i = anychart.math.round(i + interval, 7)) {
     if (skipVal != i)
       res.push(i);
+    if (iter && prev == i)
+      break;
+    iter++;
   }
   return res;
 };
