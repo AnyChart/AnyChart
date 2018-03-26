@@ -16,33 +16,12 @@ goog.require('anychart.utils');
 anychart.circularGaugeModule.pointers.Marker = function() {
   anychart.circularGaugeModule.pointers.Marker.base(this, 'constructor');
 
-  /**
-   * Pointer size.
-   * @type {?string}
-   * @private
-   */
-  this.size_;
-
-  /**
-   * Pointer position.
-   * @type {anychart.enums.GaugeSidePosition}
-   * @private
-   */
-  this.position_;
-
-  /**
-   * Pointer radius.
-   * @type {?string}
-   * @private
-   */
-  this.radius_;
-
-  /**
-   * Pointer radius.
-   * @type {anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number): acgraph.vector.Path}
-   * @private
-   */
-  this.type_;
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['size', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['position', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['radius', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['type', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED]
+  ]);
 
   this.domElement = new anychart.core.ui.MarkersFactory();
   // defaults that was deleted form MarkersFactory
@@ -57,86 +36,45 @@ anychart.circularGaugeModule.pointers.Marker = function() {
 goog.inherits(anychart.circularGaugeModule.pointers.Marker, anychart.circularGaugeModule.pointers.Base);
 
 
-/**
- * Marker size in percent relative gauge radius.
- * @param {(null|number|string)=} opt_value .
- * @return {(string|anychart.circularGaugeModule.pointers.Marker)} .
- */
-anychart.circularGaugeModule.pointers.Marker.prototype.size = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
-    if (this.size_ != opt_value) {
-      this.size_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else
-    return this.size_;
+//region --- Infrastructure
+/** @inheritDoc */
+anychart.circularGaugeModule.pointers.Marker.prototype.getType = function() {
+  return anychart.enums.CircularGaugePointerType.MARKER;
 };
 
 
+//endregion
+//region --- Descriptors
 /**
- * Marker position relative axis - inside, center, outside.
- * @param {(anychart.enums.GaugeSidePosition|string)=} opt_value .
- * @return {(anychart.enums.GaugeSidePosition|string|!anychart.circularGaugeModule.pointers.Marker)} .
+ * Properties that should be defined in anychart.circularGaugeModule.pointers.Marker prototype.
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.circularGaugeModule.pointers.Marker.prototype.position = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeGaugeSidePosition(opt_value);
-    if (this.position_ != opt_value)
-      this.position_ = opt_value;
-    this.invalidate(anychart.ConsistencyState.BOUNDS,
-        anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    return this;
-  } else
-    return this.position_;
-};
+anychart.circularGaugeModule.pointers.Marker.OWN_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
 
-
-/**
- * Pointer radius in percent relative gauge radius.
- * @param {(null|number|string)=} opt_value .
- * @return {(string|anychart.circularGaugeModule.pointers.Marker)} .
- */
-anychart.circularGaugeModule.pointers.Marker.prototype.radius = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
-    if (this.radius_ != opt_value) {
-      this.radius_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.radius_;
-  }
-};
-
-
-/**
- * Marker type.
- * @param {(anychart.enums.MarkerType|function(acgraph.vector.Path, number,
- * number, number): acgraph.vector.Path|string)=} opt_value .
- * @return {(!anychart.circularGaugeModule.pointers.Marker|anychart.enums.MarkerType|function(acgraph.vector.Path, number,
- * number, number): acgraph.vector.Path)} .
- */
-anychart.circularGaugeModule.pointers.Marker.prototype.type = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = goog.isFunction(opt_value) ?
+  var radiusNormalizer = function(opt_value) {
+    return goog.isNull(opt_value) ? opt_value : /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
+  };
+  var typeNormalizer = function(opt_value) {
+    return goog.isFunction(opt_value) ?
         opt_value :
         anychart.enums.normalizeMarkerType(opt_value, anychart.enums.MarkerType.LINE);
-    if (this.type_ != opt_value) {
-      this.type_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else
-    return this.type_;
-};
+  };
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'size', anychart.utils.normalizeToPercent],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'position', anychart.enums.normalizeGaugeSidePosition],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'radius', radiusNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'type', typeNormalizer]
+  ]);
+
+  return map;
+})();
+anychart.core.settings.populate(anychart.circularGaugeModule.pointers.Marker, anychart.circularGaugeModule.pointers.Marker.OWN_DESCRIPTORS);
 
 
+//endregion
+//region --- Drawing
 /** @inheritDoc */
 anychart.circularGaugeModule.pointers.Marker.prototype.draw = function() {
   var gauge = this.gauge();
@@ -144,12 +82,17 @@ anychart.circularGaugeModule.pointers.Marker.prototype.draw = function() {
   if (!this.checkDrawingNeeded())
     return this;
 
+  this.ensureCreated();
+
   if (!axis || !axis.enabled()) {
     if (this.domElement) this.domElement.clear();
     if (this.hatchFillElement) this.hatchFillElement.clear();
+    if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS))
+      this.markConsistent(anychart.ConsistencyState.BOUNDS);
     return this;
   }
 
+  var type = /** @type {string|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path} */(this.getOption('type'));
   if (this.hasInvalidationState(anychart.ConsistencyState.GAUGE_HATCH_FILL)) {
     var fill = /** @type {acgraph.vector.PatternFill|acgraph.vector.HatchFill} */(this.hatchFill());
     if (!this.hatchFillElement && !anychart.utils.isNone(fill)) {
@@ -169,7 +112,7 @@ anychart.circularGaugeModule.pointers.Marker.prototype.draw = function() {
       this.hatchFillElement.fill(fill);
       this.hatchFillElement.stroke(null);
       this.hatchFillElement.size(this.pixSize_);
-      this.hatchFillElement.type(this.type_);
+      this.hatchFillElement.type(type);
 
       this.invalidate(anychart.ConsistencyState.BOUNDS);
     }
@@ -183,7 +126,7 @@ anychart.circularGaugeModule.pointers.Marker.prototype.draw = function() {
 
     var scale = axis.scale();
 
-    var iterator = gauge.getResetIterator();
+    var iterator = this.getResetIterator();
     iterator.select(/** @type {number} */(this.dataIndex()));
     var value = parseFloat(iterator.get('value'));
 
@@ -200,16 +143,19 @@ anychart.circularGaugeModule.pointers.Marker.prototype.draw = function() {
     var axisStartAngle = /** @type {number} */(goog.isDef(axis.startAngle()) ? axis.getStartAngle() : gauge.getStartAngle());
     var axisSweepAngle = /** @type {number} */(goog.isDef(axis.sweepAngle()) ? axis.sweepAngle() : /** @type {number} */(gauge.getOption('sweepAngle')));
 
-    var pixRadius = goog.isDefAndNotNull(this.radius_) ?
-        anychart.utils.normalizeSize(this.radius_, gauge.getPixRadius()) :
+    var radius = /** @type {number|string} */(this.getOption('radius'));
+    var pixRadius = goog.isDefAndNotNull(radius) ?
+        anychart.utils.normalizeSize(radius, gauge.getPixRadius()) :
         axisRadius;
-    this.pixSize_ = goog.isDefAndNotNull(this.size_) ?
-        anychart.utils.normalizeSize(this.size_, gauge.getPixRadius()) :
+    var size = /** @type {number|string} */(this.getOption('size'));
+    this.pixSize_ = goog.isDefAndNotNull(size) ?
+        anychart.utils.normalizeSize(size, gauge.getPixRadius()) :
         axisWidth;
 
-    if (this.position_ == anychart.enums.GaugeSidePosition.OUTSIDE)
+    var position = /** @type {anychart.enums.GaugeSidePosition} */(this.getOption('position'));
+    if (position == anychart.enums.GaugeSidePosition.OUTSIDE)
       pixRadius += this.pixSize_ + axisWidth / 2;
-    else if (this.position_ == anychart.enums.GaugeSidePosition.INSIDE)
+    else if (position == anychart.enums.GaugeSidePosition.INSIDE)
       pixRadius -= this.pixSize_ + axisWidth / 2;
 
     var valueRatio = goog.math.clamp(scale.transform(value), 0, 1);
@@ -230,14 +176,14 @@ anychart.circularGaugeModule.pointers.Marker.prototype.draw = function() {
 
 
     this.domElement.size(this.pixSize_);
-    this.domElement.type(this.type_);
+    this.domElement.type(type);
 
     var marker = this.domElement.add({'value': {'x': x, 'y': y}}, 0);
     marker.rotation(angle + 90);
 
     if (this.hatchFillElement) {
       this.hatchFillElement.size(this.pixSize_);
-      this.hatchFillElement.type(this.type_);
+      this.hatchFillElement.type(type);
 
       var hatchFill = this.hatchFillElement.add({'value': {'x': x, 'y': y}}, 0);
       hatchFill.rotation(angle + 90);
@@ -262,25 +208,13 @@ anychart.circularGaugeModule.pointers.Marker.prototype.draw = function() {
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//  Serialize & Deserialize
-//----------------------------------------------------------------------------------------------------------------------
+//endregion
+//region --- Serialize / Deserialize / Disposing
 /** @inheritDoc */
 anychart.circularGaugeModule.pointers.Marker.prototype.serialize = function() {
   var json = anychart.circularGaugeModule.pointers.Marker.base(this, 'serialize');
 
-  json['position'] = this.position();
-  json['size'] = this.size();
-  if (goog.isFunction(this.type())) {
-    anychart.core.reporting.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Gauge marker pointer type']
-    );
-  } else {
-    json['type'] = this.type();
-  }
-  if (goog.isDef(this.radius())) json['radius'] = this.radius();
+  anychart.core.settings.serialize(this, anychart.circularGaugeModule.pointers.Marker.OWN_DESCRIPTORS, json, 'Marker pointer');
 
   return json;
 };
@@ -289,19 +223,28 @@ anychart.circularGaugeModule.pointers.Marker.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.circularGaugeModule.pointers.Marker.prototype.setupByJSON = function(config, opt_default) {
   anychart.circularGaugeModule.pointers.Marker.base(this, 'setupByJSON', config, opt_default);
-
-  this.size(config['size']);
-  this.position(config['position']);
-  this.type(config['type']);
-  this.radius(config['radius']);
+  anychart.core.settings.deserialize(this, anychart.circularGaugeModule.pointers.Marker.OWN_DESCRIPTORS, config, opt_default);
 };
 
 
+/** @inheritDoc */
+anychart.circularGaugeModule.pointers.Marker.prototype.disposeInternal = function() {
+  goog.disposeAll(this.domElement, this.hatchFillElement);
+  this.domElement = null;
+  this.hatchFillElement = null;
+  anychart.circularGaugeModule.pointers.Marker.base(this, 'disposeInternal');
+};
+
+
+//endregion
+
+
 //exports
-(function() {
-  var proto = anychart.circularGaugeModule.pointers.Marker.prototype;
-  proto['size'] = proto.size;
-  proto['position'] = proto.position;
-  proto['radius'] = proto.radius;
-  proto['type'] = proto.type;
-})();
+//(function() {
+//  var proto = anychart.circularGaugeModule.pointers.Marker.prototype;
+//  auto generated
+//  proto['size'] = proto.size;
+//  proto['position'] = proto.position;
+//  proto['radius'] = proto.radius;
+//  proto['type'] = proto.type;
+//})();

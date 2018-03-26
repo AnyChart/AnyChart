@@ -1,4 +1,5 @@
 goog.provide('anychart.stockModule.scales.Ordinal');
+goog.require('anychart.stockModule.scales.ExplicitTicksIterator');
 goog.require('anychart.stockModule.scales.OrdinalTicksIterator');
 goog.require('anychart.stockModule.scales.Scatter');
 goog.require('anychart.utils');
@@ -52,6 +53,8 @@ anychart.stockModule.scales.Ordinal.prototype.transformAligned = function(key) {
 anychart.stockModule.scales.Ordinal.prototype.ensureTicksIteratorCreated = function() {
   if (!this.ticksIterator)
     this.ticksIterator = new anychart.stockModule.scales.OrdinalTicksIterator(this);
+  if (!this.explicitTicksIterator && this.ticksCallback_)
+    this.explicitTicksIterator = new anychart.stockModule.scales.ExplicitTicksIterator();
 };
 
 

@@ -2,7 +2,7 @@
 *.swp
 .idea
 *.pid
-libs/compiler/
+/libs/compiler/
 out/*
 *.swo
 *.pyc

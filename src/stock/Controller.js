@@ -77,6 +77,7 @@ anychart.stockModule.Controller = function() {
    * @private
    */
   this.currentSelection_ = {
+    intervals: {},
     startKey: NaN,
     endKey: NaN,
     startIndex: NaN,
@@ -98,6 +99,7 @@ anychart.stockModule.Controller = function() {
    * @private
    */
   this.currentScrollerSelection_ = {
+    intervals: {},
     startKey: NaN,
     endKey: NaN,
     startIndex: NaN,
@@ -299,7 +301,7 @@ anychart.stockModule.Controller.prototype.refreshSelection = function(newPixelWi
     var interval = this.scrollerGrouping_.getCurrentDataInterval();
     scrollerScale.setCurrentRange(
         this.currentScrollerSelection_.startKey, this.currentScrollerSelection_.endKey,
-        interval['unit'], interval['count']);
+        interval['unit'], interval['count'], this.currentScrollerSelection_.intervals);
     result += 2;
   }
 
@@ -573,7 +575,7 @@ anychart.stockModule.Controller.prototype.updateCurrentScaleRange = function(sca
   var interval = this.grouping().getCurrentDataInterval();
   scale.setCurrentRange(
       this.currentSelection_.startKey, this.currentSelection_.endKey,
-      interval['unit'], interval['count']);
+      interval['unit'], interval['count'], this.currentSelection_.intervals);
 };
 
 
@@ -592,6 +594,28 @@ anychart.stockModule.Controller.prototype.updateFullScaleRange = function(scale)
 //  Key to index and index to key methods
 //
 //----------------------------------------------------------------------------------------------------------------------
+/**
+ * Returns key by index. Index can be fractional - the key will be inter- or extrapolated.
+ * @param {number} index
+ * @return {number}
+ */
+anychart.stockModule.Controller.prototype.getKeyByMainIndex = function(index) {
+  this.updateMainRegistry();
+  return this.mainRegistry_.getKeyByIndex(index);
+};
+
+
+/**
+ * Returns index by key. If the key is not in the registry - returns fractional inter/extrapolated index for it.
+ * @param {number} key
+ * @return {number}
+ */
+anychart.stockModule.Controller.prototype.getMainIndexByKey = function(key) {
+  this.updateMainRegistry();
+  return this.mainRegistry_.getIndexByKey(key);
+};
+
+
 /**
  * Returns key by index. Index can be fractional - the key will be inter- or extrapolated.
  * @param {number} index
@@ -668,6 +692,24 @@ anychart.stockModule.Controller.prototype.getFirstKey = function() {
  */
 anychart.stockModule.Controller.prototype.getLastKey = function() {
   return this.alignedLastKey_;
+};
+
+
+/**
+ * Returns the first index in the main registry.
+ * @return {number}
+ */
+anychart.stockModule.Controller.prototype.getFirstMainIndex = function() {
+  return this.mainRegistry_.getFirstIndex();
+};
+
+
+/**
+ * Returns the last index in the main registry.
+ * @return {number}
+ */
+anychart.stockModule.Controller.prototype.getLastMainIndex = function() {
+  return this.mainRegistry_.getLastIndex();
 };
 
 

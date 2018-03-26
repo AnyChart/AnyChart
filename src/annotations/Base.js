@@ -407,7 +407,7 @@ anychart.annotationsModule.Base.prototype.xScale = function(opt_value) {
     var scType = opt_value && goog.isFunction(opt_value.getType) && opt_value.getType();
     var stockScale = scType == anychart.enums.ScaleTypes.STOCK_SCATTER_DATE_TIME || scType == anychart.enums.ScaleTypes.STOCK_ORDINAL_DATE_TIME;
     var val = stockScale ? opt_value :
-        anychart.scales.Base.setupScale(this.yScale_, opt_value, null, anychart.scales.Base.ScaleTypes.ALL_DEFAULT, null, this.scaleSignalHandler_, this);
+        anychart.scales.Base.setupScale(/** @type {anychart.scales.Base} */(this.xScale_), opt_value, null, anychart.scales.Base.ScaleTypes.ALL_DEFAULT, null, this.scaleSignalHandler_, this);
     if (val || goog.isNull(opt_value)) {
       var dispatch = this.xScale_ == val;
       if (!val)

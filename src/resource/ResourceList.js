@@ -7,7 +7,7 @@ goog.require('anychart.core.settings');
 goog.require('anychart.core.ui.Background');
 goog.require('anychart.core.utils.Space');
 goog.require('anychart.data');
-goog.require('anychart.resourceModule.Overlay');
+goog.require('anychart.ganttBaseModule.Overlay');
 goog.require('anychart.resourceModule.resourceList.ImageSettings');
 goog.require('anychart.resourceModule.resourceList.Item');
 goog.require('anychart.resourceModule.resourceList.TagsSettings');
@@ -26,7 +26,7 @@ goog.require('anychart.utils');
 anychart.resourceModule.ResourceList = function() {
   anychart.resourceModule.ResourceList.base(this, 'constructor');
 
-  this.overlay_ = new anychart.resourceModule.Overlay();
+  this.overlay_ = new anychart.ganttBaseModule.Overlay();
   this.overlay_.listenSignals(this.overlaySignal_, this);
 
   /**
@@ -165,7 +165,7 @@ anychart.resourceModule.ResourceList.GET_SETTINGS = function(name, descriptors, 
 //endregion
 //region --- Settings
 /**
- * Properties that should be defined in anychart.resourceModule.TimeLine prototype.
+ * Properties that should be defined in anychart.ganttBaseModule.TimeLineHeader prototype.
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
 anychart.resourceModule.ResourceList.DESCRIPTORS = (function() {
@@ -456,7 +456,7 @@ anychart.resourceModule.ResourceList.prototype.verticalScrollBarPosition = funct
 /**
  * Overlay element.
  * @param {(string|Object|null|boolean)=} opt_value .
- * @return {anychart.resourceModule.ResourceList|anychart.resourceModule.Overlay}
+ * @return {anychart.resourceModule.ResourceList|anychart.ganttBaseModule.Overlay}
  */
 anychart.resourceModule.ResourceList.prototype.overlay = function(opt_value) {
   if (goog.isDef(opt_value)) {

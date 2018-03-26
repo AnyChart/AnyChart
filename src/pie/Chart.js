@@ -3,11 +3,13 @@ goog.provide('anychart.pieModule.Chart');
 
 goog.require('anychart.animations.AnimationSerialQueue');
 goog.require('anychart.color');
+goog.require('anychart.core.ICenterContentChart');
 goog.require('anychart.core.IShapeManagerUser');
 goog.require('anychart.core.SeparateChart');
 goog.require('anychart.core.StateSettings');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.settings');
+goog.require('anychart.core.ui.Center');
 goog.require('anychart.core.ui.CircularLabelsFactory');
 goog.require('anychart.core.ui.Tooltip');
 goog.require('anychart.core.utils.IInteractiveSeries');
@@ -19,7 +21,6 @@ goog.require('anychart.format.Context');
 goog.require('anychart.math');
 goog.require('anychart.palettes');
 goog.require('anychart.pieModule.Animation');
-goog.require('anychart.pieModule.Center');
 goog.require('anychart.pieModule.DataView');
 goog.require('anychart.pieModule.LabelAnimation');
 goog.require('anychart.pieModule.Point');
@@ -36,6 +37,7 @@ goog.require('goog.labs.userAgent.device');
  * @extends {anychart.core.SeparateChart}
  * @implements {anychart.core.utils.IInteractiveSeries}
  * @implements {anychart.core.IShapeManagerUser}
+ * @implements {anychart.core.ICenterContentChart}
  * @constructor
  */
 anychart.pieModule.Chart = function(opt_data, opt_csvSettings) {
@@ -1151,11 +1153,11 @@ anychart.pieModule.Chart.prototype.isNoData = function() {
 /**
  * Pie center settings.
  * @param {Object=} opt_value
- * @return {anychart.pieModule.Chart|anychart.pieModule.Center}
+ * @return {anychart.pieModule.Chart|anychart.core.ui.Center}
  */
 anychart.pieModule.Chart.prototype.center = function(opt_value) {
   if (!this.center_) {
-    this.center_ = new anychart.pieModule.Center(this);
+    this.center_ = new anychart.core.ui.Center(this);
     this.center_.listenSignals(this.pieCenterInvalidated_, this);
   }
 
@@ -2072,7 +2074,7 @@ anychart.pieModule.Chart.prototype.beforeDraw = function() {
 /**
  * Listener for graphics elements rendering.
  */
-anychart.pieModule.Chart.prototype.acgraphElemetnsListener = function() {
+anychart.pieModule.Chart.prototype.acgraphElementsListener = function() {
   var ccbb = this.center_.realContent.getBounds();
 
   if (!anychart.math.Rect.equals(ccbb, this.contentBoundingBox_)) {
@@ -2118,7 +2120,7 @@ anychart.pieModule.Chart.prototype.drawContent = function(bounds) {
       if (this.center_.contentLayer) {
         if (anychart.utils.instanceOf(this.center_.realContent, acgraph.vector.Element)) {
           this.center_.contentLayer.getStage().listen(acgraph.vector.Stage.EventType.RENDER_FINISH,
-              this.acgraphElemetnsListener, false, this);
+              this.acgraphElementsListener, false, this);
         } else if (anychart.utils.instanceOf(this.center_.realContent, anychart.core.VisualBase)) {
           this.center_.contentLayer.listen(anychart.enums.EventType.CHART_DRAW,
               this.chartsListener, false, this);
@@ -2755,7 +2757,7 @@ anychart.pieModule.Chart.prototype.drawSlice_ = function(pointState, opt_update)
  */
 anychart.pieModule.Chart.prototype.drawFrontSide_ = function(cx, cy, outerR, startAngle, endAngle, sweep, pointState, opt_update) {
   // there may be two front sides
-  var uniqueValue = '' + startAngle;
+  var uniqueValue = String(startAngle);
   var pathName = 'frontPath' + uniqueValue;
   var path = this.createPath_(pathName, opt_update);
   if (!path) return null;
@@ -2808,7 +2810,7 @@ anychart.pieModule.Chart.prototype.drawFrontSide_ = function(cx, cy, outerR, sta
  */
 anychart.pieModule.Chart.prototype.drawBackSide_ = function(cx, cy, innerR, startAngle, endAngle, sweep, pointState, opt_update) {
   // there may be two back sides
-  var uniqueValue = '' + startAngle;
+  var uniqueValue = String(startAngle);
   var pathName = 'backPath' + uniqueValue;
   var path = this.createPath_(pathName, opt_update);
   if (!path) return null;
@@ -3877,6 +3879,18 @@ anychart.pieModule.Chart.prototype.getCenterPoint = function() {
 };
 
 
+/** @inheritDoc */
+anychart.pieModule.Chart.prototype.getCenterCoords = function() {
+  return [this.cx, this.cy];
+};
+
+
+/** @inheritDoc */
+anychart.pieModule.Chart.prototype.getCenterContentBounds = function() {
+  return this.centerContentBounds;
+};
+
+
 /**
  * Getter for the current pie pixel outer radius.<br/>
  * <b>Note:</b> Works only after {@link anychart.pieModule.Chart#draw} is called.
@@ -4146,28 +4160,7 @@ anychart.pieModule.Chart.prototype.getSeriesStatus = function(event) {
 
 /** @inheritDoc */
 anychart.pieModule.Chart.prototype.makeBrowserEvent = function(e) {
-  var res = {
-    'type': e['type'],
-    'target': this,
-    'relatedTarget': this.getOwnerElement(e['relatedTarget']) || e['relatedTarget'],
-    'domTarget': e['target'],
-    'relatedDomTarget': e['relatedTarget'],
-    'offsetX': e['offsetX'],
-    'offsetY': e['offsetY'],
-    'clientX': e['clientX'],
-    'clientY': e['clientY'],
-    'screenX': e['screenX'],
-    'screenY': e['screenY'],
-    'button': e['button'],
-    'keyCode': e['keyCode'],
-    'charCode': e['charCode'],
-    'ctrlKey': e['ctrlKey'],
-    'altKey': e['altKey'],
-    'shiftKey': e['shiftKey'],
-    'metaKey': e['metaKey'],
-    'platformModifierKey': e['platformModifierKey'],
-    'state': e['state']
-  };
+  var res = anychart.core.VisualBase.prototype.makeBrowserEvent.call(this, e);
 
   var tag = anychart.utils.extractTag(res['domTarget']);
   var pointIndex = tag.index;
@@ -4487,9 +4480,7 @@ anychart.pieModule.Chart.prototype.applyAppearanceToPoint = function(pointState,
     this.drawSlice_(pointState, true);
   }
 
-  if (!this.isOutsideLabels()) {
-    this.drawLabel_(pointState);
-  }
+  this.drawLabel_(pointState);
 
   return opt_value || (currentPointExplode != this.getExplode(pointState));
 };
@@ -4612,7 +4603,7 @@ anychart.pieModule.Chart.prototype.createTooltipContextProvider = function() {
 
 
 //endregion
-//region --- Disposing / Serialization / Stup
+//region --- Disposing / Serialization / Setup
 /** @inheritDoc */
 anychart.pieModule.Chart.prototype.serialize = function() {
   var json = anychart.pieModule.Chart.base(this, 'serialize');
@@ -4681,7 +4672,7 @@ anychart.pieModule.Chart.prototype.setupByJSON = function(config, opt_default) {
  * @inheritDoc
  */
 anychart.pieModule.Chart.prototype.disposeInternal = function() {
-  goog.disposeAll(this.animationQueue_, this.normal_, this.hovered_, this.center_);
+  goog.disposeAll(this.animationQueue_, this.normal_, this.hovered_, this.selected_, this.center_);
   anychart.pieModule.Chart.base(this, 'disposeInternal');
 };
 

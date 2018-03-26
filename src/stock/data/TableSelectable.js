@@ -88,12 +88,12 @@ anychart.stockModule.data.TableSelectable.prototype.getFullPointsCount = functio
 
 /**
  * Searches asked key with asked mode and returns an object that allows values fetching.
- * @param {number} key
+ * @param {number|string|Date} key
  * @param {anychart.enums.TableSearchMode=} opt_mode
  * @return {anychart.stockModule.data.TableSelectable.RowProxy}
  */
 anychart.stockModule.data.TableSelectable.prototype.search = function(key, opt_mode) {
-  return this.getAtIndex(this.currentStorage_.searchIndex(key, anychart.enums.normalizeTableSearchMode(opt_mode)));
+  return this.getAtIndex(this.currentStorage_.searchIndex(anychart.utils.normalizeTimestamp(key), anychart.enums.normalizeTableSearchMode(opt_mode)));
 };
 
 
@@ -206,7 +206,7 @@ anychart.stockModule.data.TableSelectable.prototype.wrapRow_ = function(row, row
         this.mapping_,
         !this.currentStorageIsMain_,
         globalIndex,
-        this.metaData_[globalIndex]
+        this.metaData_[globalIndex] || {}
     );
   }
   return null;
@@ -233,19 +233,47 @@ anychart.stockModule.data.TableSelectable.prototype.getPostLastRow = function() 
 
 /**
  * Returns the last row in current selection if there is one.
+ * @param {string=} opt_fieldName
  * @return {?anychart.stockModule.data.TableSelectable.RowProxy}
  */
-anychart.stockModule.data.TableSelectable.prototype.getLastVisibleRow = function() {
-  return this.wrapRow_(this.currentSelection_.lastRow, this.currentSelection_.lastIndex);
+anychart.stockModule.data.TableSelectable.prototype.getLastVisibleRow = function(opt_fieldName) {
+  var row = this.currentSelection_.lastRow;
+  var index = this.currentSelection_.lastIndex;
+  if (goog.isDef(opt_fieldName)) {
+    var column = this.currentStorageIsMain_ ?
+        this.mapping_.getSourceColumn(opt_fieldName) :
+        this.mapping_.getAggregateColumn(opt_fieldName);
+    while (row && row != this.currentSelection_.preFirstRow && isNaN(row.getValue(column))) {
+      row = row.prev;
+      index--;
+    }
+  }
+  if (row == this.currentSelection_.preFirstRow)
+    row = null;
+  return this.wrapRow_(row, index);
 };
 
 
 /**
  * Returns the first row in current selection if there is one.
+ * @param {string=} opt_fieldName
  * @return {?anychart.stockModule.data.TableSelectable.RowProxy}
  */
-anychart.stockModule.data.TableSelectable.prototype.getFirstVisibleRow = function() {
-  return this.wrapRow_(this.currentSelection_.firstRow, this.currentSelection_.firstIndex);
+anychart.stockModule.data.TableSelectable.prototype.getFirstVisibleRow = function(opt_fieldName) {
+  var row = this.currentSelection_.firstRow;
+  var index = this.currentSelection_.firstIndex;
+  if (goog.isDef(opt_fieldName)) {
+    var column = this.currentStorageIsMain_ ?
+        this.mapping_.getSourceColumn(opt_fieldName) :
+        this.mapping_.getAggregateColumn(opt_fieldName);
+    while (row && row != this.currentSelection_.postLastRow && isNaN(row.getValue(column))) {
+      row = row.next;
+      index++;
+    }
+  }
+  if (row == this.currentSelection_.postLastRow)
+    row = null;
+  return this.wrapRow_(row, index);
 };
 
 
@@ -276,7 +304,7 @@ anychart.stockModule.data.TableSelectable.prototype.getFirstRowFromMainStorage =
     var column = this.mapping_.getSourceColumn(opt_fieldName);
     for (var i = 0, len = mainStorage.getRowsCount(); i < len; i++) {
       row = mainStorage.getRow(i);
-      if (row.getValue(column))
+      if (!isNaN(row.getValue(column)))
         break;
     }
   } else {
@@ -299,7 +327,7 @@ anychart.stockModule.data.TableSelectable.prototype.getLastRowFromMainStorage = 
     var column = this.mapping_.getSourceColumn(opt_fieldName);
     for (var i = mainStorage.getRowsCount(); i--;) {
       row = mainStorage.getRow(i);
-      if (row.getValue(column))
+      if (!isNaN(row.getValue(column)))
         break;
     }
   } else {
@@ -319,9 +347,9 @@ anychart.stockModule.data.TableSelectable.prototype.getRowByDataSource = functio
   /** @type {?anychart.stockModule.data.TableSelectable.RowProxy} */
   var row;
   if (dataSource == anychart.enums.ComparisonDataSource.FIRST_VISIBLE) {
-    row = this.getFirstVisibleRow();
+    row = this.getFirstVisibleRow(opt_fieldName);
   } else if (dataSource == anychart.enums.ComparisonDataSource.LAST_VISIBLE) {
-    row = this.getLastVisibleRow();
+    row = this.getLastVisibleRow(opt_fieldName);
   } else if (dataSource == anychart.enums.ComparisonDataSource.SERIES_START) {
     row = this.getFirstRowFromMainStorage(opt_fieldName);
   } else if (dataSource == anychart.enums.ComparisonDataSource.SERIES_END) {
@@ -377,12 +405,13 @@ anychart.stockModule.data.TableSelectable.prototype.getMapping = function() {
 /**
  * Returns minimum value of the column  (includes only the visible range).
  * @param {number|string} column
+ * @param {boolean=} opt_onlyVisible
  * @return {number}
  */
-anychart.stockModule.data.TableSelectable.prototype.getColumnMin = function(column) {
+anychart.stockModule.data.TableSelectable.prototype.getColumnMin = function(column, opt_onlyVisible) {
   var res = (goog.isNumber(column) && column < 0) ?
-      this.currentSelection_.calcMins[~column] :
-      this.currentSelection_.mins[column];
+      (opt_onlyVisible ? this.currentSelection_.visibleCalcMins[~column] : this.currentSelection_.calcMins[~column]) :
+      (opt_onlyVisible ? this.currentSelection_.visibleMins[column] : this.currentSelection_.mins[column]);
   return goog.isDef(res) ? res : NaN;
 };
 
@@ -390,12 +419,13 @@ anychart.stockModule.data.TableSelectable.prototype.getColumnMin = function(colu
 /**
  * Returns maximum value of the column (includes only the visible range).
  * @param {number|string} column
+ * @param {boolean=} opt_onlyVisible
  * @return {number}
  */
-anychart.stockModule.data.TableSelectable.prototype.getColumnMax = function(column) {
+anychart.stockModule.data.TableSelectable.prototype.getColumnMax = function(column, opt_onlyVisible) {
   var res = (goog.isNumber(column) && column < 0) ?
-      this.currentSelection_.calcMaxs[~column] :
-      this.currentSelection_.maxs[column];
+      (opt_onlyVisible ? this.currentSelection_.visibleCalcMaxs[~column] : this.currentSelection_.calcMaxs[~column]) :
+      (opt_onlyVisible ? this.currentSelection_.visibleMaxs[column] : this.currentSelection_.maxs[column]);
   return goog.isDef(res) ? res : NaN;
 };
 
@@ -446,7 +476,11 @@ anychart.stockModule.data.TableSelectable.prototype.getExportingIterator = funct
     mins: {},
     maxs: {},
     calcMaxs: [],
-    calcMins: []
+    calcMins: [],
+    visibleMins: {},
+    visibleMaxs: {},
+    visibleCalcMins: [],
+    visibleCalcMaxs: []
   };
   return new anychart.stockModule.data.TableIterator(this.mapping_, selection, this.metaData_, !this.currentStorageIsMain_, coIterator);
 };

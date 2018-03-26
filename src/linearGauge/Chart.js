@@ -122,23 +122,13 @@ anychart.linearGaugeModule.Chart.ZINDEX_INCREMENT_MULTIPLIER = 0.00001;
 anychart.linearGaugeModule.Chart.PROPERTY_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'globalOffset',
-      anychart.utils.normalizeToPercent);
 
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'layout',
-      anychart.enums.normalizeLayout);
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'globalOffset', anychart.utils.normalizeToPercent],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'layout', anychart.enums.normalizeLayout],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'defaultPointerType', anychart.enums.normalizeLinearGaugePointerType]
+  ]);
 
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'defaultPointerType',
-      anychart.enums.normalizeLinearGaugePointerType);
   return map;
 })();
 anychart.core.settings.populate(anychart.linearGaugeModule.Chart, anychart.linearGaugeModule.Chart.PROPERTY_DESCRIPTORS);
@@ -358,11 +348,12 @@ anychart.linearGaugeModule.Chart.prototype.getDataHolders = function() {
 /**
  * Creates pointer.
  * @param {string} type Pointer type.
- * @param {number} dataIndex Pointer data index.
+ * @param {number|anychart.data.View|anychart.data.Set|Array|string} dataIndexOrData Pointer data index or pointer data.
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @private
  * @return {anychart.linearGaugeModule.pointers.Base} Pointer instance.
  */
-anychart.linearGaugeModule.Chart.prototype.createPointerByType_ = function(type, dataIndex) {
+anychart.linearGaugeModule.Chart.prototype.createPointerByType_ = function(type, dataIndexOrData, opt_csvSettings) {
   type = anychart.enums.normalizeLinearGaugePointerType(type);
   var config = this.defaultPointerSettings()[anychart.utils.toCamelCase(type)];
   var ctl = anychart.linearGaugeModule.Chart.PointersTypesMap[type];
@@ -372,7 +363,12 @@ anychart.linearGaugeModule.Chart.prototype.createPointerByType_ = function(type,
   var instance;
 
   if (ctl) {
-    instance = new ctl(this, dataIndex);
+    instance = new ctl();
+    if (goog.isNumber(dataIndexOrData)) {
+      instance.dataIndex(/** @type {number} */(dataIndexOrData));
+    } else {
+      instance.data(/** @type {anychart.data.View|anychart.data.Set|Array|string} */(dataIndexOrData), opt_csvSettings);
+    }
     var lastPointer = this.pointers_[this.pointers_.length - 1];
     var index = lastPointer ? /** @type {number} */ (lastPointer.autoIndex()) + 1 : 0;
     this.pointers_.push(instance);
@@ -384,6 +380,7 @@ anychart.linearGaugeModule.Chart.prototype.createPointerByType_ = function(type,
       instance.autoType(/** @type {anychart.enums.MarkerType} */ (this.markerPalette().itemAt(this.markersCount_++)));
     }
     instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(index)));
+    instance.gauge(this);
     instance.setParentEventTarget(this);
     instance.setupInternal(true, config);
     instance.listenSignals(this.pointerInvalidated_, this);
@@ -402,7 +399,7 @@ anychart.linearGaugeModule.Chart.prototype.createPointerByType_ = function(type,
 
 /**
  * Adds pointers to gauge.
- * @param {...(number)} var_args Data indexes for pointers.
+ * @param {...(number|anychart.data.View|anychart.data.Set|Array)} var_args Data indexes or data for pointers.
  * @return {Array.<anychart.linearGaugeModule.pointers.Base>} Array of created pointers.
  */
 anychart.linearGaugeModule.Chart.prototype.addPointer = function(var_args) {
@@ -1070,8 +1067,8 @@ anychart.linearGaugeModule.Chart.prototype.drawContent = function(bounds) {
     for (i = 0; i < items.length; i++) {
       item = items[i];
       if (item && item.enabled()) {
-        width = anychart.utils.normalizeSize(/** @type {number|string} */ (anychart.utils.normalizeToPercent(item.width())), parentWidth);
-        offset = anychart.utils.normalizeSize(/** @type {number|string} */ (anychart.utils.normalizeToPercent(item.offset())), parentWidth);
+        width = anychart.utils.normalizeSize(/** @type {number|string} */ (anychart.utils.normalizeToPercent(item.getOption('width'))), parentWidth);
+        offset = anychart.utils.normalizeSize(/** @type {number|string} */ (anychart.utils.normalizeToPercent(item.getOption('offset'))), parentWidth);
         if (isVertical)
           pb = anychart.math.rect(offset, bounds.top, width, height);
         else
@@ -1335,8 +1332,10 @@ anychart.linearGaugeModule.Chart.prototype.setupByJSON = function(config, opt_de
       json = pointers[i];
       var pointerType = json['pointerType'] || this.getOption('defaultPointerType');
       var dataIndex = json['dataIndex'];
+      var data = json['data'] || null;
       var pointerInst = this.createPointerByType_(pointerType, dataIndex);
       if (pointerInst) {
+        pointerInst.data(data);
         pointerInst.setup(json);
         if (goog.isObject(json)) {
           if ('scale' in json && json['scale'] > 0) pointerInst.scale(scalesInstances[json['scale']]);
@@ -1391,64 +1390,33 @@ anychart.linearGaugeModule.Chart.prototype.pointerInvalidated_ = function(e) {
 };
 
 
-/**
- * Creates bar pointer.
- * @param {number} dataIndex Pointer data index.
- * @return {anychart.linearGaugeModule.pointers.Base} Bar pointer.
- */
-anychart.linearGaugeModule.Chart.prototype.bar = function(dataIndex) {
-  return this.createPointerByType_(anychart.enums.LinearGaugePointerType.BAR, dataIndex);
-};
+// Generate pointer constructors
+(function() {
+  /**
+   * @param {anychart.enums.LinearGaugePointerType} type
+   * @return {Function}
+   */
+  var constructorsGenerator = function(type) {
+    return function(dataIndexOrData, opt_csvSettings) {
+      return this.createPointerByType_(type, dataIndexOrData, opt_csvSettings);
+    };
+  };
+  var prototype = anychart.linearGaugeModule.Chart.prototype;
+  var types = anychart.enums.LinearGaugePointerType;
+  for (var i in types) {
+    var methodName = anychart.utils.toCamelCase(types[i]);
+    /**
+     * Pointer constructor.
+     * @param {number|anychart.data.View|anychart.data.Set|Array|string} dataIndexOrData Pointer data index or pointer data.
+     * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
+     * @return {anychart.linearGaugeModule.pointers.Base} Pointer.
+     * @this {anychart.linearGaugeModule.Chart}
+     */
+    prototype[methodName] = constructorsGenerator(types[i]);
+  }
+})();
 
 
-/**
- * Creates led pointer.
- * @param {number} dataIndex Pointer data index.
- * @return {anychart.linearGaugeModule.pointers.Base} Led pointer.
- */
-anychart.linearGaugeModule.Chart.prototype.led = function(dataIndex) {
-  return this.createPointerByType_(anychart.enums.LinearGaugePointerType.LED, dataIndex);
-};
-
-
-/**
- * Creates marker pointer.
- * @param {number} dataIndex Pointer data index.
- * @return {anychart.linearGaugeModule.pointers.Base} Marker pointer.
- */
-anychart.linearGaugeModule.Chart.prototype.marker = function(dataIndex) {
-  return this.createPointerByType_(anychart.enums.LinearGaugePointerType.MARKER, dataIndex);
-};
-
-
-/**
- * Creates range bar pointer.
- * @param {number} dataIndex Pointer data index.
- * @return {anychart.linearGaugeModule.pointers.Base} Range Bar pointer.
- */
-anychart.linearGaugeModule.Chart.prototype.rangeBar = function(dataIndex) {
-  return this.createPointerByType_(anychart.enums.LinearGaugePointerType.RANGE_BAR, dataIndex);
-};
-
-
-/**
- * Creates tank pointer.
- * @param {number} dataIndex Pointer data index.
- * @return {anychart.linearGaugeModule.pointers.Base} Tank pointer.
- */
-anychart.linearGaugeModule.Chart.prototype.tank = function(dataIndex) {
-  return this.createPointerByType_(anychart.enums.LinearGaugePointerType.TANK, dataIndex);
-};
-
-
-/**
- * Creates thermometer pointer.
- * @param {number} dataIndex Pointer data index.
- * @return {anychart.linearGaugeModule.pointers.Base} Thermometer pointer.
- */
-anychart.linearGaugeModule.Chart.prototype.thermometer = function(dataIndex) {
-  return this.createPointerByType_(anychart.enums.LinearGaugePointerType.THERMOMETER, dataIndex);
-};
 //endregion
 
 //exports
@@ -1479,10 +1447,11 @@ anychart.linearGaugeModule.Chart.prototype.thermometer = function(dataIndex) {
   proto['scaleBar'] = proto.scaleBar;
   proto['scale'] = proto.scale;
 
-  proto['bar'] = proto.bar;
-  proto['led'] = proto.led;
-  proto['marker'] = proto.marker;
-  proto['rangeBar'] = proto.rangeBar;
-  proto['tank'] = proto.tank;
-  proto['thermometer'] = proto.thermometer;
+  // generated automatically
+  //proto['bar'] = proto.bar;
+  //proto['led'] = proto.led;
+  //proto['marker'] = proto.marker;
+  //proto['rangeBar'] = proto.rangeBar;
+  //proto['tank'] = proto.tank;
+  //proto['thermometer'] = proto.thermometer;
 })();

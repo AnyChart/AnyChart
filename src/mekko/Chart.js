@@ -290,8 +290,6 @@ anychart.mekkoModule.Chart.prototype.createLegendItemsProvider = function(source
 
       data.push({
         'text': itemText,
-        'sourceUid': goog.getUid(this),
-        'sourceKey': i,
         'iconType': anychart.enums.LegendItemIconType.SQUARE,
         'iconStroke': anychart.color.setThickness(color, 1),
         'iconFill': color,

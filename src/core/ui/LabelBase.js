@@ -855,13 +855,8 @@ anychart.core.ui.LabelBase.prototype.setupSpecial = function(isDefault, var_args
 anychart.core.ui.LabelBase.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.ui.LabelBase.base(this, 'setupByJSON', config, opt_default);
 
-  if (opt_default) {
-    anychart.core.settings.copy(this.themeSettings, anychart.core.Text.TEXT_DESCRIPTORS, config);
-    anychart.core.settings.copy(this.themeSettings, anychart.core.ui.LabelBase.DESCRIPTORS, config);
-  } else {
-    anychart.core.settings.deserialize(this, anychart.core.Text.TEXT_DESCRIPTORS, config);
-    anychart.core.settings.deserialize(this, anychart.core.ui.LabelBase.DESCRIPTORS, config);
-  }
+  anychart.core.settings.deserialize(this, anychart.core.Text.TEXT_DESCRIPTORS, config, opt_default);
+  anychart.core.settings.deserialize(this, anychart.core.ui.LabelBase.DESCRIPTORS, config, opt_default);
 
   this.background().setupInternal(!!opt_default, config['background']);
   this.padding().setupInternal(!!opt_default, config['padding']);

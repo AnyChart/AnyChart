@@ -1,7 +1,7 @@
 //region --- Provide & Require
 goog.provide('anychart.resourceModule.Logo');
 goog.require('anychart.core.ui.Background');
-goog.require('anychart.resourceModule.Overlay');
+goog.require('anychart.ganttBaseModule.Overlay');
 //endregion
 
 
@@ -14,7 +14,7 @@ goog.require('anychart.resourceModule.Overlay');
 anychart.resourceModule.Logo = function() {
   anychart.resourceModule.Logo.base(this, 'constructor');
 
-  this.overlay_ = new anychart.resourceModule.Overlay();
+  this.overlay_ = new anychart.ganttBaseModule.Overlay();
   this.overlay_.listenSignals(this.overlaySignal_, this);
 };
 goog.inherits(anychart.resourceModule.Logo, anychart.core.ui.Background);
@@ -48,7 +48,7 @@ anychart.resourceModule.Logo.prototype.SUPPORTED_SIGNALS =
 /**
  * Overlay element.
  * @param {(string|Object|null|boolean)=} opt_value .
- * @return {anychart.resourceModule.Logo|anychart.resourceModule.Overlay}
+ * @return {anychart.resourceModule.Logo|anychart.ganttBaseModule.Overlay}
  */
 anychart.resourceModule.Logo.prototype.overlay = function(opt_value) {
   if (goog.isDef(opt_value)) {

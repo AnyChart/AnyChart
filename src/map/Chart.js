@@ -567,10 +567,22 @@ anychart.mapModule.Chart.prototype.getType = function() {
 };
 
 
+/** @inheritDoc */
+anychart.mapModule.Chart.prototype.getXAxisByIndex = function(index) {
+  return this.axesSettings_.getItems()[index];
+};
+
+
+/** @inheritDoc */
+anychart.mapModule.Chart.prototype.getYAxisByIndex = function(index) {
+  return this.axesSettings_.getItems()[index];
+};
+
+
 //endregion
 //region --- Interactivity
 /**
- * Conrols interactivity.
+ * Controls interactivity.
  * @private
  */
 anychart.mapModule.Chart.prototype.controlsInteractivity_ = function() {
@@ -3544,8 +3556,6 @@ anychart.mapModule.Chart.prototype.drawContent = function(bounds) {
     crosshair.suspendSignalsDispatching();
     crosshair.parentBounds(contentAreaBounds);
     crosshair.container(this.rootElement);
-    crosshair.xAxis(this.axesSettings_.getItems()[this.crosshair_.xLabel().axisIndex()]);
-    crosshair.yAxis(this.axesSettings_.getItems()[this.crosshair_.yLabel().axisIndex()]);
     crosshair.draw();
     crosshair.resumeSignalsDispatching(false);
 
@@ -5070,7 +5080,7 @@ anychart.mapModule.Chart.prototype.setupByJSON = function(config, opt_default) {
       if (!scales.hasOwnProperty(i)) continue;
       json = scales[i];
       var type = goog.isString(json) ? json : json['type'];
-      type = (type + '').toLowerCase();
+      type = String(type).toLowerCase();
       switch (type) {
         case anychart.enums.ScaleTypes.ORDINAL_COLOR:
           scale = anychart.scales.ordinalColor();

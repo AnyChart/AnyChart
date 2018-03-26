@@ -118,29 +118,6 @@ anychart.polarModule.Series.prototype.createPositionProviderByGeometry = functio
 
 
 /**
- * Prepares xRatio part of point meta.
- * @param {anychart.data.IRowInfo} rowInfo
- * @param {Array.<string>} yNames
- * @param {Array.<string|number>} yColumns
- * @param {number} pointMissing
- * @param {number} xRatio
- * @return {number} - pointMissing updated value.
- * @protected
- */
-anychart.polarModule.Series.prototype.makeXRatioMeta = function(rowInfo, yNames, yColumns, pointMissing, xRatio) {
-  rowInfo.meta('xRatio', goog.math.modulo(xRatio, 1));
-  return pointMissing;
-};
-
-
-/** @inheritDoc */
-anychart.polarModule.Series.prototype.prepareMetaMakers = function(yNames, yColumns) {
-  anychart.polarModule.Series.base(this, 'prepareMetaMakers', yNames, yColumns);
-  this.metaMakers.push(this.makeXRatioMeta);
-};
-
-
-/**
  * Returns if the chart is sorted mode.
  * @return {boolean}
  */

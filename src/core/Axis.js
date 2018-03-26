@@ -1683,33 +1683,46 @@ anychart.core.Axis.prototype.getLabelsFormatProvider = function(index, value) {
   var scale = this.scale();
 
   var labelText, labelValue;
-  var valueType = anychart.enums.TokenType.NUMBER;
+  var valueType, tickValueType;
   var addRange = true;
+  var addIntervals = false;
   if (anychart.utils.instanceOf(scale, anychart.scales.Ordinal)) {
     labelText = scale.ticks().names()[index];
     labelValue = value;
-    valueType = anychart.enums.TokenType.STRING;
+    tickValueType = valueType = anychart.enums.TokenType.STRING;
     addRange = false;
   } else if (anychart.utils.instanceOf(scale, anychart.scales.DateTime)) {
     labelText = anychart.format.date(/** @type {number} */(value));
     valueType = anychart.enums.TokenType.STRING; //Not DATE_TIME because it's already formatted.
+    tickValueType = anychart.enums.TokenType.DATE_TIME;
     labelValue = value;
+    addIntervals = true;
   } else {
     labelText = parseFloat(value);
     labelValue = parseFloat(value);
+    valueType = tickValueType = anychart.enums.TokenType.NUMBER;
   }
 
   var values = {
     'axis': {value: this, type: anychart.enums.TokenType.UNKNOWN},
     'index': {value: index, type: anychart.enums.TokenType.NUMBER},
     'value': {value: labelText, type: valueType},
-    'tickValue': {value: labelValue, type: anychart.enums.TokenType.NUMBER},
+    'tickValue': {value: labelValue, type: tickValueType},
     'scale': {value: scale, type: anychart.enums.TokenType.UNKNOWN}
   };
 
   if (addRange) {
     values['max'] = {value: goog.isDef(scale.max) ? scale.max : null, type: anychart.enums.TokenType.NUMBER};
     values['min'] = {value: goog.isDef(scale.min) ? scale.min : null, type: anychart.enums.TokenType.NUMBER};
+  }
+
+  if (addIntervals) {
+    var ticks = /** @type {anychart.scales.DateTimeTicks} */((/** @type {anychart.scales.DateTime} */(scale)).ticks());
+    values['intervalUnit'] = {value: ticks.getIntervalUnit(), type: anychart.enums.TokenType.STRING};
+    values['intervalUnitCount'] = {value: ticks.getIntervalUnitCount(), type: anychart.enums.TokenType.NUMBER};
+    ticks = /** @type {anychart.scales.DateTimeTicks} */((/** @type {anychart.scales.DateTime} */(scale)).minorTicks());
+    values['minorIntervalUnit'] = {value: ticks.getIntervalUnit(), type: anychart.enums.TokenType.STRING};
+    values['minorIntervalUnitCount'] = {value: ticks.getIntervalUnitCount(), type: anychart.enums.TokenType.NUMBER};
   }
 
   var aliases = {};

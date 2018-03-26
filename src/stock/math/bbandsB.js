@@ -67,6 +67,7 @@ anychart.stockModule.math.bbandsB.calculationFunction = function(row, context) {
   var queue = context.queue;
   var period = context.period;
   var currValue = /** @type {number} */ (row.get('value'));
+  currValue = goog.isDef(currValue) ? currValue : row.get('close');
   currValue = anychart.utils.toNumber(currValue);
   var missing = isNaN(currValue);
   var dequeuedValue;

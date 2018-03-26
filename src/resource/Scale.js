@@ -50,20 +50,6 @@ anychart.resourceModule.Scale = function() {
    * @private
    */
   this.count_ = 1;
-  //
-  // /**
-  //  * Scale pix start.
-  //  * @type {number}
-  //  * @private
-  //  */
-  // this.pixStart_ = 0;
-  //
-  // /**
-  //  * Scale pix end.
-  //  * @type {number}
-  //  * @private
-  //  */
-  // this.pixEnd_ = 1;
 
   /**
    * The timestamp that corresponds to the pix start position.
@@ -246,40 +232,6 @@ anychart.resourceModule.Scale.prototype.count = function(opt_value) {
 };
 
 
-// /**
-//  * Getter/setter for pixStart.
-//  * @param {number=} opt_value
-//  * @return {number|anychart.resourceModule.Scale}
-//  */
-// anychart.resourceModule.Scale.prototype.pixStart = function(opt_value) {
-//   if (goog.isDef(opt_value)) {
-//     opt_value = anychart.utils.toNumber(opt_value);
-//     if (this.pixStart_ != opt_value) {
-//       this.pixStart_ = opt_value;
-//     }
-//     return this;
-//   }
-//   return this.pixStart_;
-// };
-//
-//
-// /**
-//  * Getter/setter for pixStart.
-//  * @param {number=} opt_value
-//  * @return {number|anychart.resourceModule.Scale}
-//  */
-// anychart.resourceModule.Scale.prototype.pixEnd = function(opt_value) {
-//   if (goog.isDef(opt_value)) {
-//     opt_value = anychart.utils.toNumber(opt_value);
-//     if (this.pixEnd_ != opt_value) {
-//       this.pixEnd_ = opt_value;
-//     }
-//     return this;
-//   }
-//   return this.pixEnd_;
-// };
-
-
 /**
  * Getter/setter for startDate.
  * @param {number|Date=} opt_value
@@ -388,11 +340,7 @@ anychart.resourceModule.Scale.prototype.inverseTransform = function() {
 //
 //------------------------------------------------------------------------------
 /** @inheritDoc */
-anychart.resourceModule.Scale.prototype.calculate = function() {
-  if (this.consistent) return;
-
-  anychart.resourceModule.Scale.base(this, 'calculate');
-
+anychart.resourceModule.Scale.prototype.setupTicks = function() {
   if (this.minimumModeAuto)
     this.min = anychart.utils.alignDateLeftByUnit(this.min, this.unit_, this.count_, 2000);
   if (this.maximumModeAuto) {

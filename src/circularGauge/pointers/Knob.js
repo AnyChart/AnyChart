@@ -12,153 +12,59 @@ goog.require('anychart.utils');
  */
 anychart.circularGaugeModule.pointers.Knob = function() {
   anychart.circularGaugeModule.pointers.Knob.base(this, 'constructor');
-  /**
-   * @type {number}
-   * @private
-   */
-  this.verticesCount_;
 
-  /**
-   * @type {number}
-   * @private
-   */
-  this.verticesCurvature_;
-
-  /**
-   * @type {?string}
-   * @private
-   */
-  this.topRadius_;
-
-  /**
-   * @type {?string}
-   * @private
-   */
-  this.bottomRadius_;
-
-  /**
-   * @type {number}
-   * @private
-   */
-  this.topRatio_;
-
-  /**
-   * @type {number}
-   * @private
-   */
-  this.bottomRatio_;
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['verticesCount', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['verticesCurvature', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['topRatio', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['bottomRatio', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['topRadius', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['bottomRadius', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED]
+  ]);
 };
 goog.inherits(anychart.circularGaugeModule.pointers.Knob, anychart.circularGaugeModule.pointers.Base);
 
 
-/**
- * Vertices count.
- * @param {(number)=} opt_value .
- * @return {(number|!anychart.circularGaugeModule.pointers.Knob)} .
- */
-anychart.circularGaugeModule.pointers.Knob.prototype.verticesCount = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.verticesCount_ != opt_value) {
-      this.verticesCount_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else
-    return this.verticesCount_;
+//region --- Infrastructure
+/** @inheritDoc */
+anychart.circularGaugeModule.pointers.Knob.prototype.getType = function() {
+  return anychart.enums.CircularGaugePointerType.KNOB;
 };
 
 
+//endregion
+//region --- Descriptors
 /**
- * @param {number=} opt_value .
- * @this {anychart.circularGaugeModule.pointers.Knob}
- * @return {(number|!anychart.circularGaugeModule.pointers.Knob)} .
+ * Properties that should be defined in anychart.circularGaugeModule.pointers.Knob prototype.
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.circularGaugeModule.pointers.Knob.prototype.verticesCurvature = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.verticesCurvature_ != opt_value) {
-      this.verticesCurvature_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else
-    return this.verticesCurvature_;
-};
+anychart.circularGaugeModule.pointers.Knob.OWN_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  var verticesCountNormalizer = function(opt_value) {
+    opt_value = anychart.utils.toNumber(opt_value);
+    return (!opt_value ? this.getOption('verticesCount') : opt_value);
+  };
+  var normalizer = function(opt_value) {
+    return goog.isNull(opt_value) ? opt_value : /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
+  };
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'verticesCount', verticesCountNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'verticesCurvature', anychart.core.settings.asIsNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'topRatio', anychart.core.settings.ratioNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'bottomRatio', anychart.core.settings.ratioNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'topRadius', normalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'bottomRadius', normalizer]
+  ]);
+
+  return map;
+})();
+anychart.core.settings.populate(anychart.circularGaugeModule.pointers.Knob, anychart.circularGaugeModule.pointers.Knob.OWN_DESCRIPTORS);
 
 
-/**
- * @param {(number)=} opt_value .
- * @return {(number|!anychart.circularGaugeModule.pointers.Knob)} .
- */
-anychart.circularGaugeModule.pointers.Knob.prototype.topRatio = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = goog.math.clamp(opt_value, 0, 1);
-    if (this.topRatio_ != opt_value) {
-      this.topRatio_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else
-    return this.topRatio_;
-};
-
-
-/**
- * @param {(number)=} opt_value .
- * @return {(number|!anychart.circularGaugeModule.pointers.Knob)} .
- */
-anychart.circularGaugeModule.pointers.Knob.prototype.bottomRatio = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = goog.math.clamp(opt_value, 0, 1);
-    if (this.bottomRatio_ != opt_value) {
-      this.bottomRatio_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else
-    return this.bottomRatio_;
-};
-
-
-/**
- * @param {(null|number|string)=} opt_value .
- * @return {(string|anychart.circularGaugeModule.pointers.Knob)} .
- */
-anychart.circularGaugeModule.pointers.Knob.prototype.topRadius = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
-    if (this.topRadius_ != opt_value) {
-      this.topRadius_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else
-    return this.topRadius_;
-};
-
-
-/**
- * @param {(null|number|string)=} opt_value .
- * @return {(string|anychart.circularGaugeModule.pointers.Knob)} .
- */
-anychart.circularGaugeModule.pointers.Knob.prototype.bottomRadius = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
-    if (this.bottomRadius_ != opt_value) {
-      this.bottomRadius_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else
-    return this.bottomRadius_;
-};
-
-
+//endregion
+//region --- Drawing
 /**
  * Drawing vertices sides.
  * @param {acgraph.vector.Path} path Path for drawing.
@@ -224,7 +130,9 @@ anychart.circularGaugeModule.pointers.Knob.prototype.drawVertexSide = function(p
 
   //Tilt angle of vertex side to the tangent in the start vertex point.
   vertexSideTiltAngle = goog.math.toDegrees(Math.atan(lop / loa));
-  if (this.topRatio_ < 1 - this.bottomRatio_) {
+  var topRatio = /** @type {number} */(this.getOption('topRatio'));
+  var bottomRatio = /** @type {number} */(this.getOption('bottomRatio'));
+  if (topRatio < 1 - bottomRatio) {
     vertexSideTiltAngle = isFirstSide ?
         90 - vertexSideTiltAngle :
         -(90 - vertexSideTiltAngle);
@@ -241,12 +149,13 @@ anychart.circularGaugeModule.pointers.Knob.prototype.drawVertexSide = function(p
   curveBasePointX = vertexSideCenterX + Math.cos(goog.math.toRadians(curvatureBasePointAngle)) * cv;
   curveBasePointY = vertexSideCenterY + Math.sin(goog.math.toRadians(curvatureBasePointAngle)) * cv;
 
-  controlDirection = this.verticesCurvature_ < .5 ? 90 : -90;
+  var verticesCurvature = /** @type {number} */(this.getOption('verticesCurvature'));
+  controlDirection = verticesCurvature < .5 ? 90 : -90;
   //First control point of cubic curve
   control1x = curveBasePointX + Math.cos(goog.math.toRadians(curvatureBasePointAngle + controlDirection)) * (cv * .5);
   control1y = curveBasePointY + Math.sin(goog.math.toRadians(curvatureBasePointAngle + controlDirection)) * (cv * .5);
 
-  controlDirection = this.verticesCurvature_ < .5 ? -90 : 90;
+  controlDirection = verticesCurvature < .5 ? -90 : 90;
   //First control point of cubic curve
   control2x = curveBasePointX + Math.cos(goog.math.toRadians(curvatureBasePointAngle + controlDirection)) * (cv * .5);
   control2y = curveBasePointY + Math.sin(goog.math.toRadians(curvatureBasePointAngle + controlDirection)) * (cv * .5);
@@ -268,9 +177,13 @@ anychart.circularGaugeModule.pointers.Knob.prototype.draw = function() {
   if (!this.checkDrawingNeeded())
     return this;
 
+  this.ensureCreated();
+
   if (!axis || !axis.enabled()) {
     if (this.domElement) this.domElement.clear();
     if (this.hatchFillElement) this.hatchFillElement.clear();
+    if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS))
+      this.markConsistent(anychart.ConsistencyState.BOUNDS);
     return this;
   }
 
@@ -300,7 +213,7 @@ anychart.circularGaugeModule.pointers.Knob.prototype.draw = function() {
 
     var scale = axis.scale();
 
-    var iterator = gauge.getResetIterator();
+    var iterator = this.getResetIterator();
     iterator.select(/** @type {number} */(this.dataIndex()));
     var value = parseFloat(iterator.get('value'));
 
@@ -314,7 +227,6 @@ anychart.circularGaugeModule.pointers.Knob.prototype.draw = function() {
 
     if (!this.domElement) {
       this.domElement = acgraph.path();
-      this.registerDisposable(this.domElement);
     } else
       this.domElement.clear();
 
@@ -322,17 +234,22 @@ anychart.circularGaugeModule.pointers.Knob.prototype.draw = function() {
     var axisStartAngle = /** @type {number} */(goog.isDef(axis.startAngle()) ? axis.getStartAngle() : gauge.getStartAngle());
     var axisSweepAngle = /** @type {number} */(goog.isDef(axis.sweepAngle()) ? axis.sweepAngle() : /** @type {number} */(gauge.getOption('sweepAngle')));
 
-    var pixTopRadius = goog.isDefAndNotNull(this.topRadius_) ?
-        anychart.utils.normalizeSize(this.topRadius_, gauge.getPixRadius()) :
+    var topRadius = /** @type {string} */(this.getOption('topRadius'));
+    var pixTopRadius = goog.isDefAndNotNull(topRadius) ?
+        anychart.utils.normalizeSize(topRadius, gauge.getPixRadius()) :
         axisRadius * .7;
 
-    var pixBottomRadius = goog.isDefAndNotNull(this.bottomRadius_) ?
-        anychart.utils.normalizeSize(this.bottomRadius_, gauge.getPixRadius()) :
+    var bottomRadius = /** @type {string} */(this.getOption('bottomRadius'));
+    var pixBottomRadius = goog.isDefAndNotNull(bottomRadius) ?
+        anychart.utils.normalizeSize(bottomRadius, gauge.getPixRadius()) :
         axisRadius * .6;
 
-    var verticesSectorSweep = 360 / this.verticesCount_;
-    var topVerticesSweep = (verticesSectorSweep / 2) * this.topRatio_;
-    var bottomVerticesSweep = (verticesSectorSweep / 2) * this.bottomRatio_;
+    var verticesCount = /** @type {number} */(this.getOption('verticesCount'));
+    var topRatio = /** @type {number} */(this.getOption('topRatio'));
+    var bottomRatio = /** @type {number} */(this.getOption('bottomRatio'));
+    var verticesSectorSweep = 360 / verticesCount;
+    var topVerticesSweep = (verticesSectorSweep / 2) * topRatio;
+    var bottomVerticesSweep = (verticesSectorSweep / 2) * bottomRatio;
 
     var valueRatio = goog.math.clamp(scale.transform(value), 0, 1);
     var startAngle = goog.math.standardAngle(axisStartAngle + valueRatio * axisSweepAngle);
@@ -350,15 +267,16 @@ anychart.circularGaugeModule.pointers.Knob.prototype.draw = function() {
     var halfDr = dr / 2;
     //if bottom radius more then top radius - this is invert mode.
     var invert = pixTopRadius < pixBottomRadius;
+    var verticesCurvature = /** @type {number} */(this.getOption('verticesCurvature'));
     //We need change vector direction relative verticesCurvature value.
-    var curvatureSideAngle = this.verticesCurvature_ < .5 ? 90 : -90;
+    var curvatureSideAngle = verticesCurvature < .5 ? 90 : -90;
     //Pixel value of curvature max deflection.
-    var curvatureValue = Math.abs(.5 - this.verticesCurvature_) * halfDr;
+    var curvatureValue = Math.abs(.5 - verticesCurvature) * halfDr;
     var angleStartVertexSector, angleStartPointVertexSide, angleEndPointVertexSide, i;
 
     this.domElement.clear();
 
-    for (i = 0; i < this.verticesCount_; i++) {
+    for (i = 0; i < verticesCount; i++) {
       angleStartVertexSector = goog.math.standardAngle(startAngle + i * verticesSectorSweep);
 
       this.domElement.circularArc(cx, cy, pixBottomRadius, pixBottomRadius, angleStartVertexSector, bottomVerticesSweep, i != 0);
@@ -397,7 +315,7 @@ anychart.circularGaugeModule.pointers.Knob.prototype.draw = function() {
     if (this.hatchFillElement) {
       this.hatchFillElement.clear();
 
-      for (i = 0; i < this.verticesCount_; i++) {
+      for (i = 0; i < verticesCount; i++) {
         angleStartVertexSector = goog.math.standardAngle(startAngle + i * verticesSectorSweep);
 
         this.hatchFillElement.circularArc(cx, cy, pixBottomRadius, pixBottomRadius, angleStartVertexSector, bottomVerticesSweep, i != 0);
@@ -440,19 +358,13 @@ anychart.circularGaugeModule.pointers.Knob.prototype.draw = function() {
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//  Serialize & Deserialize
-//----------------------------------------------------------------------------------------------------------------------
+//endregion
+//region --- Serialize / Deserialize / Dispose
 /** @inheritDoc */
 anychart.circularGaugeModule.pointers.Knob.prototype.serialize = function() {
   var json = anychart.circularGaugeModule.pointers.Knob.base(this, 'serialize');
 
-  json['verticesCount'] = this.verticesCount();
-  json['verticesCurvature'] = this.verticesCurvature();
-  json['topRatio'] = this.topRatio();
-  json['bottomRatio'] = this.bottomRatio();
-  if (goog.isDef(this.topRadius())) json['topRadius'] = this.topRadius();
-  if (goog.isDef(this.bottomRadius())) json['bottomRadius'] = this.bottomRadius();
+  anychart.core.settings.serialize(this, anychart.circularGaugeModule.pointers.Knob.OWN_DESCRIPTORS, json, 'Knob pointer');
 
   return json;
 };
@@ -461,23 +373,31 @@ anychart.circularGaugeModule.pointers.Knob.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.circularGaugeModule.pointers.Knob.prototype.setupByJSON = function(config, opt_default) {
   anychart.circularGaugeModule.pointers.Knob.base(this, 'setupByJSON', config, opt_default);
-
-  this.verticesCount(config['verticesCount']);
-  this.verticesCurvature(config['verticesCurvature']);
-  this.topRatio(config['topRatio']);
-  this.bottomRatio(config['bottomRatio']);
-  this.topRadius(config['topRadius']);
-  this.bottomRadius(config['bottomRadius']);
+  anychart.core.settings.deserialize(this, anychart.circularGaugeModule.pointers.Knob.OWN_DESCRIPTORS, config, opt_default);
 };
 
 
+/** @inheritDoc */
+anychart.circularGaugeModule.pointers.Knob.prototype.disposeInternal = function() {
+  goog.disposeAll(this.domElement, this.hatchFillElement);
+  this.domElement = null;
+  this.hatchFillElement = null;
+  anychart.circularGaugeModule.pointers.Knob.base(this, 'disposeInternal');
+};
+
+
+//endregion
+
+
+
 //exports
-(function() {
-  var proto = anychart.circularGaugeModule.pointers.Knob.prototype;
-  proto['verticesCount'] = proto.verticesCount;
-  proto['verticesCurvature'] = proto.verticesCurvature;
-  proto['topRatio'] = proto.topRatio;
-  proto['bottomRatio'] = proto.bottomRatio;
-  proto['topRadius'] = proto.topRadius;
-  proto['bottomRadius'] = proto.bottomRadius;
-})();
+//(function() {
+//  var proto = anychart.circularGaugeModule.pointers.Knob.prototype;
+//  auto generated
+//  proto['verticesCount'] = proto.verticesCount;
+//  proto['verticesCurvature'] = proto.verticesCurvature;
+//  proto['topRatio'] = proto.topRatio;
+//  proto['bottomRatio'] = proto.bottomRatio;
+//  proto['topRadius'] = proto.topRadius;
+//  proto['bottomRadius'] = proto.bottomRadius;
+//})();

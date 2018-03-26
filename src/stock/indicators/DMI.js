@@ -8,44 +8,37 @@ goog.require('anychart.utils');
 
 /**
  * DMI indicator class.
- * @param {!(anychart.stockModule.Plot|anychart.stockModule.Scroller)} plot
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_period
- * @param {number=} opt_adxPeriod
- * @param {boolean=} opt_useWildersSmoothing
- * @param {anychart.enums.StockSeriesType=} opt_pdiSeriesType
- * @param {anychart.enums.StockSeriesType=} opt_ndiSeriesType
- * @param {anychart.enums.StockSeriesType=} opt_adxSeriesType
+ * @param {Array} args [plot, mapping, opt_period, opt_adxPeriod, opt_useWildersSmoothing, opt_pdiSeriesType, opt_ndiSeriesType, opt_adxSeriesType]
  * @constructor
  * @extends {anychart.stockModule.indicators.Base}
  */
-anychart.stockModule.indicators.DMI = function(plot, mapping, opt_period, opt_adxPeriod, opt_useWildersSmoothing, opt_pdiSeriesType, opt_ndiSeriesType, opt_adxSeriesType) {
-  anychart.stockModule.indicators.DMI.base(this, 'constructor', plot, mapping);
+anychart.stockModule.indicators.DMI = function(args) {
+  anychart.stockModule.indicators.DMI.base(this, 'constructor', args);
 
   /**
    * DI period.
    * @type {number}
    * @private
    */
-  this.period_ = anychart.utils.normalizeToNaturalNumber(opt_period, 14, false);
+  this.period_ = anychart.utils.normalizeToNaturalNumber(args[2], 14, false);
 
   /**
    * ADX period.
    * @type {number}
    * @private
    */
-  this.adxPeriod_ = anychart.utils.normalizeToNaturalNumber(opt_adxPeriod, 14, false);
+  this.adxPeriod_ = anychart.utils.normalizeToNaturalNumber(args[3], 14, false);
 
   /**
    * Wilders smoothing.
    * @type {boolean}
    * @private
    */
-  this.useWildersSmoothing_ = goog.isDef(opt_useWildersSmoothing) ? !!opt_useWildersSmoothing : true;
+  this.useWildersSmoothing_ = goog.isDef(args[4]) ? !!args[4] : true;
 
-  this.declareSeries('pdi', opt_pdiSeriesType);
-  this.declareSeries('ndi', opt_ndiSeriesType);
-  this.declareSeries('adx', opt_adxSeriesType);
+  this.declareSeries('pdi', args[5]);
+  this.declareSeries('ndi', args[6]);
+  this.declareSeries('adx', args[7]);
   this.init();
 };
 goog.inherits(anychart.stockModule.indicators.DMI, anychart.stockModule.indicators.Base);

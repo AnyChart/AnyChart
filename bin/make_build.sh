@@ -8,7 +8,7 @@ IS_RC_BUILD=false
 IS_PREVIEW_BUILD=false
 IS_DEV_BUILD=false
 
-if [ ${IS_RELEASE_BUILD} = "true" ]; then
+if [ "${TRAVIS_BRANCH}" = "master" ]; then
     VERSION=${BUILD_VERSION}
     IS_RELEASE_BUILD=true
 elif [ "${TRAVIS_BRANCH}" = "develop" ]; then
@@ -32,6 +32,11 @@ INSTALL_PACKAGE_NAME=anychart-installation-package-${VERSION}.zip
 echo Version: ${VERSION}
 echo Branch: ${TRAVIS_BRANCH}
 echo Commit Hash: ${COMMIT_HASH}
+
+echo Is release build: ${IS_RELEASE_BUILD}
+echo Is RC build: ${IS_RC_BUILD}
+echo Is dev preview build: ${IS_PREVIEW_BUILD}
+echo Is develop build: ${IS_DEV_BUILD}
 # ---- Variables (for all builds) --------------------------------------------------------------------------------------
 
 
@@ -174,7 +179,7 @@ scp -i ~/.ssh/id_rsa dist/${INSTALL_PACKAGE_NAME} $STATIC_HOST_SSH_STRING:/apps/
 
 # unzip files
 echo Unzipping files
-ssh -i ~/.ssh/id_rsa $STATIC_HOST_SSH_STRING "unzip -q -o /apps/static/cdn/releases/${VERSION}/anychart-installation-package-${VERSION}.zip -d /apps/static/cdn/releases/${VERSION}/"
+ssh -i ~/.ssh/id_rsa $STATIC_HOST_SSH_STRING "unzip -q -o /apps/static/cdn/releases/${VERSION}/${INSTALL_PACKAGE_NAME} -d /apps/static/cdn/releases/${VERSION}/"
 
 ssh -i ~/.ssh/id_rsa $STATIC_HOST_SSH_STRING "
     cp /apps/static/cdn/releases/${VERSION}/js/modules.json /apps/static/cdn/releases/${VERSION}/index.json"
@@ -199,7 +204,8 @@ echo Copy CAT legacy files
 if [ "${VERSION}" != "${TRAVIS_BRANCH}" ]; then
     ssh -i ~/.ssh/id_rsa  $STATIC_HOST_SSH_STRING "
     rm -rf /apps/static/cdn/releases/${TRAVIS_BRANCH} &&
-    cp -r /apps/static/cdn/releases/${VERSION} /apps/static/cdn/releases/${TRAVIS_BRANCH}"
+    cp -r /apps/static/cdn/releases/${VERSION} /apps/static/cdn/releases/${TRAVIS_BRANCH} &&
+    mv /apps/static/cdn/releases/${TRAVIS_BRANCH}/${INSTALL_PACKAGE_NAME} /apps/static/cdn/releases/${TRAVIS_BRANCH}/anychart-installation-package-${TRAVIS_BRANCH}.zip"
 fi
 # ---- Copy dev legacy files (dev builds only) -------------------------------------------------------------------------
 
@@ -226,7 +232,7 @@ fi
 if [ ${IS_RELEASE_BUILD} = "true" ]; then
     echo Create latest version
     ssh -i ~/.ssh/id_rsa  $STATIC_HOST_SSH_STRING "
-    rm -rf /apps/static/cdn/releases/${MAJOR_VERSION}.x.x &&
+    rm -rf /apps/static/cdn/releases/v${MAJOR_VERSION} &&
     cp -r /apps/static/cdn/releases/${VERSION} /apps/static/cdn/releases/v${MAJOR_VERSION}"
 fi
 # ---- Create latest version (release builds only) ---------------------------------------------------------------------

@@ -2,9 +2,11 @@
 *.swp
 .idea
 *.pid
-libs
-out
-src
+/bin
+/libs
+/out
+/src
+/css
 *.swo
 *.pyc
 **/.*

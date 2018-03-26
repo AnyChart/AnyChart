@@ -141,15 +141,21 @@ anychart.scales.Linear.prototype.stickToZero = function(opt_value) {
 
 
 /** @inheritDoc */
-anychart.scales.Linear.prototype.calculate = function() {
-  if (this.consistent) return;
+anychart.scales.Linear.prototype.setupTransformer = function() {
+  anychart.scales.Linear.base(this, 'setupTransformer');
+  this.transformer.domain([this.min, this.max]);
+};
 
-  anychart.scales.Linear.base(this, 'calculate');
 
+/** @inheritDoc */
+anychart.scales.Linear.prototype.setupTicks = function() {
   var setupResult = this.ticks().setupAsMajor(this.min, this.max,
-      this.minimumModeAuto && this.min != this.softMin,
-      this.maximumModeAuto && this.max != this.softMax,
-      this.logBaseVal);
+      this.minimumModeAuto && this.min != this.softMin && this.alignMinimumVal,
+      this.maximumModeAuto && this.max != this.softMax && this.alignMaximumVal,
+      this.logBaseVal, this.borderLog || 0);
+
+  if (!isNaN(setupResult[4]))
+    this.borderLog = setupResult[4];
 
   if (this.minimumModeAuto)
     this.min = setupResult[0]; // new min
@@ -157,9 +163,7 @@ anychart.scales.Linear.prototype.calculate = function() {
   if (this.maximumModeAuto)
     this.max = setupResult[1]; // new max
 
-  this.minorTicks().setupAsMinor(this.ticks().getInternal(), this.logBaseVal, setupResult[2], setupResult[3]);
-
-  this.range = this.max - this.min;
+  this.minorTicks().setupAsMinor(this.ticks().getInternal(), this.logBaseVal, setupResult[2], setupResult[3], this.borderLog);
 };
 
 
@@ -288,7 +292,7 @@ anychart.scales.Linear.prototype.makeValuesComparison_ = function(value, compari
  * @private
  */
 anychart.scales.Linear.prototype.makePercentComparison_ = function(value, comparisonZero) {
-  return (anychart.utils.toNumber(value) - comparisonZero) / (comparisonZero || 1) * 100;
+  return (anychart.utils.toNumber(value) - comparisonZero) / Math.abs(comparisonZero || NaN) * 100;
 };
 
 
@@ -356,6 +360,8 @@ anychart.scales.linear = function() {
   proto['stickToZero'] = proto.stickToZero;
   proto['softMinimum'] = proto.softMinimum;
   proto['softMaximum'] = proto.softMaximum;
+  proto['alignMinimum'] = proto.alignMinimum;
+  proto['alignMaximum'] = proto.alignMaximum;
   proto['minimumGap'] = proto.minimumGap;//doc|ex
   proto['maximumGap'] = proto.maximumGap;//doc|ex
   proto['comparisonMode'] = proto.comparisonMode;

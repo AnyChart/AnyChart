@@ -9,17 +9,17 @@ goog.require('anychart.core.utils.TypedLayer');
 goog.require('anychart.data');
 goog.require('anychart.data.Iterator');
 goog.require('anychart.format.Context');
+goog.require('anychart.ganttBaseModule.Overlay');
+goog.require('anychart.ganttBaseModule.TimeLineHeader');
 goog.require('anychart.math.Rect');
 goog.require('anychart.resourceModule.Activities');
 goog.require('anychart.resourceModule.Calendar');
 goog.require('anychart.resourceModule.Conflicts');
 goog.require('anychart.resourceModule.Grid');
 goog.require('anychart.resourceModule.Logo');
-goog.require('anychart.resourceModule.Overlay');
 goog.require('anychart.resourceModule.Resource');
 goog.require('anychart.resourceModule.ResourceList');
 goog.require('anychart.resourceModule.Scale');
-goog.require('anychart.resourceModule.TimeLine');
 goog.require('goog.events.MouseWheelHandler');
 goog.require('goog.fx.Dragger');
 goog.require('goog.userAgent');
@@ -71,10 +71,10 @@ anychart.resourceModule.Chart = function(opt_data, opt_csvSettings) {
 
   /**
    * Time line.
-   * @type {anychart.resourceModule.TimeLine}
+   * @type {anychart.ganttBaseModule.TimeLineHeader}
    * @private
    */
-  this.timeLine_ = new anychart.resourceModule.TimeLine();
+  this.timeLine_ = new anychart.ganttBaseModule.TimeLineHeader();
   this.timeLine_.listenSignals(this.handleTimeLineSignal_, this);
 
   /**
@@ -92,7 +92,7 @@ anychart.resourceModule.Chart = function(opt_data, opt_csvSettings) {
   this.logo_ = new anychart.resourceModule.Logo();
   this.logo_.listenSignals(this.handleLogoSignal_, this);
 
-  this.overlay_ = new anychart.resourceModule.Overlay();
+  this.overlay_ = new anychart.ganttBaseModule.Overlay();
   this.overlay_.listenSignals(this.overlaySignal_, this);
 
   /**
@@ -325,7 +325,7 @@ goog.inherits(anychart.resourceModule.Chart, anychart.core.Chart);
 /**
  * @typedef {{
  *   id: (string|undefined),
- *   levels: Array.<anychart.resourceModule.TimeLine.Level>,
+ *   levels: Array.<anychart.ganttBaseModule.TimeLineHeader.Level>,
  *   unit: (anychart.enums.Interval|undefined),
  *   count: (number|undefined),
  *   unitPixSize: number
@@ -637,7 +637,7 @@ anychart.resourceModule.Chart.prototype.calendar = function(opt_value) {
 /**
  * TimeLine getter/setter.
  * @param {(string|Object|null|boolean)=} opt_value
- * @return {anychart.resourceModule.TimeLine|anychart.resourceModule.Chart}
+ * @return {anychart.ganttBaseModule.TimeLineHeader|anychart.resourceModule.Chart}
  */
 anychart.resourceModule.Chart.prototype.timeLine = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -768,7 +768,7 @@ anychart.resourceModule.Chart.prototype.zoomLevel = function(opt_indexOrId) {
 /**
  * Overlay element.
  * @param {(string|Object|null|boolean)=} opt_value .
- * @return {anychart.resourceModule.Chart|anychart.resourceModule.Overlay}
+ * @return {anychart.resourceModule.Chart|anychart.ganttBaseModule.Overlay}
  */
 anychart.resourceModule.Chart.prototype.overlay = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -1130,7 +1130,7 @@ anychart.resourceModule.Chart.prototype.setZoomLevel_ = function(level) {
   this.xScale_.unit(level['unit']);
   this.xScale_.count(level['count']);
   this.xScale_.unitPixSize(level['unitPixSize']);
-  this.timeLine_.levels(level['levels']);
+  this.timeLine_.setLevels(level['levels']);
   this.resumeSignalsDispatching(true);
 };
 
@@ -1646,28 +1646,7 @@ anychart.resourceModule.Chart.prototype.getStartValueForAppearanceReduction = go
 
 /** @inheritDoc */
 anychart.resourceModule.Chart.prototype.makeBrowserEvent = function(e) {
-  var res = {
-    'type': e['type'],
-    'target': this,
-    'relatedTarget': this.getOwnerElement(e['relatedTarget']) || e['relatedTarget'],
-    'domTarget': e['target'],
-    'relatedDomTarget': e['relatedTarget'],
-    'offsetX': e['offsetX'],
-    'offsetY': e['offsetY'],
-    'clientX': e['clientX'],
-    'clientY': e['clientY'],
-    'screenX': e['screenX'],
-    'screenY': e['screenY'],
-    'button': e['button'],
-    'keyCode': e['keyCode'],
-    'charCode': e['charCode'],
-    'ctrlKey': e['ctrlKey'],
-    'altKey': e['altKey'],
-    'shiftKey': e['shiftKey'],
-    'metaKey': e['metaKey'],
-    'platformModifierKey': e['platformModifierKey'],
-    'state': e['state']
-  };
+  var res = anychart.core.VisualBase.prototype.makeBrowserEvent.call(this, e);
 
   var tag = anychart.utils.extractTag(res['domTarget']);
   var pointIndex = anychart.utils.toNumber(tag.index);

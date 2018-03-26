@@ -31,7 +31,7 @@ anychart.stockModule.scales.ScatterTicksIterator.prototype.setup = function(star
    * @type {number}
    * @protected
    */
-  this.alignedStart = anychart.utils.alignDateLeft(start, majorInterval, globalStart);
+  this.globalStart = globalStart;
 
   /**
    * @type {number}
@@ -73,11 +73,14 @@ anychart.stockModule.scales.ScatterTicksIterator.prototype.setup = function(star
  * Resets the iterator to the pre-first position.
  */
 anychart.stockModule.scales.ScatterTicksIterator.prototype.reset = function() {
+  var startAlignedByMajor = anychart.utils.alignDateLeft(this.start, this.majorInterval, this.globalStart);
+  var startAlignedByMinor = anychart.utils.alignDateLeft(this.start, this.minorInterval, this.globalStart);
+
   /**
    * @type {goog.date.UtcDateTime}
    * @protected
    */
-  this.currentMajor = new goog.date.UtcDateTime(new Date(this.alignedStart));
+  this.currentMajor = new goog.date.UtcDateTime(new Date(startAlignedByMajor));
 
   /**
    * @type {number}
@@ -85,7 +88,7 @@ anychart.stockModule.scales.ScatterTicksIterator.prototype.reset = function() {
    */
   this.preFirstMajor = NaN;
 
-  if (this.alignedStart < this.start) {
+  if (this.currentMajor.getTime() < this.start) {
     this.preFirstMajor = this.currentMajor.getTime();
     if (this.preFirstMajor > this.end)
       this.preFirstMajor = NaN;
@@ -96,7 +99,7 @@ anychart.stockModule.scales.ScatterTicksIterator.prototype.reset = function() {
    * @type {goog.date.UtcDateTime}
    * @protected
    */
-  this.currentMinor = new goog.date.UtcDateTime(new Date(this.alignedStart));
+  this.currentMinor = new goog.date.UtcDateTime(new Date(startAlignedByMinor));
 
   while (this.currentMinor.getTime() < this.start)
     this.currentMinor.add(this.minorInterval);

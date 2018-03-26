@@ -8,16 +8,14 @@ goog.require('anychart.utils');
 
 /**
  * ADL indicator class.
- * @param {!(anychart.stockModule.Plot|anychart.stockModule.Scroller)} plot
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {anychart.enums.StockSeriesType=} opt_seriesType
+ * @param {Array} args [plot, mapping, opt_seriesType]
  * @constructor
  * @extends {anychart.stockModule.indicators.Base}
  */
-anychart.stockModule.indicators.ADL = function(plot, mapping, opt_seriesType) {
-  anychart.stockModule.indicators.ADL.base(this, 'constructor', plot, mapping);
+anychart.stockModule.indicators.ADL = function(args) {
+  anychart.stockModule.indicators.ADL.base(this, 'constructor', args);
 
-  this.declareSeries('main', opt_seriesType);
+  this.declareSeries('main', args[2]);
   this.init();
 };
 goog.inherits(anychart.stockModule.indicators.ADL, anychart.stockModule.indicators.Base);

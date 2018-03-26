@@ -1,4 +1,4 @@
-goog.provide('anychart.treemapModule.ArrayIterator');
+goog.provide('anychart.treeChartBase.ArrayIterator');
 goog.require('anychart.data.Iterator');
 
 
@@ -10,7 +10,7 @@ goog.require('anychart.data.Iterator');
  * @param {Array} arr
  * @constructor
  */
-anychart.treemapModule.ArrayIterator = function(arr) {
+anychart.treeChartBase.ArrayIterator = function(arr) {
   /**
    * @type {Array}
    * @protected
@@ -19,14 +19,14 @@ anychart.treemapModule.ArrayIterator = function(arr) {
 
   this.reset();
 };
-goog.inherits(anychart.treemapModule.ArrayIterator, anychart.data.Iterator);
+goog.inherits(anychart.treeChartBase.ArrayIterator, anychart.data.Iterator);
 
 
 /**
  * Advances the iterator to the next item.
  * @return {boolean} Returns true if moved to the next item, otherwise returns false.
  */
-anychart.treemapModule.ArrayIterator.prototype.advance = function() {
+anychart.treeChartBase.ArrayIterator.prototype.advance = function() {
   this.currentRow = this.arr[++this.currentIndex];
   var rc = this.getRowsCount();
   return !!rc && this.currentIndex < rc;
@@ -38,12 +38,20 @@ anychart.treemapModule.ArrayIterator.prototype.advance = function() {
  * @param {string} fieldName Field name.
  * @return {*} The value or undefined, if not found.
  */
-anychart.treemapModule.ArrayIterator.prototype.get = function(fieldName) {
+anychart.treeChartBase.ArrayIterator.prototype.get = function(fieldName) {
   if (this.currentIndex >= this.getRowsCount()) return void 0;
-  if (goog.isDef(fieldName) && this.currentRow && this.currentRow.meta) {
-    var type = this.currentRow.meta('type');
-    if (type == 1 /* HEADER */ || type == 3 /* TRANSIENT */ || type == 4 /* HINT_LEAF */) return void 0;
-    return this.currentRow.meta(fieldName);
+  if (goog.isDef(fieldName) && this.currentRow) {
+    var result;
+    if (this.currentRow.meta) {
+      var type = this.currentRow.meta('type');
+      if (type == 1 /* HEADER */ || type == 3 /* TRANSIENT */ || type == 4 /* HINT_LEAF */) return void 0;
+      result = this.currentRow.meta(fieldName);
+      if (result)
+        return result;
+    }
+    if (this.currentRow.get) {
+      return this.currentRow.get(fieldName);
+    }
   } else
     return void 0;
 };
@@ -53,7 +61,7 @@ anychart.treemapModule.ArrayIterator.prototype.get = function(fieldName) {
  * Returns current row. May be undefined.
  * @return {*} Current row.
  */
-anychart.treemapModule.ArrayIterator.prototype.getItem = function() {
+anychart.treeChartBase.ArrayIterator.prototype.getItem = function() {
   return this.currentRow;
 };
 
@@ -62,7 +70,7 @@ anychart.treemapModule.ArrayIterator.prototype.getItem = function() {
  * Returns the index of the item to which iterator points to.
  * @return {number} The index of an iterator position.
  */
-anychart.treemapModule.ArrayIterator.prototype.getIndex = function() {
+anychart.treeChartBase.ArrayIterator.prototype.getIndex = function() {
   return this.currentIndex;
 };
 
@@ -71,7 +79,7 @@ anychart.treemapModule.ArrayIterator.prototype.getIndex = function() {
  * Returns the number of items in the array.
  * @return {number} The number of items in the array.
  */
-anychart.treemapModule.ArrayIterator.prototype.getRowsCount = function() {
+anychart.treeChartBase.ArrayIterator.prototype.getRowsCount = function() {
   return this.arr.length;
 };
 
@@ -81,9 +89,9 @@ anychart.treemapModule.ArrayIterator.prototype.getRowsCount = function() {
  * Gets/sets meta only if item of array supports meta method.
  * @param {string} name Name of meta field.
  * @param {*=} opt_value Value that should be set.
- * @return {!anychart.treemapModule.ArrayIterator|*} Meta value of self for chaining.
+ * @return {!anychart.treeChartBase.ArrayIterator|*} Meta value of self for chaining.
  */
-anychart.treemapModule.ArrayIterator.prototype.meta = function(name, opt_value) {
+anychart.treeChartBase.ArrayIterator.prototype.meta = function(name, opt_value) {
   if (this.currentRow && this.currentRow.meta) {
     if (arguments.length > 1) {
       this.currentRow.meta(name, opt_value);

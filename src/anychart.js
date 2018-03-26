@@ -805,6 +805,7 @@ goog.exportSymbol('anychart.line', anychart.getFeatureOrError('anychart.line', '
 goog.exportSymbol('anychart.verticalLine', anychart.getFeatureOrError('anychart.verticalLine', 'Vertical Line chart'));
 goog.exportSymbol('anychart.verticalArea', anychart.getFeatureOrError('anychart.verticalArea', 'Vertical Area chart'));
 goog.exportSymbol('anychart.marker', anychart.getFeatureOrError('anychart.marker', 'Marker chart'));
+goog.exportSymbol('anychart.sunburst', anychart.getFeatureOrError('anychart.sunburst', 'Sunburst chart'));
 goog.exportSymbol('anychart.pie', anychart.getFeatureOrError('anychart.pie', 'Pie chart'));
 goog.exportSymbol('anychart.pie3d', anychart.getFeatureOrError('anychart.pie3d', '3D Pie chart'));
 goog.exportSymbol('anychart.pyramid', anychart.getFeatureOrError('anychart.pyramid', 'Pyramid chart'));

@@ -363,6 +363,12 @@ anychart.ganttModule.BaseGrid = function(opt_controller, opt_isResource) {
   this.tooltip_ = null;
 
   /**
+   * @type {acgraph.vector.Rect}
+   * @private
+   */
+  this.lockInteractivityRect_ = null;
+
+  /**
    * @type {boolean}
    */
   this.preventClickAfterDrag = false;
@@ -529,8 +535,17 @@ anychart.ganttModule.BaseGrid.isMilestone = function(treeDataItem) {
 };
 
 
-/** @inheritDoc */
-anychart.ganttModule.BaseGrid.prototype.createFormatProvider = function(item, opt_period, opt_periodIndex) {
+/**
+ * Creates gantt format provider.
+ * @param {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} item - Data item.
+ * @param {Object=} opt_period - Optional current period.
+ * @param {number=} opt_periodIndex - Period index. Required is opt_period is set.
+ * @param {anychart.enums.TLElementTypes=} opt_type - Type of hovered timeline element.
+ * @param {number=} opt_hoveredRatio - For timeline: hovered ratio.
+ * @param {number=} opt_hoveredTimestamp - For timeline: hovered time.
+ * @return {Object} - Gantt context provider.
+ */
+anychart.ganttModule.BaseGrid.prototype.createFormatProvider = function(item, opt_period, opt_periodIndex, opt_type, opt_hoveredRatio, opt_hoveredTimestamp) {
   if (!this.formatProvider_)
     this.formatProvider_ = new anychart.format.Context();
 
@@ -538,7 +553,8 @@ anychart.ganttModule.BaseGrid.prototype.createFormatProvider = function(item, op
   var values = {
     'item': {value: item, type: anychart.enums.TokenType.UNKNOWN},
     'name': {value: item.get(anychart.enums.GanttDataFields.NAME), type: anychart.enums.TokenType.STRING},
-    'id': {value: item.get(anychart.enums.GanttDataFields.ID), type: anychart.enums.TokenType.STRING}
+    'id': {value: item.get(anychart.enums.GanttDataFields.ID), type: anychart.enums.TokenType.STRING},
+    'linearIndex': {value: item.meta('index') + 1, type: anychart.enums.TokenType.NUMBER}
   };
 
   if (isResources) {
@@ -546,7 +562,7 @@ anychart.ganttModule.BaseGrid.prototype.createFormatProvider = function(item, op
     values['maxPeriodDate'] = {value: item.meta('maxPeriodDate'), type: anychart.enums.TokenType.DATE_TIME};
     values['period'] = {value: opt_period, type: anychart.enums.TokenType.UNKNOWN};
     values['periodIndex'] = {
-      value: (goog.isDefAndNotNull(opt_periodIndex) && opt_periodIndex > 0) ? opt_periodIndex : void 0,
+      value: (goog.isDefAndNotNull(opt_periodIndex) && opt_periodIndex >= 0) ? opt_periodIndex : void 0,
       type: anychart.enums.TokenType.NUMBER
     };
     values['periodStart'] = {
@@ -565,9 +581,13 @@ anychart.ganttModule.BaseGrid.prototype.createFormatProvider = function(item, op
   } else {
     values['actualStart'] = {value: item.meta(anychart.enums.GanttDataFields.ACTUAL_START), type: anychart.enums.TokenType.DATE_TIME};
     values['actualEnd'] = {value: item.meta(anychart.enums.GanttDataFields.ACTUAL_END), type: anychart.enums.TokenType.DATE_TIME};
-    values['progressValue'] = {value: item.get(anychart.enums.GanttDataFields.PROGRESS_VALUE), type: anychart.enums.TokenType.PERCENT};
 
     var isParent = !!item.numChildren();
+    var progressValue = isParent ?
+        item.meta(anychart.enums.GanttDataFields.PROGRESS_VALUE) || item.get(anychart.enums.GanttDataFields.PROGRESS_VALUE) :
+        item.get(anychart.enums.GanttDataFields.PROGRESS_VALUE);
+
+    values['progressValue'] = {value: progressValue, type: anychart.enums.TokenType.PERCENT};
     values['autoStart'] = {value: isParent ? item.meta('autoStart') : void 0, type: anychart.enums.TokenType.DATE_TIME};
     values['autoEnd'] = {value: isParent ? item.meta('autoEnd') : void 0, type: anychart.enums.TokenType.DATE_TIME};
     values['autoProgress'] = {value: isParent ? item.meta('autoProgress') : void 0, type: anychart.enums.TokenType.PERCENT};
@@ -586,6 +606,15 @@ anychart.ganttModule.BaseGrid.prototype.createFormatProvider = function(item, op
     if (goog.isDef(item.get(anychart.enums.GanttDataFields.BASELINE_END)))
       values['baselineEnd'] = {value: item.get(anychart.enums.GanttDataFields.BASELINE_END), type: anychart.enums.TokenType.DATE_TIME};
   }
+
+  if (goog.isDef(opt_type))
+    values['elementType'] = {value: opt_type, type: anychart.enums.TokenType.STRING};
+
+  if (goog.isDef(opt_hoveredRatio))
+    values['hoverRatio'] = {value: opt_hoveredRatio, type: anychart.enums.TokenType.NUMBER};
+
+  if (goog.isDef(opt_hoveredTimestamp))
+    values['hoverDateTime'] = {value: opt_hoveredTimestamp, type: anychart.enums.TokenType.DATE_TIME};
 
   this.formatProvider_
       .values(values)
@@ -828,7 +857,7 @@ anychart.ganttModule.BaseGrid.prototype.rowMouseMove = function(event) {
   if (!this.dragging) {
     this.interactivityHandler.highlight(event['hoveredIndex'], event['startY'], event['endY']);
     var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
-    var formatProvider = this.interactivityHandler.createFormatProvider(event['item'], event['period'], event['periodIndex']);
+    var formatProvider = this.createFormatProvider(event['item'], event['period'], event['periodIndex']);
     tooltip.showFloat(event['originalEvent']['clientX'], event['originalEvent']['clientY'], formatProvider);
   }
 };
@@ -957,6 +986,15 @@ anychart.ganttModule.BaseGrid.prototype.getInteractivityEvent = function(event) 
     return newEvent;
   }
   return null;
+};
+
+
+/**
+ *
+ * @return {Array.<number>}
+ */
+anychart.ganttModule.BaseGrid.prototype.getGridHeightCache = function() {
+  return this.gridHeightCache_;
 };
 
 
@@ -1975,6 +2013,7 @@ anychart.ganttModule.BaseGrid.prototype.createController = function(opt_isResour
  * 4) appearanceInvalidated()
  * 5) specialInvalidated()
  * 6) positionFinal()
+ * 7) labelsInvalidated()
  *
  * @param {boolean} positionRecalculated - If the vertical position was really recalculated.
  * @return {anychart.ganttModule.BaseGrid} - Itself for method chaining.
@@ -2045,6 +2084,9 @@ anychart.ganttModule.BaseGrid.prototype.drawInternal = function(positionRecalcul
     this.base_.listenOnce(acgraph.events.EventType.TOUCHSTART, this.dragMouseDown_, false, this);
 
     this.initDom();
+
+    this.lockInteractivityRect_ = stage.rect();
+    this.lockInteractivityRect_.stroke('none').fill('#000 0.1').zIndex(1e10);
   }
 
 
@@ -2060,6 +2102,10 @@ anychart.ganttModule.BaseGrid.prototype.drawInternal = function(positionRecalcul
     this.bgRect_.setBounds(/** @type {anychart.math.Rect} */ (this.pixelBoundsCache));
     this.eventsRect_.setBounds(/** @type {anychart.math.Rect} */ (this.pixelBoundsCache));
     this.totalGridsWidth = this.pixelBoundsCache.width;
+
+    if (this.interactivityLocked_) {
+      this.lockInteractivityRect_.setBounds(this.pixelBoundsCache);
+    }
 
     var header = this.pixelBoundsCache.top + this.headerHeight_;
     var headSepTop = header + 0.5;
@@ -2159,6 +2205,9 @@ anychart.ganttModule.BaseGrid.prototype.drawInternal = function(positionRecalcul
     this.positionFinal();
     this.redrawPosition = false;
   }
+
+  this.labelsInvalidated();
+
   if (manualSuspend) stage.resume();
   if (this.isStandalone) {
     this.initMouseFeatures();
@@ -2173,6 +2222,19 @@ anychart.ganttModule.BaseGrid.prototype.drawInternal = function(positionRecalcul
  * Additional actions while DOM initialization.
  */
 anychart.ganttModule.BaseGrid.prototype.initDom = goog.nullFunction;
+
+
+/**
+ * @inheritDoc
+ */
+anychart.ganttModule.BaseGrid.prototype.lockInteractivity = function(lock) {
+  this.interactivityLocked_ = lock;
+  if (lock) {
+    this.lockInteractivityRect_.setBounds(this.pixelBoundsCache);
+  } else {
+    this.lockInteractivityRect_.setBounds(new anychart.math.Rect(0, 0, 0, 0));
+  }
+};
 
 
 /**
@@ -2432,7 +2494,13 @@ anychart.ganttModule.BaseGrid.prototype.selectRow = function(item) {
 /**
  * Special invalidation. Used by child classes to preform own invalidation.
  */
-anychart.ganttModule.BaseGrid.prototype.specialInvalidated = goog.nullFunction;
+anychart.ganttModule.BaseGrid.prototype.specialInvalidated = function(){};
+
+
+/**
+ * Labels invalidation. Used by child classes to preform own invalidation.
+ */
+anychart.ganttModule.BaseGrid.prototype.labelsInvalidated = goog.nullFunction;
 
 
 /**
@@ -2626,7 +2694,6 @@ anychart.ganttModule.BaseGrid.prototype.serialize = function() {
 
   json['rowStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */ (this.rowStroke_));
   json['headerHeight'] = this.headerHeight_;
-  json['headerHeight'] = this.defaultRowHeight();
   json['editStructurePreviewFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.editStructurePreviewFill_));
   json['editStructurePreviewStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */ (this.editStructurePreviewStroke_));
   json['editStructurePreviewDashStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */ (this.editStructurePreviewDashStroke_));

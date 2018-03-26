@@ -33,6 +33,7 @@ goog.require('anychart.stockModule.entry');
 goog.require('anychart.tableModule.entry');
 goog.require('anychart.tagCloudModule.entry');
 goog.require('anychart.treeDataModule.entry');
+goog.require('anychart.sunburstModule.entry');
 goog.require('anychart.treemapModule.entry');
 goog.require('anychart.ui.entry');
 goog.require('anychart.vennModule.entry');

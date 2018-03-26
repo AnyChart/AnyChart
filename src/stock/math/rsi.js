@@ -56,7 +56,9 @@ anychart.stockModule.math.rsi.startFunction = function(context) {
  * @this {anychart.stockModule.math.rsi.Context}
  */
 anychart.stockModule.math.rsi.calculationFunction = function(row, context) {
-  var currValue = anychart.utils.toNumber(row.get('value'));
+  var currValue = row.get('value');
+  currValue = goog.isDef(currValue) ? currValue : row.get('close');
+  currValue = anychart.utils.toNumber(currValue);
   var missing = isNaN(currValue);
   if (!missing)
     context.queue.enqueue(currValue);

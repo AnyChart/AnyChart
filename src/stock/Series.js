@@ -166,12 +166,18 @@ anychart.stockModule.Series.prototype.updateComparisonZero = function() {
   if (this.supportsComparison() && !this.planIsStacked() && (anychart.utils.instanceOf(scale, anychart.scales.Linear))) {
     var mode = /** @type {anychart.enums.ScaleComparisonMode} */(scale.comparisonMode());
     if (mode != anychart.enums.ScaleComparisonMode.NONE) {
-      row = this.data_.getRowByDataSource(/** @type {anychart.enums.ComparisonDataSource|number} */(scale.compareWith()));
+      row = this.data_.getRowByDataSource(/** @type {anychart.enums.ComparisonDataSource|number} */(scale.compareWith()), this.drawer.valueFieldName);
     }
   }
   // if we have found a row to get value from - we cast it to number
   // if anything went wrong - we get 0 value and fail to make a comparison, which is a good result
-  this.comparisonZero = Number(row && row.get('value')) || 0;
+  this.comparisonZero = Number(row && row.get(this.drawer.valueFieldName)) || 0;
+};
+
+
+/** @inheritDoc */
+anychart.stockModule.Series.prototype.chartHasLabelOverrides = function() {
+  return false;
 };
 
 
@@ -335,9 +341,10 @@ anychart.stockModule.Series.prototype.retrieveDataColumns = function() {
 
 /**
  * Returns values, needed to be counted on in scale min/max determining.
+ * @param {boolean=} opt_skipOutOfRangeRows
  * @return {!Array.<number>}
  */
-anychart.stockModule.Series.prototype.getScaleReferenceValues = function() {
+anychart.stockModule.Series.prototype.getScaleReferenceValues = function(opt_skipOutOfRangeRows) {
   var columns = this.retrieveDataColumns();
   var res = [];
   if (columns) {
@@ -345,25 +352,22 @@ anychart.stockModule.Series.prototype.getScaleReferenceValues = function() {
     var i, len = columns.length;
     for (i = 0; i < len; i++) {
       var column = columns[i];
-      res.push(yScale.applyComparison(this.data_.getColumnMin(column), this.comparisonZero));
-      res.push(yScale.applyComparison(this.data_.getColumnMax(column), this.comparisonZero));
-    }
-
-    var row = this.data_.getPreFirstRow();
-    if (row) {
-      for (i = 0; i < len; i++) {
-        res.push(yScale.applyComparison(row.getColumn(columns[i]), this.comparisonZero));
-      }
-    }
-
-    row = this.data_.getPostLastRow();
-    if (row) {
-      for (i = 0; i < len; i++) {
-        res.push(yScale.applyComparison(row.getColumn(columns[i]), this.comparisonZero));
-      }
+      res.push(yScale.applyComparison(this.data_.getColumnMin(column, opt_skipOutOfRangeRows), this.comparisonZero));
+      res.push(yScale.applyComparison(this.data_.getColumnMax(column, opt_skipOutOfRangeRows), this.comparisonZero));
     }
   }
   return res;
+};
+
+
+/** @inheritDoc */
+anychart.stockModule.Series.prototype.planHasPointLabels = function() {
+  var column = this.data_.getFieldColumn('label');
+  var minColumn = this.data_.getFieldColumn('minLabel');
+  var maxColumn = this.data_.getFieldColumn('maxLabel');
+  return goog.isString(column) || !isNaN(column) ||
+      goog.isString(minColumn) || !isNaN(minColumn) ||
+      goog.isString(maxColumn) || !isNaN(maxColumn);
 };
 
 
@@ -494,12 +498,31 @@ anychart.stockModule.Series.prototype.createLegendContextProvider = function() {
 
 /** @inheritDoc */
 anychart.stockModule.Series.prototype.getContextProviderValues = function(provider, rowInfo) {
+  var grouping = /** @type {anychart.stockModule.Grouping} */((/** @type {anychart.stockModule.Chart} */(this.chart)).grouping());
   var result = anychart.stockModule.Series.base(this, 'getContextProviderValues', provider, rowInfo);
   result['defaultDecimalDigitsCount'] = {
     value: this.defaultDecimalDigitsCount,
     type: anychart.enums.TokenType.NUMBER
   };
+  result['dataIntervalUnit'] = {
+    value: grouping.getCurrentDataInterval()['unit'],
+    type: anychart.enums.TokenType.STRING
+  };
+  result['dataIntervalUnitCount'] = {
+    value: grouping.getCurrentDataInterval()['count'],
+    type: anychart.enums.TokenType.NUMBER
+  };
+  result['isGrouped'] = {
+    value: grouping.isGrouped(),
+    type: anychart.enums.TokenType.UNKNOWN
+  };
   return result;
+};
+
+
+/** @inheritDoc */
+anychart.stockModule.Series.prototype.getXTypeInContext = function() {
+  return anychart.enums.TokenType.DATE_TIME;
 };
 
 

@@ -251,11 +251,11 @@ anychart.core.ui.MarkersFactory.prototype.enabled = function(opt_value) {
       this.invalidate(anychart.ConsistencyState.ENABLED, this.getEnableChangeSignals());
     }
     this.enabledState_ = opt_value;
-    if (!goog.isNull(opt_value)) {
-      anychart.core.ui.MarkersFactory.base(this, 'enabled', /** @type {boolean} */(opt_value));
-    } else {
-      anychart.core.ui.MarkersFactory.base(this, 'enabled', true);
-    }
+    // if (!goog.isNull(opt_value)) {
+    anychart.core.ui.MarkersFactory.base(this, 'enabled', /** @type {boolean} */(opt_value));
+    // } else {
+    //   anychart.core.ui.MarkersFactory.base(this, 'enabled', true);
+    // }
     return this;
   }
   return this.enabledState_;

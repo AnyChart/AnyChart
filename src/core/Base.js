@@ -131,7 +131,7 @@ anychart.ConsistencyState = {
   MAP_AXES: 1 << 25,
   MAP_GRIDS: 1 << 26,
   MAP_CROSSHAIR: 1 << 27,
-  //---------------------------------- HEAT MAP STATES (CARTESIAN_BASE) ---------------------------------
+  //---------------------------------- HEAT MAP STATES (CARTESIAN) ---------------------------------
   HEATMAP_COLOR_SCALE: 1 << 30,
   HEATMAP_Y_SCROLLER: 1 << 31,
   //---------------------------------- MEKKO STATES (AXES_CHART) ---------------------------------
@@ -166,6 +166,8 @@ anychart.ConsistencyState = {
   CONTROLLER_POSITION: 1 << 8,
   //---------------------------------- GANTT TIMELINE STATES (VB) ---------------------------------
   TIMELINE_SCALES: 1 << 9,
+  TIMELINE_ELEMENTS_APPEARANCE: 1 << 10,
+  TIMELINE_ELEMENTS_LABELS: 1 << 11,
   //---------------------------------- GANTT TIMELINE HEADER STATES (VB) ---------------------------------
   TIMELINE_HEADER_SCALES: 1 << 6,
   //---------------------------------- GANTT TIMELINE HEADER LEVEL STATES (VB) ---------------------------------
@@ -188,7 +190,7 @@ anychart.ConsistencyState = {
   //---------------------------------- DATA GRID COLUMN STATES (VB) ---------------------------------
   DATA_GRID_COLUMN_TITLE: 1 << 6,
   DATA_GRID_COLUMN_POSITION: 1 << 7,
-  DATA_GRID_COLUMN_BUTTON_CURSOR: 1 << 8,
+  DATA_GRID_COLUMN_BUTTON: 1 << 8,
   //---------------------------------- BACKGROUND STATES (VB) ---------------------------------
   BACKGROUND_POINTER_EVENTS: 1 << 6,
   //---------------------------------- LABEL STATES (VB) ---------------------------------
@@ -278,12 +280,17 @@ anychart.ConsistencyState = {
   //---------------------------------- STOCK SCROLLER (SCROLLER) ----------------------------------------
   STOCK_SCROLLER_SERIES: 1 << 9,
   STOCK_SCROLLER_AXIS: 1 << 10,
-  //---------------------------------- TREE MAP CHART (SEPARATE CHART) ----------------------------------
-  TREEMAP_DATA: 1 << 12,
+  //---------------------------------- TREE CHART (CHART) ----------------------------------
+  TREE_DATA: 1 << 12,
+  //---------------------------------- TREE MAP CHART (TREE CHART) ----------------------------------
   TREEMAP_COLOR_SCALE: 1 << 13,
   TREEMAP_NODE_TYPES: 1 << 14,
   TREEMAP_COLOR_RANGE: 1 << 15,
   TREEMAP_HINT_OPACITY: 1 << 16,
+  //---------------------------------- SUNBURST_LABELS STATES (TREE CHART) ---------------------------------
+  SUNBURST_CENTER_CONTENT: 1 << 13,
+  SUNBURST_COLOR_SCALE: 1 << 14,
+  SUNBURST_CALCULATIONS: 1 << 15,
   //---------------------------------- PERT CHART (SEPARATE CHART) ----------------------------------
   PERT_DATA: 1 << 12,
   PERT_CALCULATIONS: 1 << 13,
@@ -404,6 +411,21 @@ anychart.PointState = {
 };
 
 
+/**
+ * The list of state settings states.
+ * @enum {number}
+ */
+anychart.SettingsState = {
+  NORMAL: 0,
+  HOVERED: 1,
+  SELECTED: 2,
+  EXPANDED: 3,
+  COLLAPSED: 4,
+  PUSHED: 5,
+  DISABLED: 6
+};
+
+
 
 /**
  * Class implements all the work with consistency states.
@@ -505,7 +527,7 @@ anychart.core.Base.prototype.getThemeOption = function(name) {
 
 /** @inheritDoc */
 anychart.core.Base.prototype.getOption = function(name) {
-  return this.hasOwnOption(name) ? this.ownSettings[name] : this.themeSettings[name];
+  return this.hasOwnOption(name) ? this.getOwnOption(name) : this.getThemeOption(name);
 };
 
 

@@ -44,7 +44,8 @@ GRAPHICS_SRC_PATH = os.path.join(LIBS_PATH, GRAPHICS_PATH, 'src')
 
 # closure tools
 # COMPILER_VERSION = '20170521'
-COMPILER_VERSION = '20161024'
+# COMPILER_VERSION = '20161024'
+COMPILER_VERSION = '20180204'
 COMPILER_PATH = os.path.join(LIBS_PATH, 'compiler', 'closure-compiler-v%s.jar' % COMPILER_VERSION)
 CLOSURE_LIBRARY_PATH = os.path.join(LIBS_PATH, 'closure-library')
 CLOSURE_SOURCE_PATH = os.path.join(CLOSURE_LIBRARY_PATH, 'closure', 'goog')
@@ -333,7 +334,7 @@ def __xml_schema_xmlns_version(value=None):
 
 def __definition_file_version(value=None):
     return __version_by_pattern(
-        'Type definitions for AnyChart charting library, Version %s',
+        'Type definitions for AnyChart JavaScript Charting Library, v%s',
         os.path.join(PROJECT_PATH, 'dist', 'index.d.ts'),
         value
     )
@@ -982,13 +983,22 @@ def __compile_css(*args, **kwargs):
         css_out_path = os.path.join(output, 'anychart-ui.css')
         css_min_out_path = os.path.join(output, 'anychart-ui.min.css')
 
+        header = '\n'.join(['/*!',
+                            ' '.join([' * AnyChart is lightweight robust charting library with great API and Docs, '
+                                      'that works with your stack and has tons of chart types and features.']),
+                            ' * Version: %s',
+                            ' * License: https://www.anychart.com/buy/',
+                            ' * Contact: sales@anychart.com',
+                            ' * Copyright: AnyChart.com %s. All rights reserved.',
+                            ' */']) % (time.strftime('%Y-%m-%d %H:%M'), time.strftime('%Y')) + '\n'
+
         # Less
         with open(css_out_path, 'w') as f:
-            f.write(lesscpy.compile(css_src_path))
+            f.write(header + lesscpy.compile(css_src_path))
 
         # Minify
         with open(css_min_out_path, 'w') as f:
-            f.write(lesscpy.compile(css_src_path, xminify=True))
+            f.write(header + lesscpy.compile(css_src_path, xminify=True))
 
         if kwargs['gzip']:
             __gzip_file(css_out_path)

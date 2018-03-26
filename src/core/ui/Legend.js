@@ -2327,6 +2327,8 @@ anychart.core.ui.Legend.prototype.serialize = function() {
   json['itemsLayout'] = this.itemsLayout();
   json['itemsSpacing'] = this.itemsSpacing();
   json['itemsSourceMode'] = this.itemsSourceMode();
+  if (goog.isString(this.itemsFormat()))
+    json['itemsFormat'] = this.itemsFormat();
   json['inverted'] = this.inverted();
   if (goog.isDef(this.items()))
     json['items'] = this.items();

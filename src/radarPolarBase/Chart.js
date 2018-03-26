@@ -425,6 +425,18 @@ anychart.radarPolarBaseModule.Chart.prototype.getAxisByIndex = function(index) {
 };
 
 
+/** @inheritDoc */
+anychart.radarPolarBaseModule.Chart.prototype.getXAxisByIndex = function() {
+  return this.xAxis_;
+};
+
+
+/** @inheritDoc */
+anychart.radarPolarBaseModule.Chart.prototype.getYAxisByIndex = function() {
+  return this.yAxis_;
+};
+
+
 //endregion
 //region --- Drawing
 //------------------------------------------------------------------------------

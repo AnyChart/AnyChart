@@ -14,11 +14,11 @@ anychart.core.reporting.lastInfoCode_ = -1;
 
 
 /**
- * Last warning code.
- * @type {number}
+ * Warning messages that were shown.
+ * @type {Object.<string, boolean>}
  * @private
  */
-anychart.core.reporting.lastWarningCode_ = -1;
+anychart.core.reporting.shownWarningMessages_ = {};
 
 
 /**
@@ -63,7 +63,7 @@ anychart.core.reporting.getErrorDescription_ = function(code, opt_arguments) {
       return 'Empty config passed to anychart.fromJson() or anychart.fromXml() method.';
 
     case anychart.enums.ErrorCode.NO_LEGEND_IN_CHART:
-      return 'Bullet and Sparkline charts do not support Legend. Please use anychart.standalones.Legend component for a group of charts instead.';
+      return 'Bullet, Sparkline and Circular Gauge charts do not support Legend. Please use anychart.standalones.Legend component for a group of charts instead.';
 
     case anychart.enums.ErrorCode.NO_LEGEND_IN_STOCK:
       return 'Stock chart itself doesn\'t support legend - stock plots do. So use stock.plot().legend() instead.';
@@ -159,11 +159,12 @@ anychart.core.reporting.getInfoDescription_ = function(code, opt_arguments) {
  * @param {boolean=} opt_forceProd
  */
 anychart.core.reporting.warning = function(code, opt_exception, opt_descArgs, opt_forceProd) {
-  if ((anychart.DEVELOP || opt_forceProd) && anychart.core.reporting.lastWarningCode_ != code) {
-    anychart.core.reporting.lastWarningCode_ = code;
+  var desc;
+  if ((anychart.DEVELOP || opt_forceProd) && !anychart.core.reporting.shownWarningMessages_[desc = anychart.core.reporting.getWarningDescription_(code, opt_descArgs)]) {
+    anychart.core.reporting.shownWarningMessages_[desc] = true;
     anychart.core.reporting.callLog_(
         'warn',
-        ('Warning: ' + code + '\nDescription: ' + anychart.core.reporting.getWarningDescription_(code, opt_descArgs)),
+        ('Warning: ' + code + '\nDescription: ' + desc),
         (opt_exception || '')
     );
   }

@@ -153,6 +153,11 @@ anychart.ganttModule.Scale = function() {
    */
   this.emptyMax_ = NaN;
 
+  /**
+   * @type {anychart.ganttModule.Scale.ZoomLevelsSettingsRep}
+   * @private
+   */
+  this.ranges_ = this.normalizeLevels_(anychart.ganttModule.Scale.DEFAULT_LEVELS);
 };
 goog.inherits(anychart.ganttModule.Scale, anychart.core.Base);
 
@@ -163,6 +168,18 @@ goog.inherits(anychart.ganttModule.Scale, anychart.core.Base);
  */
 anychart.ganttModule.Scale.prototype.SUPPORTED_SIGNALS =
     anychart.Signal.NEEDS_RECALCULATION;
+
+
+/**
+ * @typedef {Array.<Array.<(anychart.enums.Interval|{unit:anychart.enums.Interval,count:number})>>}
+ */
+anychart.ganttModule.Scale.ZoomLevelsSettings;
+
+
+/**
+ * @typedef {Array<{range:number,levels:Array.<{unit:anychart.enums.Interval,count:number}>}>}
+ */
+anychart.ganttModule.Scale.ZoomLevelsSettingsRep;
 
 
 /**
@@ -235,56 +252,15 @@ anychart.ganttModule.Scale.createFormat_ = function(pattern, opt_template) {
 
 
 /**
- * Millisecond ranges.
- * Literally this means that if current scale range suits to RANGES[i], than index i will be
- * used to select all the other settings from TOP_ - MID_ - LOW_INTERVALS and ..TEXT_FORMATTERS.
- * @type {Array.<number>}
+ *
+ * @type {anychart.ganttModule.Scale.ZoomLevelsSettings}
  */
-anychart.ganttModule.Scale.RANGES = [
-  (anychart.ganttModule.Scale.MILLISECONDS_IN_HOUR * 4),       //0
-  (anychart.ganttModule.Scale.MILLISECONDS_IN_DAY * 3),        //1
-  (anychart.ganttModule.Scale.MILLISECONDS_IN_DAY * 31),       //2
-  (anychart.ganttModule.Scale.MILLISECONDS_IN_DAY * 365),      //3
-  (anychart.ganttModule.Scale.MILLISECONDS_IN_DAY * 365 * 10)  //4
-];
-
-
-/**
- * Top intervals.
- * @type {Array.<{unit: anychart.enums.Interval, count: number}>}
- */
-anychart.ganttModule.Scale.TOP_INTERVALS = [
-  {unit: anychart.enums.Interval.DAY, count: 1},    //0
-  {unit: anychart.enums.Interval.WEEK, count: 1},    //1
-  {unit: anychart.enums.Interval.MONTH, count: 1},  //2
-  {unit: anychart.enums.Interval.YEAR, count: 1},   //3
-  {unit: anychart.enums.Interval.YEAR, count: 10}   //4
-];
-
-
-/**
- * Middle intervals.
- * @type {Array.<{unit: anychart.enums.Interval, count: number}>}
- */
-anychart.ganttModule.Scale.MID_INTERVALS = [
-  {unit: anychart.enums.Interval.HOUR, count: 1},  //0
-  {unit: anychart.enums.Interval.DAY, count: 1},   //1
-  {unit: anychart.enums.Interval.WEEK, count: 1},   //2
-  {unit: anychart.enums.Interval.QUARTER, count: 1}, //3
-  {unit: anychart.enums.Interval.YEAR, count: 1}   //4
-];
-
-
-/**
- * Low intervals.
- * @type {Array.<{unit: anychart.enums.Interval, count: number}>}
- */
-anychart.ganttModule.Scale.LOW_INTERVALS = [
-  {unit: anychart.enums.Interval.MINUTE, count: 10}, //0
-  {unit: anychart.enums.Interval.HOUR, count: 2},    //1
-  {unit: anychart.enums.Interval.DAY, count: 1},     //2
-  {unit: anychart.enums.Interval.MONTH, count: 1},    //3
-  {unit: anychart.enums.Interval.QUARTER, count: 1}    //4
+anychart.ganttModule.Scale.DEFAULT_LEVELS = [
+  [{'unit': anychart.enums.Interval.MINUTE, 'count': 10}, {'unit': anychart.enums.Interval.HOUR, 'count': 1}, {'unit': anychart.enums.Interval.DAY, 'count': 1}],
+  [{'unit': anychart.enums.Interval.HOUR, 'count': 2}, {'unit': anychart.enums.Interval.DAY, 'count': 1}, {'unit': anychart.enums.Interval.MONTH, 'count': 1}],
+  [{'unit': anychart.enums.Interval.DAY, 'count': 1}, {'unit': anychart.enums.Interval.WEEK, 'count': 1}, {'unit': anychart.enums.Interval.MONTH, 'count': 1}],
+  [{'unit': anychart.enums.Interval.MONTH, 'count': 1}, {'unit': anychart.enums.Interval.QUARTER, 'count': 1}, {'unit': anychart.enums.Interval.YEAR, 'count': 1}],
+  [{'unit': anychart.enums.Interval.QUARTER, 'count': 1}, {'unit': anychart.enums.Interval.YEAR, 'count': 1}, {'unit': anychart.enums.Interval.YEAR, 'count': 10}]
 ];
 
 
@@ -593,141 +569,42 @@ anychart.ganttModule.Scale.prototype.maximumGap = function(opt_value) {
 
 
 /**
- * Calculates ticks depending on current scale settings and value passed.
- * @param {(number|Date|goog.date.UtcDateTime)} anchorDate - Value to be turned into a date (mills).
- * @param {goog.date.Interval} interval - Interval that definitely must cross the anchorDate.
- * @return {Array.<number>} - Array of ticks.
+ * @param {number} pixStart
+ * @param {number} pixEnd
+ * @param {anychart.enums.Interval} unit
+ * @param {number} count
+ * @return {Array.<{start:number,end:number,holiday:(boolean|undefined)}>}
  */
-anychart.ganttModule.Scale.prototype.getTicks = function(anchorDate, interval) {
-  var anchor = anychart.utils.normalizeTimestamp(anchorDate) + anychart.format.outputTimezone() * 60000;
+anychart.ganttModule.Scale.prototype.getTicks = function(pixStart, pixEnd, unit, count) {
   var range = this.getRange();
-  var min = range['min'];
-  var max = range['max'];
-
-  if (interval.years || interval.months) {
-    /*
-      In this case the intervals have not the same length in milliseconds.
-      (Duration of February != duration of July).
-
-      To make sure that the anchor point is crossed, we have the only way:
-      to go step by step from anchor point.
-      In this case here are three ways:
-        1) Anchor point is lefter than scale's minimum.
-        2) Anchor point is between scale's min and max.
-        3) Anchor point is righter than scale's maximum.
-     */
-
-    if (anchor <= min) {
-      return this.seek_(anchorDate, interval);
-    }
-
-    if (anchor > min && anchor < max) {
-      var foundLeft = this.seek_(anchorDate, interval, true);
-      var foundRight = this.seek_(anchorDate, interval, false, true);
-      return goog.array.concat(foundLeft, foundRight);
-    }
-
-    if (anchor >= max) {
-      return this.seek_(anchorDate, interval, true);
-    }
-  } else {
-    /*
-      In this case interval has the same length in milliseconds.
-      (Duration of March, 15 == duration of December, 2).
-
-      In this case closest left anchor point can be calculated mathematically using the
-      millisecond values.
-     */
-
-    var intervalLength = interval.days * anychart.ganttModule.Scale.MILLISECONDS_IN_DAY +
-        interval.hours * anychart.ganttModule.Scale.MILLISECONDS_IN_HOUR +
-        interval.minutes * anychart.ganttModule.Scale.MILLISECONDS_IN_MINUTE +
-        interval.seconds * anychart.ganttModule.Scale.MILLISECONDS_IN_SECOND;
-
-    var minAnchor, delta;
-    if (anchor <= min) {
-      delta = Math.floor((min - anchor) / intervalLength) * intervalLength;
-      minAnchor = anchor + delta;
-    } else {
-      delta = Math.ceil((anchor - min) / intervalLength) * intervalLength;
-      minAnchor = anchor - delta;
-    }
-
-    return this.seek_(minAnchor, interval);
+  var start = anychart.utils.alignDateLeftByUnit(range['min'], unit, count, 2000);
+  var end = range['max'];
+  var res = [];
+  var current = new goog.date.UtcDateTime(new Date(start));
+  var interval = anychart.utils.getIntervalFromInfo(unit, count);
+  var curr = current.getTime();
+  while (curr < end) {
+    var prev = curr;
+    current.add(interval);
+    curr = current.getTime();
+    res.push({
+      'start': prev,
+      'end': curr
+    });
   }
-
-  return [];
+  return res;
 };
 
 
 /**
- * Performs step-by-step search.
- * @param {(number|Date|goog.date.UtcDateTime)} startDate - Start date.
- * @param {goog.date.Interval} interval - Step interval.
- * @param {boolean=} opt_inverted - If must use inverted interval.
- * @param {boolean=} opt_ignoreFirstFoundValue - Flag if first found value must be added to result.
- * @return {Array.<number>} - Array of dates.
- * @private
+ * @param {anychart.enums.Interval} unit
+ * @param {number} count
+ * @return {Array.<number>}
  */
-anychart.ganttModule.Scale.prototype.seek_ = function(startDate, interval, opt_inverted, opt_ignoreFirstFoundValue) {
-  startDate = new goog.date.UtcDateTime(anychart.format.parseDateTime(startDate));
-  var range = this.getRange();
-  var min = range['min'];
-  var max = range['max'];
-
-  var result = [];
-
-  var firstFound = false;
-  var secondFound = false;
-
-  var anchorDate = startDate;
-
-  var anchorMs, newAnchorMs, newAnchorDate;
-  if (opt_inverted) {
-    interval = interval.getInverse();
-    while (!(firstFound && secondFound)) {
-      anchorMs = anychart.utils.normalizeTimestamp(anchorDate);
-      newAnchorDate = anchorDate.clone();
-      newAnchorDate.add(interval);
-      newAnchorMs = anychart.utils.normalizeTimestamp(newAnchorDate);
-
-      if (!firstFound) {
-        if (newAnchorMs < max) { // newAnchorMs <= max < anchorMs
-          firstFound = true;
-          if (!opt_ignoreFirstFoundValue) result.push(anchorMs);
-        }
-      } else {
-        goog.array.insertAt(result, anchorMs, 0);
-      }
-
-      secondFound = newAnchorMs <= min;
-      if (secondFound) result.push(newAnchorMs);
-      anchorDate = newAnchorDate.clone();
-
-    }
-  } else {
-    while (!(firstFound && secondFound)) {
-      anchorMs = anychart.utils.normalizeTimestamp(anchorDate);
-      newAnchorDate = anchorDate.clone();
-      newAnchorDate.add(interval);
-      newAnchorMs = anychart.utils.normalizeTimestamp(newAnchorDate);
-
-      if (!firstFound) {
-        if (min < newAnchorMs) { // anchorMs <= this.min_ < newAnchorMs
-          firstFound = true;
-          if (!opt_ignoreFirstFoundValue) result.push(anchorMs);
-        }
-      } else {
-        result.push(anchorMs);
-      }
-
-      secondFound = max <= newAnchorMs;
-      if (secondFound) result.push(newAnchorMs);
-      anchorDate = newAnchorDate.clone();
-    }
-  }
-
-  return result;
+anychart.ganttModule.Scale.prototype.getSimpleTicks = function(unit, count) {
+  return goog.array.map(this.getTicks(NaN, NaN, unit, count), function(item) {
+    return item['end'];
+  });
 };
 
 
@@ -780,13 +657,21 @@ anychart.ganttModule.Scale.prototype.timestampToRatio = function(value) {
 /**
  * This method is added only for compatibility with line/range/text markers of gantt chart's timeline.
  * NOTE: Use timestampToRatio method instead.
- * TODO (A.Kudryavtsev): For reviewer: we have a method timestampToRatio because we also have ratioToTimestamp.
  * @param {*} value - Value to transform.
- * @param {number=} opt_subRangeRatio - This parameter will be completely ignored.
  * @return {number} - Value transformed to ratio scope. Returns NaN if scale range is not set.
  */
-anychart.ganttModule.Scale.prototype.transform = function(value, opt_subRangeRatio) {
+anychart.ganttModule.Scale.prototype.transform = function(value) {
   return this.timestampToRatio(value);
+};
+
+
+/**
+ * This method is added only for compatibility with line/range/text markers of gantt chart's timeline.
+ * @param {number} ratio - Ratio to transform.
+ * @return {number} - Ratio transformed to datetime.
+ */
+anychart.ganttModule.Scale.prototype.inverseTransform = function(ratio) {
+  return this.ratioToTimestamp(ratio);
 };
 
 
@@ -806,29 +691,8 @@ anychart.ganttModule.Scale.prototype.ratioToTimestamp = function(value) {
 
 
 /**
- * Makes level data.
- * @param {{unit: anychart.enums.Interval, count: number}} level
- * @param {{unit: anychart.enums.Interval, count: number}=} opt_parentLevel
- * @return {Object}
- * @private
- */
-anychart.ganttModule.Scale.prototype.makeLevelData_ = function(level, opt_parentLevel) {
-  var interval = anychart.utils.getIntervalFromInfo(level.unit, level.count);
-  var range = this.getRange();
-  var intervalId = anychart.format.getIntervalIdentifier(level.unit, opt_parentLevel && opt_parentLevel.unit, 'timelineHeader');
-  var format = anychart.format.getDateTimeFormat(intervalId, 0);
-
-  return {
-    'anchor': anychart.utils.alignDateLeft(range['min'], interval, 0),
-    'interval': interval,
-    'formatter': anychart.ganttModule.Scale.createFormat_(format)
-  };
-};
-
-
-/**
  * Gets level settings for current scale state.
- * @return {Array|number}
+ * @return {Array.<anychart.ganttBaseModule.TimeLineHeader.Level>}
  */
 anychart.ganttModule.Scale.prototype.getLevelsData = function() {
   this.calculate();
@@ -836,33 +700,29 @@ anychart.ganttModule.Scale.prototype.getLevelsData = function() {
   var min = r['min'];
   var max = r['max'];
 
-  var range = max - min;
-  var ranges = anychart.ganttModule.Scale.RANGES;
-  var index = -1;
-  for (var i = 0; i < ranges.length; i++) {
-    if (range <= ranges[i]) {
-      index = i;
+  var minorTickRange = (max - min) / 20;
+  var last = this.ranges_.length - 1;
+  var row;
+  for (var i = 0; i < last; i++) {
+    if (minorTickRange <= this.ranges_[i]['range']) {
+      row = this.ranges_[i];
       break;
     }
   }
+  if (!row) {
+    row = this.ranges_[last];
+  }
 
-  if (index < 0) index = ranges.length - 1;
-
-  var topLevelData = this.makeLevelData_(anychart.ganttModule.Scale.TOP_INTERVALS[index]);
-  var midLevelData = this.makeLevelData_(anychart.ganttModule.Scale.MID_INTERVALS[index],
-      anychart.ganttModule.Scale.TOP_INTERVALS[index]);
-  var lowLevelData = this.makeLevelData_(anychart.ganttModule.Scale.LOW_INTERVALS[index],
-      anychart.ganttModule.Scale.MID_INTERVALS[index]);
-
-  return [topLevelData, midLevelData, lowLevelData];
+  return /** @type {Array.<anychart.ganttBaseModule.TimeLineHeader.Level>} */(row['levels']);
 };
 
 
 /**
  * If total min is visually reached.
  * @return {boolean}
+ * @private
  */
-anychart.ganttModule.Scale.prototype.minReached = function() {
+anychart.ganttModule.Scale.prototype.minReached_ = function() {
   if (this.isEmpty())
     return true;
   else {
@@ -876,7 +736,7 @@ anychart.ganttModule.Scale.prototype.minReached = function() {
  * If total max is visually reached.
  * @return {boolean}
  */
-anychart.ganttModule.Scale.prototype.maxReached = function() {
+anychart.ganttModule.Scale.prototype.maxReached_ = function() {
   if (this.isEmpty())
     return true;
   else {
@@ -916,7 +776,7 @@ anychart.ganttModule.Scale.prototype.zoomIn = function(opt_zoomFactor) {
  * @return {anychart.ganttModule.Scale} - Itself for method chaining.
  */
 anychart.ganttModule.Scale.prototype.zoomOut = function(opt_zoomFactor) {
-  if (!this.minReached() || !this.maxReached()) {
+  if (!this.minReached_() || !this.maxReached_()) {
     opt_zoomFactor = opt_zoomFactor || anychart.ganttModule.Scale.DEFAULT_ZOOM_FACTOR;
     var msInterval = Math.round((this.max_ - this.min_) * (opt_zoomFactor - 1) / 2);
 
@@ -1028,6 +888,89 @@ anychart.ganttModule.Scale.prototype.zoomTo = function(startOrUnit, opt_endOrCou
   }
 
   return this.setRange(start, end);
+};
+
+
+/**
+ * Zoom levels settings.
+ * @param {anychart.ganttModule.Scale.ZoomLevelsSettings=} opt_value
+ * @return {anychart.ganttModule.Scale.ZoomLevelsSettings|anychart.ganttModule.Scale}
+ */
+anychart.ganttModule.Scale.prototype.zoomLevels = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var newZoomLevels = this.normalizeLevels_(opt_value);
+    var same = newZoomLevels.length == this.ranges_.length &&
+        goog.array.every(newZoomLevels, function(newZoomLevel, index) {
+          var oldZoomLevelLevels = this.ranges_[index]['levels'];
+          return newZoomLevel['levels'].length == oldZoomLevelLevels.length &&
+              goog.array.every(newZoomLevel['levels'], function(item, index) {
+                return item['unit'] == oldZoomLevelLevels[index]['unit'] &&
+                    item['count'] == oldZoomLevelLevels[index]['count'];
+              });
+        }, this);
+    if (!same) {
+      this.ranges_ = newZoomLevels;
+      this.consistent = false;
+      this.dispatchSignal(anychart.Signal.NEED_UPDATE_TICK_DEPENDENT);
+    }
+    return this;
+  }
+  return /** @type {anychart.ganttModule.Scale.ZoomLevelsSettings} */(
+      goog.array.map(this.ranges_, function(item) {
+        return goog.array.map(item.levels, function(level) {
+          return {
+            'unit': level.unit,
+            'count': level.count
+          };
+        });
+      }));
+};
+
+
+/**
+ * Normalizes anychart.ganttModule.Scale.ZoomLevelsSettings-like representation to anychart.ganttModule.Scale.ZoomLevelsSettingsRep.
+ * @param {*} value
+ * @return {anychart.ganttModule.Scale.ZoomLevelsSettingsRep}
+ * @private
+ */
+anychart.ganttModule.Scale.prototype.normalizeLevels_ = function(value) {
+  var res = [];
+  if (goog.isArray(value)) {
+    for (var i = 0; i < value.length; i++) {
+      var zoomLevel = value[i];
+      if (goog.isArray(zoomLevel)) {
+        var levels = [];
+        for (var j = 0; j < zoomLevel.length; j++) {
+          var val = zoomLevel[j];
+          var unit = null,
+              count;
+          if (goog.isString(val)) {
+            unit = anychart.enums.normalizeInterval(val, null);
+            count = 1;
+          } else if (goog.isObject(val)) {
+            unit = anychart.enums.normalizeInterval(val['unit'], null);
+            count = anychart.utils.normalizeToNaturalNumber(val['count']);
+          }
+          if (unit) {
+            levels.push({
+              'unit': unit,
+              'count': count
+            });
+          }
+        }
+        if (levels.length) {
+          res.push({
+            'range': anychart.utils.getIntervalRange(/** @type {anychart.enums.Interval} */(levels[0]['unit']), /** @type {number} */(levels[0]['count'])),
+            'levels': levels
+          });
+        }
+      }
+    }
+    res.sort(function(a, b) {
+      return a['range'] - b['range'];
+    });
+  }
+  return res;
 };
 
 
@@ -1174,6 +1117,9 @@ anychart.ganttModule.Scale.prototype.setupByJSON = function(config, opt_default)
   proto['softMaximum'] = proto.softMaximum;
   proto['getRange'] = proto.getRange;
   proto['getTotalRange'] = proto.getTotalRange;
+  proto['zoomLevels'] = proto.zoomLevels;
+  proto['transform'] = proto.transform;
+  proto['inverseTransform'] = proto.inverseTransform;
   // proto['zoomIn'] = proto.zoomIn;
   // proto['zoomOut'] = proto.zoomOut;
   // proto['zoomTo'] = proto.zoomTo;

@@ -28,7 +28,8 @@ goog.require('goog.events.EventHandler');
  *   altKey: boolean,
  *   shiftKey: boolean,
  *   metaKey: boolean,
- *   platformModifierKey: boolean
+ *   platformModifierKey: boolean,
+ *   originalEvent: acgraph.events.BrowserEvent
  * }}
  */
 anychart.core.MouseEvent;
@@ -50,6 +51,12 @@ anychart.core.VisualBase = function() {
   this.eventsHandler = new goog.events.EventHandler(this);
 
   this.themeSettings['enabled'] = true;
+
+  /**
+   * If the instance should follow enabled double-suspension schema.
+   * @type {boolean}
+   */
+  this.supportsEnabledSuspension = true;
 
   this.invalidate(anychart.ConsistencyState.ALL);
 };
@@ -222,6 +229,7 @@ anychart.core.VisualBase.prototype.handleMouseEvent = function(e) {
 anychart.core.VisualBase.prototype.makeBrowserEvent = function(e) {
   return {
     'type': e['type'],
+    'originalEvent': e,
     'target': this,
     'relatedTarget': this.getOwnerElement(e['relatedTarget']) || e['relatedTarget'],
     'domTarget': e['target'],
@@ -382,14 +390,16 @@ anychart.core.VisualBase.prototype.enabled = function(opt_value) {
     if (this.ownSettings['enabled'] !== opt_value) {
       this.ownSettings['enabled'] = opt_value;
       this.invalidate(anychart.ConsistencyState.ENABLED, this.getEnableChangeSignals());
-      if (this.ownSettings['enabled']) {
-        if (this.suspendedByEnable) {
-          this.resumeSignalsDispatching(true);
+      if (this.supportsEnabledSuspension) {
+        if (this.ownSettings['enabled']) {
+          if (this.suspendedByEnable) {
+            this.resumeSignalsDispatching(true);
+          }
+          this.suspendedByEnable = false;
+        } else {
+          this.suspendSignalsDispatching();
+          this.suspendedByEnable = true;
         }
-        this.suspendedByEnable = false;
-      } else {
-        this.suspendSignalsDispatching();
-        this.suspendedByEnable = true;
       }
     }
     return this;

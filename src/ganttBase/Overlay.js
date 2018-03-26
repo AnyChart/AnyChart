@@ -1,5 +1,5 @@
 //region --- Requiring and Providing
-goog.provide('anychart.resourceModule.Overlay');
+goog.provide('anychart.ganttBaseModule.Overlay');
 goog.require('anychart.core.Base');
 goog.require('anychart.core.settings');
 //endregion
@@ -11,8 +11,8 @@ goog.require('anychart.core.settings');
  * @constructor
  * @extends {anychart.core.Base}
  */
-anychart.resourceModule.Overlay = function() {
-  anychart.resourceModule.Overlay.base(this, 'constructor');
+anychart.ganttBaseModule.Overlay = function() {
+  anychart.ganttBaseModule.Overlay.base(this, 'constructor');
 
   this.invalidate(anychart.ConsistencyState.ALL);
 
@@ -21,7 +21,7 @@ anychart.resourceModule.Overlay = function() {
     ['className']
   ]);
 };
-goog.inherits(anychart.resourceModule.Overlay, anychart.core.Base);
+goog.inherits(anychart.ganttBaseModule.Overlay, anychart.core.Base);
 
 
 //region --- Infrastructure
@@ -34,7 +34,7 @@ goog.inherits(anychart.resourceModule.Overlay, anychart.core.Base);
  * Supported consistency states.
  * @type {number}
  */
-anychart.resourceModule.Overlay.prototype.SUPPORTED_CONSISTENCY_STATES =
+anychart.ganttBaseModule.Overlay.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.ENABLED |
     anychart.ConsistencyState.CONTAINER |
     anychart.ConsistencyState.APPEARANCE |
@@ -45,7 +45,7 @@ anychart.resourceModule.Overlay.prototype.SUPPORTED_CONSISTENCY_STATES =
  * Supported signals.
  * @type {number}
  */
-anychart.resourceModule.Overlay.prototype.SUPPORTED_SIGNALS =
+anychart.ganttBaseModule.Overlay.prototype.SUPPORTED_SIGNALS =
     anychart.core.Base.prototype.SUPPORTED_SIGNALS |
     anychart.Signal.NEEDS_REDRAW;
 
@@ -53,10 +53,10 @@ anychart.resourceModule.Overlay.prototype.SUPPORTED_SIGNALS =
 //endregion
 //region --- Settings
 /**
- * Properties that should be defined in anychart.resourceModule.TimeLine prototype.
+ * Properties that should be defined in anychart.ganttBaseModule.TimeLineHeader prototype.
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.resourceModule.Overlay.DESCRIPTORS = (function() {
+anychart.ganttBaseModule.Overlay.DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
 
@@ -74,15 +74,15 @@ anychart.resourceModule.Overlay.DESCRIPTORS = (function() {
 
   return map;
 })();
-anychart.core.settings.populate(anychart.resourceModule.Overlay, anychart.resourceModule.Overlay.DESCRIPTORS);
+anychart.core.settings.populate(anychart.ganttBaseModule.Overlay, anychart.ganttBaseModule.Overlay.DESCRIPTORS);
 
 
 /**
  * Getter/setter for enabled.
  * @param {?boolean=} opt_value Value to set.
- * @return {!anychart.resourceModule.Overlay|boolean|null} .
+ * @return {!anychart.ganttBaseModule.Overlay|boolean|null} .
  */
-anychart.resourceModule.Overlay.prototype.enabled = function(opt_value) {
+anychart.ganttBaseModule.Overlay.prototype.enabled = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.ownSettings['enabled'] != opt_value) {
       var enabled = this.ownSettings['enabled'] = opt_value;
@@ -108,9 +108,9 @@ anychart.resourceModule.Overlay.prototype.enabled = function(opt_value) {
 /**
  * Overlay target.
  * @param {Element=} opt_value .
- * @return {Element|anychart.resourceModule.Overlay}
+ * @return {Element|anychart.ganttBaseModule.Overlay}
  */
-anychart.resourceModule.Overlay.prototype.target = function(opt_value) {
+anychart.ganttBaseModule.Overlay.prototype.target = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.target_ != opt_value) {
       this.target_ = opt_value;
@@ -126,7 +126,7 @@ anychart.resourceModule.Overlay.prototype.target = function(opt_value) {
  * Getter for overlay DOM element.
  * @return {Element}
  */
-anychart.resourceModule.Overlay.prototype.getElement = function() {
+anychart.ganttBaseModule.Overlay.prototype.getElement = function() {
   return this.domElement_;
 };
 
@@ -135,7 +135,7 @@ anychart.resourceModule.Overlay.prototype.getElement = function() {
  * Setter for bounds.
  * @param {anychart.math.Rect} value .
  */
-anychart.resourceModule.Overlay.prototype.setBounds = function(value) {
+anychart.ganttBaseModule.Overlay.prototype.setBounds = function(value) {
   this.bounds_ = value;
   this.invalidate(anychart.ConsistencyState.BOUNDS);
 };
@@ -144,20 +144,20 @@ anychart.resourceModule.Overlay.prototype.setBounds = function(value) {
 //endregion
 //region --- IObjectWithSettings impl
 /** @inheritDoc */
-anychart.resourceModule.Overlay.prototype.hasOwnOption = function(name) {
+anychart.ganttBaseModule.Overlay.prototype.hasOwnOption = function(name) {
   return goog.isDefAndNotNull(this.ownSettings[name]);
 };
 
 
 /** @inheritDoc */
-anychart.resourceModule.Overlay.prototype.getConsistencyState = function(fieldName) {
+anychart.ganttBaseModule.Overlay.prototype.getConsistencyState = function(fieldName) {
   // all properties invalidates APPEARANCE
   return anychart.ConsistencyState.APPEARANCE;
 };
 
 
 /** @inheritDoc */
-anychart.resourceModule.Overlay.prototype.getSignal = function(fieldName) {
+anychart.ganttBaseModule.Overlay.prototype.getSignal = function(fieldName) {
   // all properties invalidates with NEEDS_REDRAW
   return anychart.Signal.NEEDS_REDRAW;
 };
@@ -169,7 +169,7 @@ anychart.resourceModule.Overlay.prototype.getSignal = function(fieldName) {
  * Checks if drawing continuation is needed. Also resolves enabled state.
  * @return {boolean} True - if we should continue drawing, false otherwise.
  */
-anychart.resourceModule.Overlay.prototype.checkDrawingNeeded = function() {
+anychart.ganttBaseModule.Overlay.prototype.checkDrawingNeeded = function() {
   if (this.isConsistent() || this.isDisposed())
     return false;
 
@@ -193,9 +193,9 @@ anychart.resourceModule.Overlay.prototype.checkDrawingNeeded = function() {
 
 /**
  * Drawing.
- * @return {anychart.resourceModule.Overlay}
+ * @return {anychart.ganttBaseModule.Overlay}
  */
-anychart.resourceModule.Overlay.prototype.draw = function() {
+anychart.ganttBaseModule.Overlay.prototype.draw = function() {
   if (!this.checkDrawingNeeded())
     return this;
 
@@ -239,7 +239,7 @@ anychart.resourceModule.Overlay.prototype.draw = function() {
 /**
  * Removing element from DOM.
  */
-anychart.resourceModule.Overlay.prototype.remove = function() {
+anychart.ganttBaseModule.Overlay.prototype.remove = function() {
   if (this.domElement_) goog.dom.removeNode(this.domElement_);
 };
 
@@ -252,7 +252,7 @@ anychart.resourceModule.Overlay.prototype.remove = function() {
 //
 //------------------------------------------------------------------------------
 /** @inheritDoc */
-anychart.resourceModule.Overlay.prototype.setupSpecial = function(isDefault, var_args) {
+anychart.ganttBaseModule.Overlay.prototype.setupSpecial = function(isDefault, var_args) {
   var arg0 = arguments[1];
   if (goog.isBoolean(arg0) || goog.isNull(arg0)) {
     if (isDefault)
@@ -269,17 +269,17 @@ anychart.resourceModule.Overlay.prototype.setupSpecial = function(isDefault, var
  * Sets default settings.
  * @param {!Object} config
  */
-anychart.resourceModule.Overlay.prototype.setThemeSettings = function(config) {
-  anychart.core.settings.copy(this.themeSettings, anychart.resourceModule.Overlay.DESCRIPTORS, config);
+anychart.ganttBaseModule.Overlay.prototype.setThemeSettings = function(config) {
+  anychart.core.settings.copy(this.themeSettings, anychart.ganttBaseModule.Overlay.DESCRIPTORS, config);
   if ('enabled' in config)
     this.themeSettings['enabled'] = config['enabled'];
 };
 
 
 /** @inheritDoc */
-anychart.resourceModule.Overlay.prototype.serialize = function() {
-  var json = anychart.resourceModule.Overlay.base(this, 'serialize');
-  anychart.core.settings.serialize(this, anychart.resourceModule.Overlay.DESCRIPTORS, json, 'Overlay ui element');
+anychart.ganttBaseModule.Overlay.prototype.serialize = function() {
+  var json = anychart.ganttBaseModule.Overlay.base(this, 'serialize');
+  anychart.core.settings.serialize(this, anychart.ganttBaseModule.Overlay.DESCRIPTORS, json, 'Overlay ui element');
 
   var enabled = anychart.core.Base.prototype.getOption.call(this, 'enabled');
   json['enabled'] = goog.isDef(enabled) ? enabled : null;
@@ -289,20 +289,20 @@ anychart.resourceModule.Overlay.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.resourceModule.Overlay.prototype.setupByJSON = function(config, opt_default) {
-  anychart.resourceModule.Overlay.base(this, 'setupByJSON', config, opt_default);
+anychart.ganttBaseModule.Overlay.prototype.setupByJSON = function(config, opt_default) {
+  anychart.ganttBaseModule.Overlay.base(this, 'setupByJSON', config, opt_default);
   if (opt_default) {
     this.setThemeSettings(config);
   } else {
-    anychart.core.settings.deserialize(this, anychart.resourceModule.Overlay.DESCRIPTORS, config);
+    anychart.core.settings.deserialize(this, anychart.ganttBaseModule.Overlay.DESCRIPTORS, config);
     this.enabled(config['enabled']);
   }
 };
 
 
 /** @inheritDoc */
-anychart.resourceModule.Overlay.prototype.disposeInternal = function() {
-  anychart.resourceModule.Overlay.base(this, 'disposeInternal');
+anychart.ganttBaseModule.Overlay.prototype.disposeInternal = function() {
+  anychart.ganttBaseModule.Overlay.base(this, 'disposeInternal');
 };
 
 
@@ -310,7 +310,7 @@ anychart.resourceModule.Overlay.prototype.disposeInternal = function() {
 //region --- Exports
 //exports
 (function() {
-  var proto = anychart.resourceModule.Overlay.prototype;
+  var proto = anychart.ganttBaseModule.Overlay.prototype;
   // proto['id'] = proto.id;
   // proto['className'] = proto.className;
   proto['getElement'] = proto.getElement;

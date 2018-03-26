@@ -6,12 +6,11 @@ goog.require('goog.Disposable');
 
 /**
  * EMA indicator class.
- * @param {!(anychart.stockModule.Plot|anychart.stockModule.Scroller)} plot
- * @param {!anychart.stockModule.data.TableMapping} mapping
+ * @param {Array} args [plot, mapping]
  * @constructor
  * @extends {goog.Disposable}
  */
-anychart.stockModule.indicators.Base = function(plot, mapping) {
+anychart.stockModule.indicators.Base = function(args) {
   anychart.stockModule.indicators.Base.base(this, 'constructor');
 
   /**
@@ -19,14 +18,14 @@ anychart.stockModule.indicators.Base = function(plot, mapping) {
    * @type {!(anychart.stockModule.Plot|anychart.stockModule.Scroller)}
    * @private
    */
-  this.plot_ = plot;
+  this.plot_ = args[0];
 
   /**
    * Input mapping.
    * @type {!anychart.stockModule.data.TableMapping}
    * @private
    */
-  this.mapping_ = mapping;
+  this.mapping_ = args[1];
 
   /**
    * Series holder.

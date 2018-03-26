@@ -45,6 +45,16 @@ anychart.stockModule.defaultTheme.StockOHLCTooltipFormatter = function() {
 };
 
 
+/**
+ * @this {*}
+ * @returns {*}
+ */
+anychart.stockModule.defaultTheme.StockSeriesLabelFormatter = function() {
+  var date = this['x'];
+  return anychart.format.dateTime(date, anychart.format.getDateTimeFormat(anychart.format.getIntervalIdentifier(this['dataIntervalUnit'], void 0, 'full')));
+};
+
+
 goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
   'defaultGroupingSettings': {
     'enabled': true,
@@ -222,9 +232,19 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
           'tooltip': {
             'format': anychart.stockModule.defaultTheme.StockSimpleTooltipFormatter
           },
-          'legendItem': {'iconStroke': 'none'}
+          'legendItem': {'iconStroke': 'none'},
+          'normal': {
+            'labels': {
+              'offsetY': 10
+            }
+          }
         },
         'areaLike': {
+          'normal': {
+            'labels': {
+              'format': anychart.stockModule.defaultTheme.StockSeriesLabelFormatter
+            }
+          },
           'hovered': {
             'markers': {
               'enabled': null
@@ -237,6 +257,11 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
           }
         },
         'lineLike': {
+          'normal': {
+            'labels': {
+              'format': anychart.stockModule.defaultTheme.StockSeriesLabelFormatter
+            }
+          },
           'hovered': {
             'markers': {
               'enabled': null
@@ -249,26 +274,47 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
           }
         },
         'rangeLike': {
+          'normal': {
+            'labels': {
+              'format': anychart.stockModule.defaultTheme.StockSeriesLabelFormatter
+            }
+          },
           'tooltip': {
             'format': anychart.stockModule.defaultTheme.StockRangeTooltipFormatter
           }
         },
         'candlestick': {
+          'normal': {
+            'labels': {
+              'format': anychart.stockModule.defaultTheme.StockSeriesLabelFormatter
+            }
+          },
           'tooltip': {
             'format': anychart.stockModule.defaultTheme.StockOHLCTooltipFormatter
           }
         },
         'column': {
           'normal': {
+            'labels': {
+              'format': anychart.stockModule.defaultTheme.StockSeriesLabelFormatter
+            },
             'stroke': 'none'
           }
         },
         'rangeColumn': {
           'normal': {
+            'labels': {
+              'format': anychart.stockModule.defaultTheme.StockSeriesLabelFormatter
+            },
             'stroke': 'none'
           }
         },
         'ohlc': {
+          'normal': {
+            'labels': {
+              'format': anychart.stockModule.defaultTheme.StockSeriesLabelFormatter
+            }
+          },
           'tooltip': {
             'format': anychart.stockModule.defaultTheme.StockOHLCTooltipFormatter
           }
@@ -449,7 +495,9 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       'yAxes': [{}],
       'crosshair': {
         'zIndex': 201,
-        'enabled': null
+        'enabled': null,
+        'xLabels': [{'enabled': null}],
+        'yLabels': [{'enabled': null}]
       }
     },
     'padding': [20, 30, 20, 60],
@@ -488,7 +536,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         },
         /**
          * @this {*}
-         * @returns {string}
+         * @return {string}
          */
         'titleFormat': function() {
           var date = anychart.format.dateTime(this['date'],
@@ -500,7 +548,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         },
         /**
          * @this {*}
-         * @returns {string}
+         * @return {string}
          */
         'format': function() {
           return this['description'] || this['symbol'];
@@ -669,6 +717,8 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'crosshair': {
       'enabled': true,
       'displayMode': 'sticky',
+      'xLabels': [{'enabled': null}],
+      'yLabels': [{'enabled': null}],
       'xStroke': anychart.core.defaultTheme.colorStrokeExtraBright,
       'yStroke': anychart.core.defaultTheme.colorStrokeExtraBright
     }

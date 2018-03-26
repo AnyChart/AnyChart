@@ -8,40 +8,35 @@ goog.require('anychart.utils');
 
 /**
  * AMA indicator class.
- * @param {!(anychart.stockModule.Plot|anychart.stockModule.Scroller)} plot
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_period
- * @param {number=} opt_fastPeriod
- * @param {number=} opt_slowPeriod
- * @param {anychart.enums.StockSeriesType=} opt_seriesType
+ * @param {Array} args [plot, mapping, opt_period, opt_fastPeriod, opt_slowPeriod, opt_seriesType]
  * @constructor
  * @extends {anychart.stockModule.indicators.Base}
  */
-anychart.stockModule.indicators.AMA = function(plot, mapping, opt_period, opt_fastPeriod, opt_slowPeriod, opt_seriesType) {
-  anychart.stockModule.indicators.AMA.base(this, 'constructor', plot, mapping);
+anychart.stockModule.indicators.AMA = function(args) {
+  anychart.stockModule.indicators.AMA.base(this, 'constructor', args);
 
   /**
    * AMA period.
    * @type {number}
    * @private
    */
-  this.period_ = anychart.utils.normalizeToNaturalNumber(opt_period, 20, false);
+  this.period_ = anychart.utils.normalizeToNaturalNumber(args[2], 20, false);
 
   /**
    * AMA fast period.
    * @type {number}
    * @private
    */
-  this.fastPeriod_ = anychart.utils.normalizeToNaturalNumber(opt_fastPeriod, 2, false);
+  this.fastPeriod_ = anychart.utils.normalizeToNaturalNumber(args[3], 2, false);
 
   /**
    * AMA period.
    * @type {number}
    * @private
    */
-  this.slowPeriod_ = anychart.utils.normalizeToNaturalNumber(opt_slowPeriod, 30, false);
+  this.slowPeriod_ = anychart.utils.normalizeToNaturalNumber(args[4], 30, false);
 
-  this.declareSeries('main', opt_seriesType);
+  this.declareSeries('main', args[5]);
   this.init();
 };
 goog.inherits(anychart.stockModule.indicators.AMA, anychart.stockModule.indicators.Base);

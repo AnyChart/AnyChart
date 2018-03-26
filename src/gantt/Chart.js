@@ -225,75 +225,6 @@ anychart.ganttModule.Chart.prototype.getVersionHistoryLink = function() {
 };
 
 
-/** @inheritDoc */
-anychart.ganttModule.Chart.prototype.createFormatProvider = function(item, opt_period, opt_periodIndex) {
-  if (!this.formatProvider_)
-    this.formatProvider_ = new anychart.format.Context();
-
-  var isResources = this.controller_.isResources();
-  var values = {
-    'item': {value: item, type: anychart.enums.TokenType.UNKNOWN},
-    'name': {value: item.get(anychart.enums.GanttDataFields.NAME), type: anychart.enums.TokenType.STRING},
-    'id': {value: item.get(anychart.enums.GanttDataFields.ID), type: anychart.enums.TokenType.STRING}
-  };
-
-  if (isResources) {
-    values['minPeriodDate'] = {value: item.meta('minPeriodDate'), type: anychart.enums.TokenType.DATE_TIME};
-    values['maxPeriodDate'] = {value: item.meta('maxPeriodDate'), type: anychart.enums.TokenType.DATE_TIME};
-    values['period'] = {value: opt_period, type: anychart.enums.TokenType.UNKNOWN};
-    values['periodIndex'] = {
-      value: (goog.isDefAndNotNull(opt_periodIndex) && opt_periodIndex >= 0) ? opt_periodIndex : void 0,
-      type: anychart.enums.TokenType.NUMBER
-    };
-    values['periodStart'] = {
-      value: opt_period ?
-          item.getMeta(anychart.enums.GanttDataFields.PERIODS, opt_periodIndex, anychart.enums.GanttDataFields.START) :
-          void 0, type: anychart.enums.TokenType.DATE_TIME
-    };
-    values['periodEnd'] = {
-      value: opt_period ?
-          item.getMeta(anychart.enums.GanttDataFields.PERIODS, opt_periodIndex, anychart.enums.GanttDataFields.END) :
-          void 0, type: anychart.enums.TokenType.DATE_TIME
-    };
-    values['start'] = {value: values['periodStart'].value || values['minPeriodDate'].value, type: anychart.enums.TokenType.DATE_TIME};
-    values['end'] = {value: values['periodEnd'].value || values['maxPeriodDate'].value, type: anychart.enums.TokenType.DATE_TIME};
-  } else {
-    values['actualStart'] = {value: item.meta(anychart.enums.GanttDataFields.ACTUAL_START), type: anychart.enums.TokenType.DATE_TIME};
-    values['actualEnd'] = {value: item.meta(anychart.enums.GanttDataFields.ACTUAL_END), type: anychart.enums.TokenType.DATE_TIME};
-
-    var isParent = !!item.numChildren();
-    var progressValue = isParent ?
-        item.meta(anychart.enums.GanttDataFields.PROGRESS_VALUE) || item.get(anychart.enums.GanttDataFields.PROGRESS_VALUE) :
-        item.get(anychart.enums.GanttDataFields.PROGRESS_VALUE);
-
-    values['progressValue'] = {value: progressValue, type: anychart.enums.TokenType.PERCENT};
-    values['autoStart'] = {value: isParent ? item.meta('autoStart') : void 0, type: anychart.enums.TokenType.DATE_TIME};
-    values['autoEnd'] = {value: isParent ? item.meta('autoEnd') : void 0, type: anychart.enums.TokenType.DATE_TIME};
-    values['autoProgress'] = {value: isParent ? item.meta('autoProgress') : void 0, type: anychart.enums.TokenType.PERCENT};
-
-    var progress = item.meta(anychart.enums.GanttDataFields.PROGRESS_VALUE);
-    var progressPresents = goog.isDef(progress);
-    var autoProgress = item.meta('autoProgress');
-    var autoProgressPresents = goog.isDef(autoProgress);
-    var resultProgress = progressPresents ? progress : (autoProgressPresents ? autoProgress : 0);
-    resultProgress = anychart.utils.isPercent(resultProgress) ? parseFloat(resultProgress) / 100 : Number(resultProgress);
-    values['progress'] = {value: resultProgress, type: anychart.enums.TokenType.PERCENT};
-
-    if (goog.isDef(item.get(anychart.enums.GanttDataFields.BASELINE_START)))
-      values['baselineStart'] = {value: item.get(anychart.enums.GanttDataFields.BASELINE_START), type: anychart.enums.TokenType.DATE_TIME};
-    if (goog.isDef(item.get(anychart.enums.GanttDataFields.BASELINE_END)))
-      values['baselineEnd'] = {value: item.get(anychart.enums.GanttDataFields.BASELINE_END), type: anychart.enums.TokenType.DATE_TIME};
-  }
-
-  this.formatProvider_
-      .values(values)
-      .dataSource(item)
-      .statisticsSources([this]);
-
-  return this.formatProvider_.propagate();
-};
-
-
 /**
  * This method also has a side effect - it patches the original source event to maintain pointIndex support for
  * browser events.
@@ -401,6 +332,15 @@ anychart.ganttModule.Chart.prototype.defaultRowHeight = function(opt_value) {
     return this;
   }
   return /** @type {number} */ (this.controller_.defaultRowHeight());
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.ganttModule.Chart.prototype.lockInteractivity = function(lock) {
+  this.dg_.lockInteractivity(lock);
+  this.tl_.lockInteractivity(lock);
 };
 
 
@@ -829,8 +769,8 @@ anychart.ganttModule.Chart.prototype.editStructureHighlight = function(opt_index
  * @param {Object} event - Dispatched event object.
  */
 anychart.ganttModule.Chart.prototype.rowMouseMove = function(event) {
-  var target = event['target'];
-  if (!target.dragging) {
+  var target = /** @type {anychart.ganttModule.BaseGrid} */ (event['target']);
+  if (!target.dragging && !target.draggingConnector) {
     this.highlight(event['hoveredIndex'], event['startY'], event['endY']);
 
     var tooltip;
@@ -840,8 +780,10 @@ anychart.ganttModule.Chart.prototype.rowMouseMove = function(event) {
       tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tl_.tooltip());
     }
 
-    var formatProvider = this.createFormatProvider(event['item'], event['period'], event['periodIndex']);
-    tooltip.showFloat(event['originalEvent']['clientX'], event['originalEvent']['clientY'], formatProvider);
+    if (tooltip.enabled()) {
+      var formatProvider = target.createFormatProvider(event['item'], event['period'], event['periodIndex'], event['elementType'], event['hoverRatio'], event['hoverDateTime']);
+      tooltip.showFloat(event['originalEvent']['clientX'], event['originalEvent']['clientY'], formatProvider);
+    }
   }
 };
 

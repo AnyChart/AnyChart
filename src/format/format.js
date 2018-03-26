@@ -120,33 +120,72 @@ goog.exportSymbol('anychart.format.locales.default.dateTimeLocale', {
     'full_year_second': 'dd MMM yyyy, HH:mm:ss',
     'full_year_millisecond': 'dd MMM yyyy, HH:mm:ss.SSS',
     'timeline_year': ['yyyy', 'yy'],
-    'timeline_year_semester': ['MMMM yyyy', 'MMM \'\'yyyy', 'MMM \'\'yy', 'MM \'\'yy'],
-    'timeline_year_quarter': ['MMMM yyyy', 'MMM \'\'yyyy', 'MMM \'\'yy', 'MM \'\'yy'],
-    'timeline_year_month': ['MMMM yyyy', 'MMM \'\'yyyy', 'MMM \'\'yy', 'MM \'\'yy'],
+    'timeline_year_semester': ['Q yyyy', 'Q \'\'yy'],
+    'timeline_year_quarter': ['QQ yyyy', 'QQ \'\'yy', 'Q yyyy', 'Q \'\'yy'],
+    'timeline_year_month': ['MMMM yyyy', 'MMM yyyy', 'MMM \'\'yy', 'MM \'\'yy'],
     'timeline_year_third_of_month': ['EEEE, dd MMMM yyyy', 'EE, dd MMM yyyy', 'EE, dd MMM yy', 'dd MMM yyyy', 'dd MMMM yy', 'MM.dd.yyyy', 'MM.dd.yy'],
-    'timeline_year_week': ['EEEE, dd MMMM yyyy', 'EE, dd MMM yyyy', 'EE, dd MMM yy', 'dd MMM yyyy', 'dd MMMM yy', 'MM.dd.yyyy', 'MM.dd.yy'],
+    'timeline_year_week': ['dd MMMM yyyy', 'dd MMM yyyy', 'dd MMMM yy', 'dd MMM yy', 'MM.dd.yyyy', 'MM.dd.yy'],
     'timeline_year_day': ['EEEE, dd MMMM yyyy', 'EE, dd MMM yyyy', 'EE, dd MMM yy', 'dd MMM yyyy', 'dd MMMM yy', 'MM.dd.yyyy', 'MM.dd.yy'],
-    'timeline_semester': ['MMMM', 'MMM', 'MM'],
-    'timeline_semester_quarter': ['MMMM', 'MMM', 'MM'],
+    'timeline_year_hour': ['dd MMMM yyyy HH\'h\'', 'dd MMM yyyy HH\'h\'', 'dd MMM yy HH\'h\'', 'MM.dd.yyyy HH\'h\'', 'MM.dd.yy HH\'h\''],
+    'timeline_year_minute': ['dd MMMM yyyy HH:mm', 'dd MMM yyyy HH:mm', 'dd MMM yy HH:mm', 'MM.dd.yyyy HH:mm', 'MM.dd.yy HH:mm'],
+    'timeline_year_second': ['dd MMMM yyyy HH:mm:ss', 'dd MMM yyyy HH:mm:ss', 'dd MMM yy HH:mm:ss', 'MM.dd.yyyy HH:mm:ss', 'MM.dd.yy HH:mm:ss'],
+    'timeline_year_millisecond': ['dd MMMM yyyy HH:mm:ss.SSS', 'dd MMM yyyy HH:mm:ss.SSS', 'dd MMM yy HH:mm:ss.SSS', 'MM.dd.yyyy HH:mm:ss.SSS', 'MM.dd.yy HH:mm:ss.SSS'],
+    'timeline_semester': ['Q'],
+    'timeline_semester_quarter': ['QQ', 'Q'],
     'timeline_semester_month': ['MMMM', 'MMM', 'MM'],
     'timeline_semester_third_of_month': ['EEEE, dd MMMM', 'EE, dd MMM', 'EE, dd MMM', 'dd MMM', 'dd MMMM', 'MM.dd', 'MM.dd'],
-    'timeline_semester_week': ['EEEE, dd MMMM', 'EE, dd MMM', 'EE, dd MMM', 'dd MMM', 'dd MMMM', 'MM.dd', 'MM.dd'],
+    'timeline_semester_week': ['dd MMMM', 'dd MMM', 'MM.dd', 'MM.dd'],
     'timeline_semester_day': ['EEEE, dd MMMM', 'EE, dd MMM', 'EE, dd MMM', 'dd MMM', 'dd MMMM', 'MM.dd', 'MM.dd'],
-    'timeline_quarter': ['MMMM', 'MMM', 'MM'],
+    'timeline_semester_hour': ['dd MMMM HH\'h\'', 'dd MMM HH\'h\'', 'dd MMM HH\'h\'', 'MM.dd HH\'h\'', 'MM.dd HH\'h\''],
+    'timeline_semester_minute': ['dd MMMM HH:mm', 'dd MMM HH:mm', 'dd MMM HH:mm', 'MM.dd HH:mm', 'MM.dd HH:mm'],
+    'timeline_semester_second': ['dd MMMM HH:mm:ss', 'dd MMM HH:mm:ss', 'dd MMM HH:mm:ss', 'MM.dd HH:mm:ss', 'MM.dd HH:mm:ss'],
+    'timeline_semester_millisecond': ['dd MMMM HH:mm:ss.SSS', 'dd MMM HH:mm:ss.SSS', 'dd MMM HH:mm:ss.SSS', 'MM.dd HH:mm:ss.SSS', 'MM.dd HH:mm:ss.SSS'],
+    'timeline_quarter': ['QQ', 'Q'],
     'timeline_quarter_month': ['MMMM', 'MMM', 'MM'],
     'timeline_quarter_third_of_month': ['EEEE, dd MMMM', 'EE, dd MMM', 'EE, dd MMM', 'dd MMM', 'dd MMMM', 'MM.dd', 'MM.dd'],
-    'timeline_quarter_week': ['EEEE, dd MMMM', 'EE, dd MMM', 'EE, dd MMM', 'dd MMM', 'dd MMMM', 'MM.dd', 'MM.dd'],
+    'timeline_quarter_week': ['dd MMMM', 'dd MMM', 'MM.dd', 'MM.dd'],
     'timeline_quarter_day': ['EEEE, dd MMMM', 'EE, dd MMM', 'EE, dd MMM', 'dd MMM', 'dd MMMM', 'MM.dd', 'MM.dd'],
+    'timeline_quarter_hour': ['dd MMMM HH\'h\'', 'dd MMM HH\'h\'', 'dd MMM HH\'h\'', 'MM.dd HH\'h\'', 'MM.dd HH\'h\''],
+    'timeline_quarter_minute': ['dd MMMM HH:mm', 'dd MMM HH:mm', 'dd MMM HH:mm', 'MM.dd HH:mm', 'MM.dd HH:mm'],
+    'timeline_quarter_second': ['dd MMMM HH:mm:ss', 'dd MMM HH:mm:ss', 'dd MMM HH:mm:ss', 'MM.dd HH:mm:ss', 'MM.dd HH:mm:ss'],
+    'timeline_quarter_millisecond': ['dd MMMM HH:mm:ss.SSS', 'dd MMM HH:mm:ss.SSS', 'dd MMM HH:mm:ss.SSS', 'MM.dd HH:mm:ss.SSS', 'MM.dd HH:mm:ss.SSS'],
     'timeline_month': ['MMMM', 'MMM', 'MM'],
     'timeline_month_third_of_month': ['EEEE, dd MMMM', 'EE, dd MMM', 'EE, dd MMM', 'dd MMM', 'dd MMMM', 'MM.dd', 'MM.dd'],
-    'timeline_month_week': ['EEEE, dd MMMM', 'EE, dd MMM', 'EE, dd MMM', 'dd MMM', 'dd MMMM', 'MM.dd', 'MM.dd'],
+    'timeline_month_week': ['dd MMMM', 'dd MMM', 'MM.dd', 'MM.dd'],
     'timeline_month_day': ['EEEE, dd MMMM', 'EE, dd MMM', 'EE, dd MMM', 'dd MMM', 'dd MMMM', 'MM.dd', 'MM.dd'],
+    'timeline_month_hour': ['dd MMMM HH\'h\'', 'dd MMM HH\'h\'', 'dd MMM HH\'h\'', 'MM.dd HH\'h\'', 'MM.dd HH\'h\''],
+    'timeline_month_minute': ['dd MMMM HH:mm', 'dd MMM HH:mm', 'dd MMM HH:mm', 'MM.dd HH:mm', 'MM.dd HH:mm'],
+    'timeline_month_second': ['dd MMMM HH:mm:ss', 'dd MMM HH:mm:ss', 'dd MMM HH:mm:ss', 'MM.dd HH:mm:ss', 'MM.dd HH:mm:ss'],
+    'timeline_month_millisecond': ['dd MMMM HH:mm:ss.SSS', 'dd MMM HH:mm:ss.SSS', 'dd MMM HH:mm:ss.SSS', 'MM.dd HH:mm:ss.SSS', 'MM.dd HH:mm:ss.SSS'],
     'timeline_third_of_month': ['dd'],
     'timeline_third_of_month_week': ['dd'],
     'timeline_third_of_month_day': ['EEEE, dd', 'EE, dd', 'dd'],
+    'timeline_third_of_month_hour': ['EEEE, dd HH\'h\'', 'EE, dd HH\'h\'', 'dd HH\'h\''],
+    'timeline_third_of_month_minute': ['EEEE, dd HH:mm', 'EE, dd HH:mm', 'dd HH:mm'],
+    'timeline_third_of_month_second': ['EEEE, dd HH:mm:ss', 'EE, dd HH:mm:ss', 'dd HH:mm:ss'],
+    'timeline_third_of_month_millisecond': ['EEEE, dd HH:mm:ss.SSS', 'EE, dd HH:mm:ss.SSS', 'dd HH:mm:ss.SSS'],
     'timeline_week': ['dd'],
     'timeline_week_day': ['EEEE, dd', 'EE, dd', 'dd'],
-    'timeline_day': ['EEEE, dd', 'EEEE', 'EE, dd', 'EE', 'dd'],
+    'timeline_week_hour': ['EEEE, dd HH\'h\'', 'EE, dd HH\'h\'', 'dd HH\'h\''],
+    'timeline_week_minute': ['EEEE, dd HH:mm', 'EE, dd HH:mm', 'dd HH:mm'],
+    'timeline_week_second': ['EEEE, dd HH:mm:ss', 'EE, dd HH:mm:ss', 'dd HH:mm:ss'],
+    'timeline_week_millisecond': ['EEEE, dd HH:mm:ss.SSS', 'EE, dd HH:mm:ss.SSS', 'dd HH:mm:ss.SSS'],
+    'timeline_day': ['EEEE, dd', 'EEEE, dd', 'EE, dd', 'dd'],
+    'timeline_day_hour': ['EEEE, dd HH\'h\'', 'EE, dd HH\'h\'', 'dd HH\'h\''],
+    'timeline_day_minute': ['EEEE, dd HH:mm', 'EE, dd HH:mm', 'dd HH:mm'],
+    'timeline_day_second': ['EEEE, dd HH:mm:ss', 'EE, dd HH:mm:ss', 'dd HH:mm:ss'],
+    'timeline_day_millisecond': ['EEEE, dd HH:mm:ss.SSS', 'EE, dd HH:mm:ss.SSS', 'dd HH:mm:ss.SSS'],
+    'timeline_hour': ['HH\'h\'', 'HH'],
+    'timeline_hour_minute': ['HH:mm'],
+    'timeline_hour_second': ['HH:mm:ss'],
+    'timeline_hour_millisecond': ['HH:mm:ss.SSS'],
+    'timeline_minute': ['mm\'\''],
+    'timeline_minute_second': ['mm\'\'ss\"'],
+    'timeline_minute_millisecond': ['mm\'\'ss\"SSS', 'mm\'\'ss\"SS'],
+    'timeline_second': ['ss\"', 'ss'],
+    'timeline_second_millisecond': ['ss\"SSS', 'ss\"SS'],
+    'timeline_millisecond': ['SSS'],
+
     'year': 'yyyy',
     'year_semester': 'yyyy MMM',
     'year_quarter': 'yyyy MMM',
@@ -214,16 +253,28 @@ goog.exportSymbol('anychart.format.locales.default.dateTimeLocale', {
     'second_millisecond': 'SSS',
     'millisecond': 'SSS',
 
-    'timelineHeader_year': 'yyyy',
-    'timelineHeader_year_month': 'MMMM, yyyy',
-    'timelineHeader_year_week': 'dd MMM yy',
-    'timelineHeader_year_quarter': 'MMM yyyy',
-    'timelineHeader_year_day': 'dd MMM yy',
-    'timelineHeader_quarter_month': 'MMMM',
-    'timelineHeader_month_week': 'dd-MMM',
-    'timelineHeader_week_day': 'd MMM, EEE',
-    'timelineHeader_day_hour': 'HH:mm',
-    'timelineHeader_hour_minute': 'H:mm'
+    'charts_year': 'yyyy',
+    'charts_semester': 'MMM yyyy',
+    'charts_quarter': 'MMM yyyy',
+    'charts_month': 'MMM',
+    'charts_third_of_month': 'dd MMM',
+    'charts_week': 'dd MMM',
+    'charts_day': 'dd MMM',
+    'charts_hour': 'HH:mm',
+    'charts_minute': 'HH:mm',
+    'charts_second': 'HH:mm:ss',
+    'charts_millisecond': 'HH:mm:ss.SSS',
+
+    'charts_year_semester': 'MMM',
+    'charts_semester_quarter': 'MMM',
+    'charts_quarter_month': 'MMM',
+    'charts_month_third_of_month': 'dd MMM',
+    'charts_third_of_month_week': 'dd MMM',
+    'charts_week_day': 'dd',
+    'charts_day_hour': 'HH:mm',
+    'charts_hour_minute': 'HH:mm',
+    'charts_minute_second': 'HH:mm:ss',
+    'charts_second_millisecond': 'HH:mm:ss.SSS'
   }
 });
 goog.exportSymbol('anychart.format.locales.default.numberLocale', {
@@ -644,50 +695,7 @@ anychart.format.parseDateTime = function(value, opt_format, opt_baseDate, opt_lo
       return new Date(value);
     }
   } else if (goog.isString(value)) {
-    var format = (goog.isDef(opt_format) ? opt_format : anychart.format.inputDateTimeFormat_) || null;
-    if (format) {
-      var locale = anychart.format.getDateTimeLocale(opt_locale) ||
-          anychart.format.getDateTimeLocale(anychart.format.inputLocale_) ||
-          anychart.format.getDateTimeLocale('default');
-      var localeHash = goog.getUid(locale);
-      var parserCacheKey = format + localeHash;
-      /** @type {goog.i18n.DateTimeParse} */
-      var parser;
-      if (!(parserCacheKey in anychart.format.parseDateTimeCache_)) {
-        var symbols = anychart.format.localeToDateTimeSymbols_(locale);
-        anychart.format.parseDateTimeCache_[parserCacheKey] = new goog.i18n.DateTimeParse(format, symbols);
-      }
-      parser = anychart.format.parseDateTimeCache_[parserCacheKey];
-
-      var date = goog.isDateLike(opt_baseDate) ? /** @type {Date} */ (opt_baseDate) : anychart.format.inputBaseDate();
-
-      var hasNoTZInFormat = (format.replace(/'.+?'/g, '').search(/z+/i) == -1);
-      if (hasNoTZInFormat) {
-        date.setTime(date.getTime() + date.getTimezoneOffset() * 60000);
-      }
-
-      var valueLength = value.length;
-      var resultLength = parser.parse(value, date);
-
-      if (valueLength == resultLength) {//parsing successful.
-        if (hasNoTZInFormat) {
-          date.setTime(date.getTime() - date.getTimezoneOffset() * 60000);
-        }
-        return /** @type {Date} */ (date);
-      } else {
-        // anychart.core.reporting.warning(anychart.enums.WarningCode.PARSE_DATETIME, void 0, [value, resultLength], true);
-        return null;
-      }
-    } else { //falling back to anychart.utils.normalizeTimestamp -like behaviour
-      var numValue = +value;
-      var newDate = new Date(isNaN(numValue) ? value : numValue);
-      if (isNaN(newDate.getTime())) { //Got string not in ISO8601 format.
-        // anychart.core.reporting.warning(anychart.enums.WarningCode.PARSE_DATETIME, void 0, [value]);
-        return null; // Parsing error.
-      } else {
-        return newDate;
-      }
-    }
+    return anychart.format.parseDateTimeStr_(value, opt_format, opt_baseDate, opt_locale);
   } else {
     // anychart.core.reporting.warning(anychart.enums.WarningCode.PARSE_DATETIME, void 0, [value]);
     return null;
@@ -799,9 +807,10 @@ anychart.format.getIntervalIdentifier = function(intervalUnit, opt_parentInterva
   var parentInterval = anychart.enums.normalizeInterval(opt_parentIntervalUnit);
   intervalUnit = /** @type {anychart.enums.Interval} */(anychart.enums.normalizeInterval(intervalUnit));
   opt_prefix = opt_prefix ? opt_prefix + '_' : '';
-  return opt_prefix + ((intervalUnit == parentInterval) ?
+  var result = opt_prefix + ((intervalUnit == parentInterval) ?
       intervalUnit :
       parentInterval + '_' + intervalUnit);
+  return result.replace(/-/g, '_');
 };
 
 
@@ -1034,6 +1043,87 @@ anychart.format.number = function(number, opt_decimalsCountOrLocale, opt_decimal
 };
 
 
+
+
+//endregion
+//region --- Utility
+//------------------------------------------------------------------------------
+//
+//  Utility
+//
+//------------------------------------------------------------------------------
+/**
+ * Parses input value to date.
+ * @param {string} value - Input value.
+ * @param {?string=} opt_format - Format to be parsed. If is undefined, anychart.format.inputDateTimeFormat will be used.
+ * @param {?Date=} opt_baseDate - Date object to hold the parsed date. Used for case if input value doesn't contain
+ *  information about year or month or something like that. If parsing process ends successfully, this object will
+ *  contain totally the same values of date time units as return value.
+ *  NOTE: If is not Date, Date.UTC(currentYear, currentMoth) will be used.
+ * @param {?(string|anychart.format.Locale)=} opt_locale - Locale to be used. If not set, anychart.format.inputLocale will
+ *  be used.
+ * @return {?Date} - Parsed date or null if got wrong input value.
+ * @private
+ */
+anychart.format.parseDateTimeStr_ = function(value, opt_format, opt_baseDate, opt_locale) {
+  var format = (goog.isDef(opt_format) ? opt_format : anychart.format.inputDateTimeFormat_) || null;
+  if (format) {
+    var locale = anychart.format.getDateTimeLocale(opt_locale) ||
+        anychart.format.getDateTimeLocale(anychart.format.inputLocale_) ||
+        anychart.format.getDateTimeLocale('default');
+    var localeHash = goog.getUid(locale);
+    var parserCacheKey = format + localeHash;
+    /** @type {goog.i18n.DateTimeParse} */
+    var parser;
+    if (!(parserCacheKey in anychart.format.parseDateTimeCache_)) {
+      var symbols = anychart.format.localeToDateTimeSymbols_(locale);
+      anychart.format.parseDateTimeCache_[parserCacheKey] = new goog.i18n.DateTimeParse(format, symbols);
+    }
+    parser = anychart.format.parseDateTimeCache_[parserCacheKey];
+
+    var date = goog.isDateLike(opt_baseDate) ? /** @type {Date} */ (opt_baseDate) : anychart.format.inputBaseDate();
+
+    var hasNoTZInFormat = (format.replace(/'.+?'/g, '').search(/z+/i) == -1);
+    if (hasNoTZInFormat) {
+      date.setTime(date.getTime() + date.getTimezoneOffset() * 60000);
+    }
+
+    var valueLength = value.length;
+    var resultLength = parser.parse(value, date);
+
+    if (valueLength == resultLength) {//parsing successful.
+      if (hasNoTZInFormat) {
+        date.setTime(date.getTime() - date.getTimezoneOffset() * 60000);
+      }
+      return /** @type {Date} */ (date);
+    } else {
+      // anychart.core.reporting.warning(anychart.enums.WarningCode.PARSE_DATETIME, void 0, [value, resultLength], true);
+      return null;
+    }
+  } else { //falling back to anychart.utils.normalizeTimestamp -like behaviour
+    var numValue = Number(value);
+    var newDate = new Date(isNaN(numValue) ? value : numValue);
+    if (isNaN(newDate.getTime())) { //Got string not in ISO8601 format.
+      // anychart.core.reporting.warning(anychart.enums.WarningCode.PARSE_DATETIME, void 0, [value]);
+      return null; // Parsing error.
+    } else {
+      return newDate;
+    }
+  }
+};
+
+
+/**
+ * Parses passed val with anychart.format.parseDateTime and returns the result as a number, not a Date object.
+ * @param {*} val
+ * @return {number}
+ */
+anychart.format.toTimestamp = function(val) {
+  if (goog.isString(val)) {
+    val = anychart.format.parseDateTimeStr_(val);
+  }
+  return Number(val);
+};
 
 
 //endregion

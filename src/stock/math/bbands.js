@@ -101,7 +101,9 @@ anychart.stockModule.math.bbands.calculate = function(context, value) {
  * @this {anychart.stockModule.math.bbands.Context}
  */
 anychart.stockModule.math.bbands.calculationFunction = function(row, context) {
-  var value = anychart.utils.toNumber(row.get('value'));
+  var value = row.get('value');
+  value = goog.isDef(value) ? value : row.get('close');
+  value = anychart.utils.toNumber(value);
   var rv = anychart.stockModule.math.bbands.calculate(context, value);
   var middle = rv[0];
   var upper = rv[1];

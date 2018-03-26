@@ -1,6 +1,7 @@
 goog.provide('anychart.scales.DateTime');
 
 goog.require('anychart.enums');
+goog.require('anychart.scales.Continuous');
 goog.require('anychart.scales.DateTimeTicks');
 goog.require('anychart.scales.ScatterBase');
 
@@ -88,45 +89,29 @@ anychart.scales.DateTime.prototype.minorTicks = function(opt_value) {
 /** @inheritDoc */
 anychart.scales.DateTime.prototype.extendDataRange = function(var_args) {
   for (var i = 0; i < arguments.length; i++) {
-    anychart.scales.DateTime.base(this, 'extendDataRange', anychart.format.parseDateTime(arguments[i]));
+    anychart.scales.DateTime.base(this, 'extendDataRange', anychart.format.toTimestamp(arguments[i]));
   }
   return this;
 };
 
 
 /** @inheritDoc */
-anychart.scales.DateTime.prototype.transform = function(value, opt_subRangeRatio) {
-  return anychart.scales.DateTime.base(this, 'transform', anychart.format.parseDateTime(value), opt_subRangeRatio);
+anychart.scales.DateTime.prototype.setupTransformer = function() {
+  anychart.scales.DateTime.base(this, 'setupTransformer');
+  this.transformer.domain([this.min, this.max]);
+  this.transformer.types(anychart.scales.Continuous.PieceType.UTC_TIME);
 };
 
 
 /** @inheritDoc */
-anychart.scales.DateTime.prototype.inverseTransform = function(ratio) {
-  return Math.round(anychart.scales.DateTime.base(this, 'inverseTransform', ratio));
-};
-
-
-/** @inheritDoc */
-anychart.scales.DateTime.prototype.calculate = function() {
-  if (this.consistent) return;
-
-  anychart.scales.DateTime.base(this, 'calculate');
-
-  var newRange = this.ticks().setupAsMajor(this.min, this.max, this.minimumModeAuto, this.maximumModeAuto);
+anychart.scales.DateTime.prototype.setupTicks = function() {
+  var newRange = this.ticks().setupAsMajor(this.min, this.max, this.minimumModeAuto && this.alignMinimumVal, this.maximumModeAuto && this.alignMaximumVal);
   this.minorTicks().setupAsMinor(this.min, this.max, newRange[0], newRange[1]);
   // adjusting range AFTER minors calc to avoid range selection change
   if (this.minimumModeAuto)
     this.min = newRange[0];
   if (this.maximumModeAuto)
     this.max = newRange[1];
-
-  this.range = this.max - this.min;
-};
-
-
-/** @inheritDoc */
-anychart.scales.DateTime.prototype.getCategorisation = function() {
-  return true;
 };
 
 
@@ -197,6 +182,8 @@ anychart.scales.dateTime = function() {
   proto['extendDataRange'] = proto.extendDataRange;//inherited
   proto['softMinimum'] = proto.softMinimum;
   proto['softMaximum'] = proto.softMaximum;
+  proto['alignMinimum'] = proto.alignMinimum;
+  proto['alignMaximum'] = proto.alignMaximum;
   proto['minimumGap'] = proto.minimumGap;//doc|ex
   proto['maximumGap'] = proto.maximumGap;//doc|ex
 })();

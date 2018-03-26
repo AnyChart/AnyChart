@@ -2398,8 +2398,7 @@ anychart.tableModule.Table.prototype.resolveFullProperty_ = function(name, cell,
  * @return {!anychart.core.ui.LabelsFactory.Label}
  */
 anychart.tableModule.Table.prototype.createTextCellContent = function(value) {
-  value = value + '';
-  return this.getLabelsFactory_().add({'value': value}, {'value': {'x': 0, 'y': 0}});
+  return this.getLabelsFactory_().add({'value': String(value)}, {'value': {'x': 0, 'y': 0}});
 };
 
 

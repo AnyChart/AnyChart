@@ -629,6 +629,9 @@ anychart.stockModule.Axis.prototype.drawLabels_ = function(bounds, iterator) {
     allMinorBounds.push.apply(allMinorBounds, prevMinorBounds);
   }
 
+  this.labels().dropCallsCache();
+  this.minorLabels().dropCallsCache();
+
   curr = iterator.getPreFirstMajor();
   if (this.drawHelperLabel_ && !isNaN(curr)) {
     currBounds = this.getLabelBounds_(curr, true, bounds,
@@ -674,22 +677,20 @@ anychart.stockModule.Axis.prototype.drawLabels_ = function(bounds, iterator) {
  * @param {number} index
  * @private
  */
-anychart.stockModule.Axis.prototype.drawLabel_ = function(value, isMajor, bounds,
-    majorUnit, majorUnitCount, minorUnit, minorUnitCount, index) {
-  var labels;
-  if (isMajor) {
-    labels = this.labels();
-  } else {
-    labels = this.minorLabels();
-  }
+anychart.stockModule.Axis.prototype.drawLabel_ = function(value, isMajor, bounds, majorUnit, majorUnitCount, minorUnit, minorUnitCount, index) {
+  var labels = isMajor ? this.labels() : this.minorLabels();
 
-  var x = Math.round(bounds.left + this.scale_.transformAligned(value) * bounds.width);
+  var dataIndex = Math.ceil(this.scale_.getIndexByKey(value));
+  var realValue = this.scale_.getKeyByIndex(dataIndex);
+  var ratio = this.scale_.transformInternal(realValue, dataIndex);
+  var x = Math.round(bounds.left + ratio * bounds.width);
   var y = bounds.top;
 
-  var formatProvider = this.getLabelsFormatProvider_(value, majorUnit, majorUnitCount, minorUnit, minorUnitCount);
+  var formatProvider = this.getLabelsFormatProvider_(value, realValue, majorUnit, majorUnitCount, minorUnit, minorUnitCount);
   var positionProvider = {'value': {'x': x, 'y': y}};
 
   var labelBounds = labels.measure(formatProvider, positionProvider, undefined, index);
+
   if (!isNaN(labelBounds.left)) {
     var diff = bounds.left - labelBounds.left;
     if (diff > 0)
@@ -712,18 +713,21 @@ anychart.stockModule.Axis.prototype.drawLabel_ = function(value, isMajor, bounds
  * @return {anychart.math.Rect}
  * @private
  */
-anychart.stockModule.Axis.prototype.getLabelBounds_ = function(value, isMajor, bounds,
-    majorUnit, majorUnitCount, minorUnit, minorUnitCount, index) {
+anychart.stockModule.Axis.prototype.getLabelBounds_ = function(value, isMajor, bounds, majorUnit, majorUnitCount, minorUnit, minorUnitCount, index) {
   var labels = isMajor ? this.labels() : this.minorLabels();
   if (!labels.enabled()) return null;
 
-  var x = Math.round(bounds.left + this.scale_.transformAligned(value) * bounds.width);
+  var dataIndex = Math.ceil(this.scale_.getIndexByKey(value));
+  var realValue = this.scale_.getKeyByIndex(dataIndex);
+  var ratio = this.scale_.transformInternal(realValue, dataIndex);
+  var x = Math.round(bounds.left + ratio * bounds.width);
   var y = bounds.top;
 
-  var formatProvider = this.getLabelsFormatProvider_(value, majorUnit, majorUnitCount, minorUnit, minorUnitCount);
+  var formatProvider = this.getLabelsFormatProvider_(value, realValue, majorUnit, majorUnitCount, minorUnit, minorUnitCount);
   var positionProvider = {'value': {'x': x, 'y': y}};
 
   var labelBounds = labels.measure(formatProvider, positionProvider, undefined, index);
+
   labelBounds.left = Math.max(labelBounds.left, bounds.left);
   return labelBounds;
 };
@@ -732,6 +736,7 @@ anychart.stockModule.Axis.prototype.getLabelBounds_ = function(value, isMajor, b
 /**
  * Gets format provider for label.
  * @param {number} value Label value.
+ * @param {number} existValue Exist data value.
  * @param {anychart.enums.Interval} majorUnit
  * @param {number} majorUnitCount
  * @param {anychart.enums.Interval} minorUnit
@@ -739,7 +744,7 @@ anychart.stockModule.Axis.prototype.getLabelBounds_ = function(value, isMajor, b
  * @return {Object} Labels format provider.
  * @private
  */
-anychart.stockModule.Axis.prototype.getLabelsFormatProvider_ = function(value,
+anychart.stockModule.Axis.prototype.getLabelsFormatProvider_ = function(value, existValue,
     majorUnit, majorUnitCount, minorUnit, minorUnitCount) {
 
   var labelText = anychart.format.date(value);
@@ -781,6 +786,10 @@ anychart.stockModule.Axis.prototype.getLabelsFormatProvider_ = function(value,
     },
     'tickValue': {
       value: value,
+      type: anychart.enums.TokenType.NUMBER
+    },
+    'dataValue': {
+      value: existValue,
       type: anychart.enums.TokenType.NUMBER
     },
     'max': {

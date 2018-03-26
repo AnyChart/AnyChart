@@ -900,7 +900,7 @@ anychart.circularGaugeModule.Axis.prototype.getLabelsFormatProvider_ = function(
  * @private
  */
 anychart.circularGaugeModule.Axis.prototype.getAnchorForLabel_ = function(angle) {
-  angle = goog.math.standardAngle(angle);
+  angle = goog.math.standardAngle(anychart.math.specialRound(angle));
   var anchor = anychart.enums.Anchor.CENTER;
   var position = anychart.enums.normalizeGaugeSidePosition(this.labels().getOption('position'));
 
@@ -1190,7 +1190,7 @@ anychart.circularGaugeModule.Axis.prototype.draw = function() {
         drawTick = (goog.isArray(needDrawLabels) && needDrawLabels[i]) || goog.isBoolean(needDrawLabels);
 
         if (drawTick && ticksDrawer)
-          ticksDrawer.call(this.ticks_, angle);
+          ticksDrawer.call(this.ticks_, angle, tickVal);
 
         if (drawLabel && labelsDrawer)
           labelsDrawer.call(this, i, angle, true);
@@ -1204,7 +1204,7 @@ anychart.circularGaugeModule.Axis.prototype.draw = function() {
         drawTick = (goog.isArray(needDrawMinorLabels) && needDrawMinorLabels[j]) || goog.isBoolean(needDrawMinorLabels);
 
         if (drawTick && minorTicksDrawer && prevMajorRatio != minorRatio)
-          minorTicksDrawer.call(this.minorTicks_, angle);
+          minorTicksDrawer.call(this.minorTicks_, angle, minorTickVal);
 
         if (drawLabel && minorLabelsDrawer && prevMajorRatio != minorRatio)
           minorLabelsDrawer.call(this, j, angle, false);

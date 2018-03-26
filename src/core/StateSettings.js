@@ -2,6 +2,7 @@ goog.provide('anychart.core.StateSettings');
 goog.require('anychart.core.Base');
 goog.require('anychart.core.settings');
 goog.require('anychart.core.settings.IObjectWithSettings');
+goog.require('anychart.core.ui.Background');
 goog.require('anychart.core.ui.CircularLabelsFactory');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.MarkersFactory');
@@ -14,7 +15,7 @@ goog.require('anychart.core.utils.Connector');
  * Class representing state settings (normal, hovered, selected)
  * @param {anychart.core.settings.IObjectWithSettings} stateHolder State holder.
  * @param {!Object.<string, anychart.core.settings.PropertyDescriptorMeta>} descriptorsMeta Descriptors for state.
- * @param {anychart.PointState} stateType
+ * @param {anychart.PointState|anychart.SettingsState} stateType
  * @param {!Array.<Array>=} opt_descriptorsOverride
  * @constructor
  * @implements {anychart.core.settings.IResolvable}
@@ -34,7 +35,7 @@ anychart.core.StateSettings = function(stateHolder, descriptorsMeta, stateType, 
   this.descriptorsMeta = descriptorsMeta;
 
   /**
-   * @type {anychart.PointState}
+   * @type {anychart.PointState|anychart.SettingsState}
    */
   this.stateType = stateType;
 
@@ -109,6 +110,13 @@ anychart.core.StateSettings.CONNECTOR_AFTER_INIT_CALLBACK = 'connectorAfterInitC
 
 
 /**
+ * Option name for labels factory after init callback.
+ * @type {string}
+ */
+anychart.core.StateSettings.BACKGROUND_AFTER_INIT_CALLBACK = 'backgroundAfterInitCallback';
+
+
+/**
  * Option name for outline settings constructor.
  * @type {string}
  */
@@ -149,6 +157,16 @@ anychart.core.StateSettings.CIRCULAR_LABELS_CONSTRUCTOR = function() {
  */
 anychart.core.StateSettings.DEFAULT_MARKERS_CONSTRUCTOR = function() {
   return new anychart.core.ui.MarkersFactory();
+};
+
+
+/**
+ * Default outline settings constructor.
+ * @this {*}
+ * @return {anychart.core.ui.Outline}
+ */
+anychart.core.StateSettings.DEFAULT_OUTLINE_CONSTRUCTOR = function() {
+  return new anychart.core.ui.Outline();
 };
 
 
@@ -208,12 +226,12 @@ anychart.core.StateSettings.DEFAULT_CONNECTOR_AFTER_INIT_CALLBACK = function(con
 
 
 /**
- * Default outline settings constructor.
+ * Default background after init callback.
+ * @param {anychart.core.ui.Background} background
  * @this {*}
- * @return {anychart.core.ui.Outline}
  */
-anychart.core.StateSettings.DEFAULT_OUTLINE_CONSTRUCTOR = function() {
-  return new anychart.core.ui.Outline();
+anychart.core.StateSettings.DEFAULT_BACKGROUND_AFTER_INIT_CALLBACK = function(background) {
+  background.listenSignals(this.backgroundInvalidated_, this);
 };
 
 
@@ -250,7 +268,7 @@ anychart.core.StateSettings.prototype.getLowPriorityResolutionChain = function()
   var sett = [this.themeSettings];
   var parent = this.stateHolder.getParentState(this.stateType);
   if (parent) {
-    sett.push(parent.themeSettings);
+    sett.push.apply(sett, parent.getLowPriorityResolutionChain());
   }
   return sett;
 };
@@ -261,7 +279,7 @@ anychart.core.StateSettings.prototype.getHighPriorityResolutionChain = function(
   var sett = [this.ownSettings];
   var parent = this.stateHolder.getParentState(this.stateType);
   if (parent) {
-    sett.push(parent.ownSettings);
+    sett.push.apply(sett, parent.getHighPriorityResolutionChain());
   }
   return sett;
 };
@@ -367,6 +385,15 @@ anychart.core.StateSettings.prototype.addMeta = function(metas) {
 };
 
 
+/**
+ *  Getter for state type.
+ *  @return {number}
+ */
+anychart.core.StateSettings.prototype.getState = function() {
+  return this.stateType;
+};
+
+
 //endregion
 //region --- Complex objects
 /**
@@ -379,6 +406,7 @@ anychart.core.StateSettings.prototype.labels = function(opt_value) {
     var labelsFactoryConstructor = /** @type {Function} */ (this.getOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR)) || anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR;
     var afterInitCallback = /** @type {Function} */ (this.getOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK)) || goog.nullFunction;
     this.labels_ = labelsFactoryConstructor();
+    this.labels_.supportsEnabledSuspension = false;
     afterInitCallback.call(this.stateHolder, this.labels_);
   }
 
@@ -389,6 +417,56 @@ anychart.core.StateSettings.prototype.labels = function(opt_value) {
     return this;
   }
   return this.labels_;
+};
+
+
+/**
+ * Labels.
+ * @param {(Object|boolean|null)=} opt_value
+ * @return {anychart.core.StateSettings|anychart.core.ui.LabelsFactory|anychart.core.ui.CircularLabelsFactory}
+ */
+anychart.core.StateSettings.prototype.minLabels = function(opt_value) {
+  if (!this.minLabels_) {
+    var labelsFactoryConstructor = /** @type {Function} */ (this.getOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR)) || anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR;
+    var afterInitCallback = /** @type {Function} */ (this.getOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK)) || goog.nullFunction;
+    this.minLabels_ = labelsFactoryConstructor();
+    this.minLabels_.supportsEnabledSuspension = false;
+    afterInitCallback.call(this.stateHolder, this.minLabels_);
+    this.minLabels_.markConsistent(anychart.ConsistencyState.ALL);
+  }
+
+  if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
+    this.minLabels_.setup(opt_value);
+    return this;
+  }
+  return this.minLabels_;
+};
+
+
+/**
+ * Labels.
+ * @param {(Object|boolean|null)=} opt_value
+ * @return {anychart.core.StateSettings|anychart.core.ui.LabelsFactory|anychart.core.ui.CircularLabelsFactory}
+ */
+anychart.core.StateSettings.prototype.maxLabels = function(opt_value) {
+  if (!this.maxLabels_) {
+    var labelsFactoryConstructor = /** @type {Function} */ (this.getOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR)) || anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR;
+    var afterInitCallback = /** @type {Function} */ (this.getOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK)) || goog.nullFunction;
+    this.maxLabels_ = labelsFactoryConstructor();
+    this.maxLabels_.supportsEnabledSuspension = false;
+    afterInitCallback.call(this.stateHolder, this.maxLabels_);
+    this.maxLabels_.markConsistent(anychart.ConsistencyState.ALL);
+  }
+
+  if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
+    this.maxLabels_.setup(opt_value);
+    return this;
+  }
+  return this.maxLabels_;
 };
 
 
@@ -532,6 +610,26 @@ anychart.core.StateSettings.prototype.outline = function(opt_value) {
 };
 
 
+/**
+ * Background.
+ * @param {(Object|string|boolean|null)=} opt_value
+ * @return {anychart.core.StateSettings|anychart.core.ui.Background}
+ */
+anychart.core.StateSettings.prototype.background = function(opt_value) {
+  if (!this.background_) {
+    var afterInitCallback = /** @type {Function} */ (this.getOption(anychart.core.StateSettings.BACKGROUND_AFTER_INIT_CALLBACK)) || anychart.core.StateSettings.DEFAULT_BACKGROUND_AFTER_INIT_CALLBACK;
+    this.background_ = new anychart.core.ui.Background();
+    afterInitCallback.call(this.stateHolder, this.background_);
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.background_.setup(opt_value);
+    return this;
+  }
+  return this.background_;
+};
+
+
 //endregion
 //region --- State Fallbacks
 /**
@@ -577,6 +675,12 @@ anychart.core.StateSettings.prototype.serialize = function() {
   if (this.descriptorsMeta['labels'])
     json['labels'] = this.labels().serialize();
 
+  if (this.descriptorsMeta['minLabels'])
+    json['minLabels'] = this.minLabels().serialize();
+
+  if (this.descriptorsMeta['maxLabels'])
+    json['maxLabels'] = this.maxLabels().serialize();
+
   if (this.descriptorsMeta['headers'])
     json['headers'] = this.headers().serialize();
 
@@ -600,6 +704,9 @@ anychart.core.StateSettings.prototype.serialize = function() {
   if (this.descriptorsMeta['outline'])
     json['outline'] = this.outline().serialize();
 
+  if (this.descriptorsMeta['background'])
+    json['background'] = this.background().serialize();
+
   return json;
 };
 
@@ -617,11 +724,21 @@ anychart.core.StateSettings.prototype.setEnabledTrue = function(config) {
 /** @inheritDoc */
 anychart.core.StateSettings.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.StateSettings.base(this, 'setupByJSON', config, opt_default);
-  anychart.core.settings.deserialize(this, this.PROPERTY_DESCRIPTORS, config);
+  anychart.core.settings.deserialize(this, this.PROPERTY_DESCRIPTORS, config, opt_default);
 
   if (goog.isDef(this.descriptorsMeta['labels'])) {
     this.setEnabledTrue(config['labels']);
     this.labels().setupInternal(!!opt_default, config['labels']);
+  }
+
+  if (goog.isDef(this.descriptorsMeta['minLabels'])) {
+    this.setEnabledTrue(config['minLabels']);
+    this.minLabels().setupInternal(!!opt_default, config['minLabels']);
+  }
+
+  if (goog.isDef(this.descriptorsMeta['maxLabels'])) {
+    this.setEnabledTrue(config['maxLabels']);
+    this.maxLabels().setupInternal(!!opt_default, config['maxLabels']);
   }
 
   if (goog.isDef(this.descriptorsMeta['headers'])) {
@@ -657,6 +774,11 @@ anychart.core.StateSettings.prototype.setupByJSON = function(config, opt_default
     // this.setEnabledTrue(config['outline']);
     this.outline().setupInternal(!!opt_default, config['outline']);
   }
+
+  if (goog.isDef(this.descriptorsMeta['background'])) {
+    this.background().setupInternal(!!opt_default, config['background']);
+    this.background().markConsistent(anychart.ConsistencyState.ALL);
+  }
 };
 
 
@@ -664,12 +786,15 @@ anychart.core.StateSettings.prototype.setupByJSON = function(config, opt_default
 anychart.core.StateSettings.prototype.disposeInternal = function() {
   goog.disposeAll(
       this.labels_,
+      this.minLabels_,
+      this.maxLabels_,
       this.headers_,
       this.lowerLabels_,
       this.markers_,
       this.outlierMarkers_,
       this.outline_,
-      this.connector_
+      this.connector_,
+      this.background_
   );
   delete this.connector_;
   anychart.core.StateSettings.base(this, 'disposeInternal');
@@ -681,6 +806,8 @@ anychart.core.StateSettings.prototype.disposeInternal = function() {
 (function() {
   var proto = anychart.core.StateSettings.prototype;
   proto['labels'] = proto.labels;
+  proto['minLabels'] = proto.minLabels;
+  proto['maxLabels'] = proto.maxLabels;
   proto['headers'] = proto.headers;
   proto['upperLabels'] = proto.upperLabels;
   proto['lowerLabels'] = proto.lowerLabels;

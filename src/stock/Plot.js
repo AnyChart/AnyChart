@@ -21,6 +21,7 @@ goog.require('anychart.stockModule.Series');
 goog.require('anychart.stockModule.eventMarkers.PlotController');
 goog.require('anychart.stockModule.indicators');
 goog.require('anychart.utils');
+goog.require('goog.events.BrowserEvent');
 goog.require('goog.fx.Dragger');
 
 
@@ -171,6 +172,19 @@ anychart.stockModule.Plot = function(chart) {
     } else {
       this.chart_.highlightAtRatio(this.frameHighlightRatio_, this.frameHighlightX_, this.frameHighlightY_, this);
     }
+  }, this);
+
+  /**
+   * @type {!function(number)}
+   * @private
+   */
+  this.zoomingFrameAction_ = goog.bind(function(time) {
+    this.zoomingFrame_ = undefined;
+    var anchor = this.zoomingFrameParams_.anchor;
+    var dx = this.zoomingFrameParams_.dx;
+    var dDistance = this.zoomingFrameParams_.dDistance;
+    this.zoomingFrameParams_ = null;
+    this.chart_.pinchZoom(anchor, dx, dDistance);
   }, this);
 
   this.defaultSeriesType(anychart.enums.StockSeriesType.LINE);
@@ -752,304 +766,6 @@ anychart.stockModule.Plot.prototype.getAllSeries = function() {
 
 
 /**
- * Creates ADL indicator on the chart.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {anychart.enums.StockSeriesType=} opt_seriesType
- * @return {anychart.stockModule.indicators.ADL}
- */
-anychart.stockModule.Plot.prototype.adl = function(mapping, opt_seriesType) {
-  var result = new anychart.stockModule.indicators.ADL(this, mapping, opt_seriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates AMA indicator on the chart.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_period
- * @param {number=} opt_fastPeriod
- * @param {number=} opt_slowPeriod
- * @param {anychart.enums.StockSeriesType=} opt_seriesType
- * @return {anychart.stockModule.indicators.AMA}
- */
-anychart.stockModule.Plot.prototype.ama = function(mapping, opt_period, opt_fastPeriod, opt_slowPeriod, opt_seriesType) {
-  var result = new anychart.stockModule.indicators.AMA(this, mapping, opt_period, opt_fastPeriod, opt_slowPeriod, opt_seriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates Aroon indicator on the chart.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_period
- * @param {anychart.enums.StockSeriesType=} opt_upSeriesType
- * @param {anychart.enums.StockSeriesType=} opt_downSeriesType
- * @return {anychart.stockModule.indicators.Aroon}
- */
-anychart.stockModule.Plot.prototype.aroon = function(mapping, opt_period, opt_upSeriesType, opt_downSeriesType) {
-  var result = new anychart.stockModule.indicators.Aroon(this, mapping, opt_period, opt_upSeriesType, opt_downSeriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates ATR indicator on the chart.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_period
- * @param {anychart.enums.StockSeriesType=} opt_seriesType
- * @return {anychart.stockModule.indicators.ATR}
- */
-anychart.stockModule.Plot.prototype.atr = function(mapping, opt_period, opt_seriesType) {
-  var result = new anychart.stockModule.indicators.ATR(this, mapping, opt_period, opt_seriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates BBands indicator on the chart.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_period [20] Sets moving average period value.
- * @param {number=} opt_deviation [2] Sets the multiplier applied to the moving average to compute upper and lower bands of the indicator.
- * @param {anychart.enums.StockSeriesType=} opt_middleSeriesType
- * @param {anychart.enums.StockSeriesType=} opt_upperSeriesType
- * @param {anychart.enums.StockSeriesType=} opt_lowerSeriesType
- * @return {anychart.stockModule.indicators.BBands}
- */
-anychart.stockModule.Plot.prototype.bbands = function(mapping, opt_period, opt_deviation, opt_middleSeriesType, opt_upperSeriesType, opt_lowerSeriesType) {
-  var result = new anychart.stockModule.indicators.BBands(this, mapping, opt_period, opt_deviation, opt_middleSeriesType, opt_upperSeriesType, opt_lowerSeriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates BBands %B indicator on the chart.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_period [20] Sets moving average period value.
- * @param {number=} opt_deviation [2] Sets the multiplier applied to the moving average to compute upper and lower bands of the indicator.
- * @param {anychart.enums.StockSeriesType=} opt_seriesType
- * @return {anychart.stockModule.indicators.BBandsB}
- */
-anychart.stockModule.Plot.prototype.bbandsB = function(mapping, opt_period, opt_deviation, opt_seriesType) {
-  var result = new anychart.stockModule.indicators.BBandsB(this, mapping, opt_period, opt_deviation, opt_seriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates BBands Width indicator on the chart.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_period [20] Sets moving average period value.
- * @param {number=} opt_deviation [2] Sets the multiplier applied to the moving average to compute upper and lower bands of the indicator.
- * @param {anychart.enums.StockSeriesType=} opt_seriesType
- * @return {anychart.stockModule.indicators.BBandsWidth}
- */
-anychart.stockModule.Plot.prototype.bbandsWidth = function(mapping, opt_period, opt_deviation, opt_seriesType) {
-  var result = new anychart.stockModule.indicators.BBandsWidth(this, mapping, opt_period, opt_deviation, opt_seriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates CCI indicator on the chart.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_period
- * @param {anychart.enums.StockSeriesType=} opt_seriesType
- * @return {anychart.stockModule.indicators.CCI}
- */
-anychart.stockModule.Plot.prototype.cci = function(mapping, opt_period, opt_seriesType) {
-  var result = new anychart.stockModule.indicators.CCI(this, mapping, opt_period, opt_seriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates CHO indicator on the chart.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_fastPeriod [3] Indicator period. Defaults to 3.
- * @param {number=} opt_slowPeriod [10] Indicator period. Defaults to 10.
- * @param {string=} opt_maType [EMA] Indicator smoothing type. Defaults to EMA.
- * @param {anychart.enums.StockSeriesType=} opt_seriesType
- * @return {anychart.stockModule.indicators.CHO}
- */
-anychart.stockModule.Plot.prototype.cho = function(mapping, opt_fastPeriod, opt_slowPeriod, opt_maType, opt_seriesType) {
-  var result = new anychart.stockModule.indicators.CHO(this, mapping, opt_fastPeriod, opt_slowPeriod, opt_maType, opt_seriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates CMF indicator on the chart.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_period
- * @param {anychart.enums.StockSeriesType=} opt_seriesType
- * @return {anychart.stockModule.indicators.CMF}
- */
-anychart.stockModule.Plot.prototype.cmf = function(mapping, opt_period, opt_seriesType) {
-  var result = new anychart.stockModule.indicators.CMF(this, mapping, opt_period, opt_seriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates DMI indicator on the chart.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_period
- * @param {number=} opt_adxPeriod
- * @param {boolean=} opt_useWildersSmoothing
- * @param {anychart.enums.StockSeriesType=} opt_pdiSeriesType
- * @param {anychart.enums.StockSeriesType=} opt_ndiSeriesType
- * @param {anychart.enums.StockSeriesType=} opt_adxSeriesType
- * @return {anychart.stockModule.indicators.DMI}
- */
-anychart.stockModule.Plot.prototype.dmi = function(mapping, opt_period, opt_adxPeriod, opt_useWildersSmoothing, opt_pdiSeriesType, opt_ndiSeriesType, opt_adxSeriesType) {
-  var result = new anychart.stockModule.indicators.DMI(this, mapping, opt_period, opt_adxPeriod, opt_useWildersSmoothing, opt_pdiSeriesType, opt_ndiSeriesType, opt_adxSeriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates EMA indicator on the chart.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_period
- * @param {anychart.enums.StockSeriesType=} opt_seriesType
- * @return {anychart.stockModule.indicators.EMA}
- */
-anychart.stockModule.Plot.prototype.ema = function(mapping, opt_period, opt_seriesType) {
-  var result = new anychart.stockModule.indicators.EMA(this, mapping, opt_period, opt_seriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates KDJ indicator on the chart.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_kPeriod [14] Indicator period. Defaults to 14.
- * @param {number=} opt_kMAPeriod [5] Indicator K smoothing period. Defaults to 5.
- * @param {number=} opt_dPeriod [5] Indicator D period. Defaults to 5.
- * @param {anychart.enums.MovingAverageType=} opt_kMAType [EMA] Indicator K smoothing type. Defaults to EMA.
- * @param {anychart.enums.MovingAverageType=} opt_dMAType [EMA] Indicator D smoothing type. Defaults to EMA.
- * @param {number=} opt_kMultiplier [-2] K multiplier.
- * @param {number=} opt_dMultiplier [3] D multiplier.
- * @param {anychart.enums.StockSeriesType=} opt_kSeriesType
- * @param {anychart.enums.StockSeriesType=} opt_dSeriesType
- * @param {anychart.enums.StockSeriesType=} opt_jSeriesType
- * @return {anychart.stockModule.indicators.KDJ}
- */
-anychart.stockModule.Plot.prototype.kdj = function(mapping, opt_kPeriod, opt_kMAPeriod, opt_dPeriod, opt_kMAType, opt_dMAType, opt_kMultiplier, opt_dMultiplier, opt_kSeriesType, opt_dSeriesType, opt_jSeriesType) {
-  var result = new anychart.stockModule.indicators.KDJ(this, mapping, opt_kPeriod, opt_kMAPeriod, opt_dPeriod, opt_kMAType, opt_dMAType, opt_kMultiplier, opt_dMultiplier, opt_kSeriesType, opt_dSeriesType, opt_jSeriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates MACD indicator on the chart.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_fastPeriod
- * @param {number=} opt_slowPeriod
- * @param {number=} opt_signalPeriod
- * @param {anychart.enums.StockSeriesType=} opt_macdSeriesType
- * @param {anychart.enums.StockSeriesType=} opt_signalSeriesType
- * @param {anychart.enums.StockSeriesType=} opt_histogramSeriesType
- * @return {anychart.stockModule.indicators.MACD}
- */
-anychart.stockModule.Plot.prototype.macd = function(mapping, opt_fastPeriod, opt_slowPeriod, opt_signalPeriod,
-    opt_macdSeriesType, opt_signalSeriesType, opt_histogramSeriesType) {
-  var result = new anychart.stockModule.indicators.MACD(this, mapping, opt_fastPeriod, opt_slowPeriod, opt_signalPeriod,
-      opt_macdSeriesType, opt_signalSeriesType, opt_histogramSeriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates MMA indicator on the chart.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_period
- * @param {anychart.enums.StockSeriesType=} opt_seriesType
- * @return {anychart.stockModule.indicators.MMA}
- */
-anychart.stockModule.Plot.prototype.mma = function(mapping, opt_period, opt_seriesType) {
-  var result = new anychart.stockModule.indicators.MMA(this, mapping, opt_period, opt_seriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates RoC indicator on the chart.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_period
- * @param {anychart.enums.StockSeriesType=} opt_seriesType
- * @return {anychart.stockModule.indicators.RoC}
- */
-anychart.stockModule.Plot.prototype.roc = function(mapping, opt_period, opt_seriesType) {
-  var result = new anychart.stockModule.indicators.RoC(this, mapping, opt_period, opt_seriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates RSI indicator on the chart.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_period
- * @param {anychart.enums.StockSeriesType=} opt_seriesType
- * @return {anychart.stockModule.indicators.RSI}
- */
-anychart.stockModule.Plot.prototype.rsi = function(mapping, opt_period, opt_seriesType) {
-  var result = new anychart.stockModule.indicators.RSI(this, mapping, opt_period, opt_seriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates SMA indicator on the chart.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_period
- * @param {anychart.enums.StockSeriesType=} opt_seriesType
- * @return {anychart.stockModule.indicators.SMA}
- */
-anychart.stockModule.Plot.prototype.sma = function(mapping, opt_period, opt_seriesType) {
-  var result = new anychart.stockModule.indicators.SMA(this, mapping, opt_period, opt_seriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates Stochastic indicator on the chart.
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_kPeriod [14] Indicator period. Defaults to 14.
- * @param {number=} opt_kMAPeriod [1] Indicator K smoothing period. Defaults to 1.
- * @param {number=} opt_dPeriod [3] Indicator D period. Defaults to 3.
- * @param {anychart.enums.MovingAverageType=} opt_kMAType [SMA] Indicator K smoothing type. Defaults to SMA.
- * @param {anychart.enums.MovingAverageType=} opt_dMAType [SMA] Indicator D smoothing type. Defaults to SMA.
- * @param {anychart.enums.StockSeriesType=} opt_kSeriesType
- * @param {anychart.enums.StockSeriesType=} opt_dSeriesType
- * @return {anychart.stockModule.indicators.Stochastic}
- */
-anychart.stockModule.Plot.prototype.stochastic = function(mapping, opt_kPeriod, opt_kMAPeriod, opt_dPeriod, opt_kMAType, opt_dMAType, opt_kSeriesType, opt_dSeriesType) {
-  var result = new anychart.stockModule.indicators.Stochastic(this, mapping, opt_kPeriod, opt_kMAPeriod, opt_dPeriod, opt_kMAType, opt_dMAType, opt_kSeriesType, opt_dSeriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
  * Getter/setter for series default settings.
  * @param {Object=} opt_value Object with default series settings.
  * @return {Object}
@@ -1118,6 +834,11 @@ anychart.stockModule.Plot.prototype.createSeriesByType = function(type, opt_data
 
   return series;
 };
+
+
+//endregion
+//region Indicators
+anychart.stockModule.indicators.generateIndicatorsConstructors(anychart.stockModule.Plot);
 
 
 //endregion
@@ -1297,6 +1018,13 @@ anychart.stockModule.Plot.prototype.getDrawingWidth = function() {
 anychart.stockModule.Plot.prototype.getPlotBounds = function() {
   this.ensureBoundsDistributed_();
   return this.seriesBounds_;
+};
+
+
+/** @inheritDoc */
+anychart.stockModule.Plot.prototype.getEnableChangeSignals = function() {
+  return anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED |
+      anychart.Signal.ENABLED_STATE_CHANGED | anychart.Signal.NEEDS_RECALCULATION;
 };
 
 
@@ -1514,6 +1242,18 @@ anychart.stockModule.Plot.prototype.xAxis = function(opt_value) {
  */
 anychart.stockModule.Plot.prototype.getAxisByIndex = function(index) {
   return index ? (this.yAxes_[index - 1]) : this.xAxis_;
+};
+
+
+/** @inheritDoc */
+anychart.stockModule.Plot.prototype.getXAxisByIndex = function(index) {
+  return this.xAxis_;
+};
+
+
+/** @inheritDoc */
+anychart.stockModule.Plot.prototype.getYAxisByIndex = function(index) {
+  return this.yAxes_[index];
 };
 
 
@@ -1864,7 +1604,6 @@ anychart.stockModule.Plot.prototype.draw = function() {
     crosshair.parentBounds(this.getPlotBounds());
     crosshair.container(this.rootLayer_);
     crosshair.xAxis(this.xAxis_);
-    crosshair.yAxis(this.yAxes_[/** @type {number} */(this.crosshair_.yLabel().axisIndex())]);
     crosshair.draw();
     crosshair.resumeSignalsDispatching(false);
 
@@ -1913,6 +1652,8 @@ anychart.stockModule.Plot.prototype.ensureVisualReady_ = function() {
     this.eventsInterceptor_.stroke(null);
     this.eventsHandler.listenOnce(this.eventsInterceptor_, acgraph.events.EventType.MOUSEDOWN, this.initDragger_);
     this.eventsHandler.listenOnce(this.eventsInterceptor_, acgraph.events.EventType.TOUCHSTART, this.initDragger_);
+    this.eventsHandler.listen(this.eventsInterceptor_, acgraph.events.EventType.TOUCHSTART, this.handleTouchStart_);
+    this.eventsHandler.listen(this.eventsInterceptor_, acgraph.events.EventType.TOUCHEND, this.handleTouchEnd_);
     this.eventsHandler.listen(this.eventsInterceptor_, acgraph.events.EventType.MOUSEOVER, this.handlePlotMouseOverAndMove_);
     this.eventsHandler.listen(this.eventsInterceptor_, acgraph.events.EventType.MOUSEMOVE, this.handlePlotMouseOverAndMove_);
     this.eventsHandler.listen(this.eventsInterceptor_, acgraph.events.EventType.MOUSEOUT, this.handlePlotMouseOut_);
@@ -2046,7 +1787,7 @@ anychart.stockModule.Plot.prototype.getLegendAutoText = function(legendFormatter
         'hoveredDate': {value: opt_titleValue, type: anychart.enums.TokenType.DATE_TIME},
         'dataIntervalUnit': {value: grouping.getCurrentDataInterval()['unit'], type: anychart.enums.TokenType.STRING},
         'dataIntervalUnitCount': {value: grouping.getCurrentDataInterval()['count'], type: anychart.enums.TokenType.NUMBER},
-        'isGrouped': {value: grouping.isGrouped()}
+        'isGrouped': {value: grouping.isGrouped(), type: anychart.enums.TokenType.UNKNOWN}
       };
       var context = (new anychart.format.Context(values)).propagate();
       return formatter.call(context, context);
@@ -2226,7 +1967,7 @@ anychart.stockModule.Plot.prototype.prepareHighlight = function(value) {
  * @param {number=} opt_y - .
  */
 anychart.stockModule.Plot.prototype.highlight = function(value, rawValue, hlSource, opt_y) {
-  if (!this.rootLayer_ || !this.seriesBounds_) return;
+  if (!this.rootLayer_ || !this.seriesBounds_ || !this.enabled()) return;
 
   var sticky = this.crosshair().getOption('displayMode') == anychart.enums.CrosshairDisplayMode.STICKY;
   var setValue = sticky ? value : rawValue;
@@ -2256,6 +1997,8 @@ anychart.stockModule.Plot.prototype.highlight = function(value, rawValue, hlSour
  * Removes plot highlight.
  */
 anychart.stockModule.Plot.prototype.unhighlight = function() {
+  if (!this.enabled()) return;
+
   this.highlightedValue_ = NaN;
 
   for (var i = 0; i < this.series_.length; i++) {
@@ -2286,6 +2029,9 @@ anychart.stockModule.Plot.prototype.refreshDragAnchor = function() {
   if (this.dragger_ && this.dragger_.isDragging()) {
     this.dragger_.refreshDragAnchor();
   }
+  if (this.zooming_) {
+    this.chart_.refreshDragAnchor(this.zooming_.anchor);
+  }
 };
 
 
@@ -2297,6 +2043,99 @@ anychart.stockModule.Plot.prototype.refreshDragAnchor = function() {
 anychart.stockModule.Plot.prototype.initDragger_ = function(e) {
   this.dragger_ = new anychart.stockModule.Plot.Dragger(this, this.eventsInterceptor_);
   this.dragger_.startDrag(e.getOriginalEvent());
+};
+
+
+/**
+ * Handles touch start.
+ * @param {acgraph.events.BrowserEvent} e
+ * @private
+ */
+anychart.stockModule.Plot.prototype.handleTouchStart_ = function(e) {
+  var googEvent = e.getOriginalEvent();
+  var touches = googEvent.getBrowserEvent()['touches'];
+  if (touches && touches.length > 1) {
+    this.dragger_.endDrag(googEvent);
+    if (touches.length == 2) {
+      var coords = [];
+      var ids = {};
+      for (var i = 0; i < 2; i++) {
+        var touch = touches[i];
+        coords[i + i] = touch['clientX'] !== undefined ? touch['clientX'] : touch['pageX'];
+        coords[i + i + 1] = touch['clientY'] !== undefined ? touch['clientY'] : touch['pageY'];
+        ids[touch['identifier']] = true;
+      }
+      this.zooming_ = {
+        anchor: this.chart_.getDragAnchor(),
+        x: (coords[0] + coords[2]) / 2,
+        y: (coords[1] + coords[3]) / 2,
+        distance: anychart.math.vectorLength.apply(null, coords),
+        ids: ids
+      };
+      goog.events.listen(anychart.document, goog.events.EventType.TOUCHMOVE, this.handleZoomMove_, {capture: true, passive: false}, this);
+      e.preventDefault();
+    }
+  }
+};
+
+
+/**
+ * Handles touchMove in zooming.
+ * @param {goog.events.BrowserEvent} e
+ * @private
+ */
+anychart.stockModule.Plot.prototype.handleZoomMove_ = function(e) {
+  var touches = e.getBrowserEvent()['touches'];
+  if (this.zooming_ && touches && touches.length > 1) {
+    var coords = [];
+    for (var i = 0; i < touches.length; i++) {
+      var touch = touches[i];
+      if (touch['identifier'] in this.zooming_.ids) {
+        coords[i + i] = touch['clientX'] !== undefined ? touch['clientX'] : touch['pageX'];
+        coords[i + i + 1] = touch['clientY'] !== undefined ? touch['clientY'] : touch['pageY'];
+      }
+    }
+    var x = (coords[0] + coords[2]) / 2;
+    var y = (coords[1] + coords[3]) / 2;
+    var distance = anychart.math.vectorLength.apply(null, coords);
+    this.zoomingFrameParams_ = {
+      anchor: this.zooming_.anchor,
+      x: x,
+      y: y,
+      distance: distance,
+      dx: (x - this.zooming_.x) / this.seriesBounds_.width,
+      dDistance: distance / this.zooming_.distance
+    };
+    if (!goog.isDef(this.zoomingFrame_))
+      this.zoomingFrame_ = anychart.window.requestAnimationFrame(this.zoomingFrameAction_);
+    e.preventDefault();
+  }
+};
+
+
+/**
+ * Handles touch start.
+ * @param {acgraph.events.BrowserEvent} e
+ * @private
+ */
+anychart.stockModule.Plot.prototype.handleTouchEnd_ = function(e) {
+  var googEvent = e.getOriginalEvent();
+  var browserEvent = googEvent.getBrowserEvent();
+  var touches = browserEvent['touches'];
+  if (touches.length == 1) {
+    goog.events.unlisten(anychart.document, goog.events.EventType.TOUCHMOVE, this.handleZoomMove_, {
+      capture: true,
+      passive: false
+    }, this);
+    var touch = touches[0];
+    var newEvent = new goog.events.BrowserEvent(browserEvent);
+    newEvent.clientX = touch['clientX'] !== undefined ? touch['clientX']: touch['pageX'];
+    newEvent.clientY = touch['clientY'] !== undefined ? touch['clientY']: touch['pageY'];
+    newEvent.screenX = touch['screenX'] || 0;
+    newEvent.screenY = touch['screenY'] || 0;
+    this.zooming_ = null;
+    this.dragger_.startDrag(newEvent);
+  }
 };
 
 
@@ -2377,6 +2216,7 @@ anychart.stockModule.Plot.prototype.isLastPlot = function(opt_value) {
 anychart.stockModule.Plot.prototype.crosshair = function(opt_value) {
   if (!this.crosshair_) {
     this.crosshair_ = new anychart.core.ui.Crosshair();
+    this.crosshair_.setInteractivityTarget(this);
     this.registerDisposable(this.crosshair_);
     this.crosshair_.listenSignals(this.onCrosshairSignal_, this);
     this.invalidate(anychart.ConsistencyState.AXES_CHART_CROSSHAIR, anychart.Signal.NEEDS_REDRAW);
@@ -2751,7 +2591,8 @@ anychart.stockModule.Plot.prototype.disposeInternal = function() {
       this.yAxes_,
       this.xAxis_,
       this.priceIndicators_,
-      this.noDataSettings_);
+      this.noDataSettings_,
+      this.rootLayer_);
 
   this.annotations_ = null;
   this.eventMarkers_ = null;
@@ -2763,16 +2604,19 @@ anychart.stockModule.Plot.prototype.disposeInternal = function() {
   this.xAxis_ = null;
   this.noDataSettings_ = null;
 
-  delete this.chart_;
   delete this.defaultSeriesSettings_;
   delete this.defaultGridSettings_;
   delete this.defaultMinorGridSettings_;
   delete this.defaultYAxisSettings_;
+  delete this.rootLayer_;
 
   goog.disposeAll(this.palette_, this.markerPalette_, this.hatchFillPalette_);
   this.palette_ = this.markerPalette_ = this.hatchFillPalette_ = null;
 
   anychart.stockModule.Plot.base(this, 'disposeInternal');
+
+  this.chart_.removePlotInternal(this);
+  delete this.chart_;
 };
 
 
@@ -3137,6 +2981,7 @@ anychart.stockModule.Plot.Dragger = function(plot, target) {
   this.setHysteresis(3);
 
   this.listen(goog.fx.Dragger.EventType.START, this.dragStartHandler_, false, this);
+  this.listen(goog.fx.Dragger.EventType.BEFOREDRAG, this.beforeDragHandler_, false, this);
   this.listen(goog.fx.Dragger.EventType.END, this.dragEndHandler_, false, this);
 };
 goog.inherits(anychart.stockModule.Plot.Dragger, goog.fx.Dragger);
@@ -3178,6 +3023,17 @@ anychart.stockModule.Plot.Dragger.prototype.dragEndHandler_ = function(e) {
     this.frameAction_(0);
   }
   this.plot_.chart_.dragEnd();
+};
+
+
+/**
+ * Before drag handler.
+ * @param {goog.fx.DragEvent} e
+ * @return {boolean}
+ * @private
+ */
+anychart.stockModule.Plot.Dragger.prototype.beforeDragHandler_ = function(e) {
+  return !!this.plot_.chart_.getDragParamsIfChanged(e.left / this.plot_.seriesBounds_.width, this.anchor_);
 };
 
 
@@ -3263,25 +3119,30 @@ anychart.stockModule.Plot.Dragger.prototype.limitY = function(y) {
   proto['removeSeries'] = proto.removeSeries;
   proto['removeSeriesAt'] = proto.removeSeriesAt;
   proto['removeAllSeries'] = proto.removeAllSeries;
-  proto['adl'] = proto.adl;
-  proto['ama'] = proto.ama;
-  proto['aroon'] = proto.aroon;
-  proto['atr'] = proto.atr;
-  proto['bbands'] = proto.bbands;
-  proto['bbandsB'] = proto.bbandsB;
-  proto['bbandsWidth'] = proto.bbandsWidth;
-  proto['cci'] = proto.cci;
-  proto['cho'] = proto.cho;
-  proto['cmf'] = proto.cmf;
-  proto['dmi'] = proto.dmi;
-  proto['ema'] = proto.ema;
-  proto['kdj'] = proto.kdj;
-  proto['macd'] = proto.macd;
-  proto['mma'] = proto.mma;
-  proto['roc'] = proto.roc;
-  proto['rsi'] = proto.rsi;
-  proto['sma'] = proto.sma;
-  proto['stochastic'] = proto.stochastic;
+  // auto generated methods
+  //proto['adl'] = proto.adl;
+  //proto['ama'] = proto.ama;
+  //proto['aroon'] = proto.aroon;
+  //proto['atr'] = proto.atr;
+  //proto['bbands'] = proto.bbands;
+  //proto['bbandsB'] = proto.bbandsB;
+  //proto['bbandsWidth'] = proto.bbandsWidth;
+  //proto['cci'] = proto.cci;
+  //proto['cho'] = proto.cho;
+  //proto['cmf'] = proto.cmf;
+  //proto['dmi'] = proto.dmi;
+  //proto['ema'] = proto.ema;
+  //proto['kdj'] = proto.kdj;
+  //proto['macd'] = proto.macd;
+  //proto['mfi'] = proto.mfi;
+  //proto['mma'] = proto.mma;
+  //proto['momentum'] = proto.momentum;
+  //proto['psar'] = proto.psar;
+  //proto['roc'] = proto.roc;
+  //proto['rsi'] = proto.rsi;
+  //proto['sma'] = proto.sma;
+  //proto['stochastic'] = proto.stochastic;
+  //proto['williamsR'] = proto.williamsR;
   proto['palette'] = proto.palette;
   proto['markerPalette'] = proto.markerPalette;
   proto['hatchFillPalette'] = proto.hatchFillPalette;

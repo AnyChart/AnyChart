@@ -8,24 +8,21 @@ goog.require('anychart.utils');
 
 /**
  * RSI indicator class.
- * @param {!(anychart.stockModule.Plot|anychart.stockModule.Scroller)} plot
- * @param {!anychart.stockModule.data.TableMapping} mapping
- * @param {number=} opt_period
- * @param {anychart.enums.StockSeriesType=} opt_seriesType
+ * @param {Array} args [plot, mapping, opt_period, opt_seriesType]
  * @constructor
  * @extends {anychart.stockModule.indicators.Base}
  */
-anychart.stockModule.indicators.RSI = function(plot, mapping, opt_period, opt_seriesType) {
-  anychart.stockModule.indicators.RSI.base(this, 'constructor', plot, mapping);
+anychart.stockModule.indicators.RSI = function(args) {
+  anychart.stockModule.indicators.RSI.base(this, 'constructor', args);
 
   /**
    * RSI period.
    * @type {number}
    * @private
    */
-  this.period_ = anychart.utils.normalizeToNaturalNumber(opt_period, 14, false);
+  this.period_ = anychart.utils.normalizeToNaturalNumber(args[2], 14, false);
 
-  this.declareSeries('main', opt_seriesType);
+  this.declareSeries('main', args[3]);
   this.init();
 };
 goog.inherits(anychart.stockModule.indicators.RSI, anychart.stockModule.indicators.Base);

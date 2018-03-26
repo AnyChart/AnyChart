@@ -266,7 +266,7 @@ anychart.stockModule.Chart.prototype.createSeriesConfig = function(allowColoring
       // anychart.core.series.Capabilities.ALLOW_POINT_SETTINGS |
       // anychart.core.series.Capabilities.ALLOW_ERROR |
       anychart.core.series.Capabilities.SUPPORTS_MARKERS |
-      // anychart.core.series.Capabilities.SUPPORTS_LABELS |
+      anychart.core.series.Capabilities.SUPPORTS_LABELS |
       0);
   capabilities |= (allowColoring && anychart.core.series.Capabilities.ALLOW_POINT_SETTINGS);
   var discreteShapeManager = allowColoring ? anychart.enums.ShapeManagerTypes.PER_POINT : anychart.enums.ShapeManagerTypes.PER_SERIES;
@@ -632,6 +632,17 @@ anychart.stockModule.Chart.prototype.plotInternal = function(opt_indexOrValue, o
 
 
 /**
+ * Plot remove endpoint.
+ * @param {anychart.stockModule.Plot} plot
+ */
+anychart.stockModule.Chart.prototype.removePlotInternal = function(plot) {
+  if (goog.array.remove(this.plots_, plot))
+    this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.STOCK_PLOTS_APPEARANCE,
+        anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+};
+
+
+/**
  * Scroller getter-setter.
  * @param {(Object|boolean|null)=} opt_value
  * @return {anychart.stockModule.Scroller|anychart.stockModule.Chart}
@@ -670,11 +681,34 @@ anychart.stockModule.Chart.prototype.scroller = function(opt_value) {
 anychart.stockModule.Chart.prototype.selectRange = function(typeOrUnitOrStart, opt_endOrCountOrDispatchEvent, opt_anchorOrDispatchEvent, opt_dispatchEvent) {
   var type, unit;
   var offset, year, month;
+  var count, anchor, direction;
 
   var baseKey = this.dataController_.getLastKey(), baseDate;
   var newKey = NaN, newDate;
+  type = anychart.enums.normalizeStockRangeType(typeOrUnitOrStart, null);
 
-  if (type = anychart.enums.normalizeStockRangeType(typeOrUnitOrStart, null)) {
+  if (type == anychart.enums.StockRangeType.POINTS) {
+    count = Math.max(+opt_endOrCountOrDispatchEvent || 0, 10);
+    anchor = anychart.enums.normalizeStockRangeAnchor(opt_anchorOrDispatchEvent);
+    direction = -1;
+    var baseIndex;
+    if (anchor == anychart.enums.StockRangeAnchor.LAST_VISIBLE_DATE) {
+      baseIndex = this.dataController_.getMainIndexByKey(this.dataController_.getLastVisibleKey());
+    } else if (anchor == anychart.enums.StockRangeAnchor.FIRST_VISIBLE_DATE) {
+      baseIndex = this.dataController_.getMainIndexByKey(this.dataController_.getFirstVisibleKey());
+      direction = 1;
+    } else if (anchor == anychart.enums.StockRangeAnchor.FIRST_DATE) {
+      baseIndex = this.dataController_.getFirstMainIndex();
+      direction = 1;
+    } else {
+      baseIndex = this.dataController_.getLastMainIndex();
+    }
+    var newIndex = baseIndex + direction * (count - 1);
+    baseIndex -= direction / 2;
+    newIndex += direction / 2;
+    baseKey = this.dataController_.getKeyByMainIndex(baseIndex);
+    newKey = this.dataController_.getKeyByMainIndex(goog.math.clamp(newIndex, this.dataController_.getFirstMainIndex(), this.dataController_.getLastMainIndex()));
+  } else if (type && (type != anychart.enums.StockRangeType.UNIT)) {
     baseDate = new Date(baseKey);
     switch (type) {
       case anychart.enums.StockRangeType.YTD:
@@ -692,16 +726,9 @@ anychart.stockModule.Chart.prototype.selectRange = function(typeOrUnitOrStart, o
         break;
     }
   } else if (unit = anychart.enums.normalizeInterval(typeOrUnitOrStart, null)) {
-    var count = opt_endOrCountOrDispatchEvent || 1;
-    var anchor = anychart.enums.normalizeStockRangeAnchor(opt_anchorOrDispatchEvent);
-    /**
-     * Anchor determines the direction of offset.
-     * Direction determines a sign of an operation.
-     * 1 - forward (FIRST_DATE|FIRST_VISIBLE_DATE)
-     * -1 - backward (LAST_DATE|LAST_VISIBLE_DATE)
-     * @type {number}
-     */
-    var direction = -1;
+    count = opt_endOrCountOrDispatchEvent || 1;
+    anchor = anychart.enums.normalizeStockRangeAnchor(opt_anchorOrDispatchEvent);
+    direction = -1;
     if (anchor == anychart.enums.StockRangeAnchor.LAST_VISIBLE_DATE) {
       baseKey = this.dataController_.getLastVisibleKey();
     } else if (anchor == anychart.enums.StockRangeAnchor.FIRST_VISIBLE_DATE) {
@@ -941,6 +968,7 @@ anychart.stockModule.Chart.prototype.getEventMarkersIteratorParams = function(op
  * @private
  */
 anychart.stockModule.Chart.prototype.selectRangeInternal_ = function(start, end) {
+  this.suspendSignalsDispatching();
   var xScale = /** @type {!anychart.stockModule.scales.Scatter} */(this.xScale());
   var scrollerXScale = /** @type {!anychart.stockModule.scales.Scatter} */(this.scroller().xScale());
   if (this.dataController_.refreshFullRange()) {
@@ -951,6 +979,7 @@ anychart.stockModule.Chart.prototype.selectRangeInternal_ = function(start, end)
     this.dataController_.updateCurrentScaleRange(xScale);
     this.invalidateRedrawable();
   }
+  this.resumeSignalsDispatching(true);
 };
 
 
@@ -2599,8 +2628,79 @@ anychart.stockModule.Chart.prototype.refreshDragAnchor = function(anchor) {
  * @param {anychart.enums.StockRangeChangeSource=} opt_source
  */
 anychart.stockModule.Chart.prototype.dragToRatio = function(ratio, anchor, opt_source) {
+  var params = this.getDragParamsIfChanged(ratio, anchor);
+  if (params) {
+    this.selectRangeByAnchor_(params[0], params[1], anchor, opt_source);
+  }
+};
+
+
+/**
+ *
+ * @param {number} start
+ * @param {number} end
+ * @param {anychart.stockModule.Chart.DragAnchor} anchor
+ * @param {anychart.enums.StockRangeChangeSource=} opt_source
+ * @private
+ */
+anychart.stockModule.Chart.prototype.selectRangeByAnchor_ = function(start, end, anchor, opt_source) {
+  if (this.dispatchRangeChange_(
+          anychart.enums.EventType.SELECTED_RANGE_BEFORE_CHANGE,
+          opt_source || anychart.enums.StockRangeChangeSource.PLOT_DRAG,
+          start, end)) {
+    this.selectRangeInternal_(start, end);
+    anchor.firstIndex = this.getIndexByKey(anchor.firstKey);
+    anchor.lastIndex = this.getIndexByKey(anchor.lastKey);
+    anchor.minIndex = this.getIndexByKey(anchor.minKey);
+    anchor.maxIndex = this.getIndexByKey(anchor.maxKey);
+    this.dispatchRangeChange_(
+        anychart.enums.EventType.SELECTED_RANGE_CHANGE,
+        opt_source || anychart.enums.StockRangeChangeSource.PLOT_DRAG);
+  }
+};
+
+
+/**
+ * Drags the chart to passed position. If opt_source passed - dispatches with that source instead of plot drag.
+ * @param {anychart.stockModule.Chart.DragAnchor} anchor
+ * @param {number} dXRatio
+ * @param {number} dDistanceRatio
+ * @param {anychart.enums.StockRangeChangeSource=} opt_source
+ */
+anychart.stockModule.Chart.prototype.pinchZoom = function(anchor, dXRatio, dDistanceRatio, opt_source) {
   var scale = this.xScale();
-  var valueDiff, range, start, end;
+  var valueDiff, range, rangeHalf, start, end;
+  dDistanceRatio = Math.min(dDistanceRatio, 1.9);
+  if (anychart.utils.instanceOf(scale, anychart.stockModule.scales.Ordinal)) {
+    range = anchor.lastIndex - anchor.firstIndex;
+    valueDiff = dXRatio * range;
+    rangeHalf = range * (1 - dDistanceRatio) / 2;
+    start = this.getKeyByIndex(anchor.firstIndex - valueDiff - rangeHalf);
+    end = this.getKeyByIndex(anchor.lastIndex - valueDiff + rangeHalf);
+  } else {
+    range = anchor.lastKey - anchor.firstKey;
+    valueDiff = dXRatio * range;
+    rangeHalf = range * (1 - dDistanceRatio) / 2;
+    start = anchor.firstKey - valueDiff - rangeHalf;
+    end = anchor.lastKey - valueDiff + rangeHalf;
+  }
+  if (start != this.dataController_.getFirstSelectedKey() || end != this.dataController_.getLastSelectedKey())
+    this.selectRangeByAnchor_(start, end, anchor, opt_source);
+};
+
+
+/**
+ * If new drag params differ from current position - returns new start/end keys.
+ * @param {number} ratio
+ * @param {anychart.stockModule.Chart.DragAnchor} anchor
+ * @return {?Array.<number>} [start, end]
+ */
+anychart.stockModule.Chart.prototype.getDragParamsIfChanged = function(ratio, anchor) {
+  var scale = this.xScale();
+  var valueDiff,
+      range,
+      start,
+      end;
   if (anychart.utils.instanceOf(scale, anychart.stockModule.scales.Ordinal)) {
     range = anchor.lastIndex - anchor.firstIndex;
     valueDiff = ratio * range;
@@ -2612,21 +2712,14 @@ anychart.stockModule.Chart.prototype.dragToRatio = function(ratio, anchor, opt_s
     start = anchor.firstKey - valueDiff;
     end = anchor.lastKey - valueDiff;
   }
-  if ((start != this.dataController_.getFirstSelectedKey() ||
-      end != this.dataController_.getLastSelectedKey()) &&
-      this.dispatchRangeChange_(
-          anychart.enums.EventType.SELECTED_RANGE_BEFORE_CHANGE,
-          opt_source || anychart.enums.StockRangeChangeSource.PLOT_DRAG,
-          Math.min(start, end), Math.max(start, end))) {
-    this.selectRangeInternal_(start, end);
-    anchor.firstIndex = this.getIndexByKey(anchor.firstKey);
-    anchor.lastIndex = this.getIndexByKey(anchor.lastKey);
-    anchor.minIndex = this.getIndexByKey(anchor.minKey);
-    anchor.maxIndex = this.getIndexByKey(anchor.maxKey);
-    this.dispatchRangeChange_(
-        anychart.enums.EventType.SELECTED_RANGE_CHANGE,
-        opt_source || anychart.enums.StockRangeChangeSource.PLOT_DRAG);
+  if (start > end) {
+    var tmp = start;
+    start = end;
+    end = tmp;
   }
+  return (start != this.dataController_.getFirstSelectedKey() || end != this.dataController_.getLastSelectedKey()) ?
+      [start, end] :
+      null;
 };
 
 

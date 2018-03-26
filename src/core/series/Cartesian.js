@@ -80,7 +80,9 @@ anychart.core.series.Cartesian.prototype.SUPPORTED_SIGNALS = anychart.core.serie
  *   hasPointErrors: (boolean|undefined),
  *   hasPointOutliers: (boolean|undefined),
  *   xHashMap: (Object.<number>|undefined),
- *   xArray: (Array|undefined)
+ *   xArray: (Array|undefined),
+ *   minYValue: (number|undefined),
+ *   maxYValue: (number|undefined)
  * }}
  */
 anychart.core.series.Cartesian.DrawingPlan;
@@ -179,6 +181,17 @@ anychart.core.series.Cartesian.prototype.getCategoryWidth = function(opt_categor
   }
   return (ratio || (this.xScale().getZoomFactor() / this.getIterator().getRowsCount())) *
       (this.getOption('isVertical') ? this.pixelBoundsCache.height : this.pixelBoundsCache.width);
+};
+
+
+
+/**
+ * Returns values, needed to be counted on in scale min/max determining.
+ * @param {boolean=} opt_skipOutOfRangeRows
+ * @return {!Array.<number>}
+ */
+anychart.core.series.Cartesian.prototype.getScaleReferenceValues = function(opt_skipOutOfRangeRows) {
+  return [this.drawingPlan.minYValue, this.drawingPlan.maxYValue];
 };
 
 
@@ -337,7 +350,7 @@ anychart.core.series.Cartesian.prototype.data = function(opt_value, opt_csvSetti
       this.dataInternal.listenSignals(this.dataInvalidated_, this);
       // DATA is supported only in Bubble, so we invalidate only for it.
       this.invalidate(anychart.ConsistencyState.SERIES_POINTS | anychart.ConsistencyState.SERIES_DATA,
-          anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW | anychart.Signal.DATA_CHANGED);
+          anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW | anychart.Signal.DATA_CHANGED | anychart.Signal.NEED_UPDATE_LEGEND);
     }
     return this;
   }
@@ -353,7 +366,7 @@ anychart.core.series.Cartesian.prototype.data = function(opt_value, opt_csvSetti
 anychart.core.series.Cartesian.prototype.dataInvalidated_ = function(e) {
   if (e.hasSignal(anychart.Signal.DATA_CHANGED)) {
     this.invalidate(anychart.ConsistencyState.SERIES_POINTS | anychart.ConsistencyState.SERIES_DATA,
-        anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW | anychart.Signal.DATA_CHANGED);
+        anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW | anychart.Signal.DATA_CHANGED | anychart.Signal.NEED_UPDATE_LEGEND);
   }
 };
 
@@ -742,7 +755,13 @@ anychart.core.series.Cartesian.prototype.getDrawingData = function(data, dataPus
             dataSource.checkFieldExist('selected') ||
             dataSource.checkFieldExist('label') ||
             dataSource.checkFieldExist('hoverLabel') ||
-            dataSource.checkFieldExist('selectLabel')
+            dataSource.checkFieldExist('selectLabel') ||
+            dataSource.checkFieldExist('minLabel') ||
+            dataSource.checkFieldExist('hoverMinLabel') ||
+            dataSource.checkFieldExist('selectMinLabel') ||
+            dataSource.checkFieldExist('maxLabel') ||
+            dataSource.checkFieldExist('hoverMaxLabel') ||
+            dataSource.checkFieldExist('selectMaxLabel')
         ),
     hasPointMarkers: this.supportsMarkers() &&
         (

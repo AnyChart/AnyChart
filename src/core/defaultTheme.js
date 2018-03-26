@@ -2,6 +2,7 @@ goog.provide('anychart.core.defaultTheme');
 goog.require('anychart.color');
 goog.require('anychart.format');
 goog.require('anychart.math');
+goog.require('anychart.utils');
 
 
 //region --- Aux
@@ -705,6 +706,8 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
       'maximumGap': 0.1,
       'softMinimum': null,
       'softMaximum': null,
+      'alignMinimum': true,
+      'alignMaximum': true,
       'ticks': {
         'mode': 'linear',
         'base': 0,
@@ -744,6 +747,10 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     },
     'dateTime': {
       'type': 'date-time',
+      'alignMinimum': false,
+      'alignMaximum': false,
+      'minimumGap': 0,
+      'maximumGap': 0,
       'ticks': {
         'count': 4
       },
@@ -1192,6 +1199,33 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'zIndex': 50
   },
 
+  'defaultButtonSettings': {
+    'padding': [3, 5],
+    'normal': {
+      'background': {
+        'enabled': true,
+        'stroke': '#dedede',
+        'fill': '#e7e7e7',
+        'corners': [0]
+      },
+      'text': 'Button',
+      'disablePointerEvents': true,
+      'selectable': false
+    },
+    'hovered': {
+      'background': {
+        'stroke': '#cecece',
+        'fill': '#eee'
+      }
+    },
+    'pushed': {
+      'background': {
+        'stroke': '#d0d0d0',
+        'fill': '#d9d9d9'
+      }
+    }
+  },
+
   'defaultNoDataLabel': {
     'padding': {},
     'disablePointerEvents': false,
@@ -1318,6 +1352,9 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
             'anchor': 'auto',
             'position': 'value'
           },
+          'minLabels': {'enabled': null},
+          'maxLabels': {'enabled': null},
+          'outlierMarkers': {'enabled': null},
           'markers': {
             'enabled': false,
             'disablePointerEvents': false,
@@ -1333,6 +1370,9 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
           'highStroke': anychart.core.defaultTheme.returnLightenStrokeSourceColor,
           'hatchFill': null,
           'labels': {'enabled': null},
+          'minLabels': {'enabled': null},
+          'maxLabels': {'enabled': null},
+          'outlierMarkers': {'enabled': null},
           'markers': {
             'enabled': null,
             'size': 6
@@ -1345,6 +1385,9 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
           'highStroke': anychart.core.defaultTheme.defaultSelectColor,
           'hatchFill': null,
           'labels': {'enabled': null},
+          'minLabels': {'enabled': null},
+          'maxLabels': {'enabled': null},
+          'outlierMarkers': {'enabled': null},
           'markers': {
             'enabled': null,
             'fill': anychart.core.defaultTheme.defaultSelectColor,
@@ -1612,13 +1655,19 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
       'mode': 'chart-elements'
     },
     'normal': {
-      'labels': {'enabled': false}
+      'labels': {'enabled': false},
+      'minLabels': {'enabled': null},
+      'maxLabels': {'enabled': null}
     },
     'hovered': {
-      'labels': {'enabled': null}
+      'labels': {'enabled': null},
+      'minLabels': {'enabled': null},
+      'maxLabels': {'enabled': null}
     },
     'selected': {
-      'labels': {'enabled': null}
+      'labels': {'enabled': null},
+      'minLabels': {'enabled': null},
+      'maxLabels': {'enabled': null}
     },
     'crossing': {
       'stroke': 'none'
@@ -1676,21 +1725,8 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'defaultSeriesSettings': {
       'base': {
         'normal': {
-          'outlierMarkers': {
-            'enabled': null
-          },
           'labels': {
             'format': anychart.core.defaultTheme.VALUE_TOKEN_DECIMALS_COUNT_2
-          }
-        },
-        'hovered': {
-          'outlierMarkers': {
-            'enabled': null
-          }
-        },
-        'selected': {
-          'outlierMarkers': {
-            'enabled': null
           }
         }
       },
@@ -1810,7 +1846,48 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
         'padding': {'top': 5, 'right': 0, 'bottom': 0, 'left': 0}
       },
       'labels': {
-        'format': anychart.core.defaultTheme.VALUE_TOKEN_DECIMALS_COUNT_10
+        /**
+         * @this {*}
+         * @return {string}
+         */
+        'format': function() {
+          var scale = this['scale'];
+          var value = this['tickValue'];
+          switch (scale.getType()) {
+            case 'ordinal':
+              return this['value'];
+            case 'date-time':
+              var unit = this['intervalUnit'];
+              return anychart.format.dateTime(value,
+                  anychart.format.getDateTimeFormat(
+                      anychart.format.getIntervalIdentifier(
+                          unit, unit, 'charts')));
+            default:
+              return anychart.format.number(this['value']);
+          }
+        }
+      },
+      'minorLabels': {
+        /**
+         * @this {*}
+         * @return {string}
+         */
+        'format': function() {
+          var scale = this['scale'];
+          var value = this['tickValue'];
+          switch (scale.getType()) {
+            case 'ordinal':
+              return this['value'];
+            case 'date-time':
+              var unit = this['minorIntervalUnit'];
+              return anychart.format.dateTime(value,
+                  anychart.format.getDateTimeFormat(
+                      anychart.format.getIntervalIdentifier(
+                          unit, anychart.utils.getParentInterval(unit), 'charts')));
+            default:
+              return anychart.format.number(this['value']);
+          }
+        }
       },
       'scale': 0
     },
@@ -1860,7 +1937,9 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
       'displayMode': 'float',
       'xStroke': anychart.core.defaultTheme.colorStrokeExtraBright,
       'yStroke': anychart.core.defaultTheme.colorStrokeExtraBright,
-      'zIndex': 41
+      'zIndex': 41,
+      'xLabels': [{'enabled': null}],
+      'yLabels': [{'enabled': null}]
     },
     'xZoom': {
       'continuous': true,
@@ -1980,323 +2059,6 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'endRatio': '1',
     'buttonsVisible': false,
     'cornersRadius': 5
-  },
-
-  'defaultDataGrid': {
-    'isStandalone': true,
-    'headerHeight': 25,
-
-    'backgroundFill': 'none',
-    'columnStroke': anychart.core.defaultTheme.ganttDefaultStroke,
-
-    'rowHoverFill': anychart.core.defaultTheme.returnSourceColor,
-    'rowSelectedFill': anychart.core.defaultTheme.returnSourceColor,
-
-    'rowStroke': anychart.core.defaultTheme.ganttDefaultStroke,
-    'rowOddFill': '#fff',
-    'rowEvenFill': '#fff',
-    'rowFill': '#fff',
-
-    'zIndex': 5,
-    'editing': false,
-    'editStructurePreviewFill': {
-      'color': '#4285F4',
-      'opacity': 0.2
-    },
-    'editStructurePreviewStroke': {
-      'color': '#4285F4',
-      'thickness': 2
-    },
-    'editStructurePreviewDashStroke': {
-      'color': '#4285F4',
-      'dash': '4 4'
-    },
-    'headerFill': '#f7f7f7',
-    'tooltip': {
-      'padding': 5,
-      'title': {
-        'enabled': true,
-        'fontSize': '14px',
-        'fontWeight': 'normal',
-        'fontColor': '#e5e5e5'
-      },
-      'separator': {
-        'enabled': true
-      },
-      /**
-       * @this {*}
-       * @return {string}
-       */
-      'format': function() {
-        var name = this['name'];
-        return (name !== void 0) ? name + '' : '';
-      }
-    },
-    'defaultColumnSettings': {
-      'width': 90,
-      'buttonCursor': 'pointer',
-      'cellTextSettings': {
-        'enabled': true,
-        'wordBreak': 'break-all',
-        'anchor': 'left-top',
-        'vAlign': 'middle',
-        'padding': {
-          'top': 0,
-          'right': 5,
-          'bottom': 0,
-          'left': 5
-        },
-        'background': null,
-        'fontSize': 11,
-        'disablePointerEvents': true
-      },
-      'depthPaddingMultiplier': 0,
-      'collapseExpandButtons': false,
-      'title': {
-        'enabled': true,
-        'margin': 0,
-        'vAlign': 'middle',
-        'background': {
-          'enabled': false
-        }
-      },
-      /**
-       * @this {*}
-       * @return {string}
-       */
-      'format': function() {
-        return '';
-      }
-    },
-    'columns': [
-      {
-        'width': 50,
-        /**
-         * @this {*}
-         * @return {string}
-         */
-        'format': function() {
-          var val = this['item']['meta']('index');
-          return (val != null) ? (val + 1) + '' : '';
-        },
-        'title': {
-          'text': '#'
-        }
-      },
-      {
-        'width': 170,
-        'collapseExpandButtons': true,
-        'depthPaddingMultiplier': 15,
-        /**
-         * @this {*}
-         * @return {string}
-         */
-        'format': function() {
-          var val = this['name'];
-          return (val != null) ? (val + '') : '';
-        },
-        'title': {
-          'text': 'Name'
-        }
-      }
-    ]
-  },
-
-  'defaultTimeline': {
-    'isStandalone': true,
-
-    'columnStroke': anychart.core.defaultTheme.ganttDefaultStroke,
-    'backgroundFill': 'none',
-
-    'rowHoverFill': anychart.core.defaultTheme.returnSourceColor,
-    'rowSelectedFill': anychart.core.defaultTheme.returnSourceColor,
-    'selectedElementFill': anychart.core.defaultTheme.returnSourceColor,
-    'selectedElementStroke': anychart.core.defaultTheme.returnSourceColor,
-
-    'rowStroke': anychart.core.defaultTheme.ganttDefaultStroke,
-    'rowOddFill': '#fff',
-    'rowEvenFill': '#fff',
-    'rowFill': '#fff',
-
-    'zIndex': 5,
-    'headerHeight': 70,
-    'editing': false,
-
-    'connectorPreviewStroke': {
-      'color': '#545f69',
-      'dash': '3 3'
-    },
-
-    'editPreviewFill': {
-      'color': '#fff',
-      'opacity': 0.00001
-    },
-
-    'editPreviewStroke': {
-      'color': '#aaa',
-      'dash': '3 3'
-    },
-
-    'editProgressFill': '#EAEAEA',
-    'editProgressStroke': '#545f69',
-    'editIntervalThumbFill': '#EAEAEA',
-    'editIntervalThumbStroke': '#545f69',
-    'editConnectorThumbFill': '#EAEAEA',
-    'editConnectorThumbStroke': '#545f69',
-
-    'editStructurePreviewFill': {
-      'color': '#4285F4',
-      'opacity': 0.2
-    },
-
-    'editStructurePreviewStroke': {
-      'color': '#4285F4',
-      'thickness': 2
-    },
-
-    'editStructurePreviewDashStroke': {
-      'color': '#4285F4',
-      'dash': '4 4'
-    },
-
-    'editStartConnectorMarkerType': 'circle',
-    'editStartConnectorMarkerSize': 10,
-    'editStartConnectorMarkerHorizontalOffset': 0,
-    'editStartConnectorMarkerVerticalOffset': 0,
-    'editFinishConnectorMarkerType': 'circle',
-    'editFinishConnectorMarkerSize': 10,
-    'editFinishConnectorMarkerHorizontalOffset': 0,
-    'editFinishConnectorMarkerVerticalOffset': 0,
-    'editIntervalWidth': 3,
-
-    'baseFill': anychart.core.defaultTheme.returnSourceColor,
-    'baseStroke': anychart.core.defaultTheme.returnSourceColor,
-
-    'baseBarAnchor': 'auto',
-    'baseBarPosition': 'left-center',
-    'baseBarOffset': 0,
-    'baseBarHeight': '70%',
-    'progressBarHeight': '100%',
-    'progressBarPosition': 'left-center',
-    'progressBarAnchor': 'left-center',
-    //all another settings should be set to 'null' for serialization demerging purposes
-
-    'connectorFill': '#545f69',
-    'connectorStroke': '#545f69',
-    'baselineAbove': false,
-    'tooltip': {
-      'padding': 5,
-      'title': {
-        'enabled': true,
-        'fontSize': '14px',
-        'fontWeight': 'normal',
-        'fontColor': '#e5e5e5'
-      },
-      'separator': {
-        'enabled': true
-      },
-      'zIndex': 100
-    },
-    'labels': {
-      'enabled': true,
-      'anchor': 'left-center',
-      'position': 'right-center',
-      'padding': {
-        'top': 3,
-        'right': 5,
-        'bottom': 3,
-        'left': 5
-      },
-      'vAlign': 'middle',
-      'background': null,
-      'fontSize': 11,
-      'zIndex': 40,
-      'disablePointerEvents': true
-    },
-    'markers': {
-      'anchor': 'center-top',
-      'zIndex': 50,
-      'type': 'star5',
-      'fill': '#ff0',
-      'stroke': '2 red'
-    },
-    'defaultLineMarkerSettings': {
-      'layout': 'vertical',
-      'zIndex': 1.5
-    },
-    'defaultRangeMarkerSettings': {
-      'layout': 'vertical',
-      'zIndex': 1
-    },
-    'defaultTextMarkerSettings': {
-      'layout': 'vertical',
-      'zIndex': 2
-    },
-    'header': {
-      'backgroundFill': '#cecece',
-      'levelsSeparationStroke': anychart.core.defaultTheme.ganttDefaultStroke,
-
-      'topLevel': {
-        'tileFill': '#f7f7f7',
-        'tilesSeparationStroke': anychart.core.defaultTheme.ganttDefaultStroke,
-        'labels': {
-          'enabled': true,
-          'anchor': 'left-top',
-          'fontSize': 10,
-          'vAlign': 'middle',
-          'format': anychart.core.defaultTheme.returnValueAsIs,
-          'padding': {
-            'top': 0,
-            'right': 5,
-            'bottom': 0,
-            'left': 5
-          },
-          'background': null,
-          'disablePointerEvents': true
-        }
-      },
-
-      'midLevel': {
-        'tileFill': '#f7f7f7',
-        'tilesSeparationStroke': anychart.core.defaultTheme.ganttDefaultStroke,
-        'labels': {
-          'enabled': true,
-          'anchor': 'left-top',
-          'fontSize': 10,
-          'vAlign': 'middle',
-          'format': anychart.core.defaultTheme.returnValueAsIs,
-          'padding': {
-            'top': 0,
-            'right': 5,
-            'bottom': 0,
-            'left': 5
-          },
-          'background': null,
-          'disablePointerEvents': true
-        }
-      },
-
-      'lowLevel': {
-        'tileFill': '#f7f7f7',
-        'tilesSeparationStroke': anychart.core.defaultTheme.ganttDefaultStroke,
-        'labels': {
-          'enabled': true,
-          'anchor': 'left-top',
-          'fontSize': 10,
-          'vAlign': 'middle',
-          'format': anychart.core.defaultTheme.returnValueAsIs,
-          'padding': {
-            'top': 0,
-            'right': 5,
-            'bottom': 0,
-            'left': 5
-          },
-          'background': null,
-          'disablePointerEvents': true
-        }
-      }
-
-    }
   },
 
   // standalone components

@@ -27,6 +27,66 @@ goog.require('goog.object');
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
+ * Settings in format [obj, mode, obj, mode,...]
+ * Description 0 - plain object with settings, 1 -
+ * @param {Array} settingsArray
+ * @param {string=} opt_callProp
+ * @return {Array}
+ */
+anychart.utils.extractSettings = function(settingsArray, opt_callProp) {
+  var result = [];
+  for (var i = 0; i < settingsArray.length; i += 2) {
+    var obj = settingsArray[i];
+    var res = undefined;
+    var mode = settingsArray[i + 1];
+    if (mode == anychart.utils.ExtractSettingModes.PLAIN_VALUE) {
+      res = obj;
+    } else if (obj) {
+      switch (mode) {
+        case anychart.utils.ExtractSettingModes.OWN_SETTINGS:
+          obj = obj.ownSettings;
+          break;
+        case anychart.utils.ExtractSettingModes.THEME_SETTINGS:
+          obj = obj.themeSettings;
+          break;
+        case anychart.utils.ExtractSettingModes.AUTO_SETTINGS:
+          obj = obj.autoSettings;
+          break;
+      }
+      if (opt_callProp) {
+        if (mode == anychart.utils.ExtractSettingModes.I_ROW_INFO) {
+          res = obj.get(opt_callProp);
+        } else {
+          res = obj[opt_callProp];
+          if (mode == anychart.utils.ExtractSettingModes.CALL_METHOD)
+            res = res ? res.call(obj) : undefined;
+        }
+      } else {
+        res = obj;
+      }
+    }
+    result.push(res);
+  }
+  return result;
+};
+
+
+/**
+ * Extracting settings modes.
+ * @enum {number}
+ */
+anychart.utils.ExtractSettingModes = {
+  PLAIN_OBJECT: 0,
+  OWN_SETTINGS: 1,
+  THEME_SETTINGS: 2,
+  AUTO_SETTINGS: 3,
+  CALL_METHOD: 4,
+  I_ROW_INFO: 5,
+  PLAIN_VALUE: 6
+};
+
+
+/**
  * Gets or sets obj property, takes in account fields addresses.
  * Fields are first looked using mapping order, then - field order (e.g. mapping is empty).
  * If field can not be found - field is written.
@@ -847,6 +907,51 @@ anychart.utils.getFirstDefinedValue = function(var_args) {
 
 
 /**
+ * Returns first not-null argument.
+ * @param {...*} var_args .
+ * @return {*}
+ */
+anychart.utils.getFirstNotNullValue = function(var_args) {
+  for (var i = 0, len = arguments.length; i < len; i++) {
+    var a = arguments[i];
+    if (goog.isDefAndNotNull(a)) return a;
+  }
+};
+
+
+/**
+ * Returns first defined argument, recurse in arrays.
+ * @param {...*} var_args .
+ * @return {*}
+ */
+anychart.utils.getFirstDefinedValueRecursive = function(var_args) {
+  for (var i = 0, len = arguments.length; i < len; i++) {
+    var a = arguments[i];
+    if (goog.isArray(a))
+      a = anychart.utils.getFirstDefinedValueRecursive.apply(null, a);
+    if (goog.isDefAndNotNull(a))
+      return a;
+  }
+};
+
+
+/**
+ * Returns first not-null argument, recurse in arrays.
+ * @param {...*} var_args .
+ * @return {*}
+ */
+anychart.utils.getFirstNotNullValueRecursive = function(var_args) {
+  for (var i = 0, len = arguments.length; i < len; i++) {
+    var a = arguments[i];
+    if (goog.isArray(a))
+      a = anychart.utils.getFirstDefinedValueRecursive.apply(null, a);
+    if (goog.isDefAndNotNull(a))
+      return a;
+  }
+};
+
+
+/**
  * Does a recursive clone of an object.
  *
  * @param {*} obj Object to clone.
@@ -872,6 +977,30 @@ anychart.utils.recursiveClone = function(obj) {
   }
 
   return res;
+};
+
+
+/**
+ * Create and fills an array or object with value.
+ * @param {Object|number} fieldsOrLength
+ * @param {*} value
+ * @param {boolean=} opt_forceObject
+ * @return {!(Object|Array)}
+ */
+anychart.utils.getFilled = function(fieldsOrLength, value, opt_forceObject) {
+  var i, target;
+  if (goog.isNumber(fieldsOrLength)) {
+    target = opt_forceObject ? {} : [];
+    for (i = 0; i < fieldsOrLength; i++) {
+      target[i] = value;
+    }
+  } else {
+    target = {};
+    for (i in fieldsOrLength) {
+      target[i] = value;
+    }
+  }
+  return target;
 };
 
 
@@ -1244,7 +1373,7 @@ anychart.utils.json2xml = function(json, opt_rootNodeName, opt_returnAsXmlNode) 
   var root = anychart.utils.json2xml_(json, opt_rootNodeName || 'anychart', result);
   if (root) {
     if (!opt_rootNodeName)
-      root.setAttribute('xmlns', 'http://anychart.com/schemas/8.1.0/xml-schema.xsd');
+      root.setAttribute('xmlns', 'http://anychart.com/schemas/8.2.0/xml-schema.xsd');
     result.appendChild(root);
   }
   return opt_returnAsXmlNode ? result : goog.dom.xml.serialize(result);
@@ -1256,7 +1385,7 @@ anychart.utils.json2xml = function(json, opt_rootNodeName, opt_returnAsXmlNode) 
  * @type {RegExp}
  * @private
  */
-anychart.utils.ACCEPTED_BY_ATTRIBUTE_ = /^[^<&"\n\r]*$/;
+anychart.utils.ACCEPTED_BY_ATTRIBUTE_ = /^[^<&"\n\r–]*$/;
 
 
 /**
@@ -1442,6 +1571,12 @@ anychart.utils.getNodeNames_ = function(arrayPropName) {
       return ['weights', 'weight'];
     case 'angles':
       return ['angles', 'angle'];
+    case 'levels':
+      return ['levels', 'level'];
+    case 'xLabels':
+      return ['x_labels', 'item'];
+    case 'yLabels':
+      return ['y_labels', 'item'];
   }
   return null;
 };
@@ -1539,6 +1674,12 @@ anychart.utils.getArrayPropName_ = function(nodeName) {
       return ['weights', 'weight'];
     case 'angles':
       return ['angles', 'angle'];
+    case 'levels':
+      return ['levels', 'level'];
+    case 'xLabels':
+      return ['xLabels', 'item'];
+    case 'yLabels':
+      return ['yLabels', 'item'];
   }
   return null;
 };
@@ -1770,6 +1911,23 @@ anychart.utils.INTERVAL_ESTIMATIONS = [
   {unit: anychart.enums.Interval.SECOND, range: 1000, basic: true},
   {unit: anychart.enums.Interval.MILLISECOND, range: 1, basic: true}
 ];
+
+
+/**
+ *
+ * @param {anychart.enums.Interval} unit
+ * @param {number=} opt_count defaults to 1.
+ * @return {anychart.enums.Interval}
+ */
+anychart.utils.getParentInterval = function(unit, opt_count) {
+  opt_count = opt_count || 1;
+  var i = 0;
+  for (; i < anychart.utils.INTERVAL_ESTIMATIONS.length; i++) {
+    if (anychart.utils.INTERVAL_ESTIMATIONS[i].unit == unit)
+      break;
+  }
+  return anychart.utils.INTERVAL_ESTIMATIONS[goog.math.clamp(i - opt_count, 0, anychart.utils.INTERVAL_ESTIMATIONS.length)].unit;
+};
 
 
 /**

@@ -15,23 +15,7 @@ anychart.core.VisualBaseWithBounds = function() {
 };
 goog.inherits(anychart.core.VisualBaseWithBounds, anychart.core.VisualBase);
 
-
-/**
- * Stores user settings for element bounds.
- * @type {anychart.core.utils.Bounds}
- * @private
- */
-anychart.core.VisualBaseWithBounds.prototype.bounds_;
-
-
-/**
- * Stores normalized bounds.
- * @type {anychart.math.Rect}
- * @private
- */
-anychart.core.VisualBaseWithBounds.prototype.pixelBounds_;
-
-
+//region --- States/Signals
 /**
  * Supported consistency states. Adds BOUNDS and PIXEL_BOUNDS to Base states.
  * @type {number}
@@ -47,12 +31,25 @@ anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES;
 
 
+//endregion
+//region --- Utility
 /** @inheritDoc */
 anychart.core.VisualBaseWithBounds.prototype.dependsOnContainerSize = function() {
   return this.bounds().dependsOnContainerSize();
 };
 
 
+/**
+ * Returns pixel bounds of the element due to parent bounds and self bounds settings.
+ * @return {!anychart.math.Rect} .
+ */
+anychart.core.VisualBaseWithBounds.prototype.getPixelBounds = function() {
+  return this.bounds().toRect(/** @type {anychart.math.Rect} */(this.parentBounds()));
+};
+
+
+//endregion
+//region --- Measures
 /**
  * Getter/setter for bounds.
  * @param {(number|string|null|Array.<number|string>|anychart.utils.RectObj|anychart.math.Rect|anychart.core.utils.Bounds)=} opt_boundsOrX .
@@ -64,7 +61,6 @@ anychart.core.VisualBaseWithBounds.prototype.dependsOnContainerSize = function()
 anychart.core.VisualBaseWithBounds.prototype.bounds = function(opt_boundsOrX, opt_y, opt_width, opt_height) {
   if (!this.bounds_) {
     this.bounds_ = new anychart.core.utils.Bounds();
-    this.registerDisposable(this.bounds_);
     this.bounds_.listenSignals(this.boundsInvalidated_, this);
   }
   if (goog.isDef(opt_boundsOrX)) {
@@ -72,6 +68,18 @@ anychart.core.VisualBaseWithBounds.prototype.bounds = function(opt_boundsOrX, op
     return this;
   }
   return this.bounds_;
+};
+
+
+/**
+ * Listener for the bounds invalidation.
+ * @param {anychart.SignalEvent} event Invalidation event.
+ * @private
+ */
+anychart.core.VisualBaseWithBounds.prototype.boundsInvalidated_ = function(event) {
+  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION))
+    this.invalidate(anychart.ConsistencyState.BOUNDS,
+        anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 };
 
 
@@ -211,37 +219,18 @@ anychart.core.VisualBaseWithBounds.prototype.maxHeight = function(opt_value) {
 };
 
 
-/**
- * Returns pixel bounds of the element due to parent bounds and self bounds settings.
- * @return {!anychart.math.Rect} .
- */
-anychart.core.VisualBaseWithBounds.prototype.getPixelBounds = function() {
-  return this.bounds().toRect(/** @type {anychart.math.Rect} */(this.parentBounds()));
-};
-
-
-/**
- * Listener for the bounds invalidation.
- * @param {anychart.SignalEvent} event Invalidation event.
- * @private
- */
-anychart.core.VisualBaseWithBounds.prototype.boundsInvalidated_ = function(event) {
-  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION))
-    this.invalidate(anychart.ConsistencyState.BOUNDS,
-        anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-};
-
-
+//endregion
+//region --- Disposing
 /** @inheritDoc */
 anychart.core.VisualBaseWithBounds.prototype.disposeInternal = function() {
   goog.dispose(this.bounds_);
   this.bounds_ = null;
-  this.pixelBounds_ = null;
 
   anychart.core.VisualBaseWithBounds.base(this, 'disposeInternal');
 };
 
 
+//endregion
 //exports
 (function() {
   var proto = anychart.core.VisualBaseWithBounds.prototype;
