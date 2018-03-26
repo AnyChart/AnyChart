@@ -1,1 +1,1 @@
-if(!_.theme_pareto){_.theme_pareto=1;(function($){$.sa($.ea.anychart.themes.defaultTheme,{pareto:{defaultSeriesType:"column",tooltip:{displayMode:"union"},interactivity:{hoverMode:"by-x"},yAxes:[{orientation:"left"},{orientation:"right",labels:{format:"{%Value}%"}}]}});}).call(this,$)}
+if(!_.theme_pareto){_.theme_pareto=1;(function($){$.ta($.ea.anychart.themes.defaultTheme,{pareto:{defaultSeriesType:"column",tooltip:{displayMode:"union"},interactivity:{hoverMode:"by-x"},yAxes:[{orientation:"left"},{orientation:"right",labels:{format:"{%Value}%"}}]}});}).call(this,$)}

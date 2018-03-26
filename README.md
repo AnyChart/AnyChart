@@ -35,11 +35,11 @@ All binaries are located in [dist](https://github.com/AnyChart/AnyChart/tree/mas
 
 #### CDN
 
-If you don't want to download and host AnyChart yourself, you can include it from the AnyChart CDN (Content Delivery Network): [https://cdn.anychart.com/](https://cdn.anychart.com/) 
+If you don't want to download and host AnyChart yourself, you can include it from the AnyChart CDN (Content Delivery Network): [https://www.anychart.com/download/cdn](https://www.anychart.com/download/cdn) 
 
 ```html
 <head>
-<script src="https://cdn.anychart.com/js/latest/anychart-bundle.min.js"></script>
+<script src="https://cdn.anychart.com/releases/v8/js/anychart-base.min.js"></script>
 </head>
 ```
 
@@ -59,7 +59,7 @@ The fastest way to start with AnyChart is to include framework into a webpage an
 <!doctype html>
 <body>
 <div id="container" style="width: 500px; height: 400px;"></div>
-<script src="https://cdn.anychart.com/js/latest/anychart-bundle.min.js" type="text/javascript"></script>
+<script src="https://cdn.anychart.com/releases/v8/js/anychart-base.min.js" type="text/javascript"></script>
 <script>
     anychart.onDocumentReady(function() {
         // create a pie chart
@@ -83,10 +83,10 @@ The fastest way to start with AnyChart is to include framework into a webpage an
 
 #### Step by step quick start guides
 
-* [AnyChart Quick Start](http://docs.anychart.com/latest/Quick_Start/Quick_Start)
-* [AnyStock Quick Start](http://docs.anychart.com/latest/Stock_Charts/Quick_Start)
-* [AnyMap Quick Start](http://docs.anychart.com/latest/Maps/Quick_Start)
-* [AnyGantt Quick Start](http://docs.anychart.com/latest/Gantt_Chart/Quick_Start)
+* [AnyChart Quick Start](http://docs.anychart.com/Quick_Start/Quick_Start)
+* [AnyStock Quick Start](http://docs.anychart.com/Stock_Charts/Quick_Start)
+* [AnyMap Quick Start](http://docs.anychart.com/Maps/Quick_Start)
+* [AnyGantt Quick Start](http://docs.anychart.com/Gantt_Chart/Quick_Start)
 
 ## Plugins
 
@@ -288,7 +288,7 @@ The `dist` folder contains binaries and JSON/XML Schemas.
 * [AnyChart Documentation](https://docs.anychart.com)
 * [AnyChart API Reference](https://api.anychart.com)
 * [AnyChart Sample Solutions](https://www.anychart.com/solutions/)
-* [AnyChart Integrations](https://www.anychart.com/integrations/)
+* [AnyChart Integrations](https://www.anychart.com/technical-integrations/samples/)
 
 ## License
 
