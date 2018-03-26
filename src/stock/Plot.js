@@ -1245,6 +1245,18 @@ anychart.stockModule.Plot.prototype.getAxisByIndex = function(index) {
 };
 
 
+/** @inheritDoc */
+anychart.stockModule.Plot.prototype.getXAxisByIndex = function(index) {
+  return this.xAxis_;
+};
+
+
+/** @inheritDoc */
+anychart.stockModule.Plot.prototype.getYAxisByIndex = function(index) {
+  return this.yAxes_[index];
+};
+
+
 /**
  * Return z-index for grid.
  * @param {boolean} isMajor .
@@ -1592,7 +1604,6 @@ anychart.stockModule.Plot.prototype.draw = function() {
     crosshair.parentBounds(this.getPlotBounds());
     crosshair.container(this.rootLayer_);
     crosshair.xAxis(this.xAxis_);
-    crosshair.yAxis(this.yAxes_[/** @type {number} */(this.crosshair_.yLabel().axisIndex())]);
     crosshair.draw();
     crosshair.resumeSignalsDispatching(false);
 
@@ -2205,6 +2216,7 @@ anychart.stockModule.Plot.prototype.isLastPlot = function(opt_value) {
 anychart.stockModule.Plot.prototype.crosshair = function(opt_value) {
   if (!this.crosshair_) {
     this.crosshair_ = new anychart.core.ui.Crosshair();
+    this.crosshair_.setInteractivityTarget(this);
     this.registerDisposable(this.crosshair_);
     this.crosshair_.listenSignals(this.onCrosshairSignal_, this);
     this.invalidate(anychart.ConsistencyState.AXES_CHART_CROSSHAIR, anychart.Signal.NEEDS_REDRAW);

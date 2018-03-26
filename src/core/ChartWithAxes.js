@@ -658,6 +658,18 @@ anychart.core.ChartWithAxes.prototype.getAxisByIndex = function(index) {
 };
 
 
+/** @inheritDoc */
+anychart.core.ChartWithAxes.prototype.getXAxisByIndex = function(index) {
+  return this.xAxes_[index];
+};
+
+
+/** @inheritDoc */
+anychart.core.ChartWithAxes.prototype.getYAxisByIndex = function(index) {
+  return this.yAxes_[index];
+};
+
+
 /**
  * @param {anychart.core.Axis} axis
  * @protected
@@ -1327,8 +1339,6 @@ anychart.core.ChartWithAxes.prototype.drawContent = function(bounds) {
     crosshair.suspendSignalsDispatching();
     crosshair.parentBounds(this.dataBounds);
     crosshair.container(this.rootElement);
-    crosshair.xAxis(this.xAxes_[/** @type {number} */(this.crosshair_.xLabel().axisIndex())]);
-    crosshair.yAxis(this.yAxes_[/** @type {number} */(this.crosshair_.yLabel().axisIndex())]);
     crosshair.draw();
     crosshair.resumeSignalsDispatching(false);
 

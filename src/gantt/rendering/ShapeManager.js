@@ -11,7 +11,7 @@ goog.require('goog.Disposable');
 /**
  * Gantt timeline shape manager.
  * @param {anychart.ganttModule.TimeLine} timeline - Related timeline.
- * @param {anychart.ganttModule.elements.Base} visualElement - Visual element.
+ * @param {anychart.ganttModule.elements.TimelineElement} visualElement - Visual element.
  * @param {!Array.<anychart.ganttModule.rendering.shapes.ShapeConfig>=} opt_config - Config.
  * @constructor
  * @extends {goog.Disposable}
@@ -28,7 +28,7 @@ anychart.ganttModule.rendering.ShapeManager = function(timeline, visualElement, 
 
   /**
    * Visual element.
-   * @type {anychart.ganttModule.elements.Base}
+   * @type {anychart.ganttModule.elements.TimelineElement}
    * @private
    */
   this.visualElement_ = visualElement;
@@ -65,12 +65,8 @@ anychart.ganttModule.rendering.ShapeManager = function(timeline, visualElement, 
   this.defs = {};
 
   if (goog.isArray(opt_config)) {
-    var resolver = anychart.ganttModule.BaseGrid.getColorResolver;
-    // var config = opt_config || [anychart.ganttModule.rendering.shapes.barConfig];
     for (var i = 0; i < opt_config.length; i++) {
       var shapeConfig = opt_config[i];
-      var fill = resolver(shapeConfig['fillName'], anychart.enums.ColorType.FILL, false);
-      var stroke = resolver(shapeConfig['strokeName'], anychart.enums.ColorType.FILL, false);
 
       var type = shapeConfig['shapeType'];
       var val = String(type).toLowerCase();
@@ -100,8 +96,6 @@ anychart.ganttModule.rendering.ShapeManager = function(timeline, visualElement, 
       }
 
       this.defs[shapeConfig['name']] = {
-        fill: fill,
-        stroke: stroke,
         zIndex: +shapeConfig['zIndex'],
         cls: cls,
         shapeType: type,
@@ -124,8 +118,6 @@ goog.inherits(anychart.ganttModule.rendering.ShapeManager, goog.Disposable);
 //region -- Type definitions.
 /**
  * @typedef {{
- *   fill: function(anychart.ganttModule.BaseGrid, number, (anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)=, (anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)=, anychart.enums.ConnectorType=, number=, number=):acgraph.vector.AnyColor,
- *   stroke: function(anychart.ganttModule.BaseGrid, number, (anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)=, (anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)=, anychart.enums.ConnectorType=, number=, number=):acgraph.vector.AnyColor,
  *   zIndex: number,
  *   cls: function():acgraph.vector.Shape,
  *   shapeType: string,
@@ -159,11 +151,11 @@ anychart.ganttModule.rendering.ShapeManager.prototype.setContainer = function(va
  * @param {string} name
  * @param {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} item
  * @param {number} baseZIndex
+ * @param {anychart.PointState} state - State.
  * @param {number=} opt_periodIndex
- * @param {boolean=} opt_selected - Whether is selected. TODO (A.Kudryavtsev): Replace this with State in future implementation.
  * @return {acgraph.vector.Shape}
  */
-anychart.ganttModule.rendering.ShapeManager.prototype.createShape = function(name, item, baseZIndex, opt_periodIndex, opt_selected) {
+anychart.ganttModule.rendering.ShapeManager.prototype.createShape = function(name, item, baseZIndex, state, opt_periodIndex) {
   var descriptor = this.defs[name];
   var shapeType = descriptor.shapeType;
 
@@ -177,7 +169,7 @@ anychart.ganttModule.rendering.ShapeManager.prototype.createShape = function(nam
   this.shapePoolPointers[shapeType]++;
   this.usedShapes[shapeType].push(shape);
 
-  return this.configureShape(name, item, baseZIndex, shape, opt_periodIndex, opt_selected);
+  return this.configureShape(name, item, baseZIndex, shape, state, opt_periodIndex);
 };
 
 
@@ -187,16 +179,16 @@ anychart.ganttModule.rendering.ShapeManager.prototype.createShape = function(nam
  * @param {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} item
  * @param {number} baseZIndex
  * @param {acgraph.vector.Shape} shape
+ * @param {anychart.PointState} state - State.
  * @param {number=} opt_periodIndex
- * @param {boolean=} opt_selected - Whether is selected. TODO (A.Kudryavtsev): Replace this with State in future implementation.
  * @return {acgraph.vector.Shape}
  * @protected
  */
-anychart.ganttModule.rendering.ShapeManager.prototype.configureShape = function(name, item, baseZIndex, shape, opt_periodIndex, opt_selected) {
+anychart.ganttModule.rendering.ShapeManager.prototype.configureShape = function(name, item, baseZIndex, shape, state, opt_periodIndex) {
   var descriptor = this.defs[name];
 
-  var fill = this.visualElement_.getFill(item, opt_periodIndex, opt_selected);
-  var stroke = this.visualElement_.getStroke(item, opt_periodIndex, opt_selected);
+  var fill = this.visualElement_.getFill(item, state, opt_periodIndex);
+  var stroke = this.visualElement_.getStroke(item, state, opt_periodIndex);
 
   shape.fill(fill);
   shape.stroke(stroke);
@@ -235,14 +227,14 @@ anychart.ganttModule.rendering.ShapeManager.prototype.clearShapes = function() {
  * Returns an object with all defined paths for the next point.
  * @param {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} item
  * @param {anychart.ganttModule.TimeLine.Tag} tag - Tag data object. NOTE: not optional because current implementation (16 Jan 2018) depends on this data a lot.
+ * @param {anychart.PointState} state - State.
  * @param {Object.<string>=} opt_only If set - contains a subset of shape names that should be returned.
  * @param {number=} opt_baseZIndex - zIndex that is used as a base zIndex for all shapes of the group.
  * @param {acgraph.vector.Shape=} opt_shape Foreign shape.
  * @param {number=} opt_periodIndex - .
- * @param {boolean=} opt_selected - Whether is selected. TODO (A.Kudryavtsev): Replace this with State in future implementation.
  * @return {Object.<string, acgraph.vector.Shape>}
  */
-anychart.ganttModule.rendering.ShapeManager.prototype.getShapesGroup = function(item, tag, opt_only, opt_baseZIndex, opt_shape, opt_periodIndex, opt_selected) {
+anychart.ganttModule.rendering.ShapeManager.prototype.getShapesGroup = function(item, tag, state, opt_only, opt_baseZIndex, opt_shape, opt_periodIndex) {
   var res = {};
   var names = opt_only || this.defs;
   var uid = goog.getUid(item) + (goog.isDef(opt_periodIndex) ? ('_' + String(opt_periodIndex)) : '');
@@ -252,11 +244,11 @@ anychart.ganttModule.rendering.ShapeManager.prototype.getShapesGroup = function(
     var descriptor = names[name];
     if (descriptor.shapeType == anychart.enums.ShapeType.NONE && opt_shape) {
       if (anychart.utils.instanceOf(opt_shape, acgraph.vector.Shape)) {
-        res[name] = this.configureShape(name, item, opt_baseZIndex || 0, opt_shape, opt_periodIndex, opt_selected);
+        res[name] = this.configureShape(name, item, opt_baseZIndex || 0, opt_shape, state, opt_periodIndex);
         res[name].tag = tag;
       }
     } else {
-      res[name] = this.createShape(name, item, opt_baseZIndex || 0, opt_periodIndex, opt_selected);
+      res[name] = this.createShape(name, item, opt_baseZIndex || 0, state, opt_periodIndex);
       res[name].tag = tag;
     }
   }

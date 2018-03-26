@@ -187,14 +187,54 @@ anychart.ui.RangeSelector.prototype.selectionHandler_ = function(button, select)
  */
 anychart.ui.RangeSelector.prototype.ranges = function(opt_ranges) {
   if (goog.isDef(opt_ranges) && goog.isArray(opt_ranges)) {
+    // new behaviour
+    this.ranges_ = goog.array.reduce(opt_ranges, function(ranges, range) {
+      /*
+
+      {
+        type: range
+      } - do not add to ranges
+
+      {
+        start: '',
+        end: ''
+      } - add range type. add to ranges,
+
+      {
+        type: unit || points
+      } - normalize, add to ranges
+
+      {
+        type: YTD QTD MTD MAX
+      } - add to ranges
+
+       */
+      range = goog.object.clone(range);
+      var datesAreSet = goog.isDef(range['startDate']) && goog.isDef(range['endDate']);
+      if (range['type'] == anychart.enums.StockRangeType.UNIT || range['type'] == anychart.enums.StockRangeType.POINTS) {
+        // UNIT AND POINTS
+        range['count'] = range['count'] || anychart.ui.RangeSelector.DEFAULT_UNIT_COUNT;
+        range['anchor'] = anychart.enums.normalizeStockRangeAnchor(range['anchor']);
+        ranges.push(range);
+      } else if (datesAreSet) {
+        // STARTDATE ENDDATE
+        range['type'] = anychart.enums.StockRangeType.RANGE;
+        ranges.push(range);
+      } else if (range['type'] != anychart.enums.StockRangeType.RANGE) {
+        // YTD QTD MTD MAX
+        ranges.push(range);
+      }
+      return ranges;
+    }, []);
+    /*// old behaviour
     this.ranges_ = goog.array.map(opt_ranges, function(range) {
       // Set default values
-      if (range['type'] == anychart.enums.StockRangeType.UNIT || anychart.enums.StockRangeType.POINTS) {
+      if (range['type'] == anychart.enums.StockRangeType.UNIT || range['type'] == anychart.enums.StockRangeType.POINTS) {
         range['count'] = range['count'] || anychart.ui.RangeSelector.DEFAULT_UNIT_COUNT;
         range['anchor'] = anychart.enums.normalizeStockRangeAnchor(range['anchor']);
       }
       return range;
-    });
+    });*/
     this.update();
   }
   return this.ranges_;

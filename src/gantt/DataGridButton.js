@@ -38,6 +38,13 @@ goog.inherits(anychart.ganttModule.DataGridButton, anychart.core.ui.NewButton);
 
 
 /**
+ * Default button side.
+ * @type {number}
+ */
+anychart.ganttModule.DataGridButton.DEFAULT_BUTTON_SIDE = 15;
+
+
+/**
  * Gets/sets data item index.
  * @param {number=} opt_value - Value to be set.
  * @return {(anychart.ganttModule.DataGridButton|number)} - Current value or itself for method chaining.

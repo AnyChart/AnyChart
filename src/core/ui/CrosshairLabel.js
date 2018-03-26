@@ -212,11 +212,7 @@ anychart.core.ui.CrosshairLabel.prototype.serialize = function() {
 anychart.core.ui.CrosshairLabel.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.ui.CrosshairLabel.base(this, 'setupByJSON', config, opt_default);
 
-  if (opt_default) {
-    anychart.core.settings.copy(this.themeSettings, anychart.core.ui.CrosshairLabel.DESCRIPTORS, config);
-  } else {
-    anychart.core.settings.deserialize(this, anychart.core.ui.CrosshairLabel.DESCRIPTORS, config);
-  }
+  anychart.core.settings.deserialize(this, anychart.core.ui.CrosshairLabel.DESCRIPTORS, config, opt_default);
 
   this.axisIndex(config['axisIndex']);
 };

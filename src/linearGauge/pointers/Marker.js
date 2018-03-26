@@ -5,13 +5,11 @@ goog.require('anychart.linearGaugeModule.pointers.Base');
 
 /**
  * Marker pointer class.
- * @param {anychart.linearGaugeModule.Chart} gauge Gauge.
- * @param {number} dataIndex Pointer data index.
  * @extends {anychart.linearGaugeModule.pointers.Base}
  * @constructor
  */
-anychart.linearGaugeModule.pointers.Marker = function(gauge, dataIndex) {
-  anychart.linearGaugeModule.pointers.Marker.base(this, 'constructor', gauge, dataIndex);
+anychart.linearGaugeModule.pointers.Marker = function() {
+  anychart.linearGaugeModule.pointers.Marker.base(this, 'constructor');
 };
 goog.inherits(anychart.linearGaugeModule.pointers.Marker, anychart.linearGaugeModule.pointers.Base);
 

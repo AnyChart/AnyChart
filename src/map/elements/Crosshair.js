@@ -25,7 +25,8 @@ goog.inherits(anychart.mapModule.elements.Crosshair, anychart.core.ui.Crosshair)
  */
 anychart.mapModule.elements.Crosshair.prototype.show = function(event) {
   var toShowSeriesStatus = [];
-  var seriesStatus = this.interactivityTarget().getSeriesStatus(event);
+  var interactivityTarget = /** @type {anychart.mapModule.Chart} */(this.interactivityTarget());
+  var seriesStatus = interactivityTarget.getSeriesStatus(event);
   if (seriesStatus) {
     goog.array.forEach(seriesStatus, function(status) {
       if (status['series'].enabled() && !goog.array.isEmpty(status['points'])) {
@@ -42,12 +43,8 @@ anychart.mapModule.elements.Crosshair.prototype.show = function(event) {
         }
       });
 
-      var xAxis = /** @type {anychart.mapModule.elements.Axis} */(this.xAxis());
-      var yAxis = /** @type {anychart.mapModule.elements.Axis} */(this.yAxis());
       var xStroke = /** @type {acgraph.vector.Stroke} */(this.getOption('xStroke'));
       var yStroke = /** @type {acgraph.vector.Stroke} */(this.getOption('yStroke'));
-      var xLabel = /** @type {anychart.core.ui.CrosshairLabel} */(this.xLabel());
-      var yLabel = /** @type {anychart.core.ui.CrosshairLabel} */(this.yLabel());
 
       var series = nearestSeriesStatus['series'];
 
@@ -62,7 +59,7 @@ anychart.mapModule.elements.Crosshair.prototype.show = function(event) {
         y = position['y'];
       }
 
-      var scale = this.interactivityTarget().scale();
+      var scale = interactivityTarget.scale();
 
       var coords = scale.inverseTransform(x, y);
       x = coords[0];
@@ -71,29 +68,9 @@ anychart.mapModule.elements.Crosshair.prototype.show = function(event) {
       var xRatio = scale.transformX(x);
       var yRatio = scale.transformY(y);
 
-      if (xRatio > 0 && xRatio < 1) {
-        if (xStroke && xStroke != 'none') {
-          this.drawLine(xAxis, this.xLine, x);
-        }
+      this.drawLabels(this.getXLabels(), true, xRatio, xStroke, x);
+      this.drawLabels(this.getYLabels(), false, yRatio, yStroke, y);
 
-        if (xLabel.enabled()) {
-          this.drawLabel(xAxis, xLabel, x);
-        }
-      } else {
-        this.hideX();
-      }
-
-      if (yRatio > 0 && yRatio < 1) {
-        if (yStroke && yStroke != 'none') {
-          this.drawLine(yAxis, this.yLine, y);
-        }
-
-        if (yLabel.enabled()) {
-          this.drawLabel(yAxis, yLabel, y);
-        }
-      } else {
-        this.hideY();
-      }
     } else {
       this.hide();
     }
@@ -132,36 +109,12 @@ anychart.mapModule.elements.Crosshair.prototype.update = function(opt_x, opt_y) 
   var xRatio = scale.transformX(latLong['x']);
   var yRatio = scale.transformY(latLong['y']);
 
-  var xAxis = /** @type {anychart.mapModule.elements.Axis} */(this.xAxis());
-  var yAxis = /** @type {anychart.mapModule.elements.Axis} */(this.yAxis());
   var xStroke = /** @type {acgraph.vector.Stroke} */(this.getOption('xStroke'));
   var yStroke = /** @type {acgraph.vector.Stroke} */(this.getOption('yStroke'));
-  var xLabel = /** @type {anychart.core.ui.CrosshairLabel} */(this.xLabel());
-  var yLabel = /** @type {anychart.core.ui.CrosshairLabel} */(this.yLabel());
 
   if (xRatio > 0 && xRatio < 1 && yRatio > 0 && yRatio < 1) {
-    if (xAxis && this.canDrawForAxis(xAxis)) {
-      if (xStroke && xStroke != 'none') {
-        this.drawLine(xAxis, this.xLine, lon);
-      }
-      if (xLabel.enabled()) {
-        this.drawLabel(xAxis, xLabel, lon);
-      }
-    } else {
-      this.hideX();
-    }
-
-    if (yAxis && this.canDrawForAxis(yAxis)) {
-      if (yStroke && yStroke != 'none') {
-        this.drawLine(yAxis, this.yLine, lat);
-
-        if (yLabel.enabled()) {
-          this.drawLabel(yAxis, yLabel, lat);
-        }
-      }
-    } else {
-      this.hideY();
-    }
+    this.drawLabels(this.getXLabels(), true, xRatio, xStroke, lon);
+    this.drawLabels(this.getYLabels(), false, xRatio, yStroke, lat);
   } else {
     this.hide();
   }
@@ -209,17 +162,11 @@ anychart.mapModule.elements.Crosshair.prototype.draw = function() {
   if (!this.checkDrawingNeeded())
     return this;
 
-  var xLabel = /** @type {anychart.core.ui.CrosshairLabel} */(this.xLabel());
-  var yLabel = /** @type {anychart.core.ui.CrosshairLabel} */(this.yLabel());
-
   if (!this.rootLayer_) {
     this.rootLayer_ = acgraph.layer();
 
     this.xLine.parent(this.rootLayer_);
     this.yLine.parent(this.rootLayer_);
-
-    xLabel.container(this.rootLayer_);
-    yLabel.container(this.rootLayer_);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
@@ -229,9 +176,12 @@ anychart.mapModule.elements.Crosshair.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
 
+  var labels = goog.array.concat(this.getXLabels(), this.getYLabels());
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
     var container = /** @type {acgraph.vector.ILayer} */(this.container());
     this.rootLayer_.parent(container);
+
+    this.setLabelsContainer(labels, this.rootLayer_);
 
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
@@ -245,9 +195,7 @@ anychart.mapModule.elements.Crosshair.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     var bounds = /** @type {anychart.math.Rect} */(this.parentBounds());
-    xLabel.parentBounds(bounds);
-    yLabel.parentBounds(bounds);
-
+    this.setParentBounds(labels, bounds);
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 
@@ -314,6 +262,7 @@ anychart.mapModule.elements.Crosshair.prototype.drawLabel = function(axis, label
   var labelFormatProvider = this.getLabelsFormatProvider(axis, value);
   var labelFormat = label['format']() || anychart.utils.DEFAULT_FORMATTER;
   label['text'](labelFormat.call(labelFormatProvider, labelFormatProvider));
+  label.autoAnchor(this.getAnchorByAxis(axis));
 
   var positionCoords = axis.ticks().calcTick(value);
 
@@ -404,5 +353,43 @@ anychart.mapModule.elements.Crosshair.prototype.getLabelsFormatProvider = functi
       .tokenCustomValues(tokenCustomValues);
 
   return context.propagate();
+};
+
+
+/**
+ * Labels drawing.
+ * @param {Array.<anychart.core.ui.CrosshairLabel>} labels
+ * @param {boolean} isX
+ * @param {number} ratio
+ * @param {acgraph.vector.Stroke} stroke
+ * @param {number} coord
+ */
+anychart.mapModule.elements.Crosshair.prototype.drawLabels = function(labels, isX, ratio, stroke, coord) {
+  var axisProvider = /** @type {anychart.mapModule.Chart} */(this.interactivityTarget());
+  var i, label, axisIndex, axis;
+  var lineDrawed = false;
+  var getAxisByIndex = isX ? axisProvider.getXAxisByIndex : axisProvider.getYAxisByIndex;
+  var hide = isX ? this.hideX : this.hideY;
+  var line = isX ? this.xLine : this.yLine;
+  var hasStroke = stroke && stroke != 'none';
+  for (i = 0; i < labels.length; i++) {
+    label = /** @type {anychart.core.ui.CrosshairLabel} */(labels[i]);
+    if (label) {
+      axisIndex = /** @type {number} */(label.axisIndex());
+      axis = /** @type {anychart.mapModule.elements.Axis} */(getAxisByIndex.call(axisProvider, axisIndex));
+      if (axis && this.canDrawForAxis(axis) && ratio > 0 && ratio < 1) {
+        if (!lineDrawed && hasStroke) {
+          this.drawLine(axis, line, coord);
+          lineDrawed = true;
+        }
+
+        if (label.enabled()) {
+          this.drawLabel(axis, label, coord);
+        }
+      } else {
+        hide.call(this, label);
+      }
+    }
+  }
 };
 //endregion

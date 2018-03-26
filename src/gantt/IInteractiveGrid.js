@@ -148,3 +148,10 @@ anychart.ganttModule.IInteractiveGrid.prototype.container = function(opt_value) 
  * @return {number} Actually modified consistency states.
  */
 anychart.ganttModule.IInteractiveGrid.prototype.invalidate = function(state, opt_signal) {};
+
+
+/**
+ * Lock mouse interactivity.
+ * @param {boolean} lock - True to lock, false to unlock.
+ */
+anychart.ganttModule.IInteractiveGrid.prototype.lockInteractivity = function(lock) {};

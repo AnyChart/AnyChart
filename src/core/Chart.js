@@ -310,7 +310,7 @@ anychart.core.Chart.prototype.legend = function(opt_value) {
 
 /**
  * Internal public method. Returns all chart series.
- * @return {!Array.<anychart.core.series.Base|anychart.linearGaugeModule.pointers.Base>}
+ * @return {!Array.<anychart.core.series.Base|anychart.linearGaugeModule.pointers.Base|anychart.circularGaugeModule.pointers.Base>}
  */
 anychart.core.Chart.prototype.getAllSeries = goog.abstractMethod;
 
@@ -620,8 +620,8 @@ anychart.core.Chart.prototype.onLabelSignal_ = function(event) {
 
 
 /**
- * Getter/setter for axis default settings.
- * @param {Object=} opt_value Object with x-axis settings.
+ * Getter/setter for chart label default settings.
+ * @param {Object=} opt_value Object with label settings.
  * @return {Object}
  */
 anychart.core.Chart.prototype.defaultLabelSettings = function(opt_value) {
@@ -2218,7 +2218,7 @@ anychart.core.Chart.prototype.getPoint = goog.abstractMethod;
  * Returns points by event.
  * @param {anychart.core.MouseEvent} event
  * @return {?Array.<{
- *    series: (anychart.core.series.Base|anychart.linearGaugeModule.pointers.Base),
+ *    series: (anychart.core.series.Base|anychart.linearGaugeModule.pointers.Base|anychart.circularGaugeModule.pointers.Base),
  *    points: Array.<number>,
  *    lastPoint: (number|undefined),
  *    nearestPointToCursor: (Object.<number>|undefined)

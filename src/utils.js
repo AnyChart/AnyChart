@@ -918,6 +918,7 @@ anychart.utils.getFirstNotNullValue = function(var_args) {
   }
 };
 
+
 /**
  * Returns first defined argument, recurse in arrays.
  * @param {...*} var_args .
@@ -1372,7 +1373,7 @@ anychart.utils.json2xml = function(json, opt_rootNodeName, opt_returnAsXmlNode) 
   var root = anychart.utils.json2xml_(json, opt_rootNodeName || 'anychart', result);
   if (root) {
     if (!opt_rootNodeName)
-      root.setAttribute('xmlns', 'http://anychart.com/schemas/8.1.0/xml-schema.xsd');
+      root.setAttribute('xmlns', 'http://anychart.com/schemas/8.2.0/xml-schema.xsd');
     result.appendChild(root);
   }
   return opt_returnAsXmlNode ? result : goog.dom.xml.serialize(result);
@@ -1572,6 +1573,10 @@ anychart.utils.getNodeNames_ = function(arrayPropName) {
       return ['angles', 'angle'];
     case 'levels':
       return ['levels', 'level'];
+    case 'xLabels':
+      return ['x_labels', 'item'];
+    case 'yLabels':
+      return ['y_labels', 'item'];
   }
   return null;
 };
@@ -1671,6 +1676,10 @@ anychart.utils.getArrayPropName_ = function(nodeName) {
       return ['angles', 'angle'];
     case 'levels':
       return ['levels', 'level'];
+    case 'xLabels':
+      return ['xLabels', 'item'];
+    case 'yLabels':
+      return ['yLabels', 'item'];
   }
   return null;
 };

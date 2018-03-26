@@ -16,6 +16,11 @@ goog.require('anychart.core.Axis');
  */
 anychart.linearGaugeModule.Axis = function() {
   anychart.linearGaugeModule.Axis.base(this, 'constructor');
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['width', this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['offset', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED]
+  ]);
 };
 goog.inherits(anychart.linearGaugeModule.Axis, anychart.core.Axis);
 
@@ -28,32 +33,21 @@ anychart.linearGaugeModule.Axis.prototype.calculateSize = function(parentSize, l
 
 
 //endregion
-//region --- OWN API ---
+//region --- DESCRIPTORS ---
 /**
- * Getter/setter for axis offset.
- * @param {string=} opt_value Percent offset.
- * @return {string|anychart.linearGaugeModule.Axis} Offset or self for chaining.
+ * Properties that should be defined in series.Base prototype.
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.linearGaugeModule.Axis.prototype.offset = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
-    if (this.offset_ != opt_value) {
-      this.offset_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.offset_;
-};
-
-
-/** @inheritDoc */
-anychart.linearGaugeModule.Axis.prototype.width = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizeToPercent(opt_value);
-  }
-  return anychart.linearGaugeModule.Axis.base(this, 'width', opt_value);
-};
+anychart.linearGaugeModule.Axis.OWN_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'width', anychart.utils.normalizeToPercent],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'offset', anychart.utils.normalizeToPercent]
+  ]);
+  return map;
+})();
+anychart.core.settings.populate(anychart.linearGaugeModule.Axis, anychart.linearGaugeModule.Axis.OWN_DESCRIPTORS);
 
 
 /** @inheritDoc */
@@ -73,7 +67,7 @@ anychart.linearGaugeModule.Axis.prototype.scale = function(opt_value) {
 /** @inheritDoc */
 anychart.linearGaugeModule.Axis.prototype.serialize = function() {
   var json = anychart.linearGaugeModule.Axis.base(this, 'serialize');
-  json['offset'] = this.offset();
+  anychart.core.settings.serialize(this, anychart.linearGaugeModule.Axis.OWN_DESCRIPTORS, json, 'Axis');
   return json;
 };
 
@@ -81,12 +75,13 @@ anychart.linearGaugeModule.Axis.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.linearGaugeModule.Axis.prototype.setupByJSON = function(config, opt_default) {
   anychart.linearGaugeModule.Axis.base(this, 'setupByJSON', config, opt_default);
-  this.offset(config['offset']);
+  anychart.core.settings.deserialize(this, anychart.linearGaugeModule.Axis.OWN_DESCRIPTORS, config, opt_default);
 };
 //endregion
 
 //exports
-(function() {
-  var proto = anychart.linearGaugeModule.Axis.prototype;
-  proto['offset'] = proto.offset;
-})();
+//(function() {
+//  var proto = anychart.linearGaugeModule.Axis.prototype;
+//  auto generated
+//  proto['offset'] = proto.offset;
+//})();

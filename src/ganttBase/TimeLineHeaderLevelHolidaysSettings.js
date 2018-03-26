@@ -1,5 +1,5 @@
 //region --- Provide & Require
-goog.provide('anychart.resourceModule.TimeLineLevelHolidaysSettings');
+goog.provide('anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings');
 goog.require('anychart.core.Base');
 goog.require('anychart.core.settings');
 goog.require('anychart.core.utils.Padding');
@@ -13,8 +13,8 @@ goog.require('anychart.core.utils.Padding');
  * @extends {anychart.core.Base}
  * @implements {anychart.core.settings.IResolvable}
  */
-anychart.resourceModule.TimeLineLevelHolidaysSettings = function() {
-  anychart.resourceModule.TimeLineLevelHolidaysSettings.base(this, 'constructor');
+anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings = function() {
+  anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings.base(this, 'constructor');
 
   /**
    * Padding.
@@ -26,7 +26,7 @@ anychart.resourceModule.TimeLineLevelHolidaysSettings = function() {
 
   /**
    * Parent title.
-   * @type {anychart.resourceModule.TimeLine}
+   * @type {anychart.ganttBaseModule.TimeLineHeader}
    * @private                                                                                        `
    */
   this.parent_ = null;
@@ -50,7 +50,7 @@ anychart.resourceModule.TimeLineLevelHolidaysSettings = function() {
     ['format', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED]
   ]);
 };
-goog.inherits(anychart.resourceModule.TimeLineLevelHolidaysSettings, anychart.core.Base);
+goog.inherits(anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings, anychart.core.Base);
 
 
 //region --- Infrastructure
@@ -63,7 +63,7 @@ goog.inherits(anychart.resourceModule.TimeLineLevelHolidaysSettings, anychart.co
  * Supported signals.
  * @type {number}
  */
-anychart.resourceModule.TimeLineLevelHolidaysSettings.prototype.SUPPORTED_SIGNALS =
+anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings.prototype.SUPPORTED_SIGNALS =
     anychart.core.Base.prototype.SUPPORTED_SIGNALS |
     anychart.Signal.NEEDS_REDRAW |
     anychart.Signal.BOUNDS_CHANGED;
@@ -76,11 +76,11 @@ anychart.resourceModule.TimeLineLevelHolidaysSettings.prototype.SUPPORTED_SIGNAL
  * @param {string} name
  * @return {*}
  */
-anychart.resourceModule.TimeLineLevelHolidaysSettings.prototype.getOption = anychart.core.settings.getOption;
+anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings.prototype.getOption = anychart.core.settings.getOption;
 
 
 /** @inheritDoc */
-anychart.resourceModule.TimeLineLevelHolidaysSettings.prototype.isResolvable = function() {
+anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings.prototype.isResolvable = function() {
   return true;
 };
 
@@ -88,7 +88,7 @@ anychart.resourceModule.TimeLineLevelHolidaysSettings.prototype.isResolvable = f
 //endregion
 //region --- IResolvable implementation
 /** @inheritDoc */
-anychart.resourceModule.TimeLineLevelHolidaysSettings.prototype.resolutionChainCache = function(opt_value) {
+anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings.prototype.resolutionChainCache = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.resolutionChainCache_ = opt_value;
   }
@@ -97,11 +97,11 @@ anychart.resourceModule.TimeLineLevelHolidaysSettings.prototype.resolutionChainC
 
 
 /** @inheritDoc */
-anychart.resourceModule.TimeLineLevelHolidaysSettings.prototype.getResolutionChain = anychart.core.settings.getResolutionChain;
+anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings.prototype.getResolutionChain = anychart.core.settings.getResolutionChain;
 
 
 /** @inheritDoc */
-anychart.resourceModule.TimeLineLevelHolidaysSettings.prototype.getLowPriorityResolutionChain = function() {
+anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings.prototype.getLowPriorityResolutionChain = function() {
   var sett = [this.themeSettings];
   if (this.parent_) {
     sett = goog.array.concat(sett, this.parent_.getLowPriorityResolutionChain());
@@ -111,7 +111,7 @@ anychart.resourceModule.TimeLineLevelHolidaysSettings.prototype.getLowPriorityRe
 
 
 /** @inheritDoc */
-anychart.resourceModule.TimeLineLevelHolidaysSettings.prototype.getHighPriorityResolutionChain = function() {
+anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings.prototype.getHighPriorityResolutionChain = function() {
   var sett = [this.ownSettings];
   if (this.parent_) {
     sett = goog.array.concat(sett, this.parent_.getHighPriorityResolutionChain());
@@ -124,10 +124,10 @@ anychart.resourceModule.TimeLineLevelHolidaysSettings.prototype.getHighPriorityR
 //region --- Parental relations
 /**
  * Gets/sets new parent.
- * @param {anychart.resourceModule.TimeLine=} opt_value - Value to set.
- * @return {anychart.resourceModule.TimeLine|anychart.resourceModule.TimeLineLevelHolidaysSettings} - Current value or itself for method chaining.
+ * @param {anychart.ganttBaseModule.TimeLineHeader=} opt_value - Value to set.
+ * @return {anychart.ganttBaseModule.TimeLineHeader|anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings} - Current value or itself for method chaining.
  */
-anychart.resourceModule.TimeLineLevelHolidaysSettings.prototype.parent = function(opt_value) {
+anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings.prototype.parent = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.parent_ != opt_value) {
       if (this.parent_)
@@ -148,7 +148,7 @@ anychart.resourceModule.TimeLineLevelHolidaysSettings.prototype.parent = functio
  * @param {anychart.SignalEvent} e - Signal event.
  * @private
  */
-anychart.resourceModule.TimeLineLevelHolidaysSettings.prototype.parentInvalidated_ = function(e) {
+anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings.prototype.parentInvalidated_ = function(e) {
   var state = 0;
   var signal = 0;
 
@@ -182,7 +182,7 @@ anychart.resourceModule.TimeLineLevelHolidaysSettings.prototype.parentInvalidate
  * Text descriptors.
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.resourceModule.TimeLineLevelHolidaysSettings.TEXT_DESCRIPTORS = (function() {
+anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings.TEXT_DESCRIPTORS = (function() {
   var map = anychart.core.settings.createTextPropertiesDescriptors();
   anychart.core.settings.createDescriptor(
       map,
@@ -191,14 +191,14 @@ anychart.resourceModule.TimeLineLevelHolidaysSettings.TEXT_DESCRIPTORS = (functi
       anychart.core.settings.stringOrFunctionNormalizer);
   return map;
 })();
-anychart.core.settings.populate(anychart.resourceModule.TimeLineLevelHolidaysSettings, anychart.resourceModule.TimeLineLevelHolidaysSettings.TEXT_DESCRIPTORS);
+anychart.core.settings.populate(anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings, anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings.TEXT_DESCRIPTORS);
 
 
 /**
- * Properties that should be defined in anychart.resourceModule.TimeLineLevelHolidaysSettings prototype.
+ * Properties that should be defined in anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings prototype.
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.resourceModule.TimeLineLevelHolidaysSettings.DESCRIPTORS = (function() {
+anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings.DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
 
@@ -210,7 +210,7 @@ anychart.resourceModule.TimeLineLevelHolidaysSettings.DESCRIPTORS = (function() 
 
   return map;
 })();
-anychart.core.settings.populate(anychart.resourceModule.TimeLineLevelHolidaysSettings, anychart.resourceModule.TimeLineLevelHolidaysSettings.DESCRIPTORS);
+anychart.core.settings.populate(anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings, anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings.DESCRIPTORS);
 
 
 /**
@@ -219,9 +219,9 @@ anychart.core.settings.populate(anychart.resourceModule.TimeLineLevelHolidaysSet
  * @param {(string|number)=} opt_rightOrRightAndLeft .
  * @param {(string|number)=} opt_bottom .
  * @param {(string|number)=} opt_left .
- * @return {!(anychart.resourceModule.TimeLineLevelHolidaysSettings|anychart.core.utils.Padding)} .
+ * @return {!(anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings|anychart.core.utils.Padding)} .
  */
-anychart.resourceModule.TimeLineLevelHolidaysSettings.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
+anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
     this.padding_.setup.apply(this.padding_, arguments);
     return this;
@@ -242,7 +242,7 @@ anychart.resourceModule.TimeLineLevelHolidaysSettings.prototype.padding = functi
  * @param {anychart.SignalEvent} event Invalidation event.
  * @private
  */
-anychart.resourceModule.TimeLineLevelHolidaysSettings.prototype.boundsInvalidated_ = function(event) {
+anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings.prototype.boundsInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
     this.invalidate(anychart.ConsistencyState.BOUNDS,
         anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
@@ -256,19 +256,19 @@ anychart.resourceModule.TimeLineLevelHolidaysSettings.prototype.boundsInvalidate
  * Sets default settings.
  * @param {!Object} config
  */
-anychart.resourceModule.TimeLineLevelHolidaysSettings.prototype.setThemeSettings = function(config) {
-  anychart.core.settings.copy(this.themeSettings, anychart.resourceModule.TimeLineLevelHolidaysSettings.DESCRIPTORS, config);
-  anychart.core.settings.copy(this.themeSettings, anychart.resourceModule.TimeLineLevelHolidaysSettings.TEXT_DESCRIPTORS, config);
+anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings.prototype.setThemeSettings = function(config) {
+  anychart.core.settings.copy(this.themeSettings, anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings.DESCRIPTORS, config);
+  anychart.core.settings.copy(this.themeSettings, anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings.TEXT_DESCRIPTORS, config);
 };
 
 
 /** @inheritDoc */
-anychart.resourceModule.TimeLineLevelHolidaysSettings.prototype.setupByJSON = function(config, opt_default) {
+anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings.prototype.setupByJSON = function(config, opt_default) {
   if (opt_default) {
     this.setThemeSettings(config);
   } else {
-    anychart.core.settings.deserialize(this, anychart.resourceModule.TimeLineLevelHolidaysSettings.TEXT_DESCRIPTORS, config);
-    anychart.core.settings.deserialize(this, anychart.resourceModule.TimeLineLevelHolidaysSettings.DESCRIPTORS, config);
+    anychart.core.settings.deserialize(this, anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings.TEXT_DESCRIPTORS, config);
+    anychart.core.settings.deserialize(this, anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings.DESCRIPTORS, config);
   }
 
   this.padding().setupInternal(!!opt_default, config['padding']);
@@ -276,21 +276,21 @@ anychart.resourceModule.TimeLineLevelHolidaysSettings.prototype.setupByJSON = fu
 
 
 /** @inheritDoc */
-anychart.resourceModule.TimeLineLevelHolidaysSettings.prototype.serialize = function() {
+anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings.prototype.serialize = function() {
   var json = {};
 
   json['padding'] = this.padding().serialize();
 
-  anychart.core.settings.serialize(this, anychart.resourceModule.TimeLineLevelHolidaysSettings.TEXT_DESCRIPTORS, json, 'Time line holidays settings text props');
-  anychart.core.settings.serialize(this, anychart.resourceModule.TimeLineLevelHolidaysSettings.DESCRIPTORS, json, 'Time line holidays settings props');
+  anychart.core.settings.serialize(this, anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings.TEXT_DESCRIPTORS, json, 'Time line holidays settings text props');
+  anychart.core.settings.serialize(this, anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings.DESCRIPTORS, json, 'Time line holidays settings props');
 
   return json;
 };
 
 
 /** @inheritDoc */
-anychart.resourceModule.TimeLineLevelHolidaysSettings.prototype.disposeInternal = function() {
-  anychart.resourceModule.TimeLineLevelHolidaysSettings.base(this, 'disposeInternal');
+anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings.prototype.disposeInternal = function() {
+  anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings.base(this, 'disposeInternal');
 
   goog.dispose(this.padding_);
   this.padding_ = null;
@@ -301,7 +301,7 @@ anychart.resourceModule.TimeLineLevelHolidaysSettings.prototype.disposeInternal 
 //region --- Exports
 //exports
 (function() {
-  var proto = anychart.resourceModule.TimeLineLevelHolidaysSettings.prototype;
+  var proto = anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings.prototype;
   proto['padding'] = proto.padding;
 })();
 

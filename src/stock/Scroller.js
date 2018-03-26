@@ -1239,6 +1239,18 @@ anychart.stockModule.Scroller.prototype.xAxisInvalidated_ = function(e) {
 };
 
 
+/** @inheritDoc */
+anychart.stockModule.Scroller.prototype.getXAxisByIndex = function(index) {
+  return this.xAxis_;
+};
+
+
+/** @inheritDoc */
+anychart.stockModule.Scroller.prototype.getYAxisByIndex = function(index) {
+  return null;
+};
+
+
 /**
  * Invalidates scroller entities that depend on scroller scale.
  */

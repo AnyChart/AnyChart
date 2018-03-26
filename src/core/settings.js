@@ -277,8 +277,9 @@ anychart.core.settings.deserialize = function(target, descriptors, config, opt_d
  * @param {!Object} json
  * @param {string=} opt_warningPrefix
  * @param {Object.<anychart.core.settings.PropertyDescriptorMeta>=} opt_descriptorsMeta
+ * @param {boolean=} opt_ownOnly
  */
-anychart.core.settings.serialize = function(target, descriptors, json, opt_warningPrefix, opt_descriptorsMeta) {
+anychart.core.settings.serialize = function(target, descriptors, json, opt_warningPrefix, opt_descriptorsMeta, opt_ownOnly) {
   var name, val, descriptor;
   var list = goog.isDef(opt_descriptorsMeta) ? opt_descriptorsMeta : descriptors;
   for (name in list) {
@@ -294,7 +295,7 @@ anychart.core.settings.serialize = function(target, descriptors, json, opt_warni
         );
       }
     }
-    if (!goog.isDef(val) && target.check(/** @type {number} */ (target.getCapabilities(name)))) {
+    if (!goog.isDef(val) && !opt_ownOnly && target.check(/** @type {number} */ (target.getCapabilities(name)))) {
       val = target.getThemeOption(name);
     }
     if (goog.isDef(val) && !goog.isFunction(val)) {

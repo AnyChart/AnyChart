@@ -4,6 +4,7 @@ goog.provide('anychart.circularGaugeModule.defaultTheme');
 goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
   // merge with chart
   'circularGauge': {
+    'defaultPointerType': 'needle',
     'title': {
       'enabled': false
     },
@@ -62,6 +63,11 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'verticesCurvature': .5,
         'topRatio': .5,
         'bottomRatio': .5
+      },
+      'needle': {
+        'startRadius': '-20%',
+        'startWidth': '3%',
+        'middleWidth': '1%'
       }
     },
     'defaultRangeSettings': {
@@ -87,7 +93,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     },
     'circularPadding': '10%',
     'encloseWithStraightLine': false,
-    'axes': [],
+    'axes': [{}],
     'bars': [],
     'markers': [],
     'needles': [],

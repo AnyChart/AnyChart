@@ -362,7 +362,15 @@ anychart.color.hash = function(color) {
   // } else if (goog.isObject(color)) {
   //   result =
   // }
-  return goog.isObject(color) ? 'o' + goog.getUid(color) : (typeof color).charAt(0) + color;
+  var rv;
+  if (goog.isObject(color)) {
+    if (color.serialize)
+      return JSON.stringify(color.serialize());
+    return JSON.stringify(color);
+  } else {
+    rv = (typeof color).charAt(0) + color;
+  }
+  return rv;
 };
 
 

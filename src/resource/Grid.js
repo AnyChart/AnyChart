@@ -2,7 +2,7 @@ goog.provide('anychart.resourceModule.Grid');
 goog.require('anychart.core.VisualBaseWithBounds');
 goog.require('anychart.core.settings');
 goog.require('anychart.core.ui.Background');
-goog.require('anychart.resourceModule.Overlay');
+goog.require('anychart.ganttBaseModule.Overlay');
 
 
 
@@ -113,7 +113,7 @@ anychart.resourceModule.Grid = function() {
   this.background_ = new anychart.core.ui.Background();
   this.background_.listenSignals(this.handleBackgroundSignal_, this);
 
-  this.overlay_ = new anychart.resourceModule.Overlay();
+  this.overlay_ = new anychart.ganttBaseModule.Overlay();
   this.overlay_.listenSignals(this.overlaySignal_, this);
 
   /**
@@ -297,7 +297,7 @@ anychart.resourceModule.Grid.prototype.background = function(opt_value) {
 /**
  * Overlay element.
  * @param {(string|Object|null|boolean)=} opt_value .
- * @return {anychart.resourceModule.Grid|anychart.resourceModule.Overlay}
+ * @return {anychart.resourceModule.Grid|anychart.ganttBaseModule.Overlay}
  */
 anychart.resourceModule.Grid.prototype.overlay = function(opt_value) {
   if (goog.isDef(opt_value)) {

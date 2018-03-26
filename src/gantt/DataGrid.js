@@ -10,15 +10,18 @@ goog.require('anychart.core.ui.SimpleSplitter');
 goog.require('anychart.core.ui.Title');
 goog.require('anychart.enums');
 goog.require('anychart.ganttModule.BaseGrid');
+goog.require('anychart.ganttModule.Column');
 goog.require('anychart.ganttModule.Controller');
 goog.require('anychart.ganttModule.DataGridButton');
 goog.require('anychart.ganttModule.ScrollBar');
 goog.require('anychart.math.Rect');
 goog.require('anychart.treeDataModule.Tree');
+goog.require('anychart.ui.EditInput');
 goog.require('anychart.utils');
 goog.require('goog.date.UtcDateTime');
 goog.require('goog.events');
 goog.require('goog.i18n.DateTimeFormat');
+goog.require('goog.string');
 
 
 
@@ -34,7 +37,7 @@ anychart.ganttModule.DataGrid = function(opt_controller) {
 
   /**
    * Array of columns.
-   * @type {Array.<anychart.ganttModule.DataGrid.Column>}
+   * @type {Array.<anychart.ganttModule.Column>}
    * @private
    */
   this.columns_ = [];
@@ -71,6 +74,48 @@ anychart.ganttModule.DataGrid = function(opt_controller) {
 
   this.controller.dataGrid(this);
 
+  /**
+   *
+   * @type {anychart.ui.EditInput}
+   * @private
+   */
+  this.editInput_ = null;
+
+  /**
+   *
+   * @type {anychart.ganttModule.Column}
+   * @private
+   */
+  this.editColumn_ = null;
+
+  /**
+   *
+   * @type {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem}
+   * @private
+   */
+  this.editItem_ = null;
+
+  /**
+   *
+   * @type {Array.<number>}
+   * @private
+   */
+  this.columnsWidthsCache_ = [];
+
+  /**
+   *
+   * @type {?function():(Object|undefined)}
+   * @private
+   */
+  this.onEditStart_ = null;
+
+  /**
+   *
+   * @type {?function():(Object|undefined)}
+   * @private
+   */
+  this.onEditEnd_ = null;
+
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['columnStroke', anychart.ConsistencyState.DATA_GRID_GRIDS, anychart.Signal.NEEDS_REDRAW],
     ['headerFill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW]
@@ -103,13 +148,6 @@ anychart.ganttModule.DataGrid.prototype.SUPPORTED_CONSISTENCY_STATES =
  * }}
  */
 anychart.ganttModule.DataGrid.ColumnFormat;
-
-
-/**
- * Default side size of expand-collapse button.
- * @type {number}
- */
-anychart.ganttModule.DataGrid.DEFAULT_EXPAND_COLLAPSE_BUTTON_SIDE = 15;
 
 
 /**
@@ -330,6 +368,36 @@ anychart.ganttModule.DataGrid.prototype.resolveHeaderFill = function() {
 
 
 //endregion
+//region -- Edit input editing.
+/**
+ *
+ * @param {(function():(Object|undefined))=} opt_value - On edit start callback.
+ * @return {anychart.ganttModule.DataGrid|function():(Object|undefined)}
+ */
+anychart.ganttModule.DataGrid.prototype.onEditStart = function(opt_value) {
+  if (goog.isFunction(opt_value)) {
+    this.onEditStart_ = opt_value;
+    return this;
+  }
+  return this.onEditStart_;
+};
+
+
+/**
+ *
+ * @param {(function():(Object|undefined))=} opt_value - On edit end callback.
+ * @return {anychart.ganttModule.DataGrid|function():(Object|undefined)}
+ */
+anychart.ganttModule.DataGrid.prototype.onEditEnd = function(opt_value) {
+  if (goog.isFunction(opt_value)) {
+    this.onEditEnd_ = opt_value;
+    return this;
+  }
+  return this.onEditEnd_;
+};
+
+
+//endregion
 
 
 /**
@@ -351,7 +419,7 @@ anychart.ganttModule.DataGrid.prototype.getHeaderPath_ = function() {
 /**
  * Goes through all columns and calls passed function for each visible column (if column exists and enabled).
  * @param {Function} fn - Function to be applied to column. Signature:
- *   function(this: opt_obj, anychart.ganttModule.DataGrid.Column, number, ...[*]):void.
+ *   function(this: opt_obj, anychart.ganttModule.Column, number, ...[*]):void.
  * @param {*=} opt_obj - Object to be used as 'this'.
  * @param {...*} var_args optional arguments for the fn.
  * @private
@@ -443,9 +511,9 @@ anychart.ganttModule.DataGrid.prototype.addSplitter_ = function() {
 /**
  * Gets column by index or creates a new one if column doesn't exist yet.
  * If works like setter, sets a column by index.
- * @param {(number|anychart.ganttModule.DataGrid.Column|string)=} opt_indexOrValue - Column index or column.
- * @param {(anychart.ganttModule.DataGrid.Column|Object)=} opt_value - Column to be set.
- * @return {(anychart.ganttModule.DataGrid.Column|anychart.ganttModule.DataGrid)} - Column by index of itself for method chaining if used
+ * @param {(number|anychart.ganttModule.Column|string)=} opt_indexOrValue - Column index or column.
+ * @param {(anychart.ganttModule.Column|Object)=} opt_value - Column to be set.
+ * @return {(anychart.ganttModule.Column|anychart.ganttModule.DataGrid)} - Column by index of itself for method chaining if used
  *  like setter.
  */
 anychart.ganttModule.DataGrid.prototype.column = function(opt_indexOrValue, opt_value) {
@@ -462,7 +530,7 @@ anychart.ganttModule.DataGrid.prototype.column = function(opt_indexOrValue, opt_
 
   var column = this.columns_[index];
   if (!column) {
-    column = new anychart.ganttModule.DataGrid.Column(this);
+    column = new anychart.ganttModule.Column(this, index);
     column.setup(this.defaultColumnSettings());
     column.listenSignals(this.columnInvalidated_, this);
     this.registerDisposable(column);
@@ -470,7 +538,7 @@ anychart.ganttModule.DataGrid.prototype.column = function(opt_indexOrValue, opt_
   }
 
   if (goog.isDef(value)) {
-    column.setup(anychart.utils.instanceOf(value, anychart.ganttModule.DataGrid.Column) ? value.serialize() : value);
+    column.setup(anychart.utils.instanceOf(value, anychart.ganttModule.Column) ? value.serialize() : value);
     if (column.enabled()) column.container(this.getContentLayer());
     this.columns_[index] = column;
     this.addSplitter_();
@@ -499,7 +567,6 @@ anychart.ganttModule.DataGrid.prototype.column = function(opt_indexOrValue, opt_
     }
     return column;
   }
-
 };
 
 
@@ -529,7 +596,7 @@ anychart.ganttModule.DataGrid.prototype.splitterDblClickHandler_ = function(spli
 
 /**
  * Sets new column width.
- * @param {anychart.ganttModule.DataGrid.Column} column - Current visible column.
+ * @param {anychart.ganttModule.Column} column - Current visible column.
  * @param {number} columnIndex - Straight index of current visible column.
  * @param {number} splitterIndex
  * @param {number} width
@@ -544,7 +611,7 @@ anychart.ganttModule.DataGrid.prototype.resizeColumn_ = function(column, columnI
 
 /**
  * Sets new column width depending on it's default width or title's width.
- * @param {anychart.ganttModule.DataGrid.Column} column - Current visible column.
+ * @param {anychart.ganttModule.Column} column - Current visible column.
  * @param {number} columnIndex - Straight index of current visible column.
  * @param {number} splitterIndex
  * @param {goog.events.Event} event - Event.
@@ -716,6 +783,7 @@ anychart.ganttModule.DataGrid.prototype.specialInvalidated = function() {
 
     var enabledColumns = [];
     var i, l, col, colWidth;
+    this.columnsWidthsCache_.length = 0;
 
     for (i = 0, l = this.columns_.length; i < l; i++) {
       col = this.columns_[i];
@@ -743,7 +811,8 @@ anychart.ganttModule.DataGrid.prototype.specialInvalidated = function() {
       col.suspendSignalsDispatching();
       col.position({x: colLeft, y: 0}); //Column width and height are already set here.
       col.height(this.pixelBoundsCache.height);
-      colWidth = col.calculateBounds().width; //We need pixel value here.
+      var colBounds = col.calculateBounds();
+      colWidth = colBounds.width; //We need pixel value here.
       var splitter = this.splitters_[i];
 
       var add = colWidth;
@@ -753,6 +822,7 @@ anychart.ganttModule.DataGrid.prototype.specialInvalidated = function() {
         splitter.stroke(/** @type {acgraph.vector.Stroke} */(columnStroke));
 
         splitter.enabled(true);
+        this.columnsWidthsCache_.push(colLeft + colWidth + splitterWidth);
 
         add += splitterWidth;
         var boundsWidth = add + this.pixelBoundsCache.width;
@@ -803,6 +873,214 @@ anychart.ganttModule.DataGrid.prototype.specialInvalidated = function() {
     }
 
     this.markConsistent(anychart.ConsistencyState.DATA_GRID_GRIDS);
+  }
+};
+
+
+/**
+ *
+ * @param {goog.events.Event} e - Event.
+ * @private
+ */
+anychart.ganttModule.DataGrid.prototype.editInputSubmitHandler_ = function(e) {
+  var context = {
+    'columnIndex': this.editColumn_.getIndex(),
+    'item': this.editItem_,
+    'value': e['value']
+  };
+  if (goog.isFunction(this.onEditEnd_)) {
+    var result = this.onEditEnd_.call(context);
+    // var changes = onEdit(val);
+    if (result && goog.typeOf(result) == 'object' && !(result['cancelEdit']) && goog.typeOf(result['itemMap']) == 'object' && this.editItem_) {
+      var changes = result['itemMap'];
+      var tree = this.controller.data();//this.controller.data() can be Tree or TreeView.
+      tree.suspendSignalsDispatching();
+      for (var key in changes) {
+        if (changes.hasOwnProperty(key))
+          this.editItem_.set(key, changes[key]);
+      }
+      tree.resumeSignalsDispatching(true);
+      this.submitted_ = true;
+      this.escaped_ = false;
+    }
+  }
+};
+
+
+/**
+ *
+ * @param {goog.events.Event} e - Event.
+ * @private
+ */
+anychart.ganttModule.DataGrid.prototype.editInputBlurHandler_ = function(e) {
+  // console.log('From blur', this.submitted_ || this.escaped_ ? 'NOT WRITING' : 'WRITING');
+  if (!this.submitted_ && !this.escaped_) {
+    this.editInputSubmitHandler_.call(this, e);
+    this.escaped_ = false;
+  }
+};
+
+
+/**
+ *
+ * @param {goog.events.Event} e - Event.
+ * @private
+ */
+anychart.ganttModule.DataGrid.prototype.editInputEscapeHandler_ = function(e) {
+  this.escaped_ = true;
+};
+
+
+/**
+ *
+ * @param {goog.events.Event} e - Event.
+ * @private
+ */
+anychart.ganttModule.DataGrid.prototype.editInputFocusHandler_ = function(e) {
+  this.interactivityHandler.lockInteractivity(true);
+  this.submitted_ = false;
+};
+
+
+/**
+ *
+ * @param {goog.events.Event} e - Event.
+ * @private
+ */
+anychart.ganttModule.DataGrid.prototype.editInputHideHandler_ = function(e) {
+  this.escaped_ = false;
+  this.submitted_ = false;
+  this.editInput_.reset();
+  this.interactivityHandler.lockInteractivity(false);
+};
+
+
+/**
+ * Initializes editor input.
+ * @private
+ */
+anychart.ganttModule.DataGrid.prototype.initEditInput_ = function() {
+  if (!this.editInput_) {
+    this.editInput_ = new anychart.ui.EditInput();
+
+    var stage = this.interactivityHandler.container().getStage();
+    this.editInput_.render(/** @type {Element} */ (stage.container()));
+
+    this.editInput_.listen(anychart.enums.EventType.EDIT_INPUT_SUBMIT, this.editInputSubmitHandler_, false, this);
+    this.editInput_.listen(anychart.enums.EventType.EDIT_INPUT_ESCAPE, this.editInputEscapeHandler_, false, this);
+    this.editInput_.listen(anychart.enums.EventType.EDIT_INPUT_BLUR, this.editInputBlurHandler_, false, this);
+    this.editInput_.listen(anychart.enums.EventType.EDIT_INPUT_FOCUS, this.editInputFocusHandler_, false, this);
+    // this.editInput_.listen(anychart.enums.EventType.EDIT_INPUT_KEY_PRESS, this.editInputKeyPressHandler_, false, this);
+    // this.editInput_.listen(anychart.enums.EventType.EDIT_INPUT_BEFORE_HIDE, this.editInputKeyPressHandler_, false, this);
+    this.editInput_.listen(anychart.enums.EventType.EDIT_INPUT_HIDE, this.editInputHideHandler_, false, this);
+  }
+};
+
+
+/**
+ * Gets column bounds.
+ * @param {number} columnStraightIndex - Straight column index.
+ * @return {anychart.math.Rect}
+ * @private
+ */
+anychart.ganttModule.DataGrid.prototype.getColumnBounds_ = function(columnStraightIndex) {
+  var bounds = null;
+  var counter = -1;
+  for (var i = 0, l = this.columns_.length; i < l; i++) {
+    var col = this.columns_[i];
+    if (col && col.enabled()) {
+      counter++;
+      if (counter == columnStraightIndex) {
+        bounds = col.calculateBounds();
+        this.editColumn_ = col;
+        break;
+      }
+    }
+  }
+  return bounds;
+};
+
+
+/**
+ * Gets input bounds.
+ * @param {Object} e - Event.
+ * @return {?anychart.math.Rect}
+ * @private
+ */
+anychart.ganttModule.DataGrid.prototype.getInputBounds_ = function(e) {
+  var eX = e['originalEvent']['offsetX'];
+  var left = eX - this.pixelBoundsCache.left;
+  var ind = ~goog.array.binarySearch(this.columnsWidthsCache_, left);
+  var colBounds = this.getColumnBounds_(ind);
+  if (colBounds.left < 0) {
+    this.horizontalOffset(/** @type {number} */ (this.horizontalOffset()) + colBounds.left);
+    colBounds.left = 0;
+  }
+  var itemHeight = this.controller.getItemHeight(e['item']);
+  var heightReduction = e['hoveredIndex'] ? 2 : 1;
+  return colBounds ? new anychart.math.Rect(colBounds.left, e['startY'], colBounds.width - 2, itemHeight - heightReduction) : null;
+};
+
+
+/**
+ *
+ * @param {Object} e - Event object.
+ */
+anychart.ganttModule.DataGrid.prototype.addMouseDblClick = function(e) {
+  if (e && this.editable) {
+    this.interactive = false;
+    this.initEditInput_();
+    this.editItem_ = e['item'];
+    var hoveredIndex = e['hoveredIndex'];
+    var index = e['index'];
+
+    var fixEnd = false;
+    var usedIndex;
+
+
+    if (index == this.controller.startIndex()) {
+      this.controller.scrollToRow(index);
+    } else if (index == this.controller.endIndex()) {
+      this.controller.endIndex(index);
+      var gridHeightCache = this.getGridHeightCache();
+      usedIndex = Math.min(gridHeightCache.length - 1, hoveredIndex);
+      var initialTop = /** @type {number} */ (this.pixelBoundsCache.top + /** @type {number} */ (this.headerHeight()) + 1);
+      var startHeight = hoveredIndex ? gridHeightCache[usedIndex - 1] : 0;
+      var startY = initialTop + startHeight;
+      var endY = startY + (gridHeightCache[usedIndex] - startHeight - this.rowStrokeThickness) - 2;
+      fixEnd = true;
+    }
+
+    var bounds = this.getInputBounds_(e);
+
+    if (bounds) {
+      if (fixEnd) {
+        bounds.top = /** @type {number} */ (startY);
+        bounds.height = endY - startY;
+      }
+      var val = '';
+      if (this.editColumn_) {
+        var colLabelTexts = this.editColumn_.getLabelTexts();
+        usedIndex = Math.min(hoveredIndex, colLabelTexts.length - 1);
+        val = colLabelTexts[usedIndex];
+
+        var context = {
+          'columnIndex': this.editColumn_.getIndex(),
+          'item': this.editItem_,
+          'value': val
+        };
+
+        if (goog.isFunction(this.onEditStart_)) {
+          var result = this.onEditStart_.call(context);
+          if (result && goog.typeOf(result) == 'object' && !(result['cancelEdit']) && this.editItem_) {
+            var valueToShow = goog.isDefAndNotNull(result['value']) ? result['value'] : val;
+            this.editInput_.show(valueToShow, bounds);
+            this.editInput_.focusAndSelect();
+          }
+        }
+      }
+
+    }
   }
 };
 
@@ -914,6 +1192,9 @@ anychart.ganttModule.DataGrid.prototype.setupByJSON = function(config, opt_defau
   if ('defaultColumnSettings' in config)
     this.defaultColumnSettings(config['defaultColumnSettings']);
 
+  this.onEditStart(config['onEditStart']);
+  this.onEditEnd(config['onEditEnd']);
+
   if ('columns' in config) {
     for (var i = 0, l = config['columns'].length; i < l; i++) {
       var col = config['columns'][i];
@@ -931,964 +1212,6 @@ anychart.ganttModule.DataGrid.prototype.disposeInternal = function() {
   goog.dispose(this.horizontalScrollBar_);
   this.horizontalScrollBar_ = null;
   anychart.ganttModule.DataGrid.base(this, 'disposeInternal');
-};
-
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Data Grid Column.
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Data grid column.
- * 1) Has own labels factory.
- * 2) Has own index in data grid.
- * 3) Has own clip bounds.
- * 4) Has title.
- * 5) Has vertical offset.
- *
- * @param {anychart.ganttModule.DataGrid} dataGrid - Column's data grid.
- *
- * @constructor
- * @extends {anychart.core.VisualBase}
- */
-anychart.ganttModule.DataGrid.Column = function(dataGrid) {
-  anychart.ganttModule.DataGrid.Column.base(this, 'constructor');
-
-  /**
-   * Data grid of column.
-   * @type {anychart.ganttModule.DataGrid}
-   * @private
-   */
-  this.dataGrid_ = dataGrid;
-
-  /**
-   * Column's labels factory.
-   * @type {anychart.core.ui.LabelsFactory}
-   * @private
-   */
-  this.labelsFactory_ = null;
-
-  /**
-   * Base layer to be clipped.
-   * @type {acgraph.vector.Layer}
-   * @private
-   */
-  this.base_ = null;
-
-  /**
-   * Title layer.
-   * @type {acgraph.vector.Layer}
-   * @private
-   */
-  this.titleLayer_ = null;
-
-  /**
-   * Cells layer.
-   * @type {acgraph.vector.Layer}
-   * @private
-   */
-  this.cellsLayer_ = null;
-
-  /**
-   * Title.
-   * @type {anychart.core.ui.Title}
-   * @private
-   */
-  this.title_ = null;
-
-  /**
-   * Title path.
-   * NOTE:
-   *  This path is added here despite we already have headerPath in data grid.
-   *  It will be filled with the same fill as DG's header path.
-   *  These paths have different purposes:
-   *  - this title path covers labels during the scrolling.
-   *  - data grid's headerPath just lingers a header in data grid's width to fill a visible gap in gantt diagram.
-   * @type {acgraph.vector.Path}
-   * @private
-   */
-  this.titlePath_ = null;
-
-  /**
-   * Clip bounds.
-   * @type {anychart.math.Rect}
-   * @private
-   */
-  this.clip_ = null;
-
-  /**
-   * Width of column.
-   * @type {(string|number)}
-   * @private
-   */
-  this.width_ = 0;
-
-  /**
-   * Height of column.
-   * @type {(string|number)}
-   * @private
-   */
-  this.height_ = 0;
-
-  /**
-   * Default column width.
-   * @type {number}
-   * @private
-   */
-  this.defaultWidth_;
-
-  /**
-   * Pixel bounds cache.
-   * @type {anychart.math.Rect}
-   * @private
-   */
-  this.pixelBoundsCache_ = null;
-
-  /**
-   * Function that returns a text value for the cell by data item.
-   * @type {function(anychart.treeDataModule.Tree.DataItem=):string}
-   * @private
-   */
-  this.format_ = this.defaultFormat_;
-
-  /**
-   * Multiplier to choose a left padding in a cell depending on a tree data item's depth.
-   * Used to highlight a hierarchy of data items.
-   * Overall left padding will be calculated as anychart.ganttModule.DataGrid.DEFAULT_PADDING + depthPaddingMultiplier_ * item.meta('depth');
-   * @type {number}
-   * @private
-   */
-  this.depthPaddingMultiplier_ = 0;
-
-  /**
-   * Flag if collapse/expand buttons must be used.
-   * @type {boolean}
-   * @private
-   */
-  this.collapseExpandButtons_ = false;
-
-  /**
-   * Pool of collapse/expand buttons.
-   * @type {Array.<anychart.ganttModule.DataGridButton>}
-   * @private
-   */
-  this.buttons_ = [];
-
-  /**
-   * Function that overrides text settings for label.
-   * @type {function(anychart.core.ui.LabelsFactory.Label, anychart.treeDataModule.Tree.DataItem)}
-   * @private
-   */
-  this.cellTextSettingsOverrider_ = this.defaultCellTextSettingsOverrider_;
-
-  this.setParentEventTarget(this.dataGrid_);
-
-  /*
-    Enabling/disabling column makes data grid redraw.
-    When column is just created, we suppose it is enabled to avoid unnecessary data grid redraw.
-   */
-  this.markConsistent(anychart.ConsistencyState.ENABLED);
-
-};
-goog.inherits(anychart.ganttModule.DataGrid.Column, anychart.core.VisualBase);
-
-
-/**
- * Supported consistency states.
- * @type {number}
- */
-anychart.ganttModule.DataGrid.Column.prototype.SUPPORTED_CONSISTENCY_STATES =
-    anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.APPEARANCE |
-    anychart.ConsistencyState.DATA_GRID_COLUMN_TITLE |
-    anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION |
-    anychart.ConsistencyState.DATA_GRID_COLUMN_BUTTON;
-
-
-/**
- * Supported consistency states.
- * @type {number}
- */
-anychart.ganttModule.DataGrid.Column.prototype.SUPPORTED_SIGNALS = anychart.core.VisualBase.prototype.SUPPORTED_SIGNALS;
-
-
-/**
- * Labels factory z-index.
- * @type {number}
- */
-anychart.ganttModule.DataGrid.Column.LF_Z_INDEX = 0;
-
-
-/**
- * Buttons z-index.
- * @type {number}
- */
-anychart.ganttModule.DataGrid.Column.BUTTONS_Z_INDEX = 10;
-
-
-/**
- * Sets column format.
- * @param {string} fieldName - Name of field of data item to work with.
- * @param {anychart.enums.ColumnFormats|Object} presetOrSettings - Preset or custom column format.
- * @return {anychart.ganttModule.DataGrid.Column} - Itself for method chaining.
- */
-anychart.ganttModule.DataGrid.Column.prototype.setColumnFormat = function(fieldName, presetOrSettings) {
-  var settings = goog.isString(presetOrSettings) ? this.dataGrid_.getColumnFormatByName(presetOrSettings) : presetOrSettings;
-  if (goog.isObject(settings)) {
-    this.suspendSignalsDispatching();
-
-    var formatter = settings['formatter'];
-    var width = settings['width'];
-    var textStyle = settings['textStyle'];
-
-    if (goog.isDef(formatter)) this.format(function() {
-      var item = this['item'];
-      return formatter(item.get(fieldName));
-    });
-
-    if (goog.isDef(width)) this.width(width).defaultWidth(width);
-
-    if (goog.isDef(textStyle)) this.cellTextSettings().textSettings(textStyle);
-
-    this.resumeSignalsDispatching(true);
-  }
-  return this;
-};
-
-
-/**
- * Default function that returns a text value for the cell by data item.
- * @param {anychart.treeDataModule.Tree.DataItem=} opt_item - Context.
- * @return {string} - Text value.
- * @private
- */
-anychart.ganttModule.DataGrid.Column.prototype.defaultFormat_ = function(opt_item) {
-  return '';
-};
-
-
-/**
- * Gets/sets multiplier to choose a left padding in a cell depending on a tree data item's depth.
- * Used to highlight a hierarchy of data items.
- * Overall left padding will be calculated as anychart.ganttModule.DataGrid.DEFAULT_PADDING + depthPaddingMultiplier_ * item.meta('depth');
- * @param {number=} opt_value - Value to be set.
- * @return {(number|anychart.ganttModule.DataGrid.Column)} - Current value or itself for method chaining.
- */
-anychart.ganttModule.DataGrid.Column.prototype.depthPaddingMultiplier = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.depthPaddingMultiplier_ != opt_value) {
-      this.depthPaddingMultiplier_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.depthPaddingMultiplier_;
-};
-
-
-/**
- * Default cell text settings overrider.
- * @param {anychart.core.ui.LabelsFactory.Label} label - Incoming label.
- * @param {anychart.treeDataModule.Tree.DataItem} treeDataItem - Incoming tree data item.
- * @private
- */
-anychart.ganttModule.DataGrid.Column.prototype.defaultCellTextSettingsOverrider_ = goog.nullFunction;
-
-
-/**
- * Sets cell text value formatter.
- * @param {(function(anychart.treeDataModule.Tree.DataItem=):string)=} opt_value - Function to be set.
- * @return {(function(anychart.treeDataModule.Tree.DataItem=):string|anychart.ganttModule.DataGrid.Column)} - Current function or itself
- *  for method chaining.
- */
-anychart.ganttModule.DataGrid.Column.prototype.format = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (goog.isFunction(opt_value)) {
-      this.format_ = opt_value;
-    } else {
-      this.format_ = this.defaultFormat_;
-    }
-    this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION, anychart.Signal.NEEDS_REDRAW);
-    return this;
-  }
-  return this.format_;
-};
-
-
-/**
- * Gets/sets label factory to decorate cells.
- * @param {Object=} opt_value - Value to be set.
- * @return {(anychart.ganttModule.DataGrid.Column|anychart.core.ui.LabelsFactory)} - Current value or itself for method chaining.
- */
-anychart.ganttModule.DataGrid.Column.prototype.cellTextSettings = function(opt_value) {
-  if (!this.labelsFactory_) {
-    this.labelsFactory_ = new anychart.core.ui.LabelsFactory();
-    this.labelsFactory_.container(this.getCellsLayer_());
-    this.labelsFactory_.setParentEventTarget(this.dataGrid_.getBase());
-    this.labelsFactory_.zIndex(anychart.ganttModule.DataGrid.Column.LF_Z_INDEX);
-    this.labelsFactory_.listenSignals(this.labelsInvalidated_, this);
-
-    this.labelsFactory_.setParentEventTarget(this);
-
-    this.registerDisposable(this.labelsFactory_);
-  }
-
-  if (goog.isDef(opt_value)) {
-    var redraw = true;
-    if (anychart.utils.instanceOf(opt_value, anychart.core.ui.LabelsFactory)) {
-      this.labelsFactory_.setup(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.labelsFactory_.setup(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.labelsFactory_.enabled(false);
-    } else {
-      redraw = false;
-    }
-    if (redraw) {
-      //TODO (A.Kudryavtsev): WE invalidate position because labels factory work that way: must clear and redraw all labels.
-      this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.labelsFactory_;
-
-};
-
-
-/**
- * Label invalidation handler.
- * @param {anychart.SignalEvent} event - Signal event.
- * @private
- */
-anychart.ganttModule.DataGrid.Column.prototype.labelsInvalidated_ = function(event) {
-  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION, anychart.Signal.NEEDS_REDRAW);
-  }
-};
-
-
-/**
- * Gets/sets cells text settings overrider.
- * @param {function(anychart.core.ui.LabelsFactory.Label, anychart.treeDataModule.Tree.DataItem)=} opt_value - New text settings
- *  overrider function.
- * @return {(anychart.ganttModule.DataGrid.Column|function(anychart.core.ui.LabelsFactory.Label, anychart.treeDataModule.Tree.DataItem))} - Current value or itself for method chaining.
- */
-anychart.ganttModule.DataGrid.Column.prototype.cellTextSettingsOverrider = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.cellTextSettingsOverrider_ = opt_value;
-    //TODO (A.Kudryavtsev): WE invalidate position because labels factory work that way: must clear and redraw all labels.
-    this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION, anychart.Signal.NEEDS_REDRAW);
-    return this;
-  }
-  return this.cellTextSettingsOverrider_;
-};
-
-
-/**
- * Gets/sets a flag if column must use expand/collapse buttons.
- * Do not export.
- * @param {boolean=} opt_value - Value to be set.
- * @return {(anychart.ganttModule.DataGrid.Column|boolean)} - Current value or itself for method chaining.
- */
-anychart.ganttModule.DataGrid.Column.prototype.collapseExpandButtons = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.collapseExpandButtons_ != opt_value) {
-      this.collapseExpandButtons_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.collapseExpandButtons_;
-};
-
-
-/**
- * Gets/sets column title.
- * @param {(null|boolean|Object|string)=} opt_value - Value to be set.
- * @return {!(anychart.core.ui.Title|anychart.ganttModule.DataGrid.Column)} - Current value or itself for method chaining.
- */
-anychart.ganttModule.DataGrid.Column.prototype.title = function(opt_value) {
-  if (!this.title_) {
-    this.title_ = new anychart.core.ui.Title();
-
-    this.title_.suspendSignalsDispatching();
-    this.title_
-        .container(this.getTitleLayer_())
-        .margin(0);
-    this.title_['wordWrap']('normal');
-    this.title_['wordBreak']('normal');
-    this.title_['hAlign'](anychart.enums.HAlign.CENTER);
-    this.title_['vAlign'](anychart.enums.VAlign.MIDDLE);
-    this.title_.resumeSignalsDispatching(false);
-
-    this.title_.listenSignals(this.titleInvalidated_, this);
-    this.title_.setParentEventTarget(this);
-
-    this.registerDisposable(this.title_);
-  }
-
-  if (goog.isDef(opt_value)) {
-    this.suspendSignalsDispatching();
-    this.title_.setup(opt_value);
-    this.title_.container(this.getTitleLayer_());
-    this.resumeSignalsDispatching(true);
-    return this;
-  } else {
-    return this.title_;
-  }
-};
-
-
-/**
- * Internal title invalidation handler.
- * @param {anychart.SignalEvent} event Event object.
- * @private
- */
-anychart.ganttModule.DataGrid.Column.prototype.titleInvalidated_ = function(event) {
-  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    this.dataGrid_.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-  }
-};
-
-
-/**
- * Inner getter for this.base_.
- * @return {acgraph.vector.Layer}
- * @private
- */
-anychart.ganttModule.DataGrid.Column.prototype.getBase_ = function() {
-  if (!this.base_) {
-    this.base_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
-    this.registerDisposable(this.base_);
-  }
-  return this.base_;
-};
-
-
-/**
- * Inner getter for this.titleLayer_.
- * @return {acgraph.vector.Layer}
- * @private
- */
-anychart.ganttModule.DataGrid.Column.prototype.getTitleLayer_ = function() {
-  if (!this.titleLayer_) {
-    this.titleLayer_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
-    this.registerDisposable(this.titleLayer_);
-  }
-  return this.titleLayer_;
-};
-
-
-/**
- * Getter for this.titlePath_.
- * @return {acgraph.vector.Path}
- * @private
- */
-anychart.ganttModule.DataGrid.Column.prototype.getTitlePath_ = function() {
-  if (!this.titlePath_) {
-    this.titlePath_ = acgraph.path();
-    this.getTitleLayer_().addChildAt(this.titlePath_, 0);
-    this.titlePath_.fill(/** @type {acgraph.vector.Fill} */ (this.dataGrid_.resolveHeaderFill()));
-    this.titlePath_.stroke(null);
-    this.registerDisposable(this.titlePath_);
-  }
-  return this.titlePath_;
-};
-
-
-/**
- * Gets/sets position.
- * @param {anychart.math.Coordinate=} opt_value - Value to be set.
- * @return {(anychart.math.Coordinate|anychart.ganttModule.DataGrid.Column)} - Current value or itself for method chaining.
- */
-anychart.ganttModule.DataGrid.Column.prototype.position = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (!this.position_ || this.position_.x != opt_value.x || this.position_.y != opt_value.y) {
-      this.position_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.position_;
-  }
-};
-
-
-/**
- * Column width.
- * @param {(number|string)=} opt_value Width value.
- * @return {(number|string|anychart.ganttModule.DataGrid.Column)} - Width or itself for method chaining.
- */
-anychart.ganttModule.DataGrid.Column.prototype.width = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.width_ != opt_value) {
-      this.width_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.width_;
-};
-
-
-/**
- * Column default width.
- * @param {number=} opt_value - Default width value.
- * @return {(number|anychart.ganttModule.DataGrid.Column)} - Width or itself for method chaining.
- */
-anychart.ganttModule.DataGrid.Column.prototype.defaultWidth = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.defaultWidth_ = opt_value; //We don't invalidate anything right here.
-    return this;
-  }
-  return this.defaultWidth_;
-};
-
-
-/**
- * Column height.
- * @param {(number|string)=} opt_value Height value.
- * @return {(number|string|anychart.ganttModule.DataGrid.Column)} - Height or itself for method chaining.
- */
-anychart.ganttModule.DataGrid.Column.prototype.height = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.height_ != opt_value) {
-      this.height_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.height_;
-};
-
-
-/**
- * Getter/setter for buttonCursor.
- * @param {(anychart.enums.Cursor|string)=} opt_value buttonCursor.
- * @return {anychart.enums.Cursor|anychart.ganttModule.DataGrid.Column} buttonCursor or self for chaining.
- * @deprecated since 8.2.0. Use anychart.core.ui.DataGrid#buttons().cursor() instead
- */
-anychart.ganttModule.DataGrid.Column.prototype.buttonCursor = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['buttonCursor()', 'dataGrid.buttons().cursor()'], true);
-  var buttons = this.dataGrid_.buttons();
-  if (goog.isDef(opt_value)) {
-    buttons['cursor'](opt_value);
-    return this;
-  }
-  return buttons['cursor'](opt_value);
-};
-
-
-/**
- * Inner getter for this.cellsLayer_.
- * @return {acgraph.vector.Layer}
- * @private
- */
-anychart.ganttModule.DataGrid.Column.prototype.getCellsLayer_ = function() {
-  if (!this.cellsLayer_) {
-    this.cellsLayer_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
-    this.registerDisposable(this.cellsLayer_);
-  }
-  return this.cellsLayer_;
-};
-
-
-/** @inheritDoc */
-anychart.ganttModule.DataGrid.Column.prototype.remove = function() {
-  if (this.base_) this.base_.parent(null);
-  this.dataGrid_.invalidate(anychart.ConsistencyState.DATA_GRID_GRIDS, anychart.Signal.NEEDS_REDRAW);
-};
-
-
-/**
- * Calculates actual column bounds.
- * @return {anychart.math.Rect}
- */
-anychart.ganttModule.DataGrid.Column.prototype.calculateBounds = function() {
-  var parentBounds = this.dataGrid_.getPixelBounds();
-  var width = anychart.utils.normalizeSize(this.width_ || 0, parentBounds.width);
-  width = Math.max(anychart.ganttModule.DataGrid.MIN_COLUMN_WIDTH, width);
-  var height = anychart.utils.normalizeSize(this.height_ || 0, parentBounds.height);
-  var position = anychart.math.normalizeCoordinate(this.position_);
-
-  return new anychart.math.Rect(
-      (parentBounds.left + position.x),
-      (parentBounds.top + position.y),
-      width,
-      height
-  );
-};
-
-
-/**
- * Button invalidation handler.
- * @param {anychart.SignalEvent} event
- * @private
- */
-anychart.ganttModule.DataGrid.Column.prototype.buttonInvalidated_ = function(event) {
-  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW))
-    this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_BUTTON, anychart.Signal.NEEDS_REDRAW);
-};
-
-
-/**
- * Draws data grid column.
- * @return {anychart.ganttModule.DataGrid.Column} - Itself for method chaining.
- */
-anychart.ganttModule.DataGrid.Column.prototype.draw = function() {
-  if (this.checkDrawingNeeded()) { //We have to control enabled state manually.
-    var container = /** @type {acgraph.vector.ILayer} */(this.container());
-    var stage = container ? container.getStage() : null;
-    var manualSuspend = stage && !stage.isSuspended();
-    if (manualSuspend) stage.suspend();
-
-    //Ensure DOM structure is created.
-    if (!this.getBase_().numChildren()) {
-      this.getBase_()
-          .addChild(/** @type {!acgraph.vector.Layer} */ (this.getCellsLayer_()))
-          .addChild(/** @type {!acgraph.vector.Layer} */ (this.getTitleLayer_()));
-    }
-
-    if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
-      this.getBase_().parent(container);
-      this.markConsistent(anychart.ConsistencyState.CONTAINER);
-    }
-
-    if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-      this.pixelBoundsCache_ = this.calculateBounds();
-      this.getBase_().clip(this.pixelBoundsCache_);
-
-      /*
-        TODO (A.Kudryavtsev):
-        NOTE: Here I can't just say "Hey labelFactory, set new X and Y coordinate to all labels without clearing it before
-        new data passage".
-        In current implementation of labelsFactory we have to clear labels and add it again in new data passage.
-        That's why we invalidate anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION here.
-       */
-      this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION);
-
-      this.markConsistent(anychart.ConsistencyState.BOUNDS);
-    }
-
-    var data, startIndex, endIndex, item, i, counter, button;
-    if (this.hasInvalidationState(anychart.ConsistencyState.DATA_GRID_COLUMN_BUTTON)) {
-      data = this.dataGrid_.getVisibleItems();
-      startIndex = /** @type {number} */(this.dataGrid_.startIndex());
-      endIndex = /** @type {number} */(this.dataGrid_.endIndex());
-      counter = -1;
-      for (i = startIndex; i <= endIndex; i++) {
-        item = data[i];
-        if (!item) break;
-
-        if (this.collapseExpandButtons_ && item.numChildren()) {
-          counter++;
-          button = this.buttons_[counter];
-          if (button)
-            button.draw();
-        }
-      }
-      this.markConsistent(anychart.ConsistencyState.DATA_GRID_COLUMN_BUTTON);
-    }
-
-    if (this.hasInvalidationState(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION)) {
-      var headerHeight = /** @type {number} */ (this.dataGrid_.headerHeight());
-
-      this.getTitlePath_()
-          .clear()
-          .moveTo(this.pixelBoundsCache_.left, this.pixelBoundsCache_.top)
-          .lineTo(this.pixelBoundsCache_.left + this.pixelBoundsCache_.width, this.pixelBoundsCache_.top)
-          .lineTo(this.pixelBoundsCache_.left + this.pixelBoundsCache_.width, this.pixelBoundsCache_.top + headerHeight)
-          .lineTo(this.pixelBoundsCache_.left, this.pixelBoundsCache_.top + headerHeight)
-          .close();
-
-      var titleParentBounds = new anychart.math.Rect(this.pixelBoundsCache_.left, this.pixelBoundsCache_.top,
-          this.pixelBoundsCache_.width, headerHeight);
-
-      this.title_.suspendSignalsDispatching();
-      this.title_.parentBounds(titleParentBounds);
-      this.title_.height(headerHeight);
-      this.title_.resumeSignalsDispatching(false);
-      this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_TITLE);
-
-      data = this.dataGrid_.getVisibleItems();
-      startIndex = /** @type {number} */(this.dataGrid_.startIndex());
-      endIndex = /** @type {number} */(this.dataGrid_.endIndex());
-      var verticalOffset = this.dataGrid_.verticalOffset();
-
-      var totalTop = this.pixelBoundsCache_.top + headerHeight + 1 - verticalOffset;
-
-      this.cellTextSettings().suspendSignalsDispatching();
-      this.cellTextSettings().clear();
-
-      var paddingLeft = anychart.utils.normalizeSize(/** @type {number|string} */ (this.cellTextSettings().padding().getOption('left')),
-          this.pixelBoundsCache_.width);
-      var paddingRight = anychart.utils.normalizeSize(/** @type {(number|string)} */ (this.cellTextSettings().padding().getOption('right')),
-          this.pixelBoundsCache_.width);
-      var paddingTop = anychart.utils.normalizeSize(/** @type {(number|string)} */ (this.cellTextSettings().padding().getOption('top')),
-          this.pixelBoundsCache_.height);
-      var paddingBottom = anychart.utils.normalizeSize(/** @type {(number|string)} */ (this.cellTextSettings().padding().getOption('bottom')),
-          this.pixelBoundsCache_.height);
-
-      counter = -1;
-      var dataGridButtons = this.dataGrid_.buttons();
-      var buttonsJson = dataGridButtons.serialize();
-      dataGridButtons.markConsistent(anychart.ConsistencyState.ALL);
-      for (i = startIndex; i <= endIndex; i++) {
-        item = data[i];
-        if (!item) break;
-
-        var height = this.dataGrid_.controller.getItemHeight(item);
-        var depth = item.meta('depth') || 0;
-        var padding = paddingLeft + this.depthPaddingMultiplier_ * /** @type {number} */ (depth);
-        var addButton = 0;
-
-        if (this.collapseExpandButtons_ && item.numChildren()) {
-          counter++;
-          //addButton = anychart.ganttModule.DataGrid.DEFAULT_EXPAND_COLLAPSE_BUTTON_SIDE + anychart.ganttModule.DataGrid.DEFAULT_PADDING;
-          button = this.buttons_[counter];
-          if (!button) {
-            button = new anychart.ganttModule.DataGridButton(this.dataGrid_);
-            this.buttons_.push(button);
-            button.setupInternal(true, buttonsJson);
-            button.zIndex(anychart.ganttModule.DataGrid.Column.BUTTONS_Z_INDEX);
-            button.container(this.getCellsLayer_());
-            button.listenSignals(this.buttonInvalidated_, this);
-          }
-          button.suspendSignalsDispatching();
-          button.setup(buttonsJson);
-
-          addButton = (dataGridButtons.getOption('size') || 0) + anychart.ganttModule.DataGrid.DEFAULT_PADDING;
-
-          var top = totalTop + ((height - anychart.ganttModule.DataGrid.DEFAULT_EXPAND_COLLAPSE_BUTTON_SIDE) / 2);
-
-          var pixelShift = (acgraph.type() === acgraph.StageType.SVG) ? .5 : 0;
-          button
-              .enabled(true)
-              .dataItemIndex(i)
-              .parentBounds(this.pixelBoundsCache_)
-              .position({
-                'x': Math.floor(this.pixelBoundsCache_.left + padding) + pixelShift,
-                'y': Math.floor(top) + pixelShift
-              })
-              .setState(!!item.meta('collapsed') ? anychart.SettingsState.COLLAPSED : anychart.SettingsState.EXPANDED);
-
-          button.resumeSignalsDispatching(false);
-          button.draw();
-        }
-
-        var newTop = totalTop + height;
-
-        var format = this.dataGrid_.createFormatProvider(item);
-
-        var labelText = this.format_.call(format, item);
-
-        var label = this.cellTextSettings().add({'value': labelText},
-            {'value': {'x': this.pixelBoundsCache_.left, 'y': totalTop}});
-
-        label.suspendSignalsDispatching();
-
-        label.height(height);
-        label.width(this.pixelBoundsCache_.width);
-        label.padding(paddingTop, paddingRight, paddingBottom, padding + addButton);
-
-        this.cellTextSettingsOverrider_(label, item);
-        label.resumeSignalsDispatching(false);
-        label.draw();
-
-        totalTop = (newTop + this.dataGrid_.rowStrokeThickness);
-      }
-
-      while (++counter < this.buttons_.length && this.collapseExpandButtons_) { //This disables all remaining buttons.
-        if (!this.buttons_[counter].enabled()) break;
-        this.buttons_[counter].enabled(false).draw();
-      }
-
-      this.cellTextSettings().resumeSignalsDispatching(false);
-      this.cellTextSettings().draw();
-      this.markConsistent(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION);
-    }
-
-    if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-      this.getTitlePath_().fill(/** @type {acgraph.vector.Fill} */ (this.dataGrid_.resolveHeaderFill()));
-      this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_TITLE);
-      this.markConsistent(anychart.ConsistencyState.APPEARANCE);
-    }
-
-    if (this.hasInvalidationState(anychart.ConsistencyState.DATA_GRID_COLUMN_TITLE)) {
-      this.title_.draw();
-      this.markConsistent(anychart.ConsistencyState.DATA_GRID_COLUMN_TITLE);
-    }
-
-    if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
-      this.getBase_().zIndex(/** @type {number} */ (this.zIndex()));
-      this.markConsistent(anychart.ConsistencyState.Z_INDEX);
-    }
-
-    if (manualSuspend) stage.resume();
-  }
-  return this;
-};
-
-
-/** @inheritDoc */
-anychart.ganttModule.DataGrid.Column.prototype.serialize = function() {
-  var json = anychart.ganttModule.DataGrid.Column.base(this, 'serialize');
-
-  json['width'] = this.width_;
-  if (goog.isDef(this.defaultWidth_)) json['defaultWidth'] = this.defaultWidth_;
-  json['collapseExpandButtons'] = this.collapseExpandButtons_;
-  json['depthPaddingMultiplier'] = this.depthPaddingMultiplier_;
-  json['cellTextSettings'] = this.cellTextSettings().serialize();
-  json['title'] = this.title_.serialize();
-
-  if (this.format_ != this.defaultFormat_) {
-    anychart.core.reporting.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Data Grid Column format']
-    );
-  }
-
-  if (this.cellTextSettingsOverrider_ != this.defaultCellTextSettingsOverrider_) {
-    anychart.core.reporting.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Data Grid Column cellTextSettingsOverrider']
-    );
-  }
-
-  return json;
-};
-
-
-/** @inheritDoc */
-anychart.ganttModule.DataGrid.Column.prototype.setupByJSON = function(json, opt_default) {
-  anychart.ganttModule.DataGrid.Column.base(this, 'setupByJSON', json, opt_default);
-
-  this.width(json['width']);
-  this.defaultWidth(json['defaultWidth']);
-  this.collapseExpandButtons(json['collapseExpandButtons']);
-  this.depthPaddingMultiplier(json['depthPaddingMultiplier']);
-  this.cellTextSettings(json['cellTextSettings']);
-
-  this.title(json['title']);
-
-  if ('format' in json) this.format(json['format']);
-  if ('cellTextSettingsOverrider' in json) this.cellTextSettingsOverrider(json['cellTextSettingsOverrider']);
-};
-
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Data Grid Collapse-Expand Button.
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Collapse-expand button customization.
- * @param {anychart.ganttModule.DataGrid} dataGrid - Parent data grid.
- * @constructor
- * @extends {anychart.core.ui.Button}
- */
-anychart.ganttModule.DataGrid.Button = function(dataGrid) {
-  anychart.ganttModule.DataGrid.Button.base(this, 'constructor');
-
-  /**
-   * Own data grid.
-   * @type {anychart.ganttModule.DataGrid}
-   * @private
-   */
-  this.dataGrid_ = dataGrid;
-
-  /**
-   * Flag if button is in collapsed state.
-   * @type {boolean}
-   * @private
-   */
-  this.collapsed_ = false;
-
-  /**
-   * Index of data item to be expanded/collapsed.
-   * @type {number}
-   * @private
-   */
-  this.dataItemIndex_ = -1;
-
-  this.suspendSignalsDispatching();
-  this
-      .width(anychart.ganttModule.DataGrid.DEFAULT_EXPAND_COLLAPSE_BUTTON_SIDE)
-      .height(anychart.ganttModule.DataGrid.DEFAULT_EXPAND_COLLAPSE_BUTTON_SIDE)
-      .supportedStates(anychart.core.ui.Button.State.CHECKED, false);
-
-  this['hAlign']('center');
-  this['vAlign']('middle');
-
-  //this.backgroundPath.stroke('red');
-
-  this['text']('-');
-  this.resumeSignalsDispatching(false);
-
-  //Listens itself to process 'hover' and 'press' button decorations correctly.
-  this.listenSignals(function() {
-    this.draw();
-  });
-
-  this.setParentEventTarget(this.dataGrid_);
-
-};
-goog.inherits(anychart.ganttModule.DataGrid.Button, anychart.core.ui.Button);
-
-
-/**
- * Handler for mouse up.
- * @param {acgraph.events.BrowserEvent} event - Event.
- * @override
- */
-anychart.ganttModule.DataGrid.Button.prototype.handleMouseUp = function(event) {
-  anychart.ganttModule.DataGrid.Button.base(this, 'handleMouseUp', event);
-  this.switchState();
-};
-
-
-/**
- * Gets/sets state of button.
- * @param {boolean=} opt_value - Value to be set.
- * @return {(anychart.ganttModule.DataGrid.Button|boolean)} - Current value or itself for method chaining.
- */
-anychart.ganttModule.DataGrid.Button.prototype.collapsed = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.collapsed_ != opt_value) {
-      this.collapsed_ = opt_value;
-      this['text'](this.collapsed_ ? '+' : '-');
-    }
-    return this;
-  }
-  return this.collapsed_;
-};
-
-
-/**
- * Gets/sets data item index.
- * @param {number=} opt_value - Value to be set.
- * @return {(anychart.ganttModule.DataGrid.Button|number)} - Current value or itself for method chaining.
- */
-anychart.ganttModule.DataGrid.Button.prototype.dataItemIndex = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.dataItemIndex_ = opt_value;
-    return this;
-  }
-  return this.dataItemIndex_;
-};
-
-
-/**
- * Switches button state on button click.
- */
-anychart.ganttModule.DataGrid.Button.prototype.switchState = function() {
-  this.collapsed(!this.collapsed());
-  this.dataGrid_.collapseExpandItem(this.dataItemIndex_, this.collapsed_);
 };
 
 
@@ -1966,7 +1289,6 @@ anychart.standalones.dataGrid = function() {
 
   proto['column'] = proto.column;
 
-
   proto['data'] = proto.data;
   proto['startIndex'] = proto.startIndex;
   proto['endIndex'] = proto.endIndex;
@@ -1981,19 +1303,9 @@ anychart.standalones.dataGrid = function() {
   proto['editStructurePreviewDashStroke'] = proto.editStructurePreviewDashStroke;
   proto['buttons'] = proto.buttons;
 
-  proto = anychart.ganttModule.DataGrid.Column.prototype;
-  proto['title'] = proto.title;
-  proto['width'] = proto.width;
-  proto['defaultWidth'] = proto.defaultWidth;
-  proto['enabled'] = proto.enabled;
-  proto['format'] = proto.format;
-  proto['cellTextSettings'] = proto.cellTextSettings;
-  proto['cellTextSettingsOverrider'] = proto.cellTextSettingsOverrider;
-  proto['collapseExpandButtons'] = proto.collapseExpandButtons;
-  proto['depthPaddingMultiplier'] = proto.depthPaddingMultiplier;
-  proto['setColumnFormat'] = proto.setColumnFormat;
-  proto['buttonCursor'] = proto.buttonCursor;
-  proto['draw'] = proto.draw;
+  proto['onEditStart'] = proto.onEditStart;
+  proto['onEditEnd'] = proto.onEditEnd;
+
 
   proto = anychart.standalones.DataGrid.prototype;
   goog.exportSymbol('anychart.standalones.dataGrid', anychart.standalones.dataGrid);

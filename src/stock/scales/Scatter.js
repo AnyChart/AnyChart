@@ -3,6 +3,7 @@ goog.provide('anychart.stockModule.scales.Scatter');
 goog.require('anychart.core.Base');
 goog.require('anychart.enums');
 goog.require('anychart.scales.IXScale');
+goog.require('anychart.stockModule.scales.ExplicitTicksIterator');
 goog.require('anychart.stockModule.scales.ScatterTicksIterator');
 goog.require('anychart.utils');
 goog.require('goog.array');
@@ -97,6 +98,12 @@ anychart.stockModule.scales.Scatter = function(chartOrScroller) {
   this.maxIndex = NaN;
 
   /**
+   * @type {Object.<string, {count: number, range: number}>}
+   * @protected
+   */
+  this.intervals = {};
+
+  /**
    * Consistency flag. Easier to use than Base consistency here.
    * @type {boolean}
    */
@@ -110,6 +117,13 @@ anychart.stockModule.scales.Scatter = function(chartOrScroller) {
   this.ticksIterator = null;
 
   /**
+   * Major ticks for the scale.
+   * @type {anychart.stockModule.scales.ExplicitTicksIterator}
+   * @protected
+   */
+  this.explicitTicksIterator = null;
+
+  /**
    * Ticks settings.
    * @type {anychart.stockModule.scales.Scatter.TicksSettingsRep}
    * @private
@@ -118,6 +132,27 @@ anychart.stockModule.scales.Scatter = function(chartOrScroller) {
   this.ticks(anychart.stockModule.scales.Scatter.DEFAULT_TICKS_);
 };
 goog.inherits(anychart.stockModule.scales.Scatter, anychart.core.Base);
+
+
+
+/**
+ * @typedef {{
+ *    min: number,
+ *    max: number,
+ *    fullMin: number,
+ *    fullMax: number,
+ *    ticksCount: number,
+ *    scale: anychart.stockModule.scales.Scatter
+ * }}
+ */
+anychart.stockModule.scales.Scatter.TicksCallbackContext;
+
+
+/**
+ * @typedef {function(this: anychart.stockModule.scales.Scatter.TicksCallbackContext,
+ * anychart.stockModule.scales.Scatter.TicksCallbackContext): Array.<(number|{value: number, isMinor: boolean})>}
+ */
+anychart.stockModule.scales.Scatter.TicksCallback;
 
 
 /**
@@ -317,11 +352,11 @@ anychart.stockModule.scales.Scatter.prototype.checkWeights = function() {
 
 /**
  * Returns ticks iterator.
- * @return {anychart.stockModule.scales.ScatterTicksIterator}
+ * @return {anychart.stockModule.scales.ScatterTicksIterator|anychart.stockModule.scales.ExplicitTicksIterator}
  */
 anychart.stockModule.scales.Scatter.prototype.getTicks = function() {
   this.calculate();
-  return this.ticksIterator;
+  return this.ticksCallback_ ? this.explicitTicksIterator : this.ticksIterator;
 };
 
 
@@ -352,15 +387,49 @@ anychart.stockModule.scales.Scatter.prototype.calculate = function() {
     dataMaxKey = goog.math.clamp(this.maxKey, this.dataFullMinKey, this.dataFullMaxKey);
   }
 
-  var minorTickRange = Math.abs(dataMaxKey - dataMinKey) / this.ticksCount_;
-  if (isNaN(minorTickRange)) {
-    this.ticksIterator.setup(
-        NaN,
-        NaN,
-        anychart.utils.getIntervalFromInfo(anychart.enums.Interval.YEAR, 1),
-        anychart.utils.getIntervalFromInfo(anychart.enums.Interval.YEAR, 1),
-        NaN);
+  var pointsCount = this.maxIndex - this.minIndex + 1;
+  var error = pointsCount * 0.25;
+  var arr = [];
+
+  goog.object.forEach(this.intervals, function(interval) {
+    if (interval.count > error) {
+      arr.push(interval);
+    }
+  });
+
+  var targetInterval = goog.array.reduce(arr, function(rval, item) {
+    var firstInt = anychart.utils.getIntervalRange(rval.unit, 1);
+    var secondInt = anychart.utils.getIntervalRange(item.unit, 1);
+    var maxInt, minInt, maxRange, minRange;
+    if (firstInt >= secondInt) {
+      maxInt = rval;
+      minInt = item;
+      maxRange = firstInt;
+      minRange = secondInt;
+    } else {
+      maxInt = item;
+      minInt = rval;
+      maxRange = secondInt;
+      minRange = firstInt;
+    }
+
+    return maxRange / minRange > 60 ? maxInt : minInt;
+  }, arr[0]);
+
+  var range;
+  if (targetInterval) {
+    range = targetInterval.range;
+    var intervalRange = anychart.utils.getIntervalRange(targetInterval.unit, 1);
+    goog.object.forEach(this.intervals, function(interval) {
+      if (interval != targetInterval) {
+        range += interval.count * intervalRange;
+      }
+    });
+  } else {
+    range = Math.abs(dataMaxKey - dataMinKey);
   }
+
+  var minorTickRange = Math.abs(range) / this.ticksCount_;
 
   var last = this.ranges_.length - 1;
   var row;
@@ -384,12 +453,25 @@ anychart.stockModule.scales.Scatter.prototype.calculate = function() {
     // };
   }
 
-  this.ticksIterator.setup(
-      dataMinKey,
-      dataMaxKey,
-      anychart.utils.getIntervalFromInfo(row.majorUnit, row.majorCount),
-      anychart.utils.getIntervalFromInfo(row.minorUnit, row.minorCount),
-      this.dataFullMinKey);
+  if (this.ticksCallback_) {
+    var context = {
+      'fullMin': this.dataFullMinKey,
+      'fullMax': this.dataFullMaxKey,
+      'min': dataMinKey,
+      'max': dataMaxKey,
+      'ticksCount': this.ticksCount_,
+      'scale': this
+    };
+    var customTicks = this.ticksCallback_.call(context, context);
+    this.explicitTicksIterator.setup(customTicks);
+  } else {
+    this.ticksIterator.setup(
+        dataMinKey,
+        dataMaxKey,
+        anychart.utils.getIntervalFromInfo(row.majorUnit, row.majorCount),
+        anychart.utils.getIntervalFromInfo(row.minorUnit, row.minorCount),
+        this.dataFullMinKey);
+  }
 
   this.majorUnit_ = row.majorUnit;
   this.majorUnitCount_ = row.majorCount;
@@ -406,6 +488,8 @@ anychart.stockModule.scales.Scatter.prototype.calculate = function() {
 anychart.stockModule.scales.Scatter.prototype.ensureTicksIteratorCreated = function() {
   if (!this.ticksIterator)
     this.ticksIterator = new anychart.stockModule.scales.ScatterTicksIterator();
+  if (!this.explicitTicksIterator && this.ticksCallback_)
+    this.explicitTicksIterator = new anychart.stockModule.scales.ExplicitTicksIterator();
 };
 
 
@@ -453,8 +537,9 @@ anychart.stockModule.scales.Scatter.prototype.setAutoFullRange = function(aligne
  * @param {number} endKey
  * @param {anychart.enums.Interval} unit
  * @param {number} count
+ * @param {Object.<string, {count: number, range: number}>} intervals
  */
-anychart.stockModule.scales.Scatter.prototype.setCurrentRange = function(startKey, endKey, unit, count) {
+anychart.stockModule.scales.Scatter.prototype.setCurrentRange = function(startKey, endKey, unit, count, intervals) {
   startKey = goog.math.clamp(startKey, this.alignedFullMinKey, this.alignedFullMaxKey);
   endKey = goog.math.clamp(endKey, this.alignedFullMinKey, this.alignedFullMaxKey);
   var startIndex = this.keyIndexTransformer.getIndexByKey(startKey);
@@ -471,6 +556,7 @@ anychart.stockModule.scales.Scatter.prototype.setCurrentRange = function(startKe
   this.unit = unit;
   this.count = count;
   this.consistent = false;
+  this.intervals = intervals;
   this.dispatchSignal(anychart.Signal.NEED_UPDATE_TICK_DEPENDENT);
 };
 
@@ -489,32 +575,40 @@ anychart.stockModule.scales.Scatter.prototype.ticksInvalidated_ = function(event
 
 
 /**
- * @param {anychart.stockModule.scales.Scatter.TicksSettings=} opt_value
- * @return {anychart.stockModule.scales.Scatter.TicksSettings|anychart.stockModule.scales.Scatter}
+ * @param {anychart.stockModule.scales.Scatter.TicksCallback|anychart.stockModule.scales.Scatter.TicksSettings=} opt_value .
+ * @return {anychart.stockModule.scales.Scatter.TicksCallback|anychart.stockModule.scales.Scatter.TicksSettings|anychart.stockModule.scales.Scatter}
  */
 anychart.stockModule.scales.Scatter.prototype.ticks = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    var value = this.normalizeTicks_(opt_value);
-    var len = value.length;
-    var same = len && (len == this.ranges_.length);
-    for (var i = 0; same && i < len; i++) {
-      var rangeA = value[i];
-      var rangeB = this.ranges_[i];
-      same = (
-          rangeA.range == rangeB.range &&
-          rangeA.minorUnit == rangeB.minorUnit &&
-          rangeA.minorCount == rangeB.minorCount &&
-          rangeA.majorUnit == rangeB.majorUnit &&
-          rangeA.majorCount == rangeB.majorCount);
-    }
-    if (!same) {
-      this.ranges_ = value;
+    if (goog.isFunction(opt_value)) {
+      this.ticksCallback_ = opt_value;
       this.consistent = false;
       this.dispatchSignal(anychart.Signal.NEED_UPDATE_TICK_DEPENDENT);
+    } else {
+      var value = this.normalizeTicks_(opt_value);
+      var len = value.length;
+      var same = len && (len == this.ranges_.length);
+      for (var i = 0; same && i < len; i++) {
+        var rangeA = value[i];
+        var rangeB = this.ranges_[i];
+        same = (
+            rangeA.range == rangeB.range &&
+            rangeA.minorUnit == rangeB.minorUnit &&
+            rangeA.minorCount == rangeB.minorCount &&
+            rangeA.majorUnit == rangeB.majorUnit &&
+            rangeA.majorCount == rangeB.majorCount);
+      }
+      if (!same) {
+        this.ranges_ = value;
+        this.ticksCallback_ = null;
+        this.consistent = false;
+        this.dispatchSignal(anychart.Signal.NEED_UPDATE_TICK_DEPENDENT);
+      }
     }
     return this;
   }
-  return /** @type {anychart.stockModule.scales.Scatter.TicksSettings} */(
+  return /** @type {anychart.stockModule.scales.Scatter.TicksCallback|anychart.stockModule.scales.Scatter.TicksSettings} */(this.ticksCallback_ ?
+      this.ticksCallback_ :
       goog.array.map(this.ranges_, function(item) {
         return {
           'minor': {
@@ -581,6 +675,27 @@ anychart.stockModule.scales.Scatter.prototype.normalizeTicksRow_ = function(val)
 
 
 /**
+ * Returns key by index. Index can be fractional - the key will be inter- or extrapolated.
+ * @param {number} index
+ * @return {number}
+ */
+anychart.stockModule.scales.Scatter.prototype.getKeyByIndex = function(index) {
+  return this.keyIndexTransformer.getKeyByIndex(index);
+};
+
+
+/**
+ * Returns index by key. If the key is not in the registry - returns fractional inter/extrapolated index for it.
+ * @param {number} key
+ * @return {number}
+ */
+anychart.stockModule.scales.Scatter.prototype.getIndexByKey = function(key) {
+  return this.keyIndexTransformer.getIndexByKey(key);
+};
+
+
+
+/**
  * Array of default tick settings.
  * @type {anychart.stockModule.scales.Scatter.TicksSettings}
  * @private
@@ -601,6 +716,7 @@ anychart.stockModule.scales.Scatter.DEFAULT_TICKS_ = [
   {'minor': {'unit': anychart.enums.Interval.HOUR, 'count': 3}, 'major': {'unit': anychart.enums.Interval.HOUR, 'count': 12}},
   {'minor': {'unit': anychart.enums.Interval.HOUR, 'count': 12}, 'major': {'unit': anychart.enums.Interval.DAY, 'count': 1}},
   {'minor': {'unit': anychart.enums.Interval.DAY, 'count': 1}, 'major': {'unit': anychart.enums.Interval.WEEK, 'count': 1}},
+  {'minor': {'unit': anychart.enums.Interval.DAY, 'count': 2}, 'major': {'unit': anychart.enums.Interval.WEEK, 'count': 1}},
   {'minor': {'unit': anychart.enums.Interval.WEEK, 'count': 1}, 'major': {'unit': anychart.enums.Interval.MONTH, 'count': 1}},
   {'minor': {'unit': anychart.enums.Interval.MONTH, 'count': 1}, 'major': {'unit': anychart.enums.Interval.QUARTER, 'count': 1}},
   {'minor': {'unit': anychart.enums.Interval.QUARTER, 'count': 1}, 'major': {'unit': anychart.enums.Interval.SEMESTER, 'count': 1}},

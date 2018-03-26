@@ -268,7 +268,7 @@ anychart.core.StateSettings.prototype.getLowPriorityResolutionChain = function()
   var sett = [this.themeSettings];
   var parent = this.stateHolder.getParentState(this.stateType);
   if (parent) {
-    sett.push(parent.themeSettings);
+    sett.push.apply(sett, parent.getLowPriorityResolutionChain());
   }
   return sett;
 };
@@ -279,7 +279,7 @@ anychart.core.StateSettings.prototype.getHighPriorityResolutionChain = function(
   var sett = [this.ownSettings];
   var parent = this.stateHolder.getParentState(this.stateType);
   if (parent) {
-    sett.push(parent.ownSettings);
+    sett.push.apply(sett, parent.getHighPriorityResolutionChain());
   }
   return sett;
 };
@@ -724,7 +724,7 @@ anychart.core.StateSettings.prototype.setEnabledTrue = function(config) {
 /** @inheritDoc */
 anychart.core.StateSettings.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.StateSettings.base(this, 'setupByJSON', config, opt_default);
-  anychart.core.settings.deserialize(this, this.PROPERTY_DESCRIPTORS, config);
+  anychart.core.settings.deserialize(this, this.PROPERTY_DESCRIPTORS, config, opt_default);
 
   if (goog.isDef(this.descriptorsMeta['labels'])) {
     this.setEnabledTrue(config['labels']);

@@ -334,7 +334,7 @@ def __xml_schema_xmlns_version(value=None):
 
 def __definition_file_version(value=None):
     return __version_by_pattern(
-        'Type definitions for AnyChart charting library, Version %s',
+        'Type definitions for AnyChart JavaScript Charting Library, v%s',
         os.path.join(PROJECT_PATH, 'dist', 'index.d.ts'),
         value
     )

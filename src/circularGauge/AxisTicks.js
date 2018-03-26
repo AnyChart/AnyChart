@@ -147,7 +147,7 @@ anychart.circularGaugeModule.AxisTicks.prototype.stroke = function(opt_strokeOrF
         acgraph.vector.normalizeStroke.apply(null, arguments);
     if (stroke != this.stroke_) {
       this.stroke_ = stroke;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -173,7 +173,7 @@ anychart.circularGaugeModule.AxisTicks.prototype.fill = function(opt_fillOrColor
         acgraph.vector.normalizeFill.apply(null, arguments);
     if (fill != this.fill_) {
       this.fill_ = fill;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -328,8 +328,9 @@ anychart.circularGaugeModule.AxisTicks.prototype.startDrawing = function() {
 
 /**
  * @param {number} angle
+ * @param {number} tickValue
  */
-anychart.circularGaugeModule.AxisTicks.prototype.drawTick = function(angle) {
+anychart.circularGaugeModule.AxisTicks.prototype.drawTick = function(angle, tickValue) {
   var angleRad = goog.math.toRadians(angle);
 
   var cx = this.axis_.gauge().getCx();
@@ -344,7 +345,8 @@ anychart.circularGaugeModule.AxisTicks.prototype.drawTick = function(angle) {
   this.contextProvider_['rotation'] = rotation + angle + 90;
   this.contextProvider_['x'] = x;
   this.contextProvider_['y'] = y;
-  this.contextProvider_['angle'] = angle;
+  this.contextProvider_['angle'] = goog.math.standardAngle(angle - anychart.circularGaugeModule.Chart.DEFAULT_START_ANGLE);
+  this.contextProvider_['value'] = tickValue;
 
   tick.rotation(rotation + angle + 90);
   if (goog.isFunction(this.fill_))

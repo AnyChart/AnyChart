@@ -5,13 +5,16 @@ goog.require('anychart.linearGaugeModule.pointers.Base');
 
 /**
  * Thermometer pointer class.
- * @param {anychart.linearGaugeModule.Chart} gauge Gauge.
- * @param {number} dataIndex Pointer data index.
  * @extends {anychart.linearGaugeModule.pointers.Base}
  * @constructor
  */
-anychart.linearGaugeModule.pointers.Thermometer = function(gauge, dataIndex) {
-  anychart.linearGaugeModule.pointers.Thermometer.base(this, 'constructor', gauge, dataIndex);
+anychart.linearGaugeModule.pointers.Thermometer = function() {
+  anychart.linearGaugeModule.pointers.Thermometer.base(this, 'constructor');
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['bulbRadius', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['bulbPadding', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED]
+  ]);
 };
 goog.inherits(anychart.linearGaugeModule.pointers.Thermometer, anychart.linearGaugeModule.pointers.Base);
 
@@ -79,9 +82,9 @@ anychart.linearGaugeModule.pointers.Thermometer.prototype.getType = function() {
 
 /** @inheritDoc */
 anychart.linearGaugeModule.pointers.Thermometer.prototype.getReservedBounds = function(parentWidth, parentHeight) {
-  var w = anychart.utils.normalizeSize(/** @type {number|string} */ (this.width()), parentWidth);
-  var r = anychart.utils.normalizeSize(/** @type {number|string} */ (this.bulbRadius()), w);
-  var p = anychart.utils.normalizeSize(/** @type {number|string} */ (this.bulbPadding()), parentHeight);
+  var w = anychart.utils.normalizeSize(/** @type {number|string} */ (this.getOption('width')), parentWidth);
+  var r = anychart.utils.normalizeSize(/** @type {number|string} */ (this.getOption('bulbRadius')), w);
+  var p = anychart.utils.normalizeSize(/** @type {number|string} */ (this.getOption('bulbPadding')), parentHeight);
   if (r < w / 2)
     r = w / 2;
   this.pixRadius_ = r;
@@ -106,41 +109,21 @@ anychart.linearGaugeModule.pointers.Thermometer.prototype.getReservedBounds = fu
 
 
 //endregion
-//region --- OWN/SPECIFIC API ---
+//region --- DESCRIPTORS ---
 /**
- * Getter/setter for bulbRadius.
- * @param {string=} opt_value bulbRadius.
- * @return {string|anychart.linearGaugeModule.pointers.Thermometer} bulbRadius or self for chaining.
+ * Properties that should be defined in series.Base prototype.
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.linearGaugeModule.pointers.Thermometer.prototype.bulbRadius = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
-    if (this.bulbRadius_ != opt_value) {
-      this.bulbRadius_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.bulbRadius_;
-};
-
-
-/**
- * Getter/setter for bulbPadding.
- * @param {string|number=} opt_value bulbPadding.
- * @return {string|number|anychart.linearGaugeModule.pointers.Thermometer} bulbPadding or self for chaining.
- */
-anychart.linearGaugeModule.pointers.Thermometer.prototype.bulbPadding = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
-    if (this.bulbPadding_ != opt_value) {
-      this.bulbPadding_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.bulbPadding_;
-};
+anychart.linearGaugeModule.pointers.Thermometer.OWN_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'bulbRadius', anychart.utils.normalizeToPercent],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'bulbPadding', anychart.utils.normalizeToPercent]
+  ]);
+  return map;
+})();
+anychart.core.settings.populate(anychart.linearGaugeModule.pointers.Thermometer, anychart.linearGaugeModule.pointers.Thermometer.OWN_DESCRIPTORS);
 
 
 //endregion
@@ -148,24 +131,22 @@ anychart.linearGaugeModule.pointers.Thermometer.prototype.bulbPadding = function
 /** @inheritDoc */
 anychart.linearGaugeModule.pointers.Thermometer.prototype.setupByJSON = function(config, opt_default) {
   anychart.linearGaugeModule.pointers.Thermometer.base(this, 'setupByJSON', config, opt_default);
-
-  this.bulbRadius(config['bulbRadius']);
-  this.bulbPadding(config['bulbPadding']);
+  anychart.core.settings.deserialize(this, anychart.linearGaugeModule.pointers.Thermometer.OWN_DESCRIPTORS, config, opt_default);
 };
 
 
 /** @inheritDoc */
 anychart.linearGaugeModule.pointers.Thermometer.prototype.serialize = function() {
   var json = anychart.linearGaugeModule.pointers.Thermometer.base(this, 'serialize');
-  json['bulbRadius'] = this.bulbRadius();
-  json['bulbPadding'] = this.bulbPadding();
+  anychart.core.settings.serialize(this, anychart.linearGaugeModule.pointers.Thermometer.OWN_DESCRIPTORS, json, 'Thermometer');
   return json;
 };
 //endregion
 
 //exports
-(function() {
-  var proto = anychart.linearGaugeModule.pointers.Thermometer.prototype;
-  proto['bulbRadius'] = proto.bulbRadius;
-  proto['bulbPadding'] = proto.bulbPadding;
-})();
+//(function() {
+//  var proto = anychart.linearGaugeModule.pointers.Thermometer.prototype;
+// generated automatically
+//proto['bulbRadius'] = proto.bulbRadius;
+//proto['bulbPadding'] = proto.bulbPadding;
+//})();

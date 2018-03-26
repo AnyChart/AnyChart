@@ -80,6 +80,7 @@ anychart.stockModule.Registry.Item;
  * Internal type to represent table selection range.
  * Fields start* and end* are selected values, others are selection results (data-dependant).
  * @typedef {{
+ *   intervals: Object.<string, {count: number, range: number}>,
  *   startKey: number,
  *   endKey: number,
  *   startIndex: number,
@@ -360,6 +361,7 @@ anychart.stockModule.Registry.prototype.addSource = function(table) {
 anychart.stockModule.Registry.prototype.getSelection = function(startKey, endKey) {
   var first, last, preFirst, postLast, startIndex, endIndex, selection, minDistance, i;
   var keysLength = this.keys_.length;
+  var intervals = {};
   if (keysLength) {
     // checking cache
     for (i = 0; i < this.selectionCache_.length; i++) {
@@ -411,11 +413,61 @@ anychart.stockModule.Registry.prototype.getSelection = function(startKey, endKey
         minDistance = tmp.next.key - tmp.key;
       }
     }
+
+    var boundariesInfo = this.getBoundariesInfo();
+    var firstKey = goog.math.clamp(startKey, boundariesInfo[2], boundariesInfo[3]);
+    var lastKey = goog.math.clamp(endKey, boundariesInfo[2], boundariesInfo[3]);
+    var firstIndex = this.getIndexByKey(firstKey);
+    var lastIndex = this.getIndexByKey(lastKey);
+
+    var currKey, prevKey, range, estRange, interval;
+
+    for (i = firstIndex; i <= lastIndex; i++) {
+      if (i < first) {
+        currKey = goog.math.clamp(this.keys_[first].key, boundariesInfo[0], boundariesInfo[1]);
+        prevKey = goog.math.clamp(firstKey, boundariesInfo[0], boundariesInfo[1]);
+
+        i = first;
+      } else if (i && this.keys_[i]) {
+        currKey = this.keys_[i].key;
+        prevKey = this.keys_[i - 1].key;
+      } else {
+        currKey = prevKey = NaN;
+      }
+
+      range = currKey - prevKey;
+      if (!isNaN(range)) {
+        estRange = anychart.utils.estimateInterval(range);
+        if (intervals[estRange['unit']]) {
+          interval = intervals[estRange['unit']];
+          interval.count++;
+          interval.range += range;
+        } else {
+          intervals[estRange['unit']] = {count: 1, range: range, unit: estRange['unit']};
+        }
+      }
+    }
+    if (lastIndex > last) {
+      currKey = goog.math.clamp(lastKey, boundariesInfo[0], boundariesInfo[1]);
+      prevKey = goog.math.clamp(this.keys_[last].key, boundariesInfo[0], boundariesInfo[1]);
+      range = currKey - prevKey;
+      if (!isNaN(range)) {
+        estRange = anychart.utils.estimateInterval(range);
+        if (intervals[estRange['unit']]) {
+          interval = intervals[estRange['unit']];
+          interval.count++;
+          interval.range += range;
+        } else {
+          intervals[estRange['unit']] = {count: 1, range: range, unit: estRange.unit};
+        }
+      }
+    }
   } else {
     first = last = preFirst = postLast = startIndex = endIndex = minDistance = NaN;
   }
 
   selection = {
+    intervals: intervals,
     startKey: startKey,
     endKey: endKey,
     startIndex: startIndex,

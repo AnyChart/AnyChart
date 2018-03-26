@@ -199,6 +199,7 @@ anychart.scales.ScatterBase.prototype.alignMinimum = function(opt_value) {
         this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REAPPLICATION);
       }
     }
+    return this;
   }
   return this.alignMinimumVal;
 };
@@ -219,6 +220,7 @@ anychart.scales.ScatterBase.prototype.alignMaximum = function(opt_value) {
         this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REAPPLICATION);
       }
     }
+    return this;
   }
   return this.alignMaximumVal;
 };

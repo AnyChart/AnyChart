@@ -672,6 +672,7 @@ anychart.themes.merging.mergingMap_ = (function() {
         [[
           ['default', [
             'Title',
+            'Timeline.header',
             'ButtonSettings.normal',
             ['Tooltip', [
               '',
@@ -724,12 +725,10 @@ anychart.themes.merging.mergingMap_ = (function() {
         ['default', [
           ['Axis.', [[['minorL', 'l'], 'abels']]],
           ['Timeline.', [
-            [[
-              '',
-              ['header.', [[['top', 'mid', 'low'], 'Level.']]]
-            ], 'labels']
+            'header',
+            'labels'
           ]],
-          'DataGrid.defaultColumnSettings.cellTextSettings'
+          'DataGrid.defaultColumnSettings.labels'
         ]],
         'standalones.labelsFactory',
         ['map.axesSettings.', [
@@ -776,14 +775,7 @@ anychart.themes.merging.mergingMap_ = (function() {
           'scatter',
           'map',
           'stock'
-        ], [
-          ['.crosshair.', [
-            [[
-              'x',
-              'y'
-            ], 'Label']
-          ]]
-        ]]
+        ], '.crosshair.defaultLabelSettings']
       ]
     },
     {
@@ -1681,7 +1673,7 @@ anychart.themes.merging.mergingMap_ = (function() {
       defaultObj: 'defaultGroupingSettings',
       targets: [
         ['stock.', [
-            [['g', 'scrollerG'], 'rouping']
+          [['g', 'scrollerG'], 'rouping']
         ]]
       ]
     },

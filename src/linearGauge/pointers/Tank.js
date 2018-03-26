@@ -6,13 +6,11 @@ goog.require('anychart.linearGaugeModule.pointers.Base');
 
 /**
  * Tank pointer class.
- * @param {anychart.linearGaugeModule.Chart} gauge Gauge.
- * @param {number} dataIndex Pointer data index.
  * @extends {anychart.linearGaugeModule.pointers.Base}
  * @constructor
  */
-anychart.linearGaugeModule.pointers.Tank = function(gauge, dataIndex) {
-  anychart.linearGaugeModule.pointers.Tank.base(this, 'constructor', gauge, dataIndex);
+anychart.linearGaugeModule.pointers.Tank = function() {
+  anychart.linearGaugeModule.pointers.Tank.base(this, 'constructor');
 
   /**
    * @type {acgraph.vector.Layer}
@@ -116,7 +114,7 @@ anychart.linearGaugeModule.pointers.Tank.prototype.getType = function() {
 
 /** @inheritDoc */
 anychart.linearGaugeModule.pointers.Tank.prototype.getReservedBounds = function(parentWidth, parentHeight) {
-  var w = anychart.utils.normalizeSize(/** @type {number|string} */ (this.width()), parentWidth);
+  var w = anychart.utils.normalizeSize(/** @type {number|string} */ (this.getOption('width')), parentWidth);
   var gap = w * anychart.linearGaugeModule.pointers.Tank.MULTIPLIER;
   var left, top, right, bottom;
   left = top = right = bottom = 0;

@@ -4,7 +4,7 @@ goog.provide('anychart.ganttModule.rendering.Context');
 
 /**
  *
- * @param {anychart.ganttModule.elements.Base} element - Related element.
+ * @param {anychart.ganttModule.elements.TimelineElement} element - Related element.
  * @param {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} item - Related data item.
  * @param {anychart.math.Rect} predictedBounds - Default predicted bounds to display element.
  * @param {Object} tag - Tag data object. NOTE: not optional because current implementation (16 Jan 2018) depends on this data a lot.
@@ -15,7 +15,7 @@ goog.provide('anychart.ganttModule.rendering.Context');
 anychart.ganttModule.rendering.Context = function(element, item, predictedBounds, tag, opt_periodIndex, opt_selected) {
   /**
    *
-   * @type {anychart.ganttModule.elements.Base}
+   * @type {anychart.ganttModule.elements.TimelineElement}
    */
   this.element = element;
 
@@ -36,8 +36,9 @@ anychart.ganttModule.rendering.Context = function(element, item, predictedBounds
    * @type {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem}
    */
   this['item'] = item;
+  var state = opt_selected ? anychart.PointState.SELECT : anychart.PointState.NORMAL;
 
-  this['shapes'] = this.element.shapeManager.getShapesGroup(item, tag, void 0, void 0, void 0, opt_periodIndex, opt_selected);
+  this['shapes'] = this.element.shapeManager.getShapesGroup(item, tag, state, void 0, void 0, void 0, opt_periodIndex);
 
   if (goog.isDef(opt_periodIndex)) {
     /**
@@ -57,12 +58,12 @@ anychart.ganttModule.rendering.Context = function(element, item, predictedBounds
 
 /**
  * Generates a shapes group.
+ * @param {anychart.PointState} state - State.
  * @param {Object.<string>=} opt_only If set - contains a subset of shape names that should be returned.
  * @param {number=} opt_baseZIndex - zIndex that is used as a base zIndex for all shapes of the group.
  * @param {acgraph.vector.Shape=} opt_shape Foreign shape.
- * @param {boolean=} opt_selected - Whether is selected. TODO (A.Kudryavtsev): Replace this with State in future implementation.
  * @return {Object.<string, acgraph.vector.Shape>}
  */
-anychart.ganttModule.rendering.Context.prototype.getShapesGroup = function(opt_only, opt_baseZIndex, opt_shape, opt_selected) {
-  return this.element.shapeManager.getShapesGroup(this['item'], this.tag, opt_only, opt_baseZIndex, opt_shape, this['periodIndex'], opt_selected);
+anychart.ganttModule.rendering.Context.prototype.getShapesGroup = function(state, opt_only, opt_baseZIndex, opt_shape) {
+  return this.element.shapeManager.getShapesGroup(this['item'], this.tag, state, opt_only, opt_baseZIndex, opt_shape, this['periodIndex']);
 };

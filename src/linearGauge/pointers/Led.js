@@ -1,17 +1,16 @@
 goog.provide('anychart.linearGaugeModule.pointers.Led');
+goog.require('anychart.color');
 goog.require('anychart.linearGaugeModule.pointers.Base');
 
 
 
 /**
  * Led pointer class.
- * @param {anychart.linearGaugeModule.Chart} gauge Gauge.
- * @param {number} dataIndex Pointer data index.
  * @extends {anychart.linearGaugeModule.pointers.Base}
  * @constructor
  */
-anychart.linearGaugeModule.pointers.Led = function(gauge, dataIndex) {
-  anychart.linearGaugeModule.pointers.Led.base(this, 'constructor', gauge, dataIndex);
+anychart.linearGaugeModule.pointers.Led = function() {
+  anychart.linearGaugeModule.pointers.Led.base(this, 'constructor');
 
   /**
    * @type {?(string|number)}
@@ -32,10 +31,11 @@ anychart.linearGaugeModule.pointers.Led = function(gauge, dataIndex) {
   this.count_ = null;
 
   /**
-   * @type {Object.<string, acgraph.vector.Path>}
+   * Contains path and it's fill by color hash.
+   * @type {Object.<string, Array>}
    * @private
    */
-  this.colorsToPath_ = {};
+  this.coloringMeta_ = {};
 
   /** @inheritDoc */
   this.BOUNDS_DEPENDENT_STATES |= anychart.ConsistencyState.GAUGE_COLOR_SCALE;
@@ -46,6 +46,10 @@ anychart.linearGaugeModule.pointers.Led = function(gauge, dataIndex) {
    * @private
    */
   this.gscState_ = '';
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['dimmer', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW]
+  ]);
 };
 goog.inherits(anychart.linearGaugeModule.pointers.Led, anychart.linearGaugeModule.pointers.Base);
 
@@ -84,10 +88,10 @@ anychart.linearGaugeModule.pointers.Led.prototype.createShapes = function() {
  * Drops colorsToPath cache.
  */
 anychart.linearGaugeModule.pointers.Led.prototype.dropColorsToPath = function() {
-  for (var color in this.colorsToPath_) {
-    goog.dispose(this.colorsToPath_[color]);
+  for (var colorHash in this.coloringMeta_) {
+    goog.dispose(this.coloringMeta_[colorHash][0]);
   }
-  this.colorsToPath_ = {};
+  this.coloringMeta_ = {};
 };
 
 
@@ -173,27 +177,24 @@ anychart.linearGaugeModule.pointers.Led.prototype.drawVertical = function() {
     value = this.scale_.inverseTransform(ratio);
     color = this.colorScale_.valueToColor(value);
     criteria = this.scale_.inverted() ? ratio <= ledRatio : botRatio >= ledRatio;
-    if (criteria && goog.isFunction(this.dimmer_))
-      color = this.dimmer_.call({'color' : color}, color);
+    if (criteria) {
+      var dimmer = this.getOption('dimmer');
+      color = /** @type {string} */(goog.isFunction(dimmer) ? dimmer.call({'color' : color}, color) : dimmer);
+    }
+    var colorHash = anychart.color.hash(color);
     if (goog.isNull(color))
       color = 'none';
-    if (goog.isNull(currentColor)) {
+
+    if (goog.isNull(currentColor) || (color != currentColor)) {
       currentColor = color;
-      if (!(color in this.colorsToPath_))
-        this.colorsToPath_[color] = this.rootLayer.path().clear();
-      else
-        path = this.colorsToPath_[color].clear();
-      path = this.colorsToPath_[color];
-    } else {
-      if (color != currentColor) {
-        currentColor = color;
-        if (!(color in this.colorsToPath_))
-          this.colorsToPath_[color] = this.rootLayer.path().clear();
-        else
-          path = this.colorsToPath_[color].clear();
+      if (!(colorHash in this.coloringMeta_)) {
+        this.coloringMeta_[colorHash] = [this.rootLayer.path(), color];
+      } else {
+        this.coloringMeta_[colorHash][0].clear();
       }
-      path = this.colorsToPath_[color];
     }
+
+    path = this.coloringMeta_[colorHash][0];
 
     path
         .moveTo(left, top)
@@ -226,8 +227,10 @@ anychart.linearGaugeModule.pointers.Led.prototype.drawHorizontal = anychart.line
 
 /** @inheritDoc */
 anychart.linearGaugeModule.pointers.Led.prototype.colorizePointer = function(pointerState) {
-  for (var color in this.colorsToPath_) {
-    this.colorsToPath_[color].stroke('none').fill(color);
+  var meta;
+  for (var colorHash in this.coloringMeta_) {
+    meta = this.coloringMeta_[colorHash];
+    meta[0].stroke('none').fill(meta[1]);
   }
 
   var hatch = /** @type {acgraph.vector.Fill} */ (this.hatchFillResolver(this, pointerState, false));
@@ -265,23 +268,6 @@ anychart.linearGaugeModule.pointers.Led.prototype.getRatioByBound = function(bou
 
 
 /**
- * Getter/setter for dimmer.
- * @param {Function=} opt_value dimmer.
- * @return {Function|anychart.linearGaugeModule.pointers.Led} dimmer or self for chaining.
- */
-anychart.linearGaugeModule.pointers.Led.prototype.dimmer = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.dimmer_ != opt_value) {
-      this.dimmer_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.dimmer_;
-};
-
-
-/**
  * Finite automation for gap, size and count settings. Allows to exist only two of these three settings.
  * @param {string} propLetter Property letter.
  */
@@ -309,6 +295,23 @@ anychart.linearGaugeModule.pointers.Led.prototype.updateGscState = function(prop
     }
   }
 };
+
+
+/**
+ * Properties that should be defined in anychart.linearGaugeModule.pointers.Led prototype.
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.linearGaugeModule.pointers.Led.OWN_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'dimmer', anychart.core.settings.fillOrFunctionSimpleNormalizer]
+  ]);
+
+  return map;
+})();
+anychart.core.settings.populate(anychart.linearGaugeModule.pointers.Led, anychart.linearGaugeModule.pointers.Led.OWN_DESCRIPTORS);
 
 
 /**
@@ -434,15 +437,7 @@ anychart.linearGaugeModule.pointers.Led.prototype.serialize = function() {
 
   json['colorScale'] = this.colorScale().serialize();
 
-  if (goog.isFunction(this.dimmer())) {
-    anychart.core.reporting.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Pointer dimmer']
-    );
-  } else {
-    json['dimmer'] = this.dimmer();
-  }
+  anychart.core.settings.serialize(this, anychart.linearGaugeModule.pointers.Led.OWN_DESCRIPTORS, json, 'Led pointer');
 
   return json;
 };
@@ -455,7 +450,8 @@ anychart.linearGaugeModule.pointers.Led.prototype.setupByJSON = function(config,
   this.gap(config['gap']);
   this.size(config['size']);
   this.count(config['count']);
-  this.dimmer(config['dimmer']);
+
+  anychart.core.settings.deserialize(this, anychart.linearGaugeModule.pointers.Led.OWN_DESCRIPTORS, config, opt_default);
 
   if ('colorScale' in config) {
     var json = config['colorScale'];
@@ -490,7 +486,6 @@ anychart.linearGaugeModule.pointers.Led.prototype.disposeInternal = function() {
 //exports
 (function() {
   var proto = anychart.linearGaugeModule.pointers.Led.prototype;
-  proto['dimmer'] = proto.dimmer;
   proto['gap'] = proto.gap;
   proto['size'] = proto.size;
   proto['count'] = proto.count;

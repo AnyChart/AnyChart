@@ -159,6 +159,22 @@ anychart.core.IPlot.prototype.getPlotBounds = function() {};
 anychart.core.IPlot.prototype.getBaseSeriesZIndex = function(series) {};
 
 
+/**
+ * Returns xAxis by index.
+ * @param {number} index
+ * @return {anychart.stockModule.Axis|anychart.core.Axis|anychart.mapModule.elements.Axis|anychart.radarModule.Axis|anychart.polarModule.Axis}
+ */
+anychart.core.IPlot.prototype.getXAxisByIndex = function(index) {};
+
+
+/**
+ * Returns xAxis by index.
+ * @param {number} index
+ * @return {anychart.core.Axis|anychart.mapModule.elements.Axis|anychart.radarModule.Axis|anychart.polarModule.Axis}
+ */
+anychart.core.IPlot.prototype.getYAxisByIndex = function(index) {};
+
+
 
 //endregion
 //region I3DProvider

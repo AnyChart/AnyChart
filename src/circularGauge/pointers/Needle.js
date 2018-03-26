@@ -12,168 +12,64 @@ goog.require('anychart.utils');
  */
 anychart.circularGaugeModule.pointers.Needle = function() {
   anychart.circularGaugeModule.pointers.Needle.base(this, 'constructor');
-  /**
-   * Pointer width.
-   * @type {?string}
-   * @private
-   */
-  this.startWidth_;
 
-  /**
-   * Pointer radius.
-   * @type {?string}
-   * @private
-   */
-  this.startRadius_;
-
-  /**
-   * Pointer width.
-   * @type {?string}
-   * @private
-   */
-  this.middleWidth_;
-
-  /**
-   * Pointer radius.
-   * @type {?string}
-   * @private
-   */
-  this.middleRadius_;
-
-  /**
-   * Pointer width.
-   * @type {?string}
-   * @private
-   */
-  this.endWidth_;
-
-  /**
-   * Pointer radius.
-   * @type {?string}
-   * @private
-   */
-  this.endRadius_;
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['startWidth', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['startRadius', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['middleWidth', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['middleRadius', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['endWidth', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['endRadius', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED]
+  ]);
 };
 goog.inherits(anychart.circularGaugeModule.pointers.Needle, anychart.circularGaugeModule.pointers.Base);
 
 
-/**
- * .
- * @param {(null|number|string)=} opt_value .
- * @return {(string|anychart.circularGaugeModule.pointers.Needle)} .
- */
-anychart.circularGaugeModule.pointers.Needle.prototype.startWidth = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
-    if (this.startWidth_ != opt_value) {
-      this.startWidth_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else
-    return this.startWidth_;
+//region --- Infrastructure
+/** @inheritDoc */
+anychart.circularGaugeModule.pointers.Needle.prototype.getType = function() {
+  return anychart.enums.CircularGaugePointerType.NEEDLE;
 };
 
 
+//endregion
+//region --- Descriptors
 /**
- * .
- * @param {(null|number|string)=} opt_value .
- * @return {(string|anychart.circularGaugeModule.pointers.Needle)} .
+ * Properties that should be defined in anychart.circularGaugeModule.pointers.Needle prototype.
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.circularGaugeModule.pointers.Needle.prototype.startRadius = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
-    if (this.startRadius_ != opt_value) {
-      this.startRadius_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.startRadius_;
-  }
+anychart.circularGaugeModule.pointers.Needle.OWN_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  var normalizer = function(opt_value) {
+    return goog.isNull(opt_value) ? opt_value : /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
+  };
+
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'startWidth', normalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'startRadius', normalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'middleWidth', normalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'middleRadius', normalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'endWidth', normalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'endRadius', normalizer]
+  ]);
+
+  return map;
+})();
+anychart.core.settings.populate(anychart.circularGaugeModule.pointers.Needle, anychart.circularGaugeModule.pointers.Needle.OWN_DESCRIPTORS);
+
+
+//endregion
+//region --- Overrides
+/** @inheritDoc */
+anychart.circularGaugeModule.pointers.Needle.prototype.hasOwnOption = function(name) {
+  return goog.isDefAndNotNull(this.ownSettings[name]);
 };
 
 
-/**
- * .
- * @param {(null|number|string)=} opt_value .
- * @return {(string|anychart.circularGaugeModule.pointers.Needle)} .
- */
-anychart.circularGaugeModule.pointers.Needle.prototype.middleWidth = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
-    if (this.middleWidth_ != opt_value) {
-      this.middleWidth_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else
-    return this.middleWidth_;
-};
-
-
-/**
- * .
- * @param {(null|number|string)=} opt_value .
- * @return {(string|anychart.circularGaugeModule.pointers.Needle)} .
- */
-anychart.circularGaugeModule.pointers.Needle.prototype.middleRadius = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
-    if (this.middleRadius_ != opt_value) {
-      this.middleRadius_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.middleRadius_;
-  }
-};
-
-
-/**
- * .
- * @param {(null|number|string)=} opt_value .
- * @return {(string|anychart.circularGaugeModule.pointers.Needle)} .
- */
-anychart.circularGaugeModule.pointers.Needle.prototype.endWidth = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
-    if (this.endWidth_ != opt_value) {
-      this.endWidth_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else
-    return this.endWidth_;
-};
-
-
-/**
- * .
- * @param {(null|number|string)=} opt_value .
- * @return {(string|anychart.circularGaugeModule.pointers.Needle)} .
- */
-anychart.circularGaugeModule.pointers.Needle.prototype.endRadius = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
-    if (this.endRadius_ != opt_value) {
-      this.endRadius_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.endRadius_;
-  }
-};
-
-
+//endregion
+//region --- Drawing
 /** @inheritDoc */
 anychart.circularGaugeModule.pointers.Needle.prototype.draw = function() {
   var gauge = this.gauge();
@@ -181,9 +77,13 @@ anychart.circularGaugeModule.pointers.Needle.prototype.draw = function() {
   if (!this.checkDrawingNeeded())
     return this;
 
+  this.ensureCreated();
+
   if (!axis || !axis.enabled()) {
     if (this.domElement) this.domElement.clear();
     if (this.hatchFillElement) this.hatchFillElement.clear();
+    if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS))
+      this.markConsistent(anychart.ConsistencyState.BOUNDS);
     return this;
   }
 
@@ -214,7 +114,7 @@ anychart.circularGaugeModule.pointers.Needle.prototype.draw = function() {
 
     var scale = axis.scale();
 
-    var iterator = gauge.getResetIterator();
+    var iterator = this.getResetIterator();
     iterator.select(/** @type {number} */(this.dataIndex()));
 
     var value = parseFloat(iterator.get('value'));
@@ -229,7 +129,6 @@ anychart.circularGaugeModule.pointers.Needle.prototype.draw = function() {
 
     if (!this.domElement) {
       this.domElement = acgraph.path();
-      this.registerDisposable(this.domElement);
     } else
       this.domElement.clear();
 
@@ -237,23 +136,22 @@ anychart.circularGaugeModule.pointers.Needle.prototype.draw = function() {
     var axisStartAngle = /** @type {number} */(goog.isDef(axis.startAngle()) ? axis.getStartAngle() : gauge.getStartAngle());
     var axisSweepAngle = /** @type {number} */(goog.isDef(axis.sweepAngle()) ? axis.sweepAngle() : /** @type {number} */(gauge.getOption('sweepAngle')));
 
-    var pixStartRadius = anychart.utils.normalizeSize(
-        goog.isDefAndNotNull(this.startRadius_) ? this.startRadius_ : '-20%', gauge.getPixRadius());
-    var pixStartWidth = anychart.utils.normalizeSize(
-        goog.isDefAndNotNull(this.startWidth_) ? this.startWidth_ : '3%', gauge.getPixRadius());
+    var pixStartRadius = anychart.utils.normalizeSize(/** @type {string} */(this.getOption('startRadius')), gauge.getPixRadius());
+    var pixStartWidth = anychart.utils.normalizeSize(/** @type {string} */(this.getOption('startWidth')), gauge.getPixRadius());
 
+    var endRadius = /** @type {string} */(this.getOption('endRadius'));
+    var pixEndRadius = goog.isDefAndNotNull(endRadius) ? anychart.utils.normalizeSize(
+        endRadius, gauge.getPixRadius()) : axisRadius;
 
-    var pixEndRadius = goog.isDefAndNotNull(this.endRadius_) ? anychart.utils.normalizeSize(
-        this.endRadius_, gauge.getPixRadius()) : axisRadius;
-    var pixEndWidth = goog.isDefAndNotNull(this.endWidth_) ? anychart.utils.normalizeSize(
-        this.endWidth_, gauge.getPixRadius()) : 0;
+    var endWidth = /** @type {string} */(this.getOption('endWidth'));
+    var pixEndWidth = goog.isDefAndNotNull(endWidth) ? anychart.utils.normalizeSize(
+        endWidth, gauge.getPixRadius()) : 0;
 
+    var middleRadius = /** @type {string} */(this.getOption('middleRadius'));
+    var pixMiddleRadius = goog.isDefAndNotNull(middleRadius) ? anychart.utils.normalizeSize(
+        middleRadius, gauge.getPixRadius()) : pixEndRadius * 0.9;
 
-    var pixMiddleRadius = goog.isDefAndNotNull(this.middleRadius_) ? anychart.utils.normalizeSize(
-        this.middleRadius_, gauge.getPixRadius()) : pixEndRadius * 0.9;
-    var pixMiddleWidth = anychart.utils.normalizeSize(
-        goog.isDefAndNotNull(this.middleWidth_) ? this.middleWidth_ : '1%', gauge.getPixRadius());
-
+    var pixMiddleWidth = anychart.utils.normalizeSize(/** @type {string} */(this.getOption('middleWidth')), gauge.getPixRadius());
 
     var valueRatio = goog.math.clamp(scale.transform(value), 0, 1);
 
@@ -347,19 +245,13 @@ anychart.circularGaugeModule.pointers.Needle.prototype.draw = function() {
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//  Serialize & Deserialize
-//----------------------------------------------------------------------------------------------------------------------
+//endregion
+//region --- Serialize / Deserialize / Dispose
 /** @inheritDoc */
 anychart.circularGaugeModule.pointers.Needle.prototype.serialize = function() {
   var json = anychart.circularGaugeModule.pointers.Needle.base(this, 'serialize');
 
-  if (goog.isDef(this.startRadius())) json['startRadius'] = this.startRadius();
-  if (goog.isDef(this.middleRadius())) json['middleRadius'] = this.middleRadius();
-  if (goog.isDef(this.endRadius())) json['endRadius'] = this.endRadius();
-  if (goog.isDef(this.startWidth())) json['startWidth'] = this.startWidth();
-  if (goog.isDef(this.middleWidth())) json['middleWidth'] = this.middleWidth();
-  if (goog.isDef(this.endWidth())) json['endWidth'] = this.endWidth();
+  anychart.core.settings.serialize(this, anychart.circularGaugeModule.pointers.Needle.OWN_DESCRIPTORS, json, 'Needle pointer');
 
   return json;
 };
@@ -368,23 +260,30 @@ anychart.circularGaugeModule.pointers.Needle.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.circularGaugeModule.pointers.Needle.prototype.setupByJSON = function(config, opt_default) {
   anychart.circularGaugeModule.pointers.Needle.base(this, 'setupByJSON', config, opt_default);
-
-  this.startRadius(config['startRadius']);
-  this.middleRadius(config['middleRadius']);
-  this.endRadius(config['endRadius']);
-  this.startWidth(config['startWidth']);
-  this.middleWidth(config['middleWidth']);
-  this.endWidth(config['endWidth']);
+  anychart.core.settings.deserialize(this, anychart.circularGaugeModule.pointers.Needle.OWN_DESCRIPTORS, config, opt_default);
 };
 
 
+/** @inheritDoc */
+anychart.circularGaugeModule.pointers.Needle.prototype.disposeInternal = function() {
+  goog.disposeAll(this.domElement, this.hatchFillElement);
+  this.domElement = null;
+  this.hatchFillElement = null;
+  anychart.circularGaugeModule.pointers.Needle.base(this, 'disposeInternal');
+};
+
+
+//endregion
+
+
 //exports
-(function() {
-  var proto = anychart.circularGaugeModule.pointers.Needle.prototype;
-  proto['startRadius'] = proto.startRadius;
-  proto['middleRadius'] = proto.middleRadius;
-  proto['endRadius'] = proto.endRadius;
-  proto['startWidth'] = proto.startWidth;
-  proto['middleWidth'] = proto.middleWidth;
-  proto['endWidth'] = proto.endWidth;
-})();
+//(function() {
+//  var proto = anychart.circularGaugeModule.pointers.Needle.prototype;
+//  auto generated
+//  proto['startRadius'] = proto.startRadius;
+//  proto['middleRadius'] = proto.middleRadius;
+//  proto['endRadius'] = proto.endRadius;
+//  proto['startWidth'] = proto.startWidth;
+//  proto['middleWidth'] = proto.middleWidth;
+//  proto['endWidth'] = proto.endWidth;
+//})();

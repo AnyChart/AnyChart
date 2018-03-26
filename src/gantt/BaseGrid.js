@@ -363,6 +363,12 @@ anychart.ganttModule.BaseGrid = function(opt_controller, opt_isResource) {
   this.tooltip_ = null;
 
   /**
+   * @type {acgraph.vector.Rect}
+   * @private
+   */
+  this.lockInteractivityRect_ = null;
+
+  /**
    * @type {boolean}
    */
   this.preventClickAfterDrag = false;
@@ -547,7 +553,8 @@ anychart.ganttModule.BaseGrid.prototype.createFormatProvider = function(item, op
   var values = {
     'item': {value: item, type: anychart.enums.TokenType.UNKNOWN},
     'name': {value: item.get(anychart.enums.GanttDataFields.NAME), type: anychart.enums.TokenType.STRING},
-    'id': {value: item.get(anychart.enums.GanttDataFields.ID), type: anychart.enums.TokenType.STRING}
+    'id': {value: item.get(anychart.enums.GanttDataFields.ID), type: anychart.enums.TokenType.STRING},
+    'linearIndex': {value: item.meta('index') + 1, type: anychart.enums.TokenType.NUMBER}
   };
 
   if (isResources) {
@@ -979,6 +986,15 @@ anychart.ganttModule.BaseGrid.prototype.getInteractivityEvent = function(event) 
     return newEvent;
   }
   return null;
+};
+
+
+/**
+ *
+ * @return {Array.<number>}
+ */
+anychart.ganttModule.BaseGrid.prototype.getGridHeightCache = function() {
+  return this.gridHeightCache_;
 };
 
 
@@ -1997,6 +2013,7 @@ anychart.ganttModule.BaseGrid.prototype.createController = function(opt_isResour
  * 4) appearanceInvalidated()
  * 5) specialInvalidated()
  * 6) positionFinal()
+ * 7) labelsInvalidated()
  *
  * @param {boolean} positionRecalculated - If the vertical position was really recalculated.
  * @return {anychart.ganttModule.BaseGrid} - Itself for method chaining.
@@ -2067,6 +2084,9 @@ anychart.ganttModule.BaseGrid.prototype.drawInternal = function(positionRecalcul
     this.base_.listenOnce(acgraph.events.EventType.TOUCHSTART, this.dragMouseDown_, false, this);
 
     this.initDom();
+
+    this.lockInteractivityRect_ = stage.rect();
+    this.lockInteractivityRect_.stroke('none').fill('#000 0.1').zIndex(1e10);
   }
 
 
@@ -2082,6 +2102,10 @@ anychart.ganttModule.BaseGrid.prototype.drawInternal = function(positionRecalcul
     this.bgRect_.setBounds(/** @type {anychart.math.Rect} */ (this.pixelBoundsCache));
     this.eventsRect_.setBounds(/** @type {anychart.math.Rect} */ (this.pixelBoundsCache));
     this.totalGridsWidth = this.pixelBoundsCache.width;
+
+    if (this.interactivityLocked_) {
+      this.lockInteractivityRect_.setBounds(this.pixelBoundsCache);
+    }
 
     var header = this.pixelBoundsCache.top + this.headerHeight_;
     var headSepTop = header + 0.5;
@@ -2181,6 +2205,9 @@ anychart.ganttModule.BaseGrid.prototype.drawInternal = function(positionRecalcul
     this.positionFinal();
     this.redrawPosition = false;
   }
+
+  this.labelsInvalidated();
+
   if (manualSuspend) stage.resume();
   if (this.isStandalone) {
     this.initMouseFeatures();
@@ -2195,6 +2222,19 @@ anychart.ganttModule.BaseGrid.prototype.drawInternal = function(positionRecalcul
  * Additional actions while DOM initialization.
  */
 anychart.ganttModule.BaseGrid.prototype.initDom = goog.nullFunction;
+
+
+/**
+ * @inheritDoc
+ */
+anychart.ganttModule.BaseGrid.prototype.lockInteractivity = function(lock) {
+  this.interactivityLocked_ = lock;
+  if (lock) {
+    this.lockInteractivityRect_.setBounds(this.pixelBoundsCache);
+  } else {
+    this.lockInteractivityRect_.setBounds(new anychart.math.Rect(0, 0, 0, 0));
+  }
+};
 
 
 /**
@@ -2454,7 +2494,13 @@ anychart.ganttModule.BaseGrid.prototype.selectRow = function(item) {
 /**
  * Special invalidation. Used by child classes to preform own invalidation.
  */
-anychart.ganttModule.BaseGrid.prototype.specialInvalidated = goog.nullFunction;
+anychart.ganttModule.BaseGrid.prototype.specialInvalidated = function(){};
+
+
+/**
+ * Labels invalidation. Used by child classes to preform own invalidation.
+ */
+anychart.ganttModule.BaseGrid.prototype.labelsInvalidated = goog.nullFunction;
 
 
 /**

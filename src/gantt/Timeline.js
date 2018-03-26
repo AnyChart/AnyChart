@@ -6,14 +6,20 @@ goog.require('acgraph.vector.Path');
 goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.MarkersFactory');
+goog.require('anychart.ganttBaseModule.TimeLineHeader');
 goog.require('anychart.ganttModule.BaseGrid');
 goog.require('anychart.ganttModule.Scale');
 goog.require('anychart.ganttModule.ScrollBar');
-goog.require('anychart.ganttModule.TimelineHeader');
 goog.require('anychart.ganttModule.axisMarkers.Line');
 goog.require('anychart.ganttModule.axisMarkers.Range');
 goog.require('anychart.ganttModule.axisMarkers.Text');
-goog.require('anychart.ganttModule.elements.Base');
+goog.require('anychart.ganttModule.elements.BaselinesElement');
+goog.require('anychart.ganttModule.elements.ConnectorElement');
+goog.require('anychart.ganttModule.elements.GroupingTasksElement');
+goog.require('anychart.ganttModule.elements.MilestonesElement');
+goog.require('anychart.ganttModule.elements.PeriodsElement');
+goog.require('anychart.ganttModule.elements.TasksElement');
+goog.require('anychart.ganttModule.elements.TimelineElement');
 goog.require('anychart.math.Rect');
 goog.require('goog.array');
 goog.require('goog.fx.Dragger');
@@ -205,13 +211,6 @@ anychart.ganttModule.TimeLine = function(opt_controller, opt_isResources) {
    * @private
    */
   this.lastHoveredPeriodIndex_ = NaN;
-
-  /**
-   * Whether baseline bar must be placed above the actual interval bar.
-   * @type {boolean}
-   * @private
-   */
-  this.baselineAbove_ = false;
 
   /**
    *
@@ -406,50 +405,15 @@ anychart.ganttModule.TimeLine = function(opt_controller, opt_isResources) {
   this.registerDisposable(this.scale_);
 
   /**
-   * Base bar labels settings.
-   * @type {anychart.core.ui.LabelsFactory}
-   * @private
-   */
-  this.baseLabels_ = null;
-
-  /**
-   * Baseline bar labels settings.
-   * @type {anychart.core.ui.LabelsFactory}
-   * @private
-   */
-  this.baselineLabels_ = null;
-
-  /**
-   * Grouping task bar labels settings.
-   * @type {anychart.core.ui.LabelsFactory}
-   * @private
-   */
-  this.parentLabels_ = null;
-
-  /**
-   * Milestone labels settings.
-   * @type {anychart.core.ui.LabelsFactory}
-   * @private
-   */
-  this.milestoneLabels_ = null;
-
-  /**
-   * Progress labels settings.
-   * @type {anychart.core.ui.LabelsFactory}
-   * @private
-   */
-  this.progressLabels_ = null;
-
-  /**
    *
-   * @type {anychart.ganttModule.elements.Base}
+   * @type {anychart.ganttModule.elements.TimelineElement}
    * @private
    */
   this.elements_ = null;
 
   /**
    *
-   * @type {anychart.ganttModule.elements.Base}
+   * @type {anychart.ganttModule.elements.TasksElement}
    * @private
    */
   this.tasks_ = null;
@@ -457,7 +421,7 @@ anychart.ganttModule.TimeLine = function(opt_controller, opt_isResources) {
 
   /**
    *
-   * @type {anychart.ganttModule.elements.Base}
+   * @type {anychart.ganttModule.elements.PeriodsElement}
    * @private
    */
   this.periods_ = null;
@@ -465,126 +429,34 @@ anychart.ganttModule.TimeLine = function(opt_controller, opt_isResources) {
 
   /**
    *
-   * @type {anychart.ganttModule.elements.Base}
+   * @type {anychart.ganttModule.elements.MilestonesElement}
    * @private
    */
   this.milestones_ = null;
 
   /**
    *
-   * @type {anychart.ganttModule.elements.Base}
+   * @type {anychart.ganttModule.elements.GroupingTasksElement}
    * @private
    */
   this.groupingTasks_ = null;
 
   /**
    *
-   * @type {anychart.ganttModule.elements.Base}
-   * @private
-   */
-  this.progress_ = null;
-
-  /**
-   *
-   * @type {anychart.ganttModule.elements.Base}
+   * @type {anychart.ganttModule.elements.BaselinesElement}
    * @private
    */
   this.baselines_ = null;
 
-  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
-    //Base bar
-    ['baseBarHeight',
-      anychart.ConsistencyState.GRIDS_POSITION,
-      anychart.Signal.NEEDS_REDRAW],
-    ['baseBarAnchor',
-      anychart.ConsistencyState.GRIDS_POSITION,
-      anychart.Signal.NEEDS_REDRAW],
-    ['baseBarPosition',
-      anychart.ConsistencyState.GRIDS_POSITION,
-      anychart.Signal.NEEDS_REDRAW],
-    ['baseBarOffset',
-      anychart.ConsistencyState.GRIDS_POSITION,
-      anychart.Signal.NEEDS_REDRAW],
-
-    //Parent bar
-    ['parentBarHeight',
-      anychart.ConsistencyState.GRIDS_POSITION,
-      anychart.Signal.NEEDS_REDRAW],
-    ['parentBarAnchor',
-      anychart.ConsistencyState.GRIDS_POSITION,
-      anychart.Signal.NEEDS_REDRAW],
-    ['parentBarPosition',
-      anychart.ConsistencyState.GRIDS_POSITION,
-      anychart.Signal.NEEDS_REDRAW],
-    ['parentBarOffset',
-      anychart.ConsistencyState.GRIDS_POSITION,
-      anychart.Signal.NEEDS_REDRAW],
-
-    //Baseine bar
-    ['baselineBarHeight',
-      anychart.ConsistencyState.GRIDS_POSITION,
-      anychart.Signal.NEEDS_REDRAW],
-    ['baselineBarAnchor',
-      anychart.ConsistencyState.GRIDS_POSITION,
-      anychart.Signal.NEEDS_REDRAW],
-    ['baselineBarPosition',
-      anychart.ConsistencyState.GRIDS_POSITION,
-      anychart.Signal.NEEDS_REDRAW],
-    ['baselineBarOffset',
-      anychart.ConsistencyState.GRIDS_POSITION,
-      anychart.Signal.NEEDS_REDRAW],
-
-    //Progress bar
-    ['progressBarHeight',
-      anychart.ConsistencyState.GRIDS_POSITION,
-      anychart.Signal.NEEDS_REDRAW],
-    ['progressBarAnchor',
-      anychart.ConsistencyState.GRIDS_POSITION,
-      anychart.Signal.NEEDS_REDRAW],
-    ['progressBarPosition',
-      anychart.ConsistencyState.GRIDS_POSITION,
-      anychart.Signal.NEEDS_REDRAW],
-    ['progressBarOffset',
-      anychart.ConsistencyState.GRIDS_POSITION,
-      anychart.Signal.NEEDS_REDRAW],
-
-    //Milestones
-    ['milestoneHeight',
-      anychart.ConsistencyState.GRIDS_POSITION,
-      anychart.Signal.NEEDS_REDRAW],
-    ['milestoneAnchor',
-      anychart.ConsistencyState.GRIDS_POSITION,
-      anychart.Signal.NEEDS_REDRAW],
-    ['milestonePosition',
-      anychart.ConsistencyState.GRIDS_POSITION,
-      anychart.Signal.NEEDS_REDRAW],
-    ['milestoneOffset',
-      anychart.ConsistencyState.GRIDS_POSITION,
-      anychart.Signal.NEEDS_REDRAW]
-  ]);
+  /**
+   *
+   * @type {anychart.ganttModule.elements.ConnectorElement}
+   * @private
+   */
+  this.connectors_ = null;
 
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
-    // timeline coloring
-    ['columnStroke', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
-
-    // elements coloring
-    ['connectorFill', anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW],
-    ['connectorStroke', anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW],
-    ['selectedConnectorStroke', anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW],
-
-    // element's fills and strokes
-    ['baseFill', anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW],
-    ['baseStroke', anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW],
-    ['baselineFill', anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW],
-    ['baselineStroke', anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW],
-    ['milestoneFill', anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW],
-    ['milestoneStroke', anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW],
-    ['parentFill', anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW],
-    ['parentStroke', anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW],
-    ['progressFill', anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW],
-    ['progressStroke', anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW],
-    ['selectedElementFill', anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW],
-    ['selectedElementStroke', anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW]
+    ['columnStroke', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW]
   ]);
 
   this.controller.timeline(this);
@@ -605,7 +477,9 @@ anychart.ganttModule.TimeLine.SUPPORTED_SIGNALS = anychart.ganttModule.BaseGrid.
  */
 anychart.ganttModule.TimeLine.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ganttModule.BaseGrid.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.TIMELINE_SCALES;
+    anychart.ConsistencyState.TIMELINE_SCALES |
+    anychart.ConsistencyState.TIMELINE_ELEMENTS_APPEARANCE |
+    anychart.ConsistencyState.TIMELINE_ELEMENTS_LABELS;
 
 
 /**
@@ -614,66 +488,15 @@ anychart.ganttModule.TimeLine.prototype.SUPPORTED_CONSISTENCY_STATES =
  *   id: (number|string),
  *   type: anychart.enums.TLElementTypes,
  *   item: (anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem),
- *   labels: anychart.core.ui.LabelsFactory,
+ *   labels: Array.<anychart.core.ui.LabelsFactory>,
  *   bounds: anychart.math.Rect,
  *   periodIndex: number,
  *   period: Object,
- *   label: anychart.core.ui.LabelsFactory.Label
+ *   label: anychart.core.ui.LabelsFactory.Label,
+ *   labelPointSettings: Object
  * }}
  */
 anychart.ganttModule.TimeLine.Tag;
-
-
-//region -- Normalisers adaptation
-/**
- * Timeline specific anchor normalizer.
- * @param {*} value - Value to normalize.
- * @return {?anychart.enums.Anchor}
- */
-anychart.ganttModule.TimeLine.normalizeAnchor = function(value) {
-  if (goog.isNull(value))
-    return null;
-
-  value = anychart.enums.normalizeAnchor(value, anychart.enums.Anchor.LEFT_CENTER);
-  if (value == anychart.enums.Anchor.AUTO)
-    return anychart.enums.Anchor.AUTO;
-  if (anychart.utils.isTopAnchor(value))
-    return anychart.enums.Anchor.LEFT_TOP;
-  if (anychart.utils.isBottomAnchor(value))
-    return anychart.enums.Anchor.LEFT_BOTTOM;
-  return anychart.enums.Anchor.LEFT_CENTER;
-};
-
-
-/**
- * Timeline specific position normalizer.
- * @param {*} value - Value to normalize.
- * @return {?anychart.enums.Position}
- */
-anychart.ganttModule.TimeLine.normalizePosition = function(value) {
-  if (goog.isNull(value))
-    return null;
-
-  value = /** @type {anychart.enums.Anchor} */ (anychart.enums.normalizePosition(value, anychart.enums.Position.LEFT_CENTER));
-  if (anychart.utils.isTopAnchor(value))
-    return anychart.enums.Position.LEFT_TOP;
-  if (anychart.utils.isBottomAnchor(value))
-    return anychart.enums.Position.LEFT_BOTTOM;
-  return anychart.enums.Position.LEFT_CENTER;
-};
-
-
-/**
- * Implements option inheritance from base bar settings.
- * @param {string} name - .
- * @param {string} defaultName - .
- * @return {*}
- * @private
- */
-anychart.ganttModule.TimeLine.prototype.getInheritedOption_ = function(name, defaultName) {
-  var val = this.getOption(name);
-  return /** @type {anychart.enums.Anchor} */ (goog.isDefAndNotNull(val) ? val : this.getOption(defaultName));
-};
 
 
 /**
@@ -699,7 +522,6 @@ anychart.ganttModule.TimeLine.prototype.fixBarTop_ = function(anchoredTop, barHe
 
 /**
  * Resolves anchor by position and bar type.
- * NOTE: anychart.enums.TLElementTypes.TASKS here is the same as anychart.enums.TLElementTypes.TASKS.
  * @param {anychart.enums.Position} position - Position.
  * @param {anychart.enums.TLElementTypes} type - Timeline element type.
  * @param {boolean=} opt_considerBaseline - Whether to consider baseline.
@@ -708,10 +530,11 @@ anychart.ganttModule.TimeLine.prototype.fixBarTop_ = function(anchoredTop, barHe
  */
 anychart.ganttModule.TimeLine.prototype.resolveAutoAnchorByType_ = function(position, type, opt_considerBaseline) {
   var anchor = /** @type {anychart.enums.Anchor} */ (position);
+  var above = this.baselines().getOption('above');
   switch (type) {
     case anychart.enums.TLElementTypes.TASKS:
       if (opt_considerBaseline && position == anychart.enums.Position.LEFT_CENTER) {
-        anchor = this.baselineAbove() ? anychart.enums.Anchor.LEFT_TOP : anychart.enums.Anchor.LEFT_BOTTOM;
+        anchor = above ? anychart.enums.Anchor.LEFT_TOP : anychart.enums.Anchor.LEFT_BOTTOM;
       }
       break;
     case anychart.enums.TLElementTypes.GROUPING_TASKS:
@@ -719,155 +542,16 @@ anychart.ganttModule.TimeLine.prototype.resolveAutoAnchorByType_ = function(posi
           anychart.enums.Anchor.LEFT_TOP :
           anychart.enums.Anchor.LEFT_BOTTOM;
       if (opt_considerBaseline && position == anychart.enums.Position.LEFT_CENTER) {
-        anchor = this.baselineAbove() ? anychart.enums.Anchor.LEFT_TOP : anychart.enums.Anchor.LEFT_BOTTOM;
+        anchor = above ? anychart.enums.Anchor.LEFT_TOP : anychart.enums.Anchor.LEFT_BOTTOM;
       }
       break;
     case anychart.enums.TLElementTypes.BASELINES:
       if (position == anychart.enums.Position.LEFT_CENTER)
-        anchor = this.baselineAbove() ? anychart.enums.Anchor.LEFT_BOTTOM : anychart.enums.Anchor.LEFT_TOP;
+        anchor = above ? anychart.enums.Anchor.LEFT_BOTTOM : anychart.enums.Anchor.LEFT_TOP;
   }
 
   return /** @type {anychart.enums.Anchor} */ (anchor);
 };
-
-
-//endregion
-//region -- Descriptors.
-/**
- * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
- */
-anychart.ganttModule.TimeLine.DESCRIPTORS = (function() {
-  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
-  var map = {};
-
-  //Base bar
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'baseBarHeight',
-      anychart.core.settings.numberOrPercentNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'baseBarAnchor',
-      anychart.ganttModule.TimeLine.normalizeAnchor);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'baseBarPosition',
-      anychart.ganttModule.TimeLine.normalizePosition);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'baseBarOffset',
-      anychart.core.settings.numberOrPercentNormalizer);
-
-  //Parent bar
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'parentBarHeight',
-      anychart.core.settings.numberOrPercentNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'parentBarAnchor',
-      anychart.ganttModule.TimeLine.normalizeAnchor);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'parentBarPosition',
-      anychart.ganttModule.TimeLine.normalizePosition);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'parentBarOffset',
-      anychart.core.settings.numberOrPercentNormalizer);
-
-  //Baseline bar
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'baselineBarHeight',
-      anychart.core.settings.numberOrPercentNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'baselineBarAnchor',
-      anychart.ganttModule.TimeLine.normalizeAnchor);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'baselineBarPosition',
-      anychart.ganttModule.TimeLine.normalizePosition);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'baselineBarOffset',
-      anychart.core.settings.numberOrPercentNormalizer);
-
-  //Progress bar
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'progressBarHeight',
-      anychart.core.settings.numberOrPercentNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'progressBarAnchor',
-      anychart.ganttModule.TimeLine.normalizeAnchor);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'progressBarPosition',
-      anychart.ganttModule.TimeLine.normalizePosition);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'progressBarOffset',
-      anychart.core.settings.numberOrPercentNormalizer);
-
-  //Milestones
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'milestoneHeight',
-      anychart.core.settings.numberOrPercentNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'milestoneAnchor',
-      anychart.ganttModule.TimeLine.normalizeAnchor);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'milestonePosition',
-      anychart.ganttModule.TimeLine.normalizePosition);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'milestoneOffset',
-      anychart.core.settings.numberOrPercentNormalizer);
-
-  return map;
-})();
-anychart.core.settings.populate(anychart.ganttModule.TimeLine, anychart.ganttModule.TimeLine.DESCRIPTORS);
 
 
 //endregion
@@ -876,34 +560,6 @@ anychart.core.settings.populate(anychart.ganttModule.TimeLine, anychart.ganttMod
  * @type {number}
  */
 anychart.ganttModule.TimeLine.DEFAULT_HEADER_HEIGHT = 70;
-
-
-/**
- * Baseline path z-index.
- * @type {number}
- */
-anychart.ganttModule.TimeLine.BASELINE_Z_INDEX = 10;
-
-
-/**
- * Base path z-index.
- * @type {number}
- */
-anychart.ganttModule.TimeLine.BASE_Z_INDEX = 20;
-
-
-/**
- * Progress path z-index.
- * @type {number}
- */
-anychart.ganttModule.TimeLine.PROGRESS_Z_INDEX = 30;
-
-
-/**
- * labels factory z-index.
- * @type {number}
- */
-anychart.ganttModule.TimeLine.LABEL_Z_INDEX = 40;
 
 
 /**
@@ -1018,7 +674,7 @@ anychart.ganttModule.TimeLine.EDIT_CORNER_HEIGHT = 5;
 anychart.ganttModule.TimeLine.EDIT_CONNECTOR_RADIUS = 5;
 
 
-//region --- Coloring
+//region -- Coloring.
 /**
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
@@ -1026,29 +682,7 @@ anychart.ganttModule.TimeLine.COLOR_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
   anychart.core.settings.createDescriptors(map, [
-    // timeline coloring
-    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'columnStroke', anychart.core.settings.strokeNormalizer],
-
-    // connectors
-    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'connectorFill', anychart.core.settings.fillOrFunctionNormalizer],
-    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'connectorStroke', anychart.core.settings.strokeOrFunctionNormalizer],
-    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'selectedConnectorStroke', anychart.core.settings.strokeOrFunctionNormalizer],
-
-    // elements coloring
-    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'baseFill', anychart.core.settings.fillOrFunctionNormalizer],
-    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'baseStroke', anychart.core.settings.strokeOrFunctionNormalizer],
-    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'baselineFill', anychart.core.settings.fillOrFunctionNormalizer],
-    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'baselineStroke', anychart.core.settings.strokeOrFunctionNormalizer],
-    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'milestoneFill', anychart.core.settings.fillOrFunctionNormalizer],
-    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'milestoneStroke', anychart.core.settings.strokeOrFunctionNormalizer],
-    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'parentFill', anychart.core.settings.fillOrFunctionNormalizer],
-    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'parentStroke', anychart.core.settings.strokeOrFunctionNormalizer],
-    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'progressFill', anychart.core.settings.fillOrFunctionNormalizer],
-    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'progressStroke', anychart.core.settings.strokeOrFunctionNormalizer],
-    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'progressFill', anychart.core.settings.fillOrFunctionNormalizer],
-    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'progressStroke', anychart.core.settings.strokeOrFunctionNormalizer],
-    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'selectedElementFill', anychart.core.settings.fillOrFunctionNormalizer],
-    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'selectedElementStroke', anychart.core.settings.strokeOrFunctionNormalizer]
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'columnStroke', anychart.core.settings.strokeNormalizer]
   ]);
   return map;
 })();
@@ -1060,11 +694,11 @@ anychart.core.settings.populate(anychart.ganttModule.TimeLine, anychart.ganttMod
 /**
  *
  * @param {Object=} opt_value - Config object.
- * @return {anychart.ganttModule.elements.Base|anychart.ganttModule.TimeLine}
+ * @return {anychart.ganttModule.elements.TimelineElement|anychart.ganttModule.TimeLine}
  */
 anychart.ganttModule.TimeLine.prototype.elements = function(opt_value) {
   if (!this.elements_) {
-    this.elements_ = new anychart.ganttModule.elements.Base(this, anychart.enums.TLElementTypes.ALL);
+    this.elements_ = new anychart.ganttModule.elements.TimelineElement(this);
     this.elements_.listenSignals(this.visualElementInvalidated_, this);
   }
 
@@ -1079,12 +713,12 @@ anychart.ganttModule.TimeLine.prototype.elements = function(opt_value) {
 /**
  *
  * @param {Object=} opt_value - Config object.
- * @return {anychart.ganttModule.elements.Base|anychart.ganttModule.TimeLine}
+ * @return {anychart.ganttModule.elements.PeriodsElement|anychart.ganttModule.TimeLine}
  */
 anychart.ganttModule.TimeLine.prototype.periods = function(opt_value) {
   if (!this.periods_) {
-    this.periods_ = new anychart.ganttModule.elements.Base(this, anychart.enums.TLElementTypes.PERIODS);
-    this.periods_.parent(/** @type {anychart.ganttModule.elements.Base} */ (this.elements()));
+    this.periods_ = new anychart.ganttModule.elements.PeriodsElement(this);
+    this.periods_.parent(/** @type {anychart.ganttModule.elements.TimelineElement} */ (this.elements()));
     this.periods_.listenSignals(this.visualElementInvalidated_, this);
   }
 
@@ -1099,12 +733,12 @@ anychart.ganttModule.TimeLine.prototype.periods = function(opt_value) {
 /**
  *
  * @param {Object=} opt_value - Config object.
- * @return {anychart.ganttModule.elements.Base|anychart.ganttModule.TimeLine}
+ * @return {anychart.ganttModule.elements.TasksElement|anychart.ganttModule.TimeLine}
  */
 anychart.ganttModule.TimeLine.prototype.tasks = function(opt_value) {
   if (!this.tasks_) {
-    this.tasks_ = new anychart.ganttModule.elements.Base(this, anychart.enums.TLElementTypes.TASKS);
-    this.tasks_.parent(/** @type {anychart.ganttModule.elements.Base} */ (this.elements()));
+    this.tasks_ = new anychart.ganttModule.elements.TasksElement(this);
+    this.tasks_.parent(/** @type {anychart.ganttModule.elements.TimelineElement} */ (this.elements()));
     this.tasks_.listenSignals(this.visualElementInvalidated_, this);
   }
 
@@ -1119,12 +753,12 @@ anychart.ganttModule.TimeLine.prototype.tasks = function(opt_value) {
 /**
  *
  * @param {Object=} opt_value - Config object.
- * @return {anychart.ganttModule.elements.Base|anychart.ganttModule.TimeLine}
+ * @return {anychart.ganttModule.elements.MilestonesElement|anychart.ganttModule.TimeLine}
  */
 anychart.ganttModule.TimeLine.prototype.milestones = function(opt_value) {
   if (!this.milestones_) {
-    this.milestones_ = new anychart.ganttModule.elements.Base(this, anychart.enums.TLElementTypes.MILESTONES);
-    this.milestones_.parent(/** @type {anychart.ganttModule.elements.Base} */ (this.elements()));
+    this.milestones_ = new anychart.ganttModule.elements.MilestonesElement(this);
+    this.milestones_.parent(/** @type {anychart.ganttModule.elements.TimelineElement} */ (this.elements()));
     this.milestones_.listenSignals(this.visualElementInvalidated_, this);
   }
 
@@ -1139,12 +773,12 @@ anychart.ganttModule.TimeLine.prototype.milestones = function(opt_value) {
 /**
  *
  * @param {Object=} opt_value - Config object.
- * @return {anychart.ganttModule.elements.Base|anychart.ganttModule.TimeLine}
+ * @return {anychart.ganttModule.elements.GroupingTasksElement|anychart.ganttModule.TimeLine}
  */
 anychart.ganttModule.TimeLine.prototype.groupingTasks = function(opt_value) {
   if (!this.groupingTasks_) {
-    this.groupingTasks_ = new anychart.ganttModule.elements.Base(this, anychart.enums.TLElementTypes.GROUPING_TASKS);
-    this.groupingTasks_.parent(/** @type {anychart.ganttModule.elements.Base} */ (this.tasks()));
+    this.groupingTasks_ = new anychart.ganttModule.elements.GroupingTasksElement(this);
+    this.groupingTasks_.parent(/** @type {anychart.ganttModule.elements.TimelineElement} */ (this.tasks()));
     this.groupingTasks_.listenSignals(this.visualElementInvalidated_, this);
   }
 
@@ -1159,32 +793,12 @@ anychart.ganttModule.TimeLine.prototype.groupingTasks = function(opt_value) {
 /**
  *
  * @param {Object=} opt_value - Config object.
- * @return {anychart.ganttModule.elements.Base|anychart.ganttModule.TimeLine}
- */
-anychart.ganttModule.TimeLine.prototype.progress = function(opt_value) {
-  if (!this.progress_) {
-    this.progress_ = new anychart.ganttModule.elements.Base(this, anychart.enums.TLElementTypes.PROGRESS);
-    this.progress_.parent(/** @type {anychart.ganttModule.elements.Base} */ (this.elements()));
-    this.progress_.listenSignals(this.visualElementInvalidated_, this);
-  }
-
-  if (goog.isDef(opt_value)) {
-    this.progress_.setup(opt_value);
-    return this;
-  }
-  return this.progress_;
-};
-
-
-/**
- *
- * @param {Object=} opt_value - Config object.
- * @return {anychart.ganttModule.elements.Base|anychart.ganttModule.TimeLine}
+ * @return {anychart.ganttModule.elements.BaselinesElement|anychart.ganttModule.TimeLine}
  */
 anychart.ganttModule.TimeLine.prototype.baselines = function(opt_value) {
   if (!this.baselines_) {
-    this.baselines_ = new anychart.ganttModule.elements.Base(this, anychart.enums.TLElementTypes.BASELINES);
-    this.baselines_.parent(/** @type {anychart.ganttModule.elements.Base} */ (this.elements()));
+    this.baselines_ = new anychart.ganttModule.elements.BaselinesElement(this);
+    this.baselines_.parent(/** @type {anychart.ganttModule.elements.TimelineElement} */ (this.elements()));
     this.baselines_.listenSignals(this.visualElementInvalidated_, this);
   }
 
@@ -1198,29 +812,47 @@ anychart.ganttModule.TimeLine.prototype.baselines = function(opt_value) {
 
 /**
  *
+ * @param {Object=} opt_value - Config object.
+ * @return {anychart.ganttModule.elements.ConnectorElement|anychart.ganttModule.TimeLine}
+ */
+anychart.ganttModule.TimeLine.prototype.connectors = function(opt_value) {
+  if (!this.connectors_) {
+    this.connectors_ = new anychart.ganttModule.elements.ConnectorElement(this);
+    this.connectors_.listenSignals(this.visualElementInvalidated_, this);
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.connectors_.setup(opt_value);
+    return this;
+  }
+  return this.connectors_;
+};
+
+
+/**
+ *
  * @param {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} item - Item.
- * @param {anychart.enums.TLElementTypes} type - Element type.
+ * @param {anychart.ganttModule.elements.TimelineElement} element - Element type.
  * @param {anychart.math.Rect} bounds - Bounds.
  * @param {number=} opt_periodIndex - Period index.
  *
  * @return {anychart.ganttModule.TimeLine.Tag}
  */
-anychart.ganttModule.TimeLine.prototype.createTag = function(item, type, bounds, opt_periodIndex) {
+anychart.ganttModule.TimeLine.prototype.createTag = function(item, element, bounds, opt_periodIndex) {
   var tag = {
     isElement: true,
     id: item.get(anychart.enums.GanttDataFields.ID),
-    type: type,
+    type: element.getType(),
     item: item,
-    labels: this.getLabelsFactoryByType_(type),
-    bounds: bounds
+    labels: element.getLabelsResolutionOrder(),
+    bounds: bounds,
+    labelPointSettings: element.getLabelPointSettings(item, opt_periodIndex)
   };
 
   if (goog.isDef(opt_periodIndex)) {
     tag.periodIndex = opt_periodIndex;
     var periods = item.get(anychart.enums.GanttDataFields.PERIODS);
     tag.period = periods[opt_periodIndex];
-    if (goog.isDef(tag.period))
-      tag.pointLabelSettings = tag.period['label'];
   }
 
   return /** @type {anychart.ganttModule.TimeLine.Tag} */ (tag);
@@ -1233,9 +865,654 @@ anychart.ganttModule.TimeLine.prototype.createTag = function(item, type, bounds,
  * @private
  */
 anychart.ganttModule.TimeLine.prototype.visualElementInvalidated_ = function(event) {
-  this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW);
+  var state = 0;
+  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW_LABELS)) {
+    state |= anychart.ConsistencyState.TIMELINE_ELEMENTS_LABELS;
+  }
+  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
+    state |= anychart.ConsistencyState.GRIDS_POSITION;
+  }
+  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW_APPEARANCE)) {
+    state |= anychart.ConsistencyState.BASE_GRID_REDRAW;
+  }
+  this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
 };
 
+
+//endregion
+//region -- DEPRECATED API.
+/**
+ * @param {...*} var_args - Args.
+ * @deprecated since 8.2.0 use timeline.elements().fill() instead. DVF-3625
+ * @return {anychart.ganttModule.TimeLine|acgraph.vector.Fill|anychart.ganttModule.elements.TimelineElement}
+ */
+anychart.ganttModule.TimeLine.prototype.baseFill = function(var_args) {
+  var target = this.elements();
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['timeline.baseFill()', 'timeline.elements().fill()'], true);
+  return arguments.length ? target['fill'].apply(target, arguments) : target['fill']();
+};
+
+
+/**
+ * @param {...*} var_args - Args.
+ * @deprecated since 8.2.0 use timeline.elements().stroke() instead. DVF-3625
+ * @return {anychart.ganttModule.TimeLine|acgraph.vector.Stroke|anychart.ganttModule.elements.TimelineElement}
+ */
+anychart.ganttModule.TimeLine.prototype.baseStroke = function(var_args) {
+  var target = this.elements();
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['timeline.baseStroke()', 'timeline.elements().stroke()'], true);
+  return arguments.length ? target['stroke'].apply(target, arguments) : target['stroke']();
+};
+
+
+/**
+ * @param {...*} var_args - Args.
+ * @deprecated since 8.2.0 use timeline.baselines().fill() instead. DVF-3625
+ * @return {anychart.ganttModule.TimeLine|acgraph.vector.Fill|anychart.ganttModule.elements.TimelineElement}
+ */
+anychart.ganttModule.TimeLine.prototype.baselineFill = function(var_args) {
+  var target;
+  if (this.controller.isResources()) {
+    return this;
+  } else {
+    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['timeline.baselineFill()', 'timeline.baselines().fill()'], true);
+    target = this.baselines();
+    return arguments.length ? target['fill'].apply(target, arguments) : target['fill']();
+  }
+};
+
+
+/**
+ * @param {...*} var_args - Args.
+ * @deprecated since 8.2.0 use timeline.baselines().stroke() instead. DVF-3625
+ * @return {anychart.ganttModule.TimeLine|acgraph.vector.Stroke|anychart.ganttModule.elements.TimelineElement}
+ */
+anychart.ganttModule.TimeLine.prototype.baselineStroke = function(var_args) {
+  var target;
+  if (this.controller.isResources()) {
+    return this;
+  } else {
+    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['timeline.baselineStroke()', 'timeline.baselines().stroke()'], true);
+    target = this.baselines();
+    return arguments.length ? target['stroke'].apply(target, arguments) : target['stroke']();
+  }
+};
+
+
+/**
+ * @param {...*} var_args - Args.
+ * @deprecated since 8.2.0 use timeline.milestones().fill() instead. DVF-3625
+ * @return {anychart.ganttModule.TimeLine|acgraph.vector.Fill|anychart.ganttModule.elements.TimelineElement}
+ */
+anychart.ganttModule.TimeLine.prototype.milestoneFill = function(var_args) {
+  var target;
+  if (this.controller.isResources()) {
+    return this;
+  } else {
+    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['timeline.milestoneFill()', 'timeline.milestones().fill()'], true);
+    target = this.milestones();
+    return arguments.length ? target['fill'].apply(target, arguments) : target['fill']();
+  }
+};
+
+
+/**
+ * @param {...*} var_args - Args.
+ * @deprecated since 8.2.0 use timeline.milestones().stroke() instead. DVF-3625
+ * @return {anychart.ganttModule.TimeLine|acgraph.vector.Stroke|anychart.ganttModule.elements.TimelineElement}
+ */
+anychart.ganttModule.TimeLine.prototype.milestoneStroke = function(var_args) {
+  var target;
+  if (this.controller.isResources()) {
+    return this;
+  } else {
+    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['timeline.milestoneStroke()', 'timeline.milestones().stroke()'], true);
+    target = this.milestones();
+    return arguments.length ? target['stroke'].apply(target, arguments) : target['stroke']();
+  }
+};
+
+
+/**
+ * @param {...*} var_args - Args.
+ * @deprecated since 8.2.0 use timeline.groupingTasks().fill() instead. DVF-3625
+ * @return {anychart.ganttModule.TimeLine|acgraph.vector.Fill|anychart.ganttModule.elements.TimelineElement}
+ */
+anychart.ganttModule.TimeLine.prototype.parentFill = function(var_args) {
+  var target;
+  if (this.controller.isResources()) {
+    return this;
+  } else {
+    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['timeline.parentFill()', 'timeline.groupingTasks().fill()'], true);
+    target = this.groupingTasks();
+    return arguments.length ? target['fill'].apply(target, arguments) : target['fill']();
+  }
+};
+
+
+/**
+ * @param {...*} var_args - Args.
+ * @deprecated since 8.2.0 use timeline.groupingTasks().stroke() instead. DVF-3625
+ * @return {anychart.ganttModule.TimeLine|acgraph.vector.Stroke|anychart.ganttModule.elements.TimelineElement}
+ */
+anychart.ganttModule.TimeLine.prototype.parentStroke = function(var_args) {
+  var target;
+  if (this.controller.isResources()) {
+    return this;
+  } else {
+    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['timeline.parentStroke()', 'timeline.groupingTasks().stroke()'], true);
+    target = this.groupingTasks();
+    return arguments.length ? target['stroke'].apply(target, arguments) : target['stroke']();
+  }
+};
+
+
+/**
+ * @param {...*} var_args - Args.
+ * @deprecated since 8.2.0 use timeline.tasks().progress().fill() or timeline.groupingTasks().progress().fill() instead. DVF-3625
+ * @return {anychart.ganttModule.TimeLine|acgraph.vector.Fill|anychart.ganttModule.elements.TimelineElement}
+ */
+anychart.ganttModule.TimeLine.prototype.progressFill = function(var_args) {
+  var target;
+  if (this.controller.isResources()) {
+    return this;
+  } else {
+    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+        ['timeline.progressFill()', 'timeline.tasks().progress().fill() or timeline.groupingTasks().progress().fill()'], true);
+    target = this.tasks();
+    return arguments.length ? target['fill'].apply(target, arguments) : target['fill']();
+  }
+};
+
+
+/**
+ * @param {...*} var_args - Args.
+ * @deprecated since 8.2.0 use timeline.tasks().progress().stroke() or timeline.groupingTasks().progress().stroke() instead. DVF-3625
+ * @return {anychart.ganttModule.TimeLine|acgraph.vector.Stroke|anychart.ganttModule.elements.TimelineElement}
+ */
+anychart.ganttModule.TimeLine.prototype.progressStroke = function(var_args) {
+  var target;
+  if (this.controller.isResources()) {
+    return this;
+  } else {
+    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+        ['timeline.progressStroke()', 'timeline.tasks().progress().stroke() or timeline.groupingTasks().progress().stroke()'], true);
+    target = this.tasks();
+    return arguments.length ? target['stroke'].apply(target, arguments) : target['stroke']();
+  }
+};
+
+
+/**
+ * @param {...*} var_args - Args.
+ * @deprecated since 8.2.0 use timeline.elements().selected().fill() instead. DVF-3625
+ * @return {anychart.ganttModule.TimeLine|acgraph.vector.Fill|anychart.ganttModule.elements.TimelineElement}
+ */
+anychart.ganttModule.TimeLine.prototype.selectedElementFill = function(var_args) {
+  var target = this.elements().selected();
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+      ['timeline.selectedElementFill()', 'timeline.elements().selected().fill()'], true);
+  return arguments.length ? target['fill'].apply(target, arguments) : target['fill']();
+};
+
+
+/**
+ * @param {...*} var_args - Args.
+ * @deprecated since 8.2.0 use timeline.elements().selected().stroke(). DVF-3625
+ * @return {anychart.ganttModule.TimeLine|acgraph.vector.Stroke|anychart.ganttModule.elements.TimelineElement}
+ */
+anychart.ganttModule.TimeLine.prototype.selectedElementStroke = function(var_args) {
+  var target = this.elements().selected();
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+      ['timeline.selectedElementStroke()', 'timeline.elements().selected().stroke()'], true);
+  return arguments.length ? target['stroke'].apply(target, arguments) : target['stroke']();
+};
+
+
+/**
+ * Getter/setter for base labels.
+ * @param {(Object|boolean|null)=} opt_value - Settings.
+ * @deprecated since 8.2.0 use timeline.elements().labels() instead. DVF-3625
+ * @return {anychart.core.ui.LabelsFactory|anychart.ganttModule.elements.TimelineElement}
+ */
+anychart.ganttModule.TimeLine.prototype.baseLabels = function(opt_value) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+      ['timeline.baseLabels()', 'timeline.elements().labels()'], true);
+  return this.elements().labels(opt_value);
+};
+
+
+/**
+ * Getter/setter for baseline labels.
+ * @param {(Object|boolean|null)=} opt_value - Settings.
+ * @deprecated since 8.2.0 use timeline.baselines().labels() instead. DVF-3625
+ * @return {anychart.ganttModule.TimeLine|anychart.core.ui.LabelsFactory|anychart.ganttModule.elements.TimelineElement}
+ */
+anychart.ganttModule.TimeLine.prototype.baselineLabels = function(opt_value) {
+  if (this.controller.isResources()) {
+    return this;
+  } else {
+    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+        ['timeline.baselineLabels()', 'timeline.baselines().labels()'], true);
+    return this.baselines().labels(opt_value);
+  }
+};
+
+
+/**
+ * Getter/setter for parent labels.
+ * @param {(Object|boolean|null)=} opt_value - Settings.
+ * @deprecated since 8.2.0 use timeline.groupingTasks().labels() instead. DVF-3625
+ * @return {anychart.ganttModule.TimeLine|anychart.core.ui.LabelsFactory|anychart.ganttModule.elements.TimelineElement}
+ */
+anychart.ganttModule.TimeLine.prototype.parentLabels = function(opt_value) {
+  if (this.controller.isResources()) {
+    return this;
+  } else {
+    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+        ['timeline.parentLabels()', 'timeline.groupingTasks().labels()'], true);
+    return this.groupingTasks().labels(opt_value);
+  }
+};
+
+
+/**
+ * Getter/setter for milestones labels.
+ * @param {(Object|boolean|null)=} opt_value - Settings.
+ * @deprecated since 8.2.0 use timeline.milestones().labels() instead. DVF-3625
+ * @return {anychart.ganttModule.TimeLine|anychart.core.ui.LabelsFactory|anychart.ganttModule.elements.TimelineElement}
+ */
+anychart.ganttModule.TimeLine.prototype.milestoneLabels = function(opt_value) {
+  if (this.controller.isResources()) {
+    return this;
+  } else {
+    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+        ['timeline.milestoneLabels()', 'timeline.milestones().labels()'], true);
+    return this.milestones().labels(opt_value);
+  }
+};
+
+
+/**
+ * Getter/setter for progress labels.
+ * @param {(Object|boolean|null)=} opt_value - Settings.
+ * @deprecated since 8.2.0 use timeline.tasks().progress().labels() or timeline.groupingTasks().progress().labels() instead. DVF-3625
+ * @return {anychart.ganttModule.TimeLine|anychart.core.ui.LabelsFactory|anychart.ganttModule.elements.TimelineElement}
+ */
+anychart.ganttModule.TimeLine.prototype.progressLabels = function(opt_value) {
+  if (this.controller.isResources()) {
+    return this;
+  } else {
+    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+        ['timeline.progressLabels()', 'timeline.tasks().progress().labels() or timeline.groupingTasks().progress().labels()'], true);
+    return this.tasks().progress().labels(opt_value);
+  }
+};
+
+
+/**
+ * Gets/sets 'baseline above' flag.
+ * If the flag is set to 'true', baseline bar will be displayed abode an actual time bar.
+ * @param {boolean=} opt_value - Value to be set.
+ * @deprecated since 8.2.0 use timeline.baselines().above() instead. DVF-3625
+ * @return {boolean|anychart.ganttModule.TimeLine|anychart.ganttModule.elements.BaselinesElement} - Current value or itself for method chaining.
+ */
+anychart.ganttModule.TimeLine.prototype.baselineAbove = function(opt_value) {
+  if (this.controller.isResources()) {
+    return this;
+  } else {
+    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+        ['timeline.baselineAbove()', 'timeline.baselines().above()'], true);
+    return this.baselines()['above'](opt_value);
+  }
+};
+
+
+/**
+ * @param {(string|number)=} opt_value - Value to set.
+ * @deprecated since 8.2.0 use timeline.elements().height() instead. DVF-3625
+ * @return {number|string|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
+ */
+anychart.ganttModule.TimeLine.prototype.baseBarHeight = function(opt_value) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+      ['timeline.baseBarHeight()', 'timeline.elements().height()'], true);
+  return this.elements()['height'](opt_value);
+};
+
+
+/**
+ * @param {anychart.enums.Anchor=} opt_value - Value to set.
+ * @deprecated since 8.2.0 use timeline.elements().anchor() instead. DVF-3625
+ * @return {anychart.enums.Anchor|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
+ */
+anychart.ganttModule.TimeLine.prototype.baseBarAnchor = function(opt_value) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+      ['timeline.baseBarAnchor()', 'timeline.elements().anchor()'], true);
+  return this.elements()['anchor'](opt_value);
+};
+
+
+/**
+ * @param {anychart.enums.Position=} opt_value - Value to set.
+ * @deprecated since 8.2.0 use timeline.elements().position() instead. DVF-3625
+ * @return {anychart.enums.Position|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
+ */
+anychart.ganttModule.TimeLine.prototype.baseBarPosition = function(opt_value) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+      ['timeline.baseBarPosition()', 'timeline.elements().position()'], true);
+  return this.elements()['position'](opt_value);
+};
+
+
+/**
+ * @param {(string|number)=} opt_value - Value to set.
+ * @deprecated since 8.2.0 use timeline.elements().offset() instead. DVF-3625
+ * @return {string|number|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
+ */
+anychart.ganttModule.TimeLine.prototype.baseBarOffset = function(opt_value) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+      ['timeline.baseBarOffset()', 'timeline.elements().offset()'], true);
+  return this.elements()['offset'](opt_value);
+};
+
+
+/**
+ * @param {(string|number)=} opt_value - Value to set.
+ * @deprecated since 8.2.0 use timeline.groupingTasks().height() instead. DVF-3625
+ * @return {number|string|anychart.ganttModule.TimeLine|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
+ */
+anychart.ganttModule.TimeLine.prototype.parentBarHeight = function(opt_value) {
+  if (this.controller.isResources()) {
+    return this;
+  } else {
+    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+        ['timeline.parentBarHeight()', 'timeline.groupingTasks().height()'], true);
+    return this.groupingTasks()['height'](opt_value);
+  }
+};
+
+
+/**
+ * @param {anychart.enums.Anchor=} opt_value - Value to set.
+ * @deprecated since 8.2.0 use timeline.groupingTasks().anchor() instead. DVF-3625
+ * @return {anychart.enums.Anchor|anychart.ganttModule.TimeLine|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
+ */
+anychart.ganttModule.TimeLine.prototype.parentBarAnchor = function(opt_value) {
+  if (this.controller.isResources()) {
+    return this;
+  } else {
+    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+        ['timeline.parentBarAnchor()', 'timeline.groupingTasks().anchor()'], true);
+    return this.groupingTasks()['anchor'](opt_value);
+  }
+};
+
+
+/**
+ * @param {anychart.enums.Position=} opt_value - Value to set.
+ * @deprecated since 8.2.0 use timeline.groupingTasks().position() instead. DVF-3625
+ * @return {anychart.enums.Position|anychart.ganttModule.TimeLine|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
+ */
+anychart.ganttModule.TimeLine.prototype.parentBarPosition = function(opt_value) {
+  if (this.controller.isResources()) {
+    return this;
+  } else {
+    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+        ['timeline.parentBarPosition()', 'timeline.groupingTasks().position()'], true);
+    return this.groupingTasks()['position'](opt_value);
+  }
+};
+
+
+/**
+ * @param {(string|number)=} opt_value - Value to set.
+ * @deprecated since 8.2.0 use timeline.groupingTasks().offset() instead. DVF-3625
+ * @return {number|string|anychart.ganttModule.TimeLine|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
+ */
+anychart.ganttModule.TimeLine.prototype.parentBarOffset = function(opt_value) {
+  if (this.controller.isResources()) {
+    return this;
+  } else {
+    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+        ['timeline.parentBarOffset()', 'timeline.groupingTasks().offset()'], true);
+    return this.groupingTasks()['offset'](opt_value);
+  }
+};
+
+
+/**
+ * @param {(string|number)=} opt_value - Value to set.
+ * @deprecated since 8.2.0 use timeline.baselines().height() instead. DVF-3625
+ * @return {number|string|anychart.ganttModule.TimeLine|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
+ */
+anychart.ganttModule.TimeLine.prototype.baselineBarHeight = function(opt_value) {
+  if (this.controller.isResources()) {
+    return this;
+  } else {
+    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+        ['timeline.baselineBarHeight()', 'timeline.baselines().height()'], true);
+    return this.baselines()['height'](opt_value);
+  }
+};
+
+
+/**
+ * @param {anychart.enums.Anchor=} opt_value - Value to set.
+ * @deprecated since 8.2.0 use timeline.baselines().anchor() instead. DVF-3625
+ * @return {anychart.enums.Anchor|anychart.ganttModule.TimeLine|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
+ */
+anychart.ganttModule.TimeLine.prototype.baselineBarAnchor = function(opt_value) {
+  if (this.controller.isResources()) {
+    return this;
+  } else {
+    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+        ['timeline.baselineBarAnchor()', 'timeline.baselines().anchor()'], true);
+    return this.baselines()['anchor'](opt_value);
+  }
+};
+
+
+/**
+ * @param {anychart.enums.Position=} opt_value - Value to set.
+ * @deprecated since 8.2.0 use timeline.baselines().position() instead. DVF-3625
+ * @return {anychart.enums.Position|anychart.ganttModule.TimeLine|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
+ */
+anychart.ganttModule.TimeLine.prototype.baselineBarPosition = function(opt_value) {
+  if (this.controller.isResources()) {
+    return this;
+  } else {
+    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+        ['timeline.baselineBarPosition()', 'timeline.baselines().position()'], true);
+    return this.baselines()['position'](opt_value);
+  }
+};
+
+
+/**
+ * @param {(string|number)=} opt_value - Value to set.
+ * @deprecated since 8.2.0 use timeline.baselines().offset() instead. DVF-3625
+ * @return {number|string|anychart.ganttModule.TimeLine|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
+ */
+anychart.ganttModule.TimeLine.prototype.baselineBarOffset = function(opt_value) {
+  if (this.controller.isResources()) {
+    return this;
+  } else {
+    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+        ['timeline.baselineBarOffset()', 'timeline.baselines().offset()'], true);
+    return this.baselines()['offset'](opt_value);
+  }
+};
+
+
+/**
+ * @param {(string|number)=} opt_value - Value to set.
+ * @deprecated since 8.2.0 use timeline.tasks().progress().height() or
+ *  timeline.groupingTasks().progress().height() instead. DVF-3625
+ * @return {number|string|anychart.ganttModule.TimeLine|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
+ */
+anychart.ganttModule.TimeLine.prototype.progressBarHeight = function(opt_value) {
+  if (this.controller.isResources()) {
+    return this;
+  } else {
+    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+        ['timeline.progressBarHeight()', 'timeline.tasks().progress().height() or timeline.groupingTasks().progress().height()'], true);
+    return this.tasks().progress()['height'](opt_value);
+  }
+};
+
+
+/**
+ * @param {anychart.enums.Anchor=} opt_value - Value to set.
+ * @deprecated since 8.2.0 use timeline.tasks().progress().anchor() or
+ *  timeline.groupingTasks().progress().anchor() instead. DVF-3625
+ * @return {anychart.enums.Anchor|anychart.ganttModule.TimeLine|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
+ */
+anychart.ganttModule.TimeLine.prototype.progressBarAnchor = function(opt_value) {
+  if (this.controller.isResources()) {
+    return this;
+  } else {
+    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+        ['timeline.progressBarAnchor()', 'timeline.tasks().progress().anchor() or timeline.groupingTasks().progress().anchor()'], true);
+    return this.tasks().progress()['anchor'](opt_value);
+  }
+};
+
+
+/**
+ * @param {anychart.enums.Position=} opt_value - Value to set.
+ * @deprecated since 8.2.0 use timeline.tasks().progress().position() or
+ *  timeline.groupingTasks().progress().position() instead. DVF-3625
+ * @return {anychart.enums.Position|anychart.ganttModule.TimeLine|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
+ */
+anychart.ganttModule.TimeLine.prototype.progressBarPosition = function(opt_value) {
+  if (this.controller.isResources()) {
+    return this;
+  } else {
+    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+        ['timeline.progressBarPosition()', 'timeline.tasks().progress().position() or timeline.groupingTasks().progress().position()'], true);
+    return this.tasks().progress()['position'](opt_value);
+  }
+};
+
+
+/**
+ * @param {(string|number)=} opt_value - Value to set.
+ * @deprecated since 8.2.0 use timeline.tasks().progress().offset() or
+ *  timeline.groupingTasks().progress().offset() instead. DVF-3625
+ * @return {number|string|anychart.ganttModule.TimeLine|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
+ */
+anychart.ganttModule.TimeLine.prototype.progressBarOffset = function(opt_value) {
+  if (this.controller.isResources()) {
+    return this;
+  } else {
+    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+        ['timeline.progressBarOffset()', 'timeline.tasks().progress().offset() or timeline.groupingTasks().progress().offset()'], true);
+    return this.tasks().progress()['offset'](opt_value);
+  }
+};
+
+
+/**
+ * @param {(string|number)=} opt_value - Value to set.
+ * @deprecated since 8.2.0 use timeline.milestones().height() instead. DVF-3625
+ * @return {number|string|anychart.ganttModule.TimeLine|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
+ */
+anychart.ganttModule.TimeLine.prototype.milestoneHeight = function(opt_value) {
+  if (this.controller.isResources()) {
+    return this;
+  } else {
+    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+        ['timeline.milestoneHeight()', 'timeline.milestones().height()'], true);
+    return this.milestones()['height'](opt_value);
+  }
+};
+
+
+/**
+ * @param {anychart.enums.Anchor=} opt_value - Value to set.
+ * @deprecated since 8.2.0 use timeline.milestones().anchor() instead. DVF-3625
+ * @return {anychart.enums.Anchor|anychart.ganttModule.TimeLine|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
+ */
+anychart.ganttModule.TimeLine.prototype.milestoneAnchor = function(opt_value) {
+  if (this.controller.isResources()) {
+    return this;
+  } else {
+    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+        ['timeline.milestoneAnchor()', 'timeline.milestones().anchor()'], true);
+    return this.milestones()['anchor'](opt_value);
+  }
+};
+
+
+/**
+ * @param {anychart.enums.Position=} opt_value - Value to set.
+ * @deprecated since 8.2.0 use timeline.milestones().position() instead. DVF-3625
+ * @return {anychart.enums.Position|anychart.ganttModule.TimeLine|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
+ */
+anychart.ganttModule.TimeLine.prototype.milestonePosition = function(opt_value) {
+  if (this.controller.isResources()) {
+    return this;
+  } else {
+    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+        ['timeline.milestonePosition()', 'timeline.milestones().position()'], true);
+    return this.milestones()['position'](opt_value);
+  }
+};
+
+
+/**
+ * @param {(string|number)=} opt_value - Value to set.
+ * @deprecated since 8.2.0 use timeline.milestones().offset() instead. DVF-3625
+ * @return {number|string|anychart.ganttModule.TimeLine|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
+ */
+anychart.ganttModule.TimeLine.prototype.milestoneOffset = function(opt_value) {
+  if (this.controller.isResources()) {
+    return this;
+  } else {
+    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+        ['timeline.milestoneOffset()', 'timeline.milestones().offset()'], true);
+    return this.milestones()['offset'](opt_value);
+  }
+};
+
+
+/**
+ * @param {...*} var_args - Args.
+ * @deprecated since 8.2.0 use timeline.connectors().fill() instead. DVF-3625
+ * @return {anychart.ganttModule.TimeLine|acgraph.vector.Fill|anychart.ganttModule.elements.TimelineElement}
+ */
+anychart.ganttModule.TimeLine.prototype.connectorFill = function(var_args) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+      ['timeline.connectorFill()', 'timeline.connectors().fill()'], true);
+  var target = this.connectors();
+  return arguments.length ? target['fill'].apply(target, arguments) : target['fill']();
+};
+
+
+/**
+ * @param {...*} var_args - Args.
+ * @deprecated since 8.2.0 use timeline.connectors().stroke() instead. DVF-3625
+ * @return {anychart.ganttModule.TimeLine|acgraph.vector.Stroke|anychart.ganttModule.elements.TimelineElement}
+ */
+anychart.ganttModule.TimeLine.prototype.connectorStroke = function(var_args) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+      ['timeline.connectorStroke()', 'timeline.connectors().stroke()'], true);
+  var target = this.connectors();
+  return arguments.length ? target['stroke'].apply(target, arguments) : target['stroke']();
+};
+
+
+/**
+ * @param {...*} var_args - Args.
+ * @deprecated since 8.2.0 use timeline.connectors().selected().stroke() instead. DVF-3625
+ * @return {anychart.ganttModule.TimeLine|acgraph.vector.Stroke|anychart.ganttModule.elements.TimelineElement}
+ */
+anychart.ganttModule.TimeLine.prototype.selectedConnectorStroke = function(var_args) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+      ['timeline.selectedConnectorStroke()', 'timeline.connectors().selected().stroke()'], true);
+  var target = this.connectors().selected();
+  return arguments.length ? target['stroke'].apply(target, arguments) : target['stroke']();
+};
 
 //endregion
 
@@ -1264,12 +1541,12 @@ anychart.ganttModule.TimeLine.prototype.getScale = function() {
 /**
  * Gets/configures timeline header.
  * @param {Object=} opt_value - Config.
- * @return {anychart.ganttModule.TimelineHeader|anychart.ganttModule.TimeLine} - Header or itself for chaining..
+ * @return {anychart.ganttBaseModule.TimeLineHeader|anychart.ganttModule.TimeLine} - Header or itself for chaining..
  */
 anychart.ganttModule.TimeLine.prototype.header = function(opt_value) {
   if (!this.header_) {
-    this.header_ = new anychart.ganttModule.TimelineHeader();
-    this.header_.scale(this.scale_);
+    this.header_ = new anychart.ganttBaseModule.TimeLineHeader();
+    this.header_.xScale(this.scale_);
     this.header_.zIndex(anychart.ganttModule.TimeLine.HEADER_Z_INDEX);
     this.registerDisposable(this.header_);
     this.header_.listenSignals(this.headerInvalidated_, this);
@@ -1678,7 +1955,7 @@ anychart.ganttModule.TimeLine.prototype.labels = function(opt_value) {
   if (!this.labelsFactory_) {
     this.labelsFactory_ = new anychart.core.ui.LabelsFactory();
     this.labelsFactory_.setParentEventTarget(this);
-    this.labelsFactory_.listenSignals(this.drawLabels_, this);
+    this.labelsFactory_.listenSignals(this.labelsInvalidated_, this);
   }
 
   if (goog.isDef(opt_value)) {
@@ -1699,111 +1976,6 @@ anychart.ganttModule.TimeLine.prototype.labels = function(opt_value) {
   }
 
   return this.labelsFactory_;
-};
-
-
-/**
- * Getter/setter for base labels.
- * @param {(Object|boolean|null)=} opt_value - Settings.
- * @return {!(anychart.core.ui.LabelsFactory|anychart.ganttModule.TimeLine)} - Labels instance or itself for chaining call.
- */
-anychart.ganttModule.TimeLine.prototype.baseLabels = function(opt_value) {
-  if (!this.baseLabels_) {
-    this.baseLabels_ = new anychart.core.ui.LabelsFactory();
-    this.baseLabels_.listenSignals(this.drawLabels_, this);
-  }
-
-  if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !('enabled' in opt_value))
-      opt_value['enabled'] = true;
-    this.baseLabels_.setup(opt_value);
-    return this;
-  }
-  return this.baseLabels_;
-};
-
-
-/**
- * Getter/setter for baseline labels.
- * @param {(Object|boolean|null)=} opt_value - Settings.
- * @return {!(anychart.core.ui.LabelsFactory|anychart.ganttModule.TimeLine)} - Labels instance or itself for chaining call.
- */
-anychart.ganttModule.TimeLine.prototype.baselineLabels = function(opt_value) {
-  if (!this.baselineLabels_) {
-    this.baselineLabels_ = new anychart.core.ui.LabelsFactory();
-    this.baselineLabels_.listenSignals(this.drawLabels_, this);
-  }
-
-  if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !('enabled' in opt_value))
-      opt_value['enabled'] = true;
-    this.baselineLabels_.setup(opt_value);
-    return this;
-  }
-  return this.baselineLabels_;
-};
-
-
-/**
- * Getter/setter for parent (grouping tasks) labels.
- * @param {(Object|boolean|null)=} opt_value - Settings.
- * @return {!(anychart.core.ui.LabelsFactory|anychart.ganttModule.TimeLine)} - Labels instance or itself for chaining call.
- */
-anychart.ganttModule.TimeLine.prototype.parentLabels = function(opt_value) {
-  if (!this.parentLabels_) {
-    this.parentLabels_ = new anychart.core.ui.LabelsFactory();
-    this.parentLabels_.listenSignals(this.drawLabels_, this);
-  }
-
-  if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !('enabled' in opt_value))
-      opt_value['enabled'] = true;
-    this.parentLabels_.setup(opt_value);
-    return this;
-  }
-  return this.parentLabels_;
-};
-
-
-/**
- * Getter/setter for milestone labels.
- * @param {(Object|boolean|null)=} opt_value - Settings.
- * @return {!(anychart.core.ui.LabelsFactory|anychart.ganttModule.TimeLine)} - Labels instance or itself for chaining call.
- */
-anychart.ganttModule.TimeLine.prototype.milestoneLabels = function(opt_value) {
-  if (!this.milestoneLabels_) {
-    this.milestoneLabels_ = new anychart.core.ui.LabelsFactory();
-    this.milestoneLabels_.listenSignals(this.drawLabels_, this);
-  }
-
-  if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !('enabled' in opt_value))
-      opt_value['enabled'] = true;
-    this.milestoneLabels_.setup(opt_value);
-    return this;
-  }
-  return this.milestoneLabels_;
-};
-
-
-/**
- * Getter/setter for progress labels.
- * @param {(Object|boolean|null)=} opt_value - Settings.
- * @return {!(anychart.core.ui.LabelsFactory|anychart.ganttModule.TimeLine)} - Labels instance or itself for chaining call.
- */
-anychart.ganttModule.TimeLine.prototype.progressLabels = function(opt_value) {
-  if (!this.progressLabels_) {
-    this.progressLabels_ = new anychart.core.ui.LabelsFactory();
-    this.progressLabels_.listenSignals(this.drawLabels_, this);
-  }
-
-  if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !('enabled' in opt_value))
-      opt_value['enabled'] = true;
-    this.progressLabels_.setup(opt_value);
-    return this;
-  }
-  return this.progressLabels_;
 };
 
 
@@ -1836,24 +2008,6 @@ anychart.ganttModule.TimeLine.prototype.markers = function(opt_value) {
   }
 
   return this.markersFactory_;
-};
-
-
-/**
- * Gets/sets 'baseline above' flag.
- * If the flag is set to 'true', baseline bar will be displayed abode an actual time bar.
- * @param {boolean=} opt_value - Value to be set.
- * @return {boolean|anychart.ganttModule.TimeLine} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.baselineAbove = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.baselineAbove_ != opt_value) {
-      this.baselineAbove_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW);
-      return this;
-    }
-  }
-  return this.baselineAbove_;
 };
 
 
@@ -3005,9 +3159,7 @@ anychart.ganttModule.TimeLine.prototype.addMouseMoveAndOver = function(evt) {
           var startItem = path.item;
           var startIndex = path.index;
 
-          if (tag.type != anychart.enums.TLElementTypes.BASELINES &&
-              tag.type != anychart.enums.TLElementTypes.CONNECTORS) {
-
+          if (tag.type != anychart.enums.TLElementTypes.BASELINES && tag.type != anychart.enums.TLElementTypes.CONNECTORS) {
             var from, to;
 
             if (period) {
@@ -3509,38 +3661,13 @@ anychart.ganttModule.TimeLine.prototype.genElement_ = function() {
 
 
 /**
- * Gets related labels factory.
- * @param {anychart.enums.TLElementTypes} type
- * @return {anychart.core.ui.LabelsFactory}
- * @private
- */
-anychart.ganttModule.TimeLine.prototype.getLabelsFactoryByType_ = function(type) {
-  switch (type) {
-    case anychart.enums.TLElementTypes.TASKS:
-    case anychart.enums.TLElementTypes.PERIODS:
-      return /** @type {anychart.core.ui.LabelsFactory} */ (this.baseLabels());
-    case anychart.enums.TLElementTypes.GROUPING_TASKS:
-      return /** @type {anychart.core.ui.LabelsFactory} */ (this.parentLabels());
-    case anychart.enums.TLElementTypes.MILESTONES:
-      return /** @type {anychart.core.ui.LabelsFactory} */ (this.milestoneLabels());
-    case anychart.enums.TLElementTypes.BASELINES:
-      return /** @type {anychart.core.ui.LabelsFactory} */ (this.baselineLabels());
-    case anychart.enums.TLElementTypes.PROGRESS:
-      return /** @type {anychart.core.ui.LabelsFactory} */ (this.progressLabels());
-    default:
-      return null; //connector has no labels for a while.
-  }
-};
-
-
-/**
  * Draws timeline bars.
  * @private
  */
 anychart.ganttModule.TimeLine.prototype.drawTimelineElements_ = function() {
   var els = this.controller.isResources() ?
       [this.periods()] :
-      [this.tasks(), this.groupingTasks(), this.milestones(), this.baselines(), this.progress()];
+      [this.tasks(), this.groupingTasks(), this.milestones(), this.baselines(), this.tasks().progress(), this.groupingTasks().progress()];
   for (var j = 0; j < els.length; j++) {
     var element = els[j];
     if (!element.shapeManager)
@@ -3548,6 +3675,7 @@ anychart.ganttModule.TimeLine.prototype.drawTimelineElements_ = function() {
     element.shapeManager.clearShapes();
   }
 
+  this.getDrawLayer().removeChildren();
   var markers = goog.array.concat(this.lineMarkers_, this.rangeMarkers_, this.textMarkers_);
 
   var dataBounds = new anychart.math.Rect(this.pixelBoundsCache.left,
@@ -3586,173 +3714,6 @@ anychart.ganttModule.TimeLine.prototype.drawTimelineElements_ = function() {
     el.reset();
   }
 };
-
-
-// /**
-//  * Draws a single bar with its markers and labels.
-//  * @param {anychart.math.Rect} bounds - Bounds of bar.
-//  * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} item - Related tree data item.
-//  * @param {anychart.enums.TLElementTypes} type - Type of bar.
-//  * @param {anychart.enums.GanttDataFields=} opt_field - Field that contains a setting for fill, stroke, labels and markers.
-//  * @param {number=} opt_periodIndex - Period index for resources timeline.
-//  * @return {!acgraph.vector.Element} - Bar itself.
-//  * @private
-//  */
-// anychart.ganttModule.TimeLine.prototype.drawBar_ = function(bounds, item, type, opt_field, opt_periodIndex) {
-//   var isTreeDataItem = !goog.isDef(opt_periodIndex);
-//   var period = {};
-//   if (!isTreeDataItem)
-//     period = item.get(anychart.enums.GanttDataFields.PERIODS)[opt_periodIndex];
-//
-//   var settings; //It is always a raw object.
-//   if (opt_field) {
-//     settings = isTreeDataItem ? item.get(opt_field) : period[opt_field];
-//   } else {
-//     /*
-//       Here field is not specified.
-//       It means that if it is an instance of tree data item, we color a bar with default color.
-//       If it is not tree data item (it is period - actually a raw object), it contains all visual settings in itself.
-//       TODO (A.Kudryavtsev): Bad english.
-//      */
-//     settings = isTreeDataItem ? null : period;
-//   }
-//
-//   var isParent = false;
-//   var isProgress = false;
-//   var selectedBar = isTreeDataItem ?
-//       (this.selectedItem == item) :
-//       (this.selectedPeriodId_ == period[anychart.enums.GanttDataFields.ID]);
-//
-//   var zIndex, defaultFill, defaultStroke;
-//   var resolver = anychart.ganttModule.BaseGrid.getColorResolver;
-//
-//   switch (opt_field) {
-//     case anychart.enums.GanttDataFields.BASELINE:
-//       zIndex = anychart.ganttModule.TimeLine.BASELINE_Z_INDEX;
-//       defaultFill = resolver('baselineFill', anychart.enums.ColorType.FILL, false)(this, 0, item);
-//       defaultStroke = resolver('baselineStroke', anychart.enums.ColorType.STROKE, false)(this, 0, item);
-//       break;
-//     case anychart.enums.GanttDataFields.PROGRESS:
-//       zIndex = anychart.ganttModule.TimeLine.PROGRESS_Z_INDEX;
-//       defaultFill = resolver('progressFill', anychart.enums.ColorType.FILL, false)(this, 0, item);
-//       defaultStroke = resolver('progressStroke', anychart.enums.ColorType.STROKE, false)(this, 0, item);
-//       isProgress = true;
-//       break;
-//     default:
-//       zIndex = anychart.ganttModule.TimeLine.BASE_Z_INDEX;
-//       isParent = (isTreeDataItem && item.numChildren());
-//       if (isParent) {
-//         defaultFill = resolver('parentFill', anychart.enums.ColorType.FILL, false)(this, 0, item);
-//         defaultStroke = resolver('parentStroke', anychart.enums.ColorType.STROKE, false)(this, 0, item);
-//       } else {
-//         defaultFill = resolver('baseFill', anychart.enums.ColorType.FILL, false)(this, 0, item, void 0, void 0, opt_periodIndex);
-//         defaultStroke = resolver('baseStroke', anychart.enums.ColorType.STROKE, false)(this, 0, item, void 0, void 0, opt_periodIndex);
-//       }
-//
-//       this.controller.data().suspendSignalsDispatching();//this.controller.data() can be Tree or TreeView.
-//       if (isTreeDataItem) {
-//         item.meta('relBounds', bounds);
-//       } else {
-//         if (!goog.isArray(item.meta('periodBounds'))) {
-//           item.setMeta('periodBounds', []);
-//         }
-//         item.setMeta('periodBounds', opt_periodIndex, bounds);
-//       }
-//       this.controller.data().resumeSignalsDispatching(false);
-//
-//   }
-//
-//   var stroke = /** @type {acgraph.vector.Stroke} */ (settings && goog.isDef(settings[anychart.enums.GanttDataFields.STROKE]) ?
-//       acgraph.vector.normalizeStroke(settings[anychart.enums.GanttDataFields.STROKE]) :
-//       defaultStroke);
-//
-//
-//   var bar = this.genElement_();
-//   bar.disablePointerEvents(isProgress);
-//   bar.item = item;
-//   bar.typeLabels = this.getLabelsFactoryByType_(type);
-//   bar.labelPointSettings = settings ? settings['label'] : null;
-//
-//   bar.tag = isTreeDataItem ? item.get(anychart.enums.GanttDataFields.ID) : period[anychart.enums.GanttDataFields.ID];
-//   bar.type = type;
-//
-//   if (!isTreeDataItem) {
-//     bar.period = period;
-//     bar.periodIndex = opt_periodIndex;
-//   }
-//
-//   var lineThickness = anychart.utils.extractThickness(/** @type {acgraph.vector.Stroke} */ (stroke));
-//
-//   var pixelShift = (lineThickness % 2 && acgraph.type() === acgraph.StageType.SVG) ? 0.5 : 0;
-//
-//   var roundLeft = Math.round(bounds.left) + pixelShift;
-//   var roundTop = Math.round(bounds.top) + pixelShift;
-//   var roundRight = Math.round(bounds.left + bounds.width) + pixelShift;
-//   var roundHeight = Math.round(bounds.top + bounds.height) + pixelShift;
-//   bar.currBounds = new anychart.math.Rect(roundLeft, roundTop, roundRight - roundLeft, roundHeight - roundTop);
-//
-//   bar
-//       .zIndex(zIndex)
-//       .moveTo(roundLeft, roundTop)
-//       .lineTo(roundRight, roundTop);
-//
-//   if (isParent) {
-//     var roundHeight2 = (bounds.top + bounds.height * 1.4) + pixelShift;
-//     bar
-//         .lineTo(roundRight, roundHeight2)
-//         .lineTo(roundRight - 1, roundHeight2)
-//         .lineTo(roundRight - 1, roundHeight)
-//         .lineTo(roundLeft + 1, roundHeight)
-//         .lineTo(roundLeft + 1, roundHeight2)
-//         .lineTo(roundLeft, roundHeight2);
-//   } else {
-//     bar
-//         .lineTo(roundRight, roundHeight)
-//         .lineTo(roundLeft, roundHeight);
-//   }
-//   bar.close();
-//
-//   if (selectedBar) {
-//     var selectedElementFill = resolver('selectedElementFill', anychart.enums.ColorType.FILL, false)(this, 0, this.selectedItem, void 0, void 0, opt_periodIndex);
-//     var selectedElementStroke = resolver('selectedElementStroke', anychart.enums.ColorType.STROKE, false)(this, 0, this.selectedItem, void 0, void 0, opt_periodIndex);
-//   }
-//
-//   if (settings) {
-//     var rawStartMarker = settings[anychart.enums.GanttDataFields.START_MARKER];
-//     if (rawStartMarker) {
-//       var startMarker = this.markers().add({value: {x: bounds.left, y: bounds.top}});
-//       startMarker
-//           .size(bounds.height / 2)
-//           .setup(rawStartMarker);
-//     }
-//
-//     var rawEndMarker = settings[anychart.enums.GanttDataFields.END_MARKER];
-//     if (rawEndMarker) {
-//       var endMarker = this.markers().add({value: {x: bounds.left + bounds.width, y: bounds.top}});
-//       endMarker
-//           .size(bounds.height / 2)
-//           .setup(rawEndMarker);
-//     }
-//
-//     var fill;
-//     if (selectedBar) {
-//       fill = selectedElementFill;
-//       stroke = selectedElementStroke;
-//     } else {
-//       fill = goog.isDef(settings[anychart.enums.GanttDataFields.FILL]) ?
-//           acgraph.vector.normalizeFill(settings[anychart.enums.GanttDataFields.FILL]) :
-//           defaultFill;
-//     }
-//
-//     bar.fill(/** @type {acgraph.vector.Fill} */(fill)).stroke(/** @type {acgraph.vector.Stroke} */(stroke));
-//   } else { //Default coloring.
-//     bar
-//         .fill(/** @type {acgraph.vector.Fill} */(selectedBar ? selectedElementFill : defaultFill))
-//         .stroke(/** @type {acgraph.vector.Stroke} */(selectedBar ? selectedElementStroke : defaultStroke));
-//   }
-//
-//   return bar;
-// };
 
 
 /**
@@ -3848,62 +3809,24 @@ anychart.ganttModule.TimeLine.prototype.drawProjectTimeline_ = function() {
 
 /**
  * Gets bar bounds.
- * @param {anychart.enums.TLElementTypes} type - Bar type.
+ * @param {anychart.ganttModule.elements.TimelineElement} element - Element.
  * @param {anychart.math.Rect} itemBounds - Full item bounds. Left and width must be taken
  *  from scale transformed values, top and height are values from item's position in grid.
  * @param {boolean=} opt_considerBaseline - Whether to consider baseline appearance in itemBounds.
  * @return {anychart.math.Rect} - Bar bounds considering anchor/position settings.
  * @private
  */
-anychart.ganttModule.TimeLine.prototype.getBarBounds_ = function(type, itemBounds, opt_considerBaseline) {
-  var optionHeight, barHeight, anchor, position, offset, offsetNorm;
-  var heightOptionName, anchorOptionName, positionOptionName, offsetOptionName;
-  var fixParentHeight = false;
-  switch (type) {
-    case anychart.enums.TLElementTypes.PERIODS:
-    case anychart.enums.TLElementTypes.TASKS:
-      heightOptionName = 'baseBarHeight';
-      anchorOptionName = 'baseBarAnchor';
-      positionOptionName = 'baseBarPosition';
-      offsetOptionName = 'baseBarOffset';
-      break;
-    case anychart.enums.TLElementTypes.GROUPING_TASKS:
-      heightOptionName = 'parentBarHeight';
-      anchorOptionName = 'parentBarAnchor';
-      positionOptionName = 'parentBarPosition';
-      offsetOptionName = 'parentBarOffset';
-      fixParentHeight = true;
-      break;
-    case anychart.enums.TLElementTypes.BASELINES:
-      heightOptionName = 'baselineBarHeight';
-      anchorOptionName = 'baselineBarAnchor';
-      positionOptionName = 'baselineBarPosition';
-      offsetOptionName = 'baselineBarOffset';
-      break;
-    case anychart.enums.TLElementTypes.MILESTONES:
-      heightOptionName = 'milestoneHeight';
-      anchorOptionName = 'milestoneAnchor';
-      positionOptionName = 'milestonePosition';
-      offsetOptionName = 'milestoneOffset';
-      break;
-    case anychart.enums.TLElementTypes.PROGRESS:
-      heightOptionName = 'progressBarHeight';
-      anchorOptionName = 'progressBarAnchor';
-      positionOptionName = 'progressBarPosition';
-      offsetOptionName = 'progressBarOffset';
-      break;
-  }
-
-  optionHeight = /** @type {string|number} */ (this.getInheritedOption_(/** @type {string} */ (heightOptionName), 'baseBarHeight'));
+anychart.ganttModule.TimeLine.prototype.getBarBounds_ = function(element, itemBounds, opt_considerBaseline) {
+  var fixParentHeight = element.getType() == anychart.enums.TLElementTypes.GROUPING_TASKS;
+  var optionHeight = /** @type {string|number} */ (element.getOption('height'));
   var height = opt_considerBaseline || fixParentHeight ? itemBounds.height / 2 : itemBounds.height;
-  barHeight = anychart.utils.normalizeSize(optionHeight, height);
-  anchor = /** @type {anychart.enums.Anchor} */ (this.getInheritedOption_(/** @type {string} */ (anchorOptionName), 'baseBarAnchor'));
-  position = /** @type {anychart.enums.Position} */ (this.getInheritedOption_(/** @type {string} */ (positionOptionName), 'baseBarPosition'));
-  offset = /** @type {number|string} */ (this.getInheritedOption_(/** @type {string} */ (offsetOptionName), 'baseBarOffset'));
-  offsetNorm = anychart.utils.normalizeSize(offset, itemBounds.height);
-
+  var barHeight = anychart.utils.normalizeSize(optionHeight, height);
+  var anchor = /** @type {anychart.enums.Anchor} */ (element.getOption('anchor'));
+  var position = /** @type {anychart.enums.Position} */ (element.getOption('position'));
+  var offset = /** @type {number|string} */ (element.getOption('offset'));
+  var offsetNorm = anychart.utils.normalizeSize(offset, itemBounds.height);
   if (anchor == anychart.enums.Anchor.AUTO) {
-    anchor = this.resolveAutoAnchorByType_(position, type, opt_considerBaseline);
+    anchor = this.resolveAutoAnchorByType_(position, element.getType(), opt_considerBaseline);
   }
 
   var coord = anychart.utils.getCoordinateByAnchor(itemBounds, position);
@@ -3914,7 +3837,7 @@ anychart.ganttModule.TimeLine.prototype.getBarBounds_ = function(type, itemBound
 
 /**
  * Fixes bounds with current stroke thickness.
- * @param {anychart.ganttModule.elements.Base} element - Element.
+ * @param {anychart.ganttModule.elements.TimelineElement} element - Element.
  * @param {anychart.math.Rect} bounds - Bounds to fix.
  * @param {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} item - .
  * @param {number=} opt_periodIndex - .
@@ -3923,7 +3846,8 @@ anychart.ganttModule.TimeLine.prototype.getBarBounds_ = function(type, itemBound
  * @return {anychart.math.Rect} - Fixed bounds.
  */
 anychart.ganttModule.TimeLine.prototype.fixBounds_ = function(element, bounds, item, opt_periodIndex, opt_selected) {
-  var stroke = element.getStroke(item, opt_periodIndex, opt_selected);
+  var state = opt_selected ? anychart.PointState.SELECT : anychart.PointState.NORMAL;
+  var stroke = element.getStroke(item, state, opt_periodIndex);
   var thickness = anychart.utils.extractThickness(stroke);
   var pixelShift = (thickness % 2 && acgraph.type() === acgraph.StageType.SVG) ? 0.5 : 0;
 
@@ -3979,30 +3903,30 @@ anychart.ganttModule.TimeLine.prototype.drawAsPeriods_ = function(dataItem, tota
           var left = this.pixelBoundsCache.left + this.pixelBoundsCache.width * startRatio;
           var right = this.pixelBoundsCache.left + this.pixelBoundsCache.width * endRatio;
           var width = right - left;
+          var el = /** @type {anychart.ganttModule.elements.PeriodsElement} */ (this.periods());
 
-          var optionHeight = /** @type {string|number} */ (this.getOption('baseBarHeight'));
+          var optionHeight = /** @type {string|number} */ (el.getOption('height'));
           var height = anychart.utils.normalizeSize(optionHeight, itemHeight);
 
           var itemBounds = new anychart.math.Rect(left, totalTop, width, itemHeight);
-          var anchor = /** @type {anychart.enums.Anchor} */ (this.getOption('baseBarAnchor'));
-          var position = /** @type {anychart.enums.Position} */ (this.getOption('baseBarPosition'));
+          var anchor = /** @type {anychart.enums.Anchor} */ (el.getOption('anchor'));
+          var position = /** @type {anychart.enums.Position} */ (el.getOption('position'));
           if (anchor == anychart.enums.Anchor.AUTO) {
             anchor = this.resolveAutoAnchorByType_(position, anychart.enums.TLElementTypes.PERIODS);
           }
 
-          var offset = /** @type {number|string} */ (this.getOption('baseBarOffset'));
+          var offset = /** @type {number|string} */ (el.getOption('offset'));
           var offsetNorm = anychart.utils.normalizeSize(offset, itemHeight);
 
           var coord = anychart.utils.getCoordinateByAnchor(itemBounds, position);
           var top = this.fixBarTop_(coord.y, height, anchor) + offsetNorm;
           var isSelected = this.selectedPeriodId_ == id;
 
-          var bounds = this.fixBounds_(/** @type {anychart.ganttModule.elements.Base} */ (this.periods()),
-              new anychart.math.Rect(coord.x, top, width, height), dataItem, j, isSelected);
+          var bounds = this.fixBounds_(el, new anychart.math.Rect(coord.x, top, width, height), dataItem, j, isSelected);
 
-          var tag = this.createTag(dataItem, anychart.enums.TLElementTypes.PERIODS, bounds, j);
+          var tag = this.createTag(dataItem, el, bounds, j);
           this.setRelatedBounds_(dataItem, bounds, j);
-          this.periods().rendering().callDrawer(dataItem, bounds, tag, j, isSelected);
+          el.rendering().callDrawer(dataItem, bounds, tag, j, isSelected);
         }
       }
     }
@@ -4039,31 +3963,28 @@ anychart.ganttModule.TimeLine.prototype.drawAsBaseline_ = function(dataItem, tot
     var actualWidth = actualRight - actualLeft;
 
     var isParent = !!dataItem.numChildren();
+    var element = /** @type {anychart.ganttModule.elements.GroupingTasksElement|anychart.ganttModule.elements.TasksElement} */ (isParent ? this.groupingTasks() : this.tasks());
+    var baselines = /** @type {anychart.ganttModule.elements.BaselinesElement} */ (this.baselines());
+
     var actualItemBounds = new anychart.math.Rect(actualLeft, totalTop, actualWidth, itemHeight);
-    var actualType = isParent ? anychart.enums.TLElementTypes.GROUPING_TASKS : anychart.enums.TLElementTypes.TASKS;
-    var actualBounds = this.getBarBounds_(actualType, actualItemBounds, true);
+    var actualBounds = this.getBarBounds_(element, actualItemBounds, true);
 
     var baselineLeft = b.left + b.width * baselineStartRatio;
     var baselineRight = b.left + b.width * baselineEndRatio;
     var baselineWidth = baselineRight - baselineLeft;
     var baselineItemBounds = new anychart.math.Rect(baselineLeft, totalTop, baselineWidth, itemHeight);
-    var baselineBounds = this.getBarBounds_(anychart.enums.TLElementTypes.BASELINES, baselineItemBounds, true);
+    var baselineBounds = this.getBarBounds_(baselines, baselineItemBounds, true);
 
-    this.fixBaselineBarsPositioning_(actualBounds, baselineBounds, isParent);
-    var element = isParent ? this.groupingTasks() : this.tasks();
-    var type = isParent ? anychart.enums.TLElementTypes.GROUPING_TASKS : anychart.enums.TLElementTypes.TASKS;
+    this.fixBaselineBarsPositioning_(actualBounds, baselineBounds, element, dataItem);
 
     var isSelected = this.selectedItem == dataItem;
-    actualBounds = this.fixBounds_(/** @type {anychart.ganttModule.elements.Base} */ (element),
-        actualBounds, dataItem, void 0, isSelected);
+    actualBounds = this.fixBounds_(element, actualBounds, dataItem, void 0, isSelected);
 
-    baselineBounds = this.fixBounds_(/** @type {anychart.ganttModule.elements.Base} */ (this.baselines()),
-        baselineBounds, dataItem, void 0, isSelected);
+    baselineBounds = this.fixBounds_(baselines, baselineBounds, dataItem, void 0, isSelected);
 
-    var tag = this.createTag(dataItem, type, actualBounds);
-    var baselineTag = this.createTag(dataItem, anychart.enums.TLElementTypes.BASELINES, baselineBounds);
-
-    this.baselines().rendering().callDrawer(dataItem, baselineBounds, baselineTag, void 0, isSelected);
+    var tag = this.createTag(dataItem, element, actualBounds);
+    var baselineTag = this.createTag(dataItem, baselines, baselineBounds);
+    baselines.rendering().callDrawer(dataItem, baselineBounds, baselineTag, void 0, isSelected);
 
     this.setRelatedBounds_(dataItem, actualBounds);
     element.rendering().callDrawer(dataItem, actualBounds, tag, void 0, isSelected);
@@ -4075,9 +3996,9 @@ anychart.ganttModule.TimeLine.prototype.drawAsBaseline_ = function(dataItem, tot
     if (goog.isDefAndNotNull(progressValue)) { //Draw progress.
       var progressWidth = /** @type {number} */ (progressValue) * actualBounds.width;
       var progressItemBounds = new anychart.math.Rect(actualBounds.left, actualBounds.top, progressWidth, actualBounds.height);
-      var progressBounds = this.getBarBounds_(anychart.enums.TLElementTypes.PROGRESS, progressItemBounds);
-      var progressTag = this.createTag(dataItem, anychart.enums.TLElementTypes.PROGRESS, progressBounds);
-      this.progress().rendering().callDrawer(dataItem, progressBounds, progressTag, void 0, isSelected);
+      var progressBounds = this.getBarBounds_(/** @type {anychart.ganttModule.elements.TimelineElement} */ (element.progress()), progressItemBounds);
+      var progressTag = this.createTag(dataItem, element.progress(), progressBounds);
+      element.progress().rendering().callDrawer(dataItem, progressBounds, progressTag, void 0, isSelected);
     }
   }
 };
@@ -4088,33 +4009,31 @@ anychart.ganttModule.TimeLine.prototype.drawAsBaseline_ = function(dataItem, tot
  * Allows to avoid bar and baseline intersection for auto anchor case.
  * @param {anychart.math.Rect} barBounds - .
  * @param {anychart.math.Rect} baselineBounds - .
- * @param {boolean=} opt_isParent - .
+ * @param {anychart.ganttModule.elements.TasksElement|anychart.ganttModule.elements.GroupingTasksElement} element - .
+ * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} item - Current tree data item.
  * @private
  */
-anychart.ganttModule.TimeLine.prototype.fixBaselineBarsPositioning_ = function(barBounds, baselineBounds, opt_isParent) {
-  var barAnchorName = opt_isParent ? 'parentBarAnchor' : 'baseBarAnchor';
-  var barPositionName = opt_isParent ? 'parentBarPosition' : 'baseBarPosition';
-  var barAnchor = /** @type {anychart.enums.Anchor} */ (this.getInheritedOption_(barAnchorName, 'baseBarAnchor'));
-  var barPosition = /** @type {anychart.enums.Position} */ (this.getInheritedOption_(barPositionName, 'baseBarPosition'));
-  var baselineAnchor = /** @type {anychart.enums.Anchor} */ (this.getInheritedOption_('baselineBarAnchor', 'baseBarAnchor'));
-  var baselinePosition = /** @type {anychart.enums.Position} */ (this.getInheritedOption_('baselineBarPosition', 'baseBarPosition'));
+anychart.ganttModule.TimeLine.prototype.fixBaselineBarsPositioning_ = function(barBounds, baselineBounds, element, item) {
+  var barAnchor = /** @type {anychart.enums.Anchor} */ (element.getOption('anchor'));
+  var barPosition = /** @type {anychart.enums.Position} */ (element.getOption('position'));
+  var baselineAnchor = /** @type {anychart.enums.Anchor} */ (this.baselines().getOption('anchor'));
+  var baselinePosition = /** @type {anychart.enums.Position} */ (this.baselines().getOption('position'));
 
   if ((barAnchor == baselineAnchor) && (barPosition == baselinePosition)) {
-    var barType = opt_isParent ? anychart.enums.TLElementTypes.GROUPING_TASKS : anychart.enums.TLElementTypes.TASKS;
     if (barAnchor == anychart.enums.Anchor.AUTO)
-      barAnchor = this.resolveAutoAnchorByType_(barPosition, barType, true);
+      barAnchor = this.resolveAutoAnchorByType_(barPosition, element.getType(), true);
     if (baselineAnchor == anychart.enums.Anchor.AUTO)
-      baselineAnchor = this.resolveAutoAnchorByType_(baselinePosition, anychart.enums.TLElementTypes.BASELINES, true);
+      baselineAnchor = this.resolveAutoAnchorByType_(baselinePosition, this.baselines().getType(), true);
 
-    var baselineStroke = anychart.ganttModule.BaseGrid.getColorResolver('baselineStroke', anychart.enums.ColorType.STROKE, false);
-    var barStroke = anychart.ganttModule.BaseGrid.getColorResolver((opt_isParent ? 'parentStroke' : 'baseStroke'), anychart.enums.ColorType.STROKE, false);
+    var baselineStroke = this.baselines().getStroke(item, anychart.PointState.NORMAL);
+    var barStroke = element.getStroke(item, anychart.PointState.NORMAL);
 
     var barStrokeThickness = anychart.utils.extractThickness(/** @type {acgraph.vector.Stroke|string} */ (barStroke)) / 2;
     var baselineStrokeThickness = anychart.utils.extractThickness(/** @type {acgraph.vector.Stroke|string} */ (baselineStroke)) / 2;
     var strokes = barStrokeThickness + baselineStrokeThickness;
 
     if (barAnchor == baselineAnchor) {
-      if (this.baselineAbove()) {
+      if (this.baselines().getOption('above')) {
         if (anychart.utils.isTopAnchor(barAnchor)) {
           barBounds.top += (baselineBounds.height + strokes);
         } else {
@@ -4151,19 +4070,19 @@ anychart.ganttModule.TimeLine.prototype.drawAsParent_ = function(dataItem, total
 
   if (endRatio > 0 && startRatio < 1) { //Is visible
     var b = this.pixelBoundsCache;
+    var el = /** @type {anychart.ganttModule.elements.GroupingTasksElement} */ (this.groupingTasks());
     var actualLeft = b.left + b.width * startRatio;
     var actualRight = b.left + b.width * endRatio;
     var actualWidth = actualRight - actualLeft;
     var actualItemBounds = new anychart.math.Rect(actualLeft, totalTop, actualWidth, itemHeight);
-    var actualBounds = this.getBarBounds_(anychart.enums.TLElementTypes.GROUPING_TASKS, actualItemBounds);
+    var actualBounds = this.getBarBounds_(el, actualItemBounds);
 
     var isSelected = this.selectedItem == dataItem;
-    actualBounds = this.fixBounds_(/** @type {anychart.ganttModule.elements.Base} */ (this.groupingTasks()),
-        actualBounds, dataItem, void 0, isSelected);
+    actualBounds = this.fixBounds_(el, actualBounds, dataItem, void 0, isSelected);
 
-    var tag = this.createTag(dataItem, anychart.enums.TLElementTypes.GROUPING_TASKS, actualBounds);
+    var tag = this.createTag(dataItem, el, actualBounds);
     this.setRelatedBounds_(dataItem, actualBounds);
-    this.groupingTasks().rendering().callDrawer(dataItem, actualBounds, tag, void 0, isSelected);
+    el.rendering().callDrawer(dataItem, actualBounds, tag, void 0, isSelected);
 
     var progressValue = goog.isDef(dataItem.meta(anychart.enums.GanttDataFields.PROGRESS_VALUE)) ?
         dataItem.meta(anychart.enums.GanttDataFields.PROGRESS_VALUE) :
@@ -4172,9 +4091,9 @@ anychart.ganttModule.TimeLine.prototype.drawAsParent_ = function(dataItem, total
     if (goog.isDefAndNotNull(progressValue)) { //Draw progress.
       var progressWidth = /** @type {number} */ (progressValue) * actualWidth;
       var progressItemBounds = new anychart.math.Rect(actualBounds.left, actualBounds.top, progressWidth, actualBounds.height);
-      var progressBounds = this.getBarBounds_(anychart.enums.TLElementTypes.PROGRESS, progressItemBounds);
-      var progressTag = this.createTag(dataItem, anychart.enums.TLElementTypes.PROGRESS, progressBounds);
-      this.progress().rendering().callDrawer(dataItem, progressBounds, progressTag, void 0, isSelected);
+      var progressBounds = this.getBarBounds_(/** @type {anychart.ganttModule.elements.TimelineElement} */ (el.progress()), progressItemBounds);
+      var progressTag = this.createTag(dataItem, el.progress(), progressBounds);
+      el.progress().rendering().callDrawer(dataItem, progressBounds, progressTag, void 0, isSelected);
     }
   }
 };
@@ -4200,17 +4119,17 @@ anychart.ganttModule.TimeLine.prototype.drawAsProgress_ = function(dataItem, tot
 
   if (endRatio > 0 && startRatio < 1) { //Is visible
     var b = this.pixelBoundsCache;
+    var el = /** @type {anychart.ganttModule.elements.TasksElement} */ (this.tasks());
     var actualLeft = b.left + b.width * startRatio;
     var actualRight = b.left + b.width * endRatio;
     var actualWidth = actualRight - actualLeft;
     var actualItemBounds = new anychart.math.Rect(actualLeft, totalTop, actualWidth, itemHeight);
-    var actualBounds = this.getBarBounds_(anychart.enums.TLElementTypes.TASKS, actualItemBounds);
+    var actualBounds = this.getBarBounds_(el, actualItemBounds);
 
     var isSelected = this.selectedItem == dataItem;
-    actualBounds = this.fixBounds_(/** @type {anychart.ganttModule.elements.Base} */ (this.tasks()),
-        actualBounds, dataItem, void 0, isSelected);
+    actualBounds = this.fixBounds_(el, actualBounds, dataItem, void 0, isSelected);
 
-    var tag = this.createTag(dataItem, anychart.enums.TLElementTypes.TASKS, actualBounds);
+    var tag = this.createTag(dataItem, el, actualBounds);
     this.setRelatedBounds_(dataItem, actualBounds);
     this.tasks().rendering().callDrawer(dataItem, actualBounds, tag, void 0, isSelected);
 
@@ -4221,9 +4140,9 @@ anychart.ganttModule.TimeLine.prototype.drawAsProgress_ = function(dataItem, tot
     if (goog.isDefAndNotNull(progressValue)) { //Draw progress.
       var progressWidth = /** @type {number} */ (progressValue) * actualWidth;
       var progressItemBounds = new anychart.math.Rect(actualBounds.left, actualBounds.top, progressWidth, actualBounds.height);
-      var progressBounds = this.getBarBounds_(anychart.enums.TLElementTypes.PROGRESS, progressItemBounds);
-      var progressTag = this.createTag(dataItem, anychart.enums.TLElementTypes.PROGRESS, actualBounds);
-      this.progress().rendering().callDrawer(dataItem, progressBounds, progressTag, void 0, isSelected);
+      var progressBounds = this.getBarBounds_(/** @type {anychart.ganttModule.elements.TimelineElement} */ (this.tasks().progress()), progressItemBounds);
+      var progressTag = this.createTag(dataItem, this.tasks().progress(), actualBounds);
+      this.tasks().progress().rendering().callDrawer(dataItem, progressBounds, progressTag, void 0, isSelected);
     }
 
   }
@@ -4241,31 +4160,32 @@ anychart.ganttModule.TimeLine.prototype.drawAsMilestone_ = function(dataItem, to
   var actualStart = dataItem.get(anychart.enums.GanttDataFields.ACTUAL_START);
   var ratio = this.scale_.timestampToRatio(actualStart);
   if (ratio >= 0 && ratio <= 1) { //Is visible
-    var settings = dataItem.get(anychart.enums.GanttDataFields.MILESTONE);
+    var el = /** @type {anychart.ganttModule.elements.MilestonesElement} */ (this.milestones());
+    // var settings = dataItem.get(anychart.enums.GanttDataFields.MILESTONE);
 
-    var stroke = /** @type {acgraph.vector.Stroke} */ (settings && goog.isDef(settings[anychart.enums.GanttDataFields.STROKE]) ?
-        acgraph.vector.normalizeStroke(settings[anychart.enums.GanttDataFields.STROKE]) :
-        anychart.ganttModule.BaseGrid.getColorResolver('milestoneStroke', anychart.enums.ColorType.STROKE, false)(this, 0, dataItem));
+    // var stroke = /** @type {acgraph.vector.Stroke} */ (settings && goog.isDef(settings[anychart.enums.GanttDataFields.STROKE]) ?
+    //     acgraph.vector.normalizeStroke(settings[anychart.enums.GanttDataFields.STROKE]) :
+    //     anychart.ganttModule.BaseGrid.getColorResolver('milestoneStroke', anychart.enums.ColorType.STROKE, false)(this, 0, dataItem));
+    var stroke = el.getStroke(dataItem, anychart.PointState.NORMAL);
 
     var lineThickness = anychart.utils.isNone(stroke) ? 0 :
         goog.isString(stroke) ? 1 :
             stroke['thickness'] ? stroke['thickness'] : 1;
 
     var pixelShift = (lineThickness % 2 && acgraph.type() === acgraph.StageType.SVG) ? 0.5 : 0;
-    var optionHeight = /** @type {string|number} */ (this.getInheritedOption_('milestoneHeight', 'baseBarHeight'));
+    var optionHeight = /** @type {string|number} */ (el.getOption('height'));
     var height = anychart.utils.normalizeSize(optionHeight, itemHeight);
 
     var halfHeight = Math.round(height / 2);
 
     var centerLeft = Math.round(this.pixelBoundsCache.left + this.pixelBoundsCache.width * ratio) + pixelShift;
     var itemBounds = new anychart.math.Rect(centerLeft - halfHeight, totalTop, height, itemHeight);
-    var bounds = this.getBarBounds_(anychart.enums.TLElementTypes.MILESTONES, itemBounds);
+    var bounds = this.getBarBounds_(el, itemBounds);
 
     var isSelected = this.selectedItem == dataItem;
-    bounds = this.fixBounds_(/** @type {anychart.ganttModule.elements.Base} */ (this.milestones()),
-        bounds, dataItem, void 0, isSelected);
+    bounds = this.fixBounds_(el, bounds, dataItem, void 0, isSelected);
 
-    var tag = this.createTag(dataItem, anychart.enums.TLElementTypes.MILESTONES, bounds);
+    var tag = this.createTag(dataItem, el, bounds);
     this.setRelatedBounds_(dataItem, bounds);
     this.milestones().rendering().callDrawer(dataItem, bounds, tag, void 0, isSelected);
   }
@@ -4332,7 +4252,7 @@ anychart.ganttModule.TimeLine.prototype.getItemBounds_ = function(index, opt_per
   if (anychart.ganttModule.BaseGrid.isMilestone(item)) {
     isMilestone = true;
     endTimestamp = startTimestamp;
-    var optionHeight = /** @type {string|number} */ (this.getInheritedOption_('milestoneHeight', 'baseBarHeight'));
+    var optionHeight = /** @type {string|number} */ (this.milestones().getOption('height'));
     var mHeight = anychart.utils.normalizeSize(optionHeight, rowHeight);
     milestoneHalfWidth = Math.round(mHeight / 2);
   }
@@ -4349,21 +4269,21 @@ anychart.ganttModule.TimeLine.prototype.getItemBounds_ = function(index, opt_per
 
     if (!this.controller.isResources()) {
       if (isMilestone) {
-        return this.getBarBounds_(anychart.enums.TLElementTypes.MILESTONES, itemBounds);
+        return this.getBarBounds_(/** @type {anychart.ganttModule.elements.TimelineElement} */ (this.milestones()), itemBounds);
       } else if (goog.isDef(item.get(anychart.enums.GanttDataFields.BASELINE_START)) &&
           goog.isDef(item.get(anychart.enums.GanttDataFields.BASELINE_END))) {
-        var type = item.numChildren() ? anychart.enums.TLElementTypes.GROUPING_TASKS : anychart.enums.TLElementTypes.TASKS;
-        var barBounds = this.getBarBounds_(type, itemBounds, true);
-        var baselineBounds = this.getBarBounds_(anychart.enums.TLElementTypes.BASELINES, itemBounds, true);
-        this.fixBaselineBarsPositioning_(barBounds, baselineBounds, !!item.numChildren());
+        var element = /** @type {anychart.ganttModule.elements.TasksElement|anychart.ganttModule.elements.GroupingTasksElement} */ (item.numChildren() ? this.groupingTasks() : this.tasks());
+        var barBounds = this.getBarBounds_(/** @type {anychart.ganttModule.elements.TimelineElement} */ (element), itemBounds, true);
+        var baselineBounds = this.getBarBounds_(/** @type {anychart.ganttModule.elements.TimelineElement} */ (this.baselines()), itemBounds, true);
+        this.fixBaselineBarsPositioning_(barBounds, baselineBounds, element, item);
         return barBounds;
       } else if (item.numChildren()) {
-        return this.getBarBounds_(anychart.enums.TLElementTypes.GROUPING_TASKS, itemBounds);
+        return this.getBarBounds_(/** @type {anychart.ganttModule.elements.TimelineElement} */ (this.groupingTasks()), itemBounds);
       } else {
-        return this.getBarBounds_(anychart.enums.TLElementTypes.TASKS, itemBounds);
+        return this.getBarBounds_(/** @type {anychart.ganttModule.elements.TimelineElement} */ (this.tasks()), itemBounds);
       }
     }
-    return this.getBarBounds_(anychart.enums.TLElementTypes.PERIODS, itemBounds);
+    return this.getBarBounds_(/** @type {anychart.ganttModule.elements.TimelineElement} */ (this.periods()), itemBounds);
   }
 };
 
@@ -4399,23 +4319,41 @@ anychart.ganttModule.TimeLine.prototype.connectItems_ = function(from, to, opt_c
   var toRowHeight = this.controller.getItemHeight(toItem);
 
   if (fromBounds && toBounds) {
-    var fill, stroke;
+    var selected = !goog.isNull(this.selectedConnectorData_) &&
+        this.selectedConnectorData_['fromItemIndex'] == fromIndex &&
+        this.selectedConnectorData_['toItemIndex'] == toIndex &&
+        this.selectedConnectorData_['connType'] == opt_connType;
 
-    if (!(opt_connSettings && opt_connSettings[anychart.enums.GanttDataFields.FILL])) {
-      var connectorFill = anychart.ganttModule.BaseGrid.getColorResolver('connectorFill', anychart.enums.ColorType.FILL, false)(this, 0, fromItem, toItem, opt_connType, fromPeriodIndex, toPeriodIndex);
+    if (this.controller.isResources()) {
+      if (this.selectedConnectorData_) {
+        selected &= (this.selectedConnectorData_['fromPeriodIndex'] == fromPeriodIndex && this.selectedConnectorData_['toPeriodIndex'] == toPeriodIndex);
+      }
     }
-    if (!(opt_connSettings && opt_connSettings[anychart.enums.GanttDataFields.STROKE])) {
-      var connectorStroke = anychart.ganttModule.BaseGrid.getColorResolver('connectorStroke', anychart.enums.ColorType.STROKE, false)(this, 0, fromItem, toItem, opt_connType, fromPeriodIndex, toPeriodIndex);
-    }
-    fill = (opt_connSettings && opt_connSettings[anychart.enums.GanttDataFields.FILL]) ?
-        acgraph.vector.normalizeFill(opt_connSettings[anychart.enums.GanttDataFields.FILL]) :
-        connectorFill;
-
-    stroke = (opt_connSettings && opt_connSettings[anychart.enums.GanttDataFields.STROKE]) ?
-        acgraph.vector.normalizeStroke(opt_connSettings[anychart.enums.GanttDataFields.STROKE]) :
-        connectorStroke;
 
     var drawPreview = goog.isDefAndNotNull(opt_path);
+    var pointFill, pointStroke;
+    if (opt_connSettings) {
+      if (selected) {
+        pointFill = goog.typeOf(opt_connSettings['selected']) == 'object' ?
+            opt_connSettings['selected']['fill'] :
+            void 0;
+        pointStroke = goog.typeOf(opt_connSettings['selected']) == 'object' ?
+            opt_connSettings['selected']['stroke'] :
+            void 0;
+      } else {
+        pointFill = goog.isDef(opt_connSettings['fill']) ? opt_connSettings['fill'] :
+            goog.typeOf(opt_connSettings['normal']) == 'object' ?
+                opt_connSettings['normal']['fill'] :
+                void 0;
+        pointStroke = goog.isDef(opt_connSettings['stroke']) ? opt_connSettings['stroke'] :
+            goog.typeOf(opt_connSettings['normal']) == 'object' ?
+                opt_connSettings['normal']['stroke'] :
+                void 0;
+      }
+    }
+
+    var state = selected ? anychart.PointState.SELECT : anychart.PointState.NORMAL;
+    var stroke = /** @type {acgraph.vector.Stroke} */(pointStroke || this.connectors().getStroke(fromItem, toItem, state, opt_connType, fromPeriodIndex, toPeriodIndex));
 
     var fromLeft, fromTop, toLeft, toTop, orientation;
     var am = anychart.ganttModule.TimeLine.ARROW_MARGIN;
@@ -4427,11 +4365,11 @@ anychart.ganttModule.TimeLine.prototype.connectItems_ = function(from, to, opt_c
     var segmentTop0; //Util variable, temporary segment Y-coordinate storage.
     var aboveSequence = true; //If 'from' bar is above the 'to' bar.
 
-    var lineThickness = anychart.utils.extractThickness(/** @type {acgraph.vector.Stroke} */(stroke));
+    var lineThickness = anychart.utils.extractThickness(stroke);
     var pixelShift = (lineThickness % 2 && acgraph.type() === acgraph.StageType.SVG) ? 0.5 : 0;
     var toActualTop;
 
-    switch (String(opt_connType).toLowerCase()) {
+    switch ((opt_connType + '').toLowerCase()) {
       case anychart.enums.ConnectorType.FINISH_FINISH:
         fromLeft = Math.round(fromBounds.left + fromBounds.width) + pixelShift;
         fromTop = Math.round(fromBounds.top + fromBounds.height / 2) + pixelShift;
@@ -4552,41 +4490,29 @@ anychart.ganttModule.TimeLine.prototype.connectItems_ = function(from, to, opt_c
       'toItem': toItem
     };
 
-    var connectorHighlight = !goog.isNull(this.selectedConnectorData_) &&
-        this.selectedConnectorData_['fromItemIndex'] == meta['fromItemIndex'] &&
-        this.selectedConnectorData_['toItemIndex'] == meta['toItemIndex'] &&
-        this.selectedConnectorData_['connType'] == meta['connType'];
-
     if (this.controller.isResources()) {
       meta['fromPeriodIndex'] = fromPeriodIndex;
       meta['toPeriodIndex'] = toPeriodIndex;
-      if (this.selectedConnectorData_) {
-        connectorHighlight &= (this.selectedConnectorData_['fromPeriodIndex'] == meta['fromPeriodIndex'] && this.selectedConnectorData_['toPeriodIndex'] == meta['toPeriodIndex']);
-      }
     }
 
-    var selectedConnectorStroke;
-    if (connectorHighlight)
-      selectedConnectorStroke = /** @type {acgraph.vector.Stroke} */(anychart.ganttModule.BaseGrid.getColorResolver('selectedConnectorStroke', anychart.enums.ColorType.STROKE, false)(this, 0, fromItem, toItem, opt_connType, fromPeriodIndex, toPeriodIndex));
     if (path && !drawPreview) {
-      path.stroke(/** @type {acgraph.vector.Stroke} */ (stroke));
       path.tag = void 0; //Tooltip will not appear on connector mouse over.
       path.type = anychart.enums.TLElementTypes.CONNECTORS;
       path.currBounds = null;
       path.cursor(this.editable ? acgraph.vector.Cursor.POINTER : acgraph.vector.Cursor.DEFAULT);
       meta['path'] = path;
       path.meta = meta;
-      path.stroke(connectorHighlight ? selectedConnectorStroke : /** @type {acgraph.vector.Stroke} */ (stroke));
+      path.stroke(stroke);
     }
     if (arrow && !drawPreview) {
-      arrow.fill(/** @type {acgraph.vector.Fill} */ (fill)).stroke(/** @type {acgraph.vector.Stroke} */ (stroke));
       arrow.tag = void 0; //Tooltip will not appear on connector arrow mouse over.
       arrow.type = anychart.enums.TLElementTypes.CONNECTORS;
       arrow.currBounds = null;
       arrow.cursor(this.editable ? acgraph.vector.Cursor.POINTER : acgraph.vector.Cursor.DEFAULT);
       meta['arrow'] = arrow;
       arrow.meta = meta;
-      arrow.stroke(connectorHighlight ? selectedConnectorStroke : /** @type {acgraph.vector.Stroke} */ (stroke));
+      arrow.fill(pointFill || this.connectors().getFill(fromItem, toItem, state, opt_connType, fromPeriodIndex, toPeriodIndex));
+      arrow.stroke(stroke);
     }
   }
 };
@@ -4845,9 +4771,7 @@ anychart.ganttModule.TimeLine.prototype.initDom = function() {
  * @override
  */
 anychart.ganttModule.TimeLine.prototype.boundsInvalidated = function() {
-  this.header()
-      .bounds()
-      .set(this.pixelBoundsCache.left, this.pixelBoundsCache.top,
+  this.header().bounds(this.pixelBoundsCache.left, this.pixelBoundsCache.top,
           this.pixelBoundsCache.width, /** @type {number} */ (this.headerHeight()));
   this.redrawHeader = true;
 };
@@ -4891,6 +4815,17 @@ anychart.ganttModule.TimeLine.prototype.appearanceInvalidated = function() {
 /**
  * @override
  */
+anychart.ganttModule.TimeLine.prototype.labelsInvalidated = function() {
+  if (this.hasInvalidationState(anychart.ConsistencyState.TIMELINE_ELEMENTS_LABELS)) {
+    this.drawLabels_();
+    this.markConsistent(anychart.ConsistencyState.TIMELINE_ELEMENTS_LABELS);
+  }
+};
+
+
+/**
+ * @override
+ */
 anychart.ganttModule.TimeLine.prototype.specialInvalidated = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.TIMELINE_SCALES)) {
     this.redrawPosition = true;
@@ -4899,19 +4834,22 @@ anychart.ganttModule.TimeLine.prototype.specialInvalidated = function() {
   }
 
   if (this.redrawHeader) {
-    this.header().invalidate(anychart.ConsistencyState.TIMELINE_HEADER_SCALES);
-    this.header_.draw();
-    var level, ticks = [];
-    if (this.header_.lowLevel().enabled()) {
-      level = this.header_.lowLevel();
-    } else if (this.header_.midLevel().enabled()) {
-      level = this.header_.midLevel();
-    } else if (this.header_.topLevel().enabled()) {
-      level = this.header_.topLevel();
+    var header = this.header();
+    header.suspendSignalsDispatching();
+    var levels = this.scale_.getLevelsData();
+    header.setLevels(levels);
+
+    var ticks = [];
+    for (var i = 0; i < levels.length; i++) {
+      if (header.level(i).enabled()) {
+        var level = levels[i];
+        ticks = this.scale_.getSimpleTicks(/** @type {anychart.enums.Interval} */(level['unit']), /** @type {number} */(level['count']));
+        break;
+      }
     }
 
-    if (level)
-      ticks = level.getTicks();
+    header.draw();
+    header.resumeSignalsDispatching(false);
 
     this.drawLowTicks_(ticks);
 
@@ -4948,7 +4886,7 @@ anychart.ganttModule.TimeLine.prototype.specialInvalidated = function() {
 anychart.ganttModule.TimeLine.prototype.positionFinal = function() {
   if (this.redrawPosition || this.redrawHeader) {
     this.drawTimelineElements_();
-    this.drawLabels_(void 0, true);
+    this.invalidate(anychart.ConsistencyState.TIMELINE_ELEMENTS_LABELS);
 
     this.redrawHeader = false;
 
@@ -4969,18 +4907,26 @@ anychart.ganttModule.TimeLine.prototype.positionFinal = function() {
 
 
 /**
- * Draws labels.
- * @param {anychart.SignalEvent=} opt_event - Event object.
- * @param {boolean=} opt_skipDrawing - Whether to skip labels suspension and this.labels().draw().
+ * Labels invalidation handler.
+ * @param {anychart.SignalEvent} event - Event object.
  * @private
  */
-anychart.ganttModule.TimeLine.prototype.drawLabels_ = function(opt_event, opt_skipDrawing) {
+anychart.ganttModule.TimeLine.prototype.labelsInvalidated_ = function(event) {
+  this.invalidate(anychart.ConsistencyState.TIMELINE_ELEMENTS_LABELS, anychart.Signal.NEEDS_REDRAW);
+};
+
+
+/**
+ * Draws labels.
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.drawLabels_ = function() {
   this.labels().suspendSignalsDispatching();
   this.labels().clear();
 
   var els = this.controller.isResources() ?
       [this.periods()] :
-      [this.tasks(), this.groupingTasks(), this.milestones(), this.baselines(), this.progress()];
+      [this.tasks(), this.groupingTasks(), this.milestones(), this.baselines(), this.tasks().progress(), this.groupingTasks().progress()];
 
   for (var i = 0; i < els.length; i++) {
     var element = els[i];
@@ -5001,18 +4947,26 @@ anychart.ganttModule.TimeLine.prototype.drawLabels_ = function(opt_event, opt_sk
           });
 
           var pointLabels = tag.labelPointSettings;
-          var typeLabels = tag.labels;
+          // var typeLabels = tag.labels;
+          var resolutionLabels = tag.labels;
+          var typeLabels = resolutionLabels && resolutionLabels[0] ? resolutionLabels[0] : null; //smth like this.tasks().labels() always here.
+          var elementsLabels = this.elements().labels();
           var normalLabels = this.labels();
 
           var pointLabelsEnabled = pointLabels && goog.isDef(pointLabels['enabled']) ? pointLabels['enabled'] : null;
+          var elementsLabelsEnabled = element && goog.isDef(elementsLabels.enabled()) ? elementsLabels.enabled() : null;
           var typeLabelsEnabled = typeLabels && goog.isDef(typeLabels.enabled()) ? typeLabels.enabled() : null;
 
           var draw = false;
           if (goog.isNull(pointLabelsEnabled)) {
-            if (goog.isNull(typeLabelsEnabled)) {
-              draw = normalLabels.enabled();
+            if (goog.isNull(elementsLabelsEnabled)) {
+              if (goog.isNull(typeLabelsEnabled)) {
+                draw = normalLabels.enabled();
+              } else {
+                draw = typeLabelsEnabled;
+              }
             } else {
-              draw = typeLabelsEnabled;
+              draw = elementsLabelsEnabled;
             }
           } else {
             draw = pointLabelsEnabled;
@@ -5024,10 +4978,21 @@ anychart.ganttModule.TimeLine.prototype.drawLabels_ = function(opt_event, opt_sk
 
             tag.label.state('labelOwnSettings', tag.label.ownSettings, 0);
             tag.label.state('pointState', pointLabels, 1);
-            tag.label.state('typeLabels', typeLabels, 2);
-            tag.label.state('normalLabels', normalLabels, 3);
-            tag.label.state('typeThemeLabels', typeLabels.themeSettings, 4);
-            tag.label.state('normalThemeLabels', normalLabels.themeSettings, 5);
+
+            var len = resolutionLabels.length;
+            var k, count, stateLabels;
+            for (k = 0; k < len; k++) {
+              stateLabels = resolutionLabels[k];
+              count = 2 + k;
+              tag.label.state('st' + count, stateLabels, count);
+            }
+
+            //Second passage provides correct theme settings order
+            for (k = 0; k < len; k++) {
+              stateLabels = resolutionLabels[k];
+              count = 2 + k + len;
+              tag.label.state('st' + count, stateLabels.themeSettings, count);
+            }
 
             var position = anychart.enums.normalizeAnchor(tag.label.getFinalSettings('position'));
             var positionProvider = {'value': anychart.utils.getCoordinateByAnchor(tag.bounds, position)};
@@ -5051,13 +5016,20 @@ anychart.ganttModule.TimeLine.prototype.drawLabels_ = function(opt_event, opt_sk
     }
   }
 
-  this.labels().resumeSignalsDispatching(!opt_skipDrawing);
+  this.labels().resumeSignalsDispatching(true);
   this.labels().draw();
-  this.baseLabels().markConsistent(anychart.ConsistencyState.ALL);
-  this.baselineLabels().markConsistent(anychart.ConsistencyState.ALL);
-  this.parentLabels().markConsistent(anychart.ConsistencyState.ALL);
-  this.milestoneLabels().markConsistent(anychart.ConsistencyState.ALL);
-  this.progressLabels().markConsistent(anychart.ConsistencyState.ALL);
+  this.elements().labels().markConsistent(anychart.ConsistencyState.ALL);
+
+  if (this.controller.isResources()) {
+    this.periods().labels().markConsistent(anychart.ConsistencyState.ALL);
+  } else {
+    this.tasks().labels().markConsistent(anychart.ConsistencyState.ALL);
+    this.tasks().progress().labels().markConsistent(anychart.ConsistencyState.ALL);
+    this.groupingTasks().labels().markConsistent(anychart.ConsistencyState.ALL);
+    this.groupingTasks().progress().labels().markConsistent(anychart.ConsistencyState.ALL);
+    this.milestones().labels().markConsistent(anychart.ConsistencyState.ALL);
+    this.baselines().labels().markConsistent(anychart.ConsistencyState.ALL);
+  }
 };
 
 
@@ -5236,39 +5208,10 @@ anychart.ganttModule.TimeLine.prototype.scale = function(opt_value) {
 /** @inheritDoc */
 anychart.ganttModule.TimeLine.prototype.serialize = function() {
   var json = anychart.ganttModule.TimeLine.base(this, 'serialize');
-
-  anychart.core.settings.serialize(this, anychart.ganttModule.TimeLine.DESCRIPTORS, json);
-
   json['scale'] = this.scale_.serialize();
-
   json['labels'] = this.labels().serialize();
-
-  var baseLabelsConf = this.baseLabels().serialize();
-  if (!goog.object.isEmpty(baseLabelsConf))
-    json['baseLabels'] = baseLabelsConf;
-
-  var parentLabelsConf = this.parentLabels().serialize();
-  if (!goog.object.isEmpty(parentLabelsConf))
-    json['parentLabels'] = parentLabelsConf;
-
-  var baselineLabelsConf = this.baselineLabels().serialize();
-  if (!goog.object.isEmpty(baselineLabelsConf))
-    json['baselineLabels'] = baselineLabelsConf;
-
-  var milestonesLabelsConf = this.milestoneLabels().serialize();
-  if (!goog.object.isEmpty(milestonesLabelsConf))
-    json['milestoneLabels'] = milestonesLabelsConf;
-
-
-  var progressLabelsConf = this.progressLabels().serialize();
-  if (!goog.object.isEmpty(progressLabelsConf))
-    json['progressLabels'] = progressLabelsConf;
-
   json['markers'] = this.markers().serialize();
-
   json['header'] = this.header().serialize();
-
-  json['baselineAbove'] = this.baselineAbove_;
 
   anychart.core.settings.serialize(this, anychart.ganttModule.TimeLine.COLOR_DESCRIPTORS, json);
 
@@ -5293,6 +5236,7 @@ anychart.ganttModule.TimeLine.prototype.serialize = function() {
   json['editIntervalWidth'] = this.editIntervalWidth_;
 
   json['elements'] = this.elements().serialize();
+  json['connectors'] = this.connectors().serialize();
   if (this.controller.isResources()) {
     json['periods'] = this.periods().serialize();
   } else {
@@ -5300,7 +5244,6 @@ anychart.ganttModule.TimeLine.prototype.serialize = function() {
     json['groupingTasks'] = this.groupingTasks().serialize();
     json['baselines'] = this.baselines().serialize();
     json['milestones'] = this.milestones().serialize();
-    json['progress'] = this.progress().serialize();
   }
 
   var i;
@@ -5338,25 +5281,12 @@ anychart.ganttModule.TimeLine.prototype.serialize = function() {
 anychart.ganttModule.TimeLine.prototype.setupByJSON = function(config, opt_default) {
   anychart.ganttModule.TimeLine.base(this, 'setupByJSON', config, opt_default);
 
-  if (opt_default) {
-    anychart.core.settings.copy(this.themeSettings, anychart.ganttModule.TimeLine.DESCRIPTORS, config);
-  } else {
-    anychart.core.settings.deserialize(this, anychart.ganttModule.TimeLine.DESCRIPTORS, config);
-  }
-
   if ('scale' in config) this.scale_.setup(config['scale']);
 
   this.labels().setupInternal(!!opt_default, config['labels']);
-  this.baseLabels().setupInternal(!!opt_default, config['baseLabels']);
-  this.baselineLabels().setupInternal(!!opt_default, config['baselineLabels']);
-  this.parentLabels().setupInternal(!!opt_default, config['parentLabels']);
-  this.milestoneLabels().setupInternal(!!opt_default, config['milestoneLabels']);
-  this.progressLabels().setupInternal(!!opt_default, config['progressLabels']);
 
   if ('markers' in config) this.markers(config['markers']);
-  if ('header' in config) this.header(config['header']);
-
-  this.baselineAbove(config['baselineAbove']);
+  if ('header' in config) this.header().setupInternal(!!opt_default, config['header']);
 
   anychart.core.settings.deserialize(this, anychart.ganttModule.TimeLine.COLOR_DESCRIPTORS, config, opt_default);
 
@@ -5381,13 +5311,13 @@ anychart.ganttModule.TimeLine.prototype.setupByJSON = function(config, opt_defau
   this.editIntervalWidth(config['editIntervalWidth']);
 
   this.elements().setupInternal(!!opt_default, config['elements']);
+  this.connectors().setupInternal(!!opt_default, config['connectors']);
   if (this.controller.isResources()) {
     this.periods().setupInternal(!!opt_default, config['periods']);
   } else {
     this.tasks().setupInternal(!!opt_default, config['tasks']);
     this.milestones().setupInternal(!!opt_default, config['milestones']);
     this.groupingTasks().setupInternal(!!opt_default, config['groupingTasks']);
-    this.progress().setupInternal(!!opt_default, config['progress']);
     this.baselines().setupInternal(!!opt_default, config['baselines']);
   }
 
@@ -5435,7 +5365,7 @@ anychart.ganttModule.TimeLine.prototype.setupByJSON = function(config, opt_defau
 anychart.ganttModule.TimeLine.prototype.disposeInternal = function() {
   goog.dispose(this.horizontalScrollBar_);
   this.horizontalScrollBar_ = null;
-  goog.disposeAll(this.elements_, this.periods_, this.tasks_, this.groupingTasks_, this.milestones_, this.baselines_, this.progress_);
+  goog.disposeAll(this.elements_, this.periods_, this.tasks_, this.groupingTasks_, this.milestones_, this.baselines_);
   anychart.ganttModule.TimeLine.base(this, 'disposeInternal');
 };
 
@@ -5782,6 +5712,9 @@ anychart.standalones.resourceTimeline = function() {
 
 //endregion
 //exports
+/**
+ * @suppress {deprecated}
+ */
 (function() {
   var proto = anychart.ganttModule.TimeLine.prototype;
   // auto generated
@@ -5795,50 +5728,58 @@ anychart.standalones.resourceTimeline = function() {
   //proto['rowHoverFill'] = proto.rowHoverFill;
   //proto['rowSelectedFill'] = proto.rowSelectedFill;
 
-  // bar coloring
-  //proto['baseFill'] = proto.baseFill;
-  //proto['baseStroke'] = proto.baseStroke;
+  // DEPRECATED API
+  proto['baseFill'] = proto.baseFill;
+  proto['baseStroke'] = proto.baseStroke;
+  proto['baselineFill'] = proto.baselineFill;
+  proto['baselineStroke'] = proto.baselineStroke;
+  proto['milestoneFill'] = proto.milestoneFill;
+  proto['milestoneStroke'] = proto.milestoneStroke;
+  proto['parentFill'] = proto.parentFill;
+  proto['parentStroke'] = proto.parentStroke;
+  proto['progressFill'] = proto.progressFill;
+  proto['progressStroke'] = proto.progressStroke;
+  proto['baseLabels'] = proto.baseLabels;
+  proto['baselineLabels'] = proto.baselineLabels;
+  proto['parentLabels'] = proto.parentLabels;
+  proto['milestoneLabels'] = proto.milestoneLabels;
+  proto['progressLabels'] = proto.progressLabels;
+  proto['baselineAbove'] = proto.baselineAbove;
+  proto['baseBarHeight'] = proto.baseBarHeight;
+  proto['baseBarAnchor'] = proto.baseBarAnchor;
+  proto['baseBarPosition'] = proto.baseBarPosition;
+  proto['baseBarOffset'] = proto.baseBarOffset;
+  proto['parentBarHeight'] = proto.parentBarHeight;
+  proto['parentBarAnchor'] = proto.parentBarAnchor;
+  proto['parentBarPosition'] = proto.parentBarPosition;
+  proto['parentBarOffset'] = proto.parentBarOffset;
+  proto['baselineBarHeight'] = proto.baselineBarHeight;
+  proto['baselineBarAnchor'] = proto.baselineBarAnchor;
+  proto['baselineBarPosition'] = proto.baselineBarPosition;
+  proto['baselineBarOffset'] = proto.baselineBarOffset;
+  proto['progressBarHeight'] = proto.progressBarHeight;
+  proto['progressBarAnchor'] = proto.progressBarAnchor;
+  proto['progressBarPosition'] = proto.progressBarPosition;
+  proto['progressBarOffset'] = proto.progressBarOffset;
+  proto['milestoneHeight'] = proto.milestoneHeight;
+  proto['milestoneAnchor'] = proto.milestoneAnchor;
+  proto['milestonePosition'] = proto.milestonePosition;
+  proto['milestoneOffset'] = proto.milestoneOffset;
+  proto['selectedElementFill'] = proto.selectedElementFill;
+  proto['selectedElementStroke'] = proto.selectedElementStroke;
+  proto['connectorFill'] = proto.connectorFill;
+  proto['connectorStroke'] = proto.connectorStroke;
+  proto['selectedConnectorStroke'] = proto.selectedConnectorStroke;
 
-  // baseline coloring
-  //proto['baselineFill'] = proto.baselineFill;
-  //proto['baselineStroke'] = proto.baselineStroke;
-
-  // milestone coloring
-  //proto['milestoneFill'] = proto.milestoneFill;
-  //proto['milestoneStroke'] = proto.milestoneStroke;
-
-  // parent bar coloring
-  //proto['parentFill'] = proto.parentFill;
-  //proto['parentStroke'] = proto.parentStroke;
-
-  // progress bar coloring
-  //proto['progressFill'] = proto.progressFill;
-  //proto['progressStroke'] = proto.progressStroke;
-
-  // connector coloring
-  //proto['connectorFill'] = proto.connectorFill;
-  //proto['connectorStroke'] = proto.connectorStroke;
-  //proto['selectedConnectorStroke'] = proto.selectedConnectorStroke;
-
-  // full bar stack coloring (bar progress parent milestone)
-  //proto['selectedElementFill'] = proto.selectedElementFill;
-  //proto['selectedElementStroke'] = proto.selectedElementStroke;
 
 
   proto['editing'] = proto.editing;
-
-  proto['baselineAbove'] = proto.baselineAbove;
 
   proto['horizontalScrollBar'] = proto.horizontalScrollBar;
   proto['verticalScrollBar'] = proto.verticalScrollBar;
   proto['tooltip'] = proto.tooltip;
 
   proto['labels'] = proto.labels;
-  proto['baseLabels'] = proto.baseLabels;
-  proto['baselineLabels'] = proto.baselineLabels;
-  proto['parentLabels'] = proto.parentLabels;
-  proto['milestoneLabels'] = proto.milestoneLabels;
-  proto['progressLabels'] = proto.progressLabels;
 
   proto['markers'] = proto.markers;
   proto['scale'] = proto.scale;
@@ -5873,10 +5814,10 @@ anychart.standalones.resourceTimeline = function() {
   proto['header'] = proto.header;
 
   proto['elements'] = proto.elements;
+  proto['connectors'] = proto.connectors;
   proto['tasks'] = proto.tasks;
   proto['milestones'] = proto.milestones;
   proto['groupingTasks'] = proto.groupingTasks;
-  proto['progress'] = proto.progress;
   proto['baselines'] = proto.baselines;
   proto['periods'] = proto.periods;
 

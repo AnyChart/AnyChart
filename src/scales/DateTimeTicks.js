@@ -398,14 +398,19 @@ anychart.scales.DateTimeTicks.prototype.setupAsMajor = function(min, max, opt_ca
     }
     if (!interval)
       interval = this.calculateIntervals_(min, max, false);
-    if (opt_canModifyMin)
-      result[0] = min = anychart.utils.alignDateLeft(min, interval, 0);
-    var date = new goog.date.UtcDateTime(new Date(min));
+    var newMin = anychart.utils.alignDateLeft(min, interval, 0);
+    var date = new goog.date.UtcDateTime(new Date(newMin));
+    if (opt_canModifyMin) {
+      result[0] = newMin;
+    } else if (newMin < min) {
+      date.add(interval);
+    }
     var endDate = new goog.date.UtcDateTime(new Date(max));
     for (var i = 0; goog.date.Date.compare(date, endDate) <= 0 && i < this.scale.maxTicksCount(); date.add(interval), i++)
       ticks.push(date.getTime());
-    if (opt_canModifyMax && goog.date.Date.compare(date, endDate) > 0)
+    if (opt_canModifyMax && (!ticks.length || ticks[ticks.length - 1] < endDate.getTime())) {
       ticks.push(result[1] = date.getTime());
+    }
     this.autoTicks_ = ticks;
     this.count_ = backupCount;
     this.intervalValue_ = interval;

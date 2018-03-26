@@ -68,11 +68,18 @@
         "core"
       ]
     },
+    "gantt-base": {
+      "entry": "anychart.ganttBaseModule.entry",
+      "deps": [
+        "core"
+      ]
+    },
     "gantt-part": {
       "entry": "anychart.ganttModule.entry",
       "deps": [
         "core",
-        "tree-data"
+        "tree-data",
+        "gantt-base"
       ]
     },
     "heatmap-part": {
@@ -153,7 +160,8 @@
     "resource": {
       "entry": "anychart.resourceModule.entry",
       "deps": [
-        "core"
+        "core",
+        "gantt-base"
       ]
     },
     "scatter": {
@@ -647,6 +655,7 @@
       "docs": "https://docs.anychart.com/beta/Resource_Chart",
       "icon": "/_design/img/upload/charts/types/area-chart.svg",
       "parts": [
+        "gantt-base",
         "resource",
         "theme-resource"
       ]
@@ -762,6 +771,7 @@
       "icon": "/_design/img/upload/charts/types/gantt-chart.svg",
       "parts": [
         "tree-data",
+        "gantt-base",
         "gantt-part",
         "theme-gantt"
       ]

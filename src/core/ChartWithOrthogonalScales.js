@@ -163,6 +163,20 @@ anychart.core.ChartWithOrthogonalScales.prototype.drawSeriesInOrder = function()
 
 
 //endregion
+//region --- Infrastructure
+/** @inheritDoc */
+anychart.core.ChartWithOrthogonalScales.prototype.getXAxisByIndex = function(index) {
+  return null;
+};
+
+
+/** @inheritDoc */
+anychart.core.ChartWithOrthogonalScales.prototype.getYAxisByIndex = function(index) {
+  return null;
+};
+
+
+//endregion
 //region --- Scales
 //----------------------------------------------------------------------------------------------------------------------
 //
