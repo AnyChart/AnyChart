@@ -17,9 +17,11 @@ AnyChart is a flexible JavaScript (HTML5, SVG, VML) charting framework that fits
 * [Getting started](#getting-started)
 * [Plugins](#plugins)
 * [Using AnyChart with TypeScript](#using-anychart-with-typescript)
+* [Using AnyChart with ECMAScript 6](#using-anychart-with-ecmascript-6)
 * [Technical Integrations](#technical-integrations)
 * [Contribution guide](#contribution-guide)
 * [Build and debug](#build-and-debug)
+* [Module system](#module-system)
 * [Package directory](#package-directory)
 * [Contacts](#contacts)
 * [Links](#links)
@@ -110,7 +112,7 @@ Please, take a look at [webpack and typescript integration](https://github.com/a
 You can use AnyChart in your ECMAScript 6 projects over two ways:
 
 #### Plain ECMAScript 6
-To add AnyChart on a page use `<script>` section with `type="module"` attribute. 
+To add AnyChart on a page use `<script>` section with `type="module"` attribute.
 ```
 <script type="module">
     import '_localpath_to_anychart/anychart-bundle.min.js'
@@ -215,11 +217,7 @@ After running this command you can compile the project using the `compile` comma
 
 `./build.py compile`
 
-This compiles production version of **anychart-bundle**  and puts it into the `out` folder.
-
-To compile other modules use `-m` or `--module` option. To see all available modules see the description of `-m` option in the `compile` command help:
-
-`./build.py compile -h`
+This compiles production version of **anychart-bundle** and **all** modules and puts them into the `out` folder. You can read more about modules in our [Modules](https://docs.anychart.com/Quick_Start/Modules) article.
 
 To create a dev build for the debug purposes use `-d` or `--develop` option:
 
@@ -230,6 +228,9 @@ The `-df` option generates **property renaming report**, **variable renaming rep
 `./build.py compile -df`
 
 Source map maps minified code to source code. Read more about using [source maps in Chrome](https://developers.google.com/web/tools/chrome-devtools/javascript/source-maps) or [source maps in Firefox](https://developer.mozilla.org/en-US/docs/Tools/Debugger/How_to/Use_a_source_map).
+
+## Module system
+AnyChart since v8.0.0 is structured as a modules, so you can use only what you need. Please look at our article [Modules](https://docs.anychart.com/Quick_Start/Modules) to start working with modules.
 
 ## Package directory
 
