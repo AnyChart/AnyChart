@@ -78,20 +78,20 @@ if [ ${IS_RELEASE_BUILD} = "true" ]; then
         exit 1
     fi
 
-    if [ "${NPM_VERSION_INFO}" != "" ]; then
-        echo NPM version exists, you have to increase version number
-        exit 1
-    fi
+    #if [ "${NPM_VERSION_INFO}" != "" ]; then
+    #    echo NPM version exists, you have to increase version number
+    #    exit 1
+    #fi
 
-    if [ "${GITHUB_TAG_INFO}" != *"\"name\": \"v${VERSION}\""* ]; then
-        echo Gthub tag doesn\'t exist, create it and try again. Travis restart button is recommented.
-        exit 1
-    fi
+    #if [[ "${GITHUB_TAG_INFO}" != *"\"name\": \"v${VERSION}\""* ]]; then
+    #    echo Gthub tag doesn\'t exist, create it and try again. Travis restart button is recommented.
+    #    exit 1
+    #fi
 
-    if [ "${GITHUB_RELEASE_INFO}" != *"\"message\": \"Not Found\""* ]; then
-        echo Github release exists, remove it and try again. Travis restart button is recommented.
-        exit 1
-    fi
+    #if [[ "${GITHUB_RELEASE_INFO}" != *"\"message\": \"Not Found\""* ]]; then
+    #    echo Github release exists, remove it and try again. Travis restart button is recommented.
+    #    exit 1
+    #fi
 
 fi
 # ---- Blocker Checks (release builds only) ----------------------------------------------------------------------------
@@ -116,15 +116,15 @@ if [ ${IS_RELEASE_BUILD} = "true" ]; then
         exit 1
     fi
 
-    if [[ "${GIT_STATUS}" =~ dist/js/.+ ]]; then
-        echo JavaScript files has changes, looks like you forgot update JavaScript files in dist folder
-        exit 1
-    fi
+    #if [[ "${GIT_STATUS}" =~ dist/js/.+ ]]; then
+    #    echo JavaScript files has changes, looks like you forgot update JavaScript files in dist folder
+    #    exit 1
+    #fi
 
-    if [[ "${GIT_STATUS}" =~ dist/css/.+ ]]; then
-        echo CSS files has changes, looks like you forgot update CSS files in dist folder
-        exit 1
-    fi
+    #if [[ "${GIT_STATUS}" =~ dist/css/.+ ]]; then
+    #    echo CSS files has changes, looks like you forgot update CSS files in dist folder
+    #    exit 1
+    #fi
 fi
 # ---- One more check, should be executed right after binaries build (release builds only) -----------------------------
 
@@ -246,6 +246,7 @@ if [ ${IS_PREVIEW_BUILD} = "true" ]; then
 else
     # drop cache for /releases/X.X.X/*
     python ./bin/drop_cdn_cache.py ${VERSION} ${CDN_ALIASE} ${CDN_CONSUMER_KEY} ${CDN_CONSUMER_SECRET} ${CDN_ZONE_ID}
+    python ./bin/drop_cdn_cache.py v${MAJOR_VERSION} ${CDN_ALIASE} ${CDN_CONSUMER_KEY} ${CDN_CONSUMER_SECRET} ${CDN_ZONE_ID}
 fi
 
 if [ "${VERSION}" != "${TRAVIS_BRANCH}" ]; then
@@ -259,7 +260,7 @@ fi
 if [ ${IS_RELEASE_BUILD} = "true" ]; then
     # make NPM release
     echo Publishing NPM release
-    npm publish
+    #npm publish
 
     # build export server
     echo Building and uploading export server
