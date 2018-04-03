@@ -300,16 +300,40 @@ anychart.stockModule.Series.prototype.considerMetaEmpty = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.stockModule.Series.prototype.getColorResolutionContext = function(opt_baseColor, opt_ignorePointSettings) {
+  var source = opt_baseColor || this.getOption('color') || 'blue';
+  if (this.supportsPointSettings()) {
+    var iterator = !!opt_ignorePointSettings ? this.getDetachedIterator() : this.getIterator();
+    return {
+      'index': iterator.getIndex(),
+      'sourceColor': source,
+      'iterator': iterator,
+      'series': this,
+      'plot': this.plot,
+      'chart': this.chart
+    };
+  }
   return {
-    'sourceColor': opt_baseColor || this.getOption('color') || 'blue'
+    'sourceColor': source
   };
 };
 
 
 /** @inheritDoc */
 anychart.stockModule.Series.prototype.getHatchFillResolutionContext = function(opt_ignorePointSettings) {
+  var source = this.getAutoHatchFill();
+  if (this.supportsPointSettings()) {
+    var iterator = !!opt_ignorePointSettings ? this.getDetachedIterator() : this.getIterator();
+    return {
+      'index': iterator.getIndex(),
+      'sourceHatchFill': source,
+      'iterator': iterator,
+      'series': this,
+      'plot': this.plot,
+      'chart': this.chart
+    };
+  }
   return {
-    'sourceHatchFill': this.getAutoHatchFill()
+    'sourceHatchFill': source
   };
 };
 
