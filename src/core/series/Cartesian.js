@@ -1109,6 +1109,9 @@ anychart.core.series.Cartesian.prototype.pointIsInRect = function(point, left, t
 /** @inheritDoc */
 anychart.core.series.Cartesian.prototype.applyAppearanceToPoint = function(pointState, opt_value) {
   var iterator = this.getIterator();
+  if (iterator.meta('missing') === anychart.core.series.PointAbsenceReason.OUT_OF_RANGE)
+    return opt_value;
+
   if (this.isDiscreteBased()) {
     this.shapeManager.updateColors(pointState,
         /** @type {Object.<string, acgraph.vector.Shape>} */(iterator.meta('shapes')));
