@@ -3,9 +3,10 @@
 export VERSION=$1
 
 echo "Pull develop"
+git checkout -- .
 git pull origin develop
 
-echo ""build.py
+echo ""
 echo "Download latest index.d.ts"
 curl http://api.anychart.stg/si/develop/index-develop.d.ts --output  ./dist/index.d.ts
 
@@ -22,12 +23,10 @@ with open(\"./package.json\", \"r+\") as f:
     f.seek(0)
     f.write(text)
     f.close()"
+echo "npm publish --tag "${VERSION//\./}
+npm publish --tag ${VERSION//\./}
 
 echo ""
-echo "NPM release "$VERSION
-npm release --tag $VERSION
-
-echo ""
-echo "Discard all changes"
-git checkout -- .
-git clean -df
+echo "Commit all changes"
+git commit -am "release npm $VERSION"
+git push origin develop
