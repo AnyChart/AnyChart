@@ -80,26 +80,28 @@ anychart.core.drawers.Column.prototype.updatePointOnAnimate = function(point) {
  * @protected
  */
 anychart.core.drawers.Column.prototype.drawPointShape = function(point, path, hatchFill) {
-  var x = /** @type {number} */(point.meta('x'));
-  var zero = /** @type {number} */(point.meta('zero'));
-  var y = /** @type {number} */(point.meta('value'));
+  if (!point.meta('skipDrawing')) { //fixes DVF-3048
+    var x = /** @type {number} */(point.meta('x'));
+    var zero = /** @type {number} */(point.meta('zero'));
+    var y = /** @type {number} */(point.meta('value'));
 
-  var leftX = x - this.pointWidth / 2;
-  var rightX = leftX + this.pointWidth;
+    var leftX = x - this.pointWidth / 2;
+    var rightX = leftX + this.pointWidth;
 
-  var thickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(path.stroke()));
-  if (this.crispEdges) {
-    leftX = anychart.utils.applyPixelShift(leftX, thickness);
-    rightX = anychart.utils.applyPixelShift(rightX, thickness);
+    var thickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(path.stroke()));
+    if (this.crispEdges) {
+      leftX = anychart.utils.applyPixelShift(leftX, thickness);
+      rightX = anychart.utils.applyPixelShift(rightX, thickness);
+    }
+    y = anychart.utils.applyPixelShift(y, thickness);
+    zero = anychart.utils.applyPixelShift(zero, thickness);
+
+    anychart.core.drawers.move(path, this.isVertical, leftX, y);
+    anychart.core.drawers.line(path, this.isVertical, rightX, y, rightX, zero, leftX, zero);
+    path.close();
+
+    anychart.core.drawers.move(hatchFill, this.isVertical, leftX, y);
+    anychart.core.drawers.line(hatchFill, this.isVertical, rightX, y, rightX, zero, leftX, zero);
+    hatchFill.close();
   }
-  y = anychart.utils.applyPixelShift(y, thickness);
-  zero = anychart.utils.applyPixelShift(zero, thickness);
-
-  anychart.core.drawers.move(path, this.isVertical, leftX, y);
-  anychart.core.drawers.line(path, this.isVertical, rightX, y, rightX, zero, leftX, zero);
-  path.close();
-
-  anychart.core.drawers.move(hatchFill, this.isVertical, leftX, y);
-  anychart.core.drawers.line(hatchFill, this.isVertical, rightX, y, rightX, zero, leftX, zero);
-  hatchFill.close();
 };
