@@ -2313,7 +2313,7 @@ anychart.stockModule.Chart.prototype.handleMouseWheel_ = function(e) {
         }
         if (isNaN(start) || isNaN(end))
           return;
-        var factor = (-delta * anychart.stockModule.Chart.ZOOM_FACTOR_PER_WHEEL_STEP) * (end - start);
+        var factor = (delta * anychart.stockModule.Chart.ZOOM_FACTOR_PER_WHEEL_STEP) * (end - start);
         start -= factor;
         end += factor;
         if (end - start > last - first) {
