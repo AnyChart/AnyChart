@@ -65,6 +65,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
   },
   // merge with pie
   'pie3d': {
+    'radius': '65%',
     'mode3d': true,
     'explode': '5%',
     'connectorLength': '15%',
