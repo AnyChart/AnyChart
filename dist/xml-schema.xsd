@@ -2142,6 +2142,7 @@
         <xsd:attribute name="min_count" type="xsd:unsignedInt" default="4"/>
         <xsd:attribute name="max_count" type="xsd:unsignedInt" default="6"/>
         <xsd:attribute name="interval" type="simple.ScaleInterval"/>
+        <xsd:attribute name="allow_fractional" type="simple.Bool"/>
     </xsd:complexType>
 
     <xsd:complexType name="GeoScaleTicks">

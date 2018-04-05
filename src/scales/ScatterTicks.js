@@ -20,6 +20,14 @@ anychart.scales.ScatterTicks = function(scale) {
    * @private
    */
   this.scale_ = scale;
+
+  /**
+   * Whether to allow fractional ticks calculation.
+   * NOTE: Logarithmic mode always turns this flag to true.
+   * @type {boolean}
+   * @private
+   */
+  this.allowFractional_;
 };
 goog.inherits(anychart.scales.ScatterTicks, anychart.core.Base);
 
@@ -85,6 +93,24 @@ anychart.scales.ScatterTicks.prototype.base_ = 0;
  * @private
  */
 anychart.scales.ScatterTicks.prototype.mode_ = anychart.enums.ScatterTicksMode.LINEAR;
+
+
+/**
+ * Whether to allow fractional values in ticks.
+ * @param {boolean=} opt_value - Value to set.
+ * @return {anychart.scales.ScatterTicks|boolean}
+ */
+anychart.scales.ScatterTicks.prototype.allowFractional = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.allowFractional_ != opt_value) {
+      this.allowFractional_ = opt_value;
+      if (this.mode_ != anychart.enums.ScatterTicksMode.LOGARITHMIC)
+        this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
+    }
+    return this;
+  }
+  return this.allowFractional_;
+};
 
 
 /**
@@ -267,7 +293,7 @@ anychart.scales.ScatterTicks.prototype.setupAsMajor = function(min, max, opt_can
     if (this.mode_ == anychart.enums.ScatterTicksMode.LOGARITHMIC) {
       tmp = this.setupLogarithmic_(min, max, opt_logBase || 10, opt_borderLog || 0, !!opt_canModifyMin, !!opt_canModifyMax);
     } else {
-      tmp = this.setupLinear_(min, max, !!opt_canModifyMin, !!opt_canModifyMax, true, this.base_);
+      tmp = this.setupLinear_(min, max, !!opt_canModifyMin, !!opt_canModifyMax, this.allowFractional_, this.base_);
     }
     this.autoTicks_ = tmp.ticks;
     result = tmp.result;
@@ -672,6 +698,7 @@ anychart.scales.ScatterTicks.prototype.serialize = function() {
   var json = anychart.scales.ScatterTicks.base(this, 'serialize');
   json['mode'] = this.mode_;
   json['base'] = this.base_;
+  json['allowFractional'] = this.allowFractional_;
   if (this.explicit_)
     json['explicit'] = this.explicit_;
   else {
@@ -707,6 +734,7 @@ anychart.scales.ScatterTicks.prototype.setupByJSON = function(config, opt_defaul
   this.minCount_ = anychart.utils.toNumber(config['count']) || anychart.utils.toNumber(config['minCount']) || NaN;
   this.maxCount_ = anychart.utils.toNumber(config['count']) || anychart.utils.toNumber(config['maxCount']) || NaN;
   this.interval_ = anychart.utils.toNumber(config['interval']) || NaN;
+  this.allowFractional(config['allowFractional']);
   if (this.explicit_) {
     this.minCount_ = this.maxCount_ = this.interval_ = NaN;
   } else if (this.interval_) {
@@ -725,6 +753,7 @@ anychart.scales.ScatterTicks.prototype.setupByJSON = function(config, opt_defaul
 (function() {
   var proto = anychart.scales.ScatterTicks.prototype;
   proto['interval'] = proto.interval;//doc|ex
+  proto['allowFractional'] = proto.allowFractional;
   proto['count'] = proto.count;//doc|ex
   proto['base'] = proto.base;//doc|ex
   proto['set'] = proto.set;//doc|ex
