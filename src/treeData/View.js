@@ -167,6 +167,20 @@ anychart.treeDataModule.View.prototype.find = function(field, value) {
 
 
 /**
+ * Filters tree data items by filter-function.
+ * NOTE: filter performs full data passage. It means that filtering is way slower than searching on indexed field
+ *  with correctly implemented comparison function.
+ * @param {function((anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)):boolean} filterFunction - Filter function.
+ * @return {Array.<anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem>}
+ */
+anychart.treeDataModule.View.prototype.filter = function(filterFunction) {
+  var traverser = this.getTraverser();
+  traverser.nodeYieldCondition(filterFunction);
+  return traverser.toArray();
+};
+
+
+/**
  * Adds a data.
  * @param {(Array.<Object>|string)} data - Raw data or CSV-string. If string is passed, second parameter will be
  *  interpreted as fields mapping.
@@ -827,6 +841,7 @@ anychart.treeDataModule.View.DataItem.prototype.setParent = function(parentView)
   proto['addData'] = proto.addData;
   proto['search'] = proto.search;
   proto['searchItems'] = proto.searchItems;
+  proto['filter'] = proto.filter;
   proto['addChild'] = proto.addChild;
   proto['addChildAt'] = proto.addChildAt;
   proto['getChildren'] = proto.getChildren;
