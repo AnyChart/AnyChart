@@ -652,6 +652,55 @@ anychart.stockModule.Series.prototype.getLegendItemText = function(context) {
 
 
 //endregion
+//region Allow point settings
+/**
+ * Reconfigure series with allowPointSettings flag.
+ * NOTE: Some series can not be affected with allowPointSettings flag
+ * @see anychart.stockModule.Chart.ALLOWED_POINT_SETTINGS
+ * @param {boolean=} opt_value
+ * @return {boolean|anychart.stockModule.Series}
+ */
+anychart.stockModule.Series.prototype.allowPointSettings = function(opt_value) {
+  var type = this.getType();
+  var allowFlag = anychart.stockModule.Chart.ALLOWED_POINT_SETTINGS[type];
+  if (!goog.isNull(allowFlag)) {
+    if (goog.isDef(opt_value))
+      return this;
+    else
+      return allowFlag;
+  }
+
+  if (goog.isDef(opt_value)) {
+    opt_value = !!opt_value;
+    if (!goog.isDef(this.allowPointSettings_))
+      this.allowPointSettings_ = this.chart.getAllowPointSettings();
+    if (this.allowPointSettings_ != opt_value) {
+      this.allowPointSettings_ = opt_value;
+      var config = /** @type {anychart.core.series.TypeConfig} */ (this.chart.getConfigByType(this.getType())[1]);
+      this.applyConfig(config, false);
+      this.invalidate(
+          anychart.ConsistencyState.SERIES_POINTS |
+          anychart.ConsistencyState.SERIES_CLIP |
+          anychart.ConsistencyState.SERIES_DATA |
+          anychart.ConsistencyState.A11Y,
+          this.SUPPORTED_SIGNALS);
+    }
+    return this;
+  }
+  return goog.isDef(this.allowPointSettings_) ? this.allowPointSettings_ : /** @type {boolean} */(this.chart.getAllowPointSettings());
+};
+
+
+/** @inheritDoc */
+anychart.stockModule.Series.prototype.applyConfig = function(config, opt_reapplyClip) {
+  var newConfig = /** @type {anychart.core.series.TypeConfig} */(goog.object.clone(config));
+  var allowFlag = this.allowPointSettings();
+  newConfig.shapeManagerType = allowFlag ? anychart.enums.ShapeManagerTypes.PER_POINT : anychart.enums.ShapeManagerTypes.PER_SERIES;
+  anychart.stockModule.Series.base(this, 'applyConfig', newConfig, opt_reapplyClip);
+};
+
+
+//endregion
 //region Serialization/Deserialization/Disposing
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -696,4 +745,5 @@ anychart.stockModule.Series.prototype.disposeInternal = function() {
 (function() {
   var proto = anychart.stockModule.Series.prototype;
   proto['data'] = proto.data;
+  proto['allowPointSettings'] = proto.allowPointSettings;
 })();

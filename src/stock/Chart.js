@@ -169,10 +169,17 @@ anychart.stockModule.Chart = function(opt_allowPointSettings) {
   this.lastPlotIndex_ = -1;
 
   /**
+   * Whether stock series should use PER_POINT shape manager (discrete style of point drawing).
+   * @type {boolean}
+   * @private
+   */
+  this.allowPointSettings_ = !!opt_allowPointSettings;
+
+  /**
    * Series config.
    * @type {Object.<string, anychart.core.series.TypeConfig>}
    */
-  this.seriesConfig = this.createSeriesConfig(!!opt_allowPointSettings);
+  this.seriesConfig = this.createSeriesConfig(this.allowPointSettings_);
 
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['zoomMarqueeFill', 0, 0],
@@ -236,6 +243,34 @@ anychart.stockModule.Chart.SCROLL_FACTOR_PER_WHEEL_STEP = 0.1 / 4;
 anychart.stockModule.Chart.MOUSE_WHEEL_MAX_DELTA = 21;
 
 
+/**
+ * Hashmap which shows whether point settings allowed for stock series.
+ *   true  means always allowed (always PER_POINT)
+ *   false means always disallowed (always PER_SERIES)
+ *   null  means depended on allowPointSettings flag (if not set for series - chart flag is used)
+ * @type {Object.<string, boolean>}
+ */
+anychart.stockModule.Chart.ALLOWED_POINT_SETTINGS = {
+  'area': false,
+  'candlestick': null,
+  'column': null,
+  'jump-line': true,
+  'stick': true,
+  'line': false,
+  'marker': null,
+  'ohlc': null,
+  'range-area': false,
+  'range-column': null,
+  'range-spline-area': false,
+  'range-step-area': false,
+  'spline': false,
+  'spline-area': false,
+  'step-area': false,
+  'step-line': false,
+  'hilo': true
+};
+
+
 /** @inheritDoc */
 anychart.stockModule.Chart.prototype.supportsBaseHighlight = function() {
   return false;
@@ -256,20 +291,20 @@ anychart.stockModule.Chart.prototype.getType = function() {
 
 /**
  * Creates series config for the chart.
- * @param {boolean} allowColoring
+ * @param {boolean} allowPointSettings
  * @return {Object.<string, anychart.core.series.TypeConfig>}
  */
-anychart.stockModule.Chart.prototype.createSeriesConfig = function(allowColoring) {
+anychart.stockModule.Chart.prototype.createSeriesConfig = function(allowPointSettings) {
   var res = {};
   var capabilities = (
       // anychart.core.series.Capabilities.ALLOW_INTERACTIVITY |
-      // anychart.core.series.Capabilities.ALLOW_POINT_SETTINGS |
+      anychart.core.series.Capabilities.ALLOW_POINT_SETTINGS |
       // anychart.core.series.Capabilities.ALLOW_ERROR |
       anychart.core.series.Capabilities.SUPPORTS_MARKERS |
       anychart.core.series.Capabilities.SUPPORTS_LABELS |
       0);
-  capabilities |= (allowColoring && anychart.core.series.Capabilities.ALLOW_POINT_SETTINGS);
-  var discreteShapeManager = allowColoring ? anychart.enums.ShapeManagerTypes.PER_POINT : anychart.enums.ShapeManagerTypes.PER_SERIES;
+  capabilities |= (allowPointSettings && anychart.core.series.Capabilities.ALLOW_POINT_SETTINGS);
+  var discreteShapeManager = allowPointSettings ? anychart.enums.ShapeManagerTypes.PER_POINT : anychart.enums.ShapeManagerTypes.PER_SERIES;
   res[anychart.enums.StockSeriesType.AREA] = {
     drawerType: anychart.enums.SeriesDrawerTypes.AREA,
     shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
@@ -1061,6 +1096,15 @@ anychart.stockModule.Chart.prototype.getPlotsCount = function() {
 /** @inheritDoc */
 anychart.stockModule.Chart.prototype.supportsNoData = function() {
   return false;
+};
+
+
+/**
+ * Whether point settings is allowed.
+ * @return {boolean}
+ */
+anychart.stockModule.Chart.prototype.getAllowPointSettings = function() {
+  return this.allowPointSettings_;
 };
 
 
