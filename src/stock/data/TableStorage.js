@@ -243,6 +243,7 @@ anychart.stockModule.data.TableStorage.prototype.processMinMax_ = function(curr,
     }
   }
   for (i = 0; i <= this.lastComputedColumn; i++) { // if there are comp columns than row.computedValues is not null
+    if (!curr.computedValues) continue;
     val = anychart.utils.toNumber(curr.computedValues[i]);
     if (val < calcMins[i])
       calcMins[i] = val;
