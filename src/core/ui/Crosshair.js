@@ -756,6 +756,11 @@ anychart.core.ui.Crosshair.prototype.drawLine_ = function(axis, xDirection, mous
     var start = isHorizontal ? bounds.getLeft() : bounds.getTop();
 
     var ratio = scale.transform(scale.inverseTransform(offset / side), .5); //aligning
+    if (ratio < 0 || ratio > 1) {
+      line.clear();
+      return;
+    }
+
     var coord = Math.round(start + ratio * side);
     if (isHorizontal) {
       startX = coord - shift;
@@ -814,6 +819,11 @@ anychart.core.ui.Crosshair.prototype.drawLabel_ = function(axis, xDirection, lab
     }
 
     var ratio = scale.transform(scale.inverseTransform(providedRatio), .5); //aligning
+    if (ratio < 0 || ratio > 1) {
+      label.container(null);
+      label.remove();
+      return;
+    }
 
     var provider = this.getLabelsFormatProvider(axis, isHorizontal ? ratio : 1 - ratio);
     var labelFormat = /** @type {string|Function} */(label.getOption('format') || axis.labels().getOption('format') || anychart.utils.DEFAULT_FORMATTER);
