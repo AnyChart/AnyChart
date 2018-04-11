@@ -542,20 +542,22 @@ anychart.core.Axis.prototype.setDefaultOrientation = function(value) {
  */
 anychart.core.Axis.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    var val = anychart.scales.Base.setupScale(
-        /** @type {anychart.scales.Base} */(this.scale()),
-        opt_value, null, this.getAllowedScaleTypes(), null, this.scaleInvalidated, this);
-    if (val) {
-      var dispatch = this.internalScale == val;
-      this.internalScale = val;
-      this.dropStaggeredLabelsCache_();
-      this.dropOverlappedLabelsCache_();
-      this.dropBoundsCache();
-      this.labels().clear();
-      this.minorLabels().clear();
-      val.resumeSignalsDispatching(dispatch);
-      if (!dispatch)
-        this.invalidate(this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    if (this.internalScale != opt_value) { //Check for trying to set the same scale.
+      var val = anychart.scales.Base.setupScale(
+          /** @type {anychart.scales.Base} */(this.scale()),
+          opt_value, null, this.getAllowedScaleTypes(), null, this.scaleInvalidated, this);
+      if (val) {
+        var dispatch = this.internalScale == val;
+        this.internalScale = val;
+        this.dropStaggeredLabelsCache_();
+        this.dropOverlappedLabelsCache_();
+        this.dropBoundsCache();
+        this.labels().clear();
+        this.minorLabels().clear();
+        val.resumeSignalsDispatching(dispatch);
+        if (!dispatch)
+          this.invalidate(this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      }
     }
     return this;
   } else {

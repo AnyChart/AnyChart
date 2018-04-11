@@ -238,6 +238,15 @@ anychart.core.ChartWithOrthogonalScales.prototype.getYScaleWrongTypeError = func
 
 
 /**
+ * Gets scale additional invalidation state.
+ * @return {anychart.ConsistencyState|number}
+ */
+anychart.core.ChartWithOrthogonalScales.prototype.getScaleAdditionalInvalidationState = function() {
+  return 0;
+};
+
+
+/**
  * Getter/setter for xScale.
  * @param {(anychart.enums.ScaleTypes|Object|anychart.scales.Base)=} opt_value X Scale to set.
  * @return {!(anychart.scales.Base|anychart.core.ChartWithOrthogonalScales)} Default chart scale value or itself for method chaining.
@@ -247,6 +256,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.xScale = function(opt_value) {
     var val = anychart.scales.Base.setupScale(this.xScale_, opt_value, null, this.getXScaleAllowedTypes(), this.getXScaleWrongTypeError(), this.xScaleInvalidated, this);
     if (val) {
       var dispatch = this.xScale_ == val;
+      this.oldXScaleUid = this.xScale_ ? String(goog.getUid(this.xScale_)) : null; //this.fixes DVF-3678
       this.xScale_ = val;
       val.resumeSignalsDispatching(dispatch);
 
@@ -256,6 +266,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.xScale = function(opt_value) {
             this.legend().itemsSourceMode() == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
           state |= anychart.ConsistencyState.CHART_LEGEND;
         }
+        state |= this.getScaleAdditionalInvalidationState();
         this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
       }
     }
@@ -304,10 +315,14 @@ anychart.core.ChartWithOrthogonalScales.prototype.yScale = function(opt_value) {
     var val = anychart.scales.Base.setupScale(this.yScale_, opt_value, null, this.getYScaleAllowedTypes(), this.getYScaleWrongTypeError(), this.yScaleInvalidated, this);
     if (val) {
       var dispatch = this.yScale_ == val;
+      this.oldYScaleUid = this.yScale_ ? String(goog.getUid(this.yScale_)) : null; //this.fixes DVF-3678
       this.yScale_ = val;
       this.yScale_.resumeSignalsDispatching(dispatch);
-      if (!dispatch)
-        this.invalidate(anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS, anychart.Signal.NEEDS_REDRAW);
+      if (!dispatch) {
+        var state = anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS;
+        state |= this.getScaleAdditionalInvalidationState();
+        this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
+      }
     }
     return this;
   }
