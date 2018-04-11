@@ -137,11 +137,16 @@ anychart.core.ChartWithAxes.MAX_ATTEMPTS_AXES_CALCULATION = 5;
  * @protected
  */
 anychart.core.ChartWithAxes.prototype.setDefaultScaleForLayoutBasedElements = function(item) {
-  if (!!(item.isHorizontal() ^ this.isVerticalInternal)) {
-    item.scale(/** @type {anychart.scales.Base} */(this.yScale()));
-  } else {
-    item.scale(/** @type {anychart.scales.Base} */(this.xScale()));
-  }
+  var scale;
+  if (!!(item.isHorizontal() ^ this.isVerticalInternal))
+    scale = this.yScale();
+  else
+    scale = this.xScale();
+
+  if (anychart.utils.instanceOf(item, anychart.core.GridBase))
+    item.setAutoScale(/** @type {anychart.scales.Base} */(scale));
+  else
+    item.scale(/** @type {anychart.scales.Base} */(scale));
 };
 
 
