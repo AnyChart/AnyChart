@@ -148,7 +148,7 @@ anychart.annotationsModule.TrendChannel.prototype.drawThreePointsShape = functio
   var bB = this.pixelBoundsCache.getBottom(); // bounds bottom
   if (x2 == x1) { // drawing two vertical lines
     var direction = (y2 - y1) || 1; // let zero direction to be positive
-    if (!(x1 < bL && x3 < bR || x1 > bL && x3 > bR)) { // something is in bounds
+    if (!(x1 < bL && x3 < bL || x1 > bR && x3 > bR)) { // something is in bounds
       line1 = anychart.math.clipLineByRect(x1, y1, x1, y1 + direction, this.pixelBoundsCache);
       line2 = anychart.math.clipLineByRect(x3, y3, x3, y3 + direction, this.pixelBoundsCache);
       left = Math.max(Math.min(x1, x3), bL);

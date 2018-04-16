@@ -93,76 +93,54 @@ anychart.treeDataModule.View.prototype.getTraverser = function() {
 
 
 /**
- * Performs a data search. Returns null of nothing is found, tree data item if here's a single result and array of
+ * Performs a data search. Returns null if nothing is found, tree data item if here's a single result and array of
  * tree data items if here are multiple matches.
  *
- * @param {string} soughtField - Field for search. Literally means the name of field of data item.
- * @param {(string|number|boolean|function(anychart.treeDataModule.Tree.DataItem, anychart.treeDataModule.Tree.DataItem):number|
- * function(anychart.treeDataModule.Tree.DataItem, number, Array.<anychart.treeDataModule.Tree.DataItem>):number)} valueOrEvaluator -
- *  Sought value or evaluator function. Evaluator function that receives 3 arguments (the element, the index and the array).
- *  Should return a negative number, zero, or a positive number depending on whether the desired index is before, at, or
- *  after the element passed to it.
- * @param {(function(anychart.treeDataModule.Tree.DataItem, anychart.treeDataModule.Tree.DataItem):number|Object)=} opt_comparisonFnOrEvaluatorContext -
- *  Custom comparison function or evaluator context. Optional comparison function by which the array is ordered. Should
+ * @param {string} field - Field for search. Literally means the name of field of data item.
+ * @param {?} value - Value to be found.
+ * @param {(function(?, ?):number)=} opt_comparisonFn - Optional comparison function by which the array is ordered. Should
  *  take 2 arguments to compare, and return a negative number, zero, or a positive number depending on whether the
  *  first argument is less than, equal to, or greater than the second.
  * @return {(anychart.treeDataModule.View.DataItem|Array.<anychart.treeDataModule.View.DataItem>|null)} - Found tree data item or null or array of found tree data items.
  */
-anychart.treeDataModule.View.prototype.search = function(soughtField, valueOrEvaluator, opt_comparisonFnOrEvaluatorContext) {
-  soughtField = this.mapping_[soughtField] || soughtField;
-  var result = this.tree_.search(soughtField, valueOrEvaluator, opt_comparisonFnOrEvaluatorContext);
-  var rv;
-  if (goog.isNull(result))
-    return null;
-  if (goog.isArray(result)) {
-    rv = [];
-    for (var i = 0; i < result.length; i++) {
-      rv.push(result[i].getWrapper(this));
-    }
-  } else {
-    rv = result.getWrapper(this);
-  }
-  return rv;
+anychart.treeDataModule.View.prototype.search = function(field, value, opt_comparisonFn) {
+  var res = this.searchItems(field, value, opt_comparisonFn);
+  return res.length ? (res.length == 1 ? res[0] : res) : null;
 };
 
 
 /**
  * Performs a data search. Actually does the same as (@see search) but result is always an array.
  *
- * @param {string} soughtField - Field for search. Literally means the name of field of data item.
- * @param {(string|number|boolean|function(anychart.treeDataModule.Tree.DataItem, anychart.treeDataModule.Tree.DataItem):number|
- * function(anychart.treeDataModule.Tree.DataItem, number, Array.<anychart.treeDataModule.Tree.DataItem>):number)} valueOrEvaluator -
- *  Sought value or evaluator function. Evaluator function that receives 3 arguments (the element, the index and the array).
- *  Should return a negative number, zero, or a positive number depending on whether the desired index is before, at, or
- *  after the element passed to it.
- * @param {(function(anychart.treeDataModule.Tree.DataItem, anychart.treeDataModule.Tree.DataItem):number|Object)=} opt_comparisonFnOrEvaluatorContext -
- *  Custom comparison function or evaluator context. Optional comparison function by which the array is ordered. Should
+ * @param {string} field - Field for search. Literally means the name of field of data item.
+ * @param {?} value - Value to be found.
+ * @param {(function(?, ?):number)=} opt_comparisonFn - Optional comparison function by which the array is ordered. Should
  *  take 2 arguments to compare, and return a negative number, zero, or a positive number depending on whether the
  *  first argument is less than, equal to, or greater than the second.
  * @return {Array.<anychart.treeDataModule.View.DataItem>} - Array of found tree data items.
  */
-anychart.treeDataModule.View.prototype.searchItems = function(soughtField, valueOrEvaluator, opt_comparisonFnOrEvaluatorContext) {
-  var result = this.search(soughtField, valueOrEvaluator, opt_comparisonFnOrEvaluatorContext);
-  return result ? (goog.isArray(result) ? result : [result]) : [];
-};
-
-
-/**
- * Simple searcher. Searches using default comparison function anychart.utils.compareAsc().
- * NOTE: Can't compare complex values as objects or arrays.
- * TODO (A.Kudryavtsev): This method is added and not exported for inner usage.
- * @param {string} field - Sought field.
- * @param {*} value - Value to be found. If value is complex (object or array) will get incorrect result.
- * @return {Array.<anychart.treeDataModule.View.DataItem>} - If nothing is found, empty array will be returned.
- */
-anychart.treeDataModule.View.prototype.find = function(field, value) {
+anychart.treeDataModule.View.prototype.searchItems = function(field, value, opt_comparisonFn) {
   field = this.mapping_[field] || field;
-  var result = this.tree_.find(field, value);
+  var result = this.tree_.searchItems(field, value, opt_comparisonFn);
   var rv = [];
   for (var i = 0; i < result.length; i++) {
     rv.push(result[i].getWrapper(this));
   }
   return rv;
+};
+
+
+/**
+ * Filters tree data items by filter-function.
+ * NOTE: filter performs full data passage. It means that filtering is way slower than searching on indexed field
+ *  with correctly implemented comparison function.
+ * @param {function((anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)):boolean} filterFunction - Filter function.
+ * @return {Array.<anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem>}
+ */
+anychart.treeDataModule.View.prototype.filter = function(filterFunction) {
+  var traverser = this.getTraverser();
+  traverser.nodeYieldCondition(filterFunction);
+  return traverser.toArray();
 };
 
 
@@ -827,6 +805,7 @@ anychart.treeDataModule.View.DataItem.prototype.setParent = function(parentView)
   proto['addData'] = proto.addData;
   proto['search'] = proto.search;
   proto['searchItems'] = proto.searchItems;
+  proto['filter'] = proto.filter;
   proto['addChild'] = proto.addChild;
   proto['addChildAt'] = proto.addChildAt;
   proto['getChildren'] = proto.getChildren;

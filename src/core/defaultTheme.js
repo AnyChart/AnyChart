@@ -714,14 +714,16 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
         'explicit': null,
         'minCount': 4,
         'maxCount': 6,
-        'interval': NaN
+        'interval': NaN,
+        'allowFractional': true
       },
       'minorTicks': {
         'mode': 'linear',
         'base': 0,
         'explicit': null,
         'count': 5,
-        'interval': NaN
+        'interval': NaN,
+        'allowFractional': true
       },
       'stackMode': 'none',
       'stackDirection': 'direct',

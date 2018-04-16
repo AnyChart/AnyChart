@@ -16,35 +16,12 @@ anychart.stockModule.Interactivity = function(parent) {
    * @type {boolean}
    * @private
    */
-  this.zoomOnMouseWheel_;
-
-  /**
-   * @type {boolean}
-   * @private
-   */
   this.scrollOnMouseWheel_;
 };
 goog.inherits(anychart.stockModule.Interactivity, anychart.core.utils.Interactivity);
 
 
 //region --- Settings
-/**
- * Allows use mouse wheel for zoming.
- * @param {boolean=} opt_value Whether will use mouse wheel.
- * @return {anychart.stockModule.Interactivity|boolean} .
- */
-anychart.stockModule.Interactivity.prototype.zoomOnMouseWheel = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = !!opt_value;
-    if (opt_value != this.zoomOnMouseWheel_) {
-      this.zoomOnMouseWheel_ = opt_value;
-    }
-    return this;
-  }
-  return /** @type {boolean} */(this.zoomOnMouseWheel_);
-};
-
-
 /**
  * Allows use mouse wheel for scrolling.
  * @param {boolean=} opt_value Whether will use mouse wheel.
@@ -65,11 +42,11 @@ anychart.stockModule.Interactivity.prototype.scrollOnMouseWheel = function(opt_v
 //endregion
 //region --- Setup and serialize
 /** @inheritDoc */
-anychart.stockModule.Interactivity.prototype.setupByJSON = function(value, opt_default) {
-  anychart.stockModule.Interactivity.base(this, 'setupByJSON', value, opt_default);
+anychart.stockModule.Interactivity.prototype.setupByJSON = function(config, opt_default) {
+  anychart.stockModule.Interactivity.base(this, 'setupByJSON', config, opt_default);
 
-  this.zoomOnMouseWheel(value['zoomOnMouseWheel']);
-  this.scrollOnMouseWheel(value['scrollOnMouseWheel']);
+  this.zoomOnMouseWheel(config['zoomOnMouseWheel']);
+  this.scrollOnMouseWheel(config['scrollOnMouseWheel']);
 };
 
 

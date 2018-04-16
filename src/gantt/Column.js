@@ -298,7 +298,8 @@ anychart.ganttModule.Column.prototype.format = function(opt_value) {
   if (goog.isDef(opt_value))
     anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['column.format()', 'column.labels().format()'], true);
   var l = /** @type {anychart.core.ui.LabelsFactory} */ (this.labels());
-  return l['format'](opt_value);
+  var result = l['format'](opt_value);
+  return goog.isDef(opt_value) ? this : result;
 };
 
 
@@ -347,7 +348,11 @@ anychart.ganttModule.Column.prototype.labels = function(opt_value) {
  */
 anychart.ganttModule.Column.prototype.cellTextSettings = function(opt_value) {
   anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['column.cellTextSettings()', 'column.labels()'], true);
-  return this.labels(opt_value);
+  if (goog.isDef(opt_value)) {
+    this.labels(opt_value);
+    return this;
+  }
+  return this.labels();
 };
 
 
@@ -578,7 +583,7 @@ anychart.ganttModule.Column.prototype.buttonCursor = function(opt_value) {
     buttons['cursor'](opt_value);
     return this;
   }
-  return buttons['cursor'](opt_value);
+  return buttons['cursor']();
 };
 
 
@@ -782,6 +787,26 @@ anychart.ganttModule.Column.prototype.draw = function() {
         var newTop = totalTop + height;
 
         var format = this.dataGrid_.createFormatProvider(item);
+
+        /*
+           Terrible shit. Because previous behaviour was like that - label.format().call(context, item);
+           Now, format function called like that - .call(context, context), but it happens in LabelsFactory.
+           For save legacy behaviour here is this mixin.
+         */
+        var dataItemMethods = ['get', 'set','meta', 'del', 'getParent', 'addChild', 'addChildAt', 'getChildren', 'numChildren', 'getChildAt', 'remove', 'removeChild', 'removeChildAt', 'removeChildren', 'indexOfChild'];
+        goog.array.forEach(dataItemMethods, function(methodName) {
+          var wrappedMethod = item['__wrapped' + methodName];
+          if (!wrappedMethod) {
+            var bindedHandler = goog.bind(item[methodName], item);
+            wrappedMethod = function() {
+              anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['arguments[0].' + methodName + '()', 'arguments[0].item.' + methodName + '()'], true);
+              return bindedHandler.apply(item, arguments);
+            };
+
+            item['__wrapped' + methodName] = wrappedMethod;
+          }
+          format[methodName] = wrappedMethod;
+        }, this);
 
         var label = labels.add(format, {'value': {'x': this.pixelBoundsCache_.left, 'y': totalTop}});
 

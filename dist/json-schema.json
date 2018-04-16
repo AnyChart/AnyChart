@@ -4366,6 +4366,9 @@
         "base": {
           "type": "number"
         },
+        "allowFractional": {
+          "type": "boolean"
+        },
         "explicit": {
           "type": [
             "array",

@@ -13,6 +13,7 @@ goog.require('anychart.enums');
  */
 anychart.waterfallModule.Drawer = function(series) {
   anychart.waterfallModule.Drawer.base(this, 'constructor', series);
+  this.calculatePxShiftInversion = false;
 };
 goog.inherits(anychart.waterfallModule.Drawer, anychart.core.drawers.Column);
 anychart.core.drawers.AvailableDrawers[anychart.enums.SeriesDrawerTypes.WATERFALL] = anychart.waterfallModule.Drawer;

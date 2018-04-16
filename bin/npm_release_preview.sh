@@ -1,5 +1,11 @@
 #!/bin/bash
 
+########################################################################################################################
+#
+#  ./bin/npm_release_preview 8.3.0-rc1
+#
+########################################################################################################################
+
 export VERSION=$1
 
 echo "Pull develop"
@@ -28,5 +34,6 @@ npm publish --tag ${VERSION//\./}
 
 echo ""
 echo "Commit all changes"
+git checkout -- package.json
 git commit -am "release npm $VERSION"
 git push origin develop

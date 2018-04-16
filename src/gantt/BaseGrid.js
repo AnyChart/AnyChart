@@ -2836,6 +2836,21 @@ anychart.ganttModule.BaseGrid.KeyHandler.prototype.resetState = function() {
 };
 
 
+/** @inheritDoc */
+anychart.ganttModule.BaseGrid.KeyHandler.prototype.attach = function(element, opt_capture) {
+  anychart.ganttModule.BaseGrid.KeyHandler.base(this, 'attach', element, opt_capture);
+
+  goog.events.listen(anychart.window, [goog.events.EventType.VISIBILITYCHANGE, goog.events.EventType.BLUR], this.resetState, false, this);
+};
+
+
+/** @inheritDoc */
+anychart.ganttModule.BaseGrid.KeyHandler.prototype.detach = function() {
+  anychart.ganttModule.BaseGrid.KeyHandler.base(this, 'detach');
+
+  goog.events.unlisten(anychart.window, [goog.events.EventType.VISIBILITYCHANGE, goog.events.EventType.BLUR], this.resetState, false, this);
+};
+
 
 //endregion
 //region --- Base Grid Element

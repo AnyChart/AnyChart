@@ -137,11 +137,16 @@ anychart.core.ChartWithAxes.MAX_ATTEMPTS_AXES_CALCULATION = 5;
  * @protected
  */
 anychart.core.ChartWithAxes.prototype.setDefaultScaleForLayoutBasedElements = function(item) {
-  if (!!(item.isHorizontal() ^ this.isVerticalInternal)) {
-    item.scale(/** @type {anychart.scales.Base} */(this.yScale()));
-  } else {
-    item.scale(/** @type {anychart.scales.Base} */(this.xScale()));
-  }
+  var scale;
+  if (!!(item.isHorizontal() ^ this.isVerticalInternal))
+    scale = this.yScale();
+  else
+    scale = this.xScale();
+
+  if (anychart.utils.instanceOf(item, anychart.core.GridBase))
+    item.setAutoScale(/** @type {anychart.scales.Base} */(scale));
+  else
+    item.scale(/** @type {anychart.scales.Base} */(scale));
 };
 
 
@@ -676,6 +681,14 @@ anychart.core.ChartWithAxes.prototype.getYAxisByIndex = function(index) {
  */
 anychart.core.ChartWithAxes.prototype.setYAxisScale = function(axis) {
   axis.scale(/** @type {anychart.scales.Base} */(this.yScale()));
+};
+
+
+//endregion
+//region -- Scales invalidation.
+/** @inheritDoc */
+anychart.core.ChartWithAxes.prototype.getScaleAdditionalInvalidationState = function() {
+  return anychart.ConsistencyState.AXES_CHART_AXES; //this overridden method fixes DVF-3678
 };
 
 
@@ -1299,8 +1312,11 @@ anychart.core.ChartWithAxes.prototype.drawContent = function(bounds) {
       if (item) {
         item.labels().dropCallsCache();
         item.minorLabels().dropCallsCache();
-        if (item && !item.scale())
+        //Scale uid check fixes DVF-3678
+        if (item && (!item.scale() || String(goog.getUid(item.scale())) == this.oldXScaleUid)) {
           item.scale(/** @type {anychart.scales.Base} */(this.xScale()));
+          this.invalidate(anychart.ConsistencyState.BOUNDS);
+        }
       }
     }
 
@@ -1309,8 +1325,11 @@ anychart.core.ChartWithAxes.prototype.drawContent = function(bounds) {
       if (item) {
         item.labels().dropCallsCache();
         item.minorLabels().dropCallsCache();
-        if (item && !item.scale())
+        //Scale uid check fixes DVF-3678
+        if (item && (!item.scale() || String(goog.getUid(item.scale())) == this.oldYScaleUid)) {
           this.setYAxisScale(item);
+          this.invalidate(anychart.ConsistencyState.BOUNDS);
+        }
       }
     }
   }

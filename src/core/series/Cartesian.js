@@ -365,6 +365,8 @@ anychart.core.series.Cartesian.prototype.data = function(opt_value, opt_csvSetti
  */
 anychart.core.series.Cartesian.prototype.dataInvalidated_ = function(e) {
   if (e.hasSignal(anychart.Signal.DATA_CHANGED)) {
+    //this fixes DVF-3657 because makes chart recalculate drawing plan.
+    /** @type {anychart.core.Base} */(this.chart).invalidate(anychart.ConsistencyState.SCALE_CHART_SCALES | anychart.ConsistencyState.SCALE_CHART_Y_SCALES);
     this.invalidate(anychart.ConsistencyState.SERIES_POINTS | anychart.ConsistencyState.SERIES_DATA,
         anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW | anychart.Signal.DATA_CHANGED | anychart.Signal.NEED_UPDATE_LEGEND);
   }
@@ -1109,6 +1111,9 @@ anychart.core.series.Cartesian.prototype.pointIsInRect = function(point, left, t
 /** @inheritDoc */
 anychart.core.series.Cartesian.prototype.applyAppearanceToPoint = function(pointState, opt_value) {
   var iterator = this.getIterator();
+  if (iterator.meta('missing') === anychart.core.series.PointAbsenceReason.OUT_OF_RANGE)
+    return opt_value;
+
   if (this.isDiscreteBased()) {
     this.shapeManager.updateColors(pointState,
         /** @type {Object.<string, acgraph.vector.Shape>} */(iterator.meta('shapes')));

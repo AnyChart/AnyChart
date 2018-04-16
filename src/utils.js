@@ -1102,19 +1102,33 @@ anychart.utils.checkSeparator = function(separator) {
 };
 
 
-
 /**
  * Escapes values.
  * @param {Array} row Array of values.
  * @param {string} colSep
  * @param {string} rowSep
  * @param {number} length
+ * @param {Array=} opt_headers - Array of headers.
+ * @param {(Object.<string, function(*, *=):string>|function(*, *):string)=} opt_formats
  * @return {string}
  * @private
  */
-anychart.utils.toCsvRow_ = function(row, colSep, rowSep, length) {
+anychart.utils.toCsvRow_ = function(row, colSep, rowSep, length, opt_headers, opt_formats) {
   for (var i = 0; i < length; i++) {
     var value = row[i];
+    var header = opt_headers ? opt_headers[i] : void 0;
+
+    if (opt_formats && header) {
+      if (goog.isFunction(opt_formats)) {
+        value = opt_formats(header, value);
+      } else if (goog.typeOf(opt_formats) == 'object') {
+        var headerProcessor = opt_formats[header];
+        if (headerProcessor) {
+          value = headerProcessor(value);
+        }
+      }
+    }
+
     if (goog.isDefAndNotNull(value)) {
       if (!goog.isString(value))
         value = String(value);
@@ -1142,6 +1156,7 @@ anychart.utils.serializeCsv = function(headers, data, settings) {
   var rowSep = (settings && settings['rowsSeparator']) || '\n';
   var colSep = (settings && settings['columnsSeparator']) || ',';
   var noHeader = (settings && settings['ignoreFirstRow']) || false;
+  var formats = (settings && settings['formats']) || void 0;
   if (!data.length || !anychart.utils.checkSeparator(rowSep) || !anychart.utils.checkSeparator(colSep))
     return '';
 
@@ -1151,7 +1166,7 @@ anychart.utils.serializeCsv = function(headers, data, settings) {
   }
 
   for (var i = 0; i < data.length; i++) {
-    strings.push(anychart.utils.toCsvRow_(data[i], colSep, rowSep, headers.length));
+    strings.push(anychart.utils.toCsvRow_(data[i], colSep, rowSep, headers.length, headers, formats));
   }
   return strings.join(rowSep);
 };

@@ -2279,7 +2279,7 @@ anychart.core.series.Base.prototype.drawFactoryElement = function(seriesFactoryG
 
   var tmp;
 
-  if (point.meta('missing')) {
+  if (point.meta('missing') || point.meta('skipDrawing')) {
     isDraw = false;
   } else {
     state = anychart.core.utils.InteractivityState.clarifyState(state);
@@ -2882,6 +2882,8 @@ anychart.core.series.Base.prototype.resetPointStack_ = function(point) {
     if (shared) {
       shared.positiveAnchor = NaN;
       shared.negativeAnchor = NaN;
+      // shared.drawn = false;
+      // shared.hasNotZero = false;
     }
   }
 };
@@ -3603,12 +3605,19 @@ anychart.core.series.Base.prototype.makeMinPointLengthStackedMeta = function(row
       positive = !(isVertical ^ inverted);
     }
 
+    //fixes DVF-3048
+    var hasNotZero = shared.hasNotZero;
+    var valueRatio = rowInfo.meta('valueRatio'); //For polar chart.
+    var skipDrawing = goog.isDef(valueRatio) ? !valueRatio : !height;
+
     if (positive) {
       height = -height;
       if (isNaN(shared.positiveAnchor)) {//Drawing first point.
         shared.positiveAnchor = zero + height;
         newZero = zero;
         newY = shared.positiveAnchor;
+        if (!hasNotZero)
+          skipDrawing = false;
       } else {
         newZero = Math.min(zero, shared.positiveAnchor);
         newY = newZero + height;
@@ -3619,6 +3628,8 @@ anychart.core.series.Base.prototype.makeMinPointLengthStackedMeta = function(row
         shared.negativeAnchor = zero + height;
         newZero = zero;
         newY = shared.negativeAnchor;
+        if (!hasNotZero)
+          skipDrawing = false;
       } else {
         newZero = Math.max(zero, shared.negativeAnchor);
         newY = newZero + height;
@@ -3628,6 +3639,7 @@ anychart.core.series.Base.prototype.makeMinPointLengthStackedMeta = function(row
 
     rowInfo.meta('value', newY);
     rowInfo.meta('zero', newZero);
+    rowInfo.meta('skipDrawing', skipDrawing);
   }
   return pointMissing;
 };
@@ -3717,6 +3729,23 @@ anychart.core.series.Base.prototype.makeStackedMeta = function(rowInfo, yNames, 
   };
   this.makePointsMetaFromMap(rowInfo, map, xRatio);
   rowInfo.meta('zeroMissing', rowInfo.meta('stackedMissing'));
+
+  //code below fixes DVF-3048.
+  var shared = rowInfo.meta('shared');
+  if (shared) {
+    var zero = /** @type {number} */ (map['zero']);
+    var val = /** @type {number} */ (map['value']);
+    var height = Math.abs(val - zero);
+    var hasNotZero = shared.hasNotZero;
+    var valueRatio = rowInfo.meta('valueRatio'); //For polar chart.
+    var skipDrawing = goog.isDef(valueRatio) ? !valueRatio : !height;
+    if (!shared.drawn && !hasNotZero) {
+      skipDrawing = false;
+      shared.drawn = true;
+    }
+    rowInfo.meta('skipDrawing', skipDrawing);
+  }
+
   return pointMissing;
 };
 
@@ -3742,6 +3771,7 @@ anychart.core.series.Base.prototype.makeComparisonMeta = function(rowInfo, yName
   }
   return pointMissing;
 };
+
 
 /**
  * Prepares Extremum part of point meta.
@@ -4297,71 +4327,19 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
 
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'color',
-      anychart.core.settings.colorNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'xPointPosition',
-      anychart.core.settings.numberNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'pointWidth',
-      anychart.core.settings.numberOrPercentNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'maxPointWidth',
-      anychart.core.settings.numberOrPercentNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'minPointLength',
-      anychart.core.settings.numberOrPercentNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'maxPointWidth',
-      anychart.core.settings.numberOrPercentNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'minPointLength',
-      anychart.core.settings.numberOrPercentNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'connectMissingPoints',
-      anychart.core.settings.booleanNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'displayNegative',
-      anychart.core.settings.booleanNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'stepDirection',
-      anychart.enums.normalizeStepDirection);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'isVertical',
-      anychart.core.settings.boolOrNullNormalizer);
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'color', anychart.core.settings.colorNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'xPointPosition', anychart.core.settings.numberNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'pointWidth', anychart.core.settings.numberOrPercentNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'maxPointWidth', anychart.core.settings.numberOrPercentNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'minPointLength', anychart.core.settings.numberOrPercentNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'maxPointWidth', anychart.core.settings.numberOrPercentNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'minPointLength', anychart.core.settings.numberOrPercentNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'connectMissingPoints', anychart.core.settings.booleanNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'displayNegative', anychart.core.settings.booleanNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'stepDirection', anychart.enums.normalizeStepDirection],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'isVertical', anychart.core.settings.boolOrNullNormalizer]
+  ]);
 
   return map;
 })();
