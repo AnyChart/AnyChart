@@ -82,6 +82,11 @@ anychart.treeDataModule.Tree = function(opt_data, opt_fillMethodOrCsvMapping, op
    */
   this.isStringIndex_ = {};
 
+  /**
+   * Map of index comparators.
+   * @type {Object.<string, function(?, ?):number>}
+   */
+  this.indexComparators_ = {};
 
   /**
    * Default traverser.
@@ -150,7 +155,7 @@ anychart.treeDataModule.Tree.fromJson = function(config) {
 
 /**
  * @typedef {{
- *    key:*,
+ *    key:?,
  *    value:(anychart.treeDataModule.Tree.DataItem|Array.<anychart.treeDataModule.Tree.DataItem>)
  * }}
  */
@@ -459,7 +464,7 @@ anychart.treeDataModule.Tree.prototype.addData = function(data, opt_fillMethodOr
         var to = dependency[anychart.enums.DataField.TO];
 
         if ((goog.isString(from) || goog.isNumber(from)) && (goog.isString(to) || goog.isNumber(to))) {
-          var dependent = this.find(anychart.enums.GanttDataFields.ID, to)[0];
+          var dependent = this.searchItems(anychart.enums.GanttDataFields.ID, to)[0];
           if (dependent) {
             var dependsOn = dependent.get(anychart.enums.DataField.DEPENDS_ON);
             if (goog.isDef(dependsOn)) {
@@ -522,14 +527,15 @@ anychart.treeDataModule.Tree.prototype.addToIndex = function(item, opt_field, op
   var indexArr = this.index_[/** @type {string} */ (opt_field)];
   if (indexArr) {
 
+    var key = item.get(/** @type {string} */ (opt_field));
+    if (this.isStringIndex_[/** @type {string} */ (opt_field)])
+      key = String(key);
+    var index = goog.array.binarySearch(indexArr, key, this.indexComparators_[opt_field]);
+
     /**
      * @type {anychart.treeDataModule.Tree.IndexKeyValue}
      */
-    var indexKeyValue = {key: item.get(/** @type {string} */ (opt_field)), value: item};
-    if (this.isStringIndex_[/** @type {string} */ (opt_field)])
-      indexKeyValue.key = String(indexKeyValue.key);
-    var index = goog.array.binarySearch(indexArr, indexKeyValue, this.comparisonFunction_);
-
+    var indexKeyValue = {key: key, value: item};
     if (index < 0) { //Not found.
       goog.array.insertAt(indexArr, indexKeyValue, ~index);
     } else {
@@ -570,11 +576,16 @@ anychart.treeDataModule.Tree.prototype.removeFromIndex = function(item, opt_fiel
 
   var indexArr = this.index_[opt_field]; //Array of key-value pairs or undefined.
   if (indexArr) {
+    var key = item.get(/** @type {string} */ (opt_field));
+    if (this.isStringIndex_[/** @type {string} */ (opt_field)])
+      key = String(key);
+
     //Looking in index array of key-value pairs for unique key.
     var indexKey = {key: item.get(/** @type {string} */ (opt_field))};
     if (this.isStringIndex_[/** @type {string} */ (opt_field)])
       indexKey.key = String(indexKey.key);
-    var index = goog.array.binarySearch(indexArr, indexKey, this.comparisonFunction_); //index here really can't be negative (value must exist). If not found - here's a bug.
+
+    var index = goog.array.binarySearch(indexArr, key, this.indexComparators_[opt_field]); //index here really can't be negative (value must exist). If not found - here's a bug.
     var found = indexArr[index]; //found {key:'', value:(TreeDataItem|Array)}-object. Value can be a tree data item or array.
     if (found) {
       if (goog.isArray(found.value) && found.value.length > 1) {
@@ -594,13 +605,15 @@ anychart.treeDataModule.Tree.prototype.removeFromIndex = function(item, opt_fiel
  * It can't be indexed by 'parent' or 'children' fields because these fields are not available by treeItem.get(field); (@see createComparisonFunction).
  * @param {string} field - Field name.
  * @param {boolean=} opt_asString - If the value should be treated as string always.
+ * @param {(function(?, ?):number)=} opt_comparisonFn - Comparison function. TODO (A.Kudryavtsev): Describe.
  * @return {anychart.treeDataModule.Tree} - Itself for method chaining.
  */
-anychart.treeDataModule.Tree.prototype.createIndexOn = function(field, opt_asString) {
+anychart.treeDataModule.Tree.prototype.createIndexOn = function(field, opt_asString, opt_comparisonFn) {
   if (!this.index_[field]) { //Index can be created.
     this.isStringIndex_[field] = !!opt_asString;
     this.defaultTraverser_.reset();
     this.index_[field] = [];
+    this.indexComparators_[field] = this.comparisonFunctionWrapper_(opt_comparisonFn || anychart.utils.compareAsc);
 
     if (!this.traverserToArrayCache_) this.traverserToArrayCache_ = this.defaultTraverser_.toArray();
 
@@ -620,6 +633,7 @@ anychart.treeDataModule.Tree.prototype.createIndexOn = function(field, opt_asStr
 anychart.treeDataModule.Tree.prototype.removeIndexOn = function(field) {
   delete this.index_[field];
   delete this.isStringIndex_[field];
+  delete this.indexComparators_[field];
   return this;
 };
 
@@ -644,109 +658,85 @@ anychart.treeDataModule.Tree.prototype.indexBranch_ = function(root) {
 
 
 /**
- * Performs a data search. Returns null of nothing is found, tree data item if here's a single result and array of
+ * Wraps comparison function to perform binary search on index.
+ * @param {function(?, ?):number} compFn - Comparison function.
+ * @return {function(?, anychart.treeDataModule.Tree.IndexKeyValue):number} - Wrapped comparison function.
+ * @private
+ */
+anychart.treeDataModule.Tree.prototype.comparisonFunctionWrapper_ = function(compFn) {
+  return function(indexKey, item2) {
+    return compFn(indexKey, item2.key);
+  };
+};
+
+
+/**
+ * Performs a data search. Returns null if nothing is found, tree data item if here's a single result and array of
  * tree data items if here are multiple matches.
  *
- * @param {string} soughtField - Field for search. Literally means the name of field of data item.
- * @param {(string|number|boolean|function(anychart.treeDataModule.Tree.DataItem, anychart.treeDataModule.Tree.DataItem):number|
- * function(anychart.treeDataModule.Tree.DataItem, number, Array.<anychart.treeDataModule.Tree.DataItem>):number)} valueOrEvaluator -
- *  Sought value or evaluator function. Evaluator function that receives 3 arguments (the element, the index and the array).
- *  Should return a negative number, zero, or a positive number depending on whether the desired index is before, at, or
- *  after the element passed to it.
- * @param {(function(anychart.treeDataModule.Tree.DataItem, anychart.treeDataModule.Tree.DataItem):number|Object)=} opt_comparisonFnOrEvaluatorContext -
- *  Custom comparison function or evaluator context. Optional comparison function by which the array is ordered. Should
+ * @param {string} field - Field for search. Literally means the name of field of data item.
+ * @param {?} value - Value to be found.
+ * @param {(function(?, ?):number)=} opt_comparisonFn - Optional comparison function by which the array is ordered. Should
  *  take 2 arguments to compare, and return a negative number, zero, or a positive number depending on whether the
  *  first argument is less than, equal to, or greater than the second.
  * @return {(anychart.treeDataModule.Tree.DataItem|Array.<anychart.treeDataModule.Tree.DataItem>|null)} - Found tree data item or null or array of found tree data items.
  */
-anychart.treeDataModule.Tree.prototype.search = function(soughtField, valueOrEvaluator, opt_comparisonFnOrEvaluatorContext) {
-  var isEvaluator = goog.isFunction(valueOrEvaluator); //Actually means if binary select must be used.
-  var i, result;
-  var isStringIndex = this.isStringIndex_[soughtField];
-  if (this.index_[soughtField]) { //Fast search: index exists.
-    var resultIndex = isEvaluator ?
-        goog.array.binarySelect(this.index_[soughtField],
-            /** @type {!Function} */ (valueOrEvaluator),
-            /** @type {Object} */ (opt_comparisonFnOrEvaluatorContext)) :
-        goog.array.binarySearch(this.index_[soughtField], {key: isStringIndex ? String(valueOrEvaluator) : valueOrEvaluator},
-            /** @type {!Function} */ (opt_comparisonFnOrEvaluatorContext) || /** @type {!Function} */ (this.comparisonFunction_));
-
-    result = resultIndex >= 0 ? this.index_[soughtField][resultIndex].value : null;
-
-    if (goog.isArray(result)) {
-      return result.length == 1 ? result[0] : result;
-    } else {
-      return result;
-    }
-
-  } else { //Slow search without indexes: full passage.
-    result = [];
-
-    if (!this.traverserToArrayCache_) this.traverserToArrayCache_ = this.defaultTraverser_.toArray();
-
-    if (isEvaluator) {
-      for (i = 0; i < this.traverserToArrayCache_.length; i++) {
-        var compareResult = valueOrEvaluator.call(opt_comparisonFnOrEvaluatorContext, this.traverserToArrayCache_[i], i, this.traverserToArrayCache_);
-        if (!compareResult) result.push(this.traverserToArrayCache_[i]);
-      }
-    } else {
-      var comparator = /** @type {Function} */ (opt_comparisonFnOrEvaluatorContext || anychart.utils.compareAsc);
-      for (i = 0; i < this.traverserToArrayCache_.length; i++) {
-        if (!comparator(this.traverserToArrayCache_[i].get(soughtField), valueOrEvaluator)) result.push(this.traverserToArrayCache_[i]);
-      }
-    }
-
-    return result.length ? (result.length == 1 ? result[0] : result) : null;
-  }
-
+anychart.treeDataModule.Tree.prototype.search = function(field, value, opt_comparisonFn) {
+  var res = this.searchItems(field, value, opt_comparisonFn);
+  return res.length ? (res.length == 1 ? res[0] : res) : null;
 };
 
 
 /**
  * Performs a data search. Actually does the same as (@see search) but result is always an array.
  *
- * @param {string} soughtField - Field for search. Literally means the name of field of data item.
- * @param {(string|number|boolean|function(anychart.treeDataModule.Tree.DataItem, anychart.treeDataModule.Tree.DataItem):number|
- * function(anychart.treeDataModule.Tree.DataItem, number, Array.<anychart.treeDataModule.Tree.DataItem>):number)} valueOrEvaluator -
- *  Sought value or evaluator function. Evaluator function that receives 3 arguments (the element, the index and the array).
- *  Should return a negative number, zero, or a positive number depending on whether the desired index is before, at, or
- *  after the element passed to it.
- * @param {(function(anychart.treeDataModule.Tree.DataItem, anychart.treeDataModule.Tree.DataItem):number|Object)=} opt_comparisonFnOrEvaluatorContext -
- *  Custom comparison function or evaluator context. Optional comparison function by which the array is ordered. Should
+ * @param {string} field - Field for search. Literally means the name of field of data item.
+ * @param {?} value - Value to be found.
+ * @param {(function(?, ?):number)=} opt_comparisonFn - Optional comparison function by which the array is ordered. Should
  *  take 2 arguments to compare, and return a negative number, zero, or a positive number depending on whether the
  *  first argument is less than, equal to, or greater than the second.
  * @return {Array.<anychart.treeDataModule.Tree.DataItem>} - Array of found tree data items.
  */
-anychart.treeDataModule.Tree.prototype.searchItems = function(soughtField, valueOrEvaluator, opt_comparisonFnOrEvaluatorContext) {
-  var result = this.search(soughtField, valueOrEvaluator, opt_comparisonFnOrEvaluatorContext);
-  return result ? (goog.isArray(result) ? result : [result]) : [];
+anychart.treeDataModule.Tree.prototype.searchItems = function(field, value, opt_comparisonFn) {
+  var i, result;
+  var isStringIndex = this.isStringIndex_[field];
+  var indexVal = this.index_[field];
+  if (indexVal) { //Fast search: index exists.
+    var compWrapper = goog.isFunction(opt_comparisonFn) ?
+        this.comparisonFunctionWrapper_(/** @type {function(?, ?):number} */ (opt_comparisonFn)) :
+        this.indexComparators_[field];
+    var val = isStringIndex ? String(value) : value;
+    var resultIndex = goog.array.binarySearch(indexVal, val, compWrapper);
+    result = resultIndex >= 0 ? this.index_[field][resultIndex].value : null;
+
+    return goog.isArray(result) ? result : [result];
+  } else { //Slow search without indexes: full passage.
+    result = [];
+    if (!this.traverserToArrayCache_)
+      this.traverserToArrayCache_ = this.defaultTraverser_.toArray();
+
+    var comparator = /** @type {Function} */ (opt_comparisonFn || anychart.utils.compareAsc);
+    for (i = 0; i < this.traverserToArrayCache_.length; i++) {
+      if (!comparator(this.traverserToArrayCache_[i].get(field), value))
+        result.push(this.traverserToArrayCache_[i]);
+    }
+
+    return result;
+  }
 };
 
 
 /**
- * Simple searcher. Searches using default comparison function anychart.utils.compareAsc().
- * NOTE: Can't compare complex values as objects or arrays.
- * TODO (A.Kudryavtsev): This method is added and not exported for inner usage.
- * @param {string} field - Sought field.
- * @param {*} value - Value to be found. If value is complex (object or array) will get incorrect result.
- * @return {Array.<anychart.treeDataModule.Tree.DataItem>} - If nothing is found, empty array will be returned.
+ * Filters tree data items by filter-function.
+ * NOTE: filter performs full data passage. It means that filtering is way slower than searching on indexed field
+ *  with correctly implemented comparison function.
+ * @param {function((anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)):boolean} filterFunction - Filter function.
+ * @return {Array.<anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem>}
  */
-anychart.treeDataModule.Tree.prototype.find = function(field, value) {
-  var i, result;
-  var isStringIndex = this.isStringIndex_[field];
-  if (this.index_[field]) { //Fast search: index exists.
-    var resultIndex = goog.array.binarySearch(this.index_[field], {key: isStringIndex ? String(value) : value}, this.comparisonFunction_);
-    result = resultIndex >= 0 ? this.index_[field][resultIndex].value : [];
-    return (goog.isArray(result)) ? result : [result];
-  } else { //Slow search without indexes: full passage.
-    result = [];
-    if (!this.traverserToArrayCache_) this.traverserToArrayCache_ = this.defaultTraverser_.toArray();
-    for (i = 0; i < this.traverserToArrayCache_.length; i++) {
-      if (!anychart.utils.compareAsc(this.traverserToArrayCache_[i].get(field), value))
-        result.push(this.traverserToArrayCache_[i]);
-    }
-    return result;
-  }
+anychart.treeDataModule.Tree.prototype.filter = function(filterFunction) {
+  var traverser = this.getTraverser();
+  traverser.nodeYieldCondition(filterFunction);
+  return traverser.toArray();
 };
 
 
@@ -2012,6 +2002,7 @@ anychart.data.tree = function(opt_data, opt_fillMethodOrCsvMapping, opt_csvSetti
   proto['removeIndexOn'] = proto.removeIndexOn;
   proto['search'] = proto.search;
   proto['searchItems'] = proto.searchItems;
+  proto['filter'] = proto.filter;
   proto['addChild'] = proto.addChild;
   proto['addChildAt'] = proto.addChildAt;
   proto['getChildren'] = proto.getChildren;

@@ -16,12 +16,6 @@ anychart.mapModule.Interactivity = function(parent) {
    * @type {boolean}
    * @private
    */
-  this.zoomOnMouseWheel_;
-
-  /**
-   * @type {boolean}
-   * @private
-   */
   this.zoomOnDoubleClick_;
 
   /**
@@ -46,23 +40,6 @@ goog.inherits(anychart.mapModule.Interactivity, anychart.core.utils.Interactivit
 
 
 //region --- Settings
-/**
- * Allows use mouse wheel for zoming.
- * @param {boolean=} opt_value Whether will use mouse wheel.
- * @return {anychart.core.utils.Interactivity|boolean} .
- */
-anychart.mapModule.Interactivity.prototype.zoomOnMouseWheel = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = !!opt_value;
-    if (opt_value != this.zoomOnMouseWheel_) {
-      this.zoomOnMouseWheel_ = opt_value;
-    }
-    return this;
-  }
-  return /** @type {boolean} */(this.zoomOnMouseWheel_);
-};
-
-
 /**
  * Allows use double click for zoom.
  * @param {boolean=} opt_value Whether will use dbl click for zoom.
@@ -133,14 +110,14 @@ anychart.mapModule.Interactivity.prototype.copyFormat = function(opt_value) {
 //endregion
 //region --- Setup and serialize
 /** @inheritDoc */
-anychart.mapModule.Interactivity.prototype.setupByJSON = function(value, opt_default) {
-  anychart.mapModule.Interactivity.base(this, 'setupByJSON', value, opt_default);
+anychart.mapModule.Interactivity.prototype.setupByJSON = function(config, opt_default) {
+  anychart.mapModule.Interactivity.base(this, 'setupByJSON', config, opt_default);
 
-  this.zoomOnMouseWheel(value['zoomOnMouseWheel']);
-  this.keyboardZoomAndMove(value['keyboardZoomAndMove']);
-  this.zoomOnDoubleClick(value['zoomOnDoubleClick']);
-  this.drag(value['drag']);
-  this.copyFormat(value['copyFormat']);
+  this.zoomOnMouseWheel(config['zoomOnMouseWheel']);
+  this.keyboardZoomAndMove(config['keyboardZoomAndMove']);
+  this.zoomOnDoubleClick(config['zoomOnDoubleClick']);
+  this.drag(config['drag']);
+  this.copyFormat(config['copyFormat']);
 };
 
 

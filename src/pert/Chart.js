@@ -1140,7 +1140,7 @@ anychart.pertModule.Chart.prototype.calculate = function() {
                 goog.array.binaryInsert(this.worksMap_[id].depLeft, dependsOn);
               }
             } else {
-              var found = this.data_.find(anychart.enums.DataField.ID, dependsOn)[0];
+              var found = this.data_.searchItems(anychart.enums.DataField.ID, dependsOn)[0];
               if (found) {
                 var foundId = String(found.get(anychart.enums.DataField.ID));
                 this.worksMap_[foundId] = {

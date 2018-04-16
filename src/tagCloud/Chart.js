@@ -248,10 +248,17 @@ anychart.tagCloudModule.Chart.prototype.getAllSeries = function() {
 
 /** @inheritDoc */
 anychart.tagCloudModule.Chart.prototype.getPoint = function(index) {
+  var point = new anychart.core.Point(this, index);
   var iterator = this.getIterator();
-  iterator.select(index);
 
-  return new anychart.core.Point(this, index);
+  if (iterator.select(index) && point.exists()) {
+    var value = /** @type {number} */(point.get('value'));
+    var v = value / /** @type {number} */ (this.getStat(anychart.enums.Statistics.SUM));
+    point.statistics(anychart.enums.Statistics.Y_PERCENT_OF_TOTAL, anychart.math.round(v * 100, 2));
+    point.statistics(anychart.enums.Statistics.PERCENT_VALUE, v);
+  }
+
+  return point;
 };
 
 
@@ -1702,8 +1709,8 @@ anychart.tagCloudModule.Chart.prototype.calculate = function() {
     return;
 
   var anglesCount, fromAngle, toAngle, range, i, arrAngles, maxValue, value, category, key, index, item;
-  var iterator = this.getResetIterator();
   var colorScale = this.getColorScale();
+  var iterator;
 
   if (this.hasInvalidationState(anychart.ConsistencyState.TAG_CLOUD_ANGLES)) {
     anglesCount = /** @type {number} */(this.getOption('anglesCount'));
@@ -1724,6 +1731,7 @@ anychart.tagCloudModule.Chart.prototype.calculate = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.TAG_CLOUD_DATA)) {
+    iterator = this.getResetIterator();
     this.tagsPool = [];
     if (this.normalizedData) {
       this.normalizedData.forEach(function(d, i) {
@@ -1818,6 +1826,7 @@ anychart.tagCloudModule.Chart.prototype.calculate = function() {
     var zeroAngleIndex = Math.max(goog.array.indexOf(arrAngles, 0), 0);
     anglesCount = /** @type {number} */(arrAngles.length);
     maxValue = this.normalizedData.length ? this.normalizedData[0].value : NaN;
+    iterator = this.getIterator();
 
     var pointsCount = this.normalizedData.length;
     var sum = 0;

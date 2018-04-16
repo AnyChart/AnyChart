@@ -13,6 +13,15 @@ goog.require('anychart.enums');
  */
 anychart.core.drawers.Column = function(series) {
   anychart.core.drawers.Column.base(this, 'constructor', series);
+
+  /**
+   * Flag to decide if pixel shift inversion must be calculated.
+   * Pixel shift inversion is used to show single zero-values in columns.
+   * Waterfall series doesn't need it.
+   * @type {boolean}
+   * @protected
+   */
+  this.calculatePxShiftInversion = true;
 };
 goog.inherits(anychart.core.drawers.Column, anychart.core.drawers.Base);
 anychart.core.drawers.AvailableDrawers[anychart.enums.SeriesDrawerTypes.COLUMN] = anychart.core.drawers.Column;
@@ -80,26 +89,33 @@ anychart.core.drawers.Column.prototype.updatePointOnAnimate = function(point) {
  * @protected
  */
 anychart.core.drawers.Column.prototype.drawPointShape = function(point, path, hatchFill) {
-  var x = /** @type {number} */(point.meta('x'));
-  var zero = /** @type {number} */(point.meta('zero'));
-  var y = /** @type {number} */(point.meta('value'));
+  if (!point.meta('skipDrawing')) { //fixes DVF-3048
+    var x = /** @type {number} */(point.meta('x'));
+    var zero = /** @type {number} */(point.meta('zero'));
+    var y = /** @type {number} */(point.meta('value'));
 
-  var leftX = x - this.pointWidth / 2;
-  var rightX = leftX + this.pointWidth;
+    var leftX = x - this.pointWidth / 2;
+    var rightX = leftX + this.pointWidth;
+    var shared = point.meta('shared');
+    //This inversion allow to show single zero value.
+    var invertShift = this.calculatePxShiftInversion ?
+        (this.isVertical ? false : (shared ? !shared.hasNotZero : true)) :
+        false;
 
-  var thickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(path.stroke()));
-  if (this.crispEdges) {
-    leftX = anychart.utils.applyPixelShift(leftX, thickness);
-    rightX = anychart.utils.applyPixelShift(rightX, thickness);
+    var thickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(path.stroke()));
+    if (this.crispEdges) {
+      leftX = anychart.utils.applyPixelShift(leftX, thickness, invertShift);
+      rightX = anychart.utils.applyPixelShift(rightX, thickness, invertShift);
+    }
+    y = anychart.utils.applyPixelShift(y, thickness, invertShift);
+    zero = anychart.utils.applyPixelShift(zero, thickness, invertShift);
+
+    anychart.core.drawers.move(path, this.isVertical, leftX, y);
+    anychart.core.drawers.line(path, this.isVertical, rightX, y, rightX, zero, leftX, zero);
+    path.close();
+
+    anychart.core.drawers.move(hatchFill, this.isVertical, leftX, y);
+    anychart.core.drawers.line(hatchFill, this.isVertical, rightX, y, rightX, zero, leftX, zero);
+    hatchFill.close();
   }
-  y = anychart.utils.applyPixelShift(y, thickness);
-  zero = anychart.utils.applyPixelShift(zero, thickness);
-
-  anychart.core.drawers.move(path, this.isVertical, leftX, y);
-  anychart.core.drawers.line(path, this.isVertical, rightX, y, rightX, zero, leftX, zero);
-  path.close();
-
-  anychart.core.drawers.move(hatchFill, this.isVertical, leftX, y);
-  anychart.core.drawers.line(hatchFill, this.isVertical, rightX, y, rightX, zero, leftX, zero);
-  hatchFill.close();
 };

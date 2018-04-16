@@ -29,7 +29,7 @@ script:
   - echo -e "//registry.npmjs.org/:_authToken=$NPM_TOKEN\n" >> ~/.npmrc
   - echo -e "Host $STATIC_HOST\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
   - git rev-parse HEAD >> ./dist/commit-hash.txt
-  - ./bin/make_build.sh
+  - ./bin/travis_build.sh
 
 
 after_success:

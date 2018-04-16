@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsd:schema
         xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-        targetNamespace="http://anychart.com/schemas/8.2.0/xml-schema.xsd"
-        xmlns="http://anychart.com/schemas/8.2.0/xml-schema.xsd"
+        targetNamespace="http://anychart.com/schemas/8.2.1/xml-schema.xsd"
+        xmlns="http://anychart.com/schemas/8.2.1/xml-schema.xsd"
         elementFormDefault="qualified">
 
     <xsd:element name="anychart" type="Anychart"/>
@@ -2142,6 +2142,7 @@
         <xsd:attribute name="min_count" type="xsd:unsignedInt" default="4"/>
         <xsd:attribute name="max_count" type="xsd:unsignedInt" default="6"/>
         <xsd:attribute name="interval" type="simple.ScaleInterval"/>
+        <xsd:attribute name="allow_fractional" type="simple.Bool"/>
     </xsd:complexType>
 
     <xsd:complexType name="GeoScaleTicks">

@@ -134,103 +134,105 @@ anychart.cartesian3dModule.drawers.Column.prototype.updatePointOnAnimate = funct
  * @private
  */
 anychart.cartesian3dModule.drawers.Column.prototype.drawPoint_ = function(point, shapes) {
-  var x = /** @type {number} */(point.meta('x'));
-  var zero = /** @type {number} */(point.meta('zero'));
-  var y = /** @type {number} */(point.meta('value'));
-  if (!this.isVertical) {
-    x += this.x3dSeriesShift_;
-    zero -= this.y3dSeriesShift_;
-    y -= this.y3dSeriesShift_;
+  if (!point.meta('skipDrawing')) { //fixes DVF-3048
+    var x = /** @type {number} */(point.meta('x'));
+    var zero = /** @type {number} */(point.meta('zero'));
+    var y = /** @type {number} */(point.meta('value'));
+    if (!this.isVertical) {
+      x += this.x3dSeriesShift_;
+      zero -= this.y3dSeriesShift_;
+      y -= this.y3dSeriesShift_;
+    }
+
+    var bottomSide = shapes['bottom'];
+    var backSide = shapes['back'];
+    var leftSide = shapes['left'];
+    var rightSide = shapes['right'];
+    var frontSide = shapes['front'];
+    var topSide = shapes['top'];
+    var rightHatchSide = shapes['rightHatch'];
+    var frontHatchSide = shapes['frontHatch'];
+    var topHatchSide = shapes['topHatch'];
+
+    var x3dShift = this.x3dShift_;
+    var y3dShift = this.y3dShift_;
+
+    // width in barMode is height
+    var x_, y_, width, height, leftShift, rightShift;
+    var pixelShift = (frontSide.stroke()['thickness'] % 2 / 2) || 0;
+    if (this.isVertical) {
+      height = this.pointWidth;
+      x_ = Math.min(zero, y) + this.x3dSeriesShift_;
+      y_ = x - height / 2 - this.y3dSeriesShift_;
+      width = Math.abs(zero - y);
+      leftShift = pixelShift;
+      rightShift = 0;
+    } else {
+      width = this.pointWidth;
+      x_ = x - width / 2;
+      y_ = Math.min(zero, y);
+      height = Math.abs(zero - y);
+      rightShift = leftShift = -pixelShift;
+    }
+
+    bottomSide
+        .moveTo(x_ + pixelShift, y_ + height)
+        .lineTo(x_ + width, y_ + height)
+        .lineTo(x_ + width + x3dShift - pixelShift, y_ + height - y3dShift + pixelShift)
+        .lineTo(x_ + x3dShift, y_ + height - y3dShift)
+        .close();
+
+    backSide
+        .moveTo(x_ + x3dShift, y_ - y3dShift)
+        .lineTo(x_ + x3dShift + width, y_ - y3dShift)
+        .lineTo(x_ + x3dShift + width, y_ - y3dShift + height)
+        .lineTo(x_ + x3dShift, y_ - y3dShift + height)
+        .close();
+
+    leftSide
+        .moveTo(x_, y_)
+        .lineTo(x_ + x3dShift + leftShift, y_ - y3dShift + pixelShift)
+        .lineTo(x_ + x3dShift, y_ + height - y3dShift)
+        .lineTo(x_, y_ + height - pixelShift)
+        .close();
+
+    rightSide
+        .moveTo(x_ + width, y_)
+        .lineTo(x_ + width + x3dShift + rightShift, y_ - y3dShift + pixelShift)
+        .lineTo(x_ + width + x3dShift, y_ + height - y3dShift)
+        .lineTo(x_ + width, y_ + height - pixelShift)
+        .close();
+    rightHatchSide
+        .moveTo(x_ + width, y_)
+        .lineTo(x_ + width + x3dShift + rightShift, y_ - y3dShift + pixelShift)
+        .lineTo(x_ + width + x3dShift, y_ + height - y3dShift)
+        .lineTo(x_ + width, y_ + height - pixelShift)
+        .close();
+
+    frontSide
+        .moveTo(x_, y_)
+        .lineTo(x_ + width, y_)
+        .lineTo(x_ + width, y_ + height)
+        .lineTo(x_, y_ + height)
+        .close();
+    frontHatchSide
+        .moveTo(x_, y_)
+        .lineTo(x_ + width, y_)
+        .lineTo(x_ + width, y_ + height)
+        .lineTo(x_, y_ + height)
+        .close();
+
+    topSide
+        .moveTo(x_ + pixelShift, y_)
+        .lineTo(x_ + width, y_)
+        .lineTo(x_ + width + x3dShift - pixelShift, y_ - y3dShift + pixelShift)
+        .lineTo(x_ + x3dShift, y_ - y3dShift)
+        .close();
+    topHatchSide
+        .moveTo(x_ + pixelShift, y_)
+        .lineTo(x_ + width, y_)
+        .lineTo(x_ + width + x3dShift - pixelShift, y_ - y3dShift + pixelShift)
+        .lineTo(x_ + x3dShift, y_ - y3dShift)
+        .close();
   }
-
-  var bottomSide = shapes['bottom'];
-  var backSide = shapes['back'];
-  var leftSide = shapes['left'];
-  var rightSide = shapes['right'];
-  var frontSide = shapes['front'];
-  var topSide = shapes['top'];
-  var rightHatchSide = shapes['rightHatch'];
-  var frontHatchSide = shapes['frontHatch'];
-  var topHatchSide = shapes['topHatch'];
-
-  var x3dShift = this.x3dShift_;
-  var y3dShift = this.y3dShift_;
-
-  // width in barMode is height
-  var x_, y_, width, height, leftShift, rightShift;
-  var pixelShift = (frontSide.stroke()['thickness'] % 2 / 2) || 0;
-  if (this.isVertical) {
-    height = this.pointWidth;
-    x_ = Math.min(zero, y) + this.x3dSeriesShift_;
-    y_ = x - height / 2 - this.y3dSeriesShift_;
-    width = Math.abs(zero - y);
-    leftShift = pixelShift;
-    rightShift = 0;
-  } else {
-    width = this.pointWidth;
-    x_ = x - width / 2;
-    y_ = Math.min(zero, y);
-    height = Math.abs(zero - y);
-    rightShift = leftShift = -pixelShift;
-  }
-
-  bottomSide
-      .moveTo(x_ + pixelShift, y_ + height)
-      .lineTo(x_ + width, y_ + height)
-      .lineTo(x_ + width + x3dShift - pixelShift, y_ + height - y3dShift + pixelShift)
-      .lineTo(x_ + x3dShift, y_ + height - y3dShift)
-      .close();
-
-  backSide
-      .moveTo(x_ + x3dShift, y_ - y3dShift)
-      .lineTo(x_ + x3dShift + width, y_ - y3dShift)
-      .lineTo(x_ + x3dShift + width, y_ - y3dShift + height)
-      .lineTo(x_ + x3dShift, y_ - y3dShift + height)
-      .close();
-
-  leftSide
-      .moveTo(x_, y_)
-      .lineTo(x_ + x3dShift + leftShift, y_ - y3dShift + pixelShift)
-      .lineTo(x_ + x3dShift, y_ + height - y3dShift)
-      .lineTo(x_, y_ + height - pixelShift)
-      .close();
-
-  rightSide
-      .moveTo(x_ + width, y_)
-      .lineTo(x_ + width + x3dShift + rightShift, y_ - y3dShift + pixelShift)
-      .lineTo(x_ + width + x3dShift, y_ + height - y3dShift)
-      .lineTo(x_ + width, y_ + height - pixelShift)
-      .close();
-  rightHatchSide
-      .moveTo(x_ + width, y_)
-      .lineTo(x_ + width + x3dShift + rightShift, y_ - y3dShift + pixelShift)
-      .lineTo(x_ + width + x3dShift, y_ + height - y3dShift)
-      .lineTo(x_ + width, y_ + height - pixelShift)
-      .close();
-
-  frontSide
-      .moveTo(x_, y_)
-      .lineTo(x_ + width, y_)
-      .lineTo(x_ + width, y_ + height)
-      .lineTo(x_, y_ + height)
-      .close();
-  frontHatchSide
-      .moveTo(x_, y_)
-      .lineTo(x_ + width, y_)
-      .lineTo(x_ + width, y_ + height)
-      .lineTo(x_, y_ + height)
-      .close();
-
-  topSide
-      .moveTo(x_ + pixelShift, y_)
-      .lineTo(x_ + width, y_)
-      .lineTo(x_ + width + x3dShift - pixelShift, y_ - y3dShift + pixelShift)
-      .lineTo(x_ + x3dShift, y_ - y3dShift)
-      .close();
-  topHatchSide
-      .moveTo(x_ + pixelShift, y_)
-      .lineTo(x_ + width, y_)
-      .lineTo(x_ + width + x3dShift - pixelShift, y_ - y3dShift + pixelShift)
-      .lineTo(x_ + x3dShift, y_ - y3dShift)
-      .close();
 };

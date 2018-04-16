@@ -161,7 +161,7 @@ anychart.pieModule.Chart = function(opt_data, opt_csvSettings) {
     ['outsideLabelsCriticalAngle', anychart.ConsistencyState.PIE_LABELS, anychart.Signal.NEEDS_REDRAW],
     ['forceHoverLabels', anychart.ConsistencyState.PIE_LABELS, anychart.Signal.NEEDS_REDRAW],
     ['connectorStroke', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
-    ['mode3d', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.PIE_LABELS, anychart.Signal.NEEDS_REDRAW]
+    ['mode3d', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.PIE_LABELS, anychart.Signal.NEEDS_REDRAW]
   ]);
 
   var normalDescriptorsMeta = {};
@@ -684,7 +684,7 @@ anychart.pieModule.Chart.prototype.prepareData_ = function(data) {
   }
 
   var sort = /** @type {anychart.enums.Sort} */ (this.getOption('sort'));
-  if (sort == 'none') {
+  if (sort == 'none' || !goog.isDefAndNotNull(sort)) {
     return data;
   } else {
     if (sort == 'asc') {
@@ -1925,7 +1925,16 @@ anychart.pieModule.Chart.prototype.calculateBounds_ = function(bounds) {
   // if (!this[___name]) this[___name] = this.container().rect().zIndex(1000);
   // this[___name].setBounds(bounds);
 
-  this.radiusValue_ = Math.min(minWidthHeightOfPieBounds / 2, Math.max(anychart.utils.normalizeSize(/** @type {number|string} */ (this.getOption('radius')), minWidthHeightOfPieBounds), 0));
+  var radiusX = Math.max(anychart.utils.normalizeSize(/** @type {number|string} */ (this.getOption('radius')), minWidthHeightOfPieBounds), 0);
+  var mode3d = /** @type {boolean} */ (this.getOption('mode3d'));
+  if (mode3d) {
+    var radiusXMax = Math.min(radiusX, (bounds.width - 2 * clampPie) / 2);
+    var ratioSum = anychart.pieModule.Chart.ASPECT_3D + anychart.pieModule.Chart.PIE_THICKNESS;
+    var radiusYMax = (bounds.height - 2 * clampPie) / (2 * ratioSum);
+    this.radiusValue_ = Math.min(radiusXMax, radiusYMax);
+  } else {
+    this.radiusValue_ = Math.min(minWidthHeightOfPieBounds / 2, radiusX);
+  }
   this.connectorLengthValue_ = anychart.utils.normalizeSize(/** @type {number|string} */ (this.getOption('connectorLength')), this.radiusValue_);
 
   this.originalRadiusValue_ = this.radiusValue_;
@@ -4651,8 +4660,8 @@ anychart.pieModule.Chart.prototype.setupByJSON = function(config, opt_default) {
   if ('tooltip' in config)
     this.tooltip().setupInternal(!!opt_default, config['tooltip']);
 
-  anychart.core.settings.deserialize(this, anychart.pieModule.Chart.PROPERTY_DESCRIPTORS, config);
-  
+  anychart.core.settings.deserialize(this, anychart.pieModule.Chart.PROPERTY_DESCRIPTORS, config, opt_default);
+
   this.selected_.setupInternal(!!opt_default, config['selected']);
 
   if (goog.isDef(config['explode'])) {

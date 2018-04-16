@@ -63,5 +63,9 @@ anychart.mapModule.projections.Aitoff.prototype.invert = function(x, y) {
   x = lambda;
   y = phi;
 
-  return [goog.math.toDegrees(x), goog.math.toDegrees(y)];
+  //TODO (A.Kudryavtsev): This clamp fixes very strange issue DVF-3038.
+  var degX = goog.math.clamp(goog.math.toDegrees(x), -180, 180);
+  var degY = goog.math.clamp(goog.math.toDegrees(y), -180, 180);
+
+  return [degX, degY];
 };
