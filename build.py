@@ -776,7 +776,7 @@ def __get_bundle_wrapper(bundle_name, modules, file_name='', performance_monitor
         else "throw Error('anychart-base.min.js module should be included first. See modules explanation at https://docs.anychart.com/Quick_Start/Modules for details');"
 
     branch_name = __get_current_branch_name()
-    date_mask = '%Y-%m-%d' if branch_name == 'master' else '%Y-%m-%d %H:%M'
+    date_mask = '%Y-%m-%d' #if branch_name == 'master' else '%Y-%m-%d %H:%M'
     
     start = start % (
         ', '.join(modules),
@@ -997,7 +997,7 @@ def __compile_css(*args, **kwargs):
                             ' * License: https://www.anychart.com/buy/',
                             ' * Contact: sales@anychart.com',
                             ' * Copyright: AnyChart.com %s. All rights reserved.',
-                            ' */']) % (time.strftime('%Y-%m-%d %H:%M'), time.strftime('%Y')) + '\n'
+                            ' */']) % (time.strftime('%Y-%m-%d'), time.strftime('%Y')) + '\n'
 
         # Less
         with open(css_out_path, 'w') as f:

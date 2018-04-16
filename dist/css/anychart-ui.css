@@ -1,6 +1,6 @@
 /*!
  * AnyChart is lightweight robust charting library with great API and Docs, that works with your stack and has tons of chart types and features.
- * Version: 2018-04-04 13:19
+ * Version: 2018-04-16
  * License: https://www.anychart.com/buy/
  * Contact: sales@anychart.com
  * Copyright: AnyChart.com 2018. All rights reserved.
@@ -581,6 +581,7 @@
  padding: 6px 0;
  position: absolute;
  z-index: 1003;
+ line-height: normal;
 }
 .anychart-menuitem {
  position: relative;

@@ -22,9 +22,9 @@ IS_DEV_BUILD=false                          # build without geoData (drop CDN wi
 VERSION=''
 
 #### Set Steps
-STEP_BUILD_DIST=true
-STEP_UPLOAD_STATIC=true
-STEP_DROP_CDN=true
+#STEP_BUILD_DIST=true
+#STEP_UPLOAD_STATIC=true
+#STEP_DROP_CDN=true
 
 STEP_EXPORT_SERVER=false
 STEP_NPM_RELEASE=false
@@ -37,11 +37,11 @@ if [ "${TRAVIS_BRANCH}" = "master" ] || [ ${DRY_RUN_RELEASE} ]; then
     VERSION=${BUILD_VERSION}
     IS_RELEASE_BUILD=true
 
-    STEP_NPM_RELEASE=true
+    #STEP_NPM_RELEASE=true
     STEP_GIT_RELEASE=true
 
-    STEP_EXPORT_SERVER=true
-    STEP_DOWNLOAD_EXTERNAL=true
+    #STEP_EXPORT_SERVER=true
+    #STEP_DOWNLOAD_EXTERNAL=true
 
     ####  Be sure u wanna uncomment this
     #STEP_LEGACY_7x=true
