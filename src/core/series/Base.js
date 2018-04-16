@@ -2279,7 +2279,7 @@ anychart.core.series.Base.prototype.drawFactoryElement = function(seriesFactoryG
 
   var tmp;
 
-  if (point.meta('missing')) {
+  if (point.meta('missing') || point.meta('skipDrawing')) {
     isDraw = false;
   } else {
     state = anychart.core.utils.InteractivityState.clarifyState(state);
@@ -3607,7 +3607,8 @@ anychart.core.series.Base.prototype.makeMinPointLengthStackedMeta = function(row
 
     //fixes DVF-3048
     var hasNotZero = shared.hasNotZero;
-    var skipDrawing = !height;
+    var valueRatio = rowInfo.meta('valueRatio'); //For polar chart.
+    var skipDrawing = goog.isDef(valueRatio) ? !valueRatio : !height;
 
     if (positive) {
       height = -height;
@@ -3736,7 +3737,8 @@ anychart.core.series.Base.prototype.makeStackedMeta = function(rowInfo, yNames, 
     var val = /** @type {number} */ (map['value']);
     var height = Math.abs(val - zero);
     var hasNotZero = shared.hasNotZero;
-    var skipDrawing = !height;
+    var valueRatio = rowInfo.meta('valueRatio'); //For polar chart.
+    var skipDrawing = goog.isDef(valueRatio) ? !valueRatio : !height;
     if (!shared.drawn && !hasNotZero) {
       skipDrawing = false;
       shared.drawn = true;

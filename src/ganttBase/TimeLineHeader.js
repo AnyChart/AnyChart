@@ -889,10 +889,15 @@ anychart.ganttBaseModule.TimeLineHeader.prototype.draw = function() {
     this.pixelBoundsCache_ = this.getPixelBounds();
     anychart.utils.applyPixelShiftToRect(this.pixelBoundsCache_, 0);
     this.clip_.shape(this.pixelBoundsCache_);
+
+    //This makes this.labelsConfiguration() to choose correct this.formatIndex_ on hidden container.
+    this.choosenFormats_.length = 0;
+
     this.invalidate(
         anychart.ConsistencyState.RESOURCE_TIMELINE_BACKGROUND |
         anychart.ConsistencyState.RESOURCE_TIMELINE_TICKS |
         anychart.ConsistencyState.RESOURCE_TIMELINE_LABELS |
+        // anychart.ConsistencyState.RESOURCE_TIMELINE_LEVELS |
         anychart.ConsistencyState.RESOURCE_TIMELINE_OVERLAY);
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
