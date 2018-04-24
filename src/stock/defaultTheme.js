@@ -228,7 +228,8 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       },
       'title': {
         'text': 'Plot Title',
-        'padding': 5
+        'padding': [5, 5, 2, 5],
+        'fontSize': 12
       },
       'defaultSeriesSettings': {
         'base': {
