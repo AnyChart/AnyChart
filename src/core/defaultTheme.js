@@ -1016,19 +1016,14 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
   },
 
   'defaultTextMarkerSettings': {
-    'enabled': true,
     'fontSize': 12,
     'value': 0,
-    'anchor': 'center',
+    'anchor': 'auto',
     'align': 'center',
     'layout': null,
-    'offsetX': 0,
-    'offsetY': 0,
     'text': 'Text marker',
-    'width': null,
-    'height': null,
     'zIndex': 25.3,
-    'scale': 1
+    'rotation': null
   },
 
   'defaultRangeMarkerSettings': {

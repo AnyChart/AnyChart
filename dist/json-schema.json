@@ -5415,22 +5415,6 @@
         "layout": {"$ref": "#/definitions/anychart.enums.Layout"}
       }
     },
-    "anychart.core.axisMarkers.GanttLine": {
-      "type": "object",
-      "allOf": [
-        {"$ref": "#/definitions/anychart.core.VisualBase"}
-      ],
-      "properties": {
-        "stroke": {"$ref": "#/definitions/stroke"},
-        "value": {
-          "type": ["number", "string"]
-        },
-        "scale": {
-          "type": "number"
-        },
-        "layout": {"$ref": "#/definitions/anychart.enums.Layout"}
-      }
-    },
     "anychart.core.axisMarkers.Range": {
       "type": "object",
       "allOf": [
@@ -5448,25 +5432,6 @@
           "type": "number"
         },
         "axis": {
-          "type": "number"
-        },
-        "layout": {"$ref": "#/definitions/anychart.enums.Layout"}
-      }
-    },
-    "anychart.core.axisMarkers.GanttRange": {
-      "type": "object",
-      "allOf": [
-        {"$ref": "#/definitions/anychart.core.VisualBase"}
-      ],
-      "properties": {
-        "fill": {"$ref": "#/definitions/fill"},
-        "from": {
-          "type": ["number", "string"]
-        },
-        "to": {
-          "type": ["number", "string"]
-        },
-        "scale": {
           "type": "number"
         },
         "layout": {"$ref": "#/definitions/anychart.enums.Layout"}
@@ -5513,8 +5478,13 @@
         "value": {
           "type": ["number", "string"]
         },
-        "text": {
-          "type": ["string"]
+        "align": {"$ref": "#/definitions/anychart.enums.Align"},
+        "layout": {"$ref": "#/definitions/anychart.enums.Layout"},
+        "background": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.Background"}
+          ]
         },
         "width": {
           "type": [
@@ -5530,6 +5500,7 @@
             "null"
           ]
         },
+        "anchor": {"$ref": "#/definitions/anychart.enums.Anchor"},
         "offsetX": {
           "type": [
             "number",
@@ -5541,6 +5512,40 @@
             "number",
             "string"
           ]
+        },
+        "position": {"$ref": "#/definitions/anychart.enums.Anchor"},
+        "text": {
+          "type": ["string"]
+        },
+        "minFontSize": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "maxFontSize": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "adjustFontSize": {
+          "type": [
+            "boolean",
+            "object",
+            "array"
+          ],
+          "properties": {
+            "width": {
+              "type": "boolean"
+            },
+            "height": {
+              "type": "boolean"
+            }
+          },
+          "items": {
+            "type": "boolean"
+          }
         },
         "rotation": {
           "type": [
@@ -5554,62 +5559,7 @@
         "axis": {
           "type": "number"
         },
-        "layout": {"$ref": "#/definitions/anychart.enums.Layout"},
-        "align": {"$ref": "#/definitions/anychart.enums.Align"},
-        "anchor": {"$ref": "#/definitions/anychart.enums.Anchor"}
-      }
-    },
-    "anychart.core.axisMarkers.GanttText": {
-      "type": "object",
-      "allOf": [
-        {"$ref": "#/definitions/anychart.core.VisualBase"},
-        {"$ref": "#/definitions/anychart.core.Text"}
-      ],
-      "properties": {
-        "value": {
-          "type": ["number", "string"]
-        },
-        "text": {
-          "type": ["string"]
-        },
-        "width": {
-          "type": [
-            "number",
-            "string",
-            "null"
-          ]
-        },
-        "height": {
-          "type": [
-            "number",
-            "string",
-            "null"
-          ]
-        },
-        "offsetX": {
-          "type": [
-            "number",
-            "string"
-          ]
-        },
-        "offsetY": {
-          "type": [
-            "number",
-            "string"
-          ]
-        },
-        "rotation": {
-          "type": [
-            "number",
-            "null"
-          ]
-        },
-        "scale": {
-          "type": "number"
-        },
-        "layout": {"$ref": "#/definitions/anychart.enums.Layout"},
-        "align": {"$ref": "#/definitions/anychart.enums.Align"},
-        "anchor": {"$ref": "#/definitions/anychart.enums.Anchor"}
+        "padding": {"$ref": "#/definitions/anychart.core.utils.Space"}
       }
     },
 
