@@ -985,19 +985,27 @@
 
     <xsd:complexType name="core.axisMarkers.Text">
         <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="background" type="core.Background"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="padding" type="utils.Space"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="adjust_font_size" type="utils.AdjustFontSizeObj"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="text" type="simple.Text"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="value" type="simple.Text"/>
         </xsd:all>
         <xsd:attribute name="value" type="xsd:string"/>
-        <xsd:attribute name="anchor" type="enums.AnchorAndPosition" default="center"/>
         <xsd:attribute name="align" type="enums.Align" default="center"/>
         <xsd:attribute name="layout" type="enums.Layout"/>
-        <xsd:attribute name="rotation" type="simple.DoubleOrNull" default="0"/>
+        <xsd:attribute name="background" type="simple.StringOrBoolOrNull" default="false"/>
+        <xsd:attribute name="width" type="simple.NumberOrPercentOrNull" default="null"/>
+        <xsd:attribute name="height" type="simple.NumberOrPercentOrNull" default="null"/>
+        <xsd:attribute name="anchor" type="enums.AnchorAndPosition" default="center"/>
         <xsd:attribute name="offset_x" type="simple.NumberOrPercent" default="0"/>
         <xsd:attribute name="offset_y" type="simple.NumberOrPercent" default="0"/>
+        <xsd:attribute name="position" type="enums.AnchorAndPosition" default="center"/>
         <xsd:attribute name="text" type="xsd:string"/>
-        <xsd:attribute name="height" type="simple.NumberOrPercentOrNull" default="null"/>
-        <xsd:attribute name="width" type="simple.NumberOrPercentOrNull" default="null"/>
+        <xsd:attribute name="min_font_size" type="xsd:string"/>
+        <xsd:attribute name="max_font_size" type="xsd:string"/>
+        <xsd:attribute name="adjust_font_size" type="simple.Bool" default="false"/>
+        <xsd:attribute name="rotation" type="simple.NumberOrNull"/>
         <xsd:attribute name="scale" type="simple.ScaleRef"/>
         <xsd:attribute name="axis" type="simple.AxisRef"/>
         <xsd:attributeGroup ref="attrs.TextSettings"/>

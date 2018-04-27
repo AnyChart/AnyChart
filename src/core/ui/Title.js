@@ -179,6 +179,16 @@ anychart.core.ui.Title = function() {
    */
   this.resolutionChainCache_ = null;
 
+  /**
+   * Flag, if the title belongs to stock plot.
+   * Here's a difference: due to the stock plot y-axes specific positioning title orientation
+   * can be only top or bottom in current implementation (17 Apr 2018).
+   * This affects orientation normalizer result.
+   * @type {boolean}
+   * @private
+   */
+  this.isStockPlotTitle_ = false;
+
   anychart.core.settings.createTextPropertiesDescriptorsMeta(this.descriptorsMeta,
       anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
       anychart.ConsistencyState.APPEARANCE,
@@ -253,11 +263,18 @@ anychart.core.ui.Title.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
       'align',
       anychart.enums.normalizeAlign);
 
+  function orientationNormalizer(val) {
+    if (this.isStockPlotTitle_)
+      return val == anychart.enums.Orientation.BOTTOM ? val : anychart.enums.Orientation.TOP;
+    else
+      return anychart.enums.normalizeOrientation(val);
+  }
+
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'orientation',
-      anychart.enums.normalizeOrientation);
+      orientationNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
@@ -426,6 +443,20 @@ anychart.core.ui.Title.prototype.parentInvalidated_ = function(e) {
 
 //endregion
 //region -- Other methods
+/**
+ * See this.isStockPlotTitle_ field description.
+ * @param {boolean=} opt_value - Value to set.
+ * @return {boolean|anychart.core.ui.Title}
+ */
+anychart.core.ui.Title.prototype.isStockPlotTitle = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.isStockPlotTitle_ = opt_value;
+    return this;
+  }
+  return this.isStockPlotTitle_;
+};
+
+
 /**
  * Getter/setter for background.
  * @param {(string|Object|null|boolean)=} opt_value .

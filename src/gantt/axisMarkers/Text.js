@@ -109,14 +109,8 @@ anychart.ganttModule.axisMarkers.Text.prototype.setupByJSON = function(config, o
   var proto = anychart.ganttModule.axisMarkers.Text.prototype;
   proto['value'] = proto.value;
   proto['scale'] = proto.scale;
-  proto['anchor'] = proto.anchor;
-  proto['align'] = proto.align;
   proto['layout'] = proto.layout;
-  proto['rotation'] = proto.rotation;
-  proto['offsetX'] = proto.offsetX;
-  proto['offsetY'] = proto.offsetY;
-  proto['text'] = proto.text;
-  proto['height'] = proto.height;
-  proto['width'] = proto.width;
+  proto['background'] = proto.background;
+  proto['padding'] = proto.padding;
   proto['isHorizontal'] = proto.isHorizontal;
 })();

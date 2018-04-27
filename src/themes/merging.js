@@ -663,7 +663,8 @@ anychart.themes.merging.mergingMap_ = (function() {
       targets: [
         ['chart.', [
           [['', 'defaultQuarterSettings.'], 'defaultLabelSettings']
-        ]]
+        ]],
+        'defaultTextMarkerSettings'
       ]
     },
     {
@@ -673,6 +674,7 @@ anychart.themes.merging.mergingMap_ = (function() {
           ['default', [
             'Title',
             'Timeline.header',
+            'TextMarkerSettings',
             'ButtonSettings.normal',
             ['Tooltip', [
               '',
@@ -808,6 +810,7 @@ anychart.themes.merging.mergingMap_ = (function() {
             '',
             '.defaultQuarterSettings'
           ]],
+          'stock.defaultPlotSettings',
           'standalones',
           'map.axesSettings'
         ], '.title']

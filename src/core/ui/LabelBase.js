@@ -150,7 +150,7 @@ anychart.core.ui.LabelBase.DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'rotation',
-      anychart.core.settings.numberNormalizer);
+      anychart.core.settings.numberOrNullNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
@@ -301,7 +301,7 @@ anychart.core.ui.LabelBase.prototype.autoRotation = function(opt_value) {
  */
 anychart.core.ui.LabelBase.prototype.getFinalRotation = function() {
   var rot = this.getOption('rotation');
-  return goog.isDef(rot) && !isNaN(rot) ? rot : this.autoRotation_;
+  return goog.isDefAndNotNull(rot) && !isNaN(rot) ? rot : this.autoRotation_;
 };
 
 
@@ -471,6 +471,15 @@ anychart.core.ui.LabelBase.prototype.calculateFontSize_ = function(originWidth, 
 
 
 /**
+ * Gets bounds for this.calculateLabelBounds_ label width and height correct calculation.
+ * @return {anychart.math.Rect}
+ */
+anychart.core.ui.LabelBase.prototype.getLabelsParentBounds = function() {
+  return /** @type {anychart.math.Rect} */ (this.parentBounds());
+};
+
+
+/**
  * Calculate label bounds.
  * @private
  */
@@ -494,18 +503,17 @@ anychart.core.ui.LabelBase.prototype.calculateLabelBounds_ = function() {
   // canAdjustBy = !auto
   var w = this.getOption('width');
   var h = this.getOption('height');
-  if (parentBounds) {
-    parentWidth = parentBounds.width;
-    parentHeight = parentBounds.height;
+  var whBounds = this.getLabelsParentBounds();
+  if (parentBounds && whBounds) {
     if (goog.isDefAndNotNull(w)) {
-      this.backgroundWidth = width = anychart.utils.normalizeSize(/** @type {number|string} */(w), parentWidth);
+      this.backgroundWidth = width = anychart.utils.normalizeSize(/** @type {number|string} */(w), whBounds.width);
       autoWidth = false;
     } else {
       width = 0;
       autoWidth = true;
     }
     if (goog.isDefAndNotNull(h)) {
-      this.backgroundHeight = height = anychart.utils.normalizeSize(/** @type {number|string} */(h), parentHeight);
+      this.backgroundHeight = height = anychart.utils.normalizeSize(/** @type {number|string} */(h), whBounds.height);
       autoHeight = false;
     } else {
       height = 0;
@@ -601,6 +609,15 @@ anychart.core.ui.LabelBase.prototype.calculateLabelBounds_ = function() {
 
 
 /**
+ * Gets position overridable method.
+ * @return {anychart.enums.Position}
+ */
+anychart.core.ui.LabelBase.prototype.getPosition = function() {
+  return /** @type {anychart.enums.Position} */ (this.getOption('position')) || anychart.enums.Position.CENTER;
+};
+
+
+/**
  * Label drawing.
  * @return {anychart.math.Rect}
  * @protected
@@ -618,7 +635,7 @@ anychart.core.ui.LabelBase.prototype.drawLabel = function() {
   var position = new goog.math.Coordinate(0, 0);
 
   if (this.parentBounds()) {
-    switch (this.getOption('position')) {
+    switch (this.getPosition()) {
       case anychart.enums.Position.LEFT_TOP:
         position.x = parentX;
         position.y = parentY;

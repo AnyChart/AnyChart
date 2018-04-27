@@ -226,6 +226,11 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       'background': {
         'enabled': false
       },
+      'title': {
+        'text': 'Plot Title',
+        'padding': [5, 5, 2, 5],
+        'fontSize': 12
+      },
       'defaultSeriesSettings': {
         'base': {
           'pointWidth': '75%',

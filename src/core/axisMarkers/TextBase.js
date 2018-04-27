@@ -1,21 +1,26 @@
 goog.provide('anychart.core.axisMarkers.TextBase');
 
+//region -- Requirements.
 goog.require('acgraph.math');
 goog.require('anychart.core.Axis');
 goog.require('anychart.core.IStandaloneBackend');
-goog.require('anychart.core.Text');
 goog.require('anychart.core.reporting');
+goog.require('anychart.core.ui.Background');
+goog.require('anychart.core.ui.LabelBase');
 goog.require('anychart.core.utils.Padding');
 goog.require('anychart.enums');
+goog.require('anychart.math.Rect');
 goog.require('anychart.utils');
 goog.require('goog.math');
 
 
 
+//endregion
+//region -- Constructor.
 /**
  * Text marker base.
  * @constructor
- * @extends {anychart.core.Text}
+ * @extends {anychart.core.ui.LabelBase}
  * @implements {anychart.core.IStandaloneBackend}
  */
 anychart.core.axisMarkers.TextBase = function() {
@@ -35,12 +40,13 @@ anychart.core.axisMarkers.TextBase = function() {
    */
   this.scale_;
 
+
   /**
-   * Marker element.
-   * @type {acgraph.vector.Text} - Marker text element.
+   * Auto scale.
+   * @type {anychart.scales.Base|anychart.ganttModule.Scale}
    * @private
    */
-  this.markerElement_;
+  this.autoScale_ = null;
 
   /**
    * Assigned axis.
@@ -57,48 +63,6 @@ anychart.core.axisMarkers.TextBase = function() {
   this.chart_ = null;
 
   /**
-   * @type {?number}
-   * @private
-   */
-  this.rotation_ = null;
-
-  /**
-   * @type {anychart.enums.Align}
-   * @private
-   */
-  this.align_;
-
-  /**
-   * @type {anychart.enums.Anchor}
-   * @private
-   */
-  this.anchor_;
-
-  /**
-   * @type {string|number}
-   * @private
-   */
-  this.offsetX_;
-
-  /**
-   * @type {string|number}
-   * @private
-   */
-  this.offsetY_;
-
-  /**
-   * @type {?(string|number)}
-   * @private
-   */
-  this.width_ = null;
-
-  /**
-   * @type {?(string|number)}
-   * @private
-   */
-  this.height_ = null;
-
-  /**
    * @type {anychart.enums.Layout}
    * @private
    */
@@ -110,23 +74,29 @@ anychart.core.axisMarkers.TextBase = function() {
    */
   this.defaultLayout_ = anychart.enums.Layout.HORIZONTAL;
 
+  /**
+   * Parent bounds storage to wrap LabelsBase parentBounds logic.
+   * @type {anychart.math.Rect}
+   * @private
+   */
+  this.contBounds_ = null;
+
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
-    ['text', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED]
+    ['align', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED]
   ]);
+
 };
-goog.inherits(anychart.core.axisMarkers.TextBase, anychart.core.Text);
-anychart.core.settings.populate(anychart.core.axisMarkers.TextBase, anychart.core.Text.TEXT_DESCRIPTORS);
+goog.inherits(anychart.core.axisMarkers.TextBase, anychart.core.ui.LabelBase);
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//  States and signals.
-//----------------------------------------------------------------------------------------------------------------------
+//endregion
+//region -- States and Signals.
 /**
  * Supported signals.
  * @type {number}
  */
 anychart.core.axisMarkers.TextBase.prototype.SUPPORTED_SIGNALS =
-    anychart.core.Text.prototype.SUPPORTED_SIGNALS;
+    anychart.core.ui.LabelBase.prototype.SUPPORTED_SIGNALS;
 
 
 /**
@@ -134,9 +104,30 @@ anychart.core.axisMarkers.TextBase.prototype.SUPPORTED_SIGNALS =
  * @type {number}
  */
 anychart.core.axisMarkers.TextBase.prototype.SUPPORTED_CONSISTENCY_STATES =
-    anychart.core.Text.prototype.SUPPORTED_CONSISTENCY_STATES;
+    anychart.core.ui.LabelBase.prototype.SUPPORTED_CONSISTENCY_STATES;
 
 
+//endregion
+//region -- Descriptors.
+/**
+ * Descriptors.
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.core.axisMarkers.TextBase.DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'align',
+      anychart.enums.normalizeAlign);
+  return map;
+})();
+anychart.core.settings.populate(anychart.core.axisMarkers.TextBase, anychart.core.axisMarkers.TextBase.DESCRIPTORS);
+
+
+//endregion
+//region -- Gettings and setting chart.
 /**
  * Sets the chart axisMarkers belongs to.
  * @param {anychart.core.SeparateChart} chart Chart instance.
@@ -152,6 +143,41 @@ anychart.core.axisMarkers.TextBase.prototype.setChart = function(chart) {
  */
 anychart.core.axisMarkers.TextBase.prototype.getChart = function() {
   return this.chart_;
+};
+
+
+//endregion
+//region -- Scale.
+/**
+ * Getter/setter for auto scale.
+ * Works with instances of anychart.scales.Base only.
+ * @param {(anychart.scales.Base|anychart.ganttModule.Scale|Object|anychart.enums.ScaleTypes)=} opt_value - Scale.
+ * @return {anychart.scales.Base|anychart.ganttModule.Scale|!anychart.core.axisMarkers.TextBase} - Axis scale or
+ * itself for method chaining.
+ */
+anychart.core.axisMarkers.TextBase.prototype.autoScale = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var scType = opt_value && goog.isFunction(opt_value.getType) && opt_value.getType();
+    var ganttScale = scType == anychart.enums.ScaleTypes.GANTT;
+    var val = ganttScale ?
+        (opt_value == this.autoScale_ ? null : opt_value) :
+        anychart.scales.Base.setupScale(/** @type {anychart.scales.Base} */(this.autoScale_), opt_value, null, anychart.scales.Base.ScaleTypes.ALL_DEFAULT, null, this.scaleInvalidated, this);
+    if (val) {
+      var dispatch = this.autoScale_ == val;
+      this.autoScale_ = /** @type {anychart.scales.Base|anychart.ganttModule.Scale} */(val);
+      var scaleIsSet = this.scale_ || (this.axis_ && /** @type {?anychart.scales.Base} */ (this.axis_.scale()));
+      if (scaleIsSet) {
+        val.resumeSignalsDispatching(false);
+      } else if (!ganttScale)
+        val.resumeSignalsDispatching(dispatch);
+      if (!dispatch && !scaleIsSet)
+        this.invalidate(anychart.ConsistencyState.BOUNDS,
+            anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  } else {
+    return this.autoScale_;
+  }
 };
 
 
@@ -180,7 +206,7 @@ anychart.core.axisMarkers.TextBase.prototype.scaleInternal = function(opt_value)
     }
     return this;
   } else {
-    return this.scale_ || (this.axis_ && /** @type {?anychart.scales.Base} */ (this.axis_.scale())) || null;
+    return this.scale_ || (this.axis_ && /** @type {?anychart.scales.Base} */ (this.axis_.scale())) || this.autoScale_;
   }
 };
 
@@ -191,21 +217,22 @@ anychart.core.axisMarkers.TextBase.prototype.scaleInternal = function(opt_value)
  * @protected
  */
 anychart.core.axisMarkers.TextBase.prototype.scaleInvalidated = function(event) {
-  var signal = 0;
-  if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION))
-    signal |= anychart.Signal.NEEDS_RECALCULATION;
-  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION))
-    signal |= anychart.Signal.NEEDS_REDRAW;
+  if (event.target == this.scaleInternal()) {
+    var signal = 0;
+    if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION))
+      signal |= anychart.Signal.NEEDS_RECALCULATION;
+    if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION))
+      signal |= anychart.Signal.NEEDS_REDRAW;
 
-  signal |= anychart.Signal.BOUNDS_CHANGED;
+    signal |= anychart.Signal.BOUNDS_CHANGED;
 
-  this.invalidate(anychart.ConsistencyState.BOUNDS, signal);
+    this.invalidate(anychart.ConsistencyState.BOUNDS, signal);
+  }
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//  Axis.
-//----------------------------------------------------------------------------------------------------------------------
+//endregion
+//region -- Axis.
 /**
  * Axis invalidation handler.
  * @param {anychart.SignalEvent} event - Event object.
@@ -236,11 +263,11 @@ anychart.core.axisMarkers.TextBase.prototype.axis = function(opt_value) {
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//  Bounds.
-//----------------------------------------------------------------------------------------------------------------------
 /**
  * Axes lines space.
+ * TODO (A.Kudryavtsev): NOTE that this method is useless for text markers.
+ * TODO (A.Kudryavtsev): However I don't remove it to keep all markers internal API consistent
+ * TODO (A.Kudryavtsev): because ChartWithAxes doesn't differ marker types on draw.
  * @param {(string|number|anychart.core.utils.Space)=} opt_spaceOrTopOrTopAndBottom Space object or top or top and bottom
  *    space.
  * @param {(string|number)=} opt_rightOrRightAndLeft Right or right and left space.
@@ -263,18 +290,8 @@ anychart.core.axisMarkers.TextBase.prototype.axesLinesSpace = function(opt_space
 };
 
 
-/**
- * Whether marker is horizontal
- * @return {boolean} - If the marker is horizontal.
- */
-anychart.core.axisMarkers.TextBase.prototype.isHorizontal = function() {
-  return this.layout() == anychart.enums.Layout.HORIZONTAL;
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//  Layout.
-//----------------------------------------------------------------------------------------------------------------------
+//endregion
+//region -- Layout.
 /**
  * Get/set layout.
  * @param {anychart.enums.Layout=} opt_value - RangeMarker layout.
@@ -312,66 +329,138 @@ anychart.core.axisMarkers.TextBase.prototype.setDefaultLayout = function(value) 
 
 
 /**
- * Get/Set align.
- * @param {anychart.enums.Align=} opt_value TextMarker align.
- * @return {anychart.enums.Align|anychart.core.axisMarkers.TextBase} Align or this.
+ * Whether marker is horizontal
+ * @return {boolean} - If the marker is horizontal.
  */
-anychart.core.axisMarkers.TextBase.prototype.align = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var align = anychart.enums.normalizeAlign(opt_value);
-    if (this.align_ != align) {
-      this.align_ = align;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.align_;
-  }
+anychart.core.axisMarkers.TextBase.prototype.isHorizontal = function() {
+  return this.layout() == anychart.enums.Layout.HORIZONTAL;
+};
+
+
+//endregion
+//region -- Overridden API.
+/**
+ * Checks if marker is ready to be drawn.
+ * @return {boolean}
+ * @private
+ */
+anychart.core.axisMarkers.TextBase.prototype.isReady_ = function() {
+  return Boolean(goog.isDefAndNotNull(this.val) && this.scaleInternal());
 };
 
 
 /**
- * Get/set rotation in degrees.
- * If null is provided then rotation angle depends on layout: vertical = -90 degrees; horizontal = 0 degrees.
- * @param {?number=} opt_value rotation.
- * @return {null|number|anychart.core.axisMarkers.TextBase} Rotation or self for chaining.
+ * @inheritDoc
  */
-anychart.core.axisMarkers.TextBase.prototype.rotation = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.rotation_ != opt_value) {
-      this.rotation_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.rotation_;
+anychart.core.axisMarkers.TextBase.prototype.checkDrawingNeeded = function() {
+  var draw = anychart.core.axisMarkers.TextBase.base(this, 'checkDrawingNeeded') && this.isReady_();
+  if (!draw)
+    return draw;
+
+  var ratio = this.scale().transform(this.val, 0.5);
+  return (ratio >= 0 && ratio <= 1);
 };
 
 
 /**
- * Get/set text marker anchor settings.
- * @param {(anychart.enums.Anchor|string)=} opt_value Text marker anchor settings.
- * @return {anychart.core.axisMarkers.TextBase|anychart.enums.Anchor} Text marker anchor settings or itself for method chaining.
+ * @inheritDoc
  */
-anychart.core.axisMarkers.TextBase.prototype.anchor = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeAnchor(opt_value);
-    if (this.anchor_ != opt_value) {
-      this.anchor_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+anychart.core.axisMarkers.TextBase.prototype.getFinalRotation = function() {
+  var rot = this.getOption('rotation');
+  return /** @type {number} */ (goog.isDefAndNotNull(rot) && !isNaN(rot) ? rot : (this.isHorizontal() ? 0 : -90));
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.core.axisMarkers.TextBase.prototype.getPosition = function() {
+  var align = /** @type {anychart.enums.Align} */ (this.getOption('align'));
+  if (this.isHorizontal()) {
+    if (align == anychart.enums.Align.LEFT)
+      return anychart.enums.Position.LEFT_CENTER;
+    else if (align == anychart.enums.Align.RIGHT)
+      return anychart.enums.Position.RIGHT_CENTER;
+  } else {
+    if (align == anychart.enums.Align.TOP)
+      return anychart.enums.Position.CENTER_TOP;
+    else if (align == anychart.enums.Align.BOTTOM)
+      return anychart.enums.Position.CENTER_BOTTOM;
+  }
+  return anychart.enums.Position.CENTER;
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.core.axisMarkers.TextBase.prototype.getFinalAnchor = function() {
+  var anch = /** @type {?anychart.enums.Anchor} */(this.getOption('anchor'));
+  if (!anch || anch == anychart.enums.Anchor.AUTO) {
+    //here pos has only values CENTER, LEFT_CENTER, RIGHT_CENTER, CENTER_TOP, CENTER_BOTTOM.
+    var pos = this.getPosition();
+    switch (pos) {
+      case anychart.enums.Position.CENTER_TOP:
+      case anychart.enums.Position.RIGHT_CENTER:
+        anch = anychart.enums.Anchor.RIGHT_CENTER;
+        break;
+      case anychart.enums.Position.CENTER_BOTTOM:
+      case anychart.enums.Position.LEFT_CENTER:
+        anch = anychart.enums.Anchor.LEFT_CENTER;
+        break;
+      default:
+        anch = anychart.enums.Anchor.CENTER;
     }
+  }
+  return anch;
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.core.axisMarkers.TextBase.prototype.getLabelsParentBounds = function() {
+  return /** @type {anychart.math.Rect} */ (this.contBounds_);
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.core.axisMarkers.TextBase.prototype.parentBounds = function(opt_boundsOrLeft, opt_top, opt_width, opt_height) {
+  if (goog.isDef(opt_boundsOrLeft)) {
+    if (goog.isNull(opt_boundsOrLeft) || anychart.utils.instanceOf(opt_boundsOrLeft, anychart.math.Rect)) {
+      this.contBounds_ = /** @type {anychart.math.Rect} */ (opt_boundsOrLeft);
+    } else if (goog.typeOf(opt_boundsOrLeft) == 'object') {
+      this.contBounds_ = new anychart.math.Rect(opt_boundsOrLeft['left'], opt_boundsOrLeft['top'],
+          opt_boundsOrLeft['width'], opt_boundsOrLeft['height']);
+    } else {
+      this.contBounds_ = new anychart.math.Rect(/** @type {number} */ (opt_boundsOrLeft || 0), opt_top || 0, opt_width || 0, opt_height || 0);
+    }
+    this.invalidateParentBounds();
     return this;
   } else {
-    return this.anchor_;
+    if (this.isReady_() && this.contBounds_) {
+      //TODO (A.Kudryavtsev): Cache cloning result.
+      var clone = this.contBounds_.clone();
+      var ratio = this.scale().transform(this.val, 0.5);
+      if (this.isHorizontal()) {
+        clone.height = 0;
+        clone.top = Math.round(this.contBounds_.top + this.contBounds_.height - ratio * this.contBounds_.height);
+      } else {
+        clone.width = 0;
+        clone.left = Math.round(this.contBounds_.left + ratio * this.contBounds_.width);
+      }
+      return clone;
+    } else {
+      return null;
+    }
   }
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//  Settings.
-//----------------------------------------------------------------------------------------------------------------------
+//endregion
+//region -- Value.
 /**
  * Getter/setter for scale.
  * @param {*=} opt_value - Value to be set.
@@ -390,288 +479,14 @@ anychart.core.axisMarkers.TextBase.prototype.valueInternal = function(opt_value)
 };
 
 
-/**
- * Get/set offset x.
- * @param {(number|string)=} opt_newValue TextMarker value settings.
- * @return {number|string|anychart.core.axisMarkers.TextBase} TextMarker value settings or TextMarker instance for method chaining.
- */
-anychart.core.axisMarkers.TextBase.prototype.offsetX = function(opt_newValue) {
-  if (goog.isDef(opt_newValue)) {
-    if (this.offsetX_ != opt_newValue) {
-      this.offsetX_ = opt_newValue;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.offsetX_;
-  }
-};
-
-
-/**
- * Get/set offset y.
- * @param {(number|string)=} opt_newValue TextMarker value settings.
- * @return {number|string|anychart.core.axisMarkers.TextBase} TextMarker value settings or TextMarker instance for method chaining.
- */
-anychart.core.axisMarkers.TextBase.prototype.offsetY = function(opt_newValue) {
-  if (goog.isDef(opt_newValue)) {
-    if (this.offsetY_ != opt_newValue) {
-      this.offsetY_ = opt_newValue;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.offsetY_;
-  }
-};
-
-
-/**
- * Getter/setter for width.
- * @param {(number|string|null)=} opt_value .
- * @return {!anychart.core.axisMarkers.TextBase|number|string|null} .
- */
-anychart.core.axisMarkers.TextBase.prototype.width = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.width_ != opt_value) {
-      this.width_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.width_;
-};
-
-
-/**
- * Getter/setter for height.
- * @param {(number|string|null)=} opt_value .
- * @return {!anychart.core.axisMarkers.TextBase|number|string|null} .
- */
-anychart.core.axisMarkers.TextBase.prototype.height = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.height_ != opt_value) {
-      this.height_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.height_;
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//  Drawing.
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Drawing.
- * @return {anychart.core.axisMarkers.TextBase} An instance of {@link anychart.core.axisMarkers.Text} class for method chaining.
- */
-anychart.core.axisMarkers.TextBase.prototype.draw = function() {
-  if (!this.scale()) {
-    anychart.core.reporting.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
-    return this;
-  }
-
-  if (!this.checkDrawingNeeded())
-    return this;
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    this.applyTextSettings(this.markerElement(), true);
-    this.markConsistent(anychart.ConsistencyState.APPEARANCE);
-  }
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
-    var zIndex = /** @type {number} */(this.zIndex());
-    this.markerElement().zIndex(zIndex);
-    this.markConsistent(anychart.ConsistencyState.Z_INDEX);
-  }
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    var ratio = this.scale().transform(this.val, 0.5);
-    if (isNaN(ratio)) return this;
-
-    var textElement = this.markerElement();
-
-    if (ratio >= 0 && ratio <= 1) {
-      var shift = -.5;
-
-      var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
-      parentBounds = parentBounds.clone().round();
-      var anchor = /** @type {anychart.enums.Anchor} */(this.anchor());
-
-      textElement.setTransformationMatrix(1, 0, 0, 1, 0, 0);
-      textElement.width(null);
-      textElement.height(null);
-      textElement.x(0);
-      textElement.y(0);
-
-      var isWidthSet = !goog.isNull(this.width());
-      var isHeightSet = !goog.isNull(this.height());
-
-      var textElementBounds = textElement.getBounds();
-
-      var width = isWidthSet ?
-          Math.ceil(anychart.utils.normalizeSize(/** @type {number|string} */(this.width()), parentBounds.width)) :
-          textElementBounds.width;
-      if (isWidthSet) textElement.width(width);
-
-      textElementBounds = textElement.getBounds();
-
-      var height = isHeightSet ?
-          Math.ceil(anychart.utils.normalizeSize(/** @type {number|string} */(this.height()), parentBounds.height)) :
-          textElementBounds.height;
-      if (isHeightSet) textElement.height(height);
-
-      var position = /** @type {goog.math.Coordinate}*/(this.getTextPosition_(ratio, shift));
-
-      var angle = anychart.utils.toNumber(this.rotation_);
-      var rotation = isNaN(angle) ?
-          this.isHorizontal() ?
-              0 : -90 :
-          angle;
-
-      var transform = goog.math.AffineTransform.getRotateInstance(goog.math.toRadians(rotation), 0, 0);
-      var rotatedBounds = acgraph.math.getBoundsOfRectWithTransform(textElementBounds, transform);
-
-      var anchorCoordinate = anychart.utils.getCoordinateByAnchor(
-          anychart.math.rect(0, 0, rotatedBounds.width, rotatedBounds.height),
-          anchor);
-
-      position.x -= anchorCoordinate.x;
-      position.y -= anchorCoordinate.y;
-
-      var offsetX = anychart.utils.normalizeSize(/** @type {number|string} */(this.offsetX()), width);
-      var offsetY = anychart.utils.normalizeSize(/** @type {number|string} */(this.offsetY()), height);
-
-      anychart.utils.applyOffsetByAnchor(position, anchor, offsetX, offsetY);
-      this.applyTextSettings(textElement, true);
-
-      textElement
-          .x(position.x + rotatedBounds.width / 2 - width / 2)
-          .y(position.y + rotatedBounds.height / 2 - height / 2)
-          .setRotationByAnchor(rotation, acgraph.vector.Anchor.CENTER);
-
-      this.invalidate(anychart.ConsistencyState.CONTAINER);
-    } else {
-      this.remove();
-      this.markConsistent(anychart.ConsistencyState.CONTAINER);
-    }
-
-    this.markConsistent(anychart.ConsistencyState.BOUNDS);
-  }
-
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
-    var container = /** @type {acgraph.vector.ILayer} */(this.container());
-    this.markerElement().parent(container);
-    this.markConsistent(anychart.ConsistencyState.CONTAINER);
-  }
-
-  return this;
-};
-
-
-/**
- * Calculates text position using layout and align.
- * @param {number} ratio Scale ratio.
- * @param {number} shift Pixel shift.
- * @return {anychart.math.Coordinate} text position.
- * @private
- */
-anychart.core.axisMarkers.TextBase.prototype.getTextPosition_ = function(ratio, shift) {
-  var x, y;
-  var parentBounds = this.parentBounds();
-  parentBounds = parentBounds.clone().round();
-  if (this.isHorizontal()) {
-    y = Math.round(parentBounds.getTop() + parentBounds.height - (ratio * parentBounds.height));
-    ratio == 1 ? y -= shift : y += shift;
-    switch (this.align_) {
-      case anychart.enums.Align.LEFT:
-        x = parentBounds.getLeft();
-        break;
-      case anychart.enums.Align.RIGHT:
-        x = parentBounds.getRight();
-        break;
-      default: // TOP CENTER BOTTOM
-        x = parentBounds.getLeft() + parentBounds.width / 2;
-        break;
-    }
-  } else {
-    x = Math.round(parentBounds.getLeft() + ratio * parentBounds.width);
-    ratio == 1 ? x += shift : x -= shift;
-    switch (this.align_) {
-      case anychart.enums.Align.TOP:
-        y = parentBounds.getTop();
-        break;
-      case anychart.enums.Align.BOTTOM:
-        y = parentBounds.getBottom();
-        break;
-      default: // LEFT CENTER RIGHT
-        y = parentBounds.getTop() + parentBounds.height / 2;
-        break;
-    }
-  }
-  return new goog.math.Coordinate(x, y);
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//  Disabling & enabling.
-//----------------------------------------------------------------------------------------------------------------------
-/** @inheritDoc */
-anychart.core.axisMarkers.TextBase.prototype.remove = function() {
-  this.markerElement().parent(null);
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//  Elements creation.
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Create marker element.
- * @return {!acgraph.vector.Text} AxisMarker line element.
- * @protected
- */
-anychart.core.axisMarkers.TextBase.prototype.markerElement = function() {
-  if (!this.markerElement_) {
-    this.markerElement_ = acgraph.text();
-    this.markerElement_.attr('aria-hidden', 'true');
-    this.registerDisposable(this.markerElement_);
-  }
-  return this.markerElement_;
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//  Disposing.
-//----------------------------------------------------------------------------------------------------------------------
-/** @inheritDoc */
-anychart.core.axisMarkers.TextBase.prototype.disposeInternal = function() {
-  goog.dispose(this.markerElement_);
-  this.markerElement_ = null;
-  this.chart_ = null;
-  this.axis_ = null;
-  anychart.core.axisMarkers.TextBase.base(this, 'disposeInternal');
-};
-
-
+//endregion
+//region -- Serialize/Deserialize.
 /** @inheritDoc */
 anychart.core.axisMarkers.TextBase.prototype.serialize = function() {
   var json = anychart.core.axisMarkers.TextBase.base(this, 'serialize');
-  anychart.core.settings.serialize(this, anychart.core.Text.TEXT_DESCRIPTORS, json, 'Text Base');
-  json['anchor'] = this.anchor();
-  json['align'] = this.align();
+  anychart.core.settings.serialize(this, anychart.core.axisMarkers.TextBase.DESCRIPTORS, json, 'TextBase');
+
   if (this.layout_) json['layout'] = this.layout_;
-  json['rotation'] = this.rotation();
-  json['offsetX'] = this.offsetX();
-  json['offsetY'] = this.offsetY();
-  json['height'] = this.height();
-  json['width'] = this.width();
   return json;
 };
 
@@ -680,20 +495,9 @@ anychart.core.axisMarkers.TextBase.prototype.serialize = function() {
 anychart.core.axisMarkers.TextBase.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.axisMarkers.TextBase.base(this, 'setupByJSON', config, opt_default);
 
-  if (opt_default) {
-    anychart.core.settings.copy(this.themeSettings, anychart.core.Text.TEXT_DESCRIPTORS, config);
-  } else {
-    anychart.core.settings.deserialize(this, anychart.core.Text.TEXT_DESCRIPTORS, config);
-  }
+  anychart.core.settings.deserialize(this, anychart.core.axisMarkers.TextBase.DESCRIPTORS, config, opt_default);
 
-  this.anchor(config['anchor']);
-  this.align(config['align']);
   if ('layout' in config && config['layout']) this.layout(config['layout']);
-  this.rotation(config['rotation']);
-  this.offsetX(config['offsetX']);
-  this.offsetY(config['offsetY']);
-  this.height(config['height']);
-  this.width(config['width']);
 
   if ('axis' in config) {
     var ax = config['axis'];
@@ -706,3 +510,6 @@ anychart.core.axisMarkers.TextBase.prototype.setupByJSON = function(config, opt_
     }
   }
 };
+
+
+//endregion
