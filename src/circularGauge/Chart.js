@@ -214,6 +214,20 @@ anychart.circularGaugeModule.Chart.ZINDEX_POINTER = 40;
 anychart.circularGaugeModule.Chart.ZINDEX_MULTIPLIER = 0.0001;
 
 
+/** @inheritDoc */
+anychart.circularGaugeModule.Chart.prototype.calculateStatistics = function() {
+  anychart.circularGaugeModule.Chart.base(this, 'calculateStatistics');
+
+  var elementsStat = this.statistics(anychart.enums.Statistics.CHART_ELEMENTS) || {};
+  var axesCount = 0;
+  for (var i = this.axes_.length; i--;) {
+    if (this.axes_[i]) axesCount++;
+  }
+  elementsStat['axes'] = axesCount;
+  this.statistics(anychart.enums.Statistics.CHART_ELEMENTS, elementsStat);
+};
+
+
 /**
  * @inheritDoc
  */
