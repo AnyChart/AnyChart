@@ -55,15 +55,15 @@ CLOSURE_BUILDER_PATH = os.path.join(CLOSURE_BIN_PATH, 'build', 'closurebuilder.p
 
 # special files
 STAT_REPORT_OUT_PATH = os.path.join(OUT_PATH, 'size.stat.json')
-MODULES_CONFIG_PATH = os.path.join(PROJECT_PATH, 'bin', 'sources_modules.json')
+MODULES_CONFIG_PATH = os.path.join(PROJECT_PATH, 'bin', 'sources','modules.json')
 VERSION_INI_PATH = os.path.join(PROJECT_PATH, 'version.ini')
 ANYCHART_DEPS_PATH = os.path.join(SRC_PATH, 'deps.js')
 CLOSURE_DEPS_PATH = os.path.join(CLOSURE_SOURCE_PATH, 'deps.js')
 
-CHECKS_FLAGS = os.path.join(PROJECT_PATH, 'bin', 'sources_checks.flags')
-COMMON_FLAGS = os.path.join(PROJECT_PATH, 'bin', 'sources_common.flags')
-BINARIES_WRAPPER_START = os.path.join(PROJECT_PATH, 'bin', 'sources_binaries_wrapper_start.txt')
-BINARIES_WRAPPER_END = os.path.join(PROJECT_PATH, 'bin', 'sources_binaries_wrapper_end.txt')
+CHECKS_FLAGS = os.path.join(PROJECT_PATH, 'bin', 'sources','checks.flags')
+COMMON_FLAGS = os.path.join(PROJECT_PATH, 'bin', 'sources','common.flags')
+BINARIES_WRAPPER_START = os.path.join(PROJECT_PATH, 'bin', 'sources','binaries_wrapper_start.txt')
+BINARIES_WRAPPER_END = os.path.join(PROJECT_PATH, 'bin', 'sources','binaries_wrapper_end.txt')
 GIT_CONTRIBUTORS_URL = 'https://api.github.com/repos/anychart/anychart/contributors?anon=1%s'
 GIT_COMPARE_URL_TEMPLATE = 'https://api.github.com/repos/AnyChart/AnyChart/compare/master...%s%s'
 
@@ -776,8 +776,8 @@ def __get_bundle_wrapper(bundle_name, modules, file_name='', performance_monitor
         else "throw Error('anychart-base.min.js module should be included first. See modules explanation at https://docs.anychart.com/Quick_Start/Modules for details');"
 
     branch_name = __get_current_branch_name()
-    date_mask = '%Y-%m-%d' if branch_name == 'master' else '%Y-%m-%d %H:%M'
-    
+    date_mask = '%Y-%m-%d' #if branch_name == 'master' else '%Y-%m-%d %H:%M'
+
     start = start % (
         ', '.join(modules),
         __get_build_version(),
@@ -997,7 +997,7 @@ def __compile_css(*args, **kwargs):
                             ' * License: https://www.anychart.com/buy/',
                             ' * Contact: sales@anychart.com',
                             ' * Copyright: AnyChart.com %s. All rights reserved.',
-                            ' */']) % (time.strftime('%Y-%m-%d %H:%M'), time.strftime('%Y')) + '\n'
+                            ' */']) % (time.strftime('%Y-%m-%d'), time.strftime('%Y')) + '\n'
 
         # Less
         with open(css_out_path, 'w') as f:

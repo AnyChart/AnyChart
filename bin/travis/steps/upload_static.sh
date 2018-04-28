@@ -54,6 +54,24 @@ function upload_all_files(){
         cp /apps/static/cdn/releases/${VERSION}/js/modules.json /apps/static/cdn/releases/${VERSION}/index.json\" "
     echo
 
+
+    ####################################################################################################################
+    #
+    #  unzip files on server
+    #
+    ####################################################################################################################
+    if [ ${IS_RELEASE_BUILD} = "true" ]; then
+        echo Copy prod legacy files
+        Run "ssh -i ~/.ssh/id_rsa $STATIC_HOST_SSH_STRING \"
+        mkdir -p /apps/static/cdn/themes/${VERSION} &&
+        rm -rf /apps/static/cdn/themes/${VERSION} &&
+        cp -r /apps/static/cdn/releases/${VERSION}/themes /apps/static/cdn/themes/${VERSION} &&
+        mkdir -p /apps/static/cdn/schemas/${VERSION} &&
+        cp /apps/static/cdn/releases/${VERSION}/json-schema.json /apps/static/cdn/schemas/${VERSION}/json-schema.json &&
+        cp /apps/static/cdn/releases/${VERSION}/xml-schema.xsd /apps/static/cdn/schemas/${VERSION}/xml-schema.xsd \" "
+        echo
+    fi
+
     ####################################################################################################################
     #
     #  Create latest version for release
@@ -66,5 +84,14 @@ function upload_all_files(){
         cp -r /apps/static/cdn/releases/${VERSION} /apps/static/cdn/releases/v${MAJOR_VERSION} \" "
         echo
     fi
+
+    if [ ${IS_RC_BUILD} = "true" ]; then
+        echo Create RC version
+        Run "ssh -i ~/.ssh/id_rsa  $STATIC_HOST_SSH_STRING \"
+        rm -rf /apps/static/cdn/releases/rc &&
+        cp -r /apps/static/cdn/releases/${VERSION} /apps/static/cdn/releases/rc \" "
+        echo
+    fi
+
 
 }

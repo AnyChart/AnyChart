@@ -5,7 +5,7 @@
 # Include module with functions
 #
 ########################################################################################################################
-. ./bin/utils_mock.sh
+. ./bin/travis/utils/mock.sh
 
 ########################################################################################################################
 #
@@ -18,6 +18,7 @@
 COMMIT_HASH=$(git rev-parse --short HEAD)   # hash commit for Develop Version
 BUILD_VERSION=$(python build.py version)    # 3 digit version (for ex. 8.3.0)
 IS_RELEASE_BUILD=false                      # if Release make NPM, git tag, git realse etc
+IS_RC_BUILD=false                           # if it is a RC release
 IS_DEV_BUILD=false                          # build without geoData (drop CDN without latest)
 VERSION=''
 
@@ -46,6 +47,19 @@ if [ "${TRAVIS_BRANCH}" = "master" ] || [ ${DRY_RUN_RELEASE} ]; then
     ####  Be sure u wanna uncomment this
     #STEP_LEGACY_7x=true
 
+elif [[ "${TRAVIS_BRANCH}" =~ ^([0-9]+\.[0-9]+\.[0-9]+[-rc]+[0-9]+)$ ]]; then
+    # 8.3.0-rc0 it is RC build
+    VERSION=${TRAVIS_BRANCH}
+    IS_RC_BUILD=true
+
+    STEP_BUILD_DIST=false
+
+    STEP_EXPORT_SERVER=true
+    STEP_DOWNLOAD_EXTERNAL=true
+
+    STEP_NPM_RELEASE=false
+    STEP_GIT_RELEASE=false
+
 elif [[ "${TRAVIS_BRANCH}" =~ ^v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
     # v8.3.0 it is a tag. Drop build
     echo 'No build needed for TAG'
@@ -54,6 +68,9 @@ elif [[ "${TRAVIS_BRANCH}" =~ ^v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
 else
     VERSION=${TRAVIS_BRANCH}
     IS_DEV_BUILD=true
+
+    STEP_NPM_RELEASE=false
+    STEP_GIT_RELEASE=false
 fi
 INSTALL_PACKAGE_NAME=anychart-installation-package-${VERSION}.zip
 
@@ -64,6 +81,7 @@ echo Version: ${VERSION}
 echo Branch: ${TRAVIS_BRANCH}
 echo Commit Hash: ${COMMIT_HASH}
 echo Is release build: ${IS_RELEASE_BUILD}
+echo Is RC build: ${IS_RC_BUILD}
 echo Is develop build: ${IS_DEV_BUILD}
 echo '################################'
 echo
@@ -74,17 +92,17 @@ echo
 # Include Steps
 #
 ########################################################################################################################
-if [ "${STEP_BUILD_DIST}" = "true" ]; then . ./bin/step_build_dist.sh; fi
-if [ "${STEP_UPLOAD_STATIC}" = "true" ]; then . ./bin/step_upload_static.sh; fi
-if [ "${STEP_DROP_CDN}" = "true" ]; then . ./bin/step_drop_cdn.sh; fi
-if [ "${STEP_NPM_RELEASE}" = "true" ]; then . ./bin/step_npm_release.sh; fi
-if [ "${STEP_GIT_RELEASE}" = "true" ]; then . ./bin/step_git_release.sh; fi
-if [ "${STEP_EXPORT_SERVER}" = "true" ]; then . ./bin/step_export_server.sh; fi
-if [ "${STEP_DOWNLOAD_EXTERNAL}" = "true" ]; then . ./bin/step_download_external.sh; fi
-if [ "${STEP_LEGACY_7x}" = "true" ]; then . ./bin/step_legacy_binaries.sh; fi
+if [ "${STEP_BUILD_DIST}" = "true" ]; then . ./bin/travis/steps/build_dist.sh; fi
+if [ "${STEP_UPLOAD_STATIC}" = "true" ]; then . ./bin/travis/steps/upload_static.sh; fi
+if [ "${STEP_DROP_CDN}" = "true" ]; then . ./bin/travis/steps/drop_cdn.sh; fi
+if [ "${STEP_NPM_RELEASE}" = "true" ]; then . ./bin/travis/steps/npm_release.sh; fi
+if [ "${STEP_GIT_RELEASE}" = "true" ]; then . ./bin/travis/steps/git_release.sh; fi
+if [ "${STEP_EXPORT_SERVER}" = "true" ]; then . ./bin/travis/steps/export_server.sh; fi
+if [ "${STEP_DOWNLOAD_EXTERNAL}" = "true" ]; then . ./bin/travis/steps/download_external.sh; fi
+if [ "${STEP_LEGACY_7x}" = "true" ]; then . ./bin/travis/steps/legacy_binaries.sh; fi
 
 
-if [ ${IS_RELEASE_BUILD} = "true" ]; then
+if [ ${IS_RELEASE_BUILD} = "true" ] || [ ${IS_RC_BUILD} = "true" ]; then
     echo "--"
     echo Fetching release build variables
     echo "--"
@@ -92,6 +110,7 @@ if [ ${IS_RELEASE_BUILD} = "true" ]; then
     ALL_VERSIONS_IS_SET=$(python build.py version -v)
     if [ "${ALL_VERSIONS_IS_SET}" != "Ok" ]; then
         echo "Wrong version set in one of the project files, check them all!"
+        echo ${ALL_VERSIONS_IS_SET}
         exit 1
     fi
 
@@ -113,7 +132,7 @@ build_dist
 
 
 
-if [ ${IS_RELEASE_BUILD} = "true" ]; then
+if [ ${IS_RELEASE_BUILD} = "true" ] || [ ${IS_RC_BUILD} = "true" ]; then
     ####################################################################################################################
     #
     #  Check dist files (if its actual)
@@ -149,7 +168,7 @@ fi
 #  Clear all big files/data for non release branch
 #
 ########################################################################################################################
-if [ ${IS_DEV_BUILD} = "true" ]; then
+if [ ${IS_DEV_BUILD} = "true" ] || [ ${IS_RC_BUILD} = "true" ]; then
     echo "--"
     echo Removeing geodata
     echo "--"
@@ -160,7 +179,7 @@ fi
 
 ########################################################################################################################
 #
-# Build all binaries (JS/CSS/Themes etc for ACDVF & Graphics)
+# Upload all binaries (JS/CSS/Themes etc for ACDVF & Graphics) on static
 #
 ########################################################################################################################
 upload_all_files
@@ -179,7 +198,7 @@ drop_cdn_cache
 #  MAKE RELEASES
 #
 ########################################################################################################################
-if [ ${IS_RELEASE_BUILD} = "true" ]; then
+if [ ${IS_RELEASE_BUILD} = "true" ] || [ ${IS_RC_BUILD} = "true" ]; then
 
     ####################################################################################################################
     #

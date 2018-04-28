@@ -12,7 +12,7 @@ function git_release(){
     echo Publishing GIT release
     echo "--"
 
-    Run "python ./bin/utils_upload_github_release.py ${GITHUB_TOKEN}"
+    Run "python ./bin/travis/utils/upload_github_release.py ${GITHUB_TOKEN}"
     echo
 }
 

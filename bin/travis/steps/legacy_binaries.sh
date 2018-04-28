@@ -53,12 +53,7 @@ function legacy_7x_magic(){
         rm -rf /apps/static/cdn/js/${VERSION} &&
         cp -r /apps/static/cdn/releases/${VERSION}/js /apps/static/cdn/js/${VERSION} &&
         rm -rf /apps/static/cdn/css/${VERSION} &&
-        cp -r /apps/static/cdn/releases/${VERSION}/css /apps/static/cdn/css/${VERSION} &&
-        rm -rf /apps/static/cdn/themes/${VERSION} &&
-        cp -r /apps/static/cdn/releases/${VERSION}/themes /apps/static/cdn/themes/${VERSION} &&
-        mkdir -p /apps/static/cdn/schemas/${VERSION} &&
-        cp /apps/static/cdn/releases/${VERSION}/json-schema.json /apps/static/cdn/schemas/${VERSION}/json-schema.json &&
-        cp /apps/static/cdn/releases/${VERSION}/xml-schema.xsd /apps/static/cdn/schemas/${VERSION}/xml-schema.xsd \" "
+        cp -r /apps/static/cdn/releases/${VERSION}/css /apps/static/cdn/css/${VERSION} \" "
         echo
     fi
 

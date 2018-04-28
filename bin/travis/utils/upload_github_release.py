@@ -66,14 +66,14 @@ if __name__ == "__main__":
     version = get_version()
     tag_name = 'v%s' % version
 
-    #print 'Creating github release %s' % tag_name
-    #release = create_github_release(version, tag_name)
+    print 'Creating github release %s' % tag_name
+    release = create_github_release(version, tag_name)
 
-    #print 'Uploading release files %s' % tag_name
-    #upload_release_binary(
-    #    release,
-    #    'anychart-installation-package-%s.zip' % version,
-    #    os.path.join(PROJECT_PATH, 'dist', 'anychart-installation-package-%s.zip' % version)
-    #)
+    print 'Uploading release files %s' % tag_name
+    upload_release_binary(
+        release,
+        'anychart-installation-package-%s.zip' % version,
+        os.path.join(PROJECT_PATH, 'dist', 'anychart-installation-package-%s.zip' % version)
+    )
 
     print 'Successfully release %s' % tag_name
