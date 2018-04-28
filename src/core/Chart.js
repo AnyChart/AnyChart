@@ -723,10 +723,17 @@ anychart.core.Chart.prototype.calculate = goog.nullFunction;
 
 
 /**
+ * Calculates all statistics for the chart.
+ */
+anychart.core.Chart.prototype.calculateStatistics = goog.nullFunction;
+
+
+/**
  * Ensures that statistics is ready.
  */
 anychart.core.Chart.prototype.ensureStatisticsReady = function() {
   this.calculate();
+  this.calculateStatistics();
 };
 
 

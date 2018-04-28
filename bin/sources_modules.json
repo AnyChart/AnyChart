@@ -31,13 +31,6 @@
         "cartesian"
       ]
     },
-    "chart-editor": {
-      "entry": "anychart.chartEditorModule.entry",
-      "deps": [
-        "core",
-        "ui"
-      ]
-    },
     "circular-gauge": {
       "entry": "anychart.circularGaugeModule.entry",
       "deps": [
@@ -496,16 +489,6 @@
       "parts": [
         "annotations",
         "theme-annotations"
-      ]
-    },
-    "anychart-chart-editor": {
-      "type": "feature",
-      "name": "Chart Editor",
-      "desc": "AnyChart chart editor module.",
-      "docs": "",
-      "icon": "/_design/img/upload/charts/types/area-chart.svg",
-      "parts": [
-        "chart-editor"
       ]
     },
     "anychart-data-adapter": {

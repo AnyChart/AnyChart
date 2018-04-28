@@ -367,6 +367,7 @@ anychart.colorScalesModule.Linear.prototype.setupByJSON = function(config, opt_d
 (function() {
   var proto = anychart.colorScalesModule.Linear.prototype;
   goog.exportSymbol('anychart.scales.linearColor', anychart.scales.linearColor);
+  proto['getType'] = proto.getType;
   proto['colors'] = proto.colors;
   proto['valueToColor'] = proto.valueToColor;
   proto['colorToValue'] = proto.colorToValue;
