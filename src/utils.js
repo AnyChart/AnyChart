@@ -72,6 +72,27 @@ anychart.utils.extractSettings = function(settingsArray, opt_callProp) {
 
 
 /**
+ * Returns new instance of constructor function with unknown parameters. Generic version of "new" operator.
+ * @param {Function} ctor .
+ * @param {...*} var_args .
+ * @return {*}
+ */
+anychart.utils.construct = function(ctor, var_args) {
+  var args = Array.prototype.slice.call(arguments, 1);
+
+  /**
+   * @return {*}
+   * @constructor
+   */
+  var F = function() {
+    return ctor.apply(this, args);
+  };
+  F.prototype = ctor.prototype;
+  return new F();
+};
+
+
+/**
  * Extracting settings modes.
  * @enum {number}
  */
