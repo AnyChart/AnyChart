@@ -348,6 +348,11 @@ def __xml_schema_xmlns_version(value=None, rc=False):
 
 
 def __definition_file_version(value=None, rc=False):
+    if rc:
+        f = open(os.path.join(PROJECT_PATH, 'dist', 'index.d.ts'), 'r+')
+        text = f.read()
+        f.write(text.replace('Library, vdevelop','Library, v0.0.0'))
+        f.close()
     return __version_by_pattern(
         'Type definitions for AnyChart JavaScript Charting Library, v%s',
         os.path.join(PROJECT_PATH, 'dist', 'index.d.ts'),
