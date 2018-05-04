@@ -287,7 +287,7 @@ def __get_build_version():
     return '%s.%s' % (__get_version(), commits_count)
 
 
-def __version_by_pattern(pattern, path, value=None):
+def __version_by_pattern(pattern, path, value=None, rc=None):
     f = open(path, 'r')
     text = f.read()
     f.close()
@@ -297,69 +297,82 @@ def __version_by_pattern(pattern, path, value=None):
             f = open(path, 'w')
             f.write(text)
             f.close()
-            return re.search(pattern % '([0-9]+\.[0-9]+\.[0-9]+)', text, re.IGNORECASE).group(1)
+            if rc:
+                return re.search(pattern % '([0-9]+\.[0-9]+\.[0-9]+(-rc)[0-9]+)', text, re.IGNORECASE).group(1)
+            else:
+                return re.search(pattern % '([0-9]+\.[0-9]+\.[0-9]+)', text, re.IGNORECASE).group(1)
         else:
-            return re.search(pattern % '([0-9]+\.[0-9]+\.[0-9]+)', text, re.IGNORECASE).group(1)
-    except:
+            if rc:
+                return re.search(pattern % '([0-9]+\.[0-9]+\.[0-9]+(\-rc)[0-9]+)', text, re.IGNORECASE).group(1)
+            else:
+                return re.search(pattern % '([0-9]+\.[0-9]+\.[0-9]+)', text, re.IGNORECASE).group(1)
+    except (StandardError, KeyboardInterrupt):
+        print traceback.format_exc()
         print "No version found in %s" % path
 
 
-def __package_json_version(value=None):
+def __package_json_version(value=None, rc=False):
     return __version_by_pattern(
         '"version": "%s"',
         os.path.join(PROJECT_PATH, 'package.json'),
-        value
+        value,
+        rc
     )
 
 
-def __json_schema_version(value=None):
+def __json_schema_version(value=None, rc=False):
     return __version_by_pattern(
         '"description": "AnyChart JSON Schema, version %s"',
         os.path.join(PROJECT_PATH, 'dist', 'json-schema.json'),
-        value
+        value,
+        rc
     )
 
 
-def __xml_schema_target_namespace_version(value=None):
+def __xml_schema_target_namespace_version(value=None, rc=False):
     return __version_by_pattern(
         'targetNamespace="http://anychart.com/schemas/%s/xml-schema.xsd"',
         os.path.join(PROJECT_PATH, 'dist', 'xml-schema.xsd'),
-        value
+        value,
+        rc
     )
 
 
-def __xml_schema_xmlns_version(value=None):
+def __xml_schema_xmlns_version(value=None, rc=False):
     return __version_by_pattern(
         'xmlns="http://anychart.com/schemas/%s/xml-schema.xsd"',
         os.path.join(PROJECT_PATH, 'dist', 'xml-schema.xsd'),
-        value
+        value,
+        rc
     )
 
 
-def __definition_file_version(value=None):
+def __definition_file_version(value=None, rc=False):
     return __version_by_pattern(
         'Type definitions for AnyChart JavaScript Charting Library, v%s',
         os.path.join(PROJECT_PATH, 'dist', 'index.d.ts'),
-        value
+        value,
+        rc
     )
 
 
-def __json_2_xml_version(value=None):
+def __json_2_xml_version(value=None, rc=False):
     return __version_by_pattern(
         "'xmlns', 'http://anychart.com/schemas/%s/xml-schema.xsd'",
         os.path.join(PROJECT_PATH, 'src', 'utils.js'),
-        value
+        value,
+        rc
     )
 
 
-def __all_files_versions(value=None):
+def __all_files_versions(value=None, rc=False):
     return {
-        "json2xml": __json_2_xml_version(value),
-        "xml-schema-target": __xml_schema_target_namespace_version(value),
-        "xml-schema-xmlns": __xml_schema_xmlns_version(value),
-        "json-schema": __json_schema_version(value),
-        "definition-file": __definition_file_version(value),
-        "package-json": __package_json_version(value),
+        "json2xml": __json_2_xml_version(value, rc),
+        "xml-schema-target": __xml_schema_target_namespace_version(value, rc),
+        "xml-schema-xmlns": __xml_schema_xmlns_version(value, rc),
+        "json-schema": __json_schema_version(value, rc),
+        "definition-file": __definition_file_version(value, rc),
+        "package-json": __package_json_version(value, rc),
         "project-(version-ini)": __project_version(value)
     }
 
@@ -382,6 +395,12 @@ def __project_version(value=None):
         return __get_version()
 
 
+def __is_rc_version(value):
+    try:
+        return re.search('([0-9]+\.[0-9]+\.[0-9]+(-rc)[0-9]+)', value, re.IGNORECASE).group(1)
+    except:
+        return False
+
 def __print_version(*args, **kwargs):
     if kwargs['commits_count']:
         print __get_build_version()
@@ -389,12 +408,12 @@ def __print_version(*args, **kwargs):
         print __get_version().split('.')[0]
     elif kwargs['verify']:
         version = __get_version()
-        m = __all_files_versions()
+        m = __all_files_versions(None, __is_rc_version(version))
         res = all(x == version for x in m.values())
         print "Ok" if res else "Fail\n " + json.dumps(m)
     elif kwargs['set']:
         print kwargs['set']
-        m = __all_files_versions(kwargs['set'])
+        m = __all_files_versions(kwargs['set'], __is_rc_version(kwargs['set']))
         res = all(x == kwargs['set'] for x in m.values())
         print "Ok" if res else "Fail\n " + json.dumps(m)
     else:

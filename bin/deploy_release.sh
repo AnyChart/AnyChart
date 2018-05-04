@@ -127,6 +127,15 @@ echo
 echo " -- Change version in files"
 run "./build.py version -s ${VERSION}"
 
+ALL_VERSIONS_IS_SET=$(python build.py version -v)
+if [ ${IS_RC} = "true" ]; then ALL_VERSIONS_IS_SET=$(python build.py version -v); fi
+
+if [ "${ALL_VERSIONS_IS_SET}" != "Ok" ]; then
+    echo "Wrong version set in one of the project files, check them all!"
+    echo ${ALL_VERSIONS_IS_SET}
+    exit 1
+fi
+
 ########################################################################################################################
 #
 #  Build binaries
@@ -139,7 +148,7 @@ run "sh ./bin/build_all_binaries.sh"
 
 
 
-if [ ${IS_RC} == "true" ]; then
+if [ ${IS_RC} = "true" ]; then
     ####################################################################################################################
     #
     #  Make RC release
