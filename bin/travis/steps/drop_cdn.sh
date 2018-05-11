@@ -22,7 +22,7 @@ function drop_cdn_cache(){
             Run "python ./bin/travis/utils/drop_cdn_cache.py ${VERSION} ${CDN_ALIASE} ${CDN_CONSUMER_KEY} ${CDN_CONSUMER_SECRET} ${CDN_ZONE_ID}"
             Run "python ./bin/travis/utils/drop_cdn_cache.py rc ${CDN_ALIASE} ${CDN_CONSUMER_KEY} ${CDN_CONSUMER_SECRET} ${CDN_ZONE_ID}"
         else
-            echo "drop cache for /releases/develop/*"
+            echo "drop cache for /releases/${TRAVIS_BRANCH}/*"
             Run "python ./bin/travis/utils/drop_cdn_cache.py ${TRAVIS_BRANCH} ${CDN_ALIASE} ${CDN_CONSUMER_KEY} ${CDN_CONSUMER_SECRET} ${CDN_ZONE_ID}"
         fi
     fi
