@@ -1373,6 +1373,7 @@ anychart.circularGaugeModule.Chart.prototype.drawContent = function(bounds) {
       axis.scale().finishAutoCalc();
     });
 
+    this.invalidatePointerBounds();
     this.invalidate(anychart.ConsistencyState.GAUGE_AXES);
     this.invalidate(anychart.ConsistencyState.GAUGE_AXIS_MARKERS);
     this.markConsistent(anychart.ConsistencyState.GAUGE_SCALE);
@@ -1393,10 +1394,7 @@ anychart.circularGaugeModule.Chart.prototype.drawContent = function(bounds) {
       if (axis) axis.invalidate(anychart.ConsistencyState.BOUNDS);
     }
 
-    for (i = 0, len = pointers.length; i < len; i++) {
-      pointer = pointers[i];
-      if (pointer) pointer.invalidate(anychart.ConsistencyState.BOUNDS);
-    }
+    this.invalidatePointerBounds();
 
     for (i = 0, len = this.ranges_.length; i < len; i++) {
       range = this.ranges_[i];
