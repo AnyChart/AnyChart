@@ -1,5 +1,6 @@
 goog.provide('anychart.scales.DateTimeTicks');
 goog.require('anychart.core.Base');
+goog.require('anychart.format');
 goog.require('goog.array');
 goog.require('goog.date.Interval');
 goog.require('goog.date.UtcDateTime');
@@ -605,8 +606,13 @@ anychart.scales.DateTimeTicks.prototype.calculateIntervals_ = function(min, max,
 /** @inheritDoc */
 anychart.scales.DateTimeTicks.prototype.serialize = function() {
   var json = anychart.scales.DateTimeTicks.base(this, 'serialize');
-  if (this.explicit_)
-    json['explicit'] = this.explicit_;
+  if (this.explicit_) {
+    var ticks = [];
+    for (var i = 0; i < this.explicit_.length; i++) {
+      ticks.push(this.explicit_[i].getTime());
+    }
+    json['explicit'] = ticks;
+  }
   else if (this.interval_)
     json['interval'] = this.interval_.toIsoString();
   else if (!isNaN(this.count_))
@@ -629,7 +635,10 @@ anychart.scales.DateTimeTicks.prototype.setupSpecial = function(isDefault, var_a
 /** @inheritDoc */
 anychart.scales.DateTimeTicks.prototype.setupByJSON = function(config, opt_default) {
   anychart.scales.DateTimeTicks.base(this, 'setupByJSON', config, opt_default);
-  this.explicit_ = config['explicit'] || null;
+  if (goog.isArray(config['explicit']))
+    this.set(config['explicit']);
+  else
+    this.explicit_ = null;
   this.count_ = Math.max(2, Math.ceil(anychart.utils.toNumber(config['count'])));
   this.interval_ = goog.isString(config['interval']) ? goog.date.Interval.fromIsoString(config['interval']) : null;
   this.autoTicks_ = null;
