@@ -102,6 +102,14 @@ anychart.circularGaugeModule.pointers.Base.prototype.isDiscreteBased = function(
 
 
 /**
+ *
+ * @type {?anychart.data.Iterator}
+ * @private
+ */
+anychart.circularGaugeModule.pointers.Base.prototype.iterator_;
+
+
+/**
  * Interface tester.
  * @return {boolean}
  */
@@ -377,6 +385,7 @@ anychart.circularGaugeModule.pointers.Base.prototype.data = function(opt_value, 
     if (this.rawData !== opt_value) {
       this.rawData = opt_value;
       goog.dispose(this.parentViewToDispose); // disposing a view created by the series if any;
+      this.iterator_ = null; // reset iterator
       if (anychart.utils.instanceOf(opt_value, anychart.data.View))
         this.ownData = this.parentViewToDispose = opt_value.derive(); // deriving a view to avoid interference with other view users
       else if (anychart.utils.instanceOf(opt_value, anychart.data.Set))
@@ -384,8 +393,10 @@ anychart.circularGaugeModule.pointers.Base.prototype.data = function(opt_value, 
       else
         this.ownData = !goog.isNull(opt_value) ? (this.parentViewToDispose = new anychart.data.Set(
             (goog.isArray(opt_value) || goog.isString(opt_value)) ? opt_value : null, opt_csvSettings)).mapAs() : null;
-      if (this.ownData)
+      if (this.ownData) {
         this.ownData.listenSignals(this.dataInvalidated_, this);
+      }
+
       this.invalidate(anychart.ConsistencyState.BOUNDS,
           anychart.Signal.NEEDS_REDRAW |
           anychart.Signal.NEEDS_RECALCULATION

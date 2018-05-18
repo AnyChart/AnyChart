@@ -153,7 +153,7 @@ anychart.circularGaugeModule.Chart.prototype.rawData_;
 
 /**
  *
- * @type {!anychart.data.Iterator}
+ * @type {?anychart.data.Iterator}
  * @private
  */
 anychart.circularGaugeModule.Chart.prototype.iterator_;
@@ -322,6 +322,7 @@ anychart.circularGaugeModule.Chart.prototype.data = function(opt_value, opt_csvS
     if (this.rawData_ !== opt_value) {
       this.rawData_ = opt_value;
       goog.dispose(this.parentViewToDispose_); // disposing a view created by the series if any;
+      this.iterator_ = null; // reset iterator
       if (anychart.utils.instanceOf(opt_value, anychart.data.View))
         this.parentView_ = this.parentViewToDispose_ = opt_value.derive(); // deriving a view to avoid interference with other view users
       else if (anychart.utils.instanceOf(opt_value, anychart.data.Set))

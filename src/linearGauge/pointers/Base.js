@@ -99,7 +99,8 @@ anychart.core.settings.populateAliases(anychart.linearGaugeModule.pointers.Base,
  */
 anychart.linearGaugeModule.pointers.Base.prototype.SUPPORTED_SIGNALS =
     anychart.core.VisualBase.prototype.SUPPORTED_SIGNALS |
-    anychart.Signal.NEED_UPDATE_LEGEND;
+    anychart.Signal.NEED_UPDATE_LEGEND |
+    anychart.Signal.NEEDS_RECALCULATION;
 
 
 /**
@@ -114,6 +115,24 @@ anychart.linearGaugeModule.pointers.Base.prototype.SUPPORTED_CONSISTENCY_STATES 
 
 //endregion
 //region --- PROPERTIES ---
+/**
+ * Link to incoming raw data.
+ * Used to avoid data reapplication on same data sets.
+ * NOTE: If is disposable entity, should be disposed from the source, not from this class.
+ * @type {?(anychart.data.View|anychart.data.Set|Array|string)}
+ * @private
+ */
+anychart.linearGaugeModule.pointers.Base.prototype.rawData_;
+
+
+/**
+ *
+ * @type {?anychart.data.Iterator}
+ * @private
+ */
+anychart.linearGaugeModule.pointers.Base.prototype.iterator_;
+
+
 /**
  * Default hatch fill type.
  * @type {acgraph.vector.HatchFill.HatchFillType|string}
@@ -131,9 +150,10 @@ anychart.linearGaugeModule.pointers.Base.DEFAULT_HATCH_FILL_TYPE = acgraph.vecto
  */
 anychart.linearGaugeModule.pointers.Base.prototype.data = function(opt_value, opt_csvSettings) {
   if (goog.isDef(opt_value)) {
-    if (this.rawData !== opt_value) {
-      this.rawData = opt_value;
+    if (this.rawData_ !== opt_value) {
+      this.rawData_ = opt_value;
       goog.dispose(this.parentViewToDispose); // disposing a view created by the series if any;
+      this.iterator_ = null; // reset iterator
       if (anychart.utils.instanceOf(opt_value, anychart.data.View))
         this.ownData = this.parentViewToDispose = opt_value.derive(); // deriving a view to avoid interference with other view users
       else if (anychart.utils.instanceOf(opt_value, anychart.data.Set))
@@ -141,9 +161,13 @@ anychart.linearGaugeModule.pointers.Base.prototype.data = function(opt_value, op
       else
         this.ownData = !goog.isNull(opt_value) ? (this.parentViewToDispose = new anychart.data.Set(
             (goog.isArray(opt_value) || goog.isString(opt_value)) ? opt_value : null, opt_csvSettings)).mapAs() : null;
-      if (this.ownData)
+      if (this.ownData) {
         this.ownData.listenSignals(this.dataInvalidated_, this);
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+      }
+
+      //GAUGE_COLOR_SCALE invalidated for Led to redraw correctly
+      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.GAUGE_COLOR_SCALE,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEEDS_RECALCULATION);
     }
     return this;
   }
