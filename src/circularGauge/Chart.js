@@ -524,7 +524,8 @@ anychart.circularGaugeModule.Chart.prototype.createPointerByType_ = function(typ
 
     var count = isKnob ? this.knobCounter_++ : this.pointerCounter_++;
 
-    var pointerZIndex = anychart.circularGaugeModule.Chart.ZINDEX_POINTER + anychart.circularGaugeModule.Chart.ZINDEX_MULTIPLIER * count;
+    var pointerZIndex = isKnob ? anychart.circularGaugeModule.Chart.ZINDEX_KNOB : anychart.circularGaugeModule.Chart.ZINDEX_POINTER;
+    pointerZIndex += anychart.circularGaugeModule.Chart.ZINDEX_MULTIPLIER * count;
 
     instance.autoIndex(index);
     instance.autoDataIndex(count);
@@ -652,6 +653,8 @@ anychart.circularGaugeModule.Chart.prototype.removeAllPointers = function() {
     this.knobs_ = [];
     this.markers_ = [];
     this.needles_ = [];
+    this.pointerCounter_ = 0;
+    this.knobCounter_ = 0;
     goog.disposeAll(pointers);
     this.invalidate(anychart.ConsistencyState.GAUGE_POINTERS |
         anychart.ConsistencyState.GAUGE_SCALE,
