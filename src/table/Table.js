@@ -2496,7 +2496,7 @@ anychart.tableModule.Table.prototype.saveAsXlsx = function(opt_filename) {
       'columnsSeparator': ',',
       'ignoreFirstRow': false
     });
-    exports['saveAsXlsx'](csv, opt_filename);
+    exports.saveAsXlsx(this, csv, opt_filename);
   } else {
     anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Exporting']);
   }
@@ -2512,7 +2512,7 @@ anychart.tableModule.Table.prototype.saveAsCsv = function(opt_csvSettings, opt_f
   var exports = anychart.window['anychart']['exports'];
   if (exports) {
     var csv = this.toCsv(opt_csvSettings);
-    exports['saveAsCsv'](csv, opt_filename);
+    exports.saveAsCsv(this, csv, opt_filename);
   } else {
     anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Exporting']);
   }
