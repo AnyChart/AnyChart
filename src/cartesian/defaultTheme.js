@@ -44,7 +44,8 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       'anchor': 'left-center'
     },
     'xScroller': {
-      'orientation': 'left'
+      'orientation': 'left',
+      'inverted': true
     }
   },
   'column': {
@@ -146,7 +147,8 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       'hoverMode': 'by-x'
     },
     'xScroller': {
-      'orientation': 'left'
+      'orientation': 'left',
+      'inverted': true
     }
   },
   'verticalArea': {
@@ -174,7 +176,8 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       'hoverMode': 'by-x'
     },
     'xScroller': {
-      'orientation': 'left'
+      'orientation': 'left',
+      'inverted': true
     }
   }
 });

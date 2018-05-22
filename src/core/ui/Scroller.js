@@ -770,7 +770,7 @@ anychart.core.ui.Scroller.prototype.drawLeft_ = function() {
   var bounds = this.pixelBoundsCache;
   var startRatio = this.startRatio_;
   var endRatio = this.endRatio_;
-  if (this.inverted_) {
+  if (!this.inverted_) {
     startRatio = anychart.core.ui.Scroller.MAX_RATIO - startRatio;
     endRatio = anychart.core.ui.Scroller.MAX_RATIO - endRatio;
   }
@@ -1393,10 +1393,8 @@ anychart.core.ui.Scroller.prototype.moveHandleTo_ = function(handle, position) {
   var ratio;
   switch (this.orientation_) {
     case anychart.enums.Orientation.RIGHT:
-      ratio = (bounds.top + bounds.height - position) / bounds.height;
-      break;
     case anychart.enums.Orientation.LEFT:
-      ratio = (position - bounds.top) / bounds.height;
+      ratio = (bounds.top + bounds.height - position) / bounds.height;
       break;
     case anychart.enums.Orientation.TOP:
     case anychart.enums.Orientation.BOTTOM:
@@ -1497,9 +1495,7 @@ anychart.core.ui.Scroller.prototype.getCurrentPosition_ = function(handle) {
   var bounds = this.pixelBoundsCache;
   if (this.isHorizontal())
     return bounds.left + bounds.width * ratio;
-  else if (this.orientation_ == anychart.enums.Orientation.LEFT)
-    return bounds.top + bounds.height * ratio;
-  else
+  else // vertical scroller
     return bounds.top + bounds.height * (1 - ratio);
 };
 
