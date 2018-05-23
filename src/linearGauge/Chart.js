@@ -1220,19 +1220,21 @@ anychart.linearGaugeModule.Chart.prototype.serialize = function() {
   var axes = [];
   for (i = 0; i < this.axes_.length; i++) {
     var axis = this.axes_[i];
-    config = axis.serialize();
-    scale = axis.scale();
-    if (scale) {
-      uid = goog.getUid(scale);
-      if (!scalesIds[uid]) {
-        scalesIds[uid] = scale.serialize();
-        scales.push(scalesIds[uid]);
-        config['scale'] = scales.length - 1;
-      } else {
-        config['scale'] = goog.array.indexOf(scales, scalesIds[uid]);
+    if (axis) {
+      config = axis.serialize();
+      scale = axis.scale();
+      if (scale) {
+        uid = goog.getUid(scale);
+        if (!scalesIds[uid]) {
+          scalesIds[uid] = scale.serialize();
+          scales.push(scalesIds[uid]);
+          config['scale'] = scales.length - 1;
+        } else {
+          config['scale'] = goog.array.indexOf(scales, scalesIds[uid]);
+        }
       }
+      axes.push(config);
     }
-    axes.push(config);
   }
   if (axes.length)
     json['axes'] = axes;

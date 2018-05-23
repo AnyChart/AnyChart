@@ -420,28 +420,28 @@ anychart.scales.Base.constructorsMap_;
  * @return {?anychart.scales.Base}
  */
 anychart.scales.Base.createOfType = function(type, defaultType) {
- if (!anychart.scales.Base.constructorsMap_) {
-   anychart.scales.Base.constructorsMap_ = {};
-   anychart.scales.Base.constructorsMap_[anychart.scales.Base.ScaleTypes.LINEAR] = anychart.scales.linear;
-   anychart.scales.Base.constructorsMap_[anychart.scales.Base.ScaleTypes.LOG] = anychart.scales.log;
-   anychart.scales.Base.constructorsMap_[anychart.scales.Base.ScaleTypes.DATE_TIME] = anychart.scales.dateTime;
-   anychart.scales.Base.constructorsMap_[anychart.scales.Base.ScaleTypes.ORDINAL] = anychart.scales.ordinal;
-   anychart.scales.Base.constructorsMap_[anychart.scales.Base.ScaleTypes.LINEAR_COLOR] = function() {
-     var cls;
-     return (cls = anychart.window['anychart']['scales']['linearColor']) ?
-         cls() :
-         anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Color scales']);
-   };
-   anychart.scales.Base.constructorsMap_[anychart.scales.Base.ScaleTypes.ORDINAL_COLOR] = function() {
-     var cls;
-     return (cls = anychart.window['anychart']['scales']['ordinalColor']) ?
-         cls() :
-         anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Color scales']);
-   };
- }
- var cls = anychart.scales.Base.constructorsMap_[type] || anychart.scales.Base.constructorsMap_[defaultType] || null;
- // cls can return undefined
- return /** @type {?anychart.scales.Base} */(cls && cls() || null);
+  if (!anychart.scales.Base.constructorsMap_) {
+    anychart.scales.Base.constructorsMap_ = {};
+    anychart.scales.Base.constructorsMap_[anychart.scales.Base.ScaleTypes.LINEAR] = anychart.scales.linear;
+    anychart.scales.Base.constructorsMap_[anychart.scales.Base.ScaleTypes.LOG] = anychart.scales.log;
+    anychart.scales.Base.constructorsMap_[anychart.scales.Base.ScaleTypes.DATE_TIME] = anychart.scales.dateTime;
+    anychart.scales.Base.constructorsMap_[anychart.scales.Base.ScaleTypes.ORDINAL] = anychart.scales.ordinal;
+    anychart.scales.Base.constructorsMap_[anychart.scales.Base.ScaleTypes.LINEAR_COLOR] = function() {
+      var cls;
+      return (cls = anychart.window['anychart']['scales']['linearColor']) ?
+          cls() :
+          anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Color scales']);
+    };
+    anychart.scales.Base.constructorsMap_[anychart.scales.Base.ScaleTypes.ORDINAL_COLOR] = function() {
+      var cls;
+      return (cls = anychart.window['anychart']['scales']['ordinalColor']) ?
+          cls() :
+          anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Color scales']);
+    };
+  }
+  var cls = anychart.scales.Base.constructorsMap_[type] || anychart.scales.Base.constructorsMap_[defaultType] || null;
+  // cls can return undefined
+  return /** @type {?anychart.scales.Base} */(cls && cls() || null);
 };
 
 
@@ -500,7 +500,7 @@ anychart.scales.Base.setupScale = function(currentScale, opt_newScaleSetupValue,
         result = currentScale;
       }
     } else if (opt_errorParams) {
-        anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, opt_errorParams);
+      anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, opt_errorParams);
     }
   }
   return /** @type {anychart.scales.Base} */(result);

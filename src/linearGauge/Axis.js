@@ -32,6 +32,12 @@ anychart.linearGaugeModule.Axis.prototype.calculateSize = function(parentSize, l
 };
 
 
+/** @inheritDoc */
+anychart.linearGaugeModule.Axis.prototype.getAllowedScaleTypes = function() {
+  return anychart.scales.Base.ScaleTypes.SCATTER_OR_DATE_TIME;
+};
+
+
 //endregion
 //region --- DESCRIPTORS ---
 /**
@@ -48,18 +54,6 @@ anychart.linearGaugeModule.Axis.OWN_DESCRIPTORS = (function() {
   return map;
 })();
 anychart.core.settings.populate(anychart.linearGaugeModule.Axis, anychart.linearGaugeModule.Axis.OWN_DESCRIPTORS);
-
-
-/** @inheritDoc */
-anychart.linearGaugeModule.Axis.prototype.scale = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (!(anychart.utils.instanceOf(opt_value, anychart.scales.ScatterBase))) {
-      anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['Linear gauge axis scale', 'scatter', 'linear, log, date-time']);
-      return this;
-    }
-  }
-  return anychart.linearGaugeModule.Axis.base(this, 'scale', opt_value);
-};
 
 
 //endregion

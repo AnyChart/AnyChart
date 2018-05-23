@@ -537,7 +537,7 @@ anychart.core.Axis.prototype.setDefaultOrientation = function(value) {
 
 /**
  * Getter/setter for scale.
- * @param {(anychart.scales.Base|Object|anychart.enums.ScaleTypes)=} opt_value Scale.
+ * @param {(anychart.scales.Base|Object|anychart.enums.ScaleTypes|string)=} opt_value Scale.
  * @return {anychart.scales.Base|!anychart.core.Axis} Axis scale or itself for method chaining.
  */
 anychart.core.Axis.prototype.scale = function(opt_value) {
