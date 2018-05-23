@@ -18,7 +18,7 @@ anychart.core.axisMarkers.Line = function() {
   this.val = 0;
 
   /**
-   * @type {acgraph.vector.Stroke}
+   * @type {?acgraph.vector.Stroke}
    * @private
    */
   this.stroke_;
@@ -121,7 +121,7 @@ anychart.core.axisMarkers.Line.prototype.scale = function(opt_value) {
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
  * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {!(anychart.core.axisMarkers.Line|acgraph.vector.Stroke)} LineMarker line settings or LineMarker instance for method chaining.
+ * @return {(anychart.core.axisMarkers.Line|acgraph.vector.Stroke)} LineMarker line settings or LineMarker instance for method chaining.
  */
 anychart.core.axisMarkers.Line.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {
@@ -171,7 +171,7 @@ anychart.core.axisMarkers.Line.prototype.appearanceInvalidated = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.axisMarkers.Line.prototype.disposeInternal = function() {
-  delete this.stroke_;
+  this.stroke_ = null;
   anychart.core.axisMarkers.Line.base(this, 'disposeInternal');
 };
 

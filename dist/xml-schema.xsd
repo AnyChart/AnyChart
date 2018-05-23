@@ -947,6 +947,7 @@
         <xsd:attribute name="layout" type="enums.Layout"/>
         <xsd:attribute name="scale" type="simple.ScaleRef"/>
         <xsd:attribute name="axis" type="simple.AxisRef"/>
+        <xsd:attribute name="scale_range_mode" type="enums.ScaleRangeMode"/>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
     </xsd:complexType>
 
@@ -968,6 +969,7 @@
         <xsd:attribute name="layout" type="enums.Layout"/>
         <xsd:attribute name="scale" type="simple.ScaleRef"/>
         <xsd:attribute name="axis" type="simple.AxisRef"/>
+        <xsd:attribute name="scale_range_mode" type="enums.ScaleRangeMode"/>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
     </xsd:complexType>
 
@@ -1008,6 +1010,7 @@
         <xsd:attribute name="rotation" type="simple.NumberOrNull"/>
         <xsd:attribute name="scale" type="simple.ScaleRef"/>
         <xsd:attribute name="axis" type="simple.AxisRef"/>
+        <xsd:attribute name="scale_range_mode" type="enums.ScaleRangeMode"/>
         <xsd:attributeGroup ref="attrs.TextSettings"/>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
     </xsd:complexType>
@@ -3758,6 +3761,13 @@
 
     <xsd:simpleType name="enums.GaugePointerType">
         <xsd:union memberTypes="enums.CircularGaugePointerType enums.LinearGaugePointerType"/>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="enums.ScaleRangeMode">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="none" />
+            <xsd:enumeration value="consider" />
+        </xsd:restriction>
     </xsd:simpleType>
 
     <!-- Common attribute groups -->

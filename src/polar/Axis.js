@@ -1128,6 +1128,12 @@ anychart.polarModule.Axis.prototype.calcLabelTextPath = function(label, index, t
 
 
 /** @inheritDoc */
+anychart.polarModule.Axis.prototype.isAxisMarkerProvider = function() {
+  return false;
+};
+
+
+/** @inheritDoc */
 anychart.polarModule.Axis.prototype.checkDrawingNeeded = function() {
   if (this.isConsistent())
     return false;

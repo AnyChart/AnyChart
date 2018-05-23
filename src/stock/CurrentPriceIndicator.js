@@ -421,7 +421,7 @@ anychart.stockModule.CurrentPriceIndicator.prototype.draw = function() {
 
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
-  
+
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     var y = plotBounds.getBottom() - yRatio * plotBounds.height;
     y = anychart.utils.applyPixelShift(y, thickness);
@@ -435,7 +435,7 @@ anychart.stockModule.CurrentPriceIndicator.prototype.draw = function() {
 
     if (this.label_.getFinalSettings('enabled')) {
       var labelPositionProvider = this.getLabelPositionProvider(axis, y);
-      
+
       if (isNaN(labelPositionProvider['value']['x'])) {
         this.labelDisabled = true;
         this.label_.clear();

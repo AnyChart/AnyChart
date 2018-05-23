@@ -4,6 +4,9 @@ goog.require('anychart.core.Axis');
 goog.require('anychart.core.IPlot');
 goog.require('anychart.core.NoDataSettings');
 goog.require('anychart.core.VisualBaseWithBounds');
+goog.require('anychart.core.axisMarkers.Line');
+goog.require('anychart.core.axisMarkers.Range');
+goog.require('anychart.core.axisMarkers.Text');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.settings');
 goog.require('anychart.core.ui.Background');
@@ -113,6 +116,24 @@ anychart.stockModule.Plot = function(chart) {
    * @private
    */
   this.xAxis_ = null;
+
+  /**
+   * @type {Array.<anychart.core.axisMarkers.Line>}
+   * @private
+   */
+  this.lineAxesMarkers_ = [];
+
+  /**
+   * @type {Array.<anychart.core.axisMarkers.Range>}
+   * @private
+   */
+  this.rangeAxesMarkers_ = [];
+
+  /**
+   * @type {Array.<anychart.core.axisMarkers.Text>}
+   * @private
+   */
+  this.textAxesMarkers_ = [];
 
   /**
    * @type {Array.<anychart.stockModule.Grid>}
@@ -264,7 +285,8 @@ anychart.stockModule.Plot.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.STOCK_PLOT_NO_DATA_LABEL |
     anychart.ConsistencyState.AXES_CHART_CROSSHAIR |
     anychart.ConsistencyState.STOCK_PLOT_TITLE |
-    anychart.ConsistencyState.STOCK_PLOT_PRICE_INDICATORS;
+    anychart.ConsistencyState.STOCK_PLOT_PRICE_INDICATORS |
+    anychart.ConsistencyState.STOCK_PLOT_AXIS_MARKERS;
 
 
 /**
@@ -1072,6 +1094,14 @@ anychart.stockModule.Plot.prototype.invalidateRedrawable = function(doInvalidate
       grid.invalidate(anychart.ConsistencyState.GRIDS_POSITION);
   }
 
+  var marker;
+  var markers = goog.array.concat(this.lineAxesMarkers_, this.rangeAxesMarkers_, this.textAxesMarkers_);
+  for (i = 0; i < markers.length; i++) {
+    marker = markers[i];
+    if (marker)
+      marker.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS);
+  }
+
   state = anychart.ConsistencyState.APPEARANCE;
   if (doInvalidateBounds) state |= anychart.ConsistencyState.BOUNDS;
   if (this.xAxis_)
@@ -1094,7 +1124,8 @@ anychart.stockModule.Plot.prototype.invalidateRedrawable = function(doInvalidate
       anychart.ConsistencyState.STOCK_PLOT_DT_AXIS |
       anychart.ConsistencyState.STOCK_PLOT_GRIDS |
       anychart.ConsistencyState.STOCK_PLOT_LEGEND |
-      anychart.ConsistencyState.STOCK_PLOT_NO_DATA_LABEL);
+      anychart.ConsistencyState.STOCK_PLOT_NO_DATA_LABEL |
+      anychart.ConsistencyState.STOCK_PLOT_AXIS_MARKERS);
 };
 
 
@@ -1556,6 +1587,180 @@ anychart.stockModule.Plot.prototype.onTitleSignal_ = function(event) {
 
 
 //endregion
+//region Axis markers and defaults
+/**
+ * Getter/setter for line marker default settings.
+ * @param {Object=} opt_value Object with line marker settings.
+ * @return {Object}
+ */
+anychart.stockModule.Plot.prototype.defaultLineMarkerSettings = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.defaultLineMarkerSettings_ = opt_value;
+    return this;
+  }
+  return this.defaultLineMarkerSettings_ || {};
+};
+
+
+/**
+ * Getter/setter for text marker default settings.
+ * @param {Object=} opt_value Object with text marker settings.
+ * @return {Object}
+ */
+anychart.stockModule.Plot.prototype.defaultTextMarkerSettings = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.defaultTextMarkerSettings_ = opt_value;
+    return this;
+  }
+  return this.defaultTextMarkerSettings_ || {};
+};
+
+
+/**
+ * Getter/setter for range marker default settings.
+ * @param {Object=} opt_value Object with range marker settings.
+ * @return {Object}
+ */
+anychart.stockModule.Plot.prototype.defaultRangeMarkerSettings = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.defaultRangeMarkerSettings_ = opt_value;
+    return this;
+  }
+  return this.defaultRangeMarkerSettings_ || {};
+};
+
+
+/**
+ * Getter/setter for lineMarker.
+ * @param {(Object|boolean|null|number)=} opt_indexOrValue Marker index or chart line marker settings to set.
+ * @param {(Object|boolean|null)=} opt_value Chart line marker settings to set.
+ * @return {!(anychart.core.axisMarkers.Line|anychart.stockModule.Plot)} Line marker instance by index or itself for method chaining.
+ */
+anychart.stockModule.Plot.prototype.lineMarker = function(opt_indexOrValue, opt_value) {
+  var index, value;
+  index = anychart.utils.toNumber(opt_indexOrValue);
+  if (isNaN(index)) {
+    index = 0;
+    value = opt_indexOrValue;
+  } else {
+    index = /** @type {number} */(opt_indexOrValue);
+    value = opt_value;
+  }
+  var lineMarker = this.lineAxesMarkers_[index];
+  if (!lineMarker) {
+    lineMarker = new anychart.core.axisMarkers.Line();
+    lineMarker.setChart(this);
+    lineMarker.setup(this.defaultLineMarkerSettings());
+    lineMarker.setDefaultLayout(anychart.enums.Layout.HORIZONTAL);
+    this.lineAxesMarkers_[index] = lineMarker;
+    lineMarker.listenSignals(this.onMarkersSignal, this);
+    this.invalidate(anychart.ConsistencyState.STOCK_PLOT_AXIS_MARKERS, anychart.Signal.NEEDS_REDRAW);
+  }
+
+  if (goog.isDef(value)) {
+    lineMarker.setup(value);
+    return this;
+  } else {
+    return lineMarker;
+  }
+};
+
+
+/**
+ * Getter/setter for rangeMarker.
+ * @param {(Object|boolean|null|number)=} opt_indexOrValue Marker index or chart range marker settings to set.
+ * @param {(Object|boolean|null)=} opt_value Chart range marker settings to set.
+ * @return {!(anychart.core.axisMarkers.Range|anychart.stockModule.Plot)} Range marker instance by index or itself for chaining call.
+ */
+anychart.stockModule.Plot.prototype.rangeMarker = function(opt_indexOrValue, opt_value) {
+  var index, value;
+  index = anychart.utils.toNumber(opt_indexOrValue);
+  if (isNaN(index)) {
+    index = 0;
+    value = opt_indexOrValue;
+  } else {
+    index = /** @type {number} */(opt_indexOrValue);
+    value = opt_value;
+  }
+  var rangeMarker = this.rangeAxesMarkers_[index];
+  if (!rangeMarker) {
+    rangeMarker = new anychart.core.axisMarkers.Range();
+    rangeMarker.setChart(this);
+    rangeMarker.setup(this.defaultRangeMarkerSettings());
+    rangeMarker.setDefaultLayout(anychart.enums.Layout.HORIZONTAL);
+    this.rangeAxesMarkers_[index] = rangeMarker;
+    rangeMarker.listenSignals(this.onMarkersSignal, this);
+    this.invalidate(anychart.ConsistencyState.STOCK_PLOT_AXIS_MARKERS, anychart.Signal.NEEDS_REDRAW);
+  }
+
+  if (goog.isDef(value)) {
+    rangeMarker.setup(value);
+    return this;
+  } else {
+    return rangeMarker;
+  }
+};
+
+
+/**
+ * Getter/setter for textMarker.
+ * @param {(Object|boolean|null|number)=} opt_indexOrValue Marker index or chart text marker settings to set.
+ * @param {(Object|boolean|null)=} opt_value Chart text marker settings to set.
+ * @return {!(anychart.core.axisMarkers.Text|anychart.stockModule.Plot)} Text marker instance by index or itself for chaining call.
+ */
+anychart.stockModule.Plot.prototype.textMarker = function(opt_indexOrValue, opt_value) {
+  var index, value;
+  index = anychart.utils.toNumber(opt_indexOrValue);
+  if (isNaN(index)) {
+    index = 0;
+    value = opt_indexOrValue;
+  } else {
+    index = /** @type {number} */(opt_indexOrValue);
+    value = opt_value;
+  }
+  var textMarker = this.textAxesMarkers_[index];
+  if (!textMarker) {
+    textMarker = new anychart.core.axisMarkers.Text();
+    textMarker.setChart(this);
+    textMarker.setup(this.defaultTextMarkerSettings());
+    textMarker.setDefaultLayout(anychart.enums.Layout.HORIZONTAL);
+    this.textAxesMarkers_[index] = textMarker;
+    textMarker.listenSignals(this.onMarkersSignal, this);
+    this.invalidate(anychart.ConsistencyState.STOCK_PLOT_AXIS_MARKERS, anychart.Signal.NEEDS_REDRAW);
+  }
+
+  if (goog.isDef(value)) {
+    textMarker.setup(value);
+    return this;
+  } else {
+    return textMarker;
+  }
+};
+
+
+/**
+ * Listener for markers invalidation.
+ * @param {anychart.SignalEvent} event Invalidation event.
+ * @protected
+ */
+anychart.stockModule.Plot.prototype.onMarkersSignal = function(event) {
+  if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION)) {
+    this.chart_.invalidate(anychart.ConsistencyState.STOCK_SCALES);
+  }
+  this.invalidate(anychart.ConsistencyState.STOCK_PLOT_AXIS_MARKERS, anychart.Signal.NEEDS_REDRAW);
+};
+
+
+/**
+ * Returns all axis markers. Used to calculate scale.
+ * @return {Array.<anychart.core.axisMarkers.Line|anychart.core.axisMarkers.Range|anychart.core.axisMarkers.Text>}
+ */
+anychart.stockModule.Plot.prototype.getAxisMarkers = function() {
+  return goog.array.concat(this.lineAxesMarkers_, this.rangeAxesMarkers_, this.textAxesMarkers_);
+};
+
+
+//endregion
 //region Drawing
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1682,6 +1887,24 @@ anychart.stockModule.Plot.prototype.draw = function() {
       this.title_.resumeSignalsDispatching(false);
     }
     this.markConsistent(anychart.ConsistencyState.STOCK_PLOT_TITLE);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.STOCK_PLOT_AXIS_MARKERS)) {
+    var markers = goog.array.concat(this.lineAxesMarkers_, this.rangeAxesMarkers_, this.textAxesMarkers_);
+    for (i = 0; i < markers.length; i++) {
+      var marker = markers[i];
+      if (marker) {
+        marker.suspendSignalsDispatching();
+        if (!marker.scale()) {
+          marker.autoScale(marker.isHorizontal() ? this.yScale() : this.chart_.xScale());
+        }
+        marker.parentBounds(this.seriesBounds_);
+        marker.container(this.rootLayer_);
+        marker.draw();
+        marker.resumeSignalsDispatching(false);
+      }
+    }
+    this.markConsistent(anychart.ConsistencyState.STOCK_PLOT_AXIS_MARKERS);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.STOCK_PLOT_BACKGROUND)) {
@@ -2749,6 +2972,13 @@ anychart.stockModule.Plot.prototype.disposeInternal = function() {
       this.series_,
       this.yAxes_,
       this.xAxis_,
+      this.xGrids_,
+      this.yGrids_,
+      this.xMinorGrids_,
+      this.yMinorGrids_,
+      this.lineAxesMarkers_,
+      this.rangeAxesMarkers_,
+      this.textAxesMarkers_,
       this.priceIndicators_,
       this.noDataSettings_,
       this.rootLayer_);
@@ -3024,6 +3254,10 @@ anychart.stockModule.Plot.prototype.setupByJSON = function(config, opt_default) 
 
   if ('defaultPriceIndicatorSettings' in config)
     this.setDefaultPriceIndicatorSettings(config['defaultPriceIndicatorSettings']);
+
+  this.defaultLineMarkerSettings(config['defaultLineMarkerSettings']);
+  this.defaultRangeMarkerSettings(config['defaultRangeMarkerSettings']);
+  this.defaultTextMarkerSettings(config['defaultTextMarkerSettings']);
 
   var xGrids = config['xGrids'];
   if (goog.isArray(xGrids)) {
@@ -3314,6 +3548,9 @@ anychart.stockModule.Plot.Dragger.prototype.limitY = function(y) {
   proto['annotations'] = proto.annotations;
   proto['eventMarkers'] = proto.eventMarkers;
   proto['priceIndicator'] = proto.priceIndicator;
+  proto['lineMarker'] = proto.lineMarker;
+  proto['rangeMarker'] = proto.rangeMarker;
+  proto['textMarker'] = proto.textMarker;
   proto['noData'] = proto.noData;
   proto['getStat'] = proto.getStat;
 })();

@@ -41,6 +41,14 @@ anychart.core.IAxis.prototype.scale = function() {};
 anychart.core.IAxis.prototype.labels = function(opt_value) {};
 
 
+/**
+ * Whether axis can be set as axisMarker axis
+ * @return {boolean}
+ */
+anychart.core.IAxis.prototype.isAxisMarkerProvider = function() {};
+
+
+
 //endregion
 //region IChart
 //----------------------------------------------------------------------------------------------------------------------

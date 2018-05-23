@@ -32,15 +32,22 @@ anychart.core.axisMarkers.PathBase = function() {
   this.scale_;
 
   /**
+   * Auto scale.
+   * @type {anychart.scales.Base|anychart.ganttModule.Scale}
+   * @private
+   */
+  this.autoScale_ = null;
+
+  /**
    * Assigned axis.
-   * @type {anychart.core.Axis}
+   * @type {anychart.core.Axis|anychart.stockModule.Axis}
    * @private
    */
   this.axis_ = null;
 
   /**
    * Parent chart instance.
-   * @type {anychart.core.SeparateChart}
+   * @type {anychart.core.SeparateChart|anychart.stockModule.Plot}
    * @private
    */
   this.chart_ = null;
@@ -52,6 +59,9 @@ anychart.core.axisMarkers.PathBase = function() {
    */
   this.markerElement_;
 
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['scaleRangeMode', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_RECALCULATION]
+  ]);
 };
 goog.inherits(anychart.core.axisMarkers.PathBase, anychart.core.VisualBase);
 
@@ -74,7 +84,7 @@ anychart.core.axisMarkers.PathBase.Range;
  */
 anychart.core.axisMarkers.PathBase.prototype.SUPPORTED_SIGNALS =
     anychart.core.VisualBase.prototype.SUPPORTED_SIGNALS |
-    anychart.Signal.BOUNDS_CHANGED;
+    anychart.Signal.NEEDS_RECALCULATION;
 
 
 /**
@@ -89,7 +99,7 @@ anychart.core.axisMarkers.PathBase.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 /**
  * Sets the chart axisMarkers belongs to.
- * @param {anychart.core.SeparateChart} chart - Chart instance.
+ * @param {(anychart.core.SeparateChart|anychart.stockModule.Plot)} chart - Chart or plot instance.
  */
 anychart.core.axisMarkers.PathBase.prototype.setChart = function(chart) {
   this.chart_ = chart;
@@ -98,7 +108,7 @@ anychart.core.axisMarkers.PathBase.prototype.setChart = function(chart) {
 
 /**
  * Get the chart axisMarkers belongs to.
- * @return {anychart.core.SeparateChart}
+ * @return {(anychart.core.SeparateChart|anychart.stockModule.Plot)}
  */
 anychart.core.axisMarkers.PathBase.prototype.getChart = function() {
   return this.chart_;
@@ -114,6 +124,39 @@ anychart.core.axisMarkers.PathBase.prototype.getChart = function() {
  * @return {anychart.enums.Layout|anychart.core.axisMarkers.PathBase} - Layout or this.
  */
 anychart.core.axisMarkers.PathBase.prototype.layout = goog.abstractMethod;
+
+
+/**
+ * Getter/setter for auto scale.
+ * Works with instances of anychart.scales.Base only.
+ * @param {(anychart.scales.Base|anychart.ganttModule.Scale|Object|anychart.enums.ScaleTypes)=} opt_value - Scale.
+ * @return {anychart.scales.Base|anychart.ganttModule.Scale|!anychart.core.axisMarkers.PathBase} - Axis scale or
+ * itself for method chaining.
+ */
+anychart.core.axisMarkers.PathBase.prototype.autoScale = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var scType = opt_value && goog.isFunction(opt_value.getType) && opt_value.getType();
+    var ganttScale = scType == anychart.enums.ScaleTypes.GANTT;
+    var val = ganttScale ?
+        (opt_value == this.autoScale_ ? null : opt_value) :
+        anychart.scales.Base.setupScale(/** @type {anychart.scales.Base} */(this.autoScale_), opt_value, null, anychart.scales.Base.ScaleTypes.ALL_DEFAULT, null, this.scaleInvalidated, this);
+    if (val) {
+      var dispatch = this.autoScale_ == val;
+      this.autoScale_ = /** @type {anychart.scales.Base|anychart.ganttModule.Scale} */(val);
+      var scaleIsSet = this.scale_ || (this.axis_ && /** @type {?anychart.scales.Base} */ (this.axis_.scale()));
+      if (scaleIsSet) {
+        val.resumeSignalsDispatching(false);
+      } else if (!ganttScale)
+        val.resumeSignalsDispatching(dispatch);
+      if (!dispatch && !scaleIsSet)
+        this.invalidate(anychart.ConsistencyState.BOUNDS,
+            anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED | anychart.Signal.NEEDS_RECALCULATION);
+    }
+    return this;
+  } else {
+    return this.autoScale_;
+  }
+};
 
 
 /**
@@ -142,18 +185,21 @@ anychart.core.axisMarkers.PathBase.prototype.scaleInternal = function(opt_value)
         val.resumeSignalsDispatching(dispatch);
       if (!dispatch)
         this.invalidate(anychart.ConsistencyState.BOUNDS,
-            anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+            anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED | anychart.Signal.NEEDS_RECALCULATION);
     }
     return this;
   } else {
-    if (this.scale_) {
-      return /** @type {anychart.scales.Base|anychart.ganttModule.Scale} */ (this.scale_);
-    } else {
-      if (this.axis_)
-        return /** @type {?anychart.scales.Base} */ (this.axis_.scale());
-      return null;
-    }
+    return this.scale_ || (this.axis_ && /** @type {?anychart.scales.Base} */ (this.axis_.scale())) || this.autoScale_;
   }
+};
+
+
+/**
+ * Whether scale is set for marker.
+ * @return {boolean}
+ */
+anychart.core.axisMarkers.PathBase.prototype.isScaleSet = function() {
+  return !!this.scale_;
 };
 
 
@@ -187,12 +233,39 @@ anychart.core.axisMarkers.PathBase.prototype.valueInternal = function(opt_value)
   if (goog.isDef(opt_value)) {
     if (this.val !== opt_value) {
       this.val = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      this.invalidate(anychart.ConsistencyState.BOUNDS, this.getValueChangeSignals());
     }
     return this;
   }
   return this.val;
+};
+
+
+/**
+ * Signals dispatched on value change.
+ * @return {number}
+ */
+anychart.core.axisMarkers.PathBase.prototype.getValueChangeSignals = function() {
+  var signals = anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED;
+  if (this.getOption('scaleRangeMode') == anychart.enums.ScaleRangeMode.CONSIDER)
+    signals |= anychart.Signal.NEEDS_RECALCULATION;
+  return signals;
+};
+
+
+/** @inheritDoc */
+anychart.core.axisMarkers.PathBase.prototype.getEnableChangeSignals = function() {
+  var signals = anychart.core.axisMarkers.PathBase.base(this, 'getEnableChangeSignals');
+  return signals | anychart.Signal.NEEDS_RECALCULATION;
+};
+
+
+/**
+ * Values for scale extending.
+ * @return {Array}
+ */
+anychart.core.axisMarkers.PathBase.prototype.getReferenceValues = function() {
+  return [this.valueInternal()];
 };
 
 
@@ -211,8 +284,8 @@ anychart.core.axisMarkers.PathBase.prototype.axisInvalidated_ = function(event) 
 
 /**
  * Sets axis for marker.
- * @param {anychart.core.Axis=} opt_value - Value to be set.
- * @return {(anychart.core.Axis|anychart.core.axisMarkers.PathBase)} - Current value or itself for method chaining.
+ * @param {(anychart.core.Axis|anychart.stockModule.Axis)=} opt_value - Value to be set.
+ * @return {(anychart.core.Axis|anychart.stockModule.Axis|anychart.core.axisMarkers.PathBase)} - Current value or itself for method chaining.
  */
 anychart.core.axisMarkers.PathBase.prototype.axis = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -222,12 +295,8 @@ anychart.core.axisMarkers.PathBase.prototype.axis = function(opt_value) {
       this.axis_ = opt_value;
       this.axis_.listenSignals(this.axisInvalidated_, this);
 
-      if (this.scale_)
-        this.scale_.unlistenSignals(this.scaleInvalidated, this);
-      this.scale_ = null;
-
       this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED | anychart.Signal.NEEDS_RECALCULATION);
     }
     return this;
   }
@@ -250,7 +319,6 @@ anychart.core.axisMarkers.PathBase.prototype.axis = function(opt_value) {
 anychart.core.axisMarkers.PathBase.prototype.axesLinesSpace = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.axesLinesSpace_) {
     this.axesLinesSpace_ = new anychart.core.utils.Padding();
-    this.registerDisposable(this.axesLinesSpace_);
   }
 
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
@@ -343,8 +411,8 @@ anychart.core.axisMarkers.PathBase.prototype.drawLine = function() {
   var el = /** @type {acgraph.vector.Path} */ (this.markerElement());
 
   var ratio = scale.transform(this.val, 0.5);
-  if (isNaN(ratio)) return this;
   el.clear();
+  if (isNaN(ratio)) return this;
 
   if (ratio >= 0 && ratio <= 1) {
     var shift = el.strokeThickness() % 2 == 0 ? 0 : -.5;
@@ -461,10 +529,26 @@ anychart.core.axisMarkers.PathBase.prototype.remove = function() {
 anychart.core.axisMarkers.PathBase.prototype.markerElement = function() {
   if (!this.markerElement_) {
     this.markerElement_ = /** @type {!acgraph.vector.Path} */(acgraph.path());
-    this.registerDisposable(this.markerElement_);
   }
   return this.markerElement_;
 };
+
+
+/**
+ * Properties that should be defined in class prototype.
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.core.axisMarkers.PathBase.OWN_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'scaleRangeMode', anychart.enums.normalizeScaleRangeMode]
+  ]);
+
+  return map;
+})();
+anychart.core.settings.populate(anychart.core.axisMarkers.PathBase, anychart.core.axisMarkers.PathBase.OWN_DESCRIPTORS);
 
 
 /** @inheritDoc */
@@ -477,10 +561,19 @@ anychart.core.axisMarkers.PathBase.prototype.setupByJSON = function(config, opt_
       if (this.chart_) {
         this.axis((/** @type {anychart.core.CartesianBase} */(this.chart_)).getAxisByIndex(ax));
       }
-    } else if (anychart.utils.instanceOf(ax, anychart.core.Axis)) {
+    } else if (ax.isAxisMarkerProvider && ax.isAxisMarkerProvider()) {
       this.axis(ax);
     }
   }
+  anychart.core.settings.deserialize(this, anychart.core.axisMarkers.PathBase.OWN_DESCRIPTORS, config, opt_default);
+};
+
+
+/** @inheritDoc */
+anychart.core.axisMarkers.PathBase.prototype.serialize = function() {
+  var json = anychart.core.axisMarkers.PathBase.base(this, 'serialize');
+  anychart.core.settings.serialize(this, anychart.core.axisMarkers.PathBase.OWN_DESCRIPTORS, json);
+  return json;
 };
 
 
@@ -488,5 +581,8 @@ anychart.core.axisMarkers.PathBase.prototype.setupByJSON = function(config, opt_
 anychart.core.axisMarkers.PathBase.prototype.disposeInternal = function() {
   this.axis_ = null;
   this.chart_ = null;
+  goog.disposeAll(this.markerElement_, this.axesLinesSpace_);
+  this.markerElement_ = null;
+  this.axesLinesSpace_ = null;
   anychart.core.axisMarkers.PathBase.base(this, 'disposeInternal');
 };

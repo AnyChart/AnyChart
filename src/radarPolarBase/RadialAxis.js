@@ -1083,6 +1083,12 @@ anychart.radarPolarBaseModule.RadialAxis.prototype.checkDrawingNeeded = function
 };
 
 
+/** @inheritDoc */
+anychart.radarPolarBaseModule.RadialAxis.prototype.isAxisMarkerProvider = function() {
+  return false;
+};
+
+
 /**
  * Axis drawing.
  * @return {anychart.radarPolarBaseModule.RadialAxis} An instance of {@link anychart.radarPolarBaseModule.RadialAxis} class for method chaining.

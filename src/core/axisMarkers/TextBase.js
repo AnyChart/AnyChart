@@ -57,7 +57,7 @@ anychart.core.axisMarkers.TextBase = function() {
 
   /**
    * Parent chart instance.
-   * @type {anychart.core.SeparateChart}
+   * @type {anychart.core.SeparateChart|anychart.stockModule.Plot}
    * @private
    */
   this.chart_ = null;
@@ -82,7 +82,8 @@ anychart.core.axisMarkers.TextBase = function() {
   this.contBounds_ = null;
 
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
-    ['align', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED]
+    ['align', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['scaleRangeMode', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_RECALCULATION]
   ]);
 
 };
@@ -96,7 +97,8 @@ goog.inherits(anychart.core.axisMarkers.TextBase, anychart.core.ui.LabelBase);
  * @type {number}
  */
 anychart.core.axisMarkers.TextBase.prototype.SUPPORTED_SIGNALS =
-    anychart.core.ui.LabelBase.prototype.SUPPORTED_SIGNALS;
+    anychart.core.ui.LabelBase.prototype.SUPPORTED_SIGNALS |
+    anychart.Signal.NEEDS_RECALCULATION;
 
 
 /**
@@ -116,11 +118,12 @@ anychart.core.axisMarkers.TextBase.prototype.SUPPORTED_CONSISTENCY_STATES =
 anychart.core.axisMarkers.TextBase.DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'align',
-      anychart.enums.normalizeAlign);
+
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'align', anychart.enums.normalizeAlign],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'scaleRangeMode', anychart.enums.normalizeScaleRangeMode]
+  ]);
+
   return map;
 })();
 anychart.core.settings.populate(anychart.core.axisMarkers.TextBase, anychart.core.axisMarkers.TextBase.DESCRIPTORS);
@@ -130,7 +133,7 @@ anychart.core.settings.populate(anychart.core.axisMarkers.TextBase, anychart.cor
 //region -- Gettings and setting chart.
 /**
  * Sets the chart axisMarkers belongs to.
- * @param {anychart.core.SeparateChart} chart Chart instance.
+ * @param {anychart.core.SeparateChart|anychart.stockModule.Plot} chart Chart instance.
  */
 anychart.core.axisMarkers.TextBase.prototype.setChart = function(chart) {
   this.chart_ = chart;
@@ -139,7 +142,7 @@ anychart.core.axisMarkers.TextBase.prototype.setChart = function(chart) {
 
 /**
  * Get the chart axisMarkers belongs to.
- * @return {anychart.core.SeparateChart}
+ * @return {anychart.core.SeparateChart|anychart.stockModule.Plot}
  */
 anychart.core.axisMarkers.TextBase.prototype.getChart = function() {
   return this.chart_;
@@ -172,7 +175,7 @@ anychart.core.axisMarkers.TextBase.prototype.autoScale = function(opt_value) {
         val.resumeSignalsDispatching(dispatch);
       if (!dispatch && !scaleIsSet)
         this.invalidate(anychart.ConsistencyState.BOUNDS,
-            anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+            anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED | anychart.Signal.NEEDS_RECALCULATION);
     }
     return this;
   } else {
@@ -202,12 +205,21 @@ anychart.core.axisMarkers.TextBase.prototype.scaleInternal = function(opt_value)
         val.resumeSignalsDispatching(dispatch);
       if (!dispatch)
         this.invalidate(anychart.ConsistencyState.BOUNDS,
-            anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+            anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED | anychart.Signal.NEEDS_RECALCULATION);
     }
     return this;
   } else {
     return this.scale_ || (this.axis_ && /** @type {?anychart.scales.Base} */ (this.axis_.scale())) || this.autoScale_;
   }
+};
+
+
+/**
+ * Whether scale is set for marker.
+ * @return {boolean}
+ */
+anychart.core.axisMarkers.TextBase.prototype.isScaleSet = function() {
+  return !!this.scale_;
 };
 
 
@@ -255,7 +267,7 @@ anychart.core.axisMarkers.TextBase.prototype.axis = function(opt_value) {
       this.axis_ = opt_value;
       this.axis_.listenSignals(this.axisInvalidated_, this);
       this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED | anychart.Signal.NEEDS_RECALCULATION);
     }
     return this;
   }
@@ -278,7 +290,6 @@ anychart.core.axisMarkers.TextBase.prototype.axis = function(opt_value) {
 anychart.core.axisMarkers.TextBase.prototype.axesLinesSpace = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.axesLinesSpace_) {
     this.axesLinesSpace_ = new anychart.core.utils.Padding();
-    this.registerDisposable(this.axesLinesSpace_);
   }
 
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
@@ -358,7 +369,14 @@ anychart.core.axisMarkers.TextBase.prototype.checkDrawingNeeded = function() {
     return draw;
 
   var ratio = this.scale().transform(this.val, 0.5);
-  return (ratio >= 0 && ratio <= 1);
+  if (ratio >= 0 && ratio <= 1) {
+    this.invalidate(anychart.ConsistencyState.CONTAINER | anychart.ConsistencyState.BOUNDS);
+    return true;
+  } else {
+    this.remove();
+    this.markConsistent(anychart.ConsistencyState.CONTAINER | anychart.ConsistencyState.BOUNDS);
+    return false;
+  }
 };
 
 
@@ -470,12 +488,39 @@ anychart.core.axisMarkers.TextBase.prototype.valueInternal = function(opt_value)
   if (goog.isDef(opt_value)) {
     if (this.val !== opt_value) {
       this.val = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      this.invalidate(anychart.ConsistencyState.BOUNDS, this.getValueChangeSignals());
     }
     return this;
   }
   return this.val;
+};
+
+
+/**
+ * Signals dispatched on value change.
+ * @return {number}
+ */
+anychart.core.axisMarkers.TextBase.prototype.getValueChangeSignals = function() {
+  var signals = anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED;
+  if (this.getOption('scaleRangeMode') == anychart.enums.ScaleRangeMode.CONSIDER)
+    signals |= anychart.Signal.NEEDS_RECALCULATION;
+  return signals;
+};
+
+
+/** @inheritDoc */
+anychart.core.axisMarkers.TextBase.prototype.getEnableChangeSignals = function() {
+  var signals = anychart.core.axisMarkers.TextBase.base(this, 'getEnableChangeSignals');
+  return signals | anychart.Signal.NEEDS_RECALCULATION;
+};
+
+
+/**
+ * Values for scale extending.
+ * @return {Array}
+ */
+anychart.core.axisMarkers.TextBase.prototype.getReferenceValues = function() {
+  return [this.valueInternal()];
 };
 
 
@@ -505,10 +550,20 @@ anychart.core.axisMarkers.TextBase.prototype.setupByJSON = function(config, opt_
       if (this.chart_) {
         this.axis((/** @type {anychart.core.CartesianBase} */(this.chart_)).getAxisByIndex(ax));
       }
-    } else if (anychart.utils.instanceOf(ax, anychart.core.Axis)) {
+    } else if (ax.isAxisMarkerProvider && ax.isAxisMarkerProvider()) {
       this.axis(ax);
     }
   }
+};
+
+
+/** @inheritDoc */
+anychart.core.axisMarkers.TextBase.prototype.disposeInternal = function() {
+  goog.dispose(this.axesLinesSpace_);
+  this.axesLinesSpace_ = null;
+  this.chart_ = null;
+  this.axis_ = null;
+  anychart.core.axisMarkers.TextBase.base(this, 'disposeInternal');
 };
 
 

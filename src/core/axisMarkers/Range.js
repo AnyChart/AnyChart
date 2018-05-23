@@ -20,7 +20,7 @@ anychart.core.axisMarkers.Range = function() {
   this.val = {from: 0, to: 0};
 
   /**
-   * @type {string|acgraph.vector.Fill}
+   * @type {?(string|acgraph.vector.Fill)}
    * @private
    */
   this.fill_;
@@ -132,7 +132,7 @@ anychart.core.axisMarkers.Range.prototype.scale = function(opt_value) {
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
- * @return {!(acgraph.vector.Fill|anychart.core.axisMarkers.Range)} .
+ * @return {(acgraph.vector.Fill|anychart.core.axisMarkers.Range)} .
  */
 anychart.core.axisMarkers.Range.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
@@ -167,8 +167,7 @@ anychart.core.axisMarkers.Range.prototype.from = function(opt_newValue) {
   if (goog.isDef(opt_newValue)) {
     if (this.val.from != opt_newValue) {
       this.val.from = opt_newValue;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      this.invalidate(anychart.ConsistencyState.BOUNDS, this.getValueChangeSignals());
     }
     return this;
   }
@@ -186,13 +185,18 @@ anychart.core.axisMarkers.Range.prototype.to = function(opt_newValue) {
   if (goog.isDef(opt_newValue)) {
     if (this.val.to != opt_newValue) {
       this.val.to = opt_newValue;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      this.invalidate(anychart.ConsistencyState.BOUNDS, this.getValueChangeSignals());
     }
     return this;
   }
 
   return /** @type {number} */ (this.val.to);
+};
+
+
+/** @inheritDoc */
+anychart.core.axisMarkers.Range.prototype.getReferenceValues = function() {
+  return [this.val.from, this.val.to];
 };
 
 
@@ -220,7 +224,7 @@ anychart.core.axisMarkers.Range.prototype.appearanceInvalidated = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.axisMarkers.Range.prototype.disposeInternal = function() {
-  delete this.fill_;
+  this.fill_ = null;
   anychart.core.axisMarkers.Range.base(this, 'disposeInternal');
 };
 

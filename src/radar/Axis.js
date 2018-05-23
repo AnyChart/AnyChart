@@ -711,6 +711,12 @@ anychart.radarModule.Axis.prototype.drawLabel_ = function(index, x, y) {
 
 
 /** @inheritDoc */
+anychart.radarModule.Axis.prototype.isAxisMarkerProvider = function() {
+  return false;
+};
+
+
+/** @inheritDoc */
 anychart.radarModule.Axis.prototype.checkDrawingNeeded = function() {
   if (this.isConsistent())
     return false;

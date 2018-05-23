@@ -5412,7 +5412,8 @@
         "axis": {
           "type": "number"
         },
-        "layout": {"$ref": "#/definitions/anychart.enums.Layout"}
+        "layout": {"$ref": "#/definitions/anychart.enums.Layout"},
+        "scaleRangeMode": {"$ref": "#/definitions/anychart.enums.ScaleRangeMode"}
       }
     },
     "anychart.core.axisMarkers.Range": {
@@ -5434,6 +5435,7 @@
         "axis": {
           "type": "number"
         },
+        "scaleRangeMode": {"$ref": "#/definitions/anychart.enums.ScaleRangeMode"},
         "layout": {"$ref": "#/definitions/anychart.enums.Layout"}
       }
     },
@@ -5513,6 +5515,7 @@
             "string"
           ]
         },
+        "scaleRangeMode": {"$ref": "#/definitions/anychart.enums.ScaleRangeMode"},
         "position": {"$ref": "#/definitions/anychart.enums.Anchor"},
         "text": {
           "type": ["string"]
@@ -5819,6 +5822,9 @@
           "parent-dependent",
           "parent-independent"
       ]
+    },
+    "anychart.enums.ScaleRangeMode": {
+      "enum": ["none", "consider"]
     },
 
     "acgraph.vector.HatchFill.HatchFillType": {

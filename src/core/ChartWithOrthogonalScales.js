@@ -247,6 +247,13 @@ anychart.core.ChartWithOrthogonalScales.prototype.getScaleAdditionalInvalidation
 
 
 /**
+ * Invalidated elements based on scale.
+ * @param {anychart.scales.Base} scale
+ */
+anychart.core.ChartWithOrthogonalScales.prototype.invalidateScaleBasedElements = function(scale) {};
+
+
+/**
  * Getter/setter for xScale.
  * @param {(anychart.enums.ScaleTypes|Object|anychart.scales.Base)=} opt_value X Scale to set.
  * @return {!(anychart.scales.Base|anychart.core.ChartWithOrthogonalScales)} Default chart scale value or itself for method chaining.
@@ -268,6 +275,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.xScale = function(opt_value) {
         }
         state |= this.getScaleAdditionalInvalidationState();
         this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
+        this.invalidateScaleBasedElements(this.xScale_);
       }
     }
     return this;
@@ -322,6 +330,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.yScale = function(opt_value) {
         var state = anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS;
         state |= this.getScaleAdditionalInvalidationState();
         this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
+        this.invalidateScaleBasedElements(this.yScale_);
       }
     }
     return this;
@@ -740,6 +749,9 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateXScales = function() 
         }
       }
     }
+
+    this.calculateAdditionalXScalesExtensions();
+
     for (uid in this.xScales) {
       xScale = this.xScales[uid];
       if (xScale.needsAutoCalc())
@@ -1080,6 +1092,9 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateYScales = function() 
         }
       }
     }
+
+    this.calculateAdditionalYScalesExtensions();
+
     for (uid in this.yScales) {
       yScale = this.yScales[uid];
       if (yScale.needsAutoCalc())
@@ -1192,6 +1207,8 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateXYScales = function()
       this.drawingPlans.push(drawingPlan);
     }
 
+    this.calculateAdditionalScalesExtensions();
+
     for (uid in this.xScales) {
       xScale = this.xScales[uid];
       if (xScale.needsAutoCalc())
@@ -1210,6 +1227,27 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateXYScales = function()
     anychart.performance.end('X scales, drawing plans and Y scales calculation');
   }
 };
+
+
+/**
+ * Calculates additional scale extensions
+ */
+anychart.core.ChartWithOrthogonalScales.prototype.calculateAdditionalScalesExtensions = function() {
+  this.calculateAdditionalXScalesExtensions();
+  this.calculateAdditionalYScalesExtensions();
+};
+
+
+/**
+ * Calculates additional x scales extensions.
+ */
+anychart.core.ChartWithOrthogonalScales.prototype.calculateAdditionalXScalesExtensions = function() {};
+
+
+/**
+ * Calculates additional y scales extensions
+ */
+anychart.core.ChartWithOrthogonalScales.prototype.calculateAdditionalYScalesExtensions = function() {};
 
 
 /**

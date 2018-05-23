@@ -141,11 +141,8 @@ anychart.core.ChartWithAxes.prototype.setDefaultScaleForLayoutBasedElements = fu
 
   if (anychart.utils.instanceOf(item, anychart.core.GridBase))
     item.setAutoScale(sc);
-  else if (anychart.utils.instanceOf(item, anychart.core.axisMarkers.Text)) {
+  else
     item.autoScale(sc);
-  } else {
-    item.scale(sc);
-  }
 };
 
 
@@ -396,7 +393,6 @@ anychart.core.ChartWithAxes.prototype.xGrid = function(opt_indexOrValue, opt_val
     grid.setup(this.defaultGridSettings());
     grid.zIndex(this.getGridZIndex(true));
     this.xGrids_[index] = grid;
-    this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal, this);
     this.invalidate(anychart.ConsistencyState.AXES_CHART_GRIDS | anychart.ConsistencyState.SCALE_CHART_SCALES_STATISTICS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -434,7 +430,6 @@ anychart.core.ChartWithAxes.prototype.yGrid = function(opt_indexOrValue, opt_val
     grid.setup(this.defaultGridSettings());
     grid.zIndex(this.getGridZIndex(true));
     this.yGrids_[index] = grid;
-    this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal, this);
     this.invalidate(anychart.ConsistencyState.AXES_CHART_GRIDS | anychart.ConsistencyState.SCALE_CHART_SCALES_STATISTICS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -472,7 +467,6 @@ anychart.core.ChartWithAxes.prototype.xMinorGrid = function(opt_indexOrValue, op
     grid.setup(this.defaultMinorGridSettings());
     grid.zIndex(this.getGridZIndex(false));
     this.xMinorGrids_[index] = grid;
-    this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal, this);
     this.invalidate(anychart.ConsistencyState.AXES_CHART_GRIDS | anychart.ConsistencyState.SCALE_CHART_SCALES_STATISTICS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -510,7 +504,6 @@ anychart.core.ChartWithAxes.prototype.yMinorGrid = function(opt_indexOrValue, op
     grid.setup(this.defaultMinorGridSettings());
     grid.zIndex(this.getGridZIndex(false));
     this.yMinorGrids_[index] = grid;
-    this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal, this);
     this.invalidate(anychart.ConsistencyState.AXES_CHART_GRIDS | anychart.ConsistencyState.SCALE_CHART_SCALES_STATISTICS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -594,7 +587,6 @@ anychart.core.ChartWithAxes.prototype.xAxis = function(opt_indexOrValue, opt_val
     axis.setParentEventTarget(this);
     axis.setupInternal(true, this.defaultXAxisSettings());
     this.xAxes_[index] = axis;
-    this.registerDisposable(axis);
     axis.listenSignals(this.onAxisSignal_, this);
     this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES | anychart.ConsistencyState.SCALE_CHART_SCALES_STATISTICS | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -630,7 +622,6 @@ anychart.core.ChartWithAxes.prototype.yAxis = function(opt_indexOrValue, opt_val
     axis.setParentEventTarget(this);
     axis.setupInternal(true, this.defaultYAxisSettings());
     this.yAxes_[index] = axis;
-    this.registerDisposable(axis);
     axis.listenSignals(this.onAxisSignal_, this);
     this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES | anychart.ConsistencyState.SCALE_CHART_SCALES_STATISTICS | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -760,7 +751,6 @@ anychart.core.ChartWithAxes.prototype.lineMarker = function(opt_indexOrValue, op
     lineMarker.setup(this.defaultLineMarkerSettings());
     lineMarker.setDefaultLayout(this.isVerticalInternal ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
     this.lineAxesMarkers_[index] = lineMarker;
-    this.registerDisposable(lineMarker);
     lineMarker.listenSignals(this.onMarkersSignal, this);
     this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES_MARKERS | anychart.ConsistencyState.SCALE_CHART_SCALES_STATISTICS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -807,7 +797,6 @@ anychart.core.ChartWithAxes.prototype.rangeMarker = function(opt_indexOrValue, o
     rangeMarker.setup(this.defaultRangeMarkerSettings());
     rangeMarker.setDefaultLayout(this.isVerticalInternal ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
     this.rangeAxesMarkers_[index] = rangeMarker;
-    this.registerDisposable(rangeMarker);
     rangeMarker.listenSignals(this.onMarkersSignal, this);
     this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES_MARKERS | anychart.ConsistencyState.SCALE_CHART_SCALES_STATISTICS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -835,7 +824,7 @@ anychart.core.ChartWithAxes.prototype.createTextMarkerInstance = function() {
  * Getter/setter for textMarker.
  * @param {(Object|boolean|null|number)=} opt_indexOrValue Chart line marker settings to set.
  * @param {(Object|boolean|null)=} opt_value Chart line marker settings to set.
- * @return {!(anychart.core.axisMarkers.Text|anychart.cartesian3dModule.axisMarkers.Text|anychart.core.ChartWithAxes)} Line marker instance by index or itself for chaining call.
+ * @return {!(anychart.core.axisMarkers.Text|anychart.cartesian3dModule.axisMarkers.Text|anychart.core.ChartWithAxes)} Text marker instance by index or itself for chaining call.
  */
 anychart.core.ChartWithAxes.prototype.textMarker = function(opt_indexOrValue, opt_value) {
   var index, value;
@@ -854,7 +843,6 @@ anychart.core.ChartWithAxes.prototype.textMarker = function(opt_indexOrValue, op
     textMarker.setup(this.defaultTextMarkerSettings());
     textMarker.setDefaultLayout(this.isVerticalInternal ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
     this.textAxesMarkers_[index] = textMarker;
-    this.registerDisposable(textMarker);
     textMarker.listenSignals(this.onMarkersSignal, this);
     this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES_MARKERS | anychart.ConsistencyState.SCALE_CHART_SCALES_STATISTICS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -874,7 +862,10 @@ anychart.core.ChartWithAxes.prototype.textMarker = function(opt_indexOrValue, op
  * @protected
  */
 anychart.core.ChartWithAxes.prototype.onMarkersSignal = function(event) {
-  this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
+  var state = anychart.ConsistencyState.AXES_CHART_AXES_MARKERS;
+  if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION))
+    state |= anychart.ConsistencyState.SCALE_CHART_SCALES | anychart.ConsistencyState.SCALE_CHART_Y_SCALES;
+  this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -932,6 +923,21 @@ anychart.core.ChartWithAxes.prototype.getAdditionalScales = function(scales, isX
 };
 
 
+/** @inheritDoc */
+anychart.core.ChartWithAxes.prototype.invalidateScaleBasedElements = function(scale) {
+  var foundOne = 0;
+  var markers = goog.array.concat(this.lineAxesMarkers_, this.rangeAxesMarkers_, this.textAxesMarkers_);
+  for (var i = 0; i < markers.length; i++) {
+    var marker = markers[i];
+    if (marker && marker.enabled() && (marker.scale() == scale)) {
+      foundOne |= marker.invalidate(anychart.ConsistencyState.BOUNDS);
+    }
+  }
+  if (foundOne)
+    this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
+};
+
+
 //endregion
 //region --- Calculation/Statistics
 /** @inheritDoc */
@@ -945,6 +951,44 @@ anychart.core.ChartWithAxes.prototype.getXScales = function() {
 anychart.core.ChartWithAxes.prototype.getYScales = function() {
   this.calculate();
   return this.getScales(this.getAdditionalScales(this.yScales, false));
+};
+
+
+/** @inheritDoc */
+anychart.core.ChartWithAxes.prototype.calculateAdditionalXScalesExtensions = function() {
+  this.extendScalesByMarkers(this.xScales, true);
+};
+
+
+/** @inheritDoc */
+anychart.core.ChartWithAxes.prototype.calculateAdditionalYScalesExtensions = function() {
+  this.extendScalesByMarkers(this.yScales, false);
+};
+
+
+/**
+ * Extend scales by axis markers values.
+ * @param {Object} scalesObject Scales map.
+ * @param {boolean} isX x scales extending.
+ */
+anychart.core.ChartWithAxes.prototype.extendScalesByMarkers = function(scalesObject, isX) {
+  var scales = this.getScales(scalesObject);
+  var markers = goog.array.concat(this.lineAxesMarkers_, this.rangeAxesMarkers_, this.textAxesMarkers_);
+  for (var i = 0; i < markers.length; i++) {
+    var marker = markers[i];
+    if (marker && marker.enabled()) {
+      var autoScale = /** @type {anychart.scales.Base} */ (!!(marker.isHorizontal() ^ this.isVerticalInternal) ? this.yScale() : this.xScale());
+      var markerScale = marker.scale() ? marker.scale() : autoScale;
+      if (markerScale) {
+        for (var j = 0; j < scales.length; j++) {
+          var scale = scales[j];
+          if ((scale === markerScale) && (marker.getOption('scaleRangeMode') == anychart.enums.ScaleRangeMode.CONSIDER)) {
+            scale.extendDataRange.apply(scale, marker.getReferenceValues());
+          }
+        }
+      }
+    }
+  }
 };
 
 
@@ -965,7 +1009,6 @@ anychart.core.ChartWithAxes.prototype.crosshair = function(opt_value) {
     this.crosshair_ = new anychart.core.ui.Crosshair();
     this.crosshair_.enabled(false);
     this.crosshair_.interactivityTarget(this);
-    this.registerDisposable(this.crosshair_);
     this.crosshair_.listenSignals(this.onCrosshairSignal_, this);
     this.invalidate(anychart.ConsistencyState.AXES_CHART_CROSSHAIR, anychart.Signal.NEEDS_REDRAW);
   }
@@ -1016,7 +1059,6 @@ anychart.core.ChartWithAxes.prototype.annotations = function(opt_annotationsList
      */
     this.annotationsPlotController_ = new this.annotationsModule_['PlotController'](this.annotationsChartController_, this);
     this.annotationsPlotController_.listenSignals(this.annotationsInvalidated_, this);
-    this.registerDisposable(this.annotationsPlotController_);
   }
   if (goog.isDef(opt_annotationsList)) {
     if (this.annotationsPlotController_)
@@ -1718,7 +1760,8 @@ anychart.core.ChartWithAxes.prototype.serializeElementAxis_ = function(item, con
  */
 anychart.core.ChartWithAxes.prototype.serializeAxisMarker_ = function(item, scales, scaleIds, axesIds) {
   var config = item.serialize();
-  this.serializeScale(config, 'scale', /** @type {anychart.scales.Base} */(item.scaleInternal()), scales, scaleIds);
+  if (item.isScaleSet())
+    this.serializeScale(config, 'scale', /** @type {anychart.scales.Base} */(item.scaleInternal()), scales, scaleIds);
   this.serializeElementAxis_(item, config, scales, scaleIds, axesIds);
   return config;
 };

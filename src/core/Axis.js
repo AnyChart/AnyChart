@@ -770,6 +770,12 @@ anychart.core.Axis.prototype.staggerMaxLines = function(opt_value) {
 
 
 //endregion
+//region IAxis implementation
+/** @inheritDoc */
+anychart.core.Axis.prototype.isAxisMarkerProvider = function() {
+  return true;
+};
+//endregion
 
 
 /**

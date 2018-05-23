@@ -909,3 +909,6 @@ goog.exportSymbol('anychart.enums.TagCloudMode.RECT', anychart.enums.TagCloudMod
 
 goog.exportSymbol('anychart.enums.WaterfallDataMode.ABSOLUTE', anychart.enums.WaterfallDataMode.ABSOLUTE);
 goog.exportSymbol('anychart.enums.WaterfallDataMode.DIFF', anychart.enums.WaterfallDataMode.DIFF);
+
+goog.exportSymbol('anychart.enums.ScaleRangeMode.NONE', anychart.enums.ScaleRangeMode.NONE);
+goog.exportSymbol('anychart.enums.ScaleRangeMode.CONSIDER', anychart.enums.ScaleRangeMode.CONSIDER);

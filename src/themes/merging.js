@@ -934,7 +934,8 @@ anychart.themes.merging.mergingMap_ = (function() {
           'scatter',
           'mekko',
           'sparkline',
-          'defaultTimeline'
+          'defaultTimeline',
+          'stock.defaultPlotSettings'
         ], '.defaultLineMarkerSettings'],
         'standalones.lineAxisMarker'
       ]
@@ -947,7 +948,8 @@ anychart.themes.merging.mergingMap_ = (function() {
           'scatter',
           'mekko',
           'sparkline',
-          'defaultTimeline'
+          'defaultTimeline',
+          'stock.defaultPlotSettings'
         ], '.defaultTextMarkerSettings'],
         'standalones.textAxisMarker'
       ]
@@ -960,7 +962,8 @@ anychart.themes.merging.mergingMap_ = (function() {
           'scatter',
           'mekko',
           'sparkline',
-          'defaultTimeline'
+          'defaultTimeline',
+          'stock.defaultPlotSettings'
         ], '.defaultRangeMarkerSettings'],
         'standalones.rangeAxisMarker'
       ]
@@ -2027,6 +2030,9 @@ anychart.themes.merging.multipleEntities_ = {
   'chart.lineAxesMarkers': 'chart.defaultLineMarkerSettings',
   'chart.rangeAxesMarkers': 'chart.defaultRangeMarkerSettings',
   'chart.textAxesMarkers': 'chart.defaultTextMarkerSettings',
+  'plot.lineAxesMarkers': 'plot.defaultLineMarkerSettings',
+  'plot.rangeAxesMarkers': 'plot.defaultRangeMarkerSettings',
+  'plot.textAxesMarkers': 'plot.defaultTextMarkerSettings',
   'chart.ranges': 'chart.defaultRangeSettings',
   'gauge.bars': 'gauge.defaultPointerSettings',
   'gauge.markers': 'gauge.defaultPointerSettings',

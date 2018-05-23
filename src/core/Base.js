@@ -273,6 +273,9 @@ anychart.ConsistencyState = {
   STOCK_PLOT_NO_DATA_LABEL: 1 << 15,
   STOCK_PLOT_EVENT_MARKERS: 1 << 16,
   STOCK_PLOT_TITLE: 1 << 17,
+  STOCK_PLOT_AXIS_MARKERS: 1 << 18,
+  // stock plot uses this consistency state
+  // AXES_CHART_CROSSHAIR: 1 << 24
   //---------------------------------- PRICE INDICATOR STATES (VB) ---------------------------------
   STOCK_PRICE_INDICATOR_LABEL: 1 << 6,
   STOCK_PRICE_INDICATOR_SERIES: 1 << 7,

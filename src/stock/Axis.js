@@ -393,6 +393,12 @@ anychart.stockModule.Axis.prototype.labelsInvalidated_ = function(e) {
 
 
 /** @inheritDoc */
+anychart.stockModule.Axis.prototype.isAxisMarkerProvider = function() {
+  return true;
+};
+
+
+/** @inheritDoc */
 anychart.stockModule.Axis.prototype.remove = function() {
   if (this.rootLayer_)
     this.rootLayer_.remove();
