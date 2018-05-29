@@ -86,7 +86,8 @@ anychart.stockModule.indicators.Base.prototype.declareSeries = function(id, opt_
     series: null,
     seriesType: anychart.enums.normalizeStockSeriesType(opt_type, opt_defaultType),
     mappingSet: false,
-    mapping: null
+    mapping: null,
+    internalChanged: false
   };
 };
 
@@ -107,9 +108,10 @@ anychart.stockModule.indicators.Base.prototype.seriesInternal = function(id, opt
   }
   if (goog.isDef(opt_type)) {
     var type = anychart.enums.normalizeStockSeriesType(opt_type, descriptor.seriesType);
-    if (type != descriptor.seriesType) {
+    if (type != descriptor.series.seriesType()) {
       descriptor.seriesType = type;
       descriptor.mappingSet = false;
+      descriptor.internalChanged = true;
       this.init();
     }
     return this;
@@ -148,9 +150,9 @@ anychart.stockModule.indicators.Base.prototype.init = function() {
       descriptor.mappingSet = false;
     }
     descriptor.series.suspendSignalsDispatching();
-    if (descriptor.series.seriesType() != descriptor.seriesType) {
+    if (descriptor.internalChanged) {
       descriptor.series.seriesType(descriptor.seriesType);
-      descriptor.mappingSet = false;
+      descriptor.internalChanged = false;
     }
     if (!descriptor.mapping) {
       descriptor.mapping = this.mapping_.getTable().mapAs();
