@@ -3149,6 +3149,13 @@ anychart.mapModule.Chart.prototype.calculate = function() {
 
 
 /** @inheritDoc */
+anychart.mapModule.Chart.prototype.specialDraw = function(bounds) {
+  anychart.mapModule.Chart.base(this, 'specialDraw', this.contentBounds);
+  this.dataArea().applyClip(this.scale().getViewSpace());
+};
+
+
+/** @inheritDoc */
 anychart.mapModule.Chart.prototype.drawContent = function(bounds) {
   this.getRootScene();
 

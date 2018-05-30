@@ -666,8 +666,11 @@ anychart.core.ChartWithAxes.prototype.onAxisSignal_ = function(event) {
   if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
     state |= anychart.ConsistencyState.BOUNDS;
   }
+  this.suspendSignalsDispatching();
   // if there are no signals, !state and nothing happens.
   this.invalidate(state, signal);
+  this.invalidateState(anychart.enums.Store.SERIES_CHART, anychart.enums.State.DATA_AREA, anychart.Signal.NEEDS_REDRAW);
+  this.resumeSignalsDispatching(true);
 };
 
 

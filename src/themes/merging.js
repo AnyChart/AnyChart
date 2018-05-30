@@ -693,13 +693,15 @@ anychart.themes.merging.mergingMap_ = (function() {
             [[
               '',
               '.defaultQuarterSettings'
-            ], '.defaultLabelSettings']
+            ], '.defaultLabelSettings'],
+            '.dataArea'
           ]],
           ['stock.', [
             [[
               'defaultPlotSettings',
               'scroller'
-            ], '.xAxis']
+            ], '.xAxis'],
+            'defaultPlotSettings.dataArea'
           ]],
           ['resource.', [
             'grid',

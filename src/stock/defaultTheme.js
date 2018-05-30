@@ -503,6 +503,12 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'enabled': null,
         'xLabels': [{'enabled': null}],
         'yLabels': [{'enabled': null}]
+      },
+      'dataArea': {
+        'zIndex': 10,
+        'background': {
+          'fill': 'none'
+        }
       }
     },
     'padding': [20, 30, 20, 60],

@@ -263,7 +263,14 @@
         },
 
         "selectMarqueeFill": {"$ref": "#/definitions/fill"},
-        "selectMarqueeStroke": {"$ref": "#/definitions/stroke"}
+        "selectMarqueeStroke": {"$ref": "#/definitions/stroke"},
+
+        "dataArea": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.DataArea"}
+          ]
+        }
       }
     },
     "anychart.core.SeparateChart": {
@@ -283,7 +290,13 @@
         },
         "normal": {"$ref": "#/definitions/anychart.core.StateSettings"},
         "hovered": {"$ref": "#/definitions/anychart.core.StateSettings"},
-        "selected": {"$ref": "#/definitions/anychart.core.StateSettings"}
+        "selected": {"$ref": "#/definitions/anychart.core.StateSettings"},
+        "dataArea": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.DataArea"}
+          ]
+        }
       }
     },
     "anychart.core.CartesianBase": {
@@ -5287,6 +5300,21 @@
         "normal": {"$ref": "#/definitions/anychart.core.StateSettings"},
         "hovered": {"$ref": "#/definitions/anychart.core.StateSettings"},
         "selected": {"$ref": "#/definitions/anychart.core.StateSettings"}
+      }
+    },
+
+    "anychart.core.ui.DataArea": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.VisualBase"}
+      ],
+      "properties": {
+        "background": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.Background"}
+          ]
+        }
       }
     },
 

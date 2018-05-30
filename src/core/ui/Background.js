@@ -326,9 +326,13 @@ anychart.core.ui.Background.prototype.draw = function() {
   var bottomStroke = /** @type {acgraph.vector.Stroke} */(this.getOption('bottomStroke'));
   var leftStroke = /** @type {acgraph.vector.Stroke} */(this.getOption('leftStroke'));
 
-  var isSingleStroke = !(topStroke || rightStroke || bottomStroke || leftStroke);
+  var hasTopStroke = goog.isDef(topStroke) && !anychart.utils.isNone(topStroke);
+  var hasRightStroke = goog.isDef(rightStroke) && !anychart.utils.isNone(rightStroke);
+  var hasBottomStroke = goog.isDef(bottomStroke) && !anychart.utils.isNone(bottomStroke);
+  var hasLeftStroke = goog.isDef(leftStroke) && !anychart.utils.isNone(leftStroke);
+  var isSingleStroke = !(hasTopStroke || hasRightStroke || hasBottomStroke || hasLeftStroke);
   var isAtLeastOneCustomStroke = !isSingleStroke;
-  var allStrokeIsCustom = topStroke && rightStroke && bottomStroke && leftStroke;
+  var allStrokeIsCustom = hasTopStroke && hasRightStroke && hasBottomStroke && hasLeftStroke;
   var i, len, strokePath;
 
   var stage = this.container() ? this.container().getStage() : null;

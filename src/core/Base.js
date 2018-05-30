@@ -4,6 +4,7 @@ goog.provide('anychart.core.Base');
 goog.require('anychart');
 goog.require('anychart.core.settings.IObjectWithSettings');
 goog.require('anychart.enums');
+goog.require('goog.array');
 goog.require('goog.events.Event');
 goog.require('goog.events.EventTarget');
 
@@ -430,6 +431,48 @@ anychart.SettingsState = {
 };
 
 
+/**
+ * Consistency store meta information.
+ * Keeps information about states that supported by this store.
+ * Please see anychart.consistency package for more information.
+ * @typedef {
+ * Object.<string, {
+ *   lastUsedBit: number,
+ *   supportedStates: number,
+ *   states: Object.<string, number>
+ * }>
+ * }
+ */
+anychart.ConsistencyStoreMeta;
+
+
+/**
+ * Consistency storage meta information.
+ * Keeps information about store by its name.
+ * @typedef {Object.<string, anychart.ConsistencyStoreMeta>}
+ */
+anychart.ConsistencyStorageMeta;
+
+
+/**
+ * Consistency storage map type definition.
+ * Maps store name to store consistency.
+ * Information about store structure presented in store meta (@see anychart.ConsistencyStoreMeta).
+ * This number is a decimal representation of binary mask.
+ *   0 means 0b000 or parseInt('000', 2)
+ *   1 means 0b001 or parseInt('001', 2)
+ *   4 means 0b100 or parseInt('100', 2)
+ * @example
+ * {
+ *   'serieschart': 1,
+ *   'mystorename': 0,
+ *   'otherstore': 4
+ * }
+ * @typedef {Object.<string, number>}
+ */
+anychart.ConsistencyStorage;
+
+
 
 /**
  * Class implements all the work with consistency states.
@@ -467,6 +510,16 @@ anychart.core.Base = function() {
    * @private
    */
   this.needsForceSignalsDispatching_ = false;
+
+  /**
+   * Consistency storage map.
+   * Please see type definition for more information.
+   * @type {anychart.ConsistencyStorage}
+   */
+  this.consistencyStorage = {};
+
+  // Marks storage as inconsistent.
+  this.invalidateStorage();
 };
 goog.inherits(anychart.core.Base, goog.events.EventTarget);
 
@@ -641,6 +694,291 @@ anychart.core.Base.prototype.unlistenSignals = function(listener, opt_scope) {
 };
 
 
+//region --- New Consistency State Model
+//region -- Properties
+/**
+ * @type {anychart.ConsistencyStorageMeta}
+ */
+anychart.core.Base.prototype.consistencyStorageMeta;
+
+
+//endregion
+//region -- Helpers
+/**
+ * State sum reducer.
+ * @param {number} stateSum Last state.
+ * @param {string} stateName State name.
+ * @return {number} Calculated sum of all states (using bitwise OR)
+ * @this {anychart.ConsistencyStoreMeta}
+ */
+anychart.core.Base.STATE_SUM_REDUCER = function(stateSum, stateName) {
+  return (stateSum | (this.states[stateName] || 0));
+};
+
+
+/**
+ * Ensures that store and store meta exists.
+ * @param {!string} storeName Store name.
+ * @private
+ * @return {boolean}
+ */
+anychart.core.Base.prototype.storeExists_ = function(storeName) {
+  return ((storeName in this.consistencyStorageMeta) && (storeName in this.consistencyStorage));
+};
+
+
+//endregion
+//region -- Invalidate
+/**
+ * Invalidates state in store.
+ * @example
+ * A.prototype.foo = function() {
+ *   this.invalidateState('mystore', 'mystate', 1);
+ * }
+ * // NB: A extends your very base class that supports states behaviour.
+ *
+ * @param {!string} storeName Name of the store.
+ * @param {!string} stateName Name of the state.
+ * @param {(anychart.Signal|number)=} opt_signal Signal(s) to be sent to listener, if state have been set.
+ * @return {number} Actually modified consistency states.
+ */
+anychart.core.Base.prototype.invalidateState = function(storeName, stateName, opt_signal) {
+  if (this.storeExists_(storeName)) {
+    var storeMeta = this.consistencyStorageMeta[storeName];
+    var state = storeMeta.states[stateName] || 0;
+    var effective = state & ~this.consistencyStorage[storeName];
+    this.consistencyStorage[storeName] |= effective;
+    if (effective || this.needsForceSignalsDispatching())
+      this.dispatchSignal(opt_signal || 0);
+    return effective;
+  }
+  return 0;
+};
+
+
+/**
+ * Invalidates states in store.
+ * Code is similar to invalidateState despite of calculation of state-to-invalidate.
+ * This method exists only to remove checking whether stateName(s) parameter is array or not.
+ * @example
+ * A.prototype.foo = function() {
+ *   this.invalidateMultiState('mystore', ['mystate1', 'mystate2'], 1);
+ * }
+ * // NB: A extends your very base class that supports states behaviour.
+ *
+ * @param {!string} storeName Name of the store.
+ * @param {!Array.<string>} stateNames Name of the states.
+ * @param {(anychart.Signal|number)=} opt_signal Signal(s) to be sent to listener, if states have been set.
+ * @return {number} Actually modified consistency states.
+ */
+anychart.core.Base.prototype.invalidateMultiState = function(storeName, stateNames, opt_signal) {
+  if (this.storeExists_(storeName)) {
+    var storeMeta = this.consistencyStorageMeta[storeName];
+    var state = goog.array.reduce(stateNames, anychart.core.Base.STATE_SUM_REDUCER, 0, storeMeta);
+    var effective = state & ~this.consistencyStorage[storeName];
+    this.consistencyStorage[storeName] |= effective;
+    if (effective || this.needsForceSignalsDispatching())
+      this.dispatchSignal(opt_signal || 0);
+    return effective;
+  }
+  return 0;
+};
+
+
+/**
+ * Fully invalidates store.
+ * @example
+ * A.prototype.foo = function() {
+ *   this.invalidateStore('mystore');
+ * }
+ * // NB: A extends your very base class that supports states behaviour.
+ * @param {!string} storeName Name of the store.
+ */
+anychart.core.Base.prototype.invalidateStore = function(storeName) {
+  if (this.storeExists_(storeName)) {
+    this.consistencyStorage[storeName] |= this.consistencyStorageMeta[storeName].supportedStates;
+  }
+};
+
+
+/**
+ * Fully invalidates consistency storage.
+ * You should probably do this in the very base class (e.g. anychart.core.Base);
+ * @example
+ * anychart.core.Base = function() {
+ *   // constructor code here
+ *   this.consistencyStorage = {};
+ *   this.invalidateStorage();
+ * }
+ * If classes extending your very base class adds states support (through out anychart.consistency.supportStates method)
+ * then this method called in a base class will automatically invalidate all states in all stores in a prototype chain.
+ * Do remember that this very base class in a constructor should define consistencyStorage object to work with before
+ * method call.
+ */
+anychart.core.Base.prototype.invalidateStorage = function() {
+  for (var storeName in this.consistencyStorageMeta) {
+    this.consistencyStorage[storeName] = this.consistencyStorageMeta[storeName].supportedStates;
+  }
+};
+
+
+//endregion
+//region -- Mark consistent
+/**
+ * Marks state as consistent in the store.
+ * @example
+ * A.prototype.foo = function() {
+ *   this.markStateConsistent('mystore', 'mystate');
+ * }
+ * // NB: A extends your very base class that supports states behaviour.
+ * @param {!string} storeName Name of the store.
+ * @param {!string} stateName Name of the state.
+ */
+anychart.core.Base.prototype.markStateConsistent = function(storeName, stateName) {
+  if (this.storeExists_(storeName)) {
+    var state = this.consistencyStorageMeta[storeName].states[stateName] || 0;
+    this.consistencyStorage[storeName] &= ~state;
+  }
+};
+
+
+/**
+ * Mark states as consistent in the store.
+ * Code is similar to markStateConsistent despite of calculation of state-to-mark.
+ * This method exists only to remove checking whether stateName(s) parameter is array or not.
+ * @example
+ * A.prototype.foo = function() {
+ *   this.markMultiStateConsistent('mystore', ['mystate1', 'mystate2']);
+ * }
+ * // NB: A extends your very base class that supports states behaviour.
+ *
+ * @param {!string} storeName Name of the store.
+ * @param {Array.<string>} stateNames Name of the states.
+ */
+anychart.core.Base.prototype.markMultiStateConsistent = function(storeName, stateNames) {
+  if (this.storeExists_(storeName)) {
+    var storeMeta = this.consistencyStorageMeta[storeName];
+    var state = goog.array.reduce(stateNames, anychart.core.Base.STATE_SUM_REDUCER, 0, storeMeta);
+    this.consistencyStorage[storeName] &= ~state;
+  }
+};
+
+
+/**
+ * Marks store as consistent.
+ * @example
+ * A.prototype.foo = function() {
+ *   this.markStoreConsistent('mystore');
+ * }
+ * // NB: A extends your very base class that supports states behaviour.
+ * @param {!string} storeName Name of the store.
+ */
+anychart.core.Base.prototype.markStoreConsistent = function(storeName) {
+  if (storeName in this.consistencyStorage) {
+    this.consistencyStorage[storeName] = 0;
+  }
+};
+
+
+/**
+ * Marks storage consistent.
+ * @example
+ * A.prototype.foo = function() {
+ *   this.markStorageConsistent();
+ * }
+ * // NB: A extends your very base class that supports states behaviour.
+ */
+anychart.core.Base.prototype.markStorageConsistent = function() {
+  for (var storeName in this.consistencyStorage) {
+    this.consistencyStorage[storeName] = 0;
+  }
+};
+
+
+//endregion
+//region -- Is consistent
+/**
+ * Checks whether store consistent or not.
+ * @example
+ * A.prototype.foo = function() {
+ *   this.isStoreConsistent();
+ * }
+ * // NB: A extends your very base class that supports states behaviour.
+ * @param {!string} storeName
+ * @return {boolean}
+ */
+anychart.core.Base.prototype.isStoreConsistent = function(storeName) {
+  return (storeName in this.consistencyStorage) && !this.consistencyStorage[storeName];
+};
+
+
+/**
+ * Checks whether storage consistent or not.
+ * @return {boolean}
+ */
+anychart.core.Base.prototype.isStorageConsistent = function() {
+  for (var storeName in this.consistencyStorage) {
+    if (this.consistencyStorage[storeName])
+      return false;
+  }
+  return true;
+};
+
+
+//endregion
+//region -- Has invalidation state
+/**
+ * Checks if a store has a consistency state.
+ * @example
+ * A.prototype.foo = function() {
+ *   if (this.hasStateInvalidation('mystore', 'mystate')) {
+ *     // do something
+ *     this.markStateConsistent('mystore', 'mystate');
+ *   };
+ * }
+ * // NB: A extends your very base class that supports states behaviour.
+ * @param {!string} storeName
+ * @param {!string} stateName
+ * @return {boolean}
+ */
+anychart.core.Base.prototype.hasStateInvalidation = function(storeName, stateName) {
+  if (this.storeExists_(storeName)) {
+    var storeMeta = this.consistencyStorageMeta[storeName];
+    var state = storeMeta.states[stateName] || 0;
+    return !!(this.consistencyStorage[storeName] & state);
+  }
+  return false;
+};
+
+
+/**
+ * Checks if a store has a consistency states.
+ * @example
+ * A.prototype.foo = function() {
+ *   if (this.hasMultiStateInvalidation('mystore', ['mystate1', 'mystate2'])) {
+ *     // do something
+ *     this.markMultiStateConsistent('mystore', 'mystate');
+ *   };
+ * }
+ * // NB: A extends your very base class that supports states behaviour.
+ * @param {!string} storeName
+ * @param {!Array.<string>} stateNames
+ * @return {boolean}
+ */
+anychart.core.Base.prototype.hasMultiStateInvalidation = function(storeName, stateNames) {
+  if (this.storeExists_(storeName)) {
+    var storeMeta = this.consistencyStorageMeta[storeName];
+    var state = goog.array.reduce(stateNames, anychart.core.Base.STATE_SUM_REDUCER, 0, storeMeta);
+    return !!(this.consistencyStorage[storeName] & state);
+  }
+  return false;
+};
+
+
+//endregion
+//endregion
+
+
 /**
  * Sets consistency state to an element {@link anychart.ConsistencyState}.
  * @param {anychart.ConsistencyState|number} state State(s) to be set.
@@ -672,7 +1010,7 @@ anychart.core.Base.prototype.markConsistent = function(state) {
  * @return {boolean} True if it has it.
  */
 anychart.core.Base.prototype.isConsistent = function(opt_allowState) {
-  return !(this.consistency_ & ~(opt_allowState || 0));
+  return !(this.consistency_ & ~(opt_allowState || 0)) && this.isStorageConsistent();
 };
 
 
@@ -691,20 +1029,20 @@ anychart.core.Base.prototype.hasInvalidationState = function(state) {
  *
  * NOTE: YOU CAN ONLY SEND SIGNALS FROM SUPPORTED_SIGNALS MASK!
  *
- * @param {anychart.Signal|number} state Invalidation state(s).
+ * @param {anychart.Signal|number} signal Invalidation signal(s).
  * @param {boolean=} opt_force Force to dispatch signal.
  */
-anychart.core.Base.prototype.dispatchSignal = function(state, opt_force) {
-  state &= this.SUPPORTED_SIGNALS;
-  if (!state) return;
+anychart.core.Base.prototype.dispatchSignal = function(signal, opt_force) {
+  signal &= this.SUPPORTED_SIGNALS;
+  if (!signal) return;
   if (isNaN(this.suspendedDispatching) || !!opt_force) {
     // Hack to prevent Signal events bubbling. May be we should use all advantages of bubbling but not now.
     var parent = this.getParentEventTarget();
     this.setParentEventTarget(null);
-    this.dispatchEvent(new anychart.SignalEvent(this, state));
+    this.dispatchEvent(new anychart.SignalEvent(this, signal));
     this.setParentEventTarget(parent);
   } else {
-    this.suspendedDispatching |= state;
+    this.suspendedDispatching |= signal;
   }
 };
 

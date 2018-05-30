@@ -49,6 +49,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="y_scale" type="Scale"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="series_list" type="Series_list"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="a11y" type="utils.A11y"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="data_area" type="core.DataArea"/>
             <!-- charts.TagCloud elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="angles" type="Angle_list"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="normal" type="core.StateSettings"/>
@@ -405,6 +406,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="hatch_fill_palette" type="palettes.HatchFills"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="marker_palette" type="palettes.Markers"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="tooltip" type="core.Tooltip"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="data_area" type="core.DataArea"/>
             <!-- Map elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="unbound_regions" type="utils.UnboundRegionsSettings"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="color_range" type="core.ColorRange"/>
@@ -1124,6 +1126,13 @@
         <xsd:attribute name="disable_pointer_events" type="xsd:boolean"/>
         <xsd:attribute name="corner_type" type="enums.BackgroundCornerTypes" default="none"/>
         <xsd:attribute name="corners" type="xsd:double" default="0"/>
+        <xsd:attributeGroup ref="attrs.VisualBase"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="core.DataArea">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="background" type="core.Background"/>
+        </xsd:all>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
     </xsd:complexType>
 

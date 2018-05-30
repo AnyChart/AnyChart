@@ -1719,7 +1719,13 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'selectMarqueeStroke': '#d3d3d3',
 
     'maxPointWidth': '100%',
-    'minPointLength': 0
+    'minPointLength': 0,
+    'dataArea': {
+      'zIndex': 10, // series zIndex = 30
+      'background': {
+        'fill': 'none'
+      }
+    }
   },
 
   'cartesianBase': {

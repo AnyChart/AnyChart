@@ -1612,7 +1612,8 @@ anychart.mapModule.scales.Geo.prototype.serialize = function() {
   json['xMinorTicks'] = this.xMinorTicks().serialize();
   json['yTicks'] = this.yTicks().serialize();
   json['yMinorTicks'] = this.yMinorTicks().serialize();
-  json['maxTicksCount'] = this.maxTicksCount_;
+  if (!isNaN(this.maxTicksCount_))
+    json['maxTicksCount'] = this.maxTicksCount_;
   return json;
 };
 

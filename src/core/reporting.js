@@ -280,6 +280,13 @@ anychart.core.reporting.getWarningDescription_ = function(code, opt_arguments) {
     case anychart.enums.WarningCode.VENN_AREA_NOT_REPRESENTED_ON_SCREEN:
       return 'Area ' + opt_arguments[0] + ' not represented on screen.';
 
+    case anychart.enums.WarningCode.STATES_IN_STORE_EXCEEDED:
+      return 'Can\'t add state. All states for store \'' + opt_arguments[0] + '\' has been used.';
+    case anychart.enums.WarningCode.STORE_LAST_STATE_USED:
+      return 'Last state for store \'' + opt_arguments[0] + '\' has been used.';
+    case anychart.enums.WarningCode.STORE_STATE_PAIR_EXISTS:
+      return 'State \'' + opt_arguments[1] + '\' already exists in \'' + opt_arguments[0] + '\' store.';
+
     default:
       return 'Unknown error. Please, contact support team at http://support.anychart.com/.\n' +
           'We will be very grateful for your report!';
