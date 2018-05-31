@@ -1,5 +1,7 @@
+//region --- Provide and Require
 goog.provide('anychart.stockModule.Axis');
 goog.require('acgraph');
+goog.require('anychart.core.AxisTicks');
 goog.require('anychart.core.IAxis');
 goog.require('anychart.core.IGroupingProvider');
 goog.require('anychart.core.VisualBase');
@@ -7,7 +9,7 @@ goog.require('anychart.core.ui.Background');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.format.Context');
 goog.require('anychart.math.Rect');
-goog.require('anychart.stockModule.AxisTicks');
+//endregion
 
 
 
@@ -88,6 +90,7 @@ anychart.stockModule.Axis = function(groupingProvider, opt_disableInteractivity)
 goog.inherits(anychart.stockModule.Axis, anychart.core.VisualBase);
 
 
+//region --- States and Signals
 /**
  * Supported consistency states.
  * @type {number}
@@ -105,6 +108,8 @@ anychart.stockModule.Axis.prototype.SUPPORTED_CONSISTENCY_STATES =
 anychart.stockModule.Axis.prototype.SUPPORTED_SIGNALS = anychart.core.VisualBase.prototype.SUPPORTED_SIGNALS;
 
 
+//endregion
+//region --- API
 /**
  * Axis height getter/setter.
  * @param {number=} opt_value
@@ -139,6 +144,17 @@ anychart.stockModule.Axis.prototype.background = function(opt_value) {
     return this;
   }
   return this.background_;
+};
+
+
+/**
+ * Background invalidation handler.
+ * @param {anychart.SignalEvent} e
+ * @private
+ */
+anychart.stockModule.Axis.prototype.backgroundInvalidated_ = function(e) {
+  if (e.hasSignal(anychart.Signal.NEEDS_REDRAW))
+    this.invalidate(anychart.ConsistencyState.STOCK_DTAXIS_BACKGROUND, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -187,14 +203,34 @@ anychart.stockModule.Axis.prototype.minorLabels = function(opt_value) {
 
 
 /**
+ * Labels invalidation handler.
+ * @param {anychart.SignalEvent} e
+ * @private
+ */
+anychart.stockModule.Axis.prototype.labelsInvalidated_ = function(e) {
+  var state = 0;
+  var signal = 0;
+  if (e.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
+    state = anychart.ConsistencyState.APPEARANCE;
+    signal = anychart.Signal.NEEDS_REDRAW;
+  }
+  if (e.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
+    state |= anychart.ConsistencyState.BOUNDS;
+    signal |= anychart.Signal.BOUNDS_CHANGED;
+  }
+  this.invalidate(state, signal);
+};
+
+
+/**
  * @param {(Object|boolean|null)=} opt_value Axis ticks.
- * @return {!(anychart.stockModule.AxisTicks|anychart.stockModule.Axis)} Axis ticks or itself for method chaining.
+ * @return {!(anychart.core.AxisTicks|anychart.stockModule.Axis)} Axis ticks or itself for method chaining.
  */
 anychart.stockModule.Axis.prototype.ticks = function(opt_value) {
   if (!this.ticks_) {
-    this.ticks_ = new anychart.stockModule.AxisTicks();
+    this.ticks_ = new anychart.core.AxisTicks();
     this.ticks_.orientation('top');
-    this.ticks_.enabled(false);
+    this.ticks_.setupSpecial(true, false);
     this.ticks_.setParentEventTarget(this);
     this.ticks_.listenSignals(this.ticksInvalidated, this);
     this.registerDisposable(this.ticks_);
@@ -210,13 +246,13 @@ anychart.stockModule.Axis.prototype.ticks = function(opt_value) {
 
 /**
  * @param {(Object|boolean|null)=} opt_value Axis ticks.
- * @return {!(anychart.stockModule.AxisTicks|anychart.stockModule.Axis)} Axis ticks or itself for method chaining.
+ * @return {!(anychart.core.AxisTicks|anychart.stockModule.Axis)} Axis ticks or itself for method chaining.
  */
 anychart.stockModule.Axis.prototype.minorTicks = function(opt_value) {
   if (!this.minorTicks_) {
-    this.minorTicks_ = new anychart.stockModule.AxisTicks();
+    this.minorTicks_ = new anychart.core.AxisTicks();
     this.minorTicks_.orientation('top');
-    this.minorTicks_.enabled(false);
+    this.minorTicks_.setupSpecial(true, false);
     this.minorTicks_.setParentEventTarget(this);
     this.minorTicks_.listenSignals(this.ticksInvalidated, this);
     this.registerDisposable(this.minorTicks_);
@@ -298,6 +334,18 @@ anychart.stockModule.Axis.prototype.scale = function(opt_value) {
 
 
 /**
+ * Scale invalidation handler.
+ * @param {anychart.SignalEvent} e
+ * @private
+ */
+anychart.stockModule.Axis.prototype.scaleInvalidated_ = function(e) {
+  if (e.hasSignal(anychart.Signal.NEED_UPDATE_TICK_DEPENDENT)) {
+    this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+  }
+};
+
+
+/**
  * Currently does nothing. Method is added to support stock chart crosshair.
  * @param {anychart.enums.Orientation=} opt_value - Currently sets nothing.
  * @return {anychart.enums.Orientation|anychart.stockModule.Axis} - Currently returns axis instance or anychart.enums.Orientation.BOTTOM.
@@ -311,6 +359,8 @@ anychart.stockModule.Axis.prototype.orientation = function(opt_value) {
 };
 
 
+//endregion
+//region --- Bounds
 /**
  * Gets pixel bounds.
  * @return {anychart.math.Rect}
@@ -323,15 +373,6 @@ anychart.stockModule.Axis.prototype.getPixelBounds = function() {
     res.top = res.top + res.height - this.height_ + 1;
   }
   return res;
-};
-
-
-/**
- * Whether axis is horizontal.
- * @return {boolean}
- */
-anychart.stockModule.Axis.prototype.isHorizontal = function() {
-  return true;
 };
 
 
@@ -349,180 +390,8 @@ anychart.stockModule.Axis.prototype.getRemainingBounds = function() {
 };
 
 
-/**
- * Scale invalidation handler.
- * @param {anychart.SignalEvent} e
- * @private
- */
-anychart.stockModule.Axis.prototype.scaleInvalidated_ = function(e) {
-  if (e.hasSignal(anychart.Signal.NEED_UPDATE_TICK_DEPENDENT)) {
-    this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-  }
-};
-
-
-/**
- * Background invalidation handler.
- * @param {anychart.SignalEvent} e
- * @private
- */
-anychart.stockModule.Axis.prototype.backgroundInvalidated_ = function(e) {
-  if (e.hasSignal(anychart.Signal.NEEDS_REDRAW))
-    this.invalidate(anychart.ConsistencyState.STOCK_DTAXIS_BACKGROUND, anychart.Signal.NEEDS_REDRAW);
-};
-
-
-/**
- * Labels invalidation handler.
- * @param {anychart.SignalEvent} e
- * @private
- */
-anychart.stockModule.Axis.prototype.labelsInvalidated_ = function(e) {
-  var state = 0;
-  var signal = 0;
-  if (e.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    state = anychart.ConsistencyState.APPEARANCE;
-    signal = anychart.Signal.NEEDS_REDRAW;
-  }
-  if (e.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
-    state |= anychart.ConsistencyState.BOUNDS;
-    signal |= anychart.Signal.BOUNDS_CHANGED;
-  }
-  this.invalidate(state, signal);
-};
-
-
-/** @inheritDoc */
-anychart.stockModule.Axis.prototype.isAxisMarkerProvider = function() {
-  return true;
-};
-
-
-/** @inheritDoc */
-anychart.stockModule.Axis.prototype.remove = function() {
-  if (this.rootLayer_)
-    this.rootLayer_.remove();
-};
-
-
-/**
- * Draws the axis.
- * @return {anychart.stockModule.Axis}
- */
-anychart.stockModule.Axis.prototype.draw = function() {
-  if (!this.checkDrawingNeeded())
-    return this;
-
-  if (!this.rootLayer_) {
-    this.rootLayer_ = acgraph.layer();
-    if (!this.interactive_)
-      this.rootLayer_.disablePointerEvents(true);
-  }
-
-  if (this.background_)
-    this.background_.suspendSignalsDispatching();
-  if (this.labels_)
-    this.labels_.suspendSignalsDispatching();
-  if (this.minorLabels_)
-    this.minorLabels_.suspendSignalsDispatching();
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    if (this.background_) {
-      var bgBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
-      bgBounds.top = bgBounds.top + bgBounds.height - this.height_;
-      bgBounds.height = this.height_;
-      this.background_.parentBounds(bgBounds);
-    }
-    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.STOCK_DTAXIS_BACKGROUND);
-    this.markConsistent(anychart.ConsistencyState.BOUNDS);
-  }
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.STOCK_DTAXIS_BACKGROUND)) {
-    if (this.background_) {
-      this.background_.container(this.rootLayer_);
-      this.background_.draw();
-    }
-    this.markConsistent(anychart.ConsistencyState.STOCK_DTAXIS_BACKGROUND);
-  }
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    if (this.scale_) {
-      var bounds;
-      if (this.background_) {
-        bounds = this.background_.getRemainingBounds();
-      } else {
-        bounds = /** @type {anychart.math.Rect} */(this.parentBounds());
-        bounds.top = bounds.top + bounds.height - this.height_;
-        bounds.height = this.height_;
-      }
-      if (this.labels_) {
-        this.labels_.clear();
-        this.labels_.dropCallsCache();
-      }
-      if (this.minorLabels_) {
-        this.minorLabels_.clear();
-        this.minorLabels_.dropCallsCache();
-      }
-
-      if (this.ticks_) {
-        this.ticks_.length(bounds.height);
-        this.ticks_.container(this.rootLayer_);
-        this.ticks_.draw();
-      }
-      if (this.minorTicks_) {
-        this.minorTicks_.length(bounds.height);
-        this.minorTicks_.container(this.rootLayer_);
-        this.minorTicks_.draw();
-      }
-
-      var drawMajor = this.labels_ && this.labels_.enabled();
-      var drawMinor = this.minorLabels_ && this.minorLabels_.enabled();
-      if (drawMajor || drawMinor) {
-        this.drawLabels_(bounds, this.scale_.getTicks());
-      }
-
-      if (!this.clipElement_)
-        this.clipElement_ = acgraph.clip();
-      this.clipElement_.shape(bounds);
-
-      var tmp;
-      if (this.labels_) {
-        this.labels_.container(this.rootLayer_);
-        this.labels_.draw();
-        tmp = this.labels_.getRootLayer();
-        if (tmp) tmp.clip(this.clipElement_);
-      }
-      if (this.minorLabels_) {
-        this.minorLabels_.container(this.rootLayer_);
-        this.minorLabels_.draw();
-        tmp = this.minorLabels_.getRootLayer();
-        if (tmp) tmp.clip(this.clipElement_);
-      }
-    }
-    this.markConsistent(anychart.ConsistencyState.APPEARANCE);
-  }
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
-    this.rootLayer_.zIndex(/** @type {number} */(this.zIndex()));
-    this.markConsistent(anychart.ConsistencyState.Z_INDEX);
-  }
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
-    this.rootLayer_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
-    this.markConsistent(anychart.ConsistencyState.CONTAINER);
-  }
-
-  if (this.background_)
-    this.background_.resumeSignalsDispatching(false);
-  if (this.labels_)
-    this.labels_.resumeSignalsDispatching(false);
-  if (this.minorLabels_)
-    this.minorLabels_.resumeSignalsDispatching(false);
-
-  return this;
-};
-
-
+//endregion
+//region --- Labels
 /**
  * Draws labels.
  * @param {anychart.math.Rect} bounds
@@ -689,6 +558,7 @@ anychart.stockModule.Axis.prototype.drawLabel_ = function(value, isMajor, bounds
   var dataIndex = Math.ceil(this.scale_.getIndexByKey(value));
   var realValue = this.scale_.getKeyByIndex(dataIndex);
   var ratio = this.scale_.transformInternal(realValue, dataIndex);
+
   var x = Math.round(bounds.left + ratio * bounds.width);
   var y = bounds.top;
 
@@ -701,7 +571,18 @@ anychart.stockModule.Axis.prototype.drawLabel_ = function(value, isMajor, bounds
     var diff = bounds.left - labelBounds.left;
     if (diff > 0)
       positionProvider['value']['x'] += diff;
-    labels.add(formatProvider, positionProvider, index);
+    var label = labels.add(formatProvider, positionProvider, index);
+    label.stateOrder([label.ownSettings, labels.ownSettings, label.autoSettings, labels.themeSettings]);
+
+    var labelsPosition = /** @type {anychart.enums.SidePosition} */(labels.getOption('position'));
+    var labelsSidePosition = anychart.utils.sidePositionToNumber(labelsPosition);
+
+    var anchor = labelsSidePosition < 0 ?
+        anychart.enums.Anchor.CENTER_BOTTOM :
+        labelsSidePosition > 0 ?
+            anychart.enums.Anchor.CENTER_TOP :
+            anychart.enums.Anchor.CENTER;
+    label.autoAnchor(anchor);
   }
 };
 
@@ -823,6 +704,152 @@ anychart.stockModule.Axis.prototype.getLabelsFormatProvider_ = function(value, e
 };
 
 
+//endregion
+//region --- Drawing
+/** @inheritDoc */
+anychart.stockModule.Axis.prototype.remove = function() {
+  if (this.rootLayer_)
+    this.rootLayer_.remove();
+};
+
+
+/**
+ * Draws the axis.
+ * @return {anychart.stockModule.Axis}
+ */
+anychart.stockModule.Axis.prototype.draw = function() {
+  if (!this.checkDrawingNeeded())
+    return this;
+
+  if (!this.rootLayer_) {
+    this.rootLayer_ = acgraph.layer();
+    if (!this.interactive_)
+      this.rootLayer_.disablePointerEvents(true);
+  }
+
+  if (this.background_)
+    this.background_.suspendSignalsDispatching();
+  if (this.labels_)
+    this.labels_.suspendSignalsDispatching();
+  if (this.minorLabels_)
+    this.minorLabels_.suspendSignalsDispatching();
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
+    if (this.background_) {
+      var bgBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
+      bgBounds.top = bgBounds.top + bgBounds.height - this.height_;
+      bgBounds.height = this.height_;
+      this.background_.parentBounds(bgBounds);
+    }
+    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.STOCK_DTAXIS_BACKGROUND);
+    this.markConsistent(anychart.ConsistencyState.BOUNDS);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.STOCK_DTAXIS_BACKGROUND)) {
+    if (this.background_) {
+      this.background_.container(this.rootLayer_);
+      this.background_.draw();
+    }
+    this.markConsistent(anychart.ConsistencyState.STOCK_DTAXIS_BACKGROUND);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
+    if (this.scale_) {
+      var bounds;
+      if (this.background_) {
+        bounds = this.background_.getRemainingBounds();
+      } else {
+        bounds = /** @type {anychart.math.Rect} */(this.parentBounds());
+        bounds.top = bounds.top + bounds.height - this.height_;
+        bounds.height = this.height_;
+      }
+      if (this.labels_) {
+        this.labels_.clear();
+        this.labels_.dropCallsCache();
+      }
+      if (this.minorLabels_) {
+        this.minorLabels_.clear();
+        this.minorLabels_.dropCallsCache();
+      }
+
+      if (this.ticks_) {
+        this.ticks_.length(bounds.height);
+        this.ticks_.container(this.rootLayer_);
+        this.ticks_.draw();
+      }
+      if (this.minorTicks_) {
+        this.minorTicks_.length(bounds.height);
+        this.minorTicks_.container(this.rootLayer_);
+        this.minorTicks_.draw();
+      }
+
+      var drawMajor = this.labels_ && this.labels_.enabled();
+      var drawMinor = this.minorLabels_ && this.minorLabels_.enabled();
+      if (drawMajor || drawMinor) {
+        this.drawLabels_(bounds, this.scale_.getTicks());
+      }
+
+      if (!this.clipElement_)
+        this.clipElement_ = acgraph.clip();
+      this.clipElement_.shape(bounds);
+
+      var tmp;
+      if (this.labels_) {
+        this.labels_.container(this.rootLayer_);
+        this.labels_.draw();
+        tmp = this.labels_.getRootLayer();
+        if (tmp) tmp.clip(this.labels_.getOption('position') == 'outside' ? this.clipElement_ : null);
+      }
+      if (this.minorLabels_) {
+        this.minorLabels_.container(this.rootLayer_);
+        this.minorLabels_.draw();
+        tmp = this.minorLabels_.getRootLayer();
+        if (tmp) tmp.clip(this.minorLabels_.getOption('position') == 'outside' ? this.clipElement_ : null);
+      }
+    }
+    this.markConsistent(anychart.ConsistencyState.APPEARANCE);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
+    this.rootLayer_.zIndex(/** @type {number} */(this.zIndex()));
+    this.markConsistent(anychart.ConsistencyState.Z_INDEX);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
+    this.rootLayer_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
+    this.markConsistent(anychart.ConsistencyState.CONTAINER);
+  }
+
+  if (this.background_)
+    this.background_.resumeSignalsDispatching(false);
+  if (this.labels_)
+    this.labels_.resumeSignalsDispatching(false);
+  if (this.minorLabels_)
+    this.minorLabels_.resumeSignalsDispatching(false);
+
+  return this;
+};
+
+
+//endregion
+//region --- Utils
+/**
+ * Whether axis is horizontal.
+ * @return {boolean}
+ */
+anychart.stockModule.Axis.prototype.isHorizontal = function() {
+  return true;
+};
+
+
+/** @inheritDoc */
+anychart.stockModule.Axis.prototype.isAxisMarkerProvider = function() {
+  return true;
+};
+
+
+//endregion
+//region --- Setup and Serialize
 /** @inheritDoc */
 anychart.stockModule.Axis.prototype.disposeInternal = function() {
   goog.dispose(this.labels_);
@@ -872,7 +899,8 @@ anychart.stockModule.Axis.prototype.setupByJSON = function(config, opt_default) 
 };
 
 
-
+//endregion
+//region --- Export
 //exports
 (function() {
   var proto = anychart.stockModule.Axis.prototype;
@@ -885,3 +913,4 @@ anychart.stockModule.Axis.prototype.setupByJSON = function(config, opt_default) 
   proto['showHelperLabel'] = proto.showHelperLabel;
   proto['overlapMode'] = proto.overlapMode;
 })();
+//endregion

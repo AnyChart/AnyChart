@@ -16,26 +16,11 @@ goog.require('anychart.utils');
 anychart.core.AxisTicks = function() {
   anychart.core.AxisTicks.base(this, 'constructor');
 
-  /**
-   * Ticks length.
-   * @type {number}
-   * @private
-   */
-  this.length_;
-
-  /**
-   * Ticks stroke.
-   * @type {acgraph.vector.Stroke|string}
-   * @private
-   */
-  this.stroke_;
-
-  /**
-   * Ticks position.
-   * @type {anychart.enums.SidePosition}
-   * @private
-   */
-  this.position_;
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['stroke', 0, anychart.Signal.NEEDS_REDRAW],
+    ['length', 0, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['position', 0, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED]
+  ]);
 
   /**
    * Ticks enabled.
@@ -56,6 +41,8 @@ anychart.core.AxisTicks = function() {
 goog.inherits(anychart.core.AxisTicks, anychart.core.VisualBase);
 
 
+//region --- States and Signals
+
 /**
  * Supported consistency states.
  * @type {number}
@@ -70,68 +57,29 @@ anychart.core.AxisTicks.prototype.SUPPORTED_SIGNALS = anychart.core.VisualBase.p
 anychart.core.AxisTicks.prototype.SUPPORTED_CONSISTENCY_STATES = anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES; // ENABLED CONTAINER Z_INDEX
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Properties.
-//
-//----------------------------------------------------------------------------------------------------------------------
+//endregion
+//region --- Descriptors
 /**
- * Getter/setter for length.
- * @param {(number|string)=} opt_value .
- * @return {(number|!anychart.core.AxisTicks)} .
+ * Simple descriptors.
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.core.AxisTicks.prototype.length = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.toNumber(opt_value);
-    if (this.length_ != opt_value) {
-      this.length_ = opt_value;
-      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else
-    return this.length_;
-};
+anychart.core.AxisTicks.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'stroke', anychart.core.settings.strokeNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'length', anychart.utils.normalizeNumberOrPercent],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'position', anychart.enums.normalizeSidePosition]
+  ]);
+
+  return map;
+})();
+anychart.core.settings.populate(anychart.core.AxisTicks, anychart.core.AxisTicks.prototype.SIMPLE_PROPS_DESCRIPTORS);
 
 
-/**
- * Getter/setter for stroke.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {!(anychart.core.AxisTicks|acgraph.vector.Stroke)} .
- */
-anychart.core.AxisTicks.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (this.stroke_ != stroke) {
-      this.stroke_ = stroke;
-      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  } else {
-    return this.stroke_;
-  }
-};
-
-
-/**
- * Getter/setter for position.
- * @param {(anychart.enums.SidePosition|string)=} opt_value .
- * @return {(anychart.enums.SidePosition|string|!anychart.core.AxisTicks)} .
- */
-anychart.core.AxisTicks.prototype.position = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.position_ = anychart.enums.normalizeSidePosition(opt_value);
-    this.dispatchSignal(anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    return this;
-  } else
-    return this.position_;
-};
-
-
+//endregion
+//region --- Internal API
 /**
  * Internal use.
  * Change orientation and set drawer to null.
@@ -153,6 +101,8 @@ anychart.core.AxisTicks.prototype.orientation = function(opt_value) {
 };
 
 
+//endregion
+//region --- Drawing
 /** @inheritDoc */
 anychart.core.AxisTicks.prototype.remove = function() {
   if (this.path) this.path.parent(null);
@@ -165,7 +115,7 @@ anychart.core.AxisTicks.prototype.remove = function() {
  */
 anychart.core.AxisTicks.prototype.draw = function() {
   this.path.clear();
-  this.path.stroke(this.stroke_);
+  this.path.stroke(/** @type {acgraph.vector.Stroke} */(this.getOption('stroke')));
 
   if (!this.checkDrawingNeeded())
     return this;
@@ -184,6 +134,8 @@ anychart.core.AxisTicks.prototype.draw = function() {
 };
 
 
+//endregion
+//region --- Drawers
 /**
  * Get drawer depends on orientation
  * @return {Function}
@@ -229,15 +181,18 @@ anychart.core.AxisTicks.prototype.drawTopTick = function(ratio, bounds, lineBoun
   if (ratio == 1) x += pixelShift;
   else x -= pixelShift;
 
-  if (this.position_ == anychart.enums.SidePosition.OUTSIDE) {
+  var position = /** @type {anychart.enums.SidePosition} */(this.getOption('position'));
+  var length = /** @type {number} */(this.getOption('length'));
+
+  if (position == anychart.enums.SidePosition.OUTSIDE) {
     y -= lineThickness / 2;
-    dy = /** @type {number} */(-this.length_);
-  } else if (this.position_ == anychart.enums.SidePosition.CENTER) {
-    y = lineBounds.top + lineBounds.height / 2 - this.length_ / 2;
-    dy = /** @type {number} */(this.length_);
+    dy = /** @type {number} */(-length);
+  } else if (position == anychart.enums.SidePosition.CENTER) {
+    y += (lineBounds.height - length) / 2;
+    dy = /** @type {number} */(length);
   } else {
     y += lineThickness / 2;
-    dy = /** @type {number} */(this.length_);
+    dy = /** @type {number} */(length);
   }
 
   this.path.moveTo(x, y);
@@ -265,15 +220,18 @@ anychart.core.AxisTicks.prototype.drawRightTick = function(ratio, bounds, lineBo
   if (ratio == 1) y -= pixelShift;
   else y += pixelShift;
 
-  if (this.position_ == anychart.enums.SidePosition.OUTSIDE) {
+  var position = /** @type {anychart.enums.SidePosition} */(this.getOption('position'));
+  var length = /** @type {number} */(this.getOption('length'));
+
+  if (position == anychart.enums.SidePosition.OUTSIDE) {
     x += lineThickness / 2;
-    dx = /** @type {number} */(this.length_);
-  } else if (this.position_ == anychart.enums.SidePosition.CENTER) {
-    x -= this.length_ / 2;
-    dx = /** @type {number} */(this.length_);
+    dx = /** @type {number} */(length);
+  } else if (position == anychart.enums.SidePosition.CENTER) {
+    x -= length / 2;
+    dx = /** @type {number} */(length);
   } else {
     x -= lineThickness / 2;
-    dx = /** @type {number} */(-this.length_);
+    dx = /** @type {number} */(-length);
   }
 
   this.path.moveTo(x, y);
@@ -301,15 +259,18 @@ anychart.core.AxisTicks.prototype.drawBottomTick = function(ratio, bounds, lineB
   if (ratio == 1) x += pixelShift;
   else x -= pixelShift;
 
-  if (this.position_ == anychart.enums.SidePosition.OUTSIDE) {
+  var position = /** @type {anychart.enums.SidePosition} */(this.getOption('position'));
+  var length = /** @type {number} */(this.getOption('length'));
+
+  if (position == anychart.enums.SidePosition.OUTSIDE) {
     y += lineThickness / 2;
-    dy = /** @type {number} */(this.length_);
-  } else if (this.position_ == anychart.enums.SidePosition.CENTER) {
-    y -= this.length_ / 2;
-    dy = /** @type {number} */(this.length_);
+    dy = /** @type {number} */(length);
+  } else if (position == anychart.enums.SidePosition.CENTER) {
+    y -= length / 2;
+    dy = /** @type {number} */(length);
   } else {
     y -= lineThickness / 2;
-    dy = /** @type {number} */(-this.length_);
+    dy = /** @type {number} */(-length);
   }
 
   this.path.moveTo(x, y);
@@ -337,15 +298,18 @@ anychart.core.AxisTicks.prototype.drawLeftTick = function(ratio, bounds, lineBou
   if (ratio == 1) y -= pixelShift;
   else y += pixelShift;
 
-  if (this.position_ == anychart.enums.SidePosition.OUTSIDE) {
+  var position = /** @type {anychart.enums.SidePosition} */(this.getOption('position'));
+  var length = /** @type {number} */(this.getOption('length'));
+
+  if (position == anychart.enums.SidePosition.OUTSIDE) {
     x -= lineThickness / 2;
-    dx = /** @type {number} */(-this.length_);
-  } else if (this.position_ == anychart.enums.SidePosition.CENTER) {
-    x -= this.length_ / 2;
-    dx = /** @type {number} */(this.length_);
+    dx = /** @type {number} */(-length);
+  } else if (position == anychart.enums.SidePosition.CENTER) {
+    x -= length / 2;
+    dx = /** @type {number} */(length);
   } else {
     x += lineThickness / 2;
-    dx = /** @type {number} */(this.length_);
+    dx = /** @type {number} */(length);
   }
 
   this.path.moveTo(x, y);
@@ -353,12 +317,12 @@ anychart.core.AxisTicks.prototype.drawLeftTick = function(ratio, bounds, lineBou
 };
 
 
+//endregion
+//region --- Setup and Serialize
 /** @inheritDoc */
 anychart.core.AxisTicks.prototype.serialize = function() {
   var json = anychart.core.AxisTicks.base(this, 'serialize');
-  json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
-  json['length'] = this.length();
-  json['position'] = this.position();
+  anychart.core.settings.serialize(this, this.SIMPLE_PROPS_DESCRIPTORS, json, 'AxisTicks');
   return json;
 };
 
@@ -366,16 +330,17 @@ anychart.core.AxisTicks.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.core.AxisTicks.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.AxisTicks.base(this, 'setupByJSON', config, opt_default);
-  this.length(config['length']);
-  this.stroke(config['stroke']);
-  this.position(config['position']);
+  anychart.core.settings.deserialize(this, this.SIMPLE_PROPS_DESCRIPTORS, config, opt_default);
 };
 
 
+//endregion
+//region --- Export
 //exports
-(function() {
-  var proto = anychart.core.AxisTicks.prototype;
-  proto['length'] = proto.length;//in docs/
-  proto['stroke'] = proto.stroke;//in docs/
-  proto['position'] = proto.position;//in docs/
-})();
+// (function() {
+//   var proto = anychart.core.AxisTicks.prototype;
+  // proto['length'] = proto.length;
+  // proto['stroke'] = proto.stroke;
+  // proto['position'] = proto.position;
+// })();
+//endregion

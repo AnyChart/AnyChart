@@ -588,7 +588,10 @@ anychart.core.ChartWithAxes.prototype.xAxis = function(opt_indexOrValue, opt_val
     axis.setupInternal(true, this.defaultXAxisSettings());
     this.xAxes_[index] = axis;
     axis.listenSignals(this.onAxisSignal_, this);
-    this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES | anychart.ConsistencyState.SCALE_CHART_SCALES_STATISTICS | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES |
+        anychart.ConsistencyState.SCALE_CHART_SCALES_STATISTICS |
+        anychart.ConsistencyState.BOUNDS,
+        anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -707,7 +710,7 @@ anychart.core.ChartWithAxes.prototype.setYAxisScale = function(axis) {
 
 
 //endregion
-//region -- Scales invalidation.
+//region --- Scales invalidation.
 /** @inheritDoc */
 anychart.core.ChartWithAxes.prototype.getScaleAdditionalInvalidationState = function() {
   return anychart.ConsistencyState.AXES_CHART_AXES; //this overridden method fixes DVF-3678
@@ -1135,24 +1138,37 @@ anychart.core.ChartWithAxes.prototype.getContentAreaBounds = function(bounds) {
  * @return {anychart.math.Rect}
  */
 anychart.core.ChartWithAxes.prototype.getBoundsWithoutAxes = function(contentAreaBounds, opt_scrollerSize) {
+  var axesInsideBounds = this.getPixelBounds().clone();
+
   var i, count;
-  var xAxis, yAxis;
+  var axis;
   var axes = goog.array.concat(this.xAxes_, this.yAxes_);
   var attempt = 0;
 
-  for (i = 0, count = this.xAxes_.length; i < count; i++) {
-    xAxis = this.xAxes_[i];
-    if (xAxis) {
-      xAxis.suspendSignalsDispatching();
-      xAxis.padding(0);
-    }
-  }
-
-  for (i = 0, count = this.yAxes_.length; i < count; i++) {
-    yAxis = this.yAxes_[i];
-    if (yAxis) {
-      yAxis.suspendSignalsDispatching();
-      yAxis.padding(0);
+  var firstLeftAxis, firstTopAxis, firstRightAxis, firstBottomAxis;
+  for (i = 0, count = axes.length; i < count; i++) {
+    axis = /** @type {anychart.core.Axis} */(axes[i]);
+    if (axis && axis.enabled()) {
+      switch (axis.orientation()) {
+        case anychart.enums.Orientation.TOP:
+          if (!firstTopAxis)
+            firstTopAxis = axis;
+          break;
+        case anychart.enums.Orientation.BOTTOM:
+          if (!firstBottomAxis)
+            firstBottomAxis = axis;
+          break;
+        case anychart.enums.Orientation.RIGHT:
+          if (!firstRightAxis)
+            firstRightAxis = axis;
+          break;
+        case anychart.enums.Orientation.LEFT:
+          if (!firstLeftAxis)
+            firstLeftAxis = axis;
+          break;
+      }
+      axis.suspendSignalsDispatching();
+      axis.padding(0);
     }
   }
 
@@ -1160,7 +1176,6 @@ anychart.core.ChartWithAxes.prototype.getBoundsWithoutAxes = function(contentAre
   do {
     // axes local vars
     var remainingBounds;
-    var axis;
     var orientation;
     var offsets = [0, 0, 0, 0];
     var complete = true;
@@ -1181,28 +1196,28 @@ anychart.core.ChartWithAxes.prototype.getBoundsWithoutAxes = function(contentAre
         if (orientation == anychart.enums.Orientation.TOP) {
           axis.padding()['top'](offsets[0]);
           axis.padding()['bottom'](0);
-          remainingBounds = axis.getRemainingBounds();
+          remainingBounds = axis.getRemainingBounds(firstTopAxis != axis);
           offsets[0] = contentAreaBounds.height - remainingBounds.height;
           if (isNaN(this.topAxisPadding_))
             this.topAxisPadding_ = axisStrokeThickness;
         } else if (orientation == anychart.enums.Orientation.BOTTOM) {
           axis.padding()['bottom'](offsets[2]);
           axis.padding()['top'](0);
-          remainingBounds = axis.getRemainingBounds();
+          remainingBounds = axis.getRemainingBounds(firstBottomAxis != axis);
           offsets[2] = contentAreaBounds.height - remainingBounds.height;
           if (isNaN(this.bottomAxisPadding_))
             this.bottomAxisPadding_ = axisStrokeThickness;
         } else if (orientation == anychart.enums.Orientation.LEFT) {
           axis.padding()['left'](offsets[3]);
           axis.padding()['right'](0);
-          remainingBounds = axis.getRemainingBounds();
+          remainingBounds = axis.getRemainingBounds(firstLeftAxis != axis);
           offsets[3] = contentAreaBounds.width - remainingBounds.width;
           if (isNaN(this.leftAxisPadding_))
             this.leftAxisPadding_ = axisStrokeThickness;
         } else if (orientation == anychart.enums.Orientation.RIGHT) {
           axis.padding()['right'](offsets[1]);
           axis.padding()['left'](0);
-          remainingBounds = axis.getRemainingBounds();
+          remainingBounds = axis.getRemainingBounds(firstRightAxis != axis);
           offsets[1] = contentAreaBounds.width - remainingBounds.width;
           if (isNaN(this.rightAxisPadding_))
             this.rightAxisPadding_ = axisStrokeThickness;
@@ -1220,38 +1235,58 @@ anychart.core.ChartWithAxes.prototype.getBoundsWithoutAxes = function(contentAre
     for (i = axes.length; i--;) {
       axis = /** @type {anychart.core.Axis} */(axes[i]);
       if (axis && axis.enabled()) {
-        var remainingBoundsBeforeSetPadding = axis.getRemainingBounds();
+        var isNotFirstAxis = firstTopAxis != axis && firstBottomAxis != axis && firstLeftAxis != axis && firstRightAxis != axis;
+        var remainingBoundsBeforeSetPadding = axis.getRemainingBounds(isNotFirstAxis);
 
         if (axis.isHorizontal()) {
           axis.padding()['left'](offsets[3]);
           axis.padding()['right'](offsets[1]);
-          remainingBounds = axis.getRemainingBounds();
+          remainingBounds = axis.getRemainingBounds(firstTopAxis != axis && firstBottomAxis != axis);
           if (remainingBounds.height != remainingBoundsBeforeSetPadding.height) {
             complete = false;
           }
         } else {
           axis.padding()['top'](offsets[0]);
           axis.padding()['bottom'](offsets[2]);
-          remainingBounds = axis.getRemainingBounds();
+          remainingBounds = axis.getRemainingBounds(firstLeftAxis != axis && firstRightAxis != axis);
           if (remainingBounds.width != remainingBoundsBeforeSetPadding.width) {
             complete = false;
           }
         }
+
+        var axisPixelBounds = axis.getPixelBounds(false);
+        var side;
+        switch (axis.orientation()) {
+          case anychart.enums.Orientation.TOP:
+            side = anychart.enums.Orientation.BOTTOM;
+            break;
+          case anychart.enums.Orientation.RIGHT:
+            side = anychart.enums.Orientation.LEFT;
+            break;
+          case anychart.enums.Orientation.BOTTOM:
+            side = anychart.enums.Orientation.TOP;
+            break;
+          case anychart.enums.Orientation.LEFT:
+            side = anychart.enums.Orientation.RIGHT;
+            break;
+        }
+
+        var bounds = axesInsideBounds.differenceBySide(axisPixelBounds, /** @type {anychart.enums.Orientation} */(side));
+        if (bounds)
+          axesInsideBounds = bounds;
       }
     }
     attempt++;
   } while (!complete && attempt < anychart.core.ChartWithAxes.MAX_ATTEMPTS_AXES_CALCULATION);
 
-  for (i = 0, count = this.xAxes_.length; i < count; i++) {
-    xAxis = this.xAxes_[i];
-    if (xAxis) xAxis.resumeSignalsDispatching(false);
+  for (i = 0, count = axes.length; i < count; i++) {
+    axis = axes[i];
+    if (axis && axis.enabled()) {
+      // if (axis == firstTopAxis || axis == firstBottomAxis || axis == firstLeftAxis || axis == firstRightAxis)
+      //   axis.insideBounds(axesInsideBounds);
+      axis.resumeSignalsDispatching(false);
+    }
   }
-
-  for (i = 0, count = this.yAxes_.length; i < count; i++) {
-    yAxis = this.yAxes_[i];
-    if (yAxis) yAxis.resumeSignalsDispatching(false);
-  }
-
   return boundsWithoutAxes.clone().round();
 };
 

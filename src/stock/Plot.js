@@ -1381,7 +1381,7 @@ anychart.stockModule.Plot.prototype.xAxis = function(opt_value) {
   if (!this.xAxis_) {
     this.xAxis_ = new anychart.stockModule.Axis(this.chart_);
     this.xAxis_.setParentEventTarget(this);
-    this.xAxis_.enabled(false);
+    this.xAxis_.setupSpecial(true, false);
     this.xAxis_.zIndex(anychart.stockModule.Plot.ZINDEX_AXIS);
     this.xAxis_.listenSignals(this.xAxisInvalidated_, this);
     this.invalidate(anychart.ConsistencyState.STOCK_PLOT_DT_AXIS | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
@@ -3233,7 +3233,7 @@ anychart.stockModule.Plot.prototype.setupByJSON = function(config, opt_default) 
   if ('title' in config)
     this.title().setupInternal(!!opt_default, config['title']);
 
-  this.xAxis(config['xAxis']);
+  this.xAxis().setupInternal(!!opt_default, config['xAxis']);
   this.legend(config['legend']);
   var type = this.getChart().getType();
 

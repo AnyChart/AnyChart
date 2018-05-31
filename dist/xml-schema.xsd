@@ -842,8 +842,8 @@
         <xsd:all>
             <xsd:element minOccurs="0" maxOccurs="1" name="labels" type="core.LabelsFactory"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="minor_labels" type="core.LabelsFactory"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="ticks" type="core.axes.RadialTicks"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="minor_ticks" type="core.axes.RadialTicks"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="ticks" type="core.axes.Ticks"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="minor_ticks" type="core.axes.Ticks"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill"/>
         </xsd:all>
@@ -862,8 +862,8 @@
         <xsd:all>
             <xsd:element minOccurs="0" maxOccurs="1" name="labels" type="core.LabelsFactory"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="minor_labels" type="core.LabelsFactory"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="ticks" type="core.axes.RadialTicks"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="minor_ticks" type="core.axes.RadialTicks"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="ticks" type="core.axes.Ticks"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="minor_ticks" type="core.axes.Ticks"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
         </xsd:all>
         <xsd:attribute name="labels" type="simple.BoolOrNull" default="true"/>
@@ -875,15 +875,6 @@
         <xsd:attribute name="draw_last_label" type="simple.Bool" default="true"/>
         <xsd:attribute name="overlap_mode" type="enums.LabelsOverlapMode" default="no-overlap"/>
         <xsd:attribute name="scale" type="simple.ScaleRef"/>
-        <xsd:attributeGroup ref="attrs.VisualBase"/>
-    </xsd:complexType>
-
-    <xsd:complexType name="core.axes.RadialTicks">
-        <xsd:all>
-            <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
-        </xsd:all>
-        <xsd:attribute name="stroke" type="xsd:string"/>
-        <xsd:attribute name="length" type="xsd:double" default="5"/>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
     </xsd:complexType>
 

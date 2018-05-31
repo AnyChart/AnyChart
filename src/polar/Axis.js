@@ -1,3 +1,4 @@
+//region --- Provide and Require
 goog.provide('anychart.polarModule.Axis');
 goog.provide('anychart.standalones.axes.Polar');
 goog.require('acgraph');
@@ -12,6 +13,7 @@ goog.require('anychart.enums');
 goog.require('anychart.format.Context');
 goog.require('anychart.math.Rect');
 goog.require('anychart.radarPolarBaseModule.RadialAxisTicks');
+//endregion
 
 
 
@@ -47,6 +49,7 @@ anychart.polarModule.Axis = function() {
 goog.inherits(anychart.polarModule.Axis, anychart.core.VisualBase);
 
 
+//region --- States and Signals
 /**
  * Supported consistency states.
  * @type {number}
@@ -65,6 +68,8 @@ anychart.polarModule.Axis.prototype.SUPPORTED_CONSISTENCY_STATES =
 anychart.polarModule.Axis.prototype.SUPPORTED_SIGNALS = anychart.core.VisualBase.prototype.SUPPORTED_SIGNALS;
 
 
+//endregion
+//region --- Properties
 /**
  * @type {anychart.enums.LabelsOverlapMode}
  * @private
@@ -185,6 +190,8 @@ anychart.polarModule.Axis.prototype.labelsBounds_ = null;
 anychart.polarModule.Axis.prototype.minorLabelsBounds_ = null;
 
 
+//endregion
+//region --- API
 /**
  * @param {(anychart.enums.LabelsOverlapMode|string)=} opt_value Value to set.
  * @return {anychart.enums.LabelsOverlapMode|string|anychart.polarModule.Axis} Drawing flag or itself for method chaining.
@@ -450,6 +457,8 @@ anychart.polarModule.Axis.prototype.startAngle = function(opt_value) {
 };
 
 
+//endregion
+//region --- Bounds
 /** @inheritDoc */
 anychart.polarModule.Axis.prototype.invalidateParentBounds = function() {
   this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
@@ -477,11 +486,18 @@ anychart.polarModule.Axis.prototype.calculateAxisBounds_ = function() {
     var scale = /** @type {anychart.scales.Ordinal|anychart.scales.ScatterBase} */(this.scale());
 
     var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds()) || anychart.math.rect(0, 0, 0, 0);
+
     this.radius_ = Math.max(Math.round(Math.min(parentBounds.width, parentBounds.height) / 2), 0);
     this.cx_ = Math.round(parentBounds.left + parentBounds.width / 2);
     this.cy_ = Math.round(parentBounds.top + parentBounds.height / 2);
+
     var majorLabels = /** @type {anychart.core.ui.LabelsFactory} */(this.labels());
+    var majorLabelsPosition = /** @type {anychart.enums.SidePosition} */(majorLabels.getOption('position'));
+    var majorLabelsSidePosition = majorLabelsPosition == 'normal' ? 1 : anychart.utils.sidePositionToNumber(majorLabelsPosition);
+
     var minorLabels = /** @type {anychart.core.ui.LabelsFactory} */(this.minorLabels());
+    var minorLabelsPosition = /** @type {anychart.enums.SidePosition} */(majorLabels.getOption('position'));
+    var minorLabelsSidePosition = minorLabelsPosition == 'normal' ? 1 : anychart.utils.sidePositionToNumber(minorLabelsPosition);
 
     majorLabels
         .clear()
@@ -491,34 +507,47 @@ anychart.polarModule.Axis.prototype.calculateAxisBounds_ = function() {
         .clear()
         .parentBounds(parentBounds);
 
+    this.markConsistent(anychart.ConsistencyState.BOUNDS);
+
     if (scale && this.radius_ && this.enabled()) {
+      var ticks = /** @type {!anychart.radarPolarBaseModule.RadialAxisTicks} */(this.ticks());
       var isOrdinal = anychart.utils.instanceOf(scale, anychart.scales.Ordinal);
-      var majorLabelsEnabled = this.labels().enabled();
-      var minorLabelsEnabled = this.minorLabels().enabled();
+
+      var majorLabelsEnabled = majorLabels.enabled();
+      var minorLabelsEnabled = minorLabels.enabled();
+
       var lineThickness = acgraph.vector.getThickness(this.stroke_);
-      var majorTicksLength = this.ticks().enabled() ? /** @type {number} */(this.ticks().length()) : 0;
+
+      var majorTicksLength = anychart.utils.getAffectBoundsTickLength(ticks);
       var ignoreMajorTicks;
       if (anychart.utils.isPercent(majorTicksLength)) {
         ignoreMajorTicks = true;
         majorTicksLength = parseFloat(majorTicksLength);
       }
+
+      var majorAffectsRadiusTicksLength = parseFloat(anychart.utils.getAffectBoundsTickLength(ticks, majorLabelsSidePosition));
+      var minorTicks = /** @type {!anychart.radarPolarBaseModule.RadialAxisTicks} */(this.minorTicks());
       // var majorLabelsOffsetByTicks = isOrdinal ? 0 : majorTicksLength;
-      var minorTicksLength = (!isOrdinal && this.minorTicks().enabled()) ?
-          /** @type {number} */(this.minorTicks().length()) : 0;
+      var minorTicksLength = isOrdinal ? 0 : anychart.utils.getAffectBoundsTickLength(minorTicks) ;
       if (anychart.utils.isPercent(minorTicksLength)) {
         minorTicksLength = parseFloat(minorTicksLength);
       }
+      var minorAffectsRadiusTicksLength = isOrdinal ? 0 : parseFloat(anychart.utils.getAffectBoundsTickLength(minorTicks, minorLabelsSidePosition)) ;
+
       var majorTicksArr = (majorTicksLength || majorLabelsEnabled) ? scale.ticks().get() : [];
       var minorTicksArr = (!isOrdinal && (minorTicksLength || minorLabelsEnabled)) ? scale.minorTicks().get() : [];
+
       if (!isOrdinal && !this.getRatio_(0, majorTicksArr, scale, 0)) {
         if (this.getRatio_(minorTicksArr.length - 1, minorTicksArr, scale, 1) == 1)
           minorTicksArr.pop();
         if (this.getRatio_(majorTicksArr.length - 1, majorTicksArr, scale, 1) == 1)
           majorTicksArr.pop();
       }
+
       var i, j, index, ratio, isMajor, majorRatio, minorRatio, angle, radius,
-          dx, dy, labelsEnabled, tickLength, ticksArr, boundsCache,
+          dx, dy, labelsEnabled, tickLength, affectsRadiusTicksLength, ticksArr, boundsCache,
           labels, label, ticksAngles, ignoreTicks, angleRad;
+
       var labelsOrder = [];
       var majorTickAngles = [];
       var minorTickAngles = [];
@@ -542,6 +571,7 @@ anychart.polarModule.Axis.prototype.calculateAxisBounds_ = function() {
             isMajor = true;
             index = i;
             labelsEnabled = majorLabelsEnabled;
+            affectsRadiusTicksLength = majorAffectsRadiusTicksLength;
             tickLength = majorTicksLength;
             ticksArr = majorTicksArr;
             // labelsOffset = majorLabelsOffsetByTicks;
@@ -554,6 +584,7 @@ anychart.polarModule.Axis.prototype.calculateAxisBounds_ = function() {
             isMajor = false;
             index = j;
             labelsEnabled = minorLabelsEnabled;
+            affectsRadiusTicksLength = minorAffectsRadiusTicksLength;
             tickLength = minorTicksLength;
             ticksArr = minorTicksArr;
             // labelsOffset = minorTicksLength;
@@ -563,7 +594,7 @@ anychart.polarModule.Axis.prototype.calculateAxisBounds_ = function() {
             ignoreTicks = false;
           }
 
-          labelsOriginRadius = isOrdinal ? this.radius_ : this.radius_ + tickLength;
+          labelsOriginRadius = isOrdinal ? this.radius_ : this.radius_ + affectsRadiusTicksLength;
           commonIndex = isMajor ? index : ~index;
           angle = anychart.math.round(goog.math.standardAngle(this.startAngle_ - 90 + ratio * 360), 4);
           angleRad = goog.math.toRadians(angle);
@@ -579,7 +610,6 @@ anychart.polarModule.Axis.prototype.calculateAxisBounds_ = function() {
               radiusDelta = Math.max(boundsChecker.call(this, angle, dx, dy, points), radiusDelta);
             } else {
               padding = label.getFinalSettings('padding');
-
               labels.measureWithTransform(label);
               this.calcLabelTextPath(label, i, ticksArr);
 
@@ -784,8 +814,6 @@ anychart.polarModule.Axis.prototype.calculateAxisBounds_ = function() {
       this.majorTickAngles_ = [];
       this.minorTickAngles_ = [];
     }
-
-    this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 };
 
@@ -879,20 +907,8 @@ anychart.polarModule.Axis.prototype.getRemainingBounds = function() {
 };
 
 
-/**
- * Helper function to calculate ratios.
- * @param {number} i
- * @param {Array} ticksArr
- * @param {anychart.scales.Base} scale
- * @param {number} subRatio
- * @return {number}
- * @private
- */
-anychart.polarModule.Axis.prototype.getRatio_ = function(i, ticksArr, scale, subRatio) {
-  return (i < ticksArr.length) ? scale.transform(ticksArr[i], subRatio) : NaN;
-};
-
-
+//endregion
+//region --- Labels
 /**
  * Configures the label. Returns label bounds coordinate box.
  * @param {anychart.core.ui.LabelsFactory} labels
@@ -1086,8 +1102,11 @@ anychart.polarModule.Axis.prototype.calcLabelTextPath = function(label, index, t
     startAngle = this.startAngle_ - 90 + this.getRatio_(index, ticksArr, scale, 0) * 360;
     endAngle = this.startAngle_ - 90 + this.getRatio_(index, ticksArr, scale, 1) * 360;
 
+    var ticks = /** @type {anychart.radarPolarBaseModule.RadialAxisTicks} */(this.ticks());
+    var ticksStroke = /** @type {acgraph.vector.Stroke} */(ticks.getOption('stroke'));
+
     var tmpSweep = Math.abs(endAngle - startAngle);
-    var dw = ((tmpSweep - (padding.tightenWidth(tmpSweep * pxPerDegree) - acgraph.vector.getThickness(this.ticks().stroke())) / pxPerDegree)) / 2;
+    var dw = ((tmpSweep - (padding.tightenWidth(tmpSweep * pxPerDegree) - acgraph.vector.getThickness(ticksStroke)) / pxPerDegree)) / 2;
 
     startAngle += dw;
     endAngle -= dw;
@@ -1127,6 +1146,24 @@ anychart.polarModule.Axis.prototype.calcLabelTextPath = function(label, index, t
 };
 
 
+//endregion
+//region --- Utils
+/**
+ * Helper function to calculate ratios.
+ * @param {number} i
+ * @param {Array} ticksArr
+ * @param {anychart.scales.Base} scale
+ * @param {number} subRatio
+ * @return {number}
+ * @private
+ */
+anychart.polarModule.Axis.prototype.getRatio_ = function(i, ticksArr, scale, subRatio) {
+  return (i < ticksArr.length) ? scale.transform(ticksArr[i], subRatio) : NaN;
+};
+
+
+//endregion
+//region --- Drawing
 /** @inheritDoc */
 anychart.polarModule.Axis.prototype.isAxisMarkerProvider = function() {
   return false;
@@ -1226,8 +1263,8 @@ anychart.polarModule.Axis.prototype.draw = function() {
     var lineThickness = acgraph.vector.getThickness(this.stroke_);
     var ticks = /** @type {anychart.radarPolarBaseModule.RadialAxisTicks} */(this.ticks());
     ticks.draw();
-    var tickThickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(ticks.stroke()));
-    var tickLen = /** @type {number} */(ticks.length());
+    var tickThickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(ticks.getOption('stroke')));
+    var tickLen = /** @type {number} */(ticks.getOption('length'));
     if (anychart.utils.isPercent(tickLen)) {
       tickLen = isOrdinal ? anychart.utils.normalizeSize(tickLen, this.originalRadius_ - this.radius_) : parseFloat(tickLen);
     }
@@ -1237,8 +1274,8 @@ anychart.polarModule.Axis.prototype.draw = function() {
 
     ticks = /** @type {anychart.radarPolarBaseModule.RadialAxisTicks} */(this.minorTicks());
     ticks.draw();
-    tickThickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(ticks.stroke()));
-    tickLen = /** @type {number} */(ticks.length());
+    tickThickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(ticks.getOption('stroke')));
+    tickLen = /** @type {number} */(ticks.getOption('length'));
     if (anychart.utils.isPercent(tickLen)) {
       tickLen = parseFloat(tickLen);
     }
@@ -1278,27 +1315,45 @@ anychart.polarModule.Axis.prototype.draw = function() {
  * @private
  */
 anychart.polarModule.Axis.prototype.drawTick_ = function(ticks, angle, lineThickness, tickThickness, tickLen) {
+  var ticksPosition = /** @type {anychart.enums.SidePosition} */(ticks.getOption('position'));
+  var ticksSidePosition = anychart.utils.sidePositionToNumber(ticksPosition);
+
   var angleRad = goog.math.toRadians(angle);
+
   var sin = Math.sin(angleRad);
   var cos = Math.cos(angleRad);
+
   var xPixelShift = 0;
   var yPixelShift = 0;
 
-  var halfThickness = Math.floor(lineThickness / 2);
+  var halfThickness = ticksSidePosition >= 0 ? Math.floor(lineThickness / 2) : Math.ceil(lineThickness / 2);
   if ((tickThickness % 2) && !(angle % 90)) {
     yPixelShift = -Math.round(cos) / 2;
     xPixelShift = -Math.round(sin) / 2;
   }
 
-  var radius = this.radius_ + halfThickness;
-  var x0Ticks = Math.round(this.cx_ + radius * cos) + xPixelShift;
-  var y0Ticks = Math.round(this.cy_ + radius * sin) + yPixelShift;
+  var radius = this.radius_;
+  var x = this.cx_ + radius * cos;
+  var y = this.cy_ + radius * sin;
 
-  radius = this.radius_ + tickLen + halfThickness;
-  var x1Ticks = Math.round(this.cx_ + radius * cos) + xPixelShift;
-  var y1Ticks = Math.round(this.cy_ + radius * sin) + yPixelShift;
+  var startLength = ticksSidePosition ? ticksSidePosition * halfThickness : -tickLen / 2;
+  var endLength = ticksSidePosition ? ticksSidePosition * tickLen : tickLen;
 
-  ticks.drawTick(x0Ticks, y0Ticks, x1Ticks, y1Ticks);
+  var dx, dy;
+
+  dx = startLength * cos;
+  dy = startLength * sin;
+
+  var xStart = Math.round(x + dx) + xPixelShift;
+  var yStart = Math.round(y + dy) + yPixelShift;
+
+  dx = endLength * cos;
+  dy = endLength * sin;
+
+  var xEnd = xStart + dx;
+  var yEnd = yStart + dy;
+
+  ticks.drawTick(xStart, yStart, xEnd, yEnd);
 };
 
 
@@ -1313,6 +1368,8 @@ anychart.polarModule.Axis.prototype.remove = function() {
 };
 
 
+//endregion
+//region --- Setup and Serialize
 /** @inheritDoc */
 anychart.polarModule.Axis.prototype.serialize = function() {
   var json = anychart.polarModule.Axis.base(this, 'serialize');
@@ -1362,6 +1419,8 @@ anychart.polarModule.Axis.prototype.disposeInternal = function() {
 };
 
 
+//endregion
+//region --- Debug
 // /**
 //  * Debug method.
 //  * @param {Array.<number>} points
@@ -1384,7 +1443,7 @@ anychart.polarModule.Axis.prototype.disposeInternal = function() {
 // };
 
 
-
+//endregion
 //region --- Standalone
 //------------------------------------------------------------------------------
 //
@@ -1430,6 +1489,7 @@ anychart.standalones.axes.polar = function() {
 
 
 //endregion
+//region --- Export
 //proto['startAngle'] = proto.startAngle;
 //exports
 (function() {
@@ -1451,3 +1511,4 @@ anychart.standalones.axes.polar = function() {
   proto['container'] = proto.container;
   proto['startAngle'] = proto.startAngle;
 })();
+//endregion

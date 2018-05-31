@@ -270,23 +270,28 @@ anychart.colorScalesModule.ui.ColorRange.prototype.getLabelsFormatProvider = fun
 };
 
 
-/** @inheritDoc */
+/**
+ * @param {anychart.core.AxisTicks} ticks .
+ * @param {number=} opt_side .
+ * @return {number}
+ */
 anychart.colorScalesModule.ui.ColorRange.prototype.getAffectBoundsTickLength = function(ticks, opt_side) {
   var result = 0;
   if (ticks.enabled()) {
-    var length = /** @type {number} */(ticks.length());
+    var length = /** @type {number} */(ticks.getOption('length'));
+    var position = /** @type {number} */(ticks.getOption('position'));
 
-    if (ticks.position() == anychart.enums.SidePosition.CENTER) {
+    if (position == anychart.enums.SidePosition.CENTER) {
       result = Math.max((length - this.colorLineSize_) / 2, 0);
     } else {
       if (goog.isDef(opt_side)) {
         if (opt_side > 0) {
-          if (ticks.position() == anychart.enums.SidePosition.OUTSIDE)
+          if (position == anychart.enums.SidePosition.OUTSIDE)
             result = 0;
           else
             result = length;
         } else if (opt_side < 0) {
-          if (ticks.position() == anychart.enums.SidePosition.INSIDE)
+          if (position == anychart.enums.SidePosition.INSIDE)
             result = 0;
           else
             result = length;
@@ -636,8 +641,11 @@ anychart.colorScalesModule.ui.ColorRange.prototype.getLength = function(parentLe
 
 /** @inheritDoc */
 anychart.colorScalesModule.ui.ColorRange.prototype.calcSize = function(maxLabelSize, maxMinorLabelSize) {
-  var ticks = this.ticks();
-  var minorTicks = this.minorTicks();
+  var ticks = /** @type {anychart.core.AxisTicks} */(this.ticks());
+  var minorTicks = /** @type {anychart.core.AxisTicks} */(this.minorTicks());
+
+  var ticksPosition = /** @type {anychart.enums.SidePosition} */(ticks.getOption('position'));
+  var minorTicksPosition = /** @type {anychart.enums.SidePosition} */(minorTicks.getOption('position'));
 
   var ticksLength = this.getAffectBoundsTickLength(/** @type {!anychart.core.AxisTicks} */(ticks));
   var minorTicksLength = this.getAffectBoundsTickLength(/** @type {!anychart.core.AxisTicks} */(minorTicks));
@@ -646,12 +654,12 @@ anychart.colorScalesModule.ui.ColorRange.prototype.calcSize = function(maxLabelS
   var insideSize = this.getMarkerSpace_();
 
   var sumTicksAndLabelsSizes, sumMinorTicksAndLabelsSizes;
-  if (ticks.position() == anychart.enums.SidePosition.OUTSIDE) {
-    if (minorTicks.position() == anychart.enums.SidePosition.OUTSIDE) {
+  if (ticksPosition == anychart.enums.SidePosition.OUTSIDE) {
+    if (minorTicksPosition == anychart.enums.SidePosition.OUTSIDE) {
       sumTicksAndLabelsSizes = maxLabelSize + ticksLength;
       sumMinorTicksAndLabelsSizes = maxMinorLabelSize + minorTicksLength;
       outsideSize = Math.max(sumTicksAndLabelsSizes, sumMinorTicksAndLabelsSizes);
-    } else if (minorTicks.position() == anychart.enums.SidePosition.INSIDE) {
+    } else if (minorTicksPosition == anychart.enums.SidePosition.INSIDE) {
       sumTicksAndLabelsSizes = maxLabelSize + ticksLength;
       outsideSize = Math.max(sumTicksAndLabelsSizes, maxMinorLabelSize);
       insideSize = Math.max(minorTicksLength, insideSize);
@@ -661,12 +669,12 @@ anychart.colorScalesModule.ui.ColorRange.prototype.calcSize = function(maxLabelS
       outsideSize = Math.max(sumTicksAndLabelsSizes, sumMinorTicksAndLabelsSizes);
       insideSize = Math.max(minorTicksLength, insideSize);
     }
-  } else if (ticks.position() == anychart.enums.SidePosition.INSIDE) {
-    if (minorTicks.position() == anychart.enums.SidePosition.OUTSIDE) {
+  } else if (ticksPosition == anychart.enums.SidePosition.INSIDE) {
+    if (minorTicksPosition == anychart.enums.SidePosition.OUTSIDE) {
       sumMinorTicksAndLabelsSizes = maxMinorLabelSize + minorTicksLength;
       outsideSize = Math.max(maxLabelSize, sumMinorTicksAndLabelsSizes);
       insideSize = Math.max(ticksLength, insideSize);
-    } else if (minorTicks.position() == anychart.enums.SidePosition.INSIDE) {
+    } else if (minorTicksPosition == anychart.enums.SidePosition.INSIDE) {
       outsideSize = Math.max(maxLabelSize, maxMinorLabelSize);
       insideSize = Math.max(ticksLength, minorTicksLength, insideSize);
     } else {
@@ -675,12 +683,12 @@ anychart.colorScalesModule.ui.ColorRange.prototype.calcSize = function(maxLabelS
       insideSize = Math.max(ticksLength, minorTicksLength, insideSize);
     }
   } else {
-    if (minorTicks.position() == anychart.enums.SidePosition.OUTSIDE) {
+    if (ticksPosition == anychart.enums.SidePosition.OUTSIDE) {
       sumTicksAndLabelsSizes = maxLabelSize + ticksLength;
       sumMinorTicksAndLabelsSizes = maxMinorLabelSize + minorTicksLength;
       outsideSize = Math.max(sumTicksAndLabelsSizes, sumMinorTicksAndLabelsSizes);
       insideSize = Math.max(ticksLength, insideSize);
-    } else if (minorTicks.position() == anychart.enums.SidePosition.INSIDE) {
+    } else if (minorTicksPosition == anychart.enums.SidePosition.INSIDE) {
       sumTicksAndLabelsSizes = maxLabelSize + ticksLength;
       outsideSize = Math.max(sumTicksAndLabelsSizes, maxMinorLabelSize);
       insideSize = Math.max(ticksLength, minorTicksLength, insideSize);

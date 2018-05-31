@@ -388,7 +388,8 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'height': 25,
         'scale': 0,
         'ticks': {
-          'enabled': false
+          'enabled': false,
+          'position': 'center'
         },
         'labels': {
           'enabled': true,
@@ -664,7 +665,8 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         },
         'minorTicks': {
           'enabled': true,
-          'stroke': '#cecece'
+          'stroke': '#cecece',
+          'position': 'center'
         },
         'labels': {
           'enabled': true,
@@ -693,6 +695,9 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
             var date = this['tickValue'];
             return anychart.format.dateTime(date, anychart.format.getDateTimeFormat(anychart.format.getIntervalIdentifier(this['minorIntervalUnit'], this['majorIntervalUnit'])));
           }
+        },
+        'ticks': {
+          'position': 'center'
         },
         'zIndex': 75
       }

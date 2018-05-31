@@ -1,3 +1,4 @@
+//region --- Provide and Require
 goog.provide('anychart.radarPolarBaseModule.RadialAxis');
 goog.provide('anychart.standalones.axes.Radial');
 goog.require('acgraph');
@@ -13,6 +14,7 @@ goog.require('anychart.math.Rect');
 goog.require('anychart.radarPolarBaseModule.RadialAxisTicks');
 goog.require('anychart.scales');
 goog.require('anychart.utils');
+//endregion
 
 
 
@@ -55,6 +57,7 @@ anychart.radarPolarBaseModule.RadialAxis = function() {
 goog.inherits(anychart.radarPolarBaseModule.RadialAxis, anychart.core.VisualBase);
 
 
+//region --- States and Signals
 /**
  * Supported consistency states.
  * @type {number}
@@ -74,6 +77,8 @@ anychart.radarPolarBaseModule.RadialAxis.prototype.SUPPORTED_CONSISTENCY_STATES 
 anychart.radarPolarBaseModule.RadialAxis.prototype.SUPPORTED_SIGNALS = anychart.core.VisualBase.prototype.SUPPORTED_SIGNALS;
 
 
+//endregion
+//region --- Properties
 /**
  * @type {acgraph.vector.Path}
  * @private
@@ -172,17 +177,8 @@ anychart.radarPolarBaseModule.RadialAxis.prototype.labelsBounds_ = null;
 anychart.radarPolarBaseModule.RadialAxis.prototype.minorLabelsBounds_ = null;
 
 
-/**
- * Drops labels calls cache.
- */
-anychart.radarPolarBaseModule.RadialAxis.prototype.dropLabelCallsCache = function() {
-  if (this.labels_)
-    this.labels_.dropCallsCache();
-  if (this.minorLabels_)
-    this.minorLabels_.dropCallsCache();
-};
-
-
+//endregion
+//region --- Settings
 /**
  * Getter/setter for labels.
  * @param {(Object|boolean|null)=} opt_value Axis labels.
@@ -420,12 +416,6 @@ anychart.radarPolarBaseModule.RadialAxis.prototype.scaleInvalidated_ = function(
 };
 
 
-/** @inheritDoc */
-anychart.radarPolarBaseModule.RadialAxis.prototype.invalidateParentBounds = function() {
-  this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-};
-
-
 /**
  * @param {(string|number)=} opt_value .
  * @return {(string|number|anychart.radarPolarBaseModule.RadialAxis)} .
@@ -460,6 +450,77 @@ anychart.radarPolarBaseModule.RadialAxis.prototype.innerRadius = function(opt_va
     return this;
   }
   return this.innerRadius_;
+};
+
+
+/**
+ * Getter/setter for drawFirstLabel.
+ * @param {boolean=} opt_value Drawing flag.
+ * @return {boolean|anychart.radarPolarBaseModule.RadialAxis} Drawing flag or itself for method chaining.
+ */
+anychart.radarPolarBaseModule.RadialAxis.prototype.drawFirstLabel = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.drawFirstLabel_ != opt_value) {
+      this.drawFirstLabel_ = opt_value;
+      this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  }
+  return this.drawFirstLabel_;
+};
+
+
+/**
+ * Getter/setter for drawLastLabel.
+ * @param {boolean=} opt_value Drawing flag.
+ * @return {boolean|anychart.radarPolarBaseModule.RadialAxis} Drawing flag or itself for method chaining.
+ */
+anychart.radarPolarBaseModule.RadialAxis.prototype.drawLastLabel = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.drawLastLabel_ != opt_value) {
+      this.drawLastLabel_ = opt_value;
+      this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  }
+  return this.drawLastLabel_;
+};
+
+
+/**
+ * Getter/setter for overlapMode.
+ * @param {(anychart.enums.LabelsOverlapMode|string)=} opt_value Value to set.
+ * @return {anychart.enums.LabelsOverlapMode|string|anychart.radarPolarBaseModule.RadialAxis} Drawing flag or itself for method chaining.
+ */
+anychart.radarPolarBaseModule.RadialAxis.prototype.overlapMode = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var overlap = anychart.enums.normalizeLabelsOverlapMode(opt_value, this.overlapMode_);
+    if (this.overlapMode_ != overlap) {
+      this.overlapMode_ = overlap;
+      this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  }
+  return this.overlapMode_;
+};
+
+
+//endregion
+//region --- Utils
+/** @inheritDoc */
+anychart.radarPolarBaseModule.RadialAxis.prototype.invalidateParentBounds = function() {
+  this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+};
+
+
+/**
+ * Drops labels calls cache.
+ */
+anychart.radarPolarBaseModule.RadialAxis.prototype.dropLabelCallsCache = function() {
+  if (this.labels_)
+    this.labels_.dropCallsCache();
+  if (this.minorLabels_)
+    this.minorLabels_.dropCallsCache();
 };
 
 
@@ -700,11 +761,15 @@ anychart.radarPolarBaseModule.RadialAxis.prototype.getLabelBounds_ = function(in
   if (goog.isDef(boundsCache[index]))
     return boundsCache[index];
 
-  var ticks = isMajor ? this.ticks() : this.minorTicks();
-  var ticksLength = ticks.length();
+  var ticks = /** @type {!anychart.radarPolarBaseModule.RadialAxisTicks} */(isMajor ? this.ticks() : this.minorTicks());
+  var ticksPosition = /** @type {anychart.enums.SidePosition} */(ticks.getOption('position'));
+  var ticksSidePosition = anychart.utils.sidePositionToNumber(ticksPosition);
+
   var lineThickness = this.stroke()['thickness'] ? this.stroke()['thickness'] : 1;
-  var halfThickness = Math.floor(lineThickness / 2);
-  var labels = isMajor ? this.labels() : this.minorLabels();
+  var halfThickness = ticksSidePosition < 0 ? Math.ceil(lineThickness / 2) : Math.floor(lineThickness / 2);
+  var labels = /** @type {anychart.core.ui.LabelsFactory} */(isMajor ? this.labels() : this.minorLabels());
+  var labelsPosition = /** @type {anychart.enums.SidePosition} */(labels.getOption('position'));
+  var labelsSidePosition = anychart.utils.sidePositionToNumber(labelsPosition);
 
   var scale = /** @type {anychart.scales.ScatterBase|anychart.scales.Ordinal} */(this.scale());
   var scaleTicks = isMajor ? scale.ticks() : scale.minorTicks();
@@ -717,6 +782,9 @@ anychart.radarPolarBaseModule.RadialAxis.prototype.getLabelBounds_ = function(in
   } else {
     ratio = scale.transform(value, .5);
   }
+  var formatProvider = this.getLabelsFormatProvider_(index, value);
+  var positionProvider = {'value': {'x': 0, 'y': 0}};
+  var labelBounds = labels.measure(formatProvider, positionProvider, undefined, index);
 
   var radius = this.innerLength_ + (this.length_ - this.innerLength_) * ratio;
   var angle = goog.math.standardAngle(this.startAngle() - 90);
@@ -727,22 +795,20 @@ anychart.radarPolarBaseModule.RadialAxis.prototype.getLabelBounds_ = function(in
 
   var angle_ = goog.math.toRadians(goog.math.standardAngle(90 - angle - 270));
 
-  var dx = (ticksLength + halfThickness) * Math.sin(angle_);
-  var dy = (ticksLength + halfThickness) * Math.cos(angle_);
+  var ticksLength = anychart.utils.getAffectBoundsTickLength(ticks, labelsSidePosition);
 
-  var xTick = x + dx;
-  var yTick = y + dy;
+  var ticksDx = ticksLength * Math.sin(angle_);
+  var ticksDy = ticksLength * Math.cos(angle_);
 
-  var formatProvider = this.getLabelsFormatProvider_(index, value);
-  var positionProvider = {'value': {'x': xTick, 'y': yTick}};
-  var labelBounds = labels.measure(formatProvider, positionProvider, undefined, index);
+  var lineDx = labelsSidePosition * halfThickness * Math.sin(angle_);
+  var lineDy = labelsSidePosition * halfThickness * Math.cos(angle_);
 
   var offset = this.getLabelPositionOffsetForAngle_(goog.math.standardAngle(angle + 90), labelBounds);
-  labelBounds.left += offset.x + labelBounds.width / 2;
-  labelBounds.top += offset.y + labelBounds.height / 2;
+  var labelDx = offset.x * labelsSidePosition;
+  var labelDy = offset.y * labelsSidePosition;
 
-  positionProvider['value']['x'] = labelBounds.left;
-  positionProvider['value']['y'] = labelBounds.top;
+  positionProvider['value']['x'] = x + labelDx + ticksDx + lineDx;
+  positionProvider['value']['y'] = y + labelDy + ticksDy + lineDy;
 
   return boundsCache[index] = labels.measureWithTransform(formatProvider, positionProvider, undefined, index);
 };
@@ -827,188 +893,6 @@ anychart.radarPolarBaseModule.RadialAxis.prototype.getLabelPositionOffsetForAngl
 
 
 /**
- * Getter/setter for drawFirstLabel.
- * @param {boolean=} opt_value Drawing flag.
- * @return {boolean|anychart.radarPolarBaseModule.RadialAxis} Drawing flag or itself for method chaining.
- */
-anychart.radarPolarBaseModule.RadialAxis.prototype.drawFirstLabel = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.drawFirstLabel_ != opt_value) {
-      this.drawFirstLabel_ = opt_value;
-      this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.drawFirstLabel_;
-};
-
-
-/**
- * Getter/setter for drawLastLabel.
- * @param {boolean=} opt_value Drawing flag.
- * @return {boolean|anychart.radarPolarBaseModule.RadialAxis} Drawing flag or itself for method chaining.
- */
-anychart.radarPolarBaseModule.RadialAxis.prototype.drawLastLabel = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.drawLastLabel_ != opt_value) {
-      this.drawLastLabel_ = opt_value;
-      this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.drawLastLabel_;
-};
-
-
-/**
- * Getter/setter for overlapMode.
- * @param {(anychart.enums.LabelsOverlapMode|string)=} opt_value Value to set.
- * @return {anychart.enums.LabelsOverlapMode|string|anychart.radarPolarBaseModule.RadialAxis} Drawing flag or itself for method chaining.
- */
-anychart.radarPolarBaseModule.RadialAxis.prototype.overlapMode = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var overlap = anychart.enums.normalizeLabelsOverlapMode(opt_value, this.overlapMode_);
-    if (this.overlapMode_ != overlap) {
-      this.overlapMode_ = overlap;
-      this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.overlapMode_;
-};
-
-
-/**
- * Axis line drawer.
- * @private
- */
-anychart.radarPolarBaseModule.RadialAxis.prototype.drawLine_ = function() {
-  var angle = goog.math.standardAngle(this.startAngle() - 90);
-  var angleRad = goog.math.toRadians(angle);
-
-  var xPixelShift = 0;
-  var yPixelShift = 0;
-
-  var lineThickness = this.stroke()['thickness'] ? parseFloat(this.stroke()['thickness']) : 1;
-  if (!angle) {
-    yPixelShift = lineThickness % 2 == 0 ? 0 : -.5;
-  } else if (angle == 90) {
-    xPixelShift = lineThickness % 2 == 0 ? 0 : -.5;
-  } else if (angle == 180) {
-    yPixelShift = lineThickness % 2 == 0 ? 0 : .5;
-  } else if (angle == 270) {
-    xPixelShift = lineThickness % 2 == 0 ? 0 : .5;
-  }
-
-  var x = Math.round(this.cx_ + this.length_ * Math.cos(angleRad));
-  var y = Math.round(this.cy_ + this.length_ * Math.sin(angleRad));
-  var zeroX = Math.round(this.cx_ + this.innerLength_ * Math.cos(angleRad));
-  var zeroY = Math.round(this.cy_ + this.innerLength_ * Math.sin(angleRad));
-
-  this.line_
-      .moveTo(zeroX + xPixelShift, zeroY + yPixelShift)
-      .lineTo(x + xPixelShift, y + yPixelShift);
-};
-
-
-/**
- * Ticks drawer.
- * @param {number} ratio Ratio.
- * @param {boolean} isMajor Is major label.
- * @private
- */
-anychart.radarPolarBaseModule.RadialAxis.prototype.drawTick_ = function(ratio, isMajor) {
-  var angle = goog.math.standardAngle(this.startAngle() - 90);
-  var angleRad = goog.math.toRadians(angle);
-  var ticks = isMajor ? this.ticks() : this.minorTicks();
-  var ticksLength = ticks.length();
-
-  var ticksThickness = ticks.stroke()['thickness'] ? parseFloat(ticks.stroke()['thickness']) : 1;
-  var lineThickness = this.stroke()['thickness'] ? parseFloat(this.stroke()['thickness']) : 1;
-
-  var xPixelShift = 0;
-  var yPixelShift = 0;
-
-  if (!angle) {
-    xPixelShift = ticksThickness % 2 == 0 ? 0 : -.5;
-  } else if (angle == 90) {
-    yPixelShift = ticksThickness % 2 == 0 ? 0 : -.5;
-  } else if (angle == 180) {
-    xPixelShift = ticksThickness % 2 == 0 ? 0 : .5;
-  } else if (angle == 270) {
-    yPixelShift = ticksThickness % 2 == 0 ? 0 : .5;
-  }
-
-  if (!ratio) {
-    xPixelShift *= -1;
-    yPixelShift *= -1;
-  }
-
-  var radius = this.innerLength_ + (this.length_ - this.innerLength_) * ratio;
-
-  var x = this.cx_ + radius * Math.cos(angleRad);
-  var y = this.cy_ + radius * Math.sin(angleRad);
-
-  if (angle == 180) {
-    x = Math.floor(x);
-    y = Math.floor(y);
-  } else {
-    x = Math.ceil(x);
-    y = Math.ceil(y);
-  }
-
-  var angle_ = goog.math.toRadians(goog.math.standardAngle(90 - angle - 270));
-
-  var dx, dy;
-
-  var halfThickness = Math.floor(lineThickness / 2);
-
-  dx = halfThickness * Math.sin(angle_);
-  dy = halfThickness * Math.cos(angle_);
-
-  var xStart = x + dx + xPixelShift;
-  var yStart = y + dy + yPixelShift;
-
-  dx = ticksLength * Math.sin(angle_);
-  dy = ticksLength * Math.cos(angle_);
-
-  var xEnd = xStart + dx;
-  var yEnd = yStart + dy;
-
-  ticks.drawTick(xStart, yStart, xEnd, yEnd);
-};
-
-
-/**
- * Axis labels drawer.
- * @param {number} index Scale label index.
- * @param {boolean} isMajor Is major label.
- * @private
- */
-anychart.radarPolarBaseModule.RadialAxis.prototype.drawLabel_ = function(index, isMajor) {
-  var ticks, labels;
-  var scale = /** @type {anychart.scales.ScatterBase|anychart.scales.Ordinal} */(this.scale());
-  if (isMajor) {
-    ticks = scale.ticks();
-    labels = this.labels();
-  } else {
-    ticks = scale.minorTicks();
-    labels = this.minorLabels();
-  }
-  var scaleTicksArr = ticks.get();
-
-  var formatProvider = this.getLabelsFormatProvider_(index, scaleTicksArr[index]);
-  var bounds = anychart.math.Rect.fromCoordinateBox(this.getLabelBounds_(index, isMajor));
-
-  var x = bounds.left + bounds.width / 2;
-  var y = bounds.top + bounds.height / 2;
-
-  var positionProvider = {'value': {'x': x, 'y': y}};
-  labels.add(formatProvider, positionProvider, index);
-};
-
-
-/**
  * Gets format provider for label.
  * @param {number} index Label index.
  * @param {string|number} value Label value.
@@ -1053,6 +937,145 @@ anychart.radarPolarBaseModule.RadialAxis.prototype.getLabelsFormatProvider_ = fu
   context.tokenAliases(aliases);
 
   return context.propagate();
+};
+
+
+//endregion
+//region --- Drawing
+/**
+ * Axis line drawer.
+ * @private
+ */
+anychart.radarPolarBaseModule.RadialAxis.prototype.drawLine_ = function() {
+  var angle = goog.math.standardAngle(this.startAngle() - 90);
+  var angleRad = goog.math.toRadians(angle);
+
+  var xPixelShift = 0;
+  var yPixelShift = 0;
+
+  var lineThickness = this.stroke()['thickness'] ? parseFloat(this.stroke()['thickness']) : 1;
+  if (!angle) {
+    yPixelShift = lineThickness % 2 == 0 ? 0 : -.5;
+  } else if (angle == 90) {
+    xPixelShift = lineThickness % 2 == 0 ? 0 : -.5;
+  } else if (angle == 180) {
+    yPixelShift = lineThickness % 2 == 0 ? 0 : .5;
+  } else if (angle == 270) {
+    xPixelShift = lineThickness % 2 == 0 ? 0 : .5;
+  }
+
+  var x = Math.round(this.cx_ + this.length_ * Math.cos(angleRad));
+  var y = Math.round(this.cy_ + this.length_ * Math.sin(angleRad));
+  var zeroX = Math.round(this.cx_ + this.innerLength_ * Math.cos(angleRad));
+  var zeroY = Math.round(this.cy_ + this.innerLength_ * Math.sin(angleRad));
+
+  this.line_
+      .moveTo(zeroX + xPixelShift, zeroY + yPixelShift)
+      .lineTo(x + xPixelShift, y + yPixelShift);
+};
+
+
+/**
+ * Ticks drawer.
+ * @param {number} ratio Ratio.
+ * @param {boolean} isMajor Is major label.
+ * @private
+ */
+anychart.radarPolarBaseModule.RadialAxis.prototype.drawTick_ = function(ratio, isMajor) {
+  var angle = goog.math.standardAngle(this.startAngle() - 90);
+  var angleRad = goog.math.toRadians(angle);
+  var ticks = /** @type {!anychart.radarPolarBaseModule.RadialAxisTicks} */(isMajor ? this.ticks() : this.minorTicks());
+
+  var ticksLength = /** @type {number} */(ticks.getOption('length'));
+  var ticksStroke = /** @type {acgraph.vector.Stroke} */(ticks.getOption('stroke'));
+  var ticksPosition = /** @type {anychart.enums.SidePosition} */(ticks.getOption('position'));
+  var ticksSidePosition = anychart.utils.sidePositionToNumber(ticksPosition);
+
+  var ticksThickness = ticksStroke['thickness'] ? parseFloat(ticksStroke['thickness']) : 1;
+  var lineThickness = this.stroke()['thickness'] ? parseFloat(this.stroke()['thickness']) : 1;
+
+  var xPixelShift = 0;
+  var yPixelShift = 0;
+
+  if (!angle) {
+    xPixelShift = ticksThickness % 2 == 0 ? 0 : -.5;
+  } else if (angle == 90) {
+    yPixelShift = ticksThickness % 2 == 0 ? 0 : -.5;
+  } else if (angle == 180) {
+    xPixelShift = ticksThickness % 2 == 0 ? 0 : .5;
+  } else if (angle == 270) {
+    yPixelShift = ticksThickness % 2 == 0 ? 0 : .5;
+  }
+
+  if (!ratio) {
+    xPixelShift *= -1;
+    yPixelShift *= -1;
+  }
+
+  var radius = this.innerLength_ + (this.length_ - this.innerLength_) * ratio;
+
+  var x = this.cx_ + radius * Math.cos(angleRad);
+  var y = this.cy_ + radius * Math.sin(angleRad);
+
+  if (angle == 180) {
+    x = Math.floor(x);
+    y = Math.floor(y);
+  } else {
+    x = Math.ceil(x);
+    y = Math.ceil(y);
+  }
+
+  var angle_ = goog.math.toRadians(goog.math.standardAngle(90 - angle - 270));
+
+  var dx, dy;
+
+  var halfThickness = ticksSidePosition < 0 ? Math.ceil(lineThickness / 2) : Math.floor(lineThickness / 2);
+
+  var startLength = ticksSidePosition ? ticksSidePosition * halfThickness : -ticksLength / 2;
+  var endLength = ticksSidePosition ? ticksSidePosition * ticksLength : ticksLength;
+
+  dx = startLength * Math.sin(angle_);
+  dy = startLength * Math.cos(angle_);
+
+  var xStart = x + dx + xPixelShift;
+  var yStart = y + dy + yPixelShift;
+
+  dx = endLength * Math.sin(angle_);
+  dy = endLength * Math.cos(angle_);
+
+  var xEnd = xStart + dx;
+  var yEnd = yStart + dy;
+
+  ticks.drawTick(xStart, yStart, xEnd, yEnd);
+};
+
+
+/**
+ * Axis labels drawer.
+ * @param {number} index Scale label index.
+ * @param {boolean} isMajor Is major label.
+ * @private
+ */
+anychart.radarPolarBaseModule.RadialAxis.prototype.drawLabel_ = function(index, isMajor) {
+  var ticks, labels;
+  var scale = /** @type {anychart.scales.ScatterBase|anychart.scales.Ordinal} */(this.scale());
+  if (isMajor) {
+    ticks = scale.ticks();
+    labels = this.labels();
+  } else {
+    ticks = scale.minorTicks();
+    labels = this.minorLabels();
+  }
+  var scaleTicksArr = ticks.get();
+
+  var formatProvider = this.getLabelsFormatProvider_(index, scaleTicksArr[index]);
+  var bounds = anychart.math.Rect.fromCoordinateBox(this.getLabelBounds_(index, isMajor));
+
+  var x = bounds.left + bounds.width / 2;
+  var y = bounds.top + bounds.height / 2;
+
+  var positionProvider = {'value': {'x': x, 'y': y}};
+  labels.add(formatProvider, positionProvider, index);
 };
 
 
@@ -1287,6 +1310,8 @@ anychart.radarPolarBaseModule.RadialAxis.prototype.remove = function() {
 };
 
 
+//endregion
+//region --- Setup and Serialize
 /** @inheritDoc */
 anychart.radarPolarBaseModule.RadialAxis.prototype.serialize = function() {
   var json = anychart.radarPolarBaseModule.RadialAxis.base(this, 'serialize');
@@ -1338,7 +1363,7 @@ anychart.radarPolarBaseModule.RadialAxis.prototype.disposeInternal = function() 
 };
 
 
-
+//endregion
 //region --- Standalone
 //------------------------------------------------------------------------------
 //
@@ -1386,7 +1411,7 @@ anychart.standalones.axes.radial = function() {
 
 
 //endregion
-//proto['startAngle'] = proto.startAngle;
+//region --- Export
 //exports
 (function() {
   var proto = anychart.radarPolarBaseModule.RadialAxis.prototype;
@@ -1408,3 +1433,4 @@ anychart.standalones.axes.radial = function() {
   proto['startAngle'] = proto.startAngle;
   proto['innerRadius'] = proto.innerRadius;
 })();
+//endregion

@@ -257,6 +257,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'rotation': null,
         'fontSize': 10,
         'anchor': 'auto',
+        'position': 'outside',
         'zIndex': 5
       },
       'minorLabels': {
@@ -264,6 +265,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'rotation': null,
         'fontSize': 9,
         'anchor': null,
+        'position': 'outside',
         'zIndex': 4
       },
       'overlapMode': 'no-overlap',

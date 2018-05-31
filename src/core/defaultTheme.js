@@ -951,11 +951,13 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'labels': {
       'enabled': true,
       'format': anychart.core.defaultTheme.returnValue,
+      'position': 'outside',
       'zIndex': 35
     },
     'minorLabels': {
       'fontSize': 9,
       'format': anychart.core.defaultTheme.returnValue,
+      'position': 'outside',
       'zIndex': 35
     },
     'ticks': {

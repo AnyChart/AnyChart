@@ -525,6 +525,45 @@ anychart.utils.rotateAnchorByPosition = function(anchor, position) {
 
 
 /**
+ * Returns number representation of side position.
+ * @param {anychart.enums.SidePosition} position
+ * @return {number}
+ */
+anychart.utils.sidePositionToNumber = function(position) {
+  //byPath value for polar xAxis only
+  return position == anychart.enums.SidePosition.OUTSIDE || position == 'byPath' ?
+      1 : position == anychart.enums.SidePosition.INSIDE ? -1 : 0;
+};
+
+
+
+/**
+ * Returns ticks length that affects axis size calculation.
+ * @param {!anychart.core.AxisTicks} ticks Ticks instance.
+ * @param {number=} opt_side If value greater than 0 - calculates offset relative outside position,
+ * less then 0 - relative inside position, equal to 0 - relative both sides.
+ * @return {number} Ticks length.
+ */
+anychart.utils.getAffectBoundsTickLength = function(ticks, opt_side) {
+  var length = 0;
+  var side = goog.isDef(opt_side) ? opt_side : NaN;
+  if (ticks.enabled()) {
+    var position = /** @type {anychart.enums.SidePosition} */(ticks.getOption('position'));
+    var ticksLength = /** @type {number} */(ticks.getOption('length'));
+
+    if (position == anychart.enums.SidePosition.OUTSIDE) {
+      length = side <= 0 ? 0 : ticksLength ;
+    } else if (position == anychart.enums.SidePosition.CENTER) {
+      length = side * ticksLength / 2;
+    } else if (position == anychart.enums.SidePosition.INSIDE) {
+      length = side >= 0 ? 0 : -ticksLength;
+    }
+  }
+  return /** @type {number} */(length);
+};
+
+
+/**
  * Returns an anchor for the position to keep the element outside of the body.
  * @param {anychart.enums.Position|anychart.enums.Anchor} anchor
  * @return {anychart.enums.Anchor}

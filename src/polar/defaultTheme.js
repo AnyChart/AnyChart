@@ -21,7 +21,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       'zIndex': 25,
       'fill': 'none',
       'labels': {
-        'position': 'byPath',
+        'position': 'outside',
         'vAlign': 'middle',
         'hAlign': 'middle',
         'anchor': 'auto',

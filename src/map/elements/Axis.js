@@ -853,24 +853,33 @@ anychart.mapModule.elements.Axis.prototype.getLabelsFormatProvider = function(in
 
 /**
  * Returns anchor for label.
+ * @param {boolean} isMajor .
  * @return {anychart.enums.Anchor}
  * @private
  */
-anychart.mapModule.elements.Axis.prototype.getLabelAnchor_ = function() {
-  var anchor;
-  switch (this.orientation_) {
-    case anychart.enums.Orientation.TOP:
-      anchor = anychart.enums.Anchor.CENTER_BOTTOM;
-      break;
-    case anychart.enums.Orientation.RIGHT:
-      anchor = anychart.enums.Anchor.LEFT_CENTER;
-      break;
-    case anychart.enums.Orientation.BOTTOM:
-      anchor = anychart.enums.Anchor.CENTER_TOP;
-      break;
-    case anychart.enums.Orientation.LEFT:
-      anchor = anychart.enums.Anchor.RIGHT_CENTER;
-      break;
+anychart.mapModule.elements.Axis.prototype.getLabelAnchor_ = function(isMajor) {
+  var labels = isMajor ? this.labels() : this.minorLabels();
+  var position = labels.getOption('position');
+
+  if (position == 'center') {
+    anchor = anychart.enums.Anchor.CENTER;
+  } else {
+    var isPositionInside = position == 'inside';
+    var anchor;
+    switch (this.orientation_) {
+      case anychart.enums.Orientation.TOP:
+        anchor = anychart.enums.Anchor.CENTER_BOTTOM;
+        break;
+      case anychart.enums.Orientation.RIGHT:
+        anchor = anychart.enums.Anchor.LEFT_CENTER;
+        break;
+      case anychart.enums.Orientation.BOTTOM:
+        anchor = anychart.enums.Anchor.CENTER_TOP;
+        break;
+      case anychart.enums.Orientation.LEFT:
+        anchor = isPositionInside ? anychart.enums.Anchor.LEFT_CENTER : anychart.enums.Anchor.RIGHT_CENTER;
+        break;
+    }
   }
 
   return /** @type {anychart.enums.Anchor} */(anchor);
@@ -933,15 +942,22 @@ anychart.mapModule.elements.Axis.prototype.getLabelBounds_ = function(index, isM
 
   var value = parseFloat(ticksArray[index]);
   var coords = ticks.calcTick(value);
-  var tickPosition = ticks.getOption('position');
+
+  var labelsPosition = /** @type {anychart.enums.SidePosition} */(labels.getOption('position') || parentLabels.getOption('position'));
+  var labelsSidePosition = anychart.utils.sidePositionToNumber(labelsPosition);
+  var ticksPosition = /** @type {anychart.enums.SidePosition} */(ticks.getOption('position'));
+  var ticksSidePosition = anychart.utils.sidePositionToNumber(ticksPosition);
 
   if (ticks.enabled()) {
-    if (tickPosition == anychart.enums.SidePosition.OUTSIDE) {
+    if (ticksSidePosition * labelsSidePosition > 0) {
       x = coords[2];
       y = coords[3];
-    } else if (tickPosition == anychart.enums.SidePosition.INSIDE || tickPosition == anychart.enums.SidePosition.CENTER) {
+    } else if (ticksSidePosition * labelsSidePosition < 0 || ticksSidePosition) {
       x = coords[0];
       y = coords[1];
+    } else {
+      x = coords[0] + (coords[2] - coords[0]) / 2;
+      y = coords[1] + (coords[3] - coords[1]) / 2;
     }
   } else {
     x = coords[0];
@@ -955,7 +971,7 @@ anychart.mapModule.elements.Axis.prototype.getLabelBounds_ = function(index, isM
   var settings = labels.getChangedSettings();
 
   var autoRotation = this.getLabelRotation_(coords[4], isMajor);
-  var autoAnchor = this.getLabelAnchor_();
+  var autoAnchor = this.getLabelAnchor_(isMajor);
 
   goog.object.extend(parentSettings, settings);
 
@@ -1022,6 +1038,11 @@ anychart.mapModule.elements.Axis.prototype.getAffectingBounds = function(opt_bou
     var axisMinorTicks = this.minorTicks();
     axisMinorTicks.setScale(scale);
 
+    var ticksPosition = /** @type {anychart.enums.SidePosition} */(axisTicks.getOption('position'));
+    var ticksSidePosition = anychart.utils.sidePositionToNumber(ticksPosition);
+    var minorTicksPosition = /** @type {anychart.enums.SidePosition} */(axisMinorTicks.getOption('position'));
+    var minorTicksSidePosition = anychart.utils.sidePositionToNumber(minorTicksPosition);
+
     var resultBounds;
     var labelBounds, tickBounds, titleBounds;
 
@@ -1037,7 +1058,7 @@ anychart.mapModule.elements.Axis.prototype.getAffectingBounds = function(opt_bou
           resultBounds.boundingRect(labelBounds);
         }
       }
-    } else if (axisTicks.enabled() && axisTicks.getOption('position') == anychart.enums.SidePosition.OUTSIDE) {
+    } else if (axisTicks.enabled() && ticksSidePosition >= 0) {
       for (i = 0, len = ticksArr.length; i < len; i++) {
         tickBounds = axisTicks.getTickBounds(parseFloat(ticksArr[i]));
         if (!resultBounds) {
@@ -1058,7 +1079,7 @@ anychart.mapModule.elements.Axis.prototype.getAffectingBounds = function(opt_bou
           resultBounds.boundingRect(labelBounds);
         }
       }
-    } else if (axisMinorTicks.enabled() && axisMinorTicks.getOption('position') == anychart.enums.SidePosition.OUTSIDE) {
+    } else if (axisMinorTicks.enabled() && minorTicksSidePosition >= 0) {
       for (i = 0, len = minorTicksArr.length; i < len; i++) {
         tickBounds = axisMinorTicks.getTickBounds(minorTicksArr[i]);
         if (!resultBounds) {
@@ -1187,14 +1208,21 @@ anychart.mapModule.elements.Axis.prototype.drawLabel_ = function(value, isMajor,
   var parentLabels = isMajor ? this.parent().labels() : this.parent().minorLabels();
 
   var coords = ticks.calcTick(value);
-  var tickPosition = ticks.getOption('position');
+
+  var labelsPosition = /** @type {anychart.enums.SidePosition} */(labels.getOption('position') || parentLabels.getOption('position'));
+  var labelsSidePosition = anychart.utils.sidePositionToNumber(labelsPosition);
+  var ticksPosition = /** @type {anychart.enums.SidePosition} */(ticks.getOption('position'));
+  var ticksSidePosition = anychart.utils.sidePositionToNumber(ticksPosition);
 
   var x, y;
   if (ticks.enabled()) {
-    if (tickPosition == anychart.enums.SidePosition.OUTSIDE) {
+    if (!ticksSidePosition && !labelsSidePosition) {
+      x = coords[0] + (coords[2] - coords[0]) / 2;
+      y = coords[1] + (coords[3] - coords[1]) / 2;
+    } else if (ticksSidePosition * labelsSidePosition > 0 || (!ticksSidePosition && labelsSidePosition < 0)) {
       x = coords[2];
       y = coords[3];
-    } else if (tickPosition == anychart.enums.SidePosition.INSIDE || tickPosition == anychart.enums.SidePosition.CENTER) {
+    } else if (ticksSidePosition * labelsSidePosition < 0 || !labelsSidePosition || (!ticksSidePosition && labelsSidePosition > 0)) {
       x = coords[0];
       y = coords[1];
     }
@@ -1208,13 +1236,15 @@ anychart.mapModule.elements.Axis.prototype.drawLabel_ = function(value, isMajor,
 
   var label = labels.add(formatProvider, positionProvider, index);
   label.autoRotation(this.getLabelRotation_(coords[4], isMajor));
-  label.autoAnchor(this.getLabelAnchor_());
+  label.autoAnchor(this.getLabelAnchor_(isMajor));
 
   var labelChangedSettings = labels.getChangedSettings();
   if (goog.isDef(labelChangedSettings['enabled']) && labelChangedSettings['enabled'] == null)
     delete labelChangedSettings['enabled'];
 
   label.stateOrder([label, labelChangedSettings, 'auto', parentLabels, labels.themeSettings, parentLabels.themeSettings]);
+
+
 };
 
 

@@ -177,30 +177,46 @@ anychart.math.mode = function(arr) {
 
 
 /**
- * Cheking rectangles intersection. Rectangle described by an array of its vertices.
- * We consider that two rectangles do not intersect, if we find a side of any of two rectangles
- * relative to which all vertices of another rect lie towards the same direction or lie on this side.
- * @param {Array.<number>=} opt_first First rect.
- * @param {Array.<number>=} opt_second Second rect.
- * @return {boolean} Returns true if rectangles intersect, false
- * if rectangles do not intersect.
+ * Check is rect1 contains rect2.
+ * @param {goog.math.Rect|Array.<number>} rect1 .
+ * @param {goog.math.Rect|Array.<number>} rect2 .
+ * @return {boolean}
  */
-anychart.math.checkRectIntersection = function(opt_first, opt_second) {
-  var result = false, k, k1, i, len;
-  if (!opt_first || !opt_second) return false;
-  for (i = 0, len = opt_first.length; i < len - 1; i = i + 2) {
-    k = i == len - 2 ? 0 : i + 2;
-    k1 = i == len - 2 ? 1 : i + 3;
-    result = result || anychart.math.checkPointsRelativeLine(
-        opt_first[i], opt_first[i + 1], opt_first[k], opt_first[k1], opt_second);
+anychart.math.rectContains = function(rect1, rect2) {
+  if (!rect1 || !rect2)
+    return false;
+
+  var isRect1 = anychart.utils.instanceOf(rect1, goog.math.Rect);
+  var isRect2 = anychart.utils.instanceOf(rect2, goog.math.Rect);
+
+  var left1, left2, right1, right2, top1, top2, bottom1, bottom2;
+  if (isRect1 && isRect2) {
+    return rect1.contains(/** @type {goog.math.Rect} */(rect2));
+  } else if (isRect1) {
+    rect2 = /** @type {Array.<number>} */(rect2);
+    left1 = rect1.left; left2 = rect2[0];
+    right1 = rect1.getRight(); right2 = rect2[2];
+    top1 = rect1.top; top2 = rect2[1];
+    bottom1 = rect1.getBottom(); bottom2 = rect2[5];
+  } else if (isRect2) {
+    rect1 = /** @type {Array.<number>} */(rect1);
+    left1 = rect1[0]; left2 = rect2.left;
+    right1 = rect1[2]; right2 = rect2.getRight();
+    top1 = rect1[1]; top2 = rect2.top;
+    bottom1 = rect1[5]; bottom2 = rect2.getBottom();
+  } else {
+    rect2 = /** @type {Array.<number>} */(rect2);
+    rect1 = /** @type {Array.<number>} */(rect1);
+    left1 = rect1[0];  left2 = rect2[0];
+    right1 = rect1[2];  right2 = rect2[2];
+    top1 = rect1[1];  top2 = rect2[1];
+    bottom1 = rect1[5];  bottom2 = rect2[5];
   }
-  for (i = 0, len = opt_second.length; i < len - 1; i = i + 2) {
-    k = i == len - 2 ? 0 : i + 2;
-    k1 = i == len - 2 ? 1 : i + 3;
-    result = result || anychart.math.checkPointsRelativeLine(
-        opt_second[i], opt_second[i + 1], opt_second[k], opt_second[k1], opt_first);
-  }
-  return !result;
+
+  return left1 <= left2 &&
+      right1 >= right2 &&
+      top1 <= top2 &&
+      bottom1 >= bottom2;
 };
 
 
@@ -229,6 +245,34 @@ anychart.math.checkRectIntersectionExt = function(opt_first, opt_second) {
         opt_second[i], opt_second[i + 1], opt_second[k], opt_second[k1], opt_first));
   }
   return result;
+};
+
+
+/**
+ * Cheking rectangles intersection. Rectangle described by an array of its vertices.
+ * We consider that two rectangles do not intersect, if we find a side of any of two rectangles
+ * relative to which all vertices of another rect lie towards the same direction or lie on this side.
+ * @param {Array.<number>=} opt_first First rect.
+ * @param {Array.<number>=} opt_second Second rect.
+ * @return {boolean} Returns true if rectangles intersect, false
+ * if rectangles do not intersect.
+ */
+anychart.math.checkRectIntersection = function(opt_first, opt_second) {
+  var result = false, k, k1, i, len;
+  if (!opt_first || !opt_second) return false;
+  for (i = 0, len = opt_first.length; i < len - 1; i = i + 2) {
+    k = i == len - 2 ? 0 : i + 2;
+    k1 = i == len - 2 ? 1 : i + 3;
+    result = result || anychart.math.checkPointsRelativeLine(
+        opt_first[i], opt_first[i + 1], opt_first[k], opt_first[k1], opt_second);
+  }
+  for (i = 0, len = opt_second.length; i < len - 1; i = i + 2) {
+    k = i == len - 2 ? 0 : i + 2;
+    k1 = i == len - 2 ? 1 : i + 3;
+    result = result || anychart.math.checkPointsRelativeLine(
+        opt_second[i], opt_second[i + 1], opt_second[k], opt_second[k1], opt_first);
+  }
+  return !result;
 };
 
 
@@ -866,6 +910,58 @@ anychart.math.Rect.prototype.height;
  * @return {!anychart.math.Rect} A copy of a rectangle.
  */
 anychart.math.Rect.prototype.clone;
+
+
+/**
+ * Computes the difference region between this rectangle and {@code rect}. The
+ * return value is a rectangle or null defining the remaining region from passed side
+ * of this rectangle after the other has been subtracted.
+ * @param {goog.math.Rect} rect A Rectangle.
+ * @param {anychart.enums.Orientation} side .
+ * @return {goog.math.Rect} An rectangle which
+ *     define the difference area of this rectangle minus passed rectangle relative side.
+ */
+anychart.math.Rect.prototype.differenceBySide = function(rect, side) {
+  var result = null;
+
+  var top = this.top;
+  var height = this.height;
+
+  var ar = this.left + this.width;
+  var ab = this.top + this.height;
+
+  var br = rect.left + rect.width;
+  var bb = rect.top + rect.height;
+
+  // Subtract off any area on top where this extends past rect
+  switch (side) {
+    case anychart.enums.Orientation.TOP:
+      if (rect.top > this.top) {
+        result = new goog.math.Rect(this.left, this.top, this.width, rect.top - this.top);
+      }
+      break;
+    case anychart.enums.Orientation.BOTTOM:
+      // Subtract off any area on bottom where this extends past rect
+      if (bb < ab) {
+        result = new goog.math.Rect(this.left, bb, this.width, ab - bb);
+      }
+      break;
+    case anychart.enums.Orientation.LEFT:
+      // Subtract any area on left where this extends past rect
+      if (rect.left > this.left) {
+        result = new goog.math.Rect(this.left, top, rect.left - this.left, height);
+      }
+      break;
+    case anychart.enums.Orientation.RIGHT:
+      // Subtract any area on right where this extends past rect
+      if (br < ar) {
+        result = new goog.math.Rect(br, top, ar - br, height);
+      }
+      break;
+  }
+
+  return result;
+};
 
 
 /**

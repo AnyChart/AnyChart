@@ -15,6 +15,7 @@ anychart.colorScalesModule.ui.ColorRangeTicks = function() {
 goog.inherits(anychart.colorScalesModule.ui.ColorRangeTicks, anychart.core.AxisTicks);
 
 
+//region --- Drawers
 /** @inheritDoc */
 anychart.colorScalesModule.ui.ColorRangeTicks.prototype.drawTopTick = function(ratio, bounds, lineBounds, lineThickness, pixelShift) {
   /** @type {number} */
@@ -23,11 +24,12 @@ anychart.colorScalesModule.ui.ColorRangeTicks.prototype.drawTopTick = function(r
   var y;
   /** @type {number} */
   var dy;
-  var length = /** @type {number} */(this.length());
-  var position = /** @type {anychart.enums.SidePosition} */(this.position());
 
   if (ratio == 1) x += pixelShift;
   else x -= pixelShift;
+
+  var length = /** @type {number} */(this.getOption('length'));
+  var position = /** @type {anychart.enums.SidePosition} */(this.getOption('position'));
 
   if (position == anychart.enums.SidePosition.OUTSIDE) {
     y = lineBounds.top - lineThickness / 2;
@@ -53,11 +55,12 @@ anychart.colorScalesModule.ui.ColorRangeTicks.prototype.drawRightTick = function
   var y = Math.round(bounds.top + bounds.height - ratio * bounds.height);
   /** @type {number} */
   var dx;
-  var length = /** @type {number} */(this.length());
-  var position = /** @type {anychart.enums.SidePosition} */(this.position());
 
   if (ratio == 1) y -= pixelShift;
   else y += pixelShift;
+
+  var length = /** @type {number} */(this.getOption('length'));
+  var position = /** @type {anychart.enums.SidePosition} */(this.getOption('position'));
 
   if (position == anychart.enums.SidePosition.OUTSIDE) {
     x = lineBounds.getRight() + lineThickness / 2;
@@ -83,11 +86,12 @@ anychart.colorScalesModule.ui.ColorRangeTicks.prototype.drawBottomTick = functio
   var y;
   /** @type {number} */
   var dy;
-  var length = /** @type {number} */(this.length());
-  var position = /** @type {anychart.enums.SidePosition} */(this.position());
 
   if (ratio == 1) x += pixelShift;
   else x -= pixelShift;
+
+  var length = /** @type {number} */(this.getOption('length'));
+  var position = /** @type {anychart.enums.SidePosition} */(this.getOption('position'));
 
   if (position == anychart.enums.SidePosition.OUTSIDE) {
     y = lineBounds.getBottom() + lineThickness / 2;
@@ -113,11 +117,12 @@ anychart.colorScalesModule.ui.ColorRangeTicks.prototype.drawLeftTick = function(
   var y = Math.round(bounds.top + bounds.height - ratio * (bounds.height));
   /** @type {number} */
   var dx;
-  var length = /** @type {number} */(this.length());
-  var position = /** @type {anychart.enums.SidePosition} */(this.position());
 
   if (ratio == 1) y -= pixelShift;
   else y += pixelShift;
+
+  var length = /** @type {number} */(this.getOption('length'));
+  var position = /** @type {anychart.enums.SidePosition} */(this.getOption('position'));
 
   if (position == anychart.enums.SidePosition.OUTSIDE) {
     x = lineBounds.left - lineThickness / 2;
@@ -133,3 +138,4 @@ anychart.colorScalesModule.ui.ColorRangeTicks.prototype.drawLeftTick = function(
   this.path.moveTo(x, y);
   this.path.lineTo(x + dx, y);
 };
+//endregion
