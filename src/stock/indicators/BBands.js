@@ -8,7 +8,7 @@ goog.require('anychart.utils');
 
 /**
  * Bollinger Bands (BBands) indicator class.
- * @param {Array} args [plot, mapping, opt_period, opt_deviation, opt_middleSeriesType, opt_upperSeriesType, opt_lowerSeriesType]
+ * @param {Array} args [plot, mapping, opt_period, opt_deviation, opt_middleSeriesType, opt_upperSeriesType, opt_lowerSeriesType, opt_rangeSeriesType]
  * @constructor
  * @extends {anychart.stockModule.indicators.Base}
  */
@@ -32,6 +32,7 @@ anychart.stockModule.indicators.BBands = function(args) {
   this.declareSeries('middle', args[4]);
   this.declareSeries('upper', args[5]);
   this.declareSeries('lower', args[6]);
+  this.declareSeries('range', args[7], anychart.enums.StockSeriesType.RANGE_AREA);
   this.init();
 };
 goog.inherits(anychart.stockModule.indicators.BBands, anychart.stockModule.indicators.Base);
@@ -52,6 +53,8 @@ anychart.stockModule.indicators.BBands.prototype.createNameForSeries = function(
       return 'BBands L';
     case 'middle':
       return 'BBands M';
+    case 'range':
+      return 'BBands';
   }
   return '';
 };
@@ -68,6 +71,10 @@ anychart.stockModule.indicators.BBands.prototype.setupMapping = function(mapping
       break;
     case 'middle':
       mapping.addField('value', computer.getFieldIndex('middleResult'));
+      break;
+    case 'range':
+      mapping.addField('high', computer.getFieldIndex('upperResult'));
+      mapping.addField('low', computer.getFieldIndex('lowerResult'));
       break;
   }
 };
@@ -103,6 +110,17 @@ anychart.stockModule.indicators.BBands.prototype.lowerSeries = function(opt_type
 anychart.stockModule.indicators.BBands.prototype.middleSeries = function(opt_type) {
   return /** @type {anychart.stockModule.indicators.BBands|anychart.stockModule.Series} */(
       this.seriesInternal('middle', opt_type));
+};
+
+
+/**
+ * Getter for the range series or setter for it's type. If passed - recreates the series.
+ * @param {anychart.enums.StockSeriesType=} opt_type
+ * @return {anychart.stockModule.indicators.BBands|anychart.stockModule.Series}
+ */
+anychart.stockModule.indicators.BBands.prototype.rangeSeries = function(opt_type) {
+  return /** @type {anychart.stockModule.indicators.BBands|anychart.stockModule.Series} */(
+      this.seriesInternal('range', opt_type));
 };
 
 
@@ -150,4 +168,5 @@ anychart.stockModule.indicators.BBands.prototype.deviation = function(opt_value)
   proto['upperSeries'] = proto.upperSeries;
   proto['lowerSeries'] = proto.lowerSeries;
   proto['middleSeries'] = proto.middleSeries;
+  proto['rangeSeries'] = proto.rangeSeries;
 })();

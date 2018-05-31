@@ -8,7 +8,7 @@ goog.require('anychart.utils');
 
 /**
  * Aroon indicator class.
- * @param {Array} args [plot, mapping, opt_period, opt_upSeriesType, opt_downSeriesType]
+ * @param {Array} args [plot, mapping, opt_period, opt_upSeriesType, opt_downSeriesType, opt_rangeSeriesType]
  * @constructor
  * @extends {anychart.stockModule.indicators.Base}
  */
@@ -24,6 +24,7 @@ anychart.stockModule.indicators.Aroon = function(args) {
 
   this.declareSeries('upAroon', args[3]);
   this.declareSeries('downAroon', args[4]);
+  this.declareSeries('range', args[5], anychart.enums.StockSeriesType.RANGE_AREA);
   this.init();
 };
 goog.inherits(anychart.stockModule.indicators.Aroon, anychart.stockModule.indicators.Base);
@@ -42,6 +43,8 @@ anychart.stockModule.indicators.Aroon.prototype.createNameForSeries = function(s
       return 'Aroon up';
     case 'downAroon':
       return 'Aroon down';
+    case 'range':
+      return 'Aroon';
   }
   return '';
 };
@@ -55,6 +58,10 @@ anychart.stockModule.indicators.Aroon.prototype.setupMapping = function(mapping,
       break;
     case 'downAroon':
       mapping.addField('value', computer.getFieldIndex('downResult'));
+      break;
+    case 'range':
+      mapping.addField('high', computer.getFieldIndex('upResult'));
+      mapping.addField('low', computer.getFieldIndex('downResult'));
       break;
   }
 };
@@ -83,6 +90,17 @@ anychart.stockModule.indicators.Aroon.prototype.downSeries = function(opt_type) 
 
 
 /**
+ * Getter for the range series or setter for it's type. If passed - recreates the series.
+ * @param {anychart.enums.StockSeriesType=} opt_type
+ * @return {anychart.stockModule.indicators.Aroon|anychart.stockModule.Series}
+ */
+anychart.stockModule.indicators.Aroon.prototype.rangeSeries = function(opt_type) {
+  return /** @type {anychart.stockModule.indicators.Aroon|anychart.stockModule.Series} */(
+      this.seriesInternal('range', opt_type));
+};
+
+
+/**
  * Getter and setter for the period.
  * @param {number=} opt_value
  * @return {anychart.stockModule.indicators.Aroon|number}
@@ -106,4 +124,5 @@ anychart.stockModule.indicators.Aroon.prototype.period = function(opt_value) {
   proto['period'] = proto.period;
   proto['upSeries'] = proto.upSeries;
   proto['downSeries'] = proto.downSeries;
+  proto['rangeSeries'] = proto.rangeSeries;
 })();

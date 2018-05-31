@@ -8,7 +8,7 @@ goog.require('anychart.utils');
 
 /**
  * Keltner Channels indicator class.
- * @param {Array} args [plot, mapping, opt_maPeriod, opt_atrPeriod, opt_maType, opt_multiplier, opt_maSeries, opt_upperSeries, opt_lowerSeries]
+ * @param {Array} args [plot, mapping, opt_maPeriod, opt_atrPeriod, opt_maType, opt_multiplier, opt_maSeries, opt_upperSeries, opt_lowerSeries, opt_rangeSeriesType]
  * @constructor
  * @extends {anychart.stockModule.indicators.Base}
  */
@@ -46,6 +46,7 @@ anychart.stockModule.indicators.KeltnerChannels = function(args) {
   this.declareSeries('ma', args[6]);
   this.declareSeries('upper', args[7]);
   this.declareSeries('lower', args[8]);
+  this.declareSeries('range', args[9], anychart.enums.StockSeriesType.RANGE_AREA);
   this.init();
 };
 goog.inherits(anychart.stockModule.indicators.KeltnerChannels, anychart.stockModule.indicators.Base);
@@ -66,6 +67,8 @@ anychart.stockModule.indicators.KeltnerChannels.prototype.createNameForSeries = 
       return 'KeltnerChannels L';
     case 'ma':
       return this.maType_.toUpperCase() + '(' + this.maPeriod_ + ')';
+    case 'range':
+      return 'KeltnerChannels';
   }
   return '';
 };
@@ -82,6 +85,10 @@ anychart.stockModule.indicators.KeltnerChannels.prototype.setupMapping = functio
       break;
     case 'ma':
       mapping.addField('value', computer.getFieldIndex('maResult'));
+      break;
+    case 'range':
+      mapping.addField('high', computer.getFieldIndex('upperResult'));
+      mapping.addField('low', computer.getFieldIndex('lowerResult'));
       break;
   }
 };
@@ -117,6 +124,17 @@ anychart.stockModule.indicators.KeltnerChannels.prototype.maSeries = function(op
 anychart.stockModule.indicators.KeltnerChannels.prototype.lowerSeries = function(opt_type) {
   return /** @type {anychart.stockModule.indicators.KeltnerChannels|anychart.stockModule.Series} */(
       this.seriesInternal('lower', opt_type));
+};
+
+
+/**
+ * Getter for the range series or setter for it's type. If passed - recreates the series.
+ * @param {anychart.enums.StockSeriesType=} opt_type
+ * @return {anychart.stockModule.indicators.KeltnerChannels|anychart.stockModule.Series}
+ */
+anychart.stockModule.indicators.KeltnerChannels.prototype.rangeSeries = function(opt_type) {
+  return /** @type {anychart.stockModule.indicators.KeltnerChannels|anychart.stockModule.Series} */(
+      this.seriesInternal('range', opt_type));
 };
 
 
@@ -201,5 +219,6 @@ anychart.stockModule.indicators.KeltnerChannels.prototype.atrPeriod = function(o
   proto['multiplier'] = proto.multiplier;
   proto['upperSeries'] = proto.upperSeries;
   proto['lowerSeries'] = proto.lowerSeries;
+  proto['rangeSeries'] = proto.rangeSeries;
   proto['maSeries'] = proto.maSeries;
 })();
