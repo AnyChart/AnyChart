@@ -752,16 +752,12 @@ anychart.core.ui.Tooltip.prototype.chart = function(opt_value) {
 anychart.core.ui.Tooltip.prototype.showAsSingle_ = function(points, clientX, clientY, opt_useUnionAsSingle) {
   var firstPoint = points[0];
   var firstSeries = firstPoint['series'];
+  /** @type {anychart.core.ui.Tooltip} */
   this.tooltipInUse_ = opt_useUnionAsSingle ? this : firstSeries.tooltip();
 
-  if (!this.tooltipInUse_.enabled()) {
+  // the second condition is for compile_each (gantt, bullet)
+  if (this.isTooltipDisabled_(this.tooltipInUse_, firstPoint) || !goog.isDef(firstSeries.createTooltipContextProvider))
     return;
-  }
-
-  // for compile_each (gantt, bullet)
-  if (!goog.isDef(firstSeries.createTooltipContextProvider)) {
-    return;
-  }
 
   var contextProvider = firstSeries.createTooltipContextProvider();
   contextProvider['clientX'] = clientX;
@@ -957,14 +953,14 @@ anychart.core.ui.Tooltip.prototype.showAsUnion_ = function(points, clientX, clie
       var point = points[i];
       if (point) {
         var series = /** @type {anychart.core.series.Base} */ (point['series']);
-        var tooltip = series.tooltip();
-        if (!series.enabled() || !tooltip.enabled())
-          continue;
 
         // for compile_each (gantt, bullet)
-        if (!goog.isDef(series.createTooltipContextProvider)) {
+        if (!goog.isDef(series.createTooltipContextProvider))
           return;
-        }
+
+        var tooltip = /** @type {anychart.core.ui.Tooltip} */ (series.tooltip());
+        if (!series.enabled() || this.isTooltipDisabled_(tooltip, point))
+          continue;
 
         var contextProvider = series.createTooltipContextProvider();
         unionContext['formattedValues'].value.push(tooltip.getFormattedContent_(contextProvider));
@@ -1041,15 +1037,15 @@ anychart.core.ui.Tooltip.prototype.showSeparatedChildren_ = function(points, cli
   for (var i = 0; i < points.length; i++) {
     var point = points[i];
     var series = point['series'];
-    var tooltip = series.tooltip();
-
-    if (!tooltip.enabled())
-      break;
 
     // for compile_each (gantt, bullet)
-    if (!goog.isDef(series.createTooltipContextProvider)) {
+    if (!goog.isDef(series.createTooltipContextProvider))
       return;
-    }
+
+    var tooltip = /** @type {anychart.core.ui.Tooltip} */ (series.tooltip());
+
+    if (this.isTooltipDisabled_(tooltip, point))
+      continue;
 
     var contextProvider = series.createTooltipContextProvider();
     contextProvider['clientX'] = clientX;
@@ -1068,6 +1064,18 @@ anychart.core.ui.Tooltip.prototype.showSeparatedChildren_ = function(points, cli
 
 
 /**
+ * Checks if the tooltips is disabled for this series or the point is missing.
+ * @param {anychart.core.ui.Tooltip} tooltip
+ * @param {Object} point - the current series point.
+ * @return {boolean}
+ * @private
+ */
+anychart.core.ui.Tooltip.prototype.isTooltipDisabled_ = function(tooltip, point) {
+  return !tooltip.enabled() || point['nearestPointToCursor'] && !isFinite(point['nearestPointToCursor']['distance']);
+};
+
+
+/**
  * Show tooltip base on points on series.
  * @param {Array} points
  * @param {number} clientX
@@ -1077,20 +1085,18 @@ anychart.core.ui.Tooltip.prototype.showSeparatedChildren_ = function(points, cli
  * @param {Object=} opt_tooltipContextLoad
  */
 anychart.core.ui.Tooltip.prototype.showForSeriesPoints = function(points, clientX, clientY, hoveredSeries, opt_useUnionAsSingle, opt_tooltipContextLoad) {
-  if ((this.tooltipContainer_ && !this.tooltipContainer_.isLocal()) &&
-      this.tooltipContainer_.selectable() && !this.check(anychart.core.ui.Tooltip.Capabilities.CAN_CHANGE_DISPLAY_MODE))
-    return;
+  if (!this.tooltipContainer_ || this.tooltipContainer_.isLocal() || !this.tooltipContainer_.selectable() ||
+    this.check(anychart.core.ui.Tooltip.Capabilities.CAN_CHANGE_DISPLAY_MODE) || points.length) {
+    this.updateForceInvalidation();
 
-  if (goog.array.isEmpty(points)) return;
-  this.updateForceInvalidation();
-
-  var dispMode = this.getOption('displayMode');
-  if (dispMode == anychart.enums.TooltipDisplayMode.SINGLE) {
-    this.showAsSingle_(points, clientX, clientY, opt_useUnionAsSingle);
-  } else if (dispMode == anychart.enums.TooltipDisplayMode.UNION) {
-    this.showAsUnion_(points, clientX, clientY, hoveredSeries, opt_tooltipContextLoad);
-  } else if (dispMode == anychart.enums.TooltipDisplayMode.SEPARATED) {
-    this.showSeparatedChildren_(points, clientX, clientY);
+    var dispMode = this.getOption('displayMode');
+    if (dispMode == anychart.enums.TooltipDisplayMode.SINGLE) {
+      this.showAsSingle_(points, clientX, clientY, opt_useUnionAsSingle);
+    } else if (dispMode == anychart.enums.TooltipDisplayMode.UNION) {
+      this.showAsUnion_(points, clientX, clientY, hoveredSeries, opt_tooltipContextLoad);
+    } else if (dispMode == anychart.enums.TooltipDisplayMode.SEPARATED) {
+      this.showSeparatedChildren_(points, clientX, clientY);
+    }
   }
 };
 
