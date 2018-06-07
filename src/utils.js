@@ -1401,7 +1401,7 @@ anychart.utils.xml2json = function(xml) {
         name = anychart.utils.toCamelCase(attr.nodeName, true);
 
         if (!(name in result)) {
-          val = attr.value;
+          val = anychart.utils.unescapeString(attr.value);
           if (val == '')
             result[name] = val;
           else if (!isNaN(+val))
@@ -1508,6 +1508,8 @@ anychart.utils.json2xml_ = function(json, rootNodeName, doc) {
           if (goog.isObject(child) || !anychart.utils.ACCEPTED_BY_ATTRIBUTE_.test(child)) {
             root.appendChild(anychart.utils.json2xml_(child, i, doc));
           } else {
+            if (goog.isString(child))
+              child = goog.string.escapeString(String(child));
             root.setAttribute(anychart.utils.toXmlCase(i), child);
           }
         }
