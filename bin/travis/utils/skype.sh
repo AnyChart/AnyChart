@@ -125,7 +125,7 @@ function clrz(){
 }
 
 function see_report(){
-    echo "(<a href=\\\"https://travis-ci.com/AnyChart/$repo/builds/${TRAVIS_BUILD_ID}\\\">see report</a>)"
+    echo "(<a href=\\\"https://travis-ci.org/AnyChart/$repo/builds/${TRAVIS_BUILD_ID}\\\">see report</a>)"
 }
 
 function get_msg(){
@@ -135,7 +135,7 @@ function get_msg(){
 function skype_message(){
     case $1 in
         "status")
-            msg="$(get_msg) $(clrz gray "$2")" ;;
+            msg="$(get_msg) $(clrz grey "$2")" ;;
         "start")
             msg="$(get_msg) $(clrz blue "start travis") $(see_report)" ;;
         "success")

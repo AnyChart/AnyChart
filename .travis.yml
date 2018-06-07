@@ -26,7 +26,6 @@ cache: pip
 
 script:
   - . bin/travis/utils/skype.sh
-  - skype_send start
   - echo -e "//registry.npmjs.org/:_authToken=$NPM_TOKEN\n" >> ~/.npmrc
   - echo -e "Host $STATIC_HOST\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
   - git rev-parse HEAD >> ./dist/commit-hash.txt
