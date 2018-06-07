@@ -93,5 +93,5 @@ function upload_all_files(){
         echo
     fi
 
-
+    skype_send status "UPLOAD CDN"
 }

@@ -14,6 +14,8 @@ function git_release(){
 
     Run "python ./bin/travis/utils/upload_github_release.py ${GITHUB_TOKEN}"
     echo
+
+    skype_send status "GIT RELEASE"
 }
 
 function git_check_variables(){

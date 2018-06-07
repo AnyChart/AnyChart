@@ -18,5 +18,6 @@ function build_dist(){
     Run "cp ./bin/sources/binaries_wrapper_start.txt ./dist/binaries_wrapper_start.txt"
     echo
 
+    skype_send status "Build binaries"
 }
 

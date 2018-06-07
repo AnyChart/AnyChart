@@ -25,12 +25,16 @@ install:
 cache: pip
 
 script:
+  - . ./bin/travis/utlis/skype.sh
   - echo -e "//registry.npmjs.org/:_authToken=$NPM_TOKEN\n" >> ~/.npmrc
   - echo -e "Host $STATIC_HOST\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
   - git rev-parse HEAD >> ./dist/commit-hash.txt
-  - if [[ $TRAVIS_BRANCH =~ "develop" ]]; then ./bin/travis/utils/skype.py commit develop ; fi
-  - ./bin/travis/build.sh
+  - skype_send start
+  - . ./bin/travis/build.sh
 
+after_failure:
+- skype_send failed
 
 after_success:
-  - curl -X POST $TESTS_HOST/ci_test --data "branch=$TRAVIS_BRANCH&commit=$TRAVIS_COMMIT"
+- skype_send success
+- curl -X POST $TESTS_HOST/ci_test --data "branch=$TRAVIS_BRANCH&commit=$TRAVIS_COMMIT"
