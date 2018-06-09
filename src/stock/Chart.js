@@ -850,6 +850,8 @@ anychart.stockModule.Chart.prototype.selectRange = function(typeOrUnitOrStart, o
     newKey = anychart.utils.normalizeTimestamp(opt_endOrCountOrDispatchEvent);
   }
 
+  this.invalidate(anychart.ConsistencyState.STOCK_DATA);
+
   this.selectRangeInternal_(baseKey, newKey);
 
   if ((goog.isBoolean(opt_endOrCountOrDispatchEvent) && opt_endOrCountOrDispatchEvent) ||
