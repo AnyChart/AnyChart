@@ -5,6 +5,7 @@ goog.require('anychart.core.Base');
 goog.require('anychart.core.StateSettings');
 goog.require('anychart.core.settings');
 goog.require('anychart.core.ui.LabelsFactory');
+goog.require('anychart.ganttModule.edit.ElementEdit');
 goog.require('anychart.ganttModule.rendering.Settings');
 goog.require('anychart.ganttModule.rendering.ShapeManager');
 
@@ -94,6 +95,13 @@ anychart.ganttModule.elements.TimelineElement = function(timeline) {
 
   this.renderingSettings = new anychart.ganttModule.rendering.Settings(this.timeline_, this);
   this.renderingSettings.listenSignals(this.renderingSettingsInvalidated_, this);
+
+  /**
+   * Elements edit settings.
+   * @type {anychart.ganttModule.edit.ElementEdit}
+   * @private
+   */
+  this.edit_ = null;
 };
 goog.inherits(anychart.ganttModule.elements.TimelineElement, anychart.core.Base);
 anychart.core.settings.populateAliases(anychart.ganttModule.elements.TimelineElement, ['fill', 'stroke'], 'normal');
@@ -106,6 +114,7 @@ anychart.core.settings.populateAliases(anychart.ganttModule.elements.TimelineEle
  * @type {number}
  */
 anychart.ganttModule.elements.TimelineElement.prototype.SUPPORTED_SIGNALS =
+    anychart.Signal.NEEDS_REAPPLICATION | //Edit settings change signal.
     anychart.Signal.NEEDS_REDRAW | //Needs to redraw position.
     anychart.Signal.NEEDS_REDRAW_LABELS | //Needs to redraw labels.
     anychart.Signal.NEEDS_REDRAW_APPEARANCE; //Needs to reapply coloring.
@@ -256,12 +265,14 @@ anychart.ganttModule.elements.TimelineElement.prototype.parent = function(opt_va
         //this.parent_ is not null here.
         this.parent_.unlistenSignals(this.parentInvalidated_, this);
         this.rendering().parent(null);
+        this.edit().parent(null);
         this.parent_ = null;
       } else {
         if (this.parent_)
           this.parent_.unlistenSignals(this.parentInvalidated_, this);
         this.parent_ = opt_value;
         this.rendering().parent(this.parent_.rendering());
+        this.edit().parent(this.parent_.edit());
         this.parent_.listenSignals(this.parentInvalidated_, this);
       }
     }
@@ -277,8 +288,15 @@ anychart.ganttModule.elements.TimelineElement.prototype.parent = function(opt_va
  * @private
  */
 anychart.ganttModule.elements.TimelineElement.prototype.parentInvalidated_ = function(e) {
-  this.resolutionChainCache_ = null;
-  this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
+  //TODO (A.Kudryavtsev): do we need this.resolutionChainCache_ = null; ???
+  var signal = 0;
+  if (e.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
+    signal |= anychart.Signal.NEEDS_REAPPLICATION;
+  }
+  if (e.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
+    signal |= anychart.Signal.NEEDS_REDRAW;
+  }
+  this.dispatchSignal(signal);
 };
 
 
@@ -520,6 +538,39 @@ anychart.ganttModule.elements.TimelineElement.prototype.getLabelPointSettings = 
 
 
 //endregion
+//region -- Edit.
+/**
+ * timeline element edit settings.
+ * @param {(Object|boolean)=} opt_value - Value to set.
+ * @return {anychart.ganttModule.elements.TimelineElement|anychart.ganttModule.edit.ElementEdit} - Current value or itself for chaining.
+ */
+anychart.ganttModule.elements.TimelineElement.prototype.edit = function(opt_value) {
+  if (!this.edit_) {
+    this.edit_ = new anychart.ganttModule.edit.ElementEdit(/** @type {anychart.ganttModule.edit.StructureEdit} */ (this.timeline_.edit()));
+    this.edit_.listenSignals(this.onEditSignal_, this);
+  }
+
+  if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
+    this.edit_.setup(opt_value);
+    return this;
+  }
+  return this.edit_;
+};
+
+
+/**
+ *
+ * @param {anychart.SignalEvent} e - Signal event.
+ * @private
+ */
+anychart.ganttModule.elements.TimelineElement.prototype.onEditSignal_ = function(e) {
+  this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
+};
+
+
+//endregion
 //region -- Internal API.
 /**
  * Gets type.
@@ -661,6 +712,7 @@ anychart.ganttModule.elements.TimelineElement.prototype.setupByJSON = function(c
   this.normal().setupInternal(!!opt_default, config['normal']);
   this.selected().setupInternal(!!opt_default, config['selected']);
   this.rendering().setupInternal(!!opt_default, config['rendering']);
+  this.edit().setupInternal(!!opt_default, config['edit']);
 };
 
 
@@ -674,6 +726,7 @@ anychart.ganttModule.elements.TimelineElement.prototype.serialize = function() {
   json['rendering'] = this.rendering().serialize();
   json['normal'] = this.normal().serialize();
   json['selected'] = this.selected().serialize();
+  json['edit'] = this.edit().serialize();
   return json;
 };
 
@@ -709,6 +762,7 @@ anychart.ganttModule.elements.TimelineElement.prototype.disposeInternal = functi
   proto['normal'] = proto.normal;
   proto['selected'] = proto.selected;
   proto['labels'] = proto.labels;
+  proto['edit'] = proto.edit;
 })();
 
 

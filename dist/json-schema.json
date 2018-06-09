@@ -1956,7 +1956,7 @@
         "controller": {"$ref": "#/definitions/anychart.core.gantt.Controller"},
         "dataGrid": {"$ref": "#/definitions/anychart.core.ui.DataGrid"},
         "timeline": {"$ref": "#/definitions/anychart.core.ui.Timeline"},
-        "editing": {"type": "boolean"}
+        "edit": {"$ref": "#/definitions/anychart.core.ui.GanttStructureEdit"}
       },
       "required": ["type"]
     },
@@ -1981,7 +1981,7 @@
         "controller": {"$ref": "#/definitions/anychart.core.gantt.Controller"},
         "dataGrid": {"$ref": "#/definitions/anychart.core.ui.DataGrid"},
         "timeline": {"$ref": "#/definitions/anychart.core.ui.Timeline"},
-        "editing": {"type": "boolean"}
+        "edit": {"$ref": "#/definitions/anychart.core.ui.GanttStructureEdit"}
       },
       "required": ["type"]
     },
@@ -3974,19 +3974,7 @@
         "labels": {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"},
         "markers": {"$ref": "#/definitions/anychart.core.ui.MarkersFactory"},
         "header": {"$ref": "#/definitions/anychart.core.ui.TimelineHeader"},
-        "connectorPreviewStroke": {"$ref": "#/definitions/stroke"},
-        "editPreviewFill":  {"$ref": "#/definitions/fill"},
-        "editPreviewStroke": {"$ref": "#/definitions/stroke"},
-        "editProgressFill":  {"$ref": "#/definitions/fill"},
-        "editProgressStroke": {"$ref": "#/definitions/stroke"},
-        "editIntervalThumbFill":  {"$ref": "#/definitions/fill"},
-        "editIntervalThumbStroke": {"$ref": "#/definitions/stroke"},
-        "editConnectorThumbFill":  {"$ref": "#/definitions/fill"},
-        "editConnectorThumbStroke": {"$ref": "#/definitions/stroke"},
-        "editStructurePreviewFill": {"$ref": "#/definitions/fill"},
-        "editStructurePreviewStroke": {"$ref": "#/definitions/stroke"},
-        "editStructurePreviewDashStroke": {"$ref": "#/definitions/stroke"},
-        "editing": {"type": "boolean"},
+        "edit": {"$ref": "#/definitions/anychart.core.ui.GanttStructureEdit"},
         "headerHeight": {"type": "number"},
         "defaultRowHeight": {"type": "number"},
         "lineAxesMarkers": {
@@ -4018,15 +4006,6 @@
         },
         "horizontalScrollBar": {"$ref": "#/definitions/anychart.core.ui.ScrollBar"},
         "verticalScrollBar": {"$ref": "#/definitions/anychart.core.ui.ScrollBar"},
-        "editStartConnectorMarkerType": {"type": "string"},
-        "editFinishConnectorMarkerType": {"type": "string"},
-        "editStartConnectorMarkerSize": {"type": "number"},
-        "editFinishConnectorMarkerSize": {"type": "number"},
-        "editStartConnectorMarkerHorizontalOffset": {"type": "number"},
-        "editFinishConnectorMarkerHorizontalOffset": {"type": "number"},
-        "editStartConnectorMarkerVerticalOffset": {"type": "number"},
-        "editFinishConnectorMarkerVerticalOffset": {"type": "number"},
-        "editIntervalWidth": {"type": "number"},
 
         "elements": {"$ref": "#/definitions/anychart.core.ui.GanttTimelineElement"},
         "tasks": {"$ref": "#/definitions/anychart.core.ui.GanttTimelineTasksElement"},
@@ -4136,7 +4115,8 @@
         },
         "position": {
           "type": ["string"]
-        }
+        },
+        "edit": {"$ref": "#/definitions/anychart.core.ui.GanttElementEdit"}
       }
     },
 
@@ -4161,6 +4141,7 @@
     "anychart.core.ui.GanttTimelineConnectorsElement": {
       "type": "object",
       "properties": {
+        "previewStroke": {"$ref": "#/definitions/stroke"},
         "normal": {"$ref": "#/definitions/anychart.core.StateSettings"},
         "selected": {"$ref": "#/definitions/anychart.core.StateSettings"}
       }
@@ -4190,6 +4171,64 @@
         },
         "disablePointerEvents": {
           "type": "boolean"
+        }
+      }
+    },
+
+    "anychart.core.ui.GanttStructureEdit": {
+      "type": "object",
+      "properties": {
+        "fill": {"$ref": "#/definitions/fill"},
+        "stroke": {"$ref": "#/definitions/stroke"},
+        "placementStroke": {"$ref": "#/definitions/stroke"},
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    },
+
+    "anychart.core.ui.GanttElementEdit": {
+      "type": "object",
+      "properties": {
+        "fill": {"$ref": "#/definitions/fill"},
+        "stroke": {"$ref": "#/definitions/stroke"},
+        "thumbs": {"$ref": "#/definitions/anychart.core.ui.GanttThumb"},
+        "connectorThumbs": {"$ref": "#/definitions/anychart.core.ui.GanttThumb"},
+        "start": {"$ref": "#/definitions/anychart.core.ui.GanttSideControl"},
+        "end": {"$ref": "#/definitions/anychart.core.ui.GanttSideControl"},
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    },
+
+    "anychart.core.ui.GanttSideControl": {
+      "type": "object",
+      "properties": {
+        "thumb": {"$ref": "#/definitions/anychart.core.ui.GanttThumb"},
+        "connectorThumb": {"$ref": "#/definitions/anychart.core.ui.GanttThumb"}
+      }
+    },
+
+    "anychart.core.ui.GanttThumb": {
+      "type": "object",
+      "properties": {
+        "fill": {"$ref": "#/definitions/fill"},
+        "stroke": {"$ref": "#/definitions/stroke"},
+        "enabled": {
+          "type": "boolean"
+        },
+        "size": {
+          "type": "number"
+        },
+        "type": {
+          "type": "string"
+        },
+        "verticalOffset": {
+          "type": "number"
+        },
+        "horizontalOffset": {
+          "type": "number"
         }
       }
     },
@@ -5231,10 +5270,7 @@
         "rowFill": {"$ref": "#/definitions/fill"},
         "rowHoverFill": {"$ref": "#/definitions/fill"},
         "rowSelectedFill": {"$ref": "#/definitions/fill"},
-        "editStructurePreviewFill": {"$ref": "#/definitions/fill"},
-        "editStructurePreviewStroke": {"$ref": "#/definitions/stroke"},
-        "editStructurePreviewDashStroke": {"$ref": "#/definitions/stroke"},
-        "editing": {"type": "boolean"},
+        "edit": {"$ref": "#/definitions/anychart.core.ui.GanttStructureEdit"},
         "horizontalScrollBar": {"$ref": "#/definitions/anychart.core.ui.ScrollBar"},
         "buttons": {"$ref": "#/definitions/anychart.ganttModule.DataGridButton"}
       }

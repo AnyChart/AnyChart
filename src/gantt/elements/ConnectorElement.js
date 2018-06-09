@@ -34,6 +34,10 @@ anychart.ganttModule.elements.ConnectorElement = function(timeline) {
    */
   this.timeline_ = timeline;
 
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['previewStroke', 0, anychart.Signal.NEEDS_REAPPLICATION]
+  ]);
+
   var normalDescriptorsMeta = {};
   anychart.core.settings.createDescriptorsMeta(normalDescriptorsMeta, [
     ['fill', 0, anychart.Signal.NEEDS_REDRAW_APPEARANCE],
@@ -60,7 +64,8 @@ anychart.core.settings.populateAliases(anychart.ganttModule.elements.ConnectorEl
  * @type {number}
  */
 anychart.ganttModule.elements.ConnectorElement.prototype.SUPPORTED_SIGNALS =
-    anychart.Signal.NEEDS_REDRAW_APPEARANCE; //Needs to reapply coloring.
+    anychart.Signal.NEEDS_REDRAW_APPEARANCE | //Needs to redraw visual connector settings.
+    anychart.Signal.NEEDS_REAPPLICATION; //Needs to redraw edit settings.
 
 
 /**
@@ -69,6 +74,22 @@ anychart.ganttModule.elements.ConnectorElement.prototype.SUPPORTED_SIGNALS =
  */
 anychart.ganttModule.elements.ConnectorElement.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.Base.prototype.SUPPORTED_CONSISTENCY_STATES;
+
+
+//endregion
+//region -- Descriptors.
+/**
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.ganttModule.elements.ConnectorElement.DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'previewStroke', anychart.core.settings.strokeNormalizer]
+  ]);
+  return map;
+})();
+anychart.core.settings.populate(anychart.ganttModule.elements.ConnectorElement, anychart.ganttModule.elements.ConnectorElement.DESCRIPTORS);
 
 
 //endregion
@@ -148,7 +169,7 @@ anychart.ganttModule.elements.ConnectorElement.prototype.getColorResolutionConte
  * @return {acgraph.vector.Fill|acgraph.vector.Stroke}
  */
 anychart.ganttModule.elements.ConnectorElement.prototype.getColor = function(fromItem, toItem, state, colorName, opt_connType, opt_fromPeriodIndex, opt_toPeriodIndex) {
-  //TODO (A.Kudryavtsev): In current implementation (6 Mar 2018) only 'normal' and 'selected' are supportd.
+  //TODO (A.Kudryavtsev): In current implementation (6 Mar 2018) only 'normal' and 'selected' are supported.
   var isNormal = (state === anychart.PointState.NORMAL);
   var colorSource = isNormal ? this.normal() : this.selected();
   var stateColor = colorSource.getOption(colorName);
@@ -294,7 +315,7 @@ anychart.ganttModule.elements.ConnectorElement.prototype.getStroke = function(fr
  */
 anychart.ganttModule.elements.ConnectorElement.prototype.setupByJSON = function(config, opt_default) {
   anychart.ganttModule.elements.ConnectorElement.base(this, 'setupByJSON', config, opt_default);
-  // anychart.core.settings.deserialize(this, anychart.ganttModule.elements.ConnectorElement.DESCRIPTORS, config, opt_default);
+  anychart.core.settings.deserialize(this, anychart.ganttModule.elements.ConnectorElement.DESCRIPTORS, config, opt_default);
   this.normal().setupInternal(!!opt_default, config);
   this.normal().setupInternal(!!opt_default, config['normal']);
   this.selected().setupInternal(!!opt_default, config['selected']);
@@ -306,7 +327,7 @@ anychart.ganttModule.elements.ConnectorElement.prototype.setupByJSON = function(
  */
 anychart.ganttModule.elements.ConnectorElement.prototype.serialize = function() {
   var json = anychart.ganttModule.elements.ConnectorElement.base(this, 'serialize');
-  // anychart.core.settings.deserialize(this, anychart.ganttModule.elements.ConnectorElement.DESCRIPTORS, json);
+  anychart.core.settings.serialize(this, anychart.ganttModule.elements.ConnectorElement.DESCRIPTORS, json);
   json['normal'] = this.normal().serialize();
   json['selected'] = this.selected().serialize();
   return json;

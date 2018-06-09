@@ -351,6 +351,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="a11y" type="utils.A11y"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="row_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="column_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="edit" type="GanttStructureEdit"/>
         </xsd:all>
 
         <xsd:attributeGroup ref="attrs.VisualBase"/>
@@ -362,7 +363,6 @@
         <xsd:attribute name="tooltip" type="simple.BoolOrNull" default="true"/>
         <xsd:attribute name="animation" type="simple.Bool" default="false"/>
         <xsd:attribute name="context_menu" type="simple.Bool" default="true"/>
-        <xsd:attribute name="editing" type="simple.Bool" default="false"/>
         <xsd:attribute name="select_marquee_fill" type="xsd:string"/>
         <xsd:attribute name="select_marquee_stroke" type="xsd:string"/>
         <!-- Gantt attributes -->
@@ -1474,14 +1474,11 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="row_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="row_hover_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="row_selected_fill" type="Fill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="edit_structure_preview_fill" type="Fill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="edit_structure_preview_stroke" type="Stroke"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="edit_structure_preview_dash_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="horizontal_scroll_bar" type="core.ScrollBar"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="edit" type="GanttStructureEdit"/>
         </xsd:all>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
         <xsd:attribute name="is_standalone" type="simple.Bool"/>
-        <xsd:attribute name="editing" type="simple.Bool"/>
         <xsd:attribute name="header_height" type="xsd:double"/>
         <xsd:attribute name="row_stroke" type="xsd:string"/>
         <xsd:attribute name="column_stroke" type="xsd:string"/>
@@ -1494,9 +1491,6 @@
         <xsd:attribute name="row_selected_fill" type="xsd:string"/>
         <xsd:attribute name="horizontal_offset" type="xsd:double" default="0"/>
         <xsd:attribute name="default_row_height" type="xsd:double"/>
-        <xsd:attribute name="edit_structure_preview_fill" type="xsd:string"/>
-        <xsd:attribute name="edit_structure_preview_stroke" type="xsd:string"/>
-        <xsd:attribute name="edit_structure_preview_dash_stroke" type="xsd:string"/>
     </xsd:complexType>
 
     <xsd:complexType name="ganttModule.DataGridButton">
@@ -1539,18 +1533,6 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="row_selected_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="labels" type="core.LabelsFactory"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="markers" type="core.MarkersFactory"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="connector_preview_stroke" type="Stroke"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="edit_preview_fill" type="Fill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="edit_preview_stroke" type="Stroke"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="edit_progress_fill" type="Fill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="edit_progress_stroke" type="Stroke"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="edit_interval_thumb_fill" type="Fill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="edit_interval_thumb_stroke" type="Stroke"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="edit_connector_thumb_fill" type="Fill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="edit_connector_thumb_stroke" type="Stroke"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="edit_structure_preview_fill" type="Fill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="edit_structure_preview_stroke" type="Stroke"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="edit_structure_preview_dash_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="line_axes_markers" type="core.axisMarkers.Line_list"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="range_axes_markers" type="core.axisMarkers.Range_list"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="text_axes_markers" type="core.axisMarkers.Text_list"/>
@@ -1566,11 +1548,11 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="milestones" type="GanttTimelineElement"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="periods" type="GanttTimelineElement"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="connectors" type="GanttTimelineConnectorsElement"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="edit" type="GanttStructureEdit"/>
         </xsd:all>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
         <xsd:attribute name="is_standalone" type="simple.Bool"/>
         <xsd:attribute name="header_height" type="xsd:double"/>
-        <xsd:attribute name="editing" type="simple.Bool"/>
         <xsd:attribute name="default_row_height" type="xsd:double"/>
         <xsd:attribute name="row_stroke" type="xsd:string"/>
         <xsd:attribute name="column_stroke" type="xsd:string"/>
@@ -1582,27 +1564,6 @@
         <xsd:attribute name="row_selected_fill" type="xsd:string"/>
         <xsd:attribute name="labels" type="simple.BoolOrNull"/>
         <xsd:attribute name="markers" type="simple.BoolOrNull"/>
-        <xsd:attribute name="connector_preview_stroke" type="xsd:string"/>
-        <xsd:attribute name="edit_preview_fill" type="xsd:string"/>
-        <xsd:attribute name="edit_preview_stroke" type="xsd:string"/>
-        <xsd:attribute name="edit_progress_fill" type="xsd:string"/>
-        <xsd:attribute name="edit_progress_stroke" type="xsd:string"/>
-        <xsd:attribute name="edit_interval_thumb_fill" type="xsd:string"/>
-        <xsd:attribute name="edit_interval_thumb_stroke" type="xsd:string"/>
-        <xsd:attribute name="edit_connector_thumb_fill" type="xsd:string"/>
-        <xsd:attribute name="edit_connector_thumb_stroke" type="xsd:string"/>
-        <xsd:attribute name="edit_structure_preview_fill" type="xsd:string"/>
-        <xsd:attribute name="edit_structure_preview_stroke" type="xsd:string"/>
-        <xsd:attribute name="edit_structure_preview_dash_stroke" type="xsd:string"/>
-        <xsd:attribute name="edit_start_connector_marker_type" type="xsd:string"/>
-        <xsd:attribute name="edit_finish_connector_marker_type" type="xsd:string"/>
-        <xsd:attribute name="edit_start_connector_marker_size" type="xsd:double"/>
-        <xsd:attribute name="edit_finish_connector_marker_size" type="xsd:double"/>
-        <xsd:attribute name="edit_start_connector_marker_horizontal_offset" type="xsd:double"/>
-        <xsd:attribute name="edit_finish_connector_marker_horizontal_offset" type="xsd:double"/>
-        <xsd:attribute name="edit_start_connector_marker_vertical_offset" type="xsd:double"/>
-        <xsd:attribute name="edit_finish_connector_marker_vertical_offset" type="xsd:double"/>
-        <xsd:attribute name="edit_interval_width" type="xsd:double"/>
     </xsd:complexType>
 
     <xsd:complexType name="core.ColorRange">
@@ -2303,6 +2264,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="normal" type="core.StateSettings"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="selected" type="core.StateSettings"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="labels" type="core.LabelsFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="edit" type="GanttElementEdit"/>
         </xsd:all>
         <xsd:attribute name="fill" type="xsd:string"/>
         <xsd:attribute name="stroke" type="xsd:string"/>
@@ -2319,6 +2281,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="normal" type="core.StateSettings"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="selected" type="core.StateSettings"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="labels" type="core.LabelsFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="edit" type="GanttElementEdit"/>
         </xsd:all>
         <xsd:attribute name="fill" type="xsd:string"/>
         <xsd:attribute name="stroke" type="xsd:string"/>
@@ -2334,6 +2297,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="normal" type="core.StateSettings"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="selected" type="core.StateSettings"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="labels" type="core.LabelsFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="edit" type="GanttElementEdit"/>
         </xsd:all>
         <xsd:attribute name="fill" type="xsd:string"/>
         <xsd:attribute name="stroke" type="xsd:string"/>
@@ -2346,9 +2310,11 @@
 
     <xsd:complexType name="GanttTimelineConnectorsElement">
         <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="preview_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="normal" type="core.StateSettings"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="selected" type="core.StateSettings"/>
         </xsd:all>
+        <xsd:attribute name="preview_stroke" type="xsd:string"/>
     </xsd:complexType>
 
     <xsd:complexType name="GanttElementBase">
@@ -2378,6 +2344,53 @@
         <xsd:attribute name="stroke_name" type="xsd:string"/>
         <xsd:attribute name="z_index" type="xsd:double"/>
         <xsd:attribute name="disable_pointer_events" type="simple.Bool"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="GanttStructureEdit">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="placement_stroke" type="Stroke"/>
+        </xsd:all>
+        <xsd:attribute name="fill" type="xsd:string"/>
+        <xsd:attribute name="stroke" type="xsd:string"/>
+        <xsd:attribute name="placement_stroke" type="xsd:string"/>
+        <xsd:attribute name="enabled" type="simple.BoolOrNull"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="GanttElementEdit">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="thumbs" type="GanttThumb"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="connector_thumbs" type="GanttThumb"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="start" type="GanttSideControl"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="end" type="GanttSideControl"/>
+        </xsd:all>
+        <xsd:attribute name="fill" type="xsd:string"/>
+        <xsd:attribute name="stroke" type="xsd:string"/>
+        <xsd:attribute name="enabled" type="simple.BoolOrNull"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="GanttSideControl">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="thumb" type="GanttThumb"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="connector_thumb" type="GanttThumb"/>
+        </xsd:all>
+    </xsd:complexType>
+
+    <xsd:complexType name="GanttThumb">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
+        </xsd:all>
+        <xsd:attribute name="fill" type="xsd:string"/>
+        <xsd:attribute name="stroke" type="xsd:string"/>
+        <xsd:attribute name="enabled" type="simple.BoolOrNull"/>
+        <xsd:attribute name="size" type="xsd:double"/>
+        <xsd:attribute name="type" type="enums.MarkerType"/>
+        <xsd:attribute name="vertical_offset" type="xsd:double"/>
+        <xsd:attribute name="horizontal_offset" type="xsd:double"/>
     </xsd:complexType>
 
     <!-- Gauge elements -->

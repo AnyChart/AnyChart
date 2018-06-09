@@ -8,6 +8,7 @@ goog.require('anychart.ganttModule.DataGrid');
 goog.require('anychart.ganttModule.IInteractiveGrid');
 goog.require('anychart.ganttModule.Splitter');
 goog.require('anychart.ganttModule.TimeLine');
+goog.require('anychart.ganttModule.edit.StructureEdit');
 goog.require('anychart.treeDataModule.Tree');
 goog.require('anychart.treeDataModule.utils');
 
@@ -399,7 +400,7 @@ anychart.ganttModule.Chart.prototype.getDataGrid_ = function() {
     this.dg_ = new anychart.ganttModule.DataGrid(this.controller_);
     this.dg_.setOption('backgroundFill', null);
     this.dg_.zIndex(anychart.ganttModule.Chart.Z_INDEX_DG_TL);
-    this.dg_.interactivityHandler = this;
+    this.dg_.setInteractivityHandler(this);
     this.registerDisposable(this.dg_);
     var ths = this;
     this.dg_.listenSignals(function() {
@@ -442,7 +443,7 @@ anychart.ganttModule.Chart.prototype.getTimeline = function() {
     this.tl_ = new anychart.ganttModule.TimeLine(this.controller_, this.isResourcesChart_);
     this.tl_.setOption('backgroundFill', null);
     this.tl_.zIndex(anychart.ganttModule.Chart.Z_INDEX_DG_TL);
-    this.tl_.interactivityHandler = this;
+    this.tl_.setInteractivityHandler(this);
     this.registerDisposable(this.tl_);
     var ths = this;
     this.tl_.listenSignals(function() {
@@ -887,15 +888,64 @@ anychart.ganttModule.Chart.prototype.rowMouseUp = function(event) {
 };
 
 
-/** @inheritDoc */
-anychart.ganttModule.Chart.prototype.editing = function(opt_value) {
+//region -- Edit.
+/**
+ * @inheritDoc
+ */
+anychart.ganttModule.Chart.prototype.edit = function(opt_value) {
+  if (!this.edit_) {
+    this.edit_ = new anychart.ganttModule.edit.StructureEdit();
+    // this.edit_.listenSignals(this.onEditSignal_, this);
+  }
+
   if (goog.isDef(opt_value)) {
-    this.editable = opt_value;
-    this.getDataGrid_().editing(opt_value);
-    this.getTimeline().editing(opt_value);
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
+    this.edit_.setup(opt_value);
     return this;
   }
-  return this.editable;
+  return this.edit_;
+};
+
+
+// /**
+//  *
+//  * @param {anychart.SignalEvent} e - Signal event.
+//  * @private
+//  */
+// anychart.ganttModule.Chart.prototype.prototype.onEditSignal_ = function(e) {
+//   if (e.hasSignal(anychart.Signal.ENABLED_STATE_CHANGED)) {
+//     if (this.edit().getOption('enabled')) {
+//       if (!this.denyAddDocMouseMoveListener_) {
+//         goog.events.listen(anychart.document, goog.events.EventType.MOUSEMOVE, this.docMouseMoveListener_, false, this);
+//         this.denyAddDocMouseMoveListener_ = true;
+//       }
+//     } else {
+//       goog.events.unlisten(anychart.document, goog.events.EventType.MOUSEMOVE, this.docMouseMoveListener_, false, this);
+//       this.denyAddDocMouseMoveListener_ = false;
+//     }
+//     // this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
+//   }
+//   if (e.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
+//     this.reapplyStructureEditAppearance();
+//   }
+// };
+
+
+//endregion
+/**
+ * Enables/disables live edit mode.
+ * @param {boolean=} opt_value - Value to be set.
+ * @deprecated since 8.3.0 use chart.edit() instead. DVF-3623
+ * @return {anychart.ganttModule.IInteractiveGrid|boolean} - Itself for method chaining or current value.
+ */
+anychart.ganttModule.Chart.prototype.editing = function(opt_value) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['chart.editing()', 'chart.edit()'], true);
+  if (goog.isDef(opt_value)) {
+    this.edit()['enabled'](opt_value);
+    return this;
+  }
+  return /** @type {boolean} */ (this.edit().getOption('enabled'));
 };
 
 
@@ -1087,6 +1137,7 @@ anychart.ganttModule.Chart.prototype.serialize = function() {
   json['controller'] = this.controller_.serialize();
   json['dataGrid'] = this.dataGrid().serialize();
   json['timeline'] = this.getTimeline().serialize();
+  json['edit'] = this.edit().serialize();
   json['palette'] = this.palette().serialize();
 
   return {'gantt': json};
@@ -1100,14 +1151,17 @@ anychart.ganttModule.Chart.prototype.setupByJSON = function(config, opt_default)
   if ('controller' in config) this.controller_.setupByJSON(config['controller'], opt_default);
 
   this.data(/** @type {anychart.treeDataModule.Tree} */ (this.controller_.data()));
+  if ('dataGrid' in config) this.dataGrid().setupByJSON(config['dataGrid'], opt_default);
+  if ('timeline' in config) this.getTimeline().setupByJSON(config['timeline'], opt_default);
+
   this.palette(config['palette']);
 
   anychart.core.settings.deserialize(this, anychart.ganttModule.Chart.PROPERTY_DESCRIPTORS, config);
   this.defaultRowHeight(config['defaultRowHeight']);
-  this.editing(config['editing']);
+  // this.editing(config['editing']);
+  if ('edit' in config)
+    this.edit().setupInternal(!!opt_default, config['edit']);
 
-  if ('dataGrid' in config) this.dataGrid().setupByJSON(config['dataGrid'], opt_default);
-  if ('timeline' in config) this.getTimeline().setupByJSON(config['timeline'], opt_default);
 
 };
 
@@ -1120,6 +1174,9 @@ anychart.ganttModule.Chart.prototype.disposeInternal = function() {
 
 
 //exports
+/**
+ * @suppress {deprecated}
+ */
 (function() {
   var proto = anychart.ganttModule.Chart.prototype;
   proto['data'] = proto.data;
@@ -1139,6 +1196,7 @@ anychart.ganttModule.Chart.prototype.disposeInternal = function() {
   proto['collapseTask'] = proto.collapseTask;
   proto['getType'] = proto.getType;
   proto['editing'] = proto.editing;
+  proto['edit'] = proto.edit;
   proto['toCsv'] = proto.toCsv;
   proto['xScale'] = proto.xScale;
   proto['defaultRowHeight'] = proto.defaultRowHeight;

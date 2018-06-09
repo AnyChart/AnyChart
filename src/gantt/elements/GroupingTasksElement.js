@@ -67,6 +67,8 @@ anychart.ganttModule.elements.GroupingTasksElement.prototype.progress = function
     var parentProgress = /** @type {anychart.ganttModule.elements.ProgressElement} */ (parent.progress());
     this.progress_.parent(parentProgress);
     this.progress_.listenSignals(this.progressInvalidated_, this);
+    this.progress_.edit().parent(parentProgress.edit());
+    //TODO (A.Kudryavtsev): Do we need add this.progress_.edit() parent?
 
     this.progress_.labelsResolution = [
       this.progress().labels(),

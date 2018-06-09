@@ -2,6 +2,8 @@ goog.provide('anychart.ganttModule.TimeLine');
 goog.provide('anychart.standalones.ProjectTimeline');
 goog.provide('anychart.standalones.ResourceTimeline');
 
+
+//region -- Requirements.
 goog.require('acgraph.vector.Path');
 goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.ui.LabelsFactory');
@@ -13,6 +15,10 @@ goog.require('anychart.ganttModule.ScrollBar');
 goog.require('anychart.ganttModule.axisMarkers.Line');
 goog.require('anychart.ganttModule.axisMarkers.Range');
 goog.require('anychart.ganttModule.axisMarkers.Text');
+goog.require('anychart.ganttModule.draggers.BarDragger');
+goog.require('anychart.ganttModule.draggers.ConnectorDragger');
+goog.require('anychart.ganttModule.draggers.ProgressDragger');
+goog.require('anychart.ganttModule.draggers.ThumbDragger');
 goog.require('anychart.ganttModule.elements.BaselinesElement');
 goog.require('anychart.ganttModule.elements.ConnectorElement');
 goog.require('anychart.ganttModule.elements.GroupingTasksElement');
@@ -26,6 +32,8 @@ goog.require('goog.fx.Dragger');
 
 
 
+//endregion
+//region -- Constructor.
 /**
  * Gantt timeline implementation.
  * @param {anychart.ganttModule.Controller=} opt_controller - Controller to be set. See full description in parent class.
@@ -60,42 +68,42 @@ anychart.ganttModule.TimeLine = function(opt_controller, opt_isResources) {
 
   /**
    * Edit preview path.
-   * @type {anychart.ganttModule.TimeLine.LiveEditControl}
+   * @type {acgraph.vector.Path}
    * @private
    */
   this.editPreviewPath_ = null;
 
   /**
    * Edit progress path.
-   * @type {anychart.ganttModule.TimeLine.LiveEditControl}
+   * @type {acgraph.vector.Path}
    * @private
    */
   this.editProgressPath_ = null;
 
   /**
    * Edit left thumb path.
-   * @type {anychart.ganttModule.TimeLine.LiveEditControl}
+   * @type {acgraph.vector.Path}
    * @private
    */
   this.editLeftThumbPath_ = null;
 
   /**
    * Edit right thumb path.
-   * @type {anychart.ganttModule.TimeLine.LiveEditControl}
+   * @type {acgraph.vector.Path}
    * @private
    */
   this.editRightThumbPath_ = null;
 
   /**
    * Edit start connector path.
-   * @type {anychart.ganttModule.TimeLine.LiveEditControl}
+   * @type {acgraph.vector.Path}
    * @private
    */
   this.editStartConnectorPath_ = null;
 
   /**
    * Edit finish connector path.
-   * @type {anychart.ganttModule.TimeLine.LiveEditControl}
+   * @type {acgraph.vector.Path}
    * @private
    */
   this.editFinishConnectorPath_ = null;
@@ -115,69 +123,6 @@ anychart.ganttModule.TimeLine = function(opt_controller, opt_isResources) {
    */
   this.tooltipEnabledBackup_;
 
-
-  /**
-   * Edit connector preview stroke.
-   * @type {acgraph.vector.Stroke}
-   * @private
-   */
-  this.connectorPreviewStroke_;
-
-  /**
-   * Edit preview fill.
-   * @type {acgraph.vector.Fill}
-   * @private
-   */
-  this.editPreviewFill_;
-
-  /**
-   * Edit preview stroke.
-   * @type {acgraph.vector.Stroke}
-   * @private
-   */
-  this.editPreviewStroke_;
-
-  /**
-   * Edit progress fill.
-   * @type {acgraph.vector.Fill}
-   * @private
-   */
-  this.editProgressFill_;
-
-  /**
-   * Edit progress stroke.
-   * @type {acgraph.vector.Stroke}
-   * @private
-   */
-  this.editProgressStroke_;
-
-  /**
-   * Edit interval thumb fill.
-   * @type {acgraph.vector.Fill}
-   * @private
-   */
-  this.editIntervalThumbFill_;
-
-  /**
-   * Edit interval thumb stroke.
-   * @type {acgraph.vector.Stroke}
-   * @private
-   */
-  this.editIntervalThumbStroke_;
-
-  /**
-   * Edit connector thumb fill.
-   * @type {acgraph.vector.Fill}
-   * @private
-   */
-  this.editConnectorThumbFill_;
-
-  /**
-   * Edit connector thumb stroke.
-   * @type {acgraph.vector.Stroke}
-   * @private
-   */
-  this.editConnectorThumbStroke_;
 
   /**
    * Selected period.
@@ -220,42 +165,42 @@ anychart.ganttModule.TimeLine = function(opt_controller, opt_isResources) {
 
   /**
    * Edit preview dragger.
-   * @type {anychart.ganttModule.TimeLine.BarDragger}
+   * @type {anychart.ganttModule.draggers.BarDragger}
    * @private
    */
   this.editPreviewDragger_ = null;
 
   /**
    * Edit progress dragger.
-   * @type {anychart.ganttModule.TimeLine.ProgressDragger}
+   * @type {anychart.ganttModule.draggers.ProgressDragger}
    * @private
    */
   this.editProgressDragger_ = null;
 
   /**
    * Edit left thumb dragger.
-   * @type {anychart.ganttModule.TimeLine.ThumbDragger}
+   * @type {anychart.ganttModule.draggers.ThumbDragger}
    * @private
    */
   this.editLeftThumbDragger_ = null;
 
   /**
    * Edit right thumb dragger.
-   * @type {anychart.ganttModule.TimeLine.ThumbDragger}
+   * @type {anychart.ganttModule.draggers.ThumbDragger}
    * @private
    */
   this.editRightThumbDragger_ = null;
 
   /**
    * Edit start connector dragger.
-   * @type {anychart.ganttModule.TimeLine.ConnectorDragger}
+   * @type {anychart.ganttModule.draggers.ConnectorDragger}
    * @private
    */
   this.editStartConnectorDragger_ = null;
 
   /**
    * Edit finish connector dragger.
-   * @type {anychart.ganttModule.TimeLine.ConnectorDragger}
+   * @type {anychart.ganttModule.draggers.ConnectorDragger}
    * @private
    */
   this.editFinishConnectorDragger_ = null;
@@ -280,14 +225,14 @@ anychart.ganttModule.TimeLine = function(opt_controller, opt_isResources) {
 
   /**
    * Whether we are dragging the thumb.
-   * @type {anychart.ganttModule.TimeLine.ThumbDragger}
+   * @type {anychart.ganttModule.draggers.ThumbDragger}
    * @private
    */
   this.currentThumbDragger_ = null;
 
   /**
    * Whether we are dragging the connector circle.
-   * @type {anychart.ganttModule.TimeLine.ConnectorDragger}
+   * @type {anychart.ganttModule.draggers.ConnectorDragger}
    * @private
    */
   this.currentConnectorDragger_ = null;
@@ -325,6 +270,13 @@ anychart.ganttModule.TimeLine = function(opt_controller, opt_isResources) {
   this.textMarkers_ = [];
 
   /**
+   * List of edit controls.
+   * @type {Array.<acgraph.vector.Path>}
+   * @private
+   */
+  this.editControls_ = [];
+
+  /**
    * Hovered connector data.
    * We use it to correctly dispatch connector mouse out event.
    * @type {?Object}
@@ -333,76 +285,12 @@ anychart.ganttModule.TimeLine = function(opt_controller, opt_isResources) {
   this.hoveredConnector_ = null;
 
   /**
-   *
-   * @type {anychart.enums.MarkerType}
-   * @private
-   */
-  this.editStartConnectorMarkerType_;
-
-  /**
-   *
-   * @type {number}
-   * @private
-   */
-  this.editStartConnectorMarkerSize_;
-
-  /**
-   *
-   * @type {number}
-   * @private
-   */
-  this.editStartConnectorMarkerHorizontalOffset_;
-
-  /**
-   *
-   * @type {number}
-   * @private
-   */
-  this.editStartConnectorMarkerVerticalOffset_;
-
-  /**
-   *
-   * @type {anychart.enums.MarkerType}
-   * @private
-   */
-  this.editFinishConnectorMarkerType_;
-
-  /**
-   *
-   * @type {number}
-   * @private
-   */
-  this.editFinishConnectorMarkerSize_;
-
-  /**
-   *
-   * @type {number}
-   * @private
-   */
-  this.editFinishConnectorMarkerHorizontalOffset_;
-
-  /**
-   *
-   * @type {number}
-   * @private
-   */
-  this.editFinishConnectorMarkerVerticalOffset_;
-
-  /**
-   *
-   * @type {number}
-   * @private
-   */
-  this.editIntervalWidth_;
-
-  /**
    * Date time scale.
    * @type {anychart.ganttModule.Scale}
    * @private
    */
   this.scale_ = new anychart.ganttModule.Scale();
   this.scale_.listenSignals(this.scaleInvalidated_, this);
-  this.registerDisposable(this.scale_);
 
   /**
    *
@@ -418,14 +306,12 @@ anychart.ganttModule.TimeLine = function(opt_controller, opt_isResources) {
    */
   this.tasks_ = null;
 
-
   /**
    *
    * @type {anychart.ganttModule.elements.PeriodsElement}
    * @private
    */
   this.periods_ = null;
-
 
   /**
    *
@@ -464,6 +350,8 @@ anychart.ganttModule.TimeLine = function(opt_controller, opt_isResources) {
 goog.inherits(anychart.ganttModule.TimeLine, anychart.ganttModule.BaseGrid);
 
 
+//endregion
+//region -- Signals and consistency.
 /**
  * Supported signals.
  * @type {number}
@@ -482,6 +370,8 @@ anychart.ganttModule.TimeLine.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.TIMELINE_ELEMENTS_LABELS;
 
 
+//endregion
+//region -- Type definitions.
 /**
  * @typedef {{
  *   isElement: boolean,
@@ -500,61 +390,20 @@ anychart.ganttModule.TimeLine.Tag;
 
 
 /**
- *
- * @param {number} anchoredTop
- * @param {number} barHeight
- * @param {anychart.enums.Anchor} anchor
- * @private
- * @return {number}
+ * @typedef {{
+ *   item: (anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem),
+ *   index: number,
+ *   type: anychart.enums.TLElementTypes,
+ *   period: Object,
+ *   periodIndex: number,
+ *   bounds: anychart.math.Rect
+ * }}
  */
-anychart.ganttModule.TimeLine.prototype.fixBarTop_ = function(anchoredTop, barHeight, anchor) {
-  var verticalOffset;
-  if (anychart.utils.isTopAnchor(anchor))
-    verticalOffset = 0;
-  else if (anychart.utils.isBottomAnchor(anchor))
-    verticalOffset = -barHeight;
-  else
-    verticalOffset = -barHeight / 2;
-
-  return anchoredTop + verticalOffset;
-};
-
-
-/**
- * Resolves anchor by position and bar type.
- * @param {anychart.enums.Position} position - Position.
- * @param {anychart.enums.TLElementTypes} type - Timeline element type.
- * @param {boolean=} opt_considerBaseline - Whether to consider baseline.
- * @return {anychart.enums.Anchor}
- * @private
- */
-anychart.ganttModule.TimeLine.prototype.resolveAutoAnchorByType_ = function(position, type, opt_considerBaseline) {
-  var anchor = /** @type {anychart.enums.Anchor} */ (position);
-  var above = this.baselines().getOption('above');
-  switch (type) {
-    case anychart.enums.TLElementTypes.TASKS:
-      if (opt_considerBaseline && position == anychart.enums.Position.LEFT_CENTER) {
-        anchor = above ? anychart.enums.Anchor.LEFT_TOP : anychart.enums.Anchor.LEFT_BOTTOM;
-      }
-      break;
-    case anychart.enums.TLElementTypes.GROUPING_TASKS:
-      anchor = anychart.utils.isTopAnchor(/** @type {anychart.enums.Anchor} */ (position)) ?
-          anychart.enums.Anchor.LEFT_TOP :
-          anychart.enums.Anchor.LEFT_BOTTOM;
-      if (opt_considerBaseline && position == anychart.enums.Position.LEFT_CENTER) {
-        anchor = above ? anychart.enums.Anchor.LEFT_TOP : anychart.enums.Anchor.LEFT_BOTTOM;
-      }
-      break;
-    case anychart.enums.TLElementTypes.BASELINES:
-      if (position == anychart.enums.Position.LEFT_CENTER)
-        anchor = above ? anychart.enums.Anchor.LEFT_BOTTOM : anychart.enums.Anchor.LEFT_TOP;
-  }
-
-  return /** @type {anychart.enums.Anchor} */ (anchor);
-};
+anychart.ganttModule.TimeLine.EditTag;
 
 
 //endregion
+//region -- Constants.
 /**
  * Default timeline header height.
  * @type {number}
@@ -674,6 +523,7 @@ anychart.ganttModule.TimeLine.EDIT_CORNER_HEIGHT = 5;
 anychart.ganttModule.TimeLine.EDIT_CONNECTOR_RADIUS = 5;
 
 
+//endregion
 //region -- Coloring.
 /**
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
@@ -860,22 +710,54 @@ anychart.ganttModule.TimeLine.prototype.createTag = function(item, element, boun
 
 
 /**
+ *
+ * @param {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} item - Item.
+ * @param {?number} index - Index.
+ * @param {anychart.enums.TLElementTypes} type - Type.
+ * @param {anychart.math.Rect} bounds - Bounds.
+ * @param {number=} opt_periodIndex - Period index.
+ *
+ * @return {anychart.ganttModule.TimeLine.EditTag}
+ */
+anychart.ganttModule.TimeLine.prototype.createEditTag = function(item, index, type, bounds, opt_periodIndex) {
+  var tag = {
+    item: item,
+    index: index,
+    type: type,
+    bounds: bounds
+  };
+
+  if (goog.isDef(opt_periodIndex)) {
+    tag.periodIndex = opt_periodIndex;
+    var periods = item.get(anychart.enums.GanttDataFields.PERIODS);
+    tag.period = periods[opt_periodIndex];
+  }
+
+  return /** @type {anychart.ganttModule.TimeLine.EditTag} */ (tag);
+};
+
+
+/**
  * Visual element invalidation handler.
  * @param {anychart.SignalEvent} event - Signal event.
  * @private
  */
 anychart.ganttModule.TimeLine.prototype.visualElementInvalidated_ = function(event) {
-  var state = 0;
-  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW_LABELS)) {
-    state |= anychart.ConsistencyState.TIMELINE_ELEMENTS_LABELS;
+  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) { //edit visual settings only!
+    //TODO (A.Kudryavtsev): Current implementation doesn't need to react on edit controls appearance signal for a while.
+  } else {
+    var state = 0;
+    if (event.hasSignal(anychart.Signal.NEEDS_REDRAW_LABELS)) {
+      state |= anychart.ConsistencyState.TIMELINE_ELEMENTS_LABELS;
+    }
+    if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
+      state |= anychart.ConsistencyState.GRIDS_POSITION;
+    }
+    if (event.hasSignal(anychart.Signal.NEEDS_REDRAW_APPEARANCE)) {
+      state |= anychart.ConsistencyState.BASE_GRID_REDRAW;
+    }
+    this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
   }
-  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    state |= anychart.ConsistencyState.GRIDS_POSITION;
-  }
-  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW_APPEARANCE)) {
-    state |= anychart.ConsistencyState.BASE_GRID_REDRAW;
-  }
-  this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -1514,7 +1396,255 @@ anychart.ganttModule.TimeLine.prototype.selectedConnectorStroke = function(var_a
   return arguments.length ? target['stroke'].apply(target, arguments) : target['stroke']();
 };
 
+
+/**
+ * @param {...*} var_args - Args.
+ * @deprecated since 8.3.0 use timeline.connectors().previewStroke() instead. DVF-3623
+ * @return {anychart.ganttModule.TimeLine|acgraph.vector.Stroke|anychart.ganttModule.elements.TimelineElement}
+ */
+anychart.ganttModule.TimeLine.prototype.connectorPreviewStroke = function(var_args) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+      ['timeline.connectorPreviewStroke()', 'timeline.connectors().previewStroke()'], true);
+  var target = this.connectors();
+  return arguments.length ? target['previewStroke'].apply(target, arguments) : target['previewStroke']();
+};
+
+
+/**
+ * @param {...*} var_args - Args.
+ * @deprecated since 8.3.0 use timeline.elements().edit().fill() instead. DVF-3623
+ * @return {anychart.ganttModule.TimeLine|acgraph.vector.Fill|anychart.ganttModule.elements.TimelineElement}
+ */
+anychart.ganttModule.TimeLine.prototype.editPreviewFill = function(var_args) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+      ['timeline.editPreviewFill()', 'timeline.elements().edit().fill()'], true);
+  var target = this.elements().edit();
+  return arguments.length ? target['fill'].apply(target, arguments) : target['fill']();
+};
+
+
+/**
+ * @param {...*} var_args - Args.
+ * @deprecated since 8.3.0 use timeline.connectors().stroke() instead. DVF-3623
+ * @return {anychart.ganttModule.TimeLine|acgraph.vector.Fill|anychart.ganttModule.elements.TimelineElement}
+ */
+anychart.ganttModule.TimeLine.prototype.editPreviewStroke = function(var_args) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+      ['timeline.editPreviewStroke()', 'timeline.elements().edit().stroke()'], true);
+  var target = this.elements().edit();
+  return arguments.length ? target['stroke'].apply(target, arguments) : target['stroke']();
+};
+
+
+/**
+ * @param {...*} var_args - Args.
+ * @deprecated since 8.3.0 use timeline.tasks().progress().edit().fill() instead. DVF-3623
+ * @return {anychart.ganttModule.TimeLine|acgraph.vector.Fill|anychart.ganttModule.elements.TimelineElement}
+ */
+anychart.ganttModule.TimeLine.prototype.editProgressFill = function(var_args) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+      ['timeline.editProgressFill()', 'timeline.tasks().edit().fill()'], true);
+  var target = this.tasks().edit();
+  return arguments.length ? target['fill'].apply(target, arguments) : target['fill']();
+};
+
+
+/**
+ * @param {...*} var_args - Args.
+ * @deprecated since 8.3.0 use timeline.tasks().edit().stroke() instead. DVF-3623
+ * @return {anychart.ganttModule.TimeLine|acgraph.vector.Fill|anychart.ganttModule.elements.TimelineElement}
+ */
+anychart.ganttModule.TimeLine.prototype.editProgressStroke = function(var_args) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+      ['timeline.editProgressStroke()', 'timeline.tasks().edit().stroke()'], true);
+  var target = this.tasks().edit();
+  return arguments.length ? target['stroke'].apply(target, arguments) : target['stroke']();
+};
+
+
+/**
+ * @param {...*} var_args - Args.
+ * @deprecated since 8.3.0 use timeline.elements().edit().thumbs().fill() instead. DVF-3623
+ * @return {anychart.ganttModule.TimeLine|acgraph.vector.Fill|anychart.ganttModule.elements.TimelineElement}
+ */
+anychart.ganttModule.TimeLine.prototype.editIntervalThumbFill = function(var_args) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+      ['timeline.editIntervalThumbFill()', 'timeline.elements().edit().thumbs().fill()'], true);
+  var target = this.elements().edit().thumbs();
+  return arguments.length ? target['fill'].apply(target, arguments) : target['fill']();
+};
+
+
+/**
+ * @param {...*} var_args - Args.
+ * @deprecated since 8.3.0 use timeline.elements().edit().thumbs().stroke() instead. DVF-3623
+ * @return {anychart.ganttModule.TimeLine|acgraph.vector.Fill|anychart.ganttModule.elements.TimelineElement}
+ */
+anychart.ganttModule.TimeLine.prototype.editIntervalThumbStroke = function(var_args) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+      ['timeline.editIntervalThumbStroke()', 'timeline.elements().edit().thumbs().stroke()'], true);
+  var target = this.elements().edit().thumbs();
+  return arguments.length ? target['stroke'].apply(target, arguments) : target['stroke']();
+};
+
+
+/**
+ * @param {...*} var_args - Args.
+ * @deprecated since 8.3.0 use timeline.elements().edit().connectorThumbs().fill() instead. DVF-3623
+ * @return {anychart.ganttModule.TimeLine|acgraph.vector.Fill|anychart.ganttModule.elements.TimelineElement}
+ */
+anychart.ganttModule.TimeLine.prototype.editConnectorThumbFill = function(var_args) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+      ['timeline.editConnectorThumbFill()', 'timeline.elements().edit().connectorThumbs().fill()'], true);
+  var target = this.elements().edit().connectorThumbs();
+  return arguments.length ? target['fill'].apply(target, arguments) : target['fill']();
+};
+
+
+/**
+ * @param {...*} var_args - Args.
+ * @deprecated since 8.3.0 use timeline.elements().edit().connectorThumbs().stroke() instead. DVF-3623
+ * @return {anychart.ganttModule.TimeLine|acgraph.vector.Fill|anychart.ganttModule.elements.TimelineElement}
+ */
+anychart.ganttModule.TimeLine.prototype.editConnectorThumbStroke = function(var_args) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+      ['timeline.editConnectorThumbStroke()', 'timeline.elements().edit().connectorThumbs().stroke()'], true);
+  var target = this.elements().edit().connectorThumbs();
+  return arguments.length ? target['stroke'].apply(target, arguments) : target['stroke']();
+};
+
+
+/**
+ * @param {anychart.enums.MarkerType=} opt_value - Value to set.
+ * @deprecated since 8.3.0 use timeline.elements().edit().start().connectorThumb().type() instead. DVF-3623
+ * @return {anychart.enums.MarkerType|anychart.ganttModule.TimeLine} - Current value or itself for method chaining.
+ */
+anychart.ganttModule.TimeLine.prototype.editStartConnectorMarkerType = function(opt_value) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+      ['timeline.editStartConnectorMarkerType()', 'timeline.elements().edit().start().connectorThumb().type()'], true);
+  var target = this.elements().edit().start().connectorThumb();
+  return arguments.length ? target['type'].apply(target, arguments) : target['type']();
+};
+
+
+/**
+ * @param {number=} opt_value - Value to set.
+ * @deprecated since 8.3.0 use timeline.elements().edit().start().connectorThumb().size() instead. DVF-3623
+ * @return {number|anychart.ganttModule.TimeLine} - Current value or itself for method chaining.
+ */
+anychart.ganttModule.TimeLine.prototype.editStartConnectorMarkerSize = function(opt_value) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+      ['timeline.editStartConnectorMarkerSize()', 'timeline.elements().edit().start().connectorThumb().size()'], true);
+  var target = this.elements().edit().start().connectorThumb();
+  return arguments.length ? target['size'].apply(target, arguments) : target['size']();
+};
+
+
+/**
+ * @param {number=} opt_value - Value to set.
+ * @deprecated since 8.3.0 use timeline.elements().edit().start().connectorThumb().horizontalOffset() instead. DVF-3623
+ * @return {number|anychart.ganttModule.TimeLine} - Current value or itself for method chaining.
+ */
+anychart.ganttModule.TimeLine.prototype.editStartConnectorMarkerHorizontalOffset = function(opt_value) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+      ['timeline.editStartConnectorMarkerHorizontalOffset()', 'timeline.elements().edit().start().connectorThumb().horizontalOffset()'], true);
+  var target = this.elements().edit().start().connectorThumb();
+  return arguments.length ? target['horizontalOffset'].apply(target, arguments) : target['horizontalOffset']();
+};
+
+
+/**
+ * @param {number=} opt_value - Value to set.
+ * @deprecated since 8.3.0 use timeline.elements().edit().start().connectorThumb().verticalOffset() instead. DVF-3623
+ * @return {number|anychart.ganttModule.TimeLine} - Current value or itself for method chaining.
+ */
+anychart.ganttModule.TimeLine.prototype.editStartConnectorMarkerVerticalOffset = function(opt_value) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+      ['timeline.editStartConnectorMarkerVerticalOffset()', 'timeline.elements().edit().start().connectorThumb().verticalOffset()'], true);
+  var target = this.elements().edit().start().connectorThumb();
+  return arguments.length ? target['verticalOffset'].apply(target, arguments) : target['verticalOffset']();
+};
+
+
+/**
+ * @param {anychart.enums.MarkerType=} opt_value - Value to set.
+ * @deprecated since 8.3.0 use timeline.elements().edit().end().connectorThumb().type() instead. DVF-3623
+ * @return {anychart.enums.MarkerType|anychart.ganttModule.TimeLine} - Current value or itself for method chaining.
+ */
+anychart.ganttModule.TimeLine.prototype.editFinishConnectorMarkerType = function(opt_value) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+      ['timeline.editFinishConnectorMarkerType()', 'timeline.elements().edit().end().connectorThumb().type()'], true);
+  var target = this.elements().edit().end().connectorThumb();
+  return arguments.length ? target['type'].apply(target, arguments) : target['type']();
+};
+
+
+/**
+ * @param {number=} opt_value - Value to set.
+ * @deprecated since 8.3.0 use timeline.elements().edit().end().connectorThumb().size() instead. DVF-3623
+ * @return {number|anychart.ganttModule.TimeLine} - Current value or itself for method chaining.
+ */
+anychart.ganttModule.TimeLine.prototype.editFinishConnectorMarkerSize = function(opt_value) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+      ['timeline.editFinishConnectorMarkerSize()', 'timeline.elements().edit().end().connectorThumb().size()'], true);
+  var target = this.elements().edit().end().connectorThumb();
+  return arguments.length ? target['size'].apply(target, arguments) : target['size']();
+};
+
+
+/**
+ * @param {number=} opt_value - Value to set.
+ * @deprecated since 8.3.0 use timeline.elements().edit().end().connectorThumb().horizontalOffset() instead. DVF-3623
+ * @return {number|anychart.ganttModule.TimeLine} - Current value or itself for method chaining.
+ */
+anychart.ganttModule.TimeLine.prototype.editFinishConnectorMarkerHorizontalOffset = function(opt_value) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+      ['timeline.editStartConnectorMarkerHorizontalOffset()', 'timeline.elements().edit().end().connectorThumb().horizontalOffset()'], true);
+  var target = this.elements().edit().end().connectorThumb();
+  return arguments.length ? target['horizontalOffset'].apply(target, arguments) : target['horizontalOffset']();
+};
+
+
+/**
+ * @param {number=} opt_value - Value to set.
+ * @deprecated since 8.3.0 use timeline.elements().edit().end().connectorThumb().verticalOffset() instead. DVF-3623
+ * @return {number|anychart.ganttModule.TimeLine} - Current value or itself for method chaining.
+ */
+anychart.ganttModule.TimeLine.prototype.editFinishConnectorMarkerVerticalOffset = function(opt_value) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+      ['timeline.editFinishConnectorMarkerVerticalOffset()', 'timeline.elements().edit().end().connectorThumb().verticalOffset()'], true);
+  var target = this.elements().edit().end().connectorThumb();
+  return arguments.length ? target['verticalOffset'].apply(target, arguments) : target['verticalOffset']();
+};
+
+
+/**
+ * @param {number=} opt_value - Value to set.
+ * @deprecated since 8.3.0 use timeline.elements().edit().thumbs().size() instead. DVF-3623
+ * @return {number|anychart.ganttModule.TimeLine} - Current value or itself for method chaining.
+ */
+anychart.ganttModule.TimeLine.prototype.editIntervalWidth = function(opt_value) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
+      ['timeline.editIntervalWidth()', 'timeline.elements().edit().thumbs().size()'], true);
+  var target = this.elements().edit().thumbs();
+  return arguments.length ? target['size'].apply(target, arguments) : target['size']();
+};
+
+
 //endregion
+//region -- Scale.
+/**
+ * Gets timeline scale.
+ * @param {Object=} opt_value - Scale config.
+ * @return {anychart.ganttModule.TimeLine|anychart.ganttModule.Scale}
+ */
+anychart.ganttModule.TimeLine.prototype.scale = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.scale_.setup(opt_value);
+    return this;
+  }
+  return this.scale_;
+};
 
 
 /**
@@ -1538,6 +1668,8 @@ anychart.ganttModule.TimeLine.prototype.getScale = function() {
 };
 
 
+//endregion
+//region -- Header.
 /**
  * Gets/configures timeline header.
  * @param {Object=} opt_value - Config.
@@ -1548,7 +1680,6 @@ anychart.ganttModule.TimeLine.prototype.header = function(opt_value) {
     this.header_ = new anychart.ganttBaseModule.TimeLineHeader();
     this.header_.xScale(this.scale_);
     this.header_.zIndex(anychart.ganttModule.TimeLine.HEADER_Z_INDEX);
-    this.registerDisposable(this.header_);
     this.header_.listenSignals(this.headerInvalidated_, this);
   }
 
@@ -1573,221 +1704,8 @@ anychart.ganttModule.TimeLine.prototype.headerInvalidated_ = function(event) {
 };
 
 
-/**
- * Gets/sets a connector preview stroke.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill .
- * @param {number=} opt_thickness .
- * @param {string=} opt_dashpattern .
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin .
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap .
- * @return {acgraph.vector.Stroke|anychart.ganttModule.TimeLine|string} - Current value or itself for chaining.
- */
-anychart.ganttModule.TimeLine.prototype.connectorPreviewStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (!anychart.color.equals(this.connectorPreviewStroke_, val)) {
-      this.connectorPreviewStroke_ = val;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.connectorPreviewStroke_ || 'none';
-};
-
-
-/**
- * Gets/sets edit preview fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.ganttModule.TimeLine|string} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.editPreviewFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.editPreviewFill_), val)) {
-      this.editPreviewFill_ = val;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.editPreviewFill_ || 'none';
-};
-
-
-/**
- * Gets/sets a edit preview stroke.
- * Base stroke is a stroke of simple time bar on timeline.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill .
- * @param {number=} opt_thickness .
- * @param {string=} opt_dashpattern .
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin .
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap .
- * @return {acgraph.vector.Stroke|anychart.ganttModule.TimeLine|string} - Current value or itself for chaining.
- */
-anychart.ganttModule.TimeLine.prototype.editPreviewStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (!anychart.color.equals(this.editPreviewStroke_, val)) {
-      this.editPreviewStroke_ = val;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.editPreviewStroke_ || 'none';
-};
-
-
-/**
- * Gets/sets edit progress fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.ganttModule.TimeLine|string} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.editProgressFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.editProgressFill_), val)) {
-      this.editProgressFill_ = val;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.editProgressFill_ || 'none';
-};
-
-
-/**
- * Gets/sets a edit progress stroke.
- * Base stroke is a stroke of simple time bar on timeline.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill .
- * @param {number=} opt_thickness .
- * @param {string=} opt_dashpattern .
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin .
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap .
- * @return {acgraph.vector.Stroke|anychart.ganttModule.TimeLine|string} - Current value or itself for chaining.
- */
-anychart.ganttModule.TimeLine.prototype.editProgressStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (!anychart.color.equals(this.editProgressStroke_, val)) {
-      this.editProgressStroke_ = val;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.editProgressStroke_ || 'none';
-};
-
-
-/**
- * Gets/sets edit interval thumb fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.ganttModule.TimeLine|string} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.editIntervalThumbFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.editIntervalThumbFill_), val)) {
-      this.editIntervalThumbFill_ = val;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.editIntervalThumbFill_ || 'none';
-};
-
-
-/**
- * Gets/sets a edit interval thumb stroke.
- * Base stroke is a stroke of simple time bar on timeline.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill .
- * @param {number=} opt_thickness .
- * @param {string=} opt_dashpattern .
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin .
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap .
- * @return {acgraph.vector.Stroke|anychart.ganttModule.TimeLine|string} - Current value or itself for chaining.
- */
-anychart.ganttModule.TimeLine.prototype.editIntervalThumbStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (!anychart.color.equals(this.editIntervalThumbStroke_, val)) {
-      this.editIntervalThumbStroke_ = val;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.editIntervalThumbStroke_ || 'none';
-};
-
-
-/**
- * Gets/sets edit connector thumb fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.ganttModule.TimeLine|string} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.editConnectorThumbFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.editConnectorThumbFill_), val)) {
-      this.editConnectorThumbFill_ = val;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.editConnectorThumbFill_ || 'none';
-};
-
-
-/**
- * Gets/sets a edit connector thumb stroke.
- * Base stroke is a stroke of simple time bar on timeline.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill .
- * @param {number=} opt_thickness .
- * @param {string=} opt_dashpattern .
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin .
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap .
- * @return {acgraph.vector.Stroke|anychart.ganttModule.TimeLine|string} - Current value or itself for chaining.
- */
-anychart.ganttModule.TimeLine.prototype.editConnectorThumbStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (!anychart.color.equals(this.editConnectorThumbStroke_, val)) {
-      this.editConnectorThumbStroke_ = val;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.editConnectorThumbStroke_ || 'none';
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Axes markers.
-//
-//----------------------------------------------------------------------------------------------------------------------
+//endregion
+//region -- Axis markers.
 /**
  * Getter/setter for line marker default settings.
  * @param {Object=} opt_value - Object with line marker settings.
@@ -1851,7 +1769,6 @@ anychart.ganttModule.TimeLine.prototype.lineMarker = function(opt_indexOrValue, 
     lineMarker = new anychart.ganttModule.axisMarkers.Line(this.scale_);
     lineMarker.setup(this.defaultLineMarkerSettings());
     this.lineMarkers_[index] = lineMarker;
-    this.registerDisposable(lineMarker);
     lineMarker.listenSignals(this.onMarkersSignal_, this);
     this.invalidate(anychart.ConsistencyState.TIMELINE_SCALES, anychart.Signal.NEEDS_REDRAW);
   }
@@ -1887,7 +1804,6 @@ anychart.ganttModule.TimeLine.prototype.rangeMarker = function(opt_indexOrValue,
     rangeMarker = new anychart.ganttModule.axisMarkers.Range(this.scale_);
     rangeMarker.setup(this.defaultRangeMarkerSettings());
     this.rangeMarkers_[index] = rangeMarker;
-    this.registerDisposable(rangeMarker);
     rangeMarker.listenSignals(this.onMarkersSignal_, this);
     this.invalidate(anychart.ConsistencyState.TIMELINE_SCALES, anychart.Signal.NEEDS_REDRAW);
   }
@@ -1922,7 +1838,6 @@ anychart.ganttModule.TimeLine.prototype.textMarker = function(opt_indexOrValue, 
     textMarker = new anychart.ganttModule.axisMarkers.Text(this.scale_);
     textMarker.setup(this.defaultTextMarkerSettings());
     this.textMarkers_[index] = textMarker;
-    this.registerDisposable(textMarker);
     textMarker.listenSignals(this.onMarkersSignal_, this);
     this.invalidate(anychart.ConsistencyState.TIMELINE_SCALES, anychart.Signal.NEEDS_REDRAW);
   }
@@ -1946,6 +1861,8 @@ anychart.ganttModule.TimeLine.prototype.onMarkersSignal_ = function(event) {
 };
 
 
+//endregion
+//region -- Labels and Markers.
 /**
  * Labels factory getter/setter.
  * @param {Object=} opt_value - Value to be set.
@@ -2011,6 +1928,8 @@ anychart.ganttModule.TimeLine.prototype.markers = function(opt_value) {
 };
 
 
+//endregion
+//region -- Paths getters.
 /**
  * Getter for this.separationPath_.
  * @return {acgraph.vector.Path}
@@ -2021,7 +1940,6 @@ anychart.ganttModule.TimeLine.prototype.getSeparationPath_ = function() {
     this.separationPath_ = /** @type {acgraph.vector.Path} */ (this.getClipLayer().path());
     this.separationPath_.zIndex(6);
     this.separationPath_.stroke(/** @type {acgraph.vector.Stroke} */(anychart.ganttModule.BaseGrid.getColorResolver('columnStroke', anychart.enums.ColorType.STROKE, false)(this, 0)));
-    this.registerDisposable(this.separationPath_);
   }
   return this.separationPath_;
 };
@@ -2029,12 +1947,12 @@ anychart.ganttModule.TimeLine.prototype.getSeparationPath_ = function() {
 
 /**
  * Getter for this.editPreviewPath_.
- * @return {anychart.ganttModule.TimeLine.LiveEditControl}
+ * @return {acgraph.vector.Path}
  * @private
  */
 anychart.ganttModule.TimeLine.prototype.getEditPreviewPath_ = function() {
   if (!this.editPreviewPath_) {
-    this.editPreviewPath_ = new anychart.ganttModule.TimeLine.LiveEditControl(this.getEditLayer());
+    this.editPreviewPath_ = this.getEditLayer().path();
     this.editPreviewPath_
         .zIndex(anychart.ganttModule.TimeLine.EDIT_PREVIEW_Z_INDEX)
         .cursor(acgraph.vector.Cursor.EW_RESIZE);
@@ -2044,8 +1962,6 @@ anychart.ganttModule.TimeLine.prototype.getEditPreviewPath_ = function() {
     });
 
     this.editPreviewPath_.listenOnce(acgraph.events.EventType.MOUSEDOWN, this.editPreviewDragMouseDown_, false, this);
-
-    this.registerDisposable(this.editPreviewPath_);
   }
   return this.editPreviewPath_;
 };
@@ -2053,12 +1969,12 @@ anychart.ganttModule.TimeLine.prototype.getEditPreviewPath_ = function() {
 
 /**
  * Getter for this.editProgressPath_.
- * @return {anychart.ganttModule.TimeLine.LiveEditControl}
+ * @return {acgraph.vector.Path}
  * @private
  */
 anychart.ganttModule.TimeLine.prototype.getEditProgressPath_ = function() {
   if (!this.editProgressPath_) {
-    this.editProgressPath_ = new anychart.ganttModule.TimeLine.LiveEditControl(this.getEditLayer());
+    this.editProgressPath_ = this.getEditLayer().path();
     this.editProgressPath_
         .zIndex(anychart.ganttModule.TimeLine.EDIT_PROGRESS_Z_INDEX);
 
@@ -2067,8 +1983,6 @@ anychart.ganttModule.TimeLine.prototype.getEditProgressPath_ = function() {
     });
 
     this.editProgressPath_.listenOnce(acgraph.events.EventType.MOUSEDOWN, this.editProgressDragMouseDown_, false, this);
-
-    this.registerDisposable(this.editProgressPath_);
   }
   return this.editProgressPath_;
 };
@@ -2076,12 +1990,12 @@ anychart.ganttModule.TimeLine.prototype.getEditProgressPath_ = function() {
 
 /**
  * Getter for this.editLeftThumbPath_.
- * @return {anychart.ganttModule.TimeLine.LiveEditControl}
+ * @return {acgraph.vector.Path}
  * @private
  */
 anychart.ganttModule.TimeLine.prototype.getEditLeftThumbPath_ = function() {
   if (!this.editLeftThumbPath_) {
-    this.editLeftThumbPath_ = new anychart.ganttModule.TimeLine.LiveEditControl(this.getEditLayer());
+    this.editLeftThumbPath_ = this.getEditLayer().path();
     this.editLeftThumbPath_
         .zIndex(anychart.ganttModule.TimeLine.EDIT_LEFT_THUMB_Z_INDEX)
         .cursor(/** @type {acgraph.vector.Cursor} */ ('col-resize')); //TODO (A.Kudryavtsev): Kind of crossbrowser issue?
@@ -2093,8 +2007,6 @@ anychart.ganttModule.TimeLine.prototype.getEditLeftThumbPath_ = function() {
     });
 
     this.editLeftThumbPath_.listenOnce(acgraph.events.EventType.MOUSEDOWN, this.editLeftThumbDragMouseDown_, false, this);
-
-    this.registerDisposable(this.editLeftThumbPath_);
   }
   return this.editLeftThumbPath_;
 };
@@ -2102,12 +2014,12 @@ anychart.ganttModule.TimeLine.prototype.getEditLeftThumbPath_ = function() {
 
 /**
  * Getter for this.editLeftThumbPath_.
- * @return {anychart.ganttModule.TimeLine.LiveEditControl}
+ * @return {acgraph.vector.Path}
  * @private
  */
 anychart.ganttModule.TimeLine.prototype.getEditRightThumbPath_ = function() {
   if (!this.editRightThumbPath_) {
-    this.editRightThumbPath_ = new anychart.ganttModule.TimeLine.LiveEditControl(this.getEditLayer());
+    this.editRightThumbPath_ = this.getEditLayer().path();
     this.editRightThumbPath_
         .zIndex(anychart.ganttModule.TimeLine.EDIT_RIGHT_THUMB_Z_INDEX)
         .cursor(/** @type {acgraph.vector.Cursor} */ ('col-resize')); //TODO (A.Kudryavtsev): Kind of crossbrowser issue?
@@ -2119,8 +2031,6 @@ anychart.ganttModule.TimeLine.prototype.getEditRightThumbPath_ = function() {
     });
 
     this.editRightThumbPath_.listenOnce(acgraph.events.EventType.MOUSEDOWN, this.editRightThumbDragMouseDown_, false, this);
-
-    this.registerDisposable(this.editRightThumbPath_);
   }
   return this.editRightThumbPath_;
 };
@@ -2128,12 +2038,12 @@ anychart.ganttModule.TimeLine.prototype.getEditRightThumbPath_ = function() {
 
 /**
  * Getter for this.editStartConnectorPath_.
- * @return {anychart.ganttModule.TimeLine.LiveEditControl}
+ * @return {acgraph.vector.Path}
  * @private
  */
 anychart.ganttModule.TimeLine.prototype.getEditStartConnectorPath_ = function() {
   if (!this.editStartConnectorPath_) {
-    this.editStartConnectorPath_ = new anychart.ganttModule.TimeLine.LiveEditControl(this.getEditLayer());
+    this.editStartConnectorPath_ = this.getEditLayer().path();
     this.editStartConnectorPath_
         .zIndex(anychart.ganttModule.TimeLine.EDIT_START_CONNECTOR_Z_INDEX)
         .cursor(acgraph.vector.Cursor.MOVE);
@@ -2143,8 +2053,6 @@ anychart.ganttModule.TimeLine.prototype.getEditStartConnectorPath_ = function() 
     });
 
     this.editStartConnectorPath_.listenOnce(acgraph.events.EventType.MOUSEDOWN, this.editStartConnectorMouseDown_, false, this);
-
-    this.registerDisposable(this.editStartConnectorPath_);
   }
   return this.editStartConnectorPath_;
 };
@@ -2152,12 +2060,12 @@ anychart.ganttModule.TimeLine.prototype.getEditStartConnectorPath_ = function() 
 
 /**
  * Getter for this.editLeftThumbPath_.
- * @return {anychart.ganttModule.TimeLine.LiveEditControl}
+ * @return {acgraph.vector.Path}
  * @private
  */
 anychart.ganttModule.TimeLine.prototype.getEditFinishConnectorPath_ = function() {
   if (!this.editFinishConnectorPath_) {
-    this.editFinishConnectorPath_ = new anychart.ganttModule.TimeLine.LiveEditControl(this.getEditLayer());
+    this.editFinishConnectorPath_ = this.getEditLayer().path();
     this.editFinishConnectorPath_
         .zIndex(anychart.ganttModule.TimeLine.EDIT_FINISH_CONNECTOR_Z_INDEX)
         .cursor(acgraph.vector.Cursor.MOVE);
@@ -2167,136 +2075,8 @@ anychart.ganttModule.TimeLine.prototype.getEditFinishConnectorPath_ = function()
     });
 
     this.editFinishConnectorPath_.listenOnce(acgraph.events.EventType.MOUSEDOWN, this.editFinishConnectorMouseDown_, false, this);
-
-    this.registerDisposable(this.editFinishConnectorPath_);
   }
   return this.editFinishConnectorPath_;
-};
-
-
-/**
- * Gets/sets start edit connector control type.
- * @param {anychart.enums.MarkerType=} opt_value - Value to set.
- * @return {anychart.enums.MarkerType|anychart.ganttModule.TimeLine} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.editStartConnectorMarkerType = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.editStartConnectorMarkerType_ = opt_value;
-    return this;
-  }
-  return this.editStartConnectorMarkerType_;
-};
-
-
-/**
- * Gets/sets start edit connector control size.
- * @param {number=} opt_value - Value to set.
- * @return {number|anychart.ganttModule.TimeLine} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.editStartConnectorMarkerSize = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.editStartConnectorMarkerSize_ = opt_value;
-    return this;
-  }
-  return this.editStartConnectorMarkerSize_;
-};
-
-
-/**
- * Gets/sets start edit connector control horizontal offset.
- * @param {number=} opt_value - Value to set.
- * @return {number|anychart.ganttModule.TimeLine} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.editStartConnectorMarkerHorizontalOffset = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.editStartConnectorMarkerHorizontalOffset_ = opt_value;
-    return this;
-  }
-  return this.editStartConnectorMarkerHorizontalOffset_;
-};
-
-
-/**
- * Gets/sets start edit connector control vertical offset.
- * @param {number=} opt_value - Value to set.
- * @return {number|anychart.ganttModule.TimeLine} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.editStartConnectorMarkerVerticalOffset = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.editStartConnectorMarkerVerticalOffset_ = opt_value;
-    return this;
-  }
-  return this.editStartConnectorMarkerVerticalOffset_;
-};
-
-
-/**
- * Gets/sets finish edit connector control type.
- * @param {anychart.enums.MarkerType=} opt_value - Value to set.
- * @return {anychart.enums.MarkerType|anychart.ganttModule.TimeLine} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.editFinishConnectorMarkerType = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.editFinishConnectorMarkerType_ = opt_value;
-    return this;
-  }
-  return this.editFinishConnectorMarkerType_;
-};
-
-
-/**
- * Gets/sets finish edit connector control size.
- * @param {number=} opt_value - Value to set.
- * @return {number|anychart.ganttModule.TimeLine} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.editFinishConnectorMarkerSize = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.editFinishConnectorMarkerSize_ = opt_value;
-    return this;
-  }
-  return this.editFinishConnectorMarkerSize_;
-};
-
-
-/**
- * Gets/sets finish edit connector control horizontal offset.
- * @param {number=} opt_value - Value to set.
- * @return {number|anychart.ganttModule.TimeLine} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.editFinishConnectorMarkerHorizontalOffset = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.editFinishConnectorMarkerHorizontalOffset_ = opt_value;
-    return this;
-  }
-  return this.editFinishConnectorMarkerHorizontalOffset_;
-};
-
-
-/**
- * Gets/sets finish edit connector control vertical offset.
- * @param {number=} opt_value - Value to set.
- * @return {number|anychart.ganttModule.TimeLine} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.editFinishConnectorMarkerVerticalOffset = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.editFinishConnectorMarkerVerticalOffset_ = opt_value;
-    return this;
-  }
-  return this.editFinishConnectorMarkerVerticalOffset_;
-};
-
-
-/**
- * Gets/sets interval edit control width.
- * @param {number=} opt_value - Value to set.
- * @return {number|anychart.ganttModule.TimeLine} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.editIntervalWidth = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.editIntervalWidth_ = opt_value;
-    return this;
-  }
-  return this.editIntervalWidth_;
 };
 
 
@@ -2309,36 +2089,27 @@ anychart.ganttModule.TimeLine.prototype.getEditConnectorPreviewPath_ = function(
   if (!this.editConnectorPreviewPath_) {
     this.editConnectorPreviewPath_ = /** @type {acgraph.vector.Path} */ (this.getEditLayer().path());
     this.editConnectorPreviewPath_
-        .stroke(this.connectorPreviewStroke_)
+    // .stroke(this.connectorPreviewStroke_)
         .zIndex(anychart.ganttModule.TimeLine.EDIT_CONNECTOR_PREVIEW_Z_INDEX);
-
-    this.registerDisposable(this.editConnectorPreviewPath_);
+    this.editConnectorPreviewPath_.disablePointerEvents(true);
   }
   return this.editConnectorPreviewPath_;
 };
 
 
+//endregion
+//region -- Edit events.
 /**
  * Clears edit controls.
  * @param {boolean=} opt_ignoreTooltip - Whether to try to restore tooltip visibility.
  * @private
  */
 anychart.ganttModule.TimeLine.prototype.clearEdit_ = function(opt_ignoreTooltip) {
-  //This conditions allow to avoid multiple path operations.
-  if (!this.getEditPreviewPath_().isEmpty())
-    this.getEditPreviewPath_().clear().setTransformationMatrix(1, 0, 0, 1, 0, 0);
-  if (!this.getEditProgressPath_().isEmpty())
-    this.getEditProgressPath_().clear().setTransformationMatrix(1, 0, 0, 1, 0, 0);
-  if (!this.getEditRightThumbPath_().isEmpty())
-    this.getEditRightThumbPath_().clear().setTransformationMatrix(1, 0, 0, 1, 0, 0);
-  if (!this.getEditLeftThumbPath_().isEmpty())
-    this.getEditLeftThumbPath_().clear().setTransformationMatrix(1, 0, 0, 1, 0, 0);
-  if (!this.getEditFinishConnectorPath_().isEmpty())
-    this.getEditFinishConnectorPath_().clear().setTransformationMatrix(1, 0, 0, 1, 0, 0);
-  if (!this.getEditStartConnectorPath_().isEmpty())
-    this.getEditStartConnectorPath_().clear().setTransformationMatrix(1, 0, 0, 1, 0, 0);
-  if (!this.getEditConnectorPreviewPath_().isEmpty())
-    this.getEditConnectorPreviewPath_().clear();
+  for (var i = 0; i < this.editControls_.length; i++) {
+    var path = this.editControls_[i];
+    path.clear().setTransformationMatrix(1, 0, 0, 1, 0, 0);
+  }
+  this.editControls_.length = 0;
 
   if (!opt_ignoreTooltip) {
     this.tooltip().enabled(this.tooltipEnabledBackup_);
@@ -2354,8 +2125,7 @@ anychart.ganttModule.TimeLine.prototype.clearEdit_ = function(opt_ignoreTooltip)
  * @private
  */
 anychart.ganttModule.TimeLine.prototype.editPreviewDragMouseDown_ = function(e) {
-  this.editPreviewDragger_ = new anychart.ganttModule.TimeLine.BarDragger(this.getEditPreviewPath_());
-  this.registerDisposable(this.editPreviewDragger_);
+  this.editPreviewDragger_ = new anychart.ganttModule.draggers.BarDragger(this.getEditPreviewPath_());
 
   this.editPreviewDragger_.listen(goog.fx.Dragger.EventType.START, this.editPreviewDragStart_, false, this);
   this.editPreviewDragger_.listen(goog.fx.Dragger.EventType.DRAG, this.editPreviewDrag_, false, this);
@@ -2371,8 +2141,7 @@ anychart.ganttModule.TimeLine.prototype.editPreviewDragMouseDown_ = function(e) 
  * @private
  */
 anychart.ganttModule.TimeLine.prototype.editProgressDragMouseDown_ = function(e) {
-  this.editProgressDragger_ = new anychart.ganttModule.TimeLine.ProgressDragger(this.getEditProgressPath_());
-  this.registerDisposable(this.editProgressDragger_);
+  this.editProgressDragger_ = new anychart.ganttModule.draggers.ProgressDragger(this.getEditProgressPath_());
 
   this.editProgressDragger_.listen(goog.fx.Dragger.EventType.START, this.editProgressDragStart_, false, this);
   this.editProgressDragger_.listen(goog.fx.Dragger.EventType.DRAG, this.editProgressDrag_, false, this);
@@ -2388,8 +2157,7 @@ anychart.ganttModule.TimeLine.prototype.editProgressDragMouseDown_ = function(e)
  * @private
  */
 anychart.ganttModule.TimeLine.prototype.editLeftThumbDragMouseDown_ = function(e) {
-  this.editLeftThumbDragger_ = new anychart.ganttModule.TimeLine.ThumbDragger(this.getEditLeftThumbPath_(), true);
-  this.registerDisposable(this.editLeftThumbDragger_);
+  this.editLeftThumbDragger_ = new anychart.ganttModule.draggers.ThumbDragger(this.getEditLeftThumbPath_(), true);
 
   this.editLeftThumbDragger_.listen(goog.fx.Dragger.EventType.START, this.editLeftThumbDragStart_, false, this);
   this.editLeftThumbDragger_.listen(goog.fx.Dragger.EventType.DRAG, this.editThumbDrag_, false, this);
@@ -2405,8 +2173,7 @@ anychart.ganttModule.TimeLine.prototype.editLeftThumbDragMouseDown_ = function(e
  * @private
  */
 anychart.ganttModule.TimeLine.prototype.editRightThumbDragMouseDown_ = function(e) {
-  this.editRightThumbDragger_ = new anychart.ganttModule.TimeLine.ThumbDragger(this.getEditRightThumbPath_(), false);
-  this.registerDisposable(this.editRightThumbDragger_);
+  this.editRightThumbDragger_ = new anychart.ganttModule.draggers.ThumbDragger(this.getEditRightThumbPath_(), false);
 
   this.editRightThumbDragger_.listen(goog.fx.Dragger.EventType.START, this.editRightThumbDragStart_, false, this);
   this.editRightThumbDragger_.listen(goog.fx.Dragger.EventType.DRAG, this.editThumbDrag_, false, this);
@@ -2422,8 +2189,7 @@ anychart.ganttModule.TimeLine.prototype.editRightThumbDragMouseDown_ = function(
  * @private
  */
 anychart.ganttModule.TimeLine.prototype.editStartConnectorMouseDown_ = function(e) {
-  this.editStartConnectorDragger_ = new anychart.ganttModule.TimeLine.ConnectorDragger(this, this.getEditStartConnectorPath_(), true);
-  this.registerDisposable(this.editStartConnectorDragger_);
+  this.editStartConnectorDragger_ = new anychart.ganttModule.draggers.ConnectorDragger(this, this.getEditStartConnectorPath_(), true);
 
   this.editStartConnectorDragger_.listen(goog.fx.Dragger.EventType.START, this.editConnectorDragStart_, false, this);
   this.editStartConnectorDragger_.listen(goog.fx.Dragger.EventType.DRAG, this.editConnectorDrag_, false, this);
@@ -2439,8 +2205,7 @@ anychart.ganttModule.TimeLine.prototype.editStartConnectorMouseDown_ = function(
  * @private
  */
 anychart.ganttModule.TimeLine.prototype.editFinishConnectorMouseDown_ = function(e) {
-  this.editFinishConnectorDragger_ = new anychart.ganttModule.TimeLine.ConnectorDragger(this, this.getEditFinishConnectorPath_(), false);
-  this.registerDisposable(this.editFinishConnectorDragger_);
+  this.editFinishConnectorDragger_ = new anychart.ganttModule.draggers.ConnectorDragger(this, this.getEditFinishConnectorPath_(), false);
 
   this.editFinishConnectorDragger_.listen(goog.fx.Dragger.EventType.START, this.editConnectorDragStart_, false, this);
   this.editFinishConnectorDragger_.listen(goog.fx.Dragger.EventType.DRAG, this.editConnectorDrag_, false, this);
@@ -2467,6 +2232,7 @@ anychart.ganttModule.TimeLine.prototype.editPreviewDragStart_ = function(e) {
   this.getEditFinishConnectorPath_().clear();
 
   goog.style.setStyle(anychart.document['body'], 'cursor', acgraph.vector.Cursor.EW_RESIZE);
+  this.enableDocMouseMove(true);
 };
 
 
@@ -2479,6 +2245,7 @@ anychart.ganttModule.TimeLine.prototype.editPreviewDrag_ = function(e) {
   this.dragging = true;
   this.interactive = false;
   this.draggingPreview = true;
+  this.preventClickAfterDrag = true;
 };
 
 
@@ -2495,13 +2262,13 @@ anychart.ganttModule.TimeLine.prototype.editPreviewEnd_ = function(e) {
     this.clearEdit_();
 
     var dragger = e.target;
-    var el = /** @type {anychart.ganttModule.TimeLine.LiveEditControl} */ (dragger.element);
-    var dataItem = el.item;
+    var el = /** @type {acgraph.vector.Path} */ (dragger.element);
+    var dataItem = el.tag.item;
     var tree = this.controller.data();//this.controller.data() can be Tree or TreeView.
 
     tree.suspendSignalsDispatching();
 
-    var newActualStartRatio = (el.type == anychart.enums.TLElementTypes.MILESTONES) ?
+    var newActualStartRatio = (el.tag.type == anychart.enums.TLElementTypes.MILESTONES) ?
         ((draggedBounds.left + draggedBounds.width / 2 - this.pixelBoundsCache.left) / (this.pixelBoundsCache.width)) :
         ((draggedBounds.left - this.pixelBoundsCache.left) / (this.pixelBoundsCache.width));
     var newActualStart = this.scale_.ratioToTimestamp(newActualStartRatio);
@@ -2514,7 +2281,7 @@ anychart.ganttModule.TimeLine.prototype.editPreviewEnd_ = function(e) {
     if (!isNaN(newActualStart)) {
       var delta = 0;
 
-      switch (el.type) {
+      switch (el.tag.type) {
         case anychart.enums.TLElementTypes.MILESTONES:
           dataItem.set(anychart.enums.GanttDataFields.ACTUAL_START, newActualStart);
           dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_START, newActualStart);
@@ -2524,7 +2291,7 @@ anychart.ganttModule.TimeLine.prototype.editPreviewEnd_ = function(e) {
           }
           break;
         case anychart.enums.TLElementTypes.PERIODS:
-          var periodIndex = el.periodIndex;
+          var periodIndex = el.tag.periodIndex;
           var periodStart = /** @type {number} */ (dataItem.getMeta(anychart.enums.GanttDataFields.PERIODS, periodIndex, anychart.enums.GanttDataFields.START));
           var periodEnd = dataItem.getMeta(anychart.enums.GanttDataFields.PERIODS, periodIndex, anychart.enums.GanttDataFields.END);
           delta = newActualStart - periodStart;
@@ -2578,6 +2345,7 @@ anychart.ganttModule.TimeLine.prototype.editPreviewEnd_ = function(e) {
     this.scrollInterval = null;
   }
   goog.style.setStyle(anychart.document['body'], 'cursor', ''); //TODO (A.Kudryavtsev): Do we reset old CSS cursor here?
+  this.enableDocMouseMove(false);
 };
 
 
@@ -2608,6 +2376,7 @@ anychart.ganttModule.TimeLine.prototype.editProgressDragStart_ = function(e) {
 anychart.ganttModule.TimeLine.prototype.editProgressDrag_ = function(e) {
   this.dragging = true;
   this.interactive = false;
+  this.preventClickAfterDrag = true;
 };
 
 
@@ -2624,9 +2393,9 @@ anychart.ganttModule.TimeLine.prototype.editProgressDragEnd_ = function(e) {
 
     var dragger = e.target;
     var el = dragger.element;
+    var item = el.tag.item;
     if (!isNaN(dragger.progress)) {
-      var prog = anychart.math.round(dragger.progress * 100) + '%';
-      el.item.set(anychart.enums.GanttDataFields.PROGRESS_VALUE, prog);
+      item.set(anychart.enums.GanttDataFields.PROGRESS_VALUE, anychart.math.round(dragger.progress, 2));
     }
     this.dragging = false;
     clearInterval(this.scrollInterval);
@@ -2654,6 +2423,7 @@ anychart.ganttModule.TimeLine.prototype.editRightThumbDragStart_ = function(e) {
 
   goog.style.setStyle(anychart.document['body'], 'cursor', 'col-resize');
   this.editPreviewPath_.cursor(/** @type {acgraph.vector.Cursor} */ ('col-resize'));
+  this.enableDocMouseMove(true);
 };
 
 
@@ -2675,10 +2445,68 @@ anychart.ganttModule.TimeLine.prototype.editLeftThumbDragStart_ = function(e) {
 
   goog.style.setStyle(anychart.document['body'], 'cursor', 'col-resize');
   this.editPreviewPath_.cursor(/** @type {acgraph.vector.Cursor} */ ('col-resize'));
-
+  this.enableDocMouseMove(true);
 };
 
 
+//endregion
+//region -- Utils.
+/**
+ *
+ * @param {number} anchoredTop
+ * @param {number} barHeight
+ * @param {anychart.enums.Anchor} anchor
+ * @private
+ * @return {number}
+ */
+anychart.ganttModule.TimeLine.prototype.fixBarTop_ = function(anchoredTop, barHeight, anchor) {
+  var verticalOffset;
+  if (anychart.utils.isTopAnchor(anchor))
+    verticalOffset = 0;
+  else if (anychart.utils.isBottomAnchor(anchor))
+    verticalOffset = -barHeight;
+  else
+    verticalOffset = -barHeight / 2;
+
+  return anchoredTop + verticalOffset;
+};
+
+
+/**
+ * Resolves anchor by position and bar type.
+ * @param {anychart.enums.Position} position - Position.
+ * @param {anychart.enums.TLElementTypes} type - Timeline element type.
+ * @param {boolean=} opt_considerBaseline - Whether to consider baseline.
+ * @return {anychart.enums.Anchor}
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.resolveAutoAnchorByType_ = function(position, type, opt_considerBaseline) {
+  var anchor = /** @type {anychart.enums.Anchor} */ (position);
+  var above = this.baselines().getOption('above');
+  switch (type) {
+    case anychart.enums.TLElementTypes.TASKS:
+      if (opt_considerBaseline && position == anychart.enums.Position.LEFT_CENTER) {
+        anchor = above ? anychart.enums.Anchor.LEFT_TOP : anychart.enums.Anchor.LEFT_BOTTOM;
+      }
+      break;
+    case anychart.enums.TLElementTypes.GROUPING_TASKS:
+      anchor = anychart.utils.isTopAnchor(/** @type {anychart.enums.Anchor} */ (position)) ?
+          anychart.enums.Anchor.LEFT_TOP :
+          anychart.enums.Anchor.LEFT_BOTTOM;
+      if (opt_considerBaseline && position == anychart.enums.Position.LEFT_CENTER) {
+        anchor = above ? anychart.enums.Anchor.LEFT_TOP : anychart.enums.Anchor.LEFT_BOTTOM;
+      }
+      break;
+    case anychart.enums.TLElementTypes.BASELINES:
+      if (position == anychart.enums.Position.LEFT_CENTER)
+        anchor = above ? anychart.enums.Anchor.LEFT_BOTTOM : anychart.enums.Anchor.LEFT_TOP;
+  }
+
+  return /** @type {anychart.enums.Anchor} */ (anchor);
+};
+
+
+//endregion
 /**
  * Draws thumb preview.
  * @param {goog.fx.DragEvent} event - Event.
@@ -2689,10 +2517,10 @@ anychart.ganttModule.TimeLine.prototype.drawThumbPreview_ = function(event, opt_
   if (this.currentThumbDragger_) {
     var path = this.currentThumbDragger_.isLeft ? this.editLeftThumbPath_ : this.editRightThumbPath_;
 
-    var item = path.item;
-    var type = path.type;
-    var periodIndex = path.periodIndex;
-    var bounds = path.bounds;
+    var item = path.tag.item;
+    var type = path.tag.type;
+    var periodIndex = path.tag.periodIndex;
+    var bounds = path.tag.bounds;
 
     var time;
 
@@ -2744,7 +2572,7 @@ anychart.ganttModule.TimeLine.prototype.drawThumbPreview_ = function(event, opt_
 
 /**
  * Draws connector preview.
- * @param {goog.fx.DragEvent} event - Event.
+ * @param {goog.fx.DragEvent|anychart.core.MouseEvent} event - Event.
  * @param {number=} opt_scrollOffsetX - Negative value means scrolling left, otherwise is scrolling right. Zero is not a scrolling.
  * @param {number=} opt_scrollOffsetY - Negative value means scrolling left, otherwise is scrolling right. Zero is not a scrolling.
  * @private
@@ -2754,9 +2582,9 @@ anychart.ganttModule.TimeLine.prototype.drawConnectorPreview_ = function(event, 
   if (this.currentConnectorDragger_ && this.dragging) {
     var circle = this.currentConnectorDragger_.isStart ? this.editStartConnectorPath_ : this.editFinishConnectorPath_;
 
-    var index = circle.index;
-    var period = circle.period;
-    var periodIndex = circle.periodIndex;
+    var index = circle.tag.index;
+    var period = circle.tag.period;
+    var periodIndex = circle.tag.periodIndex;
 
     var containerPosition = this.container().getStage().getClientPosition();
     var containerLeft = containerPosition.x;
@@ -2773,14 +2601,16 @@ anychart.ganttModule.TimeLine.prototype.drawConnectorPreview_ = function(event, 
     }
 
     var initItemsBounds = this.getItemBounds_(index, period, periodIndex);
+    var previewStroke = this.connectors()['previewStroke']();
 
-    var previewThickness = anychart.utils.extractThickness(this.connectorPreviewStroke_);
+    var previewThickness = anychart.utils.extractThickness(previewStroke);
     var pixelShift = (previewThickness % 2 && acgraph.type() === acgraph.StageType.SVG) ? 0.5 : 0;
 
     var startLeft = this.currentConnectorDragger_.isStart ? initItemsBounds.left : initItemsBounds.left + initItemsBounds.width;
     var startTop = initItemsBounds.top + initItemsBounds.height / 2 + pixelShift;
 
     this.getEditConnectorPreviewPath_()
+        .stroke(previewStroke)
         .clear()
         .moveTo(startLeft, startTop)
         .lineTo(mouseLeft, mouseTop);
@@ -2796,7 +2626,8 @@ anychart.ganttModule.TimeLine.prototype.drawConnectorPreview_ = function(event, 
 anychart.ganttModule.TimeLine.prototype.editThumbDrag_ = function(e) {
   this.dragging = true;
   this.interactive = false;
-  this.currentThumbDragger_ = /** @type {anychart.ganttModule.TimeLine.ThumbDragger} */ (e.target);
+  this.currentThumbDragger_ = /** @type {anychart.ganttModule.draggers.ThumbDragger} */ (e.target);
+  this.preventClickAfterDrag = true;
   this.drawThumbPreview_(e);
 };
 
@@ -2811,12 +2642,13 @@ anychart.ganttModule.TimeLine.prototype.editThumbDragEnd_ = function(e) {
     if (this.scrollDragger) this.scrollDragger.setEnabled(true);
     var dragPreviewBounds = this.editPreviewPath_.getBounds();
 
+    this.editControls_.push(this.editPreviewPath_); //Kind of soft hack: force this.editPreviewPath_ clearing.
     this.clearEdit_();
 
     var dragger = e.target;
     var el = dragger.element;
-    var dataItem = el.item;
-    var periodIndex = el.periodIndex;
+    var dataItem = el.tag.item;
+    var periodIndex = el.tag.periodIndex;
     var tree = this.controller.data();//this.controller.data() can be Tree or TreeView.
 
     tree.suspendSignalsDispatching();
@@ -2829,7 +2661,7 @@ anychart.ganttModule.TimeLine.prototype.editThumbDragEnd_ = function(e) {
     var newEnd = this.scale_.ratioToTimestamp(rightRatio);
 
     if (!isNaN(newStart) && !isNaN(newEnd)) {
-      switch (el.type) {
+      switch (el.tag.type) {
         case anychart.enums.TLElementTypes.PERIODS:
           dataItem.set(anychart.enums.GanttDataFields.PERIODS, periodIndex, anychart.enums.GanttDataFields.START, newStart);
           dataItem.setMeta(anychart.enums.GanttDataFields.PERIODS, periodIndex, anychart.enums.GanttDataFields.START, newStart);
@@ -2861,6 +2693,7 @@ anychart.ganttModule.TimeLine.prototype.editThumbDragEnd_ = function(e) {
 
   goog.style.setStyle(anychart.document['body'], 'cursor', '');
   this.editPreviewPath_.cursor(acgraph.vector.Cursor.EW_RESIZE);
+  this.enableDocMouseMove(false);
 };
 
 
@@ -2871,11 +2704,12 @@ anychart.ganttModule.TimeLine.prototype.editThumbDragEnd_ = function(e) {
 anychart.ganttModule.TimeLine.prototype.editConnectorDragStart_ = function(e) {
   if (this.scrollDragger) this.scrollDragger.setEnabled(false);
   this.interactivityHandler.highlight();
-  this.currentConnectorDragger_ = /** @type {anychart.ganttModule.TimeLine.ConnectorDragger} */ (e.target);
+  this.currentConnectorDragger_ = /** @type {anychart.ganttModule.draggers.ConnectorDragger} */ (e.target);
   this.clearEdit_();
   this.tooltipEnabledBackup_ = /** @type {boolean} */ (this.tooltip().enabled());
   this.tooltip().hide();
   this.tooltip().enabled(false);
+  this.enableDocMouseMove(true);
 };
 
 
@@ -2886,9 +2720,11 @@ anychart.ganttModule.TimeLine.prototype.editConnectorDragStart_ = function(e) {
 anychart.ganttModule.TimeLine.prototype.editConnectorDrag_ = function(e) {
   this.dragging = true;
   this.draggingConnector = true;
+  this.finishedDraggingConnector = false;
   this.interactive = false;
   this.currentConnectorDragger_.lastTrackedMouseX = e.clientX;
   this.currentConnectorDragger_.lastTrackedMouseY = e.clientY;
+  this.preventClickAfterDrag = true;
 };
 
 
@@ -2903,13 +2739,17 @@ anychart.ganttModule.TimeLine.prototype.editConnectorDragEnd_ = function(e) {
     this.tooltipEnabledBackup_ = void 0;
     this.getEditConnectorPreviewPath_().clear();
     this.dragging = false;
+    this.draggingConnector = false;
+    this.finishedDraggingConnector = true;
     clearInterval(this.scrollInterval);
     this.scrollInterval = null;
   }
+  this.enableDocMouseMove(false);
   //Moved nulling of this.currentConnectorDragger_ to additional mouse up actions (see addMouseUp() method).
 };
 
 
+//region -- Connector events.
 /**
  * Creates connector interactivity event.
  * @param {anychart.core.MouseEvent} event - Incoming original event. By idea, can't be null.
@@ -3000,17 +2840,206 @@ anychart.ganttModule.TimeLine.prototype.patchConnectorMouseOutEvent_ = function(
 };
 
 
+//endregion
+//region -- Edit controls drawing.
+/**
+ *
+ * @param {anychart.enums.TLElementTypes} type - .
+ * @param {anychart.math.Rect} bounds - .
+ * @param {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} item - .
+ * @param {number=} opt_periodIndex - .
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.drawEditPreview_ = function(type, bounds, item, opt_periodIndex) {
+  this.clearEdit_(true);
+  var el = this.getElementByType_(type);
+  var edit = /** @type {anychart.ganttModule.edit.ElementEdit} */ (el.edit());
+  if (edit.getOption('enabled')) {
+    var tag = this.createEditTag(item, null, type, bounds, opt_periodIndex);
+    var path = this.getEditPreviewPath_();
+    path.tag = tag;
+    path
+        .fill(/** @type {acgraph.vector.Fill} */ (edit.getOption('fill')))
+        .stroke(/** @type {acgraph.vector.Stroke} */ (edit.getOption('stroke')))
+        .clear()
+        .moveTo(bounds.left, bounds.top)
+        .lineTo(bounds.left + bounds.width, bounds.top)
+        .lineTo(bounds.left + bounds.width, bounds.top + bounds.height)
+        .lineTo(bounds.left, bounds.top + bounds.height)
+        .close();
+
+    this.editControls_.push(path);
+  }
+};
+
+
+/**
+ *
+ * @param {anychart.enums.TLElementTypes} type - .
+ * @param {anychart.math.Rect} bounds - .
+ * @param {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} item - .
+ * @param {number=} opt_periodIndex - .
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.drawEditProgress_ = function(type, bounds, item, opt_periodIndex) {
+  var el = /** @type {anychart.ganttModule.elements.TasksElement|anychart.ganttModule.elements.GroupingTasksElement} */ (this.getElementByType_(type));
+  var edit = /** @type {anychart.ganttModule.edit.ElementEdit} */ (el.progress().edit());
+  if (edit.getOption('enabled')) {
+    var tag = this.createEditTag(item, null, anychart.enums.TLElementTypes.PROGRESS, bounds, opt_periodIndex);
+    var path = this.getEditProgressPath_();
+    path.tag = tag;
+    var progressValue = goog.isDef(item.meta('progressValue')) ?
+        item.meta('progressValue') :
+        item.meta('autoProgress');
+
+    progressValue = /** @type {number} */ (progressValue || 0);
+    var progressLeft = bounds.left + progressValue * bounds.width;
+    var top = bounds.top + bounds.height;
+    var cornerHeight = anychart.ganttModule.TimeLine.EDIT_CORNER_HEIGHT;
+
+    path
+        .fill(/** @type {acgraph.vector.Fill} */ (edit.getOption('fill')))
+        .stroke(/** @type {acgraph.vector.Stroke} */ (edit.getOption('stroke')))
+        .clear()
+        .moveTo(progressLeft, top - cornerHeight)
+        .lineTo(progressLeft + cornerHeight, top)
+        .lineTo(progressLeft + cornerHeight, top + cornerHeight)
+        .lineTo(progressLeft - cornerHeight, top + cornerHeight)
+        .lineTo(progressLeft - cornerHeight, top)
+        .close();
+
+    this.editControls_.push(path);
+  }
+};
+
+
+/**
+ *
+ * @param {anychart.enums.TLElementTypes} type - .
+ * @param {anychart.math.Rect} bounds - .
+ * @param {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} item - .
+ * @param {number=} opt_periodIndex - .
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.drawEditThumbs_ = function(type, bounds, item, opt_periodIndex) {
+  var el = this.getElementByType_(type);
+  var edit = /** @type {anychart.ganttModule.edit.ElementEdit} */ (el.edit());
+  var tag = this.createEditTag(item, null, type, bounds, opt_periodIndex);
+  var leftThumb = edit.start().thumb();
+  var rightThumb = edit.end().thumb();
+  var path, size;
+  var right = bounds.left + bounds.width;
+
+  if (edit.getOption('enabled') && leftThumb.getOption('enabled')) {
+    path = this.getEditLeftThumbPath_();
+    path.tag = tag;
+    size = /** @type {number} */ (leftThumb.getOption('size'));
+    path
+        .fill(/** @type {acgraph.vector.Fill} */ (leftThumb.getOption('fill')))
+        .stroke(/** @type {acgraph.vector.Stroke} */ (leftThumb.getOption('stroke')))
+        .clear()
+        .moveTo(bounds.left - 1, bounds.top)
+        .lineTo(bounds.left - 1 + size, bounds.top)
+        .lineTo(bounds.left - 1 + size, bounds.top + bounds.height)
+        .lineTo(bounds.left - 1, bounds.top + bounds.height)
+        .close();
+
+    this.editControls_.push(path);
+  }
+
+  if (edit.getOption('enabled') && rightThumb.getOption('enabled')) {
+    path = this.getEditRightThumbPath_();
+    path.tag = tag;
+    size = /** @type {number} */ (rightThumb.getOption('size'));
+    path
+        .fill(/** @type {acgraph.vector.Fill} */ (rightThumb.getOption('fill')))
+        .stroke(/** @type {acgraph.vector.Stroke} */ (rightThumb.getOption('stroke')))
+        .clear()
+        .moveTo(right + 1, bounds.top)
+        .lineTo(right + 1 - size, bounds.top)
+        .lineTo(right + 1 - size, bounds.top + bounds.height)
+        .lineTo(right + 1, bounds.top + bounds.height)
+        .close();
+
+    this.editControls_.push(path);
+  }
+};
+
+
+/**
+ *
+ * @param {anychart.enums.TLElementTypes} type - .
+ * @param {number} index - .
+ * @param {anychart.math.Rect} bounds - .
+ * @param {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} item - .
+ * @param {number=} opt_periodIndex - .
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.drawConnectorsEditThumbs_ = function(type, index, bounds, item, opt_periodIndex) {
+  var el = this.getElementByType_(type);
+  var edit = /** @type {anychart.ganttModule.edit.ElementEdit} */ (el.edit());
+  var tag = this.createEditTag(item, index, type, bounds, opt_periodIndex);
+  var right = bounds.left + bounds.width;
+
+  var leftThumb = edit.start().connectorThumb();
+  var rightThumb = edit.end().connectorThumb();
+  var path, size, drawer;
+  var rTop = bounds.top + bounds.height / 2;
+
+  if (edit.getOption('enabled') && leftThumb.getOption('enabled')) {
+    path = this.getEditStartConnectorPath_();
+    path.tag = tag;
+    path
+        .fill(/** @type {acgraph.vector.Fill} */ (leftThumb.getOption('fill')))
+        .stroke(/** @type {acgraph.vector.Stroke} */ (leftThumb.getOption('stroke')));
+    drawer = anychart.utils.getMarkerDrawer(leftThumb.getOption('type'));
+    size = /** @type {number} */ (leftThumb.getOption('size')) / 2;
+    drawer.call(null,
+        /** @type {!acgraph.vector.Path} */ (path),
+        bounds.left - size + /** @type {number} */ (leftThumb.getOption('horizontalOffset')),
+        rTop + /** @type {number} */ (leftThumb.getOption('verticalOffset')),
+        size);
+
+    this.editControls_.push(path);
+  }
+
+  if (edit.getOption('enabled') && rightThumb.getOption('enabled')) {
+    path = this.getEditFinishConnectorPath_();
+    path.tag = tag;
+    path
+        .fill(/** @type {acgraph.vector.Fill} */ (rightThumb.getOption('fill')))
+        .stroke(/** @type {acgraph.vector.Stroke} */ (rightThumb.getOption('stroke')));
+    drawer = anychart.utils.getMarkerDrawer(rightThumb.getOption('type'));
+    size = /** @type {number} */ (rightThumb.getOption('size')) / 2;
+    drawer.call(null,
+        /** @type {!acgraph.vector.Path} */ (path),
+        right + size + /** @type {number} */ (rightThumb.getOption('horizontalOffset')),
+        rTop + /** @type {number} */ (rightThumb.getOption('verticalOffset')),
+        size);
+
+    this.editControls_.push(path);
+  }
+};
+
+
+//endregion
+//region -- Common mouse events.
 /**
  * @inheritDoc
  */
-anychart.ganttModule.TimeLine.prototype.addMouseMoveAndOver = function(evt) {
-  if (evt && evt['originalEvent']) {
-    var orig = evt['originalEvent'];
-    var domTarget = orig['domTarget'];
-    if (this.editable) {
+anychart.ganttModule.TimeLine.prototype.addMouseMoveAndOver = function(evt, originalEvent) {
+  var orig, domTarget, tag, dataItem;
+  if (this.dragging) {
+    if (this.draggingConnector) {
+      this.drawEditConnector_(evt, originalEvent);
+    }
+  } else {
+    if (evt && evt['originalEvent']) {
+      orig = evt['originalEvent'];
+      domTarget = orig['domTarget'];
       if (domTarget && domTarget.tag && domTarget.tag.isElement) {
-        var tag = /** @type {anychart.ganttModule.TimeLine.Tag} */ (domTarget.tag);
-        var dataItem = tag['item'];
+        tag = /** @type {anychart.ganttModule.TimeLine.Tag} */ (domTarget.tag);
+        dataItem = tag['item'];
         var id = dataItem.get(anychart.enums.GanttDataFields.ID);
         if (!goog.isDef(this.lastHoveredBarItemId_))
           this.lastHoveredBarItemId_ = id;
@@ -3028,197 +3057,124 @@ anychart.ganttModule.TimeLine.prototype.addMouseMoveAndOver = function(evt) {
             this.lastHoveredPeriodIndex_ = periodIndex;
         }
 
-        if (tag.bounds && !this.dragging) {
-          var b = tag.bounds;
-
-          this.getEditPreviewPath_()
-              .clear()
-              .moveTo(b.left, b.top)
-              .lineTo(b.left + b.width, b.top)
-              .lineTo(b.left + b.width, b.top + b.height)
-              .lineTo(b.left, b.top + b.height)
-              .close();
-
-          this.editPreviewPath_.item = dataItem;
-          this.editPreviewPath_.type = tag.type;
-
-          if (period) this.editPreviewPath_.period = period;
-
-          if (goog.isDef(periodIndex)) this.editPreviewPath_.periodIndex = periodIndex;
-
-          // ------ Drawing progress ------
+        if (tag.bounds) {
+          this.drawEditPreview_(tag.type, tag.bounds, tag.item, periodIndex);
+          // Drawing progress
           if (dataItem && (tag.type == anychart.enums.TLElementTypes.TASKS || tag.type == anychart.enums.TLElementTypes.GROUPING_TASKS ||
               tag.type == anychart.enums.TLElementTypes.PROGRESS)) {
-            var progressValue = goog.isDef(dataItem.meta('progressValue')) ?
-                dataItem.meta('progressValue') :
-                dataItem.meta('autoProgress');
-
-            progressValue = progressValue || 0;
-            var progressLeft = b.left + progressValue * b.width;
-            var top = b.top + b.height;
-
-            this.getEditProgressPath_()
-                .clear()
-                .moveTo(progressLeft, top - anychart.ganttModule.TimeLine.EDIT_CORNER_HEIGHT)
-                .lineTo(progressLeft + anychart.ganttModule.TimeLine.EDIT_CORNER_HEIGHT, top)
-                .lineTo(progressLeft + anychart.ganttModule.TimeLine.EDIT_CORNER_HEIGHT, top + anychart.ganttModule.TimeLine.EDIT_CORNER_HEIGHT)
-                .lineTo(progressLeft - anychart.ganttModule.TimeLine.EDIT_CORNER_HEIGHT, top + anychart.ganttModule.TimeLine.EDIT_CORNER_HEIGHT)
-                .lineTo(progressLeft - anychart.ganttModule.TimeLine.EDIT_CORNER_HEIGHT, top)
-                .close();
-
-            this.editProgressPath_.bounds = b;
-            this.editProgressPath_.item = dataItem;
-
+            this.drawEditProgress_(tag.type, tag.bounds, tag.item);
           } else {
             this.getEditProgressPath_().clear();
           }
 
-          var right = b.left + b.width;
-
-          // ------ Drawing any resizeable bar ------
+          // Drawing any resizeable bar
           if (dataItem && tag.type != anychart.enums.TLElementTypes.MILESTONES) {
-            this.getEditRightThumbPath_()
-                .clear()
-                .moveTo(right + 1, b.top)
-                .lineTo(right + 1 - this.editIntervalWidth_, b.top)
-                .lineTo(right + 1 - this.editIntervalWidth_, b.top + b.height)
-                .lineTo(right + 1, b.top + b.height)
-                .close();
-
-            this.getEditLeftThumbPath_()
-                .clear()
-                .moveTo(b.left - 1, b.top)
-                .lineTo(b.left - 1 + this.editIntervalWidth_, b.top)
-                .lineTo(b.left - 1 + this.editIntervalWidth_, b.top + b.height)
-                .lineTo(b.left - 1, b.top + b.height)
-                .close();
-
-            this.editRightThumbPath_.bounds = b;
-            this.editRightThumbPath_.item = dataItem;
-            this.editRightThumbPath_.type = tag.type;
-            this.editLeftThumbPath_.bounds = b;
-            this.editLeftThumbPath_.item = dataItem;
-            this.editLeftThumbPath_.type = tag.type;
-
-            if (period) {
-              this.editRightThumbPath_.period = period;
-              this.editLeftThumbPath_.period = period;
-            }
-
-            if (goog.isDef(periodIndex)) {
-              this.editRightThumbPath_.periodIndex = periodIndex;
-              this.editLeftThumbPath_.periodIndex = periodIndex;
-            }
-
+            this.drawEditThumbs_(tag.type, tag.bounds, tag.item, periodIndex);
           } else {
             this.getEditLeftThumbPath_().clear();
             this.getEditRightThumbPath_().clear();
           }
 
+          // Drawing connectors thumbs
           if (dataItem && tag.type != anychart.enums.TLElementTypes.BASELINES) {
-            var rTop = b.top + b.height / 2;
-            var finishDrawer = anychart.utils.getMarkerDrawer(this.editFinishConnectorMarkerType_);
-            var finishSize = this.editFinishConnectorMarkerSize_ / 2;
-            finishDrawer.call(null,
-                /** @type {!acgraph.vector.Path} */ (this.getEditFinishConnectorPath_()),
-                right + finishSize + this.editFinishConnectorMarkerHorizontalOffset_,
-                rTop + this.editFinishConnectorMarkerVerticalOffset_,
-                finishSize);
-
-            var startDrawer = anychart.utils.getMarkerDrawer(this.editStartConnectorMarkerType_);
-            var startSize = this.editStartConnectorMarkerSize_ / 2;
-            startDrawer.call(null,
-                /** @type {!acgraph.vector.Path} */ (this.getEditStartConnectorPath_()),
-                b.left - startSize + this.editStartConnectorMarkerHorizontalOffset_,
-                rTop + this.editStartConnectorMarkerVerticalOffset_,
-                startSize);
-
-            this.editFinishConnectorPath_.item = dataItem;
-            this.editFinishConnectorPath_.type = tag.type;
-            this.editFinishConnectorPath_.index = evt['hoveredIndex'] + this.controller.startIndex();
-            this.editStartConnectorPath_.item = dataItem;
-            this.editStartConnectorPath_.type = tag.type;
-            this.editStartConnectorPath_.index = evt['hoveredIndex'] + this.controller.startIndex();
-
-            if (period) {
-              this.editStartConnectorPath_.period = period;
-              this.editFinishConnectorPath_.period = period;
-            }
-
-            if (goog.isDef(periodIndex)) {
-              this.editStartConnectorPath_.periodIndex = periodIndex;
-              this.editFinishConnectorPath_.periodIndex = periodIndex;
-            }
+            var ind = evt['hoveredIndex'] + this.controller.startIndex();
+            this.drawConnectorsEditThumbs_(tag.type, ind, tag.bounds, tag.item, periodIndex);
           } else {
             this.getEditFinishConnectorPath_().clear();
             this.getEditStartConnectorPath_().clear();
           }
-        } else if (this.draggingConnector && dataItem) {//dataItem here is destination item.
-          var path = this.currentConnectorDragger_.isStart ? this.editStartConnectorPath_ : this.editFinishConnectorPath_;
-
-          var startItem = path.item;
-          var startIndex = path.index;
-
-          if (tag.type != anychart.enums.TLElementTypes.BASELINES && tag.type != anychart.enums.TLElementTypes.CONNECTORS) {
-            var from, to;
-
-            if (period) {
-              var startPeriod = path.period;
-              var startPeriodIndex = path.periodIndex;
-              from = {'item': startItem, 'period': startPeriod, 'index': startIndex, 'periodIndex': startPeriodIndex};
-              to = {
-                'item': dataItem,
-                'period': period,
-                'index': evt['hoveredIndex'] + this.controller.startIndex(),
-                'periodIndex': periodIndex
-              };
-            } else {
-              from = {'item': startItem, 'index': startIndex};
-              to = {'item': dataItem, 'index': evt['hoveredIndex'] + this.controller.startIndex()};
-            }
-
-            var originalEvent = evt['originalEvent'];
-            var left = originalEvent.clientX - this.container().getStage().getClientPosition().x;
-            var elBounds = tag.bounds;
-            var dropRatio = (left - elBounds.left) / elBounds.width;
-            var startStart = this.currentConnectorDragger_.isStart;
-            var dropStart = dropRatio < .5;
-            var connType;
-            if (startStart) {
-              connType = dropStart ? anychart.enums.ConnectorType.START_START : anychart.enums.ConnectorType.START_FINISH;
-            } else {
-              connType = dropStart ? anychart.enums.ConnectorType.FINISH_START : anychart.enums.ConnectorType.FINISH_FINISH;
-            }
-
-
-            this.getEditConnectorPreviewPath_().clear();
-            this.connectItems_(from, to, connType, void 0, this.editConnectorPreviewPath_);
-          } else {
-            this.drawConnectorPreview_(orig);
-          }
         }
-      } else if (domTarget != this.getEditPreviewPath_() &&
-          domTarget != this.getEditProgressPath_() &&
-          domTarget != this.getEditRightThumbPath_() &&
-          domTarget != this.getEditLeftThumbPath_() &&
-          domTarget != this.getEditFinishConnectorPath_() &&
-          domTarget != this.getEditStartConnectorPath_() && !this.dragging) {
-        this.clearEdit_(true);
-      } else if (this.draggingConnector) {
-        this.drawConnectorPreview_(orig);
+      } else {
+        if (domTarget && !domTarget.tag)
+          this.clearEdit_(true);
       }
+
+      var connEvent = this.patchConnectorEvent_(evt);
+      if (connEvent) {
+        this.interactivityHandler.dispatchEvent(connEvent);
+        this.hoveredConnector_ = domTarget.meta;
+      } else if (this.hoveredConnector_) {
+        connEvent = this.patchConnectorMouseOutEvent_(evt);
+        this.interactivityHandler.dispatchEvent(connEvent);
+        this.hoveredConnector_ = null;
+      }
+    } else {
+      this.clearEdit_(false);
     }
+  }
+};
 
 
-    var connEvent = this.patchConnectorEvent_(evt);
-    if (connEvent) {
-      this.interactivityHandler.dispatchEvent(connEvent);
-      this.hoveredConnector_ = domTarget.meta;
-    } else if (this.hoveredConnector_) {
-      connEvent = this.patchConnectorMouseOutEvent_(evt);
-      this.interactivityHandler.dispatchEvent(connEvent);
-      this.hoveredConnector_ = null;
+/**
+ *
+ * @param {?Object} evt - Event object.
+ * @param {anychart.core.MouseEvent} originalEvent - Original event.
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.drawEditConnector_ = function(evt, originalEvent) {
+  if (evt && this.currentConnectorDragger_) {
+    var orig = evt['originalEvent'];
+    var domTarget = orig['domTarget'];
+
+    if (domTarget && domTarget.tag && domTarget.tag.isElement) {
+      var tag = /** @type {anychart.ganttModule.TimeLine.Tag} */ (domTarget.tag);
+      var destinationDataItem = tag.item;
+
+      if (tag.type != anychart.enums.TLElementTypes.BASELINES && tag.type != anychart.enums.TLElementTypes.CONNECTORS) {
+        var editTag = /** @type {anychart.ganttModule.TimeLine.EditTag} */ (this.currentConnectorDragger_.element.tag);
+        var startItem = editTag.item;
+        var startIndex = editTag.index;
+
+        var period = evt['period'];
+        var periodIndex = evt['periodIndex'];
+
+        var from, to;
+        if (period) {
+          var startPeriod = editTag.period;
+          var startPeriodIndex = editTag.periodIndex;
+          from = {
+            'item': startItem,
+            'period': startPeriod,
+            'index': startIndex,
+            'periodIndex': startPeriodIndex
+          };
+          to = {
+            'item': destinationDataItem,
+            'period': period,
+            'index': evt['hoveredIndex'] + this.controller.startIndex(),
+            'periodIndex': periodIndex
+          };
+        } else {
+          from = {'item': startItem, 'index': startIndex};
+          to = {'item': destinationDataItem, 'index': evt['hoveredIndex'] + this.controller.startIndex()};
+        }
+
+        var left = originalEvent.clientX - this.container().getStage().getClientPosition().x;
+        var elBounds = tag.bounds;
+        var dropRatio = (left - elBounds.left) / elBounds.width;
+        var startStart = this.currentConnectorDragger_.isStart;
+        var dropStart = dropRatio < .5;
+        var connType;
+        if (startStart) {
+          connType = dropStart ?
+              anychart.enums.ConnectorType.START_START :
+              anychart.enums.ConnectorType.START_FINISH;
+        } else {
+          connType = dropStart ?
+              anychart.enums.ConnectorType.FINISH_START :
+              anychart.enums.ConnectorType.FINISH_FINISH;
+        }
+
+        this.getEditConnectorPreviewPath_().clear();
+        this.connectItems_(from, to, connType, void 0, this.getEditConnectorPreviewPath_());
+      } else {
+        this.drawConnectorPreview_(originalEvent);
+      }
+    } else {
+      this.drawConnectorPreview_(originalEvent);
     }
+  } else {
+    this.drawConnectorPreview_(originalEvent);
   }
 };
 
@@ -3234,9 +3190,117 @@ anychart.ganttModule.TimeLine.prototype.rowMouseDown = function(evt) {
  * @param {Object} evt - Event object.
  */
 anychart.ganttModule.TimeLine.prototype.mouseDown = function(evt) {
-  if (this.editable) this.draggingItem = evt['item'];
+  if (this.elements().edit().getOption('enabled'))
+    this.draggingItem = evt['item'];
 };
 
+
+/**
+ * @inheritDoc
+ */
+anychart.ganttModule.TimeLine.prototype.addMouseDown = function(evt) {
+  if (evt) {
+    var connEvent = this.patchConnectorEvent_(evt);
+    if (connEvent) {
+      this.interactivityHandler.dispatchEvent(connEvent);
+    }
+  }
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.ganttModule.TimeLine.prototype.addMouseUp = function(evt) {
+  if (this.finishedDraggingConnector) {
+    this.finishedDraggingConnector = false;
+    if (evt) {
+      var destinationItem = evt['item'];
+      var destinationPeriodIndex = evt['periodIndex'];
+      var originalEvent = evt['originalEvent'];
+      var domTarget = originalEvent['domTarget'];
+      var tag = domTarget ? domTarget.tag : void 0;
+      if (tag && tag.isElement && tag.type != anychart.enums.TLElementTypes.BASELINES) {
+        var left = originalEvent.clientX - this.container().getStage().getClientPosition().x;
+        var elBounds = tag.bounds;
+        var dropRatio = (left - elBounds.left) / elBounds.width;
+
+        var circle = this.currentConnectorDragger_.isStart ? this.editStartConnectorPath_ : this.editFinishConnectorPath_;
+
+        var startItem = circle.tag.item;
+        var startPeriodIndex = circle.tag.periodIndex;
+
+        var startStart = this.currentConnectorDragger_.isStart;
+        var dropStart = dropRatio < .5;
+        var connType;
+        if (startStart) {
+          connType = dropStart ? anychart.enums.ConnectorType.START_START : anychart.enums.ConnectorType.START_FINISH;
+        } else {
+          connType = dropStart ? anychart.enums.ConnectorType.FINISH_START : anychart.enums.ConnectorType.FINISH_FINISH;
+        }
+
+        this.addConnector(startItem, destinationItem, connType, startPeriodIndex, destinationPeriodIndex);
+      }
+    }
+  }
+
+  var connEvent = this.patchConnectorEvent_(evt);
+  if (connEvent) {
+    this.interactivityHandler.dispatchEvent(connEvent);
+  } else {
+    this.getEditConnectorPreviewPath_().clear();
+  }
+
+  this.draggingConnector = false;
+  this.currentConnectorDragger_ = null;
+  this.interactive = true;
+};
+
+
+/** @inheritDoc */
+anychart.ganttModule.TimeLine.prototype.mouseOutMove = function(e) {
+  if (this.dragging && !this.draggingProgress && (this.scrollOffsetX || this.scrollOffsetY)) {
+    var scrollX = 0;
+    var scrollY = 0;
+    if (this.scrollOffsetX)
+      scrollX = this.scrollOffsetX > 0 ? anychart.ganttModule.BaseGrid.SCROLL_STEP : -anychart.ganttModule.BaseGrid.SCROLL_STEP;
+
+    if ((this.draggingConnector || this.draggingItem) && this.scrollOffsetY) {
+      scrollY = this.scrollOffsetY > 0 ? anychart.ganttModule.BaseGrid.SCROLL_STEP : -anychart.ganttModule.BaseGrid.SCROLL_STEP;
+    }
+
+    if (this.scroll(scrollX, scrollY, true)) {
+      this.drawThumbPreview_(/** @type {goog.fx.DragEvent} */ (e), this.scrollOffsetX);
+      this.drawConnectorPreview_(/** @type {goog.fx.DragEvent} */ (e), this.scrollOffsetX, this.scrollOffsetY);
+    }
+  }
+};
+
+
+//endregion
+/**
+ *
+ * @param {anychart.enums.TLElementTypes} type - Type.
+ * @return {anychart.ganttModule.elements.TimelineElement}
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.getElementByType_ = function(type) {
+  switch (type) {
+    case anychart.enums.TLElementTypes.ALL:
+      return /** @type {anychart.ganttModule.elements.TimelineElement} */ (this.elements());
+    case anychart.enums.TLElementTypes.PERIODS:
+      return /** @type {anychart.ganttModule.elements.TimelineElement} */ (this.periods());
+    case anychart.enums.TLElementTypes.TASKS:
+      return /** @type {anychart.ganttModule.elements.TimelineElement} */ (this.tasks());
+    case anychart.enums.TLElementTypes.GROUPING_TASKS:
+      return /** @type {anychart.ganttModule.elements.TimelineElement} */ (this.groupingTasks());
+    case anychart.enums.TLElementTypes.BASELINES:
+      return /** @type {anychart.ganttModule.elements.TimelineElement} */ (this.baselines());
+    case anychart.enums.TLElementTypes.MILESTONES:
+      return /** @type {anychart.ganttModule.elements.TimelineElement} */ (this.milestones());
+  }
+  return /** @type {anychart.ganttModule.elements.TimelineElement} */ (this.elements());
+};
 
 /**
  * Creates connector.
@@ -3380,83 +3444,6 @@ anychart.ganttModule.TimeLine.prototype.addConnector = function(startItem, targe
 };
 
 
-/**
- * @inheritDoc
- */
-anychart.ganttModule.TimeLine.prototype.addMouseDown = function(evt) {
-  if (evt) {
-    var connEvent = this.patchConnectorEvent_(evt);
-    if (connEvent) {
-      this.interactivityHandler.dispatchEvent(connEvent);
-    }
-  }
-};
-
-
-/**
- * @inheritDoc
- */
-anychart.ganttModule.TimeLine.prototype.addMouseUp = function(evt) {
-  if (this.editable && this.draggingConnector) {
-    if (evt) {
-      var destinationItem = evt['item'];
-      var destinationPeriodIndex = evt['periodIndex'];
-      var originalEvent = evt['originalEvent'];
-      var domTarget = originalEvent['domTarget'];
-      var tag = domTarget ? domTarget.tag : void 0;
-      if (tag && tag.isElement && tag.type != anychart.enums.TLElementTypes.BASELINES) {
-        var left = originalEvent.clientX - this.container().getStage().getClientPosition().x;
-        var elBounds = tag.bounds;
-        var dropRatio = (left - elBounds.left) / elBounds.width;
-
-        var circle = this.currentConnectorDragger_.isStart ? this.editStartConnectorPath_ : this.editFinishConnectorPath_;
-
-        var startItem = circle.item;
-        var startPeriodIndex = circle.periodIndex;
-
-        var startStart = this.currentConnectorDragger_.isStart;
-        var dropStart = dropRatio < .5;
-        var connType;
-        if (startStart) {
-          connType = dropStart ? anychart.enums.ConnectorType.START_START : anychart.enums.ConnectorType.START_FINISH;
-        } else {
-          connType = dropStart ? anychart.enums.ConnectorType.FINISH_START : anychart.enums.ConnectorType.FINISH_FINISH;
-        }
-
-        this.addConnector(startItem, destinationItem, connType, startPeriodIndex, destinationPeriodIndex);
-      }
-    }
-    this.draggingConnector = false;
-  }
-
-  var connEvent = this.patchConnectorEvent_(evt);
-  if (connEvent) {
-    this.interactivityHandler.dispatchEvent(connEvent);
-  }
-
-  this.currentConnectorDragger_ = null;
-  this.interactive = true;
-};
-
-
-/** @inheritDoc */
-anychart.ganttModule.TimeLine.prototype.mouseOutMove = function(e) {
-  if (this.dragging && !this.draggingProgress && (this.scrollOffsetX || this.scrollOffsetY)) {
-    var scrollX = 0;
-    var scrollY = 0;
-    if (this.scrollOffsetX)
-      scrollX = this.scrollOffsetX > 0 ? anychart.ganttModule.BaseGrid.SCROLL_STEP : -anychart.ganttModule.BaseGrid.SCROLL_STEP;
-
-    if ((this.draggingConnector || this.draggingItem) && this.scrollOffsetY) {
-      scrollY = this.scrollOffsetY > 0 ? anychart.ganttModule.BaseGrid.SCROLL_STEP : -anychart.ganttModule.BaseGrid.SCROLL_STEP;
-    }
-
-    this.scroll(scrollX, scrollY, true);
-    this.drawThumbPreview_(/** @type {goog.fx.DragEvent} */ (e), this.scrollOffsetX);
-    this.drawConnectorPreview_(/** @type {goog.fx.DragEvent} */ (e), this.scrollOffsetX, this.scrollOffsetY);
-  }
-};
-
 
 /**
  * Handles row collapse/expand.
@@ -3527,6 +3514,7 @@ anychart.ganttModule.TimeLine.prototype.rowSelect = function(event) {
  */
 anychart.ganttModule.TimeLine.prototype.checkRowSelection = function(event) {
   var domTarget = (event && event['originalEvent']) ? event['originalEvent']['domTarget'] : null;
+  //TODO (A.Kudryavtsev): domTarget.type or domTarget.tag.type?
   if (domTarget && domTarget.type == anychart.enums.TLElementTypes.CONNECTORS) {
     this.clearEdit_();
     var connClickEvent = this.patchConnectorEvent_(event);
@@ -3585,10 +3573,9 @@ anychart.ganttModule.TimeLine.prototype.getInteractivityEvent = function(event) 
     var ratio = Math.abs(bounds.left - event.offsetX) / (bounds.width);
     var timestamp = this.scale().ratioToTimestamp(ratio);
 
-    var domTarget = event.domTarget;
     var elType;
-    if (domTarget && domTarget.tag && goog.isDef(domTarget.tag.type)) {
-      elType = domTarget.tag.type;
+    if (target.tag && goog.isDef(target.tag.type)) {
+      elType = target.tag.type;
     }
 
     evt['hoverRatio'] = ratio;
@@ -4499,7 +4486,7 @@ anychart.ganttModule.TimeLine.prototype.connectItems_ = function(from, to, opt_c
       path.tag = void 0; //Tooltip will not appear on connector mouse over.
       path.type = anychart.enums.TLElementTypes.CONNECTORS;
       path.currBounds = null;
-      path.cursor(this.editable ? acgraph.vector.Cursor.POINTER : acgraph.vector.Cursor.DEFAULT);
+      path.cursor(this.elements().edit().getOption('enabled') ? acgraph.vector.Cursor.POINTER : acgraph.vector.Cursor.DEFAULT);
       meta['path'] = path;
       path.meta = meta;
       path.stroke(stroke);
@@ -4508,7 +4495,7 @@ anychart.ganttModule.TimeLine.prototype.connectItems_ = function(from, to, opt_c
       arrow.tag = void 0; //Tooltip will not appear on connector arrow mouse over.
       arrow.type = anychart.enums.TLElementTypes.CONNECTORS;
       arrow.currBounds = null;
-      arrow.cursor(this.editable ? acgraph.vector.Cursor.POINTER : acgraph.vector.Cursor.DEFAULT);
+      arrow.cursor(this.elements().edit().getOption('enabled') ? acgraph.vector.Cursor.POINTER : acgraph.vector.Cursor.DEFAULT);
       meta['arrow'] = arrow;
       arrow.meta = meta;
       arrow.fill(pointFill || this.connectors().getFill(fromItem, toItem, state, opt_connType, fromPeriodIndex, toPeriodIndex));
@@ -4771,8 +4758,7 @@ anychart.ganttModule.TimeLine.prototype.initDom = function() {
  * @override
  */
 anychart.ganttModule.TimeLine.prototype.boundsInvalidated = function() {
-  this.header().bounds(this.pixelBoundsCache.left, this.pixelBoundsCache.top,
-          this.pixelBoundsCache.width, /** @type {number} */ (this.headerHeight()));
+  this.header().bounds(this.pixelBoundsCache.left, this.pixelBoundsCache.top, this.pixelBoundsCache.width, /** @type {number} */ (this.headerHeight()));
   this.redrawHeader = true;
 };
 
@@ -4782,33 +4768,6 @@ anychart.ganttModule.TimeLine.prototype.boundsInvalidated = function() {
  */
 anychart.ganttModule.TimeLine.prototype.appearanceInvalidated = function() {
   this.getSeparationPath_().stroke(/** @type {acgraph.vector.Stroke} */(anychart.ganttModule.BaseGrid.getColorResolver('columnStroke', anychart.enums.ColorType.STROKE, false)(this, 0)));
-
-  this.getEditConnectorPreviewPath_()
-      .stroke(this.connectorPreviewStroke_);
-
-  this.getEditPreviewPath_()
-      .fill(this.editPreviewFill_)
-      .stroke(this.editPreviewStroke_);
-
-  this.getEditProgressPath_()
-      .fill(this.editProgressFill_)
-      .stroke(this.editProgressStroke_);
-
-  this.getEditLeftThumbPath_()
-      .fill(this.editIntervalThumbFill_)
-      .stroke(this.editIntervalThumbStroke_);
-
-  this.getEditRightThumbPath_()
-      .fill(this.editIntervalThumbFill_)
-      .stroke(this.editIntervalThumbStroke_);
-
-  this.getEditStartConnectorPath_()
-      .fill(this.editConnectorThumbFill_)
-      .stroke(this.editConnectorThumbStroke_);
-
-  this.getEditFinishConnectorPath_()
-      .fill(this.editConnectorThumbFill_)
-      .stroke(this.editConnectorThumbStroke_);
 };
 
 
@@ -5037,7 +4996,7 @@ anychart.ganttModule.TimeLine.prototype.drawLabels_ = function() {
  * @inheritDoc
  */
 anychart.ganttModule.TimeLine.prototype.deleteKeyHandler = function(e) {
-  if (this.selectedConnectorData_) {
+  if (this.selectedConnectorData_ && this.elements().edit().getOption('enabled')) {
     var fromItemIndex = this.selectedConnectorData_['fromItemIndex'];
     var toItemIndex = this.selectedConnectorData_['toItemIndex'];
     var connType = this.selectedConnectorData_['connType'];
@@ -5161,47 +5120,38 @@ anychart.ganttModule.TimeLine.prototype.scrollBarInvalidated_ = function(e) {
  * @param {number} horizontalPixelOffset - Horizontal pixel offset.
  * @param {number} verticalPixelOffset - Vertical pixel offset.
  * @param {boolean=} opt_dragScrolling - Whether TL is in drag scrolling.
+ * @return {boolean} - Whether scroll has been performed.
  */
 anychart.ganttModule.TimeLine.prototype.scroll = function(horizontalPixelOffset, verticalPixelOffset, opt_dragScrolling) {
-  anychart.core.Base.suspendSignalsDispatching(this, this.scale_, this.controller);
+  if (horizontalPixelOffset || verticalPixelOffset) {
+    anychart.core.Base.suspendSignalsDispatching(this, this.scale_, this.controller);
 
-  if (!opt_dragScrolling) {
-    this.dragging = false;
-    clearInterval(this.scrollInterval);
-    this.scrollInterval = null;
-    this.clearEdit_();
+    if (!opt_dragScrolling) {
+      this.dragging = false;
+      clearInterval(this.scrollInterval);
+      this.scrollInterval = null;
+      this.clearEdit_();
+    }
+
+    var startIndex = this.controller.startIndex();
+    var heightCache = this.controller.getHeightCache();
+    var verticalOffset = this.controller.verticalOffset();
+
+    var totalVerticalStartOffset = startIndex ? heightCache[startIndex - 1] : 0;
+    totalVerticalStartOffset += (verticalOffset + verticalPixelOffset);
+    this.controller.scrollTo(/** @type {number} */ (totalVerticalStartOffset));
+
+    var ratio = horizontalPixelOffset / this.pixelBoundsCache.width;
+    if (opt_dragScrolling && !this.draggingConnector && (this.currentThumbDragger_ || this.draggingPreview)) {
+      this.scale_.ratioForceScroll(ratio);
+    } else if (this.draggingConnector || (this.dragging && this.draggingItem) || (!this.dragging)) {
+      this.scale_.ratioScroll(ratio);
+    }
+
+    anychart.core.Base.resumeSignalsDispatchingTrue(this, this.scale_, this.controller);
+    return true;
   }
-
-  var startIndex = this.controller.startIndex();
-  var heightCache = this.controller.getHeightCache();
-  var verticalOffset = this.controller.verticalOffset();
-
-  var totalVerticalStartOffset = startIndex ? heightCache[startIndex - 1] : 0;
-  totalVerticalStartOffset += (verticalOffset + verticalPixelOffset);
-  this.controller.scrollTo(/** @type {number} */ (totalVerticalStartOffset));
-
-  var ratio = horizontalPixelOffset / this.pixelBoundsCache.width;
-  if (opt_dragScrolling && !this.draggingConnector && (this.currentThumbDragger_ || this.draggingPreview)) {
-    this.scale_.ratioForceScroll(ratio);
-  } else if (this.draggingConnector || (this.dragging && this.draggingItem) || (!this.dragging)) {
-    this.scale_.ratioScroll(ratio);
-  }
-
-  anychart.core.Base.resumeSignalsDispatchingTrue(this, this.scale_, this.controller);
-};
-
-
-/**
- * Gets timeline scale.
- * @param {Object=} opt_value - Scale config.
- * @return {anychart.ganttModule.TimeLine|anychart.ganttModule.Scale}
- */
-anychart.ganttModule.TimeLine.prototype.scale = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.scale_.setup(opt_value);
-    return this;
-  }
-  return this.scale_;
+  return false;
 };
 
 
@@ -5214,26 +5164,6 @@ anychart.ganttModule.TimeLine.prototype.serialize = function() {
   json['header'] = this.header().serialize();
 
   anychart.core.settings.serialize(this, anychart.ganttModule.TimeLine.COLOR_DESCRIPTORS, json);
-
-  json['connectorPreviewStroke'] = anychart.color.serialize(this.connectorPreviewStroke_);
-  json['editPreviewFill'] = anychart.color.serialize(this.editPreviewFill_);
-  json['editPreviewStroke'] = anychart.color.serialize(this.editPreviewStroke_);
-  json['editProgressFill'] = anychart.color.serialize(this.editProgressFill_);
-  json['editProgressStroke'] = anychart.color.serialize(this.editProgressStroke_);
-  json['editIntervalThumbFill'] = anychart.color.serialize(this.editIntervalThumbFill_);
-  json['editIntervalThumbStroke'] = anychart.color.serialize(this.editIntervalThumbStroke_);
-  json['editConnectorThumbFill'] = anychart.color.serialize(this.editConnectorThumbFill_);
-  json['editConnectorThumbStroke'] = anychart.color.serialize(this.editConnectorThumbStroke_);
-
-  json['editStartConnectorMarkerType'] = this.editStartConnectorMarkerType_;
-  json['editStartConnectorMarkerSize'] = this.editStartConnectorMarkerSize_;
-  json['editStartConnectorMarkerHorizontalOffset'] = this.editStartConnectorMarkerHorizontalOffset_;
-  json['editStartConnectorMarkerVerticalOffset'] = this.editStartConnectorMarkerVerticalOffset_;
-  json['editFinishConnectorMarkerType'] = this.editFinishConnectorMarkerType_;
-  json['editFinishConnectorMarkerSize'] = this.editFinishConnectorMarkerSize_;
-  json['editFinishConnectorMarkerHorizontalOffset'] = this.editFinishConnectorMarkerHorizontalOffset_;
-  json['editFinishConnectorMarkerVerticalOffset'] = this.editFinishConnectorMarkerVerticalOffset_;
-  json['editIntervalWidth'] = this.editIntervalWidth_;
 
   json['elements'] = this.elements().serialize();
   json['connectors'] = this.connectors().serialize();
@@ -5290,26 +5220,6 @@ anychart.ganttModule.TimeLine.prototype.setupByJSON = function(config, opt_defau
 
   anychart.core.settings.deserialize(this, anychart.ganttModule.TimeLine.COLOR_DESCRIPTORS, config, opt_default);
 
-  this.connectorPreviewStroke(config['connectorPreviewStroke']);
-  this.editPreviewFill(config['editPreviewFill']);
-  this.editPreviewStroke(config['editPreviewStroke']);
-  this.editProgressFill(config['editProgressFill']);
-  this.editProgressStroke(config['editProgressStroke']);
-  this.editIntervalThumbFill(config['editIntervalThumbFill']);
-  this.editIntervalThumbStroke(config['editIntervalThumbStroke']);
-  this.editConnectorThumbFill(config['editConnectorThumbFill']);
-  this.editConnectorThumbStroke(config['editConnectorThumbStroke']);
-
-  this.editStartConnectorMarkerType(config['editStartConnectorMarkerType']);
-  this.editStartConnectorMarkerSize(config['editStartConnectorMarkerSize']);
-  this.editStartConnectorMarkerHorizontalOffset(config['editStartConnectorMarkerHorizontalOffset']);
-  this.editStartConnectorMarkerVerticalOffset(config['editStartConnectorMarkerVerticalOffset']);
-  this.editFinishConnectorMarkerType(config['editFinishConnectorMarkerType']);
-  this.editFinishConnectorMarkerSize(config['editFinishConnectorMarkerSize']);
-  this.editFinishConnectorMarkerHorizontalOffset(config['editFinishConnectorMarkerHorizontalOffset']);
-  this.editFinishConnectorMarkerVerticalOffset(config['editFinishConnectorMarkerVerticalOffset']);
-  this.editIntervalWidth(config['editIntervalWidth']);
-
   this.elements().setupInternal(!!opt_default, config['elements']);
   this.connectors().setupInternal(!!opt_default, config['connectors']);
   if (this.controller.isResources()) {
@@ -5365,298 +5275,84 @@ anychart.ganttModule.TimeLine.prototype.setupByJSON = function(config, opt_defau
 anychart.ganttModule.TimeLine.prototype.disposeInternal = function() {
   goog.dispose(this.horizontalScrollBar_);
   this.horizontalScrollBar_ = null;
-  goog.disposeAll(this.elements_, this.periods_, this.tasks_, this.groupingTasks_, this.milestones_, this.baselines_);
+  this.scale_.unlistenSignals(this.scaleInvalidated_);
+  if (this.header_)
+    this.header_.unlistenSignals(this.headerInvalidated_);
+
+  var markers = goog.array.concat(this.lineMarkers_, this.textMarkers_, this.rangeMarkers_);
+  for (var i = 0; i < markers.length; i++) {
+    var marker = markers[i];
+    if (marker) {
+      marker.unlistenSignals(this.onMarkersSignal_);
+      goog.dispose(marker);
+    }
+  }
+
+  if (this.editPreviewDragger_) {
+    this.editPreviewDragger_.unlisten(goog.fx.Dragger.EventType.START, this.editPreviewDragStart_, false, this);
+    this.editPreviewDragger_.unlisten(goog.fx.Dragger.EventType.DRAG, this.editPreviewDrag_, false, this);
+    this.editPreviewDragger_.unlisten(goog.fx.Dragger.EventType.END, this.editPreviewEnd_, false, this);
+  }
+  if (this.editProgressDragger_) {
+    this.editProgressDragger_.unlisten(goog.fx.Dragger.EventType.START, this.editProgressDragStart_, false, this);
+    this.editProgressDragger_.unlisten(goog.fx.Dragger.EventType.DRAG, this.editProgressDrag_, false, this);
+    this.editProgressDragger_.unlisten(goog.fx.Dragger.EventType.END, this.editProgressDragEnd_, false, this);
+  }
+  if (this.editLeftThumbDragger_) {
+    this.editLeftThumbDragger_.unlisten(goog.fx.Dragger.EventType.START, this.editLeftThumbDragStart_, false, this);
+    this.editLeftThumbDragger_.unlisten(goog.fx.Dragger.EventType.DRAG, this.editThumbDrag_, false, this);
+    this.editLeftThumbDragger_.unlisten(goog.fx.Dragger.EventType.END, this.editThumbDragEnd_, false, this);
+  }
+  if (this.editRightThumbDragger_) {
+    this.editRightThumbDragger_.unlisten(goog.fx.Dragger.EventType.START, this.editRightThumbDragStart_, false, this);
+    this.editRightThumbDragger_.unlisten(goog.fx.Dragger.EventType.DRAG, this.editThumbDrag_, false, this);
+    this.editRightThumbDragger_.unlisten(goog.fx.Dragger.EventType.END, this.editThumbDragEnd_, false, this);
+  }
+  if (this.editStartConnectorDragger_) {
+    this.editStartConnectorDragger_.unlisten(goog.fx.Dragger.EventType.START, this.editConnectorDragStart_, false, this);
+    this.editStartConnectorDragger_.unlisten(goog.fx.Dragger.EventType.DRAG, this.editConnectorDrag_, false, this);
+    this.editStartConnectorDragger_.unlisten(goog.fx.Dragger.EventType.END, this.editConnectorDragEnd_, false, this);
+  }
+  if (this.editFinishConnectorDragger_) {
+    this.editFinishConnectorDragger_.unlisten(goog.fx.Dragger.EventType.START, this.editConnectorDragStart_, false, this);
+    this.editFinishConnectorDragger_.unlisten(goog.fx.Dragger.EventType.DRAG, this.editConnectorDrag_, false, this);
+    this.editFinishConnectorDragger_.unlisten(goog.fx.Dragger.EventType.END, this.editConnectorDragEnd_, false, this);
+  }
+
+  goog.disposeAll(
+      this.elements_,
+      this.periods_,
+      this.tasks_,
+      this.groupingTasks_,
+      this.milestones_,
+      this.baselines_,
+
+      this.scale_,
+      this.header_,
+      this.separationPath_,
+      this.editPreviewPath_,
+
+      this.editProgressPath_,
+      this.editLeftThumbPath_,
+      this.editRightThumbPath_,
+      this.editStartConnectorPath_,
+      this.editFinishConnectorPath_,
+      this.editConnectorPreviewPath_,
+
+      this.editPreviewDragger_,
+      this.editProgressDragger_,
+      this.editLeftThumbDragger_,
+      this.editRightThumbDragger_,
+      this.editStartConnectorDragger_,
+      this.editFinishConnectorDragger_
+  );
+
+  this.lineMarkers_.length = 0;
+  this.rangeMarkers_.length = 0;
+  this.textMarkers_.length = 0;
+
   anychart.ganttModule.TimeLine.base(this, 'disposeInternal');
 };
-
-
-
-/**
- * Live edit control. Extends path to add some data to be stored in usage process.
- * @param {acgraph.vector.Layer} parent - Parent layer.
- * @constructor
- * @extends {acgraph.vector.Path}
- */
-anychart.ganttModule.TimeLine.LiveEditControl = function(parent) {
-  anychart.ganttModule.TimeLine.LiveEditControl.base(this, 'constructor');
-
-  this.parent(parent);
-};
-goog.inherits(anychart.ganttModule.TimeLine.LiveEditControl, acgraph.vector.Path);
-
-
-/**
- * @type {anychart.treeDataModule.Tree.DataItem}
- */
-anychart.ganttModule.TimeLine.LiveEditControl.prototype.item;
-
-
-/**
- * @type {number}
- */
-anychart.ganttModule.TimeLine.LiveEditControl.prototype.index = -1;
-
-
-/**
- * @type {anychart.enums.TLElementTypes|undefined}
- */
-anychart.ganttModule.TimeLine.LiveEditControl.prototype.type;
-
-
-/**
- * @type {Object}
- */
-anychart.ganttModule.TimeLine.LiveEditControl.prototype.period;
-
-
-/**
- * @type {number}
- */
-anychart.ganttModule.TimeLine.LiveEditControl.prototype.periodIndex = -1;
-
-
-/**
- * @type {anychart.math.Rect}
- */
-anychart.ganttModule.TimeLine.LiveEditControl.prototype.bounds;
-
-
-/**
- * @type {anychart.ganttModule.TimeLine.LiveEditControl}
- */
-anychart.ganttModule.TimeLine.LiveEditControl.prototype.preview;
-
-
-/**
- * Draws path as circle.
- * @param {number} cx - Center X.
- * @param {number} cy - Center Y.
- * @param {number} radius - Radius.
- * @return {anychart.ganttModule.TimeLine.LiveEditControl} - Itself for method chaining.
- */
-anychart.ganttModule.TimeLine.LiveEditControl.prototype.drawAsCircle = function(cx, cy, radius) {
-  this
-      .moveTo(cx + radius, cy)
-      .arcTo(radius, radius, 0, 360);
-
-  return this;
-};
-
-
-
-/**
- * Bar dragger.
- * @param {acgraph.vector.Element} target - Target element.
- * @constructor
- * @extends {goog.fx.Dragger}
- */
-anychart.ganttModule.TimeLine.BarDragger = function(target) {
-  anychart.ganttModule.TimeLine.BarDragger.base(this, 'constructor', target.domElement());
-
-  this.element = target;
-
-  /**
-   * X.
-   * @type {number}
-   */
-  this.x = 0;
-
-  /**
-   * Y.
-   * @type {number}
-   */
-  this.y = 0;
-};
-goog.inherits(anychart.ganttModule.TimeLine.BarDragger, goog.fx.Dragger);
-
-
-/**
- * @override
- */
-anychart.ganttModule.TimeLine.BarDragger.prototype.computeInitialPosition = function() {
-  this.deltaX = 0;
-  this.deltaY = 0;
-};
-
-
-/**
- * @override
- */
-anychart.ganttModule.TimeLine.BarDragger.prototype.defaultAction = function(x, y) {
-  this.element.setTransformationMatrix(1, 0, 0, 1, x, 0);
-};
-
-
-/**
- * @override
- */
-anychart.ganttModule.TimeLine.BarDragger.prototype.limitY = function(y) {
-  return 0;
-};
-
-
-
-/**
- * Progress dragger.
- * @param {anychart.ganttModule.TimeLine.LiveEditControl} target - Target element.
- * @constructor
- * @extends {goog.fx.Dragger}
- */
-anychart.ganttModule.TimeLine.ProgressDragger = function(target) {
-  anychart.ganttModule.TimeLine.ProgressDragger.base(this, 'constructor', target.domElement());
-
-  /**
-   * Element.
-   * @type {anychart.ganttModule.TimeLine.LiveEditControl}
-   */
-  this.element = target;
-
-  /**
-   * Progress value to be applied after edit.
-   * @type {number}
-   */
-  this.progress = NaN;
-};
-goog.inherits(anychart.ganttModule.TimeLine.ProgressDragger, goog.fx.Dragger);
-
-
-/**
- * @override
- */
-anychart.ganttModule.TimeLine.ProgressDragger.prototype.computeInitialPosition = function() {
-  this.deltaX = 0;
-  this.deltaY = 0;
-};
-
-
-/**
- * @override
- */
-anychart.ganttModule.TimeLine.ProgressDragger.prototype.defaultAction = function(x, y) {
-  this.element.setTransformationMatrix(1, 0, 0, 1, x, 0);
-  var progressLeft = x - this.limits.left;
-  this.progress = progressLeft / this.limits.width;
-};
-
-
-/**
- * @override
- */
-anychart.ganttModule.TimeLine.ProgressDragger.prototype.limitX = function(x) {
-  var b = this.element.bounds;
-  var dataItem = this.element.item;
-
-  var progressValue = goog.isDef(dataItem.meta('progressValue')) ?
-      dataItem.meta('progressValue') :
-      dataItem.meta('autoProgress');
-
-  progressValue = /** @type {number} */ (progressValue || 0);
-  var progress = b.width * progressValue;
-  this.limits.left = -progress;
-  this.limits.width = b.width;
-
-  return goog.math.clamp(x, -progress, b.width - progress);
-};
-
-
-/**
- * @override
- */
-anychart.ganttModule.TimeLine.ProgressDragger.prototype.limitY = function(y) {
-  return 0;
-};
-
-
-
-/**
- * Edit time interval dragger.
- * @param {acgraph.vector.Element} target - Target element.
- * @param {boolean=} opt_isLeft - Whether it is a left-oriented thumb. Otherwise - is right.
- * @constructor
- * @extends {goog.fx.Dragger}
- */
-anychart.ganttModule.TimeLine.ThumbDragger = function(target, opt_isLeft) {
-  anychart.ganttModule.TimeLine.ThumbDragger.base(this, 'constructor', target.domElement());
-
-  /**
-   * Element.
-   * @type {acgraph.vector.Element}
-   */
-  this.element = target;
-
-  /**
-   * Orientation of thumb.
-   * @type {boolean}
-   */
-  this.isLeft = !!opt_isLeft;
-
-};
-goog.inherits(anychart.ganttModule.TimeLine.ThumbDragger, goog.fx.Dragger);
-
-
-/**
- * @override
- */
-anychart.ganttModule.TimeLine.ThumbDragger.prototype.limitY = function(y) {
-  return 0;
-};
-
-
-
-/**
- * Edit connector dragger.
- * @param {anychart.ganttModule.TimeLine} timeline - Related TL.
- * @param {acgraph.vector.Element} target - Target element.
- * @param {boolean=} opt_isStart - Whether it is a 'start'-connector. Otherwise - is 'finish'.
- * @constructor
- * @extends {goog.fx.Dragger}
- */
-anychart.ganttModule.TimeLine.ConnectorDragger = function(timeline, target, opt_isStart) {
-  anychart.ganttModule.TimeLine.ConnectorDragger.base(this, 'constructor', target.domElement());
-
-  /**
-   * Related TL.
-   * @type {anychart.ganttModule.TimeLine}
-   */
-  this.timeline = timeline;
-
-  /**
-   * Element.
-   * @type {acgraph.vector.Element}
-   */
-  this.element = target;
-
-  /**
-   * Orientation of thumb.
-   * @type {boolean}
-   */
-  this.isStart = !!opt_isStart;
-
-
-  /**
-   * Last tracked X coordinate from mouseEvent.
-   * @type {number}
-   */
-  this.lastTrackedMouseX = NaN;
-
-
-  /**
-   * Last tracked Y coordinate from mouseEvent.
-   * @type {number}
-   */
-  this.lastTrackedMouseY = NaN;
-};
-goog.inherits(anychart.ganttModule.TimeLine.ConnectorDragger, goog.fx.Dragger);
-
-
-/**
- * @override
- */
-anychart.ganttModule.TimeLine.ConnectorDragger.prototype.computeInitialPosition = function() {
-  this.deltaX = 0;
-  this.deltaY = 0;
-};
-
 
 
 //region --- Standalone
@@ -5770,21 +5466,11 @@ anychart.standalones.resourceTimeline = function() {
   proto['connectorFill'] = proto.connectorFill;
   proto['connectorStroke'] = proto.connectorStroke;
   proto['selectedConnectorStroke'] = proto.selectedConnectorStroke;
-
-
-
-  proto['editing'] = proto.editing;
-
-  proto['horizontalScrollBar'] = proto.horizontalScrollBar;
-  proto['verticalScrollBar'] = proto.verticalScrollBar;
-  proto['tooltip'] = proto.tooltip;
-
-  proto['labels'] = proto.labels;
-
-  proto['markers'] = proto.markers;
-  proto['scale'] = proto.scale;
-
   proto['connectorPreviewStroke'] = proto.connectorPreviewStroke;
+  proto['editStructurePreviewDashStroke'] = proto.editStructurePreviewDashStroke;
+  proto['editStructurePreviewFill'] = proto.editStructurePreviewFill;
+  proto['editStructurePreviewStroke'] = proto.editStructurePreviewStroke;
+  proto['editing'] = proto.editing;
   proto['editPreviewFill'] = proto.editPreviewFill;
   proto['editPreviewStroke'] = proto.editPreviewStroke;
   proto['editProgressFill'] = proto.editProgressFill;
@@ -5793,10 +5479,6 @@ anychart.standalones.resourceTimeline = function() {
   proto['editIntervalThumbStroke'] = proto.editIntervalThumbStroke;
   proto['editConnectorThumbFill'] = proto.editConnectorThumbFill;
   proto['editConnectorThumbStroke'] = proto.editConnectorThumbStroke;
-  proto['editStructurePreviewFill'] = proto.editStructurePreviewFill;
-  proto['editStructurePreviewStroke'] = proto.editStructurePreviewStroke;
-  proto['editStructurePreviewDashStroke'] = proto.editStructurePreviewDashStroke;
-
   proto['editStartConnectorMarkerSize'] = proto.editStartConnectorMarkerSize;
   proto['editStartConnectorMarkerType'] = proto.editStartConnectorMarkerType;
   proto['editStartConnectorMarkerHorizontalOffset'] = proto.editStartConnectorMarkerHorizontalOffset;
@@ -5806,6 +5488,18 @@ anychart.standalones.resourceTimeline = function() {
   proto['editFinishConnectorMarkerHorizontalOffset'] = proto.editFinishConnectorMarkerHorizontalOffset;
   proto['editFinishConnectorMarkerVerticalOffset'] = proto.editFinishConnectorMarkerVerticalOffset;
   proto['editIntervalWidth'] = proto.editIntervalWidth;
+
+
+  proto['edit'] = proto.edit;
+  proto['horizontalScrollBar'] = proto.horizontalScrollBar;
+  proto['verticalScrollBar'] = proto.verticalScrollBar;
+  proto['tooltip'] = proto.tooltip;
+
+  proto['labels'] = proto.labels;
+
+  proto['markers'] = proto.markers;
+  proto['scale'] = proto.scale;
+
 
   proto['textMarker'] = proto.textMarker;
   proto['lineMarker'] = proto.lineMarker;

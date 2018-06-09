@@ -690,6 +690,7 @@ anychart.ganttModule.DataGrid.prototype.scrollBarInvalidated_ = function(e) {
  *
  * @param {number} horizontalPixelOffset - Horizontal pixel offset.
  * @param {number} verticalPixelOffset - Vertical pixel offset.
+ * @return {boolean} - Whether scroll has been performed.
  */
 anychart.ganttModule.DataGrid.prototype.scroll = function(horizontalPixelOffset, verticalPixelOffset) {
   anychart.core.Base.suspendSignalsDispatching(this, this.controller);
@@ -705,6 +706,8 @@ anychart.ganttModule.DataGrid.prototype.scroll = function(horizontalPixelOffset,
   this.controller.scrollTo(/** @type {number} */ (totalVerticalStartOffset));
 
   anychart.core.Base.resumeSignalsDispatchingTrue(this, this.controller);
+
+  return true; //TODO (A.Kudryavtsev): DG doesn't need to determine whether scroll is performed for a while.
 };
 
 
@@ -1027,7 +1030,7 @@ anychart.ganttModule.DataGrid.prototype.getInputBounds_ = function(e) {
  * @param {Object} e - Event object.
  */
 anychart.ganttModule.DataGrid.prototype.addMouseDblClick = function(e) {
-  if (e && this.editable) {
+  if (e && this.edit().getOption('enabled')) {
     this.interactive = false;
     this.initEditInput_();
     this.editItem_ = e['item'];
@@ -1096,7 +1099,7 @@ anychart.ganttModule.DataGrid.prototype.rowMouseDown = function(evt) {
  * @param {anychart.core.MouseEvent|Object} evt - Event object.
  */
 anychart.ganttModule.DataGrid.prototype.mouseDown = function(evt) {
-  if (this.editable) this.draggingItem = evt['item'];
+  if (this.edit().getOption('enabled')) this.draggingItem = evt['item'];
 };
 
 
@@ -1286,6 +1289,7 @@ anychart.standalones.dataGrid = function() {
   //proto['headerFill'] = proto.headerFill;
 
   proto['editing'] = proto.editing;
+  proto['edit'] = proto.edit;
 
   proto['column'] = proto.column;
 

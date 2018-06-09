@@ -9,6 +9,7 @@ goog.require('anychart.format.Context');
 goog.require('anychart.ganttModule.Controller');
 goog.require('anychart.ganttModule.IInteractiveGrid');
 goog.require('anychart.ganttModule.ScrollBar');
+goog.require('anychart.ganttModule.edit.StructureEdit');
 goog.require('anychart.math.Rect');
 goog.require('goog.events.KeyHandler');
 goog.require('goog.events.MouseWheelHandler');
@@ -162,28 +163,6 @@ anychart.ganttModule.BaseGrid = function(opt_controller, opt_isResource) {
    * @private
    */
   this.drawLayer_ = null;
-
-  /**
-   * Edit structure preview fill.
-   * @type {acgraph.vector.Fill}
-   * @private
-   */
-  this.editStructurePreviewFill_;
-
-  /**
-   * Edit structure preview stroke.
-   * @type {acgraph.vector.Stroke}
-   * @private
-   */
-  this.editStructurePreviewStroke_;
-
-
-  /**
-   * Edit structure preview stroke.
-   * @type {acgraph.vector.Stroke}
-   * @private
-   */
-  this.editStructurePreviewDashStroke_;
 
   /**
    * Edit structure preview path.
@@ -341,12 +320,12 @@ anychart.ganttModule.BaseGrid = function(opt_controller, opt_isResource) {
    */
   this.interactive = true;
 
-
   /**
-   * Whether grid is editable.
-   * @type {boolean}
+   * Structure edit settings.
+   * @type {anychart.ganttModule.edit.StructureEdit}
+   * @private
    */
-  this.editable = false;
+  this.edit_ = null;
 
   /**
    * Context provider.
@@ -392,16 +371,14 @@ anychart.ganttModule.BaseGrid = function(opt_controller, opt_isResource) {
 goog.inherits(anychart.ganttModule.BaseGrid, anychart.core.VisualBaseWithBounds);
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  General.
-//
-//----------------------------------------------------------------------------------------------------------------------
+//region -- Consistency States and Signals.
 /**
  * Supported signals.
  * @type {number}
  */
-anychart.ganttModule.BaseGrid.SUPPORTED_SIGNALS = anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_SIGNALS;
+anychart.ganttModule.BaseGrid.SUPPORTED_SIGNALS =
+    anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_SIGNALS |
+    anychart.Signal.NEEDS_REAPPLICATION; //Live edit coloring.
 
 
 /**
@@ -415,6 +392,8 @@ anychart.ganttModule.BaseGrid.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.BASE_GRID_REDRAW; //Light redraw. We use this state to highlight a row without redrawing all or smth like that.
 
 
+//endregion
+//region -- Constants.
 /**
  * Background rect z-index.
  * @type {number}
@@ -523,6 +502,7 @@ anychart.ganttModule.BaseGrid.LOWER_DRAG_EDIT_RATIO = .2;
 anychart.ganttModule.BaseGrid.HIGHER_DRAG_EDIT_RATIO = 1 - anychart.ganttModule.BaseGrid.LOWER_DRAG_EDIT_RATIO;
 
 
+//endregion
 /**
  * Checks whether tree data item is actually a milestone.
  * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} treeDataItem - Tree data item.
@@ -616,11 +596,8 @@ anychart.ganttModule.BaseGrid.prototype.createFormatProvider = function(item, op
   if (goog.isDef(opt_hoveredTimestamp))
     values['hoverDateTime'] = {value: opt_hoveredTimestamp, type: anychart.enums.TokenType.DATE_TIME};
 
-  this.formatProvider_
-      .values(values)
-      .dataSource(item);
-
-  return this.formatProvider_.propagate();
+  this.formatProvider_.dataSource(item);
+  return this.formatProvider_.propagate(values);
 };
 
 
@@ -674,7 +651,8 @@ anychart.ganttModule.BaseGrid.prototype.addDragMouseUp = goog.nullFunction;
 
 /**
  * Additional actions for inherited classes on mouse move and over.
- * @param {?Object} evt - Event object.
+ * @param {?Object} wrappedEvent - Event object.
+ * @param {anychart.core.MouseEvent} originalEvent - Original event.
  */
 anychart.ganttModule.BaseGrid.prototype.addMouseMoveAndOver = goog.nullFunction;
 
@@ -707,7 +685,7 @@ anychart.ganttModule.BaseGrid.prototype.addMouseDblClick = goog.nullFunction;
  */
 anychart.ganttModule.BaseGrid.prototype.handleMouseOverAndMove_ = function(event) {
   var evt = this.getInteractivityEvent(event);
-  this.addMouseMoveAndOver(evt);
+  this.addMouseMoveAndOver(evt, event);
   if (evt && this.interactive && this.interactivityHandler.dispatchEvent(evt)) {
     this.interactivityHandler.rowMouseMove(evt);
   }
@@ -999,27 +977,95 @@ anychart.ganttModule.BaseGrid.prototype.getGridHeightCache = function() {
 
 
 /**
- * @inheritDoc
+ * Enables/disables live edit mode.
+ * @param {boolean=} opt_value - Value to be set.
+ * @deprecated since 8.3.0 use grid.edit() instead. DVF-3623
+ * @return {anychart.ganttModule.IInteractiveGrid|boolean} - Itself for method chaining or current value.
  */
 anychart.ganttModule.BaseGrid.prototype.editing = function(opt_value) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['dataGrid.editing() or timeline.editing()', 'dataGrid.edit() or timeline.edit()'], true);
   if (goog.isDef(opt_value)) {
-    if (this.editable != opt_value) {
-      this.editable = opt_value;
-
-      if (this.editable)
-        goog.events.listen(anychart.document, goog.events.EventType.MOUSEMOVE, this.docMouseMoveListener_, false, this);
-      else
-        goog.events.unlisten(anychart.document, goog.events.EventType.MOUSEMOVE, this.docMouseMoveListener_, false, this);
-
-      //for Timeline instance this state wil initiate connectors redraw (will set new cursors for connectors).
-      this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
-    }
+    this.edit()['enabled'](opt_value);
     return this;
   }
-  return this.editable;
+  return /** @type {boolean} */ (this.edit().getOption('enabled'));
 };
 
 
+/**
+ * Sets interactivity handler.
+ * @param {!anychart.ganttModule.IInteractiveGrid} value - Interactivity handler.
+ */
+anychart.ganttModule.BaseGrid.prototype.setInteractivityHandler = function(value) {
+  this.interactivityHandler = value;
+  if (this.interactivityHandler != this) {
+    this.edit().parent(/** @type {anychart.ganttModule.edit.StructureEdit} */ (this.interactivityHandler.edit()));
+  }
+};
+
+
+//region -- Edit.
+/**
+ * @inheritDoc
+ */
+anychart.ganttModule.BaseGrid.prototype.edit = function(opt_value) {
+  if (!this.edit_) {
+    this.edit_ = new anychart.ganttModule.edit.StructureEdit();
+    this.edit_.listenSignals(this.onEditSignal_, this);
+  }
+
+  if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
+    this.edit_.setup(opt_value);
+    return this;
+  }
+  return this.edit_;
+};
+
+
+/**
+ *
+ * @param {anychart.SignalEvent} e - Signal event.
+ * @private
+ */
+anychart.ganttModule.BaseGrid.prototype.onEditSignal_ = function(e) {
+  // if (e.hasSignal(anychart.Signal.ENABLED_STATE_CHANGED)) {
+  //   if (/** @type {anychart.core.settings.IObjectWithSettings} */ (this.edit()).getOption('enabled')) {
+  //     if (!this.denyAddDocMouseMoveListener_) {
+  //       goog.events.listen(anychart.document, goog.events.EventType.MOUSEMOVE, this.docMouseMoveListener_, false, this);
+  //       this.denyAddDocMouseMoveListener_ = true;
+  //     }
+  //   } else {
+  //     goog.events.unlisten(anychart.document, goog.events.EventType.MOUSEMOVE, this.docMouseMoveListener_, false, this);
+  //     this.denyAddDocMouseMoveListener_ = false;
+  //   }
+  //   // this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
+  // }
+  if (e.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
+    this.reapplyStructureEditAppearance();
+  }
+};
+
+
+/**
+ * Adds/removes document mouse move listener to provide ability
+ * to auto scroll grid and auto extend TL scale on edit drag.
+ * NOTE: does not add listener twice.
+ * @param {boolean} value - Whether to enable document mouse move listening.
+ */
+anychart.ganttModule.BaseGrid.prototype.enableDocMouseMove = function(value) {
+  if (value && !this.denyAddDocMouseMoveListener_) {
+    goog.events.listen(anychart.document, goog.events.EventType.MOUSEMOVE, this.docMouseMoveListener_, false, this);
+    this.denyAddDocMouseMoveListener_ = true;
+  } else {
+    goog.events.unlisten(anychart.document, goog.events.EventType.MOUSEMOVE, this.docMouseMoveListener_, false, this);
+    this.denyAddDocMouseMoveListener_ = false;
+  }
+};
+
+
+//endregion
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  DOM init.
@@ -1560,64 +1606,38 @@ anychart.ganttModule.BaseGrid.prototype.paletteInvalidated_ = function(event) {
 
 
 /**
- * Gets/sets a default editStructurePreviewFill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.ganttModule.BaseGrid|string} - Current value or itself for method chaining.
+ * @param {...*} var_args - Args.
+ * @deprecated since 8.3.0 use timeline.edit().fill() instead. DVF-3623
+ * @return {(acgraph.vector.Stroke|anychart.ganttModule.edit.StructureEdit)}
  */
-anychart.ganttModule.BaseGrid.prototype.editStructurePreviewFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.editStructurePreviewFill_), val)) {
-      this.editStructurePreviewFill_ = val;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.editStructurePreviewFill_;
+anychart.ganttModule.BaseGrid.prototype.editStructurePreviewFill = function(var_args) {
+  var target = this.edit();
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['timeline.editStructurePreviewFill()', 'timeline.edit().fill()'], true);
+  return arguments.length ? target['fill'].apply(target, arguments) : target['fill']();
 };
 
 
 /**
- * Gets/sets editStructurePreviewStroke.
- * @param {(acgraph.vector.Stroke|string)=} opt_value - Value to be set.
- * @return {(string|acgraph.vector.Stroke|anychart.ganttModule.BaseGrid)} - Current value or itself for method chaining.
+ * @param {...*} var_args - Args.
+ * @deprecated since 8.3.0 use timeline.edit().stroke() instead. DVF-3623
+ * @return {(acgraph.vector.Stroke|anychart.ganttModule.edit.StructureEdit)}
  */
-anychart.ganttModule.BaseGrid.prototype.editStructurePreviewStroke = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Stroke} */ (this.editStructurePreviewStroke_), val)) {
-      this.editStructurePreviewStroke_ = val;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-
-    return this;
-  }
-  return this.editStructurePreviewStroke_;
+anychart.ganttModule.BaseGrid.prototype.editStructurePreviewStroke = function(var_args) {
+  var target = this.edit();
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['timeline.editStructurePreviewStroke()', 'timeline.edit().stroke()'], true);
+  return arguments.length ? target['stroke'].apply(target, arguments) : target['stroke']();
 };
 
 
 /**
- * Gets/sets editStructurePreviewDashStroke.
- * @param {(acgraph.vector.Stroke|string)=} opt_value - Value to be set.
- * @return {(string|acgraph.vector.Stroke|anychart.ganttModule.BaseGrid)} - Current value or itself for method chaining.
+ * @param {...*} var_args - Args.
+ * @deprecated since 8.3.0 use timeline.edit().placementStroke() instead. DVF-3623
+ * @return {(acgraph.vector.Stroke|anychart.ganttModule.edit.StructureEdit)}
  */
-anychart.ganttModule.BaseGrid.prototype.editStructurePreviewDashStroke = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Stroke} */ (this.editStructurePreviewDashStroke_), val)) {
-      this.editStructurePreviewDashStroke_ = val;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-
-    return this;
-  }
-  return this.editStructurePreviewDashStroke_;
+anychart.ganttModule.BaseGrid.prototype.editStructurePreviewDashStroke = function(var_args) {
+  var target = this.edit();
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['timeline.editStructurePreviewDashStroke()', 'timeline.edit().placementStroke()'], true);
+  return arguments.length ? target['placementStroke'].apply(target, arguments) : target['placementStroke']();
 };
 
 
@@ -1662,7 +1682,8 @@ anychart.ganttModule.BaseGrid.prototype.dragStartHandler_ = function(e) {
  */
 anychart.ganttModule.BaseGrid.prototype.dragHandler_ = function(e) {
   this.dragging = true;
-  if (this.editable && !this.denyDragScrolling) {
+  if (this.edit().getOption('enabled') && !this.denyDragScrolling) {
+    this.enableDocMouseMove(true);
     this.interactive = false;
     this.interactivityHandler.highlight();
     this.tooltip().hide();
@@ -1674,22 +1695,31 @@ anychart.ganttModule.BaseGrid.prototype.dragHandler_ = function(e) {
       var startY = evt['startY'];
       var endY = evt['endY'];
 
-      if (this.draggingItem && destinationItem && destinationItem != this.draggingItem && !destinationItem.isChildOf(this.draggingItem)) {
-        if (itemHeightMouseRatio < anychart.ganttModule.BaseGrid.LOWER_DRAG_EDIT_RATIO ||
-            itemHeightMouseRatio > anychart.ganttModule.BaseGrid.HIGHER_DRAG_EDIT_RATIO) {
-          var top = itemHeightMouseRatio < anychart.ganttModule.BaseGrid.LOWER_DRAG_EDIT_RATIO ? startY : endY;
-          this.interactivityHandler.editStructureHighlight(top, void 0, 'auto');
-        } else {
-          if (anychart.ganttModule.BaseGrid.isMilestone(destinationItem)) {
-            this.interactivityHandler.editStructureHighlight(void 0, void 0, 'not-allowed');
+      if (this.draggingItem) {
+        if (destinationItem && destinationItem != this.draggingItem && !destinationItem.isChildOf(this.draggingItem)) {
+          if (itemHeightMouseRatio < anychart.ganttModule.BaseGrid.LOWER_DRAG_EDIT_RATIO ||
+              itemHeightMouseRatio > anychart.ganttModule.BaseGrid.HIGHER_DRAG_EDIT_RATIO) {
+            var top = itemHeightMouseRatio < anychart.ganttModule.BaseGrid.LOWER_DRAG_EDIT_RATIO ? startY : endY;
+            this.interactivityHandler.editStructureHighlight(top, void 0, 'auto');
           } else {
-            this.interactivityHandler.editStructureHighlight(startY, endY, 'auto');
+            if (anychart.ganttModule.BaseGrid.isMilestone(destinationItem)) {
+              this.interactivityHandler.editStructureHighlight(void 0, void 0, 'not-allowed');
+            } else {
+              this.interactivityHandler.editStructureHighlight(startY, endY, 'auto');
+            }
           }
+        } else {
+          this.interactivityHandler.editStructureHighlight(void 0, void 0, 'not-allowed');
         }
+        this.addDragMouseMove(evt);
       } else {
-        this.interactivityHandler.editStructureHighlight(void 0, void 0, 'not-allowed');
+        var min = this.pixelBoundsCache.top +
+            this.container().getStage().getClientPosition().y +
+            this.headerHeight_;
+
+        var h = this.gridHeightCache_[this.gridHeightCache_.length - 1];
+        this.interactivityHandler.editStructureHighlight(min + h, void 0, 'auto');
       }
-      this.addDragMouseMove(evt);
     }
   }
   this.tooltip().hide();
@@ -1703,8 +1733,9 @@ anychart.ganttModule.BaseGrid.prototype.dragHandler_ = function(e) {
  * @private
  */
 anychart.ganttModule.BaseGrid.prototype.dragEndHandler_ = function(e) {
-  if (this.editable && !this.denyDragScrolling) {
+  if (this.edit().enabled() && !this.denyDragScrolling) {
     var evt = this.getInteractivityEvent(e);
+    var tree = this.controller.data();
 
     this.addDragMouseUp(evt);
 
@@ -1715,13 +1746,15 @@ anychart.ganttModule.BaseGrid.prototype.dragEndHandler_ = function(e) {
 
       var visibleItems = this.controller.getVisibleItems();
 
-
       var itemHeightMouseRatio = evt['itemHeightMouseRatio'];
-      var firstItem, secondItem; //We drop item between these two.
+      var firstItem, secondItem, par; //We drop item between these two.
 
-      if (this.draggingItem && destinationItem && destinationItem != this.draggingItem && !anychart.ganttModule.BaseGrid.isMilestone(destinationItem) && !destinationItem.isChildOf(this.draggingItem)) {
-        if (itemHeightMouseRatio < anychart.ganttModule.BaseGrid.LOWER_DRAG_EDIT_RATIO || itemHeightMouseRatio > anychart.ganttModule.BaseGrid.HIGHER_DRAG_EDIT_RATIO) {
-          if (itemHeightMouseRatio < anychart.ganttModule.BaseGrid.LOWER_DRAG_EDIT_RATIO) {
+      var dropLower = itemHeightMouseRatio < anychart.ganttModule.BaseGrid.LOWER_DRAG_EDIT_RATIO;
+      var dropUpper = itemHeightMouseRatio > anychart.ganttModule.BaseGrid.HIGHER_DRAG_EDIT_RATIO;
+
+      if (this.draggingItem && destinationItem && destinationItem != this.draggingItem && !destinationItem.isChildOf(this.draggingItem)) {
+        if (dropLower || dropUpper) {
+          if (dropLower) {
             firstItem = visibleItems[totalIndex - 1];
             secondItem = destinationItem;
           } else {
@@ -1732,9 +1765,12 @@ anychart.ganttModule.BaseGrid.prototype.dragEndHandler_ = function(e) {
           if (firstItem && secondItem) {
             var firstDepth = firstItem.meta('depth');
             var secondDepth = secondItem.meta('depth');
-            var destIndex, tree;
+            var destIndex;
 
-            if (firstDepth == secondDepth) {
+            if (dropUpper) {
+              par = destinationItem.getParent() || tree;
+              par.addChildAt(this.draggingItem, par.indexOfChild(destinationItem) + 1);
+            } else if (firstDepth == secondDepth) {
               var secondParent = secondItem.getParent() || secondItem.tree();
               destIndex = secondParent.indexOfChild(secondItem);
 
@@ -1749,10 +1785,13 @@ anychart.ganttModule.BaseGrid.prototype.dragEndHandler_ = function(e) {
             } else {
               if (firstDepth < secondDepth) { //Here firstItem is parent of secondItem.
                 firstItem.addChildAt(this.draggingItem, 0); //The only case if firstItem is neighbour of secondItem.
-              } else {
-                var firstParent = firstItem.getParent() || firstItem.tree();
-                destIndex = firstParent.indexOfChild(firstItem) + 1;
-                firstParent.addChildAt(this.draggingItem, destIndex);
+              } else if (!firstItem.isChildOf(this.draggingItem)) {
+                par = destinationItem.getParent() || tree;
+                destIndex = par.indexOfChild(destinationItem);
+                par.addChildAt(this.draggingItem, destIndex);
+                // var firstParent = firstItem.getParent() || firstItem.tree();
+                // destIndex = firstParent.indexOfChild(firstItem) + 1;
+                // firstParent.addChildAt(this.draggingItem, destIndex);
               }
             }
           } else if (secondItem) { //First item is undefined.
@@ -1765,10 +1804,18 @@ anychart.ganttModule.BaseGrid.prototype.dragEndHandler_ = function(e) {
             destIndex = tree.indexOfChild(firstItem) + 1;
             tree.addChildAt(this.draggingItem, destIndex);
           }
-        } else {
+        } else if (!anychart.ganttModule.BaseGrid.isMilestone(destinationItem)) {
           //Dropping data item inside. Setting dragged data item as child of destinationItem.
           destinationItem.addChild(this.draggingItem);
         }
+      }
+    } else if (this.draggingItem) {
+      //dropping outside the rows
+      var min = this.pixelBoundsCache.top + this.container().getStage().getClientPosition().y + this.headerHeight_;
+      if (e.clientY < min) {
+        tree.addChildAt(this.draggingItem, 0);
+      } else {
+        tree.addChild(this.draggingItem);
       }
     }
 
@@ -1781,6 +1828,7 @@ anychart.ganttModule.BaseGrid.prototype.dragEndHandler_ = function(e) {
   this.interactive = true;
   clearInterval(this.scrollInterval);
   this.scrollInterval = null;
+  this.enableDocMouseMove(false);
 };
 
 
@@ -2179,11 +2227,8 @@ anychart.ganttModule.BaseGrid.prototype.drawInternal = function(positionRecalcul
 
     this.getRowStrokePath().stroke(this.rowStroke_);
 
-    this.getEditStructurePreviewPath_()
-        .fill(this.editStructurePreviewFill_)
-        .stroke(this.editStructurePreviewStroke_);
-
     this.appearanceInvalidated();
+    this.reapplyStructureEditAppearance();
 
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
@@ -2295,13 +2340,13 @@ anychart.ganttModule.BaseGrid.prototype.editStructureHighlight = function(opt_st
           .lineTo(this.pixelBoundsCache.left + this.totalGridsWidth, opt_endY)
           .lineTo(this.pixelBoundsCache.left, opt_endY)
           .close()
-          .stroke(this.editStructurePreviewStroke_);
+          .stroke(/** @type {acgraph.vector.Stroke} */ (this.edit().getOption('stroke')));
     } else {
       previewPath
           .clear()
           .moveTo(this.pixelBoundsCache.left, opt_startY)
           .lineTo(this.pixelBoundsCache.left + this.totalGridsWidth, opt_startY)
-          .stroke(this.editStructurePreviewDashStroke_);
+          .stroke(/** @type {acgraph.vector.Stroke} */ (this.edit().getOption('placementStroke')));
     }
   } else {
     previewPath.clear();
@@ -2421,6 +2466,16 @@ anychart.ganttModule.BaseGrid.prototype.positionFinal = goog.nullFunction;
 
 
 /**
+ * Reapplies structure edit control appearance.
+ */
+anychart.ganttModule.BaseGrid.prototype.reapplyStructureEditAppearance = function() {
+  var path = this.getEditStructurePreviewPath_();
+  path.fill(/** @type {acgraph.vector.Fill} */ (this.edit().getOption('fill')));
+  path.stroke(/** @type {acgraph.vector.Stroke} */ (this.edit().getOption('stroke')));
+};
+
+
+/**
  * @inheritDoc
  */
 anychart.ganttModule.BaseGrid.prototype.remove = function() {
@@ -2468,6 +2523,7 @@ anychart.ganttModule.BaseGrid.prototype.rowStroke = function(opt_strokeOrFill, o
  * Performs scrolling.
  * @param {number} horizontalPixelOffset - Horizontal pixel offset.
  * @param {number} verticalPixelOffset - Vertical pixel offset.
+ * @return {boolean} - Whether scroll has been performed.
  */
 anychart.ganttModule.BaseGrid.prototype.scroll = goog.abstractMethod;
 
@@ -2668,9 +2724,11 @@ anychart.ganttModule.BaseGrid.prototype.verticalOffset = function(opt_value) {
  * @inheritDoc
  */
 anychart.ganttModule.BaseGrid.prototype.disposeInternal = function() {
-  goog.dispose(this.palette_);
-  anychart.ganttModule.BaseGrid.base(this, 'disposeInternal');
   goog.events.unlisten(document, goog.events.EventType.MOUSEMOVE, this.docMouseMoveListener_, false, this);
+  if (this.edit_)
+    this.edit_.unlistenSignals(this.onEditSignal_, this);
+  goog.disposeAll(this.palette_, this.edit_);
+  anychart.ganttModule.BaseGrid.base(this, 'disposeInternal');
 };
 
 
@@ -2694,11 +2752,12 @@ anychart.ganttModule.BaseGrid.prototype.serialize = function() {
 
   json['rowStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */ (this.rowStroke_));
   json['headerHeight'] = this.headerHeight_;
-  json['editStructurePreviewFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.editStructurePreviewFill_));
-  json['editStructurePreviewStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */ (this.editStructurePreviewStroke_));
-  json['editStructurePreviewDashStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */ (this.editStructurePreviewDashStroke_));
+  json['edit'] = /** @type {anychart.ganttModule.edit.StructureEdit} */ (this.edit()).serialize();
+  // json['editStructurePreviewFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.editStructurePreviewFill_));
+  // json['editStructurePreviewStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */ (this.editStructurePreviewStroke_));
+  // json['editStructurePreviewDashStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */ (this.editStructurePreviewDashStroke_));
 
-  json['editing'] = this.editable;
+  // json['editing'] = this.editable;
   json['tooltip'] = this.tooltip().serialize();
 
   return json;
@@ -2728,10 +2787,13 @@ anychart.ganttModule.BaseGrid.prototype.setupByJSON = function(config, opt_defau
     this.tooltip().setupInternal(!!opt_default, config['tooltip']);
 
   this.headerHeight(config['headerHeight']);
-  this.editStructurePreviewFill(config['editStructurePreviewFill']);
-  this.editStructurePreviewStroke(config['editStructurePreviewStroke']);
-  this.editStructurePreviewDashStroke(config['editStructurePreviewDashStroke']);
-  this.editing(config['editing']);
+  
+  if ('edit' in config)
+    /** @type {anychart.ganttModule.edit.StructureEdit} */ (this.edit()).setupInternal(!!opt_default, config['edit']);
+  // this.editStructurePreviewFill(config['editStructurePreviewFill']);
+  // this.editStructurePreviewStroke(config['editStructurePreviewStroke']);
+  // this.editStructurePreviewDashStroke(config['editStructurePreviewDashStroke']);
+  // this.editing(config['editing']);
 };
 
 
@@ -2784,7 +2846,7 @@ anychart.ganttModule.BaseGrid.Dragger.prototype.computeInitialPosition = functio
  * @override
  */
 anychart.ganttModule.BaseGrid.Dragger.prototype.defaultAction = function(x, y) {
-  if (this.grid.interactivityHandler.altKey || (!this.grid.editable && !this.grid.denyDragScrolling)) {
+  if (this.grid.interactivityHandler.altKey || (!this.grid.edit()['enabled']() && !this.grid.denyDragScrolling)) {
     var dX = this.x - x;
     var dY = this.y - y;
 

@@ -1012,9 +1012,11 @@ anychart.ganttModule.Scale.prototype.ratioForceScroll = function(ratio) {
     if ((!isNaN(this.manualMin_) && newMin < this.manualMin_) || (!isNaN(this.manualMax_) && newMax > this.manualMax_))
       return this;
 
-    this.dataMin_ = Math.min(this.dataMin_, newMin);
+    // this.dataMin_ = Math.min(this.dataMin_, newMin);
+    this.dataMin_ = NaN;
     this.min_ = newMin;
-    this.dataMax_ = Math.max(this.dataMax_, newMax);
+    // this.dataMax_ = Math.max(this.dataMax_, newMax);
+    this.dataMax_ = NaN;
     this.max_ = newMax;
 
     this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);

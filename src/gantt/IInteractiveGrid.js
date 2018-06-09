@@ -1,4 +1,6 @@
 goog.provide('anychart.ganttModule.IInteractiveGrid');
+
+goog.require('anychart.ganttModule.edit.StructureEdit');
 goog.require('goog.events.Listenable');
 
 
@@ -82,12 +84,20 @@ anychart.ganttModule.IInteractiveGrid.prototype.rowUnselect = function(event) {}
 anychart.ganttModule.IInteractiveGrid.prototype.rowExpandCollapse = function(event) {};
 
 
+// /**
+//  * Enables/disables live edit mode.
+//  * @param {boolean=} opt_value - Value to be set.
+//  * @return {anychart.ganttModule.IInteractiveGrid|boolean} - Itself for method chaining or current value.
+//  */
+// anychart.ganttModule.IInteractiveGrid.prototype.editing = function(opt_value) {};
+
+
 /**
- * Enables/disables live edit mode.
- * @param {boolean=} opt_value - Value to be set.
- * @return {anychart.ganttModule.IInteractiveGrid|boolean} - Itself for method chaining or current value.
+ * Live edit settings.
+ * @param {Object=} opt_value - Value to be set.
+ * @return {anychart.ganttModule.IInteractiveGrid|anychart.ganttModule.edit.StructureEdit} - Itself for method chaining or current value.
  */
-anychart.ganttModule.IInteractiveGrid.prototype.editing = function(opt_value) {};
+anychart.ganttModule.IInteractiveGrid.prototype.edit = function(opt_value) {};
 
 
 /**
