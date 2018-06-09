@@ -436,10 +436,15 @@ anychart.stockModule.Series.prototype.updateLastRow = function() {
 /**
  * Highlights series data.
  * @param {number} value
+ * @param {number} stickyValue
  */
-anychart.stockModule.Series.prototype.highlight = function(value) {
+anychart.stockModule.Series.prototype.highlight = function(value, stickyValue) {
   this.highlightedRow_ = this.prepareHighlight(value);
   this.inHighlight_ = true;
+
+  this.highlightStickyRow_(anychart.PointState.NORMAL);
+  this.highlightedStyckyRow_ = this.highlightedRow_ ? this.highlightedRow_ : this.prepareHighlight(stickyValue);
+  this.highlightStickyRow_(anychart.PointState.HOVER);
 };
 
 
@@ -449,6 +454,35 @@ anychart.stockModule.Series.prototype.highlight = function(value) {
 anychart.stockModule.Series.prototype.removeHighlight = function() {
   this.highlightedRow_ = null;
   this.inHighlight_ = false;
+
+  this.highlightStickyRow_(anychart.PointState.NORMAL);
+};
+
+
+/**
+ * Hover marker processing
+ * @param {anychart.PointState} state Point hover state
+ * @private
+ */
+anychart.stockModule.Series.prototype.highlightStickyRow_ = function(state) {
+  if (this.highlightedStyckyRow_) {
+    var iterator = this.getIterator();
+    iterator.specialSelect(this.highlightedStyckyRow_.row, this.highlightedStyckyRow_.getIndex());
+
+    iterator.meta('marker', this.drawFactoryElement(
+        [this.normal_.markers, this.hovered_.markers, this.selected_.markers],
+        [],
+        ['marker', 'hoverMarker', 'selectMarker'],
+        false,
+        false,
+        null,
+        iterator,
+        state,
+        true));
+
+    if (state == anychart.PointState.NORMAL)
+      this.highlightedStyckyRow_ = null;
+  }
 };
 
 

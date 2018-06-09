@@ -6,6 +6,8 @@
 #
 ########################################################################################################################
 function upload_all_files(){
+    skype_send status "Start upload CDN (static)"
+
     echo "--"
     echo "Upload files to static server"
     echo "--"
@@ -92,6 +94,4 @@ function upload_all_files(){
         cp -r /apps/static/cdn/releases/${VERSION} /apps/static/cdn/releases/rc \" "
         echo
     fi
-
-    skype_send status "UPLOAD CDN"
 }

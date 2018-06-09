@@ -251,6 +251,7 @@ anychart.core.ui.MarkersFactory.prototype.enabled = function(opt_value) {
       this.invalidate(anychart.ConsistencyState.ENABLED, this.getEnableChangeSignals());
     }
     this.enabledState_ = opt_value;
+    this.supportsEnabledSuspension = !goog.isNull(this.ownSettings['enabled']);
     // if (!goog.isNull(opt_value)) {
     anychart.core.ui.MarkersFactory.base(this, 'enabled', /** @type {boolean} */(opt_value));
     // } else {

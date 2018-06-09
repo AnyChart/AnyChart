@@ -7,6 +7,8 @@
 ########################################################################################################################
 
 function build_dist(){
+    skype_send status "Start build binaries"
+
     echo "--"
     echo Building binaries. Copy them to ./dist/
     echo "--"
@@ -17,7 +19,5 @@ function build_dist(){
     Run "cp ./bin/sources/binaries_wrapper_end.txt ./dist/binaries_wrapper_end.txt"
     Run "cp ./bin/sources/binaries_wrapper_start.txt ./dist/binaries_wrapper_start.txt"
     echo
-
-    skype_send status "Build binaries"
 }
 
