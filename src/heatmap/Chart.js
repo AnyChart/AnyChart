@@ -819,7 +819,7 @@ anychart.heatmapModule.Chart.prototype.setupByJSONWithScales = function(config, 
   anychart.heatmapModule.Chart.base(this, 'setupByJSONWithScales', config, scalesInstances, opt_default);
 
   anychart.core.settings.deserialize(this, anychart.heatmapModule.Chart.PROPERTY_DESCRIPTORS, config);
-  this.yScroller(config['yScroller']);
+  this.yScroller().setupInternal(!!opt_default, config['yScroller']);
 
   var yZoom = config['yZoom'];
   if (goog.isObject(yZoom) && (goog.isNumber(yZoom['scale']) || goog.isString(yZoom['scale']))) {

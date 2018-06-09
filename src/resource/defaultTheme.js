@@ -207,7 +207,8 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       'orientation': 'right',
       'thumbs': false,
       'fill': null,
-      'zIndex': 1010
+      'zIndex': 1010,
+      'inverted': true
     },
     'zoomLevels': [
       {

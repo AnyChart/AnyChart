@@ -294,7 +294,7 @@ anychart.core.CartesianBase.prototype.resetScrollerPosition = function(scroller,
  */
 anychart.core.CartesianBase.prototype.applyScrollerOffsetInternal = function(offsets, scroller, scrollerSize) {
   if (scroller.position() == anychart.enums.ChartScrollerPosition.BEFORE_AXES) {
-    switch (scroller.orientation()) {
+    switch (scroller.getOption('orientation')) {
       case anychart.enums.Orientation.TOP:
         scroller.padding()['top'](offsets[0] + (this.topAxisPadding_ || 0));
         scroller.padding()['bottom'](0);
@@ -430,7 +430,7 @@ anychart.core.CartesianBase.prototype.setupByJSONWithScales = function(config, s
   anychart.core.CartesianBase.base(this, 'setupByJSONWithScales', config, scalesInstances, opt_default);
 
   anychart.core.settings.deserialize(this, anychart.core.CartesianBase.PROPERTY_DESCRIPTORS, config);
-  this.xScroller(config['xScroller']);
+  this.xScroller().setupInternal(!!opt_default, config['xScroller']);
 
   var xZoom = config['xZoom'];
   if (goog.isObject(xZoom) && (goog.isNumber(xZoom['scale']) || goog.isString(xZoom['scale']))) {
