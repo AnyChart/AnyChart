@@ -948,6 +948,8 @@ anychart.vennModule.Chart.prototype.selectPoint = function(indexOrIndexes, opt_e
     this.state.setPointState(anychart.PointState.SELECT, indexOrIndexes, unselect ? anychart.PointState.HOVER : undefined);
   }
 
+  this.showTooltip(opt_event);
+
   return this;
 };
 
@@ -1028,6 +1030,15 @@ anychart.vennModule.Chart.prototype.createFormatProvider = function(opt_force) {
       .dataSource(iterator)
       .statisticsSources([this.getPoint(iterator.getIndex()), this]);
 
+  var currentIteratorIndex = iterator.getIndex();
+  var selectedPointsSum = 0;
+  var selectedPoints = this.state.getIndexByPointState(anychart.PointState.SELECT);
+  for (var i = 0; i < selectedPoints.length; i++) {
+    iterator.select(selectedPoints[i]);
+    selectedPointsSum += iterator.get('value');
+  }
+  iterator.select(currentIteratorIndex);
+
   var x = iterator.get('x');
   var name = goog.isDef(iterator.get('name')) ? iterator.get('name') : x;
   var values = {
@@ -1036,7 +1047,8 @@ anychart.vennModule.Chart.prototype.createFormatProvider = function(opt_force) {
     'index': {value: iterator.getIndex(), type: anychart.enums.TokenType.NUMBER},
     'chart': {value: this, type: anychart.enums.TokenType.UNKNOWN},
     'name': {value: name, type: anychart.enums.TokenType.STRING},
-    'isIntersection': {value: !!iterator.meta('isIntersection'), type: anychart.enums.TokenType.STRING}
+    'isIntersection': {value: !!iterator.meta('isIntersection'), type: anychart.enums.TokenType.STRING},
+    'selectedPointsSum': {value: selectedPointsSum, type: anychart.enums.TokenType.NUMBER}
   };
 
   return this.pointProvider_.propagate(values);
