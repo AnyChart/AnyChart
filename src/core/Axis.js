@@ -878,7 +878,7 @@ anychart.core.Axis.prototype.getOverlappedLabels_ = function(opt_bounds) {
                 else
                   bounds3 = null;
 
-                isLabelInInsideSpace = insideLabelSpace ? anychart.math.rectContains(insideLabelSpace, bounds1) : true;
+                isLabelInInsideSpace = insideLabelSpace ? !this.hasIntersectionLabelsSpace(insideLabelSpace, bounds1) : true;
                 if (bounds1 &&
                     isLabelInInsideSpace &&
                     !(anychart.math.checkRectIntersection(bounds1, bounds2) ||
@@ -926,7 +926,7 @@ anychart.core.Axis.prototype.getOverlappedLabels_ = function(opt_bounds) {
                         true :
                     true;
 
-                isLabelInInsideSpace = insideLabelSpace ? anychart.math.rectContains(insideLabelSpace, bounds1) : true;
+                isLabelInInsideSpace = insideLabelSpace ? !this.hasIntersectionLabelsSpace(insideLabelSpace, bounds1) : true;
                 if (isLabelInInsideSpace &&
                     !(anychart.math.checkRectIntersection(bounds1, bounds2) ||
                         anychart.math.checkRectIntersection(bounds1, bounds3) ||
@@ -956,7 +956,9 @@ anychart.core.Axis.prototype.getOverlappedLabels_ = function(opt_bounds) {
         } else if (anychart.utils.instanceOf(scale, anychart.scales.Base)) {
           if (this.drawLastLabel()) {
             bounds3 = this.getLabelBounds_(ticksArrLen - 1, true, scaleTicksArr, opt_bounds);
-            bounds3 = insideLabelSpace ? anychart.math.rectContains(insideLabelSpace, bounds3) ? bounds3 : null : bounds3;
+            bounds3 = insideLabelSpace ?
+                (!this.hasIntersectionLabelsSpace(insideLabelSpace, bounds3) ? bounds3 : null) :
+                bounds3;
           } else
             bounds3 = null;
 
@@ -972,7 +974,7 @@ anychart.core.Axis.prototype.getOverlappedLabels_ = function(opt_bounds) {
               else
                 bounds2 = null;
 
-              isLabelInInsideSpace = insideLabelSpace ? anychart.math.rectContains(insideLabelSpace, bounds1) : true;
+              isLabelInInsideSpace = insideLabelSpace ? !this.hasIntersectionLabelsSpace(insideLabelSpace, bounds1) : true;
               if (!i) {
                 if (this.drawFirstLabel() && isLabelInInsideSpace) {
                   prevDrawableLabel = i;
@@ -1003,6 +1005,8 @@ anychart.core.Axis.prototype.getOverlappedLabels_ = function(opt_bounds) {
       if (!isLabels) overlappedLabels = false;
       this.overlappedLabels_ = {labels: overlappedLabels, minorLabels: overlappedMinorLabels};
     }
+
+    this.invalidate(this.ALL_VISUAL_STATES);
     this.markConsistent(anychart.ConsistencyState.AXIS_OVERLAP);
   }
   return this.overlappedLabels_;
@@ -1043,7 +1047,7 @@ anychart.core.Axis.prototype.applyStaggerMode_ = function(opt_bounds) {
         states[tickIndex] = false;
       } else {
         var labelBounds = this.getLabelBounds_(tickIndex, true, scaleTicksArr, opt_bounds);
-        states[tickIndex] = insideLabelSpace ? anychart.math.rectContains(insideLabelSpace, labelBounds) : true;
+        states[tickIndex] = insideLabelSpace ? !this.hasIntersectionLabelsSpace(insideLabelSpace, labelBounds) : true;
       }
     }
 
@@ -1096,7 +1100,7 @@ anychart.core.Axis.prototype.applyStaggerMode_ = function(opt_bounds) {
           else
             bounds3 = null;
 
-          isLabelInInsideSpace = insideLabelSpace ? anychart.math.rectContains(insideLabelSpace, bounds1) : true;
+          isLabelInInsideSpace = insideLabelSpace ? !this.hasIntersectionLabelsSpace(insideLabelSpace, bounds1) : true;
           if (!i) {
             if (this.drawFirstLabel() && isLabelInInsideSpace) {
               prevDrawableLabel = i;
@@ -1380,8 +1384,35 @@ anychart.core.Axis.prototype.getSize = function(parentBounds, length, opt_includ
 
   var width = this.isHorizontal() ? length : 0;
   var height = this.isHorizontal() ? 0 : length;
+  var left = (parentBounds ? parentBounds.left : 0);
+  var top = (parentBounds ? parentBounds.top : 0);
 
-  var tempBounds = new anychart.math.Rect(0, 0, width, height);
+  var padding = this.padding();
+  var topPad = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption('top')), parentBounds.height);
+  var rightPad = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption('right')), parentBounds.width);
+  var bottomPad = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption('bottom')), parentBounds.height);
+  var leftPad = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption('left')), parentBounds.width);
+
+  switch (this.orientation()) {
+    case anychart.enums.Orientation.TOP:
+      left += leftPad;
+      top += topPad;
+      break;
+    case anychart.enums.Orientation.RIGHT:
+      left += width - rightPad;
+      top += topPad;
+      break;
+    case anychart.enums.Orientation.BOTTOM:
+      left += leftPad;
+      top += height - bottomPad;
+      break;
+    case anychart.enums.Orientation.LEFT:
+      left += leftPad;
+      top += topPad;
+      break;
+  }
+
+  var tempBounds = new anychart.math.Rect(left, top, width, height);
 
   var overlappedLabels = this.calcLabels_(tempBounds);
   var ticksArr;
@@ -1595,8 +1626,8 @@ anychart.core.Axis.prototype.getPixelBounds = function(opt_includeInsideContent)
 
 /**
  * Inside bounds.
- * @param {goog.math.Rect=} opt_value
- * @return {anychart.core.Axis|goog.math.Rect}
+ * @param {anychart.math.Rect=} opt_value
+ * @return {anychart.core.Axis|anychart.math.Rect}
  */
 anychart.core.Axis.prototype.insideBounds = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -2244,6 +2275,28 @@ anychart.core.Axis.prototype.isHorizontal = function() {
   var orientation = this.orientation();
   return orientation == anychart.enums.Orientation.TOP ||
       orientation == anychart.enums.Orientation.BOTTOM;
+};
+
+
+/**
+ * @param {anychart.math.Rect} insideLabelSpace
+ * @param {Array.<number>} bounds1
+ * @return {boolean}
+ */
+anychart.core.Axis.prototype.hasIntersectionLabelsSpace = function(insideLabelSpace, bounds1) {
+  var intersected = false;
+  switch (this.orientation()) {
+    case anychart.enums.Orientation.TOP:
+    case anychart.enums.Orientation.BOTTOM:
+      intersected = insideLabelSpace.left > bounds1[0] || insideLabelSpace.getRight() < bounds1[2];
+      break;
+    case anychart.enums.Orientation.RIGHT:
+    case anychart.enums.Orientation.LEFT:
+      intersected = insideLabelSpace.top > bounds1[1] || insideLabelSpace.getBottom() < bounds1[7];
+      break;
+  }
+
+  return intersected;
 };
 
 
