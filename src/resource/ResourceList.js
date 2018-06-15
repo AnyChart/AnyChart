@@ -172,48 +172,15 @@ anychart.resourceModule.ResourceList.DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
 
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'stroke',
-      anychart.core.settings.strokeNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'oddFill',
-      anychart.core.settings.fillNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'evenFill',
-      anychart.core.settings.fillNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'drawTopLine',
-      anychart.core.settings.booleanNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'drawRightLine',
-      anychart.core.settings.booleanNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'drawBottomLine',
-      anychart.core.settings.booleanNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'drawLeftLine',
-      anychart.core.settings.booleanNormalizer);
-
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'stroke', anychart.core.settings.strokeNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'oddFill', anychart.core.settings.fillNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'evenFill', anychart.core.settings.fillNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'drawTopLine', anychart.core.settings.booleanNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'drawRightLine', anychart.core.settings.booleanNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'drawBottomLine', anychart.core.settings.booleanNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'drawLeftLine', anychart.core.settings.booleanNormalizer]
+  ]);
   return map;
 })();
 anychart.core.settings.populate(anychart.resourceModule.ResourceList, anychart.resourceModule.ResourceList.DESCRIPTORS);
@@ -988,7 +955,7 @@ anychart.resourceModule.ResourceList.prototype.serialize = function() {
   json['types'] = this.types().serialize();
   json['descriptions'] = this.descriptions().serialize();
   json['tags'] = this.tags().serialize();
-  json['overlay'] = this.overlay_.serialize();
+  json['overlay'] = this.overlay().serialize();
   return json;
 };
 
@@ -996,20 +963,15 @@ anychart.resourceModule.ResourceList.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.resourceModule.ResourceList.prototype.setupByJSON = function(config, opt_default) {
   anychart.resourceModule.ResourceList.base(this, 'setupByJSON', config, opt_default);
-  if (opt_default) {
-    this.setThemeSettings(config);
-  } else {
-    anychart.core.settings.deserialize(this, anychart.resourceModule.ResourceList.DESCRIPTORS, config);
-  }
 
-  if ('background' in config)
-    this.background(config['background']);
+  anychart.core.settings.deserialize(this, anychart.resourceModule.ResourceList.DESCRIPTORS, config, opt_default);
 
-  this.images().setupByJSON(config['images'], opt_default);
-  this.names().setupByJSON(config['names'], opt_default);
-  this.types().setupByJSON(config['types'], opt_default);
-  this.descriptions().setupByJSON(config['descriptions'], opt_default);
-  this.tags().setupByJSON(config['tags'], opt_default);
+  this.background().setupInternal(!!opt_default, config['background']);
+  this.images().setupInternal(!!opt_default, config['images']);
+  this.names().setupInternal(!!opt_default, config['names']);
+  this.types().setupInternal(!!opt_default, config['types']);
+  this.descriptions().setupInternal(!!opt_default, config['descriptions']);
+  this.tags().setupInternal(!!opt_default, config['tags']);
   this.overlay().setupInternal(!!opt_default, config['overlay']);
 };
 

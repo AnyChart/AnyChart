@@ -381,12 +381,11 @@ goog.addDependency('../../../../src/resource/ResourceList.js', ['anychart.resour
 goog.addDependency('../../../../src/resource/Scale.js', ['anychart.resourceModule.Scale'], ['anychart.enums', 'anychart.resourceModule.Calendar', 'anychart.scales.ScatterBase', 'anychart.utils', 'goog.date.Interval', 'goog.date.UtcDateTime'], {});
 goog.addDependency('../../../../src/resource/defaultTheme.js', ['anychart.resourceModule.defaultTheme'], [], {});
 goog.addDependency('../../../../src/resource/resource.module.js', ['anychart.resourceModule.entry'], ['anychart.resourceModule.Chart'], {});
-goog.addDependency('../../../../src/resource/resourcelist/ImageSettings.js', ['anychart.resourceModule.resourceList.ImageSettings'], ['anychart.core.settings', 'anychart.resourceModule.resourceList.SettingsWithMargin'], {});
+goog.addDependency('../../../../src/resource/resourcelist/ImageSettings.js', ['anychart.resourceModule.resourceList.ImageSettings'], ['anychart.core.settings', 'anychart.resourceModule.resourceList.Settings'], {});
 goog.addDependency('../../../../src/resource/resourcelist/Item.js', ['anychart.resourceModule.resourceList.Item'], ['anychart.core.VisualBase', 'anychart.core.settings', 'anychart.core.ui.Label'], {});
-goog.addDependency('../../../../src/resource/resourcelist/Settings.js', ['anychart.resourceModule.resourceList.Settings'], ['anychart.core.Base', 'anychart.core.settings'], {});
-goog.addDependency('../../../../src/resource/resourcelist/SettingsWithMargin.js', ['anychart.resourceModule.resourceList.SettingsWithMargin'], ['anychart.core.utils.Margin', 'anychart.resourceModule.resourceList.Settings'], {});
+goog.addDependency('../../../../src/resource/resourcelist/Settings.js', ['anychart.resourceModule.resourceList.Settings'], ['anychart.core.Base', 'anychart.core.utils.Margin'], {});
 goog.addDependency('../../../../src/resource/resourcelist/TagsSettings.js', ['anychart.resourceModule.resourceList.TagsSettings'], ['anychart.core.ui.Background', 'anychart.core.utils.Padding', 'anychart.resourceModule.resourceList.TextSettings'], {});
-goog.addDependency('../../../../src/resource/resourcelist/TextSettings.js', ['anychart.resourceModule.resourceList.TextSettings'], ['anychart.core.settings', 'anychart.resourceModule.resourceList.SettingsWithMargin'], {});
+goog.addDependency('../../../../src/resource/resourcelist/TextSettings.js', ['anychart.resourceModule.resourceList.TextSettings'], ['anychart.core.settings', 'anychart.resourceModule.resourceList.Settings'], {});
 goog.addDependency('../../../../src/scales/Base.js', ['anychart.scales.Base'], ['anychart.core.Base', 'anychart.enums', 'anychart.scales.IXScale'], {});
 goog.addDependency('../../../../src/scales/Continuous.js', ['anychart.scales.Continuous'], ['anychart.format', 'anychart.math', 'anychart.utils', 'goog.array'], {});
 goog.addDependency('../../../../src/scales/DateTime.js', ['anychart.scales.DateTime'], ['anychart.enums', 'anychart.scales.Continuous', 'anychart.scales.DateTimeTicks', 'anychart.scales.ScatterBase'], {});

@@ -1,26 +1,27 @@
 goog.provide('anychart.resourceModule.resourceList.ImageSettings');
+
 goog.require('anychart.core.settings');
-goog.require('anychart.resourceModule.resourceList.SettingsWithMargin');
+goog.require('anychart.resourceModule.resourceList.Settings');
 
 
 
 /**
  * Class representing text settings for resource list items.
- * @extends {anychart.resourceModule.resourceList.SettingsWithMargin}
+ * @extends {anychart.resourceModule.resourceList.Settings}
  * @constructor
  */
 anychart.resourceModule.resourceList.ImageSettings = function() {
   anychart.resourceModule.resourceList.ImageSettings.base(this, 'constructor');
 
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
-    ['size', 0, anychart.Signal.NEEDS_REDRAW],
-    ['borderRadius', 0, anychart.Signal.NEEDS_REDRAW],
-    ['opacity', 0, anychart.Signal.NEEDS_REDRAW],
-    ['align', 0, anychart.Signal.NEEDS_REDRAW],
-    ['fittingMode', 0, anychart.Signal.NEEDS_REDRAW]
+    ['size', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
+    ['borderRadius', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
+    ['opacity', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
+    ['align', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
+    ['fittingMode', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW]
   ]);
 };
-goog.inherits(anychart.resourceModule.resourceList.ImageSettings, anychart.resourceModule.resourceList.SettingsWithMargin);
+goog.inherits(anychart.resourceModule.resourceList.ImageSettings, anychart.resourceModule.resourceList.Settings);
 
 
 //region --- PROPERTIES ---
@@ -48,8 +49,7 @@ anychart.core.settings.populate(anychart.resourceModule.resourceList.ImageSettin
 /** @inheritDoc */
 anychart.resourceModule.resourceList.ImageSettings.prototype.setupByJSON = function(config, opt_default) {
   anychart.resourceModule.resourceList.ImageSettings.base(this, 'setupByJSON', config, opt_default);
-  if (!opt_default)
-    anychart.core.settings.deserialize(this, anychart.resourceModule.resourceList.ImageSettings.PROPERTY_DESCRIPTORS, config);
+  anychart.core.settings.deserialize(this, anychart.resourceModule.resourceList.ImageSettings.PROPERTY_DESCRIPTORS, config, opt_default);
 };
 
 

@@ -104,8 +104,8 @@ anychart.resourceModule.resourceList.Item = function(resourceList) {
     ['imageSrc', 0, 0],
     ['name', 0, 0],
     ['type', 0, 0],
-    ['description', 0, anychart.Signal.NEEDS_REDRAW],
-    ['tags', 0, anychart.Signal.NEEDS_REDRAW]
+    ['description', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
+    ['tags', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW]
   ]);
 };
 goog.inherits(anychart.resourceModule.resourceList.Item, anychart.core.VisualBase);

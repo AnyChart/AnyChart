@@ -1,12 +1,13 @@
 goog.provide('anychart.resourceModule.resourceList.TextSettings');
+
 goog.require('anychart.core.settings');
-goog.require('anychart.resourceModule.resourceList.SettingsWithMargin');
+goog.require('anychart.resourceModule.resourceList.Settings');
 
 
 
 /**
  * Class representing text settings for resource list items.
- * @extends {anychart.resourceModule.resourceList.SettingsWithMargin}
+ * @extends {anychart.resourceModule.resourceList.Settings}
  * @constructor
  */
 anychart.resourceModule.resourceList.TextSettings = function() {
@@ -35,7 +36,7 @@ anychart.resourceModule.resourceList.TextSettings = function() {
     ['disablePointerEvents', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW]
   ]);
 };
-goog.inherits(anychart.resourceModule.resourceList.TextSettings, anychart.resourceModule.resourceList.SettingsWithMargin);
+goog.inherits(anychart.resourceModule.resourceList.TextSettings, anychart.resourceModule.resourceList.Settings);
 
 
 //region --- PROPERTIES ---
@@ -78,8 +79,7 @@ anychart.core.settings.populate(anychart.resourceModule.resourceList.TextSetting
 /** @inheritDoc */
 anychart.resourceModule.resourceList.TextSettings.prototype.setupByJSON = function(config, opt_default) {
   anychart.resourceModule.resourceList.TextSettings.base(this, 'setupByJSON', config, opt_default);
-  if (!opt_default)
-    anychart.core.settings.deserialize(this, anychart.resourceModule.resourceList.TextSettings.PROPERTY_DESCRIPTORS, config);
+  anychart.core.settings.deserialize(this, anychart.resourceModule.resourceList.TextSettings.PROPERTY_DESCRIPTORS, config, opt_default);
 };
 
 
