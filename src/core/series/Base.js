@@ -3792,11 +3792,27 @@ anychart.core.series.Base.prototype.makeExtremumMeta = function(rowInfo, yNames,
   var isMinPoint = false;
   var isMaxPoint = false;
   if (!pointMissing && 0 <= xRatio && xRatio <= 1) {
-    var max = -Infinity;
     var min = Infinity;
+    var max = -Infinity;
+    var minCache = Math.min.apply(null, this.referenceValuesCache_);
+    var maxCache = Math.max.apply(null, this.referenceValuesCache_);
+
     var i;
     for (i = 0; i < yColumns.length; i++) {
-      var val = Number(rowInfo.getColumn(yColumns[i]));
+      var val;
+      var comparisonMode = anychart.utils.instanceOf(this.yScale(), anychart.scales.Linear) ?
+          /** @type {anychart.scales.Linear} */(this.yScale()).comparisonMode() : null;
+      if (comparisonMode && comparisonMode != anychart.enums.ScaleComparisonMode.NONE) {
+        if (comparisonMode == anychart.enums.ScaleComparisonMode.VALUE)
+          val = Number(rowInfo.meta('valueChange'));
+        else {
+          val = Number(rowInfo.meta('valuePercentChange'));
+          minCache = anychart.math.round(minCache, 2);
+          maxCache = anychart.math.round(maxCache, 2);
+        }
+      } else
+        val = Number(rowInfo.getColumn(yColumns[i]));
+
       if (!isNaN(val)) {
         if (max < val)
           max = val;
@@ -3804,8 +3820,9 @@ anychart.core.series.Base.prototype.makeExtremumMeta = function(rowInfo, yNames,
           min = val;
       }
     }
-    isMinPoint = isFinite(min) && Math.min.apply(null, this.referenceValuesCache_) >= min;
-    isMaxPoint = isFinite(max) && Math.max.apply(null, this.referenceValuesCache_) <= max;
+
+    isMinPoint = isFinite(min) && minCache >= min;
+    isMaxPoint = isFinite(max) && maxCache <= max;
   }
   rowInfo.meta('isMinPoint', isMinPoint);
   rowInfo.meta('isMaxPoint', isMaxPoint);
