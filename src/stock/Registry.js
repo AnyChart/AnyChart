@@ -436,7 +436,7 @@ anychart.stockModule.Registry.prototype.getSelection = function(startKey, endKey
       }
 
       range = currKey - prevKey;
-      if (!isNaN(range)) {
+      if (!isNaN(range) && range != 0) {
         estRange = anychart.utils.estimateInterval(range);
         if (intervals[estRange['unit']]) {
           interval = intervals[estRange['unit']];
@@ -451,7 +451,7 @@ anychart.stockModule.Registry.prototype.getSelection = function(startKey, endKey
       currKey = goog.math.clamp(lastKey, boundariesInfo[0], boundariesInfo[1]);
       prevKey = goog.math.clamp(this.keys_[last].key, boundariesInfo[0], boundariesInfo[1]);
       range = currKey - prevKey;
-      if (!isNaN(range)) {
+      if (!isNaN(range) && range != 0) {
         estRange = anychart.utils.estimateInterval(range);
         if (intervals[estRange['unit']]) {
           interval = intervals[estRange['unit']];

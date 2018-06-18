@@ -439,7 +439,6 @@ anychart.stockModule.Axis.prototype.drawLabels_ = function(bounds, iterator) {
     curr = iterator.getCurrent();
     currIsMajor = allowMajor && iterator.getCurrentIsMajor();
 
-
     if (currIsMajor && majorTicksDrawer)
       majorTicksDrawer.call(this.ticks_, this.scale_.transformAligned(curr), bounds, bounds, 0, 0.5);
     else if (minorTicksDrawer)
@@ -555,7 +554,10 @@ anychart.stockModule.Axis.prototype.drawLabels_ = function(bounds, iterator) {
 anychart.stockModule.Axis.prototype.drawLabel_ = function(value, isMajor, bounds, majorUnit, majorUnitCount, minorUnit, minorUnitCount, index) {
   var labels = isMajor ? this.labels() : this.minorLabels();
 
-  var dataIndex = Math.ceil(this.scale_.getIndexByKey(value));
+  var dataIndex = this.scale_.getIndexByKey(value);
+  if (this.scale_.getType() == anychart.enums.ScaleTypes.STOCK_ORDINAL_DATE_TIME)
+    dataIndex = Math.ceil(dataIndex);
+
   var realValue = this.scale_.getKeyByIndex(dataIndex);
   var ratio = this.scale_.transformInternal(realValue, dataIndex);
 
@@ -604,7 +606,10 @@ anychart.stockModule.Axis.prototype.getLabelBounds_ = function(value, isMajor, b
   var labels = isMajor ? this.labels() : this.minorLabels();
   if (!labels.enabled()) return null;
 
-  var dataIndex = Math.ceil(this.scale_.getIndexByKey(value));
+  var dataIndex = this.scale_.getIndexByKey(value);
+  if (this.scale_.getType() == anychart.enums.ScaleTypes.STOCK_ORDINAL_DATE_TIME)
+    dataIndex = Math.ceil(dataIndex);
+
   var realValue = this.scale_.getKeyByIndex(dataIndex);
   var ratio = this.scale_.transformInternal(realValue, dataIndex);
   var x = Math.round(bounds.left + ratio * bounds.width);
