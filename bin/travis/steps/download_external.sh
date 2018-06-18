@@ -6,7 +6,6 @@
 #
 ########################################################################################################################
 
-
 function download_docs(){
     echo "--"
     echo Downloading docs
@@ -29,12 +28,31 @@ function download_demos(){
     echo
 }
 
-function prepare_fonts(){
+function download_fonts(){
     echo "--"
-    echo Prepare fonts
+    echo Download fonts
     echo "--"
 
+    Run "git@github.com:AnyChart/fonts.git ../out/fonts --depth 1"
+    Run "rm -rf fonts"
+    Run "mv ../out/fonts/dist ./fonts"
+
     Run "zip -q -r anychart-fonts-${VERSION}.zip fonts"
+    # Run "git clone git@github.com:AnyChart/chart-editor.git --depth 1"
+    echo
+}
+
+function download_chart_editor(){
+    echo "--"
+    echo Download Chart Editor
+    echo "--"
+
+    Run "git clone git@github.com:AnyChart/chart-editor.git ../out/chart-editor --depth 1"
+
+    Run "cp ../out/chart-editor/dist/anychart-editor.min.js ./js/anychart-editor.min.js"
+    Run "cp ../out/chart-editor/dist/anychart-editor.css ./css/anychart-editor.css"
+    Run "cp ../out/chart-editor/dist/anychart-editor.min.css ./css/anychart-editor.min.css"
+
     echo
 }
 
@@ -43,9 +61,9 @@ function download_resources(){
 
     download_docs
     download_demos
-    prepare_fonts
+    download_fonts
+    download_chart_editor
 
     Run "cd .."
     echo
 }
-

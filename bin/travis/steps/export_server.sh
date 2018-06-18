@@ -12,7 +12,7 @@ function es_clone_and_build(){
     echo "Building and uploading export server: $1"
     echo "--"
 
-    Run "git clone $1 out/export-server"
+    Run "git clone $1 out/export-server --depth 1"
     Run "cp out/anychart-bundle.min.js out/export-server/resources/js/anychart-bundle.min.js"
     Run "cd out/export-server"
     Run "lein uberjar"
