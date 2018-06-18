@@ -777,14 +777,15 @@ def __get_bundle_wrapper(bundle_name, modules, file_name='', performance_monitor
         return '', ''
     perf_start = ''
     perf_end = ''
+    camel_case_bundle_name = bundle_name.replace('-', '_');
     if performance_monitoring:
-        perf_start = "window.anychart_%s_init_start=(typeof window.performance=='object')" \
-                     "&&(typeof window.performance.now=='function')?window.performance.now():+new Date();" % bundle_name
+        perf_start = "window.%s_init_start=(typeof window.performance=='object')" \
+                     "&&(typeof window.performance.now=='function')?window.performance.now():+new Date();" % camel_case_bundle_name
         perf_end = ";if(console&&(typeof console.log!='object'))" \
                    "console.log('AnyChart \"%s\" module initialized in:'," \
                    "((typeof window.performance=='object')&&(typeof window.performance.now=='function')?" \
-                   "window.performance.now():+new Date()-window.anychart_%s_init_start).toFixed(5),'ms');" \
-                   "delete window.anychart_%s_init_start;" % (bundle_name, bundle_name, bundle_name)
+                   "window.performance.now():+new Date()-window.%s_init_start).toFixed(5),'ms');" \
+                   "delete window.%s_init_start;" % (camel_case_bundle_name, camel_case_bundle_name, camel_case_bundle_name)
     source_mapping = ('//# sourceMappingURL=%s.map' % file_name) if debug_files else ''
 
     f = open(BINARIES_WRAPPER_START, 'r')
