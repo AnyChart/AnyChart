@@ -508,6 +508,7 @@ goog.exportSymbol('anychart.enums.StringToken.SERIES_Y_RANGE_MAX', anychart.enum
 goog.exportSymbol('anychart.enums.StringToken.SERIES_Y_RANGE_MIN', anychart.enums.StringToken.SERIES_Y_RANGE_MIN);
 goog.exportSymbol('anychart.enums.StringToken.SERIES_Y_RANGE_SUM', anychart.enums.StringToken.SERIES_Y_RANGE_SUM);
 goog.exportSymbol('anychart.enums.StringToken.SERIES_Y_SUM', anychart.enums.StringToken.SERIES_Y_SUM);
+goog.exportSymbol('anychart.enums.StringToken.SELECTED_POINTS_SUM', anychart.enums.StringToken.SELECTED_POINTS_SUM);
 goog.exportSymbol('anychart.enums.StringToken.VALUE', anychart.enums.StringToken.VALUE);
 goog.exportSymbol('anychart.enums.StringToken.PERCENT_VALUE', anychart.enums.StringToken.PERCENT_VALUE);
 //goog.exportSymbol('anychart.enums.StringToken.X_AXIS_AVERAGE', anychart.enums.StringToken.X_AXIS_AVERAGE);

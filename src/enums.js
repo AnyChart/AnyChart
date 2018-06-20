@@ -3824,6 +3824,10 @@ anychart.enums.StringToken = {
    */
   SERIES_Y_SUM: '%SeriesYSum',
   /**
+   * The sum of all selected points on the Venn diagram
+   */
+  SELECTED_POINTS_SUM: '%SelectedPointsSum',
+  /**
    The y value of this point.
    */
   VALUE: '%Value',
