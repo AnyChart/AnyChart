@@ -639,8 +639,8 @@ anychart.core.ui.MarkersFactory.prototype.clear = function(opt_index) {
         }
       }
       this.markers_.length = 0;
+      this.invalidate(anychart.ConsistencyState.MARKERS_FACTORY_HANDLERS, anychart.Signal.NEEDS_REDRAW);
     }
-    this.invalidate(anychart.ConsistencyState.MARKERS_FACTORY_HANDLERS, anychart.Signal.NEEDS_REDRAW);
   } else
     this.markers_ = [];
   return this;

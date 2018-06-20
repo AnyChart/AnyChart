@@ -2265,9 +2265,12 @@ anychart.core.series.Base.prototype.extractSettings = function(settingsArray, op
  * @return {anychart.core.ui.MarkersFactory.Marker|anychart.core.ui.LabelsFactory.Label|null}
  * @protected
  */
-anychart.core.series.Base.prototype.drawFactoryElement = function(seriesFactoryGetters, chartFactoryGetters, overrideNames, hasPointOverrides, isLabel, positionYs, point, state, callDraw) {  
+anychart.core.series.Base.prototype.drawFactoryElement = function(seriesFactoryGetters, chartFactoryGetters, overrideNames, hasPointOverrides, isLabel, positionYs, point, state, callDraw) {
   var isDraw, positionProvider, i, indexes;
   var index = point.getIndex();
+  if (isNaN(index))
+    return null;
+
   if (positionYs) {
     indexes = this.indexToMarkerIndexes_[index];
     if (!indexes)

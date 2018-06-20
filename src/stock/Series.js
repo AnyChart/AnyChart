@@ -465,7 +465,7 @@ anychart.stockModule.Series.prototype.removeHighlight = function() {
  * @private
  */
 anychart.stockModule.Series.prototype.highlightStickyRow_ = function(state) {
-  if (this.highlightedStyckyRow_) {
+  if (this.highlightedStyckyRow_ && this.enabled()) {
     var iterator = this.getIterator();
     iterator.specialSelect(this.highlightedStyckyRow_.row, this.highlightedStyckyRow_.getIndex());
 
