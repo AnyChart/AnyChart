@@ -4747,24 +4747,7 @@
         {"$ref": "#/definitions/anychart.core.Text"}
       ],
       "properties": {
-        "adjustFontSize": {
-          "type": [
-            "boolean",
-            "object",
-            "array"
-          ],
-          "properties": {
-            "width": {
-              "type": "boolean"
-            },
-            "height": {
-              "type": "boolean"
-            }
-          },
-          "items": {
-            "type": "boolean"
-          }
-        },
+        "adjustFontSize": {"$ref": "#/definitions/adjustFontSize"},
         "minFontSize": {
           "type": [
             "number",
@@ -4978,24 +4961,7 @@
             "null"
           ]
         },
-        "adjustFontSize": {
-          "type": [
-            "boolean",
-            "object",
-            "array"
-          ],
-          "properties": {
-            "width": {
-              "type": "boolean"
-            },
-            "height": {
-              "type": "boolean"
-            }
-          },
-          "items": {
-            "type": "boolean"
-          }
-        },
+        "adjustFontSize": {"$ref": "#/definitions/adjustFontSize"},
         "minFontSize": {
           "type": [
             "number",
@@ -5143,14 +5109,7 @@
         "padding": {"$ref": "#/definitions/anychart.core.utils.Space"},
         "enabled": {"type": "boolean"},
         "hideDelay": {"type": "number"},
-        "adjustFontSize": {
-          "type": ["boolean", "object", "array"],
-          "properties": {
-            "width": {"type": "boolean"},
-            "height": {"type": "boolean"}
-          },
-          "items": {"type": "boolean"}
-        },
+        "adjustFontSize": {"$ref": "#/definitions/adjustFontSize"},
         "width": {"type": ["number", "string", "null"]},
         "height": {"type": ["number", "string", "null"]},
         "zIndex": {"type": "number"},
@@ -5240,7 +5199,12 @@
       "allOf": [{"$ref": "#/definitions/anychart.core.VisualBase"}],
       "properties": {
         "cursor": {"type": "string"},
-        "size": {"type": "number"}
+        "width": {"type": "number"},
+        "height": {"type": "number"},
+        "normal": {"$ref": "#/definitions/anychart.core.StateSettings"},
+        "hovered": {"$ref": "#/definitions/anychart.core.StateSettings"},
+        "selected": {"$ref": "#/definitions/anychart.core.StateSettings"},
+        "padding": {"$ref": "#/definitions/anychart.core.utils.Space"}
       }
     },
     "anychart.ganttModule.DataGridButton": {
@@ -5596,24 +5560,7 @@
             "string"
           ]
         },
-        "adjustFontSize": {
-          "type": [
-            "boolean",
-            "object",
-            "array"
-          ],
-          "properties": {
-            "width": {
-              "type": "boolean"
-            },
-            "height": {
-              "type": "boolean"
-            }
-          },
-          "items": {
-            "type": "boolean"
-          }
-        },
+        "adjustFontSize": {"$ref": "#/definitions/adjustFontSize"},
         "rotation": {
           "type": [
             "number",
@@ -6253,6 +6200,25 @@
         "dummyFill": {"$ref": "#/definitions/fill"},
         "dummyStroke": {"$ref": "#/definitions/stroke"},
 
+        "minFontSize": {"type": ["number", "string"]},
+        "maxFontSize": {"type": ["number", "string"]},
+        "adjustFontSize": {"$ref": "#/definitions/adjustFontSize"},
+        "fontColor": {"type": ["string", "null"]},
+        "fontOpacity": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+        "fontDecoration": {"enum": ["blink", "line-through", "overline", "underline", "none", "null"]},
+        "letterSpacing": {"type": ["string", "number", "null"]},
+        "textDirection": {"enum": ["ltr", "rtl", "null"]},
+        "lineHeight": {"type": ["string", "number", "null"]},
+        "textIndent": {"type": ["number", "null"]},
+        "vAlign": {"enum": ["top", "middle", "bottom", "null"]},
+        "hAlign": {"enum": ["left", "start", "center", "end", "right", "null"]},
+        "wordWrap": {"enum": ["normal", "break-word", "null"]},
+        "wordBreak": {"enum": ["normal", "keep-all", "break-all", "null"]},
+        "textOverflow": {"type": ["string", "null"]},
+        "selectable": {"type": ["boolean", "null"]},
+        "disablePointerEvents": {"type": ["boolean", "null"]},
+        "useHtml": {"type": ["boolean", "null"]},
+
         "labels": {
           "oneOf": [
             {"$ref": "#/definitions/disable"},
@@ -6314,6 +6280,9 @@
             {"$ref": "#/definitions/disable"},
             {"$ref": "#/definitions/anychart.core.ui.Background"}
           ]
+        },
+        "content": {
+          "type": ["string", "number"]
         }
       }
     },
@@ -6433,6 +6402,15 @@
           ]
         }
       }
+    },
+
+    "adjustFontSize": {
+      "type": ["boolean", "object", "array"],
+      "properties": {
+        "width": {"type": "boolean"},
+        "height": {"type": "boolean"}
+      },
+      "items": {"type": "boolean"}
     },
 
     "data": {

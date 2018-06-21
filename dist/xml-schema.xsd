@@ -666,13 +666,19 @@
         <xsd:attribute name="dummy_fill" type="xsd:string" />
         <xsd:attribute name="dummy_stroke" type="xsd:string" />
         <!-- tag cloud -->
-        <xsd:attribute name="font_size" type="xsd:string"/>
-        <xsd:attribute name="font_family" type="xsd:string"/>
-        <xsd:attribute name="font_style" type="enums.FontStyle"/>
-        <xsd:attribute name="font_variant" type="enums.FontVariant"/>
-        <xsd:attribute name="font_weight" type="xsd:string"/>
+        <!--<xsd:attribute name="font_size" type="xsd:string"/>-->
+        <!--<xsd:attribute name="font_family" type="xsd:string"/>-->
+        <!--<xsd:attribute name="font_style" type="enums.FontStyle"/>-->
+        <!--<xsd:attribute name="font_variant" type="enums.FontVariant"/>-->
+        <!--<xsd:attribute name="font_weight" type="xsd:string"/>-->
         <!-- pie -->
         <xsd:attribute name="explode" type="simple.NumberOrPercent"/>
+        <xsd:attribute name="min_font_size" type="xsd:string"/>
+        <xsd:attribute name="max_font_size" type="xsd:string"/>
+        <xsd:attribute name="adjust_font_size" type="simple.Bool" default="false"/>
+        <xsd:attributeGroup ref="attrs.TextSettings"/>
+        <!-- dg buttons -->
+        <xsd:attribute name="content" type="xsd:string" />
     </xsd:complexType>
 
     <!-- data complex types -->
@@ -1494,8 +1500,17 @@
     </xsd:complexType>
 
     <xsd:complexType name="ganttModule.DataGridButton">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="background" type="core.Background"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="padding" type="utils.Space" />
+            <xsd:element minOccurs="0" maxOccurs="1" name="normal" type="core.StateSettings"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="hovered" type="core.StateSettings"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="selected" type="core.StateSettings"/>
+        </xsd:all>
+
         <xsd:attributeGroup ref="attrs.VisualBase"/>
-        <xsd:attribute name="size" type="xsd:double" />
+        <xsd:attribute name="width" type="simple.NumberOrPercentOrNull" />
+        <xsd:attribute name="height" type="simple.NumberOrPercentOrNull" />
         <xsd:attribute name="cursor" type="xsd:string" />
     </xsd:complexType>
 

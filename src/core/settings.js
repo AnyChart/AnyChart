@@ -876,6 +876,7 @@ anychart.core.settings.descriptors = (function() {
   map.EXPLODE = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'explode', anychart.core.settings.numberOrPercentNormalizer];
 
   map.CURSOR = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'cursor', anychart.enums.normalizeCursor];
+  map.CONTENT = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'content', anychart.core.settings.asIsNormalizer];
 
   return map;
 })();

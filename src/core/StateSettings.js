@@ -350,7 +350,9 @@ anychart.core.StateSettings.prototype.PROPERTY_DESCRIPTORS = (function() {
     descriptors.DUMMY_FILL,
     descriptors.DUMMY_STROKE,
     // pie tasks
-    descriptors.EXPLODE
+    descriptors.EXPLODE,
+    // button content
+    descriptors.CONTENT
   ]);
 
   return map;

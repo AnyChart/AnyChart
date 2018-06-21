@@ -423,11 +423,7 @@ anychart.PointState = {
 anychart.SettingsState = {
   NORMAL: 0,
   HOVERED: 1,
-  SELECTED: 2,
-  EXPANDED: 3,
-  COLLAPSED: 4,
-  PUSHED: 5,
-  DISABLED: 6
+  SELECTED: 2
 };
 
 

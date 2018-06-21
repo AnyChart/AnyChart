@@ -35,24 +35,20 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     },
 
     'buttons': {
-      'size': 15,
       'padding': [0, 0, 0, 0],
+      'width': 15,
+      'height': 15,
       'cursor': 'pointer',
       'normal': {
         'hAlign': 'center',
         'vAlign': 'middle',
         'fontColor': '#7c868e',
-        'fontSize': '10px'
+        'fontSize': 12,
+        'content': '+'
       },
-      'collapsed': {
-        'hAlign': 'center',
-        'vAlign': 'middle',
-        'text': '+'
-      },
-      'expanded': {
-        'hAlign': 'center',
-        'vAlign': 'middle',
-        'text': '-'
+      'hovered': {},
+      'selected': {
+        'content': '-'
       }
     },
 

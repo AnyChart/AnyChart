@@ -1205,28 +1205,26 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
   'defaultButtonSettings': {
     'padding': [3, 5],
     'normal': {
+      'hAlign': 'center',
+      'vAlign': 'middle',
       'background': {
         'enabled': true,
         'stroke': '#dedede',
         'fill': '#e7e7e7',
         'corners': [0]
       },
-      'text': 'Button',
+      'content': 'Button',
       'disablePointerEvents': true,
-      'selectable': false
+      'selectable': false,
+      'adjustFontSize': {
+        'width': false,
+        'height': false
+      },
+      'minFontSize': 8,
+      'maxFontSize': 72
     },
-    'hovered': {
-      'background': {
-        'stroke': '#cecece',
-        'fill': '#eee'
-      }
-    },
-    'pushed': {
-      'background': {
-        'stroke': '#d0d0d0',
-        'fill': '#d9d9d9'
-      }
-    }
+    'hovered': {},
+    'selected': {}
   },
 
   'defaultNoDataLabel': {

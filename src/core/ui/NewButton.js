@@ -17,17 +17,14 @@ anychart.core.ui.NewButton = function() {
 
   /**
    * @type {anychart.SettingsState}
+   * @private
    */
-  this.state = anychart.SettingsState.NORMAL;
-
-  /**
-   * @type {Object.<anychart.core.StateSettings>}
-   */
-  this.stateToObjectMap = {};
+  this.state_ = anychart.SettingsState.NORMAL;
 
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.core.ui.NewButton.OWN_DESCRIPTORS_META);
 
   this.createStateSettings();
+  this.createResolveChainMap();
 };
 goog.inherits(anychart.core.ui.NewButton, anychart.core.VisualBase);
 
@@ -81,41 +78,48 @@ anychart.core.ui.NewButton.prototype.hovered = function(opt_value) {
  * @param {Object=} opt_value
  * @return {anychart.core.StateSettings|anychart.core.ui.NewButton}
  */
-anychart.core.ui.NewButton.prototype.pushed = function(opt_value) {
+anychart.core.ui.NewButton.prototype.selected = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    this.pushed_.setup(opt_value);
+    this.selected_.setup(opt_value);
     return this;
   }
-  return this.pushed_;
+  return this.selected_;
 };
 
 
 //endregion
 //region --- Interactivity / Event handling
 /**
- * @param {anychart.SettingsState} state
+ * @param {anychart.SettingsState=} opt_value
+ * @return {anychart.core.ui.NewButton|anychart.SettingsState|number}
  */
-anychart.core.ui.NewButton.prototype.setState = function(state) {
-  this.state = state;
-  this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+anychart.core.ui.NewButton.prototype.state = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.state_ != opt_value) {
+      this.state_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.state_;
 };
 
 
 /**
- * Helper that checks disabled state.
+ * Helper that checks hovered state.
  * @return {boolean}
  */
-anychart.core.ui.NewButton.prototype.isDisabled = function() {
-  return this.state == anychart.SettingsState.DISABLED;
+anychart.core.ui.NewButton.prototype.isHovered = function() {
+  return this.state_ == anychart.SettingsState.HOVERED;
 };
 
 
 /**
- * Helper that checks pushed state.
+ * Helper that checks selected state.
  * @return {boolean}
  */
-anychart.core.ui.NewButton.prototype.isPushed = function() {
-  return this.state == anychart.SettingsState.PUSHED;
+anychart.core.ui.NewButton.prototype.isSelected = function() {
+  return this.state_ == anychart.SettingsState.SELECTED;
 };
 
 
@@ -124,17 +128,8 @@ anychart.core.ui.NewButton.prototype.isPushed = function() {
  * @param {acgraph.events.BrowserEvent} event Event
  */
 anychart.core.ui.NewButton.prototype.handleMouseOver = function(event) {
-  if (this.isDisabled() || this.isPushed()) return;
-  if (this.handleBrowserEvent(event))
-    this.setState(anychart.SettingsState.HOVERED);
-};
-
-
-/**
- *  @return {anychart.SettingsState}
- */
-anychart.core.ui.NewButton.prototype.getMouseOutState = function() {
-  return anychart.SettingsState.NORMAL;
+  if (!this.isSelected() && this.handleBrowserEvent(event))
+    this.state(anychart.SettingsState.HOVERED);
 };
 
 
@@ -143,35 +138,8 @@ anychart.core.ui.NewButton.prototype.getMouseOutState = function() {
  * @param {acgraph.events.BrowserEvent} event Event
  */
 anychart.core.ui.NewButton.prototype.handleMouseOut = function(event) {
-  if (this.isDisabled() || this.isPushed()) return;
-  if (this.handleBrowserEvent(event))
-    this.setState(this.getMouseOutState());
-};
-
-
-/**
- * Handler for mouse down.
- * @param {acgraph.events.BrowserEvent} event Event
- */
-anychart.core.ui.NewButton.prototype.handleMouseDown = function(event) {
-  if (this.isDisabled() || this.isPushed())
-    return;
-
-  if (this.handleBrowserEvent(event)) {
-    this.setState(anychart.SettingsState.PUSHED);
-    goog.events.listenOnce(document, acgraph.events.EventType.MOUSEUP, this.handleGlobalMouseUp, false, this);
-  }
-};
-
-
-/**
- * Handler for global mouse up.
- * @param {acgraph.events.BrowserEvent} event Event
- */
-anychart.core.ui.NewButton.prototype.handleGlobalMouseUp = function(event) {
-  if (event['target'] != this.hoverRect_.domElement()) {
-    this.setState(anychart.SettingsState.NORMAL);
-  }
+  if (!this.isSelected() && this.handleBrowserEvent(event))
+    this.state(anychart.SettingsState.NORMAL);
 };
 
 
@@ -180,12 +148,17 @@ anychart.core.ui.NewButton.prototype.handleGlobalMouseUp = function(event) {
  * @param {acgraph.events.BrowserEvent} event Event
  */
 anychart.core.ui.NewButton.prototype.handleMouseClick = function(event) {
-  if (this.isDisabled())
-    return;
-
   if (this.handleBrowserEvent(event)) {
-    this.setState(anychart.SettingsState.HOVERED);
+    this.toggleButtonState();
   }
+};
+
+
+/**
+ * Toggles button state between SELECTED and NORMAL (HOVERED, cause after click mouse will be on button);
+ */
+anychart.core.ui.NewButton.prototype.toggleButtonState = function() {
+  this.isSelected() ? this.state(anychart.SettingsState.HOVERED) : this.state(anychart.SettingsState.SELECTED);
 };
 
 
@@ -233,16 +206,10 @@ anychart.core.ui.NewButton.OWN_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
 
-  function sizeNormalizer(opt_value) {
-    opt_value = anychart.utils.toNumber(opt_value);
-    return isNaN(opt_value) ? this.getOption('size') : opt_value;
-  }
-
   anychart.core.settings.createDescriptors(map, [
     anychart.core.settings.descriptors.CURSOR,
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'size', sizeNormalizer]
-    //anychart.core.settings.descriptors.WIDTH,
-    //anychart.core.settings.descriptors.HEIGHT
+    anychart.core.settings.descriptors.WIDTH,
+    anychart.core.settings.descriptors.HEIGHT
   ]);
 
   return map;
@@ -255,20 +222,15 @@ anychart.core.settings.populate(anychart.core.ui.NewButton, anychart.core.ui.New
  */
 anychart.core.ui.NewButton.OWN_DESCRIPTORS_META = ([
   ['cursor', anychart.ConsistencyState.BUTTON_CURSOR, anychart.Signal.NEEDS_REDRAW],
-  ['size', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW]
-  //['width', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW],
-  //['height', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW]
+  ['width', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW],
+  ['height', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW]
 ]);
 
 
 /**
  * @const {!Array.<Array>}
  */
-anychart.core.ui.NewButton.STATE_DESCRIPTORS_OVERRIDE = (function() {
-  var rv = anychart.core.settings.createTextPropertiesDescriptorsTemplate();
-  rv.push([anychart.enums.PropertyHandlerType.SINGLE_ARG, 'text', anychart.core.settings.asIsNormalizer]);
-  return rv;
-})();
+anychart.core.ui.NewButton.STATE_DESCRIPTORS_OVERRIDE = anychart.core.settings.createTextPropertiesDescriptorsTemplate();
 
 
 /**
@@ -278,8 +240,8 @@ anychart.core.ui.NewButton.STATE_DESCRIPTORS_META_NORMAL = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptorMeta>} */
   var map = {};
   anychart.core.settings.createDescriptorsMeta(map, [
-    ['text', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW],
-    ['background', 0, 0]
+    ['background', 0, 0],// anychart.ConsistencyState.BUTTON_BACKGROUND, anychart.Signal.NEEDS_REDRAW],
+    ['content', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW]
   ]);
   anychart.core.settings.createTextPropertiesDescriptorsMeta(
       map,
@@ -289,30 +251,15 @@ anychart.core.ui.NewButton.STATE_DESCRIPTORS_META_NORMAL = (function() {
       anychart.Signal.NEEDS_REDRAW);
   return map;
 })();
-//anychart.core.settings.populateAliases(anychart.core.ui.NewButton, goog.object.getKeys(anychart.core.ui.NewButton.STATE_DESCRIPTORS_META_NORMAL), 'normal');
-
-
-/**
- * @type {!Object.<string, anychart.core.settings.PropertyDescriptorMeta>}
- */
-anychart.core.ui.NewButton.STATE_DESCRIPTORS_META_STATE = (function() {
-  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptorMeta>} */
-  var map = {};
-  anychart.core.settings.createDescriptorsMeta(map, [
-    ['text', 0, 0],
-    ['background', 0, 0]
-  ]);
-  anychart.core.settings.createTextPropertiesDescriptorsMeta(map, 0, 0, 0, 0);
-  return map;
-})();
+anychart.core.settings.populateAliases(anychart.core.ui.NewButton, goog.object.getKeys(anychart.core.ui.NewButton.STATE_DESCRIPTORS_META_NORMAL), 'normal');
 
 
 //endregion
 //region --- Drawing
 /**
- * Ensure creation.
+ * Prepare drawable entities.
  */
-anychart.core.ui.NewButton.prototype.ensureCreated = function() {
+anychart.core.ui.NewButton.prototype.prepareDrawable = function() {
   if (!this.rootLayer) {
     this.rootLayer = acgraph.layer();
 
@@ -324,14 +271,39 @@ anychart.core.ui.NewButton.prototype.ensureCreated = function() {
     this.background_.setParentEventTarget(this);
 
     // rect for intercepting events
-    this.hoverRect_ = acgraph.rect().parent(this.rootLayer).stroke(null).fill(anychart.color.TRANSPARENT_HANDLER).zIndex(999);
+    this.hoverRect_ = this.rootLayer.rect()
+        .stroke(null)
+        .fill(anychart.color.TRANSPARENT_HANDLER)
+        .zIndex(999);
 
-    this.bindHandlersToGraphics(this.hoverRect_, this.handleMouseOver, this.handleMouseOut, this.handleMouseClick, null,
-        this.handleMouseDown);
+    this.bindHandlersToGraphics(/** @type {acgraph.vector.Rect} */ (this.hoverRect_),
+        this.handleMouseOver,   // mouse over handler
+        this.handleMouseOut,    // mouse out handler
+        this.handleMouseClick,  // mouse click handler
+        null);                  // mouse move handler
   }
 
   if (!this.textElement_)
-    this.textElement_ = /** @type {acgraph.vector.Text} */(acgraph.text().zIndex(1).parent(this.rootLayer));
+    this.textElement_ = /** @type {acgraph.vector.Text} */(acgraph.text().zIndex(1));
+  if (!this.element_)
+    this.element_ = /** @type {acgraph.vector.Path} */ (acgraph.path().zIndex(1).stroke(null).fill(null));
+
+  var content = this.resolveOption('content');
+  this.isTextContent = goog.isString(content) || goog.isNumber(content);
+  this.isFunction = goog.isFunction(content);
+
+  // there is only one drawable - this.textElement_ or this.element_
+  // remove content from button root layer
+  this.element_.parent(null);
+  this.textElement_.parent(null);
+
+  // set parent for element depending on content type
+  if (this.isTextContent) {
+    this.textElement_.parent(this.rootLayer);
+  } else if (this.isFunction) {
+    this.drawFunction = content;
+    this.element_.parent(this.rootLayer);
+  }
 };
 
 
@@ -352,7 +324,7 @@ anychart.core.ui.NewButton.prototype.draw = function() {
 
   this.suspendSignalsDispatching();
 
-  this.ensureCreated();
+  this.prepareDrawable();
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
     this.rootLayer.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
@@ -370,7 +342,8 @@ anychart.core.ui.NewButton.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    this.applyTextSettings();
+    if (this.isTextContent)
+      this.applyTextSettings();
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
@@ -380,7 +353,8 @@ anychart.core.ui.NewButton.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    this.drawText();
+    if (this.isTextContent)
+      this.drawText();
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
 
@@ -394,19 +368,40 @@ anychart.core.ui.NewButton.prototype.draw = function() {
 
 
 /**
- * Check
+ * Check the dimensions.
+ * Return values are:
+ * -1 means that bounds are smaller that compareBounds
+ *  0 means that bounds are the same as compareBounds
+ *  1 means that bounds are greater that compareBounds
  * @param {number} width
  * @param {number} height
- * @param {number} originWidth
- * @param {number} originHeight
+ * @param {number} compareWidth
+ * @param {number} compareHeight
  * @return {number}
  * @private
  */
-anychart.core.ui.NewButton.prototype.check_ = function(width, height, originWidth, originHeight) {
-  if (width > originWidth || height > originHeight) {
-    return 1;
-  } else if (width < originWidth || height < originHeight) {
-    return -1;
+anychart.core.ui.NewButton.prototype.check_ = function(width, height, compareWidth, compareHeight) {
+  var adjustFontSize = this.resolveOption('adjustFontSize');
+  if (adjustFontSize) {
+    if (adjustFontSize.width && adjustFontSize.height) {
+      if (width > compareWidth || height > compareHeight) {
+        return 1;
+      } else if (width < compareWidth || height < compareHeight) {
+        return -1;
+      }
+    } else if (adjustFontSize.width) {
+      if (width > compareWidth) {
+        return 1;
+      } else if (width < compareWidth) {
+        return -1;
+      }
+    } else if (adjustFontSize.height) {
+      if (height > compareHeight) {
+        return 1;
+      } else if (height < compareHeight) {
+        return -1;
+      }
+    }
   }
 
   return 0;
@@ -415,12 +410,14 @@ anychart.core.ui.NewButton.prototype.check_ = function(width, height, originWidt
 
 /**
  * Adjust font size by width/height.
+ * @param {number} compareWidth
+ * @param {number} compareHeight
  * @return {number}
  * @private
  */
-anychart.core.ui.NewButton.prototype.calculateFontSize_ = function() {
-  var minFontSize = 6;
-  var maxFontSize = 72;
+anychart.core.ui.NewButton.prototype.calculateFontSize_ = function(compareWidth, compareHeight) {
+  var minFontSize = /** @type {number} */ (this.resolveOption('minFontSize'));
+  var maxFontSize = /** @type {number} */ (this.resolveOption('maxFontSize'));
   /** @type {number} */
   var fontSize = Math.round((maxFontSize + minFontSize) / 2);
 
@@ -433,19 +430,27 @@ anychart.core.ui.NewButton.prototype.calculateFontSize_ = function() {
   /** @type {number} */
   var checked;
 
+  var textBounds;
+
   var text = acgraph.text();
   text.attr('aria-hidden', 'true');
   this.applyTextSettings(text);
 
   // check if the maximal value is ok
   text.fontSize(/** @type {number} */ (maxFontSize));
-  if (this.check_(text.getBounds().width, text.getBounds().height, this.textWidth, this.textHeight) <= 0) {
+  textBounds = text.getBounds();
+
+  checked = this.check_(textBounds.width, textBounds.height, compareWidth, compareHeight);
+  if (checked <= 0) {
     return /** @type {number} */ (maxFontSize);
   }
+
   // set initial fontSize - that's half way between min and max
   text.fontSize(fontSize);
+  textBounds = text.getBounds();
+
   // check sign
-  var sign = checked = this.check_(text.getBounds().width, text.getBounds().height, this.textWidth, this.textHeight);
+  var sign = checked = this.check_(textBounds.width, textBounds.height, compareWidth, compareHeight);
 
   // divide in half and iterate waiting for the sign to change
   while (from != to) {
@@ -458,9 +463,12 @@ anychart.core.ui.NewButton.prototype.calculateFontSize_ = function() {
     } else {
       break;
     }
+
     text.fontSize(fontSize);
-    checked = this.check_(text.getBounds().width, text.getBounds().height, this.textWidth, this.textHeight);
-    // sign changd if product is negative, 0 is an exit too
+    textBounds = text.getBounds();
+
+    checked = this.check_(textBounds.width, textBounds.height, compareWidth, compareHeight);
+    // sign changed if product is negative, 0 is an exit too
     if (sign * checked <= 0) {
       break;
     }
@@ -476,13 +484,24 @@ anychart.core.ui.NewButton.prototype.calculateFontSize_ = function() {
   do {
     fontSize += sign;
     text.fontSize(fontSize);
-    checked = this.check_(text.getBounds().width, text.getBounds().height, this.textWidth, this.textHeight);
+    textBounds = text.getBounds();
+    checked = this.check_(textBounds.width, textBounds.height, compareWidth, compareHeight);
   } while (sign * checked < 0);
 
   goog.dispose(text);
   // decrease font size only if we've been increasing it - we are looking for size to fit in bounds
-  if (sign > 0) fontSize -= sign;
+  // if (sign > 0) fontSize -= sign;
   return fontSize;
+};
+
+
+/**
+ * Whether adjust font size enabled.
+ * @return {boolean} is adjustment enabled.
+ */
+anychart.core.ui.NewButton.prototype.adjustEnabled = function() {
+  var adjustFontSize = this.resolveOption('adjustFontSize');
+  return /** @type {boolean} */ ((adjustFontSize && (adjustFontSize.width || adjustFontSize.height)));
 };
 
 
@@ -490,9 +509,13 @@ anychart.core.ui.NewButton.prototype.calculateFontSize_ = function() {
  *  Draws text.
  */
 anychart.core.ui.NewButton.prototype.drawText = function() {
-  var fontSize = this.calculateFontSize_();
-  this.textElement_.fontSize(fontSize);
+  if (this.adjustEnabled()) {
+    var fontSize = this.calculateFontSize_(this.backgroundWidth, this.backgroundHeight);
+    this.textElement_.fontSize(fontSize);
+  }
   this.textElement_.x(this.textX);
+  // if font size presented and it odd we deduct from y for better look of the text
+  // this.textElement_.y(this.textY - (fontSize ? (fontSize % 2) ? 1 : 0 : 0));
   this.textElement_.y(this.textY - 1);
   this.textElement_.clip(this.backgroundBounds);
 };
@@ -531,6 +554,11 @@ anychart.core.ui.NewButton.prototype.backgroundInvalidated_ = function(event) {
  *  @protected
  */
 anychart.core.ui.NewButton.prototype.createStateSettings = function() {
+  /**
+   * @type {Object.<anychart.core.StateSettings>}
+   */
+  this.stateToObjectMap = {};
+
   this.normal_ = new anychart.core.StateSettings(
       this,
       anychart.core.ui.NewButton.STATE_DESCRIPTORS_META_NORMAL,
@@ -543,23 +571,84 @@ anychart.core.ui.NewButton.prototype.createStateSettings = function() {
       anychart.SettingsState.HOVERED,
       anychart.core.ui.NewButton.STATE_DESCRIPTORS_OVERRIDE);
 
-  this.pushed_ = new anychart.core.StateSettings(
+  this.selected_ = new anychart.core.StateSettings(
       this,
       anychart.core.ui.NewButton.STATE_DESCRIPTORS_META_NORMAL,
-      anychart.SettingsState.PUSHED,
+      anychart.SettingsState.SELECTED,
       anychart.core.ui.NewButton.STATE_DESCRIPTORS_OVERRIDE);
 
   this.stateToObjectMap[anychart.SettingsState.NORMAL] = this.normal_;
   this.stateToObjectMap[anychart.SettingsState.HOVERED] = this.hovered_;
-  this.stateToObjectMap[anychart.SettingsState.PUSHED] = this.pushed_;
+  this.stateToObjectMap[anychart.SettingsState.SELECTED] = this.selected_;
 };
 
 
 /**
- * @return {Array.<anychart.SettingsState>}
+ * Creates chains to resolve options.
  */
-anychart.core.ui.NewButton.prototype.getStateSettingsResolveOrder = function() {
-  return [this.state, anychart.SettingsState.NORMAL];
+anychart.core.ui.NewButton.prototype.createResolveChainMap = function() {
+  var normal = this.stateToObjectMap[anychart.SettingsState.NORMAL];
+  var hovered = this.stateToObjectMap[anychart.SettingsState.HOVERED];
+  var selected = this.stateToObjectMap[anychart.SettingsState.SELECTED];
+
+  /**
+   * Object that contains resolution chains for simple properties depends on state.
+   * @type {Object.<anychart.SettingsState, Array>}
+   */
+  this.stateToChainMap = {};
+
+  this.stateToChainMap[anychart.SettingsState.NORMAL] = [
+    normal.ownSettings,
+    normal.themeSettings
+  ];
+  this.stateToChainMap[anychart.SettingsState.HOVERED] = [
+    hovered.ownSettings,
+    hovered.themeSettings,
+    normal.ownSettings,
+    normal.themeSettings
+  ];
+  this.stateToChainMap[anychart.SettingsState.SELECTED] = [
+    selected.ownSettings,
+    selected.themeSettings,
+    normal.ownSettings,
+    normal.themeSettings
+  ];
+
+  /**
+   * Object that contains resolution chains for background property depends on state.
+   * @type {Object.<anychart.SettingsState, Array>}
+   */
+  this.backgroundStateToChainMap = {};
+
+  var normalBackground = normal['background']();
+  var hoveredBackground = hovered['background']();
+  var selectedBackground = selected['background']();
+
+  this.backgroundStateToChainMap[anychart.SettingsState.NORMAL] = [
+    normalBackground.themeSettings,
+    normalBackground.ownSettings
+  ];
+  this.backgroundStateToChainMap[anychart.SettingsState.HOVERED] = [
+    normalBackground.themeSettings,
+    normalBackground.ownSettings,
+    hoveredBackground.themeSettings,
+    hoveredBackground.ownSettings
+  ];
+  this.backgroundStateToChainMap[anychart.SettingsState.SELECTED] = [
+    normalBackground.themeSettings,
+    normalBackground.ownSettings,
+    selectedBackground.themeSettings,
+    selectedBackground.ownSettings
+  ];
+};
+
+
+/**
+ * Called when anychart.core.settings.getOption method is called.
+ * @return {Array} Resolution chain for current button state.
+ */
+anychart.core.ui.NewButton.prototype.getResolutionChain = function() {
+  return this.stateToChainMap[this.state_];
 };
 
 
@@ -569,32 +658,19 @@ anychart.core.ui.NewButton.prototype.getStateSettingsResolveOrder = function() {
  */
 anychart.core.ui.NewButton.prototype.resolveOption = function(name) {
   var rv;
-  var order = this.getStateSettingsResolveOrder();
-  var i;
-  var values = [];
-  var theme = [];
   if (name == 'background') {
+    // Object that will contain final background settings.
+    // Always create new one because goog.object.extend
+    // modifies extendable object.
     rv = {};
-    for (i = order.length; i; i--) {
-      var background = this.stateToObjectMap[order[i - 1]]['background']();
-      values.push(background.ownSettings);
-      theme.push(background.themeSettings);
-      background.markConsistent(anychart.ConsistencyState.ALL);
-    }
-    theme.push.apply(theme, values);
-    theme.unshift(rv);
-    goog.object.extend.apply(null, theme);
-    return rv;
+    var chain = goog.array.concat(rv, this.backgroundStateToChainMap[this.state_]);
+    goog.object.extend.apply(null, chain);
   } else {
-    for (i = 0; i < order.length; i++) {
-      var state = this.stateToObjectMap[order[i]];
-      if (state) {
-        values.push(state.ownSettings[name]);
-        theme.push(state.themeSettings[name]);
-      }
-    }
-    values.push(theme);
-    rv = anychart.utils.getFirstDefinedValue.apply(null, values);
+    // this method exists for IResolvable interfaces,
+    // but we use it without implementation because of
+    // it's convenience. That's why so dirty-hack typecast - to fool compiler (^_^').
+    // It will call getResolutionChain method that we implemented above.
+    rv = anychart.core.settings.getOption.call(/** @type {anychart.core.settings.IResolvable} */ (this), name);
   }
   return rv;
 };
@@ -612,7 +688,7 @@ anychart.core.ui.NewButton.prototype.applyTextSettings = function(opt_textElemen
   textElement.disablePointerEvents(/** @type {boolean} */ (this.resolveOption('disablePointerEvents')));
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS) || opt_textElement) {
-    var text = this.resolveOption('text');
+    var text = this.resolveOption('content');
     var useHtml = this.resolveOption('useHtml');
 
     if (goog.isDef(text)) {
@@ -656,8 +732,8 @@ anychart.core.ui.NewButton.prototype.calculateBounds = function() {
   var autoWidth;
   var autoHeight;
 
-  var w = /** @type {number} */(this.getOption('size'));
-  var h = /** @type {number} */(this.getOption('size'));
+  var w = /** @type {number} */(this.getOption('width'));
+  var h = /** @type {number} */(this.getOption('height'));
   var textWidth = 0;
   var textHeight = 0;
   if (parentBounds) {
@@ -698,40 +774,60 @@ anychart.core.ui.NewButton.prototype.calculateBounds = function() {
     }
   }
 
-  var padding = this.padding();
-
-  this.textElement_.width(null);
-  this.textElement_.height(null);
-
-  if (autoWidth) {
-    width += this.textElement_.getBounds().width;
-    this.textWidth = width;
-    this.backgroundWidth = padding.widenWidth(width);
-  } else {
-    this.textWidth = padding.tightenWidth(textWidth);
-  }
-
-  this.textElement_.width(this.textWidth);
-
-  if (autoHeight) {
-    height += this.textElement_.getBounds().height;
-    this.textHeight = height;
-    this.backgroundHeight = padding.widenHeight(height);
-  } else {
-    this.textHeight = padding.tightenHeight(textHeight);
-  }
-
-  this.textElement_.height(this.textHeight);
-
-  this.textX = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption('left')), this.backgroundWidth);
-  this.textY = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption('top')), this.backgroundHeight);
-
   var position = anychart.math.normalizeCoordinate(this.position_);
   position.x = parentWidth ? anychart.utils.normalizeSize(position.x, parentWidth) : 0;
   position.y = parentHeight ? anychart.utils.normalizeSize(position.y, parentHeight) : 0;
 
-  this.textX += position.x;
-  this.textY += position.y;
+  if (this.isTextContent) {
+    var padding = this.padding();
+    this.textElement_.width(null);
+    this.textElement_.height(null);
+
+    if (autoWidth) {
+      width += this.textElement_.getBounds().width;
+      this.textWidth = width;
+      this.backgroundWidth = padding.widenWidth(width);
+    } else {
+      this.textWidth = padding.tightenWidth(textWidth);
+    }
+
+    this.textElement_.width(this.textWidth);
+
+    if (autoHeight) {
+      height += this.textElement_.getBounds().height;
+      this.textHeight = height;
+      this.backgroundHeight = padding.widenHeight(height);
+    } else {
+      this.textHeight = padding.tightenHeight(textHeight);
+    }
+
+    this.textElement_.height(this.textHeight);
+
+    this.textX = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption('left')), this.backgroundWidth);
+    this.textY = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption('top')), this.backgroundHeight);
+
+    this.textX += position.x;
+    this.textY += position.y;
+  }
+
+  if (this.isFunction) {
+    var ctx = {
+      'path': this.element_,
+      'width': w,
+      'height': h,
+      'state': this.isSelected() ? 'selected' : this.isHovered() ? 'hovered' : 'normal'
+    };
+    this.drawFunction.call(ctx, this.element_);
+    var bounds = this.element_.getBounds();
+    if (autoWidth) {
+      this.backgroundWidth = bounds.left + bounds.width;
+    }
+    if (autoHeight) {
+      this.backgroundHeight = bounds.top + bounds.height;
+    }
+    this.element_.setTransformationMatrix(1, 0, 0, 1, position.x, position.y);
+  }
+
   this.backgroundBounds = new anychart.math.Rect(position.x, position.y, this.backgroundWidth, this.backgroundHeight);
   this.hoverRect_.setBounds(this.backgroundBounds);
 };
@@ -775,7 +871,7 @@ anychart.core.ui.NewButton.prototype.serialize = function() {
 anychart.core.ui.NewButton.prototype.serializeStates = function(json) {
   json['normal'] = this.normal_.serialize();
   json['hovered'] = this.hovered_.serialize();
-  json['pushed'] = this.pushed_.serialize();
+  json['selected'] = this.selected_.serialize();
 };
 
 
@@ -784,23 +880,11 @@ anychart.core.ui.NewButton.prototype.setupByJSON = function(config, opt_default)
   anychart.core.ui.NewButton.base(this, 'setupByJSON', config, opt_default);
   anychart.core.settings.deserialize(this, anychart.core.ui.NewButton.OWN_DESCRIPTORS, config, opt_default);
 
-  //this.padding().setupInternal(!!opt_default, config['padding']);
-  this.padding().setupInternal(!!opt_default, anychart.getFullTheme('defaultDataGrid.buttons.padding'));
+  this.padding().setupInternal(!!opt_default, config['padding']);
 
-  this.setupStateSettings(config, !!opt_default);
-};
-
-
-/**
- *  Setup state settings.
- *  @param {Object} config
- *  @param {boolean} isDefault
- */
-anychart.core.ui.NewButton.prototype.setupStateSettings = function(config, isDefault) {
-  var cfg = anychart.getFullTheme('defaultDataGrid.buttons');
-  this.normal_.setupInternal(isDefault, cfg['normal']);
-  this.hovered_.setupInternal(isDefault, cfg['hovered']);
-  this.pushed_.setupInternal(isDefault, cfg['pushed']);
+  this.normal_.setupInternal(!!opt_default, config['normal']);
+  this.hovered_.setupInternal(!!opt_default, config['hovered']);
+  this.selected_.setupInternal(!!opt_default, config['selected']);
 };
 
 
@@ -820,12 +904,12 @@ anychart.core.ui.NewButton.prototype.disposeInternal = function() {
 //endregion
 //region --- Exports
 // exports
-//(function() {
-//  var proto = anychart.core.ui.NewButton.prototype;
-//  proto['normal'] = proto.normal;
-//  proto['hovered'] = proto.hovered;
-//  proto['pushed'] = proto.pushed;
-//  proto['padding'] = proto.padding;
-//  proto['position'] = proto.position;
-//})();
+(function() {
+  var proto = anychart.core.ui.NewButton.prototype;
+  proto['normal'] = proto.normal;
+  proto['hovered'] = proto.hovered;
+  proto['selected'] = proto.selected;
+  proto['padding'] = proto.padding;
+  // proto['position'] = proto.position;
+})();
 //endregion

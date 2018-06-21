@@ -739,7 +739,16 @@ anychart.ganttModule.Column.prototype.draw = function() {
       this.labelsTexts_.length = 0;
       counter = -1;
       var dataGridButtons = this.dataGrid_.buttons();
+
+      // this move needs for case when content is function cause function do not serialize
+      var normalContent = dataGridButtons.normal().getOption('content');
+      var hoveredContent = dataGridButtons.hovered().getOption('content');
+      var selectedContent = dataGridButtons.selected().getOption('content');
       var buttonsJson = dataGridButtons.serialize();
+      buttonsJson['normal']['content'] = normalContent;
+      buttonsJson['hovered']['content'] = anychart.utils.getFirstDefinedValue(hoveredContent, normalContent);
+      buttonsJson['selected']['content'] = anychart.utils.getFirstDefinedValue(selectedContent, normalContent);
+
       dataGridButtons.markConsistent(anychart.ConsistencyState.ALL);
       for (i = startIndex; i <= endIndex; i++) {
         item = data[i];
@@ -765,9 +774,10 @@ anychart.ganttModule.Column.prototype.draw = function() {
           button.suspendSignalsDispatching();
           button.setup(buttonsJson);
 
-          addButton = (dataGridButtons.getOption('size') || 0) + anychart.ganttModule.DataGrid.DEFAULT_PADDING;
+          addButton = (dataGridButtons.getOption('width') || 0) + anychart.ganttModule.DataGrid.DEFAULT_PADDING;
 
-          var top = totalTop + ((height - anychart.ganttModule.DataGridButton.DEFAULT_BUTTON_SIDE) / 2);
+          // var top = totalTop + ((height - anychart.ganttModule.DataGridButton.DEFAULT_BUTTON_SIDE) / 2);
+          var top = totalTop + ((height - (/** @type {number} */ (dataGridButtons.getOption('height')) || 0)) / 2);
 
           var pixelShift = (acgraph.type() === acgraph.StageType.SVG) ? .5 : 0;
           button
@@ -778,7 +788,20 @@ anychart.ganttModule.Column.prototype.draw = function() {
                 'x': Math.floor(this.pixelBoundsCache_.left + padding) + pixelShift,
                 'y': Math.floor(top) + pixelShift
               })
-              .setState(!!item.meta('collapsed') ? anychart.SettingsState.COLLAPSED : anychart.SettingsState.EXPANDED);
+              .state(!!item.meta('collapsed') ? // is item collapsed ?
+
+                  // check if hovered (when collapse state triggered by button)
+                  button.isHovered() ?
+
+                      // save hovered state in case of hovered
+                      anychart.SettingsState.HOVERED :
+
+                      // set to normal (collapsed) in case of normal and not hovered
+                      // (when buttons are redrawn by clicking other buttons)
+                      anychart.SettingsState.NORMAL :
+
+                  // SELECTED (expanded) otherwise
+                  anychart.SettingsState.SELECTED);
 
           button.resumeSignalsDispatching(false);
           button.draw();
@@ -793,7 +816,7 @@ anychart.ganttModule.Column.prototype.draw = function() {
            Now, format function called like that - .call(context, context), but it happens in LabelsFactory.
            For save legacy behaviour here is this mixin.
          */
-        var dataItemMethods = ['get', 'set','meta', 'del', 'getParent', 'addChild', 'addChildAt', 'getChildren', 'numChildren', 'getChildAt', 'remove', 'removeChild', 'removeChildAt', 'removeChildren', 'indexOfChild'];
+        var dataItemMethods = ['get', 'set', 'meta', 'del', 'getParent', 'addChild', 'addChildAt', 'getChildren', 'numChildren', 'getChildAt', 'remove', 'removeChild', 'removeChildAt', 'removeChildren', 'indexOfChild'];
         goog.array.forEach(dataItemMethods, function(methodName) {
           var wrappedMethod = item['__wrapped' + methodName];
           if (!wrappedMethod) {

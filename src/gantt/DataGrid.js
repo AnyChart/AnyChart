@@ -1163,11 +1163,6 @@ anychart.ganttModule.DataGrid.prototype.serialize = function() {
   json['horizontalOffset'] = this.horizontalOffset();
 
   json['buttons'] = this.buttons().serialize();
-  delete json['buttons']['normal'];
-  delete json['buttons']['hovered'];
-  delete json['buttons']['expanded'];
-  delete json['buttons']['collapsed'];
-  delete json['buttons']['padding'];
 
   json['columns'] = [];
 
@@ -1190,7 +1185,7 @@ anychart.ganttModule.DataGrid.prototype.setupByJSON = function(config, opt_defau
   anychart.core.settings.deserialize(this, anychart.ganttModule.DataGrid.COLOR_DESCRIPTORS, config, opt_default);
   this.horizontalOffset(config['horizontalOffset']);
 
-  this.buttons(config['buttons']);
+  this.buttons().setupInternal(!!opt_default, config['buttons']);
 
   if ('defaultColumnSettings' in config)
     this.defaultColumnSettings(config['defaultColumnSettings']);
