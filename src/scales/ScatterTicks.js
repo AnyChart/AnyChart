@@ -475,7 +475,9 @@ anychart.scales.ScatterTicks.prototype.setupLinear_ = function(min, max, canModi
     for (var q = minCount; q <= maxCount; q++) {
       var count = q - 1; // it should be valid here
       currentInterval = anychart.math.specialRound(range / count);
-      //console.log(currentInterval);
+      if (currentInterval == 0)
+        currentInterval = anychart.math.specialRound(range / count, 7);
+
       // Here we can add other interval rounding options and choose the best
       // For example, with fractional values powers of 2 give better result because they divide interval in 2, 4, 8,
       // with big values: powers of 10 work better, and so long.
@@ -521,6 +523,11 @@ anychart.scales.ScatterTicks.prototype.setupLinear_ = function(min, max, canModi
         interval = currentInterval;
       }
     }
+  }
+
+  if (isNaN(interval)) {
+    // This should never happen but if interval is still NaN browser crashes
+    interval = 0.5;
   }
 
   var result = [min, max];

@@ -148,8 +148,8 @@ anychart.scales.ScatterBase.prototype.minimum = function(opt_value) {
       this.consistent = false;
       if (auto)
         this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
-      else
-        this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
+
+      this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
     }
     return this;
   }
@@ -174,8 +174,8 @@ anychart.scales.ScatterBase.prototype.maximum = function(opt_value) {
       this.consistent = false;
       if (auto)
         this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
-      else
-        this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
+
+      this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
     }
     return this;
   }
@@ -470,14 +470,15 @@ anychart.scales.ScatterBase.prototype.determineScaleMinMax = function() {
     cannotChangeMax = true;
   }
 
-  if (anychart.math.roughlyEqual(min, max, 1e-7)) {
+  if (anychart.math.roughlyEqual(min, max, 1e-6)) {
+    var d = min == max ? .5 : 1e-5;
     if (cannotChangeMax) {
-      min--;
+      min -= d * 2;
     } else if (cannotChangeMin) {
-      max++;
+      max += d * 2;
     } else {
-      min -= .5;
-      max += .5;
+      min -= d;
+      max += d;
     }
   }
 
@@ -506,13 +507,17 @@ anychart.scales.ScatterBase.prototype.determineScaleMinMax = function() {
 anychart.scales.ScatterBase.prototype.applyGaps = function(min, max, canChangeMin, canChangeMax, stickToZero, round) {
   if (canChangeMin || canChangeMax) {
     var tmp;
+    var tmp2;
     var range = max - min;
     if (canChangeMin) {
       tmp = min - range * this.minimumRangeBasedGap;
       if (stickToZero && (min * tmp <= 0)) {
         tmp = 0;
       } else if (round) {
-        tmp = anychart.math.specialRound(tmp);
+        tmp2 = anychart.math.specialRound(tmp);
+        if (tmp2 > tmp)
+          tmp2 -= 1e-6;
+        tmp = tmp2;
       }
       min = tmp;
     }
@@ -521,7 +526,10 @@ anychart.scales.ScatterBase.prototype.applyGaps = function(min, max, canChangeMi
       if (stickToZero && (max * tmp <= 0)) {
         tmp = 0;
       } else if (round) {
-        tmp = anychart.math.specialRound(tmp);
+        tmp2 = anychart.math.specialRound(tmp);
+        if (tmp2 < tmp)
+          tmp2 += 1e-6;
+        tmp = tmp2;
       }
       max = tmp;
     }
