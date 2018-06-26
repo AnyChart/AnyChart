@@ -240,18 +240,24 @@ anychart.color.fillOrStrokeToHex_ = function(fillOrStroke) {
  * @return {(string|acgraph.vector.Fill|acgraph.vector.Stroke)} Hex representation of the lightened color, or Color if color can not be lighten.
  */
 anychart.color.lighten = function(fillOrStroke, opt_factor) {
-  if (goog.isObject(fillOrStroke) && goog.isDef(fillOrStroke['keys'])) {
-    var newFillOrStroke = /** @type {acgraph.vector.Fill} */ (goog.object.clone(fillOrStroke));
-    var keys = newFillOrStroke['keys'];
-    var newKeys = [];
-    for (var i = 0, len = keys.length; i < len; i++) {
-      var key = goog.object.clone(keys[i]);
-      key['color'] = anychart.color.lighten(key['color']);
-      newKeys.push(key);
+  if (goog.isObject(fillOrStroke)) {
+    if (goog.isDef(fillOrStroke['color']) || goog.isDef(fillOrStroke['keys'])) {
+      var newFillOrStroke = /** @type {acgraph.vector.Fill} */ (goog.object.clone(fillOrStroke));
+      if (goog.isDef(fillOrStroke['keys'])) {
+        var keys = newFillOrStroke['keys'];
+        var newKeys = [];
+        for (var i = 0, len = keys.length; i < len; i++) {
+          var key = goog.object.clone(keys[i]);
+          key['color'] = anychart.color.lighten(key['color'], opt_factor);
+          newKeys.push(key);
+        }
+        newFillOrStroke['keys'] = newKeys;
+      }
+      if (goog.isDef(newFillOrStroke['color']))
+        newFillOrStroke['color'] = anychart.color.lighten(newFillOrStroke['color'], opt_factor);
+      return newFillOrStroke;
     }
-    newFillOrStroke['keys'] = newKeys;
-    return newFillOrStroke;
-
+    return fillOrStroke;
   } else {
     var hex;
     // if null is returned then we can't get a hex representation and return the initial color
@@ -282,18 +288,24 @@ anychart.color.lighten = function(fillOrStroke, opt_factor) {
  * @return {(string|acgraph.vector.Fill|acgraph.vector.Stroke)} Hex representation of the darkened color, or Color if color can't be darkened.
  */
 anychart.color.darken = function(fillOrStroke, opt_factor) {
-  if (goog.isObject(fillOrStroke) && goog.isDef(fillOrStroke['keys'])) {
-    var newFillOrStroke = /** @type {acgraph.vector.Fill} */ (goog.object.clone(fillOrStroke));
-    var keys = newFillOrStroke['keys'];
-    var newKeys = [];
-    for (var i = 0, len = keys.length; i < len; i++) {
-      var key = goog.object.clone(keys[i]);
-      key['color'] = anychart.color.darken(key['color']);
-      newKeys.push(key);
+  if (goog.isObject(fillOrStroke)) {
+    if (goog.isDef(fillOrStroke['color']) || goog.isDef(fillOrStroke['keys'])) {
+      var newFillOrStroke = /** @type {acgraph.vector.Fill} */ (goog.object.clone(fillOrStroke));
+      if (goog.isDef(fillOrStroke['keys'])) {
+        var keys = newFillOrStroke['keys'];
+        var newKeys = [];
+        for (var i = 0, len = keys.length; i < len; i++) {
+          var key = goog.object.clone(keys[i]);
+          key['color'] = anychart.color.darken(key['color'], opt_factor);
+          newKeys.push(key);
+        }
+        newFillOrStroke['keys'] = newKeys;
+      }
+      if (goog.isDef(newFillOrStroke['color']))
+        newFillOrStroke['color'] = anychart.color.darken(newFillOrStroke['color'], opt_factor);
+      return newFillOrStroke;
     }
-    newFillOrStroke['keys'] = newKeys;
-    return newFillOrStroke;
-
+    return fillOrStroke;
   } else {
     var hex;
     // if null is returned then we can't get a hex representation and return the initial color

@@ -430,16 +430,19 @@ anychart.linearGaugeModule.pointers.Tank.prototype.colorizePointer = function(po
   var angle = isVertical ? 0 : 90;
 
   var color = /** @type {acgraph.vector.Fill} */ (this.fillResolver(this, pointerState, false));
+  var opacity = anychart.color.getOpacity(color);
   var colorDarken = anychart.color.darken(color);
+  colorDarken = goog.isString(colorDarken) ? colorDarken : colorDarken.color;
   var colorLighten = anychart.color.lighten(color);
+  colorLighten = goog.isString(colorLighten) ? colorLighten : colorLighten.color;
   var fill = /** @type {acgraph.vector.Fill} */ ({
     'angle': angle,
     'keys': [
-      {'color': colorDarken, 'offset': '0', 'opacity': 1},
-      {'color': colorDarken, 'offset': '0.05', 'opacity': 1},
-      {'color': colorLighten, 'offset': '0.85', 'opacity': 1},
-      {'color': colorLighten, 'offset': '0.85', 'opacity': 1},
-      {'color': colorDarken, 'offset': '1', 'opacity': 1}
+      {'color': colorDarken, 'offset': '0', 'opacity': opacity},
+      {'color': colorDarken, 'offset': '0.05', 'opacity': opacity},
+      {'color': colorLighten, 'offset': '0.85', 'opacity': opacity},
+      {'color': colorLighten, 'offset': '0.85', 'opacity': opacity},
+      {'color': colorDarken, 'offset': '1', 'opacity': opacity}
     ]
   });
   this.bodyMainPath_.fill(fill);
@@ -468,8 +471,10 @@ anychart.linearGaugeModule.pointers.Tank.prototype.colorizePointer = function(po
   ////////////////////
   var emptyColor = /** @type {acgraph.vector.Fill} */ (this.emptyFillResolver(this, pointerState, false));
   colorDarken = anychart.color.darken(emptyColor);
+  colorDarken = goog.isString(colorDarken) ? colorDarken : colorDarken.color;
   colorLighten = anychart.color.lighten(emptyColor);
-  var opacity = anychart.color.getOpacity(emptyColor);
+  colorLighten = goog.isString(colorLighten) ? colorLighten : colorLighten.color;
+  opacity = anychart.color.getOpacity(emptyColor);
 
   fill = /** @type {acgraph.vector.Fill} */ ({
     'angle': -angle,
