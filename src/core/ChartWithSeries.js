@@ -1056,6 +1056,9 @@ anychart.core.ChartWithSeries.prototype.beforeDraw = function() {
   if (this.isConsistent())
     return;
 
+  if (anychart.utils.instanceOf(this.palette_, anychart.palettes.RangeColors))
+    this.palette_.setAutoCount(this.getAllSeries().length);
+
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_CHART_PALETTE |
           anychart.ConsistencyState.SERIES_CHART_MARKER_PALETTE |
           anychart.ConsistencyState.SERIES_CHART_HATCH_FILL_PALETTE)) {

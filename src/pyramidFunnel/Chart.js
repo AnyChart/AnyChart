@@ -629,6 +629,17 @@ anychart.pyramidFunnelModule.Chart.prototype.remove = function() {
 
 
 /**
+ * @inheritDoc
+ */
+anychart.pyramidFunnelModule.Chart.prototype.beforeDraw = function() {
+  var iterator = this.getIterator();
+  if (this.palette_ && anychart.utils.instanceOf(this.palette_, anychart.palettes.RangeColors)) {
+    this.palette_.setAutoCount(iterator.getRowsCount());
+  }
+};
+
+
+/**
  * Draw chart chart content items.
  * @param {anychart.math.Rect} bounds Bounds of chart content area.
  */
@@ -672,10 +683,6 @@ anychart.pyramidFunnelModule.Chart.prototype.drawContent = function(bounds) {
       this.registerDisposable(this.hatchLayer_);
       this.hatchLayer_.parent(this.rootElement);
       this.hatchLayer_.zIndex(anychart.pyramidFunnelModule.Chart.ZINDEX_HATCH_FILL).disablePointerEvents(true);
-    }
-
-    if (this.palette_ && anychart.utils.instanceOf(this.palette_, anychart.palettes.RangeColors)) {
-      this.palette_.count(iterator.getRowsCount());
     }
 
     this.pointsPaddingValue_ = Math.abs(anychart.math.round(anychart.utils.normalizeSize(/** @type {number|string} */ (this.getOption('pointsPadding')), bounds.height), 2));

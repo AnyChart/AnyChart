@@ -46,6 +46,13 @@ anychart.palettes.RangeColors = function() {
    */
   this.colorPalette_ = [];
 
+  /**
+   * AutoCount, used to store how much count chart needs
+   * @type {number}
+   * @private
+   */
+  this.autoCount_ = NaN;
+
   this.restoreDefaults(true);
 };
 goog.inherits(anychart.palettes.RangeColors, anychart.core.Base);
@@ -59,11 +66,41 @@ anychart.palettes.RangeColors.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEED
 
 
 /**
+ * Supported consistency states.
+ * @type {anychart.ConsistencyState|number}
+ */
+anychart.palettes.RangeColors.prototype.SUPPORTED_CONSISTENCY_STATES = anychart.ConsistencyState.APPEARANCE;
+
+
+/**
  * Color palette.
  * @type {Array.<acgraph.vector.SolidFill>}
  * @private
  */
 anychart.palettes.RangeColors.prototype.colorPalette_;
+
+
+/**
+ * Checks if palette is consistent and if not - recreates it
+ */
+anychart.palettes.RangeColors.prototype.ensureProcessed = function() {
+  if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
+    this.processColorRange_();
+    this.markConsistent(anychart.ConsistencyState.APPEARANCE);
+  }
+};
+
+
+/**
+ * @param {number} val Value from chart for autoCount
+ */
+anychart.palettes.RangeColors.prototype.setAutoCount = function(val) {
+  if (this.autoCount_ != val) {
+    this.autoCount_ = val;
+    if (isNaN(this.count_) || goog.isNull(this.count_))
+      this.invalidate(anychart.ConsistencyState.APPEARANCE);
+  }
+};
 
 
 /**
@@ -87,8 +124,7 @@ anychart.palettes.RangeColors.prototype.items = function(opt_value, var_args) {
       });
     }
 
-    this.processColorRange_();
-    this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
+    this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REAPPLICATION);
     return this;
   } else {
     return /** @type {Array|acgraph.vector.LinearGradientFill|acgraph.vector.RadialGradientFill} */ (this.colors_);
@@ -105,8 +141,8 @@ anychart.palettes.RangeColors.prototype.count = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.count_ != opt_value) {
       this.count_ = opt_value;
-      this.processColorRange_();
-      this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
+
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REAPPLICATION);
     }
     return this;
   } else {
@@ -122,15 +158,18 @@ anychart.palettes.RangeColors.prototype.count = function(opt_value) {
  * @return {acgraph.vector.SolidFill|anychart.palettes.RangeColors} .
  */
 anychart.palettes.RangeColors.prototype.itemAt = function(index, opt_item) {
-  if (!this.colors_ || this.colors_.length < 1) return null;
-  if (!this.count_) return null;
+  this.ensureProcessed();
+  var colors = goog.isArray(this.colors_) ? this.colors_ : this.colors_.keys;
+  if (colors.length < 1) return null;
+  var count = this.count_ || this.autoCount_ || colors.length;
+  if (!count) return null;
 
   if (goog.isDef(opt_item)) {
     this.colorPalette_[index] = opt_item;
     this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
     return this;
   } else {
-    if (index > this.count_ - 1) index = this.count_ - 1;
+    if (index > count - 1) index = count - 1;
     if (index < 0) index = 0;
     var color = /**@type {acgraph.vector.SolidFill} */(this.colorPalette_[index]);
     return color ? color : null;
@@ -147,8 +186,8 @@ anychart.palettes.RangeColors.prototype.processColorRange_ = function() {
     var gradientKeys = [];
     var colors = goog.isArray(this.colors_) ? this.colors_ : this.colors_.keys;
     if (!goog.isArray(colors) || !colors.length) return;
-    if (isNaN(this.count_)) this.count_ = colors.length;
 
+    var count = this.count_ || this.autoCount_ || colors.length;
 
     var offsetStep = 1 / (colors.length - 1), color;
     for (var i = 0; i < colors.length; i++) {
@@ -177,11 +216,11 @@ anychart.palettes.RangeColors.prototype.processColorRange_ = function() {
     this.colorPalette_ = [];
 
     if (gradientKeys.length == 1) {
-      for (i = 0; i < this.count_; i++)
+      for (i = 0; i < count; i++)
         this.colorPalette_[i] = {'color': gradientKeys[0].color};
     } else {
-      for (i = 0; i < this.count_; i++) {
-        var indexOffset = this.count_ == 1 ? 0 : i / (this.count_ - 1);
+      for (i = 0; i < count; i++) {
+        var indexOffset = count == 1 ? 0 : i / (count - 1);
 
         var leftLimit = null;
         var rightLimit = null;
@@ -261,7 +300,7 @@ anychart.palettes.RangeColors.prototype.restoreDefaults = function(opt_doNotDisp
     '#FF9A00',
     '#FF6500'
   ];
-  this.processColorRange_();
+  this.invalidate(anychart.ConsistencyState.APPEARANCE);
   if (opt_doNotDispatch) this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
 };
 
@@ -285,7 +324,6 @@ anychart.palettes.RangeColors.prototype.setupSpecial = function(isDefault, var_a
   var arg0 = arguments[1];
   if (goog.isArray(arg0)) {
     this.items(arg0);
-    this.count(arg0.length);
     return true;
   }
   if (anychart.utils.instanceOf(arg0, anychart.palettes.RangeColors)) {

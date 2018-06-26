@@ -2075,7 +2075,7 @@ anychart.pieModule.Chart.prototype.transformCenterContent = function(contentBoun
  */
 anychart.pieModule.Chart.prototype.beforeDraw = function() {
   if (this.palette_ && anychart.utils.instanceOf(this.palette_, anychart.palettes.RangeColors)) {
-    this.palette_.count(this.getIterator().getRowsCount());
+    this.palette_.setAutoCount(this.getIterator().getRowsCount());
   }
 };
 
