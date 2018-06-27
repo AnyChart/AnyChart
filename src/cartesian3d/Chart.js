@@ -158,6 +158,7 @@ anychart.cartesian3dModule.Chart.areaPostProcessor = function(series, shapes, po
   shapes['left'].fill({'color': leftFill, 'opacity': opacity});
   shapes['right'].fill({'color': rightFill, 'opacity': opacity});
   shapes['top'].fill({'color': topFill, 'opacity': opacity});
+  shapes['cap'].fill({'color': bottomFill, 'opacity': opacity});
   shapes['front'].fill(frontFill);
 
   // fix for batik (DVF-2068)
@@ -280,6 +281,7 @@ anychart.cartesian3dModule.Chart.prototype.seriesConfig = (function() {
       anychart.core.shapeManagers.pathRight3DConfig,
       anychart.core.shapeManagers.pathBack3DConfig,
       anychart.core.shapeManagers.pathFront3DConfig,
+      anychart.core.shapeManagers.pathCapArea3DConfig,
       // anychart.core.shapeManagers.pathRight3DHatchConfig,
       // anychart.core.shapeManagers.pathTop3DHatchConfig,
       anychart.core.shapeManagers.pathFront3DHatchConfig

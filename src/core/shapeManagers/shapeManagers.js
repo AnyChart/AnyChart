@@ -81,6 +81,13 @@ anychart.core.shapeManagers.TOP_SHAPES_ZINDEX = 3 * anychart.core.shapeManagers.
 
 
 /**
+ * Z index shift for the cap shapes of 3D area series.
+ * @const {number}
+ */
+anychart.core.shapeManagers.AREA_CAP_SHAPES_ZINDEX = 3.5 * anychart.core.shapeManagers.ZINDEX_STEP;
+
+
+/**
  * Z index shift for the right shapes of 3D series.
  * @const {number}
  */
@@ -492,6 +499,21 @@ anychart.core.shapeManagers.pathTopArea3DConfig = {
   canBeHoveredSelected: false,
   isHatchFill: false,
   zIndex: anychart.core.shapeManagers.TOP_SHAPES_ZINDEX
+};
+
+
+/**
+ * Template shape config for easy reusage.
+ * @const {anychart.core.shapeManagers.ShapeConfig}
+ */
+anychart.core.shapeManagers.pathCapArea3DConfig = {
+  name: 'cap',
+  shapeType: anychart.enums.ShapeType.PATH,
+  fillName: null,
+  strokeName: null,
+  canBeHoveredSelected: false,
+  isHatchFill: false,
+  zIndex: anychart.core.shapeManagers.AREA_CAP_SHAPES_ZINDEX
 };
 
 
