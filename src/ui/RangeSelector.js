@@ -386,9 +386,38 @@ anychart.ui.RangeSelector.prototype.render = function(opt_parentElement) {
 
   if (container && rangeSelected) {
     anychart.ui.RangeSelector.base(this, 'render', container);
+    var range = this.target_ ? this.target_.getDragAnchor() : null; // using getDragAnchor, because it returns {first,last,firstSelected,lastSelected}Key(s) from stock dataControllers
+    if (range) { // this one sets MAX button clicked, if full range selected
+      this.changeSelectedRange_({
+        'firstKey': range.minKey,
+        'lastKey': range.maxKey,
+        'firstSelected': range.firstKey,
+        'lastSelected': range.lastKey
+      });
+    }
   } else {
     var bind = goog.bind(this.delayedRenderOnChartDraw_, this, container || this.target_);
     this.target_.listenOnce(anychart.enums.EventType.CHART_DRAW, bind, false, this);
+  }
+};
+
+
+/**
+ * @param {Element} element Element to decorate.
+ * @override
+ */
+anychart.ui.RangeSelector.prototype.decorate = function(element) {
+  anychart.ui.RangeSelector.base(this, 'decorate', element);
+  if (this.target_) {
+    var range = this.target_ ? this.target_.getDragAnchor() : null; // using getDragAnchor, because it returns {first,last,firstSelected,lastSelected}Key(s) from stock dataControllers
+    if (range) { // this one sets MAX button clicked, if full range selected
+      this.changeSelectedRange_({
+        'firstKey': range.minKey,
+        'lastKey': range.maxKey,
+        'firstSelected': range.firstKey,
+        'lastSelected': range.lastKey
+      });
+    }
   }
 };
 
