@@ -583,7 +583,7 @@ anychart.pertModule.Chart.prototype.resizeHandler = function(evt) {
  * @private
  */
 anychart.pertModule.Chart.prototype.dataInvalidated_ = function(event) {
-  this.invalidate(anychart.ConsistencyState.PERT_DATA | anychart.ConsistencyState.CHART_LABELS, anychart.Signal.NEEDS_REDRAW);
+  this.invalidate(anychart.ConsistencyState.PERT_DATA | anychart.ConsistencyState.CHART_LABELS | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
 };
 
 
