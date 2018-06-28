@@ -143,7 +143,7 @@ anychart.annotationsModule.X_ANCHOR_DESCRIPTORS = (function() {
  */
 anychart.annotationsModule.X_ANCHOR_DESCRIPTORS_META = (function() {
   return [
-    ['xAnchor', anychart.ConsistencyState.ANNOTATIONS_ANCHORS, anychart.Signal.NEEDS_REDRAW]
+    ['xAnchor', anychart.ConsistencyState.ANNOTATIONS_ANCHORS | anychart.ConsistencyState.ANNOTATIONS_LAST_POINT, anychart.Signal.NEEDS_REDRAW]
   ];
 })();
 
@@ -170,7 +170,7 @@ anychart.annotationsModule.VALUE_ANCHOR_DESCRIPTORS = (function() {
  */
 anychart.annotationsModule.VALUE_ANCHOR_DESCRIPTORS_META = (function() {
   return [
-    ['valueAnchor', anychart.ConsistencyState.ANNOTATIONS_ANCHORS, anychart.Signal.NEEDS_REDRAW]
+    ['valueAnchor', anychart.ConsistencyState.ANNOTATIONS_ANCHORS | anychart.ConsistencyState.ANNOTATIONS_LAST_POINT, anychart.Signal.NEEDS_REDRAW]
   ];
 })();
 
@@ -203,8 +203,8 @@ anychart.annotationsModule.SECOND_ANCHOR_POINT_DESCRIPTORS = (function() {
  */
 anychart.annotationsModule.SECOND_ANCHOR_POINT_DESCRIPTORS_META = (function() {
   return [
-    ['secondXAnchor', anychart.ConsistencyState.ANNOTATIONS_ANCHORS, anychart.Signal.NEEDS_REDRAW],
-    ['secondValueAnchor', anychart.ConsistencyState.ANNOTATIONS_ANCHORS, anychart.Signal.NEEDS_REDRAW]
+    ['secondXAnchor', anychart.ConsistencyState.ANNOTATIONS_ANCHORS | anychart.ConsistencyState.ANNOTATIONS_LAST_POINT, anychart.Signal.NEEDS_REDRAW],
+    ['secondValueAnchor', anychart.ConsistencyState.ANNOTATIONS_ANCHORS | anychart.ConsistencyState.ANNOTATIONS_LAST_POINT, anychart.Signal.NEEDS_REDRAW]
   ];
 })();
 
@@ -238,8 +238,8 @@ anychart.annotationsModule.THIRD_ANCHOR_POINT_DESCRIPTORS = (function() {
  */
 anychart.annotationsModule.THIRD_ANCHOR_POINT_DESCRIPTORS_META = (function() {
   return [
-    ['thirdXAnchor', anychart.ConsistencyState.ANNOTATIONS_ANCHORS, anychart.Signal.NEEDS_REDRAW],
-    ['thirdValueAnchor', anychart.ConsistencyState.ANNOTATIONS_ANCHORS, anychart.Signal.NEEDS_REDRAW]
+    ['thirdXAnchor', anychart.ConsistencyState.ANNOTATIONS_ANCHORS | anychart.ConsistencyState.ANNOTATIONS_LAST_POINT, anychart.Signal.NEEDS_REDRAW],
+    ['thirdValueAnchor', anychart.ConsistencyState.ANNOTATIONS_ANCHORS | anychart.ConsistencyState.ANNOTATIONS_LAST_POINT, anychart.Signal.NEEDS_REDRAW]
   ];
 })();
 
