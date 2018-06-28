@@ -263,7 +263,7 @@ anychart.utils.normalizeSize = function(value, opt_containerSize, opt_invert) {
   var result = goog.isNumber(value) ?
       value :
       (!isNaN(opt_containerSize) && anychart.utils.isPercent(value) ?
-      opt_containerSize * parseFloat(value) / 100 :
+          opt_containerSize * parseFloat(value) / 100 :
           parseFloat(value));
   return (opt_invert && !isNaN(opt_containerSize)) ? opt_containerSize - result : result;
 };
@@ -552,7 +552,7 @@ anychart.utils.getAffectBoundsTickLength = function(ticks, opt_side) {
     var ticksLength = /** @type {number} */(ticks.getOption('length'));
 
     if (position == anychart.enums.SidePosition.OUTSIDE) {
-      length = side <= 0 ? 0 : ticksLength ;
+      length = side <= 0 ? 0 : ticksLength;
     } else if (position == anychart.enums.SidePosition.CENTER) {
       length = side * ticksLength / 2;
     } else if (position == anychart.enums.SidePosition.INSIDE) {
@@ -1915,6 +1915,57 @@ anychart.utils.hideTooltips = function(opt_force) {
       if (!tooltip.isDisposed())
         tooltip.hide(opt_force);
     }
+  }
+};
+
+
+/**
+ * Install default html tooltip style.
+ * DEV NOTE: this code is actually a modification of goog.style.installSafeStyleSheet().
+ */
+anychart.utils.installHtmlTooltipStyle = function() {
+  if (!anychart.utils.htmlTooltipStyleIsInstalled_) {
+    anychart.utils.htmlTooltipStyleIsInstalled_ = true;
+
+    var dh = goog.dom.getDomHelper();
+    var head = dh.getElementsByTagNameAndClass(goog.dom.TagName.HEAD)[0];
+
+    // In opera documents are not guaranteed to have a head element, thus we
+    // have to make sure one exists before using it.
+    if (!head) {
+      var body = dh.getElementsByTagNameAndClass(goog.dom.TagName.BODY)[0];
+      head = dh.createDom(goog.dom.TagName.HEAD);
+      body.parentNode.insertBefore(head, body);
+    }
+    var el = dh.createDom(goog.dom.TagName.STYLE);
+
+    el.innerHTML = '.anychart-tooltip {' +
+        'border-radius: 3px;' +
+        'padding: 5px 10px;' +
+        'background: rgba(33, 33, 33, 0.7);' +
+        'border: none;' +
+        'display: inline-block;' +
+        'box-sizing: border-box;' +
+        'letter-spacing: normal;' +
+        'color: #fff;' +
+        'font-family: Verdana, Helvetica, Arial, \'sans-serif\';' +
+        'font-size: 12px;' +
+        'position: absolute;' +
+        'pointer-events: none;' +
+        'margin: 10px 0px 10px 10px;' +
+        '}' +
+        '.anychart-tooltip-separator {' +
+        'color: rgba(206, 206, 206, 0.3);' +
+        'border: none;' +
+        'height: 1px;' +
+        'margin: 5px 0;' +
+        '}' +
+        '.anychart-tooltip-title{' +
+        'font-size: 14px;' +
+        '}';
+
+    //Inserting as first node to prevent overrinding of css user inclusion.
+    dh.insertChildAt(head, el, 0);
   }
 };
 

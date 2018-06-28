@@ -917,13 +917,7 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'hideDelay': 0,
     'titleFormat': anychart.core.defaultTheme.returnValue,
     'format': anychart.core.defaultTheme.returnValueWithPrefixPostfix,
-    /**
-     * @this {*}
-     * @return {*}
-     */
-    'unionFormat': function() {
-      return this['formattedValues'].join('\n');
-    },
+    'unionFormat': '{%joinedFormattedValues}',
     'zIndex': 0,
     'allowLeaveChart': true,
     'allowLeaveScreen': false,

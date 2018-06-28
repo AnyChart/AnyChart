@@ -82,7 +82,6 @@ anychart.core.utils.GlobalTooltipContainer.LOCAL_STAGE_WRAPPER_STYLE_VML = {
 };
 
 
-
 /**
  * Global stage.domElement() style.
  * @type {Object}
@@ -99,8 +98,6 @@ anychart.core.utils.GlobalTooltipContainer.GLOBAL_STAGE_DOM_ELEMENT_STYLE_VML = 
   'width': '',
   'height': ''
 };
-
-
 
 
 /**
