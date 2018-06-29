@@ -1422,7 +1422,7 @@ anychart.treemapModule.Chart.prototype.configureLabel = function(pointState, isH
       label.formatProvider(formatProvider);
       label.positionProvider(positionProvider);
     } else {
-      label = factory.add(formatProvider, positionProvider);
+      label = factory.add(formatProvider, positionProvider, index);
       node.meta('labelIndex', label.getIndex());
       this.labelToPointIndex_[(isHeader ? 'h' : 'l') + label.getIndex()] = node.meta('index');
     }
