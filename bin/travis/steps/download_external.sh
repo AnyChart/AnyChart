@@ -33,7 +33,7 @@ function download_fonts(){
     echo Download fonts
     echo "--"
 
-    Run "git@github.com:AnyChart/fonts.git ../out/fonts --depth 1"
+    Run "git clone --depth 1 git@github.com:AnyChart/fonts.git ../out/fonts"
     Run "rm -rf fonts"
     Run "mv ../out/fonts/dist ./fonts"
 
@@ -47,7 +47,7 @@ function download_chart_editor(){
     echo Download Chart Editor
     echo "--"
 
-    Run "git clone git@github.com:AnyChart/chart-editor.git ../out/chart-editor --depth 1"
+    Run "git clone --depth 1 git@github.com:AnyChart/chart-editor.git ../out/chart-editor"
 
     Run "cp ../out/chart-editor/dist/anychart-editor.min.js ./js/anychart-editor.min.js"
     Run "cp ../out/chart-editor/dist/anychart-editor.css ./css/anychart-editor.css"
