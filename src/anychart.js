@@ -654,6 +654,60 @@ anychart.getFullTheme = function(root) {
 // setTimeout(anychart.getFullTheme, 0);
 
 
+//region -- Async DOM event listening.
+/**
+ * @typedef {{
+ *    eventHandler: goog.events.EventHandler,
+ *    target: (acgraph.vector.Element|acgraph.vector.Stage|anychart.core.VisualBase),
+ *    type: acgraph.events.EventType,
+ *    callback: (function(acgraph.events.BrowserEvent)|function(anychart.core.MouseEvent))
+ * }}
+ */
+anychart.AsyncListenerData;
+
+
+/**
+ * @type {Array.<anychart.AsyncListenerData>}
+ */
+anychart.asyncListenersData = [];
+
+
+/**
+ * @type {boolean}
+ */
+anychart.needsFirstListenersApply = true;
+
+
+/**
+ * @param {goog.events.EventHandler} eventHandler - Event handler.
+ * @param {(acgraph.vector.Element|acgraph.vector.Stage|anychart.core.VisualBase)} target - Target.
+ * @param {acgraph.events.EventType} type - Event type.
+ * @param {(function(acgraph.events.BrowserEvent)|function(anychart.core.MouseEvent))} callback - Callback.
+ */
+anychart.addAsyncListener = function(eventHandler, target, type, callback) {
+  anychart.asyncListenersData.push(/** @type {anychart.AsyncListenerData} */ ({
+    eventHandler: eventHandler,
+    target: target,
+    type: type,
+    callback: callback
+  }));
+};
+
+
+/**
+ * Applies async listening.
+ */
+anychart.applyAsyncListening = function() {
+  anychart.window.requestAnimationFrame(function() {
+    while (anychart.asyncListenersData.length) {
+      var data = /** @type {anychart.AsyncListenerData} */ (anychart.asyncListenersData.pop());
+      data.eventHandler.listen(data.target, data.type, data.callback);
+    }
+  });
+};
+
+
+//endregion
 //region --- Patches for missing features
 //------------------------------------------------------------------------------
 //

@@ -1700,6 +1700,10 @@ anychart.core.Chart.prototype.drawInternal = function() {
   if (this.supportsBaseHighlight())
     this.onInteractivitySignal();
 
+  if (anychart.needsFirstListenersApply) {
+    anychart.applyAsyncListening();
+    anychart.needsFirstListenersApply = false;
+  }
   anychart.performance.end('Chart.draw()');
 };
 

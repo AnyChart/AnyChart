@@ -140,20 +140,36 @@ anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES =
  * @protected
  */
 anychart.core.VisualBase.prototype.bindHandlersToGraphics = function(element, opt_overHandler, opt_outHandler,
-    opt_clickHandler, opt_moveHandler, opt_downHandler, opt_upHandler) {
+                                                                     opt_clickHandler, opt_moveHandler, opt_downHandler, opt_upHandler) {
   element.tag = this;
-  this.eventsHandler.listen(element, acgraph.events.EventType.CLICK, opt_clickHandler || this.handleBrowserEvent);
-  this.eventsHandler.listen(element, acgraph.events.EventType.DBLCLICK, this.handleBrowserEvent);
-  this.eventsHandler.listen(element, acgraph.events.EventType.MOUSEOVER, opt_overHandler || this.handleBrowserEvent);
-  this.eventsHandler.listen(element, acgraph.events.EventType.MOUSEOUT, opt_outHandler || this.handleBrowserEvent);
-  this.eventsHandler.listen(element, acgraph.events.EventType.MOUSEDOWN, opt_downHandler || this.handleBrowserEvent);
-  this.eventsHandler.listen(element, acgraph.events.EventType.MOUSEUP, opt_upHandler || this.handleBrowserEvent);
-  this.eventsHandler.listen(element, acgraph.events.EventType.MOUSEMOVE, opt_moveHandler || this.handleBrowserEvent);
-  this.eventsHandler.listen(element, acgraph.events.EventType.TOUCHSTART, this.handleBrowserEvent);
-  this.eventsHandler.listen(element, acgraph.events.EventType.TOUCHEND, this.handleBrowserEvent);
-  this.eventsHandler.listen(element, acgraph.events.EventType.TOUCHCANCEL, this.handleBrowserEvent);
-  this.eventsHandler.listen(element, acgraph.events.EventType.TOUCHMOVE, this.handleBrowserEvent);
-  this.eventsHandler.listen(element, acgraph.events.EventType.CONTEXTMENU, this.handleBrowserEvent);
+  // console.timeStamp('bindHandlersToGraphics start');
+  anychart.addAsyncListener(this.eventsHandler, element, acgraph.events.EventType.CLICK, opt_clickHandler || this.handleBrowserEvent);
+  anychart.addAsyncListener(this.eventsHandler, element, acgraph.events.EventType.DBLCLICK, this.handleBrowserEvent);
+  anychart.addAsyncListener(this.eventsHandler, element, acgraph.events.EventType.MOUSEOVER, opt_overHandler || this.handleBrowserEvent);
+  anychart.addAsyncListener(this.eventsHandler, element, acgraph.events.EventType.MOUSEOUT, opt_outHandler || this.handleBrowserEvent);
+  anychart.addAsyncListener(this.eventsHandler, element, acgraph.events.EventType.MOUSEDOWN, opt_downHandler || this.handleBrowserEvent);
+  anychart.addAsyncListener(this.eventsHandler, element, acgraph.events.EventType.MOUSEUP, opt_upHandler || this.handleBrowserEvent);
+  anychart.addAsyncListener(this.eventsHandler, element, acgraph.events.EventType.MOUSEMOVE, opt_moveHandler || this.handleBrowserEvent);
+  anychart.addAsyncListener(this.eventsHandler, element, acgraph.events.EventType.TOUCHSTART, this.handleBrowserEvent);
+  anychart.addAsyncListener(this.eventsHandler, element, acgraph.events.EventType.TOUCHEND, this.handleBrowserEvent);
+  anychart.addAsyncListener(this.eventsHandler, element, acgraph.events.EventType.TOUCHCANCEL, this.handleBrowserEvent);
+  anychart.addAsyncListener(this.eventsHandler, element, acgraph.events.EventType.TOUCHMOVE, this.handleBrowserEvent);
+  anychart.addAsyncListener(this.eventsHandler, element, acgraph.events.EventType.CONTEXTMENU, this.handleBrowserEvent);
+  if (!anychart.needsFirstListenersApply)
+    anychart.applyAsyncListening();
+  // console.timeStamp('bindHandlersToGraphics end');
+  // this.eventsHandler.listen(element, acgraph.events.EventType.CLICK, opt_clickHandler || this.handleBrowserEvent);
+  // this.eventsHandler.listen(element, acgraph.events.EventType.DBLCLICK, this.handleBrowserEvent);
+  // this.eventsHandler.listen(element, acgraph.events.EventType.MOUSEOVER, opt_overHandler || this.handleBrowserEvent);
+  // this.eventsHandler.listen(element, acgraph.events.EventType.MOUSEOUT, opt_outHandler || this.handleBrowserEvent);
+  // this.eventsHandler.listen(element, acgraph.events.EventType.MOUSEDOWN, opt_downHandler || this.handleBrowserEvent);
+  // this.eventsHandler.listen(element, acgraph.events.EventType.MOUSEUP, opt_upHandler || this.handleBrowserEvent);
+  // this.eventsHandler.listen(element, acgraph.events.EventType.MOUSEMOVE, opt_moveHandler || this.handleBrowserEvent);
+  // this.eventsHandler.listen(element, acgraph.events.EventType.TOUCHSTART, this.handleBrowserEvent);
+  // this.eventsHandler.listen(element, acgraph.events.EventType.TOUCHEND, this.handleBrowserEvent);
+  // this.eventsHandler.listen(element, acgraph.events.EventType.TOUCHCANCEL, this.handleBrowserEvent);
+  // this.eventsHandler.listen(element, acgraph.events.EventType.TOUCHMOVE, this.handleBrowserEvent);
+  // this.eventsHandler.listen(element, acgraph.events.EventType.CONTEXTMENU, this.handleBrowserEvent);
 };
 
 
@@ -171,18 +187,35 @@ anychart.core.VisualBase.prototype.bindHandlersToGraphics = function(element, op
  */
 anychart.core.VisualBase.prototype.bindHandlersToComponent = function(target, opt_overHandler, opt_outHandler,
                                                                       opt_clickHandler, opt_moveHandler, opt_allHandler, opt_downHandler) {
-  this.eventsHandler.listen(target, acgraph.events.EventType.CLICK, opt_clickHandler || opt_allHandler || this.handleMouseEvent);
-  this.eventsHandler.listen(target, acgraph.events.EventType.DBLCLICK, opt_allHandler || this.handleMouseEvent);
-  this.eventsHandler.listen(target, acgraph.events.EventType.MOUSEOVER, opt_overHandler || opt_allHandler || this.handleMouseEvent);
-  this.eventsHandler.listen(target, acgraph.events.EventType.MOUSEOUT, opt_outHandler || opt_allHandler || this.handleMouseEvent);
-  this.eventsHandler.listen(target, acgraph.events.EventType.MOUSEDOWN, opt_downHandler || opt_allHandler || this.handleMouseEvent);
-  this.eventsHandler.listen(target, acgraph.events.EventType.MOUSEUP, opt_allHandler || this.handleMouseEvent);
-  this.eventsHandler.listen(target, acgraph.events.EventType.MOUSEMOVE, opt_moveHandler || opt_allHandler || this.handleMouseEvent);
-  this.eventsHandler.listen(target, acgraph.events.EventType.TOUCHSTART, opt_allHandler || this.handleMouseEvent);
-  this.eventsHandler.listen(target, acgraph.events.EventType.TOUCHEND, opt_allHandler || this.handleMouseEvent);
-  this.eventsHandler.listen(target, acgraph.events.EventType.TOUCHCANCEL, opt_allHandler || this.handleMouseEvent);
-  this.eventsHandler.listen(target, acgraph.events.EventType.TOUCHMOVE, opt_allHandler || this.handleMouseEvent);
-  this.eventsHandler.listen(target, acgraph.events.EventType.CONTEXTMENU, opt_allHandler || this.handleMouseEvent);
+  // console.timeStamp('bindHandlersToComponent start');
+  anychart.addAsyncListener(this.eventsHandler, target, acgraph.events.EventType.CLICK, opt_clickHandler || opt_allHandler || this.handleMouseEvent);
+  anychart.addAsyncListener(this.eventsHandler, target, acgraph.events.EventType.DBLCLICK, opt_allHandler || this.handleMouseEvent);
+  anychart.addAsyncListener(this.eventsHandler, target, acgraph.events.EventType.MOUSEOVER, opt_overHandler || opt_allHandler || this.handleMouseEvent);
+  anychart.addAsyncListener(this.eventsHandler, target, acgraph.events.EventType.MOUSEOUT, opt_outHandler || opt_allHandler || this.handleMouseEvent);
+  anychart.addAsyncListener(this.eventsHandler, target, acgraph.events.EventType.MOUSEDOWN, opt_downHandler || opt_allHandler || this.handleMouseEvent);
+  anychart.addAsyncListener(this.eventsHandler, target, acgraph.events.EventType.MOUSEUP, opt_allHandler || this.handleMouseEvent);
+  anychart.addAsyncListener(this.eventsHandler, target, acgraph.events.EventType.MOUSEMOVE, opt_moveHandler || opt_allHandler || this.handleMouseEvent);
+  anychart.addAsyncListener(this.eventsHandler, target, acgraph.events.EventType.TOUCHSTART, opt_allHandler || this.handleMouseEvent);
+  anychart.addAsyncListener(this.eventsHandler, target, acgraph.events.EventType.TOUCHEND, opt_allHandler || this.handleMouseEvent);
+  anychart.addAsyncListener(this.eventsHandler, target, acgraph.events.EventType.TOUCHCANCEL, opt_allHandler || this.handleMouseEvent);
+  anychart.addAsyncListener(this.eventsHandler, target, acgraph.events.EventType.TOUCHMOVE, opt_allHandler || this.handleMouseEvent);
+  anychart.addAsyncListener(this.eventsHandler, target, acgraph.events.EventType.CONTEXTMENU, opt_allHandler || this.handleMouseEvent);
+  if (!anychart.needsFirstListenersApply)
+    anychart.applyAsyncListening();
+
+  // console.timeStamp('bindHandlersToComponent end');
+  // this.eventsHandler.listen(target, acgraph.events.EventType.CLICK, opt_clickHandler || opt_allHandler || this.handleMouseEvent);
+  // this.eventsHandler.listen(target, acgraph.events.EventType.DBLCLICK, opt_allHandler || this.handleMouseEvent);
+  // this.eventsHandler.listen(target, acgraph.events.EventType.MOUSEOVER, opt_overHandler || opt_allHandler || this.handleMouseEvent);
+  // this.eventsHandler.listen(target, acgraph.events.EventType.MOUSEOUT, opt_outHandler || opt_allHandler || this.handleMouseEvent);
+  // this.eventsHandler.listen(target, acgraph.events.EventType.MOUSEDOWN, opt_downHandler || opt_allHandler || this.handleMouseEvent);
+  // this.eventsHandler.listen(target, acgraph.events.EventType.MOUSEUP, opt_allHandler || this.handleMouseEvent);
+  // this.eventsHandler.listen(target, acgraph.events.EventType.MOUSEMOVE, opt_moveHandler || opt_allHandler || this.handleMouseEvent);
+  // this.eventsHandler.listen(target, acgraph.events.EventType.TOUCHSTART, opt_allHandler || this.handleMouseEvent);
+  // this.eventsHandler.listen(target, acgraph.events.EventType.TOUCHEND, opt_allHandler || this.handleMouseEvent);
+  // this.eventsHandler.listen(target, acgraph.events.EventType.TOUCHCANCEL, opt_allHandler || this.handleMouseEvent);
+  // this.eventsHandler.listen(target, acgraph.events.EventType.TOUCHMOVE, opt_allHandler || this.handleMouseEvent);
+  // this.eventsHandler.listen(target, acgraph.events.EventType.CONTEXTMENU, opt_allHandler || this.handleMouseEvent);
 };
 
 
@@ -556,7 +589,7 @@ anychart.core.VisualBase.prototype.dependsOnContainerSize = function() {
   return true;
 };
 
-    
+
 //region --- Saving
 /**
  * Saves the current visual state into PNG file.
