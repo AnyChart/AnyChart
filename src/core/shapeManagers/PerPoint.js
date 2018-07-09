@@ -39,3 +39,30 @@ anychart.core.shapeManagers.PerPoint.prototype.updateZIndex = function(newBaseZI
   newBaseZIndex += this.series.supportsPointSettings() && Number(iterator.get('zIndex')) || 0;
   anychart.core.shapeManagers.PerPoint.base(this, 'updateZIndex', newBaseZIndex, opt_shapesGroup);
 };
+
+
+/**
+ * @param {number} state
+ * @param {Object.<string, acgraph.vector.Shape>} shapesGroup
+ */
+anychart.core.shapeManagers.PerPoint.prototype.updateMarkersColors = function(state, shapesGroup) {
+  var iterator = this.series.getIterator();
+  var markerFill, markerStroke;
+  for (var name in shapesGroup) {
+    var descriptor = this.defs[name];
+
+    if (descriptor && !descriptor.isHatchFill) {
+      var markerDescFill = /** @type {acgraph.vector.Fill} */(descriptor.fill(this.series, +state, void 0, void  0, 'fill'));
+      var markerDescStroke = /** @type {acgraph.vector.Stroke} */(descriptor.stroke(this.series, +state, void 0, void 0, 'stroke'));
+
+      if (markerDescFill && anychart.color.isNotNullColor(markerDescFill))
+        markerFill = markerDescFill;
+      if (markerDescStroke && anychart.color.isNotNullColor(markerDescStroke))
+        markerStroke = markerDescStroke;
+    }
+  }
+
+  iterator.meta('markerFill', markerFill);
+  iterator.meta('markerStroke', markerStroke);
+};
+

@@ -94,11 +94,106 @@ anychart.core.drawers.Base.prototype.requiredShapes = (function() { return {}; }
 
 
 /**
+ * @param {...*} var_args .
+ * @return {Object.<string>}
+ */
+anychart.core.drawers.Base.prototype.getShapeNames = function(var_args) {
+  var firstValue = /** @type {number} */(arguments[0]);
+  var secondValue = /** @type {number} */(arguments[1]);
+
+  var isLineBased = this.series.check(anychart.core.drawers.Capabilities.IS_LINE_BASED);
+  var isRangeBased = this.series.check(anychart.core.drawers.Capabilities.IS_RANGE_BASED);
+  var isStrokeUsedAsFill = this.series.check(anychart.core.drawers.Capabilities.USES_STROKE_AS_FILL);
+  var isDiscreteBased = this.series.isDiscreteBased();
+
+  var names = {}, hatchFillName = 'hatchFill', strokeName = 'stroke', fillName = 'fill';
+  var pathName = isStrokeUsedAsFill ? 'stroke' : 'path';
+
+ if (isRangeBased) {
+   if (firstValue > secondValue) {
+     if (this.hasHighColoring) {
+       pathName = 'high';
+       hatchFillName = 'highHatchFill';
+     }
+   } else {
+     if (this.hasLowColoring) {
+       pathName = 'low';
+       hatchFillName = 'lowHatchFill';
+     }
+   }
+
+   names.path = pathName;
+   names.hatchFill = hatchFillName;
+ } else if (isDiscreteBased) {
+    if (!this.series.planIsStacked()) {
+      if (this.hasNegativeColoring) {
+        if (firstValue < this.baseline) {
+          pathName = 'negative';
+          hatchFillName = 'negativeHatchFill';
+        }
+      } else if (this.hasRisingFallingColoring) {
+        if (firstValue > secondValue || isNaN(secondValue)) {
+          pathName = 'rising';
+          hatchFillName = 'risingHatchFill';
+        } else if (firstValue < secondValue) {
+          pathName = 'falling';
+          hatchFillName = 'fallingHatchFill';
+        }
+      }
+    }
+    if (isStrokeUsedAsFill) {
+      names.stroke = pathName;
+    } else {
+      names.path = pathName;
+      names.hatchFill = hatchFillName;
+    }
+  } else {
+    if (!this.series.planIsStacked()) {
+      if (this.hasNegativeColoring) {
+        if (firstValue < this.baseline) {
+          strokeName = 'negativeStroke';
+          fillName = 'negativeFill';
+          hatchFillName = 'negativeHatchFill';
+        }
+      } else if (this.hasRisingFallingColoring) {
+        if (firstValue > secondValue || isNaN(secondValue)) {
+          strokeName = 'risingStroke';
+          fillName = 'risingFill';
+          hatchFillName = 'risingHatchFill';
+        } else if (firstValue < secondValue) {
+          strokeName = 'fallingStroke';
+          fillName = 'fallingFill';
+          hatchFillName = 'fallingHatchFill';
+        }
+      }
+    }
+
+    names.stroke = strokeName;
+    if (!isLineBased) {
+      names.fill = fillName;
+      names.hatchFill = hatchFillName;
+    }
+  }
+
+  return names;
+};
+
+
+/**
  * Returns y value names. Used for Y scale calculations.
  * @return {Array.<string>}
  */
 anychart.core.drawers.Base.prototype.getYValueNames = function() {
   return this.yValueNames;
+};
+
+
+/**
+ * @param {number} value .
+ * @return {boolean}
+ */
+anychart.core.drawers.Base.prototype.isBaselineIntersect = function(value) {
+  return ((this.prevValue - this.baseline) || 1) * ((value - this.baseline) || 1) < 0;
 };
 
 
@@ -188,12 +283,49 @@ anychart.core.drawers.Base.prototype.startDrawing = function(shapeManager) {
 
   this.series.rendering().callStart(this.series);
 
+  var plot = /** @type {anychart.stockModule.Plot|anychart.core.ChartWithSeries} */(this.series.plot);
+  this.baseline = /** @type {number} */(plot.getOption('baseline'));
+
   /**
    * If each point has it's own width.
    * @type {boolean}
    * @private
    */
   this.individualPointWidths_ = Boolean(this.series.getXScale()) && this.series.getXScale().checkWeights();
+
+  var normSettings = this.series.normal();
+  /**
+   * @type {boolean}
+   */
+  this.hasNegativeColoring = goog.isDef(normSettings.getOwnOption('negativeStroke')) ||
+      goog.isDef(normSettings.getOwnOption('negativeFill'));
+
+  /**
+   * @type {boolean}
+   */
+  this.hasRisingFallingColoring = goog.isDef(normSettings.getOwnOption('risingStroke')) ||
+      goog.isDef(normSettings.getOwnOption('fallingStroke')) ||
+      goog.isDef(normSettings.getOwnOption('risingFill')) ||
+      goog.isDef(normSettings.getOwnOption('fallingFill'));
+
+  /**
+   * @type {boolean}
+   */
+  this.hasHighFill = goog.isDef(normSettings.getOwnOption('highFill'));
+  /**
+   * @type {boolean}
+   */
+  this.hasLowFill = goog.isDef(normSettings.getOwnOption('lowFill'));
+  /**
+   * @type {boolean}
+   */
+  this.hasHighColoring = goog.isDef(normSettings.getOwnOption('highStroke')) || this.hasHighFill;
+  /**
+   * @type {boolean}
+   */
+  this.hasLowColoring = goog.isDef(normSettings.getOwnOption('lowStroke')) || this.hasLowFill;
+
+  this.prevValue = NaN;
 };
 
 
@@ -290,7 +422,12 @@ anychart.core.drawers.Base.prototype.finalizeSegment = function() {};
  * @param {anychart.PointState|number} state
  * @protected
  */
-anychart.core.drawers.Base.prototype.updatePointInternal = function(point, state) {};
+anychart.core.drawers.Base.prototype.updatePointInternal = function(point, state) {
+  if (!this.series.isDiscreteBased()) {
+    this.shapesManager.calcPointColors(state, /** @type {Object} */(point.meta('shapeNames')));
+    this.shapesManager.updateMarkersColors(state, /** @type {Object} */(point.meta('shapeNames')));
+  }
+};
 
 
 /**

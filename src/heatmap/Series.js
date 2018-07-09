@@ -449,9 +449,30 @@ anychart.heatmapModule.Series.prototype.getContextProviderValues = function(prov
 
 /** @inheritDoc */
 anychart.heatmapModule.Series.prototype.getColorResolutionContext = function(opt_baseColor, opt_ignorePointSettings, opt_ignoreColorScale) {
-  var result = anychart.heatmapModule.Series.base(this, 'getColorResolutionContext', opt_baseColor, opt_ignorePointSettings, opt_ignoreColorScale);
-  result['colorScale'] = (/** @type {anychart.heatmapModule.Chart} */(this.getChart())).colorScale();
-  return result;
+  var pointProvider = /** @type {anychart.format.Context} */(anychart.heatmapModule.Series.base(this, 'getColorResolutionContext', opt_baseColor, opt_ignorePointSettings, opt_ignoreColorScale));
+  var values = pointProvider.values();
+
+  var iterator = pointProvider.dataSource();
+
+  values['x'] = {value: iterator.get('x'), type: anychart.enums.TokenType.STRING};
+  values['y'] = {value: iterator.get('y'), type: anychart.enums.TokenType.STRING};
+  values['heat'] = {value: iterator.get('heat'), type: anychart.enums.TokenType.NUMBER};
+
+  var scaledColor;
+  var source = opt_baseColor || this.getOption('color') || 'blue';
+  var colorScale = (/** @type {anychart.heatmapModule.Chart} */(this.getChart())).colorScale();
+  if (colorScale) {
+    var value = /** @type {number|string} */(iterator.get('heat'));
+    if (goog.isDef(value))
+      scaledColor = colorScale.valueToColor(value);
+
+    values['scaledColor'] = {value: scaledColor, type: anychart.enums.TokenType.UNKNOWN};
+  }
+
+  values['colorScale'] = {value: colorScale, type: anychart.enums.TokenType.UNKNOWN};
+  values['sourceColor'] = {value: scaledColor || source, type: anychart.enums.TokenType.UNKNOWN};
+
+  return pointProvider.propagate(values);
 };
 
 

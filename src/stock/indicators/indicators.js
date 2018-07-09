@@ -5,6 +5,7 @@
 goog.provide('anychart.stockModule.indicators');
 goog.require('anychart.stockModule.indicators.ADL');
 goog.require('anychart.stockModule.indicators.AMA');
+goog.require('anychart.stockModule.indicators.AO');
 goog.require('anychart.stockModule.indicators.ATR');
 goog.require('anychart.stockModule.indicators.Aroon');
 goog.require('anychart.stockModule.indicators.BBands');
@@ -47,6 +48,7 @@ anychart.stockModule.indicators.config = (function() {
   var res = {};
   res[anychart.enums.StockIndicatorTypes.ADL] = anychart.stockModule.indicators.ADL;
   res[anychart.enums.StockIndicatorTypes.AMA] = anychart.stockModule.indicators.AMA;
+  res[anychart.enums.StockIndicatorTypes.AO] = anychart.stockModule.indicators.AO;
   res[anychart.enums.StockIndicatorTypes.AROON] = anychart.stockModule.indicators.Aroon;
   res[anychart.enums.StockIndicatorTypes.ATR] = anychart.stockModule.indicators.ATR;
   res[anychart.enums.StockIndicatorTypes.BBANDS] = anychart.stockModule.indicators.BBands;

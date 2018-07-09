@@ -510,7 +510,8 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'background': {
           'fill': 'none'
         }
-      }
+      },
+      'baseline': 0
     },
     'padding': [20, 30, 20, 60],
     'plots': [{}],

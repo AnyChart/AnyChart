@@ -71,8 +71,7 @@ anychart.mapModule.Series.prototype.SUPPORTED_SIGNALS =
  */
 anychart.mapModule.Series.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.series.Cartesian.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.MAP_GEO_DATA_INDEX |
-    anychart.ConsistencyState.MAP_COLOR_SCALE;
+    anychart.ConsistencyState.MAP_GEO_DATA_INDEX;
 
 
 /**
@@ -144,50 +143,6 @@ anychart.mapModule.Series.prototype.seriesPoints;
 
 //endregion
 //region --- Coloring
-/**
- * Color scale.
- * @param {(anychart.colorScalesModule.Linear|anychart.colorScalesModule.Ordinal|Object|anychart.enums.ScaleTypes)=} opt_value Scale to set.
- * @return {anychart.colorScalesModule.Ordinal|anychart.colorScalesModule.Linear|anychart.mapModule.Series} Default chart color scale value or itself for
- * method chaining.
- */
-anychart.mapModule.Series.prototype.colorScale = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (goog.isNull(opt_value) && this.colorScale_) {
-      this.colorScale_ = null;
-      this.invalidate(anychart.ConsistencyState.MAP_COLOR_SCALE,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_COLOR_RANGE);
-    } else {
-      var val = anychart.scales.Base.setupScale(this.colorScale_, opt_value, null,
-          anychart.scales.Base.ScaleTypes.COLOR_SCALES, null, this.colorScaleInvalidated_, this);
-      if (val) {
-        var dispatch = this.colorScale_ == val;
-        this.colorScale_ = val;
-        this.colorScale_.resumeSignalsDispatching(dispatch);
-        if (!dispatch) {
-          this.invalidate(anychart.ConsistencyState.MAP_COLOR_SCALE,
-              anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_COLOR_RANGE);
-        }
-      }
-    }
-    return this;
-  }
-  return this.colorScale_;
-};
-
-
-/**
- * Chart scale invalidation handler.
- * @param {anychart.SignalEvent} event Event.
- * @private
- */
-anychart.mapModule.Series.prototype.colorScaleInvalidated_ = function(event) {
-  if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REAPPLICATION)) {
-    this.invalidate(anychart.ConsistencyState.MAP_COLOR_SCALE,
-        anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_COLOR_RANGE);
-  }
-};
-
-
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Path manager interface methods
@@ -901,12 +856,14 @@ anychart.mapModule.Series.prototype.applyAppearanceToPoint = function(pointState
               shapeGroup['hatchFill'] = shape.hatchFillDomElement;
 
             this.shapeManager.updateColors(pointState, shapeGroup);
+            this.shapeManager.updateMarkersColors(pointState, shapeGroup);
           }, this);
         }
       }
     } else {
-      this.shapeManager.updateColors(pointState,
-          /** @type {Object.<string, acgraph.vector.Shape>} */(iterator.meta('shapes')));
+      var shapes = /** @type {Object.<string, acgraph.vector.Shape>} */(iterator.meta('shapes'));
+      this.shapeManager.updateColors(pointState, shapes);
+      this.shapeManager.updateMarkersColors(pointState, shapes);
     }
   }
   if (this.supportsOutliers()) {
@@ -927,16 +884,23 @@ anychart.mapModule.Series.prototype.getStartValueForAppearanceReduction = goog.n
 
 //endregion
 //region --- Drawing
+/** @inheritDoc */
+anychart.mapModule.Series.prototype.calcColorScale = function() {
+  this.markConsistent(anychart.ConsistencyState.SERIES_COLOR_SCALE);
+};
+
+
 /**
  * Calculation before draw.
  */
 anychart.mapModule.Series.prototype.calculate = function() {
   if (!this.isChoropleth()) {
-    this.markConsistent(anychart.ConsistencyState.MAP_COLOR_SCALE);
+    this.markConsistent(anychart.ConsistencyState.SERIES_COLOR_SCALE);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_GEO_DATA_INDEX) ||
-      this.hasInvalidationState(anychart.ConsistencyState.MAP_COLOR_SCALE)) {
+      this.hasInvalidationState(anychart.ConsistencyState.SERIES_COLOR_SCALE)) {
+    var colorScale = this.getColorScale();
     var refNames = this.getYValueNames();
     this.seriesPoints.length = 0;
     var iterator = this.getResetIterator();
@@ -969,19 +933,20 @@ anychart.mapModule.Series.prototype.calculate = function() {
         iterator.meta('features', features);
       }
 
-      if (this.hasInvalidationState(anychart.ConsistencyState.MAP_COLOR_SCALE)) {
+      if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_COLOR_SCALE)) {
+
         var value = iterator.get(refNames[1]);
-        if (this.colorScale_)
-          this.colorScale_.extendDataRange(value);
+        if (colorScale)
+          colorScale.extendDataRange(value);
       }
     }
 
-    if (this.hasInvalidationState(anychart.ConsistencyState.MAP_COLOR_SCALE)) {
-      if (this.colorScale_)
-        this.colorScale_.finishAutoCalc();
+    if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_COLOR_SCALE)) {
+      if (colorScale)
+        colorScale.finishAutoCalc();
     }
     this.markConsistent(anychart.ConsistencyState.MAP_GEO_DATA_INDEX);
-    this.markConsistent(anychart.ConsistencyState.MAP_COLOR_SCALE);
+    this.markConsistent(anychart.ConsistencyState.SERIES_COLOR_SCALE);
   }
 };
 
@@ -1799,7 +1764,6 @@ anychart.mapModule.Series.prototype.setupByJSON = function(config, opt_default) 
   proto['overlapMode'] = proto.overlapMode;
   proto['geoIdField'] = proto.geoIdField;
   proto['transformXY'] = proto.transformXY;
-  proto['colorScale'] = proto.colorScale;
   proto['getPoint'] = proto.getPoint;
 })();
 //endregion

@@ -667,14 +667,15 @@ anychart.cartesian3dModule.Chart.prototype.prepare3d = function() {
               series.zIndex() != maxZIndex) {
             maxZIndex = series.zIndex();
           }
+          if (series.supportsStack()) {
+            this.lastEnabledAreaSeriesMap[series.getScalesPairIdentifier()] = actualIndex;
+          }
         }
         //Set zIndex for the series for correct min/max labels position.
         series.zIndex(/**@type {number}*/(maxZIndex));
-      } else if (series.supportsStack()) {
-        this.lastEnabledAreaSeriesMap[series.getScalesPairIdentifier()] = actualIndex;
+      } else {
+        series.setAutoZIndex(series.autoIndex() * anychart.core.series.Base.ZINDEX_INCREMENT_MULTIPLIER + anychart.cartesian3dModule.Chart.ZINDEX_2D_LINE_SERIES);
       }
-    } else {
-      series.setAutoZIndex(series.autoIndex() * anychart.core.series.Base.ZINDEX_INCREMENT_MULTIPLIER + anychart.cartesian3dModule.Chart.ZINDEX_2D_LINE_SERIES);
     }
   }
 };

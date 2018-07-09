@@ -299,42 +299,78 @@ anychart.stockModule.Series.prototype.considerMetaEmpty = function() {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
-anychart.stockModule.Series.prototype.getColorResolutionContext = function(opt_baseColor, opt_ignorePointSettings) {
+anychart.stockModule.Series.prototype.getColorResolutionContext = function(opt_baseColor, opt_ignorePointSettings, opt_ignoreColorScale) {
+  var pointProvider = this.getPointProvider();
+
+  var iterator = !!opt_ignorePointSettings ? this.getDetachedIterator() : this.getIterator();
+  var index = iterator.getIndex();
+
+  pointProvider
+      .dataSource(iterator)
+      .statisticsSources([this.getPoint(index), this]);
+
+  var scaledColor;
   var source = opt_baseColor || this.getOption('color') || 'blue';
-  if (this.supportsPointSettings()) {
-    var iterator = !!opt_ignorePointSettings ? this.getDetachedIterator() : this.getIterator();
-    return {
-      'index': iterator.getIndex(),
-      'sourceColor': source,
-      'iterator': iterator,
-      'series': this,
-      'plot': this.plot,
-      'chart': this.chart
-    };
-  }
-  return {
-    'sourceColor': source
+  var x = iterator.getX();
+  var value = iterator.get('value');
+  var name = goog.isDef(iterator.get('name')) ? iterator.get('name') : x;
+  var values = {
+    'x': {value: x, type: anychart.enums.TokenType.DATE_TIME},
+    'value': {value: value, type: anychart.enums.TokenType.NUMBER},
+    'index': {value: index, type: anychart.enums.TokenType.NUMBER},
+    'iterator': {value: iterator, type: anychart.enums.TokenType.UNKNOWN},
+    'autoColor': {value: source, type: anychart.enums.TokenType.UNKNOWN},
+    'chart': {value: this.chart, type: anychart.enums.TokenType.UNKNOWN},
+    'plot': {value: this.plot, type: anychart.enums.TokenType.UNKNOWN},
+    'series': {value: this, type: anychart.enums.TokenType.UNKNOWN},
+    'name': {value: name, type: anychart.enums.TokenType.STRING},
+    'isIntersection': {value: !!iterator.meta('isIntersection'), type: anychart.enums.TokenType.STRING}
   };
+
+  var ignoreColorScale = goog.isDef(opt_ignoreColorScale) && opt_ignoreColorScale;
+  var colorScale = this.colorScale();
+  if (colorScale && !ignoreColorScale) {
+    if (goog.isDef(value))
+      scaledColor = colorScale.valueToColor(value);
+
+    values['scaledColor'] = {value: scaledColor, type: anychart.enums.TokenType.UNKNOWN};
+    values['colorScale'] = {value: colorScale, type: anychart.enums.TokenType.UNKNOWN};
+  }
+
+  values['sourceColor'] = {value: scaledColor || source, type: anychart.enums.TokenType.UNKNOWN};
+
+  return pointProvider.propagate(values);
 };
 
 
 /** @inheritDoc */
 anychart.stockModule.Series.prototype.getHatchFillResolutionContext = function(opt_ignorePointSettings) {
+  var pointProvider = this.getPointProvider();
+
+  var iterator = !!opt_ignorePointSettings ? this.getDetachedIterator() : this.getIterator();
+  var index = iterator.getIndex();
+
+  pointProvider
+      .dataSource(iterator)
+      .statisticsSources([this.getPoint(index), this]);
+
   var source = this.getAutoHatchFill();
-  if (this.supportsPointSettings()) {
-    var iterator = !!opt_ignorePointSettings ? this.getDetachedIterator() : this.getIterator();
-    return {
-      'index': iterator.getIndex(),
-      'sourceHatchFill': source,
-      'iterator': iterator,
-      'series': this,
-      'plot': this.plot,
-      'chart': this.chart
-    };
-  }
-  return {
-    'sourceHatchFill': source
+  var x = iterator.getX();
+  var value = iterator.get('value');
+  var name = goog.isDef(iterator.get('name')) ? iterator.get('name') : x;
+  var values = {
+    'x': {value: x, type: anychart.enums.TokenType.DATE_TIME},
+    'value': {value: value, type: anychart.enums.TokenType.NUMBER},
+    'index': {value: index, type: anychart.enums.TokenType.NUMBER},
+    'iterator': {value: iterator, type: anychart.enums.TokenType.UNKNOWN},
+    'sourceHatchFill': {value: source, type: anychart.enums.TokenType.UNKNOWN},
+    'plot': {value: this.plot, type: anychart.enums.TokenType.UNKNOWN},
+    'chart': {value: this.chart, type: anychart.enums.TokenType.UNKNOWN},
+    'series': {value: this, type: anychart.enums.TokenType.UNKNOWN},
+    'name': {value: name, type: anychart.enums.TokenType.STRING}
   };
+
+  return pointProvider.propagate(values);
 };
 
 
@@ -456,6 +492,7 @@ anychart.stockModule.Series.prototype.removeHighlight = function() {
   this.inHighlight_ = false;
 
   this.highlightStickyRow_(anychart.PointState.NORMAL);
+  this.getIterator().reset();
 };
 
 
@@ -469,16 +506,20 @@ anychart.stockModule.Series.prototype.highlightStickyRow_ = function(state) {
     var iterator = this.getIterator();
     iterator.specialSelect(this.highlightedStyckyRow_.row, this.highlightedStyckyRow_.getIndex());
 
-    iterator.meta('marker', this.drawFactoryElement(
-        [this.normal_.markers, this.hovered_.markers, this.selected_.markers],
-        [],
-        ['marker', 'hoverMarker', 'selectMarker'],
-        false,
-        false,
-        null,
-        iterator,
-        state,
-        true));
+    if (this.chart.getAllowPointSettings()) {
+      if (this.isDiscreteBased()) {
+        this.shapeManager.updateColors(state,
+            /** @type {Object.<string, acgraph.vector.Shape>} */(iterator.meta('shapes')));
+      }
+      var metaName = anychart.utils.instanceOf(this.shapeManager, anychart.core.shapeManagers.PerPoint) ? 'shapes' : 'shapeNames';
+      var shapes = /** @type {Object.<string, acgraph.vector.Shape>} */(iterator.meta(metaName));
+
+      this.shapeManager.updateMarkersColors(state, shapes);
+      this.drawer.updatePoint(iterator, state);
+    }
+
+    if (this.check(anychart.core.series.Capabilities.SUPPORTS_MARKERS))
+      this.drawMarker(iterator, state, true);
 
     if (state == anychart.PointState.NORMAL)
       this.highlightedStyckyRow_ = null;
@@ -704,10 +745,11 @@ anychart.stockModule.Series.prototype.allowPointSettings = function(opt_value) {
       return allowFlag;
   }
 
+  var chartSettings = /** @type {boolean} */(this.chart.getAllowPointSettings ? this.chart.getAllowPointSettings() : false);
   if (goog.isDef(opt_value)) {
     opt_value = !!opt_value;
     if (!goog.isDef(this.allowPointSettings_))
-      this.allowPointSettings_ = this.chart.getAllowPointSettings();
+      this.allowPointSettings_ = chartSettings;
     if (this.allowPointSettings_ != opt_value) {
       this.allowPointSettings_ = opt_value;
       var config = /** @type {anychart.core.series.TypeConfig} */ (this.chart.getConfigByType(this.getType())[1]);
@@ -721,14 +763,17 @@ anychart.stockModule.Series.prototype.allowPointSettings = function(opt_value) {
     }
     return this;
   }
-  return goog.isDef(this.allowPointSettings_) ? this.allowPointSettings_ : /** @type {boolean} */(this.chart.getAllowPointSettings());
+
+  return goog.isDef(this.allowPointSettings_) ? this.allowPointSettings_ : chartSettings;
 };
 
 
 /** @inheritDoc */
 anychart.stockModule.Series.prototype.applyConfig = function(config, opt_reapplyClip) {
   var newConfig = /** @type {anychart.core.series.TypeConfig} */(goog.object.clone(config));
-  var allowFlag = this.allowPointSettings();
+  var allowFlag = !anychart.utils.instanceOf(this, anychart.stockModule.ScrollerSeries) && this.allowPointSettings();
+
+  newConfig.capabilities |= (allowFlag && anychart.core.series.Capabilities.ALLOW_POINT_SETTINGS);
   newConfig.shapeManagerType = allowFlag ? anychart.enums.ShapeManagerTypes.PER_POINT : anychart.enums.ShapeManagerTypes.PER_SERIES;
   anychart.stockModule.Series.base(this, 'applyConfig', newConfig, opt_reapplyClip);
 };

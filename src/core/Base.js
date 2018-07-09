@@ -121,7 +121,6 @@ anychart.ConsistencyState = {
   SPARK_AXES_MARKERS: 1 << 14,
   //---------------------------------- MAP STATES (SERIES_CHART) ---------------------------------
   MAP_SCALE: 1 << 16,
-  MAP_COLOR_SCALE: 1 << 17,
   MAP_GEO_DATA: 1 << 18,
   MAP_COLOR_RANGE: 1 << 19,
   MAP_MOVE: 1 << 20,
@@ -149,6 +148,7 @@ anychart.ConsistencyState = {
   SERIES_ERROR: 1 << 13, //
   SERIES_OUTLIERS: 1 << 14, //
   SERIES_SHAPE_MANAGER: 1 << 15,
+  SERIES_COLOR_SCALE: 1 << 16,
   //---------------------------------- AXES STATES (VB) ---------------------------------
   CALLOUT_TITLE: 1 << 6,
   CALLOUT_LABELS: 1 << 7,
@@ -233,6 +233,7 @@ anychart.ConsistencyState = {
   TOOLTIP_ALLOWANCE: 1 << 13, //allowLeaveScreen or allowLeaveChart.
   TOOLTIP_HTML_MODE: 1 << 14, //html-tooltip usage.
   //------------------------------ CIRCULAR/LINEAR GAUGE (CHART) ------------------------------
+  //---------------------------------- GAUGE STATES (CHART) ---------------------------------
   GAUGE_POINTERS: 1 << 12,
   GAUGE_KNOB: 1 << 13,
   GAUGE_CAP: 1 << 14,
@@ -247,6 +248,7 @@ anychart.ConsistencyState = {
   GAUGE_SCALE_BAR: 1 << 23,
   GAUGE_POINTER_LABELS: 1 << 13, // reset knob state for linear gauge, cause it doesn't need it
   //---------------------------------- TABLE (VB) ---------------------------------------------
+  //---------------------------------- TABLE STATES (VB) ---------------------------------
   TABLE_CELL_BOUNDS: 1 << 6,
   TABLE_OVERLAP: 1 << 7,
   TABLE_BORDERS: 1 << 8,

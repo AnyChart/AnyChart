@@ -66,8 +66,21 @@ anychart.core.drawers.Column.prototype.requiredShapes = (function() {
 
 /** @inheritDoc */
 anychart.core.drawers.Column.prototype.drawSubsequentPoint = function(point, state) {
-  var shapes = /** @type {Object.<acgraph.vector.Path>} */(this.shapesManager.getShapesGroup(state));
-  this.drawPointShape(point, shapes['path'], shapes['hatchFill']);
+  var shapesManager = this.shapesManager;
+  var value = point.get(this.series.getYValueNames()[0]);
+  var names = this.getShapeNames(value, this.prevValue);
+
+  var shapeNames = {};
+  shapeNames[names.path] = true;
+  shapeNames[names.hatchFill] = true;
+
+  point.meta('names', names);
+
+  var shapes = /** @type {Object.<acgraph.vector.Path>} */(shapesManager.getShapesGroup(state, shapeNames));
+
+  this.drawPointShape(point, shapes[names.path], shapes[names.hatchFill]);
+
+  this.prevValue = value;
 };
 
 
@@ -75,9 +88,11 @@ anychart.core.drawers.Column.prototype.drawSubsequentPoint = function(point, sta
 anychart.core.drawers.Column.prototype.updatePointOnAnimate = function(point) {
   // this code can currently work with Bar series created with PerPoint shape managers.
   var shapes = /** @type {Object.<acgraph.vector.Path>} */(point.meta('shapes'));
+  var names = /** @type {Object} */(point.meta('names'));
+
   for (var i in shapes)
     shapes[i].clear();
-  this.drawPointShape(point, shapes['path'], shapes['hatchFill']);
+  this.drawPointShape(point, shapes[names.path], shapes[names.hatchFill]);
 };
 
 

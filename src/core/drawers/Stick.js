@@ -63,17 +63,30 @@ anychart.core.drawers.Stick.prototype.startDrawing = function(shapeManager) {
 
 /** @inheritDoc */
 anychart.core.drawers.Stick.prototype.drawSubsequentPoint = function(point, state) {
-  var shapes = /** @type {Object.<acgraph.vector.Path>} */(this.shapesManager.getShapesGroup(state));
-  this.drawPoint_(point, shapes);
+  var shapesManager = this.shapesManager;
+  var value = point.get(this.series.getYValueNames()[0]);
+  var names = this.getShapeNames(value, this.prevValue);
+
+  var shapeNames = {};
+  shapeNames[names.stroke] = true;
+
+  point.meta('names', names);
+
+  var shapes = /** @type {Object.<acgraph.vector.Path>} */(shapesManager.getShapesGroup(state, shapeNames));
+
+  this.drawPoint_(point, shapes, names);
+
+  this.prevValue = value;
 };
 
 
 /** @inheritDoc */
 anychart.core.drawers.Stick.prototype.updatePointOnAnimate = function(point) {
   var shapes = /** @type {Object.<acgraph.vector.Path>} */(point.meta('shapes'));
+  var names = /** @type {Object} */(point.meta('names'));
   for (var i in shapes)
     shapes[i].clear();
-  this.drawPoint_(point, shapes);
+  this.drawPoint_(point, shapes, names);
 };
 
 
@@ -81,21 +94,22 @@ anychart.core.drawers.Stick.prototype.updatePointOnAnimate = function(point) {
  * Actually draws the point.
  * @param {anychart.data.IRowInfo} point
  * @param {Object.<acgraph.vector.Shape>} shapes
+ * @param {Object} names
  * @private
  */
-anychart.core.drawers.Stick.prototype.drawPoint_ = function(point, shapes) {
+anychart.core.drawers.Stick.prototype.drawPoint_ = function(point, shapes, names) {
   var x = /** @type {number} */(point.meta('x'));
   var zero = /** @type {number} */(point.meta('zero'));
   var y = /** @type {number} */(point.meta('value'));
 
-  var thickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(shapes['stroke'].stroke()));
+  var thickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(shapes[names.stroke].stroke()));
   if (this.crispEdges) {
     x = anychart.utils.applyPixelShift(x, thickness);
   }
   // y = anychart.utils.applyPixelShift(y, thickness);
   // zero = anychart.utils.applyPixelShift(zero, thickness);
 
-  var path = /** @type {acgraph.vector.Path} */(shapes['stroke']);
+  var path = /** @type {acgraph.vector.Path} */(shapes[names.stroke]);
   anychart.core.drawers.move(path, this.isVertical, x, y);
   anychart.core.drawers.line(path, this.isVertical, x, zero);
 };

@@ -101,7 +101,8 @@ anychart.core.ChartWithSeries = function() {
     ['defaultSeriesType', 0, 0],
     ['pointWidth', anychart.ConsistencyState.SERIES_CHART_SERIES, anychart.Signal.NEEDS_REDRAW, 0, this.invalidateWidthBasedSeries],
     ['maxPointWidth', anychart.ConsistencyState.SERIES_CHART_SERIES, anychart.Signal.NEEDS_REDRAW, 0, this.invalidateWidthBasedSeries],
-    ['minPointLength', anychart.ConsistencyState.SERIES_CHART_SERIES, anychart.Signal.NEEDS_REDRAW, 0, this.resetSeriesStack]
+    ['minPointLength', anychart.ConsistencyState.SERIES_CHART_SERIES, anychart.Signal.NEEDS_REDRAW, 0, this.resetSeriesStack],
+    ['baseline', anychart.ConsistencyState.SERIES_CHART_SERIES, anychart.Signal.NEEDS_REDRAW, 0, this.resetSeriesBaseLine]
   ]);
 };
 goog.inherits(anychart.core.ChartWithSeries, anychart.core.SeparateChart);
@@ -226,7 +227,8 @@ anychart.core.ChartWithSeries.PROPERTY_DESCRIPTORS = (function() {
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'defaultSeriesType', seriesTypeNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'pointWidth', anychart.utils.normalizeNumberOrPercent],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'maxPointWidth', anychart.utils.normalizeNumberOrPercent],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'minPointLength', anychart.utils.normalizeNumberOrPercent]
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'minPointLength', anychart.utils.normalizeNumberOrPercent],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'baseline', anychart.core.settings.numberNormalizer]
   ]);
   return map;
 })();
@@ -608,6 +610,21 @@ anychart.core.ChartWithSeries.prototype.minBubbleSize = function(opt_value) {
     return this;
   }
   return this.minBubbleSize_;
+};
+
+
+/**
+ * Resets series shared stack.
+ * @param {boolean=} opt_skipInvalidation - Whether to skip width based series invalidation.
+ */
+anychart.core.ChartWithSeries.prototype.resetSeriesBaseLine = function(opt_skipInvalidation) {
+  for (var i = 0; i < this.seriesList.length; i++) {
+    var series = this.seriesList[i];
+    if (series)
+      series.resetSharedStack();
+    if (!opt_skipInvalidation)
+      series.invalidate(anychart.ConsistencyState.SERIES_POINTS);
+  }
 };
 
 

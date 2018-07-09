@@ -62,7 +62,21 @@ anychart.polarModule.drawers.RangeColumn.prototype.startDrawing = function(shape
 
 /** @inheritDoc */
 anychart.polarModule.drawers.RangeColumn.prototype.drawSubsequentPoint = function(point, state) {
-  var shapes = this.shapesManager.getShapesGroup(state);
+  var valueNames = this.series.getYValueNames();
+
+  var highValue = point.get(valueNames[1]);
+  var lowValue = point.get(valueNames[0]);
+
+  var names = this.getShapeNames(highValue, lowValue);
+
+  var shapeNames = {};
+  shapeNames[names.path] = true;
+  shapeNames[names.hatchFill] = true;
+
+  point.meta('name', names.path);
+
+  var shapes = this.shapesManager.getShapesGroup(state, shapeNames);
+
   var lowRatio = /** @type {number} */(point.meta('lowRatio'));
   var xRatio = /** @type {number} */(point.meta('xRatio'));
   var highRatio = /** @type {number} */(point.meta('highRatio'));
@@ -72,7 +86,7 @@ anychart.polarModule.drawers.RangeColumn.prototype.drawSubsequentPoint = functio
   var leftSide = this.series.ratiosToPixelPairs(leftXRatio, [lowRatio, highRatio]);
   var rightSide = this.series.ratiosToPixelPairs(rightXRatio, [lowRatio, highRatio]);
 
-  var path = /** @type {acgraph.vector.Path} */(shapes['path']);
+  var path = /** @type {acgraph.vector.Path} */(shapes[names.path]);
   path.moveTo(leftSide[2], leftSide[3]);
   path.curveTo.apply(path, anychart.math.getPolarLineParamsSimple(
       leftSide[2], leftSide[3], leftXRatio, highRatio,
@@ -84,6 +98,6 @@ anychart.polarModule.drawers.RangeColumn.prototype.drawSubsequentPoint = functio
       leftSide[0], leftSide[1], leftXRatio, lowRatio,
       this.cx, this.cy, this.radius, this.innerRadius, this.zeroAngle, true));
   path.close();
-  var hatch = /** @type {acgraph.vector.Path} */(shapes['hatchFill']);
+  var hatch = /** @type {acgraph.vector.Path} */(shapes[names.hatchFill]);
   hatch.deserialize(path.serializePathArgs());
 };

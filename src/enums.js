@@ -1899,6 +1899,7 @@ anychart.enums.normalizeStockSeriesType = function(value, opt_default) {
 anychart.enums.StockIndicatorTypes = {
   ADL: 'adl',
   AMA: 'ama',
+  AO: 'ao',
   AROON: 'aroon',
   ATR: 'atr',
   BBANDS: 'bbands',

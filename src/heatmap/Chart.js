@@ -156,6 +156,22 @@ anychart.heatmapModule.Chart.REVERSE_PROXY_METHODS = ([
 anychart.core.settings.populateAliases(anychart.heatmapModule.Chart, ['fill', 'stroke', 'hatchFill', 'labels', 'markers'], 'normal');
 
 
+/**
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.heatmapModule.Chart.PROPERTY_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'labelsDisplayMode',
+      anychart.enums.normalizeLabelsDisplayMode);
+  return map;
+})();
+anychart.core.settings.populate(anychart.heatmapModule.Chart, anychart.heatmapModule.Chart.PROPERTY_DESCRIPTORS);
+
+
 /** @inheritDoc */
 anychart.heatmapModule.Chart.prototype.normalizeSeriesType = function(type) {
   return anychart.enums.normalizeHeatMapSeriesType(type);
@@ -473,22 +489,6 @@ anychart.heatmapModule.Chart.prototype.legendItemOut = function(item, event) {
 };
 
 
-/**
- * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
- */
-anychart.heatmapModule.Chart.PROPERTY_DESCRIPTORS = (function() {
-  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
-  var map = {};
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'labelsDisplayMode',
-      anychart.enums.normalizeLabelsDisplayMode);
-  return map;
-})();
-anychart.core.settings.populate(anychart.heatmapModule.Chart, anychart.heatmapModule.Chart.PROPERTY_DESCRIPTORS);
-
-
 /** @inheritDoc */
 anychart.heatmapModule.Chart.prototype.createEventSeriesStatus = function(seriesStatus, opt_empty) {
   var eventSeriesStatus = [];
@@ -669,8 +669,10 @@ anychart.heatmapModule.Chart.prototype.calculateXYScales = function() {
       }
       this.colorScale_.finishAutoCalc();
     }
-    this.series_.invalidate(anychart.ConsistencyState.SERIES_COLOR);
+    if (this.series_)
+      this.series_.invalidate(anychart.ConsistencyState.SERIES_COLOR);
     this.invalidate(anychart.ConsistencyState.SERIES_CHART_SERIES);
+
     this.markConsistent(anychart.ConsistencyState.HEATMAP_COLOR_SCALE);
   }
 };

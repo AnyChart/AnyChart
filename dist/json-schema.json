@@ -544,6 +544,12 @@
             "null"
           ]
         },
+        "baseline": {
+          "type": [
+            "string",
+            "number"
+          ]
+        },
         "maxPointWidth": {
           "type": [
             "string",
@@ -972,6 +978,12 @@
           "type": [
             "number"
           ]
+        },
+        "baseline": {
+          "type": [
+            "string",
+            "number"
+          ]
         }
       },
       "required": ["type"]
@@ -1128,6 +1140,12 @@
           "type": [
             "number",
             "string"
+          ]
+        },
+        "baseline": {
+          "type": [
+            "string",
+            "number"
           ]
         }
       },
@@ -1330,6 +1348,12 @@
             "leftBottom": {"$ref": "#/definitions/anychart.core.quadrant.Quarter"},
             "rightBottom": {"$ref": "#/definitions/anychart.core.quadrant.Quarter"}
           }
+        },
+        "baseline": {
+          "type": [
+            "string",
+            "number"
+          ]
         }
       },
       "required": ["type"]
@@ -2784,6 +2808,13 @@
         },
         "highStroke": {"$ref": "#/definitions/stroke"},
         "lowStroke": {"$ref": "#/definitions/stroke"},
+
+        "highFill": {"$ref": "#/definitions/fill"},
+        "lowFill": {"$ref": "#/definitions/fill"},
+
+        "highHatchFill": {"$ref": "#/definitions/hatchFillSet"},
+        "lowHatchFill": {"$ref": "#/definitions/hatchFillSet"},
+
         "medianStroke": {"$ref": "#/definitions/stroke"},
 
         "stemStroke": {"$ref": "#/definitions/stroke"},
@@ -6141,6 +6172,10 @@
       "properties": {
         "fill": {"$ref": "#/definitions/fill"},
         "negativeFill": {"$ref": "#/definitions/fill"},
+        "highFill": {"$ref": "#/definitions/fill"},
+        "lowFill": {"$ref": "#/definitions/fill"},
+        "highHatchFill": {"$ref": "#/definitions/hatchFillSet"},
+        "lowHatchFill": {"$ref": "#/definitions/hatchFillSet"},
         "risingFill": {"$ref": "#/definitions/fill"},
         "fallingFill": {"$ref": "#/definitions/fill"},
         "stroke": {"$ref": "#/definitions/stroke"},

@@ -66,24 +66,9 @@ anychart.core.drawers.SplineArea.prototype.requiredShapes = (function() {
 /** @inheritDoc */
 anychart.core.drawers.SplineArea.prototype.startDrawing = function(shapeManager) {
   anychart.core.drawers.SplineArea.base(this, 'startDrawing', shapeManager);
-  var shapes = this.shapesManager.getShapesGroup(this.seriesState);
+
   this.queue_.isVertical(this.isVertical);
   this.queue_.rtl(this.series.planIsXScaleInverted());
-  /**
-   * @type {Array.<acgraph.vector.Path>}
-   * @private
-   */
-  this.forwardPaths_ = [
-    /** @type {acgraph.vector.Path} */(shapes['fill']),
-    /** @type {acgraph.vector.Path} */(shapes['hatchFill']),
-    /** @type {acgraph.vector.Path} */(shapes['stroke'])];
-  /**
-   * @type {Array.<acgraph.vector.Path>}
-   * @private
-   */
-  this.backwardPaths_ = [
-    /** @type {acgraph.vector.Path} */(shapes['fill']),
-    /** @type {acgraph.vector.Path} */(shapes['hatchFill'])];
 };
 
 
@@ -104,20 +89,33 @@ anychart.core.drawers.SplineArea.prototype.drawMissingPoint = function(point, st
 
 /** @inheritDoc */
 anychart.core.drawers.SplineArea.prototype.drawFirstPoint = function(point, state) {
-  var shapes = this.shapesManager.getShapesGroup(this.seriesState);
+  var value = /** @type {number} */(point.get(this.series.getYValueNames()[0]));
+  var names = this.getShapeNames(value, this.prevValue);
+
   var x = /** @type {number} */(point.meta('x'));
   var zero = /** @type {number} */(point.meta('zero'));
   var zeroMissing = /** @type {boolean} */(point.meta('zeroMissing'));
   var y = /** @type {number} */(point.meta('value'));
 
-  this.queue_.setPaths(this.forwardPaths_);
   this.queue_.resetDrawer(false);
-  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes['fill']), this.isVertical, x, zero);
-  anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes['fill']), this.isVertical, x, y);
-  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes['hatchFill']), this.isVertical, x, zero);
-  anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes['hatchFill']), this.isVertical, x, y);
-  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes['stroke']), this.isVertical, x, y);
+  this.queue_.baseline(zero);
   this.queue_.processPoint(x, y);
+
+  var shapeNames = {};
+  shapeNames[names.stroke] = true;
+  shapeNames[names.fill] = true;
+  shapeNames[names.hatchFill] = true;
+
+  this.currentShapes = this.shapesManager.getShapesGroup(this.seriesState, shapeNames);
+
+  var fillShape = /** @type {acgraph.vector.Path} */(this.currentShapes[names.fill]);
+  fillShape.baselineDepened = true;
+  var hatchShape = /** @type {acgraph.vector.Path} */(this.currentShapes[names.hatchFill]);
+  hatchShape.baselineDepened = true;
+  var strokeShape = /** @type {acgraph.vector.Path} */(this.currentShapes[names.stroke]);
+  strokeShape.baselineDepened = false;
+
+  this.queue_.setPaths([fillShape, strokeShape, hatchShape]);
 
   if (this.series.planIsStacked()) {
     /** @type {Array.<number|boolean>} */
@@ -128,11 +126,18 @@ anychart.core.drawers.SplineArea.prototype.drawFirstPoint = function(point, stat
     /** @type {number} */
     this.zeroY = zero;
   }
+
+  this.prevY = y;
+  this.prevValue = value;
 };
 
 
 /** @inheritDoc */
 anychart.core.drawers.SplineArea.prototype.drawSubsequentPoint = function(point, state) {
+  var shapesManager = this.shapesManager;
+  var value = /** @type {number} */(point.get(this.series.getYValueNames()[0]));
+  var names = this.currentNames = this.getShapeNames(value, this.prevValue);
+
   var x = /** @type {number} */(point.meta('x'));
   var zero = /** @type {number} */(point.meta('zero'));
   var zeroMissing = /** @type {boolean} */(point.meta('zeroMissing'));
@@ -140,11 +145,45 @@ anychart.core.drawers.SplineArea.prototype.drawSubsequentPoint = function(point,
 
   this.queue_.processPoint(x, y);
 
+  var shapeNames = {};
+  shapeNames[names.stroke] = true;
+  shapeNames[names.fill] = true;
+  shapeNames[names.hatchFill] = true;
+
+  var shapes = shapesManager.getShapesGroup(this.seriesState, shapeNames);
+
+  if (shapes != this.currentShapes) {
+    var crossY, prevY;
+    prevY = /** @type {number} */(this.prevY);
+
+    var isBaselineIntersect = this.isBaselineIntersect(value);
+    if (this.hasNegativeColoring && isBaselineIntersect) {
+      crossY = zero;
+    } else if (this.hasRisingFallingColoring && !this.hasNegativeColoring) {
+      crossY = prevY;
+    } else {
+      crossY = 'middle';
+    }
+    var fillShape = /** @type {acgraph.vector.Path} */(shapes[names.fill]);
+    fillShape.baselineDepened = true;
+    var hatchShape = /** @type {acgraph.vector.Path} */(shapes[names.hatchFill]);
+    hatchShape.baselineDepened = true;
+    var strokeShape = /** @type {acgraph.vector.Path} */(shapes[names.stroke]);
+    strokeShape.baselineDepened = false;
+
+    this.queue_.setBreak(crossY, [fillShape, strokeShape, hatchShape]);
+    this.queue_.baseline(zero);
+    this.currentShapes = shapes;
+  }
+
   if (this.series.planIsStacked()) {
     this.zeroesStack.push(x, zero, zeroMissing);
   } else {
     this.lastDrawnX = x;
   }
+
+  this.prevY = y;
+  this.prevValue = value;
 };
 
 
@@ -152,13 +191,25 @@ anychart.core.drawers.SplineArea.prototype.drawSubsequentPoint = function(point,
 anychart.core.drawers.SplineArea.prototype.finalizeSegment = function() {
   if (!this.prevPointDrawn) return;
   this.queue_.finalizeProcessing();
-  if (!isNaN(this.lastDrawnX)) {
-    anychart.core.drawers.line(this.backwardPaths_[0], this.isVertical, this.lastDrawnX, this.zeroY);
-    this.backwardPaths_[0].close();
-    anychart.core.drawers.line(this.backwardPaths_[1], this.isVertical, this.lastDrawnX, this.zeroY);
-    this.backwardPaths_[1].close();
-  } else if (this.zeroesStack) {
-    this.queue_.setPaths(this.backwardPaths_);
+
+  if (this.zeroesStack) {
+    var names = this.currentNames;
+
+    var shapeNames = {};
+    shapeNames[names.stroke] = true;
+    shapeNames[names.fill] = true;
+    shapeNames[names.hatchFill] = true;
+
+    this.currentShapes = this.shapesManager.getShapesGroup(this.seriesState, shapeNames);
+
+    var fillShape = /** @type {acgraph.vector.Path} */(this.currentShapes[names.fill]);
+    fillShape.baselineDepened = false;
+    var hatchShape = /** @type {acgraph.vector.Path} */(this.currentShapes[names.hatchFill]);
+    hatchShape.baselineDepened = false;
+    var strokeShape = /** @type {acgraph.vector.Path} */(this.currentShapes[names.stroke]);
+    strokeShape.baselineDepened = false;
+
+    this.queue_.setPaths([fillShape, strokeShape, hatchShape]);
     this.queue_.resetDrawer(true);
     /** @type {number} */
     var prevX = NaN;
@@ -176,22 +227,22 @@ anychart.core.drawers.SplineArea.prototype.finalizeSegment = function() {
       /** @type {boolean} */
       var isMissing = /** @type {boolean} */(this.zeroesStack[i]);
       if (firstPoint) {
-        anychart.core.drawers.line(this.backwardPaths_[0], this.isVertical, x, y);
-        anychart.core.drawers.line(this.backwardPaths_[1], this.isVertical, x, y);
+        anychart.core.drawers.line(fillShape, this.isVertical, x, y);
+        anychart.core.drawers.line(hatchShape, this.isVertical, x, y);
         if (!isMissing)
           this.queue_.processPoint(x, y);
         firstPoint = false;
       } else if (isMissing && prevWasMissing) {
-        anychart.core.drawers.line(this.backwardPaths_[0], this.isVertical, x, y);
-        anychart.core.drawers.line(this.backwardPaths_[1], this.isVertical, x, y);
+        anychart.core.drawers.line(fillShape, this.isVertical, x, y);
+        anychart.core.drawers.line(hatchShape, this.isVertical, x, y);
       } else if (isMissing) {
         this.queue_.finalizeProcessing();
         this.queue_.resetDrawer(true);
-        anychart.core.drawers.line(this.backwardPaths_[0], this.isVertical, prevX, y, x, y);
-        anychart.core.drawers.line(this.backwardPaths_[1], this.isVertical, prevX, y, x, y);
+        anychart.core.drawers.line(fillShape, this.isVertical, prevX, y, x, y);
+        anychart.core.drawers.line(hatchShape, this.isVertical, prevX, y, x, y);
       } else if (prevWasMissing) {
-        anychart.core.drawers.line(this.backwardPaths_[0], this.isVertical, x, prevY, x, y);
-        anychart.core.drawers.line(this.backwardPaths_[1], this.isVertical, x, prevY, x, y);
+        anychart.core.drawers.line(fillShape, this.isVertical, x, prevY, x, y);
+        anychart.core.drawers.line(hatchShape, this.isVertical, x, prevY, x, y);
         this.queue_.processPoint(x, y);
       } else {
         this.queue_.processPoint(x, y);

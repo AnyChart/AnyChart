@@ -76,19 +76,33 @@ anychart.core.drawers.Marker.prototype.requiredShapes = (function() {
 /** @inheritDoc */
 anychart.core.drawers.Marker.prototype.updatePointInternal = function(point, state) {
   var shapes = /** @type {Object.<acgraph.vector.Path>} */(point.meta('shapes'));
+  var names = /** @type {Object} */(point.meta('names'));
   // this can happen before first draw in Cartesian.prepareData()
   if (shapes) {
-    shapes['path'].clear();
-    shapes['hatchFill'].clear();
-    this.drawPointInternal(point, state, shapes);
+    shapes[names.path].clear();
+    shapes[names.hatchFill].clear();
+    this.drawPointInternal(point, state, shapes, names);
   }
 };
 
 
 /** @inheritDoc */
 anychart.core.drawers.Marker.prototype.drawSubsequentPoint = function(point, state) {
-  var shapes = this.shapesManager.getShapesGroup(state);
-  this.drawPointInternal(point, state, shapes);
+  var shapesManager = this.shapesManager;
+  var value = point.get(this.series.getYValueNames()[0]);
+  var names = this.getShapeNames(value, this.prevValue);
+
+  var shapeNames = {};
+  shapeNames[names.path] = true;
+  shapeNames[names.hatchFill] = true;
+
+  point.meta('names', names);
+
+  var shapes = /** @type {Object.<acgraph.vector.Path>} */(shapesManager.getShapesGroup(state, shapeNames));
+
+  this.drawPointInternal(point, state, shapes, names);
+
+  this.prevValue = value;
 };
 
 
@@ -97,9 +111,10 @@ anychart.core.drawers.Marker.prototype.drawSubsequentPoint = function(point, sta
  * @param {anychart.data.IRowInfo} point
  * @param {anychart.PointState|number} state
  * @param {Object.<acgraph.vector.Shape>} shapes
+ * @param {Object} names
  * @protected
  */
-anychart.core.drawers.Marker.prototype.drawPointInternal = function(point, state, shapes) {
+anychart.core.drawers.Marker.prototype.drawPointInternal = function(point, state, shapes, names) {
   var x = /** @type {number} */(point.meta('x'));
   var y = /** @type {number} */(point.meta('value'));
   var type = /** @type {anychart.enums.MarkerType|Function} */(this.typeGetter_(this.series, point, state));
@@ -111,6 +126,6 @@ anychart.core.drawers.Marker.prototype.drawPointInternal = function(point, state
     y = tmp;
   }
 
-  drawer(shapes['path'], x, y, size);
-  drawer(shapes['hatchFill'], x, y, size);
+  drawer(shapes[names.path], x, y, size);
+  drawer(shapes[names.hatchFill], x, y, size);
 };

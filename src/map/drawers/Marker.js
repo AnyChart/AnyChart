@@ -28,19 +28,28 @@ anychart.mapModule.drawers.Marker.prototype.yValueNames = (function () { return 
 
 /** @inheritDoc */
 anychart.mapModule.drawers.Marker.prototype.updatePointInternal = function(point, state) {
+  anychart.mapModule.drawers.Marker.base(this, 'updatePointInternal', point, state);
+
   var shapes = /** @type {Object.<acgraph.vector.Path>} */(point.meta('shapes'));
-  // this can happen before first draw in Cartesian.prepareData()
-  if (shapes) {
-    shapes['path'].clear();
-    shapes['hatchFill'].clear();
-    this.drawPointInternal(point, state, shapes);
-  }
   this.shapesManager.updateZIndex(state, shapes);
 };
 
 
 /** @inheritDoc */
 anychart.mapModule.drawers.Marker.prototype.drawSubsequentPoint = function(point, state) {
-  var shapes = this.shapesManager.getShapesGroup(state, undefined, state);
-  this.drawPointInternal(point, state, shapes);
+  var shapesManager = this.shapesManager;
+  var value = point.get(this.series.getYValueNames()[0]);
+  var names = this.getShapeNames(value, this.prevValue);
+
+  var shapeNames = {};
+  shapeNames[names.path] = true;
+  shapeNames[names.hatchFill] = true;
+
+  point.meta('names', names);
+
+  var shapes = shapesManager.getShapesGroup(state, shapeNames, state);
+
+  this.drawPointInternal(point, state, shapes, names);
+
+  this.prevValue = value;
 };

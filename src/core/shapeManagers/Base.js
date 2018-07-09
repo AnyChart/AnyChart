@@ -133,8 +133,8 @@ goog.inherits(anychart.core.shapeManagers.Base, goog.Disposable);
 
 /**
  * @typedef {{
- *   fill: function(anychart.core.IShapeManagerUser, number):acgraph.vector.AnyColor,
- *   stroke: function(anychart.core.IShapeManagerUser, number):acgraph.vector.AnyColor,
+ *   fill: function(anychart.core.IShapeManagerUser, number, boolean=, boolean=, string=):acgraph.vector.AnyColor,
+ *   stroke: function(anychart.core.IShapeManagerUser, number, boolean=, boolean=, string=):acgraph.vector.AnyColor,
  *   zIndex: (number),
  *   isHatchFill: boolean,
  *   cls: function():acgraph.vector.Shape,
@@ -251,6 +251,12 @@ anychart.core.shapeManagers.Base.prototype.configureShape = function(name, state
     this.setupInteractivity(shape, descriptor.isHatchFill, indexOrGlobal);
   }
 
+  if (!descriptor.isHatchFill) {
+    var names = {};
+    names[name] = descriptor;
+    this.updateMetaColors(fill, stroke, names, state);
+  }
+
   var fillCondition = !(fill ||
       (state != anychart.PointState.NORMAL && descriptor.fill(this.series, anychart.PointState.NORMAL)) ||
       (state != anychart.PointState.HOVER && descriptor.fill(this.series, anychart.PointState.HOVER)) ||
@@ -301,6 +307,19 @@ anychart.core.shapeManagers.Base.prototype.clearShapes = function() {
  * @return {Object.<string, acgraph.vector.Shape>}
  */
 anychart.core.shapeManagers.Base.prototype.getShapesGroup = function(state, opt_only, opt_baseZIndex, opt_shape) {
+  return this.getShapesGroupInternal(state, opt_only, opt_baseZIndex, opt_shape);
+};
+
+
+/**
+ * getShapesGroup method for internal usage.
+ * @param {number} state - Shapes group state.
+ * @param {Object.<string>=} opt_only If set - contains a subset of shape names that should be returned.
+ * @param {number=} opt_baseZIndex - zIndex that is used as a base zIndex for all shapes of the group.
+ * @param {acgraph.vector.Shape=} opt_shape Foreign shape.
+ * @return {Object.<string, acgraph.vector.Shape>}
+ */
+anychart.core.shapeManagers.Base.prototype.getShapesGroupInternal = function(state, opt_only, opt_baseZIndex, opt_shape) {
   var res = {};
   var names = opt_only || this.defs;
   var atPoint = this.series.isDiscreteBased();
@@ -395,12 +414,23 @@ anychart.core.shapeManagers.Base.prototype.updateColors_ = function(state, shape
     }
 
     if (!descriptor.isHatchFill) {
-      var iterator = this.series.getIterator();
-      iterator.meta('fill', fill);
-      iterator.meta('stroke', stroke);
+      this.updateMetaColors(fill, stroke, shapesGroup, state);
     }
   }
   this.postProcessor(this.series, shapesGroup, state);
+};
+
+
+/**
+ * @param {acgraph.vector.Fill|acgraph.vector.PatternFill} fill .
+ * @param {acgraph.vector.Stroke} stroke .
+ * @param {Object.<string, *>=} opt_only If set - contains a subset of shape names.
+ * @param {number=} opt_state .
+ */
+anychart.core.shapeManagers.Base.prototype.updateMetaColors = function(fill, stroke, opt_only, opt_state) {
+  var iterator = this.series.getIterator();
+  iterator.meta('fill', fill);
+  iterator.meta('stroke', stroke);
 };
 
 

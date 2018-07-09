@@ -8,7 +8,7 @@ goog.require('anychart.utils');
 
 /**
  * Keltner Channels indicator class.
- * @param {Array} args [plot, mapping, opt_maPeriod, opt_atrPeriod, opt_maType, opt_multiplier, opt_maSeries, opt_upperSeries, opt_lowerSeries, opt_rangeSeriesType]
+ * @param {Array} args [plot, mapping, opt_maPeriod, opt_atrPeriod, opt_maType, opt_multiplier, opt_maSeries, opt_rangeSeriesType]
  * @constructor
  * @extends {anychart.stockModule.indicators.Base}
  */
@@ -44,10 +44,11 @@ anychart.stockModule.indicators.KeltnerChannels = function(args) {
   this.multiplier_ = anychart.utils.normalizeToNaturalNumber(args[5], 2, false);
 
   this.declareSeries('ma', args[6]);
-  this.declareSeries('upper', args[7]);
-  this.declareSeries('lower', args[8]);
-  this.declareSeries('range', args[9], anychart.enums.StockSeriesType.RANGE_AREA);
+  this.declareSeries('range', args[7], anychart.enums.StockSeriesType.RANGE_AREA);
   this.init();
+  this.rangeSeries()['fill'](function() {
+    return anychart.color.setOpacity(this['sourceColor'], 0.1);
+  });
 };
 goog.inherits(anychart.stockModule.indicators.KeltnerChannels, anychart.stockModule.indicators.Base);
 
@@ -61,10 +62,6 @@ anychart.stockModule.indicators.KeltnerChannels.prototype.createComputer = funct
 /** @inheritDoc */
 anychart.stockModule.indicators.KeltnerChannels.prototype.createNameForSeries = function(seriesId, series) {
   switch (seriesId) {
-    case 'upper':
-      return 'KeltnerChannels U';
-    case 'lower':
-      return 'KeltnerChannels L';
     case 'ma':
       return this.maType_.toUpperCase() + '(' + this.maPeriod_ + ')';
     case 'range':
@@ -77,12 +74,6 @@ anychart.stockModule.indicators.KeltnerChannels.prototype.createNameForSeries = 
 /** @inheritDoc */
 anychart.stockModule.indicators.KeltnerChannels.prototype.setupMapping = function(mapping, computer, seriesId, series) {
   switch (seriesId) {
-    case 'upper':
-      mapping.addField('value', computer.getFieldIndex('upperResult'));
-      break;
-    case 'lower':
-      mapping.addField('value', computer.getFieldIndex('lowerResult'));
-      break;
     case 'ma':
       mapping.addField('value', computer.getFieldIndex('maResult'));
       break;
@@ -95,17 +86,6 @@ anychart.stockModule.indicators.KeltnerChannels.prototype.setupMapping = functio
 
 
 /**
- * Getter for the upper series or setter for it's type. If passed - recreates the series.
- * @param {anychart.enums.StockSeriesType=} opt_type
- * @return {anychart.stockModule.indicators.KeltnerChannels|anychart.stockModule.Series}
- */
-anychart.stockModule.indicators.KeltnerChannels.prototype.upperSeries = function(opt_type) {
-  return /** @type {anychart.stockModule.indicators.KeltnerChannels|anychart.stockModule.Series} */(
-      this.seriesInternal('upper', opt_type));
-};
-
-
-/**
  * Getter for the middle series or setter for it's type. If passed - recreates the series.
  * @param {anychart.enums.StockSeriesType=} opt_type
  * @return {anychart.stockModule.indicators.KeltnerChannels|anychart.stockModule.Series}
@@ -113,17 +93,6 @@ anychart.stockModule.indicators.KeltnerChannels.prototype.upperSeries = function
 anychart.stockModule.indicators.KeltnerChannels.prototype.maSeries = function(opt_type) {
   return /** @type {anychart.stockModule.indicators.KeltnerChannels|anychart.stockModule.Series} */(
       this.seriesInternal('ma', opt_type));
-};
-
-
-/**
- * Getter for the lower series or setter for it's type. If passed - recreates the series.
- * @param {anychart.enums.StockSeriesType=} opt_type
- * @return {anychart.stockModule.indicators.KeltnerChannels|anychart.stockModule.Series}
- */
-anychart.stockModule.indicators.KeltnerChannels.prototype.lowerSeries = function(opt_type) {
-  return /** @type {anychart.stockModule.indicators.KeltnerChannels|anychart.stockModule.Series} */(
-      this.seriesInternal('lower', opt_type));
 };
 
 
@@ -217,8 +186,6 @@ anychart.stockModule.indicators.KeltnerChannels.prototype.atrPeriod = function(o
   proto['maType'] = proto.maType;
   proto['atrPeriod'] = proto.atrPeriod;
   proto['multiplier'] = proto.multiplier;
-  proto['upperSeries'] = proto.upperSeries;
-  proto['lowerSeries'] = proto.lowerSeries;
   proto['rangeSeries'] = proto.rangeSeries;
   proto['maSeries'] = proto.maSeries;
 })();

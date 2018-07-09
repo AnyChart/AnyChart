@@ -809,6 +809,8 @@ anychart.core.settings.descriptors = (function() {
   map.NEGATIVE_FILL = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'negativeFill', anychart.core.settings.fillOrFunctionNormalizer];
   map.RISING_FILL = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'risingFill', anychart.core.settings.fillOrFunctionNormalizer];
   map.FALLING_FILL = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'fallingFill', anychart.core.settings.fillOrFunctionNormalizer];
+  map.LOW_FILL = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'lowFill', anychart.core.settings.fillOrFunctionNormalizer];
+  map.HIGH_FILL = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'highFill', anychart.core.settings.fillOrFunctionNormalizer];
 
   map.STROKE = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'stroke', anychart.core.settings.strokeNormalizer];
   map.STROKE_FUNCTION = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'stroke', anychart.core.settings.strokeOrFunctionNormalizer];
@@ -828,6 +830,8 @@ anychart.core.settings.descriptors = (function() {
   map.NEGATIVE_HATCH_FILL = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'negativeHatchFill', anychart.core.settings.hatchFillOrFunctionNormalizer];
   map.RISING_HATCH_FILL = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'risingHatchFill', anychart.core.settings.hatchFillOrFunctionNormalizer];
   map.FALLING_HATCH_FILL = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'fallingHatchFill', anychart.core.settings.hatchFillOrFunctionNormalizer];
+  map.HIGH_HATCH_FILL = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'highHatchFill', anychart.core.settings.hatchFillOrFunctionNormalizer];
+  map.LOW_HATCH_FILL = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'lowHatchFill', anychart.core.settings.hatchFillOrFunctionNormalizer];
 
   // box series
   map.WHISKER_WIDTH = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'whiskerWidth', anychart.core.settings.numberOrPercentNormalizer];
