@@ -802,7 +802,6 @@ def __get_bundle_wrapper(bundle_name, modules, file_name='', performance_monitor
 
     branch_name = __get_current_branch_name()
     date_mask = '%Y-%m-%d' #if branch_name == 'master' else '%Y-%m-%d %H:%M'
-
     start = start % (
         ', '.join(modules),
         __get_build_version(),
