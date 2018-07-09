@@ -42,7 +42,7 @@ if [ "${TRAVIS_BRANCH}" = "master" ] || [ ${DRY_RUN_RELEASE} ]; then
 
     STEP_CHECK_VARIABLES=true
 
-    STEP_NPM_RELEASE=true
+    STEP_NPM_RELEASE=false
     STEP_GIT_RELEASE=true
 
     STEP_EXPORT_SERVER=true
