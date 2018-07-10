@@ -602,6 +602,19 @@ anychart.color.getNullColor = function() {
 
 
 /**
+ * @param {acgraph.vector.Fill|acgraph.vector.Stroke} color .
+ * @return {boolean}
+ */
+anychart.color.isNotNullColor = function(color) {
+  return color ?
+      goog.isObject(color) ?
+          color['color'] ? color['color'] != 'none' : true
+          : color != 'none'
+      : false;
+};
+
+
+/**
  * Returns final color or hatch fill for passed params.
  * @param {string} colorName
  * @param {!Function} normalizer
@@ -612,13 +625,16 @@ anychart.color.getNullColor = function() {
  * @param {number} state
  * @param {boolean=} opt_ignorePointSettings
  * @param {boolean=} opt_ignoreColorScale
+ * @param {string=} opt_baseColorName
  * @return {acgraph.vector.Fill|acgraph.vector.Stroke|acgraph.vector.PatternFill}
  */
-anychart.color.getColor = function(colorName, normalizer, isHatchFill, canBeHoveredSelected, scrollerSelected, series, state, opt_ignorePointSettings, opt_ignoreColorScale) {
+anychart.color.getColor = function(colorName, normalizer, isHatchFill, canBeHoveredSelected, scrollerSelected, series, state, opt_ignorePointSettings, opt_ignoreColorScale, opt_baseColorName) {
   var stateColor, context;
   state = anychart.core.utils.InteractivityState.clarifyState(state);
+  opt_ignoreColorScale = opt_ignoreColorScale || series.check(anychart.core.drawers.Capabilities.IS_RANGE_BASED);
+  var iterator = series.getIterator();
   if (canBeHoveredSelected && (state != anychart.PointState.NORMAL)) {
-    stateColor = series.resolveOption(colorName, state, series.getIterator(), normalizer, scrollerSelected, void 0, opt_ignorePointSettings);
+    stateColor = series.resolveOption(colorName, state, iterator, normalizer, scrollerSelected, void 0, opt_ignorePointSettings);
     if (isHatchFill && stateColor === true)
       stateColor = normalizer(series.getAutoHatchFill());
     if (goog.isDef(stateColor)) {
@@ -631,13 +647,23 @@ anychart.color.getColor = function(colorName, normalizer, isHatchFill, canBeHove
     }
   }
   // we can get here only if state color is undefined or is a function
-  var color = series.resolveOption(colorName, 0, series.getIterator(), normalizer, scrollerSelected, void 0, opt_ignorePointSettings);
+  var color = series.resolveOption(colorName, 0, iterator, normalizer, scrollerSelected, void 0, opt_ignorePointSettings);
   if (isHatchFill && color === true)
     color = normalizer(series.getAutoHatchFill());
+
+  var baseColor;
+  if (opt_baseColorName && !isHatchFill && colorName != opt_baseColorName) {
+    baseColor = series.resolveOption(opt_baseColorName, 0, iterator, normalizer, scrollerSelected, void 0, opt_ignorePointSettings);
+    if (goog.isFunction(baseColor)) {
+      context = series.getColorResolutionContext(void 0, opt_ignorePointSettings, opt_ignoreColorScale);
+      baseColor = /** @type {acgraph.vector.Fill|acgraph.vector.Stroke|acgraph.vector.PatternFill} */(normalizer(baseColor.call(context, context)));
+    }
+  }
+
   if (goog.isFunction(color)) {
     context = isHatchFill ?
         series.getHatchFillResolutionContext(opt_ignorePointSettings) :
-        series.getColorResolutionContext(void 0, opt_ignorePointSettings, opt_ignoreColorScale);
+        series.getColorResolutionContext(/** @type {acgraph.vector.Fill|acgraph.vector.Stroke} */(baseColor), opt_ignorePointSettings, opt_ignoreColorScale);
     color = /** @type {acgraph.vector.Fill|acgraph.vector.Stroke|acgraph.vector.PatternFill} */(normalizer(color.call(context, context)));
   }
   if (stateColor) { // it is a function and not a hatch fill here

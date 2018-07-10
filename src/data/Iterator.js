@@ -71,6 +71,18 @@ anychart.data.Iterator.prototype.select = function(index) {
 };
 
 
+/** @inheritDoc */
+anychart.data.Iterator.prototype.specialSelect = function(row, opt_index) {
+  this.select(/** @type {number} */(row));
+};
+
+
+/** @inheritDoc */
+anychart.data.Iterator.prototype.current = function() {
+  return this.currentIndex;
+};
+
+
 /**
  * Resets the data iterator to its zero state (before the first item of the view).
  * @example <t>listingOnly</t>

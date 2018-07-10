@@ -1333,14 +1333,28 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
            */
           'format': function() {
             return this['seriesName'] + ': ' + this['valuePrefix'] + anychart.core.defaultTheme.locNum(this['value']) + this['valuePostfix'];
-          },
-          'zIndex': 0
+          }
         },
         'normal': {
           'fill': anychart.core.defaultTheme.returnSourceColor65,
           'stroke': anychart.core.defaultTheme.returnStrokeSourceColor,
+
           'lowStroke': anychart.core.defaultTheme.returnStrokeSourceColor,
           'highStroke': anychart.core.defaultTheme.returnStrokeSourceColor,
+          'lowFill': anychart.core.defaultTheme.returnSourceColor,
+          'highFill': anychart.core.defaultTheme.returnSourceColor,
+
+          'negativeFill': anychart.core.defaultTheme.returnSourceColor,
+          'negativeStroke': anychart.core.defaultTheme.returnStrokeSourceColor,
+
+          'risingFill': anychart.core.defaultTheme.returnSourceColor,
+          'risingStroke': anychart.core.defaultTheme.returnStrokeSourceColor,
+          'fallingFill': anychart.core.defaultTheme.returnSourceColor,
+          'fallingStroke': anychart.core.defaultTheme.returnStrokeSourceColor,
+
+          'risingHatchFill': false,
+          'fallingHatchFill': false,
+
           'hatchFill': false,
           'labels': {
             'enabled': null,
@@ -1361,8 +1375,23 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
         'hovered': {
           'fill': anychart.core.defaultTheme.returnSourceColor,
           'stroke': anychart.core.defaultTheme.returnLightenStrokeSourceColor,
+
+          'lowFill': anychart.core.defaultTheme.returnSourceColor,
+          'highFill': anychart.core.defaultTheme.returnSourceColor,
           'lowStroke': anychart.core.defaultTheme.returnLightenStrokeSourceColor,
           'highStroke': anychart.core.defaultTheme.returnLightenStrokeSourceColor,
+
+          'negativeFill': anychart.core.defaultTheme.returnSourceColor,
+          'negativeStroke': anychart.core.defaultTheme.returnLightenStrokeSourceColor,
+
+          'risingFill': anychart.core.defaultTheme.returnSourceColor,
+          'fallingFill': anychart.core.defaultTheme.returnSourceColor,
+          'risingStroke': anychart.core.defaultTheme.returnLightenStrokeSourceColor,
+          'fallingStroke': anychart.core.defaultTheme.returnLightenStrokeSourceColor,
+
+          'risingHatchFill': null,
+          'fallingHatchFill': null,
+
           'hatchFill': null,
           'labels': {'enabled': null},
           'minLabels': {'enabled': null},
@@ -1376,8 +1405,23 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
         'selected': {
           'fill': anychart.core.defaultTheme.defaultSelectColor,
           'stroke': anychart.core.defaultTheme.defaultSelectColor,
+
           'lowStroke': anychart.core.defaultTheme.defaultSelectColor,
           'highStroke': anychart.core.defaultTheme.defaultSelectColor,
+          'lowFill': anychart.core.defaultTheme.defaultSelectColor,
+          'highFill': anychart.core.defaultTheme.defaultSelectColor,
+
+          'negativeFill': anychart.core.defaultTheme.defaultSelectColor,
+          'negativeStroke': anychart.core.defaultTheme.defaultSelectColor,
+
+          'risingFill': anychart.core.defaultTheme.defaultSelectColor,
+          'risingStroke': anychart.core.defaultTheme.defaultSelectColor,
+          'fallingFill': anychart.core.defaultTheme.defaultSelectColor,
+          'fallingStroke': anychart.core.defaultTheme.defaultSelectColor,
+
+          'risingHatchFill': null,
+          'fallingHatchFill': null,
+
           'hatchFill': null,
           'labels': {'enabled': null},
           'minLabels': {'enabled': null},
@@ -1667,6 +1711,7 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'crossing': {
       'stroke': 'none'
     },
+    'baseline': 0,
 
     'defaultQuarterSettings': {
       'enabled': false,

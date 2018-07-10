@@ -71,17 +71,37 @@ anychart.core.drawers.RangeStick.prototype.valueFieldName = 'high';
 
 /** @inheritDoc */
 anychart.core.drawers.RangeStick.prototype.drawSubsequentPoint = function(point, state) {
-  var shapes = /** @type {Object.<acgraph.vector.Path>} */(this.shapesManager.getShapesGroup(state));
-  this.drawPoint_(point, shapes);
+  var valueNames = this.series.getYValueNames();
+
+  var highValue = point.get(valueNames[1]);
+  var lowValue = point.get(valueNames[0]);
+
+  var shapeNames = {};
+  var name = 'stroke';
+  if (highValue > lowValue) {
+    if (this.hasHighColoring) {
+      name = 'highStroke';
+    }
+  } else {
+    if (this.hasLowColoring) {
+      name = 'lowStroke';
+    }
+  }
+  shapeNames[name] = true;
+  point.meta('name', name);
+
+  var shapes = /** @type {Object.<acgraph.vector.Path>} */(this.shapesManager.getShapesGroup(state, shapeNames));
+  this.drawPoint_(point, shapes, name);
 };
 
 
 /** @inheritDoc */
 anychart.core.drawers.RangeStick.prototype.updatePointOnAnimate = function(point) {
   var shapes = /** @type {Object.<acgraph.vector.Path>} */(point.meta('shapes'));
+  var name = /** @type {string} */(point.meta('name'));
   for (var i in shapes)
     shapes[i].clear();
-  this.drawPoint_(point, shapes);
+  this.drawPoint_(point, shapes, name);
 };
 
 
@@ -89,21 +109,22 @@ anychart.core.drawers.RangeStick.prototype.updatePointOnAnimate = function(point
  * Actually draws the point.
  * @param {anychart.data.IRowInfo} point
  * @param {Object.<acgraph.vector.Shape>} shapes
+ * @param {string} name
  * @private
  */
-anychart.core.drawers.RangeStick.prototype.drawPoint_ = function(point, shapes) {
+anychart.core.drawers.RangeStick.prototype.drawPoint_ = function(point, shapes, name) {
   var x = /** @type {number} */(point.meta('x'));
   var high = /** @type {number} */(point.meta('high'));
   var low = /** @type {number} */(point.meta('low'));
 
-  var thickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(shapes['stroke'].stroke()));
+  var thickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(shapes[name].stroke()));
   if (this.crispEdges) {
     x = anychart.utils.applyPixelShift(x, thickness);
   }
   high = anychart.utils.applyPixelShift(high, thickness);
   low = anychart.utils.applyPixelShift(low, thickness);
 
-  var path = /** @type {acgraph.vector.Path} */(shapes['stroke']);
+  var path = /** @type {acgraph.vector.Path} */(shapes[name]);
   anychart.core.drawers.move(path, this.isVertical, x, low);
   anychart.core.drawers.line(path, this.isVertical, x, high);
 };

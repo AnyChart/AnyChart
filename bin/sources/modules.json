@@ -179,7 +179,8 @@
     "stock": {
       "entry": "anychart.stockModule.entry",
       "deps": [
-        "core"
+        "core",
+        "color-scales"
       ]
     },
     "table": {
@@ -661,6 +662,8 @@
       "docs": "https://docs.anychart.com/Stock_Charts/",
       "icon": "/_design/img/upload/charts/types/stock-chart.svg",
       "parts": [
+        "color-scales",
+        "theme-color-scales",
         "stock",
         "theme-stock"
       ]
@@ -694,6 +697,8 @@
       "docs": "",
       "icon": "/_design/img/upload/charts/types/area-chart.svg",
       "parts": [
+        "color-scales",
+        "theme-color-scales",
         "cartesian",
         "theme-cartesian"
       ]
@@ -705,6 +710,8 @@
       "docs": "https://docs.anychart.com/Basic_Charts/Scatter_Plot/",
       "icon": "/_design/img/upload/charts/types/dot-marker-chart.svg",
       "parts": [
+        "color-scales",
+        "theme-color-scales",
         "cartesian",
         "theme-cartesian",
         "scatter",

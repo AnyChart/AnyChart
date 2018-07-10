@@ -22,10 +22,17 @@ anychart.stockModule.indicators.Aroon = function(args) {
    */
   this.period_ = anychart.utils.normalizeToNaturalNumber(args[2], 20, false);
 
-  this.declareSeries('upAroon', args[3]);
-  this.declareSeries('downAroon', args[4]);
+  this.opt_upSeriesType = args[3];
+  this.opt_downSeriesType = args[4];
   this.declareSeries('range', args[5], anychart.enums.StockSeriesType.RANGE_AREA);
   this.init();
+
+  this.rangeSeries()['lowFill'](function() {
+    return anychart.color.setOpacity(anychart.color.darken(this['sourceColor'], .6), 0.65);
+  });
+  this.rangeSeries()['lowStroke'](function() {
+    return anychart.color.setOpacity(anychart.color.darken(this['sourceColor']), 1);
+  });
 };
 goog.inherits(anychart.stockModule.indicators.Aroon, anychart.stockModule.indicators.Base);
 
@@ -73,6 +80,10 @@ anychart.stockModule.indicators.Aroon.prototype.setupMapping = function(mapping,
  * @return {anychart.stockModule.indicators.Aroon|anychart.stockModule.Series}
  */
 anychart.stockModule.indicators.Aroon.prototype.upSeries = function(opt_type) {
+  if (goog.isNull(this.seriesInternal('upAroon'))) {
+    this.declareSeries('upAroon', this.opt_upSeriesType);
+    this.init();
+  }
   return /** @type {anychart.stockModule.indicators.Aroon|anychart.stockModule.Series} */(
       this.seriesInternal('upAroon', opt_type));
 };
@@ -84,6 +95,10 @@ anychart.stockModule.indicators.Aroon.prototype.upSeries = function(opt_type) {
  * @return {anychart.stockModule.indicators.Aroon|anychart.stockModule.Series}
  */
 anychart.stockModule.indicators.Aroon.prototype.downSeries = function(opt_type) {
+  if (goog.isNull(this.seriesInternal('downAroon'))) {
+    this.declareSeries('downAroon', this.opt_downSeriesType);
+    this.init();
+  }
   return /** @type {anychart.stockModule.indicators.Aroon|anychart.stockModule.Series} */(
       this.seriesInternal('downAroon', opt_type));
 };

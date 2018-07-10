@@ -1,4 +1,6 @@
 goog.provide('anychart.math');
+goog.provide('anychart.math.Point2D');
+goog.provide('anychart.math.Polynomial');
 goog.provide('anychart.math.Rect');
 
 goog.require('acgraph.math');
@@ -194,23 +196,35 @@ anychart.math.rectContains = function(rect1, rect2) {
     return rect1.contains(/** @type {goog.math.Rect} */(rect2));
   } else if (isRect1) {
     rect2 = /** @type {Array.<number>} */(rect2);
-    left1 = rect1.left; left2 = rect2[0];
-    right1 = rect1.getRight(); right2 = rect2[2];
-    top1 = rect1.top; top2 = rect2[1];
-    bottom1 = rect1.getBottom(); bottom2 = rect2[5];
+    left1 = rect1.left;
+    left2 = rect2[0];
+    right1 = rect1.getRight();
+    right2 = rect2[2];
+    top1 = rect1.top;
+    top2 = rect2[1];
+    bottom1 = rect1.getBottom();
+    bottom2 = rect2[5];
   } else if (isRect2) {
     rect1 = /** @type {Array.<number>} */(rect1);
-    left1 = rect1[0]; left2 = rect2.left;
-    right1 = rect1[2]; right2 = rect2.getRight();
-    top1 = rect1[1]; top2 = rect2.top;
-    bottom1 = rect1[5]; bottom2 = rect2.getBottom();
+    left1 = rect1[0];
+    left2 = rect2.left;
+    right1 = rect1[2];
+    right2 = rect2.getRight();
+    top1 = rect1[1];
+    top2 = rect2.top;
+    bottom1 = rect1[5];
+    bottom2 = rect2.getBottom();
   } else {
     rect2 = /** @type {Array.<number>} */(rect2);
     rect1 = /** @type {Array.<number>} */(rect1);
-    left1 = rect1[0];  left2 = rect2[0];
-    right1 = rect1[2];  right2 = rect2[2];
-    top1 = rect1[1];  top2 = rect2[1];
-    bottom1 = rect1[5];  bottom2 = rect2[5];
+    left1 = rect1[0];
+    left2 = rect2[0];
+    right1 = rect1[2];
+    right2 = rect2[2];
+    top1 = rect1[1];
+    top2 = rect2[1];
+    bottom1 = rect1[5];
+    bottom2 = rect2[5];
   }
 
   return left1 <= left2 &&
@@ -814,6 +828,39 @@ anychart.math.projectToLine = function(points, vx, vy, x0, y0) {
 
 
 /**
+ * @param {number} p0x
+ * @param {number} p0y
+ * @param {number} p1x
+ * @param {number} p1y
+ * @param {number} p2x
+ * @param {number} p2y
+ * @param {number} x
+ * @param {number} y
+ * @return {number}
+ */
+anychart.math.getQuadraticCurveDistanceByPoint = function(p0x, p0y, p1x, p1y, p2x, p2y, x, y) {
+  var t = NaN, t1x, t2x, t1y, t2y;
+  if (p0x - 2 * p1x + p2x != 0) {
+    t1x = (p0x - p1x + Math.sqrt((p0x - 2 * p1x + p2x) * x + p1x * p1x - p0x * p2x)) / (p0x - 2 * p1x + p2x);
+    t2x = (p0x - p1x - Math.sqrt((p0x - 2 * p1x + p2x) * x + p1x * p1x - p0x * p2x)) / (p0x - 2 * p1x + p2x);
+
+    t1y = (p0y - p1y + Math.sqrt((p0y - 2 * p1y + p2y) * y + p1y * p1y - p0y * p2y)) / (p0y - 2 * p1y + p2y);
+    t2y = (p0y - p1y - Math.sqrt((p0y - 2 * p1y + p2y) * y + p1y * p1y - p0y * p2y)) / (p0y - 2 * p1y + p2y);
+    t = (t1x > 0 && t1x < 1) ? t1x :
+        (t2x > 0 && t2x < 1) ? t2x :
+            (t1y > 0 && t1y < 1) ? t1y :
+                (t2y > 0 && t2y < 1) ? t2y : NaN ;
+  } else if (p0x != p1x) {
+    t = (x - p0x) / (2 * (p1x - p0x));
+  } else if (p0x == p1x && p1x != p2x) {
+    t = Math.sqrt((x - p0x) / (p2x - p1x));
+  }
+
+  return t;
+};
+
+
+/**
  * Returns the length of the vector set by two coordinate pairs.
  * @param {number} x1
  * @param {number} y1
@@ -852,7 +899,6 @@ anychart.math.angleDy = function(radians, r, opt_cy) {
 };
 
 
-
 /**
  * Define rectangle.
  * @param {number} x X-coordinate of top-left point.
@@ -873,6 +919,19 @@ anychart.math.Rect = goog.math.Rect;
  *     and height, or if both are null.
  */
 anychart.math.Rect.equals = goog.math.Rect.equals;
+
+
+/**
+ * Constructor function.
+ * @param {number} x X-coordinate.
+ * @param {number} y Y-coordinate.
+ * @param {number} w Width.
+ * @param {number} h Height.
+ * @return {!anychart.math.Rect}
+ */
+anychart.math.rect = function(x, y, w, h) {
+  return new anychart.math.Rect(x, y, w, h);
+};
 
 
 //region --- Declarations for IDEA ---
@@ -1038,17 +1097,645 @@ anychart.math.Rect.fromJSON = function(config) {
 
 
 //endregion
+//region --- Point 2D
 /**
- * Constructor function.
- * @param {number} x X-coordinate.
- * @param {number} y Y-coordinate.
- * @param {number} w Width.
- * @param {number} h Height.
- * @return {!anychart.math.Rect}
+ * Class point 2d.
+ * @param {number} x
+ * @param {number} y
+ * @constructor
  */
-anychart.math.rect = function(x, y, w, h) {
-  return new anychart.math.Rect(x, y, w, h);
+anychart.math.Point2D = function(x, y) {
+  if (arguments.length > 0) {
+    this.init(x, y);
+  }
 };
+
+
+/**
+ * @param {number} x
+ * @param {number} y
+ */
+anychart.math.Point2D.prototype.init = function(x, y) {
+  this.x = x;
+  this.y = y;
+};
+
+
+/**
+ * @param {anychart.math.Point2D} that
+ * @return {anychart.math.Point2D}
+ */
+anychart.math.Point2D.prototype.add = function(that) {
+  return new anychart.math.Point2D(this.x + that.x, this.y + that.y);
+};
+
+
+/**
+ * @param {number} scalar
+ * @return {anychart.math.Point2D}
+ */
+anychart.math.Point2D.prototype.multiply = function(scalar) {
+  return new anychart.math.Point2D(this.x * scalar, this.y * scalar);
+};
+
+
+/**
+ * @param {anychart.math.Point2D} that
+ * @return {boolean}
+ */
+anychart.math.Point2D.prototype.lte = function(that) {
+  return (this.x <= that.x && this.y <= that.y);
+};
+
+
+/**
+ * @param {anychart.math.Point2D} that
+ * @return {boolean}
+ */
+anychart.math.Point2D.prototype.gte = function(that) {
+  return (this.x >= that.x && this.y >= that.y);
+};
+
+
+/**
+ * @param {anychart.math.Point2D} that
+ * @param {number} t
+ * @return {anychart.math.Point2D}
+ */
+anychart.math.Point2D.prototype.lerp = function(that, t) {
+  return new anychart.math.Point2D(this.x + (that.x - this.x) * t, this.y + (that.y - this.y) * t);
+};
+
+
+/**
+ * @param {anychart.math.Point2D} that
+ * @return {anychart.math.Point2D}
+ */
+anychart.math.Point2D.prototype.min = function(that) {
+  return new anychart.math.Point2D(Math.min(this.x, that.x), Math.min(this.y, that.y));
+};
+
+
+/**
+ * @param {anychart.math.Point2D} that
+ * @return {anychart.math.Point2D}
+ */
+anychart.math.Point2D.prototype.max = function(that) {
+  return new anychart.math.Point2D(Math.max(this.x, that.x), Math.max(this.y, that.y));
+};
+
+
+//endregion
+//region --- Polynomial
+/**
+ * @param {...number} var_args
+ * @constructor
+ */
+anychart.math.Polynomial = function(var_args) {
+  this.init(arguments);
+};
+
+
+/**
+ * @type {number}
+ */
+anychart.math.Polynomial.TOLERANCE = 1e-6;
+
+
+/**
+ * @type {number}
+ */
+anychart.math.Polynomial.ACCURACY = 6;
+
+
+/**
+ * @param {Array.<number>|Arguments} coefs
+ */
+anychart.math.Polynomial.prototype.init = function(coefs) {
+  this.coefs = [];
+  for (var i = coefs.length - 1; i >= 0; i--)
+    this.coefs.push(coefs[i]);
+};
+
+
+/**
+ * @param {number} x
+ * @return {number}
+ */
+anychart.math.Polynomial.prototype.eval = function(x) {
+  var result = 0;
+  for (var i = this.coefs.length - 1; i >= 0; i--) result = result * x + this.coefs[i];
+  return result;
+};
+
+
+/**
+ * Simplify.
+ */
+anychart.math.Polynomial.prototype.simplify = function() {
+  for (var i = this.getDegree(); i >= 0; i--) {
+    if (Math.abs(this.coefs[i]) <= anychart.math.Polynomial.TOLERANCE) this.coefs.pop(); else break;
+  }
+};
+
+
+/**
+ * @param {number} min
+ * @param {number} max
+ * @return {number}
+ */
+anychart.math.Polynomial.prototype.bisection = function(min, max) {
+  var minValue = this.eval(min);
+  var maxValue = this.eval(max);
+  var result;
+  if (Math.abs(minValue) <= anychart.math.Polynomial.TOLERANCE) result = min; else if (Math.abs(maxValue) <= anychart.math.Polynomial.TOLERANCE) result = max; else if (minValue * maxValue <= 0) {
+    var tmp1 = Math.log(max - min);
+    var tmp2 = Math.log(10) * anychart.math.Polynomial.ACCURACY;
+    var iters = Math.ceil((tmp1 + tmp2) / Math.log(2));
+    for (var i = 0; i < iters; i++) {
+      result = 0.5 * (min + max);
+      var value = this.eval(result);
+      if (Math.abs(value) <= anychart.math.Polynomial.TOLERANCE) {
+        break;
+      }
+      if (value * minValue < 0) {
+        max = result;
+        maxValue = value;
+      } else {
+        min = result;
+        minValue = value;
+      }
+    }
+  }
+  return /** @type {number} */(result);
+};
+
+
+/**
+ * @return {number}
+ */
+anychart.math.Polynomial.prototype.getDegree = function() {
+  return this.coefs.length - 1;
+};
+
+
+/**
+ * @return {anychart.math.Polynomial}
+ */
+anychart.math.Polynomial.prototype.getDerivative = function() {
+  var derivative = new anychart.math.Polynomial();
+  for (var i = 1; i < this.coefs.length; i++) {
+    derivative.coefs.push(i * this.coefs[i]);
+  }
+  return derivative;
+};
+
+
+/**
+ * @return {Array.<number>}
+ */
+anychart.math.Polynomial.prototype.getRoots = function() {
+  var result;
+  this.simplify();
+  switch (this.getDegree()) {
+    case 0:
+      result = [];
+      break;
+    case 1:
+      result = this.getLinearRoot();
+      break;
+    case 2:
+      result = this.getQuadraticRoots();
+      break;
+    case 3:
+      result = this.getCubicRoots();
+      break;
+    case 4:
+      result = this.getQuarticRoots();
+      break;
+    default:
+      result = [];
+  }
+  return result;
+};
+
+
+/**
+ * @param {number} min
+ * @param {number} max
+ * @return {Array.<number>}
+ */
+anychart.math.Polynomial.prototype.getRootsInInterval = function(min, max) {
+  var roots = [];
+  var root;
+  if (this.getDegree() == 1) {
+    root = this.bisection(min, max);
+    if (root != null) roots.push(root);
+  } else {
+    var deriv = this.getDerivative();
+    var droots = deriv.getRootsInInterval(min, max);
+    if (droots.length > 0) {
+      root = this.bisection(min, droots[0]);
+      if (root != null) roots.push(root);
+      for (var i = 0; i <= droots.length - 2; i++) {
+        root = this.bisection(droots[i], droots[i + 1]);
+        if (root != null) roots.push(root);
+      }
+      root = this.bisection(droots[droots.length - 1], max);
+      if (root != null) roots.push(root);
+    } else {
+      root = this.bisection(min, max);
+      if (root != null) roots.push(root);
+    }
+  }
+  return roots;
+};
+
+
+/**
+ * @return {Array.<number>}
+ */
+anychart.math.Polynomial.prototype.getLinearRoot = function() {
+  var result = [];
+  var a = this.coefs[1];
+  if (a != 0) result.push(-this.coefs[0] / a);
+  return result;
+};
+
+
+/**
+ * @return {Array.<number>}
+ */
+anychart.math.Polynomial.prototype.getQuadraticRoots = function() {
+  var results = [];
+  if (this.getDegree() == 2) {
+    var a = this.coefs[2];
+    var b = this.coefs[1] / a;
+    var c = this.coefs[0] / a;
+    var d = b * b - 4 * c;
+    if (d > 0) {
+      var e = Math.sqrt(d);
+      results.push(0.5 * (-b + e));
+      results.push(0.5 * (-b - e));
+    } else if (d == 0) {
+      results.push(0.5 * -b);
+    }
+  }
+  return results;
+};
+
+
+/**
+ * @return {Array.<number>}
+ */
+anychart.math.Polynomial.prototype.getCubicRoots = function() {
+  var results = [];
+  var disrim;
+  if (this.getDegree() == 3) {
+    var c3 = this.coefs[3];
+    var c2 = this.coefs[2] / c3;
+    var c1 = this.coefs[1] / c3;
+    var c0 = this.coefs[0] / c3;
+    var a = (3 * c1 - c2 * c2) / 3;
+    var b = (2 * c2 * c2 * c2 - 9 * c1 * c2 + 27 * c0) / 27;
+    var offset = c2 / 3;
+    var discrim = b * b / 4 + a * a * a / 27;
+    var halfB = b / 2;
+    if (Math.abs(discrim) <= anychart.math.Polynomial.TOLERANCE) disrim = 0;
+    if (discrim > 0) {
+      var e = Math.sqrt(discrim);
+      var tmp;
+      var root;
+      tmp = -halfB + e;
+      if (tmp >= 0) root = Math.pow(tmp, 1 / 3); else root = -Math.pow(-tmp, 1 / 3);
+      tmp = -halfB - e;
+      if (tmp >= 0) root += Math.pow(tmp, 1 / 3); else root -= Math.pow(-tmp, 1 / 3);
+      results.push(root - offset);
+    } else if (discrim < 0) {
+      var distance = Math.sqrt(-a / 3);
+      var angle = Math.atan2(Math.sqrt(-discrim), -halfB) / 3;
+      var cos = Math.cos(angle);
+      var sin = Math.sin(angle);
+      var sqrt3 = Math.sqrt(3);
+      results.push(2 * distance * cos - offset);
+      results.push(-distance * (cos + sqrt3 * sin) - offset);
+      results.push(-distance * (cos - sqrt3 * sin) - offset);
+    } else {
+      var tmp;
+      if (halfB >= 0) tmp = -Math.pow(halfB, 1 / 3); else tmp = Math.pow(-halfB, 1 / 3);
+      results.push(2 * tmp - offset);
+      results.push(-tmp - offset);
+    }
+  }
+  return results;
+};
+
+
+/**
+ * @return {Array.<number>}
+ */
+anychart.math.Polynomial.prototype.getQuarticRoots = function() {
+  var results = [];
+  if (this.getDegree() == 4) {
+    var c4 = this.coefs[4];
+    var c3 = this.coefs[3] / c4;
+    var c2 = this.coefs[2] / c4;
+    var c1 = this.coefs[1] / c4;
+    var c0 = this.coefs[0] / c4;
+    var resolveRoots = new anychart.math.Polynomial(1, -c2, c3 * c1 - 4 * c0, -c3 * c3 * c0 + 4 * c2 * c0 - c1 * c1).getCubicRoots();
+    var y = resolveRoots[0];
+    var discrim = c3 * c3 / 4 - c2 + y;
+    if (Math.abs(discrim) <= anychart.math.Polynomial.TOLERANCE) discrim = 0;
+    if (discrim > 0) {
+      var e = Math.sqrt(discrim);
+      var t1 = 3 * c3 * c3 / 4 - e * e - 2 * c2;
+      var t2 = (4 * c3 * c2 - 8 * c1 - c3 * c3 * c3) / (4 * e);
+      var plus = t1 + t2;
+      var minus = t1 - t2;
+      if (Math.abs(plus) <= anychart.math.Polynomial.TOLERANCE) plus = 0;
+      if (Math.abs(minus) <= anychart.math.Polynomial.TOLERANCE) minus = 0;
+      if (plus >= 0) {
+        var f = Math.sqrt(plus);
+        results.push(-c3 / 4 + (e + f) / 2);
+        results.push(-c3 / 4 + (e - f) / 2);
+      }
+      if (minus >= 0) {
+        var f = Math.sqrt(minus);
+        results.push(-c3 / 4 + (f - e) / 2);
+        results.push(-c3 / 4 - (f + e) / 2);
+      }
+    } else if (discrim < 0) {
+    } else {
+      var t2 = y * y - 4 * c0;
+      if (t2 >= -anychart.math.Polynomial.TOLERANCE) {
+        if (t2 < 0) t2 = 0;
+        t2 = 2 * Math.sqrt(t2);
+        t1 = 3 * c3 * c3 / 4 - 2 * c2;
+        if (t1 + t2 >= anychart.math.Polynomial.TOLERANCE) {
+          var d = Math.sqrt(t1 + t2);
+          results.push(-c3 / 4 + d / 2);
+          results.push(-c3 / 4 - d / 2);
+        }
+        if (t1 - t2 >= anychart.math.Polynomial.TOLERANCE) {
+          var d = Math.sqrt(t1 - t2);
+          results.push(-c3 / 4 + d / 2);
+          results.push(-c3 / 4 - d / 2);
+        }
+      }
+    }
+  }
+  return results;
+};
+
+
+//endregion
+/**
+ * @param {number} p0x .
+ * @param {number} p0y .
+ * @param {number} p1x .
+ * @param {number} p1y .
+ * @param {number} p2x .
+ * @param {number} p2y .
+ * @param {number} a0x .
+ * @param {number} a0y .
+ * @param {number} a1x .
+ * @param {number} a1y .
+ * @return {Array.<number>}
+ */
+anychart.math.intersectBezier2Line = function(p0x, p0y, p1x, p1y, p2x, p2y, a0x, a0y, a1x, a1y) {
+  var p1 = new anychart.math.Point2D(p0x, p0y);
+  var p2 = new anychart.math.Point2D(p1x, p1y);
+  var p3 = new anychart.math.Point2D(p2x, p2y);
+  var a1 = new anychart.math.Point2D(a0x, a0y);
+  var a2 = new anychart.math.Point2D(a1x, a1y);
+
+  var a, b;             // temporary variables
+  var c2, c1, c0;       // coefficients of quadratic
+  var cl;               // c coefficient for normal form of line
+  var n;                // normal for normal form of line
+  var nc2, nc1, nc0;
+  var min = a1.min(a2); // used to determine if point is on line segment
+  var max = a1.max(a2); // used to determine if point is on line segment
+  var result = [];
+
+  a = p2.multiply(-2);
+  c2 = p1.add(a.add(p3));
+
+  a = p1.multiply(-2);
+  b = p2.multiply(2);
+  c1 = a.add(b);
+
+  c0 = new anychart.math.Point2D(p1.x, p1.y);
+
+  // Convert line to normal form: ax + by + c = 0
+  // Find normal to line: negative inverse of original line's slope
+  n = new anychart.math.Point2D(a1.y - a2.y, a2.x - a1.x);
+
+  nc2 = n.x * c2.x + n.y * c2.y;
+  nc1 = n.x * c1.x + n.y * c1.y;
+  nc0 = n.x * c0.x + n.y * c0.y;
+
+  // Determine new c coefficient
+  cl = a1.x * a2.y - a2.x * a1.y;
+
+  // Transform cubic coefficients to line's coordinate system and find roots
+  // of cubic
+  var polynomial = new anychart.math.Polynomial(nc2, nc1, nc0 + cl);
+  var roots = polynomial.getRoots();
+
+  // Any roots in closed interval [0,1] are intersections on Bezier, but
+  // might not be on the line segment.
+  // Find intersections and calculate point coordinates
+  for (var i = 0; i < roots.length; i++) {
+    var t = roots[i];
+    if (0 <= t && t <= 1) {
+      // We're within the Bezier curve
+      // Find point on Bezier
+      var p4 = p1.lerp(p2, t);
+      var p5 = p2.lerp(p3, t);
+      var p6 = p4.lerp(p5, t);
+
+      // See if point is on line segment
+      // Had to make special cases for vertical and horizontal lines due
+      // to slight errors in calculation of p6
+      if (a1.x == a2.x) {
+        if (min.y <= p6.y && p6.y <= max.y) {
+          result.push(p6);
+        }
+      } else if (a1.y == a2.y) {
+        if (min.x <= p6.x && p6.x <= max.x) {
+          result.push(p6);
+        }
+      } else if (p6.gte(min) && p6.lte(max)) {
+        result.push(p6);
+      }
+    }
+  }
+
+  return result;
+};
+
+
+/**
+ * @param {number} a0x .
+ * @param {number} a0y .
+ * @param {number} a1x .
+ * @param {number} a1y .
+ * @param {number} a2x .
+ * @param {number} a2y .
+ * @param {number} b0x .
+ * @param {number} b0y .
+ * @param {number} b1x .
+ * @param {number} b1y .
+ * @param {number} b2x .
+ * @param {number} b2y
+ * @return {Array.<number>}
+ */
+anychart.math.intersectBezier2Bezier2 = function(a0x, a0y, a1x, a1y, a2x, a2y, b0x, b0y, b1x, b1y, b2x, b2y) {
+  var a1 = new anychart.math.Point2D(a0x, a0y);
+  var a2 = new anychart.math.Point2D(a1x, a1y);
+  var a3 = new anychart.math.Point2D(a2x, a2y);
+  var b1 = new anychart.math.Point2D(b0x, b0y);
+  var b2 = new anychart.math.Point2D(b1x, b1y);
+  var b3 = new anychart.math.Point2D(b2x, b2y);
+
+  var a, b;
+  var c12, c11, c10;
+  var c22, c21, c20;
+  var result = [];
+  var poly;
+
+  a = a2.multiply(-2);
+  c12 = a1.add(a.add(a3));
+
+  a = a1.multiply(-2);
+  b = a2.multiply(2);
+  c11 = a.add(b);
+
+  c10 = new anychart.math.Point2D(a1.x, a1.y);
+
+  a = b2.multiply(-2);
+  c22 = b1.add(a.add(b3));
+
+  a = b1.multiply(-2);
+  b = b2.multiply(2);
+  c21 = a.add(b);
+
+  c20 = new anychart.math.Point2D(b1.x, b1.y);
+  var v0, v1, v2, v3, v4, v5, v6;
+
+  if (c12.y == 0) {
+    v0 = c12.x * (c10.y - c20.y);
+    v1 = v0 - c11.x * c11.y;
+    v2 = v0 + v1;
+    v3 = c11.y * c11.y;
+
+    poly = new anychart.math.Polynomial(
+        c12.x * c22.y * c22.y,
+        2 * c12.x * c21.y * c22.y,
+        c12.x * c21.y * c21.y - c22.x * v3 - c22.y * v0 - c22.y * v1,
+        -c21.x * v3 - c21.y * v0 - c21.y * v1,
+        (c10.x - c20.x) * v3 + (c10.y - c20.y) * v1
+    );
+  } else {
+    v0 = c12.x * c22.y - c12.y * c22.x;
+    v1 = c12.x * c21.y - c21.x * c12.y;
+    v2 = c11.x * c12.y - c11.y * c12.x;
+    v3 = c10.y - c20.y;
+    v4 = c12.y * (c10.x - c20.x) - c12.x * v3;
+    v5 = -c11.y * v2 + c12.y * v4;
+    v6 = v2 * v2;
+
+    poly = new anychart.math.Polynomial(
+        v0 * v0,
+        2 * v0 * v1,
+        (-c22.y * v6 + c12.y * v1 * v1 + c12.y * v0 * v4 + v0 * v5) / c12.y,
+        (-c21.y * v6 + c12.y * v1 * v4 + v1 * v5) / c12.y,
+        (v3 * v6 + v4 * v5) / c12.y
+    );
+  }
+
+  var roots = poly.getRoots();
+  for (var i = 0; i < roots.length; i++) {
+    var s = roots[i];
+
+    if (0 <= s && s <= 1) {
+      var xRoots = new anychart.math.Polynomial(
+          c12.x,
+          c11.x,
+          c10.x - c20.x - s * c21.x - s * s * c22.x
+      ).getRoots();
+      var yRoots = new anychart.math.Polynomial(
+          c12.y,
+          c11.y,
+          c10.y - c20.y - s * c21.y - s * s * c22.y
+      ).getRoots();
+
+      if (xRoots.length > 0 && yRoots.length > 0) {
+        var TOLERANCE = 1e-4;
+
+        checkRoots:
+            for (var j = 0; j < xRoots.length; j++) {
+              var xRoot = xRoots[j];
+
+              if (0 <= xRoot && xRoot <= 1) {
+                for (var k = 0; k < yRoots.length; k++) {
+                  if (Math.abs(xRoot - yRoots[k]) < TOLERANCE) {
+                    result.push(c22.multiply(s * s).add(c21.multiply(s).add(c20)));
+                    break checkRoots;
+                  }
+                }
+              }
+            }
+      }
+    }
+  }
+
+  return result;
+};
+
+
+/**
+ * @param {number} a1x .
+ * @param {number} a1y .
+ * @param {number} a2x .
+ * @param {number} a2y .
+ * @param {number} b1x .
+ * @param {number} b1y .
+ * @param {number} b2x .
+ * @param {number} b2y .
+ * @return {anychart.math.Point2D}
+ */
+anychart.math.intersectLineLine = function(a1x, a1y, a2x, a2y, b1x, b1y, b2x, b2y) {
+  var result;
+
+  var ua_t = (b2x - b1x) * (a1y - b1y) - (b2y - b1y) * (a1x - b1x);
+  var ub_t = (a2x - a1x) * (a1y - b1y) - (a2y - a1y) * (a1x - b1x);
+  var u_b = (b2y - b1y) * (a2x - a1x) - (b2x - b1x) * (a2y - a1y);
+
+  if (u_b != 0) {
+    var ua = ua_t / u_b;
+    var ub = ub_t / u_b;
+
+    if (0 <= ua && ua <= 1 && 0 <= ub && ub <= 1) {
+      result = new anychart.math.Point2D(a1x + ua * (a2x - a1x), a1y + ua * (a2y - a1y));
+    } else {
+      //no intersection
+      result = null;
+    }
+  } else {
+    if (ua_t == 0 || ub_t == 0) {
+      //coincident
+      result = null;
+    } else {
+      //parallel
+      result = null;
+    }
+  }
+
+  return result;
+};
+
 
 
 //exports

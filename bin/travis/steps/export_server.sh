@@ -30,12 +30,12 @@ function es_clone_and_build(){
 
 function build_export_server(){
 
-    es_clone_and_build "https://github.com/AnyChart/export-server.git"
+    es_clone_and_build "git@github.com:AnyChart/export-server.git"
 
     Run "scp -i ~/.ssh/id_rsa out/export-server/target/export-server-standalone.jar $STATIC_HOST_SSH_STRING:/apps/static/cdn/releases/${VERSION}/anychart-export-server-${VERSION}.jar"
     Run "rm -rf out/export-server"
 
-    es_clone_and_build "https://github.com/AnyChart/export-server-private.git"
+    es_clone_and_build "git@github.com:AnyChart/export-server-private.git"
     Run "rm -rf out/export-server"
 
     echo

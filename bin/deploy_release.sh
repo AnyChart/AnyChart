@@ -101,7 +101,7 @@ fi
 #
 ########################################################################################################################
 
-indexDTSurl="https://api.anychart.com/si/${VERSION}/index-${VERSION}.d.ts"
+indexDTSurl="http://api.anychart.stg/si/${VERSION}/index.d.ts"
 if $IS_RC; then indexDTSurl='http://api.anychart.stg/si/develop/index-develop.d.ts'; fi
 
 echo
@@ -192,7 +192,7 @@ else
 
     echo
     echo ' -- create tag'
-    run "git tag v{$VERSION}"
+    run "git tag v$VERSION"
 
     echo
     echo " -- push tags befor branch (travis' issue)"

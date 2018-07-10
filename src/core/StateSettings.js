@@ -315,6 +315,8 @@ anychart.core.StateSettings.prototype.PROPERTY_DESCRIPTORS = (function() {
     descriptors.STROKE_FUNCTION,
     descriptors.LOW_STROKE,
     descriptors.HIGH_STROKE,
+    descriptors.LOW_FILL,
+    descriptors.HIGH_FILL,
     descriptors.NEGATIVE_STROKE,
     descriptors.RISING_STROKE,
     descriptors.FALLING_STROKE,
@@ -325,6 +327,8 @@ anychart.core.StateSettings.prototype.PROPERTY_DESCRIPTORS = (function() {
     descriptors.NEGATIVE_HATCH_FILL,
     descriptors.RISING_HATCH_FILL,
     descriptors.FALLING_HATCH_FILL,
+    descriptors.HIGH_HATCH_FILL,
+    descriptors.LOW_HATCH_FILL,
     descriptors.WHISKER_WIDTH,
     // marker series
     descriptors.TYPE,

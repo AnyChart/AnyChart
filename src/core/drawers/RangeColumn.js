@@ -66,7 +66,21 @@ anychart.core.drawers.RangeColumn.prototype.valueFieldName = 'high';
 /** @inheritDoc */
 anychart.core.drawers.RangeColumn.prototype.drawSubsequentPoint = function(point, state) {
   if (!point.meta('skipDrawing')) { //fixes DVF-3048
-    var shapes = this.shapesManager.getShapesGroup(state);
+    var valueNames = this.series.getYValueNames();
+
+    var highValue = point.get(valueNames[1]);
+    var lowValue = point.get(valueNames[0]);
+
+    var names = this.getShapeNames(highValue, lowValue);
+
+    var shapeNames = {};
+    shapeNames[names.path] = true;
+    shapeNames[names.hatchFill] = true;
+
+    point.meta('name', names.path);
+
+    var shapes = this.shapesManager.getShapesGroup(state, shapeNames);
+
     var x = /** @type {number} */(point.meta('x'));
     var high = /** @type {number} */(point.meta('high'));
     var low = /** @type {number} */(point.meta('low'));
@@ -74,7 +88,7 @@ anychart.core.drawers.RangeColumn.prototype.drawSubsequentPoint = function(point
     var leftX = x - this.pointWidth / 2;
     var rightX = leftX + this.pointWidth;
 
-    var thickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(shapes['path'].stroke()));
+    var thickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(shapes[names.path].stroke()));
     if (this.crispEdges) {
       leftX = anychart.utils.applyPixelShift(leftX, thickness);
       rightX = anychart.utils.applyPixelShift(rightX, thickness);
@@ -82,13 +96,13 @@ anychart.core.drawers.RangeColumn.prototype.drawSubsequentPoint = function(point
     high = anychart.utils.applyPixelShift(high, thickness);
     low = anychart.utils.applyPixelShift(low, thickness);
 
-    var path = /** @type {acgraph.vector.Path} */(shapes['path']);
+    var path = /** @type {acgraph.vector.Path} */(shapes[names.path]);
     anychart.core.drawers.move(path, this.isVertical, leftX, low);
     anychart.core.drawers.line(path, this.isVertical, rightX, low);
     anychart.core.drawers.line(path, this.isVertical, rightX, high);
     anychart.core.drawers.line(path, this.isVertical, leftX, high);
     path.close();
-    path = /** @type {acgraph.vector.Path} */(shapes['hatchFill']);
+    path = /** @type {acgraph.vector.Path} */(shapes[names.hatchFill]);
     anychart.core.drawers.move(path, this.isVertical, leftX, low);
     anychart.core.drawers.line(path, this.isVertical, rightX, low);
     anychart.core.drawers.line(path, this.isVertical, rightX, high);

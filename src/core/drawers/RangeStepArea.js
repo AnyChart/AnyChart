@@ -51,8 +51,12 @@ anychart.core.drawers.RangeStepArea.prototype.requiredShapes = (function() {
   var res = {};
   res['fill'] = anychart.enums.ShapeType.PATH;
   res['hatchFill'] = anychart.enums.ShapeType.PATH;
-  res['low'] = anychart.enums.ShapeType.PATH;
-  res['high'] = anychart.enums.ShapeType.PATH;
+  // res['highFill'] = anychart.enums.ShapeType.PATH;
+  // res['lowFill'] = anychart.enums.ShapeType.PATH;
+  res['highStroke'] = anychart.enums.ShapeType.PATH;
+  res['lowStroke'] = anychart.enums.ShapeType.PATH;
+  // res['highHatchFill'] = anychart.enums.ShapeType.PATH;
+  // res['lowHatchFill'] = anychart.enums.ShapeType.PATH;
   return res;
 })();
 
@@ -83,7 +87,7 @@ anychart.core.drawers.RangeStepArea.prototype.drawFirstPoint = function(point, s
   anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes['fill']), this.isVertical, x, high);
   anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes['hatchFill']), this.isVertical, x, low);
   anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes['hatchFill']), this.isVertical, x, high);
-  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes['high']), this.isVertical, x, high);
+  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes['highStroke']), this.isVertical, x, high);
 
   /** @type {number} */
   this.prevX_ = x;
@@ -103,7 +107,7 @@ anychart.core.drawers.RangeStepArea.prototype.drawSubsequentPoint = function(poi
 
   var fill = /** @type {acgraph.vector.Path} */(shapes['fill']);
   var hatchFill = /** @type {acgraph.vector.Path} */(shapes['hatchFill']);
-  var highShape = /** @type {acgraph.vector.Path} */(shapes['high']);
+  var highShape = /** @type {acgraph.vector.Path} */(shapes['highStroke']);
 
   switch (this.direction_) {
     case anychart.enums.StepDirection.FORWARD:
@@ -141,7 +145,7 @@ anychart.core.drawers.RangeStepArea.prototype.finalizeSegment = function() {
     var shapes = this.shapesManager.getShapesGroup(this.seriesState);
     var fill = /** @type {acgraph.vector.Path} */(shapes['fill']);
     var hatchFill = /** @type {acgraph.vector.Path} */(shapes['hatchFill']);
-    var low = /** @type {acgraph.vector.Path} */(shapes['low']);
+    var low = /** @type {acgraph.vector.Path} */(shapes['lowStroke']);
 
     /** @type {number} */
     var prevX = NaN;

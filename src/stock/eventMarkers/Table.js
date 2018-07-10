@@ -326,7 +326,19 @@ anychart.stockModule.eventMarkers.Table.Iterator.prototype.select = function(ind
 };
 
 
-/**
+/** @inheritDoc */
+anychart.stockModule.eventMarkers.Table.Iterator.prototype.specialSelect = function(row, opt_index) {
+  this.select(/** @type {number} */(row));
+};
+
+
+/** @inheritDoc */
+anychart.stockModule.eventMarkers.Table.Iterator.prototype.current = function() {
+  return this.data_[this.currentItemIndex_].items[this.currentSubIndex_].data;
+};
+
+
+    /**
  * @param {number} index
  * @return {boolean}
  */

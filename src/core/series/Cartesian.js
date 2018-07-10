@@ -278,46 +278,78 @@ anychart.core.series.Cartesian.prototype.prepareData = function() {
 
 //endregion
 //region --- Path manager interface methods
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Path manager interface methods
-//
-//----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.series.Cartesian.prototype.getColorResolutionContext = function(opt_baseColor, opt_ignorePointSettings, opt_ignoreColorScale) {
+  var pointProvider = this.getPointProvider();
+
+  var iterator = !!opt_ignorePointSettings ? this.getDetachedIterator() : this.getIterator();
+  var index = iterator.getIndex();
+
+  pointProvider
+      .dataSource(iterator)
+      .statisticsSources([this.getPoint(index), this]);
+
+  var scaledColor;
   var source = opt_baseColor || this.getOption('color') || 'blue';
-  if (this.supportsPointSettings()) {
-    var iterator = !!opt_ignorePointSettings ? this.getDetachedIterator() : this.getIterator();
-    return {
-      'index': iterator.getIndex(),
-      'sourceColor': source,
-      'iterator': iterator,
-      'series': this,
-      'chart': this.chart
-    };
-  }
-  return {
-    'sourceColor': source
+  var x = iterator.getX();
+  var value = iterator.get('value');
+  var name = goog.isDef(iterator.get('name')) ? iterator.get('name') : x;
+  var values = {
+    'x': {value: x, type: anychart.enums.TokenType.DATE_TIME},
+    'value': {value: value, type: anychart.enums.TokenType.NUMBER},
+    'index': {value: index, type: anychart.enums.TokenType.NUMBER},
+    'iterator': {value: iterator, type: anychart.enums.TokenType.UNKNOWN},
+    'autoColor': {value: source, type: anychart.enums.TokenType.UNKNOWN},
+    'chart': {value: this.chart, type: anychart.enums.TokenType.UNKNOWN},
+    'plot': {value: this.plot, type: anychart.enums.TokenType.UNKNOWN},
+    'series': {value: this, type: anychart.enums.TokenType.UNKNOWN},
+    'name': {value: name, type: anychart.enums.TokenType.STRING}
   };
+
+  var ignoreColorScale = goog.isDef(opt_ignoreColorScale) && opt_ignoreColorScale;
+  var colorScale = this.colorScale();
+  if (colorScale && !ignoreColorScale) {
+    if (goog.isDef(value))
+      scaledColor = colorScale.valueToColor(value);
+
+    values['scaledColor'] = {value: scaledColor, type: anychart.enums.TokenType.UNKNOWN};
+    values['colorScale'] = {value: colorScale, type: anychart.enums.TokenType.UNKNOWN};
+  }
+
+  values['sourceColor'] = {value: scaledColor || source, type: anychart.enums.TokenType.UNKNOWN};
+
+  return pointProvider.propagate(values);
 };
 
 
 /** @inheritDoc */
 anychart.core.series.Cartesian.prototype.getHatchFillResolutionContext = function(opt_ignorePointSettings) {
+  var pointProvider = this.getPointProvider();
+
+  var iterator = !!opt_ignorePointSettings ? this.getDetachedIterator() : this.getIterator();
+  var index = iterator.getIndex();
+
+  pointProvider
+      .dataSource(iterator)
+      .statisticsSources([this.getPoint(index), this]);
+
   var source = this.getAutoHatchFill();
-  if (this.supportsPointSettings()) {
-    var iterator = !!opt_ignorePointSettings ? this.getDetachedIterator() : this.getIterator();
-    return {
-      'index': iterator.getIndex(),
-      'sourceHatchFill': source,
-      'iterator': iterator,
-      'series': this,
-      'chart': this.chart
-    };
-  }
-  return {
-    'sourceHatchFill': source
+  var x = iterator.getX();
+  var value = iterator.get('value');
+  var name = goog.isDef(iterator.get('name')) ? iterator.get('name') : x;
+  var values = {
+    'x': {value: x, type: anychart.enums.TokenType.DATE_TIME},
+    'value': {value: value, type: anychart.enums.TokenType.NUMBER},
+    'index': {value: index, type: anychart.enums.TokenType.NUMBER},
+    'iterator': {value: iterator, type: anychart.enums.TokenType.UNKNOWN},
+    'sourceHatchFill': {value: source, type: anychart.enums.TokenType.UNKNOWN},
+    'plot': {value: this.plot, type: anychart.enums.TokenType.UNKNOWN},
+    'chart': {value: this.chart, type: anychart.enums.TokenType.UNKNOWN},
+    'series': {value: this, type: anychart.enums.TokenType.UNKNOWN},
+    'name': {value: name, type: anychart.enums.TokenType.STRING}
   };
+
+  return pointProvider.propagate(values);
 };
 
 
@@ -1114,10 +1146,12 @@ anychart.core.series.Cartesian.prototype.applyAppearanceToPoint = function(point
   if (iterator.meta('missing') === anychart.core.series.PointAbsenceReason.OUT_OF_RANGE)
     return opt_value;
 
+  var shapes = /** @type {Object.<string, acgraph.vector.Shape>} */(iterator.meta('shapes'));
   if (this.isDiscreteBased()) {
-    this.shapeManager.updateColors(pointState,
-        /** @type {Object.<string, acgraph.vector.Shape>} */(iterator.meta('shapes')));
+    this.shapeManager.updateColors(pointState, shapes);
+    this.shapeManager.updateMarkersColors(pointState, shapes);
   }
+
   if (this.supportsOutliers()) {
     this.drawPointOutliers(iterator, pointState, true);
   }
@@ -1141,8 +1175,8 @@ anychart.core.series.Cartesian.prototype.finalizePointAppearance = goog.nullFunc
  */
 anychart.core.series.Cartesian.prototype.applyAppearanceToSeries = function(pointState) {
   var iterator = this.getIterator();
-  this.shapeManager.updateColors(pointState,
-      /** @type {Object.<string, acgraph.vector.Shape>} */(iterator.meta('shapes')));
+  var shapes = /** @type {Object.<string, acgraph.vector.Shape>} */(iterator.meta('shapes'));
+  this.shapeManager.updateColors(pointState, shapes);
   this.drawer.updatePoint(iterator, pointState);
   if (this.supportsOutliers()) {
     this.drawPointOutliers(iterator, pointState, true);

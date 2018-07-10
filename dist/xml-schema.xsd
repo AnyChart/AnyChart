@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsd:schema
         xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-        targetNamespace="http://anychart.com/schemas/8.2.1/xml-schema.xsd"
-        xmlns="http://anychart.com/schemas/8.2.1/xml-schema.xsd"
+        targetNamespace="http://anychart.com/schemas/8.3.0/xml-schema.xsd"
+        xmlns="http://anychart.com/schemas/8.3.0/xml-schema.xsd"
         elementFormDefault="qualified">
 
     <xsd:element name="anychart" type="Anychart"/>
@@ -131,6 +131,7 @@
         <!-- core.Chart attrs -->
         <xsd:attributeGroup ref="attrs.VisualBase"/>
         <xsd:attributeGroup ref="attrs.Bounds"/>
+        <xsd:attribute name="baseline" type="xsd:double"/>
         <xsd:attribute name="type" type="enums.ChartTypes" use="required"/>
         <xsd:attribute name="default_series_type" type="xsd:string"/>
         <xsd:attribute name="container" type="xsd:string"/>
@@ -425,6 +426,7 @@
         <!-- core.Chart attrs -->
         <xsd:attributeGroup ref="attrs.VisualBase"/>
         <xsd:attributeGroup ref="attrs.Bounds"/>
+        <xsd:attribute name="baseline" type="xsd:double"/>
         <xsd:attribute name="type" type="enums.ChartTypes" use="required"/>
         <xsd:attribute name="default_series_type" type="xsd:string"/>
         <xsd:attribute name="container" type="xsd:string"/>
@@ -481,6 +483,10 @@
             <!-- ContinuousRangeBase series -->
             <xsd:element minOccurs="0" maxOccurs="1" name="high_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="low_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="high_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="low_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="high_hatch_fill" type="HatchFill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="low_hatch_fill" type="HatchFill"/>
             <!-- OHLC series -->
             <xsd:element minOccurs="0" maxOccurs="1" name="rising_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="falling_stroke" type="Stroke"/>
@@ -534,6 +540,10 @@
         <!-- ContinuousRangeBase series -->
         <xsd:attribute name="high_stroke" type="xsd:string"/>
         <xsd:attribute name="low_stroke" type="xsd:string"/>
+        <xsd:attribute name="high_fill" type="xsd:string"/>
+        <xsd:attribute name="low_fill" type="xsd:string"/>
+        <xsd:attribute name="high_hatch_fill" type="simple.HatchFill"/>
+        <xsd:attribute name="low_hatch_fill" type="simple.HatchFill"/>
         <!-- Marker series -->
         <xsd:attribute name="size" type="xsd:double"/>
         <xsd:attribute name="type" type="enums.MarkerType"/>
@@ -594,6 +604,10 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="negative_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="rising_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="falling_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="high_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="low_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="high_hatch_fill" type="HatchFill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="low_hatch_fill" type="HatchFill"/>
 
             <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="low_stroke" type="Stroke"/>
@@ -641,6 +655,10 @@
 
         <xsd:attribute name="fill" type="xsd:string" />
         <xsd:attribute name="negative_fill" type="xsd:string" />
+        <xsd:attribute name="high_fill" type="xsd:string"/>
+        <xsd:attribute name="low_fill" type="xsd:string"/>
+        <xsd:attribute name="high_hatch_fill" type="simple.HatchFill"/>
+        <xsd:attribute name="low_hatch_fill" type="simple.HatchFill"/>
         <xsd:attribute name="rising_fill" type="xsd:string" />
         <xsd:attribute name="falling_fill" type="xsd:string" />
         <xsd:attribute name="stroke" type="xsd:string" />

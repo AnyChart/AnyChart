@@ -1862,7 +1862,7 @@ anychart.mapModule.Chart.prototype.seriesInvalidated = function(event) {
       this.seriesList[i].invalidate(
           anychart.ConsistencyState.BOUNDS |
           anychart.ConsistencyState.SERIES_DATA |
-          anychart.ConsistencyState.MAP_COLOR_SCALE |
+          anychart.ConsistencyState.SERIES_COLOR_SCALE |
           anychart.ConsistencyState.MAP_GEO_DATA_INDEX
       );
   }

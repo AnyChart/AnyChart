@@ -24,7 +24,7 @@ anychart.core.drawers.Line.prototype.type = anychart.enums.SeriesDrawerTypes.LIN
 
 /** @inheritDoc */
 anychart.core.drawers.Line.prototype.flags = (
-    // anychart.core.drawers.Capabilities.NEEDS_ZERO |
+    anychart.core.drawers.Capabilities.NEEDS_ZERO |
     // anychart.core.drawers.Capabilities.NEEDS_SIZE_SCALE |
     // anychart.core.drawers.Capabilities.USES_CONTAINER_AS_ROOT |
     anychart.core.drawers.Capabilities.USES_STROKE_AS_FILL |
@@ -97,23 +97,71 @@ anychart.core.drawers.Line.prototype.drawMissingPoint = function(point, state) {
 
 /** @inheritDoc */
 anychart.core.drawers.Line.prototype.drawFirstPoint = function(point, state) {
-  var shapes = this.shapesManager.getShapesGroup(this.seriesState);
+  var value = point.get(this.series.getYValueNames()[0]);
+  var names = this.getShapeNames(value, this.prevValue);
+  var shapeNames = {};
+  shapeNames[names.stroke] = true;
+
+  this.currentShapes = this.shapesManager.getShapesGroup(this.seriesState, shapeNames);
+
   var x = /** @type {number} */(point.meta('x'));
   var y = /** @type {number} */(point.meta('value'));
-  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes['stroke']), this.isVertical, x, y);
+
+  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(this.currentShapes[names.stroke]), this.isVertical, x, y);
   if (isNaN(this.firstPointX)) {
     this.firstPointX = x;
     this.firstPointY = y;
   }
+
+  this.prevX = x;
+  this.prevY = y;
+  this.prevValue = value;
+  this.prevShapeNames = names;
 };
 
 
 /** @inheritDoc */
 anychart.core.drawers.Line.prototype.drawSubsequentPoint = function(point, state) {
-  var shapes = this.shapesManager.getShapesGroup(this.seriesState);
+  var shapesManager = this.shapesManager;
+  var value = /** @type {number} */(point.get(this.series.getYValueNames()[0]));
+  var names = this.getShapeNames(value, this.prevValue);
+  var shapeNames = {};
+  shapeNames[names.stroke] = true;
+
+  var shapes = shapesManager.getShapesGroup(this.seriesState, shapeNames);
+
   var x = /** @type {number} */(point.meta('x'));
   var y = /** @type {number} */(point.meta('value'));
-  anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes['stroke']), this.isVertical, x, y);
+
+  if (shapes != this.currentShapes) {
+    var crossX, crossY, prevX, prevY;
+    prevX = /** @type {number} */(this.prevX);
+    prevY = /** @type {number} */(this.prevY);
+
+    var isBaselineIntersect = this.isBaselineIntersect(value);
+
+    if (this.hasNegativeColoring && isBaselineIntersect) {
+      crossY = /** @type {number} */(point.meta('zero'));
+      crossX = (x - this.prevX) * (crossY - this.prevY) / (y - this.prevY) + this.prevX;
+    } else if (this.hasRisingFallingColoring && !this.hasNegativeColoring) {
+      crossX = prevX;
+      crossY = prevY;
+    } else {
+      crossX = prevX + (x - prevX) / 2;
+      crossY = prevY + (y - prevY) / 2;
+    }
+
+    anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(this.currentShapes[this.prevShapeNames.stroke]), this.isVertical, crossX, crossY);
+    this.currentShapes = shapes;
+    anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(this.currentShapes[names.stroke]), this.isVertical, crossX, crossY);
+  }
+
+  anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(this.currentShapes[names.stroke]), this.isVertical, x, y);
+
+  this.prevX = x;
+  this.prevY = y;
+  this.prevValue = value;
+  this.prevShapeNames = names;
 };
 
 
@@ -130,7 +178,7 @@ anychart.core.drawers.Line.prototype.finalizeDrawing = function() {
  */
 anychart.core.drawers.Line.prototype.additionalFinalize = function() {
   if (this.closed && !isNaN(this.firstPointX) && (this.connectMissing || this.prevPointDrawn && !this.firstPointMissing)) {
-    var shapes = this.shapesManager.getShapesGroup(this.seriesState);
-    anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes['stroke']), this.isVertical, this.firstPointX, this.firstPointY);
+    anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(this.currentShapes[this.prevShapeNames.stroke]),
+        this.isVertical, this.firstPointX, this.firstPointY);
   }
 };

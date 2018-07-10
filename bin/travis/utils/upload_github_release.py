@@ -5,7 +5,7 @@ import requests
 import os
 import sys
 
-PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..','..','..'))
 VERSION_INI_PATH = os.path.join(PROJECT_PATH, 'version.ini')
 
 
