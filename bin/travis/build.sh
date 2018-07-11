@@ -24,7 +24,7 @@ VERSION=''
 
 #### Set Steps
 STEP_CHECK_VARIABLES=false
-STEP_BUILD_DIST=true
+STEP_BUILD_DIST=false
 STEP_UPLOAD_STATIC=true
 STEP_DROP_CDN=true
 
@@ -45,8 +45,10 @@ if [ "${TRAVIS_BRANCH}" = "master" ] || [ ${DRY_RUN_RELEASE} ]; then
     STEP_NPM_RELEASE=false
     STEP_GIT_RELEASE=true
 
-    #STEP_EXPORT_SERVER=true
-    #STEP_DOWNLOAD_EXTERNAL=true
+    STEP_BUILD_DIST=false
+
+    STEP_EXPORT_SERVER=true
+    STEP_DOWNLOAD_EXTERNAL=true
 
     ####  Be sure u wanna uncomment this
     #STEP_LEGACY_7x=true

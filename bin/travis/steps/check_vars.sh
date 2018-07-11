@@ -19,7 +19,9 @@ function check_variables(){
         exit 1
     fi
 
+    echo "check NPM"
     npm_check_variables
+    echo "check GIT"
     git_check_variables
 
     # used to create latest build
