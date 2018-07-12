@@ -77,6 +77,8 @@ else
     VERSION=${TRAVIS_BRANCH}
     IS_DEV_BUILD=true
 
+    STEP_BUILD_DIST=true
+
     STEP_NPM_RELEASE=false
     STEP_GIT_RELEASE=false
 fi
