@@ -201,7 +201,7 @@ anychart.stockModule.CurrentPriceIndicator.prototype.getLabelsFormatProvider = f
   };
 
   var context = series.updateContext(new anychart.format.Context(), this.row_);
-  return context.propagate(goog.object.extend(context.values(), values));
+  return context.propagate(goog.object.extend(context.contextValues(), values));
 };
 
 

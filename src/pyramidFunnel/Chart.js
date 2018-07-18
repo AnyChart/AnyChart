@@ -2989,7 +2989,7 @@ anychart.pyramidFunnelModule.Chart.prototype.calculate = function() {
 
 /**
  * Create chart label/tooltip format provider.
- * @return {Object} Object with info for labels/tooltip formatting.
+ * @return {anychart.format.Context} Object with info for labels/tooltip formatting.
  * @protected
  */
 anychart.pyramidFunnelModule.Chart.prototype.createFormatProvider = function() {

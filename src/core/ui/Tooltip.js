@@ -830,7 +830,7 @@ anychart.core.ui.Tooltip.prototype.showAsSingle_ = function(points, clientX, cli
   if (this.isTooltipDisabled_(this.tooltipInUse_, firstPoint) || !goog.isDef(firstSeries.createTooltipContextProvider))
     return;
 
-  var contextProvider = firstSeries.createTooltipContextProvider();
+  var contextProvider = /** @type {anychart.format.Context} */ (firstSeries.createTooltipContextProvider());
   contextProvider['clientX'] = clientX;
   contextProvider['clientY'] = clientY;
   this.tooltipInUse_.title().autoText(this.tooltipInUse_.getFormattedTitle(contextProvider));
@@ -1155,7 +1155,7 @@ anychart.core.ui.Tooltip.prototype.showSeparatedChildren_ = function(points, cli
     if (this.isTooltipDisabled_(tooltip, point))
       continue;
 
-    var contextProvider = series.createTooltipContextProvider();
+    var contextProvider = /** @type {anychart.format.Context} */ (series.createTooltipContextProvider());
     contextProvider['clientX'] = clientX;
     contextProvider['clientY'] = clientY;
     tooltip.title().autoText(tooltip.getFormattedTitle(contextProvider));
@@ -1257,7 +1257,7 @@ anychart.core.ui.Tooltip.prototype.showForPosition_ = function(clientX, clientY)
  * Show tooltip in position.
  * @param {number} clientX - ClientX coordinate.
  * @param {number} clientY - ClientY coordinate.
- * @param {Object=} opt_contextProvider - Context provider.
+ * @param {anychart.format.Context=} opt_contextProvider - Context provider.
  */
 anychart.core.ui.Tooltip.prototype.showFloat = function(clientX, clientY, opt_contextProvider) {
   this.updateForceInvalidation();
@@ -1303,11 +1303,11 @@ anychart.core.ui.Tooltip.prototype.updatePosition = function(clientX, clientY) {
 
 /**
  * Get formatted title.
- * @param {Object} contextProvider
+ * @param {anychart.format.Context} contextProvider
  * @return {string}
  */
 anychart.core.ui.Tooltip.prototype.getFormattedTitle = function(contextProvider) {
-  contextProvider.values()['titleText'] = {value: this.title_.getOption('text'), type: anychart.enums.TokenType.STRING};
+  contextProvider.contextValues()['titleText'] = {value: this.title_.getOption('text'), type: anychart.enums.TokenType.STRING};
   contextProvider.propagate();
   var formatter = this.getOption('titleFormat');
   if (goog.isString(formatter))
@@ -1319,17 +1319,17 @@ anychart.core.ui.Tooltip.prototype.getFormattedTitle = function(contextProvider)
 
 /**
  * Get formatted content.
- * @param {Object} contextProvider
+ * @param {anychart.format.Context} contextProvider
  * @param {boolean=} opt_useUnionFormatter - Whether to use tooltip's union text formatter.
  * @return {string}
  * @private
  */
 anychart.core.ui.Tooltip.prototype.getFormattedContent_ = function(contextProvider, opt_useUnionFormatter) {
-  contextProvider.values()['valuePrefix'] = {
+  contextProvider.contextValues()['valuePrefix'] = {
     value: this.getOption('valuePrefix') || '',
     type: anychart.enums.TokenType.STRING
   };
-  contextProvider.values()['valuePostfix'] = {
+  contextProvider.contextValues()['valuePostfix'] = {
     value: this.getOption('valuePostfix') || '',
     type: anychart.enums.TokenType.STRING
   };

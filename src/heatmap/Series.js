@@ -450,7 +450,7 @@ anychart.heatmapModule.Series.prototype.getContextProviderValues = function(prov
 /** @inheritDoc */
 anychart.heatmapModule.Series.prototype.getColorResolutionContext = function(opt_baseColor, opt_ignorePointSettings, opt_ignoreColorScale) {
   var pointProvider = /** @type {anychart.format.Context} */(anychart.heatmapModule.Series.base(this, 'getColorResolutionContext', opt_baseColor, opt_ignorePointSettings, opt_ignoreColorScale));
-  var values = pointProvider.values();
+  var values = pointProvider.contextValues();
 
   var iterator = pointProvider.dataSource();
 

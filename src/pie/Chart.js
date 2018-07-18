@@ -676,7 +676,7 @@ anychart.pieModule.Chart.prototype.getDetachedIterator = function() {
 anychart.pieModule.Chart.prototype.prepareData_ = function(data) {
   if (this.groupedPointFilter_ != null) {
     var oldData = data;
-    data = new anychart.pieModule.DataView(/** @type {!anychart.data.View} */(data), 'value', this.groupedPointFilter_, undefined, function() {
+    data = new anychart.pieModule.DataView(/** @type {!anychart.data.View} */(data), 'value', this.groupedPointName_, this.groupedPointFilter_, undefined, function() {
       return {'value': 0};
     });
     oldData.registerDisposable(data);
@@ -705,13 +705,15 @@ anychart.pieModule.Chart.prototype.prepareData_ = function(data) {
 
 /**
  * Getter/setter for grouping.
- * @param {(string|null|function(*):boolean)=} opt_value Filter function or disablt value (null, 'none').
+ * @param {(string|null|function(*):boolean)=} opt_value Filter function or disable value (null, 'none').
+ * @param {string=} opt_name Name for group
  * @return {(anychart.pieModule.Chart|function(*):boolean|null)} Current grouping function or self for method chaining.
  */
-anychart.pieModule.Chart.prototype.group = function(opt_value) {
+anychart.pieModule.Chart.prototype.group = function(opt_value, opt_name) {
   if (goog.isDef(opt_value)) {
     if (goog.isFunction(opt_value) && opt_value != this.groupedPointFilter_) {
       this.groupedPointFilter_ = opt_value;
+      this.groupedPointName_ = opt_name || 'Grouped point';
       this.redefineView_();
     } else if (anychart.utils.isNone(opt_value)) {
       this.groupedPointFilter_ = null;
@@ -1268,7 +1270,7 @@ anychart.pieModule.Chart.prototype.outlineInvalidated_ = function(event) {
 /**
  * Create pie label format provider.
  * @param {boolean=} opt_force create context provider forcibly.
- * @return {Object} Object with info for labels formatting.
+ * @return {anychart.format.Context} Object with info for labels formatting.
  * @protected
  */
 anychart.pieModule.Chart.prototype.createFormatProvider = function(opt_force) {
@@ -1290,13 +1292,13 @@ anychart.pieModule.Chart.prototype.createFormatProvider = function(opt_force) {
   };
 
   if (iterator.meta('groupedPoint')) {
-    values['name'] = {value: 'Other points', type: anychart.enums.TokenType.STRING};
+    values['name'] = {value: iterator.meta('name'), type: anychart.enums.TokenType.STRING};
     values['groupedPoint'] = {value: true, type: anychart.enums.TokenType.STRING};
     values['names'] = {value: iterator.meta('names'), type: anychart.enums.TokenType.UNKNOWN};
     values['values'] = {value: iterator.meta('values'), type: anychart.enums.TokenType.UNKNOWN};
   }
 
-  return this.pointProvider_.propagate(values);
+  return /** @type {anychart.format.Context} */ (this.pointProvider_.propagate(values));
 };
 
 
@@ -2252,7 +2254,7 @@ anychart.pieModule.Chart.prototype.drawContent = function(bounds) {
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     var hasOutLine = this.normal_.outline().getOption('offset') || this.normal_.outline().getOption('width') ||
         this.hovered_.outline().getOption('offset') || this.hovered_.outline().getOption('width') ||
-        this.selected_.outline().getOption('offset') ||  this.selected_.outline().getOption('width');
+        this.selected_.outline().getOption('offset') || this.selected_.outline().getOption('width');
 
     if (this.outlineLayer_) {
       this.outlineLayer_.clear();
@@ -4006,7 +4008,7 @@ anychart.pieModule.Chart.prototype.createLegendItemsProvider = function(sourceMo
     if (!goog.isString(itemText)) {
       var isGrouped = !!iterator.meta('groupedPoint');
       if (isGrouped)
-        itemText = 'Other points';
+        itemText = /** @type {string} */(iterator.meta('name'));
       else
         itemText = String(goog.isDef(iterator.get('name')) ? iterator.get('name') : iterator.get('x'));
     }
@@ -4097,8 +4099,8 @@ anychart.pieModule.Chart.prototype.explodeSlice = function(index, opt_explode) {
   anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['explodeSlice()', 'select()'], true);
   var currentPointState = this.state.getPointStateByIndex(index);
   if (opt_explode || !goog.isDef(opt_explode)) {
-      if (!this.state.isStateContains(currentPointState, anychart.PointState.SELECT))
-        this.select(index);
+    if (!this.state.isStateContains(currentPointState, anychart.PointState.SELECT))
+      this.select(index);
   } else {
     this.unselect(index);
   }
@@ -4684,6 +4686,7 @@ anychart.pieModule.Chart.prototype.disposeInternal = function() {
   goog.disposeAll(this.animationQueue_, this.normal_, this.hovered_, this.selected_, this.center_);
   anychart.pieModule.Chart.base(this, 'disposeInternal');
 };
+
 
 
 //endregion

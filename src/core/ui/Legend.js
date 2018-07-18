@@ -745,7 +745,7 @@ anychart.core.ui.Legend.prototype.showTooltip = function(event) {
         'meta': {value: this.legendItemsMeta_[index], type: anychart.enums.TokenType.UNKNOWN}
       };
       var formatProvider = new anychart.format.Context(values);
-      tooltip.showFloat(event['clientX'], event['clientY'], formatProvider.propagate());
+      tooltip.showFloat(event['clientX'], event['clientY'], /** @type {anychart.format.Context} */ (formatProvider.propagate()));
     }
   }
 };

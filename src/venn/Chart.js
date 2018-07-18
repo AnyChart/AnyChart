@@ -1017,7 +1017,7 @@ anychart.vennModule.Chart.prototype.getPointState = function(index) {
 /**
  * Create format provider.
  * @param {boolean=} opt_force - create context provider forcibly.
- * @return {Object} - Object with info for labels formatting.
+ * @return {anychart.format.Context} - Object with info for labels formatting.
  * @protected
  */
 anychart.vennModule.Chart.prototype.createFormatProvider = function(opt_force) {

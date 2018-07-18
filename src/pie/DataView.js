@@ -10,6 +10,7 @@ goog.require('goog.array');
  * Pie view.
  * @param {!anychart.data.IView} parentView Parent view. The last view is a mapping.
  * @param {string} fieldName Field name to make filter by.
+ * @param {string} groupedPointName Name for grouped point
  * @param {function(*):boolean=} opt_func Filter function that should accept a field value and return true if the row
  *    should be included into the resulting view as a and false otherwise.
  * @param {(function(R, T, number, Array) : R)=} opt_other The function to call for
@@ -23,7 +24,7 @@ goog.require('goog.array');
  * @constructor
  * @extends {anychart.data.View}
  */
-anychart.pieModule.DataView = function(parentView, fieldName, opt_func, opt_other, opt_otherInitialConstructor) {
+anychart.pieModule.DataView = function(parentView, fieldName, groupedPointName, opt_func, opt_other, opt_otherInitialConstructor) {
   anychart.pieModule.DataView.base(this, 'constructor', parentView);
 
   /**
@@ -67,6 +68,7 @@ anychart.pieModule.DataView = function(parentView, fieldName, opt_func, opt_othe
    */
   this.otherPointView_ = new anychart.pieModule.DataView.Mapping_();
   this.otherPointView_.meta(0, 'groupedPoint', true);
+  this.otherPointView_.meta(0, 'name', groupedPointName);
 };
 goog.inherits(anychart.pieModule.DataView, anychart.data.View);
 
