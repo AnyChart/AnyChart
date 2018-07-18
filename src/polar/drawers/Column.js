@@ -62,7 +62,7 @@ anychart.polarModule.drawers.Column.prototype.startDrawing = function(shapeManag
 
 /** @inheritDoc */
 anychart.polarModule.drawers.Column.prototype.drawPointShape = function(point, path, hatchFill) {
-  var zeroRatio = this.series.planIsStacked() ? /** @type {number} */(point.meta('zeroRatio')) : 0;
+  var zeroRatio = /** @type {number} */(point.meta('zeroRatio'));
   var xRatio = /** @type {number} */(point.meta('xRatio'));
   var yRatio = /** @type {number} */(point.meta('valueRatio'));
   var leftXRatio = xRatio - this.pointWidthHalfRatio;
