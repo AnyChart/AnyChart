@@ -868,7 +868,7 @@ anychart.core.ui.Crosshair.prototype.drawLabels_ = function(labels, xDirection, 
     for (i = 0; i < labels.length; i++) {
       label = /** @type {anychart.core.ui.CrosshairLabel} */(labels[i]);
       if (label) {
-        axisIndex = /** @type {number} */(label.axisIndex());
+        axisIndex = /** @type {number} */(label.getOption('axisIndex'));
         axis = /** @type {anychart.core.Axis} */(getAxisByIndex.call(axisProvider, axisIndex));
 
         if (axis && this.canDrawForAxis(axis)) {

@@ -220,10 +220,10 @@ anychart.core.SeparateChart.prototype.calculateContentAreaSpace = function(total
 
   var legend = /** @type {anychart.core.ui.Legend} */(this.legend());
   if (this.hasInvalidationState(anychart.ConsistencyState.CHART_LEGEND | anychart.ConsistencyState.BOUNDS) &&
-      legend.positionMode() == anychart.enums.LegendPositionMode.OUTSIDE) {
+      legend.getOption('positionMode') == anychart.enums.LegendPositionMode.OUTSIDE) {
     this.drawLegend(bounds);
   }
-  bounds = legend.enabled() && legend.positionMode() == anychart.enums.LegendPositionMode.OUTSIDE ?
+  bounds = legend.enabled() && legend.getOption('positionMode') == anychart.enums.LegendPositionMode.OUTSIDE ?
       legend.getRemainingBounds() :
       bounds;
 
@@ -238,7 +238,7 @@ anychart.core.SeparateChart.prototype.calculateContentAreaSpace = function(total
 anychart.core.SeparateChart.prototype.specialDraw = function(bounds) {
   var legend = /** @type {anychart.core.ui.Legend} */(this.legend());
   if (this.hasInvalidationState(anychart.ConsistencyState.CHART_LEGEND | anychart.ConsistencyState.BOUNDS) &&
-      legend.positionMode() == anychart.enums.LegendPositionMode.INSIDE) {
+      legend.getOption('positionMode') == anychart.enums.LegendPositionMode.INSIDE) {
 
     this.drawLegend(bounds);
     this.markConsistent(anychart.ConsistencyState.CHART_LEGEND);

@@ -774,10 +774,10 @@ anychart.tagCloudModule.Chart.prototype.hoverMode = function(opt_value) {
  */
 anychart.tagCloudModule.Chart.prototype.selectionMode = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    this.interactivity().selectionMode(opt_value);
+    this.interactivity()['selectionMode'](opt_value);
     return this;
   } else {
-    return /** @type {anychart.enums.SelectionMode} */(this.interactivity().selectionMode());
+    return /** @type {anychart.enums.SelectionMode} */(this.interactivity().getOption('selectionMode'));
   }
 };
 
@@ -1193,7 +1193,7 @@ anychart.tagCloudModule.Chart.prototype.legendItemCanInteractInMode = function(m
 anychart.tagCloudModule.Chart.prototype.legendItemClick = function(item, event) {
   var meta = /** @type {Object} */(item.meta());
   var series;
-  var sourceMode = this.legend().itemsSourceMode();
+  var sourceMode = /** @type {anychart.enums.LegendItemsSourceMode} */(this.legend().getOption('itemsSourceMode'));
   if (sourceMode == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
     series = meta.series;
     var scale = meta.scale;
@@ -1213,7 +1213,7 @@ anychart.tagCloudModule.Chart.prototype.legendItemClick = function(item, event) 
         }
       }
 
-      if (this.interactivity().hoverMode() == anychart.enums.HoverMode.SINGLE) {
+      if (this.interactivity().getOption('hoverMode') == anychart.enums.HoverMode.SINGLE) {
         event.points_ = {
           series: series,
           points: points
@@ -1236,7 +1236,7 @@ anychart.tagCloudModule.Chart.prototype.legendItemOver = function(item, event) {
   var meta = /** @type {Object} */(item.meta());
   var series;
 
-  var sourceMode = this.legend().itemsSourceMode();
+  var sourceMode = /** @type {anychart.enums.LegendItemsSourceMode} */(this.legend().getOption('itemsSourceMode'));
   if (sourceMode == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
     series = /** @type {anychart.mapModule.Series} */(meta.series);
     var scale = meta.scale;
@@ -1257,7 +1257,7 @@ anychart.tagCloudModule.Chart.prototype.legendItemOver = function(item, event) {
 
       var tag = anychart.utils.extractTag(event['domTarget']);
       if (tag) {
-        if (this.interactivity().hoverMode() == anychart.enums.HoverMode.SINGLE) {
+        if (this.interactivity().getOption('hoverMode') == anychart.enums.HoverMode.SINGLE) {
           tag.points_ = {
             series: series,
             points: points
@@ -1284,9 +1284,9 @@ anychart.tagCloudModule.Chart.prototype.legendItemOver = function(item, event) {
 anychart.tagCloudModule.Chart.prototype.legendItemOut = function(item, event) {
   var meta = /** @type {Object} */(item.meta());
 
-  var sourceMode = this.legend().itemsSourceMode();
+  var sourceMode = /** @type {anychart.enums.LegendItemsSourceMode} */(this.legend().getOption('itemsSourceMode'));
   if (sourceMode == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
-    if (this.interactivity().hoverMode() == anychart.enums.HoverMode.SINGLE) {
+    if (this.interactivity().getOption('hoverMode') == anychart.enums.HoverMode.SINGLE) {
       var tag = anychart.utils.extractTag(event['domTarget']);
       if (tag)
         tag.series = meta.series;

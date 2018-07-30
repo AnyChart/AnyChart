@@ -917,7 +917,7 @@ anychart.vennModule.Chart.prototype.getStartValueForAppearanceReduction = goog.n
  * @return {anychart.vennModule.Chart|anychart.enums.HoverMode} .
  */
 anychart.vennModule.Chart.prototype.hoverMode = function(opt_value) {
-  return /** @type {anychart.enums.HoverMode} */ (this.interactivity().hoverMode(opt_value));
+  return /** @type {anychart.enums.HoverMode} */ (this.interactivity()['hoverMode'](opt_value));
 };
 
 
@@ -926,7 +926,7 @@ anychart.vennModule.Chart.prototype.hoverMode = function(opt_value) {
  * @return {anychart.vennModule.Chart|anychart.enums.SelectionMode|null} .
  */
 anychart.vennModule.Chart.prototype.selectionMode = function(opt_value) {
-  return /** @type {anychart.enums.SelectionMode} */ (this.interactivity().selectionMode(opt_value));
+  return /** @type {anychart.enums.SelectionMode} */ (this.interactivity()['selectionMode'](opt_value));
 };
 
 

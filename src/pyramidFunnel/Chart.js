@@ -1078,13 +1078,13 @@ anychart.pyramidFunnelModule.Chart.prototype.updateLabelsOnAnimate = function(la
 
 /** @inheritDoc */
 anychart.pyramidFunnelModule.Chart.prototype.doAnimation = function() {
-  if (this.animation().enabled() && this.animation().duration() > 0) {
+  if (this.animation().getOption('enabled') && /** @type {number} */(this.animation().getOption('duration')) > 0) {
     if (this.animationQueue_ && this.animationQueue_.isPlaying()) {
       this.animationQueue_.update();
     } else if (this.hasInvalidationState(anychart.ConsistencyState.CHART_ANIMATION)) {
       goog.dispose(this.animationQueue_);
       this.animationQueue_ = new anychart.animations.AnimationSerialQueue();
-      var duration = /** @type {number} */(this.animation().duration());
+      var duration = /** @type {number} */(this.animation().getOption('duration'));
       var pyramidFunnelDuration = duration * anychart.pyramidFunnelModule.Chart.ANIMATION_DURATION_RATIO;
       var pyramidFunnelLabelDuration = duration * (1 - anychart.pyramidFunnelModule.Chart.ANIMATION_DURATION_RATIO);
 

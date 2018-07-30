@@ -571,7 +571,7 @@ anychart.sunburstModule.Chart.prototype.drillUp = function() {
 /** @inheritDoc */
 anychart.sunburstModule.Chart.prototype.onMouseDown = function(event) {
   var interactivity = this.interactivity();
-  if (interactivity.selectionMode() == anychart.enums.SelectionMode.DRILL_DOWN) {
+  if (interactivity.getOption('selectionMode') == anychart.enums.SelectionMode.DRILL_DOWN) {
     if (event['button'] != acgraph.events.BrowserEvent.MouseButton.LEFT) return;
 
     var tag = anychart.utils.extractTag(event['domTarget']);

@@ -1212,7 +1212,7 @@ anychart.core.series.Cartesian.prototype.hoverMode = function(opt_value) {
   if (goog.isDef(opt_value)) {
     return this;
   }
-  return /** @type {anychart.enums.HoverMode} */((/** @type {anychart.core.CartesianBase}*/(this.chart)).interactivity().hoverMode());
+  return /** @type {anychart.enums.HoverMode} */((/** @type {anychart.core.CartesianBase}*/(this.chart)).interactivity().getOption('hoverMode'));
 };
 
 

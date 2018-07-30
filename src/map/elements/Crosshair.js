@@ -375,7 +375,7 @@ anychart.mapModule.elements.Crosshair.prototype.drawLabels = function(labels, is
   for (i = 0; i < labels.length; i++) {
     label = /** @type {anychart.core.ui.CrosshairLabel} */(labels[i]);
     if (label) {
-      axisIndex = /** @type {number} */(label.axisIndex());
+      axisIndex = /** @type {number} */(label.getOption('axisIndex'));
       axis = /** @type {anychart.mapModule.elements.Axis} */(getAxisByIndex.call(axisProvider, axisIndex));
       if (axis && this.canDrawForAxis(axis) && ratio > 0 && ratio < 1) {
         if (!lineDrawed && hasStroke) {

@@ -143,7 +143,7 @@ anychart.mekkoModule.Chart.prototype.firstCategoriesScale = function(opt_value) 
         var state = anychart.ConsistencyState.SCALE_CHART_SCALES |
             anychart.ConsistencyState.SCALE_CHART_Y_SCALES |
             anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS;
-        if ((this.allowLegendCategoriesMode() && this.legend().itemsSourceMode() == anychart.enums.LegendItemsSourceMode.CATEGORIES) ||
+        if ((this.allowLegendCategoriesMode() && /** @type {anychart.enums.LegendItemsSourceMode} */(this.legend().getOption('itemsSourceMode')) == anychart.enums.LegendItemsSourceMode.CATEGORIES) ||
             this.barmekkoMode_) {
           state |= anychart.ConsistencyState.CHART_LEGEND;
         }
@@ -203,7 +203,7 @@ anychart.mekkoModule.Chart.prototype.categoriesScaleInvalidated = function(event
     var state = anychart.ConsistencyState.SCALE_CHART_SCALES |
         anychart.ConsistencyState.SCALE_CHART_Y_SCALES |
         anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS;
-    if ((this.allowLegendCategoriesMode() && this.legend().itemsSourceMode() == anychart.enums.LegendItemsSourceMode.CATEGORIES) ||
+    if ((this.allowLegendCategoriesMode() && /** @type {anychart.enums.LegendItemsSourceMode} */(this.legend().getOption('itemsSourceMode')) == anychart.enums.LegendItemsSourceMode.CATEGORIES) ||
         this.barmekkoMode_) {
       state |= anychart.ConsistencyState.CHART_LEGEND;
     }

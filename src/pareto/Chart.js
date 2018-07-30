@@ -694,8 +694,6 @@ anychart.paretoModule.Chart.prototype.setupByJSON = function(config, opt_default
   // proto['barsPadding'] = proto.barsPadding;
   // proto['barGroupsPadding'] = proto.barGroupsPadding;
   proto['crosshair'] = proto.crosshair;
-  proto['maxBubbleSize'] = proto.maxBubbleSize;
-  proto['minBubbleSize'] = proto.minBubbleSize;
   proto['xGrid'] = proto.xGrid;
   proto['yGrid'] = proto.yGrid;
   proto['xMinorGrid'] = proto.xMinorGrid;
@@ -733,6 +731,8 @@ anychart.paretoModule.Chart.prototype.setupByJSON = function(config, opt_default
   proto['getType'] = proto.getType;
   // auto from ChartWithSeries
   // proto['defaultSeriesType'] = proto.defaultSeriesType;
+  // proto['maxBubbleSize'] = proto.maxBubbleSize;
+  // proto['minBubbleSize'] = proto.minBubbleSize;
   proto['addSeries'] = proto.addSeries;
   proto['getSeriesAt'] = proto.getSeriesAt;
   proto['getSeriesCount'] = proto.getSeriesCount;

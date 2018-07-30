@@ -623,8 +623,8 @@ anychart.radarPolarBaseModule.Chart.prototype.getSeriesStatus = function(event) 
   var iterator;
   var dx, dy, angle;
 
-  if (interactivity.hoverMode() == anychart.enums.HoverMode.BY_SPOT) {
-    var spotRadius = interactivity.spotRadius();
+  if (interactivity.getOption('hoverMode') == anychart.enums.HoverMode.BY_SPOT) {
+    var spotRadius = /** @type {number} */(interactivity.getOption('spotRadius'));
     for (i = 0, len = this.seriesList.length; i < len; i++) {
       series = this.seriesList[i];
       if (series.enabled()) {
@@ -657,7 +657,7 @@ anychart.radarPolarBaseModule.Chart.prototype.getSeriesStatus = function(event) 
           });
       }
     }
-  } else if (this.interactivity().hoverMode() == anychart.enums.HoverMode.BY_X) {
+  } else if (this.interactivity().getOption('hoverMode') == anychart.enums.HoverMode.BY_X) {
     dx = x - cx;
     dy = y - cy;
     angle = Math.PI / 2 + Math.atan2(dy, -dx) + goog.math.toRadians(/** @type {number} */ (this.getOption('startAngle')));
