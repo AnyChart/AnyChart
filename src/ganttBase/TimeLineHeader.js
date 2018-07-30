@@ -6,6 +6,7 @@ goog.require('anychart.core.settings');
 goog.require('anychart.core.ui.Background');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.utils.Padding');
+goog.require('anychart.format.Context');
 goog.require('anychart.ganttBaseModule.Overlay');
 goog.require('anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings');
 //endregion
@@ -249,48 +250,15 @@ anychart.ganttBaseModule.TimeLineHeader.DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
 
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'stroke',
-      anychart.core.settings.strokeNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'fill',
-      anychart.core.settings.fillNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'levelHeight',
-      anychart.core.settings.numberOrPercentNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'drawTopLine',
-      anychart.core.settings.booleanNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'drawRightLine',
-      anychart.core.settings.booleanNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'drawBottomLine',
-      anychart.core.settings.booleanNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'drawLeftLine',
-      anychart.core.settings.booleanNormalizer);
-
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'stroke', anychart.core.settings.strokeNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'fill', anychart.core.settings.fillNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'levelHeight', anychart.core.settings.numberOrPercentNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'drawTopLine', anychart.core.settings.booleanNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'drawRightLine', anychart.core.settings.booleanNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'drawBottomLine', anychart.core.settings.booleanNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'drawLeftLine', anychart.core.settings.booleanNormalizer]
+  ]);
   return map;
 })();
 anychart.core.settings.populate(anychart.ganttBaseModule.TimeLineHeader, anychart.ganttBaseModule.TimeLineHeader.DESCRIPTORS);
@@ -724,12 +692,11 @@ anychart.ganttBaseModule.TimeLineHeader.prototype.overlaySignal_ = function(e) {
 anychart.ganttBaseModule.TimeLineHeader.prototype.getLabelFormatIndex_ = function(value, labelFactory, labelSettings, bounds, formats) {
   for (var formatIndex = 0, formatsCount = formats.length; formatIndex < formatsCount; formatIndex++) {
     var format = formats[formatIndex];
-    var labelText = anychart.format.dateTime(value, format);
 
     labelSettings['width'] = null;
     labelSettings['height'] = null;
 
-    var labelBounds = labelFactory.measure({'value': labelText}, undefined, labelSettings);
+    var labelBounds = labelFactory.measure(this.getLabelsFormatProvider_(value, format), undefined, labelSettings);
 
     if (labelBounds.width < bounds.width) {
       return formatIndex;
@@ -749,11 +716,13 @@ anychart.ganttBaseModule.TimeLineHeader.prototype.getLabelFormatIndex_ = functio
  */
 anychart.ganttBaseModule.TimeLineHeader.prototype.getLabelsFormatProvider_ = function(value, format) {
   var labelText = anychart.format.dateTime(value, format);
-  return {
-    'value': labelText,
-    'tickValue': value,
-    'scale': this.xScale_
-  };
+  var context = new anychart.format.Context({
+    'value': {value: labelText, type: anychart.enums.TokenType.STRING},
+    'tickValue': {value: value, type: anychart.enums.TokenType.NUMBER},
+    'scale': {value: this.xScale_, type: anychart.enums.TokenType.UNKNOWN}
+  });
+
+  return context.propagate();
 };
 
 
@@ -1340,11 +1309,9 @@ anychart.ganttBaseModule.TimeLineHeader.prototype.setupByJSON = function(config,
   //todo (blackart)
   if ('holidays' in config) this.holidays_.setupByJSON(config['holidays'], opt_default);
   if ('overlay' in config) this.overlay_.setupInternal(!!opt_default, config['overlay']);
-  
+
   var levels = config['levels'];
   if (goog.isArray(levels)) {
-    goog.disposeAll(this.wrappers_);
-    this.wrappers_.length = 0;
     for (var i = 0; i < levels.length; i++) {
       this.level(i, levels[i]);
     }
@@ -1441,29 +1408,12 @@ anychart.ganttBaseModule.TimeLineHeader.LevelWrapper.DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
 
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'enabled',
-      anychart.core.settings.booleanNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'stroke',
-      anychart.core.settings.strokeNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'fill',
-      anychart.core.settings.fillNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'height',
-      anychart.core.settings.numberOrPercentNormalizer);
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'enabled', anychart.core.settings.booleanNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'stroke', anychart.core.settings.strokeNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'fill', anychart.core.settings.fillNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'height', anychart.core.settings.numberOrPercentNormalizer]
+  ]);
 
   return map;
 })();
