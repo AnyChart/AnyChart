@@ -707,7 +707,7 @@ anychart.treeDataModule.Tree.prototype.searchItems = function(field, value, opt_
         this.indexComparators_[field];
     var val = isStringIndex ? String(value) : value;
     var resultIndex = goog.array.binarySearch(indexVal, val, compWrapper);
-    result = resultIndex >= 0 ? this.index_[field][resultIndex].value : null;
+    result = resultIndex >= 0 ? this.index_[field][resultIndex].value : [];
 
     return goog.isArray(result) ? result : [result];
   } else { //Slow search without indexes: full passage.
