@@ -629,6 +629,7 @@ anychart.annotationsModule.PlotController.prototype.removeAnnotation = function(
     goog.dispose(annotation);
     return this;
   }
+  this.controller_.checkAnnotationSelectedReset(annotation);
   return this.removeAnnotationAt(goog.array.indexOf(this.annotations_, annotation));
 };
 
