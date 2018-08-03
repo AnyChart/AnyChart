@@ -1139,7 +1139,7 @@ goog.inherits(anychart.annotationsModule.PlotController.AnchorDragger, goog.fx.D
 
 /** @inheritDoc */
 anychart.annotationsModule.PlotController.AnchorDragger.prototype.startDrag = function(e) {
-  if (this.extractTarget(e)) {
+  if (!this.isDragging() && this.extractTarget(e)) {
     if (this.annotation_.isFinished()) {
       if (this.controller_.getController().getChart().dispatchEvent({
         'type': anychart.enums.EventType.ANNOTATION_CHANGE_START,
