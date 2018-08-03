@@ -509,6 +509,69 @@ anychart.circularGaugeModule.AxisMarker.prototype.clearPaths_ = function() {
 
 
 /**
+ * Return radii depends on gauge radius and passed arguments
+ * @param {anychart.circularGaugeModule.Chart} gauge
+ * @param {number} axisWidth
+ * @param {number} radius
+ * @param {number} startPercentSize
+ * @param {number} endPercentSize
+ * @return {Array.<number>}
+ * @private
+ */
+anychart.circularGaugeModule.AxisMarker.prototype.getRadii_ = function(gauge, axisWidth, radius, startPercentSize, endPercentSize) {
+  //Calculate radii based on gauge radius
+  var gaugeRadius = gauge.getPixRadius();
+  var baseStartR = this.getComplexRadius_(gaugeRadius, axisWidth, startPercentSize, true);
+  var baseEndR = this.getComplexRadius_(gaugeRadius, axisWidth, endPercentSize, true);
+  var startR = this.getComplexRadius_(gaugeRadius, axisWidth, startPercentSize, false);
+  var endR = this.getComplexRadius_(gaugeRadius, axisWidth, endPercentSize, false);
+
+  var tmp;
+  if (startR < baseStartR) {
+    tmp = startR;
+    startR = baseStartR;
+    baseStartR = tmp;
+  }
+  if (endR < baseEndR) {
+    tmp = endR;
+    endR = baseEndR;
+    baseEndR = tmp;
+  }
+
+  var mainStartWidth = (startR - baseStartR);
+  var mainEndWidth = (endR - baseEndR);
+
+  baseStartR = this.getComplexRadius_(radius, axisWidth, startPercentSize, true);
+  baseEndR = this.getComplexRadius_(radius, axisWidth, endPercentSize, true);
+  startR = this.getComplexRadius_(radius, axisWidth, startPercentSize, false);
+  endR = this.getComplexRadius_(radius, axisWidth, endPercentSize, false);
+
+  if (startR < baseStartR) {
+    tmp = startR;
+    startR = baseStartR;
+    baseStartR = tmp;
+  }
+  if (endR < baseEndR) {
+    tmp = endR;
+    endR = baseEndR;
+    baseEndR = tmp;
+  }
+
+  var startWidth = startR - baseStartR;
+  var endWidth = endR - baseEndR;
+  var startDifference = (mainStartWidth - startWidth) / 2;
+  var endDifference = (mainEndWidth - endWidth) / 2;
+
+  startR += startDifference;
+  baseStartR -= startDifference;
+  endR += endDifference;
+  baseEndR -= endDifference;
+
+  return [startR, baseStartR, endR, baseEndR];
+};
+
+
+/**
  * Drawing.
  * @return {anychart.circularGaugeModule.AxisMarker} .
  */
@@ -586,23 +649,13 @@ anychart.circularGaugeModule.AxisMarker.prototype.draw = function() {
 
       var axisWidth = goog.isDefAndNotNull(this.radius_) ? 0 : axis.getPixWidth();
 
-      var baseStartR = this.getComplexRadius_(radius, axisWidth, startPercentSize, true);
-      var baseEndR = this.getComplexRadius_(radius, axisWidth, endPercentSize, true);
-      var startR = this.getComplexRadius_(radius, axisWidth, startPercentSize, false);
-      var endR = this.getComplexRadius_(radius, axisWidth, endPercentSize, false);
+      var radii = this.getRadii_(gauge, axisWidth, radius, startPercentSize, endPercentSize);
 
-      var tmp;
-      if (startR < baseStartR) {
-        tmp = startR;
-        startR = baseStartR;
-        baseStartR = tmp;
-      }
+      var startR = radii[0];
+      var baseStartR = radii[1];
+      var endR = radii[2];
+      var baseEndR = radii[3];
 
-      if (endR < baseEndR) {
-        tmp = endR;
-        endR = baseEndR;
-        baseEndR = tmp;
-      }
 
       var startWidth = startR - baseStartR;
       var cornersRoundingPixStart = anychart.utils.normalizeSize(/** @type {string} */ (this.cornersRounding()), startWidth);
