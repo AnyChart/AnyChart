@@ -266,7 +266,7 @@ anychart.core.CartesianBase.prototype.applyScrollerOffset = function(offsets, sc
  * @protected
  */
 anychart.core.CartesianBase.prototype.resetScrollerPosition = function(scroller, contentAreaBounds) {
-  var scrollerBeforeAxes = scroller.position() == anychart.enums.ChartScrollerPosition.BEFORE_AXES;
+  var scrollerBeforeAxes = scroller.getOption('position') == anychart.enums.ChartScrollerPosition.BEFORE_AXES;
   scroller.padding(0);
   scroller.parentBounds(contentAreaBounds);
   var scrollerHorizontal = scroller.isHorizontal();
@@ -293,7 +293,7 @@ anychart.core.CartesianBase.prototype.resetScrollerPosition = function(scroller,
  * @protected
  */
 anychart.core.CartesianBase.prototype.applyScrollerOffsetInternal = function(offsets, scroller, scrollerSize) {
-  if (scroller.position() == anychart.enums.ChartScrollerPosition.BEFORE_AXES) {
+  if (scroller.getOption('position') == anychart.enums.ChartScrollerPosition.BEFORE_AXES) {
     switch (scroller.getOption('orientation')) {
       case anychart.enums.Orientation.TOP:
         scroller.padding()['top'](offsets[0] + (this.topAxisPadding_ || 0));

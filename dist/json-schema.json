@@ -4881,7 +4881,8 @@
             "string"
           ]
         },
-        "itemsFormat": {"type": "string"},
+        "itemsFormat": {"type": ["string", "null"]},
+        "titleFormat": {"type": ["string", "null"]},
         "itemsSourceMode": {"$ref": "#/definitions/anychart.enums.LegendItemsSourceMode"},
         "hoverCursor": {"$ref": "#/definitions/anychart.enums.Cursor"},
         "inverted": {

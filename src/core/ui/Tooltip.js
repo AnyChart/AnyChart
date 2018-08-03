@@ -298,143 +298,31 @@ anychart.core.ui.Tooltip.prototype.TOOLTIP_SIMPLE_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
 
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'width',
-      anychart.core.settings.numberOrPercentNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'height',
-      anychart.core.settings.numberOrPercentNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'titleFormat',
-      anychart.core.settings.stringOrFunctionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'format',
-      anychart.core.settings.stringOrFunctionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'unionFormat',
-      anychart.core.settings.stringOrFunctionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'valuePrefix',
-      anychart.core.settings.stringNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'valuePostfix',
-      anychart.core.settings.stringNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'position',
-      anychart.enums.normalizePosition);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'anchor',
-      anychart.enums.normalizeAnchor);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'offsetX',
-      anychart.core.settings.numberNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'offsetY',
-      anychart.core.settings.numberNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'x',
-      anychart.core.settings.numberNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'y',
-      anychart.core.settings.numberNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'allowLeaveScreen',
-      anychart.core.settings.booleanNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'allowLeaveChart',
-      anychart.core.settings.booleanNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'allowLeaveStage',
-      anychart.core.settings.booleanNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'displayMode',
-      anychart.enums.normalizeTooltipDisplayMode);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'positionMode',
-      anychart.enums.normalizeTooltipPositionMode);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'onDomReady',
-      anychart.core.settings.functionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'onBeforeTitleChange',
-      anychart.core.settings.functionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'onTitleChanged',
-      anychart.core.settings.functionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'onBeforeContentChange',
-      anychart.core.settings.functionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'onContentChanged',
-      anychart.core.settings.functionNormalizer);
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'width', anychart.core.settings.numberOrPercentNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'height', anychart.core.settings.numberOrPercentNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'titleFormat', anychart.core.settings.stringOrFunctionNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'format', anychart.core.settings.stringOrFunctionNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'unionFormat', anychart.core.settings.stringOrFunctionNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'valuePrefix', anychart.core.settings.stringNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'valuePostfix', anychart.core.settings.stringNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'position', anychart.enums.normalizePosition],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'anchor', anychart.enums.normalizeAnchor],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'offsetX', anychart.core.settings.numberNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'offsetY', anychart.core.settings.numberNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'x', anychart.core.settings.numberNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'y', anychart.core.settings.numberNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'allowLeaveScreen', anychart.core.settings.booleanNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'allowLeaveChart', anychart.core.settings.booleanNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'allowLeaveStage', anychart.core.settings.booleanNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'displayMode', anychart.enums.normalizeTooltipDisplayMode],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'positionMode', anychart.enums.normalizeTooltipPositionMode],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'onDomReady', anychart.core.settings.functionNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'onBeforeTitleChange', anychart.core.settings.functionNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'onTitleChanged', anychart.core.settings.functionNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'onBeforeContentChange', anychart.core.settings.functionNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'onContentChanged', anychart.core.settings.functionNormalizer]
+  ]);
 
   return map;
 })();
@@ -2501,5 +2389,28 @@ anychart.core.ui.Tooltip.prototype.disposeInternal = function() {
   proto['hide'] = proto.hide;
   proto['hideDelay'] = proto.hideDelay;
   proto['textSettings'] = proto.textSettings;
+  // auto generated
+  // proto['useHtml'] = proto.useHtml;
+  // proto['width'] = proto.width;
+  // proto['height'] = proto.height;
+  // proto['titleFormat'] = proto.titleFormat;
+  // proto['format'] = proto.format;
+  // proto['unionFormat'] = proto.unionFormat;
+  // proto['valuePrefix'] = proto.valuePrefix;
+  // proto['valuePostfix'] = proto.valuePostfix;
+  // proto['position'] = proto.position;
+  // proto['anchor'] = proto.anchor;
+  // proto['offsetX'] = proto.offsetX;
+  // proto['offsetY'] = proto.offsetY;
+  // proto['allowLeaveScreen'] = proto.allowLeaveScreen;
+  // proto['allowLeaveChart'] = proto.allowLeaveChart;
+  // proto['allowLeaveStage'] = proto.allowLeaveStage;
+  // proto['displayMode'] = proto.displayMode;
+  // proto['positionMode'] = proto.positionMode;
+  // proto['onDomReady'] = proto.onDomReady;
+  // proto['onBeforeTitleChange'] = proto.onBeforeTitleChange;
+  // proto['onTitleChanged'] = proto.onTitleChanged;
+  // proto['onBeforeContentChange'] = proto.onBeforeContentChange;
+  // proto['onContentChanged'] = proto.onContentChanged
 })();
 //endregion

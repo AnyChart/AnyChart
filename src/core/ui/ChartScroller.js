@@ -18,34 +18,32 @@ anychart.core.ui.ChartScroller = function() {
    * @private
    */
   this.position_ = anychart.enums.ChartScrollerPosition.AFTER_AXES;
+
+  anychart.core.settings.createDescriptorMeta(this.descriptorsMeta, 'position',
+      anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.APPEARANCE,
+      anychart.Signal.BOUNDS_CHANGED | anychart.Signal.NEEDS_REDRAW);
 };
 goog.inherits(anychart.core.ui.ChartScroller, anychart.core.ui.Scroller);
 
 
 /**
- * Position getter/setter.
- * @param {anychart.enums.ChartScrollerPosition=} opt_value
- * @return {anychart.enums.ChartScrollerPosition|anychart.core.ui.ChartScroller}
+ * @type {!Object<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.core.ui.ChartScroller.prototype.position = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    /** @type {anychart.enums.ChartScrollerPosition} */
-    var value = anychart.enums.normalizeChartScrollerPosition(opt_value);
-    if (value != this.position_) {
-      this.position_ = value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.APPEARANCE,
-          anychart.Signal.BOUNDS_CHANGED | anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.position_;
-};
+anychart.core.ui.ChartScroller.PROPERTY_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  anychart.core.settings.createDescriptor(map, anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'position', anychart.enums.normalizeChartScrollerPosition);
+  return map;
+})();
+anychart.core.settings.populate(anychart.core.ui.ChartScroller, anychart.core.ui.ChartScroller.PROPERTY_DESCRIPTORS);
 
 
 /** @inheritDoc */
 anychart.core.ui.ChartScroller.prototype.serialize = function() {
   var json = anychart.core.ui.ChartScroller.base(this, 'serialize');
-  json['position'] = this.position();
+  anychart.core.settings.serialize(this, anychart.core.ui.ChartScroller.PROPERTY_DESCRIPTORS, json);
   return json;
 };
 
@@ -53,12 +51,13 @@ anychart.core.ui.ChartScroller.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.core.ui.ChartScroller.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.ui.ChartScroller.base(this, 'setupByJSON', config, opt_default);
-  this.position(config['position']);
+  anychart.core.settings.deserialize(this, anychart.core.ui.ChartScroller.PROPERTY_DESCRIPTORS, config, opt_default);
 };
 
 
 //exports
 (function() {
   var proto = anychart.core.ui.ChartScroller.prototype;
-  proto['position'] = proto.position;
+  // auto generated
+  // proto['position'] = proto.position;
 })();

@@ -99,7 +99,7 @@ anychart.core.ui.Legend = function() {
   var iconTextSpacingBeforeInvalidationHook = function() {
     if (goog.isDefAndNotNull(this.items_)) {
       for (var i = 0, len = this.items_.length; i < len; i++) {
-        this.items_[i].iconTextSpacing(this.iconTextSpacing_);
+        this.items_[i]['iconTextSpacing'](this.getOption('iconTextSpacing'));
       }
     }
   };
@@ -566,11 +566,11 @@ anychart.core.ui.Legend.prototype.showTooltip = function(event) {
     var item = this.items_[index];
     if (item && event) {
       var values = {
-        'value': {value: item.text(), type: anychart.enums.TokenType.STRING},
-        'iconType': {value: item.iconType(), type: anychart.enums.TokenType.STRING},
-        'iconStroke': {value: item.iconStroke(), type: anychart.enums.TokenType.UNKNOWN},
-        'iconFill': {value: item.iconFill(), type: anychart.enums.TokenType.UNKNOWN},
-        'iconHatchFill': {value: item.iconHatchFill(), type: anychart.enums.TokenType.UNKNOWN},
+        'value': {value: item.getOption('text'), type: anychart.enums.TokenType.STRING},
+        'iconType': {value: item.getOption('iconType'), type: anychart.enums.TokenType.STRING},
+        'iconStroke': {value: item.getOption('iconStroke'), type: anychart.enums.TokenType.UNKNOWN},
+        'iconFill': {value: item.getOption('iconFill'), type: anychart.enums.TokenType.UNKNOWN},
+        'iconHatchFill': {value: item.getOption('iconHatchFill'), type: anychart.enums.TokenType.UNKNOWN},
         'iconMarkerType': {value: item.iconMarkerType(), type: anychart.enums.TokenType.STRING},
         'iconMarkerStroke': {value: item.iconMarkerStroke(), type: anychart.enums.TokenType.UNKNOWN},
         'iconMarkerFill': {value: item.iconMarkerFill(), type: anychart.enums.TokenType.UNKNOWN},
@@ -847,7 +847,7 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
   var paginator = /** @type {anychart.core.ui.Paginator} */(this.paginator());
   var title = /** @type {anychart.core.ui.Title} */(this.title());
 
-  var paginatorOrientation = paginator.orientation();
+  var paginatorOrientation = paginator.getOption('orientation');
   var paginatorIsHorizontal = paginatorOrientation == anychart.enums.Orientation.BOTTOM || paginatorOrientation == anychart.enums.Orientation.TOP;
   var titleOrientation = title.getOption('orientation') || title.defaultOrientation();
   var titleIsHorizontal = titleOrientation == anychart.enums.Orientation.BOTTOM || titleOrientation == anychart.enums.Orientation.TOP;
@@ -1008,7 +1008,7 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
             if (separatorBounds && separatorIsHorizontal) {
               accHeight += separatorBounds.height;
             }
-            if (paginator.orientation() == anychart.enums.Orientation.TOP || paginator.orientation() == anychart.enums.Orientation.BOTTOM) {
+            if (paginatorOrientation == anychart.enums.Orientation.TOP || paginatorOrientation == anychart.enums.Orientation.BOTTOM) {
               accHeight += paginatorBounds.height;
             }
 
@@ -1717,8 +1717,8 @@ anychart.core.ui.Legend.prototype.drawLegendContent_ = function(pageNumber, cont
             item
                 .suspendSignalsDispatching()
                 .parentBounds(contentBounds)
-                .x(x)
-                .y(y)
+                ['x'](x)
+                ['y'](y)
                 .enabled(true)
                 .resumeSignalsDispatching(false)
                 .draw();
@@ -1733,8 +1733,8 @@ anychart.core.ui.Legend.prototype.drawLegendContent_ = function(pageNumber, cont
             item
                 .suspendSignalsDispatching()
                 .parentBounds(contentBounds)
-                .x(x)
-                .y(y)
+                ['x'](x)
+                ['y'](y)
                 .enabled(true)
                 .resumeSignalsDispatching(false)
                 .draw();
@@ -1757,8 +1757,8 @@ anychart.core.ui.Legend.prototype.drawLegendContent_ = function(pageNumber, cont
             item
                 .suspendSignalsDispatching()
                 .parentBounds(contentBounds)
-                .x(x)
-                .y(y)
+                ['x'](x)
+                ['y'](y)
                 .enabled(true)
                 .resumeSignalsDispatching(false)
                 .draw();
@@ -1782,8 +1782,8 @@ anychart.core.ui.Legend.prototype.drawLegendContent_ = function(pageNumber, cont
             item
                 .suspendSignalsDispatching()
                 .parentBounds(contentBounds)
-                .x(x)
-                .y(y)
+                ['x'](x)
+                ['y'](y)
                 .enabled(true)
                 .resumeSignalsDispatching(false)
                 .draw();
