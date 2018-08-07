@@ -217,6 +217,7 @@ anychart.core.shapeManagers.Base.prototype.createShape = function(name, state, i
     shape = this.shapePools[shapeType][this.shapePoolPointers[shapeType]];
   } else {
     this.shapePools[shapeType].push(shape = descriptor.cls());
+    shape.parent(this.layer);
   }
   this.shapePoolPointers[shapeType]++;
   this.usedShapes[shapeType].push(shape);

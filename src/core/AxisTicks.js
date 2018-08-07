@@ -34,9 +34,7 @@ anychart.core.AxisTicks = function() {
    * @type {!acgraph.vector.Path}
    * @protected
    */
-  this.path = acgraph.path();
-  this.bindHandlersToGraphics(this.path);
-  this.registerDisposable(this.path);
+  this.path;
 };
 goog.inherits(anychart.core.AxisTicks, anychart.core.VisualBase);
 
@@ -114,6 +112,12 @@ anychart.core.AxisTicks.prototype.remove = function() {
  * @return {!anychart.core.AxisTicks} {@link anychart.core.AxisTicks} instance for method chaining.
  */
 anychart.core.AxisTicks.prototype.draw = function() {
+  if (!this.path) {
+    this.path = this.container().path();
+    this.bindHandlersToGraphics(this.path);
+    this.registerDisposable(this.path);
+  }
+
   this.path.clear();
   this.path.stroke(/** @type {acgraph.vector.Stroke} */(this.getOption('stroke')));
 

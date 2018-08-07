@@ -418,7 +418,7 @@ anychart.core.Axis.prototype.createTicks = function() {
  * @protected
  */
 anychart.core.Axis.prototype.getLine = function() {
-  return this.line ? this.line : this.line = /** @type {acgraph.vector.Element} */(acgraph.path());
+  return this.line ? this.line : this.line = /** @type {acgraph.vector.Element} */(this.container().path());
 };
 
 

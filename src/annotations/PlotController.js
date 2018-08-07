@@ -167,13 +167,13 @@ anychart.annotationsModule.PlotController.prototype.draw = function() {
   this.suspendSignalsDispatching();
 
   if (!this.annotationsLayer_) {
-    this.annotationsLayer_ = acgraph.layer();
+    this.annotationsLayer_ = this.container().layer();
     this.annotationsLayer_.listenOnce(acgraph.events.EventType.MOUSEOVER, this.initDragger_, false, this);
     this.annotationsLayer_.listenOnce(acgraph.events.EventType.TOUCHSTART, this.initDragger_, false, this);
     this.annotationsLayer_.listen(acgraph.events.EventType.MOUSEOVER, this.handleAnnotationMouseOver_, false, this);
     this.annotationsLayer_.listen(acgraph.events.EventType.MOUSEOUT, this.handleAnnotationMouseOut_, false, this);
 
-    this.drawingOverlayRect_ = acgraph.rect(0, 0, 0, 0);
+    this.drawingOverlayRect_ = this.container().rect(0, 0, 0, 0);
     this.drawingOverlayRect_.cursor(acgraph.vector.Cursor.CROSSHAIR);
     this.drawingOverlayRect_.fill(anychart.color.TRANSPARENT_HANDLER);
     this.drawingOverlayRect_.stroke(null);
@@ -183,7 +183,7 @@ anychart.annotationsModule.PlotController.prototype.draw = function() {
      * @type {!acgraph.vector.Rect}
      * @private
      */
-    this.counterHighlighter_ = acgraph.rect(0, 0, 0, 0);
+    this.counterHighlighter_ = this.annotationsLayer_.rect(0, 0, 0, 0);
     this.counterHighlighter_.fill(anychart.color.TRANSPARENT_HANDLER);
     this.counterHighlighter_.stroke(null);
     this.counterHighlighter_.zIndex(1000);
