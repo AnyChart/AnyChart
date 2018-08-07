@@ -633,7 +633,7 @@ anychart.core.ui.Tooltip.prototype.draw = function() {
     if (this.hasInvalidationState(anychart.ConsistencyState.TOOLTIP_BACKGROUND)) {
       background.suspendSignalsDispatching();
       background.parentBounds(this.contentBounds_);
-      background.container(this.getRootLayer_());
+      background.container(this.rootLayer_);
       background.draw();
       background.resumeSignalsDispatching(false);
 
@@ -643,6 +643,7 @@ anychart.core.ui.Tooltip.prototype.draw = function() {
     if (this.hasInvalidationState(anychart.ConsistencyState.TOOLTIP_TITLE)) {
       title.suspendSignalsDispatching();
       title.parentBounds(this.boundsWithoutPadding_);
+      title.container(this.rootLayer_);
       title.draw();
       title.resumeSignalsDispatching(false);
 
@@ -656,6 +657,7 @@ anychart.core.ui.Tooltip.prototype.draw = function() {
     if (this.hasInvalidationState(anychart.ConsistencyState.TOOLTIP_SEPARATOR)) {
       separator.suspendSignalsDispatching();
       separator.parentBounds(this.titleRemainingBounds_ || this.boundsWithoutPadding_);
+      separator.container(this.rootLayer_);
       separator.draw();
       separator.resumeSignalsDispatching(false);
 
@@ -669,8 +671,9 @@ anychart.core.ui.Tooltip.prototype.draw = function() {
     if (this.hasInvalidationState(anychart.ConsistencyState.TOOLTIP_CONTENT)) {
       var remainingBounds = this.separatorRemainingBounds_ || this.titleRemainingBounds_ || this.boundsWithoutPadding_;
       content.suspendSignalsDispatching();
-      this.applyTextSettings();
       content.parentBounds(remainingBounds);
+      content.container(this.rootLayer_);
+      this.applyTextSettings();
       content.draw();
       content.resumeSignalsDispatching(false);
       this.markConsistent(anychart.ConsistencyState.TOOLTIP_CONTENT);
@@ -1428,15 +1431,15 @@ anychart.core.ui.Tooltip.prototype.getRootLayer_ = function() {
     this.registerDisposable(this.rootLayer_);
     this.bindHandlersToGraphics(this.rootLayer_);
 
-    var background = /** @type {anychart.core.ui.Background} */(this.background());
-    var title = this.title();
-    var separator = /** @type {anychart.core.ui.Separator} */(this.separator());
-    var content = /** @type {anychart.core.ui.Label} */(this.contentInternal());
-
-    background.container(this.rootLayer_);
-    title.container(this.rootLayer_);
-    separator.container(this.rootLayer_);
-    content.container(this.rootLayer_);
+    // var background = /** @type {anychart.core.ui.Background} */(this.background());
+    // var title = this.title();
+    // var separator = /** @type {anychart.core.ui.Separator} */(this.separator());
+    // var content = /** @type {anychart.core.ui.Label} */(this.contentInternal());
+    //
+    // background.container(this.rootLayer_);
+    // title.container(this.rootLayer_);
+    // separator.container(this.rootLayer_);
+    // content.container(this.rootLayer_);
   }
   return this.rootLayer_;
 };
@@ -1823,14 +1826,24 @@ anychart.core.ui.Tooltip.prototype.setContainerToTooltip_ = function(tooltip) {
             anychart.utils.tooltipContainersRegistry[stageUid] = tc;
           }
           tooltip.tooltipContainer_ = tc;
-          tooltip.getRootLayer_().parent(/** @type {acgraph.vector.ILayer} */ (tooltip.container()));
           tc.container(wrapper);
           tc.allocTooltip(tooltip);
+          tooltip.getRootLayer_().parent(/** @type {acgraph.vector.ILayer} */ (tooltip.container()));
         }
         tooltip.markConsistent(anychart.ConsistencyState.CONTAINER);
       }
 
     }
+
+    var background = /** @type {anychart.core.ui.Background} */(tooltip.background());
+    var title = tooltip.title();
+    var separator = /** @type {anychart.core.ui.Separator} */(tooltip.separator());
+    var content = /** @type {anychart.core.ui.Label} */(tooltip.contentInternal());
+
+    background.container(tooltip.getRootLayer_());
+    title.container(tooltip.getRootLayer_());
+    separator.container(tooltip.getRootLayer_());
+    content.container(tooltip.getRootLayer_());
   }
 };
 

@@ -640,7 +640,7 @@ anychart.core.ui.Title.prototype.initDom_ = function() {
   var isInitial = false;
   if (!this.layer_) {
     isInitial = true;
-    this.layer_ = acgraph.layer();
+    this.layer_ = this.container().layer();
     this.background().container(this.layer_);
     this.text_ = this.layer_.text();
     this.text_.zIndex(.1);

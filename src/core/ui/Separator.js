@@ -366,11 +366,6 @@ anychart.core.ui.Separator.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
-    if (this.enabled()) this.path_.parent(container);
-    this.markConsistent(anychart.ConsistencyState.CONTAINER);
-  }
-
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
     var zIndex = /** @type {number} */ (this.zIndex());
     this.path_.zIndex(zIndex);
