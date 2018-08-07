@@ -338,12 +338,13 @@ anychart.core.ui.Separator.prototype.draw = function() {
 
   var isInitial = !this.path_;
 
+  var container = /** @type {acgraph.vector.ILayer} */(this.container());
+
   if (isInitial) {
-    this.path_ = acgraph.path();
+    this.path_ = container.path();
     this.registerDisposable(this.path_);
   }
 
-  var container = /** @type {acgraph.vector.ILayer} */(this.container());
   var stage = container ? container.getStage() : null;
   var manualSuspend = stage && !stage.isSuspended();
   if (manualSuspend) stage.suspend();
@@ -364,6 +365,11 @@ anychart.core.ui.Separator.prototype.draw = function() {
     }
     //    this.drawInternal(bounds);
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
+    if (this.enabled()) this.path_.parent(container);
+    this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
