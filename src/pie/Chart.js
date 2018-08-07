@@ -4708,7 +4708,7 @@ anychart.pieModule.Chart.prototype.setupByJSON = function(config, opt_default) {
   this.data(config['data']);
 
   this.palette(config['palette']);
-  this.hatchFillPalette(config['hatchFillPalette']);
+  // this.hatchFillPalette(config['hatchFillPalette']);
 
   this.center().setupInternal(!!opt_default, config['center']);
 

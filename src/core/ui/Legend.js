@@ -1478,7 +1478,7 @@ anychart.core.ui.Legend.prototype.draw = function() {
      * Layer of legend.
      * @type {!acgraph.vector.Layer}
      */
-    this.rootElement = acgraph.layer();
+    this.rootElement = this.container().layer();
     this.bindHandlersToGraphics(this.rootElement);
     this.registerDisposable(this.rootElement);
 

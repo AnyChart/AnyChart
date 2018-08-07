@@ -157,7 +157,7 @@ anychart.resourceModule.Activities.prototype.SUPPORTED_SIGNALS =
  * Default hatch fill.
  * @const {acgraph.vector.PatternFill}
  */
-anychart.resourceModule.Activities.DEFAULT_HATCH_FILL = acgraph.vector.normalizeHatchFill(acgraph.vector.HatchFill.HatchFillType.DIAGONAL_BRICK);
+// anychart.resourceModule.Activities.DEFAULT_HATCH_FILL = acgraph.vector.normalizeHatchFill(acgraph.vector.HatchFill.HatchFillType.DIAGONAL_BRICK);
 
 
 /**

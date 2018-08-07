@@ -648,6 +648,12 @@ anychart.core.ui.LegendItem.prototype.draw = function() {
   if (!this.checkDrawingNeeded())
     return this;
 
+  if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
+    var container = /** @type {acgraph.vector.ILayer} */(this.container());
+    this.layer_.parent(container);
+    this.markConsistent(anychart.ConsistencyState.CONTAINER);
+  }
+
   var isInitial;
   if (isInitial = !this.icon_) {
     /**
@@ -688,11 +694,6 @@ anychart.core.ui.LegendItem.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
-    var container = /** @type {acgraph.vector.ILayer} */(this.container());
-    this.layer_.parent(container);
-    this.markConsistent(anychart.ConsistencyState.CONTAINER);
-  }
   var iconType = /** @type {(string|function(acgraph.vector.Path, number))} */(this.getOption('iconType'));
   var drawer = goog.isString(iconType) ?
       this.getIconDrawer(iconType) :
