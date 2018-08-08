@@ -650,7 +650,7 @@ anychart.core.GridBase.prototype.getFillElement = function(index) {
 anychart.core.GridBase.prototype.lineElement = function(opt_isMajor) {
   this.lineElementInternal = /** @type {!acgraph.vector.Path} */(this.lineElementInternal ?
       this.lineElementInternal :
-      acgraph.path());
+      this.container().path());
   this.registerDisposable(this.lineElementInternal);
   return this.lineElementInternal;
 };

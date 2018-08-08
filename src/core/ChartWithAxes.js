@@ -1149,6 +1149,7 @@ anychart.core.ChartWithAxes.prototype.getBoundsWithoutAxes = function(contentAre
   for (i = 0, count = axes.length; i < count; i++) {
     axis = /** @type {anychart.core.Axis} */(axes[i]);
     if (axis && axis.enabled()) {
+      axis.container(this.rootElement);
       switch (axis.orientation()) {
         case anychart.enums.Orientation.TOP:
           if (!firstTopAxis)

@@ -1569,7 +1569,7 @@ anychart.core.Chart.prototype.drawInternal = function() {
 
   //create root element only if draw is called
   if (!this.rootElement) {
-    this.rootElement = acgraph.layer();
+    this.rootElement = this.container().layer();
     this.bindHandlersToGraphics(this.rootElement);
     this.registerDisposable(this.rootElement);
   }
