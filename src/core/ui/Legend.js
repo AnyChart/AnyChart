@@ -1482,6 +1482,10 @@ anychart.core.ui.Legend.prototype.draw = function() {
     this.bindHandlersToGraphics(this.rootElement);
     this.registerDisposable(this.rootElement);
 
+    this.background().container(this.rootElement);
+    this.title().container(this.rootElement);
+    this.titleSeparator().container(this.rootElement);
+
     if (!this.itemsLayer_) {
       /**
        * Legend items layer.
@@ -1502,13 +1506,13 @@ anychart.core.ui.Legend.prototype.draw = function() {
   var container = /** @type {acgraph.vector.ILayer} */(this.container());
   var stage = container ? container.getStage() : null;
 
+  var manualSuspend = stage && !stage.isSuspended();
+  if (manualSuspend) stage.suspend();
+
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
     this.rootElement.parent(container);
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
-
-  var manualSuspend = stage && !stage.isSuspended();
-  if (manualSuspend) stage.suspend();
 
   if (this.hasInvalidationState(anychart.ConsistencyState.LEGEND_RECREATE_ITEMS)) {
     this.recreateItems_ = true;

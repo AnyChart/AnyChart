@@ -32,15 +32,15 @@ anychart.core.ui.Crosshair = function() {
 
   /**
    * @type {acgraph.vector.Path}
-   * @protected
+   * @private
    */
-  this.xLine = acgraph.path();
+  this.xLine_ = null;
 
   /**
    * @type {acgraph.vector.Path}
-   * @protected
+   * @private
    */
-  this.yLine = acgraph.path();
+  this.yLine_ = null;
 
   /**
    * @type {Array.<anychart.core.ui.CrosshairLabel>}
@@ -53,9 +53,6 @@ anychart.core.ui.Crosshair = function() {
    * @private
    */
   this.yLabels_ = [];
-
-  this.xLine.disablePointerEvents(true);
-  this.yLine.disablePointerEvents(true);
 
   /**
    * This flag is used to auto enable or disable xLabel.
@@ -501,8 +498,8 @@ anychart.core.ui.Crosshair.prototype.draw = function() {
   var container = /** @type {acgraph.vector.ILayer} */(this.container());
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    this.xLine.stroke(/** @type {acgraph.vector.Stroke} */ (this.getOption('xStroke')));
-    this.yLine.stroke(/** @type {acgraph.vector.Stroke} */ (this.getOption('yStroke')));
+    this.xLine().stroke(/** @type {acgraph.vector.Stroke} */ (this.getOption('xStroke')));
+    this.yLine().stroke(/** @type {acgraph.vector.Stroke} */ (this.getOption('yStroke')));
 
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
@@ -511,8 +508,8 @@ anychart.core.ui.Crosshair.prototype.draw = function() {
   var labels = goog.array.concat(this.xLabels_, this.yLabels_);
   var labelsLength = labels.length;
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
-    this.xLine.parent(container);
-    this.yLine.parent(container);
+    this.xLine().parent(container);
+    this.yLine().parent(container);
 
     this.setLabelsContainer(labels, container);
 
@@ -520,8 +517,8 @@ anychart.core.ui.Crosshair.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
-    this.xLine.zIndex(zIndex);
-    this.yLine.zIndex(zIndex);
+    this.xLine().zIndex(zIndex);
+    this.yLine().zIndex(zIndex);
 
     for (i = 0; i < labelsLength; i++) {
       label = /** @type {anychart.core.ui.CrosshairLabel} */(labels[i]);
@@ -591,7 +588,7 @@ anychart.core.ui.Crosshair.prototype.hide = function() {
  * @param {anychart.core.ui.CrosshairLabel=} opt_label
  */
 anychart.core.ui.Crosshair.prototype.hideX = function(opt_label) {
-  this.xLine.clear();
+  this.xLine().clear();
   this.hideXLabel(opt_label);
 };
 
@@ -601,7 +598,7 @@ anychart.core.ui.Crosshair.prototype.hideX = function(opt_label) {
  * @param {anychart.core.ui.CrosshairLabel=} opt_label
  */
 anychart.core.ui.Crosshair.prototype.hideY = function(opt_label) {
-  this.yLine.clear();
+  this.yLine().clear();
   this.hideYLabel(opt_label);
 };
 
@@ -728,6 +725,32 @@ anychart.core.ui.Crosshair.prototype.xLabelAutoEnabled = function(opt_value) {
 
 
 /**
+ *
+ * @return {acgraph.vector.Path}
+ */
+anychart.core.ui.Crosshair.prototype.xLine = function() {
+  if (!this.xLine_) {
+    this.xLine_ = this.container().path();
+    this.xLine_.disablePointerEvents(true);
+  }
+  return this.xLine_;
+};
+
+
+/**
+ *
+ * @return {acgraph.vector.Path}
+ */
+anychart.core.ui.Crosshair.prototype.yLine = function() {
+  if (!this.yLine_) {
+    this.yLine_ = this.container().path();
+    this.yLine_.disablePointerEvents(true);
+  }
+  return this.yLine_;
+};
+
+
+/**
  * Draws X or Y line.
  * @param {anychart.core.Axis|anychart.mapModule.elements.Axis|anychart.stockModule.Axis} axis - Axis.
  * @param {boolean} xDirection Whether is x axis.
@@ -736,7 +759,7 @@ anychart.core.ui.Crosshair.prototype.xLabelAutoEnabled = function(opt_value) {
  * @private
  */
 anychart.core.ui.Crosshair.prototype.drawLine_ = function(axis, xDirection, mouseX, mouseY) {
-  var line = xDirection ? this.xLine : this.yLine;
+  var line = xDirection ? this.xLine() : this.yLine();
 
   var stroke = this.getOption(xDirection ? 'xStroke' : 'yStroke');
   if (stroke && !anychart.utils.isNone(stroke)) {
@@ -1068,8 +1091,8 @@ anychart.core.ui.Crosshair.prototype.disposeInternal = function() {
     this.interactivityTarget_ = null;
   }
 
-  goog.disposeAll(this.xLine, this.yLine, this.xLabels_, this.yLabels_);
-  this.xLine = this.yLine = this.xLabels_ = this.yLabels_ = null;
+  goog.disposeAll(this.xLine_, this.yLine_, this.xLabels_, this.yLabels_);
+  this.xLine_ = this.yLine_ = this.xLabels_ = this.yLabels_ = null;
 
   anychart.core.ui.Crosshair.base(this, 'disposeInternal');
 };

@@ -2066,7 +2066,7 @@ anychart.stockModule.Plot.prototype.draw = function() {
  */
 anychart.stockModule.Plot.prototype.ensureVisualReady_ = function() {
   if (!this.rootLayer_) {
-    this.rootLayer_ = acgraph.layer();
+    this.rootLayer_ = this.container().layer();
     this.bindHandlersToGraphics(this.rootLayer_);
     this.eventsInterceptor_ = this.rootLayer_.rect();
     this.eventsInterceptor_.zIndex(anychart.stockModule.Plot.ZINDEX_EVENTS_INTERCEPTOR);

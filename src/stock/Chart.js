@@ -1637,6 +1637,7 @@ anychart.stockModule.Chart.prototype.distributeBounds_ = function(contentBounds)
   for (var i = 0; i < this.plots_.length; i++) {
     var plot = this.plots_[i];
     if (plot && plot.enabled()) {
+      plot.container(this.rootElement);
       plot.parentBounds(remainingBounds);
       var bounds = /** @type {anychart.core.utils.Bounds} */(plot.bounds());
       var usedInDistribution = false;

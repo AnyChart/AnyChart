@@ -298,7 +298,7 @@ anychart.stockModule.eventMarkers.PlotController.prototype.draw = function() {
     return this;
 
   if (!this.rootLayer_) {
-    this.rootLayer_ = acgraph.layer();
+    this.rootLayer_ = this.container().layer();
     this.bindHandlersToGraphics(this.rootLayer_);
   }
   var container = /** @type {acgraph.vector.ILayer} */(this.container());

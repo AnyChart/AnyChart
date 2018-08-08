@@ -427,12 +427,12 @@ anychart.core.ui.Scroller.prototype.draw = function() {
     return this;
 
   if (!this.rootLayer) {
-    this.rootLayer = acgraph.layer();
+    this.rootLayer = this.container().layer();
 
-    this.startThumb_ = acgraph.path();
+    this.startThumb_ = this.rootLayer.path();
     this.startThumb_.zIndex(100);
 
-    this.endThumb_ = acgraph.path();
+    this.endThumb_ = this.rootLayer.path();
     this.endThumb_.zIndex(100);
 
     this.nonSelectedBackground_ = this.rootLayer.rect();

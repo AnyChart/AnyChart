@@ -727,7 +727,7 @@ anychart.stockModule.Axis.prototype.draw = function() {
     return this;
 
   if (!this.rootLayer_) {
-    this.rootLayer_ = acgraph.layer();
+    this.rootLayer_ = this.container().layer();
     if (!this.interactive_)
       this.rootLayer_.disablePointerEvents(true);
   }
