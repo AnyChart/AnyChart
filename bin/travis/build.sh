@@ -22,18 +22,6 @@ IS_RC_BUILD=false                           # if it is a RC release
 IS_DEV_BUILD=false                          # build without geoData (drop CDN without latest)
 VERSION=''
 
-#### Set Steps
-STEP_CHECK_VARIABLES=false
-STEP_BUILD_DIST=false
-STEP_UPLOAD_STATIC=true
-STEP_DROP_CDN=true
-
-STEP_EXPORT_SERVER=false
-STEP_NPM_RELEASE=false
-STEP_GIT_RELEASE=false
-STEP_DOWNLOAD_EXTERNAL=false
-STEP_LEGACY_7x=false
-
 #### Define version
 if [ "${TRAVIS_BRANCH}" = "master" ] || [ ${DRY_RUN_RELEASE} ]; then
     #TRAVIS_BRANCH =>    master (release) OR Dry-Run
@@ -41,14 +29,15 @@ if [ "${TRAVIS_BRANCH}" = "master" ] || [ ${DRY_RUN_RELEASE} ]; then
     IS_RELEASE_BUILD=true
 
     STEP_CHECK_VARIABLES=true
-
-    STEP_NPM_RELEASE=false
-    STEP_GIT_RELEASE=true
-
     STEP_BUILD_DIST=false
+    STEP_UPLOAD_STATIC=true
+    STEP_DROP_CDN=true
 
     STEP_EXPORT_SERVER=true
     STEP_DOWNLOAD_EXTERNAL=true
+
+    STEP_NPM_RELEASE=false
+    STEP_GIT_RELEASE=true
 
     ####  Be sure u wanna uncomment this
     #STEP_LEGACY_7x=true
@@ -60,12 +49,11 @@ elif [[ "${TRAVIS_BRANCH}" =~ ^([0-9]+\.[0-9]+\.[0-9]+[-rc]+[0-9]+)$ ]]; then
     
     STEP_CHECK_VARIABLES=true
     STEP_BUILD_DIST=false
+    STEP_UPLOAD_STATIC=true
+    STEP_DROP_CDN=true
 
     STEP_EXPORT_SERVER=true
     STEP_DOWNLOAD_EXTERNAL=true
-
-    STEP_NPM_RELEASE=false
-    STEP_GIT_RELEASE=false
 
 elif [[ "${TRAVIS_BRANCH}" =~ ^v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
     #TRAVIS_BRANCH =>     v8.3.0 it is a tag. Drop build
@@ -78,9 +66,9 @@ else
     IS_DEV_BUILD=true
 
     STEP_BUILD_DIST=true
+    STEP_UPLOAD_STATIC=true
+    STEP_DROP_CDN=true
 
-    STEP_NPM_RELEASE=false
-    STEP_GIT_RELEASE=false
 fi
 INSTALL_PACKAGE_NAME=anychart-installation-package-${VERSION}.zip
 

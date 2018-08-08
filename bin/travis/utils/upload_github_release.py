@@ -48,18 +48,18 @@ def create_github_release(version, tag):
     return r.json()
 
 
-def upload_release_binary(release_json, name, path):
-    print '    Uploading %s' % name
-    f = open(path)
-    content = f.read()
-    f.close()
+# def upload_release_binary(release_json, name, path):
+#     print '    Uploading %s' % name
+#     f = open(path)
+#     content = f.read()
+#     f.close()
 
-    path = '/repos/AnyChart/AnyChart/releases/%s/assets' % release_json['id']
-    url = build_github_url(path, endpoint='uploads')
-    url += '&name=%s' % name
-    headers = {'Content-Type': 'application/javascript'}
-    r = requests.post(url, data=content, headers=headers)
-    print r.text
+#     path = '/repos/AnyChart/AnyChart/releases/%s/assets' % release_json['id']
+#     url = build_github_url(path, endpoint='uploads')
+#     url += '&name=%s' % name
+#     headers = {'Content-Type': 'application/javascript'}
+#     r = requests.post(url, data=content, headers=headers)
+#     print r.text
 
 
 if __name__ == "__main__":
@@ -69,11 +69,11 @@ if __name__ == "__main__":
     print 'Creating github release %s' % tag_name
     release = create_github_release(version, tag_name)
 
-    print 'Uploading release files %s' % tag_name
-    upload_release_binary(
-        release,
-        'anychart-installation-package-%s.zip' % version,
-        os.path.join(PROJECT_PATH, 'dist', 'anychart-installation-package-%s.zip' % version)
-    )
+    # print 'Uploading release files %s' % tag_name
+    # upload_release_binary(
+    #     release,
+    #     'anychart-installation-package-%s.zip' % version,
+    #     os.path.join(PROJECT_PATH, 'dist', 'anychart-installation-package-%s.zip' % version)
+    # )
 
     print 'Successfully release %s' % tag_name

@@ -11,7 +11,6 @@ function git_release(){
     echo "--"
     echo Publishing GIT release
     echo "--"
-    pwd
     
     Run "python ./bin/travis/utils/upload_github_release.py ${GITHUB_TOKEN}"
     echo

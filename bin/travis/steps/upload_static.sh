@@ -6,7 +6,7 @@
 #
 ########################################################################################################################
 function upload_all_files(){
-    skype_send status "Start upload CDN (static)"
+    Run "skype_send status 'Start upload CDN (static)'"
 
     echo "--"
     echo "Upload files to static server"

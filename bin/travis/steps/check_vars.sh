@@ -20,9 +20,9 @@ function check_variables(){
     fi
 
     echo "check NPM"
-    npm_check_variables
+    Run "npm_check_variables"
     echo "check GIT"
-    git_check_variables
+    Run "git_check_variables"
 
     # used to create latest build
     MAJOR_VERSION=$(python build.py version -m)
