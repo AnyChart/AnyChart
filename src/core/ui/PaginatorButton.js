@@ -54,7 +54,7 @@ anychart.core.ui.PaginatorButton.prototype.drawText = goog.nullFunction;
  */
 anychart.core.ui.PaginatorButton.prototype.drawBackground = function(fill, stroke) {
   if (!this.backgroundPath) {
-    this.backgroundPath = acgraph.path();
+    this.backgroundPath = this.container().path();
     this.bindHandlersToGraphics(this.backgroundPath, this.handleMouseOver, this.handleMouseOut, null, null,
         this.handleMouseDown, this.handleMouseUp);
     this.registerDisposable(this.backgroundPath);

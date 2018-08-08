@@ -716,7 +716,7 @@ anychart.core.ui.LabelsFactory.prototype.draw = function() {
     return this;
 
   if (!this.layer_) {
-    this.layer_ = acgraph.layer();
+    this.layer_ = this.container().layer();
     this.bindHandlersToGraphics(this.layer_);
   }
 
