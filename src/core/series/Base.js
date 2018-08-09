@@ -3332,7 +3332,7 @@ anychart.core.series.Base.prototype.prepareRootLayer = function() {
     this.rootLayer = this.container();
   } else {
     if (!this.rootLayer) {
-      this.rootLayer = acgraph.layer();
+      this.rootLayer = this.container().layer();
       if (this.canBeInteractive)
         this.bindHandlersToGraphics(this.rootLayer);
     }

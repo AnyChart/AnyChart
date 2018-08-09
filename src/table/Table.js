@@ -681,7 +681,7 @@ anychart.tableModule.Table.prototype.draw = function() {
     return this;
 
   if (!this.layer_) {
-    this.layer_ = acgraph.layer();
+    this.layer_ = this.container().layer();
     this.contentLayer_ = this.layer_.layer();
   }
 
@@ -1888,7 +1888,7 @@ anychart.tableModule.Table.prototype.getBorderPath_ = function(stroke) {
   else {
     var path = this.pathsPool_.length ?
         /** @type {!acgraph.vector.Path} */(this.pathsPool_.pop()) :
-        acgraph.path();
+        this.container().path();
     this.layer_.addChild(path);
     if (goog.isObject(stroke) && ('keys' in stroke) && !goog.isObject(stroke['mode'])) {
       stroke = /** @type {acgraph.vector.Stroke} */(anychart.utils.recursiveClone(stroke));
@@ -1915,7 +1915,7 @@ anychart.tableModule.Table.prototype.getFillPath_ = function(fill) {
   else {
     var path = this.pathsPool_.length ?
         /** @type {!acgraph.vector.Path} */(this.pathsPool_.pop()) :
-        acgraph.path();
+        this.container().path();
     this.layer_.addChildAt(path, 0);
     path.fill(fill);
     path.stroke(null);

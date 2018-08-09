@@ -341,8 +341,8 @@ anychart.core.ui.Background.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     if (!this.rootElement) {
-      this.rootElement = acgraph.layer();
-      this.rootElement.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
+      this.rootElement = this.container().layer();
+      // this.rootElement.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
     }
 
     if (allStrokeIsCustom && this.strokePath_) {
@@ -575,6 +575,7 @@ anychart.core.ui.Background.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
     this.rootElement.zIndex(/** @type {number} */(this.getOption('zIndex')));
+    console.log(this.getOption('zIndex'));
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 

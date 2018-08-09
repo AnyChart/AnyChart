@@ -672,7 +672,7 @@ anychart.core.ui.Title.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
-    this.layer_.zIndex(/** @type {number} */(this.zIndex()));
+    this.layer_.zIndex(/** @type {number} */(this.getOption('zIndex')));
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 
@@ -1168,6 +1168,9 @@ anychart.core.ui.Title.prototype.setupByJSON = function(config, opt_default) {
 
   if ('margin' in config)
     this.margin(config['margin']);
+
+  if ('zIndex' in config)
+    this.zIndex(config['zIndex']);
 };
 
 

@@ -30,9 +30,13 @@ anychart.radarModule.Axis = function() {
   anychart.radarModule.Axis.base(this, 'constructor');
 
   this.labelsBounds_ = [];
-  this.line_ = acgraph.path();
-  this.bindHandlersToGraphics(this.line_);
-  this.registerDisposable(this.line_);
+
+  /**
+   * 
+   * @type {acgraph.vector.Path}
+   * @private
+   */
+  this.line_ = null;
 
   /**
    * Constant to save space.
@@ -413,7 +417,7 @@ anychart.radarModule.Axis.prototype.calculateAxisBounds_ = function() {
               y1 = labelBounds.getBottom();
 
               if (ticks.enabled() && ticksLength) {
-                lineThickness = this.line_.stroke()['thickness'] ? this.line_.stroke()['thickness'] : 1;
+                lineThickness = this.line().stroke()['thickness'] ? this.line().stroke()['thickness'] : 1;
                 tickLen = ticks.enabled() ? ticks.getOption('length') : 0;
 
                 radius = this.radius_ + ticksLength + lineThickness / 2;
@@ -427,13 +431,13 @@ anychart.radarModule.Axis.prototype.calculateAxisBounds_ = function() {
               }
 
             } else if (ticks.enabled() && ticksLength) {
-              lineThickness = this.line_.stroke()['thickness'] ? this.line_.stroke()['thickness'] : 1;
+              lineThickness = this.line().stroke()['thickness'] ? this.line().stroke()['thickness'] : 1;
               tickLen = ticks.enabled() ? ticks.getOption('length') : 0;
               radius = this.radius_ + ticksLength + lineThickness / 2;
               x = x1 = Math.round(this.cx_ + radius * Math.cos(angleRad));
               y = y1 = Math.round(this.cy_ + radius * Math.sin(angleRad));
             } else {
-              lineThickness = this.line_.stroke()['thickness'] ? this.line_.stroke()['thickness'] : 1;
+              lineThickness = this.line().stroke()['thickness'] ? this.line().stroke()['thickness'] : 1;
               radius = this.radius_ + lineThickness / 2;
               x = x1 = Math.round(this.cx_ + radius * Math.cos(angleRad));
               y = y1 = Math.round(this.cy_ + radius * Math.sin(angleRad));
@@ -523,7 +527,7 @@ anychart.radarModule.Axis.prototype.calculateAxisBounds_ = function() {
                 var extremeLabelBounds = this.getLabelBounds_(extremeLabelIndex);
                 labelSize = isHorizontal ? extremeLabelBounds.width : extremeLabelBounds.height;
               }
-              lineThickness = this.line_.stroke()['thickness'] ? this.line_.stroke()['thickness'] : 1;
+              lineThickness = this.line().stroke()['thickness'] ? this.line().stroke()['thickness'] : 1;
               this.criticalTickLength_ = Math.min(parentBounds.width, parentBounds.height) / 2 - labelSize - lineThickness;
             }
             this.dropBoundsCache_();
@@ -562,7 +566,7 @@ anychart.radarModule.Axis.prototype.getRemainingBounds = function() {
   if (parentBounds) {
     if (this.enabled()) {
       this.calculateAxisBounds_();
-      var lineThickness = this.line_.stroke()['thickness'] ? this.line_.stroke()['thickness'] : 1;
+      var lineThickness = this.line().stroke()['thickness'] ? this.line().stroke()['thickness'] : 1;
       var halfThickness = Math.floor(lineThickness / 2);
       return new anychart.math.Rect(
           this.cx_ - this.radius_ + halfThickness,
@@ -579,6 +583,20 @@ anychart.radarModule.Axis.prototype.getRemainingBounds = function() {
 
 //endregion
 //region --- Drawing
+/**
+ *
+ * @return {acgraph.vector.Path}
+ */
+anychart.radarModule.Axis.prototype.line = function() {
+  if (!this.line_) {
+    this.line_ = this.container().path();
+    this.bindHandlersToGraphics(this.line());
+    this.registerDisposable(this.line());
+  }
+  return this.line_;
+};
+
+
 /**
  * Line drawer.
  * @param {number} angle .
@@ -628,9 +646,9 @@ anychart.radarModule.Axis.prototype.drawLine_ = function(index, angle) {
   var y = Math.round(this.cy_ + this.radius_ * Math.sin(angleRad));
 
   if (!index)
-    this.line_.moveTo(x, y);
+    this.line().moveTo(x, y);
   else
-    this.line_.lineTo(x, y);
+    this.line().lineTo(x, y);
 };
 
 
@@ -730,8 +748,8 @@ anychart.radarModule.Axis.prototype.draw = function() {
   ticks.suspendSignalsDispatching();
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    this.line_.clear();
-    this.line_.stroke(this.stroke_);
+    this.line().clear();
+    this.line().stroke(this.stroke_);
 
     lineDrawer = this.drawLine_;
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
@@ -739,7 +757,7 @@ anychart.radarModule.Axis.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
     var zIndex = /** @type {number} */(this.zIndex());
-    this.line_.zIndex(zIndex);
+    this.line().zIndex(zIndex);
     ticks.zIndex(zIndex);
     labels.zIndex(zIndex);
 
@@ -748,7 +766,7 @@ anychart.radarModule.Axis.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
     var container = /** @type {acgraph.vector.ILayer} */(this.container());
-    this.line_.parent(container);
+    this.line().parent(container);
     ticks.container(container);
     labels.container(container);
 
@@ -779,7 +797,7 @@ anychart.radarModule.Axis.prototype.draw = function() {
     var ticksArrLen = scaleTicksArr.length;
     var startAngle = goog.math.standardAngle(this.startAngle() - 90);
     var tickLen = ticks.enabled() ? isNaN(this.criticalTickLength_) ? /** @type {number} */(ticks.getOption('length')) : this.criticalTickLength_ : 0;
-    var lineThickness = this.line_.stroke()['thickness'] ? this.line_.stroke()['thickness'] : 1;
+    var lineThickness = this.line().stroke()['thickness'] ? this.line().stroke()['thickness'] : 1;
     var halfThickness = Math.floor(lineThickness / 2);
     var angle, tickVal, ratio;
 
@@ -797,7 +815,7 @@ anychart.radarModule.Axis.prototype.draw = function() {
       if (labelsDrawer)
         labelsDrawer.call(this, i, angle, halfThickness, tickLen);
     }
-    if (i != 0) this.line_.close();
+    if (i != 0) this.line().close();
     labels.draw();
   }
 
@@ -810,7 +828,7 @@ anychart.radarModule.Axis.prototype.draw = function() {
 
 /** @inheritDoc */
 anychart.radarModule.Axis.prototype.remove = function() {
-  if (this.line_) this.line_.parent(null);
+  if (this.line()) this.line().parent(null);
   this.ticks().remove();
   if (this.labels_) this.labels_.remove();
 };
@@ -892,7 +910,7 @@ anychart.radarModule.Axis.prototype.getLabelBounds_ = function(index) {
   if (goog.isDef(boundsCache[index]))
     return boundsCache[index];
 
-  var lineThickness = this.line_.stroke()['thickness'] ? this.line_.stroke()['thickness'] : 1;
+  var lineThickness = this.line().stroke()['thickness'] ? this.line().stroke()['thickness'] : 1;
   var ticks = /** @type {!anychart.radarPolarBaseModule.RadialAxisTicks} */(this.ticks());
   var labels = /** @type {anychart.core.ui.LabelsFactory} */(this.labels());
   var scale = /** @type {anychart.scales.ScatterBase|anychart.scales.Ordinal} */(this.scale());

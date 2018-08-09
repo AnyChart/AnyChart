@@ -1492,8 +1492,8 @@ anychart.core.ui.Legend.prototype.draw = function() {
        * @type {!acgraph.vector.Layer}
        * @private
        */
-      this.itemsLayer_ = acgraph.layer();
-      this.itemsLayer_.parent(this.rootElement).zIndex(20);
+      this.itemsLayer_ = this.rootElement.layer();
+      this.itemsLayer_.zIndex(20);
       this.registerDisposable(this.itemsLayer_);
     }
   }

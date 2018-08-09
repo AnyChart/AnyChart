@@ -533,6 +533,7 @@ anychart.radarPolarBaseModule.Chart.prototype.drawContent = function(bounds) {
     axis = this.xAxis();
     axis.startAngle(startAngle);
     axis.parentBounds(contentAreaBounds);
+    axis.container(this.rootElement);
     this.dataBounds = axis.getRemainingBounds().round();
 
     this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES |

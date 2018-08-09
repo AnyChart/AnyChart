@@ -1358,9 +1358,9 @@ anychart.core.ui.Tooltip.prototype.needsForceSignalsDispatching = function(opt_v
  */
 anychart.core.ui.Tooltip.prototype.updateForceInvalidation = function() {
   var forceInvalidation = /** @type {boolean} */ (this.needsForceSignalsDispatching());
+  this.background().needsForceSignalsDispatching(forceInvalidation);
   this.title().needsForceSignalsDispatching(forceInvalidation);
   this.separator().needsForceSignalsDispatching(forceInvalidation);
-  this.background().needsForceSignalsDispatching(forceInvalidation);
   this.padding().needsForceSignalsDispatching(forceInvalidation);
 };
 
@@ -2075,9 +2075,9 @@ anychart.core.ui.Tooltip.prototype.parent = function(opt_value) {
         if (this.parent_)
           this.parent_.unlistenSignals(this.parentInvalidated_, this);
         this.parent_ = opt_value;
+        this.background().parent(this.parent_.background());
         this.title().parent(this.parent_.title());
         this.separator().parent(this.parent_.separator());
-        this.background().parent(this.parent_.background());
         this.padding().parent(this.parent_.padding());
         this.contentInternal().padding().parent(this.parent_.contentInternal().padding());
         this.parent_.childTooltipsMap[uid] = this;
@@ -2323,9 +2323,9 @@ anychart.core.ui.Tooltip.prototype.setupByJSON = function(config, opt_default) {
     anychart.core.settings.deserialize(this, this.TOOLTIP_SIMPLE_DESCRIPTORS, config);
   }
 
+  this.background().setupInternal(!!opt_default, config['background']);
   this.title().setupInternal(!!opt_default, config['title']);
   this.separator().setupInternal(!!opt_default, config['separator']);
-  this.background().setupInternal(!!opt_default, config['background']);
   this.padding().setupInternal(!!opt_default, config['padding']);
   this.hideDelay(config['hideDelay']);
 
