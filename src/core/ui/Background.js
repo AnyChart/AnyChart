@@ -575,7 +575,6 @@ anychart.core.ui.Background.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
     this.rootElement.zIndex(/** @type {number} */(this.getOption('zIndex')));
-    console.log(this.getOption('zIndex'));
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 
