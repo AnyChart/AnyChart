@@ -1657,7 +1657,8 @@ anychart.core.Axis.prototype.drawTopLine = function(bounds, pixelShift, lineThic
   var y = bounds.top + bounds.height + lineThickness / 2;
   this.line
       .moveTo(bounds.left + pixelShift, y)
-      .lineTo(bounds.left - pixelShift + bounds.width, y);
+      .lineTo(bounds.left - pixelShift + bounds.width, y)
+      .applyD();
 };
 
 
@@ -1674,7 +1675,8 @@ anychart.core.Axis.prototype.drawRightLine = function(bounds, pixelShift, lineTh
   var x = bounds.left - lineThickness / 2;
   this.line
       .moveTo(x, bounds.top + pixelShift)
-      .lineTo(x, bounds.top - pixelShift + bounds.height);
+      .lineTo(x, bounds.top - pixelShift + bounds.height)
+      .applyD();
 };
 
 
@@ -1691,7 +1693,8 @@ anychart.core.Axis.prototype.drawBottomLine = function(bounds, pixelShift, lineT
   var y = bounds.top - lineThickness / 2;
   this.line
       .moveTo(bounds.left + pixelShift, y)
-      .lineTo(bounds.left - pixelShift + bounds.width, y);
+      .lineTo(bounds.left - pixelShift + bounds.width, y)
+      .applyD();
 };
 
 
@@ -1708,7 +1711,8 @@ anychart.core.Axis.prototype.drawLeftLine = function(bounds, pixelShift, lineThi
   var x = bounds.left + bounds.width + lineThickness / 2;
   this.line
       .moveTo(x, bounds.top + pixelShift)
-      .lineTo(x, bounds.top - pixelShift + bounds.height);
+      .lineTo(x, bounds.top - pixelShift + bounds.height)
+      .applyD();
 };
 
 

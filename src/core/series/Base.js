@@ -2136,6 +2136,7 @@ anychart.core.series.Base.prototype.getFactoryContainer = function() {
 /**
  * Prepares passed factory to be displayed. Returns true, if the factory SHOULD be drawn.
  * @param {anychart.core.ui.LabelsFactory|anychart.core.ui.MarkersFactory} factory
+ * @param {boolean} chartFactoryEnabled
  * @param {boolean} stateFactoriesEnabled
  * @param {boolean} hasPointSettings
  * @param {anychart.core.series.Capabilities|number} isSupported

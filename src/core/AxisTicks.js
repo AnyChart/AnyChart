@@ -201,6 +201,7 @@ anychart.core.AxisTicks.prototype.drawTopTick = function(ratio, bounds, lineBoun
 
   this.path.moveTo(x, y);
   this.path.lineTo(x, y + dy);
+  this.path.applyD();
 };
 
 
@@ -240,6 +241,7 @@ anychart.core.AxisTicks.prototype.drawRightTick = function(ratio, bounds, lineBo
 
   this.path.moveTo(x, y);
   this.path.lineTo(x + dx, y);
+  this.path.applyD();
 };
 
 
@@ -279,6 +281,7 @@ anychart.core.AxisTicks.prototype.drawBottomTick = function(ratio, bounds, lineB
 
   this.path.moveTo(x, y);
   this.path.lineTo(x, y + dy);
+  this.path.applyD();
 };
 
 
@@ -318,6 +321,7 @@ anychart.core.AxisTicks.prototype.drawLeftTick = function(ratio, bounds, lineBou
 
   this.path.moveTo(x, y);
   this.path.lineTo(x + dx, y);
+  this.path.applyD();
 };
 
 

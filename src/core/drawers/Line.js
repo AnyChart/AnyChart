@@ -177,8 +177,9 @@ anychart.core.drawers.Line.prototype.finalizeDrawing = function() {
  * @protected
  */
 anychart.core.drawers.Line.prototype.additionalFinalize = function() {
+  var p = /** @type {acgraph.vector.Path} */(this.currentShapes[this.prevShapeNames.stroke]);
   if (this.closed && !isNaN(this.firstPointX) && (this.connectMissing || this.prevPointDrawn && !this.firstPointMissing)) {
-    anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(this.currentShapes[this.prevShapeNames.stroke]),
-        this.isVertical, this.firstPointX, this.firstPointY);
+    anychart.core.drawers.line(p, this.isVertical, this.firstPointX, this.firstPointY);
   }
+  p.applyD();
 };
