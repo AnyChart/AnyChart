@@ -1242,6 +1242,9 @@ anychart.core.Axis.prototype.getLabelBounds_ = function(index, isMajor, ticksArr
 
   var label = labels.add(formatProvider, positionProvider, index);
   label.stateOrder([label.ownSettings, labels.ownSettings, labels.themeSettings]);
+  var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
+  label.parentBounds(parentBounds);
+  labels.parentBounds(parentBounds);
   var labelBounds = labels.measure(label, undefined, undefined, index);
 
   var labelsSidePosition = anychart.utils.sidePositionToNumber(labelPosition);
