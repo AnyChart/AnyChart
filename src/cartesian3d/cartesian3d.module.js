@@ -17,11 +17,12 @@ goog.require('anychart.cartesian3dModule.drawers.Column');
  * anychart.area3d([1.3, 2, 1.4], [1.1, 1.6, 1.3])
  *   .container(stage).draw();
  * @param {...(anychart.data.View|anychart.data.Set|Array)} var_args Area chart data.
- * @return {anychart.cartesian3dModule.Chart} Chart with defaults for area series. 
+ * @return {anychart.cartesian3dModule.Chart} Chart with defaults for area series.
  */
 anychart.area3d = function(var_args) {
   var chart = new anychart.cartesian3dModule.Chart();
 
+  chart.setOption('defaultSeriesType', anychart.enums.CartesianSeriesType.AREA);
   chart.setType(anychart.enums.ChartTypes.AREA_3D);
   chart.setupInternal(true, anychart.getFullTheme('area3d'));
 
@@ -45,6 +46,7 @@ anychart.chartTypesMap[anychart.enums.ChartTypes.AREA_3D] = anychart.area3d;
 anychart.bar3d = function(var_args) {
   var chart = new anychart.cartesian3dModule.Chart();
 
+  chart.setOption('defaultSeriesType', anychart.enums.CartesianSeriesType.BAR);
   chart.setType(anychart.enums.ChartTypes.BAR_3D);
   chart.setupInternal(true, anychart.getFullTheme('bar3d'));
 
@@ -68,6 +70,7 @@ anychart.chartTypesMap[anychart.enums.ChartTypes.BAR_3D] = anychart.bar3d;
 anychart.column3d = function(var_args) {
   var chart = new anychart.cartesian3dModule.Chart();
 
+  chart.setOption('defaultSeriesType', anychart.enums.CartesianSeriesType.COLUMN);
   chart.setType(anychart.enums.ChartTypes.COLUMN_3D);
   chart.setupInternal(true, anychart.getFullTheme('column3d'));
 
@@ -85,12 +88,13 @@ anychart.chartTypesMap[anychart.enums.ChartTypes.COLUMN_3D] = anychart.column3d;
  * @example
  * anychart.line3d([1.3, 2, 1.4], [1.1, 1.6, 1.3])
  *   .container(stage).draw();
- * @param {...(anychart.data.View|anychart.data.Set|Array)} var_args Area chart data.
- * @return {anychart.cartesian3dModule.Chart} Chart with defaults for area series.
+ * @param {...(anychart.data.View|anychart.data.Set|Array)} var_args Line chart data.
+ * @return {anychart.cartesian3dModule.Chart} Chart with defaults for line series.
  */
 anychart.line3d = function(var_args) {
   var chart = new anychart.cartesian3dModule.Chart();
 
+  chart.setOption('defaultSeriesType', anychart.enums.CartesianSeriesType.LINE);
   chart.setType(anychart.enums.ChartTypes.LINE_3D);
   chart.setupInternal(true, anychart.getFullTheme('line3d'));
 
