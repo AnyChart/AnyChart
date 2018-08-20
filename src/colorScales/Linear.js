@@ -60,9 +60,9 @@ anychart.colorScalesModule.Linear.prototype.extractKeys_ = function(var_args) {
     var arg = arguments[i];
 
     if (goog.isString(arg)) {
-      keys.push(acgraph.vector.parseColor(arg, true));
+      keys.push(arg);
     } else if (goog.isArray(arg)) {
-      keys.push.apply(keys, this.extractKeys_.apply(this, arg));
+      keys.push.apply(keys, arg);
     } else if (goog.isObject(arg)) {
       var keysAttr = arg['keys'];
       if (goog.isDef(keysAttr) && goog.isArray(keysAttr)) {
@@ -84,6 +84,7 @@ anychart.colorScalesModule.Linear.prototype.extractKeys_ = function(var_args) {
     }
   }
 
+  keys = acgraph.vector.normalizeFill(keys)['keys'];
   return keys;
 };
 
@@ -346,8 +347,9 @@ anychart.colorScalesModule.Linear.prototype.serialize = function() {
   var json = anychart.colorScalesModule.Linear.base(this, 'serialize');
   json['ticks'] = this.ticks().serialize();
   json['minorTicks'] = this.minorTicks().serialize();
+
   json['colors'] = goog.array.map(/** @type {Array.<Object>} */(this.colors()), function(elem) {
-    return goog.color.rgbArrayToHex(/** @type {!goog.color.Rgb} */(elem.color));
+    return elem.offset + ' ' + goog.color.rgbArrayToHex(/** @type {!goog.color.Rgb} */(elem.color));
   });
 
   return json;
