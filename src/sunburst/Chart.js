@@ -237,14 +237,15 @@ anychart.sunburstModule.Chart.ZINDEX_LABEL = 32;
  * @enum {string}
  */
 anychart.sunburstModule.Chart.FieldsName = {
+  META_VALUE: 'sunburst_value',
   VALUE: 'value',
-  LEAVES_SUM: 'leavesSum',
-  CHILDREN_SUM: 'childSum',
-  VISIBLE_LEAVES_SUM: 'visibleLeavesSum',
-  LEAVES_COUNT: 'leavesCount',
-  CHILDREN_LEAVES_COUNT: 'childrenLeavesCount',
-  TYPE: 'type',
-  MISSING: 'missing'
+  LEAVES_SUM: 'sunburst_leavesSum',
+  CHILDREN_SUM: 'sunburst_childSum',
+  VISIBLE_LEAVES_SUM: 'sunburst_visibleLeavesSum',
+  LEAVES_COUNT: 'sunburst_leavesCount',
+  CHILDREN_LEAVES_COUNT: 'sunburst_childrenLeavesCount',
+  TYPE: 'sunburst_type',
+  MISSING: 'sunburst_missing'
 };
 
 
@@ -1898,7 +1899,7 @@ anychart.sunburstModule.Chart.prototype.calculateNodes = function(node) {
       node.meta(anychart.sunburstModule.Chart.FieldsName.CHILDREN_LEAVES_COUNT, 1);
     }
 
-    node.meta(anychart.sunburstModule.Chart.FieldsName.VALUE, value);
+    node.meta(anychart.sunburstModule.Chart.FieldsName.META_VALUE, value);
     node.meta(anychart.sunburstModule.Chart.FieldsName.LEAVES_SUM, leavesSum);
     node.meta(anychart.sunburstModule.Chart.FieldsName.CHILDREN_SUM, childSum);
     node.meta(anychart.sunburstModule.Chart.FieldsName.VISIBLE_LEAVES_SUM, visibleLeavesSum);
@@ -2209,7 +2210,7 @@ anychart.sunburstModule.Chart.prototype.nodesLayouter_ = function(node, display,
     }
   } else if (calculationMode == anychart.enums.SunburstCalculationMode.PARENT_DEPENDENT) {
     if (display) {
-      currValue = parseFloat(node.meta(anychart.sunburstModule.Chart.FieldsName.VALUE));
+      currValue = parseFloat(node.meta(anychart.sunburstModule.Chart.FieldsName.META_VALUE));
       if (isNaN(currValue)) {
         currValue = parseFloat(node.meta(anychart.sunburstModule.Chart.FieldsName.LEAVES_SUM));
       }
@@ -2225,7 +2226,7 @@ anychart.sunburstModule.Chart.prototype.nodesLayouter_ = function(node, display,
     } else {
       if (numChildren) {
         if (depth >= this.currentFirstVisibleLevel) {
-          currValue = parseFloat(node.meta(anychart.sunburstModule.Chart.FieldsName.VALUE));
+          currValue = parseFloat(node.meta(anychart.sunburstModule.Chart.FieldsName.META_VALUE));
           ratio = currValue / parentValue;
         } else {
           nexLevel = this.currentLevels[depth + 1];

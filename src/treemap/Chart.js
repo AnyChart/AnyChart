@@ -293,7 +293,7 @@ anychart.treemapModule.Chart.prototype.doAdditionActionsOnMouseOverAndMove = fun
     if (target == series) {
       var iterator = target.getIterator();
       iterator.select(index);
-      var value = iterator.meta(target.referenceValueNames[1]);
+      var value = iterator.meta(anychart.treemapModule.Chart.DataFields.META_VALUE);
       this.colorRange_.showMarker(value);
     }
   }
@@ -424,8 +424,8 @@ anychart.treemapModule.Chart.prototype.useUnionTooltipAsSingle = function() {
  * @return {number}
  */
 anychart.treemapModule.Chart.SORT_DESC = function(node1, node2) {
-  var size1 = /** @type {number} */(node1.meta(anychart.treemapModule.Chart.DataFields.SIZE));
-  var size2 = /** @type {number} */(node2.meta(anychart.treemapModule.Chart.DataFields.SIZE));
+  var size1 = /** @type {number} */(node1.meta(anychart.treemapModule.Chart.DataFields.META_SIZE));
+  var size2 = /** @type {number} */(node2.meta(anychart.treemapModule.Chart.DataFields.META_SIZE));
   return size2 - size1;
 };
 
@@ -502,7 +502,7 @@ anychart.treemapModule.Chart.prototype.legendItemOver = function(item, event) {
 
       var points = [];
       while (iterator.advance()) {
-        var pointValue = iterator.get(series.referenceValueNames[1]);
+        var pointValue = iterator.get(anychart.treemapModule.Chart.DataFields.META_VALUE);
         if (range == scale.getRangeByValue(pointValue)) {
           points.push(iterator.getIndex());
         }
@@ -600,14 +600,16 @@ anychart.treemapModule.Chart.prototype.getChart = function() {
  * @enum {string}
  */
 anychart.treemapModule.Chart.DataFields = {
+  META_SIZE: 'treemap_size',
+  META_VALUE: 'treemap_value',
   SIZE: 'size',
   VALUE: 'value',
-  TYPE: 'type',
-  POINT_BOUNDS: 'pointBounds',
-  CONTENT_BOUNDS: 'contentBounds',
-  MISSING: 'missing',
-  SHAPE: 'shape',
-  HATCH_SHAPE: 'hatchShape'
+  TYPE: 'treemap_type',
+  POINT_BOUNDS: 'treemap_pointBounds',
+  CONTENT_BOUNDS: 'treemap_contentBounds',
+  MISSING: 'treemap_missing',
+  SHAPE: 'treemap_shape',
+  HATCH_SHAPE: 'treemap_hatchShape'
 };
 
 
@@ -662,8 +664,8 @@ anychart.treemapModule.Chart.prototype.calculateNodeSize = function(node, depth)
       size = value = 0;
     }
   }
-  node.meta(anychart.treemapModule.Chart.DataFields.SIZE, size);
-  node.meta(anychart.treemapModule.Chart.DataFields.VALUE, value);
+  node.meta(anychart.treemapModule.Chart.DataFields.META_SIZE, size);
+  node.meta(anychart.treemapModule.Chart.DataFields.META_VALUE, value);
   return [value, size];
 };
 
@@ -687,7 +689,7 @@ anychart.treemapModule.Chart.prototype.calculatePointsBounds = function(nodes, b
   var dHeight = height;
 
   var size = goog.array.reduce(nodes, function(acc, node) {
-    return acc + node.meta(anychart.treemapModule.Chart.DataFields.SIZE);
+    return acc + node.meta(anychart.treemapModule.Chart.DataFields.META_SIZE);
   }, 0);
 
   var len = points.length;
@@ -696,7 +698,7 @@ anychart.treemapModule.Chart.prototype.calculatePointsBounds = function(nodes, b
   for (var i = 0; i < len; i++) {
     if (!points[i])
       points[i] = {};
-    points[i].valueScale = anychart.math.round((/** @type {number} */ (nodes[i].meta(anychart.treemapModule.Chart.DataFields.SIZE))) * scale, 4);
+    points[i].valueScale = anychart.math.round((/** @type {number} */ (nodes[i].meta(anychart.treemapModule.Chart.DataFields.META_SIZE))) * scale, 4);
   }
 
   var start = 0;
@@ -1073,8 +1075,8 @@ anychart.treemapModule.Chart.prototype.createFormatProvider = function(opt_force
     'chart': {value: this, type: anychart.enums.TokenType.UNKNOWN},
     'index': {value: iterator.getIndex(), type: anychart.enums.TokenType.NUMBER},
     'name': {value: dataItem.get('name'), type: anychart.enums.TokenType.STRING},
-    'value': {value: dataItem.meta('value'), type: anychart.enums.TokenType.NUMBER},
-    'size': {value: dataItem.meta('size'), type: anychart.enums.TokenType.NUMBER}
+    'value': {value: dataItem.meta(anychart.treemapModule.Chart.DataFields.META_VALUE), type: anychart.enums.TokenType.NUMBER},
+    'size': {value: dataItem.meta(anychart.treemapModule.Chart.DataFields.META_SIZE), type: anychart.enums.TokenType.NUMBER}
   };
 
   this.pointProvider_
@@ -1611,7 +1613,7 @@ anychart.treemapModule.Chart.prototype.getColorResolutionContext = function(opt_
   var node = /** @type {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} */ (this.getIterator().getItem());
   var sourceColor = opt_baseColor || anychart.getFullTheme('palette.items.0');
   return {
-    'value': node.meta(anychart.treemapModule.Chart.DataFields.VALUE),
+    'value': node.meta(anychart.treemapModule.Chart.DataFields.META_VALUE),
     'sourceColor': sourceColor,
     'colorScale': this.colorScale()
   };
@@ -1650,7 +1652,7 @@ anychart.treemapModule.Chart.prototype.colorizeShape = function(pointState) {
 
   if (shape) {
     var type = node.meta(anychart.treemapModule.Chart.DataFields.TYPE);
-    var value = node.meta(anychart.treemapModule.Chart.DataFields.VALUE);
+    var value = node.meta(anychart.treemapModule.Chart.DataFields.META_VALUE);
     var fillResolver = anychart.color.getColorResolver('fill', anychart.enums.ColorType.FILL, true);
     var fill = /** @type {acgraph.vector.Fill} */ (fillResolver(this, pointState, false));
     if (type == anychart.treeChartBase.Chart.NodeType.RECT) {
@@ -1791,7 +1793,7 @@ anychart.treemapModule.Chart.prototype.calculateNodeTypes_ = function(node, dept
       this.calculateNodeTypes_(/** @type {anychart.treeDataModule.Tree.DataItem} */ (node.getChildAt(i)), depth + 1);
     }
   }
-  var value = /** @type {number} */(node.meta(anychart.treemapModule.Chart.DataFields.VALUE));
+  var value = /** @type {number} */(node.meta(anychart.treemapModule.Chart.DataFields.META_VALUE));
   if (type == anychart.treeChartBase.Chart.NodeType.LEAF || type == anychart.treeChartBase.Chart.NodeType.RECT)
     this.nodeValues_.push(value);
   else if (type == anychart.treeChartBase.Chart.NodeType.HINT_LEAF)
@@ -2048,8 +2050,8 @@ anychart.treemapModule.Chart.prototype.isNoData = function() {
   if (!this.rootNode_) {
     return true;
   } else {
-    var size = /** @type {number} */(this.rootNode_.meta(anychart.treemapModule.Chart.DataFields.SIZE));
-    var value = /** @type {number} */(this.rootNode_.meta(anychart.treemapModule.Chart.DataFields.VALUE));
+    var size = /** @type {number} */(this.rootNode_.meta(anychart.treemapModule.Chart.DataFields.META_SIZE));
+    var value = /** @type {number} */(this.rootNode_.meta(anychart.treemapModule.Chart.DataFields.META_VALUE));
     var missing = /** @type {boolean} */(this.rootNode_.meta(anychart.treemapModule.Chart.DataFields.MISSING));
     return (missing || (!size && !value));
   }
