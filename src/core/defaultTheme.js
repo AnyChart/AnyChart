@@ -1250,6 +1250,7 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
   },
 
   'chart': {
+    'zIndex': 0,
     'enabled': true,
     'padding': {'top': 10, 'right': 20, 'bottom': 15, 'left': 10},
     'margin': 0,
