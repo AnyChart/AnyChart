@@ -4548,7 +4548,32 @@
         "softMinimum": {"type": "number"},
         "softMaximum": {"type": "number"},
         "minimumGap": {"type": "number"},
-        "maximumGap": {"type": "number"}
+        "maximumGap": {"type": "number"},
+        "zoomLevels": {"$ref": "#/definitions/anychart.ganttModule.Scale.ZoomLevelsSettings"}
+      }
+    },
+    "anychart.ganttModule.Scale.ZoomLevelsSettings": {
+      "type": "array",
+      "items": {
+        "type": "array",
+         "items": {
+           "anyOf": [
+             {
+               "$ref": "#/definitions/anychart.enums.Interval"
+             },
+             {
+               "type": "object",
+               "properties": {
+                 "unit": {
+                   "$ref": "#/definitions/anychart.enums.Interval"
+                 },
+                 "count": {
+                   "type": "number"
+                 }
+               }
+             }
+           ]
+         }
       }
     },
     "anychart.scales.Geo": {
@@ -5870,6 +5895,21 @@
     },
     "anychart.enums.ScaleRangeMode": {
       "enum": ["none", "consider"]
+    },
+    "anychart.enums.Interval": {
+      "enum": [
+        "year",
+        "semester",
+        "quarter",
+        "month",
+        "third-of-month",
+        "week",
+        "day",
+        "hour",
+        "minute",
+        "second",
+        "millisecond"
+      ]
     },
 
     "acgraph.vector.HatchFill.HatchFillType": {

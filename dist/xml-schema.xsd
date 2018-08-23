@@ -2215,6 +2215,9 @@
     </xsd:complexType>
 
     <xsd:complexType name="GanttDateTimeScale">
+        <xsd:all>
+            <xsd:element name="zoom_levels" type="ZoomLevelsSettings"/>
+        </xsd:all>
         <xsd:attribute name="visible_minimum" type="xsd:double"/>
         <xsd:attribute name="visible_maximum" type="xsd:double"/>
         <xsd:attribute name="soft_minimum" type="xsd:double"/>
@@ -2225,6 +2228,25 @@
         <xsd:attribute name="maximum" type="xsd:double"/>
         <xsd:attribute name="minimum_gap" type="xsd:double"/>
         <xsd:attribute name="maximum_gap" type="xsd:double"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="ZoomLevelsSettings">
+        <xsd:sequence>
+            <xsd:element name="item" maxOccurs="unbounded" minOccurs="0">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="item" maxOccurs="unbounded" minOccurs="0">
+                            <xsd:complexType>
+                                <xsd:attribute type="xsd:string" name="unit" use="required"/>
+                                <xsd:attribute type="xsd:integer" name="count" use="optional"/>
+                            </xsd:complexType>
+                        </xsd:element>
+                    </xsd:sequence>
+                    <xsd:attribute name="treat_as_array" type="xsd:string" />
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:sequence>
+        <xsd:attribute name="treat_as_array" type="xsd:string"/>
     </xsd:complexType>
 
     <xsd:complexType name="TimelineHeader">
@@ -3392,6 +3414,22 @@
             <xsd:enumeration value="right"/>
             <xsd:enumeration value="top"/>
             <xsd:enumeration value="bottom"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="enums.Interval">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="year"/>
+            <xsd:enumeration value="semester"/>
+            <xsd:enumeration value="quarter"/>
+            <xsd:enumeration value="month"/>
+            <xsd:enumeration value="third-of-month"/>
+            <xsd:enumeration value="week"/>
+            <xsd:enumeration value="day"/>
+            <xsd:enumeration value="hour"/>
+            <xsd:enumeration value="minute"/>
+            <xsd:enumeration value="second"/>
+            <xsd:enumeration value="millisecond"/>
         </xsd:restriction>
     </xsd:simpleType>
 
