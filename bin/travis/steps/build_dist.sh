@@ -13,12 +13,13 @@ function build_dist(){
     echo Building binaries. Copy them to ./dist/
     echo "--"
     
-    Run "sh ./bin/build_all_binaries.sh"
-    # copy bin/wrappers files
     echo Copying wrappers from bin to dist
     Run "cp ./bin/sources/binaries_wrapper_end.txt ./dist/binaries_wrapper_end.txt"
     Run "cp ./bin/sources/binaries_wrapper_start.txt ./dist/binaries_wrapper_start.txt"
     echo
+    
+    Run "sh ./bin/build_all_binaries.sh"
+    # copy bin/wrappers files
     
     if [ ${IS_RELEASE_BUILD} = "true" ] || [ ${IS_RC_BUILD} = "true" ]; then
         ####################################################################################################################

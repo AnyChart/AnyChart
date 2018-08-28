@@ -769,7 +769,7 @@
     "anychart-heatmap": {
       "type": "chart-type",
       "name": "Heatmap Chart",
-      "desc": "Heatmap сhart module.",
+      "desc": "Heatmap chart module.",
       "docs": "https://docs.anychart.com/Basic_Charts/Heat_Map_Chart",
       "icon": "/_design/img/upload/charts/types/heatmap-chart.svg",
       "parts": [

@@ -59,8 +59,8 @@ function download_chart_editor(){
 function download_resources(){
     Run "cd dist"
 
-    download_docs
-    download_demos
+    # download_docs
+    # download_demos
     download_fonts
     download_chart_editor
 

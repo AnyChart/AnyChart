@@ -868,6 +868,46 @@ def build_geodata_indexes():
 
 
 # endregion
+# region --- CSS index building
+# ======================================================================================================================
+# CSS index building
+# ======================================================================================================================
+def build_css_indexes():
+    css_data_path = os.path.join(PROJECT_PATH, 'dist', 'css')
+    result = []
+    for (path, dirs, files) in os.walk(css_data_path):
+        for file_name in files:
+            result.append({ 'name': file_name })
+
+    return result
+
+
+# endregion
+# region --- Fonts index building
+# ======================================================================================================================
+# Fonts index building
+# ======================================================================================================================
+def build_fonts_indexes():
+    fonts_data_path = os.path.join(PROJECT_PATH, 'dist', 'fonts')
+    result = {}
+    target = []
+    for (path, dirs, files) in os.walk(fonts_data_path):
+        directory = path.rsplit('/', 1)[-1]
+
+        local_path = "".join(path.rsplit(PROJECT_PATH))
+        if 'demos' in local_path:
+            continue
+
+        for file_name in files:
+            if file_name != '.DS_Store':
+                target.append({ 'name': file_name })
+
+        result[directory] = target
+
+    return result
+
+
+# endregion
 # region --- Themes building
 # ======================================================================================================================
 # Themes building
@@ -948,12 +988,22 @@ def __compile_project(*args, **kwargs):
                 modules_json['modules'][bundle]['type'] = 'bundle'
                 modules_json['modules'][bundle]['desc'] = 'AnyChart Bundle module'
                 modules_json['modules'][bundle]['docs'] = 'https://docs.anychart.com/Quick_Start/Modules#bundle'
-        modules_json['themes'] = __get_modules_config()['themes']
-        modules_json['locales'] = build_locales_indexes()
-        modules_json['geodata'] = build_geodata_indexes()
 
         with open(os.path.join(output, 'modules.json'), 'w') as f:
             f.write(json.dumps(modules_json))
+
+        resource_json = {'modules': modules_json, 'addons': {}, 'css': {}, 'fonts': {}}
+        resource_json['themes'] = __get_modules_config()['themes']
+        resource_json['locales'] = build_locales_indexes()
+        resource_json['geodata'] = build_geodata_indexes()
+        resource_json['css'] = build_css_indexes()
+        resource_json['fonts'] = build_fonts_indexes()
+        resource_json['addons'] = [ {'name': 'anychart-chart-editor.min.js'},
+                                    {'name': 'graphics.js'},
+                                    {'name': 'graphics.min.js'} ]
+
+        with open(os.path.join(output, 'resource.json'), 'w') as f:
+            f.write(json.dumps(resource_json))
 
     print ''
     print compile_errors
