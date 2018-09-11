@@ -516,6 +516,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'padding': [20, 30, 20, 60],
     'plots': [{}],
     'eventMarkers': {
+      'stickToLeft': true,
       'normal': {
         'type': 'circle',
         'width': 22,

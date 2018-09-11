@@ -875,6 +875,7 @@ anychart.core.settings.descriptors = (function() {
   map.HEIGHT = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'height', anychart.core.settings.numberOrPercentNormalizer];
   map.FORMAT = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'format', anychart.core.settings.stringOrFunctionNormalizer];
   map.FONT_PADDING = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'fontPadding', anychart.core.settings.numberOrPercentNormalizer];
+  map.STICK_TO_LEFT = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'stickToLeft', anychart.core.settings.booleanNormalizer];
 
   //pie
   map.EXPLODE = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'explode', anychart.core.settings.numberOrPercentNormalizer];
