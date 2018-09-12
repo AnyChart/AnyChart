@@ -102,7 +102,8 @@ anychart.stockModule.eventMarkers.Group.OWN_DESCRIPTORS = (function() {
     anychart.core.settings.descriptors.DIRECTION,
     anychart.core.settings.descriptors.POSITION,
     anychart.core.settings.descriptors.SERIES_ID,
-    anychart.core.settings.descriptors.FIELD_NAME
+    anychart.core.settings.descriptors.FIELD_NAME,
+    anychart.core.settings.descriptors.STICK_TO_LEFT
   ]);
   return map;
 })();
@@ -124,6 +125,9 @@ anychart.stockModule.eventMarkers.Group.OWN_DESCRIPTORS_META = ([
     anychart.ConsistencyState.EVENT_MARKERS_DATA,
     anychart.Signal.NEEDS_REDRAW],
   ['fieldName',
+    anychart.ConsistencyState.EVENT_MARKERS_DATA,
+    anychart.Signal.NEEDS_REDRAW],
+  ['stickToLeft',
     anychart.ConsistencyState.EVENT_MARKERS_DATA,
     anychart.Signal.NEEDS_REDRAW]
 ]);
@@ -529,7 +533,7 @@ anychart.stockModule.eventMarkers.Group.prototype.drawEventMarker = function(opt
   var directionIsUp = direction != anychart.enums.EventMarkerDirection.DOWN;
   hash = this.getPositionHash_(position, seriesId, fieldName, directionIsUp);
   iterator.meta('positionHash', hash);
-  var x = Math.round(xScale.transformInternal(iterator.getX(), iterator.getPointIndex(), 0.5) * this.pixelBoundsCache.width + this.pixelBoundsCache.left);
+  var x = xScale.transform(iterator.getX(), 0.5) * this.pixelBoundsCache.width + this.pixelBoundsCache.left;
   offset = (opt_offsets ? opt_offsets[hash] : Number(iterator.meta('offset'))) || 0;
   iterator.meta('offset', offset);
   var connectorLen = 0;
@@ -770,7 +774,10 @@ anychart.stockModule.eventMarkers.Group.prototype.getIterator = function() {
  * @return {!anychart.stockModule.eventMarkers.Table.Iterator}
  */
 anychart.stockModule.eventMarkers.Group.prototype.getDetachedIterator = function(opt_full) {
-  return this.dataTable_.getIterator.apply(this.dataTable_, this.plot.getChart().getEventMarkersIteratorParams(opt_full));
+  var stick = this.resolveOptionFast(this.getResolutionChain(null, 0, true, false), 'stickToLeft', anychart.core.settings.booleanNormalizer);
+  var args = this.plot.getChart().getEventMarkersIteratorParams(opt_full);
+  args.push(stick);
+  return this.dataTable_.getIterator.apply(this.dataTable_, args);
 };
 
 

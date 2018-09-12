@@ -40,7 +40,6 @@ anychart.stockModule.eventMarkers.Table.DataItem;
 anychart.stockModule.eventMarkers.Table.DataItemAggregate;
 
 
-
 /**
  * Sets data to the table.
  * @param {Array} value
@@ -89,7 +88,8 @@ anychart.stockModule.eventMarkers.Table.prototype.setData = function(value, opt_
    *    lookups: Array.<number>,
    *    firstIndex: number,
    *    count: number,
-   *    pointsCount: number
+   *    pointsCount: number,
+   *    stick: boolean
    * }}
    * @private
    */
@@ -120,9 +120,10 @@ anychart.stockModule.eventMarkers.Table.prototype.getData = function() {
  * @param {anychart.stockModule.data.TableIterator.ICoIterator} coIterator
  * @param {number} fromOrNaNForFull
  * @param {number} toOrNaNForFull
+ * @param {boolean} stick
  * @return {!anychart.stockModule.eventMarkers.Table.Iterator}
  */
-anychart.stockModule.eventMarkers.Table.prototype.getIterator = function(coIterator, fromOrNaNForFull, toOrNaNForFull) {
+anychart.stockModule.eventMarkers.Table.prototype.getIterator = function(coIterator, fromOrNaNForFull, toOrNaNForFull, stick) {
   var fromIndex, toIndex;
   var full = isNaN(fromOrNaNForFull) || isNaN(toOrNaNForFull);
   if (full) {
@@ -134,8 +135,8 @@ anychart.stockModule.eventMarkers.Table.prototype.getIterator = function(coItera
   }
 
 
-  var data, count, lookups, firstIndex, j;
-  if (this.lastDataCache_ && this.lastDataCache_.fromIndex == fromIndex && this.lastDataCache_.toIndex == toIndex && this.lastDataCache_.pointsCount == coIterator.getRowsCount()) {
+  var data, count, lookups, firstIndex, j, pointsCount;
+  if (this.lastDataCache_ && this.lastDataCache_.stick == stick && this.lastDataCache_.fromIndex == fromIndex && this.lastDataCache_.toIndex == toIndex && this.lastDataCache_.pointsCount == coIterator.getRowsCount()) {
     data = this.lastDataCache_.data;
     lookups = this.lastDataCache_.lookups;
     firstIndex = this.lastDataCache_.firstIndex || 0;
@@ -143,23 +144,49 @@ anychart.stockModule.eventMarkers.Table.prototype.getIterator = function(coItera
   } else {
     data = [];
     lookups = [];
-    firstIndex = NaN;
     count = 0;
-    var i = fromIndex;
-    var prevIterKey = NaN;
-    var prevIterIndex = NaN;
-    var items = [];
-    coIterator.reset();
-    while (coIterator.advance() && i < toIndex) {
-      var currItem;
-      while (i < toIndex && (currItem = this.data_[i]).key < coIterator.currentKey()) {
-        items.push(currItem);
-        i++;
+    if (stick) {
+      firstIndex = NaN;
+      var i = fromIndex;
+      var prevIterKey = NaN;
+      var prevIterIndex = NaN;
+      var items = [];
+      coIterator.reset();
+      while (coIterator.advance() && i < toIndex) {
+        var currItem;
+        while (i < toIndex && (currItem = this.data_[i]).key < coIterator.currentKey()) {
+          items.push(currItem);
+          i++;
+        }
+        if (items.length) {
+          if (isNaN(prevIterKey) && !full) {
+            items.length = 0;
+          } else {
+            if (!data.length) {
+              firstIndex = i - items.length;
+            }
+            for (j = 0; j < items.length; j++) {
+              lookups.push(data.length);
+            }
+            data.push({
+              key: prevIterKey,
+              index: prevIterIndex,
+              items: items,
+              emIndex: i - items.length
+            });
+            count += items.length;
+            items = [];
+          }
+        }
+        prevIterKey = coIterator.currentKey();
+        prevIterIndex = coIterator.currentIndex();
       }
-      if (items.length) {
-        if (isNaN(prevIterKey) && !full) {
-          items.length = 0;
-        } else {
+      if (!isNaN(prevIterKey) || full) {
+        while (i < toIndex) {
+          items.push(currItem);
+          i++;
+        }
+        if (items.length) {
           if (!data.length) {
             firstIndex = i - items.length;
           }
@@ -173,32 +200,64 @@ anychart.stockModule.eventMarkers.Table.prototype.getIterator = function(coItera
             emIndex: i - items.length
           });
           count += items.length;
-          items = [];
         }
       }
-      prevIterKey = coIterator.currentKey();
-      prevIterIndex = coIterator.currentIndex();
-    }
-    if (!isNaN(prevIterKey) || full) {
-      while (i < toIndex) {
-        items.push(currItem);
-        i++;
-      }
-      if (items.length) {
-        if (!data.length) {
-          firstIndex = i - items.length;
+      pointsCount = coIterator.getRowsCount();
+    } else {
+      firstIndex = 0;
+
+      coIterator.reset();
+      var prevKey = NaN;
+      var prevIndex = NaN;
+      var lookup = 0;
+      var firstIndexInSeries = NaN;
+      var from = isNaN(fromOrNaNForFull) ? -Infinity : fromOrNaNForFull;
+      var to = isNaN(toOrNaNForFull) ? +Infinity : toOrNaNForFull;
+      var currentKey, currentIndex;
+      while (coIterator.advance()) {
+        currentKey = coIterator.currentKey();
+        currentIndex = coIterator.currentIndex();
+        if (isNaN(firstIndexInSeries))
+          firstIndexInSeries = currentIndex;
+        var diff = (currentKey - prevKey) / 2;
+        for (var i = 0; i < this.data_.length; i++) {
+          var keyInsideBounds = this.data_[i].key <= to && this.data_[i].key >= from;
+          var keyInsideFirstVisible = (prevIndex == firstIndexInSeries) && this.data_[i].key < (prevKey + diff);
+          var keyInsideCurrent = this.data_[i].key <= (currentKey + diff) && this.data_[i].key >= (currentKey - diff);
+          if (keyInsideBounds && (keyInsideFirstVisible || keyInsideCurrent)) {
+            data.push({
+              key: this.data_[i].key,
+              index: keyInsideCurrent ? currentIndex : prevIndex,
+              items: [this.data_[i]],
+              emIndex: lookup
+            });
+            lookups.push(lookup);
+            lookup++;
+            count++;
+          }
         }
-        for (j = 0; j < items.length; j++) {
-          lookups.push(data.length);
-        }
-        data.push({
-          key: prevIterKey,
-          index: prevIterIndex,
-          items: items,
-          emIndex: i - items.length
-        });
-        count += items.length;
+        prevKey = currentKey;
+        prevIndex = currentIndex;
       }
+      // this fixes case when eventMarker is inside one visible point or between 2 points and neither one is visible
+      if ((prevKey == currentKey && prevIndex == firstIndexInSeries) || isNaN(currentKey)) {
+        for (var i = 0; i < this.data_.length; i++) {
+          var keyInsideBounds = this.data_[i].key <= to && this.data_[i].key >= from;
+          if (keyInsideBounds) {
+            data.push({
+              key: this.data_[i].key,
+              index: currentIndex ? currentIndex : lookup,
+              items: [this.data_[i]],
+              emIndex: lookup
+            });
+            lookups.push(lookup);
+            lookup++;
+            count++;
+          }
+        }
+      }
+
+      pointsCount = count;
     }
     this.lastDataCache_ = {
       fromIndex: fromIndex,
@@ -207,7 +266,8 @@ anychart.stockModule.eventMarkers.Table.prototype.getIterator = function(coItera
       lookups: lookups,
       firstIndex: firstIndex,
       count: count,
-      pointsCount: coIterator.getRowsCount()
+      pointsCount: pointsCount,
+      stick: stick
     };
   }
 
@@ -338,7 +398,7 @@ anychart.stockModule.eventMarkers.Table.Iterator.prototype.current = function() 
 };
 
 
-    /**
+/**
  * @param {number} index
  * @return {boolean}
  */

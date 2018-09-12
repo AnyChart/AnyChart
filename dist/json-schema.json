@@ -1460,9 +1460,7 @@
         "fill": {"$ref": "#/definitions/fill"},
         "hatchFill": {"$ref": "#/definitions/hatchFillSet"},
         "outline": {"$ref": "#/definitions/anychart.core.ui.Outline"},
-        "center": {"$ref": "#/definitions/anychart.pieModule.Center"},
-        "aspect3d": {"type": "number"},
-        "height3d": {"type": "number"}
+        "center": {"$ref": "#/definitions/anychart.pieModule.Center"}
       },
       "required": ["type"]
     },

@@ -68,7 +68,6 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'radius': '65%',
     'mode3d': true,
     'explode': '5%',
-    'aspect3d': .45,
     'connectorLength': '15%',
     //'legend': {
     'legendItem': {

@@ -161,9 +161,7 @@ anychart.pieModule.Chart = function(opt_data, opt_csvSettings) {
     ['outsideLabelsCriticalAngle', anychart.ConsistencyState.PIE_LABELS, anychart.Signal.NEEDS_REDRAW],
     ['forceHoverLabels', anychart.ConsistencyState.PIE_LABELS, anychart.Signal.NEEDS_REDRAW],
     ['connectorStroke', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
-    ['mode3d', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.PIE_LABELS, anychart.Signal.NEEDS_REDRAW],
-    ['height3d', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.PIE_LABELS, anychart.Signal.NEEDS_REDRAW],
-    ['aspect3d', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.PIE_LABELS, anychart.Signal.NEEDS_REDRAW]
+    ['mode3d', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.PIE_LABELS, anychart.Signal.NEEDS_REDRAW]
   ]);
 
   var normalDescriptorsMeta = {};
@@ -444,9 +442,7 @@ anychart.pieModule.Chart.PROPERTY_DESCRIPTORS = (function() {
         [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'outsideLabelsCriticalAngle', criticalAngleNormalizer],
         [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'forceHoverLabels', anychart.core.settings.asIsNormalizer],
         [anychart.enums.PropertyHandlerType.MULTI_ARG, 'connectorStroke', anychart.core.settings.strokeNormalizer],
-        [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'mode3d', anychart.core.settings.booleanNormalizer],
-        [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'height3d', anychart.core.settings.numberNormalizer],
-        [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'aspect3d', anychart.core.settings.numberNormalizer]
+        [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'mode3d', anychart.core.settings.booleanNormalizer]
   ]);
   return map;
 })();
@@ -1890,7 +1886,7 @@ anychart.pieModule.Chart.prototype.calculateBounds_ = function(bounds) {
   var mode3d = /** @type {boolean} */ (this.getOption('mode3d'));
   if (mode3d) {
     var radiusXMax = Math.min(radiusX, (bounds.width - 2 * clampPie) / 2);
-    var ratioSum = this['aspect3d']() + anychart.pieModule.Chart.PIE_THICKNESS;
+    var ratioSum = anychart.pieModule.Chart.ASPECT_3D + anychart.pieModule.Chart.PIE_THICKNESS;
     var radiusYMax = (bounds.height - 2 * clampPie) / (2 * ratioSum);
     this.radiusValue_ = Math.min(radiusXMax, radiusYMax);
   } else {
@@ -2978,7 +2974,7 @@ anychart.pieModule.Chart.prototype.updateLabelsOnAnimate = function(labelOpacity
  * @protected
  */
 anychart.pieModule.Chart.prototype.get3DYRadius = function(majorRadius) {
-  return majorRadius * this['aspect3d']();
+  return majorRadius * anychart.pieModule.Chart.ASPECT_3D;
 };
 
 
@@ -2988,11 +2984,7 @@ anychart.pieModule.Chart.prototype.get3DYRadius = function(majorRadius) {
  * @protected
  */
 anychart.pieModule.Chart.prototype.get3DHeight = function() {
-  var height = this['height3d']();
-  if (!goog.isDef(height)) {
-    height = this.radiusValue_ * anychart.pieModule.Chart.PIE_THICKNESS;
-  }
-  return height;
+  return this.radiusValue_ * anychart.pieModule.Chart.PIE_THICKNESS;
 };
 
 
@@ -5173,8 +5165,6 @@ anychart.pieModule.Chart.PieOutsideLabelsDomain.prototype.calculate = function()
   // proto['outsideLabelsCriticalAngle'] = proto.outsideLabelsCriticalAngle;//doc|ex
   // proto['connectorStroke'] = proto.connectorStroke;//doc|ex
   // proto['mode3d'] = proto.mode3d;
-  // proto['aspect3d'] = proto.aspect3d;
-  // proto['height3d'] = proto.height3d;
   // proto['forceHoverLabels'] = proto.forceHoverLabels;
   //deprecated
   // proto['outsideLabelsSpace'] = proto.outsideLabelsSpace;//doc|ewx
