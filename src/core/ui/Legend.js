@@ -1,6 +1,7 @@
 //region --- Requiring and Providing
 goog.provide('anychart.core.ui.Legend');
 goog.provide('anychart.standalones.Legend');
+
 goog.require('acgraph.vector.Text.TextOverflow');
 goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.Text');
@@ -16,7 +17,9 @@ goog.require('anychart.enums');
 goog.require('anychart.format.Context');
 goog.require('anychart.math.Rect');
 goog.require('anychart.utils');
+
 goog.require('goog.array');
+goog.require('goog.math.Rect');
 goog.require('goog.object');
 //endregion
 
@@ -314,7 +317,6 @@ anychart.core.ui.Legend.prototype.itemsFormatter = function(opt_value) {
 anychart.core.ui.Legend.prototype.margin = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.margin_) {
     this.margin_ = new anychart.core.utils.Margin();
-    this.registerDisposable(this.margin_);
     this.margin_.listenSignals(this.boundsInvalidated_, this);
   }
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
@@ -350,7 +352,6 @@ anychart.core.ui.Legend.prototype.boundsInvalidated_ = function(event) {
 anychart.core.ui.Legend.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.padding_) {
     this.padding_ = new anychart.core.utils.Padding();
-    this.registerDisposable(this.padding_);
     this.padding_.listenSignals(this.boundsInvalidated_, this);
   }
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
@@ -369,7 +370,6 @@ anychart.core.ui.Legend.prototype.padding = function(opt_spaceOrTopOrTopAndBotto
 anychart.core.ui.Legend.prototype.background = function(opt_value) {
   if (!this.background_) {
     this.background_ = new anychart.core.ui.Background();
-    this.registerDisposable(this.background_);
     this.background_.listenSignals(this.backgroundInvalidated_, this);
   }
 
@@ -402,7 +402,6 @@ anychart.core.ui.Legend.prototype.backgroundInvalidated_ = function(event) {
 anychart.core.ui.Legend.prototype.title = function(opt_value) {
   if (!this.title_) {
     this.title_ = new anychart.core.ui.Title();
-    this.registerDisposable(this.title_);
     this.title_.listenSignals(this.titleInvalidated_, this);
     this.title_.setParentEventTarget(this);
   }
@@ -444,7 +443,6 @@ anychart.core.ui.Legend.prototype.titleInvalidated_ = function(event) {
 anychart.core.ui.Legend.prototype.titleSeparator = function(opt_value) {
   if (!this.titleSeparator_) {
     this.titleSeparator_ = new anychart.core.ui.Separator();
-    this.registerDisposable(this.titleSeparator_);
     this.titleSeparator_.listenSignals(this.titleSeparatorInvalidated_, this);
   }
 
@@ -486,7 +484,6 @@ anychart.core.ui.Legend.prototype.titleSeparatorInvalidated_ = function(event) {
 anychart.core.ui.Legend.prototype.paginator = function(opt_value) {
   if (!this.paginator_) {
     this.paginator_ = new anychart.core.ui.Paginator();
-    this.registerDisposable(this.paginator_);
     this.paginator_.listenSignals(this.paginatorInvalidated_, this);
   }
 
@@ -528,7 +525,6 @@ anychart.core.ui.Legend.prototype.paginatorInvalidated_ = function(event) {
 anychart.core.ui.Legend.prototype.tooltip = function(opt_value) {
   if (!this.tooltip_) {
     this.tooltip_ = new anychart.core.ui.Tooltip(0);
-    this.registerDisposable(this.tooltip_);
     this.tooltip_.listenSignals(this.onTooltipSignal_, this);
     this.tooltip_.containerProvider(this);
   }
@@ -1412,6 +1408,48 @@ anychart.core.ui.Legend.prototype.initializeLegendItems_ = function(items) {
     this.clearItems();
   }
 
+  /*
+    DEV NOTE: Such sequence of DOM-operations allows to minimize
+    forced reflow calculation time:
+      1) Add to DOM.
+      2) Setup all elements.
+      3) Ask numeric measurements (like el.getBBox()). This triggers
+         flow recalculation for first measurement request. Another
+         measurements are already calculated on first request.
+
+      See more: https://developers.google.com/web/fundamentals/performance/rendering/avoid-large-complex-layouts-and-layout-thrashing
+   */
+  var textEl, style, sett;
+  for (i = 0; i < this.items_.length; i++) {
+    item = this.items_[i];
+    sett = item.textSettings();
+    style = anychart.utils.toStyleString(sett);
+    textEl = item.predefinedElement();
+    if (!textEl) {
+      textEl = this.renderer.createTextElement();
+      this.measurementG_.appendChild(textEl);
+      item.predefinedElement(textEl);
+    }
+    textEl.style.cssText = style;
+    textEl.textContent = item.text();
+  }
+
+  var paginatorTextEl = this.renderer.createTextElement();
+  this.measurementG_.appendChild(paginatorTextEl);
+  sett = this.paginator_.textSettings();
+  style = anychart.utils.toStyleString(sett);
+  paginatorTextEl.style.cssText = style;
+  paginatorTextEl.textContent = '0 / 0';
+
+  for (i = 0; i < this.items_.length; i++) {
+    item = this.items_[i];
+    textEl = item.predefinedElement();
+    var bbox = textEl['getBBox']();
+    item.predefinedBounds(new goog.math.Rect(bbox.x, bbox.y, bbox.width, bbox.height));
+  }
+  var pb = paginatorTextEl['getBBox']();
+  this.paginator_.predefinedTextBounds(new goog.math.Rect(pb.x, pb.y, pb.width, pb.height));
+
   this.recreateItems_ = false;
   this.invalidate(anychart.ConsistencyState.BOUNDS);
 };
@@ -1476,11 +1514,10 @@ anychart.core.ui.Legend.prototype.draw = function() {
   if (!this.rootElement) {
     /**
      * Layer of legend.
-     * @type {!acgraph.vector.Layer}
+     * @type {acgraph.vector.Layer}
      */
     this.rootElement = acgraph.layer();
     this.bindHandlersToGraphics(this.rootElement);
-    this.registerDisposable(this.rootElement);
 
     if (!this.itemsLayer_) {
       /**
@@ -1490,7 +1527,6 @@ anychart.core.ui.Legend.prototype.draw = function() {
        */
       this.itemsLayer_ = acgraph.layer();
       this.itemsLayer_.parent(this.rootElement).zIndex(20);
-      this.registerDisposable(this.itemsLayer_);
     }
   }
 
@@ -1505,6 +1541,13 @@ anychart.core.ui.Legend.prototype.draw = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
     this.rootElement.parent(container);
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
+
+    if (acgraph.type() == acgraph.StageType.SVG) {
+      this.renderer = acgraph.getRenderer();
+      var m = this.renderer.createMeasurement();
+      this.measurementG_ = this.renderer.createLayerElement();
+      goog.dom.appendChild(m, this.measurementG_);
+    }
   }
 
   var manualSuspend = stage && !stage.isSuspended();
@@ -2046,13 +2089,42 @@ anychart.core.ui.Legend.prototype.setupByJSON = function(config, opt_default) {
 anychart.core.ui.Legend.prototype.disposeInternal = function() {
   anychart.core.ui.Legend.base(this, 'disposeInternal');
 
-  goog.disposeAll(this.dragHandler_, this.tooltip_, this.paginator_, this.itemsPool_, this.items_);
+  if (this.measurementG_) {
+    goog.dom.removeChildren(this.measurementG_);
+    goog.dom.removeNode(this.measurementG_);
+  }
+
+  goog.disposeAll(
+      this.dragHandler_,
+      this.tooltip_,
+      this.paginator_,
+      this.itemsPool_,
+      this.items_,
+      this.itemsLayer_,
+      this.margin_,
+      this.padding_,
+      this.background_,
+      this.title_,
+      this.titleSeparator_,
+      this.tooltip_,
+      this.rootElement,
+      this.measurementG_
+  );
 
   this.dragHandler_ = null;
   this.itemsPool_ = null;
   this.items_ = null;
   this.tooltip_ = null;
   this.paginator_ = null;
+  this.itemsLayer_ = null;
+  this.margin_ = null;
+  this.padding_ = null;
+  this.background_ = null;
+  this.title_ = null;
+  this.titleSeparator_ = null;
+  this.tooltip_ = null;
+  this.rootElement = null;
+  this.measurementG_ = null;
 };
 
 
@@ -2086,7 +2158,7 @@ anychart.standalones.Legend.prototype.dependsOnContainerSize = function() {
   return anychart.utils.isPercent(width) || anychart.utils.isPercent(height) || goog.isNull(width) || goog.isNull(height);
 };
 
- 
+
 //endregion
 /**
  * Removes signal listeners.

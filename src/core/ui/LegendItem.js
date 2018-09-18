@@ -34,6 +34,28 @@ anychart.core.ui.LegendItem = function() {
   this.textElement_.attr('aria-hidden', 'true');
 
   /**
+   *
+   * @type {?Element}
+   * @private
+   */
+  this.predefinedEl_ = null;
+
+  /**
+   *
+   * @type {goog.math.Rect}
+   * @private
+   */
+  this.predefinedBounds_ = null;
+
+  /**
+   * Ratio value to apply font fade gradient.
+   * If is NaN - no fade gradient is applied.
+   * @type {number}
+   * @private
+   */
+  this.applyFontGradient_ = NaN;
+
+  /**
    * Object with default stroke for icon type that should always be with stroke.
    * @type {Object}
    * @private
@@ -102,7 +124,7 @@ goog.inherits(anychart.core.ui.LegendItem, anychart.core.Text);
 /**
  * @type {!Object<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.core.ui.LegendItem.PROPERTY_DESCRIPTORS = (function(){
+anychart.core.ui.LegendItem.PROPERTY_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
 
@@ -716,25 +738,28 @@ anychart.core.ui.LegendItem.prototype.draw = function() {
 
     var textLines = this.textElement_.getLines();
     var textY, horizontalAxis;
-    this.textElement_.x(/** @type {number} */(this.iconEnabled_ ? this.iconSize_ + this.getOption('iconTextSpacing') : 0));
+    var iconSize = /** @type {number} */(this.iconEnabled_ ? this.iconSize_ + this.getOption('iconTextSpacing') : 0);
+    this.textElement_.x(iconSize);
 
     if (textLines.length > 1) {
+      var strokeThickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(this.getOption('iconStroke')));
       var maxTextSegmentHeight = 0;
       var firstTextLine = textLines[0];
       for (var i = 0, len = firstTextLine.length; i < len; i++) {
         maxTextSegmentHeight = Math.max(maxTextSegmentHeight, firstTextLine[i].height);
       }
 
-      horizontalAxis = Math.max(maxTextSegmentHeight, this.iconSize_) / 2;
+      horizontalAxis = Math.max(maxTextSegmentHeight, this.iconSize_ + strokeThickness) / 2;
       textY = horizontalAxis - maxTextSegmentHeight / 2;
     } else {
       horizontalAxis = this.pixelBounds_.height / 2;
-      textY = horizontalAxis - this.textElement_.getBounds().height / 2;
+      textY = horizontalAxis - this.predefinedBounds_.height / 2;
     }
     this.textElement_.y(textY);
     this.icon_.setTransformationMatrix(1, 0, 0, 1, 0, horizontalAxis - this.iconSize_ / 2);
     this.layer_.setTransformationMatrix(1, 0, 0, 1, this.pixelBounds_.left, this.pixelBounds_.top);
 
+    this.applyFontColor_(this.hovered_, isInitial);
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 
@@ -771,7 +796,15 @@ anychart.core.ui.LegendItem.prototype.applyFontColor_ = function(hover, opt_isIn
   this.applyTextSettings(/** @type {!acgraph.vector.Text} */(this.textElement_), !!opt_isInitial);
   var colorOption = /** @type {(acgraph.vector.Fill|acgraph.vector.Stroke)} */ (this.getOption('fontColor'));
   var fontColor = this.disabled_ ? this.disabledState_['fontColor'] : hover ? anychart.color.lighten(colorOption) : colorOption;
-  this.textElement_.color(fontColor);
+  if (isNaN(this.applyFontGradient_)) {
+    this.textElement_.color(fontColor);
+    this.textElement_.fill(fontColor);
+  } else {
+    var fo = this.getOption('fontOpacity');
+    fo = /** @type {number} */ (goog.isDef(fo) ? fo : 1);
+    var grad = anychart.utils.getFadeGradient(this.applyFontGradient_, fo, fontColor);
+    this.getTextElement().fill(grad);
+  }
 };
 
 
@@ -852,6 +885,84 @@ anychart.core.ui.LegendItem.prototype.invalidateParentBounds = function() {
 };
 
 
+// /**
+//  * Calculate bounds of legend item
+//  * @private
+//  * @return {anychart.math.Rect} pixelBounds of legend item.
+//  */
+// anychart.core.ui.LegendItem.prototype.calculateBounds_ = function() {
+//   var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
+//   var parentWidth, parentHeight;
+//   /** @type {anychart.math.Rect} */
+//   var textBounds = this.textElement_.getBounds();
+//   var strokeThickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(this.getOption('iconStroke')));
+//   var iconSize = this.iconSize_ + strokeThickness;
+//
+//   if (parentBounds) {
+//     parentWidth = parentBounds.width;
+//     parentHeight = parentBounds.height;
+//   } else {
+//     parentWidth = parentHeight = undefined;
+//   }
+//
+//   var legendItemMaxWidth = anychart.utils.normalizeSize(/** @type {number|string} */(this.getOption('maxWidth')), parentWidth);
+//   var legendItemMaxHeight = anychart.utils.normalizeSize(/** @type {number|string} */(this.getOption('maxHeight')), parentHeight);
+//
+//   var x = parentWidth ? anychart.utils.normalizeSize(/** @type {number|string} */(this.getOption('x')), parentWidth) : 0;
+//   var y = parentHeight ? anychart.utils.normalizeSize(/** @type {number|string} */(this.getOption('y')), parentHeight) : 0;
+//
+//   if (legendItemMaxWidth) {
+//     var maxTextWidth = legendItemMaxWidth - (this.iconEnabled_ ? iconSize + this.getOption('iconTextSpacing') : 0);
+//     this.textElement_.width(maxTextWidth);
+//   } else if (this.textElement_.textOverflow() == acgraph.vector.Text.TextOverflow.ELLIPSIS) {
+//     var overflowWidth;
+//     // DVF-2119
+//     overflowWidth = parentWidth ? Math.min(parentWidth - (this.iconEnabled_ ? iconSize + this.getOption('iconTextSpacing') : 0), textBounds.width) : textBounds.width;
+//
+//     // in the context of DVF-2184
+//     // Anton Kagakin:
+//     // we do need this because of width=0 or width=null set to textElement works the same, so for the ellipsis
+//     // width should be more than a zero
+//     overflowWidth = Math.max(overflowWidth, 0.00001);
+//
+//     this.textElement_.width(overflowWidth);
+//
+//     // in the context of DVF-2184
+//     // so as we want ellipsis we would also want an non-null height for proper text calculation
+//     this.textElement_.height(legendItemMaxHeight ? legendItemMaxHeight : textBounds.height);
+//   }
+//
+//   textBounds = this.textElement_.getBounds();
+//   var width = (this.iconEnabled_ ? iconSize + this.getOption('iconTextSpacing') : 0) + textBounds.width;
+//   var height;
+//
+//   var textLines = this.textElement_.getLines();
+//   if (textLines.length > 1) {
+//     var maxTextSegmentHeight = 0;
+//     var firstTextLine = textLines[0];
+//     for (var i = 0, len = firstTextLine.length; i < len; i++) {
+//       maxTextSegmentHeight = Math.max(maxTextSegmentHeight, firstTextLine[i].height);
+//     }
+//
+//     var h2 = textBounds.height - maxTextSegmentHeight / 2;
+//     height = Math.max(maxTextSegmentHeight / 2, this.iconSize_ / 2) + Math.max(h2, this.iconSize_ / 2);
+//   } else {
+//     height = Math.max((this.iconEnabled_ ? iconSize : 0), textBounds.height);
+//   }
+//
+//   if (parentBounds) {
+//     this.pixelBounds_ = new anychart.math.Rect(
+//         parentBounds.getLeft() + x,
+//         parentBounds.getTop() + y,
+//         width, height);
+//   } else {
+//     this.pixelBounds_ = new anychart.math.Rect(x, y, width, height);
+//   }
+//
+//   return this.pixelBounds_;
+// };
+
+
 /**
  * Calculate bounds of legend item
  * @private
@@ -860,8 +971,12 @@ anychart.core.ui.LegendItem.prototype.invalidateParentBounds = function() {
 anychart.core.ui.LegendItem.prototype.calculateBounds_ = function() {
   var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
   var parentWidth, parentHeight;
+  var t = this.text();
   /** @type {anychart.math.Rect} */
-  var textBounds = this.textElement_.getBounds();
+  var textBounds = goog.isNull(t) || (t.indexOf('\n') < 0) ? this.predefinedBounds_ : this.textElement_.getBounds();
+  var width = textBounds.width;
+  var height = textBounds.height;
+
   var strokeThickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(this.getOption('iconStroke')));
   var iconSize = this.iconSize_ + strokeThickness;
 
@@ -875,33 +990,49 @@ anychart.core.ui.LegendItem.prototype.calculateBounds_ = function() {
   var legendItemMaxWidth = anychart.utils.normalizeSize(/** @type {number|string} */(this.getOption('maxWidth')), parentWidth);
   var legendItemMaxHeight = anychart.utils.normalizeSize(/** @type {number|string} */(this.getOption('maxHeight')), parentHeight);
 
+  // if (isNaN(legendItemMaxWidth)) {
+  //   legendItemMaxWidth = parentWidth;
+  // } else if (parentWidth) {
+  //   legendItemMaxWidth = Math.min(legendItemMaxWidth, parentWidth);
+  // }
+  //
+  // if (isNaN(legendItemMaxHeight)) {
+  //   legendItemMaxHeight = parentHeight;
+  // } else if (parentHeight) {
+  //   legendItemMaxHeight = Math.min(legendItemMaxHeight, parentHeight);
+  // }
+
   var x = parentWidth ? anychart.utils.normalizeSize(/** @type {number|string} */(this.getOption('x')), parentWidth) : 0;
   var y = parentHeight ? anychart.utils.normalizeSize(/** @type {number|string} */(this.getOption('y')), parentHeight) : 0;
 
-  if (legendItemMaxWidth) {
-    var maxTextWidth = legendItemMaxWidth - (this.iconEnabled_ ? iconSize + this.getOption('iconTextSpacing') : 0);
-    this.textElement_.width(maxTextWidth);
-  } else if (this.textElement_.textOverflow() == acgraph.vector.Text.TextOverflow.ELLIPSIS) {
-    var overflowWidth;
-    // DVF-2119
-    overflowWidth = parentWidth ? Math.min(parentWidth - (this.iconEnabled_ ? iconSize + this.getOption('iconTextSpacing') : 0), textBounds.width) : textBounds.width;
+  var enabledIconSize = (this.iconEnabled_ ? iconSize + this.getOption('iconTextSpacing') : 0);
 
-    // in the context of DVF-2184
-    // Anton Kagakin:
-    // we do need this because of width=0 or width=null set to textElement works the same, so for the ellipsis
-    // width should be more than a zero
+  this.applyFontGradient_ = NaN;
+  if (legendItemMaxWidth) {
+    var widthWithoutIcon = legendItemMaxWidth - enabledIconSize;
+    if (width && width > widthWithoutIcon && this.textElement_.textOverflow() == acgraph.vector.Text.TextOverflow.ELLIPSIS) {
+      this.applyFontGradient_ = widthWithoutIcon / width;
+    } else {
+      this.textElement_.width(widthWithoutIcon);
+      textBounds = this.textElement_.getBounds();
+    }
+    width = legendItemMaxWidth;
+  } else {
+    var overflowWidth = parentWidth ? Math.min(parentWidth - enabledIconSize, width) : width;
     overflowWidth = Math.max(overflowWidth, 0.00001);
 
-    this.textElement_.width(overflowWidth);
+    if (this.textElement_.textOverflow() == acgraph.vector.Text.TextOverflow.ELLIPSIS) {
+      if (width && width > overflowWidth)
+        this.applyFontGradient_ = overflowWidth / width;
+    }
 
-    // in the context of DVF-2184
-    // so as we want ellipsis we would also want an non-null height for proper text calculation
-    this.textElement_.height(legendItemMaxHeight ? legendItemMaxHeight : textBounds.height);
+    // else {
+    //   this.textElement_.width(overflowWidth);
+    //   this.textElement_.height(legendItemMaxHeight ? legendItemMaxHeight : height);
+    // }
+    width = overflowWidth + enabledIconSize;
   }
 
-  textBounds = this.textElement_.getBounds();
-  var width = (this.iconEnabled_ ? iconSize + this.getOption('iconTextSpacing') : 0) + textBounds.width;
-  var height;
 
   var textLines = this.textElement_.getLines();
   if (textLines.length > 1) {
@@ -914,7 +1045,7 @@ anychart.core.ui.LegendItem.prototype.calculateBounds_ = function() {
     var h2 = textBounds.height - maxTextSegmentHeight / 2;
     height = Math.max(maxTextSegmentHeight / 2, this.iconSize_ / 2) + Math.max(h2, this.iconSize_ / 2);
   } else {
-    height = Math.max((this.iconEnabled_ ? iconSize : 0), textBounds.height);
+    height = Math.max((this.iconEnabled_ ? iconSize : 0), height);
   }
 
   if (parentBounds) {
@@ -1134,6 +1265,34 @@ anychart.core.ui.LegendItem.prototype.setItemIndexToLayer = function(index) {
 };
 
 
+/**
+ *
+ * @param {Element=} opt_value
+ * @return {anychart.core.ui.LegendItem|Element|null}
+ */
+anychart.core.ui.LegendItem.prototype.predefinedElement = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.predefinedEl_ = opt_value;
+    return this;
+  }
+  return this.predefinedEl_;
+};
+
+
+/**
+ *
+ * @param {goog.math.Rect=} opt_value - .
+ * @return {goog.math.Rect|anychart.core.ui.LegendItem}
+ */
+anychart.core.ui.LegendItem.prototype.predefinedBounds = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.predefinedBounds_ = opt_value;
+    return this;
+  }
+  return this.predefinedBounds_;
+};
+
+
 //endregion
 //region --- Setup and Dispose
 /** @inheritDoc */
@@ -1158,6 +1317,8 @@ anychart.core.ui.LegendItem.prototype.setupByJSON = function(config, opt_default
 /** @inheritDoc */
 anychart.core.ui.LegendItem.prototype.disposeInternal = function() {
   anychart.core.ui.LegendItem.base(this, 'disposeInternal');
+
+  this.predefinedEl_ = null;
 
   goog.disposeAll(
       this.layer_,

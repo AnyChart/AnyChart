@@ -2600,6 +2600,71 @@ anychart.utils.decomposeArguments = function(namedArguments, opt_options, opt_de
  */
 anychart.utils.instanceOf = acgraph.utils.instanceOf;
 
+
+/**
+ * Styling exceptions.
+ * @type {Object.<string, string>}
+ * @private
+ */
+anychart.utils.STYLE_EXCEPTIONS_ = {
+  'decoration': 'text-decoration',
+  'hAlign': 'text-anchor',
+  'color': 'fill',
+  'fontColor': 'fill'
+};
+
+
+/**
+ * Converts style object to DOM-attribute style string.
+ * @param {Object} obj - Settings object.
+ * @return {string} - Style string.
+ */
+anychart.utils.toStyleString = function(obj) {
+  var result = '';
+  for (var key in obj) {
+    var selCase = anychart.utils.STYLE_EXCEPTIONS_[key] || goog.string.toSelectorCase(key);
+    result += (selCase + ': ' + obj[key] + ';');
+  }
+  return result;
+};
+
+
+/**
+ *
+ * @param {number} ratio - .
+ * @param {number} opacity - .
+ * @param {string} fontColor - .
+ * @param {number=} opt_fadeStep - .
+ * @return {!acgraph.vector.LinearGradientFill}
+ */
+anychart.utils.getFadeGradient = function(ratio, opacity, fontColor, opt_fadeStep) {
+  return {
+    'keys': [
+      {
+        'offset': 0,
+        'color': fontColor,
+        'opacity': opacity
+      },
+      {
+        'offset': Math.max(ratio - (opt_fadeStep || 0.1), 0),
+        'color': fontColor,
+        'opacity': opacity
+      },
+      {
+        'offset': ratio,
+        'color': fontColor,
+        'opacity': 0
+      },
+      {
+        'offset': 1,
+        'color': fontColor,
+        'opacity': 0
+      }
+    ]
+  };
+};
+
+
 //exports
 goog.exportSymbol('anychart.utils.printUtilsBoolean', anychart.utils.printUtilsBoolean);
 goog.exportSymbol('anychart.utils.xml2json', anychart.utils.xml2json);
