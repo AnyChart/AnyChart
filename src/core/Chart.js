@@ -1011,14 +1011,14 @@ anychart.core.Chart.prototype.contextMenuItemsProvider = function(context) {
   if (anychart.window['anychart']['exports']) {
     goog.object.extend(items, /** @type {Object} */ (anychart.utils.recursiveClone(anychart.core.Chart.contextMenuMap['exporting'])));
   }
-  if (goog.dom.fullscreen.isSupported() && context['chart'])
-    goog.object.extend(items, /** @type {Object} */ (anychart.utils.recursiveClone(anychart.core.Chart.contextMenuMap[context['chart'].fullScreen() ? 'full-screen-exit' : 'full-screen-enter'])));
+  if (goog.dom.fullscreen.isSupported() && context['menuParent'])
+    goog.object.extend(items, /** @type {Object} */ (anychart.utils.recursiveClone(anychart.core.Chart.contextMenuMap[context['menuParent'].fullScreen() ? 'full-screen-exit' : 'full-screen-enter'])));
   goog.object.extend(items, /** @type {Object} */ (anychart.utils.recursiveClone(anychart.core.Chart.contextMenuMap['main'])));
 
   if (anychart.DEVELOP) {
     // prepare version link (specific to each product)
     var versionHistoryItem = /** @type {anychart.ui.ContextMenu.Item} */(anychart.utils.recursiveClone(anychart.core.Chart.contextMenuItems['version-history']));
-    versionHistoryItem['href'] = context['chart'].getVersionHistoryLink() + '?version=' + anychart.VERSION;
+    versionHistoryItem['href'] = context['menuParent'].getVersionHistoryLink() + '?version=' + anychart.VERSION;
 
     items['version-history-separator'] = {'index': 81};
     items['save-config-as'] = anychart.utils.recursiveClone(anychart.core.Chart.contextMenuItems['save-config-as']);
@@ -1026,7 +1026,7 @@ anychart.core.Chart.prototype.contextMenuItemsProvider = function(context) {
     items['version-history'] = versionHistoryItem;
   }
 
-  return context['chart'].specificContextMenuItems(items, context, isPointContext);
+  return context['menuParent'].specificContextMenuItems(items, context, isPointContext);
 };
 
 
@@ -1075,7 +1075,7 @@ anychart.core.Chart.contextMenuItems = {
     'text': 'Start selection marquee',
     'eventType': 'anychart.startSelectMarquee',
     'action': function(context) {
-      context['chart'].startSelectMarquee(false);
+      context['menuParent'].startSelectMarquee(false);
     }
   },
 
@@ -1091,7 +1091,7 @@ anychart.core.Chart.contextMenuItems = {
         'iconClass': 'ac ac-file-image-o',
         'eventType': 'anychart.saveAsPng',
         'action': function(context) {
-          context['chart'].saveAsPng();
+          context['menuParent'].saveAsPng();
         }
       },
       'save-chart-as-jpg': {
@@ -1100,7 +1100,7 @@ anychart.core.Chart.contextMenuItems = {
         'iconClass': 'ac ac-file-image-o',
         'eventType': 'anychart.saveAsJpg',
         'action': function(context) {
-          context['chart'].saveAsJpg();
+          context['menuParent'].saveAsJpg();
         }
       },
       'save-chart-as-pdf': {
@@ -1109,7 +1109,7 @@ anychart.core.Chart.contextMenuItems = {
         'iconClass': 'ac ac-file-pdf-o',
         'eventType': 'anychart.saveAsPdf',
         'action': function(context) {
-          context['chart'].saveAsPdf();
+          context['menuParent'].saveAsPdf();
         }
       },
       'save-chart-as-svg': {
@@ -1118,7 +1118,7 @@ anychart.core.Chart.contextMenuItems = {
         'iconClass': 'ac ac-file-code-o',
         'eventType': 'anychart.saveAsSvg',
         'action': function(context) {
-          context['chart'].saveAsSvg();
+          context['menuParent'].saveAsSvg();
         }
       }
     }
@@ -1136,7 +1136,7 @@ anychart.core.Chart.contextMenuItems = {
         'iconClass': 'ac ac-file-excel-o',
         'eventType': 'anychart.saveAsCsv',
         'action': function(context) {
-          context['chart'].saveAsCsv();
+          context['menuParent'].saveAsCsv();
         }
       },
       'save-data-as-xlsx': {
@@ -1145,7 +1145,7 @@ anychart.core.Chart.contextMenuItems = {
         'iconClass': 'ac ac-file-excel-o',
         'eventType': 'anychart.saveAsXlsx',
         'action': function(context) {
-          context['chart'].saveAsXlsx();
+          context['menuParent'].saveAsXlsx();
         }
       }
     }
@@ -1163,7 +1163,7 @@ anychart.core.Chart.contextMenuItems = {
         'iconClass': 'ac ac-facebook',
         'eventType': 'anychart.shareWithFacebook',
         'action': function(context) {
-          context['chart'].shareWithFacebook();
+          context['menuParent'].shareWithFacebook();
         }
       },
       'share-with-twitter': {
@@ -1172,7 +1172,7 @@ anychart.core.Chart.contextMenuItems = {
         'iconClass': 'ac ac-twitter',
         'eventType': 'anychart.shareWithTwitter',
         'action': function(context) {
-          context['chart'].shareWithTwitter();
+          context['menuParent'].shareWithTwitter();
         }
       },
       'share-with-linkedin': {
@@ -1181,7 +1181,7 @@ anychart.core.Chart.contextMenuItems = {
         'iconClass': 'ac ac-linkedin',
         'eventType': 'anychart.shareWithLinkedIn',
         'action': function(context) {
-          context['chart'].shareWithLinkedIn();
+          context['menuParent'].shareWithLinkedIn();
         }
       },
       'share-with-pinterest': {
@@ -1190,7 +1190,7 @@ anychart.core.Chart.contextMenuItems = {
         'iconClass': 'ac ac-pinterest',
         'eventType': 'anychart.shareWithPinterest',
         'action': function(context) {
-          context['chart'].shareWithPinterest();
+          context['menuParent'].shareWithPinterest();
         }
       }
     }
@@ -1203,7 +1203,7 @@ anychart.core.Chart.contextMenuItems = {
     'iconClass': 'ac ac-print',
     'eventType': 'anychart.print',
     'action': function(context) {
-      context['chart'].print();
+      context['menuParent'].print();
     }
   },
 
@@ -1212,7 +1212,7 @@ anychart.core.Chart.contextMenuItems = {
     'index': 60,
     'text': 'Enter full screen',
     'action': function(context) {
-      context['chart'].fullScreen(true);
+      context['menuParent'].fullScreen(true);
     }
   },
 
@@ -1220,7 +1220,7 @@ anychart.core.Chart.contextMenuItems = {
     'index': 60,
     'text': 'Exit full screen',
     'action': function(context) {
-      context['chart'].fullScreen(false);
+      context['menuParent'].fullScreen(false);
     }
   },
 
@@ -1246,7 +1246,7 @@ anychart.core.Chart.contextMenuItems = {
         'iconClass': 'ac ac-file-code-o',
         'eventType': 'anychart.saveAsJson',
         'action': function(context) {
-          context['chart'].saveAsJson();
+          context['menuParent'].saveAsJson();
         }
       },
       'save-config-as-xml': {
@@ -1255,7 +1255,7 @@ anychart.core.Chart.contextMenuItems = {
         'iconClass': 'ac ac-file-code-o',
         'eventType': 'anychart.saveAsXml',
         'action': function(context) {
-          context['chart'].saveAsXml();
+          context['menuParent'].saveAsXml();
         }
       }
     }

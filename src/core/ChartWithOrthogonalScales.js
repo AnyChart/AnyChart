@@ -1949,7 +1949,7 @@ anychart.core.ChartWithOrthogonalScales.contextMenuItems = {
     'text': 'Exclude',
     'eventType': 'anychart.exclude',
     'action': function(context) {
-      context['chart'].suspendSignalsDispatching();
+      context['menuParent'].suspendSignalsDispatching();
       var selectedPoints = context['selectedPoints'];
       var selectedPoint;
       for (var i = 0; i < selectedPoints.length; i++) {
@@ -1958,7 +1958,7 @@ anychart.core.ChartWithOrthogonalScales.contextMenuItems = {
           selectedPoint.getSeries().excludePoint(selectedPoint.getIndex());
         }
       }
-      context['chart'].resumeSignalsDispatching(true);
+      context['menuParent'].resumeSignalsDispatching(true);
     }
   },
 
@@ -1976,18 +1976,18 @@ anychart.core.ChartWithOrthogonalScales.contextMenuItems = {
     'text': 'Keep only',
     'eventType': 'anychart.keepOnly',
     'action': function(context) {
-      context['chart'].suspendSignalsDispatching();
+      context['menuParent'].suspendSignalsDispatching();
       // We don't use context['selectedPoints'] because it call .keepOnlyPoints() for each point.
       // Current implementation call .keepOnlyPoints() for each series.
       var selectedPointsIndexes, series, i;
-      var allSeries = context['chart'].getAllSeries();
+      var allSeries = context['menuParent'].getAllSeries();
       for (i = 0; i < allSeries.length; i++) {
         series = allSeries[i];
         if (!series || !series.state) continue;
         selectedPointsIndexes = series.state.getIndexByPointState(anychart.PointState.SELECT);
         series.keepOnlyPoints(selectedPointsIndexes);
       }
-      context['chart'].resumeSignalsDispatching(true);
+      context['menuParent'].resumeSignalsDispatching(true);
     }
   },
 
@@ -1997,15 +1997,15 @@ anychart.core.ChartWithOrthogonalScales.contextMenuItems = {
     'text': 'Include all',
     'eventType': 'anychart.includeAll',
     'action': function(context) {
-      context['chart'].suspendSignalsDispatching();
+      context['menuParent'].suspendSignalsDispatching();
       var series, i;
-      var allSeries = context['chart'].getAllSeries();
+      var allSeries = context['menuParent'].getAllSeries();
       for (i = 0; i < allSeries.length; i++) {
         series = allSeries[i];
         if (!goog.isFunction(series.includeAllPoints)) continue;
         series.includeAllPoints();
       }
-      context['chart'].resumeSignalsDispatching(true);
+      context['menuParent'].resumeSignalsDispatching(true);
     }
   }
 

@@ -2595,7 +2595,7 @@ anychart.stockModule.Chart.contextMenuItems = {
     'text': 'Start zoom marquee',
     'eventType': 'anychart.startZoomMarquee',
     'action': function(context) {
-      context['chart'].startZoomMarquee(false);
+      context['menuParent'].startZoomMarquee(false);
     }
   }
 };
