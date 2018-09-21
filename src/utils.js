@@ -1405,7 +1405,8 @@ anychart.utils.xml2json = function(xml) {
           if (val == '')
             result[name] = val;
           else if (!isNaN(+val)) {
-            if (val.length > 1 && val.charAt(0) == '0' && !isNaN(+val.charAt(1))) // if leading zero - keep it and treat value as string, DVF-3829, treemap id's
+            /*If value has leading zero ('00' or '0x10') - treat it as string, DVF-3829.*/
+            if (val.length > 1 && val.charAt(0) == '0' && (+val <= 0 || +val >= 1))
               result[name] = val;
             else
               result[name] = +val;
