@@ -612,6 +612,9 @@ anychart.mapModule.Chart.prototype.controlsInteractivity_ = function() {
         'width': '1px'
       });
       goog.dom.appendChild(document['body'], anychart.mapTextarea);
+      goog.events.listen(anychart.mapTextarea, [goog.events.EventType.FOCUS, goog.events.EventType.FOCUSIN, goog.events.EventType.SELECT], function(e) {
+        e.preventDefault();
+      });
     }
 
     this.listen('pointsselect', function(e) {
@@ -824,7 +827,7 @@ anychart.mapModule.Chart.prototype.controlsInteractivity_ = function() {
         var scrollX = scrollEl.scrollLeft;
         var scrollY = scrollEl.scrollTop;
 
-        anychart.mapTextarea.focus();
+        anychart.mapTextarea.select();
         anychart.mapTextarea.chart = this;
         if (goog.userAgent.GECKO) {
           var newScrollX = scrollEl.scrollLeft;
