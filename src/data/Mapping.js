@@ -214,7 +214,12 @@ anychart.data.Mapping.DEFAULT_MAPPING = {
   'category': [2],
 
   // water fall
-  'isTotal': [2]
+  'isTotal': [2],
+
+  // sankey diagram
+  'from': [0],
+  'to': [1],
+  'weight': [2, 'value', 'flow', 'weight']
 };
 
 

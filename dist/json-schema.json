@@ -70,6 +70,9 @@
             },
             {
               "$ref": "#/definitions/anychart.charts.Sunburst"
+            },
+            {
+              "$ref": "#/definitions/anychart.charts.Sankey"
             }
           ],
           "properties": {
@@ -1463,6 +1466,41 @@
         "center": {"$ref": "#/definitions/anychart.pieModule.Center"}
       },
       "required": ["type"]
+    },
+    "anychart.charts.Sankey": {
+      "type": "object",
+      "required": ["type"],
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.Chart"}
+      ],
+      "properties": {
+        "type": {"enum": ["sankey"]},
+        "nodeWidth": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "nodePadding": {
+          "type": "number"
+        },
+        "curveFactor": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "data": {"$ref": "#/definitions/data"},
+        "tooltip": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.Tooltip"}
+          ]
+        },
+        "palette": {"$ref": "#/definitions/palette"},
+        "node": {"$ref": "#/definitions/SankeyVisualElement"},
+        "flow": {"$ref": "#/definitions/SankeyVisualElement"},
+        "dropoff": {"$ref": "#/definitions/SankeyVisualElement"}
+      }
     },
     "anychart.charts.Bullet": {
       "type": "object",
@@ -6487,6 +6525,14 @@
         "height": {"type": "boolean"}
       },
       "items": {"type": "boolean"}
+    },
+
+    "SankeyVisualElement": {
+      "type": "object",
+      "properties": {
+        "normal": {"$ref": "#/definitions/anychart.core.StateSettings"},
+        "hovered": {"$ref": "#/definitions/anychart.core.StateSettings"}
+      }
     },
 
     "data": {

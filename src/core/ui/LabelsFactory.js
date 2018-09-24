@@ -2268,7 +2268,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.draw = function() {
   if (this.checkInvalidationState(anychart.ConsistencyState.ENABLED)) {
     if (!enabled) {
       if (this.layer_) this.layer_.parent(null);
-      this.markConsistent(anychart.ConsistencyState.ALL);
+      this.markConsistent(anychart.ConsistencyState.ENABLED);
       return this;
     } else {
       if (this.container() && !this.layer_.parent())

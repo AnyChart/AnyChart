@@ -157,6 +157,12 @@
         "gantt-base"
       ]
     },
+    "sankey": {
+      "entry": "anychart.sankeyModule.entry",
+      "deps": [
+        "core"
+      ]
+    },
     "scatter": {
       "entry": "anychart.scatterModule.entry",
       "deps": [
@@ -418,6 +424,13 @@
     },
     "theme-sunburst": {
       "entry": "anychart.sunburstModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-sankey": {
+      "entry": "anychart.sankeyModule.defaultTheme",
       "deps": [
         "core",
         "theme-core"
@@ -841,6 +854,17 @@
         "tree-data",
         "sunburst",
         "theme-sunburst"
+      ]
+    },
+    "anychart-sankey": {
+      "type": "chart-type",
+      "name": "Sankey",
+      "desc": "Sankey charts module.",
+      "docs": "https://docs.anychart.com/Basic_Charts/Sankey_Chart",
+      "icon": "/_design/img/upload/charts/types/sankey-chart.svg",
+      "parts": [
+        "sankey",
+        "theme-sankey"
       ]
     }
   },

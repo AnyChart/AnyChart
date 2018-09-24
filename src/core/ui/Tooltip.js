@@ -2055,6 +2055,7 @@ anychart.core.ui.Tooltip.prototype.parent = function(opt_value) {
         this.separator().parent(null);
         this.background().parent(null);
         this.padding().parent(null);
+        this.contentInternal().parent(null);
         this.contentInternal().padding().parent(null);
         delete this.parent_.childTooltipsMap[uid];
         this.parent_ = null;
@@ -2066,6 +2067,7 @@ anychart.core.ui.Tooltip.prototype.parent = function(opt_value) {
         this.separator().parent(this.parent_.separator());
         this.background().parent(this.parent_.background());
         this.padding().parent(this.parent_.padding());
+        this.contentInternal().parent(this.parent_.contentInternal());
         this.contentInternal().padding().parent(this.parent_.contentInternal().padding());
         this.parent_.childTooltipsMap[uid] = this;
         this.beforeUseHtmlHook();
@@ -2302,13 +2304,8 @@ anychart.core.ui.Tooltip.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.core.ui.Tooltip.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.ui.Tooltip.base(this, 'setupByJSON', config, opt_default);
-
-  if (opt_default) {
-    this.setThemeSettings(config);
-  } else {
-    anychart.core.settings.deserialize(this, this.TEXT_PROPERTY_DESCRIPTORS, config);
-    anychart.core.settings.deserialize(this, this.TOOLTIP_SIMPLE_DESCRIPTORS, config);
-  }
+  anychart.core.settings.deserialize(this, this.TEXT_PROPERTY_DESCRIPTORS, config, opt_default);
+  anychart.core.settings.deserialize(this, this.TOOLTIP_SIMPLE_DESCRIPTORS, config, opt_default);
 
   this.title().setupInternal(!!opt_default, config['title']);
   this.separator().setupInternal(!!opt_default, config['separator']);
