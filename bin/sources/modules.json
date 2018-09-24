@@ -512,6 +512,7 @@
       "docs": "https://docs.anychart.com/Working_with_Data/Data_Adapter/",
       "icon": "/_design/img/upload/charts/types/area-chart.svg",
       "parts": [
+        "exports",
         "data-adapter"
       ]
     },
