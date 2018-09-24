@@ -79,7 +79,7 @@ anychart.core.SeparateChart.prototype.legend = function(opt_value) {
   if (!this.legend_) {
     this.legend_ = new anychart.core.ui.Legend();
     this.registerDisposable(this.legend_);
-    this.legend_.listenSignals(this.onLegendSignal_, this);
+    this.legend_.listenSignals(this.onLegendSignal, this);
     this.legend_.setParentEventTarget(this);
   }
 
@@ -95,9 +95,9 @@ anychart.core.SeparateChart.prototype.legend = function(opt_value) {
 /**
  * Internal title invalidation handler.
  * @param {anychart.SignalEvent} event Event object.
- * @private
+ * @protected
  */
-anychart.core.SeparateChart.prototype.onLegendSignal_ = function(event) {
+anychart.core.SeparateChart.prototype.onLegendSignal = function(event) {
   var state = 0;
   var signal = 0;
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {

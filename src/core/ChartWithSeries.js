@@ -1192,6 +1192,24 @@ anychart.core.ChartWithSeries.prototype.resizeHandler = function(e) {
 };
 
 
+/** @inheritDoc */
+anychart.core.ChartWithSeries.prototype.onLegendSignal = function(e) {
+  if (e.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
+    this.invalidateState(anychart.enums.Store.SERIES_CHART, anychart.enums.State.DATA_AREA);
+  }
+  anychart.core.ChartWithSeries.base(this, 'onLegendSignal', e);
+};
+
+
+/** @inheritDoc */
+anychart.core.ChartWithSeries.prototype.onTitleSignal = function(e) {
+  if (e.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
+    this.invalidateState(anychart.enums.Store.SERIES_CHART, anychart.enums.State.DATA_AREA);
+  }
+  anychart.core.ChartWithSeries.base(this, 'onTitleSignal', e);
+};
+
+
 //endregion
 //region --- Legend
 //----------------------------------------------------------------------------------------------------------------------
