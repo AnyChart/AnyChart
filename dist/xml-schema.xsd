@@ -1552,7 +1552,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="title" type="core.Title"/>
         </xsd:all>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
-        <xsd:attribute name="width" type="xsd:double"/>
+        <xsd:attribute name="width" type="simple.NumberOrPercent"/>
         <xsd:attribute name="defaultWidth" type="xsd:double"/>
         <xsd:attribute name="collapse_expand_buttons" type="simple.Bool"/>
         <xsd:attribute name="depth_padding_multiplier" type="xsd:double"/>

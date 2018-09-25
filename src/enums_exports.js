@@ -215,7 +215,6 @@ goog.exportSymbol('anychart.enums.EventType.DRAG', anychart.enums.EventType.DRAG
 goog.exportSymbol('anychart.enums.EventType.DRAG_END', anychart.enums.EventType.DRAG_END);
 
 goog.exportSymbol('anychart.enums.EventType.SCROLL_CHANGE', anychart.enums.EventType.SCROLL_CHANGE);
-goog.exportSymbol('anychart.enums.EventType.SPLITTER_CHANGE', anychart.enums.EventType.SPLITTER_CHANGE);
 goog.exportSymbol('anychart.enums.EventType.SIGNAL', anychart.enums.EventType.SIGNAL);
 goog.exportSymbol('anychart.enums.EventType.ROW_SELECT', anychart.enums.EventType.ROW_SELECT);
 goog.exportSymbol('anychart.enums.EventType.ROW_CLICK', anychart.enums.EventType.ROW_CLICK);
