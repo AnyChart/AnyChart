@@ -539,6 +539,14 @@ anychart.ganttModule.Column.prototype.width = function(opt_value) {
 
 
 /**
+ * Resets pixel bounds cache.
+ */
+anychart.ganttModule.Column.prototype.resetBounds = function() {
+  this.pixelBoundsCache_ = null;
+};
+
+
+/**
  * Column default width.
  * @param {number=} opt_value - Default width value.
  * @return {(number|anychart.ganttModule.Column)} - Width or itself for method chaining.

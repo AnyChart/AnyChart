@@ -5340,7 +5340,12 @@
       "properties": {
         "labels": {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"},
         "title": {"$ref": "#/definitions/anychart.core.ui.Title"},
-        "width": {"type": "number"},
+        "width": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
         "buttonCursor": {"type": "string"},
         "defaultWidth": {"type": "number"},
         "collapseExpandButtons": {"type": "boolean"},
