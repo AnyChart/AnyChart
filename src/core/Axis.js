@@ -9,6 +9,7 @@ goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.LabelsFactory');
+goog.require('anychart.core.ui.Text');
 goog.require('anychart.core.ui.Title');
 goog.require('anychart.core.utils.Padding');
 goog.require('anychart.enums');
@@ -20,6 +21,7 @@ goog.require('anychart.scales.Linear');
 goog.require('anychart.scales.Ordinal');
 goog.require('anychart.scales.ScatterBase');
 goog.require('anychart.utils');
+goog.require('goog.math.Coordinate');
 //endregion
 
 
@@ -665,6 +667,7 @@ anychart.core.Axis.prototype.drawFirstLabel = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.drawFirstLabel_ != opt_value) {
       this.drawFirstLabel_ = opt_value;
+      this.dropBoundsCache();
       this.dropStaggeredLabelsCache_();
       this.invalidate(this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
@@ -683,6 +686,7 @@ anychart.core.Axis.prototype.drawLastLabel = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.drawLastLabel_ != opt_value) {
       this.drawLastLabel_ = opt_value;
+      this.dropBoundsCache();
       this.dropStaggeredLabelsCache_();
       this.invalidate(this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
@@ -805,16 +809,45 @@ anychart.core.Axis.prototype.dropOverlappedLabelsCache_ = function() {
  */
 anychart.core.Axis.prototype.getOverlappedLabels_ = function(opt_bounds) {
   if (!this.overlappedLabels_ || this.hasInvalidationState(anychart.ConsistencyState.AXIS_OVERLAP)) {
+    var scale = /** @type {anychart.scales.ScatterBase|anychart.scales.Ordinal} */(this.scale());
+    if (scale) {
+      var scaleTicksArr, ticksArrLen, labels, isLabels;
+      labels = /** @type {anychart.core.ui.LabelsFactory} */(this.labels());
+      isLabels = labels.enabled();
+      scaleTicksArr = scale.ticks().get();
+      ticksArrLen = scaleTicksArr.length;
+
+      if (isLabels) {
+        var i, j, len;
+        for (i = 0, len = ticksArrLen; i < len; i++) {
+          if ((i == 0 && this.drawFirstLabel()) || (i == ticksArrLen - 1 && this.drawLastLabel()) || (i > 0 && i < ticksArrLen - 1)) {
+            this.getLabel(i, true, scaleTicksArr, opt_bounds);
+          }
+        }
+      }
+
+      var scaleMinorTicksArr, minorTicksArrLen, minorLabels, isMinorLabels;
+      if (anychart.utils.instanceOf(scale, anychart.scales.ScatterBase)) {
+        minorLabels = /** @type {anychart.core.ui.LabelsFactory} */(this.minorLabels());
+        isMinorLabels = minorLabels.enabled();
+        scaleMinorTicksArr = scale.minorTicks().get();
+        minorTicksArrLen = scaleMinorTicksArr.length;
+
+        if (isMinorLabels) {
+          for (i = 0, len = minorTicksArrLen; i < len; i++) {
+            this.getLabel(i, false, scaleMinorTicksArr, opt_bounds);
+          }
+        }
+      }
+    }
+
     if (this.overlapMode_ == anychart.enums.LabelsOverlapMode.ALLOW_OVERLAP) {
-      return false;
+      return {labels: isLabels, minorLabels: isMinorLabels};
     } else {
-      var scale = /** @type {anychart.scales.ScatterBase|anychart.scales.Ordinal} */(this.scale());
       var overlappedLabels = [];
       var overlappedMinorLabels = [];
 
       if (scale) {
-        var i, j;
-
         /**
          * Index of previous major label which is displayed.
          * @type {number}
@@ -832,27 +865,18 @@ anychart.core.Axis.prototype.getOverlappedLabels_ = function(opt_bounds) {
          */
         var prevDrawableMinorLabel = -1;
 
-        var scaleTicksArr = scale.ticks().get();
-        var ticksArrLen = scaleTicksArr.length;
         var tickVal, ratio, bounds1, bounds2, bounds3, bounds4;
         var tempRatio;
         var k = -1;
-        var labels = /** @type {anychart.core.ui.LabelsFactory} */(this.labels());
         var labelsPosition = /** @type {anychart.enums.SidePosition} */(labels.getOption('position'));
-        var isLabels = labels.enabled();
-        var insideLabelSpace = this.insideBounds_ && anychart.utils.sidePositionToNumber(labelsPosition) < 0  ?
+        var insideLabelSpace = this.insideBounds_ && anychart.utils.sidePositionToNumber(labelsPosition) < 0 ?
             this.insideBounds_ : null;
         var isLabelInInsideSpace;
 
         if (anychart.utils.instanceOf(scale, anychart.scales.ScatterBase)) {
-          var scaleMinorTicksArr = scale.minorTicks().get();
           i = 0;
           j = 0;
-          var minorTicksArrLen = scaleMinorTicksArr.length;
           var minorTickVal, minorRatio;
-          var minorLabels = /** @type {anychart.core.ui.LabelsFactory} */(this.minorLabels());
-          var isMinorLabels = minorLabels.enabled();
-
           while (i < ticksArrLen || j < minorTicksArrLen) {
             tickVal = scaleTicksArr[i];
             minorTickVal = scaleMinorTicksArr[j];
@@ -902,7 +926,7 @@ anychart.core.Axis.prototype.getOverlappedLabels_ = function(opt_bounds) {
                 overlappedLabels.push(false);
               }
               i++;
-              if (ratio == minorRatio && (this.labels().enabled() || this.ticks().enabled())) {
+              if (ratio == minorRatio && (isLabels || this.ticks().enabled())) {
                 overlappedMinorLabels.push(false);
                 j++;
               }
@@ -1033,7 +1057,11 @@ anychart.core.Axis.prototype.applyStaggerMode_ = function(opt_bounds) {
     var staggeredLabels;
     var scaleTicksArr = scale.ticks().get();
     var ticksArrLen = scaleTicksArr.length;
-    var i, j, k, bounds1, bounds2, bounds3, states;
+    var j, k, bounds1, bounds2, bounds3, states;
+
+    for (var i = 0, len = ticksArrLen; i < len; i++) {
+      this.getLabel(i, true, scaleTicksArr, opt_bounds);
+    }
 
     var labelsPosition = /** @type {anychart.enums.SidePosition} */(labels.getOption('position'));
     var insideLabelSpace = this.insideBounds_ && anychart.utils.sidePositionToNumber(labelsPosition) < 0  ?
@@ -1176,6 +1204,82 @@ anychart.core.Axis.prototype.calcLabels_ = function(opt_bounds) {
 
 
 /**
+ * Returns label.
+ * @param {number} index
+ * @param {boolean} isMajor
+ * @param {Array.<number>} ticksArray
+ * @param {anychart.math.Rect=} opt_parentBounds
+ * @return {*}
+ */
+anychart.core.Axis.prototype.getLabel = function(index, isMajor, ticksArray, opt_parentBounds) {
+  if (!isMajor && this.scale() && !(anychart.utils.instanceOf(this.scale(), anychart.scales.ScatterBase)))
+    return null;
+
+  var labels = isMajor ? this.labels() : this.minorLabels();
+
+  var label = labels.getLabel(index);
+
+  if (!label) {
+    var bounds = goog.isDef(opt_parentBounds) ? opt_parentBounds : this.getPixelBounds();
+    var lineBounds = goog.isDef(opt_parentBounds) ? opt_parentBounds : this.line.getBounds();
+    var ticks = /** @type {!anychart.core.AxisTicks} */(isMajor ? this.ticks() : this.minorTicks());
+    var stroke = this.stroke();
+    var lineThickness = !stroke || anychart.utils.isNone(stroke) ? 0 : stroke['thickness'] ? parseFloat(this.stroke()['thickness']) : 1;
+
+    var x, y;
+    var scale = /** @type {anychart.scales.ScatterBase|anychart.scales.Ordinal} */(this.scale());
+
+    var value = ticksArray[index];
+    var ratio;
+    if (goog.isArray(value)) {
+      ratio = (scale.transform(value[0], 0) + scale.transform(value[1], 1)) / 2;
+      value = value[0];
+    } else {
+      ratio = scale.transform(value, .5);
+    }
+
+    if (ratio < 0 || ratio > 1) return [0, 0];
+
+    var labelPosition = /** @type {anychart.enums.SidePosition} */(labels.getOption('position'));
+    var side = anychart.utils.sidePositionToNumber(labelPosition);
+    var tickLength = anychart.utils.getAffectBoundsTickLength(ticks, side);
+
+    switch (this.orientation()) {
+      case anychart.enums.Orientation.TOP:
+        x = Math.round(bounds.left + ratio * bounds.width);
+        y = lineBounds.top - lineThickness / 2 - tickLength;
+        break;
+      case anychart.enums.Orientation.RIGHT:
+        x = lineBounds.getRight() + lineThickness / 2 + tickLength;
+        y = Math.round(bounds.getBottom() - ratio * bounds.height);
+        break;
+      case anychart.enums.Orientation.BOTTOM:
+        x = Math.round(bounds.left + ratio * bounds.width);
+        y = lineBounds.getBottom() + lineThickness / 2 + tickLength;
+        break;
+      case anychart.enums.Orientation.LEFT:
+        x = lineBounds.left - lineThickness / 2 - tickLength;
+        y = Math.round(bounds.getBottom() - ratio * bounds.height);
+        break;
+    }
+
+    var formatProvider = this.getLabelsFormatProvider(index, value);
+    var positionProvider = {'value': {'x': x, 'y': y}};
+
+    label = labels.add(formatProvider, positionProvider, index);
+    label.ownSettings.parentBounds = this.parentBounds();
+    label.setComplex(null);
+
+    label.stateOrder([label.ownSettings, labels.ownSettings, labels.themeSettings]);
+
+    label.firstDraw();
+  }
+
+  return label;
+};
+
+
+/**
  * Calculate label bounds.
  * @param {number} index Label index.
  * @param {boolean} isMajor Major labels or minor.
@@ -1185,7 +1289,7 @@ anychart.core.Axis.prototype.calcLabels_ = function(opt_bounds) {
  * @private
  */
 anychart.core.Axis.prototype.getLabelBounds_ = function(index, isMajor, ticksArray, opt_parentBounds) {
-  if (!isMajor && this.scale() && !(anychart.utils.instanceOf(this.scale(), anychart.scales.ScatterBase)))
+  if ((!isMajor && this.scale() && !(anychart.utils.instanceOf(this.scale(), anychart.scales.ScatterBase))) || index < 0)
     return null;
 
   var boundsCache = isMajor ? this.labelsBounds_ : this.minorLabelsBounds_;
@@ -1237,15 +1341,38 @@ anychart.core.Axis.prototype.getLabelBounds_ = function(index, isMajor, ticksArr
       break;
   }
 
-  var formatProvider = this.getLabelsFormatProvider(index, value);
   var positionProvider = {'value': {'x': x, 'y': y}};
 
-  var label = labels.add(formatProvider, positionProvider, index);
-  label.stateOrder([label.ownSettings, labels.ownSettings, labels.themeSettings]);
-  var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
-  label.parentBounds(parentBounds);
-  labels.parentBounds(parentBounds);
-  var labelBounds = labels.measure(label, undefined, undefined, index);
+  var label = this.getLabel(index, isMajor, ticksArray, opt_parentBounds);
+  label.positionProvider(positionProvider);
+
+  var labelBounds;
+  var isComplexLabel = label.isComplexText();
+  if (isComplexLabel) {
+    label.ownSettings.parentBounds = this.parentBounds();
+    label.stateOrder([label.ownSettings, labels.ownSettings, labels.themeSettings]);
+    labelBounds = labels.measure(label, undefined, undefined, index);
+  } else {
+    var textEl = label.getTextElement();
+
+    if (textEl.bounds) {
+      var measurementNode = acgraph.getRenderer().createMeasurement();
+      textEl.renderTo(measurementNode);
+      label.invalidate(anychart.ConsistencyState.CONTAINER);
+      textEl.dropBounds();
+      textEl.setPosition(0, 0);
+    }
+
+    labelBounds = textEl.getBounds();
+
+    var padding = label.getFinalSettings('padding');
+    if (padding && !goog.object.isEmpty(padding)) {
+      labelBounds = anychart.core.utils.Padding.widenBounds(labelBounds, padding);
+    }
+
+    labelBounds.left = x;
+    labelBounds.top = y;
+  }
 
   var labelsSidePosition = anychart.utils.sidePositionToNumber(labelPosition);
 
@@ -1264,7 +1391,68 @@ anychart.core.Axis.prototype.getLabelBounds_ = function(index, isMajor, ticksArr
       break;
   }
 
-  return boundsCache[index] = labelBounds.toCoordinateBox();
+  var coordBox;
+  if (isComplexLabel) {
+    coordBox = labelBounds.toCoordinateBox();
+  } else {
+    var mergedSettings = label.getMergedSettings();
+
+    var anchor = mergedSettings['anchor'] || anychart.enums.Anchor.LEFT_TOP;
+
+    var anchorCoordinate = anychart.utils.getCoordinateByAnchor(new anychart.math.Rect(0, 0, labelBounds.width, labelBounds.height), anchor);
+
+    labelBounds.left -= anchorCoordinate.x;
+    labelBounds.top -= anchorCoordinate.y;
+
+    anchorCoordinate = anychart.utils.getCoordinateByAnchor(/** @type {anychart.math.Rect} */(labelBounds), anchor);
+
+    var parentBounds = this.parentBounds();
+    var offsetX = mergedSettings['offsetX'];
+    var offsetY = mergedSettings['offsetY'];
+
+    var offsetXNormalized = goog.isDef(offsetX) ? anychart.utils.normalizeSize(/** @type {number|string} */(offsetX), parentBounds.width) : 0;
+    var offsetYNormalized = goog.isDef(offsetY) ? anychart.utils.normalizeSize(/** @type {number|string} */(offsetY), parentBounds.height) : 0;
+
+    var position = new goog.math.Coordinate(labelBounds.left, labelBounds.top);
+
+    anychart.utils.applyOffsetByAnchor(position, anchor, offsetXNormalized, offsetYNormalized);
+
+    labelBounds.left = position.x;
+    labelBounds.top = position.y;
+
+    coordBox = labelBounds.toCoordinateBox();
+
+    if (mergedSettings['rotation']) {
+      var tx = goog.math.AffineTransform.getRotateInstance(goog.math.toRadians(/** @type {number} */(mergedSettings['rotation'])),
+          anchorCoordinate.x, anchorCoordinate.y);
+
+      tx.transform(coordBox, 0, coordBox, 0, 4);
+    }
+
+    //  debug purpose
+    // var ___name = 'lbl_a' + index + ' ' + isMajor;
+    // if (!this[___name])
+    //   this[___name] = stage.circle(anchorCoordinate.x, anchorCoordinate.y, 2)
+    //     .fill('none').stroke('red').zIndex(1000);
+    // this[___name].center({x: anchorCoordinate.x, y: anchorCoordinate.y});
+    //
+    // var ___name = 'lbl_b' + index + ' ' + isMajor;
+    // if (!this[___name]) this[___name] = stage.rect().fill('none').stroke('red').zIndex(1000);
+    // this[___name].setBounds(labelBounds);
+    //
+  }
+
+  // var ___name = 'lbl' + index + ' ' + isMajor;
+  // if (!this[___name]) this[___name] = stage.path()
+  //   .fill('none').stroke('green').zIndex(1000);
+  // this[___name].clear()
+  //   .moveTo(coordBox[0], coordBox[1])
+  //   .lineTo(coordBox[2], coordBox[3])
+  //   .lineTo(coordBox[4], coordBox[5])
+  //   .lineTo(coordBox[6], coordBox[7])
+  //   .lineTo(coordBox[0], coordBox[1]);
+
+  return boundsCache[index] = coordBox;
 };
 
 

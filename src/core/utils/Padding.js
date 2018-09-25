@@ -27,8 +27,10 @@ goog.inherits(anychart.core.utils.Padding, anychart.core.utils.Space);
 anychart.core.utils.Padding.prototype.widenBounds = function(boundsRect) {
   var width = this.widenWidth(boundsRect.width);
   var height = this.widenHeight(boundsRect.height);
+
   var left = anychart.utils.normalizeSize(/** @type {number|string} */(this.getOption('left')), width);
   var top = anychart.utils.normalizeSize(/** @type {number|string} */(this.getOption('top')), height);
+
   return new anychart.math.Rect(
       boundsRect.left - left,
       boundsRect.top - top,
@@ -41,6 +43,55 @@ anychart.core.utils.Padding.prototype.widenBounds = function(boundsRect) {
 anychart.core.utils.Padding.prototype.widenHeight = function(initialHeight) {
   var top = /** @type {number|string} */(this.getOption('top'));
   var bottom = /** @type {number|string} */(this.getOption('bottom'));
+  return anychart.core.utils.Padding.widenHeight(initialHeight, top, bottom);
+};
+
+
+/** @inheritDoc */
+anychart.core.utils.Padding.prototype.widenWidth = function(initialWidth) {
+  var left = /** @type {number|string} */(this.getOption('left'));
+  var right = /** @type {number|string} */(this.getOption('right'));
+  return anychart.core.utils.Padding.widenWidth(initialWidth, left, right);
+};
+
+
+
+/**
+ * @param {anychart.math.Rect} bounds
+ * @param {Object} padding
+ * @return {*}
+ */
+anychart.core.utils.Padding.widenBounds = function(bounds, padding) {
+  var initialHeight = bounds.height;
+  var initialWidth = bounds.width;
+
+  var top = padding.top || 0;
+  var bottom = padding.bottom || 0;
+  var left = padding.left || 0;
+  var right = padding.right || 0;
+
+  var height = anychart.core.utils.Padding.widenHeight(initialHeight, top, bottom);
+  var width = anychart.core.utils.Padding.widenWidth(initialWidth, left, right);
+
+  left = anychart.utils.normalizeSize(/** @type {number|string} */(left), width);
+  top = anychart.utils.normalizeSize(/** @type {number|string} */(top), height);
+
+  return new anychart.math.Rect(
+      bounds.left - left,
+      bounds.top - top,
+      width,
+      height
+  );
+};
+
+
+/**
+ * @param {number} initialHeight
+ * @param {number|string} top
+ * @param {number|string} bottom
+ * @return {number}
+ */
+anychart.core.utils.Padding.widenHeight = function(initialHeight, top, bottom) {
   var ratio = 1;
   if (anychart.utils.isPercent(top))
     ratio -= parseFloat(top) / 100;
@@ -55,10 +106,13 @@ anychart.core.utils.Padding.prototype.widenHeight = function(initialHeight) {
 };
 
 
-/** @inheritDoc */
-anychart.core.utils.Padding.prototype.widenWidth = function(initialWidth) {
-  var left = /** @type {number|string} */(this.getOption('left'));
-  var right = /** @type {number|string} */(this.getOption('right'));
+/**
+ * @param {number} initialWidth
+ * @param {number|string} left
+ * @param {number|string} right
+ * @return {number}
+ */
+anychart.core.utils.Padding.widenWidth = function(initialWidth, left, right) {
   var ratio = 1;
   if (anychart.utils.isPercent(left))
     ratio -= parseFloat(left) / 100;

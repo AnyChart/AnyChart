@@ -2491,9 +2491,11 @@ anychart.core.ChartWithOrthogonalScales.prototype.setupElementsWithScales = func
     for (var i = 0; i < items.length; i++) {
       var json = items[i];
       var element = itemConstructor.call(this, i);
-      element.setup(json);
-      if (goog.isObject(json) && 'scale' in json && json['scale'] > this.defaultScalesLastIndex())
-        element.scale(scaleInstances[json['scale']]);
+      if (!goog.object.isEmpty(json)) {
+        element.setup(json);
+        if (goog.isObject(json) && 'scale' in json && json['scale'] > this.defaultScalesLastIndex())
+          element.scale(scaleInstances[json['scale']]);
+      }
     }
   }
 };

@@ -24,27 +24,27 @@ anychart.core.ui.Text.prototype.text = function(value) {
 
 
 /**
- * @param {number} opt_value
+ * @param {number=} opt_value
  * @return {number|anychart.core.ui.Text}
  */
 anychart.core.ui.Text.prototype.width = function(opt_value) {
-  return 0;
+  return this.bounds ? this.bounds.width : 0;
 };
 
 
 /**
  *
- * @param {number} opt_value
+ * @param {number=} opt_value
  * @return {number|anychart.core.ui.Text}
  */
 anychart.core.ui.Text.prototype.height = function(opt_value) {
-  return 0;
+  return this.bounds ? this.bounds.height : 0;
 };
 
 
 /**
  *
- * @param {acgraph.vector.Path} opt_value .
+ * @param {acgraph.vector.Path=} opt_value .
  * @return {acgraph.vector.Path|anychart.core.ui.Text}
  */
 anychart.core.ui.Text.prototype.path = function(opt_value) {
@@ -86,12 +86,12 @@ anychart.core.ui.Text.prototype.renderTo = function(element) {
 anychart.core.ui.Text.prototype.setPosition = function(x, y) {
   var dom = this.getDomElement();
 
-  if (x != this.x_ && goog.isDef(x)) {
+  if (goog.isDef(x) && x != this.x_) {
     this.x_ = x;
     dom.setAttribute('x', this.x_);
   }
 
-  if (y != this.y_ && goog.isDef(y)) {
+  if (goog.isDef(y) && y != this.y_) {
     this.y_ = y;
     dom.setAttribute('y', this.y_ + this.baseLine);
   }
@@ -188,4 +188,3 @@ anychart.core.ui.Text.prototype.dropBounds = function() {
   this.baseLine = 0;
   this.bounds = null;
 };
-

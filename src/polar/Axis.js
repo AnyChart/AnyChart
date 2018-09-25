@@ -9,6 +9,7 @@ goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.utils.Bounds');
+goog.require('anychart.core.utils.Padding');
 goog.require('anychart.enums');
 goog.require('anychart.format.Context');
 goog.require('anychart.math.Rect');
@@ -609,7 +610,7 @@ anychart.polarModule.Axis.prototype.calculateAxisBounds_ = function() {
               boundsCache[index] = points;
               radiusDelta = Math.max(boundsChecker.call(this, angle, dx, dy, points), radiusDelta);
             } else {
-              padding = label.getFinalSettings('padding');
+              padding = new anychart.core.utils.Padding().setup(label.getFinalSettings('padding'));
               labels.measureWithTransform(label);
               this.calcLabelTextPath(label, i, ticksArr);
 
@@ -949,14 +950,14 @@ anychart.polarModule.Axis.prototype.configureLabel_ = function(labels, index, ti
     if (hasFill) {
       pointState['adjustFontSize'] = false;
       dr = -(vAlign == acgraph.vector.Text.VAlign.MIDDLE ?
-          radiusDelta / 2 : vAlign == acgraph.vector.Text.VAlign.BOTTOM ? radiusDelta - padding.bottom() : padding.top());
+          radiusDelta / 2 : vAlign == acgraph.vector.Text.VAlign.BOTTOM ? radiusDelta - padding.bottom : padding.top);
     } else {
       labels.measureWithTransform(label);
       this.calcLabelTextPath(label, index, ticksArr, radius, angle);
       var height = label.getTextElement().getTextHeight();
 
       var dh = vAlign == acgraph.vector.Text.VAlign.MIDDLE ?
-          height / 2 + padding.bottom() : vAlign == acgraph.vector.Text.VAlign.BOTTOM ? padding.top() : height + padding.bottom();
+          height / 2 + padding.bottom : vAlign == acgraph.vector.Text.VAlign.BOTTOM ? padding.top : height + padding.bottom;
       dr = dh - radiusDelta;
     }
 
@@ -1094,7 +1095,7 @@ anychart.polarModule.Axis.prototype.calcLabelTextPath = function(label, index, t
   var scale = /** @type {anychart.scales.Ordinal|anychart.scales.ScatterBase} */(this.scale());
   var radius = goog.isDef(opt_radius) ? opt_radius : label.positionProvider()['value']['radius'];
   var angle = goog.isDef(opt_angle) ? opt_angle : label.positionProvider()['value']['angle'];
-  var padding = label.getFinalSettings('padding');
+  var padding = new anychart.core.utils.Padding().setup(label.getFinalSettings('padding'));
   var pxPerDegree = (2 * Math.PI * radius) / 360;
   var startAngle, endAngle;
 

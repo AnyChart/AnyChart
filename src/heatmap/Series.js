@@ -4,6 +4,7 @@ goog.require('anychart.color');
 goog.require('anychart.colorScalesModule');
 goog.require('anychart.core.series.Cartesian');
 goog.require('anychart.core.settings');
+goog.require('anychart.core.utils.Padding');
 goog.require('anychart.enums');
 goog.require('anychart.format.Context');
 goog.require('anychart.heatmapModule.Drawer');
@@ -94,7 +95,7 @@ anychart.heatmapModule.Series.prototype.calcMinFontSize_ = function(point, point
     if (needAdjust) {
       var width = /** @type {number} */(point.meta(prefix + 'Width'));
       var height = /** @type {number} */(point.meta(prefix + 'Height'));
-      var padding = mergedSettings['padding'];
+      var padding = new anychart.core.utils.Padding().setup(mergedSettings['padding']);
       width -= padding.getOption('left') + padding.getOption('right');
       height -= padding.getOption('top') + padding.getOption('bottom');
       var fontSize = label.calculateFontSize(
