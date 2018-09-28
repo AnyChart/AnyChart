@@ -161,7 +161,8 @@ anychart.pieModule.Chart = function(opt_data, opt_csvSettings) {
     ['outsideLabelsCriticalAngle', anychart.ConsistencyState.PIE_LABELS, anychart.Signal.NEEDS_REDRAW],
     ['forceHoverLabels', anychart.ConsistencyState.PIE_LABELS, anychart.Signal.NEEDS_REDRAW],
     ['connectorStroke', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
-    ['mode3d', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.PIE_LABELS, anychart.Signal.NEEDS_REDRAW]
+    ['mode3d', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.PIE_LABELS, anychart.Signal.NEEDS_REDRAW],
+    ['sliceDrawer', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW]
   ]);
 
   var normalDescriptorsMeta = {};
@@ -243,6 +244,24 @@ anychart.core.settings.populateAliases(anychart.pieModule.Chart, ['explode'], 's
 
 
 //region --- Static props
+/**
+ * @typedef {{
+ *   centerX: !number,
+ *   centerY: !number,
+ *   innerRadius: !number,
+ *   outerRadius: !number,
+ *   innerOutlineRadius: !number,
+ *   outerOutlineRadius: !number,
+ *   startAngle: !number,
+ *   sweepAngle: !number,
+ *   explodeX: !number,
+ *   explodeY: !number,
+ *   path: !acgraph.vector.Path
+ * }}
+ */
+anychart.pieModule.Chart.SliceDrawerContext;
+
+
 /**
  * @typedef {{
  *   index: number,
@@ -442,7 +461,8 @@ anychart.pieModule.Chart.PROPERTY_DESCRIPTORS = (function() {
         [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'outsideLabelsCriticalAngle', criticalAngleNormalizer],
         [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'forceHoverLabels', anychart.core.settings.asIsNormalizer],
         [anychart.enums.PropertyHandlerType.MULTI_ARG, 'connectorStroke', anychart.core.settings.strokeNormalizer],
-        [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'mode3d', anychart.core.settings.booleanNormalizer]
+        [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'mode3d', anychart.core.settings.booleanNormalizer],
+        [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'sliceDrawer', anychart.core.settings.functionNormalizer]
   ]);
   return map;
 })();
@@ -1325,7 +1345,7 @@ anychart.pieModule.Chart.prototype.createPositionProvider = function() {
       dR = anychart.utils.normalizeSize(insideLabelsOffset, radius) + this.innerRadiusValue_ + explode;
     }
 
-    return {'value': {'angle': angle, 'radius': dR}};
+    return {'value': {'angle': angle, 'radius': dR, 'outerRadius': this.radiusValue_, 'innerRadius': this.innerRadiusValue_}};
   }
 };
 
@@ -2679,6 +2699,21 @@ anychart.pieModule.Chart.prototype.drawSlice_ = function(pointState, opt_update)
     var outerSliceRadius = this.radiusValue_;
     var innerOutlineRadius = outerSliceRadius + outlineOffset;
     var outerOutlineRadius = outerSliceRadius + outlineOffset + outlineWidth;
+
+    var ctx = {
+      'centerX': this.cx,
+      'centerY': this.cy,
+      'innerRadius': this.innerRadiusValue_,
+      'outerRadius': outerSliceRadius,
+      'innerOutlineRadius': innerOutlineRadius,
+      'outerOutlineRadius': outerOutlineRadius,
+      'startAngle': start,
+      'sweepAngle': sweep,
+      'explodeX': ex,
+      'explodeY': ey,
+      'path': slice
+    };
+
     if (sliceOutline) {
       if (!outlineWidth) {
         sliceOutline.clear();
@@ -2686,7 +2721,12 @@ anychart.pieModule.Chart.prototype.drawSlice_ = function(pointState, opt_update)
         acgraph.vector.primitives.donut(sliceOutline, this.cx + ex, this.cy + ey, outerOutlineRadius, innerOutlineRadius, start, sweep);
       }
     }
-    slice = acgraph.vector.primitives.donut(slice, this.cx + ex, this.cy + ey, outerSliceRadius, this.innerRadiusValue_, start, sweep);
+    /**
+     * @type {function(this:anychart.pieModule.Chart.SliceDrawerContext, anychart.pieModule.Chart.SliceDrawerContext)}
+     */
+    var sliceDrawer = /** @type {function(this:anychart.pieModule.Chart.SliceDrawerContext, anychart.pieModule.Chart.SliceDrawerContext)} */ (this.getOption('sliceDrawer'));
+    sliceDrawer.call(ctx, ctx);
+    // slice = acgraph.vector.primitives.donut(slice, this.cx + ex, this.cy + ey, outerSliceRadius, this.innerRadiusValue_, start, sweep);
 
     slice.tag = {
       series: this,
@@ -5166,6 +5206,7 @@ anychart.pieModule.Chart.PieOutsideLabelsDomain.prototype.calculate = function()
   // proto['connectorStroke'] = proto.connectorStroke;//doc|ex
   // proto['mode3d'] = proto.mode3d;
   // proto['forceHoverLabels'] = proto.forceHoverLabels;
+  // proto['sliceDrawer'] = proto.sliceDrawer;
   //deprecated
   // proto['outsideLabelsSpace'] = proto.outsideLabelsSpace;//doc|ewx
   proto['explodeSlice'] = proto.explodeSlice;//doc|ex

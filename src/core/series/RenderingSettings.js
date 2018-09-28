@@ -98,7 +98,7 @@ anychart.core.series.RenderingSettings.prototype.SUPPORTED_SIGNALS =
  * @return {boolean}
  */
 anychart.core.series.RenderingSettings.prototype.needsCustomPointDrawer = function() {
-  return this.hasOwnOption('point');
+  return goog.isDefAndNotNull(this.getOption('point'));
 };
 
 
@@ -225,8 +225,10 @@ anychart.core.series.RenderingSettings.prototype.getShapesConfig = function() {
 
 /**
  * Resets rendering settings to default values.
+ * @param {!Object} config rendering config.
  */
-anychart.core.series.RenderingSettings.prototype.setDefaults = function() {
+anychart.core.series.RenderingSettings.prototype.setDefaults = function(config) {
+  this.themeSettings = config;
   this.themeSettings['needsZero'] = this.series_.check(anychart.core.drawers.Capabilities.NEEDS_ZERO);
   this.themeSettings['needsWidth'] = this.series_.check(anychart.core.drawers.Capabilities.IS_WIDTH_BASED);
   this.themeSettings['yValues'] = goog.array.slice(this.series_.drawer.getYValueNames(), 0);
@@ -240,47 +242,15 @@ anychart.core.series.RenderingSettings.prototype.setDefaults = function() {
 anychart.core.series.RenderingSettings.DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'start',
-      anychart.core.settings.functionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'point',
-      anychart.core.settings.functionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'updatePoint',
-      anychart.core.settings.functionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'finish',
-      anychart.core.settings.functionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'needsZero',
-      anychart.core.settings.booleanNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'needsWidth',
-      anychart.core.settings.booleanNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'yValues',
-      anychart.core.settings.arrayNormalizer);
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'start', anychart.core.settings.functionNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'point', anychart.core.settings.functionNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'updatePoint', anychart.core.settings.functionNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'finish', anychart.core.settings.functionNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'needsZero', anychart.core.settings.booleanNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'needsWidth', anychart.core.settings.booleanNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'yValues', anychart.core.settings.arrayNormalizer]
+  ]);
 
   return map;
 })();
@@ -318,9 +288,9 @@ anychart.core.series.RenderingSettings.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.series.RenderingSettings.prototype.setupByJSON = function(config) {
+anychart.core.series.RenderingSettings.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.series.RenderingSettings.base(this, 'setupByJSON', config);
-  anychart.core.settings.deserialize(this, anychart.core.series.RenderingSettings.DESCRIPTORS, config);
+  anychart.core.settings.deserialize(this, anychart.core.series.RenderingSettings.DESCRIPTORS, config, opt_default);
   var shapes = config['shapes'];
   if (goog.isDef(shapes))
     this.shapes(shapes);

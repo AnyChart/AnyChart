@@ -686,7 +686,7 @@ anychart.core.series.Base.prototype.applyConfig = function(config, opt_reapplyCl
   this.resumeSignalsDispatching(false);
   // here should markers/labels/errors/outliers setup be
 
-  this.renderingSettings_.setDefaults();
+  this.renderingSettings_.setDefaults(this.themeSettings['rendering'] || {});
 
   this.setupAutoZIndex();
 };

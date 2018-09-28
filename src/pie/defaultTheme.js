@@ -3,6 +3,20 @@ goog.provide('anychart.pieModule.defaultTheme');
 
 goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
   'pie': {
+    /**
+     * @this {anychart.pieModule.Chart.SliceDrawerContext}
+     * @param {anychart.pieModule.Chart.SliceDrawerContext} ctx Drawer context
+     */
+    'sliceDrawer': function(ctx) {
+      anychart.graphics['vector']['primitives']['donut'](
+          this['path'],
+          this['centerX'] + this['explodeX'],
+          this['centerY'] + this['explodeY'],
+          this['outerRadius'],
+          this['innerRadius'],
+          this['startAngle'],
+          this['sweepAngle']);
+    },
     'interactivity': {
       'multiSelectOnClick': true,
       'unselectOnClickOutOfPoint': false
