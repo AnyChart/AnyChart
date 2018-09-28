@@ -27,6 +27,8 @@ goog.require('anychart.format.Context');
 anychart.tagCloudModule.Chart = function(opt_data, opt_settings) {
   anychart.tagCloudModule.Chart.base(this, 'constructor');
 
+  this.addThemes('tagCloud');
+
   /**
    * @type {Array.<string>}
    */

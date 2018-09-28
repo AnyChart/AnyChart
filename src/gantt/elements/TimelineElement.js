@@ -636,6 +636,8 @@ anychart.ganttModule.elements.TimelineElement.prototype.labels = function(opt_va
   if (!this.labels_) {
     this.labels_ = new anychart.core.ui.LabelsFactory();
     this.labels_.listenSignals(this.labelsInvalidated_, this);
+
+    this.labels_.dropThemes();
   }
 
   if (goog.isDef(opt_value)) {
@@ -721,7 +723,7 @@ anychart.ganttModule.elements.TimelineElement.prototype.setupByJSON = function(c
  */
 anychart.ganttModule.elements.TimelineElement.prototype.serialize = function() {
   var json = anychart.ganttModule.elements.TimelineElement.base(this, 'serialize');
-  anychart.core.settings.serialize(this, anychart.ganttModule.elements.TimelineElement.DESCRIPTORS, json);
+  anychart.core.settings.serialize(this, anychart.ganttModule.elements.TimelineElement.DESCRIPTORS, json, void 0, void 0, true);
   json['labels'] = this.labels().serialize();
   json['rendering'] = this.rendering().serialize();
   json['normal'] = this.normal().serialize();

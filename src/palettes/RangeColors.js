@@ -320,18 +320,31 @@ anychart.palettes.RangeColors.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.palettes.RangeColors.prototype.setupSpecial = function(isDefault, var_args) {
-  var arg0 = arguments[1];
+anychart.palettes.RangeColors.prototype.resolveSpecialValue = function(var_args) {
+  var arg0 = arguments[0];
   if (goog.isArray(arg0)) {
-    this.items(arg0);
+    return {'items': arg0};
+  } else if (anychart.utils.instanceOf(arg0, anychart.palettes.RangeColors)) {
+    return {
+      'items': arg0.items(),
+      'count': arg0.count()
+    };
+  }
+  return null;
+};
+
+
+/** @inheritDoc */
+anychart.palettes.RangeColors.prototype.setupSpecial = function(isDefault, var_args) {
+  var resolvedValue = this.resolveSpecialValue(arguments[1]);
+  if (resolvedValue) {
+    this.items(/** @type {Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradientFill|acgraph.vector.RadialGradientFill|Array.<acgraph.vector.GradientKey>|Array.<string>} */(resolvedValue['items']));
+
+    if ('count' in resolvedValue)
+      this.count(/** @type {number} */(resolvedValue['count']));
     return true;
   }
-  if (anychart.utils.instanceOf(arg0, anychart.palettes.RangeColors)) {
-    this.items(/** @type {Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradientFill|acgraph.vector.RadialGradientFill|Array.<acgraph.vector.GradientKey>|Array.<string>} */(arg0.items()));
-    this.count(/** @type {number} */(arg0.count()));
-    return true;
-  }
-  return anychart.core.Base.prototype.setupSpecial.apply(this, arguments);
+  return false;
 };
 
 

@@ -19,6 +19,8 @@ goog.require('anychart.waterfallModule.Series');
 anychart.waterfallModule.Chart = function() {
   anychart.waterfallModule.Chart.base(this, 'constructor');
 
+  this.addThemes('waterfall');
+
   this.setType(anychart.enums.ChartTypes.WATERFALL);
 
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [

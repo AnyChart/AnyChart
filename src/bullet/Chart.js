@@ -29,6 +29,8 @@ goog.require('anychart.utils');
 anychart.bulletModule.Chart = function(opt_data, opt_csvSettings) {
   anychart.bulletModule.Chart.base(this, 'constructor');
 
+  this.addThemes('bullet');
+
   /**
    * @type {Array.<anychart.core.axisMarkers.Range>}
    * @private
@@ -80,34 +82,6 @@ anychart.bulletModule.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.BULLET_AXES_MARKERS |  // ranges
     anychart.ConsistencyState.BULLET_MARKERS |       // value markers
     anychart.ConsistencyState.BULLET_DATA;           // chart data
-
-
-/**
- * Getter/setter for range marker default settings.
- * @param {Object=} opt_value Object with range marker settings.
- * @return {Object}
- */
-anychart.bulletModule.Chart.prototype.defaultRangeSettings = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.defaultRangeSettings_ = opt_value;
-    return this;
-  }
-  return this.defaultRangeSettings_ || {};
-};
-
-
-/**
- * Getter/setter for marker default settings.
- * @param {Object=} opt_value Object with range marker settings.
- * @return {Object}
- */
-anychart.bulletModule.Chart.prototype.defaultMarkerSettings = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.defaultMarkerSettings_ = opt_value;
-    return this;
-  }
-  return this.defaultMarkerSettings_ || {};
-};
 
 
 /** @inheritDoc */
@@ -299,7 +273,7 @@ anychart.bulletModule.Chart.prototype.range = function(opt_indexOrValue, opt_val
   var range = this.ranges_[index];
   if (!range) {
     range = new anychart.core.axisMarkers.Range();
-    range.setup(this.defaultRangeSettings());
+    range.addThemes('bullet.defaultRangeMarkerSettings');
     this.ranges_[index] = range;
     this.registerDisposable(range);
     range.listenSignals(this.onRangeSignal_, this);
@@ -333,9 +307,11 @@ anychart.bulletModule.Chart.prototype.onRangeSignal_ = function(event) {
 anychart.bulletModule.Chart.prototype.rangePalette = function(opt_value) {
   if (!this.rangePalette_) {
     this.rangePalette_ = new anychart.palettes.DistinctColors();
-    this.rangePalette_.items(['#828282', '#a8a8a8', '#c2c2c2', '#d4d4d4', '#e1e1e1']);
     this.rangePalette_.listenSignals(this.onRangePaletteSignal_, this);
     this.registerDisposable(this.rangePalette_);
+
+    this.setupCreated('rangePalette', this.rangePalette_);
+    this.rangePalette_.restoreDefaults(false);
   }
 
   if (goog.isDef(opt_value)) {
@@ -367,9 +343,10 @@ anychart.bulletModule.Chart.prototype.onRangePaletteSignal_ = function(event) {
 anychart.bulletModule.Chart.prototype.markerPalette = function(opt_value) {
   if (!this.markerPalette_) {
     this.markerPalette_ = new anychart.palettes.Markers();
-    this.markerPalette_.items(['bar', 'line', 'x', 'ellipse']);
     this.markerPalette_.listenSignals(this.onPaletteSignal_, this);
     this.registerDisposable(this.markerPalette_);
+
+    this.setupCreated('markerPalette', this.markerPalette_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -412,10 +389,10 @@ anychart.bulletModule.Chart.prototype.calculate = function() {
     marker = this.markers_[i];
     if (goog.isDefAndNotNull(marker)) {
       marker.scale(scale);
-      if (marker.type() == anychart.enums.BulletMarkerType.BAR) {
+      if (marker.getOption('type') == anychart.enums.BulletMarkerType.BAR) {
         scale.extendDataRange(0);
       }
-      scale.extendDataRange(marker.value());
+      scale.extendDataRange(marker.getOption('value'));
     }
   }
 
@@ -423,8 +400,8 @@ anychart.bulletModule.Chart.prototype.calculate = function() {
     range = this.ranges_[i];
     if (goog.isDefAndNotNull(range)) {
       range.scale(scale);
-      scale.extendDataRange(range.from());
-      scale.extendDataRange(range.to());
+      scale.extendDataRange(range.getOption('from'));
+      scale.extendDataRange(range.getOption('to'));
     }
 
     if (scale.needsAutoCalc()) {
@@ -518,8 +495,8 @@ anychart.bulletModule.Chart.prototype.drawContent = function(bounds) {
       var marker = this.markers_[i];
       marker.suspendSignalsDispatching();
       marker.parentBounds(boundsWithoutAxis);
-      marker.setDefaultType(/** @type {anychart.enums.BulletMarkerType} */(this.markerPalette().itemAt(i)));
-      marker.setDefaultLayout(/** @type {anychart.enums.Layout} */(this.getOption('layout')));
+      marker['type'](/** @type {anychart.enums.BulletMarkerType} */(this.markerPalette().itemAt(i)));
+      marker['layout'](/** @type {anychart.enums.Layout} */(this.getOption('layout')));
       marker.draw();
       marker.resumeSignalsDispatching(false);
     }
@@ -559,6 +536,8 @@ anychart.bulletModule.Chart.prototype.createMarkers_ = function() {
 anychart.bulletModule.Chart.prototype.createMarker_ = function(iterator) {
   var index = iterator.getIndex();
   var marker = new anychart.bulletModule.Marker();
+  marker.addThemes('bullet.defaultMarkerSettings');
+
   marker.suspendSignalsDispatching();
   this.markers_[index] = marker;
   this.registerDisposable(marker);
@@ -568,18 +547,14 @@ anychart.bulletModule.Chart.prototype.createMarker_ = function(iterator) {
   marker.container(this.rootElement);
 
   //defaults
-  var settings = this.defaultMarkerSettings();
-  marker.zIndex(settings['zIndex']);
-  marker.setDefaultFill(settings['fill']);
-  marker.setDefaultStroke(settings['stroke']);
-  marker.setDefaultType(/** @type {anychart.enums.BulletMarkerType} */(this.markerPalette().itemAt(index)));
+  marker['type'](/** @type {anychart.enums.BulletMarkerType} */(this.markerPalette().itemAt(index)));
 
   //settings from data
-  marker.value(/** @type {string|number} */(iterator.get('value')));
-  marker.type(/** @type {string} */(iterator.get('type')));
+  marker['value'](/** @type {string|number} */(iterator.get('value')));
+  marker['type'](/** @type {string} */(iterator.get('type')));
   marker.gap(/** @type {string|number} */(iterator.get('gap')));
-  marker.fill(/** @type {acgraph.vector.Fill} */(iterator.get('fill')));
-  marker.stroke(/** @type {acgraph.vector.Stroke} */(iterator.get('stroke')));
+  marker['fill'](/** @type {acgraph.vector.Fill} */(iterator.get('fill')));
+  marker['stroke'](/** @type {acgraph.vector.Stroke} */(iterator.get('stroke')));
   marker.resumeSignalsDispatching(false);
   marker.listenSignals(this.markerInvalidated_, this);
 
@@ -752,16 +727,10 @@ anychart.bulletModule.Chart.prototype.serialize = function() {
 anychart.bulletModule.Chart.prototype.setupByJSON = function(config, opt_default) {
   anychart.bulletModule.Chart.base(this, 'setupByJSON', config, opt_default);
 
-  if ('defaultRangeMarkerSettings' in config)
-    this.defaultRangeSettings(config['defaultRangeMarkerSettings']);
-
-  if ('defaultMarkerSettings' in config)
-    this.defaultMarkerSettings(config['defaultMarkerSettings']);
-
   this.data(config['data']);
   anychart.core.settings.deserialize(this, anychart.bulletModule.Chart.PROPERTY_DESCRIPTORS, config);
-  this.rangePalette(config['rangePalette']);
-  this.markerPalette(config['markerPalette']);
+  this.rangePalette().setupInternal(!!opt_default, config['rangePalette']);
+  this.markerPalette().setupInternal(!!opt_default, config['markerPalette']);
 
   var scaleJson = config['scale'];
   var scale;

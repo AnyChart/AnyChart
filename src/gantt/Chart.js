@@ -27,6 +27,8 @@ goog.require('anychart.treeDataModule.utils');
 anychart.ganttModule.Chart = function(opt_isResourcesChart) {
   anychart.ganttModule.Chart.base(this, 'constructor');
 
+  this.addThemes('ganttBase');
+
   /**
    * Flag if chart must be created as resource chart.
    * NOTE: Can not be and must not be modified after initialization of chart.

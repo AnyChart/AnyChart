@@ -623,22 +623,35 @@ anychart.core.utils.Error.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.utils.Error.prototype.setupSpecial = function(isDefault, var_args) {
-  var arg0 = arguments[1];
+anychart.core.utils.Error.prototype.resolveSpecialValue = function(var_args) {
+  var arg0 = arguments[0];
   if (goog.isString(arg0) || goog.isNumber(arg0) || goog.isNull(arg0)) {
-    this.suspendSignalsDispatching();
-    this.xError(arg0);
-    this.valueError(arg0);
-    this.resumeSignalsDispatching(true);
-    return true;
+    return {'xError': arg0, 'valueError': arg0};
   } else if (goog.isBoolean(arg0)) {
-    if (arg0)
-      this.mode(anychart.enums.ErrorMode.BOTH);
-    else
-      this.mode(anychart.enums.ErrorMode.NONE);
+    return {'mode': arg0};
+  }
+  return null;
+};
+
+
+/** @inheritDoc */
+anychart.core.utils.Error.prototype.setupSpecial = function(isDefault, var_args) {
+  var resolvedValue = this.resolveSpecialValue(arguments[1]);
+  if (resolvedValue) {
+    if ('xError' in resolvedValue) {
+      this.suspendSignalsDispatching();
+      this.xError(resolvedValue['xError']);
+      this.valueError(resolvedValue['valueError']);
+      this.resumeSignalsDispatching(true);
+    } else if ('mode' in resolvedValue) {
+      if (resolvedValue['mode'])
+        this.mode(anychart.enums.ErrorMode.BOTH);
+      else
+        this.mode(anychart.enums.ErrorMode.NONE);
+    }
     return true;
   }
-  return anychart.core.Base.prototype.setupSpecial.apply(this, arguments);
+  return false;
 };
 
 

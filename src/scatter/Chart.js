@@ -15,6 +15,8 @@ goog.require('anychart.enums');
 anychart.scatterModule.Chart = function() {
   anychart.scatterModule.Chart.base(this, 'constructor', false);
 
+  this.addThemes('scatter');
+
   this.setOption('defaultSeriesType', anychart.enums.ScatterSeriesType.MARKER);
   this.setType(anychart.enums.ChartTypes.SCATTER);
 };

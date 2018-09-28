@@ -21,10 +21,15 @@ goog.require('anychart.cartesian3dModule.drawers.Column');
  */
 anychart.area3d = function(var_args) {
   var chart = new anychart.cartesian3dModule.Chart();
-
-  chart.setOption('defaultSeriesType', anychart.enums.CartesianSeriesType.AREA);
+  chart.addThemes('area3d');
   chart.setType(anychart.enums.ChartTypes.AREA_3D);
-  chart.setupInternal(true, anychart.getFullTheme('area3d'));
+  chart.setOption('defaultSeriesType', anychart.enums.CartesianSeriesType.AREA);
+
+  chart.setupStateSettings();
+  chart.setupAxes();
+
+  //chart.setupInternal(true, anychart.getFullTheme('area3d'));
+  chart.setupGrids();
 
   if (arguments.length)
     chart.addSeries.apply(chart, arguments);
@@ -45,10 +50,15 @@ anychart.chartTypesMap[anychart.enums.ChartTypes.AREA_3D] = anychart.area3d;
  */
 anychart.bar3d = function(var_args) {
   var chart = new anychart.cartesian3dModule.Chart();
-
-  chart.setOption('defaultSeriesType', anychart.enums.CartesianSeriesType.BAR);
+  chart.addThemes('bar', 'bar3d');
   chart.setType(anychart.enums.ChartTypes.BAR_3D);
-  chart.setupInternal(true, anychart.getFullTheme('bar3d'));
+  chart.setOption('defaultSeriesType', anychart.enums.CartesianSeriesType.BAR);
+
+  chart.setupStateSettings();
+  chart.setupAxes();
+
+  //chart.setupInternal(true, anychart.getFullTheme('bar3d'));
+  chart.setupGrids();
 
   if (arguments.length)
     chart.addSeries.apply(chart, arguments);
@@ -69,10 +79,15 @@ anychart.chartTypesMap[anychart.enums.ChartTypes.BAR_3D] = anychart.bar3d;
  */
 anychart.column3d = function(var_args) {
   var chart = new anychart.cartesian3dModule.Chart();
-
-  chart.setOption('defaultSeriesType', anychart.enums.CartesianSeriesType.COLUMN);
+  chart.addThemes('column', 'column3d');
   chart.setType(anychart.enums.ChartTypes.COLUMN_3D);
-  chart.setupInternal(true, anychart.getFullTheme('column3d'));
+  chart.setOption('defaultSeriesType', anychart.enums.CartesianSeriesType.COLUMN);
+
+  chart.setupStateSettings();
+  chart.setupAxes();
+
+  //chart.setupInternal(true, anychart.getFullTheme('column3d'));
+  chart.setupGrids();
 
   if (arguments.length)
     chart.addSeries.apply(chart, arguments);
@@ -93,10 +108,15 @@ anychart.chartTypesMap[anychart.enums.ChartTypes.COLUMN_3D] = anychart.column3d;
  */
 anychart.line3d = function(var_args) {
   var chart = new anychart.cartesian3dModule.Chart();
-
-  chart.setOption('defaultSeriesType', anychart.enums.CartesianSeriesType.LINE);
+  chart.addThemes('line3d');
   chart.setType(anychart.enums.ChartTypes.LINE_3D);
-  chart.setupInternal(true, anychart.getFullTheme('line3d'));
+  chart.setOption('defaultSeriesType', anychart.enums.CartesianSeriesType.LINE);
+
+  chart.setupStateSettings();
+  chart.setupAxes();
+
+  //chart.setupInternal(true, anychart.getFullTheme('line3d'));
+  chart.setupGrids();
 
   if (arguments.length)
     chart.addSeries.apply(chart, arguments);

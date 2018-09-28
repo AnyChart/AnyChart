@@ -36,6 +36,7 @@ goog.require('goog.events.MouseWheelHandler');
  */
 anychart.stockModule.Chart = function(opt_allowPointSettings) {
   anychart.stockModule.Chart.base(this, 'constructor');
+  this.dropThemes().addThemes('stock');
 
   /**
    * Chart plots array.
@@ -2000,6 +2001,7 @@ anychart.stockModule.Chart.prototype.eventMarkers = function(opt_value) {
     this.eventMarkers_ = new anychart.stockModule.eventMarkers.ChartController(this);
     this.eventMarkers_.setParentEventTarget(this);
     this.eventMarkers_.listenSignals(this.eventMarkersInvalidated_, this);
+    this.setupCreated('eventMarkers', this.eventMarkers_);
   }
 
   if (goog.isDef(opt_value)) {

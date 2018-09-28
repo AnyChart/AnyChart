@@ -118,7 +118,8 @@ anychart.core.utils.Interactivity.prototype.setupByJSON = function(config, opt_d
   //TODO(AntonKagakin): uncomment this line when zoom will be implemented in chart
   //TODO(AntonKagakin): and remove it from map and stock interactivity class
   //this.zoomOnMouseWheel(config['zoomOnMouseWheel']);
-  this.allowMultiSeriesSelection(config['allowMultiSeriesSelection']);
+  if ('allowMultiSeriesSelection' in config)
+    this.allowMultiSeriesSelection(config['allowMultiSeriesSelection']);
   this.parent_.resumeSignalsDispatching(true);
 };
 
@@ -134,7 +135,7 @@ anychart.core.utils.Interactivity.prototype.serialize = function() {
   //TODO(AntonKagakin): uncomment this line when zoom will be implemented in chart
   //TODO(AntonKagakin): and remove it from map and stock interactivity class
   //json['zoomOnMouseWheel'] = this.zoomOnMouseWheel();
-  json['allowMultiSeriesSelection'] = this.allowMultiSeriesSelection();
+  // json['allowMultiSeriesSelection'] = this.allowMultiSeriesSelection();
   return json;
 };
 

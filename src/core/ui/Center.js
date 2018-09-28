@@ -230,24 +230,14 @@ anychart.core.ui.Center.prototype.clearContent = function() {
 
 //endregion
 //region --- Setup and Dispose
-/**
- * Sets default settings.
- * @param {!Object} config
- */
-anychart.core.ui.Center.prototype.setThemeSettings = function(config) {
-  anychart.core.settings.copy(this.themeSettings, this.SIMPLE_PROPS_DESCRIPTORS, config);
-};
-
-
 /** @inheritDoc */
 anychart.core.ui.Center.prototype.setupByJSON = function(config, opt_default) {
-  if (opt_default) {
-    this.setThemeSettings(config);
-  } else {
-    anychart.core.settings.deserialize(this, this.SIMPLE_PROPS_DESCRIPTORS, config);
-  }
+  anychart.core.ui.Center.base(this, 'setupByJSON', config, opt_default);
 
-  this.content(config['content']);
+  anychart.core.settings.deserialize(this, this.SIMPLE_PROPS_DESCRIPTORS, config, opt_default);
+
+  if ('content' in config)
+    this.content(config['content']);
 };
 
 

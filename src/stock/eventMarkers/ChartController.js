@@ -272,6 +272,7 @@ anychart.stockModule.eventMarkers.ChartController.prototype.makeInteractivityMar
 anychart.stockModule.eventMarkers.ChartController.prototype.tooltip = function(opt_value) {
   if (!this.tooltip_) {
     this.tooltip_ = new anychart.core.ui.Tooltip(0);
+    this.setupCreated('tooltip', this.tooltip_);
   }
 
   if (goog.isDef(opt_value)) {

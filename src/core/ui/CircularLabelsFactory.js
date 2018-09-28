@@ -8,11 +8,13 @@ goog.require('anychart.math.Rect');
 
 
 /**
+ * @param {boolean=} opt_skipDefaultThemes
+ *
  * @constructor
  * @extends {anychart.core.ui.LabelsFactory}
  */
-anychart.core.ui.CircularLabelsFactory = function() {
-  anychart.core.ui.CircularLabelsFactory.base(this, 'constructor');
+anychart.core.ui.CircularLabelsFactory = function(opt_skipDefaultThemes) {
+  anychart.core.ui.CircularLabelsFactory.base(this, 'constructor', opt_skipDefaultThemes);
 
   if (!goog.array.contains(this.settingsFieldsForMerge, 'autoRotate'))
     this.settingsFieldsForMerge.push('autoRotate');

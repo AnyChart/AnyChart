@@ -26,8 +26,8 @@ goog.require('goog.array');
 anychart.core.ui.Background = function() {
   anychart.core.ui.Background.base(this, 'constructor');
 
-  delete this.themeSettings['enabled'];
-
+  this.addDefaultThemes(anychart.themes.DefaultThemes['background']);
+  
   /**
    * Parent.
    * @type {anychart.core.ui.Background}
@@ -201,7 +201,7 @@ anychart.core.ui.Background.prototype.corners = function(opt_value) {
     }
     return this;
   } else {
-    return /** @type {Array.<number|string>} */(this.getOption('corners'));
+    return this.cornersFormatter_(/** @type {Array.<number|string>} */(this.getOption('corners')));
   }
 };
 
@@ -393,10 +393,10 @@ anychart.core.ui.Background.prototype.draw = function() {
 
     var bounds = this.getBoundsForDrawing();
 
-    var leftTopCorner = this.getCornerSize_(0);
-    var rightTopCorner = this.getCornerSize_(1);
-    var rightBottomCorner = this.getCornerSize_(2);
-    var leftBottomCorner = this.getCornerSize_(3);
+    var leftTopCorner = this.getCornerSize_(0) || 0;
+    var rightTopCorner = this.getCornerSize_(1) || 0;
+    var rightBottomCorner = this.getCornerSize_(2) || 0;
+    var leftBottomCorner = this.getCornerSize_(3) || 0;
     var points;
 
     var currentPath, sideIndex;
@@ -628,21 +628,13 @@ anychart.core.ui.Background.prototype.getRemainingBounds = function() {
 
 //endregion
 //region -- Serialize, deserialize, dispose
-/**
- * Sets default settings.
- * @param {!Object} config
- */
-anychart.core.ui.Background.prototype.setThemeSettings = function(config) {
-  anychart.core.settings.copy(this.themeSettings, this.SIMPLE_PROPS_DESCRIPTORS, config);
-  if ('corners' in config) this.themeSettings['corners'] = this.cornersFormatter_(config['corners']);
-};
 
 
 /** @inheritDoc */
 anychart.core.ui.Background.prototype.serialize = function() {
   var json = anychart.core.ui.Background.base(this, 'serialize');
 
-  anychart.core.settings.serialize(this, this.SIMPLE_PROPS_DESCRIPTORS, json, 'Background');
+  anychart.core.settings.serialize(this, this.SIMPLE_PROPS_DESCRIPTORS, json, 'Background', void 0, true);
 
   var corners = /** @type {Array} */(this.getOwnOption('corners'));
   if (corners) {
@@ -663,24 +655,46 @@ anychart.core.ui.Background.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.ui.Background.prototype.setupSpecial = function(isDefault, var_args) {
-  var arg0 = arguments[1];
+anychart.core.ui.Background.prototype.resolveSpecialValue = function(var_args) {
+  var result = null;
+  var arg0 = arguments[0];
   if (goog.isString(arg0)) {
-    if (isDefault) {
-      this.themeSettings['fill'] = arg0;
-      this.themeSettings['stroke'] = null;
-      this.themeSettings['enabled'] = true;
-    } else {
-      this['fill'](arg0);
-      this['stroke'](null);
-      this.enabled(true);
-    }
-    return true;
+    result = {
+      'fill': arg0,
+      'stroke': null,
+      'enabled': true
+    };
   } else if (goog.isBoolean(arg0) || goog.isNull(arg0)) {
-    if (isDefault)
-      this.themeSettings['enabled'] = !!arg0;
-    else
-      this.enabled(!!arg0);
+    result = {'enabled': !!arg0};
+  }
+  return result;
+};
+
+
+/** @inheritDoc */
+anychart.core.ui.Background.prototype.setupSpecial = function(isDefault, var_args) {
+  var resolvedValue = this.resolveSpecialValue(arguments[1]);
+  if (resolvedValue) {
+    if (isDefault) {
+      if ('fill' in resolvedValue)
+        this.themeSettings['fill'] = resolvedValue['fill'];
+
+      if ('stroke' in resolvedValue)
+        this.themeSettings['stroke'] = resolvedValue['stroke'];
+
+      if ('enabled' in resolvedValue)
+        this.themeSettings['enabled'] = resolvedValue['enabled'];
+
+    } else {
+      if ('fill' in resolvedValue)
+        this['fill'](resolvedValue['fill']);
+
+      if ('stroke' in resolvedValue)
+        this['stroke'](resolvedValue['stroke']);
+
+      if ('enabled' in resolvedValue)
+        this.enabled(resolvedValue['enabled']);
+    }
     return true;
   }
   return false;
@@ -691,38 +705,27 @@ anychart.core.ui.Background.prototype.setupSpecial = function(isDefault, var_arg
 anychart.core.ui.Background.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.ui.Background.base(this, 'setupByJSON', config, opt_default);
 
+  anychart.core.settings.deserialize(this, this.SIMPLE_PROPS_DESCRIPTORS, config, opt_default);
+
   if (opt_default) {
-    this.setThemeSettings(config);
-  } else {
-    anychart.core.settings.deserialize(this, this.SIMPLE_PROPS_DESCRIPTORS, config);
-    this.corners(config['corners']);
-  }
+    if ('corners' in config)
+      this.themeSettings['corners'] = this.cornersFormatter_(config['corners']);
+  } else
+      this.corners(config['corners']);
 };
 
 
 /** @inheritDoc */
 anychart.core.ui.Background.prototype.disposeInternal = function() {
-  if (this.strokePath_) {
-    goog.dispose(this.strokePath_);
-    this.strokePath_ = null;
-  }
+  goog.disposeAll(
+      this.strokePath_,
+      this.strokePaths_,
+      this.fillPath_
+  );
 
-  if (this.strokePaths_) {
-    goog.disposeAll(this.strokePaths_);
-    this.strokePaths_ = null;
-  }
-
-  if (this.fillPath_) {
-    goog.dispose(this.fillPath_);
-    this.fillPath_ = null;
-  }
-
-  // delete this.fill_;
-  // delete this.stroke_;
-  // delete this.cornerType_;
-  // if (this.corners_)
-  //   this.corners_.length = 0;
-  // delete this.corners_;
+  this.strokePath_ = null;
+  this.strokePaths_ = null;
+  this.fillPath_ = null;
 
   anychart.core.ui.Background.base(this, 'disposeInternal');
 };

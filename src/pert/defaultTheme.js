@@ -188,10 +188,18 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
 
     'criticalPath': {
       'tasks': {
+        'tooltip': {
+          'title': {'background': null}
+        },
         'color': '#e06666',
         'normal': {
           'lowerLabels': {},
           'upperLabels': {}
+        }
+      },
+      'milestones': {
+        'tooltip': {
+          'title': {'background': null}
         }
       }
     }

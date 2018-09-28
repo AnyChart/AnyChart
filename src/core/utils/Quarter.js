@@ -15,6 +15,8 @@ goog.require('anychart.core.utils.Padding');
 anychart.core.utils.Quarter = function() {
   anychart.core.utils.Quarter.base(this, 'constructor');
 
+  this.addThemes('chart.defaultQuarterSettings');
+
   /**
    * Quarter title.
    * @type {anychart.core.ui.Title}
@@ -81,6 +83,7 @@ anychart.core.utils.Quarter.prototype.title = function(opt_value) {
     this.title_ = new anychart.core.ui.Title();
     this.title_.setParentEventTarget(this);
     this.title_.listenSignals(this.titleInvalidated_, this);
+    this.setupCreated('title', this.title_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -126,6 +129,7 @@ anychart.core.utils.Quarter.prototype.margin = function(opt_spaceOrTopOrTopAndBo
   if (!this.margin_) {
     this.margin_ = new anychart.core.utils.Margin();
     this.margin_.listenSignals(this.marginInvalidated_, this);
+    this.setupCreated('margin', this.margin_);
   }
 
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
@@ -162,6 +166,7 @@ anychart.core.utils.Quarter.prototype.padding = function(opt_spaceOrTopOrTopAndB
   if (!this.padding_) {
     this.padding_ = new anychart.core.utils.Padding();
     this.padding_.listenSignals(this.paddingInvalidated_, this);
+    this.setupCreated('padding', this.padding_);
   }
 
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
@@ -186,20 +191,6 @@ anychart.core.utils.Quarter.prototype.paddingInvalidated_ = function(event) {
 
 
 /**
- * Getter/setter for quarter label default settings.
- * @param {Object=} opt_value Object with label settings.
- * @return {Object}
- */
-anychart.core.utils.Quarter.prototype.defaultLabelSettings = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.defaultLabelSettings_ = opt_value;
-    return this;
-  }
-  return this.defaultLabelSettings_ || {};
-};
-
-
-/**
  * Getter/setter for label.
  * @param {(null|boolean|Object|string|number)=} opt_indexOrValue Chart label instance to add.
  * @param {(null|boolean|Object|string)=} opt_value Chart label instance.
@@ -218,7 +209,7 @@ anychart.core.utils.Quarter.prototype.label = function(opt_indexOrValue, opt_val
   if (!label) {
     label = new anychart.core.ui.Label();
     label.setParentEventTarget(this);
-    label.setup(this.defaultLabelSettings());
+    label.addThemes('defaultLabelSettings', 'chart.defaultQuarterSettings.defaultLabelSettings');
     this.labels_[index] = label;
     label.listenSignals(this.labelInvalidated_, this);
     this.invalidate(anychart.ConsistencyState.QUARTER_LABELS, anychart.Signal.NEEDS_REDRAW);
@@ -264,13 +255,15 @@ anychart.core.utils.Quarter.prototype.draw = function() {
   anychart.core.utils.Quarter.base(this, 'draw');
 
   if (this.hasInvalidationState(anychart.ConsistencyState.QUARTER_TITLE)) {
-    var title = this.title();
-    title.suspendSignalsDispatching();
-    title.container(this.rootElement);
-    title.zIndex(this.TITLE_ZINDEX);
-    title.parentBounds(this.getPixelBounds());
-    title.resumeSignalsDispatching(false);
-    title.draw();
+    var title = this.getCreated('title');
+    if (title) {
+      title.suspendSignalsDispatching();
+      title.container(this.rootElement);
+      title.zIndex(this.TITLE_ZINDEX);
+      title.parentBounds(this.getPixelBounds());
+      title.resumeSignalsDispatching(false);
+      title.draw();
+    }
     this.markConsistent(anychart.ConsistencyState.QUARTER_TITLE);
   }
 
@@ -299,7 +292,10 @@ anychart.core.utils.Quarter.prototype.draw = function() {
 /** @inheritDoc */
 anychart.core.utils.Quarter.prototype.serialize = function() {
   var json = anychart.core.utils.Quarter.base(this, 'serialize');
-  json['title'] = this.title().serialize();
+  var title = this.getCreated('title');
+  if (title) {
+    json['title'] = title.serialize();
+  }
   json['margin'] = this.margin().serialize();
   json['padding'] = this.padding().serialize();
   var labels = [];
@@ -316,9 +312,6 @@ anychart.core.utils.Quarter.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.core.utils.Quarter.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.utils.Quarter.base(this, 'setupByJSON', config, opt_default);
-
-  if ('defaultLabelSettings' in config)
-    this.defaultLabelSettings(config['defaultLabelSettings']);
 
   if ('title' in config)
     this.title().setupInternal(!!opt_default, config['title']);

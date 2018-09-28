@@ -24,13 +24,20 @@ goog.require('goog.math.Coordinate');
 /**
  * Class for creation of sets of similar labels and management of such sets.
  * Any individual label can be changed after all labels are displayed.
+ *
+ * @param {boolean=} opt_skipDefaultThemes
+ *
  * @constructor
  * @extends {anychart.core.VisualBase}
  * @implements {anychart.core.IStandaloneBackend}
  */
-anychart.core.ui.LabelsFactory = function() {
+anychart.core.ui.LabelsFactory = function(opt_skipDefaultThemes) {
   this.suspendSignalsDispatching();
   anychart.core.ui.LabelsFactory.base(this, 'constructor');
+
+  if (!opt_skipDefaultThemes)
+    this.addDefaultThemes(anychart.themes.DefaultThemes['labelsFactory']);
+
   delete this.themeSettings['enabled'];
 
   /**
@@ -330,6 +337,8 @@ anychart.core.ui.LabelsFactory.prototype.background = function(opt_value) {
     this.background_ = new anychart.core.ui.Background();
     this.background_.markConsistent(anychart.ConsistencyState.ALL);
     this.background_.listenSignals(this.backgroundInvalidated_, this);
+
+    this.setupCreated('background', this.background_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -368,6 +377,8 @@ anychart.core.ui.LabelsFactory.prototype.padding = function(opt_spaceOrTopOrTopA
   if (!this.padding_) {
     this.padding_ = new anychart.core.utils.Padding();
     this.padding_.listenSignals(this.paddingInvalidated_, this);
+
+    this.setupCreated('padding', this.padding_);
   }
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
     this.padding_.setup.apply(this.padding_, arguments);
@@ -905,8 +916,10 @@ anychart.core.ui.LabelsFactory.prototype.getDimension = function(formatProviderO
     measureLabel.applyTextSettings.call(this, textElement, false);
     measureLabel.applyTextSettings(textElement, false);
   }
-  if (!(anychart.utils.instanceOf(padding, anychart.core.utils.Padding)))
+  if (!(anychart.utils.instanceOf(padding, anychart.core.utils.Padding))) {
     padding = new anychart.core.utils.Padding(/** @type {(string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})} */(padding));
+    this.setupCreated('padding', padding);
+  }
 
   //we should ask text element about bounds only after text format and text settings are applied
 
@@ -1161,8 +1174,8 @@ anychart.core.ui.LabelsFactory.prototype.serialize = function() {
   if (!(adjustFontSize && (goog.isDef(adjustFontSize['width']) || goog.isDef(adjustFontSize['height']))))
     delete json['adjustFontSize'];
 
-  anychart.core.settings.serialize(this, this.TEXT_DESCRIPTORS, json, 'Labels factory label text');
-  anychart.core.settings.serialize(this, this.SIMPLE_PROPS_DESCRIPTORS, json, 'Labels factory label props');
+  anychart.core.settings.serialize(this, this.TEXT_DESCRIPTORS, json, 'Labels factory label text', void 0, true);
+  anychart.core.settings.serialize(this, this.SIMPLE_PROPS_DESCRIPTORS, json, 'Labels factory label props', void 0, true);
 
   return json;
 };
@@ -1603,7 +1616,6 @@ anychart.core.ui.LabelsFactory.Label.prototype.background = function(opt_value) 
   var makeDefault = goog.isNull(opt_value);
   if (!makeDefault && !this.background_) {
     this.background_ = new anychart.core.ui.Background();
-    this.background_.setup(anychart.getFullTheme('standalones.labelsFactory.background'));
     this.background_.listenSignals(this.backgroundInvalidated_, this);
   }
 
@@ -1915,7 +1927,10 @@ anychart.core.ui.LabelsFactory.Label.prototype.getFinalSettings = function(value
     });
     return {width: adjustByWidth, height: adjustByHeight};
   } else {
-    return this.resolveSetting_(value);
+    var result = this.resolveSetting_(value);
+    if (value == 'background' && !goog.isDef(result))
+      result = null;
+    return result;
   }
 };
 
@@ -2008,6 +2023,8 @@ anychart.core.ui.LabelsFactory.Label.defaultSettingsProcessor_ = function(state,
   } else if (goog.typeOf(settings) == 'object') {
     if (field == 'adjustFontSize') {
       setting = anychart.core.ui.LabelsFactory.Label.normalizeAdjustFontSize(settings[field]);
+    } else if (field == 'padding' && goog.isNumber(settings[field])) {
+      setting = anychart.core.utils.Space.normalizeSpace(settings[field]);
     } else {
       setting = settings[field];
       if (field == 'enabled' && goog.isNull(setting))

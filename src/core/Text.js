@@ -267,8 +267,9 @@ anychart.core.Text.prototype.textSettings = function(opt_objectOrName, opt_value
   }
   var newMap = {};
   for (var name in anychart.core.Text.BASE_DESCRIPTORS) {
-    if (goog.isDef(this.ownSettings[name])) {
-      newMap[name] = this.ownSettings[name];
+    var val = this.getOption(name);
+    if (goog.isDef(val)) {
+      newMap[name] = val;
     }
   }
   return newMap;

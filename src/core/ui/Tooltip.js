@@ -33,6 +33,8 @@ goog.require('goog.object');
 anychart.core.ui.Tooltip = function(capability) {
   anychart.core.ui.Tooltip.base(this, 'constructor');
 
+  this.addThemes(anychart.themes.DefaultThemes['tooltip']);
+
   delete this.themeSettings['enabled'];
 
   /**
@@ -65,7 +67,7 @@ anychart.core.ui.Tooltip = function(capability) {
    * @type {number}
    * @private
    */
-  this.hideDelay_;
+  this.hideDelay_ = 0;
 
   /**
    * Root layer.
@@ -423,7 +425,8 @@ anychart.core.ui.Tooltip.prototype.padding = function(opt_spaceOrTopOrTopAndBott
   if (!this.padding_) {
     this.padding_ = new anychart.core.utils.Padding();
     this.padding_.listenSignals(this.onPaddingSignal_, this);
-    this.registerDisposable(this.padding_);
+
+    this.setupCreated('padding', this.padding_);
   }
 
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
@@ -458,7 +461,8 @@ anychart.core.ui.Tooltip.prototype.background = function(opt_value) {
     this.background_ = new anychart.core.ui.Background();
     this.background_.listenSignals(this.backgroundInvalidated_, this);
     this.background_.setParentEventTarget(this);
-    this.registerDisposable(this.background_);
+
+    this.setupCreated('background', this.background_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -492,7 +496,7 @@ anychart.core.ui.Tooltip.prototype.title = function(opt_value) {
     this.title_ = new anychart.core.ui.Title();
     this.title_.listenSignals(this.onTitleSignal_, this);
     this.title_.setParentEventTarget(this);
-    this.registerDisposable(this.title_);
+    this.setupCreated('title', this.title_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -529,7 +533,8 @@ anychart.core.ui.Tooltip.prototype.separator = function(opt_value) {
     this.separator_ = new anychart.core.ui.Separator();
     this.separator_.listenSignals(this.onSeparatorSignal_, this);
     this.separator_.setParentEventTarget(this);
-    this.registerDisposable(this.separator_);
+
+    this.setupCreated('separator', this.separator_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -1247,6 +1252,8 @@ anychart.core.ui.Tooltip.prototype.contentInternal = function(opt_value) {
     //TODO (A.Kudryavtsev): Can't avoid it because width_ and height_ values are hardcoded in LabelsBase.
     this.content_.width('100%').height('100%');
     this.registerDisposable(this.content_);
+
+    this.setupCreated('contentInternal', this.content_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -2063,9 +2070,9 @@ anychart.core.ui.Tooltip.prototype.parent = function(opt_value) {
         if (this.parent_)
           this.parent_.unlistenSignals(this.parentInvalidated_, this);
         this.parent_ = opt_value;
-        this.title().parent(this.parent_.title());
-        this.separator().parent(this.parent_.separator());
-        this.background().parent(this.parent_.background());
+        this.title().dropThemes().parent(this.parent_.title());
+        this.separator().dropThemes().parent(this.parent_.separator());
+        this.background().dropThemes().parent(this.parent_.background());
         this.padding().parent(this.parent_.padding());
         this.contentInternal().parent(this.parent_.contentInternal());
         this.contentInternal().padding().parent(this.parent_.contentInternal().padding());
@@ -2272,8 +2279,8 @@ anychart.core.ui.Tooltip.prototype.setThemeSettings = function(config) {
 anychart.core.ui.Tooltip.prototype.serialize = function() {
   var json = anychart.core.ui.Tooltip.base(this, 'serialize');
 
-  anychart.core.settings.serialize(this, this.TEXT_PROPERTY_DESCRIPTORS, json);
-  anychart.core.settings.serialize(this, this.TOOLTIP_SIMPLE_DESCRIPTORS, json);
+  anychart.core.settings.serialize(this, this.TEXT_PROPERTY_DESCRIPTORS, json, void 0, void 0, true);
+  anychart.core.settings.serialize(this, this.TOOLTIP_SIMPLE_DESCRIPTORS, json, void 0, void 0, true);
 
   delete json['x'];
   delete json['y'];
@@ -2294,7 +2301,7 @@ anychart.core.ui.Tooltip.prototype.serialize = function() {
   if (!goog.object.isEmpty(paddingConfig))
     json['padding'] = paddingConfig;
 
-  if (goog.isDef(this.hideDelay_))
+  if (this.hideDelay_) //Zero value is default, we don't need to save it.
     json['hideDelay'] = this.hideDelay_;
 
   return json;
@@ -2304,6 +2311,7 @@ anychart.core.ui.Tooltip.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.core.ui.Tooltip.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.ui.Tooltip.base(this, 'setupByJSON', config, opt_default);
+
   anychart.core.settings.deserialize(this, this.TEXT_PROPERTY_DESCRIPTORS, config, opt_default);
   anychart.core.settings.deserialize(this, this.TOOLTIP_SIMPLE_DESCRIPTORS, config, opt_default);
 

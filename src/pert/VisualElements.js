@@ -57,10 +57,15 @@ anychart.pertModule.VisualElements = function() {
     ['labels', 0, 0]
   ]);
   this.normal_ = new anychart.core.StateSettings(this, descriptorsMap, anychart.PointState.NORMAL);
+  this.normal_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR,  anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME);
   this.normal_.setOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK, this.labelsAfterInitCallback);
+
   this.hovered_ = new anychart.core.StateSettings(this, descriptorsMap, anychart.PointState.HOVER);
+  this.hovered_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR,  anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME);
   this.hovered_.setOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK, this.labelsAfterInitCallback);
+
   this.selected_ = new anychart.core.StateSettings(this, descriptorsMap, anychart.PointState.SELECT);
+  this.selected_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR,  anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME);
   this.selected_.setOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK, this.labelsAfterInitCallback);
 };
 goog.inherits(anychart.pertModule.VisualElements, anychart.core.Base);
@@ -178,6 +183,7 @@ anychart.pertModule.VisualElements.prototype.parent = function(opt_value) {
         if (this.parent_)
           this.parent_.unlistenSignals(this.parentInvalidated_, this);
         this.parent_ = opt_value;
+        this.tooltip().dropThemes().parent(this.parent_.tooltip());
         this.parent_.listenSignals(this.parentInvalidated_, this);
       }
     }
@@ -330,7 +336,7 @@ anychart.pertModule.VisualElements.prototype.labelsInvalidated = function(event)
 anychart.pertModule.VisualElements.prototype.tooltip = function(opt_value) {
   if (!this.tooltip_) {
     this.tooltip_ = new anychart.core.ui.Tooltip(0);
-    this.registerDisposable(this.tooltip_);
+    this.setupCreated('tooltip', this.tooltip_);
     this.tooltip_.listenSignals(this.onTooltipSignal_, this);
   }
   if (goog.isDef(opt_value)) {
@@ -457,7 +463,6 @@ anychart.pertModule.VisualElements.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.pertModule.VisualElements.prototype.setupByJSON = function(config, opt_default) {
   anychart.pertModule.VisualElements.base(this, 'setupByJSON', config, opt_default);
-
   anychart.core.settings.deserialize(this, anychart.pertModule.VisualElements.PROPERTY_DESCRIPTORS, config);
 
   this.normal_.setupInternal(!!opt_default, config);
@@ -467,6 +472,13 @@ anychart.pertModule.VisualElements.prototype.setupByJSON = function(config, opt_
 
   if ('tooltip' in config)
     this.tooltip().setupInternal(!!opt_default, config['tooltip']);
+};
+
+
+/** @inheritDoc */
+anychart.pertModule.VisualElements.prototype.disposeInternal = function() {
+  goog.disposeAll(this.tooltip_);
+  anychart.pertModule.VisualElements.base(this, 'disposeInternal');
 };
 
 (function() {

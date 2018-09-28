@@ -16,6 +16,7 @@ goog.require('anychart.ganttModule.Splitter');
  */
 anychart.ganttProject = function() {
   var chart = new anychart.ganttModule.Chart(false);
+  chart.addThemes('ganttProject');
   chart.setupInternal(true, anychart.getFullTheme('ganttProject'));
 
   return chart;
@@ -28,6 +29,7 @@ anychart.ganttProject = function() {
  */
 anychart.ganttResource = function() {
   var chart = new anychart.ganttModule.Chart(true);
+  chart.addThemes('ganttResource');
   chart.setupInternal(true, anychart.getFullTheme('ganttResource'));
 
   return chart;

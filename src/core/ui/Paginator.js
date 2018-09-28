@@ -19,6 +19,8 @@ goog.require('anychart.math.Rect');
 anychart.core.ui.Paginator = function() {
   anychart.core.ui.Paginator.base(this, 'constructor');
 
+  this.addThemes(anychart.themes.DefaultThemes['paginator']);
+
   /**
    * TODO(AntonKagakin): make it able to set?
    * Spacing between text and buttons.
@@ -97,26 +99,27 @@ anychart.core.ui.Paginator = function() {
   this.previousButton_.padding(null);
   this.previousButton_.enabled(true);
   this.previousButton_.setOnClickListener(goog.bind(anychart.core.ui.Paginator.onClick_, this));
-  this.registerDisposable(this.previousButton_);
   this.previousButton_.listenSignals(anychart.core.ui.Paginator.buttonInvalidated_, this.previousButton_);
 
   this.nextButton_ = new anychart.core.ui.PaginatorButton();
   this.nextButton_.padding(null);
   this.nextButton_.enabled(true);
   this.nextButton_.setOnClickListener(goog.bind(anychart.core.ui.Paginator.onClick_, this));
-  this.registerDisposable(this.nextButton_);
   this.nextButton_.listenSignals(anychart.core.ui.Paginator.buttonInvalidated_, this.nextButton_);
 
   //TODO(AntonKagakin): create customDrawers flag, to avoid custom layout drawing bug.
+  var self = this;
   var layoutBeforeInvalidationHook = function() {
     if (this.getOption('layout') == anychart.enums.Layout.HORIZONTAL) {
-      this.previousButton_.buttonDrawer(anychart.core.ui.Paginator.LEFT_ARROW_DRAWER_);
-      this.nextButton_.buttonDrawer(anychart.core.ui.Paginator.RIGHT_ARROW_DRAWER_);
+      self.previousButton_.buttonDrawer(anychart.core.ui.Paginator.LEFT_ARROW_DRAWER_);
+      self.nextButton_.buttonDrawer(anychart.core.ui.Paginator.RIGHT_ARROW_DRAWER_);
     } else {
-      this.previousButton_.buttonDrawer(anychart.core.ui.Paginator.UP_ARROW_DRAWER_);
-      this.nextButton_.buttonDrawer(anychart.core.ui.Paginator.DOWN_ARROW_DRAWER_);
+      self.previousButton_.buttonDrawer(anychart.core.ui.Paginator.UP_ARROW_DRAWER_);
+      self.nextButton_.buttonDrawer(anychart.core.ui.Paginator.DOWN_ARROW_DRAWER_);
     }
   };
+  this.previousButton_.buttonDrawer(anychart.core.ui.Paginator.LEFT_ARROW_DRAWER_);
+  this.nextButton_.buttonDrawer(anychart.core.ui.Paginator.RIGHT_ARROW_DRAWER_);
 
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['text', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
@@ -175,8 +178,9 @@ anychart.core.ui.Paginator.prototype.SUPPORTED_CONSISTENCY_STATES =
 anychart.core.ui.Paginator.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.padding_) {
     this.padding_ = new anychart.core.utils.Padding();
-    this.registerDisposable(this.padding_);
     this.padding_.listenSignals(this.boundsInvalidated_, this);
+
+    this.setupCreated('padding', this.padding_);
   }
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
     this.padding_.setup.apply(this.padding_, arguments);
@@ -198,8 +202,9 @@ anychart.core.ui.Paginator.prototype.padding = function(opt_spaceOrTopOrTopAndBo
 anychart.core.ui.Paginator.prototype.margin = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.margin_) {
     this.margin_ = new anychart.core.utils.Margin();
-    this.registerDisposable(this.margin_);
     this.margin_.listenSignals(this.boundsInvalidated_, this);
+
+    this.setupCreated('margin', this.margin_);
   }
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
     this.margin_.setup.apply(this.margin_, arguments);
@@ -230,8 +235,9 @@ anychart.core.ui.Paginator.prototype.boundsInvalidated_ = function(event) {
 anychart.core.ui.Paginator.prototype.background = function(opt_value) {
   if (!this.background_) {
     this.background_ = new anychart.core.ui.Background();
-    this.registerDisposable(this.background_);
     this.background_.listenSignals(this.backgroundInvalidated_, this);
+
+    this.setupCreated('background', this.background_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -335,7 +341,10 @@ anychart.core.ui.Paginator.prototype.createTextString_ = function() {
  * @inheritDoc
  */
 anychart.core.ui.Paginator.prototype.remove = function() {
-  this.background().remove();
+  var background = this.getCreated('background');
+  if (background)
+    background.remove();
+
   if (this.previousButton_) {
     this.previousButton_.remove();
     this.previousButton_.invalidate(anychart.ConsistencyState.CONTAINER);
@@ -417,17 +426,20 @@ anychart.core.ui.Paginator.prototype.draw = function() {
   if (isInitial = !this.text_) {
     this.text_ = acgraph.text();
     this.text_.attr('aria-hidden', 'true');
-    this.registerDisposable(this.text_);
   }
 
-  this.background().suspendSignalsDispatching();
+  var background = this.getCreated('backgrouns');
+  if (background)
+    background.suspendSignalsDispatching();
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     this.calculatePaginatorBounds_();
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
-    this.background().container(container).draw();
+    if (background)
+      background.container(container).draw();
+
     if (this.previousButton_) this.previousButton_.container(container);
     if (this.text_) this.text_.parent(container);
     if (this.nextButton_) this.nextButton_.container(container);
@@ -435,14 +447,17 @@ anychart.core.ui.Paginator.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.PAGINATOR_BACKGROUND)) {
-    this.background_.parentBounds(this.actualLeft_, this.actualTop_, this.backgroundWidth_, this.backgroundHeight_);
-    this.background_.draw();
+    if (background) {
+      background.parentBounds(this.actualLeft_, this.actualTop_, this.backgroundWidth_, this.backgroundHeight_);
+      background.draw();
+    }
     this.markConsistent(anychart.ConsistencyState.PAGINATOR_BACKGROUND);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
     var zIndex = /** @type {number} */ (this.zIndex());
-    if (this.background_) this.background_.zIndex(zIndex);
+    if (background)
+      background.zIndex(zIndex);
     if (this.previousButton_) this.previousButton_.zIndex(zIndex);
     if (this.text_) this.text_.zIndex(zIndex);
     if (this.nextButton_) this.nextButton_.zIndex(zIndex);
@@ -518,7 +533,8 @@ anychart.core.ui.Paginator.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 
-  this.background().resumeSignalsDispatching(false);
+  if (background)
+    background.resumeSignalsDispatching(false);
 
   if (manualSuspend) stage.resume();
   return this;
@@ -867,16 +883,38 @@ anychart.core.ui.Paginator.prototype.setupByJSON = function(config, opt_default)
   anychart.core.ui.Paginator.base(this, 'setupByJSON', config, opt_default);
 
   anychart.core.settings.deserialize(this, anychart.core.ui.Paginator.PROPERTY_DESCRIPTORS, config, opt_default);
-  if ('background' in config)
-    this.background(config['background']);
 
   if ('padding' in config)
-    this.padding(config['padding']);
+    this.padding().setupInternal(!!opt_default, config['padding']);
 
   if ('margin' in config)
-    this.margin(config['margin']);
+    this.margin().setupInternal(!!opt_default, config['margin']);
+
+  if ('background' in config)
+    this.background().setupInternal(!!opt_default, config['background']);
 };
 
+
+/** @inheritDoc */
+anychart.core.ui.Paginator.prototype.disposeInternal = function() {
+  goog.disposeAll(
+      this.previousButton_,
+      this.nextButton_,
+      this.padding_,
+      this.margin_,
+      this.background_,
+      this.text_
+  );
+
+  this.previousButton_ = null;
+  this.nextButton_ = null;
+  this.padding_ = null;
+  this.margin_ = null;
+  this.background_ = null;
+  this.text_ = null;
+
+  anychart.core.ui.Paginator.base(this, 'disposeInternal');
+};
 
 //proto['pageCount'] = proto.pageCount;
 //proto['draw'] = proto.draw;

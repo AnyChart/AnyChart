@@ -12,17 +12,15 @@ goog.require('goog.array');
 anychart.palettes.HatchFills = function() {
   anychart.palettes.HatchFills.base(this, 'constructor');
 
+  this.addThemes('hatchFillPalette');
+
   /**
    * HatchFills palette.
    * @type {Array.<acgraph.vector.HatchFill|acgraph.vector.PatternFill>}
    * @private
    */
-  this.hatchFills_ = [];
+  this.hatchFills_;
 
-  // Initialize default marker palette using all marker types framework supports.
-  // for (var key in acgraph.vector.HatchFill.HatchFillType) {
-  //   this.hatchFills_.push(acgraph.vector.normalizeHatchFill(acgraph.vector.HatchFill.HatchFillType[key]));
-  // }
 };
 goog.inherits(anychart.palettes.HatchFills, anychart.core.Base);
 
@@ -45,20 +43,20 @@ anychart.palettes.HatchFills.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS
  * @return {acgraph.vector.HatchFill|acgraph.vector.PatternFill|anychart.palettes.HatchFills} HatchFill by index or self for chaining.
  */
 anychart.palettes.HatchFills.prototype.itemAt = function(index, opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
-  if (!this.hatchFills_) this.hatchFills_ = [];
+  var hatchFillsList = this.items();
 
-  var count = this.hatchFills_.length;
+  var count = hatchFillsList.length;
 
   if (index >= count && count > 0) index = index % count;
 
   // work as setter
   if (goog.isDef(opt_patternFillOrTypeOrState)) {
-    this.hatchFills_[index] = acgraph.vector.normalizeHatchFill.apply(null, goog.array.slice(arguments, 1));
+    hatchFillsList[index] = acgraph.vector.normalizeHatchFill.apply(null, goog.array.slice(arguments, 1));
     this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
     return this;
     // work as getter
   } else {
-    return this.hatchFills_[index] || null;
+    return hatchFillsList[index] || null;
   }
 };
 
@@ -70,6 +68,18 @@ anychart.palettes.HatchFills.prototype.itemAt = function(index, opt_patternFillO
  * @return {Array.<acgraph.vector.HatchFill|acgraph.vector.HatchFill.HatchFillType|acgraph.vector.PatternFill>|anychart.palettes.HatchFills} HatchFills list or self for method chaining.
  */
 anychart.palettes.HatchFills.prototype.items = function(opt_hatchFills, var_args) {
+  if (!this.hatchFills_) {
+    this.hatchFills_ = [];
+    if (goog.isDef(this.themeSettings['items'])) {
+      for (var i = 0; i < this.themeSettings['items'].length; i++) {
+        this.hatchFills_.push(this.themeSettings['items'][i]);
+      }
+    } else { // Initialize default marker palette using all marker types framework supports.
+      for (var key in acgraph.vector.HatchFill.HatchFillType) {
+        this.hatchFills_.push(acgraph.vector.HatchFill.HatchFillType[key]);
+      }
+    }
+  }
   if (goog.isDef(opt_hatchFills)) {
     if (!goog.isArray(opt_hatchFills)) {
       opt_hatchFills = goog.array.slice(arguments, 0);
@@ -91,8 +101,9 @@ anychart.palettes.HatchFills.prototype.items = function(opt_hatchFills, var_args
 anychart.palettes.HatchFills.prototype.serialize = function() {
   var json = anychart.palettes.HatchFills.base(this, 'serialize');
   var res = [];
-  for (var i = 0; i < this.hatchFills_.length; i++) {
-    res.push(anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.hatchFills_[i])));
+  var hatchFills = this.items();
+  for (var i = 0; i < hatchFills.length; i++) {
+    res.push(anychart.color.serialize(/** @type {acgraph.vector.Fill} */(hatchFills[i])));
   }
   json['items'] = res;
   return json;
@@ -100,17 +111,25 @@ anychart.palettes.HatchFills.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.palettes.HatchFills.prototype.setupSpecial = function(isDefault, var_args) {
-  var arg0 = arguments[1];
+anychart.palettes.HatchFills.prototype.resolveSpecialValue = function(var_args) {
+  var arg0 = arguments[0];
   if (goog.isArray(arg0)) {
-    this.items(arg0);
+    return {'items': arg0};
+  } else if (anychart.utils.instanceOf(arg0, anychart.palettes.HatchFills)) {
+    return {'items': arg0.items()};
+  }
+  return null;
+};
+
+
+/** @inheritDoc */
+anychart.palettes.HatchFills.prototype.setupSpecial = function(isDefault, var_args) {
+  var resolvedValue = this.resolveSpecialValue(arguments[1]);
+  if (resolvedValue) {
+    this.items(/** @type {Array.<acgraph.vector.HatchFill|acgraph.vector.HatchFill.HatchFillType|acgraph.vector.PatternFill>} */(resolvedValue['items']));
     return true;
   }
-  if (anychart.utils.instanceOf(arg0, anychart.palettes.HatchFills)) {
-    this.items(/** @type {Array.<acgraph.vector.HatchFill|acgraph.vector.HatchFill.HatchFillType|acgraph.vector.PatternFill>} */(arg0.items()));
-    return true;
-  }
-  return anychart.core.Base.prototype.setupSpecial.apply(this, arguments);
+  return false;
 };
 
 

@@ -27,6 +27,8 @@ goog.require('anychart.themes.merging');
 anychart.heatmapModule.Chart = function(opt_data, opt_csvSettings) {
   anychart.heatmapModule.Chart.base(this, 'constructor', false);
 
+  this.addThemes('heatMap');
+
   /**
    * Zoom settings.
    * @type {anychart.core.utils.OrdinalZoom}
@@ -37,17 +39,12 @@ anychart.heatmapModule.Chart = function(opt_data, opt_csvSettings) {
   this.setType(anychart.enums.ChartTypes.HEAT_MAP);
   this.setOption('defaultSeriesType', anychart.enums.HeatMapSeriesType.HEAT_MAP);
 
-  var config = anychart.getFullTheme('heatMap');
-  this.defaultSeriesSettings({
-    'heatMap': anychart.themes.merging.getThemePart(config, 'defaultSeriesSettings.base')
-  });
-
   /**
    * Series instance.
    * @type {anychart.heatmapModule.Series}
    * @private
    */
-  this.series_ = /** @type {anychart.heatmapModule.Series} */(this.createSeriesByType('', opt_data || null, opt_csvSettings));
+  this.series_ = /** @type {anychart.heatmapModule.Series} */(this.createSeriesByType(/** @type {string} */ (this.getOption('defaultSeriesType')), opt_data || null, opt_csvSettings));
 
   /**
    * @this {anychart.heatmapModule.Chart}
@@ -234,6 +231,8 @@ anychart.heatmapModule.Chart.prototype.yScroller = function(opt_value) {
         anychart.ConsistencyState.HEATMAP_Y_SCROLLER |
         anychart.ConsistencyState.BOUNDS,
         anychart.Signal.NEEDS_REDRAW);
+
+    this.setupCreated('yScroller', this.yScroller_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -798,25 +797,34 @@ anychart.heatmapModule.Chart.prototype.serialize = function() {
 };
 
 
-/** @inheritDoc */
-anychart.heatmapModule.Chart.prototype.setupByJSONWithScales = function(config, scalesInstances, opt_default) {
+/**
+ * @param {Object|string} config
+ * @param {Object} scalesInstances
+ * Setup colorScale for heatMap
+ */
+anychart.heatmapModule.Chart.prototype.setupColorScale = function(config, scalesInstances) {
   var scale;
-  var json = config['colorScale'];
-  if (goog.isNumber(json)) {
-    scale = scalesInstances[json];
-  } else if (goog.isString(json)) {
-    scale = anychart.scales.Base.fromString(json, null);
+  if (goog.isNumber(config)) {
+    scale = scalesInstances[config];
+  } else if (goog.isString(config)) {
+    scale = anychart.scales.Base.fromString(config, null);
     if (!scale)
-      scale = scalesInstances[json];
-  } else if (goog.isObject(json)) {
-    scale = anychart.scales.Base.fromString(json['type'], null);
+      scale = scalesInstances[config];
+  } else if (goog.isObject(config)) {
+    scale = anychart.scales.Base.fromString(config['type'], null);
     if (scale)
-      scale.setup(json);
+      scale.setup(config);
   } else {
     scale = null;
   }
   if (scale)
     this.colorScale(/** @type {anychart.colorScalesModule.Ordinal} */(scale));
+};
+
+
+/** @inheritDoc */
+anychart.heatmapModule.Chart.prototype.setupByJSONWithScales = function(config, scalesInstances, opt_default) {
+  this.setupColorScale(config['colorScale'], scalesInstances);
 
   anychart.heatmapModule.Chart.base(this, 'setupByJSONWithScales', config, scalesInstances, opt_default);
 

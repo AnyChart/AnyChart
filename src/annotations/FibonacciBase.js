@@ -446,7 +446,7 @@ anychart.annotationsModule.FibonacciBase.prototype.drawLabel = function(index, m
 /** @inheritDoc */
 anychart.annotationsModule.FibonacciBase.prototype.setDefaultSettings = function(value) {
   anychart.annotationsModule.FibonacciBase.base(this, 'setDefaultSettings', value);
-  this.levels(value['levels']);
+  this.levels(/** @type {Array<*>} */(this.getOption('levels')));
 };
 
 

@@ -18,6 +18,8 @@ goog.require('anychart.scales.Ordinal');
 anychart.paretoModule.Chart = function() {
   anychart.paretoModule.Chart.base(this, 'constructor');
 
+  this.addThemes('pareto');
+
   /**
    * Percent scale.
    * @type {anychart.scales.Linear}
@@ -671,6 +673,15 @@ anychart.paretoModule.Chart.prototype.serialize = function() {
   if (goog.isDef(this.data()))
     json['chart']['data'] = this.data().serialize();
   return json;
+};
+
+
+/**
+ * Setup axes and set percent scale to second y axis
+ */
+anychart.paretoModule.Chart.prototype.setupAxes = function() {
+  anychart.paretoModule.Chart.base(this, 'setupAxes');
+  this.yAxis(1).scale(this.percentScale);
 };
 
 

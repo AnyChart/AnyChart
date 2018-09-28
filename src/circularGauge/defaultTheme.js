@@ -12,11 +12,13 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       'startAngle': null,
       'labels': {
         'position': 'inside',
-        'adjustFontSize': true
+        'adjustFontSize': true,
+        'offsetY': 0
       },
       'minorLabels': {
         'position': 'inside',
-        'adjustFontSize': true
+        'adjustFontSize': true,
+        'offsetY': 0
       },
       'fill': anychart.core.defaultTheme.colorStrokeNormal,
       'ticks': {

@@ -1873,6 +1873,8 @@ anychart.ganttModule.TimeLine.prototype.labels = function(opt_value) {
     this.labelsFactory_ = new anychart.core.ui.LabelsFactory();
     this.labelsFactory_.setParentEventTarget(this);
     this.labelsFactory_.listenSignals(this.labelsInvalidated_, this);
+
+    this.labelsFactory_.dropThemes();
   }
 
   if (goog.isDef(opt_value)) {

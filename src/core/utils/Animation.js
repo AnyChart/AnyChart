@@ -63,22 +63,34 @@ anychart.core.utils.Animation.prototype.setupByJSON = function(json, opt_default
 
 
 /** @inheritDoc */
-anychart.core.utils.Animation.prototype.setupSpecial = function(isDefault, var_args) {
-  var arg0 = arguments[1];
+anychart.core.utils.Animation.prototype.resolveSpecialValue = function(var_args) {
+  var arg0 = arguments[0];
+  var result = null;
   if (goog.isBoolean(arg0) || goog.isNull(arg0)) {
-    this['enabled'](!!arg0);
+    result = {'enabled': !!arg0};
+
     var arg1 = arguments[2];
-    if (goog.isDef(arg1)) this['duration'](arg1);
+    if (goog.isDef(arg1))
+      result['duration'] = arg1;
+
+  } else if (!isNaN(+arg0)) {
+    result = {'enabled': true, 'duration': +arg0};
+  }
+  return result;
+};
+
+
+/** @inheritDoc */
+anychart.core.utils.Animation.prototype.setupSpecial = function(isDefault, var_args) {
+  var resolvedValue = this.resolveSpecialValue(arguments[1]);
+  if (resolvedValue) {
+    if ('enabled' in resolvedValue)
+      this['enabled'](resolvedValue['enabled']);
+    if ('duration' in resolvedValue)
+      this['duration'](resolvedValue['duration']);
     return true;
   }
-
-  if (!isNaN(+arg0)) {
-    this['enabled'](true);
-    this['duration'](+arg0);
-    return true;
-  }
-
-  return anychart.core.Base.prototype.setupSpecial.apply(this, arguments);
+  return false;
 };
 
 

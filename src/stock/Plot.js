@@ -2170,7 +2170,7 @@ anychart.stockModule.Plot.prototype.ensureBoundsDistributed_ = function() {
       if (axis) {
         axis.suspendSignalsDispatching();
         var width = axis.width();
-        if (axis.orientation() == anychart.enums.Orientation.LEFT) {
+        if (axis.getOption('orientation') == anychart.enums.Orientation.LEFT) {
           if (legendNotEnabled || !leftSide) {
             axis.parentBounds(/** @type {number} */(seriesBounds.left - width - leftPadding), seriesBounds.top, 0, seriesBounds.height);
             leftPadding += width;
@@ -2178,7 +2178,7 @@ anychart.stockModule.Plot.prototype.ensureBoundsDistributed_ = function() {
             axis.parentBounds(seriesBounds);
             seriesBounds = axis.getRemainingBounds();
           }
-        } else if (axis.orientation() == anychart.enums.Orientation.RIGHT) {
+        } else if (axis.getOption('orientation') == anychart.enums.Orientation.RIGHT) {
           if (legendNotEnabled || !rightSide) {
             rightPadding += width;
             axis.parentBounds(seriesBounds.left, seriesBounds.top, /** @type {number} */(seriesBounds.width + rightPadding), seriesBounds.height);
@@ -2186,7 +2186,6 @@ anychart.stockModule.Plot.prototype.ensureBoundsDistributed_ = function() {
             axis.parentBounds(seriesBounds);
             seriesBounds = axis.getRemainingBounds();
           }
-
         }
         axis.resumeSignalsDispatching(false);
       }
@@ -3135,7 +3134,7 @@ anychart.stockModule.Plot.prototype.serializeGrids_ = function(propName, list, j
           if (!('layout' in config)) {
             isHorizontal = false;
             if (anychart.utils.instanceOf(axis, anychart.core.Axis)) {
-              axisOrientation = axis.orientation();
+              axisOrientation = axis.getOption('orientation');
               isHorizontal = (axisOrientation == anychart.enums.Orientation.LEFT || axisOrientation == anychart.enums.Orientation.RIGHT);
             }
             config['layout'] = isHorizontal ? anychart.enums.Layout.HORIZONTAL : anychart.enums.Layout.VERTICAL;

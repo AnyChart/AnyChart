@@ -38,6 +38,8 @@ anychart.pyramidFunnelModule.Chart = function(opt_data, opt_csvSettings) {
   anychart.pyramidFunnelModule.Chart.base(this, 'constructor');
   this.suspendSignalsDispatching();
 
+  this.addThemes('pieFunnelPyramidBase', 'funnel');
+
   /**
    * @type {anychart.palettes.HatchFills}
    * @private
@@ -129,7 +131,9 @@ anychart.pyramidFunnelModule.Chart = function(opt_data, opt_csvSettings) {
     ['markers', 0, 0]
   ]);
   this.hovered_ = new anychart.core.StateSettings(this, interactivityDescriptorsMeta, anychart.PointState.HOVER);
+  this.hovered_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR,  anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME);
   this.selected_ = new anychart.core.StateSettings(this, interactivityDescriptorsMeta, anychart.PointState.SELECT);
+  this.selected_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR,  anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME);
 
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['baseWidth', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
@@ -1078,13 +1082,14 @@ anychart.pyramidFunnelModule.Chart.prototype.updateLabelsOnAnimate = function(la
 
 /** @inheritDoc */
 anychart.pyramidFunnelModule.Chart.prototype.doAnimation = function() {
-  if (this.animation().getOption('enabled') && /** @type {number} */(this.animation().getOption('duration')) > 0) {
+  var animation = this.getCreated('animation');
+  if (animation && animation.getOption('enabled') && /** @type {number} */(animation.getOption('duration')) > 0) {
     if (this.animationQueue_ && this.animationQueue_.isPlaying()) {
       this.animationQueue_.update();
     } else if (this.hasInvalidationState(anychart.ConsistencyState.CHART_ANIMATION)) {
       goog.dispose(this.animationQueue_);
       this.animationQueue_ = new anychart.animations.AnimationSerialQueue();
-      var duration = /** @type {number} */(this.animation().getOption('duration'));
+      var duration = /** @type {number} */(animation.getOption('duration'));
       var pyramidFunnelDuration = duration * anychart.pyramidFunnelModule.Chart.ANIMATION_DURATION_RATIO;
       var pyramidFunnelLabelDuration = duration * (1 - anychart.pyramidFunnelModule.Chart.ANIMATION_DURATION_RATIO);
 
@@ -2904,7 +2909,8 @@ anychart.pyramidFunnelModule.Chart.prototype.onTooltipSignal_ = function(event) 
  * @protected
  */
 anychart.pyramidFunnelModule.Chart.prototype.showTooltip = function(opt_event) {
-  if (opt_event && opt_event['target'] == this.legend()) {
+  var legend = this.getCreated('legend');
+  if (opt_event && legend && opt_event['target'] == legend) {
     return;
   }
 
@@ -2915,19 +2921,6 @@ anychart.pyramidFunnelModule.Chart.prototype.showTooltip = function(opt_event) {
     // for float
     this.listen(goog.events.EventType.MOUSEMOVE, this.showTooltip);
   }
-  // if (tooltip.isFloating() && opt_event) {
-  //   tooltip.show(
-  //       formatProvider,
-  //       new goog.math.Coordinate(opt_event['clientX'], opt_event['clientY']));
-  //
-  //   // for float
-  //   this.listen(goog.events.EventType.MOUSEMOVE, this.showTooltip);
-  //
-  // } else {
-  //   tooltip.show(
-  //       formatProvider,
-  //       new goog.math.Coordinate(0, 0));
-  // }
 };
 
 

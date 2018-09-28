@@ -84,7 +84,8 @@ goog.provide('anychart.themes.dark_blue');
       'fontSize': 12,
       'title': {
         'align': 'center',
-        'fontSize': 14
+        'fontSize': 14,
+        'fontColor': '#90a4ae'
       },
       'padding': {'top': 10, 'right': 15, 'bottom': 10, 'left': 15},
       'separator': {
@@ -210,6 +211,11 @@ goog.provide('anychart.themes.dark_blue');
       'connectorStroke': '#546e7a',
       'outsideLabels': {'autoColor': '#b0bec5'},
       'insideLabels': {'autoColor': '#212121'}
+    },
+    'pie': {
+      'selected': {
+        'stroke': '1.5 #878f96'
+      }
     },
     'map': {
       'unboundRegions': {'enabled': true, 'fill': '#455a64', 'stroke': '#546e7a'},

@@ -1131,7 +1131,7 @@ anychart.stockModule.eventMarkers.Group.prototype.getMarker = function(index) {
 anychart.stockModule.eventMarkers.Group.prototype.tooltip = function(opt_value) {
   if (!this.tooltip_) {
     this.tooltip_ = new anychart.core.ui.Tooltip(0);
-    this.tooltip_.parent(/** @type {anychart.core.ui.Tooltip} */(this.plot.eventMarkers().tooltip()));
+    this.tooltip_.dropThemes().parent(/** @type {anychart.core.ui.Tooltip} */(this.plot.eventMarkers().tooltip()));
     (/** @type {anychart.core.ui.Label} */(this.tooltip_.contentInternal()))['position']('leftTop');
     this.tooltip_.containerProvider(this.plot);
   }

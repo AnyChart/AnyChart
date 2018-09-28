@@ -19,8 +19,8 @@ goog.require('anychart.math.Rect');
 anychart.mapModule.elements.Axis = function() {
   anychart.mapModule.elements.Axis.base(this, 'constructor');
 
-  delete this.themeSettings['enabled'];
-
+  //delete this.themeSettings['enabled'];
+  //this.addThemes('map.axesSettings');
   this.labelsBounds_ = [];
   this.minorLabelsBounds_ = [];
 
@@ -335,6 +335,12 @@ anychart.mapModule.elements.Axis.prototype.title = function(opt_value) {
     this.title_.parent(/** @type {anychart.core.ui.Title} */(this.parent().title()));
     this.title_.listenSignals(this.titleInvalidated_, this);
     this.registerDisposable(this.title_);
+
+    // todo: (chernetsky) Remove this when mapModule.elements.Axis is refactored
+    //this.setupCreated('title', this.title_);
+    this.title_.dropThemes();
+    this.title_.padding().dropThemes();
+    this.title_.margin().dropThemes();
   }
 
   if (goog.isDef(opt_value)) {
@@ -375,6 +381,8 @@ anychart.mapModule.elements.Axis.prototype.labels = function(opt_value) {
     this.labels_.setParentEventTarget(this);
     this.labels_.listenSignals(this.labelsInvalidated_, this);
     this.registerDisposable(this.labels_);
+    //this.setupCreated('labels', this.labels_); // todo: Uncomment this when mapModule.elements.Axis is refactored
+    this.labels_.dropThemes();
   }
 
   if (goog.isDef(opt_value)) {
@@ -419,6 +427,8 @@ anychart.mapModule.elements.Axis.prototype.minorLabels = function(opt_value) {
     this.minorLabels_.setParentEventTarget(this);
     this.minorLabels_.listenSignals(this.minorLabelsInvalidated_, this);
     this.registerDisposable(this.minorLabels_);
+    //this.setupCreated('minorLabels', this.minorLabels_); // todo: Uncomment this when mapModule.elements.Axis is refactored
+    this.minorLabels_.dropThemes();
   }
 
   if (goog.isDef(opt_value)) {
@@ -474,6 +484,8 @@ anychart.mapModule.elements.Axis.prototype.createTicks = function() {
 anychart.mapModule.elements.Axis.prototype.ticks = function(opt_value) {
   if (!this.ticks_) {
     this.ticks_ = this.createTicks();
+    // this.setupCreated('ticks', this.ticks_); // todo: Uncomment this when mapModule.elements.Axis is refactored
+    this.ticks_.dropThemes(); // todo: Remove this when mapModule.elements.Axis is refactored
     this.ticks_.parent(/** @type {anychart.mapModule.elements.AxisTicks} */(this.parent().ticks()));
   }
 
@@ -493,6 +505,8 @@ anychart.mapModule.elements.Axis.prototype.ticks = function(opt_value) {
 anychart.mapModule.elements.Axis.prototype.minorTicks = function(opt_value) {
   if (!this.minorTicks_) {
     this.minorTicks_ = this.createTicks();
+    // this.setupCreated('minorTicks', this.minorTicks_); // todo: Uncomment this when mapModule.elements.Axis is refactored
+    this.minorTicks_.dropThemes(); // todo: Remove this when mapModule.elements.Axis is refactored
     this.minorTicks_.parent(/** @type {anychart.mapModule.elements.AxisTicks} */(this.parent().minorTicks()));
   }
 

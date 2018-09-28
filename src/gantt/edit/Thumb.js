@@ -188,7 +188,7 @@ anychart.ganttModule.edit.Thumb.prototype.setupByJSON = function(config, opt_def
  */
 anychart.ganttModule.edit.Thumb.prototype.serialize = function() {
   var json = anychart.ganttModule.edit.Thumb.base(this, 'serialize');
-  anychart.core.settings.serialize(this, anychart.ganttModule.edit.Thumb.DESCRIPTORS, json);
+  anychart.core.settings.serialize(this, anychart.ganttModule.edit.Thumb.DESCRIPTORS, json, void 0, void 0, true);
   if (!this.hasOwnOption('enabled') || goog.isNull(json['enabled']))
     delete json['enabled'];
   return json;

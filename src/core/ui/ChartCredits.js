@@ -214,17 +214,32 @@ anychart.core.ui.ChartCredits.prototype.serializeDiff = function() {
 
 
 /** @inheritDoc */
-anychart.core.ui.ChartCredits.prototype.setupSpecial = function(isDefault, var_args) {
-  var arg0 = arguments[1];
+anychart.core.ui.ChartCredits.prototype.resolveSpecialValue = function(var_args) {
+  var arg0 = arguments[0];
   if (goog.isString(arg0)) {
-    this.text(arg0);
-    this.enabled(true);
-    return true;
+    return {
+      'text': arg0,
+      'enabled': true
+    };
   } else if (goog.isBoolean(arg0) || goog.isNull(arg0)) {
-    this.enabled(!!arg0);
+    return {'enabled': !!arg0};
+  }
+  return null;
+};
+
+
+/** @inheritDoc */
+anychart.core.ui.ChartCredits.prototype.setupSpecial = function(isDefault, var_args) {
+  var resolvedValue = this.resolveSpecialValue(arguments[1]);
+  if (resolvedValue) {
+    if ('text' in resolvedValue)
+      this.text(resolvedValue['text']);
+
+    this.enabled(resolvedValue['enabled']);
+
     return true;
   }
-  return anychart.core.Base.prototype.setupSpecial.apply(this, arguments);
+  return false;
 };
 
 

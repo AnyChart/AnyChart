@@ -287,7 +287,12 @@ anychart.core.series.Base = function(chart, plot, type, config) {
     ['outlierMarkers', 0, 0]
   ]);
   this.hovered_ = new anychart.core.StateSettings(this, descriptorsMeta, anychart.PointState.HOVER);
+  this.hovered_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR,  anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME);
+  this.hovered_.setOption(anychart.core.StateSettings.MARKERS_FACTORY_CONSTRUCTOR,  anychart.core.StateSettings.DEFAULT_MARKERS_CONSTRUCTOR_NO_THEME);
+
   this.selected_ = new anychart.core.StateSettings(this, descriptorsMeta, anychart.PointState.SELECT);
+  this.selected_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR,  anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME);
+  this.selected_.setOption(anychart.core.StateSettings.MARKERS_FACTORY_CONSTRUCTOR,  anychart.core.StateSettings.DEFAULT_MARKERS_CONSTRUCTOR_NO_THEME);
   function markLabelsAllConsistent(factory) {
     anychart.core.StateSettings.DEFAULT_LABELS_AFTER_INIT_CALLBACK.call(this, factory);
     factory.markConsistent(anychart.ConsistencyState.ALL);
@@ -668,11 +673,27 @@ anychart.core.series.Base.prototype.applyConfig = function(config, opt_reapplyCl
   this.suspendSignalsDispatching();
   this.recreateShapeManager();
 
-  this.themeSettings = this.plot.defaultSeriesSettings()[anychart.utils.toCamelCase(this.type_)] || {};
-  this.normal_.setupInternal(true, this.themeSettings);
-  this.normal_.setupInternal(true, this.themeSettings['normal']);
-  this.hovered_.setupInternal(true, this.themeSettings['hovered']);
-  this.selected_.setupInternal(true, this.themeSettings['selected']);
+  if (goog.isFunction(this.plot.defaultSeriesSettings().getThemesForType)) {
+    this.dropThemes();
+    var themes = this.plot.defaultSeriesSettings().getThemesForType(this.type_, this.getChart().isMode3d());
+    this.addThemes(themes);
+  } else
+    this.themeSettings = this.plot.defaultSeriesSettings()[anychart.utils.toCamelCase(this.type_)] || {};
+
+  this.normal_.dropThemes();
+  this.setupCreated('normal', this.normal_);
+  this.normal_.updateChildrenThemes();
+  this.normal_.setupInternal(true, {});
+
+  this.hovered_.dropThemes();
+  this.setupCreated('hovered', this.hovered_);
+  this.hovered_.updateChildrenThemes();
+  this.hovered_.setupInternal(true, {});
+
+  this.selected_.dropThemes();
+  this.setupCreated('selected', this.selected_);
+  this.selected_.updateChildrenThemes();
+  this.selected_.setupInternal(true, {});
 
   if (this.supportsOutliers()) {
     this.indexToMarkerIndexes_ = {};
@@ -736,7 +757,7 @@ anychart.core.series.Base.prototype.applyDefaultsToElements = function(defaults,
     this.zIndex(defaults['zIndex']);
   }
 
-  this.a11y().setupInternal(!!opt_default, defaults['a11y'] || this.plot.defaultSeriesSettings()['a11y']);
+  this.a11y().setupInternal(!!opt_default, defaults['a11y'] || this.themeSettings['a11y']);
 };
 
 
@@ -1839,11 +1860,13 @@ anychart.core.series.Base.prototype.getLegendItemText = function(context) {
 anychart.core.series.Base.prototype.tooltip = function(opt_value) {
   if (!this.tooltipInternal) {
     this.tooltipInternal = new anychart.core.ui.Tooltip(0);
+    this.tooltipInternal.dropThemes();
     if (this.chart.supportsTooltip()) {
       var chart = /** @type {anychart.core.Chart} */ (this.chart);
       var parent = /** @type {anychart.core.ui.Tooltip} */ (chart.tooltip());
       this.tooltipInternal.parent(parent);
       this.tooltipInternal.chart(chart);
+      this.setupCreated('tooltip', this.tooltipInternal);
     }
   }
   if (goog.isDef(opt_value)) {

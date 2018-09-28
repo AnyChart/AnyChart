@@ -78,9 +78,9 @@ anychart.core.SeparateChart.prototype.getType = function() {
 anychart.core.SeparateChart.prototype.legend = function(opt_value) {
   if (!this.legend_) {
     this.legend_ = new anychart.core.ui.Legend();
-    this.registerDisposable(this.legend_);
     this.legend_.listenSignals(this.onLegendSignal, this);
     this.legend_.setParentEventTarget(this);
+    this.setupCreated('legend', this.legend_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -218,12 +218,14 @@ anychart.core.SeparateChart.prototype.drawLegend = function(bounds) {
 anychart.core.SeparateChart.prototype.calculateContentAreaSpace = function(totalBounds) {
   var bounds = anychart.core.SeparateChart.base(this, 'calculateContentAreaSpace', totalBounds);
 
-  var legend = /** @type {anychart.core.ui.Legend} */(this.legend());
-  if (this.hasInvalidationState(anychart.ConsistencyState.CHART_LEGEND | anychart.ConsistencyState.BOUNDS) &&
-      legend.getOption('positionMode') == anychart.enums.LegendPositionMode.OUTSIDE) {
-    this.drawLegend(bounds);
+  var legend = this.getCreated('legend');
+  if (this.hasInvalidationState(anychart.ConsistencyState.CHART_LEGEND | anychart.ConsistencyState.BOUNDS)) {
+    if (legend && /** @type {anychart.core.ui.Legend} */(legend).getOption('positionMode') == anychart.enums.LegendPositionMode.OUTSIDE)
+      this.drawLegend(bounds);
+    else
+      this.markConsistent(anychart.ConsistencyState.CHART_LEGEND);
   }
-  bounds = legend.enabled() && legend.getOption('positionMode') == anychart.enums.LegendPositionMode.OUTSIDE ?
+  bounds = legend && legend.enabled() && /** @type {anychart.core.ui.Legend} */(legend).getOption('positionMode') == anychart.enums.LegendPositionMode.OUTSIDE ?
       legend.getRemainingBounds() :
       bounds;
 
@@ -236,13 +238,12 @@ anychart.core.SeparateChart.prototype.calculateContentAreaSpace = function(total
  * @param {anychart.math.Rect} bounds .
  */
 anychart.core.SeparateChart.prototype.specialDraw = function(bounds) {
-  var legend = /** @type {anychart.core.ui.Legend} */(this.legend());
-  if (this.hasInvalidationState(anychart.ConsistencyState.CHART_LEGEND | anychart.ConsistencyState.BOUNDS) &&
-      legend.getOption('positionMode') == anychart.enums.LegendPositionMode.INSIDE) {
-
-    this.drawLegend(bounds);
-    this.markConsistent(anychart.ConsistencyState.CHART_LEGEND);
-  }
+  var legend = this.getCreated('legend');
+  if (this.hasInvalidationState(anychart.ConsistencyState.CHART_LEGEND | anychart.ConsistencyState.BOUNDS))
+    if (legend && /** @type {anychart.core.ui.Legend} */(legend).getOption('positionMode') == anychart.enums.LegendPositionMode.INSIDE)
+      this.drawLegend(bounds);
+    else
+      this.markConsistent(anychart.ConsistencyState.CHART_LEGEND);
 };
 
 
@@ -263,7 +264,8 @@ anychart.core.SeparateChart.prototype.needsInteractiveLegendUpdate = function() 
 /** @inheritDoc */
 anychart.core.SeparateChart.prototype.serialize = function() {
   var json = anychart.core.SeparateChart.base(this, 'serialize');
-  json['legend'] = this.legend().serialize();
+  if (this.getCreated('legend'))
+    json['legend'] = this.legend().serialize();
   json['interactivity'] = this.interactivity().serialize();
   return json;
 };
@@ -272,8 +274,21 @@ anychart.core.SeparateChart.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.core.SeparateChart.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.SeparateChart.base(this, 'setupByJSON', config, opt_default);
-  this.legend(config['legend']);
+
+  if ('legend' in config)
+    this.legend(config['legend']);
+
   this.interactivity(config['interactivity']);
+};
+
+
+/** @inheritDoc */
+anychart.core.SeparateChart.prototype.disposeInternal = function() {
+  goog.dispose(this.legend_);
+
+  this.legend_ = null;
+
+  anychart.core.SeparateChart.base(this, 'disposeInternal');
 };
 
 

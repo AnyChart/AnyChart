@@ -17,6 +17,8 @@ goog.require('anychart.mapModule.elements.Grid');
 anychart.mapModule.elements.GridSettings = function(map) {
   anychart.mapModule.elements.GridSettings.base(this, 'constructor');
 
+  this.addThemes('map.gridsSettings');
+
   /**
    * Parent title.
    * @type {anychart.core.settings.IResolvable}
@@ -63,6 +65,10 @@ anychart.mapModule.elements.GridSettings = function(map) {
     ['enabled', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.ENABLED_STATE_CHANGED],
     ['zIndex', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.Z_INDEX_STATE_CHANGED]
   ]);
+
+  // this is to retain old behaviour when horizontal and vertical grids obtained zIndex relative to GridSettings theme zIndex
+  if (!this.horizontalGrid_) this.horizontal();
+  if (!this.verticalGrid_) this.vertical();
 };
 goog.inherits(anychart.mapModule.elements.GridSettings, anychart.core.Base);
 
@@ -203,23 +209,34 @@ anychart.core.settings.populate(anychart.mapModule.elements.GridSettings, anycha
 //endregion
 //region --- Palette
 /**
+ * Creates palette depending on passed value type.
+ * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|Object|Array.<string>)} palette
+ * @private
+ */
+anychart.mapModule.elements.GridSettings.prototype.checkSetupPalette_ = function(palette) {
+  if (anychart.utils.instanceOf(palette, anychart.palettes.RangeColors) || (goog.isObject(palette) && palette['type'] == 'range')) {
+    this.setupPalette_(anychart.palettes.RangeColors);
+  } else if (anychart.utils.instanceOf(palette, anychart.palettes.DistinctColors) || goog.isObject(palette) || this.palette_ == null) {
+    this.setupPalette_(anychart.palettes.DistinctColors);
+  }
+};
+
+
+/**
  * Getter/setter for palette.
  * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|Object|Array.<string>)=} opt_value .
  * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|anychart.mapModule.elements.GridSettings)} .
  */
 anychart.mapModule.elements.GridSettings.prototype.palette = function(opt_value) {
-  if (anychart.utils.instanceOf(opt_value, anychart.palettes.RangeColors)) {
-    this.setupPalette_(anychart.palettes.RangeColors, /** @type {anychart.palettes.RangeColors} */(opt_value));
-    return this;
-  } else if (anychart.utils.instanceOf(opt_value, anychart.palettes.DistinctColors)) {
-    this.setupPalette_(anychart.palettes.DistinctColors, /** @type {anychart.palettes.DistinctColors} */(opt_value));
-    return this;
-  } else if (goog.isObject(opt_value) && opt_value['type'] == 'range') {
-    this.setupPalette_(anychart.palettes.RangeColors);
-  } else if (goog.isObject(opt_value) || this.palette_ == null)
-    this.setupPalette_(anychart.palettes.DistinctColors);
+  if (!this.palette_) {
+    var palette = this.themeSettings['palette'];
+    this.checkSetupPalette_(palette);
+    this.setupCreated('palette', this.palette_);
+    this.palette_.restoreDefaults(false);
+  }
 
   if (goog.isDef(opt_value)) {
+    this.checkSetupPalette_(opt_value);
     this.palette_.setup(opt_value);
     return this;
   }
@@ -229,20 +246,16 @@ anychart.mapModule.elements.GridSettings.prototype.palette = function(opt_value)
 
 /**
  * @param {Function} cls Palette constructor.
- * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors)=} opt_cloneFrom Settings to clone from.
  * @private
  */
-anychart.mapModule.elements.GridSettings.prototype.setupPalette_ = function(cls, opt_cloneFrom) {
+anychart.mapModule.elements.GridSettings.prototype.setupPalette_ = function(cls) {
   if (anychart.utils.instanceOf(this.palette_, cls)) {
-    if (opt_cloneFrom)
-      this.palette_.setup(opt_cloneFrom);
+    //do nothing
   } else {
     // we dispatch only if we replace existing palette.
     var doDispatch = !!this.palette_;
     goog.dispose(this.palette_);
     this.palette_ = new cls();
-    if (opt_cloneFrom)
-      this.palette_.setup(opt_cloneFrom);
     this.palette_.listenSignals(this.paletteInvalidated_, this);
     this.registerDisposable(this.palette_);
     if (doDispatch)
@@ -282,6 +295,7 @@ anychart.mapModule.elements.GridSettings.prototype.getItems = function() {
 anychart.mapModule.elements.GridSettings.prototype.vertical = function(opt_value) {
   if (!this.verticalGrid_) {
     this.verticalGrid_ = new anychart.mapModule.elements.Grid();
+    this.verticalGrid_.dropThemes();
     this.verticalGrid_.setDefaultLayout(anychart.enums.Layout.VERTICAL);
     this.verticalGrid_.parent(this);
     var zIndex = this.getOption('zIndex') + this.grids_.length * anychart.mapModule.Chart.ZINDEX_INCREMENT_MULTIPLIER;
@@ -307,6 +321,7 @@ anychart.mapModule.elements.GridSettings.prototype.vertical = function(opt_value
 anychart.mapModule.elements.GridSettings.prototype.horizontal = function(opt_value) {
   if (!this.horizontalGrid_) {
     this.horizontalGrid_ = new anychart.mapModule.elements.Grid();
+    this.horizontalGrid_.dropThemes();
     this.horizontalGrid_.setDefaultLayout(anychart.enums.Layout.HORIZONTAL);
     this.horizontalGrid_.parent(this);
     var zIndex = this.getOption('zIndex') + this.grids_.length * anychart.mapModule.Chart.ZINDEX_INCREMENT_MULTIPLIER;
@@ -336,13 +351,23 @@ anychart.mapModule.elements.GridSettings.prototype.setThemeSettings = function(c
 
 
 /** @inheritDoc */
-anychart.mapModule.elements.GridSettings.prototype.setupSpecial = function(isDefault, var_args) {
-  var arg0 = arguments[1];
+anychart.mapModule.elements.GridSettings.prototype.resolveSpecialValue = function(var_args) {
+  var arg0 = arguments[0];
   if (goog.isBoolean(arg0) || goog.isNull(arg0)) {
+    return {'enabled': !!arg0};
+  }
+  return null;
+};
+
+
+/** @inheritDoc */
+anychart.mapModule.elements.GridSettings.prototype.setupSpecial = function(isDefault, var_args) {
+  var resolvedValue = this.resolveSpecialValue(arguments[1]);
+  if (resolvedValue) {
     if (isDefault)
-      this.themeSettings['enabled'] = !!arg0;
+      this.themeSettings['enabled'] = resolvedValue['enabled'];
     else
-      this.enabled(!!arg0);
+      this.enabled(resolvedValue['enabled']);
     return true;
   }
   return false;

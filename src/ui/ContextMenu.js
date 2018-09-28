@@ -662,15 +662,29 @@ anychart.ui.ContextMenu.prototype.setup = function(var_args) {
 
 
 /**
+ *
+ * @param {...*} var_args
+ * @return {Object|null}
+ */
+anychart.ui.ContextMenu.prototype.resolveSpecialValue = function(var_args) {
+  var arg0 = arguments[0];
+  if (goog.isBoolean(arg0) || goog.isNull(arg0)) {
+    return {'enabled': !!arg0};
+  }
+  return null;
+};
+
+
+/**
  * Special objects to setup current instance.
  * @param {...(Object|Array|number|string|undefined|boolean|null)} var_args
  * @return {boolean} If passed values were recognized as special setup values.
  * @protected
  */
 anychart.ui.ContextMenu.prototype.setupSpecial = function(var_args) {
-  var arg0 = arguments[0];
-  if (goog.isBoolean(arg0) || goog.isNull(arg0)) {
-    this.enabled(!!arg0);
+  var resolvedValue = this.resolveSpecialValue(arguments[0]);
+  if (resolvedValue) {
+    this.enabled(resolvedValue['enabled']);
     return true;
   }
   return false;

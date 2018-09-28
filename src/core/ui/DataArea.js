@@ -36,6 +36,8 @@ anychart.core.ui.DataArea.prototype.background = function(opt_value) {
   if (!this.background_) {
     this.background_ = new anychart.core.ui.Background();
     this.background_.listenSignals(this.backgroundInvalidated_, this);
+
+    this.setupCreated('background', this.background_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -103,12 +105,14 @@ anychart.core.ui.DataArea.prototype.draw = function() {
   }
 
   if (this.hasStateInvalidation(anychart.enums.Store.DATA_AREA, anychart.enums.State.APPEARANCE)) {
-    var background = this.background();
-    background.suspendSignalsDispatching();
-    if (!background.container()) background.container(this.rootLayer);
-    background.parentBounds(/** @type {anychart.math.Rect} */ (this.parentBounds()));
-    background.resumeSignalsDispatching(false);
-    background.draw();
+    var background = this.getCreated('background');
+    if (background) {
+      background.suspendSignalsDispatching();
+      if (!background.container()) background.container(this.rootLayer);
+      background.parentBounds(/** @type {anychart.math.Rect} */ (this.parentBounds()));
+      background.resumeSignalsDispatching(false);
+      background.draw();
+    }
     this.markStateConsistent(anychart.enums.Store.DATA_AREA, anychart.enums.State.APPEARANCE);
   }
 

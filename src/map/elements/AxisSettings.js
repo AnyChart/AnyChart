@@ -20,6 +20,8 @@ goog.require('anychart.mapModule.elements.AxisTicks');
 anychart.mapModule.elements.AxisSettings = function(map) {
   anychart.mapModule.elements.AxisSettings.base(this, 'constructor');
 
+  this.addThemes(anychart.themes.DefaultThemes['map.axisSettings']);
+
   /**
    * Map.
    * @private
@@ -200,6 +202,7 @@ anychart.mapModule.elements.AxisSettings.prototype.getItems = function() {
 anychart.mapModule.elements.AxisSettings.prototype.top = function(opt_value) {
   if (!this.topAxis_) {
     this.topAxis_ = new anychart.mapModule.elements.Axis();
+    this.topAxis_.dropThemes(); // todo: Remove this when mapModule.elements.Axis is refactored
     this.topAxis_.orientation(anychart.enums.Orientation.TOP);
     this.topAxis_.parent(this);
     this.topAxis_.listenSignals(this.map_.onAxesSettingsSignal, this.map_);
@@ -226,6 +229,7 @@ anychart.mapModule.elements.AxisSettings.prototype.top = function(opt_value) {
 anychart.mapModule.elements.AxisSettings.prototype.right = function(opt_value) {
   if (!this.rightAxis_) {
     this.rightAxis_ = new anychart.mapModule.elements.Axis();
+    this.rightAxis_.dropThemes(); // todo: Remove this when mapModule.elements.Axis is refactored
     this.rightAxis_.orientation(anychart.enums.Orientation.RIGHT);
     this.rightAxis_.parent(this);
     this.rightAxis_.listenSignals(this.map_.onAxesSettingsSignal, this.map_);
@@ -252,6 +256,7 @@ anychart.mapModule.elements.AxisSettings.prototype.right = function(opt_value) {
 anychart.mapModule.elements.AxisSettings.prototype.bottom = function(opt_value) {
   if (!this.bottomAxis_) {
     this.bottomAxis_ = new anychart.mapModule.elements.Axis();
+    this.bottomAxis_.dropThemes(); // todo: Remove this when mapModule.elements.Axis is refactored
     this.bottomAxis_.orientation(anychart.enums.Orientation.BOTTOM);
     this.bottomAxis_.parent(this);
     this.bottomAxis_.listenSignals(this.map_.onAxesSettingsSignal, this.map_);
@@ -278,6 +283,7 @@ anychart.mapModule.elements.AxisSettings.prototype.bottom = function(opt_value) 
 anychart.mapModule.elements.AxisSettings.prototype.left = function(opt_value) {
   if (!this.leftAxis_) {
     this.leftAxis_ = new anychart.mapModule.elements.Axis();
+    this.leftAxis_.dropThemes(); // todo: Remove this when mapModule.elements.Axis is refactored
     this.leftAxis_.orientation(anychart.enums.Orientation.LEFT);
     this.leftAxis_.parent(this);
     this.leftAxis_.listenSignals(this.map_.onAxesSettingsSignal, this.map_);
@@ -306,9 +312,12 @@ anychart.mapModule.elements.AxisSettings.prototype.left = function(opt_value) {
 anychart.mapModule.elements.AxisSettings.prototype.title = function(opt_value) {
   if (!this.title_) {
     this.title_ = new anychart.core.ui.Title();
+    //this.setupCreated('title', this.title_);
+    this.title_.dropThemes(); // todo: Remove this when mapModule.elements.Axis is refactored
     this.title_.listenSignals(this.titleInvalidated_, this);
     this.title_.markConsistent(anychart.ConsistencyState.ALL);
     this.registerDisposable(this.title_);
+
   }
 
   if (goog.isDef(opt_value)) {
@@ -338,6 +347,7 @@ anychart.mapModule.elements.AxisSettings.prototype.titleInvalidated_ = function(
 anychart.mapModule.elements.AxisSettings.prototype.labels = function(opt_value) {
   if (!this.labels_) {
     this.labels_ = new anychart.core.ui.LabelsFactory();
+    this.labels_.dropThemes(); // todo: Remove this when mapModule.elements.Axis is refactored
     this.labels_.listenSignals(this.labelsInvalidated_, this);
     this.labels_.markConsistent(anychart.ConsistencyState.ALL);
     this.registerDisposable(this.labels_);
@@ -380,6 +390,7 @@ anychart.mapModule.elements.AxisSettings.prototype.labelsInvalidated_ = function
 anychart.mapModule.elements.AxisSettings.prototype.minorLabels = function(opt_value) {
   if (!this.minorLabels_) {
     this.minorLabels_ = new anychart.core.ui.LabelsFactory();
+    this.minorLabels_.dropThemes(); // todo: Remove this when mapModule.elements.Axis is refactored
     this.minorLabels_.listenSignals(this.minorLabelsInvalidated_, this);
     this.minorLabels_.markConsistent(anychart.ConsistencyState.ALL);
     this.registerDisposable(this.minorLabels_);
@@ -421,6 +432,7 @@ anychart.mapModule.elements.AxisSettings.prototype.minorLabelsInvalidated_ = fun
 anychart.mapModule.elements.AxisSettings.prototype.ticks = function(opt_value) {
   if (!this.ticks_) {
     this.ticks_ = new anychart.mapModule.elements.AxisTicks();
+    this.ticks_.dropThemes(); // todo: Remove this when mapModule.elements.Axis is refactored
     this.ticks_.listenSignals(this.ticksInvalidated_, this);
     this.registerDisposable(this.ticks_);
   }
@@ -441,6 +453,7 @@ anychart.mapModule.elements.AxisSettings.prototype.ticks = function(opt_value) {
 anychart.mapModule.elements.AxisSettings.prototype.minorTicks = function(opt_value) {
   if (!this.minorTicks_) {
     this.minorTicks_ = new anychart.mapModule.elements.AxisTicks();
+    this.minorTicks_.dropThemes(); // todo: Remove this when mapModule.elements.Axis is refactored
     this.minorTicks_.listenSignals(this.ticksInvalidated_, this);
     this.registerDisposable(this.minorTicks_);
   }
@@ -481,13 +494,23 @@ anychart.mapModule.elements.AxisSettings.prototype.setThemeSettings = function(c
 
 
 /** @inheritDoc */
-anychart.mapModule.elements.AxisSettings.prototype.setupSpecial = function(isDefault, var_args) {
-  var arg0 = arguments[1];
+anychart.mapModule.elements.AxisSettings.prototype.resolveSpecialValue = function(var_args) {
+  var arg0 = arguments[0];
   if (goog.isBoolean(arg0) || goog.isNull(arg0)) {
+    return {'enabled': !!arg0};
+  }
+  return null;
+};
+
+
+/** @inheritDoc */
+anychart.mapModule.elements.AxisSettings.prototype.setupSpecial = function(isDefault, var_args) {
+  var resolvedValue = this.resolveSpecialValue(arguments[1]);
+  if (resolvedValue) {
     if (isDefault)
-      this.themeSettings['enabled'] = !!arg0;
+      this.themeSettings['enabled'] = resolvedValue['enabled'];
     else
-      this.enabled(!!arg0);
+      this.enabled(resolvedValue['enabled']);
     return true;
   }
   return false;

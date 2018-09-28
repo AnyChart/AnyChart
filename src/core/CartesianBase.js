@@ -21,6 +21,8 @@ goog.require('anychart.enums');
 anychart.core.CartesianBase = function(opt_categorizeData) {
   anychart.core.CartesianBase.base(this, 'constructor', goog.isDef(opt_categorizeData) ? opt_categorizeData : true);
 
+  this.addThemes('cartesianBase');
+
   /**
    * Zoom settings.
    * @type {anychart.core.utils.OrdinalZoom}
@@ -176,6 +178,8 @@ anychart.core.CartesianBase.prototype.xScroller = function(opt_value) {
         anychart.ConsistencyState.CARTESIAN_X_SCROLLER |
         anychart.ConsistencyState.BOUNDS,
         anychart.Signal.NEEDS_REDRAW);
+
+    this.setupCreated('xScroller', this.xScroller_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -430,7 +434,9 @@ anychart.core.CartesianBase.prototype.setupByJSONWithScales = function(config, s
   anychart.core.CartesianBase.base(this, 'setupByJSONWithScales', config, scalesInstances, opt_default);
 
   anychart.core.settings.deserialize(this, anychart.core.CartesianBase.PROPERTY_DESCRIPTORS, config);
-  this.xScroller().setupInternal(!!opt_default, config['xScroller']);
+
+  if ('xScroller' in config)
+    this.xScroller().setupInternal(!!opt_default, config['xScroller']);
 
   var xZoom = config['xZoom'];
   if (goog.isObject(xZoom) && (goog.isNumber(xZoom['scale']) || goog.isString(xZoom['scale']))) {

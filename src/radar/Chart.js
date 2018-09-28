@@ -18,6 +18,8 @@ goog.require('anychart.radarPolarBaseModule.Series');
  */
 anychart.radarModule.Chart = function() {
   anychart.radarModule.Chart.base(this, 'constructor', true);
+
+  this.addThemes('radar');
 };
 goog.inherits(anychart.radarModule.Chart, anychart.radarPolarBaseModule.Chart);
 

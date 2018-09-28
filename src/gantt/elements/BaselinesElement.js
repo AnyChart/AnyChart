@@ -86,7 +86,7 @@ anychart.ganttModule.elements.BaselinesElement.prototype.setupByJSON = function(
  */
 anychart.ganttModule.elements.BaselinesElement.prototype.serialize = function() {
   var json = anychart.ganttModule.elements.BaselinesElement.base(this, 'serialize');
-  anychart.core.settings.serialize(this, anychart.ganttModule.elements.BaselinesElement.DESCRIPTORS, json);
+  anychart.core.settings.serialize(this, anychart.ganttModule.elements.BaselinesElement.DESCRIPTORS, json, void 0, void 0, true);
   return json;
 };
 

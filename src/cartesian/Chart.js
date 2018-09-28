@@ -26,6 +26,8 @@ goog.require('anychart.enums');
 anychart.cartesianModule.Chart = function() {
   anychart.cartesianModule.Chart.base(this, 'constructor');
 
+  this.addThemes('cartesian');
+
   this.setType(anychart.enums.ChartTypes.CARTESIAN);
 };
 goog.inherits(anychart.cartesianModule.Chart, anychart.core.CartesianBase);
@@ -468,7 +470,8 @@ anychart.cartesianModule.Chart.prototype.isSeriesVisible = function(series) {
  */
 anychart.cartesian = function() {
   var chart = new anychart.cartesianModule.Chart();
-  chart.setupInternal(true, anychart.getFullTheme('cartesian'));
+  chart.setupStateSettings();
+  // chart.setupInternal(true, anychart.getFullTheme('cartesian'));
   return chart;
 };
 

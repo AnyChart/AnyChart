@@ -288,13 +288,12 @@ anychart.core.axisMarkers.PathBase.prototype.scaleInvalidated = function(event) 
  */
 anychart.core.axisMarkers.PathBase.prototype.valueInternal = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.val !== opt_value) {
-      this.val = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, this.getValueChangeSignals());
+    if (this.getOption('value') !== opt_value) {
+      this['value'](opt_value);
     }
     return this;
   }
-  return this.val;
+  return this.getOption('value');
 };
 
 
@@ -467,7 +466,7 @@ anychart.core.axisMarkers.PathBase.prototype.drawLine = function() {
 
   var el = /** @type {acgraph.vector.Path} */ (this.markerElement());
 
-  var ratio = scale.transform(this.val, 0.5);
+  var ratio = scale.transform(this.getOption('value'), 0.5);
   el.clear();
   if (isNaN(ratio)) return this;
 
@@ -498,7 +497,7 @@ anychart.core.axisMarkers.PathBase.prototype.drawLine = function() {
  * @return {anychart.core.axisMarkers.PathBase} - Itself for method chaining.
  */
 anychart.core.axisMarkers.PathBase.prototype.drawRange = function() {
-  var range = /** @type {anychart.core.axisMarkers.PathBase.Range} */ (this.val);
+  var range = /** @type {anychart.core.axisMarkers.PathBase.Range} */ (this.valueInternal());
 
   var scale = /** @type {anychart.scales.Base|anychart.ganttModule.Scale} */ (this.scale());
 
@@ -510,8 +509,8 @@ anychart.core.axisMarkers.PathBase.prototype.drawRange = function() {
   var el = /** @type {acgraph.vector.Path} */ (this.markerElement());
   el.clear();
 
-  var to = range.to;
-  var from = range.from;
+  var to = this.getOption('to');
+  var from = this.getOption('from');
 
   //Safe transformation to ratio.
   var fromScaleRatio = scale.transform(from);
@@ -519,8 +518,8 @@ anychart.core.axisMarkers.PathBase.prototype.drawRange = function() {
 
   //Safe comparison - comparing numbers.
   if (fromScaleRatio > toScaleRatio) {
-    to = range.from;
-    from = range.to;
+    to = this.getOption('from');
+    from = this.getOption('to');
   }
 
   var fromRatio = scale.transform(from, 0);

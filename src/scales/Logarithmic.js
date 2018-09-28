@@ -15,6 +15,7 @@ goog.require('anychart.scales.Linear');
  */
 anychart.scales.Logarithmic = function() {
   anychart.scales.Logarithmic.base(this, 'constructor');
+  this.addThemes('defaultScaleSettings.log');
 };
 goog.inherits(anychart.scales.Logarithmic, anychart.scales.Linear);
 
@@ -185,9 +186,13 @@ anychart.scales.Logarithmic.prototype.setupByJSON = function(config, opt_default
  * @return {!anychart.scales.Logarithmic} Logarithmic scale.
  */
 anychart.scales.log = function() {
-  var result = new anychart.scales.Logarithmic();
-  result.setupByJSON(/** @type {!Object} */(anychart.getFullTheme('defaultScaleSettings.log')));
-  return result;
+  var scale = new anychart.scales.Logarithmic();
+  scale.setup(scale.themeSettings);
+  //TODO (A.Kudryavtsev): Check whether we need this ticks setup.
+  scale.ticks().setup(scale.ticks().themeSettings);
+  //TODO (A.Kudryavtsev): This too.
+  scale.minorTicks().setup(scale.minorTicks().themeSettings);
+  return scale;
 };
 
 

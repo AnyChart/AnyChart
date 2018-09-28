@@ -352,7 +352,7 @@ anychart.scales.OrdinalTicks.prototype.setupSpecial = function(isDefault, var_ar
     this.set(arg0);
     return true;
   }
-  return anychart.core.Base.prototype.setupSpecial.apply(this, arguments);
+  return false;
 };
 
 

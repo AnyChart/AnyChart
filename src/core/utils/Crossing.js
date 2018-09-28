@@ -10,8 +10,25 @@ goog.require('anychart.core.Base');
  */
 anychart.core.utils.Crossing = function() {
   anychart.core.utils.Crossing.base(this, 'constructor');
+
+  anychart.core.settings.createDescriptorMeta(this.descriptorsMeta, 'stroke', 0, anychart.Signal.NEEDS_REDRAW);
 };
 goog.inherits(anychart.core.utils.Crossing, anychart.core.Base);
+
+
+//region --- descriptors
+/**
+ * Simple properties descriptors.
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.core.utils.Crossing.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+  anychart.core.settings.createDescriptor(map, anychart.enums.PropertyHandlerType.MULTI_ARG, 'stroke', anychart.core.settings.strokeNormalizer);
+  return map;
+})();
+anychart.core.settings.populate(anychart.core.utils.Crossing, anychart.core.utils.Crossing.prototype.SIMPLE_PROPS_DESCRIPTORS);
+//endregion
 
 
 //region --- infrastructure
@@ -27,36 +44,11 @@ anychart.core.utils.Crossing.prototype.SUPPORTED_SIGNALS =
 
 
 //endregion
-//region --- api
-/**
- * Getter/setter for crosslines stroke.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.core.utils.Crossing|acgraph.vector.Stroke} .
- */
-anychart.core.utils.Crossing.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (stroke != this.stroke_) {
-      this.stroke_ = stroke;
-      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.stroke_;
-};
-
-
-//endregion
 //region --- setup/dispose
 /** @inheritDoc */
 anychart.core.utils.Crossing.prototype.serialize = function() {
   var json = anychart.core.utils.Crossing.base(this, 'serialize');
-  json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.stroke()));
+  anychart.core.settings.serialize(this, this.SIMPLE_PROPS_DESCRIPTORS, json);
   return json;
 };
 
@@ -64,7 +56,7 @@ anychart.core.utils.Crossing.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.core.utils.Crossing.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.utils.Crossing.base(this, 'setupByJSON', config, opt_default);
-  this.stroke(config['stroke']);
+  anychart.core.settings.deserialize(this, this.SIMPLE_PROPS_DESCRIPTORS, config, opt_default);
 };
 
 

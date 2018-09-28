@@ -40,6 +40,8 @@ goog.require('goog.ui.KeyboardShortcutHandler');
 anychart.sunburstModule.Chart = function(opt_data, opt_fillMethod) {
   anychart.sunburstModule.Chart.base(this, 'constructor', opt_data, opt_fillMethod);
 
+  this.addThemes('sunburst');
+
   /**
    * Interactivity state.
    * @type {anychart.core.utils.InteractivityState}
@@ -109,7 +111,7 @@ anychart.sunburstModule.Chart = function(opt_data, opt_fillMethod) {
     ['labels', 0, 0]
   ]);
   this.normal_ = new anychart.core.StateSettings(this, normalDescriptorsMeta, anychart.PointState.NORMAL);
-  this.normal_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.CIRCULAR_LABELS_CONSTRUCTOR);
+  this.normal_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.CIRCULAR_LABELS_CONSTRUCTOR_NO_THEME);
   this.normal_.setOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK, /** @this {anychart.sunburstModule.Chart} */ function(factory) {
     factory.listenSignals(this.labelsInvalidated, this);
     factory.setParentEventTarget(this);
@@ -124,7 +126,7 @@ anychart.sunburstModule.Chart = function(opt_data, opt_fillMethod) {
     ['labels', 0, 0]
   ]);
   this.hovered_ = new anychart.core.StateSettings(this, hoveredDescriptorsMeta, anychart.PointState.HOVER);
-  this.hovered_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.CIRCULAR_LABELS_CONSTRUCTOR);
+  this.hovered_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.CIRCULAR_LABELS_CONSTRUCTOR_NO_THEME);
 
   var selectedDescriptorsMeta = {};
   anychart.core.settings.createDescriptorsMeta(selectedDescriptorsMeta, [
@@ -134,7 +136,7 @@ anychart.sunburstModule.Chart = function(opt_data, opt_fillMethod) {
     ['labels', 0, 0]
   ]);
   this.selected_ = new anychart.core.StateSettings(this, selectedDescriptorsMeta, anychart.PointState.SELECT);
-  this.selected_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.CIRCULAR_LABELS_CONSTRUCTOR);
+  this.selected_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.CIRCULAR_LABELS_CONSTRUCTOR_NO_THEME);
 
   /**
    * Aaync init mouse and keyboard interactivity for cases when chart have no stage on draw moment.

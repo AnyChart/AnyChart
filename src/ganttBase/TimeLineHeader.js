@@ -399,6 +399,7 @@ anychart.ganttBaseModule.TimeLineHeader.prototype.getLabelsFactory_ = function(i
     labels = new anychart.core.ui.LabelsFactory();
     labels['format'](defaultFormat);
     labels['positionFormatter'](defaultPositionFormatter);
+    labels.dropThemes();
 
     labels.enabled(true);
     labels.container(this.labelsLayer_);

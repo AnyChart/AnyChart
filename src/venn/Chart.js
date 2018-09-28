@@ -35,6 +35,8 @@ goog.require('goog.string');
 anychart.vennModule.Chart = function(opt_data, opt_csvSettings) {
   anychart.vennModule.Chart.base(this, 'constructor');
 
+  this.addThemes('venn');
+
   /**
    * @type {anychart.data.Iterator}
    * @private
@@ -114,7 +116,10 @@ anychart.vennModule.Chart = function(opt_data, opt_csvSettings) {
     ['markers', 0, 0]
   ]);
   this.hovered_ = new anychart.core.StateSettings(this, descriptorsMeta, anychart.PointState.HOVER);
+  this.hovered_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR,  anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME);
+
   this.selected_ = new anychart.core.StateSettings(this, descriptorsMeta, anychart.PointState.SELECT);
+  this.selected_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR,  anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME);
   function markAllConsistent(factory) {
     factory.markConsistent(anychart.ConsistencyState.ALL);
   }

@@ -317,6 +317,8 @@ anychart.ganttModule.Column.prototype.labels = function(opt_value) {
     this.labels_.listenSignals(this.labelsInvalidated_, this);
 
     this.labels_.setParentEventTarget(this);
+
+    this.labels_.dropThemes();
   }
 
   if (goog.isDef(opt_value)) {

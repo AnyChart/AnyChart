@@ -20,6 +20,7 @@ goog.require('anychart.bulletModule.Chart');
  */
 anychart.bullet = function(opt_data, opt_csvSettings) {
   var chart = new anychart.bulletModule.Chart(opt_data, opt_csvSettings);
+
   chart.setupInternal(true, anychart.getFullTheme('bullet'));
 
   return chart;

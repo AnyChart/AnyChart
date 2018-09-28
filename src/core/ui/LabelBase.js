@@ -193,7 +193,7 @@ anychart.core.ui.LabelBase.prototype.parent = function(opt_value) {
         this.background().parent(null);
         this.padding().parent(null);
       } else {
-        this.background().parent((/** @type {anychart.core.ui.LabelBase} */ (opt_value)).background());
+        this.background().dropThemes().parent((/** @type {anychart.core.ui.LabelBase} */ (opt_value)).background());
         this.padding().parent((/** @type {anychart.core.ui.LabelBase} */ (opt_value)).padding());
       }
     }
@@ -219,6 +219,8 @@ anychart.core.ui.LabelBase.prototype.background = function(opt_value) {
   if (!this.background_) {
     this.background_ = new anychart.core.ui.Background();
     this.background_.listenSignals(this.backgroundInvalidated_, this);
+
+    this.setupCreated('background', this.background_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -254,6 +256,8 @@ anychart.core.ui.LabelBase.prototype.padding = function(opt_spaceOrTopOrTopAndBo
   if (!this.padding_) {
     this.padding_ = new anychart.core.utils.Padding();
     this.padding_.listenSignals(this.boundsInvalidated_, this);
+
+    this.setupCreated('padding', this.padding_);
   }
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
     this.padding_.setup.apply(this.padding_, arguments);
@@ -566,7 +570,7 @@ anychart.core.ui.LabelBase.prototype.calculateLabelBounds_ = function() {
 
   var adjustFontSize = this.getOption('adjustFontSize');
 
-  var needAdjust = (adjustFontSize && (canAdjustByWidth && adjustFontSize.width) || (canAdjustByHeight && adjustFontSize.height));
+  var needAdjust = (adjustFontSize && ((canAdjustByWidth && adjustFontSize.width) || (canAdjustByHeight && adjustFontSize.height)));
 
   this.suspendSignalsDispatching();
   if (needAdjust) {
@@ -736,15 +740,19 @@ anychart.core.ui.LabelBase.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
 
+  var background = this.getCreated('background');
+  if (background && !background.container())
+    background.container(this.rootLayer_);
+
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
-    if (this.background_) this.background_.container(this.rootLayer_).draw();
+    if (background) background.draw();
     if (this.textElement) this.textElement.parent(this.rootLayer_);
     this.rootLayer_.parent(container);
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
-    if (this.background_) this.background_.zIndex(0);
+    if (background) background.zIndex(0);
     if (this.textElement) this.textElement.zIndex(1);
     this.rootLayer_.zIndex(/** @type {number} */(this.zIndex()));
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
@@ -760,11 +768,11 @@ anychart.core.ui.LabelBase.prototype.draw = function() {
 
 
   if (this.hasInvalidationState(anychart.ConsistencyState.LABEL_BACKGROUND)) {
-    if (this.background_) {
-      this.background_.suspendSignalsDispatching();
-      this.background_.parentBounds(backgroundBounds);
-      this.background_.draw();
-      this.background_.resumeSignalsDispatching(false);
+    if (background) {
+      background.suspendSignalsDispatching();
+      background.parentBounds(backgroundBounds);
+      background.draw();
+      background.resumeSignalsDispatching(false);
     }
     this.markConsistent(anychart.ConsistencyState.LABEL_BACKGROUND);
   }
@@ -847,24 +855,38 @@ anychart.core.ui.LabelBase.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.ui.LabelBase.prototype.setupSpecial = function(isDefault, var_args) {
-  var arg0 = arguments[1];
+anychart.core.ui.LabelBase.prototype.resolveSpecialValue = function(var_args) {
+  var arg0 = arguments[0];
   if (goog.isString(arg0)) {
+    return {
+      'text': arg0,
+      'enabled': true
+    };
+  }
+  return null;
+};
+
+
+/** @inheritDoc */
+anychart.core.ui.LabelBase.prototype.setupSpecial = function(isDefault, var_args) {
+  var resolvedValue = this.resolveSpecialValue(arguments[1]);
+  if (resolvedValue) {
     if (isDefault) {
-      if (this.themeSettings['text'] !== arg0) {
-        this.themeSettings['text'] = arg0;
+      if (this.themeSettings['text'] !== resolvedValue['text']) {
+        this.themeSettings['text'] = resolvedValue['text'];
         this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
       }
     } else {
-      if (this.ownSettings['text'] !== arg0) {
-        this.ownSettings['text'] = arg0;
+      if (this.ownSettings['text'] !== resolvedValue['text']) {
+        this.ownSettings['text'] = resolvedValue['text'];
         this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
       }
     }
-    this.enabled(true);
+    this.enabled(resolvedValue['enabled']);
     return true;
   }
-  return anychart.core.Text.prototype.setupSpecial.apply(this, arguments);
+
+  return anychart.core.VisualBase.prototype.setupSpecial.apply(this, arguments);
 };
 
 

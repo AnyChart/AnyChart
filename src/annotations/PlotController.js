@@ -981,7 +981,7 @@ anychart.annotationsModule.PlotController.prototype.setupSpecial = function(isDe
     this.annotationsJson_(arg0);
     return true;
   }
-  return anychart.core.Base.prototype.setupSpecial.apply(this, arguments);
+  return false;
 };
 
 

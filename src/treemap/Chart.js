@@ -30,6 +30,8 @@ goog.require('anychart.utils');
 anychart.treemapModule.Chart = function(opt_data, opt_fillMethod) {
   anychart.treemapModule.Chart.base(this, 'constructor', opt_data, opt_fillMethod);
 
+  this.addThemes('treeMap');
+
   /**
    * @type {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem}
    * @private
@@ -90,12 +92,14 @@ anychart.treemapModule.Chart = function(opt_data, opt_fillMethod) {
   ]);
 
   this.selected_ = new anychart.core.StateSettings(this, hoveredSelectedDescriptorsMeta, anychart.PointState.SELECT);
+  this.selected_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR,  anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME);
   function factoryEnabledNull(factory) {
     factory.enabled(null);
   }
   this.selected_.setOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK, factoryEnabledNull);
 
   this.hovered_ = new anychart.core.StateSettings(this, hoveredSelectedDescriptorsMeta, anychart.PointState.HOVER);
+  this.hovered_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR,  anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME);
   this.hovered_.setMeta('headers', [0, 0]);
   this.hovered_.setOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK, factoryEnabledNull);
 

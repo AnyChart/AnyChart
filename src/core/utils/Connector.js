@@ -87,17 +87,28 @@ anychart.core.utils.Connector.prototype.setupByJSON = function(config, opt_defau
 
 
 /** @inheritDoc */
-anychart.core.utils.Connector.prototype.setupSpecial = function(isDefault, var_args) {
-  var arg = arguments[1];
-  var res = false;
-  if (!isNaN(arg)) {
-    this['length'](arg);
-    res = true;
-  } else if (goog.isString(arg)) {
-    this['stroke'](arg);
-    res = true;
+anychart.core.utils.Connector.prototype.resolveSpecialValue = function(var_args) {
+  var arg0 = arguments[0];
+  if (!isNaN(arg0)) {
+    return {'length': arg0};
+  } else if (goog.isString(arg0)) {
+    return {'stroke': arg0};
   }
-  return res;
+  return null;
+};
+
+
+/** @inheritDoc */
+anychart.core.utils.Connector.prototype.setupSpecial = function(isDefault, var_args) {
+  var resolvedValue = this.resolveSpecialValue(arguments[1]);
+  if (resolvedValue) {
+    if ('length' in resolvedValue)
+      this['length'](resolvedValue['length']);
+    if ('stroke' in resolvedValue)
+      this['stroke'](resolvedValue['stroke']);
+    return true;
+  }
+  return false;
 };
 
 

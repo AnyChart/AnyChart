@@ -55,6 +55,8 @@ goog.require('goog.ui.KeyboardShortcutHandler');
 anychart.mapModule.Chart = function() {
   anychart.mapModule.Chart.base(this, 'constructor');
 
+  this.addThemes('map');
+
   /**
    * Custom crs passed to crs() method.
    * @type {Object|Function|anychart.enums.MapProjections|string}
@@ -1737,6 +1739,7 @@ anychart.mapModule.Chart.prototype.onAxesSettingsSignal = function(event) {
 anychart.mapModule.Chart.prototype.grids = function(opt_value) {
   if (!this.gridSettings_) {
     this.gridSettings_ = new anychart.mapModule.elements.GridSettings(this);
+    this.setupCreated('gridsSettings', this.gridSettings_);
   }
 
   if (goog.isDef(opt_value)) {

@@ -69,6 +69,8 @@ anychart.annotationsModule.Label.prototype.background = function(opt_value) {
   if (!this.background_) {
     this.background_ = new anychart.core.ui.Background();
     this.background_.listenSignals(this.backgroundInvalidated_, this);
+
+    this.setupCreated('background', this.background_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -91,6 +93,8 @@ anychart.annotationsModule.Label.prototype.padding = function(opt_spaceOrTopOrTo
   if (!this.padding_) {
     this.padding_ = new anychart.core.utils.Padding();
     this.padding_.listenSignals(this.paddingInvalidated_, this);
+
+    this.setupCreated('padding', this.padding_);
   }
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
     this.padding_.setup.apply(this.padding_, arguments);
@@ -565,8 +569,6 @@ anychart.annotationsModule.Label.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.annotationsModule.Label.prototype.setDefaultSettings = function(value) {
   anychart.annotationsModule.Label.base(this, 'setDefaultSettings', value);
-  this.background().setupInternal(true, value['background']);
-  this.padding().setupInternal(true, value['padding']);
 };
 
 

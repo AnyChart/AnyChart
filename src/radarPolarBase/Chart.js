@@ -19,6 +19,7 @@ goog.require('anychart.scales');
 anychart.radarPolarBaseModule.Chart = function(categorizeData) {
   anychart.radarPolarBaseModule.Chart.base(this, 'constructor', categorizeData);
 
+  this.addThemes('polar');
   /**
    * @type {Array.<anychart.radarModule.Grid|anychart.polarModule.Grid>}
    * @private
@@ -191,7 +192,6 @@ anychart.radarPolarBaseModule.Chart.prototype.xGrid = function(opt_indexOrValue,
     grid = this.createGridInstance();
     grid.setOwner(this);
     grid.setDefaultLayout(anychart.enums.RadialGridLayout.RADIAL);
-    grid.setup(this.defaultGridSettings());
     grid.zIndex(this.getGridZIndex(true));
     this.xGrids_[index] = grid;
     this.registerDisposable(grid);
@@ -229,7 +229,6 @@ anychart.radarPolarBaseModule.Chart.prototype.yGrid = function(opt_indexOrValue,
     grid = this.createGridInstance();
     grid.setOwner(this);
     grid.setDefaultLayout(anychart.enums.RadialGridLayout.CIRCUIT);
-    grid.setup(this.defaultGridSettings());
     grid.zIndex(this.getGridZIndex(true));
     this.yGrids_[index] = grid;
     this.registerDisposable(grid);
@@ -267,7 +266,7 @@ anychart.radarPolarBaseModule.Chart.prototype.xMinorGrid = function(opt_indexOrV
     grid = this.createGridInstance();
     grid.setOwner(this);
     grid.setDefaultLayout(anychart.enums.RadialGridLayout.RADIAL);
-    grid.setup(this.defaultMinorGridSettings());
+    grid.addThemes('defaultMinorGridSettings');
     grid.zIndex(this.getGridZIndex(false));
     this.xMinorGrids_[index] = grid;
     this.registerDisposable(grid);
@@ -305,7 +304,7 @@ anychart.radarPolarBaseModule.Chart.prototype.yMinorGrid = function(opt_indexOrV
     grid = this.createGridInstance();
     grid.setOwner(this);
     grid.setDefaultLayout(anychart.enums.RadialGridLayout.CIRCUIT);
-    grid.setup(this.defaultMinorGridSettings());
+    grid.addThemes('defaultMinorGridSettings');
     grid.zIndex(this.getGridZIndex(false));
     this.yMinorGrids_[index] = grid;
     this.registerDisposable(grid);
@@ -338,6 +337,10 @@ anychart.radarPolarBaseModule.Chart.prototype.onGridSignal = function(event) {
  * @return {Object}
  */
 anychart.radarPolarBaseModule.Chart.prototype.defaultGridSettings = function(opt_value) {
+  if (!this.defaultGridSettings_) { // we need this for getGridZIndex method to work
+    this.defaultGridSettings_ = anychart.getThemes()[0]['defaultGridSettings'];
+  }
+
   if (goog.isDef(opt_value)) {
     this.defaultGridSettings_ = opt_value;
     return this;
@@ -352,6 +355,10 @@ anychart.radarPolarBaseModule.Chart.prototype.defaultGridSettings = function(opt
  * @return {Object}
  */
 anychart.radarPolarBaseModule.Chart.prototype.defaultMinorGridSettings = function(opt_value) {
+  if (!this.defaultMinorGridSettings_) { // we need this for getGridZIndex method to work
+    this.defaultMinorGridSettings_ = anychart.getThemes()[0]['defaultMinorGridSettings'];
+  }
+
   if (goog.isDef(opt_value)) {
     this.defaultMinorGridSettings_ = opt_value;
     return this;
@@ -727,13 +734,11 @@ anychart.radarPolarBaseModule.Chart.prototype.setupByJSONWithScales = function(c
   anychart.radarPolarBaseModule.Chart.base(this, 'setupByJSONWithScales', config, scalesInstances, opt_default);
 
   anychart.core.settings.deserialize(this, anychart.radarPolarBaseModule.Chart.PROPERTY_DESCRIPTORS, config);
-  this.defaultGridSettings(config['defaultGridSettings']);
-  this.defaultMinorGridSettings(config['defaultMinorGridSettings']);
 
-  this.setupElementsWithScales(config['xGrids'], this.xGrid, scalesInstances);
-  this.setupElementsWithScales(config['yGrids'], this.yGrid, scalesInstances);
-  this.setupElementsWithScales(config['xMinorGrids'], this.xMinorGrid, scalesInstances);
-  this.setupElementsWithScales(config['yMinorGrids'], this.yMinorGrid, scalesInstances);
+  this.setupElementsWithScales(config['xGrids'], this.xGrid, scalesInstances, true);
+  this.setupElementsWithScales(config['yGrids'], this.yGrid, scalesInstances, true);
+  this.setupElementsWithScales(config['xMinorGrids'], this.xMinorGrid, scalesInstances, true);
+  this.setupElementsWithScales(config['yMinorGrids'], this.yMinorGrid, scalesInstances, true);
 
   var json = config['xAxis'];
   this.xAxis().setupInternal(!!opt_default, json);
@@ -741,7 +746,7 @@ anychart.radarPolarBaseModule.Chart.prototype.setupByJSONWithScales = function(c
     this.xAxis().scale(scalesInstances[json['scale']]);
 
   json = config['yAxis'];
-  this.yAxis(json);
+  this.yAxis().setupInternal(!!opt_default, json);
   if (goog.isObject(json) && 'scale' in json && json['scale'] > 1)
     this.yAxis().scale(scalesInstances[json['scale']]);
 };
