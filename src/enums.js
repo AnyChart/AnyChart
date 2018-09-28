@@ -1539,7 +1539,12 @@ anychart.enums.EventType = {
   EDIT_INPUT_FOCUS: 'editinputfocus',
   EDIT_INPUT_KEY_PRESS: 'editinputkeypress',
   EDIT_INPUT_BEFORE_HIDE: 'editinputbeforehide',
-  EDIT_INPUT_HIDE: 'editinputhide'
+  EDIT_INPUT_HIDE: 'editinputhide',
+
+  //axis marker events
+  AXIS_MARKER_OVER: 'axismarkerover',
+  AXIS_MARKER_MOVE: 'axismarkermove',
+  AXIS_MARKER_OUT: 'axismarkerout'
 };
 
 

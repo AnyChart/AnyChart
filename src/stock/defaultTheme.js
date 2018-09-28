@@ -219,6 +219,12 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     },
     'defaultAnnotationSettings': {},
     'defaultPlotSettings': {
+      'defaultLineMarkerSettings': {
+        'zIndex': 200.2
+      },
+      'defaultTextMarkerSettings': {
+        'zIndex': 200.3
+      },
       'annotations': {
         'annotationsList': [],
         'zIndex': 2000

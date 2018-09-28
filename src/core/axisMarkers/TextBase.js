@@ -81,6 +81,8 @@ anychart.core.axisMarkers.TextBase = function() {
    */
   this.contBounds_ = null;
 
+  this.bindHandlersToComponent(this);
+
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['align', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
     ['scaleRangeMode', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_RECALCULATION]
@@ -88,6 +90,59 @@ anychart.core.axisMarkers.TextBase = function() {
 
 };
 goog.inherits(anychart.core.axisMarkers.TextBase, anychart.core.ui.LabelBase);
+
+
+//endregion
+//region -- Events
+/** @inheritDoc */
+anychart.core.axisMarkers.TextBase.prototype.handleMouseEvent = function(event) {
+  var evt = this.createAxisMarkerEvent_(event);
+  if (evt) {
+    this.dispatchEvent(evt);
+  }
+};
+
+
+/**
+ * @param {anychart.core.MouseEvent} event
+ * @return {Object}
+ * @private
+ */
+anychart.core.axisMarkers.TextBase.prototype.createAxisMarkerEvent_ = function(event) {
+  var type = event['type'];
+  switch (type) {
+    case acgraph.events.EventType.MOUSEOUT:
+      type = anychart.enums.EventType.AXIS_MARKER_OUT;
+      break;
+    case acgraph.events.EventType.MOUSEOVER:
+      type = anychart.enums.EventType.AXIS_MARKER_OVER;
+      break;
+    case acgraph.events.EventType.MOUSEMOVE:
+      type = anychart.enums.EventType.AXIS_MARKER_MOVE;
+      break;
+    default:
+      return null;
+  }
+  return {
+    'type': type,
+    'target': this,
+    'originalEvent': event,
+    'rawValue': this.valueInternal(),
+    'formattedValue': this.getFormattedValue(),
+    'offsetX': event.offsetX,
+    'offsetY': event.offsetY
+  };
+};
+
+
+/**
+ * Retruns formatted value to use with createAxisMarkerEvent_
+ * @return {string}
+ * @protected
+ */
+anychart.core.axisMarkers.TextBase.prototype.getFormattedValue = function() {
+  return 'Value: ' + this.valueInternal();
+};
 
 
 //endregion

@@ -59,6 +59,8 @@ anychart.core.axisMarkers.PathBase = function() {
    */
   this.markerElement_;
 
+  this.bindHandlersToComponent(this);
+
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['scaleRangeMode', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_RECALCULATION]
   ]);
@@ -73,6 +75,61 @@ goog.inherits(anychart.core.axisMarkers.PathBase, anychart.core.VisualBase);
  * }}
  */
 anychart.core.axisMarkers.PathBase.Range;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Events
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * @param {anychart.core.MouseEvent} event
+ */
+anychart.core.axisMarkers.PathBase.prototype.handleMouseEvent = function(event) {
+  var evt = this.createAxisMarkerEvent_(event);
+  if (evt)
+    this.dispatchEvent(evt);
+};
+
+
+/**
+ * @param {anychart.core.MouseEvent} event
+ * @return {Object}
+ * @private
+ */
+anychart.core.axisMarkers.PathBase.prototype.createAxisMarkerEvent_ = function(event) {
+  var type = event['type'];
+  switch (type) {
+    case acgraph.events.EventType.MOUSEOUT:
+      type = anychart.enums.EventType.AXIS_MARKER_OUT;
+      break;
+    case acgraph.events.EventType.MOUSEOVER:
+      type = anychart.enums.EventType.AXIS_MARKER_OVER;
+      break;
+    case acgraph.events.EventType.MOUSEMOVE:
+      type = anychart.enums.EventType.AXIS_MARKER_MOVE;
+      break;
+    default:
+      return null;
+  }
+  return {
+    'type': type,
+    'target': this,
+    'originalEvent': event,
+    'rawValue': this.valueInternal(),
+    'formattedValue': this.getFormattedValue(),
+    'offsetX': event.offsetX,
+    'offsetY': event.offsetY
+  };
+};
+
+
+/**
+ * Retruns formatted value to use with createAxisMarkerEvent_
+ * @return {string}
+ * @protected
+ */
+anychart.core.axisMarkers.PathBase.prototype.getFormattedValue = function() {
+  return 'Value: ' + this.valueInternal();
+};
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -529,6 +586,7 @@ anychart.core.axisMarkers.PathBase.prototype.remove = function() {
 anychart.core.axisMarkers.PathBase.prototype.markerElement = function() {
   if (!this.markerElement_) {
     this.markerElement_ = /** @type {!acgraph.vector.Path} */(acgraph.path());
+    this.bindHandlersToGraphics(this.markerElement_);
   }
   return this.markerElement_;
 };
