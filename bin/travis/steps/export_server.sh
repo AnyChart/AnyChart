@@ -43,8 +43,8 @@ function build_export_server(){
 
     es_clone_and_build "git@github.com:AnyChart/export-server.git"
 
-    Run "scp -i ~/.ssh/id_rsa out/export-server/target/export-server-standalone.jar $STATIC_HOST_SSH_STRING:/apps/static/cdn/releases/${VERSION}/anychart-export-server-${VERSION}.jar"
-    Run "scp -i ~/.ssh/id_rsa out/export-server/target/export-server-standalone.jar $STATIC_HOST_SSH_STRING:/apps/static/cdn/export-server/export-server{$EXP_S_VERSION}-bundle-${VERSION}.jar"
+    Run "scp -i ~/.ssh/id_rsa out/export-server/target/export-server-standalone.jar $STATIC_HOST_SSH_STRING:/apps/static/cdn/${MOCK_CDN_PATH}releases/${VERSION}/anychart-export-server-${VERSION}.jar"
+    Run "scp -i ~/.ssh/id_rsa out/export-server/target/export-server-standalone.jar $STATIC_HOST_SSH_STRING:/apps/static/cdn/${MOCK_CDN_PATH}export-server/export-server{$EXP_S_VERSION}-bundle-${VERSION}.jar"
     Run "rm -rf out/export-server"
 
     es_clone_and_build "git@github.com:AnyChart/export-server-private.git"

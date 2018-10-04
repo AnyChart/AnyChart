@@ -55,6 +55,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
          * @param {anychart.circularGaugeModule.pointers.Bar.BarDrawerContext} ctx Drawer context
          */
         'barDrawer': function(ctx) {
+          this['path']['clear']();
           this['path']['circularArc'](
               this['centerX'],
               this['centerY'],

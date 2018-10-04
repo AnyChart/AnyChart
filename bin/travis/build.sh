@@ -102,8 +102,8 @@ if [ "${STEP_LEGACY_7x}" = "true" ]; then . ./bin/travis/steps/legacy_binaries.s
 
 
 check_variables
-download_resources
 build_dist
+download_resources
 
 ########################################################################################################################
 #

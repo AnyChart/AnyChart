@@ -729,8 +729,6 @@ anychart.tableModule.Table.prototype.draw = function() {
 
   if (!this.contextMenu_) {
     this.contextMenu({fromTheme: true, enabled: true});
-    if (this.contextMenu_)
-      this.contextMenu_['attach'](this);
   }
 
   if (manualSuspend) stage.resume();
@@ -2611,6 +2609,7 @@ anychart.tableModule.Table.prototype.contextMenu = function(opt_value) {
     this.contextMenu_ = anychart.window['anychart']['ui']['contextMenu'](true);
     if (this.contextMenu_) {
       this.contextMenu_['itemsProvider'](this.contextMenuItemsProvider);
+      this.contextMenu_['attach'](this);
     }
   }
 

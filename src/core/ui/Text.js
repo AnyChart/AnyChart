@@ -172,6 +172,11 @@ anychart.core.ui.Text.prototype.applySettings = function() {
 anychart.core.ui.Text.prototype.getBounds = function() {
   if (!this.bounds) {
     var dom = this.getDomElement();
+
+    //We need bBox without x and y offsets.
+    dom.removeAttribute('x');
+    dom.removeAttribute('y');
+
     var bbox = dom['getBBox']();
 
     this.bounds = new anychart.math.Rect(bbox.x, -bbox.y, bbox.width, bbox.height);

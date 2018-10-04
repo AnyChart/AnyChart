@@ -28,6 +28,12 @@ anychart.core.ui.LabelBase = function() {
   this.background_ = null;
 
   /**
+   * @type {anychart.math.Rect|undefined}
+   * @private
+   */
+  this.bgBounds_ = void 0;
+
+  /**
    * Label padding settings.
    * @type {anychart.core.utils.Padding}
    * @private
@@ -218,6 +224,10 @@ anychart.core.ui.LabelBase.prototype.parent = function(opt_value) {
 anychart.core.ui.LabelBase.prototype.background = function(opt_value) {
   if (!this.background_) {
     this.background_ = new anychart.core.ui.Background();
+
+    //TODO (A.Kudryavtsev): Actually is lazy setup stupid hack.
+    this.background_.needsForceSignalsDispatching(true);
+
     this.background_.listenSignals(this.backgroundInvalidated_, this);
 
     this.setupCreated('background', this.background_);
@@ -761,7 +771,7 @@ anychart.core.ui.LabelBase.prototype.draw = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     this.calculateLabelBounds_();
 
-    var backgroundBounds = this.drawLabel();
+    this.bgBounds_ = this.drawLabel();
 
     this.invalidate(anychart.ConsistencyState.LABEL_BACKGROUND);
   }
@@ -769,8 +779,9 @@ anychart.core.ui.LabelBase.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.LABEL_BACKGROUND)) {
     if (background) {
+      background.needsForceSignalsDispatching(false);
       background.suspendSignalsDispatching();
-      background.parentBounds(backgroundBounds);
+      background.parentBounds(this.bgBounds_);
       background.draw();
       background.resumeSignalsDispatching(false);
     }
@@ -787,7 +798,7 @@ anychart.core.ui.LabelBase.prototype.draw = function() {
       rotation = 0;
     }
 
-    var coordinateByAnchor = anychart.utils.getCoordinateByAnchor(/** @type {anychart.math.Rect} */(backgroundBounds), anchor);
+    var coordinateByAnchor = anychart.utils.getCoordinateByAnchor(/** @type {anychart.math.Rect} */(this.bgBounds_), anchor);
     this.rootLayer_.setRotation(/** @type {number} */(rotation), coordinateByAnchor.x, coordinateByAnchor.y);
 
     this.markConsistent(anychart.ConsistencyState.BOUNDS);

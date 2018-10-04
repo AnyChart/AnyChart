@@ -77,6 +77,13 @@ if ${IS_DRY_RUN}; then
   echo '##############################'
 fi
 
+CHANGES=$(git diff --name-only)
+if [ "$CHANGES" ] && [ ${IS_RC} == "false" ]; then
+    echo
+    echo 'ABORTED! Files not commited. Commit them (commit will be reseted for save commit number).'
+    echo $CHANGES
+    exit 1
+fi
 ########################################################################################################################
 #
 #  Check target branch. `master` for release, `develop` for RC
@@ -102,7 +109,7 @@ fi
 ########################################################################################################################
 
 indexDTSurl="http://api.anychart.stg/si/${VERSION}/index.d.ts"
-if $IS_RC; then indexDTSurl='http://api.anychart.stg/si/develop/index-develop.d.ts'; fi
+ if $IS_RC; then indexDTSurl='http://api.anychart.stg/si/develop/index-develop.d.ts'; fi
 
 echo
 echo " -- Download ${indexDTSurl}"

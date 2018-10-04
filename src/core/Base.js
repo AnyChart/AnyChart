@@ -516,10 +516,10 @@ anychart.core.Base = function() {
 
   /**
    * Themes chain for current instances in order from less specific to more specific.
-   * 
+   *
    * Can contain strings (names in defaultTheme objects, for example 'title' or 'chart.title')
    * of theme objects.
-   * 
+   *
    * @type {Array.<Object|string>}
    * @protected
    */
@@ -1340,6 +1340,7 @@ anychart.core.Base.prototype.flattenThemes = function() {
       splitPath = theme.split('.');
       var part;
 
+
       for (var t = 0; t < baseThemes.length; t++) {
         theme = baseThemes[t];
         for (var j = 0; j < splitPath.length; j++) {
@@ -1350,20 +1351,17 @@ anychart.core.Base.prototype.flattenThemes = function() {
         }
 
         if (goog.isDef(theme)) {
-          if (goog.isObject(theme) && goog.isObject(flatTheme))
-            goog.mixin(flatTheme, theme);
-          else if (goog.isBoolean(theme))
-            goog.mixin(flatTheme, {'enabled': theme});
-          else
-            flatTheme = theme;
+          theme = goog.isObject(theme) && !goog.isArray(theme) ? theme :
+              goog.isBoolean(theme) ?
+                  {'enabled': theme} :
+                  this.resolveSpecialValue(theme);
+
+          goog.mixin(flatTheme, theme);
         }
       }
     } else if (goog.isObject(theme))
       goog.mixin(flatTheme, theme);
   }
-
-  if (!goog.isObject(flatTheme))
-    flatTheme = this.resolveSpecialValue(flatTheme);
 
   this.themeSettings = /** @type {!Object} */(flatTheme);
 };

@@ -529,8 +529,9 @@ anychart.mekkoModule.Chart.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.mekkoModule.Chart.prototype.serializeWithScales = function(json, scales, scaleIds) {
-  this.serializeScale(json, 'firstCategoriesScale', /** @type {anychart.scales.Base} */(this.firstCategoriesScale()), scales, scaleIds);
-  this.serializeScale(json, 'lastCategoriesScale', /** @type {anychart.scales.Base} */(this.lastCategoriesScale()), scales, scaleIds);
+  // todo: (chernetsky) Uncomment when firstCategoriesScale and lastCategoriesScale become available from user API
+  // this.serializeScale(json, 'firstCategoriesScale', /** @type {anychart.scales.Base} */(this.firstCategoriesScale()), scales, scaleIds);
+  // this.serializeScale(json, 'lastCategoriesScale', /** @type {anychart.scales.Base} */(this.lastCategoriesScale()), scales, scaleIds);
 
   anychart.mekkoModule.Chart.base(this, 'serializeWithScales', json, scales, scaleIds);
 };

@@ -167,7 +167,7 @@ anychart.core.shapeManagers.PerSeries.prototype.updateMarkersColors = function(s
     for (var name in shapeGroup) {
       var descriptor = this.defs[name];
       if (descriptor && !descriptor.isHatchFill) {
-        var markerDescFill = /** @type {acgraph.vector.Fill} */(descriptor.fill(this.series, state, void 0, void  0, 'fill'));
+        var markerDescFill = /** @type {acgraph.vector.Fill} */(descriptor.fill(this.series, state, void 0, void 0, 'fill'));
         var markerDescStroke = /** @type {acgraph.vector.Stroke} */(descriptor.stroke(this.series, state, void 0, void 0, 'stroke'));
 
         if (markerDescFill && anychart.color.isNotNullColor(markerDescFill))

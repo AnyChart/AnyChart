@@ -495,8 +495,8 @@ anychart.bulletModule.Chart.prototype.drawContent = function(bounds) {
       var marker = this.markers_[i];
       marker.suspendSignalsDispatching();
       marker.parentBounds(boundsWithoutAxis);
-      marker['type'](/** @type {anychart.enums.BulletMarkerType} */(this.markerPalette().itemAt(i)));
-      marker['layout'](/** @type {anychart.enums.Layout} */(this.getOption('layout')));
+      marker.setDefaultType(/** @type {anychart.enums.BulletMarkerType} */(this.markerPalette().itemAt(i)));
+      marker.setDefaultLayout(/** @type {anychart.enums.Layout} */(this.getOption('layout')));
       marker.draw();
       marker.resumeSignalsDispatching(false);
     }
@@ -547,7 +547,7 @@ anychart.bulletModule.Chart.prototype.createMarker_ = function(iterator) {
   marker.container(this.rootElement);
 
   //defaults
-  marker['type'](/** @type {anychart.enums.BulletMarkerType} */(this.markerPalette().itemAt(index)));
+  marker.setDefaultType(/** @type {anychart.enums.BulletMarkerType} */(this.markerPalette().itemAt(index)));
 
   //settings from data
   marker['value'](/** @type {string|number} */(iterator.get('value')));

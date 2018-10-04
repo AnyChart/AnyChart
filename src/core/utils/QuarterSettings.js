@@ -60,12 +60,10 @@ goog.inherits(anychart.core.utils.QuarterSettings, anychart.core.Base);
  * @return {Array.<anychart.core.utils.Quarter>}
  */
 anychart.core.utils.QuarterSettings.prototype.getItems = function() {
-  if (!this.quarters_.length) {
-    this.getCreated('leftBottom');
-    this.getCreated('rightBottom');
-    this.getCreated('leftTop');
-    this.getCreated('rightTop');
-  }
+  if (!this.rightTop_) this.getCreated('rightTop');
+  if (!this.leftBottom_) this.getCreated('leftBottom');
+  if (!this.rightBottom_) this.getCreated('rightBottom');
+  if (!this.leftTop_) this.getCreated('leftTop');
 
   return this.quarters_;
 };

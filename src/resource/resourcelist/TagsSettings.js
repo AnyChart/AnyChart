@@ -25,6 +25,7 @@ goog.inherits(anychart.resourceModule.resourceList.TagsSettings, anychart.resour
 anychart.resourceModule.resourceList.TagsSettings.prototype.background = function(opt_value) {
   if (!this.background_) {
     this.background_ = new anychart.core.ui.Background();
+    this.background_.serializeOnlyOwn = false; //todo: Should think about it after themes refactoring. Hack for gantt serialize
     this.background_.listenSignals(this.backgroundInvalidated_, this);
   }
 

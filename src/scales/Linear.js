@@ -319,21 +319,8 @@ anychart.scales.Linear.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.scales.Linear.prototype.setupByJSON = function(config, opt_default) {
   anychart.scales.Linear.base(this, 'setupByJSON', config, opt_default);
-  //TODO (A.Kudryavtsev): Pretty dirty activities. Need to drop this mess.
-  if ('ticks' in config) {
-    var ticksConf = {};
-    goog.mixin(ticksConf, this.ticks().themeSettings);
-    goog.mixin(ticksConf, config['ticks']);
-    this.ticks(ticksConf);
-  }
-  if ('minorTicks' in config) {
-    var minorTicksConf = {};
-    goog.mixin(minorTicksConf, this.minorTicks().themeSettings);
-    goog.mixin(minorTicksConf, config['minorTicks']);
-    this.minorTicks(minorTicksConf);
-  }
-  // this.ticks(config['ticks']);
-  // this.minorTicks(config['minorTicks']);
+  this.ticks(config['ticks']);
+  this.minorTicks(config['minorTicks']);
   this.stackMode(config['stackMode']);
   this.stackDirection(config['stackDirection']);
   this.stickToZero(config['stickToZero']);

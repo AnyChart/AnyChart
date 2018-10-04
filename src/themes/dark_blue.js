@@ -117,6 +117,11 @@ goog.provide('anychart.themes.dark_blue');
         }
       }
     },
+    'defaultLegend': {
+      'paginator': {
+        'fontColor': '#b0bec5'
+      }
+    },
     'chart': {
       'defaultSeriesSettings': {
         'base': {

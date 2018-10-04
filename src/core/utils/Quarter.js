@@ -209,7 +209,7 @@ anychart.core.utils.Quarter.prototype.label = function(opt_indexOrValue, opt_val
   if (!label) {
     label = new anychart.core.ui.Label();
     label.setParentEventTarget(this);
-    label.addThemes('defaultLabelSettings', 'chart.defaultQuarterSettings.defaultLabelSettings');
+    label.addThemes('defaultFontSettings', 'defaultLabelSettings', 'chart.defaultQuarterSettings.defaultLabelSettings');
     this.labels_[index] = label;
     label.listenSignals(this.labelInvalidated_, this);
     this.invalidate(anychart.ConsistencyState.QUARTER_LABELS, anychart.Signal.NEEDS_REDRAW);

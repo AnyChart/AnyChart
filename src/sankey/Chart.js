@@ -585,6 +585,13 @@ anychart.sankeyModule.Chart.prototype.createLabelsContextProvider = function(ele
 
   var values = {};
   this.createContextValues(values, element);
+  if (element.type != anychart.sankeyModule.Chart.ElementType.NODE) {
+    var iterator = this.getIterator();
+    iterator.select(element.dataIndex);
+    this.labelsContextProvider_.dataSource(iterator);
+  } else {
+    this.labelsContextProvider_.dataSource(null);
+  }
 
   return /** @type {anychart.format.Context} */ (this.labelsContextProvider_.propagate(values));
 };
@@ -664,7 +671,15 @@ anychart.sankeyModule.Chart.prototype.createContextProvider = function(tag) {
     this.contextProvider_ = new anychart.format.Context();
 
   var values = {};
-  this.createContextValues(values, tag.element);
+  var element = /** @type {anychart.sankeyModule.Chart.Node|anychart.sankeyModule.Chart.Flow} */ (tag.element);
+  this.createContextValues(values, element);
+  if (element.type != anychart.sankeyModule.Chart.ElementType.NODE) {
+    var iterator = this.getIterator();
+    iterator.select(element.dataIndex);
+    this.contextProvider_.dataSource(iterator);
+  } else {
+    this.contextProvider_.dataSource(null);
+  }
 
   return /** @type {anychart.format.Context} */ (this.contextProvider_.propagate(values));
 };
@@ -971,7 +986,9 @@ anychart.sankeyModule.Chart.prototype.setupPalette_ = function(cls, opt_cloneFro
     // we dispatch only if we replace existing palette.
     var doDispatch = !!this.palette_;
     goog.dispose(this.palette_);
-    this.palette_ = new cls();
+    this.palette_ = /** @type {anychart.palettes.DistinctColors|anychart.palettes.RangeColors} */ (new cls());
+    this.setupCreated('palette', this.palette_);
+    this.palette_.restoreDefaults();
     if (opt_cloneFrom)
       this.palette_.setup(opt_cloneFrom);
     this.palette_.listenSignals(this.paletteInvalidated_, this);

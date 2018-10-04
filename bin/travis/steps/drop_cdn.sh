@@ -13,16 +13,16 @@ function drop_cdn_cache(){
     echo "--"
 
     if [ ${IS_RELEASE_BUILD} = "true" ]; then
-        echo "drop cache for /releases/X.X.X/*"
+        echo "drop cache for /${MOCK_CDN_PATH}releases/X.X.X/*"
         Run "python ./bin/travis/utils/drop_cdn_cache.py ${VERSION} ${CDN_ALIASE} ${CDN_CONSUMER_KEY} ${CDN_CONSUMER_SECRET} ${CDN_ZONE_ID}"
         Run "python ./bin/travis/utils/drop_cdn_cache.py v${MAJOR_VERSION} ${CDN_ALIASE} ${CDN_CONSUMER_KEY} ${CDN_CONSUMER_SECRET} ${CDN_ZONE_ID}"
     else
         if [ ${IS_RC_BUILD} = "true" ]; then
-            echo "drop cache for /releases/X.X.X/*"
+            echo "drop cache for /${MOCK_CDN_PATH}releases/X.X.X/*"
             Run "python ./bin/travis/utils/drop_cdn_cache.py ${VERSION} ${CDN_ALIASE} ${CDN_CONSUMER_KEY} ${CDN_CONSUMER_SECRET} ${CDN_ZONE_ID}"
             Run "python ./bin/travis/utils/drop_cdn_cache.py rc ${CDN_ALIASE} ${CDN_CONSUMER_KEY} ${CDN_CONSUMER_SECRET} ${CDN_ZONE_ID}"
         else
-            echo "drop cache for /releases/${TRAVIS_BRANCH}/*"
+            echo "drop cache for /${MOCK_CDN_PATH}releases/${TRAVIS_BRANCH}/*"
             Run "python ./bin/travis/utils/drop_cdn_cache.py ${TRAVIS_BRANCH} ${CDN_ALIASE} ${CDN_CONSUMER_KEY} ${CDN_CONSUMER_SECRET} ${CDN_ZONE_ID}"
         fi
     fi

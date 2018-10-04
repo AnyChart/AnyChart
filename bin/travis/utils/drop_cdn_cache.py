@@ -34,14 +34,14 @@ if __name__ == '__main__':
 
     dist_path = os.path.join(PROJECT_PATH, 'dist')
 
-    releases = get_paths_list(dist_path, '/releases/%s/' % version)
+    releases = get_paths_list(dist_path, os.getenv('MOCK_CDN_PATH')+'/releases/%s/' % version)
 
-    legacy_versioned_js = get_paths_list(os.path.join(dist_path, 'js'), '/js/%s/' % version)
-    legacy_versioned_css = get_paths_list(os.path.join(dist_path, 'css'), '/css/%s/' % version)
-    legacy_versioned_themes = get_paths_list(os.path.join(dist_path, 'themes'), '/themes/%s/' % version)
+    legacy_versioned_js = get_paths_list(os.path.join(dist_path, os.getenv('MOCK_CDN_PATH')+'js'), '/js/%s/' % version)
+    legacy_versioned_css = get_paths_list(os.path.join(dist_path, os.getenv('MOCK_CDN_PATH')+'css'), '/css/%s/' % version)
+    legacy_versioned_themes = get_paths_list(os.path.join(dist_path, os.getenv('MOCK_CDN_PATH')+'themes'), '/themes/%s/' % version)
     legacy_schemas = [
-        '/schemas/%s/json-schema.json' % version,
-        '/schemas/%s/xml-schema.xsd' % version
+        os.getenv('MOCK_CDN_PATH')+'/schemas/%s/json-schema.json' % version,
+        os.getenv('MOCK_CDN_PATH')+'/schemas/%s/xml-schema.xsd' % version
     ]
 
     paths = releases

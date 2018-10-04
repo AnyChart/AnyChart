@@ -364,7 +364,9 @@ anychart.tagCloudModule.Chart.prototype.setupPalette_ = function(cls, opt_cloneF
     // we dispatch only if we replace existing palette.
     var doDispatch = !!this.palette_;
     goog.dispose(this.palette_);
-    this.palette_ = new cls();
+    this.palette_ = /** @type {anychart.palettes.DistinctColors|anychart.palettes.RangeColors} */ (new cls());
+    this.setupCreated('palette', this.palette_);
+    this.palette_.restoreDefaults();
     if (opt_cloneFrom)
       this.palette_.setup(opt_cloneFrom);
     this.palette_.listenSignals(this.paletteInvalidated_, this);

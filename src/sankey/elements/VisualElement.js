@@ -48,8 +48,10 @@ anychart.sankeyModule.elements.VisualElement = function(chart, type) {
   ]);
 
   this.normal_ = new anychart.core.StateSettings(this, descriptorsMap, anychart.PointState.NORMAL);
+  this.normal_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME);
   this.normal_.setOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK, anychart.core.StateSettings.DEFAULT_LABELS_AFTER_INIT_CALLBACK);
   this.hovered_ = new anychart.core.StateSettings(this, descriptorsMap, anychart.PointState.HOVER);
+  this.hovered_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME);
   this.hovered_.setOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK, function(factory) {
     factory.markConsistent(anychart.ConsistencyState.ALL);
   });
@@ -92,6 +94,7 @@ anychart.sankeyModule.elements.VisualElement.prototype.getType = function() {
 anychart.sankeyModule.elements.VisualElement.prototype.tooltip = function(opt_value) {
   if (!this.tooltip_) {
     this.tooltip_ = new anychart.core.ui.Tooltip(0);
+    this.tooltip_.dropThemes();
     this.tooltip_.parent(/** @type {anychart.core.ui.Tooltip} */ (this.chart.tooltip()));
     this.tooltip_.chart(this.chart);
   }

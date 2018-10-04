@@ -63,13 +63,6 @@ anychart.core.ui.Tooltip = function(capability) {
   this.childTooltipsMap = {};
 
   /**
-   * Hide delay.
-   * @type {number}
-   * @private
-   */
-  this.hideDelay_ = 0;
-
-  /**
    * Root layer.
    * @type {acgraph.vector.Layer}
    */
@@ -220,7 +213,8 @@ anychart.core.ui.Tooltip = function(capability) {
     ['onBeforeTitleChange', 0, 0],
     ['onTitleChanged', 0, 0],
     ['onBeforeContentChange', 0, 0],
-    ['onContentChanged', 0, 0]
+    ['onContentChanged', 0, 0],
+    ['hideDelay', 0, 0, 0, this.createDelayObject_]
   ]);
 };
 goog.inherits(anychart.core.ui.Tooltip, anychart.core.VisualBase);
@@ -323,7 +317,8 @@ anychart.core.ui.Tooltip.prototype.TOOLTIP_SIMPLE_DESCRIPTORS = (function() {
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'onBeforeTitleChange', anychart.core.settings.functionNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'onTitleChanged', anychart.core.settings.functionNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'onBeforeContentChange', anychart.core.settings.functionNormalizer],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'onContentChanged', anychart.core.settings.functionNormalizer]
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'onContentChanged', anychart.core.settings.functionNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'hideDelay', anychart.core.settings.numberNormalizer]
   ]);
 
   return map;
@@ -351,29 +346,6 @@ anychart.core.ui.Tooltip.prototype.hide = function(opt_force, opt_event) {
       childTooltip.hide(opt_force, opt_event);
   }
   return this.hideSelf(opt_force, opt_event);
-};
-
-
-/**
- * Sets/gets delay in milliseconds before tooltip item becomes hidden.
- * @param {number=} opt_value - Delay in milliseconds.
- * @return {number|undefined|anychart.core.ui.Tooltip} - Delay in milliseconds or itself for method chaining.
- */
-anychart.core.ui.Tooltip.prototype.hideDelay = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    // we have no need to invalidate anything here
-    if (this.hideDelay_ != opt_value) {
-      this.hideDelay_ = +opt_value;
-      this.createDelayObject_();
-    }
-    return this;
-  } else {
-    if (goog.isDef(this.hideDelay_))
-      return this.hideDelay_;
-    else {
-      return this.parent_ ? this.parent_.hideDelay() : void 0;
-    }
-  }
 };
 
 
@@ -1329,7 +1301,7 @@ anychart.core.ui.Tooltip.prototype.hideSelf = function(opt_force, opt_event) {
     this.triangle_ = null;
   }
 
-  if (this.hideDelay()) {
+  if (this.getOption('hideDelay')) {
     this.createDelayObject_();
     if (!this.delay_.isActive()) this.delay_.start();
     return false;
@@ -1492,7 +1464,7 @@ anychart.core.ui.Tooltip.prototype.createDelayObject_ = function() {
         this.refreshDelay_ = false;
         this.createDelayObject_();
       }
-    }, /** @type {number} */ (this.hideDelay()), this);
+    }, /** @type {number} */ (this.getOption('hideDelay')), this);
   }
 };
 
@@ -2018,7 +1990,7 @@ anychart.core.ui.Tooltip.prototype.hideSelectable_ = function(event) {
     goog.events.unlisten(this.getRootLayer_().domElement(), goog.events.EventType.MOUSELEAVE, this.hideSelectable_, false, this);
   this.triangle_ = null;
 
-  if (!this.hideDelay()) {
+  if (!this.getOption('hideDelay')) {
     this.hide(true);
   } else {
     this.createDelayObject_();
@@ -2301,9 +2273,6 @@ anychart.core.ui.Tooltip.prototype.serialize = function() {
   if (!goog.object.isEmpty(paddingConfig))
     json['padding'] = paddingConfig;
 
-  if (this.hideDelay_) //Zero value is default, we don't need to save it.
-    json['hideDelay'] = this.hideDelay_;
-
   return json;
 };
 
@@ -2319,7 +2288,6 @@ anychart.core.ui.Tooltip.prototype.setupByJSON = function(config, opt_default) {
   this.separator().setupInternal(!!opt_default, config['separator']);
   this.background().setupInternal(!!opt_default, config['background']);
   this.padding().setupInternal(!!opt_default, config['padding']);
-  this.hideDelay(config['hideDelay']);
 
   var contentConfig = config['contentInternal'] || {};
   contentConfig['position'] = contentConfig['position'] ? contentConfig['position'] : anychart.enums.Position.LEFT_TOP;
@@ -2392,7 +2360,6 @@ anychart.core.ui.Tooltip.prototype.disposeInternal = function() {
   proto['background'] = proto.background;
   proto['padding'] = proto.padding;
   proto['hide'] = proto.hide;
-  proto['hideDelay'] = proto.hideDelay;
   proto['textSettings'] = proto.textSettings;
   // auto generated
   // proto['useHtml'] = proto.useHtml;
@@ -2417,5 +2384,6 @@ anychart.core.ui.Tooltip.prototype.disposeInternal = function() {
   // proto['onTitleChanged'] = proto.onTitleChanged;
   // proto['onBeforeContentChange'] = proto.onBeforeContentChange;
   // proto['onContentChanged'] = proto.onContentChanged
+  // proto['hideDelay'] = proto.hideDelay;
 })();
 //endregion

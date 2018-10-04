@@ -45,8 +45,8 @@ anychart.bulletModule.Marker.PROTOTYPE_DESCRIPTORS = (function() {
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'type', anychart.enums.normalizeBulletMarkerType],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'value', anychart.utils.toNumber],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'layout', anychart.enums.normalizeLayout],
-    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'fill', acgraph.vector.normalizeFill],
-    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'stroke', acgraph.vector.normalizeStroke]
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'fill', anychart.core.settings.fillNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'stroke', anychart.core.settings.strokeNormalizer]
   ]);
   return map;
 })();
@@ -132,6 +132,40 @@ anychart.bulletModule.Marker.prototype.scale = function(opt_value) {
     return this;
   }
   return this.scale_;
+};
+
+
+/**
+ * Sets default type, straight to theme settings, this is used when marker palette in chart is updated.
+ * @param {string|anychart.enums.BulletMarkerType} value
+ */
+anychart.bulletModule.Marker.prototype.setDefaultType = function(value) {
+  if (goog.isDef(value)) {
+    value = anychart.enums.normalizeBulletMarkerType(value, /** @type {anychart.enums.BulletMarkerType} */(this.getThemeOption('type')));
+    if (this.getThemeOption('type') != value) {
+      this.themeSettings['type'] = value;
+      if (!goog.isDef(this.getOwnOption('type'))) {
+        this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      }
+    }
+  }
+};
+
+
+/**
+ * Sets default layout, straight to theme settings, this is used when layout in chart is updated.
+ * @param {string|anychart.enums.Layout} value
+ */
+anychart.bulletModule.Marker.prototype.setDefaultLayout = function(value) {
+  if (goog.isDef(value)) {
+    value = anychart.enums.normalizeLayout(value, /** @type {anychart.enums.Layout} */(this.getThemeOption('layout')));
+    if (this.getThemeOption('layout') != value) {
+      this.themeSettings['layout'] = value;
+      if (!goog.isDef(this.getOwnOption('layout'))) {
+        this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      }
+    }
+  }
 };
 
 

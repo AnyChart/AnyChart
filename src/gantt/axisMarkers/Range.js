@@ -41,7 +41,7 @@ anychart.ganttModule.axisMarkers.Range.PROPERTY_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
   anychart.core.settings.createDescriptors(map, [
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'fill', acgraph.vector.normalizeFill],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'fill', anychart.core.settings.fillNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'from', anychart.core.settings.asIsNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'to', anychart.core.settings.asIsNormalizer]
   ]);
@@ -57,7 +57,7 @@ anychart.core.settings.populate(anychart.ganttModule.axisMarkers.Range, anychart
  * @inheritDoc
  */
 anychart.ganttModule.axisMarkers.Range.prototype.getFormattedValue = function() {
-  return 'From: ' + this.from() + ' to: ' + this.to();
+    return 'From: ' + this.getOption('from') + ' to: ' + this.getOption('to');
 };
 
 

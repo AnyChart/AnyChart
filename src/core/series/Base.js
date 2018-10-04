@@ -2595,6 +2595,12 @@ anychart.core.series.Base.prototype.drawSingleFactoryElement = function(factorie
     var currentFactory = /** @type {anychart.core.ui.MarkersFactory} */(factories[1] || mainFactory);
     var iterator = this.getIterator();
 
+    var metaName = anychart.utils.instanceOf(this.shapeManager, anychart.core.shapeManagers.PerPoint) ? 'shapes' : 'shapeNames';
+    var group = /** @type {Object.<string, acgraph.vector.Shape>} */(iterator.meta(metaName));
+    var state = this.getPointState(iterator.getIndex());
+    // this.shapeManager.updateMarkersColors(anychart.PointState.NORMAL, group);
+    this.shapeManager.updateMarkersColors(state, group);
+
     var color = /** @type {acgraph.vector.Fill|acgraph.vector.Stroke} */(
         iterator.meta(this.check(anychart.core.drawers.Capabilities.USES_STROKE_AS_FILL) ? 'markerStroke' : 'markerFill'));
 
@@ -3240,7 +3246,6 @@ anychart.core.series.Base.prototype.draw = function() {
         this.drawPoint(point, this.getPointState(point.getIndex()));
       }
 
-      var metaName = anychart.utils.instanceOf(this.shapeManager, anychart.core.shapeManagers.PerPoint) ? 'shapes' : 'shapeNames';
       // main points drawing cycle
       iterator.reset();
       while (iterator.advance()) {
@@ -3249,8 +3254,10 @@ anychart.core.series.Base.prototype.draw = function() {
         this.makePointMeta(iterator, yValueNames, columns);
         this.drawPoint(iterator, state);
 
-        var group = /** @type {Object.<string, acgraph.vector.Shape>} */(iterator.meta(metaName));
-        this.shapeManager.updateMarkersColors(state, group);
+        // if (updateMarkers) {
+        //   var group = /** @type {Object.<string, acgraph.vector.Shape>} */(iterator.meta(metaName));
+        //   this.shapeManager.updateMarkersColors(state, group);
+        // }
 
         for (i = 0; i < elementsDrawersLength; i++)
           elementsDrawers[i].call(this, iterator, state, false);

@@ -72,7 +72,9 @@ anychart.palettes.HatchFills.prototype.items = function(opt_hatchFills, var_args
     this.hatchFills_ = [];
     if (goog.isDef(this.themeSettings['items'])) {
       for (var i = 0; i < this.themeSettings['items'].length; i++) {
-        this.hatchFills_.push(this.themeSettings['items'][i]);
+        var hFill = this.themeSettings['items'][i];
+        var norm = acgraph.vector.normalizeHatchFill.call(null, hFill);
+        this.hatchFills_.push(norm);
       }
     } else { // Initialize default marker palette using all marker types framework supports.
       for (var key in acgraph.vector.HatchFill.HatchFillType) {

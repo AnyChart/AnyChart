@@ -65,7 +65,7 @@ anychart.core.ui.Legend = function() {
 
   this.invalidate(anychart.ConsistencyState.ALL);
 
-  this.bindHandlersToComponent(this, this.handleMouseOver_, this.handleMouseOut_, null, this.handleMouseMove_, null, this.handleMouseClick_);
+  this.bindHandlersToComponent(this, null, null, null, null, this.handleAll_, null);
 
   var iconSizeBeforeInvalidationHook = function() {
     if (goog.isDefAndNotNull(this.items_)) {
@@ -1894,15 +1894,15 @@ anychart.core.ui.Legend.prototype.drawLegendContent_ = function(pageNumber, cont
           dx = tx.getTranslateX();
           dy = tx.getTranslateY();
         }
-        var itemsContentBounds = this.itemsLayer_.getAbsoluteBounds();
+        // var itemsContentBounds = this.itemsLayer_.getAbsoluteBounds();
         var titleBounds = this.title_.getContentBounds();
         titleBounds.top += dy;
         titleBounds.left += dx;
 
-        var topTranslate = titleBounds.top + titleBounds.height / 2 - (itemsContentBounds.top + itemsContentBounds.height / 2);
-        topTranslate = Math.min(this.contentAreaBounds_.height - itemsContentBounds.height, Math.max(topTranslate, 0));
-
-        this.itemsLayer_.setTransformationMatrix(1, 0, 0, 1, 0, topTranslate);
+        // var topTranslate = titleBounds.top + titleBounds.height / 2 - (itemsContentBounds.top + itemsContentBounds.height / 2);
+        // topTranslate = Math.min(this.contentAreaBounds_.height - itemsContentBounds.height, Math.max(topTranslate, 0));
+        //
+        // // this.itemsLayer_.setTransformationMatrix(1, 0, 0, 1, 0, topTranslate);
       }
     }
   }
@@ -1944,66 +1944,47 @@ anychart.core.ui.Legend.prototype.makeBrowserEvent = function(e) {
  * @param {anychart.core.MouseEvent} event .
  * @private
  */
-anychart.core.ui.Legend.prototype.handleMouseOver_ = function(event) {
+anychart.core.ui.Legend.prototype.handleAll_ = function(event) {
   var evt = this.makePointEvent_(event);
   if (evt && this.dispatchEvent(evt)) {
-    var item = this.items_ && this.items_[evt['itemIndex']];
-    var source = /** @type {anychart.core.SeparateChart|anychart.stockModule.Plot} */(evt['itemSource']);
-    if (item) {
-      if (source && goog.isFunction(source.legendItemOver)) {
-        source.legendItemOver(item, event);
-      }
-      item.applyHover(true);
-      if (event) this.showTooltip(event);
+    var item, source;
+    switch (evt.type) {
+      case anychart.enums.EventType.LEGEND_ITEM_MOUSE_OVER:
+        item = this.items_ && this.items_[evt['itemIndex']];
+        source = /** @type {anychart.core.SeparateChart|anychart.stockModule.Plot} */(evt['itemSource']);
+        if (item) {
+          if (source && goog.isFunction(source.legendItemOver)) {
+            source.legendItemOver(item, event);
+          }
+          item.applyHover(true);
+          if (event) this.showTooltip(event);
+        }
+        break;
+
+      case anychart.enums.EventType.LEGEND_ITEM_MOUSE_MOVE:
+        if (event) this.showTooltip(event);
+        break;
+
+      case anychart.enums.EventType.LEGEND_ITEM_MOUSE_OUT:
+        item = this.items_ && this.items_[evt['itemIndex']];
+        source = /** @type {anychart.core.SeparateChart|anychart.stockModule.Plot} */(evt['itemSource']);
+        if (item) {
+          if (source && goog.isFunction(source.legendItemOut)) {
+            source.legendItemOut(item, event);
+          }
+          item.applyHover(false);
+          this.hideTooltip();
+        }
+        break;
+
+      case anychart.enums.EventType.LEGEND_ITEM_CLICK:
+        if (event['button'] != acgraph.events.BrowserEvent.MouseButton.LEFT) return;
+        item = this.items_ && this.items_[evt['itemIndex']];
+        source = /** @type {anychart.core.SeparateChart|anychart.stockModule.Plot} */(evt['itemSource']);
+        if (item && source && goog.isFunction(source.legendItemClick))
+          source.legendItemClick.call(source, item, event);
+        break;
     }
-  }
-};
-
-
-/**
- * @param {anychart.core.MouseEvent} event .
- * @private
- */
-anychart.core.ui.Legend.prototype.handleMouseMove_ = function(event) {
-  var evt = this.makePointEvent_(event);
-  if (evt && this.dispatchEvent(evt)) {
-    if (event) this.showTooltip(event);
-  }
-};
-
-
-/**
- * @param {anychart.core.MouseEvent} event .
- * @private
- */
-anychart.core.ui.Legend.prototype.handleMouseOut_ = function(event) {
-  var evt = this.makePointEvent_(event);
-  if (evt && this.dispatchEvent(evt)) {
-    var item = this.items_ && this.items_[evt['itemIndex']];
-    var source = /** @type {anychart.core.SeparateChart|anychart.stockModule.Plot} */(evt['itemSource']);
-    if (item) {
-      if (source && goog.isFunction(source.legendItemOut)) {
-        source.legendItemOut(item, event);
-      }
-      item.applyHover(false);
-      this.hideTooltip();
-    }
-  }
-};
-
-
-/**
- * @param {anychart.core.MouseEvent} event .
- * @private
- */
-anychart.core.ui.Legend.prototype.handleMouseClick_ = function(event) {
-  if (event['button'] != acgraph.events.BrowserEvent.MouseButton.LEFT) return;
-  var evt = this.makePointEvent_(event);
-  if (evt && this.dispatchEvent(evt)) {
-    var item = this.items_ && this.items_[evt['itemIndex']];
-    var source = /** @type {anychart.core.SeparateChart|anychart.stockModule.Plot} */(evt['itemSource']);
-    if (item && source && goog.isFunction(source.legendItemClick))
-      source.legendItemClick.call(source, item, event);
   }
 };
 

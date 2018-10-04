@@ -195,8 +195,18 @@ anychart.circularGaugeModule.pointers.Bar.prototype.draw = function() {
     barDrawer.call(ctx, ctx);
     this.makeInteractive(/** @type {acgraph.vector.Path} */(this.domElement));
 
-    if (this.hatchFillElement)
-      this.hatchFillElement.deserialize(this.domElement.serialize());
+    if (this.hatchFillElement) {
+      var hatchFillCtx = {
+        'centerX': cx,
+        'centerY': cy,
+        'radius': pixRadius,
+        'startAngle': startAngle,
+        'sweepAngle': sweepAngle,
+        'width': pixWidth,
+        'path': /** @type {!acgraph.vector.Path} */ (this.hatchFillElement)
+      };
+      barDrawer.call(hatchFillCtx, hatchFillCtx);
+    }
 
     if (goog.isFunction(this.fill()) || goog.isFunction(this.stroke()))
       this.invalidate(anychart.ConsistencyState.APPEARANCE);

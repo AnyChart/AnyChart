@@ -205,7 +205,11 @@ anychart.stockModule.eventMarkers.Table.prototype.getIterator = function(coItera
       pointsCount = coIterator.getRowsCount();
     } else {
       firstIndex = 0;
-
+      var keysFromCoIterator = [];
+      coIterator.reset();
+      while (coIterator.advance()) {
+        keysFromCoIterator[coIterator.currentIndex()] = coIterator.currentKey();
+      }
       coIterator.reset();
       var prevKey = NaN;
       var prevIndex = NaN;
@@ -214,16 +218,22 @@ anychart.stockModule.eventMarkers.Table.prototype.getIterator = function(coItera
       var from = isNaN(fromOrNaNForFull) ? -Infinity : fromOrNaNForFull;
       var to = isNaN(toOrNaNForFull) ? +Infinity : toOrNaNForFull;
       var currentKey, currentIndex;
+      var keyInsideBounds;
       while (coIterator.advance()) {
         currentKey = coIterator.currentKey();
         currentIndex = coIterator.currentIndex();
         if (isNaN(firstIndexInSeries))
           firstIndexInSeries = currentIndex;
-        var diff = (currentKey - prevKey) / 2;
+        var diff = (keysFromCoIterator[currentIndex] - keysFromCoIterator[prevIndex])/2;
         for (var i = 0; i < this.data_.length; i++) {
-          var keyInsideBounds = this.data_[i].key <= to && this.data_[i].key >= from;
+          keyInsideBounds = this.data_[i].key <= to && this.data_[i].key >= from;
           var keyInsideFirstVisible = (prevIndex == firstIndexInSeries) && this.data_[i].key < (prevKey + diff);
-          var keyInsideCurrent = this.data_[i].key <= (currentKey + diff) && this.data_[i].key >= (currentKey - diff);
+
+          var lowerBounds, upperBounds;
+          upperBounds = keysFromCoIterator[currentIndex] + (keysFromCoIterator[currentIndex+1] - keysFromCoIterator[currentIndex])/2;
+          lowerBounds = keysFromCoIterator[currentIndex] - (keysFromCoIterator[currentIndex] - keysFromCoIterator[currentIndex-1])/2;
+          upperBounds = isNaN(upperBounds) ? to : upperBounds;
+          var keyInsideCurrent = this.data_[i].key <= (upperBounds) && this.data_[i].key >= (lowerBounds);
           if (keyInsideBounds && (keyInsideFirstVisible || keyInsideCurrent)) {
             data.push({
               key: this.data_[i].key,
@@ -242,7 +252,7 @@ anychart.stockModule.eventMarkers.Table.prototype.getIterator = function(coItera
       // this fixes case when eventMarker is inside one visible point or between 2 points and neither one is visible
       if ((prevKey == currentKey && prevIndex == firstIndexInSeries) || isNaN(currentKey)) {
         for (var i = 0; i < this.data_.length; i++) {
-          var keyInsideBounds = this.data_[i].key <= to && this.data_[i].key >= from;
+          keyInsideBounds = this.data_[i].key <= to && this.data_[i].key >= from;
           if (keyInsideBounds) {
             data.push({
               key: this.data_[i].key,

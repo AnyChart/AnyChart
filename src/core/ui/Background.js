@@ -27,7 +27,13 @@ anychart.core.ui.Background = function() {
   anychart.core.ui.Background.base(this, 'constructor');
 
   this.addDefaultThemes(anychart.themes.DefaultThemes['background']);
-  
+
+  /**
+   * Serialize only own properties
+   * @type {boolean}
+  **/
+  this.serializeOnlyOwn = true; //todo: Should think about it after themes refactoring. Hack for gantt serialize
+
   /**
    * Parent.
    * @type {anychart.core.ui.Background}
@@ -634,7 +640,7 @@ anychart.core.ui.Background.prototype.getRemainingBounds = function() {
 anychart.core.ui.Background.prototype.serialize = function() {
   var json = anychart.core.ui.Background.base(this, 'serialize');
 
-  anychart.core.settings.serialize(this, this.SIMPLE_PROPS_DESCRIPTORS, json, 'Background', void 0, true);
+  anychart.core.settings.serialize(this, this.SIMPLE_PROPS_DESCRIPTORS, json, 'Background', void 0, this.serializeOnlyOwn);
 
   var corners = /** @type {Array} */(this.getOwnOption('corners'));
   if (corners) {

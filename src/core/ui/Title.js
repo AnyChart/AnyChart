@@ -607,9 +607,10 @@ anychart.core.ui.Title.prototype.textSettings = function(opt_objectOrName, opt_v
   }
 
   var res = {};
-  for (var key in this.ownSettings) {
-    if (key in this.TEXT_DESCRIPTORS)
-      res[key] = this.ownSettings[key];
+  for (var key in this.TEXT_DESCRIPTORS) {
+    var val = this.getOption(key);
+    if (goog.isDef(val))
+      res[key] = val;
   }
   return res;
 };
