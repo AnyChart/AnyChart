@@ -1079,7 +1079,7 @@ anychart.linearGaugeModule.pointers.Base.prototype.hoverMode = function(opt_valu
   if (goog.isDef(opt_value)) {
     return this;
   }
-  return /** @type {anychart.enums.HoverMode} */((/** @type {anychart.linearGaugeModule.Chart}*/(this.gauge_)).interactivity().hoverMode());
+  return /** @type {anychart.enums.HoverMode} */((/** @type {anychart.linearGaugeModule.Chart}*/(this.gauge_)).interactivity().getOption('hoverMode'));
 };
 
 

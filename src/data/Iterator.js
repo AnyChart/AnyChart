@@ -110,7 +110,7 @@ anychart.data.Iterator.prototype.current = function() {
  */
 anychart.data.Iterator.prototype.reset = function() {
   this.currentIndex = -1;
-  this.currentRow = undefined;
+  this.currentRow = void 0;
   return this;
 };
 

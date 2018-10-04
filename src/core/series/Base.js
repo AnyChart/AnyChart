@@ -287,7 +287,12 @@ anychart.core.series.Base = function(chart, plot, type, config) {
     ['outlierMarkers', 0, 0]
   ]);
   this.hovered_ = new anychart.core.StateSettings(this, descriptorsMeta, anychart.PointState.HOVER);
+  this.hovered_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR,  anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME);
+  this.hovered_.setOption(anychart.core.StateSettings.MARKERS_FACTORY_CONSTRUCTOR,  anychart.core.StateSettings.DEFAULT_MARKERS_CONSTRUCTOR_NO_THEME);
+
   this.selected_ = new anychart.core.StateSettings(this, descriptorsMeta, anychart.PointState.SELECT);
+  this.selected_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR,  anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME);
+  this.selected_.setOption(anychart.core.StateSettings.MARKERS_FACTORY_CONSTRUCTOR,  anychart.core.StateSettings.DEFAULT_MARKERS_CONSTRUCTOR_NO_THEME);
   function markLabelsAllConsistent(factory) {
     anychart.core.StateSettings.DEFAULT_LABELS_AFTER_INIT_CALLBACK.call(this, factory);
     factory.markConsistent(anychart.ConsistencyState.ALL);
@@ -668,11 +673,27 @@ anychart.core.series.Base.prototype.applyConfig = function(config, opt_reapplyCl
   this.suspendSignalsDispatching();
   this.recreateShapeManager();
 
-  this.themeSettings = this.plot.defaultSeriesSettings()[anychart.utils.toCamelCase(this.type_)] || {};
-  this.normal_.setupInternal(true, this.themeSettings);
-  this.normal_.setupInternal(true, this.themeSettings['normal']);
-  this.hovered_.setupInternal(true, this.themeSettings['hovered']);
-  this.selected_.setupInternal(true, this.themeSettings['selected']);
+  if (goog.isFunction(this.plot.defaultSeriesSettings().getThemesForType)) {
+    this.dropThemes();
+    var themes = this.plot.defaultSeriesSettings().getThemesForType(this.type_, this.getChart().isMode3d());
+    this.addThemes(themes);
+  } else
+    this.themeSettings = this.plot.defaultSeriesSettings()[anychart.utils.toCamelCase(this.type_)] || {};
+
+  this.normal_.dropThemes();
+  this.setupCreated('normal', this.normal_);
+  this.normal_.updateChildrenThemes();
+  this.normal_.setupInternal(true, {});
+
+  this.hovered_.dropThemes();
+  this.setupCreated('hovered', this.hovered_);
+  this.hovered_.updateChildrenThemes();
+  this.hovered_.setupInternal(true, {});
+
+  this.selected_.dropThemes();
+  this.setupCreated('selected', this.selected_);
+  this.selected_.updateChildrenThemes();
+  this.selected_.setupInternal(true, {});
 
   if (this.supportsOutliers()) {
     this.indexToMarkerIndexes_ = {};
@@ -686,7 +707,7 @@ anychart.core.series.Base.prototype.applyConfig = function(config, opt_reapplyCl
   this.resumeSignalsDispatching(false);
   // here should markers/labels/errors/outliers setup be
 
-  this.renderingSettings_.setDefaults();
+  this.renderingSettings_.setDefaults(this.themeSettings['rendering'] || {});
 
   this.setupAutoZIndex();
 };
@@ -736,7 +757,7 @@ anychart.core.series.Base.prototype.applyDefaultsToElements = function(defaults,
     this.zIndex(defaults['zIndex']);
   }
 
-  this.a11y().setupInternal(!!opt_default, defaults['a11y'] || this.plot.defaultSeriesSettings()['a11y']);
+  this.a11y().setupInternal(!!opt_default, defaults['a11y'] || this.themeSettings['a11y']);
 };
 
 
@@ -1776,11 +1797,10 @@ anychart.core.series.Base.prototype.getLegendIconType = function(type, context) 
  * @return {acgraph.vector.Fill|acgraph.vector.Stroke|acgraph.vector.PatternFill}
  */
 anychart.core.series.Base.prototype.getLegendIconColor = function(legendItemJson, colorType, baseColor, context) {
+  var ctx;
   if (legendItemJson) {
     if (goog.isFunction(legendItemJson)) {
-      var ctx = {
-        'sourceColor': baseColor
-      };
+      ctx = {'sourceColor': baseColor};
       legendItemJson = legendItemJson.call(ctx, ctx);
     } else {
       legendItemJson = anychart.color.serialize(
@@ -1802,6 +1822,17 @@ anychart.core.series.Base.prototype.getLegendIconColor = function(legendItemJson
         name = 'fill';
       }
     }
+
+    //NOTE: Code below is the kind of performance hack.
+    //      Here we try to escape heavyweight operations like color resolving.
+    var opt = this.normal_.getOption(name);
+    var defaultOpt = this.normal_.themeSettings[name];
+    if (goog.isFunction(opt) && (opt == defaultOpt)) {
+      // ctx = {'sourceColor': baseColor};
+      ctx = this.createLegendContextProvider([{'sourceColor': {value: baseColor, type: anychart.enums.TokenType.STRING}}]);
+      return opt.call(ctx, ctx);
+    }
+
     var resolver = anychart.color.getColorResolver(name, colorType, false);
     legendItemJson = resolver(this, anychart.PointState.NORMAL, true);
   }
@@ -1829,11 +1860,13 @@ anychart.core.series.Base.prototype.getLegendItemText = function(context) {
 anychart.core.series.Base.prototype.tooltip = function(opt_value) {
   if (!this.tooltipInternal) {
     this.tooltipInternal = new anychart.core.ui.Tooltip(0);
+    this.tooltipInternal.dropThemes();
     if (this.chart.supportsTooltip()) {
       var chart = /** @type {anychart.core.Chart} */ (this.chart);
       var parent = /** @type {anychart.core.ui.Tooltip} */ (chart.tooltip());
       this.tooltipInternal.parent(parent);
       this.tooltipInternal.chart(chart);
+      this.setupCreated('tooltip', this.tooltipInternal);
     }
   }
   if (goog.isDef(opt_value)) {
@@ -2562,6 +2595,12 @@ anychart.core.series.Base.prototype.drawSingleFactoryElement = function(factorie
     var currentFactory = /** @type {anychart.core.ui.MarkersFactory} */(factories[1] || mainFactory);
     var iterator = this.getIterator();
 
+    var metaName = anychart.utils.instanceOf(this.shapeManager, anychart.core.shapeManagers.PerPoint) ? 'shapes' : 'shapeNames';
+    var group = /** @type {Object.<string, acgraph.vector.Shape>} */(iterator.meta(metaName));
+    var state = this.getPointState(iterator.getIndex());
+    // this.shapeManager.updateMarkersColors(anychart.PointState.NORMAL, group);
+    this.shapeManager.updateMarkersColors(state, group);
+
     var color = /** @type {acgraph.vector.Fill|acgraph.vector.Stroke} */(
         iterator.meta(this.check(anychart.core.drawers.Capabilities.USES_STROKE_AS_FILL) ? 'markerStroke' : 'markerFill'));
 
@@ -3207,7 +3246,6 @@ anychart.core.series.Base.prototype.draw = function() {
         this.drawPoint(point, this.getPointState(point.getIndex()));
       }
 
-      var metaName = anychart.utils.instanceOf(this.shapeManager, anychart.core.shapeManagers.PerPoint) ? 'shapes' : 'shapeNames';
       // main points drawing cycle
       iterator.reset();
       while (iterator.advance()) {
@@ -3216,8 +3254,10 @@ anychart.core.series.Base.prototype.draw = function() {
         this.makePointMeta(iterator, yValueNames, columns);
         this.drawPoint(iterator, state);
 
-        var group = /** @type {Object.<string, acgraph.vector.Shape>} */(iterator.meta(metaName));
-        this.shapeManager.updateMarkersColors(state, group);
+        // if (updateMarkers) {
+        //   var group = /** @type {Object.<string, acgraph.vector.Shape>} */(iterator.meta(metaName));
+        //   this.shapeManager.updateMarkersColors(state, group);
+        // }
 
         for (i = 0; i < elementsDrawersLength; i++)
           elementsDrawers[i].call(this, iterator, state, false);
@@ -4313,10 +4353,11 @@ anychart.core.series.Base.prototype.createTooltipContextProvider = function() {
 
 /**
  * Creates context provider for legend items text formatter function.
+ * @param {(Array.<Object.<string, anychart.core.BaseContext.TypedValue>>)=} opt_addValues - Values to add.
  * @return {Object} Legend context provider.
  * @protected
  */
-anychart.core.series.Base.prototype.createLegendContextProvider = function() {
+anychart.core.series.Base.prototype.createLegendContextProvider = function(opt_addValues) {
   if (!this.legendProvider_)
     this.legendProvider_ = new anychart.format.Context(void 0, void 0, [this, this.chart]);
 
@@ -4325,6 +4366,13 @@ anychart.core.series.Base.prototype.createLegendContextProvider = function() {
     'chart': {value: this.getChart(), type: anychart.enums.TokenType.UNKNOWN},
     'seriesName': {value: this.name(), type: anychart.enums.TokenType.STRING}
   };
+
+  if (opt_addValues) {
+    for (var i = 0; i < opt_addValues.length; i++) {
+      goog.mixin(values, opt_addValues[i]);
+    }
+  }
+
   this.legendProvider_.statisticsSources([this, this.chart]);
 
   return this.legendProvider_.propagate(values);

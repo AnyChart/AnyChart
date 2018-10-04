@@ -10,17 +10,10 @@ goog.require('anychart.core.Base');
 anychart.core.utils.Animation = function() {
   anychart.core.utils.Animation.base(this, 'constructor');
 
-  /**
-   * @type {boolean}
-   * @private
-   */
-  this.enabled_ = false;
-
-  /**
-   * @type {number}
-   * @private
-   */
-  this.duration_ = 1000;
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['enabled', 0, anychart.Signal.NEEDS_REAPPLICATION],
+    ['duration', 0, anychart.Signal.NEEDS_REAPPLICATION]
+  ]);
 };
 goog.inherits(anychart.core.utils.Animation, anychart.core.Base);
 
@@ -33,48 +26,31 @@ anychart.core.utils.Animation.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEED
 
 
 /**
- * Turns on animations.
- * @param {boolean=} opt_value
- * @return {boolean|anychart.core.utils.Animation}
+ * @type {!Object<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.core.utils.Animation.prototype.enabled = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.enabled_ != opt_value) {
-      this.enabled_ = opt_value;
-      this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
-    }
-    return this;
-  } else {
-    return this.enabled_;
-  }
-};
+anychart.core.utils.Animation.PROPERTY_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
 
+  var durationNormalizer = function(val) {
+    return goog.isNull(val) ? this.getThemeOption('duration') : anychart.utils.normalizeToNaturalNumber(val, this.getOption('duration'), true);
+  };
 
-/**
- * Set animation duration.
- * @param {number=} opt_value
- * @return {number|anychart.core.utils.Animation}
- */
-anychart.core.utils.Animation.prototype.duration = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizeToNaturalNumber(opt_value, this.duration_, true);
-    if (this.duration_ != opt_value) {
-      this.duration_ = opt_value;
-      this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
-    }
-    return this;
-  } else {
-    return this.duration_;
-  }
-};
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'enabled', anychart.core.settings.booleanNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'duration', durationNormalizer]
+  ]);
+
+  return map;
+})();
+anychart.core.settings.populate(anychart.core.utils.Animation, anychart.core.utils.Animation.PROPERTY_DESCRIPTORS);
 
 
 /** @inheritDoc */
 anychart.core.utils.Animation.prototype.serialize = function() {
-  return {
-    'enabled': this.enabled_,
-    'duration': this.duration_
-  };
+  var json = {};
+  anychart.core.settings.serialize(this, anychart.core.utils.Animation.PROPERTY_DESCRIPTORS, json);
+  return json;
 };
 
 
@@ -82,34 +58,46 @@ anychart.core.utils.Animation.prototype.serialize = function() {
  * @inheritDoc
  */
 anychart.core.utils.Animation.prototype.setupByJSON = function(json, opt_default) {
-  this.enabled(json['enabled']);
-  this.duration(json['duration']);
+  anychart.core.settings.deserialize(this, anychart.core.utils.Animation.PROPERTY_DESCRIPTORS, json, opt_default);
+};
+
+
+/** @inheritDoc */
+anychart.core.utils.Animation.prototype.resolveSpecialValue = function(var_args) {
+  var arg0 = arguments[0];
+  var result = null;
+  if (goog.isBoolean(arg0) || goog.isNull(arg0)) {
+    result = {'enabled': !!arg0};
+
+    var arg1 = arguments[2];
+    if (goog.isDef(arg1))
+      result['duration'] = arg1;
+
+  } else if (!isNaN(+arg0)) {
+    result = {'enabled': true, 'duration': +arg0};
+  }
+  return result;
 };
 
 
 /** @inheritDoc */
 anychart.core.utils.Animation.prototype.setupSpecial = function(isDefault, var_args) {
-  var arg0 = arguments[1];
-  if (goog.isBoolean(arg0) || goog.isNull(arg0)) {
-    this.enabled(!!arg0);
-    var arg1 = arguments[2];
-    if (goog.isDef(arg1)) this.duration(arg1);
+  var resolvedValue = this.resolveSpecialValue(arguments[1]);
+  if (resolvedValue) {
+    if ('enabled' in resolvedValue)
+      this['enabled'](resolvedValue['enabled']);
+    if ('duration' in resolvedValue)
+      this['duration'](resolvedValue['duration']);
     return true;
   }
-
-  if (!isNaN(+arg0)) {
-    this.enabled(true);
-    this.duration(+arg0);
-    return true;
-  }
-
-  return anychart.core.Base.prototype.setupSpecial.apply(this, arguments);
+  return false;
 };
 
 
 //exports
 (function() {
   var proto = anychart.core.utils.Animation.prototype;
-  proto['enabled'] = proto.enabled;
-  proto['duration'] = proto.duration;
+  // auto generated
+  //proto['enabled'] = proto.enabled;
+  //proto['duration'] = proto.duration;
 })();

@@ -17,7 +17,8 @@ anychart.circularGaugeModule.pointers.Bar = function() {
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['width', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
     ['position', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
-    ['radius', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED]
+    ['radius', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['barDrawer', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW]
   ]);
 };
 goog.inherits(anychart.circularGaugeModule.pointers.Bar, anychart.circularGaugeModule.pointers.Base);
@@ -28,6 +29,20 @@ goog.inherits(anychart.circularGaugeModule.pointers.Bar, anychart.circularGaugeM
 anychart.circularGaugeModule.pointers.Bar.prototype.getType = function() {
   return anychart.enums.CircularGaugePointerType.BAR;
 };
+
+
+/**
+ * @typedef {{
+ *   centerX: !number,
+ *   centerY: !number,
+ *   radius: !number,
+ *   startAngle: !number,
+ *   sweepAngle: !number,
+ *   width: !number,
+ *   path: !acgraph.vector.Path
+ * }}
+ */
+anychart.circularGaugeModule.pointers.Bar.BarDrawerContext;
 
 
 //endregion
@@ -46,7 +61,8 @@ anychart.circularGaugeModule.pointers.Bar.OWN_DESCRIPTORS = (function() {
   anychart.core.settings.createDescriptors(map, [
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'width', widthRadiusNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'position', anychart.enums.normalizeGaugeSidePosition],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'radius', widthRadiusNormalizer]
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'radius', widthRadiusNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'barDrawer', anychart.core.settings.functionNormalizer]
   ]);
 
   return map;
@@ -163,46 +179,33 @@ anychart.circularGaugeModule.pointers.Bar.prototype.draw = function() {
     this.contextProvider['startAngle'] = goog.math.standardAngle(startAngle - anychart.circularGaugeModule.Chart.DEFAULT_START_ANGLE);
     this.contextProvider['sweepAngle'] = sweepAngle;
     this.contextProvider['width'] = pixWidth;
-
-    this.domElement.circularArc(
-        cx,
-        cy,
-        pixRadius - pixWidth / 2,
-        pixRadius - pixWidth / 2,
-        startAngle,
-        sweepAngle);
-
-    this.domElement.circularArc(
-        cx,
-        cy,
-        pixRadius + pixWidth / 2,
-        pixRadius + pixWidth / 2,
-        startAngle + sweepAngle,
-        -sweepAngle, true);
-
-    this.domElement.close();
-
+    var ctx = {
+      'centerX': cx,
+      'centerY': cy,
+      'radius': pixRadius,
+      'startAngle': startAngle,
+      'sweepAngle': sweepAngle,
+      'width': pixWidth,
+      'path': /** @type {!acgraph.vector.Path} */ (this.domElement)
+    };
+    /**
+     * @type {function(this:anychart.circularGaugeModule.pointers.Bar.BarDrawerContext, anychart.circularGaugeModule.pointers.Bar.BarDrawerContext)}
+     */
+    var barDrawer = /** @type {function(this:anychart.circularGaugeModule.pointers.Bar.BarDrawerContext, anychart.circularGaugeModule.pointers.Bar.BarDrawerContext)} */ (this.getOption('barDrawer'));
+    barDrawer.call(ctx, ctx);
     this.makeInteractive(/** @type {acgraph.vector.Path} */(this.domElement));
 
     if (this.hatchFillElement) {
-      this.hatchFillElement.clear();
-      this.hatchFillElement.circularArc(
-          cx,
-          cy,
-          pixRadius - pixWidth / 2,
-          pixRadius - pixWidth / 2,
-          startAngle,
-          sweepAngle);
-
-      this.hatchFillElement.circularArc(
-          cx,
-          cy,
-          pixRadius + pixWidth / 2,
-          pixRadius + pixWidth / 2,
-          startAngle + sweepAngle,
-          -sweepAngle, true);
-
-      this.hatchFillElement.close();
+      var hatchFillCtx = {
+        'centerX': cx,
+        'centerY': cy,
+        'radius': pixRadius,
+        'startAngle': startAngle,
+        'sweepAngle': sweepAngle,
+        'width': pixWidth,
+        'path': /** @type {!acgraph.vector.Path} */ (this.hatchFillElement)
+      };
+      barDrawer.call(hatchFillCtx, hatchFillCtx);
     }
 
     if (goog.isFunction(this.fill()) || goog.isFunction(this.stroke()))
@@ -253,4 +256,5 @@ anychart.circularGaugeModule.pointers.Bar.prototype.disposeInternal = function()
 // proto['width'] = proto.width;
 // proto['position'] = proto.position;
 // proto['radius'] = proto.radius;
+// proto['barDrawer'] = proto.barDrawer;
 //})();

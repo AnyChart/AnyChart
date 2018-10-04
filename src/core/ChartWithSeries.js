@@ -3,6 +3,7 @@ goog.provide('anychart.core.ChartWithSeries');
 goog.require('anychart.consistency');
 goog.require('anychart.core.IChart');
 goog.require('anychart.core.SeparateChart');
+goog.require('anychart.core.SeriesSettings');
 goog.require('anychart.core.StateSettings');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.DataArea');
@@ -50,20 +51,6 @@ anychart.core.ChartWithSeries = function() {
   this.hatchFillPalette_ = null;
 
   /**
-   * Max size for all bubbles on the chart.
-   * @type {string|number}
-   * @private
-   */
-  this.maxBubbleSize_;
-
-  /**
-   * Min size for all bubbles on the chart.
-   * @type {string|number}
-   * @private
-   */
-  this.minBubbleSize_;
-
-  /**
    * Cache of chart data bounds.
    * @type {anychart.math.Rect}
    * @protected
@@ -77,6 +64,7 @@ anychart.core.ChartWithSeries = function() {
     ['maxLabels', 0, 0]
   ]);
   this.normal_ = new anychart.core.StateSettings(this, normalDescriptorsMeta, anychart.PointState.NORMAL);
+  this.normal_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME);
   this.normal_.setOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK, /** @this {anychart.core.ChartWithSeries} */ function(factory) {
     factory.markConsistent(anychart.ConsistencyState.ALL);
     factory.listenSignals(this.labelsInvalidated_, this);
@@ -89,6 +77,7 @@ anychart.core.ChartWithSeries = function() {
     ['maxLabels', 0, 0]
   ]);
   this.hovered_ = new anychart.core.StateSettings(this, descriptorsMeta, anychart.PointState.HOVER);
+  this.hovered_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME);
 
   anychart.core.settings.createDescriptorsMeta(descriptorsMeta, [
     ['labels', 0, 0],
@@ -96,9 +85,12 @@ anychart.core.ChartWithSeries = function() {
     ['maxLabels', 0, 0]
   ]);
   this.selected_ = new anychart.core.StateSettings(this, descriptorsMeta, anychart.PointState.SELECT);
+  this.selected_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME);
 
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['defaultSeriesType', 0, 0],
+    ['maxBubbleSize', anychart.ConsistencyState.SERIES_CHART_SERIES, anychart.Signal.NEEDS_REDRAW, 0, this.invalidateSizeBasedSeries],
+    ['minBubbleSize', anychart.ConsistencyState.SERIES_CHART_SERIES, anychart.Signal.NEEDS_REDRAW, 0, this.invalidateSizeBasedSeries],
     ['pointWidth', anychart.ConsistencyState.SERIES_CHART_SERIES, anychart.Signal.NEEDS_REDRAW, 0, this.invalidateWidthBasedSeries],
     ['maxPointWidth', anychart.ConsistencyState.SERIES_CHART_SERIES, anychart.Signal.NEEDS_REDRAW, 0, this.invalidateWidthBasedSeries],
     ['minPointLength', anychart.ConsistencyState.SERIES_CHART_SERIES, anychart.Signal.NEEDS_REDRAW, 0, this.resetSeriesStack],
@@ -187,14 +179,20 @@ anychart.core.ChartWithSeries.prototype.seriesConfig = (function() { return {}; 
 /**
  * Getter/setter for series default settings.
  * @param {Object=} opt_value Object with default series settings.
- * @return {Object}
+ * @return {anychart.core.SeriesSettings|anychart.core.ChartWithSeries}
  */
 anychart.core.ChartWithSeries.prototype.defaultSeriesSettings = function(opt_value) {
+  if (!this.defaultSeriesSettings_) {
+    this.defaultSeriesSettings_ = new anychart.core.SeriesSettings();
+    this.setupCreated('defaultSeriesSettings', this.defaultSeriesSettings_);
+  }
+
   if (goog.isDef(opt_value)) {
-    this.defaultSeriesSettings_ = opt_value;
+    this.defaultSeriesSettings_.themeSettings = opt_value;
     return this;
   }
-  return this.defaultSeriesSettings_ || {};
+
+  return this.defaultSeriesSettings_;
 };
 
 
@@ -225,6 +223,8 @@ anychart.core.ChartWithSeries.PROPERTY_DESCRIPTORS = (function() {
   }
   anychart.core.settings.createDescriptors(map, [
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'defaultSeriesType', seriesTypeNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'maxBubbleSize', anychart.core.settings.numberOrStringNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'minBubbleSize', anychart.core.settings.numberOrStringNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'pointWidth', anychart.utils.normalizeNumberOrPercent],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'maxPointWidth', anychart.utils.normalizeNumberOrPercent],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'minPointLength', anychart.utils.normalizeNumberOrPercent],
@@ -482,7 +482,7 @@ anychart.core.ChartWithSeries.prototype.seriesInvalidated = function(event) {
   }
   if (event.hasSignal(anychart.Signal.DATA_CHANGED)) {
     state |= anychart.ConsistencyState.CHART_LABELS;
-    if (this.legend().itemsSourceMode() == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
+    if (/** @type {anychart.enums.LegendItemsSourceMode} */(this.legend().getOption('itemsSourceMode')) == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
       // CHART_LABELS invalidation for no data label.
       state |= anychart.ConsistencyState.CHART_LEGEND;
     }
@@ -577,40 +577,6 @@ anychart.core.ChartWithSeries.prototype.allowLegendCategoriesMode = function() {
 //  Series specific settings
 //
 //----------------------------------------------------------------------------------------------------------------------
-/**
- * Sets max size for all bubbles on the charts.
- * @param {(number|string)=} opt_value
- * @return {number|string|anychart.core.ChartWithSeries}
- */
-anychart.core.ChartWithSeries.prototype.maxBubbleSize = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.maxBubbleSize_ != opt_value) {
-      this.maxBubbleSize_ = opt_value;
-      this.invalidateSizeBasedSeries();
-      this.invalidate(anychart.ConsistencyState.SERIES_CHART_SERIES, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.maxBubbleSize_;
-};
-
-
-/**
- * Sets min size for all bubbles on the charts.
- * @param {(number|string)=} opt_value
- * @return {number|string|anychart.core.ChartWithSeries}
- */
-anychart.core.ChartWithSeries.prototype.minBubbleSize = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.minBubbleSize_ != opt_value) {
-      this.minBubbleSize_ = opt_value;
-      this.invalidateSizeBasedSeries();
-      this.invalidate(anychart.ConsistencyState.SERIES_CHART_SERIES, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.minBubbleSize_;
-};
 
 
 /**
@@ -700,6 +666,8 @@ anychart.core.ChartWithSeries.prototype.markerPalette = function(opt_value) {
     this.markerPalette_ = new anychart.palettes.Markers();
     this.markerPalette_.listenSignals(this.markerPaletteInvalidated_, this);
     this.registerDisposable(this.markerPalette_);
+
+    this.setupCreated('markerPalette', this.markerPalette_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -723,6 +691,8 @@ anychart.core.ChartWithSeries.prototype.hatchFillPalette = function(opt_value) {
     this.hatchFillPalette_ = new anychart.palettes.HatchFills();
     this.hatchFillPalette_.listenSignals(this.hatchFillPaletteInvalidated_, this);
     this.registerDisposable(this.hatchFillPalette_);
+
+    this.setupCreated('hatchFillPalette', this.hatchFillPalette_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -748,10 +718,11 @@ anychart.core.ChartWithSeries.prototype.setupPalette_ = function(cls, opt_cloneF
     var doDispatch = !!this.palette_;
     goog.dispose(this.palette_);
     this.palette_ = new cls();
+    this.setupCreated('palette', this.palette_);
+    this.palette_.restoreDefaults();
     if (opt_cloneFrom)
       this.palette_.setup(opt_cloneFrom);
     this.palette_.listenSignals(this.paletteInvalidated_, this);
-    this.registerDisposable(this.palette_);
     if (doDispatch)
       this.invalidate(anychart.ConsistencyState.SERIES_CHART_PALETTE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
   }
@@ -921,7 +892,7 @@ anychart.core.ChartWithSeries.prototype.calcBubbleSizes = function() {
   }
   for (i = this.seriesList.length; i--;) {
     if (this.seriesList[i].isSizeBased()) {
-      this.seriesList[i].setAutoSizeScale(minMax[0], minMax[1], this.minBubbleSize_, this.maxBubbleSize_);
+      this.seriesList[i].setAutoSizeScale(minMax[0], minMax[1], /** @type {number|string} */(this.getOption('minBubbleSize')), /** @type {number|string} */(this.getOption('maxBubbleSize')));
     }
   }
 };
@@ -1191,6 +1162,8 @@ anychart.core.ChartWithSeries.prototype.dataArea = function(opt_value) {
   if (!this.dataArea_) {
     this.dataArea_ = new anychart.core.ui.DataArea();
     this.dataArea_.listenSignals(this.dataAreaInvalidated_, this);
+
+    this.setupCreated('dataArea', this.dataArea_);
   }
   if (goog.isDef(opt_value)) {
     this.dataArea_.setup(opt_value);
@@ -1216,12 +1189,14 @@ anychart.core.ChartWithSeries.prototype.dataAreaInvalidated_ = function(e) {
 anychart.core.ChartWithSeries.prototype.specialDraw = function(bounds) {
   anychart.core.ChartWithSeries.base(this, 'specialDraw', bounds);
   if (this.hasStateInvalidation(anychart.enums.Store.SERIES_CHART, anychart.enums.State.DATA_AREA)) {
-    var dataArea = this.dataArea();
-    dataArea.suspendSignalsDispatching();
-    if (!dataArea.container()) dataArea.container(this.rootElement);
-    dataArea.parentBounds(bounds);
-    dataArea.resumeSignalsDispatching(false);
-    dataArea.draw();
+    var dataArea = this.getCreated('dataArea');
+    if (dataArea) {
+      dataArea.suspendSignalsDispatching();
+      if (!dataArea.container()) dataArea.container(this.rootElement);
+      dataArea.parentBounds(bounds);
+      dataArea.resumeSignalsDispatching(false);
+      dataArea.draw();
+    }
     this.markStateConsistent(anychart.enums.Store.SERIES_CHART, anychart.enums.State.DATA_AREA);
   }
 };
@@ -1233,6 +1208,24 @@ anychart.core.ChartWithSeries.prototype.resizeHandler = function(e) {
   anychart.core.ChartWithSeries.base(this, 'resizeHandler', e);
   this.invalidateState(anychart.enums.Store.SERIES_CHART, anychart.enums.State.DATA_AREA, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
   this.resumeSignalsDispatching(true);
+};
+
+
+/** @inheritDoc */
+anychart.core.ChartWithSeries.prototype.onLegendSignal = function(e) {
+  if (e.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
+    this.invalidateState(anychart.enums.Store.SERIES_CHART, anychart.enums.State.DATA_AREA);
+  }
+  anychart.core.ChartWithSeries.base(this, 'onLegendSignal', e);
+};
+
+
+/** @inheritDoc */
+anychart.core.ChartWithSeries.prototype.onTitleSignal = function(e) {
+  if (e.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
+    this.invalidateState(anychart.enums.Store.SERIES_CHART, anychart.enums.State.DATA_AREA);
+  }
+  anychart.core.ChartWithSeries.base(this, 'onTitleSignal', e);
 };
 
 
@@ -1346,17 +1339,31 @@ anychart.core.ChartWithSeries.prototype.setupByJSON = function(config, opt_defau
   anychart.core.ChartWithSeries.base(this, 'setupByJSON', config, opt_default);
 
   anychart.core.settings.deserialize(this, anychart.core.ChartWithSeries.PROPERTY_DESCRIPTORS, config, opt_default);
-  this.minBubbleSize(config['minBubbleSize']);
-  this.maxBubbleSize(config['maxBubbleSize']);
+
   this.palette(config['palette']);
   this.markerPalette(config['markerPalette']);
   this.hatchFillPalette(config['hatchFillPalette']);
-  this.dataArea().setupInternal(!!opt_default, config['dataArea']);
-
+  if (config['dataArea']) {
+    this.dataArea().setupInternal(!!opt_default, config['dataArea']);
+  }
   this.normal_.setupInternal(!!opt_default, config);
   this.normal_.setupInternal(!!opt_default, config['normal']);
   this.hovered_.setupInternal(!!opt_default, config['hovered']);
   this.selected_.setupInternal(!!opt_default, config['selected']);
+};
+
+
+/** @inheritDoc */
+anychart.core.ChartWithSeries.prototype.setupStateSettings = function() {
+  this.normal_.addThemes(this.themeSettings);
+  this.setupCreated('normal', this.normal_);
+  this.normal_.setupInternal(true, {});
+
+  this.setupCreated('hovered', this.hovered_);
+  this.hovered_.setupInternal(true, {});
+
+  this.setupCreated('selected', this.selected_);
+  this.selected_.setupInternal(true, {});
 };
 
 
@@ -1367,13 +1374,11 @@ anychart.core.ChartWithSeries.prototype.serialize = function() {
   var json = anychart.core.ChartWithSeries.base(this, 'serialize');
 
   anychart.core.settings.serialize(this, anychart.core.ChartWithSeries.PROPERTY_DESCRIPTORS, json);
-  json['minBubbleSize'] = this.minBubbleSize();
-  json['maxBubbleSize'] = this.maxBubbleSize();
   json['palette'] = this.palette().serialize();
   json['markerPalette'] = this.markerPalette().serialize();
   json['hatchFillPalette'] = this.hatchFillPalette().serialize();
-  json['dataArea'] = this.dataArea().serialize();
-
+  if (this.dataArea_)
+    json['dataArea'] = this.dataArea().serialize();
   json['normal'] = this.normal().serialize();
   json['hovered'] = this.hovered().serialize();
   json['selected'] = this.selected().serialize();
@@ -1388,8 +1393,8 @@ anychart.core.ChartWithSeries.prototype.disposeInternal = function() {
   this.removeAllSeries();
   this.resumeSignalsDispatching(false);
 
-  goog.disposeAll(this.palette_, this.markerPalette_, this.hatchFillPalette_, this.dataArea_);
-  this.palette_ = this.markerPalette_ = this.hatchFillPalette_ = this.dataArea_ = null;
+  goog.disposeAll(this.palette_, this.markerPalette_, this.hatchFillPalette_, this.dataArea_, this.defaultSeriesSettings_);
+  this.palette_ = this.markerPalette_ = this.hatchFillPalette_ = this.dataArea_ = this.defaultSeriesSettings_ = null;
 
   goog.disposeAll(this.normal_, this.hovered_, this.selected_);
 

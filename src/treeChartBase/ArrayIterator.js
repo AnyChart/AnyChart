@@ -43,7 +43,7 @@ anychart.treeChartBase.ArrayIterator.prototype.get = function(fieldName) {
   if (goog.isDef(fieldName) && this.currentRow) {
     var result;
     if (this.currentRow.meta) {
-      var type = this.currentRow.meta('type');
+      var type = this.currentRow.meta('treemap_type');
       if (type == 1 /* HEADER */ || type == 3 /* TRANSIENT */ || type == 4 /* HINT_LEAF */) return void 0;
       result = this.currentRow.meta(fieldName);
       if (result)

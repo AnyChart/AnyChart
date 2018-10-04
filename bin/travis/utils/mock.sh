@@ -15,7 +15,7 @@ fi
 
 Run ()
 {
-    echo "$*"
+    echo ">$*"
     
     if [ ${DRY_RUN} ] && [ ${DRY_RUN} -eq 1 ]; then
         return 0

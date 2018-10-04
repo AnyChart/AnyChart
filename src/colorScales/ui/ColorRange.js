@@ -336,7 +336,7 @@ anychart.colorScalesModule.ui.ColorRange.prototype.drawTopLine = function(bounds
           .lineTo(x, y - size)
           .close();
 
-      line.stroke(/** @type {acgraph.vector.Stroke} */(this.stroke()));
+      line.stroke(/** @type {acgraph.vector.Stroke} */(this.getOption('stroke')));
       line.fill(color);
     }
   }
@@ -373,7 +373,7 @@ anychart.colorScalesModule.ui.ColorRange.prototype.drawRightLine = function(boun
           .lineTo(x + size, y)
           .close();
 
-      line.stroke(/** @type {acgraph.vector.Stroke} */(this.stroke()));
+      line.stroke(/** @type {acgraph.vector.Stroke} */(this.getOption('stroke')));
       line.fill(color);
     }
   }
@@ -410,7 +410,7 @@ anychart.colorScalesModule.ui.ColorRange.prototype.drawBottomLine = function(bou
           .lineTo(x, y + size)
           .close();
 
-      line.stroke(/** @type {acgraph.vector.Stroke} */(this.stroke()));
+      line.stroke(/** @type {acgraph.vector.Stroke} */(this.getOption('stroke')));
       line.fill(color);
     }
   }
@@ -447,7 +447,7 @@ anychart.colorScalesModule.ui.ColorRange.prototype.drawLeftLine = function(bound
           .lineTo(x - size, y)
           .close();
 
-      line.stroke(/** @type {acgraph.vector.Stroke} */(this.stroke()));
+      line.stroke(/** @type {acgraph.vector.Stroke} */(this.getOption('stroke')));
       line.fill(color);
     }
   }
@@ -464,7 +464,7 @@ anychart.colorScalesModule.ui.ColorRange.prototype.drawLine = function() {
 
   if (anychart.utils.instanceOf(scale, anychart.colorScalesModule.Linear)) {
     line.clear();
-    line.stroke(/** @type {acgraph.vector.Stroke} */(this.stroke()));
+    line.stroke(/** @type {acgraph.vector.Stroke} */(this.getOption('stroke')));
     var fill = acgraph.vector.normalizeFill(/** @type {!Array.<acgraph.vector.GradientKey>} */(scale.colors()));
     if (this.isHorizontal())
       fill['angle'] = 0;
@@ -476,7 +476,7 @@ anychart.colorScalesModule.ui.ColorRange.prototype.drawLine = function() {
       this.lines[i].clear();
   }
 
-  var orientation = /** @type {anychart.enums.Orientation} */(this.orientation());
+  var orientation = /** @type {anychart.enums.Orientation} */(this.getOption('orientation'));
   var lineDrawer;
   switch (orientation) {
     case anychart.enums.Orientation.TOP:
@@ -493,8 +493,9 @@ anychart.colorScalesModule.ui.ColorRange.prototype.drawLine = function() {
       break;
   }
 
-  var stroke = this.stroke();
-  var lineThickness = !stroke || anychart.utils.isNone(stroke) ? 0 : stroke['thickness'] ? parseFloat(this.stroke()['thickness']) : 1;
+  var stroke = /**@type {acgraph.vector.Stroke|string}*/(this.getOption('stroke'));
+  stroke = acgraph.vector.normalizeStroke(stroke);
+  var lineThickness = !stroke || anychart.utils.isNone(stroke) ? 0 : stroke['thickness'] ? parseFloat(stroke['thickness']) : 1;
   var pixelShift = lineThickness % 2 == 0 ? 0 : 0.5;
   var bounds = this.getPixelBounds();
   var markerSize = this.getMarkerSpace_();
@@ -515,7 +516,7 @@ anychart.colorScalesModule.ui.ColorRange.prototype.drawLine = function() {
 anychart.colorScalesModule.ui.ColorRange.prototype.getMarkerSpace_ = function() {
   var markerSpace = 0;
   if (this.marker_ && this.marker_.enabled()) {
-    var orientation = /** @type {anychart.enums.Orientation} */(this.orientation());
+    var orientation = /** @type {anychart.enums.Orientation} */(this.getOption('orientation'));
     markerSpace = this.marker_.size() * 2;
 
     var offsetX = goog.isDef(this.marker_.offsetX()) ? this.marker_.offsetX() : 0;
@@ -597,7 +598,7 @@ anychart.colorScalesModule.ui.ColorRange.prototype.getPixelBounds = function() {
       }
 
       var width, height;
-      switch (this.orientation()) {
+      switch (this.getOption('orientation')) {
         case anychart.enums.Orientation.TOP:
           y = parentBounds.top + topPad;
           x = parentBounds.left + offset;
@@ -700,7 +701,7 @@ anychart.colorScalesModule.ui.ColorRange.prototype.calcSize = function(maxLabelS
     }
   }
 
-  var stroke = this.stroke();
+  var stroke = this.getOption('stroke');
   var lineThickness = !stroke || anychart.utils.isNone(stroke) ? 0 : stroke['thickness'] ? parseFloat(stroke['thickness']) : 1;
   var colorLineSizePx = Math.round(this.colorLineSize_) + lineThickness;
 
@@ -728,7 +729,7 @@ anychart.colorScalesModule.ui.ColorRange.prototype.showMarker = function(value) 
 
       if (isNaN(ratio)) return;
 
-      var orientation = this.orientation();
+      var orientation = this.getOption('orientation');
       var x, y, rotation;
       switch (orientation) {
         case anychart.enums.Orientation.TOP:
@@ -872,7 +873,7 @@ anychart.colorScalesModule.ui.ColorRange.prototype.handleMouseClick = function(e
           points = this.rangeRegions_[range.sourceIndex];
           chart = /** @type {anychart.core.SeparateChart} */(target.getChart());
           interactivity = /** @type {anychart.core.utils.Interactivity} */(chart.interactivity());
-          if (interactivity.hoverMode() == anychart.enums.HoverMode.SINGLE) {
+          if (interactivity.getOption('hoverMode') == anychart.enums.HoverMode.SINGLE) {
             this.points_ = {
               series: target,
               points: points
@@ -917,7 +918,7 @@ anychart.colorScalesModule.ui.ColorRange.prototype.handleMouseClick = function(e
         if (scale && target) {
           chart = /** @type {anychart.core.SeparateChart} */(target.getChart());
           interactivity = /** @type {anychart.core.utils.Interactivity} */(chart.interactivity());
-          if (interactivity.hoverMode() == anychart.enums.HoverMode.SINGLE) {
+          if (interactivity.getOption('hoverMode') == anychart.enums.HoverMode.SINGLE) {
             this.points_ = {
               series: target,
               points: points
@@ -966,7 +967,7 @@ anychart.colorScalesModule.ui.ColorRange.prototype.handleMouseOverAndMove = func
         points = this.rangeRegions_[range.sourceIndex];
         chart = /** @type {anychart.core.SeparateChart} */(target.getChart());
         interactivity = /** @type {anychart.core.utils.Interactivity} */(chart.interactivity());
-        if (interactivity.hoverMode() == anychart.enums.HoverMode.SINGLE) {
+        if (interactivity.getOption('hoverMode') == anychart.enums.HoverMode.SINGLE) {
           this.points_ = {
             series: target,
             points: points
@@ -1009,7 +1010,7 @@ anychart.colorScalesModule.ui.ColorRange.prototype.handleMouseOverAndMove = func
         if (scale && target) {
           chart = /** @type {anychart.core.SeparateChart} */(target.getChart());
           interactivity = /** @type {anychart.core.utils.Interactivity} */(chart.interactivity());
-          if (interactivity.hoverMode() == anychart.enums.HoverMode.SINGLE) {
+          if (interactivity.getOption('hoverMode') == anychart.enums.HoverMode.SINGLE) {
             var dispatchUnhover = this.points_ && !goog.array.every(points, function(el) {
                   return goog.array.contains(this.points_.points, el);
                 }, this);

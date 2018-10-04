@@ -12,7 +12,8 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       'enabled': true,
       'from': 0,
       'to': 0,
-      'zIndex': 2
+      'zIndex': 2,
+      'fill': null
     },
     'padding': {
       'top': 5,

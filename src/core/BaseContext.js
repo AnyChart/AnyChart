@@ -72,7 +72,7 @@ anychart.core.BaseContext.Storage;
  * @param {Object.<string, anychart.core.BaseContext.TypedValue>=} opt_value - Typed values.
  * @return {Object.<string, anychart.core.BaseContext.TypedValue>|anychart.core.BaseContext}
  */
-anychart.core.BaseContext.prototype.values = function(opt_value) {
+anychart.core.BaseContext.prototype.contextValues = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.storage_.values = opt_value;
     return this;

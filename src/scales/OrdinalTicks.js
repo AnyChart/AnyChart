@@ -352,14 +352,14 @@ anychart.scales.OrdinalTicks.prototype.setupSpecial = function(isDefault, var_ar
     this.set(arg0);
     return true;
   }
-  return anychart.core.Base.prototype.setupSpecial.apply(this, arguments);
+  return false;
 };
 
 
 /** @inheritDoc */
 anychart.scales.OrdinalTicks.prototype.setupByJSON = function(config, opt_default) {
   anychart.scales.OrdinalTicks.base(this, 'setupByJSON', config, opt_default);
-  if ('explicit' in config)
+  if ('explicit' in config && config['explicit'])
     this.set(config['explicit']);
   else if ('interval' in config)
     this.interval(config['interval']);

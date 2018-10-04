@@ -17,10 +17,10 @@ goog.inherits(anychart.cartesian3dModule.axisMarkers.Range, anychart.core.axisMa
 /** @inheritDoc */
 anychart.cartesian3dModule.axisMarkers.Range.prototype.boundsInvalidated = function() {
   var layout = this.layout();
-  var minValue = this.from(), maxValue = this.to();
-  if (this.from() > this.to()) {
-    minValue = this.from();
-    maxValue = this.to();
+  var minValue = this.getOption('from'), maxValue = this.getOption('to');
+  if (this.getOption('from') > this.getOption('to')) {
+    minValue = this.getOption('to');
+    maxValue = this.getOption('from');
   }
   // clamping to prevent range marker go out from the bounds. Ratio should be between 0 and 1.
   var ratioMinValue = goog.math.clamp(this.scale().transform(minValue, 0), 0, 1);

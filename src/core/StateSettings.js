@@ -141,6 +141,16 @@ anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR = function() {
 
 
 /**
+ * Default labels factory constructor. But without using defaultLabelsFactory theme
+ * @this {*}
+ * @return {anychart.core.ui.LabelsFactory}
+ */
+anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME = function() {
+  return new anychart.core.ui.LabelsFactory(true);
+};
+
+
+/**
  * Circular labels factory constructor.
  * @this {*}
  * @return {anychart.core.ui.CircularLabelsFactory}
@@ -151,12 +161,33 @@ anychart.core.StateSettings.CIRCULAR_LABELS_CONSTRUCTOR = function() {
 
 
 /**
+ * Circular labels factory constructor. But without using defaultLabelsFactory theme
+ * @this {*}
+ * @return {anychart.core.ui.CircularLabelsFactory}
+ */
+anychart.core.StateSettings.CIRCULAR_LABELS_CONSTRUCTOR_NO_THEME = function() {
+  return new anychart.core.ui.CircularLabelsFactory(true);
+};
+
+
+
+/**
  * Default labels factory constructor.
  * @this {*}
  * @return {anychart.core.ui.MarkersFactory}
  */
 anychart.core.StateSettings.DEFAULT_MARKERS_CONSTRUCTOR = function() {
   return new anychart.core.ui.MarkersFactory();
+};
+
+
+/**
+ * Default labels factory constructor. But without using defaultMarkerFactory theme
+ * @this {*}
+ * @return {anychart.core.ui.MarkersFactory}
+ */
+anychart.core.StateSettings.DEFAULT_MARKERS_CONSTRUCTOR_NO_THEME = function() {
+  return new anychart.core.ui.MarkersFactory(void 0, void 0, true);
 };
 
 
@@ -413,6 +444,7 @@ anychart.core.StateSettings.prototype.labels = function(opt_value) {
     var afterInitCallback = /** @type {Function} */ (this.getOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK)) || goog.nullFunction;
     this.labels_ = labelsFactoryConstructor();
     this.labels_.supportsEnabledSuspension = false;
+    this.setupCreated('labels', this.labels_);
     afterInitCallback.call(this.stateHolder, this.labels_);
   }
 
@@ -433,10 +465,12 @@ anychart.core.StateSettings.prototype.labels = function(opt_value) {
  */
 anychart.core.StateSettings.prototype.minLabels = function(opt_value) {
   if (!this.minLabels_) {
-    var labelsFactoryConstructor = /** @type {Function} */ (this.getOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR)) || anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR;
+    var labelsFactoryConstructor = /** @type {Function} */ (this.getOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR)) || anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME;
     var afterInitCallback = /** @type {Function} */ (this.getOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK)) || goog.nullFunction;
     this.minLabels_ = labelsFactoryConstructor();
     this.minLabels_.supportsEnabledSuspension = false;
+    this.setupCreated('minLabels', this.minLabels_);
+
     afterInitCallback.call(this.stateHolder, this.minLabels_);
     this.minLabels_.markConsistent(anychart.ConsistencyState.ALL);
   }
@@ -458,10 +492,12 @@ anychart.core.StateSettings.prototype.minLabels = function(opt_value) {
  */
 anychart.core.StateSettings.prototype.maxLabels = function(opt_value) {
   if (!this.maxLabels_) {
-    var labelsFactoryConstructor = /** @type {Function} */ (this.getOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR)) || anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR;
+    var labelsFactoryConstructor = /** @type {Function} */ (this.getOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR)) || anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME;
     var afterInitCallback = /** @type {Function} */ (this.getOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK)) || goog.nullFunction;
     this.maxLabels_ = labelsFactoryConstructor();
     this.maxLabels_.supportsEnabledSuspension = false;
+    this.setupCreated('maxLabels', this.maxLabels_);
+
     afterInitCallback.call(this.stateHolder, this.maxLabels_);
     this.maxLabels_.markConsistent(anychart.ConsistencyState.ALL);
   }
@@ -483,8 +519,10 @@ anychart.core.StateSettings.prototype.maxLabels = function(opt_value) {
  */
 anychart.core.StateSettings.prototype.headers = function(opt_value) {
   if (!this.headers_) {
+    var labelsFactoryConstructor = /** @type {Function} */ (this.getOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR)) || anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME;
     var afterInitCallback = /** @type {Function} */ (this.getOption(anychart.core.StateSettings.HEADERS_AFTER_INIT_CALLBACK)) || anychart.core.StateSettings.DEFAULT_HEADERS_AFTER_INIT_CALLBACK;
-    this.headers_ = new anychart.core.ui.LabelsFactory();
+    this.headers_ = labelsFactoryConstructor();
+    this.setupCreated('headers', this.headers_);
     afterInitCallback.call(this.stateHolder, this.headers_);
   }
 
@@ -515,8 +553,11 @@ anychart.core.StateSettings.prototype.upperLabels = function(opt_value) {
  */
 anychart.core.StateSettings.prototype.lowerLabels = function(opt_value) {
   if (!this.lowerLabels_) {
-    var afterInitCallback = /** @type {Function} */ (this.getOption(anychart.core.StateSettings.LOWER_LABELS_AFTER_INIT_CALLBACK)) || goog.nullFunction;
-    this.lowerLabels_ = new anychart.core.ui.LabelsFactory();
+    var labelsFactoryConstructor = /** @type {Function} */ (this.getOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR)) || anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR;
+    var afterInitCallback = /** @type {Function} */ (this.getOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK)) || goog.nullFunction;
+    this.lowerLabels_ = labelsFactoryConstructor();
+    //this.setupCreated('lowerLabels', this.lowerLabels_);
+
     afterInitCallback.call(this.stateHolder, this.lowerLabels_);
   }
 
@@ -540,6 +581,7 @@ anychart.core.StateSettings.prototype.markers = function(opt_value) {
     var markersFactoryConstructor = /** @type {Function} */ (this.getOption(anychart.core.StateSettings.MARKERS_FACTORY_CONSTRUCTOR)) || anychart.core.StateSettings.DEFAULT_MARKERS_CONSTRUCTOR;
     var afterInitCallback = /** @type {Function} */ (this.getOption(anychart.core.StateSettings.MARKERS_AFTER_INIT_CALLBACK)) || goog.nullFunction;
     this.markers_ = markersFactoryConstructor();
+    this.setupCreated('markers', this.markers_);
     afterInitCallback.call(this.stateHolder, this.markers_);
   }
 
@@ -562,6 +604,7 @@ anychart.core.StateSettings.prototype.outlierMarkers = function(opt_value) {
   if (!this.outlierMarkers_) {
     var afterInitCallback = /** @type {Function} */ (this.getOption(anychart.core.StateSettings.OUTLIER_MARKERS_AFTER_INIT_CALLBACK)) || goog.nullFunction;
     this.outlierMarkers_ = new anychart.core.ui.MarkersFactory();
+    this.setupCreated('outlierMarkers', this.outlierMarkers_);
     afterInitCallback.call(this.stateHolder, this.outlierMarkers_);
   }
 
@@ -584,6 +627,7 @@ anychart.core.StateSettings.prototype.connector = function(opt_value) {
   if (!this.connector_) {
     var afterInitCallback = /** @type {Function} */ (this.getOption(anychart.core.StateSettings.CONNECTOR_AFTER_INIT_CALLBACK)) || goog.nullFunction;
     this.connector_ = new anychart.core.utils.Connector();
+    this.setupCreated('connector', this.connector_);
     afterInitCallback.call(this.stateHolder, this.connector_);
   }
 
@@ -605,6 +649,7 @@ anychart.core.StateSettings.prototype.outline = function(opt_value) {
     var outlineSettingsConstructor = /** @type {Function} */ (this.getOption(anychart.core.StateSettings.OUTLINE_CONSTRUCTOR)) || anychart.core.StateSettings.DEFAULT_OUTLINE_CONSTRUCTOR;
     var afterInitCallback = /** @type {Function} */ (this.getOption(anychart.core.StateSettings.OUTLINE_AFTER_INIT_CALLBACK)) || goog.nullFunction;
     this.outline_ = outlineSettingsConstructor();
+    this.setupCreated('outline', this.outline_);
     afterInitCallback.call(this.stateHolder, this.outline_);
   }
 
@@ -625,7 +670,10 @@ anychart.core.StateSettings.prototype.background = function(opt_value) {
   if (!this.background_) {
     var afterInitCallback = /** @type {Function} */ (this.getOption(anychart.core.StateSettings.BACKGROUND_AFTER_INIT_CALLBACK)) || anychart.core.StateSettings.DEFAULT_BACKGROUND_AFTER_INIT_CALLBACK;
     this.background_ = new anychart.core.ui.Background();
+    this.setupCreated('background', this.background_);
     afterInitCallback.call(this.stateHolder, this.background_);
+
+    this.background_.dropThemes();
   }
 
   if (goog.isDef(opt_value)) {
@@ -722,7 +770,7 @@ anychart.core.StateSettings.prototype.serialize = function() {
  *  @param {Object} config
  */
 anychart.core.StateSettings.prototype.setEnabledTrue = function(config) {
-  if (goog.isObject(config) && !('enabled' in config))
+  if (goog.typeOf(config) == 'object' && !('enabled' in config))
     config['enabled'] = true;
 };
 
@@ -732,58 +780,103 @@ anychart.core.StateSettings.prototype.setupByJSON = function(config, opt_default
   anychart.core.StateSettings.base(this, 'setupByJSON', config, opt_default);
   anychart.core.settings.deserialize(this, this.PROPERTY_DESCRIPTORS, config, opt_default);
 
+  var flatThemeSetup = goog.object.isEmpty(config);
   if (goog.isDef(this.descriptorsMeta['labels'])) {
-    this.setEnabledTrue(config['labels']);
-    this.labels().setupInternal(!!opt_default, config['labels']);
+    var labelsConfig = flatThemeSetup ? this.labels().themeSettings : config['labels'];
+    this.setEnabledTrue(labelsConfig);
+    this.labels().setupInternal(!!opt_default, labelsConfig);
   }
 
   if (goog.isDef(this.descriptorsMeta['minLabels'])) {
-    this.setEnabledTrue(config['minLabels']);
-    this.minLabels().setupInternal(!!opt_default, config['minLabels']);
+    var minLabelsConfig = flatThemeSetup ? this.minLabels().themeSettings : config['minLabels'];
+    this.setEnabledTrue(minLabelsConfig);
+    this.minLabels().setupInternal(!!opt_default, minLabelsConfig);
   }
 
   if (goog.isDef(this.descriptorsMeta['maxLabels'])) {
-    this.setEnabledTrue(config['maxLabels']);
-    this.maxLabels().setupInternal(!!opt_default, config['maxLabels']);
+    var maxLabelsConfig = flatThemeSetup ? this.maxLabels().themeSettings : config['maxLabels'];
+    this.setEnabledTrue(maxLabelsConfig);
+    this.maxLabels().setupInternal(!!opt_default, maxLabelsConfig);
   }
 
   if (goog.isDef(this.descriptorsMeta['headers'])) {
-    this.setEnabledTrue(config['headers']);
-    this.headers().setup(config['headers']);
+    var headersConfig = flatThemeSetup ? this.headers().themeSettings : config['headers'];
+    this.setEnabledTrue(headersConfig);
+    this.headers().setup(headersConfig);
   }
 
   if (goog.isDef(this.descriptorsMeta['lowerLabels'])) {
-    this.setEnabledTrue(config['lowerLabels']);
-    this.lowerLabels().setupInternal(!!opt_default, config['lowerLabels']);
+    var lowerLabelsConfig = flatThemeSetup ? this.lowerLabels().themeSettings : config['lowerLabels'];
+    this.setEnabledTrue(lowerLabelsConfig);
+    this.lowerLabels().setupInternal(!!opt_default, lowerLabelsConfig);
   }
 
   if (goog.isDef(this.descriptorsMeta['upperLabels'])) {
-    this.setEnabledTrue(config['upperLabels']);
-    this.upperLabels().setupInternal(!!opt_default, config['upperLabels']);
+    var upperLabelsConfig = flatThemeSetup ? this.upperLabels().themeSettings : config['upperLabels'];
+    this.setEnabledTrue(upperLabelsConfig);
+    this.upperLabels().setupInternal(!!opt_default, upperLabelsConfig);
   }
 
   if (goog.isDef(this.descriptorsMeta['markers'])) {
-    this.setEnabledTrue(config['markers']);
-    this.markers().setupInternal(!!opt_default, config['markers']);
+    var markersConfig = flatThemeSetup ? this.markers().themeSettings : config['markers'];
+    this.setEnabledTrue(markersConfig);
+    this.markers().setupInternal(!!opt_default, markersConfig);
   }
 
   if (goog.isDef(this.descriptorsMeta['outlierMarkers'])) {
-    this.setEnabledTrue(config['outlierMarkers']);
-    this.outlierMarkers().setupInternal(!!opt_default, config['outlierMarkers']);
+    var outlierMarkersConfig = flatThemeSetup ? this.outlierMarkers().themeSettings : config['outlierMarkers'];
+    this.setEnabledTrue(outlierMarkersConfig);
+    this.outlierMarkers().setupInternal(!!opt_default, outlierMarkersConfig);
   }
 
   if (goog.isDef(this.descriptorsMeta['connector'])) {
-    this.connector().setupInternal(!!opt_default, config['connector']);
+    this.connector().setupInternal(!!opt_default, flatThemeSetup ? this.connector().themeSettings : config['connector']);
   }
 
   if (goog.isDef(this.descriptorsMeta['outline'])) {
     // this.setEnabledTrue(config['outline']);
-    this.outline().setupInternal(!!opt_default, config['outline']);
+    this.outline().setupInternal(!!opt_default, flatThemeSetup ? this.outline().themeSettings : config['outline']);
   }
 
   if (goog.isDef(this.descriptorsMeta['background'])) {
     this.background().setupInternal(!!opt_default, config['background']);
     this.background().markConsistent(anychart.ConsistencyState.ALL);
+  }
+};
+
+
+/** @inheritDoc */
+anychart.core.StateSettings.prototype.dropThemes = function(opt_dropDefaultThemes) {
+  anychart.core.StateSettings.base(this, 'dropThemes', opt_dropDefaultThemes);
+  this.resolutionChainCache(null);
+  return this;
+};
+
+
+/**
+ * Re-initialize theme settings for all child elements
+ */
+anychart.core.StateSettings.prototype.updateChildrenThemes = function() {
+  var children = {
+    'labels': this.labels_,
+    'minLabels': this.minLabels_,
+    'maxLabels': this.maxLabels_,
+    'headers': this.headers_,
+    'lowerLabels': this.lowerLabels_,
+    'markers': this.markers_,
+    'outlierMarkers': this.outlierMarkers_,
+    'outline': this.outline_,
+    'connector': this.connector_,
+    'background': this.background_
+  };
+
+  for (var getterName in children) {
+    var child = children[getterName];
+    if (child && child.dropThemes) {
+      child.dropThemes();
+      child.restoreDefaultThemes();
+      this.setupCreated(getterName, child);
+    }
   }
 };
 

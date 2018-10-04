@@ -47,6 +47,8 @@ anychart.core.ui.Title = function() {
 
   delete this.themeSettings['enabled'];
 
+  this.addThemes(anychart.themes.DefaultThemes['title']);
+
   /**
    * Text element.
    * @type {!acgraph.vector.Text}
@@ -395,7 +397,7 @@ anychart.core.ui.Title.prototype.parent = function(opt_value) {
       this.parent_ = opt_value;
       if (this.parent_) {
         this.parent_.listenSignals(this.parentInvalidated_, this);
-        this.background().parent(this.parent_.background());
+        this.background().dropThemes().parent(this.parent_.background());
         this.padding().parent(this.parent_.padding());
         this.margin().parent(this.parent_.margin());
       } else {
@@ -465,8 +467,9 @@ anychart.core.ui.Title.prototype.isStockPlotTitle = function(opt_value) {
 anychart.core.ui.Title.prototype.background = function(opt_value) {
   if (!this.background_) {
     this.background_ = new anychart.core.ui.Background();
-    this.registerDisposable(this.background_);
     this.background_.listenSignals(this.backgroundInvalidated_, this);
+
+    this.setupCreated('background', this.background_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -514,8 +517,9 @@ anychart.core.ui.Title.prototype.setAutoHeight = function(height) {
 anychart.core.ui.Title.prototype.margin = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.margin_) {
     this.margin_ = new anychart.core.utils.Margin();
-    this.registerDisposable(this.margin_);
     this.margin_.listenSignals(this.boundsInvalidated_, this);
+
+    this.setupCreated('margin', this.margin_);
   }
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
     this.margin_.setup.apply(this.margin_, arguments);
@@ -536,8 +540,9 @@ anychart.core.ui.Title.prototype.margin = function(opt_spaceOrTopOrTopAndBottom,
 anychart.core.ui.Title.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.padding_) {
     this.padding_ = new anychart.core.utils.Padding();
-    this.registerDisposable(this.padding_);
     this.padding_.listenSignals(this.boundsInvalidated_, this);
+
+    this.setupCreated('padding', this.padding_);
   }
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
     this.padding_.setup.apply(this.padding_, arguments);
@@ -602,9 +607,10 @@ anychart.core.ui.Title.prototype.textSettings = function(opt_objectOrName, opt_v
   }
 
   var res = {};
-  for (var key in this.ownSettings) {
-    if (key in this.TEXT_DESCRIPTORS)
-      res[key] = this.ownSettings[key];
+  for (var key in this.TEXT_DESCRIPTORS) {
+    var val = this.getOption(key);
+    if (goog.isDef(val))
+      res[key] = val;
   }
   return res;
 };
@@ -645,7 +651,6 @@ anychart.core.ui.Title.prototype.initDom_ = function() {
     this.text_ = this.layer_.text();
     this.text_.zIndex(.1);
     this.text_.attr('aria-hidden', 'true');
-    this.registerDisposable(this.layer_);
     this.bindHandlersToGraphics(this.layer_);
   }
   return isInitial;
@@ -1087,14 +1092,6 @@ anychart.core.ui.Title.prototype.clear = function() {
 
 //endregion
 //region -- Serialization
-/**
- * Sets default settings.
- * @param {!Object} config
- */
-anychart.core.ui.Title.prototype.setThemeSettings = function(config) {
-  anychart.core.settings.copy(this.themeSettings, this.TEXT_DESCRIPTORS, config);
-  anychart.core.settings.copy(this.themeSettings, this.SIMPLE_PROPS_DESCRIPTORS, config);
-};
 
 
 /** @inheritDoc */
@@ -1127,22 +1124,36 @@ anychart.core.ui.Title.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.ui.Title.prototype.setupSpecial = function(isDefault, var_args) {
-  var arg0 = arguments[1];
+anychart.core.ui.Title.prototype.resolveSpecialValue = function(var_args) {
+  var arg0 = arguments[0];
   if (goog.isString(arg0)) {
-    if (isDefault) {
-      this.themeSettings['text'] = arg0;
-      this.themeSettings['enabled'] = true;
-    } else {
-      this['text'](arg0);
-      this.enabled(true);
-    }
-    return true;
+    return {
+      'text': arg0,
+      'enabled': true
+    };
   } else if (goog.isBoolean(arg0) || goog.isNull(arg0)) {
-    if (isDefault)
-      this.themeSettings['enabled'] = !!arg0;
-    else
-      this.enabled(!!arg0);
+    return {'enabled': !!arg0};
+  }
+  return null;
+};
+
+
+/** @inheritDoc */
+anychart.core.ui.Title.prototype.setupSpecial = function(isDefault, var_args) {
+  var resolvedValue = this.resolveSpecialValue(arguments[1]);
+  if (resolvedValue) {
+    if (isDefault) {
+      this.themeSettings['enabled'] = resolvedValue['enabled'];
+
+      if ('text' in resolvedValue)
+        this.themeSettings['text'] = resolvedValue['text'];
+
+    } else {
+      this.enabled(resolvedValue['enabled']);
+
+      if ('text' in resolvedValue)
+        this['text'](resolvedValue['text']);
+    }
     return true;
   }
   return false;
@@ -1153,24 +1164,36 @@ anychart.core.ui.Title.prototype.setupSpecial = function(isDefault, var_args) {
 anychart.core.ui.Title.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.ui.Title.base(this, 'setupByJSON', config, opt_default);
 
-  if (opt_default) {
-    this.setThemeSettings(config);
-  } else {
-    anychart.core.settings.deserialize(this, this.TEXT_DESCRIPTORS, config);
-    anychart.core.settings.deserialize(this, this.SIMPLE_PROPS_DESCRIPTORS, config);
-  }
-
-  if ('background' in config)
-    this.background(config['background']);
+  anychart.core.settings.deserialize(this, this.TEXT_DESCRIPTORS, config, opt_default);
+  anychart.core.settings.deserialize(this, this.SIMPLE_PROPS_DESCRIPTORS, config, opt_default);
 
   if ('padding' in config)
-    this.padding(config['padding']);
+    this.padding().setupInternal(!!opt_default, config['padding']);
 
   if ('margin' in config)
-    this.margin(config['margin']);
+    this.margin().setupInternal(!!opt_default, config['margin']);
+
+  if ('background' in config)
+    this.background().setupInternal(!!opt_default, config['background']);
 };
 
 
+/** @inheritDoc */
+anychart.core.ui.Title.prototype.disposeInternal = function() {
+  goog.disposeAll(
+      this.background_,
+      this.margin_,
+      this.padding_,
+      this.layer_
+  );
+
+  this.background_ = null;
+  this.margin_ = null;
+  this.padding_ = null;
+  this.layer_ = null;
+
+  anychart.core.ui.Title.base(this, 'disposeInternal');
+};
 
 //endregion
 //region --- Standalone

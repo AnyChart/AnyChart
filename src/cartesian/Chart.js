@@ -26,6 +26,8 @@ goog.require('anychart.enums');
 anychart.cartesianModule.Chart = function() {
   anychart.cartesianModule.Chart.base(this, 'constructor');
 
+  this.addThemes('cartesian');
+
   this.setType(anychart.enums.ChartTypes.CARTESIAN);
 };
 goog.inherits(anychart.cartesianModule.Chart, anychart.core.CartesianBase);
@@ -468,7 +470,8 @@ anychart.cartesianModule.Chart.prototype.isSeriesVisible = function(series) {
  */
 anychart.cartesian = function() {
   var chart = new anychart.cartesianModule.Chart();
-  chart.setupInternal(true, anychart.getFullTheme('cartesian'));
+  chart.setupStateSettings();
+  // chart.setupInternal(true, anychart.getFullTheme('cartesian'));
   return chart;
 };
 
@@ -486,8 +489,6 @@ anychart.chartTypesMap[anychart.enums.ChartTypes.CARTESIAN] = anychart.cartesian
   // proto['barsPadding'] = proto.barsPadding;
   // proto['barGroupsPadding'] = proto.barGroupsPadding;
   proto['crosshair'] = proto.crosshair;
-  proto['maxBubbleSize'] = proto.maxBubbleSize;
-  proto['minBubbleSize'] = proto.minBubbleSize;
   proto['xGrid'] = proto.xGrid;
   proto['yGrid'] = proto.yGrid;
   proto['xMinorGrid'] = proto.xMinorGrid;
@@ -528,6 +529,8 @@ anychart.chartTypesMap[anychart.enums.ChartTypes.CARTESIAN] = anychart.cartesian
   proto['getType'] = proto.getType;
   // auto from ChartWithSeries
   // proto['defaultSeriesType'] = proto.defaultSeriesType;
+  // proto['maxBubbleSize'] = proto.maxBubbleSize;
+  // proto['minBubbleSize'] = proto.minBubbleSize;
   proto['addSeries'] = proto.addSeries;
   proto['getSeriesAt'] = proto.getSeriesAt;
   proto['getSeriesCount'] = proto.getSeriesCount;

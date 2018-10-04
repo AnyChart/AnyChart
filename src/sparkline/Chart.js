@@ -30,6 +30,8 @@ goog.require('anychart.sparklineModule.series.Base');
 anychart.sparklineModule.Chart = function(opt_data, opt_csvSettings) {
   anychart.sparklineModule.Chart.base(this, 'constructor');
 
+  this.addThemes('sparkline');
+
   this.getCsvExportRow = this.getCsvExportRowScatter;
 
   /**
@@ -130,6 +132,7 @@ anychart.sparklineModule.Chart = function(opt_data, opt_csvSettings) {
   this.labelsInternal_['maxFontSize'](72);
   this.labelsInternal_.setParentEventTarget(this);
   this.labelsInternal_.setAutoZIndex(anychart.sparklineModule.Chart.ZINDEX_LABEL);
+  this.labelsInternal_.dropThemes(true);
 
   this.data(opt_data || null, opt_csvSettings);
 
@@ -518,20 +521,6 @@ anychart.sparklineModule.Chart.prototype.getStartValueForAppearanceReduction = g
 
 
 /**
- * Getter/setter for marker default settings.
- * @param {Object=} opt_value Object with default series settings.
- * @return {Object}
- */
-anychart.sparklineModule.Chart.prototype.defaultMarkerSettings = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.defaultMarkerSettings_ = opt_value;
-    return this;
-  }
-  return this.defaultMarkerSettings_ || {};
-};
-
-
-/**
  * Getter/setter for series default settings.
  * @param {Object=} opt_value Object with default series settings.
  * @return {Object}
@@ -542,48 +531,6 @@ anychart.sparklineModule.Chart.prototype.defaultSeriesSettings = function(opt_va
     return this;
   }
   return this.defaultSeriesSettings_ || {};
-};
-
-
-/**
- * Getter/setter for line marker default settings.
- * @param {Object=} opt_value Object with line marker settings.
- * @return {Object}
- */
-anychart.sparklineModule.Chart.prototype.defaultLineMarkerSettings = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.defaultLineMarkerSettings_ = opt_value;
-    return this;
-  }
-  return this.defaultLineMarkerSettings_ || {};
-};
-
-
-/**
- * Getter/setter for text marker default settings.
- * @param {Object=} opt_value Object with text marker settings.
- * @return {Object}
- */
-anychart.sparklineModule.Chart.prototype.defaultTextMarkerSettings = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.defaultTextMarkerSettings_ = opt_value;
-    return this;
-  }
-  return this.defaultTextMarkerSettings_ || {};
-};
-
-
-/**
- * Getter/setter for range marker default settings.
- * @param {Object=} opt_value Object with range marker settings.
- * @return {Object}
- */
-anychart.sparklineModule.Chart.prototype.defaultRangeMarkerSettings = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.defaultRangeMarkerSettings_ = opt_value;
-    return this;
-  }
-  return this.defaultRangeMarkerSettings_ || {};
 };
 
 
@@ -719,7 +666,6 @@ anychart.sparklineModule.Chart.prototype.lineMarker = function(opt_indexOrValue,
   var lineMarker = this.lineAxesMarkers_[index];
   if (!lineMarker) {
     lineMarker = new anychart.core.axisMarkers.Line();
-    lineMarker.setup(this.defaultLineMarkerSettings());
     this.lineAxesMarkers_[index] = lineMarker;
     this.registerDisposable(lineMarker);
     lineMarker.listenSignals(this.onMarkersSignal_, this);
@@ -754,7 +700,6 @@ anychart.sparklineModule.Chart.prototype.rangeMarker = function(opt_indexOrValue
   var rangeMarker = this.rangeAxesMarkers_[index];
   if (!rangeMarker) {
     rangeMarker = new anychart.core.axisMarkers.Range();
-    rangeMarker.setup(this.defaultRangeMarkerSettings());
     this.rangeAxesMarkers_[index] = rangeMarker;
     this.registerDisposable(rangeMarker);
     rangeMarker.listenSignals(this.onMarkersSignal_, this);
@@ -789,7 +734,6 @@ anychart.sparklineModule.Chart.prototype.textMarker = function(opt_indexOrValue,
   var textMarker = this.textAxesMarkers_[index];
   if (!textMarker) {
     textMarker = new anychart.core.axisMarkers.Text();
-    textMarker.setup(this.defaultTextMarkerSettings());
     this.textAxesMarkers_[index] = textMarker;
     this.registerDisposable(textMarker);
     textMarker.listenSignals(this.onMarkersSignal_, this);
@@ -2281,23 +2225,8 @@ anychart.sparklineModule.Chart.prototype.isNoData = function() {
 anychart.sparklineModule.Chart.prototype.setupByJSON = function(config, opt_default) {
   anychart.sparklineModule.Chart.base(this, 'setupByJSON', config, opt_default);
 
-  if ('defaultLabelSettings' in config)
-    this.defaultLabelSettings(config['defaultLabelSettings']);
-
-  if ('defaultMarkerSettings' in config)
-    this.defaultMarkerSettings(config['defaultMarkerSettings']);
-
   if ('defaultSeriesSettings' in config)
     this.defaultSeriesSettings(config['defaultSeriesSettings']);
-
-  if ('defaultLineMarkerSettings' in config)
-    this.defaultLineMarkerSettings(config['defaultLineMarkerSettings']);
-
-  if ('defaultTextMarkerSettings' in config)
-    this.defaultTextMarkerSettings(config['defaultTextMarkerSettings']);
-
-  if ('defaultRangeMarkerSettings' in config)
-    this.defaultRangeMarkerSettings(config['defaultRangeMarkerSettings']);
 
   var i, json, scale;
   var lineAxesMarkers = config['lineAxesMarkers'];

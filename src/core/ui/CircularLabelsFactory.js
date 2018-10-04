@@ -8,11 +8,13 @@ goog.require('anychart.math.Rect');
 
 
 /**
+ * @param {boolean=} opt_skipDefaultThemes
+ *
  * @constructor
  * @extends {anychart.core.ui.LabelsFactory}
  */
-anychart.core.ui.CircularLabelsFactory = function() {
-  anychart.core.ui.CircularLabelsFactory.base(this, 'constructor');
+anychart.core.ui.CircularLabelsFactory = function(opt_skipDefaultThemes) {
+  anychart.core.ui.CircularLabelsFactory.base(this, 'constructor', opt_skipDefaultThemes);
 
   if (!goog.array.contains(this.settingsFieldsForMerge, 'autoRotate'))
     this.settingsFieldsForMerge.push('autoRotate');
@@ -324,6 +326,9 @@ anychart.core.ui.CircularLabelsFactory.Label.prototype.getRotation = function(an
 
 /** @inheritDoc */
 anychart.core.ui.CircularLabelsFactory.Label.prototype.drawLabel = function(bounds, parentBounds) {
+  if (!this.mergedSettings)
+    this.getMergedSettings();
+
   var positionFormatter = this.mergedSettings['positionFormatter'];
   var isTextByPath = !!this.textElement.path();
   var anchor = isTextByPath ?
@@ -384,8 +389,20 @@ anychart.core.ui.CircularLabelsFactory.Label.prototype.drawLabel = function(boun
   bounds.left = /** @type {number} */(x);
   bounds.top = /** @type {number} */(y);
 
+  // if (!this.anchPoint)
+  //   this.anchPoint = this.container().circle(x, y, 2).fill('red').stroke('black').zIndex(1000);
+  // this.anchPoint.center({x: x, y: y});
+  //
+  // if (!this.labelBounds)
+  //   this.labelBounds = this.container().rect().fill('none').stroke('red').zIndex(1000);
+  // this.labelBounds.setBounds(new anychart.math.rect(bounds.left, bounds.top, bounds.width, bounds.height));
+
   this.mergedSettings['rotation'] = this.getRotation(angle);
-  this.textElement.x(/** @type {number} */(this.textX)).y(/** @type {number} */(this.textY));
+  if (this.isComplex) {
+    this.textElement.x(/** @type {number} */(this.textX)).y(/** @type {number} */(this.textY));
+  } else {
+    this.textElement.setPosition(/** @type {number} */(this.textX), /** @type {number} */(this.textY));
+  }
 };
 
 

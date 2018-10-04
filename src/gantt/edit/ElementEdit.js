@@ -329,7 +329,7 @@ anychart.ganttModule.edit.ElementEdit.prototype.setupByJSON = function(config, o
  */
 anychart.ganttModule.edit.ElementEdit.prototype.serialize = function() {
   var json = anychart.ganttModule.edit.ElementEdit.base(this, 'serialize');
-  anychart.core.settings.serialize(this, anychart.ganttModule.edit.ElementEdit.DESCRIPTORS, json);
+  anychart.core.settings.serialize(this, anychart.ganttModule.edit.ElementEdit.DESCRIPTORS, json, void 0, void 0, true);
   if (!this.hasOwnOption('enabled') || goog.isNull(json['enabled']))
     delete json['enabled'];
   json['thumbs'] = this.thumbs().serialize();

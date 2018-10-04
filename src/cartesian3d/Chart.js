@@ -38,6 +38,8 @@ goog.require('goog.color');
 anychart.cartesian3dModule.Chart = function() {
   anychart.cartesian3dModule.Chart.base(this, 'constructor');
 
+  this.addThemes('cartesian', 'cartesian3dBase', 'cartesian3d');
+
   /**
    * @type {number}
    * @private
@@ -376,7 +378,8 @@ anychart.core.ChartWithSeries.generateSeriesConstructors(anychart.cartesian3dMod
  */
 anychart.cartesian3d = function() {
   var chart = new anychart.cartesian3dModule.Chart();
-  chart.setupInternal(true, anychart.getFullTheme('cartesian3d'));
+  chart.setupStateSettings();
+  //chart.setupInternal(true, anychart.getFullTheme('cartesian3d'));
   return chart;
 };
 

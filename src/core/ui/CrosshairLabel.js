@@ -33,7 +33,8 @@ anychart.core.ui.CrosshairLabel = function() {
   this.y_ = NaN;
 
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
-    ['format', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED]
+    ['format', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['axisIndex', 0, anychart.Signal.NEEDS_REAPPLICATION]
   ]);
 };
 goog.inherits(anychart.core.ui.CrosshairLabel, anychart.core.ui.LabelBase);
@@ -57,11 +58,10 @@ anychart.core.ui.CrosshairLabel.DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
 
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'format',
-      anychart.core.settings.stringOrFunctionNormalizer);
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'format', anychart.core.settings.stringOrFunctionNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'axisIndex', anychart.core.settings.asIsNormalizer]
+  ]);
 
   return map;
 })();
@@ -69,22 +69,6 @@ anychart.core.settings.populate(anychart.core.ui.CrosshairLabel, anychart.core.u
 
 
 //endregion
-/**
- * Gets/Sets axis index.
- * @param {number=} opt_value
- * @return {!(number|anychart.core.ui.CrosshairLabel)}
- */
-anychart.core.ui.CrosshairLabel.prototype.axisIndex = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.axisIndex_ != opt_value) {
-      this.axisIndex_ = opt_value;
-      this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
-    }
-    return this;
-  } else {
-    return this.axisIndex_;
-  }
-};
 
 
 /**
@@ -203,7 +187,6 @@ anychart.core.ui.CrosshairLabel.prototype.drawLabel = function() {
 anychart.core.ui.CrosshairLabel.prototype.serialize = function() {
   var json = anychart.core.ui.CrosshairLabel.base(this, 'serialize');
   anychart.core.settings.serialize(this, anychart.core.ui.CrosshairLabel.DESCRIPTORS, json, 'Crosshair Label');
-  json['axisIndex'] = this.axisIndex_;
   return json;
 };
 
@@ -213,15 +196,15 @@ anychart.core.ui.CrosshairLabel.prototype.setupByJSON = function(config, opt_def
   anychart.core.ui.CrosshairLabel.base(this, 'setupByJSON', config, opt_default);
 
   anychart.core.settings.deserialize(this, anychart.core.ui.CrosshairLabel.DESCRIPTORS, config, opt_default);
-
-  this.axisIndex(config['axisIndex']);
 };
 
 
 (function() {
   var proto = anychart.core.ui.CrosshairLabel.prototype;
   //exports
-  proto['axisIndex'] = proto.axisIndex;
   proto['background'] = proto.background;
   proto['padding'] = proto.padding;
+  // auto generated
+  // proto['axisIndex'] = proto.axisIndex;
+  // proto['format'] = proto.format;
 })();

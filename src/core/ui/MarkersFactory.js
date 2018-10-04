@@ -35,13 +35,17 @@ goog.require('goog.math.Coordinate');
  *  MMarker.draw({x: 200, y: 50});
  * @param {boolean=} opt_isNonInteractive
  * @param {boolean=} opt_crispEdges
+ * @param {boolean=} opt_skipDefaultThemes
  * @constructor
  * @extends {anychart.core.VisualBase}
  * @implements {anychart.core.IStandaloneBackend}
  */
-anychart.core.ui.MarkersFactory = function(opt_isNonInteractive, opt_crispEdges) {
+anychart.core.ui.MarkersFactory = function(opt_isNonInteractive, opt_crispEdges, opt_skipDefaultThemes) {
   this.suspendSignalsDispatching();
   anychart.core.ui.MarkersFactory.base(this, 'constructor');
+
+  if (!opt_skipDefaultThemes)
+    this.addDefaultThemes(anychart.themes.DefaultThemes['markersFactory']);
 
   delete this.themeSettings['enabled'];
 
@@ -809,11 +813,24 @@ anychart.core.ui.MarkersFactory.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.ui.MarkersFactory.prototype.setupSpecial = function(isDefault, var_args) {
-  var arg0 = arguments[1];
+anychart.core.ui.MarkersFactory.prototype.resolveSpecialValue = function(var_args) {
+  var arg0 = arguments[0];
   if (goog.isString(arg0)) {
-    this.type(arg0);
-    this.enabled(true);
+    return {
+      'type': arg0,
+      'enabled': true
+    };
+  }
+  return null;
+};
+
+
+/** @inheritDoc */
+anychart.core.ui.MarkersFactory.prototype.setupSpecial = function(isDefault, var_args) {
+  var resolvedValue = this.resolveSpecialValue(arguments[1]);
+  if (resolvedValue) {
+    this.type(resolvedValue['type']);
+    this.enabled(resolvedValue['enabled']);
     return true;
   }
   return anychart.core.VisualBase.prototype.setupSpecial.apply(this, arguments);

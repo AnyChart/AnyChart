@@ -6,7 +6,9 @@
 #
 ########################################################################################################################
 function upload_all_files(){
-    skype_send status "Start upload CDN (static)"
+    CDN_PATH_="/apps/static/cdn/${MOCK_CDN_PATH}"
+    
+    Run "skype_send status 'Start upload CDN (static)'"
 
     echo "--"
     echo "Upload files to static server"
@@ -31,7 +33,7 @@ function upload_all_files(){
     ####################################################################################################################
     echo Create-n-clear dir on static
     Run "ssh -i ~/.ssh/id_rsa $STATIC_HOST_SSH_STRING \"
-      mkdir -p /apps/static/cdn/releases/${VERSION} && rm -rf /apps/static/cdn/releases/${VERSION}/*\" "
+      mkdir -p ${CDN_PATH_}releases/${VERSION} && rm -rf ${CDN_PATH_}releases/${VERSION}/*\" "
     echo
 
     ####################################################################################################################
@@ -40,7 +42,7 @@ function upload_all_files(){
     #
     ####################################################################################################################
     echo Uploading files
-    Run "scp -i ~/.ssh/id_rsa dist/${INSTALL_PACKAGE_NAME} $STATIC_HOST_SSH_STRING:/apps/static/cdn/releases/${VERSION}/${INSTALL_PACKAGE_NAME}"
+    Run "scp -i ~/.ssh/id_rsa dist/${INSTALL_PACKAGE_NAME} $STATIC_HOST_SSH_STRING:${CDN_PATH_}releases/${VERSION}/${INSTALL_PACKAGE_NAME}"
     echo
 
     ####################################################################################################################
@@ -50,10 +52,10 @@ function upload_all_files(){
     ####################################################################################################################
     echo Unzipping files
     Run "ssh -i ~/.ssh/id_rsa $STATIC_HOST_SSH_STRING \"
-    unzip -q -o /apps/static/cdn/releases/${VERSION}/${INSTALL_PACKAGE_NAME} -d /apps/static/cdn/releases/${VERSION}/\" "
+    unzip -q -o ${CDN_PATH_}releases/${VERSION}/${INSTALL_PACKAGE_NAME} -d ${CDN_PATH_}releases/${VERSION}/\" "
 
     Run "ssh -i ~/.ssh/id_rsa $STATIC_HOST_SSH_STRING \"
-        cp /apps/static/cdn/releases/${VERSION}/js/modules.json /apps/static/cdn/releases/${VERSION}/index.json\" "
+        cp ${CDN_PATH_}releases/${VERSION}/js/modules.json ${CDN_PATH_}releases/${VERSION}/index.json\" "
     echo
 
 
@@ -65,12 +67,12 @@ function upload_all_files(){
     if [ ${IS_RELEASE_BUILD} = "true" ]; then
         echo Copy prod legacy files
         Run "ssh -i ~/.ssh/id_rsa $STATIC_HOST_SSH_STRING \"
-        mkdir -p /apps/static/cdn/themes/${VERSION} &&
-        rm -rf /apps/static/cdn/themes/${VERSION} &&
-        cp -r /apps/static/cdn/releases/${VERSION}/themes /apps/static/cdn/themes/${VERSION} &&
-        mkdir -p /apps/static/cdn/schemas/${VERSION} &&
-        cp /apps/static/cdn/releases/${VERSION}/json-schema.json /apps/static/cdn/schemas/${VERSION}/json-schema.json &&
-        cp /apps/static/cdn/releases/${VERSION}/xml-schema.xsd /apps/static/cdn/schemas/${VERSION}/xml-schema.xsd \" "
+        mkdir -p ${CDN_PATH_}themes/${VERSION} &&
+        rm -rf ${CDN_PATH_}themes/${VERSION} &&
+        cp -r ${CDN_PATH_}releases/${VERSION}/themes ${CDN_PATH_}themes/${VERSION} &&
+        mkdir -p ${CDN_PATH_}schemas/${VERSION} &&
+        cp ${CDN_PATH_}releases/${VERSION}/json-schema.json ${CDN_PATH_}schemas/${VERSION}/json-schema.json &&
+        cp ${CDN_PATH_}releases/${VERSION}/xml-schema.xsd ${CDN_PATH_}schemas/${VERSION}/xml-schema.xsd \" "
         echo
     fi
 
@@ -82,16 +84,16 @@ function upload_all_files(){
     if [ ${IS_RELEASE_BUILD} = "true" ]; then
         echo Create latest version
         Run "ssh -i ~/.ssh/id_rsa  $STATIC_HOST_SSH_STRING \"
-        rm -rf /apps/static/cdn/releases/v${MAJOR_VERSION} &&
-        cp -r /apps/static/cdn/releases/${VERSION} /apps/static/cdn/releases/v${MAJOR_VERSION} \" "
+        rm -rf ${CDN_PATH_}releases/v${MAJOR_VERSION} &&
+        cp -r ${CDN_PATH_}releases/${VERSION} ${CDN_PATH_}releases/v${MAJOR_VERSION} \" "
         echo
     fi
 
     if [ ${IS_RC_BUILD} = "true" ]; then
         echo Create RC version
         Run "ssh -i ~/.ssh/id_rsa  $STATIC_HOST_SSH_STRING \"
-        rm -rf /apps/static/cdn/releases/rc &&
-        cp -r /apps/static/cdn/releases/${VERSION} /apps/static/cdn/releases/rc \" "
+        rm -rf ${CDN_PATH_}releases/rc &&
+        cp -r ${CDN_PATH_}releases/${VERSION} ${CDN_PATH_}releases/rc \" "
         echo
     fi
 }

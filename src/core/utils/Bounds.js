@@ -567,6 +567,35 @@ anychart.core.utils.Bounds.prototype.setupByJSON = function(json, opt_default) {
 
 
 /** @inheritDoc */
+anychart.core.utils.Bounds.prototype.resolveSpecialValue = function(var_args) {
+  var left, top, width, height = null;
+  var arg0 = arguments[0];
+  var resolvedValue;
+  // bounds set from theme as array
+  if (goog.isArray(arg0)) {
+    left = goog.isDef(arg0[0]) ? arg0[0] : null;
+    top = goog.isDef(arg0[1]) ? arg0[1] : null;
+    width = goog.isDef(arg0[2]) ? arg0[2] : null;
+    height = goog.isDef(arg0[3]) ? arg0[3] : null;
+  // bounds set from theme as one number/string
+  } else if (goog.isDef(arg0) && !goog.isObject(arg0)) {
+    left = arg0;
+  }
+  resolvedValue = {
+    'left': left,
+    'top': top,
+    'width': width,
+    'height': height
+  };
+  this.left(left)
+      .top(top)
+      .width(width)
+      .height(height);
+  return resolvedValue;
+};
+
+
+/** @inheritDoc */
 anychart.core.utils.Bounds.prototype.setupSpecial = function(isDefault, var_args) {
   var left, top, right, bottom, width, height, minWidth, minHeight, maxWidth, maxHeight;
   var operable = false;

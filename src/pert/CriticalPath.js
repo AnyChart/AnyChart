@@ -14,6 +14,8 @@ goog.require('anychart.pertModule.Tasks');
 anychart.pertModule.CriticalPath = function() {
   anychart.pertModule.CriticalPath.base(this, 'constructor');
 
+  this.addThemes('criticalPath');
+
   /**
    * @type {anychart.pertModule.Milestones}
    * @private
@@ -48,6 +50,7 @@ anychart.pertModule.CriticalPath.prototype.SUPPORTED_SIGNALS =
 anychart.pertModule.CriticalPath.prototype.milestones = function(opt_value) {
   if (!this.milestones_) {
     this.milestones_ = new anychart.pertModule.Milestones();
+    this.setupCreated('milestones', this.milestones_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -66,6 +69,7 @@ anychart.pertModule.CriticalPath.prototype.milestones = function(opt_value) {
 anychart.pertModule.CriticalPath.prototype.tasks = function(opt_value) {
   if (!this.tasks_) {
     this.tasks_ = new anychart.pertModule.Tasks();
+    this.setupCreated('tasks', this.tasks_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -88,8 +92,8 @@ anychart.pertModule.CriticalPath.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.pertModule.CriticalPath.prototype.setupByJSON = function(config, opt_default) {
   anychart.pertModule.CriticalPath.base(this, 'setupByJSON', config, opt_default);
-  if ('milestones' in config) this.milestones().setupByJSON(config['milestones']);
-  if ('tasks' in config) this.tasks().setupByJSON(config['tasks']);
+  if ('milestones' in config) this.milestones().setupByJSON(config['milestones'], opt_default);
+  if ('tasks' in config) this.tasks().setupByJSON(config['tasks'], opt_default);
 };
 
 

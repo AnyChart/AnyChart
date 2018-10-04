@@ -55,6 +55,8 @@ goog.require('goog.ui.KeyboardShortcutHandler');
 anychart.mapModule.Chart = function() {
   anychart.mapModule.Chart.base(this, 'constructor');
 
+  this.addThemes('map');
+
   /**
    * Custom crs passed to crs() method.
    * @type {Object|Function|anychart.enums.MapProjections|string}
@@ -612,6 +614,9 @@ anychart.mapModule.Chart.prototype.controlsInteractivity_ = function() {
         'width': '1px'
       });
       goog.dom.appendChild(document['body'], anychart.mapTextarea);
+      goog.events.listen(anychart.mapTextarea, [goog.events.EventType.FOCUS, goog.events.EventType.FOCUSIN, goog.events.EventType.SELECT], function(e) {
+        e.preventDefault();
+      });
     }
 
     this.listen('pointsselect', function(e) {
@@ -824,7 +829,7 @@ anychart.mapModule.Chart.prototype.controlsInteractivity_ = function() {
         var scrollX = scrollEl.scrollLeft;
         var scrollY = scrollEl.scrollTop;
 
-        anychart.mapTextarea.focus();
+        anychart.mapTextarea.select();
         anychart.mapTextarea.chart = this;
         if (goog.userAgent.GECKO) {
           var newScrollX = scrollEl.scrollLeft;
@@ -1067,7 +1072,7 @@ anychart.mapModule.Chart.prototype.handleMouseDown = function(event) {
 /** @inheritDoc */
 anychart.mapModule.Chart.prototype.onMouseDown = function(event) {
   var interactivity = this.interactivity();
-  if (interactivity.selectionMode() == anychart.enums.SelectionMode.DRILL_DOWN) {
+  if (interactivity.getOption('selectionMode') == anychart.enums.SelectionMode.DRILL_DOWN) {
     var drillDownMap = this.getCurrentScene().drillDownMap();
     if (drillDownMap) {
       var tag = anychart.utils.extractTag(event['domTarget']);
@@ -1122,7 +1127,7 @@ anychart.mapModule.Chart.prototype.onMouseDown = function(event) {
  */
 anychart.mapModule.Chart.prototype.handleMouseOut = function(event) {
   var scene = this.getCurrentScene();
-  var hoverMode = scene.interactivity().hoverMode();
+  var hoverMode = /** @type {anychart.enums.HoverMode} */(scene.interactivity().getOption('hoverMode'));
 
   var tag = anychart.utils.extractTag(event['domTarget']);
   var forbidTooltip = false;
@@ -1320,8 +1325,8 @@ anychart.mapModule.Chart.prototype.getSeriesStatus = function(event) {
   var interactivity = this.interactivity();
   var i, len, series;
 
-  if (interactivity.hoverMode() == anychart.enums.HoverMode.BY_SPOT) {
-    var spotRadius = interactivity.spotRadius();
+  if (interactivity.getOption('hoverMode') == anychart.enums.HoverMode.BY_SPOT) {
+    var spotRadius = /** @type {number}*/(interactivity.getOption('spotRadius'));
 
     for (i = 0, len = this.seriesList.length; i < len; i++) {
       series = this.seriesList[i];
@@ -1358,7 +1363,7 @@ anychart.mapModule.Chart.prototype.getSeriesStatus = function(event) {
           });
       }
     }
-  } else if (this.interactivity().hoverMode() == anychart.enums.HoverMode.BY_X) {
+  } else if (this.interactivity().getOption('hoverMode') == anychart.enums.HoverMode.BY_X) {
     //not working yet. coming soon.
   }
 
@@ -1734,6 +1739,7 @@ anychart.mapModule.Chart.prototype.onAxesSettingsSignal = function(event) {
 anychart.mapModule.Chart.prototype.grids = function(opt_value) {
   if (!this.gridSettings_) {
     this.gridSettings_ = new anychart.mapModule.elements.GridSettings(this);
+    this.setupCreated('gridsSettings', this.gridSettings_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -3021,7 +3027,8 @@ anychart.mapModule.Chart.prototype.calculate = function() {
       }
 
       if ((this.crsMapAnimation && this.crsMapAnimation.isStopped()) || !this.crsMapAnimation) {
-        var isAnimate = this.crsAnimation_ && this.crsAnimation_.enabled() && this.crsAnimation_.duration() > 0 && !initInternalGeoData && changeProjection;
+        var isAnimate = this.crsAnimation_ && /** @type {boolean} */(this.crsAnimation_.getOption('enabled')) &&
+            /** @type {number} */(this.crsAnimation_.getOption('duration')) > 0 && !initInternalGeoData && changeProjection;
         if (isAnimate) {
           tx.curProj = new anychart.mapModule.projections.TwinProjection(
               /** @type {anychart.mapModule.projections.Base} */(currentProjection),
@@ -3031,7 +3038,7 @@ anychart.mapModule.Chart.prototype.calculate = function() {
               /** @type {!Array.<anychart.mapModule.geom.Point|anychart.mapModule.geom.Line|anychart.mapModule.geom.Polygon|anychart.mapModule.geom.Collection>} */(geoData),
               sourceProjection,
               tx,
-              /** @type {number} */(this.crsAnimation_.duration()),
+              /** @type {number} */(this.crsAnimation_.getOption('duration')),
               this != this.getCurrentScene());
           this.crsMapAnimation.listenOnce(goog.fx.Transition.EventType.END,
               /**
@@ -4878,7 +4885,7 @@ anychart.mapModule.Chart.prototype.legendItemCanInteractInMode = function(mode) 
 anychart.mapModule.Chart.prototype.legendItemClick = function(item, event) {
   var meta = /** @type {Object} */(item.meta());
   var series;
-  var sourceMode = this.legend().itemsSourceMode();
+  var sourceMode = /** @type {anychart.enums.LegendItemsSourceMode} */(this.legend().getOption('itemsSourceMode'));
   if (sourceMode == anychart.enums.LegendItemsSourceMode.DEFAULT) {
     var sourceKey = item.sourceKey();
     series = this.getSeries(/** @type {number} */ (sourceKey));
@@ -4905,7 +4912,7 @@ anychart.mapModule.Chart.prototype.legendItemClick = function(item, event) {
         }
       }
 
-      if (this.interactivity().hoverMode() == anychart.enums.HoverMode.SINGLE) {
+      if (this.interactivity().getOption('hoverMode') == anychart.enums.HoverMode.SINGLE) {
         event.points_ = {
           series: series,
           points: points
@@ -4928,7 +4935,7 @@ anychart.mapModule.Chart.prototype.legendItemOver = function(item, event) {
   var meta = /** @type {Object} */(item.meta());
   var series;
 
-  var sourceMode = this.legend().itemsSourceMode();
+  var sourceMode = /** @type {anychart.enums.LegendItemsSourceMode} */(this.legend().getOption('itemsSourceMode'));
   if (sourceMode == anychart.enums.LegendItemsSourceMode.DEFAULT) {
     var sourceKey = item.sourceKey();
     if (item && !goog.isDefAndNotNull(sourceKey) && !isNaN(sourceKey))
@@ -4953,7 +4960,7 @@ anychart.mapModule.Chart.prototype.legendItemOver = function(item, event) {
 
       var tag = anychart.utils.extractTag(event['domTarget']);
       if (tag) {
-        if (this.interactivity().hoverMode() == anychart.enums.HoverMode.SINGLE) {
+        if (this.interactivity().getOption('hoverMode') == anychart.enums.HoverMode.SINGLE) {
           tag.points_ = {
             series: series,
             points: points
@@ -4981,7 +4988,7 @@ anychart.mapModule.Chart.prototype.legendItemOut = function(item, event) {
   var meta = /** @type {Object} */(item.meta());
   var series;
 
-  var sourceMode = this.legend().itemsSourceMode();
+  var sourceMode = /** @type {anychart.enums.LegendItemsSourceMode} */(this.legend().getOption('itemsSourceMode'));
   if (sourceMode == anychart.enums.LegendItemsSourceMode.DEFAULT) {
     var sourceKey = item.sourceKey();
     if (item && !goog.isDefAndNotNull(sourceKey) && !isNaN(sourceKey))
@@ -4990,7 +4997,7 @@ anychart.mapModule.Chart.prototype.legendItemOut = function(item, event) {
     if (series)
       series.unhover();
   } else if (sourceMode == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
-    if (this.interactivity().hoverMode() == anychart.enums.HoverMode.SINGLE) {
+    if (this.interactivity().getOption('hoverMode') == anychart.enums.HoverMode.SINGLE) {
       var tag = anychart.utils.extractTag(event['domTarget']);
       if (tag)
         tag.series = meta.series;
@@ -5287,9 +5294,8 @@ anychart.mapModule.Chart.prototype.disposeInternal = function() {
   proto['removeAllSeries'] = proto.removeAllSeries;
   // auto from ChartWithSeries
   // proto['defaultSeriesType'] = proto.defaultSeriesType;
-  //bubble
-  proto['maxBubbleSize'] = proto.maxBubbleSize;
-  proto['minBubbleSize'] = proto.minBubbleSize;
+  // proto['maxBubbleSize'] = proto.maxBubbleSize;
+  // proto['minBubbleSize'] = proto.minBubbleSize;
   //ui
   proto['colorRange'] = proto.colorRange;
   proto['callout'] = proto.callout;

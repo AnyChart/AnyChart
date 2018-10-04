@@ -33,6 +33,8 @@ goog.require('goog.object');
 anychart.core.ui.Tooltip = function(capability) {
   anychart.core.ui.Tooltip.base(this, 'constructor');
 
+  this.addThemes(anychart.themes.DefaultThemes['tooltip']);
+
   delete this.themeSettings['enabled'];
 
   /**
@@ -59,13 +61,6 @@ anychart.core.ui.Tooltip = function(capability) {
    * @type {Object.<string, anychart.core.ui.Tooltip>}
    */
   this.childTooltipsMap = {};
-
-  /**
-   * Hide delay.
-   * @type {number}
-   * @private
-   */
-  this.hideDelay_;
 
   /**
    * Root layer.
@@ -218,7 +213,8 @@ anychart.core.ui.Tooltip = function(capability) {
     ['onBeforeTitleChange', 0, 0],
     ['onTitleChanged', 0, 0],
     ['onBeforeContentChange', 0, 0],
-    ['onContentChanged', 0, 0]
+    ['onContentChanged', 0, 0],
+    ['hideDelay', 0, 0, 0, this.createDelayObject_]
   ]);
 };
 goog.inherits(anychart.core.ui.Tooltip, anychart.core.VisualBase);
@@ -298,143 +294,32 @@ anychart.core.ui.Tooltip.prototype.TOOLTIP_SIMPLE_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
 
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'width',
-      anychart.core.settings.numberOrPercentNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'height',
-      anychart.core.settings.numberOrPercentNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'titleFormat',
-      anychart.core.settings.stringOrFunctionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'format',
-      anychart.core.settings.stringOrFunctionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'unionFormat',
-      anychart.core.settings.stringOrFunctionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'valuePrefix',
-      anychart.core.settings.stringNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'valuePostfix',
-      anychart.core.settings.stringNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'position',
-      anychart.enums.normalizePosition);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'anchor',
-      anychart.enums.normalizeAnchor);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'offsetX',
-      anychart.core.settings.numberNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'offsetY',
-      anychart.core.settings.numberNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'x',
-      anychart.core.settings.numberNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'y',
-      anychart.core.settings.numberNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'allowLeaveScreen',
-      anychart.core.settings.booleanNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'allowLeaveChart',
-      anychart.core.settings.booleanNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'allowLeaveStage',
-      anychart.core.settings.booleanNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'displayMode',
-      anychart.enums.normalizeTooltipDisplayMode);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'positionMode',
-      anychart.enums.normalizeTooltipPositionMode);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'onDomReady',
-      anychart.core.settings.functionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'onBeforeTitleChange',
-      anychart.core.settings.functionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'onTitleChanged',
-      anychart.core.settings.functionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'onBeforeContentChange',
-      anychart.core.settings.functionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'onContentChanged',
-      anychart.core.settings.functionNormalizer);
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'width', anychart.core.settings.numberOrPercentNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'height', anychart.core.settings.numberOrPercentNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'titleFormat', anychart.core.settings.stringOrFunctionNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'format', anychart.core.settings.stringOrFunctionNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'unionFormat', anychart.core.settings.stringOrFunctionNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'valuePrefix', anychart.core.settings.stringNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'valuePostfix', anychart.core.settings.stringNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'position', anychart.enums.normalizePosition],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'anchor', anychart.enums.normalizeAnchor],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'offsetX', anychart.core.settings.numberNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'offsetY', anychart.core.settings.numberNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'x', anychart.core.settings.numberNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'y', anychart.core.settings.numberNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'allowLeaveScreen', anychart.core.settings.booleanNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'allowLeaveChart', anychart.core.settings.booleanNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'allowLeaveStage', anychart.core.settings.booleanNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'displayMode', anychart.enums.normalizeTooltipDisplayMode],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'positionMode', anychart.enums.normalizeTooltipPositionMode],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'onDomReady', anychart.core.settings.functionNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'onBeforeTitleChange', anychart.core.settings.functionNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'onTitleChanged', anychart.core.settings.functionNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'onBeforeContentChange', anychart.core.settings.functionNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'onContentChanged', anychart.core.settings.functionNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'hideDelay', anychart.core.settings.numberNormalizer]
+  ]);
 
   return map;
 })();
@@ -461,29 +346,6 @@ anychart.core.ui.Tooltip.prototype.hide = function(opt_force, opt_event) {
       childTooltip.hide(opt_force, opt_event);
   }
   return this.hideSelf(opt_force, opt_event);
-};
-
-
-/**
- * Sets/gets delay in milliseconds before tooltip item becomes hidden.
- * @param {number=} opt_value - Delay in milliseconds.
- * @return {number|undefined|anychart.core.ui.Tooltip} - Delay in milliseconds or itself for method chaining.
- */
-anychart.core.ui.Tooltip.prototype.hideDelay = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    // we have no need to invalidate anything here
-    if (this.hideDelay_ != opt_value) {
-      this.hideDelay_ = +opt_value;
-      this.createDelayObject_();
-    }
-    return this;
-  } else {
-    if (goog.isDef(this.hideDelay_))
-      return this.hideDelay_;
-    else {
-      return this.parent_ ? this.parent_.hideDelay() : void 0;
-    }
-  }
 };
 
 
@@ -535,7 +397,8 @@ anychart.core.ui.Tooltip.prototype.padding = function(opt_spaceOrTopOrTopAndBott
   if (!this.padding_) {
     this.padding_ = new anychart.core.utils.Padding();
     this.padding_.listenSignals(this.onPaddingSignal_, this);
-    this.registerDisposable(this.padding_);
+
+    this.setupCreated('padding', this.padding_);
   }
 
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
@@ -570,7 +433,8 @@ anychart.core.ui.Tooltip.prototype.background = function(opt_value) {
     this.background_ = new anychart.core.ui.Background();
     this.background_.listenSignals(this.backgroundInvalidated_, this);
     this.background_.setParentEventTarget(this);
-    this.registerDisposable(this.background_);
+
+    this.setupCreated('background', this.background_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -604,7 +468,7 @@ anychart.core.ui.Tooltip.prototype.title = function(opt_value) {
     this.title_ = new anychart.core.ui.Title();
     this.title_.listenSignals(this.onTitleSignal_, this);
     this.title_.setParentEventTarget(this);
-    this.registerDisposable(this.title_);
+    this.setupCreated('title', this.title_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -641,7 +505,8 @@ anychart.core.ui.Tooltip.prototype.separator = function(opt_value) {
     this.separator_ = new anychart.core.ui.Separator();
     this.separator_.listenSignals(this.onSeparatorSignal_, this);
     this.separator_.setParentEventTarget(this);
-    this.registerDisposable(this.separator_);
+
+    this.setupCreated('separator', this.separator_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -830,7 +695,7 @@ anychart.core.ui.Tooltip.prototype.showAsSingle_ = function(points, clientX, cli
   if (this.isTooltipDisabled_(this.tooltipInUse_, firstPoint) || !goog.isDef(firstSeries.createTooltipContextProvider))
     return;
 
-  var contextProvider = firstSeries.createTooltipContextProvider();
+  var contextProvider = /** @type {anychart.format.Context} */ (firstSeries.createTooltipContextProvider());
   contextProvider['clientX'] = clientX;
   contextProvider['clientY'] = clientY;
   this.tooltipInUse_.title().autoText(this.tooltipInUse_.getFormattedTitle(contextProvider));
@@ -1155,7 +1020,7 @@ anychart.core.ui.Tooltip.prototype.showSeparatedChildren_ = function(points, cli
     if (this.isTooltipDisabled_(tooltip, point))
       continue;
 
-    var contextProvider = series.createTooltipContextProvider();
+    var contextProvider = /** @type {anychart.format.Context} */ (series.createTooltipContextProvider());
     contextProvider['clientX'] = clientX;
     contextProvider['clientY'] = clientY;
     tooltip.title().autoText(tooltip.getFormattedTitle(contextProvider));
@@ -1257,7 +1122,7 @@ anychart.core.ui.Tooltip.prototype.showForPosition_ = function(clientX, clientY)
  * Show tooltip in position.
  * @param {number} clientX - ClientX coordinate.
  * @param {number} clientY - ClientY coordinate.
- * @param {Object=} opt_contextProvider - Context provider.
+ * @param {anychart.format.Context=} opt_contextProvider - Context provider.
  */
 anychart.core.ui.Tooltip.prototype.showFloat = function(clientX, clientY, opt_contextProvider) {
   this.updateForceInvalidation();
@@ -1303,11 +1168,11 @@ anychart.core.ui.Tooltip.prototype.updatePosition = function(clientX, clientY) {
 
 /**
  * Get formatted title.
- * @param {Object} contextProvider
+ * @param {anychart.format.Context} contextProvider
  * @return {string}
  */
 anychart.core.ui.Tooltip.prototype.getFormattedTitle = function(contextProvider) {
-  contextProvider.values()['titleText'] = {value: this.title_.getOption('text'), type: anychart.enums.TokenType.STRING};
+  contextProvider.contextValues()['titleText'] = {value: this.title_.getOption('text'), type: anychart.enums.TokenType.STRING};
   contextProvider.propagate();
   var formatter = this.getOption('titleFormat');
   if (goog.isString(formatter))
@@ -1319,17 +1184,17 @@ anychart.core.ui.Tooltip.prototype.getFormattedTitle = function(contextProvider)
 
 /**
  * Get formatted content.
- * @param {Object} contextProvider
+ * @param {anychart.format.Context} contextProvider
  * @param {boolean=} opt_useUnionFormatter - Whether to use tooltip's union text formatter.
  * @return {string}
  * @private
  */
 anychart.core.ui.Tooltip.prototype.getFormattedContent_ = function(contextProvider, opt_useUnionFormatter) {
-  contextProvider.values()['valuePrefix'] = {
+  contextProvider.contextValues()['valuePrefix'] = {
     value: this.getOption('valuePrefix') || '',
     type: anychart.enums.TokenType.STRING
   };
-  contextProvider.values()['valuePostfix'] = {
+  contextProvider.contextValues()['valuePostfix'] = {
     value: this.getOption('valuePostfix') || '',
     type: anychart.enums.TokenType.STRING
   };
@@ -1359,6 +1224,8 @@ anychart.core.ui.Tooltip.prototype.contentInternal = function(opt_value) {
     //TODO (A.Kudryavtsev): Can't avoid it because width_ and height_ values are hardcoded in LabelsBase.
     this.content_.width('100%').height('100%');
     this.registerDisposable(this.content_);
+
+    this.setupCreated('contentInternal', this.content_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -1434,7 +1301,7 @@ anychart.core.ui.Tooltip.prototype.hideSelf = function(opt_force, opt_event) {
     this.triangle_ = null;
   }
 
-  if (this.hideDelay()) {
+  if (this.getOption('hideDelay')) {
     this.createDelayObject_();
     if (!this.delay_.isActive()) this.delay_.start();
     return false;
@@ -1597,7 +1464,7 @@ anychart.core.ui.Tooltip.prototype.createDelayObject_ = function() {
         this.refreshDelay_ = false;
         this.createDelayObject_();
       }
-    }, /** @type {number} */ (this.hideDelay()), this);
+    }, /** @type {number} */ (this.getOption('hideDelay')), this);
   }
 };
 
@@ -2123,7 +1990,7 @@ anychart.core.ui.Tooltip.prototype.hideSelectable_ = function(event) {
     goog.events.unlisten(this.getRootLayer_().domElement(), goog.events.EventType.MOUSELEAVE, this.hideSelectable_, false, this);
   this.triangle_ = null;
 
-  if (!this.hideDelay()) {
+  if (!this.getOption('hideDelay')) {
     this.hide(true);
   } else {
     this.createDelayObject_();
@@ -2167,6 +2034,7 @@ anychart.core.ui.Tooltip.prototype.parent = function(opt_value) {
         this.separator().parent(null);
         this.background().parent(null);
         this.padding().parent(null);
+        this.contentInternal().parent(null);
         this.contentInternal().padding().parent(null);
         delete this.parent_.childTooltipsMap[uid];
         this.parent_ = null;
@@ -2174,10 +2042,11 @@ anychart.core.ui.Tooltip.prototype.parent = function(opt_value) {
         if (this.parent_)
           this.parent_.unlistenSignals(this.parentInvalidated_, this);
         this.parent_ = opt_value;
-        this.title().parent(this.parent_.title());
-        this.separator().parent(this.parent_.separator());
-        this.background().parent(this.parent_.background());
+        this.title().dropThemes().parent(this.parent_.title());
+        this.separator().dropThemes().parent(this.parent_.separator());
+        this.background().dropThemes().parent(this.parent_.background());
         this.padding().parent(this.parent_.padding());
+        this.contentInternal().parent(this.parent_.contentInternal());
         this.contentInternal().padding().parent(this.parent_.contentInternal().padding());
         this.parent_.childTooltipsMap[uid] = this;
         this.beforeUseHtmlHook();
@@ -2382,8 +2251,8 @@ anychart.core.ui.Tooltip.prototype.setThemeSettings = function(config) {
 anychart.core.ui.Tooltip.prototype.serialize = function() {
   var json = anychart.core.ui.Tooltip.base(this, 'serialize');
 
-  anychart.core.settings.serialize(this, this.TEXT_PROPERTY_DESCRIPTORS, json);
-  anychart.core.settings.serialize(this, this.TOOLTIP_SIMPLE_DESCRIPTORS, json);
+  anychart.core.settings.serialize(this, this.TEXT_PROPERTY_DESCRIPTORS, json, void 0, void 0, true);
+  anychart.core.settings.serialize(this, this.TOOLTIP_SIMPLE_DESCRIPTORS, json, void 0, void 0, true);
 
   delete json['x'];
   delete json['y'];
@@ -2404,9 +2273,6 @@ anychart.core.ui.Tooltip.prototype.serialize = function() {
   if (!goog.object.isEmpty(paddingConfig))
     json['padding'] = paddingConfig;
 
-  if (goog.isDef(this.hideDelay_))
-    json['hideDelay'] = this.hideDelay_;
-
   return json;
 };
 
@@ -2415,18 +2281,13 @@ anychart.core.ui.Tooltip.prototype.serialize = function() {
 anychart.core.ui.Tooltip.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.ui.Tooltip.base(this, 'setupByJSON', config, opt_default);
 
-  if (opt_default) {
-    this.setThemeSettings(config);
-  } else {
-    anychart.core.settings.deserialize(this, this.TEXT_PROPERTY_DESCRIPTORS, config);
-    anychart.core.settings.deserialize(this, this.TOOLTIP_SIMPLE_DESCRIPTORS, config);
-  }
+  anychart.core.settings.deserialize(this, this.TEXT_PROPERTY_DESCRIPTORS, config, opt_default);
+  anychart.core.settings.deserialize(this, this.TOOLTIP_SIMPLE_DESCRIPTORS, config, opt_default);
 
   this.title().setupInternal(!!opt_default, config['title']);
   this.separator().setupInternal(!!opt_default, config['separator']);
   this.background().setupInternal(!!opt_default, config['background']);
   this.padding().setupInternal(!!opt_default, config['padding']);
-  this.hideDelay(config['hideDelay']);
 
   var contentConfig = config['contentInternal'] || {};
   contentConfig['position'] = contentConfig['position'] ? contentConfig['position'] : anychart.enums.Position.LEFT_TOP;
@@ -2499,7 +2360,30 @@ anychart.core.ui.Tooltip.prototype.disposeInternal = function() {
   proto['background'] = proto.background;
   proto['padding'] = proto.padding;
   proto['hide'] = proto.hide;
-  proto['hideDelay'] = proto.hideDelay;
   proto['textSettings'] = proto.textSettings;
+  // auto generated
+  // proto['useHtml'] = proto.useHtml;
+  // proto['width'] = proto.width;
+  // proto['height'] = proto.height;
+  // proto['titleFormat'] = proto.titleFormat;
+  // proto['format'] = proto.format;
+  // proto['unionFormat'] = proto.unionFormat;
+  // proto['valuePrefix'] = proto.valuePrefix;
+  // proto['valuePostfix'] = proto.valuePostfix;
+  // proto['position'] = proto.position;
+  // proto['anchor'] = proto.anchor;
+  // proto['offsetX'] = proto.offsetX;
+  // proto['offsetY'] = proto.offsetY;
+  // proto['allowLeaveScreen'] = proto.allowLeaveScreen;
+  // proto['allowLeaveChart'] = proto.allowLeaveChart;
+  // proto['allowLeaveStage'] = proto.allowLeaveStage;
+  // proto['displayMode'] = proto.displayMode;
+  // proto['positionMode'] = proto.positionMode;
+  // proto['onDomReady'] = proto.onDomReady;
+  // proto['onBeforeTitleChange'] = proto.onBeforeTitleChange;
+  // proto['onTitleChanged'] = proto.onTitleChanged;
+  // proto['onBeforeContentChange'] = proto.onBeforeContentChange;
+  // proto['onContentChanged'] = proto.onContentChanged
+  // proto['hideDelay'] = proto.hideDelay;
 })();
 //endregion

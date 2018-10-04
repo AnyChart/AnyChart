@@ -18,6 +18,8 @@ goog.require('anychart.utils');
 anychart.core.ui.Separator = function() {
   anychart.core.ui.Separator.base(this, 'constructor');
 
+  this.addThemes(anychart.themes.DefaultThemes['separator']);
+
   delete this.themeSettings['enabled'];
 
   /**
@@ -300,8 +302,9 @@ anychart.core.ui.Separator.prototype.invalidateParentBounds = function() {
 anychart.core.ui.Separator.prototype.margin = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.margin_) {
     this.margin_ = new anychart.core.utils.Margin();
-    this.registerDisposable(this.margin_);
     this.margin_.listenSignals(this.marginInvalidated_, this);
+
+    this.setupCreated('margin', this.margin_);
   }
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
     this.margin_.setup.apply(this.margin_, arguments);
@@ -340,7 +343,6 @@ anychart.core.ui.Separator.prototype.draw = function() {
 
   if (isInitial) {
     this.path_ = acgraph.path();
-    this.registerDisposable(this.path_);
   }
 
   var container = /** @type {acgraph.vector.ILayer} */(this.container());
@@ -585,9 +587,21 @@ anychart.core.ui.Separator.prototype.serialize = function() {
 anychart.core.ui.Separator.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.ui.Separator.base(this, 'setupByJSON', config, opt_default);
 
-  anychart.core.settings.deserialize(this, this.SIMPLE_SEPARATOR_DESCRIPTORS, config);
+  anychart.core.settings.deserialize(this, this.SIMPLE_SEPARATOR_DESCRIPTORS, config, opt_default);
 
-  this.margin().setupInternal(!!opt_default, config['margin']);
+  if ('margin' in config)
+    this.margin().setupInternal(!!opt_default, config['margin']);
+};
+
+
+/** @inheritDoc */
+anychart.core.ui.Separator.prototype.disposeInternal = function() {
+  goog.disposeAll(this.margin_, this.path_);
+
+  this.margin_ = null;
+  this.path_ = null;
+
+  anychart.core.ui.Separator.base(this, 'disposeInternal');
 };
 
 

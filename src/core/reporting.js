@@ -63,7 +63,7 @@ anychart.core.reporting.getErrorDescription_ = function(code, opt_arguments) {
       return 'Empty config passed to anychart.fromJson() or anychart.fromXml() method.';
 
     case anychart.enums.ErrorCode.NO_LEGEND_IN_CHART:
-      return 'Bullet, Sparkline and Circular Gauge charts do not support Legend. Please use anychart.standalones.Legend component for a group of charts instead.';
+      return 'Bullet, Sparkline, Sankey and Circular Gauge charts do not support Legend. Please use anychart.standalones.Legend component for a group of charts instead.';
 
     case anychart.enums.ErrorCode.NO_LEGEND_IN_STOCK:
       return 'Stock chart itself doesn\'t support legend - stock plots do. So use stock.plot().legend() instead.';

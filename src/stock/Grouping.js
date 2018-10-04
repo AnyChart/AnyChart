@@ -416,18 +416,27 @@ anychart.stockModule.Grouping.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.stockModule.Grouping.prototype.setupSpecial = function(isDefault, var_args) {
-  var arg0 = arguments[1];
+anychart.stockModule.Grouping.prototype.resolveSpecialValue = function(var_args) {
+  var arg0 = arguments[0];
   if (goog.isBoolean(arg0) || goog.isNull(arg0)) {
-    this.enabled(!!arg0);
+    return {'enabled': !!arg0};
+  } else if (goog.isArray(arg0)) {
+    return {'enabled': true, 'levels': arg0};
+  }
+  return null;
+};
+
+
+/** @inheritDoc */
+anychart.stockModule.Grouping.prototype.setupSpecial = function(isDefault, var_args) {
+  var resolvedValue = this.resolveSpecialValue(arguments[1]);
+  if (resolvedValue) {
+    this.enabled(resolvedValue['enabled']);
+    if ('levels' in resolvedValue)
+      this.levels(resolvedValue['levels']);
     return true;
   }
-  if (goog.isArray(arg0)) {
-    this.enabled(true);
-    this.levels(arg0);
-    return true;
-  }
-  return anychart.core.Base.prototype.setupSpecial.apply(this, arguments);
+  return false;
 };
 
 

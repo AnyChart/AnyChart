@@ -44,11 +44,11 @@ anychart.ui.ContextMenu = function() {
   this.contextTarget_ = null;
 
   /**
-   * Link to chart.
-   * @type {anychart.core.Chart}
+   * Link to an element which menu is attached to.
+   * @type {anychart.core.Chart|anychart.tableModule.Table}
    * @private
    */
-  this.chart_ = null;
+  this.menuParent_ = null;
 
   /**
    * Additional class name(s) to apply to the context menu's root element, if any.
@@ -118,9 +118,11 @@ anychart.ui.ContextMenu = function() {
       'item': menuItemModel
     };
 
-    if (this.chart_ && goog.isFunction(this.chart_['getSelectedPoints'])) {
-      actionContext['chart'] = this.chart_;
-      actionContext['selectedPoints'] = this.chart_['getSelectedPoints']() || [];
+    if (this.menuParent_) {
+      actionContext['menuParent'] = this.menuParent_;
+      if (goog.isFunction(this.menuParent_['getSelectedPoints'])) {
+        actionContext['selectedPoints'] = this.menuParent_['getSelectedPoints']() || [];
+      }
     }
 
     if (goog.isFunction(menuItemModel['action'])) {
@@ -281,13 +283,17 @@ anychart.ui.ContextMenu.prototype.itemsFormatter = function(opt_value) {
  */
 anychart.ui.ContextMenu.prototype.handleContextMenu_ = function(e) {
   if (!this.enabledInternal_) return;
+  //a workaround for Android devices
+  if (this.chart_)
+    this.chart_.tooltip().hide();
+
   this.contextTarget_ = e['target'];
   this.prepareItems_(e, this.contextTarget_);
 
   if (!goog.isObject(this.items()) || goog.object.isEmpty(this.items())) return;
   goog.isFunction(e['getOriginalEvent']) ? e['getOriginalEvent']().preventDefault() : e.preventDefault();
 
-  if (this.chart_ && goog.isFunction(this.chart_['getType']) && this.chart_['getType']() == anychart.enums.MapTypes.MAP) {
+  if (this.menuParent_ && goog.isFunction(this.menuParent_['getType']) && this.menuParent_['getType']() == anychart.enums.MapTypes.MAP) {
     //because Map has async interactivity model
     setTimeout(this.acyncShow, 0, e['clientX'], e['clientY']);
   } else {
@@ -310,11 +316,13 @@ anychart.ui.ContextMenu.prototype.prepareItems_ = function(event, target) {
     'menu': this
   };
 
-  if (this.chart_ && goog.isFunction(this.chart_['getSelectedPoints'])) {
-    var stage = this.chart_['container']() ? this.chart_['container']()['getStage']() : null;
+  if (this.menuParent_) {
+    var stage = this.menuParent_['container']() ? this.menuParent_['container']()['getStage']() : null;
     if (goog.isNull(stage) || goog.style.getComputedStyle(stage['domElement'](), 'border-style') == 'none') return false;
-    context['chart'] = this.chart_;
-    context['selectedPoints'] = this.chart_['getSelectedPoints']() || [];
+    context['menuParent'] = this.menuParent_;
+    if (goog.isFunction(this.menuParent_['getSelectedPoints'])) {
+      context['selectedPoints'] = this.menuParent_['getSelectedPoints']() || [];
+    }
   }
 
   // Flow: itemsProvider -> itemsFormatter -> items -> render
@@ -342,7 +350,7 @@ anychart.ui.ContextMenu.prototype.render = function(opt_parentElement) {
  * only be attached to a target once, since attaching the same menu for
  * multiple targets doesn't make sense.
  * This method will render the context menu in the document.body.
- * @param {Element|anychart.core.Chart} target Target whose click event should trigger the context menu.
+ * @param {Element|anychart.core.Chart|anychart.tableModule.Table} target Target whose click event should trigger the context menu.
  * @param {boolean=} opt_capture Optional whether to use capture phase.
  * @return {anychart.ui.ContextMenu} Self for chaining.
  * @suppress {checkTypes}
@@ -351,8 +359,8 @@ anychart.ui.ContextMenu.prototype.attach = function(target, opt_capture) {
   if (target && !this.attached_) {
     this.attached_ = true;
     if (goog.isObject(target) && goog.isFunction(target['listen'])) {
-      this.chart_ = target;
-      this.chart_['listen'](goog.events.EventType.CONTEXTMENU, this.handleContextMenu_, opt_capture, this);
+      this.menuParent_ = target;
+      this.menuParent_['listen'](goog.events.EventType.CONTEXTMENU, this.handleContextMenu_, opt_capture, this);
     } else {
       this.getHandler().listen(target, goog.events.EventType.CONTEXTMENU, this.handleContextMenu_, opt_capture);
     }
@@ -370,8 +378,8 @@ anychart.ui.ContextMenu.prototype.attach = function(target, opt_capture) {
  */
 anychart.ui.ContextMenu.prototype.detach = function(opt_target, opt_capture) {
   if (this.attached_) {
-    if (goog.isDefAndNotNull(this.chart_) && goog.isFunction(this.chart_['unlisten'])) {
-      this.attached_ = !this.chart_['unlisten'](goog.events.EventType.CONTEXTMENU, this.handleContextMenu_, opt_capture, this);
+    if (goog.isDefAndNotNull(this.menuParent_) && goog.isFunction(this.menuParent_['unlisten'])) {
+      this.attached_ = !this.menuParent_['unlisten'](goog.events.EventType.CONTEXTMENU, this.handleContextMenu_, opt_capture, this);
 
     } else if (goog.events.getListener(opt_target, goog.events.EventType.CONTEXTMENU, this.handleContextMenu_, opt_capture, this)) {
       this.getHandler().unlisten(opt_target, goog.events.EventType.CONTEXTMENU, this.handleContextMenu_, opt_capture);
@@ -390,8 +398,8 @@ anychart.ui.ContextMenu.prototype.detach = function(opt_target, opt_capture) {
  * @param {number} y The client-Y associated with the show event.
  */
 anychart.ui.ContextMenu.prototype.show = function(x, y) {
-  if ((this.itemsReady_ && !goog.object.isEmpty(this.items())) || this.prepareItems_(null, this.chart_)) {
-    var stage = this.chart_ ? this.chart_.container().getStage() : null;
+  if ((this.itemsReady_ && !goog.object.isEmpty(this.items())) || this.prepareItems_(null, this.menuParent_)) {
+    var stage = this.menuParent_ ? this.menuParent_.container().getStage() : null;
     var container = (stage && stage.fullScreen()) ? stage.getDomWrapper() : anychart.document.body;
     if (this.wrapper_.parentNode != container)
       container.appendChild(this.wrapper_);
@@ -603,9 +611,9 @@ anychart.ui.ContextMenu.Item;
 
 /** @inheritDoc */
 anychart.ui.ContextMenu.prototype.disposeInternal = function() {
-  if (goog.isDefAndNotNull(this.chart_)) this.detach();
+  if (goog.isDefAndNotNull(this.menuParent_)) this.detach();
   this.contextTarget_ = null;
-  this.chart_ = null;
+  this.menuParent_ = null;
   this.extraClassNames_ = null;
   this.wrapper_ = null;
 
@@ -654,15 +662,29 @@ anychart.ui.ContextMenu.prototype.setup = function(var_args) {
 
 
 /**
+ *
+ * @param {...*} var_args
+ * @return {Object|null}
+ */
+anychart.ui.ContextMenu.prototype.resolveSpecialValue = function(var_args) {
+  var arg0 = arguments[0];
+  if (goog.isBoolean(arg0) || goog.isNull(arg0)) {
+    return {'enabled': !!arg0};
+  }
+  return null;
+};
+
+
+/**
  * Special objects to setup current instance.
  * @param {...(Object|Array|number|string|undefined|boolean|null)} var_args
  * @return {boolean} If passed values were recognized as special setup values.
  * @protected
  */
 anychart.ui.ContextMenu.prototype.setupSpecial = function(var_args) {
-  var arg0 = arguments[0];
-  if (goog.isBoolean(arg0) || goog.isNull(arg0)) {
-    this.enabled(!!arg0);
+  var resolvedValue = this.resolveSpecialValue(arguments[0]);
+  if (resolvedValue) {
+    this.enabled(resolvedValue['enabled']);
     return true;
   }
   return false;

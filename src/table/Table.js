@@ -17,6 +17,10 @@ goog.require('anychart.tableModule.elements.Padding');
 goog.require('anychart.tableModule.elements.Row');
 goog.require('anychart.utils');
 
+goog.forwardDeclare('anychart.ui.ContextMenu');
+goog.forwardDeclare('anychart.ui.ContextMenu.Item');
+goog.forwardDeclare('anychart.ui.ContextMenu.PrepareItemsContext');
+
 
 
 /**
@@ -682,6 +686,7 @@ anychart.tableModule.Table.prototype.draw = function() {
 
   if (!this.layer_) {
     this.layer_ = acgraph.layer();
+    this.bindHandlersToGraphics(this.layer_);
     this.contentLayer_ = this.layer_.layer();
   }
 
@@ -722,9 +727,25 @@ anychart.tableModule.Table.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
+  if (!this.contextMenu_) {
+    this.contextMenu({fromTheme: true, enabled: true});
+  }
+
   if (manualSuspend) stage.resume();
 
   return this;
+};
+
+
+/**
+ * Default browser event handler. Redispatches the event over ACDVF event target hierarchy.
+ * @param {acgraph.events.BrowserEvent} event
+ * @override
+ */
+anychart.tableModule.Table.prototype.handleBrowserEvent = function(event) {
+  if (event.type == 'contextmenu')
+    return this.dispatchEvent(event);
+  return false;
 };
 
 
@@ -2409,12 +2430,36 @@ anychart.tableModule.Table.prototype.disposeInternal = function() {
   goog.dispose(this.labelsFactory_);
   goog.dispose(this.layer_);
   goog.dispose(this.contentLayer_);
+  goog.dispose(this.contextMenu_);
   delete this.settingsObj;
   anychart.tableModule.Table.base(this, 'disposeInternal');
 };
 
 
-//region --- Save as csv / Export to csv/xlsx
+//region --- Export settings / Save as csv / Export to csv/xlsx
+/**
+ * Table exports settings.
+ * @param {Object=} opt_value .
+ * @return {anychart.tableModule.Table|anychart.exportsModule.Exports}
+ */
+anychart.tableModule.Table.prototype.exports = function(opt_value) {
+  var exports = goog.global['anychart']['exports'];
+  if (exports) {
+    if (!this.exports_)
+      this.exports_ = exports.create();
+  } else {
+    anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Exporting']);
+  }
+
+  if (goog.isDef(opt_value) && this.exports_) {
+    this.exports_.setupByJSON(opt_value);
+    return this;
+  }
+
+  return this.exports_;
+};
+
+
 /**
  * Returns CSV string with series data.
  * @param {Object.<string, (string|boolean|undefined)>=} opt_csvSettings CSV settings.
@@ -2545,6 +2590,333 @@ anychart.tableModule.table = function(opt_rowsCount, opt_colsCount) {
 
 
 //endregion
+
+
+//region --- Context menu
+//------------------------------------------------------------------------------
+//
+//  Context menu
+//
+//------------------------------------------------------------------------------
+/**
+ * Creates context menu for table.
+ * @param {(Object|boolean|null)=} opt_value
+ * @return {anychart.ui.ContextMenu|!anychart.tableModule.Table}
+ */
+anychart.tableModule.Table.prototype.contextMenu = function(opt_value) {
+  if (!this.contextMenu_) {
+    // suppress NO_FEATURE_IN_MODULE warning
+    this.contextMenu_ = anychart.window['anychart']['ui']['contextMenu'](true);
+    if (this.contextMenu_) {
+      this.contextMenu_['itemsProvider'](this.contextMenuItemsProvider);
+      this.contextMenu_['attach'](this);
+    }
+  }
+
+  if (goog.isDef(opt_value)) {
+    if (this.contextMenu_) {
+      this.contextMenu_['setup'](opt_value);
+    }
+    return this;
+  } else {
+    return this.contextMenu_;
+  }
+};
+
+
+/**
+ * Returns link to version history.
+ * Used by context menu version item.
+ * @return {string}
+ * @protected
+ */
+anychart.tableModule.Table.prototype.getVersionHistoryLink = function() {
+  return 'https://anychart.com/products/anychart/history';
+};
+
+
+/**
+ * Default context menu items provider.
+ * @param {anychart.ui.ContextMenu.PrepareItemsContext} context Context object.
+ * @this {anychart.ui.ContextMenu.PrepareItemsContext}
+ * @return {Object.<string, anychart.ui.ContextMenu.Item>}
+ * @protected
+ */
+anychart.tableModule.Table.prototype.contextMenuItemsProvider = function(context) {
+  var items = {};
+  if (anychart.window['anychart']['exports']) {
+    goog.object.extend(items, /** @type {Object} */ (anychart.utils.recursiveClone(anychart.tableModule.Table.contextMenuMap['exporting'])));
+  }
+  if (goog.dom.fullscreen.isSupported() && context['menuParent'])
+    goog.object.extend(items, /** @type {Object} */ (anychart.utils.recursiveClone(anychart.tableModule.Table.contextMenuMap[context['menuParent'].fullScreen() ? 'full-screen-exit' : 'full-screen-enter'])));
+  goog.object.extend(items, /** @type {Object} */ (anychart.utils.recursiveClone(anychart.tableModule.Table.contextMenuMap['main'])));
+
+  if (anychart.DEVELOP) {
+    // prepare version link (specific to each product)
+    var versionHistoryItem = /** @type {anychart.ui.ContextMenu.Item} */(anychart.utils.recursiveClone(anychart.tableModule.Table.contextMenuItems['version-history']));
+    versionHistoryItem['href'] = context['menuParent'].getVersionHistoryLink() + '?version=' + anychart.VERSION;
+
+    items['version-history-separator'] = {'index': 81};
+    items['link-to-help'] = anychart.utils.recursiveClone(anychart.tableModule.Table.contextMenuItems['link-to-help']);
+    items['version-history'] = versionHistoryItem;
+  }
+
+  return context['menuParent'].specificContextMenuItems(items, context);
+};
+
+
+/**
+ * Specific set context menu items to chart.
+ * @param {Object.<string, anychart.ui.ContextMenu.Item>} items Default items provided from chart.
+ * @param {anychart.ui.ContextMenu.PrepareItemsContext} context Context object.
+ * @return {Object.<string, anychart.ui.ContextMenu.Item>}
+ * @protected
+ */
+anychart.tableModule.Table.prototype.specificContextMenuItems = function(items, context) {
+  return items;
+};
+
+
+/**
+ * Items map.
+ * @type {Object.<string, anychart.ui.ContextMenu.Item>}
+ */
+anychart.tableModule.Table.contextMenuItems = {
+  // Item 'Export as ...'.
+  'save-table-as': {
+    'index': 10,
+    'text': 'Save table as...',
+    'iconClass': 'ac ac-file-image-o',
+    'subMenu': {
+      'save-table-as-png': {
+        'index': 10,
+        'text': '.png',
+        'iconClass': 'ac ac-file-image-o',
+        'eventType': 'anychart.saveAsPng',
+        'action': function(context) {
+          context['menuParent'].saveAsPng();
+        }
+      },
+      'save-table-as-jpg': {
+        'index': 20,
+        'text': '.jpg',
+        'iconClass': 'ac ac-file-image-o',
+        'eventType': 'anychart.saveAsJpg',
+        'action': function(context) {
+          context['menuParent'].saveAsJpg();
+        }
+      },
+      'save-table-as-pdf': {
+        'index': 30,
+        'text': '.pdf',
+        'iconClass': 'ac ac-file-pdf-o',
+        'eventType': 'anychart.saveAsPdf',
+        'action': function(context) {
+          context['menuParent'].saveAsPdf();
+        }
+      },
+      'save-table-as-svg': {
+        'index': 40,
+        'text': '.svg',
+        'iconClass': 'ac ac-file-code-o',
+        'eventType': 'anychart.saveAsSvg',
+        'action': function(context) {
+          context['menuParent'].saveAsSvg();
+        }
+      }
+    }
+  },
+
+  // Item 'Save data as...'.
+  'save-data-as': {
+    'index': 20,
+    'text': 'Save data as...',
+    'iconClass': 'ac ac-save',
+    'subMenu': {
+      'save-data-as-text': {
+        'index': 10,
+        'text': '.csv',
+        'iconClass': 'ac ac-file-excel-o',
+        'eventType': 'anychart.saveAsCsv',
+        'action': function(context) {
+          context['menuParent'].saveAsCsv();
+        }
+      },
+      'save-data-as-xlsx': {
+        'index': 20,
+        'text': '.xlsx',
+        'iconClass': 'ac ac-file-excel-o',
+        'eventType': 'anychart.saveAsXlsx',
+        'action': function(context) {
+          context['menuParent'].saveAsXlsx();
+        }
+      }
+    }
+  },
+
+  // Item 'Share with...'.
+  'share-with': {
+    'index': 30,
+    'text': 'Share with...',
+    'iconClass': 'ac ac-net',
+    'subMenu': {
+      'share-with-facebook': {
+        'index': 10,
+        'text': 'Facebook',
+        'iconClass': 'ac ac-facebook',
+        'eventType': 'anychart.shareWithFacebook',
+        'action': function(context) {
+          context['menuParent'].shareWithFacebook();
+        }
+      },
+      'share-with-twitter': {
+        'index': 20,
+        'text': 'Twitter',
+        'iconClass': 'ac ac-twitter',
+        'eventType': 'anychart.shareWithTwitter',
+        'action': function(context) {
+          context['menuParent'].shareWithTwitter();
+        }
+      },
+      'share-with-linkedin': {
+        'index': 30,
+        'text': 'LinkedIn',
+        'iconClass': 'ac ac-linkedin',
+        'eventType': 'anychart.shareWithLinkedIn',
+        'action': function(context) {
+          context['menuParent'].shareWithLinkedIn();
+        }
+      },
+      'share-with-pinterest': {
+        'index': 40,
+        'text': 'Pinterest',
+        'iconClass': 'ac ac-pinterest',
+        'eventType': 'anychart.shareWithPinterest',
+        'action': function(context) {
+          context['menuParent'].shareWithPinterest();
+        }
+      }
+    }
+  },
+
+  // Item 'Print Chart'.
+  'print-table': {
+    'index': 50,
+    'text': 'Print',
+    'iconClass': 'ac ac-print',
+    'eventType': 'anychart.print',
+    'action': function(context) {
+      context['menuParent'].print();
+    }
+  },
+
+  // Item-link to our site.
+  'full-screen-enter': {
+    'index': 60,
+    'text': 'Enter full screen',
+    'action': function(context) {
+      context['menuParent'].fullScreen(true);
+    }
+  },
+
+  'full-screen-exit': {
+    'index': 60,
+    'text': 'Exit full screen',
+    'action': function(context) {
+      context['menuParent'].fullScreen(false);
+    }
+  },
+
+  // Item-link to our site.
+  'about': {
+    'index': 80,
+    'iconClass': 'ac ac-cog',
+    'text': 'AnyChart ' + (anychart.VERSION ?
+        goog.string.subs.apply(null, ['v%s.%s.%s.%s'].concat(anychart.VERSION.split('.'))) :
+        ' develop version'),
+    'href': 'https://anychart.com'
+  },
+
+  // Item 'Link to help'.
+  'link-to-help': {
+    'index': 110,
+    'iconClass': 'ac ac-question',
+    'text': 'Need help? Go to support center!',
+    'href': 'https://anychart.com/support'
+  },
+
+  // Item-link to version history.
+  'version-history': {
+    'index': 120,
+    'text': 'Version History',
+    'href': ''
+  }
+};
+
+
+/**
+ * Menu map.
+ * @type {Object.<string, Object.<string, anychart.ui.ContextMenu.Item>>}
+ */
+anychart.tableModule.Table.contextMenuMap = {
+  // Menu 'Default menu'.
+  'exporting': {
+    'save-table-as': anychart.tableModule.Table.contextMenuItems['save-table-as'],
+    'save-data-as': anychart.tableModule.Table.contextMenuItems['save-data-as'],
+    'share-with': anychart.tableModule.Table.contextMenuItems['share-with'],
+    'print-table': anychart.tableModule.Table.contextMenuItems['print-table'],
+    'exporting-separator': {'index': 51}
+  },
+  'full-screen-enter': {
+    'full-screen-enter': anychart.tableModule.Table.contextMenuItems['full-screen-enter'],
+    'full-screen-separator': {'index': 61}
+  },
+  'full-screen-exit': {
+    'full-screen-exit': anychart.tableModule.Table.contextMenuItems['full-screen-exit'],
+    'full-screen-separator': {'index': 61}
+  },
+  'main': {
+    'about': anychart.tableModule.Table.contextMenuItems['about']
+  }
+};
+
+
+//endregion
+//region --- Full screen
+//------------------------------------------------------------------------------
+//
+//  Full screen
+//
+//------------------------------------------------------------------------------
+/**
+ * Getter/Setter for the full screen mode.
+ * @param {boolean=} opt_value
+ * @return {anychart.tableModule.Table|boolean}
+ */
+anychart.tableModule.Table.prototype.fullScreen = function(opt_value) {
+  var container = this.container();
+  var stage = container ? container.getStage() : null;
+  if (goog.isDef(opt_value)) {
+    if (stage)
+      stage.fullScreen(opt_value);
+    return this;
+  }
+  return stage ? /** @type {boolean} */(stage.fullScreen()) : false;
+};
+
+
+/**
+ * Tester for the full screen support.
+ * @return {boolean}
+ */
+anychart.tableModule.Table.prototype.isFullScreenAvailable = function() {
+  var container = this.container();
+  var stage = container ? container.getStage() : null;
+  return stage ? /** @type {boolean} */(stage.isFullScreenAvailable()) : false;
+};
+
+
+//endregion
 //exports
 (function() {
   var proto = anychart.tableModule.Table.prototype;
@@ -2566,7 +2938,12 @@ anychart.tableModule.table = function(opt_rowsCount, opt_colsCount) {
 
   proto['contents'] = proto.contents;//doc|ex
 
+  proto['contextMenu'] = proto.contextMenu;
+
   proto['draw'] = proto.draw;//doc
+
+  proto['fullScreen'] = proto.fullScreen;
+  proto['isFullScreenAvailable'] = proto.isFullScreenAvailable;
 
   proto['fontSize'] = proto.fontSize;
   proto['fontFamily'] = proto.fontFamily;
@@ -2611,12 +2988,18 @@ anychart.tableModule.table = function(opt_rowsCount, opt_colsCount) {
   proto['getSvgBase64String'] = proto.getSvgBase64String;//inherited
   proto['getPdfBase64String'] = proto.getPdfBase64String;//inherited
   proto['toSvg'] = proto.toSvg;//inherited
-
-  proto['parentBounds'] = proto.parentBounds;
-  proto['container'] = proto.container;
   proto['toCsv'] = proto.toCsv;
   proto['saveAsCsv'] = proto.saveAsCsv;
   proto['saveAsXlsx'] = proto.saveAsXlsx;
+  proto['exports'] = proto.exports;
+
+  proto['shareWithFacebook'] = proto.shareWithFacebook;//inherited
+  proto['shareWithTwitter'] = proto.shareWithTwitter;//inherited
+  proto['shareWithLinkedIn'] = proto.shareWithLinkedIn;//inherited
+  proto['shareWithPinterest'] = proto.shareWithPinterest;//inherited
+
+  proto['parentBounds'] = proto.parentBounds;
+  proto['container'] = proto.container;
 
   proto = anychart.tableModule.Table.Standalone.prototype;
   proto['draw'] = proto.draw;

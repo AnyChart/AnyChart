@@ -274,6 +274,8 @@ anychart.core.ui.Scroller.prototype.height_;
 anychart.core.ui.Scroller.prototype.thumbs = function(opt_value) {
   if (!this.thumbs_) {
     this.thumbs_ = new anychart.core.ui.Scroller.Thumbs(this);
+
+    this.setupCreated('thumbs', this.thumbs_);
   }
   if (goog.isDef(opt_value)) {
     this.thumbs_.setup(opt_value);
@@ -334,6 +336,8 @@ anychart.core.ui.Scroller.prototype.padding = function(opt_spaceOrTopOrTopAndBot
   if (!this.padding_) {
     this.padding_ = new anychart.core.utils.Padding();
     this.padding_.listenSignals(this.paddingInvalidated_, this);
+
+    this.setupCreated('padding', this.padding_);
   }
 
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
@@ -1353,7 +1357,9 @@ anychart.core.ui.Scroller.prototype.serialize = function() {
 anychart.core.ui.Scroller.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.ui.Scroller.base(this, 'setupByJSON', config, opt_default);
   anychart.core.settings.deserialize(this, anychart.core.ui.Scroller.PROPERTY_DESCRIPTORS, config, opt_default);
-  this.thumbs().setupInternal(!!opt_default, config['thumbs']);
+
+  if ('thumbs' in config)
+   this.thumbs().setupInternal(!!opt_default, config['thumbs']);
 };
 
 
@@ -1468,6 +1474,9 @@ anychart.core.ui.Scroller.Dragger.prototype.limitY = function(y) {
  */
 anychart.core.ui.Scroller.Thumbs = function(scroller) {
   anychart.core.ui.Scroller.Thumbs.base(this, 'constructor');
+
+  this.addThemes(anychart.themes.DefaultThemes['thumbs']);
+
   /**
    * @type {!anychart.core.ui.Scroller}
    * @private
@@ -1486,7 +1495,9 @@ anychart.core.ui.Scroller.Thumbs = function(scroller) {
   ]);
 
   this.normal_ = new anychart.core.StateSettings(this, descriptorsMeta, anychart.PointState.NORMAL);
-  this.hovered_ = new anychart.core.StateSettings(this, descriptorsMeta, anychart.PointState.NORMAL);
+  this.setupCreated('normal', this.normal_);
+  this.hovered_ = new anychart.core.StateSettings(this, descriptorsMeta, anychart.PointState.HOVER);
+  this.setupCreated('hovered', this.hovered_);
 };
 goog.inherits(anychart.core.ui.Scroller.Thumbs, anychart.core.Base);
 anychart.core.settings.populateAliases(anychart.core.ui.Scroller.Thumbs, ['fill', 'stroke'], 'normal');
@@ -1564,10 +1575,20 @@ anychart.core.ui.Scroller.Thumbs.prototype.setupByJSON = function(config, opt_de
 
 
 /** @inheritDoc */
-anychart.core.ui.Scroller.Thumbs.prototype.setupSpecial = function(isDefault, var_args) {
-  var arg0 = arguments[1];
+anychart.core.ui.Scroller.Thumbs.prototype.resolveSpecialValue = function(var_args) {
+  var arg0 = arguments[0];
   if (goog.isBoolean(arg0) || goog.isNull(arg0)) {
-    this['enabled'](!!arg0);
+    return {'enabled': !!arg0};
+  }
+  return null;
+};
+
+
+/** @inheritDoc */
+anychart.core.ui.Scroller.Thumbs.prototype.setupSpecial = function(isDefault, var_args) {
+  var resolvedValue = this.resolveSpecialValue(arguments[1]);
+  if (resolvedValue) {
+    this.enabled(resolvedValue['enabled']);
     return true;
   }
   return false;

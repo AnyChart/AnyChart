@@ -1873,6 +1873,8 @@ anychart.ganttModule.TimeLine.prototype.labels = function(opt_value) {
     this.labelsFactory_ = new anychart.core.ui.LabelsFactory();
     this.labelsFactory_.setParentEventTarget(this);
     this.labelsFactory_.listenSignals(this.labelsInvalidated_, this);
+
+    this.labelsFactory_.dropThemes();
   }
 
   if (goog.isDef(opt_value)) {
@@ -4957,7 +4959,7 @@ anychart.ganttModule.TimeLine.prototype.drawLabels_ = function() {
             var positionProvider = {'value': anychart.utils.getCoordinateByAnchor(tag.bounds, position)};
             tag.label.positionProvider(positionProvider);
 
-            var values = context.values();
+            var values = context.contextValues();
             values['label'] = {value: tag.label, type: anychart.enums.TokenType.UNKNOWN};
             context.propagate();
 

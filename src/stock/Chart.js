@@ -36,6 +36,7 @@ goog.require('goog.events.MouseWheelHandler');
  */
 anychart.stockModule.Chart = function(opt_allowPointSettings) {
   anychart.stockModule.Chart.base(this, 'constructor');
+  this.dropThemes().addThemes('stock');
 
   /**
    * Chart plots array.
@@ -1173,7 +1174,12 @@ anychart.stockModule.Chart.prototype.getCurrentScrollerMinDistance = function() 
  * @return {number} Number of plots.
  */
 anychart.stockModule.Chart.prototype.getPlotsCount = function() {
-  return this.plots_.length;
+  var count = 0;
+  for (var i = 0; i < this.plots_.length; i++) {
+    if (this.plots_[i])
+      count++;
+  }
+  return count;
 };
 
 
@@ -1571,7 +1577,9 @@ anychart.stockModule.Chart.prototype.calculateScales_ = function() {
           scale = /** @type {anychart.scales.Base} */(series.yScale());
           for (var k = 0; k < axisMarkers.length; k++) {
             var marker = axisMarkers[k];
-            if (marker && marker.enabled() && marker.scale() && marker.scale() == scale && (marker.getOption('scaleRangeMode') == anychart.enums.ScaleRangeMode.CONSIDER))
+            var autoScale = marker.isHorizontal() ? scale : this.xScale();
+            var markerScale = marker.scale() || autoScale;
+            if (marker && marker.enabled() && scale == markerScale && (marker.getOption('scaleRangeMode') == anychart.enums.ScaleRangeMode.CONSIDER))
               scale.extendDataRange.apply(scale, marker.getReferenceValues());
           }
         }
@@ -1993,6 +2001,7 @@ anychart.stockModule.Chart.prototype.eventMarkers = function(opt_value) {
     this.eventMarkers_ = new anychart.stockModule.eventMarkers.ChartController(this);
     this.eventMarkers_.setParentEventTarget(this);
     this.eventMarkers_.listenSignals(this.eventMarkersInvalidated_, this);
+    this.setupCreated('eventMarkers', this.eventMarkers_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -2588,7 +2597,7 @@ anychart.stockModule.Chart.contextMenuItems = {
     'text': 'Start zoom marquee',
     'eventType': 'anychart.startZoomMarquee',
     'action': function(context) {
-      context['chart'].startZoomMarquee(false);
+      context['menuParent'].startZoomMarquee(false);
     }
   }
 };

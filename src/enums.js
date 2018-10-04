@@ -61,7 +61,8 @@ anychart.enums.ChartTypes = {
   VENN: 'venn',
   HILO: 'hilo',
   WATERFALL: 'waterfall',
-  SUNBURST: 'sunburst'
+  SUNBURST: 'sunburst',
+  SANKEY: 'sankey'
 };
 
 
@@ -1538,7 +1539,12 @@ anychart.enums.EventType = {
   EDIT_INPUT_FOCUS: 'editinputfocus',
   EDIT_INPUT_KEY_PRESS: 'editinputkeypress',
   EDIT_INPUT_BEFORE_HIDE: 'editinputbeforehide',
-  EDIT_INPUT_HIDE: 'editinputhide'
+  EDIT_INPUT_HIDE: 'editinputhide',
+
+  //axis marker events
+  AXIS_MARKER_OVER: 'axismarkerover',
+  AXIS_MARKER_MOVE: 'axismarkermove',
+  AXIS_MARKER_OUT: 'axismarkerout'
 };
 
 
@@ -5057,7 +5063,8 @@ anychart.enums.normalizeTimeTrackingMode = function(value) {
 anychart.enums.Store = {
   SERIES_CHART: 'serieschart',
   PLOT: 'plot',
-  DATA_AREA: 'dataarea'
+  DATA_AREA: 'dataarea',
+  SANKEY: 'sankey'
 };
 
 
@@ -5067,7 +5074,10 @@ anychart.enums.Store = {
  */
 anychart.enums.State = {
   DATA_AREA: 'dataarea',
-  APPEARANCE: 'appearance'
+  APPEARANCE: 'appearance',
+  DATA: 'data',
+  NODE_LABELS: 'nodelabels',
+  FLOW_LABELS: 'flowlabels'
 };
 //endregion
 

@@ -19,7 +19,8 @@ goog.require('anychart.scatterModule.Chart');
  */
 anychart.scatter = function(var_args) {
   var chart = new anychart.scatterModule.Chart();
-  chart.setupInternal(true, anychart.getFullTheme('scatter'));
+  chart.setupAxes();
+  chart.setupStateSettings();
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['marker'](arguments[i]);
@@ -40,7 +41,10 @@ anychart.scatter = function(var_args) {
  */
 anychart.marker = function(var_args) {
   var chart = new anychart.scatterModule.Chart();
-  chart.setupInternal(true, anychart.getFullTheme('marker'));
+  chart.addThemes('marker');
+  chart.setupAxes();
+  chart.setupStateSettings();
+  //chart.setupInternal(true, anychart.getFullTheme('marker'));
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['marker'](arguments[i]);
@@ -65,7 +69,9 @@ anychart.marker = function(var_args) {
  */
 anychart.bubble = function(var_args) {
   var chart = new anychart.scatterModule.Chart();
-  chart.setupInternal(true, anychart.getFullTheme('bubble'));
+  chart.addThemes('bubble');
+  chart.setupAxes();
+  chart.setupStateSettings();
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['bubble'](arguments[i]);
@@ -76,15 +82,19 @@ anychart.bubble = function(var_args) {
 
 
 /**
- * Default quarant chart.<br/>
+ * Default quadrant chart.<br/>
  * <b>Note:</b> Contains predefined settings for quadrant chart.
  * @param {...(anychart.data.View|anychart.data.Set|Array)} var_args Marker chart data.
  * @return {anychart.scatterModule.Chart} Chart with defaults.
  */
 anychart.quadrant = function(var_args) {
   var chart = new anychart.scatterModule.Chart();
-  chart.setupInternal(true, anychart.getFullTheme('quadrant'));
+  chart.addThemes('quadrant');
   chart.setType(anychart.enums.ChartTypes.QUADRANT);
+
+  chart.setupAxes();
+  chart.setupStateSettings();
+  // chart.setupInternal(true, anychart.getFullTheme('quadrant'));
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['marker'](arguments[i]);

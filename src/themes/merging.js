@@ -21,6 +21,8 @@ anychart.themes.merging.compileTheme = function(theme, path, themeIndex) {
   if (needsCompilation) {
     descriptor.compiledIn = themeIndex + 1;
     var requires = descriptor.requires;
+    // if (requires.length)
+    //  console.log(path, "requires", requires);
     for (var i = 0; i < requires.length; i++) {
       var req = requires[i];
       // ensure the default object is merged first
@@ -755,6 +757,7 @@ anychart.themes.merging.mergingMap_ = (function() {
           'venn',
           'pieFunnelPyramidBase',
           'sunburst',
+          ['sankey.', ['node', 'flow', 'dropoff']],
           [['heat', 'tree'], 'Map'],
           [[
             'chart.defaultAnnotation',
@@ -1084,7 +1087,8 @@ anychart.themes.merging.mergingMap_ = (function() {
         'resource',
         'mekko',
         'venn',
-        'sunburst'
+        'sunburst',
+        'sankey'
       ]
     },
     {
@@ -2087,3 +2091,29 @@ anychart.themes.merging.typedEntities_ = {
     typeDescriptor: 'type'
   }
 };
+
+
+/**
+ * Default themes map for child entities that are using in lazy setup system
+ *
+ * @type {Object}
+ */
+anychart.themes.DefaultThemes = {
+  'title': ['defaultFontSettings', 'defaultTitle'],
+  'background': ['defaultBackground'],
+  'legend': ['defaultFontSettings', 'defaultLegend'],
+  'legendItem': ['defaultFontSettings'],
+  'paginator': ['defaultFontSettings'],
+  'separator': ['defaultSeparator'],
+  'titleSeparator': ['defaultSeparator'],
+  'tooltip': ['defaultFontSettings', 'defaultTooltip'],
+  'labelsFactory': ['defaultFontSettings', 'defaultLabelFactory'],
+  'markersFactory': ['defaultMarkerFactory'],
+  'axis': ['defaultAxis'],
+  'map.axisSettings': ['map.axesSettings'],
+  'scroller': ['defaultScroller'],
+  'thumbs': ['defaultScroller.thumbs']
+};
+
+anychart.themes.DefaultThemes['xScroller'] = anychart.themes.DefaultThemes['scroller'];
+anychart.themes.DefaultThemes['titleSeparator'] = anychart.themes.DefaultThemes['separator'];

@@ -1,6 +1,7 @@
 //region --- Requiring and Providing
 goog.provide('anychart.core.ui.Legend');
 goog.provide('anychart.standalones.Legend');
+
 goog.require('acgraph.vector.Text.TextOverflow');
 goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.Text');
@@ -16,7 +17,9 @@ goog.require('anychart.enums');
 goog.require('anychart.format.Context');
 goog.require('anychart.math.Rect');
 goog.require('anychart.utils');
+
 goog.require('goog.array');
+goog.require('goog.math.Rect');
 goog.require('goog.object');
 //endregion
 
@@ -31,82 +34,7 @@ goog.require('goog.object');
 anychart.core.ui.Legend = function() {
   anychart.core.ui.Legend.base(this, 'constructor');
 
-  /**
-   * Drag.
-   * @type {boolean}
-   * @private
-   */
-  this.drag_;
-
-  /**
-   * Position of the legend.
-   * @type {anychart.enums.Orientation}
-   * @private
-   */
-  this.position_;
-
-  /**
-   * Position mode of the legend.
-   * @type {anychart.enums.LegendPositionMode}
-   * @private
-   */
-  this.positionMode_;
-
-  /**
-   * Align of the legend.
-   * @type {anychart.enums.Align}
-   * @private
-   */
-  this.align_;
-
-  /**
-   * Spacing between items.
-   * @type {number}
-   * @private
-   */
-  this.itemsSpacing_ = NaN;
-
-  /**
-   * Spacing between icon and text in legend item.
-   * @type {number}
-   * @private
-   */
-  this.iconTextSpacing_ = NaN;
-
-  /**
-   * Width of legend element.
-   * @type {?(number|string)}
-   * @private
-   */
-  this.width_ = null;
-
-  /**
-   * Max width of legend element.
-   * @type {?(number|string)}
-   * @private
-   */
-  this.maxWidth_ = null;
-
-  /**
-   * Height of legend element.
-   * @type {?(number|string)}
-   * @private
-   */
-  this.height_ = null;
-
-  /**
-   * Max height of legend element.
-   * @type {?(number|string)}
-   * @private
-   */
-  this.maxHeight_ = null;
-
-  /**
-   * Default layout of legend.
-   * @type {anychart.enums.LegendLayout}
-   * @private
-   */
-  this.itemsLayout_;
+  this.addThemes(anychart.themes.DefaultThemes['legend']);
 
   /**
    * Wrapped legend items.
@@ -129,42 +57,89 @@ anychart.core.ui.Legend = function() {
   this.drawedPage_ = NaN;
 
   /**
-   * Legend items text formatter.
-   * @type {?(Function|string)}
-   * @private
-   */
-  this.itemsFormat_ = null;
-
-  /**
    * Flag that shows what we need: true - create items, false - update them.
    * @type {boolean}
    * @private
    */
   this.recreateItems_ = true;
 
-  /**
-   * Title text formatter. If set, overrides the title text.
-   * @type {?(Function|string)}
-   * @private
-   */
-  this.titleFormat_ = null;
-
-  /**
-   * Hover cursor setting.
-   * @type {?anychart.enums.Cursor}
-   * @private
-   */
-  this.hoverCursor_;
-
-  /**
-   * @type {boolean}
-   * @private
-   */
-  this.inverted_ = false;
-
   this.invalidate(anychart.ConsistencyState.ALL);
 
-  this.bindHandlersToComponent(this, this.handleMouseOver_, this.handleMouseOut_, null, this.handleMouseMove_, null, this.handleMouseClick_);
+  this.bindHandlersToComponent(this, null, null, null, null, this.handleAll_, null);
+
+  var iconSizeBeforeInvalidationHook = function() {
+    if (goog.isDefAndNotNull(this.items_)) {
+      for (var i = 0, len = this.items_.length; i < len; i++) {
+        this.items_[i].iconSize(this.getOption('iconSize'));
+      }
+    }
+  };
+
+  var positionBeforeInvalidationHook = function() {
+    this.dragged = false;
+    var signal = anychart.Signal.NEEDS_REDRAW;
+    if (this.getOption('positionMode') == anychart.enums.LegendPositionMode.OUTSIDE)
+      signal |= anychart.Signal.BOUNDS_CHANGED;
+    this.invalidate(anychart.ConsistencyState.BOUNDS, signal);
+  };
+
+  var positionModeBeforeInvalidationHook = function() {
+    this.dragged = false;
+    if (this.getOption('drag')) {
+      this.invalidate(anychart.ConsistencyState.LEGEND_DRAG,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    } else {
+      this.dispatchSignal(anychart.Signal.BOUNDS_CHANGED);
+    }
+  };
+
+  var hoverCursorBeforeInvalidationHook = function() {
+    if (goog.isDefAndNotNull(this.items_)) {
+      for (var i = 0, len = this.items_.length; i < len; i++) {
+        this.items_[i].hoverCursor(this.hoverCursor_);
+      }
+    }
+  };
+
+  var iconTextSpacingBeforeInvalidationHook = function() {
+    if (goog.isDefAndNotNull(this.items_)) {
+      for (var i = 0, len = this.items_.length; i < len; i++) {
+        this.items_[i]['iconTextSpacing'](this.getOption('iconTextSpacing'));
+      }
+    }
+  };
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['inverted', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['itemsLayout', anychart.ConsistencyState.BOUNDS,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['iconSize', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED,
+          0, iconSizeBeforeInvalidationHook],
+    ['width', anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.LEGEND_BACKGROUND,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['height', anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.LEGEND_BACKGROUND,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['maxWidth', anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.LEGEND_BACKGROUND,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['maxHeight', anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.LEGEND_BACKGROUND,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['position', 0, 0, 0, positionBeforeInvalidationHook], // signals\states are in beforeInvalidationHook
+    ['positionMode', 0, 0, 0, positionModeBeforeInvalidationHook], // signals\states are in beforeInvalidationHook
+    ['align', anychart.ConsistencyState.BOUNDS,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED, 0, function() {this.dragged = false;}],
+    ['drag', anychart.ConsistencyState.LEGEND_DRAG, anychart.Signal.NEEDS_REDRAW],
+    ['itemsFormat', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.LEGEND_RECREATE_ITEMS,
+          anychart.Signal.NEEDS_REDRAW],
+    ['titleFormat', anychart.ConsistencyState.LEGEND_TITLE | anychart.ConsistencyState.BOUNDS,
+          anychart.Signal.BOUNDS_CHANGED | anychart.Signal.NEEDS_REDRAW],
+    ['itemsSpacing', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['itemsSourceMode', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.LEGEND_RECREATE_ITEMS,
+          anychart.Signal.NEEDS_REDRAW],
+    ['hoverCursor', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW,
+          0, hoverCursorBeforeInvalidationHook],
+    ['iconTextSpacing', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED,
+          0, iconTextSpacingBeforeInvalidationHook]
+  ]);
 };
 goog.inherits(anychart.core.ui.Legend, anychart.core.Text);
 
@@ -175,6 +150,49 @@ goog.inherits(anychart.core.ui.Legend, anychart.core.Text);
  * @type {number}
  */
 anychart.core.ui.Legend.prototype.SUPPORTED_SIGNALS = anychart.core.Text.prototype.SUPPORTED_SIGNALS; // NEEDS_REDRAW BOUNDS_CHANGED
+
+
+/**
+ * @type {!Object<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.core.ui.Legend.PROPERTY_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  var spacingNormalizer = function(field) {
+    return function(val) {
+      var normalized;
+      if (field == 'itemsSpacing')
+        normalized = parseFloat(val);
+      else
+        normalized = anychart.core.settings.numberNormalizer(val); // iconTextSpacing needs numberNormalizer
+      return goog.isNull(val) ? this.getThemeOption(field) :
+          (isNaN(normalized) ? this.getOption(field) : normalized);
+    };
+  };
+
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'inverted', anychart.core.settings.booleanNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'itemsLayout', anychart.enums.normalizeLegendLayout],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'iconSize', anychart.utils.toNumber],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'width', anychart.core.settings.asIsNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'height', anychart.core.settings.asIsNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'maxWidth', anychart.core.settings.asIsNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'maxHeight', anychart.core.settings.asIsNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'position', anychart.enums.normalizeOrientation],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'positionMode', anychart.enums.normalizeLegendPositionMode],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'align', anychart.enums.normalizeAlign],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'drag', anychart.core.settings.booleanNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'itemsFormat', anychart.core.settings.asIsNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'titleFormat', anychart.core.settings.asIsNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'itemsSpacing', spacingNormalizer('itemsSpacing')],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'itemsSourceMode', anychart.enums.normalizeLegendItemsSourceMode],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'hoverCursor', anychart.enums.normalizeCursor],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'iconTextSpacing', spacingNormalizer('iconTextSpacing')]
+  ]);
+  return map;
+})();
+anychart.core.settings.populate(anychart.core.ui.Legend, anychart.core.ui.Legend.PROPERTY_DESCRIPTORS);
 
 
 /**
@@ -211,68 +229,6 @@ anychart.core.ui.Legend.prototype.SUPPORTED_CONSISTENCY_STATES =
  * }}
  */
 anychart.core.ui.Legend.LegendItemProvider;
-
-
-//endregion
-//region --- Settings
-/**
- * Getter/Setter for hover cursor setting.
- * @param {(string|anychart.enums.Cursor)=} opt_value hover cursor setting.
- * @return {(anychart.enums.Cursor|anychart.core.ui.Legend)} Hover cursor setting or self for chaining.
- */
-anychart.core.ui.Legend.prototype.hoverCursor = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeCursor(opt_value);
-    if (this.hoverCursor_ != opt_value) {
-      this.hoverCursor_ = opt_value;
-      if (goog.isDefAndNotNull(this.items_)) {
-        for (var i = 0, len = this.items_.length; i < len; i++) {
-          this.items_[i].hoverCursor(this.hoverCursor_);
-        }
-      }
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-      return this;
-    }
-  }
-  return this.hoverCursor_;
-};
-
-
-/**
- * Sets items layout.
- * @param {(anychart.enums.LegendLayout|string)=} opt_value Layout type for legend items.
- * @return {(anychart.enums.LegendLayout|anychart.core.ui.Legend)} Items layout or self for method chaining.
- */
-anychart.core.ui.Legend.prototype.itemsLayout = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeLegendLayout(opt_value, this.itemsLayout_);
-    if (this.itemsLayout_ != opt_value) {
-      this.itemsLayout_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.itemsLayout_;
-};
-
-
-/**
- * Getter/setter for inverted setting.
- * @param {boolean=} opt_value Whether item list should be inverted or not.
- * @return {(boolean|anychart.core.ui.Legend)} Whether item list inverted or not or self for chaining.
- */
-anychart.core.ui.Legend.prototype.inverted = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = !!opt_value;
-    if (this.inverted_ != opt_value) {
-      this.inverted_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.inverted_;
-};
 
 
 /**
@@ -334,25 +290,6 @@ anychart.core.ui.Legend.prototype.itemsSource = function(opt_value) {
 
 
 /**
- * Getter/setter for items source mode.
- * @param {(anychart.enums.LegendItemsSourceMode|string)=} opt_value Items source mode.
- * @return {anychart.enums.LegendItemsSourceMode|anychart.core.ui.Legend} Items source mode or self for chaining.
- */
-anychart.core.ui.Legend.prototype.itemsSourceMode = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeLegendItemsSourceMode(opt_value);
-    if (this.itemsSourceMode_ != opt_value) {
-      this.itemsSourceMode_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.LEGEND_RECREATE_ITEMS,
-          anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.itemsSourceMode_;
-};
-
-
-/**
  * Getter/setter for items formatter
  * @param {function(Array.<anychart.core.ui.Legend.LegendItemProvider>):Array.<anychart.core.ui.Legend.LegendItemProvider>=} opt_value Formatter function.
  * @return {(function(Array.<anychart.core.ui.Legend.LegendItemProvider>):Array.<anychart.core.ui.Legend.LegendItemProvider>|anychart.core.ui.Legend)} Formatter function or self for chaining.
@@ -371,88 +308,6 @@ anychart.core.ui.Legend.prototype.itemsFormatter = function(opt_value) {
 
 
 /**
- * Getter/setter for items text formatter.
- * @param {(string|Function)=} opt_value Items text formatter function.
- * @return {(Function|string|anychart.core.ui.Legend)} Items text formatter function or self for chaining.
- */
-anychart.core.ui.Legend.prototype.itemsFormat = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.itemsFormat_ != opt_value) {
-      this.itemsFormat_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.LEGEND_RECREATE_ITEMS,
-          anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.itemsFormat_;
-};
-
-
-/**
- * Getter/setter for itemsSpacing.
- * @param {(string|number)=} opt_value Value of spacing between legend items.
- * @return {(string|number|anychart.core.ui.Legend)} Items spacing setting or self for method chaining.
- */
-anychart.core.ui.Legend.prototype.itemsSpacing = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = !isNaN(parseFloat(opt_value)) ? opt_value : 15;
-    if (this.itemsSpacing_ != opt_value) {
-      this.itemsSpacing_ = parseFloat(opt_value);
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.itemsSpacing_;
-};
-
-
-/**
- * Getter/setter for iconTextSpacing.
- * @param {(string|number)=} opt_value Spacing setting.
- * @return {(number|anychart.core.ui.Legend)} Spacing setting or self for method chaining.
- */
-anychart.core.ui.Legend.prototype.iconTextSpacing = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = !anychart.utils.isNaN(opt_value) ? +opt_value : 5;
-    if (this.iconTextSpacing_ != opt_value) {
-      this.iconTextSpacing_ = opt_value;
-      if (goog.isDefAndNotNull(this.items_)) {
-        for (var i = 0, len = this.items_.length; i < len; i++) {
-          this.items_[i].iconTextSpacing(this.iconTextSpacing_);
-        }
-      }
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.iconTextSpacing_;
-};
-
-
-/**
- * Getter/setter for icon size.
- * @param {(number|string)=} opt_value Icon size setting.
- * @return {(number|anychart.core.ui.Legend)} Icon size setting or self for method chaining.
- */
-anychart.core.ui.Legend.prototype.iconSize = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.toNumber(opt_value);
-    if (this.iconSize_ != opt_value) {
-      this.iconSize_ = opt_value;
-      if (goog.isDefAndNotNull(this.items_)) {
-        for (var i = 0, len = this.items_.length; i < len; i++) {
-          this.items_[i].iconSize(this.iconSize_);
-        }
-      }
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.iconSize_;
-};
-
-
-/**
  * Legend margin setting.
  * @param {(string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_spaceOrTopOrTopAndBottom Space object or top or top and bottom
  *    space.
@@ -464,8 +319,9 @@ anychart.core.ui.Legend.prototype.iconSize = function(opt_value) {
 anychart.core.ui.Legend.prototype.margin = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.margin_) {
     this.margin_ = new anychart.core.utils.Margin();
-    this.registerDisposable(this.margin_);
     this.margin_.listenSignals(this.boundsInvalidated_, this);
+
+    this.setupCreated('margin', this.margin_);
   }
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
     this.margin_.setup.apply(this.margin_, arguments);
@@ -500,8 +356,9 @@ anychart.core.ui.Legend.prototype.boundsInvalidated_ = function(event) {
 anychart.core.ui.Legend.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.padding_) {
     this.padding_ = new anychart.core.utils.Padding();
-    this.registerDisposable(this.padding_);
     this.padding_.listenSignals(this.boundsInvalidated_, this);
+
+    this.setupCreated('padding', this.padding_);
   }
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
     this.padding_.setup.apply(this.padding_, arguments);
@@ -519,8 +376,9 @@ anychart.core.ui.Legend.prototype.padding = function(opt_spaceOrTopOrTopAndBotto
 anychart.core.ui.Legend.prototype.background = function(opt_value) {
   if (!this.background_) {
     this.background_ = new anychart.core.ui.Background();
-    this.registerDisposable(this.background_);
     this.background_.listenSignals(this.backgroundInvalidated_, this);
+
+    this.setupCreated('background', this.background_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -552,9 +410,10 @@ anychart.core.ui.Legend.prototype.backgroundInvalidated_ = function(event) {
 anychart.core.ui.Legend.prototype.title = function(opt_value) {
   if (!this.title_) {
     this.title_ = new anychart.core.ui.Title();
-    this.registerDisposable(this.title_);
     this.title_.listenSignals(this.titleInvalidated_, this);
     this.title_.setParentEventTarget(this);
+
+    this.setupCreated('title', this.title_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -587,24 +446,6 @@ anychart.core.ui.Legend.prototype.titleInvalidated_ = function(event) {
 };
 
 
-/**
- * If set, formats title. Currently supported in Stock only.
- * @param {?(Function|string)=} opt_value
- * @return {Function|string|anychart.core.ui.Legend}
- */
-anychart.core.ui.Legend.prototype.titleFormat = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.titleFormat_ != opt_value) {
-      this.titleFormat_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.LEGEND_TITLE | anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.BOUNDS_CHANGED | anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.titleFormat_;
-};
-
-
 /**Getter/setter for titleSeparator.
  * @param {(Object|boolean|null)=} opt_value Separator setting.
  * @return {!(anychart.core.ui.Separator|anychart.core.ui.Legend)} Separator setting or self for method chaining.
@@ -612,8 +453,9 @@ anychart.core.ui.Legend.prototype.titleFormat = function(opt_value) {
 anychart.core.ui.Legend.prototype.titleSeparator = function(opt_value) {
   if (!this.titleSeparator_) {
     this.titleSeparator_ = new anychart.core.ui.Separator();
-    this.registerDisposable(this.titleSeparator_);
     this.titleSeparator_.listenSignals(this.titleSeparatorInvalidated_, this);
+
+    this.setupCreated('titleSeparator', this.titleSeparator_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -654,8 +496,9 @@ anychart.core.ui.Legend.prototype.titleSeparatorInvalidated_ = function(event) {
 anychart.core.ui.Legend.prototype.paginator = function(opt_value) {
   if (!this.paginator_) {
     this.paginator_ = new anychart.core.ui.Paginator();
-    this.registerDisposable(this.paginator_);
     this.paginator_.listenSignals(this.paginatorInvalidated_, this);
+
+    this.setupCreated('paginator', this.paginator_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -696,9 +539,14 @@ anychart.core.ui.Legend.prototype.paginatorInvalidated_ = function(event) {
 anychart.core.ui.Legend.prototype.tooltip = function(opt_value) {
   if (!this.tooltip_) {
     this.tooltip_ = new anychart.core.ui.Tooltip(0);
-    this.registerDisposable(this.tooltip_);
     this.tooltip_.listenSignals(this.onTooltipSignal_, this);
     this.tooltip_.containerProvider(this);
+
+    this.tooltip_.addThemes(anychart.themes.DefaultThemes['tooltip']);
+    this.setupCreated('tooltip', this.tooltip_);
+
+    // todo: (chernetsky) remove this when tooltip refactored
+    this.tooltip_.setupInternal(true, this.tooltip_.themeSettings);
   }
   if (goog.isDef(opt_value)) {
     this.tooltip_.setup(opt_value);
@@ -734,18 +582,18 @@ anychart.core.ui.Legend.prototype.showTooltip = function(event) {
     var item = this.items_[index];
     if (item && event) {
       var values = {
-        'value': {value: item.text(), type: anychart.enums.TokenType.STRING},
-        'iconType': {value: item.iconType(), type: anychart.enums.TokenType.STRING},
-        'iconStroke': {value: item.iconStroke(), type: anychart.enums.TokenType.UNKNOWN},
-        'iconFill': {value: item.iconFill(), type: anychart.enums.TokenType.UNKNOWN},
-        'iconHatchFill': {value: item.iconHatchFill(), type: anychart.enums.TokenType.UNKNOWN},
+        'value': {value: item.getOption('text'), type: anychart.enums.TokenType.STRING},
+        'iconType': {value: item.getOption('iconType'), type: anychart.enums.TokenType.STRING},
+        'iconStroke': {value: item.getOption('iconStroke'), type: anychart.enums.TokenType.UNKNOWN},
+        'iconFill': {value: item.getOption('iconFill'), type: anychart.enums.TokenType.UNKNOWN},
+        'iconHatchFill': {value: item.getOption('iconHatchFill'), type: anychart.enums.TokenType.UNKNOWN},
         'iconMarkerType': {value: item.iconMarkerType(), type: anychart.enums.TokenType.STRING},
         'iconMarkerStroke': {value: item.iconMarkerStroke(), type: anychart.enums.TokenType.UNKNOWN},
         'iconMarkerFill': {value: item.iconMarkerFill(), type: anychart.enums.TokenType.UNKNOWN},
         'meta': {value: this.legendItemsMeta_[index], type: anychart.enums.TokenType.UNKNOWN}
       };
       var formatProvider = new anychart.format.Context(values);
-      tooltip.showFloat(event['clientX'], event['clientY'], formatProvider.propagate());
+      tooltip.showFloat(event['clientX'], event['clientY'], /** @type {anychart.format.Context} */ (formatProvider.propagate()));
     }
   }
 };
@@ -758,169 +606,6 @@ anychart.core.ui.Legend.prototype.showTooltip = function(event) {
 anychart.core.ui.Legend.prototype.hideTooltip = function() {
   var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
   tooltip.hide();
-};
-
-
-/**
- * Getter/setter for width.
- * @param {(number|string|null)=} opt_value .
- * @return {!anychart.core.ui.Legend|number|string|null} .
- */
-anychart.core.ui.Legend.prototype.width = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.width_ != opt_value) {
-      this.width_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.LEGEND_BACKGROUND,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.width_;
-};
-
-
-/**
- * Getter/setter for max width.
- * @param {(number|string|null)=} opt_value .
- * @return {!anychart.core.ui.Legend|number|string|null} .
- */
-anychart.core.ui.Legend.prototype.maxWidth = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.maxWidth_ != opt_value) {
-      this.maxWidth_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.LEGEND_BACKGROUND,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.maxWidth_;
-};
-
-
-/**
- * Getter/setter for height.
- * @param {(number|string|null)=} opt_value .
- * @return {!anychart.core.ui.Legend|number|string|null} .
- */
-anychart.core.ui.Legend.prototype.height = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.height_ != opt_value) {
-      this.height_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.LEGEND_BACKGROUND,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.height_;
-};
-
-
-/**
- * Getter/setter for max height.
- * @param {(number|string|null)=} opt_value .
- * @return {!anychart.core.ui.Legend|number|string|null} .
- */
-anychart.core.ui.Legend.prototype.maxHeight = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.maxHeight_ != opt_value) {
-      this.maxHeight_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.LEGEND_BACKGROUND,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.maxHeight_;
-};
-
-
-/**
- * Getter/setter for position.
- * @param {(anychart.enums.Orientation|string)=} opt_value Legend position.
- * @return {(anychart.enums.Orientation|anychart.core.ui.Legend)} Legend position or self for method chaining.
- */
-anychart.core.ui.Legend.prototype.position = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeOrientation(opt_value);
-    if (this.position_ != opt_value) {
-      this.position_ = opt_value;
-      this.dragged = false;
-
-      var signal = anychart.Signal.NEEDS_REDRAW;
-      if (this.positionMode_ == anychart.enums.LegendPositionMode.OUTSIDE)
-        signal |= anychart.Signal.BOUNDS_CHANGED;
-
-      this.invalidate(anychart.ConsistencyState.BOUNDS, signal);
-    }
-    return this;
-  } else {
-    return this.position_;
-  }
-};
-
-
-/**
- * Getter/setter for position mode.
- * @param {(anychart.enums.LegendPositionMode|string)=} opt_value Legend position mode.
- * @return {(anychart.enums.LegendPositionMode|anychart.core.ui.Legend)} Legend position mode or self for method chaining.
- */
-anychart.core.ui.Legend.prototype.positionMode = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeLegendPositionMode(opt_value);
-    if (this.positionMode_ != opt_value) {
-      this.positionMode_ = opt_value;
-      this.dragged = false;
-      if (this.drag_) {
-        this.invalidate(anychart.ConsistencyState.LEGEND_DRAG,
-            anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-      } else {
-        this.dispatchSignal(anychart.Signal.BOUNDS_CHANGED);
-      }
-    }
-    return this;
-  } else {
-    return this.positionMode_;
-  }
-};
-
-
-/**
- * Getter/setter for align.
- * @param {(anychart.enums.Align|string)=} opt_value Legend align.
- * @return {(anychart.enums.Align|anychart.core.ui.Legend)} Legend align or self for chaining.
- */
-anychart.core.ui.Legend.prototype.align = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeAlign(opt_value);
-    if (this.align_ != opt_value) {
-      this.align_ = opt_value;
-      this.dragged = false;
-
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.align_;
-  }
-};
-
-
-/**
- * Getter/setter for drag.
- * @param {boolean=} opt_value Legend drag.
- * @return {(boolean|anychart.core.ui.Legend)} Legend drag or self for method chaining.
- */
-anychart.core.ui.Legend.prototype.drag = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = !!opt_value;
-    if (this.drag_ != opt_value) {
-      this.drag_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.LEGEND_DRAG, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  } else {
-    return this.drag_;
-  }
 };
 
 
@@ -939,13 +624,13 @@ anychart.core.ui.Legend.prototype.parentBounds = function(opt_boundsOrLeft, opt_
 anychart.core.ui.Legend.prototype.getRemainingBounds = function() {
   /** @type {!anychart.math.Rect} */
   var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds()) || anychart.math.rect(0, 0, 0, 0);
-  if (!this.enabled() || this.positionMode_ == anychart.enums.LegendPositionMode.INSIDE)
+  if (!this.enabled() || this.getOption('positionMode') == anychart.enums.LegendPositionMode.INSIDE)
     return parentBounds;
 
   if (!this.pixelBounds_ || this.hasInvalidationState(anychart.ConsistencyState.BOUNDS))
     this.calculateBounds_();
 
-  switch (this.position_) {
+  switch (this.getOption('position')) {
     case anychart.enums.Orientation.TOP:
       parentBounds.top += this.pixelBounds_.height;
       parentBounds.height -= this.pixelBounds_.height;
@@ -1005,6 +690,8 @@ anychart.core.ui.Legend.prototype.calculateContentBounds_ = function(widthLimit,
   var colCount = 1;
   var fullWidthExpand = 0;
   var fullHeightExpand = 0;
+  var itemsLayout = /** @type {anychart.enums.LegendLayout} */(this.getOption('itemsLayout'));
+  var itemsSpacing = /** @type {number} */(this.getOption('itemsSpacing'));
 
   for (var i = 0, len = this.items_.length; i < len; i++) {
     if (i in this.notEnabledItems_)
@@ -1013,37 +700,37 @@ anychart.core.ui.Legend.prototype.calculateContentBounds_ = function(widthLimit,
     var bounds = this.items_[i].getPixelBounds();
 
     width = bounds.width;
-    fullWidth += width + this.itemsSpacing_;
+    fullWidth += width + itemsSpacing;
     maxWidth = Math.max(maxWidth, width);
 
     height = bounds.height;
-    fullHeight += height + this.itemsSpacing_;
+    fullHeight += height + itemsSpacing;
     maxHeight = Math.max(maxHeight, height);
 
 
-    if (this.itemsLayout_ == anychart.enums.LegendLayout.HORIZONTAL_EXPANDABLE) {
+    if (itemsLayout == anychart.enums.LegendLayout.HORIZONTAL_EXPANDABLE) {
       if (rowWidth + width > widthLimit) {
         fullWidthExpand = Math.max(fullWidthExpand, rowWidth);
         fullHeightExpand += rowHeight;
         rowCount++;
 
-        rowWidth = width + this.itemsSpacing_;
-        rowHeight = height + this.itemsSpacing_;
+        rowWidth = width + itemsSpacing;
+        rowHeight = height + itemsSpacing;
       } else {
-        rowWidth += width + this.itemsSpacing_;
-        rowHeight = Math.max(rowHeight, height + this.itemsSpacing_);
+        rowWidth += width + itemsSpacing;
+        rowHeight = Math.max(rowHeight, height + itemsSpacing);
       }
-    } else if (this.itemsLayout_ == anychart.enums.LegendLayout.VERTICAL_EXPANDABLE) {
+    } else if (itemsLayout == anychart.enums.LegendLayout.VERTICAL_EXPANDABLE) {
       if (colHeight + height > heightLimit) {
         fullHeightExpand = Math.max(fullHeightExpand, colHeight);
         fullWidthExpand += colWidth;
         colCount++;
 
-        colWidth = width + this.itemsSpacing_;
-        colHeight = height + this.itemsSpacing_;
+        colWidth = width + itemsSpacing;
+        colHeight = height + itemsSpacing;
       } else {
-        colHeight += height + this.itemsSpacing_;
-        colWidth = Math.max(colWidth, width + this.itemsSpacing_);
+        colHeight += height + itemsSpacing;
+        colWidth = Math.max(colWidth, width + itemsSpacing);
       }
     }
   }
@@ -1053,30 +740,30 @@ anychart.core.ui.Legend.prototype.calculateContentBounds_ = function(widthLimit,
     fullWidth = 0;
     maxWidth = 0;
   } else {
-    fullWidth -= this.itemsSpacing_;
+    fullWidth -= itemsSpacing;
   }
 
   if (!fullHeight || maxHeight < 0) {
     fullHeight = 0;
     maxHeight = 0;
   } else {
-    fullHeight -= this.itemsSpacing_;
+    fullHeight -= itemsSpacing;
   }
 
   this.colCount_ = colCount;
   this.rowCount_ = rowCount;
 
-  if (this.itemsLayout_ == anychart.enums.LegendLayout.VERTICAL) {
+  if (itemsLayout == anychart.enums.LegendLayout.VERTICAL) {
     return anychart.math.rect(0, 0, Math.max(0, maxWidth), Math.max(0, fullHeight));
-  } else if (this.itemsLayout_ == anychart.enums.LegendLayout.HORIZONTAL) {
+  } else if (itemsLayout == anychart.enums.LegendLayout.HORIZONTAL) {
     return anychart.math.rect(0, 0, Math.max(0, fullWidth), Math.max(0, maxHeight));
-  } else if (this.itemsLayout_ == anychart.enums.LegendLayout.VERTICAL_EXPANDABLE) {
-    fullWidthExpand += colWidth - this.itemsSpacing_;
-    fullHeightExpand = Math.max(fullHeightExpand, colHeight) - this.itemsSpacing_;
+  } else if (itemsLayout == anychart.enums.LegendLayout.VERTICAL_EXPANDABLE) {
+    fullWidthExpand += colWidth - itemsSpacing;
+    fullHeightExpand = Math.max(fullHeightExpand, colHeight) - itemsSpacing;
     return anychart.math.rect(0, 0, Math.max(0, fullWidthExpand), Math.max(0, fullHeightExpand));
-  } else if (this.itemsLayout_ == anychart.enums.LegendLayout.HORIZONTAL_EXPANDABLE) {
-    fullWidthExpand = Math.max(fullWidthExpand, rowWidth) - this.itemsSpacing_;
-    fullHeightExpand += rowHeight - this.itemsSpacing_;
+  } else if (itemsLayout == anychart.enums.LegendLayout.HORIZONTAL_EXPANDABLE) {
+    fullWidthExpand = Math.max(fullWidthExpand, rowWidth) - itemsSpacing;
+    fullHeightExpand += rowHeight - itemsSpacing;
     return anychart.math.rect(0, 0, Math.max(0, fullWidthExpand), Math.max(0, fullHeightExpand));
   }
 
@@ -1114,50 +801,55 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
 
   var width, height, fullWidth, fullHeight, left = 0, top = 0;
 
+  var width_ = /** @type {number|string} */(this.getOption('width'));
+  var height_ = /** @type {number|string} */(this.getOption('height'));
+  var maxWidth_ = /** @type {number|string} */(this.getOption('maxWidth'));
+  var maxHeight_ = /** @type {number|string} */(this.getOption('maxHeight'));
+
   var maxWidth, maxHeight;
   if (parentBounds) {
     parentWidth = parentBounds.width;
     parentHeight = parentBounds.height;
-    if (goog.isDefAndNotNull(this.width_)) {
-      var wiredWidth = anychart.utils.normalizeSize(/** @type {number|string} */(this.width_), parentWidth);
-      var dynamicWidth = goog.isDefAndNotNull(this.maxWidth_) ?
-          anychart.utils.normalizeSize(/** @type {number|string} */(this.maxWidth_), parentWidth) :
+    if (goog.isDefAndNotNull(width_)) {
+      var wiredWidth = anychart.utils.normalizeSize(/** @type {number|string} */(width_), parentWidth);
+      var dynamicWidth = goog.isDefAndNotNull(maxWidth_) ?
+          anychart.utils.normalizeSize(/** @type {number|string} */(maxWidth_), parentWidth) :
           parentWidth;
 
       fullWidth = Math.min(parentWidth, wiredWidth, dynamicWidth);
       maxWidth = padding.tightenWidth(margin.tightenWidth(fullWidth));
-    } else if (goog.isDefAndNotNull(this.maxWidth_)) {
-      maxWidth = padding.tightenWidth(margin.tightenWidth(anychart.utils.normalizeSize(/** @type {number|string} */(this.maxWidth_), parentWidth)));
+    } else if (goog.isDefAndNotNull(maxWidth_)) {
+      maxWidth = padding.tightenWidth(margin.tightenWidth(anychart.utils.normalizeSize(/** @type {number|string} */(maxWidth_), parentWidth)));
     } else {
       maxWidth = padding.tightenWidth(margin.tightenWidth(parentWidth));
     }
-    if (goog.isDefAndNotNull(this.height_)) {
-      var wiredHeight = anychart.utils.normalizeSize(/** @type {number|string} */(this.height_), parentHeight);
-      var dynamicHeight = goog.isDefAndNotNull(this.maxHeight_) ?
-          anychart.utils.normalizeSize(/** @type {number|string} */(this.maxHeight_), parentHeight) :
+    if (goog.isDefAndNotNull(height_)) {
+      var wiredHeight = anychart.utils.normalizeSize(/** @type {number|string} */(height_), parentHeight);
+      var dynamicHeight = goog.isDefAndNotNull(maxHeight_) ?
+          anychart.utils.normalizeSize(/** @type {number|string} */(maxHeight_), parentHeight) :
           parentHeight;
 
       fullHeight = Math.min(parentHeight, wiredHeight, dynamicHeight);
       maxHeight = padding.tightenHeight(margin.tightenHeight(fullHeight));
-    } else if (goog.isDefAndNotNull(this.maxHeight_)) {
-      maxHeight = padding.tightenHeight(margin.tightenHeight(anychart.utils.normalizeSize(/** @type {number|string} */(this.maxHeight_), parentHeight)));
+    } else if (goog.isDefAndNotNull(maxHeight_)) {
+      maxHeight = padding.tightenHeight(margin.tightenHeight(anychart.utils.normalizeSize(/** @type {number|string} */(maxHeight_), parentHeight)));
     } else {
       maxHeight = padding.tightenHeight(margin.tightenHeight(parentHeight));
     }
   } else {
-    if (goog.isNumber(this.width_) && !isNaN(this.width_)) {
-      fullWidth = this.width_;
-      maxWidth = padding.tightenWidth(this.width_);
-    } else if (goog.isNumber(this.maxWidth_) && !isNaN(this.maxWidth_)) {
-      maxWidth = padding.tightenWidth(this.maxWidth_);
+    if (goog.isNumber(width_) && !isNaN(width_)) {
+      fullWidth = width_;
+      maxWidth = padding.tightenWidth(width_);
+    } else if (goog.isNumber(maxWidth_) && !isNaN(maxWidth_)) {
+      maxWidth = padding.tightenWidth(maxWidth_);
     } else {
       maxWidth = Infinity;
     }
-    if (goog.isNumber(this.height_) && !isNaN(this.height_)) {
-      fullHeight = this.height_;
-      maxHeight = padding.tightenHeight(this.height_);
-    } else if (goog.isNumber(this.maxHeight_) && !isNaN(this.maxHeight_)) {
-      maxHeight = padding.tightenHeight(this.maxHeight_);
+    if (goog.isNumber(height_) && !isNaN(height_)) {
+      fullHeight = height_;
+      maxHeight = padding.tightenHeight(height_);
+    } else if (goog.isNumber(maxHeight_) && !isNaN(maxHeight_)) {
+      maxHeight = padding.tightenHeight(maxHeight_);
     } else {
       maxHeight = Infinity;
     }
@@ -1167,20 +859,25 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
   var paginatorBounds;
   var titleBounds;
 
-  var separator = /** @type {anychart.core.ui.Separator} */(this.titleSeparator());
-  var paginator = /** @type {anychart.core.ui.Paginator} */(this.paginator());
-  var title = /** @type {anychart.core.ui.Title} */(this.title());
+  var separator = this.getCreated('titleSeparator');
+  var paginator = this.getCreated('paginator');
+  var title = this.getCreated('title');
 
-  var paginatorOrientation = paginator.orientation();
+  var paginatorOrientation = paginator && paginator.getOption('orientation');
   var paginatorIsHorizontal = paginatorOrientation == anychart.enums.Orientation.BOTTOM || paginatorOrientation == anychart.enums.Orientation.TOP;
-  var titleOrientation = title.getOption('orientation') || title.defaultOrientation();
-  var titleIsHorizontal = titleOrientation == anychart.enums.Orientation.BOTTOM || titleOrientation == anychart.enums.Orientation.TOP;
-  var titleIsRLYHorizontal = title.getRotation() % 180 == 0;
-  var separatorIsHorizontal = separator.isHorizontal();
+  var titleOrientation = title && (title.getOption('orientation') || title.defaultOrientation());
+  var titleIsHorizontal = titleOrientation && (titleOrientation == anychart.enums.Orientation.BOTTOM || titleOrientation == anychart.enums.Orientation.TOP);
+  var titleIsRLYHorizontal = title ? title.getRotation() % 180 == 0 : 0;
+  var separatorIsHorizontal = separator && separator.isHorizontal();
 
-  separator.suspendSignalsDispatching();
-  paginator.suspendSignalsDispatching();
-  title.suspendSignalsDispatching();
+  if (separator)
+    separator.suspendSignalsDispatching();
+
+  if (paginator)
+    paginator.suspendSignalsDispatching();
+
+  if (title)
+    title.suspendSignalsDispatching();
 
   var calculatedBounds = null;
   var lastCalculatedPaginatorBounds = null;
@@ -1195,7 +892,7 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
     var forCompareHeight = 0;
     var forCompareWidth = 0;
 
-    if (title.enabled()) {
+    if (title && title.enabled()) {
       title.parentBounds(null);
       title.setAutoWidth(null);
       title.setAutoHeight(null);
@@ -1230,7 +927,7 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
       titleBounds = null;
     }
 
-    if (separator.enabled()) {
+    if (separator && separator.enabled()) {
       separator.parentBounds(null);
       separatorBounds = separator.getContentBounds();
 
@@ -1269,20 +966,22 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
     paginator.parentBounds(null);
     paginatorBounds = paginator.getPixelBoundsInternal(1);
 
-    if (this.itemsLayout_ == anychart.enums.LegendLayout.HORIZONTAL) {
+    var itemsLayout = /** @type {anychart.enums.LegendLayout} */(this.getOption('itemsLayout'));
+
+    if (itemsLayout == anychart.enums.LegendLayout.HORIZONTAL) {
       if (contentWidth > itemsAreaWidth && this.items_ && this.items_.length > 1) {
         paginator.autoEnabled(true);
       } else {
         paginator.autoEnabled(false);
       }
-    } else if (this.itemsLayout_ == anychart.enums.LegendLayout.VERTICAL_EXPANDABLE) {
+    } else if (itemsLayout == anychart.enums.LegendLayout.VERTICAL_EXPANDABLE) {
       if (contentWidth > itemsAreaWidth && this.colCount_ > 1) {
         paginator.autoEnabled(true);
       } else {
         paginator.autoEnabled(false);
       }
-    } else if (this.itemsLayout_ == anychart.enums.LegendLayout.VERTICAL ||
-        this.itemsLayout_ == anychart.enums.LegendLayout.HORIZONTAL_EXPANDABLE) {
+    } else if (itemsLayout == anychart.enums.LegendLayout.VERTICAL ||
+        itemsLayout == anychart.enums.LegendLayout.HORIZONTAL_EXPANDABLE) {
       if (contentHeight > maxHeightForPaginator && this.items_ && this.items_.length > 1) {
         paginator.autoEnabled(true);
       } else {
@@ -1306,7 +1005,7 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
     width = margin.widenWidth(padding.widenWidth(contentAreaWidth));
     height = margin.widenHeight(padding.widenHeight(contentAreaHeight));
 
-    if (title.enabled()) {
+    if (title && title.enabled()) {
       var titleWidth = titleBounds.width;
       if (titleIsHorizontal || titleIsRLYHorizontal) {
         if (titleIsRLYHorizontal && !titleIsHorizontal) {
@@ -1330,7 +1029,7 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
             if (separatorBounds && separatorIsHorizontal) {
               accHeight += separatorBounds.height;
             }
-            if (paginator.orientation() == anychart.enums.Orientation.TOP || paginator.orientation() == anychart.enums.Orientation.BOTTOM) {
+            if (paginatorOrientation == anychart.enums.Orientation.TOP || paginatorOrientation == anychart.enums.Orientation.BOTTOM) {
               accHeight += paginatorBounds.height;
             }
 
@@ -1347,12 +1046,17 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
         }
 
         titleBounds = title.getContentBounds();
-        separator['width'](width);
-        separatorBounds = separator.getContentBounds();
+        if (separator) {
+          separator['width'](width);
+          separatorBounds = separator.getContentBounds();
+        }
+
       } else {
         titleBounds = title.getContentBounds();
-        separator['width'](height);
-        separatorBounds = separator.getContentBounds();
+        if (separator) {
+          separator['width'](height);
+          separatorBounds = separator.getContentBounds();
+        }
       }
 
       if (titleIsHorizontal)
@@ -1361,7 +1065,7 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
         contentAreaWidth -= titleBounds.width;
     }
 
-    if (separator.enabled()) {
+    if (separator && separator.enabled()) {
       if (separatorIsHorizontal) {
         contentAreaHeight -= separatorBounds.height;
       } else {
@@ -1418,12 +1122,14 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
     }
   } else {
     if (parentBounds) {
+      var position = /** @type {anychart.enums.Orientation} */(this.getOption('position'));
+      var align = /** @type {anychart.enums.Align} */(this.getOption('align'));
       left = parentBounds.getLeft();
       top = parentBounds.getTop();
-      switch (this.position_) {
+      switch (position) {
         case anychart.enums.Orientation.LEFT:
         case anychart.enums.Orientation.RIGHT:
-          switch (this.align_) {
+          switch (align) {
             case anychart.enums.Align.CENTER:
               top = top + (parentHeight - fullHeight) / 2;
               break;
@@ -1435,7 +1141,7 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
           break;
         case anychart.enums.Orientation.TOP:
         case anychart.enums.Orientation.BOTTOM:
-          switch (this.align_) {
+          switch (align) {
             case anychart.enums.Align.CENTER:
               left = left + (parentWidth - fullWidth) / 2;
               break;
@@ -1446,7 +1152,7 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
           }
           break;
       }
-      switch (this.position_) {
+      switch (position) {
         case anychart.enums.Orientation.RIGHT:
           left = parentBounds.getRight() - fullWidth;
           break;
@@ -1470,9 +1176,14 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
   this.relativeBoundsWithoutMargin_ = this.margin().tightenBounds(relativePixelBounds);
   this.relativeBoundsWithoutMarginAndPadding_ = this.padding().tightenBounds(this.relativeBoundsWithoutMargin_);
 
-  separator.resumeSignalsDispatching(false);
-  paginator.resumeSignalsDispatching(false);
-  title.resumeSignalsDispatching(false);
+  if (separator)
+    separator.resumeSignalsDispatching(false);
+
+  if (paginator)
+    paginator.resumeSignalsDispatching(false);
+
+  if (title)
+    title.resumeSignalsDispatching(false);
 
   this.markConsistent(anychart.ConsistencyState.BOUNDS);
 };
@@ -1492,6 +1203,7 @@ anychart.core.ui.Legend.prototype.distributeItemsInBounds_ = function(width, hei
   this.distributedItems_ = [];
   page = 0;
   var itemsLength = this.items_ && this.items_.length;
+  var itemsSpacing = this.getOption('itemsSpacing');
   var k;
   // find first item that need to be showed
   for (k = 0; k < itemsLength; k++) {
@@ -1503,19 +1215,19 @@ anychart.core.ui.Legend.prototype.distributeItemsInBounds_ = function(width, hei
     this.distributedItems_[page] = [];
     this.distributedItems_[page][0] = this.items_[k];
 
-    switch (this.itemsLayout_) {
+    switch (/** @type {anychart.enums.LegendLayout} */(this.getOption('itemsLayout'))) {
       case anychart.enums.LegendLayout.HORIZONTAL:
         w = this.items_[k].getPixelBounds().getWidth();
         for (i = k + 1; i < itemsLength; i++) {
           if (i in this.notEnabledItems_)
             continue;
-          if (w + this.itemsSpacing_ + this.items_[i].getPixelBounds().getWidth() > width) {
+          if (w + itemsSpacing + this.items_[i].getPixelBounds().getWidth() > width) {
             page++;
             this.distributedItems_[page] = [];
             this.distributedItems_[page][0] = this.items_[i];
             w = this.items_[i].getPixelBounds().getWidth();
           } else {
-            w = w + this.itemsSpacing_ + this.items_[i].getPixelBounds().getWidth();
+            w = w + itemsSpacing + this.items_[i].getPixelBounds().getWidth();
             this.distributedItems_[page].push(this.items_[i]);
           }
         }
@@ -1525,20 +1237,20 @@ anychart.core.ui.Legend.prototype.distributeItemsInBounds_ = function(width, hei
         for (i = k + 1, len = this.items_.length; i < len; i++) {
           if (i in this.notEnabledItems_)
             continue;
-          if (h + this.itemsSpacing_ + this.items_[i].getPixelBounds().getHeight() > height) {
+          if (h + itemsSpacing + this.items_[i].getPixelBounds().getHeight() > height) {
             page++;
             this.distributedItems_[page] = [];
             this.distributedItems_[page][0] = this.items_[i];
             h = this.items_[i].getPixelBounds().getHeight();
           } else {
-            h = h + this.itemsSpacing_ + this.items_[i].getPixelBounds().getHeight();
+            h = h + itemsSpacing + this.items_[i].getPixelBounds().getHeight();
             this.distributedItems_[page].push(this.items_[i]);
           }
         }
         break;
       case anychart.enums.LegendLayout.HORIZONTAL_EXPANDABLE:
-        var rowWidth = this.items_[k].getPixelBounds().getWidth() + this.itemsSpacing_;
-        var rowHeight = this.items_[k].getPixelBounds().getHeight() + this.itemsSpacing_;
+        var rowWidth = this.items_[k].getPixelBounds().getWidth() + itemsSpacing;
+        var rowHeight = this.items_[k].getPixelBounds().getHeight() + itemsSpacing;
         var pageHeight = 0;
 
         for (i = k + 1; i < itemsLength; i++) {
@@ -1559,18 +1271,18 @@ anychart.core.ui.Legend.prototype.distributeItemsInBounds_ = function(width, hei
             } else {
               this.distributedItems_[page].push(item);
             }
-            rowWidth = itemWidth + this.itemsSpacing_;
-            rowHeight = itemHeight + this.itemsSpacing_;
+            rowWidth = itemWidth + itemsSpacing;
+            rowHeight = itemHeight + itemsSpacing;
           } else {
-            rowWidth += itemWidth + this.itemsSpacing_;
-            rowHeight = Math.max(rowHeight, itemHeight + this.itemsSpacing_);
+            rowWidth += itemWidth + itemsSpacing;
+            rowHeight = Math.max(rowHeight, itemHeight + itemsSpacing);
             this.distributedItems_[page].push(item);
           }
         }
         break;
       case anychart.enums.LegendLayout.VERTICAL_EXPANDABLE:
-        var colWidth = this.items_[k].getPixelBounds().getWidth() + this.itemsSpacing_;
-        var colHeight = this.items_[k].getPixelBounds().getHeight() + this.itemsSpacing_;
+        var colWidth = this.items_[k].getPixelBounds().getWidth() + itemsSpacing;
+        var colHeight = this.items_[k].getPixelBounds().getHeight() + itemsSpacing;
         var pageWidth = 0;
 
         for (i = k + 1; i < itemsLength; i++) {
@@ -1591,11 +1303,11 @@ anychart.core.ui.Legend.prototype.distributeItemsInBounds_ = function(width, hei
             } else {
               this.distributedItems_[page].push(item);
             }
-            colWidth = itemWidth + this.itemsSpacing_;
-            colHeight = itemHeight + this.itemsSpacing_;
+            colWidth = itemWidth + itemsSpacing;
+            colHeight = itemHeight + itemsSpacing;
           } else {
-            colWidth = Math.max(colWidth, itemWidth + this.itemsSpacing_);
-            colHeight += itemHeight + this.itemsSpacing_;
+            colWidth = Math.max(colWidth, itemWidth + itemsSpacing);
+            colHeight += itemHeight + itemsSpacing;
             this.distributedItems_[page].push(item);
           }
         }
@@ -1603,7 +1315,9 @@ anychart.core.ui.Legend.prototype.distributeItemsInBounds_ = function(width, hei
     }
   }
 
-  this.paginator().pageCount(page + 1);
+  var paginator = this.getCreated('paginator');
+  if (paginator)
+    paginator.pageCount(page + 1);
 };
 
 
@@ -1623,10 +1337,10 @@ anychart.core.ui.Legend.prototype.createItemsFromSource_ = function() {
     for (var i = 0; i < this.itemsSourceInternal.length; i++) {
       source = /** @type {anychart.core.SeparateChart|anychart.stockModule.Plot} */ (this.itemsSourceInternal[i]);
       if (!goog.isNull(source) && goog.isFunction(source.createLegendItemsProvider)) {
-        var format = this.itemsFormat_;
+        var format = /** @type {Function|string} */(this.getOption('itemsFormat'));
         if (goog.isString(format))
           format = anychart.core.utils.TokenParser.getInstance().getFormat(format);
-        items = goog.array.concat(items, source.createLegendItemsProvider(this.itemsSourceMode_, format));
+        items = goog.array.concat(items, source.createLegendItemsProvider(this.getOption('itemsSourceMode'), format));
       }
     }
     return items;
@@ -1649,11 +1363,11 @@ anychart.core.ui.Legend.prototype.prepareItems_ = function(items) {
   var textSettings = /** @type {Object} */ (this.textSettings());
   for (var i = 0; i < items.length; i++) {
     if (isNaN(items[i]['iconSize']))
-      items[i]['iconSize'] = this.iconSize_;
+      items[i]['iconSize'] = /** @type {number} */(this.getOption('iconSize'));
     config = {
-      'iconTextSpacing': this.iconTextSpacing_,
-      'iconSize': this.iconSize_,
-      'hoverCursor': this.hoverCursor_
+      'iconTextSpacing': /** @type {number} */(this.getOption('iconTextSpacing')),
+      'iconSize': /** @type {number} */(this.getOption('iconSize')),
+      'hoverCursor': /** @type {anychart.enums.Cursor} */(this.getOption('hoverCursor'))
     };
     goog.object.extend(config, textSettings, items[i]);
     itemList.push(config);
@@ -1698,7 +1412,7 @@ anychart.core.ui.Legend.prototype.initializeLegendItems_ = function(items) {
           item.clear();
           item.setup(items[i]);
           item.applyFontColor();
-          item.setItemIndexToLayer(this.inverted_ ? items.length - 1 - i : i);
+          item.setItemIndexToLayer(/** @type {boolean} */(this.getOption('inverted')) ? items.length - 1 - i : i);
           break;
         }
       }
@@ -1722,7 +1436,7 @@ anychart.core.ui.Legend.prototype.initializeLegendItems_ = function(items) {
       if (!item.hasOwnOption('text'))
         item.ownSettings['text'] = 'Legend Item';
       item.applyTextSettings(item.getTextElement(), true);
-      item.setItemIndexToLayer(this.inverted_ ? items.length - 1 - i : i);
+      item.setItemIndexToLayer(/** @type {boolean} */(this.getOption('inverted')) ? items.length - 1 - i : i);
 
       this.items_.push(item);
       this.legendItemsMeta_.push(items[i]['meta'] ? items[i]['meta'] : {});
@@ -1730,6 +1444,48 @@ anychart.core.ui.Legend.prototype.initializeLegendItems_ = function(items) {
   } else {
     this.clearItems();
   }
+
+  /*
+    DEV NOTE: Such sequence of DOM-operations allows to minimize
+    forced reflow calculation time:
+      1) Add to DOM.
+      2) Setup all elements.
+      3) Ask numeric measurements (like el.getBBox()). This triggers
+         flow recalculation for first measurement request. Another
+         measurements are already calculated on first request.
+
+      See more: https://developers.google.com/web/fundamentals/performance/rendering/avoid-large-complex-layouts-and-layout-thrashing
+   */
+  var textEl, style, sett;
+  for (i = 0; i < this.items_.length; i++) {
+    item = this.items_[i];
+    sett = item.textSettings();
+    style = anychart.utils.toStyleString(sett);
+    textEl = item.predefinedElement();
+    if (!textEl) {
+      textEl = this.renderer.createTextElement();
+      this.measurementG_.appendChild(textEl);
+      item.predefinedElement(textEl);
+    }
+    textEl.style.cssText = style;
+    textEl.textContent = item.text();
+  }
+
+  var paginatorTextEl = this.renderer.createTextElement();
+  this.measurementG_.appendChild(paginatorTextEl);
+  sett = this.paginator().textSettings();
+  style = anychart.utils.toStyleString(/** @type {Object} */ (sett));
+  paginatorTextEl.style.cssText = style;
+  paginatorTextEl.textContent = '0 / 0';
+
+  for (i = 0; i < this.items_.length; i++) {
+    item = this.items_[i];
+    textEl = item.predefinedElement();
+    var bbox = textEl['getBBox']();
+    item.predefinedBounds(new goog.math.Rect(bbox.x, bbox.y, bbox.width, bbox.height));
+  }
+  var pb = paginatorTextEl['getBBox']();
+  this.paginator_.predefinedTextBounds(new goog.math.Rect(pb.x, pb.y, pb.width, pb.height));
 
   this.recreateItems_ = false;
   this.invalidate(anychart.ConsistencyState.BOUNDS);
@@ -1770,7 +1526,9 @@ anychart.core.ui.Legend.prototype.clearItems = function() {
  * @return {anychart.core.ui.LegendItem}
  */
 anychart.core.ui.Legend.prototype.createItem = function() {
-  return new anychart.core.ui.LegendItem();
+  var item = new anychart.core.ui.LegendItem();
+  item.addThemes(this.themeSettings, 'defaultFontSettings');
+  return item;
 };
 
 
@@ -1795,11 +1553,10 @@ anychart.core.ui.Legend.prototype.draw = function() {
   if (!this.rootElement) {
     /**
      * Layer of legend.
-     * @type {!acgraph.vector.Layer}
+     * @type {acgraph.vector.Layer}
      */
     this.rootElement = acgraph.layer();
     this.bindHandlersToGraphics(this.rootElement);
-    this.registerDisposable(this.rootElement);
 
     if (!this.itemsLayer_) {
       /**
@@ -1809,7 +1566,6 @@ anychart.core.ui.Legend.prototype.draw = function() {
        */
       this.itemsLayer_ = acgraph.layer();
       this.itemsLayer_.parent(this.rootElement).zIndex(20);
-      this.registerDisposable(this.itemsLayer_);
     }
   }
 
@@ -1824,6 +1580,13 @@ anychart.core.ui.Legend.prototype.draw = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
     this.rootElement.parent(container);
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
+
+    if (acgraph.type() == acgraph.StageType.SVG) {
+      this.renderer = acgraph.getRenderer();
+      var m = this.renderer.createMeasurement();
+      this.measurementG_ = this.renderer.createLayerElement();
+      goog.dom.appendChild(m, this.measurementG_);
+    }
   }
 
   var manualSuspend = stage && !stage.isSuspended();
@@ -1837,7 +1600,7 @@ anychart.core.ui.Legend.prototype.draw = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     var formatter = this.itemsFormatter();
     var items = this.createItemsFromSource_();
-    if (this.inverted_)
+    if (/** @type {boolean} */(this.getOption('inverted')))
       items = items.reverse();
     items = goog.isFunction(formatter) ? formatter(items) : items;
     if (this.items_ && this.items_.length != items.length)
@@ -1869,52 +1632,59 @@ anychart.core.ui.Legend.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.LEGEND_BACKGROUND)) {
-    var background = /** @type {anychart.core.ui.Background} */(this.background());
-    background.suspendSignalsDispatching();
-    background.parentBounds(this.relativeBoundsWithoutMargin_);
-    if (this.enabled()) background.container(this.rootElement);
-    background.resumeSignalsDispatching(false);
-    background.draw();
+    var background = this.getCreated('background');
+    if (background) {
+      background.suspendSignalsDispatching();
+      background.parentBounds(this.relativeBoundsWithoutMargin_);
+      if (this.enabled()) background.container(this.rootElement);
+      background.resumeSignalsDispatching(false);
+      background.draw();
+    }
     this.markConsistent(anychart.ConsistencyState.LEGEND_BACKGROUND);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.LEGEND_TITLE)) {
-    var title = /** @type {anychart.core.ui.Title} */(this.title());
-    title.suspendSignalsDispatching();
-    title.parentBounds(this.relativeBoundsWithoutMarginAndPadding_);
-    if (this.enabled()) title.container(this.rootElement);
-    title.resumeSignalsDispatching(false);
-    title.draw();
+    var title = this.getCreated('title');
+    if (title) {
+      title.suspendSignalsDispatching();
+      title.parentBounds(this.relativeBoundsWithoutMarginAndPadding_);
+      if (this.enabled()) title.container(this.rootElement);
+      title.resumeSignalsDispatching(false);
+      title.draw();
+    }
     this.markConsistent(anychart.ConsistencyState.LEGEND_TITLE);
   }
 
   var boundsWithoutTitle = this.title_ ? this.title_.getRemainingBounds() : this.relativeBoundsWithoutMarginAndPadding_;
 
   if (this.hasInvalidationState(anychart.ConsistencyState.LEGEND_SEPARATOR)) {
-    var titleSeparator = /** @type {anychart.core.ui.Separator} */(this.titleSeparator());
-    titleSeparator.suspendSignalsDispatching();
-    titleSeparator.parentBounds(boundsWithoutTitle);
-    if (this.enabled()) titleSeparator.container(this.rootElement);
-    titleSeparator.resumeSignalsDispatching(false);
-    titleSeparator.draw();
+    var titleSeparator = this.getCreated('titleSeparator');
+    if (titleSeparator) {
+      titleSeparator.suspendSignalsDispatching();
+      titleSeparator.parentBounds(boundsWithoutTitle);
+      if (this.enabled()) titleSeparator.container(this.rootElement);
+      titleSeparator.resumeSignalsDispatching(false);
+      titleSeparator.draw();
+    }
     this.markConsistent(anychart.ConsistencyState.LEGEND_SEPARATOR);
   }
 
   var boundsWithoutSeparator = this.titleSeparator_ ? this.titleSeparator_.getRemainingBounds() : boundsWithoutTitle;
 
+  var paginator = this.getCreated('paginator');
   if (this.hasInvalidationState(anychart.ConsistencyState.LEGEND_PAGINATOR)) {
-    var paginator = /** @type {anychart.core.ui.Paginator} */(this.paginator());
-    paginator.suspendSignalsDispatching();
-    paginator.parentBounds(boundsWithoutSeparator);
-    if (this.enabled()) paginator.container(this.rootElement);
-    paginator.resumeSignalsDispatching(false);
-    paginator.draw();
+    if (paginator) {
+      paginator.suspendSignalsDispatching();
+      paginator.parentBounds(boundsWithoutSeparator);
+      if (this.enabled()) paginator.container(this.rootElement);
+      paginator.resumeSignalsDispatching(false);
+      paginator.draw();
+    }
     this.markConsistent(anychart.ConsistencyState.LEGEND_PAGINATOR);
   }
 
-  var contentBounds = this.paginator().getFinalEnabled() ? this.paginator().getRemainingBounds() : boundsWithoutSeparator;
-
-  var pageToDraw = this.paginator().getFinalEnabled() ? this.paginator().currentPage() - 1 : 0;
+  var contentBounds = paginator && paginator.getFinalEnabled() ? paginator.getRemainingBounds() : boundsWithoutSeparator;
+  var pageToDraw = paginator && paginator.getFinalEnabled() ? paginator.currentPage() - 1 : 0;
 
   contentBounds.width = Math.max(1, contentBounds.width);
   contentBounds.height = Math.max(1, contentBounds.height);
@@ -1922,7 +1692,7 @@ anychart.core.ui.Legend.prototype.draw = function() {
   this.drawLegendContent_(pageToDraw, /** @type {anychart.math.Rect} */(contentBounds.ceil()));
 
   if (this.hasInvalidationState(anychart.ConsistencyState.LEGEND_DRAG)) {
-    if (!this.dragHandler_ && this.drag_) {
+    if (!this.dragHandler_ && this.getOption('drag')) {
       this.dragHandler_ = this.rootElement.rect();
       this.dragHandler_
           .fill(anychart.color.TRANSPARENT_HANDLER)
@@ -1968,10 +1738,10 @@ anychart.core.ui.Legend.prototype.draw = function() {
     }
 
     var drag = false;
-    if (this.drag_) {
+    if (this.getOption('drag')) {
       var diff;
       drag = this.margin().tightenBounds(
-          /** @type {!anychart.math.Rect} */(this.positionMode_ == anychart.enums.LegendPositionMode.INSIDE ?
+          /** @type {!anychart.math.Rect} */(this.getOption('positionMode') == anychart.enums.LegendPositionMode.INSIDE ?
               this.parentBounds() :
               (diff = this.parentBounds().difference(this.getRemainingBounds())).length ? diff[0] : anychart.math.rect(0, 0, 0, 0)));
 
@@ -2023,9 +1793,11 @@ anychart.core.ui.Legend.prototype.drawLegendContent_ = function(pageNumber, cont
     var i;
     var items = this.distributedItems_[pageNumber];
     var item, itemBounds;
+    var itemsSpacing = /** @type {number} */(this.getOption('itemsSpacing'));
+    var itemsLayout = /** @type {anychart.enums.LegendLayout} */(this.getOption('itemsLayout'));
 
     if (items) {
-      switch (this.itemsLayout_) {
+      switch (itemsLayout) {
         case anychart.enums.LegendLayout.HORIZONTAL:
           for (i = 0; i < items.length; i++) {
             item = items[i];
@@ -2034,12 +1806,12 @@ anychart.core.ui.Legend.prototype.drawLegendContent_ = function(pageNumber, cont
             item
                 .suspendSignalsDispatching()
                 .parentBounds(contentBounds)
-                .x(x)
-                .y(y)
+                ['x'](x)
+                ['y'](y)
                 .enabled(true)
                 .resumeSignalsDispatching(false)
                 .draw();
-            x += items[i].getPixelBounds().getWidth() + this.itemsSpacing_;
+            x += items[i].getPixelBounds().getWidth() + itemsSpacing;
           }
           break;
         case anychart.enums.LegendLayout.VERTICAL:
@@ -2050,12 +1822,12 @@ anychart.core.ui.Legend.prototype.drawLegendContent_ = function(pageNumber, cont
             item
                 .suspendSignalsDispatching()
                 .parentBounds(contentBounds)
-                .x(x)
-                .y(y)
+                ['x'](x)
+                ['y'](y)
                 .enabled(true)
                 .resumeSignalsDispatching(false)
                 .draw();
-            y += items[i].getPixelBounds().getHeight() + this.itemsSpacing_;
+            y += items[i].getPixelBounds().getHeight() + itemsSpacing;
           }
           break;
         case anychart.enums.LegendLayout.HORIZONTAL_EXPANDABLE:
@@ -2074,14 +1846,14 @@ anychart.core.ui.Legend.prototype.drawLegendContent_ = function(pageNumber, cont
             item
                 .suspendSignalsDispatching()
                 .parentBounds(contentBounds)
-                .x(x)
-                .y(y)
+                ['x'](x)
+                ['y'](y)
                 .enabled(true)
                 .resumeSignalsDispatching(false)
                 .draw();
 
-            x += item.getPixelBounds().getWidth() + this.itemsSpacing_;
-            rowHeight = Math.max(rowHeight, itemBounds.getHeight() + this.itemsSpacing_);
+            x += item.getPixelBounds().getWidth() + itemsSpacing;
+            rowHeight = Math.max(rowHeight, itemBounds.getHeight() + itemsSpacing);
           }
           break;
         case anychart.enums.LegendLayout.VERTICAL_EXPANDABLE:
@@ -2099,20 +1871,21 @@ anychart.core.ui.Legend.prototype.drawLegendContent_ = function(pageNumber, cont
             item
                 .suspendSignalsDispatching()
                 .parentBounds(contentBounds)
-                .x(x)
-                .y(y)
+                ['x'](x)
+                ['y'](y)
                 .enabled(true)
                 .resumeSignalsDispatching(false)
                 .draw();
-            y += items[i].getPixelBounds().getHeight() + this.itemsSpacing_;
-            colWidth = Math.max(colWidth, itemBounds.getWidth() + this.itemsSpacing_);
+            y += items[i].getPixelBounds().getHeight() + itemsSpacing;
+            colWidth = Math.max(colWidth, itemBounds.getWidth() + itemsSpacing);
           }
           break;
       }
     }
 
-    if (this.title().enabled()) {
-      var titleOrientation = this.title().getOption('orientation') || this.title().defaultOrientation();
+    var title = this.getCreated('title');
+    if (title && title.enabled()) {
+      var titleOrientation = title.getOption('orientation') || title.defaultOrientation();
       var titleIsHorizontal = titleOrientation == 'top' || titleOrientation == 'bottom';
 
       if (!titleIsHorizontal) {
@@ -2121,15 +1894,15 @@ anychart.core.ui.Legend.prototype.drawLegendContent_ = function(pageNumber, cont
           dx = tx.getTranslateX();
           dy = tx.getTranslateY();
         }
-        var itemsContentBounds = this.itemsLayer_.getAbsoluteBounds();
+        // var itemsContentBounds = this.itemsLayer_.getAbsoluteBounds();
         var titleBounds = this.title_.getContentBounds();
         titleBounds.top += dy;
         titleBounds.left += dx;
 
-        var topTranslate = titleBounds.top + titleBounds.height / 2 - (itemsContentBounds.top + itemsContentBounds.height / 2);
-        topTranslate = Math.min(this.contentAreaBounds_.height - itemsContentBounds.height, Math.max(topTranslate, 0));
-
-        this.itemsLayer_.setTransformationMatrix(1, 0, 0, 1, 0, topTranslate);
+        // var topTranslate = titleBounds.top + titleBounds.height / 2 - (itemsContentBounds.top + itemsContentBounds.height / 2);
+        // topTranslate = Math.min(this.contentAreaBounds_.height - itemsContentBounds.height, Math.max(topTranslate, 0));
+        //
+        // // this.itemsLayer_.setTransformationMatrix(1, 0, 0, 1, 0, topTranslate);
       }
     }
   }
@@ -2171,66 +1944,47 @@ anychart.core.ui.Legend.prototype.makeBrowserEvent = function(e) {
  * @param {anychart.core.MouseEvent} event .
  * @private
  */
-anychart.core.ui.Legend.prototype.handleMouseOver_ = function(event) {
+anychart.core.ui.Legend.prototype.handleAll_ = function(event) {
   var evt = this.makePointEvent_(event);
   if (evt && this.dispatchEvent(evt)) {
-    var item = this.items_ && this.items_[evt['itemIndex']];
-    var source = /** @type {anychart.core.SeparateChart|anychart.stockModule.Plot} */(evt['itemSource']);
-    if (item) {
-      if (source && goog.isFunction(source.legendItemOver)) {
-        source.legendItemOver(item, event);
-      }
-      item.applyHover(true);
-      if (event) this.showTooltip(event);
+    var item, source;
+    switch (evt.type) {
+      case anychart.enums.EventType.LEGEND_ITEM_MOUSE_OVER:
+        item = this.items_ && this.items_[evt['itemIndex']];
+        source = /** @type {anychart.core.SeparateChart|anychart.stockModule.Plot} */(evt['itemSource']);
+        if (item) {
+          if (source && goog.isFunction(source.legendItemOver)) {
+            source.legendItemOver(item, event);
+          }
+          item.applyHover(true);
+          if (event) this.showTooltip(event);
+        }
+        break;
+
+      case anychart.enums.EventType.LEGEND_ITEM_MOUSE_MOVE:
+        if (event) this.showTooltip(event);
+        break;
+
+      case anychart.enums.EventType.LEGEND_ITEM_MOUSE_OUT:
+        item = this.items_ && this.items_[evt['itemIndex']];
+        source = /** @type {anychart.core.SeparateChart|anychart.stockModule.Plot} */(evt['itemSource']);
+        if (item) {
+          if (source && goog.isFunction(source.legendItemOut)) {
+            source.legendItemOut(item, event);
+          }
+          item.applyHover(false);
+          this.hideTooltip();
+        }
+        break;
+
+      case anychart.enums.EventType.LEGEND_ITEM_CLICK:
+        if (event['button'] != acgraph.events.BrowserEvent.MouseButton.LEFT) return;
+        item = this.items_ && this.items_[evt['itemIndex']];
+        source = /** @type {anychart.core.SeparateChart|anychart.stockModule.Plot} */(evt['itemSource']);
+        if (item && source && goog.isFunction(source.legendItemClick))
+          source.legendItemClick.call(source, item, event);
+        break;
     }
-  }
-};
-
-
-/**
- * @param {anychart.core.MouseEvent} event .
- * @private
- */
-anychart.core.ui.Legend.prototype.handleMouseMove_ = function(event) {
-  var evt = this.makePointEvent_(event);
-  if (evt && this.dispatchEvent(evt)) {
-    if (event) this.showTooltip(event);
-  }
-};
-
-
-/**
- * @param {anychart.core.MouseEvent} event .
- * @private
- */
-anychart.core.ui.Legend.prototype.handleMouseOut_ = function(event) {
-  var evt = this.makePointEvent_(event);
-  if (evt && this.dispatchEvent(evt)) {
-    var item = this.items_ && this.items_[evt['itemIndex']];
-    var source = /** @type {anychart.core.SeparateChart|anychart.stockModule.Plot} */(evt['itemSource']);
-    if (item) {
-      if (source && goog.isFunction(source.legendItemOut)) {
-        source.legendItemOut(item, event);
-      }
-      item.applyHover(false);
-      this.hideTooltip();
-    }
-  }
-};
-
-
-/**
- * @param {anychart.core.MouseEvent} event .
- * @private
- */
-anychart.core.ui.Legend.prototype.handleMouseClick_ = function(event) {
-  if (event['button'] != acgraph.events.BrowserEvent.MouseButton.LEFT) return;
-  var evt = this.makePointEvent_(event);
-  if (evt && this.dispatchEvent(evt)) {
-    var item = this.items_ && this.items_[evt['itemIndex']];
-    var source = /** @type {anychart.core.SeparateChart|anychart.stockModule.Plot} */(evt['itemSource']);
-    if (item && source && goog.isFunction(source.legendItemClick))
-      source.legendItemClick.call(source, item, event);
   }
 };
 
@@ -2282,7 +2036,7 @@ anychart.core.ui.Legend.prototype.makePointEvent_ = function(event) {
       return null;
   }
 
-  itemIndex = this.inverted_ ? this.items_.length - 1 - itemIndex : itemIndex;
+  itemIndex = /** @type {boolean} */(this.getOption('inverted')) ? this.items_.length - 1 - itemIndex : itemIndex;
 
   var itemSource = null;
   var itemIndexInSource = NaN;
@@ -2292,7 +2046,7 @@ anychart.core.ui.Legend.prototype.makePointEvent_ = function(event) {
       var source = /** @type {anychart.core.SeparateChart|anychart.stockModule.Plot} */ (this.itemsSourceInternal[i]);
       if (goog.getUid(source) == item.sourceUid() &&
           goog.isFunction(source.legendItemCanInteractInMode) &&
-          source.legendItemCanInteractInMode(this.itemsSourceMode_)) {
+          source.legendItemCanInteractInMode(/** @type {anychart.enums.LegendItemsSourceMode} */(this.getOption('itemsSourceMode')))) {
         itemSource = source;
         itemIndexInSource = item.sourceKey();
         break;
@@ -2316,33 +2070,17 @@ anychart.core.ui.Legend.prototype.makePointEvent_ = function(event) {
 /** @inheritDoc */
 anychart.core.ui.Legend.prototype.serialize = function() {
   var json = anychart.core.ui.Legend.base(this, 'serialize');
+
+  anychart.core.settings.serialize(this, anychart.core.ui.Legend.PROPERTY_DESCRIPTORS, json);
   json['margin'] = this.margin().serialize();
   json['padding'] = this.padding().serialize();
   json['background'] = this.background().serialize();
   json['title'] = this.title().serialize();
-  json['titleFormat'] = this.titleFormat();
   json['titleSeparator'] = this.titleSeparator().serialize();
   json['paginator'] = this.paginator().serialize();
   json['tooltip'] = this.tooltip().serialize();
-  json['itemsLayout'] = this.itemsLayout();
-  json['itemsSpacing'] = this.itemsSpacing();
-  json['itemsSourceMode'] = this.itemsSourceMode();
-  if (goog.isString(this.itemsFormat()))
-    json['itemsFormat'] = this.itemsFormat();
-  json['inverted'] = this.inverted();
   if (goog.isDef(this.items()))
     json['items'] = this.items();
-  json['iconTextSpacing'] = this.iconTextSpacing();
-  json['iconSize'] = this.iconSize();
-  json['width'] = this.width();
-  json['height'] = this.height();
-  json['maxWidth'] = this.maxWidth();
-  json['maxHeight'] = this.maxHeight();
-  json['position'] = this.position();
-  json['positionMode'] = this.positionMode();
-  json['align'] = this.align();
-  json['hoverCursor'] = this.hoverCursor();
-  json['drag'] = this.drag();
   return json;
 };
 
@@ -2351,42 +2089,30 @@ anychart.core.ui.Legend.prototype.serialize = function() {
 anychart.core.ui.Legend.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.ui.Legend.base(this, 'setupByJSON', config, opt_default);
 
-  if ('title' in config)
-    this.title(config['title']);
-
-  if ('background' in config)
-    this.background(config['background']);
+  anychart.core.settings.deserialize(this, anychart.core.ui.Legend.PROPERTY_DESCRIPTORS, config, opt_default);
 
   if ('padding' in config)
-    this.padding(config['padding']);
+    this.padding().setupInternal(!!opt_default, config['padding']);
 
   if ('margin' in config)
-    this.margin(config['margin']);
+    this.margin().setupInternal(!!opt_default, config['margin']);
 
-  this.titleFormat(config['titleFormat']);
-  this.titleSeparator(config['titleSeparator']);
-  this.paginator(config['paginator']);
+  if ('title' in config)
+    this.title().setupInternal(!!opt_default, config['title']);
+
+  if ('background' in config)
+    this.background().setupInternal(!!opt_default, config['background']);
+
+  if ('titleSeparator' in config)
+    this.titleSeparator().setupInternal(!!opt_default, config['titleSeparator']);
+
+  if ('paginator' in config)
+    this.paginator().setupInternal(!!opt_default, config['paginator']);
 
   this.tooltip().setupInternal(!!opt_default, config['tooltip']);
 
-  this.itemsLayout(config['itemsLayout']);
-  this.itemsSpacing(config['itemsSpacing']);
-  this.inverted(config['inverted']);
-  this.itemsSourceMode(config['itemsSourceMode']);
   this.items(config['items']);
-  this.itemsFormat(config['itemsFormat']);
   this.itemsFormatter(config['itemsFormatter']);
-  this.iconTextSpacing(config['iconTextSpacing']);
-  this.iconSize(config['iconSize']);
-  this.width(config['width']);
-  this.height(config['height']);
-  this.maxWidth(config['maxWidth']);
-  this.maxHeight(config['maxHeight']);
-  this.position(config['position']);
-  this.positionMode(config['positionMode']);
-  this.align(config['align']);
-  this.hoverCursor(config['hoverCursor']);
-  this.drag(config['drag']);
 };
 
 
@@ -2394,13 +2120,41 @@ anychart.core.ui.Legend.prototype.setupByJSON = function(config, opt_default) {
 anychart.core.ui.Legend.prototype.disposeInternal = function() {
   anychart.core.ui.Legend.base(this, 'disposeInternal');
 
-  goog.disposeAll(this.dragHandler_, this.tooltip_, this.paginator_, this.itemsPool_, this.items_);
+  if (this.measurementG_) {
+    goog.dom.removeChildren(this.measurementG_);
+    goog.dom.removeNode(this.measurementG_);
+  }
+
+  goog.disposeAll(
+      this.dragHandler_,
+      this.tooltip_,
+      this.paginator_,
+      this.itemsPool_,
+      this.items_,
+      this.itemsLayer_,
+      this.margin_,
+      this.padding_,
+      this.background_,
+      this.title_,
+      this.titleSeparator_,
+      this.tooltip_,
+      this.rootElement,
+      this.measurementG_
+  );
 
   this.dragHandler_ = null;
   this.itemsPool_ = null;
   this.items_ = null;
-  this.tooltip_ = null;
+  this.margin_ = null;
+  this.padding_ = null;
   this.paginator_ = null;
+  this.itemsLayer_ = null;
+  this.background_ = null;
+  this.title_ = null;
+  this.titleSeparator_ = null;
+  this.tooltip_ = null;
+  this.rootElement = null;
+  this.measurementG_ = null;
 };
 
 
@@ -2429,13 +2183,12 @@ anychart.core.makeStandalone(anychart.standalones.Legend, anychart.core.ui.Legen
  * @return {boolean} Is one of the bounds settings set in percent.
  */
 anychart.standalones.Legend.prototype.dependsOnContainerSize = function() {
-  //TODO(AntonKagakin): should be reworked to getOption
-  var width = this.width();
-  var height = this.height();
+  var width = this.getOption('width');
+  var height = this.getOption('height');
   return anychart.utils.isPercent(width) || anychart.utils.isPercent(height) || goog.isNull(width) || goog.isNull(height);
 };
 
- 
+
 //endregion
 /**
  * Removes signal listeners.
@@ -2477,9 +2230,10 @@ anychart.standalones.Legend.prototype.onStockPlotSignal_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEED_UPDATE_LEGEND)) {
     this.suspendSignalsDispatching();
     var plot = /** @type {anychart.stockModule.Plot} */ (event.target);
-    var autoText = plot.getLegendAutoText(/** @type {string|Function} */ (this.titleFormat()));
-    if (!goog.isNull(autoText))
-      this.title().autoText(autoText);
+    var autoText = plot.getLegendAutoText(/** @type {string|Function} */ (this.getOption('titleFormat')));
+    var title = this.getCreated('title');
+    if (title && !goog.isNull(autoText))
+      title.autoText(autoText);
     this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.LEGEND_RECREATE_ITEMS);
     if (this.container())
       this.draw();
@@ -2527,34 +2281,36 @@ anychart.standalones.legend = function() {
 //exports
 (function() {
   var proto = anychart.core.ui.Legend.prototype;
-  proto['itemsLayout'] = proto.itemsLayout;
-  proto['itemsSpacing'] = proto.itemsSpacing;
   proto['items'] = proto.items;
   proto['itemsFormatter'] = proto.itemsFormatter;
-  proto['itemsFormat'] = proto.itemsFormat;
-  proto['itemsSourceMode'] = proto.itemsSourceMode;
-  proto['inverted'] = proto.inverted;
-  proto['hoverCursor'] = proto.hoverCursor;
-  proto['iconTextSpacing'] = proto.iconTextSpacing;
-  proto['iconSize'] = proto.iconSize;
   proto['margin'] = proto.margin;
   proto['padding'] = proto.padding;
   proto['background'] = proto.background;
   proto['title'] = proto.title;
-  proto['titleFormat'] = proto.titleFormat;
   proto['titleSeparator'] = proto.titleSeparator;
   proto['paginator'] = proto.paginator;
   proto['tooltip'] = proto.tooltip;
-  proto['width'] = proto.width;
-  proto['height'] = proto.height;
-  proto['maxWidth'] = proto.maxWidth;
-  proto['maxHeight'] = proto.maxHeight;
-  proto['position'] = proto.position;
-  proto['positionMode'] = proto.positionMode;
-  proto['align'] = proto.align;
-  proto['drag'] = proto.drag;
   proto['getRemainingBounds'] = proto.getRemainingBounds;
   proto['getPixelBounds'] = proto.getPixelBounds;
+
+  // auto generated
+  // proto['inverted'] = proto.inverted;
+  // proto['itemsLayout'] = proto.itemsLayout;
+  // proto['iconSize'] = proto.iconSize;
+  // proto['width'] = proto.width;
+  // proto['height'] = proto.height;
+  // proto['maxWidth'] = proto.maxWidth;
+  // proto['maxHeight'] = proto.maxHeight;
+  // proto['align'] = proto.align;
+  // proto['drag'] = proto.drag;
+  // proto['itemsFormat'] = proto.itemsFormat;
+  // proto['titleFormat'] = proto.titleFormat;
+  // proto['itemsSpacing'] = proto.itemsSpacing;
+  // proto['itemsSourceMode'] = proto.itemsSourceMode;
+  // proto['hoverCursor'] = proto.hoverCursor;
+  // proto['iconTextSpacing'] = proto.iconTextSpacing;
+  // proto['position'] = proto.position;
+  // proto['positionMode'] = proto.positionMode;
 
   proto = anychart.standalones.Legend.prototype;
   goog.exportSymbol('anychart.standalones.legend', anychart.standalones.legend);

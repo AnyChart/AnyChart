@@ -733,6 +733,8 @@ anychart.ganttModule.DataGrid.prototype.boundsInvalidated = function() {
   for (var i = 0, l = this.columns_.length; i < l; i++) {
     var col = this.columns_[i];
     if (col && col.enabled()) {
+      if (anychart.utils.isPercent(col.width()))
+        col.resetBounds();
       var colWidth = col.calculateBounds().width; //We need pixel value here.
       totalWidth += (colWidth + splitterWidth);
     }

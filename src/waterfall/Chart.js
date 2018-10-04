@@ -19,6 +19,8 @@ goog.require('anychart.waterfallModule.Series');
 anychart.waterfallModule.Chart = function() {
   anychart.waterfallModule.Chart.base(this, 'constructor');
 
+  this.addThemes('waterfall');
+
   this.setType(anychart.enums.ChartTypes.WATERFALL);
 
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
@@ -411,7 +413,7 @@ anychart.waterfallModule.Chart.prototype.doHoverOnPoints = function(sourceKey) {
 
 /** @inheritDoc */
 anychart.waterfallModule.Chart.prototype.legendItemOver = function(item, event) {
-  var sourceMode = this.legend().itemsSourceMode();
+  var sourceMode = /** @type {anychart.enums.LegendItemsSourceMode} */(this.legend().getOption('itemsSourceMode'));
   if (sourceMode == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
     this.doHoverOnPoints(/** @type {number} */ (item.sourceKey()));
   } else {
@@ -422,7 +424,7 @@ anychart.waterfallModule.Chart.prototype.legendItemOver = function(item, event) 
 
 /** @inheritDoc */
 anychart.waterfallModule.Chart.prototype.legendItemOut = function(item, event) {
-  var sourceMode = this.legend().itemsSourceMode();
+  var sourceMode = /** @type {anychart.enums.LegendItemsSourceMode} */(this.legend().getOption('itemsSourceMode'));
   if (sourceMode == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
     this.unhover();
   } else {
@@ -433,7 +435,7 @@ anychart.waterfallModule.Chart.prototype.legendItemOut = function(item, event) {
 
 /** @inheritDoc */
 anychart.waterfallModule.Chart.prototype.legendItemClick = function(item, event) {
-  var sourceMode = this.legend().itemsSourceMode();
+  var sourceMode = /** @type {anychart.enums.LegendItemsSourceMode} */(this.legend().getOption('itemsSourceMode'));
   if (sourceMode == anychart.enums.LegendItemsSourceMode.DEFAULT) {
     return anychart.waterfallModule.Chart.base(this, 'legendItemClick', item, event);
   }

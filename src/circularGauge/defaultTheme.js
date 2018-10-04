@@ -12,11 +12,13 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       'startAngle': null,
       'labels': {
         'position': 'inside',
-        'adjustFontSize': true
+        'adjustFontSize': true,
+        'offsetY': 0
       },
       'minorLabels': {
         'position': 'inside',
-        'adjustFontSize': true
+        'adjustFontSize': true,
+        'offsetY': 0
       },
       'fill': anychart.core.defaultTheme.colorStrokeNormal,
       'ticks': {
@@ -47,7 +49,31 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'axisIndex': 0
       },
       'bar': {
-        'position': 'center'
+        'position': 'center',
+        /**
+         * @this {anychart.circularGaugeModule.pointers.Bar.BarDrawerContext}
+         * @param {anychart.circularGaugeModule.pointers.Bar.BarDrawerContext} ctx Drawer context
+         */
+        'barDrawer': function(ctx) {
+          this['path']['clear']();
+          this['path']['circularArc'](
+              this['centerX'],
+              this['centerY'],
+              this['radius'] - this['width'] / 2,
+              this['radius'] - this['width'] / 2,
+              this['startAngle'],
+              this['sweepAngle']);
+
+          this['path']['circularArc'](
+              this['centerX'],
+              this['centerY'],
+              this['radius'] + this['width'] / 2,
+              this['radius'] + this['width'] / 2,
+              this['startAngle'] + this['sweepAngle'],
+              -this['sweepAngle'], true);
+
+          this['path']['close']();
+        }
       },
       'marker': {
         'size': 4,

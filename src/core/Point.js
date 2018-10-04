@@ -144,11 +144,20 @@ anychart.core.Point.prototype.statistics = function(opt_name, opt_value) {
 
 
 /**
+ * Ensures that statistics is ready.
+ */
+anychart.core.Point.prototype.ensureStatisticsReady = function() {
+  this.chart.ensureStatisticsReady();
+};
+
+
+/**
  * Gets statistics value by key.
  * @param {string} key - Key.
  * @return {*} - Statistics value.
  */
 anychart.core.Point.prototype.getStat = function(key) {
+  this.ensureStatisticsReady();
   var stat = this.statistics(key);
   return goog.isDef(stat) ? stat : this.get(key);
 };

@@ -1867,6 +1867,25 @@ anychart.stockModule.Plot.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.STOCK_PLOT_PALETTE);
   }
 
+  if (this.hasInvalidationState(anychart.ConsistencyState.STOCK_PLOT_AXES)) {
+    for (i = 0; i < this.yAxes_.length; i++) {
+      axis = this.yAxes_[i];
+      if (axis) {
+        axis.suspendSignalsDispatching();
+        if (!axis.scale()) axis.scale(/** @type {anychart.scales.ScatterBase} */(this.yScale()));
+        axis.resumeSignalsDispatching(false);
+      }
+    }
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.STOCK_PLOT_DT_AXIS)) {
+    if (this.xAxis_) {
+      this.xAxis_.suspendSignalsDispatching();
+      this.xAxis_.scale(/** @type {anychart.stockModule.scales.Scatter} */(this.chart_.xScale()));
+      this.xAxis_.resumeSignalsDispatching(false);
+    }
+  }
+
   this.ensureBoundsDistributed_();
 
   if (this.hasInvalidationState(anychart.ConsistencyState.STOCK_PLOT_AXES)) {
@@ -1874,7 +1893,6 @@ anychart.stockModule.Plot.prototype.draw = function() {
       axis = this.yAxes_[i];
       if (axis) {
         axis.suspendSignalsDispatching();
-        if (!axis.scale()) axis.scale(/** @type {anychart.scales.ScatterBase} */(this.yScale()));
         axis.labels().dropCallsCache();
         axis.minorLabels().dropCallsCache();
         axis.container(this.rootLayer_);
@@ -1888,7 +1906,6 @@ anychart.stockModule.Plot.prototype.draw = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.STOCK_PLOT_DT_AXIS)) {
     if (this.xAxis_) {
       this.xAxis_.suspendSignalsDispatching();
-      this.xAxis_.scale(/** @type {anychart.stockModule.scales.Scatter} */(this.chart_.xScale()));
       this.xAxis_.container(this.rootLayer_);
       this.xAxis_.draw();
       this.xAxis_.resumeSignalsDispatching(false);
@@ -2125,7 +2142,7 @@ anychart.stockModule.Plot.prototype.ensureBoundsDistributed_ = function() {
     }
 
     var legend = /** @type {anychart.core.ui.Legend} */(this.legend());
-    if (legend.positionMode() == anychart.enums.LegendPositionMode.OUTSIDE) {
+    if (legend.getOption('positionMode') == anychart.enums.LegendPositionMode.OUTSIDE) {
       this.updateLegend_(seriesBounds, legendTitleDate);
       // we need forced dispatch signal here to update standalone legend on series enable/disable
       // we do not worry about it because only standalone legend listens this signal
@@ -2145,21 +2162,40 @@ anychart.stockModule.Plot.prototype.ensureBoundsDistributed_ = function() {
 
     var leftPadding = 0;
     var rightPadding = 0;
+    var legendNotEnabled = !legend.getOption('enabled');
+    var leftSide = legend.getOption('position') == anychart.enums.Orientation.LEFT;
+    var rightSide = legend.getOption('position') == anychart.enums.Orientation.RIGHT;
     for (i = 0; i < this.yAxes_.length; i++) {
       var axis = this.yAxes_[i];
       if (axis) {
         axis.suspendSignalsDispatching();
         var width = axis.width();
-        if (axis.orientation() == anychart.enums.Orientation.LEFT) {
-          axis.parentBounds(/** @type {number} */(seriesBounds.left - width - leftPadding),
-              seriesBounds.top, 0, seriesBounds.height);
-          leftPadding += width;
-        } else if (axis.orientation() == anychart.enums.Orientation.RIGHT) {
-          rightPadding += width;
-          axis.parentBounds(seriesBounds.left, seriesBounds.top, /** @type {number} */(seriesBounds.width + rightPadding), seriesBounds.height);
+        if (axis.getOption('orientation') == anychart.enums.Orientation.LEFT) {
+          if (legendNotEnabled || !leftSide) {
+            axis.parentBounds(/** @type {number} */(seriesBounds.left - width - leftPadding), seriesBounds.top, 0, seriesBounds.height);
+            leftPadding += width;
+          } else {
+            axis.parentBounds(seriesBounds);
+            seriesBounds = axis.getRemainingBounds();
+          }
+        } else if (axis.getOption('orientation') == anychart.enums.Orientation.RIGHT) {
+          if (legendNotEnabled || !rightSide) {
+            rightPadding += width;
+            axis.parentBounds(seriesBounds.left, seriesBounds.top, /** @type {number} */(seriesBounds.width + rightPadding), seriesBounds.height);
+          } else {
+            axis.parentBounds(seriesBounds);
+            seriesBounds = axis.getRemainingBounds();
+          }
         }
         axis.resumeSignalsDispatching(false);
       }
+    }
+
+    if (seriesBounds.width < 0) {
+      seriesBounds.width = 1;
+    }
+    if (seriesBounds.height < 0) {
+      seriesBounds.height = 1;
     }
 
     if (this.xAxis_ && this.xAxis_.enabled()) {
@@ -2171,7 +2207,7 @@ anychart.stockModule.Plot.prototype.ensureBoundsDistributed_ = function() {
       seriesBounds = this.xAxis_.getRemainingBounds();
     }
 
-    if (legend.positionMode() == anychart.enums.LegendPositionMode.INSIDE) {
+    if (legend.getOption('positionMode') == anychart.enums.LegendPositionMode.INSIDE) {
       this.updateLegend_(seriesBounds, legendTitleDate);
       // we need forced dispatch signal here to update standalone legend on series enable/disable
       // we do not worry about it because only standalone legend listens this signal
@@ -2242,7 +2278,7 @@ anychart.stockModule.Plot.prototype.updateLegend_ = function(opt_seriesBounds, o
   if (opt_seriesBounds) {
     legend.parentBounds(opt_seriesBounds);
   }
-  var autoText = this.getLegendAutoText(/** @type {string|Function} */ (legend.titleFormat()), opt_titleValue, opt_rawValue);
+  var autoText = this.getLegendAutoText(/** @type {string|Function} */ (legend.getOption('titleFormat')), opt_titleValue, opt_rawValue);
   if (!goog.isNull(autoText))
     legend.title().autoText(autoText);
   if (!legend.itemsSource())
@@ -3098,7 +3134,7 @@ anychart.stockModule.Plot.prototype.serializeGrids_ = function(propName, list, j
           if (!('layout' in config)) {
             isHorizontal = false;
             if (anychart.utils.instanceOf(axis, anychart.core.Axis)) {
-              axisOrientation = axis.orientation();
+              axisOrientation = axis.getOption('orientation');
               isHorizontal = (axisOrientation == anychart.enums.Orientation.LEFT || axisOrientation == anychart.enums.Orientation.RIGHT);
             }
             config['layout'] = isHorizontal ? anychart.enums.Layout.HORIZONTAL : anychart.enums.Layout.VERTICAL;

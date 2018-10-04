@@ -585,13 +585,24 @@ anychart.stockModule.Series.prototype.createTooltipContextProvider = function() 
 
 /**
  * Creates context provider for legend items text formatter function.
+ * @param {(Array.<Object.<string, anychart.core.BaseContext.TypedValue>>)=} opt_addValues - Values to add.
  * @return {Object} Legend context provider.
  * @protected
  */
-anychart.stockModule.Series.prototype.createLegendContextProvider = function() {
+anychart.stockModule.Series.prototype.createLegendContextProvider = function(opt_addValues) {
   if (!this.legendProvider)
     this.legendProvider = new anychart.format.Context();
-  return this.updateContext(this.legendProvider, this.getCurrentPoint());
+  this.legendProvider = this.updateContext(this.legendProvider, this.getCurrentPoint());
+
+  if (opt_addValues) {
+    var values = this.legendProvider.contextValues();
+    for (var i = 0; i < opt_addValues.length; i++) {
+      goog.mixin(values, opt_addValues[i]);
+    }
+    this.legendProvider.propagate();
+  }
+
+  return this.legendProvider;
 };
 
 

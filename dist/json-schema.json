@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema",
-  "description": "AnyChart JSON Schema, version 8.3.0",
+  "description": "AnyChart JSON Schema, version 8.4.0",
   "$ref": "#/definitions/anychart",
   "definitions": {
     "anychart": {
@@ -70,6 +70,9 @@
             },
             {
               "$ref": "#/definitions/anychart.charts.Sunburst"
+            },
+            {
+              "$ref": "#/definitions/anychart.charts.Sankey"
             }
           ],
           "properties": {
@@ -1463,6 +1466,41 @@
         "center": {"$ref": "#/definitions/anychart.pieModule.Center"}
       },
       "required": ["type"]
+    },
+    "anychart.charts.Sankey": {
+      "type": "object",
+      "required": ["type"],
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.Chart"}
+      ],
+      "properties": {
+        "type": {"enum": ["sankey"]},
+        "nodeWidth": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "nodePadding": {
+          "type": "number"
+        },
+        "curveFactor": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "data": {"$ref": "#/definitions/data"},
+        "tooltip": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.Tooltip"}
+          ]
+        },
+        "palette": {"$ref": "#/definitions/palette"},
+        "node": {"$ref": "#/definitions/SankeyVisualElement"},
+        "flow": {"$ref": "#/definitions/SankeyVisualElement"},
+        "dropoff": {"$ref": "#/definitions/SankeyVisualElement"}
+      }
     },
     "anychart.charts.Bullet": {
       "type": "object",
@@ -4546,7 +4584,32 @@
         "softMinimum": {"type": "number"},
         "softMaximum": {"type": "number"},
         "minimumGap": {"type": "number"},
-        "maximumGap": {"type": "number"}
+        "maximumGap": {"type": "number"},
+        "zoomLevels": {"$ref": "#/definitions/anychart.ganttModule.Scale.ZoomLevelsSettings"}
+      }
+    },
+    "anychart.ganttModule.Scale.ZoomLevelsSettings": {
+      "type": "array",
+      "items": {
+        "type": "array",
+         "items": {
+           "anyOf": [
+             {
+               "$ref": "#/definitions/anychart.enums.Interval"
+             },
+             {
+               "type": "object",
+               "properties": {
+                 "unit": {
+                   "$ref": "#/definitions/anychart.enums.Interval"
+                 },
+                 "count": {
+                   "type": "number"
+                 }
+               }
+             }
+           ]
+         }
       }
     },
     "anychart.scales.Geo": {
@@ -4879,7 +4942,8 @@
             "string"
           ]
         },
-        "itemsFormat": {"type": "string"},
+        "itemsFormat": {"type": ["string", "null"]},
+        "titleFormat": {"type": ["string", "null"]},
         "itemsSourceMode": {"$ref": "#/definitions/anychart.enums.LegendItemsSourceMode"},
         "hoverCursor": {"$ref": "#/definitions/anychart.enums.Cursor"},
         "inverted": {
@@ -5276,7 +5340,12 @@
       "properties": {
         "labels": {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"},
         "title": {"$ref": "#/definitions/anychart.core.ui.Title"},
-        "width": {"type": "number"},
+        "width": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
         "buttonCursor": {"type": "string"},
         "defaultWidth": {"type": "number"},
         "collapseExpandButtons": {"type": "boolean"},
@@ -5868,6 +5937,21 @@
     "anychart.enums.ScaleRangeMode": {
       "enum": ["none", "consider"]
     },
+    "anychart.enums.Interval": {
+      "enum": [
+        "year",
+        "semester",
+        "quarter",
+        "month",
+        "third-of-month",
+        "week",
+        "day",
+        "hour",
+        "minute",
+        "second",
+        "millisecond"
+      ]
+    },
 
     "acgraph.vector.HatchFill.HatchFillType": {
       "enum": [
@@ -6446,6 +6530,14 @@
         "height": {"type": "boolean"}
       },
       "items": {"type": "boolean"}
+    },
+
+    "SankeyVisualElement": {
+      "type": "object",
+      "properties": {
+        "normal": {"$ref": "#/definitions/anychart.core.StateSettings"},
+        "hovered": {"$ref": "#/definitions/anychart.core.StateSettings"}
+      }
     },
 
     "data": {

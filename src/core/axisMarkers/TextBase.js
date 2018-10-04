@@ -81,6 +81,8 @@ anychart.core.axisMarkers.TextBase = function() {
    */
   this.contBounds_ = null;
 
+  this.bindHandlersToComponent(this);
+
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['align', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
     ['scaleRangeMode', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_RECALCULATION]
@@ -88,6 +90,59 @@ anychart.core.axisMarkers.TextBase = function() {
 
 };
 goog.inherits(anychart.core.axisMarkers.TextBase, anychart.core.ui.LabelBase);
+
+
+//endregion
+//region -- Events
+/** @inheritDoc */
+anychart.core.axisMarkers.TextBase.prototype.handleMouseEvent = function(event) {
+  var evt = this.createAxisMarkerEvent_(event);
+  if (evt) {
+    this.dispatchEvent(evt);
+  }
+};
+
+
+/**
+ * @param {anychart.core.MouseEvent} event
+ * @return {Object}
+ * @private
+ */
+anychart.core.axisMarkers.TextBase.prototype.createAxisMarkerEvent_ = function(event) {
+  var type = event['type'];
+  switch (type) {
+    case acgraph.events.EventType.MOUSEOUT:
+      type = anychart.enums.EventType.AXIS_MARKER_OUT;
+      break;
+    case acgraph.events.EventType.MOUSEOVER:
+      type = anychart.enums.EventType.AXIS_MARKER_OVER;
+      break;
+    case acgraph.events.EventType.MOUSEMOVE:
+      type = anychart.enums.EventType.AXIS_MARKER_MOVE;
+      break;
+    default:
+      return null;
+  }
+  return {
+    'type': type,
+    'target': this,
+    'originalEvent': event,
+    'rawValue': this.valueInternal(),
+    'formattedValue': this.getFormattedValue(),
+    'offsetX': event.offsetX,
+    'offsetY': event.offsetY
+  };
+};
+
+
+/**
+ * Retruns formatted value to use with createAxisMarkerEvent_
+ * @return {string}
+ * @protected
+ */
+anychart.core.axisMarkers.TextBase.prototype.getFormattedValue = function() {
+  return 'Value: ' + this.valueInternal();
+};
 
 
 //endregion
@@ -319,7 +374,7 @@ anychart.core.axisMarkers.TextBase.prototype.layout = function(opt_value) {
   } else if (this.layout_) {
     return this.layout_;
   } else if (this.axis_) {
-    var axisOrientation = this.axis_.orientation();
+    var axisOrientation = this.axis_.getOption('orientation');
     var isHorizontal = (axisOrientation == anychart.enums.Orientation.LEFT || axisOrientation == anychart.enums.Orientation.RIGHT);
     return isHorizontal ? anychart.enums.Layout.HORIZONTAL : anychart.enums.Layout.VERTICAL;
   } else {
@@ -356,7 +411,7 @@ anychart.core.axisMarkers.TextBase.prototype.isHorizontal = function() {
  * @private
  */
 anychart.core.axisMarkers.TextBase.prototype.isReady_ = function() {
-  return Boolean(goog.isDefAndNotNull(this.val) && this.scaleInternal());
+  return Boolean(goog.isDefAndNotNull(this.valueInternal()) && this.scaleInternal());
 };
 
 
@@ -368,7 +423,7 @@ anychart.core.axisMarkers.TextBase.prototype.checkDrawingNeeded = function() {
   if (!draw)
     return draw;
 
-  var ratio = this.scale().transform(this.val, 0.5);
+  var ratio = this.scale().transform(this.valueInternal(), 0.5);
   if (ratio >= 0 && ratio <= 1) {
     this.invalidate(anychart.ConsistencyState.CONTAINER | anychart.ConsistencyState.BOUNDS);
     return true;
@@ -461,7 +516,7 @@ anychart.core.axisMarkers.TextBase.prototype.parentBounds = function(opt_boundsO
     if (this.isReady_() && this.contBounds_) {
       //TODO (A.Kudryavtsev): Cache cloning result.
       var clone = this.contBounds_.clone();
-      var ratio = this.scale().transform(this.val, 0.5);
+      var ratio = this.scale().transform(this.valueInternal(), 0.5);
       if (this.isHorizontal()) {
         clone.height = 0;
         clone.top = Math.round(this.contBounds_.top + this.contBounds_.height - ratio * this.contBounds_.height);
@@ -486,13 +541,12 @@ anychart.core.axisMarkers.TextBase.prototype.parentBounds = function(opt_boundsO
  */
 anychart.core.axisMarkers.TextBase.prototype.valueInternal = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.val !== opt_value) {
-      this.val = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, this.getValueChangeSignals());
+    if (this.getOption('value') !== opt_value) {
+      this['value'](opt_value);
     }
     return this;
   }
-  return this.val;
+  return this.getOption('value');
 };
 
 

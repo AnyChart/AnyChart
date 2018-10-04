@@ -15,6 +15,8 @@ goog.require('anychart.utils');
 anychart.bulletModule.Marker = function() {
   anychart.bulletModule.Marker.base(this, 'constructor');
 
+  this.addThemes('defaultRangeMarkerSettings');
+
   /**
    * Gap for bullet marker.
    * @type {number|string|null}
@@ -22,67 +24,33 @@ anychart.bulletModule.Marker = function() {
    */
   this.gap_ = null;
 
-  /**
-   * Value for bullet marker.
-   * @type {number}
-   * @private
-   */
-  this.value_ = NaN;
-
-  /**
-   * Layout of marker.
-   * @type {anychart.enums.Layout}
-   * @private
-   */
-  this.layout_;
-
-  /**
-   * @type {anychart.enums.Layout}
-   * @private
-   */
-  this.defaultLayout_;
-
-  /**
-   * Type for bullet marker.
-   * @type {anychart.enums.BulletMarkerType}
-   * @private
-   */
-  this.type_;
-
-  /**
-   * @type {anychart.enums.BulletMarkerType}
-   * @private
-   */
-  this.defaultType_;
-
-  /**
-   * Fill of bullet marker.
-   * @type {acgraph.vector.Fill}
-   * @private
-   */
-  this.fill_;
-
-
-  /**
-   * @type {acgraph.vector.Fill}
-   * @private
-   */
-  this.defaultFill_ = 'black';
-
-  /**
-   * Stroke of bullet marker.
-   * @type {acgraph.vector.Stroke}
-   * @private
-   */
-  this.stroke_;
-
-  /**
-   * @type {acgraph.vector.Stroke}
-   * @private
-   */
-  this.defaultStroke_ = 'black';
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['type', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['value', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['layout', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['fill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['stroke', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW]
+  ]);
 };
 goog.inherits(anychart.bulletModule.Marker, anychart.core.VisualBase);
+
+
+/**
+ * @type {!Object<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.bulletModule.Marker.PROTOTYPE_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'type', anychart.enums.normalizeBulletMarkerType],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'value', anychart.utils.toNumber],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'layout', anychart.enums.normalizeLayout],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'fill', anychart.core.settings.fillNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'stroke', anychart.core.settings.strokeNormalizer]
+  ]);
+  return map;
+})();
+anychart.core.settings.populate(anychart.bulletModule.Marker, anychart.bulletModule.Marker.PROTOTYPE_DESCRIPTORS);
 
 
 /**
@@ -119,36 +87,6 @@ anychart.bulletModule.Marker.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
- * Getter/setter for bullet marker type value.
- * @param {(string|anychart.enums.BulletMarkerType)=} opt_value [{@link anychart.enums.BulletMarkerType}.BAR] Type value.
- * @return {(anychart.enums.BulletMarkerType|anychart.bulletModule.Marker)}
- */
-anychart.bulletModule.Marker.prototype.type = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var type = anychart.enums.normalizeBulletMarkerType(opt_value);
-    if (this.type_ != type) {
-      this.type_ = type;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.type_ || this.defaultType_;
-};
-
-
-/**
- * Set default Bullet Marker type.
- * @param {anychart.enums.BulletMarkerType} value Default type value.
- */
-anychart.bulletModule.Marker.prototype.setDefaultType = function(value) {
-  var needInvalidate = !this.type_ && this.defaultType_ != value;
-  this.defaultType_ = value;
-  if (needInvalidate)
-    this.invalidate(anychart.ConsistencyState.BOUNDS);
-};
-
-
-/**
  * Getter/setter for bullet marker gap value.
  * @param {(number|string)=} opt_value ['50%'] Gap value.
  * @return {(number|string|anychart.bulletModule.Marker)}
@@ -161,57 +99,8 @@ anychart.bulletModule.Marker.prototype.gap = function(opt_value) {
     }
     return this;
   } else {
-    return goog.isNull(this.gap_) ? anychart.bulletModule.Marker.DEFAULT_GAP_BY_TYPE[this.type()] : this.gap_;
+    return goog.isNull(this.gap_) ? anychart.bulletModule.Marker.DEFAULT_GAP_BY_TYPE[this.getOption('type')] : this.gap_;
   }
-};
-
-
-/**
- * Getter/setter for bullet marker value.
- * @param {(number|string)=} opt_value [NaN] Value of bullet marker.
- * @return {number|string|anychart.bulletModule.Marker} Bullet marker value or itself for chaining call.
- */
-anychart.bulletModule.Marker.prototype.value = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var value = anychart.utils.toNumber(opt_value);
-    if (this.value_ != value) {
-      this.value_ = value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.value_;
-};
-
-
-/**
- * Get/set layout.
- * @param {anychart.enums.Layout=} opt_value [{@link anychart.enums.Layout}.VERTICAL] BulletMarker layout.
- * @return {anychart.enums.Layout|anychart.bulletModule.Marker} Bullet marker layout or self for method chaining.
- */
-anychart.bulletModule.Marker.prototype.layout = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var layout = anychart.enums.normalizeLayout(opt_value);
-    if (this.layout_ != layout) {
-      this.layout_ = layout;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.layout_ || this.defaultLayout_;
-  }
-};
-
-
-/**
- * Set Bullet Marker default layout value.
- * @param {anychart.enums.Layout} value Default layout value.
- */
-anychart.bulletModule.Marker.prototype.setDefaultLayout = function(value) {
-  var needInvalidate = !this.layout_ && this.defaultLayout_ != value;
-  this.defaultLayout_ = value;
-  if (needInvalidate)
-    this.invalidate(anychart.ConsistencyState.BOUNDS);
 };
 
 
@@ -220,7 +109,7 @@ anychart.bulletModule.Marker.prototype.setDefaultLayout = function(value) {
  * @return {boolean} Is layout horizontal.
  */
 anychart.bulletModule.Marker.prototype.isHorizontal = function() {
-  return this.layout() == anychart.enums.Layout.HORIZONTAL;
+  return this.getOption('layout') == anychart.enums.Layout.HORIZONTAL;
 };
 
 
@@ -247,6 +136,40 @@ anychart.bulletModule.Marker.prototype.scale = function(opt_value) {
 
 
 /**
+ * Sets default type, straight to theme settings, this is used when marker palette in chart is updated.
+ * @param {string|anychart.enums.BulletMarkerType} value
+ */
+anychart.bulletModule.Marker.prototype.setDefaultType = function(value) {
+  if (goog.isDef(value)) {
+    value = anychart.enums.normalizeBulletMarkerType(value, /** @type {anychart.enums.BulletMarkerType} */(this.getThemeOption('type')));
+    if (this.getThemeOption('type') != value) {
+      this.themeSettings['type'] = value;
+      if (!goog.isDef(this.getOwnOption('type'))) {
+        this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      }
+    }
+  }
+};
+
+
+/**
+ * Sets default layout, straight to theme settings, this is used when layout in chart is updated.
+ * @param {string|anychart.enums.Layout} value
+ */
+anychart.bulletModule.Marker.prototype.setDefaultLayout = function(value) {
+  if (goog.isDef(value)) {
+    value = anychart.enums.normalizeLayout(value, /** @type {anychart.enums.Layout} */(this.getThemeOption('layout')));
+    if (this.getThemeOption('layout') != value) {
+      this.themeSettings['layout'] = value;
+      if (!goog.isDef(this.getOwnOption('layout'))) {
+        this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      }
+    }
+  }
+};
+
+
+/**
  * Internal ticks invalidation handler.
  * @param {anychart.SignalEvent} event Event object.
  * @private
@@ -263,76 +186,6 @@ anychart.bulletModule.Marker.prototype.onScaleSignal_ = function(event) {
   var state = anychart.ConsistencyState.BOUNDS;
 
   this.invalidate(state, signal);
-};
-
-
-/**
- * Get/set bullet marker fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {!(acgraph.vector.Fill|anychart.bulletModule.Marker)} .
- */
-anychart.bulletModule.Marker.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var fill = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (fill != this.fill_) {
-      this.fill_ = fill;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.fill_ || this.defaultFill_;
-};
-
-
-/**
- * @param {acgraph.vector.Fill} value Default fill value.
- */
-anychart.bulletModule.Marker.prototype.setDefaultFill = function(value) {
-  var needInvalidate = !this.fill_ && this.defaultFill_ != value;
-  this.defaultFill_ = value;
-  if (needInvalidate)
-    this.invalidate(anychart.ConsistencyState.APPEARANCE);
-};
-
-
-/**
- * Get/set bullet marker stroke.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {!(anychart.bulletModule.Marker|acgraph.vector.Stroke)} LineMarker line settings or LineMarker instance for method chaining.
- */
-anychart.bulletModule.Marker.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (this.stroke_ != stroke) {
-      this.stroke_ = stroke;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  } else {
-    return this.stroke_ || this.defaultStroke_;
-  }
-};
-
-
-/**
- * @param {acgraph.vector.Stroke} value Default stroke value.
- */
-anychart.bulletModule.Marker.prototype.setDefaultStroke = function(value) {
-  var needInvalidate = !this.stroke_ && this.defaultStroke_ != value;
-  this.defaultStroke_ = value;
-  if (needInvalidate)
-    this.invalidate(anychart.ConsistencyState.APPEARANCE);
 };
 
 
@@ -559,21 +412,21 @@ anychart.bulletModule.Marker.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    this.path_.stroke(this.stroke());
-    this.path_.fill(this.fill());
+    this.path_.stroke(this.getOption('stroke'));
+    this.path_.fill(this.getOption('fill'));
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    var value = this.value();
+    var value = this.getOption('value');
     var ratio = this.scale().transform(value, 0);
     this.path_.clear();
 
     if (!isNaN(ratio)) {
       ratio = goog.math.clamp(ratio, 0, 1);
       var drawer = anychart.bulletModule.Marker.getDrawer(
-          /** @type {anychart.enums.Layout} */(this.layout()),
-          /** @type {anychart.enums.BulletMarkerType} */(this.type())
+          /** @type {anychart.enums.Layout} */(this.getOption('layout')),
+          /** @type {anychart.enums.BulletMarkerType} */(this.getOption('type'))
           );
       drawer.call(this, this.path_, ratio);
     }

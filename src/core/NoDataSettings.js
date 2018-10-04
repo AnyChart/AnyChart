@@ -32,6 +32,8 @@ anychart.core.NoDataSettings.prototype.label = function(opt_value) {
   if (!this.label_) {
     this.label_ = /** @type {anychart.core.ui.Label} */(this.provider_.createChartLabel());
     this.label_.listenSignals(this.labelInvalidated_, this);
+    this.label_.addThemes('defaultFontSettings', 'defaultLabelSettings', 'defaultNoDataLabel');
+    this.setupCreated('label', this.label_);
   }
 
   if (goog.isDef(opt_value)) {

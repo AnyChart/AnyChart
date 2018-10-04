@@ -441,7 +441,7 @@ anychart.treeChartBase.Chart.prototype.data = function(opt_value, opt_fillMethod
 anychart.treeChartBase.Chart.prototype.dataInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.DATA_CHANGED))
     this.invalidate(anychart.ConsistencyState.TREE_DATA | anychart.ConsistencyState.CHART_LABELS, anychart.Signal.NEEDS_REDRAW);
-};                                                                             
+};
 
 
 /**

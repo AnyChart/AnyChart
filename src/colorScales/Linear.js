@@ -14,6 +14,7 @@ goog.require('anychart.scales.ScatterTicks');
  */
 anychart.colorScalesModule.Linear = function() {
   anychart.colorScalesModule.Linear.base(this, 'constructor');
+  this.addThemes('defaultLinearColorScale');
 
   /**
    * @type {number}
@@ -60,9 +61,9 @@ anychart.colorScalesModule.Linear.prototype.extractKeys_ = function(var_args) {
     var arg = arguments[i];
 
     if (goog.isString(arg)) {
-      keys.push(acgraph.vector.parseColor(arg, true));
+      keys.push(arg);
     } else if (goog.isArray(arg)) {
-      keys.push.apply(keys, this.extractKeys_.apply(this, arg));
+      keys.push.apply(keys, arg);
     } else if (goog.isObject(arg)) {
       var keysAttr = arg['keys'];
       if (goog.isDef(keysAttr) && goog.isArray(keysAttr)) {
@@ -84,6 +85,7 @@ anychart.colorScalesModule.Linear.prototype.extractKeys_ = function(var_args) {
     }
   }
 
+  keys = acgraph.vector.normalizeFill(keys)['keys'];
   return keys;
 };
 
@@ -242,6 +244,7 @@ anychart.colorScalesModule.Linear.prototype.colorToValue = function(value) {
 anychart.colorScalesModule.Linear.prototype.ticks = function(opt_value) {
   if (!this.ticksObj) {
     this.ticksObj = this.createTicks();
+    this.ticksObj.setupCreated('ticks', this.ticksObj);
   }
   if (goog.isDef(opt_value)) {
     this.ticksObj.setup(opt_value);
@@ -260,6 +263,7 @@ anychart.colorScalesModule.Linear.prototype.ticks = function(opt_value) {
 anychart.colorScalesModule.Linear.prototype.minorTicks = function(opt_value) {
   if (!this.minorTicksObj) {
     this.minorTicksObj = this.createTicks();
+    this.ticksObj.setupCreated('minorTicks', this.minorTicksObj);
     this.minorTicksObj.count(5);
   }
   if (goog.isDef(opt_value)) {
@@ -334,8 +338,9 @@ anychart.colorScalesModule.Linear.prototype.createTicks = function() {
  */
 anychart.scales.linearColor = function(var_args) {
   var scale = new anychart.colorScalesModule.Linear();
-  scale.setupByJSON(/** @type {!Object} */(anychart.getFullTheme('defaultScaleSettings.linear')));
-  scale.setupByJSON(/** @type {!Object} */(anychart.getFullTheme('defaultLinearColorScale')));
+  scale.setup(scale.themeSettings);
+  // scale.setupByJSON(/** @type {!Object} */(anychart.getFullTheme('defaultScaleSettings.linear')));
+  // scale.setupByJSON(/** @type {!Object} */(anychart.getFullTheme('defaultLinearColorScale')));
   scale.colors.apply(scale, arguments);
   return scale;
 };
@@ -346,8 +351,9 @@ anychart.colorScalesModule.Linear.prototype.serialize = function() {
   var json = anychart.colorScalesModule.Linear.base(this, 'serialize');
   json['ticks'] = this.ticks().serialize();
   json['minorTicks'] = this.minorTicks().serialize();
+
   json['colors'] = goog.array.map(/** @type {Array.<Object>} */(this.colors()), function(elem) {
-    return goog.color.rgbArrayToHex(/** @type {!goog.color.Rgb} */(elem.color));
+    return elem.offset + ' ' + goog.color.rgbArrayToHex(/** @type {!goog.color.Rgb} */(elem.color));
   });
 
   return json;

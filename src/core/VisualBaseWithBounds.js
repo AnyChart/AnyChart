@@ -62,6 +62,7 @@ anychart.core.VisualBaseWithBounds.prototype.bounds = function(opt_boundsOrX, op
   if (!this.bounds_) {
     this.bounds_ = new anychart.core.utils.Bounds();
     this.bounds_.listenSignals(this.boundsInvalidated_, this);
+    this.setupCreated('bounds', this.bounds_);
   }
   if (goog.isDef(opt_boundsOrX)) {
     this.bounds_.setup.apply(this.bounds_, arguments);

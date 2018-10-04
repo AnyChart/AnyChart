@@ -430,16 +430,19 @@ anychart.core.utils.Space.prototype.serialize = function() {
 
 
 /** @inheritDoc */
+anychart.core.utils.Space.prototype.resolveSpecialValue = function(var_args) {
+  return anychart.core.utils.Space.normalizeSpace.apply(null, arguments);
+};
+
+
+/** @inheritDoc */
 anychart.core.utils.Space.prototype.setupSpecial = function(isDefault, var_args) {
   if (goog.isDef(arguments[1])) {
-    var args = [];
-    for (var i = 1; i < arguments.length; i++)
-      args.push(arguments[i]);
-    var settings = anychart.core.utils.Space.normalizeSpace.apply(null, args);
+    var resolvedValue = /** @type {!Object} */(this.resolveSpecialValue.apply(this, goog.array.slice(arguments, 1)));
     if (isDefault)
-      this.setThemeSettings(settings);
+      this.setThemeSettings(resolvedValue);
     else
-      this.set(settings);
+      this.set(resolvedValue);
     return true;
   }
   return false;

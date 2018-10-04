@@ -106,6 +106,92 @@ anychart.core.SeriesPoint.prototype.exists = function() {
 };
 
 
+/** @inheritDoc */
+anychart.core.SeriesPoint.prototype.ensureStatisticsReady = function() {
+  anychart.core.SeriesPoint.base(this, 'ensureStatisticsReady');
+  var chart = /** @type {anychart.core.CartesianBase} */ (this.chart);
+  var series = /** @type {anychart.core.series.Base} */ (this.series);
+  var isRangeSeries = series.check(anychart.core.drawers.Capabilities.IS_RANGE_BASED | anychart.core.drawers.Capabilities.IS_OHLC_BASED);
+
+  var val = /** @type {number} */ (isRangeSeries ? (/** @type {number} */ (this.get('high')) - /** @type {number} */ (this.get('low'))) : this.get('value'));
+
+  this.statistics(anychart.enums.Statistics.INDEX, this.index);
+  if (goog.isDef(val)) this.statistics(anychart.enums.Statistics.VALUE, val);
+
+  var size = /** @type {number} */ (this.get('size')); //Bubble.
+  var v;
+
+  if (goog.isNumber(chart.statistics(anychart.enums.Statistics.DATA_PLOT_X_SUM))) {
+    v = val / /** @type {number} */ (chart.statistics(anychart.enums.Statistics.DATA_PLOT_X_SUM));
+    this.statistics(anychart.enums.Statistics.X_PERCENT_OF_TOTAL, anychart.math.round(v * 100, 2));
+  }
+
+  if (goog.isNumber(series.statistics(anychart.enums.Statistics.SERIES_X_SUM))) {
+    v = val / /** @type {number} */ (series.statistics(anychart.enums.Statistics.SERIES_X_SUM));
+    this.statistics(anychart.enums.Statistics.X_PERCENT_OF_SERIES, anychart.math.round(v * 100, 2));
+  }
+
+  if (goog.isNumber(series.statistics(anychart.enums.Statistics.SERIES_BUBBLE_SIZE_SUM))) {
+    v = size / /** @type {number} */ (series.statistics(anychart.enums.Statistics.SERIES_BUBBLE_SIZE_SUM));
+    this.statistics(anychart.enums.Statistics.BUBBLE_SIZE_PERCENT_OF_SERIES, anychart.math.round(v * 100, 2));
+    v = size / /** @type {number} */ (chart.statistics(anychart.enums.Statistics.DATA_PLOT_BUBBLE_SIZE_SUM));
+    this.statistics(anychart.enums.Statistics.BUBBLE_SIZE_PERCENT_OF_TOTAL, anychart.math.round(v * 100, 2));
+    this.statistics(anychart.enums.Statistics.BUBBLE_SIZE, size);
+  }
+
+  var sumArr = isRangeSeries ?
+      series.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_SUM_ARR_) :
+      series.statistics(anychart.enums.Statistics.CATEGORY_Y_SUM_ARR_);
+  var x = /** @type {number} */ (this.get('x'));
+
+  if (sumArr) {
+    this.statistics(anychart.enums.Statistics.CATEGORY_NAME, x);
+    var catSum = sumArr[this.index];
+
+    if (isRangeSeries) {
+      v = val / /** @type {number} */ (series.statistics(anychart.enums.Statistics.SERIES_Y_RANGE_SUM));
+      this.statistics(anychart.enums.Statistics.Y_PERCENT_OF_SERIES, anychart.math.round(v * 100, 2));
+      v = val / /** @type {number} */ (chart.statistics(anychart.enums.Statistics.DATA_PLOT_Y_SUM));
+      this.statistics(anychart.enums.Statistics.Y_PERCENT_OF_TOTAL, anychart.math.round(v * 100, 2));
+      v = val / catSum;
+      this.statistics(anychart.enums.Statistics.Y_PERCENT_OF_CATEGORY, anychart.math.round(v * 100, 2));
+      v = catSum / /** @type {number} */ (chart.statistics(anychart.enums.Statistics.DATA_PLOT_Y_SUM));
+      this.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_PERCENT_OF_TOTAL, anychart.math.round(v * 100, 2));
+      this.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_SUM, catSum);
+      this.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_MAX, series.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_MAX_ARR_)[this.index]);
+      this.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_MIN, series.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_MIN_ARR_)[this.index]);
+      this.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_AVERAGE, series.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_AVG_ARR_)[this.index]);
+      this.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_MEDIAN, series.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_MEDIAN_ARR_)[this.index]);
+      this.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_MODE, series.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_MODE_ARR_)[this.index]);
+    } else {
+      v = val / /** @type {number} */ (series.statistics(anychart.enums.Statistics.SERIES_Y_SUM));
+      this.statistics(anychart.enums.Statistics.Y_PERCENT_OF_SERIES, anychart.math.round(v * 100, 2));
+      v = val / /** @type {number} */ (chart.statistics(anychart.enums.Statistics.DATA_PLOT_Y_SUM));
+      this.statistics(anychart.enums.Statistics.Y_PERCENT_OF_TOTAL, anychart.math.round(v * 100, 2));
+      v = val / catSum;
+      this.statistics(anychart.enums.Statistics.Y_PERCENT_OF_CATEGORY, anychart.math.round(v * 100, 2));
+      v = catSum / /** @type {number} */ (chart.statistics(anychart.enums.Statistics.DATA_PLOT_Y_SUM));
+      this.statistics(anychart.enums.Statistics.CATEGORY_Y_PERCENT_OF_TOTAL, anychart.math.round(v * 100, 2));
+      this.statistics(anychart.enums.Statistics.CATEGORY_Y_SUM, catSum);
+      this.statistics(anychart.enums.Statistics.CATEGORY_Y_MAX, series.statistics(anychart.enums.Statistics.CATEGORY_Y_MAX_ARR_)[this.index]);
+      this.statistics(anychart.enums.Statistics.CATEGORY_Y_MIN, series.statistics(anychart.enums.Statistics.CATEGORY_Y_MIN_ARR_)[this.index]);
+      this.statistics(anychart.enums.Statistics.CATEGORY_Y_AVERAGE, series.statistics(anychart.enums.Statistics.CATEGORY_Y_AVG_ARR_)[this.index]);
+      this.statistics(anychart.enums.Statistics.CATEGORY_Y_MEDIAN, series.statistics(anychart.enums.Statistics.CATEGORY_Y_MEDIAN_ARR_)[this.index]);
+      this.statistics(anychart.enums.Statistics.CATEGORY_Y_MODE, series.statistics(anychart.enums.Statistics.CATEGORY_Y_MODE_ARR_)[this.index]);
+    }
+  } else {
+    v = x / /** @type {number} */ (series.statistics(anychart.enums.Statistics.SERIES_X_SUM));
+    this.statistics(anychart.enums.Statistics.X_PERCENT_OF_SERIES, anychart.math.round(v * 100, 2));
+    v = val / /** @type {number} */ (series.statistics(anychart.enums.Statistics.SERIES_Y_SUM));
+    this.statistics(anychart.enums.Statistics.Y_PERCENT_OF_SERIES, anychart.math.round(v * 100, 2));
+    v = x / /** @type {number} */ (chart.statistics(anychart.enums.Statistics.DATA_PLOT_X_SUM));
+    this.statistics(anychart.enums.Statistics.X_PERCENT_OF_TOTAL, anychart.math.round(v * 100, 2));
+    v = val / /** @type {number} */ (chart.statistics(anychart.enums.Statistics.DATA_PLOT_Y_SUM));
+    this.statistics(anychart.enums.Statistics.Y_PERCENT_OF_TOTAL, anychart.math.round(v * 100, 2));
+  }
+};
+
+
 //exports
 (function() {
   var proto = anychart.core.SeriesPoint.prototype;

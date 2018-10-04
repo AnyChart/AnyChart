@@ -62,7 +62,8 @@
             fontSize: 12,
             title: {
                 align: "center",
-                fontSize: 14
+                fontSize: 14,
+                fontColor: "#90a4ae"
             },
             padding: {
                 top: 10,
@@ -113,6 +114,11 @@
                     fill: "#90a4ae",
                     stroke: "#546e7a"
                 }
+            }
+        },
+        defaultLegend: {
+            paginator: {
+                fontColor: "#b0bec5"
             }
         },
         chart: {
@@ -219,6 +225,11 @@
             },
             insideLabels: {
                 autoColor: "#212121"
+            }
+        },
+        pie: {
+            selected: {
+                stroke: "1.5 #878f96"
             }
         },
         map: {

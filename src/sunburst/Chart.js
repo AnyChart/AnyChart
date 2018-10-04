@@ -12,6 +12,7 @@ goog.require('anychart.core.ui.Center');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.Tooltip');
 goog.require('anychart.core.utils.InteractivityState');
+goog.require('anychart.core.utils.Padding');
 goog.require('anychart.core.utils.TypedLayer');
 goog.require('anychart.data.Set');
 goog.require('anychart.enums');
@@ -38,6 +39,8 @@ goog.require('goog.ui.KeyboardShortcutHandler');
  */
 anychart.sunburstModule.Chart = function(opt_data, opt_fillMethod) {
   anychart.sunburstModule.Chart.base(this, 'constructor', opt_data, opt_fillMethod);
+
+  this.addThemes('sunburst');
 
   /**
    * Interactivity state.
@@ -108,7 +111,7 @@ anychart.sunburstModule.Chart = function(opt_data, opt_fillMethod) {
     ['labels', 0, 0]
   ]);
   this.normal_ = new anychart.core.StateSettings(this, normalDescriptorsMeta, anychart.PointState.NORMAL);
-  this.normal_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.CIRCULAR_LABELS_CONSTRUCTOR);
+  this.normal_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.CIRCULAR_LABELS_CONSTRUCTOR_NO_THEME);
   this.normal_.setOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK, /** @this {anychart.sunburstModule.Chart} */ function(factory) {
     factory.listenSignals(this.labelsInvalidated, this);
     factory.setParentEventTarget(this);
@@ -123,7 +126,7 @@ anychart.sunburstModule.Chart = function(opt_data, opt_fillMethod) {
     ['labels', 0, 0]
   ]);
   this.hovered_ = new anychart.core.StateSettings(this, hoveredDescriptorsMeta, anychart.PointState.HOVER);
-  this.hovered_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.CIRCULAR_LABELS_CONSTRUCTOR);
+  this.hovered_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.CIRCULAR_LABELS_CONSTRUCTOR_NO_THEME);
 
   var selectedDescriptorsMeta = {};
   anychart.core.settings.createDescriptorsMeta(selectedDescriptorsMeta, [
@@ -133,7 +136,7 @@ anychart.sunburstModule.Chart = function(opt_data, opt_fillMethod) {
     ['labels', 0, 0]
   ]);
   this.selected_ = new anychart.core.StateSettings(this, selectedDescriptorsMeta, anychart.PointState.SELECT);
-  this.selected_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.CIRCULAR_LABELS_CONSTRUCTOR);
+  this.selected_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.CIRCULAR_LABELS_CONSTRUCTOR_NO_THEME);
 
   /**
    * Aaync init mouse and keyboard interactivity for cases when chart have no stage on draw moment.
@@ -237,14 +240,15 @@ anychart.sunburstModule.Chart.ZINDEX_LABEL = 32;
  * @enum {string}
  */
 anychart.sunburstModule.Chart.FieldsName = {
+  META_VALUE: 'sunburst_value',
   VALUE: 'value',
-  LEAVES_SUM: 'leavesSum',
-  CHILDREN_SUM: 'childSum',
-  VISIBLE_LEAVES_SUM: 'visibleLeavesSum',
-  LEAVES_COUNT: 'leavesCount',
-  CHILDREN_LEAVES_COUNT: 'childrenLeavesCount',
-  TYPE: 'type',
-  MISSING: 'missing'
+  LEAVES_SUM: 'sunburst_leavesSum',
+  CHILDREN_SUM: 'sunburst_childSum',
+  VISIBLE_LEAVES_SUM: 'sunburst_visibleLeavesSum',
+  LEAVES_COUNT: 'sunburst_leavesCount',
+  CHILDREN_LEAVES_COUNT: 'sunburst_childrenLeavesCount',
+  TYPE: 'sunburst_type',
+  MISSING: 'sunburst_missing'
 };
 
 
@@ -571,7 +575,7 @@ anychart.sunburstModule.Chart.prototype.drillUp = function() {
 /** @inheritDoc */
 anychart.sunburstModule.Chart.prototype.onMouseDown = function(event) {
   var interactivity = this.interactivity();
-  if (interactivity.selectionMode() == anychart.enums.SelectionMode.DRILL_DOWN) {
+  if (interactivity.getOption('selectionMode') == anychart.enums.SelectionMode.DRILL_DOWN) {
     if (event['button'] != acgraph.events.BrowserEvent.MouseButton.LEFT) return;
 
     var tag = anychart.utils.extractTag(event['domTarget']);
@@ -785,6 +789,8 @@ anychart.sunburstModule.Chart.prototype.setupPalette_ = function(cls, opt_cloneF
     var doDispatch = !!this.palette_;
     goog.dispose(this.palette_);
     this.palette_ = new cls();
+    this.setupCreated('palette', this.palette_);
+    this.palette_.restoreDefaults();
     if (opt_cloneFrom)
       this.palette_.setup(opt_cloneFrom);
     this.palette_.listenSignals(this.paletteInvalidated_, this);
@@ -1898,7 +1904,7 @@ anychart.sunburstModule.Chart.prototype.calculateNodes = function(node) {
       node.meta(anychart.sunburstModule.Chart.FieldsName.CHILDREN_LEAVES_COUNT, 1);
     }
 
-    node.meta(anychart.sunburstModule.Chart.FieldsName.VALUE, value);
+    node.meta(anychart.sunburstModule.Chart.FieldsName.META_VALUE, value);
     node.meta(anychart.sunburstModule.Chart.FieldsName.LEAVES_SUM, leavesSum);
     node.meta(anychart.sunburstModule.Chart.FieldsName.CHILDREN_SUM, childSum);
     node.meta(anychart.sunburstModule.Chart.FieldsName.VISIBLE_LEAVES_SUM, visibleLeavesSum);
@@ -2209,7 +2215,7 @@ anychart.sunburstModule.Chart.prototype.nodesLayouter_ = function(node, display,
     }
   } else if (calculationMode == anychart.enums.SunburstCalculationMode.PARENT_DEPENDENT) {
     if (display) {
-      currValue = parseFloat(node.meta(anychart.sunburstModule.Chart.FieldsName.VALUE));
+      currValue = parseFloat(node.meta(anychart.sunburstModule.Chart.FieldsName.META_VALUE));
       if (isNaN(currValue)) {
         currValue = parseFloat(node.meta(anychart.sunburstModule.Chart.FieldsName.LEAVES_SUM));
       }
@@ -2225,7 +2231,7 @@ anychart.sunburstModule.Chart.prototype.nodesLayouter_ = function(node, display,
     } else {
       if (numChildren) {
         if (depth >= this.currentFirstVisibleLevel) {
-          currValue = parseFloat(node.meta(anychart.sunburstModule.Chart.FieldsName.VALUE));
+          currValue = parseFloat(node.meta(anychart.sunburstModule.Chart.FieldsName.META_VALUE));
           ratio = currValue / parentValue;
         } else {
           nexLevel = this.currentLevels[depth + 1];
@@ -2312,8 +2318,8 @@ anychart.sunburstModule.Chart.prototype.getLabelRadialTextPath = function(label,
 
   var dr = outerRadius - innerRadius;
   var padding = label.getFinalSettings('padding');
-  outerRadius -= anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption('left')), dr);
-  innerRadius += anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption('right')), dr);
+  outerRadius -= anychart.utils.normalizeSize(/** @type {number|string} */(padding.left), dr);
+  innerRadius += anychart.utils.normalizeSize(/** @type {number|string} */(padding.right), dr);
 
   var dAngle = 90;
   var flip = mainAngle > dAngle && mainAngle < dAngle + 180;
@@ -2366,7 +2372,7 @@ anychart.sunburstModule.Chart.prototype.getLabelCircularTextPath = function(labe
   var sweep = /** @type {number} */(iterator.meta('sweep'));
   var start = /** @type {number} */(iterator.meta('start'));
   start = sweep == 360 ? anychart.sunburstModule.Chart.DEFAULT_START_ANGLE : start;
-  var padding = label.getFinalSettings('padding');
+  var padding = new anychart.core.utils.Padding().setup(label.getFinalSettings('padding'));
   var pxPerDegree = (2 * Math.PI * radius) / 360;
   var startAngle = start;
   var endAngle = start + sweep;
@@ -2640,7 +2646,7 @@ anychart.sunburstModule.Chart.prototype.drawLabel_ = function(pointState, opt_up
         .width(width);
 
     position = label.getFinalSettings('position');
-    padding = label.getFinalSettings('padding');
+    padding = new anychart.core.utils.Padding().setup(label.getFinalSettings('padding'));
     // start = /** @type {number} */ (iterator.meta('start'));
     sweep = /** @type {number} */ (iterator.meta('sweep'));
     innerRadius = /** @type {number} */ (iterator.meta('innerRadius'));

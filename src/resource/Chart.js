@@ -37,8 +37,10 @@ goog.require('goog.userAgent');
 anychart.resourceModule.Chart = function(opt_data, opt_csvSettings) {
   anychart.resourceModule.Chart.base(this, 'constructor');
 
+  this.addThemes('resource');
+
   // it doesn't support other options
-  this.interactivity().hoverMode('single').selectionMode(anychart.enums.SelectionMode.MULTI_SELECT);
+  this.interactivity()['hoverMode']('single')['selectionMode'](anychart.enums.SelectionMode.MULTI_SELECT);
 
   /**
    * Interactivity state.
@@ -116,6 +118,7 @@ anychart.resourceModule.Chart = function(opt_data, opt_csvSettings) {
    * @private
    */
   this.xScroll_ = new anychart.core.ui.Scroller(true);
+  this.setupCreated('horizontalScrollBar', this.xScroll_);
   this.xScroll_.listen(anychart.enums.EventType.SCROLLER_CHANGE, this.handleXScrollChange_, false, this);
   this.xScroll_.listenSignals(this.handleXScrollSignal_, this);
 
@@ -132,6 +135,7 @@ anychart.resourceModule.Chart = function(opt_data, opt_csvSettings) {
    * @private
    */
   this.yScroll_ = new anychart.core.ui.Scroller(true);
+  this.setupCreated('verticalScrollBar', this.yScroll_);
   this.yScroll_.setOption('inverted', true);
   this.yScroll_.listen(anychart.enums.EventType.SCROLLER_CHANGE, this.handleYScrollChange_, false, this);
   this.yScroll_.listenSignals(this.handleYScrollSignal_, this);

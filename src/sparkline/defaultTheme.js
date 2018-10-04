@@ -16,6 +16,9 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'padding': 0,
     'hatchFill': null,
     'markers': {},
+    'interactivity': {
+      'hoverMode': 'by-x'
+    },
 
     'firstMarkers': {
       'fill': '#64b5f6'

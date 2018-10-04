@@ -18,6 +18,8 @@ goog.require('anychart.scales.Ordinal');
 anychart.paretoModule.Chart = function() {
   anychart.paretoModule.Chart.base(this, 'constructor');
 
+  this.addThemes('pareto');
+
   /**
    * Percent scale.
    * @type {anychart.scales.Linear}
@@ -674,6 +676,15 @@ anychart.paretoModule.Chart.prototype.serialize = function() {
 };
 
 
+/**
+ * Setup axes and set percent scale to second y axis
+ */
+anychart.paretoModule.Chart.prototype.setupAxes = function() {
+  anychart.paretoModule.Chart.base(this, 'setupAxes');
+  this.yAxis(1).scale(this.percentScale);
+};
+
+
 /** @inheritDoc */
 anychart.paretoModule.Chart.prototype.setupByJSON = function(config, opt_default) {
   anychart.paretoModule.Chart.base(this, 'setupByJSON', config, opt_default);
@@ -694,8 +705,6 @@ anychart.paretoModule.Chart.prototype.setupByJSON = function(config, opt_default
   // proto['barsPadding'] = proto.barsPadding;
   // proto['barGroupsPadding'] = proto.barGroupsPadding;
   proto['crosshair'] = proto.crosshair;
-  proto['maxBubbleSize'] = proto.maxBubbleSize;
-  proto['minBubbleSize'] = proto.minBubbleSize;
   proto['xGrid'] = proto.xGrid;
   proto['yGrid'] = proto.yGrid;
   proto['xMinorGrid'] = proto.xMinorGrid;
@@ -733,6 +742,8 @@ anychart.paretoModule.Chart.prototype.setupByJSON = function(config, opt_default
   proto['getType'] = proto.getType;
   // auto from ChartWithSeries
   // proto['defaultSeriesType'] = proto.defaultSeriesType;
+  // proto['maxBubbleSize'] = proto.maxBubbleSize;
+  // proto['minBubbleSize'] = proto.minBubbleSize;
   proto['addSeries'] = proto.addSeries;
   proto['getSeriesAt'] = proto.getSeriesAt;
   proto['getSeriesCount'] = proto.getSeriesCount;

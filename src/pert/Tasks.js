@@ -12,6 +12,9 @@ goog.require('anychart.pertModule.VisualElements');
  */
 anychart.pertModule.Tasks = function() {
   anychart.pertModule.Tasks.base(this, 'constructor');
+
+  this.addThemes('tasks');
+
   this.normal_.addMeta([
     ['dummyFill', 0, anychart.Signal.NEEDS_REDRAW_APPEARANCE],
     ['dummyStroke', 0, anychart.Signal.NEEDS_REDRAW_APPEARANCE],

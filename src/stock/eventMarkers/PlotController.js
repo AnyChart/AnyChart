@@ -10,13 +10,13 @@ goog.require('anychart.stockModule.eventMarkers.Group');
 /**
  * Plot-level event markers controller.
  * @param {anychart.stockModule.Plot} plot
- * @param {anychart.stockModule.eventMarkers.ChartController} chartController 
+ * @param {anychart.stockModule.eventMarkers.ChartController} chartController
  * @constructor
  * @extends {anychart.core.VisualBase}
  */
 anychart.stockModule.eventMarkers.PlotController = function(plot, chartController) {
   anychart.stockModule.eventMarkers.PlotController.base(this, 'constructor');
-  
+
   chartController.listenSignals(this.onSignal_, this);
 
   /**
@@ -492,7 +492,7 @@ anychart.stockModule.eventMarkers.PlotController.prototype.applyState = function
 anychart.stockModule.eventMarkers.PlotController.prototype.tooltip = function(opt_value) {
   if (!this.tooltip_) {
     this.tooltip_ = new anychart.core.ui.Tooltip(0);
-    this.tooltip_.parent(/** @type {anychart.core.ui.Tooltip} */(this.plot_.getChart().eventMarkers().tooltip()));
+    this.tooltip_.dropThemes().parent(/** @type {anychart.core.ui.Tooltip} */(this.plot_.getChart().eventMarkers().tooltip()));
   }
 
   if (goog.isDef(opt_value)) {

@@ -16,6 +16,8 @@ goog.require('anychart.scales.ScatterTicks');
 anychart.scales.Linear = function() {
   anychart.scales.Linear.base(this, 'constructor');
 
+  this.addThemes('defaultScaleSettings.linear');
+
   /**
    * Major ticks for the scale.
    * @type {anychart.scales.ScatterTicks}
@@ -90,6 +92,7 @@ anychart.scales.Linear.prototype.roundToTicksPrecision = function(value, opt_add
 anychart.scales.Linear.prototype.ticks = function(opt_value) {
   if (!this.ticksObj) {
     this.ticksObj = this.createTicks();
+    this.setupCreated('ticks', this.ticksObj);
   }
   if (goog.isDef(opt_value)) {
     this.ticksObj.setup(opt_value);
@@ -107,6 +110,7 @@ anychart.scales.Linear.prototype.ticks = function(opt_value) {
 anychart.scales.Linear.prototype.minorTicks = function(opt_value) {
   if (!this.minorTicksObj) {
     this.minorTicksObj = this.createTicks();
+    this.setupCreated('minorTicks', this.minorTicksObj);
     this.minorTicksObj.suspendSignalsDispatching();
     this.minorTicksObj.count(5);
     this.minorTicksObj.resumeSignalsDispatching(false);
@@ -340,9 +344,9 @@ anychart.scales.Linear.prototype.setupByJSON = function(config, opt_default) {
  * @return {!anychart.scales.Linear} Linear scale.
  */
 anychart.scales.linear = function() {
-  var result = new anychart.scales.Linear();
-  result.setupByJSON(/** @type {!Object} */(anychart.getFullTheme('defaultScaleSettings.linear')));
-  return result;
+  var scale = new anychart.scales.Linear();
+  scale.setup(scale.themeSettings);
+  return scale;
 };
 
 

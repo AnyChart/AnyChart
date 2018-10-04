@@ -327,7 +327,7 @@ anychart.ganttModule.elements.ConnectorElement.prototype.setupByJSON = function(
  */
 anychart.ganttModule.elements.ConnectorElement.prototype.serialize = function() {
   var json = anychart.ganttModule.elements.ConnectorElement.base(this, 'serialize');
-  anychart.core.settings.serialize(this, anychart.ganttModule.elements.ConnectorElement.DESCRIPTORS, json);
+  anychart.core.settings.serialize(this, anychart.ganttModule.elements.ConnectorElement.DESCRIPTORS, json, void 0, void 0, true);
   json['normal'] = this.normal().serialize();
   json['selected'] = this.selected().serialize();
   return json;

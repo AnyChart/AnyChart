@@ -476,7 +476,7 @@ anychart.scales.ScatterTicks.prototype.setupLinear_ = function(min, max, canModi
       var count = q - 1; // it should be valid here
       currentInterval = anychart.math.specialRound(range / count);
       if (currentInterval == 0)
-        currentInterval = anychart.math.specialRound(range / count, 7);
+        currentInterval = anychart.math.specialRound(range / count, 10);
 
       // Here we can add other interval rounding options and choose the best
       // For example, with fractional values powers of 2 give better result because they divide interval in 2, 4, 8,
@@ -494,7 +494,7 @@ anychart.scales.ScatterTicks.prototype.setupLinear_ = function(min, max, canModi
       ];
 
       intervals = goog.array.map(intervals, function(x) {
-        return anychart.utils.alignRight(currentInterval, x) || Infinity;
+        return anychart.utils.alignRight(currentInterval, x, 0, 10) || Infinity;
       });
 
       if (!opt_allowFractionalTicks) {
@@ -728,7 +728,7 @@ anychart.scales.ScatterTicks.prototype.setupSpecial = function(isDefault, var_ar
     this.set(arg0);
     return true;
   }
-  return anychart.core.Base.prototype.setupSpecial.apply(this, arguments);
+  return false;
 };
 
 

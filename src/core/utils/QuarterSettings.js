@@ -12,6 +12,9 @@ goog.require('anychart.core.utils.Quarter');
  */
 anychart.core.utils.QuarterSettings = function(chart) {
   anychart.core.utils.QuarterSettings.base(this, 'constructor');
+
+  this.addThemes('chart.defaultQuarterSettings');
+
   this.chart_ = chart;
 
   /**
@@ -57,6 +60,11 @@ goog.inherits(anychart.core.utils.QuarterSettings, anychart.core.Base);
  * @return {Array.<anychart.core.utils.Quarter>}
  */
 anychart.core.utils.QuarterSettings.prototype.getItems = function() {
+  if (!this.rightTop_) this.getCreated('rightTop');
+  if (!this.leftBottom_) this.getCreated('leftBottom');
+  if (!this.rightBottom_) this.getCreated('rightBottom');
+  if (!this.leftTop_) this.getCreated('leftTop');
+
   return this.quarters_;
 };
 
@@ -77,6 +85,7 @@ anychart.core.utils.QuarterSettings.prototype.rightTop = function(opt_value) {
     this.rightTop_ = new anychart.core.utils.Quarter();
     this.rightTop_.listenSignals(this.chart_.quarterInvalidated, this.chart_);
     this.quarters_[0] = this.rightTop_;
+    this.setupCreated('rightTop', this.rightTop_);
   }
   if (goog.isDef(opt_value)) {
     this.rightTop_.setup(opt_value);
@@ -96,6 +105,7 @@ anychart.core.utils.QuarterSettings.prototype.leftTop = function(opt_value) {
     this.leftTop_ = new anychart.core.utils.Quarter();
     this.leftTop_.listenSignals(this.chart_.quarterInvalidated, this.chart_);
     this.quarters_[1] = this.leftTop_;
+    this.setupCreated('leftTop', this.leftTop_);
   }
   if (goog.isDef(opt_value)) {
     this.leftTop_.setup(opt_value);
@@ -115,6 +125,7 @@ anychart.core.utils.QuarterSettings.prototype.leftBottom = function(opt_value) {
     this.leftBottom_ = new anychart.core.utils.Quarter();
     this.leftBottom_.listenSignals(this.chart_.quarterInvalidated, this.chart_);
     this.quarters_[2] = this.leftBottom_;
+    this.setupCreated('leftBottom', this.leftBottom_);
   }
   if (goog.isDef(opt_value)) {
     this.leftBottom_.setup(opt_value);
@@ -134,6 +145,7 @@ anychart.core.utils.QuarterSettings.prototype.rightBottom = function(opt_value) 
     this.rightBottom_ = new anychart.core.utils.Quarter();
     this.rightBottom_.listenSignals(this.chart_.quarterInvalidated, this.chart_);
     this.quarters_[3] = this.rightBottom_;
+    this.setupCreated('rightBottom', this.rightBottom_);
   }
   if (goog.isDef(opt_value)) {
     this.rightBottom_.setup(opt_value);

@@ -523,7 +523,7 @@ anychart.ganttModule.BaseGrid.isMilestone = function(treeDataItem) {
  * @param {anychart.enums.TLElementTypes=} opt_type - Type of hovered timeline element.
  * @param {number=} opt_hoveredRatio - For timeline: hovered ratio.
  * @param {number=} opt_hoveredTimestamp - For timeline: hovered time.
- * @return {Object} - Gantt context provider.
+ * @return {anychart.format.Context} - Gantt context provider.
  */
 anychart.ganttModule.BaseGrid.prototype.createFormatProvider = function(item, opt_period, opt_periodIndex, opt_type, opt_hoveredRatio, opt_hoveredTimestamp) {
   if (!this.formatProvider_)
@@ -597,7 +597,7 @@ anychart.ganttModule.BaseGrid.prototype.createFormatProvider = function(item, op
     values['hoverDateTime'] = {value: opt_hoveredTimestamp, type: anychart.enums.TokenType.DATE_TIME};
 
   this.formatProvider_.dataSource(item);
-  return this.formatProvider_.propagate(values);
+  return /** @type {anychart.format.Context} */ (this.formatProvider_.propagate(values));
 };
 
 

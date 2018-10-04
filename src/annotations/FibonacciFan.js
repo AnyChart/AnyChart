@@ -329,7 +329,7 @@ anychart.annotationsModule.FibonacciFan.prototype.resolveCustomPreDrawingStates 
 /** @inheritDoc */
 anychart.annotationsModule.FibonacciFan.prototype.setDefaultSettings = function(value) {
   anychart.annotationsModule.FibonacciFan.base(this, 'setDefaultSettings', value);
-  this.timeLevels(value['timeLevels']);
+  this.timeLevels(/** @type {Array<*>} */(this.getOption('timeLevels')));
 };
 
 

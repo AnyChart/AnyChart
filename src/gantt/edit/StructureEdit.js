@@ -190,7 +190,7 @@ anychart.ganttModule.edit.StructureEdit.prototype.setupByJSON = function(config,
  */
 anychart.ganttModule.edit.StructureEdit.prototype.serialize = function() {
   var json = anychart.ganttModule.edit.StructureEdit.base(this, 'serialize');
-  anychart.core.settings.serialize(this, anychart.ganttModule.edit.StructureEdit.DESCRIPTORS, json);
+  anychart.core.settings.serialize(this, anychart.ganttModule.edit.StructureEdit.DESCRIPTORS, json, void 0, void 0, true);
   if (!this.hasOwnOption('enabled') || goog.isNull(json['enabled']))
     delete json['enabled'];
   return json;

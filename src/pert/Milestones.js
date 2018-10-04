@@ -13,6 +13,8 @@ goog.require('anychart.utils');
 anychart.pertModule.Milestones = function() {
   anychart.pertModule.Milestones.base(this, 'constructor');
 
+  this.addThemes('milestones');
+
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['size', 0, anychart.Signal.NEEDS_REDRAW],
     ['shape', 0, anychart.Signal.NEEDS_REDRAW]

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsd:schema
         xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-        targetNamespace="http://anychart.com/schemas/8.3.0/xml-schema.xsd"
-        xmlns="http://anychart.com/schemas/8.3.0/xml-schema.xsd"
+        targetNamespace="http://anychart.com/schemas/8.4.0/xml-schema.xsd"
+        xmlns="http://anychart.com/schemas/8.4.0/xml-schema.xsd"
         elementFormDefault="qualified">
 
     <xsd:element name="anychart" type="Anychart"/>
@@ -127,6 +127,10 @@
             <!-- chart.Sunburst elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="levels" type="core.SunburstLevels"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="leaves" type="core.SunburstLevel"/>
+            <!-- chart.Sankey elements -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="node" type="core.SankeyVisualElement"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="flow" type="core.SankeyVisualElement"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="dropoff" type="core.SankeyVisualElement"/>
         </xsd:all>
         <!-- core.Chart attrs -->
         <xsd:attributeGroup ref="attrs.VisualBase"/>
@@ -252,6 +256,10 @@
         <xsd:attribute name="data_mode" type="enums.WaterfallDataMode"/>
         <!-- chart.Sunburst elements -->
         <xsd:attribute name="calculation_mode" type="enums.CalculationMode" default="ordinal-from-root"/>
+        <!-- chart.Sankey attributes -->
+        <xsd:attribute name="node_width" type="simple.NumberOrPercent" />
+        <xsd:attribute name="node_padding" type="xsd:double" />
+        <xsd:attribute name="curve_factor" type="simple.Ratio" />
     </xsd:complexType>
 
     <xsd:complexType name="Gauge">
@@ -1544,7 +1552,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="title" type="core.Title"/>
         </xsd:all>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
-        <xsd:attribute name="width" type="xsd:double"/>
+        <xsd:attribute name="width" type="simple.NumberOrPercent"/>
         <xsd:attribute name="defaultWidth" type="xsd:double"/>
         <xsd:attribute name="collapse_expand_buttons" type="simple.Bool"/>
         <xsd:attribute name="depth_padding_multiplier" type="xsd:double"/>
@@ -2213,6 +2221,9 @@
     </xsd:complexType>
 
     <xsd:complexType name="GanttDateTimeScale">
+        <xsd:all>
+            <xsd:element name="zoom_levels" type="ZoomLevelsSettings"/>
+        </xsd:all>
         <xsd:attribute name="visible_minimum" type="xsd:double"/>
         <xsd:attribute name="visible_maximum" type="xsd:double"/>
         <xsd:attribute name="soft_minimum" type="xsd:double"/>
@@ -2223,6 +2234,25 @@
         <xsd:attribute name="maximum" type="xsd:double"/>
         <xsd:attribute name="minimum_gap" type="xsd:double"/>
         <xsd:attribute name="maximum_gap" type="xsd:double"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="ZoomLevelsSettings">
+        <xsd:sequence>
+            <xsd:element name="item" maxOccurs="unbounded" minOccurs="0">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="item" maxOccurs="unbounded" minOccurs="0">
+                            <xsd:complexType>
+                                <xsd:attribute type="xsd:string" name="unit" use="required"/>
+                                <xsd:attribute type="xsd:integer" name="count" use="optional"/>
+                            </xsd:complexType>
+                        </xsd:element>
+                    </xsd:sequence>
+                    <xsd:attribute name="treat_as_array" type="xsd:string" />
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:sequence>
+        <xsd:attribute name="treat_as_array" type="xsd:string"/>
     </xsd:complexType>
 
     <xsd:complexType name="TimelineHeader">
@@ -2860,6 +2890,23 @@
         </xsd:all>
     </xsd:complexType>
 
+    <xsd:complexType name="core.SankeyVisualElement">
+        <xsd:all>
+            <xsd:element name="fill" type="Fill" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="stroke" type="Stroke" minOccurs="0" maxOccurs="1"/>
+
+            <xsd:element name="labels" type="core.LabelsFactory" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="tooltip" type="core.Tooltip" minOccurs="0" maxOccurs="1"/>
+
+            <xsd:element minOccurs="0" maxOccurs="1" name="normal" type="core.StateSettings"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="hovered" type="core.StateSettings"/>
+        </xsd:all>
+        <xsd:attribute name="fill" type="xsd:string"/>
+        <xsd:attribute name="stroke" type="xsd:string"/>
+        <xsd:attribute name="labels" type="simple.BoolOrNull" default="true"/>
+        <xsd:attribute name="tooltip" type="simple.BoolOrNull" default="true"/>
+    </xsd:complexType>
+
     <xsd:complexType name="core.SunburstLevels">
         <xsd:sequence minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="level" type="core.sunburst.Level"/>
@@ -3157,38 +3204,38 @@
             <xsd:enumeration value="false"/>
             <xsd:enumeration value="null"/>
             <xsd:enumeration value="none"/>
-            <xsd:enumeration value="backwardDiagonal"/>
-            <xsd:enumeration value="forwardDiagonal"/>
+            <xsd:enumeration value="backward-diagonal"/>
+            <xsd:enumeration value="forward-diagonal"/>
             <xsd:enumeration value="horizontal"/>
             <xsd:enumeration value="vertical"/>
-            <xsd:enumeration value="dashedBackwardDiagonal"/>
+            <xsd:enumeration value="dashed-backward-diagonal"/>
             <xsd:enumeration value="grid"/>
-            <xsd:enumeration value="dashedForwardDiagonal"/>
-            <xsd:enumeration value="dashedHorizontal"/>
-            <xsd:enumeration value="dashedVertical"/>
-            <xsd:enumeration value="diagonalCross"/>
-            <xsd:enumeration value="diagonalBrick"/>
+            <xsd:enumeration value="dashed-forward-diagonal"/>
+            <xsd:enumeration value="dashed-horizontal"/>
+            <xsd:enumeration value="dashed-vertical"/>
+            <xsd:enumeration value="diagonal-cross"/>
+            <xsd:enumeration value="diagonal-brick"/>
             <xsd:enumeration value="divot"/>
-            <xsd:enumeration value="horizontalBrick"/>
-            <xsd:enumeration value="verticalBrick"/>
-            <xsd:enumeration value="checkerBoard"/>
+            <xsd:enumeration value="horizontal-brick"/>
+            <xsd:enumeration value="vertical-brick"/>
+            <xsd:enumeration value="checker-board"/>
             <xsd:enumeration value="confetti"/>
             <xsd:enumeration value="plaid"/>
-            <xsd:enumeration value="solidDiamond"/>
-            <xsd:enumeration value="zigZag"/>
+            <xsd:enumeration value="solid-diamond"/>
+            <xsd:enumeration value="zig-zag"/>
             <xsd:enumeration value="weave"/>
-            <xsd:enumeration value="percent05"/>
-            <xsd:enumeration value="percent10"/>
-            <xsd:enumeration value="percent20"/>
-            <xsd:enumeration value="percent25"/>
-            <xsd:enumeration value="percent30"/>
-            <xsd:enumeration value="percent40"/>
-            <xsd:enumeration value="percent50"/>
-            <xsd:enumeration value="percent60"/>
-            <xsd:enumeration value="percent70"/>
-            <xsd:enumeration value="percent75"/>
-            <xsd:enumeration value="percent80"/>
-            <xsd:enumeration value="percent90"/>
+            <xsd:enumeration value="percent-05"/>
+            <xsd:enumeration value="percent-10"/>
+            <xsd:enumeration value="percent-20"/>
+            <xsd:enumeration value="percent-25"/>
+            <xsd:enumeration value="percent-30"/>
+            <xsd:enumeration value="percent-40"/>
+            <xsd:enumeration value="percent-50"/>
+            <xsd:enumeration value="percent-60"/>
+            <xsd:enumeration value="percent-70"/>
+            <xsd:enumeration value="percent-75"/>
+            <xsd:enumeration value="percent-80"/>
+            <xsd:enumeration value="percent-90"/>
         </xsd:restriction>
     </xsd:simpleType>
 
@@ -3285,6 +3332,7 @@
             <xsd:enumeration value="hilo"/>
             <xsd:enumeration value="waterfall"/>
             <xsd:enumeration value="sunburst"/>
+            <xsd:enumeration value="sankey"/>
         </xsd:restriction>
     </xsd:simpleType>
 
@@ -3390,6 +3438,22 @@
             <xsd:enumeration value="right"/>
             <xsd:enumeration value="top"/>
             <xsd:enumeration value="bottom"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="enums.Interval">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="year"/>
+            <xsd:enumeration value="semester"/>
+            <xsd:enumeration value="quarter"/>
+            <xsd:enumeration value="month"/>
+            <xsd:enumeration value="third-of-month"/>
+            <xsd:enumeration value="week"/>
+            <xsd:enumeration value="day"/>
+            <xsd:enumeration value="hour"/>
+            <xsd:enumeration value="minute"/>
+            <xsd:enumeration value="second"/>
+            <xsd:enumeration value="millisecond"/>
         </xsd:restriction>
     </xsd:simpleType>
 

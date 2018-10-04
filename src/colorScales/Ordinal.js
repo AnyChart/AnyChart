@@ -14,6 +14,7 @@ goog.require('anychart.scales.Base');
 anychart.colorScalesModule.Ordinal = function() {
   anychart.colorScalesModule.Ordinal.base(this, 'constructor');
 
+  this.addThemes('defaultOrdinalColorScale');
   /**
    * Colors.
    * @type {?Array.<Object>}
@@ -370,6 +371,7 @@ anychart.colorScalesModule.Ordinal.prototype.ticksInvalidated_ = function(event)
  */
 anychart.colorScalesModule.Ordinal.prototype.createTicks = function() {
   var ticks = new anychart.colorScalesModule.OrdinalTicks(this);
+  ticks.setupCreated('ticks', ticks);
   this.registerDisposable(ticks);
   ticks.listenSignals(this.ticksInvalidated_, this);
   return ticks;
@@ -619,7 +621,8 @@ anychart.colorScalesModule.Ordinal.prototype.calculate = function() {
  */
 anychart.scales.ordinalColor = function(opt_value) {
   var scale = new anychart.colorScalesModule.Ordinal();
-  scale.setupByJSON(/** @type {!Object} */(anychart.getFullTheme('defaultOrdinalColorScale')));
+  // scale.setupByJSON(/** @type {!Object} */(anychart.getFullTheme('defaultOrdinalColorScale')));
+  scale.setup(scale.themeSettings);
   scale.ranges(opt_value);
   return scale;
 };

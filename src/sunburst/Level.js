@@ -49,7 +49,7 @@ anychart.sunburstModule.Level = function(target) {
     ['labels', anychart.ConsistencyState.ONLY_DISPATCHING, 0]
   ]);
   this.normal_ = new anychart.core.StateSettings(this, normalDescriptorsMeta, anychart.PointState.NORMAL);
-  this.normal_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.CIRCULAR_LABELS_CONSTRUCTOR);
+  this.normal_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.CIRCULAR_LABELS_CONSTRUCTOR_NO_THEME);
   this.normal_.setOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK, /** @this {anychart.sunburstModule.Level} */ function(factory) {
     factory.listenSignals(this.labelsSignalHandler, this);
     factory.setParentEventTarget(this);
@@ -61,14 +61,14 @@ anychart.sunburstModule.Level = function(target) {
     ['labels', anychart.ConsistencyState.ONLY_DISPATCHING, 0]
   ]);
   this.hovered_ = new anychart.core.StateSettings(this, hoveredDescriptorsMeta, anychart.PointState.HOVER);
-  this.hovered_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.CIRCULAR_LABELS_CONSTRUCTOR);
+  this.hovered_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.CIRCULAR_LABELS_CONSTRUCTOR_NO_THEME);
 
   var selectedDescriptorsMeta = {};
   anychart.core.settings.createDescriptorsMeta(selectedDescriptorsMeta, [
     ['labels', anychart.ConsistencyState.ONLY_DISPATCHING, 0]
   ]);
   this.selected_ = new anychart.core.StateSettings(this, selectedDescriptorsMeta, anychart.PointState.SELECT);
-  this.selected_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.CIRCULAR_LABELS_CONSTRUCTOR);
+  this.selected_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.CIRCULAR_LABELS_CONSTRUCTOR_NO_THEME);
 
   this.normal_.labels().markConsistent(anychart.ConsistencyState.ALL);
 };
@@ -223,13 +223,23 @@ anychart.sunburstModule.Level.prototype.getHighPriorityResolutionChain = functio
 //endregion
 //region --- Setup and Dispose
 /** @inheritDoc */
-anychart.sunburstModule.Level.prototype.setupSpecial = function(isDefault, var_args) {
-  var arg0 = arguments[1];
+anychart.sunburstModule.Level.prototype.resolveSpecialValue = function(var_args) {
+  var arg0 = arguments[0];
   if (goog.isBoolean(arg0) || goog.isNull(arg0)) {
+    return {'enabled': !!arg0};
+  }
+  return null;
+};
+
+
+/** @inheritDoc */
+anychart.sunburstModule.Level.prototype.setupSpecial = function(isDefault, var_args) {
+  var resolvedValue = this.resolveSpecialValue(arguments[1]);
+  if (resolvedValue) {
     if (isDefault)
-      this.themeSettings['enabled'] = !!arg0;
+      this.themeSettings['enabled'] = resolvedValue['enabled'];
     else
-      this.enabled(!!arg0);
+      this.enabled(resolvedValue['enabled']);
     return true;
   }
   return false;

@@ -242,12 +242,25 @@ anychart.annotationsModule.ChartController.prototype.removeAllAnnotations = func
  */
 anychart.annotationsModule.ChartController.prototype.removeAnnotation = function(annotation) {
   var plotController = annotation.getPlotController();
+  this.checkAnnotationSelectedReset(annotation);
   if (plotController) {
     plotController.removeAnnotation(annotation);
   } else {
     goog.dispose(annotation);
   }
   return this;
+};
+
+
+/**
+ * Force nulls selectedAnnotation if it equals passed annotation
+ * @param {anychart.annotationsModule.Base} annotation
+ */
+anychart.annotationsModule.ChartController.prototype.checkAnnotationSelectedReset = function(annotation) {
+  if (this.selectedAnnotation_ == annotation) {
+    this.selectedAnnotation_ = null;
+    this.setupDrawing(false);
+  }
 };
 
 
@@ -313,7 +326,10 @@ anychart.annotationsModule.ChartController.prototype.createAnnotationByType = fu
   }
   type = anychart.enums.normalizeAnnotationType(type);
   var annotation = /** @type {anychart.annotationsModule.Base} */(new anychart.annotationsModule.AnnotationTypes[type](this));
-  annotation.setDefaultSettings(this.chart_.defaultAnnotationSettings()[anychart.utils.toCamelCase(annotation.getType())]);
+  annotation.addThemes('chart.defaultAnnotationSettings.base');
+  annotation.addThemes('chart.defaultAnnotationSettings.' + anychart.utils.toCamelCase(annotation.getType()));
+
+  annotation.setDefaultSettings();
   annotation.setup(config);
   return annotation;
 };

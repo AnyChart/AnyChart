@@ -35,6 +35,7 @@ anychart.vennModule.Intersections = function(chart) {
     ['markers', 0, 0]
   ]);
   this.normal_ = new anychart.core.StateSettings(this, normalDescriptorsMeta, anychart.PointState.NORMAL);
+  this.normal_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR,  anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME);
   this.normal_.setOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK, /** @this {anychart.vennModule.Intersections} */ function(factory) {
     factory.listenSignals(this.labelsInvalidated_, this);
   });
@@ -49,7 +50,10 @@ anychart.vennModule.Intersections = function(chart) {
     ['markers', 0, 0]
   ]);
   this.hovered_ = new anychart.core.StateSettings(this, descriptorsMeta, anychart.PointState.HOVER);
+  this.hovered_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR,  anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME);
+
   this.selected_ = new anychart.core.StateSettings(this, descriptorsMeta, anychart.PointState.SELECT);
+  this.selected_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR,  anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME);
   function markAllConsistent(factory) {
     factory.markConsistent(anychart.ConsistencyState.ALL);
   }
@@ -170,7 +174,7 @@ anychart.vennModule.Intersections.prototype.tooltip = function(opt_value) {
   if (!this.tooltip_) {
     this.tooltip_ = new anychart.core.ui.Tooltip(0);
     var parent = /** @type {anychart.core.ui.Tooltip} */ (this.chart_.tooltip());
-    this.tooltip_.parent(parent);
+    this.tooltip_.dropThemes().parent(parent);
     this.tooltip_.chart(this.chart_);
   }
   if (goog.isDef(opt_value)) {

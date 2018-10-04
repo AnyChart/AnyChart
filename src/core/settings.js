@@ -28,10 +28,22 @@ anychart.core.settings.PropertyDescriptor;
  *   signal: number,
  *   capabilities: number,
  *   beforeInvalidationHook: Function,
- *   context: *
+ *   context: *,
+ *   invalidationCondition: function(*, *):boolean
  * }}
  */
 anychart.core.settings.PropertyDescriptorMeta;
+
+
+/**
+ * Default values comparator.
+ * @param {*} oldValue - Old value.
+ * @param {*} newNormalizedValue - New normalized value.
+ * @return {boolean} - True if value has been changed and instance must be invalidated, false otherwise.
+ */
+anychart.core.settings.DEFAULT_INVALIDATION_CONDITION = function(oldValue, newNormalizedValue) {
+  return oldValue !== newNormalizedValue;
+};
 
 
 //region Creating descriptors
@@ -88,8 +100,10 @@ anychart.core.settings.createDescriptors = function(map, descriptors) {
  * @param {number=} opt_capabilities - Check function.
  * @param {Function=} opt_beforeInvalidationHook
  * @param {*=} opt_hookContext
+ * @param {(function(*, *):boolean)=} opt_invalidationCondition
  */
-anychart.core.settings.createDescriptorMeta = function(map, propName, consistency, signal, opt_capabilities, opt_beforeInvalidationHook, opt_hookContext) {
+anychart.core.settings.createDescriptorMeta = function(map, propName, consistency, signal, opt_capabilities,
+                                                       opt_beforeInvalidationHook, opt_hookContext, opt_invalidationCondition) {
   var meta = {
     consistency: consistency,
     signal: signal
@@ -100,7 +114,8 @@ anychart.core.settings.createDescriptorMeta = function(map, propName, consistenc
     meta.beforeInvalidationHook = opt_beforeInvalidationHook;
     meta.context = opt_hookContext;
   }
-  map[propName] = meta;
+  meta.invalidationCondition = opt_invalidationCondition;
+  map[propName] = /** @type {anychart.core.settings.PropertyDescriptorMeta} */ (meta);
 };
 
 
@@ -295,23 +310,25 @@ anychart.core.settings.serialize = function(target, descriptors, json, opt_warni
         );
       }
     }
-    if (!goog.isDef(val) && !opt_ownOnly && target.check(/** @type {number} */ (target.getCapabilities(name)))) {
-      val = target.getThemeOption(name);
-    }
-    if (goog.isDef(val) && !goog.isFunction(val)) {
-      if (descriptor.normalizer == anychart.core.settings.strokeOrFunctionNormalizer ||
-          descriptor.normalizer == anychart.core.settings.fillOrFunctionNormalizer ||
-          descriptor.normalizer == anychart.core.settings.hatchFillOrFunctionNormalizer ||
-          descriptor.normalizer == anychart.core.settings.strokeNormalizer ||
-          descriptor.normalizer == anychart.core.settings.fillNormalizer ||
-          descriptor.normalizer == anychart.core.settings.hatchFillNormalizer) {
-        val = anychart.color.serialize(descriptor.normalizer([val]));
-      } else if (descriptor.normalizer == anychart.core.settings.colorNormalizer && !goog.isNull(val)) {
-        val = anychart.color.serialize(descriptor.normalizer(val));
-      } else if (descriptor.normalizer == anychart.core.settings.adjustFontSizeNormalizer) {
-        val = descriptor.normalizer([val]);
+    if (descriptor) {
+      if (!goog.isDef(val) && !opt_ownOnly && target.check(/** @type {number} */ (target.getCapabilities(name)))) {
+        val = target.getThemeOption(name);
       }
-      json[name] = val;
+      if (goog.isDef(val) && !goog.isFunction(val)) {
+        if (descriptor.normalizer == anychart.core.settings.strokeOrFunctionNormalizer ||
+            descriptor.normalizer == anychart.core.settings.fillOrFunctionNormalizer ||
+            descriptor.normalizer == anychart.core.settings.hatchFillOrFunctionNormalizer ||
+            descriptor.normalizer == anychart.core.settings.strokeNormalizer ||
+            descriptor.normalizer == anychart.core.settings.fillNormalizer ||
+            descriptor.normalizer == anychart.core.settings.hatchFillNormalizer) {
+          val = anychart.color.serialize(descriptor.normalizer([val]));
+        } else if (descriptor.normalizer == anychart.core.settings.colorNormalizer && !goog.isNull(val)) {
+          val = anychart.color.serialize(descriptor.normalizer(val));
+        } else if (descriptor.normalizer == anychart.core.settings.adjustFontSizeNormalizer) {
+          val = descriptor.normalizer([val]);
+        }
+        json[name] = val;
+      }
     }
   }
 };
@@ -351,7 +368,8 @@ anychart.core.settings.copy = function(target, descriptors, config) {
 anychart.core.settings.simpleHandler = function(fieldName, deprecatedFieldName, normalizer, opt_value) {
   if (goog.isDef(opt_value)) {
     opt_value = normalizer.call(this, opt_value);
-    if (this.getOwnOption(fieldName) !== opt_value) {
+    var comparator = this.getInvalidationCondition(fieldName);
+    if (comparator.call(this, this.getOwnOption(fieldName), opt_value)) {
       this.setOption(fieldName, opt_value);
       if (this.check(/** @type {number} */ (this.getCapabilities(fieldName)))) {
         this.getHook(fieldName).call(this.getHookContext(fieldName));
@@ -408,7 +426,8 @@ anychart.core.settings.multiArgsHandler = function(fieldName, deprecatedFieldNam
       args.push(arguments[i]);
     }
     opt_value = arrayNormalizer.call(this, args);
-    if (this.getOwnOption(fieldName) !== opt_value) {
+    var comparator = this.getInvalidationCondition(fieldName);
+    if (comparator.call(this, this.getOwnOption(fieldName), opt_value)) {
       this.setOption(fieldName, opt_value);
       if (this.check(/** @type {number} */ (this.getCapabilities(fieldName)))) {
         this.getHook(fieldName).call(this.getHookContext(fieldName));
@@ -875,6 +894,7 @@ anychart.core.settings.descriptors = (function() {
   map.HEIGHT = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'height', anychart.core.settings.numberOrPercentNormalizer];
   map.FORMAT = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'format', anychart.core.settings.stringOrFunctionNormalizer];
   map.FONT_PADDING = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'fontPadding', anychart.core.settings.numberOrPercentNormalizer];
+  map.STICK_TO_LEFT = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'stickToLeft', anychart.core.settings.booleanNormalizer];
 
   //pie
   map.EXPLODE = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'explode', anychart.core.settings.numberOrPercentNormalizer];
@@ -989,6 +1009,14 @@ anychart.core.settings.IObjectWithSettings.prototype.getHookContext = function(f
  * @return {Function} Before invalidation hook.
  */
 anychart.core.settings.IObjectWithSettings.prototype.getHook = function(fieldName) {};
+
+
+/**
+ * Returns invalidation condition.
+ * @param {string} fieldName
+ * @return {function(*, *):boolean} Invalidation condition function.
+ */
+anychart.core.settings.IObjectWithSettings.prototype.getInvalidationCondition = function(fieldName) {};
 
 
 /**

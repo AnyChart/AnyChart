@@ -219,6 +219,12 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     },
     'defaultAnnotationSettings': {},
     'defaultPlotSettings': {
+      'defaultLineMarkerSettings': {
+        'zIndex': 200.2
+      },
+      'defaultTextMarkerSettings': {
+        'zIndex': 200.3
+      },
       'annotations': {
         'annotationsList': [],
         'zIndex': 2000
@@ -516,6 +522,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'padding': [20, 30, 20, 60],
     'plots': [{}],
     'eventMarkers': {
+      'stickToLeft': true,
       'normal': {
         'type': 'circle',
         'width': 22,

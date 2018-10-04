@@ -491,7 +491,7 @@ anychart.core.defaultTheme.returnStrokeWithThickness = function() {
 anychart.core.defaultTheme.chartA11yTitleFormatter = function() {
   /** @type {anychart.core.Chart} */
   var chart = this['chart'];
-  var title = chart.title();
+  var title = chart.getCreated('title');
   var titleText = title && title.enabled() && title.text() ? title.text() : '';
   var type = chart.getType();
   var typeText = type || 'Anychart ';
@@ -983,7 +983,9 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'fill': function() {
       return this['palette'].itemAt(this['index']);
     },
-    'palette': ['none'],
+    'palette': {
+      'items': ['none']
+    },
     'stroke': anychart.core.defaultTheme.colorStrokeNormal,
     'scale': 1,
     'zIndex': 11
@@ -1250,9 +1252,10 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
   },
 
   'chart': {
+    'zIndex': 0,
     'enabled': true,
     'padding': {'top': 10, 'right': 20, 'bottom': 15, 'left': 10},
-    'margin': 0,
+    'margin': {'top': 0, 'right': 0, 'bottom': 0, 'left': 0},
     'autoRedraw': true,
     'background': {'enabled': true, 'zIndex': 1},
     'contextMenu': {
@@ -1772,6 +1775,7 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
       'base': {
         'normal': {
           'labels': {
+            'enabled': null,
             'format': anychart.core.defaultTheme.VALUE_TOKEN_DECIMALS_COUNT_2
           }
         }

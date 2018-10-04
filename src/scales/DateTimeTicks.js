@@ -628,7 +628,7 @@ anychart.scales.DateTimeTicks.prototype.setupSpecial = function(isDefault, var_a
     this.set(arg);
     return true;
   }
-  return anychart.core.Base.prototype.setupSpecial.apply(this, arguments);
+  return false;
 };
 
 

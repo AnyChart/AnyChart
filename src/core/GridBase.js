@@ -22,7 +22,7 @@ goog.require('anychart.scales');
 anychart.core.GridBase = function() {
   anychart.core.GridBase.base(this, 'constructor');
 
-
+  this.addThemes('defaultGridSettings');
   /**
    * @type {acgraph.vector.Path}
    * @protected
@@ -302,23 +302,34 @@ anychart.core.GridBase.prototype.zIndex = function(opt_value) {
 //endregion
 //region --- Palette
 /**
+ * Creates palette depending on passed value type.
+ * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|Object|Array.<string>)} palette
+ * @private
+ */
+anychart.core.GridBase.prototype.checkSetupPalette_ = function(palette) {
+  if (anychart.utils.instanceOf(palette, anychart.palettes.RangeColors) || (goog.isObject(palette) && palette['type'] == 'range')) {
+    this.setupPalette_(anychart.palettes.RangeColors);
+  } else if (anychart.utils.instanceOf(palette, anychart.palettes.DistinctColors) || goog.isObject(palette) || this.palette_ == null) {
+    this.setupPalette_(anychart.palettes.DistinctColors);
+  }
+};
+
+
+/**
  * Getter/setter for palette.
  * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|Object|Array.<string>)=} opt_value .
  * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|anychart.core.GridBase)} .
  */
 anychart.core.GridBase.prototype.palette = function(opt_value) {
-  if (anychart.utils.instanceOf(opt_value, anychart.palettes.RangeColors)) {
-    this.setupPalette_(anychart.palettes.RangeColors, /** @type {anychart.palettes.RangeColors} */(opt_value));
-    return this;
-  } else if (anychart.utils.instanceOf(opt_value, anychart.palettes.DistinctColors)) {
-    this.setupPalette_(anychart.palettes.DistinctColors, /** @type {anychart.palettes.DistinctColors} */(opt_value));
-    return this;
-  } else if (goog.isObject(opt_value) && opt_value['type'] == 'range') {
-    this.setupPalette_(anychart.palettes.RangeColors);
-  } else if (goog.isObject(opt_value) || this.palette_ == null)
-    this.setupPalette_(anychart.palettes.DistinctColors);
+  if (!this.palette_ && (!this.parent_ || this.themeSettings['palette'])) { // this is for map/elements/Grid.js to work properly
+    var palette = this.themeSettings['palette'];
+    this.checkSetupPalette_(palette);
+    this.setupCreated('palette', this.palette_);
+    this.palette_.restoreDefaults(false);
+  }
 
   if (goog.isDef(opt_value)) {
+    this.checkSetupPalette_(opt_value);
     this.palette_.setup(opt_value);
     return this;
   }
@@ -328,20 +339,16 @@ anychart.core.GridBase.prototype.palette = function(opt_value) {
 
 /**
  * @param {Function} cls Palette constructor.
- * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors)=} opt_cloneFrom Settings to clone from.
  * @private
  */
-anychart.core.GridBase.prototype.setupPalette_ = function(cls, opt_cloneFrom) {
+anychart.core.GridBase.prototype.setupPalette_ = function(cls) {
   if (anychart.utils.instanceOf(this.palette_, cls)) {
-    if (opt_cloneFrom)
-      this.palette_.setup(opt_cloneFrom);
+    //do nothing
   } else {
     // we dispatch only if we replace existing palette.
     var doDispatch = !!this.palette_;
     goog.dispose(this.palette_);
     this.palette_ = new cls();
-    if (opt_cloneFrom)
-      this.palette_.setup(opt_cloneFrom);
     this.palette_.listenSignals(this.paletteInvalidated_, this);
     this.registerDisposable(this.palette_);
     if (doDispatch)
@@ -493,7 +500,7 @@ anychart.core.GridBase.prototype.setupScale = function(useAutoScale, opt_value) 
         scaleProperty.unlistenSignals(this.scaleInvalidated, this);
 
       scaleProperty = /** @type {anychart.stockModule.scales.Scatter|anychart.scales.Base} */(val);
-      useAutoScale ? this.autoScale_ = scaleProperty :this.scale_ = scaleProperty;
+      useAutoScale ? this.autoScale_ = scaleProperty : this.scale_ = scaleProperty;
 
       if (val && !stockScale)
         val.resumeSignalsDispatching(dispatch);
@@ -507,6 +514,7 @@ anychart.core.GridBase.prototype.setupScale = function(useAutoScale, opt_value) 
 
   return scaleProperty;
 };
+
 
 /**
  * Getter/setter for scale.
@@ -625,7 +633,7 @@ anychart.core.GridBase.prototype.getFillElement = function(index) {
     var context = {
       'index': index,
       'grid': this,
-      'palette': this.palette_ || this.parent_.palette()
+      'palette': this.palette() || this.parent_.palette()
     };
 
     fill_ = fill.call(context);
@@ -837,7 +845,7 @@ anychart.core.GridBase.prototype.applyZIndex = function() {
 };
 
 
-    /**
+/**
  * Drawing.
  * @return {anychart.core.GridBase} An instance of {@link anychart.core.GridBase} class for method chaining.
  */
@@ -908,20 +916,6 @@ anychart.core.GridBase.prototype.serialize = function() {
   anychart.core.settings.serialize(this, this.SIMPLE_PROPS_DESCRIPTORS, json, 'Map grids props');
 
   return json;
-};
-
-
-/** @inheritDoc */
-anychart.core.GridBase.prototype.setupSpecial = function(isDefault, var_args) {
-  var arg0 = arguments[1];
-  if (goog.isBoolean(arg0) || goog.isNull(arg0)) {
-    if (isDefault)
-      this.themeSettings['enabled'] = !!arg0;
-    else
-      this.enabled(!!arg0);
-    return true;
-  }
-  return false;
 };
 
 

@@ -735,6 +735,7 @@ anychart.ganttModule.Scale.prototype.minReached_ = function() {
 /**
  * If total max is visually reached.
  * @return {boolean}
+ * @private
  */
 anychart.ganttModule.Scale.prototype.maxReached_ = function() {
   if (this.isEmpty())
@@ -911,16 +912,16 @@ anychart.ganttModule.Scale.prototype.zoomLevels = function(opt_value) {
     if (!same) {
       this.ranges_ = newZoomLevels;
       this.consistent = false;
-      this.dispatchSignal(anychart.Signal.NEED_UPDATE_TICK_DEPENDENT);
+      this.dispatchSignal(anychart.Signal.NEED_UPDATE_TICK_DEPENDENT | anychart.Signal.NEEDS_RECALCULATION);
     }
     return this;
   }
   return /** @type {anychart.ganttModule.Scale.ZoomLevelsSettings} */(
       goog.array.map(this.ranges_, function(item) {
-        return goog.array.map(item.levels, function(level) {
+        return goog.array.map(item['levels'], function(level) {
           return {
-            'unit': level.unit,
-            'count': level.count
+            'unit': level['unit'],
+            'count': level['count']
           };
         });
       }));
@@ -1055,6 +1056,7 @@ anychart.ganttModule.Scale.prototype.serialize = function() {
 
   json['minimumGap'] = this.minimumGap_;
   json['maximumGap'] = this.maximumGap_;
+  json['zoomLevels'] = this.zoomLevels();
 
   return json;
 };
@@ -1099,6 +1101,9 @@ anychart.ganttModule.Scale.prototype.setupByJSON = function(config, opt_default)
     this.max_ = config['visibleMaximum'];
     recalc = true;
   }
+
+  if ('zoomLevels' in config)
+    this.zoomLevels(config['zoomLevels']);
 
   if (recalc) {
     this.consistent = false;
