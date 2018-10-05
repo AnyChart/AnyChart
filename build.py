@@ -1002,7 +1002,7 @@ def __compile_project(*args, **kwargs):
                                     {'name': 'graphics.js'},
                                     {'name': 'graphics.min.js'} ]
 
-        with open(os.path.join(output, 'resource.json'), 'w') as f:
+        with open(os.path.join(output,'..', 'resources.json'), 'w') as f:
             f.write(json.dumps(resource_json))
 
     print ''
