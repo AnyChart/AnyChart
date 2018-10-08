@@ -28,8 +28,7 @@ def build_github_url(path, endpoint='api'):
 
 
 def create_github_release(version, tag):
-    dirname = os.path.dirname(os.path.join(os.path.realpath(__file__),'..','..','..'))
-    url = build_github_url('/repos/AnyChart/'+dirname+'/releases')
+    url = build_github_url('/repos/AnyChart/AnyChart/releases')
     data = {
         'tag_name': tag,
         #'target_commitish': tag,
