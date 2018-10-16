@@ -8,6 +8,7 @@
 
 echo Building binary JS files
 python ./build.py compile --output ./dist/js
+mv ./dist/js/resources.json ./dist/
 
 echo Building binary CSS files
 python ./build.py css --output ./dist/css
