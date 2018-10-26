@@ -270,6 +270,23 @@ anychart.utils.normalizeSize = function(value, opt_containerSize, opt_invert) {
 
 
 /**
+ * Gets state string name.
+ * @param {anychart.PointState|number} state - State.
+ * @return {string}
+ */
+anychart.utils.pointStateToName = function(state) {
+  switch (state) {
+    case anychart.PointState.HOVER:
+      return 'hovered';
+    case anychart.PointState.SELECT:
+      return 'selected';
+    default:
+      return 'normal';
+  }
+};
+
+
+/**
  * Define whether value is set in percent.
  * @param {*} value Value to define.
  * @return {boolean} Is value set in percent.

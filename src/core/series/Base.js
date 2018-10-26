@@ -3136,9 +3136,11 @@ anychart.core.series.Base.prototype.draw = function() {
 
   this.calcColorScale();
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_COLOR)) {
-    this.updateAutoMarkersColors();
-  }
+  //TODO (A.Kudryavtsev): updateAutoMarkersColors is so heavy operation. Commenting this boosts performance
+  //TODO (A.Kudryavtsev): and doesn't affect anything. Left here to consider it on potential issues.
+  // if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_COLOR)) {
+  //    this.updateAutoMarkersColors();
+  // }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_POINTS)) {
     this.invalidate(anychart.ConsistencyState.SERIES_LABELS |

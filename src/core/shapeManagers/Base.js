@@ -124,7 +124,9 @@ anychart.core.shapeManagers.Base = function(series, config, interactive, opt_sha
       zIndex: +shapeConfig.zIndex,
       isHatchFill: shapeConfig.isHatchFill,
       cls: cls,
-      shapeType: type
+      shapeType: type,
+      fillName: shapeConfig.fillName,
+      strokeName: shapeConfig.strokeName
     };
   }
 };
@@ -138,7 +140,9 @@ goog.inherits(anychart.core.shapeManagers.Base, goog.Disposable);
  *   zIndex: (number),
  *   isHatchFill: boolean,
  *   cls: function():acgraph.vector.Shape,
- *   shapeType: string
+ *   shapeType: string,
+ *   fillName: string,
+ *   strokeName: string
  * }}
  */
 anychart.core.shapeManagers.Base.ShapeDescriptor;
@@ -422,15 +426,17 @@ anychart.core.shapeManagers.Base.prototype.updateColors_ = function(state, shape
 
 
 /**
- * @param {acgraph.vector.Fill|acgraph.vector.PatternFill} fill .
- * @param {acgraph.vector.Stroke} stroke .
+ * @param {(acgraph.vector.Fill|acgraph.vector.PatternFill)=} opt_fill .
+ * @param {acgraph.vector.Stroke=} opt_stroke .
  * @param {Object.<string, *>=} opt_only If set - contains a subset of shape names.
  * @param {number=} opt_state .
  */
-anychart.core.shapeManagers.Base.prototype.updateMetaColors = function(fill, stroke, opt_only, opt_state) {
+anychart.core.shapeManagers.Base.prototype.updateMetaColors = function(opt_fill, opt_stroke, opt_only, opt_state) {
   var iterator = this.series.getIterator();
-  iterator.meta('fill', fill);
-  iterator.meta('stroke', stroke);
+  if (goog.isDef(opt_fill))
+    iterator.meta('fill', opt_fill);
+  if (goog.isDef(opt_stroke))
+    iterator.meta('stroke', opt_stroke);
 };
 
 

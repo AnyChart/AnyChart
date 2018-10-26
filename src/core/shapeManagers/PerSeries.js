@@ -41,6 +41,68 @@ anychart.core.shapeManagers.PerSeries.prototype.clearShapes = function() {
 
 
 /**
+ * Wrapper on the series coloring to boost performance skipping heavyweight operations like color resolving.
+ *
+ * @param {anychart.core.shapeManagers.Base.ShapeDescriptor} descriptor - Descriptor.
+ * @param {anychart.PointState|number} state - State .
+ * @param {?string} colorerName - Colorer name.
+ * @param {boolean=} opt_isFill - Whether color is fill.
+ * @private
+ * @return {(acgraph.vector.Fill|acgraph.vector.Stroke|undefined)}
+ */
+anychart.core.shapeManagers.PerSeries.prototype.colorize_ = function(descriptor, state, colorerName, opt_isFill) {
+  var result = void 0;
+  if (colorerName) {
+    var iterator = this.series.getIterator();
+    var stateName = anychart.utils.pointStateToName(state);
+    var stateObj = iterator.get(stateName);
+    var pointData = stateObj ?
+        stateObj[colorerName] :
+        iterator.get(anychart.color.getPrefixedColorName(state, colorerName)); //Deprecated data fields support.
+
+    if (pointData) {
+      // Here we suppose that user passes point data as valid color object.
+      result = /** @type {acgraph.vector.Fill|acgraph.vector.Stroke} */ (pointData);
+    } else {
+      var colorScale = this.series.colorScale();
+
+      /*
+          This actually is
+          - this.series.hovered.fill
+          - this.series.normal.stroke
+          - ...
+         */
+      var seriesColorer = this.series[stateName]()[colorerName]();
+
+
+      if (goog.isFunction(seriesColorer) || colorScale) {
+        /*
+        This actually is something like
+        - anychart.themes.defaultTheme.chart.defaultSeriesSettings.base.hovered.stroke
+        - anychart.themes.defaultTheme.chart.defaultSeriesSettings.base.hovered.fill
+        - ...
+       */
+        var defaultColorer = anychart.window['anychart']['themes'][anychart.DEFAULT_THEME]['chart']['defaultSeriesSettings']['base'][stateName][colorerName];
+
+        if (seriesColorer == defaultColorer && !colorScale) {
+          var ctx = {'sourceColor': this.series.getOption('color')};
+          result = seriesColorer.call(ctx);
+        } else {
+          //Color resolution is here. Heavyweight operation.
+          result = opt_isFill ?
+              /** @type {acgraph.vector.Fill} */(descriptor.fill(this.series, state)) :
+              /** @type {acgraph.vector.Stroke} */(descriptor.stroke(this.series, state));
+        }
+      } else {
+        result = seriesColorer;
+      }
+    }
+  }
+  return result;
+};
+
+
+/**
  * Returns point color full hash.
  * @param {number} state .
  * @param {Object.<string>=} opt_only .
@@ -52,11 +114,18 @@ anychart.core.shapeManagers.PerSeries.prototype.calcPointColors = function(state
   var iterator = this.series.getIterator();
 
   var fill, stroke;
+  var descFill;
+  var descStroke;
+
   var hash = '';
   for (var name in names) {
     var descriptor = this.defs[name];
-    var descFill = /** @type {acgraph.vector.Fill} */(descriptor.fill(this.series, state));
-    var descStroke = /** @type {acgraph.vector.Stroke} */(descriptor.stroke(this.series, state));
+
+    var strokeName = descriptor.strokeName;
+    var fillName = descriptor.fillName;
+
+    descFill = this.colorize_(descriptor, state, fillName, true);
+    descStroke = this.colorize_(descriptor, state, strokeName);
 
     if (!descriptor.isHatchFill) {
       if (descFill && anychart.color.isNotNullColor(descFill))
@@ -65,7 +134,7 @@ anychart.core.shapeManagers.PerSeries.prototype.calcPointColors = function(state
         stroke = descStroke;
     }
 
-    hash += name + anychart.color.hash(descFill) + anychart.color.hash(descStroke);
+    hash += name + anychart.color.hash(/** @type {acgraph.vector.Fill} */ (descFill)) + anychart.color.hash(/** @type {acgraph.vector.Stroke} */ (descStroke));
   }
 
   this.updateMetaColors(/** @type {acgraph.vector.Fill} */(fill), /** @type {acgraph.vector.Stroke} */(stroke), opt_only);
