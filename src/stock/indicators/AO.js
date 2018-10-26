@@ -39,8 +39,15 @@ anychart.stockModule.indicators.AO = function(args) {
   this.declareSeries('main', args[5], anychart.enums.StockSeriesType.STICK);
   this.init();
 
-  this.series()['risingStroke'](anychart.getFullTheme('stock.defaultPlotSettings.defaultSeriesSettings.ohlc.normal.risingStroke'));
-  this.series()['fallingStroke'](anychart.getFullTheme('stock.defaultPlotSettings.defaultSeriesSettings.ohlc.normal.fallingStroke'));
+  //TODO (A.Kudryavtsev): I really don't know why the values are hardcoded here and use OHLC coloring.
+  //TODO (A.Kudryavtsev): It is probably an issue for future features.
+  var ohlcRising = anychart.getFullTheme('stock.defaultPlotSettings.defaultSeriesSettings.ohlc.normal.risingStroke');
+  var ohlcFalling = anychart.getFullTheme('stock.defaultPlotSettings.defaultSeriesSettings.ohlc.normal.fallingStroke');
+
+  this.series()['risingStroke'](ohlcRising);
+  this.series()['fallingStroke'](ohlcFalling);
+  this.series()['risingFill'](ohlcRising);
+  this.series()['fallingFill'](ohlcFalling);
 };
 goog.inherits(anychart.stockModule.indicators.AO, anychart.stockModule.indicators.Base);
 
