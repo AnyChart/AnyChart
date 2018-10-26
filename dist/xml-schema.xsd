@@ -582,6 +582,8 @@
         <xsd:attribute name="curvature" type="xsd:double"/>
         <!-- Choropleth series -->
         <xsd:attribute name="color_scale" type="simple.ScaleRef"/>
+        <!-- Cartesian series -->
+        <xsd:attribute name="x_mode" type="enums.XMode" />
     </xsd:complexType>
 
     <xsd:complexType name="Series_list">
@@ -3877,6 +3879,13 @@
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="none" />
             <xsd:enumeration value="consider" />
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="enums.XMode">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="ordinal" />
+            <xsd:enumeration value="scatter" />
         </xsd:restriction>
     </xsd:simpleType>
 

@@ -860,15 +860,26 @@ anychart.core.Chart.prototype.showTooltip_ = function(event) {
       if (this.tooltip_.getOption('displayMode') == anychart.enums.TooltipDisplayMode.SINGLE) {
         points = event['seriesStatus'];
       } else {
-        var pointIndex = event['seriesStatus'][0]['points'][0];
+        var categoryIndex;
+        var pointIndex = categoryIndex = event['seriesStatus'][0]['points'][0];
         // improve maps support (separated & point modes)
-        if (goog.isDef(pointIndex['index'])) pointIndex = pointIndex['index'];
+        if (goog.isDef(pointIndex['index'])) pointIndex = categoryIndex = pointIndex['index'];
+        var series = event['seriesStatus'][0]['series'];
+
+        // if series xScale ordinal and in scatter xMode than we should use categoryIndex insteadof pointIndex
+        if (anychart.utils.instanceOf(series.getXScale(), anychart.scales.Ordinal) &&
+            series.getOption('xMode') == anychart.enums.XMode.SCATTER) {
+          categoryIndex = event['point'].get('x');
+        }
 
         // check isDef series for compile_each (for gantt, etc.)
         if (goog.isDef(this.getAllSeries())) {
           // get points from all series by point index
           points = goog.array.map(this.getAllSeries(), function(series) {
-            series.getIterator().select(pointIndex);
+            if (series.getOption('xMode') == anychart.enums.XMode.SCATTER)
+              series.getIterator().select(pointIndex);
+            else
+              series.getIterator().select(categoryIndex);
             return {
               'series': series,
               'points': [pointIndex]

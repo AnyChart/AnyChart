@@ -2794,6 +2794,9 @@
         "autoIndex": {
           "type": "number"
         },
+        "xMode": {
+          "enum": ["ordinal", "scatter"]
+        },
         "isVertical": {
           "type": [
             "boolean",

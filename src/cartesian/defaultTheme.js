@@ -4,7 +4,12 @@ goog.provide('anychart.cartesianModule.defaultTheme');
 goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
   // merge with cartesianBase
   'cartesian': {
-    'defaultSeriesType': 'line'
+    'defaultSeriesType': 'line',
+    'defaultSeriesSettings': {
+      'base': {
+        'xMode': 'ordinal'
+      }
+    }
     // 'xAxes': [],
     // 'yAxes': []
   },
