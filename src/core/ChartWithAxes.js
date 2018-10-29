@@ -1149,7 +1149,12 @@ anychart.core.ChartWithAxes.prototype.getBoundsWithoutAxes = function(contentAre
           break;
       }
       axis.suspendSignalsDispatching();
-      axis.padding(0);
+      var axisPaddingSettings = axis.padding().ownSettings;
+      axisPaddingSettings['top'] = 0;
+      axisPaddingSettings['right'] = 0;
+      axisPaddingSettings['bottom'] = 0;
+      axisPaddingSettings['left'] = 0;
+      axis.invalidate(axis.ALL_VISUAL_STATES);
     }
   }
 

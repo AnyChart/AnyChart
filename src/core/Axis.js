@@ -64,7 +64,6 @@ anychart.core.Axis = function() {
   /**
    * Constant to save space.
    * @type {number}
-   * @protected
    */
   this.ALL_VISUAL_STATES = anychart.ConsistencyState.APPEARANCE |
       anychart.ConsistencyState.AXIS_TITLE |
@@ -1191,7 +1190,7 @@ anychart.core.Axis.prototype.getLabelBounds_ = function(index, isMajor, ticksArr
     label.stateOrder([label.ownSettings, labels.ownSettings, labels.themeSettings]);
     labelBounds = labels.measure(label, undefined, undefined, index);
   } else {
-    var textEl = label.getTextElement();
+    var textEl = /** @type {anychart.core.ui.Text} */ (label.getTextElement());
 
     //TODO (A.Kudryavtsev): Looks like an issue.
     if (textEl.bounds) {

@@ -10128,6 +10128,8 @@ goog.require("goog.math.Rect");
 acgraph.vector.Element = function() {
   acgraph.vector.Element.base(this, "constructor");
   this.attributes_ = {};
+  this.isSuspended_ = false;
+  this.suspendedState_ = 0;
   this.setDirtyState(acgraph.vector.Element.DirtyState.ALL);
 };
 goog.inherits(acgraph.vector.Element, goog.events.EventTarget);
@@ -10263,16 +10265,28 @@ acgraph.vector.Element.prototype.isDirty = function() {
 acgraph.vector.Element.prototype.hasDirtyState = function(state) {
   return !!(this.dirtyState_ & state);
 };
+acgraph.vector.Element.prototype.suspend = function() {
+  this.isSuspended_ = true;
+};
+acgraph.vector.Element.prototype.resume = function() {
+  this.isSuspended_ = false;
+  this.setDirtyState(this.suspendedState_);
+  this.suspendedState_ = 0;
+};
 acgraph.vector.Element.prototype.setDirtyState = function(value) {
   value &= this.SUPPORTED_DIRTY_STATES;
-  if (!!value) {
-    this.dirtyState_ |= value;
-    if (this.parent_) {
-      this.parent_.setDirtyState(acgraph.vector.Element.DirtyState.CHILDREN);
-    }
-    var stage = this.getStage();
-    if (stage && !stage.isSuspended() && !stage.isRendering() && !this.isRendering()) {
-      this.render();
+  if (value) {
+    if (this.isSuspended_) {
+      this.suspendedState_ |= value;
+    } else {
+      this.dirtyState_ |= value;
+      if (this.parent_) {
+        this.parent_.setDirtyState(acgraph.vector.Element.DirtyState.CHILDREN);
+      }
+      var stage = this.getStage();
+      if (stage && !stage.isSuspended() && !stage.isRendering() && !this.isRendering()) {
+        this.render();
+      }
     }
   }
 };
@@ -15557,7 +15571,7 @@ acgraph.vector.svg.Renderer.prototype.createMeasurement = function() {
     this.measurementLayerForBBox_ = this.createLayerElement();
     goog.dom.appendChild(this.measurement_, this.measurementLayerForBBox_);
     this.setAttrs(this.measurement_, {"width":0, "height":0});
-    this.measurement_.style.cssText = "position: absolute; left: -99999; top: -99999";
+    this.measurement_.style.cssText = "position: absolute; left: -99999px; top: -99999px";
     this.measurementGroupNode_ = this.createLayerElement();
     goog.dom.appendChild(this.measurement_, this.measurementGroupNode_);
     goog.dom.appendChild(goog.global["document"].body, this.measurement_);

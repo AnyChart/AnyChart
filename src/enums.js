@@ -5101,3 +5101,34 @@ anychart.enums.normalizeScaleRangeMode = function(value) {
   return /** @type {anychart.enums.ScaleRangeMode} */ (anychart.enums.normalize(anychart.enums.ScaleRangeMode, value,
       anychart.enums.ScaleRangeMode.NONE));
 };
+
+
+/**
+ * Cartesian series ordinal xScale drawing behaviour representation.
+ * In case of ORDINAL only last point in same-named category is drawn.
+ * In case of SCATTER all points in same-named category are drawn.
+ *
+ * data = [
+ *  ['p1', 10],
+ *  ['p1', 5],
+ *  ['p2', 15]
+ * ]
+ *
+ * If ORDINAL only 2 points will be drawn, otherwise - 3 points.
+ * @enum {string}
+ */
+anychart.enums.XMode = {
+  ORDINAL: 'ordinal',
+  SCATTER: 'scatter'
+};
+
+
+/**
+ * Normalizes x mode string.
+ * @param {*} value
+ * @return {anychart.enums.XMode}
+ */
+anychart.enums.normalizeXMode = function(value) {
+  return /** @type {anychart.enums.XMode} */ (anychart.enums.normalize(anychart.enums.XMode, value,
+      anychart.enums.XMode.ORDINAL));
+};

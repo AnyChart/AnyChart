@@ -1163,7 +1163,8 @@ anychart.ganttModule.Controller.prototype.serialize = function() {
   var json = anychart.ganttModule.Controller.base(this, 'serialize');
 
   json['isResourceChart'] = this.isResources_;
-  json['treeData'] = this.data().serializeWithoutMeta(['collapsed']);
+  if (this.data_)
+    json['treeData'] = this.data_.serializeWithoutMeta(['collapsed']);
   json['verticalOffset'] = this.verticalOffset();
   if (!isNaN(this.startIndex()))
     json['startIndex'] = this.startIndex();

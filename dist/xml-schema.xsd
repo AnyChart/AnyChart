@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsd:schema
         xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-        targetNamespace="http://anychart.com/schemas/8.4.0/xml-schema.xsd"
-        xmlns="http://anychart.com/schemas/8.4.0/xml-schema.xsd"
+        targetNamespace="http://anychart.com/schemas/8.4.1/xml-schema.xsd"
+        xmlns="http://anychart.com/schemas/8.4.1/xml-schema.xsd"
         elementFormDefault="qualified">
 
     <xsd:element name="anychart" type="Anychart"/>
@@ -582,6 +582,8 @@
         <xsd:attribute name="curvature" type="xsd:double"/>
         <!-- Choropleth series -->
         <xsd:attribute name="color_scale" type="simple.ScaleRef"/>
+        <!-- Cartesian series -->
+        <xsd:attribute name="x_mode" type="enums.XMode" />
     </xsd:complexType>
 
     <xsd:complexType name="Series_list">
@@ -2907,6 +2909,23 @@
         <xsd:attribute name="tooltip" type="simple.BoolOrNull" default="true"/>
     </xsd:complexType>
 
+    <xsd:complexType name="core.SankeyVisualElement">
+        <xsd:all>
+            <xsd:element name="fill" type="Fill" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="stroke" type="Stroke" minOccurs="0" maxOccurs="1"/>
+
+            <xsd:element name="labels" type="core.LabelsFactory" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="tooltip" type="core.Tooltip" minOccurs="0" maxOccurs="1"/>
+
+            <xsd:element minOccurs="0" maxOccurs="1" name="normal" type="core.StateSettings"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="hovered" type="core.StateSettings"/>
+        </xsd:all>
+        <xsd:attribute name="fill" type="xsd:string"/>
+        <xsd:attribute name="stroke" type="xsd:string"/>
+        <xsd:attribute name="labels" type="simple.BoolOrNull" default="true"/>
+        <xsd:attribute name="tooltip" type="simple.BoolOrNull" default="true"/>
+    </xsd:complexType>
+
     <xsd:complexType name="core.SunburstLevels">
         <xsd:sequence minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="level" type="core.sunburst.Level"/>
@@ -3877,6 +3896,13 @@
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="none" />
             <xsd:enumeration value="consider" />
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="enums.XMode">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="ordinal" />
+            <xsd:enumeration value="scatter" />
         </xsd:restriction>
     </xsd:simpleType>
 

@@ -41,6 +41,12 @@ anychart.core.series.Cartesian = function(chart, plot, type, config, sortedMode)
    */
   this.sortedMode_ = sortedMode;
 
+  anychart.core.settings.createDescriptorMeta(this.descriptorsMeta,
+      'xMode',
+      anychart.ConsistencyState.SERIES_POINTS,
+      anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW,
+      anychart.core.series.Capabilities.ANY);
+
   this.data(null);
 };
 goog.inherits(anychart.core.series.Cartesian, anychart.core.series.Base);
@@ -147,6 +153,25 @@ anychart.core.series.Cartesian.prototype.hoverMode_;
  * @private
  */
 anychart.core.series.Cartesian.prototype.pointProvider_;
+
+
+//endregion
+//region --- Descriptors
+/**
+ * Properties that should be defined in series.Base prototype.
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.core.series.Cartesian.OWN_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'xMode', anychart.enums.normalizeXMode]
+  ]);
+
+  return map;
+})();
+anychart.core.settings.populate(anychart.core.series.Cartesian, anychart.core.series.Cartesian.OWN_DESCRIPTORS);
 
 
 //endregion
@@ -653,6 +678,10 @@ anychart.core.series.Cartesian.prototype.planIsXScaleInverted = function() {
 /** @inheritDoc */
 anychart.core.series.Cartesian.prototype.isPointVisible = function(point) {
   var index = point.getIndex();
+  var xModeScatter = this.getOption('xMode') == anychart.enums.XMode.SCATTER;
+  if (xModeScatter) {
+    index = this.drawingPlan.xHashMap[anychart.utils.hash(this.drawingPlan.data[index].data['x'])];
+  }
   return (index >= this.drawingPlan.firstIndex && index <= this.drawingPlan.lastIndex);
 };
 
@@ -779,7 +808,7 @@ anychart.core.series.Cartesian.prototype.getDrawingData = function(data, dataPus
 
   // anychart.performance.end('Drawing plan calc');
   this.invalidate(anychart.ConsistencyState.SERIES_DATA);
-  return this.drawingPlan = {
+  this.drawingPlan = {
     data: data,
     series: this,
     hasPointLabels: this.supportsLabels() &&
@@ -820,6 +849,8 @@ anychart.core.series.Cartesian.prototype.getDrawingData = function(data, dataPus
     hasPointYErrors: hasYErrors,
     hasPointErrors: hasXErrors || hasYErrors
   };
+
+  return this.drawingPlan;
 };
 
 
@@ -923,8 +954,20 @@ anychart.core.series.Cartesian.prototype.getOrdinalDrawingPlan = function(xHashM
       return result || null;
     };
   } else {
+    var xModeScatter = this.getOption('xMode') == anychart.enums.XMode.SCATTER;
     if (opt_seriesIndependent) {
       dataPusher = function(data, point) {
+        data.push(point);
+        return null;
+      };
+    } else if (xModeScatter) {
+      dataPusher = function(data, point) {
+        var xValue = point.data['x'];
+        var xHash = anychart.utils.hash(xValue);
+        if (!(xHash in xHashMap)) {
+          xHashMap[xHash] = xArray.length;
+          xArray.push(xValue);
+        }
         data.push(point);
         return null;
       };
@@ -952,7 +995,9 @@ anychart.core.series.Cartesian.prototype.getOrdinalDrawingPlan = function(xHashM
     return a === undefined;
   };
 
-  var result = this.getDrawingData(new Array(xArray.length), dataPusher, xNormalizer, xMissingChecker);
+  var result = this.getDrawingData(xModeScatter ? [] : new Array(xArray.length), dataPusher, xNormalizer, xMissingChecker);
+
+  //TODO (A.Kudryavtsev): Looks like overhead. Can we avoid this passage somehow?
   var data = result.data;
   for (var i = 0; i < data.length; i++) {
     if (!data[i])
@@ -992,14 +1037,32 @@ anychart.core.series.Cartesian.comparePointsXNumericAsc = function(a, b) {
 
 /**
  * @param {*} fieldValue
- * @return {number}
+ * @return {number|Array.<number>}
  */
 anychart.core.series.Cartesian.prototype.findX = function(fieldValue) {
   var res;
   if (this.drawingPlan) { // no plan yet - strange situation, falling back to data view search
     if (this.drawingPlan.xHashMap) { // ordinal plan
       res = this.drawingPlan.xHashMap[anychart.utils.hash(fieldValue)];
-      return isNaN(res) ? -1 : res;
+      if (isNaN(res)) {
+        return -1;
+      } else {
+        var xModeScatter = this.getOption('xMode') == anychart.enums.XMode.SCATTER;
+
+        // in scatter mode there can be more than one index for category
+        if (xModeScatter) {
+          res = [];
+          var dataArray = this.drawingPlan.data;
+          // search data indexes for category
+          for (var i = 0; i < dataArray.length; i++) {
+            var data = dataArray[i];
+            if (data.data['x'] == fieldValue) {
+              res.push(data.meta['rawIndex']);
+            }
+          }
+        }
+        return res;
+      }
     } else if (this.drawingPlan.data.length) { // scatter case - plan.data should be sorted by X field
       res = goog.array.binarySelect(this.drawingPlan.data, function(val) {
         return /** @type {number} */(fieldValue) - val.data['x'];
@@ -1038,6 +1101,7 @@ anychart.core.series.Cartesian.prototype.findInRangeByX = function(minValue, max
   if (this.drawingPlan) { // no plan yet - strange situation, falling back to data view search
     var res = [];
     var i, start, end;
+    var xModeScatter = this.getOption('xMode') == anychart.enums.XMode.SCATTER;
     if (this.drawingPlan.xHashMap) { // ordinal plan
       start = this.drawingPlan.xHashMap[anychart.utils.hash(minValue)];
       end = this.drawingPlan.xHashMap[anychart.utils.hash(maxValue)];
@@ -1057,9 +1121,21 @@ anychart.core.series.Cartesian.prototype.findInRangeByX = function(minValue, max
         start = end;
         end = tmp;
       }
-      end = Math.min(end, this.drawingPlan.data.length - 1);
-      for (i = start; i <= end; i++)
-        res.push(i);
+      if (!xModeScatter) {
+        end = Math.min(end, this.drawingPlan.data.length - 1);
+        for (i = start; i <= end; i++)
+          res.push(i);
+      } else {
+        var dataArray = this.drawingPlan.data;
+        // search data indexes for category
+        for (i = 0; i < dataArray.length; i++) {
+          var data = dataArray[i];
+          var dataX = data.data['x'];
+          var dataNumber = this.drawingPlan.xHashMap[anychart.utils.hash(dataX)];
+          if (dataNumber >= start && dataNumber <= end)
+            res.push(data.meta['rawIndex']);
+        }
+      }
     }
     return res;
   } else {
@@ -1394,19 +1470,25 @@ anychart.core.series.Cartesian.prototype.makeBrowserEvent = function(e) {
     var bounds = this.pixelBoundsCache || anychart.math.rect(0, 0, 0, 0);
     var x, min, range;
     var value, index;
+    var clientPosition = this.container().getStage().getClientPosition();
+    var clientX = res['clientX'];
+    var clientY = res['clientY'];
 
     if (/** @type {boolean} */(this.getOption('isVertical'))) {
-      x = res['clientY'];
-      min = bounds.top + this.container().getStage().getClientPosition().y + bounds.height;
+      x = clientY;
+      min = bounds.top + clientPosition.y + bounds.height;
       range = -bounds.height;
     } else {
-      x = res['clientX'];
-      min = bounds.left + this.container().getStage().getClientPosition().x;
+      x = clientX;
+      min = bounds.left + clientPosition.x;
       range = bounds.width;
     }
     value = this.xScale().inverseTransform((x - min) / range);
 
     index = this.findX(value);
+    if (goog.isArray(index) && index.length > 1) {
+      index = this.findNearestIndex(/** @type {Array.<number>} */ (index), clientX - clientPosition.x, clientY - clientPosition.y);
+    }
 
     if (index < 0) index = NaN;
 
@@ -1414,6 +1496,36 @@ anychart.core.series.Cartesian.prototype.makeBrowserEvent = function(e) {
   }
 
   return res;
+};
+
+
+/**
+ * Finds nearest point to cursors x, y
+ * Indexes should be always array of length greater than 1.
+ * @param {Array.<number>} indexes Indexes of the points.
+ * @param {number} x Cursor x position
+ * @param {number} y Cursor y position
+ * @return {number}
+ */
+anychart.core.series.Cartesian.prototype.findNearestIndex = function(indexes, x, y) {
+  var iterator = this.getIterator();
+  var minLength = Infinity;
+  var minLengthIndex = -1;
+  for (var j = 0; j < indexes.length; j++) {
+    if (iterator.select(indexes[j])) {
+      var pixX = /** @type {number} */(iterator.meta('x'));
+      var names = this.getYValueNames();
+      for (var k = 0; k < names.length; k++) {
+        var pixY = /** @type {number} */(iterator.meta(names[k]));
+        var length = anychart.math.vectorLength(pixX, pixY, x, y);
+        if (length < minLength) {
+          minLength = length;
+          minLengthIndex = indexes[j];
+        }
+      }
+    }
+  }
+  return minLengthIndex;
 };
 
 
@@ -1524,6 +1636,7 @@ anychart.core.series.Cartesian.prototype.getPoint = function(index) {
  */
 anychart.core.series.Cartesian.prototype.serialize = function() {
   var json = anychart.core.series.Cartesian.base(this, 'serialize');
+  anychart.core.settings.serialize(this, anychart.core.series.Cartesian.OWN_DESCRIPTORS, json);
 
   if (this.drawingPlan) {
     var arr = [];
@@ -1554,6 +1667,7 @@ anychart.core.series.Cartesian.prototype.serialize = function() {
  */
 anychart.core.series.Cartesian.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.series.Cartesian.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.settings.deserialize(this, anychart.core.series.Cartesian.OWN_DESCRIPTORS, config, opt_default);
 
   if ('data' in config)
     this.data(config['data'] || null);

@@ -108,7 +108,7 @@ fi
 #
 ########################################################################################################################
 
-indexDTSurl="http://api.anychart.stg/si/${VERSION}/index.d.ts"
+indexDTSurl="http://api.anychart.stg/si/v8/index.d.ts"
  if $IS_RC; then indexDTSurl='http://api.anychart.stg/si/develop/index-develop.d.ts'; fi
 
 echo
@@ -194,8 +194,8 @@ else
     echo
     echo ' -- reset head (reset commit number for travis)'
     run "git reset HEAD~1"
-
-    run "git commit -am 'release ${VERSION}'"
+    run "git add ."
+    run "git commit -am 'Release ${VERSION}'"
 
     echo
     echo ' -- create tag'

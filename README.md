@@ -133,39 +133,39 @@ All examples are distributed under an Apache 2.0 License and can be customized t
 <table>
 <tbody>
 <tr>
-  <td><a href="https://www.anychart.com/integrations/asp-net-c-sharp-mysql-charts/">ASP.NET, C# and MySQL</a></td>
-  <td><a href="https://www.anychart.com/integrations/asp-net-vb-mysql-charts/">ASP.NET, VB.NET and MySQL</a></td>
-  <td><a href="https://www.anychart.com/integrations/asp-net-signalr-mysql-charts/">ASP.NET, C#, SignalR and MySQL</a></td>
+  <td><a href="https://www.anychart.com/integrations/asp-net-c-sharp-mysql-template/">ASP.NET, C# and MySQL</a></td>
+  <td><a href="https://www.anychart.com/integrations/asp-net-vb-mysql-template/">ASP.NET, VB.NET and MySQL</a></td>
+  <td><a href="https://www.anychart.com/integrations/asp-net-signalr-mysql-template/">ASP.NET, C#, SignalR and MySQL</a></td>
 </tr>
 <tr>
-  <td><a href="https://www.anychart.com/integrations/golang-revel-mysql-charts/">Go, Revel and MySQL</a></td>
-  <td><a href="https://www.anychart.com/integrations/golang-http-mysql-charts/">Go and MySQL</a></td>
-  <td><a href="https://www.anychart.com/integrations/java-jsp-jdbc-mysql-charts/">Java Servlets, Maven, JDBC, JSP and MySQL</a></td>
+  <td><a href="https://www.anychart.com/integrations/golang-revel-mysql-template/">Go, Revel and MySQL</a></td>
+  <td><a href="https://www.anychart.com/integrations/golang-http-mysql-template/">Go and MySQL</a></td>
+  <td><a href="https://www.anychart.com/integrations/java-jsp-jdbc-mysql-template/">Java Servlets, Maven, JDBC, JSP and MySQL</a></td>
 </tr>
 <tr>
-  <td><a href="https://www.anychart.com/integrations/nodejs-socket-io-mongodb-charts/">NodeJS and MongoDB using socket.io</a></td>
-  <td><a href="https://www.anychart.com/integrations/java-spring-hibernate-mysql-charts/">Java Spring, Maven, Hibernate and MySQL</a></td>
-  <td><a href="https://www.anychart.com/integrations/julia-http-mysql-charts/">Julia and MySQL</a></td>
+  <td><a href="https://www.anychart.com/integrations/nodejs-socket-io-mongodb-template/">NodeJS and MongoDB using socket.io</a></td>
+  <td><a href="https://www.anychart.com/integrations/java-spring-hibernate-mysql-template/">Java Spring, Maven, Hibernate and MySQL</a></td>
+  <td><a href="https://www.anychart.com/integrations/julia-http-mysql-template/">Julia and MySQL</a></td>
 </tr>
 <tr>
-  <td><a href="https://www.anychart.com/integrations/nodejs-express-mongodb-charts/">NodeJS Express, Jade and MongoDB</a></td>
-  <td><a href="https://www.anychart.com/integrations/php-symfony-mysql-charts/">PHP, Symfony and MySQL</a></td>
-  <td><a href="https://www.anychart.com/integrations/php-laravel-mysql-charts/">PHP, Laravel and MySQL</a></td>
+  <td><a href="https://www.anychart.com/integrations/nodejs-express-mongodb-template/">NodeJS Express, Jade and MongoDB</a></td>
+  <td><a href="https://www.anychart.com/integrations/php-symfony-mysql-template/">PHP, Symfony and MySQL</a></td>
+  <td><a href="https://www.anychart.com/integrations/php-laravel-mysql-template/">PHP, Laravel and MySQL</a></td>
 </tr>
 <tr>
-  <td><a href="https://www.anychart.com/integrations/php-slim-mysql-charts/">PHP, Slim and MySQL</a></td>
-  <td><a href="https://www.anychart.com/integrations/perl-catalyst-basic-charts/">Perl, Catalyst Web Framework and MySQL</a></td>
-  <td><a href="https://www.anychart.com/integrations/python-flask-mysql-charts/">Python, Flask and MySQL</a></td>
+  <td><a href="https://www.anychart.com/integrations/php-slim-mysql-template/">PHP, Slim and MySQL</a></td>
+  <td><a href="https://www.anychart.com/integrations/perl-catalyst-basic-template/">Perl, Catalyst Web Framework and MySQL</a></td>
+  <td><a href="https://www.anychart.com/integrations/python-flask-mysql-template/">Python, Flask and MySQL</a></td>
 </tr>
 <tr>
-  <td><a href="https://www.anychart.com/integrations/python-django-mysql-charts/">Python, Django and MySQL</a></td>
-  <td><a href="https://www.anychart.com/integrations/r-shiny-mysql-charts/">R, Shiny and MySQL</a></td>
-  <td><a href="https://www.anychart.com/integrations/ruby-sinatra-mysql-charts/">Ruby, Sinatra and MySQL</a></td>
+  <td><a href="https://www.anychart.com/integrations/python-django-mysql-template/">Python, Django and MySQL</a></td>
+  <td><a href="https://www.anychart.com/integrations/r-shiny-mysql-template/">R, Shiny and MySQL</a></td>
+  <td><a href="https://www.anychart.com/integrations/ruby-sinatra-mysql-template/">Ruby, Sinatra and MySQL</a></td>
 </tr>
 <tr>
-  <td><a href="https://www.anychart.com/integrations/ruby-rails-mysql-charts/">Ruby on Rails and MySQL</a></td>
-  <td><a href="https://www.anychart.com/integrations/scala-akka-http-mysql-charts/">Scala, Akka and MySQL</a></td>
-  <td><a href="https://www.anychart.com/integrations/scala-play-mysql-charts/">Scala, Play and MySQL</a></td>
+  <td><a href="https://www.anychart.com/integrations/ruby-rails-mysql-template/">Ruby on Rails and MySQL</a></td>
+  <td><a href="https://www.anychart.com/integrations/scala-akka-http-mysql-template/">Scala, Akka and MySQL</a></td>
+  <td><a href="https://www.anychart.com/integrations/scala-play-mysql-template/">Scala, Play and MySQL</a></td>
 </tr>
 </tbody>
 </table>

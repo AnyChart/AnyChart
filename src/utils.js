@@ -270,6 +270,23 @@ anychart.utils.normalizeSize = function(value, opt_containerSize, opt_invert) {
 
 
 /**
+ * Gets state string name.
+ * @param {anychart.PointState|number} state - State.
+ * @return {string}
+ */
+anychart.utils.pointStateToName = function(state) {
+  switch (state) {
+    case anychart.PointState.HOVER:
+      return 'hovered';
+    case anychart.PointState.SELECT:
+      return 'selected';
+    default:
+      return 'normal';
+  }
+};
+
+
+/**
  * Define whether value is set in percent.
  * @param {*} value Value to define.
  * @return {boolean} Is value set in percent.
@@ -1453,7 +1470,7 @@ anychart.utils.json2xml = function(json, opt_rootNodeName, opt_returnAsXmlNode) 
   var root = anychart.utils.json2xml_(json, opt_rootNodeName || 'anychart', result);
   if (root) {
     if (!opt_rootNodeName)
-      root.setAttribute('xmlns', 'http://anychart.com/schemas/8.4.0/xml-schema.xsd');
+      root.setAttribute('xmlns', 'http://anychart.com/schemas/8.4.1/xml-schema.xsd');
     result.appendChild(root);
   }
   return opt_returnAsXmlNode ? result : goog.dom.xml.serialize(result);
