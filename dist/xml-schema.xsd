@@ -2257,25 +2257,6 @@
         <xsd:attribute name="treat_as_array" type="xsd:string"/>
     </xsd:complexType>
 
-    <xsd:complexType name="ZoomLevelsSettings">
-        <xsd:sequence>
-            <xsd:element name="item" maxOccurs="unbounded" minOccurs="0">
-                <xsd:complexType>
-                    <xsd:sequence>
-                        <xsd:element name="item" maxOccurs="unbounded" minOccurs="0">
-                            <xsd:complexType>
-                                <xsd:attribute type="xsd:string" name="unit" use="required"/>
-                                <xsd:attribute type="xsd:integer" name="count" use="optional"/>
-                            </xsd:complexType>
-                        </xsd:element>
-                    </xsd:sequence>
-                    <xsd:attribute name="treat_as_array" type="xsd:string" />
-                </xsd:complexType>
-            </xsd:element>
-        </xsd:sequence>
-        <xsd:attribute name="treat_as_array" type="xsd:string"/>
-    </xsd:complexType>
-
     <xsd:complexType name="TimelineHeader">
         <xsd:all>
             <xsd:element minOccurs="0" maxOccurs="1" name="background" type="core.Background"/>
@@ -2909,40 +2890,6 @@
             <xsd:element name="tasks" type="core.Tasks" minOccurs="0" maxOccurs="1"/>
             <xsd:element name="milestones" type="core.Milestones" minOccurs="0" maxOccurs="1"/>
         </xsd:all>
-    </xsd:complexType>
-
-    <xsd:complexType name="core.SankeyVisualElement">
-        <xsd:all>
-            <xsd:element name="fill" type="Fill" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="stroke" type="Stroke" minOccurs="0" maxOccurs="1"/>
-
-            <xsd:element name="labels" type="core.LabelsFactory" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="tooltip" type="core.Tooltip" minOccurs="0" maxOccurs="1"/>
-
-            <xsd:element minOccurs="0" maxOccurs="1" name="normal" type="core.StateSettings"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hovered" type="core.StateSettings"/>
-        </xsd:all>
-        <xsd:attribute name="fill" type="xsd:string"/>
-        <xsd:attribute name="stroke" type="xsd:string"/>
-        <xsd:attribute name="labels" type="simple.BoolOrNull" default="true"/>
-        <xsd:attribute name="tooltip" type="simple.BoolOrNull" default="true"/>
-    </xsd:complexType>
-
-    <xsd:complexType name="core.SankeyVisualElement">
-        <xsd:all>
-            <xsd:element name="fill" type="Fill" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="stroke" type="Stroke" minOccurs="0" maxOccurs="1"/>
-
-            <xsd:element name="labels" type="core.LabelsFactory" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="tooltip" type="core.Tooltip" minOccurs="0" maxOccurs="1"/>
-
-            <xsd:element minOccurs="0" maxOccurs="1" name="normal" type="core.StateSettings"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hovered" type="core.StateSettings"/>
-        </xsd:all>
-        <xsd:attribute name="fill" type="xsd:string"/>
-        <xsd:attribute name="stroke" type="xsd:string"/>
-        <xsd:attribute name="labels" type="simple.BoolOrNull" default="true"/>
-        <xsd:attribute name="tooltip" type="simple.BoolOrNull" default="true"/>
     </xsd:complexType>
 
     <xsd:complexType name="core.SankeyVisualElement">
