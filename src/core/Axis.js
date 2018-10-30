@@ -64,7 +64,6 @@ anychart.core.Axis = function() {
   /**
    * Constant to save space.
    * @type {number}
-   * @protected
    */
   this.ALL_VISUAL_STATES = anychart.ConsistencyState.APPEARANCE |
       anychart.ConsistencyState.AXIS_TITLE |
