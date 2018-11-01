@@ -428,7 +428,7 @@ anychart.core.ui.Paginator.prototype.draw = function() {
     this.text_.attr('aria-hidden', 'true');
   }
 
-  var background = this.getCreated('backgrouns');
+  var background = this.getCreated('background');
   if (background)
     background.suspendSignalsDispatching();
 
