@@ -4026,7 +4026,8 @@
         "treeData": {"$ref": "#/definitions/treeData"},
         "isResourceChart": {"type": "boolean"},
         "verticalOffset": {"type": "number"},
-        "startIndex": {"type": "number"}
+        "startIndex": {"type": "number"},
+        "scrollTo": {"type": "number"}
       }
     },
     "anychart.core.ui.Timeline": {

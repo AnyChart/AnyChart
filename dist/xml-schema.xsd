@@ -2755,6 +2755,7 @@
         <xsd:attribute name="is_resource_chart" type="simple.Bool" default="false"/>
         <xsd:attribute name="vertical_offset" type="xsd:double" default="0"/>
         <xsd:attribute name="start_index" type="xsd:double" default="0"/>
+        <xsd:attribute name="scroll_to" type="xsd:double" default="0"/>
     </xsd:complexType>
 
 
