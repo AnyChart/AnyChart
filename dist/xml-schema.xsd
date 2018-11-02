@@ -105,8 +105,6 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="markers" type="core.MarkersFactory"/>
             <!-- charts.HeatMap elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="color_scale" type="Scale"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="y_zoom" type="core.CartesianXZoom"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="y_scroller" type="core.ChartScroller"/>
             <!-- charts.TreeMap elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="headers" type="core.LabelsFactory"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="color_range" type="core.ColorRange"/>
@@ -114,6 +112,8 @@
             <!-- new Cartesian elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="x_zoom" type="core.CartesianXZoom"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="x_scroller" type="core.ChartScroller"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="y_zoom" type="core.CartesianXZoom"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="y_scroller" type="core.ChartScroller"/>
             <!-- chart.Pert elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="milestones" type="core.Milestones"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="tasks" type="core.Tasks"/>
@@ -235,8 +235,6 @@
         <xsd:attribute name="markers" type="simple.MarkerType"/>
         <!-- charts.HeatMap elements -->
         <xsd:attribute name="color_scale" type="simple.ChartScaleRef"/>
-        <xsd:attribute name="y_zoom" type="simple.NumberOrBoolOrNull"/>
-        <xsd:attribute name="y_scroller" type="simple.BoolOrNull"/>
         <!-- charts.TreeMap elements -->
         <xsd:attribute name="headers_display_mode" type="enums.LabelsDisplayMode" default="clip"/>
         <xsd:attribute name="headers" type="simple.BoolOrNull"/>
@@ -247,6 +245,8 @@
         <!-- new Cartesian attributes -->
         <xsd:attribute name="x_zoom" type="simple.NumberOrBoolOrNull"/>
         <xsd:attribute name="x_scroller" type="simple.BoolOrNull"/>
+        <xsd:attribute name="y_zoom" type="simple.NumberOrBoolOrNull"/>
+        <xsd:attribute name="y_scroller" type="simple.BoolOrNull"/>
         <!-- Pert attributes -->
         <xsd:attribute name="vertical_spacing" type="simple.NumberOrPercent"/>
         <xsd:attribute name="horizontal_spacing" type="simple.NumberOrPercent"/>

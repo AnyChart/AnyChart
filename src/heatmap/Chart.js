@@ -6,7 +6,6 @@ goog.require('anychart.core.Axis');
 goog.require('anychart.core.CartesianBase');
 goog.require('anychart.core.GridBase');
 goog.require('anychart.core.reporting');
-goog.require('anychart.core.ui.ChartScroller');
 goog.require('anychart.core.utils.IZoomableChart');
 goog.require('anychart.core.utils.OrdinalZoom');
 goog.require('anychart.enums');
@@ -28,13 +27,6 @@ anychart.heatmapModule.Chart = function(opt_data, opt_csvSettings) {
   anychart.heatmapModule.Chart.base(this, 'constructor', false);
 
   this.addThemes('heatMap');
-
-  /**
-   * Zoom settings.
-   * @type {anychart.core.utils.OrdinalZoom}
-   * @private
-   */
-  this.yZoom_ = new anychart.core.utils.OrdinalZoom(this, false);
 
   this.setType(anychart.enums.ChartTypes.HEAT_MAP);
   this.setOption('defaultSeriesType', anychart.enums.HeatMapSeriesType.HEAT_MAP);
@@ -65,7 +57,6 @@ goog.inherits(anychart.heatmapModule.Chart, anychart.core.CartesianBase);
  */
 anychart.heatmapModule.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.CartesianBase.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.HEATMAP_Y_SCROLLER |
     anychart.ConsistencyState.HEATMAP_COLOR_SCALE;
 
 
@@ -184,91 +175,6 @@ anychart.heatmapModule.Chart.prototype.getConfigByType = function(type) {
 /** @inheritDoc */
 anychart.heatmapModule.Chart.prototype.createSeriesInstance = function(type, config) {
   return new anychart.heatmapModule.Series(this, this, type, config, true);
-};
-
-
-/**
- * Ensures that scales are ready for zooming.
- */
-anychart.heatmapModule.Chart.prototype.ensureScalesReadyForZoom = function() {
-  this.makeScaleMaps();
-  if (this.hasInvalidationState(anychart.ConsistencyState.SCALE_CHART_SCALES)) {
-    if (!!this.xZoom().getSetup() || !!this.yZoom().getSetup())
-      this.calculate();
-  }
-};
-
-
-/**
- * Y Zoom settings getter/setter.
- * @param {(number|boolean|null|Object)=} opt_value
- * @return {anychart.heatmapModule.Chart|anychart.core.utils.OrdinalZoom}
- */
-anychart.heatmapModule.Chart.prototype.yZoom = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.suspendSignalsDispatching();
-    this.yZoom_.setup(opt_value);
-    this.resumeSignalsDispatching(true);
-    return this;
-  }
-  return this.yZoom_;
-};
-
-
-/**
- * Y Scroller getter-setter.
- * @param {(Object|boolean|null)=} opt_value
- * @return {anychart.core.ui.ChartScroller|anychart.heatmapModule.Chart}
- */
-anychart.heatmapModule.Chart.prototype.yScroller = function(opt_value) {
-  if (!this.yScroller_) {
-    this.yScroller_ = new anychart.core.ui.ChartScroller();
-    this.yScroller_.setParentEventTarget(this);
-    this.yScroller_.listenSignals(this.yScrollerInvalidated_, this);
-    this.eventsHandler.listen(this.yScroller_, anychart.enums.EventType.SCROLLER_CHANGE, this.scrollerChangeHandler);
-    this.eventsHandler.listen(this.yScroller_, anychart.enums.EventType.SCROLLER_CHANGE_FINISH, this.scrollerChangeHandler);
-    this.invalidate(
-        anychart.ConsistencyState.HEATMAP_Y_SCROLLER |
-        anychart.ConsistencyState.BOUNDS,
-        anychart.Signal.NEEDS_REDRAW);
-
-    this.setupCreated('yScroller', this.yScroller_);
-  }
-
-  if (goog.isDef(opt_value)) {
-    this.yScroller_.setup(opt_value);
-    return this;
-  } else {
-    return this.yScroller_;
-  }
-};
-
-
-/**
- * Scroller signals handler.
- * @param {anychart.SignalEvent} e
- * @private
- */
-anychart.heatmapModule.Chart.prototype.yScrollerInvalidated_ = function(e) {
-  var state = anychart.ConsistencyState.HEATMAP_Y_SCROLLER;
-  var signal = anychart.Signal.NEEDS_REDRAW;
-  if (e.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
-    state |= anychart.ConsistencyState.BOUNDS;
-    signal |= anychart.Signal.BOUNDS_CHANGED;
-  }
-  this.invalidate(state, signal);
-};
-
-
-/** @inheritDoc */
-anychart.heatmapModule.Chart.prototype.scrollerChangeHandler = function(e) {
-  var zoom = e.target == this.xScroller() ? /** @type {anychart.core.utils.OrdinalZoom} */(this.xZoom()) : this.yZoom_;
-  if (zoom.continuous() ^ e.type == anychart.enums.EventType.SCROLLER_CHANGE_FINISH) {
-    e.preventDefault();
-    this.suspendSignalsDispatching();
-    zoom.setTo(e['startRatio'], e['endRatio']);
-    this.resumeSignalsDispatching(true);
-  }
 };
 
 
@@ -548,64 +454,6 @@ anychart.heatmapModule.Chart.prototype.createTooltipContextProvider = function()
 
 
 /** @inheritDoc */
-anychart.heatmapModule.Chart.prototype.getBoundsWithoutAxes = function(contentAreaBounds, opt_scrollerSize) {
-  var yScroller = /** @type {anychart.core.ui.ChartScroller} */(this.yScroller());
-  var res = this.resetScrollerPosition(yScroller, contentAreaBounds);
-  this.yScrollerSize_ = res.scrollerSize;
-  return anychart.heatmapModule.Chart.base(this, 'getBoundsWithoutAxes', res.contentAreaBounds, opt_scrollerSize);
-};
-
-
-/** @inheritDoc */
-anychart.heatmapModule.Chart.prototype.applyScrollerOffset = function(offsets, scrollerSize) {
-  offsets = anychart.heatmapModule.Chart.base(this, 'applyScrollerOffset', offsets, scrollerSize);
-  var yScroller = /** @type {anychart.core.ui.ChartScroller} */(this.yScroller());
-  return this.applyScrollerOffsetInternal(offsets, yScroller, this.yScrollerSize_);
-};
-
-
-/** @inheritDoc */
-anychart.heatmapModule.Chart.prototype.getBoundsChangedSignal = function() {
-  return anychart.heatmapModule.Chart.base(this, 'getBoundsChangedSignal') |
-      anychart.ConsistencyState.CARTESIAN_X_SCROLLER |
-      anychart.ConsistencyState.HEATMAP_Y_SCROLLER;
-};
-
-
-/** @inheritDoc */
-anychart.heatmapModule.Chart.prototype.drawElements = function() {
-  anychart.heatmapModule.Chart.base(this, 'drawElements');
-  if (this.hasInvalidationState(anychart.ConsistencyState.HEATMAP_Y_SCROLLER)) {
-    this.yScroller().container(this.rootElement);
-    this.yScroller().draw();
-    this.markConsistent(anychart.ConsistencyState.HEATMAP_Y_SCROLLER);
-  }
-};
-
-
-/** @inheritDoc */
-anychart.heatmapModule.Chart.prototype.applyComplexZoom = function() {
-  if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_ZOOM)) {
-    var start, factor;
-
-    start = this.xZoom().getStartRatio();
-    factor = 1 / (this.xZoom().getEndRatio() - start);
-    this.xScale().setZoom(factor, start);
-
-    start = this.yZoom().getStartRatio();
-    factor = 1 / (this.yZoom().getEndRatio() - start);
-    this.yScale().setZoom(factor, start);
-
-    this.xScroller().setRangeInternal(this.xZoom().getStartRatio(), this.xZoom().getEndRatio());
-    this.yScroller().setRangeInternal(this.yZoom().getStartRatio(), this.yZoom().getEndRatio());
-
-    this.markConsistent(anychart.ConsistencyState.CARTESIAN_ZOOM);
-    this.invalidate(anychart.ConsistencyState.CARTESIAN_X_SCROLLER | anychart.ConsistencyState.HEATMAP_Y_SCROLLER);
-  }
-};
-
-
-/** @inheritDoc */
 anychart.heatmapModule.Chart.prototype.calculateXYScales = function() {
   var needsCalc = this.hasInvalidationState(anychart.ConsistencyState.SCALE_CHART_SCALES |
       anychart.ConsistencyState.SCALE_CHART_Y_SCALES);
@@ -829,17 +677,6 @@ anychart.heatmapModule.Chart.prototype.setupByJSONWithScales = function(config, 
   anychart.heatmapModule.Chart.base(this, 'setupByJSONWithScales', config, scalesInstances, opt_default);
 
   anychart.core.settings.deserialize(this, anychart.heatmapModule.Chart.PROPERTY_DESCRIPTORS, config);
-  this.yScroller().setupInternal(!!opt_default, config['yScroller']);
-
-  var yZoom = config['yZoom'];
-  if (goog.isObject(yZoom) && (goog.isNumber(yZoom['scale']) || goog.isString(yZoom['scale']))) {
-    var tmp = yZoom['scale'];
-    yZoom['scale'] = scalesInstances[yZoom['scale']];
-    this.yZoom(yZoom);
-    yZoom['scale'] = tmp;
-  } else {
-    this.yZoom(yZoom);
-  }
 };
 
 
@@ -848,8 +685,6 @@ anychart.heatmapModule.Chart.prototype.setupByJSONWithScales = function(config, 
  */
 anychart.heatmapModule.Chart.prototype.serializeWithScales = function(json, scales, scaleIds) {
   anychart.heatmapModule.Chart.base(this, 'serializeWithScales', json, scales, scaleIds);
-  json['yScroller'] = this.yScroller().serialize();
-  json['yZoom'] = this.yZoom().serialize();
   anychart.core.settings.serialize(this, anychart.heatmapModule.Chart.PROPERTY_DESCRIPTORS, json);
 
   this.serializeScale(json, 'colorScale', /** @type {anychart.scales.Base} */(this.colorScale()), scales, scaleIds);
@@ -900,8 +735,6 @@ anychart.heatmapModule.Chart.prototype.serializeSeries = function(json, scales, 
  */
 anychart.heatmapModule.Chart.prototype.disposeInternal = function() {
   anychart.heatmapModule.Chart.base(this, 'disposeInternal');
-  goog.disposeAll(this.yScroller_);
-  this.yScroller_ = null;
   this.series_ = null;
 };
 

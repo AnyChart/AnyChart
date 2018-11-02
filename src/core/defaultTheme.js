@@ -1982,6 +1982,10 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
         'type': 'linear'
       }
     ],
+    'yScroller': {
+      'orientation': 'left',
+      'inverted': false
+    },
     'crosshair': {
       'enabled': false,
       'displayMode': 'float',
@@ -1992,6 +1996,11 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
       'yLabels': [{'enabled': null}]
     },
     'xZoom': {
+      'continuous': true,
+      'startRatio': 0,
+      'endRatio': 1
+    },
+    'yZoom': {
       'continuous': true,
       'startRatio': 0,
       'endRatio': 1

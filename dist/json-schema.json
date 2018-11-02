@@ -536,6 +536,19 @@
             {"$ref": "#/definitions/anychart.core.ui.ChartScroller"}
           ]
         },
+        "yZoom": {
+          "oneOf": [
+            {"type": "number"},
+            {"type": "boolean"},
+            {"$ref": "#/definitions/anychart.core.CartesianXZoom"}
+          ]
+        },
+        "yScroller": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.ChartScroller"}
+          ]
+        },
         "zAngle": {"type": ["number"]},
         "zAspect": {"type": ["number", "string"]},
         "zPadding": {"type": ["number"]},

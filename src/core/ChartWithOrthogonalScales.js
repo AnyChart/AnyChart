@@ -406,6 +406,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculate = function() {
     this.calculateXScales();
     this.applyXZoom();
     this.calculateYScales();
+    this.applyYZoom();
   } else {
     this.calculateXYScales();
     this.applyComplexZoom();
@@ -1686,9 +1687,18 @@ anychart.core.ChartWithOrthogonalScales.prototype.prepare3d = function() {};
 
 /**
  * Applies modifications (like zoom) on the calculated x scales.
+ * @param {boolean=} opt_doNotInvalidate Do not invalidate associated states.
  * @protected
  */
-anychart.core.ChartWithOrthogonalScales.prototype.applyXZoom = function() {};
+anychart.core.ChartWithOrthogonalScales.prototype.applyXZoom = function(opt_doNotInvalidate) {};
+
+
+/**
+ * Applies modifications (like zoom) on the calculated y scales.
+ * @param {boolean=} opt_doNotInvalidate Do not invalidate associated states.
+ * @protected
+ */
+anychart.core.ChartWithOrthogonalScales.prototype.applyYZoom = function(opt_doNotInvalidate) {};
 
 
 /**
