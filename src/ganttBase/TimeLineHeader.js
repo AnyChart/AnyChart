@@ -980,6 +980,12 @@ anychart.ganttBaseModule.TimeLineHeader.prototype.draw = function() {
     var themeLabelsSettings = /** @type {Object} */(anychart.getFullTheme('defaultLabelFactory'));
     var timeLineWeekdaysLabelsSettings = {};
     anychart.core.settings.serialize(this, anychart.ganttBaseModule.TimeLineHeader.TEXT_DESCRIPTORS, timeLineWeekdaysLabelsSettings);
+
+    // fixes DVF-3957
+    // since anychart.core.settings.serialize doesn't serialize functions we kinda do trick here
+    // to be sure that settings (theme or own) from TimeLine will set
+    timeLineWeekdaysLabelsSettings['format'] = this.getOption('format');
+
     timeLineWeekdaysLabelsSettings['padding'] = this.padding();
     var timeLineHolidaysLabelsSettings = {};
     anychart.core.settings.serialize(
