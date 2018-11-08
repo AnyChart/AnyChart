@@ -867,7 +867,7 @@ anychart.core.Chart.prototype.showTooltip_ = function(event) {
         var series = event['seriesStatus'][0]['series'];
 
         // if series xScale ordinal and in scatter xMode than we should use categoryIndex insteadof pointIndex
-        if (anychart.utils.instanceOf(series.getXScale(), anychart.scales.Ordinal) &&
+        if (series.getXScale && anychart.utils.instanceOf(series.getXScale(), anychart.scales.Ordinal) &&
             series.getOption('xMode') == anychart.enums.XMode.SCATTER) {
           categoryIndex = event['point'].get('x');
         }
