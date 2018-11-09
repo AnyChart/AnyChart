@@ -12,7 +12,7 @@ addons:
   - static.anychart.com
 
 before_install:
-  - openssl aes-256-cbc -K $encrypted_70c31ee585ad_key -iv $encrypted_70c31ee585ad_iv -in bin/travis/anychart-deploy-key.enc -out ~/.ssh/id_rsa -d
+  - openssl aes-256-cbc -K $encrypted_70c31ee585ad_key -iv $encrypted_70c31ee585ad_iv -in bin/anychart-deploy-key.enc -out ~/.ssh/id_rsa -d
   - chmod 600 ~/.ssh/id_rsa
   - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
 
@@ -21,6 +21,8 @@ install:
   - pip install requests --user --upgrade
   - pip install maxcdn --user --upgrade
   - ./build.py libs
+  - git clone git@github.com:AnyChart/travis-scripts.git out/travis --depth 1
+  - mv out/travis/anychart bin/travis
 
 cache: pip
 
