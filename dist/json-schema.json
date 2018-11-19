@@ -613,6 +613,9 @@
             "stick",
             "pareto"
           ]
+        },
+        "categorizedBySeries": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -1811,7 +1814,8 @@
           "items": {
             "anyOf": [
               {"$ref": "#/definitions/anychart.scales.Ordinal"},
-              {"$ref": "#/definitions/anychart.scales.OrdinalColor"}
+              {"$ref": "#/definitions/anychart.scales.OrdinalColor"},
+              {"$ref": "#/definitions/anychart.scales.LinearColor"}
             ]
           },
           "patternProperties": {

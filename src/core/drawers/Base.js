@@ -224,8 +224,9 @@ anychart.core.drawers.Base.prototype.checkShapesInRect = function(shapes, left, 
 /**
  * This function is invoked before the drawing process starts.
  * @param {anychart.core.shapeManagers.Base} shapeManager
+ * @param {boolean=} opt_crispEdges Whether to use crisp edges.
  */
-anychart.core.drawers.Base.prototype.startDrawing = function(shapeManager) {
+anychart.core.drawers.Base.prototype.startDrawing = function(shapeManager, opt_crispEdges) {
   if (this.series.rendering().needsCustomPointDrawer()) {
     this.drawPoint = this.drawPointCustom_;
     this.updatePoint = this.updatePointCustom_;
@@ -279,7 +280,7 @@ anychart.core.drawers.Base.prototype.startDrawing = function(shapeManager) {
    * @type {boolean}
    * @protected
    */
-  this.crispEdges = (this.series.categoryWidthCache - this.pointWidth) > 2.5 && this.pointWidth > 10;
+  this.crispEdges = goog.isDef(opt_crispEdges) ? opt_crispEdges : ((this.series.categoryWidthCache - this.pointWidth) > 2.5 && this.pointWidth > 10);
 
   this.series.rendering().callStart(this.series);
 

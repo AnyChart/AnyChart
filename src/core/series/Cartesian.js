@@ -78,6 +78,7 @@ anychart.core.series.Cartesian.prototype.SUPPORTED_SIGNALS = anychart.core.serie
  * @typedef {{
  *   series: anychart.core.series.Cartesian,
  *   data: Array.<Object>,
+ *   nonMissingCount: number,
  *   stacked: (boolean|undefined),
  *   firstIndex: (number|undefined),
  *   lastIndex: (number|undefined),
@@ -207,7 +208,6 @@ anychart.core.series.Cartesian.prototype.getCategoryWidth = function(opt_categor
   return (ratio || (this.xScale().getZoomFactor() / this.getIterator().getRowsCount())) *
       (this.getOption('isVertical') ? this.pixelBoundsCache.height : this.pixelBoundsCache.width);
 };
-
 
 
 /**
@@ -768,6 +768,11 @@ anychart.core.series.Cartesian.prototype.getDrawingData = function(data, dataPus
 
   var postProcessingMeta = this.initPostProcessingMeta();
 
+  /**
+   * Counter for points that are not missing.
+   * @type {number}
+   */
+  var nonMissingCount = 0;
   while (iterator.advance()) {
     var xValue = xNormalizer(iterator.get('x'));
     if (xMissingChecker(xValue)) // we do not add missings for points that have undefined X
@@ -793,8 +798,20 @@ anychart.core.series.Cartesian.prototype.getDrawingData = function(data, dataPus
     }
 
     var meta = {};
-    meta['missing'] = missing ? anychart.core.series.PointAbsenceReason.VALUE_FIELD_MISSING : 0;
+    if (missing) {
+      meta['missing'] = anychart.core.series.PointAbsenceReason.VALUE_FIELD_MISSING;
+    } else {
+      meta['missing'] = 0;
+      nonMissingCount++;
+    }
     meta['rawIndex'] = iterator.getIndex();
+
+    /**
+     * Ordinal index for points that are visible (not missing).
+     * Used for points distribution in categorizedBySeries mode.
+     * @type {number}
+     */
+    meta['ordinalIndex'] = (nonMissingCount - 1);
 
     var point = {
       data: pointData,
@@ -811,6 +828,7 @@ anychart.core.series.Cartesian.prototype.getDrawingData = function(data, dataPus
   this.drawingPlan = {
     data: data,
     series: this,
+    nonMissingCount: nonMissingCount,
     hasPointLabels: this.supportsLabels() &&
         (
             dataSource.checkFieldExist('normal') ||
@@ -1463,7 +1481,7 @@ anychart.core.series.Cartesian.prototype.selectSeries = function() {
 anychart.core.series.Cartesian.prototype.makeBrowserEvent = function(e) {
   //this method is invoked only for events from data layer
   var res = anychart.core.series.Cartesian.base(this, 'makeBrowserEvent', e);
-
+  var isVertical = /** @type {boolean} */(this.getOption('isVertical'));
   if (this.isDiscreteBased()) {
     res['pointIndex'] = anychart.utils.toNumber(anychart.utils.extractTag(res['domTarget']).index);
   } else if (this.sortedMode_) {
@@ -1474,7 +1492,7 @@ anychart.core.series.Cartesian.prototype.makeBrowserEvent = function(e) {
     var clientX = res['clientX'];
     var clientY = res['clientY'];
 
-    if (/** @type {boolean} */(this.getOption('isVertical'))) {
+    if (isVertical) {
       x = clientY;
       min = bounds.top + clientPosition.y + bounds.height;
       range = -bounds.height;
@@ -1484,6 +1502,47 @@ anychart.core.series.Cartesian.prototype.makeBrowserEvent = function(e) {
       range = bounds.width;
     }
     value = this.xScale().inverseTransform((x - min) / range);
+
+    var categorizedBySeries = !!(/** @type {anychart.cartesianModule.Chart} */ (this.chart).getOption('categorizedBySeries'));
+
+    if (this.chart && categorizedBySeries && !this.isDiscreteBased()) {
+      var xScale = this.xScale();
+
+      var seriesName = this.name();
+      var leftCategoryRatio = xScale.transformInternal(seriesName, NaN, 0);
+      var rightCategoryRatio = xScale.transformInternal(seriesName, NaN, 1);
+
+      var categoryWidth = rightCategoryRatio - leftCategoryRatio; // width of scale category
+
+      var barsPadding = /** @type {number} */ (/** @type {anychart.cartesianModule.Chart} */ (this.chart).getOption('barsPadding'));
+      var barGroupsPadding = /** @type {number} */ (/** @type {anychart.cartesianModule.Chart} */ (this.chart).getOption('barGroupsPadding'));
+      barsPadding *= this.barWidthRatio;       // real padding ratio in terms of bar width
+      barGroupsPadding *= this.barWidthRatio;  // real padding ratio in terms of bar width
+
+      var nonMissingCount = this.drawingPlan.nonMissingCount;
+
+      // this ratios calculates according with anychart.core.series.Base@4217 formula to calculate ratios
+      var seriesLeftRatio = leftCategoryRatio + categoryWidth * (barGroupsPadding - barsPadding) / 2;
+      var subCategoryWidth = categoryWidth * (this.barWidthRatio + barsPadding);
+      var seriesRightRatio = seriesLeftRatio + subCategoryWidth * nonMissingCount;
+
+      var seriesLeftX = this.applyRatioToBounds(seriesLeftRatio, true);
+      var seriesRightX = this.applyRatioToBounds(seriesRightRatio, true);
+      var seriesPixelWidth = (seriesRightX - seriesLeftX) / nonMissingCount;
+
+      var clientPositionX = isVertical ? clientPosition.y : clientPosition.x;
+
+      min = seriesLeftX + clientPositionX;
+      var subCategoryIndex = Math.floor((x - min) / seriesPixelWidth);
+      var nonMissing = -1;
+      for (var i = 0; i < this.drawingPlan.data.length; i++) {
+        var pointData = this.drawingPlan.data[i];
+        if (!pointData.meta['missing'] && ++nonMissing == subCategoryIndex) {
+          value = pointData.data['x'];
+          break;
+        }
+      }
+    }
 
     index = this.findX(value);
     if (goog.isArray(index) && index.length > 1) {

@@ -28,6 +28,10 @@ anychart.cartesianModule.Chart = function() {
 
   this.addThemes('cartesian');
 
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['categorizedBySeries', anychart.ConsistencyState.SCALE_CHART_SCALES | anychart.ConsistencyState.SCALE_CHART_Y_SCALES, anychart.Signal.NEEDS_REDRAW]
+  ]);
+
   this.setType(anychart.enums.ChartTypes.CARTESIAN);
 };
 goog.inherits(anychart.cartesianModule.Chart, anychart.core.CartesianBase);
@@ -450,6 +454,79 @@ anychart.cartesianModule.Chart.prototype.isSeriesVisible = function(series) {
     visible = false;
   return (enabled && visible);
 };
+
+
+//endregion
+//region --- Categorization By Series
+/** @inheritDoc */
+anychart.cartesianModule.Chart.prototype.autoCalcOrdinalXScale = function(xScale, drawingPlans, hasExcludes, excludesMap) {
+  if (!this.getOption('categorizedBySeries')) {
+    anychart.cartesianModule.Chart.base(this, 'autoCalcOrdinalXScale', xScale, drawingPlans, hasExcludes, excludesMap);
+  } else {
+    var i;
+    var len = drawingPlans.length;
+
+    var xArray = [];
+    var xHashMap = {};
+
+    for (i = 0; i < len; i++) {
+      var plan = drawingPlans[i];
+      var x = plan.series.name();
+      xArray.push(x);
+
+      var xHash = anychart.utils.hash(x);
+      xHashMap[xHash] = i;
+    }
+
+    xScale.setAutoValues(xHashMap, xArray);
+  }
+};
+
+
+/** @inheritDoc */
+anychart.cartesianModule.Chart.prototype.finishOrdinalXScaleCalculation = function(xScale, drawingPlans) {
+  if (!this.getOption('categorizedBySeries')) {
+    anychart.cartesianModule.Chart.base(this, 'finishOrdinalXScaleCalculation', xScale, drawingPlans);
+  }
+};
+
+
+//endregion
+//region --- Descriptors
+/**
+ * Properties that should be defined in class prototype.
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.cartesianModule.Chart.OWN_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'categorizedBySeries', anychart.core.settings.booleanNormalizer]
+  ]);
+
+  return map;
+})();
+anychart.core.settings.populate(anychart.cartesianModule.Chart, anychart.cartesianModule.Chart.OWN_DESCRIPTORS);
+
+
+//endregion
+//region --- Serialize / Setup / Dispose
+/** @inheritDoc */
+anychart.cartesianModule.Chart.prototype.serialize = function() {
+  var json = anychart.cartesianModule.Chart.base(this, 'serialize');
+  anychart.core.settings.serialize(this, anychart.cartesianModule.Chart.OWN_DESCRIPTORS, json['chart']);
+  return json;
+};
+
+
+/** @inheritDoc */
+anychart.cartesianModule.Chart.prototype.setupByJSON = function(config, opt_default) {
+  anychart.cartesianModule.Chart.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.settings.deserialize(this, anychart.cartesianModule.Chart.OWN_DESCRIPTORS, config);
+};
+
+
 //endregion
 
 
@@ -542,10 +619,13 @@ anychart.chartTypesMap[anychart.enums.ChartTypes.CARTESIAN] = anychart.cartesian
   proto['yZoom'] = proto.yZoom;
   proto['xScroller'] = proto.xScroller;
   proto['yScroller'] = proto.yScroller;
-  //proto['zAspect'] = proto.zAspect;
-  //proto['zAngle'] = proto.zAngle;
-  //proto['zDistribution'] = proto.zDistribution;
-  //proto['zPadding'] = proto.zPadding;
+  // auto form CartesianBase
+  // proto['zAspect'] = proto.zAspect;
+  // proto['zAngle'] = proto.zAngle;
+  // proto['zDistribution'] = proto.zDistribution;
+  // proto['zPadding'] = proto.zPadding;
+  // auto
+  // proto['categorizedBySeries'] = proto.categorizedBySeries;
   proto['getStat'] = proto.getStat;
   proto['annotations'] = proto.annotations;
   proto['getXScales'] = proto.getXScales;

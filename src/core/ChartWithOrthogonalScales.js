@@ -468,6 +468,63 @@ anychart.core.ChartWithOrthogonalScales.prototype.makeScaleMaps = function() {
 
 
 /**
+ * Calculates auto values for ordinal x scale.
+ * @param {anychart.scales.Ordinal} xScale
+ * @param {Array.<Object>} drawingPlans
+ * @param {boolean} hasExcludes
+ * @param {Object} excludesMap
+ */
+anychart.core.ChartWithOrthogonalScales.prototype.autoCalcOrdinalXScale = function(xScale, drawingPlans, hasExcludes, excludesMap) {
+  var i, xHashMap, xArray;
+  var drawingPlan = drawingPlans[0];
+  if (hasExcludes) {
+    xHashMap = {};
+    xArray = [];
+    for (i = 0; i < drawingPlan.data.length; i++) {
+      if (!(i in excludesMap)) {
+        var xValue = drawingPlan.data[i].data['x'];
+        xHashMap[anychart.utils.hash(xValue)] = xArray.length;
+        xArray.push(xValue);
+      }
+    }
+  } else {
+    xHashMap = drawingPlan.xHashMap;
+    xArray = drawingPlan.xArray;
+  }
+  xScale.setAutoValues(xHashMap, xArray);
+};
+
+
+/**
+ * Finish ordinal x scale calculation.
+ * Calculates auto names, depends on from-data-field for ordinal scale.
+ * @param {anychart.scales.Ordinal} xScale
+ * @param {Array.<Object>} drawingPlans
+ */
+anychart.core.ChartWithOrthogonalScales.prototype.finishOrdinalXScaleCalculation = function(xScale, drawingPlans) {
+  var i, j, val;
+  var namesField = xScale.getNamesField();
+  // retrieving names
+  if (namesField) {
+    var remainingNames = drawingPlans[0].xArray.length;
+    var autoNames = new Array(remainingNames);
+    for (i = 0; i < drawingPlans.length; i++) {
+      var drawingPlanData = drawingPlans[i].data;
+      if (remainingNames > 0) {
+        for (j = 0; j < drawingPlanData.length; j++) {
+          if (!goog.isDef(autoNames[j]) && goog.isDef(val = drawingPlanData[j].data[namesField])) {
+            autoNames[j] = val;
+            remainingNames--;
+          }
+        }
+      }
+    }
+    xScale.setAutoNames(autoNames);
+  }
+};
+
+
+/**
  * @protected
  */
 anychart.core.ChartWithOrthogonalScales.prototype.calculateXScales = function() {
@@ -667,7 +724,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateXScales = function() 
             var drawingPlan = drawingPlans[i];
             var meta = drawingPlan.data[+index].meta;
             if (!anychart.core.series.filterPointAbsenceReason(meta['missing'],
-                    anychart.core.series.PointAbsenceReason.EXCLUDED_OR_ARTIFICIAL))
+                anychart.core.series.PointAbsenceReason.EXCLUDED_OR_ARTIFICIAL))
               return false;
           }
           return true;
@@ -676,21 +733,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateXScales = function() 
       drawingPlan = drawingPlans[0];
       if (xScale.needsAutoCalc()) {
         if (anychart.utils.instanceOf(xScale, anychart.scales.Ordinal)) {
-          if (hasExcludes) {
-            xHashMap = {};
-            xArray = [];
-            for (i = 0; i < drawingPlan.data.length; i++) {
-              if (!(i in excludesMap)) {
-                var xValue = drawingPlan.data[i].data['x'];
-                xHashMap[anychart.utils.hash(xValue)] = xArray.length;
-                xArray.push(xValue);
-              }
-            }
-          } else {
-            xHashMap = drawingPlan.xHashMap;
-            xArray = drawingPlan.xArray;
-          }
-          xScale.setAutoValues(xHashMap, xArray);
+          this.autoCalcOrdinalXScale(/** @type {anychart.scales.Ordinal} */ (xScale), drawingPlans, hasExcludes, excludesMap);
         } else if (drawingPlan.data.length) {
           if (hasExcludes) {
             for (i = 0; i < drawingPlan.data.length; i++) {
@@ -731,24 +774,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateXScales = function() 
         }
       }
       if (anychart.utils.instanceOf(xScale, anychart.scales.Ordinal)) {
-        var namesField = xScale.getNamesField();
-        // retrieving names
-        if (namesField) {
-          var remainingNames = drawingPlans[0].xArray.length;
-          var autoNames = new Array(remainingNames);
-          for (i = 0; i < drawingPlans.length; i++) {
-            var drawingPlanData = drawingPlans[i].data;
-            if (remainingNames > 0) {
-              for (j = 0; j < drawingPlanData.length; j++) {
-                if (!goog.isDef(autoNames[j]) && goog.isDef(val = drawingPlanData[j].data[namesField])) {
-                  autoNames[j] = val;
-                  remainingNames--;
-                }
-              }
-            }
-          }
-          xScale.setAutoNames(autoNames);
-        }
+        this.finishOrdinalXScaleCalculation(/** @type {anychart.scales.Ordinal} */ (xScale), drawingPlans);
       }
     }
 

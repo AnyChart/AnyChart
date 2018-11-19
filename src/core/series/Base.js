@@ -721,13 +721,13 @@ anychart.core.series.Base.prototype.recreateShapeManager = function() {
   var smc = (this.config.shapeManagerType == anychart.enums.ShapeManagerTypes.PER_POINT) ?
       anychart.core.shapeManagers.PerPoint :
       anychart.core.shapeManagers.PerSeries;
-  this.shapeManager = new smc(
+  this.shapeManager = /** @type {!anychart.core.shapeManagers.Base} */ (new smc(
       this,
       this.renderingSettings_.getShapesConfig(),
       this.check(anychart.core.series.Capabilities.ALLOW_INTERACTIVITY),
       null,
       this.config.postProcessor,
-      this.disableStrokeScaling);
+      this.disableStrokeScaling));
 };
 
 
@@ -851,6 +851,10 @@ anychart.core.series.Base.prototype.name = function(opt_value) {
     if (this.name_ != opt_value) {
       this.name_ = opt_value;
       this.dispatchSignal(anychart.Signal.NEED_UPDATE_LEGEND);
+      if (!!/** @type {anychart.cartesianModule.Chart} */ (this.chart).getOption('categorizedBySeries')) {
+        // TODO(AntonKagakin): Possible overhead for calculation. We should try to find less agressive way.
+        /** @type {anychart.scales.Ordinal} */ (this.getXScale()).dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
+      }
     }
     return this;
   }
@@ -2197,7 +2201,7 @@ anychart.core.series.Base.prototype.prepareFactory = function(factory, stateFact
 
 /**
  * Settings in format [obj, mode, obj, mode,...]
- * Description 0 - plain object with settings, 1 - 
+ * Description 0 - plain object with settings, 1 -
  * @param {Array} settingsArray
  * @param {string=} opt_callProp
  * @return {Array}
@@ -2268,7 +2272,7 @@ anychart.core.series.Base.prototype.drawFactoryElement = function(seriesFactoryG
   var mainFactory;
   if (seriesFactoryGetters[0])
     mainFactory = seriesFactoryGetters[0].call(this.normal_);
-  
+
   var chartNormal, seriesNormal, pointNormal,
       chartState, seriesState, pointState,
       chartExtremumNormal, seriesExtremumNormal, pointExtremumNormal,
@@ -2289,7 +2293,7 @@ anychart.core.series.Base.prototype.drawFactoryElement = function(seriesFactoryG
       tmp = point.get('normal');
       pointNormal = tmp ? tmp[overrideNames[0]] : point.get(overrideNames[0]);
     }
-    
+
     if (seriesFactoryGetters.length > 3) {
       if (chartFactoryGetters[3])
         chartExtremumNormal = chartFactoryGetters[3].call(this.chart.normal_);
@@ -2300,7 +2304,7 @@ anychart.core.series.Base.prototype.drawFactoryElement = function(seriesFactoryG
         pointExtremumNormal = tmp ? tmp[overrideNames[3]] : point.get(overrideNames[3]);
       }
     }
-    
+
     if (state) {
       var stateName = state == 1 ? 'hovered' : 'selected';
 
@@ -3237,9 +3241,41 @@ anychart.core.series.Base.prototype.draw = function() {
       this.prepareMetaMakers(columns, yValueNames);
       if (labelsAreToBeRedrawn)
         this.additionalLabelsInitialize();
-      this.startDrawing();
 
-      iterator = this.getResetIterator();
+      var makePointMeta;
+      var categorizedBySeries = /** @type {boolean} */ (/** @type {anychart.cartesianModule.Chart} */ (this.chart).getOption('categorizedBySeries'));
+      if (categorizedBySeries) {
+        iterator = this.getResetIterator();
+        makePointMeta = this.makePointMetaCategorizedBySeries;
+        var barsPadding = /** @type {number} */ (/** @type {anychart.cartesianModule.Chart} */ (this.chart).getOption('barsPadding'));
+        var barGroupsPadding = /** @type {number} */ (/** @type {anychart.cartesianModule.Chart} */ (this.chart).getOption('barGroupsPadding'));
+        var pointsCount = iterator.getRowsCountNonMissing();
+
+        // formula:
+        // barGroupsPadding - ratio in term of barWidth and means padding between category groups
+        // barsPadding - ratio in term of barWidth and means padding between bars
+        // _||__||_ - full category
+        // _        - barGroupsPadding / 2 (one for left and for right, sum = barGroupsPadding)
+        // __       - barsPadding
+        // ||       - point
+        // 1 = barGroupsPadding * barWidth + barsPadding * (pointsCount - 1) * barWidth + pointsCount * barWidth
+        // 1 = barWidth * (barGroupsPadding + barsPadding * (pointsCount - 1) + pointsCount)
+        this.barWidthRatio = 1 / (barGroupsPadding + barsPadding * (pointsCount - 1) + pointsCount);
+        this.setAutoPointWidth(this.barWidthRatio);
+
+        // recalculate cache values for drawer
+        this.prepareAdditional();
+
+        // disable crispEdges forcely
+        this.startDrawing(false);
+      } else {
+        makePointMeta = this.makePointMeta;
+        this.startDrawing();
+        // this move need because mapModule.Series call getResetIterator() in startDrawing()->calculate() chain
+        // and rewrite original link to this.iterator
+        iterator = this.getResetIterator();
+      }
+
       // currently this section is actual only for Stock, because
       // Cartesian processes preFirst point as a regular point in iterator
       var point = this.getPreFirstPoint();
@@ -3253,7 +3289,7 @@ anychart.core.series.Base.prototype.draw = function() {
       while (iterator.advance()) {
         iterator.meta('destinationValue', NaN); //for animation-after-draw purposes.
         state = this.getPointState(iterator.getIndex());
-        this.makePointMeta(iterator, yValueNames, columns);
+        makePointMeta.call(this, iterator, yValueNames, columns);
         this.drawPoint(iterator, state);
 
         // if (updateMarkers) {
@@ -3338,10 +3374,11 @@ anychart.core.series.Base.prototype.draw = function() {
 
 /**
  * Starts drawing.
+ * @param {boolean=} opt_crispEdges Whether to use crisp edges.
  * @protected
  */
-anychart.core.series.Base.prototype.startDrawing = function() {
-  this.drawer.startDrawing(this.shapeManager);
+anychart.core.series.Base.prototype.startDrawing = function(opt_crispEdges) {
+  this.drawer.startDrawing(this.shapeManager, opt_crispEdges);
 };
 
 
@@ -4149,6 +4186,46 @@ anychart.core.series.Base.prototype.makePointMeta = function(rowInfo, yNames, yC
       pointMissing = this.metaMakers[i].call(this, rowInfo, yNames, yColumns, pointMissing, xRatio);
     }
   }
+  rowInfo.meta('missing', pointMissing);
+};
+
+
+/**
+ * Calculates pixel value and additional meta for drawing.
+ * @param {anychart.data.IRowInfo} rowInfo
+ * @param {Array.<string>} yNames
+ * @param {Array.<string|number>} yColumns
+ * @protected
+ */
+anychart.core.series.Base.prototype.makePointMetaCategorizedBySeries = function(rowInfo, yNames, yColumns) {
+  var pointMissing = (Number(rowInfo.meta('missing')) || 0) & ~anychart.core.series.PointAbsenceReason.OUT_OF_RANGE;
+  if (!this.isPointVisible(rowInfo))
+    pointMissing |= anychart.core.series.PointAbsenceReason.OUT_OF_RANGE;
+
+  //TODO(AntonKagakin): Should we work here only with points that are rly visible?
+
+  var xScale = this.getXScale();
+  var pointIndex = /** @type {number} */ (rowInfo.meta('ordinalIndex'));
+  var seriesName = this.name();
+
+  var leftCategoryX = xScale.transformInternal(seriesName, pointIndex, 0);
+  var rightCategoryX = xScale.transformInternal(seriesName, pointIndex, 1);
+
+  var barsPadding = /** @type {number} */ (/** @type {anychart.cartesianModule.Chart} */ (this.chart).getOption('barsPadding'));
+  var barGroupsPadding = /** @type {number} */ (/** @type {anychart.cartesianModule.Chart} */ (this.chart).getOption('barGroupsPadding'));
+  var catWidth = rightCategoryX - leftCategoryX;
+  var xRatio = leftCategoryX + catWidth * (
+      (barGroupsPadding / 2 * this.barWidthRatio) + (this.barWidthRatio / 2) + pointIndex * this.barWidthRatio * (1 + barsPadding));
+
+  rowInfo.meta('xRatio', xRatio);
+  if (pointMissing) {
+    this.makeMissing(rowInfo, yNames, xRatio);
+  } else {
+    for (var i = 0; i < this.metaMakers.length; i++) {
+      pointMissing = this.metaMakers[i].call(this, rowInfo, yNames, yColumns, pointMissing, xRatio);
+    }
+  }
+
   rowInfo.meta('missing', pointMissing);
 };
 
