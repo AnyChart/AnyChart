@@ -522,39 +522,43 @@ anychart.scales.ScatterBase.prototype.determineScaleMinMax = function() {
  * @protected
  */
 anychart.scales.ScatterBase.prototype.applyGaps = function(min, max, canChangeMin, canChangeMax, stickToZero, round) {
-  if (canChangeMin || canChangeMax) {
-    var tmp;
-    var tmp2;
-    var range = max - min;
-    if (canChangeMin) {
-      tmp = min - range * this.minimumRangeBasedGap;
-      if (stickToZero && (min * tmp <= 0)) {
-        tmp = 0;
-      } else if (round) {
-        tmp2 = anychart.math.specialRound(tmp);
-        if (tmp2 > tmp)
-          tmp2 -= 1e-6;
-        tmp = tmp2;
-      }
-      min = tmp;
-    }
-    if (canChangeMax) {
-      tmp = max + range * this.maximumRangeBasedGap;
-      if (stickToZero && (max * tmp <= 0)) {
-        tmp = 0;
-      } else if (round) {
-        tmp2 = anychart.math.specialRound(tmp);
-        if (tmp2 < tmp)
-          tmp2 += 1e-6;
-        tmp = tmp2;
-      }
-      max = tmp;
-    }
-  }
+  var range = max - min;
+  var minimumGap = range * this.minimumRangeBasedGap;
+  var maximumGap = range * this.maximumRangeBasedGap;
   return {
-    max: max,
-    min: min
+    max: canChangeMax ? this.applyGap_(max, maximumGap, stickToZero, round, 1) : max,
+    min: canChangeMin ? this.applyGap_(min, minimumGap, stickToZero, round, -1) : min
   };
+};
+
+
+/**
+ * Applies gap to value.
+ * @param {number} value Value that need to be gaped.
+ * @param {number} gap Gap that should be applied.
+ * @param {boolean} stickToZero Whether to take into account stickToZero flag.
+ * @param {boolean} round Should we use round in calculation.
+ * @param {number} sign (1, -1) to indicate max or min gap we applying.
+ * @return {number} Value with applied gap.
+ * @private
+ */
+anychart.scales.ScatterBase.prototype.applyGap_ = function(value, gap, stickToZero, round, sign) {
+  var gapedValue = value + sign * gap;
+
+  if (stickToZero && (value * gapedValue <= 0))
+    return 0;
+
+  if (round) {
+    var roundedGapedValue = anychart.math.specialRound(gapedValue);
+    var digitsCount = Math.min(anychart.math.getPrecision(roundedGapedValue), anychart.math.getPrecision(gapedValue));
+    var adjuster = +('1e-' + (digitsCount + 1));
+    if (roundedGapedValue > gapedValue) {
+      roundedGapedValue = roundedGapedValue + sign * adjuster;
+    }
+    gapedValue = roundedGapedValue;
+  }
+
+  return gapedValue;
 };
 
 
