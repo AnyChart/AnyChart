@@ -568,7 +568,6 @@ anychart.core.CartesianBase.prototype.setupByJSONWithScales = function(config, s
 anychart.core.CartesianBase.prototype.serialize = function() {
   var json = anychart.core.CartesianBase.base(this, 'serialize');
   anychart.core.settings.serialize(this, anychart.core.CartesianBase.PROPERTY_DESCRIPTORS, json);
-  json['type'] = this.getType();
   json['xScroller'] = this.xScroller().serialize();
   json['yScroller'] = this.yScroller().serialize();
   json['xZoom'] = this.xZoom().serialize();

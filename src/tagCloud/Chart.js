@@ -2183,7 +2183,6 @@ anychart.tagCloudModule.Chart.prototype.serialize = function() {
 
   anychart.core.settings.serialize(this, this.SIMPLE_PROPS_DESCRIPTORS, json);
 
-  json['type'] = this.getType();
   json['data'] = this.data().serialize();
   if (goog.isDef(this.angles_))
     json['angles'] = this.angles_;

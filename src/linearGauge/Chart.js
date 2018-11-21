@@ -1196,7 +1196,6 @@ anychart.linearGaugeModule.Chart.prototype.isNoData = function() {
 /** @inheritDoc */
 anychart.linearGaugeModule.Chart.prototype.serialize = function() {
   var json = anychart.linearGaugeModule.Chart.base(this, 'serialize');
-  json['type'] = this.getType();
 
   json['palette'] = this.palette().serialize();
   json['markerPalette'] = this.markerPalette().serialize();

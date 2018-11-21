@@ -1893,7 +1893,6 @@ anychart.sankeyModule.Chart.prototype.getCsvColumns = function(dataHolder) {
 anychart.sankeyModule.Chart.prototype.serialize = function() {
   var json = anychart.sankeyModule.Chart.base(this, 'serialize');
 
-  json['type'] = this.getType();
   json['data'] = this.data().serialize();
   json['tooltip'] = this.tooltip().serialize();
   json['palette'] = this.palette().serialize();
@@ -1941,6 +1940,7 @@ anychart.sankeyModule.Chart.prototype.disposeInternal = function() {
 (function() {
   var proto = anychart.sankeyModule.Chart.prototype;
   // common
+  proto['getType'] = proto.getType;
   proto['data'] = proto.data;
   proto['noData'] = proto.noData;
   proto['tooltip'] = proto.tooltip;

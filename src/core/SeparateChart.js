@@ -58,7 +58,6 @@ anychart.core.SeparateChart.prototype.setType = function(value) {
 
 /**
  * @inheritDoc
- *
  */
 anychart.core.SeparateChart.prototype.getType = function() {
   return this.type_;

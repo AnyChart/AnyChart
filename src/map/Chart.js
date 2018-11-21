@@ -5148,7 +5148,6 @@ anychart.mapModule.Chart.prototype.setupByJSON = function(config, opt_default) {
 anychart.mapModule.Chart.prototype.serialize = function() {
   var json = anychart.mapModule.Chart.base(this, 'serialize');
 
-  json['type'] = this.getType();
   json['unboundRegions'] = goog.isString(this.unboundRegions()) ? this.unboundRegions() : this.unboundRegions().serialize();
   json['colorRange'] = this.colorRange().serialize();
   json['geoScale'] = this.scale().serialize();

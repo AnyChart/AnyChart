@@ -708,7 +708,6 @@ anychart.bulletModule.Chart.prototype.isNoData = function() {
 /** @inheritDoc */
 anychart.bulletModule.Chart.prototype.serialize = function() {
   var json = anychart.bulletModule.Chart.base(this, 'serialize');
-  json['type'] = anychart.enums.ChartTypes.BULLET;
   anychart.core.settings.serialize(this, anychart.bulletModule.Chart.PROPERTY_DESCRIPTORS, json);
   json['data'] = this.data().serialize();
   json['rangePalette'] = this.rangePalette().serialize();

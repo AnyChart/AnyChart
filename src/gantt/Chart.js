@@ -1135,8 +1135,6 @@ anychart.ganttModule.Chart.prototype.paletteInvalidated_ = function(event) {
 anychart.ganttModule.Chart.prototype.serialize = function() {
   var json = anychart.ganttModule.Chart.base(this, 'serialize');
 
-  json['type'] = this.getType();
-
   anychart.core.settings.serialize(this, anychart.ganttModule.Chart.PROPERTY_DESCRIPTORS, json);
   json['defaultRowHeight'] = this.defaultRowHeight();
 

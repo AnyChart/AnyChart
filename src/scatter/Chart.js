@@ -148,7 +148,6 @@ anychart.scatterModule.Chart.prototype.normalizeSeriesType = function(type) {
  */
 anychart.scatterModule.Chart.prototype.serialize = function() {
   var json = anychart.scatterModule.Chart.base(this, 'serialize');
-  json['type'] = this.getType();
   return {'chart': json};
 };
 
