@@ -2449,8 +2449,10 @@ anychart.stockModule.Plot.prototype.highlight = function(value, rawValue, hlSour
 
   for (var i = 0; i < this.series_.length; i++) {
     var series = this.series_[i];
-    if (series)
+    if (series) {
+      series.removeHighlight();
       series.highlight(setValue, value);
+    }
   }
 
   if (this.legend_ && this.legend_.enabled()) {
