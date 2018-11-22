@@ -1052,7 +1052,7 @@ anychart.linearGaugeModule.Chart.prototype.drawContent = function(bounds) {
   }
 
   if (!this.rootLayer) {
-    this.rootLayer = this.rootElement.layer().zIndex(1);
+    this.rootLayer = this.rootElement.layer().zIndex(2);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
