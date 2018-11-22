@@ -264,6 +264,7 @@ anychart.ConsistencyState = {
   STOCK_SCROLLER: 1 << 13,
   STOCK_DATA: 1 << 14,
   STOCK_SCALES: 1 << 15,
+  STOCK_GAP: 1 << 16,
   //---------------------------------- STOCK PLOT (VB) -------------------------------------------
   STOCK_PLOT_BACKGROUND: 1 << 6,
   STOCK_PLOT_SERIES: 1 << 7,
