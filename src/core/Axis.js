@@ -1032,9 +1032,9 @@ anychart.core.Axis.prototype.applyStaggerMode_ = function(opt_bounds) {
  * @private
  */
 anychart.core.Axis.prototype.calcLabels_ = function(opt_bounds) {
-  return this.getOption('staggerMode') ?
-      this.applyStaggerMode_(opt_bounds) :
-      this.getOverlappedLabels_(opt_bounds);
+  return this.labels().enabled() || this.minorLabels().enabled() ?
+      this.getOption('staggerMode') ? this.applyStaggerMode_(opt_bounds) : this.getOverlappedLabels_(opt_bounds) :
+      true; //Means that here are no labels.
 };
 
 
@@ -2004,7 +2004,7 @@ anychart.core.Axis.prototype.draw = function() {
     var pixelBounds = this.getPixelBounds();
     var lineBounds = this.line.getBounds();
     var stroke =  /**@type {acgraph.vector.Stroke|string}*/(this.getOption('stroke'));
-    stroke =acgraph.vector.normalizeStroke(stroke);
+    stroke = acgraph.vector.normalizeStroke(stroke);
     lineThickness = !stroke || anychart.utils.isNone(stroke) ? 0 : stroke['thickness'] ? parseFloat(stroke['thickness']) : 1;
 
     if (anychart.utils.instanceOf(scale, anychart.scales.ScatterBase)) {
