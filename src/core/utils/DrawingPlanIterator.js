@@ -80,6 +80,14 @@ anychart.core.utils.DrawingPlanIterator.prototype.getRowsCount = function() {
 };
 
 
+/**
+ * @return {number} Count of non missing points.
+ */
+anychart.core.utils.DrawingPlanIterator.prototype.getRowsCountNonMissing = function() {
+  return this.series_.drawingPlan.nonMissingCount;
+};
+
+
 /** @inheritDoc */
 anychart.core.utils.DrawingPlanIterator.prototype.meta = function(name, opt_value) {
   var isSetter = arguments.length > 1;

@@ -127,6 +127,25 @@ anychart.ganttModule.Controller = function(opt_isResources) {
    */
   this.verticalOffset_ = 0;
 
+  /**
+   * DVF-3323: Absolute pixel vertical offset.
+   * Difference from this.verticalOffset_ is in:
+   *  this.verticalOffset_ is offset for exact top row (row of this.startIndex_).
+   *  this.scrollTo_ is offset of all rows from the top.
+   *
+   * Field is used to restore vertical scroll position on XML/JSON restoration.
+   * @type {number}
+   * @private
+   */
+  this.scrollTo_ = 0;
+
+  /**
+   * DVF-3323: Whether to restore vertical position on XML/JSON operations or in
+   * before draw case.
+   * @type {boolean}
+   * @private
+   */
+  this.restoreScrollState_ = false;
 
   /**
    * Height of data grid, available for rows render.
@@ -971,6 +990,11 @@ anychart.ganttModule.Controller.prototype.run = function() {
       this.invalidate(anychart.ConsistencyState.CONTROLLER_POSITION);
     }
 
+    if (this.restoreScrollState_) {
+      this.scrollTo(this.scrollTo_);
+      this.restoreScrollState_ = false;
+    }
+
     this.recalculate();
 
     if (!isNaN(this.minDate_) && this.minDate_ == this.maxDate_) {
@@ -999,6 +1023,7 @@ anychart.ganttModule.Controller.prototype.run = function() {
 
       var start = height + this.verticalOffset_;
       var end = start + this.availableHeight_;
+      this.scrollTo_ = start;
 
       var totalEnd = this.heightCache_[this.heightCache_.length - 1];
 
@@ -1067,29 +1092,35 @@ anychart.ganttModule.Controller.prototype.getScrollBar = function() {
 /**
  * Scrolls controller to pixel offset specified.
  * TODO (A.Kudryavtsev): Describe how this method fits to total height and available height.
- * @param {number} pxOffset - Vertical pixel total offset.
- * @return {anychart.ganttModule.Controller} - Itself for method chaining.
+ * @param {number=} opt_value - Vertical pixel total offset.
+ * @return {anychart.ganttModule.Controller|number} - Value or itself for method chaining.
  */
-anychart.ganttModule.Controller.prototype.scrollTo = function(pxOffset) {
-  if (this.heightCache_.length) { //TODO (A.Kudryavtsev): Provide an availability to set this before draw()?
-    pxOffset = Math.max(pxOffset, 0);
-    var totalHeight = this.heightCache_[this.heightCache_.length - 1];
-    this.suspendSignalsDispatching();
+anychart.ganttModule.Controller.prototype.scrollTo = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var pxOffset = Math.max(+opt_value, 0);
+    if (this.heightCache_.length) {
+      var totalHeight = this.heightCache_[this.heightCache_.length - 1];
+      this.suspendSignalsDispatching();
 
-    if (pxOffset > totalHeight - this.availableHeight_) { //auto scroll to end
-      this.endIndex(this.heightCache_.length - 1);
+      if (pxOffset > totalHeight - this.availableHeight_) { //auto scroll to end
+        this.endIndex(this.heightCache_.length - 1);
+      } else {
+        var itemIndex = this.getIndexByHeight(pxOffset);
+        var previousHeight = itemIndex ? this.heightCache_[itemIndex - 1] : 0;
+        var verticalOffset = pxOffset - previousHeight;
+        this
+            .startIndex(itemIndex)
+            .verticalOffset(verticalOffset);
+      }
+      this.resumeSignalsDispatching(true);
     } else {
-      var itemIndex = this.getIndexByHeight(pxOffset);
-      var previousHeight = itemIndex ? this.heightCache_[itemIndex - 1] : 0;
-      var verticalOffset = pxOffset - previousHeight;
-      this
-          .startIndex(itemIndex)
-          .verticalOffset(verticalOffset);
+      this.scrollTo_ = pxOffset;
+      this.restoreScrollState_ = true;
     }
-    this.resumeSignalsDispatching(true);
+    return this;
   }
 
-  return this;
+  return this.scrollTo_;
 };
 
 
@@ -1171,6 +1202,8 @@ anychart.ganttModule.Controller.prototype.serialize = function() {
   else if (!isNaN(this.endIndex()))
     json['endIndex'] = this.endIndex();
 
+  json['scrollTo'] = this.scrollTo_;
+
   return json;
 };
 
@@ -1186,4 +1219,11 @@ anychart.ganttModule.Controller.prototype.setupByJSON = function(config, opt_def
     this.startIndex(config['startIndex']);
   else if ('endIndex' in config)
     this.endIndex(config['endIndex']);
+
+  /*
+    NOTE: setupByJSON is called before linearizing the data.
+          scrollTo() sets this.restoreScrollState_ to true.
+   */
+  if ('scrollTo' in config)
+    this.scrollTo(+config['scrollTo']);
 };

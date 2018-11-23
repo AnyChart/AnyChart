@@ -80,7 +80,18 @@ anychart.math.round = function(num, opt_digitsCount) {
  * @return {number} The rounded number.
  */
 anychart.math.specialRound = function(num, opt_precision) {
-  return anychart.math.round(num, opt_precision ? opt_precision : 13 - Math.max(Math.floor(Math.log(Math.abs(num)) * Math.LOG10E), 7));
+  // AntonKagakin DVF-3975
+  // looks like this method was buggy
+  // it work incorrectly with 0.000..001 numbers cause digitsCount
+  // resolved to negative and precision was always from 6 to 0,
+  // depending on non-float digits count
+  var digitsCount = Math.floor(Math.log(Math.abs(num)) * Math.LOG10E);
+  var calculatedPrecision;
+  if (digitsCount < 0) {
+    calculatedPrecision = Math.min(anychart.math.getPrecision(num), 14);
+  } else
+    calculatedPrecision = 13 - Math.max(digitsCount, 7);
+  return anychart.math.round(num, opt_precision ? opt_precision : calculatedPrecision);
 };
 
 

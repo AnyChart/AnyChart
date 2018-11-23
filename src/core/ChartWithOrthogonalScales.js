@@ -406,6 +406,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculate = function() {
     this.calculateXScales();
     this.applyXZoom();
     this.calculateYScales();
+    this.applyYZoom();
   } else {
     this.calculateXYScales();
     this.applyComplexZoom();
@@ -462,6 +463,63 @@ anychart.core.ChartWithOrthogonalScales.prototype.makeScaleMaps = function() {
     anychart.core.Base.resumeSignalsDispatchingFalse(this.seriesList);
     this.markConsistent(anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS);
     anychart.performance.end('Scale maps gathering');
+  }
+};
+
+
+/**
+ * Calculates auto values for ordinal x scale.
+ * @param {anychart.scales.Ordinal} xScale
+ * @param {Array.<Object>} drawingPlans
+ * @param {boolean} hasExcludes
+ * @param {Object} excludesMap
+ */
+anychart.core.ChartWithOrthogonalScales.prototype.autoCalcOrdinalXScale = function(xScale, drawingPlans, hasExcludes, excludesMap) {
+  var i, xHashMap, xArray;
+  var drawingPlan = drawingPlans[0];
+  if (hasExcludes) {
+    xHashMap = {};
+    xArray = [];
+    for (i = 0; i < drawingPlan.data.length; i++) {
+      if (!(i in excludesMap)) {
+        var xValue = drawingPlan.data[i].data['x'];
+        xHashMap[anychart.utils.hash(xValue)] = xArray.length;
+        xArray.push(xValue);
+      }
+    }
+  } else {
+    xHashMap = drawingPlan.xHashMap;
+    xArray = drawingPlan.xArray;
+  }
+  xScale.setAutoValues(xHashMap, xArray);
+};
+
+
+/**
+ * Finish ordinal x scale calculation.
+ * Calculates auto names, depends on from-data-field for ordinal scale.
+ * @param {anychart.scales.Ordinal} xScale
+ * @param {Array.<Object>} drawingPlans
+ */
+anychart.core.ChartWithOrthogonalScales.prototype.finishOrdinalXScaleCalculation = function(xScale, drawingPlans) {
+  var i, j, val;
+  var namesField = xScale.getNamesField();
+  // retrieving names
+  if (namesField) {
+    var remainingNames = drawingPlans[0].xArray.length;
+    var autoNames = new Array(remainingNames);
+    for (i = 0; i < drawingPlans.length; i++) {
+      var drawingPlanData = drawingPlans[i].data;
+      if (remainingNames > 0) {
+        for (j = 0; j < drawingPlanData.length; j++) {
+          if (!goog.isDef(autoNames[j]) && goog.isDef(val = drawingPlanData[j].data[namesField])) {
+            autoNames[j] = val;
+            remainingNames--;
+          }
+        }
+      }
+    }
+    xScale.setAutoNames(autoNames);
   }
 };
 
@@ -666,7 +724,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateXScales = function() 
             var drawingPlan = drawingPlans[i];
             var meta = drawingPlan.data[+index].meta;
             if (!anychart.core.series.filterPointAbsenceReason(meta['missing'],
-                    anychart.core.series.PointAbsenceReason.EXCLUDED_OR_ARTIFICIAL))
+                anychart.core.series.PointAbsenceReason.EXCLUDED_OR_ARTIFICIAL))
               return false;
           }
           return true;
@@ -675,21 +733,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateXScales = function() 
       drawingPlan = drawingPlans[0];
       if (xScale.needsAutoCalc()) {
         if (anychart.utils.instanceOf(xScale, anychart.scales.Ordinal)) {
-          if (hasExcludes) {
-            xHashMap = {};
-            xArray = [];
-            for (i = 0; i < drawingPlan.data.length; i++) {
-              if (!(i in excludesMap)) {
-                var xValue = drawingPlan.data[i].data['x'];
-                xHashMap[anychart.utils.hash(xValue)] = xArray.length;
-                xArray.push(xValue);
-              }
-            }
-          } else {
-            xHashMap = drawingPlan.xHashMap;
-            xArray = drawingPlan.xArray;
-          }
-          xScale.setAutoValues(xHashMap, xArray);
+          this.autoCalcOrdinalXScale(/** @type {anychart.scales.Ordinal} */ (xScale), drawingPlans, hasExcludes, excludesMap);
         } else if (drawingPlan.data.length) {
           if (hasExcludes) {
             for (i = 0; i < drawingPlan.data.length; i++) {
@@ -730,24 +774,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateXScales = function() 
         }
       }
       if (anychart.utils.instanceOf(xScale, anychart.scales.Ordinal)) {
-        var namesField = xScale.getNamesField();
-        // retrieving names
-        if (namesField) {
-          var remainingNames = drawingPlans[0].xArray.length;
-          var autoNames = new Array(remainingNames);
-          for (i = 0; i < drawingPlans.length; i++) {
-            var drawingPlanData = drawingPlans[i].data;
-            if (remainingNames > 0) {
-              for (j = 0; j < drawingPlanData.length; j++) {
-                if (!goog.isDef(autoNames[j]) && goog.isDef(val = drawingPlanData[j].data[namesField])) {
-                  autoNames[j] = val;
-                  remainingNames--;
-                }
-              }
-            }
-          }
-          xScale.setAutoNames(autoNames);
-        }
+        this.finishOrdinalXScaleCalculation(/** @type {anychart.scales.Ordinal} */ (xScale), drawingPlans);
       }
     }
 
@@ -1686,9 +1713,18 @@ anychart.core.ChartWithOrthogonalScales.prototype.prepare3d = function() {};
 
 /**
  * Applies modifications (like zoom) on the calculated x scales.
+ * @param {boolean=} opt_doNotInvalidate Do not invalidate associated states.
  * @protected
  */
-anychart.core.ChartWithOrthogonalScales.prototype.applyXZoom = function() {};
+anychart.core.ChartWithOrthogonalScales.prototype.applyXZoom = function(opt_doNotInvalidate) {};
+
+
+/**
+ * Applies modifications (like zoom) on the calculated y scales.
+ * @param {boolean=} opt_doNotInvalidate Do not invalidate associated states.
+ * @protected
+ */
+anychart.core.ChartWithOrthogonalScales.prototype.applyYZoom = function(opt_doNotInvalidate) {};
 
 
 /**

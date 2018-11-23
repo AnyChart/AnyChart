@@ -2960,7 +2960,6 @@ anychart.pertModule.Chart.prototype.disposeInternal = function() {
 /** @inheritDoc */
 anychart.pertModule.Chart.prototype.serialize = function() {
   var json = anychart.pertModule.Chart.base(this, 'serialize');
-  json['type'] = this.getType();
 
   if (this.data_)
     json['treeData'] = this.data_.serializeWithoutMeta();
@@ -3003,7 +3002,6 @@ anychart.pertModule.Chart.prototype.setupByJSON = function(config, opt_default) 
   proto['milestones'] = proto.milestones;
   proto['criticalPath'] = proto.criticalPath;
   proto['data'] = proto.data;
-  proto['getType'] = proto.getType;
   proto['toCsv'] = proto.toCsv;
 })();
 

@@ -306,10 +306,10 @@ anychart.core.utils.Space.normalizeSpace = function(var_args) {
  */
 anychart.core.utils.Space.prototype.set = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   var normalizedSpace = /** @type {anychart.core.utils.Space.NormalizedSpace} */ (anychart.core.utils.Space.normalizeSpace.apply(this, arguments));
-  if ((this.getOption('top') !== normalizedSpace.top) ||
-      (this.getOption('right') !== normalizedSpace.right) ||
-      (this.getOption('bottom') !== normalizedSpace.bottom) ||
-      (this.getOption('left') !== normalizedSpace.left)) {
+  if ((this.getOwnOption('top') !== normalizedSpace.top) ||
+      (this.getOwnOption('right') !== normalizedSpace.right) ||
+      (this.getOwnOption('bottom') !== normalizedSpace.bottom) ||
+      (this.getOwnOption('left') !== normalizedSpace.left)) {
     this.setOption('top', normalizedSpace.top);
     this.setOption('right', normalizedSpace.right);
     this.setOption('bottom', normalizedSpace.bottom);

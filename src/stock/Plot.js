@@ -2269,20 +2269,26 @@ anychart.stockModule.Plot.prototype.getLegendAutoText = function(legendFormatter
  * @param {anychart.math.Rect=} opt_seriesBounds
  * @param {number=} opt_titleValue
  * @param {number=} opt_rawValue - As is date.
+ * @param {boolean=} opt_clear - Whether to clear legend.
  * @private
  */
-anychart.stockModule.Plot.prototype.updateLegend_ = function(opt_seriesBounds, opt_titleValue, opt_rawValue) {
+anychart.stockModule.Plot.prototype.updateLegend_ = function(opt_seriesBounds, opt_titleValue, opt_rawValue, opt_clear) {
   var legend = /** @type {anychart.core.ui.Legend} */(this.legend());
   legend.suspendSignalsDispatching();
   legend.container(this.rootLayer_);
   if (opt_seriesBounds) {
     legend.parentBounds(opt_seriesBounds);
   }
-  var autoText = this.getLegendAutoText(/** @type {string|Function} */ (legend.getOption('titleFormat')), opt_titleValue, opt_rawValue);
+  var autoText = opt_clear ? '' : this.getLegendAutoText(/** @type {string|Function} */ (legend.getOption('titleFormat')), opt_titleValue, opt_rawValue);
   if (!goog.isNull(autoText))
     legend.title().autoText(autoText);
-  if (!legend.itemsSource())
+
+  if (opt_clear) {
+    legend.clearItems();
+    legend.itemsSource(null);
+  } else if (!legend.itemsSource())
     legend.itemsSource(this);
+
   legend.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.LEGEND_RECREATE_ITEMS);
   legend.draw();
   legend.resumeSignalsDispatching(false);
@@ -2449,12 +2455,15 @@ anychart.stockModule.Plot.prototype.highlight = function(value, rawValue, hlSour
 
   for (var i = 0; i < this.series_.length; i++) {
     var series = this.series_[i];
-    if (series)
+    if (series) {
+      series.removeHighlight();
       series.highlight(setValue, value);
+    }
   }
 
   if (this.legend_ && this.legend_.enabled()) {
-    this.updateLegend_(null, value, rawValue);
+    var clear = this.chart_.xScale().isValueInDummyRange(setValue);
+    this.updateLegend_(null, value, rawValue, clear);
   }
   this.dispatchSignal(anychart.Signal.NEED_UPDATE_LEGEND);
 };

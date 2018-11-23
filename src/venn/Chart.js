@@ -1659,7 +1659,6 @@ anychart.vennModule.Chart.prototype.serialize = function() {
 
   anychart.core.settings.serialize(this, anychart.vennModule.Chart.SIMPLE_PROPS_DESCRIPTORS, json, 'Venn');
 
-  json['type'] = this.getType();
   json['data'] = this.data().serialize();
 
   json['normal'] = this.normal().serialize();

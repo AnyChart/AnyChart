@@ -376,7 +376,7 @@ anychart.core.Chart.prototype.createStage = function() {
 
 
 /**
- * Returns chart or gauge type. Published in charts.
+ * Returns chart type. Published in charts.
  * @return {anychart.enums.ChartTypes|anychart.enums.GaugeTypes|anychart.enums.MapTypes}
  */
 anychart.core.Chart.prototype.getType = goog.abstractMethod;
@@ -867,7 +867,7 @@ anychart.core.Chart.prototype.showTooltip_ = function(event) {
         var series = event['seriesStatus'][0]['series'];
 
         // if series xScale ordinal and in scatter xMode than we should use categoryIndex insteadof pointIndex
-        if (anychart.utils.instanceOf(series.getXScale(), anychart.scales.Ordinal) &&
+        if (series.getXScale && anychart.utils.instanceOf(series.getXScale(), anychart.scales.Ordinal) &&
             series.getOption('xMode') == anychart.enums.XMode.SCATTER) {
           categoryIndex = event['point'].get('x');
         }
@@ -1966,6 +1966,8 @@ anychart.core.Chart.prototype.getDefaultThemeObj = function() {
 /** @inheritDoc */
 anychart.core.Chart.prototype.serialize = function() {
   var json = anychart.core.Chart.base(this, 'serialize');
+
+  json['type'] = this.getType();
 
   if (this.getCreated('title'))
     json['title'] = this.title().serialize();

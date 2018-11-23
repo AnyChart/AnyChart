@@ -1,5 +1,7 @@
 goog.provide('anychart.stockModule.scales.IKeyIndexTransformer');
 goog.provide('anychart.stockModule.scales.Scatter');
+
+//region -- Requirements.
 goog.require('anychart.core.Base');
 goog.require('anychart.enums');
 goog.require('anychart.scales.IXScale');
@@ -11,6 +13,8 @@ goog.require('goog.math');
 
 
 
+//endregion
+//region -- Constructor.
 /**
  * Stock scatter datetime scale class.
  * @param {!anychart.stockModule.scales.IKeyIndexTransformer} chartOrScroller
@@ -129,12 +133,40 @@ anychart.stockModule.scales.Scatter = function(chartOrScroller) {
    * @private
    */
   this.ranges_ = [];
+
+  /**
+   *
+   * @type {?Object}
+   * @private
+   */
+  this.minGapRange_ = null;
+
+  /**
+   *
+   * @type {?Object}
+   * @private
+   */
+  this.maxGapRange_ = null;
+
+  /**
+   *
+   * @type {anychart.stockModule.scales.Scatter.GapConfig}
+   */
+  this.minGapConfig = this.normalizeGapConfig_(null);
+
+  /**
+   *
+   * @type {anychart.stockModule.scales.Scatter.GapConfig}
+   */
+  this.maxGapConfig = this.normalizeGapConfig_(null);
+
   this.ticks(anychart.stockModule.scales.Scatter.DEFAULT_TICKS_);
 };
 goog.inherits(anychart.stockModule.scales.Scatter, anychart.core.Base);
 
 
-
+//endregion
+//region -- Type definitions.
 /**
  * @typedef {{
  *    min: number,
@@ -168,14 +200,28 @@ anychart.stockModule.scales.Scatter.TicksSettingsRep;
 
 
 /**
+ * @typedef {{
+ *    unitType: anychart.enums.Interval,
+ *    unitCount: number,
+ *    intervalsCount: number
+ * }}
+ */
+anychart.stockModule.scales.Scatter.GapConfig;
+
+
+//endregion
+//region -- Signals.
+/**
  * Supported signals set.
  * @type {number}
  */
 anychart.stockModule.scales.Scatter.prototype.SUPPORTED_SIGNALS =
     anychart.Signal.NEED_UPDATE_TICK_DEPENDENT |
-    anychart.Signal.NEED_UPDATE_FULL_RANGE_ITEMS;
+    anychart.Signal.NEED_UPDATE_FULL_RANGE_ITEMS |
+    anychart.Signal.DATA_CHANGED; // This signal means that gaps were changed. DVF-3076.
 
 
+//endregion
 /**
  * Return scale type.
  * @return {anychart.enums.ScaleTypes}
@@ -220,6 +266,123 @@ anychart.stockModule.scales.Scatter.prototype.ticksCount = function(opt_value) {
     return this;
   }
   return this.ticksCount_;
+};
+
+
+/**
+ *
+ * @param {?anychart.stockModule.scales.Scatter.GapConfig} val - Config to normalize.
+ * @return {anychart.stockModule.scales.Scatter.GapConfig} - Normalized config.
+ * @private
+ */
+anychart.stockModule.scales.Scatter.prototype.normalizeGapConfig_ = function(val) {
+  /*
+  This variable is always an instance of chart here because stock scroller doesn't have
+  xScale() method exported, that's why this method is always called from chart's xScale.
+  */
+  var chart = /** @type {anychart.stockModule.Chart} */ (this.keyIndexTransformer);
+  var defaultIntervalConfig = chart.grouping().getCurrentDataInterval();
+
+  var norm = {
+    'unitType': defaultIntervalConfig['unit'],
+    'unitCount': defaultIntervalConfig['count'],
+    'intervalsCount': 0
+  };
+
+  if (goog.typeOf(val) == 'object') {
+    if (goog.isDefAndNotNull(val['unitType']))
+      norm['unitType'] = anychart.enums.normalizeInterval(val['unitType']);
+    if (val['unitCount'] > 0) //yes, undefined, zero and negative values are not allowed here.
+      norm['unitCount'] = +val['unitCount'];
+    if (val['intervalsCount'])
+      norm['intervalsCount'] = Math.max(0, val['intervalsCount']);
+  }
+  return norm;
+};
+
+
+/**
+ *
+ * @param {anychart.stockModule.scales.Scatter.GapConfig=} opt_value - Gap config to set.
+ *  NOTE: In config, if unitType or unitCount is not set, value will be taken from
+ *  chart.grouping().getCurrentDataInterval(). If intervalsCount is not set, gap will be removed.
+ * @return {anychart.stockModule.scales.Scatter.GapConfig|anychart.stockModule.scales.Scatter} - Value or itself for chaining.
+ */
+anychart.stockModule.scales.Scatter.prototype.minimumGap = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = this.normalizeGapConfig_(opt_value);
+    if (!goog.object.equals(this.minGapConfig, opt_value)) {
+      this.minGapConfig = opt_value;
+      this.dispatchSignal(anychart.Signal.DATA_CHANGED);
+      return this;
+    }
+  }
+  return this.minGapConfig;
+};
+
+
+/**
+ *
+ * @param {anychart.stockModule.scales.Scatter.GapConfig=} opt_value - Gap config to set.
+ *  NOTE: In config, if unitType or unitCount is not set, value will be taken from
+ *  chart.grouping().getCurrentDataInterval(). If intervalsCount is not set, gap will be removed.
+ * @return {anychart.stockModule.scales.Scatter.GapConfig|anychart.stockModule.scales.Scatter} - Value or itself for chaining.
+ */
+anychart.stockModule.scales.Scatter.prototype.maximumGap = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = this.normalizeGapConfig_(opt_value);
+    if (!goog.object.equals(this.maxGapConfig, opt_value)) {
+      this.maxGapConfig = opt_value;
+      this.dispatchSignal(anychart.Signal.DATA_CHANGED);
+      return this;
+    }
+  }
+  return this.maxGapConfig;
+};
+
+
+/**
+ * Sets minimum gap range to determine dummy data min interval.
+ * @param {?number} min - Min value. Null value meas that maxGapRange_ must be nullified, otherwise opt_max value must be set.
+ * @param {number=} opt_max - Max value in dummy data gap.
+ */
+anychart.stockModule.scales.Scatter.prototype.setMinGapRange = function(min, opt_max) {
+  if (goog.isNumber(min)) {
+    this.minGapRange_ = {min: min, max: opt_max};
+  } else {
+    this.minGapRange_ = null;
+  }
+};
+
+
+/**
+ * Sets maximum gap range to determine dummy data max interval.
+ * @param {?number} min - Min value. Null value meas that maxGapRange_ must be nullified, otherwise opt_max value must be set.
+ * @param {number=} opt_max - Max value in dummy data gap.
+ */
+anychart.stockModule.scales.Scatter.prototype.setMaxGapRange = function(min, opt_max) {
+  if (goog.isNumber(min)) {
+    this.maxGapRange_ = {min: min, max: opt_max};
+  } else {
+    this.maxGapRange_ = null;
+  }
+};
+
+
+/**
+ * Decides whether passed value belongs to dummy interval.
+ * @param {number} val - Value to check.
+ * @return {boolean}
+ */
+anychart.stockModule.scales.Scatter.prototype.isValueInDummyRange = function(val) {
+  /*
+    NOTE: val < this.minGapRange_.max is because this.minGapRange_.max belongs to real data as well as
+          this.maxGapRange_.min belongs to real data as well.
+  */
+  return !!(
+      (this.minGapRange_ && val >= this.minGapRange_.min && val < this.minGapRange_.max) ||
+      (this.maxGapRange_ && val > this.maxGapRange_.min && val <= this.maxGapRange_.max)
+  );
 };
 
 
@@ -649,7 +812,9 @@ anychart.stockModule.scales.Scatter.prototype.normalizeTicks_ = function(value) 
         }
       }
     }
-    res.sort(function(a, b) { return a.range - b.range; });
+    res.sort(function(a, b) {
+      return a.range - b.range;
+    });
   }
   return res;
 };
@@ -701,39 +866,138 @@ anychart.stockModule.scales.Scatter.prototype.getIndexByKey = function(key) {
  * @private
  */
 anychart.stockModule.scales.Scatter.DEFAULT_TICKS_ = [
-  {'minor': {'unit': anychart.enums.Interval.MILLISECOND, 'count': 1}, 'major': {'unit': anychart.enums.Interval.MILLISECOND, 'count': 5}},
-  {'minor': {'unit': anychart.enums.Interval.MILLISECOND, 'count': 5}, 'major': {'unit': anychart.enums.Interval.MILLISECOND, 'count': 20}},
-  {'minor': {'unit': anychart.enums.Interval.MILLISECOND, 'count': 20}, 'major': {'unit': anychart.enums.Interval.MILLISECOND, 'count': 100}},
-  {'minor': {'unit': anychart.enums.Interval.MILLISECOND, 'count': 100}, 'major': {'unit': anychart.enums.Interval.MILLISECOND, 'count': 500}},
-  {'minor': {'unit': anychart.enums.Interval.MILLISECOND, 'count': 500}, 'major': {'unit': anychart.enums.Interval.SECOND, 'count': 2}},
-  {'minor': {'unit': anychart.enums.Interval.SECOND, 'count': 2}, 'major': {'unit': anychart.enums.Interval.SECOND, 'count': 10}},
-  {'minor': {'unit': anychart.enums.Interval.SECOND, 'count': 10}, 'major': {'unit': anychart.enums.Interval.SECOND, 'count': 30}},
-  {'minor': {'unit': anychart.enums.Interval.SECOND, 'count': 30}, 'major': {'unit': anychart.enums.Interval.MINUTE, 'count': 2}},
-  {'minor': {'unit': anychart.enums.Interval.MINUTE, 'count': 2}, 'major': {'unit': anychart.enums.Interval.MINUTE, 'count': 10}},
-  {'minor': {'unit': anychart.enums.Interval.MINUTE, 'count': 10}, 'major': {'unit': anychart.enums.Interval.MINUTE, 'count': 30}},
-  {'minor': {'unit': anychart.enums.Interval.MINUTE, 'count': 30}, 'major': {'unit': anychart.enums.Interval.HOUR, 'count': 1}},
-  {'minor': {'unit': anychart.enums.Interval.HOUR, 'count': 1}, 'major': {'unit': anychart.enums.Interval.HOUR, 'count': 3}},
-  {'minor': {'unit': anychart.enums.Interval.HOUR, 'count': 3}, 'major': {'unit': anychart.enums.Interval.HOUR, 'count': 12}},
-  {'minor': {'unit': anychart.enums.Interval.HOUR, 'count': 12}, 'major': {'unit': anychart.enums.Interval.DAY, 'count': 1}},
-  {'minor': {'unit': anychart.enums.Interval.DAY, 'count': 1}, 'major': {'unit': anychart.enums.Interval.WEEK, 'count': 1}},
-  {'minor': {'unit': anychart.enums.Interval.DAY, 'count': 2}, 'major': {'unit': anychart.enums.Interval.WEEK, 'count': 1}},
-  {'minor': {'unit': anychart.enums.Interval.WEEK, 'count': 1}, 'major': {'unit': anychart.enums.Interval.MONTH, 'count': 1}},
-  {'minor': {'unit': anychart.enums.Interval.MONTH, 'count': 1}, 'major': {'unit': anychart.enums.Interval.QUARTER, 'count': 1}},
-  {'minor': {'unit': anychart.enums.Interval.QUARTER, 'count': 1}, 'major': {'unit': anychart.enums.Interval.SEMESTER, 'count': 1}},
-  {'minor': {'unit': anychart.enums.Interval.SEMESTER, 'count': 1}, 'major': {'unit': anychart.enums.Interval.YEAR, 'count': 1}},
-  {'minor': {'unit': anychart.enums.Interval.YEAR, 'count': 1}, 'major': {'unit': anychart.enums.Interval.YEAR, 'count': 2}},
-  {'minor': {'unit': anychart.enums.Interval.YEAR, 'count': 2}, 'major': {'unit': anychart.enums.Interval.YEAR, 'count': 4}},
-  {'minor': {'unit': anychart.enums.Interval.YEAR, 'count': 3}, 'major': {'unit': anychart.enums.Interval.YEAR, 'count': 6}},
-  {'minor': {'unit': anychart.enums.Interval.YEAR, 'count': 4}, 'major': {'unit': anychart.enums.Interval.YEAR, 'count': 8}},
-  {'minor': {'unit': anychart.enums.Interval.YEAR, 'count': 5}, 'major': {'unit': anychart.enums.Interval.YEAR, 'count': 10}},
-  {'minor': {'unit': anychart.enums.Interval.YEAR, 'count': 6}, 'major': {'unit': anychart.enums.Interval.YEAR, 'count': 12}},
-  {'minor': {'unit': anychart.enums.Interval.YEAR, 'count': 7}, 'major': {'unit': anychart.enums.Interval.YEAR, 'count': 14}},
-  {'minor': {'unit': anychart.enums.Interval.YEAR, 'count': 8}, 'major': {'unit': anychart.enums.Interval.YEAR, 'count': 16}},
-  {'minor': {'unit': anychart.enums.Interval.YEAR, 'count': 9}, 'major': {'unit': anychart.enums.Interval.YEAR, 'count': 18}},
-  {'minor': {'unit': anychart.enums.Interval.YEAR, 'count': 10}, 'major': {'unit': anychart.enums.Interval.YEAR, 'count': 20}},
-  {'minor': {'unit': anychart.enums.Interval.YEAR, 'count': 20}, 'major': {'unit': anychart.enums.Interval.YEAR, 'count': 40}},
-  {'minor': {'unit': anychart.enums.Interval.YEAR, 'count': 25}, 'major': {'unit': anychart.enums.Interval.YEAR, 'count': 100}},
-  {'minor': {'unit': anychart.enums.Interval.YEAR, 'count': 100}, 'major': {'unit': anychart.enums.Interval.YEAR, 'count': 500}}
+  {
+    'minor': {'unit': anychart.enums.Interval.MILLISECOND, 'count': 1},
+    'major': {'unit': anychart.enums.Interval.MILLISECOND, 'count': 5}
+  },
+  {
+    'minor': {'unit': anychart.enums.Interval.MILLISECOND, 'count': 5},
+    'major': {'unit': anychart.enums.Interval.MILLISECOND, 'count': 20}
+  },
+  {
+    'minor': {'unit': anychart.enums.Interval.MILLISECOND, 'count': 20},
+    'major': {'unit': anychart.enums.Interval.MILLISECOND, 'count': 100}
+  },
+  {
+    'minor': {'unit': anychart.enums.Interval.MILLISECOND, 'count': 100},
+    'major': {'unit': anychart.enums.Interval.MILLISECOND, 'count': 500}
+  },
+  {
+    'minor': {'unit': anychart.enums.Interval.MILLISECOND, 'count': 500},
+    'major': {'unit': anychart.enums.Interval.SECOND, 'count': 2}
+  },
+  {
+    'minor': {'unit': anychart.enums.Interval.SECOND, 'count': 2},
+    'major': {'unit': anychart.enums.Interval.SECOND, 'count': 10}
+  },
+  {
+    'minor': {'unit': anychart.enums.Interval.SECOND, 'count': 10},
+    'major': {'unit': anychart.enums.Interval.SECOND, 'count': 30}
+  },
+  {
+    'minor': {'unit': anychart.enums.Interval.SECOND, 'count': 30},
+    'major': {'unit': anychart.enums.Interval.MINUTE, 'count': 2}
+  },
+  {
+    'minor': {'unit': anychart.enums.Interval.MINUTE, 'count': 2},
+    'major': {'unit': anychart.enums.Interval.MINUTE, 'count': 10}
+  },
+  {
+    'minor': {'unit': anychart.enums.Interval.MINUTE, 'count': 10},
+    'major': {'unit': anychart.enums.Interval.MINUTE, 'count': 30}
+  },
+  {
+    'minor': {'unit': anychart.enums.Interval.MINUTE, 'count': 30},
+    'major': {'unit': anychart.enums.Interval.HOUR, 'count': 1}
+  },
+  {
+    'minor': {'unit': anychart.enums.Interval.HOUR, 'count': 1},
+    'major': {'unit': anychart.enums.Interval.HOUR, 'count': 3}
+  },
+  {
+    'minor': {'unit': anychart.enums.Interval.HOUR, 'count': 3},
+    'major': {'unit': anychart.enums.Interval.HOUR, 'count': 12}
+  },
+  {
+    'minor': {'unit': anychart.enums.Interval.HOUR, 'count': 12},
+    'major': {'unit': anychart.enums.Interval.DAY, 'count': 1}
+  },
+  {
+    'minor': {'unit': anychart.enums.Interval.DAY, 'count': 1},
+    'major': {'unit': anychart.enums.Interval.WEEK, 'count': 1}
+  },
+  {
+    'minor': {'unit': anychart.enums.Interval.DAY, 'count': 2},
+    'major': {'unit': anychart.enums.Interval.WEEK, 'count': 1}
+  },
+  {
+    'minor': {'unit': anychart.enums.Interval.WEEK, 'count': 1},
+    'major': {'unit': anychart.enums.Interval.MONTH, 'count': 1}
+  },
+  {
+    'minor': {'unit': anychart.enums.Interval.MONTH, 'count': 1},
+    'major': {'unit': anychart.enums.Interval.QUARTER, 'count': 1}
+  },
+  {
+    'minor': {'unit': anychart.enums.Interval.QUARTER, 'count': 1},
+    'major': {'unit': anychart.enums.Interval.SEMESTER, 'count': 1}
+  },
+  {
+    'minor': {'unit': anychart.enums.Interval.SEMESTER, 'count': 1},
+    'major': {'unit': anychart.enums.Interval.YEAR, 'count': 1}
+  },
+  {
+    'minor': {'unit': anychart.enums.Interval.YEAR, 'count': 1},
+    'major': {'unit': anychart.enums.Interval.YEAR, 'count': 2}
+  },
+  {
+    'minor': {'unit': anychart.enums.Interval.YEAR, 'count': 2},
+    'major': {'unit': anychart.enums.Interval.YEAR, 'count': 4}
+  },
+  {
+    'minor': {'unit': anychart.enums.Interval.YEAR, 'count': 3},
+    'major': {'unit': anychart.enums.Interval.YEAR, 'count': 6}
+  },
+  {
+    'minor': {'unit': anychart.enums.Interval.YEAR, 'count': 4},
+    'major': {'unit': anychart.enums.Interval.YEAR, 'count': 8}
+  },
+  {
+    'minor': {'unit': anychart.enums.Interval.YEAR, 'count': 5},
+    'major': {'unit': anychart.enums.Interval.YEAR, 'count': 10}
+  },
+  {
+    'minor': {'unit': anychart.enums.Interval.YEAR, 'count': 6},
+    'major': {'unit': anychart.enums.Interval.YEAR, 'count': 12}
+  },
+  {
+    'minor': {'unit': anychart.enums.Interval.YEAR, 'count': 7},
+    'major': {'unit': anychart.enums.Interval.YEAR, 'count': 14}
+  },
+  {
+    'minor': {'unit': anychart.enums.Interval.YEAR, 'count': 8},
+    'major': {'unit': anychart.enums.Interval.YEAR, 'count': 16}
+  },
+  {
+    'minor': {'unit': anychart.enums.Interval.YEAR, 'count': 9},
+    'major': {'unit': anychart.enums.Interval.YEAR, 'count': 18}
+  },
+  {
+    'minor': {'unit': anychart.enums.Interval.YEAR, 'count': 10},
+    'major': {'unit': anychart.enums.Interval.YEAR, 'count': 20}
+  },
+  {
+    'minor': {'unit': anychart.enums.Interval.YEAR, 'count': 20},
+    'major': {'unit': anychart.enums.Interval.YEAR, 'count': 40}
+  },
+  {
+    'minor': {'unit': anychart.enums.Interval.YEAR, 'count': 25},
+    'major': {'unit': anychart.enums.Interval.YEAR, 'count': 100}
+  },
+  {
+    'minor': {'unit': anychart.enums.Interval.YEAR, 'count': 100},
+    'major': {'unit': anychart.enums.Interval.YEAR, 'count': 500}
+  }
 ];
 
 
@@ -775,4 +1039,6 @@ anychart.stockModule.scales.IKeyIndexTransformer.prototype.getIndexByKey = funct
   proto['getMaximum'] = proto.getMaximum;
   proto['transform'] = proto.transform;
   proto['inverseTransform'] = proto.inverseTransform;
+  proto['minimumGap'] = proto.minimumGap;
+  proto['maximumGap'] = proto.maximumGap;
 })();

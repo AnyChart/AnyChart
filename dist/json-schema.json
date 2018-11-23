@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema",
-  "description": "AnyChart JSON Schema, version 8.4.1",
+  "description": "AnyChart JSON Schema, version 8.4.2",
   "$ref": "#/definitions/anychart",
   "definitions": {
     "anychart": {
@@ -536,6 +536,19 @@
             {"$ref": "#/definitions/anychart.core.ui.ChartScroller"}
           ]
         },
+        "yZoom": {
+          "oneOf": [
+            {"type": "number"},
+            {"type": "boolean"},
+            {"$ref": "#/definitions/anychart.core.CartesianXZoom"}
+          ]
+        },
+        "yScroller": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.ChartScroller"}
+          ]
+        },
         "zAngle": {"type": ["number"]},
         "zAspect": {"type": ["number", "string"]},
         "zPadding": {"type": ["number"]},
@@ -600,6 +613,9 @@
             "stick",
             "pareto"
           ]
+        },
+        "categorizedBySeries": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -1798,7 +1814,8 @@
           "items": {
             "anyOf": [
               {"$ref": "#/definitions/anychart.scales.Ordinal"},
-              {"$ref": "#/definitions/anychart.scales.OrdinalColor"}
+              {"$ref": "#/definitions/anychart.scales.OrdinalColor"},
+              {"$ref": "#/definitions/anychart.scales.LinearColor"}
             ]
           },
           "patternProperties": {
@@ -4026,7 +4043,8 @@
         "treeData": {"$ref": "#/definitions/treeData"},
         "isResourceChart": {"type": "boolean"},
         "verticalOffset": {"type": "number"},
-        "startIndex": {"type": "number"}
+        "startIndex": {"type": "number"},
+        "scrollTo": {"type": "number"}
       }
     },
     "anychart.core.ui.Timeline": {

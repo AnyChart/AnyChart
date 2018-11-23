@@ -724,7 +724,6 @@ anychart.radarPolarBaseModule.Chart.prototype.getSeriesStatus = function(event) 
 /** @inheritDoc */
 anychart.radarPolarBaseModule.Chart.prototype.serialize = function() {
   var json = anychart.radarPolarBaseModule.Chart.base(this, 'serialize');
-  json['type'] = this.getType();
   return {'chart': json};
 };
 

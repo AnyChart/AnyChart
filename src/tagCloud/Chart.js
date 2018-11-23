@@ -493,6 +493,19 @@ anychart.tagCloudModule.Chart.prototype.createTooltipContextProvider = function(
 
 
 /**
+ * Creates position provider. Series-like behaviour.
+ * @return {Object} Object positioning data.
+ */
+anychart.tagCloudModule.Chart.prototype.createPositionProvider = function() {
+  var iterator = this.getIterator();
+  var item = iterator.meta('item');
+  var left = this.lCenterX_ + item.x * this.lScale_;
+  var top = this.lCenterY_ + item.y * this.lScale_;
+  return {'value': {'x': left, 'y': top}};
+};
+
+
+/**
  * Apply appearance to series.
  * @param {anychart.PointState|number} pointState .
  */
@@ -1961,8 +1974,11 @@ anychart.tagCloudModule.Chart.prototype.drawContent = function(bounds) {
       this.texts_ = this.layer_.layer();
     }
 
+    this.lCenterX_ = this.internalBounds_.left + (this.w >> 1);
+    this.lCenterY_ = this.internalBounds_.top + (this.h >> 1);
+    this.lScale_ = scale_;
     this.layer_
-        .setTransformationMatrix(scale_, 0, 0, scale_, this.internalBounds_.left + (this.w >> 1), this.internalBounds_.top + (this.h >> 1));
+        .setTransformationMatrix(scale_, 0, 0, scale_, this.lCenterX_, this.lCenterY_);
     var tx = this.layer_.getSelfTransformation();
 
 
@@ -2167,7 +2183,6 @@ anychart.tagCloudModule.Chart.prototype.serialize = function() {
 
   anychart.core.settings.serialize(this, this.SIMPLE_PROPS_DESCRIPTORS, json);
 
-  json['type'] = this.getType();
   json['data'] = this.data().serialize();
   if (goog.isDef(this.angles_))
     json['angles'] = this.angles_;

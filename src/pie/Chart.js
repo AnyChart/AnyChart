@@ -4711,7 +4711,6 @@ anychart.pieModule.Chart.prototype.createTooltipContextProvider = function() {
 /** @inheritDoc */
 anychart.pieModule.Chart.prototype.serialize = function() {
   var json = anychart.pieModule.Chart.base(this, 'serialize');
-  json['type'] = this.getType();
   json['data'] = this.data().serialize();
   json['palette'] = this.palette().serialize();
   json['hatchFillPalette'] = this.hatchFillPalette().serialize();

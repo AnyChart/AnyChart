@@ -521,7 +521,6 @@ anychart.mekkoModule.Chart.prototype.defaultScalesLastIndex = function() {
 /** @inheritDoc */
 anychart.mekkoModule.Chart.prototype.serialize = function() {
   var json = anychart.mekkoModule.Chart.base(this, 'serialize');
-  json['type'] = this.getType();
   anychart.core.settings.serialize(this, anychart.mekkoModule.Chart.PROPERTY_DESCRIPTORS, json);
   return {'chart': json};
 };

@@ -14,6 +14,7 @@ goog.require('anychart.stockModule.Controller');
 goog.require('anychart.stockModule.Interactivity');
 goog.require('anychart.stockModule.Plot');
 goog.require('anychart.stockModule.Scroller');
+goog.require('anychart.stockModule.data.DummyTable');
 goog.require('anychart.stockModule.eventMarkers.ChartController');
 goog.require('anychart.stockModule.scales.IKeyIndexTransformer');
 goog.require('anychart.stockModule.scales.Ordinal');
@@ -183,10 +184,19 @@ anychart.stockModule.Chart = function(opt_allowPointSettings) {
    */
   this.seriesConfig = this.createSeriesConfig(this.allowPointSettings_);
 
+  /**
+   *
+   * @type {anychart.stockModule.data.DummyTable}
+   * @private
+   */
+  this.dummyTable_ = null;
+
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['zoomMarqueeFill', 0, 0],
     ['zoomMarqueeStroke', 0, 0]
   ]);
+
+  this.markConsistent(anychart.ConsistencyState.STOCK_GAP);
 };
 goog.inherits(anychart.stockModule.Chart, anychart.core.Chart);
 
@@ -207,7 +217,8 @@ anychart.stockModule.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.STOCK_PLOTS_APPEARANCE |
     anychart.ConsistencyState.STOCK_SCROLLER |
     anychart.ConsistencyState.STOCK_DATA |
-    anychart.ConsistencyState.STOCK_SCALES;
+    anychart.ConsistencyState.STOCK_SCALES |
+    anychart.ConsistencyState.STOCK_GAP;
 
 
 /**
@@ -981,6 +992,10 @@ anychart.stockModule.Chart.prototype.xScale = function(opt_value) {
     newType = String(newType).toLowerCase();
     var askedForScatter = newType == anychart.enums.ScaleTypes.STOCK_SCATTER_DATE_TIME || newType == 'scatter';
     var currIsScatter = this.xScale_ && !(anychart.utils.instanceOf(this.xScale_, anychart.stockModule.scales.Ordinal));
+
+    if (this.xScale_)
+      this.xScale_.unlistenSignals(this.xScaleListener_, this);
+
     if (askedForScatter != currIsScatter) {
       if (askedForScatter) {
         this.xScale_ = new anychart.stockModule.scales.Scatter(this);
@@ -992,14 +1007,31 @@ anychart.stockModule.Chart.prototype.xScale = function(opt_value) {
           this.scroller_.xScale(new anychart.stockModule.scales.Ordinal(this.scroller_));
       }
 
+      this.xScale_.listenSignals(this.xScaleListener_, this);
       this.invalidateRedrawable();
     }
     return this;
   }
   if (!this.xScale_) {
     this.xScale_ = new anychart.stockModule.scales.Ordinal(this);
+    this.xScale_.listenSignals(this.xScaleListener_, this);
   }
   return this.xScale_;
+};
+
+
+/**
+ * xScale listener.
+ * @param {anychart.SignalEvent} e
+ * @private
+ */
+anychart.stockModule.Chart.prototype.xScaleListener_ = function(e) {
+  if (e.hasSignal(anychart.Signal.DATA_CHANGED)) {
+    if (this.dummyTable_) {
+      this.dummyTable_.remove();
+    }
+    this.invalidate(anychart.ConsistencyState.STOCK_GAP | anychart.ConsistencyState.STOCK_DATA, anychart.Signal.NEEDS_REDRAW);
+  }
 };
 
 
@@ -1226,10 +1258,29 @@ anychart.stockModule.Chart.prototype.drawContent = function(bounds) {
     anychart.performance.start('Stock data calc');
     var xScale = /** @type {anychart.stockModule.scales.Scatter} */(this.xScale());
     var scrollerXScale = /** @type {anychart.stockModule.scales.Scatter} */(this.scroller().xScale());
+
+    //this first selection is needed to define total data max value.
     var changed = this.dataController_.refreshSelection(
         this.minPlotsDrawingWidth_,
         this.inDrag_ || this.preserveSelectedRangeOnDataUpdate_,
         xScale, scrollerXScale);
+
+    if (this.hasInvalidationState(anychart.ConsistencyState.STOCK_GAP)) {
+      if (!this.dummyTable_) {
+        this.dummyTable_ = new anychart.stockModule.data.DummyTable();
+        this.dataController_.registerSource(this.dummyTable_.mapAs().createSelectable(), false); //TODO (A.Kudryavtsev): Check second arg.
+      }
+
+      this.dummyTable_.applyGapSettings(/** @type {anychart.stockModule.scales.Scatter} */ (this.xScale()));
+      this.markConsistent(anychart.ConsistencyState.STOCK_GAP);
+
+      //this second refresh allows to consider dummy data.
+      changed = this.dataController_.refreshSelection(
+          this.minPlotsDrawingWidth_,
+          this.inDrag_ || this.preserveSelectedRangeOnDataUpdate_,
+          xScale, scrollerXScale);
+    }
+
     if (!!(changed & 1)) {
       this.invalidateRedrawable();
       for (i = 0; i < this.plots_.length; i++) {
@@ -2137,33 +2188,38 @@ anychart.stockModule.Chart.prototype.highlightAtRatio_ = function(ratio, clientX
    * @type {!anychart.core.ui.Tooltip}
    */
   var tooltip = /** @type {!anychart.core.ui.Tooltip} */(this.tooltip());
-  if (tooltip.getOption('displayMode') == anychart.enums.TooltipDisplayMode.UNION &&
-      tooltip.getOption('positionMode') != anychart.enums.TooltipPositionMode.POINT) {
-    var points = [];
-    var info = eventInfo['infoByPlots'];
-    for (i = 0; i < info.length; i++) {
-      if (info[i]) {
-        var seriesInfo = info[i]['infoBySeries'];
-        if (seriesInfo) {
-          for (var j = 0; j < seriesInfo.length; j++) {
-            var series = seriesInfo[j]['series'];
-            if (series)
-              points.push({'series': series});
+
+  if (this.xScale_.isValueInDummyRange(rawValue)) { //deciding whether to hide tooltip.
+    tooltip.hide();
+  } else {
+    if (tooltip.getOption('displayMode') == anychart.enums.TooltipDisplayMode.UNION &&
+        tooltip.getOption('positionMode') != anychart.enums.TooltipPositionMode.POINT) {
+      var points = [];
+      var info = eventInfo['infoByPlots'];
+      for (i = 0; i < info.length; i++) {
+        if (info[i]) {
+          var seriesInfo = info[i]['infoBySeries'];
+          if (seriesInfo) {
+            for (var j = 0; j < seriesInfo.length; j++) {
+              var series = seriesInfo[j]['series'];
+              if (series)
+                points.push({'series': series});
+            }
           }
         }
       }
+      var grouping = /** @type {anychart.stockModule.Grouping} */(this.grouping());
+      tooltip.showForSeriesPoints(points, clientX, clientY, null, false, {
+        'hoveredDate': {value: value, type: anychart.enums.TokenType.DATE_TIME},
+        'rawHoveredDate': {value: rawValue, type: anychart.enums.TokenType.DATE_TIME},
+        'dataIntervalUnit': {value: grouping.getCurrentDataInterval()['unit'], type: anychart.enums.TokenType.STRING},
+        'dataIntervalUnitCount': {
+          value: grouping.getCurrentDataInterval()['count'],
+          type: anychart.enums.TokenType.NUMBER
+        },
+        'isGrouped': {value: grouping.isGrouped()}
+      });
     }
-    var grouping = /** @type {anychart.stockModule.Grouping} */(this.grouping());
-    tooltip.showForSeriesPoints(points, clientX, clientY, null, false, {
-      'hoveredDate': {value: value, type: anychart.enums.TokenType.DATE_TIME},
-      'rawHoveredDate': {value: rawValue, type: anychart.enums.TokenType.DATE_TIME},
-      'dataIntervalUnit': {value: grouping.getCurrentDataInterval()['unit'], type: anychart.enums.TokenType.STRING},
-      'dataIntervalUnitCount': {
-        value: grouping.getCurrentDataInterval()['count'],
-        type: anychart.enums.TokenType.NUMBER
-      },
-      'isGrouped': {value: grouping.isGrouped()}
-    });
   }
   //}
 };

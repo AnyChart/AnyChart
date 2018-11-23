@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsd:schema
         xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-        targetNamespace="http://anychart.com/schemas/8.4.1/xml-schema.xsd"
-        xmlns="http://anychart.com/schemas/8.4.1/xml-schema.xsd"
+        targetNamespace="http://anychart.com/schemas/8.4.2/xml-schema.xsd"
+        xmlns="http://anychart.com/schemas/8.4.2/xml-schema.xsd"
         elementFormDefault="qualified">
 
     <xsd:element name="anychart" type="Anychart"/>
@@ -105,8 +105,6 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="markers" type="core.MarkersFactory"/>
             <!-- charts.HeatMap elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="color_scale" type="Scale"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="y_zoom" type="core.CartesianXZoom"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="y_scroller" type="core.ChartScroller"/>
             <!-- charts.TreeMap elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="headers" type="core.LabelsFactory"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="color_range" type="core.ColorRange"/>
@@ -114,6 +112,8 @@
             <!-- new Cartesian elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="x_zoom" type="core.CartesianXZoom"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="x_scroller" type="core.ChartScroller"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="y_zoom" type="core.CartesianXZoom"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="y_scroller" type="core.ChartScroller"/>
             <!-- chart.Pert elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="milestones" type="core.Milestones"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="tasks" type="core.Tasks"/>
@@ -158,6 +158,7 @@
         <xsd:attribute name="axis" type="simple.BoolOrNull" default="true"/>
         <!-- charts.Cartesian attrs -->
         <xsd:attribute name="is_vertical" type="simple.Bool" default="false"/>
+        <xsd:attribute name="categorized_by_series" type="simple.Bool" default="false"/>
         <xsd:attribute name="bar_groups_padding" type="xsd:double" default="0.5"/>
         <xsd:attribute name="bars_padding" type="xsd:double" default="0.1"/>
         <xsd:attribute name="min_bubble_size" type="simple.NumberOrPercent" default="5%"/>
@@ -235,8 +236,6 @@
         <xsd:attribute name="markers" type="simple.MarkerType"/>
         <!-- charts.HeatMap elements -->
         <xsd:attribute name="color_scale" type="simple.ChartScaleRef"/>
-        <xsd:attribute name="y_zoom" type="simple.NumberOrBoolOrNull"/>
-        <xsd:attribute name="y_scroller" type="simple.BoolOrNull"/>
         <!-- charts.TreeMap elements -->
         <xsd:attribute name="headers_display_mode" type="enums.LabelsDisplayMode" default="clip"/>
         <xsd:attribute name="headers" type="simple.BoolOrNull"/>
@@ -247,6 +246,8 @@
         <!-- new Cartesian attributes -->
         <xsd:attribute name="x_zoom" type="simple.NumberOrBoolOrNull"/>
         <xsd:attribute name="x_scroller" type="simple.BoolOrNull"/>
+        <xsd:attribute name="y_zoom" type="simple.NumberOrBoolOrNull"/>
+        <xsd:attribute name="y_scroller" type="simple.BoolOrNull"/>
         <!-- Pert attributes -->
         <xsd:attribute name="vertical_spacing" type="simple.NumberOrPercent"/>
         <xsd:attribute name="horizontal_spacing" type="simple.NumberOrPercent"/>
@@ -2755,6 +2756,7 @@
         <xsd:attribute name="is_resource_chart" type="simple.Bool" default="false"/>
         <xsd:attribute name="vertical_offset" type="xsd:double" default="0"/>
         <xsd:attribute name="start_index" type="xsd:double" default="0"/>
+        <xsd:attribute name="scroll_to" type="xsd:double" default="0"/>
     </xsd:complexType>
 
 
@@ -2890,23 +2892,6 @@
             <xsd:element name="tasks" type="core.Tasks" minOccurs="0" maxOccurs="1"/>
             <xsd:element name="milestones" type="core.Milestones" minOccurs="0" maxOccurs="1"/>
         </xsd:all>
-    </xsd:complexType>
-
-    <xsd:complexType name="core.SankeyVisualElement">
-        <xsd:all>
-            <xsd:element name="fill" type="Fill" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="stroke" type="Stroke" minOccurs="0" maxOccurs="1"/>
-
-            <xsd:element name="labels" type="core.LabelsFactory" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="tooltip" type="core.Tooltip" minOccurs="0" maxOccurs="1"/>
-
-            <xsd:element minOccurs="0" maxOccurs="1" name="normal" type="core.StateSettings"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hovered" type="core.StateSettings"/>
-        </xsd:all>
-        <xsd:attribute name="fill" type="xsd:string"/>
-        <xsd:attribute name="stroke" type="xsd:string"/>
-        <xsd:attribute name="labels" type="simple.BoolOrNull" default="true"/>
-        <xsd:attribute name="tooltip" type="simple.BoolOrNull" default="true"/>
     </xsd:complexType>
 
     <xsd:complexType name="core.SankeyVisualElement">

@@ -109,7 +109,7 @@ fi
 ########################################################################################################################
 
 indexDTSurl="http://api.anychart.stg/si/v8/index.d.ts"
- if $IS_RC; then indexDTSurl='http://api.anychart.stg/si/develop/index-develop.d.ts'; fi
+if $IS_RC; then indexDTSurl='http://api.anychart.stg/si/develop/index-develop.d.ts'; fi
 
 echo
 echo " -- Download ${indexDTSurl}"

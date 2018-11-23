@@ -50,8 +50,8 @@ anychart.scales.Logarithmic.prototype.setupTransformer = function() {
   var min = this.min;
   var max = this.max;
   var logBase = /** @type {number} */(this.logBase());
-  var minLog = anychart.math.specialRound(anychart.math.log(Math.abs(min), logBase));
-  var maxLog = anychart.math.specialRound(anychart.math.log(Math.abs(max), logBase));
+  var minLog = anychart.math.specialRound(anychart.math.log(Math.abs(min), logBase), 6);
+  var maxLog = anychart.math.specialRound(anychart.math.log(Math.abs(max), logBase), 6);
   var border, helper, domain, range, span;
   var minMaxProd = min * max;
   var borderLog = this.borderLog;

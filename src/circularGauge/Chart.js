@@ -1590,8 +1590,6 @@ anychart.circularGaugeModule.Chart.prototype.setupByJSON = function(config, opt_
 anychart.circularGaugeModule.Chart.prototype.serialize = function() {
   var json = anychart.circularGaugeModule.Chart.base(this, 'serialize');
 
-  json['type'] = anychart.enums.GaugeTypes.CIRCULAR;
-
   anychart.core.settings.serialize(this, anychart.circularGaugeModule.Chart.PROPERTY_DESCRIPTORS, json);
   json['data'] = this.data().serialize();
   if (this.cap_)

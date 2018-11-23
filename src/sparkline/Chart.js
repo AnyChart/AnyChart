@@ -2373,7 +2373,6 @@ anychart.sparklineModule.Chart.prototype.serialize = function() {
     scales.push(scalesIds[goog.getUid(this.yScale())]);
   }
   json['yScale'] = scales.length - 1;
-  json['type'] = anychart.enums.ChartTypes.SPARKLINE;
 
   anychart.core.settings.serialize(this, anychart.sparklineModule.Chart.PROPERTY_DESCRIPTORS, json);
   json['clip'] = (anychart.utils.instanceOf(this.clip_, anychart.math.Rect)) ? this.clip_.serialize() : this.clip_;

@@ -415,7 +415,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       'holidays': {
         'padding': {}
       },
-      //'format': anychart.core.defaultTheme.returnValueAsIs,
+      'format': anychart.core.defaultTheme.returnValueAsIs,
       'padding': {
         'top': 0,
         'right': 5,

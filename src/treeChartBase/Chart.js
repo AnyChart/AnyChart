@@ -473,8 +473,6 @@ anychart.treeChartBase.Chart.prototype.toCsv = function(opt_chartDataExportMode,
 anychart.treeChartBase.Chart.prototype.serialize = function() {
   var json = anychart.treeChartBase.Chart.base(this, 'serialize');
 
-  json['type'] = this.getType();
-
   var data = this.data();
   if (data)
     json['treeData'] = data.serializeWithoutMeta();

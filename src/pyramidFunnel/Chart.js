@@ -3155,7 +3155,6 @@ anychart.pyramidFunnelModule.Chart.prototype.isNoData = function() {
 anychart.pyramidFunnelModule.Chart.prototype.serialize = function() {
   var json = anychart.pyramidFunnelModule.Chart.base(this, 'serialize');
 
-  json['type'] = this.getType();
   json['data'] = this.data().serialize();
 
   json['palette'] = this.palette().serialize();

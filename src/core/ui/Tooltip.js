@@ -863,7 +863,7 @@ anychart.core.ui.Tooltip.prototype.setPositionForSingle_ = function(tooltip, cli
 
     case anychart.enums.TooltipPositionMode.POINT:
       var positionProvider;
-      if (opt_series) {
+      if (opt_series && opt_series.createPositionProvider) {
         positionProvider = opt_series.createPositionProvider(position, true)['value'];
       } else {
         positionProvider = {'x': clientX, 'y': clientY};

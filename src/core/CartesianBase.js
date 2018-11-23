@@ -30,6 +30,13 @@ anychart.core.CartesianBase = function(opt_categorizeData) {
    */
   this.xZoom_ = new anychart.core.utils.OrdinalZoom(this, true);
 
+  /**
+   * Zoom settings.
+   * @type {anychart.core.utils.OrdinalZoom}
+   * @private
+   */
+  this.yZoom_ = new anychart.core.utils.OrdinalZoom(this, false);
+
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['zAngle', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
     ['zAspect', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
@@ -56,35 +63,22 @@ anychart.core.CartesianBase.PROPERTY_DESCRIPTORS = (function() {
   function zAngleNormalizer(opt_value) {
     return goog.math.clamp(anychart.utils.toNumber(opt_value), 0, 90);
   }
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'zAngle',
-      zAngleNormalizer);
 
   function zAspectNormalizer(opt_value) {
     return goog.isNumber(opt_value) ? Math.max(opt_value, 0) : opt_value;
   }
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'zAspect',
-      zAspectNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'zDistribution',
-      anychart.core.settings.booleanNormalizer);
 
   function zPaddingNormalizer(opt_value) {
     return Math.max(anychart.utils.toNumber(opt_value), 0) || 0;
   }
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'zPadding',
-      zPaddingNormalizer);
+
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'zAngle', zAngleNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'zAspect', zAspectNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'zDistribution', anychart.core.settings.booleanNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'zPadding', zPaddingNormalizer]
+  ]);
+
   return map;
 })();
 anychart.core.settings.populate(anychart.core.CartesianBase, anychart.core.CartesianBase.PROPERTY_DESCRIPTORS);
@@ -104,6 +98,7 @@ anychart.core.settings.populate(anychart.core.CartesianBase, anychart.core.Carte
 anychart.core.CartesianBase.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.ChartWithAxes.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.CARTESIAN_X_SCROLLER |
+    anychart.ConsistencyState.CARTESIAN_Y_SCROLLER |
     anychart.ConsistencyState.CARTESIAN_ZOOM;
 
 
@@ -140,8 +135,8 @@ anychart.core.CartesianBase.prototype.getDefaultScale = function(forX) {
 anychart.core.CartesianBase.prototype.ensureScalesReadyForZoom = function() {
   this.makeScaleMaps();
   if (this.hasInvalidationState(anychart.ConsistencyState.SCALE_CHART_SCALES)) {
-    if (!!this.xZoom().getSetup())
-      this.calculateXScales();
+    if (!!this.xZoom().getSetup() || !!this.yZoom().getSetup())
+      this.calculate();
   }
 };
 
@@ -159,6 +154,22 @@ anychart.core.CartesianBase.prototype.xZoom = function(opt_value) {
     return this;
   }
   return this.xZoom_;
+};
+
+
+/**
+ * Zoom settings getter/setter.
+ * @param {(number|boolean|null|Object)=} opt_value
+ * @return {anychart.core.CartesianBase|anychart.core.utils.OrdinalZoom}
+ */
+anychart.core.CartesianBase.prototype.yZoom = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.suspendSignalsDispatching();
+    this.yZoom_.setup(opt_value);
+    this.resumeSignalsDispatching(true);
+    return this;
+  }
+  return this.yZoom_;
 };
 
 
@@ -192,12 +203,41 @@ anychart.core.CartesianBase.prototype.xScroller = function(opt_value) {
 
 
 /**
+ * Y Scroller getter-setter.
+ * @param {(Object|boolean|null)=} opt_value
+ * @return {anychart.core.ui.ChartScroller|anychart.core.CartesianBase}
+ */
+anychart.core.CartesianBase.prototype.yScroller = function(opt_value) {
+  if (!this.yScroller_) {
+    this.yScroller_ = new anychart.core.ui.ChartScroller();
+    this.yScroller_.setParentEventTarget(this);
+    this.yScroller_.listenSignals(this.scrollerInvalidated_, this);
+    this.eventsHandler.listen(this.yScroller_, anychart.enums.EventType.SCROLLER_CHANGE, this.scrollerChangeHandler);
+    this.eventsHandler.listen(this.yScroller_, anychart.enums.EventType.SCROLLER_CHANGE_FINISH, this.scrollerChangeHandler);
+    this.invalidate(
+        anychart.ConsistencyState.CARTESIAN_Y_SCROLLER |
+        anychart.ConsistencyState.BOUNDS,
+        anychart.Signal.NEEDS_REDRAW);
+
+    this.setupCreated('yScroller', this.yScroller_);
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.yScroller_.setup(opt_value);
+    return this;
+  } else {
+    return this.yScroller_;
+  }
+};
+
+
+/**
  * Scroller signals handler.
  * @param {anychart.SignalEvent} e
  * @private
  */
 anychart.core.CartesianBase.prototype.scrollerInvalidated_ = function(e) {
-  var state = anychart.ConsistencyState.CARTESIAN_X_SCROLLER;
+  var state = e.target == this.xScroller() ? anychart.ConsistencyState.CARTESIAN_X_SCROLLER : anychart.ConsistencyState.CARTESIAN_Y_SCROLLER;
   var signal = anychart.Signal.NEEDS_REDRAW;
   if (e.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
     state |= anychart.ConsistencyState.BOUNDS;
@@ -213,10 +253,11 @@ anychart.core.CartesianBase.prototype.scrollerInvalidated_ = function(e) {
  * @protected
  */
 anychart.core.CartesianBase.prototype.scrollerChangeHandler = function(e) {
-  if (this.xZoom_.continuous() ^ e.type == anychart.enums.EventType.SCROLLER_CHANGE_FINISH) {
+  var zoom = e.target == this.xScroller() ? this.xZoom_ : this.yZoom_;
+  if (zoom.continuous() ^ e.type == anychart.enums.EventType.SCROLLER_CHANGE_FINISH) {
     e.preventDefault();
     this.suspendSignalsDispatching();
-    this.xZoom_.setTo(e['startRatio'], e['endRatio']);
+    zoom.setTo(e['startRatio'], e['endRatio']);
     this.resumeSignalsDispatching(true);
   }
 };
@@ -250,15 +291,23 @@ anychart.core.CartesianBase.prototype.normalizeSeriesType = function(type) {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.CartesianBase.prototype.getBoundsWithoutAxes = function(contentAreaBounds, opt_scrollerSize) {
-  var scroller = /** @type {anychart.core.ui.ChartScroller} */(this.xScroller());
-  var res = this.resetScrollerPosition(scroller, contentAreaBounds);
+  var res;
+
+  res = this.resetScrollerPosition(/** @type {anychart.core.ui.ChartScroller} */(this.yScroller()), contentAreaBounds);
+  this.yScrollerSize_ = res.scrollerSize;
+
+  res = this.resetScrollerPosition(/** @type {anychart.core.ui.ChartScroller} */(this.xScroller()), res.contentAreaBounds);
+
   return anychart.core.CartesianBase.base(this, 'getBoundsWithoutAxes', res.contentAreaBounds, res.scrollerSize);
 };
 
 
 /** @inheritDoc */
 anychart.core.CartesianBase.prototype.applyScrollerOffset = function(offsets, scrollerSize) {
-  return this.applyScrollerOffsetInternal(offsets, /** @type {anychart.core.ui.ChartScroller} */(this.xScroller()), scrollerSize);
+  var xOffsets = this.applyScrollerOffsetInternal(offsets, /** @type {anychart.core.ui.ChartScroller} */(this.xScroller()), scrollerSize);
+
+  var yScroller = /** @type {anychart.core.ui.ChartScroller} */(this.yScroller());
+  return this.applyScrollerOffsetInternal(xOffsets, yScroller, this.yScrollerSize_);
 };
 
 
@@ -341,7 +390,7 @@ anychart.core.CartesianBase.prototype.applyScrollerOffsetInternal = function(off
 //
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
-anychart.core.CartesianBase.prototype.applyXZoom = function() {
+anychart.core.CartesianBase.prototype.applyXZoom = function(opt_doNotInvalidate) {
   if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_ZOOM)) {
     for (var i in this.xScales) {
       var start = this.xZoom().getStartRatio();
@@ -349,12 +398,55 @@ anychart.core.CartesianBase.prototype.applyXZoom = function() {
       (/** @type {anychart.scales.Base} */(this.xScales[i])).setZoom(factor, start);
     }
     this.xScroller().setRangeInternal(this.xZoom().getStartRatio(), this.xZoom().getEndRatio());
-    this.markConsistent(anychart.ConsistencyState.CARTESIAN_ZOOM);
+    if (!opt_doNotInvalidate) {
+      this.invalidate(
+          anychart.ConsistencyState.SCALE_CHART_Y_SCALES |
+          anychart.ConsistencyState.CARTESIAN_X_SCROLLER |
+          anychart.ConsistencyState.AXES_CHART_ANNOTATIONS);
+    }
+  }
+};
+
+
+/** @inheritDoc */
+anychart.core.CartesianBase.prototype.applyYZoom = function(opt_doNotInvalidate) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_ZOOM)) {
+    for (var i in this.yScales) {
+      var start = this.yZoom().getStartRatio();
+      var factor = 1 / (this.yZoom().getEndRatio() - start);
+      (/** @type {anychart.scales.Base} */(this.yScales[i])).setZoom(factor, start);
+    }
+    this.yScroller().setRangeInternal(this.yZoom().getStartRatio(), this.yZoom().getEndRatio());
+    if (!opt_doNotInvalidate) {
+      this.invalidate(
+          anychart.ConsistencyState.CARTESIAN_Y_SCROLLER |
+          anychart.ConsistencyState.AXES_CHART_ANNOTATIONS);
+    }
+  }
+};
+
+
+/**
+ * Applies both X and Y zooms.
+ */
+anychart.core.CartesianBase.prototype.applyComplexZoom = function() {
+  if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_ZOOM)) {
+    this.applyXZoom(true);
+    this.applyYZoom(true);
+
     this.invalidate(
-        anychart.ConsistencyState.SCALE_CHART_Y_SCALES |
         anychart.ConsistencyState.CARTESIAN_X_SCROLLER |
+        anychart.ConsistencyState.CARTESIAN_Y_SCROLLER |
         anychart.ConsistencyState.AXES_CHART_ANNOTATIONS);
   }
+};
+
+
+/** @inheritDoc */
+anychart.core.CartesianBase.prototype.calculate = function() {
+  anychart.core.CartesianBase.base(this, 'calculate');
+  // mark ZOOM as calculated and applied (in ChartWithOrthogonalScales#calculate)
+  this.markConsistent(anychart.ConsistencyState.CARTESIAN_ZOOM);
 };
 
 
@@ -379,7 +471,9 @@ anychart.core.CartesianBase.prototype.getZoomEndRatio = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.CartesianBase.prototype.getBoundsChangedSignal = function() {
-  return anychart.core.CartesianBase.base(this, 'getBoundsChangedSignal') | anychart.ConsistencyState.CARTESIAN_X_SCROLLER;
+  return anychart.core.CartesianBase.base(this, 'getBoundsChangedSignal') |
+      anychart.ConsistencyState.CARTESIAN_X_SCROLLER |
+      anychart.ConsistencyState.CARTESIAN_Y_SCROLLER;
 };
 
 
@@ -390,6 +484,12 @@ anychart.core.CartesianBase.prototype.drawElements = function() {
     this.xScroller().container(this.rootElement);
     this.xScroller().draw();
     this.markConsistent(anychart.ConsistencyState.CARTESIAN_X_SCROLLER);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_Y_SCROLLER)) {
+    this.yScroller().container(this.rootElement);
+    this.yScroller().draw();
+    this.markConsistent(anychart.ConsistencyState.CARTESIAN_Y_SCROLLER);
   }
 };
 
@@ -409,7 +509,6 @@ anychart.core.CartesianBase.prototype.shouldAddCsvRow = function(mode, series, x
   return mode != anychart.enums.ChartDataExportMode.SELECTED ||
       (Math.min(left, right) <= 1 && Math.max(left, right) >= 0);
 };
-
 
 
 /**
@@ -437,15 +536,28 @@ anychart.core.CartesianBase.prototype.setupByJSONWithScales = function(config, s
 
   if ('xScroller' in config)
     this.xScroller().setupInternal(!!opt_default, config['xScroller']);
+  if ('yScroller' in config)
+    this.yScroller().setupInternal(!!opt_default, config['yScroller']);
 
+  var tmp;
   var xZoom = config['xZoom'];
   if (goog.isObject(xZoom) && (goog.isNumber(xZoom['scale']) || goog.isString(xZoom['scale']))) {
-    var tmp = xZoom['scale'];
+    tmp = xZoom['scale'];
     xZoom['scale'] = scalesInstances[xZoom['scale']];
     this.xZoom(xZoom);
     xZoom['scale'] = tmp;
   } else {
     this.xZoom(xZoom);
+  }
+
+  var yZoom = config['yZoom'];
+  if (goog.isObject(yZoom) && (goog.isNumber(yZoom['scale']) || goog.isString(yZoom['scale']))) {
+    tmp = yZoom['scale'];
+    yZoom['scale'] = scalesInstances[yZoom['scale']];
+    this.yZoom(yZoom);
+    yZoom['scale'] = tmp;
+  } else {
+    this.yZoom(yZoom);
   }
 };
 
@@ -456,9 +568,10 @@ anychart.core.CartesianBase.prototype.setupByJSONWithScales = function(config, s
 anychart.core.CartesianBase.prototype.serialize = function() {
   var json = anychart.core.CartesianBase.base(this, 'serialize');
   anychart.core.settings.serialize(this, anychart.core.CartesianBase.PROPERTY_DESCRIPTORS, json);
-  json['type'] = this.getType();
   json['xScroller'] = this.xScroller().serialize();
+  json['yScroller'] = this.yScroller().serialize();
   json['xZoom'] = this.xZoom().serialize();
+  json['yZoom'] = this.yZoom().serialize();
   return {'chart': json};
 };
 
@@ -468,8 +581,9 @@ anychart.core.CartesianBase.prototype.serialize = function() {
  */
 anychart.core.CartesianBase.prototype.disposeInternal = function() {
   anychart.core.CartesianBase.base(this, 'disposeInternal');
-  goog.dispose(this.xScroller_);
+  goog.disposeAll(this.xScroller_, this.yScroller_);
   this.xScroller_ = null;
+  this.yScroller_ = null;
 };
 
 

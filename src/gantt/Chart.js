@@ -564,19 +564,22 @@ anychart.ganttModule.Chart.prototype.fitToTask = function(taskId) {
 
 /**
  * Performs vertical scroll to pxOffset.
- * TODO (A.Kudryavtsev): See full description in related method of controller.
- * @param {number} pxOffset - Pixel offset.
- * @return {anychart.ganttModule.Chart} - Itself for method chaining.
+ * @see anychart.ganttModule.Controller#scrollTo
+ * @param {number=} opt_value - Pixel offset.
+ * @return {anychart.ganttModule.Chart|number} - Itself for method chaining.
  */
-anychart.ganttModule.Chart.prototype.scrollTo = function(pxOffset) {
-  this.controller_.scrollTo(pxOffset);
-  return this;
+anychart.ganttModule.Chart.prototype.scrollTo = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.controller_.scrollTo(opt_value);
+    return this;
+  }
+  return /** @type {number} */ (this.controller_.scrollTo());
 };
 
 
 /**
  * Performs vertical scroll to rowIndex specified.
- * TODO (A.Kudryavtsev): See full description in related method of controller.
+ * @see anychart.ganttModule.Controller#scrollToRow
  * @param {number} rowIndex - Row index.
  * @return {anychart.ganttModule.Chart} - Itself for method chaining.
  */
@@ -602,6 +605,7 @@ anychart.ganttModule.Chart.prototype.xScale = function(opt_value) {
 
 /**
  * Scrolls vertically to specified index.
+ * @see anychart.ganttModule.Controller#scrollToEnd
  * @param {number=} opt_index - End index to scroll to.
  * @return {anychart.ganttModule.Chart} - Itself for method chaining.
  */
@@ -1130,8 +1134,6 @@ anychart.ganttModule.Chart.prototype.paletteInvalidated_ = function(event) {
 /** @inheritDoc */
 anychart.ganttModule.Chart.prototype.serialize = function() {
   var json = anychart.ganttModule.Chart.base(this, 'serialize');
-
-  json['type'] = this.getType();
 
   anychart.core.settings.serialize(this, anychart.ganttModule.Chart.PROPERTY_DESCRIPTORS, json);
   json['defaultRowHeight'] = this.defaultRowHeight();

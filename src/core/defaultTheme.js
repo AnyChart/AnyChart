@@ -1257,7 +1257,7 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'padding': {'top': 10, 'right': 20, 'bottom': 15, 'left': 10},
     'margin': {'top': 0, 'right': 0, 'bottom': 0, 'left': 0},
     'autoRedraw': true,
-    'background': {'enabled': true, 'zIndex': 1},
+    'background': {'enabled': true, 'zIndex': 0.5},
     'contextMenu': {
       'fromTheme': true, // suppress NO_FEATURE_IN_MODULE warning
       'enabled': true
@@ -1982,6 +1982,10 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
         'type': 'linear'
       }
     ],
+    'yScroller': {
+      'orientation': 'left',
+      'inverted': false
+    },
     'crosshair': {
       'enabled': false,
       'displayMode': 'float',
@@ -1992,6 +1996,11 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
       'yLabels': [{'enabled': null}]
     },
     'xZoom': {
+      'continuous': true,
+      'startRatio': 0,
+      'endRatio': 1
+    },
+    'yZoom': {
       'continuous': true,
       'startRatio': 0,
       'endRatio': 1
