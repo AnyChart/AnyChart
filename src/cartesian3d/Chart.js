@@ -378,8 +378,10 @@ anychart.core.ChartWithSeries.generateSeriesConstructors(anychart.cartesian3dMod
  */
 anychart.cartesian3d = function() {
   var chart = new anychart.cartesian3dModule.Chart();
+  chart.setOption('defaultSeriesType', anychart.enums.Cartesian3dSeriesType.COLUMN);
   chart.setupStateSettings();
-  //chart.setupInternal(true, anychart.getFullTheme('cartesian3d'));
+  chart.setupGrids();
+  chart.setupAxes();
   return chart;
 };
 

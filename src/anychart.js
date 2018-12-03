@@ -837,6 +837,11 @@ goog.exportSymbol('anychart.bullet', anychart.getFeatureOrError('anychart.bullet
 goog.exportSymbol('anychart.cartesian', anychart.getFeatureOrError('anychart.cartesian', 'Cartesian chart'));
 goog.exportSymbol('anychart.cartesian3d', anychart.getFeatureOrError('anychart.cartesian3d', '3D Cartesian chart'));
 goog.exportSymbol('anychart.scatter', anychart.getFeatureOrError('anychart.scatter', 'Scatter chart'));
+goog.exportSymbol('anychart.stick', anychart.getFeatureOrError('anychart.stick', 'Stick chart'));
+goog.exportSymbol('anychart.jumpLine', anychart.getFeatureOrError('anychart.jumpLine', 'JumpLine chart'));
+goog.exportSymbol('anychart.stepLine', anychart.getFeatureOrError('anychart.stepLine', 'StepLine chart'));
+goog.exportSymbol('anychart.ohlc', anychart.getFeatureOrError('anychart.ohlc', 'OHLC chart'));
+goog.exportSymbol('anychart.candlestick', anychart.getFeatureOrError('anychart.candlestick', 'Candlestick chart'));
 goog.exportSymbol('anychart.column', anychart.getFeatureOrError('anychart.column', 'Column chart'));
 goog.exportSymbol('anychart.column3d', anychart.getFeatureOrError('anychart.column3d', '3D Column chart'));
 goog.exportSymbol('anychart.box', anychart.getFeatureOrError('anychart.box', 'Box chart'));

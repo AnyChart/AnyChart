@@ -3337,6 +3337,10 @@
             <xsd:enumeration value="waterfall"/>
             <xsd:enumeration value="sunburst"/>
             <xsd:enumeration value="sankey"/>
+            <xsd:enumeration value="ohlc"/>
+            <xsd:enumeration value="candlestick"/>
+            <xsd:enumeration value="stick"/>
+            <xsd:enumeration value="step-line"/>
         </xsd:restriction>
     </xsd:simpleType>
 

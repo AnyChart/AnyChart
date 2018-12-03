@@ -191,8 +191,10 @@ anychart.chartTypesMap[anychart.enums.ChartTypes.HILO] = anychart.hilo;
  * chart.container(stage).draw();
  * @param {...(anychart.data.View|anychart.data.Set|Array)} var_args Finance chart data.
  * @return {anychart.cartesianModule.Chart} Chart with defaults for ohlc and candlestick series.
+ * @deprecated Since 8.4.2 use anychart.candlestick() or anychart.ohlc() instead
  */
 anychart.financial = function(var_args) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.financial()', 'anychart.ohlc() or anychart.candlestick()'], true);
   var chart = new anychart.cartesianModule.Chart();
   chart.addThemes('financial');
   chart.setOption('defaultSeriesType', anychart.enums.CartesianSeriesType.CANDLESTICK);
@@ -287,6 +289,139 @@ anychart.verticalLine = function(var_args) {
 anychart.chartTypesMap[anychart.enums.ChartTypes.VERTICAL_LINE] = anychart.verticalLine;
 
 
+/**
+ * Default stick chart.<br/>
+ * <b>Note:</b> Contains predefined settings for axes and grids.
+ * @param {...(anychart.data.View|anychart.data.Set|Array)} var_args Series data.
+ * @return {anychart.cartesianModule.Chart} Chart with defaults for stick series.
+ */
+anychart.stick = function(var_args) {
+  var chart = new anychart.cartesianModule.Chart();
+  chart.addThemes('line', 'stick');
+  chart.setOption('defaultSeriesType', anychart.enums.CartesianSeriesType.STICK);
+  chart.setType(anychart.enums.ChartTypes.STICK);
+  chart.setupAxes();
+  chart.setupStateSettings();
+
+  for (var i = 0, count = arguments.length; i < count; i++) {
+    chart[anychart.enums.CartesianSeriesType.STICK](arguments[i]);
+  }
+
+  return chart;
+};
+anychart.chartTypesMap[anychart.enums.ChartTypes.STICK] = anychart.stick;
+
+
+/**
+ * Default jump line chart.<br/>
+ * <b>Note:</b> Contains predefined settings for axes and grids.
+ * @param {...(anychart.data.View|anychart.data.Set|Array)} var_args Series data.
+ * @return {anychart.cartesianModule.Chart} Chart with defaults for jump line series.
+ */
+anychart.jumpLine = function(var_args) {
+  var chart = new anychart.cartesianModule.Chart();
+  chart.addThemes('line', 'jumpLine');
+  chart.setOption('defaultSeriesType', anychart.enums.CartesianSeriesType.JUMP_LINE);
+  chart.setType(anychart.enums.ChartTypes.JUMP_LINE);
+  chart.setupAxes();
+  chart.setupStateSettings();
+  var seriesType = anychart.utils.toCamelCase(anychart.enums.CartesianSeriesType.JUMP_LINE);
+  for (var i = 0, count = arguments.length; i < count; i++) {
+    chart[seriesType](arguments[i]);
+  }
+
+  return chart;
+};
+anychart.chartTypesMap[anychart.enums.ChartTypes.JUMP_LINE] = anychart.jumpLine;
+
+
+/**
+ * Default step line chart.<br/>
+ * <b>Note:</b> Contains predefined settings for axes and grids.
+ * @param {...(anychart.data.View|anychart.data.Set|Array)} var_args Series data.
+ * @return {anychart.cartesianModule.Chart} Chart with defaults for step line series.
+ */
+anychart.stepLine = function(var_args) {
+  var chart = new anychart.cartesianModule.Chart();
+  chart.addThemes('line', 'stepLine');
+  chart.setOption('defaultSeriesType', anychart.enums.CartesianSeriesType.STEP_LINE);
+  chart.setType(anychart.enums.ChartTypes.STEP_LINE);
+  chart.setupAxes();
+  chart.setupStateSettings();
+  var seriesType = anychart.utils.toCamelCase(anychart.enums.CartesianSeriesType.STEP_LINE);
+  for (var i = 0, count = arguments.length; i < count; i++) {
+    chart[seriesType](arguments[i]);
+  }
+
+  return chart;
+};
+anychart.chartTypesMap[anychart.enums.ChartTypes.STEP_LINE] = anychart.stepLine;
+
+
+/**
+ * Default ohlc chart.<br/>
+ * <b>Note:</b> Contains predefined settings for axes and grids.
+ * @example
+ * var chart = anychart.ohlc([
+ *    [Date.UTC(2013, 07, 04), 511.53, 514.98, 505.79, 506.40],
+ *    [Date.UTC(2013, 07, 05), 507.84, 513.30, 507.23, 512.88],
+ *    [Date.UTC(2013, 07, 06), 512.36, 515.40, 510.58, 511.40],
+ *    [Date.UTC(2013, 07, 07), 513.10, 516.50, 511.47, 515.25],
+ *    [Date.UTC(2013, 07, 08), 515.02, 528.00, 514.62, 525.15]
+ * ]);
+ * chart.container(stage).draw();
+ * @param {...(anychart.data.View|anychart.data.Set|Array)} var_args Finance chart data.
+ * @return {anychart.cartesianModule.Chart} Chart with defaults for ohlc series.
+ */
+anychart.ohlc = function(var_args) {
+  var chart = new anychart.cartesianModule.Chart();
+  chart.addThemes('financial', 'ohlc');
+  chart.setOption('defaultSeriesType', anychart.enums.CartesianSeriesType.OHLC);
+  chart.setType(anychart.enums.ChartTypes.OHLC);
+  chart.setupAxes();
+  chart.setupStateSettings();
+
+  for (var i = 0, count = arguments.length; i < count; i++) {
+    chart[anychart.enums.CartesianSeriesType.OHLC](arguments[i]);
+  }
+
+  return chart;
+};
+anychart.chartTypesMap[anychart.enums.ChartTypes.OHLC] = anychart.ohlc;
+
+
+/**
+ * Default candlestick chart.<br/>
+ * <b>Note:</b> Contains predefined settings for axes and grids.
+ * @example
+ * var chart = anychart.candlestick([
+ *    [Date.UTC(2013, 07, 04), 511.53, 514.98, 505.79, 506.40],
+ *    [Date.UTC(2013, 07, 05), 507.84, 513.30, 507.23, 512.88],
+ *    [Date.UTC(2013, 07, 06), 512.36, 515.40, 510.58, 511.40],
+ *    [Date.UTC(2013, 07, 07), 513.10, 516.50, 511.47, 515.25],
+ *    [Date.UTC(2013, 07, 08), 515.02, 528.00, 514.62, 525.15]
+ * ]);
+ * chart.container(stage).draw();
+ * @param {...(anychart.data.View|anychart.data.Set|Array)} var_args Finance chart data.
+ * @return {anychart.cartesianModule.Chart} Chart with defaults for candlestick series.
+ */
+anychart.candlestick = function(var_args) {
+  var chart = new anychart.cartesianModule.Chart();
+  chart.addThemes('financial', 'candlestick');
+  chart.setOption('defaultSeriesType', anychart.enums.CartesianSeriesType.CANDLESTICK);
+  chart.setType(anychart.enums.ChartTypes.CANDLESTICK);
+  chart.setupAxes();
+  chart.setupStateSettings();
+
+  for (var i = 0, count = arguments.length; i < count; i++) {
+    chart[anychart.enums.CartesianSeriesType.CANDLESTICK](arguments[i]);
+  }
+
+  return chart;
+};
+anychart.chartTypesMap[anychart.enums.ChartTypes.CANDLESTICK] = anychart.candlestick;
+
+
 //exports
 goog.exportSymbol('anychart.area', anychart.area);
 goog.exportSymbol('anychart.bar', anychart.bar);
@@ -295,6 +430,11 @@ goog.exportSymbol('anychart.box', anychart.box);
 goog.exportSymbol('anychart.column', anychart.column);
 goog.exportSymbol('anychart.hilo', anychart.hilo);
 goog.exportSymbol('anychart.financial', anychart.financial);
+goog.exportSymbol('anychart.ohlc', anychart.ohlc);
+goog.exportSymbol('anychart.candlestick', anychart.candlestick);
+goog.exportSymbol('anychart.stick', anychart.stick);
+goog.exportSymbol('anychart.jumpLine', anychart.jumpLine);
+goog.exportSymbol('anychart.stepLine', anychart.stepLine);
 goog.exportSymbol('anychart.line', anychart.line);
 goog.exportSymbol('anychart.verticalArea', anychart.verticalArea);
 goog.exportSymbol('anychart.verticalLine', anychart.verticalLine);

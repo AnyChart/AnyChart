@@ -326,7 +326,7 @@
             {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
           ]
         },
-        "type": {"enum": ["cartesian", "cartesian-3d", "area", "vertical-area", "area-3d", "bar", "bar-3d", "box", "bubble", "column", "column-3d", "financial", "line", "line-3d", "vertical-line", "marker", "jump-line", "stick", "pareto", "hilo", "waterfall"]},
+        "type": {"enum": ["cartesian", "cartesian-3d", "area", "vertical-area", "area-3d", "bar", "bar-3d", "box", "bubble", "column", "column-3d", "financial", "line", "line-3d", "vertical-line", "marker", "jump-line", "stick", "pareto", "hilo", "waterfall", "ohlc", "candlestick", "stick","step-line"]},
         "xGrids": {
           "type": "array",
           "items": {
@@ -611,7 +611,11 @@
             "marker",
             "jump-line",
             "stick",
-            "pareto"
+            "pareto",
+            "ohlc",
+            "candlestick",
+            "stick",
+            "step-line"
           ]
         },
         "categorizedBySeries": {
