@@ -2355,6 +2355,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.getScaleInstances = function(o
       if (opt_config['scales'].length > scales.length)
         scales = goog.array.concat(scales, goog.array.slice(opt_config['scales'], scales.length));
     }
+
     var scalesInstances = {};
     var theme;
     if (goog.isArray(scales)) {
@@ -2546,33 +2547,6 @@ anychart.core.ChartWithOrthogonalScales.prototype.setupSeriesByJSON = function(c
       var seriesInst = this.createSeriesByType(seriesType, data);
       if (seriesInst) {
         seriesInst.setupInternal(!!opt_default, json);
-        if (goog.isObject(json)) {
-          if ('xScale' in json && json['xScale'] > this.defaultScalesLastIndex())
-            seriesInst.xScale(scalesInstances[json['xScale']]);
-          if ('yScale' in json && json['yScale'] > this.defaultScalesLastIndex())
-            seriesInst.yScale(scalesInstances[json['yScale']]);
-        }
-      }
-    }
-  }
-};
-
-
-/**
- * Setup series with scale instances.
- */
-anychart.core.ChartWithOrthogonalScales.prototype.setupScaleForSeries = function() {
-  var scalesInstances = this.getScaleInstances();
-  var i, json;
-  var series = this.getThemeOption('series');
-  if (goog.isArray(series)) {
-    for (i = 0; i < series.length; i++) {
-      json = series[i];
-      var seriesType = json['seriesType'] || this.getOption('defaultSeriesType');
-      var data = json['data'];
-      var seriesInst = this.createSeriesByType(seriesType, data);
-      if (seriesInst) {
-        //seriesInst.setupInternal(!!opt_default, json);
         if (goog.isObject(json)) {
           if ('xScale' in json && json['xScale'] > this.defaultScalesLastIndex())
             seriesInst.xScale(scalesInstances[json['xScale']]);

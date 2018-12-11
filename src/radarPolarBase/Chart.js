@@ -338,7 +338,7 @@ anychart.radarPolarBaseModule.Chart.prototype.onGridSignal = function(event) {
  */
 anychart.radarPolarBaseModule.Chart.prototype.defaultGridSettings = function(opt_value) {
   if (!this.defaultGridSettings_) { // we need this for getGridZIndex method to work
-    this.defaultGridSettings_ = anychart.getThemes()[0]['defaultGridSettings'];
+    this.defaultGridSettings_ = anychart.getFlatTheme('defaultGridSettings');
   }
 
   if (goog.isDef(opt_value)) {
@@ -356,7 +356,7 @@ anychart.radarPolarBaseModule.Chart.prototype.defaultGridSettings = function(opt
  */
 anychart.radarPolarBaseModule.Chart.prototype.defaultMinorGridSettings = function(opt_value) {
   if (!this.defaultMinorGridSettings_) { // we need this for getGridZIndex method to work
-    this.defaultMinorGridSettings_ = anychart.getThemes()[0]['defaultMinorGridSettings'];
+    this.defaultMinorGridSettings_ = anychart.getFlatTheme('defaultMinorGridSettings');
   }
 
   if (goog.isDef(opt_value)) {

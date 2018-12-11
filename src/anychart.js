@@ -73,8 +73,7 @@ acgraph.vector.Stage.prototype.allowCreditsDisabling = false;
 acgraph.vector.Stage.prototype.credits = function(opt_value) {
   if (!this.credits_) {
     this.credits_ = new anychart.core.ui.StageCredits(this, this.allowCreditsDisabling);
-    // this.credits_.setup(anychart.getFullTheme('stageCredits'));
-    this.credits_.setup(anychart.getThemes()[0]['stageCredits']);
+    this.credits_.setup(anychart.getFlatTheme('stageCredits'));
   }
   if (goog.isDef(opt_value)) {
     this.credits_.setup(opt_value);
@@ -647,13 +646,54 @@ anychart.appendTheme = function(value) {
 
 
 /**
+ * Returns final flattened theme object.
+ *
+ * @param {string} themePath Theme name (path) to get flattened
+ * @param {Object=} opt_flatTheme Base flat theme object to collect flattened settings
+ * @param {Function=} opt_resolver Function to resolve special theme values
+ * @return {Object} Result flattened theme object
+ */
+anychart.getFlatTheme = function(themePath, opt_flatTheme, opt_resolver) {
+  opt_flatTheme = goog.isDef(opt_flatTheme) ? opt_flatTheme : {};
+  var splitPath = themePath.split('.');
+  var themes = anychart.getThemes();
+  var part;
+
+  for (var t = 0; t < themes.length; t++) {
+    var theme = themes[t];
+    for (var j = 0; j < splitPath.length; j++) {
+      if (theme) {
+        part = splitPath[j];
+        theme = theme[part];
+      }
+    }
+
+    if (goog.isDef(theme)) {
+      if (goog.typeOf(theme) != 'object') {
+        if (goog.isFunction(opt_resolver))
+          theme = opt_resolver(theme);
+        else if (goog.isBoolean(theme))
+          theme = {'enabled': theme};
+        else
+          theme = null;
+      }
+
+      if (theme)
+        goog.mixin(opt_flatTheme, theme);
+    }
+  }
+
+  return opt_flatTheme;
+};
+
+
+/**
  * Returns final compiled and merged theme. Pass root name to compile the theme
  * partially.
  * @param {string} root
  * @return {*}
  */
 anychart.getFullTheme = function(root) {
-  //debugger;
   root = anychart.utils.toCamelCase(root);
   anychart.performance.start('Theme compilation');
   var i;

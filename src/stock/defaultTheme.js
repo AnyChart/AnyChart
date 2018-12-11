@@ -392,6 +392,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
           'fill': '#F7F7F7'
         },
         'height': 25,
+        'showHelperLabel': true,
         'scale': 0,
         'ticks': {
           'enabled': false,
@@ -507,7 +508,6 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       'yAxes': [{}],
       'crosshair': {
         'zIndex': 201,
-        'enabled': null,
         'xLabels': [{'enabled': null}],
         'yLabels': [{'enabled': null}]
       },
@@ -584,6 +584,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'scroller': {
       'defaultSeriesSettings': {
         'base': {
+          'enabled': true,
           'normal': {
             'fill': anychart.stockModule.defaultTheme.stockScrollerUnselected,
             'stroke': anychart.stockModule.defaultTheme.stockScrollerUnselected,
@@ -671,11 +672,6 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'background': {
           'enabled': false
         },
-        'minorTicks': {
-          'enabled': true,
-          'stroke': '#cecece',
-          'position': 'center'
-        },
         'labels': {
           'enabled': true,
           'fontSize': '11px',
@@ -707,7 +703,13 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'ticks': {
           'position': 'center'
         },
-        'zIndex': 75
+        'minorTicks': {
+          'enabled': true,
+          'stroke': '#cecece',
+          'position': 'center'
+        },
+        'zIndex': 75,
+        'showHelperLabel': true
       }
     },
     'tooltip': {

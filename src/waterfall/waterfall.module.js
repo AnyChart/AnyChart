@@ -21,7 +21,6 @@ anychart.waterfall = function(var_args) {
   var chart = new anychart.waterfallModule.Chart();
   chart.setupAxes();
   chart.setupStateSettings();
-  // chart.setupInternal(true, anychart.getFullTheme('waterfall'));
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['waterfall'](arguments[i]);

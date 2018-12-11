@@ -917,8 +917,7 @@ anychart.core.ui.LabelsFactory.prototype.getDimension = function(formatProviderO
     measureLabel.applyTextSettings(textElement, false);
   }
   if (!(anychart.utils.instanceOf(padding, anychart.core.utils.Padding))) {
-    padding = new anychart.core.utils.Padding(/** @type {(string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})} */(padding));
-    this.setupCreated('padding', padding);
+    padding = this.padding();
   }
 
   //we should ask text element about bounds only after text format and text settings are applied

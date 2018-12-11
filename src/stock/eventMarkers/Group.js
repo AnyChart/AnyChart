@@ -60,6 +60,7 @@ anychart.stockModule.eventMarkers.Group = function(plot, index) {
       anychart.stockModule.eventMarkers.Group.STATE_DESCRIPTORS_META_STATE,
       anychart.PointState.NORMAL,
       anychart.stockModule.eventMarkers.Group.STATE_DESCRIPTORS_OVERRIDE);
+
   this.selected_ = new anychart.core.StateSettings(this,
       anychart.stockModule.eventMarkers.Group.STATE_DESCRIPTORS_META_STATE,
       anychart.PointState.NORMAL,

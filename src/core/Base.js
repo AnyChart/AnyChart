@@ -1332,35 +1332,12 @@ anychart.core.Base.prototype.createExtendedThemes = function(sourceThemes, exten
  */
 anychart.core.Base.prototype.flattenThemes = function() {
   var flatTheme = this.themeSettings || {}; // this one is to preserve themeSettings['enabled'] = true from VisualBase constructor
-  var baseThemes = anychart.getThemes();
-  var splitPath;
 
   for (var i = 0; i < this.themes_.length; i++) {
     var theme = this.themes_[i];
-    if (goog.isString(theme)) {
-      splitPath = theme.split('.');
-      var part;
-
-
-      for (var t = 0; t < baseThemes.length; t++) {
-        theme = baseThemes[t];
-        for (var j = 0; j < splitPath.length; j++) {
-          if (theme) {
-            part = splitPath[j];
-            theme = theme[part];
-          }
-        }
-
-        if (goog.isDef(theme)) {
-          theme = goog.isObject(theme) && !goog.isArray(theme) ? theme :
-              goog.isBoolean(theme) ?
-                  {'enabled': theme} :
-                  this.resolveSpecialValue(theme);
-
-          goog.mixin(flatTheme, theme);
-        }
-      }
-    } else if (goog.isObject(theme))
+    if (goog.isString(theme))
+      flatTheme = anychart.getFlatTheme(theme, flatTheme, this.resolveSpecialValue);
+    else if (goog.isObject(theme))
       goog.mixin(flatTheme, theme);
   }
 

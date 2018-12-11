@@ -26,36 +26,19 @@ anychart.stockModule.CurrentPriceIndicator = function() {
    * @type {anychart.core.ui.LabelsFactory}
    * @private
    */
-  this.mainLabel_ = new anychart.core.ui.LabelsFactory();
-  this.mainLabel_.listenSignals(this.labelInvalidated_, this);
-  this.label_ = this.mainLabel_.add(null, null, 0);
-  this.label_.zIndex(1);
-  this.mainLabel_.markConsistent(anychart.ConsistencyState.ALL);
-
-  // todo: (chernetsky) Remove when class is refactored
-  this.mainLabel_.dropThemes();
+  this.mainLabel_ = null;
 
   /**
    * @type {anychart.core.ui.LabelsFactory}
    * @private
    */
-  this.risingLabel_ = new anychart.core.ui.LabelsFactory();
-  this.risingLabel_.listenSignals(this.labelInvalidated_, this);
-  this.risingLabel_.markConsistent(anychart.ConsistencyState.ALL);
-
-  // todo: (chernetsky) Remove when class is refactored
-  this.risingLabel_.dropThemes();
+  this.risingLabel_ = null;
 
   /**
    * @type {anychart.core.ui.LabelsFactory}
    * @private
    */
-  this.fallingLabel_ = new anychart.core.ui.LabelsFactory();
-  this.fallingLabel_.listenSignals(this.labelInvalidated_, this);
-  this.fallingLabel_.markConsistent(anychart.ConsistencyState.ALL);
-
-  // todo: (chernetsky) Remove when class is refactored
-  this.fallingLabel_.dropThemes();
+  this.fallingLabel_ = null;
 
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['value', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW],
@@ -528,25 +511,6 @@ anychart.stockModule.CurrentPriceIndicator.prototype.setThemeSettings = function
 
 
 /** @inheritDoc */
-anychart.stockModule.CurrentPriceIndicator.prototype.disposeInternal = function() {
-  anychart.stockModule.CurrentPriceIndicator.base(this, 'disposeInternal');
-
-  this.plot_ = null;
-  this.axis_ = null;
-  this.series_ = null;
-
-  this.remove();
-  if (this.line)
-    this.line.dispose();
-
-  this.mainLabel_.clear();
-  this.mainLabel_.dispose();
-  this.risingLabel_.dispose();
-  this.fallingLabel_.dispose();
-};
-
-
-/** @inheritDoc */
 anychart.stockModule.CurrentPriceIndicator.prototype.serialize = function() {
   var json = anychart.stockModule.CurrentPriceIndicator.base(this, 'serialize');
 
@@ -576,11 +540,63 @@ anychart.stockModule.CurrentPriceIndicator.prototype.setupByJSON = function(conf
   this.series(config['series']);
   this.axis(config['axis']);
 
+  this.setupLabels(config, opt_default);
+
+  anychart.stockModule.CurrentPriceIndicator.base(this, 'setupByJSON', config, opt_default);
+};
+
+
+/**
+ * @param {Object=} opt_config
+ * @param {boolean=} opt_default
+ */
+anychart.stockModule.CurrentPriceIndicator.prototype.setupLabels = function(opt_config, opt_default) {
+  var config = goog.isDef(opt_config) ? opt_config : this.themeSettings;
+
+  if (!this.mainLabel_) {
+    this.mainLabel_ = new anychart.core.ui.LabelsFactory();
+    this.mainLabel_.listenSignals(this.labelInvalidated_, this);
+    this.label_ = this.mainLabel_.add(null, null, 0);
+    this.label_.zIndex(1);
+    this.mainLabel_.markConsistent(anychart.ConsistencyState.ALL);
+  }
+
+  if (!this.risingLabel_) {
+    this.risingLabel_ = new anychart.core.ui.LabelsFactory();
+    this.risingLabel_.listenSignals(this.labelInvalidated_, this);
+    this.risingLabel_.markConsistent(anychart.ConsistencyState.ALL);
+  }
+
+  if (!this.fallingLabel_) {
+    this.fallingLabel_ = new anychart.core.ui.LabelsFactory();
+    this.fallingLabel_.listenSignals(this.labelInvalidated_, this);
+    this.fallingLabel_.markConsistent(anychart.ConsistencyState.ALL);
+  }
+
   this.mainLabel_.setupInternal(!!opt_default, config['label']);
   this.risingLabel_.setupInternal(!!opt_default, config['risingLabel']);
   this.fallingLabel_.setupInternal(!!opt_default, config['fallingLabel']);
+};
 
-  anychart.stockModule.CurrentPriceIndicator.base(this, 'setupByJSON', config, opt_default);
+
+/** @inheritDoc */
+anychart.stockModule.CurrentPriceIndicator.prototype.disposeInternal = function() {
+  this.plot_ = null;
+  this.axis_ = null;
+  this.series_ = null;
+
+  this.remove();
+  if (this.line)
+    this.line.dispose();
+
+  this.mainLabel_.clear();
+
+  goog.disposeAll(this.mainLabel_, this.risingLabel_, this.fallingLabel_);
+  this.mainLabel_ = null;
+  this.risingLabel_ = null;
+  this.fallingLabel_ = null;
+
+  anychart.stockModule.CurrentPriceIndicator.base(this, 'disposeInternal');
 };
 
 

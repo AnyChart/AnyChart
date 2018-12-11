@@ -18,6 +18,8 @@ goog.require('anychart.math.Rect');
 anychart.annotationsModule.Label = function(chartController) {
   anychart.annotationsModule.Label.base(this, 'constructor', chartController);
 
+  this.addThemes('defaultFontSettings');
+
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.annotationsModule.X_ANCHOR_DESCRIPTORS_META);
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.annotationsModule.VALUE_ANCHOR_DESCRIPTORS_META);
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.annotationsModule.LABEL_DESCRIPTORS_META);

@@ -37,7 +37,8 @@ goog.require('goog.events.MouseWheelHandler');
  */
 anychart.stockModule.Chart = function(opt_allowPointSettings) {
   anychart.stockModule.Chart.base(this, 'constructor');
-  this.dropThemes().addThemes('stock');
+
+  this.addThemes('stock');
 
   /**
    * Chart plots array.
@@ -734,10 +735,9 @@ anychart.stockModule.Chart.prototype.plotInternal = function(opt_indexOrValue, o
   if (!plot) {
     //NOTE: plot.crosshair().interactivityTarget() is not set because stock chart controls crosshair itself.
     plot = new anychart.stockModule.Plot(this);
-
+    plot.addThemes('stock.defaultPlotSettings', this.defaultPlotSettings());
     plot.crosshair().parent(/** @type {anychart.core.ui.Crosshair} */ (this.crosshair()));
-    if (goog.isDef(this.defaultPlotSettings_))
-      plot.setupInternal(!!opt_default, this.defaultPlotSettings_);
+    plot.setupElements(true);
     plot.setParentEventTarget(this);
     this.plots_[index] = plot;
     plot.listenSignals(this.plotInvalidated_, this);
@@ -781,6 +781,9 @@ anychart.stockModule.Chart.prototype.scroller = function(opt_value) {
   if (!this.scroller_) {
     this.scroller_ = new anychart.stockModule.Scroller(this);
     this.scroller_.setParentEventTarget(this);
+    this.setupCreated('scroller', this.scroller_);
+    this.scroller_.setupElements(true);
+
     this.scroller_.listenSignals(this.scrollerInvalidated_, this);
     this.eventsHandler.listen(this.scroller_, anychart.enums.EventType.SCROLLER_CHANGE_START, this.scrollerChangeStartHandler_);
     this.eventsHandler.listen(this.scroller_, anychart.enums.EventType.SCROLLER_CHANGE, this.scrollerChangeHandler_);
@@ -993,19 +996,22 @@ anychart.stockModule.Chart.prototype.xScale = function(opt_value) {
     var askedForScatter = newType == anychart.enums.ScaleTypes.STOCK_SCATTER_DATE_TIME || newType == 'scatter';
     var currIsScatter = this.xScale_ && !(anychart.utils.instanceOf(this.xScale_, anychart.stockModule.scales.Ordinal));
 
-    if (this.xScale_)
-      this.xScale_.unlistenSignals(this.xScaleListener_, this);
+    var scroller = this.getCreated('scroller');
+    if (scroller)
+      scroller.unlistenSignals(this.xScaleListener_, this);
 
     if (askedForScatter != currIsScatter) {
       if (askedForScatter) {
         this.xScale_ = new anychart.stockModule.scales.Scatter(this);
-        if (this.scroller_)
-          this.scroller_.xScale(new anychart.stockModule.scales.Scatter(this.scroller_));
+        if (scroller)
+          scroller.xScale(new anychart.stockModule.scales.Scatter(/** @type {!anychart.stockModule.Scroller} */(scroller)));
       } else {
         this.xScale_ = new anychart.stockModule.scales.Ordinal(this);
-        if (this.scroller_)
-          this.scroller_.xScale(new anychart.stockModule.scales.Ordinal(this.scroller_));
+        if (scroller)
+          scroller.xScale(new anychart.stockModule.scales.Ordinal(/** @type {!anychart.stockModule.Scroller} */(scroller)));
       }
+      this.setupCreated('xScale', this.xScale_);
+      this.xScale_.setup(this.xScale_.themeSettings);
 
       this.xScale_.listenSignals(this.xScaleListener_, this);
       this.invalidateRedrawable();
@@ -1014,6 +1020,8 @@ anychart.stockModule.Chart.prototype.xScale = function(opt_value) {
   }
   if (!this.xScale_) {
     this.xScale_ = new anychart.stockModule.scales.Ordinal(this);
+    this.setupCreated('xScale', this.xScale_);
+    this.xScale_.setup(this.xScale_.themeSettings);
     this.xScale_.listenSignals(this.xScaleListener_, this);
   }
   return this.xScale_;
@@ -1087,15 +1095,15 @@ anychart.stockModule.Chart.prototype.preserveSelectedRangeOnDataUpdate = functio
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Setter for plot default settings.
- * @param {Object} value Object with default series settings.
+ * @param {Object=} opt_value Object with default series settings.
+ * @return {Object}
  */
-anychart.stockModule.Chart.prototype.setDefaultPlotSettings = function(value) {
-  /**
-   * Default plot settings.
-   * @type {*}
-   * @private
-   */
-  this.defaultPlotSettings_ = value;
+anychart.stockModule.Chart.prototype.defaultPlotSettings = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.defaultPlotSettings_ = !!opt_value;
+    return this;
+  }
+  return this.defaultPlotSettings_ || {};
 };
 
 
@@ -1638,8 +1646,9 @@ anychart.stockModule.Chart.prototype.calculateScales_ = function() {
     }
   }
 
-  if (this.scroller_ && this.scroller_.isVisible()) {
-    seriesList = this.scroller_.getAllSeries();
+  var scroller = this.getCreated('scroller');
+  if (scroller && scroller.isVisible()) {
+    seriesList = scroller.getAllSeries();
     stacksByScale = {};
     hasPercentStacks = false;
     for (j = 0; j < seriesList.length; j++) {
@@ -1683,16 +1692,18 @@ anychart.stockModule.Chart.prototype.calculateScales_ = function() {
 anychart.stockModule.Chart.prototype.distributeBounds_ = function(contentBounds) {
   var remainingBounds = contentBounds;
   // first - setup scroller
-  if (this.scroller_) {
-    this.scroller_.parentBounds(remainingBounds);
-    remainingBounds = this.scroller_.getRemainingBounds();
+  var scroller = this.getCreated('scroller');
+  if (scroller) {
+    scroller.parentBounds(remainingBounds);
+    remainingBounds = scroller.getRemainingBounds();
   }
 
+  var plot;
   var currentTop = 0;
   var currentBottom = NaN;
   var boundsArray = [];
   for (var i = 0; i < this.plots_.length; i++) {
-    var plot = this.plots_[i];
+    plot = this.plots_[i];
     if (plot && plot.enabled()) {
       plot.parentBounds(remainingBounds);
       var bounds = /** @type {anychart.core.utils.Bounds} */(plot.bounds());
@@ -1720,7 +1731,7 @@ anychart.stockModule.Chart.prototype.distributeBounds_ = function(contentBounds)
 
   this.minPlotsDrawingWidth_ = Infinity;
   for (i = 0; i < this.plots_.length; i++) {
-    var plot = this.plots_[i];
+    plot = this.plots_[i];
     if (plot && plot.enabled()) {
       var width = plot.getDrawingWidth();
       if (this.minPlotsDrawingWidth_ > width)
@@ -2052,7 +2063,6 @@ anychart.stockModule.Chart.prototype.eventMarkers = function(opt_value) {
     this.eventMarkers_ = new anychart.stockModule.eventMarkers.ChartController(this);
     this.eventMarkers_.setParentEventTarget(this);
     this.eventMarkers_.listenSignals(this.eventMarkersInvalidated_, this);
-    this.setupCreated('eventMarkers', this.eventMarkers_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -2263,7 +2273,7 @@ anychart.stockModule.Chart.prototype.crosshair = function(opt_value) {
   if (!this.crosshair_) {
     this.crosshair_ = new anychart.core.ui.Crosshair();
     this.crosshair_.needsForceSignalsDispatching(true);
-    this.registerDisposable(this.crosshair_);
+    this.setupCreated('crosshair', this.crosshair_);
     this.crosshair_.listenSignals(this.onCrosshairSignal_, this);
     this.invalidate(anychart.ConsistencyState.AXES_CHART_CROSSHAIR, anychart.Signal.NEEDS_REDRAW);
   }
@@ -2482,8 +2492,10 @@ anychart.stockModule.Chart.prototype.handleMouseWheel_ = function(e) {
       }
     }
   }
-  if (!inBounds && this.scroller_ && this.scroller_.isVisible()) {
-    boundsItem = this.scroller_.getPixelBounds();
+
+  var scroller = this.getCreated('scroller');
+  if (!inBounds && scroller && scroller.isVisible()) {
+    boundsItem = scroller.getPixelBounds();
     inBounds = (boundsItem &&
         boundsItem.left <= x && x <= boundsItem.left + boundsItem.width &&
         boundsItem.top <= y && y <= boundsItem.top + boundsItem.height);
@@ -2993,12 +3005,22 @@ anychart.stockModule.Chart.prototype.dragEnd = function() {
 /** @inheritDoc */
 anychart.stockModule.Chart.prototype.disposeInternal = function() {
   // plot annotations should be disposed before chart annotations
-  goog.disposeAll(this.plots_, this.scroller_, this.dataController_, this.annotations_, this.eventMarkers_, this.mouseWheelHandler_);
+  goog.disposeAll(
+      this.plots_,
+      this.scroller_,
+      this.dataController_,
+      this.annotations_,
+      this.eventMarkers_,
+      this.mouseWheelHandler_,
+      this.crosshair_);
+
   this.plots_ = null;
   this.scroller_ = null;
   this.annotations_ = null;
   this.eventMarkers_ = null;
   this.mouseWheelHandler_ = null;
+  this.crosshair_ = null;
+
   delete this.dataController_;
   delete this.defaultAnnotationSettings_;
 
@@ -3034,17 +3056,12 @@ anychart.stockModule.Chart.prototype.setupByJSON = function(config, opt_default)
   if ('xScale' in config)
     this.xScale(config['xScale']);
 
-  this.crosshair().setupInternal(!!opt_default, config['crosshair']);
+  this.setupElements(opt_default, config);
+
+  this.crosshair(config['crosshair']);
 
   if ('defaultPlotSettings' in config)
-    this.setDefaultPlotSettings(config['defaultPlotSettings']);
-
-  json = config['plots'];
-  if (goog.isArray(json)) {
-    for (var i = 0; i < json.length; i++) {
-      this.plotInternal(i, json[i], opt_default);
-    }
-  }
+    this.defaultPlotSettings(config['defaultPlotSettings']);
 
   this.scroller(config['scroller']);
   this.grouping(config['grouping']);
@@ -3067,6 +3084,22 @@ anychart.stockModule.Chart.prototype.setupByJSON = function(config, opt_default)
 };
 
 
+/**
+ * Create and setup elements that should be created before draw
+ * @param {boolean=} opt_default
+ * @param {Object=} opt_config
+ */
+anychart.stockModule.Chart.prototype.setupElements = function(opt_default, opt_config) {
+  var config = opt_config || this.themeSettings;
+  var json = config['plots'];
+  if (goog.isArray(json)) {
+    for (var i = 0; i < json.length; i++) {
+      this.plotInternal(i, json[i], opt_default);
+    }
+  }
+};
+
+
 //endregion
 /**
  * Stock chart constructor function.
@@ -3074,9 +3107,9 @@ anychart.stockModule.Chart.prototype.setupByJSON = function(config, opt_default)
  * @return {anychart.stockModule.Chart}
  */
 anychart.stock = function(opt_allowPointSettings) {
-  var result = new anychart.stockModule.Chart(opt_allowPointSettings);
-  result.setupInternal(true, anychart.getFullTheme('stock'));
-  return result;
+  var chart = new anychart.stockModule.Chart(opt_allowPointSettings);
+  chart.setupElements(true);
+  return chart;
 };
 
 

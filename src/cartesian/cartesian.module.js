@@ -43,7 +43,6 @@ anychart.area = function(var_args) {
   chart.setType(anychart.enums.ChartTypes.AREA);
   chart.setupAxes();
   chart.setupStateSettings();
-  // chart.setupInternal(true, anychart.getFullTheme('area'));
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['area'](arguments[i]);
@@ -71,7 +70,6 @@ anychart.bar = function(var_args) {
   chart.setType(anychart.enums.ChartTypes.BAR);
   chart.setupAxes();
   chart.setupStateSettings();
-  // chart.setupInternal(true, anychart.getFullTheme('bar'));
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['bar'](arguments[i]);
@@ -108,8 +106,6 @@ anychart.box = function(var_args) {
   chart.setupAxes();
   chart.setupStateSettings();
 
-  //chart.setupInternal(true, anychart.getFullTheme('box'));
-
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['box'](arguments[i]);
   }
@@ -136,7 +132,6 @@ anychart.column = function(var_args) {
   chart.setType(anychart.enums.ChartTypes.COLUMN);
   chart.setupAxes();
   chart.setupStateSettings();
-//  chart.setupInternal(true, anychart.getFullTheme('column'));
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['column'](arguments[i]);
@@ -161,11 +156,8 @@ anychart.hilo = function(var_args) {
   chart.addThemes('column');
   chart.setOption('defaultSeriesType', anychart.enums.CartesianSeriesType.HILO);
   chart.setType(anychart.enums.ChartTypes.HILO);
-
   chart.setupAxes();
   chart.setupStateSettings();
-
-  // chart.setupInternal(true, anychart.getFullTheme('column'));
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['hilo'](arguments[i]);
@@ -202,8 +194,6 @@ anychart.financial = function(var_args) {
   chart.setupAxes();
   chart.setupStateSettings();
 
-  // chart.setupInternal(true, anychart.getFullTheme('financial'));
-
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['candlestick'](arguments[i]);
   }
@@ -226,12 +216,10 @@ anychart.line = function(var_args) {
   anychart.performance.start('anychart.line()');
   var chart = new anychart.cartesianModule.Chart();
   chart.addThemes('line');
-
   chart.setOption('defaultSeriesType', anychart.enums.CartesianSeriesType.LINE);
   chart.setType(anychart.enums.ChartTypes.LINE);
   chart.setupAxes();
   chart.setupStateSettings();
-  // chart.setupInternal(true, anychart.getFullTheme('line'));
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['line'](arguments[i]);
@@ -255,7 +243,6 @@ anychart.verticalArea = function(var_args) {
   chart.setType(anychart.enums.ChartTypes.VERTICAL_AREA);
   chart.setupAxes();
   chart.setupStateSettings();
-  // chart.setupInternal(true, anychart.getFullTheme('verticalArea'));
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart[anychart.enums.CartesianSeriesType.AREA](arguments[i]);

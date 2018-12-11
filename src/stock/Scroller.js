@@ -1,7 +1,9 @@
 goog.provide('anychart.stockModule.Scroller');
+
 goog.require('anychart.core.IChart');
 goog.require('anychart.core.IGroupingProvider');
 goog.require('anychart.core.IPlot');
+goog.require('anychart.core.SeriesSettings');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.Scroller');
 goog.require('anychart.palettes');
@@ -980,11 +982,17 @@ anychart.stockModule.Scroller.prototype.getAllSeries = function() {
  * @return {Object}
  */
 anychart.stockModule.Scroller.prototype.defaultSeriesSettings = function(opt_value) {
+  if (!this.defaultSeriesSettings_) {
+    this.defaultSeriesSettings_ = new anychart.core.SeriesSettings();
+    this.defaultSeriesSettings_.addThemes('chart.defaultSeriesSettings', 'stock.scroller.defaultSeriesSettings');
+  }
+
   if (goog.isDef(opt_value)) {
-    this.defaultSeriesSettings_ = opt_value;
+    this.defaultSeriesSettings_.themeSettings = opt_value;
     return this;
   }
-  return this.defaultSeriesSettings_ || {};
+
+  return this.defaultSeriesSettings_;
 };
 
 
@@ -1301,8 +1309,8 @@ anychart.stockModule.Scroller.prototype.xAxis = function(opt_value) {
   if (!this.xAxis_) {
     this.xAxis_ = new anychart.stockModule.Axis(this, true);
     this.xAxis_.setParentEventTarget(this);
-    this.xAxis_.enabled(false);
     this.xAxis_.zIndex(52);
+    this.setupCreated('xAxis', this.xAxis_);
     this.xAxis_.listenSignals(this.xAxisInvalidated_, this);
     this.invalidate(anychart.ConsistencyState.STOCK_SCROLLER_AXIS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -1486,8 +1494,8 @@ anychart.stockModule.Scroller.prototype.setupPalette_ = function(cls, opt_cloneF
 anychart.stockModule.Scroller.prototype.hatchFillPalette = function(opt_value) {
   if (!this.hatchFillPalette_) {
     this.hatchFillPalette_ = new anychart.palettes.HatchFills();
+    this.setupCreated('hatchFillPalette', this.hatchFillPalette_);
     this.hatchFillPalette_.listenSignals(this.paletteInvalidated_, this);
-    this.registerDisposable(this.hatchFillPalette_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -1569,24 +1577,23 @@ anychart.stockModule.Scroller.prototype.makeRangeChangeEvent = function(type, st
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.stockModule.Scroller.prototype.disposeInternal = function() {
-  goog.disposeAll(this.series_);
-  delete this.series_;
+  goog.disposeAll(
+      this.hatchFillPalette_,
+      this.seriesContainer_,
+      this.selectedSeriesContainer_,
+      this.xAxis_,
+      this.xScale_,
+      this.yScale_);
 
-  goog.disposeAll(this.indicators_);
-  delete this.indicators_;
-
-  goog.dispose(this.seriesContainer_);
-  goog.dispose(this.selectedSeriesContainer_);
+  this.hatchFillPalette_ = null;
   this.seriesContainer_ = null;
   this.selectedSeriesContainer_ = null;
-
-  goog.dispose(this.xAxis_);
   this.xAxis_ = null;
-
+  this.xScale_ = null;
   this.yScale_ = null;
 
-  goog.dispose(this.xScale_);
-  this.xScale_ = null;
+  this.series_.length = 0;
+  this.indicators_.length = 0;
 
   delete this.chart_;
 
@@ -1610,13 +1617,54 @@ anychart.stockModule.Scroller.prototype.serialize = function() {
 anychart.stockModule.Scroller.prototype.setupByJSON = function(config, opt_default) {
   anychart.stockModule.Scroller.base(this, 'setupByJSON', config, opt_default);
 
+  this.setupElements(false, config);
+
+  if ('xAxis' in config)
+    this.xAxis(config['xAxis']);
+
+  this.palette(config['palette']);
+
+  this.hatchFillPalette(config['hatchFillPalette']);
+
+  this.defaultSeriesType(config['defaultSeriesType']);
+
+  if ('defaultSeriesSettings' in config)
+    this.defaultSeriesSettings(config['defaultSeriesSettings']);
+
+  var series = config['series'];
+  if (goog.isArray(series)) {
+    for (var i = 0; i < series.length; i++) {
+      var json = series[i];
+      var seriesType = (json['seriesType'] || this.defaultSeriesType()).toLowerCase();
+      var data = json['data'];
+      var seriesInst = this.createSeriesByType(seriesType, data);
+      if (seriesInst) {
+        seriesInst.setup(json);
+        if (goog.isObject(json)) {
+          if ('yScale' in json && json['yScale'] > 1) seriesInst.yScale(this.scalesInstances_[json['yScale']]);
+        }
+      }
+    }
+  }
+};
+
+
+/**'
+ * @param {Object=} opt_config
+ */
+anychart.stockModule.Scroller.prototype.setupScales = function(opt_config) {
   var i, json, scale;
 
-  this.xAxis(config['xAxis']);
-  this.defaultSeriesType(config['defaultSeriesType']);
-  var type = this.getChart().getType();
+  var scales = anychart.utils.recursiveClone(this.getThemeOption('scales'));
+  if (opt_config && opt_config['scales']) {
+    for (var k = 0; k < scales.length; k++) {
+      if (opt_config['scales'][k])
+        goog.mixin(scales[k], opt_config['scales'][k]);
+    }
+    if (opt_config['scales'].length > scales.length)
+      scales = goog.array.concat(scales, goog.array.slice(opt_config['scales'], scales.length));
+  }
 
-  var scales = config['scales'];
   var scalesInstances = {};
   if (goog.isArray(scales)) {
     for (i = 0; i < scales.length; i++) {
@@ -1624,7 +1672,6 @@ anychart.stockModule.Scroller.prototype.setupByJSON = function(config, opt_defau
       if (goog.isString(json)) {
         json = {'type': json};
       }
-      json = anychart.themes.merging.mergeScale(json, i, type, anychart.enums.ScaleTypes.LINEAR);
       scale = anychart.scales.ScatterBase.fromString(json['type'], false);
       scale.setup(json);
       scalesInstances[i] = scale;
@@ -1636,14 +1683,20 @@ anychart.stockModule.Scroller.prototype.setupByJSON = function(config, opt_defau
       if (goog.isString(json)) {
         json = {'type': json};
       }
-      json = anychart.themes.merging.mergeScale(json, i, type, anychart.enums.ScaleTypes.LINEAR);
       scale = anychart.scales.ScatterBase.fromString(json['type'], false);
       scale.setup(json);
       scalesInstances[i] = scale;
     }
   }
 
-  json = config['yScale'];
+  json = anychart.utils.recursiveClone(this.getThemeOption('yScale'));
+  if (opt_config && goog.isDef(opt_config['yScale'])) {
+    if (goog.typeOf(opt_config['yScale']) == 'object' && goog.typeOf(json) == 'object')
+      goog.mixin(/** @type {!Object} */(json), opt_config['yScale']);
+    else
+      json = opt_config['yScale'];
+  }
+
   if (goog.isNumber(json)) {
     scale = scalesInstances[json];
   } else if (goog.isString(json)) {
@@ -1659,26 +1712,18 @@ anychart.stockModule.Scroller.prototype.setupByJSON = function(config, opt_defau
   if (scale)
     this.yScale(scale);
 
-  if ('defaultSeriesSettings' in config)
-    this.defaultSeriesSettings(config['defaultSeriesSettings']);
+  this.scalesInstances_ = scalesInstances;
+};
 
-  var series = config['series'];
-  if (goog.isArray(series)) {
-    for (i = 0; i < series.length; i++) {
-      json = series[i];
-      var seriesType = (json['seriesType'] || this.defaultSeriesType()).toLowerCase();
-      var data = json['data'];
-      var seriesInst = this.createSeriesByType(seriesType, data);
-      if (seriesInst) {
-        seriesInst.setup(json);
-        if (goog.isObject(json)) {
-          if ('yScale' in json && json['yScale'] > 1) seriesInst.yScale(scalesInstances[json['yScale']]);
-        }
-      }
-    }
-  }
-  this.palette(config['palette']);
-  this.hatchFillPalette(config['hatchFillPalette']);
+
+/**
+ * Create and setup elements that should be created before draw
+ * @param {boolean=} opt_default
+ * @param {Object=} opt_config
+ */
+anychart.stockModule.Scroller.prototype.setupElements = function(opt_default, opt_config) {
+  this.setupScales(opt_config);
+  this.xAxis();
 };
 
 

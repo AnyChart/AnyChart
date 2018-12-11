@@ -14,6 +14,8 @@ goog.require('goog.array');
 anychart.stockModule.Grouping = function() {
   anychart.stockModule.Grouping.base(this, 'constructor');
 
+  this.addThemes('defaultGroupingSettings');
+
   /**
    * Enabled state.
    * @type {boolean}
