@@ -1934,7 +1934,7 @@ anychart.resourceModule.Chart.prototype.serialize = function() {
   json['cellPadding'] = this.cellPadding_.serialize();
   json['conflicts'] = this.conflicts_.serialize();
   anychart.core.settings.serialize(this, anychart.resourceModule.Chart.PROPERTY_DESCRIPTORS, json);
-  return json;
+  return {'chart': json};
 };
 
 
