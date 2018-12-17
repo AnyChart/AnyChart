@@ -90,11 +90,19 @@ anychart.stockModule.Chart = function(opt_allowPointSettings) {
   this.highlightPrevented_ = false;
 
   /**
-   * Last highlighted ratio.
+   * Last highlighted X-ratio.
    * @type {number}
    * @private
    */
   this.highlightedRatio_ = NaN;
+
+
+  /**
+   * Last highlighted Y-ratio.
+   * @type {number}
+   * @private
+   */
+  this.highlightedYRatio_ = NaN;
 
   /**
    * Last highlighted clientX.
@@ -2096,17 +2104,19 @@ anychart.stockModule.Chart.prototype.onInteractivitySignal = goog.nullFunction;
 
 /**
  * Highlights points on all charts by ratio of current selected range. Used by plots.
- * @param {number} ratio
+ * @param {number} xRatio
+ * @param {number} yRatio
  * @param {number} clientX
  * @param {number} clientY
  * @param {anychart.stockModule.Plot} plot
  */
-anychart.stockModule.Chart.prototype.highlightAtRatio = function(ratio, clientX, clientY, plot) {
-  this.highlightedRatio_ = ratio;
+anychart.stockModule.Chart.prototype.highlightAtRatio = function(xRatio, yRatio, clientX, clientY, plot) {
+  this.highlightedRatio_ = xRatio;
+  this.highlightedYRatio_ = yRatio;
   this.highlightedClientX_ = clientX;
   this.highlightedClientY_ = clientY;
   this.highlightSourcePlot_ = plot;
-  this.highlightAtRatio_(ratio, clientX, clientY, plot);
+  this.highlightAtRatio_(xRatio, yRatio, clientX, clientY, plot);
 };
 
 
@@ -2115,6 +2125,7 @@ anychart.stockModule.Chart.prototype.highlightAtRatio = function(ratio, clientX,
  */
 anychart.stockModule.Chart.prototype.unhighlight = function() {
   this.highlightedRatio_ = NaN;
+  this.highlightedYRatio_ = NaN;
   this.highlightedClientX_ = NaN;
   this.highlightedClientY_ = NaN;
   this.highlightSourcePlot_ = null;
@@ -2155,22 +2166,23 @@ anychart.stockModule.Chart.prototype.allowHighlight = function() {
  */
 anychart.stockModule.Chart.prototype.refreshHighlight_ = function() {
   if (!isNaN(this.highlightedRatio_)) {
-    this.highlightAtRatio_(this.highlightedRatio_, this.highlightedClientX_, this.highlightedClientY_, this.highlightSourcePlot_);
+    this.highlightAtRatio_(this.highlightedRatio_, this.highlightedYRatio_, this.highlightedClientX_, this.highlightedClientY_, this.highlightSourcePlot_);
   }
 };
 
 
 /**
  * Highlights passed ratio.
- * @param {number} ratio
+ * @param {number} xRatio
+ * @param {number} yRatio
  * @param {number} clientX
  * @param {number} clientY
  * @param {anychart.stockModule.Plot} sourcePlot - .
  * @private
  */
-anychart.stockModule.Chart.prototype.highlightAtRatio_ = function(ratio, clientX, clientY, sourcePlot) {
-  if (this.highlightPrevented_ || ratio < 0 || ratio > 1) return;
-  var rawValue = this.xScale().inverseTransform(ratio);
+anychart.stockModule.Chart.prototype.highlightAtRatio_ = function(xRatio, yRatio, clientX, clientY, sourcePlot) {
+  if (this.highlightPrevented_ || xRatio < 0 || xRatio > 1) return;
+  var rawValue = this.xScale().inverseTransform(xRatio);
   var value = this.dataController_.alignHighlight(rawValue);
   if (isNaN(value)) return;
 
@@ -2194,44 +2206,92 @@ anychart.stockModule.Chart.prototype.highlightAtRatio_ = function(ratio, clientX
   }
   this.highlighted_ = true;
 
+  var grouping = /** @type {anychart.stockModule.Grouping} */(this.grouping());
+  var extendedContext = {
+    'hoveredDate': {value: value, type: anychart.enums.TokenType.DATE_TIME},
+    'rawHoveredDate': {value: rawValue, type: anychart.enums.TokenType.DATE_TIME},
+    'dataIntervalUnit': {value: grouping.getCurrentDataInterval()['unit'], type: anychart.enums.TokenType.STRING},
+    'dataIntervalUnitCount': {
+      value: grouping.getCurrentDataInterval()['count'],
+      type: anychart.enums.TokenType.NUMBER
+    },
+    'isGrouped': {value: grouping.isGrouped()}
+  };
+
   /**
    * @type {!anychart.core.ui.Tooltip}
    */
   var tooltip = /** @type {!anychart.core.ui.Tooltip} */(this.tooltip());
-
   if (this.xScale_.isValueInDummyRange(rawValue)) { //deciding whether to hide tooltip.
     tooltip.hide();
-  } else {
-    if (tooltip.getOption('displayMode') == anychart.enums.TooltipDisplayMode.UNION &&
-        tooltip.getOption('positionMode') != anychart.enums.TooltipPositionMode.POINT) {
-      var points = [];
-      var info = eventInfo['infoByPlots'];
-      for (i = 0; i < info.length; i++) {
-        if (info[i]) {
-          var seriesInfo = info[i]['infoBySeries'];
-          if (seriesInfo) {
-            for (var j = 0; j < seriesInfo.length; j++) {
-              var series = seriesInfo[j]['series'];
-              if (series)
-                points.push({'series': series});
-            }
+  } else if (tooltip.getOption('displayMode') == anychart.enums.TooltipDisplayMode.UNION &&
+      tooltip.getOption('positionMode') != anychart.enums.TooltipPositionMode.POINT) {
+    var points = [];
+    var info = eventInfo['infoByPlots'];
+    for (i = 0; i < info.length; i++) {
+      if (info[i]) {
+        var seriesInfo = info[i]['infoBySeries'];
+        if (seriesInfo) {
+          for (var j = 0; j < seriesInfo.length; j++) {
+            var series = seriesInfo[j]['series'];
+            if (series)
+              points.push({'series': series});
           }
         }
       }
-      var grouping = /** @type {anychart.stockModule.Grouping} */(this.grouping());
-      tooltip.showForSeriesPoints(points, clientX, clientY, null, false, {
-        'hoveredDate': {value: value, type: anychart.enums.TokenType.DATE_TIME},
-        'rawHoveredDate': {value: rawValue, type: anychart.enums.TokenType.DATE_TIME},
-        'dataIntervalUnit': {value: grouping.getCurrentDataInterval()['unit'], type: anychart.enums.TokenType.STRING},
-        'dataIntervalUnitCount': {
-          value: grouping.getCurrentDataInterval()['count'],
-          type: anychart.enums.TokenType.NUMBER
-        },
-        'isGrouped': {value: grouping.isGrouped()}
-      });
+    }
+    tooltip.showForSeriesPoints(points, clientX, clientY, null, false, extendedContext);
+  } else if (tooltip.getOption('displayMode') == anychart.enums.TooltipDisplayMode.SINGLE) { // DVF-4056
+    var singleInfo = (sourcePlot && sourcePlot.enabled()) ? sourcePlot.prepareHighlight(value) : null;
+
+    /*
+      Code below is kind of pretty elegant juking.
+      Here we define the first closest series to cursor.
+     */
+    if (singleInfo) {
+      var hoveredSeries = null;
+      for (var k = 0; k < singleInfo.length; k++) {
+        var inf = singleInfo[k];
+        var ser = inf['series'];
+        var pt = inf['point'];
+        if (pt && ser) {
+          var scale = ser.yScale();
+
+          /*
+            Should consider that
+              - OHLC series returns 'close' as 'value'
+              - Range series returns 'high' as 'value'
+              - etc.
+            In this case single tooltip appears only when cursor is close
+            to 'high' or 'close' (or smth like that) value.
+            It looks kind of strange, but it's not so clear how to implement it
+            in another way.
+           */
+          var v = pt.get('value');
+          var close = pt.get('close');
+          var high = pt.get('high');
+          var val = goog.isDefAndNotNull(v) ? v :
+              goog.isDefAndNotNull(close) ? close :
+                  goog.isDefAndNotNull(high) ? high :
+                      void 0;
+          var rat = scale.transform(val);
+          var yR = scale.inverted() ? yRatio : 1 - yRatio;
+          if (anychart.math.roughlyEqual(rat, yR, 0.03)) {
+            hoveredSeries = ser;
+            break;
+          }
+        }
+      }
+
+      if (hoveredSeries) {
+        tooltip.showForSeriesPoints([{'series': hoveredSeries}], clientX, clientY, hoveredSeries, false, extendedContext);
+      } else {
+        tooltip.hide();
+      }
+    } else {
+      tooltip.hide();
     }
   }
-  //}
 };
 
 

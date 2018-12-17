@@ -212,7 +212,7 @@ anychart.stockModule.Plot = function(chart) {
     if (isNaN(this.frameHighlightRatio_)) {
       this.chart_.unhighlight();
     } else {
-      this.chart_.highlightAtRatio(this.frameHighlightRatio_, this.frameHighlightX_, this.frameHighlightY_, this);
+      this.chart_.highlightAtRatio(this.frameHighlightRatio_, this.frameHighlightYRatio_, this.frameHighlightX_, this.frameHighlightY_, this);
     }
   }, this);
 
@@ -254,6 +254,13 @@ anychart.consistency.supportStates(anychart.stockModule.Plot, anychart.enums.Sto
  * @private
  */
 anychart.stockModule.Plot.prototype.frameHighlightRatio_ = NaN;
+
+
+/**
+ * @type {number}
+ * @private
+ */
+anychart.stockModule.Plot.prototype.frameHighlightYRatio_ = NaN;
 
 
 /**
@@ -2694,6 +2701,7 @@ anychart.stockModule.Plot.prototype.handlePlotMouseOverAndMove_ = function(e) {
     if (x >= 0 && x <= this.seriesBounds_.width &&
         y >= 0 && y <= this.seriesBounds_.height) {
       this.frameHighlightRatio_ = x / this.seriesBounds_.width;
+      this.frameHighlightYRatio_ = y / this.seriesBounds_.height;
       this.frameHighlightX_ = e['clientX'];
       this.frameHighlightY_ = e['clientY'];
       this.crosshair().xLabelAutoEnabled(this.isLastPlot_);
@@ -2712,6 +2720,7 @@ anychart.stockModule.Plot.prototype.handlePlotMouseOverAndMove_ = function(e) {
 anychart.stockModule.Plot.prototype.handlePlotMouseOut_ = function(e) {
   this.dispatchEvent(acgraph.events.EventType.MOUSEOUT);
   this.frameHighlightRatio_ = NaN;
+  this.frameHighlightYRatio_ = NaN;
   if (!goog.isDef(this.frame_))
     this.frame_ = anychart.window.requestAnimationFrame(this.frameAction_);
 };

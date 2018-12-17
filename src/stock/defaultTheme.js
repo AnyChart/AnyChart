@@ -47,11 +47,25 @@ anychart.stockModule.defaultTheme.StockOHLCTooltipFormatter = function() {
 
 /**
  * @this {*}
- * @returns {*}
+ * @return {*}
  */
 anychart.stockModule.defaultTheme.StockSeriesLabelFormatter = function() {
   var date = this['x'];
   return anychart.format.dateTime(date, anychart.format.getDateTimeFormat(anychart.format.getIntervalIdentifier(this['dataIntervalUnit'], void 0, 'full')));
+};
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
+anychart.stockModule.defaultTheme.stockTitleFormatter = function() {
+  var date = this['hoveredDate'];
+  return anychart.format.dateTime(date,
+      anychart.format.getDateTimeFormat(
+          anychart.format.getIntervalIdentifier(
+              this['dataIntervalUnit'], void 0, 'full'
+          )));
 };
 
 
@@ -241,7 +255,8 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'base': {
           'pointWidth': '75%',
           'tooltip': {
-            'format': anychart.stockModule.defaultTheme.StockSimpleTooltipFormatter
+            'format': anychart.stockModule.defaultTheme.StockSimpleTooltipFormatter,
+            'titleFormat': anychart.stockModule.defaultTheme.stockTitleFormatter
           },
           'legendItem': {'iconStroke': 'none'},
           'normal': {
@@ -718,18 +733,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       'title': {
         'fontSize': 13
       },
-      /**
-       * @this {*}
-       * @return {*}
-       */
-      'titleFormat': function() {
-        var date = this['hoveredDate'];
-        return anychart.format.dateTime(date,
-            anychart.format.getDateTimeFormat(
-                anychart.format.getIntervalIdentifier(
-                    this['dataIntervalUnit'], void 0, 'full'
-                )));
-      }
+      'titleFormat': anychart.stockModule.defaultTheme.stockTitleFormatter
     },
     'a11y': {
       'titleFormat': anychart.core.defaultTheme.chartA11yTitleFormatter
