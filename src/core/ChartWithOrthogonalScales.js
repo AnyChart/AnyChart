@@ -1475,7 +1475,8 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateStatistics = function
                 seriesSizeSum += pointVal;
                 seriesSizes.push(pointVal);
               }
-              pointVal = anychart.utils.toNumber(pointObj.data['value']);
+              var name = this.getType() == anychart.enums.ChartTypes.HEAT_MAP ? 'heat' : 'value';
+              pointVal = anychart.utils.toNumber(pointObj.data[name]);
               seriesYMax = Math.max(pointVal, seriesYMax);
               seriesYMin = Math.min(pointVal, seriesYMin);
             }

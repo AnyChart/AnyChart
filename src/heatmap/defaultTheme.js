@@ -54,7 +54,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
        * @return {*}
        */
       'format': function() {
-        if (this['heat'] === undefined) {
+        if (this['heat'] !== undefined) {
           var value = 'Value: ' + this['valuePrefix'] + this['heat'] + this['valuePostfix'];
           if (!isNaN(+this['heat']))
             value += '\n' + 'Percent Value: ' + (this['heat'] * 100 / this['getStat']('sum')).toFixed(1) + '%';
@@ -207,7 +207,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
            * @return {*}
            */
           'format': function() {
-            if (this['heat'] === undefined) {
+            if (this['heat'] !== undefined) {
               var value = 'Value: ' + this['valuePrefix'] + this['heat'] + this['valuePostfix'];
               if (!isNaN(+this['heat']))
                 value += '\n' + 'Percent Value: ' + (this['heat'] * 100 / this['getStat']('sum')).toFixed(1) + '%';
