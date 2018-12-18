@@ -2006,6 +2006,7 @@ anychart.core.Axis.prototype.draw = function() {
     var stroke =  /**@type {acgraph.vector.Stroke|string}*/(this.getOption('stroke'));
     stroke = acgraph.vector.normalizeStroke(stroke);
     lineThickness = !stroke || anychart.utils.isNone(stroke) ? 0 : stroke['thickness'] ? parseFloat(stroke['thickness']) : 1;
+    var isOrdinal = anychart.utils.instanceOf(scale, anychart.scales.Ordinal);
 
     if (anychart.utils.instanceOf(scale, anychart.scales.ScatterBase)) {
       overlappedLabels = this.calcLabels_();
@@ -2101,7 +2102,8 @@ anychart.core.Axis.prototype.draw = function() {
           leftTick = rightTick = tickVal;
           labelPosition = scale.transform(tickVal, .5);
         }
-        ratio = scale.transform(leftTick, 0);
+        var subRangeRatio = (isOrdinal && scale.mode() == anychart.enums.OrdinalScaleMode.CONTINUOUS) ? 0.5 : 0;
+        ratio = scale.transform(leftTick, subRangeRatio);
 
         if (ticksDrawer) {
           if (0 <= ratio && ratio <= 1)

@@ -732,6 +732,7 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'ordinal': {
       'type': 'ordinal',
       'inverted': false,
+      'mode': 'discrete',
       'names': [],
       'ticks': {
         'maxCount': 100

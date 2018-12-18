@@ -5135,3 +5135,25 @@ anychart.enums.normalizeXMode = function(value) {
   return /** @type {anychart.enums.XMode} */ (anychart.enums.normalize(anychart.enums.XMode, value,
       anychart.enums.XMode.ORDINAL));
 };
+
+
+/**
+ * Ordinal scale mode.
+ * @see anychart.scales.Ordinal#mode for detailed explanation.
+ * @enum {string}
+ */
+anychart.enums.OrdinalScaleMode = {
+  DISCRETE: 'discrete',
+  CONTINUOUS: 'continuous'
+};
+
+
+/**
+ * Normalizes ordinal scale mode.
+ * @param {*} value
+ * @return {anychart.enums.OrdinalScaleMode}
+ */
+anychart.enums.normalizeOrdinalScaleMode = function(value) {
+  return /** @type {anychart.enums.OrdinalScaleMode} */ (anychart.enums.normalize(anychart.enums.OrdinalScaleMode, value,
+      anychart.enums.OrdinalScaleMode.DISCRETE));
+};
