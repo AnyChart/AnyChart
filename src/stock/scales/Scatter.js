@@ -380,8 +380,8 @@ anychart.stockModule.scales.Scatter.prototype.isValueInDummyRange = function(val
           this.maxGapRange_.min belongs to real data as well.
   */
   return !!(
-      (this.minGapRange_ && val >= this.minGapRange_.min && val < this.minGapRange_.max) ||
-      (this.maxGapRange_ && val > this.maxGapRange_.min && val <= this.maxGapRange_.max)
+      (this.minGapRange_ && val < this.minGapRange_.max) ||
+      (this.maxGapRange_ && val > this.maxGapRange_.min)
   );
 };
 
