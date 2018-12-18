@@ -1342,7 +1342,7 @@ anychart.core.Base.prototype.flattenThemes = function() {
   for (var i = 0; i < this.themes_.length; i++) {
     var theme = this.themes_[i];
     if (goog.isString(theme))
-      flatTheme = anychart.getFlatTheme(theme, flatTheme, this.resolveSpecialValue);
+      flatTheme = anychart.getFlatTheme(theme, flatTheme, goog.bind(this.resolveSpecialValue, this));
     else if (goog.isObject(theme))
       goog.mixin(flatTheme, theme);
   }
