@@ -890,8 +890,8 @@ anychart.ganttModule.Column.prototype.draw = function() {
     //Ensure DOM structure is created.
     if (!this.getBase_().numChildren()) {
       this.getBase_()
-          .addChild(/** @type {!acgraph.vector.Layer} */ (this.getCellsLayer_()))
           .addChild(/** @type {!acgraph.vector.UnmanagedLayer} */ (this.getLabelsLayer_()))
+          .addChild(/** @type {!acgraph.vector.Layer} */ (this.getCellsLayer_()))
           .addChild(/** @type {!acgraph.vector.Layer} */ (this.getTitleLayer_()));
     }
 
