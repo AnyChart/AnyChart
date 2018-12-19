@@ -733,8 +733,7 @@ anychart.themes.merging.mergingMap_ = (function() {
           ['Timeline.', [
             'header',
             'labels'
-          ]],
-          'DataGrid.defaultColumnSettings.labels'
+          ]]
         ]],
         'standalones.labelsFactory',
         ['map.axesSettings.', [

@@ -65,12 +65,6 @@ anychart.core.ui.Center.prototype.SUPPORTED_SIGNALS =
 anychart.core.ui.Center.prototype.getOption = anychart.core.settings.getOption;
 
 
-/** @inheritDoc */
-anychart.core.ui.Center.prototype.isResolvable = function() {
-  return true;
-};
-
-
 //endregion
 //region --- IResolvable implementation
 /** @inheritDoc */

@@ -135,12 +135,6 @@ anychart.core.utils.Space.prototype.getSignal = function(fieldName) {
 };
 
 
-/** @inheritDoc */
-anychart.core.utils.Space.prototype.isResolvable = function() {
-  return true;
-};
-
-
 //endregion
 //region -- IResolvable implementation
 /** @inheritDoc */

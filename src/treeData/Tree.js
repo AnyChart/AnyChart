@@ -85,6 +85,7 @@ anychart.treeDataModule.Tree = function(opt_data, opt_fillMethodOrCsvMapping, op
   /**
    * Map of index comparators.
    * @type {Object.<string, function(?, ?):number>}
+   * @private
    */
   this.indexComparators_ = {};
 

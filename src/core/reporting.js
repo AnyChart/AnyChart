@@ -28,7 +28,7 @@ anychart.core.reporting.shownWarningMessages_ = {};
  * @param {Array.<*>=} opt_descArgs Description message arguments.
  */
 anychart.core.reporting.error = function(code, opt_exception, opt_descArgs) {
-  anychart.core.reporting.callLog_(
+  anychart.core.reporting.callLog(
       'error',
       ('Error: ' + code + '\nDescription: ' + anychart.core.reporting.getErrorDescription_(code, opt_descArgs)),
       (opt_exception || '')
@@ -115,14 +115,14 @@ anychart.core.reporting.info = function(codeOrMsg, opt_descArgs) {
     if (goog.isNumber(codeOrMsg)) {
       if (anychart.core.reporting.lastInfoCode_ != codeOrMsg) {
         anychart.core.reporting.lastInfoCode_ = /** @type {number} */ (codeOrMsg);
-        anychart.core.reporting.callLog_(
+        anychart.core.reporting.callLog(
             'info',
             ('Info: ' + codeOrMsg + '\nDescription: ' + anychart.core.reporting.getInfoDescription_(codeOrMsg, opt_descArgs)),
             ''
         );
       }
     } else {
-      anychart.core.reporting.callLog_('info', codeOrMsg, '');
+      anychart.core.reporting.callLog('info', codeOrMsg, '');
     }
   }
 };
@@ -162,7 +162,7 @@ anychart.core.reporting.warning = function(code, opt_exception, opt_descArgs, op
   var desc;
   if ((anychart.DEVELOP || opt_forceProd) && !anychart.core.reporting.shownWarningMessages_[desc = anychart.core.reporting.getWarningDescription_(code, opt_descArgs)]) {
     anychart.core.reporting.shownWarningMessages_[desc] = true;
-    anychart.core.reporting.callLog_(
+    anychart.core.reporting.callLog(
         'warn',
         ('Warning: ' + code + '\nDescription: ' + desc),
         (opt_exception || '')
@@ -298,14 +298,13 @@ anychart.core.reporting.getWarningDescription_ = function(code, opt_arguments) {
  * @param {string} name Log function name.
  * @param {string} message Message text.
  * @param {*=} opt_exception Exception.
- * @private
  */
-anychart.core.reporting.callLog_ = function(name, message, opt_exception) {
+anychart.core.reporting.callLog = function(name, message, opt_exception) {
   var console = anychart.window['console'];
   if (console) {
     var log = console[name] || console['log'];
     if (typeof log != 'object') {
-      log.call(console, message, opt_exception);
+      log.call(console, message, opt_exception || '');
     }
   }
 };

@@ -179,12 +179,6 @@ anychart.sunburstModule.Level.prototype.labelsSignalHandler = function(event) {
 anychart.sunburstModule.Level.prototype.getOption = anychart.core.settings.getOption;
 
 
-/** @inheritDoc */
-anychart.sunburstModule.Level.prototype.isResolvable = function() {
-  return true;
-};
-
-
 //endregion
 //region --- IResolvable implementation
 /** @inheritDoc */

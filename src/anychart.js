@@ -11,6 +11,7 @@ goog.require('anychart.base');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.StageCredits');
 goog.require('anychart.performance');
+goog.require('anychart.reflow.Measuriator');
 goog.require('anychart.themes.merging');
 goog.require('anychart.utils');
 goog.require('goog.array');
@@ -729,6 +730,17 @@ anychart.getFullTheme = function(root) {
 
   return anychart.themes.merging.getThemePart(anychart.mergedThemeClones_[anychart.mergedThemeClones_.length - 1], root);
 };
+
+
+//region -- Measuriator.
+/**
+ * Shared measuriator.
+ * @type {anychart.reflow.Measuriator}
+ */
+anychart.measuriator = new anychart.reflow.Measuriator();
+
+
+//endregion
 
 
 // we execute it here to move load from first chart drawing to library initialization phase.

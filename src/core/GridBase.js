@@ -139,12 +139,6 @@ anychart.core.GridBase.prototype.getResolutionChain = anychart.core.settings.get
 
 
 /** @inheritDoc */
-anychart.core.GridBase.prototype.isResolvable = function() {
-  return true;
-};
-
-
-/** @inheritDoc */
 anychart.core.GridBase.prototype.getLowPriorityResolutionChain = function() {
   var sett = [this.themeSettings];
   if (this.parent_) {

@@ -1035,15 +1035,9 @@ anychart.core.settings.IObjectWithSettings.prototype.invalidate = function(state
  *
  * @param {anychart.Signal|number} state Invalidation state(s).
  * @param {boolean=} opt_force Force to dispatch signal.
+ * @param {(Object.<string, *>)=} opt_meta - Meta key-value config to be copied to signal event.
  */
-anychart.core.settings.IObjectWithSettings.prototype.dispatchSignal = function(state, opt_force) {};
-
-
-/**
- * Whether implementation of IObjectWithSettings implements IResolvable also.
- * @return {boolean}
- */
-anychart.core.settings.IObjectWithSettings.prototype.isResolvable = function() {};
+anychart.core.settings.IObjectWithSettings.prototype.dispatchSignal = function(state, opt_force, opt_meta) {};
 
 
 /**

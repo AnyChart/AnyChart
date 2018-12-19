@@ -516,12 +516,6 @@ anychart.ganttBaseModule.TimeLineHeader.prototype.hasOwnOption = function(name) 
 };
 
 
-/** @inheritDoc */
-anychart.ganttBaseModule.TimeLineHeader.prototype.isResolvable = function() {
-  return true;
-};
-
-
 //endregion
 //region --- IResolvable implementation
 /** @inheritDoc */

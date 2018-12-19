@@ -61,12 +61,6 @@ anychart.core.ui.Outline.prototype.SUPPORTED_SIGNALS =
 anychart.core.ui.Outline.prototype.getOption = anychart.core.settings.getOption;
 
 
-/** @inheritDoc */
-anychart.core.ui.Outline.prototype.isResolvable = function() {
-  return true;
-};
-
-
 //endregion
 //region --- IResolvable implementation
 /** @inheritDoc */

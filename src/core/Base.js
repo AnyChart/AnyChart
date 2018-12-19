@@ -192,6 +192,9 @@ anychart.ConsistencyState = {
   DATA_GRID_COLUMN_TITLE: 1 << 6,
   DATA_GRID_COLUMN_POSITION: 1 << 7,
   DATA_GRID_COLUMN_BUTTON: 1 << 8,
+  DATA_GRID_COLUMN_LABELS_APPEARANCE: 1 << 9,
+  DATA_GRID_COLUMN_LABELS_BOUNDS: 1 << 10,
+  DATA_GRID_COLUMN_DATA: 1 << 11,
   //---------------------------------- BACKGROUND STATES (VB) ---------------------------------
   BACKGROUND_POINTER_EVENTS: 1 << 6,
   //---------------------------------- LABEL STATES (VB) ---------------------------------
@@ -408,7 +411,10 @@ anychart.Signal = {
   ENABLED_STATE_CHANGED: 1 << 15,
   Z_INDEX_STATE_CHANGED: 1 << 16,
   NEED_RECALCULATE_LEGEND: 1 << 17,
-  NEEDS_UPDATE_MARKERS: 1 << 18
+  NEEDS_UPDATE_MARKERS: 1 << 18,
+
+  MEASURE_COLLECT: 1 << 19, //Special Measuriator signal to collect texts to measure.
+  MEASURE_BOUNDS: 1 << 20 //Special Measuriator signal to measure already collected texts.
 };
 
 
@@ -682,12 +688,6 @@ anychart.core.Base.prototype.getInvalidationCondition = function(fieldName) {
   return meta ?
       (meta.invalidationCondition || anychart.core.settings.DEFAULT_INVALIDATION_CONDITION) :
       anychart.core.settings.DEFAULT_INVALIDATION_CONDITION;
-};
-
-
-/** @inheritDoc */
-anychart.core.Base.prototype.isResolvable = function() {
-  return false;
 };
 
 
@@ -1081,15 +1081,17 @@ anychart.core.Base.prototype.hasInvalidationState = function(state) {
  *
  * @param {anychart.Signal|number} signal Invalidation signal(s).
  * @param {boolean=} opt_force Force to dispatch signal.
+ * @param {(Object.<string, *>)=} opt_meta - Meta key-value config to be copied to signal event.
  */
-anychart.core.Base.prototype.dispatchSignal = function(signal, opt_force) {
+anychart.core.Base.prototype.dispatchSignal = function(signal, opt_force, opt_meta) {
   signal &= this.SUPPORTED_SIGNALS;
   if (!signal) return;
   if (isNaN(this.suspendedDispatching) || !!opt_force) {
     // Hack to prevent Signal events bubbling. May be we should use all advantages of bubbling but not now.
     var parent = this.getParentEventTarget();
     this.setParentEventTarget(null);
-    this.dispatchEvent(new anychart.SignalEvent(this, signal));
+    var ev = new anychart.SignalEvent(this, signal, opt_meta);
+    this.dispatchEvent(ev);
     this.setParentEventTarget(parent);
   } else {
     this.suspendedDispatching |= signal;
@@ -1509,10 +1511,11 @@ anychart.core.Base.resumeSignalsDispatchingFalse = function(var_args) {
  * Special event for changes in dirty states.
  * @param {anychart.core.Base} target Event target.
  * @param {number} invalidatedStates Changes effectively happened with the target.
+ * @param {Object=} opt_meta - Metadata to attach to signal event.
  * @constructor
  * @extends {goog.events.Event}
  */
-anychart.SignalEvent = function(target, invalidatedStates) {
+anychart.SignalEvent = function(target, invalidatedStates, opt_meta) {
   anychart.SignalEvent.base(this, 'constructor', anychart.enums.EventType.SIGNAL, target);
 
   /**
@@ -1520,6 +1523,9 @@ anychart.SignalEvent = function(target, invalidatedStates) {
    * @type {number}
    */
   this.signals = invalidatedStates;
+
+  if (opt_meta)
+    goog.mixin(this, opt_meta);
 };
 goog.inherits(anychart.SignalEvent, goog.events.Event);
 

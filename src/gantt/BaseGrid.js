@@ -376,8 +376,9 @@ goog.inherits(anychart.ganttModule.BaseGrid, anychart.core.VisualBaseWithBounds)
  * Supported signals.
  * @type {number}
  */
-anychart.ganttModule.BaseGrid.SUPPORTED_SIGNALS =
+anychart.ganttModule.BaseGrid.prototype.SUPPORTED_SIGNALS =
     anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_SIGNALS |
+    anychart.Signal.MEASURE_COLLECT | //Signal for measuriator.
     anychart.Signal.NEEDS_REAPPLICATION; //Live edit coloring.
 
 
@@ -1878,12 +1879,14 @@ anychart.ganttModule.BaseGrid.prototype.drawRowFills_ = function() {
     var path = i % 2 ? this.evenPath_ : this.oddPath_;
 
     var newTop = /** @type {number} */ (top + height);
-    path
-        .moveTo(this.pixelBoundsCache.left, top)
-        .lineTo(this.pixelBoundsCache.left + this.totalGridsWidth, top)
-        .lineTo(this.pixelBoundsCache.left + this.totalGridsWidth, newTop)
-        .lineTo(this.pixelBoundsCache.left, newTop)
-        .close();
+    if (!anychart.utils.isNone(path.fill())) {
+      path
+          .moveTo(this.pixelBoundsCache.left, top)
+          .lineTo(this.pixelBoundsCache.left + this.totalGridsWidth, top)
+          .lineTo(this.pixelBoundsCache.left + this.totalGridsWidth, newTop)
+          .lineTo(this.pixelBoundsCache.left, newTop)
+          .close();
+    }
 
     if (item.meta('selected')) {
       this.selectedItem_ = item; //In case of restoration from XML/JSON, this allows to save selected item state.
@@ -2067,7 +2070,8 @@ anychart.ganttModule.BaseGrid.prototype.createController = function(opt_isResour
  * @return {anychart.ganttModule.BaseGrid} - Itself for method chaining.
  */
 anychart.ganttModule.BaseGrid.prototype.drawInternal = function(positionRecalculated) {
-  if (positionRecalculated) this.invalidate(anychart.ConsistencyState.GRIDS_POSITION);
+  if (positionRecalculated)
+    this.invalidate(anychart.ConsistencyState.GRIDS_POSITION);
 
   if (!this.checkDrawingNeeded()) return this;
 
@@ -2267,6 +2271,12 @@ anychart.ganttModule.BaseGrid.prototype.drawInternal = function(positionRecalcul
  * Additional actions while DOM initialization.
  */
 anychart.ganttModule.BaseGrid.prototype.initDom = goog.nullFunction;
+
+
+/**
+ * Prepares labels to be measured.
+ */
+anychart.ganttModule.BaseGrid.prototype.prepareLabels = goog.nullFunction;
 
 
 /**
@@ -2550,7 +2560,7 @@ anychart.ganttModule.BaseGrid.prototype.selectRow = function(item) {
 /**
  * Special invalidation. Used by child classes to preform own invalidation.
  */
-anychart.ganttModule.BaseGrid.prototype.specialInvalidated = function(){};
+anychart.ganttModule.BaseGrid.prototype.specialInvalidated = function() {};
 
 
 /**

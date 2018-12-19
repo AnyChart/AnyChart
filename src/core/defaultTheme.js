@@ -826,6 +826,41 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'positionFormatter': anychart.core.defaultTheme.returnValue
   },
 
+  'defaultSimpleLabelsSettings': {
+    'fontSize': 13,
+    'fontFamily': 'Verdana, Helvetica, Arial, sans-serif',
+    'fontColor': anychart.core.defaultTheme.fontColorNormal,
+    'textDirection': 'ltr',
+    'fontOpacity': 1,
+    'fontDecoration': 'none',
+    'fontStyle': 'normal',
+    'fontVariant': 'normal',
+    'fontWeight': 'normal',
+    'letterSpacing': 'normal',
+    'lineHeight': 'normal',
+    'textIndent': 0,
+    'vAlign': 'top',
+    'hAlign': 'left',
+    'wordWrap': null,
+    'wordBreak': null,
+    'textOverflow': false,
+    'selectable': false,
+    'useHtml': false,
+    'allowMultiline': false,
+
+    'padding': 4,
+    // 'format': '',
+    'width': null,
+    'height': null,
+    'anchor': 'left-top',
+    'position': 'left-top',
+    'offsetX': 0,
+    'offsetY': 0,
+    'enabled': true,
+    'disablePointerEvents': true
+  },
+
+
   'defaultMarkerFactory': {
     'anchor': 'center',
     'size': 6,

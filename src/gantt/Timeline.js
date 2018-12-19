@@ -356,7 +356,7 @@ goog.inherits(anychart.ganttModule.TimeLine, anychart.ganttModule.BaseGrid);
  * Supported signals.
  * @type {number}
  */
-anychart.ganttModule.TimeLine.SUPPORTED_SIGNALS = anychart.ganttModule.BaseGrid.prototype.SUPPORTED_SIGNALS;
+anychart.ganttModule.TimeLine.prototype.SUPPORTED_SIGNALS = anychart.ganttModule.BaseGrid.prototype.SUPPORTED_SIGNALS;
 
 
 /**

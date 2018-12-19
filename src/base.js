@@ -32,6 +32,13 @@ anychart.DEVELOP = true;
 
 
 /**
+ * Defines if measurements order must be debugged.
+ * @define {boolean} Replaced on compile time.
+ */
+anychart.DEBUG_MEASUREMENTS = false;
+
+
+/**
  * Defines the default theme.
  * @define {string} Replaced on compile time.
  */
