@@ -37,6 +37,7 @@
             <!-- Common elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="data" type="Data"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="tree_data" type="TreeData"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="word_tree_raw_data" type="xsd:string" />
             <xsd:element minOccurs="0" maxOccurs="1" name="palette" type="palettes.Colors"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="hatch_fill_palette" type="palettes.HatchFills"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="marker_palette" type="palettes.Markers"/>
@@ -131,6 +132,8 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="node" type="core.SankeyVisualElement"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="flow" type="core.SankeyVisualElement"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="dropoff" type="core.SankeyVisualElement"/>
+            <!-- chart.Wordtree elements -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="connectors" type="core.WordtreeConnectors"/>
         </xsd:all>
         <!-- core.Chart attrs -->
         <xsd:attributeGroup ref="attrs.VisualBase"/>
@@ -261,6 +264,19 @@
         <xsd:attribute name="node_width" type="simple.NumberOrPercent" />
         <xsd:attribute name="node_padding" type="xsd:double" />
         <xsd:attribute name="curve_factor" type="simple.Ratio" />
+        <!-- chart.Wordtree attributes -->
+        <xsd:attribute name="word" type="xsd:string" />
+        <xsd:attribute name="max_font_size" type="simple.NumberOrNull" />
+        <xsd:attribute name="min_font_size" type="simple.NumberOrNull" />
+        <xsd:attribute name="postfix" type="xsd:string" />
+        <xsd:attribute name="font_family" type="xsd:string" />
+        <xsd:attribute name="font_decoration" type="xsd:string" />
+        <xsd:attribute name="font_opacity" type="simple.Ratio" />
+        <xsd:attribute name="font_style" type="enums.FontStyle" />
+        <xsd:attribute name="font_weight" type="xsd:string" />
+        <xsd:attribute name="font_color" type="xsd:string" />
+        <xsd:attribute name="word_tree_raw_data" type="xsd:string" />
+
     </xsd:complexType>
 
     <xsd:complexType name="Gauge">
@@ -2911,6 +2927,19 @@
         <xsd:attribute name="tooltip" type="simple.BoolOrNull" default="true"/>
     </xsd:complexType>
 
+    <xsd:complexType name="core.WordtreeConnectors">
+        <xsd:all>
+            <xsd:element name="stroke" type="Stroke" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="curve_factor" type="simple.NumberOrNull" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="length" type="simple.NumberOrNull" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="offset" type="simple.NumberOrNull" minOccurs="0" maxOccurs="1"/>
+        </xsd:all>
+        <xsd:attribute name="stroke" type="xsd:string"/>
+        <xsd:attribute name="curve_factor" type="xsd:string"/>
+        <xsd:attribute name="length" type="xsd:string"/>
+        <xsd:attribute name="offset" type="xsd:string"/>
+    </xsd:complexType>
+
     <xsd:complexType name="core.SunburstLevels">
         <xsd:sequence minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="level" type="core.sunburst.Level"/>
@@ -3341,6 +3370,7 @@
             <xsd:enumeration value="candlestick"/>
             <xsd:enumeration value="stick"/>
             <xsd:enumeration value="step-line"/>
+            <xsd:enumeration value="wordtree"/>
         </xsd:restriction>
     </xsd:simpleType>
 

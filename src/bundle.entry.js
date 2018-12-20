@@ -39,4 +39,5 @@ goog.require('anychart.treemapModule.entry');
 goog.require('anychart.ui.entry');
 goog.require('anychart.vennModule.entry');
 goog.require('anychart.waterfallModule.entry');
+goog.require('anychart.wordtreeModule.entry');
 

@@ -936,6 +936,7 @@ goog.exportSymbol('anychart.mekko', anychart.getFeatureOrError('anychart.mekko',
 goog.exportSymbol('anychart.mosaic', anychart.getFeatureOrError('anychart.mosaic', 'Mosaic chart'));
 goog.exportSymbol('anychart.barmekko', anychart.getFeatureOrError('anychart.barmekko', 'Barmekko chart'));
 goog.exportSymbol('anychart.waterfall', anychart.getFeatureOrError('anychart.waterfall', 'Waterfall chart'));
+goog.exportSymbol('anychart.wordtree', anychart.getFeatureOrError('anychart.wordtree', 'Wordtree chart'));
 goog.exportSymbol('anychart.sankey', anychart.getFeatureOrError('anychart.sankey', 'Sankey chart'));
 goog.exportSymbol('anychart.standalones.background', anychart.getFeatureOrError('anychart.standalones.background', 'anychart.standalones.Background'));
 goog.exportSymbol('anychart.standalones.colorRange', anychart.getFeatureOrError('anychart.standalones.colorRange', 'anychart.standalones.ColorRange'));

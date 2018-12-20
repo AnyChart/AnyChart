@@ -73,6 +73,9 @@
             },
             {
               "$ref": "#/definitions/anychart.charts.Sankey"
+            },
+            {
+              "$ref": "#/definitions/anychart.charts.Wordtree"
             }
           ],
           "properties": {
@@ -615,7 +618,8 @@
             "ohlc",
             "candlestick",
             "stick",
-            "step-line"
+            "step-line",
+            "hilo"
           ]
         },
         "categorizedBySeries": {
@@ -1521,6 +1525,107 @@
         "flow": {"$ref": "#/definitions/SankeyVisualElement"},
         "dropoff": {"$ref": "#/definitions/SankeyVisualElement"}
       }
+    },
+    "anychart.charts.Wordtree": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/anychart.core.Chart"
+        }
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "wordtree"
+          ]
+        },
+        "treeData": {
+          "$ref": "#/definitions/treeData"
+        },
+        "wordTreeRawData": {
+          "anyOf":[
+            {"type":"string"},
+            {"type":"array"}
+          ]
+        },
+        "word": {
+          "type": "string"
+        },
+        "maxFontSize": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "postfix": {
+          "type": "string"
+        },
+        "minFontSize": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "fontFamily": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "fontDecoration": {
+          "enum": [
+            "blink",
+            "line-through",
+            "overline",
+            "underline",
+            "none",
+            "null"
+          ]
+        },
+        "fontOpacity": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "fontStyle": {
+          "enum": [
+            "normal",
+            "italic",
+            "oblique",
+            "null"
+          ]
+        },
+        "fontWeight": {
+          "type": [
+            "string",
+            "number",
+            "null"
+          ]
+        },
+        "connectors": {
+          "type": "object",
+          "properties": {
+            "curveFactor": {
+              "type": "number"
+            },
+            "offset": {
+              "type": "number"
+            },
+            "length": {
+              "type": "number"
+            },
+            "stroke": {
+              "$ref": "#/definitions/stroke"
+            }
+          }
+        }
+      },
+      "required": [
+        "type"
+      ]
     },
     "anychart.charts.Bullet": {
       "type": "object",

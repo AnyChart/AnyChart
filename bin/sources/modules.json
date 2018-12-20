@@ -241,6 +241,12 @@
         "cartesian"
       ]
     },
+    "wordtree": {
+      "entry": "anychart.wordtreeModule.entry",
+      "deps": [
+        "core"
+      ]
+    },
     "theme-annotations": {
       "entry": "anychart.annotationsModule.defaultTheme",
       "deps": [
@@ -431,6 +437,13 @@
     },
     "theme-sankey": {
       "entry": "anychart.sankeyModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-wordtree": {
+      "entry": "anychart.wordtreeModule.defaultTheme",
       "deps": [
         "core",
         "theme-core"
@@ -866,6 +879,18 @@
       "parts": [
         "sankey",
         "theme-sankey"
+      ]
+    },
+    "anychart-wordtree": {
+      "type": "chart-type",
+      "name": "Wordtree",
+      "desc": "Wordtree charts module.",
+      "docs": "https://docs.anychart.com/Basic_Charts/Wordtree_Chart",
+      "icon": "/_design/img/upload/charts/types/wordtree-chart.svg",
+      "parts": [
+        "tree-data",
+        "wordtree",
+        "theme-wordtree"
       ]
     }
   },

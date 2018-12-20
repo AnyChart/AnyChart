@@ -65,7 +65,8 @@ anychart.enums.ChartTypes = {
   HILO: 'hilo',
   WATERFALL: 'waterfall',
   SUNBURST: 'sunburst',
-  SANKEY: 'sankey'
+  SANKEY: 'sankey',
+  WORDTREE: 'wordtree'
 };
 
 
