@@ -354,7 +354,6 @@ anychart.ganttModule.Column.prototype.hasLabelsOverrider = function() {
  */
 anychart.ganttModule.Column.prototype.controllerListener_ = function(event) {
   if (event.hasSignal(anychart.Signal.DATA_CHANGED)) {
-
     /*
       anychart.core.ui.OptimizedText is not IDisposable, that's why we
       use such a killing for a while.

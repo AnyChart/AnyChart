@@ -378,6 +378,17 @@ anychart.treeDataModule.View.DataItem.prototype.tree = function() {
 
 
 /**
+ * DNA test.
+ * TODO (A.Kudryavtsev): Add description on exporting this method.
+ * @param {anychart.treeDataModule.View.DataItem} potentialParent - Suspicious data item.
+ * @return {boolean} - Whether current data item is child of set in parameter.
+ */
+anychart.treeDataModule.View.DataItem.prototype.isChildOf = function(potentialParent) {
+  return anychart.treeDataModule.Tree.isDescendant(this.dataItem_, potentialParent.getDataItem()); //Just sugar.
+};
+
+
+/**
  * Return Tree view.
  * @return {anychart.treeDataModule.View}
  */
