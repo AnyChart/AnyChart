@@ -368,7 +368,7 @@ anychart.ganttModule.Column.prototype.controllerListener_ = function(event) {
       Column dispatches NEEDS_REDRAW because DG decides itself
       when to dispatch MEASURE_COLLECT in dg.prepareLabels() .
      */
-    this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_DATA, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_DATA);
   }
 };
 

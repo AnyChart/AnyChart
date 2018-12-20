@@ -525,6 +525,8 @@ anychart.ganttModule.Controller.prototype.linearizeData_ = function() {
   this.linearIndex_ = 0;
   this.minDate_ = NaN;
   this.maxDate_ = NaN;
+  this.startIndex_ = NaN;
+  this.endIndex_ = NaN;
   this.allItems_.length = 0;
 
   this.data_.suspendSignalsDispatching();
