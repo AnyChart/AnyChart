@@ -373,9 +373,9 @@ def __json_2_xml_version(value=None, rc=False):
 def __all_files_versions(value=None, rc=False):
     return {
         "json2xml": __json_2_xml_version(value, rc),
-        "xml-schema-target": __xml_schema_target_namespace_version(value, rc),
-        "xml-schema-xmlns": __xml_schema_xmlns_version(value, rc),
-        "json-schema": __json_schema_version(value, rc),
+        # "xml-schema-target": __xml_schema_target_namespace_version(value, rc),
+        # "xml-schema-xmlns": __xml_schema_xmlns_version(value, rc),
+        # "json-schema": __json_schema_version(value, rc),
         "definition-file": __definition_file_version(value, rc),
         "package-json": __package_json_version(value, rc),
         "project-(version-ini)": __project_version(value)
@@ -992,15 +992,17 @@ def __compile_project(*args, **kwargs):
         with open(os.path.join(output, 'modules.json'), 'w') as f:
             f.write(json.dumps(modules_json))
 
-        resource_json = {'modules': modules_json, 'addons': {}, 'css': {}, 'fonts': {}}
+        # resource_json = {'modules': modules_json, 'addons': {}, 'css': {}, 'fonts': {}}
+        resource_json = {}
+        resource_json['modules'] = modules_json
+        resource_json['css'] = build_css_indexes()
+        resource_json['fonts'] = build_fonts_indexes()
         resource_json['themes'] = __get_modules_config()['themes']
         resource_json['locales'] = build_locales_indexes()
         resource_json['geodata'] = build_geodata_indexes()
-        resource_json['css'] = build_css_indexes()
-        resource_json['fonts'] = build_fonts_indexes()
-        resource_json['addons'] = [ {'name': 'anychart-chart-editor.min.js'},
-                                    {'name': 'graphics.js'},
-                                    {'name': 'graphics.min.js'} ]
+        # resource_json['addons'] = [ {'name': 'anychart-chart-editor.min.js'},
+        #                             {'name': 'graphics.js'},
+        #                             {'name': 'graphics.min.js'} ]
 
         with open(os.path.join(output, 'resources.json'), 'w') as f:
             f.write(json.dumps(resource_json))
