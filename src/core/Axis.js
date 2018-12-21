@@ -972,7 +972,7 @@ anychart.core.Axis.prototype.applyStaggerMode_ = function(opt_bounds) {
               states[i] = false;
             }
           } else if (i == ticksArrLen - 1) {
-            if (drawLastLabel&& isLabelInInsideSpace) {
+            if (drawLastLabel && isLabelInInsideSpace) {
               prevDrawableLabel = i;
               states[i] = true;
             } else {
@@ -1058,8 +1058,8 @@ anychart.core.Axis.prototype.getLabel = function(index, isMajor, ticksArray, opt
     var bounds = goog.isDef(opt_parentBounds) ? opt_parentBounds : this.getPixelBounds();
     var lineBounds = goog.isDef(opt_parentBounds) ? opt_parentBounds : this.line.getBounds();
     var ticks = /** @type {!anychart.core.AxisTicks} */(isMajor ? this.ticks() : this.minorTicks());
-    var stroke = this.getOption('stroke');
-    var lineThickness = !stroke || anychart.utils.isNone(stroke) ? 0 : stroke['thickness'] ? parseFloat(stroke['thickness']) : 1;
+    var stroke = /** @type {acgraph.vector.Stroke} */(this.getOption('stroke'));
+    var lineThickness = anychart.utils.extractThickness(stroke);
 
     var x, y;
     var scale = /** @type {anychart.scales.ScatterBase|anychart.scales.Ordinal} */(this.scale());
@@ -1134,9 +1134,8 @@ anychart.core.Axis.prototype.getLabelBounds_ = function(index, isMajor, ticksArr
   var bounds = goog.isDef(opt_parentBounds) ? opt_parentBounds : this.getPixelBounds();
   var lineBounds = goog.isDef(opt_parentBounds) ? opt_parentBounds : this.line.getBounds();
   var ticks = /** @type {!anychart.core.AxisTicks} */(isMajor ? this.ticks() : this.minorTicks());
-  var stroke = /**@type {acgraph.vector.Stroke|string}*/(this.getOption('stroke'));
-  stroke = acgraph.vector.normalizeStroke(stroke);
-  var lineThickness = !stroke || anychart.utils.isNone(stroke) ? 0 : stroke['thickness'] ? parseFloat(stroke['thickness']) : 1;
+  var stroke = /**@type {acgraph.vector.Stroke}*/(this.getOption('stroke'));
+  var lineThickness = anychart.utils.extractThickness(stroke);
 
   var labels = isMajor ? this.labels() : this.minorLabels();
 
@@ -1159,24 +1158,9 @@ anychart.core.Axis.prototype.getLabelBounds_ = function(index, isMajor, ticksArr
   var tickLength = anychart.utils.getAffectBoundsTickLength(ticks, side);
 
 
-  switch (this.getOption('orientation')) {
-    case anychart.enums.Orientation.TOP:
-      x = Math.round(bounds.left + ratio * bounds.width);
-      y = lineBounds.top - lineThickness / 2 - tickLength;
-      break;
-    case anychart.enums.Orientation.RIGHT:
-      x = lineBounds.getRight() + lineThickness / 2 + tickLength;
-      y = Math.round(bounds.getBottom() - ratio * bounds.height);
-      break;
-    case anychart.enums.Orientation.BOTTOM:
-      x = Math.round(bounds.left + ratio * bounds.width);
-      y = lineBounds.getBottom() + lineThickness / 2 + tickLength;
-      break;
-    case anychart.enums.Orientation.LEFT:
-      x = lineBounds.left - lineThickness / 2 - tickLength;
-      y = Math.round(bounds.getBottom() - ratio * bounds.height);
-      break;
-  }
+  var labelPositionXY = this.getLabelPositionXY(bounds, ratio, lineThickness, tickLength, lineBounds);
+  x = labelPositionXY.x;
+  y = labelPositionXY.y;
 
   var positionProvider = {'value': {'x': x, 'y': y}};
 
@@ -1291,6 +1275,41 @@ anychart.core.Axis.prototype.getLabelBounds_ = function(index, isMajor, ticksArr
   //   .lineTo(coordBox[0], coordBox[1]);
 
   return boundsCache[index] = coordBox;
+};
+
+
+/**
+ * Calculates label position and returns it's coordinates.
+ * @param {goog.math.Rect} bounds where label is drawn.
+ * @param {number} ratio is a position along axis.
+ * @param {number} lineThickness of axis.
+ * @param {number} tickLength length of tick.
+ * @param {goog.math.Rect} lineBounds bounds of axis line.
+ * @return {{x: number, y: number}} position of label.
+ * @protected
+ */
+anychart.core.Axis.prototype.getLabelPositionXY = function(bounds, ratio, lineThickness, tickLength, lineBounds) {
+  var x = 0;
+  var y = 0;
+  switch (this.getOption('orientation')) {
+    case anychart.enums.Orientation.TOP:
+      x = Math.round(bounds.left + ratio * bounds.width);
+      y = lineBounds.top - lineThickness / 2 - tickLength;
+      break;
+    case anychart.enums.Orientation.RIGHT:
+      x = lineBounds.getRight() + lineThickness / 2 + tickLength;
+      y = Math.round(bounds.getBottom() - ratio * bounds.height);
+      break;
+    case anychart.enums.Orientation.BOTTOM:
+      x = Math.round(bounds.left + ratio * bounds.width);
+      y = lineBounds.getBottom() + lineThickness / 2 + tickLength;
+      break;
+    case anychart.enums.Orientation.LEFT:
+      x = lineBounds.left - lineThickness / 2 - tickLength;
+      y = Math.round(bounds.getBottom() - ratio * bounds.height);
+      break;
+  }
+  return {x: x, y: y};
 };
 
 
@@ -1655,7 +1674,7 @@ anychart.core.Axis.prototype.getPixelBounds = function(opt_includeInsideContent)
     }
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
-  return affectInsideContent? this.pixelBoundsWithInside : this.pixelBounds;
+  return affectInsideContent ? this.pixelBoundsWithInside : this.pixelBounds;
 };
 
 
@@ -1775,15 +1794,58 @@ anychart.core.Axis.prototype.drawLine = function() {
       break;
   }
 
-  var stroke = /**@type {acgraph.vector.Stroke|string}*/(this.getOption('stroke'));
-  stroke = acgraph.vector.normalizeStroke(stroke);
-  var lineThickness = stroke && stroke['thickness'] ? parseFloat(stroke['thickness']) : 1;
+  var stroke = /**@type {acgraph.vector.Stroke}*/(this.getOption('stroke'));
+  var lineThickness = anychart.utils.extractThickness(stroke);
+  lineThickness = lineThickness ? lineThickness : 1; // this is to keep old behaviour
+
   var pixelShift = lineThickness % 2 == 0 ? 0 : 0.5;
   var bounds = this.getPixelBounds();
 
   lineDrawer.call(this, bounds, pixelShift, lineThickness, 0, 0);
 
   this.line.stroke(/** @type {acgraph.vector.Stroke} */(stroke));
+};
+
+
+/**
+ * Calculates and returns position for label to draw in.
+ * @param {number} ratio along axis.
+ * @param {goog.math.Rect} labelBounds label size.
+ * @param {number} staggerSize
+ * @param {number} tickLength length of tick at the label position.
+ * @param {number} pixelShift amount of shift for cripier svg look.
+ * @param {number} labelsSidePosition where labels go to.
+ * @param {boolean} isMajor whether this is major tick label.
+ * @return {{x: number, y: number}} value to be used as label position provider.
+ * @protected
+ */
+anychart.core.Axis.prototype.getLabelDrawPosition = function(ratio, labelBounds, staggerSize, tickLength, pixelShift, labelsSidePosition, isMajor) {
+  var bounds = this.getPixelBounds();
+  var lineBounds = this.line.getBounds();
+  var stroke = /**@type {acgraph.vector.Stroke}*/(this.getOption('stroke'));
+  var lineThickness = anychart.utils.extractThickness(stroke);
+  var orientation = this.getOption('orientation');
+  var x = 0;
+  var y = 0;
+  switch (orientation) {
+    case anychart.enums.Orientation.TOP:
+      x = Math.round(bounds.left + ratio * bounds.width) + pixelShift;
+      y = lineBounds.top - labelsSidePosition * (lineThickness / 2 + labelBounds.height / 2 + staggerSize) - tickLength;
+      break;
+    case anychart.enums.Orientation.RIGHT:
+      x = lineBounds.getRight() + labelsSidePosition * (lineThickness / 2 + labelBounds.width / 2 + staggerSize) + tickLength;
+      y = Math.round(bounds.top + bounds.height - ratio * bounds.height) + pixelShift;
+      break;
+    case anychart.enums.Orientation.BOTTOM:
+      x = Math.round(bounds.left + ratio * bounds.width) + pixelShift;
+      y = lineBounds.getBottom() + labelsSidePosition * (lineThickness / 2 + labelBounds.height / 2 + staggerSize) + tickLength;
+      break;
+    case anychart.enums.Orientation.LEFT:
+      x = lineBounds.left - labelsSidePosition * (lineThickness / 2 + labelBounds.width / 2 + staggerSize) - tickLength;
+      y = Math.round(bounds.top + bounds.height - ratio * bounds.height) + pixelShift;
+      break;
+  }
+  return {x: x, y: y};
 };
 
 
@@ -1813,14 +1875,7 @@ anychart.core.Axis.prototype.drawLabel_ = function(value, ratio, index, pixelShi
     return;
   }
 
-  var bounds = this.getPixelBounds();
-  var lineBounds = this.line.getBounds();
-
-  var stroke = /**@type {acgraph.vector.Stroke|string}*/(this.getOption('stroke'));
-  stroke = acgraph.vector.normalizeStroke(stroke);
-  var lineThickness = !stroke || anychart.utils.isNone(stroke) ? 0 : stroke['thickness'] ? parseFloat(stroke['thickness']) : 1;
   var labelBounds = anychart.math.Rect.fromCoordinateBox(this.getLabelBounds_(index, isMajor, ticksArr));
-  var orientation = this.getOption('orientation');
   var staggerSize = 0;
 
   if (isMajor) {
@@ -1843,26 +1898,8 @@ anychart.core.Axis.prototype.drawLabel_ = function(value, ratio, index, pixelShi
   var labelsSidePosition = anychart.utils.sidePositionToNumber(/** @type {anychart.enums.SidePosition} */(labels.getOption('position')));
   var tickLength = anychart.utils.getAffectBoundsTickLength(ticks, labelsSidePosition);
 
-  var x, y;
-  switch (orientation) {
-    case anychart.enums.Orientation.TOP:
-      x = Math.round(bounds.left + ratio * bounds.width) + pixelShift;
-      y = lineBounds.top - labelsSidePosition * (lineThickness / 2 + labelBounds.height / 2 + staggerSize) - tickLength;
-      break;
-    case anychart.enums.Orientation.RIGHT:
-      x = lineBounds.getRight() + labelsSidePosition * (lineThickness / 2 + labelBounds.width / 2 + staggerSize) + tickLength;
-      y = Math.round(bounds.top + bounds.height - ratio * bounds.height) + pixelShift;
-      break;
-    case anychart.enums.Orientation.BOTTOM:
-      x = Math.round(bounds.left + ratio * bounds.width) + pixelShift;
-      y = lineBounds.getBottom() + labelsSidePosition * (lineThickness / 2 + labelBounds.height / 2 + staggerSize) + tickLength;
-      break;
-    case anychart.enums.Orientation.LEFT:
-      x = lineBounds.left - labelsSidePosition * (lineThickness / 2 + labelBounds.width / 2 + staggerSize) - tickLength;
-      y = Math.round(bounds.top + bounds.height - ratio * bounds.height) + pixelShift;
-      break;
-  }
-  var positionProvider = {'value': {x: x, y: y}};
+  var drawPosition = this.getLabelDrawPosition(ratio, labelBounds, staggerSize, tickLength, pixelShift, labelsSidePosition, isMajor);
+  var positionProvider = {'value': drawPosition};
   var label = labels.getLabel(index);
   if (!label) {
     var formatProvider = this.getLabelsFormatProvider(index, value);
@@ -1902,6 +1939,33 @@ anychart.core.Axis.prototype.checkDrawingNeeded = function() {
 
 
 /**
+ * Title drawing for inheritance.
+ * @protected
+ */
+anychart.core.Axis.prototype.drawTitle = function() {
+  var title = this.title();
+  title.parentBounds(this.getPixelBounds());
+  title.defaultOrientation(/** @type {anychart.enums.Orientation} */(this.getOption('orientation')));
+  title.draw();
+};
+
+
+/**
+ * Updates line z index.
+ * @protected
+ */
+anychart.core.Axis.prototype.updateZIndex = function() {
+  var zIndex = /** @type {number}*/(this.zIndex());
+  this.line.zIndex(zIndex);
+  this.title().zIndex(zIndex);
+  this.ticks().zIndex(zIndex);
+  this.minorTicks().zIndex(zIndex);
+  this.labels().zIndex(zIndex);
+  this.minorLabels().zIndex(zIndex);
+};
+
+
+/**
  * Axis drawing.
  * @return {anychart.core.Axis} An instance of {@link anychart.core.Axis} class for method chaining.
  */
@@ -1935,13 +1999,7 @@ anychart.core.Axis.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
-    var zIndex = /** @type {number} */(this.zIndex());
-    this.title().zIndex(zIndex);
-    this.line.zIndex(zIndex);
-    axisTicks.zIndex(zIndex);
-    axisMinorTicks.zIndex(zIndex);
-    this.labels().zIndex(zIndex);
-    this.minorLabels().zIndex(zIndex);
+    this.updateZIndex();
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 
@@ -1958,10 +2016,7 @@ anychart.core.Axis.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.AXIS_TITLE)) {
-    var title = this.title();
-    title.parentBounds(this.getPixelBounds());
-    title.defaultOrientation(orientation);
-    title.draw();
+    this.drawTitle();
     this.markConsistent(anychart.ConsistencyState.AXIS_TITLE);
   }
 
@@ -2003,9 +2058,9 @@ anychart.core.Axis.prototype.draw = function() {
     var tickVal, ratio, drawLabel, drawTick;
     var pixelBounds = this.getPixelBounds();
     var lineBounds = this.line.getBounds();
-    var stroke =  /**@type {acgraph.vector.Stroke|string}*/(this.getOption('stroke'));
+    var stroke =  /**@type {acgraph.vector.Stroke}*/(this.getOption('stroke'));
     stroke = acgraph.vector.normalizeStroke(stroke);
-    lineThickness = !stroke || anychart.utils.isNone(stroke) ? 0 : stroke['thickness'] ? parseFloat(stroke['thickness']) : 1;
+    lineThickness = anychart.utils.extractThickness(stroke);
     var isOrdinal = anychart.utils.instanceOf(scale, anychart.scales.Ordinal);
 
     if (anychart.utils.instanceOf(scale, anychart.scales.ScatterBase)) {
@@ -2256,9 +2311,8 @@ anychart.core.Axis.prototype.getLabelsPositionProvider = function(index, isMajor
   var lineBounds = goog.isDef(opt_parentBounds) ? opt_parentBounds : this.line.getBounds();
   var ticks = /** @type {anychart.core.AxisTicks} */(isMajor ? this.ticks() : this.minorTicks());
   var ticksLength = /** @type {number} */(ticks.getOption('length'));
-  var stroke = /**@type {acgraph.vector.Stroke|string}*/(this.getOption('stroke'));
-  stroke = acgraph.vector.normalizeStroke(stroke);
-  var lineThickness = !stroke || anychart.utils.isNone(stroke) ? 0 : stroke['thickness'] ? parseFloat(stroke['thickness']) : 1;
+  var stroke = /**@type {acgraph.vector.Stroke}*/(this.getOption('stroke'));
+  var lineThickness = anychart.utils.extractThickness(stroke);
 
   var isEnabled = ticks.enabled();
   var position = /** @type {anychart.enums.SidePosition} */(ticks.getOption('position'));

@@ -98,6 +98,9 @@ anychart.core.reporting.getErrorDescription_ = function(code, opt_arguments) {
         '" cannot be drawn, because it requires ', req.length,
         ' shapes with the following names: ', shapes.join(', ')].join('');
 
+    case anychart.enums.ErrorCode.SURFACE_DATA_MALFORMED:
+      return 'Surface chart data is malformed.';
+
     default:
       return 'Unknown error occurred. Please, contact support team at http://support.anychart.com/.\n' +
           'We will be very grateful for your report.';
@@ -286,6 +289,10 @@ anychart.core.reporting.getWarningDescription_ = function(code, opt_arguments) {
       return 'Last state for store \'' + opt_arguments[0] + '\' has been used.';
     case anychart.enums.WarningCode.STORE_STATE_PAIR_EXISTS:
       return 'State \'' + opt_arguments[1] + '\' already exists in \'' + opt_arguments[0] + '\' store.';
+
+    case anychart.enums.WarningCode.SURFACE_POOR_PERFORMANCE:
+      return 'Surface chart has ' + opt_arguments[0] + ' points now. If more than 3000 points are drawn on surface' +
+          ' chart you may experience instability and poor performance.';
 
     default:
       return 'Unknown error. Please, contact support team at http://support.anychart.com/.\n' +

@@ -66,6 +66,7 @@ anychart.enums.ChartTypes = {
   WATERFALL: 'waterfall',
   SUNBURST: 'sunburst',
   SANKEY: 'sankey',
+  SURFACE: 'surface',
   WORDTREE: 'wordtree'
 };
 
@@ -2529,7 +2530,9 @@ anychart.enums.ErrorCode = {
   TABLE_FIELD_NAME_DUPLICATE: 201,
   TABLE_COMPUTER_OUTPUT_FIELD_DUPLICATE: 202,
 
-  WRONG_SHAPES_CONFIG: 300
+  WRONG_SHAPES_CONFIG: 300,
+
+  SURFACE_DATA_MALFORMED: 400
 };
 
 
@@ -2600,7 +2603,9 @@ anychart.enums.WarningCode = {
 
   STATES_IN_STORE_EXCEEDED: 700,
   STORE_LAST_STATE_USED: 701,
-  STORE_STATE_PAIR_EXISTS: 702
+  STORE_STATE_PAIR_EXISTS: 702,
+
+  SURFACE_POOR_PERFORMANCE: 800
 
 };
 

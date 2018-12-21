@@ -189,6 +189,13 @@
         "color-scales"
       ]
     },
+    "surface": {
+      "entry": "anychart.surfaceModule.entry",
+      "deps": [
+        "core",
+        "color-scales"
+      ]
+    },
     "table": {
       "entry": "anychart.tableModule.entry",
       "deps": [
@@ -442,6 +449,13 @@
         "theme-core"
       ]
     },
+    "theme-surface": {
+      "entry": "anychart.surfaceModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
     "theme-wordtree": {
       "entry": "anychart.wordtreeModule.defaultTheme",
       "deps": [
@@ -501,6 +515,7 @@
         "theme-scatter",
         "theme-sparkline",
         "theme-stock",
+        "theme-surface",
         "theme-tag-cloud",
         "theme-treemap",
         "theme-venn",
@@ -879,6 +894,17 @@
       "parts": [
         "sankey",
         "theme-sankey"
+      ]
+    },
+    "anychart-surface": {
+      "type": "chart-type",
+      "name": "Surface",
+      "desc": "Surface charts module.",
+      "parts": [
+        "surface",
+        "color-scales",
+        "theme-color-scales",
+        "theme-surface"
       ]
     },
     "anychart-wordtree": {

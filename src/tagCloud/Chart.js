@@ -1116,6 +1116,7 @@ anychart.tagCloudModule.Chart.prototype.selected = function(opt_value) {
 anychart.tagCloudModule.Chart.prototype.colorRange = function(opt_value) {
   if (!this.colorRange_) {
     this.colorRange_ = new anychart.colorScalesModule.ui.ColorRange();
+    this.colorRange_.dropThemes();
     this.colorRange_.listenSignals(this.colorRangeInvalidated_, this);
     this.invalidate(anychart.ConsistencyState.TAG_CLOUD_COLOR_RANGE | anychart.ConsistencyState.BOUNDS,
         anychart.Signal.NEEDS_REDRAW);

@@ -24,6 +24,8 @@ goog.forwardDeclare('anychart.treemapModule.Chart');
 anychart.colorScalesModule.ui.ColorRange = function() {
   anychart.colorScalesModule.ui.ColorRange.base(this, 'constructor');
 
+  this.addThemes('defaultAxis', 'defaultColorRange');
+
   /**
    * Size of color range line. Height in horizontal orientation.
    * @type {number}
@@ -1103,6 +1105,7 @@ anychart.core.makeStandalone(anychart.standalones.ColorRange, anychart.colorScal
  */
 anychart.standalones.colorRange = function() {
   var colorRange = new anychart.standalones.ColorRange();
+  colorRange.dropThemes();
   colorRange.setupInternal(true, anychart.getFullTheme('standalones.colorRange'));
   return colorRange;
 };

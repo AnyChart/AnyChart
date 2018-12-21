@@ -23,6 +23,7 @@ goog.require('anychart.scatterModule.defaultTheme');
 goog.require('anychart.sparklineModule.defaultTheme');
 goog.require('anychart.stockModule.defaultTheme');
 goog.require('anychart.sunburstModule.defaultTheme');
+goog.require('anychart.surfaceModule.defaultTheme');
 goog.require('anychart.tagCloudModule.defaultTheme');
 goog.require('anychart.treemapModule.defaultTheme');
 goog.require('anychart.vennModule.defaultTheme');

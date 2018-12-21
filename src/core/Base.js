@@ -381,6 +381,10 @@ anychart.ConsistencyState = {
   SANKEY_DATA: 1 << 12,
   SANKEY_NODE_LABELS: 1 << 13, // node labels
   SANKEY_FLOW_LABELS: 1 << 14, // flow and dropoff labels
+  //---------------------------------- SURFACE STATES (CHART) ----------------------------------
+  SURFACE_DATA: 1 << 12,
+  SURFACE_COLOR_RANGE: 1 << 13,
+  SURFACE_COLOR_SCALE: 1 << 14,
   /**
    * Combination of all states.
    */
