@@ -1329,6 +1329,21 @@ anychart.surfaceModule.Chart.prototype.getType = function() {
 };
 
 
+/**
+ * Serializes object scale if it's not in scaleUids list.
+ * @param {Array.<Object>} scaleUids array of uids in surface chart scales.
+ * @param {Object} object with scale.
+ * @param {string} name of object with scale.
+ * @param {Object} json passed to chart.
+ */
+anychart.surfaceModule.Chart.prototype.serializeScales = function(scaleUids, object, name, json) {
+  var uid = goog.getUid(object.scale());
+  if (!(uid in scaleUids)) {
+    json[name]['scale'] = object.scale().serialize();
+  }
+};
+
+
 /** @inheritDoc */
 anychart.surfaceModule.Chart.prototype.serialize = function() {
   var json = anychart.surfaceModule.Chart.base(this, 'serialize');
@@ -1336,26 +1351,47 @@ anychart.surfaceModule.Chart.prototype.serialize = function() {
   if (this.data_)
     json['data'] = this.data().serialize();
 
-  if (this.xScale_)
+  var scaleGuids = [];
+  var uid;
+
+  if (this.xScale_) {
     json['xScale'] = this.xScale().serialize();
-  if (this.yScale_)
+    scaleGuids.push(goog.getUid(this.xScale()));
+  }
+  if (this.yScale_) {
     json['yScale'] = this.yScale().serialize();
-  if (this.zScale_)
+    scaleGuids.push(goog.getUid(this.xScale()));
+  }
+  if (this.zScale_) {
     json['zScale'] = this.zScale().serialize();
+    scaleGuids.push(goog.getUid(this.xScale()));
+  }
 
-  if (this.xAxis_)
+  if (this.xAxis_) {
     json['xAxis'] = this.xAxis().serialize();
-  if (this.yAxis_)
+    this.serializeScales(scaleGuids, this.xAxis(), 'xAxis', json);
+  }
+  if (this.yAxis_) {
     json['yAxis'] = this.yAxis().serialize();
-  if (this.zAxis_)
+    this.serializeScales(scaleGuids, this.xAxis(), 'yAxis', json);
+  }
+  if (this.zAxis_) {
     json['zAxis'] = this.zAxis().serialize();
+    this.serializeScales(scaleGuids, this.xAxis(), 'zAxis', json);
+  }
 
-  if (this.xGrid_)
+  if (this.xGrid_) {
     json['xGrid'] = this.xGrid().serialize();
-  if (this.yGrid_)
+    this.serializeScales(scaleGuids, this.xAxis(), 'xGrid', json);
+  }
+  if (this.yGrid_) {
     json['yGrid'] = this.yGrid().serialize();
-  if (this.zGrid_)
+    this.serializeScales(scaleGuids, this.xAxis(), 'yGrid', json);
+  }
+  if (this.zGrid_) {
     json['zGrid'] = this.zGrid().serialize();
+    this.serializeScales(scaleGuids, this.xAxis(), 'zGrid', json);
+  }
 
   if (this.colorScale_)
     json['colorScale'] = this.colorScale().serialize();
@@ -1370,32 +1406,37 @@ anychart.surfaceModule.Chart.prototype.serialize = function() {
 };
 
 
+/**
+ * Setup objects with scale settings if they are present in config.
+ * @param {!Object} config
+ * @param {string} name of object with scale.
+ */
+anychart.surfaceModule.Chart.prototype.setupScalesByJSON = function(config, name) {
+  if (name in config) {
+    this[name](config[name]);
+    if ('scale' in config[name])
+      this[name]().scale(config[name]['scale']);
+  }
+};
+
+
 /** @inheritDoc */
 anychart.surfaceModule.Chart.prototype.setupByJSON = function(config, opt_default) {
   anychart.surfaceModule.Chart.base(this, 'setupByJSON', config, opt_default);
   if ('data' in config)
     this.data(config['data']);
 
-  if ('xScale' in config)
-    this.xScale(config['xScale']);
-  if ('yScale' in config)
-    this.yScale(config['yScale']);
-  if ('zScale' in config)
-    this.zScale(config['zScale']);
+  this.setupScalesByJSON(config, 'xScale');
+  this.setupScalesByJSON(config, 'yScale');
+  this.setupScalesByJSON(config, 'zScale');
 
-  if ('xAxis' in config)
-    this.xAxis(config['xAxis']);
-  if ('yAxis' in config)
-    this.yAxis(config['yAxis']);
-  if ('zAxis' in config)
-    this.zAxis(config['zAxis']);
+  this.setupScalesByJSON(config, 'xAxis');
+  this.setupScalesByJSON(config, 'yAxis');
+  this.setupScalesByJSON(config, 'zAxis');
 
-  if ('xGrid' in config)
-    this.xGrid(config['xGrid']);
-  if ('yGrid' in config)
-    this.yGrid(config['yGrid']);
-  if ('zGrid' in config)
-    this.zGrid(config['zGrid']);
+  this.setupScalesByJSON(config, 'xGrid');
+  this.setupScalesByJSON(config, 'yGrid');
+  this.setupScalesByJSON(config, 'zGrid');
 
   if ('colorScale' in config)
     this.colorScale(config['colorScale']);
