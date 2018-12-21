@@ -1359,6 +1359,9 @@ anychart.surfaceModule.Chart.prototype.serialize = function() {
 
   if (this.colorScale_)
     json['colorScale'] = this.colorScale().serialize();
+  else
+    json['colorScale'] = null;
+
   if (this.colorRange_)
     json['colorRange'] = this.colorRange().serialize();
 
