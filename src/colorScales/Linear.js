@@ -353,7 +353,7 @@ anychart.colorScalesModule.Linear.prototype.serialize = function() {
   json['minorTicks'] = this.minorTicks().serialize();
 
   json['colors'] = goog.array.map(/** @type {Array.<Object>} */(this.colors()), function(elem) {
-    return elem.offset + ' ' + goog.color.rgbArrayToHex(/** @type {!goog.color.Rgb} */(elem.color));
+    return elem.offset + ' ' + goog.color.rgbArrayToHex(/** @type {!goog.color.Rgb} */(elem.color)) + (goog.isDef(elem.opacity) ? ' ' + elem.opacity : '');
   });
 
   return json;
