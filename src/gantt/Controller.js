@@ -211,6 +211,22 @@ anychart.ganttModule.Controller = function(opt_isResources) {
    */
   this.defaultRowHeight_ = 20;
 
+  /**
+   * Start index set by api.
+   * Needed to set start index before draw.
+   * @type {number}
+   * @private
+   */
+  this.apiStartIndex_ = NaN;
+
+  /**
+   * End index set by api.
+   * Needed to set end index before draw.
+   * @type {number}
+   * @private
+   */
+  this.apiEndIndex_ = NaN;
+
 };
 goog.inherits(anychart.ganttModule.Controller, anychart.core.Base);
 
@@ -720,6 +736,11 @@ anychart.ganttModule.Controller.prototype.getIndexByHeight = function(height) {
  */
 anychart.ganttModule.Controller.prototype.recalculate = function() {
   if (this.visibleItems_.length) {
+    this.startIndex_ = isNaN(this.startIndex_) ? this.apiStartIndex_ : this.startIndex_;
+    this.endIndex_ = isNaN(this.endIndex_) ? this.apiEndIndex_ : this.endIndex_;
+    this.apiStartIndex_ = NaN;
+    this.apiEndIndex_ = NaN;
+
     if (!isNaN(this.startIndex_)) this.startIndex_ = goog.math.clamp(this.startIndex_, 0, this.visibleItems_.length - 1);
     if (!isNaN(this.endIndex_)) this.endIndex_ = goog.math.clamp(this.endIndex_, 0, this.visibleItems_.length - 1);
 
@@ -900,8 +921,10 @@ anychart.ganttModule.Controller.prototype.startIndex = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (!isNaN(opt_value)) {
       this.startIndex_ = opt_value;
-      this.verticalOffset_ = 0;
       this.endIndex_ = NaN;
+      this.apiStartIndex_ = opt_value;
+      this.apiEndIndex_ = NaN;
+      this.verticalOffset_ = 0;
       this.invalidate(anychart.ConsistencyState.CONTROLLER_POSITION, anychart.Signal.NEEDS_REAPPLICATION);
     }
     return this;
@@ -919,8 +942,10 @@ anychart.ganttModule.Controller.prototype.startIndex = function(opt_value) {
 anychart.ganttModule.Controller.prototype.endIndex = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (!isNaN(opt_value)) {
-      this.endIndex_ = opt_value;
       this.startIndex_ = NaN;
+      this.endIndex_ = opt_value;
+      this.apiStartIndex_ = NaN;
+      this.apiEndIndex_ = opt_value;
       this.invalidate(anychart.ConsistencyState.CONTROLLER_POSITION, anychart.Signal.NEEDS_REAPPLICATION);
     }
     return this;
