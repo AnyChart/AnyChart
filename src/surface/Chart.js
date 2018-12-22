@@ -591,6 +591,8 @@ anychart.surfaceModule.Chart.prototype.colorRange = function(opt_value) {
     this.colorRange_ = new anychart.colorScalesModule.ui.ColorRange();
     this.setupCreated('colorRange', this.colorRange_);
     this.colorRange_.setupInternal(true, this.colorRange_.themeSettings);
+    this.colorRange_.marker().addThemes('defaultMarkerFactory', 'surface.colorRange.marker');
+    this.colorRange_.marker().setupInternal(true, this.colorRange_.marker().themeSettings);
     this.colorRange_.setParentEventTarget(this);
     this.colorRange_.container(this.rootElement);
     this.colorRange_.listenSignals(this.colorRangeInvalidated_, this);

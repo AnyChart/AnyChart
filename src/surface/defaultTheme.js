@@ -14,7 +14,8 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     },
     'colorRange': {
       'marker': {
-        'enabled': false
+        'enabled': false,
+        'type': anychart.enums.MarkerType.TRIANGLE_DOWN
       },
       'labels': {
         'useHtml': true
