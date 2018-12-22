@@ -1340,7 +1340,7 @@ anychart.surfaceModule.Chart.prototype.getType = function() {
  */
 anychart.surfaceModule.Chart.prototype.serializeScales = function(scaleUids, object, name, json) {
   var uid = goog.getUid(object.scale());
-  if (!(uid in scaleUids)) {
+  if (!goog.array.contains(scaleUids, uid)) {
     json[name]['scale'] = object.scale().serialize();
   }
 };
@@ -1362,11 +1362,11 @@ anychart.surfaceModule.Chart.prototype.serialize = function() {
   }
   if (this.yScale_) {
     json['yScale'] = this.yScale().serialize();
-    scaleGuids.push(goog.getUid(this.xScale()));
+    scaleGuids.push(goog.getUid(this.yScale()));
   }
   if (this.zScale_) {
     json['zScale'] = this.zScale().serialize();
-    scaleGuids.push(goog.getUid(this.xScale()));
+    scaleGuids.push(goog.getUid(this.zScale()));
   }
 
   if (this.xAxis_) {
@@ -1375,24 +1375,24 @@ anychart.surfaceModule.Chart.prototype.serialize = function() {
   }
   if (this.yAxis_) {
     json['yAxis'] = this.yAxis().serialize();
-    this.serializeScales(scaleGuids, this.xAxis(), 'yAxis', json);
+    this.serializeScales(scaleGuids, this.yAxis(), 'yAxis', json);
   }
   if (this.zAxis_) {
     json['zAxis'] = this.zAxis().serialize();
-    this.serializeScales(scaleGuids, this.xAxis(), 'zAxis', json);
+    this.serializeScales(scaleGuids, this.zAxis(), 'zAxis', json);
   }
 
   if (this.xGrid_) {
     json['xGrid'] = this.xGrid().serialize();
-    this.serializeScales(scaleGuids, this.xAxis(), 'xGrid', json);
+    this.serializeScales(scaleGuids, this.xGrid(), 'xGrid', json);
   }
   if (this.yGrid_) {
     json['yGrid'] = this.yGrid().serialize();
-    this.serializeScales(scaleGuids, this.xAxis(), 'yGrid', json);
+    this.serializeScales(scaleGuids, this.yGrid(), 'yGrid', json);
   }
   if (this.zGrid_) {
     json['zGrid'] = this.zGrid().serialize();
-    this.serializeScales(scaleGuids, this.xAxis(), 'zGrid', json);
+    this.serializeScales(scaleGuids, this.zGrid(), 'zGrid', json);
   }
 
   if (this.colorScale_)
