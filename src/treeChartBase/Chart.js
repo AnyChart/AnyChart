@@ -479,10 +479,12 @@ anychart.treeChartBase.Chart.prototype.serialize = function() {
 
   var drillPath = this.getDrilldownPath();
   var drillTo = [];
-  var parentNode;
-  for (var i = 1; i < drillPath.length; i++) {
-    parentNode = drillPath[i - 1].getNode();
-    drillTo[i - 1] = parentNode.indexOfChild(drillPath[i].getNode());
+  if (drillPath) {
+    var parentNode;
+    for (var i = 1; i < drillPath.length; i++) {
+      parentNode = drillPath[i - 1].getNode();
+      drillTo[i - 1] = parentNode.indexOfChild(drillPath[i].getNode());
+    }
   }
   if (drillTo.length)
     json['drillTo'] = drillTo;

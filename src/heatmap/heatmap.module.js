@@ -20,8 +20,6 @@ anychart.heatMap = function(opt_data, opt_csvSettings) {
   chart.setupColorScale(/** @type {Object|string} */ (chart.getThemeOption('colorScale')), chart.getScaleInstances());
   chart.setupAxes();
   chart.setupStateSettings();
-  //chart.setupInternal(true, anychart.getFullTheme('heatMap'));
-
   return chart;
 };
 anychart.chartTypesMap[anychart.enums.ChartTypes.HEAT_MAP] = anychart.heatMap;

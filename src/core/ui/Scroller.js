@@ -23,6 +23,8 @@ goog.require('goog.style');
 anychart.core.ui.Scroller = function(opt_usesAbsolutePadding) {
   anychart.core.ui.Scroller.base(this, 'constructor');
 
+  this.addThemes(anychart.themes.DefaultThemes['scroller']);
+
   /**
    * If thumbs are shown. Cache to avoid children search.
    * @type {boolean}

@@ -283,7 +283,7 @@ anychart.core.ChartWithAxes.prototype.defaultYAxisSettings = function(opt_value)
  */
 anychart.core.ChartWithAxes.prototype.defaultGridSettings = function(opt_value) {
   if (!this.defaultGridSettings_) { // we need this for getGridZIndex method to work
-    this.defaultGridSettings_ = anychart.getThemes()[0]['defaultGridSettings'];
+    this.defaultGridSettings_ = anychart.getFlatTheme('defaultGridSettings');
   }
 
   if (goog.isDef(opt_value)) {
@@ -301,7 +301,7 @@ anychart.core.ChartWithAxes.prototype.defaultGridSettings = function(opt_value) 
  */
 anychart.core.ChartWithAxes.prototype.defaultMinorGridSettings = function(opt_value) {
   if (!this.defaultMinorGridSettings_) { // we need this for getGridZIndex method to work
-    this.defaultMinorGridSettings_ = anychart.getThemes()[0]['defaultMinorGridSettings'];
+    this.defaultMinorGridSettings_ = anychart.getFlatTheme('defaultMinorGridSettings');
   }
 
   if (goog.isDef(opt_value)) {
@@ -1643,7 +1643,7 @@ anychart.core.ChartWithAxes.prototype.setupByJSON = function(config, opt_default
 /**
  * Setup axis markers with scales.
  */
-anychart.core.ChartWithAxes.prototype.setupAxisMarkers= function() {
+anychart.core.ChartWithAxes.prototype.setupAxisMarkers = function() {
   var scalesInstances = this.getScaleInstances();
   this.setupElementsWithScales(this.getThemeOption('lineAxesMarkers'), this.lineMarker, scalesInstances);
   this.setupElementsWithScales(this.getThemeOption('rangeAxesMarkers'), this.rangeMarker, scalesInstances);

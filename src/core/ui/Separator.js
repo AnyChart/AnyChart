@@ -188,12 +188,6 @@ anychart.core.ui.Separator.prototype.hasOwnOption = function(name) {
 anychart.core.ui.Separator.prototype.getOption = anychart.core.settings.getOption;
 
 
-/** @inheritDoc */
-anychart.core.ui.Separator.prototype.isResolvable = function() {
-  return true;
-};
-
-
 //endregion
 //region -- IResolvable implementation
 /** @inheritDoc */

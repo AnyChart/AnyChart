@@ -107,7 +107,6 @@ anychart.scales.Ordinal.prototype.ticks = function(opt_value) {
   if (!this.ticks_) {
     this.ticks_ = new anychart.scales.OrdinalTicks(this);
     this.setupCreated('ticks', this.ticks_);
-    this.registerDisposable(this.ticks_);
     this.ticks_.listenSignals(this.ticksInvalidated_, this);
   }
   if (goog.isDef(opt_value)) {
@@ -422,6 +421,59 @@ anychart.scales.Ordinal.prototype.getPointWidthRatio = function() {
 
 
 /**
+ * Scale mode.
+ * Identifies categories behaviour.
+ *
+ * If mode is set to discrete (default value) then drawing representation will be
+ *       |-------|-------|-------|
+ *           A       B       C
+ * This is suitable for drawing discrete series (column, box).
+ *
+ * Otherwise (continuous) it will be
+ * |~~~~~|-----------|-----------|~~~~~|
+ *       A           B           C
+ * This is suitable for drawing continuous series (line, area).
+ *
+ * Scale transforms values according formula which takes into account that
+ * ('A', 0.5) should be displayed as 0
+ * ('C', 0.5) should be 1
+ *
+ * Example for 3 categories.
+ * NB: values a rounded
+ *
+ *  value, subRangeRatio | discrete | continuous
+ * ----------------------|----------|-----------
+ *            A,   0     |        0 |        0  (-0.25)
+ *            A, 0.5     |     0.16 |        0
+ *            A,   1     |     0.33 |     0.25
+ *            B,   0     |     0.33 |     0.25
+ *            B, 0.5     |     0.50 |     0.50
+ *            B,   1     |     0.67 |     0.75
+ *            C,   0     |     0.67 |     0.75
+ *            C, 0.5     |     0.83 |        1
+ *            C,   1     |        1 |        1  (1.25)
+ *
+ * As you can see categories are widened and center of left category are placed at 0 ratio.
+ * Same as center of right category are placed at 1 ratio.
+ * Value in bracers shows "actual" values.
+ *
+ * @param {anychart.enums.OrdinalScaleMode=} opt_value
+ * @return {anychart.enums.OrdinalScaleMode|anychart.scales.Ordinal} .
+ */
+anychart.scales.Ordinal.prototype.mode = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.enums.normalizeOrdinalScaleMode(opt_value);
+    if (this.mode_ != opt_value) {
+      this.mode_ = opt_value;
+      this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REAPPLICATION);
+    }
+    return this;
+  }
+  return this.mode_;
+};
+
+
+/**
  * Returns tick position ratio by its name.<br/>
  * <b>Note:</b> returns correct values only after {@link anychart.scales.Base#finishAutoCalc} or <b>chart.draw()</b>.
  * @example
@@ -450,8 +502,13 @@ anychart.scales.Ordinal.prototype.transform = function(value, opt_subRangeRatio)
     result = (opt_subRangeRatio || 0) * this.weightRatios()[k] + this.weightRatiosSums_[k];
 
   } else {
-    result = index / this.values_.length +
-        (opt_subRangeRatio || 0) / this.values_.length; // sub scale part
+    // just to short the length of code
+    var n = this.values_.length;
+    result = index / n + (opt_subRangeRatio || 0) / n;
+    if (this.mode_ === anychart.enums.OrdinalScaleMode.CONTINUOUS) {
+      result = (result * n - 0.5) / (n - 1);
+      result = goog.math.clamp(result, 0, 1);
+    }
   }
   return this.applyZoomAndInverse(result);
 };
@@ -487,6 +544,10 @@ anychart.scales.Ordinal.prototype.inverseTransform = function(ratio) {
 
     index = j - 1;
   } else {
+    if (this.mode_ === anychart.enums.OrdinalScaleMode.CONTINUOUS) {
+      var n = this.values_.length;
+      ratio = (ratio * (n - 1) + 0.5) / n;
+    }
     //todo(Anton Saukh): needs improvement.
     index = goog.math.clamp(Math.ceil(ratio * this.values_.length) - 1, 0, this.values_.length - 1);
   }
@@ -523,6 +584,8 @@ anychart.scales.Ordinal.prototype.serialize = function() {
   if (!this.autoWeights_ && this.checkWeights())
     json['weights'] = this.weights_;
 
+  json['mode'] = this.mode_;
+
   return json;
 };
 
@@ -534,6 +597,14 @@ anychart.scales.Ordinal.prototype.setupByJSON = function(config, opt_default) {
   this.ticks(config['ticks']);
   this.names(config['names']);
   this.weights(config['weights']);
+  this.mode(config['mode']);
+};
+
+
+/** @inheritDoc */
+anychart.scales.Ordinal.prototype.disposeInternal = function() {
+  goog.dispose(this.ticks_);
+  anychart.scales.Ordinal.base(this, 'disposeInternal');
 };
 
 

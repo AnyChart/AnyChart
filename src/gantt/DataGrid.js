@@ -398,8 +398,6 @@ anychart.ganttModule.DataGrid.prototype.onEditEnd = function(opt_value) {
 
 
 //endregion
-
-
 /**
  * Getter for this.headerPath_.
  * @return {acgraph.vector.Path}
@@ -517,6 +515,21 @@ anychart.ganttModule.DataGrid.prototype.addSplitter_ = function() {
  *  like setter.
  */
 anychart.ganttModule.DataGrid.prototype.column = function(opt_indexOrValue, opt_value) {
+  return this.columnInternal_(opt_indexOrValue, opt_value);
+};
+
+
+/**
+ * Gets column by index or creates a new one if column doesn't exist yet.
+ * If works like setter, sets a column by index.
+ * @param {(number|anychart.ganttModule.Column|string)=} opt_indexOrValue - Column index or column.
+ * @param {(anychart.ganttModule.Column|Object)=} opt_value - Column to be set.
+ * @param {boolean=} opt_default - If is default config.
+ * @return {(anychart.ganttModule.Column|anychart.ganttModule.DataGrid)} - Column by index of itself for method chaining if used
+ *  like setter.
+ *  @private
+ */
+anychart.ganttModule.DataGrid.prototype.columnInternal_ = function(opt_indexOrValue, opt_value, opt_default) {
   var index, value;
   var newColumn = false;
   index = anychart.utils.toNumber(opt_indexOrValue);
@@ -531,14 +544,18 @@ anychart.ganttModule.DataGrid.prototype.column = function(opt_indexOrValue, opt_
   var column = this.columns_[index];
   if (!column) {
     column = new anychart.ganttModule.Column(this, index);
-    column.setup(this.defaultColumnSettings());
+    // column.setup(this.defaultColumnSettings());
+    column.setupInternal(!!opt_default, this.defaultColumnSettings());
     column.listenSignals(this.columnInvalidated_, this);
+    // column.labels().installStyle();
+    anychart.measuriator.register(column);
     this.registerDisposable(column);
     newColumn = true;
   }
 
   if (goog.isDef(value)) {
-    column.setup(anychart.utils.instanceOf(value, anychart.ganttModule.Column) ? value.serialize() : value);
+    var conf = anychart.utils.instanceOf(value, anychart.ganttModule.Column) ? value.serialize() : value;
+    column.setupInternal(!!opt_default, conf);
     if (column.enabled()) column.container(this.getContentLayer());
     this.columns_[index] = column;
     this.addSplitter_();
@@ -567,6 +584,53 @@ anychart.ganttModule.DataGrid.prototype.column = function(opt_indexOrValue, opt_
     }
     return column;
   }
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.ganttModule.DataGrid.prototype.prepareLabels = function() {
+  this.forEachVisibleColumn_(function(col) {
+    col.provideMeasurements();
+    var applyStyling = false;
+    var needsToDropOldBounds = false;
+
+    var signal = 0;
+    if (col.hasInvalidationState(anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_APPEARANCE)) {
+      applyStyling = true;
+    }
+
+    if (col.hasInvalidationState(anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_BOUNDS)) {
+      if (col.labels().needsBoundsCalculation())
+        signal |= anychart.Signal.MEASURE_BOUNDS;
+      needsToDropOldBounds = true;
+      applyStyling = true;
+    }
+
+    if (col.hasInvalidationState(anychart.ConsistencyState.DATA_GRID_COLUMN_DATA)) {
+      /*
+        Measuriator will collect labels itself on this signal.
+       */
+      signal |= anychart.Signal.MEASURE_COLLECT;
+      needsToDropOldBounds = true;
+      applyStyling = true;
+    }
+
+    /*
+      Labels are already collected here, applies the style if needed.
+     */
+    if (applyStyling)
+      col.applyLabelsStyle(needsToDropOldBounds);
+
+    /*
+      Signal makes Measuriator to collect labels and be ready to
+      measure it.
+     */
+    col.dispatchSignal(signal);
+
+
+  });
 };
 
 
@@ -641,8 +705,12 @@ anychart.ganttModule.DataGrid.prototype.columnInvalidated_ = function(event) {
   var state = 0;
   var signal = anychart.Signal.NEEDS_REDRAW;
 
-  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) state |= anychart.ConsistencyState.APPEARANCE;
-  if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) state |= anychart.ConsistencyState.DATA_GRID_GRIDS;
+  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW))
+    state |= anychart.ConsistencyState.APPEARANCE;
+  if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED))
+    state |= anychart.ConsistencyState.DATA_GRID_GRIDS;
+  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW_LABELS))
+    state |= anychart.ConsistencyState.GRIDS_POSITION;
 
   this.invalidate(state, signal);
 };
@@ -1198,7 +1266,7 @@ anychart.ganttModule.DataGrid.prototype.setupByJSON = function(config, opt_defau
   if ('columns' in config) {
     for (var i = 0, l = config['columns'].length; i < l; i++) {
       var col = config['columns'][i];
-      if (col) this.column(i, col);
+      if (col) this.columnInternal_(i, col, opt_default);
     }
   }
 

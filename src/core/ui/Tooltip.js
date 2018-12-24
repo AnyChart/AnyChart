@@ -683,9 +683,10 @@ anychart.core.ui.Tooltip.prototype.chart = function(opt_value) {
  * @param {number} clientX - ClientX coordinate.
  * @param {number} clientY - ClientY coordinate.
  * @param {boolean=} opt_useUnionAsSingle - Whether to use union tooltip as single.
+ * @param {Object=} opt_tooltipContextLoad
  * @private
  */
-anychart.core.ui.Tooltip.prototype.showAsSingle_ = function(points, clientX, clientY, opt_useUnionAsSingle) {
+anychart.core.ui.Tooltip.prototype.showAsSingle_ = function(points, clientX, clientY, opt_useUnionAsSingle, opt_tooltipContextLoad) {
   var firstPoint = points[0];
   var firstSeries = firstPoint['series'];
   /** @type {anychart.core.ui.Tooltip} */
@@ -696,6 +697,10 @@ anychart.core.ui.Tooltip.prototype.showAsSingle_ = function(points, clientX, cli
     return;
 
   var contextProvider = /** @type {anychart.format.Context} */ (firstSeries.createTooltipContextProvider());
+  if (opt_tooltipContextLoad) {
+    goog.object.extend(contextProvider.contextValues(), opt_tooltipContextLoad);
+    contextProvider.propagate();
+  }
   contextProvider['clientX'] = clientX;
   contextProvider['clientY'] = clientY;
   this.tooltipInUse_.title().autoText(this.tooltipInUse_.getFormattedTitle(contextProvider));
@@ -1068,7 +1073,7 @@ anychart.core.ui.Tooltip.prototype.showForSeriesPoints = function(points, client
 
     var dispMode = this.getOption('displayMode');
     if (dispMode == anychart.enums.TooltipDisplayMode.SINGLE) {
-      this.showAsSingle_(points, clientX, clientY, opt_useUnionAsSingle);
+      this.showAsSingle_(points, clientX, clientY, opt_useUnionAsSingle, opt_tooltipContextLoad);
     } else if (dispMode == anychart.enums.TooltipDisplayMode.UNION) {
       this.showAsUnion_(points, clientX, clientY, hoveredSeries, opt_tooltipContextLoad);
     } else if (dispMode == anychart.enums.TooltipDisplayMode.SEPARATED) {
@@ -2113,12 +2118,6 @@ anychart.core.ui.Tooltip.prototype.check = function(flags) {
   if (goog.isDef(flags)) {
     return !!(flags & this.capability);
   }
-  return true;
-};
-
-
-/** @inheritDoc */
-anychart.core.ui.Tooltip.prototype.isResolvable = function() {
   return true;
 };
 

@@ -131,6 +131,12 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       }
     ]
   },
+  'candlestick' : {
+    'defaultSeriesType': 'candlestick'
+  },
+  'ohlc': {
+    'defaultSeriesType': 'ohlc'
+  },
   'verticalLine': {
     'isVertical': true,
     'defaultSeriesType': 'line',

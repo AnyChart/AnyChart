@@ -47,11 +47,25 @@ anychart.stockModule.defaultTheme.StockOHLCTooltipFormatter = function() {
 
 /**
  * @this {*}
- * @returns {*}
+ * @return {*}
  */
 anychart.stockModule.defaultTheme.StockSeriesLabelFormatter = function() {
   var date = this['x'];
   return anychart.format.dateTime(date, anychart.format.getDateTimeFormat(anychart.format.getIntervalIdentifier(this['dataIntervalUnit'], void 0, 'full')));
+};
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
+anychart.stockModule.defaultTheme.stockTitleFormatter = function() {
+  var date = this['hoveredDate'];
+  return anychart.format.dateTime(date,
+      anychart.format.getDateTimeFormat(
+          anychart.format.getIntervalIdentifier(
+              this['dataIntervalUnit'], void 0, 'full'
+          )));
 };
 
 
@@ -241,7 +255,8 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'base': {
           'pointWidth': '75%',
           'tooltip': {
-            'format': anychart.stockModule.defaultTheme.StockSimpleTooltipFormatter
+            'format': anychart.stockModule.defaultTheme.StockSimpleTooltipFormatter,
+            'titleFormat': anychart.stockModule.defaultTheme.stockTitleFormatter
           },
           'legendItem': {'iconStroke': 'none'},
           'normal': {
@@ -392,6 +407,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
           'fill': '#F7F7F7'
         },
         'height': 25,
+        'showHelperLabel': true,
         'scale': 0,
         'ticks': {
           'enabled': false,
@@ -507,7 +523,6 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       'yAxes': [{}],
       'crosshair': {
         'zIndex': 201,
-        'enabled': null,
         'xLabels': [{'enabled': null}],
         'yLabels': [{'enabled': null}]
       },
@@ -584,6 +599,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'scroller': {
       'defaultSeriesSettings': {
         'base': {
+          'enabled': true,
           'normal': {
             'fill': anychart.stockModule.defaultTheme.stockScrollerUnselected,
             'stroke': anychart.stockModule.defaultTheme.stockScrollerUnselected,
@@ -671,11 +687,6 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'background': {
           'enabled': false
         },
-        'minorTicks': {
-          'enabled': true,
-          'stroke': '#cecece',
-          'position': 'center'
-        },
         'labels': {
           'enabled': true,
           'fontSize': '11px',
@@ -707,7 +718,13 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'ticks': {
           'position': 'center'
         },
-        'zIndex': 75
+        'minorTicks': {
+          'enabled': true,
+          'stroke': '#cecece',
+          'position': 'center'
+        },
+        'zIndex': 75,
+        'showHelperLabel': true
       }
     },
     'tooltip': {
@@ -716,18 +733,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       'title': {
         'fontSize': 13
       },
-      /**
-       * @this {*}
-       * @return {*}
-       */
-      'titleFormat': function() {
-        var date = this['hoveredDate'];
-        return anychart.format.dateTime(date,
-            anychart.format.getDateTimeFormat(
-                anychart.format.getIntervalIdentifier(
-                    this['dataIntervalUnit'], void 0, 'full'
-                )));
-      }
+      'titleFormat': anychart.stockModule.defaultTheme.stockTitleFormatter
     },
     'a11y': {
       'titleFormat': anychart.core.defaultTheme.chartA11yTitleFormatter

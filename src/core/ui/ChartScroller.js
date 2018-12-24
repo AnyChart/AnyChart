@@ -12,8 +12,6 @@ goog.require('anychart.enums');
 anychart.core.ui.ChartScroller = function() {
   anychart.core.ui.ChartScroller.base(this, 'constructor', true);
 
-  this.addThemes(anychart.themes.DefaultThemes['scroller']);
-
   /**
    * Position.
    * @type {anychart.enums.ChartScrollerPosition}

@@ -189,6 +189,13 @@
         "color-scales"
       ]
     },
+    "surface": {
+      "entry": "anychart.surfaceModule.entry",
+      "deps": [
+        "core",
+        "color-scales"
+      ]
+    },
     "table": {
       "entry": "anychart.tableModule.entry",
       "deps": [
@@ -239,6 +246,12 @@
       "deps": [
         "core",
         "cartesian"
+      ]
+    },
+    "wordtree": {
+      "entry": "anychart.wordtreeModule.entry",
+      "deps": [
+        "core"
       ]
     },
     "theme-annotations": {
@@ -435,6 +448,20 @@
         "core",
         "theme-core"
       ]
+    },
+    "theme-surface": {
+      "entry": "anychart.surfaceModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-wordtree": {
+      "entry": "anychart.wordtreeModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
     }
   },
   "modules": {
@@ -488,6 +515,7 @@
         "theme-scatter",
         "theme-sparkline",
         "theme-stock",
+        "theme-surface",
         "theme-tag-cloud",
         "theme-treemap",
         "theme-venn",
@@ -866,6 +894,29 @@
       "parts": [
         "sankey",
         "theme-sankey"
+      ]
+    },
+    "anychart-surface": {
+      "type": "chart-type",
+      "name": "Surface",
+      "desc": "Surface charts module.",
+      "parts": [
+        "surface",
+        "color-scales",
+        "theme-color-scales",
+        "theme-surface"
+      ]
+    },
+    "anychart-wordtree": {
+      "type": "chart-type",
+      "name": "Wordtree",
+      "desc": "Wordtree charts module.",
+      "docs": "https://docs.anychart.com/Basic_Charts/Wordtree_Chart",
+      "icon": "/_design/img/upload/charts/types/wordtree-chart.svg",
+      "parts": [
+        "tree-data",
+        "wordtree",
+        "theme-wordtree"
       ]
     }
   },

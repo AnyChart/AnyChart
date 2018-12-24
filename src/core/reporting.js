@@ -28,7 +28,7 @@ anychart.core.reporting.shownWarningMessages_ = {};
  * @param {Array.<*>=} opt_descArgs Description message arguments.
  */
 anychart.core.reporting.error = function(code, opt_exception, opt_descArgs) {
-  anychart.core.reporting.callLog_(
+  anychart.core.reporting.callLog(
       'error',
       ('Error: ' + code + '\nDescription: ' + anychart.core.reporting.getErrorDescription_(code, opt_descArgs)),
       (opt_exception || '')
@@ -98,6 +98,9 @@ anychart.core.reporting.getErrorDescription_ = function(code, opt_arguments) {
         '" cannot be drawn, because it requires ', req.length,
         ' shapes with the following names: ', shapes.join(', ')].join('');
 
+    case anychart.enums.ErrorCode.SURFACE_DATA_MALFORMED:
+      return 'Surface chart data is malformed.';
+
     default:
       return 'Unknown error occurred. Please, contact support team at http://support.anychart.com/.\n' +
           'We will be very grateful for your report.';
@@ -115,14 +118,14 @@ anychart.core.reporting.info = function(codeOrMsg, opt_descArgs) {
     if (goog.isNumber(codeOrMsg)) {
       if (anychart.core.reporting.lastInfoCode_ != codeOrMsg) {
         anychart.core.reporting.lastInfoCode_ = /** @type {number} */ (codeOrMsg);
-        anychart.core.reporting.callLog_(
+        anychart.core.reporting.callLog(
             'info',
             ('Info: ' + codeOrMsg + '\nDescription: ' + anychart.core.reporting.getInfoDescription_(codeOrMsg, opt_descArgs)),
             ''
         );
       }
     } else {
-      anychart.core.reporting.callLog_('info', codeOrMsg, '');
+      anychart.core.reporting.callLog('info', codeOrMsg, '');
     }
   }
 };
@@ -162,7 +165,7 @@ anychart.core.reporting.warning = function(code, opt_exception, opt_descArgs, op
   var desc;
   if ((anychart.DEVELOP || opt_forceProd) && !anychart.core.reporting.shownWarningMessages_[desc = anychart.core.reporting.getWarningDescription_(code, opt_descArgs)]) {
     anychart.core.reporting.shownWarningMessages_[desc] = true;
-    anychart.core.reporting.callLog_(
+    anychart.core.reporting.callLog(
         'warn',
         ('Warning: ' + code + '\nDescription: ' + desc),
         (opt_exception || '')
@@ -287,6 +290,10 @@ anychart.core.reporting.getWarningDescription_ = function(code, opt_arguments) {
     case anychart.enums.WarningCode.STORE_STATE_PAIR_EXISTS:
       return 'State \'' + opt_arguments[1] + '\' already exists in \'' + opt_arguments[0] + '\' store.';
 
+    case anychart.enums.WarningCode.SURFACE_POOR_PERFORMANCE:
+      return 'Surface chart has ' + opt_arguments[0] + ' points now. If more than 3000 points are drawn on surface' +
+          ' chart you may experience instability and poor performance.';
+
     default:
       return 'Unknown error. Please, contact support team at http://support.anychart.com/.\n' +
           'We will be very grateful for your report!';
@@ -298,14 +305,13 @@ anychart.core.reporting.getWarningDescription_ = function(code, opt_arguments) {
  * @param {string} name Log function name.
  * @param {string} message Message text.
  * @param {*=} opt_exception Exception.
- * @private
  */
-anychart.core.reporting.callLog_ = function(name, message, opt_exception) {
+anychart.core.reporting.callLog = function(name, message, opt_exception) {
   var console = anychart.window['console'];
   if (console) {
     var log = console[name] || console['log'];
     if (typeof log != 'object') {
-      log.call(console, message, opt_exception);
+      log.call(console, message, opt_exception || '');
     }
   }
 };

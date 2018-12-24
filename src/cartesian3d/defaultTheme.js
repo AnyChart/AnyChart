@@ -90,6 +90,22 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
   },
   // merge with column
   'column3d': {
+    'defaultSeriesType': 'column'
+  },
+  // merge with area
+  'area3d': {
+    'defaultSeriesType': 'area',
+    'zDistribution': true,
+    'zPadding': 5
+  },
+  // merge with area
+  'line3d': {
+    'defaultSeriesType': 'line',
+    'zDistribution': true,
+    'zPadding': 5
+  },
+  // merge with cartesian
+  'cartesian3d': {
     'defaultSeriesType': 'column',
     'xGrids': [
       {
@@ -100,39 +116,5 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'yGrids': [
       {}
     ]
-  },
-  // merge with area
-  'area3d': {
-    'defaultSeriesType': 'area',
-    'zDistribution': true,
-    'zPadding': 5,
-    'xGrids': [
-      {
-        'enabled': true,
-        'scale': 0
-      }
-    ],
-    'yGrids': [
-      {}
-    ]
-  },
-  // merge with area
-  'line3d': {
-    'defaultSeriesType': 'line',
-    'zDistribution': true,
-    'zPadding': 5,
-    'xGrids': [
-      {
-        'enabled': true,
-        'scale': 0
-      }
-    ],
-    'yGrids': [
-      {}
-    ]
-  },
-  // merge with cartesian
-  'cartesian3d': {
-    'defaultSeriesType': 'column'
   }
 });

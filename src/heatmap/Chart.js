@@ -413,7 +413,7 @@ anychart.heatmapModule.Chart.prototype.createEventSeriesStatus = function(series
       };
     }
     eventSeriesStatus.push({
-      'series': this,
+      'series': status.series,
       'points': opt_empty ? [] : status.points ? goog.array.clone(status.points) : [],
       'nearestPointToCursor': nearestPointToCursor_
     });

@@ -26,6 +26,36 @@ anychart.math.CoordinateObject;
 
 
 /**
+ * @includeDoc
+ * @typedef {{
+     x: number,
+     y: number
+  }}
+ */
+anychart.math.NumericCoordinateObject;
+
+
+/**
+ * @typedef {{
+     left: number,
+     top: number,
+     width: number,
+     height: number
+  }}
+ */
+anychart.math.BoundsObject;
+
+
+/**
+ * @typedef {{
+     width: number,
+     height: number
+  }}
+ */
+anychart.math.SizeObject;
+
+
+/**
  * Identifies an x-y coordinate pair.
  * @includeDoc
  * @typedef {!(

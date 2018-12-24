@@ -16,6 +16,9 @@ goog.require('anychart.math.Rect');
  */
 anychart.annotationsModule.Base = function(chartController) {
   anychart.annotationsModule.Base.base(this, 'constructor');
+
+  this.addThemes('chart.defaultAnnotationSettings.base');
+
   /**
    * Chart controller reference.
    * @type {!anychart.annotationsModule.ChartController}
@@ -48,12 +51,6 @@ anychart.annotationsModule.Base = function(chartController) {
    * @type {(anychart.annotationsModule.AnchorSupport|number)}
    */
   this.anchorsAvailable = 0;
-
-  /**
-   * A set of missing anchors.
-   * @type {(anychart.annotationsModule.AnchorSupport|number)}
-   */
-  this.anchorsMissing = this.SUPPORTED_ANCHORS;
 
   /**
    * A name of X coord that is vacant for last point value.
@@ -1283,6 +1280,7 @@ anychart.annotationsModule.Base.prototype.hasOwnOption = function(name) {
 anychart.annotationsModule.Base.prototype.setDefaultSettings = function(opt_value) {
   if (anychart.utils.toCamelCase(this.getType()) == 'label')
     this.normal_.addThemes('defaultFontSettings');
+
   this.setupCreated('normal', this.normal_);
   this.normal_.setupInternal(true, {});
 
@@ -1297,7 +1295,6 @@ anychart.annotationsModule.Base.prototype.setDefaultSettings = function(opt_valu
 /** @inheritDoc */
 anychart.annotationsModule.Base.prototype.serialize = function() {
   var json = anychart.annotationsModule.Base.base(this, 'serialize');
-
   json['type'] = this.getType();
 
   anychart.core.settings.serialize(this, anychart.annotationsModule.BASE_DESCRIPTORS, json, 'Annotation');

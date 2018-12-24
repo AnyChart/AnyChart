@@ -48,20 +48,12 @@ anychart.ganttModule.Chart = function(opt_isResourcesChart) {
    */
   this.isResourcesChart_ = !!opt_isResourcesChart;
 
-  this.controller_ = new anychart.ganttModule.Controller(this.isResourcesChart_);
-  this.controller_.dataGrid(/** @type {anychart.ganttModule.DataGrid} */ (this.getDataGrid_()));
-  this.controller_.timeline(/** @type {anychart.ganttModule.TimeLine} */ (this.getTimeline()));
-  this.registerDisposable(this.controller_);
-  this.controller_.listenSignals(this.controllerInvalidated_, this);
-
-
   /**
    * Data tree.
    * @type {anychart.treeDataModule.Tree|anychart.treeDataModule.View}
    * @private
    */
   this.data_ = null;
-
 
   /**
    * Data grid of gantt chart.
@@ -70,14 +62,12 @@ anychart.ganttModule.Chart = function(opt_isResourcesChart) {
    */
   this.dg_ = null;
 
-
   /**
    * Timeline of gantt chart.
    * @type {anychart.ganttModule.TimeLine}
    * @private
    */
   this.tl_ = null;
-
 
   /**
    * Splitter between DG and TL.
@@ -92,6 +82,11 @@ anychart.ganttModule.Chart = function(opt_isResourcesChart) {
    * @private
    */
   this.formatProvider_ = null;
+
+  this.controller_ = new anychart.ganttModule.Controller(this.isResourcesChart_);
+  this.controller_.dataGrid(/** @type {anychart.ganttModule.DataGrid} */ (this.getDataGrid_()));
+  this.controller_.timeline(/** @type {anychart.ganttModule.TimeLine} */ (this.getTimeline()));
+  this.controller_.listenSignals(this.controllerInvalidated_, this);
 
   /**
    * Vertical scroll bar.
@@ -1172,7 +1167,10 @@ anychart.ganttModule.Chart.prototype.setupByJSON = function(config, opt_default)
 
 /** @inheritDoc */
 anychart.ganttModule.Chart.prototype.disposeInternal = function() {
-  goog.dispose(this.palette_);
+  this.controller_.unlistenSignals(this.controllerInvalidated_, this);
+  goog.disposeAll(this.palette_, this.controller_);
+  this.palette_ = null;
+  this.controller_ = null;
   anychart.ganttModule.Chart.base(this, 'disposeInternal');
 };
 

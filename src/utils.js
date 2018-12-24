@@ -1470,7 +1470,7 @@ anychart.utils.json2xml = function(json, opt_rootNodeName, opt_returnAsXmlNode) 
   var root = anychart.utils.json2xml_(json, opt_rootNodeName || 'anychart', result);
   if (root) {
     if (!opt_rootNodeName)
-      root.setAttribute('xmlns', 'http://anychart.com/schemas/8.4.2/xml-schema.xsd');
+      root.setAttribute('xmlns', 'http://anychart.com/schemas/8.5.0/xml-schema.xsd');
     result.appendChild(root);
   }
   return opt_returnAsXmlNode ? result : goog.dom.xml.serialize(result);
@@ -2653,32 +2653,118 @@ anychart.utils.toStyleString = function(obj) {
  * @param {number} opacity - .
  * @param {string} fontColor - .
  * @param {number=} opt_fadeStep - .
+ * @param {acgraph.vector.Text.HAlign=} opt_hAlign - .
+ * @return {!Array.<acgraph.vector.GradientKey>}
+ */
+anychart.utils.getFadeGradientKeys = function(ratio, opacity, fontColor, opt_fadeStep, opt_hAlign) {
+  opt_hAlign = opt_hAlign || acgraph.vector.Text.HAlign.LEFT;
+  opt_fadeStep = opt_fadeStep || 0.05;
+  var result;
+  switch (opt_hAlign) {
+    case acgraph.vector.Text.HAlign.LEFT:
+    case acgraph.vector.Text.HAlign.START:
+      result = [
+        {
+          'offset': 0,
+          'color': fontColor,
+          'opacity': opacity
+        },
+        {
+          'offset': Math.max(ratio - opt_fadeStep, 0),
+          'color': fontColor,
+          'opacity': opacity
+        },
+        {
+          'offset': ratio,
+          'color': fontColor,
+          'opacity': 0
+        },
+        {
+          'offset': 1,
+          'color': fontColor,
+          'opacity': 0
+        }
+      ];
+      break;
+    case acgraph.vector.Text.HAlign.CENTER:
+      var r = ratio < 1 ? (1 - ratio) / 2 : 0;
+      opt_fadeStep = ratio < 1 ? opt_fadeStep : 0;
+      result = [
+        {
+          'offset': 0,
+          'color': fontColor,
+          'opacity': 0
+        },
+        {
+          'offset': r,
+          'color': fontColor,
+          'opacity': 0
+        },
+        {
+          'offset': r + opt_fadeStep,
+          'color': fontColor,
+          'opacity': opacity
+        },
+        {
+          'offset': 1 - r - opt_fadeStep,
+          'color': fontColor,
+          'opacity': opacity
+        },
+        {
+          'offset': 1 - r,
+          'color': fontColor,
+          'opacity': 0
+        },
+        {
+          'offset': 1,
+          'color': fontColor,
+          'opacity': 0
+        }
+      ];
+      break;
+    case acgraph.vector.Text.HAlign.RIGHT:
+    case acgraph.vector.Text.HAlign.END:
+      ratio = 1 - ratio;
+      result = [
+        {
+          'offset': 0,
+          'color': fontColor,
+          'opacity': 0
+        },
+        {
+          'offset': ratio,
+          'color': fontColor,
+          'opacity': 0
+        },
+        {
+          'offset': Math.max(ratio + opt_fadeStep, 0),
+          'color': fontColor,
+          'opacity': opacity
+        },
+        {
+          'offset': 1,
+          'color': fontColor,
+          'opacity': 1
+        }
+      ];
+      break;
+  }
+  return /** @type {!Array.<acgraph.vector.GradientKey>} */ (result);
+};
+
+
+/**
+ *
+ * @param {number} ratio - .
+ * @param {number} opacity - .
+ * @param {string} fontColor - .
+ * @param {number=} opt_fadeStep - .
+ * @param {acgraph.vector.Text.HAlign=} opt_hAlign - .
  * @return {!acgraph.vector.LinearGradientFill}
  */
-anychart.utils.getFadeGradient = function(ratio, opacity, fontColor, opt_fadeStep) {
+anychart.utils.getFadeGradient = function(ratio, opacity, fontColor, opt_fadeStep, opt_hAlign) {
   return {
-    'keys': [
-      {
-        'offset': 0,
-        'color': fontColor,
-        'opacity': opacity
-      },
-      {
-        'offset': Math.max(ratio - (opt_fadeStep || 0.1), 0),
-        'color': fontColor,
-        'opacity': opacity
-      },
-      {
-        'offset': ratio,
-        'color': fontColor,
-        'opacity': 0
-      },
-      {
-        'offset': 1,
-        'color': fontColor,
-        'opacity': 0
-      }
-    ]
+    'keys': anychart.utils.getFadeGradientKeys(ratio, opacity, fontColor, opt_fadeStep, opt_hAlign)
   };
 };
 

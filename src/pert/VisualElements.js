@@ -116,12 +116,6 @@ anychart.pertModule.VisualElements.prototype.getOption = anychart.core.settings.
 
 
 /** @inheritDoc */
-anychart.pertModule.VisualElements.prototype.isResolvable = function() {
-  return true;
-};
-
-
-/** @inheritDoc */
 anychart.pertModule.VisualElements.prototype.getParentState = function(stateType) {
   var parent = this.parent();
   if (parent) {

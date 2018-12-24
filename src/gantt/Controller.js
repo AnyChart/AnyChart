@@ -76,6 +76,14 @@ anychart.ganttModule.Controller = function(opt_isResources) {
    */
   this.visibleItems_ = [];
 
+
+  /**
+   * Linear list of all data.
+   * @type {Array.<(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)>}
+   * @private
+   */
+  this.allItems_ = [];
+
   /**
    * Array that contains a row height differences.
    * NOTE: This array doesn't store row spaces!
@@ -203,6 +211,22 @@ anychart.ganttModule.Controller = function(opt_isResources) {
    */
   this.defaultRowHeight_ = 20;
 
+  /**
+   * Start index set by api.
+   * Needed to set start index before draw.
+   * @type {number}
+   * @private
+   */
+  this.apiStartIndex_ = NaN;
+
+  /**
+   * End index set by api.
+   * Needed to set end index before draw.
+   * @type {number}
+   * @private
+   */
+  this.apiEndIndex_ = NaN;
+
 };
 goog.inherits(anychart.ganttModule.Controller, anychart.core.Base);
 
@@ -211,13 +235,15 @@ goog.inherits(anychart.ganttModule.Controller, anychart.core.Base);
  * Consistency state mask supported by this object.
  * @type {number}
  */
-anychart.ganttModule.Controller.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS_REAPPLICATION;
+anychart.ganttModule.Controller.prototype.SUPPORTED_SIGNALS =
+    anychart.Signal.DATA_CHANGED |
+    anychart.Signal.NEEDS_REAPPLICATION;
 
 
 /**
  * Consistency state mask supported by this object.
  * In this case consistency state
- *  DATA means that the whole tree has been changed. Needs to re-linearize, calculate visible data anew, recalculate start& end indexes.
+ *  DATA means that the whole tree has been changed. Needs to re-linearize, calculate visible data anew, recalculate start and end indexes.
  *  VISIBILITY means that some item was collapsed/expanded (children become visible/invisible). Needs to recalculate visible data without new tree linearization.
  *  POSITION means that new start, end, offset, available height were set. No need to linearize a tree and build new visibility data.
  * @type {number}
@@ -275,13 +301,17 @@ anychart.ganttModule.Controller.prototype.dataInvalidated_ = function(event) {
    Here meta_changed_signal comes from tree on tree data item change.
    We have to initialize rebuilding of visible data items.
    */
-  if (event.hasSignal(anychart.Signal.META_CHANGED)) state |= anychart.ConsistencyState.CONTROLLER_VISIBILITY;
+  if (event.hasSignal(anychart.Signal.META_CHANGED)) {
+    state |= anychart.ConsistencyState.CONTROLLER_VISIBILITY;
+  }
 
   /*
    Here data_changed_signal comes from tree when tree has some structural changes.
    We have to relinerize data and rebuild visible data items.
    */
-  if (event.hasSignal(anychart.Signal.DATA_CHANGED)) state |= anychart.ConsistencyState.CONTROLLER_DATA;
+  if (event.hasSignal(anychart.Signal.DATA_CHANGED)) {
+    state |= anychart.ConsistencyState.CONTROLLER_DATA;
+  }
 
   if (this.dataGrid_ && this.timeline_) {
     this.timeline_.interactivityHandler.invalidate(anychart.ConsistencyState.CHART_LABELS);
@@ -416,6 +446,7 @@ anychart.ganttModule.Controller.prototype.autoCalcItem_ = function(item, current
   item
       .meta('depth', currentDepth)
       .meta('index', this.linearIndex_++);
+  this.allItems_.push(item);
 
   var itemProgressValue = item.get(anychart.enums.GanttDataFields.PROGRESS_VALUE);
   if (goog.isDef(itemProgressValue)) {
@@ -450,6 +481,7 @@ anychart.ganttModule.Controller.prototype.autoCalcItem_ = function(item, current
       this.datesToMeta_(child);
       this.periodsToMeta_(child);
       this.markersToMeta_(child);
+      this.allItems_.push(child);
     }
 
     if (!this.isResources_) {
@@ -509,6 +541,9 @@ anychart.ganttModule.Controller.prototype.linearizeData_ = function() {
   this.linearIndex_ = 0;
   this.minDate_ = NaN;
   this.maxDate_ = NaN;
+  this.startIndex_ = NaN;
+  this.endIndex_ = NaN;
+  this.allItems_.length = 0;
 
   this.data_.suspendSignalsDispatching();
   for (var i = 0, l = this.data_.numChildren(); i < l; i++) {
@@ -701,6 +736,11 @@ anychart.ganttModule.Controller.prototype.getIndexByHeight = function(height) {
  */
 anychart.ganttModule.Controller.prototype.recalculate = function() {
   if (this.visibleItems_.length) {
+    this.startIndex_ = isNaN(this.startIndex_) ? this.apiStartIndex_ : this.startIndex_;
+    this.endIndex_ = isNaN(this.endIndex_) ? this.apiEndIndex_ : this.endIndex_;
+    this.apiStartIndex_ = NaN;
+    this.apiEndIndex_ = NaN;
+
     if (!isNaN(this.startIndex_)) this.startIndex_ = goog.math.clamp(this.startIndex_, 0, this.visibleItems_.length - 1);
     if (!isNaN(this.endIndex_)) this.endIndex_ = goog.math.clamp(this.endIndex_, 0, this.visibleItems_.length - 1);
 
@@ -797,6 +837,15 @@ anychart.ganttModule.Controller.prototype.getVisibleItems = function() {
 
 
 /**
+ * Gets all items.
+ * @return {Array.<(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)>} - Height cache.
+ */
+anychart.ganttModule.Controller.prototype.getAllItems = function() {
+  return this.allItems_;
+};
+
+
+/**
  * Gets min date.
  * @return {number} - Min date.
  */
@@ -872,8 +921,10 @@ anychart.ganttModule.Controller.prototype.startIndex = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (!isNaN(opt_value)) {
       this.startIndex_ = opt_value;
-      this.verticalOffset_ = 0;
       this.endIndex_ = NaN;
+      this.apiStartIndex_ = opt_value;
+      this.apiEndIndex_ = NaN;
+      this.verticalOffset_ = 0;
       this.invalidate(anychart.ConsistencyState.CONTROLLER_POSITION, anychart.Signal.NEEDS_REAPPLICATION);
     }
     return this;
@@ -891,8 +942,10 @@ anychart.ganttModule.Controller.prototype.startIndex = function(opt_value) {
 anychart.ganttModule.Controller.prototype.endIndex = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (!isNaN(opt_value)) {
-      this.endIndex_ = opt_value;
       this.startIndex_ = NaN;
+      this.endIndex_ = opt_value;
+      this.apiStartIndex_ = NaN;
+      this.apiEndIndex_ = opt_value;
       this.invalidate(anychart.ConsistencyState.CONTROLLER_POSITION, anychart.Signal.NEEDS_REAPPLICATION);
     }
     return this;
@@ -978,6 +1031,12 @@ anychart.ganttModule.Controller.prototype.run = function() {
   if (!this.isConsistent()) {
     if (this.hasInvalidationState(anychart.ConsistencyState.CONTROLLER_DATA)) {
       this.linearizeData_();
+
+      /*
+        This signal is for another entities to process the linearized data.
+       */
+      this.dispatchSignal(anychart.Signal.DATA_CHANGED);
+
       this.markConsistent(anychart.ConsistencyState.CONTROLLER_DATA);
       if (this.timeline_)
         this.timeline_.initScale();
@@ -1003,10 +1062,16 @@ anychart.ganttModule.Controller.prototype.run = function() {
     }
   }
 
+  if (this.dataGrid_)
+    this.dataGrid_.prepareLabels();
+  if (this.timeline_)
+    this.timeline_.prepareLabels();
+
+  anychart.measuriator.measure();
+
   //This must be called anyway. Clears consistency states of data grid not related to controller.
   if (this.dataGrid_)
     this.dataGrid_.drawInternal(this.positionRecalculated_);
-
   if (this.timeline_)
     this.timeline_.drawInternal(this.positionRecalculated_);
 

@@ -290,7 +290,7 @@ anychart.stockModule.Controller.prototype.refreshSelection = function(newPixelWi
   var scrollerSelectionChanged = this.select_(
       alignedFirst,
       alignedLast,
-      this.scrollerGrouping_,
+      /** @type {!anychart.stockModule.Grouping} */(this.scrollerGrouping()),
       this.scrollerSources_,
       this.currentScrollerRegistry_,
       this.currentScrollerSelection_,
@@ -365,7 +365,7 @@ anychart.stockModule.Controller.prototype.select = function(startKey, endKey, sc
   var result = this.select_(
       startKey,
       endKey,
-      this.grouping_,
+      /** @type {!anychart.stockModule.Grouping} */(this.grouping()),
       this.selectableSources_,
       this.currentRegistry_,
       this.currentSelection_,
@@ -477,6 +477,8 @@ anychart.stockModule.Controller.prototype.getCoIterator = function(scroller, opt
 anychart.stockModule.Controller.prototype.grouping = function(opt_value) {
   if (!this.grouping_) {
     this.grouping_ = new anychart.stockModule.Grouping();
+    this.grouping_.addThemes('stock.grouping');
+    this.grouping_.setupByJSON(this.grouping_.themeSettings, true);
     this.grouping_.listenSignals(this.groupingInvalidated_, this);
   }
 
@@ -496,6 +498,8 @@ anychart.stockModule.Controller.prototype.grouping = function(opt_value) {
 anychart.stockModule.Controller.prototype.scrollerGrouping = function(opt_value) {
   if (!this.scrollerGrouping_) {
     this.scrollerGrouping_ = new anychart.stockModule.Grouping();
+    this.scrollerGrouping_.addThemes('stock.scrollerGrouping');
+    this.scrollerGrouping_.setupByJSON(this.scrollerGrouping_.themeSettings, true);
     this.scrollerGrouping_.listenSignals(this.groupingInvalidated_, this);
   }
 

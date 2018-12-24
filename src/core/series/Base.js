@@ -675,7 +675,8 @@ anychart.core.series.Base.prototype.applyConfig = function(config, opt_reapplyCl
 
   if (goog.isFunction(this.plot.defaultSeriesSettings().getThemesForType)) {
     this.dropThemes();
-    var themes = this.plot.defaultSeriesSettings().getThemesForType(this.type_, this.getChart().isMode3d());
+    var isMode3d = goog.isFunction(this.getChart().isMode3d) && this.getChart().isMode3d();
+    var themes = this.plot.defaultSeriesSettings().getThemesForType(this.type_, isMode3d);
     this.addThemes(themes);
   } else
     this.themeSettings = this.plot.defaultSeriesSettings()[anychart.utils.toCamelCase(this.type_)] || {};

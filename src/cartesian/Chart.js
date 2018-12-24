@@ -547,8 +547,9 @@ anychart.cartesianModule.Chart.prototype.setupByJSON = function(config, opt_defa
  */
 anychart.cartesian = function() {
   var chart = new anychart.cartesianModule.Chart();
+  chart.setOption('defaultSeriesType', anychart.enums.CartesianSeriesType.LINE);
   chart.setupStateSettings();
-  // chart.setupInternal(true, anychart.getFullTheme('cartesian'));
+  chart.setupAxes();
   return chart;
 };
 

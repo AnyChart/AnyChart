@@ -139,12 +139,6 @@ anychart.core.GridBase.prototype.getResolutionChain = anychart.core.settings.get
 
 
 /** @inheritDoc */
-anychart.core.GridBase.prototype.isResolvable = function() {
-  return true;
-};
-
-
-/** @inheritDoc */
 anychart.core.GridBase.prototype.getLowPriorityResolutionChain = function() {
   var sett = [this.themeSettings];
   if (this.parent_) {
@@ -774,7 +768,8 @@ anychart.core.GridBase.prototype.drawInternal = function() {
   for (var i = 0, count = ticksArray.length; i < count; i++) {
     var tickVal = ticksArray[i];
     if (goog.isArray(tickVal)) tickVal = tickVal[0];
-    ratio = scale.transform(tickVal);
+    var subRangeRatio = (isOrdinal && scale.mode() == anychart.enums.OrdinalScaleMode.CONTINUOUS) ? 0.5 : 0;
+    ratio = scale.transform(tickVal, subRangeRatio);
 
     if (i) {
       path = this.getFillElement(i - 1);

@@ -190,12 +190,6 @@ anychart.mapModule.elements.Axis.prototype.minorLabelsBounds_ = null;
 anychart.mapModule.elements.Axis.prototype.getOption = anychart.core.settings.getOption;
 
 
-/** @inheritDoc */
-anychart.mapModule.elements.Axis.prototype.isResolvable = function() {
-  return true;
-};
-
-
 //endregion
 //region --- IResolvable implementation
 /** @inheritDoc */

@@ -2,6 +2,17 @@ goog.provide('anychart.ganttModule.defaultTheme');
 
 
 goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
+  'ganttDefaultSimpleLabelsSettings': {
+    'fontSize': 11,
+    'vAlign': 'middle',
+    'height': '100%',
+    'padding': {
+      'left': 4,
+      'top': 0,
+      'right': 4,
+      'bottom': 0
+    }
+  },
 
   'defaultDataGrid': {
     'isStandalone': true,
@@ -14,9 +25,9 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'rowSelectedFill': anychart.core.defaultTheme.returnSourceColor,
 
     'rowStroke': anychart.core.defaultTheme.ganttDefaultStroke,
-    'rowOddFill': '#fff',
-    'rowEvenFill': '#fff',
-    'rowFill': '#fff',
+    'rowOddFill': 'none',
+    'rowEvenFill': 'none',
+    'rowFill': 'none',
 
     /**
      * @this {*}
@@ -83,21 +94,21 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'defaultColumnSettings': {
       'width': 90,
       'buttonCursor': 'pointer',
-      'labels': {
-        'enabled': true,
-        'wordBreak': 'break-all',
-        'anchor': 'left-top',
-        'vAlign': 'middle',
-        'padding': {
-          'top': 0,
-          'right': 5,
-          'bottom': 0,
-          'left': 5
-        },
-        'background': null,
-        'fontSize': 11,
-        'disablePointerEvents': true
-      },
+      // 'labels': {
+      //   'enabled': true,
+      //   'wordBreak': 'break-all',
+      //   'anchor': 'left-center',
+      //   'vAlign': 'middle',
+      //   'padding': {
+      //     'top': 0,
+      //     'right': 5,
+      //     'bottom': 0,
+      //     'left': 5
+      //   },
+      //   'background': null,
+      //   'fontSize': 11,
+      //   'disablePointerEvents': true
+      // },
       'depthPaddingMultiplier': 0,
       'collapseExpandButtons': false,
       'title': {
@@ -115,9 +126,9 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'columns': [
       {
         'width': 50,
-        'labels': {
-          'format': '{%linearIndex}'
-        },
+        // 'labels': {
+        //   'format': '{%linearIndex}'
+        // },
         'title': {
           'text': '#'
         }
@@ -126,9 +137,9 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'width': 170,
         'collapseExpandButtons': true,
         'depthPaddingMultiplier': 15,
-        'labels': {
-          'format': '{%name}'
-        },
+        // 'labels': {
+        //   'format': '{%name}'
+        // },
         'title': {
           'text': 'Name'
         }

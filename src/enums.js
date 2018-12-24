@@ -26,6 +26,7 @@ anychart.enums.ChartTypes = {
   BOX: 'box',
   BUBBLE: 'bubble',
   BULLET: 'bullet',
+  CANDLESTICK: 'candlestick',
   CARTESIAN: 'cartesian',
   CARTESIAN_3D: 'cartesian-3d',
   COLUMN: 'column',
@@ -39,9 +40,11 @@ anychart.enums.ChartTypes = {
   PIE: 'pie',
   PIE_3D: 'pie-3d',
   POLAR: 'polar',
+  OHLC: 'ohlc',
   PYRAMID: 'pyramid',
   RADAR: 'radar',
   SCATTER: 'scatter',
+  STEP_LINE: 'step-line',
   SPARKLINE: 'sparkline',
   HEAT_MAP: 'heat-map',
   TREE_MAP: 'tree-map',
@@ -62,7 +65,9 @@ anychart.enums.ChartTypes = {
   HILO: 'hilo',
   WATERFALL: 'waterfall',
   SUNBURST: 'sunburst',
-  SANKEY: 'sankey'
+  SANKEY: 'sankey',
+  SURFACE: 'surface',
+  WORDTREE: 'wordtree'
 };
 
 
@@ -2525,7 +2530,9 @@ anychart.enums.ErrorCode = {
   TABLE_FIELD_NAME_DUPLICATE: 201,
   TABLE_COMPUTER_OUTPUT_FIELD_DUPLICATE: 202,
 
-  WRONG_SHAPES_CONFIG: 300
+  WRONG_SHAPES_CONFIG: 300,
+
+  SURFACE_DATA_MALFORMED: 400
 };
 
 
@@ -2596,7 +2603,9 @@ anychart.enums.WarningCode = {
 
   STATES_IN_STORE_EXCEEDED: 700,
   STORE_LAST_STATE_USED: 701,
-  STORE_STATE_PAIR_EXISTS: 702
+  STORE_STATE_PAIR_EXISTS: 702,
+
+  SURFACE_POOR_PERFORMANCE: 800
 
 };
 
@@ -5131,4 +5140,26 @@ anychart.enums.XMode = {
 anychart.enums.normalizeXMode = function(value) {
   return /** @type {anychart.enums.XMode} */ (anychart.enums.normalize(anychart.enums.XMode, value,
       anychart.enums.XMode.ORDINAL));
+};
+
+
+/**
+ * Ordinal scale mode.
+ * @see anychart.scales.Ordinal#mode for detailed explanation.
+ * @enum {string}
+ */
+anychart.enums.OrdinalScaleMode = {
+  DISCRETE: 'discrete',
+  CONTINUOUS: 'continuous'
+};
+
+
+/**
+ * Normalizes ordinal scale mode.
+ * @param {*} value
+ * @return {anychart.enums.OrdinalScaleMode}
+ */
+anychart.enums.normalizeOrdinalScaleMode = function(value) {
+  return /** @type {anychart.enums.OrdinalScaleMode} */ (anychart.enums.normalize(anychart.enums.OrdinalScaleMode, value,
+      anychart.enums.OrdinalScaleMode.DISCRETE));
 };

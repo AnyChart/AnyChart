@@ -971,6 +971,7 @@ anychart.treemapModule.Chart.prototype.colorScaleInvalidated_ = function(event) 
 anychart.treemapModule.Chart.prototype.colorRange = function(opt_value) {
   if (!this.colorRange_) {
     this.colorRange_ = new anychart.colorScalesModule.ui.ColorRange();
+    this.colorRange_.dropThemes();
     this.colorRange_.setParentEventTarget(this);
     this.colorRange_.listenSignals(this.colorRangeInvalidated_, this);
     this.invalidate(anychart.ConsistencyState.TREEMAP_COLOR_RANGE | anychart.ConsistencyState.BOUNDS,

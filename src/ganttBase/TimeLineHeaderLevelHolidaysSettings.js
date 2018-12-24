@@ -79,12 +79,6 @@ anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings.prototype.SUPPORTED
 anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings.prototype.getOption = anychart.core.settings.getOption;
 
 
-/** @inheritDoc */
-anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings.prototype.isResolvable = function() {
-  return true;
-};
-
-
 //endregion
 //region --- IResolvable implementation
 /** @inheritDoc */

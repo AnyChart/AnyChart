@@ -32,6 +32,7 @@ goog.require('anychart.scatterModule.entry');
 goog.require('anychart.sparklineModule.entry');
 goog.require('anychart.stockModule.entry');
 goog.require('anychart.sunburstModule.entry');
+goog.require('anychart.surfaceModule.entry');
 goog.require('anychart.tableModule.entry');
 goog.require('anychart.tagCloudModule.entry');
 goog.require('anychart.treeDataModule.entry');
@@ -39,4 +40,5 @@ goog.require('anychart.treemapModule.entry');
 goog.require('anychart.ui.entry');
 goog.require('anychart.vennModule.entry');
 goog.require('anychart.waterfallModule.entry');
+goog.require('anychart.wordtreeModule.entry');
 

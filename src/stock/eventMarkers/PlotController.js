@@ -17,6 +17,8 @@ goog.require('anychart.stockModule.eventMarkers.Group');
 anychart.stockModule.eventMarkers.PlotController = function(plot, chartController) {
   anychart.stockModule.eventMarkers.PlotController.base(this, 'constructor');
 
+  this.addThemes('stock.eventMarkers');
+
   chartController.listenSignals(this.onSignal_, this);
 
   /**
@@ -51,15 +53,19 @@ anychart.stockModule.eventMarkers.PlotController = function(plot, chartControlle
       anychart.PointState.NORMAL,
       anychart.stockModule.eventMarkers.Group.STATE_DESCRIPTORS_OVERRIDE);
   this.normal_.setOption(anychart.core.StateSettings.CONNECTOR_AFTER_INIT_CALLBACK, anychart.core.StateSettings.DEFAULT_CONNECTOR_AFTER_INIT_CALLBACK);
+  this.normal_.addThemes('defaultFontSettings', 'stock.eventMarkers.normal');
 
   this.hovered_ = new anychart.core.StateSettings(this,
       anychart.stockModule.eventMarkers.Group.STATE_DESCRIPTORS_META_STATE,
       anychart.PointState.NORMAL,
       anychart.stockModule.eventMarkers.Group.STATE_DESCRIPTORS_OVERRIDE);
+  this.setupCreated('hovered', this.hovered_);
+
   this.selected_ = new anychart.core.StateSettings(this,
       anychart.stockModule.eventMarkers.Group.STATE_DESCRIPTORS_META_STATE,
       anychart.PointState.NORMAL,
       anychart.stockModule.eventMarkers.Group.STATE_DESCRIPTORS_OVERRIDE);
+  this.setupCreated('selected', this.selected_);
 
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.stockModule.eventMarkers.Group.OWN_DESCRIPTORS_META);
 

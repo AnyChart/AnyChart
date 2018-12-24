@@ -24,11 +24,8 @@ anychart.area3d = function(var_args) {
   chart.addThemes('area3d');
   chart.setType(anychart.enums.ChartTypes.AREA_3D);
   chart.setOption('defaultSeriesType', anychart.enums.CartesianSeriesType.AREA);
-
   chart.setupStateSettings();
   chart.setupAxes();
-
-  //chart.setupInternal(true, anychart.getFullTheme('area3d'));
   chart.setupGrids();
 
   if (arguments.length)
@@ -56,8 +53,6 @@ anychart.bar3d = function(var_args) {
 
   chart.setupStateSettings();
   chart.setupAxes();
-
-  //chart.setupInternal(true, anychart.getFullTheme('bar3d'));
   chart.setupGrids();
 
   if (arguments.length)
@@ -82,11 +77,8 @@ anychart.column3d = function(var_args) {
   chart.addThemes('column', 'column3d');
   chart.setType(anychart.enums.ChartTypes.COLUMN_3D);
   chart.setOption('defaultSeriesType', anychart.enums.CartesianSeriesType.COLUMN);
-
   chart.setupStateSettings();
   chart.setupAxes();
-
-  //chart.setupInternal(true, anychart.getFullTheme('column3d'));
   chart.setupGrids();
 
   if (arguments.length)
@@ -111,11 +103,8 @@ anychart.line3d = function(var_args) {
   chart.addThemes('line3d');
   chart.setType(anychart.enums.ChartTypes.LINE_3D);
   chart.setOption('defaultSeriesType', anychart.enums.CartesianSeriesType.LINE);
-
   chart.setupStateSettings();
   chart.setupAxes();
-
-  //chart.setupInternal(true, anychart.getFullTheme('line3d'));
   chart.setupGrids();
 
   if (arguments.length)
