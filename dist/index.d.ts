@@ -1,4 +1,4 @@
-// Type definitions for AnyChart JavaScript Charting Library, v8.4.2
+// Type definitions for AnyChart JavaScript Charting Library, v8.5.0
 // Project: https://www.anychart.com/
 // Definitions by: AnyChart <https://www.anychart.com>
 declare namespace anychart {
@@ -16,6 +16,7 @@ declare namespace anychart {
     function bubble(...var_args: (anychart.data.View | anychart.data.Set | Array<any>)[]): anychart.charts.Scatter;
     function bubbleMap(...var_args: (anychart.data.View | anychart.data.Set | Array<any>)[]): anychart.charts.Map;
     function bullet(data?: anychart.data.View | anychart.data.Set | Array<any> | string): anychart.charts.Bullet;
+    function candlestick(...var_args: (anychart.data.View | anychart.data.Set | Array<any>)[]): anychart.charts.Cartesian;
     function cartesian(): anychart.charts.Cartesian;
     function cartesian3d(): anychart.charts.Cartesian3d;
     function choropleth(...var_args: (anychart.data.View | anychart.data.Set | Array<any>)[]): anychart.charts.Map;
@@ -36,6 +37,7 @@ declare namespace anychart {
     function getChartById(id: string): anychart.core.Chart;
     function heatMap(data?: anychart.data.View | anychart.data.Set | Array<any> | string, csvSettings?: string | anychart.data.TextParsingSettings): anychart.charts.HeatMap;
     function hilo(...var_args: (anychart.data.View | anychart.data.Set | Array<any>)[]): anychart.charts.Cartesian;
+    function jumpLine(...var_args: (anychart.data.View | anychart.data.Set | Array<any>)[]): anychart.charts.Cartesian;
     function licenseKey(key?: string): string;
     function line(...var_args: (anychart.data.View | anychart.data.Set | Array<any>)[]): anychart.charts.Cartesian;
     function line3d(...var_args: (anychart.data.View | anychart.data.Set | Array<any>)[]): anychart.charts.Cartesian3d;
@@ -44,6 +46,7 @@ declare namespace anychart {
     function markerMap(...var_args: (anychart.data.View | anychart.data.Set | Array<any>)[]): anychart.charts.Map;
     function mekko(...var_args: (anychart.data.View | anychart.data.Set | Array<any>)[]): anychart.charts.Mekko;
     function mosaic(...var_args: (anychart.data.View | anychart.data.Set | Array<any>)[]): anychart.charts.Mekko;
+    function ohlc(...var_args: (anychart.data.View | anychart.data.Set | Array<any>)[]): anychart.charts.Cartesian;
     function onDocumentLoad(func: (() => void), scope?: any): void;
     function onDocumentReady(func: (() => void), scope?: any): void;
     function pareto(data?: anychart.data.View | anychart.data.Set | Array<any>): anychart.charts.Pareto;
@@ -61,8 +64,11 @@ declare namespace anychart {
     function server(): string;
     function server(address?: string): void;
     function sparkline(data?: anychart.data.View | anychart.data.Set | Array<any> | string, csvSettings?: string | anychart.data.TextParsingSettings): anychart.charts.Sparkline;
+    function stepLine(...var_args: (anychart.data.View | anychart.data.Set | Array<any>)[]): anychart.charts.Cartesian;
+    function stick(...var_args: (anychart.data.View | anychart.data.Set | Array<any>)[]): anychart.charts.Cartesian;
     function stock(allowPointSettings?: boolean): anychart.charts.Stock;
     function sunburst(data?: anychart.data.Tree | anychart.data.TreeView | Array<Object>, fillMethod?: string): anychart.charts.Sunburst;
+    function surface(data?: anychart.data.View | anychart.data.Set | Array<any> | string, csvSettings?: string | anychart.data.TextParsingSettings): anychart.charts.Surface;
     function tagCloud(data?: anychart.data.View | anychart.data.Set | Array<any> | string, settings?: string | anychart.data.TextParsingSettings): anychart.charts.TagCloud;
     function theme(settings?: string | Object | Array<string|Object>): string | Object | Array<string|Object>;
     function treeMap(data?: anychart.data.Tree | anychart.data.TreeView | Array<Object>, fillMethod?: string): anychart.charts.TreeMap;
@@ -71,6 +77,7 @@ declare namespace anychart {
     function verticalArea(...var_args: (anychart.data.View | anychart.data.Set | Array<any>)[]): anychart.charts.Cartesian;
     function verticalLine(...var_args: (anychart.data.View | anychart.data.Set | Array<any>)[]): anychart.charts.Cartesian;
     function waterfall(...var_args: (anychart.data.View | anychart.data.Set | Array<any>)[]): anychart.charts.Waterfall;
+    function wordtree(data?: anychart.data.Tree | string | Array<Object> | Array<Array<string>> | Array<string>, fillMethod?: string): anychart.charts.Wordtree;
     interface SignalEvent {
         targetBoundsChanged(): boolean;
         targetDataChanged(): boolean;
@@ -264,6 +271,165 @@ declare namespace anychart.charts {
         depth: number;
         level: {sum:number,nodesCount:number,leavesCount:number,branchesCount:number,display:boolean,attendingRoots:Array<number>,statsByRoot:{[prop:string]:{sum:number,nodesCount:number,leavesSum:number,leavesCount:number,branchesCount:number,childSum:number,nodes:Array<anychart.core.TreeChartPoint>}}};
     }
+    }
+    interface Surface extends anychart.core.SeparateChart {
+        a11y(): anychart.core.utils.ChartA11y;
+        a11y(settings?: boolean | Object): anychart.charts.Surface;
+        animation(): anychart.core.utils.Animation;
+        animation(settings?: boolean | Object): anychart.charts.Surface;
+        animation(enabled: boolean, duration: number): anychart.charts.Surface;
+        autoRedraw(): boolean;
+        autoRedraw(enabled?: boolean): anychart.charts.Surface;
+        background(): anychart.core.ui.Background;
+        background(settings?: Object): anychart.charts.Surface;
+        bottom(): number | string;
+        bottom(bottom?: number | string): anychart.charts.Surface;
+        bounds(): anychart.core.utils.Bounds;
+        bounds(bounds?: anychart.utils.RectObj | anychart.math.Rect | anychart.core.utils.Bounds): anychart.charts.Surface;
+        bounds(x?: number | string, y?: number | string, width?: number | string, height?: number | string): anychart.charts.Surface;
+        box(): anychart.graphics.vector.Stroke;
+        box(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Surface;
+        box(settings?: Object): anychart.charts.Surface;
+        cancelMarquee(): anychart.charts.Surface;
+        colorRange(): anychart.core.ui.ColorRange;
+        colorRange(settings?: Object): anychart.charts.Surface;
+        colorScale(): anychart.scales.LinearColor;
+        colorScale(settings?: anychart.scales.LinearColor | anychart.scales.OrdinalColor | Object | string): anychart.charts.Surface;
+        container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
+        container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.charts.Surface;
+        contextMenu(): anychart.ui.ContextMenu;
+        contextMenu(settings?: Object | boolean): anychart.charts.Surface;
+        credits(): anychart.core.ui.ChartCredits;
+        credits(value?: Object | boolean): anychart.charts.Surface;
+        data(): anychart.data.View;
+        data(data?: anychart.data.Set | Array<Array<number>> | string): anychart.charts.Surface;
+        dispose(): void;
+        draw(async?: boolean): anychart.charts.Surface;
+        enabled(): boolean;
+        enabled(enabled?: boolean): anychart.charts.Surface;
+        exports(): anychart.core.utils.Exports;
+        exports(settings?: Object): anychart.charts.Surface;
+        fullScreen(): boolean;
+        fullScreen(enabled?: boolean): anychart.charts.Surface;
+        getJpgBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean): void;
+        getPdfBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), paperSizeOrWidth?: number | string, landscapeOrWidth?: number | boolean, x?: number, y?: number): void;
+        getPixelBounds(): anychart.math.Rect;
+        getPngBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), width?: number, height?: number, quality?: number): void;
+        getSelectedPoints(): Array<anychart.core.Point>;
+        getStat(key?: string): any;
+        getSvgBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), paperSizeOrWidth?: string | number, landscapeOrHeight?: boolean | string): void;
+        globalToLocal(xCoord: number, yCoord: number): {[prop:string]:number};
+        height(): number | string;
+        height(height?: number | string): anychart.charts.Surface;
+        id(): string;
+        id(id?: string): anychart.charts.Surface;
+        inMarquee(): boolean;
+        interactivity(): anychart.core.utils.Interactivity;
+        interactivity(settings?: Object | string): anychart.charts.Surface;
+        isFullScreenAvailable(): boolean;
+        label(index?: string | number): anychart.core.ui.Label;
+        label(settings?: boolean | Object | string): anychart.charts.Surface;
+        label(index?: string | number, settings?: boolean | Object | string): anychart.charts.Surface;
+        left(): number | string;
+        left(left?: number | string): anychart.charts.Surface;
+        legend(): anychart.core.ui.Legend;
+        legend(settings?: Object | boolean): anychart.charts.Surface;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        localToGlobal(xCoord: number, yCoord: number): {[prop:string]:number};
+        margin(): anychart.core.utils.Margin;
+        margin(margin?: Array<number|string> | Object): anychart.charts.Surface;
+        margin(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.charts.Surface;
+        maxHeight(): number | string;
+        maxHeight(height?: number | string): anychart.charts.Surface;
+        maxWidth(): number | string;
+        maxWidth(width?: number | string): anychart.charts.Surface;
+        minHeight(): number | string;
+        minHeight(height?: number | string): anychart.charts.Surface;
+        minWidth(): number | string;
+        minWidth(width?: number | string): anychart.charts.Surface;
+        noData(): anychart.core.NoDataSettings;
+        noData(settings?: Object): anychart.charts.Surface;
+        padding(): anychart.core.utils.Padding;
+        padding(padding?: Array<number|string> | Object): anychart.charts.Surface;
+        padding(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.charts.Surface;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        removeAllListeners(type?: string): number;
+        right(): number | string;
+        right(right?: number | string): anychart.charts.Surface;
+        rotationY(): number;
+        rotationY(angle?: number): anychart.charts.Surface;
+        rotationZ(): number;
+        rotationZ(angle?: number): anychart.charts.Surface;
+        saveAsCsv(chartDataExportMode?: string, csvSettings?: {[prop:string]:string|boolean|((name:any,value:any)=>void)}, filename?: string): void;
+        saveAsJpg(width?: number | Object, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
+        saveAsJson(filename?: string): void;
+        saveAsPdf(paperSizeOrWidthOrOptions?: number | string | Object, landscape?: boolean, x?: number, y?: number, filename?: string): void;
+        saveAsPng(width?: number | Object, height?: number, quality?: number, filename?: string): void;
+        saveAsSvg(paperSize?: string | Object, landscape?: boolean, filename?: string): void;
+        saveAsSvg(width?: number, height?: number): void;
+        saveAsXlsx(chartDataExportMode?: string, filename?: string): void;
+        saveAsXml(filename?: string): void;
+        selectMarqueeFill(): anychart.graphics.vector.Fill;
+        selectMarqueeFill(color: anychart.graphics.vector.Fill | Array<anychart.graphics.vector.GradientKey|string>): anychart.charts.Surface;
+        selectMarqueeFill(color: string, opacity?: number): anychart.charts.Surface;
+        selectMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.Surface;
+        selectMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.Surface;
+        selectMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.Surface;
+        selectMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Surface;
+        shareAsJpg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
+        shareAsPdf(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, paperSizeOrWidth?: number | string, landscapeOrWidth?: number | boolean, x?: number, y?: number, filename?: string): void;
+        shareAsPng(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, filename?: string): void;
+        shareAsSvg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, paperSizeOrWidth?: string | number, landscapeOrHeight?: boolean | string, filename?: string): void;
+        shareWithFacebook(captionOrOptions?: string | Object, link?: string, name?: string, description?: string): void;
+        shareWithLinkedIn(captionOrOptions?: string | Object, description?: string): void;
+        shareWithPinterest(linkOrOptions?: string | Object, description?: string): void;
+        shareWithTwitter(): void;
+        startSelectMarquee(repeat?: boolean): anychart.charts.Surface;
+        stroke(): anychart.graphics.vector.Stroke;
+        stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Surface;
+        stroke(settings?: Object): anychart.charts.Surface;
+        title(): anychart.core.ui.Title;
+        title(settings?: boolean | Object | string): anychart.charts.Surface;
+        toA11yTable(title?: string, asString?: boolean): Element | string;
+        toCsv(chartDataExportMode?: string, csvSettings?: {[prop:string]:string|boolean|((name:any,value:any)=>void)|Object}): string;
+        toHtmlTable(title?: string, asString?: boolean): Element | string;
+        toJson(stringify?: boolean): Object | string;
+        toSvg(paperSize?: string | Object, landscape?: boolean): string;
+        toSvg(width?: number, height?: number): string;
+        toXml(asXmlNode?: boolean): string | Node;
+        tooltip(): anychart.core.ui.Tooltip;
+        tooltip(settings?: Object | boolean): anychart.charts.Surface;
+        top(): number | string;
+        top(top?: number | string): anychart.charts.Surface;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
+        width(): number | string;
+        width(width?: number | string): anychart.charts.Surface;
+        xAxis(): anychart.core.axes.Surface;
+        xAxis(settings?: Object | boolean): anychart.charts.Surface;
+        xGrid(): anychart.core.grids.Surface;
+        xGrid(settings?: Object | boolean): anychart.charts.Surface;
+        xScale(): anychart.scales.Base;
+        xScale(settings?: anychart.scales.Base | Object | string): anychart.charts.Surface;
+        yAxis(): anychart.core.axes.Surface;
+        yAxis(settings?: Object | boolean): anychart.charts.Surface;
+        yGrid(): anychart.core.grids.Surface;
+        yGrid(settings?: Object | boolean): anychart.charts.Surface;
+        yScale(): anychart.scales.Base;
+        yScale(settings?: anychart.scales.Base | Object | string): anychart.charts.Surface;
+        zAxis(): anychart.core.axes.Surface;
+        zAxis(settings?: Object | boolean): anychart.charts.Surface;
+        zGrid(): anychart.core.grids.Surface;
+        zGrid(settings?: Object | boolean): anychart.charts.Surface;
+        zIndex(): number;
+        zIndex(zIndex?: number): anychart.charts.Surface;
+        zScale(): anychart.scales.Base;
+        zScale(settings?: anychart.scales.Base | Object | string): anychart.charts.Surface;
+        parentBounds(): anychart.math.Rect;
+        parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.charts.Surface;
+        parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.charts.Surface;
     }
     interface TreeMap extends anychart.core.SeparateChart {
         a11y(): anychart.core.utils.ChartA11y;
@@ -475,6 +641,8 @@ declare namespace anychart.charts {
         bubble(data?: anychart.data.View | anychart.data.Set | Array<any> | string, csvSettings?: string | anychart.data.TextParsingSettings): anychart.core.cartesian.series.Bubble;
         cancelMarquee(): anychart.charts.Cartesian;
         candlestick(data?: anychart.data.View | anychart.data.Set | Array<any> | string, csvSettings?: string | anychart.data.TextParsingSettings): anychart.core.cartesian.series.Candlestick;
+        categorizedBySeries(): boolean;
+        categorizedBySeries(enabled?: boolean): anychart.charts.Cartesian;
         column(data?: anychart.data.View | anychart.data.Set | Array<any> | string, csvSettings?: string | anychart.data.TextParsingSettings): anychart.core.cartesian.series.Column;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.charts.Cartesian;
@@ -831,14 +999,11 @@ declare namespace anychart.charts {
         a11y(): anychart.core.utils.ChartA11y;
         a11y(settings?: boolean | Object): anychart.charts.Polar;
         addSeries(...var_args: (anychart.data.View | anychart.data.Set | Array<any>)[]): Array<anychart.core.polar.series.Base>;
-        animation(): anychart.core.utils.Animation;
-        animation(settings?: boolean | Object): anychart.charts.Polar;
-        animation(enabled: boolean, duration: number): anychart.charts.Polar;
         area(data: anychart.data.View | anychart.data.Set | Array<any>, csvSettings?: string | anychart.data.TextParsingSettings): anychart.core.polar.series.Area;
         autoRedraw(): boolean;
         autoRedraw(enabled?: boolean): anychart.charts.Polar;
         background(): anychart.core.ui.Background;
-        background(settings?: Object): anychart.charts.Polar;
+        background(settings?: string | Object | boolean): anychart.charts.Polar;
         barGroupsPadding(): number;
         barGroupsPadding(padding?: number): anychart.charts.Polar;
         barsPadding(): number;
@@ -857,7 +1022,7 @@ declare namespace anychart.charts {
         contextMenu(): anychart.ui.ContextMenu;
         contextMenu(settings?: Object | boolean): anychart.charts.Polar;
         credits(): anychart.core.ui.ChartCredits;
-        credits(value?: Object | boolean): anychart.charts.Polar;
+        credits(settings?: Object | boolean): anychart.charts.Polar;
         data(): anychart.data.View;
         data(data?: anychart.data.Set | anychart.data.DataSettings | Array<any>): anychart.charts.Polar;
         defaultSeriesType(): string;
@@ -905,7 +1070,7 @@ declare namespace anychart.charts {
         labels(): anychart.core.ui.LabelsFactory;
         labels(settings?: Object | boolean): anychart.charts.Polar;
         left(): number | string;
-        left(left?: number | string): anychart.charts.Polar;
+        left(value?: number | string): anychart.charts.Polar;
         legend(): anychart.core.ui.Legend;
         legend(settings?: Object | boolean): anychart.charts.Polar;
         line(data: anychart.data.View | anychart.data.Set | Array<any> | string, csvSettings?: string | anychart.data.TextParsingSettings): anychart.core.polar.series.Line;
@@ -919,21 +1084,21 @@ declare namespace anychart.charts {
         markerPalette(): anychart.palettes.Markers;
         markerPalette(settings?: anychart.palettes.Markers | Object | Array<string|string>): anychart.charts.Polar;
         maxHeight(): number | string;
-        maxHeight(height?: number | string): anychart.charts.Polar;
+        maxHeight(maxHeight?: number | string): anychart.charts.Polar;
         maxLabels(): anychart.core.ui.LabelsFactory;
         maxLabels(settings?: Object | boolean): anychart.charts.Polar;
         maxPointWidth(): string | number;
         maxPointWidth(width?: number | string): anychart.charts.Polar;
         maxWidth(): number | string;
-        maxWidth(width?: number | string): anychart.charts.Polar;
+        maxWidth(value?: number | string): anychart.charts.Polar;
         minHeight(): number | string;
-        minHeight(height?: number | string): anychart.charts.Polar;
+        minHeight(minHeight?: number | string): anychart.charts.Polar;
         minLabels(): anychart.core.ui.LabelsFactory;
         minLabels(settings?: Object | boolean): anychart.charts.Polar;
         minPointLength(): string | number;
         minPointLength(length?: number | string): anychart.charts.Polar;
         minWidth(): number | string;
-        minWidth(width?: number | string): anychart.charts.Polar;
+        minWidth(minWidth?: number | string): anychart.charts.Polar;
         noData(): anychart.core.NoDataSettings;
         noData(settings?: Object): anychart.charts.Polar;
         normal(): anychart.core.StateSettings;
@@ -947,7 +1112,7 @@ declare namespace anychart.charts {
         pointWidth(width?: number | string): anychart.charts.Polar;
         polygon(data: anychart.data.View | anychart.data.Set | Array<any> | string, csvSettings?: string | anychart.data.TextParsingSettings): anychart.core.polar.series.Polygon;
         polyline(data: anychart.data.View | anychart.data.Set | Array<any> | string, csvSettings?: string | anychart.data.TextParsingSettings): anychart.core.polar.series.Polyline;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        print(paperSize?: anychart.graphics.vector.PaperSize, landscape?: boolean): void;
         rangeColumn(data: anychart.data.View | anychart.data.Set | Array<any> | string, csvSettings?: string | anychart.data.TextParsingSettings): anychart.core.polar.series.RangeColumn;
         removeAllListeners(type?: string): number;
         removeAllSeries(): anychart.charts.Polar;
@@ -956,11 +1121,11 @@ declare namespace anychart.charts {
         right(): number | string;
         right(right?: number | string): anychart.charts.Polar;
         saveAsCsv(chartDataExportMode?: string, csvSettings?: {[prop:string]:string|boolean|((name:any,value:any)=>void)}, filename?: string): void;
-        saveAsJpg(width?: number | Object, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
+        saveAsJpg(width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean): void;
         saveAsJson(filename?: string): void;
-        saveAsPdf(paperSizeOrWidthOrOptions?: number | string | Object, landscape?: boolean, x?: number, y?: number, filename?: string): void;
-        saveAsPng(width?: number | Object, height?: number, quality?: number, filename?: string): void;
-        saveAsSvg(paperSize?: string | Object, landscape?: boolean, filename?: string): void;
+        saveAsPdf(paperSize?: string, landscape?: boolean, x?: number, y?: number): void;
+        saveAsPng(width?: number, height?: number, quality?: number): void;
+        saveAsSvg(paperSize?: string, landscape?: boolean): void;
         saveAsSvg(width?: number, height?: number): void;
         saveAsXlsx(chartDataExportMode?: string, filename?: string): void;
         saveAsXml(filename?: string): void;
@@ -987,14 +1152,14 @@ declare namespace anychart.charts {
         title(settings?: boolean | Object | string): anychart.charts.Polar;
         toCsv(chartDataExportMode?: string, csvSettings?: {[prop:string]:string|boolean|((name:any,value:any)=>void)|Object}): string;
         toJson(stringify?: boolean): Object | string;
-        toSvg(paperSize?: string | Object, landscape?: boolean): string;
+        toSvg(paperSize?: string, landscape?: boolean): string;
         toSvg(width?: number, height?: number): string;
         toXml(asXmlNode?: boolean): string | Node;
         tooltip(): anychart.core.ui.Tooltip;
         tooltip(settings?: Object | boolean): anychart.charts.Polar;
         top(): number | string;
         top(top?: number | string): anychart.charts.Polar;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlisten(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.charts.Polar;
@@ -1020,6 +1185,9 @@ declare namespace anychart.charts {
         yScale(value?: Object | string | anychart.scales.ScatterBase): anychart.charts.Polar;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.charts.Polar;
+        animation(): anychart.core.utils.Animation;
+        animation(settings?: boolean | Object): anychart.charts.Polar;
+        animation(enabled: boolean, duration: number): anychart.charts.Polar;
         shareAsJpg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
         shareAsPdf(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, paperSizeOrWidth?: number | string, landscapeOrWidth?: number | boolean, x?: number, y?: number, filename?: string): void;
         shareAsPng(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, filename?: string): void;
@@ -1033,13 +1201,10 @@ declare namespace anychart.charts {
     interface Pert extends anychart.core.SeparateChart {
         a11y(): anychart.core.utils.ChartA11y;
         a11y(settings?: boolean | Object): anychart.charts.Pert;
-        animation(): anychart.core.utils.Animation;
-        animation(settings?: boolean | Object): anychart.charts.Pert;
-        animation(enabled: boolean, duration: number): anychart.charts.Pert;
         autoRedraw(): boolean;
         autoRedraw(enabled?: boolean): anychart.charts.Pert;
         background(): anychart.core.ui.Background;
-        background(settings?: Object): anychart.charts.Pert;
+        background(settings?: string | Object | boolean): anychart.charts.Pert;
         bottom(): number | string;
         bottom(bottom?: number | string): anychart.charts.Pert;
         bounds(): anychart.core.utils.Bounds;
@@ -1051,7 +1216,7 @@ declare namespace anychart.charts {
         contextMenu(): anychart.ui.ContextMenu;
         contextMenu(settings?: Object | boolean): anychart.charts.Pert;
         credits(): anychart.core.ui.ChartCredits;
-        credits(value?: Object | boolean): anychart.charts.Pert;
+        credits(settings?: Object | boolean): anychart.charts.Pert;
         criticalPath(): anychart.core.pert.CriticalPath;
         criticalPath(settings?: Object): anychart.charts.Pert;
         data(): anychart.data.Tree | anychart.data.TreeView;
@@ -1070,7 +1235,6 @@ declare namespace anychart.charts {
         getPdfBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), paperSizeOrWidth?: number | string, landscapeOrWidth?: number | boolean, x?: number, y?: number): void;
         getPixelBounds(): anychart.math.Rect;
         getPngBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), width?: number, height?: number, quality?: number): void;
-        getSelectedPoints(): Array<anychart.core.Point>;
         getStat(key?: string): any;
         getSvgBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), paperSizeOrWidth?: string | number, landscapeOrHeight?: boolean | string): void;
         getType(): string;
@@ -1082,16 +1246,12 @@ declare namespace anychart.charts {
         id(): string;
         id(id?: string): anychart.charts.Pert;
         inMarquee(): boolean;
-        interactivity(): anychart.core.utils.Interactivity;
-        interactivity(settings?: Object | string): anychart.charts.Pert;
         isFullScreenAvailable(): boolean;
         label(index?: string | number): anychart.core.ui.Label;
         label(settings?: boolean | Object | string): anychart.charts.Pert;
         label(index?: string | number, settings?: boolean | Object | string): anychart.charts.Pert;
         left(): number | string;
-        left(left?: number | string): anychart.charts.Pert;
-        legend(): anychart.core.ui.Legend;
-        legend(settings?: Object | boolean): anychart.charts.Pert;
+        left(value?: number | string): anychart.charts.Pert;
         listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         localToGlobal(xCoord: number, yCoord: number): {[prop:string]:number};
@@ -1099,30 +1259,30 @@ declare namespace anychart.charts {
         margin(margin?: Array<number|string> | Object): anychart.charts.Pert;
         margin(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.charts.Pert;
         maxHeight(): number | string;
-        maxHeight(height?: number | string): anychart.charts.Pert;
+        maxHeight(maxHeight?: number | string): anychart.charts.Pert;
         maxWidth(): number | string;
-        maxWidth(width?: number | string): anychart.charts.Pert;
+        maxWidth(value?: number | string): anychart.charts.Pert;
         milestones(): anychart.core.pert.Milestones;
         milestones(settings?: Object): anychart.charts.Pert;
         minHeight(): number | string;
-        minHeight(height?: number | string): anychart.charts.Pert;
+        minHeight(minHeight?: number | string): anychart.charts.Pert;
         minWidth(): number | string;
-        minWidth(width?: number | string): anychart.charts.Pert;
+        minWidth(minWidth?: number | string): anychart.charts.Pert;
         noData(): anychart.core.NoDataSettings;
         noData(settings?: Object): anychart.charts.Pert;
         padding(): anychart.core.utils.Padding;
         padding(padding?: Array<number|string> | Object): anychart.charts.Pert;
         padding(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.charts.Pert;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        print(paperSize?: anychart.graphics.vector.PaperSize, landscape?: boolean): void;
         removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.charts.Pert;
         saveAsCsv(chartDataExportMode?: string, csvSettings?: {[prop:string]:string|boolean|((name:any,value:any)=>void)}, filename?: string): void;
-        saveAsJpg(width?: number | Object, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
+        saveAsJpg(width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean): void;
         saveAsJson(filename?: string): void;
-        saveAsPdf(paperSizeOrWidthOrOptions?: number | string | Object, landscape?: boolean, x?: number, y?: number, filename?: string): void;
-        saveAsPng(width?: number | Object, height?: number, quality?: number, filename?: string): void;
-        saveAsSvg(paperSize?: string | Object, landscape?: boolean, filename?: string): void;
+        saveAsPdf(paperSize?: string, landscape?: boolean, x?: number, y?: number): void;
+        saveAsPng(width?: number, height?: number, quality?: number): void;
+        saveAsSvg(paperSize?: string, landscape?: boolean): void;
         saveAsSvg(width?: number, height?: number): void;
         saveAsXlsx(chartDataExportMode?: string, filename?: string): void;
         saveAsXml(filename?: string): void;
@@ -1151,12 +1311,12 @@ declare namespace anychart.charts {
         toCsv(chartDataExportMode?: string, csvSettings?: {[prop:string]:string|boolean|((name:any,value:any)=>void)|Object}): string;
         toHtmlTable(title?: string, asString?: boolean): Element | string;
         toJson(stringify?: boolean): Object | string;
-        toSvg(paperSize?: string | Object, landscape?: boolean): string;
+        toSvg(paperSize?: string, landscape?: boolean): string;
         toSvg(width?: number, height?: number): string;
         toXml(asXmlNode?: boolean): string | Node;
         top(): number | string;
         top(top?: number | string): anychart.charts.Pert;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlisten(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
         verticalSpacing(): string | number;
         verticalSpacing(settings?: number | string): anychart.charts.Pert;
@@ -1164,6 +1324,14 @@ declare namespace anychart.charts {
         width(width?: number | string): anychart.charts.Pert;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.charts.Pert;
+        animation(): anychart.core.utils.Animation;
+        animation(settings?: boolean | Object): anychart.charts.Pert;
+        animation(enabled: boolean, duration: number): anychart.charts.Pert;
+        getSelectedPoints(): Array<anychart.core.Point>;
+        interactivity(): anychart.core.utils.Interactivity;
+        interactivity(settings?: Object | string): anychart.charts.Pert;
+        legend(): anychart.core.ui.Legend;
+        legend(settings?: Object | boolean): anychart.charts.Pert;
         tooltip(): anychart.core.ui.Tooltip;
         tooltip(settings?: Object | boolean): anychart.charts.Pert;
         parentBounds(): anychart.math.Rect;
@@ -1182,7 +1350,7 @@ declare namespace anychart.charts {
         autoRedraw(): boolean;
         autoRedraw(enabled?: boolean): anychart.charts.Scatter;
         background(): anychart.core.ui.Background;
-        background(settings?: Object): anychart.charts.Scatter;
+        background(settings?: string | Object | boolean): anychart.charts.Scatter;
         baseline(): number;
         baseline(value?: number): anychart.charts.Scatter;
         bottom(): number | string;
@@ -1197,7 +1365,7 @@ declare namespace anychart.charts {
         contextMenu(): anychart.ui.ContextMenu;
         contextMenu(settings?: Object | boolean): anychart.charts.Scatter;
         credits(): anychart.core.ui.ChartCredits;
-        credits(value?: Object | boolean): anychart.charts.Scatter;
+        credits(settings?: Object | boolean): anychart.charts.Scatter;
         crosshair(): anychart.core.ui.Crosshair;
         crosshair(settings?: Object | boolean): anychart.charts.Scatter;
         crossing(): anychart.core.utils.Crossing;
@@ -1249,7 +1417,7 @@ declare namespace anychart.charts {
         labels(): anychart.core.ui.LabelsFactory;
         labels(settings?: Object | boolean): anychart.charts.Scatter;
         left(): number | string;
-        left(left?: number | string): anychart.charts.Scatter;
+        left(value?: number | string): anychart.charts.Scatter;
         legend(): anychart.core.ui.Legend;
         legend(settings?: Object | boolean): anychart.charts.Scatter;
         line(data?: anychart.data.View | anychart.data.Set | Array<any> | string, csvSettings?: string | anychart.data.TextParsingSettings): anychart.core.scatter.series.Line;
@@ -1268,19 +1436,19 @@ declare namespace anychart.charts {
         maxBubbleSize(): number | string;
         maxBubbleSize(size?: number | string): anychart.charts.Scatter;
         maxHeight(): number | string;
-        maxHeight(height?: number | string): anychart.charts.Scatter;
+        maxHeight(maxHeight?: number | string): anychart.charts.Scatter;
         maxLabels(): anychart.core.ui.LabelsFactory;
         maxLabels(settings?: Object | boolean): anychart.charts.Scatter;
         maxWidth(): number | string;
-        maxWidth(width?: number | string): anychart.charts.Scatter;
+        maxWidth(maxWidth?: number | string): anychart.charts.Scatter;
         minBubbleSize(): number | string;
         minBubbleSize(value?: number | string): anychart.charts.Scatter;
         minHeight(): number | string;
-        minHeight(height?: number | string): anychart.charts.Scatter;
+        minHeight(minHeight?: number | string): anychart.charts.Scatter;
         minLabels(): anychart.core.ui.LabelsFactory;
         minLabels(settings?: Object | boolean): anychart.charts.Scatter;
         minWidth(): number | string;
-        minWidth(width?: number | string): anychart.charts.Scatter;
+        minWidth(minWidth?: number | string): anychart.charts.Scatter;
         noData(): anychart.core.NoDataSettings;
         noData(settings?: Object): anychart.charts.Scatter;
         normal(): anychart.core.StateSettings;
@@ -1290,7 +1458,7 @@ declare namespace anychart.charts {
         padding(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.charts.Scatter;
         palette(): anychart.palettes.RangeColors | anychart.palettes.DistinctColors;
         palette(settings?: anychart.palettes.RangeColors | anychart.palettes.DistinctColors | Object | Array<string>): anychart.charts.Scatter;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        print(paperSize?: anychart.graphics.vector.PaperSize, landscape?: boolean): void;
         quarters(): anychart.core.utils.QuarterSettings;
         quarters(settings?: Object): anychart.charts.Scatter;
         rangeMarker(index?: number): anychart.core.axisMarkers.Range;
@@ -1301,13 +1469,13 @@ declare namespace anychart.charts {
         removeSeries(id: number | string): anychart.charts.Scatter;
         removeSeriesAt(index: number): anychart.charts.Scatter;
         right(): number | string;
-        right(right?: number | string): anychart.charts.Scatter;
+        right(value?: number | string): anychart.charts.Scatter;
         saveAsCsv(chartDataExportMode?: string, csvSettings?: {[prop:string]:string|boolean|((name:any,value:any)=>void)}, filename?: string): void;
-        saveAsJpg(width?: number | Object, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
+        saveAsJpg(width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean): void;
         saveAsJson(filename?: string): void;
-        saveAsPdf(paperSizeOrWidthOrOptions?: number | string | Object, landscape?: boolean, x?: number, y?: number, filename?: string): void;
-        saveAsPng(width?: number | Object, height?: number, quality?: number, filename?: string): void;
-        saveAsSvg(paperSize?: string | Object, landscape?: boolean, filename?: string): void;
+        saveAsPdf(paperSize?: string, landscape?: boolean, x?: number, y?: number): void;
+        saveAsPng(width?: number, height?: number, quality?: number): void;
+        saveAsSvg(paperSize?: string, landscape?: boolean): void;
         saveAsSvg(width?: number, height?: number): void;
         saveAsXlsx(chartDataExportMode?: string, filename?: string): void;
         saveAsXml(filename?: string): void;
@@ -1339,14 +1507,14 @@ declare namespace anychart.charts {
         toCsv(chartDataExportMode?: string, csvSettings?: {[prop:string]:string|boolean|((name:any,value:any)=>void)|Object}): string;
         toHtmlTable(title?: string, asString?: boolean): Element | string;
         toJson(stringify?: boolean): Object | string;
-        toSvg(paperSize?: string | Object, landscape?: boolean): string;
+        toSvg(paperSize?: string, landscape?: boolean): string;
         toSvg(width?: number, height?: number): string;
         toXml(asXmlNode?: boolean): string | Node;
         tooltip(): anychart.core.ui.Tooltip;
         tooltip(settings?: Object | boolean): anychart.charts.Scatter;
         top(): number | string;
         top(top?: number | string): anychart.charts.Scatter;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlisten(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.charts.Scatter;
@@ -1387,7 +1555,7 @@ declare namespace anychart.charts {
         autoRedraw(): boolean;
         autoRedraw(enabled?: boolean): anychart.charts.Pareto;
         background(): anychart.core.ui.Background;
-        background(settings?: Object): anychart.charts.Pareto;
+        background(settings?: string | Object | boolean): anychart.charts.Pareto;
         barGroupsPadding(): number;
         barGroupsPadding(padding?: number): anychart.charts.Pareto;
         barsPadding(): number;
@@ -1403,7 +1571,7 @@ declare namespace anychart.charts {
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.charts.Pareto;
         credits(): anychart.core.ui.ChartCredits;
-        credits(value?: Object | boolean): anychart.charts.Pareto;
+        credits(settings?: Object | boolean): anychart.charts.Pareto;
         crosshair(): anychart.core.ui.Crosshair;
         crosshair(settings?: Object | boolean): anychart.charts.Pareto;
         data(): anychart.data.View;
@@ -1454,7 +1622,7 @@ declare namespace anychart.charts {
         labels(): anychart.core.ui.LabelsFactory;
         labels(settings?: Object | boolean): anychart.charts.Pareto;
         left(): number | string;
-        left(left?: number | string): anychart.charts.Pareto;
+        left(value?: number | string): anychart.charts.Pareto;
         legend(): anychart.core.ui.Legend;
         legend(settings?: Object | boolean): anychart.charts.Pareto;
         lineMarker(index?: number): anychart.core.axisMarkers.Line;
@@ -1491,11 +1659,11 @@ declare namespace anychart.charts {
         removeSeries(id: number | string): anychart.charts.Pareto;
         removeSeriesAt(index: number): anychart.charts.Pareto;
         saveAsCsv(chartDataExportMode?: string, csvSettings?: {[prop:string]:string|boolean|((name:any,value:any)=>void)}, filename?: string): void;
-        saveAsJpg(width?: number | Object, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
+        saveAsJpg(width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean): void;
         saveAsJson(filename?: string): void;
-        saveAsPdf(paperSizeOrWidthOrOptions?: number | string | Object, landscape?: boolean, x?: number, y?: number, filename?: string): void;
-        saveAsPng(width?: number | Object, height?: number, quality?: number, filename?: string): void;
-        saveAsSvg(paperSize?: string | Object, landscape?: boolean, filename?: string): void;
+        saveAsPdf(paperSize?: string, landscape?: boolean, x?: number, y?: number): void;
+        saveAsPng(width?: number, height?: number, quality?: number): void;
+        saveAsSvg(paperSize?: string, landscape?: boolean): void;
         saveAsSvg(width?: number, height?: number): void;
         saveAsXlsx(chartDataExportMode?: string, filename?: string): void;
         saveAsXml(filename?: string): void;
@@ -1527,14 +1695,14 @@ declare namespace anychart.charts {
         toCsv(chartDataExportMode?: string, csvSettings?: {[prop:string]:string|boolean|((name:any,value:any)=>void)|Object}): string;
         toHtmlTable(title?: string, asString?: boolean): Element | string;
         toJson(stringify?: boolean): Object | string;
-        toSvg(paperSize?: string | Object, landscape?: boolean): string;
+        toSvg(paperSize?: string, landscape?: boolean): string;
         toSvg(width?: number, height?: number): string;
         toXml(asXmlNode?: boolean): string | Node;
         tooltip(): anychart.core.ui.Tooltip;
         tooltip(settings?: Object | boolean): anychart.charts.Pareto;
         top(): number | string;
         top(top?: number | string): anychart.charts.Pareto;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlisten(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.charts.Pareto;
@@ -1591,8 +1759,6 @@ declare namespace anychart.charts {
         padding(): anychart.core.utils.Padding;
         padding(padding?: Array<number|string> | Object): anychart.charts.Pareto;
         padding(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.charts.Pareto;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.charts.Pareto;
         zIndex(): number;
@@ -1600,6 +1766,8 @@ declare namespace anychart.charts {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.charts.Pareto;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.charts.Pareto;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        removeAllListeners(type?: string): number;
     }
     interface Venn extends anychart.core.SeparateChart {
         a11y(): anychart.core.utils.ChartA11y;
@@ -2552,13 +2720,10 @@ declare namespace anychart.charts {
         a11y(settings?: boolean | Object): anychart.charts.Resource;
         activities(): anychart.core.resource.Activities;
         activities(settings?: Object): anychart.charts.Resource;
-        animation(): anychart.core.utils.Animation;
-        animation(settings?: boolean | Object): anychart.charts.Resource;
-        animation(enabled: boolean, duration: number): anychart.charts.Resource;
         autoRedraw(): boolean;
         autoRedraw(enabled?: boolean): anychart.charts.Resource;
         background(): anychart.core.ui.Background;
-        background(settings?: Object): anychart.charts.Resource;
+        background(settings?: string | Object | boolean): anychart.charts.Resource;
         bottom(): number | string;
         bottom(bottom?: number | string): anychart.charts.Resource;
         bounds(): anychart.core.utils.Bounds;
@@ -2577,7 +2742,7 @@ declare namespace anychart.charts {
         contextMenu(): anychart.ui.ContextMenu;
         contextMenu(settings?: Object | boolean): anychart.charts.Resource;
         credits(): anychart.core.ui.ChartCredits;
-        credits(value?: Object | boolean): anychart.charts.Resource;
+        credits(settings?: Object | boolean): anychart.charts.Resource;
         currentStartDate(): Date | number | string;
         currentStartDate(date: Date | number | string): anychart.charts.Resource;
         data(): anychart.data.View;
@@ -2592,9 +2757,13 @@ declare namespace anychart.charts {
         exports(settings?: Object): anychart.charts.Resource;
         fullScreen(): boolean;
         fullScreen(enabled?: boolean): anychart.charts.Resource;
+        getJpgBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean): void;
+        getPdfBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), paperSizeOrWidth?: number | string, landscapeOrWidth?: number | boolean, x?: number, y?: number): void;
         getPixelBounds(): anychart.math.Rect;
+        getPngBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), width?: number, height?: number, quality?: number): void;
         getSelectedPoints(): Array<anychart.core.Point>;
         getStat(key?: string): any;
+        getSvgBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), paperSizeOrWidth?: string | number, landscapeOrHeight?: boolean | string): void;
         getType(): string;
         globalToLocal(xCoord: number, yCoord: number): {[prop:string]:number};
         grid(): anychart.core.resource.Grid;
@@ -2613,7 +2782,7 @@ declare namespace anychart.charts {
         label(settings?: boolean | Object | string): anychart.charts.Resource;
         label(index?: string | number, settings?: boolean | Object | string): anychart.charts.Resource;
         left(): number | string;
-        left(left?: number | string): anychart.charts.Resource;
+        left(value?: number | string): anychart.charts.Resource;
         listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         localToGlobal(xCoord: number, yCoord: number): {[prop:string]:number};
@@ -2621,17 +2790,17 @@ declare namespace anychart.charts {
         logo(settings?: Object): anychart.charts.Resource;
         margin(): anychart.core.utils.Margin;
         margin(margin?: Array<number|string> | Object): anychart.charts.Resource;
-        margin(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.charts.Resource;
+        margin(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): void;
         maxHeight(): number | string;
-        maxHeight(height?: number | string): anychart.charts.Resource;
+        maxHeight(maxHeight?: number | string): anychart.charts.Resource;
         maxWidth(): number | string;
-        maxWidth(width?: number | string): anychart.charts.Resource;
+        maxWidth(value?: number | string): anychart.charts.Resource;
         minHeight(): number | string;
-        minHeight(height?: number | string): anychart.charts.Resource;
+        minHeight(minHeight?: number | string): anychart.charts.Resource;
         minRowHeight(): number;
         minRowHeight(height?: number): anychart.charts.Resource;
         minWidth(): number | string;
-        minWidth(width?: number | string): anychart.charts.Resource;
+        minWidth(minWidth?: number | string): anychart.charts.Resource;
         noData(): anychart.core.NoDataSettings;
         noData(settings?: Object): anychart.charts.Resource;
         overlay(): anychart.core.gantt.Overlay;
@@ -2641,7 +2810,7 @@ declare namespace anychart.charts {
         padding(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.charts.Resource;
         pixPerHour(): number;
         pixPerHour(height?: number): anychart.charts.Resource;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        print(paperSize?: anychart.graphics.vector.PaperSize, landscape?: boolean): void;
         removeAllListeners(type?: string): number;
         resourceList(): anychart.core.resource.ResourceList;
         resourceList(settings?: Object | boolean): anychart.charts.Resource;
@@ -2650,11 +2819,11 @@ declare namespace anychart.charts {
         right(): number | string;
         right(right?: number | string): anychart.charts.Resource;
         saveAsCsv(chartDataExportMode?: string, csvSettings?: {[prop:string]:string|boolean|((name:any,value:any)=>void)}, filename?: string): void;
-        saveAsJpg(width?: number | Object, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
+        saveAsJpg(width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean): void;
         saveAsJson(filename?: string): void;
-        saveAsPdf(paperSizeOrWidthOrOptions?: number | string | Object, landscape?: boolean, x?: number, y?: number, filename?: string): void;
-        saveAsPng(width?: number | Object, height?: number, quality?: number, filename?: string): void;
-        saveAsSvg(paperSize?: string | Object, landscape?: boolean, filename?: string): void;
+        saveAsPdf(paperSize?: string, landscape?: boolean, x?: number, y?: number): void;
+        saveAsPng(width?: number, height?: number, quality?: number): void;
+        saveAsSvg(paperSize?: string, landscape?: boolean): void;
         saveAsSvg(width?: number, height?: number): void;
         saveAsXlsx(chartDataExportMode?: string, filename?: string): void;
         saveAsXml(filename?: string): void;
@@ -2668,6 +2837,10 @@ declare namespace anychart.charts {
         selectMarqueeStroke(): anychart.graphics.vector.Stroke;
         selectMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Resource;
         selectPoint(globalIndex: number, event?: anychart.core.MouseEvent): anychart.charts.Resource;
+        shareAsJpg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
+        shareAsPdf(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, paperSizeOrWidth?: number | string, landscapeOrWidth?: number | boolean, x?: number, y?: number, filename?: string): void;
+        shareAsPng(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, filename?: string): void;
+        shareAsSvg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, paperSizeOrWidth?: string | number, landscapeOrHeight?: boolean | string, filename?: string): void;
         shareWithFacebook(captionOrOptions?: string | Object, link?: string, name?: string, description?: string): void;
         shareWithLinkedIn(captionOrOptions?: string | Object, description?: string): void;
         shareWithPinterest(linkOrOptions?: string | Object, description?: string): void;
@@ -2683,9 +2856,11 @@ declare namespace anychart.charts {
         timeTrackingMode(mode?: string): anychart.charts.Resource;
         title(): anychart.core.ui.Title;
         title(settings?: boolean | Object | string): anychart.charts.Resource;
+        toA11yTable(title?: string, asString?: boolean): Element | string;
         toCsv(chartDataExportMode?: string, csvSettings?: {[prop:string]:string|boolean|((name:any,value:any)=>void)|Object}): string;
+        toHtmlTable(title?: string, asString?: boolean): Element | string;
         toJson(stringify?: boolean): Object | string;
-        toSvg(paperSize?: string | Object, landscape?: boolean): string;
+        toSvg(paperSize?: string, landscape?: boolean): string;
         toSvg(width?: number, height?: number): string;
         toXml(asXmlNode?: boolean): string | Node;
         tooltip(): anychart.core.ui.Tooltip;
@@ -2693,7 +2868,7 @@ declare namespace anychart.charts {
         top(): number | string;
         top(top?: number | string): anychart.charts.Resource;
         unhover(resourceIndex?: number | Array<number>, activityIndex?: number): anychart.charts.Resource;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlisten(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
         unselect(resourceIndex?: number | Array<number>, activityIndex?: number): void;
         verticalScrollBar(): anychart.core.ui.Scroller;
@@ -2708,16 +2883,9 @@ declare namespace anychart.charts {
         zoomLevel(indexOrId?: number | string): anychart.charts.Resource;
         zoomLevels(): Array<anychart.charts.Resource.ZoomLevel>;
         zoomLevels(levelsSettings?: Array<anychart.charts.Resource.ZoomLevel>): anychart.charts.Resource;
-        getJpgBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean): void;
-        getPdfBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), paperSizeOrWidth?: number | string, landscapeOrWidth?: number | boolean, x?: number, y?: number): void;
-        getPngBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), width?: number, height?: number, quality?: number): void;
-        getSvgBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), paperSizeOrWidth?: string | number, landscapeOrHeight?: boolean | string): void;
-        shareAsJpg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
-        shareAsPdf(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, paperSizeOrWidth?: number | string, landscapeOrWidth?: number | boolean, x?: number, y?: number, filename?: string): void;
-        shareAsPng(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, filename?: string): void;
-        shareAsSvg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, paperSizeOrWidth?: string | number, landscapeOrHeight?: boolean | string, filename?: string): void;
-        toA11yTable(title?: string, asString?: boolean): Element | string;
-        toHtmlTable(title?: string, asString?: boolean): Element | string;
+        animation(): anychart.core.utils.Animation;
+        animation(settings?: boolean | Object): anychart.charts.Resource;
+        animation(enabled: boolean, duration: number): anychart.charts.Resource;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.charts.Resource;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.charts.Resource;
@@ -2730,6 +2898,153 @@ declare namespace anychart.charts {
         unit: string;
         unitPixSize: number;
     }
+    }
+    interface Wordtree extends anychart.core.Chart {
+        a11y(): anychart.core.utils.ChartA11y;
+        a11y(settings?: boolean | Object): anychart.charts.Wordtree;
+        animation(): anychart.core.utils.Animation;
+        animation(settings?: boolean | Object): anychart.charts.Wordtree;
+        animation(enabled: boolean, duration: number): anychart.charts.Wordtree;
+        autoRedraw(): boolean;
+        autoRedraw(enabled?: boolean): anychart.charts.Wordtree;
+        background(): anychart.core.ui.Background;
+        background(settings?: Object): anychart.charts.Wordtree;
+        bottom(): number | string;
+        bottom(bottom?: number | string): anychart.charts.Wordtree;
+        bounds(): anychart.core.utils.Bounds;
+        bounds(bounds?: anychart.utils.RectObj | anychart.math.Rect | anychart.core.utils.Bounds): anychart.charts.Wordtree;
+        bounds(x?: number | string, y?: number | string, width?: number | string, height?: number | string): anychart.charts.Wordtree;
+        cancelMarquee(): anychart.charts.Wordtree;
+        connectors(): anychart.core.wordtree.Connectors;
+        connectors(settings?: Object): anychart.charts.Wordtree;
+        container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
+        container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.charts.Wordtree;
+        contextMenu(): anychart.ui.ContextMenu;
+        contextMenu(settings?: Object | boolean): anychart.charts.Wordtree;
+        credits(): anychart.core.ui.ChartCredits;
+        credits(value?: Object | boolean): anychart.charts.Wordtree;
+        data(): anychart.data.Tree;
+        data(data?: string | Array<Array<string>|string|anychart.data.Tree>): anychart.charts.Wordtree;
+        dispose(): void;
+        draw(async?: boolean): anychart.charts.Wordtree;
+        drillTo(Target: anychart.data.Tree.DataItem | string): void;
+        drillUp(): anychart.charts.Wordtree;
+        enabled(): boolean;
+        enabled(enabled?: boolean): anychart.charts.Wordtree;
+        exports(): anychart.core.utils.Exports;
+        exports(settings?: Object): anychart.charts.Wordtree;
+        fontColor(): string;
+        fontColor(color?: string): anychart.charts.Wordtree;
+        fontDecoration(): anychart.graphics.vector.Text.Decoration | string;
+        fontDecoration(type?: anychart.graphics.vector.Text.Decoration | string): anychart.charts.Wordtree;
+        fontFamily(): string;
+        fontFamily(fontFamily?: string): anychart.charts.Wordtree;
+        fontOpacity(): number;
+        fontOpacity(opacity?: number): anychart.charts.Wordtree;
+        fontStyle(): anychart.graphics.vector.Text.FontStyle;
+        fontStyle(style?: string | anychart.graphics.vector.Text.FontStyle): anychart.charts.Wordtree;
+        fontWeight(): string | number;
+        fontWeight(weight?: string | number): anychart.charts.Wordtree;
+        fullScreen(): boolean;
+        fullScreen(enabled?: boolean): anychart.charts.Wordtree;
+        getJpgBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean): void;
+        getPdfBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), paperSizeOrWidth?: number | string, landscapeOrWidth?: number | boolean, x?: number, y?: number): void;
+        getPixelBounds(): anychart.math.Rect;
+        getPngBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), width?: number, height?: number, quality?: number): void;
+        getSelectedPoints(): Array<anychart.core.Point>;
+        getStat(key?: string): any;
+        getSvgBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), paperSizeOrWidth?: string | number, landscapeOrHeight?: boolean | string): void;
+        globalToLocal(xCoord: number, yCoord: number): {[prop:string]:number};
+        height(): number | string;
+        height(height?: number | string): anychart.charts.Wordtree;
+        id(): string;
+        id(id?: string): anychart.charts.Wordtree;
+        inMarquee(): boolean;
+        isFullScreenAvailable(): boolean;
+        label(index?: string | number): anychart.core.ui.Label;
+        label(settings?: boolean | Object | string): anychart.charts.Wordtree;
+        label(index?: string | number, settings?: boolean | Object | string): anychart.charts.Wordtree;
+        left(): number | string;
+        left(left?: number | string): anychart.charts.Wordtree;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        localToGlobal(xCoord: number, yCoord: number): {[prop:string]:number};
+        margin(): anychart.core.utils.Margin;
+        margin(margin?: Array<number|string> | Object): anychart.charts.Wordtree;
+        margin(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.charts.Wordtree;
+        maxFontSize(): number;
+        maxFontSize(size?: number | string): anychart.charts.Wordtree;
+        maxHeight(): number | string;
+        maxHeight(height?: number | string): anychart.charts.Wordtree;
+        maxWidth(): number | string;
+        maxWidth(width?: number | string): anychart.charts.Wordtree;
+        minFontSize(): number;
+        minFontSize(size?: number | string): anychart.charts.Wordtree;
+        minHeight(): number | string;
+        minHeight(height?: number | string): anychart.charts.Wordtree;
+        minWidth(): number | string;
+        minWidth(width?: number | string): anychart.charts.Wordtree;
+        noData(): anychart.core.NoDataSettings;
+        noData(settings?: Object): anychart.charts.Wordtree;
+        padding(): anychart.core.utils.Padding;
+        padding(padding?: Array<number|string> | Object): anychart.charts.Wordtree;
+        padding(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.charts.Wordtree;
+        postfix(): string;
+        postfix(text?: string): anychart.charts.Wordtree;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        removeAllListeners(type?: string): number;
+        right(): number | string;
+        right(right?: number | string): anychart.charts.Wordtree;
+        saveAsCsv(chartDataExportMode?: string, csvSettings?: {[prop:string]:string|boolean|((name:any,value:any)=>void)}, filename?: string): void;
+        saveAsJpg(width?: number | Object, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
+        saveAsJson(filename?: string): void;
+        saveAsPdf(paperSizeOrWidthOrOptions?: number | string | Object, landscape?: boolean, x?: number, y?: number, filename?: string): void;
+        saveAsPng(width?: number | Object, height?: number, quality?: number, filename?: string): void;
+        saveAsSvg(paperSize?: string | Object, landscape?: boolean, filename?: string): void;
+        saveAsSvg(width?: number, height?: number): void;
+        saveAsXlsx(chartDataExportMode?: string, filename?: string): void;
+        saveAsXml(filename?: string): void;
+        selectMarqueeFill(): anychart.graphics.vector.Fill;
+        selectMarqueeFill(color: anychart.graphics.vector.Fill | Array<anychart.graphics.vector.GradientKey|string>): anychart.charts.Wordtree;
+        selectMarqueeFill(color: string, opacity?: number): anychart.charts.Wordtree;
+        selectMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.Wordtree;
+        selectMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.Wordtree;
+        selectMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.Wordtree;
+        selectMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Wordtree;
+        shareAsJpg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
+        shareAsPdf(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, paperSizeOrWidth?: number | string, landscapeOrWidth?: number | boolean, x?: number, y?: number, filename?: string): void;
+        shareAsPng(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, filename?: string): void;
+        shareAsSvg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, paperSizeOrWidth?: string | number, landscapeOrHeight?: boolean | string, filename?: string): void;
+        shareWithFacebook(captionOrOptions?: string | Object, link?: string, name?: string, description?: string): void;
+        shareWithLinkedIn(captionOrOptions?: string | Object, description?: string): void;
+        shareWithPinterest(linkOrOptions?: string | Object, description?: string): void;
+        shareWithTwitter(): void;
+        startSelectMarquee(repeat?: boolean): anychart.charts.Wordtree;
+        title(): anychart.core.ui.Title;
+        title(settings?: boolean | Object | string): anychart.charts.Wordtree;
+        toA11yTable(title?: string, asString?: boolean): Element | string;
+        toCsv(chartDataExportMode?: string, csvSettings?: {[prop:string]:string|boolean|((name:any,value:any)=>void)|Object}): string;
+        toHtmlTable(title?: string, asString?: boolean): Element | string;
+        toJson(stringify?: boolean): Object | string;
+        toSvg(paperSize?: string | Object, landscape?: boolean): string;
+        toSvg(width?: number, height?: number): string;
+        toXml(asXmlNode?: boolean): string | Node;
+        tooltip(): anychart.core.ui.Tooltip;
+        tooltip(settings?: Object | boolean): anychart.charts.Wordtree;
+        top(): number | string;
+        top(top?: number | string): anychart.charts.Wordtree;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
+        width(): number | string;
+        width(width?: number | string): anychart.charts.Wordtree;
+        word(): string;
+        word(word?: string): anychart.charts.Wordtree;
+        zIndex(): number;
+        zIndex(zIndex?: number): anychart.charts.Wordtree;
+        parentBounds(): anychart.math.Rect;
+        parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.charts.Wordtree;
+        parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.charts.Wordtree;
     }
     interface Sparkline extends anychart.core.Chart {
         a11y(): anychart.core.utils.ChartA11y;
@@ -2987,9 +3302,9 @@ declare namespace anychart.charts {
         autoRedraw(): boolean;
         autoRedraw(enabled?: boolean): anychart.charts.Radar;
         background(): anychart.core.ui.Background;
-        background(settings?: Object): anychart.charts.Radar;
+        background(settings?: string | Object | boolean): anychart.charts.Radar;
         baseline(): number;
-        baseline(value?: number): anychart.charts.Polar;
+        baseline(value?: number): anychart.charts.Radar;
         bottom(): number | string;
         bottom(bottom?: number | string): anychart.charts.Radar;
         bounds(): anychart.core.utils.Bounds;
@@ -3001,7 +3316,7 @@ declare namespace anychart.charts {
         contextMenu(): anychart.ui.ContextMenu;
         contextMenu(settings?: Object | boolean): anychart.charts.Radar;
         credits(): anychart.core.ui.ChartCredits;
-        credits(value?: Object | boolean): anychart.charts.Radar;
+        credits(settings?: Object | boolean): anychart.charts.Radar;
         data(): anychart.data.View;
         data(data?: anychart.data.Set | anychart.data.DataSettings | Array<any>): anychart.charts.Radar;
         defaultSeriesType(): string;
@@ -3049,7 +3364,7 @@ declare namespace anychart.charts {
         labels(): anychart.core.ui.LabelsFactory;
         labels(settings?: Object | boolean): anychart.charts.Radar;
         left(): number | string;
-        left(left?: number | string): anychart.charts.Radar;
+        left(value?: number | string): anychart.charts.Radar;
         legend(): anychart.core.ui.Legend;
         legend(settings?: Object | boolean): anychart.charts.Radar;
         line(data: anychart.data.View | anychart.data.Set | Array<any> | string, csvSettings?: string | anychart.data.TextParsingSettings): anychart.core.radar.series.Line;
@@ -3058,22 +3373,22 @@ declare namespace anychart.charts {
         localToGlobal(xCoord: number, yCoord: number): {[prop:string]:number};
         margin(): anychart.core.utils.Margin;
         margin(margin?: Array<number|string> | Object): anychart.charts.Radar;
-        margin(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.charts.Radar;
+        margin(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): void;
         marker(data: anychart.data.View | anychart.data.Set | Array<any> | string, csvSettings?: string | anychart.data.TextParsingSettings): anychart.core.radar.series.Marker;
         markerPalette(): anychart.palettes.Markers;
         markerPalette(settings?: anychart.palettes.Markers | Object | Array<string|string>): anychart.charts.Radar;
         maxHeight(): number | string;
-        maxHeight(height?: number | string): anychart.charts.Radar;
+        maxHeight(maxHeight?: number | string): anychart.charts.Radar;
         maxLabels(): anychart.core.ui.LabelsFactory;
         maxLabels(settings?: Object | boolean): anychart.charts.Radar;
         maxWidth(): number | string;
-        maxWidth(width?: number | string): anychart.charts.Radar;
+        maxWidth(value?: number | string): anychart.charts.Radar;
         minHeight(): number | string;
-        minHeight(height?: number | string): anychart.charts.Radar;
+        minHeight(minHeight?: number | string): anychart.charts.Radar;
         minLabels(): anychart.core.ui.LabelsFactory;
         minLabels(settings?: Object | boolean): anychart.charts.Radar;
         minWidth(): number | string;
-        minWidth(width?: number | string): anychart.charts.Radar;
+        minWidth(minWidth?: number | string): anychart.charts.Radar;
         noData(): anychart.core.NoDataSettings;
         noData(settings?: Object): anychart.charts.Radar;
         normal(): anychart.core.StateSettings;
@@ -3083,7 +3398,7 @@ declare namespace anychart.charts {
         padding(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.charts.Radar;
         palette(): anychart.palettes.RangeColors | anychart.palettes.DistinctColors;
         palette(settings?: anychart.palettes.RangeColors | anychart.palettes.DistinctColors | Object | Array<string>): anychart.charts.Radar;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        print(paperSize?: anychart.graphics.vector.PaperSize, landscape?: boolean): void;
         removeAllListeners(type?: string): number;
         removeAllSeries(): anychart.charts.Radar;
         removeSeries(id: number | string): anychart.charts.Radar;
@@ -3091,11 +3406,11 @@ declare namespace anychart.charts {
         right(): number | string;
         right(right?: number | string): anychart.charts.Radar;
         saveAsCsv(chartDataExportMode?: string, csvSettings?: {[prop:string]:string|boolean|((name:any,value:any)=>void)}, filename?: string): void;
-        saveAsJpg(width?: number | Object, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
+        saveAsJpg(width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean): void;
         saveAsJson(filename?: string): void;
-        saveAsPdf(paperSizeOrWidthOrOptions?: number | string | Object, landscape?: boolean, x?: number, y?: number, filename?: string): void;
-        saveAsPng(width?: number | Object, height?: number, quality?: number, filename?: string): void;
-        saveAsSvg(paperSize?: string | Object, landscape?: boolean, filename?: string): void;
+        saveAsPdf(paperSize?: string, landscape?: boolean, x?: number, y?: number): void;
+        saveAsPng(width?: number, height?: number, quality?: number): void;
+        saveAsSvg(paperSize?: string, landscape?: boolean): void;
         saveAsSvg(width?: number, height?: number): void;
         saveAsXlsx(chartDataExportMode?: string, filename?: string): void;
         saveAsXml(filename?: string): void;
@@ -3126,14 +3441,14 @@ declare namespace anychart.charts {
         toCsv(chartDataExportMode?: string, csvSettings?: {[prop:string]:string|boolean|((name:any,value:any)=>void)|Object}): string;
         toHtmlTable(title?: string, asString?: boolean): Element | string;
         toJson(stringify?: boolean): Object | string;
-        toSvg(paperSize?: string | Object, landscape?: boolean): string;
+        toSvg(paperSize?: string, landscape?: boolean): string;
         toSvg(width?: number, height?: number): string;
         toXml(asXmlNode?: boolean): string | Node;
         tooltip(): anychart.core.ui.Tooltip;
         tooltip(settings?: Object | boolean): anychart.charts.Radar;
         top(): number | string;
         top(top?: number | string): anychart.charts.Radar;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlisten(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.charts.Radar;
@@ -3702,19 +4017,18 @@ declare namespace anychart.charts {
         autoRedraw(): boolean;
         autoRedraw(enabled?: boolean): anychart.charts.Sankey;
         background(): anychart.core.ui.Background;
-        background(settings?: Object): anychart.charts.Sankey;
+        background(settings?: string | Object | boolean): anychart.charts.Sankey;
         bottom(): number | string;
         bottom(bottom?: number | string): anychart.charts.Sankey;
         bounds(): anychart.core.utils.Bounds;
         bounds(bounds?: anychart.utils.RectObj | anychart.math.Rect | anychart.core.utils.Bounds): anychart.charts.Sankey;
         bounds(x?: number | string, y?: number | string, width?: number | string, height?: number | string): anychart.charts.Sankey;
-        cancelMarquee(): anychart.charts.Sankey;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.charts.Sankey;
         contextMenu(): anychart.ui.ContextMenu;
         contextMenu(settings?: Object | boolean): anychart.charts.Sankey;
         credits(): anychart.core.ui.ChartCredits;
-        credits(value?: Object | boolean): anychart.charts.Sankey;
+        credits(settings?: Object | boolean): anychart.charts.Sankey;
         curveFactor(): number;
         curveFactor(padding?: number): anychart.charts.Sankey;
         data(): anychart.data.View;
@@ -3737,34 +4051,32 @@ declare namespace anychart.charts {
         getPixelBounds(): anychart.math.Rect;
         getPngBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), width?: number, height?: number, quality?: number): void;
         getSelectedPoints(): Array<anychart.core.Point>;
-        getStat(key?: string): any;
         getSvgBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), paperSizeOrWidth?: string | number, landscapeOrHeight?: boolean | string): void;
         globalToLocal(xCoord: number, yCoord: number): {[prop:string]:number};
         height(): number | string;
         height(height?: number | string): anychart.charts.Sankey;
         id(): string;
         id(id?: string): anychart.charts.Sankey;
-        inMarquee(): boolean;
         isFullScreenAvailable(): boolean;
         label(index?: string | number): anychart.core.ui.Label;
         label(settings?: boolean | Object | string): anychart.charts.Sankey;
         label(index?: string | number, settings?: boolean | Object | string): anychart.charts.Sankey;
         left(): number | string;
-        left(left?: number | string): anychart.charts.Sankey;
+        left(value?: number | string): anychart.charts.Sankey;
         listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         localToGlobal(xCoord: number, yCoord: number): {[prop:string]:number};
         margin(): anychart.core.utils.Margin;
         margin(margin?: Array<number|string> | Object): anychart.charts.Sankey;
-        margin(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.charts.Sankey;
+        margin(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): void;
         maxHeight(): number | string;
-        maxHeight(height?: number | string): anychart.charts.Sankey;
+        maxHeight(maxHeight?: number | string): anychart.charts.Sankey;
         maxWidth(): number | string;
-        maxWidth(width?: number | string): anychart.charts.Sankey;
+        maxWidth(value?: number | string): anychart.charts.Sankey;
         minHeight(): number | string;
-        minHeight(height?: number | string): anychart.charts.Sankey;
+        minHeight(minHeight?: number | string): anychart.charts.Sankey;
         minWidth(): number | string;
-        minWidth(width?: number | string): anychart.charts.Sankey;
+        minWidth(minWidth?: number | string): anychart.charts.Sankey;
         noData(): anychart.core.NoDataSettings;
         noData(settings?: Object): anychart.charts.Sankey;
         node(): anychart.core.sankey.elements.Node;
@@ -3778,27 +4090,19 @@ declare namespace anychart.charts {
         padding(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.charts.Sankey;
         palette(): anychart.palettes.RangeColors | anychart.palettes.DistinctColors;
         palette(settings?: anychart.palettes.RangeColors | anychart.palettes.DistinctColors | Object | Array<string>): anychart.charts.Sankey;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        print(paperSize?: anychart.graphics.vector.PaperSize, landscape?: boolean): void;
         removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.charts.Sankey;
         saveAsCsv(chartDataExportMode?: string, csvSettings?: {[prop:string]:string|boolean|((name:any,value:any)=>void)}, filename?: string): void;
-        saveAsJpg(width?: number | Object, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
+        saveAsJpg(width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean): void;
         saveAsJson(filename?: string): void;
-        saveAsPdf(paperSizeOrWidthOrOptions?: number | string | Object, landscape?: boolean, x?: number, y?: number, filename?: string): void;
-        saveAsPng(width?: number | Object, height?: number, quality?: number, filename?: string): void;
-        saveAsSvg(paperSize?: string | Object, landscape?: boolean, filename?: string): void;
+        saveAsPdf(paperSize?: string, landscape?: boolean, x?: number, y?: number): void;
+        saveAsPng(width?: number, height?: number, quality?: number): void;
+        saveAsSvg(paperSize?: string, landscape?: boolean): void;
         saveAsSvg(width?: number, height?: number): void;
         saveAsXlsx(chartDataExportMode?: string, filename?: string): void;
         saveAsXml(filename?: string): void;
-        selectMarqueeFill(): anychart.graphics.vector.Fill;
-        selectMarqueeFill(color: anychart.graphics.vector.Fill | Array<anychart.graphics.vector.GradientKey|string>): anychart.charts.Sankey;
-        selectMarqueeFill(color: string, opacity?: number): anychart.charts.Sankey;
-        selectMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.Sankey;
-        selectMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.Sankey;
-        selectMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.Sankey;
-        selectMarqueeStroke(): anychart.graphics.vector.Stroke;
-        selectMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Sankey;
         shareAsJpg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
         shareAsPdf(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, paperSizeOrWidth?: number | string, landscapeOrWidth?: number | boolean, x?: number, y?: number, filename?: string): void;
         shareAsPng(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, filename?: string): void;
@@ -3807,21 +4111,20 @@ declare namespace anychart.charts {
         shareWithLinkedIn(captionOrOptions?: string | Object, description?: string): void;
         shareWithPinterest(linkOrOptions?: string | Object, description?: string): void;
         shareWithTwitter(): void;
-        startSelectMarquee(repeat?: boolean): anychart.charts.Sankey;
         title(): anychart.core.ui.Title;
         title(settings?: boolean | Object | string): anychart.charts.Sankey;
         toA11yTable(title?: string, asString?: boolean): Element | string;
         toCsv(chartDataExportMode?: string, csvSettings?: {[prop:string]:string|boolean|((name:any,value:any)=>void)|Object}): string;
         toHtmlTable(title?: string, asString?: boolean): Element | string;
         toJson(stringify?: boolean): Object | string;
-        toSvg(paperSize?: string | Object, landscape?: boolean): string;
+        toSvg(paperSize?: string, landscape?: boolean): string;
         toSvg(width?: number, height?: number): string;
         toXml(asXmlNode?: boolean): string | Node;
         tooltip(): anychart.core.ui.Tooltip;
         tooltip(settings?: Object | boolean): anychart.charts.Sankey;
         top(): number | string;
         top(top?: number | string): anychart.charts.Sankey;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlisten(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.charts.Sankey;
@@ -3830,6 +4133,18 @@ declare namespace anychart.charts {
         animation(): anychart.core.utils.Animation;
         animation(settings?: boolean | Object): anychart.charts.Sankey;
         animation(enabled: boolean, duration: number): anychart.charts.Sankey;
+        cancelMarquee(): anychart.charts.Sankey;
+        getStat(key?: string): any;
+        inMarquee(): boolean;
+        selectMarqueeFill(): anychart.graphics.vector.Fill;
+        selectMarqueeFill(color: anychart.graphics.vector.Fill | Array<anychart.graphics.vector.GradientKey|string>): anychart.charts.Sankey;
+        selectMarqueeFill(color: string, opacity?: number): anychart.charts.Sankey;
+        selectMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.Sankey;
+        selectMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.Sankey;
+        selectMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.Sankey;
+        selectMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Sankey;
+        startSelectMarquee(repeat?: boolean): anychart.charts.Sankey;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.charts.Sankey;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.charts.Sankey;
@@ -4013,7 +4328,7 @@ declare namespace anychart.charts {
         autoRedraw(): boolean;
         autoRedraw(enabled?: boolean): anychart.charts.Mekko;
         background(): anychart.core.ui.Background;
-        background(settings?: Object): anychart.charts.Mekko;
+        background(settings?: string | Object | boolean): anychart.charts.Mekko;
         baseline(): number;
         baseline(value?: number): anychart.charts.Mekko;
         bottom(): number | string;
@@ -4027,7 +4342,7 @@ declare namespace anychart.charts {
         contextMenu(): anychart.ui.ContextMenu;
         contextMenu(settings?: Object | boolean): anychart.charts.Mekko;
         credits(): anychart.core.ui.ChartCredits;
-        credits(value?: Object | boolean): anychart.charts.Mekko;
+        credits(settings?: Object | boolean): anychart.charts.Mekko;
         crosshair(): anychart.core.ui.Crosshair;
         crosshair(settings?: Object | boolean): anychart.charts.Mekko;
         data(): anychart.data.View;
@@ -4078,7 +4393,7 @@ declare namespace anychart.charts {
         labels(): anychart.core.ui.LabelsFactory;
         labels(settings?: Object | boolean): anychart.charts.Mekko;
         left(): number | string;
-        left(left?: number | string): anychart.charts.Mekko;
+        left(value?: number | string): anychart.charts.Mekko;
         legend(): anychart.core.ui.Legend;
         legend(settings?: Object | boolean): anychart.charts.Mekko;
         lineMarker(index?: number): anychart.core.axisMarkers.Line;
@@ -4091,18 +4406,18 @@ declare namespace anychart.charts {
         margin(margin?: Array<number|string> | Object): anychart.charts.Mekko;
         margin(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.charts.Mekko;
         maxHeight(): number | string;
-        maxHeight(height?: number | string): anychart.charts.Mekko;
+        maxHeight(maxHeight?: number | string): anychart.charts.Mekko;
         maxLabels(): anychart.core.ui.LabelsFactory;
         maxLabels(settings?: Object | boolean): anychart.charts.Mekko;
         maxWidth(): number | string;
-        maxWidth(width?: number | string): anychart.charts.Mekko;
+        maxWidth(value?: number | string): anychart.charts.Mekko;
         mekko(data: anychart.data.View | anychart.data.Set | Array<any>, csvSettings?: {[prop:string]:string|boolean}): anychart.core.mekko.series.Mekko;
         minHeight(): number | string;
-        minHeight(height?: number | string): anychart.charts.Mekko;
+        minHeight(minHeight?: number | string): anychart.charts.Mekko;
         minLabels(): anychart.core.ui.LabelsFactory;
         minLabels(settings?: Object | boolean): anychart.charts.Mekko;
         minWidth(): number | string;
-        minWidth(width?: number | string): anychart.charts.Mekko;
+        minWidth(minWidth?: number | string): anychart.charts.Mekko;
         noData(): anychart.core.NoDataSettings;
         noData(settings?: Object): anychart.charts.Mekko;
         normal(): anychart.core.StateSettings;
@@ -4114,7 +4429,7 @@ declare namespace anychart.charts {
         palette(settings?: anychart.palettes.RangeColors | anychart.palettes.DistinctColors | Object | Array<string>): anychart.charts.Mekko;
         pointsPadding(): number;
         pointsPadding(padding?: number): anychart.charts.Mekko;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        print(paperSize?: anychart.graphics.vector.PaperSize, landscape?: boolean): void;
         rangeMarker(index?: number): anychart.core.axisMarkers.Range;
         rangeMarker(settings?: Object | boolean): anychart.charts.Mekko;
         rangeMarker(index?: number, settings?: Object | boolean): anychart.charts.Mekko;
@@ -4125,11 +4440,11 @@ declare namespace anychart.charts {
         right(): number | string;
         right(right?: number | string): anychart.charts.Mekko;
         saveAsCsv(chartDataExportMode?: string, csvSettings?: {[prop:string]:string|boolean|((name:any,value:any)=>void)}, filename?: string): void;
-        saveAsJpg(width?: number | Object, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
+        saveAsJpg(width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean): void;
         saveAsJson(filename?: string): void;
-        saveAsPdf(paperSizeOrWidthOrOptions?: number | string | Object, landscape?: boolean, x?: number, y?: number, filename?: string): void;
-        saveAsPng(width?: number | Object, height?: number, quality?: number, filename?: string): void;
-        saveAsSvg(paperSize?: string | Object, landscape?: boolean, filename?: string): void;
+        saveAsPdf(paperSize?: string, landscape?: boolean, x?: number, y?: number): void;
+        saveAsPng(width?: number, height?: number, quality?: number): void;
+        saveAsSvg(paperSize?: string, landscape?: boolean): void;
         saveAsSvg(width?: number, height?: number): void;
         saveAsXlsx(chartDataExportMode?: string, filename?: string): void;
         saveAsXml(filename?: string): void;
@@ -4161,14 +4476,14 @@ declare namespace anychart.charts {
         toCsv(chartDataExportMode?: string, csvSettings?: {[prop:string]:string|boolean|((name:any,value:any)=>void)|Object}): string;
         toHtmlTable(title?: string, asString?: boolean): Element | string;
         toJson(stringify?: boolean): Object | string;
-        toSvg(paperSize?: string | Object, landscape?: boolean): string;
+        toSvg(paperSize?: string, landscape?: boolean): string;
         toSvg(width?: number, height?: number): string;
         toXml(asXmlNode?: boolean): string | Node;
         tooltip(): anychart.core.ui.Tooltip;
         tooltip(settings?: Object | boolean): anychart.charts.Mekko;
         top(): number | string;
         top(top?: number | string): anychart.charts.Mekko;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlisten(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.charts.Mekko;
@@ -4201,7 +4516,7 @@ declare namespace anychart.charts {
         autoRedraw(): boolean;
         autoRedraw(enabled?: boolean): anychart.charts.Pie;
         background(): anychart.core.ui.Background;
-        background(settings?: Object): anychart.charts.Pie;
+        background(settings?: string | Object | boolean): anychart.charts.Pie;
         bottom(): number | string;
         bottom(bottom?: number | string): anychart.charts.Pie;
         bounds(): anychart.core.utils.Bounds;
@@ -4220,15 +4535,13 @@ declare namespace anychart.charts {
         contextMenu(): anychart.ui.ContextMenu;
         contextMenu(settings?: Object | boolean): anychart.charts.Pie;
         credits(): anychart.core.ui.ChartCredits;
-        credits(value?: Object | boolean): anychart.charts.Pie;
+        credits(settings?: Object | boolean): anychart.charts.Pie;
         data(): anychart.data.View;
         data(data?: anychart.data.View | anychart.data.Mapping | anychart.data.Set | anychart.data.DataSettings | Array<any>, csvSettings?: string | anychart.data.TextParsingSettings): anychart.charts.Pie;
         dispose(): void;
         draw(async?: boolean): anychart.charts.Pie;
         enabled(): boolean;
         enabled(enabled?: boolean): anychart.charts.Pie;
-        explode(): string | number;
-        explode(value?: string | number): anychart.charts.Pie;
         explodeSlice(index: number, explode?: boolean): anychart.charts.Pie;
         explodeSlices(value: boolean): anychart.charts.Pie;
         exports(): anychart.core.utils.Exports;
@@ -4253,7 +4566,7 @@ declare namespace anychart.charts {
         getPixelRadius(): number;
         getPngBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), width?: number, height?: number, quality?: number): void;
         getPoint(index: number): anychart.core.PiePoint;
-        getSelectedPoints(): Array<anychart.core.Point>;
+        getSelectedPoints(): Array<anychart.core.PiePoint>;
         getStat(key?: string): any;
         getSvgBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), paperSizeOrWidth?: string | number, landscapeOrHeight?: boolean | string): void;
         getType(): string;
@@ -4280,8 +4593,6 @@ declare namespace anychart.charts {
         innerRadius(radius?: string | number | ((outerRadius:number)=>number)): anychart.charts.Pie;
         insideLabelsOffset(): number | string;
         insideLabelsOffset(offset?: number | string): anychart.charts.Pie;
-        interactivity(): anychart.core.utils.Interactivity;
-        interactivity(settings?: Object | string): anychart.charts.Pie;
         isFullScreenAvailable(): boolean;
         label(index?: string | number): anychart.core.ui.Label;
         label(settings?: boolean | Object | string): anychart.charts.Pie;
@@ -4289,7 +4600,7 @@ declare namespace anychart.charts {
         labels(): anychart.core.ui.LabelsFactory;
         labels(settings?: Object | boolean): anychart.charts.Pie;
         left(): number | string;
-        left(left?: number | string): anychart.charts.Pie;
+        left(value?: number | string): anychart.charts.Pie;
         legend(): anychart.core.ui.Legend;
         legend(settings?: Object | boolean): anychart.charts.Pie;
         listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
@@ -4299,13 +4610,13 @@ declare namespace anychart.charts {
         margin(margin?: Array<number|string> | Object): anychart.charts.Pie;
         margin(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.charts.Pie;
         maxHeight(): number | string;
-        maxHeight(height?: number | string): anychart.charts.Pie;
+        maxHeight(maxHeight?: number | string): anychart.charts.Pie;
         maxWidth(): number | string;
-        maxWidth(width?: number | string): anychart.charts.Pie;
+        maxWidth(value?: number | string): anychart.charts.Pie;
         minHeight(): number | string;
-        minHeight(height?: number | string): anychart.charts.Pie;
+        minHeight(minHeight?: number | string): anychart.charts.Pie;
         minWidth(): number | string;
-        minWidth(width?: number | string): anychart.charts.Pie;
+        minWidth(minWidth?: number | string): anychart.charts.Pie;
         noData(): anychart.core.NoDataSettings;
         noData(settings?: Object): anychart.charts.Pie;
         normal(): anychart.core.StateSettings;
@@ -4323,18 +4634,18 @@ declare namespace anychart.charts {
         padding(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.charts.Pie;
         palette(): anychart.palettes.RangeColors | anychart.palettes.DistinctColors;
         palette(settings?: anychart.palettes.RangeColors | anychart.palettes.DistinctColors | Object | Array<string>): anychart.charts.Pie;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        print(paperSize?: anychart.graphics.vector.PaperSize, landscape?: boolean): void;
         radius(): string | number;
         radius(radius?: string | number): anychart.charts.Pie;
         removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.charts.Pie;
         saveAsCsv(chartDataExportMode?: string, csvSettings?: {[prop:string]:string|boolean|((name:any,value:any)=>void)}, filename?: string): void;
-        saveAsJpg(width?: number | Object, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
+        saveAsJpg(width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean): void;
         saveAsJson(filename?: string): void;
-        saveAsPdf(paperSizeOrWidthOrOptions?: number | string | Object, landscape?: boolean, x?: number, y?: number, filename?: string): void;
-        saveAsPng(width?: number | Object, height?: number, quality?: number, filename?: string): void;
-        saveAsSvg(paperSize?: string | Object, landscape?: boolean, filename?: string): void;
+        saveAsPdf(paperSize?: string, landscape?: boolean, x?: number, y?: number): void;
+        saveAsPng(width?: number, height?: number, quality?: number): void;
+        saveAsSvg(paperSize?: string, landscape?: boolean): void;
         saveAsSvg(width?: number, height?: number): void;
         saveAsXlsx(chartDataExportMode?: string, filename?: string): void;
         saveAsXml(filename?: string): void;
@@ -4374,7 +4685,7 @@ declare namespace anychart.charts {
         toCsv(chartDataExportMode?: string, csvSettings?: {[prop:string]:string|boolean|((name:any,value:any)=>void)|Object}): string;
         toHtmlTable(title?: string, asString?: boolean): Element | string;
         toJson(stringify?: boolean): Object | string;
-        toSvg(paperSize?: string | Object, landscape?: boolean): string;
+        toSvg(paperSize?: string, landscape?: boolean): string;
         toSvg(width?: number, height?: number): string;
         toXml(asXmlNode?: boolean): string | Node;
         tooltip(): anychart.core.ui.Tooltip;
@@ -4382,13 +4693,15 @@ declare namespace anychart.charts {
         top(): number | string;
         top(top?: number | string): anychart.charts.Pie;
         unhover(): anychart.charts.Pie;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlisten(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
         unselect(): anychart.charts.Pie;
         width(): number | string;
         width(width?: number | string): anychart.charts.Pie;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.charts.Pie;
+        interactivity(): anychart.core.utils.Interactivity;
+        interactivity(settings?: Object | string): anychart.charts.Pie;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.charts.Pie;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.charts.Pie;
@@ -4580,15 +4893,12 @@ declare namespace anychart.charts {
         a11y(): anychart.core.utils.ChartA11y;
         a11y(settings?: boolean | Object): anychart.charts.Map;
         addSeries(...var_args: (anychart.data.View | anychart.data.Set | Array<any>)[]): Array<anychart.core.map.series.Base>;
-        animation(): anychart.core.utils.Animation;
-        animation(settings?: boolean | Object): anychart.charts.Map;
-        animation(enabled: boolean, duration: number): anychart.charts.Map;
         autoRedraw(): boolean;
         autoRedraw(enabled?: boolean): anychart.charts.Map;
         axes(): anychart.core.axes.MapSettings;
         axes(settings?: Object | boolean): anychart.charts.Map;
         background(): anychart.core.ui.Background;
-        background(settings?: Object): anychart.charts.Map;
+        background(settings?: string | Object | boolean): anychart.charts.Map;
         bottom(): number | string;
         bottom(bottom?: number | string): anychart.charts.Map;
         bounds(): anychart.core.utils.Bounds;
@@ -4608,7 +4918,7 @@ declare namespace anychart.charts {
         contextMenu(): anychart.ui.ContextMenu;
         contextMenu(settings?: Object | boolean): anychart.charts.Map;
         credits(): anychart.core.ui.ChartCredits;
-        credits(value?: Object | boolean): anychart.charts.Map;
+        credits(settings?: Object | boolean): anychart.charts.Map;
         crosshair(): anychart.core.ui.Crosshair;
         crosshair(settings?: Object | boolean): anychart.charts.Map;
         crs(): Object | (() => void) | string;
@@ -4646,11 +4956,10 @@ declare namespace anychart.charts {
         getPixelBounds(): anychart.math.Rect;
         getPlotBounds(): anychart.math.Rect;
         getPngBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), width?: number, height?: number, quality?: number): void;
-        getSelectedPoints(): Array<anychart.core.Point>;
+        getSelectedPoints(): Array<anychart.core.MapPoint>;
         getSeries(id: number | string): anychart.core.map.series.Base;
         getSeriesAt(index: number): anychart.core.map.series.Base;
         getSeriesCount(): number;
-        getStat(key?: string): any;
         getSvgBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), paperSizeOrWidth?: string | number, landscapeOrHeight?: boolean | string): void;
         getType(): string;
         getZoomLevel(): number;
@@ -4666,8 +4975,6 @@ declare namespace anychart.charts {
         id(): string;
         id(id?: string): anychart.charts.Map;
         inMarquee(): boolean;
-        interactivity(): anychart.core.utils.MapInteractivity;
-        interactivity(settings?: Object | string): anychart.charts.Map;
         inverseTransform(x: number, y: number): {[prop:string]:number};
         isFullScreenAvailable(): boolean;
         label(index?: string | number): anychart.core.ui.Label;
@@ -4676,7 +4983,7 @@ declare namespace anychart.charts {
         labels(): anychart.core.ui.LabelsFactory;
         labels(settings?: Object | boolean): anychart.charts.Map;
         left(): number | string;
-        left(left?: number | string): anychart.charts.Map;
+        left(value?: number | string): anychart.charts.Map;
         legend(): anychart.core.ui.Legend;
         legend(settings?: Object | boolean): anychart.charts.Map;
         listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
@@ -4691,17 +4998,17 @@ declare namespace anychart.charts {
         maxBubbleSize(): number | string;
         maxBubbleSize(size?: number | string): anychart.charts.Map;
         maxHeight(): number | string;
-        maxHeight(height?: number | string): anychart.charts.Map;
+        maxHeight(maxHeight?: number | string): anychart.charts.Map;
         maxWidth(): number | string;
-        maxWidth(width?: number | string): anychart.charts.Map;
+        maxWidth(maxWidth?: number | string): anychart.charts.Map;
         maxZoomLevel(): number;
         maxZoomLevel(value?: number): anychart.charts.Map;
         minBubbleSize(): number | string;
         minBubbleSize(size?: number | string): anychart.charts.Map;
         minHeight(): number | string;
-        minHeight(height?: number | string): anychart.charts.Map;
+        minHeight(minHeight?: number | string): anychart.charts.Map;
         minWidth(): number | string;
-        minWidth(width?: number | string): anychart.charts.Map;
+        minWidth(minWidth?: number | string): anychart.charts.Map;
         move(dx: number, dy: number): anychart.charts.Map;
         noData(): anychart.core.NoDataSettings;
         noData(settings?: Object): anychart.charts.Map;
@@ -4714,7 +5021,7 @@ declare namespace anychart.charts {
         padding(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.charts.Map;
         palette(): anychart.palettes.RangeColors | anychart.palettes.DistinctColors;
         palette(settings?: anychart.palettes.RangeColors | anychart.palettes.DistinctColors | Object | Array<string>): anychart.charts.Map;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        print(paperSize?: anychart.graphics.vector.PaperSize, landscape?: boolean): void;
         removeAllListeners(type?: string): number;
         removeAllSeries(): anychart.charts.Map;
         removeSeries(id: number | string): anychart.charts.Map;
@@ -4722,11 +5029,11 @@ declare namespace anychart.charts {
         right(): number | string;
         right(right?: number | string): anychart.charts.Map;
         saveAsCsv(chartDataExportMode?: string, csvSettings?: {[prop:string]:string|boolean|((name:any,value:any)=>void)}, filename?: string): void;
-        saveAsJpg(width?: number | Object, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
+        saveAsJpg(width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean): void;
         saveAsJson(filename?: string): void;
-        saveAsPdf(paperSizeOrWidthOrOptions?: number | string | Object, landscape?: boolean, x?: number, y?: number, filename?: string): void;
-        saveAsPng(width?: number | Object, height?: number, quality?: number, filename?: string): void;
-        saveAsSvg(paperSize?: string | Object, landscape?: boolean, filename?: string): void;
+        saveAsPdf(paperSize?: string, landscape?: boolean, x?: number, y?: number): void;
+        saveAsPng(width?: number, height?: number, quality?: number): void;
+        saveAsSvg(paperSize?: string, landscape?: boolean): void;
         saveAsSvg(width?: number, height?: number): void;
         saveAsXlsx(chartDataExportMode?: string, filename?: string): void;
         saveAsXml(filename?: string): void;
@@ -4758,7 +5065,7 @@ declare namespace anychart.charts {
         toGeoJSON(): Object;
         toHtmlTable(title?: string, asString?: boolean): Element | string;
         toJson(stringify?: boolean): Object | string;
-        toSvg(paperSize?: string | Object, landscape?: boolean): string;
+        toSvg(paperSize?: string, landscape?: boolean): string;
         toSvg(width?: number, height?: number): string;
         toXml(asXmlNode?: boolean): string | Node;
         tooltip(): anychart.core.ui.Tooltip;
@@ -4769,7 +5076,7 @@ declare namespace anychart.charts {
         translateFeature(id: string, dx: number, dy: number): anychart.charts.Map;
         unboundRegions(): anychart.core.utils.UnboundRegionsSettings | string;
         unboundRegions(settings?: Object | string | boolean): anychart.charts.Map;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlisten(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.charts.Map;
@@ -4780,20 +5087,26 @@ declare namespace anychart.charts {
         zoomOut(duration?: number): anychart.charts.Map;
         zoomTo(value: number, cx?: number, cy?: number): anychart.charts.Map;
         zoomToFeature(id: string): void;
+        animation(): anychart.core.utils.Animation;
+        animation(settings?: boolean | Object): anychart.charts.Map;
+        animation(enabled: boolean, duration: number): anychart.charts.Map;
+        getStat(key?: string): any;
+        interactivity(): anychart.core.utils.Interactivity;
+        interactivity(settings?: Object | string): anychart.charts.Map;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.charts.Map;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.charts.Map;
     }
     interface Pyramid extends anychart.core.SeparateChart {
         a11y(): anychart.core.utils.ChartA11y;
-        a11y(settings?: boolean | Object): anychart.charts.Pyramid;
+        a11y(settings?: boolean | Object): anychart.charts.Pie;
         animation(): anychart.core.utils.Animation;
         animation(settings?: boolean | Object): anychart.charts.Pyramid;
         animation(enabled: boolean, duration: number): anychart.charts.Pyramid;
         autoRedraw(): boolean;
-        autoRedraw(enabled?: boolean): anychart.charts.Pyramid;
+        autoRedraw(enabled?: boolean): anychart.charts.Pie;
         background(): anychart.core.ui.Background;
-        background(settings?: Object): anychart.charts.Pyramid;
+        background(settings?: string | Object | boolean): anychart.charts.Pyramid;
         baseWidth(): string | number;
         baseWidth(width?: string | number): anychart.charts.Pyramid;
         bottom(): number | string;
@@ -4801,7 +5114,7 @@ declare namespace anychart.charts {
         bounds(): anychart.core.utils.Bounds;
         bounds(bounds?: anychart.utils.RectObj | anychart.math.Rect | anychart.core.utils.Bounds): anychart.charts.Pyramid;
         bounds(x?: number | string, y?: number | string, width?: number | string, height?: number | string): anychart.charts.Pyramid;
-        cancelMarquee(): anychart.charts.Pyramid;
+        cancelMarquee(): anychart.charts.Pie;
         connectorLength(): number | string;
         connectorLength(length?: number | string): anychart.charts.Pyramid;
         connectorStroke(): anychart.graphics.vector.Stroke | (() => void);
@@ -4811,7 +5124,7 @@ declare namespace anychart.charts {
         contextMenu(): anychart.ui.ContextMenu;
         contextMenu(settings?: Object | boolean): anychart.charts.Pyramid;
         credits(): anychart.core.ui.ChartCredits;
-        credits(value?: Object | boolean): anychart.charts.Pyramid;
+        credits(settings?: Object | boolean): anychart.charts.Pyramid;
         data(): anychart.data.View;
         data(data?: anychart.data.View | anychart.data.Mapping | anychart.data.Set | Array<any> | string | anychart.data.DataSettings, csvSettings?: string | anychart.data.TextParsingSettings): anychart.charts.Pyramid;
         dispose(): void;
@@ -4819,7 +5132,7 @@ declare namespace anychart.charts {
         enabled(): boolean;
         enabled(enabled?: boolean): anychart.charts.Pyramid;
         exports(): anychart.core.utils.Exports;
-        exports(settings?: Object): anychart.charts.Pyramid;
+        exports(settings?: Object): anychart.charts.Pie;
         fill(): anychart.graphics.vector.Fill | (()=>anychart.graphics.vector.Fill);
         fill(fillFunction?: anychart.graphics.vector.Fill | (()=>anychart.graphics.vector.Fill)): anychart.charts.Pyramid;
         fill(color: anychart.graphics.vector.Fill | Array<anychart.graphics.vector.GradientKey|string>): anychart.charts.Pyramid;
@@ -4828,7 +5141,7 @@ declare namespace anychart.charts {
         fill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.Pyramid;
         fill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.Pyramid;
         fullScreen(): boolean;
-        fullScreen(enabled?: boolean): anychart.charts.Pyramid;
+        fullScreen(enabled?: boolean): anychart.charts.Pie;
         getJpgBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean): void;
         getPdfBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), paperSizeOrWidth?: number | string, landscapeOrWidth?: number | boolean, x?: number, y?: number): void;
         getPixelBounds(): anychart.math.Rect;
@@ -4853,10 +5166,8 @@ declare namespace anychart.charts {
         hovered(): anychart.core.StateSettings;
         hovered(settings?: Object): anychart.charts.Pyramid;
         id(): string;
-        id(id?: string): anychart.charts.Pyramid;
+        id(id?: string): anychart.charts.Pie;
         inMarquee(): boolean;
-        interactivity(): anychart.core.utils.Interactivity;
-        interactivity(settings?: Object | string): anychart.charts.Pyramid;
         isFullScreenAvailable(): boolean;
         label(index?: string | number): anychart.core.ui.Label;
         label(settings?: boolean | Object | string): anychart.charts.Pyramid;
@@ -4864,7 +5175,7 @@ declare namespace anychart.charts {
         labels(): anychart.core.ui.LabelsFactory;
         labels(settings?: Object | boolean): anychart.charts.Pyramid;
         left(): number | string;
-        left(left?: number | string): anychart.charts.Pyramid;
+        left(value?: number | string): anychart.charts.Pyramid;
         legend(): anychart.core.ui.Legend;
         legend(settings?: Object | boolean): anychart.charts.Pyramid;
         listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
@@ -4878,15 +5189,15 @@ declare namespace anychart.charts {
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.charts.Pyramid;
         maxHeight(): number | string;
-        maxHeight(height?: number | string): anychart.charts.Pyramid;
+        maxHeight(maxHeight?: number | string): anychart.charts.Pyramid;
         maxWidth(): number | string;
-        maxWidth(width?: number | string): anychart.charts.Pyramid;
+        maxWidth(value?: number | string): anychart.charts.Pyramid;
         minHeight(): number | string;
-        minHeight(height?: number | string): anychart.charts.Pyramid;
+        minHeight(minHeight?: number | string): anychart.charts.Pyramid;
         minWidth(): number | string;
-        minWidth(width?: number | string): anychart.charts.Pyramid;
+        minWidth(minWidth?: number | string): anychart.charts.Pyramid;
         noData(): anychart.core.NoDataSettings;
-        noData(settings?: Object): anychart.charts.Pyramid;
+        noData(settings?: Object): anychart.charts.Pie;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.charts.Pyramid;
         overlapMode(): string;
@@ -4898,18 +5209,18 @@ declare namespace anychart.charts {
         palette(settings?: anychart.palettes.RangeColors | anychart.palettes.DistinctColors | Object | Array<string>): anychart.charts.Pyramid;
         pointsPadding(): string | number;
         pointsPadding(padding?: string | number): anychart.charts.Pyramid;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        print(paperSize?: anychart.graphics.vector.PaperSize, landscape?: boolean): void;
         removeAllListeners(type?: string): number;
         reversed(): boolean;
         reversed(value?: boolean): anychart.charts.Pyramid;
         right(): number | string;
         right(right?: number | string): anychart.charts.Pyramid;
         saveAsCsv(chartDataExportMode?: string, csvSettings?: {[prop:string]:string|boolean|((name:any,value:any)=>void)}, filename?: string): void;
-        saveAsJpg(width?: number | Object, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
+        saveAsJpg(width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean): void;
         saveAsJson(filename?: string): void;
-        saveAsPdf(paperSizeOrWidthOrOptions?: number | string | Object, landscape?: boolean, x?: number, y?: number, filename?: string): void;
-        saveAsPng(width?: number | Object, height?: number, quality?: number, filename?: string): void;
-        saveAsSvg(paperSize?: string | Object, landscape?: boolean, filename?: string): void;
+        saveAsPdf(paperSize?: string, landscape?: boolean, x?: number, y?: number): void;
+        saveAsPng(width?: number, height?: number, quality?: number): void;
+        saveAsSvg(paperSize?: string, landscape?: boolean): void;
         saveAsSvg(width?: number, height?: number): void;
         saveAsXlsx(chartDataExportMode?: string, filename?: string): void;
         saveAsXml(filename?: string): void;
@@ -4917,13 +5228,13 @@ declare namespace anychart.charts {
         select(index?: number): anychart.charts.Pyramid;
         select(indexes?: Array<number>): anychart.charts.Pyramid;
         selectMarqueeFill(): anychart.graphics.vector.Fill;
-        selectMarqueeFill(color: anychart.graphics.vector.Fill | Array<anychart.graphics.vector.GradientKey|string>): anychart.charts.Pyramid;
-        selectMarqueeFill(color: string, opacity?: number): anychart.charts.Pyramid;
-        selectMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.Pyramid;
-        selectMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.Pyramid;
-        selectMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.Pyramid;
+        selectMarqueeFill(color: anychart.graphics.vector.Fill | Array<anychart.graphics.vector.GradientKey|string>): anychart.charts.Pie;
+        selectMarqueeFill(color: string, opacity?: number): anychart.charts.Pie;
+        selectMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.Pie;
+        selectMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.Pie;
+        selectMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.Pie;
         selectMarqueeStroke(): anychart.graphics.vector.Stroke;
-        selectMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Pyramid;
+        selectMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Pie;
         selected(): anychart.core.StateSettings;
         selected(settings?: Object): anychart.charts.Pyramid;
         shareAsJpg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
@@ -4934,7 +5245,7 @@ declare namespace anychart.charts {
         shareWithLinkedIn(captionOrOptions?: string | Object, description?: string): void;
         shareWithPinterest(linkOrOptions?: string | Object, description?: string): void;
         shareWithTwitter(): void;
-        startSelectMarquee(repeat?: boolean): anychart.charts.Pyramid;
+        startSelectMarquee(repeat?: boolean): anychart.charts.Pie;
         stroke(): anychart.graphics.vector.Stroke | (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill);
         stroke(value?: anychart.graphics.vector.Stroke | (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill)): anychart.charts.Pyramid;
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Pyramid;
@@ -4945,7 +5256,7 @@ declare namespace anychart.charts {
         toCsv(chartDataExportMode?: string, csvSettings?: {[prop:string]:string|boolean|((name:any,value:any)=>void)|Object}): string;
         toHtmlTable(title?: string, asString?: boolean): Element | string;
         toJson(stringify?: boolean): Object | string;
-        toSvg(paperSize?: string | Object, landscape?: boolean): string;
+        toSvg(paperSize?: string, landscape?: boolean): string;
         toSvg(width?: number, height?: number): string;
         toXml(asXmlNode?: boolean): string | Node;
         tooltip(): anychart.core.ui.Tooltip;
@@ -4953,13 +5264,15 @@ declare namespace anychart.charts {
         top(): number | string;
         top(top?: number | string): anychart.charts.Pyramid;
         unhover(): anychart.charts.Pyramid;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlisten(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
         unselect(): anychart.charts.Pyramid;
         width(): number | string;
         width(width?: number | string): anychart.charts.Pyramid;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.charts.Pyramid;
+        interactivity(): anychart.core.utils.Interactivity;
+        interactivity(settings?: Object | string): anychart.charts.Pyramid;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.charts.Pyramid;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.charts.Pyramid;
@@ -5005,17 +5318,17 @@ declare namespace anychart.core {
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.VisualBase;
         enabled(): boolean;
         enabled(enabled?: boolean): anychart.core.VisualBase;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.VisualBase;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.VisualBase;
         print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        zIndex(): number;
+        zIndex(zIndex?: number): anychart.core.VisualBase;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
-        zIndex(): number;
-        zIndex(zIndex?: number): anychart.core.VisualBase;
     }
     interface Point {
         exists(): boolean;
@@ -5145,8 +5458,6 @@ declare namespace anychart.core {
         letterSpacing(spacing?: string | number): anychart.core.StateSettings;
         lineHeight(): string | number;
         lineHeight(height?: string | number): anychart.core.StateSettings;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         lowFill(): anychart.graphics.vector.Fill;
         lowFill(color: anychart.graphics.vector.Fill | Array<anychart.graphics.vector.GradientKey|string>): anychart.core.stock.scrollerSeries.Base;
         lowFill(fillFunction?: (()=>anychart.graphics.vector.Fill)): anychart.core.StateSettings;
@@ -5199,7 +5510,6 @@ declare namespace anychart.core {
         outlierMarkers(settings?: Object | boolean | string): anychart.core.StateSettings;
         outline(): anychart.core.ui.Outline;
         outline(settings?: Object): anychart.core.StateSettings;
-        removeAllListeners(type?: string): number;
         risingFill(): anychart.graphics.vector.Fill;
         risingFill(color: anychart.graphics.vector.Fill | string | Array<any>): anychart.core.stock.scrollerSeries.Base;
         risingFill(fillFunction?: (()=>anychart.graphics.vector.Fill)): anychart.core.StateSettings;
@@ -5242,8 +5552,6 @@ declare namespace anychart.core {
         trend(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.StateSettings;
         type(): string | (() => void);
         type(type?: string | (() => void)): anychart.core.StateSettings;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         upperLabels(): anychart.core.ui.LabelsFactory;
         upperLabels(settings?: Object | boolean): anychart.core.StateSettings;
         useHtml(): boolean;
@@ -5262,6 +5570,11 @@ declare namespace anychart.core {
         wordBreak(mode?: string): anychart.core.StateSettings;
         wordWrap(): string;
         wordWrap(mode?: string): anychart.core.StateSettings;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Base {
         listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
@@ -5292,7 +5605,6 @@ declare namespace anychart.core {
         contextMenu(settings?: Object | boolean): anychart.core.SeparateChart;
         credits(): anychart.core.ui.ChartCredits;
         credits(value?: Object | boolean): anychart.core.SeparateChart;
-        dispose(): void;
         draw(async?: boolean): anychart.core.SeparateChart;
         enabled(): boolean;
         enabled(enabled?: boolean): anychart.core.SeparateChart;
@@ -5323,8 +5635,6 @@ declare namespace anychart.core {
         left(left?: number | string): anychart.core.SeparateChart;
         legend(): anychart.core.ui.Legend;
         legend(settings?: Object | boolean): anychart.core.SeparateChart;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         localToGlobal(xCoord: number, yCoord: number): {[prop:string]:number};
         margin(): anychart.core.utils.Margin;
         margin(margin?: Array<number|string> | Object): anychart.core.SeparateChart;
@@ -5342,8 +5652,6 @@ declare namespace anychart.core {
         padding(): anychart.core.utils.Padding;
         padding(padding?: Array<number|string> | Object): anychart.core.SeparateChart;
         padding(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.core.SeparateChart;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.SeparateChart;
         saveAsCsv(chartDataExportMode?: string, csvSettings?: {[prop:string]:string|boolean|((name:any,value:any)=>void)}, filename?: string): void;
@@ -5384,16 +5692,21 @@ declare namespace anychart.core {
         tooltip(settings?: Object | boolean): anychart.core.SeparateChart;
         top(): number | string;
         top(top?: number | string): anychart.core.SeparateChart;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.SeparateChart;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.SeparateChart;
+        dispose(): void;
         startSelectMarquee(repeat?: boolean): anychart.core.SeparateChart;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.SeparateChart;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.SeparateChart;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Chart extends anychart.core.VisualBaseWithBounds {
         a11y(): anychart.core.utils.ChartA11y;
@@ -5444,8 +5757,6 @@ declare namespace anychart.core {
         label(index?: string | number, settings?: boolean | Object | string): anychart.core.Chart;
         left(): number | string;
         left(left?: number | string): anychart.core.Chart;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         localToGlobal(xCoord: number, yCoord: number): {[prop:string]:number};
         margin(): anychart.core.utils.Margin;
         margin(margin?: Array<number|string> | Object): anychart.core.Chart;
@@ -5463,8 +5774,6 @@ declare namespace anychart.core {
         padding(): anychart.core.utils.Padding;
         padding(padding?: Array<number|string> | Object): anychart.core.Chart;
         padding(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.core.Chart;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.Chart;
         saveAsCsv(chartDataExportMode?: string, csvSettings?: {[prop:string]:string|boolean|((name:any,value:any)=>void)}, filename?: string): void;
@@ -5506,8 +5815,6 @@ declare namespace anychart.core {
         tooltip(settings?: Object | boolean): anychart.core.Chart;
         top(): number | string;
         top(top?: number | string): anychart.core.Chart;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.Chart;
         zIndex(): number;
@@ -5515,6 +5822,12 @@ declare namespace anychart.core {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.Chart;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.Chart;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface SeriesPoint extends anychart.core.Point {
         exists(): boolean;
@@ -5574,8 +5887,6 @@ declare namespace anychart.core {
         left(left?: number | string): anychart.core.SeriesBase;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.SeriesBase;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(value?: Object | boolean | string): anychart.core.SeriesBase;
         maxHeight(): number | string;
@@ -5593,8 +5904,6 @@ declare namespace anychart.core {
         name(name?: string): anychart.core.SeriesBase;
         normal(): anychart.core.StateSettings;
         normal(value?: Object): anychart.core.SeriesBase;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.SeriesBase;
         select(index?: number): anychart.core.SeriesBase;
@@ -5608,8 +5917,6 @@ declare namespace anychart.core {
         top(): number | string;
         top(top?: number | string): anychart.core.SeriesBase;
         unhover(indexOrIndexes?: number | Array<number>): anychart.core.SeriesBase;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.SeriesBase;
         unselect(index?: number): anychart.core.SeriesBase;
         unselect(indexes?: Array<number>): anychart.core.SeriesBase;
@@ -5622,6 +5929,12 @@ declare namespace anychart.core {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.SeriesBase;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.SeriesBase;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Text extends anychart.core.VisualBase {
         disablePointerEvents(): boolean;
@@ -5650,10 +5963,6 @@ declare namespace anychart.core {
         letterSpacing(spacing?: string | number): anychart.core.Text;
         lineHeight(): string | number;
         lineHeight(height?: string | number): anychart.core.Text;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         selectable(): boolean;
         selectable(enabled?: boolean): anychart.core.Text;
         textDirection(): anychart.graphics.vector.Text.Direction | string;
@@ -5666,8 +5975,6 @@ declare namespace anychart.core {
         textSettings(name?: string): string | number | boolean;
         textSettings(objectWithSettings?: Object): anychart.core.Text;
         textSettings(name?: string, settings?: string | number | boolean | (() => void)): anychart.core.Text;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         useHtml(): boolean;
         useHtml(enabled?: boolean): anychart.core.Text;
         vAlign(): anychart.graphics.vector.Text.VAlign | string;
@@ -5683,6 +5990,12 @@ declare namespace anychart.core {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.Text;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.Text;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface TreeChartPoint extends anychart.core.Point {
         exists(): boolean;
@@ -5710,8 +6023,6 @@ declare namespace anychart.core {
         height(height?: number | string): anychart.core.VisualBaseWithBounds;
         left(): number | string;
         left(left?: number | string): anychart.core.VisualBaseWithBounds;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.VisualBaseWithBounds;
         maxWidth(): number | string;
@@ -5720,14 +6031,10 @@ declare namespace anychart.core {
         minHeight(height?: number | string): anychart.core.VisualBaseWithBounds;
         minWidth(): number | string;
         minWidth(width?: number | string): anychart.core.VisualBaseWithBounds;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.VisualBaseWithBounds;
         top(): number | string;
         top(top?: number | string): anychart.core.VisualBaseWithBounds;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.VisualBaseWithBounds;
         zIndex(): number;
@@ -5737,6 +6044,12 @@ declare namespace anychart.core {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.VisualBaseWithBounds;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.VisualBaseWithBounds;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface ChoroplethPoint extends anychart.core.SeriesPoint {
         crs(): string;
@@ -5902,17 +6215,17 @@ declare namespace anychart.core.annotations {
         yScale(settings?: anychart.scales.Base | Object | string): anychart.core.annotations.Ray;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.annotations.Ray;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.annotations.Ray;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.annotations.Ray;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.annotations.Ray;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface InfiniteLine extends anychart.core.annotations.Base {
         allowEdit(): boolean;
@@ -5977,17 +6290,17 @@ declare namespace anychart.core.annotations {
         yScale(settings?: anychart.scales.Base | Object | string): anychart.core.annotations.InfiniteLine;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.annotations.InfiniteLine;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.annotations.InfiniteLine;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.annotations.InfiniteLine;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.annotations.InfiniteLine;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Label extends anychart.core.annotations.Base {
         adjustFontSize(): Object;
@@ -6041,8 +6354,6 @@ declare namespace anychart.core.annotations {
         letterSpacing(spacing?: number | string): anychart.core.annotations.Label;
         lineHeight(): string | number;
         lineHeight(height?: string | number): anychart.core.annotations.Label;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.annotations.Label;
         maxFontSize(): number;
@@ -6066,7 +6377,6 @@ declare namespace anychart.core.annotations {
         padding(): anychart.core.utils.Padding;
         padding(padding?: Array<number|string> | Object): anychart.core.annotations.Label;
         padding(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.core.annotations.Label;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
         right(): number | string;
         right(right?: number | string): anychart.core.annotations.Label;
         select(): void;
@@ -6084,8 +6394,6 @@ declare namespace anychart.core.annotations {
         textOverflow(value?: anychart.graphics.vector.Text.TextOverflow | string): anychart.core.annotations.Label;
         top(): number | string;
         top(top?: number | string): anychart.core.annotations.Label;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         useHtml(): boolean;
         useHtml(enabled?: boolean): anychart.core.annotations.Label;
         vAlign(): anychart.graphics.vector.Text.VAlign | string;
@@ -6108,12 +6416,17 @@ declare namespace anychart.core.annotations {
         zIndex(zIndex?: number): anychart.core.annotations.Label;
         color(): string;
         color(color: string): anychart.core.annotations.Label;
-        removeAllListeners(type?: string): number;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.annotations.Label;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.annotations.Label;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.annotations.Label;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface FibonacciFan extends anychart.core.annotations.FibonacciBase {
         allowEdit(): boolean;
@@ -6190,17 +6503,17 @@ declare namespace anychart.core.annotations {
         yScale(settings?: anychart.scales.Base | Object | string): anychart.core.annotations.FibonacciFan;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.annotations.FibonacciFan;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.annotations.FibonacciFan;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.annotations.FibonacciFan;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.annotations.FibonacciFan;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Rectangle extends anychart.core.annotations.Base {
         allowEdit(): boolean;
@@ -6278,17 +6591,17 @@ declare namespace anychart.core.annotations {
         yScale(settings?: anychart.scales.Base | Object | string): anychart.core.annotations.Rectangle;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.annotations.Rectangle;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.annotations.Rectangle;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.annotations.Rectangle;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.annotations.Rectangle;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface AndrewsPitchfork extends anychart.core.annotations.Base {
         allowEdit(): boolean;
@@ -6357,17 +6670,17 @@ declare namespace anychart.core.annotations {
         yScale(settings?: anychart.scales.Base | Object | string): anychart.core.annotations.AndrewsPitchfork;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.annotations.AndrewsPitchfork;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.annotations.AndrewsPitchfork;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.annotations.AndrewsPitchfork;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.annotations.AndrewsPitchfork;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Base extends anychart.core.VisualBaseWithBounds {
         allowEdit(): boolean;
@@ -6393,8 +6706,6 @@ declare namespace anychart.core.annotations {
         hovered(settings?: Object): anychart.core.annotations.Base;
         left(): number | string;
         left(left?: number | string): anychart.core.annotations.Base;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.annotations.Base;
         maxHeight(): number | string;
@@ -6407,8 +6718,6 @@ declare namespace anychart.core.annotations {
         minWidth(width?: number | string): anychart.core.annotations.Base;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.annotations.Base;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.annotations.Base;
         select(): void;
@@ -6416,8 +6725,6 @@ declare namespace anychart.core.annotations {
         selected(settings?: Object): anychart.core.annotations.Base;
         top(): number | string;
         top(top?: number | string): anychart.core.annotations.Base;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.annotations.Base;
         xScale(): anychart.scales.Ordinal | anychart.scales.Linear | anychart.scales.Logarithmic | anychart.scales.StockScatterDateTime;
@@ -6431,6 +6738,12 @@ declare namespace anychart.core.annotations {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.annotations.Base;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.annotations.Base;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface PlotController extends anychart.core.VisualBase {
         add(annotationTypeOrConfig: string | anychart.core.annotations.AnnotationJSONFormat): anychart.core.annotations.Base;
@@ -6452,10 +6765,7 @@ declare namespace anychart.core.annotations {
         infiniteLine(settings?: Object): anychart.core.annotations.InfiniteLine;
         label(settings?: Object): anychart.core.annotations.Label;
         line(settings?: Object): anychart.core.annotations.Line;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         marker(settings?: Object): anychart.core.annotations.Marker;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
         ray(settings?: Object): anychart.core.annotations.Ray;
         rectangle(settings?: Object): anychart.core.annotations.Rectangle;
         removeAllAnnotations(): anychart.core.annotations.PlotController;
@@ -6467,8 +6777,6 @@ declare namespace anychart.core.annotations {
         toXml(asXmlNode?: boolean): string | Node;
         trendChannel(settings?: Object): anychart.core.annotations.TrendChannel;
         triangle(settings?: Object): anychart.core.annotations.Triangle;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.annotations.PlotController;
         verticalLine(settings?: Object): anychart.core.annotations.VerticalLine;
         zIndex(): number;
@@ -6478,7 +6786,12 @@ declare namespace anychart.core.annotations {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.annotations.PlotController;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.annotations.PlotController;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface FibonacciBase extends anychart.core.annotations.Base {
         allowEdit(): boolean;
@@ -6550,17 +6863,17 @@ declare namespace anychart.core.annotations {
         yScale(settings?: anychart.scales.Base | Object | string): anychart.core.annotations.FibonacciBase;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.annotations.FibonacciBase;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.annotations.FibonacciBase;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.annotations.FibonacciBase;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.annotations.FibonacciBase;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Triangle extends anychart.core.annotations.Base {
         allowEdit(): boolean;
@@ -6638,17 +6951,17 @@ declare namespace anychart.core.annotations {
         yScale(settings?: anychart.scales.Base | Object | string): anychart.core.annotations.Triangle;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.annotations.Triangle;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.annotations.Triangle;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.annotations.Triangle;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.annotations.Triangle;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface FibonacciRetracement extends anychart.core.annotations.FibonacciBase {
         allowEdit(): boolean;
@@ -6720,17 +7033,17 @@ declare namespace anychart.core.annotations {
         yScale(settings?: anychart.scales.Base | Object | string): anychart.core.annotations.FibonacciRetracement;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.annotations.FibonacciRetracement;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.annotations.FibonacciRetracement;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.annotations.FibonacciRetracement;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.annotations.FibonacciRetracement;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface TrendChannel extends anychart.core.annotations.Base {
         allowEdit(): boolean;
@@ -6812,17 +7125,17 @@ declare namespace anychart.core.annotations {
         yScale(settings?: anychart.scales.Base | Object | string): anychart.core.annotations.TrendChannel;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.annotations.TrendChannel;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.annotations.TrendChannel;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.annotations.TrendChannel;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.annotations.TrendChannel;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface VerticalLine extends anychart.core.annotations.Base {
         allowEdit(): boolean;
@@ -6881,17 +7194,17 @@ declare namespace anychart.core.annotations {
         yScale(settings?: anychart.scales.Base | Object | string): anychart.core.annotations.VerticalLine;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.annotations.VerticalLine;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.annotations.VerticalLine;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.annotations.VerticalLine;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.annotations.VerticalLine;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface HorizontalLine extends anychart.core.annotations.Base {
         allowEdit(): boolean;
@@ -6950,31 +7263,31 @@ declare namespace anychart.core.annotations {
         yScale(settings?: anychart.scales.Base | Object | string): anychart.core.annotations.HorizontalLine;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.annotations.HorizontalLine;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.annotations.HorizontalLine;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.annotations.HorizontalLine;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.annotations.HorizontalLine;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface ChartController extends anychart.core.Base {
         cancelDrawing(): void;
         getSelectedAnnotation(): anychart.core.annotations.Base;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         removeAllAnnotations(): anychart.core.annotations.ChartController;
-        removeAllListeners(type?: string): number;
         removeAnnotation(annotation: anychart.core.annotations.Base): anychart.core.annotations.ChartController;
         select(annotation: anychart.core.annotations.Base): anychart.core.annotations.ChartController;
         startDrawing(annotationTypeOrConfig: string | anychart.core.annotations.AnnotationJSONFormat): anychart.core.annotations.Base;
+        unselect(): anychart.core.annotations.ChartController;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
-        unselect(): anychart.core.annotations.ChartController;
     }
     interface FibonacciArc extends anychart.core.annotations.FibonacciBase {
         allowEdit(): boolean;
@@ -7046,17 +7359,17 @@ declare namespace anychart.core.annotations {
         yScale(settings?: anychart.scales.Base | Object | string): anychart.core.annotations.FibonacciArc;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.annotations.FibonacciArc;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.annotations.FibonacciArc;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.annotations.FibonacciArc;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.annotations.FibonacciArc;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Line extends anychart.core.annotations.Base {
         allowEdit(): boolean;
@@ -7121,17 +7434,17 @@ declare namespace anychart.core.annotations {
         yScale(settings?: anychart.scales.Base | Object | string): anychart.core.annotations.Line;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.annotations.Line;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.annotations.Line;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.annotations.Line;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.annotations.Line;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface FibonacciTimezones extends anychart.core.annotations.FibonacciBase {
         allowEdit(): boolean;
@@ -7203,17 +7516,17 @@ declare namespace anychart.core.annotations {
         yScale(settings?: anychart.scales.Base | Object | string): anychart.core.annotations.FibonacciTimezones;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.annotations.FibonacciTimezones;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.annotations.FibonacciTimezones;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.annotations.FibonacciTimezones;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.annotations.FibonacciTimezones;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Ellipse extends anychart.core.annotations.Base {
         allowEdit(): boolean;
@@ -7291,17 +7604,17 @@ declare namespace anychart.core.annotations {
         yScale(settings?: anychart.scales.Base | Object | string): anychart.core.annotations.Ellipse;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.annotations.Ellipse;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.annotations.Ellipse;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.annotations.Ellipse;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.annotations.Ellipse;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Marker extends anychart.core.annotations.Base {
         allowEdit(): boolean;
@@ -7385,21 +7698,72 @@ declare namespace anychart.core.annotations {
         yScale(settings?: anychart.scales.Base | Object | string): anychart.core.annotations.Marker;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.annotations.Marker;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.annotations.Marker;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.annotations.Marker;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.annotations.Marker;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
 }
 
 declare namespace anychart.core.axes {
+    interface Surface extends anychart.core.axes.Linear {
+        drawFirstLabel(): boolean;
+        drawFirstLabel(enabled?: boolean): anychart.core.axes.Surface;
+        drawLastLabel(): boolean;
+        drawLastLabel(enabled?: boolean): anychart.core.axes.Surface;
+        enabled(): boolean;
+        enabled(enabled?: boolean): anychart.core.axes.Surface;
+        getPixelBounds(): anychart.math.Rect;
+        getRemainingBounds(): anychart.math.Rect;
+        isHorizontal(): boolean;
+        labels(): anychart.core.ui.LabelsFactory;
+        labels(settings?: Object | boolean): anychart.core.axes.Surface;
+        minorLabels(): anychart.core.ui.LabelsFactory;
+        minorLabels(settings?: Object | boolean): anychart.core.axes.Surface;
+        minorTicks(): anychart.core.axes.Ticks;
+        minorTicks(settings?: Object | boolean): anychart.core.axes.Surface;
+        orientation(): string;
+        orientation(orientation?: string): anychart.core.axes.Surface;
+        overlapMode(): string;
+        overlapMode(mode?: string): anychart.core.axes.Surface;
+        scale(): anychart.scales.Base;
+        scale(settings?: anychart.scales.Base | Object | string): anychart.core.axes.Surface;
+        staggerLines(): number;
+        staggerLines(count?: number): anychart.core.axes.Surface;
+        staggerMaxLines(): number;
+        staggerMaxLines(count?: number): anychart.core.axes.Surface;
+        staggerMode(): boolean;
+        staggerMode(enabled?: boolean): anychart.core.axes.Surface;
+        stroke(): anychart.graphics.vector.Stroke;
+        stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string | (() => void), thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.axes.Surface;
+        stroke(settings?: Object): anychart.core.axes.Surface;
+        ticks(): anychart.core.axes.Ticks;
+        ticks(settings?: Object | boolean): anychart.core.axes.Surface;
+        title(): anychart.core.ui.Title;
+        title(settings?: boolean | Object | string): anychart.core.axes.Surface;
+        width(): number | string;
+        width(width?: number | string): anychart.core.axes.Surface;
+        zIndex(): number;
+        zIndex(zIndex?: number): anychart.core.axes.Surface;
+        container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
+        container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.axes.Surface;
+        parentBounds(): anychart.math.Rect;
+        parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.axes.Surface;
+        parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.axes.Surface;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
+    }
     interface CircularTicks extends anychart.core.VisualBase {
         enabled(): boolean;
         enabled(enabled?: boolean): anychart.core.axes.CircularTicks;
@@ -7417,20 +7781,14 @@ declare namespace anychart.core.axes {
         hatchFill(enabled?: boolean): anychart.core.axes.CircularTicks;
         length(): string;
         length(length?: number | string): anychart.core.axes.CircularTicks;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         position(): string;
         position(value?: string): anychart.core.axes.CircularTicks;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         stroke(): anychart.graphics.vector.Stroke | (() => void);
         stroke(strokeFunction?: (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill)): anychart.core.axes.CircularTicks;
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.axes.CircularTicks;
         stroke(settings?: Object): anychart.core.axes.CircularTicks;
         type(): string | (() => void);
         type(type?: string | ((path:anychart.graphics.vector.Path,x:number,y:number,radius:number)=>void)): anychart.core.axes.CircularTicks;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.axes.CircularTicks;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
@@ -7438,6 +7796,12 @@ declare namespace anychart.core.axes {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.axes.CircularTicks;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.axes.CircularTicks;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Polar extends anychart.core.VisualBase {
         enabled(): boolean;
@@ -7451,16 +7815,12 @@ declare namespace anychart.core.axes {
         getRemainingBounds(): anychart.math.Rect;
         labels(): anychart.core.ui.LabelsFactory;
         labels(settings?: Object | boolean): anychart.core.axes.Polar;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         minorLabels(): anychart.core.ui.LabelsFactory;
         minorLabels(settings?: Object | boolean): anychart.core.axes.Polar;
         minorTicks(): anychart.core.axes.Ticks;
         minorTicks(settings?: Object | boolean): anychart.core.axes.Polar;
         overlapMode(): string;
         overlapMode(mode?: string): anychart.core.axes.Polar;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         scale(): anychart.scales.ScatterBase;
         scale(settings?: anychart.scales.ScatterBase | string | Object): anychart.core.axes.Polar;
         stroke(): anychart.graphics.vector.Stroke;
@@ -7468,8 +7828,6 @@ declare namespace anychart.core.axes {
         stroke(settings?: Object): anychart.core.axes.Polar;
         ticks(): anychart.core.axes.Ticks;
         ticks(settings?: Object | boolean): anychart.core.axes.Polar;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.axes.Polar;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
@@ -7477,6 +7835,12 @@ declare namespace anychart.core.axes {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.axes.Polar;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.axes.Polar;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Linear extends anychart.core.VisualBase {
         drawFirstLabel(): boolean;
@@ -7490,8 +7854,6 @@ declare namespace anychart.core.axes {
         isHorizontal(): boolean;
         labels(): anychart.core.ui.LabelsFactory;
         labels(settings?: Object | boolean): anychart.core.axes.Linear;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         minorLabels(): anychart.core.ui.LabelsFactory;
         minorLabels(settings?: Object | boolean): anychart.core.axes.Linear;
         minorTicks(): anychart.core.axes.Ticks;
@@ -7500,8 +7862,6 @@ declare namespace anychart.core.axes {
         orientation(orientation?: string): anychart.core.axes.Linear;
         overlapMode(): string;
         overlapMode(mode?: string): anychart.core.axes.Linear;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         scale(): anychart.scales.Base;
         scale(settings?: anychart.scales.Base | Object | string): anychart.core.axes.Linear;
         staggerLines(): number;
@@ -7517,8 +7877,6 @@ declare namespace anychart.core.axes {
         ticks(settings?: Object | boolean): anychart.core.axes.Linear;
         title(): anychart.core.ui.Title;
         title(settings?: boolean | Object | string): anychart.core.axes.Linear;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.axes.Linear;
         zIndex(): number;
@@ -7528,6 +7886,12 @@ declare namespace anychart.core.axes {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.axes.Linear;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.axes.Linear;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface MapSettings extends anychart.core.VisualBase {
         bottom(): anychart.core.axes.Map;
@@ -7542,15 +7906,12 @@ declare namespace anychart.core.axes {
         labels(settings?: Object | boolean): anychart.core.axes.MapSettings;
         left(): anychart.core.axes.Map;
         left(settings?: boolean | Object): anychart.core.axes.MapSettings;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         minorLabels(): anychart.core.ui.LabelsFactory;
         minorLabels(settings?: Object | boolean): anychart.core.axes.MapSettings;
         minorTicks(): anychart.core.axes.MapTicks;
         minorTicks(settings?: Object | boolean): anychart.core.axes.MapSettings;
         overlapMode(): string;
         overlapMode(mode?: string): anychart.core.axes.MapSettings;
-        removeAllListeners(type?: string): number;
         right(): anychart.core.axes.Map;
         right(settings?: boolean | Object): anychart.core.axes.MapSettings;
         stroke(): anychart.graphics.vector.Stroke;
@@ -7562,8 +7923,6 @@ declare namespace anychart.core.axes {
         title(settings?: boolean | Object | string): anychart.core.axes.MapSettings;
         top(): anychart.core.axes.Map;
         top(settings?: boolean | Object): anychart.core.axes.MapSettings;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.axes.MapSettings;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
@@ -7572,6 +7931,11 @@ declare namespace anychart.core.axes {
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.axes.MapSettings;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.axes.MapSettings;
         print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Radial extends anychart.core.VisualBase {
         drawFirstLabel(): boolean;
@@ -7582,16 +7946,12 @@ declare namespace anychart.core.axes {
         enabled(enabled?: boolean): anychart.core.axes.Radial;
         labels(): anychart.core.ui.LabelsFactory;
         labels(settings?: Object | boolean): anychart.core.axes.Radial;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         minorLabels(): anychart.core.ui.LabelsFactory;
         minorLabels(settings?: Object | boolean): anychart.core.axes.Radial;
         minorTicks(): anychart.core.axes.Ticks;
         minorTicks(settings?: Object | boolean): anychart.core.axes.Radial;
         overlapMode(): string;
         overlapMode(mode?: string): anychart.core.axes.Radial;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         scale(): anychart.scales.Base;
         scale(settings?: anychart.scales.Base | Object | string): anychart.core.axes.Radial;
         stroke(): anychart.graphics.vector.Stroke;
@@ -7599,8 +7959,6 @@ declare namespace anychart.core.axes {
         stroke(settings?: Object): anychart.core.axes.Radial;
         ticks(): anychart.core.axes.Ticks;
         ticks(settings?: Object | boolean): anychart.core.axes.Radial;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.axes.Radial;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
@@ -7608,24 +7966,24 @@ declare namespace anychart.core.axes {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.axes.Radial;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.axes.Radial;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Ticks extends anychart.core.VisualBase {
         enabled(): boolean;
         enabled(enabled?: boolean): anychart.core.axes.Ticks;
         length(): number;
         length(length?: number): anychart.core.axes.Ticks;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         position(): string;
         position(position?: string): anychart.core.axes.Ticks;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         stroke(): anychart.graphics.vector.Stroke;
         stroke(color?: anychart.graphics.vector.Stroke): anychart.core.axes.Ticks;
         stroke(color?: string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.axes.Ticks;
         stroke(settings?: Object): anychart.core.axes.Ticks;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.axes.Ticks;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
@@ -7633,6 +7991,37 @@ declare namespace anychart.core.axes {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.axes.Ticks;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.axes.Ticks;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
+    }
+    interface SurfaceTicks extends anychart.core.axes.Ticks {
+        enabled(): boolean;
+        enabled(enabled?: boolean): anychart.core.axes.SurfaceTicks;
+        length(): number;
+        length(length?: number): anychart.core.axes.SurfaceTicks;
+        position(): string;
+        position(position?: string): anychart.core.axes.SurfaceTicks;
+        stroke(): anychart.graphics.vector.Stroke;
+        stroke(color?: anychart.graphics.vector.Stroke): anychart.core.axes.SurfaceTicks;
+        stroke(color?: string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.axes.SurfaceTicks;
+        stroke(settings?: Object): anychart.core.axes.SurfaceTicks;
+        zIndex(): number;
+        zIndex(zIndex?: number): anychart.core.axes.SurfaceTicks;
+        container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
+        container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.axes.SurfaceTicks;
+        parentBounds(): anychart.math.Rect;
+        parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.axes.SurfaceTicks;
+        parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.axes.SurfaceTicks;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Circular extends anychart.core.VisualBase {
         cornersRounding(): string;
@@ -7651,18 +8040,14 @@ declare namespace anychart.core.axes {
         fill(imageSettings: anychart.graphics.vector.Fill): anychart.core.axes.Circular;
         labels(): anychart.core.ui.LabelsFactory;
         labels(settings?: Object | boolean): anychart.core.axes.Circular;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         minorLabels(): anychart.core.ui.LabelsFactory;
         minorLabels(settings?: Object | boolean): anychart.core.axes.Circular;
         minorTicks(): anychart.core.axes.CircularTicks;
         minorTicks(settings?: Object | boolean): anychart.core.axes.Circular;
         overlapMode(): string;
         overlapMode(value?: string | boolean): anychart.core.axes.Circular;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
         radius(): string;
         radius(value?: number | string): anychart.core.axes.Circular;
-        removeAllListeners(type?: string): number;
         scale(): anychart.scales.Linear | anychart.scales.Logarithmic;
         scale(settings?: string | anychart.scales.Linear | Object): anychart.core.axes.Circular;
         startAngle(): number;
@@ -7671,8 +8056,6 @@ declare namespace anychart.core.axes {
         sweepAngle(value?: string | number): anychart.core.axes.Circular;
         ticks(): anychart.core.axes.CircularTicks;
         ticks(settings?: Object | boolean): anychart.core.axes.Circular;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): string;
         width(value?: number | string): anychart.core.axes.Circular;
         zIndex(): number;
@@ -7682,6 +8065,12 @@ declare namespace anychart.core.axes {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.axes.Circular;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.axes.Circular;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface StockDateTime extends anychart.core.VisualBase {
         background(): anychart.core.ui.Background;
@@ -7692,22 +8081,16 @@ declare namespace anychart.core.axes {
         height(height?: number): anychart.core.axes.StockDateTime;
         labels(): anychart.core.ui.LabelsFactory;
         labels(settings?: Object | boolean): anychart.core.axes.StockDateTime;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         minorLabels(): anychart.core.ui.LabelsFactory;
         minorLabels(settings?: Object | boolean): anychart.core.axes.StockDateTime;
         minorTicks(): anychart.core.axes.Ticks;
         minorTicks(settings?: Object | boolean): anychart.core.axes.StockDateTime;
         overlapMode(): string;
         overlapMode(mode?: string): anychart.core.axes.StockDateTime;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         showHelperLabel(): boolean;
         showHelperLabel(settings?: boolean): anychart.core.axes.StockDateTime;
         ticks(): anychart.core.axes.Ticks;
         ticks(settings?: Object | boolean): anychart.core.axes.StockDateTime;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.axes.StockDateTime;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
@@ -7715,6 +8098,12 @@ declare namespace anychart.core.axes {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.axes.StockDateTime;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.axes.StockDateTime;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Radar extends anychart.core.VisualBase {
         enabled(): boolean;
@@ -7722,10 +8111,6 @@ declare namespace anychart.core.axes {
         getRemainingBounds(): anychart.math.Rect;
         labels(): anychart.core.ui.LabelsFactory;
         labels(settings?: Object | boolean): anychart.core.axes.Radar;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         scale(): anychart.scales.Base;
         scale(settings?: anychart.scales.Base | string | Object): anychart.core.axes.Radar;
         stroke(): anychart.graphics.vector.Stroke;
@@ -7733,8 +8118,6 @@ declare namespace anychart.core.axes {
         stroke(settings?: Object): anychart.core.axes.Radar;
         ticks(): anychart.core.axes.Ticks;
         ticks(settings?: Object | boolean): anychart.core.axes.Radar;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.axes.Radar;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
@@ -7742,6 +8125,12 @@ declare namespace anychart.core.axes {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.axes.Radar;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.axes.Radar;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface LinearGauge extends anychart.core.axes.Linear {
         drawFirstLabel(): boolean;
@@ -7755,8 +8144,6 @@ declare namespace anychart.core.axes {
         isHorizontal(): boolean;
         labels(): anychart.core.ui.LabelsFactory;
         labels(settings?: Object | boolean): anychart.core.axes.LinearGauge;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         minorLabels(): anychart.core.ui.LabelsFactory;
         minorLabels(settings?: Object | boolean): anychart.core.axes.LinearGauge;
         minorTicks(): anychart.core.axes.Ticks;
@@ -7770,8 +8157,6 @@ declare namespace anychart.core.axes {
         padding(): anychart.core.utils.Padding;
         padding(padding?: Array<number|string> | Object): anychart.core.axes.LinearGauge;
         padding(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.core.axes.LinearGauge;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         scale(): anychart.scales.Base;
         scale(settings?: anychart.scales.Base | Object | string): anychart.core.axes.LinearGauge;
         staggerLines(): number;
@@ -7787,8 +8172,6 @@ declare namespace anychart.core.axes {
         ticks(settings?: Object | boolean): anychart.core.axes.LinearGauge;
         title(): anychart.core.ui.Title;
         title(settings?: boolean | Object | string): anychart.core.axes.LinearGauge;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.axes.LinearGauge;
         zIndex(): number;
@@ -7798,23 +8181,23 @@ declare namespace anychart.core.axes {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.axes.LinearGauge;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.axes.LinearGauge;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface MapTicks extends anychart.core.VisualBase {
         enabled(): boolean;
         enabled(enabled?: boolean): anychart.core.axes.MapTicks;
         length(): number;
         length(length?: number | string): anychart.core.axes.MapTicks;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         position(): string;
         position(position?: string): anychart.core.axes.MapTicks;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         stroke(): anychart.graphics.vector.Stroke;
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.axes.MapTicks;
         stroke(settings?: Object): anychart.core.axes.MapTicks;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.axes.MapTicks;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
@@ -7822,6 +8205,12 @@ declare namespace anychart.core.axes {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.axes.MapTicks;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.axes.MapTicks;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Map extends anychart.core.VisualBase {
         drawFirstLabel(): boolean;
@@ -7832,16 +8221,12 @@ declare namespace anychart.core.axes {
         enabled(enabled?: boolean): anychart.core.axes.Map;
         labels(): anychart.core.ui.LabelsFactory;
         labels(settings?: Object | boolean): anychart.core.axes.Map;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         minorLabels(): anychart.core.ui.LabelsFactory;
         minorLabels(settings?: Object | boolean): anychart.core.axes.Map;
         minorTicks(): anychart.core.axes.MapTicks;
         minorTicks(settings?: Object | boolean): anychart.core.axes.Map;
         overlapMode(): string;
         overlapMode(value?: string): anychart.core.axes.Map;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         stroke(): anychart.graphics.vector.Stroke;
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string | (() => void), thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.axes.Map;
         stroke(settings?: Object): anychart.core.axes.Map;
@@ -7849,8 +8234,6 @@ declare namespace anychart.core.axes {
         ticks(settings?: Object | boolean): anychart.core.axes.Map;
         title(): anychart.core.ui.Title;
         title(settings?: boolean | Object | string): anychart.core.axes.Map;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.axes.Map;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
@@ -7858,6 +8241,12 @@ declare namespace anychart.core.axes {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.axes.Map;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.axes.Map;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
 }
 
@@ -7879,12 +8268,12 @@ declare namespace anychart.core.axisMarkers {
         zIndex(zIndex?: number): anychart.core.axisMarkers.GanttLine;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.axisMarkers.GanttLine;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.axisMarkers.GanttLine;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.axisMarkers.GanttLine;
         print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
@@ -7966,17 +8355,17 @@ declare namespace anychart.core.axisMarkers {
         wordWrap(mode?: string): anychart.core.axisMarkers.GanttText;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.axisMarkers.GanttText;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.axisMarkers.GanttText;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.axisMarkers.GanttText;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.axisMarkers.GanttText;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface GanttRange extends anychart.core.VisualBase {
         enabled(): boolean;
@@ -8000,12 +8389,12 @@ declare namespace anychart.core.axisMarkers {
         zIndex(zIndex?: number): anychart.core.axisMarkers.GanttRange;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.axisMarkers.GanttRange;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.axisMarkers.GanttRange;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.axisMarkers.GanttRange;
         print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
@@ -8023,20 +8412,14 @@ declare namespace anychart.core.axisMarkers {
         fill(color: anychart.graphics.vector.Fill | Array<anychart.graphics.vector.GradientKey|string>): anychart.core.axisMarkers.CircularRange;
         from(): number;
         from(fromValue?: number): anychart.core.axisMarkers.CircularRange;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         position(): string;
         position(positionType?: string): anychart.core.axisMarkers.CircularRange;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
         radius(): string;
         radius(value?: number | string): anychart.core.axisMarkers.CircularRange;
-        removeAllListeners(type?: string): number;
         startSize(): string;
         startSize(value?: number | string): anychart.core.axisMarkers.CircularRange;
         to(): number;
         to(toValue?: number): anychart.core.axisMarkers.CircularRange;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.axisMarkers.CircularRange;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
@@ -8044,6 +8427,12 @@ declare namespace anychart.core.axisMarkers {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.axisMarkers.CircularRange;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.axisMarkers.CircularRange;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Text extends anychart.core.Text {
         adjustFontSize(): Object;
@@ -8087,8 +8476,6 @@ declare namespace anychart.core.axisMarkers {
         letterSpacing(spacing?: string | number): anychart.core.axisMarkers.Text;
         lineHeight(): string | number;
         lineHeight(height?: string | number): anychart.core.axisMarkers.Text;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxFontSize(): number;
         maxFontSize(size?: number | string): anychart.core.axisMarkers.Text;
         minFontSize(): number;
@@ -8102,8 +8489,6 @@ declare namespace anychart.core.axisMarkers {
         padding(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.core.axisMarkers.Text;
         position(): string;
         position(position?: string): anychart.core.axisMarkers.Text;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rotation(): number;
         rotation(rotation?: number): anychart.core.axisMarkers.Text;
         scale(): anychart.scales.Base;
@@ -8124,8 +8509,6 @@ declare namespace anychart.core.axisMarkers {
         textSettings(name?: string): string | number | boolean;
         textSettings(objectWithSettings?: Object): anychart.core.axisMarkers.Text;
         textSettings(name?: string, settings?: string | number | boolean | (() => void)): anychart.core.axisMarkers.Text;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         useHtml(): boolean;
         useHtml(enabled?: boolean): anychart.core.axisMarkers.Text;
         vAlign(): anychart.graphics.vector.Text.VAlign | string;
@@ -8145,6 +8528,12 @@ declare namespace anychart.core.axisMarkers {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.axisMarkers.Text;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.axisMarkers.Text;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface CurrentPriceIndicator extends anychart.core.VisualBase {
         axis(): anychart.core.axes.Linear;
@@ -8158,10 +8547,6 @@ declare namespace anychart.core.axisMarkers {
         fallingStroke(settings?: Object): anychart.core.axisMarkers.CurrentPriceIndicator;
         label(): anychart.core.ui.LabelsFactory;
         label(index?: string | number, settings?: boolean | Object): anychart.core.axisMarkers.CurrentPriceIndicator;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         risingLabel(): anychart.core.ui.Label;
         risingLabel(index?: string | number, settings?: boolean | Object): anychart.core.axisMarkers.CurrentPriceIndicator;
         risingStroke(): anychart.graphics.vector.Stroke;
@@ -8172,8 +8557,6 @@ declare namespace anychart.core.axisMarkers {
         stroke(): anychart.graphics.vector.Stroke;
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.axisMarkers.CurrentPriceIndicator;
         stroke(settings?: Object): anychart.core.axisMarkers.CurrentPriceIndicator;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         value(): string | number | Date;
         value(value?: string | number | Date): anychart.core.axisMarkers.CurrentPriceIndicator;
         valueField(): string;
@@ -8185,6 +8568,12 @@ declare namespace anychart.core.axisMarkers {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.axisMarkers.CurrentPriceIndicator;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.axisMarkers.CurrentPriceIndicator;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Line extends anychart.core.VisualBase {
         axis(): anychart.core.axes.Linear;
@@ -8194,10 +8583,6 @@ declare namespace anychart.core.axisMarkers {
         isHorizontal(): boolean;
         layout(): string;
         layout(layout?: string): anychart.core.axisMarkers.Line;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         scale(): anychart.scales.Base;
         scale(settings?: anychart.scales.Base | Object | string): anychart.core.axisMarkers.Line;
         scaleRangeMode(): string;
@@ -8205,8 +8590,6 @@ declare namespace anychart.core.axisMarkers {
         stroke(): string | anychart.graphics.vector.Stroke;
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.axisMarkers.Line;
         stroke(settings?: Object): anychart.core.axisMarkers.Line;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         value(): number;
         value(newValue?: number): anychart.core.axisMarkers.Line;
         zIndex(): number;
@@ -8216,6 +8599,12 @@ declare namespace anychart.core.axisMarkers {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.axisMarkers.Line;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.axisMarkers.Line;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Range extends anychart.core.VisualBase {
         axis(): anychart.core.axes.Linear;
@@ -8233,18 +8622,12 @@ declare namespace anychart.core.axisMarkers {
         isHorizontal(): boolean;
         layout(): string;
         layout(layout?: string): anychart.core.axisMarkers.Range;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         scale(): anychart.scales.Base;
         scale(settings?: anychart.scales.Base | Object | string): anychart.core.axisMarkers.Range;
         scaleRangeMode(): string;
         scaleRangeMode(mode?: string): anychart.core.axisMarkers.Range;
         to(): number;
         to(toValue?: number): anychart.core.axisMarkers.Range;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.axisMarkers.Range;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
@@ -8252,6 +8635,12 @@ declare namespace anychart.core.axisMarkers {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.axisMarkers.Range;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.axisMarkers.Range;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
 }
 
@@ -8302,8 +8691,6 @@ declare namespace anychart.core.cartesian.series {
         left(left?: number | string): anychart.core.cartesian.series.ContinuousBase;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.cartesian.series.ContinuousBase;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.cartesian.series.ContinuousBase;
         maxHeight(): number | string;
@@ -8325,8 +8712,6 @@ declare namespace anychart.core.cartesian.series {
         name(value?: string): anychart.core.cartesian.series.ContinuousBase;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.cartesian.series.ContinuousBase;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.cartesian.series.ContinuousBase;
         select(index?: number): anychart.core.cartesian.series.ContinuousBase;
@@ -8342,8 +8727,6 @@ declare namespace anychart.core.cartesian.series {
         transformX(value: any, subRangeRatio?: number): number;
         transformY(value: any, subRangeRatio?: number): number;
         unhover(): anychart.core.cartesian.series.ContinuousBase;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.cartesian.series.ContinuousBase;
         unselect(index?: number): anychart.core.cartesian.series.ContinuousBase;
         unselect(indexes?: Array<number>): anychart.core.cartesian.series.ContinuousBase;
@@ -8366,11 +8749,19 @@ declare namespace anychart.core.cartesian.series {
         rendering(settings?: Object | (() => void)): anychart.core.cartesian.series.ContinuousBase;
         seriesType(): string;
         seriesType(type?: string): anychart.core.cartesian.series.ContinuousBase;
+        xMode(): string;
+        xMode(xMode?: string): anychart.core.cartesian.series.ContinuousBase;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.cartesian.series.ContinuousBase;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.cartesian.series.ContinuousBase;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.cartesian.series.ContinuousBase;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Box extends anychart.core.cartesian.series.WidthBased {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -8431,8 +8822,6 @@ declare namespace anychart.core.cartesian.series {
         left(left?: number | string): anychart.core.cartesian.series.Box;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.cartesian.series.Box;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.cartesian.series.Box;
         maxHeight(): number | string;
@@ -8466,8 +8855,6 @@ declare namespace anychart.core.cartesian.series {
         outlierMarkers(settings?: Object | boolean | string): anychart.core.cartesian.series.Box;
         pointWidth(): string | number;
         pointWidth(width?: number | string): anychart.core.cartesian.series.Box;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.cartesian.series.Box;
         right(): number | string;
@@ -8495,8 +8882,6 @@ declare namespace anychart.core.cartesian.series {
         transformX(value: any, subRangeRatio?: number): number;
         transformY(value: any, subRangeRatio?: number): number;
         unhover(): anychart.core.cartesian.series.Box;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.cartesian.series.Box;
         unselect(index?: number): anychart.core.cartesian.series.Box;
         unselect(indexes?: Array<number>): anychart.core.cartesian.series.Box;
@@ -8516,11 +8901,19 @@ declare namespace anychart.core.cartesian.series {
         yScale(settings?: anychart.scales.Base | Object | string): anychart.core.cartesian.series.Box;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.cartesian.series.Box;
+        xMode(): string;
+        xMode(xMode?: string): anychart.core.cartesian.series.Box;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.cartesian.series.Box;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.cartesian.series.Box;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.cartesian.series.Box;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Line3d extends anychart.core.cartesian.series.ContinuousBase {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -8570,8 +8963,6 @@ declare namespace anychart.core.cartesian.series {
         left(left?: number | string): anychart.core.cartesian.series.Line3d;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.cartesian.series.Line3d;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.cartesian.series.Line3d;
         maxHeight(): number | string;
@@ -8593,8 +8984,6 @@ declare namespace anychart.core.cartesian.series {
         name(value?: string): anychart.core.cartesian.series.Line3d;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.cartesian.series.Line3d;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.cartesian.series.Line3d;
         right(): number | string;
@@ -8614,8 +9003,6 @@ declare namespace anychart.core.cartesian.series {
         transformX(value: any, subRangeRatio?: number): number;
         transformY(value: any, subRangeRatio?: number): number;
         unhover(): anychart.core.cartesian.series.Line3d;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.cartesian.series.Line3d;
         unselect(index?: number): anychart.core.cartesian.series.Line3d;
         unselect(indexes?: Array<number>): anychart.core.cartesian.series.Line3d;
@@ -8631,11 +9018,19 @@ declare namespace anychart.core.cartesian.series {
         zIndex(zIndex?: number): anychart.core.cartesian.series.Line3d;
         isVertical(): boolean;
         isVertical(enabled?: boolean): anychart.core.cartesian.series.Line3d;
+        xMode(): string;
+        xMode(xMode?: string): anychart.core.cartesian.series.Line3d;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.cartesian.series.Line3d;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.cartesian.series.Line3d;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.cartesian.series.Line3d;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface SplineArea extends anychart.core.cartesian.series.ContinuousBase {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -8698,8 +9093,6 @@ declare namespace anychart.core.cartesian.series {
         left(left?: number | string): anychart.core.cartesian.series.SplineArea;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.cartesian.series.SplineArea;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.cartesian.series.SplineArea;
         maxHeight(): number | string;
@@ -8721,8 +9114,6 @@ declare namespace anychart.core.cartesian.series {
         name(value?: string): anychart.core.cartesian.series.SplineArea;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.cartesian.series.SplineArea;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.cartesian.series.SplineArea;
         right(): number | string;
@@ -8746,8 +9137,6 @@ declare namespace anychart.core.cartesian.series {
         transformX(value: any, subRangeRatio?: number): number;
         transformY(value: any, subRangeRatio?: number): number;
         unhover(): anychart.core.cartesian.series.SplineArea;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.cartesian.series.SplineArea;
         unselect(index?: number): anychart.core.cartesian.series.SplineArea;
         unselect(indexes?: Array<number>): anychart.core.cartesian.series.SplineArea;
@@ -8761,11 +9150,19 @@ declare namespace anychart.core.cartesian.series {
         yScale(settings?: anychart.scales.Base | Object | string): anychart.core.cartesian.series.SplineArea;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.cartesian.series.SplineArea;
+        xMode(): string;
+        xMode(xMode?: string): anychart.core.cartesian.series.SplineArea;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.cartesian.series.SplineArea;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.cartesian.series.SplineArea;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.cartesian.series.SplineArea;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Spline extends anychart.core.cartesian.series.ContinuousBase {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -8815,8 +9212,6 @@ declare namespace anychart.core.cartesian.series {
         left(left?: number | string): anychart.core.cartesian.series.Spline;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.cartesian.series.Spline;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.cartesian.series.Spline;
         maxHeight(): number | string;
@@ -8838,8 +9233,6 @@ declare namespace anychart.core.cartesian.series {
         name(value?: string): anychart.core.cartesian.series.Spline;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.cartesian.series.Spline;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.cartesian.series.Spline;
         right(): number | string;
@@ -8863,13 +9256,13 @@ declare namespace anychart.core.cartesian.series {
         transformX(value: any, subRangeRatio?: number): number;
         transformY(value: any, subRangeRatio?: number): number;
         unhover(): anychart.core.cartesian.series.Spline;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.cartesian.series.Spline;
         unselect(index?: number): anychart.core.cartesian.series.Spline;
         unselect(indexes?: Array<number>): anychart.core.cartesian.series.Spline;
         width(): number | string;
         width(width?: number | string): anychart.core.cartesian.series.Spline;
+        xMode(): string;
+        xMode(xMode?: string): anychart.core.cartesian.series.Spline;
         xPointPosition(): number;
         xPointPosition(position?: number): anychart.core.cartesian.series.Spline;
         xScale(): anychart.scales.Ordinal;
@@ -8883,6 +9276,12 @@ declare namespace anychart.core.cartesian.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.cartesian.series.Spline;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.cartesian.series.Spline;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface DiscreteBase extends anychart.core.cartesian.series.BaseWithMarkers {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -8931,8 +9330,6 @@ declare namespace anychart.core.cartesian.series {
         left(left?: number | string): anychart.core.cartesian.series.DiscreteBase;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.cartesian.series.DiscreteBase;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.cartesian.series.DiscreteBase;
         maxHeight(): number | string;
@@ -8954,8 +9351,6 @@ declare namespace anychart.core.cartesian.series {
         name(value?: string): anychart.core.cartesian.series.DiscreteBase;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.cartesian.series.DiscreteBase;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.cartesian.series.DiscreteBase;
         select(index?: number): anychart.core.cartesian.series.DiscreteBase;
@@ -8970,8 +9365,6 @@ declare namespace anychart.core.cartesian.series {
         top(top?: number | string): anychart.core.cartesian.series.DiscreteBase;
         transformX(value: any, subRangeRatio?: number): number;
         transformY(value: any, subRangeRatio?: number): number;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.cartesian.series.DiscreteBase;
         xPointPosition(): number;
@@ -8991,11 +9384,19 @@ declare namespace anychart.core.cartesian.series {
         rendering(settings?: Object | (() => void)): anychart.core.cartesian.series.DiscreteBase;
         seriesType(): string;
         seriesType(type?: string): anychart.core.cartesian.series.DiscreteBase;
+        xMode(): string;
+        xMode(xMode?: string): anychart.core.cartesian.series.DiscreteBase;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.cartesian.series.DiscreteBase;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.cartesian.series.DiscreteBase;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.cartesian.series.DiscreteBase;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface RangeStepArea extends anychart.core.cartesian.series.ContinuousRangeBase {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -9062,8 +9463,6 @@ declare namespace anychart.core.cartesian.series {
         left(left?: number | string): anychart.core.cartesian.series.RangeStepArea;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.cartesian.series.RangeStepArea;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         lowStroke(): anychart.graphics.vector.Stroke | (() => void);
         lowStroke(strokeFunction?: (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill)): anychart.core.cartesian.series.RangeStepArea;
         lowStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.cartesian.series.RangeStepArea;
@@ -9089,8 +9488,6 @@ declare namespace anychart.core.cartesian.series {
         name(value?: string): anychart.core.cartesian.series.RangeStepArea;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.cartesian.series.RangeStepArea;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.cartesian.series.RangeStepArea;
         right(): number | string;
@@ -9112,8 +9509,6 @@ declare namespace anychart.core.cartesian.series {
         transformX(value: any, subRangeRatio?: number): number;
         transformY(value: any, subRangeRatio?: number): number;
         unhover(): anychart.core.cartesian.series.RangeStepArea;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.cartesian.series.RangeStepArea;
         unselect(index?: number): anychart.core.cartesian.series.RangeStepArea;
         unselect(indexes?: Array<number>): anychart.core.cartesian.series.RangeStepArea;
@@ -9127,11 +9522,19 @@ declare namespace anychart.core.cartesian.series {
         yScale(settings?: anychart.scales.Base | Object | string): anychart.core.cartesian.series.RangeStepArea;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.cartesian.series.RangeStepArea;
+        xMode(): string;
+        xMode(xMode?: string): anychart.core.cartesian.series.RangeStepArea;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.cartesian.series.RangeStepArea;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.cartesian.series.RangeStepArea;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.cartesian.series.RangeStepArea;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface StepArea extends anychart.core.cartesian.series.ContinuousBase {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -9194,8 +9597,6 @@ declare namespace anychart.core.cartesian.series {
         left(left?: number | string): anychart.core.cartesian.series.StepArea;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.cartesian.series.StepArea;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.cartesian.series.StepArea;
         maxHeight(): number | string;
@@ -9217,8 +9618,6 @@ declare namespace anychart.core.cartesian.series {
         name(value?: string): anychart.core.cartesian.series.StepArea;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.cartesian.series.StepArea;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.cartesian.series.StepArea;
         right(): number | string;
@@ -9244,8 +9643,6 @@ declare namespace anychart.core.cartesian.series {
         transformX(value: any, subRangeRatio?: number): number;
         transformY(value: any, subRangeRatio?: number): number;
         unhover(): anychart.core.cartesian.series.StepArea;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.cartesian.series.StepArea;
         unselect(index?: number): anychart.core.cartesian.series.StepArea;
         unselect(indexes?: Array<number>): anychart.core.cartesian.series.StepArea;
@@ -9259,11 +9656,19 @@ declare namespace anychart.core.cartesian.series {
         yScale(settings?: anychart.scales.Base | Object | string): anychart.core.cartesian.series.StepArea;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.cartesian.series.StepArea;
+        xMode(): string;
+        xMode(xMode?: string): anychart.core.cartesian.series.StepArea;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.cartesian.series.StepArea;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.cartesian.series.StepArea;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.cartesian.series.StepArea;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Base extends anychart.core.SeriesBase {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -9306,8 +9711,6 @@ declare namespace anychart.core.cartesian.series {
         left(left?: number | string): anychart.core.cartesian.series.Base;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.cartesian.series.Base;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.cartesian.series.Base;
         maxHeight(): number | string;
@@ -9329,8 +9732,6 @@ declare namespace anychart.core.cartesian.series {
         name(value?: string): anychart.core.cartesian.series.Base;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.cartesian.series.Base;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.cartesian.series.Base;
         right(): number | string;
@@ -9350,13 +9751,13 @@ declare namespace anychart.core.cartesian.series {
         transformX(value: any, subRangeRatio?: number): number;
         transformY(value: any, subRangeRatio?: number): number;
         unhover(indexOrIndexes?: number | Array<number>): anychart.core.cartesian.series.Base;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.cartesian.series.Base;
         unselect(index?: number): anychart.core.cartesian.series.Base;
         unselect(indexes?: Array<number>): anychart.core.cartesian.series.Base;
         width(): number | string;
         width(width?: number | string): anychart.core.cartesian.series.Base;
+        xMode(): string;
+        xMode(xMode?: string): anychart.core.cartesian.series.Base;
         xPointPosition(): number;
         xPointPosition(position?: number): anychart.core.cartesian.series.Base;
         xScale(): anychart.scales.Ordinal;
@@ -9375,6 +9776,12 @@ declare namespace anychart.core.cartesian.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.cartesian.series.Base;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.cartesian.series.Base;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface RangeBar extends anychart.core.cartesian.series.WidthBased {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -9435,8 +9842,6 @@ declare namespace anychart.core.cartesian.series {
         left(left?: number | string): anychart.core.cartesian.series.RangeBar;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.cartesian.series.RangeBar;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.cartesian.series.RangeBar;
         maxHeight(): number | string;
@@ -9464,8 +9869,6 @@ declare namespace anychart.core.cartesian.series {
         normal(settings?: Object): anychart.core.cartesian.series.RangeBar;
         pointWidth(): string | number;
         pointWidth(width?: number | string): anychart.core.cartesian.series.RangeBar;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.cartesian.series.RangeBar;
         right(): number | string;
@@ -9489,13 +9892,13 @@ declare namespace anychart.core.cartesian.series {
         transformX(value: any, subRangeRatio?: number): number;
         transformY(value: any, subRangeRatio?: number): number;
         unhover(indexOrIndexes?: number | Array<number>): anychart.core.cartesian.series.RangeBar;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.cartesian.series.RangeBar;
         unselect(index?: number): anychart.core.cartesian.series.RangeBar;
         unselect(indexes?: Array<number>): anychart.core.cartesian.series.RangeBar;
         width(): number | string;
         width(width?: number | string): anychart.core.cartesian.series.RangeBar;
+        xMode(): string;
+        xMode(xMode?: string): anychart.core.cartesian.series.RangeBar;
         xPointPosition(): number;
         xPointPosition(position?: number): anychart.core.cartesian.series.RangeBar;
         xScale(): anychart.scales.Ordinal;
@@ -9509,6 +9912,12 @@ declare namespace anychart.core.cartesian.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.cartesian.series.RangeBar;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.cartesian.series.RangeBar;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Column3d extends anychart.core.cartesian.series.WidthBased {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -9563,8 +9972,6 @@ declare namespace anychart.core.cartesian.series {
         left(left?: number | string): anychart.core.cartesian.series.Column3d;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.cartesian.series.Column3d;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.cartesian.series.Column3d;
         maxHeight(): number | string;
@@ -9592,8 +9999,6 @@ declare namespace anychart.core.cartesian.series {
         normal(settings?: Object): anychart.core.cartesian.series.Column3d;
         pointWidth(): string | number;
         pointWidth(width?: number | string): anychart.core.cartesian.series.Column3d;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.cartesian.series.Column3d;
         right(): number | string;
@@ -9617,8 +10022,6 @@ declare namespace anychart.core.cartesian.series {
         transformX(value: any, subRangeRatio?: number): number;
         transformY(value: any, subRangeRatio?: number): number;
         unhover(indexOrIndexes?: number | Array<number>): anychart.core.cartesian.series.Column3d;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.cartesian.series.Column3d;
         unselect(index?: number): anychart.core.cartesian.series.Column3d;
         unselect(indexes?: Array<number>): anychart.core.cartesian.series.Column3d;
@@ -9632,11 +10035,19 @@ declare namespace anychart.core.cartesian.series {
         yScale(settings?: anychart.scales.Base | Object | string): anychart.core.cartesian.series.Column3d;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.cartesian.series.Column3d;
+        xMode(): string;
+        xMode(xMode?: string): anychart.core.cartesian.series.Column3d;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.cartesian.series.Column3d;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.cartesian.series.Column3d;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.cartesian.series.Column3d;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface ContinuousRangeBase extends anychart.core.cartesian.series.ContinuousBase {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -9698,8 +10109,6 @@ declare namespace anychart.core.cartesian.series {
         left(left?: number | string): anychart.core.cartesian.series.ContinuousRangeBase;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.cartesian.series.ContinuousRangeBase;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         lowStroke(): anychart.graphics.vector.Stroke | (() => void);
         lowStroke(strokeFunction?: (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill)): anychart.core.cartesian.series.ContinuousRangeBase;
         lowStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.cartesian.series.ContinuousRangeBase;
@@ -9725,8 +10134,6 @@ declare namespace anychart.core.cartesian.series {
         name(value?: string): anychart.core.cartesian.series.ContinuousRangeBase;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.cartesian.series.ContinuousRangeBase;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.cartesian.series.ContinuousRangeBase;
         select(index?: number): anychart.core.cartesian.series.ContinuousRangeBase;
@@ -9742,8 +10149,6 @@ declare namespace anychart.core.cartesian.series {
         transformX(value: any, subRangeRatio?: number): number;
         transformY(value: any, subRangeRatio?: number): number;
         unhover(): anychart.core.cartesian.series.ContinuousRangeBase;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.cartesian.series.ContinuousRangeBase;
         unselect(index?: number): anychart.core.cartesian.series.ContinuousRangeBase;
         unselect(indexes?: Array<number>): anychart.core.cartesian.series.ContinuousRangeBase;
@@ -9766,11 +10171,19 @@ declare namespace anychart.core.cartesian.series {
         rendering(settings?: Object | (() => void)): anychart.core.cartesian.series.ContinuousRangeBase;
         seriesType(): string;
         seriesType(type?: string): anychart.core.cartesian.series.ContinuousRangeBase;
+        xMode(): string;
+        xMode(xMode?: string): anychart.core.cartesian.series.ContinuousRangeBase;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.cartesian.series.ContinuousRangeBase;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.cartesian.series.ContinuousRangeBase;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.cartesian.series.ContinuousRangeBase;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Area extends anychart.core.cartesian.series.ContinuousBase {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -9833,8 +10246,6 @@ declare namespace anychart.core.cartesian.series {
         left(left?: number | string): anychart.core.cartesian.series.Area;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.cartesian.series.Area;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.cartesian.series.Area;
         maxHeight(): number | string;
@@ -9856,8 +10267,6 @@ declare namespace anychart.core.cartesian.series {
         name(value?: string): anychart.core.cartesian.series.Area;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.cartesian.series.Area;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.cartesian.series.Area;
         right(): number | string;
@@ -9881,8 +10290,6 @@ declare namespace anychart.core.cartesian.series {
         transformX(value: any, subRangeRatio?: number): number;
         transformY(value: any, subRangeRatio?: number): number;
         unhover(): anychart.core.cartesian.series.Area;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.cartesian.series.Area;
         unselect(index?: number): anychart.core.cartesian.series.Area;
         unselect(indexes?: Array<number>): anychart.core.cartesian.series.Area;
@@ -9896,11 +10303,19 @@ declare namespace anychart.core.cartesian.series {
         yScale(settings?: anychart.scales.Base | Object | string): anychart.core.cartesian.series.Area;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.cartesian.series.Area;
+        xMode(): string;
+        xMode(xMode?: string): anychart.core.cartesian.series.Area;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.cartesian.series.Area;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.cartesian.series.Area;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.cartesian.series.Area;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Stick extends anychart.core.cartesian.series.WidthBased {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -9948,8 +10363,6 @@ declare namespace anychart.core.cartesian.series {
         left(left?: number | string): anychart.core.cartesian.series.Stick;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.cartesian.series.Stick;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.cartesian.series.Stick;
         maxHeight(): number | string;
@@ -9977,8 +10390,6 @@ declare namespace anychart.core.cartesian.series {
         normal(settings?: Object): anychart.core.cartesian.series.Stick;
         pointWidth(): string | number;
         pointWidth(width?: number | string): anychart.core.cartesian.series.Stick;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.cartesian.series.Stick;
         right(): number | string;
@@ -10002,13 +10413,13 @@ declare namespace anychart.core.cartesian.series {
         transformX(value: any, subRangeRatio?: number): number;
         transformY(value: any, subRangeRatio?: number): number;
         unhover(indexOrIndexes?: number | Array<number>): anychart.core.cartesian.series.Stick;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.cartesian.series.Stick;
         unselect(index?: number): anychart.core.cartesian.series.Stick;
         unselect(indexes?: Array<number>): anychart.core.cartesian.series.Stick;
         width(): number | string;
         width(width?: number | string): anychart.core.cartesian.series.Stick;
+        xMode(): string;
+        xMode(xMode?: string): anychart.core.cartesian.series.Stick;
         xPointPosition(): number;
         xPointPosition(position?: number): anychart.core.cartesian.series.Stick;
         xScale(): anychart.scales.Ordinal;
@@ -10022,6 +10433,12 @@ declare namespace anychart.core.cartesian.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.cartesian.series.Stick;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.cartesian.series.Stick;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Bubble extends anychart.core.cartesian.series.BaseWithMarkers {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -10084,8 +10501,6 @@ declare namespace anychart.core.cartesian.series {
         left(left?: number | string): anychart.core.cartesian.series.Bubble;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.cartesian.series.Bubble;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.cartesian.series.Bubble;
         maxHeight(): number | string;
@@ -10124,8 +10539,6 @@ declare namespace anychart.core.cartesian.series {
         negativeStroke(settings?: Object): anychart.core.cartesian.series.Bubble;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.cartesian.series.Bubble;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.cartesian.series.Bubble;
         right(): number | string;
@@ -10149,13 +10562,13 @@ declare namespace anychart.core.cartesian.series {
         transformX(value: any, subRangeRatio?: number): number;
         transformY(value: any, subRangeRatio?: number): number;
         unhover(indexOrIndexes?: number | Array<number>): anychart.core.cartesian.series.Bubble;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.cartesian.series.Bubble;
         unselect(index?: number): anychart.core.cartesian.series.Bubble;
         unselect(indexes?: Array<number>): anychart.core.cartesian.series.Bubble;
         width(): number | string;
         width(width?: number | string): anychart.core.cartesian.series.Bubble;
+        xMode(): string;
+        xMode(xMode?: string): anychart.core.cartesian.series.Bubble;
         xPointPosition(): number;
         xPointPosition(position?: number): anychart.core.cartesian.series.Bubble;
         xScale(): anychart.scales.Ordinal;
@@ -10169,6 +10582,12 @@ declare namespace anychart.core.cartesian.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.cartesian.series.Bubble;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.cartesian.series.Bubble;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Bar extends anychart.core.cartesian.series.WidthBased {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -10229,8 +10648,6 @@ declare namespace anychart.core.cartesian.series {
         left(left?: number | string): anychart.core.cartesian.series.Bar;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.cartesian.series.Bar;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.cartesian.series.Bar;
         maxHeight(): number | string;
@@ -10258,8 +10675,6 @@ declare namespace anychart.core.cartesian.series {
         normal(settings?: Object): anychart.core.cartesian.series.Bar;
         pointWidth(): string | number;
         pointWidth(width?: number | string): anychart.core.cartesian.series.Bar;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.cartesian.series.Bar;
         right(): number | string;
@@ -10283,13 +10698,13 @@ declare namespace anychart.core.cartesian.series {
         transformX(value: any, subRangeRatio?: number): number;
         transformY(value: any, subRangeRatio?: number): number;
         unhover(indexOrIndexes?: number | Array<number>): anychart.core.cartesian.series.Bar;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.cartesian.series.Bar;
         unselect(index?: number): anychart.core.cartesian.series.Bar;
         unselect(indexes?: Array<number>): anychart.core.cartesian.series.Bar;
         width(): number | string;
         width(width?: number | string): anychart.core.cartesian.series.Bar;
+        xMode(): string;
+        xMode(xMode?: string): anychart.core.cartesian.series.Bar;
         xPointPosition(): number;
         xPointPosition(position?: number): anychart.core.cartesian.series.Bar;
         xScale(): anychart.scales.Ordinal;
@@ -10303,6 +10718,12 @@ declare namespace anychart.core.cartesian.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.cartesian.series.Bar;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.cartesian.series.Bar;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Area3d extends anychart.core.cartesian.series.ContinuousBase {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -10356,8 +10777,6 @@ declare namespace anychart.core.cartesian.series {
         left(left?: number | string): anychart.core.cartesian.series.Area3d;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.cartesian.series.Area3d;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.cartesian.series.Area3d;
         maxHeight(): number | string;
@@ -10379,8 +10798,6 @@ declare namespace anychart.core.cartesian.series {
         name(value?: string): anychart.core.cartesian.series.Area3d;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.cartesian.series.Area3d;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.cartesian.series.Area3d;
         right(): number | string;
@@ -10404,8 +10821,6 @@ declare namespace anychart.core.cartesian.series {
         transformX(value: any, subRangeRatio?: number): number;
         transformY(value: any, subRangeRatio?: number): number;
         unhover(): anychart.core.cartesian.series.Area3d;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.cartesian.series.Area3d;
         unselect(index?: number): anychart.core.cartesian.series.Area3d;
         unselect(indexes?: Array<number>): anychart.core.cartesian.series.Area3d;
@@ -10421,11 +10836,19 @@ declare namespace anychart.core.cartesian.series {
         zIndex(zIndex?: number): anychart.core.cartesian.series.Area3d;
         isVertical(): boolean;
         isVertical(enabled?: boolean): anychart.core.cartesian.series.Area3d;
+        xMode(): string;
+        xMode(xMode?: string): anychart.core.cartesian.series.Area3d;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.cartesian.series.Area3d;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.cartesian.series.Area3d;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.cartesian.series.Area3d;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface OHLC extends anychart.core.cartesian.series.WidthBased {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -10477,8 +10900,6 @@ declare namespace anychart.core.cartesian.series {
         left(left?: number | string): anychart.core.cartesian.series.OHLC;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.cartesian.series.OHLC;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.cartesian.series.OHLC;
         maxHeight(): number | string;
@@ -10506,8 +10927,6 @@ declare namespace anychart.core.cartesian.series {
         normal(settings?: Object): anychart.core.cartesian.series.OHLC;
         pointWidth(): string | number;
         pointWidth(width?: number | string): anychart.core.cartesian.series.OHLC;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.cartesian.series.OHLC;
         right(): number | string;
@@ -10531,8 +10950,6 @@ declare namespace anychart.core.cartesian.series {
         transformX(value: any, subRangeRatio?: number): number;
         transformY(value: any, subRangeRatio?: number): number;
         unhover(indexOrIndexes?: number | Array<number>): anychart.core.cartesian.series.OHLC;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.cartesian.series.OHLC;
         unselect(index?: number): anychart.core.cartesian.series.OHLC;
         unselect(indexes?: Array<number>): anychart.core.cartesian.series.OHLC;
@@ -10546,11 +10963,19 @@ declare namespace anychart.core.cartesian.series {
         yScale(settings?: anychart.scales.Base | Object | string): anychart.core.cartesian.series.OHLC;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.cartesian.series.OHLC;
+        xMode(): string;
+        xMode(xMode?: string): anychart.core.cartesian.series.OHLC;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.cartesian.series.OHLC;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.cartesian.series.OHLC;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.cartesian.series.OHLC;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Candlestick extends anychart.core.cartesian.series.OHLC {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -10615,8 +11040,6 @@ declare namespace anychart.core.cartesian.series {
         left(left?: number | string): anychart.core.cartesian.series.Candlestick;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.cartesian.series.Candlestick;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.cartesian.series.Candlestick;
         maxHeight(): number | string;
@@ -10644,8 +11067,6 @@ declare namespace anychart.core.cartesian.series {
         normal(settings?: Object): anychart.core.cartesian.series.Candlestick;
         pointWidth(): string | number;
         pointWidth(width?: number | string): anychart.core.cartesian.series.Candlestick;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.cartesian.series.Candlestick;
         right(): number | string;
@@ -10682,8 +11103,6 @@ declare namespace anychart.core.cartesian.series {
         transformX(value: any, subRangeRatio?: number): number;
         transformY(value: any, subRangeRatio?: number): number;
         unhover(indexOrIndexes?: number | Array<number>): anychart.core.cartesian.series.Candlestick;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.cartesian.series.Candlestick;
         unselect(index?: number): anychart.core.cartesian.series.Candlestick;
         unselect(indexes?: Array<number>): anychart.core.cartesian.series.Candlestick;
@@ -10697,11 +11116,19 @@ declare namespace anychart.core.cartesian.series {
         yScale(settings?: anychart.scales.Base | Object | string): anychart.core.cartesian.series.Candlestick;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.cartesian.series.Candlestick;
+        xMode(): string;
+        xMode(xMode?: string): anychart.core.cartesian.series.Candlestick;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.cartesian.series.Candlestick;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.cartesian.series.Candlestick;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.cartesian.series.Candlestick;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Column extends anychart.core.cartesian.series.WidthBased {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -10762,8 +11189,6 @@ declare namespace anychart.core.cartesian.series {
         left(left?: number | string): anychart.core.cartesian.series.Column;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.cartesian.series.Column;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.cartesian.series.Column;
         maxHeight(): number | string;
@@ -10791,8 +11216,6 @@ declare namespace anychart.core.cartesian.series {
         normal(settings?: Object): anychart.core.cartesian.series.Column;
         pointWidth(): string | number;
         pointWidth(width?: number | string): anychart.core.cartesian.series.Column;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.cartesian.series.Column;
         right(): number | string;
@@ -10816,13 +11239,13 @@ declare namespace anychart.core.cartesian.series {
         transformX(value: any, subRangeRatio?: number): number;
         transformY(value: any, subRangeRatio?: number): number;
         unhover(indexOrIndexes?: number | Array<number>): anychart.core.cartesian.series.Column;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.cartesian.series.Column;
         unselect(index?: number): anychart.core.cartesian.series.Column;
         unselect(indexes?: Array<number>): anychart.core.cartesian.series.Column;
         width(): number | string;
         width(width?: number | string): anychart.core.cartesian.series.Column;
+        xMode(): string;
+        xMode(xMode?: string): anychart.core.cartesian.series.Column;
         xPointPosition(): number;
         xPointPosition(position?: number): anychart.core.cartesian.series.Column;
         xScale(): anychart.scales.Ordinal;
@@ -10836,6 +11259,12 @@ declare namespace anychart.core.cartesian.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.cartesian.series.Column;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.cartesian.series.Column;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface WidthBased extends anychart.core.cartesian.series.BaseWithMarkers {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -10878,8 +11307,6 @@ declare namespace anychart.core.cartesian.series {
         left(left?: number | string): anychart.core.cartesian.series.WidthBased;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.cartesian.series.WidthBased;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.cartesian.series.WidthBased;
         maxHeight(): number | string;
@@ -10907,8 +11334,6 @@ declare namespace anychart.core.cartesian.series {
         normal(settings?: Object): anychart.core.cartesian.series.WidthBased;
         pointWidth(): string | number;
         pointWidth(width?: number | string): anychart.core.cartesian.series.WidthBased;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.cartesian.series.WidthBased;
         select(index?: number): anychart.core.cartesian.series.WidthBased;
@@ -10924,8 +11349,6 @@ declare namespace anychart.core.cartesian.series {
         transformX(value: any, subRangeRatio?: number): number;
         transformY(value: any, subRangeRatio?: number): number;
         unhover(indexOrIndexes?: number | Array<number>): anychart.core.cartesian.series.WidthBased;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.cartesian.series.WidthBased;
         unselect(index?: number): anychart.core.cartesian.series.WidthBased;
         unselect(indexes?: Array<number>): anychart.core.cartesian.series.WidthBased;
@@ -10948,11 +11371,19 @@ declare namespace anychart.core.cartesian.series {
         rendering(settings?: Object | (() => void)): anychart.core.cartesian.series.WidthBased;
         seriesType(): string;
         seriesType(type?: string): anychart.core.cartesian.series.WidthBased;
+        xMode(): string;
+        xMode(xMode?: string): anychart.core.cartesian.series.WidthBased;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.cartesian.series.WidthBased;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.cartesian.series.WidthBased;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.cartesian.series.WidthBased;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface RangeArea extends anychart.core.cartesian.series.ContinuousRangeBase {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -11019,8 +11450,6 @@ declare namespace anychart.core.cartesian.series {
         left(left?: number | string): anychart.core.cartesian.series.RangeArea;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.cartesian.series.RangeArea;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         lowStroke(): anychart.graphics.vector.Stroke | (() => void);
         lowStroke(strokeFunction?: (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill)): anychart.core.cartesian.series.RangeArea;
         lowStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.cartesian.series.RangeArea;
@@ -11046,8 +11475,6 @@ declare namespace anychart.core.cartesian.series {
         name(value?: string): anychart.core.cartesian.series.RangeArea;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.cartesian.series.RangeArea;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.cartesian.series.RangeArea;
         right(): number | string;
@@ -11067,8 +11494,6 @@ declare namespace anychart.core.cartesian.series {
         transformX(value: any, subRangeRatio?: number): number;
         transformY(value: any, subRangeRatio?: number): number;
         unhover(): anychart.core.cartesian.series.RangeArea;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.cartesian.series.RangeArea;
         unselect(index?: number): anychart.core.cartesian.series.RangeArea;
         unselect(indexes?: Array<number>): anychart.core.cartesian.series.RangeArea;
@@ -11082,11 +11507,19 @@ declare namespace anychart.core.cartesian.series {
         yScale(settings?: anychart.scales.Base | Object | string): anychart.core.cartesian.series.RangeArea;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.cartesian.series.RangeArea;
+        xMode(): string;
+        xMode(xMode?: string): anychart.core.cartesian.series.RangeArea;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.cartesian.series.RangeArea;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.cartesian.series.RangeArea;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.cartesian.series.RangeArea;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface BaseWithMarkers extends anychart.core.cartesian.series.Base {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -11129,8 +11562,6 @@ declare namespace anychart.core.cartesian.series {
         left(left?: number | string): anychart.core.cartesian.series.BaseWithMarkers;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.cartesian.series.BaseWithMarkers;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.cartesian.series.BaseWithMarkers;
         maxHeight(): number | string;
@@ -11152,8 +11583,6 @@ declare namespace anychart.core.cartesian.series {
         name(value?: string): anychart.core.cartesian.series.BaseWithMarkers;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.cartesian.series.BaseWithMarkers;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.cartesian.series.BaseWithMarkers;
         select(index?: number): anychart.core.cartesian.series.BaseWithMarkers;
@@ -11169,8 +11598,6 @@ declare namespace anychart.core.cartesian.series {
         transformX(value: any, subRangeRatio?: number): number;
         transformY(value: any, subRangeRatio?: number): number;
         unhover(indexOrIndexes?: number | Array<number>): anychart.core.cartesian.series.BaseWithMarkers;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.cartesian.series.BaseWithMarkers;
         unselect(index?: number): anychart.core.cartesian.series.BaseWithMarkers;
         unselect(indexes?: Array<number>): anychart.core.cartesian.series.BaseWithMarkers;
@@ -11193,13 +11620,23 @@ declare namespace anychart.core.cartesian.series {
         rendering(settings?: Object | (() => void)): anychart.core.cartesian.series.BaseWithMarkers;
         seriesType(): string;
         seriesType(type?: string): anychart.core.cartesian.series.BaseWithMarkers;
+        xMode(): string;
+        xMode(xMode?: string): anychart.core.cartesian.series.BaseWithMarkers;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.cartesian.series.BaseWithMarkers;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.cartesian.series.BaseWithMarkers;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.cartesian.series.BaseWithMarkers;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface JumpLine extends anychart.core.cartesian.series.WidthBased {
+        a11y(): anychart.core.utils.SeriesA11y;
+        a11y(value?: boolean | Object): anychart.core.cartesian.series.JumpLine;
         bottom(): number | string;
         bottom(bottom?: number | string): anychart.core.cartesian.series.JumpLine;
         bounds(): anychart.core.utils.Bounds;
@@ -11209,6 +11646,8 @@ declare namespace anychart.core.cartesian.series {
         clip(value?: boolean | anychart.math.Rect): anychart.core.cartesian.series.JumpLine;
         color(): string;
         color(value: anychart.graphics.vector.Fill): anychart.core.cartesian.series.JumpLine;
+        colorScale(): anychart.scales.LinearColor | anychart.scales.OrdinalColor;
+        colorScale(settings?: anychart.scales.LinearColor | anychart.scales.OrdinalColor | Object | string): anychart.core.cartesian.series.JumpLine;
         data(): anychart.data.View;
         data(value?: anychart.data.View | anychart.data.Set | Array<any> | string, csvSettings?: string | anychart.data.TextParsingSettings): anychart.core.cartesian.series.JumpLine;
         enabled(): boolean;
@@ -11220,6 +11659,7 @@ declare namespace anychart.core.cartesian.series {
         getPixelBounds(): anychart.math.Rect;
         getPixelPointWidth(): number;
         getPoint(index: number): anychart.core.SeriesPoint;
+        getStat(key: string): any;
         height(): number | string;
         height(height?: number | string): anychart.core.cartesian.series.JumpLine;
         hover(): anychart.core.cartesian.series.JumpLine;
@@ -11240,12 +11680,12 @@ declare namespace anychart.core.cartesian.series {
         left(left?: number | string): anychart.core.cartesian.series.JumpLine;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.cartesian.series.JumpLine;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.cartesian.series.JumpLine;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.cartesian.series.JumpLine;
+        maxLabels(): anychart.core.ui.LabelsFactory;
+        maxLabels(settings?: Object | boolean): anychart.core.cartesian.series.JumpLine;
         maxWidth(): number | string;
         maxWidth(width?: number | string): anychart.core.cartesian.series.JumpLine;
         meta(key?: any): any;
@@ -11253,14 +11693,14 @@ declare namespace anychart.core.cartesian.series {
         meta(key?: string, value?: any): anychart.core.cartesian.series.JumpLine;
         minHeight(): number | string;
         minHeight(height?: number | string): anychart.core.cartesian.series.JumpLine;
+        minLabels(): anychart.core.ui.LabelsFactory;
+        minLabels(settings?: Object | boolean): anychart.core.cartesian.series.JumpLine;
         minWidth(): number | string;
         minWidth(width?: number | string): anychart.core.cartesian.series.JumpLine;
         name(): string;
         name(value?: string): anychart.core.cartesian.series.JumpLine;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.cartesian.series.JumpLine;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.cartesian.series.JumpLine;
         right(): number | string;
@@ -11284,8 +11724,6 @@ declare namespace anychart.core.cartesian.series {
         transformX(value: any, subRangeRatio?: number): number;
         transformY(value: any, subRangeRatio?: number): number;
         unhover(indexOrIndexes?: number | Array<number>): anychart.core.cartesian.series.JumpLine;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.cartesian.series.JumpLine;
         unselect(index?: number): anychart.core.cartesian.series.JumpLine;
         unselect(indexes?: Array<number>): anychart.core.cartesian.series.JumpLine;
@@ -11299,26 +11737,25 @@ declare namespace anychart.core.cartesian.series {
         yScale(settings?: anychart.scales.Base | Object | string): anychart.core.cartesian.series.JumpLine;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.cartesian.series.JumpLine;
-        a11y(): anychart.core.utils.SeriesA11y;
-        a11y(value?: boolean | Object): anychart.core.cartesian.series.JumpLine;
-        maxLabels(): anychart.core.ui.LabelsFactory;
-        maxLabels(settings?: Object | boolean): anychart.core.cartesian.series.JumpLine;
         maxPointWidth(): string | number;
         maxPointWidth(width?: number | string): anychart.core.cartesian.series.JumpLine;
-        minLabels(): anychart.core.ui.LabelsFactory;
-        minLabels(settings?: Object | boolean): anychart.core.cartesian.series.JumpLine;
         minPointLength(): string | number;
         minPointLength(length?: number | string): anychart.core.cartesian.series.JumpLine;
         pointWidth(): string | number;
         pointWidth(width?: number | string): anychart.core.cartesian.series.JumpLine;
-        colorScale(): anychart.scales.LinearColor | anychart.scales.OrdinalColor;
-        colorScale(settings?: anychart.scales.LinearColor | anychart.scales.OrdinalColor | Object | string): anychart.core.cartesian.series.JumpLine;
-        getStat(key: string): any;
+        xMode(): string;
+        xMode(xMode?: string): anychart.core.cartesian.series.JumpLine;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.cartesian.series.JumpLine;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.cartesian.series.JumpLine;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.cartesian.series.JumpLine;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface StepLine extends anychart.core.cartesian.series.ContinuousBase {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -11368,8 +11805,6 @@ declare namespace anychart.core.cartesian.series {
         left(left?: number | string): anychart.core.cartesian.series.StepLine;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.cartesian.series.StepLine;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.cartesian.series.StepLine;
         maxHeight(): number | string;
@@ -11391,8 +11826,6 @@ declare namespace anychart.core.cartesian.series {
         name(value?: string): anychart.core.cartesian.series.StepLine;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.cartesian.series.StepLine;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.cartesian.series.StepLine;
         right(): number | string;
@@ -11418,8 +11851,6 @@ declare namespace anychart.core.cartesian.series {
         transformX(value: any, subRangeRatio?: number): number;
         transformY(value: any, subRangeRatio?: number): number;
         unhover(): anychart.core.cartesian.series.StepLine;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.cartesian.series.StepLine;
         unselect(index?: number): anychart.core.cartesian.series.StepLine;
         unselect(indexes?: Array<number>): anychart.core.cartesian.series.StepLine;
@@ -11433,11 +11864,19 @@ declare namespace anychart.core.cartesian.series {
         yScale(settings?: anychart.scales.Base | Object | string): anychart.core.cartesian.series.StepLine;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.cartesian.series.StepLine;
+        xMode(): string;
+        xMode(xMode?: string): anychart.core.cartesian.series.StepLine;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.cartesian.series.StepLine;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.cartesian.series.StepLine;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.cartesian.series.StepLine;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Line extends anychart.core.cartesian.series.ContinuousBase {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -11490,8 +11929,6 @@ declare namespace anychart.core.cartesian.series {
         left(left?: number | string): anychart.core.cartesian.series.Line;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.cartesian.series.Line;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.cartesian.series.Line;
         maxHeight(): number | string;
@@ -11513,8 +11950,6 @@ declare namespace anychart.core.cartesian.series {
         name(value?: string): anychart.core.cartesian.series.Line;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.cartesian.series.Line;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.cartesian.series.Line;
         right(): number | string;
@@ -11538,13 +11973,13 @@ declare namespace anychart.core.cartesian.series {
         transformX(value: any, subRangeRatio?: number): number;
         transformY(value: any, subRangeRatio?: number): number;
         unhover(): anychart.core.cartesian.series.Line;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.cartesian.series.Line;
         unselect(index?: number): anychart.core.cartesian.series.Line;
         unselect(indexes?: Array<number>): anychart.core.cartesian.series.Line;
         width(): number | string;
         width(width?: number | string): anychart.core.cartesian.series.Line;
+        xMode(): string;
+        xMode(xMode?: string): anychart.core.cartesian.series.Line;
         xPointPosition(): number;
         xPointPosition(position?: number): anychart.core.cartesian.series.Line;
         xScale(): anychart.scales.Ordinal;
@@ -11558,6 +11993,12 @@ declare namespace anychart.core.cartesian.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.cartesian.series.Line;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.cartesian.series.Line;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface RangeColumn extends anychart.core.cartesian.series.WidthBased {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -11618,8 +12059,6 @@ declare namespace anychart.core.cartesian.series {
         left(left?: number | string): anychart.core.cartesian.series.RangeColumn;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.cartesian.series.RangeColumn;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.cartesian.series.RangeColumn;
         maxHeight(): number | string;
@@ -11647,8 +12086,6 @@ declare namespace anychart.core.cartesian.series {
         normal(settings?: Object): anychart.core.cartesian.series.RangeColumn;
         pointWidth(): string | number;
         pointWidth(width?: number | string): anychart.core.cartesian.series.RangeColumn;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.cartesian.series.RangeColumn;
         right(): number | string;
@@ -11672,13 +12109,13 @@ declare namespace anychart.core.cartesian.series {
         transformX(value: any, subRangeRatio?: number): number;
         transformY(value: any, subRangeRatio?: number): number;
         unhover(indexOrIndexes?: number | Array<number>): anychart.core.cartesian.series.RangeColumn;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.cartesian.series.RangeColumn;
         unselect(index?: number): anychart.core.cartesian.series.RangeColumn;
         unselect(indexes?: Array<number>): anychart.core.cartesian.series.RangeColumn;
         width(): number | string;
         width(width?: number | string): anychart.core.cartesian.series.RangeColumn;
+        xMode(): string;
+        xMode(xMode?: string): anychart.core.cartesian.series.RangeColumn;
         xPointPosition(): number;
         xPointPosition(position?: number): anychart.core.cartesian.series.RangeColumn;
         xScale(): anychart.scales.Ordinal;
@@ -11692,6 +12129,12 @@ declare namespace anychart.core.cartesian.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.cartesian.series.RangeColumn;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.cartesian.series.RangeColumn;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface RangeSplineArea extends anychart.core.cartesian.series.ContinuousRangeBase {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -11758,8 +12201,6 @@ declare namespace anychart.core.cartesian.series {
         left(left?: number | string): anychart.core.cartesian.series.RangeSplineArea;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.cartesian.series.RangeSplineArea;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         lowStroke(): anychart.graphics.vector.Stroke | (() => void);
         lowStroke(strokeFunction?: (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill)): anychart.core.cartesian.series.RangeSplineArea;
         lowStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.cartesian.series.RangeSplineArea;
@@ -11785,8 +12226,6 @@ declare namespace anychart.core.cartesian.series {
         name(value?: string): anychart.core.cartesian.series.RangeSplineArea;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.cartesian.series.RangeSplineArea;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.cartesian.series.RangeSplineArea;
         right(): number | string;
@@ -11806,8 +12245,6 @@ declare namespace anychart.core.cartesian.series {
         transformX(value: any, subRangeRatio?: number): number;
         transformY(value: any, subRangeRatio?: number): number;
         unhover(): anychart.core.cartesian.series.RangeSplineArea;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.cartesian.series.RangeSplineArea;
         unselect(index?: number): anychart.core.cartesian.series.RangeSplineArea;
         unselect(indexes?: Array<number>): anychart.core.cartesian.series.RangeSplineArea;
@@ -11821,11 +12258,19 @@ declare namespace anychart.core.cartesian.series {
         yScale(settings?: anychart.scales.Base | Object | string): anychart.core.cartesian.series.RangeSplineArea;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.cartesian.series.RangeSplineArea;
+        xMode(): string;
+        xMode(xMode?: string): anychart.core.cartesian.series.RangeSplineArea;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.cartesian.series.RangeSplineArea;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.cartesian.series.RangeSplineArea;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.cartesian.series.RangeSplineArea;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Hilo extends anychart.core.cartesian.series.ContinuousBase {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -11870,8 +12315,6 @@ declare namespace anychart.core.cartesian.series {
         left(left?: number | string): anychart.core.cartesian.series.Hilo;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.cartesian.series.Hilo;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.cartesian.series.Hilo;
         maxHeight(): number | string;
@@ -11893,8 +12336,6 @@ declare namespace anychart.core.cartesian.series {
         name(value?: string): anychart.core.cartesian.series.Hilo;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.cartesian.series.Hilo;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.cartesian.series.Hilo;
         right(): number | string;
@@ -11918,8 +12359,6 @@ declare namespace anychart.core.cartesian.series {
         transformX(value: any, subRangeRatio?: number): number;
         transformY(value: any, subRangeRatio?: number): number;
         unhover(): anychart.core.cartesian.series.Hilo;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.cartesian.series.Hilo;
         unselect(index?: number): anychart.core.cartesian.series.Hilo;
         unselect(indexes?: Array<number>): anychart.core.cartesian.series.Hilo;
@@ -11938,11 +12377,19 @@ declare namespace anychart.core.cartesian.series {
         error(): anychart.core.utils.Error;
         error(settings?: Object | boolean | string | number): anychart.core.cartesian.series.Hilo;
         getPixelPointWidth(): number;
+        xMode(): string;
+        xMode(xMode?: string): anychart.core.cartesian.series.Hilo;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.cartesian.series.Hilo;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.cartesian.series.Hilo;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.cartesian.series.Hilo;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Marker extends anychart.core.cartesian.series.Base {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -12003,8 +12450,6 @@ declare namespace anychart.core.cartesian.series {
         left(left?: number | string): anychart.core.cartesian.series.Marker;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.cartesian.series.Marker;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.cartesian.series.Marker;
         maxLabels(): anychart.core.ui.LabelsFactory;
@@ -12024,8 +12469,6 @@ declare namespace anychart.core.cartesian.series {
         name(value?: string): anychart.core.cartesian.series.Marker;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.cartesian.series.Marker;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.cartesian.series.Marker;
         right(): number | string;
@@ -12053,13 +12496,13 @@ declare namespace anychart.core.cartesian.series {
         type(): string | (() => void);
         type(type?: string | (() => void)): anychart.core.cartesian.series.Marker;
         unhover(): anychart.core.cartesian.series.Marker;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.cartesian.series.Marker;
         unselect(index?: number): anychart.core.cartesian.series.Marker;
         unselect(indexes?: Array<number>): anychart.core.cartesian.series.Marker;
         width(): number | string;
         width(width?: number | string): anychart.core.cartesian.series.Marker;
+        xMode(): string;
+        xMode(xMode?: string): anychart.core.cartesian.series.Marker;
         xPointPosition(): number;
         xPointPosition(position?: number): anychart.core.cartesian.series.Marker;
         xScale(): anychart.scales.Ordinal;
@@ -12075,6 +12518,12 @@ declare namespace anychart.core.cartesian.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.cartesian.series.Marker;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.cartesian.series.Marker;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Bar3d extends anychart.core.cartesian.series.WidthBased {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -12122,8 +12571,6 @@ declare namespace anychart.core.cartesian.series {
         left(left?: number | string): anychart.core.cartesian.series.Bar3d;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.cartesian.series.Bar3d;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.cartesian.series.Bar3d;
         maxHeight(): number | string;
@@ -12151,8 +12598,6 @@ declare namespace anychart.core.cartesian.series {
         normal(settings?: Object): anychart.core.cartesian.series.Bar3d;
         pointWidth(): string | number;
         pointWidth(width?: number | string): anychart.core.cartesian.series.Bar3d;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.cartesian.series.Bar3d;
         right(): number | string;
@@ -12172,8 +12617,6 @@ declare namespace anychart.core.cartesian.series {
         transformX(value: any, subRangeRatio?: number): number;
         transformY(value: any, subRangeRatio?: number): number;
         unhover(indexOrIndexes?: number | Array<number>): anychart.core.cartesian.series.Bar3d;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.cartesian.series.Bar3d;
         unselect(index?: number): anychart.core.cartesian.series.Bar3d;
         unselect(indexes?: Array<number>): anychart.core.cartesian.series.Bar3d;
@@ -12187,11 +12630,19 @@ declare namespace anychart.core.cartesian.series {
         yScale(settings?: anychart.scales.Base | Object | string): anychart.core.cartesian.series.Bar3d;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.cartesian.series.Bar3d;
+        xMode(): string;
+        xMode(xMode?: string): anychart.core.cartesian.series.Bar3d;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.cartesian.series.Bar3d;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.cartesian.series.Bar3d;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.cartesian.series.Bar3d;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
 }
 
@@ -12257,8 +12708,6 @@ declare namespace anychart.core.gantt {
         levelHeight(height: number): anychart.core.gantt.TimeLineHeader;
         lineHeight(): number | string;
         lineHeight(height?: number | string): anychart.core.gantt.TimeLineHeader;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxFontSize(): number;
         maxFontSize(size?: number | string): anychart.core.gantt.TimeLineHeader;
         maxHeight(): number | string;
@@ -12276,8 +12725,6 @@ declare namespace anychart.core.gantt {
         padding(): anychart.core.utils.Padding;
         padding(padding?: Array<number|string> | Object): anychart.core.gantt.TimeLineHeader;
         padding(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.core.gantt.TimeLineHeader;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.gantt.TimeLineHeader;
         selectable(): boolean;
@@ -12293,8 +12740,6 @@ declare namespace anychart.core.gantt {
         textOverflow(value?: anychart.graphics.vector.Text.TextOverflow | string): anychart.core.gantt.TimeLineHeader;
         top(): number | string;
         top(top?: number | string): anychart.core.gantt.TimeLineHeader;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         useHtml(): boolean;
         useHtml(enabled?: boolean): anychart.core.gantt.TimeLineHeader;
         vAlign(): anychart.graphics.vector.Text.VAlign;
@@ -12315,6 +12760,12 @@ declare namespace anychart.core.gantt {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.gantt.TimeLineHeader;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.gantt.TimeLineHeader;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     namespace TimeLineHeader {
     type Level = {
@@ -12505,8 +12956,6 @@ declare namespace anychart.core.gantt {
         height(height?: number | string): anychart.core.gantt.TimeLineHeaderLevelHolidaysSettings;
         left(): number | string;
         left(left?: number | string): anychart.core.gantt.TimeLineHeaderLevelHolidaysSettings;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.gantt.TimeLineHeaderLevelHolidaysSettings;
         maxWidth(): number | string;
@@ -12515,14 +12964,10 @@ declare namespace anychart.core.gantt {
         minHeight(height?: number | string): anychart.core.gantt.TimeLineHeaderLevelHolidaysSettings;
         minWidth(): number | string;
         minWidth(width?: number | string): anychart.core.gantt.TimeLineHeaderLevelHolidaysSettings;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.gantt.TimeLineHeaderLevelHolidaysSettings;
         top(): number | string;
         top(top?: number | string): anychart.core.gantt.TimeLineHeaderLevelHolidaysSettings;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.gantt.TimeLineHeaderLevelHolidaysSettings;
         zIndex(): number;
@@ -12532,6 +12977,12 @@ declare namespace anychart.core.gantt {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.gantt.TimeLineHeaderLevelHolidaysSettings;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.gantt.TimeLineHeaderLevelHolidaysSettings;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface DataGridButton extends anychart.core.VisualBase {
         content(): string | number;
@@ -12569,15 +13020,11 @@ declare namespace anychart.core.gantt {
         letterSpacing(spacing?: string | number): anychart.core.gantt.DataGridButton;
         lineHeight(): string | number;
         lineHeight(height?: string | number): anychart.core.gantt.DataGridButton;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.gantt.DataGridButton;
         padding(): anychart.core.utils.Padding;
         padding(padding?: Array<number|string> | Object): anychart.core.gantt.DataGridButton;
         padding(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.core.gantt.DataGridButton;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         selectable(): boolean;
         selectable(enabled?: boolean): anychart.core.gantt.DataGridButton;
         selected(): anychart.core.StateSettings;
@@ -12588,8 +13035,6 @@ declare namespace anychart.core.gantt {
         textIndent(indent?: number): anychart.core.gantt.DataGridButton;
         textOverflow(): anychart.graphics.vector.Text.TextOverflow | string;
         textOverflow(value?: anychart.graphics.vector.Text.TextOverflow | string): anychart.core.gantt.DataGridButton;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         useHtml(): boolean;
         useHtml(enabled?: boolean): anychart.core.gantt.DataGridButton;
         vAlign(): anychart.graphics.vector.Text.VAlign | string;
@@ -12607,6 +13052,12 @@ declare namespace anychart.core.gantt {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.gantt.DataGridButton;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.gantt.DataGridButton;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
 }
 
@@ -12622,9 +13073,6 @@ declare namespace anychart.core.gantt.edit {
         fill(imageSettings: anychart.graphics.vector.Fill): anychart.core.gantt.edit.Thumb;
         horizontalOffset(): number;
         horizontalOffset(offset?: number): anychart.core.gantt.edit.Thumb;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        removeAllListeners(type?: string): number;
         size(): number;
         size(size?: number): anychart.core.gantt.edit.Thumb;
         stroke(): anychart.graphics.vector.Stroke;
@@ -12632,10 +13080,13 @@ declare namespace anychart.core.gantt.edit {
         stroke(settings?: Object): anychart.core.gantt.edit.Thumb;
         type(): string;
         type(type?: string): anychart.core.gantt.edit.Thumb;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         verticalOffset(): number;
         verticalOffset(offset?: number): anychart.core.gantt.edit.Thumb;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface ElementEdit extends anychart.core.Base {
         connectorThumbs(): anychart.core.gantt.edit.Thumb;
@@ -12650,9 +13101,6 @@ declare namespace anychart.core.gantt.edit {
         fill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.core.gantt.edit.ElementEdit;
         fill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.core.gantt.edit.ElementEdit;
         fill(imageSettings: anychart.graphics.vector.Fill): anychart.core.gantt.edit.ElementEdit;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        removeAllListeners(type?: string): number;
         start(): anychart.core.gantt.edit.SideControl;
         start(settings?: Object): anychart.core.gantt.edit.ElementEdit;
         stroke(): anychart.graphics.vector.Stroke | string;
@@ -12660,6 +13108,9 @@ declare namespace anychart.core.gantt.edit {
         stroke(settings?: Object): anychart.core.gantt.edit.ElementEdit;
         thumbs(): anychart.core.gantt.edit.Thumb;
         thumbs(settings?: Object): anychart.core.gantt.edit.ElementEdit;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
     }
@@ -12672,25 +13123,25 @@ declare namespace anychart.core.gantt.edit {
         fill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.core.gantt.edit.StructureEdit;
         fill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.core.gantt.edit.StructureEdit;
         fill(imageSettings: anychart.graphics.vector.Fill): anychart.core.gantt.edit.StructureEdit;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         placementStroke(): anychart.graphics.vector.Stroke;
         placementStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.gantt.edit.StructureEdit;
-        removeAllListeners(type?: string): number;
         stroke(): anychart.graphics.vector.Stroke;
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.gantt.edit.StructureEdit;
         stroke(settings?: Object): anychart.core.gantt.edit.StructureEdit;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
     }
     interface SideControl extends anychart.core.Base {
         connectorThumb(): anychart.core.gantt.edit.Thumb;
         connectorThumb(settings?: Object): anychart.core.gantt.edit.SideControl;
+        thumb(): anychart.core.gantt.edit.Thumb;
+        thumb(settings?: Object): anychart.core.gantt.edit.SideControl;
         listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         removeAllListeners(type?: string): number;
-        thumb(): anychart.core.gantt.edit.Thumb;
-        thumb(settings?: Object): anychart.core.gantt.edit.SideControl;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
     }
@@ -12713,8 +13164,6 @@ declare namespace anychart.core.gantt.elements {
         height(height?: string | number): anychart.core.gantt.elements.GroupingTasksElement;
         labels(): anychart.core.ui.LabelsFactory;
         labels(settings?: Object | boolean): anychart.core.gantt.elements.GroupingTasksElement;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.gantt.elements.GroupingTasksElement;
         offset(): string | number;
@@ -12723,7 +13172,6 @@ declare namespace anychart.core.gantt.elements {
         position(position?: string): anychart.core.ui.Timeline;
         progress(): anychart.core.gantt.elements.ProgressElement;
         progress(settings?: Object): anychart.core.gantt.elements.GroupingTasksElement;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.gantt.rendering.Settings;
         rendering(settings?: Object): anychart.core.gantt.elements.GroupingTasksElement;
         selected(): anychart.core.StateSettings;
@@ -12732,6 +13180,9 @@ declare namespace anychart.core.gantt.elements {
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.gantt.elements.GroupingTasksElement;
         stroke(strokeFunction?: (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill)): anychart.core.gantt.elements.GroupingTasksElement;
         stroke(settings?: Object): anychart.core.gantt.elements.GroupingTasksElement;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
     }
@@ -12739,19 +13190,19 @@ declare namespace anychart.core.gantt.elements {
         fill(): anychart.graphics.vector.Fill | string;
         fill(fillFunction?: (()=>anychart.graphics.vector.Fill)): anychart.core.ui.Timeline;
         fill(color?: anychart.graphics.vector.Fill | Array<anychart.graphics.vector.GradientKey|string>, cx?: number, cy?: number, opacityOrMode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.core.gantt.elements.ConnectorElement;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.gantt.elements.ConnectorElement;
         previewStroke(): anychart.graphics.vector.Stroke | string;
         previewStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.gantt.elements.ConnectorElement;
-        removeAllListeners(type?: string): number;
         selected(): anychart.core.StateSettings;
         selected(settings?: Object): anychart.core.gantt.elements.ConnectorElement;
         stroke(): anychart.graphics.vector.Stroke | string;
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.gantt.elements.ConnectorElement;
         stroke(strokeFunction?: (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill)): anychart.core.gantt.elements.ConnectorElement;
         stroke(settings?: Object): anychart.core.gantt.elements.ConnectorElement;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
     }
@@ -12771,15 +13222,12 @@ declare namespace anychart.core.gantt.elements {
         height(height?: string | number): anychart.core.gantt.elements.PeriodsElement;
         labels(): anychart.core.ui.LabelsFactory;
         labels(settings?: Object | boolean): anychart.core.gantt.elements.PeriodsElement;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.gantt.elements.PeriodsElement;
         offset(): string | number;
         offset(offset?: string | number): anychart.core.ui.Timeline;
         position(): string;
         position(position?: string): anychart.core.ui.Timeline;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.gantt.rendering.Settings;
         rendering(settings?: Object): anychart.core.gantt.elements.PeriodsElement;
         selected(): anychart.core.StateSettings;
@@ -12788,6 +13236,9 @@ declare namespace anychart.core.gantt.elements {
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.gantt.elements.PeriodsElement;
         stroke(strokeFunction?: (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill)): anychart.core.gantt.elements.PeriodsElement;
         stroke(settings?: Object): anychart.core.gantt.elements.PeriodsElement;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
     }
@@ -12807,15 +13258,12 @@ declare namespace anychart.core.gantt.elements {
         height(height?: string | number): anychart.core.gantt.elements.ProgressElement;
         labels(): anychart.core.ui.LabelsFactory;
         labels(settings?: Object | boolean): anychart.core.gantt.elements.ProgressElement;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.gantt.elements.ProgressElement;
         offset(): string | number;
         offset(offset?: string | number): anychart.core.ui.Timeline;
         position(): string;
         position(position?: string): anychart.core.ui.Timeline;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.gantt.rendering.Settings;
         rendering(settings?: Object): anychart.core.gantt.elements.ProgressElement;
         selected(): anychart.core.StateSettings;
@@ -12824,6 +13272,9 @@ declare namespace anychart.core.gantt.elements {
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.gantt.elements.ProgressElement;
         stroke(strokeFunction?: (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill)): anychart.core.gantt.elements.ProgressElement;
         stroke(settings?: Object): anychart.core.gantt.elements.ProgressElement;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
     }
@@ -12845,8 +13296,6 @@ declare namespace anychart.core.gantt.elements {
         height(height?: string | number): anychart.core.gantt.elements.BaselinesElement;
         labels(): anychart.core.ui.LabelsFactory;
         labels(settings?: Object | boolean): anychart.core.gantt.elements.BaselinesElement;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.gantt.elements.BaselinesElement;
         offset(): string | number;
@@ -12862,6 +13311,8 @@ declare namespace anychart.core.gantt.elements {
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.gantt.elements.BaselinesElement;
         stroke(strokeFunction?: (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill)): anychart.core.gantt.elements.BaselinesElement;
         stroke(settings?: Object): anychart.core.gantt.elements.BaselinesElement;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
     }
@@ -12881,15 +13332,12 @@ declare namespace anychart.core.gantt.elements {
         height(height?: string | number): anychart.core.gantt.elements.TimelineElement;
         labels(): anychart.core.ui.LabelsFactory;
         labels(settings?: Object | boolean): anychart.core.gantt.elements.TimelineElement;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.gantt.elements.TimelineElement;
         offset(): string | number;
         offset(offset?: string | number): anychart.core.ui.Timeline;
         position(): string;
         position(position?: string): anychart.core.ui.Timeline;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.gantt.rendering.Settings;
         rendering(settings?: Object): anychart.core.gantt.elements.TimelineElement;
         selected(): anychart.core.StateSettings;
@@ -12898,6 +13346,9 @@ declare namespace anychart.core.gantt.elements {
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.gantt.elements.TimelineElement;
         stroke(strokeFunction?: (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill)): anychart.core.gantt.elements.TimelineElement;
         stroke(settings?: Object): anychart.core.gantt.elements.TimelineElement;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
     }
@@ -12917,15 +13368,6 @@ declare namespace anychart.core.gantt.elements {
         height(height?: string | number): anychart.core.gantt.elements.MilestonesElement;
         labels(): anychart.core.ui.LabelsFactory;
         labels(settings?: Object | boolean): anychart.core.gantt.elements.MilestonesElement;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        normal(): anychart.core.StateSettings;
-        normal(settings?: Object): anychart.core.gantt.elements.MilestonesElement;
-        offset(): string | number;
-        offset(offset?: string | number): anychart.core.ui.Timeline;
-        position(): string;
-        position(position?: string): anychart.core.ui.Timeline;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.gantt.rendering.Settings;
         rendering(settings?: Object): anychart.core.gantt.elements.MilestonesElement;
         selected(): anychart.core.StateSettings;
@@ -12934,6 +13376,15 @@ declare namespace anychart.core.gantt.elements {
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.gantt.elements.MilestonesElement;
         stroke(strokeFunction?: (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill)): anychart.core.gantt.elements.MilestonesElement;
         stroke(settings?: Object): anychart.core.gantt.elements.MilestonesElement;
+        normal(): anychart.core.StateSettings;
+        normal(settings?: Object): anychart.core.gantt.elements.MilestonesElement;
+        offset(): string | number;
+        offset(offset?: string | number): anychart.core.ui.Timeline;
+        position(): string;
+        position(position?: string): anychart.core.ui.Timeline;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
     }
@@ -12953,8 +13404,6 @@ declare namespace anychart.core.gantt.elements {
         height(height?: string | number): anychart.core.gantt.elements.TasksElement;
         labels(): anychart.core.ui.LabelsFactory;
         labels(settings?: Object | boolean): anychart.core.gantt.elements.TasksElement;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.gantt.elements.TasksElement;
         offset(): string | number;
@@ -12963,7 +13412,6 @@ declare namespace anychart.core.gantt.elements {
         position(position?: string): anychart.core.ui.Timeline;
         progress(): anychart.core.gantt.elements.ProgressElement;
         progress(settings?: Object): anychart.core.gantt.elements.TasksElement;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.gantt.rendering.Settings;
         rendering(settings?: Object): anychart.core.gantt.elements.TasksElement;
         selected(): anychart.core.StateSettings;
@@ -12972,6 +13420,9 @@ declare namespace anychart.core.gantt.elements {
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.gantt.elements.TasksElement;
         stroke(strokeFunction?: (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill)): anychart.core.gantt.elements.TasksElement;
         stroke(settings?: Object): anychart.core.gantt.elements.TasksElement;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
     }
@@ -12981,11 +13432,11 @@ declare namespace anychart.core.gantt.rendering {
     interface Settings extends anychart.core.Base {
         drawer(): (() => void);
         drawer(drawerFunction: (() => void)): anychart.core.gantt.rendering.Settings;
+        shapes(): Array<anychart.core.gantt.rendering.Settings.ShapeConfig>;
+        shapes(config?: Array<anychart.core.gantt.rendering.Settings.ShapeConfig>): anychart.core.gantt.rendering.Settings;
         listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         removeAllListeners(type?: string): number;
-        shapes(): Array<anychart.core.gantt.rendering.Settings.ShapeConfig>;
-        shapes(config?: Array<anychart.core.gantt.rendering.Settings.ShapeConfig>): anychart.core.gantt.rendering.Settings;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
     }
@@ -13023,12 +13474,12 @@ declare namespace anychart.core.gauge {
         zIndex(zIndex?: number): anychart.core.gauge.Cap;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.gauge.Cap;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.gauge.Cap;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.gauge.Cap;
         print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
@@ -13078,12 +13529,12 @@ declare namespace anychart.core.gauge.pointers {
         zIndex(zIndex?: number): anychart.core.gauge.pointers.Needle;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.gauge.pointers.Needle;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.gauge.pointers.Needle;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.gauge.pointers.Needle;
         print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
@@ -13118,12 +13569,12 @@ declare namespace anychart.core.gauge.pointers {
         zIndex(zIndex?: number): anychart.core.gauge.pointers.Base;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.gauge.pointers.Base;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.gauge.pointers.Base;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.gauge.pointers.Base;
         print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
@@ -13164,12 +13615,12 @@ declare namespace anychart.core.gauge.pointers {
         zIndex(zIndex?: number): anychart.core.gauge.pointers.Bar;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.gauge.pointers.Bar;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.gauge.pointers.Bar;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.gauge.pointers.Bar;
         print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
@@ -13216,12 +13667,12 @@ declare namespace anychart.core.gauge.pointers {
         zIndex(zIndex?: number): anychart.core.gauge.pointers.Knob;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.gauge.pointers.Knob;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.gauge.pointers.Knob;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.gauge.pointers.Knob;
         print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
@@ -13264,12 +13715,12 @@ declare namespace anychart.core.gauge.pointers {
         zIndex(zIndex?: number): anychart.core.gauge.pointers.Marker;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.gauge.pointers.Marker;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.gauge.pointers.Marker;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.gauge.pointers.Marker;
         print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
@@ -13277,6 +13728,41 @@ declare namespace anychart.core.gauge.pointers {
 }
 
 declare namespace anychart.core.grids {
+    interface Surface extends anychart.core.VisualBase {
+        drawFirstLine(): boolean;
+        drawFirstLine(enabled?: boolean): anychart.core.grids.Surface;
+        drawLastLine(): boolean;
+        drawLastLine(enabled?: boolean): anychart.core.grids.Surface;
+        enabled(): boolean;
+        enabled(enabled?: boolean): anychart.core.grids.Surface;
+        fill(): string | anychart.graphics.vector.Fill;
+        fill(color?: anychart.graphics.vector.Fill | Array<anychart.graphics.vector.GradientKey|string>): anychart.core.grids.Surface;
+        fill(fillFunction?: (()=>anychart.graphics.vector.Fill)): anychart.core.grids.Surface;
+        fill(color: string, opacity?: number): anychart.core.grids.Surface;
+        fill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.core.grids.Surface;
+        fill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.core.grids.Surface;
+        fill(imageSettings: anychart.graphics.vector.Fill): anychart.core.grids.Surface;
+        isMinor(): boolean;
+        isMinor(enabled?: boolean): anychart.core.grids.Surface;
+        palette(): anychart.palettes.RangeColors | anychart.palettes.DistinctColors;
+        palette(settings?: anychart.palettes.RangeColors | anychart.palettes.DistinctColors | Object | Array<string>): anychart.core.grids.Surface;
+        stroke(): anychart.graphics.vector.Stroke;
+        stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.grids.Surface;
+        stroke(settings?: Object): anychart.core.grids.Surface;
+        zIndex(): number;
+        zIndex(zIndex?: number): anychart.core.grids.Surface;
+        container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
+        container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.grids.Surface;
+        parentBounds(): anychart.math.Rect;
+        parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.grids.Surface;
+        parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.grids.Surface;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
+    }
     interface Polar extends anychart.core.VisualBase {
         axis(): anychart.core.axes.Polar | anychart.core.axes.Radial;
         axis(axis?: anychart.core.axes.Polar | anychart.core.axes.Radial): anychart.core.grids.Polar;
@@ -13294,17 +13780,11 @@ declare namespace anychart.core.grids {
         isMinor(): boolean;
         isMinor(enabled?: boolean): anychart.core.grids.Polar;
         isRadial(): boolean;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         palette(): anychart.palettes.RangeColors | anychart.palettes.DistinctColors;
         palette(settings?: anychart.palettes.RangeColors | anychart.palettes.DistinctColors | Object | Array<string>): anychart.core.grids.Map;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         stroke(): string | anychart.graphics.vector.Stroke;
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: anychart.graphics.vector.StrokeLineCap): anychart.core.grids.Polar;
         stroke(settings?: Object): anychart.core.grids.Polar;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         xScale(): anychart.scales.Linear;
         xScale(settings?: anychart.scales.Base | string | Object): anychart.core.grids.Polar;
         yScale(): anychart.scales.Base;
@@ -13316,6 +13796,12 @@ declare namespace anychart.core.grids {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.grids.Polar;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.grids.Polar;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Linear extends anychart.core.VisualBase {
         axis(): anychart.core.axes.Linear;
@@ -13336,19 +13822,13 @@ declare namespace anychart.core.grids {
         isHorizontal(): boolean;
         isMinor(): boolean;
         isMinor(enabled?: boolean): anychart.core.grids.Linear;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         palette(): anychart.palettes.RangeColors | anychart.palettes.DistinctColors;
         palette(settings?: anychart.palettes.RangeColors | anychart.palettes.DistinctColors | Object | Array<string>): anychart.core.grids.Linear;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         scale(): anychart.scales.Base;
         scale(settings?: Object | string | anychart.scales.Base): anychart.core.grids.Linear;
         stroke(): string | anychart.graphics.vector.Stroke;
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: anychart.graphics.vector.StrokeLineJoin, lineCap?: anychart.graphics.vector.StrokeLineCap): anychart.core.grids.Linear;
         stroke(settings?: Object): anychart.core.grids.Linear;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.grids.Linear;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
@@ -13356,6 +13836,12 @@ declare namespace anychart.core.grids {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.grids.Linear;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.grids.Linear;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface MapSettings extends anychart.core.Base {
         drawFirstLine(): boolean;
@@ -13373,23 +13859,23 @@ declare namespace anychart.core.grids {
         fill(imageSettings: anychart.graphics.vector.Fill): anychart.core.grids.MapSettings;
         horizontal(): anychart.core.grids.Map;
         horizontal(settings?: boolean | Object): anychart.core.grids.MapSettings;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         minorStroke(): string | anychart.graphics.vector.Stroke;
         minorStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.grids.MapSettings;
         minorStroke(settings?: Object): anychart.core.grids.MapSettings;
         palette(): anychart.palettes.RangeColors | anychart.palettes.DistinctColors;
         palette(settings?: anychart.palettes.RangeColors | anychart.palettes.DistinctColors | Object | Array<string>): anychart.core.grids.Map;
-        removeAllListeners(type?: string): number;
         stroke(): string | anychart.graphics.vector.Stroke;
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.grids.MapSettings;
         stroke(settings?: Object): anychart.core.grids.MapSettings;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         vertical(): anychart.core.grids.Map;
         vertical(settings?: boolean | Object): anychart.core.grids.MapSettings;
         zIndex(): number | string;
         zIndex(zIndex?: number | string): anychart.core.grids.MapSettings;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Stock extends anychart.core.VisualBase {
         axis(): anychart.core.axes.StockDateTime | anychart.core.axes.Linear;
@@ -13410,18 +13896,12 @@ declare namespace anychart.core.grids {
         isHorizontal(): boolean;
         isMinor(): boolean;
         isMinor(enabled?: boolean): anychart.core.grids.Stock;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         palette(): anychart.palettes.RangeColors | anychart.palettes.DistinctColors;
         palette(settings?: anychart.palettes.RangeColors | anychart.palettes.DistinctColors | Object | Array<string>): anychart.core.grids.Map;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         scale(): anychart.scales.Base | anychart.scales.StockScatterDateTime;
         scale(settings?: Object | anychart.scales.Base | anychart.scales.StockScatterDateTime): anychart.core.grids.Stock;
         stroke(): anychart.graphics.vector.Stroke;
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.grids.Stock;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.grids.Stock;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
@@ -13429,6 +13909,12 @@ declare namespace anychart.core.grids {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.grids.Stock;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.grids.Stock;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Radar extends anychart.core.VisualBase {
         axis(): anychart.core.axes.Radar | anychart.core.axes.Radial;
@@ -13447,18 +13933,12 @@ declare namespace anychart.core.grids {
         isMinor(): boolean;
         isMinor(enabled?: boolean): anychart.core.grids.Radar;
         isRadial(): boolean;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         palette(): anychart.palettes.RangeColors | anychart.palettes.DistinctColors;
         palette(settings?: anychart.palettes.RangeColors | anychart.palettes.DistinctColors | Object | Array<string>): anychart.core.grids.Map;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         stroke(settings?: Object): anychart.core.grids.Radar;
         stroke(): string | anychart.graphics.vector.Stroke;
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.grids.Radar;
         stroke(settings?: Object): anychart.core.grids.Radar;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         xScale(): anychart.scales.Ordinal;
         xScale(value?: anychart.scales.Ordinal | string | Object): anychart.core.grids.Radar;
         yScale(): anychart.scales.Base;
@@ -13470,6 +13950,12 @@ declare namespace anychart.core.grids {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.grids.Radar;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.grids.Radar;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Map extends anychart.core.VisualBase {
         drawFirstLine(): boolean;
@@ -13485,20 +13971,14 @@ declare namespace anychart.core.grids {
         fill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.core.grids.Map;
         fill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.core.grids.Map;
         fill(imageSettings: anychart.graphics.vector.Fill): anychart.core.grids.Map;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         minorStroke(): string | anychart.graphics.vector.Stroke;
         minorStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.grids.Map;
         minorStroke(settings?: Object): anychart.core.grids.Map;
         palette(): anychart.palettes.RangeColors | anychart.palettes.DistinctColors;
         palette(settings?: anychart.palettes.RangeColors | anychart.palettes.DistinctColors | Object | Array<string>): anychart.core.grids.Map;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         stroke(): string | anychart.graphics.vector.Stroke;
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.grids.Map;
         stroke(settings?: Object): anychart.core.grids.Map;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.grids.Map;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
@@ -13506,6 +13986,12 @@ declare namespace anychart.core.grids {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.grids.Map;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.grids.Map;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
 }
 
@@ -13540,12 +14026,12 @@ declare namespace anychart.core.linearGauge {
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.linearGauge.ScaleBar;
         enabled(): boolean;
         enabled(enabled?: boolean): anychart.core.linearGauge.ScaleBar;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.linearGauge.ScaleBar;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.linearGauge.ScaleBar;
         print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
@@ -13601,16 +14087,12 @@ declare namespace anychart.core.linearGauge.pointers {
         labels(settings?: anychart.core.ui.LabelsFactory | Object | boolean): anychart.core.linearGauge.pointers.Tank;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.linearGauge.pointers.Tank;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         name(): string;
         name(name?: string): anychart.core.linearGauge.pointers.Tank;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.linearGauge.pointers.Tank;
         offset(): string;
         offset(offset?: string | number): anychart.core.linearGauge.pointers.Tank;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         scale(): anychart.scales.Base;
         scale(scale?: anychart.scales.Base): anychart.core.linearGauge.pointers.Tank;
         select(event?: anychart.core.MouseEvent): anychart.core.linearGauge.pointers.Tank;
@@ -13621,8 +14103,6 @@ declare namespace anychart.core.linearGauge.pointers {
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.linearGauge.pointers.Tank;
         stroke(settings?: Object): anychart.core.linearGauge.pointers.Tank;
         unhover(): anychart.core.linearGauge.pointers.Tank;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.linearGauge.pointers.Tank;
         width(): string;
         width(width?: string): anychart.core.linearGauge.pointers.Tank;
@@ -13633,6 +14113,12 @@ declare namespace anychart.core.linearGauge.pointers {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.linearGauge.pointers.Tank;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.linearGauge.pointers.Tank;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Base extends anychart.core.VisualBase {
         color(): string;
@@ -13688,12 +14174,12 @@ declare namespace anychart.core.linearGauge.pointers {
         zIndex(zIndex?: number): anychart.core.linearGauge.pointers.Base;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.linearGauge.pointers.Base;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.linearGauge.pointers.Base;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.linearGauge.pointers.Base;
         print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
@@ -13729,16 +14215,12 @@ declare namespace anychart.core.linearGauge.pointers {
         labels(settings?: anychart.core.ui.LabelsFactory | Object | boolean): anychart.core.linearGauge.pointers.RangeBar;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.linearGauge.pointers.RangeBar;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         name(): string;
         name(name?: string): anychart.core.linearGauge.pointers.RangeBar;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.linearGauge.pointers.RangeBar;
         offset(): string;
         offset(offset?: string | number): anychart.core.linearGauge.pointers.RangeBar;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         scale(): anychart.scales.Base;
         scale(scale?: anychart.scales.Base): anychart.core.linearGauge.pointers.RangeBar;
         select(event?: anychart.core.MouseEvent): anychart.core.linearGauge.pointers.RangeBar;
@@ -13749,8 +14231,6 @@ declare namespace anychart.core.linearGauge.pointers {
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.linearGauge.pointers.RangeBar;
         stroke(settings?: Object): anychart.core.linearGauge.pointers.RangeBar;
         unhover(): anychart.core.linearGauge.pointers.RangeBar;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.linearGauge.pointers.RangeBar;
         width(): string;
         width(width?: string): anychart.core.linearGauge.pointers.RangeBar;
@@ -13761,6 +14241,12 @@ declare namespace anychart.core.linearGauge.pointers {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.linearGauge.pointers.RangeBar;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.linearGauge.pointers.RangeBar;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Bar extends anychart.core.linearGauge.pointers.Base {
         color(): string;
@@ -13793,16 +14279,12 @@ declare namespace anychart.core.linearGauge.pointers {
         labels(settings?: anychart.core.ui.LabelsFactory | Object | boolean): anychart.core.linearGauge.pointers.Bar;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.linearGauge.pointers.Bar;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         name(): string;
         name(name?: string): anychart.core.linearGauge.pointers.Bar;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.linearGauge.pointers.Bar;
         offset(): string;
         offset(offset?: string | number): anychart.core.linearGauge.pointers.Bar;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         scale(): anychart.scales.Base;
         scale(scale?: anychart.scales.Base): anychart.core.linearGauge.pointers.Bar;
         select(event?: anychart.core.MouseEvent): anychart.core.linearGauge.pointers.Bar;
@@ -13813,8 +14295,6 @@ declare namespace anychart.core.linearGauge.pointers {
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.linearGauge.pointers.Bar;
         stroke(settings?: Object): anychart.core.linearGauge.pointers.Bar;
         unhover(): anychart.core.linearGauge.pointers.Bar;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.linearGauge.pointers.Bar;
         width(): string;
         width(width?: string): anychart.core.linearGauge.pointers.Bar;
@@ -13825,6 +14305,12 @@ declare namespace anychart.core.linearGauge.pointers {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.linearGauge.pointers.Bar;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.linearGauge.pointers.Bar;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Led extends anychart.core.linearGauge.pointers.Base {
         color(): string;
@@ -13865,16 +14351,12 @@ declare namespace anychart.core.linearGauge.pointers {
         labels(settings?: anychart.core.ui.LabelsFactory | Object | boolean): anychart.core.linearGauge.pointers.Led;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.linearGauge.pointers.Led;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         name(): string;
         name(name?: string): anychart.core.linearGauge.pointers.Led;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.linearGauge.pointers.Led;
         offset(): string;
         offset(offset?: string | number): anychart.core.linearGauge.pointers.Led;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         scale(): anychart.scales.Base;
         scale(scale?: anychart.scales.Base): anychart.core.linearGauge.pointers.Led;
         select(event?: anychart.core.MouseEvent): anychart.core.linearGauge.pointers.Led;
@@ -13887,8 +14369,6 @@ declare namespace anychart.core.linearGauge.pointers {
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.linearGauge.pointers.Led;
         stroke(settings?: Object): anychart.core.linearGauge.pointers.Led;
         unhover(): anychart.core.linearGauge.pointers.Led;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.linearGauge.pointers.Led;
         width(): string;
         width(width?: string): anychart.core.linearGauge.pointers.Led;
@@ -13899,6 +14379,12 @@ declare namespace anychart.core.linearGauge.pointers {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.linearGauge.pointers.Led;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.linearGauge.pointers.Led;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Marker extends anychart.core.linearGauge.pointers.Base {
         color(): string;
@@ -13931,16 +14417,12 @@ declare namespace anychart.core.linearGauge.pointers {
         labels(settings?: anychart.core.ui.LabelsFactory | Object | boolean): anychart.core.linearGauge.pointers.Marker;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.linearGauge.pointers.Marker;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         name(): string;
         name(name?: string): anychart.core.linearGauge.pointers.Marker;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.linearGauge.pointers.Marker;
         offset(): string;
         offset(offset?: string | number): anychart.core.linearGauge.pointers.Marker;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         scale(): anychart.scales.Base;
         scale(scale?: anychart.scales.Base): anychart.core.linearGauge.pointers.Marker;
         select(event?: anychart.core.MouseEvent): anychart.core.linearGauge.pointers.Marker;
@@ -13953,8 +14435,6 @@ declare namespace anychart.core.linearGauge.pointers {
         type(): string;
         type(type?: string): anychart.core.linearGauge.pointers.Marker;
         unhover(): anychart.core.linearGauge.pointers.Marker;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.linearGauge.pointers.Marker;
         width(): string;
         width(width?: string): anychart.core.linearGauge.pointers.Marker;
@@ -13965,6 +14445,12 @@ declare namespace anychart.core.linearGauge.pointers {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.linearGauge.pointers.Marker;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.linearGauge.pointers.Marker;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Thermometer extends anychart.core.linearGauge.pointers.Base {
         bulbPadding(): string | number;
@@ -14001,16 +14487,12 @@ declare namespace anychart.core.linearGauge.pointers {
         labels(settings?: anychart.core.ui.LabelsFactory | Object | boolean): anychart.core.linearGauge.pointers.Thermometer;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.linearGauge.pointers.Thermometer;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         name(): string;
         name(name?: string): anychart.core.linearGauge.pointers.Thermometer;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.linearGauge.pointers.Thermometer;
         offset(): string;
         offset(offset?: string | number): anychart.core.linearGauge.pointers.Thermometer;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         scale(): anychart.scales.Base;
         scale(scale?: anychart.scales.Base): anychart.core.linearGauge.pointers.Thermometer;
         select(event?: anychart.core.MouseEvent): anychart.core.linearGauge.pointers.Thermometer;
@@ -14021,8 +14503,6 @@ declare namespace anychart.core.linearGauge.pointers {
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.linearGauge.pointers.Thermometer;
         stroke(settings?: Object): anychart.core.linearGauge.pointers.Thermometer;
         unhover(): anychart.core.linearGauge.pointers.Thermometer;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.linearGauge.pointers.Thermometer;
         width(): string;
         width(width?: string): anychart.core.linearGauge.pointers.Thermometer;
@@ -14033,6 +14513,12 @@ declare namespace anychart.core.linearGauge.pointers {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.linearGauge.pointers.Thermometer;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.linearGauge.pointers.Thermometer;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
 }
 
@@ -14096,8 +14582,6 @@ declare namespace anychart.core.map.series {
         left(left?: number | string): anychart.core.map.series.Base;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.map.series.Base;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.map.series.Base;
         maxWidth(): number | string;
@@ -14115,8 +14599,6 @@ declare namespace anychart.core.map.series {
         normal(settings?: Object): anychart.core.map.series.Base;
         overlapMode(): string;
         overlapMode(mode?: string | boolean): anychart.core.map.series.Base;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.map.series.Base;
         select(index?: number): anychart.core.map.series.Base;
@@ -14135,8 +14617,6 @@ declare namespace anychart.core.map.series {
         top(top?: number | string): anychart.core.map.series.Base;
         transformXY(xCoord: number, yCoord: number): {[prop:string]:number};
         unhover(indexOrIndexes?: number | Array<number>): anychart.core.map.series.Base;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.map.series.Base;
         unselect(index?: number): anychart.core.map.series.Base;
         unselect(indexes?: Array<number>): anychart.core.map.series.Base;
@@ -14153,6 +14633,12 @@ declare namespace anychart.core.map.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.map.series.Base;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.map.series.Base;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Choropleth extends anychart.core.map.series.BaseWithMarkers {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -14212,8 +14698,6 @@ declare namespace anychart.core.map.series {
         left(left?: number | string): anychart.core.map.series.Choropleth;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.map.series.Choropleth;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.map.series.Choropleth;
         maxHeight(): number | string;
@@ -14233,8 +14717,6 @@ declare namespace anychart.core.map.series {
         normal(settings?: Object): anychart.core.map.series.Choropleth;
         overlapMode(): string;
         overlapMode(mode?: string | boolean): anychart.core.map.series.Choropleth;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.map.series.Choropleth;
         select(index?: number): anychart.core.map.series.Choropleth;
@@ -14253,8 +14735,6 @@ declare namespace anychart.core.map.series {
         top(top?: number | string): anychart.core.map.series.Choropleth;
         transformXY(xCoord: number, yCoord: number): {[prop:string]:number};
         unhover(indexOrIndexes?: number | Array<number>): anychart.core.map.series.Choropleth;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.map.series.Choropleth;
         unselect(index?: number): anychart.core.map.series.Choropleth;
         unselect(indexes?: Array<number>): anychart.core.map.series.Choropleth;
@@ -14267,6 +14747,12 @@ declare namespace anychart.core.map.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.map.series.Choropleth;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.map.series.Choropleth;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Bubble extends anychart.core.map.series.BaseWithMarkers {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -14328,8 +14814,6 @@ declare namespace anychart.core.map.series {
         left(left?: number | string): anychart.core.map.series.Bubble;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.map.series.Bubble;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.map.series.Bubble;
         maxHeight(): number | string;
@@ -14364,8 +14848,6 @@ declare namespace anychart.core.map.series {
         normal(settings?: Object): anychart.core.map.series.Bubble;
         overlapMode(): string;
         overlapMode(mode?: string | boolean): anychart.core.map.series.Bubble;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.map.series.Bubble;
         select(index?: number): anychart.core.map.series.Bubble;
@@ -14384,8 +14866,6 @@ declare namespace anychart.core.map.series {
         top(top?: number | string): anychart.core.map.series.Bubble;
         transformXY(xCoord: number, yCoord: number): {[prop:string]:number};
         unhover(indexOrIndexes?: number | Array<number>): anychart.core.map.series.Bubble;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.map.series.Bubble;
         unselect(index?: number): anychart.core.map.series.Bubble;
         unselect(indexes?: Array<number>): anychart.core.map.series.Bubble;
@@ -14398,6 +14878,12 @@ declare namespace anychart.core.map.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.map.series.Bubble;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.map.series.Bubble;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface BaseWithMarkers extends anychart.core.map.series.Base {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -14448,8 +14934,6 @@ declare namespace anychart.core.map.series {
         left(left?: number | string): anychart.core.map.series.BaseWithMarkers;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.map.series.BaseWithMarkers;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.map.series.BaseWithMarkers;
         maxHeight(): number | string;
@@ -14467,8 +14951,6 @@ declare namespace anychart.core.map.series {
         name(name?: string): anychart.core.map.series.BaseWithMarkers;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.map.series.BaseWithMarkers;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.map.series.BaseWithMarkers;
         select(index?: number): anychart.core.map.series.BaseWithMarkers;
@@ -14487,8 +14969,6 @@ declare namespace anychart.core.map.series {
         top(top?: number | string): anychart.core.map.series.BaseWithMarkers;
         transformXY(xCoord: number, yCoord: number): {[prop:string]:number};
         unhover(indexOrIndexes?: number | Array<number>): anychart.core.map.series.BaseWithMarkers;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.map.series.BaseWithMarkers;
         unselect(index?: number): anychart.core.map.series.BaseWithMarkers;
         unselect(indexes?: Array<number>): anychart.core.map.series.BaseWithMarkers;
@@ -14512,6 +14992,12 @@ declare namespace anychart.core.map.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.map.series.BaseWithMarkers;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.map.series.BaseWithMarkers;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Connector extends anychart.core.map.series.BaseWithMarkers {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -14575,8 +15061,6 @@ declare namespace anychart.core.map.series {
         left(left?: number | string): anychart.core.map.series.Connector;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.map.series.Connector;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.map.series.Connector;
         maxHeight(): number | string;
@@ -14596,8 +15080,6 @@ declare namespace anychart.core.map.series {
         normal(settings?: Object): anychart.core.map.series.Connector;
         overlapMode(): string;
         overlapMode(mode?: string | boolean): anychart.core.map.series.Connector;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.map.series.Connector;
         select(index?: number): anychart.core.map.series.Connector;
@@ -14618,8 +15100,6 @@ declare namespace anychart.core.map.series {
         top(top?: number | string): anychart.core.map.series.Connector;
         transformXY(xCoord: number, yCoord: number): {[prop:string]:number};
         unhover(indexOrIndexes?: number | Array<number>): anychart.core.map.series.Connector;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.map.series.Connector;
         unselect(index?: number): anychart.core.map.series.Connector;
         unselect(indexes?: Array<number>): anychart.core.map.series.Connector;
@@ -14632,6 +15112,12 @@ declare namespace anychart.core.map.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.map.series.Connector;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.map.series.Connector;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Marker extends anychart.core.map.series.Base {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -14691,8 +15177,6 @@ declare namespace anychart.core.map.series {
         left(left?: number | string): anychart.core.map.series.Marker;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.map.series.Marker;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.map.series.Marker;
         maxWidth(): number | string;
@@ -14710,8 +15194,6 @@ declare namespace anychart.core.map.series {
         normal(settings?: Object): anychart.core.map.series.Marker;
         overlapMode(): string;
         overlapMode(mode?: string | boolean): anychart.core.map.series.Marker;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.map.series.Marker;
         select(index?: number): anychart.core.map.series.Marker;
@@ -14734,8 +15216,6 @@ declare namespace anychart.core.map.series {
         type(): string | (() => void);
         type(type?: string | (() => void)): anychart.core.map.series.Marker;
         unhover(indexOrIndexes?: number | Array<number>): anychart.core.map.series.Marker;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.map.series.Marker;
         unselect(index?: number): anychart.core.map.series.Marker;
         unselect(indexes?: Array<number>): anychart.core.map.series.Marker;
@@ -14750,6 +15230,12 @@ declare namespace anychart.core.map.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.map.series.Marker;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.map.series.Marker;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
 }
 
@@ -14816,8 +15302,6 @@ declare namespace anychart.core.mekko.series {
         left(left?: number | string): anychart.core.mekko.series.Mekko;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.mekko.series.Mekko;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.mekko.series.Mekko;
         maxHeight(): number | string;
@@ -14841,8 +15325,6 @@ declare namespace anychart.core.mekko.series {
         normal(settings?: Object): anychart.core.mekko.series.Mekko;
         pointWidth(): string | number;
         pointWidth(width?: number | string): anychart.core.mekko.series.Mekko;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.mekko.series.Mekko;
         right(): number | string;
@@ -14866,8 +15348,6 @@ declare namespace anychart.core.mekko.series {
         transformX(value: any, subRangeRatio?: number): number;
         transformY(value: any, subRangeRatio?: number): number;
         unhover(indexOrIndexes?: number | Array<number>): anychart.core.mekko.series.Mekko;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.mekko.series.Mekko;
         unselect(index?: number): anychart.core.mekko.series.Mekko;
         unselect(indexes?: Array<number>): anychart.core.mekko.series.Mekko;
@@ -14887,11 +15367,19 @@ declare namespace anychart.core.mekko.series {
         minPointLength(length?: number | string): anychart.core.mekko.series.Mekko;
         xPointPosition(): number;
         xPointPosition(position?: number): anychart.core.mekko.series.Mekko;
+        xMode(): string;
+        xMode(xMode?: string): anychart.core.mekko.series.Mekko;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.mekko.series.Mekko;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.mekko.series.Mekko;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.mekko.series.Mekko;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
 }
 
@@ -14964,13 +15452,13 @@ declare namespace anychart.core.pert {
         tooltip(settings?: Object | boolean): anychart.core.pert.Milestones;
     }
     interface CriticalPath extends anychart.core.Base {
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         milestones(): anychart.core.pert.Milestones;
         milestones(settings?: Object): anychart.core.pert.CriticalPath;
-        removeAllListeners(type?: string): number;
         tasks(): anychart.core.pert.Tasks;
         tasks(settings?: Object): anychart.core.pert.CriticalPath;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
     }
@@ -15018,8 +15506,6 @@ declare namespace anychart.core.polar.series {
         left(left?: number | string): anychart.core.polar.series.Polyline;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.polar.series.Polyline;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.polar.series.Polyline;
         maxHeight(): number | string;
@@ -15041,8 +15527,6 @@ declare namespace anychart.core.polar.series {
         name(name?: string): anychart.core.polar.series.Polyline;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.polar.series.Polyline;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.polar.series.Polyline;
         select(index?: number): anychart.core.polar.series.Polyline;
@@ -15061,8 +15545,6 @@ declare namespace anychart.core.polar.series {
         top(top?: number | string): anychart.core.polar.series.Polyline;
         transformXY(xValue: any, yValue: any): {[prop:string]:number};
         unhover(): anychart.core.polar.series.Polyline;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.polar.series.Polyline;
         unselect(index?: number): anychart.core.polar.series.Polyline;
         unselect(indexes?: Array<number>): anychart.core.polar.series.Polyline;
@@ -15090,6 +15572,12 @@ declare namespace anychart.core.polar.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.polar.series.Polyline;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.polar.series.Polyline;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface ContinuousBase extends anychart.core.polar.series.Base {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -15127,8 +15615,6 @@ declare namespace anychart.core.polar.series {
         left(left?: number | string): anychart.core.polar.series.ContinuousBase;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.polar.series.ContinuousBase;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.polar.series.ContinuousBase;
         maxHeight(): number | string;
@@ -15150,8 +15636,6 @@ declare namespace anychart.core.polar.series {
         name(name?: string): anychart.core.polar.series.ContinuousBase;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.polar.series.ContinuousBase;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.polar.series.ContinuousBase;
         select(index?: number): anychart.core.polar.series.ContinuousBase;
@@ -15166,8 +15650,6 @@ declare namespace anychart.core.polar.series {
         top(top?: number | string): anychart.core.polar.series.ContinuousBase;
         transformXY(xValue: any, yValue: any): {[prop:string]:number};
         unhover(): anychart.core.polar.series.ContinuousBase;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.polar.series.ContinuousBase;
         unselect(index?: number): anychart.core.polar.series.ContinuousBase;
         unselect(indexes?: Array<number>): anychart.core.polar.series.ContinuousBase;
@@ -15197,6 +15679,12 @@ declare namespace anychart.core.polar.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.polar.series.ContinuousBase;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.polar.series.ContinuousBase;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Base extends anychart.core.SeriesBase {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -15234,8 +15722,6 @@ declare namespace anychart.core.polar.series {
         left(left?: number | string): anychart.core.polar.series.Base;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.polar.series.Base;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.polar.series.Base;
         maxLabels(): anychart.core.ui.LabelsFactory;
@@ -15261,8 +15747,6 @@ declare namespace anychart.core.polar.series {
         normal(settings?: Object): anychart.core.polar.series.Base;
         pointWidth(): string | number;
         pointWidth(value?: number | string): anychart.core.polar.series.Base;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.polar.series.Base;
         select(index?: number): anychart.core.polar.series.Base;
@@ -15277,8 +15761,6 @@ declare namespace anychart.core.polar.series {
         top(top?: number | string): anychart.core.polar.series.Base;
         transformXY(xValue: any, yValue: any): {[prop:string]:number};
         unhover(indexOrIndexes?: number | Array<number>): anychart.core.polar.series.Base;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.polar.series.Base;
         unselect(index?: number): anychart.core.polar.series.Base;
         unselect(indexes?: Array<number>): anychart.core.polar.series.Base;
@@ -15300,6 +15782,12 @@ declare namespace anychart.core.polar.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.polar.series.Base;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.polar.series.Base;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Area extends anychart.core.polar.series.ContinuousBase {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -15357,8 +15845,6 @@ declare namespace anychart.core.polar.series {
         left(left?: number | string): anychart.core.polar.series.Area;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.polar.series.Area;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.polar.series.Area;
         maxHeight(): number | string;
@@ -15380,8 +15866,6 @@ declare namespace anychart.core.polar.series {
         name(name?: string): anychart.core.polar.series.Area;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.polar.series.Area;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.polar.series.Area;
         select(index?: number): anychart.core.polar.series.Area;
@@ -15400,8 +15884,6 @@ declare namespace anychart.core.polar.series {
         top(top?: number | string): anychart.core.polar.series.Area;
         transformXY(xValue: any, yValue: any): {[prop:string]:number};
         unhover(): anychart.core.polar.series.Area;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.polar.series.Area;
         unselect(index?: number): anychart.core.polar.series.Area;
         unselect(indexes?: Array<number>): anychart.core.polar.series.Area;
@@ -15424,6 +15906,12 @@ declare namespace anychart.core.polar.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.polar.series.Area;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.polar.series.Area;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Column extends anychart.core.polar.series.Base {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -15472,8 +15960,6 @@ declare namespace anychart.core.polar.series {
         left(left?: number | string): anychart.core.polar.series.Column;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.polar.series.Column;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(value?: Object | boolean | string): anychart.core.polar.series.Column;
         maxHeight(): number | string;
@@ -15501,8 +15987,6 @@ declare namespace anychart.core.polar.series {
         normal(settings?: Object): anychart.core.polar.series.Column;
         pointWidth(): string | number;
         pointWidth(width?: number | string): anychart.core.polar.series.Column;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.polar.series.Column;
         select(index?: number): anychart.core.polar.series.Column;
@@ -15522,8 +16006,6 @@ declare namespace anychart.core.polar.series {
         top(top?: number | string): anychart.core.polar.series.Column;
         transformXY(xValue: any, yValue: any): {[prop:string]:number};
         unhover(indexOrIndexes?: number | Array<number>): anychart.core.polar.series.Column;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.polar.series.Column;
         unselect(index?: number): anychart.core.polar.series.Column;
         unselect(indexes?: Array<number>): anychart.core.polar.series.Column;
@@ -15545,6 +16027,12 @@ declare namespace anychart.core.polar.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.polar.series.Column;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.polar.series.Column;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Line extends anychart.core.polar.series.ContinuousBase {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -15589,8 +16077,6 @@ declare namespace anychart.core.polar.series {
         left(left?: number | string): anychart.core.polar.series.Line;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.polar.series.Line;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.polar.series.Line;
         maxHeight(): number | string;
@@ -15612,8 +16098,6 @@ declare namespace anychart.core.polar.series {
         name(name?: string): anychart.core.polar.series.Line;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.polar.series.Line;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.polar.series.Line;
         select(index?: number): anychart.core.polar.series.Line;
@@ -15631,8 +16115,6 @@ declare namespace anychart.core.polar.series {
         top(top?: number | string): anychart.core.polar.series.Line;
         transformXY(xValue: any, yValue: any): {[prop:string]:number};
         unhover(): anychart.core.polar.series.Line;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.polar.series.Line;
         unselect(index?: number): anychart.core.polar.series.Line;
         unselect(indexes?: Array<number>): anychart.core.polar.series.Line;
@@ -15655,6 +16137,12 @@ declare namespace anychart.core.polar.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.polar.series.Line;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.polar.series.Line;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface RangeColumn extends anychart.core.polar.series.Base {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -15703,8 +16191,6 @@ declare namespace anychart.core.polar.series {
         left(left?: number | string): anychart.core.polar.series.RangeColumn;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.polar.series.RangeColumn;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(value?: Object | boolean | string): anychart.core.polar.series.RangeColumn;
         maxHeight(): number | string;
@@ -15732,8 +16218,6 @@ declare namespace anychart.core.polar.series {
         normal(settings?: Object): anychart.core.polar.series.RangeColumn;
         pointWidth(): string | number;
         pointWidth(width?: number | string): anychart.core.polar.series.RangeColumn;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.polar.series.RangeColumn;
         select(index?: number): anychart.core.polar.series.RangeColumn;
@@ -15752,8 +16236,6 @@ declare namespace anychart.core.polar.series {
         top(top?: number | string): anychart.core.polar.series.RangeColumn;
         transformXY(xValue: any, yValue: any): {[prop:string]:number};
         unhover(indexOrIndexes?: number | Array<number>): anychart.core.polar.series.RangeColumn;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.polar.series.RangeColumn;
         unselect(index?: number): anychart.core.polar.series.RangeColumn;
         unselect(indexes?: Array<number>): anychart.core.polar.series.RangeColumn;
@@ -15775,6 +16257,12 @@ declare namespace anychart.core.polar.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.polar.series.RangeColumn;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.polar.series.RangeColumn;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Marker extends anychart.core.polar.series.Base {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -15828,8 +16316,6 @@ declare namespace anychart.core.polar.series {
         left(left?: number | string): anychart.core.polar.series.Marker;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.polar.series.Marker;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.polar.series.Marker;
         maxLabels(): anychart.core.ui.LabelsFactory;
@@ -15849,8 +16335,6 @@ declare namespace anychart.core.polar.series {
         name(name?: string): anychart.core.polar.series.Marker;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.polar.series.Marker;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.polar.series.Marker;
         select(index?: number): anychart.core.polar.series.Marker;
@@ -15873,8 +16357,6 @@ declare namespace anychart.core.polar.series {
         type(): string | (() => void);
         type(type?: string | (() => void)): anychart.core.polar.series.Marker;
         unhover(): anychart.core.polar.series.Marker;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.polar.series.Marker;
         unselect(index?: number): anychart.core.polar.series.Marker;
         unselect(indexes?: Array<number>): anychart.core.polar.series.Marker;
@@ -15899,6 +16381,12 @@ declare namespace anychart.core.polar.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.polar.series.Marker;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.polar.series.Marker;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Polygon extends anychart.core.polar.series.ContinuousBase {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -15951,8 +16439,6 @@ declare namespace anychart.core.polar.series {
         left(left?: number | string): anychart.core.polar.series.Polygon;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.polar.series.Polygon;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.polar.series.Polygon;
         maxHeight(): number | string;
@@ -15974,8 +16460,6 @@ declare namespace anychart.core.polar.series {
         name(name?: string): anychart.core.polar.series.Polygon;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.polar.series.Polygon;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.polar.series.Polygon;
         select(index?: number): anychart.core.polar.series.Polygon;
@@ -15994,8 +16478,6 @@ declare namespace anychart.core.polar.series {
         top(top?: number | string): anychart.core.polar.series.Polygon;
         transformXY(xValue: any, yValue: any): {[prop:string]:number};
         unhover(): anychart.core.polar.series.Polygon;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.polar.series.Polygon;
         unselect(index?: number): anychart.core.polar.series.Polygon;
         unselect(indexes?: Array<number>): anychart.core.polar.series.Polygon;
@@ -16023,6 +16505,12 @@ declare namespace anychart.core.polar.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.polar.series.Polygon;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.polar.series.Polygon;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
 }
 
@@ -16064,8 +16552,6 @@ declare namespace anychart.core.radar.series {
         left(left?: number | string): anychart.core.radar.series.ContinuousBase;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.radar.series.ContinuousBase;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.radar.series.ContinuousBase;
         maxHeight(): number | string;
@@ -16087,8 +16573,6 @@ declare namespace anychart.core.radar.series {
         name(name?: string): anychart.core.radar.series.ContinuousBase;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.radar.series.ContinuousBase;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.radar.series.ContinuousBase;
         select(index?: number): anychart.core.radar.series.ContinuousBase;
@@ -16103,8 +16587,6 @@ declare namespace anychart.core.radar.series {
         top(top?: number | string): anychart.core.radar.series.ContinuousBase;
         transformXY(xVal: any, yVal: any, xSubRangeRatio?: number): {[prop:string]:number};
         unhover(): anychart.core.radar.series.ContinuousBase;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.radar.series.ContinuousBase;
         unselect(index?: number): anychart.core.radar.series.ContinuousBase;
         unselect(indexes?: Array<number>): anychart.core.radar.series.ContinuousBase;
@@ -16128,6 +16610,12 @@ declare namespace anychart.core.radar.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.radar.series.ContinuousBase;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.radar.series.ContinuousBase;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Base extends anychart.core.SeriesBase {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -16168,8 +16656,6 @@ declare namespace anychart.core.radar.series {
         left(left?: number | string): anychart.core.radar.series.Base;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.radar.series.Base;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.radar.series.Base;
         maxLabels(): anychart.core.ui.LabelsFactory;
@@ -16189,8 +16675,6 @@ declare namespace anychart.core.radar.series {
         name(name?: string): anychart.core.radar.series.Base;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.radar.series.Base;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.radar.series.Base;
         select(index?: number): anychart.core.radar.series.Base;
@@ -16207,8 +16691,6 @@ declare namespace anychart.core.radar.series {
         unhover(): anychart.core.radar.series.Base;
         unhover(index?: number): anychart.core.radar.series.Base;
         unhover(indexes?: Array<number>): anychart.core.radar.series.Base;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.radar.series.Base;
         unselect(index?: number): anychart.core.radar.series.Base;
         unselect(indexes?: Array<number>): anychart.core.radar.series.Base;
@@ -16227,6 +16709,12 @@ declare namespace anychart.core.radar.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.radar.series.Base;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.radar.series.Base;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Area extends anychart.core.radar.series.ContinuousBase {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -16282,8 +16770,6 @@ declare namespace anychart.core.radar.series {
         left(left?: number | string): anychart.core.radar.series.Area;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.radar.series.Area;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.radar.series.Area;
         maxHeight(): number | string;
@@ -16305,8 +16791,6 @@ declare namespace anychart.core.radar.series {
         name(name?: string): anychart.core.radar.series.Area;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.radar.series.Area;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.radar.series.Area;
         select(index?: number): anychart.core.radar.series.Area;
@@ -16325,8 +16809,6 @@ declare namespace anychart.core.radar.series {
         top(top?: number | string): anychart.core.radar.series.Area;
         transformXY(xVal: any, yVal: any, xSubRangeRatio?: number): {[prop:string]:number};
         unhover(): anychart.core.radar.series.Area;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.radar.series.Area;
         unselect(index?: number): anychart.core.radar.series.Area;
         unselect(indexes?: Array<number>): anychart.core.radar.series.Area;
@@ -16343,6 +16825,12 @@ declare namespace anychart.core.radar.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.radar.series.Area;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.radar.series.Area;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Line extends anychart.core.radar.series.ContinuousBase {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -16385,8 +16873,6 @@ declare namespace anychart.core.radar.series {
         left(left?: number | string): anychart.core.radar.series.Line;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.radar.series.Line;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.radar.series.Line;
         maxHeight(): number | string;
@@ -16408,8 +16894,6 @@ declare namespace anychart.core.radar.series {
         name(name?: string): anychart.core.radar.series.Line;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.radar.series.Line;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.radar.series.Line;
         select(index?: number): anychart.core.radar.series.Line;
@@ -16428,8 +16912,6 @@ declare namespace anychart.core.radar.series {
         top(top?: number | string): anychart.core.radar.series.Line;
         transformXY(xVal: any, yVal: any, xSubRangeRatio?: number): {[prop:string]:number};
         unhover(): anychart.core.radar.series.Line;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.radar.series.Line;
         unselect(index?: number): anychart.core.radar.series.Line;
         unselect(indexes?: Array<number>): anychart.core.radar.series.Line;
@@ -16446,6 +16928,12 @@ declare namespace anychart.core.radar.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.radar.series.Line;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.radar.series.Line;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Marker extends anychart.core.radar.series.Base {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -16499,8 +16987,6 @@ declare namespace anychart.core.radar.series {
         left(left?: number | string): anychart.core.radar.series.Marker;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.radar.series.Marker;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.radar.series.Marker;
         maxLabels(): anychart.core.ui.LabelsFactory;
@@ -16520,8 +17006,6 @@ declare namespace anychart.core.radar.series {
         name(name?: string): anychart.core.radar.series.Marker;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.radar.series.Marker;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.radar.series.Marker;
         select(index?: number): anychart.core.radar.series.Marker;
@@ -16544,8 +17028,6 @@ declare namespace anychart.core.radar.series {
         type(): string | (() => void);
         type(value?: string | (() => void)): anychart.core.radar.series.Marker;
         unhover(): anychart.core.radar.series.Marker;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.radar.series.Marker;
         unselect(index?: number): anychart.core.radar.series.Marker;
         unselect(indexes?: Array<number>): anychart.core.radar.series.Marker;
@@ -16564,6 +17046,12 @@ declare namespace anychart.core.radar.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.radar.series.Marker;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.radar.series.Marker;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
 }
 
@@ -16585,16 +17073,10 @@ declare namespace anychart.core.resource {
         height(height?: number): anychart.core.resource.Conflicts;
         labels(): anychart.core.ui.LabelsFactory;
         labels(settings?: Object | boolean): anychart.core.resource.Conflicts;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         stroke(): anychart.graphics.vector.Stroke | (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill);
         stroke(strokeFunction?: (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill)): anychart.core.resource.Conflicts;
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.resource.Conflicts;
         stroke(settings?: Object): anychart.core.resource.Conflicts;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.resource.Conflicts;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
@@ -16602,6 +17084,12 @@ declare namespace anychart.core.resource {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.resource.Conflicts;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.resource.Conflicts;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Activities extends anychart.core.Base {
         color(): string;
@@ -16682,8 +17170,6 @@ declare namespace anychart.core.resource {
         horizontalStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.resource.Grid;
         left(): number | string;
         left(left?: number | string): anychart.core.resource.Grid;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.resource.Grid;
         maxWidth(): number | string;
@@ -16714,14 +17200,10 @@ declare namespace anychart.core.resource {
         oddHolidayHatchFill(settings?: anychart.graphics.vector.HatchFill): anychart.core.resource.Grid;
         overlay(): anychart.core.gantt.Overlay;
         overlay(settings?: Object | boolean): anychart.core.resource.Grid;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.resource.Grid;
         top(): number | string;
         top(top?: number | string): anychart.core.resource.Grid;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         verticalStroke(): anychart.graphics.vector.Stroke | (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill);
         verticalStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.resource.Grid;
         width(): number | string;
@@ -16733,6 +17215,12 @@ declare namespace anychart.core.resource {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.resource.Grid;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.resource.Grid;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Logo extends anychart.core.ui.Background {
         bottom(): number | string;
@@ -16767,8 +17255,6 @@ declare namespace anychart.core.resource {
         leftStroke(): anychart.graphics.vector.Stroke;
         leftStroke(color: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string | Object): anychart.core.resource.Logo;
         leftStroke(color: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.resource.Logo;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.resource.Logo;
         maxWidth(): number | string;
@@ -16782,8 +17268,6 @@ declare namespace anychart.core.resource {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.resource.Logo;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.resource.Logo;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.resource.Logo;
         rightStroke(): anychart.graphics.vector.Stroke;
@@ -16797,12 +17281,16 @@ declare namespace anychart.core.resource {
         topStroke(): anychart.graphics.vector.Stroke;
         topStroke(color: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string | Object): anychart.core.resource.Logo;
         topStroke(color: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.resource.Logo;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.resource.Logo;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.resource.Logo;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface ResourceList extends anychart.core.VisualBaseWithBounds {
         background(): anychart.core.ui.Background;
@@ -16837,8 +17325,6 @@ declare namespace anychart.core.resource {
         images(settings?: Object): anychart.core.resource.ResourceList;
         left(): number | string;
         left(left?: number | string): anychart.core.resource.ResourceList;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.resource.ResourceList;
         maxWidth(): number | string;
@@ -16857,8 +17343,6 @@ declare namespace anychart.core.resource {
         oddFill(imageSettings: anychart.graphics.vector.Fill): anychart.core.resource.ResourceList;
         overlay(): anychart.core.gantt.Overlay;
         overlay(settings?: string | Object | boolean): anychart.core.resource.ResourceList;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.resource.ResourceList;
         stroke(): anychart.graphics.vector.Stroke;
@@ -16872,8 +17356,6 @@ declare namespace anychart.core.resource {
         top(top?: number | string): anychart.core.resource.ResourceList;
         types(): anychart.core.resource.resourceList.TextSettings;
         types(settings?: Object): anychart.core.resource.ResourceList;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.resource.ResourceList;
         zIndex(): number;
@@ -16883,6 +17365,12 @@ declare namespace anychart.core.resource {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.resource.ResourceList;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.resource.ResourceList;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
 }
 
@@ -17091,8 +17579,6 @@ declare namespace anychart.core.scatter.series {
         left(left?: number | string): anychart.core.scatter.series.Base;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.scatter.series.Base;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.scatter.series.Base;
         maxWidth(): number | string;
@@ -17108,8 +17594,6 @@ declare namespace anychart.core.scatter.series {
         name(value?: string): anychart.core.scatter.series.Base;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.scatter.series.Base;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.scatter.series.Base;
         select(index?: number): anychart.core.scatter.series.Base;
@@ -17125,8 +17609,6 @@ declare namespace anychart.core.scatter.series {
         transformX(xValue: any): number;
         transformY(yValue: any): number;
         unhover(indexOrIndexes?: number | Array<number>): anychart.core.scatter.series.Base;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.scatter.series.Base;
         unselect(index?: number): anychart.core.scatter.series.Base;
         unselect(indexes?: Array<number>): anychart.core.scatter.series.Base;
@@ -17150,6 +17632,12 @@ declare namespace anychart.core.scatter.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.scatter.series.Base;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.scatter.series.Base;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Bubble extends anychart.core.scatter.series.BaseWithMarkers {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -17206,8 +17694,6 @@ declare namespace anychart.core.scatter.series {
         left(left?: number | string): anychart.core.scatter.series.Bubble;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.scatter.series.Bubble;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.scatter.series.Bubble;
         maxHeight(): number | string;
@@ -17241,8 +17727,6 @@ declare namespace anychart.core.scatter.series {
         negativeStroke(settings?: Object): anychart.core.scatter.series.Bubble;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.scatter.series.Bubble;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.scatter.series.Bubble;
         select(index?: number): anychart.core.scatter.series.Bubble;
@@ -17262,8 +17746,6 @@ declare namespace anychart.core.scatter.series {
         transformX(xValue: any): number;
         transformY(yValue: any): number;
         unhover(): anychart.core.scatter.series.Bubble;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.scatter.series.Bubble;
         unselect(index?: number): anychart.core.scatter.series.Bubble;
         unselect(indexes?: Array<number>): anychart.core.scatter.series.Bubble;
@@ -17282,6 +17764,12 @@ declare namespace anychart.core.scatter.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.scatter.series.Bubble;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.scatter.series.Bubble;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface BaseWithMarkers extends anychart.core.scatter.series.Base {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -17319,8 +17807,6 @@ declare namespace anychart.core.scatter.series {
         left(left?: number | string): anychart.core.scatter.series.BaseWithMarkers;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.scatter.series.BaseWithMarkers;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.scatter.series.BaseWithMarkers;
         maxHeight(): number | string;
@@ -17338,8 +17824,6 @@ declare namespace anychart.core.scatter.series {
         name(value?: string): anychart.core.scatter.series.BaseWithMarkers;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.scatter.series.BaseWithMarkers;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.scatter.series.BaseWithMarkers;
         select(index?: number): anychart.core.scatter.series.BaseWithMarkers;
@@ -17355,8 +17839,6 @@ declare namespace anychart.core.scatter.series {
         transformX(xValue: any): number;
         transformY(yValue: any): number;
         unhover(indexOrIndexes?: number | Array<number>): anychart.core.scatter.series.BaseWithMarkers;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.scatter.series.BaseWithMarkers;
         unselect(index?: number): anychart.core.scatter.series.BaseWithMarkers;
         unselect(indexes?: Array<number>): anychart.core.scatter.series.BaseWithMarkers;
@@ -17380,6 +17862,12 @@ declare namespace anychart.core.scatter.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.scatter.series.BaseWithMarkers;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.scatter.series.BaseWithMarkers;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Line extends anychart.core.scatter.series.BaseWithMarkers {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -17424,8 +17912,6 @@ declare namespace anychart.core.scatter.series {
         left(left?: number | string): anychart.core.scatter.series.Line;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.scatter.series.Line;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.scatter.series.Line;
         maxHeight(): number | string;
@@ -17443,8 +17929,6 @@ declare namespace anychart.core.scatter.series {
         name(value?: string): anychart.core.scatter.series.Line;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.scatter.series.Line;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.scatter.series.Line;
         select(index?: number): anychart.core.scatter.series.Line;
@@ -17464,8 +17948,6 @@ declare namespace anychart.core.scatter.series {
         transformX(xValue: any): number;
         transformY(yValue: any): number;
         unhover(): anychart.core.scatter.series.Line;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.scatter.series.Line;
         unselect(index?: number): anychart.core.scatter.series.Line;
         unselect(indexes?: Array<number>): anychart.core.scatter.series.Line;
@@ -17484,6 +17966,12 @@ declare namespace anychart.core.scatter.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.scatter.series.Line;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.scatter.series.Line;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Marker extends anychart.core.scatter.series.Base {
         a11y(): anychart.core.utils.SeriesA11y;
@@ -17538,8 +18026,6 @@ declare namespace anychart.core.scatter.series {
         left(left?: number | string): anychart.core.scatter.series.Marker;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.scatter.series.Marker;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.scatter.series.Marker;
         maxWidth(): number | string;
@@ -17555,8 +18041,6 @@ declare namespace anychart.core.scatter.series {
         name(value?: string): anychart.core.scatter.series.Marker;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.scatter.series.Marker;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.scatter.series.Marker;
         select(index?: number): anychart.core.scatter.series.Marker;
@@ -17580,8 +18064,6 @@ declare namespace anychart.core.scatter.series {
         type(): string | (() => void);
         type(type?: string | (() => void)): anychart.core.scatter.series.Marker;
         unhover(): anychart.core.scatter.series.Marker;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.scatter.series.Marker;
         unselect(index?: number): anychart.core.scatter.series.Marker;
         unselect(indexes?: Array<number>): anychart.core.scatter.series.Marker;
@@ -17602,6 +18084,12 @@ declare namespace anychart.core.scatter.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.scatter.series.Marker;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.scatter.series.Marker;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
 }
 
@@ -17632,8 +18120,6 @@ declare namespace anychart.core.series {
         left(): number | string;
         left(left?: number | string): anychart.core.series.Cartesian;
         legendItem(value?: Object): anychart.core.utils.LegendItemSettings | anychart.core.series.Cartesian;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(value?: Object | boolean | string): anychart.core.ui.MarkersFactory | anychart.core.series.Cartesian;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.series.Cartesian;
@@ -17646,8 +18132,6 @@ declare namespace anychart.core.series {
         minWidth(width?: number | string): anychart.core.series.Cartesian;
         name(value?: string): anychart.core.series.Cartesian | string;
         outlierMarkers(value?: Object | boolean | string): anychart.core.ui.MarkersFactory | anychart.core.series.Cartesian;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.series.Cartesian;
         select(indexOrIndexes?: number | Array<number>): anychart.core.series.Cartesian;
@@ -17662,8 +18146,6 @@ declare namespace anychart.core.series {
         transformX(value: any, subRangeRatio?: number): number;
         transformY(value: any, subRangeRatio?: number): number;
         unhover(indexOrIndexes?: number | Array<number>): anychart.core.series.Cartesian;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(indexOrIndexes?: number | Array<number>): anychart.core.series.Cartesian;
         width(): number | string;
         width(width?: number | string): anychart.core.series.Cartesian;
@@ -17676,6 +18158,12 @@ declare namespace anychart.core.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.series.Cartesian;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.series.Cartesian;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Base extends anychart.core.VisualBaseWithBounds {
         bottom(): number | string;
@@ -17700,8 +18188,6 @@ declare namespace anychart.core.series {
         left(): number | string;
         left(left?: number | string): anychart.core.series.Base;
         legendItem(value?: Object): anychart.core.utils.LegendItemSettings | anychart.core.series.Base;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(value?: Object | boolean | string): anychart.core.ui.MarkersFactory | anychart.core.series.Base;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.series.Base;
@@ -17714,8 +18200,6 @@ declare namespace anychart.core.series {
         minWidth(width?: number | string): anychart.core.series.Base;
         name(value?: string): anychart.core.series.Base | string;
         outlierMarkers(value?: Object | boolean | string): anychart.core.ui.MarkersFactory | anychart.core.series.Base;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.series.Base;
         selectLabels(value?: Object | boolean): anychart.core.ui.LabelsFactory | anychart.core.series.Base;
@@ -17727,8 +18211,6 @@ declare namespace anychart.core.series {
         top(top?: number | string): anychart.core.series.Base;
         transformX(value: any, subRangeRatio?: number): number;
         transformY(value: any, subRangeRatio?: number): number;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.series.Base;
         yScale(value?: anychart.scales.Base): anychart.scales.Base | anychart.core.series.Base;
@@ -17739,6 +18221,12 @@ declare namespace anychart.core.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.series.Base;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.series.Base;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Stock extends anychart.core.series.Base {
         bottom(): number | string;
@@ -17764,8 +18252,6 @@ declare namespace anychart.core.series {
         left(): number | string;
         left(left?: number | string): anychart.core.series.Stock;
         legendItem(value?: Object): anychart.core.utils.LegendItemSettings | anychart.core.series.Stock;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(value?: Object | boolean | string): anychart.core.ui.MarkersFactory | anychart.core.series.Stock;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.series.Stock;
@@ -17778,8 +18264,6 @@ declare namespace anychart.core.series {
         minWidth(width?: number | string): anychart.core.series.Stock;
         name(value?: string): anychart.core.series.Stock | string;
         outlierMarkers(value?: Object | boolean | string): anychart.core.ui.MarkersFactory | anychart.core.series.Stock;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.series.Stock;
         selectLabels(value?: Object | boolean): anychart.core.ui.LabelsFactory | anychart.core.series.Stock;
@@ -17791,8 +18275,6 @@ declare namespace anychart.core.series {
         top(top?: number | string): anychart.core.series.Stock;
         transformX(value: any, subRangeRatio?: number): number;
         transformY(value: any, subRangeRatio?: number): number;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.series.Stock;
         yScale(value?: anychart.scales.Base): anychart.scales.Base | anychart.core.series.Stock;
@@ -17803,29 +18285,35 @@ declare namespace anychart.core.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.series.Stock;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.series.Stock;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface RenderingSettings extends anychart.core.Base {
         finish(): (() => void);
         finish(finishFunction?: (() => void)): anychart.core.series.RenderingSettings;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         needsWidth(): boolean;
         needsWidth(enabled?: boolean): anychart.core.series.RenderingSettings;
         needsZero(): boolean;
         needsZero(enabled?: boolean): anychart.core.series.RenderingSettings;
         point(): (() => void);
         point(pointFunction?: (() => void)): anychart.core.series.RenderingSettings;
-        removeAllListeners(type?: string): number;
         shapes(): Array<anychart.core.series.RenderingSettings.ShapeConfig>;
         shapes(config?: Array<anychart.core.series.RenderingSettings.ShapeConfig>): anychart.core.series.RenderingSettings;
         start(): (() => void);
         start(startFunction?: (() => void)): anychart.core.series.RenderingSettings;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         updatePoint(): (() => void);
         updatePoint(pointFunction?: (() => void)): anychart.core.series.RenderingSettings;
         yValues(): Array<string>;
         yValues(value?: Array<string>): anychart.core.series.RenderingSettings;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     namespace RenderingSettings {
     type ShapeConfig = {
@@ -17904,8 +18392,6 @@ declare namespace anychart.core.stock {
         kdj(mapping: anychart.data.TableMapping, kPeriod?: number, kMAPeriod?: number, dPeriod?: number, kMAType?: string, dMAType?: string, kMultiplier?: number, dMultiplier?: number, kSeriesType?: string, dSeriesType?: string, jSeriesType?: string): anychart.core.stock.indicators.KDJ;
         keltnerChannels(mapping: anychart.data.TableMapping, maPeriod?: number, atrPeriod?: number, maType?: string, multiplier?: number, maSeries?: string): anychart.core.stock.indicators.KeltnerChannels;
         line(data?: anychart.data.TableMapping | anychart.data.Table | Array<Array<any>> | string, mappingSettings?: {[prop:string]:{column:number,type:string|string,weights:number}|number}, csvSettings?: Object): anychart.core.stock.scrollerSeries.Line;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         macd(mapping: anychart.data.TableMapping, fastPeriod?: number, slowPeriod?: number, signalPeriod?: number, macdSeriesType?: string, signalSeriesType?: string, histogramSeriesType?: string): anychart.core.stock.indicators.MACD;
         marker(data?: anychart.data.TableMapping | anychart.data.Table | Array<Array<any>> | string, mappingSettings?: {[prop:string]:{column:number,type:string|string,weights:number}|number}, csvSettings?: Object): anychart.core.stock.scrollerSeries.Marker;
         maxHeight(): number | string;
@@ -17925,13 +18411,11 @@ declare namespace anychart.core.stock {
         palette(): anychart.palettes.RangeColors | anychart.palettes.DistinctColors;
         palette(value?: anychart.palettes.RangeColors | anychart.palettes.DistinctColors | Object | Array<string>): anychart.core.stock.Scroller;
         priceChannels(mapping: anychart.data.TableMapping, period?: number, middleSeriesType?: string, rangeSeriesType?: string): anychart.core.stock.indicators.PriceChannels;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
         psar(mapping: anychart.data.TableMapping, accelerationFactorStart?: number, accelerationFactorIncrement?: number, accelerationFactorMaximum?: number, seriesType?: string): anychart.core.stock.indicators.PSAR;
         rangeArea(data?: anychart.data.TableMapping | anychart.data.Table | Array<Array<any>> | string, mappingSettings?: {[prop:string]:{column:number,type:string|string,weights:number}|number}, csvSettings?: Object): anychart.core.stock.scrollerSeries.RangeArea;
         rangeColumn(data?: anychart.data.TableMapping | anychart.data.Table | Array<Array<any>> | string, mappingSettings?: {[prop:string]:{column:number,type:string|string,weights:number}|number}, csvSettings?: Object): anychart.core.stock.scrollerSeries.RangeColumn;
         rangeSplineArea(data?: anychart.data.TableMapping | anychart.data.Table | Array<Array<any>> | string, mappingSettings?: {[prop:string]:{column:number,type:string|string,weights:number}|number}, csvSettings?: Object): anychart.core.stock.scrollerSeries.RangeSplineArea;
         rangeStepArea(data?: anychart.data.TableMapping | anychart.data.Table | Array<Array<any>> | string, mappingSettings?: {[prop:string]:{column:number,type:string|string,weights:number}|number}, csvSettings?: Object): anychart.core.stock.scrollerSeries.RangeStepArea;
-        removeAllListeners(type?: string): number;
         removeAllSeries(): anychart.core.stock.Scroller;
         removeSeries(id: number | string): anychart.core.stock.Scroller;
         removeSeriesAt(index: number): anychart.core.stock.Scroller;
@@ -17953,8 +18437,6 @@ declare namespace anychart.core.stock {
         thumbs(): anychart.core.ui.Scroller.Thumbs;
         thumbs(settings?: boolean | Object): anychart.core.stock.Scroller;
         trix(mapping: anychart.data.TableMapping, period?: number, signalPeriod?: number, maType?: string, signalMaType?: string, trixSeriesType?: string, signalSeriesType?: string): anychart.core.stock.indicators.TRIX;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         volumeMa(mapping: anychart.data.TableMapping, maPeriod?: number, maType?: string, volumeSeriesType?: string, maSeriesType?: string): anychart.core.stock.indicators.VolumeMA;
         williamsR(mapping: anychart.data.TableMapping, period?: number, seriesType?: string): anychart.core.stock.indicators.WilliamsR;
         xAxis(): anychart.core.axes.StockDateTime;
@@ -17968,6 +18450,12 @@ declare namespace anychart.core.stock {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.Scroller;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.Scroller;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Plot extends anychart.core.VisualBaseWithBounds {
         addSeries(...var_args: (anychart.data.TableMapping)[]): Array<anychart.core.stock.series.Base>;
@@ -18030,8 +18518,6 @@ declare namespace anychart.core.stock {
         lineMarker(index?: number): anychart.core.axisMarkers.Line;
         lineMarker(settings?: Object | boolean): anychart.core.stock.Plot;
         lineMarker(index?: number, settings?: Object | boolean): anychart.core.stock.Plot;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         macd(mapping: anychart.data.TableMapping, fastPeriod?: number, slowPeriod?: number, signalPeriod?: number, macdSeriesType?: string, signalSeriesType?: string, histogramSeriesType?: string): anychart.core.stock.indicators.MACD;
         marker(data?: anychart.data.TableMapping | anychart.data.Table | Array<Array<any>> | string, mappingSettings?: {[prop:string]:{column:number,type:string|string,weights:number}|number}, csvSettings?: Object): anychart.core.stock.series.Marker;
         markerPalette(): anychart.palettes.Markers;
@@ -18063,7 +18549,6 @@ declare namespace anychart.core.stock {
         priceIndicator(index?: number): anychart.core.axisMarkers.CurrentPriceIndicator;
         priceIndicator(value?: Object | boolean): anychart.core.stock.Plot;
         priceIndicator(index?: number, value?: Object | boolean): anychart.core.stock.Plot;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
         psar(mapping: anychart.data.TableMapping, accelerationFactorStart?: number, accelerationFactorIncrement?: number, accelerationFactorMaximum?: number, seriesType?: string): anychart.core.stock.indicators.PSAR;
         rangeArea(data?: anychart.data.TableMapping | anychart.data.Table | Array<Array<any>> | string, mappingSettings?: {[prop:string]:{column:number,type:string|string,weights:number}|number}, csvSettings?: Object): anychart.core.stock.series.RangeArea;
         rangeColumn(data?: anychart.data.TableMapping | anychart.data.Table | Array<Array<any>> | string, mappingSettings?: {[prop:string]:{column:number,type:string|string,weights:number}|number}, csvSettings?: Object): anychart.core.stock.series.RangeColumn;
@@ -18072,7 +18557,6 @@ declare namespace anychart.core.stock {
         rangeMarker(index?: number, settings?: Object | boolean): anychart.core.stock.Plot;
         rangeSplineArea(data?: anychart.data.TableMapping | anychart.data.Table | Array<Array<any>> | string, mappingSettings?: {[prop:string]:{column:number,type:string|string,weights:number}|number}, csvSettings?: Object): anychart.core.stock.series.RangeSplineArea;
         rangeStepArea(data?: anychart.data.TableMapping | anychart.data.Table | Array<Array<any>> | string, mappingSettings?: {[prop:string]:{column:number,type:string|string,weights:number}|number}, csvSettings?: Object): anychart.core.stock.series.RangeStepArea;
-        removeAllListeners(type?: string): number;
         removeAllSeries(): anychart.core.stock.Plot;
         removeSeries(id: number | string): anychart.core.stock.Plot;
         removeSeriesAt(index: number): anychart.core.stock.Plot;
@@ -18095,8 +18579,6 @@ declare namespace anychart.core.stock {
         top(): number | string;
         top(top?: number | string): anychart.core.stock.Plot;
         trix(mapping: anychart.data.TableMapping, period?: number, signalPeriod?: number, maType?: string, signalMaType?: string, trixSeriesType?: string, signalSeriesType?: string): anychart.core.stock.indicators.TRIX;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         volumeMa(mapping: anychart.data.TableMapping, maPeriod?: number, maType?: string, volumeSeriesType?: string, maSeriesType?: string): anychart.core.stock.indicators.VolumeMA;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.Plot;
@@ -18127,6 +18609,12 @@ declare namespace anychart.core.stock {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.Plot;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.Plot;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Grouping extends anychart.core.Base {
         enabled(): boolean;
@@ -18137,12 +18625,12 @@ declare namespace anychart.core.stock {
         isGrouped(): boolean;
         levels(): Array<anychart.core.stock.Grouping.Level>;
         levels(levelsList?: Array<anychart.core.stock.Grouping.Level|string>): anychart.core.stock.Grouping;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxVisiblePoints(): number;
         maxVisiblePoints(count?: number): anychart.core.stock.Grouping;
         minPixPerPoint(): number;
         minPixPerPoint(count?: number): anychart.core.stock.Grouping;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
@@ -18209,8 +18697,6 @@ declare namespace anychart.core.stock.eventMarkers {
         letterSpacing(spacing?: number): anychart.core.stock.eventMarkers.Controller;
         lineHeight(): number | string;
         lineHeight(height?: number | string): anychart.core.stock.eventMarkers.Controller;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxFontSize(): number;
         maxFontSize(size?: number | string): anychart.core.stock.eventMarkers.Controller;
         minFontSize(): number;
@@ -18219,7 +18705,6 @@ declare namespace anychart.core.stock.eventMarkers {
         normal(settings?: Object): anychart.core.stock.eventMarkers.Controller;
         position(): string;
         position(position?: string): anychart.core.stock.eventMarkers.Controller;
-        removeAllListeners(type?: string): number;
         selectable(): boolean;
         selectable(enabled?: boolean): anychart.core.stock.eventMarkers.Controller;
         selected(): anychart.core.StateSettings;
@@ -18242,8 +18727,6 @@ declare namespace anychart.core.stock.eventMarkers {
         tooltip(settings?: Object | boolean): anychart.core.stock.eventMarkers.Controller;
         type(): string;
         type(type: string): anychart.core.stock.eventMarkers.Controller;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         useHtml(): boolean;
         useHtml(enabled?: boolean): anychart.core.stock.eventMarkers.Controller;
         vAlign(): anychart.graphics.vector.Text.VAlign | string;
@@ -18256,6 +18739,11 @@ declare namespace anychart.core.stock.eventMarkers {
         wordWrap(mode?: string): anychart.core.stock.eventMarkers.Controller;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.stock.eventMarkers.Controller;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Group extends anychart.core.VisualBase {
         adjustFontSize(): number;
@@ -18310,8 +18798,6 @@ declare namespace anychart.core.stock.eventMarkers {
         letterSpacing(spacing?: number): anychart.core.stock.eventMarkers.Group;
         lineHeight(): number | string;
         lineHeight(height?: number | string): anychart.core.stock.eventMarkers.Group;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxFontSize(): number;
         maxFontSize(size?: number | string): anychart.core.stock.eventMarkers.Group;
         minFontSize(): number;
@@ -18320,8 +18806,6 @@ declare namespace anychart.core.stock.eventMarkers {
         normal(settings?: Object): anychart.core.stock.eventMarkers.Group;
         position(): string;
         position(position?: string): anychart.core.stock.eventMarkers.Group;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         selectable(): boolean;
         selectable(enabled?: boolean): anychart.core.stock.eventMarkers.Group;
         selected(): anychart.core.stock.eventMarkers.Group;
@@ -18344,8 +18828,6 @@ declare namespace anychart.core.stock.eventMarkers {
         tooltip(settings?: Object | boolean): anychart.charts.Pie;
         type(): string;
         type(type: string): anychart.core.stock.eventMarkers.Group;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         useHtml(): boolean;
         useHtml(enabled?: boolean): anychart.core.stock.eventMarkers.Group;
         vAlign(): anychart.graphics.vector.Text.VAlign | string;
@@ -18363,6 +18845,12 @@ declare namespace anychart.core.stock.eventMarkers {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.eventMarkers.Group;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.eventMarkers.Group;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     namespace Group {
     type DataFormat = {
@@ -18684,8 +19172,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         labels(settings?: Object | boolean): anychart.core.stock.scrollerSeries.SplineArea;
         left(): number | string;
         left(left?: number | string): anychart.core.stock.scrollerSeries.SplineArea;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.stock.scrollerSeries.SplineArea;
         maxLabels(): anychart.core.ui.LabelsFactory;
@@ -18700,8 +19186,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         minWidth(width?: number | string): anychart.core.stock.scrollerSeries.SplineArea;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.stock.scrollerSeries.SplineArea;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.stock.scrollerSeries.SplineArea;
         right(): number | string;
@@ -18716,8 +19200,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         stroke(settings?: Object): anychart.core.stock.scrollerSeries.SplineArea;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.scrollerSeries.SplineArea;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.scrollerSeries.SplineArea;
         yScale(): anychart.scales.ScatterBase;
@@ -18736,6 +19218,12 @@ declare namespace anychart.core.stock.scrollerSeries {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.scrollerSeries.SplineArea;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.scrollerSeries.SplineArea;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Spline extends anychart.core.stock.scrollerSeries.Base {
         allowPointSettings(): boolean;
@@ -18758,8 +19246,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         labels(settings?: Object | boolean): anychart.core.stock.scrollerSeries.Spline;
         left(): number | string;
         left(left?: number | string): anychart.core.stock.scrollerSeries.Spline;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.stock.scrollerSeries.Spline;
         maxLabels(): anychart.core.ui.LabelsFactory;
@@ -18774,8 +19260,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         minWidth(width?: number | string): anychart.core.stock.scrollerSeries.Spline;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.stock.scrollerSeries.Spline;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.stock.scrollerSeries.Spline;
         right(): number | string;
@@ -18790,8 +19274,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         stroke(settings?: Object): anychart.core.stock.scrollerSeries.Spline;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.scrollerSeries.Spline;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.scrollerSeries.Spline;
         yScale(): anychart.scales.ScatterBase;
@@ -18810,6 +19292,12 @@ declare namespace anychart.core.stock.scrollerSeries {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.scrollerSeries.Spline;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.scrollerSeries.Spline;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface DiscreteBase extends anychart.core.stock.scrollerSeries.Base {
         allowPointSettings(): boolean;
@@ -18829,8 +19317,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         height(height?: number | string): anychart.core.stock.scrollerSeries.DiscreteBase;
         left(): number | string;
         left(left?: number | string): anychart.core.stock.scrollerSeries.DiscreteBase;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.stock.scrollerSeries.DiscreteBase;
         maxWidth(): number | string;
@@ -18843,16 +19329,12 @@ declare namespace anychart.core.stock.scrollerSeries {
         normal(settings?: Object): anychart.core.stock.scrollerSeries.DiscreteBase;
         pointWidth(): string | number;
         pointWidth(width?: number | string): anychart.core.stock.scrollerSeries.DiscreteBase;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.stock.scrollerSeries.DiscreteBase;
         selected(): anychart.core.StateSettings;
         selected(settings?: Object): anychart.core.stock.scrollerSeries.DiscreteBase;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.scrollerSeries.DiscreteBase;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.scrollerSeries.DiscreteBase;
         yScale(): anychart.scales.ScatterBase;
@@ -18880,6 +19362,12 @@ declare namespace anychart.core.stock.scrollerSeries {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.scrollerSeries.DiscreteBase;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.scrollerSeries.DiscreteBase;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface RangeStepArea extends anychart.core.stock.scrollerSeries.Base {
         allowPointSettings(): boolean;
@@ -18919,8 +19407,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         labels(settings?: Object | boolean): anychart.core.stock.scrollerSeries.RangeStepArea;
         left(): number | string;
         left(left?: number | string): anychart.core.stock.scrollerSeries.RangeStepArea;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         lowStroke(): anychart.graphics.vector.Stroke | (() => void);
         lowStroke(strokeFunction?: (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill)): anychart.core.stock.scrollerSeries.RangeStepArea;
         lowStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.stock.scrollerSeries.RangeStepArea;
@@ -18939,8 +19425,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         minWidth(width?: number | string): anychart.core.stock.scrollerSeries.RangeStepArea;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.stock.scrollerSeries.RangeStepArea;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.stock.scrollerSeries.RangeStepArea;
         right(): number | string;
@@ -18953,8 +19437,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         stepDirection(direction?: string): anychart.core.stock.scrollerSeries.RangeStepArea;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.scrollerSeries.RangeStepArea;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.scrollerSeries.RangeStepArea;
         yScale(): anychart.scales.ScatterBase;
@@ -18973,6 +19455,12 @@ declare namespace anychart.core.stock.scrollerSeries {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.scrollerSeries.RangeStepArea;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.scrollerSeries.RangeStepArea;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface StepArea extends anychart.core.stock.scrollerSeries.Base {
         allowPointSettings(): boolean;
@@ -19008,8 +19496,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         labels(settings?: Object | boolean): anychart.core.stock.scrollerSeries.StepArea;
         left(): number | string;
         left(left?: number | string): anychart.core.stock.scrollerSeries.StepArea;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.stock.scrollerSeries.StepArea;
         maxLabels(): anychart.core.ui.LabelsFactory;
@@ -19024,8 +19510,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         minWidth(width?: number | string): anychart.core.stock.scrollerSeries.StepArea;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.stock.scrollerSeries.StepArea;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.stock.scrollerSeries.StepArea;
         right(): number | string;
@@ -19042,8 +19526,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         stroke(settings?: Object): anychart.core.stock.scrollerSeries.StepArea;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.scrollerSeries.StepArea;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.scrollerSeries.StepArea;
         yScale(): anychart.scales.ScatterBase;
@@ -19062,6 +19544,12 @@ declare namespace anychart.core.stock.scrollerSeries {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.scrollerSeries.StepArea;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.scrollerSeries.StepArea;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Base extends anychart.core.VisualBaseWithBounds {
         allowPointSettings(): boolean;
@@ -19085,8 +19573,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         labels(settings?: Object | boolean): anychart.core.stock.scrollerSeries.Base;
         left(): number | string;
         left(left?: number | string): anychart.core.stock.scrollerSeries.Base;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.stock.scrollerSeries.Base;
         maxLabels(): anychart.core.ui.LabelsFactory;
@@ -19107,8 +19593,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         normal(settings?: Object): anychart.core.stock.scrollerSeries.Base;
         pointWidth(): string | number;
         pointWidth(width?: number | string): anychart.core.stock.scrollerSeries.Base;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.stock.scrollerSeries.Base;
         right(): number | string;
@@ -19119,8 +19603,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         seriesType(type?: string): anychart.core.stock.scrollerSeries.Base;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.scrollerSeries.Base;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.scrollerSeries.Base;
         yScale(): anychart.scales.ScatterBase;
@@ -19132,6 +19614,12 @@ declare namespace anychart.core.stock.scrollerSeries {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.scrollerSeries.Base;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.scrollerSeries.Base;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Area extends anychart.core.stock.scrollerSeries.Base {
         allowPointSettings(): boolean;
@@ -19167,8 +19655,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         labels(settings?: Object | boolean): anychart.core.stock.scrollerSeries.Area;
         left(): number | string;
         left(left?: number | string): anychart.core.stock.scrollerSeries.Area;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.stock.scrollerSeries.Area;
         maxLabels(): anychart.core.ui.LabelsFactory;
@@ -19183,8 +19669,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         minWidth(width?: number | string): anychart.core.stock.scrollerSeries.Area;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.stock.scrollerSeries.Area;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.stock.scrollerSeries.Area;
         right(): number | string;
@@ -19199,8 +19683,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         stroke(settings?: Object): anychart.core.stock.scrollerSeries.Area;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.scrollerSeries.Area;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.scrollerSeries.Area;
         yScale(): anychart.scales.ScatterBase;
@@ -19219,6 +19701,12 @@ declare namespace anychart.core.stock.scrollerSeries {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.scrollerSeries.Area;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.scrollerSeries.Area;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Stick extends anychart.core.stock.scrollerSeries.DiscreteBase {
         allowPointSettings(): boolean;
@@ -19242,8 +19730,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         labels(settings?: Object | boolean): anychart.core.stock.scrollerSeries.Stick;
         left(): number | string;
         left(left?: number | string): anychart.core.stock.scrollerSeries.Stick;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.stock.scrollerSeries.Stick;
         maxLabels(): anychart.core.ui.LabelsFactory;
@@ -19264,8 +19750,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         normal(settings?: Object): anychart.core.stock.scrollerSeries.Stick;
         pointWidth(): string | number;
         pointWidth(width?: number | string): anychart.core.stock.scrollerSeries.Stick;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.stock.scrollerSeries.Stick;
         right(): number | string;
@@ -19279,8 +19763,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         stroke(settings?: Object): anychart.core.stock.scrollerSeries.Stick;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.scrollerSeries.Stick;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.scrollerSeries.Stick;
         yScale(): anychart.scales.ScatterBase;
@@ -19292,6 +19774,12 @@ declare namespace anychart.core.stock.scrollerSeries {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.scrollerSeries.Stick;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.scrollerSeries.Stick;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface OHLC extends anychart.core.stock.scrollerSeries.DiscreteBase {
         allowPointSettings(): boolean;
@@ -19318,8 +19806,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         labels(settings?: Object | boolean): anychart.core.stock.scrollerSeries.OHLC;
         left(): number | string;
         left(left?: number | string): anychart.core.stock.scrollerSeries.OHLC;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.stock.scrollerSeries.OHLC;
         maxLabels(): anychart.core.ui.LabelsFactory;
@@ -19340,8 +19826,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         normal(settings?: Object): anychart.core.stock.scrollerSeries.OHLC;
         pointWidth(): string | number;
         pointWidth(width?: number | string): anychart.core.stock.scrollerSeries.OHLC;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.stock.scrollerSeries.OHLC;
         right(): number | string;
@@ -19355,8 +19839,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         seriesType(type?: string): anychart.core.stock.scrollerSeries.OHLC;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.scrollerSeries.OHLC;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.scrollerSeries.OHLC;
         yScale(): anychart.scales.ScatterBase;
@@ -19368,6 +19850,12 @@ declare namespace anychart.core.stock.scrollerSeries {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.scrollerSeries.OHLC;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.scrollerSeries.OHLC;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Candlestick extends anychart.core.stock.scrollerSeries.OHLC {
         allowPointSettings(): boolean;
@@ -19406,8 +19894,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         labels(settings?: Object | boolean): anychart.core.stock.scrollerSeries.Candlestick;
         left(): number | string;
         left(left?: number | string): anychart.core.stock.scrollerSeries.Candlestick;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.stock.scrollerSeries.Candlestick;
         maxLabels(): anychart.core.ui.LabelsFactory;
@@ -19428,8 +19914,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         normal(settings?: Object): anychart.core.stock.scrollerSeries.Candlestick;
         pointWidth(): string | number;
         pointWidth(width?: number | string): anychart.core.stock.scrollerSeries.Candlestick;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.stock.scrollerSeries.Candlestick;
         right(): number | string;
@@ -19456,8 +19940,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         seriesType(type?: string): anychart.core.stock.scrollerSeries.Candlestick;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.scrollerSeries.Candlestick;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.scrollerSeries.Candlestick;
         yScale(): anychart.scales.ScatterBase;
@@ -19470,6 +19952,12 @@ declare namespace anychart.core.stock.scrollerSeries {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.scrollerSeries.Candlestick;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.scrollerSeries.Candlestick;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Column extends anychart.core.stock.scrollerSeries.DiscreteBase {
         allowPointSettings(): boolean;
@@ -19505,8 +19993,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         labels(settings?: Object | boolean): anychart.core.stock.scrollerSeries.Column;
         left(): number | string;
         left(left?: number | string): anychart.core.stock.scrollerSeries.Column;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.stock.scrollerSeries.Column;
         maxLabels(): anychart.core.ui.LabelsFactory;
@@ -19527,8 +20013,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         normal(settings?: Object): anychart.core.stock.scrollerSeries.Column;
         pointWidth(): string | number;
         pointWidth(width?: number | string): anychart.core.stock.scrollerSeries.Column;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.stock.scrollerSeries.Column;
         right(): number | string;
@@ -19542,8 +20026,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         stroke(settings?: Object): anychart.core.stock.scrollerSeries.Column;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.scrollerSeries.Column;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.scrollerSeries.Column;
         yScale(): anychart.scales.ScatterBase;
@@ -19555,6 +20037,12 @@ declare namespace anychart.core.stock.scrollerSeries {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.scrollerSeries.Column;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.scrollerSeries.Column;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface RangeArea extends anychart.core.stock.scrollerSeries.Base {
         allowPointSettings(): boolean;
@@ -19594,8 +20082,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         labels(settings?: Object | boolean): anychart.core.stock.scrollerSeries.RangeArea;
         left(): number | string;
         left(left?: number | string): anychart.core.stock.scrollerSeries.RangeArea;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         lowStroke(): anychart.graphics.vector.Stroke | (() => void);
         lowStroke(strokeFunction?: (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill)): anychart.core.stock.scrollerSeries.RangeArea;
         lowStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.stock.scrollerSeries.RangeArea;
@@ -19614,8 +20100,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         minWidth(width?: number | string): anychart.core.stock.scrollerSeries.RangeArea;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.stock.scrollerSeries.RangeArea;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.stock.scrollerSeries.RangeArea;
         right(): number | string;
@@ -19626,8 +20110,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         seriesType(type?: string): anychart.core.stock.scrollerSeries.RangeArea;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.scrollerSeries.RangeArea;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.scrollerSeries.RangeArea;
         yScale(): anychart.scales.ScatterBase;
@@ -19646,6 +20128,12 @@ declare namespace anychart.core.stock.scrollerSeries {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.scrollerSeries.RangeArea;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.scrollerSeries.RangeArea;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface JumpLine extends anychart.core.stock.scrollerSeries.Base {
         allowPointSettings(): boolean;
@@ -19669,8 +20157,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         labels(settings?: Object | boolean): anychart.core.stock.scrollerSeries.JumpLine;
         left(): number | string;
         left(left?: number | string): anychart.core.stock.scrollerSeries.JumpLine;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.stock.scrollerSeries.JumpLine;
         maxLabels(): anychart.core.ui.LabelsFactory;
@@ -19685,8 +20171,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         minWidth(width?: number | string): anychart.core.stock.scrollerSeries.JumpLine;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.stock.scrollerSeries.JumpLine;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.stock.scrollerSeries.JumpLine;
         right(): number | string;
@@ -19700,8 +20184,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         stroke(settings?: Object): anychart.core.stock.scrollerSeries.JumpLine;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.scrollerSeries.JumpLine;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.scrollerSeries.JumpLine;
         yScale(): anychart.scales.ScatterBase;
@@ -19719,6 +20201,12 @@ declare namespace anychart.core.stock.scrollerSeries {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.scrollerSeries.JumpLine;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.scrollerSeries.JumpLine;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface StepLine extends anychart.core.stock.scrollerSeries.Base {
         allowPointSettings(): boolean;
@@ -19741,8 +20229,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         labels(settings?: Object | boolean): anychart.core.stock.scrollerSeries.StepLine;
         left(): number | string;
         left(left?: number | string): anychart.core.stock.scrollerSeries.StepLine;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.stock.scrollerSeries.StepLine;
         maxLabels(): anychart.core.ui.LabelsFactory;
@@ -19757,8 +20243,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         minWidth(width?: number | string): anychart.core.stock.scrollerSeries.StepLine;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.stock.scrollerSeries.StepLine;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.stock.scrollerSeries.StepLine;
         right(): number | string;
@@ -19775,8 +20259,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         stroke(settings?: Object): anychart.core.stock.scrollerSeries.StepLine;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.scrollerSeries.StepLine;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.scrollerSeries.StepLine;
         yScale(): anychart.scales.ScatterBase;
@@ -19795,6 +20277,12 @@ declare namespace anychart.core.stock.scrollerSeries {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.scrollerSeries.StepLine;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.scrollerSeries.StepLine;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Line extends anychart.core.stock.scrollerSeries.Base {
         allowPointSettings(): boolean;
@@ -19818,8 +20306,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         labels(settings?: Object | boolean): anychart.core.stock.scrollerSeries.Line;
         left(): number | string;
         left(left?: number | string): anychart.core.stock.scrollerSeries.Line;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.stock.scrollerSeries.Line;
         maxLabels(): anychart.core.ui.LabelsFactory;
@@ -19834,8 +20320,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         minWidth(width?: number | string): anychart.core.stock.scrollerSeries.Line;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.stock.scrollerSeries.Line;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.stock.scrollerSeries.Line;
         right(): number | string;
@@ -19849,8 +20333,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         stroke(settings?: Object): anychart.core.stock.scrollerSeries.Line;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.scrollerSeries.Line;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.scrollerSeries.Line;
         yScale(): anychart.scales.ScatterBase;
@@ -19868,6 +20350,12 @@ declare namespace anychart.core.stock.scrollerSeries {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.scrollerSeries.Line;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.scrollerSeries.Line;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface RangeColumn extends anychart.core.stock.scrollerSeries.Base {
         allowPointSettings(): boolean;
@@ -19903,8 +20391,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         labels(settings?: Object | boolean): anychart.core.stock.scrollerSeries.RangeColumn;
         left(): number | string;
         left(left?: number | string): anychart.core.stock.scrollerSeries.RangeColumn;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.stock.scrollerSeries.RangeColumn;
         maxLabels(): anychart.core.ui.LabelsFactory;
@@ -19921,8 +20407,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         normal(settings?: Object): anychart.core.stock.scrollerSeries.RangeColumn;
         pointWidth(): string | number;
         pointWidth(width?: number | string): anychart.core.stock.scrollerSeries.RangeColumn;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.stock.scrollerSeries.RangeColumn;
         right(): number | string;
@@ -19937,8 +20421,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         stroke(settings?: Object): anychart.core.stock.scrollerSeries.RangeColumn;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.scrollerSeries.RangeColumn;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.scrollerSeries.RangeColumn;
         yScale(): anychart.scales.ScatterBase;
@@ -19955,6 +20437,12 @@ declare namespace anychart.core.stock.scrollerSeries {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.scrollerSeries.RangeColumn;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.scrollerSeries.RangeColumn;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface RangeSplineArea extends anychart.core.stock.scrollerSeries.Base {
         bottom(): number | string;
@@ -19992,8 +20480,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         labels(settings?: Object | boolean): anychart.core.stock.scrollerSeries.RangeSplineArea;
         left(): number | string;
         left(left?: number | string): anychart.core.stock.scrollerSeries.RangeSplineArea;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         lowStroke(): anychart.graphics.vector.Stroke | (() => void);
         lowStroke(strokeFunction?: (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill)): anychart.core.stock.scrollerSeries.RangeSplineArea;
         lowStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.stock.scrollerSeries.RangeSplineArea;
@@ -20012,8 +20498,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         minWidth(width?: number | string): anychart.core.stock.scrollerSeries.RangeSplineArea;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.stock.scrollerSeries.RangeSplineArea;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.stock.scrollerSeries.RangeSplineArea;
         right(): number | string;
@@ -20024,8 +20508,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         seriesType(type?: string): anychart.core.stock.scrollerSeries.RangeSplineArea;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.scrollerSeries.RangeSplineArea;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.scrollerSeries.RangeSplineArea;
         yScale(): anychart.scales.ScatterBase;
@@ -20046,6 +20528,12 @@ declare namespace anychart.core.stock.scrollerSeries {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.scrollerSeries.RangeSplineArea;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.scrollerSeries.RangeSplineArea;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Hilo extends anychart.core.stock.scrollerSeries.Base {
         allowPointSettings(): boolean;
@@ -20069,8 +20557,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         labels(settings?: Object | boolean): anychart.core.stock.scrollerSeries.Hilo;
         left(): number | string;
         left(left?: number | string): anychart.core.stock.scrollerSeries.Hilo;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.stock.scrollerSeries.Hilo;
         maxLabels(): anychart.core.ui.LabelsFactory;
@@ -20085,8 +20571,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         minWidth(width?: number | string): anychart.core.stock.scrollerSeries.Hilo;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.stock.scrollerSeries.Hilo;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.stock.scrollerSeries.Hilo;
         right(): number | string;
@@ -20100,8 +20584,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         stroke(settings?: Object): anychart.core.stock.scrollerSeries.Hilo;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.scrollerSeries.Hilo;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.scrollerSeries.Hilo;
         yScale(): anychart.scales.ScatterBase;
@@ -20119,6 +20601,12 @@ declare namespace anychart.core.stock.scrollerSeries {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.scrollerSeries.Hilo;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.scrollerSeries.Hilo;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Marker extends anychart.core.stock.scrollerSeries.Base {
         allowPointSettings(): boolean;
@@ -20154,8 +20642,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         labels(settings?: Object | boolean): anychart.core.stock.scrollerSeries.Marker;
         left(): number | string;
         left(left?: number | string): anychart.core.stock.scrollerSeries.Marker;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.stock.scrollerSeries.Marker;
         maxLabels(): anychart.core.ui.LabelsFactory;
@@ -20170,8 +20656,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         minWidth(width?: number | string): anychart.core.stock.scrollerSeries.Marker;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.stock.scrollerSeries.Marker;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.stock.scrollerSeries.Marker;
         right(): number | string;
@@ -20190,8 +20674,6 @@ declare namespace anychart.core.stock.scrollerSeries {
         top(top?: number | string): anychart.core.stock.scrollerSeries.Marker;
         type(): string | (() => void);
         type(value?: string | (() => void)): anychart.core.stock.scrollerSeries.Marker;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.scrollerSeries.Marker;
         yScale(): anychart.scales.ScatterBase;
@@ -20210,6 +20692,12 @@ declare namespace anychart.core.stock.scrollerSeries {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.scrollerSeries.Marker;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.scrollerSeries.Marker;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
 }
 
@@ -20252,8 +20740,6 @@ declare namespace anychart.core.stock.series {
         left(left?: number | string): anychart.core.stock.series.SplineArea;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.stock.series.SplineArea;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.stock.series.SplineArea;
         maxHeight(): number | string;
@@ -20272,8 +20758,6 @@ declare namespace anychart.core.stock.series {
         name(name?: string): anychart.core.stock.series.SplineArea;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.stock.series.SplineArea;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.stock.series.SplineArea;
         right(): number | string;
@@ -20288,8 +20772,6 @@ declare namespace anychart.core.stock.series {
         tooltip(settings?: Object | boolean): anychart.core.stock.series.SplineArea;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.series.SplineArea;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.series.SplineArea;
         yScale(): anychart.scales.ScatterBase;
@@ -20308,6 +20790,12 @@ declare namespace anychart.core.stock.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.series.SplineArea;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.series.SplineArea;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Spline extends anychart.core.stock.series.Base {
         allowPointSettings(): boolean;
@@ -20334,8 +20822,6 @@ declare namespace anychart.core.stock.series {
         left(left?: number | string): anychart.core.stock.series.Spline;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.stock.series.Spline;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.stock.series.Spline;
         maxHeight(): number | string;
@@ -20354,8 +20840,6 @@ declare namespace anychart.core.stock.series {
         name(name?: string): anychart.core.stock.series.Spline;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.stock.series.Spline;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.stock.series.Spline;
         right(): number | string;
@@ -20370,8 +20854,6 @@ declare namespace anychart.core.stock.series {
         tooltip(settings?: Object | boolean): anychart.core.stock.series.Spline;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.series.Spline;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.series.Spline;
         yScale(): anychart.scales.ScatterBase;
@@ -20390,6 +20872,12 @@ declare namespace anychart.core.stock.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.series.Spline;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.series.Spline;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface DiscreteBase extends anychart.core.stock.series.Base {
         allowPointSettings(): boolean;
@@ -20411,8 +20899,6 @@ declare namespace anychart.core.stock.series {
         left(left?: number | string): anychart.core.stock.series.DiscreteBase;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.stock.series.DiscreteBase;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.stock.series.DiscreteBase;
         maxWidth(): number | string;
@@ -20425,16 +20911,12 @@ declare namespace anychart.core.stock.series {
         name(name?: string): anychart.core.stock.series.DiscreteBase;
         pointWidth(): string | number;
         pointWidth(width?: number | string): anychart.core.stock.series.DiscreteBase;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.stock.series.DiscreteBase;
         tooltip(): anychart.core.ui.Tooltip;
         tooltip(settings?: Object | boolean): anychart.core.stock.series.DiscreteBase;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.series.DiscreteBase;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.series.DiscreteBase;
         yScale(): anychart.scales.ScatterBase;
@@ -20468,6 +20950,12 @@ declare namespace anychart.core.stock.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.series.DiscreteBase;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.series.DiscreteBase;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface RangeStepArea extends anychart.core.stock.series.Base {
         allowPointSettings(): boolean;
@@ -20506,8 +20994,6 @@ declare namespace anychart.core.stock.series {
         left(left?: number | string): anychart.core.stock.series.RangeStepArea;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.stock.series.RangeStepArea;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         lowStroke(): anychart.graphics.vector.Stroke | (() => void);
         lowStroke(strokeFunction?: (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill)): anychart.core.stock.series.RangeStepArea;
         lowStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.stock.series.RangeStepArea;
@@ -20530,8 +21016,6 @@ declare namespace anychart.core.stock.series {
         name(name?: string): anychart.core.stock.series.RangeStepArea;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.stock.series.RangeStepArea;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.stock.series.RangeStepArea;
         right(): number | string;
@@ -20544,8 +21028,6 @@ declare namespace anychart.core.stock.series {
         tooltip(settings?: Object | boolean): anychart.core.stock.series.RangeStepArea;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.series.RangeStepArea;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.series.RangeStepArea;
         yScale(): anychart.scales.ScatterBase;
@@ -20564,6 +21046,12 @@ declare namespace anychart.core.stock.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.series.RangeStepArea;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.series.RangeStepArea;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface StepArea extends anychart.core.stock.series.Base {
         allowPointSettings(): boolean;
@@ -20603,8 +21091,6 @@ declare namespace anychart.core.stock.series {
         left(left?: number | string): anychart.core.stock.series.StepArea;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.stock.series.StepArea;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.stock.series.StepArea;
         maxHeight(): number | string;
@@ -20623,8 +21109,6 @@ declare namespace anychart.core.stock.series {
         name(name?: string): anychart.core.stock.series.StepArea;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.stock.series.StepArea;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.stock.series.StepArea;
         right(): number | string;
@@ -20641,8 +21125,6 @@ declare namespace anychart.core.stock.series {
         tooltip(settings?: Object | boolean): anychart.core.stock.series.StepArea;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.series.StepArea;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.series.StepArea;
         yScale(): anychart.scales.ScatterBase;
@@ -20661,6 +21143,12 @@ declare namespace anychart.core.stock.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.series.StepArea;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.series.StepArea;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Base extends anychart.core.VisualBaseWithBounds {
         allowPointSettings(): boolean;
@@ -20688,8 +21176,6 @@ declare namespace anychart.core.stock.series {
         left(left?: number | string): anychart.core.stock.series.Base;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.stock.series.Base;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.stock.series.Base;
         maxHeight(): number | string;
@@ -20714,8 +21200,6 @@ declare namespace anychart.core.stock.series {
         normal(settings?: Object): anychart.core.stock.series.Base;
         pointWidth(): string | number;
         pointWidth(width?: number | string): anychart.core.stock.series.Base;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.stock.series.Base;
         right(): number | string;
@@ -20726,8 +21210,6 @@ declare namespace anychart.core.stock.series {
         tooltip(settings?: Object | boolean): anychart.core.stock.series.Base;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.series.Base;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.series.Base;
         yScale(): anychart.scales.ScatterBase;
@@ -20739,6 +21221,12 @@ declare namespace anychart.core.stock.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.series.Base;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.series.Base;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Area extends anychart.core.stock.series.Base {
         allowPointSettings(): boolean;
@@ -20780,8 +21268,6 @@ declare namespace anychart.core.stock.series {
         left(left?: number | string): anychart.core.stock.series.Area;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.stock.series.Area;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.stock.series.Area;
         maxHeight(): number | string;
@@ -20800,8 +21286,6 @@ declare namespace anychart.core.stock.series {
         name(name?: string): anychart.core.stock.series.Area;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.stock.series.Area;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.stock.series.Area;
         right(): number | string;
@@ -20816,8 +21300,6 @@ declare namespace anychart.core.stock.series {
         tooltip(settings?: Object | boolean): anychart.core.stock.series.Area;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.series.Area;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.series.Area;
         yScale(): anychart.scales.ScatterBase;
@@ -20836,6 +21318,12 @@ declare namespace anychart.core.stock.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.series.Area;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.series.Area;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Stick extends anychart.core.stock.series.DiscreteBase {
         allowPointSettings(): boolean;
@@ -20863,8 +21351,6 @@ declare namespace anychart.core.stock.series {
         left(left?: number | string): anychart.core.stock.series.Stick;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.stock.series.Stick;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.stock.series.Stick;
         maxHeight(): number | string;
@@ -20889,8 +21375,6 @@ declare namespace anychart.core.stock.series {
         normal(settings?: Object): anychart.core.stock.series.Stick;
         pointWidth(): string | number;
         pointWidth(width?: number | string): anychart.core.stock.series.Stick;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.stock.series.Stick;
         right(): number | string;
@@ -20904,8 +21388,6 @@ declare namespace anychart.core.stock.series {
         tooltip(settings?: Object | boolean): anychart.core.stock.series.Stick;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.series.Stick;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.series.Stick;
         yScale(): anychart.scales.ScatterBase;
@@ -20917,6 +21399,12 @@ declare namespace anychart.core.stock.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.series.Stick;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.series.Stick;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface OHLC extends anychart.core.stock.series.DiscreteBase {
         allowPointSettings(): boolean;
@@ -20947,8 +21435,6 @@ declare namespace anychart.core.stock.series {
         left(left?: number | string): anychart.core.stock.series.OHLC;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.stock.series.OHLC;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.stock.series.OHLC;
         maxHeight(): number | string;
@@ -20973,8 +21459,6 @@ declare namespace anychart.core.stock.series {
         normal(settings?: Object): anychart.core.stock.series.OHLC;
         pointWidth(): string | number;
         pointWidth(width?: number | string): anychart.core.stock.series.OHLC;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.stock.series.OHLC;
         right(): number | string;
@@ -20989,8 +21473,6 @@ declare namespace anychart.core.stock.series {
         tooltip(settings?: Object | boolean): anychart.core.stock.series.OHLC;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.series.OHLC;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.series.OHLC;
         yScale(): anychart.scales.ScatterBase;
@@ -21002,6 +21484,12 @@ declare namespace anychart.core.stock.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.series.OHLC;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.series.OHLC;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Candlestick extends anychart.core.stock.series.OHLC {
         allowPointSettings(): boolean;
@@ -21039,8 +21527,6 @@ declare namespace anychart.core.stock.series {
         left(left?: number | string): anychart.core.stock.series.Candlestick;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.stock.series.Candlestick;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.stock.series.Candlestick;
         maxHeight(): number | string;
@@ -21065,8 +21551,6 @@ declare namespace anychart.core.stock.series {
         normal(settings?: Object): anychart.core.stock.series.Candlestick;
         pointWidth(): string | number;
         pointWidth(width?: number | string): anychart.core.stock.series.Candlestick;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.stock.series.Candlestick;
         right(): number | string;
@@ -21089,8 +21573,6 @@ declare namespace anychart.core.stock.series {
         tooltip(settings?: Object | boolean): anychart.core.stock.series.Candlestick;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.series.Candlestick;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.series.Candlestick;
         yScale(): anychart.scales.ScatterBase;
@@ -21103,6 +21585,12 @@ declare namespace anychart.core.stock.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.series.Candlestick;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.series.Candlestick;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Column extends anychart.core.stock.series.DiscreteBase {
         allowPointSettings(): boolean;
@@ -21143,8 +21631,6 @@ declare namespace anychart.core.stock.series {
         left(left?: number | string): anychart.core.stock.series.Column;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.stock.series.Column;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.stock.series.Column;
         maxHeight(): number | string;
@@ -21169,8 +21655,6 @@ declare namespace anychart.core.stock.series {
         normal(settings?: Object): anychart.core.stock.series.Column;
         pointWidth(): string | number;
         pointWidth(width?: number | string): anychart.core.stock.series.Column;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.stock.series.Column;
         right(): number | string;
@@ -21184,8 +21668,6 @@ declare namespace anychart.core.stock.series {
         tooltip(settings?: Object | boolean): anychart.core.stock.series.Column;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.series.Column;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.series.Column;
         yScale(): anychart.scales.ScatterBase;
@@ -21197,6 +21679,12 @@ declare namespace anychart.core.stock.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.series.Column;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.series.Column;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface RangeArea extends anychart.core.stock.series.Base {
         allowPointSettings(): boolean;
@@ -21235,8 +21723,6 @@ declare namespace anychart.core.stock.series {
         left(left?: number | string): anychart.core.stock.series.RangeArea;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.stock.series.RangeArea;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         lowStroke(): anychart.graphics.vector.Stroke | (() => void);
         lowStroke(strokeFunction?: (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill)): anychart.core.stock.series.RangeArea;
         lowStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.stock.series.RangeArea;
@@ -21259,8 +21745,6 @@ declare namespace anychart.core.stock.series {
         name(name?: string): anychart.core.stock.series.RangeArea;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.stock.series.RangeArea;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.stock.series.RangeArea;
         right(): number | string;
@@ -21271,8 +21755,6 @@ declare namespace anychart.core.stock.series {
         tooltip(settings?: Object | boolean): anychart.core.stock.series.RangeArea;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.series.RangeArea;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.series.RangeArea;
         yScale(): anychart.scales.ScatterBase;
@@ -21291,6 +21773,12 @@ declare namespace anychart.core.stock.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.series.RangeArea;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.series.RangeArea;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface JumpLine extends anychart.core.stock.series.Base {
         allowPointSettings(): boolean;
@@ -21318,8 +21806,6 @@ declare namespace anychart.core.stock.series {
         left(left?: number | string): anychart.core.stock.series.JumpLine;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.stock.series.JumpLine;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.stock.series.JumpLine;
         maxHeight(): number | string;
@@ -21338,8 +21824,6 @@ declare namespace anychart.core.stock.series {
         name(name?: string): anychart.core.stock.series.JumpLine;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.stock.series.JumpLine;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.stock.series.JumpLine;
         right(): number | string;
@@ -21354,8 +21838,6 @@ declare namespace anychart.core.stock.series {
         tooltip(settings?: Object | boolean): anychart.core.stock.series.JumpLine;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.series.JumpLine;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.series.JumpLine;
         yScale(): anychart.scales.ScatterBase;
@@ -21373,6 +21855,12 @@ declare namespace anychart.core.stock.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.series.JumpLine;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.series.JumpLine;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface StepLine extends anychart.core.stock.series.Base {
         allowPointSettings(): boolean;
@@ -21399,8 +21887,6 @@ declare namespace anychart.core.stock.series {
         left(left?: number | string): anychart.core.stock.series.StepLine;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.stock.series.StepLine;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.stock.series.StepLine;
         maxHeight(): number | string;
@@ -21419,8 +21905,6 @@ declare namespace anychart.core.stock.series {
         name(name?: string): anychart.core.stock.series.StepLine;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.stock.series.StepLine;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.stock.series.StepLine;
         right(): number | string;
@@ -21437,8 +21921,6 @@ declare namespace anychart.core.stock.series {
         tooltip(settings?: Object | boolean): anychart.core.stock.series.StepLine;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.series.StepLine;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.series.StepLine;
         yScale(): anychart.scales.ScatterBase;
@@ -21457,6 +21939,12 @@ declare namespace anychart.core.stock.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.series.StepLine;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.series.StepLine;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Line extends anychart.core.stock.series.Base {
         allowPointSettings(): boolean;
@@ -21484,8 +21972,6 @@ declare namespace anychart.core.stock.series {
         left(left?: number | string): anychart.core.stock.series.Line;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.stock.series.Line;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.stock.series.Line;
         maxHeight(): number | string;
@@ -21504,8 +21990,6 @@ declare namespace anychart.core.stock.series {
         name(name?: string): anychart.core.stock.series.Line;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.stock.series.Line;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.stock.series.Line;
         right(): number | string;
@@ -21520,8 +22004,6 @@ declare namespace anychart.core.stock.series {
         tooltip(settings?: Object | boolean): anychart.core.stock.series.Line;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.series.Line;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.series.Line;
         yScale(): anychart.scales.ScatterBase;
@@ -21539,6 +22021,12 @@ declare namespace anychart.core.stock.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.series.Line;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.series.Line;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface RangeColumn extends anychart.core.stock.series.Base {
         allowPointSettings(): boolean;
@@ -21575,8 +22063,6 @@ declare namespace anychart.core.stock.series {
         left(left?: number | string): anychart.core.stock.series.RangeColumn;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.stock.series.RangeColumn;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.stock.series.RangeColumn;
         maxHeight(): number | string;
@@ -21601,8 +22087,6 @@ declare namespace anychart.core.stock.series {
         normal(settings?: Object): anychart.core.stock.series.RangeColumn;
         pointWidth(): string | number;
         pointWidth(width?: number | string): anychart.core.stock.series.RangeColumn;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.stock.series.RangeColumn;
         right(): number | string;
@@ -21617,8 +22101,6 @@ declare namespace anychart.core.stock.series {
         tooltip(settings?: Object | boolean): anychart.core.stock.series.RangeColumn;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.series.RangeColumn;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.series.RangeColumn;
         yScale(): anychart.scales.ScatterBase;
@@ -21631,6 +22113,12 @@ declare namespace anychart.core.stock.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.series.RangeColumn;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.series.RangeColumn;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface RangeSplineArea extends anychart.core.stock.series.Base {
         allowPointSettings(): boolean;
@@ -21669,8 +22157,6 @@ declare namespace anychart.core.stock.series {
         left(left?: number | string): anychart.core.stock.series.RangeSplineArea;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.stock.series.RangeSplineArea;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         lowStroke(): anychart.graphics.vector.Stroke | (() => void);
         lowStroke(strokeFunction?: (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill)): anychart.core.stock.series.RangeSplineArea;
         lowStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.stock.series.RangeSplineArea;
@@ -21693,8 +22179,6 @@ declare namespace anychart.core.stock.series {
         name(name?: string): anychart.core.stock.series.RangeSplineArea;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.stock.series.RangeSplineArea;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.stock.series.RangeSplineArea;
         right(): number | string;
@@ -21705,8 +22189,6 @@ declare namespace anychart.core.stock.series {
         tooltip(settings?: Object | boolean): anychart.core.stock.series.RangeSplineArea;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.series.RangeSplineArea;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.series.RangeSplineArea;
         yScale(): anychart.scales.ScatterBase;
@@ -21725,6 +22207,12 @@ declare namespace anychart.core.stock.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.series.RangeSplineArea;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.series.RangeSplineArea;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Hilo extends anychart.core.stock.series.Base {
         allowPointSettings(): boolean;
@@ -21752,8 +22240,6 @@ declare namespace anychart.core.stock.series {
         left(left?: number | string): anychart.core.stock.series.Hilo;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.stock.series.Hilo;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.stock.series.Hilo;
         maxHeight(): number | string;
@@ -21776,8 +22262,6 @@ declare namespace anychart.core.stock.series {
         name(name?: string): anychart.core.stock.series.Hilo;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.stock.series.Hilo;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.stock.series.Hilo;
         right(): number | string;
@@ -21792,8 +22276,6 @@ declare namespace anychart.core.stock.series {
         tooltip(settings?: Object | boolean): anychart.core.stock.series.Hilo;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.series.Hilo;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.series.Hilo;
         yScale(): anychart.scales.ScatterBase;
@@ -21807,6 +22289,12 @@ declare namespace anychart.core.stock.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.series.Hilo;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.series.Hilo;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Marker extends anychart.core.stock.series.Base {
         allowPointSettings(): boolean;
@@ -21841,8 +22329,6 @@ declare namespace anychart.core.stock.series {
         left(left?: number | string): anychart.core.stock.series.Marker;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(settings?: Object): anychart.core.stock.series.Marker;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.stock.series.Marker;
         maxLabels(): anychart.core.ui.LabelsFactory;
@@ -21859,8 +22345,6 @@ declare namespace anychart.core.stock.series {
         name(name?: string): anychart.core.stock.series.Marker;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.stock.series.Marker;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.stock.series.Marker;
         right(): number | string;
@@ -21879,8 +22363,6 @@ declare namespace anychart.core.stock.series {
         top(top?: number | string): anychart.core.stock.series.Marker;
         type(): string | (() => void);
         type(type?: string | (() => void)): anychart.core.stock.series.Marker;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.stock.series.Marker;
         yScale(): anychart.scales.ScatterBase;
@@ -21901,6 +22383,12 @@ declare namespace anychart.core.stock.series {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.stock.series.Marker;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.stock.series.Marker;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
 }
 
@@ -21912,15 +22400,15 @@ declare namespace anychart.core.sunburst {
         hovered(settings?: Object): anychart.core.sunburst.Level;
         labels(): anychart.core.ui.LabelsFactory;
         labels(settings?: Object | boolean): anychart.core.sunburst.Level;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.sunburst.Level;
-        removeAllListeners(type?: string): number;
         selected(): anychart.core.StateSettings;
         selected(settings?: Object): anychart.core.sunburst.Level;
         thickness(): string | number;
         thickness(thickness?: string | number): anychart.core.sunburst.Level;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
     }
@@ -22223,17 +22711,17 @@ declare namespace anychart.core.ui {
         width(width?: number | string): anychart.core.ui.Timeline;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.ui.Timeline;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.ui.Timeline;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.ui.Timeline;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.ui.Timeline;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface DataGrid extends anychart.core.VisualBaseWithBounds {
         backgroundFill(): anychart.graphics.vector.Fill | string;
@@ -22293,8 +22781,6 @@ declare namespace anychart.core.ui {
         horizontalScrollBar(settings?: Object): anychart.core.ui.DataGrid;
         left(): number | string;
         left(left?: number | string): anychart.core.ui.DataGrid;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.ui.DataGrid;
         maxWidth(): number | string;
@@ -22307,8 +22793,6 @@ declare namespace anychart.core.ui {
         onEditEnd(onEditEndFunction?: (()=>Object)): anychart.core.ui.DataGrid;
         onEditStart(): (()=>Object);
         onEditStart(onEditStartFunction?: (()=>Object)): anychart.core.ui.DataGrid;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.ui.DataGrid;
         rowEvenFill(): anychart.graphics.vector.Fill | string;
@@ -22347,8 +22831,6 @@ declare namespace anychart.core.ui {
         tooltip(settings?: Object | boolean): anychart.core.ui.DataGrid;
         top(): number | string;
         top(top?: number | string): anychart.core.ui.DataGrid;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         verticalOffset(): number;
         verticalOffset(offset?: number): anychart.core.ui.DataGrid;
         width(): number | string;
@@ -22360,6 +22842,12 @@ declare namespace anychart.core.ui {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.ui.DataGrid;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.ui.DataGrid;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     module DataGrid {
     interface Column extends anychart.core.VisualBase {
@@ -22382,16 +22870,10 @@ declare namespace anychart.core.ui {
         labels(): anychart.core.ui.LabelsFactory;
         labelsOverrider(): ((label:anychart.core.ui.LabelsFactory.Label,item:anychart.data.Tree.DataItem)=>void);
         labelsOverrider(overriderFunction?: ((label:anychart.core.ui.LabelsFactory.Label,item:anychart.data.Tree.DataItem)=>void)): anychart.core.ui.DataGrid.Column;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         setColumnFormat(fieldName: string, presetValue: string): anychart.core.ui.DataGrid.Column;
         setColumnFormat(fieldName: string, settings: Object): anychart.core.ui.DataGrid.Column;
         title(): anychart.core.ui.Title;
         title(settings?: boolean | Object | string): anychart.core.ui.DataGrid.Column;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.ui.DataGrid.Column;
         zIndex(): number;
@@ -22401,6 +22883,12 @@ declare namespace anychart.core.ui {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.ui.DataGrid.Column;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.ui.DataGrid.Column;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     }
     interface MarkersFactory extends anychart.core.VisualBase {
@@ -22415,8 +22903,6 @@ declare namespace anychart.core.ui {
         fill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.core.ui.MarkersFactory;
         fill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.core.ui.MarkersFactory;
         fill(imageSettings: anychart.graphics.vector.Fill): anychart.core.ui.MarkersFactory;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         offsetX(): number | string;
         offsetX(offset?: number | string): anychart.core.ui.MarkersFactory;
         offsetY(): number | string;
@@ -22425,8 +22911,6 @@ declare namespace anychart.core.ui {
         position(position?: string): anychart.core.ui.MarkersFactory;
         positionFormatter(): (() => void);
         positionFormatter(formatter?: ((positionProvider:any,index:number)=>anychart.math.CoordinateObject)): anychart.core.ui.MarkersFactory;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rotation(): number;
         rotation(rotation?: number): anychart.core.ui.MarkersFactory;
         size(): number;
@@ -22437,8 +22921,6 @@ declare namespace anychart.core.ui {
         stroke(settings?: Object): anychart.core.ui.MarkersFactory;
         type(): string | (() => void);
         type(type?: string | (() => void)): anychart.core.ui.MarkersFactory;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.ui.MarkersFactory;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
@@ -22446,6 +22928,12 @@ declare namespace anychart.core.ui {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.ui.MarkersFactory;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.ui.MarkersFactory;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     module MarkersFactory {
     interface Marker extends anychart.core.VisualBase {
@@ -22459,8 +22947,6 @@ declare namespace anychart.core.ui {
         fill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.core.ui.MarkersFactory.Marker;
         fill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.core.ui.MarkersFactory.Marker;
         fill(imageSettings: anychart.graphics.vector.Fill): anychart.core.ui.MarkersFactory.Marker;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         offsetX(): number | string;
         offsetX(offset?: number | string): anychart.core.ui.MarkersFactory.Marker;
         offsetY(): number | string;
@@ -22472,8 +22958,6 @@ declare namespace anychart.core.ui {
         position(position?: string): anychart.core.ui.MarkersFactory.Marker;
         positionFormatter(): any;
         positionFormatter(formatter?: any): any;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rotation(): number;
         rotation(angle?: number): anychart.core.ui.MarkersFactory.Marker;
         size(): number;
@@ -22484,12 +22968,16 @@ declare namespace anychart.core.ui {
         stroke(settings?: Object): anychart.core.ui.MarkersFactory.Marker;
         type(): string | (() => void);
         type(type?: string | (() => void)): anychart.core.ui.MarkersFactory.Marker;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.ui.MarkersFactory.Marker;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.ui.MarkersFactory.Marker;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     }
     interface Scroller extends anychart.core.VisualBase {
@@ -22509,8 +22997,6 @@ declare namespace anychart.core.ui {
         height(height?: number | string): anychart.core.ui.Scroller;
         inverted(): boolean;
         inverted(enabled?: boolean): anychart.core.ui.Scroller;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.ui.Scroller;
         minHeight(): number | string;
@@ -22520,8 +23006,6 @@ declare namespace anychart.core.ui {
         outlineStroke(): anychart.graphics.vector.Stroke;
         outlineStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.ui.Scroller;
         outlineStroke(settings?: Object): anychart.core.ui.Scroller;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         selectedFill(): anychart.graphics.vector.Fill;
         selectedFill(color: anychart.graphics.vector.Fill | Array<anychart.graphics.vector.GradientKey|string>): anychart.core.ui.Scroller;
         selectedFill(color: string, opacity?: number): anychart.core.ui.Scroller;
@@ -22530,8 +23014,6 @@ declare namespace anychart.core.ui {
         selectedFill(imageSettings: anychart.graphics.vector.Fill): anychart.core.ui.Scroller;
         thumbs(): anychart.core.ui.Scroller.Thumbs;
         thumbs(settings?: boolean | Object): anychart.core.ui.Scroller;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.ui.Scroller;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
@@ -22539,6 +23021,12 @@ declare namespace anychart.core.ui {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.ui.Scroller;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.ui.Scroller;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     module Scroller {
     interface Thumbs {
@@ -22611,17 +23099,17 @@ declare namespace anychart.core.ui {
         width(width?: number | string): anychart.core.ui.ColorRange;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.ui.ColorRange;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.ui.ColorRange;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.ui.ColorRange;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.ui.ColorRange;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Label extends anychart.core.Text {
         adjustFontSize(): Object;
@@ -22658,8 +23146,6 @@ declare namespace anychart.core.ui {
         letterSpacing(spacing?: string | number): anychart.core.ui.Label;
         lineHeight(): string | number;
         lineHeight(height?: string | number): anychart.core.ui.Label;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxFontSize(): number;
         maxFontSize(size?: number | string): anychart.core.ui.Label;
         minFontSize(): number;
@@ -22673,8 +23159,6 @@ declare namespace anychart.core.ui {
         padding(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.core.ui.Label;
         position(): string;
         position(position?: string): anychart.core.ui.Label;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rotation(): number;
         rotation(rotation?: number): anychart.core.ui.Label;
         selectable(): boolean;
@@ -22691,8 +23175,6 @@ declare namespace anychart.core.ui {
         textSettings(name?: string): string | number | boolean;
         textSettings(objectWithSettings?: Object): anychart.core.ui.Label;
         textSettings(name?: string, settings?: string | number | boolean | (() => void)): anychart.core.ui.Label;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         useHtml(): boolean;
         useHtml(enabled?: boolean): anychart.core.ui.Label;
         vAlign(): anychart.graphics.vector.Text.VAlign | string;
@@ -22710,6 +23192,12 @@ declare namespace anychart.core.ui {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.ui.Label;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.ui.Label;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Outline extends anychart.core.Base {
         enabled(): boolean;
@@ -22775,8 +23263,6 @@ declare namespace anychart.core.ui {
         letterSpacing(spacing?: string | number): anychart.core.ui.CrosshairLabel;
         lineHeight(): string | number;
         lineHeight(height?: string | number): anychart.core.ui.CrosshairLabel;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxFontSize(): number;
         maxFontSize(size?: number | string): anychart.core.ui.CrosshairLabel;
         minFontSize(): number;
@@ -22790,8 +23276,6 @@ declare namespace anychart.core.ui {
         padding(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.core.ui.CrosshairLabel;
         position(): string;
         position(value?: string): anychart.core.ui.CrosshairLabel;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rotation(): number;
         rotation(value?: number): anychart.core.ui.CrosshairLabel;
         rotation(): number;
@@ -22808,8 +23292,6 @@ declare namespace anychart.core.ui {
         textSettings(name?: string): string | number | boolean;
         textSettings(objectWithSettings?: Object): anychart.core.ui.CrosshairLabel;
         textSettings(name?: string, settings?: string | number | boolean | (() => void)): anychart.core.ui.CrosshairLabel;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         useHtml(): boolean;
         useHtml(enabled?: boolean): anychart.core.ui.CrosshairLabel;
         vAlign(): anychart.graphics.vector.Text.VAlign | string;
@@ -22827,6 +23309,12 @@ declare namespace anychart.core.ui {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.ui.CrosshairLabel;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.ui.CrosshairLabel;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface StageCredits {
         alt(): string;
@@ -22853,12 +23341,12 @@ declare namespace anychart.core.ui {
         fill(imageSettings: anychart.graphics.vector.Fill): anychart.core.ui.Center;
         getBounds(): anychart.math.Rect;
         getPoint(): anychart.math.CoordinateObject;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        removeAllListeners(type?: string): number;
         stroke(): anychart.graphics.vector.Stroke;
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.map.series.Base;
         stroke(settings?: Object): anychart.core.ui.Center;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
     }
@@ -22910,8 +23398,6 @@ declare namespace anychart.core.ui {
         letterSpacing(spacing?: number): anychart.core.ui.Tooltip;
         lineHeight(): number | string;
         lineHeight(height?: number | string): anychart.core.ui.Tooltip;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxFontSize(): number;
         maxFontSize(size?: number | string): anychart.core.ui.Tooltip;
         minFontSize(): number;
@@ -22937,8 +23423,6 @@ declare namespace anychart.core.ui {
         position(position?: string): anychart.core.ui.Tooltip;
         positionMode(): string;
         positionMode(mode?: string): anychart.core.ui.Tooltip;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         selectable(): boolean;
         selectable(enabled?: boolean): anychart.core.ui.Tooltip;
         separator(): anychart.core.ui.Separator;
@@ -22958,8 +23442,6 @@ declare namespace anychart.core.ui {
         titleFormat(format?: (() => void) | string): anychart.core.ui.Tooltip;
         unionFormat(): (()=>string) | string;
         unionFormat(unionFormat?: (()=>string) | string): anychart.core.ui.Tooltip;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         useHtml(): boolean;
         useHtml(enabled?: boolean): anychart.core.ui.Tooltip;
         vAlign(): anychart.graphics.vector.Text.VAlign;
@@ -22981,18 +23463,18 @@ declare namespace anychart.core.ui {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.ui.Tooltip;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.ui.Tooltip;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface DataArea extends anychart.core.VisualBase {
         background(): anychart.core.ui.Background;
         background(settings?: string | Object | boolean): anychart.core.ui.DataArea;
         enabled(): boolean;
         enabled(enabled?: boolean): anychart.core.ui.DataArea;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.ui.DataArea;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
@@ -23000,6 +23482,12 @@ declare namespace anychart.core.ui {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.ui.DataArea;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.ui.DataArea;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Background extends anychart.core.VisualBaseWithBounds {
         bottom(): number | string;
@@ -23032,8 +23520,6 @@ declare namespace anychart.core.ui {
         leftStroke(): anychart.graphics.vector.Stroke;
         leftStroke(color: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string | Object): anychart.core.ui.Background;
         leftStroke(color: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.ui.Background;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.ui.Background;
         maxWidth(): number | string;
@@ -23042,8 +23528,6 @@ declare namespace anychart.core.ui {
         minHeight(height?: number | string): anychart.core.ui.Background;
         minWidth(): number | string;
         minWidth(width?: number | string): anychart.core.ui.Background;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.ui.Background;
         rightStroke(): anychart.graphics.vector.Stroke;
@@ -23057,8 +23541,6 @@ declare namespace anychart.core.ui {
         topStroke(): anychart.graphics.vector.Stroke;
         topStroke(color: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string | Object): anychart.core.ui.Background;
         topStroke(color: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.ui.Background;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.ui.Background;
         zIndex(): number;
@@ -23068,6 +23550,12 @@ declare namespace anychart.core.ui {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.ui.Background;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.ui.Background;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Legend extends anychart.core.Text {
         align(): string;
@@ -23126,8 +23614,6 @@ declare namespace anychart.core.ui {
         letterSpacing(spacing?: string | number): anychart.core.ui.Legend;
         lineHeight(): string | number;
         lineHeight(height?: string | number): anychart.core.ui.Legend;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         margin(): anychart.core.utils.Margin;
         margin(margin?: Array<number|string> | Object | number | string): anychart.core.ui.Legend;
         margin(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.core.ui.Legend;
@@ -23144,8 +23630,6 @@ declare namespace anychart.core.ui {
         position(position?: string): anychart.core.ui.Legend;
         positionMode(): string;
         positionMode(mode?: string): anychart.core.ui.Legend;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         selectable(): boolean;
         selectable(enabled?: boolean): anychart.core.ui.Legend;
         textDirection(): anychart.graphics.vector.Text.Direction | string;
@@ -23166,8 +23650,6 @@ declare namespace anychart.core.ui {
         titleSeparator(settings?: Object | boolean): anychart.core.ui.Legend;
         tooltip(): anychart.core.ui.Tooltip;
         tooltip(settings?: Object | boolean): anychart.core.ui.Legend;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         useHtml(): boolean;
         useHtml(enabled?: boolean): anychart.core.ui.Legend;
         vAlign(): anychart.graphics.vector.Text.VAlign | string;
@@ -23185,6 +23667,12 @@ declare namespace anychart.core.ui {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.ui.Legend;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.ui.Legend;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     namespace Legend {
     type LegendItemProvider = {
@@ -23215,20 +23703,14 @@ declare namespace anychart.core.ui {
         getRemainingBounds(): anychart.math.Rect;
         height(): number | string;
         height(height?: number | string): anychart.core.ui.Separator;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         margin(): anychart.core.utils.Margin;
         margin(margin?: Array<number|string> | Object): anychart.core.ui.Separator;
         margin(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.core.ui.Separator;
         orientation(): string;
         orientation(orientation?: string): anychart.core.ui.Separator;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         stroke(): anychart.graphics.vector.Stroke;
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.ui.Separator;
         stroke(settings?: Object): anychart.core.grids.Radar;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.ui.Separator;
         zIndex(): number;
@@ -23238,6 +23720,12 @@ declare namespace anychart.core.ui {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.ui.Separator;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.ui.Separator;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Title extends anychart.core.Text {
         adjustFontSize(): number;
@@ -23275,8 +23763,6 @@ declare namespace anychart.core.ui {
         letterSpacing(spacing?: string | number): anychart.core.ui.Title;
         lineHeight(): string | number;
         lineHeight(height?: string | number): anychart.core.ui.Title;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         margin(): anychart.core.utils.Margin;
         margin(allValues?: string | number | Array<number|string> | Object): anychart.core.ui.Title;
         margin(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.core.ui.Title;
@@ -23289,8 +23775,6 @@ declare namespace anychart.core.ui {
         padding(): anychart.core.utils.Padding;
         padding(paddinge?: string | number | Array<number|string> | Object): anychart.core.ui.Title;
         padding(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.core.ui.Title;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rotation(): number;
         rotation(rotation?: number): anychart.core.ui.Title;
         selectable(): boolean;
@@ -23307,8 +23791,6 @@ declare namespace anychart.core.ui {
         textSettings(name?: string): string | number | boolean;
         textSettings(objectWithSettings?: Object): anychart.core.ui.Title;
         textSettings(name?: string, settings?: string | number | boolean | (() => void)): anychart.core.ui.Title;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         useHtml(): boolean;
         useHtml(enabled?: boolean): anychart.core.ui.Title;
         vAlign(): anychart.graphics.vector.Text.VAlign | string;
@@ -23326,6 +23808,12 @@ declare namespace anychart.core.ui {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.ui.Title;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.ui.Title;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Paginator extends anychart.core.Text {
         background(): anychart.core.ui.Background;
@@ -23361,8 +23849,6 @@ declare namespace anychart.core.ui {
         letterSpacing(spacing?: string | number): anychart.core.ui.Paginator;
         lineHeight(): string | number;
         lineHeight(height?: string | number): anychart.core.ui.Paginator;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         margin(): anychart.core.utils.Margin;
         margin(margin?: Array<number|string> | Object): anychart.core.ui.Paginator;
         margin(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.core.ui.Paginator;
@@ -23371,8 +23857,6 @@ declare namespace anychart.core.ui {
         padding(): anychart.core.utils.Padding;
         padding(padding?: Array<number|string> | Object | number | string): anychart.core.ui.Paginator;
         padding(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.core.ui.Paginator;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         selectable(): boolean;
         selectable(enabled?: boolean): anychart.core.ui.Paginator;
         textDirection(): anychart.graphics.vector.Text.Direction | string;
@@ -23385,8 +23869,6 @@ declare namespace anychart.core.ui {
         textSettings(name?: string): string | number | boolean;
         textSettings(objectWithSettings?: Object): anychart.core.ui.Paginator;
         textSettings(name?: string, settings?: string | number | boolean | (() => void)): anychart.core.ui.Paginator;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         useHtml(): boolean;
         useHtml(enabled?: boolean): anychart.core.ui.Paginator;
         vAlign(): anychart.graphics.vector.Text.VAlign | string;
@@ -23402,6 +23884,12 @@ declare namespace anychart.core.ui {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.ui.Paginator;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.ui.Paginator;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface ChartScroller extends anychart.core.ui.Scroller {
         allowRangeChange(): boolean;
@@ -23420,8 +23908,6 @@ declare namespace anychart.core.ui {
         height(height?: number | string): anychart.core.ui.ChartScroller;
         inverted(): boolean;
         inverted(enabled?: boolean): anychart.core.ui.ChartScroller;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.ui.ChartScroller;
         minHeight(): number | string;
@@ -23433,8 +23919,6 @@ declare namespace anychart.core.ui {
         outlineStroke(settings?: Object): anychart.core.ui.ChartScroller;
         position(): string;
         position(position?: string): anychart.core.ui.ChartScroller;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         selectedFill(): anychart.graphics.vector.Fill;
         selectedFill(color: anychart.graphics.vector.Fill | Array<anychart.graphics.vector.GradientKey|string>): anychart.core.ui.ChartScroller;
         selectedFill(color: string, opacity?: number): anychart.core.ui.ChartScroller;
@@ -23443,8 +23927,6 @@ declare namespace anychart.core.ui {
         selectedFill(imageSettings: anychart.graphics.vector.Fill): anychart.core.ui.ChartScroller;
         thumbs(): anychart.core.ui.Scroller.Thumbs;
         thumbs(settings?: boolean | Object): anychart.core.ui.ChartScroller;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.ui.ChartScroller;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
@@ -23452,6 +23934,12 @@ declare namespace anychart.core.ui {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.ui.ChartScroller;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.ui.ChartScroller;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface ScrollBar extends anychart.core.VisualBaseWithBounds {
         backgroundFill(): anychart.graphics.vector.Fill | string;
@@ -23480,8 +23968,6 @@ declare namespace anychart.core.ui {
         height(height?: number | string): anychart.core.ui.ScrollBar;
         left(): number | string;
         left(left?: number | string): anychart.core.ui.ScrollBar;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.core.ui.ScrollBar;
         maxWidth(): number | string;
@@ -23494,8 +23980,6 @@ declare namespace anychart.core.ui {
         mouseOutOpacity(opacity?: number): anychart.core.ui.ScrollBar;
         mouseOverOpacity(): number;
         mouseOverOpacity(opacity?: number): anychart.core.ui.ScrollBar;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.ui.ScrollBar;
         sliderFill(): anychart.graphics.vector.Fill | string;
@@ -23508,8 +23992,6 @@ declare namespace anychart.core.ui {
         sliderStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.ui.ScrollBar;
         top(): number | string;
         top(top?: number | string): anychart.core.ui.ScrollBar;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.core.ui.ScrollBar;
         zIndex(): number;
@@ -23519,6 +24001,12 @@ declare namespace anychart.core.ui {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.ui.ScrollBar;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.ui.ScrollBar;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface CircularLabelsFactory extends anychart.core.ui.LabelsFactory {
         adjustFontSize(): Object;
@@ -23568,8 +24056,6 @@ declare namespace anychart.core.ui {
         letterSpacing(spacing?: string | number): anychart.core.ui.CircularLabelsFactory;
         lineHeight(): string | number;
         lineHeight(height?: string | number): anychart.core.ui.CircularLabelsFactory;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxFontSize(): number;
         maxFontSize(size?: number | string): anychart.core.ui.CircularLabelsFactory;
         minFontSize(): number;
@@ -23585,8 +24071,6 @@ declare namespace anychart.core.ui {
         position(position?: string): anychart.core.ui.CircularLabelsFactory;
         positionFormatter(): (() => void);
         positionFormatter(formatter?: (() => void)): anychart.core.ui.CircularLabelsFactory;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rotation(): number;
         rotation(angle?: number): anychart.core.ui.CircularLabelsFactory;
         selectable(): boolean;
@@ -23597,8 +24081,6 @@ declare namespace anychart.core.ui {
         textIndent(indent?: number): anychart.core.ui.CircularLabelsFactory;
         textOverflow(): anychart.graphics.vector.Text.TextOverflow | string;
         textOverflow(value?: anychart.graphics.vector.Text.TextOverflow | string): anychart.core.ui.CircularLabelsFactory;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         useHtml(): boolean;
         useHtml(enabled?: boolean): anychart.core.ui.CircularLabelsFactory;
         vAlign(): anychart.graphics.vector.Text.VAlign | string;
@@ -23620,6 +24102,12 @@ declare namespace anychart.core.ui {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.ui.CircularLabelsFactory;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.ui.CircularLabelsFactory;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     module CircularLabelsFactory {
     interface Label extends anychart.core.ui.LabelsFactory.Label {
@@ -23661,8 +24149,6 @@ declare namespace anychart.core.ui {
         letterSpacing(spacing?: string | number): anychart.core.ui.CircularLabelsFactory.Label;
         lineHeight(): string | number;
         lineHeight(height?: string | number): anychart.core.ui.CircularLabelsFactory.Label;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxFontSize(): number;
         maxFontSize(size?: number | string): anychart.core.ui.CircularLabelsFactory.Label;
         minFontSize(): number;
@@ -23678,8 +24164,6 @@ declare namespace anychart.core.ui {
         position(position?: string): anychart.core.ui.CircularLabelsFactory.Label;
         positionFormatter(): any;
         positionFormatter(formatter?: any): any;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rotation(): number;
         rotation(angle?: number): anychart.core.ui.CircularLabelsFactory.Label;
         selectable(): boolean;
@@ -23694,8 +24178,6 @@ declare namespace anychart.core.ui {
         textSettings(name?: string): string | number | boolean;
         textSettings(objectWithSettings?: Object): anychart.core.ui.CircularLabelsFactory.Label;
         textSettings(name?: string, settings?: string | number | boolean | (() => void)): anychart.core.ui.CircularLabelsFactory.Label;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         useHtml(): boolean;
         useHtml(enabled?: boolean): anychart.core.ui.CircularLabelsFactory.Label;
         vAlign(): anychart.graphics.vector.Text.VAlign | string;
@@ -23717,6 +24199,12 @@ declare namespace anychart.core.ui {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.ui.CircularLabelsFactory.Label;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.ui.CircularLabelsFactory.Label;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     }
     interface Crosshair extends anychart.core.VisualBase {
@@ -23724,12 +24212,6 @@ declare namespace anychart.core.ui {
         displayMode(mode?: string): anychart.core.ui.Crosshair;
         enabled(): boolean;
         enabled(enabled?: boolean): anychart.core.ui.Crosshair;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         xLabel(index?: number): anychart.core.ui.CrosshairLabel;
         xLabel(settings?: Object | boolean): anychart.core.ui.Crosshair;
         xLabel(index?: number, settings?: Object | boolean): anychart.core.ui.Crosshair;
@@ -23747,6 +24229,12 @@ declare namespace anychart.core.ui {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.ui.Crosshair;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.ui.Crosshair;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Table extends anychart.core.VisualBaseWithBounds {
         border(): anychart.core.ui.table.Border;
@@ -23944,14 +24432,10 @@ declare namespace anychart.core.ui {
         letterSpacing(spacing?: string | number): anychart.core.ui.LegendItem;
         lineHeight(): string | number;
         lineHeight(height?: string | number): anychart.core.ui.LegendItem;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(value?: number | string): anychart.core.ui.LegendItem;
         maxWidth(): number | string;
         maxWidth(value?: number | string): anychart.core.ui.LegendItem;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         selectable(): boolean;
         selectable(enabled?: boolean): anychart.core.ui.LegendItem;
         text(value?: string): string | anychart.core.ui.LegendItem;
@@ -23965,8 +24449,6 @@ declare namespace anychart.core.ui {
         textSettings(name?: string): string | number | boolean;
         textSettings(objectWithSettings?: Object): anychart.core.ui.LegendItem;
         textSettings(name?: string, settings?: string | number | boolean | (() => void)): anychart.core.ui.LegendItem;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         useHtml(): boolean;
         useHtml(enabled?: boolean): anychart.core.ui.LegendItem;
         vAlign(): anychart.graphics.vector.Text.VAlign | string;
@@ -23984,6 +24466,12 @@ declare namespace anychart.core.ui {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.ui.LegendItem;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.ui.LegendItem;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Callout extends anychart.core.VisualBase {
         align(): string;
@@ -24020,12 +24508,12 @@ declare namespace anychart.core.ui {
         zIndex(zIndex?: number): anychart.core.ui.Callout;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.ui.Callout;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.ui.Callout;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.ui.Callout;
         print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
@@ -24076,8 +24564,6 @@ declare namespace anychart.core.ui {
         letterSpacing(spacing?: string | number): anychart.core.ui.LabelsFactory;
         lineHeight(): string | number;
         lineHeight(height?: string | number): anychart.core.ui.LabelsFactory;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxFontSize(): number;
         maxFontSize(size?: number | string): anychart.core.ui.LabelsFactory;
         minFontSize(): number;
@@ -24093,8 +24579,6 @@ declare namespace anychart.core.ui {
         position(position?: string): anychart.core.ui.LabelsFactory;
         positionFormatter(): (() => void);
         positionFormatter(formatter?: (() => void)): anychart.core.ui.LabelsFactory;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rotation(): number;
         rotation(angle?: number): anychart.core.ui.LabelsFactory;
         selectable(): boolean;
@@ -24105,8 +24589,6 @@ declare namespace anychart.core.ui {
         textIndent(indent?: number): anychart.core.ui.LabelsFactory;
         textOverflow(): anychart.graphics.vector.Text.TextOverflow | string;
         textOverflow(value?: anychart.graphics.vector.Text.TextOverflow | string): anychart.core.ui.LabelsFactory;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         useHtml(): boolean;
         useHtml(enabled?: boolean): anychart.core.ui.LabelsFactory;
         vAlign(): anychart.graphics.vector.Text.VAlign | string;
@@ -24128,6 +24610,12 @@ declare namespace anychart.core.ui {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.ui.LabelsFactory;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.ui.LabelsFactory;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     module LabelsFactory {
     interface Label extends anychart.core.Text {
@@ -24170,8 +24658,6 @@ declare namespace anychart.core.ui {
         letterSpacing(spacing?: string | number): anychart.core.ui.LabelsFactory.Label;
         lineHeight(): string | number;
         lineHeight(height?: string | number): anychart.core.ui.LabelsFactory.Label;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxFontSize(): number;
         maxFontSize(size?: number | string): anychart.core.ui.LabelsFactory.Label;
         measureWithText(text: string): anychart.math.Rect;
@@ -24188,8 +24674,6 @@ declare namespace anychart.core.ui {
         position(position?: string): anychart.core.ui.LabelsFactory.Label;
         positionFormatter(): any;
         positionFormatter(formatter?: any): any;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rotation(): number;
         rotation(angle?: number): anychart.core.ui.LabelsFactory.Label;
         selectable(): boolean;
@@ -24204,8 +24688,6 @@ declare namespace anychart.core.ui {
         textSettings(name?: string): string | number | boolean;
         textSettings(objectWithSettings?: Object): anychart.core.ui.LabelsFactory.Label;
         textSettings(name?: string, settings?: string | number | boolean | (() => void)): anychart.core.ui.LabelsFactory.Label;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         useHtml(): boolean;
         useHtml(enabled?: boolean): anychart.core.ui.LabelsFactory.Label;
         vAlign(): anychart.graphics.vector.Text.VAlign | string;
@@ -24223,6 +24705,12 @@ declare namespace anychart.core.ui {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.ui.LabelsFactory.Label;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.ui.LabelsFactory.Label;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     }
     interface ChartCredits extends anychart.core.Base {
@@ -24232,17 +24720,17 @@ declare namespace anychart.core.ui {
         enabled(enabled?: boolean): anychart.core.ui.ChartCredits;
         imgAlt(): string;
         imgAlt(text?: string): anychart.core.ui.ChartCredits;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         logoSrc(): string;
         logoSrc(logoSrc?: string): anychart.core.ui.ChartCredits;
-        removeAllListeners(type?: string): number;
         text(): string;
         text(text?: string): anychart.core.ui.ChartCredits;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         url(): string;
         url(url?: string): anychart.core.ui.ChartCredits;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
 }
 
@@ -24567,10 +25055,6 @@ declare namespace anychart.core.utils {
         letterSpacing(spacing?: string | number): anychart.core.utils.LegendItemSettings;
         lineHeight(): string | number;
         lineHeight(height?: string | number): anychart.core.utils.LegendItemSettings;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         selectable(): boolean;
         selectable(enabled?: boolean): anychart.core.utils.LegendItemSettings;
         text(): string;
@@ -24585,8 +25069,6 @@ declare namespace anychart.core.utils {
         textSettings(name?: string): string | number | boolean;
         textSettings(objectWithSettings?: Object): anychart.core.utils.LegendItemSettings;
         textSettings(name?: string, settings?: string | number | boolean | (() => void)): anychart.core.utils.LegendItemSettings;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         useHtml(): boolean;
         useHtml(enabled?: boolean): anychart.core.utils.LegendItemSettings;
         vAlign(): anychart.graphics.vector.Text.VAlign | string;
@@ -24602,6 +25084,12 @@ declare namespace anychart.core.utils {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.utils.LegendItemSettings;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.utils.LegendItemSettings;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface UnboundRegionsSettings {
         enabled(): boolean;
@@ -24617,15 +25105,10 @@ declare namespace anychart.core.utils {
         stroke(settings?: Object): anychart.core.utils.UnboundRegionsSettings;
     }
     interface StockInteractivity extends anychart.core.utils.Interactivity {
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         multiSelectOnClick(): boolean;
         multiSelectOnClick(enabled?: boolean): anychart.core.utils.StockInteractivity;
-        removeAllListeners(type?: string): number;
         scrollOnMouseWheel(): boolean;
         scrollOnMouseWheel(enabled?: boolean): anychart.core.utils.StockInteractivity;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselectOnClickOutOfPoint(): boolean;
         unselectOnClickOutOfPoint(enabled?: boolean): anychart.core.utils.StockInteractivity;
         zoomOnMouseWheel(): boolean;
@@ -24637,6 +25120,11 @@ declare namespace anychart.core.utils {
         selectionMode(mode?: string): anychart.core.utils.StockInteractivity;
         spotRadius(): number;
         spotRadius(radius?: number): anychart.core.utils.StockInteractivity;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Exports {
         facebook(): Object;
@@ -24656,14 +25144,14 @@ declare namespace anychart.core.utils {
         bottom(bottom?: number | string): anychart.core.utils.Margin;
         left(): number | string;
         left(left?: number | string): anychart.core.utils.Margin;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.utils.Margin;
         set(value1?: string | number | Array<number|string> | Object, value2?: string | number, value3?: string | number, value4?: string | number): anychart.core.utils.Margin;
         top(): number | string;
         top(top?: number | string): anychart.core.utils.Margin;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
     }
@@ -24677,34 +25165,29 @@ declare namespace anychart.core.utils {
         hoverMode(mode?: string): anychart.core.utils.MapInteractivity;
         keyboardZoomAndMove(): boolean;
         keyboardZoomAndMove(enabled?: boolean): anychart.core.utils.MapInteractivity;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         mouseWheel(): boolean;
         mouseWheel(value?: boolean): anychart.core.utils.MapInteractivity;
         multiSelectOnClick(): boolean;
         multiSelectOnClick(enabled?: boolean): anychart.core.utils.MapInteractivity;
-        removeAllListeners(type?: string): number;
         selectionMode(): string;
         selectionMode(mode?: string): anychart.core.utils.MapInteractivity;
         spotRadius(): number;
         spotRadius(radius?: number): anychart.core.utils.MapInteractivity;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselectOnClickOutOfPoint(): boolean;
         unselectOnClickOutOfPoint(enabled?: boolean): anychart.core.utils.MapInteractivity;
         zoomOnDoubleClick(): boolean;
         zoomOnDoubleClick(enabled?: boolean): anychart.core.utils.MapInteractivity;
         zoomOnMouseWheel(): boolean;
         zoomOnMouseWheel(enabled?: boolean): anychart.core.utils.MapInteractivity;
-    }
-    interface Error extends anychart.core.Base {
         listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        mode(): string;
-        mode(mode?: string): anychart.core.utils.Error;
         removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
+    }
+    interface Error extends anychart.core.Base {
+        mode(): string;
+        mode(mode?: string): anychart.core.utils.Error;
         valueError(): string | number;
         valueError(valueError?: string | number): anychart.core.utils.Error;
         valueErrorStroke(): anychart.graphics.vector.Stroke;
@@ -24727,6 +25210,11 @@ declare namespace anychart.core.utils {
         xLowerError(xLowerError?: string | number): anychart.core.utils.Error;
         xUpperError(): string | number;
         xUpperError(xUpperError?: string | number): anychart.core.utils.Error;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface QuarterSettings extends anychart.core.Base {
         leftBottom(): anychart.core.utils.Quarter;
@@ -24757,19 +25245,19 @@ declare namespace anychart.core.utils {
         allowMultiSeriesSelection(value?: boolean): anychart.core.utils.Interactivity | boolean;
         hoverMode(): string;
         hoverMode(mode?: string): anychart.core.utils.Interactivity;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         multiSelectOnClick(): boolean;
         multiSelectOnClick(enabled?: boolean): anychart.core.utils.Interactivity;
-        removeAllListeners(type?: string): number;
         selectionMode(): string;
         selectionMode(mode?: string): anychart.core.utils.Interactivity;
         spotRadius(): number;
         spotRadius(radius?: number): anychart.core.utils.Interactivity;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselectOnClickOutOfPoint(): boolean;
         unselectOnClickOutOfPoint(enabled?: boolean): anychart.core.utils.Interactivity;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface A11y extends anychart.core.Base {
         listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
@@ -24836,8 +25324,6 @@ declare namespace anychart.core.utils {
         leftStroke(): anychart.graphics.vector.Stroke;
         leftStroke(color: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string | Object): anychart.core.utils.Quarter;
         leftStroke(color: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.utils.Quarter;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         margin(): anychart.core.utils.Margin;
         margin(margin?: Array<number|string> | Object): anychart.core.utils.Quarter;
         margin(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.core.utils.Quarter;
@@ -24871,15 +25357,17 @@ declare namespace anychart.core.utils {
         width(width?: number | string): anychart.core.utils.Quarter;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.utils.Quarter;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.utils.Quarter;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.utils.Quarter;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.utils.Quarter;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Crossing extends anychart.core.Base {
         stroke(): anychart.graphics.vector.Stroke;
@@ -24929,14 +25417,14 @@ declare namespace anychart.core.utils {
         bottom(bottom?: number | string): anychart.core.utils.Padding;
         left(): number | string;
         left(left?: number | string): anychart.core.utils.Padding;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.core.utils.Padding;
         set(value1?: string | number | Array<number|string> | Object, value2?: string | number, value3?: string | number, value4?: string | number): anychart.core.utils.Padding;
         top(): number | string;
         top(top?: number | string): anychart.core.utils.Padding;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
     }
@@ -24990,13 +25478,10 @@ declare namespace anychart.core.venn {
         hovered(settings?: Object): anychart.core.venn.Intersections;
         labels(): anychart.core.ui.LabelsFactory;
         labels(settings?: Object | boolean): anychart.core.venn.Intersections;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.venn.Intersections;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.core.venn.Intersections;
-        removeAllListeners(type?: string): number;
         selected(): anychart.core.StateSettings;
         selected(settings?: Object): anychart.core.venn.Intersections;
         stroke(): anychart.graphics.vector.Stroke | (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill);
@@ -25005,6 +25490,9 @@ declare namespace anychart.core.venn {
         stroke(settings?: Object): anychart.core.venn.Intersections;
         tooltip(): anychart.core.ui.Tooltip;
         tooltip(settings?: Object | boolean): anychart.core.venn.Intersections;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
     }
@@ -25074,8 +25562,6 @@ declare namespace anychart.core.waterfall.series {
         left(left?: number | string): anychart.core.waterfall.series.Waterfall;
         legendItem(): anychart.core.utils.LegendItemSettings;
         legendItem(value?: Object): anychart.core.waterfall.series.Waterfall;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         markers(): anychart.core.ui.MarkersFactory;
         markers(settings?: Object | boolean | string): anychart.core.waterfall.series.Waterfall;
         maxHeight(): number | string;
@@ -25103,8 +25589,6 @@ declare namespace anychart.core.waterfall.series {
         normal(settings?: Object): anychart.core.waterfall.series.Waterfall;
         pointWidth(): string | number;
         pointWidth(width?: number | string): anychart.core.waterfall.series.Waterfall;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rendering(): anychart.core.series.RenderingSettings;
         rendering(settings?: Object | (() => void)): anychart.core.waterfall.series.Waterfall;
         right(): number | string;
@@ -25131,8 +25615,6 @@ declare namespace anychart.core.waterfall.series {
         transformX(value: any, subRangeRatio?: number): number;
         transformY(value: any, subRangeRatio?: number): number;
         unhover(indexOrIndexes?: number | Array<number>): anychart.core.waterfall.series.Waterfall;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         unselect(): anychart.core.waterfall.series.Waterfall;
         unselect(index?: number): anychart.core.waterfall.series.Waterfall;
         unselect(indexes?: Array<number>): anychart.core.waterfall.series.Waterfall;
@@ -25148,11 +25630,38 @@ declare namespace anychart.core.waterfall.series {
         zIndex(zIndex?: number): anychart.core.waterfall.series.Waterfall;
         error(): anychart.core.utils.Error;
         error(settings?: Object | boolean | string | number): anychart.core.waterfall.series.Waterfall;
+        xMode(): string;
+        xMode(xMode?: string): anychart.core.waterfall.series.Waterfall;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.waterfall.series.Waterfall;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.core.waterfall.series.Waterfall;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.core.waterfall.series.Waterfall;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
+    }
+}
+
+declare namespace anychart.core.wordtree {
+    interface Connectors extends anychart.core.Base {
+        curveFactor(): number;
+        curveFactor(padding?: number): anychart.core.wordtree.Connectors;
+        length(): string;
+        length(length?: number | string): anychart.core.wordtree.Connectors;
+        offset(): number;
+        offset(offset?: number): anychart.core.wordtree.Connectors;
+        stroke(): anychart.graphics.vector.Stroke;
+        stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.wordtree.Connectors;
+        stroke(settings?: Object): anychart.core.wordtree.Connectors;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
 }
 
@@ -25167,7 +25676,7 @@ declare namespace anychart.data {
     function parseText(text: string, settings?: string | anychart.data.TextParsingSettings): Array<Array<string|number>>;
     function set(data?: Array<any> | string, csvSettings?: string | anychart.data.TextParsingSettings): anychart.data.Set;
     function table(keyColumnIndex?: number | string, dateTimePattern?: string, timeOffset?: number, baseDate?: number | Date, locale?: string | anychart.format.Locale): anychart.data.Table;
-    function tree(data?: Array<Object> | string, fillMethodOrCsvMapping?: string | Object, csvSettings?: Object, fieldsMapping?: Object): anychart.data.Tree;
+    function tree(data?: Array<Object> | string, fillMethodOrCsvMapping?: string | Object, csvSettings?: string | anychart.data.TextParsingSettings, fieldsMapping?: Object): anychart.data.Tree;
     type TextParsingSettings = {
         columnsSeparator?: string;
         cutLength?: number;
@@ -25271,16 +25780,16 @@ declare namespace anychart.data {
         getIterator(): anychart.data.Iterator;
         getMapping(): {[prop:string]:Array<number|string>};
         getRowsCount(): number;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         meta(index: number, name: string): any;
         meta(index: number, name: string, value?: any): anychart.data.Mapping;
-        removeAllListeners(type?: string): number;
         row(rowIndex: number): any;
         row(rowIndex: number, value?: any): any;
         set(rowIndex: number, fieldName: string, value: any): anychart.data.Mapping;
         sort(fieldName: string, comparator?: ((value1:any,value2:any)=>number)): anychart.data.Mapping;
         sort(fieldName: string, order?: string): anychart.data.Mapping;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
     }
@@ -25340,7 +25849,7 @@ declare namespace anychart.data {
         meta(index: number, name: string, value?: any): anychart.data.View;
         removeAllListeners(type?: string): number;
         row(rowIndex: number): any;
-        row(rowIndex: number, value?: any): any;
+        row(rowIndex: number, row?: any): any;
         set(rowIndex: number, fieldName: string, value: any): anychart.data.View;
         sort(fieldName: string, comparator?: ((value1:any,value2:any)=>number)): anychart.data.View;
         sort(fieldName: string, order?: string): anychart.data.View;
@@ -25359,7 +25868,7 @@ declare namespace anychart.data {
         remove(index: number): anychart.data.Set;
         removeAllListeners(type?: string): number;
         row(rowIndex: number): any;
-        row(rowIndex: number, value?: any): any;
+        row(rowIndex: number, row?: any): any;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
     }
@@ -25404,7 +25913,7 @@ declare namespace anychart.data {
         unlistenByKey(key: Object): boolean;
     }
     interface Table extends anychart.core.Base {
-        addData(rawData: Array<any> | string, removeFromStart?: boolean | number, csvSettings?: Object): anychart.data.Table;
+        addData(rawData: Array<any> | string, removeFromStart?: boolean | number, csvSettings?: string | anychart.data.TextParsingSettings): anychart.data.Table;
         createComputer(mappingSettingsOrMapping?: anychart.data.TableMapping | {[prop:string]:{column:number|string,type:string|string,weights:number|string}|number|string}): anychart.data.TableComputer;
         listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
@@ -27777,10 +28286,10 @@ declare namespace anychart.scales {
         interval(isoDate?: string): anychart.scales.DateTimeTicks;
         interval(unit?: string, count?: number): anychart.scales.DateTimeTicks;
         interval(years?: number, months?: number, days?: number, hours?: number, minutes?: number, seconds?: number): anychart.scales.DateTimeTicks;
+        set(ticks: Array<any>): anychart.scales.DateTimeTicks;
         listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         removeAllListeners(type?: string): number;
-        set(ticks: Array<any>): anychart.scales.DateTimeTicks;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
     }
@@ -27788,15 +28297,15 @@ declare namespace anychart.scales {
         availabilities(): Array<anychart.scales.Calendar.Availability>;
         availabilities(availabilities?: Array<anychart.scales.Calendar.Availability>): anychart.scales.Calendar;
         getWorkingSchedule(startDate: number, endDate: number, unit?: string, count?: number): Array<anychart.scales.Calendar.ScheduleItem>;
+        timezoneOffset(): Array<number>;
+        timezoneOffset(var_offset: number): anychart.scales.Calendar;
+        weekendRange(): Array<number>;
+        weekendRange(var_range: Array<number>): anychart.scales.Calendar;
         listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         removeAllListeners(type?: string): number;
-        timezoneOffset(): Array<number>;
-        timezoneOffset(var_offset: number): anychart.scales.Calendar;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
-        weekendRange(): Array<number>;
-        weekendRange(var_range: Array<number>): anychart.scales.Calendar;
     }
     namespace Calendar {
     type Availability = {
@@ -27829,8 +28338,6 @@ declare namespace anychart.scales {
         inverseTransform(ratio: number): any;
         inverted(): boolean;
         inverted(enabled?: boolean): anychart.scales.Linear;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxTicksCount(): number;
         maxTicksCount(count?: number): anychart.scales.Linear;
         maximum(): number;
@@ -27843,7 +28350,6 @@ declare namespace anychart.scales {
         minimumGap(gap?: number): anychart.scales.Linear;
         minorTicks(): anychart.scales.ScatterTicks;
         minorTicks(settings?: Object | Array<any>): anychart.scales.Linear;
-        removeAllListeners(type?: string): number;
         softMaximum(): number;
         softMaximum(maximum?: number): anychart.scales.Linear;
         softMinimum(): number;
@@ -27858,6 +28364,9 @@ declare namespace anychart.scales {
         ticks(): anychart.scales.ScatterTicks;
         ticks(settings?: Object | Array<any>): anychart.scales.Linear;
         transform(value: any): number;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
     }
@@ -27866,8 +28375,6 @@ declare namespace anychart.scales {
         gap(): number;
         gap(gap?: number): anychart.scales.Geo;
         getType(): string;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxTicksCount(): number;
         maxTicksCount(count?: number): anychart.scales.Geo;
         maximumX(): number;
@@ -27881,9 +28388,6 @@ declare namespace anychart.scales {
         precision(): Array<number>;
         precision(precision?: Array<number>): anychart.scales.Geo;
         precision(xPrecision?: number, yPrecision?: number): anychart.scales.Geo;
-        removeAllListeners(type?: string): number;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         xMinorTicks(): anychart.scales.GeoTicks;
         xMinorTicks(settings?: Object | Array<any>): anychart.scales.Geo;
         xTicks(): anychart.scales.GeoTicks;
@@ -27892,6 +28396,11 @@ declare namespace anychart.scales {
         yMinorTicks(settings?: Object | Array<any>): anychart.scales.Geo;
         yTicks(): anychart.scales.GeoTicks;
         yTicks(settings?: Object | Array<any>): anychart.scales.Geo;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface ScatterTicks extends anychart.core.Base {
         allowFractional(): boolean;
@@ -27904,12 +28413,12 @@ declare namespace anychart.scales {
         get(): Array<any>;
         interval(): number;
         interval(value?: number): anychart.scales.ScatterTicks;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         mode(): string;
         mode(mode?: string): anychart.scales.ScatterTicks;
-        removeAllListeners(type?: string): number;
         set(ticks: Array<any>): anychart.scales.ScatterTicks;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
     }
@@ -27918,10 +28427,10 @@ declare namespace anychart.scales {
         getType(): string;
         inverted(): boolean;
         inverted(enabled?: boolean): anychart.scales.Base;
+        startAutoCalc(): anychart.scales.Base;
         listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         removeAllListeners(type?: string): number;
-        startAutoCalc(): anychart.scales.Base;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
     }
@@ -27932,21 +28441,23 @@ declare namespace anychart.scales {
         inverseTransform(ratio: number): any;
         inverted(): boolean;
         inverted(enabled?: boolean): anychart.scales.Ordinal;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        mode(): string;
+        mode(mode?: string): anychart.scales.Ordinal;
         names(): Array<any>;
         names(names?: Array<any> | string): anychart.scales.Ordinal;
-        removeAllListeners(type?: string): number;
         startAutoCalc(): anychart.scales.Ordinal;
         ticks(): anychart.scales.OrdinalTicks;
         ticks(ticks?: Object | Array<any>): anychart.scales.Ordinal;
         transform(value: any, subRangeRatio?: number): number;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         values(): Array<number|string>;
         values(values?: Array<any> | any, ...var_args: (any)[]): anychart.scales.Ordinal;
         weights(): Array<number>;
         weights(weights?: Array<number>): anychart.scales.Ordinal;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface OrdinalColor extends anychart.scales.Base {
         colorToValue(color: string): number;
@@ -27960,20 +28471,20 @@ declare namespace anychart.scales {
         inverseTransform(ratio: number): any;
         inverted(): boolean;
         inverted(enabled?: boolean): anychart.scales.OrdinalColor;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         names(): Array<any>;
         names(names?: Array<any> | string): anychart.scales.OrdinalColor;
         ranges(): Array<Object>;
         ranges(ranges?: Array<Object>): anychart.scales.OrdinalColor;
-        removeAllListeners(type?: string): number;
         startAutoCalc(): anychart.scales.OrdinalColor;
         ticks(): anychart.scales.OrdinalTicks;
         ticks(ticks?: Object | Array<any>): anychart.scales.OrdinalColor;
         transform(value: any, subRangeRatio?: number): number;
+        valueToColor(value: number): string;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
-        valueToColor(value: number): string;
     }
     interface StockScatterDateTime extends anychart.core.Base {
         getFullMaximum(): number;
@@ -27983,18 +28494,18 @@ declare namespace anychart.scales {
         getMaximum(): number;
         getMinimum(): number;
         inverseTransform(ratio: number): number;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maximumGap(): anychart.scales.StockScatterDateTime.GapConfig;
         maximumGap(maxGap?: anychart.scales.StockScatterDateTime.GapConfig): anychart.scales.StockScatterDateTime;
         minimumGap(): anychart.scales.StockScatterDateTime.GapConfig;
         minimumGap(minGap?: anychart.scales.StockScatterDateTime.GapConfig): anychart.scales.StockScatterDateTime;
-        removeAllListeners(type?: string): number;
         ticks(): anychart.scales.StockScatterDateTime.TicksSettings;
         ticks(ticks?: anychart.scales.StockScatterDateTime.TicksSettings): anychart.scales.StockScatterDateTime;
         ticksCount(): number;
         ticksCount(count?: number): anychart.scales.StockScatterDateTime;
         transform(value: number | string | Date): number;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
     }
@@ -28019,8 +28530,6 @@ declare namespace anychart.scales {
         inverseTransform(ratio: number): any;
         inverted(): boolean;
         inverted(enabled?: boolean): anychart.scales.DateTime;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxTicksCount(): number;
         maxTicksCount(count?: number): anychart.scales.DateTime;
         maximum(): number;
@@ -28033,7 +28542,6 @@ declare namespace anychart.scales {
         minimumGap(gap?: number): anychart.scales.DateTime;
         minorTicks(): anychart.scales.DateTimeTicks;
         minorTicks(settings?: Object | Array<any>): anychart.scales.DateTime;
-        removeAllListeners(type?: string): number;
         softMaximum(): number;
         softMaximum(maximum?: number): anychart.scales.DateTime;
         softMinimum(): number;
@@ -28042,6 +28550,9 @@ declare namespace anychart.scales {
         ticks(): anychart.scales.DateTimeTicks;
         ticks(settings?: Object | Array<any>): anychart.scales.DateTime;
         transform(value: any): number;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
     }
@@ -28055,33 +28566,33 @@ declare namespace anychart.scales {
         inverseTransform(ratio: number): any;
         inverted(): boolean;
         inverted(enabled?: boolean): anychart.scales.ScatterBase;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxTicksCount(): number;
         maxTicksCount(count?: number): anychart.scales.ScatterBase;
         maximum(): number;
         maximum(maximum?: number): anychart.scales.ScatterBase;
         minimum(): number;
         minimum(minimum?: number): anychart.scales.ScatterBase;
-        removeAllListeners(type?: string): number;
         startAutoCalc(): anychart.scales.ScatterBase;
         transform(value: any): number;
+        getType(): string;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
-        getType(): string;
     }
     interface OrdinalTicks extends anychart.core.Base {
         get(): Array<any>;
         interval(): number;
         interval(interval?: number): anychart.scales.OrdinalTicks;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxCount(): number;
         maxCount(count?: number): anychart.scales.OrdinalTicks;
         names(): Array<any>;
         names(names?: Array<any>): anychart.scales.OrdinalTicks;
-        removeAllListeners(type?: string): number;
         set(ticks: Array<any>): anychart.scales.OrdinalTicks;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
     }
@@ -28117,8 +28628,6 @@ declare namespace anychart.scales {
         getType(): string;
         inverted(): boolean;
         inverted(enabled?: boolean): anychart.scales.LinearColor;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxTicksCount(): number;
         maxTicksCount(count?: number): anychart.scales.LinearColor;
         maximum(): number;
@@ -28127,12 +28636,9 @@ declare namespace anychart.scales {
         minimum(minimum?: number): anychart.scales.LinearColor;
         minorTicks(): anychart.scales.ScatterTicks;
         minorTicks(ticks?: Object | Array<any>): anychart.scales.LinearColor;
-        removeAllListeners(type?: string): number;
         startAutoCalc(): anychart.scales.LinearColor;
         ticks(): anychart.scales.ScatterTicks;
         ticks(ticks?: Object | Array<any>): anychart.scales.LinearColor;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         valueToColor(value: number): string;
         alignMaximum(): boolean;
         alignMaximum(enabled?: boolean): anychart.scales.LinearColor;
@@ -28140,6 +28646,11 @@ declare namespace anychart.scales {
         alignMinimum(enabled?: boolean): anychart.scales.LinearColor;
         inverseTransform(ratio: number): any;
         transform(value: any): number;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Logarithmic extends anychart.scales.Linear {
         alignMaximum(): boolean;
@@ -28156,8 +28667,6 @@ declare namespace anychart.scales {
         inverseTransform(ratio: number): any;
         inverted(): boolean;
         inverted(enabled?: boolean): anychart.scales.Logarithmic;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         logBase(): number;
         logBase(baseValue?: number): anychart.scales.Logarithmic;
         maxTicksCount(): number;
@@ -28172,7 +28681,6 @@ declare namespace anychart.scales {
         minimumGap(gap?: number): anychart.scales.Logarithmic;
         minorTicks(): anychart.scales.ScatterTicks;
         minorTicks(settings?: Object | Array<any>): anychart.scales.Logarithmic;
-        removeAllListeners(type?: string): number;
         softMaximum(): number;
         softMaximum(maximum?: number): anychart.scales.Logarithmic;
         softMinimum(): number;
@@ -28187,6 +28695,9 @@ declare namespace anychart.scales {
         ticks(): anychart.scales.ScatterTicks;
         ticks(settings?: Object | Array<any>): anychart.scales.Logarithmic;
         transform(value: any): number;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
     }
@@ -28194,8 +28705,6 @@ declare namespace anychart.scales {
         getRange(): {[prop:string]:number};
         getTotalRange(): {[prop:string]:number};
         inverseTransform(ratio: number): number;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maximum(): number;
         maximum(maximum?: number): anychart.scales.GanttDateTime;
         maximumGap(): number;
@@ -28204,16 +28713,18 @@ declare namespace anychart.scales {
         minimum(minimum?: number): anychart.scales.GanttDateTime;
         minimumGap(): number;
         minimumGap(gap?: number): anychart.scales.GanttDateTime;
-        removeAllListeners(type?: string): number;
         softMaximum(): number;
         softMaximum(maximum?: number): anychart.scales.GanttDateTime;
         softMinimum(): number;
         softMinimum(minimum?: number): anychart.scales.GanttDateTime;
         transform(value: any): number;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         zoomLevels(): anychart.scales.GanttDateTime.ZoomLevelsSettings;
         zoomLevels(settings?: anychart.scales.GanttDateTime.ZoomLevelsSettings): anychart.scales.GanttDateTime;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     namespace GanttDateTime {
     type ZoomLevelsSettings = {
@@ -28233,8 +28744,6 @@ declare namespace anychart.scales {
         inverseTransform(ratio: number): any;
         inverted(): boolean;
         inverted(enabled?: boolean): anychart.scales.DateTimeWithCalendar;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxTicksCount(): number;
         maxTicksCount(count?: number): anychart.scales.DateTimeWithCalendar;
         maximum(): number;
@@ -28246,7 +28755,6 @@ declare namespace anychart.scales {
         minimumGap(): number;
         minimumGap(gap?: number): anychart.scales.DateTime;
         pixToDate(pix: number): number;
-        removeAllListeners(type?: string): number;
         skipHolidays(): boolean;
         skipHolidays(enabled?: boolean): anychart.scales.DateTimeWithCalendar;
         softMaximum(): number;
@@ -28261,12 +28769,15 @@ declare namespace anychart.scales {
         unit(interval?: string): anychart.scales.DateTimeWithCalendar;
         unitPixSize(): number | string;
         unitPixSize(size?: number | string): anychart.scales.DateTimeWithCalendar;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         alignMaximum(): boolean;
         alignMaximum(enabled?: boolean): anychart.scales.DateTimeWithCalendar;
         alignMinimum(): boolean;
         alignMinimum(enabled?: boolean): anychart.scales.DateTimeWithCalendar;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     namespace DateTimeWithCalendar {
     type Tick = {
@@ -29009,8 +29520,6 @@ declare namespace anychart.standalones {
         horizontalScrollBar(settings?: Object): anychart.standalones.DataGrid;
         left(): number | string;
         left(left?: number | string): anychart.standalones.DataGrid;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.standalones.DataGrid;
         maxWidth(): number | string;
@@ -29026,8 +29535,6 @@ declare namespace anychart.standalones {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object): anychart.standalones.DataGrid;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.standalones.DataGrid;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.standalones.DataGrid;
         rowEvenFill(): anychart.graphics.vector.Fill | string;
@@ -29069,8 +29576,6 @@ declare namespace anychart.standalones {
         tooltip(settings?: Object | boolean): anychart.standalones.DataGrid;
         top(): number | string;
         top(top?: number | string): anychart.standalones.DataGrid;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         verticalOffset(): number;
         verticalOffset(offset?: number): anychart.standalones.DataGrid;
         verticalScrollBar(): anychart.core.ui.ScrollBar;
@@ -29079,6 +29584,12 @@ declare namespace anychart.standalones {
         width(width?: number | string): anychart.standalones.DataGrid;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.standalones.DataGrid;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface MarkersFactory extends anychart.core.ui.MarkersFactory {
         add(positionProvider: any, index?: number): anychart.standalones.MarkersFactory;
@@ -29097,8 +29608,6 @@ declare namespace anychart.standalones {
         fill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.standalones.MarkersFactory;
         fill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.standalones.MarkersFactory;
         fill(imageSettings: anychart.graphics.vector.Fill): anychart.standalones.MarkersFactory;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         measure(positionProvider: any): anychart.math.Rect;
         offsetX(): number | string;
         offsetX(offset?: number | string): anychart.standalones.MarkersFactory;
@@ -29111,8 +29620,6 @@ declare namespace anychart.standalones {
         position(position?: string): anychart.standalones.MarkersFactory;
         positionFormatter(): (() => void);
         positionFormatter(formatter?: ((positionProvider:any,index:number)=>anychart.math.CoordinateObject)): anychart.standalones.MarkersFactory;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rotation(): number;
         rotation(rotation?: number): anychart.standalones.MarkersFactory;
         size(): number;
@@ -29123,10 +29630,14 @@ declare namespace anychart.standalones {
         stroke(settings?: Object): anychart.standalones.MarkersFactory;
         type(): string | (() => void);
         type(type?: string | (() => void)): anychart.standalones.MarkersFactory;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.standalones.MarkersFactory;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     module MarkersFactory {
     interface Marker extends anychart.core.ui.MarkersFactory.Marker {
@@ -29142,8 +29653,6 @@ declare namespace anychart.standalones {
         fill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.standalones.MarkersFactory.Marker;
         fill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.standalones.MarkersFactory.Marker;
         fill(imageSettings: anychart.graphics.vector.Fill): anychart.standalones.MarkersFactory.Marker;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         offsetX(): number | string;
         offsetX(offset?: number | string): anychart.standalones.MarkersFactory.Marker;
         offsetY(): number | string;
@@ -29152,8 +29661,6 @@ declare namespace anychart.standalones {
         position(position?: string): anychart.standalones.MarkersFactory.Marker;
         positionFormatter(): any;
         positionFormatter(formatter?: any): any;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rotation(): number;
         rotation(angle?: number): anychart.standalones.MarkersFactory.Marker;
         size(): number;
@@ -29164,8 +29671,6 @@ declare namespace anychart.standalones {
         stroke(settings?: Object): anychart.standalones.MarkersFactory.Marker;
         type(): string | (() => void);
         type(type?: string | (() => void)): anychart.standalones.MarkersFactory.Marker;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.standalones.MarkersFactory.Marker;
         parentBounds(): anychart.math.Rect;
@@ -29173,6 +29678,12 @@ declare namespace anychart.standalones {
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.standalones.MarkersFactory.Marker;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.standalones.MarkersFactory.Marker;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     }
     interface Scroller extends anychart.core.ui.Scroller {
@@ -29198,8 +29709,6 @@ declare namespace anychart.standalones {
         height(height?: number | string): anychart.standalones.Scroller;
         inverted(): boolean;
         inverted(enabled?: boolean): anychart.standalones.Scroller;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.standalones.Scroller;
         minHeight(): number | string;
@@ -29215,8 +29724,6 @@ declare namespace anychart.standalones {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object): anychart.standalones.Scroller;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.standalones.Scroller;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         selectedFill(): anychart.graphics.vector.Fill;
         selectedFill(color: anychart.graphics.vector.Fill | Array<anychart.graphics.vector.GradientKey|string>): anychart.standalones.Scroller;
         selectedFill(color: string, opacity?: number): anychart.standalones.Scroller;
@@ -29228,10 +29735,14 @@ declare namespace anychart.standalones {
         startRatio(value?: number): anychart.standalones.Scroller;
         thumbs(): anychart.core.ui.Scroller.Thumbs;
         thumbs(settings?: boolean | Object): anychart.standalones.Scroller;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.standalones.Scroller;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface ColorRange extends anychart.core.ui.ColorRange {
         align(): string;
@@ -29254,8 +29765,6 @@ declare namespace anychart.standalones {
         labels(settings?: Object | boolean): anychart.standalones.ColorRange;
         length(): number | string;
         length(length?: string | number): anychart.standalones.ColorRange;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         marker(): anychart.core.ui.MarkersFactory.Marker;
         marker(settings?: anychart.core.ui.MarkersFactory.Marker | Object): anychart.standalones.ColorRange;
         minorLabels(): anychart.core.ui.LabelsFactory;
@@ -29272,8 +29781,6 @@ declare namespace anychart.standalones {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object): anychart.standalones.ColorRange;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.standalones.ColorRange;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         scale(): anychart.scales.Base;
         scale(settings?: anychart.scales.Base | Object | string): anychart.standalones.ColorRange;
         staggerLines(): number;
@@ -29289,12 +29796,16 @@ declare namespace anychart.standalones {
         ticks(settings?: Object | boolean): anychart.standalones.ColorRange;
         title(): anychart.core.ui.Title;
         title(settings?: boolean | Object | string): anychart.standalones.ColorRange;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.standalones.ColorRange;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.standalones.ColorRange;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Label extends anychart.core.ui.Label {
         adjustFontSize(): Object;
@@ -29334,8 +29845,6 @@ declare namespace anychart.standalones {
         letterSpacing(spacing?: string | number): anychart.standalones.Label;
         lineHeight(): string | number;
         lineHeight(height?: string | number): anychart.standalones.Label;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxFontSize(): number;
         maxFontSize(size?: number | string): anychart.standalones.Label;
         minFontSize(): number;
@@ -29352,8 +29861,6 @@ declare namespace anychart.standalones {
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.standalones.Label;
         position(): string;
         position(position?: string): anychart.standalones.Label;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rotation(): number;
         rotation(rotation?: number): anychart.standalones.Label;
         selectable(): boolean;
@@ -29370,8 +29877,6 @@ declare namespace anychart.standalones {
         textSettings(name?: string): string | number | boolean;
         textSettings(objectWithSettings?: Object): anychart.standalones.Label;
         textSettings(name?: string, settings?: string | number | boolean | (() => void)): anychart.standalones.Label;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         useHtml(): boolean;
         useHtml(enabled?: boolean): anychart.standalones.Label;
         vAlign(): anychart.graphics.vector.Text.VAlign | string;
@@ -29384,6 +29889,12 @@ declare namespace anychart.standalones {
         wordWrap(mode?: string): anychart.standalones.Label;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.standalones.Label;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Background extends anychart.core.ui.Background {
         bottom(): number | string;
@@ -29419,8 +29930,6 @@ declare namespace anychart.standalones {
         leftStroke(): anychart.graphics.vector.Stroke;
         leftStroke(color: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string | Object): anychart.standalones.Background;
         leftStroke(color: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.standalones.Background;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.standalones.Background;
         maxWidth(): number | string;
@@ -29432,8 +29941,6 @@ declare namespace anychart.standalones {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object): anychart.standalones.Background;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.standalones.Background;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.standalones.Background;
         rightStroke(): anychart.graphics.vector.Stroke;
@@ -29447,12 +29954,16 @@ declare namespace anychart.standalones {
         topStroke(): anychart.graphics.vector.Stroke;
         topStroke(color: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string | Object): anychart.standalones.Background;
         topStroke(color: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.standalones.Background;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.standalones.Background;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.standalones.Background;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Legend extends anychart.core.ui.Legend {
         align(): string;
@@ -29516,8 +30027,6 @@ declare namespace anychart.standalones {
         letterSpacing(spacing?: string | number): anychart.standalones.Legend;
         lineHeight(): string | number;
         lineHeight(height?: string | number): anychart.standalones.Legend;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         margin(): anychart.core.utils.Margin;
         margin(margin?: Array<number|string> | Object | number | string): anychart.standalones.Legend;
         margin(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.standalones.Legend;
@@ -29537,8 +30046,6 @@ declare namespace anychart.standalones {
         position(position?: string): anychart.standalones.Legend;
         positionMode(): string;
         positionMode(mode?: string): anychart.standalones.Legend;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         selectable(): boolean;
         selectable(enabled?: boolean): anychart.standalones.Legend;
         textDirection(): anychart.graphics.vector.Text.Direction | string;
@@ -29559,8 +30066,6 @@ declare namespace anychart.standalones {
         titleSeparator(settings?: Object | boolean): anychart.standalones.Legend;
         tooltip(): anychart.core.ui.Tooltip;
         tooltip(settings?: Object | boolean): anychart.standalones.Legend;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         useHtml(): boolean;
         useHtml(enabled?: boolean): anychart.standalones.Legend;
         vAlign(): anychart.graphics.vector.Text.VAlign | string;
@@ -29573,6 +30078,12 @@ declare namespace anychart.standalones {
         wordWrap(mode?: string): anychart.standalones.Legend;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.standalones.Legend;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Title extends anychart.core.ui.Title {
         adjustFontSize(): number;
@@ -29613,8 +30124,6 @@ declare namespace anychart.standalones {
         letterSpacing(spacing?: string | number): anychart.standalones.Title;
         lineHeight(): string | number;
         lineHeight(height?: string | number): anychart.standalones.Title;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         margin(): anychart.core.utils.Margin;
         margin(allValues?: string | number | Array<number|string> | Object): anychart.standalones.Title;
         margin(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.standalones.Title;
@@ -29630,8 +30139,6 @@ declare namespace anychart.standalones {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object): anychart.standalones.Title;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.standalones.Title;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rotation(): number;
         rotation(rotation?: number): anychart.standalones.Title;
         selectable(): boolean;
@@ -29648,8 +30155,6 @@ declare namespace anychart.standalones {
         textSettings(name?: string): string | number | boolean;
         textSettings(objectWithSettings?: Object): anychart.standalones.Title;
         textSettings(name?: string, settings?: string | number | boolean | (() => void)): anychart.standalones.Title;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         useHtml(): boolean;
         useHtml(enabled?: boolean): anychart.standalones.Title;
         vAlign(): anychart.graphics.vector.Text.VAlign | string;
@@ -29662,6 +30167,12 @@ declare namespace anychart.standalones {
         wordWrap(mode?: string): anychart.standalones.Title;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.standalones.Title;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Table extends anychart.core.ui.Table {
         border(): anychart.core.ui.table.Border;
@@ -29729,8 +30240,6 @@ declare namespace anychart.standalones {
         letterSpacing(spacing?: string | number): anychart.standalones.Table;
         lineHeight(): string | number;
         lineHeight(height?: string | number): anychart.standalones.Table;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.standalones.Table;
         maxWidth(): number | string;
@@ -29742,8 +30251,6 @@ declare namespace anychart.standalones {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.standalones.Table;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.standalones.Table;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.standalones.Table;
         rowEvenFill(): anychart.graphics.vector.Fill;
@@ -29786,8 +30293,6 @@ declare namespace anychart.standalones {
         toSvg(width?: number, height?: number): string;
         top(): number | string;
         top(top?: number | string): anychart.standalones.Table;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         useHtml(): boolean;
         useHtml(enabled?: boolean): anychart.standalones.Table;
         vAlign(): anychart.graphics.vector.Text.VAlign | string;
@@ -29812,6 +30317,10 @@ declare namespace anychart.standalones {
         getPngBase64String(onSuccess: ((response:string)=>void), onError?: ((response:string)=>void), width?: number, height?: number, quality?: number): void;
         getSvgBase64String(onSuccess: ((response:string)=>void), onError?: ((response:string)=>void), paperSizeOrWidth?: string | number, landscapeOrHeight?: boolean | string): void;
         isFullScreenAvailable(): boolean;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        removeAllListeners(type?: string): number;
         shareAsJpg(onSuccess: ((response:string)=>void), onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
         shareAsPdf(onSuccess: ((response:string)=>void), onError?: ((response:string)=>void), asBase64?: boolean, paperSizeOrWidth?: number | string, landscapeOrWidth?: number | boolean, x?: number, y?: number, filename?: string): void;
         shareAsPng(onSuccess: ((response:string)=>void), onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, filename?: string): void;
@@ -29820,6 +30329,8 @@ declare namespace anychart.standalones {
         shareWithLinkedIn(captionOrOptions?: string | Object, description?: string): void;
         shareWithPinterest(linkOrOptions?: string | Object, description?: string): void;
         shareWithTwitter(): void;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface LabelsFactory extends anychart.core.ui.LabelsFactory {
         add(formatProvider: any, positionProvider: any, index?: number): anychart.core.ui.LabelsFactory.Label;
@@ -29864,8 +30375,6 @@ declare namespace anychart.standalones {
         letterSpacing(spacing?: string | number): anychart.standalones.LabelsFactory;
         lineHeight(): string | number;
         lineHeight(height?: string | number): anychart.standalones.LabelsFactory;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxFontSize(): number;
         maxFontSize(size?: number | string): anychart.standalones.LabelsFactory;
         measure(formatProviderOrLabel: any | anychart.core.ui.LabelsFactory.Label, positionProvider?: any, settings?: Object, cacheIndex?: number): anychart.math.Rect;
@@ -29886,8 +30395,6 @@ declare namespace anychart.standalones {
         position(position?: string): anychart.standalones.LabelsFactory;
         positionFormatter(): (() => void);
         positionFormatter(formatter?: (() => void)): anychart.standalones.LabelsFactory;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rotation(): number;
         rotation(angle?: number): anychart.standalones.LabelsFactory;
         selectable(): boolean;
@@ -29898,8 +30405,6 @@ declare namespace anychart.standalones {
         textIndent(indent?: number): anychart.standalones.LabelsFactory;
         textOverflow(): anychart.graphics.vector.Text.TextOverflow | string;
         textOverflow(value?: anychart.graphics.vector.Text.TextOverflow | string): anychart.standalones.LabelsFactory;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         useHtml(): boolean;
         useHtml(enabled?: boolean): anychart.standalones.LabelsFactory;
         vAlign(): anychart.graphics.vector.Text.VAlign | string;
@@ -29924,6 +30429,12 @@ declare namespace anychart.standalones {
         textSettings(name?: string): string | number | boolean;
         textSettings(objectWithSettings?: Object): anychart.standalones.LabelsFactory;
         textSettings(name?: string, settings?: string | number | boolean | (() => void)): anychart.standalones.LabelsFactory;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface ResourceList extends anychart.core.resource.ResourceList {
         background(): anychart.core.ui.Background;
@@ -29963,8 +30474,6 @@ declare namespace anychart.standalones {
         images(settings?: Object): anychart.standalones.ResourceList;
         left(): number | string;
         left(left?: number | string): anychart.standalones.ResourceList;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxHeight(): number | string;
         maxHeight(height?: number | string): anychart.standalones.ResourceList;
         maxRowHeight(): number;
@@ -29990,8 +30499,6 @@ declare namespace anychart.standalones {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object): anychart.standalones.ResourceList;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.standalones.ResourceList;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         right(): number | string;
         right(right?: number | string): anychart.standalones.ResourceList;
         rowHeight(): number;
@@ -30007,14 +30514,18 @@ declare namespace anychart.standalones {
         top(top?: number | string): anychart.standalones.ResourceList;
         types(): anychart.core.resource.resourceList.TextSettings;
         types(settings?: Object): anychart.standalones.ResourceList;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         verticalScrollBarPosition(): number;
         verticalScrollBarPosition(position?: number): anychart.standalones.ResourceList;
         width(): number | string;
         width(width?: number | string): anychart.standalones.ResourceList;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.standalones.ResourceList;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
 }
 
@@ -30038,8 +30549,6 @@ declare namespace anychart.standalones.axes {
         getRemainingBounds(): anychart.math.Rect;
         labels(): anychart.core.ui.LabelsFactory;
         labels(settings?: Object | boolean): anychart.standalones.axes.Polar;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         minorLabels(): anychart.core.ui.LabelsFactory;
         minorLabels(settings?: Object | boolean): anychart.standalones.axes.Polar;
         minorTicks(): anychart.core.axes.Ticks;
@@ -30049,8 +30558,6 @@ declare namespace anychart.standalones.axes {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object): anychart.standalones.axes.Polar;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.standalones.axes.Polar;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         scale(): anychart.scales.ScatterBase;
         scale(settings?: anychart.scales.ScatterBase | string | Object): anychart.standalones.axes.Polar;
         startAngle(): string | number;
@@ -30060,10 +30567,14 @@ declare namespace anychart.standalones.axes {
         stroke(settings?: Object): anychart.standalones.axes.Polar;
         ticks(): anychart.core.axes.Ticks;
         ticks(settings?: Object | boolean): anychart.standalones.axes.Polar;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.standalones.axes.Polar;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Linear extends anychart.core.axes.Linear {
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
@@ -30080,8 +30591,6 @@ declare namespace anychart.standalones.axes {
         isHorizontal(): boolean;
         labels(): anychart.core.ui.LabelsFactory;
         labels(settings?: Object | boolean): anychart.standalones.axes.Linear;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         minorLabels(): anychart.core.ui.LabelsFactory;
         minorLabels(settings?: Object | boolean): anychart.standalones.axes.Linear;
         minorTicks(): anychart.core.axes.Ticks;
@@ -30096,8 +30605,6 @@ declare namespace anychart.standalones.axes {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object): anychart.standalones.axes.Linear;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.standalones.axes.Linear;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         scale(): anychart.scales.Base;
         scale(settings?: anychart.scales.Base | Object | string): anychart.standalones.axes.Linear;
         staggerLines(): number;
@@ -30113,12 +30620,16 @@ declare namespace anychart.standalones.axes {
         ticks(settings?: Object | boolean): anychart.standalones.axes.Linear;
         title(): anychart.core.ui.Title;
         title(settings?: boolean | Object | string): anychart.standalones.axes.Linear;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         width(): number | string;
         width(width?: number | string): anychart.standalones.axes.Linear;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.standalones.axes.Linear;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Radial extends anychart.core.axes.Radial {
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
@@ -30134,8 +30645,6 @@ declare namespace anychart.standalones.axes {
         innerRadius(value?: string | number): anychart.standalones.axes.Radial;
         labels(): anychart.core.ui.LabelsFactory;
         labels(settings?: Object | boolean): anychart.standalones.axes.Radial;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         minorLabels(): anychart.core.ui.LabelsFactory;
         minorLabels(settings?: Object | boolean): anychart.standalones.axes.Radial;
         minorTicks(): anychart.core.axes.Ticks;
@@ -30145,8 +30654,6 @@ declare namespace anychart.standalones.axes {
         parentBounds(): anychart.math.Rect;
         parentBounds(value?: anychart.math.Rect | Object): anychart.standalones.axes.Radial;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.standalones.axes.Radial;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         scale(): anychart.scales.Base;
         scale(settings?: anychart.scales.Base | Object | string): anychart.standalones.axes.Radial;
         startAngle(): string | number;
@@ -30156,10 +30663,14 @@ declare namespace anychart.standalones.axes {
         stroke(settings?: Object): anychart.standalones.axes.Radial;
         ticks(): anychart.core.axes.Ticks;
         ticks(settings?: Object | boolean): anychart.standalones.axes.Radial;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.standalones.axes.Radial;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Radar extends anychart.core.axes.Radar {
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
@@ -30170,13 +30681,9 @@ declare namespace anychart.standalones.axes {
         getRemainingBounds(): anychart.math.Rect;
         labels(): anychart.core.ui.LabelsFactory;
         labels(settings?: Object | boolean): anychart.standalones.axes.Radar;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object): anychart.standalones.axes.Radar;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.standalones.axes.Radar;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         scale(): anychart.scales.Base;
         scale(settings?: anychart.scales.Base | string | Object): anychart.standalones.axes.Radar;
         startAngle(): string | number;
@@ -30186,10 +30693,14 @@ declare namespace anychart.standalones.axes {
         stroke(settings?: Object): anychart.standalones.axes.Radar;
         ticks(): anychart.core.axes.Ticks;
         ticks(settings?: Object | boolean): anychart.standalones.axes.Radar;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.standalones.axes.Radar;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
 }
 
@@ -30242,8 +30753,6 @@ declare namespace anychart.standalones.axisMarkers {
         letterSpacing(spacing?: string | number): anychart.standalones.axisMarkers.Text;
         lineHeight(): string | number;
         lineHeight(height?: string | number): anychart.standalones.axisMarkers.Text;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         maxFontSize(): number;
         maxFontSize(size?: number | string): anychart.standalones.axisMarkers.Text;
         minFontSize(): number;
@@ -30260,8 +30769,6 @@ declare namespace anychart.standalones.axisMarkers {
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.standalones.axisMarkers.Text;
         position(): string;
         position(position?: string): anychart.standalones.axisMarkers.Text;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         rotation(): number;
         rotation(rotation?: number): anychart.standalones.axisMarkers.Text;
         scale(): anychart.scales.Base;
@@ -30282,8 +30789,6 @@ declare namespace anychart.standalones.axisMarkers {
         textSettings(name?: string): string | number | boolean;
         textSettings(objectWithSettings?: Object): anychart.standalones.axisMarkers.Text;
         textSettings(name?: string, settings?: string | number | boolean | (() => void)): anychart.standalones.axisMarkers.Text;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         useHtml(): boolean;
         useHtml(enabled?: boolean): anychart.standalones.axisMarkers.Text;
         vAlign(): anychart.graphics.vector.Text.VAlign | string;
@@ -30298,6 +30803,12 @@ declare namespace anychart.standalones.axisMarkers {
         wordWrap(mode?: string): anychart.standalones.axisMarkers.Text;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.standalones.axisMarkers.Text;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Line extends anychart.core.axisMarkers.Line {
         axis(): anychart.core.axes.Linear;
@@ -30310,13 +30821,9 @@ declare namespace anychart.standalones.axisMarkers {
         isHorizontal(): boolean;
         layout(): string;
         layout(layout?: string): anychart.standalones.axisMarkers.Line;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object): anychart.standalones.axisMarkers.Line;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.standalones.axisMarkers.Line;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         scale(): anychart.scales.Base;
         scale(settings?: anychart.scales.Base | Object | string): anychart.standalones.axisMarkers.Line;
         scaleRangeMode(): string;
@@ -30324,12 +30831,16 @@ declare namespace anychart.standalones.axisMarkers {
         stroke(): string | anychart.graphics.vector.Stroke;
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.standalones.axisMarkers.Line;
         stroke(settings?: Object): anychart.standalones.axisMarkers.Line;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         value(): number;
         value(newValue?: number): anychart.standalones.axisMarkers.Line;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.standalones.axisMarkers.Line;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Range extends anychart.core.axisMarkers.Range {
         axis(): anychart.core.axes.Linear;
@@ -30350,23 +30861,23 @@ declare namespace anychart.standalones.axisMarkers {
         isHorizontal(): boolean;
         layout(): string;
         layout(layout?: string): anychart.standalones.axisMarkers.Range;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object): anychart.standalones.axisMarkers.Range;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.standalones.axisMarkers.Range;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         scale(): anychart.scales.Base;
         scale(settings?: anychart.scales.Base | Object | string): anychart.standalones.axisMarkers.Range;
         scaleRangeMode(): string;
         scaleRangeMode(mode?: string): anychart.standalones.axisMarkers.Range;
         to(): number;
         to(toValue?: number): anychart.standalones.axisMarkers.Range;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.standalones.axisMarkers.Range;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
 }
 
@@ -30398,28 +30909,28 @@ declare namespace anychart.standalones.grids {
         isRadial(): boolean;
         layout(): string;
         layout(value?: string): anychart.standalones.grids.Polar;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         palette(): anychart.palettes.RangeColors | anychart.palettes.DistinctColors;
         palette(settings?: anychart.palettes.RangeColors | anychart.palettes.DistinctColors | Object | Array<string>): anychart.core.grids.Map;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.standalones.grids.Polar;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.standalones.grids.Polar;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         startAngle(): string | number;
         startAngle(angle?: string | number): anychart.standalones.grids.Polar;
         stroke(): string | anychart.graphics.vector.Stroke;
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: anychart.graphics.vector.StrokeLineCap): anychart.standalones.grids.Polar;
         stroke(settings?: Object): anychart.standalones.grids.Polar;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         xScale(): anychart.scales.Linear;
         xScale(settings?: anychart.scales.Base | string | Object): anychart.standalones.grids.Polar;
         yScale(): anychart.scales.Base;
         yScale(settings?: anychart.scales.Base | string | Object): anychart.standalones.grids.Polar;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.standalones.grids.Polar;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Linear extends anychart.core.grids.Linear {
         axis(): anychart.core.axes.Linear;
@@ -30445,24 +30956,24 @@ declare namespace anychart.standalones.grids {
         isMinor(enabled?: boolean): anychart.standalones.grids.Linear;
         layout(): string;
         layout(layout?: string): anychart.standalones.grids.Linear;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         palette(): anychart.palettes.RangeColors | anychart.palettes.DistinctColors;
         palette(settings?: anychart.palettes.RangeColors | anychart.palettes.DistinctColors | Object | Array<string>): anychart.standalones.grids.Linear;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.standalones.grids.Linear;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.standalones.grids.Linear;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         scale(): anychart.scales.Base;
         scale(settings?: Object | string | anychart.scales.Base): anychart.standalones.grids.Linear;
         stroke(): string | anychart.graphics.vector.Stroke;
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: anychart.graphics.vector.StrokeLineJoin, lineCap?: anychart.graphics.vector.StrokeLineCap): anychart.standalones.grids.Linear;
         stroke(settings?: Object): anychart.standalones.grids.Linear;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.standalones.grids.Linear;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Radar extends anychart.core.grids.Radar {
         axis(): anychart.core.axes.Radar | anychart.core.axes.Radial;
@@ -30488,29 +30999,29 @@ declare namespace anychart.standalones.grids {
         isRadial(): boolean;
         layout(): string;
         layout(layout?: string): anychart.standalones.grids.Radar;
-        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
-        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         palette(): anychart.palettes.RangeColors | anychart.palettes.DistinctColors;
         palette(settings?: anychart.palettes.RangeColors | anychart.palettes.DistinctColors | Object | Array<string>): anychart.core.grids.Map;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.standalones.grids.Radar;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.standalones.grids.Radar;
-        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
-        removeAllListeners(type?: string): number;
         startAngle(): string | number;
         startAngle(angle?: string | number): anychart.standalones.grids.Radar;
         stroke(settings?: Object): anychart.standalones.grids.Radar;
         stroke(): string | anychart.graphics.vector.Stroke;
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.standalones.grids.Radar;
         stroke(settings?: Object): anychart.standalones.grids.Radar;
-        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
-        unlistenByKey(key: Object): boolean;
         xScale(): anychart.scales.Ordinal;
         xScale(value?: anychart.scales.Ordinal | string | Object): anychart.standalones.grids.Radar;
         yScale(): anychart.scales.Base;
         yScale(value?: anychart.scales.Base | string | Object): anychart.standalones.grids.Radar;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.standalones.grids.Radar;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
 }
 
