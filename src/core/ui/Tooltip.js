@@ -2136,6 +2136,9 @@ anychart.core.ui.Tooltip.prototype.beforeUseHtmlHook = function() {
     if (this.htmlTooltip)
       this.htmlTooltip.remove();
   }
+  for (var key in this.childTooltipsMap) {
+    this.childTooltipsMap[key].beforeUseHtmlHook();
+  }
   this.contentBounds_ = null;
   this.instantPosition_ = null;
 };
