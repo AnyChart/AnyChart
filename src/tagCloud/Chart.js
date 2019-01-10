@@ -1963,7 +1963,12 @@ anychart.tagCloudModule.Chart.prototype.drawContent = function(bounds) {
         1;
 
     if (!this.layer_) {
-      this.layer_ = this.container().layer();
+      this.layer_ = this.rootElement.layer();
+    }
+
+    var background = this.getCreated('background');
+    if (background) {
+      this.layer_.zIndex((background.zIndex() || 0) + 1);
     }
 
     if (!this.handlers_) {
