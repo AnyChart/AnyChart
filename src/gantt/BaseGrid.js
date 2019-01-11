@@ -608,35 +608,6 @@ anychart.ganttModule.BaseGrid.prototype.createFormatProvider = function(item, op
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Mouse click internal handler.
- * @param {anychart.core.MouseEvent} event - Event object.
- * @private
- */
-anychart.ganttModule.BaseGrid.prototype.handleMouseClick_ = function(event) {
-  if (!this.preventClickAfterDrag) {
-    if (this.interactive) {
-      var click = this.getInteractivityEvent(event);
-
-      if (click && !this.interactivityHandler.altKey) {
-        var mouseUp = goog.object.clone(click);
-        mouseUp['type'] = anychart.enums.EventType.ROW_MOUSE_UP;
-        var upDispatched = this.interactivityHandler.dispatchEvent(mouseUp);
-        var clickDispatched = this.interactivityHandler.dispatchEvent(click);
-        if (upDispatched && clickDispatched) {
-          this.interactivityHandler.rowClick(click);
-        }
-      } else {
-        this.interactivityHandler.rowUnselect(click);
-      }
-    } else {
-      this.interactive = true;
-    }
-  }
-  this.preventClickAfterDrag = false;
-};
-
-
-/**
  * Additional actions for inherited classes on mouse move while dragging.
  * @param {Object} evt - Event object.
  */
@@ -678,6 +649,37 @@ anychart.ganttModule.BaseGrid.prototype.addMouseUp = goog.nullFunction;
  */
 anychart.ganttModule.BaseGrid.prototype.addMouseDblClick = goog.nullFunction;
 
+/**
+ * Mouse click internal handler.
+ * @param {anychart.core.MouseEvent} event - Event object.
+ * @private
+ */
+anychart.ganttModule.BaseGrid.prototype.handleMouseClick_ = function(event) {
+  if (!this.preventClickAfterDrag) {
+    if (this.interactive) {
+      var click = this.getInteractivityEvent(event);
+
+      if (click && !this.interactivityHandler.altKey) {
+        var mouseUp = goog.object.clone(click);
+        mouseUp['type'] = anychart.enums.EventType.ROW_MOUSE_UP;
+        var upDispatched = this.interactivityHandler.dispatchEvent(mouseUp);
+        var clickDispatched = this.interactivityHandler.dispatchEvent(click);
+        if (upDispatched && clickDispatched) {
+          this.interactivityHandler.rowClick(click);
+
+          //DVF-4040
+          this.preventMouseOverAfterClick_ = true;
+        }
+      } else {
+        this.interactivityHandler.rowUnselect(click);
+      }
+    } else {
+      this.interactive = true;
+    }
+  }
+  this.preventClickAfterDrag = false;
+};
+
 
 /**
  * Mouse over and move internal handler.
@@ -685,10 +687,15 @@ anychart.ganttModule.BaseGrid.prototype.addMouseDblClick = goog.nullFunction;
  * @private
  */
 anychart.ganttModule.BaseGrid.prototype.handleMouseOverAndMove_ = function(event) {
-  var evt = this.getInteractivityEvent(event);
-  this.addMouseMoveAndOver(evt, event);
-  if (evt && this.interactive && this.interactivityHandler.dispatchEvent(evt)) {
-    this.interactivityHandler.rowMouseMove(evt);
+  if (this.preventMouseOverAfterClick_) {
+    //DVF-4040
+    this.preventMouseOverAfterClick_ = false;
+  } else {
+    var evt = this.getInteractivityEvent(event);
+    this.addMouseMoveAndOver(evt, event);
+    if (evt && this.interactive && this.interactivityHandler.dispatchEvent(evt)) {
+      this.interactivityHandler.rowMouseMove(evt);
+    }
   }
 };
 
