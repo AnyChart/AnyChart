@@ -1407,6 +1407,16 @@ anychart.pieModule.Chart.prototype.initConnectorElements = function() {
  */
 anychart.pieModule.Chart.prototype.calculateOutsideLabels = function() {
   var iterator = this.getIterator();
+
+  /*
+    Position needs to be restored after all operation
+    because of DVF-4112 issue.
+    The general reason is in fact that calculateOutsideLabels()
+    resets iterator and calcDomain() changes index of iterator as well.
+    It breaks processing of APPEARANCE state on chart draw.
+   */
+  var previousPosition = iterator.getIndex();
+
   var label, x0, y0, radius, isRightSide;
   var connectorPath, connector;
   var mode3d = this.getOption('mode3d');
@@ -1556,6 +1566,7 @@ anychart.pieModule.Chart.prototype.calculateOutsideLabels = function() {
       labelsToCompare = labelsToCompare.concat(left, right);
     }, this);
   }
+  iterator.select(previousPosition);
 
   if (!this.maxLabelIndexesArr_)
     this.maxLabelIndexesArr_ = [];
