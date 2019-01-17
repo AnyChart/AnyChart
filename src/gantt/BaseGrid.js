@@ -415,6 +415,12 @@ anychart.ganttModule.BaseGrid.EVENTS_RECT_Z_INDEX = 20;
  */
 anychart.ganttModule.BaseGrid.CELLS_Z_INDEX = 30;
 
+/**
+ * Draw layer z-index.
+ * @type {number}
+ */
+anychart.ganttModule.BaseGrid.MARKERS_Z_INDEX = 34;
+
 
 /**
  * Draw layer z-index.
@@ -1089,8 +1095,6 @@ anychart.ganttModule.BaseGrid.prototype.getBase = function() {
     this.base_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
     //We handle mouseDown here to prevent double click selection.
     this.bindHandlersToGraphics(this.base_, null, null, null, null, /** @type {Function} */ (this.handleMouseDown_));
-
-    this.registerDisposable(this.base_);
   }
   return this.base_;
 };
@@ -1104,9 +1108,21 @@ anychart.ganttModule.BaseGrid.prototype.getCellsLayer = function() {
   if (!this.cellsLayer_) {
     this.cellsLayer_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
     this.cellsLayer_.zIndex(anychart.ganttModule.BaseGrid.CELLS_Z_INDEX);
-    this.registerDisposable(this.cellsLayer_);
   }
   return this.cellsLayer_;
+};
+
+
+/**
+ * Inner getter for this.drawLayer_.
+ * @return {acgraph.vector.Layer}
+ */
+anychart.ganttModule.BaseGrid.prototype.getMarkersLayer = function() {
+  if (!this.markersLayer_) {
+    this.markersLayer_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
+    this.markersLayer_.zIndex(anychart.ganttModule.BaseGrid.MARKERS_Z_INDEX);
+  }
+  return this.markersLayer_;
 };
 
 
@@ -1118,7 +1134,6 @@ anychart.ganttModule.BaseGrid.prototype.getDrawLayer = function() {
   if (!this.drawLayer_) {
     this.drawLayer_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
     this.drawLayer_.zIndex(anychart.ganttModule.BaseGrid.DRAW_Z_INDEX);
-    this.registerDisposable(this.drawLayer_);
   }
   return this.drawLayer_;
 };
@@ -1132,7 +1147,6 @@ anychart.ganttModule.BaseGrid.prototype.getContentLayer = function() {
   if (!this.contentLayer_) {
     this.contentLayer_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
     this.contentLayer_.zIndex(anychart.ganttModule.BaseGrid.CONTENT_Z_INDEX);
-    this.registerDisposable(this.contentLayer_);
   }
   return this.contentLayer_;
 };
@@ -1146,7 +1160,6 @@ anychart.ganttModule.BaseGrid.prototype.getEditLayer = function() {
   if (!this.editLayer_) {
     this.editLayer_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
     this.editLayer_.zIndex(anychart.ganttModule.BaseGrid.EDIT_Z_INDEX);
-    this.registerDisposable(this.editLayer_);
   }
   return this.editLayer_;
 };
@@ -1160,7 +1173,6 @@ anychart.ganttModule.BaseGrid.prototype.getClipLayer = function() {
   if (!this.clipLayer_) {
     this.clipLayer_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
     this.clipLayer_.zIndex(anychart.ganttModule.BaseGrid.CLIP_Z_INDEX);
-    this.registerDisposable(this.clipLayer_);
   }
   return this.clipLayer_;
 };
@@ -1174,7 +1186,6 @@ anychart.ganttModule.BaseGrid.prototype.getScrollsLayer = function() {
   if (!this.scrollsLayer_) {
     this.scrollsLayer_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
     this.scrollsLayer_.zIndex(anychart.ganttModule.BaseGrid.SCROLLS_Z_INDEX);
-    this.registerDisposable(this.scrollsLayer_);
   }
   return this.scrollsLayer_;
 };
@@ -1188,7 +1199,6 @@ anychart.ganttModule.BaseGrid.prototype.getOddPath = function() {
   if (!this.oddPath_) {
     this.oddPath_ = /** @type {acgraph.vector.Path} */ (this.getCellsLayer().path());
     this.oddPath_.stroke(null).zIndex(1);
-    this.registerDisposable(this.oddPath_);
   }
   return this.oddPath_;
 };
@@ -1202,7 +1212,6 @@ anychart.ganttModule.BaseGrid.prototype.getEvenPath = function() {
   if (!this.evenPath_) {
     this.evenPath_ = /** @type {acgraph.vector.Path} */ (this.getCellsLayer().path());
     this.evenPath_.stroke(null).zIndex(1);
-    this.registerDisposable(this.evenPath_);
   }
   return this.evenPath_;
 };
@@ -1216,7 +1225,6 @@ anychart.ganttModule.BaseGrid.prototype.getHoverPath = function() {
   if (!this.hoverPath_) {
     this.hoverPath_ = /** @type {acgraph.vector.Path} */ (this.getCellsLayer().path());
     this.hoverPath_.stroke(null)/*.fill(/!** @type {acgraph.vector.Fill} *!/(this.getOption('rowHoverFill')))*/.zIndex(2);
-    this.registerDisposable(this.hoverPath_);
   }
   return this.hoverPath_;
 };
@@ -1230,7 +1238,6 @@ anychart.ganttModule.BaseGrid.prototype.getSelectedPath = function() {
   if (!this.selectedPath_) {
     this.selectedPath_ = /** @type {acgraph.vector.Path} */ (this.getCellsLayer().path());
     this.selectedPath_.stroke(null)/*.fill(/!** @type {acgraph.vector.Fill} *!/(this.getOption('rowSelectedFill')))*/.zIndex(3);
-    this.registerDisposable(this.selectedPath_);
   }
   return this.selectedPath_;
 };
@@ -1244,7 +1251,6 @@ anychart.ganttModule.BaseGrid.prototype.getRowStrokePath = function() {
   if (!this.rowStrokePath_) {
     this.rowStrokePath_ = /** @type {acgraph.vector.Path} */ (this.getCellsLayer().path());
     this.rowStrokePath_.stroke(this.rowStroke_).zIndex(4);
-    this.registerDisposable(this.rowStrokePath_);
   }
   return this.rowStrokePath_;
 };
@@ -1258,7 +1264,6 @@ anychart.ganttModule.BaseGrid.prototype.getRowStrokePath = function() {
 anychart.ganttModule.BaseGrid.prototype.getEditStructurePreviewPath_ = function() {
   if (!this.editStructurePreviewPath_) {
     this.editStructurePreviewPath_ = this.getEditLayer().path();
-    this.registerDisposable(this.editStructurePreviewPath_);
   }
   return this.editStructurePreviewPath_;
 };
@@ -1272,7 +1277,6 @@ anychart.ganttModule.BaseGrid.prototype.getHeaderSeparationPath = function() {
   if (!this.headerSeparationPath_) {
     this.headerSeparationPath_ = /** @type {acgraph.vector.Path} */ (this.getCellsLayer().path());
     this.headerSeparationPath_.zIndex(40);
-    this.registerDisposable(this.headerSeparationPath_);
   }
   return this.headerSeparationPath_;
 };
@@ -1662,7 +1666,6 @@ anychart.ganttModule.BaseGrid.prototype.editStructurePreviewDashStroke = functio
 anychart.ganttModule.BaseGrid.prototype.dragMouseDown_ = function(e) {
   if (anychart.utils.instanceOf(e.currentTarget, acgraph.vector.Element) && !this.scrollDragger) {
     this.scrollDragger = new anychart.ganttModule.BaseGrid.Dragger(this.base_, this);
-    this.registerDisposable(this.scrollDragger);
     //this.scrollDragger.listen(goog.fx.Dragger.EventType.START, this.dragStartHandler_, false, this);
 
     this.scrollDragger.listen(goog.fx.Dragger.EventType.DRAG, this.dragHandler_, false, this);
@@ -1921,6 +1924,7 @@ anychart.ganttModule.BaseGrid.prototype.drawRowFills_ = function() {
       this.pixelBoundsCache.width, totalTop - this.pixelBoundsCache.top + 1);
   this.getClipLayer().clip(clipRect);
   // this.getCellsLayer().clip(clipRect);
+  this.getMarkersLayer().clip(clipRect);
   this.getDrawLayer().clip(clipRect);
 
 };
@@ -2054,7 +2058,6 @@ anychart.ganttModule.BaseGrid.prototype.defaultRowHeight = function(opt_value) {
  */
 anychart.ganttModule.BaseGrid.prototype.createController = function(opt_isResources) {
   this.controller = new anychart.ganttModule.Controller(opt_isResources);
-  this.registerDisposable(this.controller);
   this.controller.listenSignals(this.needsReapplicationHandler_, this);
 };
 
@@ -2092,14 +2095,12 @@ anychart.ganttModule.BaseGrid.prototype.drawInternal = function(positionRecalcul
   //---------- Creating DOM structure ---------------
   if (!this.getBase().numChildren()) {
     this.bgRect_ = this.base_.rect();
-    this.registerDisposable(this.bgRect_);
     this.bgRect_
         .fill(/** @type {acgraph.vector.Fill} */(this.getOption('backgroundFill')))
         .stroke(null)
         .zIndex(anychart.ganttModule.BaseGrid.BG_RECT_Z_INDEX);
 
     this.eventsRect_ = this.base_.rect();
-    this.registerDisposable(this.eventsRect_);
     this.eventsRect_
         .fill(anychart.color.TRANSPARENT_HANDLER)
         .stroke(null)
@@ -2107,6 +2108,7 @@ anychart.ganttModule.BaseGrid.prototype.drawInternal = function(positionRecalcul
 
     this.base_
         .addChild(/** @type {!acgraph.vector.Layer} */ (this.getCellsLayer()))
+        .addChild(/** @type {!acgraph.vector.Layer} */ (this.getMarkersLayer()))
         .addChild(/** @type {!acgraph.vector.Layer} */ (this.getDrawLayer()))
         .addChild(/** @type {!acgraph.vector.Layer} */ (this.getContentLayer()))
         .addChild(/** @type {!acgraph.vector.Layer} */ (this.getEditLayer()))
@@ -2128,7 +2130,6 @@ anychart.ganttModule.BaseGrid.prototype.drawInternal = function(positionRecalcul
             else
               verticalScrollBar.draw();
           }, this);
-      this.registerDisposable(verticalScrollBar);
     }
 
     horizontalScrollBar = this.horizontalScrollBar();
@@ -2137,7 +2138,6 @@ anychart.ganttModule.BaseGrid.prototype.drawInternal = function(positionRecalcul
         .listenSignals(function(event) {
           if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) horizontalScrollBar.draw();
         }, horizontalScrollBar);
-    this.registerDisposable(horizontalScrollBar);
 
     this.base_.listenOnce(acgraph.events.EventType.MOUSEDOWN, this.dragMouseDown_, false, this);
     this.base_.listenOnce(acgraph.events.EventType.TOUCHSTART, this.dragMouseDown_, false, this);
@@ -2263,6 +2263,7 @@ anychart.ganttModule.BaseGrid.prototype.drawInternal = function(positionRecalcul
   }
 
   this.labelsInvalidated();
+  this.markersInvalidated();
 
   if (manualSuspend) stage.resume();
   if (this.isStandalone) {
@@ -2439,7 +2440,6 @@ anychart.ganttModule.BaseGrid.prototype.docMouseMoveListener_ = function(e) {
 anychart.ganttModule.BaseGrid.prototype.initKeysFeatures = function() {
   if (!this.interactivityHandler.altKeyHandler) {
     this.interactivityHandler.altKeyHandler = new anychart.ganttModule.BaseGrid.KeyHandler(this.interactivityHandler, anychart.document);
-    this.registerDisposable(this.interactivityHandler.altKeyHandler);
 
     acgraph.events.listen(this.interactivityHandler.altKeyHandler, 'key', function(e) {
       if (e.keyCode == 18) { //alt
@@ -2577,6 +2577,12 @@ anychart.ganttModule.BaseGrid.prototype.labelsInvalidated = goog.nullFunction;
 
 
 /**
+ * Markers invalidation. Used by child classes to preform own invalidation.
+ */
+anychart.ganttModule.BaseGrid.prototype.markersInvalidated = goog.nullFunction;
+
+
+/**
  * @inheritDoc
  */
 anychart.ganttModule.BaseGrid.prototype.rowUnselect = function(event) {
@@ -2629,12 +2635,14 @@ anychart.ganttModule.BaseGrid.prototype.data = function(opt_value) {
  * @return {anychart.ganttModule.BaseGrid}
  */
 anychart.ganttModule.BaseGrid.prototype.draw = function() {
-  if (!this.pixelBoundsCache || this.pixelBoundsCache.height || !this.pixelBoundsCache.height)
-    this.pixelBoundsCache = /** @type {anychart.math.Rect} */ (this.getPixelBounds());
-  this.controller
-      .availableHeight(this.pixelBoundsCache.height - this.headerHeight_ - 1)
-      .rowStrokeThickness(this.rowStrokeThickness)
-      .run();
+  if (!this.isDisposed()) {
+    if (!this.pixelBoundsCache || this.pixelBoundsCache.height || !this.pixelBoundsCache.height)
+      this.pixelBoundsCache = /** @type {anychart.math.Rect} */ (this.getPixelBounds());
+    this.controller
+        .availableHeight(this.pixelBoundsCache.height - this.headerHeight_ - 1)
+        .rowStrokeThickness(this.rowStrokeThickness)
+        .run();
+  }
   return this;
 };
 
@@ -2710,7 +2718,6 @@ anychart.ganttModule.BaseGrid.prototype.headerHeight = function(opt_value) {
 anychart.ganttModule.BaseGrid.prototype.tooltip = function(opt_value) {
   if (!this.tooltip_) {
     this.tooltip_ = new anychart.core.ui.Tooltip(0);
-    this.registerDisposable(this.tooltip_);
     this.tooltip_.listenSignals(this.onTooltipSignal_, this);
     this.tooltip_.containerProvider(this);
   }
@@ -2744,7 +2751,47 @@ anychart.ganttModule.BaseGrid.prototype.disposeInternal = function() {
   goog.events.unlisten(document, goog.events.EventType.MOUSEMOVE, this.docMouseMoveListener_, false, this);
   if (this.edit_)
     this.edit_.unlistenSignals(this.onEditSignal_, this);
-  goog.disposeAll(this.palette_, this.edit_);
+
+  this.tooltip_.unlistenSignals(this.onTooltipSignal_, this);
+
+  if (this.interactivityHandler.altKeyHandler) {
+    this.interactivityHandler.altKeyHandler.removeAllListeners();
+    goog.dispose(this.interactivityHandler.altKeyHandler);
+  }
+
+  this.controller.unlistenSignals(this.needsReapplicationHandler_, this);
+  if (this.scrollDragger) {
+    this.scrollDragger.unlisten(goog.fx.Dragger.EventType.DRAG, this.dragHandler_, false, this);
+    this.scrollDragger.unlisten(goog.fx.Dragger.EventType.END, this.dragEndHandler_, false, this);
+  }
+
+  goog.disposeAll(this.palette_, this.edit_, this.tooltip_,
+      this.eventsRect_, this.bgRect_, this.scrollDragger,
+      this.headerSeparationPath_, this.editStructurePreviewPath_,
+      this.rowStrokePath_, this.selectedPath_, this.hoverPath_,
+      this.evenPath_, this.oddPath_, this.scrollsLayer_, this.clipLayer_,
+      this.editLayer_, this.contentLayer_, this.drawLayer_, this.markersLayer_,
+      this.cellsLayer_, this.base_);
+  this.tooltip_ = null;
+  this.eventsRect_ = null;
+  this.bgRect_ = null;
+  this.controller = null;
+  this.scrollDragger = null;
+  this.headerSeparationPath_ = null;
+  this.editStructurePreviewPath_ = null;
+  this.rowStrokePath_ = null;
+  this.selectedPath_ = null;
+  this.hoverPath_ = null;
+  this.evenPath_ = null;
+  this.oddPath_ = null;
+  this.scrollsLayer_ = null;
+  this.clipLayer_ = null;
+  this.editLayer_ = null;
+  this.contentLayer_ = null;
+  this.drawLayer_ = null;
+  this.markersLayer_ = null;
+  this.cellsLayer_ = null;
+  this.base_ = null;
   anychart.ganttModule.BaseGrid.base(this, 'disposeInternal');
 };
 

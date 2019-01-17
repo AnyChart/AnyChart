@@ -367,7 +367,8 @@ anychart.ganttModule.TimeLine.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ganttModule.BaseGrid.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.TIMELINE_SCALES |
     anychart.ConsistencyState.TIMELINE_ELEMENTS_APPEARANCE |
-    anychart.ConsistencyState.TIMELINE_ELEMENTS_LABELS;
+    anychart.ConsistencyState.TIMELINE_ELEMENTS_LABELS |
+    anychart.ConsistencyState.TIMELINE_MARKERS;
 
 
 //endregion
@@ -1654,7 +1655,7 @@ anychart.ganttModule.TimeLine.prototype.scale = function(opt_value) {
  */
 anychart.ganttModule.TimeLine.prototype.scaleInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION)) {
-    this.invalidate(anychart.ConsistencyState.TIMELINE_SCALES, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.TIMELINE_SCALES | anychart.ConsistencyState.TIMELINE_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -1770,7 +1771,7 @@ anychart.ganttModule.TimeLine.prototype.lineMarker = function(opt_indexOrValue, 
     lineMarker.setup(this.defaultLineMarkerSettings());
     this.lineMarkers_[index] = lineMarker;
     lineMarker.listenSignals(this.onMarkersSignal_, this);
-    this.invalidate(anychart.ConsistencyState.TIMELINE_SCALES, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.TIMELINE_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -1805,7 +1806,7 @@ anychart.ganttModule.TimeLine.prototype.rangeMarker = function(opt_indexOrValue,
     rangeMarker.setup(this.defaultRangeMarkerSettings());
     this.rangeMarkers_[index] = rangeMarker;
     rangeMarker.listenSignals(this.onMarkersSignal_, this);
-    this.invalidate(anychart.ConsistencyState.TIMELINE_SCALES, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.TIMELINE_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -1839,7 +1840,7 @@ anychart.ganttModule.TimeLine.prototype.textMarker = function(opt_indexOrValue, 
     textMarker.setup(this.defaultTextMarkerSettings());
     this.textMarkers_[index] = textMarker;
     textMarker.listenSignals(this.onMarkersSignal_, this);
-    this.invalidate(anychart.ConsistencyState.TIMELINE_SCALES, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.TIMELINE_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -1857,7 +1858,7 @@ anychart.ganttModule.TimeLine.prototype.textMarker = function(opt_indexOrValue, 
  * @private
  */
 anychart.ganttModule.TimeLine.prototype.onMarkersSignal_ = function(event) {
-  this.invalidate(anychart.ConsistencyState.TIMELINE_SCALES, anychart.Signal.NEEDS_REDRAW);
+  this.invalidate(anychart.ConsistencyState.TIMELINE_MARKERS, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -3665,24 +3666,6 @@ anychart.ganttModule.TimeLine.prototype.drawTimelineElements_ = function() {
   }
 
   this.getDrawLayer().removeChildren();
-  var markers = goog.array.concat(this.lineMarkers_, this.rangeMarkers_, this.textMarkers_);
-
-  var dataBounds = new anychart.math.Rect(this.pixelBoundsCache.left,
-      (this.pixelBoundsCache.top + /** @type {number} */ (this.headerHeight()) + 1),
-      this.pixelBoundsCache.width,
-      (this.pixelBoundsCache.height - /** @type {number} */ (this.headerHeight()) - 1));
-
-  for (var m = 0, count = markers.length; m < count; m++) {
-    var axesMarker = markers[m];
-    if (axesMarker) {
-      axesMarker.suspendSignalsDispatching();
-      axesMarker.parentBounds(dataBounds);
-      axesMarker.container(this.getDrawLayer());
-      axesMarker.invalidate(anychart.ConsistencyState.CONTAINER); //Force set of parent.
-      axesMarker.draw();
-      axesMarker.resumeSignalsDispatching(false);
-    }
-  }
 
   this.visElementsInUse_ = 0;
   this.markers().clear();
@@ -4748,7 +4731,8 @@ anychart.ganttModule.TimeLine.prototype.initScale = function() {
  * @override
  */
 anychart.ganttModule.TimeLine.prototype.initDom = function() {
-  this.getClipLayer().zIndex(anychart.ganttModule.BaseGrid.DRAW_Z_INDEX - 1); //Put it under draw layer.
+  this.getClipLayer().zIndex(anychart.ganttModule.BaseGrid.DRAW_Z_INDEX - 2); //Put it under draw layer.
+  this.getMarkersLayer().zIndex(anychart.ganttModule.BaseGrid.DRAW_Z_INDEX - 1); //Put it under draw layer but above clip layer.
   this.markers().container(this.getContentLayer());
   this.labels().container(this.getContentLayer());
   this.header().container(this.getBase());
@@ -4761,6 +4745,7 @@ anychart.ganttModule.TimeLine.prototype.initDom = function() {
  */
 anychart.ganttModule.TimeLine.prototype.boundsInvalidated = function() {
   this.header().bounds(this.pixelBoundsCache.left, this.pixelBoundsCache.top, this.pixelBoundsCache.width, /** @type {number} */ (this.headerHeight()));
+  this.invalidate(anychart.ConsistencyState.TIMELINE_MARKERS);
   this.redrawHeader = true;
 };
 
@@ -4851,18 +4836,57 @@ anychart.ganttModule.TimeLine.prototype.positionFinal = function() {
 
     this.redrawHeader = false;
 
+    // var dataBounds = new anychart.math.Rect(this.pixelBoundsCache.left,
+    //     (this.pixelBoundsCache.top + /** @type {number} */ (this.headerHeight()) + 1),
+    //     this.pixelBoundsCache.width,
+    //     this.totalGridsHeight);
+    //
+    // for (var i = 0; i < this.textMarkers_.length; i++) {
+    //   var textMarker = this.textMarkers_[i];
+    //   textMarker.suspendSignalsDispatching();
+    //   textMarker.container(this.getMarkersLayer());
+    //   textMarker.parentBounds(dataBounds);
+    //   textMarker.resumeSignalsDispatching(false);
+    //   textMarker.draw();
+    // }
+  }
+};
+
+
+/**
+ * @override
+ */
+anychart.ganttModule.TimeLine.prototype.markersInvalidated = function() {
+  if (this.hasInvalidationState(anychart.ConsistencyState.TIMELINE_MARKERS)) {
+    var markers = goog.array.concat(this.lineMarkers_, this.rangeMarkers_, this.textMarkers_);
+
+    var top = this.pixelBoundsCache.top + /** @type {number} */ (this.headerHeight()) + 1;
     var dataBounds = new anychart.math.Rect(this.pixelBoundsCache.left,
-        (this.pixelBoundsCache.top + /** @type {number} */ (this.headerHeight()) + 1),
+        top,
+        this.pixelBoundsCache.width,
+        (this.pixelBoundsCache.height - /** @type {number} */ (this.headerHeight()) - 1));
+
+    var textDataBounds = new anychart.math.Rect(this.pixelBoundsCache.left,
+        top,
         this.pixelBoundsCache.width,
         this.totalGridsHeight);
 
-    for (var i = 0; i < this.textMarkers_.length; i++) {
-      var textMarker = this.textMarkers_[i];
-      textMarker.suspendSignalsDispatching();
-      textMarker.parentBounds(dataBounds);
-      textMarker.resumeSignalsDispatching(false);
-      textMarker.draw();
+    for (var m = 0, count = markers.length; m < count; m++) {
+      var axesMarker = markers[m];
+      if (axesMarker) {
+        var b = acgraph.utils.instanceOf(axesMarker, anychart.ganttModule.axisMarkers.Text) ?
+            textDataBounds :
+            dataBounds;
+        axesMarker.suspendSignalsDispatching();
+        axesMarker.invalidate(anychart.ConsistencyState.BOUNDS);
+        axesMarker.parentBounds(b);
+        axesMarker.container(this.getMarkersLayer());
+        axesMarker.invalidate(anychart.ConsistencyState.CONTAINER); //Force set of parent.
+        axesMarker.draw();
+        axesMarker.resumeSignalsDispatching(false);
+      }
     }
+    this.markConsistent(anychart.ConsistencyState.TIMELINE_MARKERS);
   }
 };
 

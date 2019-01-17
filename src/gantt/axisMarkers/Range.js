@@ -18,6 +18,19 @@ anychart.ganttModule.axisMarkers.Range = function(scale) {
 
   this.scaleInternal(scale);
 
+  /*
+     This is pretty hacky for gantt timeline (DVF-4087).
+     Fixes multiple similar signals dispatching on timeline zoom.
+     The problem is:
+     - chart.zoomTo() invalidates scale.
+     - scale dispatches 'i_am_changed' signal.
+     - each markers hears it and dispatches 'needs_redraw' signal.
+     - chart redraws timeline as many times as markers signals received.
+
+     Timeline controls markers redraw itself instead.
+   */
+  scale.unlistenSignals(this.scaleInvalidated, this);
+
   /**
    * @type {anychart.core.axisMarkers.PathBase.Range}
    */
@@ -57,7 +70,7 @@ anychart.core.settings.populate(anychart.ganttModule.axisMarkers.Range, anychart
  * @inheritDoc
  */
 anychart.ganttModule.axisMarkers.Range.prototype.getFormattedValue = function() {
-    return 'From: ' + this.getOption('from') + ' to: ' + this.getOption('to');
+  return 'From: ' + this.getOption('from') + ' to: ' + this.getOption('to');
 };
 
 
