@@ -29,6 +29,8 @@ anychart.polarModule.Axis = function() {
   this.suspendSignalsDispatching();
   anychart.polarModule.Axis.base(this, 'constructor');
 
+  this.addThemes(anychart.themes.DefaultThemes['axis']);
+
   this.labelsBounds_ = [];
   this.minorLabelsBounds_ = [];
   this.bg_ = acgraph.path();
@@ -46,8 +48,38 @@ anychart.polarModule.Axis = function() {
       anychart.ConsistencyState.AXIS_TICKS |
       anychart.ConsistencyState.BOUNDS;
   this.resumeSignalsDispatching(false);
+
+  var beforeInvalidationHook = function() {
+    this.dropBoundsCache_();
+  };
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['overlapMode', this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED, 0, beforeInvalidationHook],
+    ['fill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['stroke', this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED, 0, beforeInvalidationHook]
+  ]);
 };
 goog.inherits(anychart.polarModule.Axis, anychart.core.VisualBase);
+
+
+/**
+ * Properties descriptors.
+ * @type {!Object<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.polarModule.Axis.PROPERTY_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  var descriptors = anychart.core.settings.descriptors;
+  anychart.core.settings.createDescriptors(map, [
+    descriptors.OVERLAP_MODE,
+    descriptors.FILL,
+    descriptors.STROKE
+  ]);
+
+  return map;
+})();
+anychart.core.settings.populate(anychart.polarModule.Axis, anychart.polarModule.Axis.PROPERTY_DESCRIPTORS);
 
 
 //region --- States and Signals
@@ -71,13 +103,6 @@ anychart.polarModule.Axis.prototype.SUPPORTED_SIGNALS = anychart.core.VisualBase
 
 //endregion
 //region --- Properties
-/**
- * @type {anychart.enums.LabelsOverlapMode}
- * @private
- */
-anychart.polarModule.Axis.prototype.overlapMode_ = anychart.enums.LabelsOverlapMode.NO_OVERLAP;
-
-
 /**
  * @type {acgraph.vector.Path}
  * @private
@@ -125,13 +150,6 @@ anychart.polarModule.Axis.prototype.minorLabels_ = null;
  * @private
  */
 anychart.polarModule.Axis.prototype.minorTicks_ = null;
-
-
-/**
- * @type {string|acgraph.vector.Stroke}
- * @private
- */
-anychart.polarModule.Axis.prototype.stroke_;
 
 
 /**
@@ -194,24 +212,6 @@ anychart.polarModule.Axis.prototype.minorLabelsBounds_ = null;
 //endregion
 //region --- API
 /**
- * @param {(anychart.enums.LabelsOverlapMode|string)=} opt_value Value to set.
- * @return {anychart.enums.LabelsOverlapMode|string|anychart.polarModule.Axis} Drawing flag or itself for method chaining.
- */
-anychart.polarModule.Axis.prototype.overlapMode = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var overlap = anychart.enums.normalizeLabelsOverlapMode(opt_value, this.overlapMode_, true);
-    if (this.overlapMode_ != overlap) {
-      this.overlapMode_ = overlap;
-      this.dropBoundsCache_();
-      this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.overlapMode_;
-};
-
-
-/**
  * Drops labels calls cache.
  */
 anychart.polarModule.Axis.prototype.dropLabelCallsCache = function() {
@@ -229,9 +229,9 @@ anychart.polarModule.Axis.prototype.dropLabelCallsCache = function() {
 anychart.polarModule.Axis.prototype.minorLabels = function(opt_value) {
   if (!this.minorLabels_) {
     this.minorLabels_ = new anychart.core.ui.LabelsFactory();
+    this.setupCreated('minorLabels', this.minorLabels_);
     this.minorLabels_.setParentEventTarget(this);
     this.minorLabels_.listenSignals(this.labelsInvalidated_, this);
-    this.registerDisposable(this.minorLabels_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -251,9 +251,9 @@ anychart.polarModule.Axis.prototype.minorLabels = function(opt_value) {
 anychart.polarModule.Axis.prototype.labels = function(opt_value) {
   if (!this.labels_) {
     this.labels_ = new anychart.core.ui.LabelsFactory();
+    this.setupCreated('labels', this.labels_);
     this.labels_.setParentEventTarget(this);
     this.labels_.listenSignals(this.labelsInvalidated_, this);
-    this.registerDisposable(this.labels_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -294,9 +294,9 @@ anychart.polarModule.Axis.prototype.labelsInvalidated_ = function(event) {
 anychart.polarModule.Axis.prototype.minorTicks = function(opt_value) {
   if (!this.minorTicks_) {
     this.minorTicks_ = new anychart.radarPolarBaseModule.RadialAxisTicks();
+    this.setupCreated('minorTicks', this.minorTicks_);
     this.minorTicks_.setParentEventTarget(this);
     this.minorTicks_.listenSignals(this.ticksInvalidated_, this);
-    this.registerDisposable(this.minorTicks_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -314,9 +314,9 @@ anychart.polarModule.Axis.prototype.minorTicks = function(opt_value) {
 anychart.polarModule.Axis.prototype.ticks = function(opt_value) {
   if (!this.ticks_) {
     this.ticks_ = new anychart.radarPolarBaseModule.RadialAxisTicks();
+    this.setupCreated('ticks', this.ticks_);
     this.ticks_.setParentEventTarget(this);
     this.ticks_.listenSignals(this.ticksInvalidated_, this);
-    this.registerDisposable(this.ticks_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -345,60 +345,6 @@ anychart.polarModule.Axis.prototype.ticksInvalidated_ = function(event) {
   }
   this.dropBoundsCache_();
   this.invalidate(state, signal);
-};
-
-
-/**
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.polarModule.Axis|acgraph.vector.Stroke|Function} .
- */
-anychart.polarModule.Axis.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    opt_strokeOrFill = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (this.stroke_ != opt_strokeOrFill) {
-      var thicknessOld = acgraph.vector.getThickness(this.stroke_);
-      var thicknessNew = acgraph.vector.getThickness(opt_strokeOrFill);
-      this.stroke_ = opt_strokeOrFill;
-      if (thicknessNew == thicknessOld)
-        this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-      else {
-        this.dropBoundsCache_();
-        this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-      }
-    }
-    return this;
-  } else {
-    return this.stroke_;
-  }
-};
-
-
-/**
- * Get/set axis fill settings.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {!(acgraph.vector.Fill|anychart.polarModule.Axis)} Grid even fill settings or Grid instance for method chaining.
- */
-anychart.polarModule.Axis.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.fill_), val)) {
-      this.fill_ = val;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.fill_;
 };
 
 
@@ -517,7 +463,7 @@ anychart.polarModule.Axis.prototype.calculateAxisBounds_ = function() {
       var majorLabelsEnabled = majorLabels.enabled();
       var minorLabelsEnabled = minorLabels.enabled();
 
-      var lineThickness = acgraph.vector.getThickness(this.stroke_);
+      var lineThickness = anychart.utils.extractThickness(/** @type {acgraph.vector.Stroke} */(this.getOption('stroke')));
 
       var majorTicksLength = anychart.utils.getAffectBoundsTickLength(ticks);
       var ignoreMajorTicks;
@@ -553,9 +499,11 @@ anychart.polarModule.Axis.prototype.calculateAxisBounds_ = function() {
       var majorTickAngles = [];
       var minorTickAngles = [];
       var radiusDelta = lineThickness / 2;
-      var hasFill = this.fill_ != 'none';
+      var hasFill = /** @type {acgraph.vector.Fill}*/(this.getOption('fill')) != 'none';
       var boundsChecker = hasFill ? this.checkCrossesParentRadius_ : this.checkCrossesParentBounds_;
-      var overlapMode = !isOrdinal ? anychart.enums.LabelsOverlapMode.NO_OVERLAP : this.overlapMode_;
+      var overlapMode = !isOrdinal ?
+                anychart.enums.LabelsOverlapMode.NO_OVERLAP :
+                /** @type {anychart.enums.LabelsOverlapMode} */(this.getOption('overlapMode'));
 
       var padding, commonIndex, radiusChanged, labelsOriginRadius;
       var changerIndex = NaN;
@@ -893,7 +841,7 @@ anychart.polarModule.Axis.prototype.getRemainingBounds = function() {
   if (parentBounds) {
     if (this.enabled()) {
       this.calculateAxisBounds_();
-      var lineThickness = acgraph.vector.getThickness(this.stroke_);
+      var lineThickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(this.getOption('stroke')));
       var halfThickness = Math.floor(lineThickness / 2);
       return new anychart.math.Rect(
           this.cx_ - this.radius_ + halfThickness,
@@ -922,7 +870,7 @@ anychart.polarModule.Axis.prototype.getRemainingBounds = function() {
  */
 anychart.polarModule.Axis.prototype.configureLabel_ = function(labels, index, ticksArr, angle, radius, radiusDelta) {
   var value = ticksArr[index];
-  var hasFill = this.fill_ != 'none';
+  var hasFill = /** @type {acgraph.vector.Fill}*/(this.getOption('fill')) != 'none';
   var formatProvider = this.getLabelsFormatProvider_(index, value);
   var label = labels.getLabel(index);
   if (label) {
@@ -1217,15 +1165,17 @@ anychart.polarModule.Axis.prototype.draw = function() {
   this.ticks().suspendSignalsDispatching();
   this.minorTicks().suspendSignalsDispatching();
 
+  var stroke = /** @type {acgraph.vector.Stroke} */(this.getOption('stroke'));
+
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    this.line_.stroke(this.stroke_);
+    this.line_.stroke(stroke);
     this.line_.fill('none');
     this.line_.clear();
     this.line_.moveTo(this.cx_ + this.radius_, this.cy_);
     this.line_.circularArc(this.cx_, this.cy_, this.radius_, this.radius_, 0, 360);
 
     this.bg_.stroke('none');
-    this.bg_.fill(this.fill_);
+    this.bg_.fill(/** @type {acgraph.vector.Fill} */(this.getOption('fill')));
     this.bg_.clear();
     this.bg_.moveTo(this.cx_ + this.radius_, this.cy_);
     this.bg_.circularArc(this.cx_, this.cy_, this.radius_, this.radius_, 0, 360);
@@ -1261,7 +1211,7 @@ anychart.polarModule.Axis.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.AXIS_TICKS)) {
     var isOrdinal = anychart.utils.instanceOf(this.scale(), anychart.scales.Ordinal);
-    var lineThickness = acgraph.vector.getThickness(this.stroke_);
+    var lineThickness = acgraph.vector.getThickness(stroke);
     var ticks = /** @type {anychart.radarPolarBaseModule.RadialAxisTicks} */(this.ticks());
     ticks.draw();
     var tickThickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(ticks.getOption('stroke')));
@@ -1374,14 +1324,12 @@ anychart.polarModule.Axis.prototype.remove = function() {
 /** @inheritDoc */
 anychart.polarModule.Axis.prototype.serialize = function() {
   var json = anychart.polarModule.Axis.base(this, 'serialize');
+  anychart.core.settings.serialize(this, anychart.polarModule.Axis.PROPERTY_DESCRIPTORS, json);
   json['labels'] = this.labels().serialize();
   json['minorLabels'] = this.minorLabels().serialize();
   json['ticks'] = this.ticks().serialize();
   json['minorTicks'] = this.minorTicks().serialize();
-  json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
-  json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.fill()));
   //json['startAngle'] = this.startAngle();
-  json['overlapMode'] = this.overlapMode();
   return json;
 };
 
@@ -1389,34 +1337,29 @@ anychart.polarModule.Axis.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.polarModule.Axis.prototype.setupByJSON = function(config, opt_default) {
   anychart.polarModule.Axis.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.settings.deserialize(this, anychart.polarModule.Axis.PROPERTY_DESCRIPTORS, config, opt_default);
   this.labels().setupInternal(!!opt_default, config['labels']);
   this.minorLabels().setupInternal(!!opt_default, config['minorLabels']);
   this.ticks(config['ticks']);
   this.minorTicks(config['minorTicks']);
   //this.startAngle(config['startAngle']);
-  this.stroke(config['stroke']);
-  this.fill(config['fill']);
-  this.overlapMode(config['overlapMode']);
 };
 
 
 /** @inheritDoc */
 anychart.polarModule.Axis.prototype.disposeInternal = function() {
-  anychart.polarModule.Axis.base(this, 'disposeInternal');
+  goog.disposeAll(this.minorLabels_, this.labels_, this.minorTicks_, this.ticks_,
+    this.line_, this.bg_);
 
   delete this.scale_;
+  this.minorLabels_ = null;
+  this.labels_ = null;
+  this.minorTicks_ = null;
+  this.ticks_ = null;
+  this.line_ = this.bg_ = null;
   this.labelsBounds_ = null;
 
-  this.title_ = null;
-
-  goog.disposeAll(this.line_, this.bg_);
-  this.line_ = this.bg_ = null;
-
-  this.ticks_ = null;
-  this.minorTicks_ = null;
-
-  this.labels_ = null;
-  this.minorLabels_ = null;
+  anychart.polarModule.Axis.base(this, 'disposeInternal');
 };
 
 
@@ -1484,7 +1427,7 @@ anychart.standalones.axes.Polar.prototype.serialize = function() {
  */
 anychart.standalones.axes.polar = function() {
   var axis = new anychart.standalones.axes.Polar();
-  axis.setup(anychart.getFullTheme('standalones.polarAxis'));
+  axis.addThemes('standalones.polarAxis');
   return axis;
 };
 
@@ -1499,11 +1442,12 @@ anychart.standalones.axes.polar = function() {
   proto['minorLabels'] = proto.minorLabels;
   proto['ticks'] = proto.ticks;
   proto['minorTicks'] = proto.minorTicks;
-  proto['stroke'] = proto.stroke;
-  proto['fill'] = proto.fill;
   proto['scale'] = proto.scale;
-  proto['overlapMode'] = proto.overlapMode;
   proto['getRemainingBounds'] = proto.getRemainingBounds;
+  // auto
+  // proto['stroke'] = proto.stroke
+  // proto['fill'] = proto.fill;
+  // proto['overlapMode'] = proto.overlapMode;
 
   proto = anychart.standalones.axes.Polar.prototype;
   goog.exportSymbol('anychart.standalones.axes.polar', anychart.standalones.axes.polar);

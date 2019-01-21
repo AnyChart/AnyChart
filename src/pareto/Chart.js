@@ -676,12 +676,11 @@ anychart.paretoModule.Chart.prototype.serialize = function() {
 };
 
 
-/**
- * Setup axes and set percent scale to second y axis
- */
-anychart.paretoModule.Chart.prototype.setupAxes = function() {
-  anychart.paretoModule.Chart.base(this, 'setupAxes');
-  this.yAxis(1).scale(this.percentScale);
+/** @inheritDoc */
+anychart.paretoModule.Chart.prototype.setupAxes = function(opt_config) {
+  anychart.paretoModule.Chart.base(this, 'setupAxes', opt_config);
+  if (!this.yAxis(1).scale())
+    this.yAxis(1).scale(this.percentScale);
 };
 
 

@@ -902,6 +902,8 @@ anychart.core.settings.descriptors = (function() {
   map.CURSOR = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'cursor', anychart.enums.normalizeCursor];
   map.CONTENT = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'content', anychart.core.settings.asIsNormalizer];
 
+  map.OVERLAP_MODE = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'overlapMode', anychart.enums.normalizeLabelsOverlapMode];
+
   return map;
 })();
 

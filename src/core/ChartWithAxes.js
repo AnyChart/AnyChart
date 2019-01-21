@@ -1642,24 +1642,32 @@ anychart.core.ChartWithAxes.prototype.setupByJSON = function(config, opt_default
 
 /**
  * Setup axis markers with scales.
+ * @param {Object=} opt_config configuration to use for elements initialization.
  */
-anychart.core.ChartWithAxes.prototype.setupAxisMarkers = function() {
+anychart.core.ChartWithAxes.prototype.setupAxisMarkers = function(opt_config) {
   var scalesInstances = this.getScaleInstances();
-  this.setupElementsWithScales(this.getThemeOption('lineAxesMarkers'), this.lineMarker, scalesInstances);
-  this.setupElementsWithScales(this.getThemeOption('rangeAxesMarkers'), this.rangeMarker, scalesInstances);
-  this.setupElementsWithScales(this.getThemeOption('textAxesMarkers'), this.textMarker, scalesInstances);
+  var config  = goog.isDef(opt_config) ? opt_config : this.themeSettings;
+  var setupElement = goog.isDef(opt_config);
+
+  this.setupElementsWithScales(config['lineAxesMarkers'], this.lineMarker, scalesInstances, setupElement);
+  this.setupElementsWithScales(config['rangeAxesMarkers'], this.rangeMarker, scalesInstances, setupElement);
+  this.setupElementsWithScales(config['textAxesMarkers'], this.textMarker, scalesInstances, setupElement);
 };
 
 
 /**
  * Setups scales for grids.
+ * @param {Object=} opt_config configuration to use for grid initialization.
  */
-anychart.core.ChartWithAxes.prototype.setupGrids = function() {
+anychart.core.ChartWithAxes.prototype.setupGrids = function(opt_config) {
   var scalesInstances = this.getScaleInstances();
-  this.setupElementsWithScales(this.getThemeOption('xGrids'), this.xGrid, scalesInstances);
-  this.setupElementsWithScales(this.getThemeOption('yGrids'), this.yGrid, scalesInstances);
-  this.setupElementsWithScales(this.getThemeOption('xMinorGrids'), this.xMinorGrid, scalesInstances);
-  this.setupElementsWithScales(this.getThemeOption('yMinorGrids'), this.yMinorGrid, scalesInstances);
+  var config  = goog.isDef(opt_config) ? opt_config : this.themeSettings;
+  var setupElement = goog.isDef(opt_config);
+
+  this.setupElementsWithScales(config['xGrids'], this.xGrid, scalesInstances, setupElement);
+  this.setupElementsWithScales(config['yGrids'], this.yGrid, scalesInstances, setupElement);
+  this.setupElementsWithScales(config['xMinorGrids'], this.xMinorGrid, scalesInstances, setupElement);
+  this.setupElementsWithScales(config['yMinorGrids'], this.yMinorGrid, scalesInstances, setupElement);
 };
 
 
@@ -1684,26 +1692,26 @@ anychart.core.ChartWithAxes.prototype.setupByJSONWithScales = function(config, s
   if (this.annotationsModule_)
     this.annotations(config['annotations']);
 
-  this.setupElementsWithScales(config['xGrids'], this.xGrid, scalesInstances, true);
-  this.setupElementsWithScales(config['yGrids'], this.yGrid, scalesInstances, true);
-  this.setupElementsWithScales(config['xMinorGrids'], this.xMinorGrid, scalesInstances, true);
-  this.setupElementsWithScales(config['yMinorGrids'], this.yMinorGrid, scalesInstances, true);
-  this.setupElementsWithScales(config['xAxes'], this.xAxis, scalesInstances, true);
-  this.setupElementsWithScales(config['yAxes'], this.yAxis, scalesInstances, true);
-  this.setupElementsWithScales(config['lineAxesMarkers'], this.lineMarker, scalesInstances, true);
-  this.setupElementsWithScales(config['rangeAxesMarkers'], this.rangeMarker, scalesInstances, true);
-  this.setupElementsWithScales(config['textAxesMarkers'], this.textMarker, scalesInstances, true);
+  this.setupGrids(config);
+  this.setupAxes(config);
+  this.setupAxisMarkers(config);
 
   if ('crosshair' in config)
     this.crosshair().setupInternal(!!opt_default, config['crosshair']);
 };
 
 
-/** Setup xAxes and yAxes */
-anychart.core.ChartWithAxes.prototype.setupAxes = function() {
+/**
+ * Setup xAxes and yAxes
+ * @param {Object=} opt_config configuration to use for elements initialization.
+ */
+anychart.core.ChartWithAxes.prototype.setupAxes = function(opt_config) {
   var scalesInstances = /**@type {Object}*/(this.getScaleInstances());
-  this.setupElementsWithScales(this.getThemeOption('xAxes'), this.xAxis, scalesInstances);
-  this.setupElementsWithScales(this.getThemeOption('yAxes'), this.yAxis, scalesInstances);
+  var config  = goog.isDef(opt_config) ? opt_config : this.themeSettings;
+  var setupElement = goog.isDef(opt_config);
+
+  this.setupElementsWithScales(config['xAxes'], this.xAxis, scalesInstances, setupElement);
+  this.setupElementsWithScales(config['yAxes'], this.yAxis, scalesInstances, setupElement);
 };
 
 
