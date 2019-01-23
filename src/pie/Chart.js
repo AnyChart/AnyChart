@@ -2461,8 +2461,10 @@ anychart.pieModule.Chart.prototype.drawOutsideLabel_ = function(pointState, opt_
       label['anchor'](/** @type {string} */(anchor));
     label.enabled(false);
   }
+
   if (opt_updateConnector)
     this.updateConnector_(/** @type {anychart.core.ui.CircularLabelsFactory.Label}*/(label), isDraw);
+
   return /** @type {anychart.core.ui.CircularLabelsFactory.Label}*/(label);
 };
 
@@ -4623,9 +4625,10 @@ anychart.pieModule.Chart.prototype.finalizePointAppearance = function(opt_value)
     return;
 
   var explodeChanged = !!opt_value;
+  var isOutsideLabels = this.isOutsideLabels();
 
-  if (explodeChanged) {
-    if (this.isOutsideLabels()) {
+  if (explodeChanged || isOutsideLabels) {
+    if (isOutsideLabels) {
       this.recalculateBounds_ = false;
       this.labels().suspendSignalsDispatching();
       this.labels().clear();
