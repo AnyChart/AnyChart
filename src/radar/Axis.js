@@ -47,7 +47,8 @@ anychart.radarModule.Axis = function() {
   this.resumeSignalsDispatching(false);
 
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
-    ['stroke', this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED]
+    ['stroke', this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['startAngle', this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED]
   ]);
 };
 goog.inherits(anychart.radarModule.Axis, anychart.core.VisualBase);
@@ -63,7 +64,8 @@ anychart.radarModule.Axis.PROPERTY_DESCRIPTORS = (function() {
 
   var descriptors = anychart.core.settings.descriptors;
   anychart.core.settings.createDescriptors(map, [
-    descriptors.STROKE
+    descriptors.STROKE,
+    descriptors.START_ANGLE
   ]);
 
   return map;
@@ -161,13 +163,6 @@ anychart.radarModule.Axis.prototype.cx_ = NaN;
  * @private
  */
 anychart.radarModule.Axis.prototype.cy_ = NaN;
-
-
-/**
- * @type {number}
- * @private
- */
-anychart.radarModule.Axis.prototype.startAngle_ = NaN;
 
 
 /**
@@ -298,24 +293,6 @@ anychart.radarModule.Axis.prototype.scaleInvalidated_ = function(event) {
 };
 
 
-/**
- * @param {(string|number)=} opt_value .
- * @return {(string|number|anychart.radarModule.Axis)} .
- */
-anychart.radarModule.Axis.prototype.startAngle = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = goog.math.standardAngle((goog.isNull(opt_value) || isNaN(+opt_value)) ? 0 : +opt_value);
-    if (this.startAngle_ != opt_value) {
-      this.startAngle_ = opt_value;
-      this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.startAngle_;
-  }
-};
-
-
 //endregion
 //region --- Bounds
 /** @inheritDoc */
@@ -359,7 +336,7 @@ anychart.radarModule.Axis.prototype.calculateAxisBounds_ = function() {
           var scaleTicksArr = scale.ticks().get();
           var ticksArrLen = scaleTicksArr.length;
 
-          var startAngle = goog.math.standardAngle(this.startAngle() - 90);
+          var startAngle = goog.math.standardAngle(/** @type {number} */(this.getOption('startAngle')) - 90);
           var angle;
 
           var leftExtreme = NaN;
@@ -765,7 +742,7 @@ anychart.radarModule.Axis.prototype.draw = function() {
     var i;
     var scaleTicksArr = scale.ticks().get();
     var ticksArrLen = scaleTicksArr.length;
-    var startAngle = goog.math.standardAngle(this.startAngle() - 90);
+    var startAngle = goog.math.standardAngle(/** @type {number} */(this.getOption('startAngle')) - 90);
     var tickLen = ticks.enabled() ? isNaN(this.criticalTickLength_) ? /** @type {number} */(ticks.getOption('length')) : this.criticalTickLength_ : 0;
     var lineThickness = this.line_.stroke()['thickness'] ? this.line_.stroke()['thickness'] : 1;
     var halfThickness = Math.floor(lineThickness / 2);
@@ -893,7 +870,7 @@ anychart.radarModule.Axis.prototype.getLabelBounds_ = function(index) {
   var labelsSidePosition = anychart.utils.sidePositionToNumber(labelsPosition);
   var ticksLength = anychart.utils.getAffectBoundsTickLength(ticks, labelsSidePosition);
 
-  var angle = goog.math.standardAngle(this.startAngle() - 90 + ratio * 360);
+  var angle = goog.math.standardAngle(/** @type {number} */(this.getOption('startAngle')) - 90 + ratio * 360);
   var angleRad = angle * Math.PI / 180;
 
   var tickLen = ticks.enabled() ? isNaN(this.criticalTickLength_) ? ticksLength : this.criticalTickLength_ : 0;
@@ -984,7 +961,6 @@ anychart.radarModule.Axis.prototype.serialize = function() {
   anychart.core.settings.serialize(this, anychart.radarModule.Axis.PROPERTY_DESCRIPTORS, json);
   json['labels'] = this.labels().serialize();
   json['ticks'] = this.ticks().serialize();
-  //json['startAngle'] = this.startAngle();
   return json;
 };
 
@@ -993,7 +969,6 @@ anychart.radarModule.Axis.prototype.serialize = function() {
 anychart.radarModule.Axis.prototype.setupByJSON = function(config, opt_default) {
   anychart.radarModule.Axis.base(this, 'setupByJSON', config, opt_default);
   anychart.core.settings.deserialize(this, anychart.radarModule.Axis.PROPERTY_DESCRIPTORS, config, opt_default);
-  //this.startAngle(config['startAngle']);
   this.labels().setupInternal(!!opt_default, config['labels']);
   this.ticks(config['ticks']);
 };
@@ -1034,21 +1009,6 @@ goog.inherits(anychart.standalones.axes.Radar, anychart.radarModule.Axis);
 anychart.core.makeStandalone(anychart.standalones.axes.Radar, anychart.radarModule.Axis);
 
 
-/** @inheritDoc */
-anychart.standalones.axes.Radar.prototype.setupByJSON = function(config, opt_default) {
-  anychart.standalones.axes.Radar.base(this, 'setupByJSON', config, opt_default);
-  this.startAngle(config['startAngle']);
-};
-
-
-/** @inheritDoc */
-anychart.standalones.axes.Radar.prototype.serialize = function() {
-  var json = anychart.standalones.axes.Radar.base(this, 'serialize');
-  json['startAngle'] = this.startAngle();
-  return json;
-};
-
-
 /**
  * Returns axis instance.<br/>
  * <b>Note:</b> Any axis must be bound to a scale.
@@ -1079,6 +1039,7 @@ anychart.standalones.axes.radar = function() {
   proto['draw'] = proto.draw;
   proto['parentBounds'] = proto.parentBounds;
   proto['container'] = proto.container;
-  proto['startAngle'] = proto.startAngle;
+  // auto
+  // proto['startAngle'] = proto.startAngle;
 })();
 //endregion

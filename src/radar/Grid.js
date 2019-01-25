@@ -35,7 +35,7 @@ anychart.radarModule.Grid.prototype.drawLineCircuit = function(ratio) {
   if (xScaleTicksCount != 0) {
     var radius = this.iRadius_ + (this.radius_ - this.iRadius_) * ratio;
 
-    var startAngle = this.startAngle() - 90;
+    var startAngle = /** @type {number} */(this.getOption('startAngle')) - 90;
 
     var x, y, angleRad, xRatio, angle;
     for (var i = 0; i < xScaleTicksCount; i++) {
@@ -92,7 +92,7 @@ anychart.radarModule.Grid.prototype.drawInterlaceCircuit = function(ratio, prevR
 
     if (xScaleTicksCount != 0) {
       var x, y, angleRad, i, radius, angle, xRatio;
-      var startAngle = this.startAngle() - 90;
+      var startAngle = /** @type {number}*/(this.getOption('startAngle')) - 90;
       radius = this.iRadius_ + (this.radius_ - this.iRadius_) * ratio;
       for (i = 0; i < xScaleTicksCount; i++) {
         xRatio = this.xScale().transform(xScaleTicks[i]);
@@ -171,7 +171,7 @@ anychart.radarModule.Grid.prototype.drawInternal = function() {
 
   var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
   this.radius_ = Math.min(parentBounds.width, parentBounds.height) / 2;
-  this.iRadius_ = anychart.utils.normalizeSize(this.innerRadius_, this.radius_);
+  this.iRadius_ = anychart.utils.normalizeSize(/** @type {number} */(this.getOption('innerRadius')), this.radius_);
   if (this.iRadius_ == this.radius_) this.iRadius_--;
   this.cx_ = Math.round(parentBounds.left + parentBounds.width / 2);
   this.cy_ = Math.round(parentBounds.top + parentBounds.height / 2);
@@ -179,7 +179,7 @@ anychart.radarModule.Grid.prototype.drawInternal = function() {
   this.lineElement().clip(parentBounds);
 
   var i, ratio, cx, cy;
-  var startAngle = this.startAngle() - 90;
+  var startAngle = /** @type {number} */(this.getOption('startAngle')) - 90;
 
   if (this.isRadial()) {
     ticks = xScale.ticks();
@@ -309,7 +309,7 @@ anychart.core.makeStandalone(anychart.standalones.grids.Radar, anychart.radarMod
  */
 anychart.standalones.grids.radar = function() {
   var grid = new anychart.standalones.grids.Radar();
-  grid.setup(anychart.getFullTheme('standalones.radarGrid'));
+  grid.addThemes('standalones.radarGrid');
   return grid;
 };
 
@@ -323,7 +323,8 @@ anychart.standalones.grids.radar = function() {
   proto['draw'] = proto.draw;
   proto['parentBounds'] = proto.parentBounds;
   proto['container'] = proto.container;
-  proto['startAngle'] = proto.startAngle;
-  proto['innerRadius'] = proto.innerRadius;
+  //auto from radarPolarBaseModule.Grid
+  //proto['startAngle'] = proto.startAngle;
+  //proto['innerRadius'] = proto.innerRadius;
 })();
 //endregion

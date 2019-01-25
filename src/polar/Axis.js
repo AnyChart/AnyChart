@@ -56,7 +56,8 @@ anychart.polarModule.Axis = function() {
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['overlapMode', this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED, 0, beforeInvalidationHook],
     ['fill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
-    ['stroke', this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED, 0, beforeInvalidationHook]
+    ['stroke', this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED, 0, beforeInvalidationHook],
+    ['startAngle', this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED, 0, beforeInvalidationHook]
   ]);
 };
 goog.inherits(anychart.polarModule.Axis, anychart.core.VisualBase);
@@ -74,7 +75,8 @@ anychart.polarModule.Axis.PROPERTY_DESCRIPTORS = (function() {
   anychart.core.settings.createDescriptors(map, [
     descriptors.OVERLAP_MODE,
     descriptors.FILL,
-    descriptors.STROKE
+    descriptors.STROKE,
+    descriptors.START_ANGLE
   ]);
 
   return map;
@@ -186,13 +188,6 @@ anychart.polarModule.Axis.prototype.cx_ = NaN;
  * @private
  */
 anychart.polarModule.Axis.prototype.cy_ = NaN;
-
-
-/**
- * @type {number}
- * @private
- */
-anychart.polarModule.Axis.prototype.startAngle_ = NaN;
 
 
 /**
@@ -385,25 +380,6 @@ anychart.polarModule.Axis.prototype.scaleInvalidated_ = function(event) {
 };
 
 
-/**
- * @param {(string|number)=} opt_value .
- * @return {(string|number|anychart.polarModule.Axis)} .
- */
-anychart.polarModule.Axis.prototype.startAngle = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = goog.math.standardAngle((goog.isNull(opt_value) || isNaN(+opt_value)) ? 0 : +opt_value);
-    if (this.startAngle_ != opt_value) {
-      this.startAngle_ = opt_value;
-      this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    this.dropBoundsCache_();
-    return this;
-  } else {
-    return this.startAngle_;
-  }
-};
-
-
 //endregion
 //region --- Bounds
 /** @inheritDoc */
@@ -545,7 +521,7 @@ anychart.polarModule.Axis.prototype.calculateAxisBounds_ = function() {
 
           labelsOriginRadius = isOrdinal ? this.radius_ : this.radius_ + affectsRadiusTicksLength;
           commonIndex = isMajor ? index : ~index;
-          angle = anychart.math.round(goog.math.standardAngle(this.startAngle_ - 90 + ratio * 360), 4);
+          angle = anychart.math.round(goog.math.standardAngle(/** @type {number} */(this.getOption('startAngle')) - 90 + ratio * 360), 4);
           angleRad = goog.math.toRadians(angle);
           dx = anychart.math.angleDx(angleRad, 1);
           dy = anychart.math.angleDy(angleRad, 1);
@@ -597,7 +573,7 @@ anychart.polarModule.Axis.prototype.calculateAxisBounds_ = function() {
             var tickAngle, tickDx, tickDy;
             if (isOrdinal) {
               var tickRatio = this.getRatio_(index, ticksArr, scale, 0);
-              tickAngle = anychart.math.round(goog.math.standardAngle(this.startAngle_ - 90 + tickRatio * 360), 4);
+              tickAngle = anychart.math.round(goog.math.standardAngle(/** @type {number} */(this.getOption('startAngle')) - 90 + tickRatio * 360), 4);
               angleRad = goog.math.toRadians(tickAngle);
               tickDx = anychart.math.angleDx(angleRad, 1);
               tickDy = anychart.math.angleDy(angleRad, 1);
@@ -1048,8 +1024,8 @@ anychart.polarModule.Axis.prototype.calcLabelTextPath = function(label, index, t
   var startAngle, endAngle;
 
   if (anychart.utils.instanceOf(scale, anychart.scales.Ordinal)) {
-    startAngle = this.startAngle_ - 90 + this.getRatio_(index, ticksArr, scale, 0) * 360;
-    endAngle = this.startAngle_ - 90 + this.getRatio_(index, ticksArr, scale, 1) * 360;
+    startAngle = /** @type {number} */(this.getOption('startAngle')) - 90 + this.getRatio_(index, ticksArr, scale, 0) * 360;
+    endAngle = /** @type {number} */(this.getOption('startAngle')) - 90 + this.getRatio_(index, ticksArr, scale, 1) * 360;
 
     var ticks = /** @type {anychart.radarPolarBaseModule.RadialAxisTicks} */(this.ticks());
     var ticksStroke = /** @type {acgraph.vector.Stroke} */(ticks.getOption('stroke'));
@@ -1329,7 +1305,6 @@ anychart.polarModule.Axis.prototype.serialize = function() {
   json['minorLabels'] = this.minorLabels().serialize();
   json['ticks'] = this.ticks().serialize();
   json['minorTicks'] = this.minorTicks().serialize();
-  //json['startAngle'] = this.startAngle();
   return json;
 };
 
@@ -1342,7 +1317,6 @@ anychart.polarModule.Axis.prototype.setupByJSON = function(config, opt_default) 
   this.minorLabels().setupInternal(!!opt_default, config['minorLabels']);
   this.ticks(config['ticks']);
   this.minorTicks(config['minorTicks']);
-  //this.startAngle(config['startAngle']);
 };
 
 
@@ -1405,21 +1379,6 @@ goog.inherits(anychart.standalones.axes.Polar, anychart.polarModule.Axis);
 anychart.core.makeStandalone(anychart.standalones.axes.Polar, anychart.polarModule.Axis);
 
 
-/** @inheritDoc */
-anychart.standalones.axes.Polar.prototype.setupByJSON = function(config, opt_default) {
-  anychart.standalones.axes.Polar.base(this, 'setupByJSON', config, opt_default);
-  this.startAngle(config['startAngle']);
-};
-
-
-/** @inheritDoc */
-anychart.standalones.axes.Polar.prototype.serialize = function() {
-  var json = anychart.standalones.axes.Polar.base(this, 'serialize');
-  json['startAngle'] = this.startAngle();
-  return json;
-};
-
-
 /**
  * Returns axis instance.<br/>
  * <b>Note:</b> Any axis must be bound to a scale.
@@ -1454,6 +1413,7 @@ anychart.standalones.axes.polar = function() {
   proto['draw'] = proto.draw;
   proto['parentBounds'] = proto.parentBounds;
   proto['container'] = proto.container;
-  proto['startAngle'] = proto.startAngle;
+  // auto
+  // proto['startAngle'] = proto.startAngle;
 })();
 //endregion

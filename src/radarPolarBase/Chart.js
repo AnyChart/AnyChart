@@ -547,7 +547,7 @@ anychart.radarPolarBaseModule.Chart.prototype.drawContent = function(bounds) {
     //total bounds of content area
     var contentAreaBounds = bounds.clone().round();
     axis = this.xAxis();
-    axis.startAngle(startAngle);
+    axis['startAngle'](startAngle);
     axis.parentBounds(contentAreaBounds);
     this.dataBounds = axis.getRemainingBounds().round();
 
@@ -570,9 +570,9 @@ anychart.radarPolarBaseModule.Chart.prototype.drawContent = function(bounds) {
           grid.invalidate(anychart.ConsistencyState.GRIDS_POSITION);
         }
         grid.parentBounds(this.dataBounds);
-        grid.innerRadius(innerRadius);
+        grid['innerRadius'](innerRadius);
         grid.container(this.rootElement);
-        grid.startAngle(startAngle);
+        grid['startAngle'](startAngle);
         grid.draw();
         grid.resumeSignalsDispatching(false);
       }
@@ -592,8 +592,8 @@ anychart.radarPolarBaseModule.Chart.prototype.drawContent = function(bounds) {
 
     axis = this.yAxis();
     axis.container(this.rootElement);
-    axis.startAngle(startAngle);
-    axis.innerRadius(innerRadius);
+    axis['startAngle'](startAngle);
+    axis['innerRadius'](innerRadius);
     axis.parentBounds(this.dataBounds.clone());
     axis.draw();
 

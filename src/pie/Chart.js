@@ -450,16 +450,14 @@ anychart.pieModule.Chart.PROPERTY_DESCRIPTORS = (function() {
   function innerRadiusNormalizer(opt_value) {
     return goog.isFunction(opt_value) ? opt_value : anychart.utils.normalizeNumberOrPercent(opt_value);
   }
-  function startAngleNormalizer(opt_value) {
-    return goog.math.standardAngle(anychart.utils.toNumber(opt_value) || 0);
-  }
+  var descriptors = anychart.core.settings.descriptors;
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
   anychart.core.settings.createDescriptors(map, [
-        [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'overlapMode', anychart.enums.normalizeLabelsOverlapMode],
+        descriptors.OVERLAP_MODE,
+        descriptors.START_ANGLE,
         [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'radius', radiusNormalizer],
         [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'innerRadius', innerRadiusNormalizer],
-        [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'startAngle', startAngleNormalizer],
         [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'sort', anychart.enums.normalizeSort],
         [anychart.enums.PropertyHandlerType.SINGLE_ARG_DEPRECATED, '', outsideLabelsSpaceNormalizer, 'outsideLabelsSpace'],
         [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'insideLabelsOffset', anychart.utils.normalizeNumberOrPercent],

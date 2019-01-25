@@ -814,6 +814,16 @@ anychart.core.settings.functionNormalizer = function(val) {
 };
 
 
+/**
+ * Single arg normalizer for start angle.
+ * @param {*} val
+ * @return {number}
+ */
+anychart.core.settings.startAngleNormalizer = function(val) {
+  return goog.math.standardAngle(anychart.utils.toNumber(val) || 0);
+};
+
+
 //endregion
 //region Descriptors
 /**
@@ -898,6 +908,7 @@ anychart.core.settings.descriptors = (function() {
 
   //pie
   map.EXPLODE = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'explode', anychart.core.settings.numberOrPercentNormalizer];
+  map.START_ANGLE = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'startAngle', anychart.core.settings.startAngleNormalizer];
 
   map.CURSOR = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'cursor', anychart.enums.normalizeCursor];
   map.CONTENT = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'content', anychart.core.settings.asIsNormalizer];

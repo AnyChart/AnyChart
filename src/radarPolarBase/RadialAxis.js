@@ -55,11 +55,17 @@ anychart.radarPolarBaseModule.RadialAxis = function() {
       anychart.ConsistencyState.AXIS_OVERLAP;
   this.resumeSignalsDispatching(false);
 
+  function beforeInvalidationHook() {
+    this.dropBoundsCache_();
+  }
+
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['drawFirstLabel', this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
     ['drawLastLabel', this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
     ['overlapMode', this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
-    ['stroke', this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED]
+    ['stroke', this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['startAngle', this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED, 0, beforeInvalidationHook],
+    ['innerRadius', this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED]
   ]);
 };
 goog.inherits(anychart.radarPolarBaseModule.RadialAxis, anychart.core.VisualBase);
@@ -73,10 +79,16 @@ anychart.radarPolarBaseModule.RadialAxis.PROPERTY_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
 
+  function innerRadiusNormalizer(opt_value) {
+    return anychart.utils.normalizeNumberOrPercent(opt_value, this.getOption('innerRadius'));
+  }
+
   var descriptors = anychart.core.settings.descriptors;
   anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'innerRadius', innerRadiusNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'drawFirstLabel', anychart.core.settings.booleanNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'drawLastLabel', anychart.core.settings.booleanNormalizer],
+    descriptors.START_ANGLE,
     descriptors.OVERLAP_MODE,
     descriptors.STROKE
   ]);
@@ -414,43 +426,6 @@ anychart.radarPolarBaseModule.RadialAxis.prototype.scaleInvalidated_ = function(
 };
 
 
-/**
- * @param {(string|number)=} opt_value .
- * @return {(string|number|anychart.radarPolarBaseModule.RadialAxis)} .
- */
-anychart.radarPolarBaseModule.RadialAxis.prototype.startAngle = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = goog.math.standardAngle((goog.isNull(opt_value) || isNaN(+opt_value)) ? 0 : +opt_value);
-    if (this.startAngle_ != opt_value) {
-      this.startAngle_ = opt_value;
-      this.dropBoundsCache_();
-      this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.startAngle_;
-  }
-};
-
-
-/**
- * Inner radius getter/setter.
- * @param {(string|number)=} opt_value .
- * @return {(string|number|anychart.radarPolarBaseModule.RadialAxis)} .
- */
-anychart.radarPolarBaseModule.RadialAxis.prototype.innerRadius = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var value = anychart.utils.normalizeNumberOrPercent(opt_value, this.innerRadius_);
-    if (this.innerRadius_ != value) {
-      this.innerRadius_ = value;
-      this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.innerRadius_;
-};
-
-
 //endregion
 //region --- Utils
 /** @inheritDoc */
@@ -690,7 +665,7 @@ anychart.radarPolarBaseModule.RadialAxis.prototype.calcLabels_ = function(opt_bo
 anychart.radarPolarBaseModule.RadialAxis.prototype.calculateAxis_ = function() {
   var parentBounds = this.parentBounds();
   this.length_ = Math.min(parentBounds.width, parentBounds.height) / 2;
-  this.innerLength_ = anychart.utils.normalizeSize(this.innerRadius_, this.length_);
+  this.innerLength_ = anychart.utils.normalizeSize(/** @type {number}*/(this.getOption('innerRadius')), this.length_);
   if (this.innerLength_ == this.length_) this.innerLength_--;
   this.cx_ = Math.round(parentBounds.left + parentBounds.width / 2);
   this.cy_ = Math.round(parentBounds.top + parentBounds.height / 2);
@@ -735,7 +710,7 @@ anychart.radarPolarBaseModule.RadialAxis.prototype.getLabelBounds_ = function(in
   var labelBounds = labels.measure(formatProvider, positionProvider, undefined, index);
 
   var radius = this.innerLength_ + (this.length_ - this.innerLength_) * ratio;
-  var angle = goog.math.standardAngle(this.startAngle() - 90);
+  var angle = goog.math.standardAngle(/** @type {number} */(this.getOption('startAngle')) - 90);
   var angleRad = goog.math.toRadians(angle);
 
   var x = this.cx_ + radius * Math.cos(angleRad);
@@ -895,7 +870,7 @@ anychart.radarPolarBaseModule.RadialAxis.prototype.getLabelsFormatProvider_ = fu
  * @private
  */
 anychart.radarPolarBaseModule.RadialAxis.prototype.drawLine_ = function() {
-  var angle = goog.math.standardAngle(this.startAngle() - 90);
+  var angle = goog.math.standardAngle(/** @type {number} */(this.getOption('startAngle')) - 90);
   var angleRad = goog.math.toRadians(angle);
 
   var xPixelShift = 0;
@@ -930,7 +905,7 @@ anychart.radarPolarBaseModule.RadialAxis.prototype.drawLine_ = function() {
  * @private
  */
 anychart.radarPolarBaseModule.RadialAxis.prototype.drawTick_ = function(ratio, isMajor) {
-  var angle = goog.math.standardAngle(this.startAngle() - 90);
+  var angle = goog.math.standardAngle(/** @type {number} */(this.getOption('startAngle')) - 90);
   var angleRad = goog.math.toRadians(angle);
   var ticks = /** @type {!anychart.radarPolarBaseModule.RadialAxisTicks} */(isMajor ? this.ticks() : this.minorTicks());
 
@@ -1268,7 +1243,6 @@ anychart.radarPolarBaseModule.RadialAxis.prototype.serialize = function() {
   json['minorLabels'] = this.minorLabels().serialize();
   json['ticks'] = this.ticks().serialize();
   json['minorTicks'] = this.minorTicks().serialize();
-  //json['startAngle'] = this.startAngle();
   return json;
 };
 
@@ -1281,7 +1255,6 @@ anychart.radarPolarBaseModule.RadialAxis.prototype.setupByJSON = function(config
   this.minorLabels().setupInternal(!!opt_default, config['minorLabels']);
   this.ticks(config['ticks']);
   this.minorTicks(config['minorTicks']);
-  //this.startAngle(config['startAngle']);
 };
 
 
@@ -1320,23 +1293,6 @@ goog.inherits(anychart.standalones.axes.Radial, anychart.radarPolarBaseModule.Ra
 anychart.core.makeStandalone(anychart.standalones.axes.Radial, anychart.radarPolarBaseModule.RadialAxis);
 
 
-/** @inheritDoc */
-anychart.standalones.axes.Radial.prototype.setupByJSON = function(config, opt_default) {
-  anychart.standalones.axes.Radial.base(this, 'setupByJSON', config, opt_default);
-  this.startAngle(config['startAngle']);
-  this.innerRadius(config['innerRadius']);
-};
-
-
-/** @inheritDoc */
-anychart.standalones.axes.Radial.prototype.serialize = function() {
-  var json = anychart.standalones.axes.Radial.base(this, 'serialize');
-  json['startAngle'] = this.startAngle();
-  json['innerRadius'] = this.innerRadius();
-  return json;
-};
-
-
 /**
  * Returns axis instance.<br/>
  * <b>Note:</b> Any axis must be bound to a scale.
@@ -1344,7 +1300,7 @@ anychart.standalones.axes.Radial.prototype.serialize = function() {
  */
 anychart.standalones.axes.radial = function() {
   var axis = new anychart.standalones.axes.Radial();
-  axis.setup(anychart.getFullTheme('standalones.radialAxis'));
+  axis.addThemes('standalones.radialAxis');
   return axis;
 };
 
@@ -1370,7 +1326,8 @@ anychart.standalones.axes.radial = function() {
   proto['draw'] = proto.draw;
   proto['parentBounds'] = proto.parentBounds;
   proto['container'] = proto.container;
-  proto['startAngle'] = proto.startAngle;
-  proto['innerRadius'] = proto.innerRadius;
+  // auto
+  // proto['startAngle'] = proto.startAngle;
+  // proto['innerRadius'] = proto.innerRadius;
 })();
 //endregion

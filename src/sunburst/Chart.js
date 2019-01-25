@@ -167,9 +167,6 @@ anychart.sunburstModule.Chart.PROPERTY_DESCRIPTORS = (function() {
   function sortNormalizer(opt_value) {
     return goog.isFunction(opt_value) ? opt_value : anychart.enums.normalizeSort(opt_value);
   }
-  function startAngleNormalizer(opt_value) {
-    return goog.math.standardAngle(anychart.utils.toNumber(opt_value) || 0);
-  }
   function innerRadiusNormalizer(opt_value) {
     return goog.isFunction(opt_value) ? opt_value : anychart.utils.normalizeNumberOrPercent(opt_value);
   }
@@ -180,12 +177,13 @@ anychart.sunburstModule.Chart.PROPERTY_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
 
+  var descriptors = anychart.core.settings.descriptors;
   anychart.core.settings.createDescriptors(map, [
       [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'sort', sortNormalizer],
       [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'calculationMode', anychart.core.settings.asIsNormalizer],
       [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'radius', radiusNormalizer],
       [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'innerRadius', innerRadiusNormalizer],
-      [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'startAngle', startAngleNormalizer]
+      descriptors.START_ANGLE
   ]);
 
   return map;

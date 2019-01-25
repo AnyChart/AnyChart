@@ -33,19 +33,36 @@ anychart.radarPolarBaseModule.Grid = function() {
   this.yScale_;
 
   /**
-   * @type {number}
-   * @private
-   */
-  this.startAngle_;
-
-  /**
    * @type {anychart.enums.Layout|anychart.enums.RadialGridLayout}
    * @protected
    */
   this.defaultLayout = anychart.enums.RadialGridLayout.CIRCUIT;
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['startAngle', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['innerRadius', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED]
+  ]);
 };
 goog.inherits(anychart.radarPolarBaseModule.Grid, anychart.core.GridBase);
 
+
+anychart.radarPolarBaseModule.Grid.PROPERTY_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  function innerRadiusNormalizer(opt_value) {
+    return anychart.utils.normalizeNumberOrPercent(opt_value, this.getOption('innerRadius'));
+  }
+
+  var descriptors = anychart.core.settings.descriptors;
+  anychart.core.settings.createDescriptors(map, [
+    descriptors.START_ANGLE,
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'innerRadius', innerRadiusNormalizer]
+  ]);
+
+  return map;
+})();
+anychart.core.settings.populate(anychart.radarPolarBaseModule.Grid, anychart.radarPolarBaseModule.Grid.PROPERTY_DESCRIPTORS);
 
 //region --- Layout
 /** @inheritDoc */
@@ -161,42 +178,6 @@ anychart.radarPolarBaseModule.Grid.prototype.xScaleInvalidated_ = function(event
       anychart.ConsistencyState.APPEARANCE;
 
   this.invalidate(state, signal);
-};
-
-
-/**
- * @param {(string|number)=} opt_value .
- * @return {(string|number|anychart.radarPolarBaseModule.Grid)} .
- */
-anychart.radarPolarBaseModule.Grid.prototype.startAngle = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = goog.math.standardAngle((goog.isNull(opt_value) || isNaN(+opt_value)) ? 0 : +opt_value);
-    if (this.startAngle_ != opt_value) {
-      this.startAngle_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.startAngle_;
-  }
-};
-
-
-/**
- * Inner radius getter/setter.
- * @param {(string|number)=} opt_value .
- * @return {(string|number|anychart.radarPolarBaseModule.Grid)} .
- */
-anychart.radarPolarBaseModule.Grid.prototype.innerRadius = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var value = anychart.utils.normalizeNumberOrPercent(opt_value, this.innerRadius_);
-    if (this.innerRadius_ != value) {
-      this.innerRadius_ = value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.innerRadius_;
 };
 
 
