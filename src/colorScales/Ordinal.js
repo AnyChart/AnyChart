@@ -30,7 +30,7 @@ anychart.colorScalesModule.Ordinal = function() {
 
   /**
    * Ranges.
-   * @type {Array.<Object>}
+   * @type {Array.<anychart.colorScalesModule.Ordinal.Range>}
    * @private
    */
   this.ranges_ = [];
@@ -64,6 +64,19 @@ anychart.colorScalesModule.Ordinal = function() {
 goog.inherits(anychart.colorScalesModule.Ordinal, anychart.scales.Base);
 
 
+/**
+ * Type declaration for a colorscale range.
+ * @typedef {{
+ *   equal: (?number|boolean|string),
+ *   less: (?number),
+ *   greater: (?number),
+ *   from: (?number),
+ *   to: (?number)
+ * }}
+ */
+anychart.colorScalesModule.Ordinal.Range;
+
+
 /** @inheritDoc */
 anychart.colorScalesModule.Ordinal.prototype.getType = function() {
   return anychart.enums.ScaleTypes.ORDINAL_COLOR;
@@ -86,8 +99,9 @@ anychart.colorScalesModule.Ordinal.prototype.colors = function(opt_value) {
     if (goog.isNull(opt_value))
       this.colors_ = [];
     else {
-      if (goog.isArray(opt_value))
+      if (goog.isArray(opt_value)) {
         this.colors_ = goog.array.clone(opt_value);
+      }
     }
     this.resetDataRange();
     this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
@@ -121,12 +135,14 @@ anychart.colorScalesModule.Ordinal.prototype.colors = function(opt_value) {
  */
 anychart.colorScalesModule.Ordinal.prototype.setAutoColors = function(value) {
   this.autoColors_ = value;
+  this.autoColors_.push('#000');
   this.manualAutoColor_ = !!value;
   this.reset();
 };
 
 
 /**
+ * Set names for colorscale ranges.
  * @param {(Array.<*>|string)=} opt_value Array of names or attribute name for data set.
  * @return {(Array.<*>|anychart.colorScalesModule.Ordinal)} Scale names or self for chaining.
  */
@@ -150,7 +166,7 @@ anychart.colorScalesModule.Ordinal.prototype.names = function(opt_value) {
   this.calculate();
   if (goog.isArray(this.names_)) {
     if (!this.resultNames_) {
-      /**
+      /*
        * Resulting names to return.
        * Need to avoid original set of names to be changed.
        */
@@ -166,11 +182,15 @@ anychart.colorScalesModule.Ordinal.prototype.names = function(opt_value) {
     return this.resultNames_;
   } else {
     if (!this.autoNames_) {
+      /*
+       * Set proper names according to the range mathematical conditions.
+       * The unnamed range is the default one.
+       */
       this.autoNames_ = [];
       for (var i = 0, len = this.internalRanges_.length; i < len; i++) {
         var range = this.internalRanges_[i];
         var name;
-        if (goog.isDef(range.equal)) {
+        if (goog.isDef(range.equal) && !goog.isBoolean(range.equal)) {
           name = range.equal;
         } else if (isFinite(range.start + range.end)) {
           if (range.start === range.end) {
@@ -178,11 +198,21 @@ anychart.colorScalesModule.Ordinal.prototype.names = function(opt_value) {
           } else {
             name = range.start + ' - ' + range.end;
           }
-        } else if (isFinite(range.start)) {
-          name = '> ' + range.start;
+        } else if (range.equal === true) {
+          if (isFinite(range.start)) {
+            name = '>= ' + range.start;
+          } else {
+            name = '<= ' + range.end;
+          }
         } else {
-          name = '< ' + range.end;
+          if (isFinite(range.start)) {
+            name = '> ' + range.start;
+          } else {
+            name = '< ' + range.end;
+          }
         }
+        if (!name)
+          name = 'default';
 
         if (!range.name) range.name = name;
         this.autoNames_.push(name);
@@ -195,15 +225,30 @@ anychart.colorScalesModule.Ordinal.prototype.names = function(opt_value) {
 
 
 /**
- * @param {Array.<Object>=} opt_value .
- * @return {Array.<Object>|!anychart.colorScalesModule.Ordinal}
+ * Sets/gets colorscale ranges.
+ * In setter mode adds the default range to the defined ones by a user.
+ * @param {Array.<anychart.colorScalesModule.Ordinal.Range>=} opt_value .
+ * @return {Array.<anychart.colorScalesModule.Ordinal.Range>|!anychart.colorScalesModule.Ordinal}
  */
 anychart.colorScalesModule.Ordinal.prototype.ranges = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.ranges_ != opt_value) {
       this.ranges_ = opt_value;
-      if (!this.manualAutoColor_)
-        this.autoColors_ = (/** @type {Function} */(anychart.getFullTheme('defaultOrdinalColorScale.autoColors')))(this.ranges_.length);
+      var defaultRange = opt_value[opt_value.length - 1];
+      if (!(goog.isNull(defaultRange['equal']) && goog.isNull(defaultRange['from']) && goog.isNull(defaultRange['to']) &&
+          goog.isNull(defaultRange['greater']) && goog.isNull(defaultRange['less']))) {
+        this.ranges_.push({
+          'equal': null,
+          'less': null,
+          'greater': null,
+          'from': null,
+          'to': null
+        });
+      }
+      if (!this.manualAutoColor_) {
+        this.autoColors_ = (/** @type {Function} */(anychart.getFlatTheme('defaultOrdinalColorScale')['autoColors']))(this.ranges_.length - 1);
+        this.autoColors_.push('#000');
+      }
       this.resetDataRange();
       this.ticks().markInvalid();
       this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
@@ -254,13 +299,17 @@ anychart.colorScalesModule.Ordinal.prototype.getRangeByValue = function(value) {
   this.calculate();
 
   var rangeSourceIndex = -1;
-  var range = null;
+  var range = this.internalRanges_[this.internalRanges_.length - 1];
 
   if (this.internalRanges_) {
-    for (var i = this.internalRanges_.length; i--;) {
+    for (var i = 0; i < this.internalRanges_.length - 1; i++) {
       var r = this.internalRanges_[i];
-      if ((goog.isDef(r.equal) && r.equal === value) || (value >= r.start && value <= r.end && r.sourceIndex > rangeSourceIndex)) {
+      if (((r.equal === true) && (value >= r.start && value <= r.end && r.sourceIndex > rangeSourceIndex)) ||
+          ((r.equal === false) && (value > r.start && value < r.end && r.sourceIndex > rangeSourceIndex)) ||
+          ((r.equal === false) && (Math.abs(value) == Infinity) && (value == r.start || value == r.end)) ||
+          (r.equal === value)) {
         range = r;
+        break;
       }
     }
   }
@@ -383,9 +432,9 @@ anychart.colorScalesModule.Ordinal.prototype.transform = function(value, opt_sub
   this.calculate();
 
   var range = this.getRangeByValue(/** @type {number} */(value));
-  if (range) {
+  if (range && range.name !== 'default') {
     var index = goog.array.indexOf(this.internalRanges_, range);
-    var rangeCount = this.internalRanges_.length;
+    var rangeCount = this.internalRanges_.length - 1;
     var step = 1 / rangeCount;
 
     return (index + (opt_subRangeRatio || 0)) * step;
@@ -398,11 +447,14 @@ anychart.colorScalesModule.Ordinal.prototype.transform = function(value, opt_sub
 /** @inheritDoc */
 anychart.colorScalesModule.Ordinal.prototype.inverseTransform = function(ratio) {
   this.calculate();
-
-  var index = goog.math.clamp(Math.ceil(ratio * this.internalRanges_.length) - 1, 0, this.internalRanges_.length - 1);
+  //the index of the default range is excluded from calculations
+  var preCalculatedIndex = Math.ceil(ratio * (this.internalRanges_.length - 1)) - 1;
+  var lastIndex = this.internalRanges_.length - 2;
+  //calculate the exact index
+  var index = goog.math.clamp(preCalculatedIndex, 0, lastIndex);
   var range = this.internalRanges_[index];
 
-  return goog.isDef(range.equal) ? range.equal : (range.start + range.end) / 2;
+  return (range.start + range.end) / 2;
 };
 
 
@@ -505,17 +557,28 @@ anychart.colorScalesModule.Ordinal.prototype.calculate = function() {
       }
 
       this.autoRanges_ = this.autoRanges_.concat(eqRanges);
-      if (!this.manualAutoColor_)
-        this.autoColors_ = (/** @type {Function} */(anychart.getFullTheme('defaultOrdinalColorScale.autoColors')))(this.autoRanges_.length);
+      if (this.autoRanges_.length)
+        this.autoRanges_.push({
+          'equal': null,
+          'less': null,
+          'greater': null,
+          'from': null,
+          'to': null
+        });
+      if (!this.manualAutoColor_) {
+        this.autoColors_ = (/** @type {Function} */(anychart.getFlatTheme('defaultOrdinalColorScale')['autoColors']))(this.autoRanges_.length - 1);
+        if (this.autoColors_)
+          this.autoColors_.push('#000');
+      }
     }
 
-    var ranges = this.ranges_.length ? this.ranges_ : this.autoRanges_;
-
+    var ranges = /** @type {Array.<anychart.colorScalesModule.Ordinal.Range>} */ (this.ranges_.length ? this.ranges_ : this.autoRanges_);
     for (i = 0, len = ranges.length; i < len; i++) {
       range = ranges[i];
       name = this.names_ ? this.names_[i] : null;
       var colors = this.colors();
-      var colorIndex = this.inverted() ? Math.max(0, colors.length - 1 - i) : i;
+      // exclude the default range color if scale is inverted
+      var colorIndex = this.inverted() ? Math.max(0, colors.length - 2 - i) : i;
       color = colors && colors[colorIndex] ? colors[colorIndex] : null;
 
       var enabled = true;
@@ -526,23 +589,34 @@ anychart.colorScalesModule.Ordinal.prototype.calculate = function() {
       var less = anychart.utils.toNumber(range['less']);
       var greater = anychart.utils.toNumber(range['greater']);
 
-      var start = NaN, end = NaN, eq = undefined;
+      var start = NaN, end = NaN, eq = true;
       if (goog.isDef(equal)) {
-        var equal_ = anychart.utils.toNumber(equal);
-        if (!isNaN(equal_)) {
-          start = equal_;
-          end = equal_;
-        } else {
+        if (goog.isBoolean(equal)) {
           eq = equal;
+          if (!isNaN(greater)) {
+            start = greater;
+            end = Infinity;
+          } else if (!isNaN(less)) {
+            start = -Infinity;
+            end = less;
+          }
+        } else {
+          var equal_ = anychart.utils.toNumber(equal);
+          if (!isNaN(equal_)) {
+            start = equal_;
+            end = equal_;
+          } else {
+            eq = equal;
+          }
         }
       } else if (!isNaN(from) && !isNaN(to)) {
         start = Math.min(from, to);
         end = Math.max(from, to);
       } else if (!isNaN(greater)) {
         start = greater;
-        end = Number.POSITIVE_INFINITY;
+        end = Infinity;
       } else if (!isNaN(less)) {
-        start = Number.NEGATIVE_INFINITY;
+        start = -Infinity;
         end = less;
       } else {
         enabled = false;
@@ -561,42 +635,7 @@ anychart.colorScalesModule.Ordinal.prototype.calculate = function() {
       }
     }
 
-    goog.array.sort(tempArr, function(a, b) {
-      var result = a.start > b.start ? 1 : a.start < b.start ? -1 : 0;
-      var hasIntersection = Math.max(a.start, b.start) <= Math.min(a.end, b.end);
-
-      if (hasIntersection) {
-        if (a.start > b.start) {
-          if (a.sourceIndex > b.sourceIndex) {
-            b.end = a.start;
-          } else {
-            a.start = b.end;
-            if (a.start >= a.end)
-              a.enabled = false;
-          }
-        } else if (a.start < b.start) {
-          if (a.sourceIndex > b.sourceIndex) {
-            b.start = a.end;
-            if (b.start >= b.end)
-              b.enabled = false;
-          } else {
-            a.end = b.start;
-          }
-        } else {
-          if (a.sourceIndex > b.sourceIndex) {
-            b.start = a.end;
-            if (b.start >= b.end)
-              b.enabled = false;
-          } else {
-            a.end = b.start;
-            if (a.start >= a.end)
-              a.enabled = false;
-          }
-        }
-      }
-
-      return result;
-    });
+    this.sortRanges(tempArr);
 
     var arr = [];
     for (i = 0, len = tempArr.length; i < len; i++) {
@@ -608,6 +647,58 @@ anychart.colorScalesModule.Ordinal.prototype.calculate = function() {
     tempArr.length = 0;
     this.internalRanges_ = arr;
   }
+};
+
+
+/**
+ * Sort ranges in numerical order resolving intersections.
+ * @param {Array.<Object>} unsortedRangeArr Array of unsorted ranges.
+ */
+anychart.colorScalesModule.Ordinal.prototype.sortRanges = function(unsortedRangeArr) {
+  goog.array.sort(unsortedRangeArr, function(a, b) {
+    var result = a.start > b.start ? 1 : a.start < b.start ? -1 : 0;
+    if (!result) {
+      result = a.end > b.end ? 1 : a.end < b.end ? -1 : 0;
+    }
+    var hasIntersection;
+    if (!a.equal || !b.equal) {
+      hasIntersection = Math.max(a.start, b.start) < Math.min(a.end, b.end);
+    } else {
+      hasIntersection = Math.max(a.start, b.start) <= Math.min(a.end, b.end);
+    }
+
+    if (hasIntersection) {
+      if (a.start > b.start) {
+        if (a.sourceIndex > b.sourceIndex) {
+          b.end = a.start;
+        } else {
+          a.start = b.end;
+          if (a.start >= a.end)
+            a.enabled = false;
+        }
+      } else if (a.start < b.start) {
+        if (a.sourceIndex > b.sourceIndex) {
+          b.start = a.end;
+          if (b.start >= b.end)
+            b.enabled = false;
+        } else {
+          a.end = b.start;
+        }
+      } else {
+        if (a.sourceIndex > b.sourceIndex) {
+          b.start = a.end;
+          if (b.start >= b.end)
+            b.enabled = false;
+        } else {
+          a.end = b.start;
+          if (a.start >= a.end)
+            a.enabled = false;
+        }
+      }
+    }
+
+    return result;
+  });
 };
 
 
