@@ -4625,7 +4625,8 @@ anychart.pieModule.Chart.prototype.applyAppearanceToPoint = function(pointState,
     this.drawSlice_(pointState, true);
   }
 
-  this.drawLabel_(pointState);
+  if (!this.isMissing_(iterator.get('value'))) // fixes DVF-4174.
+    this.drawLabel_(pointState);
 
   return opt_value || (currentPointExplode != this.getExplode(pointState));
 };
