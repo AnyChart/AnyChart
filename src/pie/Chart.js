@@ -93,6 +93,23 @@ anychart.pieModule.Chart = function(opt_data, opt_csvSettings) {
   this.parentViewToDispose_ = null;
 
   /**
+   * Flag whether chart performs first draw (initial true value)
+   * or needs force bounds recalculation (bounds invalidation).
+   * Needed to consider outsideLabels on calculation (DVF-4147)
+   * because interactivity works that way:
+   *  - default state is 'normal'.
+   *  - state is changed if state is 'exploded' (selected). Bug is here:
+   *    state can be initially 'exploded' from data.
+   *  - if state is changed, we don't need to recalculate bounds.
+   * Considering this flag fixes DVF-4147 shortly without changing
+   * jungles of code in interactivity.
+   *
+   * @type {boolean}
+   * @private
+   */
+  this.needsForceBoundsRecalculation_ = true;
+
+  /**
    * Template for aqua style fill.
    * @private
    * @type {Object}
@@ -1769,7 +1786,7 @@ anychart.pieModule.Chart.prototype.calcDomain = function(labels, isRightSide, op
           }
 
           if (label.enabled() != false) {
-            if (this.recalculateBounds_) {
+            if (this.recalculateBounds_ || this.needsForceBoundsRecalculation_) {
               var boundsForCompare = opt_explode ? this.contentBounds : this.piePlotBounds_;
 
               var labelsRadiusOffset = Math.max(
@@ -2137,6 +2154,7 @@ anychart.pieModule.Chart.prototype.drawContent = function(bounds) {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
+    this.needsForceBoundsRecalculation_ = true;
     this.calculateBounds_(bounds);
     this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.PIE_LABELS);
   }
@@ -2201,13 +2219,13 @@ anychart.pieModule.Chart.prototype.drawContent = function(bounds) {
       this.labels().setAutoColor(themePart['autoColor']);
       this.labels()['disablePointerEvents'](themePart['disablePointerEvents']);
       if (this.isOutsideLabels()) {
-        if (this.recalculateBounds_) {
+        if (this.recalculateBounds_ || this.needsForceBoundsRecalculation_) {
           this.radiusValue_ = this.originalRadiusValue_;
           this.labelsRadiusOffset_ = Number.NEGATIVE_INFINITY;
         }
         this.calculateOutsideLabels();
 
-        if (this.recalculateBounds_) {
+        if (this.recalculateBounds_ || this.needsForceBoundsRecalculation_) {
           var iteration = 5;
           var error = 10;
           //todo (blackart) for debug purpose
@@ -2369,6 +2387,8 @@ anychart.pieModule.Chart.prototype.drawContent = function(bounds) {
       }
     }
   }
+
+  this.needsForceBoundsRecalculation_ = false;
 };
 
 
