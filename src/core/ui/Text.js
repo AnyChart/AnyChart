@@ -118,48 +118,45 @@ anychart.core.ui.Text.prototype.applySettings = function() {
   var dom = this.getDomElement();
 
   if (!goog.object.isEmpty(style)) {
-    var cssString = '';
-    if (style['fontStyle']) {
-      cssString += 'font-style: ' + style['fontStyle'] + ';';
-    }
+    style['fontStyle'] ?
+      dom.setAttribute('font-style', style['fontStyle']) :
+      dom.removeAttribute('font-style');
 
-    if (style['fontVariant']) {
-      cssString += 'font-variant: ' + style['fontVariant'] + ';';
-    }
+    style['fontVariant'] ?
+      dom.setAttribute('font-variant', style['fontVariant']) :
+      dom.removeAttribute('font-variant');
 
-    if (style['fontFamily']) {
-      cssString += 'font-family: ' + style['fontFamily'] + ';';
-    }
+    style['fontFamily'] ?
+      dom.setAttribute('font-family', style['fontFamily']) :
+      dom.removeAttribute('font-family');
 
-    if (style['fontSize']) {
-      cssString += 'font-size: ' + style['fontSize'] + ';';
-    }
+    goog.isDef(style['fontSize']) ?
+      dom.setAttribute('font-size', style['fontSize']) :
+      dom.removeAttribute('font-size');
 
-    if (style['fontWeight']) {
-      cssString += 'font-weight: ' + style['fontWeight'] + ';';
-    }
+    goog.isDef(style['fontWeight']) ?
+      dom.setAttribute('font-weight', style['fontWeight']) :
+      dom.removeAttribute('font-weight');
 
-    if (style['letterSpacing']) {
-      cssString += 'letter-spacing: ' + style['letterSpacing'] + ';';
-    }
+    goog.isDef(style['letterSpacing']) ?
+      dom.setAttribute('letter-spacing', style['letterSpacing']) :
+      dom.removeAttribute('letter-spacing');
 
-    if (style['fontDecoration']) {
-      cssString += 'text-decoration: ' + style['fontDecoration'] + ';';
-    }
+    style['fontDecoration'] ?
+      dom.setAttribute('text-decoration', style['fontDecoration']) :
+      dom.removeAttribute('font-decoration');
 
-    if (style['fontColor']) {
-      cssString += 'fill: ' + style['fontColor'] + ';';
-    }
+    style['fontColor'] ?
+      dom.setAttribute('fill', style['fontColor']) :
+      dom.removeAttribute('font-color');
 
-    if (style['fontOpacity']) {
-      cssString += 'opacity: ' + style['fontOpacity'] + ';';
-    }
+    goog.isDef(style['fontOpacity']) ?
+      dom.setAttribute('opacity', style['fontOpacity']) :
+      dom.removeAttribute('font-opacity');
 
-    if (style['disablePointerEvents']) {
-      cssString += 'pointer-events: ' + (style['disablePointerEvents'] ? 'none' : '') + ';';
-    }
-
-    dom.style.cssText = cssString;
+    style['disablePointerEvents'] ?
+      dom.setAttribute('pointer-events', (style['disablePointerEvents'] ? 'none' : '')) :
+      dom.removeAttribute('pointer-events');
   }
   dom.textContent = this.text_;
 };
