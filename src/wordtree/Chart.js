@@ -932,7 +932,8 @@ anychart.wordtreeModule.Chart.prototype.drawText = function(x, y, text, fontSize
   textElement.fontSize(fontSize);
   textElement.fontFamily(fontFamily);
   textElement.fontWeight(fontWeight);
-  // textElement.parent(this.rootLayer);
+  textElement.width(null);
+  textElement.visible(true);
 
   this.textElements_.push(textElement);
   return textElement;
@@ -996,6 +997,13 @@ anychart.wordtreeModule.Chart.prototype.drawNode = function(node, hasHidden) {
 
   wordPositionY -= /**@type {number}*/(height) / 2;
 
+  var wordEnd = wordPositionX + width;
+  var boundsRight = this.contentBounds.getRight();
+  if (wordEnd > boundsRight) {
+    var difference = wordEnd - boundsRight;
+    textElement.width(width - difference - width * 0.05); //set with width some gap
+  }
+
   textElement.x(wordPositionX).y(wordPositionY);
 };
 
@@ -1014,107 +1022,114 @@ anychart.wordtreeModule.Chart.prototype.drawAllChildren = function(node, current
       .meta('connectorInYPosition', currentNodeStartPosition[1])
       .meta('connectorOutXPosition', currentNodeStartPosition[0] + this.nodeWidth(node))
       .meta('connectorOutYPosition', currentNodeStartPosition[1]);
+    var boundsRight = this.contentBounds.getRight();
+    if (xOffsetFromPrevious < boundsRight) { //Draw nodes only inside bounds
+      var connectors = this.connectors(),
+        childrenLength = /**@type {number}*/(node.numChildren()),
+        connectorLength = /**@type {number}*/(connectors.getOption('length')),
+        connectorOffset = /**@type {number}*/(connectors.getOption('offset')),
+        connectorCurveFactor = /**@type {number}*/(connectors.getOption('curveFactor')),
+        minFontSize = /**@type {number}*/(this.getOption('minFontSize'));
 
-    var connectors = this.connectors(),
-      childrenLength = /**@type {number}*/(node.numChildren()),
-      connectorLength = /**@type {number}*/(connectors.getOption('length')),
-      connectorOffset = /**@type {number}*/(connectors.getOption('offset')),
-      connectorCurveFactor = /**@type {number}*/(connectors.getOption('curveFactor')),
-      minFontSize = /**@type {number}*/(this.getOption('minFontSize'));
-
-    if (childrenLength) {
-      //Add padding top and bottom
-      if (childrenLength > 1) {
-        var paddingTopBottom = minFontSize / 10;
-        yMin += paddingTopBottom;
-        yMax -= paddingTopBottom;
-      }
-      var yEndPrev = yMin;
-      var hasHidden = false;
-      var currentChildrenElement;
-
-      //Check if current node has hidden siblings
-      for (var i = 0; i < childrenLength; i++) {
-        currentChildrenElement = node.getChildAt(i);
-        if (currentChildrenElement.meta('hidden')) {
-          hasHidden = true;
-          break;
+      if (childrenLength) {
+        //Add padding top and bottom
+        if (childrenLength > 1) {
+          var paddingTopBottom = minFontSize / 10;
+          yMin += paddingTopBottom;
+          yMax -= paddingTopBottom;
         }
-      }
+        var yEndPrev = yMin;
+        var hasHidden = false;
+        var currentChildrenElement;
 
-      //If children height less then minimum font size draw count of children leaf
-      if ((yMax - yMin) / childrenLength < minFontSize * this.lineHeightFactor_ && childrenLength > 1) {
-        var text = '+' + node.meta('leafCount') + ' ' + this.getOption('postfix'),
-          y = (yMax + yMin) / 2,
-          x = xOffsetFromPrevious,
-          textElement = this.drawText(x, y, text,
-            /**@type {number}*/(node.meta('fontSize') || minFontSize),
-            /**@type {string}*/(this.getOption('fontFamily')),
-            /**@type {string|number}*/(this.getOption('fontWeight')));
-        y = y - textElement.getTextHeight() / 2;
-        textElement.y(y);
-        textElement.tag.node = node;
-        textElement.tag.isPlug = true;
-
-        this.drawConnector(
-          /**@type {number}*/(node.meta('connectorOutXPosition')),
-          /**@type {number}*/(node.meta('connectorOutYPosition')),
-          /**@type {number}*/(node.meta('connectorOutXPosition')) + this.offsetForPlug_,
-          (yMax + yMin) / 2,
-          /**@type {number}*/(connectorCurveFactor)
-        );
-        return;
-      }
-
-      if (hasHidden)
-        xOffsetFromPrevious -= connectorLength + connectorOffset;
-      for (var i = 0; i < childrenLength; i++) {
-        currentChildrenElement = node.getChildAt(i);
-        if (currentChildrenElement.meta('hidden')) { //if current children is hidden draw next
-          continue;
+        //Check if current node has hidden siblings
+        for (var i = 0; i < childrenLength; i++) {
+          currentChildrenElement = node.getChildAt(i);
+          if (currentChildrenElement.meta('hidden')) {
+            hasHidden = true;
+            break;
+          }
         }
 
-        var childrenWeight = currentChildrenElement.meta('leafCount'),
-          nodeWeight = /**@type{number}*/(node.meta('leafCount')),
-          nodeHeight = hasHidden ? (yMax - yMin) : ((yMax - yMin) * Math.max(1, childrenWeight) / Math.max(1, nodeWeight)),
-          yStart = yEndPrev,
-          nextChildXOffset = 0,
-          childPosition,
-          halfTextHeight,
-          widthOfNode,
-          currentChildPosition;
+        //If children height less then minimum font size draw count of children leaf
+        if ((yMax - yMin) / childrenLength < minFontSize * this.lineHeightFactor_ && childrenLength > 1) {
+          var text = '+' + node.meta('leafCount') + ' ' + this.getOption('postfix'),
+            y = (yMax + yMin) / 2,
+            x = xOffsetFromPrevious,
+            textElement = this.drawText(x, y, text,
+              /**@type {number}*/(node.meta('fontSize') || minFontSize),
+              /**@type {string}*/(this.getOption('fontFamily')),
+              /**@type {string|number}*/(this.getOption('fontWeight')));
+          y = y - textElement.getTextHeight() / 2;
+          textElement.y(y);
+          textElement.tag.node = node;
+          textElement.tag.isPlug = true;
+          var textWidth = textElement.getTextWidth();
+          var wordEnd = x + textWidth;
+          if (wordEnd >= boundsRight) {
+            textElement.visible(false);
+          }
 
-        yEndPrev = yStart + nodeHeight;
-        x = xOffsetFromPrevious;
-        y = (yStart + nodeHeight / 2);
-        childPosition = [x, y];
-
-        currentChildrenElement.meta('height', nodeHeight)
-          .meta('nodePositionX', x)
-          .meta('nodePositionY', y);
-
-        this.drawNode(currentChildrenElement, hasHidden);
-
-        halfTextHeight = /**@type {number}*/(node.meta('textHeight')) / 2;
-        childPosition[1] -= halfTextHeight;
-
-        if (currentChildrenElement.numChildren() != 1) {
-          nextChildXOffset += connectorLength;
-        }
-
-        widthOfNode = /**@type {number}*/(this.nodeWidth(currentChildrenElement));
-        currentChildPosition = [childPosition[0], childPosition[1] + halfTextHeight];
-        nextChildXOffset += childPosition[0] + widthOfNode;
-
-        this.drawAllChildren(currentChildrenElement, currentChildPosition, nextChildXOffset, yStart, yStart + nodeHeight);
-
-        if (node.numChildren() > 1 && !hasHidden)
           this.drawConnector(
             /**@type {number}*/(node.meta('connectorOutXPosition')),
             /**@type {number}*/(node.meta('connectorOutYPosition')),
-            /**@type {number}*/(currentChildrenElement.meta('connectorInXPosition')),
-            /**@type {number}*/(currentChildrenElement.meta('connectorInYPosition')),
-            connectorCurveFactor);
+            /**@type {number}*/(node.meta('connectorOutXPosition')) + this.offsetForPlug_,
+            (yMax + yMin) / 2,
+            /**@type {number}*/(connectorCurveFactor)
+          );
+          return;
+        }
+
+        if (hasHidden)
+          xOffsetFromPrevious -= connectorLength + connectorOffset;
+        for (var i = 0; i < childrenLength; i++) {
+          currentChildrenElement = node.getChildAt(i);
+          if (currentChildrenElement.meta('hidden')) { //if current children is hidden draw next
+            continue;
+          }
+
+          var childrenWeight = currentChildrenElement.meta('leafCount'),
+            nodeWeight = /**@type{number}*/(node.meta('leafCount')),
+            nodeHeight = hasHidden ? (yMax - yMin) : ((yMax - yMin) * Math.max(1, childrenWeight) / Math.max(1, nodeWeight)),
+            yStart = yEndPrev,
+            nextChildXOffset = 0,
+            childPosition,
+            halfTextHeight,
+            widthOfNode,
+            currentChildPosition;
+
+          yEndPrev = yStart + nodeHeight;
+          x = xOffsetFromPrevious;
+          y = (yStart + nodeHeight / 2);
+          childPosition = [x, y];
+
+          currentChildrenElement.meta('height', nodeHeight)
+            .meta('nodePositionX', x)
+            .meta('nodePositionY', y);
+
+          this.drawNode(currentChildrenElement, hasHidden);
+
+          halfTextHeight = /**@type {number}*/(node.meta('textHeight')) / 2;
+          childPosition[1] -= halfTextHeight;
+
+          if (currentChildrenElement.numChildren() != 1) {
+            nextChildXOffset += connectorLength;
+          }
+
+          widthOfNode = /**@type {number}*/(this.nodeWidth(currentChildrenElement));
+          currentChildPosition = [childPosition[0], childPosition[1] + halfTextHeight];
+          nextChildXOffset += childPosition[0] + widthOfNode;
+
+          this.drawAllChildren(currentChildrenElement, currentChildPosition, nextChildXOffset, yStart, yStart + nodeHeight);
+
+          if (node.numChildren() > 1 && !hasHidden)
+            this.drawConnector(
+              /**@type {number}*/(node.meta('connectorOutXPosition')),
+              /**@type {number}*/(node.meta('connectorOutYPosition')),
+              /**@type {number}*/(currentChildrenElement.meta('connectorInXPosition')),
+              /**@type {number}*/(currentChildrenElement.meta('connectorInYPosition')),
+              connectorCurveFactor);
+        }
       }
     }
   }
