@@ -50,6 +50,41 @@ anychart.mapModule.Series = function(chart, plot, type, config, sortedMode) {
   ]);
 
   this.disableStrokeScaling = true;
+
+  /**
+   * Selected features map.
+   * Implements DVF-4178.
+   * @type {Object.<string, acgraph.vector.Shape>}
+   * @private
+   */
+  this.selectedFeatures_ = {};
+
+  /**
+   * Hovered features map.
+   * Implements DVF-4178.
+   * @type {Object.<string, acgraph.vector.Shape>}
+   * @private
+   */
+  this.hoveredFeatures_ = {};
+
+  /**
+   * Map to backup source z-indexes of shapes on select.
+   * Debug info: must always contain source z-indexes and never - newly set.
+   * Implements DVF-4178.
+   * @type {Object.<string, number>}
+   * @private
+   */
+  this.selectedFeaturesZIndexesBackup_ = {};
+
+  /**
+   * Map to backup source z-indexes of shapes on hover.
+   * Debug info: must always contain source z-indexes and never - newly set.
+   * Implements DVF-4178.
+   * @type {Object.<string, number>}
+   * @private
+   */
+  this.hoveredFeaturesZIndexesBackup_ = {};
+
 };
 goog.inherits(anychart.mapModule.Series, anychart.core.series.Cartesian);
 
@@ -830,6 +865,63 @@ anychart.mapModule.Series.prototype.applyZoomMoveTransform = function() {
 };
 
 
+/**
+ * General idea of this method is in DVF-4178 implementation.
+ * How it works: considering all interactivity events, it saves and restores
+ * z-indexes of shapes on hover/select/unhover/unselect.
+ * Selected shapes must be higher than normal ones, hovered shapes must
+ * be higher than selected ones.
+ * Selection overrides hovered state.
+ * @param {acgraph.vector.Shape} el - Shape.
+ * @param {anychart.PointState} state - State.
+ * @private
+ */
+anychart.mapModule.Series.prototype.updateShapeZIndex_ = function(el, state) {
+  var uid = 's' + goog.getUid(el);
+  var zIndex = /** @type {number} */ (el.zIndex());
+  switch (state) {
+    case anychart.PointState.HOVER:
+      if (uid in this.selectedFeaturesZIndexesBackup_) {
+        zIndex = this.selectedFeaturesZIndexesBackup_[uid];
+      }
+      if (!(uid in this.hoveredFeaturesZIndexesBackup_)) {
+        this.hoveredFeaturesZIndexesBackup_[uid] = zIndex;
+        el.zIndex(1e4);
+        this.hoveredFeatures_[uid] = el;
+      }
+      break;
+
+    case anychart.PointState.SELECT:
+      if (uid in this.hoveredFeaturesZIndexesBackup_) {
+        zIndex = this.hoveredFeaturesZIndexesBackup_[uid];
+        delete this.hoveredFeatures_[uid];
+        delete this.hoveredFeaturesZIndexesBackup_[uid];
+      }
+      if (!(uid in this.selectedFeaturesZIndexesBackup_)) {
+        this.selectedFeaturesZIndexesBackup_[uid] = zIndex;
+        el.zIndex(1e3);
+        this.selectedFeatures_[uid] = el;
+      }
+      break;
+
+    default:
+      if (uid in this.hoveredFeatures_) {
+        this.hoveredFeatures_[uid].zIndex(this.hoveredFeaturesZIndexesBackup_[uid]);
+        delete this.hoveredFeatures_[uid];
+        delete this.hoveredFeaturesZIndexesBackup_[uid];
+      }
+      if (uid in this.selectedFeatures_) {
+        this.selectedFeatures_[uid].zIndex(this.selectedFeaturesZIndexesBackup_[uid]);
+        delete this.selectedFeatures_[uid];
+        delete this.selectedFeaturesZIndexesBackup_[uid];
+      }
+
+  }
+  // left for debug purposes.
+  // console.log(this.hoveredFeaturesZIndexesBackup_, this.selectedFeaturesZIndexesBackup_);
+};
+
+
 /** @inheritDoc */
 anychart.mapModule.Series.prototype.applyAppearanceToPoint = function(pointState, opt_value) {
   var iterator = this.getIterator();
@@ -847,6 +939,7 @@ anychart.mapModule.Series.prototype.applyAppearanceToPoint = function(pointState
             if (!element || !(anychart.utils.instanceOf(element, acgraph.vector.Shape)))
               return;
 
+            this.updateShapeZIndex_(element, pointState);
             iterator.meta('currentPointElement', shape);
 
             var shapeGroup = {
@@ -881,6 +974,7 @@ anychart.mapModule.Series.prototype.applyAppearanceToPoint = function(pointState
 
 /** @inheritDoc */
 anychart.mapModule.Series.prototype.getStartValueForAppearanceReduction = goog.nullFunction;
+
 
 //endregion
 //region --- Drawing
