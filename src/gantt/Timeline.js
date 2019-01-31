@@ -3188,6 +3188,13 @@ anychart.ganttModule.TimeLine.prototype.rowMouseDown = function(evt) {
 };
 
 
+/** @inheritDoc */
+anychart.ganttModule.TimeLine.prototype.rowMouseUp = function(evt) {
+  this.tooltip().enabled(this.tooltipEnabledBackup_);
+  this.tooltipEnabledBackup_ = void 0;
+};
+
+
 /**
  * Actually reacts on mouse down.
  * @param {Object} evt - Event object.
