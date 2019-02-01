@@ -1657,6 +1657,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.padding = function(opt_spaceOrTop
   var makeDefault = goog.isNull(opt_spaceOrTopOrTopAndBottom);
   if (!makeDefault && !this.padding_) {
     this.padding_ = new anychart.core.utils.Padding();
+    this.setupCreated('padding', this.padding_);
     this.padding_.listenSignals(this.boundsInvalidated_, this);
   }
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
@@ -1825,7 +1826,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.hasOwnOption = function(name) {
  */
 anychart.core.ui.LabelsFactory.Label.prototype.getOption = function(name) {
   this.updateComplexSettings();
-  return this.ownSettings[name];
+  return goog.isDef(this.ownSettings[name]) ? this.ownSettings[name] : this.themeSettings[name];
 };
 
 
@@ -1875,6 +1876,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.resetSettings = function() {
   this.background_ = null;
   this.padding_ = null;
 
+  this.themeSettings = {};
   this.ownSettings = {};
   this.autoSettings = {};
   this.states_ = {

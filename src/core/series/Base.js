@@ -1735,8 +1735,8 @@ anychart.core.series.Base.prototype.getLegendItemData = function(itemsFormat) {
   json['disabled'] = 'disabled' in json ? !!json['disabled'] : !this.enabled();
   json['meta'] = /** @type {Object} */ (this.meta());
   if (json['iconType'] == anychart.enums.LegendItemIconType.MARKER && !this.check(anychart.core.drawers.Capabilities.IS_MARKER_BASED)) {
-    json['iconFill'] = this.normal_.markers().fill();
-    json['iconStroke'] = this.normal_.markers().stroke();
+    json['iconFill'] = this.normal_.markers().getOption('fill');
+    json['iconStroke'] = this.normal_.markers().getOption('stroke');
   }
   json['iconType'] = this.getLegendIconType(json['iconType'], context);
   json['iconEnabled'] = 'iconEnabled' in json ? !!json['iconEnabled'] : true;
@@ -1758,8 +1758,8 @@ anychart.core.series.Base.prototype.getLegendItemData = function(itemsFormat) {
 
   if (this.supportsMarkers() && this.normal_.markers().enabled()) {
     json['iconMarkerType'] = json['iconMarkerType'] || this.normal_.markers().type();
-    json['iconMarkerFill'] = json['iconMarkerFill'] || this.normal_.markers().fill();
-    json['iconMarkerStroke'] = json['iconMarkerStroke'] || this.normal_.markers().stroke();
+    json['iconMarkerFill'] = json['iconMarkerFill'] || this.normal_.markers().getOption('fill');
+    json['iconMarkerStroke'] = json['iconMarkerStroke'] || this.normal_.markers().getOption('stroke');
   } else {
     json['iconMarkerType'] = null;
     json['iconMarkerFill'] = null;

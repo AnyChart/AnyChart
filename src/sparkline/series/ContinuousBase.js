@@ -174,7 +174,7 @@ anychart.sparklineModule.series.ContinuousBase.prototype.applyHatchFill = functi
   if (this.hatchFillPath) {
     this.hatchFillPath.stroke(null);
     this.hatchFillPath.fill(this.chart.normalizeHatchFill(
-        /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|boolean|string} */(this.chart.hatchFill())));
+        /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|boolean|string} */(this.chart.getOption('hatchFill'))));
   }
 };
 

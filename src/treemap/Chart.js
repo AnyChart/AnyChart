@@ -76,6 +76,7 @@ anychart.treemapModule.Chart = function(opt_data, opt_fillMethod) {
   ]);
   this.normal_ = new anychart.core.StateSettings(this, normalDescriptorsMeta, anychart.PointState.NORMAL);
   this.normal_.setOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK, anychart.core.StateSettings.DEFAULT_LABELS_AFTER_INIT_CALLBACK);
+  this.normal_.setOption(anychart.core.StateSettings.MARKERS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.DEFAULT_MARKERS_CONSTRUCTOR_NO_THEME);
   this.normal_.setOption(anychart.core.StateSettings.MARKERS_AFTER_INIT_CALLBACK, /** @this {anychart.treemapModule.Chart} */ function(factory) {
     factory.setParentEventTarget(this);
     factory.setAutoType(anychart.enums.MarkerType.STAR5);
@@ -1225,9 +1226,9 @@ anychart.treemapModule.Chart.prototype.getMarkersPosition = function(pointState)
   var markerHoverPosition = hoverPointMarker && hoverPointMarker['position'] ? hoverPointMarker['position'] : null;
   var markerSelectPosition = selectPointMarker && selectPointMarker['position'] ? selectPointMarker['position'] : null;
 
-  return (hovered && (markerHoverPosition || this.hovered().markers().position())) ||
-      (selected && (markerSelectPosition || this.selected().markers().position())) ||
-      markerPosition || this.normal().markers().position();
+  return /**@type{string}*/((hovered && (markerHoverPosition || this.hovered().markers().getOption('position'))) ||
+      (selected && (markerSelectPosition || this.selected().markers().getOption('position'))) ||
+      markerPosition || this.normal().markers().getOption('position'));
 };
 
 

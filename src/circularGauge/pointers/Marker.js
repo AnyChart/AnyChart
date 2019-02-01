@@ -26,12 +26,12 @@ anychart.circularGaugeModule.pointers.Marker = function() {
   this.domElement = new anychart.core.ui.MarkersFactory();
   // defaults that was deleted form MarkersFactory
   this.domElement.setParentEventTarget(this);
-  this.domElement.positionFormatter(anychart.utils.DEFAULT_FORMATTER);
-  this.domElement.size(10);
-  this.domElement.anchor(anychart.enums.Anchor.CENTER);
-  this.domElement.offsetX(0);
-  this.domElement.offsetY(0);
-  this.domElement.rotation(0);
+  this.domElement.setOption('positionFormatter', anychart.utils.DEFAULT_FORMATTER);
+  this.domElement.setOption('size', 10);
+  this.domElement.setOption('anchor', anychart.enums.Anchor.CENTER);
+  this.domElement.setOption('offsetX', 0);
+  this.domElement.setOption('offsetY', 0);
+  this.domElement.setOption('rotation', 0);
 };
 goog.inherits(anychart.circularGaugeModule.pointers.Marker, anychart.circularGaugeModule.pointers.Base);
 
@@ -97,21 +97,21 @@ anychart.circularGaugeModule.pointers.Marker.prototype.draw = function() {
     var fill = /** @type {acgraph.vector.PatternFill|acgraph.vector.HatchFill} */(this.hatchFill());
     if (!this.hatchFillElement && !anychart.utils.isNone(fill)) {
       this.hatchFillElement = new anychart.core.ui.MarkersFactory();
-      this.hatchFillElement.positionFormatter(anychart.utils.DEFAULT_FORMATTER);
-      this.hatchFillElement.size(10);
-      this.hatchFillElement.anchor(anychart.enums.Anchor.CENTER);
-      this.hatchFillElement.offsetX(0);
-      this.hatchFillElement.offsetY(0);
-      this.hatchFillElement.rotation(0);
+      this.hatchFillElement.setOption('positionFormatter', anychart.utils.DEFAULT_FORMATTER);
+      this.hatchFillElement.setOption('size', 10);
+      this.hatchFillElement.setOption('anchor', anychart.enums.Anchor.CENTER);
+      this.hatchFillElement.setOption('offsetX', 0);
+      this.hatchFillElement.setOption('offsetY', 0);
+      this.hatchFillElement.setOption('rotation', 0);
       this.hatchFillElement.container(/** @type {acgraph.vector.ILayer} */(this.container()));
       this.hatchFillElement.zIndex(/** @type {number} */(this.zIndex() + 1));
     }
 
     if (this.hatchFillElement) {
       this.hatchFillElement.disablePointerEvents(true);
-      this.hatchFillElement.fill(fill);
-      this.hatchFillElement.stroke(null);
-      this.hatchFillElement.size(this.pixSize_);
+      this.hatchFillElement.setOption('fill', fill);
+      this.hatchFillElement.setOption('stroke', null);
+      this.hatchFillElement.setOption('size', this.pixSize_);
       this.hatchFillElement.type(type);
 
       this.invalidate(anychart.ConsistencyState.BOUNDS);
@@ -175,18 +175,18 @@ anychart.circularGaugeModule.pointers.Marker.prototype.draw = function() {
     this.contextProvider['angle'] = goog.math.standardAngle(angle - anychart.circularGaugeModule.Chart.DEFAULT_START_ANGLE);
 
 
-    this.domElement.size(this.pixSize_);
+    this.domElement.setOption('size', this.pixSize_);
     this.domElement.type(type);
 
     var marker = this.domElement.add({'value': {'x': x, 'y': y}}, 0);
-    marker.rotation(angle + 90);
+    marker.setOption('rotation', angle + 90);
 
     if (this.hatchFillElement) {
-      this.hatchFillElement.size(this.pixSize_);
+      this.hatchFillElement.setOption('size', this.pixSize_);
       this.hatchFillElement.type(type);
 
       var hatchFill = this.hatchFillElement.add({'value': {'x': x, 'y': y}}, 0);
-      hatchFill.rotation(angle + 90);
+      hatchFill.setOption('rotation', angle + 90);
     }
 
     if (goog.isFunction(this.fill()) || goog.isFunction(this.stroke()))

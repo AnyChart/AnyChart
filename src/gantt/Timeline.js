@@ -3718,9 +3718,8 @@ anychart.ganttModule.TimeLine.prototype.drawMarkers_ = function(dataItem, totalT
             var top = Math.round(totalTop + (itemHeight - height) / 2);
 
             var markerEl = this.markers().add({value: {x: left, y: top}});
-            markerEl
-                .size(height / 2)
-                .setup(marker);
+            markerEl.setOption('size', height / 2);
+            markerEl.setup(marker);
           }
         }
       }

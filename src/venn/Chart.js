@@ -104,6 +104,8 @@ anychart.vennModule.Chart = function(opt_data, opt_csvSettings) {
     ['markers', 0, 0]
   ]);
   this.normal_ = new anychart.core.StateSettings(this, normalDescriptorsMeta, anychart.PointState.NORMAL);
+  this.normal_.addThemes(this.themeSettings);
+  this.setupCreated('normal', this.normal_);
   this.normal_.setOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK, anychart.core.StateSettings.DEFAULT_LABELS_AFTER_INIT_CALLBACK);
   this.normal_.setOption(anychart.core.StateSettings.MARKERS_AFTER_INIT_CALLBACK, anychart.core.StateSettings.DEFAULT_MARKERS_AFTER_INIT_CALLBACK);
 
@@ -116,15 +118,23 @@ anychart.vennModule.Chart = function(opt_data, opt_csvSettings) {
     ['markers', 0, 0]
   ]);
   this.hovered_ = new anychart.core.StateSettings(this, descriptorsMeta, anychart.PointState.HOVER);
-  this.hovered_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR,  anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME);
+  this.setupCreated('hovered', this.hovered_);
 
   this.selected_ = new anychart.core.StateSettings(this, descriptorsMeta, anychart.PointState.SELECT);
-  this.selected_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR,  anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME);
+  this.setupCreated('selected', this.selected_);
   function markAllConsistent(factory) {
     factory.markConsistent(anychart.ConsistencyState.ALL);
   }
   this.hovered_.setOption(anychart.core.StateSettings.MARKERS_AFTER_INIT_CALLBACK, markAllConsistent);
   this.selected_.setOption(anychart.core.StateSettings.MARKERS_AFTER_INIT_CALLBACK, markAllConsistent);
+  //Labels
+  this.normal_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR);
+  this.hovered_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME);
+  this.selected_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME);
+  //Markers
+  this.normal_.setOption(anychart.core.StateSettings.MARKERS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.DEFAULT_MARKERS_CONSTRUCTOR);
+  this.hovered_.setOption(anychart.core.StateSettings.MARKERS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.DEFAULT_MARKERS_CONSTRUCTOR_NO_THEME);
+  this.selected_.setOption(anychart.core.StateSettings.MARKERS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.DEFAULT_MARKERS_CONSTRUCTOR_NO_THEME);
 
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['dataSeparator', anychart.ConsistencyState.VENN_DATA, anychart.Signal.NEEDS_REDRAW]
@@ -422,6 +432,7 @@ anychart.vennModule.Chart.prototype.setupPalette_ = function(cls, opt_cloneFrom)
     var doDispatch = !!this.palette_;
     goog.dispose(this.palette_);
     this.palette_ = new cls();
+    this.setupCreated('palette', this.palette_);
 
     if (opt_cloneFrom) {
       this.palette_.setup(opt_cloneFrom);
@@ -445,6 +456,7 @@ anychart.vennModule.Chart.prototype.setupPalette_ = function(cls, opt_cloneFrom)
 anychart.vennModule.Chart.prototype.hatchFillPalette = function(opt_value) {
   if (!this.hatchFillPalette_) {
     this.hatchFillPalette_ = new anychart.palettes.HatchFills();
+    this.setupCreated('hatchFillPalette', this.hatchFillPalette_);
     this.hatchFillPalette_.listenSignals(this.paletteInvalidated_, this);
   }
 
@@ -465,6 +477,7 @@ anychart.vennModule.Chart.prototype.hatchFillPalette = function(opt_value) {
 anychart.vennModule.Chart.prototype.markerPalette = function(opt_value) {
   if (!this.markerPalette_) {
     this.markerPalette_ = new anychart.palettes.Markers();
+    this.setupCreated('markerPalette', this.markerPalette_);
     this.markerPalette_.listenSignals(this.paletteInvalidated_, this);
   }
 
@@ -706,6 +719,7 @@ anychart.vennModule.Chart.prototype.dataReflectionSort_ = function(val1, val2) {
 anychart.vennModule.Chart.prototype.intersections = function(opt_value) {
   if (!this.intersections_) {
     this.intersections_ = new anychart.vennModule.Intersections(this);
+    this.intersections_.setupElements();
     this.intersections_.listenSignals(this.intersectionsInvalidated_, this);
   }
 
@@ -1644,13 +1658,6 @@ anychart.vennModule.Chart.prototype.isNoData = function() {
 
 //endregion
 //region -- Serialization/Deserialization
-/**
- * Sets default settings.
- * @param {!Object} config
- */
-anychart.vennModule.Chart.prototype.setThemeSettings = function(config) {
-  anychart.core.settings.copy(this.themeSettings, anychart.vennModule.Chart.SIMPLE_PROPS_DESCRIPTORS, config);
-};
 
 
 /** @inheritDoc */
@@ -1678,10 +1685,7 @@ anychart.vennModule.Chart.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.vennModule.Chart.prototype.setupByJSON = function(config, opt_default) {
   anychart.vennModule.Chart.base(this, 'setupByJSON', config, opt_default);
-  if (opt_default)
-    this.setThemeSettings(config);
-  else
-    anychart.core.settings.deserialize(this, anychart.vennModule.Chart.SIMPLE_PROPS_DESCRIPTORS, config);
+  anychart.core.settings.deserialize(this, anychart.vennModule.Chart.SIMPLE_PROPS_DESCRIPTORS, config, opt_default);
 
   this.data(config['data']);
 

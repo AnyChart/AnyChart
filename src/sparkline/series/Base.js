@@ -463,7 +463,7 @@ anychart.sparklineModule.series.Base.prototype.drawMarker = function() {
  */
 anychart.sparklineModule.series.Base.prototype.getMarkerFill = function() {
   return acgraph.vector.normalizeFill(/** @type {!acgraph.vector.Fill} */(
-      this.chart.normalizeColor(/** @type {acgraph.vector.Fill|Function} */(this.chart.fill()))));
+      this.chart.normalizeColor(/** @type {acgraph.vector.Fill|Function} */(this.chart.getOption('fill')))));
 };
 
 
@@ -486,7 +486,10 @@ anychart.sparklineModule.series.Base.prototype.getMarkerStroke = function() {
  * @return {Object} Return settings object.
  */
 anychart.sparklineModule.series.Base.prototype.getDefaults = function() {
-  this.chart.getMarkersInternal().type('circle').size(1.8).position(anychart.enums.Position.CENTER);
+  var markers = this.chart.getMarkersInternal();
+  markers.type('circle');
+  markers.setOption('size', 1.8);
+  markers.setOption('position', anychart.enums.Position.CENTER);
   return {
     'labels': {
       'background': {

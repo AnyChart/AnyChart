@@ -24,21 +24,37 @@ goog.forwardDeclare('anychart.treemapModule.Chart');
 anychart.colorScalesModule.ui.ColorRange = function() {
   anychart.colorScalesModule.ui.ColorRange.base(this, 'constructor');
 
-  this.addThemes('defaultAxis', 'defaultColorRange');
-
-  /**
-   * Size of color range line. Height in horizontal orientation.
-   * @type {number}
-   * @private
-   */
-  this.colorLineSize_ = NaN;
+  this.addThemes('defaultColorRange');
 
   this.bindHandlersToComponent(this, this.handleMouseOverAndMove, this.handleMouseOut, null, this.handleMouseOverAndMove);
   this.eventsHandler.listen(this, acgraph.events.EventType.MOUSEDOWN, this.handleMouseClick);
 
   this.ALL_VISUAL_STATES |= anychart.ConsistencyState.COLOR_RANGE_MARKER;
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['length', this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['align', this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['colorLineSize', this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED] //Size of color range line. Height in horizontal orientation.
+  ]);
 };
 goog.inherits(anychart.colorScalesModule.ui.ColorRange, anychart.core.Axis);
+
+
+/**
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.colorScalesModule.ui.ColorRange.PROPERTY_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'colorLineSize', anychart.core.settings.numberNormalizer],
+    anychart.core.settings.descriptors.ALIGN,
+    anychart.core.settings.descriptors.LENGTH
+  ]);
+
+  return map;
+})();
+anychart.core.settings.populate(anychart.colorScalesModule.ui.ColorRange, anychart.colorScalesModule.ui.ColorRange.PROPERTY_DESCRIPTORS);
 
 
 /**
@@ -89,62 +105,6 @@ anychart.colorScalesModule.ui.ColorRange.prototype.removeLines = function() {
 
 
 /**
- * Getter/setter color line size.
- * @param {number=} opt_value
- * @return {number|anychart.colorScalesModule.ui.ColorRange}
- */
-anychart.colorScalesModule.ui.ColorRange.prototype.colorLineSize = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.toNumber(opt_value);
-    if (this.colorLineSize_ != opt_value) {
-      this.colorLineSize_ = opt_value;
-      this.invalidate(this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.colorLineSize_;
-};
-
-
-/**
- * Getter/setter for color range align setting.
- * @param {(anychart.enums.Align|string)=} opt_value Color range align.
- * @return {(anychart.enums.Align|anychart.colorScalesModule.ui.ColorRange)} Color range align or self for chaining.
- */
-anychart.colorScalesModule.ui.ColorRange.prototype.align = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeAlign(opt_value);
-    if (this.align_ != opt_value) {
-      this.align_ = opt_value;
-      this.invalidate(this.ALL_VISUAL_STATES,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.align_;
-  }
-};
-
-
-/**
- * Color range line length.
- * @param {string|number=} opt_value Color line length.
- * @return {number|string|anychart.colorScalesModule.ui.ColorRange} Color line length.
- */
-anychart.colorScalesModule.ui.ColorRange.prototype.length = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.length_ != opt_value) {
-      this.length_ = opt_value;
-      this.invalidate(this.ALL_VISUAL_STATES,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.length_;
-};
-
-
-/**
  * Set/get color range marker.
  * @param {(anychart.core.ui.MarkersFactory.Marker|Object)=} opt_value Marker or marker settings.
  * @return {anychart.core.ui.MarkersFactory.Marker|anychart.colorScalesModule.ui.ColorRange} Color range marker.
@@ -152,6 +112,7 @@ anychart.colorScalesModule.ui.ColorRange.prototype.length = function(opt_value) 
 anychart.colorScalesModule.ui.ColorRange.prototype.marker = function(opt_value) {
   if (!this.marker_) {
     this.marker_ = new anychart.core.ui.MarkersFactory.Marker();
+    this.setupCreated('marker', this.marker_);
     this.marker_.positionProvider({value: {x: 0, y: 0}});
     this.marker_.listenSignals(this.markerInvalidated_, this);
   }
@@ -284,7 +245,7 @@ anychart.colorScalesModule.ui.ColorRange.prototype.getAffectBoundsTickLength = f
     var position = /** @type {number} */(ticks.getOption('position'));
 
     if (position == anychart.enums.SidePosition.CENTER) {
-      result = Math.max((length - this.colorLineSize_) / 2, 0);
+      result = Math.max((length - /**@type {number}*/(this.getOption('colorLineSize'))) / 2, 0);
     } else {
       if (goog.isDef(opt_side)) {
         if (opt_side > 0) {
@@ -501,7 +462,7 @@ anychart.colorScalesModule.ui.ColorRange.prototype.drawLine = function() {
   var pixelShift = lineThickness % 2 == 0 ? 0 : 0.5;
   var bounds = this.getPixelBounds();
   var markerSize = this.getMarkerSpace_();
-  var size = Math.round(this.colorLineSize_);
+  var size = Math.round(this.getOption('colorLineSize'));
   var tickOffset = this.getAffectBoundsTickLength(/** @type {!anychart.core.AxisTicks} */(this.ticks()), 1);
   var minorTickOffset = this.getAffectBoundsTickLength(/** @type {!anychart.core.AxisTicks} */(this.minorTicks()), 1);
   var offset = Math.max(tickOffset, minorTickOffset, markerSize);
@@ -517,12 +478,13 @@ anychart.colorScalesModule.ui.ColorRange.prototype.drawLine = function() {
  */
 anychart.colorScalesModule.ui.ColorRange.prototype.getMarkerSpace_ = function() {
   var markerSpace = 0;
-  if (this.marker_ && this.marker_.enabled()) {
+  var marker = this.getCreated('marker');
+  if (marker && marker.enabled()) {
     var orientation = /** @type {anychart.enums.Orientation} */(this.getOption('orientation'));
-    markerSpace = this.marker_.size() * 2;
+    markerSpace = marker.size() * 2;
 
-    var offsetX = goog.isDef(this.marker_.offsetX()) ? this.marker_.offsetX() : 0;
-    var offsetY = goog.isDef(this.marker_.offsetY()) ? this.marker_.offsetY() : 0;
+    var offsetX = goog.isDef(marker.offsetX()) ? marker.offsetX() : 0;
+    var offsetY = goog.isDef(marker.offsetY()) ? marker.offsetY() : 0;
     switch (orientation) {
       case anychart.enums.Orientation.TOP:
         markerSpace += offsetY;
@@ -575,7 +537,7 @@ anychart.colorScalesModule.ui.ColorRange.prototype.getPixelBounds = function() {
       var bottomPad = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption('bottom')), parentBounds.height);
       var leftPad = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption('left')), parentBounds.width);
 
-      var align = this.align();
+      var align = this.getOption('align');
       var offset;
       if (this.isHorizontal()) {
         if (length + rightPad + leftPad > parentLength)
@@ -638,7 +600,7 @@ anychart.colorScalesModule.ui.ColorRange.prototype.getPixelBounds = function() {
 
 /** @inheritDoc */
 anychart.colorScalesModule.ui.ColorRange.prototype.getLength = function(parentLength) {
-  return anychart.utils.normalizeSize(this.length_, parentLength);
+  return anychart.utils.normalizeSize(/**@type {number}*/(this.getOption('length')), parentLength);
 };
 
 
@@ -705,7 +667,7 @@ anychart.colorScalesModule.ui.ColorRange.prototype.calcSize = function(maxLabelS
 
   var stroke = this.getOption('stroke');
   var lineThickness = !stroke || anychart.utils.isNone(stroke) ? 0 : stroke['thickness'] ? parseFloat(stroke['thickness']) : 1;
-  var colorLineSizePx = Math.round(this.colorLineSize_) + lineThickness;
+  var colorLineSizePx = Math.round(this.getOption('colorLineSize')) + lineThickness;
 
   return outsideSize + insideSize + colorLineSizePx;
 };
@@ -720,9 +682,10 @@ anychart.colorScalesModule.ui.ColorRange.prototype.showMarker = function(value) 
     // if (isNaN(+value)) return;
 
     var scale = this.scale();
+    var marker = /**@type {anychart.core.ui.MarkersFactory.Marker}*/(this.getCreated('marker'));
     var target = /** @type {anychart.mapModule.Series|anychart.tagCloudModule.Chart} */(this.target_);
     var targetScale = target.colorScale() || (target.getColorScale ? target.getColorScale() : void 0);
-    var isMarker = this.marker_ && this.marker_.enabled();
+    var isMarker = marker && marker.enabled();
     var isTarget = target.enabled() && targetScale == scale;
 
     if (this.enabled() && isMarker && scale && isTarget) {
@@ -732,37 +695,37 @@ anychart.colorScalesModule.ui.ColorRange.prototype.showMarker = function(value) 
       if (isNaN(ratio)) return;
 
       var orientation = this.getOption('orientation');
+      var markerSize = /**@type {number}*/(marker.getOption('size'));
       var x, y, rotation;
       switch (orientation) {
         case anychart.enums.Orientation.TOP:
           x = lineBounds.left + lineBounds.width * ratio;
-          y = lineBounds.top + lineBounds.height + this.marker_.size();
+          y = lineBounds.top + lineBounds.height + markerSize;
           rotation = 180;
           break;
         case anychart.enums.Orientation.BOTTOM:
           x = lineBounds.left + lineBounds.width * ratio;
-          y = lineBounds.top - this.marker_.size();
+          y = lineBounds.top - markerSize;
           rotation = 0;
           break;
         case anychart.enums.Orientation.LEFT:
-          x = lineBounds.left + lineBounds.width + this.marker_.size();
+          x = lineBounds.left + lineBounds.width + markerSize;
           y = lineBounds.top + lineBounds.height - (lineBounds.height * ratio);
           rotation = 90;
           break;
         case anychart.enums.Orientation.RIGHT:
-          x = lineBounds.left - this.marker_.size();
+          x = lineBounds.left - markerSize;
           y = lineBounds.top + lineBounds.height - (lineBounds.height * ratio);
           rotation = -90;
           break;
       }
 
-      this.marker_
-          .suspendSignalsDispatching()
-          .rotation(rotation)
-          .positionProvider({'value': {x: x, y: y}})
-          .resumeSignalsDispatching(false)
-          .draw();
-      this.marker_.getDomElement().visible(true);
+      marker.suspendSignalsDispatching();
+      marker.setOption('rotation', rotation);
+      marker.positionProvider({'value': {x: x, y: y}});
+      marker.resumeSignalsDispatching(false);
+      marker.draw();
+      marker.getDomElement().visible(true);
     }
   }
 };
@@ -772,8 +735,9 @@ anychart.colorScalesModule.ui.ColorRange.prototype.showMarker = function(value) 
  * Hides color range marker.
  */
 anychart.colorScalesModule.ui.ColorRange.prototype.hideMarker = function() {
-  if (this.scale() && this.marker_)
-    this.marker_.getDomElement().visible(false);
+  var marker = this.getCreated('marker');
+  if (this.scale() && marker)
+    marker.getDomElement().visible(false);
 };
 
 
@@ -816,25 +780,25 @@ anychart.colorScalesModule.ui.ColorRange.prototype.draw = function() {
   if (!this.checkDrawingNeeded())
     return this;
 
+  var marker = this.getCreated('marker');
   if (this.hasInvalidationState(anychart.ConsistencyState.COLOR_RANGE_MARKER)) {
-    if (this.marker_) {
-      this.marker_.container(this.container());
-      this.marker_.zIndex(/** @type {number} */(this.zIndex() + 1));
-      this.marker_.draw();
-      this.marker_.getDomElement().visible(false);
+    if (marker) {
+      marker.container(this.container());
+      marker.zIndex(/** @type {number} */(this.zIndex() + 1));
+      marker.draw();
+      marker.getDomElement().visible(false);
     }
     this.markConsistent(anychart.ConsistencyState.COLOR_RANGE_MARKER);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
-    if (this.marker_)
-      this.marker_.container(this.container());
-  }
+  if (marker) {
+    if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
+      marker.container(this.container());
+    }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
-    if (this.marker_) {
+    if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
       var zIndex = /** @type {number} */(this.zIndex());
-      this.marker_.zIndex(zIndex + 1);
+      marker.zIndex(zIndex + 1);
     }
   }
 
@@ -1062,17 +1026,16 @@ anychart.colorScalesModule.ui.ColorRange.prototype.handleMouseOut = function(eve
 /** @inheritDoc */
 anychart.colorScalesModule.ui.ColorRange.prototype.remove = function() {
   anychart.colorScalesModule.ui.ColorRange.base(this, 'remove');
-  if (this.marker_) this.marker_.remove();
+  var marker = this.getCreated('marker');
+  if (marker) marker.remove();
 };
 
 
 /** @inheritDoc */
 anychart.colorScalesModule.ui.ColorRange.prototype.serialize = function() {
   var json = anychart.colorScalesModule.ui.ColorRange.base(this, 'serialize');
+  anychart.core.settings.serialize(this, anychart.colorScalesModule.ui.ColorRange.PROPERTY_DESCRIPTORS, json);
   json['marker'] = this.marker().serialize();
-  json['colorLineSize'] = this.colorLineSize();
-  json['length'] = this.length();
-  json['align'] = this.align();
   return json;
 };
 
@@ -1080,10 +1043,8 @@ anychart.colorScalesModule.ui.ColorRange.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.colorScalesModule.ui.ColorRange.prototype.setupByJSON = function(config, opt_default) {
   anychart.colorScalesModule.ui.ColorRange.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.settings.deserialize(this, anychart.colorScalesModule.ui.ColorRange.PROPERTY_DESCRIPTORS, config, opt_default);
   this.marker(config['marker']);
-  this.colorLineSize(config['colorLineSize']);
-  this.length(config['length']);
-  this.align(config['align']);
 };
 
 
@@ -1105,8 +1066,7 @@ anychart.core.makeStandalone(anychart.standalones.ColorRange, anychart.colorScal
  */
 anychart.standalones.colorRange = function() {
   var colorRange = new anychart.standalones.ColorRange();
-  colorRange.dropThemes();
-  colorRange.setupInternal(true, anychart.getFullTheme('standalones.colorRange'));
+  colorRange.addThemes('standalones.colorRange');
   return colorRange;
 };
 
@@ -1115,9 +1075,10 @@ anychart.standalones.colorRange = function() {
 (function() {
   var proto = anychart.colorScalesModule.ui.ColorRange.prototype;
   proto['marker'] = proto.marker;
-  proto['colorLineSize'] = proto.colorLineSize;
-  proto['length'] = proto.length;
-  proto['align'] = proto.align;
+  // auto generated
+  //proto['colorLineSize'] = proto.colorLineSize;
+  //proto['length'] = proto.length;
+  //proto['align'] = proto.align;
 
   proto = anychart.standalones.ColorRange.prototype;
   goog.exportSymbol('anychart.standalones.colorRange', anychart.standalones.colorRange);
@@ -1125,6 +1086,7 @@ anychart.standalones.colorRange = function() {
   proto['draw'] = proto.draw;
   proto['parentBounds'] = proto.parentBounds;
   proto['container'] = proto.container;
-  proto['colorLineSize'] = proto.colorLineSize;
+  // auto generated
+  //proto['colorLineSize'] = proto.colorLineSize;
 })();
 

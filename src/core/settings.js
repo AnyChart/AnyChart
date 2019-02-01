@@ -862,6 +862,8 @@ anychart.core.settings.descriptors = (function() {
   map.HIGH_HATCH_FILL = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'highHatchFill', anychart.core.settings.hatchFillOrFunctionNormalizer];
   map.LOW_HATCH_FILL = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'lowHatchFill', anychart.core.settings.hatchFillOrFunctionNormalizer];
 
+  map.ALIGN = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'align', anychart.enums.normalizeAlign];
+
   // box series
   map.WHISKER_WIDTH = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'whiskerWidth', anychart.core.settings.numberOrPercentNormalizer];
 
@@ -915,6 +917,12 @@ anychart.core.settings.descriptors = (function() {
 
   map.OVERLAP_MODE = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'overlapMode', anychart.enums.normalizeLabelsOverlapMode];
 
+  //markers and markers factory
+  map.ANCHOR = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'anchor', anychart.enums.normalizeAnchor];
+  map.OFFSET_X = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'offsetY', anychart.core.settings.numberNormalizer];
+  map.OFFSET_Y = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'offsetX', anychart.core.settings.numberNormalizer];
+  map.POSITION_FORMATTER = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'positionFormatter', anychart.core.settings.functionNormalizer];
+  map.ROTATION = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'rotation', anychart.core.settings.numberOrNullNormalizer];
   return map;
 })();
 

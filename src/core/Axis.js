@@ -2431,6 +2431,9 @@ anychart.core.Axis.prototype.setupByJSON = function(config, opt_default) {
   if ('title' in config)
     this.title().setupInternal(!!opt_default, config['title']);
 
+  if ('padding' in config)
+    this.padding(config['padding']);
+
   this.labels().setupInternal(!!opt_default, config['labels']);
   this.minorLabels().setupInternal(!!opt_default, config['minorLabels']);
   this.ticks(config['ticks']);

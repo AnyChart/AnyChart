@@ -22,6 +22,8 @@ goog.require('goog.array');
 anychart.sankeyModule.Chart = function(opt_data, opt_csvSettings) {
   anychart.sankeyModule.Chart.base(this, 'constructor');
 
+  this.addThemes('sankey');
+
   this.bindHandlersToComponent(this,
       this.handleMouseOverAndMove,    // override from anychart.core.Chart
       this.handleMouseOut,            // override from anychart.core.Chart
@@ -899,6 +901,8 @@ anychart.sankeyModule.Chart.prototype.elementInvalidated_ = function(event) {
 anychart.sankeyModule.Chart.prototype.dropoff = function(opt_value) {
   if (!this.dropoff_) {
     this.dropoff_ = new anychart.sankeyModule.elements.VisualElement(this, anychart.sankeyModule.Chart.ElementType.DROPOFF);
+    this.setupCreated('dropoff', this.dropoff_);
+    this.dropoff_.setupElements();
     this.dropoff_.listenSignals(this.elementInvalidated_, this);
   }
   if (goog.isDef(opt_value)) {
@@ -917,6 +921,8 @@ anychart.sankeyModule.Chart.prototype.dropoff = function(opt_value) {
 anychart.sankeyModule.Chart.prototype.flow = function(opt_value) {
   if (!this.flow_) {
     this.flow_ = new anychart.sankeyModule.elements.VisualElement(this, anychart.sankeyModule.Chart.ElementType.FLOW);
+    this.setupCreated('flow', this.flow_);
+    this.flow_.setupElements();
     this.flow_.listenSignals(this.elementInvalidated_, this);
   }
   if (goog.isDef(opt_value)) {
@@ -935,6 +941,8 @@ anychart.sankeyModule.Chart.prototype.flow = function(opt_value) {
 anychart.sankeyModule.Chart.prototype.node = function(opt_value) {
   if (!this.node_) {
     this.node_ = new anychart.sankeyModule.elements.VisualElement(this, anychart.sankeyModule.Chart.ElementType.NODE);
+    this.setupCreated('node', this.node_);
+    this.node_.setupElements();
     this.node_.listenSignals(this.elementInvalidated_, this);
   }
   if (goog.isDef(opt_value)) {
@@ -1306,6 +1314,10 @@ anychart.sankeyModule.Chart.prototype.drawContent = function(bounds) {
   if (!this.rootLayer) {
     this.rootLayer = this.rootElement.layer();
     this.rootLayer.zIndex(anychart.sankeyModule.Chart.ZINDEX_SANKEY);
+    //We need create elements here because now we don't call setupByJson method.
+    this.node();
+    this.flow();
+    this.dropoff();
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {

@@ -1525,9 +1525,9 @@ anychart.tableModule.Table.prototype.checkContent_ = function() {
               } else if (anychart.utils.instanceOf(content, anychart.core.ui.MarkersFactory.Marker)) {
                 marker = /** @type {anychart.core.ui.MarkersFactory.Marker} */(content);
                 position = /** @type {string} */(
-                    marker.position() ||
-                    (marker.currentMarkersFactory() && marker.currentMarkersFactory().position()) ||
-                    (marker.parentMarkersFactory() && marker.parentMarkersFactory().position()));
+                    marker.getOption('position') ||
+                    (marker.currentMarkersFactory() && marker.currentMarkersFactory().getOption('position')) ||
+                    (marker.parentMarkersFactory() && marker.parentMarkersFactory().getOption('position')));
                 positionProvider = {'value': anychart.utils.getCoordinateByAnchor(bounds, position)};
                 marker.positionProvider(positionProvider);
                 marker.draw();

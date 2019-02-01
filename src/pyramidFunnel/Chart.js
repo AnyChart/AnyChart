@@ -2803,9 +2803,9 @@ anychart.pyramidFunnelModule.Chart.prototype.drawMarker = function(pointState) {
     var markerHoverPosition = hoverPointMarker && hoverPointMarker['position'] ? hoverPointMarker['position'] : null;
     var markerSelectPosition = selectPointMarker && selectPointMarker['position'] ? selectPointMarker['position'] : null;
 
-    var position = (hovered && (markerHoverPosition || hoverMarkers.position())) ||
-        (selected && (markerSelectPosition || selectMarkers.position())) ||
-        markerPosition || this.markers().position();
+    var position = (hovered && (markerHoverPosition || hoverMarkers.getOption('position'))) ||
+        (selected && (markerSelectPosition || selectMarkers.getOption('position'))) ||
+        markerPosition || this.markers().getOption('position');
 
     var positionProvider = this.createMarkersPositionProvider_(/** @type {anychart.enums.Position|string} */(position));
     if (marker) {

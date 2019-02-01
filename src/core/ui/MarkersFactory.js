@@ -83,74 +83,11 @@ anychart.core.ui.MarkersFactory = function(opt_isNonInteractive, opt_crispEdges,
   this.layer_ = null;
 
   /**
-   * Type of marker.
-   * @type {(string|anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)}
-   * @private
-   */
-  this.type_;
-
-  /**
-   * Marker size.
-   * @type {number}
-   * @private
-   */
-  this.size_;
-
-  /**
-   * Marker fill settings.
-   * @type {string|acgraph.vector.Fill}
-   * @private
-   */
-  this.fill_;
-
-  /**
-   * Marker stroke settings.
-   * @type {string|acgraph.vector.Stroke}
-   * @private
-   */
-  this.stroke_;
-
-  /**
-   * Marker anchor settings.
-   * @type {?(anychart.enums.Anchor|string)}
-   * @private
-   */
-  this.anchor_;
-
-  /**
-   * Marker position settings.
-   * @type {anychart.enums.Position|string}
-   * @private
-   */
-  this.position_;
-
-  /**
-   * Offset by X coordinate from Marker position.
-   * @type {number|string}
-   * @private
-   */
-  this.offsetX_;
-
-  /**
-   * Offset by Y coordinate from Marker position.
-   * @type {number|string}
-   * @private
-   */
-  this.offsetY_;
-
-  /**
    * Enabled state.
    * @type {?boolean}
    * @private
    */
   this.enabledState_ = null;
-
-  /**
-   * Marker position formatter function.
-   * @type {Function}
-   * @private
-   */
-  this.positionFormatter_;
 
   /**
    * Markers array.
@@ -165,10 +102,71 @@ anychart.core.ui.MarkersFactory = function(opt_isNonInteractive, opt_crispEdges,
    */
   this.changedSettings = {};
 
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['position',
+      anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['offsetY',
+      anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['offsetX',
+      anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['fill',
+      anychart.ConsistencyState.APPEARANCE,
+      anychart.Signal.NEEDS_REDRAW],
+    ['stroke',
+      anychart.ConsistencyState.APPEARANCE,
+      anychart.Signal.NEEDS_REDRAW, 0],
+    ['positionFormatter',
+      anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['anchor',
+      anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['size',
+      anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['rotation',
+      anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['type',
+      anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED]
+  ]);
+
   this.invalidate(anychart.ConsistencyState.ALL);
   this.resumeSignalsDispatching(true);
 };
 goog.inherits(anychart.core.ui.MarkersFactory, anychart.core.VisualBase);
+
+
+/**
+ * Own property descriptors
+ * */
+anychart.core.ui.MarkersFactory.OWN_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  anychart.core.settings.createDescriptors(map, [
+    anychart.core.settings.descriptors.FILL,
+    anychart.core.settings.descriptors.STROKE,
+    anychart.core.settings.descriptors.ANCHOR,
+    anychart.core.settings.descriptors.OFFSET_X,
+    anychart.core.settings.descriptors.OFFSET_Y,
+    anychart.core.settings.descriptors.POSITION_FORMATTER,
+    anychart.core.settings.descriptors.ROTATION,
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'position', anychart.core.settings.stringOrNullNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'size', anychart.core.settings.numberOrNullNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'type', function(val) {
+      if (!goog.isFunction(val))
+        val = anychart.enums.normalizeMarkerType(val);
+      return val;
+    }]
+  ]);
+  return map;
+})();
+anychart.core.settings.populate(anychart.core.ui.MarkersFactory, anychart.core.ui.MarkersFactory.OWN_DESCRIPTORS);
 
 
 /**
@@ -244,6 +242,20 @@ anychart.core.ui.MarkersFactory.HANDLED_EVENT_TYPES_ = {
 anychart.core.ui.MarkersFactory.HANDLED_EVENT_TYPES_CAPTURE_SHIFT_ = 12;
 
 
+
+/** @inheritDoc */
+anychart.core.ui.MarkersFactory.prototype.flattenThemes = function() {
+  anychart.core.ui.MarkersFactory.base(this, 'flattenThemes');
+
+  //Fill changedSettings object with object from theme.
+  for (var key in this.themeSettings) {
+    if (key in this.descriptorsMeta) {
+      this.changedSettings[key] = true;
+    }
+  }
+};
+
+
 /**
  * Getter/setter for enabled.
  * @param {?boolean=} opt_value Value to set.
@@ -267,117 +279,12 @@ anychart.core.ui.MarkersFactory.prototype.enabled = function(opt_value) {
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Position.
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Getter/setter for positionFormatter.
- * @param {Function=} opt_value .
- * @return {Function|anychart.core.ui.MarkersFactory} .
- */
-anychart.core.ui.MarkersFactory.prototype.positionFormatter = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.positionFormatter_ = opt_value;
-    this.changedSettings['positionFormatter'] = true;
-    this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    return this;
-  } else {
-    return this.positionFormatter_;
-  }
-};
-
-
-/**
- * Getter/setter for position.
- * @param {string=} opt_value Markers position settings.
- * @return {anychart.core.ui.MarkersFactory|string} Markers position settings or itself for method chaining.
- */
-anychart.core.ui.MarkersFactory.prototype.position = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = String(opt_value);
-    if (this.position_ != opt_value) {
-      this.position_ = opt_value;
-      this.changedSettings['position'] = true;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.position_;
-  }
-};
-
-
-/**
- * Getter/setter for anchor.
- * @param {(anychart.enums.Anchor|string|null)=} opt_value .
- * @return {!anychart.core.ui.MarkersFactory|anychart.enums.Anchor|string|null} .
- */
-anychart.core.ui.MarkersFactory.prototype.anchor = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : anychart.enums.normalizeAnchor(opt_value);
-    if (this.anchor_ !== opt_value) {
-      this.anchor_ = opt_value;
-      this.changedSettings['anchor'] = true;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.anchor_;
-  }
-};
-
-
-/**
- * Sets rotation angle around an anchor.
- * ({@link acgraph.vector.Element}).
- * @param {number=} opt_value Rotation angle in degrees.
- * @return {number|anychart.core.ui.MarkersFactory} Rotation angle in degrees or Itself for chaining call.
- */
-anychart.core.ui.MarkersFactory.prototype.rotation = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.toNumber(opt_value);
-    if (this.rotation_ != opt_value) {
-      this.rotation_ = opt_value;
-      this.changedSettings['rotation'] = true;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.rotation_;
-  }
-};
-
-
-/**
- * Getter/setter for type.
- * @param {(string|anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value .
- * @return {!anychart.core.ui.MarkersFactory|anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path|string} .
- */
-anychart.core.ui.MarkersFactory.prototype.type = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (!goog.isFunction(opt_value))
-      opt_value = anychart.enums.normalizeMarkerType(opt_value);
-
-    if (this.type_ != opt_value) {
-      this.type_ = opt_value;
-      this.changedSettings['type'] = true;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.type_ || this.autoType_ || anychart.enums.MarkerType.DIAGONAL_CROSS;
-  }
-};
-
-
 /**
  * Getter for current type value.
  * @return {?(string|anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)} .
  */
 anychart.core.ui.MarkersFactory.prototype.getType = function() {
-  return this.type_;
+  return this.ownSettings['type'] || this.themeSettings['type'];
 };
 
 
@@ -391,95 +298,11 @@ anychart.core.ui.MarkersFactory.prototype.setAutoType = function(value) {
 
 
 /**
- * Getter/setter for size.
- * @param {number=} opt_value .
- * @return {anychart.core.ui.MarkersFactory|number} .
- */
-anychart.core.ui.MarkersFactory.prototype.size = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.toNumber(opt_value);
-    if (!isNaN(opt_value) && this.size_ != opt_value) {
-      this.size_ = opt_value;
-      this.changedSettings['size'] = true;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.size_;
-  }
-};
-
-
-/**
- * Getter/setter for offsetX.
- * @param {(number|string)=} opt_value .
- * @return {number|string|anychart.core.ui.MarkersFactory} .
- */
-anychart.core.ui.MarkersFactory.prototype.offsetX = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.offsetX_ != opt_value) {
-      this.offsetX_ = opt_value;
-      this.changedSettings['offsetX'] = true;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.offsetX_;
-  }
-};
-
-
-/**
- * Getter/setter for offsetY.
- * @param {(number|string)=} opt_value .
- * @return {number|string|anychart.core.ui.MarkersFactory} .
- */
-anychart.core.ui.MarkersFactory.prototype.offsetY = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.offsetY_ != opt_value) {
-      this.offsetY_ = opt_value;
-      this.changedSettings['offsetY'] = true;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.offsetY_;
-  }
-};
-
-
-/**
- * Getter/setter for fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|string|anychart.core.ui.MarkersFactory} .
- */
-anychart.core.ui.MarkersFactory.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var color = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (this.fill_ != color) {
-      this.fill_ = color;
-      this.changedSettings['fill'] = true;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  } else {
-    return this.fill_ || this.autoFill_ || 'black';
-  }
-};
-
-
-/**
  * Getter for current fill value.
  * @return {?(string|acgraph.vector.Fill)} .
  */
 anychart.core.ui.MarkersFactory.prototype.getFill = function() {
-  return this.fill_;
+  return goog.isDef(this.ownSettings['fill']) ? this.ownSettings['fill'] : this.themeSettings['fill'];
 };
 
 
@@ -492,31 +315,26 @@ anychart.core.ui.MarkersFactory.prototype.setAutoFill = function(value) {
 };
 
 
-/**
- * Getter/setter for stroke.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Stroke settings,
- *    if used as a setter.
- * @param {number=} opt_thickness Line thickness. If empty - set to 1.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- *    Dash array contains a list of comma and/or white space separated lengths and percentages that specify the
- *    lengths of alternating dashes and gaps. If an odd number of values is provided, then the list of values is
- *    repeated to yield an even number of values. Thus, stroke dashpattern: 5,3,2 is equivalent to dashpattern: 5,3,2,5,3,2.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
- * @return {acgraph.vector.Stroke|string|anychart.core.ui.MarkersFactory} .
- */
-anychart.core.ui.MarkersFactory.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var color = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (this.stroke_ != color) {
-      this.stroke_ = color;
-      this.changedSettings['stroke'] = true;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+/** @inheritDoc */
+anychart.core.ui.MarkersFactory.prototype.getOption = function(name) {
+  var val = anychart.core.ui.MarkersFactory.base(this, 'getOption', name);
+  if (!val) {
+    if (name == 'stroke') {
+      val = this.autoStroke_ || 'none';
+    } else if (name == 'fill') {
+      val = this.autoFill_ || 'black';
+    } else if (name == 'type') {
+      val = this.autoType_ || anychart.enums.MarkerType.DIAGONAL_CROSS;
     }
-    return this;
-  } else {
-    return this.stroke_ || this.autoStroke_ || 'none';
   }
+  return val;
+};
+
+
+/**@inheritDoc*/
+anychart.core.ui.MarkersFactory.prototype.setOption = function(name, value) {
+  anychart.core.ui.MarkersFactory.base(this, 'setOption', name, value);
+  this.changedSettings[name] = true;
 };
 
 
@@ -525,7 +343,7 @@ anychart.core.ui.MarkersFactory.prototype.stroke = function(opt_strokeOrFill, op
  * @return {?(string|acgraph.vector.Stroke)} .
  */
 anychart.core.ui.MarkersFactory.prototype.getStroke = function() {
-  return this.stroke_;
+  return goog.isDef(this.ownSettings['stroke']) ? this.ownSettings['stroke'] : this.themeSettings['stroke'];
 };
 
 
@@ -578,11 +396,11 @@ anychart.core.ui.MarkersFactory.prototype.measure = function(positionProvider) {
     parentHeight = parentBounds.height;
   }
 
-  var type = this.type();
-  var size = /** @type {number} */(this.size());
-  var anchor = /** @type {anychart.enums.Anchor} */(anychart.enums.normalizeAnchor(this.anchor()));
-  var offsetX = /** @type {number} */(this.offsetX());
-  var offsetY = /** @type {number} */(this.offsetY());
+  var type = this.getOption('type');
+  var size = /** @type {number} */(this.getOption('size'));
+  var anchor = /** @type {anychart.enums.Anchor} */(this.getOption('anchor'));
+  var offsetX = /** @type {number} */(this.getOption('offsetX'));
+  var offsetY = /** @type {number} */(this.getOption('offsetY'));
 
   drawer = goog.isString(type) ?
       anychart.utils.getMarkerDrawer(type) :
@@ -592,7 +410,7 @@ anychart.core.ui.MarkersFactory.prototype.measure = function(positionProvider) {
   drawer.call(this, this.measureMarkerElement_, 0, 0, size);
 
   var markerBounds = /** @type {anychart.math.Rect} */(this.measureMarkerElement_.getBounds());
-  var formattedPosition = goog.object.clone(this.positionFormatter_.call(positionProvider, positionProvider));
+  var formattedPosition = goog.object.clone(this.getOption('positionFormatter').call(positionProvider, positionProvider));
   var position = new goog.math.Coordinate(formattedPosition['x'], formattedPosition['y']);
   var anchorCoordinate = anychart.utils.getCoordinateByAnchor(
       new anychart.math.Rect(0, 0, markerBounds.width, markerBounds.height),
@@ -601,8 +419,8 @@ anychart.core.ui.MarkersFactory.prototype.measure = function(positionProvider) {
   position.x -= anchorCoordinate.x;
   position.y -= anchorCoordinate.y;
 
-  var offsetXNorm = goog.isDef(this.offsetX_) ? anychart.utils.normalizeSize(offsetX, parentWidth) : 0;
-  var offsetYNorm = goog.isDef(this.offsetY_) ? anychart.utils.normalizeSize(offsetY, parentHeight) : 0;
+  var offsetXNorm = goog.isDef(offsetX) ? anychart.utils.normalizeSize(offsetX, parentWidth) : 0;
+  var offsetYNorm = goog.isDef(offsetY) ? anychart.utils.normalizeSize(offsetY, parentHeight) : 0;
 
   anychart.utils.applyOffsetByAnchor(position, anchor, offsetXNorm, offsetYNorm);
 
@@ -792,22 +610,23 @@ anychart.core.ui.MarkersFactory.prototype.getRootLayer = function() {
 /** @inheritDoc */
 anychart.core.ui.MarkersFactory.prototype.serialize = function() {
   var json = anychart.core.ui.MarkersFactory.base(this, 'serialize');
+  // anychart.core.settings.serialize(this, anychart.core.ui.MarkersFactory.OWN_DESCRIPTORS, json);
   delete json['enabled'];
   var enabledState = this.enabled();
   if (goog.isDef(enabledState))
     json['enabled'] = enabledState;
   if (goog.isDef(this.disablePointerEvents())) json['disablePointerEvents'] = this.disablePointerEvents();
-  if (this.changedSettings['position']) json['position'] = this.position();
-  if (this.changedSettings['anchor']) json['anchor'] = this.anchor();
-  if (this.changedSettings['offsetX']) json['offsetX'] = this.offsetX();
-  if (this.changedSettings['offsetY']) json['offsetY'] = this.offsetY();
-  if (this.changedSettings['type']) json['type'] = this.type();
-  if (this.changedSettings['rotation']) json['rotation'] = isNaN(this.rotation()) ? null : this.rotation();
-  if (goog.isDef(this.size())) json['size'] = this.size();
-  if (this.changedSettings['fill'] && goog.isDef(this.fill_))
-    json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill_));
-  if (this.changedSettings['stroke'] && goog.isDef(this.stroke_))
-    json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke_));
+  if (this.changedSettings['position']) json['position'] = this.getOption('position');
+  if (this.changedSettings['anchor']) json['anchor'] = this.getOption('anchor');
+  if (this.changedSettings['offsetX']) json['offsetX'] = this.getOption('offsetX');
+  if (this.changedSettings['offsetY']) json['offsetY'] = this.getOption('offsetY');
+  if (this.changedSettings['type']) json['type'] = this.getOption('type');
+  if (this.changedSettings['rotation']) json['rotation'] = isNaN(this.getOption('rotation')) ? null : this.getOption('rotation');
+  if (goog.isDef(this.getOption('size'))) json['size'] = this.getOption('size');
+  if (this.changedSettings['fill'] && goog.isDef(this.ownSettings['fill']))
+    json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.ownSettings['fill']));
+  if (this.changedSettings['stroke'] && goog.isDef(this.ownSettings['stroke']))
+    json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.ownSettings['stroke']));
   return json;
 };
 
@@ -829,7 +648,11 @@ anychart.core.ui.MarkersFactory.prototype.resolveSpecialValue = function(var_arg
 anychart.core.ui.MarkersFactory.prototype.setupSpecial = function(isDefault, var_args) {
   var resolvedValue = this.resolveSpecialValue(arguments[1]);
   if (resolvedValue) {
-    this.type(resolvedValue['type']);
+    var type = 'type';
+    if (this[type])
+      this[type](resolvedValue[type]);
+    else
+      this.setOption(type, resolvedValue[type]);
     this.enabled(resolvedValue['enabled']);
     return true;
   }
@@ -841,17 +664,15 @@ anychart.core.ui.MarkersFactory.prototype.setupSpecial = function(isDefault, var
 anychart.core.ui.MarkersFactory.prototype.setupByJSON = function(config, opt_default) {
   var enabledState = this.enabled();
   anychart.core.ui.MarkersFactory.base(this, 'setupByJSON', config, opt_default);
+  if (opt_default) {
+    for (var i in config) {
+      this.themeSettings[i] = config[i];
+      this.changedSettings[i] = true;
+    }
+  } else {
+    anychart.core.settings.deserialize(this, anychart.core.ui.MarkersFactory.Marker.OWN_DESCRIPTORS, config);
+  }
   this.disablePointerEvents(config['disablePointerEvents']);
-  this.position(config['position']);
-  this.rotation(config['rotation']);
-  this.anchor(config['anchor']);
-  this.offsetX(config['offsetX']);
-  this.offsetY(config['offsetY']);
-  this.type(config['type']);
-  this.size(config['size']);
-  this.fill(config['fill']);
-  this.stroke(config['stroke']);
-  this.positionFormatter(config['positionFormatter']);
   this.enabled('enabled' in config ? config['enabled'] : enabledState);
 };
 
@@ -913,9 +734,70 @@ anychart.core.ui.MarkersFactory.Marker = function() {
    */
   this.settingsObj = {};
 
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['position',
+      anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['offsetY',
+      anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['offsetX',
+      anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['fill',
+      anychart.ConsistencyState.APPEARANCE,
+      anychart.Signal.NEEDS_REDRAW],
+    ['stroke',
+      anychart.ConsistencyState.APPEARANCE,
+      anychart.Signal.NEEDS_REDRAW],
+    ['positionFormatter',
+      anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['anchor',
+      anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['size',
+      anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['rotation',
+      anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['type',
+      anychart.ConsistencyState.APPEARANCE,
+      anychart.Signal.NEEDS_REDRAW
+    ]
+  ]);
   this.resetSettings();
 };
 goog.inherits(anychart.core.ui.MarkersFactory.Marker, anychart.core.VisualBase);
+
+
+/**
+ * Own property descriptors
+ * */
+anychart.core.ui.MarkersFactory.Marker.OWN_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  anychart.core.settings.createDescriptors(map, [
+    anychart.core.settings.descriptors.ANCHOR,
+    anychart.core.settings.descriptors.OFFSET_X,
+    anychart.core.settings.descriptors.OFFSET_Y,
+    anychart.core.settings.descriptors.POSITION_FORMATTER,
+    anychart.core.settings.descriptors.ROTATION,
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'position', anychart.core.settings.asIsNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'size', anychart.core.settings.numberNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'fill', anychart.core.settings.fillNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'stroke', anychart.core.settings.strokeNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'type', function(val) {
+      if (!goog.isFunction(val))
+        val = anychart.enums.normalizeMarkerType(val);
+      return val;
+    }]
+  ]);
+  return map;
+})();
+anychart.core.settings.populate(anychart.core.ui.MarkersFactory.Marker, anychart.core.ui.MarkersFactory.Marker.OWN_DESCRIPTORS);
 
 
 /**
@@ -1002,24 +884,6 @@ anychart.core.ui.MarkersFactory.Marker.prototype.setIndex = function(index) {
 
 
 /**
- * Gets/Sets position formatter.
- * @param {*=} opt_value Position formatter.
- * @return {*} Position formatter or self for chaining.
- */
-anychart.core.ui.MarkersFactory.Marker.prototype.positionFormatter = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.settingsObj['positionFormatter'] != opt_value) {
-      this.settingsObj['positionFormatter'] = opt_value;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.settingsObj['positionFormatter'];
-  }
-};
-
-
-/**
  * Gets/Sets position provider.
  * @param {*=} opt_value Position provider.
  * @return {*} Position provider or self for chaining.
@@ -1037,160 +901,24 @@ anychart.core.ui.MarkersFactory.Marker.prototype.positionProvider = function(opt
 };
 
 
-/**
- * Getter for current position settings of all markers.
- * @param {(anychart.enums.Position|string)=} opt_value Markers position settings.
- * @return {anychart.core.ui.MarkersFactory.Marker|anychart.enums.Position|string} Markers position
- * settings or self for chaining call.
- */
-anychart.core.ui.MarkersFactory.Marker.prototype.position = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = String(opt_value);
-    if (this.settingsObj['position'] != opt_value) {
-      this.settingsObj['position'] = opt_value;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  } else {
-    return /** @type {string} */(this.settingsObj['position']);
-  }
+/** @inheritDoc */
+anychart.core.ui.MarkersFactory.Marker.prototype.setOption = function(name, value) {
+  this.settingsObj[name] = value;
 };
 
 
-/**
- * Getter for anchor settings of all markers.
- * @param {(anychart.enums.Anchor|string)=} opt_value .
- * @return {!(anychart.core.ui.MarkersFactory.Marker|anychart.enums.Anchor|string)} .
- */
-anychart.core.ui.MarkersFactory.Marker.prototype.anchor = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : anychart.enums.normalizeAnchor(opt_value);
-    if (this.settingsObj['anchor'] !== opt_value) {
-      this.settingsObj['anchor'] = opt_value;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+/** @inheritDoc */
+anychart.core.ui.MarkersFactory.Marker.prototype.getOption = function(name) {
+  var val = goog.isDef(this.settingsObj[name]) ? this.settingsObj[name] : this.themeSettings[name];
+
+  if (!goog.isDef(val)) {
+    if (name == 'stroke') {
+      val = this.autoStroke_;
+    } else if (name == 'fill') {
+      val = this.autoFill_;
     }
-    return this;
-  } else {
-    return /** @type {string} */(this.settingsObj['anchor']);
   }
-};
-
-
-/**
- * Rotates a marker around an anchor.
- * ({@link acgraph.vector.Element}). Method resets transformation and applies a new one.
- * @param {number=} opt_value Rotation angle in degrees.
- * @return {number|anychart.core.ui.MarkersFactory.Marker} Rotation angle in degrees or self for chaining call.
- */
-anychart.core.ui.MarkersFactory.Marker.prototype.rotation = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.toNumber(opt_value);
-    if (this.settingsObj['rotation'] !== opt_value) {
-      this.settingsObj['rotation'] = opt_value;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return /** @type {number} */(this.settingsObj['rotation']);
-  }
-};
-
-
-/**
- * Getter for current type settings of all markers.
- * @param {(anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value .
- * @return {!anychart.core.ui.MarkersFactory.Marker|anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path|string} .
- */
-anychart.core.ui.MarkersFactory.Marker.prototype.type = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.settingsObj['type'] != opt_value) {
-      this.settingsObj['type'] = opt_value;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  } else {
-    return /** @type {string|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path} */(this.settingsObj['type']);
-  }
-};
-
-
-/**
- * Getter for current size settings of all markers.
- * @param {number=} opt_value .
- * @return {anychart.core.ui.MarkersFactory.Marker|number} .
- */
-anychart.core.ui.MarkersFactory.Marker.prototype.size = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.toNumber(opt_value);
-    if (!isNaN(opt_value) && this.settingsObj['size'] != opt_value) {
-      this.settingsObj['size'] = opt_value;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  } else {
-    return /** @type {number} */(this.settingsObj['size']);
-  }
-};
-
-
-/**
- * Getter for current offsetX settings of all markers.
- * @param {(number|string)=} opt_value .
- * @return {number|string|anychart.core.ui.MarkersFactory.Marker} .
- */
-anychart.core.ui.MarkersFactory.Marker.prototype.offsetX = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.settingsObj['offsetX'] != opt_value) {
-      this.settingsObj['offsetX'] = opt_value;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  } else {
-    return /** @type {number} */(this.settingsObj['offsetX']);
-  }
-};
-
-
-/**
- * Getter for current offsetY settings of all markers.
- * @param {(number|string)=} opt_value .
- * @return {number|string|anychart.core.ui.MarkersFactory.Marker} .
- */
-anychart.core.ui.MarkersFactory.Marker.prototype.offsetY = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.settingsObj['offsetY'] != opt_value) {
-      this.settingsObj['offsetY'] = opt_value;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  } else {
-    return /** @type {number} */(this.settingsObj['offsetY']);
-  }
-};
-
-
-/**
- * Getter for current fill settings of all markers.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|string|anychart.core.ui.MarkersFactory.Marker} .
- */
-anychart.core.ui.MarkersFactory.Marker.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var color = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (this.settingsObj['fill'] != color) {
-      this.settingsObj['fill'] = color;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  } else {
-    return /** @type {acgraph.vector.Fill} */(this.settingsObj['fill'] || this.autoFill_);
-  }
+  return val;
 };
 
 
@@ -1200,33 +928,6 @@ anychart.core.ui.MarkersFactory.Marker.prototype.fill = function(opt_fillOrColor
  */
 anychart.core.ui.MarkersFactory.Marker.prototype.setAutoFill = function(value) {
   this.autoFill_ = value;
-};
-
-
-/**
- * Getter for current stroke settings of all markers.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Stroke settings,
- *    if used as a setter.
- * @param {number=} opt_thickness Line thickness. Defaults to 1.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- *    Dash array contains a list of comma and/or white space separated lengths and percentages that specify the
- *    lengths of alternating dashes and gaps. If an odd number of values is provided, then the list of values is
- *    repeated to yield an even number of values. Thus, stroke dashpattern: 5,3,2 is equivalent to dashpattern: 5,3,2,5,3,2.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {acgraph.vector.Stroke|string|anychart.core.ui.MarkersFactory.Marker} .
- */
-anychart.core.ui.MarkersFactory.Marker.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var color = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (this.settingsObj['stroke'] != color) {
-      this.settingsObj['stroke'] = color;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.ENABLED, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  } else {
-    return /** @type {acgraph.vector.Stroke} */(this.settingsObj['stroke'] || this.autoStroke_);
-  }
 };
 
 
@@ -1248,7 +949,7 @@ anychart.core.ui.MarkersFactory.Marker.prototype.enabled = function(opt_value) {
     }
     return this;
   } else {
-    return /** @type {boolean} */(this.settingsObj['enabled']);
+    return /** @type {boolean} */(goog.isDef(this.settingsObj['enabled']) ? this.settingsObj['enabled'] : this.themeSettings['enabled']);
   }
 };
 
@@ -1273,6 +974,7 @@ anychart.core.ui.MarkersFactory.Marker.prototype.resetSettings = function() {
   if (this.settingsObj['padding']) {
     goog.dispose(this.settingsObj['padding']);
   }
+  this.themeSettings = {};
   this.settingsObj = {};
   this.superSettingsObj = {};
   delete this.autoFill_;
@@ -1436,13 +1138,19 @@ anychart.core.ui.MarkersFactory.Marker.prototype.draw = function() {
 
     for (var i = 0, len = settingsFields.length; i < len; i++) {
       var field = settingsFields[i];
-      settings[field] = this.getFinalSettings_(
-          this[field](),
-          this.superSettingsObj[field],
-          isSingleMarker ? undefined : parentMarkersFactory[field](),
-          isSingleMarker ? undefined : currentMarkersFactory[field](),
-          !!(settingsChangedStates && settingsChangedStates[field]));
+      var pointSettings = this[field]();
+      var pointSuperSettings = this.superSettingsObj[field];
+      var factorySettings = isSingleMarker ? undefined : parentMarkersFactory[field] ?
+          parentMarkersFactory[field]() : parentMarkersFactory.getOption(field);
+      var factorySuperSettings = isSingleMarker ? undefined : currentMarkersFactory[field] ?
+          currentMarkersFactory[field]() : currentMarkersFactory.getOption(field);
+      var isFactorySettingsChanged = !!(settingsChangedStates && settingsChangedStates[field]);
 
+      settings[field] = this.getFinalSettings_(pointSettings,
+          pointSuperSettings,
+          factorySettings,
+          factorySuperSettings,
+          isFactorySettingsChanged);
     }
 
     var drawer = goog.isString(settings['type']) ?
@@ -1518,12 +1226,12 @@ anychart.core.ui.MarkersFactory.Marker.prototype.draw = function() {
  */
 anychart.core.ui.MarkersFactory.Marker.prototype.applyDefaultsForSingle_ = function() {
   this.suspendSignalsDispatching();
-  if (!goog.isDef(this.positionFormatter())) this.positionFormatter(anychart.utils.DEFAULT_FORMATTER);
-  if (!goog.isDef(this.size())) this.size(10);
-  if (!goog.isDef(this.anchor())) this.anchor(anychart.enums.Anchor.CENTER);
-  if (!goog.isDef(this.offsetX())) this.offsetX(0);
-  if (!goog.isDef(this.offsetY())) this.offsetY(0);
-  if (!goog.isDef(this.rotation())) this.rotation(0);
+  if (!goog.isDef(this.getOption('positionFormatter'))) this.setOption('positionFormatter', anychart.utils.DEFAULT_FORMATTER);
+  if (!goog.isDef(this.getOption('size'))) this.setOption('size', 10);
+  if (!goog.isDef(this.getOption('anchor'))) this.setOption('anchor', anychart.enums.Anchor.CENTER);
+  if (!goog.isDef(this.getOption('offsetX'))) this.setOption('offsetX', 0);
+  if (!goog.isDef(this.getOption('offsetY'))) this.setOption('offsetY', 0);
+  if (!goog.isDef(this.getOption('rotation'))) this.setOption('rotation', 0);
   this.resumeSignalsDispatching(false);
 };
 
@@ -1535,15 +1243,15 @@ anychart.core.ui.MarkersFactory.Marker.prototype.serialize = function() {
   var enabledState = this.enabled();
   if (goog.isDefAndNotNull(enabledState))
     json['enabled'] = enabledState;
-  if (goog.isDef(this.position())) json['position'] = this.position();
-  if (goog.isDef(this.rotation())) json['rotation'] = isNaN(this.rotation()) ? null : this.rotation();
-  if (goog.isDef(this.anchor())) json['anchor'] = this.anchor();
-  if (goog.isDef(this.offsetX())) json['offsetX'] = this.offsetX();
-  if (goog.isDef(this.offsetY())) json['offsetY'] = this.offsetY();
-  if (goog.isDef(this.type())) json['type'] = this.type();
-  if (goog.isDef(this.size())) json['size'] = this.size();
-  if (goog.isDef(this.fill())) json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill()));
-  if (goog.isDef(this.stroke())) json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
+  if (goog.isDef(this.getOption('position'))) json['position'] = this.getOption('position');
+  if (goog.isDef(this.getOption('rotation'))) json['rotation'] = isNaN(this.getOption('rotation')) ? null : this.getOption('rotation');
+  if (goog.isDef(this.getOption('anchor'))) json['anchor'] = this.getOption('anchor');
+  if (goog.isDef(this.getOption('offsetX'))) json['offsetX'] = this.getOption('offsetX');
+  if (goog.isDef(this.getOption('offsetY'))) json['offsetY'] = this.getOption('offsetY');
+  if (goog.isDef(this.getOption('type'))) json['type'] = this.getOption('type');
+  if (goog.isDef(this.getOption('size'))) json['size'] = this.getOption('size');
+  if (goog.isDef(this.getOption('fill'))) json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.getOption('fill')));
+  if (goog.isDef(this.getOption('stroke'))) json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.getOption('stroke')));
 
   return json;
 };
@@ -1553,17 +1261,10 @@ anychart.core.ui.MarkersFactory.Marker.prototype.serialize = function() {
 anychart.core.ui.MarkersFactory.Marker.prototype.setupByJSON = function(config, opt_default) {
   var enabledState = this.enabled();
   anychart.core.ui.MarkersFactory.Marker.base(this, 'setupByJSON', config, opt_default);
-  this.position(config['position']);
-  this.rotation(config['rotation']);
-  this.anchor(config['anchor']);
-  this.offsetX(config['offsetX']);
-  this.offsetY(config['offsetY']);
-  this.type(config['type']);
-  this.size(config['size']);
-  this.fill(config['fill']);
-  this.stroke(config['stroke']);
-  this.positionFormatter(config['positionFormatter']);
-  if (!goog.isDef(config['enabled'])) delete this.settingsObj['enabled'];
+  anychart.core.settings.deserialize(this, anychart.core.ui.MarkersFactory.Marker.OWN_DESCRIPTORS, config);
+  if (!goog.isDef(config['enabled'])) {
+    delete this.settingsObj['enabled'];
+  }
   this.enabled('enabled' in config ? config['enabled'] : enabledState);
 };
 
@@ -1618,30 +1319,32 @@ anychart.standalones.markersFactory = function() {
 //exports
 (function() {
   var proto = anychart.core.ui.MarkersFactory.prototype;
-  proto['positionFormatter'] = proto.positionFormatter;
-  proto['position'] = proto.position;
-  proto['anchor'] = proto.anchor;
-  proto['offsetX'] = proto.offsetX;
-  proto['offsetY'] = proto.offsetY;
-  proto['rotation'] = proto.rotation;
-  proto['type'] = proto.type;
-  proto['size'] = proto.size;
-  proto['fill'] = proto.fill;
-  proto['stroke'] = proto.stroke;
+  // auto generated
+  // proto['positionFormatter'] = proto.positionFormatter;
+  // proto['position'] = proto.position;
+  // proto['anchor'] = proto.anchor;
+  // proto['offsetX'] = proto.offsetX;
+  // proto['offsetY'] = proto.offsetY;
+  // proto['rotation'] = proto.rotation;
+  // proto['type'] = proto.type;
+  // proto['size'] = proto.size;
+  // proto['fill'] = proto.fill;
+  // proto['stroke'] = proto.stroke;
   proto['disablePointerEvents'] = proto.disablePointerEvents;
   proto['enabled'] = proto.enabled;
 
   proto = anychart.core.ui.MarkersFactory.Marker.prototype;
-  proto['positionFormatter'] = proto.positionFormatter;
-  proto['position'] = proto.position;
-  proto['anchor'] = proto.anchor;
-  proto['offsetX'] = proto.offsetX;
-  proto['offsetY'] = proto.offsetY;
-  proto['rotation'] = proto.rotation;
-  proto['type'] = proto.type;
-  proto['size'] = proto.size;
-  proto['fill'] = proto.fill;
-  proto['stroke'] = proto.stroke;
+  // auto generated
+  // proto['positionFormatter'] = proto.positionFormatter;
+  // proto['position'] = proto.position;
+  // proto['anchor'] = proto.anchor;
+  // proto['offsetX'] = proto.offsetX;
+  // proto['offsetY'] = proto.offsetY;
+  // proto['rotation'] = proto.rotation;
+  // proto['type'] = proto.type;
+  // proto['size'] = proto.size;
+  // proto['fill'] = proto.fill;
+  // proto['stroke'] = proto.stroke;
 
   proto = anychart.standalones.MarkersFactory.prototype;
   goog.exportSymbol('anychart.standalones.markersFactory', anychart.standalones.markersFactory);
