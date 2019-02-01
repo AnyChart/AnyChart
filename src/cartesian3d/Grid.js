@@ -18,6 +18,25 @@ anychart.cartesian3dModule.Grid = function() {
 goog.inherits(anychart.cartesian3dModule.Grid, anychart.core.GridBase);
 
 
+//region --- Infrastructure
+/** @inheritDoc */
+anychart.cartesian3dModule.Grid.prototype.scaleInvalidated = function(event) {
+  var signal = 0;
+  if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION))
+    signal |= anychart.Signal.NEEDS_RECALCULATION;
+  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION))
+    signal |= anychart.Signal.NEEDS_REDRAW;
+
+  signal |= anychart.Signal.BOUNDS_CHANGED;
+
+  var state = anychart.ConsistencyState.BOUNDS |
+      anychart.ConsistencyState.APPEARANCE;
+
+  this.invalidate(state, signal);
+};
+
+
+//endregion
 //region --- Drawing
 /** @inheritDoc */
 anychart.cartesian3dModule.Grid.prototype.drawLineHorizontal = function(ratio, shift) {

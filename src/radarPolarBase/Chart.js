@@ -19,7 +19,6 @@ goog.require('anychart.scales');
 anychart.radarPolarBaseModule.Chart = function(categorizeData) {
   anychart.radarPolarBaseModule.Chart.base(this, 'constructor', categorizeData);
 
-  this.addThemes('polar');
   /**
    * @type {Array.<anychart.radarModule.Grid|anychart.polarModule.Grid>}
    * @private
@@ -194,7 +193,6 @@ anychart.radarPolarBaseModule.Chart.prototype.xGrid = function(opt_indexOrValue,
     grid.setDefaultLayout(anychart.enums.RadialGridLayout.RADIAL);
     grid.zIndex(this.getGridZIndex(true));
     this.xGrids_[index] = grid;
-    this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal, this);
     this.invalidate(anychart.ConsistencyState.AXES_CHART_GRIDS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -231,7 +229,6 @@ anychart.radarPolarBaseModule.Chart.prototype.yGrid = function(opt_indexOrValue,
     grid.setDefaultLayout(anychart.enums.RadialGridLayout.CIRCUIT);
     grid.zIndex(this.getGridZIndex(true));
     this.yGrids_[index] = grid;
-    this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal, this);
     this.invalidate(anychart.ConsistencyState.AXES_CHART_GRIDS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -269,7 +266,6 @@ anychart.radarPolarBaseModule.Chart.prototype.xMinorGrid = function(opt_indexOrV
     grid.addThemes('defaultMinorGridSettings');
     grid.zIndex(this.getGridZIndex(false));
     this.xMinorGrids_[index] = grid;
-    this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal, this);
     this.invalidate(anychart.ConsistencyState.AXES_CHART_GRIDS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -307,7 +303,6 @@ anychart.radarPolarBaseModule.Chart.prototype.yMinorGrid = function(opt_indexOrV
     grid.addThemes('defaultMinorGridSettings');
     grid.zIndex(this.getGridZIndex(false));
     this.yMinorGrids_[index] = grid;
-    this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal, this);
     this.invalidate(anychart.ConsistencyState.AXES_CHART_GRIDS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -367,6 +362,20 @@ anychart.radarPolarBaseModule.Chart.prototype.defaultMinorGridSettings = functio
 };
 
 
+/**
+ * Setup scales for grids.
+ * @param {Object=} opt_config
+ */
+anychart.radarPolarBaseModule.Chart.prototype.setupGrids = function(opt_config) {
+  var scalesInstances = this.getScaleInstances();
+  var config  = goog.isDef(opt_config) ? opt_config : this.themeSettings;
+  var setupElement = goog.isDef(opt_config);
+
+  this.setupElementsWithScales(config['xGrids'], this.xGrid, scalesInstances, setupElement);
+  this.setupElementsWithScales(config['yGrids'], this.yGrid, scalesInstances, setupElement);
+  this.setupElementsWithScales(config['xMinorGrids'], this.xMinorGrid, scalesInstances, setupElement);
+  this.setupElementsWithScales(config['yMinorGrids'], this.yMinorGrid, scalesInstances, setupElement);
+};
 //endregion
 //region --- Axes
 //------------------------------------------------------------------------------
@@ -389,8 +398,8 @@ anychart.radarPolarBaseModule.Chart.prototype.createXAxisInstance = goog.abstrac
 anychart.radarPolarBaseModule.Chart.prototype.xAxis = function(opt_value) {
   if (!this.xAxis_) {
     this.xAxis_ = this.createXAxisInstance();
+    this.setupCreated('xAxis', this.xAxis_);
     this.xAxis_.setParentEventTarget(this);
-    this.registerDisposable(this.xAxis_);
     this.xAxis_.listenSignals(this.onAxisSignal_, this);
     this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES | anychart.ConsistencyState.BOUNDS);
   }
@@ -412,8 +421,8 @@ anychart.radarPolarBaseModule.Chart.prototype.xAxis = function(opt_value) {
 anychart.radarPolarBaseModule.Chart.prototype.yAxis = function(opt_value) {
   if (!this.yAxis_) {
     this.yAxis_ = new anychart.radarPolarBaseModule.RadialAxis();
+    this.setupCreated('yAxis', this.yAxis_);
     this.yAxis_.setParentEventTarget(this);
-    this.registerDisposable(this.yAxis_);
     this.yAxis_.listenSignals(this.onAxisSignal_, this);
     this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES | anychart.ConsistencyState.BOUNDS);
   }
@@ -538,7 +547,7 @@ anychart.radarPolarBaseModule.Chart.prototype.drawContent = function(bounds) {
     //total bounds of content area
     var contentAreaBounds = bounds.clone().round();
     axis = this.xAxis();
-    axis.startAngle(startAngle);
+    axis['startAngle'](startAngle);
     axis.parentBounds(contentAreaBounds);
     this.dataBounds = axis.getRemainingBounds().round();
 
@@ -561,9 +570,9 @@ anychart.radarPolarBaseModule.Chart.prototype.drawContent = function(bounds) {
           grid.invalidate(anychart.ConsistencyState.GRIDS_POSITION);
         }
         grid.parentBounds(this.dataBounds);
-        grid.innerRadius(innerRadius);
+        grid['innerRadius'](innerRadius);
         grid.container(this.rootElement);
-        grid.startAngle(startAngle);
+        grid['startAngle'](startAngle);
         grid.draw();
         grid.resumeSignalsDispatching(false);
       }
@@ -583,8 +592,8 @@ anychart.radarPolarBaseModule.Chart.prototype.drawContent = function(bounds) {
 
     axis = this.yAxis();
     axis.container(this.rootElement);
-    axis.startAngle(startAngle);
-    axis.innerRadius(innerRadius);
+    axis['startAngle'](startAngle);
+    axis['innerRadius'](innerRadius);
     axis.parentBounds(this.dataBounds.clone());
     axis.draw();
 
@@ -734,11 +743,6 @@ anychart.radarPolarBaseModule.Chart.prototype.setupByJSONWithScales = function(c
 
   anychart.core.settings.deserialize(this, anychart.radarPolarBaseModule.Chart.PROPERTY_DESCRIPTORS, config);
 
-  this.setupElementsWithScales(config['xGrids'], this.xGrid, scalesInstances, true);
-  this.setupElementsWithScales(config['yGrids'], this.yGrid, scalesInstances, true);
-  this.setupElementsWithScales(config['xMinorGrids'], this.xMinorGrid, scalesInstances, true);
-  this.setupElementsWithScales(config['yMinorGrids'], this.yMinorGrid, scalesInstances, true);
-
   var json = config['xAxis'];
   this.xAxis().setupInternal(!!opt_default, json);
   if (goog.isObject(json) && 'scale' in json && json['scale'] > 1)
@@ -748,6 +752,8 @@ anychart.radarPolarBaseModule.Chart.prototype.setupByJSONWithScales = function(c
   this.yAxis().setupInternal(!!opt_default, json);
   if (goog.isObject(json) && 'scale' in json && json['scale'] > 1)
     this.yAxis().scale(scalesInstances[json['scale']]);
+
+  this.setupGrids(config);
 };
 
 
@@ -815,6 +821,20 @@ anychart.radarPolarBaseModule.Chart.prototype.serializeGrid_ = function(item, sc
     }
   }
   return config;
+};
+
+
+/** @inheritDoc */
+anychart.radarPolarBaseModule.Chart.prototype.disposeInternal = function() {
+  goog.disposeAll(this.xAxis_, this.yAxis_, this.xGrids_, this.yGrids_,
+      this.xMinorGrids_, this.yMinorGrids_);
+  this.xAxis_ = null;
+  this.yAxis_ = null;
+  this.xGrids_ = null;
+  this.yGrids_ = null;
+  this.xMinorGrids_ = null;
+  this.yMinorGrids_ = null;
+  anychart.radarPolarBaseModule.Chart.base(this, 'disposeInternal');
 };
 
 

@@ -169,6 +169,7 @@ anychart.ConsistencyState = {
   TIMELINE_SCALES: 1 << 9,
   TIMELINE_ELEMENTS_APPEARANCE: 1 << 10,
   TIMELINE_ELEMENTS_LABELS: 1 << 11,
+  TIMELINE_MARKERS: 1 << 12,
   //---------------------------------- GANTT TIMELINE HEADER STATES (VB) ---------------------------------
   TIMELINE_HEADER_SCALES: 1 << 6,
   //---------------------------------- GANTT TIMELINE HEADER LEVEL STATES (VB) ---------------------------------

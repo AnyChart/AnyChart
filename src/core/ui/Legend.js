@@ -77,10 +77,7 @@ anychart.core.ui.Legend = function() {
 
   var positionBeforeInvalidationHook = function() {
     this.dragged = false;
-    var signal = anychart.Signal.NEEDS_REDRAW;
-    if (this.getOption('positionMode') == anychart.enums.LegendPositionMode.OUTSIDE)
-      signal |= anychart.Signal.BOUNDS_CHANGED;
-    this.invalidate(anychart.ConsistencyState.BOUNDS, signal);
+    this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
   };
 
   var positionModeBeforeInvalidationHook = function() {

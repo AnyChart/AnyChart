@@ -222,7 +222,7 @@ anychart.colorScalesModule.ui.ColorRange.prototype.calculateRangeRegions_ = func
         var category = goog.isDef(target.categoryFieldName) ? iterator.meta(target.categoryFieldName) : null;
         var pointValue = category || iterator.get(target.drawer ? target.drawer.valueFieldName : target.referenceValueNames[1]);
         var range = scale.getRangeByValue(/** @type {number} */(pointValue));
-        if (range) {
+        if (range && !isNaN(range.start) && !isNaN(range.end)) {
           if (!this.rangeRegions_[range.sourceIndex]) this.rangeRegions_[range.sourceIndex] = [];
           this.rangeRegions_[range.sourceIndex].push(iterator.getIndex());
         }
@@ -324,8 +324,8 @@ anychart.colorScalesModule.ui.ColorRange.prototype.drawTopLine = function(bounds
     var ranges = scale.getProcessedRanges();
     var colors = scale.colors();
 
-    var partLength = bounds.width / ranges.length;
-    for (var i = 0, len = ranges.length; i < len; i++) {
+    var partLength = bounds.width / (ranges.length - 1);
+    for (var i = 0, len = ranges.length - 1; i < len; i++) {
       var range = ranges[i];
       var color = range['color'] || colors[range.sourceIndex] || colors[colors.length - 1];
 
@@ -361,13 +361,13 @@ anychart.colorScalesModule.ui.ColorRange.prototype.drawRightLine = function(boun
     var ranges = scale.getProcessedRanges();
     var colors = scale.colors();
 
-    var partLength = bounds.height / ranges.length;
-    for (var i = 0, len = ranges.length; i < len; i++) {
+    var partLength = bounds.height / (ranges.length - 1);
+    for (var i = 0, len = ranges.length - 1; i < len; i++) {
       var range = ranges[i];
       var color = range['color'] || colors[range.sourceIndex] || colors[colors.length - 1];
 
       var line = this.lines[i] ? this.lines[i].clear() : this.lines[i] = this.line.path();
-      var y = bounds.top + pixelShift + partLength * (ranges.length - 1 - i);
+      var y = bounds.top + pixelShift + partLength * (ranges.length - 1 - i - 1 /* minus default range */);
       line
           .moveTo(x, y)
           .lineTo(x, y + partLength)
@@ -398,8 +398,8 @@ anychart.colorScalesModule.ui.ColorRange.prototype.drawBottomLine = function(bou
     var ranges = scale.getProcessedRanges();
     var colors = scale.colors();
 
-    var partLength = bounds.width / ranges.length;
-    for (var i = 0, len = ranges.length; i < len; i++) {
+    var partLength = bounds.width / (ranges.length - 1);
+    for (var i = 0, len = ranges.length - 1; i < len; i++) {
       var range = ranges[i];
       var color = range['color'] || colors[range.sourceIndex] || colors[colors.length - 1];
 
@@ -435,13 +435,13 @@ anychart.colorScalesModule.ui.ColorRange.prototype.drawLeftLine = function(bound
     var ranges = scale.getProcessedRanges();
     var colors = scale.colors();
 
-    var partLength = bounds.height / ranges.length;
-    for (var i = 0, len = ranges.length; i < len; i++) {
+    var partLength = bounds.height / (ranges.length - 1);
+    for (var i = 0, len = ranges.length - 1; i < len; i++) {
       var range = ranges[i];
       var color = range['color'] || colors[range.sourceIndex] || colors[colors.length - 1];
 
       var line = this.lines[i] ? this.lines[i].clear() : this.lines[i] = this.line.path();
-      var y = bounds.top + pixelShift + partLength * (ranges.length - 1 - i);
+      var y = bounds.top + pixelShift + partLength * (ranges.length - 1 - i - 1 /* minus default range */);
       line
           .moveTo(x, y)
           .lineTo(x, y + partLength)
@@ -1014,8 +1014,8 @@ anychart.colorScalesModule.ui.ColorRange.prototype.handleMouseOverAndMove = func
           interactivity = /** @type {anychart.core.utils.Interactivity} */(chart.interactivity());
           if (interactivity.getOption('hoverMode') == anychart.enums.HoverMode.SINGLE) {
             var dispatchUnhover = this.points_ && !goog.array.every(points, function(el) {
-                  return goog.array.contains(this.points_.points, el);
-                }, this);
+              return goog.array.contains(this.points_.points, el);
+            }, this);
 
             if (dispatchUnhover) {
               var nearestPointIndex = this.points_.points[this.points_.points.length - 1];

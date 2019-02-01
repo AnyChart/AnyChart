@@ -467,8 +467,9 @@ anychart.linearGaugeModule.ScaleBar.prototype.draw = function() {
       var ranges = colorScale.getProcessedRanges();
       var scale = this.scale();
 
-      var len;
-      for (i = 0, len = ranges.length; i < len; i++) {
+      // exclude default range from drawing logic
+      var len = ranges.length - 1;
+      for (i = 0; i < len; i++) {
         var range = ranges[i];
         var color = range['color'] || colors[range.sourceIndex] || colors[colors.length - 1];
         path = this.paths[i] ? this.paths[i] : this.paths[i] = this.rootLayer.path();

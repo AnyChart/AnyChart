@@ -367,6 +367,25 @@ anychart.stockModule.Plot.ZINDEX_BACKGROUND = 1;
 
 
 /**
+ * Highlighted series description object.
+ *
+ * @typedef {{
+ *     series: ?anychart.stockModule.Series,
+ *     point: ?anychart.stockModule.data.TableSelectable.RowProxy,
+ *     pointYRatio: ?number,
+ *     distance: ?number
+ * }}
+ *
+ * Fields:
+ *   series - highlighted series
+ *   point - series point that is highlighted (has the same x ratio as the cursor)
+ *   pointYRatio - y ratio (if calculated) of the highlighted point
+ *   distance - distance (if calculated) between y ratio of the highlighted point and y ratio of the cursor
+ */
+anychart.stockModule.Plot.HighlightedSeriesInfo;
+
+
+/**
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
 anychart.stockModule.Plot.PROPERTY_DESCRIPTORS = (function() {
@@ -2492,7 +2511,7 @@ anychart.stockModule.Plot.prototype.needsInteractiveLegendUpdate = function() {
 /**
  * Prepares highlight and returns an array of highlighted data rows for each series of the plot.
  * @param {number} value
- * @return {Array.<{series:?anychart.stockModule.Series, point:?anychart.stockModule.data.TableSelectable.RowProxy}>}
+ * @return {Array.<anychart.stockModule.Plot.HighlightedSeriesInfo>}
  */
 anychart.stockModule.Plot.prototype.prepareHighlight = function(value) {
   return goog.array.map(this.series_, function(series) {
@@ -2510,8 +2529,9 @@ anychart.stockModule.Plot.prototype.prepareHighlight = function(value) {
  * @param {number} rawValue - As is date.
  * @param {anychart.stockModule.Plot} hlSource - Highlight source.
  * @param {number=} opt_y - .
+ * @param {(anychart.stockModule.Plot.HighlightedSeriesInfo|null)=} opt_closestSeriesInfo - highlighted data row for series closest to cursor.
  */
-anychart.stockModule.Plot.prototype.highlight = function(value, rawValue, hlSource, opt_y) {
+anychart.stockModule.Plot.prototype.highlight = function(value, rawValue, hlSource, opt_y, opt_closestSeriesInfo) {
   if (!this.rootLayer_ || !this.seriesBounds_ || !this.enabled()) return;
 
   var sticky = this.crosshair().getOption('displayMode') == anychart.enums.CrosshairDisplayMode.STICKY;
@@ -2521,6 +2541,13 @@ anychart.stockModule.Plot.prototype.highlight = function(value, rawValue, hlSour
   var thickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */ (this.crosshair().getOption('yStroke')));
   var x = this.seriesBounds_.left + ratio * this.seriesBounds_.width;
   x = anychart.utils.applyPixelShift(x, thickness);
+
+  if (sticky && opt_closestSeriesInfo) {
+    var pointYRatio = opt_closestSeriesInfo['pointYRatio'];
+    var chartOffset = this.container().getStage().getClientPosition();
+    var y = (this.seriesBounds_.height - pointYRatio * this.seriesBounds_.height) + this.seriesBounds_.top + chartOffset.y;
+    opt_y = anychart.utils.applyPixelShift(y, thickness);
+  }
 
   this.crosshair().xLabelAutoEnabled(this.isLastPlot_);
   this.crosshair().autoHighlightX(x, this.isLastPlot_, hlSource != this, opt_y, ratio);

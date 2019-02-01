@@ -93,6 +93,23 @@ anychart.pieModule.Chart = function(opt_data, opt_csvSettings) {
   this.parentViewToDispose_ = null;
 
   /**
+   * Flag whether chart performs first draw (initial true value)
+   * or needs force bounds recalculation (bounds invalidation).
+   * Needed to consider outsideLabels on calculation (DVF-4147)
+   * because interactivity works that way:
+   *  - default state is 'normal'.
+   *  - state is changed if state is 'exploded' (selected). Bug is here:
+   *    state can be initially 'exploded' from data.
+   *  - if state is changed, we don't need to recalculate bounds.
+   * Considering this flag fixes DVF-4147 shortly without changing
+   * jungles of code in interactivity.
+   *
+   * @type {boolean}
+   * @private
+   */
+  this.needsForceBoundsRecalculation_ = true;
+
+  /**
    * Template for aqua style fill.
    * @private
    * @type {Object}
@@ -450,16 +467,14 @@ anychart.pieModule.Chart.PROPERTY_DESCRIPTORS = (function() {
   function innerRadiusNormalizer(opt_value) {
     return goog.isFunction(opt_value) ? opt_value : anychart.utils.normalizeNumberOrPercent(opt_value);
   }
-  function startAngleNormalizer(opt_value) {
-    return goog.math.standardAngle(anychart.utils.toNumber(opt_value) || 0);
-  }
+  var descriptors = anychart.core.settings.descriptors;
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
   anychart.core.settings.createDescriptors(map, [
-        [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'overlapMode', anychart.enums.normalizeLabelsOverlapMode],
+        descriptors.OVERLAP_MODE,
+        descriptors.START_ANGLE,
         [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'radius', radiusNormalizer],
         [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'innerRadius', innerRadiusNormalizer],
-        [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'startAngle', startAngleNormalizer],
         [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'sort', anychart.enums.normalizeSort],
         [anychart.enums.PropertyHandlerType.SINGLE_ARG_DEPRECATED, '', outsideLabelsSpaceNormalizer, 'outsideLabelsSpace'],
         [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'insideLabelsOffset', anychart.utils.normalizeNumberOrPercent],
@@ -1407,6 +1422,16 @@ anychart.pieModule.Chart.prototype.initConnectorElements = function() {
  */
 anychart.pieModule.Chart.prototype.calculateOutsideLabels = function() {
   var iterator = this.getIterator();
+
+  /*
+    Position needs to be restored after all operation
+    because of DVF-4112 issue.
+    The general reason is in fact that calculateOutsideLabels()
+    resets iterator and calcDomain() changes index of iterator as well.
+    It breaks processing of APPEARANCE state on chart draw.
+   */
+  var previousPosition = iterator.getIndex();
+
   var label, x0, y0, radius, isRightSide;
   var connectorPath, connector;
   var mode3d = this.getOption('mode3d');
@@ -1556,6 +1581,7 @@ anychart.pieModule.Chart.prototype.calculateOutsideLabels = function() {
       labelsToCompare = labelsToCompare.concat(left, right);
     }, this);
   }
+  iterator.select(previousPosition);
 
   if (!this.maxLabelIndexesArr_)
     this.maxLabelIndexesArr_ = [];
@@ -1760,7 +1786,7 @@ anychart.pieModule.Chart.prototype.calcDomain = function(labels, isRightSide, op
           }
 
           if (label.enabled() != false) {
-            if (this.recalculateBounds_) {
+            if (this.recalculateBounds_ || this.needsForceBoundsRecalculation_) {
               var boundsForCompare = opt_explode ? this.contentBounds : this.piePlotBounds_;
 
               var labelsRadiusOffset = Math.max(
@@ -2128,6 +2154,7 @@ anychart.pieModule.Chart.prototype.drawContent = function(bounds) {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
+    this.needsForceBoundsRecalculation_ = true;
     this.calculateBounds_(bounds);
     this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.PIE_LABELS);
   }
@@ -2192,13 +2219,13 @@ anychart.pieModule.Chart.prototype.drawContent = function(bounds) {
       this.labels().setAutoColor(themePart['autoColor']);
       this.labels()['disablePointerEvents'](themePart['disablePointerEvents']);
       if (this.isOutsideLabels()) {
-        if (this.recalculateBounds_) {
+        if (this.recalculateBounds_ || this.needsForceBoundsRecalculation_) {
           this.radiusValue_ = this.originalRadiusValue_;
           this.labelsRadiusOffset_ = Number.NEGATIVE_INFINITY;
         }
         this.calculateOutsideLabels();
 
-        if (this.recalculateBounds_) {
+        if (this.recalculateBounds_ || this.needsForceBoundsRecalculation_) {
           var iteration = 5;
           var error = 10;
           //todo (blackart) for debug purpose
@@ -2360,6 +2387,8 @@ anychart.pieModule.Chart.prototype.drawContent = function(bounds) {
       }
     }
   }
+
+  this.needsForceBoundsRecalculation_ = false;
 };
 
 
@@ -2450,8 +2479,10 @@ anychart.pieModule.Chart.prototype.drawOutsideLabel_ = function(pointState, opt_
       label['anchor'](/** @type {string} */(anchor));
     label.enabled(false);
   }
+
   if (opt_updateConnector)
     this.updateConnector_(/** @type {anychart.core.ui.CircularLabelsFactory.Label}*/(label), isDraw);
+
   return /** @type {anychart.core.ui.CircularLabelsFactory.Label}*/(label);
 };
 
@@ -4594,7 +4625,8 @@ anychart.pieModule.Chart.prototype.applyAppearanceToPoint = function(pointState,
     this.drawSlice_(pointState, true);
   }
 
-  this.drawLabel_(pointState);
+  if (!this.isMissing_(iterator.get('value'))) // fixes DVF-4174.
+    this.drawLabel_(pointState);
 
   return opt_value || (currentPointExplode != this.getExplode(pointState));
 };
@@ -4612,9 +4644,10 @@ anychart.pieModule.Chart.prototype.finalizePointAppearance = function(opt_value)
     return;
 
   var explodeChanged = !!opt_value;
+  var isOutsideLabels = this.isOutsideLabels();
 
-  if (explodeChanged) {
-    if (this.isOutsideLabels()) {
+  if (explodeChanged || isOutsideLabels) {
+    if (isOutsideLabels) {
       this.recalculateBounds_ = false;
       this.labels().suspendSignalsDispatching();
       this.labels().clear();

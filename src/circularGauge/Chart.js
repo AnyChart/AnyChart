@@ -1029,20 +1029,16 @@ anychart.circularGaugeModule.Chart.PROPERTY_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
 
-  function startAngleNormalizer(opt_value) {
-    return goog.math.standardAngle(anychart.utils.toNumber(opt_value) || 0);
-  }
-
   function sweepAngleNormalizer(opt_value) {
     return goog.math.clamp(anychart.utils.toNumber(opt_value) || 0, -360, 360);
   }
-
+  var descriptors = anychart.core.settings.descriptors;
   anychart.core.settings.createDescriptors(map, [
-    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'fill', anychart.core.settings.fillNormalizer],
-    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'stroke', anychart.core.settings.strokeNormalizer],
+    descriptors.FILL,
+    descriptors.STROKE,
+    descriptors.START_ANGLE,
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'circularPadding', anychart.utils.normalizeToPercent],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'encloseWithStraightLine', anychart.core.settings.asIsNormalizer],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'startAngle', startAngleNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'sweepAngle', sweepAngleNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'defaultPointerType', anychart.enums.normalizeCircularGaugePointerType]
   ]);

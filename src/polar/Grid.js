@@ -122,7 +122,7 @@ anychart.polarModule.Grid.prototype.drawInternal = function() {
 
   var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
   this.radius_ = Math.min(parentBounds.width, parentBounds.height) / 2;
-  this.iRadius_ = anychart.utils.normalizeSize(this.innerRadius_, this.radius_);
+  this.iRadius_ = anychart.utils.normalizeSize(/** @type {number} */(this.getOption('innerRadius')), this.radius_);
   if (this.iRadius_ == this.radius_) this.iRadius_--;
   this.cx_ = Math.round(parentBounds.left + parentBounds.width / 2);
   this.cy_ = Math.round(parentBounds.top + parentBounds.height / 2);
@@ -130,7 +130,7 @@ anychart.polarModule.Grid.prototype.drawInternal = function() {
   this.lineElement().clip(parentBounds);
 
   var i, cx, cy;
-  var startAngle = this.startAngle() - 90;
+  var startAngle = /** @type {number} */(this.getOption('startAngle')) - 90;
 
   if (this.isRadial()) {
     isOrdinal = anychart.utils.instanceOf(xScale, anychart.scales.Ordinal);
@@ -264,7 +264,7 @@ anychart.core.makeStandalone(anychart.standalones.grids.Polar, anychart.polarMod
  */
 anychart.standalones.grids.polar = function() {
   var grid = new anychart.standalones.grids.Polar();
-  grid.setup(anychart.getFullTheme('standalones.polarGrid'));
+  grid.addThemes('standalones.polarGrid');
   return grid;
 };
 
@@ -278,6 +278,7 @@ anychart.standalones.grids.polar = function() {
   proto['draw'] = proto.draw;
   proto['parentBounds'] = proto.parentBounds;
   proto['container'] = proto.container;
-  proto['startAngle'] = proto.startAngle;
-  proto['innerRadius'] = proto.innerRadius;
+  //auto from radarPolarBaseModule.Grid
+  //proto['startAngle'] = proto.startAngle;
+  //proto['innerRadius'] = proto.innerRadius;
 })();

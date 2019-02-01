@@ -367,7 +367,8 @@ anychart.ganttModule.TimeLine.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ganttModule.BaseGrid.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.TIMELINE_SCALES |
     anychart.ConsistencyState.TIMELINE_ELEMENTS_APPEARANCE |
-    anychart.ConsistencyState.TIMELINE_ELEMENTS_LABELS;
+    anychart.ConsistencyState.TIMELINE_ELEMENTS_LABELS |
+    anychart.ConsistencyState.TIMELINE_MARKERS;
 
 
 //endregion
@@ -721,6 +722,7 @@ anychart.ganttModule.TimeLine.prototype.createTag = function(item, element, boun
  */
 anychart.ganttModule.TimeLine.prototype.createEditTag = function(item, index, type, bounds, opt_periodIndex) {
   var tag = {
+    isEdit: true,
     item: item,
     index: index,
     type: type,
@@ -1654,7 +1656,7 @@ anychart.ganttModule.TimeLine.prototype.scale = function(opt_value) {
  */
 anychart.ganttModule.TimeLine.prototype.scaleInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION)) {
-    this.invalidate(anychart.ConsistencyState.TIMELINE_SCALES, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.TIMELINE_SCALES | anychart.ConsistencyState.TIMELINE_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -1768,9 +1770,10 @@ anychart.ganttModule.TimeLine.prototype.lineMarker = function(opt_indexOrValue, 
   if (!lineMarker) {
     lineMarker = new anychart.ganttModule.axisMarkers.Line(this.scale_);
     lineMarker.setup(this.defaultLineMarkerSettings());
+    lineMarker.setParentEventTarget(this);
     this.lineMarkers_[index] = lineMarker;
     lineMarker.listenSignals(this.onMarkersSignal_, this);
-    this.invalidate(anychart.ConsistencyState.TIMELINE_SCALES, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.TIMELINE_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -1803,9 +1806,10 @@ anychart.ganttModule.TimeLine.prototype.rangeMarker = function(opt_indexOrValue,
   if (!rangeMarker) {
     rangeMarker = new anychart.ganttModule.axisMarkers.Range(this.scale_);
     rangeMarker.setup(this.defaultRangeMarkerSettings());
+    rangeMarker.setParentEventTarget(this);
     this.rangeMarkers_[index] = rangeMarker;
     rangeMarker.listenSignals(this.onMarkersSignal_, this);
-    this.invalidate(anychart.ConsistencyState.TIMELINE_SCALES, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.TIMELINE_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -1837,9 +1841,10 @@ anychart.ganttModule.TimeLine.prototype.textMarker = function(opt_indexOrValue, 
   if (!textMarker) {
     textMarker = new anychart.ganttModule.axisMarkers.Text(this.scale_);
     textMarker.setup(this.defaultTextMarkerSettings());
+    textMarker.setParentEventTarget(this);
     this.textMarkers_[index] = textMarker;
     textMarker.listenSignals(this.onMarkersSignal_, this);
-    this.invalidate(anychart.ConsistencyState.TIMELINE_SCALES, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.TIMELINE_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -1857,7 +1862,7 @@ anychart.ganttModule.TimeLine.prototype.textMarker = function(opt_indexOrValue, 
  * @private
  */
 anychart.ganttModule.TimeLine.prototype.onMarkersSignal_ = function(event) {
-  this.invalidate(anychart.ConsistencyState.TIMELINE_SCALES, anychart.Signal.NEEDS_REDRAW);
+  this.invalidate(anychart.ConsistencyState.TIMELINE_MARKERS, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -3087,8 +3092,17 @@ anychart.ganttModule.TimeLine.prototype.addMouseMoveAndOver = function(evt, orig
           }
         }
       } else {
-        if (domTarget && !domTarget.tag)
+        if (domTarget && (!domTarget.tag || !domTarget.tag.isEdit)) {
+          /*
+            If domTarget is range (text, line) marker, it also has own tag, we have to
+            consider this case and check whether domTarget is edit control.
+            This condition allows to:
+              - hide edit controls on element mouse leave
+              - hide edit controls when text-line-range marker is under the mouse on element leave
+              - leave edit controls if control itself is hovered (prevents edit control blinking)
+           */
           this.clearEdit_(true);
+        }
       }
 
       var connEvent = this.patchConnectorEvent_(evt);
@@ -3184,6 +3198,13 @@ anychart.ganttModule.TimeLine.prototype.drawEditConnector_ = function(evt, origi
 /** @inheritDoc */
 anychart.ganttModule.TimeLine.prototype.rowMouseDown = function(evt) {
   this.mouseDown(evt);
+};
+
+
+/** @inheritDoc */
+anychart.ganttModule.TimeLine.prototype.rowMouseUp = function(evt) {
+  this.tooltip().enabled(this.tooltipEnabledBackup_);
+  this.tooltipEnabledBackup_ = void 0;
 };
 
 
@@ -3665,24 +3686,6 @@ anychart.ganttModule.TimeLine.prototype.drawTimelineElements_ = function() {
   }
 
   this.getDrawLayer().removeChildren();
-  var markers = goog.array.concat(this.lineMarkers_, this.rangeMarkers_, this.textMarkers_);
-
-  var dataBounds = new anychart.math.Rect(this.pixelBoundsCache.left,
-      (this.pixelBoundsCache.top + /** @type {number} */ (this.headerHeight()) + 1),
-      this.pixelBoundsCache.width,
-      (this.pixelBoundsCache.height - /** @type {number} */ (this.headerHeight()) - 1));
-
-  for (var m = 0, count = markers.length; m < count; m++) {
-    var axesMarker = markers[m];
-    if (axesMarker) {
-      axesMarker.suspendSignalsDispatching();
-      axesMarker.parentBounds(dataBounds);
-      axesMarker.container(this.getDrawLayer());
-      axesMarker.invalidate(anychart.ConsistencyState.CONTAINER); //Force set of parent.
-      axesMarker.draw();
-      axesMarker.resumeSignalsDispatching(false);
-    }
-  }
 
   this.visElementsInUse_ = 0;
   this.markers().clear();
@@ -4748,7 +4751,7 @@ anychart.ganttModule.TimeLine.prototype.initScale = function() {
  * @override
  */
 anychart.ganttModule.TimeLine.prototype.initDom = function() {
-  this.getClipLayer().zIndex(anychart.ganttModule.BaseGrid.DRAW_Z_INDEX - 1); //Put it under draw layer.
+  this.getClipLayer().zIndex(anychart.ganttModule.BaseGrid.DRAW_Z_INDEX - 2); //Put it under draw layer.
   this.markers().container(this.getContentLayer());
   this.labels().container(this.getContentLayer());
   this.header().container(this.getBase());
@@ -4761,6 +4764,7 @@ anychart.ganttModule.TimeLine.prototype.initDom = function() {
  */
 anychart.ganttModule.TimeLine.prototype.boundsInvalidated = function() {
   this.header().bounds(this.pixelBoundsCache.left, this.pixelBoundsCache.top, this.pixelBoundsCache.width, /** @type {number} */ (this.headerHeight()));
+  this.invalidate(anychart.ConsistencyState.TIMELINE_MARKERS);
   this.redrawHeader = true;
 };
 
@@ -4770,6 +4774,48 @@ anychart.ganttModule.TimeLine.prototype.boundsInvalidated = function() {
  */
 anychart.ganttModule.TimeLine.prototype.appearanceInvalidated = function() {
   this.getSeparationPath_().stroke(/** @type {acgraph.vector.Stroke} */(anychart.ganttModule.BaseGrid.getColorResolver('columnStroke', anychart.enums.ColorType.STROKE, false)(this, 0)));
+};
+
+
+/**
+ * Inner getter for this.rangeLineMarkersLayer_.
+ * @return {acgraph.vector.Layer}
+ */
+anychart.ganttModule.TimeLine.prototype.getRangeLineMarkersLayer = function() {
+  if (!this.rangeLineMarkersLayer_) {
+    this.rangeLineMarkersLayer_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
+    this.rangeLineMarkersLayer_.zIndex(anychart.ganttModule.BaseGrid.DRAW_Z_INDEX - 1);
+  }
+  return this.rangeLineMarkersLayer_;
+};
+
+
+/**
+ * Inner getter for this.drawLayer_.
+ * @return {acgraph.vector.Layer}
+ */
+anychart.ganttModule.TimeLine.prototype.getTextMarkersLayer = function() {
+  if (!this.textMarkersLayer_) {
+    this.textMarkersLayer_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
+    this.textMarkersLayer_.zIndex(anychart.ganttModule.BaseGrid.DRAW_Z_INDEX + 1);
+  }
+  return this.textMarkersLayer_;
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.ganttModule.TimeLine.prototype.initLayersStructure = function(base) {
+  base
+      .addChild(/** @type {!acgraph.vector.Layer} */ (this.getCellsLayer()))
+      .addChild(/** @type {!acgraph.vector.Layer} */ (this.getRangeLineMarkersLayer()))
+      .addChild(/** @type {!acgraph.vector.Layer} */ (this.getDrawLayer()))
+      .addChild(/** @type {!acgraph.vector.Layer} */ (this.getTextMarkersLayer()))
+      .addChild(/** @type {!acgraph.vector.Layer} */ (this.getContentLayer()))
+      .addChild(/** @type {!acgraph.vector.Layer} */ (this.getEditLayer()))
+      .addChild(/** @type {!acgraph.vector.Layer} */ (this.getClipLayer()))
+      .addChild(/** @type {!acgraph.vector.Layer} */ (this.getScrollsLayer()));
 };
 
 
@@ -4848,21 +4894,43 @@ anychart.ganttModule.TimeLine.prototype.positionFinal = function() {
   if (this.redrawPosition || this.redrawHeader) {
     this.drawTimelineElements_();
     this.invalidate(anychart.ConsistencyState.TIMELINE_ELEMENTS_LABELS);
-
     this.redrawHeader = false;
+  }
+};
 
+
+/**
+ * @override
+ */
+anychart.ganttModule.TimeLine.prototype.markersInvalidated = function() {
+  if (this.hasInvalidationState(anychart.ConsistencyState.TIMELINE_MARKERS)) {
+    var markers = goog.array.concat(this.lineMarkers_, this.rangeMarkers_, this.textMarkers_);
+
+    var top = this.pixelBoundsCache.top + /** @type {number} */ (this.headerHeight()) + 1;
     var dataBounds = new anychart.math.Rect(this.pixelBoundsCache.left,
-        (this.pixelBoundsCache.top + /** @type {number} */ (this.headerHeight()) + 1),
+        top,
         this.pixelBoundsCache.width,
-        this.totalGridsHeight);
+        (this.pixelBoundsCache.height - /** @type {number} */ (this.headerHeight()) - 1));
 
-    for (var i = 0; i < this.textMarkers_.length; i++) {
-      var textMarker = this.textMarkers_[i];
-      textMarker.suspendSignalsDispatching();
-      textMarker.parentBounds(dataBounds);
-      textMarker.resumeSignalsDispatching(false);
-      textMarker.draw();
+    for (var m = 0, count = markers.length; m < count; m++) {
+      var axesMarker = markers[m];
+      if (axesMarker) {
+        var b = dataBounds;
+        var cont = this.getRangeLineMarkersLayer();
+        if (acgraph.utils.instanceOf(axesMarker, anychart.ganttModule.axisMarkers.Text)) {
+          b = new anychart.math.Rect(this.pixelBoundsCache.left, top, this.pixelBoundsCache.width, this.totalGridsHeight);
+          cont = this.getTextMarkersLayer();
+        }
+        axesMarker.suspendSignalsDispatching();
+        axesMarker.invalidate(anychart.ConsistencyState.BOUNDS);
+        axesMarker.parentBounds(b);
+        axesMarker.container(cont);
+        axesMarker.invalidate(anychart.ConsistencyState.CONTAINER); //Force set of parent.
+        axesMarker.draw();
+        axesMarker.resumeSignalsDispatching(false);
+      }
     }
+    this.markConsistent(anychart.ConsistencyState.TIMELINE_MARKERS);
   }
 };
 

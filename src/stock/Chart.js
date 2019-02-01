@@ -2187,21 +2187,16 @@ anychart.stockModule.Chart.prototype.highlightAtRatio_ = function(xRatio, yRatio
   if (isNaN(value)) return;
 
   var i;
-  var eventInfo = {
-    'type': anychart.enums.EventType.POINTS_HOVER,
-    'infoByPlots': goog.array.map(this.plots_, function(plot) {
-      return {
-        'plot': plot,
-        'infoBySeries': (plot && plot.enabled()) ? plot.prepareHighlight(value) : null
-      };
-    }),
-    'hoveredDate': value
-  };
+  var closestSeriesInfo;
+  var sourcePlotInfo = (sourcePlot && sourcePlot.enabled()) ? sourcePlot.prepareHighlight(value) : null;
+  if (sourcePlotInfo)
+    closestSeriesInfo = this.getClosestSeriesInfo_(sourcePlotInfo, yRatio);
 
   for (i = 0; i < this.plots_.length; i++) {
     if (this.plots_[i]) {
       var plot = this.plots_[i];
-      plot.highlight(value, rawValue, sourcePlot, clientY);
+      var closestSeriesInfoArg = plot == sourcePlot ? closestSeriesInfo : void 0; // We need this argument only for the current plot.
+      plot.highlight(value, rawValue, sourcePlot, clientY, closestSeriesInfoArg);
     }
   }
   this.highlighted_ = true;
@@ -2224,8 +2219,21 @@ anychart.stockModule.Chart.prototype.highlightAtRatio_ = function(xRatio, yRatio
   var tooltip = /** @type {!anychart.core.ui.Tooltip} */(this.tooltip());
   if (this.xScale_.isValueInDummyRange(rawValue)) { //deciding whether to hide tooltip.
     tooltip.hide();
+
   } else if (tooltip.getOption('displayMode') == anychart.enums.TooltipDisplayMode.UNION &&
       tooltip.getOption('positionMode') != anychart.enums.TooltipPositionMode.POINT) {
+
+    var eventInfo = {
+      'type': anychart.enums.EventType.POINTS_HOVER,
+      'infoByPlots': goog.array.map(this.plots_, function(plot) {
+        return {
+          'plot': plot,
+          'infoBySeries': (plot && plot.enabled()) ? plot.prepareHighlight(value) : null
+        };
+      }),
+      'hoveredDate': value
+    };
+
     var points = [];
     var info = eventInfo['infoByPlots'];
     for (i = 0; i < info.length; i++) {
@@ -2241,57 +2249,71 @@ anychart.stockModule.Chart.prototype.highlightAtRatio_ = function(xRatio, yRatio
       }
     }
     tooltip.showForSeriesPoints(points, clientX, clientY, null, false, extendedContext);
+
   } else if (tooltip.getOption('displayMode') == anychart.enums.TooltipDisplayMode.SINGLE) { // DVF-4056
-    var singleInfo = (sourcePlot && sourcePlot.enabled()) ? sourcePlot.prepareHighlight(value) : null;
+    if (closestSeriesInfo && closestSeriesInfo['distance'] < 0.03) {
+      var hoveredSeries = closestSeriesInfo['series'];
+      tooltip.showForSeriesPoints([{'series': hoveredSeries}], clientX, clientY, hoveredSeries, false, extendedContext);
+    } else
+      tooltip.hide();
+  }
+};
 
-    /*
-      Code below is kind of pretty elegant juking.
-      Here we define the first closest series to cursor.
-     */
-    if (singleInfo) {
-      var hoveredSeries = null;
-      for (var k = 0; k < singleInfo.length; k++) {
-        var inf = singleInfo[k];
-        var ser = inf['series'];
-        var pt = inf['point'];
-        if (pt && ser) {
-          var scale = ser.yScale();
 
-          /*
-            Should consider that
-              - OHLC series returns 'close' as 'value'
-              - Range series returns 'high' as 'value'
-              - etc.
-            In this case single tooltip appears only when cursor is close
-            to 'high' or 'close' (or smth like that) value.
-            It looks kind of strange, but it's not so clear how to implement it
-            in another way.
-           */
-          var v = pt.get('value');
-          var close = pt.get('close');
-          var high = pt.get('high');
-          var val = goog.isDefAndNotNull(v) ? v :
-              goog.isDefAndNotNull(close) ? close :
-                  goog.isDefAndNotNull(high) ? high :
-                      void 0;
-          var rat = scale.transform(val);
-          var yR = scale.inverted() ? yRatio : 1 - yRatio;
-          if (anychart.math.roughlyEqual(rat, yR, 0.03)) {
-            hoveredSeries = ser;
-            break;
-          }
+/**
+ * Finds closest series (by yRatio) in array of highlighted data rows for each series of the plot.
+ *
+ * @param {!Array.<anychart.stockModule.Plot.HighlightedSeriesInfo>} sourcePlotInfo
+ * @param {number} yRatio Cursor Y ratio.
+ *
+ * @return {(anychart.stockModule.Plot.HighlightedSeriesInfo|null)} Highlighted data row for series that is actually closest to cursor.
+ * @private
+ */
+anychart.stockModule.Chart.prototype.getClosestSeriesInfo_ = function (sourcePlotInfo, yRatio) {
+  var result = null;
+  var closestIndex = -1;
+  var distance = Infinity;
+  var pointYRatio;
+
+  /*
+   * Walk trough every series info to get most close distance between Y ratio of the cursor and highlighted series point's value.
+   */
+  for (var i = 0; i < sourcePlotInfo.length; i++) {
+    var inf = sourcePlotInfo[i];
+    var ser = inf['series'];
+    var pt = inf['point'];
+    if (pt && ser) {
+      var scale = ser.yScale();
+
+      /*
+        Should consider that
+          - OHLC series returns 'close' as 'value'
+          - Range series returns 'high' as 'value'
+          - etc.
+       */
+      var value = anychart.utils.getFirstNotNullValue(pt.get('value'), pt.get('close'), pt.get('high'));
+      value = anychart.utils.toNumber(value);
+
+      if (!isNaN(value)) {
+        var ptYRatio = scale.transform(value);
+        var yR = scale.inverted() ? yRatio : 1 - yRatio;
+        var d = Math.abs(ptYRatio - yR);
+        if (distance > d) {
+          distance = d;
+          pointYRatio = ptYRatio;
+          closestIndex = i;
         }
       }
-
-      if (hoveredSeries) {
-        tooltip.showForSeriesPoints([{'series': hoveredSeries}], clientX, clientY, hoveredSeries, false, extendedContext);
-      } else {
-        tooltip.hide();
-      }
-    } else {
-      tooltip.hide();
     }
   }
+
+  if (closestIndex >= 0) {
+    result = sourcePlotInfo[closestIndex];
+    result['distance'] = distance;
+    result['pointYRatio'] = pointYRatio;
+  }
+
+  return result;
 };
 
 

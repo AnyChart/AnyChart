@@ -960,7 +960,9 @@ anychart.core.series.Cartesian.prototype.getScatterDrawingPlan = function(sorted
  */
 anychart.core.series.Cartesian.prototype.getOrdinalDrawingPlan = function(xHashMap, xArray, restrictX, opt_seriesIndependent) {
   var dataPusher;
-  if (restrictX) {
+  var xModeScatter = this.getOption('xMode') == anychart.enums.XMode.SCATTER;
+
+  if (restrictX && !xModeScatter) { //!xModeScatter condition must fix DVF-4095.
     // dataPusher must return a point that was replaced by the point pushed (if any)
     dataPusher = function(data, point) {
       var result;
@@ -972,7 +974,6 @@ anychart.core.series.Cartesian.prototype.getOrdinalDrawingPlan = function(xHashM
       return result || null;
     };
   } else {
-    var xModeScatter = this.getOption('xMode') == anychart.enums.XMode.SCATTER;
     if (opt_seriesIndependent) {
       dataPusher = function(data, point) {
         data.push(point);

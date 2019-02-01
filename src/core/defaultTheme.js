@@ -2220,6 +2220,7 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'radialAxis': {
       'enabled': true,
       'startAngle': 0,
+      'innerRadius': 0,
       'zIndex': 0,
       'ticks': {'enabled': true},
       'minorTicks': {'enabled': true},

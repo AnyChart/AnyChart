@@ -14,7 +14,7 @@ anychart.core.SeriesSettings = function() {
 
   this.themeDependencies_ = [
     {
-      seriesType: ['area', 'splineArea', 'stepArea', 'rangeArea', 'rangeSplineArea', 'rangeStepArea'],
+      seriesType: ['area', 'splineArea', 'stepArea', 'rangeArea', 'rangeSplineArea', 'rangeStepArea', 'polygon'],
       theme: 'areaLike'
     },
     {
@@ -22,7 +22,7 @@ anychart.core.SeriesSettings = function() {
       theme: 'barLike'
     },
     {
-      seriesType: ['hilo', 'line', 'spline', 'stepLine', 'jumpLine', 'ohlc', 'stick'],
+      seriesType: ['hilo', 'line', 'spline', 'stepLine', 'jumpLine', 'ohlc', 'stick', 'polyline'],
       theme: 'lineLike'
     },
     {

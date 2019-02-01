@@ -24,7 +24,8 @@ anychart.colorScalesModule.OrdinalTicks.prototype.calcAutoTicks = function() {
     ranges = this.scale.getProcessedRanges();
   if (ranges) {
     var interval;
-    var len = ranges.length;
+    // exclude the default range from the logic
+    var len = ranges.length - 1;
     if (isNaN(this.interval())) {
       interval = Math.ceil(len / this.maxCount()) || 1;
     } else {
@@ -42,7 +43,8 @@ anychart.colorScalesModule.OrdinalTicks.prototype.calcAutoTicks = function() {
 anychart.colorScalesModule.OrdinalTicks.prototype.makeValues = function(indexes) {
   var len = indexes.length || 0;
   var values = this.scale.getProcessedRanges();
-  var valuesLen = values.length;
+  // exclude the default range from the logic
+  var valuesLen = values.length - 1;
   if (!len || !valuesLen) return [];
   var result = [], last = false;
   for (var i = 0; i < len && !last; i++) {
@@ -55,8 +57,15 @@ anychart.colorScalesModule.OrdinalTicks.prototype.makeValues = function(indexes)
       next--;
     }
 
-    var currValue = goog.isDef(values[curr].equal) ? values[curr].equal : (values[curr].start + values[curr].end) / 2;
-    var nextValue = goog.isDef(values[next].equal) ? values[next].equal : (values[next].start + values[next].end) / 2;
+    var currEqual = values[curr].equal;
+    // when equal field is boolean then start/end are always number
+    if (goog.isBoolean(currEqual)) {
+      var currValue = (values[curr].start + values[curr].end) / 2;
+      var nextValue = (values[next].start + values[next].end) / 2;
+    } else {
+      var currValue = currEqual;
+      var nextValue = values[next].equal;
+    }
 
     result.push(curr == next ? currValue : [currValue, nextValue]);
   }

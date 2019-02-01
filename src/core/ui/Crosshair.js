@@ -705,11 +705,20 @@ anychart.core.ui.Crosshair.prototype.handleMouseOverAndMove = function(e) {
       }
       var iterator = nearestSeries.getIterator();
       iterator.select(nearestIndex);
-      var val = anychart.utils.toNumber(iterator.meta('x'));
+
+      var xVal = anychart.utils.toNumber(iterator.meta('x'));
+
+      var yVal = anychart.utils.getFirstNotNullValue(iterator.meta('value'), iterator.meta('close'), iterator.meta('high'));
+      yVal = anychart.utils.toNumber(yVal);
+
       if (this.interactivityTarget_.isVerticalInternal) {
-        mouseY = val;
+        mouseY = xVal;
+        if (!isNaN(yVal))
+          mouseX = yVal;
       } else {
-        mouseX = val;
+        mouseX = xVal;
+        if (!isNaN(yVal))
+          mouseY = yVal;
       }
     }
   }
