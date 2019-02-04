@@ -828,6 +828,20 @@ anychart.ganttModule.DataGrid.prototype.appearanceInvalidated = function() {
 
 
 /**
+ * @inheritDoc
+ */
+anychart.ganttModule.DataGrid.prototype.initLayersStructure = function(base) {
+  base
+      .addChild(/** @type {!acgraph.vector.Layer} */ (this.getCellsLayer()))
+      .addChild(/** @type {!acgraph.vector.Layer} */ (this.getDrawLayer()))
+      .addChild(/** @type {!acgraph.vector.Layer} */ (this.getContentLayer()))
+      .addChild(/** @type {!acgraph.vector.Layer} */ (this.getEditLayer()))
+      .addChild(/** @type {!acgraph.vector.Layer} */ (this.getClipLayer()))
+      .addChild(/** @type {!acgraph.vector.Layer} */ (this.getScrollsLayer()));
+};
+
+
+/**
  * @override
  */
 anychart.ganttModule.DataGrid.prototype.positionInvalidated = function() {

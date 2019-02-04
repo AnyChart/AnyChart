@@ -1117,19 +1117,6 @@ anychart.ganttModule.BaseGrid.prototype.getCellsLayer = function() {
  * Inner getter for this.drawLayer_.
  * @return {acgraph.vector.Layer}
  */
-anychart.ganttModule.BaseGrid.prototype.getMarkersLayer = function() {
-  if (!this.markersLayer_) {
-    this.markersLayer_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
-    this.markersLayer_.zIndex(anychart.ganttModule.BaseGrid.MARKERS_Z_INDEX);
-  }
-  return this.markersLayer_;
-};
-
-
-/**
- * Inner getter for this.drawLayer_.
- * @return {acgraph.vector.Layer}
- */
 anychart.ganttModule.BaseGrid.prototype.getDrawLayer = function() {
   if (!this.drawLayer_) {
     this.drawLayer_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
@@ -1924,7 +1911,12 @@ anychart.ganttModule.BaseGrid.prototype.drawRowFills_ = function() {
       this.pixelBoundsCache.width, totalTop - this.pixelBoundsCache.top + 1);
   this.getClipLayer().clip(clipRect);
   // this.getCellsLayer().clip(clipRect);
-  this.getMarkersLayer().clip(clipRect);
+
+  if (this.rangeLineMarkersLayer_) //Data grid doesn't create own markers layer.
+    this.rangeLineMarkersLayer_.clip(clipRect);
+  if (this.textMarkersLayer_) //Data grid doesn't create own markers layer.
+    this.textMarkersLayer_.clip(clipRect);
+
   this.getDrawLayer().clip(clipRect);
 
 };
@@ -2106,14 +2098,7 @@ anychart.ganttModule.BaseGrid.prototype.drawInternal = function(positionRecalcul
         .stroke(null)
         .zIndex(anychart.ganttModule.BaseGrid.EVENTS_RECT_Z_INDEX);
 
-    this.base_
-        .addChild(/** @type {!acgraph.vector.Layer} */ (this.getCellsLayer()))
-        .addChild(/** @type {!acgraph.vector.Layer} */ (this.getMarkersLayer()))
-        .addChild(/** @type {!acgraph.vector.Layer} */ (this.getDrawLayer()))
-        .addChild(/** @type {!acgraph.vector.Layer} */ (this.getContentLayer()))
-        .addChild(/** @type {!acgraph.vector.Layer} */ (this.getEditLayer()))
-        .addChild(/** @type {!acgraph.vector.Layer} */ (this.getClipLayer()))
-        .addChild(/** @type {!acgraph.vector.Layer} */ (this.getScrollsLayer()));
+    this.initLayersStructure(this.base_);
 
     if (this.isStandalone) {
       /*
@@ -2279,6 +2264,13 @@ anychart.ganttModule.BaseGrid.prototype.drawInternal = function(positionRecalcul
  * Additional actions while DOM initialization.
  */
 anychart.ganttModule.BaseGrid.prototype.initDom = goog.nullFunction;
+
+
+/**
+ * Initializes instance-specific layers structure.
+ * @param {acgraph.vector.Layer} base - Base layer to add children.
+ */
+anychart.ganttModule.BaseGrid.prototype.initLayersStructure = goog.nullFunction;
 
 
 /**
@@ -2770,8 +2762,8 @@ anychart.ganttModule.BaseGrid.prototype.disposeInternal = function() {
       this.headerSeparationPath_, this.editStructurePreviewPath_,
       this.rowStrokePath_, this.selectedPath_, this.hoverPath_,
       this.evenPath_, this.oddPath_, this.scrollsLayer_, this.clipLayer_,
-      this.editLayer_, this.contentLayer_, this.drawLayer_, this.markersLayer_,
-      this.cellsLayer_, this.base_);
+      this.editLayer_, this.contentLayer_, this.drawLayer_, this.rangeLineMarkersLayer_,
+      this.textMarkersLayer_, this.cellsLayer_, this.base_);
   this.tooltip_ = null;
   this.eventsRect_ = null;
   this.bgRect_ = null;
@@ -2789,7 +2781,8 @@ anychart.ganttModule.BaseGrid.prototype.disposeInternal = function() {
   this.editLayer_ = null;
   this.contentLayer_ = null;
   this.drawLayer_ = null;
-  this.markersLayer_ = null;
+  this.rangeLineMarkersLayer_ = null;
+  this.textMarkersLayer_ = null;
   this.cellsLayer_ = null;
   this.base_ = null;
   anychart.ganttModule.BaseGrid.base(this, 'disposeInternal');

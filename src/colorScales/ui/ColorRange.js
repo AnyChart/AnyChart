@@ -328,7 +328,7 @@ anychart.colorScalesModule.ui.ColorRange.prototype.drawRightLine = function(boun
       var color = range['color'] || colors[range.sourceIndex] || colors[colors.length - 1];
 
       var line = this.lines[i] ? this.lines[i].clear() : this.lines[i] = this.line.path();
-      var y = bounds.top + pixelShift + partLength * (ranges.length - 1 - i);
+      var y = bounds.top + pixelShift + partLength * (ranges.length - 1 - i - 1 /* minus default range */);
       line
           .moveTo(x, y)
           .lineTo(x, y + partLength)
@@ -402,7 +402,7 @@ anychart.colorScalesModule.ui.ColorRange.prototype.drawLeftLine = function(bound
       var color = range['color'] || colors[range.sourceIndex] || colors[colors.length - 1];
 
       var line = this.lines[i] ? this.lines[i].clear() : this.lines[i] = this.line.path();
-      var y = bounds.top + pixelShift + partLength * (ranges.length - 1 - i);
+      var y = bounds.top + pixelShift + partLength * (ranges.length - 1 - i - 1 /* minus default range */);
       line
           .moveTo(x, y)
           .lineTo(x, y + partLength)
