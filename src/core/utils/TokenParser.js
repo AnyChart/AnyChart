@@ -15,6 +15,20 @@ anychart.core.utils.TokenParser = function() {
 goog.addSingletonGetter(anychart.core.utils.TokenParser);
 
 
+//region -- Reserved values.
+/**
+ * '%_message' constant.
+ * Separate processing of this token allows to localize
+ * string token with messages (DVF-3597).
+ * @type {string}
+ * @const
+ */
+anychart.core.utils.TokenParser.MESSAGE = '%_message';
+
+
+//endregion
+
+
 /**
  * Parses format string and creates partial term functions.
  * @param {string} format Format string.
@@ -142,42 +156,49 @@ anychart.core.utils.TokenParser.parse = function(format) {
   }
 
   function tokenTerm(token, params, provider) {
-    var value = provider.getTokenValueInternal(token);
-    if (!goog.isDef(value))
-      return '';
-    params = params || {};
-
-    var isDateTime = goog.isDef(params['dateTimeFormat']) || goog.isDef(params['timeZone']);
-
-    if (params['type'])
-      params['type'] = anychart.utils.trim(params['type']);
-
-    var type = tokenTypeMap[String(params['type']).toLowerCase()] ||
-        (isDateTime ? anychart.enums.TokenType.DATE_TIME : provider.getTokenTypeInternal(token));
-
-    switch (type) {
-      case anychart.enums.TokenType.UNKNOWN:
+    if (token == anychart.core.utils.TokenParser.MESSAGE) { // DVF-3597
+      return anychart.format.getMessage((params && params['key']) || '');
+    } else {
+      var value = provider.getTokenValueInternal(token);
+      if (params && (params['localized'] === 'true')) { // DVF-3597
+        value = anychart.format.getMessage(value);
+      }
+      if (!goog.isDef(value))
         return '';
+      params = params || {};
 
-      case anychart.enums.TokenType.STRING:
-        return String(value);
+      var isDateTime = goog.isDef(params['dateTimeFormat']) || goog.isDef(params['timeZone']);
 
-      case anychart.enums.TokenType.DATE_TIME:
-        return anychart.format.dateTime(value, params['dateTimeFormat'], params['timeZone']);
+      if (params['type'])
+        params['type'] = anychart.utils.trim(params['type']);
 
-      case anychart.enums.TokenType.DATE:
-        return anychart.format.date(value, params['timeZone']);
+      var type = tokenTypeMap[String(params['type']).toLowerCase()] ||
+          (isDateTime ? anychart.enums.TokenType.DATE_TIME : provider.getTokenTypeInternal(token));
 
-      case anychart.enums.TokenType.TIME:
-        return anychart.format.time(value, params['timeZone']);
+      switch (type) {
+        case anychart.enums.TokenType.UNKNOWN:
+          return '';
 
-      case anychart.enums.TokenType.NUMBER:
-        return anychart.format.number(value, params['decimalsCount'], params['decimalPoint'],
-            params['groupsSeparator'], params['scale'], params['zeroFillDecimals'], params['scaleSuffixSeparator'],
-            params['useBracketsForNegative']);
+        case anychart.enums.TokenType.STRING:
+          return String(value);
 
-      case anychart.enums.TokenType.PERCENT:
-        return anychart.utils.normalizeToPercent(anychart.math.round(value * 100, 2));
+        case anychart.enums.TokenType.DATE_TIME:
+          return anychart.format.dateTime(value, params['dateTimeFormat'], params['timeZone']);
+
+        case anychart.enums.TokenType.DATE:
+          return anychart.format.date(value, params['timeZone']);
+
+        case anychart.enums.TokenType.TIME:
+          return anychart.format.time(value, params['timeZone']);
+
+        case anychart.enums.TokenType.NUMBER:
+          return anychart.format.number(value, params['decimalsCount'], params['decimalPoint'],
+              params['groupsSeparator'], params['scale'], params['zeroFillDecimals'], params['scaleSuffixSeparator'],
+              params['useBracketsForNegative']);
+
+        case anychart.enums.TokenType.PERCENT:
+          return anychart.utils.normalizeToPercent(anychart.math.round(value * 100, 2));
+      }
     }
   }
 
