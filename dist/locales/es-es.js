@@ -223,5 +223,23 @@ window['anychart']=window['anychart']||{};window['anychart']['format']=window['a
     scale: false,
     zeroFillDecimals: false,
     scaleSuffixSeparator: ''
- }
+ },
+  messages: {
+    'Save chart as...': 'Guardar gráfica como...',
+    'Save data as...': 'Guardar datos como...',
+    'Share with...': 'Compartir con...',
+    'Save config as...': 'Guardar configuración como...',
+    'Save table as...': 'Guardar tabla como...',
+    'Print': 'Imprimir',
+    'Enter full screen': 'Ir a pantalla completa',
+    'Exit full screen': 'Salir de pantalla completa',
+    'Need help? Go to support center!': '¿Necesitas ayuda? ¡Ve al centro de soporte!',
+    'Version History': 'Historial de versiones',
+    'Exclude': 'Excluir',
+    'Include': 'Incluir',
+    'Keep only': 'Mantener solo',
+    'Include all': 'Incluir todos',
+    'Start selection marquee': 'Iniciar recuadro de selección',
+    'Start zoom marquee': 'Iniciar recuadro de ampliación'
+  }
 };

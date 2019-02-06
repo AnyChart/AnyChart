@@ -224,5 +224,23 @@ window['anychart']=window['anychart']||{};window['anychart']['format']=window['a
     scale: false,
     zeroFillDecimals: false,
     scaleSuffixSeparator: ''
- }
+ },
+  messages: {
+    'Save chart as...': 'চার্ট যেভাবে সেভ করবেন...',
+    'Save data as...': 'তথ্য যেভাবে সেভ করবেন...',
+    'Share with...': 'যেভাবে শেয়ার করবেন...',
+    'Save config as...': 'কনফিগারেশন যেভাবে সেভ করবেন...',
+    'Save table as...': 'টেবিল যেভাবে সেভ করবেন...',
+    'Print': 'প্রিন্ট করুন',
+    'Enter full screen': 'ফুল স্ক্রিনে প্রবেশ',
+    'Exit full screen': 'ফুল স্ক্রিন ত্যাগ',
+    'Need help? Go to support center!': 'সাহায্যের প্রয়োজন? সহায়তা কেন্দ্রে যান!',
+    'Version History': 'সংস্করণের ইতিহাস',
+    'Exclude': 'বাদ দিন',
+    'Include': 'অন্তর্ভুক্ত করুন',
+    'Keep only': 'কেবল রাখুন',
+    'Include all': 'সব অন্তর্ভুক্ত করুন',
+    'Start selection marquee': 'বাছাইকরণ মার্কি শুরু করুন',
+    'Start zoom marquee': 'জুম মার্কি শুরু করুন'
+  }
 };

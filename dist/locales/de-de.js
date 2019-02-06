@@ -223,5 +223,23 @@ window['anychart']=window['anychart']||{};window['anychart']['format']=window['a
     scale: false,
     zeroFillDecimals: false,
     scaleSuffixSeparator: ''
- }
+ },
+  messages: {
+    'Save chart as...': 'Diagramm speichern unter...',
+    'Save data as...': 'Daten speichern unter...',
+    'Share with...': 'Teilen mit...',
+    'Save config as...': 'Konfiguration speichern unter...',
+    'Save table as...': 'Tabelle speichern unter...',
+    'Print': 'Drucken',
+    'Enter full screen': 'Vollbildmodus aktivieren',
+    'Exit full screen': 'Vollbildmodus beenden',
+    'Need help? Go to support center!': 'Sie brauchen Hilfe? Gehen Sie zum Supportcenter!',
+    'Version History': 'Versionsgeschichte',
+    'Exclude': 'Ausschließen',
+    'Include': 'Einbeziehen',
+    'Keep only': 'Nur behalten',
+    'Include all': 'Alle einbeziehen',
+    'Start selection marquee': 'Bereich auswählen',
+    'Start zoom marquee': 'Vergrößerungsbereich auswählen'
+  }
 };

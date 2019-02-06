@@ -223,5 +223,23 @@ window['anychart']=window['anychart']||{};window['anychart']['format']=window['a
     scale: false,
     zeroFillDecimals: false,
     scaleSuffixSeparator: ''
- }
+ },
+  messages: {
+    'Save chart as...': 'Сохранить график как...',
+    'Save data as...': 'Сохранить данные как...',
+    'Share with...': 'Поделиться в...',
+    'Save config as...': 'Сохранить настройки как...',
+    'Save table as...': 'Сохранить таблицу как...',
+    'Print': 'Печать',
+    'Enter full screen': 'Полноэкранный режим',
+    'Exit full screen': 'Выйти из полноэкранного режима',
+    'Need help? Go to support center!': 'Обратиться в службу поддержки',
+    'Version History': 'История изменений',
+    'Exclude': 'Исключить точку',
+    'Include': 'Вернуть точку',
+    'Keep only': 'Оставить только эту точку',
+    'Include all': 'Вернуть все точки',
+    'Start selection marquee': 'Выделить область',
+    'Start zoom marquee': 'Выбрать область увеличения'
+  }
 };

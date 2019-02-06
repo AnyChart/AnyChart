@@ -223,5 +223,23 @@ window['anychart']=window['anychart']||{};window['anychart']['format']=window['a
     scale: false,
     zeroFillDecimals: false,
     scaleSuffixSeparator: ''
- }
+ },
+  messages: {
+    'Save chart as...': 'حفظ المخطط باسم...',
+    'Save data as...': 'حفظ البيانات باسم...',
+    'Share with...': 'مشاركة مع...',
+    'Save config as...': 'حفظ التكوين باسم...',
+    'Save table as...': 'حفظ الجدول باسم...',
+    'Print': 'طباعة',
+    'Enter full screen': 'دخول ملء الشاشة',
+    'Exit full screen': 'خروج من ملء الشاشة',
+    'Need help? Go to support center!': 'هل تحتاج إلى مساعدة؟ اذهب إلى مركز الدعم!',
+    'Version History': 'تاريخ الإصدار',
+    'Exclude': 'استبعاد',
+    'Include': 'تضمين',
+    'Keep only': 'احتفاظ فقط',
+    'Include all': 'تضمين الكل',
+    'Start selection marquee': 'بدء النص المتحرك للاختيار',
+    'Start zoom marquee': 'بدء النص المتحرك للزووم'
+  }
 };

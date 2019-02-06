@@ -223,5 +223,23 @@ window['anychart']=window['anychart']||{};window['anychart']['format']=window['a
     scale: false,
     zeroFillDecimals: false,
     scaleSuffixSeparator: ''
- }
+ },
+  messages: {
+    'Save chart as...': '다른 이름으로 차트 저장...',
+    'Save data as...': '다른 이름으로 데이터 저장...',
+    'Share with...': '공유 대상...',
+    'Save config as...': '다른 이름으로 구성 저장...',
+    'Save table as...': '다른 이름으로 테이블 저장...',
+    'Print': '인쇄',
+    'Enter full screen': '전체 화면 시작',
+    'Exit full screen': '전체 화면 끝내기',
+    'Need help? Go to support center!': '도움이 필요하신가요? 지원 센터로 이동하세요!',
+    'Version History': '버전 기록',
+    'Exclude': '제외',
+    'Include': '포함',
+    'Keep only': '유지:',
+    'Include all': '모두 포함',
+    'Start selection marquee': '선택 마퀴 시작',
+    'Start zoom marquee': '줌 마퀴 시작'
+  }
 };

@@ -223,5 +223,23 @@ window['anychart']=window['anychart']||{};window['anychart']['format']=window['a
     scale: false,
     zeroFillDecimals: false,
     scaleSuffixSeparator: ''
- }
+ },
+  messages: {
+    'Save chart as...': 'チャートに次の名前を付けて保存...',
+    'Save data as...': 'データに次の名前を付けて保存...',
+    'Share with...': '次の人と共有…',
+    'Save config as...': 'コンフィグに次の名前を付けて保存...',
+    'Save table as...': '表に次の名前を付けて保存...',
+    'Print': '印刷する',
+    'Enter full screen': '全画面表示に入る',
+    'Exit full screen': '全画面表示を終了する',
+    'Need help? Go to support center!': 'ヘルプが必要ですか？サポートセンターをお訪ねください！',
+    'Version History': 'バージョン履歴',
+    'Exclude': '除外する',
+    'Include': '含める',
+    'Keep only': 'これだけを保持する',
+    'Include all': 'すべて含める',
+    'Start selection marquee': '選択マーキーを開始する',
+    'Start zoom marquee': 'ズームマーキーを開始する'
+  }
 };

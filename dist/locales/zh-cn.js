@@ -223,5 +223,23 @@ window['anychart']=window['anychart']||{};window['anychart']['format']=window['a
     scale: false,
     zeroFillDecimals: false,
     scaleSuffixSeparator: ''
- }
+ },
+  messages: {
+    'Save chart as...': '将图表保存为…',
+    'Save data as...': '将数据保存为…',
+    'Share with...': '分享对象…',
+    'Save config as...': '将配置保存为…',
+    'Save table as...': '将表格保存为…',
+    'Print': '打印',
+    'Enter full screen': '进入全屏',
+    'Exit full screen': '退出全屏',
+    'Need help? Go to support center!': '需要帮助？请访问支持中心！',
+    'Version History': '版本历史记录',
+    'Exclude': '排除',
+    'Include': '包括',
+    'Keep only': '仅保留',
+    'Include all': '包括全部',
+    'Start selection marquee': '开始选择选框',
+    'Start zoom marquee': '开始缩放选框'
+  }
 };
