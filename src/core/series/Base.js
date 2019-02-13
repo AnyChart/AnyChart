@@ -2820,7 +2820,7 @@ anychart.core.series.Base.prototype.getMarkerFill = function(opt_baseFill) {
  * @protected
  */
 anychart.core.series.Base.prototype.getMarkerStroke = function() {
-  return /** @type {acgraph.vector.Stroke} */(anychart.color.darken(/** @type {acgraph.vector.Fill} */(this.normal_.markers().fill())));
+  return /** @type {acgraph.vector.Stroke} */(anychart.color.darken(/** @type {acgraph.vector.Fill} */(this.normal_.markers().getOption('fill'))));
 };
 
 

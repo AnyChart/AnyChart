@@ -18,8 +18,6 @@ goog.require('anychart.enums');
 anychart.mapModule.elements.Grid = function() {
   anychart.mapModule.elements.Grid.base(this, 'constructor');
 
-  delete this.themeSettings['enabled'];
-
   /**
    * @type {acgraph.vector.Path}
    * @protected

@@ -12,62 +12,46 @@ goog.require('anychart.core.utils.Interactivity');
 anychart.stockModule.Interactivity = function(parent) {
   anychart.stockModule.Interactivity.base(this, 'constructor', parent);
 
-  /**
-   * @type {boolean}
-   * @private
-   */
-  this.scrollOnMouseWheel_;
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['scrollOnMouseWheel', 0, 0]
+  ]);
 };
 goog.inherits(anychart.stockModule.Interactivity, anychart.core.utils.Interactivity);
 
 
-//region --- Settings
 /**
- * Allows use mouse wheel for scrolling.
- * @param {boolean=} opt_value Whether will use mouse wheel.
- * @return {anychart.stockModule.Interactivity|boolean} .
+ * @type {!Object<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.stockModule.Interactivity.prototype.scrollOnMouseWheel = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = !!opt_value;
-    if (opt_value != this.scrollOnMouseWheel_) {
-      this.scrollOnMouseWheel_ = opt_value;
-    }
-    return this;
-  }
-  return /** @type {boolean} */(this.scrollOnMouseWheel_);
-};
+anychart.stockModule.Interactivity.PROPERTY_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'scrollOnMouseWheel', anychart.core.settings.booleanNormalizer]
+  ]);
+  return map;
+})();
+anychart.core.settings.populate(anychart.stockModule.Interactivity, anychart.stockModule.Interactivity.PROPERTY_DESCRIPTORS);
 
 
-//endregion
-//region --- Setup and serialize
+//region --- setup/serialize
 /** @inheritDoc */
-anychart.stockModule.Interactivity.prototype.setupByJSON = function(config, opt_default) {
-  anychart.stockModule.Interactivity.base(this, 'setupByJSON', config, opt_default);
-
-  this.zoomOnMouseWheel(config['zoomOnMouseWheel']);
-  this.scrollOnMouseWheel(config['scrollOnMouseWheel']);
-};
-
-
-/**
- * @inheritDoc
- */
 anychart.stockModule.Interactivity.prototype.serialize = function() {
   var json = anychart.stockModule.Interactivity.base(this, 'serialize');
-
-  json['zoomOnMouseWheel'] = this.zoomOnMouseWheel();
-  json['scrollOnMouseWheel'] = this.scrollOnMouseWheel();
+  anychart.core.settings.serialize(this, anychart.stockModule.Interactivity.PROPERTY_DESCRIPTORS, json);
   return json;
 };
 
 
+/** @inheritDoc */
+anychart.stockModule.Interactivity.prototype.setupByJSON = function(config, opt_default) {
+  anychart.stockModule.Interactivity.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.settings.deserialize(this, anychart.stockModule.Interactivity.PROPERTY_DESCRIPTORS, config);
+};
 //endregion
+
 //region --- Export
-//exports
 (function() {
-  var proto = anychart.stockModule.Interactivity.prototype;
-  proto['zoomOnMouseWheel'] = proto.zoomOnMouseWheel;
-  proto['scrollOnMouseWheel'] = proto.scrollOnMouseWheel;
+  // auto generated
+  // proto['scrollOnMouseWheel'] = proto.scrollOnMouseWheel;
 })();
 //endregion

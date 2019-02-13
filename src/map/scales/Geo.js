@@ -14,6 +14,9 @@ goog.require('anychart.scales.IGeoScale');
  */
 anychart.mapModule.scales.Geo = function() {
   anychart.mapModule.scales.Geo.base(this, 'constructor');
+
+  this.addThemes('map.geoScale');
+
   /**
    * Threshold ticks count.
    * @type {number}

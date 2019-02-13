@@ -178,14 +178,14 @@ anychart.core.ui.Legend.PROPERTY_DESCRIPTORS = (function() {
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'maxHeight', anychart.core.settings.asIsNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'position', anychart.enums.normalizeOrientation],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'positionMode', anychart.enums.normalizeLegendPositionMode],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'align', anychart.enums.normalizeAlign],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'drag', anychart.core.settings.booleanNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'itemsFormat', anychart.core.settings.asIsNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'titleFormat', anychart.core.settings.asIsNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'itemsSpacing', spacingNormalizer('itemsSpacing')],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'itemsSourceMode', anychart.enums.normalizeLegendItemsSourceMode],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'hoverCursor', anychart.enums.normalizeCursor],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'iconTextSpacing', spacingNormalizer('iconTextSpacing')]
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'iconTextSpacing', spacingNormalizer('iconTextSpacing')],
+    anychart.core.settings.descriptors.ALIGN
   ]);
   return map;
 })();

@@ -2596,7 +2596,7 @@ anychart.stockModule.Chart.prototype.handleMouseWheel_ = function(e) {
 
     var interactivity = /** @type {anychart.stockModule.Interactivity} */(this.interactivity());
     if (doZoom) {
-      if (interactivity.zoomOnMouseWheel()) {
+      if (interactivity.getOption('zoomOnMouseWheel')) {
         var first,
             last,
             start,
@@ -2664,7 +2664,7 @@ anychart.stockModule.Chart.prototype.handleMouseWheel_ = function(e) {
         }
       }
     } else {
-      if (interactivity.scrollOnMouseWheel()) {
+      if (interactivity.getOption('scrollOnMouseWheel')) {
         var anchor = this.getDragAnchor();
         if (isNaN(anchor.firstIndex) || isNaN(anchor.lastIndex))
           return;

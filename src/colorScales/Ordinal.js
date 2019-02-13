@@ -14,7 +14,8 @@ goog.require('anychart.scales.Base');
 anychart.colorScalesModule.Ordinal = function() {
   anychart.colorScalesModule.Ordinal.base(this, 'constructor');
 
-  this.addThemes('defaultOrdinalColorScale');
+  this.dropThemes().addThemes('defaultScaleSettings.ordinalColor', 'defaultOrdinalColorScale');
+
   /**
    * Colors.
    * @type {?Array.<Object>}

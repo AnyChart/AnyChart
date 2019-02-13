@@ -19,9 +19,8 @@ goog.require('anychart.math.Rect');
 anychart.mapModule.elements.Axis = function() {
   anychart.mapModule.elements.Axis.base(this, 'constructor');
 
-  //delete this.themeSettings['enabled'];
-  //this.addThemes('map.axesSettings');
   this.labelsBounds_ = [];
+
   this.minorLabelsBounds_ = [];
 
   /**
@@ -283,7 +282,7 @@ anychart.mapModule.elements.Axis.prototype.parentInvalidated_ = function(e) {
  * Simple properties descriptors.
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.mapModule.elements.Axis.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
+anychart.mapModule.elements.Axis.SIMPLE_PROPS_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
   anychart.core.settings.createDescriptor(
@@ -312,7 +311,7 @@ anychart.mapModule.elements.Axis.prototype.SIMPLE_PROPS_DESCRIPTORS = (function(
 
   return map;
 })();
-anychart.core.settings.populate(anychart.mapModule.elements.Axis, anychart.mapModule.elements.Axis.prototype.SIMPLE_PROPS_DESCRIPTORS);
+anychart.core.settings.populate(anychart.mapModule.elements.Axis, anychart.mapModule.elements.Axis.SIMPLE_PROPS_DESCRIPTORS);
 
 
 //endregion
@@ -325,16 +324,13 @@ anychart.core.settings.populate(anychart.mapModule.elements.Axis, anychart.mapMo
 anychart.mapModule.elements.Axis.prototype.title = function(opt_value) {
   if (!this.title_) {
     this.title_ = new anychart.core.ui.Title();
-    this.title_.setParentEventTarget(this);
-    this.title_.parent(/** @type {anychart.core.ui.Title} */(this.parent().title()));
-    this.title_.listenSignals(this.titleInvalidated_, this);
-    this.registerDisposable(this.title_);
-
-    // todo: (chernetsky) Remove this when mapModule.elements.Axis is refactored
-    //this.setupCreated('title', this.title_);
     this.title_.dropThemes();
     this.title_.padding().dropThemes();
     this.title_.margin().dropThemes();
+    this.setupCreated('title', this.title_);
+    this.title_.setParentEventTarget(this);
+    this.title_.parent(/** @type {anychart.core.ui.Title} */(this.parent().title()));
+    this.title_.listenSignals(this.titleInvalidated_, this);
   }
 
   if (goog.isDef(opt_value)) {
@@ -372,11 +368,10 @@ anychart.mapModule.elements.Axis.prototype.titleInvalidated_ = function(event) {
 anychart.mapModule.elements.Axis.prototype.labels = function(opt_value) {
   if (!this.labels_) {
     this.labels_ = new anychart.core.ui.LabelsFactory();
+    this.labels_.dropThemes();
+    this.setupCreated('labels', this.labels_);
     this.labels_.setParentEventTarget(this);
     this.labels_.listenSignals(this.labelsInvalidated_, this);
-    this.registerDisposable(this.labels_);
-    //this.setupCreated('labels', this.labels_); // todo: Uncomment this when mapModule.elements.Axis is refactored
-    this.labels_.dropThemes();
   }
 
   if (goog.isDef(opt_value)) {
@@ -418,11 +413,10 @@ anychart.mapModule.elements.Axis.prototype.labelsInvalidated_ = function(event) 
 anychart.mapModule.elements.Axis.prototype.minorLabels = function(opt_value) {
   if (!this.minorLabels_) {
     this.minorLabels_ = new anychart.core.ui.LabelsFactory();
+    this.minorLabels_.dropThemes();
+    this.setupCreated('minorLabels', this.minorLabels_);
     this.minorLabels_.setParentEventTarget(this);
     this.minorLabels_.listenSignals(this.minorLabelsInvalidated_, this);
-    this.registerDisposable(this.minorLabels_);
-    //this.setupCreated('minorLabels', this.minorLabels_); // todo: Uncomment this when mapModule.elements.Axis is refactored
-    this.minorLabels_.dropThemes();
   }
 
   if (goog.isDef(opt_value)) {
@@ -465,7 +459,6 @@ anychart.mapModule.elements.Axis.prototype.createTicks = function() {
   ticks.orientation(/** @type {anychart.enums.Orientation} */ (this.orientation_));
   ticks.setParentEventTarget(this);
   ticks.listenSignals(this.ticksInvalidated, this);
-  this.registerDisposable(ticks);
   return ticks;
 };
 
@@ -478,8 +471,8 @@ anychart.mapModule.elements.Axis.prototype.createTicks = function() {
 anychart.mapModule.elements.Axis.prototype.ticks = function(opt_value) {
   if (!this.ticks_) {
     this.ticks_ = this.createTicks();
-    // this.setupCreated('ticks', this.ticks_); // todo: Uncomment this when mapModule.elements.Axis is refactored
-    this.ticks_.dropThemes(); // todo: Remove this when mapModule.elements.Axis is refactored
+    this.ticks_.dropThemes();
+    this.setupCreated('ticks', this.ticks_);
     this.ticks_.parent(/** @type {anychart.mapModule.elements.AxisTicks} */(this.parent().ticks()));
   }
 
@@ -499,8 +492,8 @@ anychart.mapModule.elements.Axis.prototype.ticks = function(opt_value) {
 anychart.mapModule.elements.Axis.prototype.minorTicks = function(opt_value) {
   if (!this.minorTicks_) {
     this.minorTicks_ = this.createTicks();
-    // this.setupCreated('minorTicks', this.minorTicks_); // todo: Uncomment this when mapModule.elements.Axis is refactored
-    this.minorTicks_.dropThemes(); // todo: Remove this when mapModule.elements.Axis is refactored
+    this.minorTicks_.dropThemes();
+    this.setupCreated('minorTicks', this.minorTicks_);
     this.minorTicks_.parent(/** @type {anychart.mapModule.elements.AxisTicks} */(this.parent().minorTicks()));
   }
 
@@ -666,7 +659,7 @@ anychart.mapModule.elements.Axis.prototype.getOverlappedLabels_ = function() {
         var k = -1;
 
         var parentLabels = this.parent().labels();
-        var labelsEnabledState = this.labels().enabled();
+        var labelsEnabledState = this.labels().getOwnOption('enabled');
         var isLabels = labelsEnabledState == void 0 ? parentLabels.enabled() : labelsEnabledState;
 
         var scaleMinorTicks;
@@ -686,7 +679,7 @@ anychart.mapModule.elements.Axis.prototype.getOverlappedLabels_ = function() {
         var minorTickVal, minorRatio;
 
         var parentMinorLabels = this.parent().minorLabels();
-        var minorLabelsEnabledState = this.minorLabels().enabled();
+        var minorLabelsEnabledState = this.minorLabels().getOwnOption('enabled');
         var isMinorLabels = minorLabelsEnabledState == void 0 ? parentMinorLabels.enabled() : minorLabelsEnabledState;
 
         while (i < ticksArrLen || j < minorTicksArrLen) {
@@ -1033,12 +1026,12 @@ anychart.mapModule.elements.Axis.prototype.getAffectingBounds = function(opt_bou
     var title = this.title();
     var labels = this.labels();
     var parentLabels = this.parent().labels();
-    var labelsEnabledState = labels.enabled();
+    var labelsEnabledState = labels.getOwnOption('enabled');
     var labelsEnabled = labelsEnabledState == void 0 ? parentLabels.enabled() : labelsEnabledState;
 
     var minorLabels = this.minorLabels();
     var parentMinorLabels = this.parent().minorLabels();
-    var minorLabelsEnabledState = minorLabels.enabled();
+    var minorLabelsEnabledState = minorLabels.getOwnOption('enabled');
     var minorLabelsEnabled = minorLabelsEnabledState == void 0 ? parentMinorLabels.enabled() : minorLabelsEnabledState;
 
     var axisTicks = this.ticks();
@@ -1265,10 +1258,6 @@ anychart.mapModule.elements.Axis.prototype.drawTopLine = function() {
   var xy, x, y;
   var precision = scale.precision()[0];
 
-  // var stroke = this.getOption('stroke');
-  // var lineThickness = anychart.utils.isNone(stroke) ? 0 : stroke['thickness'] ? parseFloat(stroke['thickness']) : 1;
-  // var pixelShift = lineThickness % 2 == 0 ? 0 : .5;
-
   var minimumX = /** @type {number} */(scale.minimumX());
   var maximumX = /** @type {number} */(scale.maximumX());
   var maximumY = /** @type {number} */(scale.maximumY());
@@ -1284,9 +1273,6 @@ anychart.mapModule.elements.Axis.prototype.drawTopLine = function() {
   } else {
     while (currLong < maximumX) {
       xy = scale.transform(currLong, maximumY, null);
-      // x = Math.round(xy[0]);
-      // y = Math.round(xy[1]) + lineThickness / 2;
-
       x = xy[0];
       y = xy[1];
 
@@ -1315,10 +1301,6 @@ anychart.mapModule.elements.Axis.prototype.drawRightLine = function() {
   var xy, x, y;
   var precision = scale.precision()[1];
 
-  // var stroke = this.getOption('stroke');
-  // var lineThickness = anychart.utils.isNone(stroke) ? 0 : stroke['thickness'] ? parseFloat(stroke['thickness']) : 1;
-  // var pixelShift = lineThickness % 2 == 0 ? 0 : .5;
-
   var maximumX = /** @type {number} */(scale.maximumX());
   var minimumY = /** @type {number} */(scale.minimumY());
   var maximumY = /** @type {number} */(scale.maximumY());
@@ -1334,9 +1316,6 @@ anychart.mapModule.elements.Axis.prototype.drawRightLine = function() {
   } else {
     while (currLat < maximumY) {
       xy = scale.transform(maximumX, currLat, null);
-      // x = Math.round(xy[0]) - lineThickness / 2;
-      // y = Math.round(xy[1]);
-
       x = xy[0];
       y = xy[1];
 
@@ -1365,10 +1344,6 @@ anychart.mapModule.elements.Axis.prototype.drawBottomLine = function() {
   var xy, x, y;
   var precision = scale.precision()[0];
 
-  // var stroke = this.getOption('stroke');
-  // var lineThickness = anychart.utils.isNone(stroke) ? 0 : stroke['thickness'] ? parseFloat(stroke['thickness']) : 1;
-  // var pixelShift = lineThickness % 2 == 0 ? 0 : .5;
-
   var minimumX = /** @type {number} */(scale.minimumX());
   var maximumX = /** @type {number} */(scale.maximumX());
   var minimumY = /** @type {number} */(scale.minimumY());
@@ -1384,10 +1359,6 @@ anychart.mapModule.elements.Axis.prototype.drawBottomLine = function() {
   } else {
     while (currLong < maximumX) {
       xy = scale.transform(currLong, minimumY, null);
-
-      // x = Math.round(xy[0]);
-      // y = Math.round(xy[1]);
-
       x = xy[0];
       y = xy[1];
 
@@ -1416,10 +1387,6 @@ anychart.mapModule.elements.Axis.prototype.drawLeftLine = function() {
   var xy, x, y;
   var precision = scale.precision()[1];
 
-  // var stroke = this.getOption('stroke');
-  // var lineThickness = anychart.utils.isNone(stroke) ? 0 : stroke['thickness'] ? parseFloat(stroke['thickness']) : 1;
-  // var pixelShift = lineThickness % 2 == 0 ? 0 : .5;
-
   var minimumX = /** @type {number} */(scale.minimumX());
   var minimumY = /** @type {number} */(scale.minimumY());
   var maximumY = /** @type {number} */(scale.maximumY());
@@ -1435,9 +1402,6 @@ anychart.mapModule.elements.Axis.prototype.drawLeftLine = function() {
   } else {
     while (currLat < maximumY) {
       xy = scale.transform(minimumX, currLat, null);
-      // x = Math.round(xy[0]) + lineThickness / 2;
-      // y = Math.round(xy[1]);
-
       x = xy[0];
       y = xy[1];
 
@@ -1549,7 +1513,6 @@ anychart.mapModule.elements.Axis.prototype.draw = function() {
 
   var ticksDrawer, minorTicksDrawer;
   var minorTicks, ticks, minorLabels, labels, minorLabelsEnabled, labelsEnabled;
-  // var lineThickness;
   var orientation = /** @type {anychart.enums.Orientation} */(this.orientation_);
 
   this.title().suspendSignalsDispatching();
@@ -1566,11 +1529,6 @@ anychart.mapModule.elements.Axis.prototype.draw = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
     var zIndex = /** @type {number} */(this.zIndex());
     this.rootLayer_.zIndex(zIndex);
-    // this.title().zIndex(10);
-    // this.labels().zIndex(5);
-    // this.minorLabels().zIndex(4);
-    // this.ticks().zIndex(3);
-    // this.minorTicks().zIndex(2);
     this.getLine().zIndex(1);
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
@@ -1609,14 +1567,14 @@ anychart.mapModule.elements.Axis.prototype.draw = function() {
     if (!labels.container()) labels.container(/** @type {acgraph.vector.ILayer} */(this.container()));
     labels.parentBounds(/** @type {anychart.math.Rect} */(this.parentBounds()));
     labels.clear();
-    var labelsEnabledState = this.labels().enabled();
+    var labelsEnabledState = this.labels().getOwnOption('enabled');
     labelsEnabled = labelsEnabledState == void 0 ? this.parent().labels().enabled() : labelsEnabledState;
 
     minorLabels = this.minorLabels();
     if (!minorLabels.container()) minorLabels.container(/** @type {acgraph.vector.ILayer} */(this.container()));
     minorLabels.parentBounds(/** @type {anychart.math.Rect} */(this.parentBounds()));
     minorLabels.clear();
-    var minorLabelsEnabledState = this.minorLabels().enabled();
+    var minorLabelsEnabledState = this.minorLabels().getOwnOption('enabled');
     minorLabelsEnabled = minorLabelsEnabledState == void 0 ? this.parent().minorLabels().enabled() : minorLabelsEnabledState;
 
     this.markConsistent(anychart.ConsistencyState.AXIS_LABELS);
@@ -1634,7 +1592,6 @@ anychart.mapModule.elements.Axis.prototype.draw = function() {
 
     var scaleTicksArr = scaleTicks.get();
     var ticksArrLen = scaleTicksArr.length;
-    // var tickThickness = this.ticks().stroke()['thickness'] ? parseFloat(this.ticks_.stroke()['thickness']) : 1;
 
     var tickVal, ratio, drawLabel, drawTick, drawMinorTick, drawMinorLabel;
 
@@ -1656,7 +1613,6 @@ anychart.mapModule.elements.Axis.prototype.draw = function() {
     }
 
     var scaleMinorTicksArr = scaleMinorTicks.get();
-    // var minorTickThickness = this.minorTicks_.stroke()['thickness'] ? parseFloat(this.minorTicks_.stroke()['thickness']) : 1;
 
     i = 0;
     j = 0;
@@ -1676,7 +1632,6 @@ anychart.mapModule.elements.Axis.prototype.draw = function() {
       }
 
       if (((ratio <= minorRatio && i < ticksArrLen) || j == minorTicksArrLen)) {
-        // var majorPixelShift = tickThickness % 2 == 0 ? 0 : -.5;
         drawLabel = goog.isArray(needDrawLabels) ? needDrawLabels[i] : needDrawLabels;
         if (goog.isBoolean(needDrawLabels)) {
           if (!i) drawLabel = drawLabel && this.getOption('drawFirstLabel');
@@ -1693,7 +1648,6 @@ anychart.mapModule.elements.Axis.prototype.draw = function() {
         i++;
       } else {
         if (!((ticksDrawer || labelsEnabled) && prevMajorRatio == minorRatio)) {
-          // var minorPixelShift = minorTickThickness % 2 == 0 ? 0 : -.5;
           drawMinorLabel = goog.isArray(needDrawMinorLabels) ? needDrawMinorLabels[j] : needDrawMinorLabels;
           drawMinorTick = (goog.isArray(needDrawMinorLabels) && needDrawMinorLabels[j]) || goog.isBoolean(needDrawMinorLabels);
 
@@ -1731,24 +1685,10 @@ anychart.mapModule.elements.Axis.prototype.draw = function() {
 
 //endregion
 //region --- Setup and Dispose
-/**
- * Sets default settings.
- * @param {!Object} config
- */
-anychart.mapModule.elements.Axis.prototype.setThemeSettings = function(config) {
-  anychart.core.settings.copy(this.themeSettings, this.SIMPLE_PROPS_DESCRIPTORS, config);
-};
-
-
 /** @inheritDoc */
 anychart.mapModule.elements.Axis.prototype.setupByJSON = function(config, opt_default) {
   anychart.mapModule.elements.Axis.base(this, 'setupByJSON', config, opt_default);
-
-  if (opt_default) {
-    this.setThemeSettings(config);
-  } else {
-    anychart.core.settings.deserialize(this, this.SIMPLE_PROPS_DESCRIPTORS, config);
-  }
+  anychart.core.settings.deserialize(this, anychart.mapModule.elements.Axis.SIMPLE_PROPS_DESCRIPTORS, config, opt_default);
 
   this.title().setupInternal(!!opt_default, config['title']);
 
@@ -1784,7 +1724,7 @@ anychart.mapModule.elements.Axis.prototype.serialize = function() {
   if (!goog.object.isEmpty(minorLabelsConfig))
     json['minorLabels'] = minorLabelsConfig;
 
-  anychart.core.settings.serialize(this, this.SIMPLE_PROPS_DESCRIPTORS, json, 'Map ' + this.orientation_ + ' axis props');
+  anychart.core.settings.serialize(this, anychart.mapModule.elements.Axis.SIMPLE_PROPS_DESCRIPTORS, json, 'Map ' + this.orientation_ + ' axis props');
 
   return json;
 };
@@ -1792,6 +1732,14 @@ anychart.mapModule.elements.Axis.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.mapModule.elements.Axis.prototype.disposeInternal = function() {
+  goog.disposeAll(this.title_, this.labels_, this.minorLabels_,this.ticks_, this.minorTicks_);
+
+  this.title_ = null;
+  this.labels_ = null;
+  this.minorLabels_ = null;
+  this.ticks_ = null;
+  this.minorTicks_ = null;
+
   anychart.mapModule.elements.Axis.base(this, 'disposeInternal');
 };
 

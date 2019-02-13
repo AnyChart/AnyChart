@@ -151,13 +151,15 @@ anychart.core.ui.MarkersFactory.OWN_DESCRIPTORS = (function() {
   anychart.core.settings.createDescriptors(map, [
     anychart.core.settings.descriptors.FILL,
     anychart.core.settings.descriptors.STROKE,
-    anychart.core.settings.descriptors.ANCHOR,
     anychart.core.settings.descriptors.OFFSET_X,
     anychart.core.settings.descriptors.OFFSET_Y,
     anychart.core.settings.descriptors.POSITION_FORMATTER,
     anychart.core.settings.descriptors.ROTATION,
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'position', anychart.core.settings.stringOrNullNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'size', anychart.core.settings.numberOrNullNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'anchor', function(val) {
+      return goog.isNull(val) ? val : anychart.enums.normalizeAnchor(val);
+    }],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'type', function(val) {
       if (!goog.isFunction(val))
         val = anychart.enums.normalizeMarkerType(val);
@@ -1310,7 +1312,7 @@ goog.inherits(anychart.standalones.MarkersFactory.Marker, anychart.core.ui.Marke
  */
 anychart.standalones.markersFactory = function() {
   var factory = new anychart.standalones.MarkersFactory();
-  factory.setup(anychart.getFullTheme('standalones.markersFactory'));
+  factory.setup(anychart.getFlatTheme('standalones.markersFactory'));
   return factory;
 };
 

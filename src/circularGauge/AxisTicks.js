@@ -299,9 +299,9 @@ anychart.circularGaugeModule.AxisTicks.prototype.startDrawing = function() {
   if (!goog.isFunction(this.stroke_))
     this.ticks_.setOption('stroke', this.stroke_);
   if (!goog.isFunction(this.fill_))
-    this.ticks_.fill(this.fill_);
+    this.ticks_.setOption('fill', this.fill_);
   this.ticks_.setOption('size', this.pixLength_ / 2);
-  this.ticks_.type(this.type_);
+  this.ticks_.setOption('type', this.type_);
 
   if (!this.hatchFillElement_ && !anychart.utils.isNone(this.hatchFill_)) {
     this.hatchFillElement_ = new anychart.core.ui.MarkersFactory();
@@ -318,10 +318,10 @@ anychart.circularGaugeModule.AxisTicks.prototype.startDrawing = function() {
   if (this.hatchFillElement_) {
     this.hatchFillElement_.clear();
     this.hatchFillElement_.disablePointerEvents(true);
-    this.hatchFillElement_.size(this.pixLength_ / 2);
-    this.hatchFillElement_.type(this.type_);
-    this.hatchFillElement_.fill(this.hatchFill_);
-    this.hatchFillElement_.stroke(null);
+    this.hatchFillElement_.setOption('size', this.pixLength_ / 2);
+    this.hatchFillElement_.setOption('type', this.type_);
+    this.hatchFillElement_.setOption('fill', this.hatchFill_);
+    this.hatchFillElement_.setOption('stroke', null);
   }
 };
 

@@ -996,6 +996,8 @@ anychart.mapModule.Series.prototype.getStartValueForAppearanceReduction = goog.n
 //region --- Drawing
 /** @inheritDoc */
 anychart.mapModule.Series.prototype.calcColorScale = function() {
+  // if (this.isChoropleth())
+  //   this.calculate();
   this.markConsistent(anychart.ConsistencyState.SERIES_COLOR_SCALE);
 };
 
@@ -1043,20 +1045,17 @@ anychart.mapModule.Series.prototype.calculate = function() {
         iterator.meta('features', features);
       }
 
-      if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_COLOR_SCALE)) {
-
-        var value = iterator.get(refNames[1]);
-        if (colorScale)
-          colorScale.extendDataRange(value);
+      if (colorScale && this.hasInvalidationState(anychart.ConsistencyState.SERIES_COLOR_SCALE)) {
+        colorScale.extendDataRange(iterator.get(refNames[1]));
       }
     }
 
-    if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_COLOR_SCALE)) {
-      if (colorScale)
-        colorScale.finishAutoCalc();
+    if (colorScale && this.hasInvalidationState(anychart.ConsistencyState.SERIES_COLOR_SCALE)) {
+      colorScale.finishAutoCalc();
     }
-    this.markConsistent(anychart.ConsistencyState.MAP_GEO_DATA_INDEX);
+
     this.markConsistent(anychart.ConsistencyState.SERIES_COLOR_SCALE);
+    this.markConsistent(anychart.ConsistencyState.MAP_GEO_DATA_INDEX);
   }
 };
 
@@ -1758,10 +1757,10 @@ anychart.mapModule.Series.prototype.getMarkersPosition = function(pointState) {
   hoverPointMarker = anychart.utils.getFirstDefinedValue(hoverPointMarker, iterator.get('hoverMarker'));
   selectPointMarker = anychart.utils.getFirstDefinedValue(selectPointMarker, iterator.get('selectMarker'));
 
-  var markerPosition = pointMarker && goog.isDef(pointMarker['position']) ? pointMarker['position'] : this.normal().markers().position();
-  var hoveredPosition = this.hovered().markers().position();
+  var markerPosition = pointMarker && goog.isDef(pointMarker['position']) ? pointMarker['position'] : this.normal().markers().getOption('position');
+  var hoveredPosition = this.hovered().markers().getOption('position');
   var markerHoverPosition = hoverPointMarker && goog.isDef(hoverPointMarker['position']) ? hoverPointMarker['position'] : goog.isDef(hoveredPosition) ? hoveredPosition : markerPosition;
-  var selectedPosition = this.selected().markers().position();
+  var selectedPosition = this.selected().markers().getOption('position');
   var markerSelectPosition = selectPointMarker && goog.isDef(selectPointMarker['position']) ? selectPointMarker['position'] : goog.isDef(selectedPosition) ? selectedPosition : markerPosition;
 
   return hovered ? markerHoverPosition : selected ? markerSelectPosition : markerPosition;

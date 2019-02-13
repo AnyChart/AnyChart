@@ -17,7 +17,7 @@ goog.require('anychart.mapModule.elements.Grid');
 anychart.mapModule.elements.GridSettings = function(map) {
   anychart.mapModule.elements.GridSettings.base(this, 'constructor');
 
-  this.addThemes('map.gridsSettings');
+  this.addThemes('defaultGridSettings');
 
   /**
    * Parent title.
@@ -65,10 +65,6 @@ anychart.mapModule.elements.GridSettings = function(map) {
     ['enabled', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.ENABLED_STATE_CHANGED],
     ['zIndex', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.Z_INDEX_STATE_CHANGED]
   ]);
-
-  // this is to retain old behaviour when horizontal and vertical grids obtained zIndex relative to GridSettings theme zIndex
-  if (!this.horizontalGrid_) this.horizontal();
-  if (!this.verticalGrid_) this.vertical();
 };
 goog.inherits(anychart.mapModule.elements.GridSettings, anychart.core.Base);
 
@@ -150,54 +146,24 @@ anychart.mapModule.elements.GridSettings.prototype.getHighPriorityResolutionChai
  * Simple properties descriptors.
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.mapModule.elements.GridSettings.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
+anychart.mapModule.elements.GridSettings.SIMPLE_PROPS_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'stroke',
-      anychart.core.settings.strokeNormalizer);
+  var descriptors = anychart.core.settings.descriptors;
 
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'minorStroke',
-      anychart.core.settings.strokeNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'fill',
-      anychart.core.settings.fillOrFunctionNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'drawFirstLine',
-      anychart.core.settings.booleanNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'drawLastLine',
-      anychart.core.settings.booleanNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'enabled',
-      anychart.core.settings.booleanNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'zIndex',
-      anychart.utils.toNumber);
+  anychart.core.settings.createDescriptors(map, [
+    descriptors.ENABLED,
+    descriptors.STROKE,
+    descriptors.FILL_FUNCTION,
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'minorStroke', anychart.core.settings.strokeNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'drawFirstLine', anychart.core.settings.booleanNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'drawLastLine', anychart.core.settings.booleanNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'zIndex', anychart.utils.toNumber]
+  ]);
 
   return map;
 })();
-anychart.core.settings.populate(anychart.mapModule.elements.GridSettings, anychart.mapModule.elements.GridSettings.prototype.SIMPLE_PROPS_DESCRIPTORS);
+anychart.core.settings.populate(anychart.mapModule.elements.GridSettings, anychart.mapModule.elements.GridSettings.SIMPLE_PROPS_DESCRIPTORS);
 
 
 //endregion
@@ -223,8 +189,7 @@ anychart.mapModule.elements.GridSettings.prototype.checkSetupPalette_ = function
  */
 anychart.mapModule.elements.GridSettings.prototype.palette = function(opt_value) {
   if (!this.palette_) {
-    var palette = this.themeSettings['palette'];
-    this.checkSetupPalette_(palette);
+    this.checkSetupPalette_(this.themeSettings['palette']);
     this.setupCreated('palette', this.palette_);
     this.palette_.restoreDefaults(false);
   }
@@ -249,7 +214,7 @@ anychart.mapModule.elements.GridSettings.prototype.setupPalette_ = function(cls)
     // we dispatch only if we replace existing palette.
     var doDispatch = !!this.palette_;
     goog.dispose(this.palette_);
-    this.palette_ = new cls();
+    this.palette_ = /** @type {anychart.palettes.DistinctColors|anychart.palettes.RangeColors} */(new cls());
     this.palette_.listenSignals(this.paletteInvalidated_, this);
     this.registerDisposable(this.palette_);
     if (doDispatch)
@@ -289,9 +254,10 @@ anychart.mapModule.elements.GridSettings.prototype.getItems = function() {
 anychart.mapModule.elements.GridSettings.prototype.vertical = function(opt_value) {
   if (!this.verticalGrid_) {
     this.verticalGrid_ = new anychart.mapModule.elements.Grid();
-    this.verticalGrid_.dropThemes();
     this.verticalGrid_.setDefaultLayout(anychart.enums.Layout.VERTICAL);
-    this.verticalGrid_.parent(this);
+    this.verticalGrid_.dropThemes().parent(this);
+    this.setupCreated('vertical', this.verticalGrid_);
+
     var zIndex = this.getOption('zIndex') + this.grids_.length * anychart.mapModule.Chart.ZINDEX_INCREMENT_MULTIPLIER;
     this.verticalGrid_.setAutoZIndex(/** @type {number} */(zIndex));
     this.verticalGrid_.listenSignals(this.map_.onGridsSettingsSignal, this.map_);
@@ -315,9 +281,10 @@ anychart.mapModule.elements.GridSettings.prototype.vertical = function(opt_value
 anychart.mapModule.elements.GridSettings.prototype.horizontal = function(opt_value) {
   if (!this.horizontalGrid_) {
     this.horizontalGrid_ = new anychart.mapModule.elements.Grid();
-    this.horizontalGrid_.dropThemes();
     this.horizontalGrid_.setDefaultLayout(anychart.enums.Layout.HORIZONTAL);
-    this.horizontalGrid_.parent(this);
+    this.horizontalGrid_.dropThemes().parent(this);
+    this.setupCreated('horizontal', this.horizontalGrid_);
+
     var zIndex = this.getOption('zIndex') + this.grids_.length * anychart.mapModule.Chart.ZINDEX_INCREMENT_MULTIPLIER;
     this.horizontalGrid_.setAutoZIndex(/** @type {number} */(zIndex));
     this.horizontalGrid_.listenSignals(this.map_.onGridsSettingsSignal, this.map_);
@@ -335,15 +302,6 @@ anychart.mapModule.elements.GridSettings.prototype.horizontal = function(opt_val
 
 //endregion
 //region --- Setup and Dispose
-/**
- * Sets default settings.
- * @param {!Object} config
- */
-anychart.mapModule.elements.GridSettings.prototype.setThemeSettings = function(config) {
-  anychart.core.settings.copy(this.themeSettings, this.SIMPLE_PROPS_DESCRIPTORS, config);
-};
-
-
 /** @inheritDoc */
 anychart.mapModule.elements.GridSettings.prototype.resolveSpecialValue = function(var_args) {
   var arg0 = arguments[0];
@@ -368,21 +326,32 @@ anychart.mapModule.elements.GridSettings.prototype.setupSpecial = function(isDef
 };
 
 
+/**
+ * Create and setup elements that should be created before draw
+ * @param {boolean=} opt_default
+ * @param {Object=} opt_config
+ */
+anychart.mapModule.elements.GridSettings.prototype.setupElements = function(opt_default, opt_config) {
+  var config = goog.isDef(opt_config) ? opt_config : this.themeSettings;
+
+  this.horizontal().setupInternal(!!opt_default, config['horizontal']);
+  this.vertical().setupInternal(!!opt_default, config['vertical']);
+};
+
+
 /** @inheritDoc */
 anychart.mapModule.elements.GridSettings.prototype.setupByJSON = function(config, opt_default) {
   this.map_.suspendSignalsDispatching();
 
-  if (opt_default) {
-    this.setThemeSettings(config);
-  } else {
-    anychart.core.settings.deserialize(this, this.SIMPLE_PROPS_DESCRIPTORS, config);
+  anychart.core.settings.deserialize(this, anychart.mapModule.elements.GridSettings.SIMPLE_PROPS_DESCRIPTORS, config);
+
+  if (opt_default)
     this.setOption('enabled', 'enabled' in config ? config['enabled'] : true);
-  }
+
   if (config['palette'])
     this.palette(config['palette']);
 
-  this.horizontal().setupInternal(!!opt_default, config['horizontal']);
-  this.vertical().setupInternal(!!opt_default, config['vertical']);
+  this.setupElements(!!opt_default, config);
 
   this.map_.resumeSignalsDispatching(true);
 };
@@ -398,15 +367,17 @@ anychart.mapModule.elements.GridSettings.prototype.serialize = function() {
     if (!goog.object.isEmpty(gridSettings))
       json['vertical'] = gridSettings;
   }
+
   if (this.horizontalGrid_) {
     gridSettings = this.horizontalGrid_.serialize();
     if (!goog.object.isEmpty(gridSettings))
       json['horizontal'] = gridSettings;
   }
+
   if (this.palette_)
     json['palette'] = this.palette_.serialize();
 
-  anychart.core.settings.serialize(this, this.SIMPLE_PROPS_DESCRIPTORS, json, 'Map grids props');
+  anychart.core.settings.serialize(this, anychart.mapModule.elements.GridSettings.SIMPLE_PROPS_DESCRIPTORS, json, 'Map grids props');
 
   return json;
 };
@@ -415,7 +386,11 @@ anychart.mapModule.elements.GridSettings.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.mapModule.elements.GridSettings.prototype.disposeInternal = function() {
   goog.disposeAll(this.verticalGrid_, this.horizontalGrid_, this.palette_);
+
   this.map_ = null;
+  this.verticalGrid_ = null;
+  this.horizontalGrid_ = null;
+  this.palette_ = null;
 
   anychart.mapModule.elements.GridSettings.base(this, 'disposeInternal');
 };

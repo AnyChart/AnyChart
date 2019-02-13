@@ -112,7 +112,7 @@ anychart.circularGaugeModule.pointers.Marker.prototype.draw = function() {
       this.hatchFillElement.setOption('fill', fill);
       this.hatchFillElement.setOption('stroke', null);
       this.hatchFillElement.setOption('size', this.pixSize_);
-      this.hatchFillElement.type(type);
+      this.hatchFillElement.setOption('type', type);
 
       this.invalidate(anychart.ConsistencyState.BOUNDS);
     }
@@ -176,14 +176,14 @@ anychart.circularGaugeModule.pointers.Marker.prototype.draw = function() {
 
 
     this.domElement.setOption('size', this.pixSize_);
-    this.domElement.type(type);
+    this.domElement.setOption('type', type);
 
     var marker = this.domElement.add({'value': {'x': x, 'y': y}}, 0);
     marker.setOption('rotation', angle + 90);
 
     if (this.hatchFillElement) {
       this.hatchFillElement.setOption('size', this.pixSize_);
-      this.hatchFillElement.type(type);
+      this.hatchFillElement.setOption('type', type);
 
       var hatchFill = this.hatchFillElement.add({'value': {'x': x, 'y': y}}, 0);
       hatchFill.setOption('rotation', angle + 90);

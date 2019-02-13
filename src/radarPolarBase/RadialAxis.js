@@ -78,19 +78,19 @@ goog.inherits(anychart.radarPolarBaseModule.RadialAxis, anychart.core.VisualBase
 anychart.radarPolarBaseModule.RadialAxis.PROPERTY_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
+  var descriptors = anychart.core.settings.descriptors;
 
   function innerRadiusNormalizer(opt_value) {
     return anychart.utils.normalizeNumberOrPercent(opt_value, this.getOption('innerRadius'));
   }
 
-  var descriptors = anychart.core.settings.descriptors;
   anychart.core.settings.createDescriptors(map, [
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'innerRadius', innerRadiusNormalizer],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'drawFirstLabel', anychart.core.settings.booleanNormalizer],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'drawLastLabel', anychart.core.settings.booleanNormalizer],
     descriptors.START_ANGLE,
     descriptors.OVERLAP_MODE,
-    descriptors.STROKE
+    descriptors.STROKE,
+    descriptors.DRAW_FIRST_LABEL,
+    descriptors.DRAW_LAST_LABEL,
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'innerRadius', innerRadiusNormalizer]
   ]);
 
   return map;
