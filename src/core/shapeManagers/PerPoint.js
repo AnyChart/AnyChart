@@ -25,7 +25,11 @@ anychart.core.shapeManagers.PerPoint.prototype.getShapesGroup = function(state, 
   var iterator = this.series.getIterator();
   var zIndex = opt_baseZIndex || 0;
   if (this.series.isDiscreteBased() && this.series.supportsPointSettings()) {
-    zIndex += Number(iterator.get('zIndex')) || 0;
+    /*
+      Can take value for zIndex configured by state.
+      Actually, issue starts from DVF-4178.
+     */
+    zIndex += Number(iterator.meta('stateZIndex')) || Number(iterator.get('zIndex')) || 0;
   }
   var res = anychart.core.shapeManagers.PerPoint.base(this, 'getShapesGroup', state, opt_only, zIndex, opt_shape);
   iterator.meta(this.shapesFieldName, res);

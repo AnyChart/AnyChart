@@ -874,9 +874,10 @@ anychart.mapModule.Series.prototype.applyZoomMoveTransform = function() {
  * Selection overrides hovered state.
  * @param {acgraph.vector.Shape} el - Shape.
  * @param {anychart.PointState} state - State.
+ * @param {!anychart.data.IIterator} iterator - Iterator.
  * @private
  */
-anychart.mapModule.Series.prototype.updateShapeZIndex_ = function(el, state) {
+anychart.mapModule.Series.prototype.updateShapeZIndex_ = function(el, state, iterator) {
   var uid = 's' + goog.getUid(el);
   var zIndex = /** @type {number} */ (el.zIndex());
   switch (state) {
@@ -887,6 +888,9 @@ anychart.mapModule.Series.prototype.updateShapeZIndex_ = function(el, state) {
       if (!(uid in this.hoveredFeaturesZIndexesBackup_)) {
         this.hoveredFeaturesZIndexesBackup_[uid] = zIndex;
         el.zIndex(1e4);
+
+        //Save zIndex to process it in anychart.core.shapeManagers.PerPoint.prototype.getShapesGroup().
+        iterator.meta('stateZIndex', 1e4);
         this.hoveredFeatures_[uid] = el;
       }
       break;
@@ -900,6 +904,9 @@ anychart.mapModule.Series.prototype.updateShapeZIndex_ = function(el, state) {
       if (!(uid in this.selectedFeaturesZIndexesBackup_)) {
         this.selectedFeaturesZIndexesBackup_[uid] = zIndex;
         el.zIndex(1e3);
+
+        //Save zIndex to process it in anychart.core.shapeManagers.PerPoint.prototype.getShapesGroup().
+        iterator.meta('stateZIndex', 1e3);
         this.selectedFeatures_[uid] = el;
       }
       break;
@@ -907,11 +914,13 @@ anychart.mapModule.Series.prototype.updateShapeZIndex_ = function(el, state) {
     default:
       if (uid in this.hoveredFeatures_) {
         this.hoveredFeatures_[uid].zIndex(this.hoveredFeaturesZIndexesBackup_[uid]);
+        iterator.meta('stateZIndex', null);
         delete this.hoveredFeatures_[uid];
         delete this.hoveredFeaturesZIndexesBackup_[uid];
       }
       if (uid in this.selectedFeatures_) {
         this.selectedFeatures_[uid].zIndex(this.selectedFeaturesZIndexesBackup_[uid]);
+        iterator.meta('stateZIndex', null);
         delete this.selectedFeatures_[uid];
         delete this.selectedFeaturesZIndexesBackup_[uid];
       }
@@ -928,8 +937,10 @@ anychart.mapModule.Series.prototype.applyAppearanceToPoint = function(pointState
   if (this.isDiscreteBased()) {
     if (this.isChoropleth()) {
       var features = iterator.meta('features');
-      if (!features)
+      if (!features) {
+        iterator.meta('beforeDrawState', pointState); //DVF-4178
         return;
+      }
 
       for (var i = 0, len = features.length; i < len; i++) {
         var feature = features[i];
@@ -939,7 +950,12 @@ anychart.mapModule.Series.prototype.applyAppearanceToPoint = function(pointState
             if (!element || !(anychart.utils.instanceOf(element, acgraph.vector.Shape)))
               return;
 
-            this.updateShapeZIndex_(element, pointState);
+            var metaState = iterator.meta('beforeDrawState');
+            if (goog.isNumber(metaState)) { //This restores state set before draw, DVF-4178.
+              pointState = /** @type {number} */ (metaState);
+              iterator.meta('beforeDrawState', null);
+            }
+            this.updateShapeZIndex_(element, pointState, iterator);
             iterator.meta('currentPointElement', shape);
 
             var shapeGroup = {
@@ -1061,6 +1077,13 @@ anychart.mapModule.Series.prototype.drawPoint = function(point, state) {
     var features = point.meta('features');
 
     if (features) {
+      //DVF-4178
+      var metaState = point.meta('beforeDrawState');
+      if (goog.isNumber(metaState)) {
+        state = /** @type {number} */ (metaState);
+        this.applyAppearanceToPoint(state);
+        point.meta('beforeDrawState', null);
+      }
       for (var i = 0, len = features.length; i < len; i++) {
         var feature = features[i];
         if (goog.isDef(feature.domElement)) {
