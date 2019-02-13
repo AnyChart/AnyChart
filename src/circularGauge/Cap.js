@@ -45,14 +45,14 @@ anychart.circularGaugeModule.Cap = function() {
 
   /**
    * Root layer.
-   * @type {!acgraph.vector.Layer}
+   * @type {acgraph.vector.Layer}
    * @private
    */
   this.rootLayer_ = acgraph.layer();
 
   /**
    * Cap dom element.
-   * @type {!acgraph.vector.Circle}
+   * @type {acgraph.vector.Circle}
    * @private
    */
   this.domElement_ = acgraph.circle();
@@ -281,6 +281,16 @@ anychart.circularGaugeModule.Cap.prototype.setupByJSON = function(config, opt_de
   this.stroke(config['stroke']);
   this.hatchFill(config['hatchFill']);
   this.radius(config['radius']);
+};
+
+
+/** @inheritDoc */
+anychart.circularGaugeModule.Cap.prototype.disposeInternal = function() {
+  goog.disposeAll(this.domElement_, this.hatchFillElement_, this.rootLayer_);
+  this.domElement_ = null;
+  this.hatchFillElement_ = null;
+  this.rootLayer_ = null;
+  anychart.circularGaugeModule.Cap.base(this, 'disposeInternal');
 };
 
 

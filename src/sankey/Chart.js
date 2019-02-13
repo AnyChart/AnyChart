@@ -117,14 +117,15 @@ anychart.sankeyModule.Chart.prototype.data = function(opt_value, opt_csvSettings
     if (this.rawData_ !== opt_value) {
       this.rawData_ = opt_value;
       goog.dispose(this.data_);
+      goog.dispose(this.parentViewToDispose_);
       this.iterator_ = null;
       if (anychart.utils.instanceOf(opt_value, anychart.data.View))
         this.data_ = (/** @type {anychart.data.View} */ (opt_value)).derive();
       else if (anychart.utils.instanceOf(opt_value, anychart.data.Set))
         this.data_ = (/** @type {anychart.data.Set} */ (opt_value)).mapAs();
       else
-        this.data_ = new anychart.data.Set(
-            (goog.isArray(opt_value) || goog.isString(opt_value)) ? opt_value : null, opt_csvSettings).mapAs();
+        this.data_ = (this.parentViewToDispose_ = new anychart.data.Set(
+            (goog.isArray(opt_value) || goog.isString(opt_value)) ? opt_value : null, opt_csvSettings)).mapAs();
       this.data_.listenSignals(this.dataInvalidated_, this);
       this.invalidate(anychart.ConsistencyState.CHART_LABELS); // for noData label
       this.invalidateState(anychart.enums.Store.SANKEY, anychart.enums.State.DATA, anychart.Signal.NEEDS_REDRAW);
@@ -1941,7 +1942,31 @@ anychart.sankeyModule.Chart.prototype.setupByJSON = function(config, opt_default
 
 /** @inheritDoc */
 anychart.sankeyModule.Chart.prototype.disposeInternal = function() {
-  goog.disposeAll(this.palette_, this.dropoff_, this.flow_, this.node_, this.tooltip_, this.dropoffPaths, this.nodePaths, this.flowPaths, this.hoverPaths);
+  goog.disposeAll(
+      this.palette_,
+      this.dropoff_,
+      this.flow_,
+      this.node_,
+      this.tooltip_,
+      this.dropoffPaths,
+      this.nodePaths,
+      this.flowPaths,
+      this.hoverPaths,
+      this.data_,
+      this.parentViewToDispose_);
+  this.palette_ = null;
+  this.dropoff_ = null;
+  this.flow_ = null;
+  this.node_ = null;
+  this.tooltip_ = null;
+  this.dropoffPaths.length = 0;
+  this.nodePaths.length = 0;
+  this.flowPaths.length = 0;
+  this.hoverPaths.length = 0;
+  this.data_ = null;
+  this.parentViewToDispose_ = null;
+  this.iterator_ = null;
+
   anychart.sankeyModule.Chart.base(this, 'disposeInternal');
 };
 

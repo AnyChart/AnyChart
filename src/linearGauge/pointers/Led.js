@@ -476,8 +476,9 @@ anychart.linearGaugeModule.pointers.Led.prototype.disposeInternal = function() {
 
   this.dropColorsToPath();
 
-  goog.dispose(this.colorScale_);
-  this.colorScale_ = null;
+  // we can't dispose color scale because it may be user-created instance
+  // goog.dispose(this.colorScale_);
+  // this.colorScale_ = null;
   anychart.linearGaugeModule.pointers.Led.base(this, 'disposeInternal');
 };
 

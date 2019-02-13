@@ -344,7 +344,6 @@ anychart.core.GridBase.prototype.setupPalette_ = function(cls) {
     goog.dispose(this.palette_);
     this.palette_ = new cls();
     this.palette_.listenSignals(this.paletteInvalidated_, this);
-    this.registerDisposable(this.palette_);
     if (doDispatch)
       this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW);
   }
@@ -576,7 +575,6 @@ anychart.core.GridBase.prototype.axisInvalidated = function(event) {
 anychart.core.GridBase.prototype.axesLinesSpace = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.axesLinesSpace_) {
     this.axesLinesSpace_ = new anychart.core.utils.Padding();
-    this.registerDisposable(this.axesLinesSpace_);
   }
 
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
@@ -600,7 +598,6 @@ anychart.core.GridBase.prototype.createFillElement = function() {
       .parent(/** @type {acgraph.vector.ILayer} */(this.container()))
       .zIndex(/** @type {number} */(this.zIndex()))
       .stroke('none');
-  this.registerDisposable(path);
   return path;
 };
 
@@ -653,7 +650,6 @@ anychart.core.GridBase.prototype.lineElement = function(opt_isMajor) {
   this.lineElementInternal = /** @type {!acgraph.vector.Path} */(this.lineElementInternal ?
       this.lineElementInternal :
       acgraph.path());
-  this.registerDisposable(this.lineElementInternal);
   return this.lineElementInternal;
 };
 
@@ -958,11 +954,16 @@ anychart.core.GridBase.prototype.setupByJSON = function(config, opt_default) {
 anychart.core.GridBase.prototype.disposeInternal = function() {
   this.axis_ = null;
   this.owner_ = null;
-  goog.object.forEach(this.fillMap, function(value, key, obj) {
-    value.dispose();
-    obj[key] = null;
-  });
+
+  for (var key in this.fillMap) {
+    goog.dispose(this.fillMap[key]);
+  }
   this.fillMap = null;
+
+  goog.disposeAll(this.palette_, this.axesLinesSpace_, this.lineElementInternal);
+  this.palette_ = null;
+  this.axesLinesSpace_ = null;
+  this.lineElementInternal = null;
 
   anychart.core.GridBase.base(this, 'disposeInternal');
 };

@@ -107,7 +107,6 @@ anychart.mapModule.elements.Grid.prototype.lineElement = function(opt_isMajor) {
     }
     lineElement.disablePointerEvents(true).disableStrokeScaling(true);
     lineElement.parent(this.rootLayer);
-    this.registerDisposable(lineElement);
   }
   return /** @type {!acgraph.vector.Path} */(lineElement);
 };
@@ -120,9 +119,10 @@ anychart.mapModule.elements.Grid.prototype.createFillElement = function() {
       .parent(/** @type {acgraph.vector.ILayer} */(this.rootLayer))
       .zIndex(3)
       .stroke('none');
-  this.registerDisposable(path);
   return path;
 };
+
+
 //endregion
 //region --- Interactivity
 /**
@@ -524,4 +524,15 @@ anychart.mapModule.elements.Grid.prototype.drawInternal = function() {
 //   var proto = anychart.mapModule.elements.Grid.prototype;
   // proto['minorStroke'] = proto.minorStroke;
 // })();
+//endregion
+//region Dispose
+/** @inheritDoc */
+anychart.mapModule.elements.Grid.prototype.disposeInternal = function() {
+  goog.disposeAll(this.lineElementInternal, this.minorLineElementInternal);
+  this.lineElementInternal = null;
+  this.minorLineElementInternal = null;
+  anychart.mapModule.elements.Grid.base(this, 'disposeInternal');
+};
+
+
 //endregion

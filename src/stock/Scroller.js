@@ -1478,7 +1478,6 @@ anychart.stockModule.Scroller.prototype.setupPalette_ = function(cls, opt_cloneF
     if (opt_cloneFrom)
       this.palette_.setup(opt_cloneFrom);
     this.palette_.listenSignals(this.paletteInvalidated_, this);
-    this.registerDisposable(this.palette_);
     if (doDispatch)
       this.invalidate(anychart.ConsistencyState.STOCK_SCROLLER_SERIES, anychart.Signal.NEEDS_REDRAW);
   }
@@ -1578,19 +1577,25 @@ anychart.stockModule.Scroller.prototype.makeRangeChangeEvent = function(type, st
 /** @inheritDoc */
 anychart.stockModule.Scroller.prototype.disposeInternal = function() {
   goog.disposeAll(
+      this.palette_,
       this.hatchFillPalette_,
       this.seriesContainer_,
       this.selectedSeriesContainer_,
       this.xAxis_,
       this.xScale_,
-      this.yScale_);
+      this.yScale_,
+      this.series_,
+      this.indicators_,
+      this.defaultSeriesSettings_);
 
+  this.palette_ = null;
   this.hatchFillPalette_ = null;
   this.seriesContainer_ = null;
   this.selectedSeriesContainer_ = null;
   this.xAxis_ = null;
   this.xScale_ = null;
   this.yScale_ = null;
+  this.defaultSeriesSettings_ = null;
 
   this.series_.length = 0;
   this.indicators_.length = 0;

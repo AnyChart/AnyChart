@@ -747,9 +747,20 @@ anychart.ganttModule.elements.TimelineElement.prototype.disposeInternal = functi
   }
 
   this.resolutionChainCache_ = null;
-  goog.disposeAll(this.normal_, this.selected_, this.labels_, this.shapeManager);
+  goog.disposeAll(
+      this.normal_,
+      this.selected_,
+      this.labels_,
+      this.labelsResolution,
+      this.shapeManager,
+      this.edit_);
   if (this.labelsResolution)
     this.labelsResolution.length = 0;
+  this.normal_ = null;
+  this.selected_ = null;
+  this.labels_ = null;
+  this.shapeManager = null;
+  this.edit_ = null;
 
   anychart.ganttModule.elements.TimelineElement.base(this, 'disposeInternal');
 };

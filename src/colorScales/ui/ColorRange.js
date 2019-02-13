@@ -1048,6 +1048,15 @@ anychart.colorScalesModule.ui.ColorRange.prototype.setupByJSON = function(config
 };
 
 
+/** @inheritDoc */
+anychart.colorScalesModule.ui.ColorRange.prototype.disposeInternal = function() {
+  goog.disposeAll(this.marker_, this.getTempScale_);
+  this.marker_ = null;
+  this.getTempScale_ = null;
+  anychart.colorScalesModule.ui.ColorRange.base(this, 'disposeInternal');
+};
+
+
 
 /**
  * @constructor

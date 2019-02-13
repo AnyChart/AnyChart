@@ -1732,14 +1732,17 @@ anychart.mapModule.elements.Axis.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.mapModule.elements.Axis.prototype.disposeInternal = function() {
-  goog.disposeAll(this.title_, this.labels_, this.minorLabels_,this.ticks_, this.minorTicks_);
-
+  goog.disposeAll(
+      this.title_,
+      this.labels_,
+      this.minorLabels_,
+      this.ticks_,
+      this.minorTicks_);
   this.title_ = null;
   this.labels_ = null;
   this.minorLabels_ = null;
   this.ticks_ = null;
   this.minorTicks_ = null;
-
   anychart.mapModule.elements.Axis.base(this, 'disposeInternal');
 };
 

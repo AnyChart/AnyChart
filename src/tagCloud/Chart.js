@@ -376,7 +376,6 @@ anychart.tagCloudModule.Chart.prototype.setupPalette_ = function(cls, opt_cloneF
     if (opt_cloneFrom)
       this.palette_.setup(opt_cloneFrom);
     this.palette_.listenSignals(this.paletteInvalidated_, this);
-    this.registerDisposable(this.palette_);
     if (doDispatch)
       this.invalidate(anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
   }
@@ -2222,24 +2221,39 @@ anychart.tagCloudModule.Chart.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.tagCloudModule.Chart.prototype.disposeInternal = function() {
-  goog.array.forEach(this.normalizedData, function(t) {
-    goog.disposeAll(
-        t.textEl,
-        t.eHandler,
-        t.sprite);
-  });
+  for (var i = 0; i < this.normalizedData.length; i++) {
+    var item = this.normalizedData[i];
+    goog.dispose(item.textEl);
+    goog.dispose(item.eHandler);
+    goog.dispose(item.sprite);
+  }
 
   goog.disposeAll(
-      this.layer_,
       this.texts_,
       this.handlers_,
+      this.layer_,
       this.normal_,
       this.hovered_,
       this.selected_,
       this.colorRange_,
-      this.colorScale_,
-      this.scale_,
-      this.state);
+      this.state,
+      this.palette_,
+      this.data_,
+      this.parentViewToDispose_);
+
+  this.texts_ = null;
+  this.handlers_ = null;
+  this.layer_ = null;
+  this.normal_ = null;
+  this.hovered_ = null;
+  this.selected_ = null;
+  this.colorRange_ = null;
+  this.colorScale_ = null;
+  this.scale_ = null;
+  this.state = null;
+  this.palette_ = null;
+  delete this.data_;
+  this.parentViewToDispose_ = null;
 
   anychart.tagCloudModule.Chart.base(this, 'disposeInternal');
 };

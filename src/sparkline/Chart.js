@@ -143,7 +143,7 @@ anychart.sparklineModule.Chart = function(opt_data, opt_csvSettings) {
    */
   function typeBeforeInvalidation() {
     if (this.series_) {
-      this.series_.dispose();
+      goog.dispose(this.series_);
       this.series_ = null;
     }
   }
@@ -2192,15 +2192,15 @@ anychart.sparklineModule.Chart.prototype.serialize = function() {
 };
 
 
-anychart.chartTypesMap[anychart.enums.ChartTypes.SPARKLINE] = anychart.sparkline;
-
-
-/**@inheritDoc*/
+/** @inheritDoc */
 anychart.sparklineModule.Chart.prototype.disposeInternal = function() {
-  goog.disposeAll(this.lineAxesMarkers_,
+  goog.disposeAll(
+      this.lineAxesMarkers_,
       this.rangeAxesMarkers_,
       this.textAxesMarkers_,
       this.parentViewToDispose_,
+      this.parentView_,
+      this.data_,
       this.series_,
       this.markers_,
       this.negativeMarkers_,
@@ -2213,14 +2213,33 @@ anychart.sparklineModule.Chart.prototype.disposeInternal = function() {
       this.firstLabels_,
       this.lastLabels_,
       this.maxLabels_,
-      this.minLabels_
-  );
-  this.lineAxesMarkers_ = null;
-  this.rangeAxesMarkers_ = null;
-  this.textAxesMarkers_ = null;
+      this.minLabels_);
+  this.lineAxesMarkers_.length = 0;
+  this.rangeAxesMarkers_.length = 0;
+  this.textAxesMarkers_.length = 0;
+  this.parentViewToDispose_ = null;
+  this.parentView_ = null;
+  delete this.data_;
+  delete this.iterator_;
+  this.series_ = null;
+  this.markers_ = null;
+  this.negativeMarkers_ = null;
+  this.firstMarkers_ = null;
+  this.lastMarkers_ = null;
+  this.maxMarkers_ = null;
+  this.minMarkers_ = null;
+  this.labels_ = null;
+  this.negativeLabels_ = null;
+  this.firstLabels_ = null;
+  this.lastLabels_ = null;
+  this.maxLabels_ = null;
+  this.minLabels_ = null;
   this.seriesDefaults_ = null;
   anychart.sparklineModule.Chart.base(this, 'disposeInternal');
 };
+
+
+anychart.chartTypesMap[anychart.enums.ChartTypes.SPARKLINE] = anychart.sparkline;
 
 
 //exports

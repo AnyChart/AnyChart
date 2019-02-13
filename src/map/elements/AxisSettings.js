@@ -579,19 +579,17 @@ anychart.mapModule.elements.AxisSettings.prototype.disposeInternal = function() 
       this.labels_,
       this.minorLabels_,
       this.ticks_,
-      this.minorTicks_
-  );
-
-  this.topAxis_= null;
-  this.rightAxis_= null;
-  this.bottomAxis_= null;
-  this.leftAxis_= null;
-  this.title_= null;
-  this.labels_= null;
-  this.minorLabels_= null;
-  this.ticks_= null;
-  this.minorTicks_= null;
-
+      this.minorTicks_);
+  this.topAxis_ = null;
+  this.rightAxis_ = null;
+  this.bottomAxis_ = null;
+  this.leftAxis_ = null;
+  this.axes_.length = 0;
+  this.title_ = null;
+  this.labels_ = null;
+  this.minorLabels_ = null;
+  this.ticks_ = null;
+  this.minorTicks_ = null;
   anychart.mapModule.elements.AxisSettings.base(this, 'disposeInternal');
 };
 

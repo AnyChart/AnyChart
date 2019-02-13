@@ -5271,10 +5271,23 @@ anychart.mapModule.Chart.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.mapModule.Chart.prototype.disposeInternal = function() {
-  goog.disposeAll(this.shortcutHandler, this.mouseWheelHandler, this.crosshair_, this.callouts_);
+  goog.disposeAll(
+      this.shortcutHandler,
+      this.mouseWheelHandler,
+      this.crosshair_,
+      this.colorRange_,
+      this.callouts_,
+      this.axesSettings_,
+      this.gridSettings_,
+      this.crsAnimation_);
   this.shortcutHandler = null;
   this.mouseWheelHandler = null;
   this.crosshair_ = null;
+  this.colorRange_ = null;
+  this.callouts_.length = 0;
+  this.axesSettings_ = null;
+  this.gridSettings_ = null;
+  this.crsAnimation_ = null;
 
   if (this.container() && this.container().getStage()) {
     var container = this.container().getStage().getDomWrapper();

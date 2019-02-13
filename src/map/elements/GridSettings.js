@@ -216,7 +216,6 @@ anychart.mapModule.elements.GridSettings.prototype.setupPalette_ = function(cls)
     goog.dispose(this.palette_);
     this.palette_ = /** @type {anychart.palettes.DistinctColors|anychart.palettes.RangeColors} */(new cls());
     this.palette_.listenSignals(this.paletteInvalidated_, this);
-    this.registerDisposable(this.palette_);
     if (doDispatch)
       this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
   }
@@ -262,7 +261,6 @@ anychart.mapModule.elements.GridSettings.prototype.vertical = function(opt_value
     this.verticalGrid_.setAutoZIndex(/** @type {number} */(zIndex));
     this.verticalGrid_.listenSignals(this.map_.onGridsSettingsSignal, this.map_);
     this.grids_.push(this.verticalGrid_);
-    this.map_.registerDisposable(this.verticalGrid_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -289,7 +287,6 @@ anychart.mapModule.elements.GridSettings.prototype.horizontal = function(opt_val
     this.horizontalGrid_.setAutoZIndex(/** @type {number} */(zIndex));
     this.horizontalGrid_.listenSignals(this.map_.onGridsSettingsSignal, this.map_);
     this.grids_.push(this.horizontalGrid_);
-    this.registerDisposable(this.horizontalGrid_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -385,12 +382,16 @@ anychart.mapModule.elements.GridSettings.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.mapModule.elements.GridSettings.prototype.disposeInternal = function() {
-  goog.disposeAll(this.verticalGrid_, this.horizontalGrid_, this.palette_);
+  goog.disposeAll(
+      this.verticalGrid_,
+      this.horizontalGrid_,
+      this.palette_);
 
-  this.map_ = null;
   this.verticalGrid_ = null;
   this.horizontalGrid_ = null;
   this.palette_ = null;
+  this.grids_.length = 0;
+  this.map_ = null;
 
   anychart.mapModule.elements.GridSettings.base(this, 'disposeInternal');
 };

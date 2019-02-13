@@ -86,6 +86,7 @@ anychart.palettes.HatchFills.prototype.items = function(opt_hatchFills, var_args
     if (!goog.isArray(opt_hatchFills)) {
       opt_hatchFills = goog.array.slice(arguments, 0);
     }
+    goog.disposeAll(this.hatchFills_);
     this.hatchFills_ = goog.array.map(opt_hatchFills, function(hatchFill) {
       return acgraph.vector.normalizeHatchFill.call(null, hatchFill);
     });

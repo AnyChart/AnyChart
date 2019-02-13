@@ -566,7 +566,6 @@ anychart.linearGaugeModule.Chart.prototype.data = function(opt_value, opt_csvSet
       else
         this.parentView_ = (this.parentViewToDispose_ = new anychart.data.Set(
             (goog.isArray(opt_value) || goog.isString(opt_value)) ? opt_value : null, opt_csvSettings)).mapAs();
-      this.registerDisposable(this.parentViewToDispose_);
       this.data_ = this.parentView_;
       this.data_.listenSignals(this.dataInvalidated_, this);
 
@@ -1389,13 +1388,26 @@ anychart.linearGaugeModule.Chart.prototype.setupByJSON = function(config, opt_de
 
 /** @inheritDoc */
 anychart.linearGaugeModule.Chart.prototype.disposeInternal = function() {
-  goog.disposeAll(this.pointers_);
-  this.pointers_ = [];
-  goog.disposeAll(this.axes_);
-  this.axes_ = null;
-  goog.disposeAll(this.scaleBars_);
-  this.scaleBars_ = null;
-  goog.disposeAll(this.palette_, this.markerPalette_, this.hatchFillPalette_);
+  goog.disposeAll(
+      this.parentViewToDispose_,
+      this.parentView_,
+      this.data_,
+      this.pointers_,
+      this.axes_,
+      this.scaleBars_,
+      this.palette_,
+      this.markerPalette_,
+      this.hatchFillPalette_);
+
+  this.parentViewToDispose_ = null;
+  this.parentView_ = null;
+  this.data_ = null;
+  this.iterator_ = null;
+
+  this.pointers_.length = 0;
+  this.axes_.length = 0;
+  this.scaleBars_.length = 0;
+
   this.palette_ = null;
   this.markerPalette_ = null;
   this.hatchFillPalette_ = null;

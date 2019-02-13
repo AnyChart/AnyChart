@@ -180,7 +180,7 @@ anychart.annotationsModule.PlotController.prototype.draw = function() {
     this.drawingOverlayRect_.listen(acgraph.events.EventType.MOUSEOVER, this.handleDrawingMouseOver_, false, this);
 
     /**
-     * @type {!acgraph.vector.Rect}
+     * @type {acgraph.vector.Rect}
      * @private
      */
     this.counterHighlighter_ = acgraph.rect(0, 0, 0, 0);
@@ -1080,10 +1080,21 @@ anychart.annotationsModule.PlotController.prototype.annotationsJson_ = function(
 
 /** @inheritDoc */
 anychart.annotationsModule.PlotController.prototype.disposeInternal = function() {
-  anychart.annotationsModule.PlotController.base(this, 'disposeInternal');
   this.controller_.deregisterPlotController(this);
-
-  goog.disposeAll(this.annotations_, this.temporaryAnnotation_);
+  goog.disposeAll(
+      this.annotations_,
+      this.temporaryAnnotation_,
+      this.drawingOverlayRect_,
+      this.annotationsLayer_,
+      this.dragger_,
+      this.counterHighlighter_);
+  this.annotations_.length = 0;
+  this.temporaryAnnotation_ = null;
+  this.drawingOverlayRect_ = null;
+  this.annotationsLayer_ = null;
+  this.dragger_ = null;
+  this.counterHighlighter_ = null;
+  anychart.annotationsModule.PlotController.base(this, 'disposeInternal');
 };
 //endregion
 

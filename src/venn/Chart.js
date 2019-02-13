@@ -1702,6 +1702,34 @@ anychart.vennModule.Chart.prototype.setupByJSON = function(config, opt_default) 
 };
 
 
+/** @inheritDoc */
+anychart.vennModule.Chart.prototype.disposeInternal = function() {
+  goog.disposeAll(
+      this.normal_,
+      this.hovered_,
+      this.selected_,
+      this.palette_,
+      this.hatchFillPalette_,
+      this.markerPalette_,
+      this.shapeManager_,
+      this.intersections_,
+      this.parentViewToDispose_,
+      this.data_);
+  this.normal_ = null;
+  this.hovered_ = null;
+  this.selected_ = null;
+  this.palette_ = null;
+  this.hatchFillPalette_ = null;
+  this.markerPalette_ = null;
+  this.shapeManager_ = null;
+  this.intersections_ = null;
+  this.parentViewToDispose_ = null;
+  delete this.data_;
+  this.iterator_ = null;
+  anychart.vennModule.Chart.base(this, 'disposeInternal');
+};
+
+
 //endregion
 
 //exports

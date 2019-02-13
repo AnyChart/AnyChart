@@ -594,7 +594,7 @@ anychart.core.ui.LabelsSettings.prototype.serialize = function() {
 anychart.core.ui.LabelsSettings.prototype.disposeInternal = function() {
   this.flatSettings_ = null;
   this.parent(null);
-  goog.disposeAll(this.background_, this.padding_);
+  goog.disposeAll(this.padding_, this.background_);
   this.padding_ = null;
   this.background_ = null;
   anychart.core.ui.LabelsSettings.base(this, 'disposeInternal');

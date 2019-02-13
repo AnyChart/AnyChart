@@ -55,7 +55,7 @@ anychart.circularGaugeModule.AxisTicks = function() {
 
   /**
    * In this class ticks are markers. Its control by MarkersFactory.
-   * @type {!anychart.core.ui.MarkersFactory}
+   * @type {anychart.core.ui.MarkersFactory}
    * @private
    */
   this.ticks_ = new anychart.core.ui.MarkersFactory();
@@ -463,6 +463,14 @@ anychart.circularGaugeModule.AxisTicks.prototype.setupByJSON = function(config, 
   this.fill(config['fill']);
   this.hatchFill(config['hatchFill']);
   this.position(config['position']);
+};
+
+
+/** @inheritDoc */
+anychart.circularGaugeModule.AxisTicks.prototype.disposeInternal = function() {
+  goog.dispose(this.ticks_);
+  this.ticks_ = null;
+  anychart.circularGaugeModule.AxisTicks.base(this, 'disposeInternal');
 };
 
 

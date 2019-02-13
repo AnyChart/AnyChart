@@ -213,7 +213,6 @@ anychart.bulletModule.Chart.prototype.axis = function(opt_value) {
   if (!this.axis_) {
     this.axis_ = new anychart.core.Axis();
     this.axis_.setParentEventTarget(this);
-    this.registerDisposable(this.axis_);
     this.axis_.listenSignals(this.onAxisSignal_, this);
     this.invalidate(
         anychart.ConsistencyState.BULLET_AXES |
@@ -275,7 +274,6 @@ anychart.bulletModule.Chart.prototype.range = function(opt_indexOrValue, opt_val
     range = new anychart.core.axisMarkers.Range();
     range.addThemes('bullet.defaultRangeMarkerSettings');
     this.ranges_[index] = range;
-    this.registerDisposable(range);
     range.listenSignals(this.onRangeSignal_, this);
     this.invalidate(anychart.ConsistencyState.BULLET_AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -308,7 +306,6 @@ anychart.bulletModule.Chart.prototype.rangePalette = function(opt_value) {
   if (!this.rangePalette_) {
     this.rangePalette_ = new anychart.palettes.DistinctColors();
     this.rangePalette_.listenSignals(this.onRangePaletteSignal_, this);
-    this.registerDisposable(this.rangePalette_);
 
     this.setupCreated('rangePalette', this.rangePalette_);
     this.rangePalette_.restoreDefaults(false);
@@ -344,7 +341,6 @@ anychart.bulletModule.Chart.prototype.markerPalette = function(opt_value) {
   if (!this.markerPalette_) {
     this.markerPalette_ = new anychart.palettes.Markers();
     this.markerPalette_.listenSignals(this.onPaletteSignal_, this);
-    this.registerDisposable(this.markerPalette_);
 
     this.setupCreated('markerPalette', this.markerPalette_);
   }
@@ -540,7 +536,6 @@ anychart.bulletModule.Chart.prototype.createMarker_ = function(iterator) {
 
   marker.suspendSignalsDispatching();
   this.markers_[index] = marker;
-  this.registerDisposable(marker);
 
   //common
   marker.scale(/** @type {anychart.scales.Base} */(this.scale()));
@@ -749,6 +744,18 @@ anychart.bulletModule.Chart.prototype.setupByJSON = function(config, opt_default
   if (goog.isArray(ranges))
     for (var i = 0; i < ranges.length; i++)
       this.range(i, ranges[i]);
+};
+
+
+/** @inheritDoc */
+anychart.bulletModule.Chart.prototype.disposeInternal = function() {
+  goog.disposeAll(this.ranges_, this.markers_, this.axis_, this.rangePalette_, this.markerPalette_);
+  this.ranges_.length = 0;
+  this.markers_.length = 0;
+  this.axis_ = null;
+  this.rangePalette_ = null;
+  this.markerPalette_ = null;
+  anychart.bulletModule.Chart.base(this, 'disposeInternal');
 };
 
 

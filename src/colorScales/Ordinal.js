@@ -422,7 +422,6 @@ anychart.colorScalesModule.Ordinal.prototype.ticksInvalidated_ = function(event)
 anychart.colorScalesModule.Ordinal.prototype.createTicks = function() {
   var ticks = new anychart.colorScalesModule.OrdinalTicks(this);
   ticks.setupCreated('ticks', ticks);
-  this.registerDisposable(ticks);
   ticks.listenSignals(this.ticksInvalidated_, this);
   return ticks;
 };
@@ -741,6 +740,14 @@ anychart.colorScalesModule.Ordinal.prototype.setupByJSON = function(config, opt_
   this.colors(config['colors']);
   this.ranges(config['ranges']);
   this.names(config['names']);
+};
+
+
+/** @inheritDoc */
+anychart.colorScalesModule.Ordinal.prototype.disposeInternal = function() {
+  goog.dispose(this.ticksObj);
+  this.ticksObj = null;
+  anychart.colorScalesModule.Ordinal.base(this, 'disposeInternal');
 };
 
 

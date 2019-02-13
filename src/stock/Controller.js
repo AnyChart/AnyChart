@@ -593,6 +593,15 @@ anychart.stockModule.Controller.prototype.updateFullScaleRange = function(scale)
 };
 
 
+/** @inheritDoc */
+anychart.stockModule.Controller.prototype.disposeInternal = function() {
+  goog.disposeAll(this.grouping_, this.scrollerGrouping_);
+  this.grouping_ = null;
+  this.scrollerGrouping_ = null;
+  anychart.stockModule.Controller.base(this, 'disposeInternal');
+};
+
+
 //region Key to index and index to key methods
 //----------------------------------------------------------------------------------------------------------------------
 //

@@ -231,7 +231,6 @@ anychart.circularGaugeModule.Axis.prototype.minorLabels = function(opt_value) {
     this.minorLabels_ = new anychart.core.ui.CircularLabelsFactory();
     this.minorLabels_.setParentEventTarget(this);
     this.minorLabels_.listenSignals(this.labelsInvalidated_, this);
-    this.registerDisposable(this.minorLabels_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -253,7 +252,6 @@ anychart.circularGaugeModule.Axis.prototype.labels = function(opt_value) {
     this.labels_ = new anychart.core.ui.CircularLabelsFactory();
     this.labels_.setParentEventTarget(this);
     this.labels_.listenSignals(this.labelsInvalidated_, this);
-    this.registerDisposable(this.labels_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -319,7 +317,6 @@ anychart.circularGaugeModule.Axis.prototype.minorTicks = function(opt_value) {
     this.minorTicks_.setParentEventTarget(this);
     this.minorTicks_.setAxis(this);
     this.minorTicks_.listenSignals(this.ticksInvalidated_, this);
-    this.registerDisposable(this.minorTicks_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -340,7 +337,6 @@ anychart.circularGaugeModule.Axis.prototype.ticks = function(opt_value) {
     this.ticks_.setParentEventTarget(this);
     this.ticks_.setAxis(this);
     this.ticks_.listenSignals(this.ticksInvalidated_, this);
-    this.registerDisposable(this.ticks_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -1023,7 +1019,6 @@ anychart.circularGaugeModule.Axis.prototype.draw = function() {
   if (!this.line_) {
     this.line_ = acgraph.path();
     this.bindHandlersToGraphics(this.line_);
-    this.registerDisposable(this.line_);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
@@ -1298,6 +1293,18 @@ anychart.circularGaugeModule.Axis.prototype.setupByJSON = function(config, opt_d
 
   this.drawFirstLabel(config['drawFirstLabel']);
   this.drawLastLabel(config['drawLastLabel']);
+};
+
+
+/** @inheritDoc */
+anychart.circularGaugeModule.Axis.prototype.disposeInternal = function() {
+  goog.disposeAll(this.labels_, this.minorLabels_, this.ticks_, this.minorTicks_, this.line_);
+  this.minorLabels_ = null;
+  this.labels_ = null;
+  this.ticks_ = null;
+  this.minorTicks_ = null;
+  this.line_ = null;
+  anychart.circularGaugeModule.Axis.base(this, 'disposeInternal');
 };
 
 

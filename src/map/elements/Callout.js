@@ -1216,12 +1216,16 @@ anychart.mapModule.elements.Callout.prototype.setupByJSON = function(config, opt
 
 /** @inheritDoc */
 anychart.mapModule.elements.Callout.prototype.disposeInternal = function() {
-  goog.disposeAll(this.title_, this.padding_, this.margin_, this.background_);
+  goog.disposeAll(
+      this.padding_,
+      this.margin_,
+      this.background_,
+      this.title_);
 
-  this.title_ = null;
   this.padding_ = null;
   this.margin_ = null;
   this.background_ = null;
+  this.title_ = null;
   this.paddingBounds = null;
 
   anychart.mapModule.elements.Callout.base(this, 'disposeInternal');

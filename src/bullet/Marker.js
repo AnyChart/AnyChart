@@ -396,7 +396,6 @@ anychart.bulletModule.Marker.prototype.draw = function() {
 
   if (!this.path_) {
     this.path_ = acgraph.path();
-    this.registerDisposable(this.path_);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
@@ -445,6 +444,14 @@ anychart.bulletModule.Marker.prototype.draw = function() {
 anychart.bulletModule.Marker.prototype.remove = function() {
   if (this.path_)
     this.path_.parent(null);
+};
+
+
+/** @inheritDoc */
+anychart.bulletModule.Marker.prototype.disposeInternal = function() {
+  goog.dispose(this.path_);
+  this.path_ = null;
+  anychart.bulletModule.Marker.base(this, 'disposeInternal');
 };
 
 

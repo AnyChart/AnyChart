@@ -278,14 +278,15 @@ anychart.surfaceModule.Chart.prototype.data = function(opt_value, opt_csvSetting
       if (this.data_)
         this.data_.unlistenSignals(this.dataInvalidated_, this);
       goog.dispose(this.data_);
+      goog.dispose(this.parentViewToDispose_);
 
       if (anychart.utils.instanceOf(opt_value, anychart.data.View))
         this.data_ = (/** @type {anychart.data.View} */ (opt_value)).derive();
       else if (anychart.utils.instanceOf(opt_value, anychart.data.Set))
         this.data_ = (/** @type {anychart.data.Set} */ (opt_value)).mapAs();
       else
-        this.data_ = new anychart.data.Set(
-            (goog.isArray(opt_value) || goog.isString(opt_value)) ? opt_value : null, opt_csvSettings).mapAs();
+        this.data_ = (this.parentViewToDispose_ = new anychart.data.Set(
+            (goog.isArray(opt_value) || goog.isString(opt_value)) ? opt_value : null, opt_csvSettings)).mapAs();
       this.data_.listenSignals(this.dataInvalidated_, this);
       this.invalidate(anychart.ConsistencyState.SURFACE_DATA |
               anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
@@ -1452,14 +1453,29 @@ anychart.surfaceModule.Chart.prototype.setupByJSON = function(config, opt_defaul
 
 /** @inheritDoc */
 anychart.surfaceModule.Chart.prototype.disposeInternal = function() {
-  goog.disposeAll(this.xAxis_, this.yAxis_, this.zAxis_, this.paths_, this.xGrid_, this.yGrid_, this.zGrid_,
-      this.boxPaths_, this.surfaceLayer_, this.rootLayer_, this.colorRange_, this.palette_);
+  goog.disposeAll(
+      this.xAxis_,
+      this.yAxis_,
+      this.zAxis_,
+      this.paths_,
+      this.xGrid_,
+      this.yGrid_,
+      this.zGrid_,
+      this.boxPaths_,
+      this.surfaceLayer_,
+      this.rootLayer_,
+      this.colorRange_,
+      this.palette_,
+      this.data_,
+      this.parentViewToDispose_);
   this.boxPaths_.length = 0;
   this.paths_.length = 0;
   this.surfaceLayer_ = null;
   this.rootLayer_ = null;
   this.colorRange_ = null;
   this.palette_ = null;
+  this.data_ = null;
+  this.parentViewToDispose_ = null;
   this.xAxis_ = null;
   this.yAxis_ = null;
   this.zAxis_ = null;

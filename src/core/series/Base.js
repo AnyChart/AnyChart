@@ -1238,7 +1238,6 @@ anychart.core.series.Base.prototype.axesLinesSpace = function(opt_spaceOrTopOrTo
   if (!this.axesLinesSpace_) {
     this.axesLinesSpace_ = new anychart.core.utils.Padding();
     this.axesLinesSpace_.set(0);
-    this.registerDisposable(this.axesLinesSpace_);
   }
 
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
@@ -3053,7 +3052,6 @@ anychart.core.series.Base.prototype.remove = function() {
 anychart.core.series.Base.prototype.a11y = function(opt_enabledOrJson) {
   if (!this.a11y_) {
     this.a11y_ = new anychart.core.utils.SeriesA11y(this);
-    this.registerDisposable(this.a11y_);
     this.a11y_.listenSignals(this.onA11ySignal_, this);
     if (anychart.utils.instanceOf(this.chart, anychart.core.Chart)) {
       this.a11y_.parentA11y(/** @type {anychart.core.utils.A11y} */ (/** @type {anychart.core.Chart} */ (this.chart).a11y()));
@@ -4731,23 +4729,30 @@ anychart.core.series.Base.prototype.disposeInternal = function() {
       this.tooltipInternal,
       this.legendItem_,
       this.error_,
-      this.renderingSettings_
+      this.renderingSettings_,
+      this.axesLinesSpace_,
+      this.a11y_
   );
+  this.normal_ = null;
+  this.hovered_ = null;
+  this.selected_ = null;
+  this.drawer_ = null;
   this.rootLayer = null;
   this.errorPaths_ = null;
   this.yScale_ = null;
+  this.axesLinesSpace_ = null;
+  this.a11y_ = null;
+  this.error_ = null;
+  this.renderingSettings_ = null;
+  this.legendItem_ = null;
+  this.tooltipInternal = null;
+  delete this.shapeManager;
   delete this.chart;
   delete this.plot;
   delete this.iterator;
   delete this.themeSettings;
   delete this.autoSettings;
   delete this.ownSettings;
-  delete this.shapeManager;
-  delete this.drawer;
-  delete this.tooltipInternal;
-  delete this.legendItem_;
-  delete this.error_;
-  delete this.renderingSettings_;
   anychart.core.series.Base.base(this, 'disposeInternal');
 };
 

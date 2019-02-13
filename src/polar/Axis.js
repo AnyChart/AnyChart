@@ -557,6 +557,8 @@ anychart.polarModule.Axis.prototype.calculateAxisBounds_ = function() {
                     bounds.getBottom() - parentBounds.getBottom(),
                     0);
               }
+              goog.dispose(padding);
+              padding = null;
 
               var deltaChanged = radiusDelta > prevRadiusDelta;
               if (deltaChanged) {
@@ -1040,6 +1042,8 @@ anychart.polarModule.Axis.prototype.calcLabelTextPath = function(label, index, t
     startAngle = angle - da;
     endAngle = angle + da;
   }
+  goog.dispose(padding);
+  padding = null;
 
   if (angle > 0 && angle < 180) {
     var tmpA = startAngle;
@@ -1051,7 +1055,15 @@ anychart.polarModule.Axis.prototype.calcLabelTextPath = function(label, index, t
   var dx = anychart.math.angleDx(startAngleRad, radius, this.cx_);
   var dy = anychart.math.angleDy(startAngleRad, radius, this.cy_);
 
-  var path = label.getTextElement().path() ? label.getTextElement().path().clear() : acgraph.path();
+  var path = /** @type {acgraph.vector.Path} */ (label.getTextElement().path());
+  if (path) {
+    path.clear();
+  } else {
+    path = acgraph.path();
+    // since this anonymous path not managed anywhere
+    // by axis, we register it to dispose with axis
+    this.registerDisposable(path);
+  }
   path
       .moveTo(dx, dy)
       .arcToAsCurves(radius, radius, startAngle, endAngle - startAngle);
@@ -1322,8 +1334,13 @@ anychart.polarModule.Axis.prototype.setupByJSON = function(config, opt_default) 
 
 /** @inheritDoc */
 anychart.polarModule.Axis.prototype.disposeInternal = function() {
-  goog.disposeAll(this.minorLabels_, this.labels_, this.minorTicks_, this.ticks_,
-    this.line_, this.bg_);
+  goog.disposeAll(
+      this.minorLabels_,
+      this.labels_,
+      this.minorTicks_,
+      this.ticks_,
+      this.line_,
+      this.bg_);
 
   delete this.scale_;
   this.minorLabels_ = null;

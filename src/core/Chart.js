@@ -407,8 +407,6 @@ anychart.core.Chart.prototype.margin = function(opt_spaceOrTopOrTopAndBottom, op
   if (!this.margin_) {
     this.margin_ = new anychart.core.utils.Margin();
     this.margin_.listenSignals(this.marginInvalidated_, this);
-    this.registerDisposable(this.margin_);
-
     this.setupCreated('margin', this.margin_);
   }
 
@@ -454,8 +452,6 @@ anychart.core.Chart.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, o
   if (!this.padding_) {
     this.padding_ = new anychart.core.utils.Padding();
     this.padding_.listenSignals(this.paddingInvalidated_, this);
-    this.registerDisposable(this.padding_);
-
     this.setupCreated('padding', this.padding_);
   }
 
@@ -540,8 +536,6 @@ anychart.core.Chart.prototype.title = function(opt_value) {
     this.title_ = new anychart.core.ui.Title();
     this.title_.setParentEventTarget(this);
     this.title_.listenSignals(this.onTitleSignal, this);
-    this.registerDisposable(this.title_);
-
     this.setupCreated('title', this.title_);
   }
 
@@ -604,7 +598,6 @@ anychart.core.Chart.prototype.label = function(opt_indexOrValue, opt_value) {
     label.addThemes('defaultFontSettings', 'defaultLabelSettings');
 
     this.chartLabels_[index] = label;
-    this.registerDisposable(label);
     label.listenSignals(this.onLabelSignal_, this);
     this.invalidate(anychart.ConsistencyState.CHART_LABELS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -807,7 +800,6 @@ anychart.core.Chart.prototype.tooltip = function(opt_value) {
  */
 anychart.core.Chart.prototype.createTooltip = function() {
   var tooltip = new anychart.core.ui.Tooltip(anychart.core.ui.Tooltip.Capabilities.ANY);
-  this.registerDisposable(tooltip);
   tooltip.chart(this);
   tooltip.containerProvider(this);
 
@@ -972,7 +964,6 @@ anychart.core.Chart.prototype.contextMenu = function(opt_value) {
     // suppress NO_FEATURE_IN_MODULE warning
     this.contextMenu_ = anychart.window['anychart']['ui']['contextMenu'](!!goog.isObject(opt_value) && opt_value['fromTheme']);
     if (this.contextMenu_) {
-      this.registerDisposable(this.contextMenu_);
       this.contextMenu_['itemsProvider'](this.contextMenuItemsProvider);
     }
   }
@@ -1332,7 +1323,6 @@ anychart.core.Chart.contextMenuMap = {
 anychart.core.Chart.prototype.credits = function(opt_value) {
   if (!this.credits_) {
     this.credits_ = new anychart.core.ui.ChartCredits(this);
-    this.registerDisposable(this.credits_);
     this.credits_.listenSignals(this.onCreditsSignal_, this);
     this.setupCreated('credits', this.credits_);
   }
@@ -1440,7 +1430,6 @@ anychart.core.Chart.prototype.createA11yContextProvider = function() {
 anychart.core.Chart.prototype.a11y = function(opt_enabledOrJson) {
   if (!this.a11y_) {
     this.a11y_ = new anychart.core.utils.ChartA11y(this);
-    this.registerDisposable(this.a11y_);
     this.a11y_.listenSignals(this.onA11ySignal_, this);
     this.setupCreated('a11y', this.a11y_);
   }
@@ -1586,7 +1575,6 @@ anychart.core.Chart.prototype.drawInternal = function() {
   if (!this.rootElement) {
     this.rootElement = acgraph.layer();
     this.bindHandlersToGraphics(this.rootElement);
-    this.registerDisposable(this.rootElement);
   }
 
   //suspend stage
@@ -2089,13 +2077,36 @@ anychart.core.Chart.prototype.setupStateSettings = goog.nullFunction();
 
 /** @inheritDoc */
 anychart.core.Chart.prototype.disposeInternal = function() {
-  goog.disposeAll(this.animation_, this.a11y_, this.tooltip_, this.noDataSettings_, this.interactivity_, this.background_);
+  goog.disposeAll(
+      this.animation_,
+      this.a11y_,
+      this.tooltip_,
+      this.noDataSettings_,
+      this.interactivity_,
+      this.background_,
+      this.tooltip_,
+      this.margin_,
+      this.padding_,
+      this.title_,
+      this.chartLabels_,
+      this.contextMenu_,
+      this.credits_,
+      this.rootElement);
+
   this.animation_ = null;
   this.a11y_ = null;
   this.tooltip_ = null;
   this.noDataSettings_ = null;
   this.interactivity_ = null;
   this.background_ = null;
+  this.tooltip_ = null;
+  this.margin_ = null;
+  this.padding_ = null;
+  this.title_ = null;
+  this.chartLabels_.length = 0;
+  this.contextMenu_ = null;
+  this.credits_ = null;
+  this.rootElement = null;
 
   anychart.core.Chart.base(this, 'disposeInternal');
 

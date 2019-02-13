@@ -665,8 +665,6 @@ anychart.core.ChartWithSeries.prototype.markerPalette = function(opt_value) {
   if (!this.markerPalette_) {
     this.markerPalette_ = new anychart.palettes.Markers();
     this.markerPalette_.listenSignals(this.markerPaletteInvalidated_, this);
-    this.registerDisposable(this.markerPalette_);
-
     this.setupCreated('markerPalette', this.markerPalette_);
   }
 
@@ -690,8 +688,6 @@ anychart.core.ChartWithSeries.prototype.hatchFillPalette = function(opt_value) {
   if (!this.hatchFillPalette_) {
     this.hatchFillPalette_ = new anychart.palettes.HatchFills();
     this.hatchFillPalette_.listenSignals(this.hatchFillPaletteInvalidated_, this);
-    this.registerDisposable(this.hatchFillPalette_);
-
     this.setupCreated('hatchFillPalette', this.hatchFillPalette_);
   }
 
@@ -957,9 +953,15 @@ anychart.core.ChartWithSeries.prototype.data = function(opt_value) {
     } else this.rawData_ = opt_value;
 
     /** @type {anychart.data.Set} */
-    var dataSet = anychart.utils.instanceOf(opt_value, anychart.data.Set) ?
-        /** @type {anychart.data.Set} */(opt_value) :
-        anychart.data.set(this.rawData_);
+    var dataSet;
+    if (anychart.utils.instanceOf(opt_value, anychart.data.Set))
+      dataSet = /** @type {anychart.data.Set} */(opt_value);
+    else {
+      dataSet = anychart.data.set(this.rawData_);
+      // we creating anonymous dataSet to create mapping for series.
+      // We shouldn't forget to dispose it on chart's disposing.
+      this.registerDisposable(dataSet);
+    }
 
     // define cols count
     var firstRow = dataSet.row(0);
@@ -1393,10 +1395,24 @@ anychart.core.ChartWithSeries.prototype.disposeInternal = function() {
   this.removeAllSeries();
   this.resumeSignalsDispatching(false);
 
-  goog.disposeAll(this.palette_, this.markerPalette_, this.hatchFillPalette_, this.dataArea_, this.defaultSeriesSettings_);
-  this.palette_ = this.markerPalette_ = this.hatchFillPalette_ = this.dataArea_ = this.defaultSeriesSettings_ = null;
+  goog.disposeAll(
+      this.palette_,
+      this.markerPalette_,
+      this.hatchFillPalette_,
+      this.dataArea_,
+      this.defaultSeriesSettings_,
+      this.normal_,
+      this.hovered_,
+      this.selected_);
 
-  goog.disposeAll(this.normal_, this.hovered_, this.selected_);
+  this.palette_ = null;
+  this.markerPalette_ = null;
+  this.hatchFillPalette_ = null;
+  this.dataArea_ = null;
+  this.defaultSeriesSettings_ = null;
+  this.normal_ = null;
+  this.hovered_ = null;
+  this.selected_ = null;
 
   anychart.core.ChartWithSeries.base(this, 'disposeInternal');
 };

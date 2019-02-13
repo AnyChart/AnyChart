@@ -261,7 +261,6 @@ anychart.sparklineModule.series.Base.prototype.startDrawing = function() {
 
   if (!this.rootLayer) {
     this.rootLayer = acgraph.layer();
-    this.registerDisposable(this.rootLayer);
   }
 
   this.checkDrawingNeeded();
@@ -500,5 +499,13 @@ anychart.sparklineModule.series.Base.prototype.getDefaults = function() {
     },
     'color': '#4682B4'
   };
+};
+
+
+/** @inheritDoc */
+anychart.sparklineModule.series.Base.prototype.disposeInternal = function() {
+  goog.dispose(this.rootLayer);
+  this.rootLayer = null;
+  anychart.sparklineModule.series.Base.base(this, 'disposeInternal');
 };
 

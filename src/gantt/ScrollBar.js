@@ -880,7 +880,6 @@ anychart.ganttModule.ScrollBar.prototype.getBase_ = function() {
   if (!this.base_) {
     this.base_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
     this.bindHandlersToGraphics(this.base_, this.baseMouseOverHandler_, this.baseMouseOutHandler_, this.baseClickHandler_);
-    this.registerDisposable(this.base_);
   }
   return this.base_;
 };
@@ -959,8 +958,6 @@ anychart.ganttModule.ScrollBar.prototype.getBg_ = function() {
   if (!this.bg_) {
     this.bg_ = /** @type {acgraph.vector.Rect} */ (acgraph.rect());
     //acgraph.events.listen(this.bg_, acgraph.events.EventType.CLICK, this.bgClickHandler_, false, this);
-
-    this.registerDisposable(this.bg_);
   }
   return this.bg_;
 };
@@ -988,8 +985,6 @@ anychart.ganttModule.ScrollBar.prototype.getForwardButton_ = function() {
         ths.scroll(anychart.ganttModule.ScrollBar.SCROLL_RATIO_STEP, 'user_action');
       }
     });
-
-    this.registerDisposable(this.forwardButton_);
   }
   return this.forwardButton_;
 };
@@ -1017,8 +1012,6 @@ anychart.ganttModule.ScrollBar.prototype.getBackwardButton_ = function() {
         ths.scroll(-anychart.ganttModule.ScrollBar.SCROLL_RATIO_STEP, 'user_action');
       }
     });
-
-    this.registerDisposable(this.backwardButton_);
   }
   return this.backwardButton_;
 };
@@ -1038,8 +1031,6 @@ anychart.ganttModule.ScrollBar.prototype.getSlider_ = function() {
     acgraph.events.listen(this.slider_, acgraph.events.EventType.DRAG, this.dragHandler_, false, this);
     acgraph.events.listen(this.slider_, acgraph.events.EventType.DRAG_END, this.dragEndHandler_, false, this);
     this.bindHandlersToGraphics(this.slider_, this.baseMouseOverHandler_, this.baseMouseOutHandler_, null, null, null, this.sliderMouseUpHandler_);
-
-    this.registerDisposable(this.slider_);
   }
   return this.slider_;
 };
@@ -1555,6 +1546,25 @@ anychart.ganttModule.ScrollBar.prototype.setupByJSON = function(config, opt_defa
   this.barSize(config['barSize']);
   this.cornersRadius(config['cornersRadius']);
 };
+
+
+/** @inheritDoc */
+anychart.ganttModule.ScrollBar.prototype.disposeInternal = function() {
+  goog.disposeAll(
+      this.bg_,
+      this.forwardButton_,
+      this.backwardButton_,
+      this.slider_,
+      this.base_);
+  this.bg_ = null;
+  this.forwardButton_ = null;
+  this.backwardButton_ = null;
+  this.slider_ = null;
+  this.base_ = null;
+  anychart.ganttModule.ScrollBar.base(this, 'disposeInternal');
+};
+
+
 //endregion
 
 

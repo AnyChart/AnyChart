@@ -330,7 +330,6 @@ anychart.circularGaugeModule.Chart.prototype.data = function(opt_value, opt_csvS
       else
         this.parentView_ = (this.parentViewToDispose_ = new anychart.data.Set(
             (goog.isArray(opt_value) || goog.isString(opt_value)) ? opt_value : null, opt_csvSettings)).mapAs();
-      this.registerDisposable(this.parentViewToDispose_);
       this.data_ = this.parentView_;
       this.data_.listenSignals(this.dataInvalidated_, this);
 
@@ -409,7 +408,6 @@ anychart.circularGaugeModule.Chart.prototype.cap = function(opt_value) {
   if (!this.cap_) {
     this.cap_ = new anychart.circularGaugeModule.Cap();
     this.cap_.gauge(this);
-    this.registerDisposable(this.cap_);
     this.cap_.listenSignals(this.onCapSignal_, this);
     this.invalidate(anychart.ConsistencyState.GAUGE_CAP, anychart.Signal.NEEDS_REDRAW);
   }
@@ -468,7 +466,6 @@ anychart.circularGaugeModule.Chart.prototype.range = function(opt_indexOrValue, 
     circularRange.gauge(this);
     circularRange.axisIndex(0);
     circularRange.setup(this.defaultRangeSettings());
-    this.registerDisposable(circularRange);
     circularRange.listenSignals(this.onCircularRangeSignal_, this);
     this.invalidate(anychart.ConsistencyState.GAUGE_POINTERS |
         anychart.ConsistencyState.GAUGE_SCALE,
@@ -961,7 +958,6 @@ anychart.circularGaugeModule.Chart.prototype.axis = function(opt_indexOrValue, o
     axis.setup(this.defaultAxisSettings());
     axis.gauge(this);
     this.axes_[index] = axis;
-    this.registerDisposable(axis);
     axis.listenSignals(this.onAxisSignal_, this);
     this.invalidate(anychart.ConsistencyState.GAUGE_AXES | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -1618,6 +1614,36 @@ anychart.circularGaugeModule.Chart.prototype.serialize = function() {
 
 
   return {'gauge': json};
+};
+
+
+/** @inheritDoc */
+anychart.circularGaugeModule.Chart.prototype.disposeInternal = function() {
+  goog.disposeAll(
+      this.parentViewToDispose_,
+      this.parentView_,
+      this.data_,
+      this.cap_,
+      this.ranges_,
+      this.axes_,
+      this.bars_,
+      this.markers_,
+      this.needles_,
+      this.knobs_,
+      this.pointers_);
+  this.parentViewToDispose_ = null;
+  this.parentView_ = null;
+  this.data_ = null;
+  this.iterator_ = null;
+  this.cap_ = null;
+  this.ranges_.length = 0;
+  this.axes_.length = 0;
+  this.bars_.length = 0;
+  this.markers_.length = 0;
+  this.needles_.length = 0;
+  this.knobs_.length = 0;
+  this.pointers_.length = 0;
+  anychart.circularGaugeModule.Chart.base(this, 'disposeInternal');
 };
 
 

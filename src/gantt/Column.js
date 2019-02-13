@@ -1190,8 +1190,24 @@ anychart.ganttModule.Column.prototype.setupByJSON = function(json, opt_default) 
 
 /** @inheritDoc */
 anychart.ganttModule.Column.prototype.disposeInternal = function() {
+  goog.disposeAll(
+      this.labelsSettings_,
+      this.overriddenLabels_,
+      this.title_,
+      this.titlePath_,
+      this.titleLayer_,
+      this.cellsLayer_,
+      this.base_,
+      this.buttons_);
+  this.labelsSettings_ = null;
+  this.overriddenLabels_.length = 0;
+  this.title_ = null;
+  this.titlePath_ = null;
+  this.titleLayer_ = null;
+  this.cellsLayer_ = null;
+  this.base_ = null;
+  this.buttons_.length = 0;
   anychart.ganttModule.Column.base(this, 'disposeInternal');
-  goog.disposeAll(this.labelsSettings_, this.overriddenLabels_, this.title_, this.titlePath_, this.titleLayer_, this.cellsLayer_, this.base_);
 };
 
 

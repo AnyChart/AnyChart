@@ -2787,6 +2787,7 @@ anychart.ganttModule.BaseGrid.prototype.disposeInternal = function() {
   this.textMarkersLayer_ = null;
   this.cellsLayer_ = null;
   this.base_ = null;
+  this.edit_ = null;
   anychart.ganttModule.BaseGrid.base(this, 'disposeInternal');
 };
 

@@ -888,15 +888,33 @@ anychart.core.ui.NewButton.prototype.setupByJSON = function(config, opt_default)
 };
 
 
+/**
+ * Dispose settings created by createStateSettings().
+ */
+anychart.core.ui.NewButton.prototype.disposeStateSettings = function() {
+  goog.disposeAll(this.normal_, this.hovered_, this.selected_);
+  this.normal_ = null;
+  this.hovered_ = null;
+  this.selected_ = null;
+};
+
+
 /** @inheritDoc */
 anychart.core.ui.NewButton.prototype.disposeInternal = function() {
   goog.disposeAll(
       this.hoverRect_,
       this.textElement_,
+      this.element_,
       this.background_,
       this.rootLayer,
-      this.padding_
-  );
+      this.padding_);
+  this.hoverRect_ = null;
+  this.textElement_ = null;
+  this.element_ = null;
+  this.background_ = null;
+  this.rootLayer = null;
+  this.padding_ = null;
+  this.disposeStateSettings();
   anychart.core.ui.NewButton.base(this, 'disposeInternal');
 };
 

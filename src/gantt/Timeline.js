@@ -5427,6 +5427,7 @@ anychart.ganttModule.TimeLine.prototype.disposeInternal = function() {
       this.groupingTasks_,
       this.milestones_,
       this.baselines_,
+      this.connectors_,
 
       this.scale_,
       this.header_,
@@ -5445,9 +5446,14 @@ anychart.ganttModule.TimeLine.prototype.disposeInternal = function() {
       this.editLeftThumbDragger_,
       this.editRightThumbDragger_,
       this.editStartConnectorDragger_,
-      this.editFinishConnectorDragger_
-  );
+      this.editFinishConnectorDragger_,
 
+      this.labelsFactory_,
+      this.markersFactory_);
+
+  this.labelsFactory_ = null;
+  this.markersFactory_ = null;
+  this.connectors_ = null;
   this.lineMarkers_.length = 0;
   this.rangeMarkers_.length = 0;
   this.textMarkers_.length = 0;

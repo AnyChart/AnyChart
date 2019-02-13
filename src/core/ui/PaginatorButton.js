@@ -61,7 +61,6 @@ anychart.core.ui.PaginatorButton.prototype.drawBackground = function(fill, strok
     this.backgroundPath = acgraph.path();
     this.bindHandlersToGraphics(this.backgroundPath, this.handleMouseOver, this.handleMouseOut, null, null,
         this.handleMouseDown, this.handleMouseUp);
-    this.registerDisposable(this.backgroundPath);
   }
 
   this.backgroundPath.clear();
@@ -75,4 +74,12 @@ anychart.core.ui.PaginatorButton.prototype.drawBackground = function(fill, strok
 /** @inheritDoc */
 anychart.core.ui.PaginatorButton.prototype.initStateSettings = function() {
   this.stateSettings_ = this.themeSettings;
+};
+
+
+/** @inheritDoc */
+anychart.core.ui.PaginatorButton.prototype.disposeInternal = function() {
+  goog.dispose(this.backgroundPath);
+  this.backgroundPath = null;
+  anychart.core.ui.PaginatorButton.base(this, 'disposeInternal');
 };

@@ -2462,33 +2462,36 @@ anychart.core.Axis.prototype.setupByJSON = function(config, opt_default) {
 
 /** @inheritDoc */
 anychart.core.Axis.prototype.disposeInternal = function() {
-  anychart.core.Axis.base(this, 'disposeInternal');
-
+  // since we can't be sure that this instance isn't created by user
+  // (e.g. standalone scale) - disposing is not an option. We just
+  // unlisten signals and null it.
   if (this.internalScale)
     this.internalScale.unlistenSignals(this.scaleInvalidated, this);
-  delete this.internalScale;
-  this.labelsBounds_ = null;
-  this.minorLabelsBounds_ = null;
+  this.internalScale = null;
 
   goog.disposeAll(
       this.title_,
+      this.padding_,
+      this.line,
       this.labels_,
       this.minorLabels_,
       this.ticks_,
-      this.minorTicks_,
-      this.padding_,
-      this.line
-  );
+      this.minorTicks_);
 
   this.title_ = null;
+  this.padding_ = null;
+
+  this.line = null;
   this.labels_ = null;
   this.minorLabels_ = null;
   this.ticks_ = null;
   this.minorTicks_ = null;
-  this.padding_ = null;
 
-  this.line = null;
+  this.labelsBounds_.length = 0;
+  this.minorLabelsBounds_.length = 0;
   this.pixelBounds = null;
+
+  anychart.core.Axis.base(this, 'disposeInternal');
 };
 
 

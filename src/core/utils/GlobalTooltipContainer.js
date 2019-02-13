@@ -16,10 +16,8 @@ anychart.core.utils.GlobalTooltipContainer = function() {
   anychart.core.utils.GlobalTooltipContainer.base(this, 'constructor');
 
   this.vsm_ = new goog.dom.ViewportSizeMonitor();
-  this.registerDisposable(this.vsm_);
 
   this.bufferedVsm_ = new goog.dom.BufferedViewportSizeMonitor(this.vsm_);
-  this.registerDisposable(this.bufferedVsm_);
 
   goog.events.listen(this.bufferedVsm_, goog.events.EventType.RESIZE, this.updateStageSize, false, this);
 };
@@ -137,4 +135,13 @@ anychart.core.utils.GlobalTooltipContainer.prototype.updateStageSize = function(
  */
 anychart.core.utils.GlobalTooltipContainer.prototype.isLocal = function() {
   return false;
+};
+
+
+/** @inheritDoc */
+anychart.core.utils.GlobalTooltipContainer.prototype.disposeInternal = function() {
+  goog.disposeAll(this.vsm_, this.bufferedVsm_);
+  this.vsm_ = null;
+  this.bufferedVsm_ = null;
+  anychart.core.utils.GlobalTooltipContainer.base(this, 'disposeInternal');
 };

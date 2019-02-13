@@ -976,17 +976,17 @@ anychart.radarModule.Axis.prototype.setupByJSON = function(config, opt_default) 
 
 /** @inheritDoc */
 anychart.radarModule.Axis.prototype.disposeInternal = function() {
- delete this.scale_;
- this.labelsBounds_ = null;
+  delete this.scale_;
+  this.labelsBounds_.length = 0;
 
- goog.disposeAll(this.line_, this.ticks_, this.labels_);
+  goog.disposeAll(this.line_, this.ticks_, this.labels_, this.pixelBounds_);
 
- this.line_ = null;
- this.ticks_ = null;
- this.pixelBounds_ = null;
- this.labels_ = null;
+  this.line_ = null;
+  this.ticks_ = null;
+  this.pixelBounds_ = null;
+  this.labels_ = null;
 
- anychart.radarModule.Axis.base(this, 'disposeInternal');
+  anychart.radarModule.Axis.base(this, 'disposeInternal');
 };
 
 

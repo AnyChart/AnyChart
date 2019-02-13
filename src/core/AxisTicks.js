@@ -31,17 +31,17 @@ anychart.core.AxisTicks = function() {
 
   /**
    * Path with ticks.
-   * @type {!acgraph.vector.Path}
+   * @type {acgraph.vector.Path}
    * @protected
    */
   this.path = acgraph.path();
   this.bindHandlersToGraphics(this.path);
-  this.registerDisposable(this.path);
 };
 goog.inherits(anychart.core.AxisTicks, anychart.core.VisualBase);
 
 
 //region --- States and Signals
+
 
 /**
  * Supported consistency states.
@@ -326,6 +326,14 @@ anychart.core.AxisTicks.prototype.serialize = function() {
 anychart.core.AxisTicks.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.AxisTicks.base(this, 'setupByJSON', config, opt_default);
   anychart.core.settings.deserialize(this, this.SIMPLE_PROPS_DESCRIPTORS, config, opt_default);
+};
+
+
+/** @inheritDoc */
+anychart.core.AxisTicks.prototype.disposeInternal = function() {
+  goog.dispose(this.path);
+  this.path = null;
+  anychart.core.AxisTicks.base(this, 'disposeInternal');
 };
 
 

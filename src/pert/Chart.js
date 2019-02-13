@@ -493,7 +493,6 @@ anychart.pertModule.Chart.prototype.createFormatProvider = function(opt_force, o
 /** @inheritDoc */
 anychart.pertModule.Chart.prototype.createTooltip = function() {
   var tooltip = new anychart.core.ui.Tooltip(0);
-  this.registerDisposable(tooltip);
   tooltip.chart(this);
   tooltip.listenSignals(this.onTooltipSignal_, this);
   return tooltip;
@@ -2508,7 +2507,6 @@ anychart.pertModule.Chart.prototype.drawContent = function(bounds) {
 
   if (!this.baseLayer_) { //Dom init.
     this.baseLayer_ = this.rootElement.layer();
-    this.registerDisposable(this.baseLayer_);
 
     this.activitiesLayer_ = new anychart.core.utils.TypedLayer(function() {
       return acgraph.path();
@@ -2951,7 +2949,14 @@ anychart.pertModule.Chart.prototype.disposeInternal = function() {
 
   goog.disposeAll(this.milestones(), this.tasks(), this.criticalPath());
   goog.disposeAll(this.workPathInteractivityLayer_, this.workLablesInteractivityLayer_,
-      this.milestonesLayer_, this.activitiesLayer_, this.labelsLayer_);
+      this.milestonesLayer_, this.activitiesLayer_, this.labelsLayer_, this.baseLayer_);
+
+  this.workPathInteractivityLayer_ = null;
+  this.workLablesInteractivityLayer_ = null;
+  this.milestonesLayer_ = null;
+  this.activitiesLayer_ = null;
+  this.labelsLayer_ = null;
+  this.baseLayer_ = null;
 
   anychart.pertModule.Chart.base(this, 'disposeInternal');
 };
