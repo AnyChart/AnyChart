@@ -1069,6 +1069,14 @@ anychart.ganttModule.Controller.prototype.run = function() {
 
   anychart.measuriator.measure();
 
+  var stage = null;
+  if (this.dataGrid_ && this.dataGrid_.container())
+    stage = this.dataGrid_.container().getStage();
+  if (!stage && this.timeline_ && this.timeline_.container())
+    stage = this.timeline_.container().getStage();
+  if (stage)
+    stage.suspend();
+
   //This must be called anyway. Clears consistency states of data grid not related to controller.
   if (this.dataGrid_)
     this.dataGrid_.drawInternal(this.positionRecalculated_);
@@ -1106,6 +1114,9 @@ anychart.ganttModule.Controller.prototype.run = function() {
         .handlePositionChange(true)
         .resumeSignalsDispatching(false);
   }
+
+  if (stage)
+    stage.resume();
 
   this.positionRecalculated_ = false;
   return this;

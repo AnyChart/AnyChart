@@ -708,7 +708,11 @@ anychart.ganttModule.Chart.prototype.splitter = function(opt_value) {
     this.splitter_.listen(anychart.enums.EventType.SPLITTER_CHANGE, function() {
       //This also stores current position for case if dg is being disabled.
       //Here we don't check if newPosition == oldPosition because it is handled by splitter.
-      ths.setOption('splitterPosition', Math.round(ths.splitter().position() * ths.getPixelBounds().width));
+      var padding = ths.padding();
+      var w = padding.tightenWidth(ths.getPixelBounds().width); //This fixes case when chart.padding() is not zero.
+      var pos = ths.splitter().position();
+      var result = Math.round(pos * w);
+      ths.setOption('splitterPosition', result);
       ths.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
     });
 

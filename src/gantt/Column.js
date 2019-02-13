@@ -167,7 +167,7 @@ anychart.ganttModule.Column = function(dataGrid, index) {
 
   /**
    * The storage of texts presenting in column.
-   * Id defined as @const field for future optimizations to give link to this
+   * Id defined as const field for future optimizations to give link to this
    * constant to Measuriator to deal with it. Theoretically, might allow to
    * skip one data passage on texts preparation.
    *
@@ -241,7 +241,7 @@ anychart.ganttModule.Column.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
- * Supported consistency states.
+ * Supported signals.
  * DEV NOTE: in current case column doesn't dispatch MEASURE_COLLECT
  *           and MEASURE_BOUNDS itself. DataGrid makes column to
  *           dispatch it (@see DataGrid#prepareLabels method).
@@ -547,6 +547,12 @@ anychart.ganttModule.Column.prototype.labelsSettingsInvalidated_ = function(even
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
     state |= anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION;
     signal |= anychart.Signal.NEEDS_REDRAW_LABELS;
+  }
+  if (event.hasSignal(anychart.Signal.ENABLED_STATE_CHANGED)) {
+    state |= anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION;
+    if (this.labelsSettings_['enabled']()) {
+      signal |= anychart.Signal.NEEDS_REDRAW_LABELS;
+    }
   }
 
   this.invalidate(state, signal);
@@ -1094,24 +1100,22 @@ anychart.ganttModule.Column.prototype.draw = function() {
         var newTop = totalTop + height;
 
         var ind = /** @type {number} */ (item.meta('index'));
-
-        // var r = new anychart.math.Rect(
-        //     /** @type {number} */ (this.pixelBoundsCache_.left + addButton),
-        //     totalTop,
-        //     /** @type {number} */ (this.pixelBoundsCache_.width - addButton),
-        //     height);
-
-        var r = new anychart.math.Rect(this.pixelBoundsCache_.left, totalTop, this.pixelBoundsCache_.width, height);
-        var cellBounds = labelsPadding.tightenBounds(r);
-        cellBounds.left += (addButton + depthLeft);
-        cellBounds.width -= (addButton + depthLeft);
-
         var t = this.texts_[ind];
-        t.renderTo(this.labelsLayerEl_);
-        t.putAt(cellBounds, stage);
 
-        t.finalizeComplexity();
-        this.labelsTexts_.push(/** @type {string} */ (t.text()));
+        if (this.labels()['enabled']()) {
+          var r = new anychart.math.Rect(this.pixelBoundsCache_.left, totalTop, this.pixelBoundsCache_.width, height);
+          var cellBounds = labelsPadding.tightenBounds(r);
+          cellBounds.left += (addButton + depthLeft);
+          cellBounds.width -= (addButton + depthLeft);
+
+          t.renderTo(this.labelsLayerEl_);
+          t.putAt(cellBounds, stage);
+
+          t.finalizeComplexity();
+          this.labelsTexts_.push(/** @type {string} */ (t.text()));
+        } else {
+          t.renderTo(null);
+        }
 
         totalTop = (newTop + this.dataGrid_.rowStrokeThickness);
       }
@@ -1169,9 +1173,10 @@ anychart.ganttModule.Column.prototype.setupByJSON = function(json, opt_default) 
   this.collapseExpandButtons(json['collapseExpandButtons']);
   this.depthPaddingMultiplier(json['depthPaddingMultiplier']);
 
-  var labels = this.labels();
+  //TODO (A.Kudryavtsev): Issue for themes flatting.
+  // var labels = this.labels();
   // labels.suspendSignalsDispatching();
-  labels.setupInternal(!!opt_default, json['labels'] || json['cellTextSettings']);
+  // labels.setupInternal(!!opt_default, json['labels'] || json['cellTextSettings']);
   // labels.resumeSignalsDispatching(false)
 
   if (goog.isDef(json['format']))

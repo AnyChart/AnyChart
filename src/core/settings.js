@@ -140,6 +140,38 @@ anychart.core.settings.createTextPropertiesDescriptors = function() {
 
 
 /**
+ * Text props.
+ * @type {Array.<string>}
+ */
+anychart.core.settings.TEXT_PROPS = [
+  'minFontSize',
+  'maxFontSize',
+  'adjustFontSize',
+  'fontSize',
+  'fontFamily',
+  'fontColor',
+  'fontOpacity',
+  'fontDecoration',
+  'fontStyle',
+  'fontVariant',
+  'fontWeight',
+  'letterSpacing',
+  'textDirection',
+  'lineHeight',
+  'textIndent',
+  'vAlign',
+  'hAlign',
+  'wordWrap',
+  'wordBreak',
+  'textOverflow',
+  'selectable',
+  'disablePointerEvents',
+  'useHtml',
+  'format' //TODO (A.Kudryavtsev): Do we need to declare it here?
+];
+
+
+/**
  * Creates text properties descriptors.
  * @return {!Array.<Array>} - Descriptors template map.
  */

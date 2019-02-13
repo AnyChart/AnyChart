@@ -175,6 +175,8 @@ anychart.ConsistencyState = {
   //---------------------------------- GANTT TIMELINE HEADER LEVEL STATES (VB) ---------------------------------
   TIMELINE_HEADER_LEVEL_LABELS: 1 << 6,
   TIMELINE_HEADER_LEVEL_TICKS: 1 << 7,
+  TIMELINE_HEADER_LEVEL_BACKGROUND: 1 << 8,
+  TIMELINE_HEADER_LEVEL_ZOOM: 1 << 9,
   //---------------------------------- GRIDS STATES (VB) ---------------------------------
   // also combined
   GRIDS_POSITION: 1 << 6,
@@ -1256,9 +1258,9 @@ anychart.core.Base.prototype.addThemes = function(var_args) {
 
 
 /**
- * Reset themes queue and drop themeSettings
+ * Reset themes queue and drop themeSettings.
  *
- * @param {boolean=} opt_dropDefaultThemes true if need to drow default themes
+ * @param {boolean=} opt_dropDefaultThemes true if need to drop default themes.
  * @return {anychart.core.Base} Self for chaining.
  */
 anychart.core.Base.prototype.dropThemes = function(opt_dropDefaultThemes) {

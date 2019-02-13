@@ -8,7 +8,6 @@ goog.require('acgraph.vector.Path');
 goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.MarkersFactory');
-goog.require('anychart.ganttBaseModule.TimeLineHeader');
 goog.require('anychart.ganttModule.BaseGrid');
 goog.require('anychart.ganttModule.Scale');
 goog.require('anychart.ganttModule.ScrollBar');
@@ -26,6 +25,7 @@ goog.require('anychart.ganttModule.elements.MilestonesElement');
 goog.require('anychart.ganttModule.elements.PeriodsElement');
 goog.require('anychart.ganttModule.elements.TasksElement');
 goog.require('anychart.ganttModule.elements.TimelineElement');
+goog.require('anychart.ganttModule.header.Header');
 goog.require('anychart.math.Rect');
 goog.require('goog.array');
 goog.require('goog.fx.Dragger');
@@ -346,6 +346,9 @@ anychart.ganttModule.TimeLine = function(opt_controller, opt_isResources) {
   ]);
 
   this.controller.timeline(this);
+
+  // TODO (A.Kudryavtsev): For a while. Creates all and registers default format selector in measuriator.
+  this.header();
 };
 goog.inherits(anychart.ganttModule.TimeLine, anychart.ganttModule.BaseGrid);
 
@@ -1675,14 +1678,14 @@ anychart.ganttModule.TimeLine.prototype.getScale = function() {
 /**
  * Gets/configures timeline header.
  * @param {Object=} opt_value - Config.
- * @return {anychart.ganttBaseModule.TimeLineHeader|anychart.ganttModule.TimeLine} - Header or itself for chaining..
+ * @return {anychart.ganttModule.header.Header|anychart.ganttModule.TimeLine} - Header or itself for chaining.
  */
 anychart.ganttModule.TimeLine.prototype.header = function(opt_value) {
   if (!this.header_) {
-    this.header_ = new anychart.ganttBaseModule.TimeLineHeader();
-    this.header_.xScale(this.scale_);
+    this.header_ = new anychart.ganttModule.header.Header(this);
     this.header_.zIndex(anychart.ganttModule.TimeLine.HEADER_Z_INDEX);
     this.header_.listenSignals(this.headerInvalidated_, this);
+    this.header_.formatSelector.dispatchSignal(anychart.Signal.MEASURE_COLLECT | anychart.Signal.MEASURE_BOUNDS);
   }
 
   if (goog.isDef(opt_value)) {
@@ -1695,7 +1698,7 @@ anychart.ganttModule.TimeLine.prototype.header = function(opt_value) {
 
 
 /**
- * Scale invalidation handler.
+ * Header invalidation handler.
  * @param {anychart.SignalEvent} event - Signal event.
  * @private
  */
@@ -3742,6 +3745,18 @@ anychart.ganttModule.TimeLine.prototype.drawMarkers_ = function(dataItem, totalT
 
 
 /**
+ * @inheritDoc
+ */
+anychart.ganttModule.TimeLine.prototype.drawRowFills = function() {
+  //this hides TL elements from top when header is invisible.
+  var clip = anychart.ganttModule.TimeLine.base(this, 'drawRowFills');
+  clip.top += /** @type {number} */ (this.headerHeight());
+  this.getDrawLayer().clip(clip);
+  return clip;
+};
+
+
+/**
  * Internal resource timeline drawer.
  * @private
  */
@@ -4689,20 +4704,26 @@ anychart.ganttModule.TimeLine.prototype.drawArrow_ = function(left, top, orienta
 
 /**
  * Redraws vertical lines.
- * @param {Array.<number>} ticks - Ticks.
+ * @param {Array.<anychart.ganttModule.Scale.Tick>} ticks - Ticks.
  * @private
  */
 anychart.ganttModule.TimeLine.prototype.drawLowTicks_ = function(ticks) {
   if (ticks.length) {
     var path = this.getSeparationPath_().clear();
 
-    for (var i = 0, l = ticks.length - 1; i < l; i++) {
+    var stroke = /** @type {acgraph.vector.Stroke} */ (path.stroke());
+    var thickness = anychart.utils.extractThickness(stroke);
+
+    var top = this.pixelBoundsCache.top + /** @type {number} */ (this.headerHeight()) + 1;
+    var bottom = this.pixelBoundsCache.top + this.pixelBoundsCache.height;
+    for (var i = 0, l = ticks.length; i < l; i++) {
       var tick = ticks[i];
-      var ratio = this.scale_.timestampToRatio(tick);
+      var ratio = this.scale_.timestampToRatio(tick['start']);
       var left = this.pixelBoundsCache.left + this.pixelBoundsCache.width * ratio;
+      left = anychart.utils.applyPixelShift(left, thickness);
       path
-          .moveTo(left, this.pixelBoundsCache.top + /** @type {number} */ (this.headerHeight()) + 1)
-          .lineTo(left, this.pixelBoundsCache.top + this.pixelBoundsCache.height);
+          .moveTo(left, top)
+          .lineTo(left, bottom);
     }
   }
 };
@@ -4762,7 +4783,12 @@ anychart.ganttModule.TimeLine.prototype.initDom = function() {
  * @override
  */
 anychart.ganttModule.TimeLine.prototype.boundsInvalidated = function() {
-  this.header().bounds(this.pixelBoundsCache.left, this.pixelBoundsCache.top, this.pixelBoundsCache.width, /** @type {number} */ (this.headerHeight()));
+  this.header().setBounds({
+    left: this.pixelBoundsCache.left,
+    top: this.pixelBoundsCache.top,
+    width: this.pixelBoundsCache.width,
+    height: /** @type {number} */ (this.headerHeight())
+  });
   this.invalidate(anychart.ConsistencyState.TIMELINE_MARKERS);
   this.redrawHeader = true;
 };
@@ -4833,23 +4859,24 @@ anychart.ganttModule.TimeLine.prototype.labelsInvalidated = function() {
  * @override
  */
 anychart.ganttModule.TimeLine.prototype.specialInvalidated = function() {
+  var header = this.header();
   if (this.hasInvalidationState(anychart.ConsistencyState.TIMELINE_SCALES)) {
     this.redrawPosition = true;
     this.redrawHeader = true;
+    header.invalidate(anychart.ConsistencyState.RESOURCE_TIMELINE_LEVELS);
     this.markConsistent(anychart.ConsistencyState.TIMELINE_SCALES);
   }
 
   if (this.redrawHeader) {
-    var header = this.header();
     header.suspendSignalsDispatching();
-    var levels = this.scale_.getLevelsData();
-    header.setLevels(levels);
+    var levelsData = this.scale_.getLevelsData();
+    header.setLevels(levelsData);
 
     var ticks = [];
-    for (var i = 0; i < levels.length; i++) {
+    for (var i = 0; i < levelsData.length; i++) {
       if (header.level(i).enabled()) {
-        var level = levels[i];
-        ticks = this.scale_.getSimpleTicks(/** @type {anychart.enums.Interval} */(level['unit']), /** @type {number} */(level['count']));
+        var levelData = levelsData[i];
+        ticks = this.scale_.getTicks(NaN, NaN, levelData['unit'], levelData['count']);
         break;
       }
     }
@@ -5217,7 +5244,9 @@ anychart.ganttModule.TimeLine.prototype.scroll = function(horizontalPixelOffset,
       this.scale_.ratioScroll(ratio);
     }
 
-    anychart.core.Base.resumeSignalsDispatchingTrue(this, this.scale_, this.controller);
+    // anychart.core.Base.resumeSignalsDispatchingTrue(this.scale_, this.controller, this);
+    anychart.core.Base.resumeSignalsDispatchingFalse(this.scale_, this.controller, this);
+    this.invalidate(anychart.ConsistencyState.TIMELINE_SCALES, anychart.Signal.NEEDS_REDRAW);
     return true;
   }
   return false;
@@ -5285,7 +5314,10 @@ anychart.ganttModule.TimeLine.prototype.setupByJSON = function(config, opt_defau
   this.labels().setupInternal(!!opt_default, config['labels']);
 
   if ('markers' in config) this.markers(config['markers']);
-  if ('header' in config) this.header().setupInternal(!!opt_default, config['header']);
+
+  //TODO (A.Kudryavtsev): Issue for flatting.
+  if (('header' in config) && !opt_default)
+    this.header().setupInternal(false, config['header']);
 
   anychart.core.settings.deserialize(this, anychart.ganttModule.TimeLine.COLOR_DESCRIPTORS, config, opt_default);
 

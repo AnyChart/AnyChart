@@ -236,7 +236,8 @@ anychart.core.ui.OptimizedText.prototype.style = function(opt_value) {
       this.style_ = st;
 
       if (opt_value['fontSize']) {
-        var fontSize = opt_value['fontSize'];
+        var fontSize = parseFloat(opt_value['fontSize']);
+        fontSize = isNaN(fontSize) ? 13 : fontSize;
         this.calculatedLineHeight = fontSize < 24 ? fontSize + 3 : Math.round(fontSize * 1.2);
         this.baseline = Math.round(this.calculatedLineHeight * 0.8);
       }
@@ -505,7 +506,7 @@ anychart.core.ui.OptimizedText.prototype.removeFadeGradient = function() {
     }
 
     var defs = this.stage.getDefs();
-    if (this.fadeGradientId_) {
+    if (this.fadeGradientId_ && defs) { //defs can be null if stage is already disposed.
       defs.removeLinearGradient(this.fadeGradient_);
       var lGradients = defs.getLinearGradients();
       goog.object.remove(lGradients, this.fadeGradientId_);
@@ -516,6 +517,31 @@ anychart.core.ui.OptimizedText.prototype.removeFadeGradient = function() {
 };
 
 
+// /**
+//  * TODO (A.Kudryavtsev): Left for a while.
+//  * @param {anychart.math.Rect} bounds - Bounds to apple fade.
+//  * @param {acgraph.vector.Text.HAlign=} opt_hAlign - HAlign.
+//  */
+// anychart.core.ui.OptimizedText.prototype.setupFadeGradient = function(bounds, opt_hAlign) {
+//   if (this.stage) {
+//     var dom = this.getDomElement();
+//     if (this.style_['textOverflow'] && goog.isDefAndNotNull(this.style_['width']) && this.bounds && this.bounds.width) {
+//       this.removeFadeGradient();
+//       var defs = this.stage.getDefs();
+//       var fadeGradientKeys = anychart.utils.getFadeGradientKeys(bounds.width / this.bounds.width,
+//           this.style_['fontOpacity'], this.style_['fontColor'] || 'black', void 0, opt_hAlign);
+//
+//       this.fadeGradient_ = defs.getLinearGradient(fadeGradientKeys);
+//       var pathPrefix = 'url(' + acgraph.getReference() + '#';
+//       this.fadeGradientId_ = this.renderer.renderLinearGradient(this.fadeGradient_, this.stage.getDefs(), bounds);
+//       dom.setAttribute('fill', pathPrefix + this.fadeGradientId_ + ')');
+//     } else {
+//       dom.setAttribute('fill', this.style_['fontColor']);
+//     }
+//   }
+// };
+
+
 /**
  *
  * @param {anychart.math.Rect} bounds - Bounds to apple fade.
@@ -524,13 +550,13 @@ anychart.core.ui.OptimizedText.prototype.removeFadeGradient = function() {
 anychart.core.ui.OptimizedText.prototype.setupFadeGradient = function(bounds, opt_hAlign) {
   if (this.stage) {
     var dom = this.getDomElement();
-    if (this.style_['textOverflow'] && goog.isDefAndNotNull(this.style_['width']) && this.bounds && this.bounds.width) {
+    if (this.style_['textOverflow']) {
       this.removeFadeGradient();
       var defs = this.stage.getDefs();
-      var fadeGradientKeys = anychart.utils.getFadeGradientKeys(bounds.width / this.bounds.width,
+      var fadeGradientKeys = anychart.utils.getFadeGradientKeys(1,
           this.style_['fontOpacity'], this.style_['fontColor'] || 'black', void 0, opt_hAlign);
 
-      this.fadeGradient_ = defs.getLinearGradient(fadeGradientKeys);
+      this.fadeGradient_ = defs.getLinearGradient(fadeGradientKeys, void 0, void 0, bounds);
       var pathPrefix = 'url(' + acgraph.getReference() + '#';
       this.fadeGradientId_ = this.renderer.renderLinearGradient(this.fadeGradient_, this.stage.getDefs(), bounds);
       dom.setAttribute('fill', pathPrefix + this.fadeGradientId_ + ')');
@@ -619,14 +645,25 @@ anychart.core.ui.OptimizedText.prototype.putAt = function(bounds, opt_stage) {
   if (goog.isDef(opt_stage))
     this.stage = opt_stage;
 
-  if (this.wordBreakBreakAll_) {
-    this.putWordBreakKeepAll_(bounds);
-  } else if (this.wordBreakKeepAll_) {
-    this.putWordBreakKeepAll_(bounds, true);
-  } else if (this.multilineOnly_) {
-    this.putMultiline_(bounds);
+  /*
+    bounds.width >= 1 condition is added because:
+      - text in 1px width is useless
+      - fade gradient issue: some browsers (for 11 Feb 2019) don't apply gradient like
+          <linearGradient x1="26" y1="35" x2="26" y2="35" spreadMethod="pad" gradientUnits="userSpaceOnUse"> </linearGradient>
+        (same values of x1 and x2). Width that exceeds 1 guarantees that x1 differs from x2.
+   */
+  if (!this.style_['textOverflow'] || (this.style_['textOverflow'] && bounds.width >= 1)) {
+    if (this.wordBreakBreakAll_) {
+      this.putWordBreakKeepAll_(bounds);
+    } else if (this.wordBreakKeepAll_) {
+      this.putWordBreakKeepAll_(bounds, true);
+    } else if (this.multilineOnly_) {
+      this.putMultiline_(bounds);
+    } else {
+      this.putSimple_(bounds);
+    }
   } else {
-    this.putSimple_(bounds);
+    this.renderTo(null);
   }
 };
 
@@ -949,73 +986,71 @@ anychart.core.ui.OptimizedText.prototype.applySettings = function() {
     // dom.removeAttribute('y');
 
     if (this.consistency.style) {
-      if (style['fontStyle']) {
+      if ('fontStyle' in style) {
         dom.setAttribute('font-style', style['fontStyle']);
       } else {
         dom.removeAttribute('font-style');
       }
 
-      if (style['fontVariant']) {
+      if ('fontVariant' in style) {
         dom.setAttribute('font-variant', style['fontVariant']);
       } else {
         dom.removeAttribute('font-variant');
       }
 
-      if (style['fontFamily']) {
+      if ('fontFamily' in style) {
         dom.setAttribute('font-family', style['fontFamily']);
       } else {
         dom.removeAttribute('fontFamily');
       }
 
-      if (style['fontSize']) {
+      if ('fontSize' in style) {
         // var fontSize = style['fontSize'];
         // this.calculatedLineHeight = fontSize < 24 ? fontSize + 3 : Math.round(fontSize * 1.2);
         // this.baseline = Math.round(this.calculatedLineHeight * 0.8);
-        dom.setAttribute('font-size', style['fontSize'] + 'px');
+        dom.setAttribute('font-size', style['fontSize']);
       } else {
         // this.calculatedLineHeight = 0;
         dom.removeAttribute('font-size');
       }
 
-      if (style['fontWeight']) {
+      if ('fontWeight' in style) {
         dom.setAttribute('font-weight', style['fontWeight']);
       } else {
         dom.removeAttribute('font-weight');
       }
 
-      if (style['letterSpacing']) {
+      if ('letterSpacing' in style) {
         dom.setAttribute('letter-spacing', style['letterSpacing']);
       } else {
         dom.removeAttribute('letter-spacing');
       }
 
-      if (style['fontDecoration']) {
+      if ('fontDecoration' in style) {
         dom.setAttribute('text-decoration', style['fontDecoration']);
       } else {
         dom.removeAttribute('text-decoration');
       }
 
-      if (style['fontColor']) {
+      if ('fontColor' in style) {
         if (!style['textOverflow']) //We need it not to overwrite fade gradient.
           dom.setAttribute('fill', style['fontColor']);
       } else {
         dom.removeAttribute('fill');
       }
 
-      if (style['fontOpacity']) {
+      if ('fontOpacity' in style) {
         dom.setAttribute('opacity', style['fontOpacity']);
       } else {
         dom.removeAttribute('opacity');
       }
 
-      if (style['disablePointerEvents']) {
-        // cssString += 'pointer-events: ' + (style['disablePointerEvents'] ? 'none' : '') + ';';
+      if ('disablePointerEvents' in style) {
         dom.setAttribute('pointer-events', style['disablePointerEvents'] ? 'none' : '');
       } else {
         dom.removeAttribute('pointer-events');
       }
 
-      // dom.style.cssText = cssString;
       this.consistency.style = false;
     }
 

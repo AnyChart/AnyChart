@@ -918,8 +918,8 @@ anychart.utils.applyPixelShift = function(value, thickness, opt_invert) {
  * @return {!anychart.math.Rect}
  */
 anychart.utils.applyPixelShiftToRect = function(rect, thickness) {
-  var right = rect.getRight();
-  var bottom = rect.getBottom();
+  var right = rect.left + rect.width;
+  var bottom = rect.top + rect.height;
   rect.left = anychart.utils.applyPixelShift(rect.left, thickness);
   rect.top = anychart.utils.applyPixelShift(rect.top, thickness);
   rect.width = anychart.utils.applyPixelShift(right, thickness) - rect.left;

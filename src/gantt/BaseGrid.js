@@ -1832,9 +1832,9 @@ anychart.ganttModule.BaseGrid.prototype.dragEndHandler_ = function(e) {
 
 /**
  * Draws cells depending on data.
- * @private
+ * @return {anychart.math.Rect} - Clip bounds.
  */
-anychart.ganttModule.BaseGrid.prototype.drawRowFills_ = function() {
+anychart.ganttModule.BaseGrid.prototype.drawRowFills = function() {
   var header = this.pixelBoundsCache.top + this.headerHeight_ + 1; //1px line always separates header from content
 
   var verticalOffset = this.controller.verticalOffset();
@@ -1919,6 +1919,7 @@ anychart.ganttModule.BaseGrid.prototype.drawRowFills_ = function() {
 
   this.getDrawLayer().clip(clipRect);
 
+  return clipRect;
 };
 
 
@@ -2079,7 +2080,7 @@ anychart.ganttModule.BaseGrid.prototype.drawInternal = function(positionRecalcul
 
   var container = /** @type {acgraph.vector.ILayer} */(this.container());
   var stage = container ? container.getStage() : null;
-  var manualSuspend = stage && !stage.isSuspended();
+  var manualSuspend = stage && !stage.isSuspended() && this.isStandalone; //Not standalone stage is suspended by chart.
   if (manualSuspend) stage.suspend();
 
   var verticalScrollBar, horizontalScrollBar;
@@ -2141,7 +2142,7 @@ anychart.ganttModule.BaseGrid.prototype.drawInternal = function(positionRecalcul
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    this.pixelBoundsCache = /** @type {anychart.math.Rect} */ (this.getPixelBounds());
+    this.pixelBoundsCache = /** @type {anychart.math.Rect} */ (anychart.utils.applyPixelShiftToRect(/** @type {!anychart.math.Rect} */ (this.getPixelBounds()), 0));
     this.base_.clip(/** @type {anychart.math.Rect} */ (this.pixelBoundsCache));
     this.bgRect_.setBounds(/** @type {anychart.math.Rect} */ (this.pixelBoundsCache));
     this.eventsRect_.setBounds(/** @type {anychart.math.Rect} */ (this.pixelBoundsCache));
@@ -2242,7 +2243,7 @@ anychart.ganttModule.BaseGrid.prototype.drawInternal = function(positionRecalcul
   this.specialInvalidated();
 
   if (this.redrawPosition) {
-    this.drawRowFills_();
+    this.drawRowFills();
     this.positionFinal();
     this.redrawPosition = false;
   }
@@ -2685,7 +2686,8 @@ anychart.ganttModule.BaseGrid.prototype.headerHeight = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.headerHeight_ != opt_value) {
       this.headerHeight_ = opt_value;
-      if (!this.pixelBoundsCache) this.pixelBoundsCache = /** @type {anychart.math.Rect} */ (this.getPixelBounds());
+      if (!this.pixelBoundsCache)
+        this.pixelBoundsCache = /** @type {anychart.math.Rect} */ (this.getPixelBounds());
 
       if (this.isStandalone) {
         this.controller

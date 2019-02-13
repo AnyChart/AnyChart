@@ -183,6 +183,25 @@ anychart.ganttModule.Scale.ZoomLevelsSettingsRep;
 
 
 /**
+ * @typedef {{
+ *  unit: anychart.enums.Interval,
+ *  count: number
+ * }}
+ */
+anychart.ganttModule.Scale.LevelData;
+
+
+/**
+ * @typedef {{
+ *  start:number,
+ *  end:number,
+ *  holiday:(boolean|undefined)
+ * }}
+ */
+anychart.ganttModule.Scale.Tick;
+
+
+/**
  * Amount of milliseconds in second.
  * @type {number}
  */
@@ -569,11 +588,11 @@ anychart.ganttModule.Scale.prototype.maximumGap = function(opt_value) {
 
 
 /**
- * @param {number} pixStart
- * @param {number} pixEnd
+ * @param {number} pixStart - TODO (A.Kudryavtsev): Unused parameter, from previous scale implementation.
+ * @param {number} pixEnd - TODO (A.Kudryavtsev): Unused parameter, from previous scale implementation.
  * @param {anychart.enums.Interval} unit
  * @param {number} count
- * @return {Array.<{start:number,end:number,holiday:(boolean|undefined)}>}
+ * @return {Array.<anychart.ganttModule.Scale.Tick>}
  */
 anychart.ganttModule.Scale.prototype.getTicks = function(pixStart, pixEnd, unit, count) {
   var range = this.getRange();
@@ -692,7 +711,7 @@ anychart.ganttModule.Scale.prototype.ratioToTimestamp = function(value) {
 
 /**
  * Gets level settings for current scale state.
- * @return {Array.<anychart.ganttBaseModule.TimeLineHeader.Level>}
+ * @return {Array.<anychart.ganttModule.Scale.LevelData>}
  */
 anychart.ganttModule.Scale.prototype.getLevelsData = function() {
   this.calculate();
@@ -713,7 +732,7 @@ anychart.ganttModule.Scale.prototype.getLevelsData = function() {
     row = this.ranges_[last];
   }
 
-  return /** @type {Array.<anychart.ganttBaseModule.TimeLineHeader.Level>} */(row['levels']);
+  return /** @type {Array.<anychart.ganttModule.Scale.LevelData>} */(row['levels']);
 };
 
 

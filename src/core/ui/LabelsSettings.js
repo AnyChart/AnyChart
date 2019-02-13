@@ -86,6 +86,12 @@ anychart.core.ui.LabelsSettings = function() {
    */
   this.styleElement = null;
 
+  /**
+   * Accumulated signal to dispatch.
+   * @type {number}
+   */
+  this.suspendedSignal = 0;
+
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['format', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
     ['adjustFontSize', 0, 0], //TODO (A.Kudryavtsev): Not supported for a while.
@@ -118,7 +124,8 @@ anychart.core.ui.LabelsSettings = function() {
     ['width', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
     ['allowMultiline', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
     ['zIndex', 0, 0], //TODO (A.Kudryavtsev): Not supported for a while.
-    ['clip', 0, 0] ////TODO (A.Kudryavtsev): Not supported for a while.
+    ['clip', 0, 0], ////TODO (A.Kudryavtsev): Not supported for a while.
+    ['enabled', 0, anychart.Signal.ENABLED_STATE_CHANGED, 0, this.resetFlatSettings]
   ]);
 
   this.addThemes('defaultSimpleLabelsSettings');
@@ -145,7 +152,32 @@ anychart.core.ui.LabelsSettings.prototype.SUPPORTED_SIGNALS =
     anychart.core.Base.prototype.SUPPORTED_SIGNALS |
     anychart.Signal.NEEDS_REDRAW | // Regular redraw, no bounds affecting changes.
     anychart.Signal.BOUNDS_CHANGED | // Settings that affect the text bounds only.
-    anychart.Signal.NEEDS_REAPPLICATION; // Settings not related to text itself (like padding).
+    anychart.Signal.NEEDS_REAPPLICATION | // Settings not related to text itself (like padding).
+    anychart.Signal.ENABLED_STATE_CHANGED; // Special state to start collecting suspended signal or to dispatch collected signal.
+
+
+/**
+ * @inheritDoc
+ */
+anychart.core.ui.LabelsSettings.prototype.getSignal = function(fieldName) {
+  var signal = anychart.core.ui.LabelsSettings.base(this, 'getSignal', fieldName);
+  var style = this.flatten();
+  var enabled = style['enabled'];
+
+  if (fieldName == 'enabled') {
+    signal = anychart.Signal.ENABLED_STATE_CHANGED;
+    if (enabled) {
+      signal |= this.suspendedSignal;
+      this.suspendedSignal = 0;
+    }
+    //TODO (A.Kudryavtsev): debug else-condition.
+  } else {
+    if (!enabled) {
+      this.suspendedSignal |= signal;
+    }
+  }
+  return signal;
+};
 
 
 //endregion
@@ -190,7 +222,8 @@ anychart.core.ui.LabelsSettings.DESCRIPTORS = (function() {
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'width', anychart.core.settings.numberOrPercentNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'zIndex', anychart.core.settings.numberNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'allowMultiline', anychart.core.settings.boolOrNullNormalizer],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'clip', anychart.core.settings.asIsNormalizer]
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'clip', anychart.core.settings.asIsNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'enabled', anychart.core.settings.boolOrNullNormalizer]
   ]);
 
   return map;
@@ -233,6 +266,7 @@ anychart.core.ui.LabelsSettings.prototype.parent = function(opt_value) {
  * @private
  */
 anychart.core.ui.LabelsSettings.prototype.parentInvalidated_ = function(e) {
+  this.resetFlatSettings();
   this.dispatchSignal(e.signals);
 };
 
@@ -540,8 +574,16 @@ anychart.core.ui.LabelsSettings.prototype.serialize = function() {
   var json = anychart.core.ui.LabelsSettings.base(this, 'serialize');
   anychart.core.settings.serialize(this, anychart.core.ui.LabelsSettings.DESCRIPTORS, json, void 0, void 0, true);
   var padding = this.getCreated('padding');
-  if (padding)
-    json['padding'] = padding.serialize();
+  if (padding) {
+    /*
+      TODO (A.Kudryavtsev):
+      Probably we should avoid this magic with just correct serialization of anychart.core.utils.Space.
+      But currently it might break some existing serialization behaviour.
+     */
+    var sett = goog.object.clone(padding.ownSettings);
+    if (!goog.object.isEmpty(sett))
+      json['padding'] = sett;
+  }
   return json;
 };
 
@@ -552,8 +594,8 @@ anychart.core.ui.LabelsSettings.prototype.serialize = function() {
 anychart.core.ui.LabelsSettings.prototype.disposeInternal = function() {
   this.flatSettings_ = null;
   this.parent(null);
+  goog.disposeAll(this.background_, this.padding_);
   this.padding_ = null;
-  goog.dispose(this.background_);
   this.background_ = null;
   anychart.core.ui.LabelsSettings.base(this, 'disposeInternal');
 };

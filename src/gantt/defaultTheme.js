@@ -6,12 +6,31 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'fontSize': 11,
     'vAlign': 'middle',
     'height': '100%',
+    // 'textOverflow': true,
     'padding': {
       'left': 4,
       'top': 0,
       'right': 4,
       'bottom': 0
     }
+  },
+
+  'defaultLevelsLabelsSettings': {
+    'fontSize': 10,
+    'format': anychart.core.defaultTheme.returnValueAsIs,
+    'textOverflow': true
+  },
+
+  'defaultGanttHeader': {
+    'stroke': anychart.core.defaultTheme.ganttDefaultStroke,
+    'background': {
+      'fill': '#f7f7f7',
+      'enabled': true
+    }
+  },
+
+  'defaultLevelSettings': {
+    'height': null
   },
 
   'defaultDataGrid': {
@@ -157,62 +176,12 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'rowSelectedFill': anychart.core.defaultTheme.returnSourceColor,
 
     'rowStroke': anychart.core.defaultTheme.ganttDefaultStroke,
-    'rowOddFill': '#fff',
-    'rowEvenFill': '#fff',
-    'rowFill': '#fff',
+    'rowOddFill': 'none',
+    'rowEvenFill': 'none',
+    'rowFill': 'none',
 
     'zIndex': 5,
     'headerHeight': 70,
-    // 'editing': false,
-
-    // 'connectorPreviewStroke': {
-    //   'color': '#545f69',
-    //   'dash': '3 3'
-    // },
-
-    // 'editPreviewFill': {
-    //   'color': '#fff',
-    //   'opacity': 0.00001
-    // },
-
-    // 'editPreviewStroke': {
-    //   'color': '#aaa',
-    //   'dash': '3 3'
-    // },
-
-    // 'editProgressFill': '#EAEAEA',
-    // 'editProgressStroke': '#545f69',
-    // 'editIntervalThumbFill': '#EAEAEA',
-    // 'editIntervalThumbStroke': '#545f69',
-    // 'editConnectorThumbFill': '#EAEAEA',
-    // 'editConnectorThumbStroke': '#545f69',
-
-    // 'editStructurePreviewFill': {
-    //   'color': '#4285F4',
-    //   'opacity': 0.2
-    // },
-    //
-    // 'editStructurePreviewStroke': {
-    //   'color': '#4285F4',
-    //   'thickness': 2
-    // },
-    //
-    // 'editStructurePreviewDashStroke': {
-    //   'color': '#4285F4',
-    //   'dash': '4 4'
-    // },
-
-    // 'editStartConnectorMarkerType': 'circle',
-    // 'editStartConnectorMarkerSize': 10,
-    // 'editStartConnectorMarkerHorizontalOffset': 0,
-    // 'editStartConnectorMarkerVerticalOffset': 0,
-    // 'editFinishConnectorMarkerType': 'circle',
-    // 'editFinishConnectorMarkerSize': 10,
-    // 'editFinishConnectorMarkerHorizontalOffset': 0,
-    // 'editFinishConnectorMarkerVerticalOffset': 0,
-    // 'editIntervalWidth': 3,
-
-    //all another settings should be set to 'null' for serialization demerging purposes
 
     'elements': {
       'anchor': 'auto',
@@ -412,28 +381,6 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'defaultTextMarkerSettings': {
       'layout': 'vertical',
       'zIndex': 2
-    },
-    'header': {
-      'background': {
-        'enabled': false,
-        'fill': '#f7f7f7'
-      },
-      'fill': '#f7f7f7',
-      'stroke': anychart.core.defaultTheme.ganttDefaultStroke,
-      'anchor': 'left-top',
-      'fontSize': 10,
-      'vAlign': 'middle',
-      'holidays': {
-        'padding': {}
-      },
-      'format': anychart.core.defaultTheme.returnValueAsIs,
-      'padding': {
-        'top': 0,
-        'right': 5,
-        'bottom': 0,
-        'left': 5
-      },
-      'disablePointerEvents': true
     }
   },
 
@@ -484,22 +431,6 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       'isStandalone': false,
       'labels': {
         'padding': [0, 4, 0, 4]
-      },
-      'header': {
-        'enabled': true,
-        'overlay': {
-          'enabled': false
-        },
-        'textOverflow': '',
-        'stroke': '#ccc',
-        'padding': [0, 5, 0, 5],
-        'fontSize': 10,
-        'vAlign': 'middle',
-        'hAlign': 'center',
-        'drawTopLine': false,
-        'drawRightLine': false,
-        'drawBottomLine': false,
-        'drawLeftLine': false
       }
     }
   },
