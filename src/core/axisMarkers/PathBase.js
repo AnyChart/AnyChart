@@ -471,18 +471,18 @@ anychart.core.axisMarkers.PathBase.prototype.drawLine = function() {
   if (isNaN(ratio)) return this;
 
   if (ratio >= 0 && ratio <= 1) {
-    var shift = el.strokeThickness() % 2 == 0 ? 0 : -.5;
     var bounds = this.parentBounds();
     var axesLinesSpace = this.axesLinesSpace();
+    var strokeThickness = /** @type {number} */(el.strokeThickness());
 
     if (this.isHorizontal()) {
-      var y = Math.round(bounds.getTop() + bounds.height - ratio * bounds.height);
-      ratio == 1 ? y -= shift : y += shift;
+      var y = bounds.getTop() + bounds.height - ratio * bounds.height;
+      y = anychart.utils.applyPixelShift(y, strokeThickness);
       el.moveTo(bounds.getLeft(), y);
       el.lineTo(bounds.getRight(), y);
     } else {
-      var x = Math.round(bounds.getLeft() + ratio * bounds.width);
-      ratio == 1 ? x += shift : x -= shift;
+      var x = bounds.getLeft() + ratio * bounds.width;
+      x = anychart.utils.applyPixelShift(x, strokeThickness);
       el.moveTo(x, bounds.getTop());
       el.lineTo(x, bounds.getBottom());
     }
@@ -497,8 +497,6 @@ anychart.core.axisMarkers.PathBase.prototype.drawLine = function() {
  * @return {anychart.core.axisMarkers.PathBase} - Itself for method chaining.
  */
 anychart.core.axisMarkers.PathBase.prototype.drawRange = function() {
-  var range = /** @type {anychart.core.axisMarkers.PathBase.Range} */ (this.valueInternal());
-
   var scale = /** @type {anychart.scales.Base|anychart.ganttModule.Scale} */ (this.scale());
 
   if (!scale) { //Here we can get null.

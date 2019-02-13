@@ -580,8 +580,11 @@ anychart.core.drawers.SplineDrawer.prototype.startSplineDrawing_ = function(p1x,
       result.push(spline[0], spline[1], spline[2], spline[3], spline[4], spline[5]);
       result.push(spline[4], spline[5], spline[6], spline[7], spline[8], spline[9]);
     } else {
+      // align spline area bottom (or top in case of baseline being above start value) horizontal line to tick
+      var baseline = anychart.utils.applyPixelShift(this.baseline_, 1);
+      baseline = baseline < p1y ? Math.floor(baseline) : Math.ceil(baseline);
       this.splineTo(
-          'bs', p1x, this.baseline_, p1x, p1y,
+          'bs', p1x, baseline, p1x, p1y,
           'c', c1x, c1y, p2x, p2y);
       result.push(p1x, p1y, c1x, c1y, p2x, p2y);
     }
@@ -710,9 +713,12 @@ anychart.core.drawers.SplineDrawer.prototype.finalizeSplineDrawing_ = function(p
     result.push(spline[0], spline[1], spline[2], spline[3], spline[4], spline[5]);
     result.push(spline[4], spline[5], spline[6], spline[7], spline[8], spline[9]);
   } else {
+    // align spline area bottom (or top in case of baseline being above start value) horizontal line to tick
+    var baseline = anychart.utils.applyPixelShift(this.baseline_, 1);
+    baseline = baseline < c1y ? Math.floor(baseline) : Math.ceil(baseline);
     this.splineTo(
         'c', c1x, c1y, p2x, p2y,
-        'bc', p2x, this.baseline_);
+        'bc', p2x, baseline);
     result.push(p1x, p1y, c1x, c1y, p2x, p2y);
   }
 

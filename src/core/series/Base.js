@@ -3457,7 +3457,30 @@ anychart.core.series.Base.prototype.applyZIndex = function() {
 anychart.core.series.Base.prototype.calcFullClipBounds = function() {
   var clip = this.clip_;
   if (goog.isBoolean(clip)) {
-    clip = this.boundsWithoutAxes;
+    clip = this.boundsWithoutAxes.clone();
+
+    /*
+    Apply pixelShift to clip to synchronize it with other pixelShifted elements.
+    Like axes, ticks, etc.
+    Rounding is used to avoid transparent pixels appearing on line ends
+    if line is drawn to or from nonround value (at least in chrome).
+     */
+    clip = anychart.utils.applyPixelShiftToRect(clip, 1);
+
+    var top = clip.top;
+    var bottom = clip.getBottom();
+    top = Math.floor(top);
+    bottom = Math.ceil(bottom);
+    clip.top = top;
+    clip.height = bottom - top;
+
+    var left = clip.left;
+    var right = clip.getRight();
+    left = Math.floor(left);
+    right = Math.ceil(right);
+    clip.left = left;
+    clip.width = right - left;
+
     if (this.check(anychart.core.drawers.Capabilities.IS_3D_BASED)) {
       clip = (/** @type {anychart.math.Rect} */(clip)).clone();
       var provider = this.get3DProvider();

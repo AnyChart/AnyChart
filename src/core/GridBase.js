@@ -737,20 +737,23 @@ anychart.core.GridBase.prototype.drawInternal = function() {
   this.clearFillElements();
   this.lineElement().clear();
 
-  var bounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
+  var bounds = /** @type {anychart.math.Rect} */(this.parentBounds() || anychart.math.rect(0, 0, 0, 0));
   var mode3d = this.owner_ && this.owner_.isMode3d();
+  var strokeThickness = anychart.utils.extractThickness(/** @type {acgraph.vector.Stroke|string} */(this.getOption('stroke')));
   if (mode3d) {
     var owner = /** @type {anychart.cartesian3dModule.Chart} */(this.owner_);
     this.x3dShift = owner.x3dShift;
     this.y3dShift = owner.y3dShift;
 
-    var strokeThickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(this.getOption('stroke'))) / 2;
-    bounds.top -= this.y3dShift + strokeThickness;
-    bounds.height += this.y3dShift + strokeThickness;
+    bounds.top -= this.y3dShift + strokeThickness / 2;
+    bounds.height += this.y3dShift + strokeThickness / 2;
     bounds.width += this.x3dShift;
   }
-  var axesLinesSpace = this.axesLinesSpace();
-  var clip = axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds));
+  var clip = bounds.clone();
+  // align clip to bottom tick
+  clip.height = anychart.utils.applyPixelShift(clip.height, 1) + 0.5;
+  // align right clip to right tick
+  clip.width = anychart.utils.applyPixelShift(clip.width, 1) + 0.5;
 
   this.lineElement().clip(clip);
 
@@ -770,6 +773,15 @@ anychart.core.GridBase.prototype.drawInternal = function() {
     if (goog.isArray(tickVal)) tickVal = tickVal[0];
     var subRangeRatio = (isOrdinal && scale.mode() == anychart.enums.OrdinalScaleMode.CONTINUOUS) ? 0.5 : 0;
     ratio = scale.transform(tickVal, subRangeRatio);
+    /*
+    Fix for logarithmic scale, because sometimes it returns nonzero ratio for
+    scale.minimum() value like this: "7.230440002281568e-8" or this "-1.0641554004653386e-7"
+    This leads to missing first tick or problems with pixel shift when yAxis tick,
+    or grid line in {value == scale.minimum()} is drawn one pixel above xAxis.
+    */
+    if (scale.getType() == 'log') {
+      ratio = anychart.math.round(ratio, 6);
+    }
 
     if (i) {
       path = this.getFillElement(i - 1);

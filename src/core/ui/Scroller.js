@@ -573,14 +573,19 @@ anychart.core.ui.Scroller.prototype.drawBottom_ = function() {
 
   this.selectedClipRect.shape(leftX, bounds.top, rightX - leftX, bounds.height);
 
+  leftX = anychart.utils.applyPixelShift(leftX, 1);
+  rightX = anychart.utils.applyPixelShift(rightX, 1);
+  var top = anychart.utils.applyPixelShift(bounds.top, 1);
+  var bottom = anychart.utils.applyPixelShift(bounds.top + bounds.height, 1);
+
   this.selectedRangeOutline_
       .clear()
-      .moveTo(bounds.left, bounds.top)
-      .lineTo(leftX, bounds.top)
-      .lineTo(leftX, bounds.top + bounds.height)
-      .lineTo(rightX, bounds.top + bounds.height)
-      .lineTo(rightX, bounds.top)
-      .lineTo(bounds.left + bounds.width, bounds.top);
+      .moveTo(bounds.left, top)
+      .lineTo(leftX, top)
+      .lineTo(leftX, bottom)
+      .lineTo(rightX, bottom)
+      .lineTo(rightX, top)
+      .lineTo(bounds.left + bounds.width, top);
 };
 
 
@@ -641,14 +646,19 @@ anychart.core.ui.Scroller.prototype.drawTop_ = function() {
 
   this.selectedClipRect.shape(leftX, bounds.top, rightX - leftX, bounds.height);
 
+  leftX = anychart.utils.applyPixelShift(leftX, 1);
+  rightX = anychart.utils.applyPixelShift(rightX, 1);
+  var top = anychart.utils.applyPixelShift(bounds.top, 1);
+  var bottom = anychart.utils.applyPixelShift(bounds.top + bounds.height, 1);
+
   this.selectedRangeOutline_
       .clear()
-      .moveTo(bounds.left, bounds.top + bounds.height)
-      .lineTo(leftX, bounds.top + bounds.height)
-      .lineTo(leftX, bounds.top)
-      .lineTo(rightX, bounds.top)
-      .lineTo(rightX, bounds.top + bounds.height)
-      .lineTo(bounds.left + bounds.width, bounds.top + bounds.height);
+      .moveTo(bounds.left, top)
+      .lineTo(leftX, top)
+      .lineTo(leftX, bottom)
+      .lineTo(rightX, bottom)
+      .lineTo(rightX, top)
+      .lineTo(bounds.left + bounds.width, top);
 };
 
 

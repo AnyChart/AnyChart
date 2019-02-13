@@ -74,6 +74,9 @@ anychart.core.drawers.Area.prototype.requiredShapes = (function() {
  * @private
  */
 anychart.core.drawers.Area.prototype.drawSegmentStart_ = function(shapes, x, y, zeroX, zeroY, names) {
+  // align area bottom (or top in case of baseline being above start value) horizontal line to tick
+  zeroY = anychart.utils.applyPixelShift(zeroY, 1);
+  zeroY = zeroY < y ? Math.floor(zeroY) : Math.ceil(zeroY);
   anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes[names.fill]), this.isVertical, zeroX, zeroY);
   anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes[names.fill]), this.isVertical, x, y);
   anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes[names.hatchFill]), this.isVertical, zeroX, zeroY);
@@ -398,7 +401,11 @@ anychart.core.drawers.Area.prototype.finalizeSegment = function() {
     hatchPath.close();
     this.zeroesStack = null;
   } else if (!isNaN(this.lastDrawnX)) {
-    anychart.core.drawers.line(path, this.isVertical, this.lastDrawnX, this.zeroY);
+    // align area bottom (or top in case of baseline being under value) horizontal line to tick
+    var zeroY = anychart.utils.applyPixelShift(this.zeroY, 1);
+    zeroY = zeroY < this.prevY ? Math.floor(zeroY) : Math.ceil(zeroY);
+
+    anychart.core.drawers.line(path, this.isVertical, this.lastDrawnX, zeroY);
     anychart.core.drawers.line(hatchPath, this.isVertical, this.lastDrawnX, this.zeroY);
     path.close();
     hatchPath.close();

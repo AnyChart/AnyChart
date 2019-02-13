@@ -112,18 +112,33 @@ anychart.core.drawers.Column.prototype.drawPointShape = function(point, path, ha
     var leftX = x - this.pointWidth / 2;
     var rightX = leftX + this.pointWidth;
     var shared = point.meta('shared');
-    //This inversion allow to show single zero value.
-    var invertShift = this.calculatePxShiftInversion ?
-        (this.isVertical ? false : (shared ? !shared.hasNotZero : true)) :
-        false;
 
     var thickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(path.stroke()));
+
+    // aligning column to ticks
     if (this.crispEdges) {
-      leftX = anychart.utils.applyPixelShift(leftX, thickness, invertShift);
-      rightX = anychart.utils.applyPixelShift(rightX, thickness, invertShift);
+      leftX = anychart.utils.applyPixelShift(leftX, thickness);
+      rightX = anychart.utils.applyPixelShift(rightX, thickness);
+      y = anychart.utils.applyPixelShift(y, thickness);
+
+      if (this.isVertical) {
+        zero = anychart.utils.applyPixelShift(zero, 1);
+        zero = zero < y ? Math.floor(zero) : Math.ceil(zero);
+      } else {
+        zero = anychart.utils.applyPixelShift(zero, thickness);
+      }
     }
-    y = anychart.utils.applyPixelShift(y, thickness, invertShift);
-    zero = anychart.utils.applyPixelShift(zero, thickness, invertShift);
+
+
+    //This inversion allow to show single zero value.
+    var invertShift = this.calculatePxShiftInversion ?
+      (this.isVertical ? false : (shared ? !shared.hasNotZero : true)) :
+      false;
+
+    if (invertShift && point.get('value') == 0) {
+      y -= 1.5;
+      zero += 1.5;
+    }
 
     anychart.core.drawers.move(path, this.isVertical, leftX, y);
     anychart.core.drawers.line(path, this.isVertical, rightX, y, rightX, zero, leftX, zero);

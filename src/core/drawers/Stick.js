@@ -106,8 +106,10 @@ anychart.core.drawers.Stick.prototype.drawPoint_ = function(point, shapes, names
   if (this.crispEdges) {
     x = anychart.utils.applyPixelShift(x, thickness);
   }
-  // y = anychart.utils.applyPixelShift(y, thickness);
-  // zero = anychart.utils.applyPixelShift(zero, thickness);
+
+  // align stick bottom (or top in case of baseline being above start value) line end to tick
+  zero = anychart.utils.applyPixelShift(zero, 1);
+  zero = zero < y ? Math.floor(zero) : Math.ceil(zero);
 
   var path = /** @type {acgraph.vector.Path} */(shapes[names.stroke]);
   anychart.core.drawers.move(path, this.isVertical, x, y);

@@ -1706,10 +1706,13 @@ anychart.core.Axis.prototype.insideBounds = function(opt_value) {
  * @protected
  */
 anychart.core.Axis.prototype.drawTopLine = function(bounds, pixelShift, lineThickness, offset, size) {
-  var y = bounds.top + bounds.height + lineThickness / 2;
+  var y = bounds.getBottom();
+  // axes lines grow inside content area
+  y += lineThickness / 2;
   this.line
-      .moveTo(bounds.left + pixelShift, y)
-      .lineTo(bounds.left - pixelShift + bounds.width, y);
+      // pixel shifts here to draw line from first tick to last
+      .moveTo(anychart.utils.applyPixelShift(bounds.left, 1) - 0.5, y)
+      .lineTo(anychart.utils.applyPixelShift(bounds.getRight(), 1) + 0.5, y);
 };
 
 
@@ -1723,10 +1726,14 @@ anychart.core.Axis.prototype.drawTopLine = function(bounds, pixelShift, lineThic
  * @protected
  */
 anychart.core.Axis.prototype.drawRightLine = function(bounds, pixelShift, lineThickness, offset, size) {
-  var x = bounds.left - lineThickness / 2;
+  var x = bounds.left;
+  // axes lines grow inside content area
+  x -= lineThickness / 2 - 1;
   this.line
-      .moveTo(x, bounds.top + pixelShift)
-      .lineTo(x, bounds.top - pixelShift + bounds.height);
+      // should fix line going out of top tick on retina
+      .moveTo(x, anychart.utils.applyPixelShift(bounds.top, 1) - 0.5)
+      // draw line till bottom tick
+      .lineTo(x, anychart.utils.applyPixelShift(bounds.getBottom(), 1) + 0.5);
 };
 
 
@@ -1740,10 +1747,13 @@ anychart.core.Axis.prototype.drawRightLine = function(bounds, pixelShift, lineTh
  * @protected
  */
 anychart.core.Axis.prototype.drawBottomLine = function(bounds, pixelShift, lineThickness, offset, size) {
-  var y = bounds.top - lineThickness / 2;
+  var y = bounds.top;
+  // axes lines grow inside content area
+  y -= lineThickness / 2 - 1;
   this.line
-      .moveTo(bounds.left + pixelShift, y)
-      .lineTo(bounds.left - pixelShift + bounds.width, y);
+      // pixel shifts here to draw line from first tick to last
+      .moveTo(anychart.utils.applyPixelShift(bounds.left, 1) - 0.5, y)
+      .lineTo(anychart.utils.applyPixelShift(bounds.getRight(), 1) + 0.5, y);
 };
 
 
@@ -1757,10 +1767,14 @@ anychart.core.Axis.prototype.drawBottomLine = function(bounds, pixelShift, lineT
  * @protected
  */
 anychart.core.Axis.prototype.drawLeftLine = function(bounds, pixelShift, lineThickness, offset, size) {
-  var x = bounds.left + bounds.width + lineThickness / 2;
+  var x = bounds.getRight();
+  // axes lines grow inside content area
+  x += lineThickness / 2;
   this.line
-      .moveTo(x, bounds.top + pixelShift)
-      .lineTo(x, bounds.top - pixelShift + bounds.height);
+      // should fix line going out of top tick on retina
+      .moveTo(x, anychart.utils.applyPixelShift(bounds.top, 1) - 0.5)
+      // draw line till bottom tick
+      .lineTo(x, anychart.utils.applyPixelShift(bounds.getBottom(), 1) + 0.5);
 };
 
 
@@ -2083,7 +2097,16 @@ anychart.core.Axis.prototype.draw = function() {
         minorTickVal = scaleMinorTicksArr[j];
         ratio = scale.transform(tickVal);
         minorRatio = scale.transform(minorTickVal);
-
+        /*
+        Fix for logarithmic scale, bc sometimes it returns nonzero ratio for scale.minimum() value,
+        like this: "7.230440002281568e-8", or this "-1.0641554004653386e-7"
+        This leads to missing first tick or problems with pixel shift when yAxis tick,
+        or grid line in {value == scale.minimum()} is drawn one pixel above xAxis.
+        */
+        if (scale.getType() == 'log') {
+          ratio = anychart.math.round(ratio, 6);
+          minorRatio = anychart.math.round(minorRatio, 6);
+        }
         if (((ratio <= minorRatio && i < ticksArrLen) || j == minorTicksArrLen)) {
           var majorPixelShift = tickThickness % 2 == 0 ? 0 : -.5;
           drawLabel = goog.isArray(needDrawLabels) ? needDrawLabels[i] : needDrawLabels;
