@@ -680,7 +680,10 @@ anychart.core.series.Cartesian.prototype.isPointVisible = function(point) {
   var index = point.getIndex();
   var xModeScatter = this.getOption('xMode') == anychart.enums.XMode.SCATTER;
   if (xModeScatter) {
-    index = this.drawingPlan.xHashMap[anychart.utils.hash(this.drawingPlan.data[index].data['x'])];
+    var data = this.drawingPlan.data[index];
+    var x = data.data['x'];
+    var hash = anychart.utils.hash(x);
+    index = this.drawingPlan.xHashMap[hash];
   }
   return (index >= this.drawingPlan.firstIndex && index <= this.drawingPlan.lastIndex);
 };
@@ -961,18 +964,27 @@ anychart.core.series.Cartesian.prototype.getScatterDrawingPlan = function(sorted
 anychart.core.series.Cartesian.prototype.getOrdinalDrawingPlan = function(xHashMap, xArray, restrictX, opt_seriesIndependent) {
   var dataPusher;
   var xModeScatter = this.getOption('xMode') == anychart.enums.XMode.SCATTER;
+  var useEmptyInitArray = false;
 
-  if (restrictX && !xModeScatter) { //!xModeScatter condition must fix DVF-4095.
+  if (restrictX) {
     // dataPusher must return a point that was replaced by the point pushed (if any)
-    dataPusher = function(data, point) {
-      var result;
-      var xHash = anychart.utils.hash(point.data['x']);
-      if (xHash in xHashMap) {
-        result = data[xHashMap[xHash]];
-        data[xHashMap[xHash]] = point;
-      }
-      return result || null;
-    };
+    if (xModeScatter) { //must fix DVF-4095.
+      dataPusher = function(data, point) {
+        var xHash = anychart.utils.hash(point.data['x']);
+        data.push(xHash in xHashMap ? point : null);
+        return null;
+      };
+    } else {
+      dataPusher = function(data, point) {
+        var result;
+        var xHash = anychart.utils.hash(point.data['x']);
+        if (xHash in xHashMap) {
+          result = data[xHashMap[xHash]];
+          data[xHashMap[xHash]] = point;
+        }
+        return result || null;
+      };
+    }
   } else {
     if (opt_seriesIndependent) {
       dataPusher = function(data, point) {
@@ -980,6 +992,7 @@ anychart.core.series.Cartesian.prototype.getOrdinalDrawingPlan = function(xHashM
         return null;
       };
     } else if (xModeScatter) {
+      useEmptyInitArray = true;
       dataPusher = function(data, point) {
         var xValue = point.data['x'];
         var xHash = anychart.utils.hash(xValue);
@@ -1014,7 +1027,7 @@ anychart.core.series.Cartesian.prototype.getOrdinalDrawingPlan = function(xHashM
     return a === undefined;
   };
 
-  var result = this.getDrawingData(xModeScatter ? [] : new Array(xArray.length), dataPusher, xNormalizer, xMissingChecker);
+  var result = this.getDrawingData(useEmptyInitArray ? [] : new Array(xArray.length), dataPusher, xNormalizer, xMissingChecker);
 
   //TODO (A.Kudryavtsev): Looks like overhead. Can we avoid this passage somehow?
   var data = result.data;
