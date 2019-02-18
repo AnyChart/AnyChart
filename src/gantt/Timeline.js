@@ -4746,9 +4746,18 @@ anychart.ganttModule.TimeLine.prototype.initScale = function() {
   this.scale_.trackedDataMax = dataMax;
 
   if (newScale && !isNaN(dataMin) && !isNaN(dataMax)) {
-    var totalRange = this.scale_.getTotalRange();
-    var newRange = Math.round((totalRange['max'] - totalRange['min']) / 10);
-    this.scale_.zoomTo(totalRange['min'], totalRange['min'] + newRange); // Initial visible range: 10% of total range.
+    if (this.scale_.needsFitAll) {//If scale demands fit all - we call it.
+      this.scale_.fitAll();
+      this.scale_.needsFitAll = false;
+    } else if (this.scale_.needsZoomTo) {//If zoomTo was called on hidden container.
+      this.scale_.zoomTo.apply(this.scale_, this.scale_.neededZoomToArgs);
+      this.scale_.needsZoomTo = false;
+      this.scale_.neededZoomToArgs = null;
+    } else {// Or apply default zoom.
+      var totalRange = this.scale_.getTotalRange();
+      var newRange = Math.round((totalRange['max'] - totalRange['min']) / 10);
+      this.scale_.zoomTo(totalRange['min'], totalRange['min'] + newRange); //Initial visible range: 10% of total range.
+    }
   }
 
   if (!newScale) {
@@ -4756,7 +4765,7 @@ anychart.ganttModule.TimeLine.prototype.initScale = function() {
     var min = range['min'];
     var delta = max - min;
 
-    if (delta) { //this saves currently visible range after totalRange changes.
+    if (delta) { //This saves currently visible range after totalRange changes.
       range = this.scale_.getRange();
       min = range['min'];
       this.scale_.zoomTo(min, min + delta);

@@ -1459,7 +1459,10 @@ anychart.core.Chart.prototype.onA11ySignal_ = function() {
 //
 //------------------------------------------------------------------------------
 /**
- * Calculate chart content bounds.
+ * Calculate chart content bounds. Reduces total bounds to content bounds by
+ * substracting credits, margin, padding, title and background stroke thickness
+ * from total bounds.
+ * If total bounds are zero - this method isn't called.
  * @param {!anychart.math.Rect} totalBounds Total chart area bounds, do not override, it can be useful later.
  * @return {!anychart.math.Rect} Chart content bounds, allocated space for all chart appearance items.
  */
@@ -1596,12 +1599,7 @@ anychart.core.Chart.prototype.drawInternal = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
-    if (this.enabled()) {
-      this.rootElement.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
-    }
-
-    // todo: (chernetsky) Обсудить!
-    //this.tooltip().containerProvider(this);
+    this.rootElement.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
@@ -1620,70 +1618,102 @@ anychart.core.Chart.prototype.drawInternal = function() {
   }
   //end clear container consistency states
 
-  // DVF-1648
-  anychart.performance.start('Chart.beforeDraw()');
-  this.beforeDraw();
-  anychart.performance.end('Chart.beforeDraw()');
-
   //total chart area bounds, do not override, it can be useful later
-  anychart.performance.start('Chart.calculateBounds()');
   var totalBounds = /** @type {!anychart.math.Rect} */(this.getPixelBounds());
-  this.contentBounds = this.calculateContentAreaSpace(totalBounds);
-  anychart.performance.end('Chart.calculateBounds()');
-  anychart.performance.start('Chart.drawContent()');
-  this.drawContent(this.contentBounds);
 
-  this.specialDraw(this.getPlotBounds());
+  /*
+  DVF-3944
+  This boolean value is set true if bounds are zero: either width or height, or both.
+  It is used further in the code to avoid drawing, animation and calculation of content bounds
+  in case of total bounds being zeroed. This is done due to lack of reasons to perform drawing
+  and calculations within zero bounds (they are not visible).
+  As a side effect it fixes problems that aroused from bounds being requested for the element while
+  it isn't visible (display: none). In this case Chrome returned zero bounds, Firefox threw an exception.
+  */
+  var isNonZeroBounds = totalBounds.width && totalBounds.height;
 
-  anychart.performance.end('Chart.drawContent()');
+  /*
+  Actions inside this condition are drawing and bounds calculation related.
+  It's unnecessary to perform any of this, when bounds are zero.
+  In case of zero bounds we skip:
+    1) this.beforeDraw() - any preparations for drawing
+    2) this.calculateContentAreaSpace() - reduction of total bounds to the bounds we actually perform drawing in.
+    3) this.drawContent() and this.specialDraw() - where most of the drawing magic happens.
+    4) creation of shadowRect for crosshair to work when background is disabled.
+    5) labels, including noDataLabel, drawing.
+    6) animation and a11y - they are unnecessary for invisible elements.
+  But dispatchDetachedEvent and onInteractivitySignal are fired anyway.
+  Former detaches 'chartdraw' signal from current execution frame, putting it in the end of events queue
+  and allowing this.draw() method to complete before event hadlers are executed.
+  And latter sets hoverMode for series with chart interactivity hoverMode, in case base interactivity is supported.
+   */
+  if (isNonZeroBounds) {
+    // DVF-1648
+    anychart.performance.start('Chart.beforeDraw()');
+    this.beforeDraw();
+    anychart.performance.end('Chart.beforeDraw()');
 
-  // used for crosshair
-  var background = this.getCreated('background');
-  if (background) {
-    var fill = background.getOption('fill');
-    if ((!background.enabled() || !fill || fill == 'none')) {
+    anychart.performance.start('Chart.calculateBounds()');
+    this.contentBounds = this.calculateContentAreaSpace(totalBounds);
+    anychart.performance.end('Chart.calculateBounds()');
+
+    anychart.performance.start('Chart.drawContent()');
+    this.drawContent(this.contentBounds);
+    this.specialDraw(this.getPlotBounds());
+    anychart.performance.end('Chart.drawContent()');
+
+    /*
+    Creates rectangular opaque element, with the size of content bounds, to catch mouse events.
+    Used for crosshair to work correctly in cases when background is not drawn and therefore mouse events
+    are fired only over series svg elements.
+     */
+    var background = this.getCreated('background');
+    var fill = background ? background.getOption('fill') : null;
+    if (!background || !background.enabled() || !fill || fill == 'none') {
       if (!this.shadowRect) {
         this.shadowRect = this.rootElement.rect();
         this.shadowRect.fill(anychart.color.TRANSPARENT_HANDLER).stroke(null);
       }
       this.shadowRect.setBounds(this.contentBounds);
     }
-  }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.CHART_LABELS | anychart.ConsistencyState.BOUNDS)) {
-    for (var i = 0, count = this.chartLabels_.length; i < count; i++) {
-      var label = this.chartLabels_[i];
-      if (label) {
-        label.suspendSignalsDispatching();
-        if (!label.container() && label.enabled()) label.container(this.rootElement);
-        this.setLabelSettings(label, totalBounds);
-        label.draw();
-        label.resumeSignalsDispatching(false);
+    if (this.hasInvalidationState(anychart.ConsistencyState.CHART_LABELS | anychart.ConsistencyState.BOUNDS)) {
+      for (var i = 0, count = this.chartLabels_.length; i < count; i++) {
+        var label = this.chartLabels_[i];
+        if (label) {
+          label.suspendSignalsDispatching();
+          if (!label.container() && label.enabled()) label.container(this.rootElement);
+          this.setLabelSettings(label, totalBounds);
+          label.draw();
+          label.resumeSignalsDispatching(false);
+        }
       }
-    }
 
-    if (noDataLabel) {
-      noDataLabel.suspendSignalsDispatching();
-      noDataLabel.container(this.rootElement);
-      this.setLabelSettings(noDataLabel, this.contentBounds);
-      noDataLabel.draw();
-      noDataLabel.resumeSignalsDispatching(false);
-    }
+      if (noDataLabel) {
+        noDataLabel.suspendSignalsDispatching();
+        noDataLabel.container(this.rootElement);
+        this.setLabelSettings(noDataLabel, this.contentBounds);
+        noDataLabel.draw();
+        noDataLabel.resumeSignalsDispatching(false);
+      }
 
-    this.markConsistent(anychart.ConsistencyState.CHART_LABELS);
+      this.markConsistent(anychart.ConsistencyState.CHART_LABELS);
+    }
   }
 
-  //after all chart items drawn, we can clear other states
+  // whether drawing happened or not we still clear bounds state to receive bounds updates
   this.markConsistent(anychart.ConsistencyState.BOUNDS);
 
-  this.doAnimation();
-  this.markConsistent(anychart.ConsistencyState.CHART_ANIMATION);
+  if (isNonZeroBounds) {
+    this.doAnimation();
+    this.markConsistent(anychart.ConsistencyState.CHART_ANIMATION);
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.A11Y)) {
-    var a11y = this.getCreated('a11y');
-    if (a11y)
-      a11y.applyA11y();
-    this.markConsistent(anychart.ConsistencyState.A11Y);
+    if (this.hasInvalidationState(anychart.ConsistencyState.A11Y)) {
+      var a11y = this.getCreated('a11y');
+      if (a11y)
+        a11y.applyA11y();
+      this.markConsistent(anychart.ConsistencyState.A11Y);
+    }
   }
 
   this.resumeSignalsDispatching(false);
@@ -1736,12 +1766,14 @@ anychart.core.Chart.prototype.draw = function(opt_async) {
 
 /**
  * Extension point do before draw chart content.
+ * If total bounds are zero - this method isn't called.
  */
 anychart.core.Chart.prototype.beforeDraw = function() {};
 
 
 /**
  * Extension point do draw chart content.
+ * If total bounds are zero - this method isn't called.
  * @param {anychart.math.Rect} bounds Chart content area bounds.
  */
 anychart.core.Chart.prototype.drawContent = function(bounds) {};
@@ -1749,6 +1781,7 @@ anychart.core.Chart.prototype.drawContent = function(bounds) {};
 
 /**
  * Extension point do draw special chart content.
+ * If total bounds are zero - this method isn't called.
  * @param {anychart.math.Rect} bounds Chart plot bounds.
  */
 anychart.core.Chart.prototype.specialDraw = function(bounds) {};

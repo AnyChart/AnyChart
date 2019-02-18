@@ -1309,7 +1309,10 @@ anychart.stockModule.Chart.prototype.drawContent = function(bounds) {
     if (!!(changed & 2)) {
       this.scroller_.invalidateScaleDependend();
       this.invalidate(anychart.ConsistencyState.STOCK_SCROLLER);
+      this.dispatchRangeChange_(anychart.enums.EventType.SELECTED_RANGE_CHANGE,
+          anychart.enums.StockRangeChangeSource.DATA_CHANGE);
     }
+
     this.markConsistent(anychart.ConsistencyState.STOCK_DATA);
     anychart.performance.end('Stock data calc');
   }

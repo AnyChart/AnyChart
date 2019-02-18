@@ -466,6 +466,12 @@ anychart.ganttModule.Scale.prototype.fitAll = function() {
   if (!this.isEmpty()) {
     var range = this.getTotalRange();
     return this.setRange(range['min'], range['max']);
+  } else {
+    /*
+     * We save our intention to fit scale until scale is initialized.
+     * See anychart.ganttModule.TimeLine.prototype.initScale.
+     */
+    this.needsFitAll = true;
   }
   return this;
 };
@@ -905,6 +911,15 @@ anychart.ganttModule.Scale.prototype.zoomTo = function(startOrUnit, opt_endOrCou
   if (start < totalRange['min']) {
     start = totalRange['min'];
     end = start + range;
+  }
+
+  if (this.isEmpty()) {
+    /*
+     * We save our intention to zoom, until scale is initialized.
+     * See anychart.ganttModule.TimeLine.prototype.initScale.
+     */
+    this.needsZoomTo = true;
+    this.neededZoomToArgs = [startOrUnit, opt_endOrCount, opt_anchor];
   }
 
   return this.setRange(start, end);
