@@ -856,6 +856,16 @@ anychart.core.settings.startAngleNormalizer = function(val) {
 };
 
 
+/**
+ * Returns null or percent value.
+ * @param {*} val
+ * @return {?string}
+ */
+anychart.core.settings.nullOrPercentNormalizer = function(val) {
+  return goog.isNull(val) ? val : /** @type {string} */ (anychart.utils.normalizeToPercent(val));
+};
+
+
 //endregion
 //region Descriptors
 /**

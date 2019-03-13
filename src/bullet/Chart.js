@@ -176,11 +176,11 @@ anychart.bulletModule.Chart.prototype.isHorizontal = function() {
  * @return {!(anychart.scales.Base|anychart.bulletModule.Chart)} Default chart scale value or itself for method chaining.
  */
 anychart.bulletModule.Chart.prototype.scale = function(opt_value) {
-  if (!this.scale_) {
-    this.scale_ = anychart.scales.linear();
-    this.scale_.minimumGap(0);
-    this.scale_.maximumGap(0);
-    this.scale_.ticks().count(3, 5);
+  if (!this.scale_ && !goog.isDef(opt_value)) {
+    var scaleConfig = this.getThemeOption('scale');
+    this.scale_ = anychart.scales.Base.setupScale(this.scale_, scaleConfig, anychart.enums.ScaleTypes.LINEAR,
+        anychart.scales.Base.ScaleTypes.SCATTER);
+    this.scale_.resumeSignalsDispatching(false);
   }
 
   if (goog.isDef(opt_value)) {
@@ -214,6 +214,7 @@ anychart.bulletModule.Chart.prototype.axis = function(opt_value) {
     this.axis_ = new anychart.core.Axis();
     this.axis_.setParentEventTarget(this);
     this.axis_.listenSignals(this.onAxisSignal_, this);
+    this.setupCreated('axis', this.axis_);
     this.invalidate(
         anychart.ConsistencyState.BULLET_AXES |
             anychart.ConsistencyState.BULLET_MARKERS |
@@ -272,7 +273,7 @@ anychart.bulletModule.Chart.prototype.range = function(opt_indexOrValue, opt_val
   var range = this.ranges_[index];
   if (!range) {
     range = new anychart.core.axisMarkers.Range();
-    range.addThemes('bullet.defaultRangeMarkerSettings');
+    range.addThemes(/** @type {Object} */(this.getThemeOption('defaultRangeMarkerSettings')));
     this.ranges_[index] = range;
     range.listenSignals(this.onRangeSignal_, this);
     this.invalidate(anychart.ConsistencyState.BULLET_AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
@@ -532,7 +533,7 @@ anychart.bulletModule.Chart.prototype.createMarkers_ = function() {
 anychart.bulletModule.Chart.prototype.createMarker_ = function(iterator) {
   var index = iterator.getIndex();
   var marker = new anychart.bulletModule.Marker();
-  marker.addThemes('bullet.defaultMarkerSettings');
+  marker.addThemes(/** @type {Object} */(this.getThemeOption('defaultMarkerSettings')));
 
   marker.suspendSignalsDispatching();
   this.markers_[index] = marker;

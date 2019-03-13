@@ -18,7 +18,7 @@ goog.require('anychart.circularGaugeModule.Chart');
 anychart.gauges.circular = function(opt_data, opt_csvSettings) {
   var gauge = new anychart.circularGaugeModule.Chart(opt_data, opt_csvSettings);
   gauge.setOption('defaultPointerType', anychart.enums.CircularGaugePointerType.NEEDLE);
-  gauge.setupInternal(true, anychart.getFullTheme('circularGauge'));
+  gauge.setupElements();
 
   return gauge;
 };

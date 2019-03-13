@@ -42,17 +42,13 @@ anychart.circularGaugeModule.pointers.Needle.OWN_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
 
-  var normalizer = function(opt_value) {
-    return goog.isNull(opt_value) ? opt_value : /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
-  };
-
   anychart.core.settings.createDescriptors(map, [
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'startWidth', normalizer],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'startRadius', normalizer],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'middleWidth', normalizer],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'middleRadius', normalizer],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'endWidth', normalizer],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'endRadius', normalizer]
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'startWidth', anychart.core.settings.nullOrPercentNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'startRadius', anychart.core.settings.nullOrPercentNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'middleWidth', anychart.core.settings.nullOrPercentNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'middleRadius', anychart.core.settings.nullOrPercentNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'endWidth', anychart.core.settings.nullOrPercentNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'endRadius', anychart.core.settings.nullOrPercentNormalizer]
   ]);
 
   return map;
@@ -73,7 +69,7 @@ anychart.circularGaugeModule.pointers.Needle.prototype.hasOwnOption = function(n
 /** @inheritDoc */
 anychart.circularGaugeModule.pointers.Needle.prototype.draw = function() {
   var gauge = this.gauge();
-  var axis = gauge.getAxis(/** @type {number} */(this.axisIndex()));
+  var axis = gauge.getAxis(/** @type {number} */(this.getOption('axisIndex')));
   if (!this.checkDrawingNeeded())
     return this;
 
@@ -89,8 +85,8 @@ anychart.circularGaugeModule.pointers.Needle.prototype.draw = function() {
 
 
   if (this.hasInvalidationState(anychart.ConsistencyState.GAUGE_HATCH_FILL)) {
-    var fill = /** @type {acgraph.vector.PatternFill|acgraph.vector.HatchFill} */(this.hatchFill());
-    if (!this.hatchFillElement && !anychart.utils.isNone(fill)) {
+    var fill = /** @type {acgraph.vector.PatternFill|acgraph.vector.HatchFill} */(this.getOption('hatchFill'));
+    if (!this.hatchFillElement && fill && !anychart.utils.isNone(fill)) {
       this.hatchFillElement = acgraph.path();
 
       this.hatchFillElement.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
@@ -133,8 +129,8 @@ anychart.circularGaugeModule.pointers.Needle.prototype.draw = function() {
       this.domElement.clear();
 
     var axisRadius = axis.getPixRadius();
-    var axisStartAngle = /** @type {number} */(goog.isDef(axis.startAngle()) ? axis.getStartAngle() : gauge.getStartAngle());
-    var axisSweepAngle = /** @type {number} */(goog.isDef(axis.sweepAngle()) ? axis.sweepAngle() : /** @type {number} */(gauge.getOption('sweepAngle')));
+    var axisStartAngle = axis.getStartAngle();
+    var axisSweepAngle = axis.getSweepAngle();
 
     var pixStartRadius = anychart.utils.normalizeSize(/** @type {string} */(this.getOption('startRadius')), gauge.getPixRadius());
     var pixStartWidth = anychart.utils.normalizeSize(/** @type {string} */(this.getOption('startWidth')), gauge.getPixRadius());
@@ -233,7 +229,7 @@ anychart.circularGaugeModule.pointers.Needle.prototype.draw = function() {
       this.hatchFillElement.close();
     }
 
-    if (goog.isFunction(this.fill()) || goog.isFunction(this.stroke()))
+    if (goog.isFunction(this.getOption('fill')) || goog.isFunction(this.getOption('stroke')))
       this.invalidate(anychart.ConsistencyState.APPEARANCE);
 
     this.markConsistent(anychart.ConsistencyState.BOUNDS);

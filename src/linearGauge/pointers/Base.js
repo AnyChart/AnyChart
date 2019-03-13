@@ -846,6 +846,7 @@ anychart.linearGaugeModule.pointers.Base.prototype.createLegendContextProvider =
 anychart.linearGaugeModule.pointers.Base.prototype.legendItem = function(opt_value) {
   if (!this.legendItem_) {
     this.legendItem_ = new anychart.core.utils.LegendItemSettings();
+    this.setupCreated('legendItem', this.legendItem_);
     this.legendItem_.listenSignals(this.onLegendItemSignal, this);
   }
   if (goog.isDef(opt_value)) {
@@ -1426,6 +1427,22 @@ anychart.linearGaugeModule.pointers.Base.prototype.setupByJSON = function(config
   this.normal_.setupInternal(!!opt_default, config['normal']);
   this.hovered_.setupInternal(!!opt_default, config['hovered']);
   this.selected_.setupInternal(!!opt_default, config['selected']);
+};
+
+
+/**
+ * Sets up state settings with flat themes.
+ */
+anychart.linearGaugeModule.pointers.Base.prototype.setupStateSettings = function() {
+  this.normal_.addThemes(this.themeSettings);
+  this.setupCreated('normal', this.normal_);
+  this.normal_.setupInternal(true, {});
+
+  this.setupCreated('hovered', this.hovered_);
+  this.hovered_.setupInternal(true, {});
+
+  this.setupCreated('selected', this.selected_);
+  this.selected_.setupInternal(true, {});
 };
 
 

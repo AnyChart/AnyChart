@@ -15,63 +15,46 @@ anychart.circularGaugeModule.AxisMarker = function() {
   anychart.circularGaugeModule.AxisMarker.base(this, 'constructor');
 
   /**
-   * @type {number}
-   * @private
-   */
-  this.from_;
-
-  /**
-   * @type {number}
-   * @private
-   */
-  this.to_;
-
-  /**
-   * @type {?string}
-   * @private
-   */
-  this.startSize_;
-
-  /**
-   * @type {?string}
-   * @private
-   */
-  this.endSize_;
-
-  /**
-   * Pointer fill.
-   * @type {acgraph.vector.Fill|string}
-   * @private
-   */
-  this.fill_;
-
-  /**
-   * @type {?string}
-   * @private
-   */
-  this.radius_;
-
-  /**
-   * Pointer position.
-   * @type {anychart.enums.GaugeSidePosition}
-   * @private
-   */
-  this.position_;
-
-  /**
-   * Defines index of axis which will be used to display its data value.
-   * @type {number}
-   * @private
-   */
-  this.axisIndex_;
-
-  /**
    * @type {acgraph.vector.Path}
    * @protected
    */
   this.domElement;
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['fill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['axisIndex', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEEDS_RECALCULATION],
+    ['position', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['startSize', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['endSize', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['from', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW],
+    ['to', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW],
+    ['radius', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW],
+    ['cornersRounding', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED]
+  ]);
 };
 goog.inherits(anychart.circularGaugeModule.AxisMarker, anychart.core.VisualBase);
+
+
+anychart.circularGaugeModule.AxisMarker.OWN_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  var d = anychart.core.settings.descriptors;
+  anychart.core.settings.createDescriptors(map, [
+    d.FILL,
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'axisIndex', anychart.core.settings.numberNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'position', anychart.enums.normalizeGaugeSidePosition],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'startSize', anychart.core.settings.nullOrPercentNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'endSize', anychart.core.settings.nullOrPercentNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'from', anychart.core.settings.numberNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'to', anychart.core.settings.numberNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'radius', anychart.core.settings.nullOrPercentNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'cornersRounding', anychart.utils.normalizeToPercent]
+  ]);
+
+  return map;
+})();
+anychart.core.settings.populate(anychart.circularGaugeModule.AxisMarker, anychart.circularGaugeModule.AxisMarker.OWN_DESCRIPTORS);
 
 
 /**
@@ -94,85 +77,6 @@ anychart.circularGaugeModule.AxisMarker.prototype.SUPPORTED_SIGNALS =
 
 
 /**
- * Range fill.
- * @param {(acgraph.vector.Fill)=} opt_value .
- * @return {(!anychart.circularGaugeModule.AxisMarker|acgraph.vector.Fill)} .
- */
-anychart.circularGaugeModule.AxisMarker.prototype.fill = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = acgraph.vector.normalizeFill(opt_value);
-    if (this.fill_ != opt_value) {
-      this.fill_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE,
-          anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  } else
-    return this.fill_;
-};
-
-
-/**
- * Range radius. Sets relative gauge radius in percent.
- * @param {(number|string|null)=} opt_value .
- * @return {(string|anychart.circularGaugeModule.AxisMarker)} .
- */
-anychart.circularGaugeModule.AxisMarker.prototype.radius = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
-    if (this.radius_ != opt_value) {
-      this.radius_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  } else {
-    return this.radius_;
-  }
-};
-
-
-/**
- * Circular range ends radius.
- * @param {(null|number|string)=} opt_value .
- * @return {string|anychart.circularGaugeModule.AxisMarker} .
- */
-anychart.circularGaugeModule.AxisMarker.prototype.cornersRounding = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizeToPercent(opt_value);
-    if (this.cornersRounding_ != opt_value) {
-      this.cornersRounding_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.cornersRounding_;
-  }
-};
-
-
-/**
- * Axis index.
- * @param {number=} opt_index .
- * @return {number|anychart.circularGaugeModule.AxisMarker} .
- */
-anychart.circularGaugeModule.AxisMarker.prototype.axisIndex = function(opt_index) {
-  if (goog.isDef(opt_index)) {
-    if (this.axisIndex_ != opt_index) {
-      this.axisIndex_ = opt_index;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW |
-          anychart.Signal.NEEDS_RECALCULATION
-      );
-    }
-    return this;
-  } else {
-    return this.axisIndex_;
-  }
-};
-
-
-/**
  * Set/get link to gauge.
  * @param {anychart.circularGaugeModule.Chart=} opt_gauge Gauge inst for set.
  * @return {anychart.circularGaugeModule.AxisMarker}
@@ -185,103 +89,6 @@ anychart.circularGaugeModule.AxisMarker.prototype.gauge = function(opt_gauge) {
     return this;
   } else {
     return this.gauge_;
-  }
-};
-
-
-/**
- * Get/set starting range value.
- * @param {number=} opt_value .
- * @return {number|anychart.circularGaugeModule.AxisMarker} .
- */
-anychart.circularGaugeModule.AxisMarker.prototype.from = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = +opt_value;
-    if (this.from_ != opt_value) {
-      this.from_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  } else {
-    return this.from_;
-  }
-};
-
-
-/**
- * Get/set ending range value.
- * @param {number=} opt_value .
- * @return {number|anychart.circularGaugeModule.AxisMarker} .
- */
-anychart.circularGaugeModule.AxisMarker.prototype.to = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = +opt_value;
-    if (this.to_ != opt_value) {
-      this.to_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  } else {
-    return this.to_;
-  }
-};
-
-
-/**
- * Range position relative axis - inside, center, outside.
- * @param {(anychart.enums.SidePosition|string)=} opt_value .
- * @return {(anychart.enums.SidePosition|string|!anychart.circularGaugeModule.AxisMarker)} .
- */
-anychart.circularGaugeModule.AxisMarker.prototype.position = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeGaugeSidePosition(opt_value);
-    if (this.position_ != opt_value) {
-      this.position_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else
-    return this.position_;
-};
-
-
-/**
- * Range start size.
- * @param {(null|number|string)=} opt_value .
- * @return {(string|anychart.circularGaugeModule.AxisMarker)} .
- */
-anychart.circularGaugeModule.AxisMarker.prototype.startSize = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
-    if (this.startSize_ != opt_value) {
-      this.startSize_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.startSize_;
-  }
-};
-
-
-/**
- * Range end size.
- * @param {(null|number|string)=} opt_value .
- * @return {(string|anychart.circularGaugeModule.AxisMarker)} .
- */
-anychart.circularGaugeModule.AxisMarker.prototype.endSize = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
-    if (this.endSize_ != opt_value) {
-      this.endSize_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.endSize_;
   }
 };
 
@@ -347,9 +154,10 @@ anychart.circularGaugeModule.AxisMarker.prototype.drawDynamicArc_ = function(pat
  * @private
  */
 anychart.circularGaugeModule.AxisMarker.prototype.getComplexRadius_ = function(radius, axisWidth, size, isStartPoint) {
-  if (this.position_ == anychart.enums.GaugeSidePosition.OUTSIDE)
+  var position = /** @type {anychart.enums.SidePosition} */(this.getOption('position'));
+  if (position == anychart.enums.GaugeSidePosition.OUTSIDE)
     return radius * (1 + (isStartPoint ? 0 : size)) + axisWidth / 2;
-  else if (this.position_ == anychart.enums.GaugeSidePosition.INSIDE)
+  else if (position == anychart.enums.GaugeSidePosition.INSIDE)
     return radius * (1 - (isStartPoint ? 0 : size)) - axisWidth / 2;
   else
     return radius * (1 + (isStartPoint ? -.5 : .5) * size);
@@ -448,7 +256,7 @@ anychart.circularGaugeModule.AxisMarker.prototype.drawGradientBlock_ = function(
   key2['color'] = color2;
   keys.push(key2);
 
-  var axis = this.gauge_.getAxis(/** @type {number} */(this.axisIndex()));
+  var axis = this.gauge_.getAxis(/** @type {number} */(this.getOption('axisIndex')));
   var inv = axis.scale().inverted();
   var sign = inv ? -1 : 1;
 
@@ -577,7 +385,7 @@ anychart.circularGaugeModule.AxisMarker.prototype.getRadii_ = function(gauge, ax
  */
 anychart.circularGaugeModule.AxisMarker.prototype.draw = function() {
   var gauge = this.gauge_;
-  var axis = gauge.getAxis(/** @type {number} */(this.axisIndex()));
+  var axis = gauge.getAxis(/** @type {number} */(this.getOption('axisIndex')));
 
   if (!this.checkDrawingNeeded())
     return this;
@@ -588,7 +396,7 @@ anychart.circularGaugeModule.AxisMarker.prototype.draw = function() {
     return this;
   }
 
-  var fill = /** @type {acgraph.vector.Fill} */ (this.fill());
+  var fill = /** @type {acgraph.vector.Fill} */ (this.getOption('fill'));
   var isLinearGradient = this.isLinearGradient_(fill);
   if (isLinearGradient)
     this.invalidate(anychart.ConsistencyState.BOUNDS);
@@ -597,8 +405,8 @@ anychart.circularGaugeModule.AxisMarker.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     var scale = axis.scale();
-    var from = parseFloat(this.from_);
-    var to = parseFloat(this.to_);
+    var from = this.getOption('from');
+    var to = this.getOption('to');
 
     if (scale.isMissing(from) || scale.isMissing(to)) {
       if (this.domElement) this.domElement.clear();
@@ -626,8 +434,8 @@ anychart.circularGaugeModule.AxisMarker.prototype.draw = function() {
       if (fromRatio == toRatio)
         return this;
 
-      var axisStartAngle = /** @type {number} */(goog.isDef(axis.startAngle()) ? axis.getStartAngle() : gauge.getStartAngle());
-      var axisSweepAngle = /** @type {number} */(goog.isDef(axis.sweepAngle()) ? axis.sweepAngle() : /** @type {number} */ (gauge.getOption('sweepAngle')));
+      var axisStartAngle = axis.getStartAngle();
+      var axisSweepAngle = axis.getSweepAngle();
       var startAngle = axisStartAngle + fromRatio * axisSweepAngle;
       var endAngle = axisStartAngle + toRatio * axisSweepAngle;
 
@@ -637,17 +445,20 @@ anychart.circularGaugeModule.AxisMarker.prototype.draw = function() {
       var startAngleRad = goog.math.toRadians(startAngle);
       var endAngleRad = goog.math.toRadians(endAngle);
 
-      var startSize = goog.isDefAndNotNull(this.startSize_) ? this.startSize_ : 0;
-      var endSize = goog.isDefAndNotNull(this.endSize_) ? this.endSize_ : '10%';
+      var startSize = this.getOption('startSize');
+      var endSize = this.getOption('endSize');
+      startSize = goog.isDefAndNotNull(startSize) ? startSize : 0;
+      endSize = goog.isDefAndNotNull(endSize) ? endSize : '10%';
 
       var startPercentSize = parseFloat(inverse ? endSize : startSize) / 100;
       var endPercentSize = parseFloat(inverse ? startSize : endSize) / 100;
 
-      var radius = goog.isDefAndNotNull(this.radius_) ?
-          anychart.utils.normalizeSize(this.radius_, gauge.getPixRadius()) :
+      var optionRadius = /** @type {null|string} */(this.getOption('radius'));
+      var radius = goog.isDefAndNotNull(optionRadius) ?
+          anychart.utils.normalizeSize(optionRadius, gauge.getPixRadius()) :
           axis.getPixRadius();
 
-      var axisWidth = goog.isDefAndNotNull(this.radius_) ? 0 : axis.getPixWidth();
+      var axisWidth = goog.isDefAndNotNull(optionRadius) ? 0 : axis.getPixWidth();
 
       var radii = this.getRadii_(gauge, axisWidth, radius, startPercentSize, endPercentSize);
 
@@ -657,10 +468,11 @@ anychart.circularGaugeModule.AxisMarker.prototype.draw = function() {
       var baseEndR = radii[3];
 
 
+      var cornersRounding = this.getOption('cornersRounding');
       var startWidth = startR - baseStartR;
-      var cornersRoundingPixStart = anychart.utils.normalizeSize(/** @type {string} */ (this.cornersRounding()), startWidth);
+      var cornersRoundingPixStart = anychart.utils.normalizeSize(/** @type {string} */ (cornersRounding), startWidth);
       var endWidth = endR - baseEndR;
-      var cornersRoundingPixEnd = anychart.utils.normalizeSize(/** @type {string} */ (this.cornersRounding()), endWidth);
+      var cornersRoundingPixEnd = anychart.utils.normalizeSize(/** @type {string} */ (cornersRounding), endWidth);
 
       var startX, startY, endX, endY, x, y;
 
@@ -778,7 +590,7 @@ anychart.circularGaugeModule.AxisMarker.prototype.draw = function() {
     if (isLinearGradient)
       this.domElement.fill(/** @type {acgraph.vector.Fill} */('none'));
     else
-      this.domElement.fill(/** @type {acgraph.vector.Fill} */(this.fill()));
+      this.domElement.fill(/** @type {acgraph.vector.Fill} */(this.getOption('fill')));
     this.domElement.stroke(/** @type {acgraph.vector.Stroke} */('none'));
 
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
@@ -814,17 +626,7 @@ anychart.circularGaugeModule.AxisMarker.prototype.draw = function() {
 /** @inheritDoc */
 anychart.circularGaugeModule.AxisMarker.prototype.serialize = function() {
   var json = anychart.circularGaugeModule.AxisMarker.base(this, 'serialize');
-
-  json['axisIndex'] = this.axisIndex();
-  json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill()));
-  json['position'] = this.position();
-  if (goog.isDef(this.from())) json['from'] = this.from();
-  if (goog.isDef(this.to())) json['to'] = this.to();
-  if (goog.isDef(this.startSize())) json['startSize'] = this.startSize();
-  if (goog.isDef(this.endSize())) json['endSize'] = this.endSize();
-  if (goog.isDef(this.radius())) json['radius'] = this.radius();
-  if (goog.isDef(this.cornersRounding())) json['cornersRounding'] = this.cornersRounding();
-
+  anychart.core.settings.serialize(this, anychart.circularGaugeModule.AxisMarker.OWN_DESCRIPTORS, json);
   return json;
 };
 
@@ -832,41 +634,31 @@ anychart.circularGaugeModule.AxisMarker.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.circularGaugeModule.AxisMarker.prototype.setupByJSON = function(config, opt_default) {
   anychart.circularGaugeModule.AxisMarker.base(this, 'setupByJSON', config, opt_default);
-
-  this.axisIndex(config['axisIndex']);
-  this.from(config['from']);
-  this.to(config['to']);
-  this.fill(config['fill']);
-  this.position(config['position']);
-  this.startSize(config['startSize']);
-  this.endSize(config['endSize']);
-  this.radius(config['radius']);
-  this.cornersRounding(config['cornersRounding']);
+  anychart.core.settings.deserialize(this, anychart.circularGaugeModule.AxisMarker.OWN_DESCRIPTORS, config);
 };
 
 
 /** @inheritDoc */
 anychart.circularGaugeModule.AxisMarker.prototype.disposeInternal = function() {
-  goog.dispose(this.domElement);
-  this.domElement = null;
-
-  goog.disposeAll(this.paths_);
+  goog.disposeAll(this.paths_, this.domElement);
   this.paths_ = null;
+  this.domElement = null;
 
   anychart.circularGaugeModule.AxisMarker.base(this, 'disposeInternal');
 };
 
 
 //exports
-(function() {
-  var proto = anychart.circularGaugeModule.AxisMarker.prototype;
-  proto['fill'] = proto.fill;
-  proto['axisIndex'] = proto.axisIndex;
-  proto['position'] = proto.position;
-  proto['startSize'] = proto.startSize;
-  proto['endSize'] = proto.endSize;
-  proto['from'] = proto.from;
-  proto['to'] = proto.to;
-  proto['radius'] = proto.radius;
-  proto['cornersRounding'] = proto.cornersRounding;
-})();
+// (function() {
+//   var proto = anychart.circularGaugeModule.AxisMarker.prototype;
+//   auto
+//   proto['fill'] = proto.fill;
+//   proto['axisIndex'] = proto.axisIndex;
+//   proto['position'] = proto.position;
+//   proto['startSize'] = proto.startSize;
+//   proto['endSize'] = proto.endSize;
+//   proto['from'] = proto.from;
+//   proto['to'] = proto.to;
+//   proto['radius'] = proto.radius;
+//   proto['cornersRounding'] = proto.cornersRounding;
+// })();

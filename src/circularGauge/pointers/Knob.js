@@ -46,16 +46,14 @@ anychart.circularGaugeModule.pointers.Knob.OWN_DESCRIPTORS = (function() {
     opt_value = anychart.utils.toNumber(opt_value);
     return (!opt_value ? this.getOption('verticesCount') : opt_value);
   };
-  var normalizer = function(opt_value) {
-    return goog.isNull(opt_value) ? opt_value : /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
-  };
+
   anychart.core.settings.createDescriptors(map, [
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'verticesCount', verticesCountNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'verticesCurvature', anychart.core.settings.asIsNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'topRatio', anychart.core.settings.ratioNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'bottomRatio', anychart.core.settings.ratioNormalizer],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'topRadius', normalizer],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'bottomRadius', normalizer]
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'topRadius', anychart.core.settings.nullOrPercentNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'bottomRadius', anychart.core.settings.nullOrPercentNormalizer]
   ]);
 
   return map;
@@ -114,8 +112,9 @@ anychart.circularGaugeModule.pointers.Knob.prototype.drawVertexSide = function(p
 
   xa = startVertexSidePointX;
   ya = startVertexSidePointY;
-  xb = startVertexSidePointX + Math.cos(tangentAngleRad) * 100;
-  yb = startVertexSidePointY + Math.sin(tangentAngleRad) * 100;
+  // 10000 magic number is to avoid rounding with certain angle values
+  xb = startVertexSidePointX + Math.cos(tangentAngleRad) * 10000;
+  yb = startVertexSidePointY + Math.sin(tangentAngleRad) * 10000;
   xp = endVertexSidePointX;
   yp = endVertexSidePointY;
 
@@ -173,7 +172,7 @@ anychart.circularGaugeModule.pointers.Knob.prototype.drawVertexSide = function(p
 /** @inheritDoc */
 anychart.circularGaugeModule.pointers.Knob.prototype.draw = function() {
   var gauge = this.gauge();
-  var axis = gauge.getAxis(/** @type {number} */(this.axisIndex()));
+  var axis = gauge.getAxis(/** @type {number} */(this.getOption('axisIndex')));
   if (!this.checkDrawingNeeded())
     return this;
 
@@ -188,8 +187,8 @@ anychart.circularGaugeModule.pointers.Knob.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.GAUGE_HATCH_FILL)) {
-    var fill = /** @type {acgraph.vector.PatternFill|acgraph.vector.HatchFill} */(this.hatchFill());
-    if (!this.hatchFillElement && !anychart.utils.isNone(fill)) {
+    var fill = /** @type {acgraph.vector.PatternFill|acgraph.vector.HatchFill} */(this.getOption('hatchFill'));
+    if (!this.hatchFillElement && fill && !anychart.utils.isNone(fill)) {
       this.hatchFillElement = acgraph.path();
 
       this.hatchFillElement.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
@@ -231,8 +230,8 @@ anychart.circularGaugeModule.pointers.Knob.prototype.draw = function() {
       this.domElement.clear();
 
     var axisRadius = axis.getPixRadius();
-    var axisStartAngle = /** @type {number} */(goog.isDef(axis.startAngle()) ? axis.getStartAngle() : gauge.getStartAngle());
-    var axisSweepAngle = /** @type {number} */(goog.isDef(axis.sweepAngle()) ? axis.sweepAngle() : /** @type {number} */(gauge.getOption('sweepAngle')));
+    var axisStartAngle = axis.getStartAngle();
+    var axisSweepAngle = axis.getSweepAngle();
 
     var topRadius = /** @type {string} */(this.getOption('topRadius'));
     var pixTopRadius = goog.isDefAndNotNull(topRadius) ?

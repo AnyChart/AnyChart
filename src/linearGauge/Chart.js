@@ -31,6 +31,8 @@ goog.require('anychart.scales');
 anychart.linearGaugeModule.Chart = function(opt_data, opt_csvSettings) {
   anychart.linearGaugeModule.Chart.base(this, 'constructor');
 
+  this.addThemes('linearGauge');
+
   /**
    * Gauge axes.
    * @type {Array.<anychart.linearGaugeModule.Axis>}
@@ -66,6 +68,9 @@ anychart.linearGaugeModule.Chart = function(opt_data, opt_csvSettings) {
     ['layout', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW],
     ['defaultPointerType', 0, 0]
   ]);
+
+  // Initializing tooltip, before flat themes it was done in setupByJSON
+  this.getCreated('tooltip');
 };
 goog.inherits(anychart.linearGaugeModule.Chart, anychart.core.SeparateChart);
 
@@ -153,53 +158,7 @@ anychart.core.settings.populate(anychart.linearGaugeModule.Chart, anychart.linea
 
 
 //endregion
-//region --- DEFAULT SETTINGS ---
-/**
- * Getter/setter for axis default settings.
- * @param {Object=} opt_value Object with axis settings.
- * @return {Object|anychart.linearGaugeModule.Chart}
- */
-anychart.linearGaugeModule.Chart.prototype.defaultAxisSettings = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.defaultAxisSettings_ = opt_value;
-    return this;
-  }
-  return this.defaultAxisSettings_ || {};
-};
-
-
-/**
- * Getter/setter for default pointer settings.
- * @param {Object=} opt_value Object with default pointer settings.
- * @return {Object|anychart.linearGaugeModule.Chart} Pointer settings or self for chaining.
- */
-anychart.linearGaugeModule.Chart.prototype.defaultPointerSettings = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.defaultPointerSettings_ = opt_value;
-    return this;
-  }
-  return this.defaultPointerSettings_ || {};
-};
-
-
-/**
- * Getter/setter for default scale bar settings.
- * @param {Object=} opt_value Object with default pointer settings.
- * @return {Object|anychart.linearGaugeModule.Chart} Pointer settings or self for chaining.
- */
-anychart.linearGaugeModule.Chart.prototype.defaultScaleBarSettings = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.defaultScaleBarSettings_ = opt_value;
-    return this;
-  }
-  return this.defaultScaleBarSettings_ || {};
-};
-
-
-//endregion
 //region --- OWN/INHERITED API ---
-
-
 /**
  * Chart markers palette settings.
  * @param {(anychart.palettes.Markers|Object|Array.<anychart.enums.MarkerType>)=} opt_value Chart marker palette settings to set.
@@ -208,6 +167,7 @@ anychart.linearGaugeModule.Chart.prototype.defaultScaleBarSettings = function(op
 anychart.linearGaugeModule.Chart.prototype.markerPalette = function(opt_value) {
   if (!this.markerPalette_) {
     this.markerPalette_ = new anychart.palettes.Markers();
+    this.setupCreated('markerPalette', this.markerPalette_);
     this.markerPalette_.listenSignals(this.markerPaletteInvalidated_, this);
   }
 
@@ -271,6 +231,7 @@ anychart.linearGaugeModule.Chart.prototype.setupPalette_ = function(cls, opt_clo
     var doDispatch = !!this.palette_;
     goog.dispose(this.palette_);
     this.palette_ = new cls();
+    this.setupCreated('palette', this.palette_);
     if (opt_cloneFrom)
       this.palette_.setup(opt_cloneFrom);
     this.palette_.listenSignals(this.paletteInvalidated_, this);
@@ -302,6 +263,7 @@ anychart.linearGaugeModule.Chart.prototype.paletteInvalidated_ = function(event)
 anychart.linearGaugeModule.Chart.prototype.hatchFillPalette = function(opt_value) {
   if (!this.hatchFillPalette_) {
     this.hatchFillPalette_ = new anychart.palettes.HatchFills();
+    this.setupCreated('hatchFillPalette', this.hatchFillPalette_);
     this.hatchFillPalette_.listenSignals(this.hatchFillPaletteInvalidated_, this);
   }
 
@@ -373,7 +335,6 @@ anychart.linearGaugeModule.Chart.prototype.getDataHolders = function() {
  */
 anychart.linearGaugeModule.Chart.prototype.createPointerByType_ = function(type, dataIndexOrData, opt_csvSettings) {
   type = anychart.enums.normalizeLinearGaugePointerType(type);
-  var config = this.defaultPointerSettings()[anychart.utils.toCamelCase(type)];
   var ctl = anychart.linearGaugeModule.Chart.PointersTypesMap[type];
   /**
    * @type {anychart.linearGaugeModule.pointers.Base}
@@ -400,7 +361,18 @@ anychart.linearGaugeModule.Chart.prototype.createPointerByType_ = function(type,
     instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(index)));
     instance.gauge(this);
     instance.setParentEventTarget(this);
-    instance.setupInternal(true, config);
+    var defaultPointerSettings = /** @type {Object} */(this.getThemeOption('defaultPointerSettings'));
+    instance.addThemes(defaultPointerSettings['base']);
+    instance.addThemes(defaultPointerSettings[anychart.utils.toCamelCase(type)]);
+
+    // fix for led pointer, that has colorScale and gsc states
+    if (goog.isFunction(instance.colorScale)) {
+      instance.colorScale(instance.getThemeOption('colorScale'));
+      // init states for gap/size/count handling
+      instance.initGscFromOptions();
+    }
+
+    instance.setupStateSettings();
     instance.listenSignals(this.pointerInvalidated_, this);
     this.invalidate(anychart.ConsistencyState.BOUNDS |
         anychart.ConsistencyState.GAUGE_POINTERS |
@@ -792,8 +764,8 @@ anychart.linearGaugeModule.Chart.prototype.axis = function(opt_indexOrValue, opt
   var axis = this.axes_[index];
   if (!axis) {
     axis = new anychart.linearGaugeModule.Axis();
+    axis.addThemes(/** @type {Object} */(this.getThemeOption('defaultAxisSettings')));
     axis.setParentEventTarget(this);
-    axis.setup(this.defaultAxisSettings());
     this.axes_[index] = axis;
     axis.listenSignals(this.onAxisSignal_, this);
     this.invalidate(anychart.ConsistencyState.GAUGE_AXES | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
@@ -871,8 +843,10 @@ anychart.linearGaugeModule.Chart.prototype.scaleBar = function(opt_indexOrValue,
   var scaleBar = this.scaleBars_[index];
   if (!scaleBar) {
     scaleBar = new anychart.linearGaugeModule.ScaleBar(this);
+    var defaultScaleBarSettings = /** @type {Object} */(this.getThemeOption('defaultScaleBarSettings'));
+    scaleBar.addThemes(defaultScaleBarSettings);
+    scaleBar.colorScale(defaultScaleBarSettings['colorScale']);
     scaleBar.setParentEventTarget(this);
-    scaleBar.setup(this.defaultScaleBarSettings());
     this.scaleBars_[index] = scaleBar;
     scaleBar.listenSignals(this.onScaleBarSignal_, this);
     this.invalidate(anychart.ConsistencyState.GAUGE_SCALE_BAR | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
@@ -1287,13 +1261,6 @@ anychart.linearGaugeModule.Chart.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.linearGaugeModule.Chart.prototype.setupByJSON = function(config, opt_default) {
   anychart.linearGaugeModule.Chart.base(this, 'setupByJSON', config, opt_default);
-
-  if ('defaultAxisSettings' in config)
-    this.defaultAxisSettings(config['defaultAxisSettings']);
-  if ('defaultPointerSettings' in config)
-    this.defaultPointerSettings(config['defaultPointerSettings']);
-  if ('defaultScaleBarSettings' in config)
-    this.defaultScaleBarSettings(config['defaultScaleBarSettings']);
 
   anychart.core.settings.deserialize(this, anychart.linearGaugeModule.Chart.PROPERTY_DESCRIPTORS, config);
   this.data(config['data']);

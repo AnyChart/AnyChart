@@ -18,44 +18,8 @@ anychart.circularGaugeModule.AxisTicks = function() {
   anychart.circularGaugeModule.AxisTicks.base(this, 'constructor');
 
   /**
-   * Ticks length.
-   * @type {?string}
-   * @private
-   */
-  this.length_;
-
-  /**
-   * Ticks stroke.
-   * @type {acgraph.vector.Stroke|string|Function}
-   * @private
-   */
-  this.stroke_;
-
-  /**
-   * Ticks fill.
-   * @type {acgraph.vector.Fill|string|Function}
-   * @private
-   */
-  this.fill_;
-
-  /**
-   * Ticks position.
-   * @type {anychart.enums.GaugeSidePosition}
-   * @private
-   */
-  this.position_;
-
-  /**
-   * Ticks type.
-   * @type {(string|anychart.enums.MarkerType|
-   * function(acgraph.vector.Path, number, number, number): acgraph.vector.Path)}
-   * @private
-   */
-  this.type_;
-
-  /**
    * In this class ticks are markers. Its control by MarkersFactory.
-   * @type {anychart.core.ui.MarkersFactory}
+   * @type {!anychart.core.ui.MarkersFactory}
    * @private
    */
   this.ticks_ = new anychart.core.ui.MarkersFactory();
@@ -68,19 +32,51 @@ anychart.circularGaugeModule.AxisTicks = function() {
   this.ticks_.setParentEventTarget(this);
 
   /**
-   * Ticks hatch fill.
-   * @type {acgraph.vector.PatternFill|acgraph.vector.HatchFill|boolean}
-   * @private
-   */
-  this.hatchFill_;
-
-  /**
    * @type {Object}
    * @private
    */
   this.contextProvider_ = {};
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['length', 0, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['type', 0, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['stroke', 0, anychart.Signal.NEEDS_REDRAW],
+    ['fill', 0, anychart.Signal.NEEDS_REDRAW],
+    ['hatchFill', 0, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['position', 0, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED]
+  ]);
 };
 goog.inherits(anychart.circularGaugeModule.AxisTicks, anychart.core.VisualBase);
+
+
+/**
+ * Property descriptors.
+ * @type {!Object<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.circularGaugeModule.AxisTicks.OWN_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  function positionNormalizer(value) {
+    return anychart.enums.normalizeGaugeSidePosition(value);
+  }
+
+  function lengthNormalizer(value) {
+    return goog.isNull(value) ? value : anychart.utils.normalizeToPercent(value);
+  }
+
+  var d = anychart.core.settings.descriptors;
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'length', lengthNormalizer],
+    d.TYPE,
+    d.STROKE_FUNCTION,
+    d.FILL_FUNCTION,
+    d.HATCH_FILL,
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'position', positionNormalizer]
+  ]);
+  return map;
+})();
+anychart.core.settings.populate(anychart.circularGaugeModule.AxisTicks, anychart.circularGaugeModule.AxisTicks.OWN_DESCRIPTORS);
 
 
 /**
@@ -105,79 +101,10 @@ anychart.circularGaugeModule.AxisTicks.prototype.SUPPORTED_CONSISTENCY_STATES =
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Tick length.
- * @param {(null|number|string)=} opt_value .
- * @return {(string|anychart.circularGaugeModule.AxisTicks)} .
- */
-anychart.circularGaugeModule.AxisTicks.prototype.length = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
-    if (this.length_ != opt_value) {
-      this.length_ = opt_value;
-      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else
-    return this.length_;
-};
-
-
-/**
  * @return {number}
  */
 anychart.circularGaugeModule.AxisTicks.prototype.getPixLength = function() {
   return this.pixLength_;
-};
-
-
-/**
- * Tick stroke.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {(!anychart.circularGaugeModule.AxisTicks|acgraph.vector.Stroke|Function)} .
- */
-anychart.circularGaugeModule.AxisTicks.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var stroke = goog.isFunction(opt_strokeOrFill) ?
-        opt_strokeOrFill :
-        acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (stroke != this.stroke_) {
-      this.stroke_ = stroke;
-      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.stroke_;
-};
-
-
-/**
- * Tick fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|string|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {(!anychart.circularGaugeModule.AxisTicks|acgraph.vector.Fill|Function)} .
- */
-anychart.circularGaugeModule.AxisTicks.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var fill = goog.isFunction(opt_fillOrColorOrKeys) ?
-        opt_fillOrColorOrKeys :
-        acgraph.vector.normalizeFill.apply(null, arguments);
-    if (fill != this.fill_) {
-      this.fill_ = fill;
-      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.fill_;
 };
 
 
@@ -192,73 +119,6 @@ anychart.circularGaugeModule.AxisTicks.prototype.normalizeColor = function(color
   return goog.isFunction(color) ?
       color.call(context, context) :
       color;
-};
-
-
-/**
- * Tick hatch fill.
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|acgraph.vector.HatchFill.HatchFillType|
- * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.circularGaugeModule.AxisTicks|boolean} Hatch fill.
- */
-anychart.circularGaugeModule.AxisTicks.prototype.hatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrTypeOrState)) {
-    if (goog.isBoolean(opt_patternFillOrTypeOrState))
-      opt_patternFillOrTypeOrState = opt_patternFillOrTypeOrState ?
-          anychart.circularGaugeModule.Chart.DEFAULT_HATCH_FILL_TYPE : 'none';
-
-    var hatchFill = acgraph.vector.normalizeHatchFill.apply(null, arguments);
-
-    if (hatchFill !== this.hatchFill_) {
-      this.hatchFill_ = hatchFill;
-      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.hatchFill_;
-};
-
-
-/**
- * Tick type.
- * @param {(string|anychart.enums.MarkerType|
- * function(acgraph.vector.Path, number, number, number): acgraph.vector.Path)=} opt_value .
- * @return {(!anychart.circularGaugeModule.AxisTicks|string|anychart.enums.MarkerType|
- * function(acgraph.vector.Path, number, number, number): acgraph.vector.Path)} .
- */
-anychart.circularGaugeModule.AxisTicks.prototype.type = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (goog.isFunction(opt_value))
-      opt_value = (goog.isFunction(opt_value)) ?
-          opt_value :
-          anychart.enums.normalizeMarkerType(opt_value, anychart.enums.MarkerType.LINE);
-    if (this.type_ != opt_value) {
-      this.type_ = opt_value;
-      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else
-    return this.type_;
-};
-
-
-/**
- * Tick position.
- * @param {(anychart.enums.SidePosition|string)=} opt_value [center] Position to set.
- * @return {(anychart.enums.SidePosition|string|!anychart.circularGaugeModule.AxisTicks)} .
- */
-anychart.circularGaugeModule.AxisTicks.prototype.position = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeGaugeSidePosition(opt_value);
-    if (this.position_ != opt_value)
-      this.position_ = opt_value;
-    this.dispatchSignal(anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    return this;
-  } else
-    return this.position_;
 };
 
 
@@ -281,13 +141,15 @@ anychart.circularGaugeModule.AxisTicks.prototype.remove = function() {
  * Start drawing.
  */
 anychart.circularGaugeModule.AxisTicks.prototype.startDrawing = function() {
-  this.pixLength_ = goog.isDefAndNotNull(this.length_) ?
-      anychart.utils.normalizeSize(this.length_, this.axis_.getPixRadius()) :
+  var length = /** @type {number|string} */(this.getOption('length'));
+  this.pixLength_ = goog.isDefAndNotNull(length) ?
+      anychart.utils.normalizeSize(length, this.axis_.getPixRadius()) :
       this.axis_.getPixWidth();
   this.radius_ = this.axis_.getPixRadius();
-  if (this.position_ == anychart.enums.GaugeSidePosition.OUTSIDE)
+  var position = this.getOption('position');
+  if (position == anychart.enums.GaugeSidePosition.OUTSIDE)
     this.radius_ += this.axis_.getPixWidth() / 2 + this.pixLength_ / 2;
-  else if (this.position_ == anychart.enums.GaugeSidePosition.INSIDE)
+  else if (position == anychart.enums.GaugeSidePosition.INSIDE)
     this.radius_ -= this.axis_.getPixWidth() / 2 + this.pixLength_ / 2;
 
   this.contextProvider_['length'] = this.pixLength_;
@@ -296,14 +158,19 @@ anychart.circularGaugeModule.AxisTicks.prototype.startDrawing = function() {
   this.contextProvider_['cy'] = this.axis_.gauge().getCy();
 
   this.ticks_.clear();
-  if (!goog.isFunction(this.stroke_))
-    this.ticks_.setOption('stroke', this.stroke_);
-  if (!goog.isFunction(this.fill_))
-    this.ticks_.setOption('fill', this.fill_);
+  var stroke = /** @type {Function|acgraph.vector.Stroke} */(this.getOption('stroke'));
+  var fill = /** @type {Function|acgraph.vector.Fill} */(this.getOption('fill'));
+  if (!goog.isFunction(stroke))
+    this.ticks_.setOption('stroke', stroke);
+  if (!goog.isFunction(fill))
+    this.ticks_.fill(fill);
   this.ticks_.setOption('size', this.pixLength_ / 2);
-  this.ticks_.setOption('type', this.type_);
+  var type = /** @type {anychart.enums.MarkerType} */(this.getOption('type'));
+  this.ticks_.type(type);
 
-  if (!this.hatchFillElement_ && !anychart.utils.isNone(this.hatchFill_)) {
+  var hatchFill = this.getOption('hatchFill');
+
+  if (!this.hatchFillElement_ && hatchFill && !anychart.utils.isNone(hatchFill)) {
     this.hatchFillElement_ = new anychart.core.ui.MarkersFactory();
     this.hatchFillElement_.setOption('positionFormatter', anychart.utils.DEFAULT_FORMATTER);
     this.hatchFillElement_.setOption('size', 10);
@@ -319,8 +186,8 @@ anychart.circularGaugeModule.AxisTicks.prototype.startDrawing = function() {
     this.hatchFillElement_.clear();
     this.hatchFillElement_.disablePointerEvents(true);
     this.hatchFillElement_.setOption('size', this.pixLength_ / 2);
-    this.hatchFillElement_.setOption('type', this.type_);
-    this.hatchFillElement_.setOption('fill', this.hatchFill_);
+    this.hatchFillElement_.setOption('type', type);
+    this.hatchFillElement_.setOption('fill', fill);
     this.hatchFillElement_.setOption('stroke', null);
   }
 };
@@ -357,12 +224,14 @@ anychart.circularGaugeModule.AxisTicks.prototype.drawTick = function(angle, tick
   this.contextProvider_['value'] = tickValue;
 
   tick.setOption('rotation', rotation + angle + 90);
-  if (goog.isFunction(this.fill_))
+  var fill = /** @type {acgraph.vector.Fill|Function} */(this.getOption('fill'));
+  var stroke = /** @type {acgraph.vector.Stroke|Function} */(this.getOption('stroke'));
+  if (goog.isFunction(fill))
     tick.setOption('fill', /** @type {acgraph.vector.Fill} */(acgraph.vector.normalizeFill(
-        /** @type {acgraph.vector.Fill} */(this.normalizeColor(this.fill_)))));
-  if (goog.isFunction(this.stroke_))
+        /** @type {acgraph.vector.Fill} */(this.normalizeColor(fill)))));
+  if (goog.isFunction(stroke))
     tick.setOption('stroke', /** @type {acgraph.vector.Stroke} */(acgraph.vector.normalizeStroke(
-        /** @type {acgraph.vector.Stroke} */(this.normalizeColor(this.stroke_)))));
+        /** @type {acgraph.vector.Stroke} */(this.normalizeColor(stroke)))));
 
   if (this.hatchFillElement_) {
     var hatchFill = this.hatchFillElement_.add({'value': {'x': x, 'y': y}});
@@ -419,36 +288,7 @@ anychart.circularGaugeModule.AxisTicks.prototype.setAxis = function(axis) {
 /** @inheritDoc */
 anychart.circularGaugeModule.AxisTicks.prototype.serialize = function() {
   var json = anychart.circularGaugeModule.AxisTicks.base(this, 'serialize');
-
-  if (goog.isDef(this.length())) json['length'] = this.length();
-  if (goog.isFunction(this['type'])) {
-    if (goog.isFunction(this.type())) {
-      anychart.core.reporting.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Gauge axis ticks type']);
-    } else {
-      json['type'] = this.type();
-    }
-  }
-  if (goog.isFunction(this['fill'])) {
-    if (goog.isFunction(this.fill())) {
-      anychart.core.reporting.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Ticks fill']);
-    } else {
-      json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.fill()));
-    }
-  }
-  if (goog.isFunction(this['stroke'])) {
-    if (goog.isFunction(this.stroke())) {
-      anychart.core.reporting.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          ['Ticks stroke']
-      );
-    } else {
-      json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.stroke()));
-    }
-  }
-  json['hatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hatchFill()));
-  json['position'] = this.position();
-
+  anychart.core.settings.serialize(this, anychart.circularGaugeModule.AxisTicks.OWN_DESCRIPTORS, json);
   return json;
 };
 
@@ -456,31 +296,17 @@ anychart.circularGaugeModule.AxisTicks.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.circularGaugeModule.AxisTicks.prototype.setupByJSON = function(config, opt_default) {
   anychart.circularGaugeModule.AxisTicks.base(this, 'setupByJSON', config, opt_default);
-
-  this.length(config['length']);
-  this.type(config['type']);
-  this.stroke(config['stroke']);
-  this.fill(config['fill']);
-  this.hatchFill(config['hatchFill']);
-  this.position(config['position']);
-};
-
-
-/** @inheritDoc */
-anychart.circularGaugeModule.AxisTicks.prototype.disposeInternal = function() {
-  goog.dispose(this.ticks_);
-  this.ticks_ = null;
-  anychart.circularGaugeModule.AxisTicks.base(this, 'disposeInternal');
+  anychart.core.settings.deserialize(this, anychart.circularGaugeModule.AxisTicks.OWN_DESCRIPTORS, config, opt_default);
 };
 
 
 //exports
-(function() {
-  var proto = anychart.circularGaugeModule.AxisTicks.prototype;
-  proto['length'] = proto.length;
-  proto['type'] = proto.type;
-  proto['stroke'] = proto.stroke;
-  proto['fill'] = proto.fill;
-  proto['hatchFill'] = proto.hatchFill;
-  proto['position'] = proto.position;
-})();
+// (function() {
+//   var proto = anychart.circularGaugeModule.AxisTicks.prototype;
+//   proto['length'] = proto.length;
+//   proto['type'] = proto.type;
+//   proto['stroke'] = proto.stroke;
+//   proto['fill'] = proto.fill;
+//   proto['hatchFill'] = proto.hatchFill;
+//   proto['position'] = proto.position;
+// })();

@@ -478,13 +478,16 @@ anychart.colorScalesModule.ui.ColorRange.prototype.drawLine = function() {
  */
 anychart.colorScalesModule.ui.ColorRange.prototype.getMarkerSpace_ = function() {
   var markerSpace = 0;
-  var marker = this.getCreated('marker');
+  var marker = /**@type {anychart.core.ui.MarkersFactory.Marker}*/(this.getCreated('marker'));
   if (marker && marker.enabled()) {
     var orientation = /** @type {anychart.enums.Orientation} */(this.getOption('orientation'));
-    markerSpace = marker.size() * 2;
+    markerSpace = /** @type {number} */(marker.getOption('size')) * 2;
 
-    var offsetX = goog.isDef(marker.offsetX()) ? marker.offsetX() : 0;
-    var offsetY = goog.isDef(marker.offsetY()) ? marker.offsetY() : 0;
+    var offsetX = /** @type {number} */(marker.getOption('offsetX'));
+    var offsetY = /** @type {number} */(marker.getOption('offsetY'));
+    offsetX = goog.isDef(offsetX) ? offsetX : 0;
+    offsetY = goog.isDef(offsetY) ? offsetY : 0;
+
     switch (orientation) {
       case anychart.enums.Orientation.TOP:
         markerSpace += offsetY;

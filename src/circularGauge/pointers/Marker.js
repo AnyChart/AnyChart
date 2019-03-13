@@ -53,18 +53,16 @@ anychart.circularGaugeModule.pointers.Marker.OWN_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
 
-  var radiusNormalizer = function(opt_value) {
-    return goog.isNull(opt_value) ? opt_value : /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
-  };
   var typeNormalizer = function(opt_value) {
     return goog.isFunction(opt_value) ?
         opt_value :
         anychart.enums.normalizeMarkerType(opt_value, anychart.enums.MarkerType.LINE);
   };
+
   anychart.core.settings.createDescriptors(map, [
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'size', anychart.utils.normalizeToPercent],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'position', anychart.enums.normalizeGaugeSidePosition],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'radius', radiusNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'radius', anychart.core.settings.nullOrPercentNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'type', typeNormalizer]
   ]);
 
@@ -78,7 +76,7 @@ anychart.core.settings.populate(anychart.circularGaugeModule.pointers.Marker, an
 /** @inheritDoc */
 anychart.circularGaugeModule.pointers.Marker.prototype.draw = function() {
   var gauge = this.gauge();
-  var axis = gauge.getAxis(/** @type {number} */(this.axisIndex()));
+  var axis = gauge.getAxis(/** @type {number} */(this.getOption('axisIndex')));
   if (!this.checkDrawingNeeded())
     return this;
 
@@ -94,8 +92,9 @@ anychart.circularGaugeModule.pointers.Marker.prototype.draw = function() {
 
   var type = /** @type {string|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path} */(this.getOption('type'));
   if (this.hasInvalidationState(anychart.ConsistencyState.GAUGE_HATCH_FILL)) {
-    var fill = /** @type {acgraph.vector.PatternFill|acgraph.vector.HatchFill} */(this.hatchFill());
-    if (!this.hatchFillElement && !anychart.utils.isNone(fill)) {
+    var fill = /** @type {acgraph.vector.PatternFill|acgraph.vector.HatchFill} */(this.getOption('hatchFill'));
+    // by default from config hatchFill is boolean false
+    if (!this.hatchFillElement && fill && !anychart.utils.isNone(fill)) {
       this.hatchFillElement = new anychart.core.ui.MarkersFactory();
       this.hatchFillElement.setOption('positionFormatter', anychart.utils.DEFAULT_FORMATTER);
       this.hatchFillElement.setOption('size', 10);
@@ -140,8 +139,8 @@ anychart.circularGaugeModule.pointers.Marker.prototype.draw = function() {
 
     var axisRadius = axis.getPixRadius();
     var axisWidth = axis.getPixWidth();
-    var axisStartAngle = /** @type {number} */(goog.isDef(axis.startAngle()) ? axis.getStartAngle() : gauge.getStartAngle());
-    var axisSweepAngle = /** @type {number} */(goog.isDef(axis.sweepAngle()) ? axis.sweepAngle() : /** @type {number} */(gauge.getOption('sweepAngle')));
+    var axisStartAngle = axis.getStartAngle();
+    var axisSweepAngle = axis.getSweepAngle();
 
     var radius = /** @type {number|string} */(this.getOption('radius'));
     var pixRadius = goog.isDefAndNotNull(radius) ?
@@ -189,7 +188,7 @@ anychart.circularGaugeModule.pointers.Marker.prototype.draw = function() {
       hatchFill.setOption('rotation', angle + 90);
     }
 
-    if (goog.isFunction(this.fill()) || goog.isFunction(this.stroke()))
+    if (goog.isFunction(this.getOption('fill')) || goog.isFunction(this.getOption('stroke')))
       this.invalidate(anychart.ConsistencyState.APPEARANCE);
 
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
