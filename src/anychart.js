@@ -700,7 +700,7 @@ anychart.getFullTheme = function(root) {
   var i;
   if (!anychart.themeClones_.length) {
     // anychart.themeClones_.push(anychart.window['anychart']['themes'][anychart.DEFAULT_THEME] || {});
-    anychart.themeClones_.push(anychart.utils.recursiveClone(anychart.window['anychart']['themes'][anychart.DEFAULT_THEME] || {}));
+    anychart.themeClones_.push(/** @type {Object} */ (anychart.utils.recursiveClone(anychart.window['anychart']['themes'][anychart.DEFAULT_THEME])) || {});
     anychart.mergedThemeClones_.push(anychart.themeClones_[0]);
   }
   for (i = anychart.themeClones_.length - 1; i < anychart.additionalThemes_.length; i++) {
