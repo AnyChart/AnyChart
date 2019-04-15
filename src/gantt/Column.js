@@ -364,6 +364,9 @@ anychart.ganttModule.Column.prototype.controllerListener_ = function(event) {
     }
     this.texts_.length = 0;
 
+    goog.disposeAll(this.overriddenLabels_);
+    this.overriddenLabels_.length = 0;
+
     /*
       Column dispatches NEEDS_REDRAW because DG decides itself
       when to dispatch MEASURE_COLLECT in dg.prepareLabels() .

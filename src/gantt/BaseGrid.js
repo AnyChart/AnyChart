@@ -11,6 +11,7 @@ goog.require('anychart.ganttModule.IInteractiveGrid');
 goog.require('anychart.ganttModule.ScrollBar');
 goog.require('anychart.ganttModule.edit.StructureEdit');
 goog.require('anychart.math.Rect');
+goog.require('goog.Timer');
 goog.require('goog.events.KeyHandler');
 goog.require('goog.events.MouseWheelHandler');
 goog.require('goog.fx.Dragger');
@@ -654,6 +655,7 @@ anychart.ganttModule.BaseGrid.prototype.addMouseUp = goog.nullFunction;
  * @param {?Object} evt - Event object.
  */
 anychart.ganttModule.BaseGrid.prototype.addMouseDblClick = goog.nullFunction;
+
 
 /**
  * Mouse click internal handler.
@@ -1821,6 +1823,18 @@ anychart.ganttModule.BaseGrid.prototype.dragEndHandler_ = function(e) {
 
     this.draggingItem = null;
   }
+
+  this.denyDragScrolling = false;
+
+  goog.Timer.callOnce(function() {
+    /*
+      This allows to restore preventClickAfterDrag value after all sync
+      activities are finished.
+      Restoration of value allows to keep selecting rows after drag.
+     */
+    this.preventClickAfterDrag = false;
+  }, 10, this);
+
   this.scrollDragger.reset();
   this.dragging = false;
   this.interactive = true;
@@ -2388,7 +2402,7 @@ anychart.ganttModule.BaseGrid.prototype.initMouseFeatures = function() {
     }
 
     this.horizontalScrollBar().listen(anychart.enums.EventType.SCROLLING, goog.bind(this.denyDragging, this, true));
-    this.horizontalScrollBar().listen(anychart.enums.EventType.SCROLL_END, goog.bind(this.denyDragging, this, false));
+    // this.horizontalScrollBar().listen(anychart.enums.EventType.SCROLL_END, goog.bind(this.denyDragging, this, true));
   }
 };
 
