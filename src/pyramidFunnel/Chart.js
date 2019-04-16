@@ -27,6 +27,7 @@ goog.require('anychart.utils');
 
 /**
  * Pyramid/Funnel Base Chart Class.<br/>
+ * @param {anychart.enums.ChartTypes} type - Type.
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data for the chart.
  * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @extends {anychart.core.SeparateChart}
@@ -34,11 +35,13 @@ goog.require('anychart.utils');
  * @implements {anychart.core.IShapeManagerUser}
  * @constructor
  */
-anychart.pyramidFunnelModule.Chart = function(opt_data, opt_csvSettings) {
+anychart.pyramidFunnelModule.Chart = function(type, opt_data, opt_csvSettings) {
   anychart.pyramidFunnelModule.Chart.base(this, 'constructor');
   this.suspendSignalsDispatching();
 
-  this.addThemes('pieFunnelPyramidBase', 'funnel');
+  this.setType(type);
+
+  this.addThemes('pieFunnelPyramidBase', type);
 
   /**
    * @type {anychart.palettes.HatchFills}
@@ -484,6 +487,7 @@ anychart.pyramidFunnelModule.Chart.prototype.palette = function(opt_value) {
 anychart.pyramidFunnelModule.Chart.prototype.markerPalette = function(opt_value) {
   if (!this.markerPalette_) {
     this.markerPalette_ = new anychart.palettes.Markers();
+    this.setupCreated('markerPalette', this.markerPalette_);
     this.markerPalette_.listenSignals(this.markerPaletteInvalidated_, this);
   }
 
@@ -506,6 +510,7 @@ anychart.pyramidFunnelModule.Chart.prototype.markerPalette = function(opt_value)
 anychart.pyramidFunnelModule.Chart.prototype.hatchFillPalette = function(opt_value) {
   if (!this.hatchFillPalette_) {
     this.hatchFillPalette_ = new anychart.palettes.HatchFills();
+    this.setupCreated('hatchFillPalette', this.hatchFillPalette_);
     this.hatchFillPalette_.listenSignals(this.hatchFillPaletteInvalidated_, this);
   }
 
@@ -774,8 +779,9 @@ anychart.pyramidFunnelModule.Chart.prototype.drawContent = function(bounds) {
     }
 
     var themePart = this.isInsideLabels() ?
-        anychart.getFullTheme('pieFunnelPyramidBase.insideLabels') :
-        anychart.getFullTheme('pieFunnelPyramidBase.outsideLabels');
+        this.themeSettings['insideLabels'] :
+        this.themeSettings['outsideLabels'];
+
     this.labels().setAutoColor(themePart['autoColor']);
     this.labels()['disablePointerEvents'](themePart['disablePointerEvents']);
 
@@ -2876,6 +2882,7 @@ anychart.pyramidFunnelModule.Chart.prototype.drawMarker = function(pointState) {
 /** @inheritDoc */
 anychart.pyramidFunnelModule.Chart.prototype.createTooltip = function() {
   var tooltip = new anychart.core.ui.Tooltip(0);
+  this.setupCreated('tooltip', tooltip);
   tooltip.chart(this);
   tooltip.listenSignals(this.onTooltipSignal_, this);
   return tooltip;
@@ -3406,6 +3413,20 @@ anychart.pyramidFunnelModule.Chart.LabelsDomain.prototype.getLabelBounds_ = func
   var labelBounds = this.chart.labels().measureWithTransform(label.formatProvider(), label.positionProvider(), /** @type {Object} */(labelSettings));
 
   return anychart.math.Rect.fromCoordinateBox(labelBounds);
+};
+
+
+/** @inheritDoc */
+anychart.pyramidFunnelModule.Chart.prototype.setupStateSettings = function() {
+  this.normal_.addThemes(this.themeSettings);
+  this.setupCreated('normal', this.normal_);
+  this.normal_.setupInternal(true, {});
+
+  this.setupCreated('hovered', this.hovered_);
+  this.hovered_.setupInternal(true, {});
+
+  this.setupCreated('selected', this.selected_);
+  this.selected_.setupInternal(true, {});
 };
 
 

@@ -19,10 +19,8 @@ goog.require('anychart.pyramidFunnelModule.Chart');
  * @return {anychart.pyramidFunnelModule.Chart}
  */
 anychart.funnel = function(opt_data, opt_csvSettings) {
-  var chart = new anychart.pyramidFunnelModule.Chart(opt_data, opt_csvSettings);
-  chart.setType(anychart.enums.ChartTypes.FUNNEL);
-  chart.setupInternal(true, anychart.getFullTheme('funnel'));
-
+  var chart = new anychart.pyramidFunnelModule.Chart(anychart.enums.ChartTypes.FUNNEL, opt_data, opt_csvSettings);
+  chart.setupStateSettings();
   return chart;
 };
 
@@ -40,10 +38,8 @@ anychart.chartTypesMap[anychart.enums.ChartTypes.FUNNEL] = anychart.funnel;
  * @return {anychart.pyramidFunnelModule.Chart}
  */
 anychart.pyramid = function(opt_data, opt_csvSettings) {
-  var chart = new anychart.pyramidFunnelModule.Chart(opt_data, opt_csvSettings);
-  chart.setType(anychart.enums.ChartTypes.PYRAMID);
-  chart.setupInternal(true, anychart.getFullTheme('pyramid'));
-
+  var chart = new anychart.pyramidFunnelModule.Chart(anychart.enums.ChartTypes.PYRAMID, opt_data, opt_csvSettings);
+  chart.setupStateSettings();
   return chart;
 };
 
