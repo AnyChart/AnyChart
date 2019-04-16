@@ -1498,6 +1498,7 @@ anychart.enums.EventType = {
   ROW_MOUSE_DOWN: 'rowMouseDown',
   ROW_MOUSE_UP: 'rowMouseUp',
   BEFORE_CREATE_CONNECTOR: 'beforeCreateConnector',
+  BEFORE_REMOVE_CONNECTOR: 'beforeRemoveConnector',
   ROW_COLLAPSE_EXPAND: 'rowcollapseexpand',
 
   //Connectors events.

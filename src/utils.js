@@ -27,6 +27,23 @@ goog.require('goog.object');
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
+ * UID internal counter.
+ * @type {number}
+ * @private
+ */
+anychart.utils.UID_COUNTER_ = 0;
+
+
+/**
+ * Generates numeric UID.
+ * @return {number}
+ */
+anychart.utils.getUid = function() {
+  return ++anychart.utils.UID_COUNTER_;
+};
+
+
+/**
  * Settings in format [obj, mode, obj, mode,...]
  * Description 0 - plain object with settings, 1 -
  * @param {Array} settingsArray

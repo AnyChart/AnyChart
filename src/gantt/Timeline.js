@@ -125,21 +125,6 @@ anychart.ganttModule.TimeLine = function(opt_controller, opt_isResources) {
 
 
   /**
-   * Selected period.
-   * @type {(string|number|undefined)}
-   * @private
-   */
-  this.selectedPeriodId_ = void 0;
-
-  /**
-   * Information about currently selected connector.
-   * Connector can't be characterized by it's path, but can be defined by elements that it connects.
-   * @type {Object}
-   * @private
-   */
-  this.selectedConnectorData_ = null;
-
-  /**
    * This value sets to ID of hovered item when mouse moves over the bar of item on timeline
    * in live edit mode.
    * It is used to correctly remove live edit controls on hovered row change.
@@ -2762,42 +2747,45 @@ anychart.ganttModule.TimeLine.prototype.editConnectorDragEnd_ = function(e) {
 //region -- Connector events.
 /**
  * Creates connector interactivity event.
- * @param {anychart.core.MouseEvent} event - Incoming original event. By idea, can't be null.
+ * @param {?anychart.core.MouseEvent} event - Incoming original event. Null value means unselection.
  * @private
  * @return {Object} - New event object to be dispatched.
  */
 anychart.ganttModule.TimeLine.prototype.getConnectorInteractivityEvent_ = function(event) {
-  var type = event.type;
-  switch (type) {
-    case acgraph.events.EventType.MOUSEOUT:
-      type = anychart.enums.EventType.CONNECTOR_MOUSE_OUT;
-      break;
-    case acgraph.events.EventType.MOUSEOVER:
-      type = anychart.enums.EventType.CONNECTOR_MOUSE_OVER;
-      break;
-    case acgraph.events.EventType.MOUSEMOVE:
-    case acgraph.events.EventType.TOUCHMOVE:
-      type = anychart.enums.EventType.CONNECTOR_MOUSE_MOVE;
-      break;
-    case acgraph.events.EventType.MOUSEDOWN:
-    case acgraph.events.EventType.TOUCHSTART:
-      type = anychart.enums.EventType.CONNECTOR_MOUSE_DOWN;
-      break;
-    case acgraph.events.EventType.MOUSEUP:
-    case acgraph.events.EventType.TOUCHEND:
-      type = anychart.enums.EventType.CONNECTOR_MOUSE_UP;
-      break;
-    case acgraph.events.EventType.CLICK:
-      type = anychart.enums.EventType.CONNECTOR_CLICK;
-      break;
-    case acgraph.events.EventType.DBLCLICK:
-      type = anychart.enums.EventType.CONNECTOR_DBL_CLICK;
-      break;
+  var type = anychart.enums.EventType.CONNECTOR_SELECT;
+  if (event) {
+    type = event.type;
+    switch (type) {
+      case acgraph.events.EventType.MOUSEOUT:
+        type = anychart.enums.EventType.CONNECTOR_MOUSE_OUT;
+        break;
+      case acgraph.events.EventType.MOUSEOVER:
+        type = anychart.enums.EventType.CONNECTOR_MOUSE_OVER;
+        break;
+      case acgraph.events.EventType.MOUSEMOVE:
+      case acgraph.events.EventType.TOUCHMOVE:
+        type = anychart.enums.EventType.CONNECTOR_MOUSE_MOVE;
+        break;
+      case acgraph.events.EventType.MOUSEDOWN:
+      case acgraph.events.EventType.TOUCHSTART:
+        type = anychart.enums.EventType.CONNECTOR_MOUSE_DOWN;
+        break;
+      case acgraph.events.EventType.MOUSEUP:
+      case acgraph.events.EventType.TOUCHEND:
+        type = anychart.enums.EventType.CONNECTOR_MOUSE_UP;
+        break;
+      case acgraph.events.EventType.CLICK:
+        type = anychart.enums.EventType.CONNECTOR_CLICK;
+        break;
+      case acgraph.events.EventType.DBLCLICK:
+        type = anychart.enums.EventType.CONNECTOR_DBL_CLICK;
+        break;
+    }
   }
 
   return {
     'type': type,
-    'actualTarget': event.target,
+    'actualTarget': event ? event.target : null,
     'target': this,
     'originalEvent': event
   };
@@ -3518,16 +3506,12 @@ anychart.ganttModule.TimeLine.prototype.checkConnectorDblClick = function(event)
  */
 anychart.ganttModule.TimeLine.prototype.rowSelect = function(event) {
   if (!this.checkRowSelection(event)) {
-    this.connectorUnselect(event);
-    var item = event['item'];
-    var period = event['period'];
-    var periodId = period ? period[anychart.enums.GanttDataFields.ID] : void 0;
-    if (this.selectTimelineRow(item, periodId)) {
+    this.connectorUnselect(event); // this dispatches conn unselect event.
+    if (this.selectTimelineRow(event['item'], event['periodIndex'])) {
       var eventObj = goog.object.clone(event);
       eventObj['type'] = anychart.enums.EventType.ROW_SELECT;
       (/** @type {anychart.ganttModule.IInteractiveGrid} */ (this.interactivityHandler)).dispatchEvent(eventObj);
     }
-    this.selectedConnectorData_ = null;
   }
 };
 
@@ -3548,12 +3532,18 @@ anychart.ganttModule.TimeLine.prototype.checkRowSelection = function(event) {
       var connSelectEvent = this.patchConnectorEvent_(event);
       connSelectEvent.type = anychart.enums.EventType.CONNECTOR_SELECT;
 
-      if (this.selectedConnectorData_)
+      if (this.interactivityHandler.selection().hasSelectedConnector())
         this.connectorUnselect(event['originalEvent']);
 
       if (this.interactivityHandler.dispatchEvent(connSelectEvent)) {
         this.interactivityHandler.rowUnselect(event['originalEvent']);
-        this.selectedConnectorData_ = domTarget.meta;
+        var m = domTarget.meta;
+        this.interactivityHandler.selection().selectConnector(
+            m['fromItem'], m['toItem'],
+            m['fromItemIndex'], m['toItemIndex'],
+            m['fromPeriodIndex'], m['toPeriodIndex'],
+            m['connType']
+        );
         this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
       }
     }
@@ -3564,25 +3554,18 @@ anychart.ganttModule.TimeLine.prototype.checkRowSelection = function(event) {
 
 
 /**
- * @inheritDoc
- */
-anychart.ganttModule.TimeLine.prototype.rowUnselect = function(event) {
-  if (this.selectedItem || goog.isDefAndNotNull(this.selectedPeriodId_)) {
-    this.selectedPeriodId_ = void 0;
-    anychart.ganttModule.TimeLine.base(this, 'rowUnselect', event);
-  }
-};
-
-
-/**
  * Connector unselect handler.
  * @param {Object} event - Dispatched event object.
  */
 anychart.ganttModule.TimeLine.prototype.connectorUnselect = function(event) {
-  if (this.selectedConnectorData_) {
+  var selection = this.interactivityHandler.selection();
+  if (selection.hasSelectedConnector()) {
     var connEvent = this.getConnectorInteractivityEvent_(/** @type {anychart.core.MouseEvent} */ (event)); //empty event.
     connEvent.type = anychart.enums.EventType.CONNECTOR_SELECT;
-    this.interactivityHandler.dispatchEvent(connEvent);
+    if (this.interactivityHandler.dispatchEvent(connEvent)) {
+      selection.selectConnector(null);
+      this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
+    }
   }
 };
 
@@ -3622,29 +3605,13 @@ anychart.ganttModule.TimeLine.prototype.getInteractivityEvent = function(event) 
 /**
  * Selects row and/or period.
  * @param {anychart.treeDataModule.Tree.DataItem} item - New selected data item.
- * @param {string=} opt_periodId - Id of period to be selected.
+ * @param {number=} opt_periodIndex - Index of period in item to be selected.
  * @return {boolean} - Whether has been selected.
  */
-anychart.ganttModule.TimeLine.prototype.selectTimelineRow = function(item, opt_periodId) {
-  var itemSelected = false;
-  var periodSelected = false;
-
-  if (item && item != this.selectedItem) {
-    this.controller.data().suspendSignalsDispatching();//this.controller.data() can be Tree or TreeView.
-    item.meta('selected', true);
-    if (this.selectedItem) this.selectedItem.meta('selected', false); //selectedItem has the same tree as item.
-    this.selectedItem = item;
-    this.controller.data().resumeSignalsDispatching(false);
-    itemSelected = true;
-  }
-
-  if (this.selectedPeriodId_ !== opt_periodId) {
-    this.selectedPeriodId_ = opt_periodId;
-    periodSelected = true;
-  }
-
-  if (itemSelected || periodSelected) {
-    this.selectedConnectorData_ = null;
+anychart.ganttModule.TimeLine.prototype.selectTimelineRow = function(item, opt_periodIndex) {
+  var selection = this.interactivityHandler.selection();
+  selection.selectPeriod(item, opt_periodIndex);
+  if (selection.hasSelectedRow()) {
     this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
     return true;
   }
@@ -3899,7 +3866,6 @@ anychart.ganttModule.TimeLine.prototype.drawAsPeriods_ = function(dataItem, tota
     for (var j = 0; j < periods.length; j++) {
       var start = dataItem.getMeta(anychart.enums.GanttDataFields.PERIODS, j, anychart.enums.GanttDataFields.START);
       var end = dataItem.getMeta(anychart.enums.GanttDataFields.PERIODS, j, anychart.enums.GanttDataFields.END);
-      var id = dataItem.get(anychart.enums.GanttDataFields.PERIODS, j, anychart.enums.GanttDataFields.ID);
 
       if (goog.isNumber(start) && goog.isNumber(end)) {
         var startRatio = this.scale_.timestampToRatio(start);
@@ -3926,7 +3892,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsPeriods_ = function(dataItem, tota
 
           var coord = anychart.utils.getCoordinateByAnchor(itemBounds, position);
           var top = this.fixBarTop_(coord.y, height, anchor) + offsetNorm;
-          var isSelected = this.selectedPeriodId_ == id;
+          var isSelected = this.interactivityHandler.selection().isPeriodSelected(dataItem, j);
 
           var bounds = this.fixBounds_(el, new anychart.math.Rect(coord.x, top, width, height), dataItem, j, isSelected);
 
@@ -3983,7 +3949,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsBaseline_ = function(dataItem, tot
 
     this.fixBaselineBarsPositioning_(actualBounds, baselineBounds, element, dataItem);
 
-    var isSelected = this.selectedItem == dataItem;
+    var isSelected = this.interactivityHandler.selection().isRowSelected(dataItem);
     actualBounds = this.fixBounds_(element, actualBounds, dataItem, void 0, isSelected);
 
     baselineBounds = this.fixBounds_(baselines, baselineBounds, dataItem, void 0, isSelected);
@@ -4083,7 +4049,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsParent_ = function(dataItem, total
     var actualItemBounds = new anychart.math.Rect(actualLeft, totalTop, actualWidth, itemHeight);
     var actualBounds = this.getBarBounds_(el, actualItemBounds);
 
-    var isSelected = this.selectedItem == dataItem;
+    var isSelected = this.interactivityHandler.selection().isRowSelected(dataItem);
     actualBounds = this.fixBounds_(el, actualBounds, dataItem, void 0, isSelected);
 
     var tag = this.createTag(dataItem, el, actualBounds);
@@ -4132,7 +4098,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsProgress_ = function(dataItem, tot
     var actualItemBounds = new anychart.math.Rect(actualLeft, totalTop, actualWidth, itemHeight);
     var actualBounds = this.getBarBounds_(el, actualItemBounds);
 
-    var isSelected = this.selectedItem == dataItem;
+    var isSelected = this.interactivityHandler.selection().isRowSelected(dataItem);
     actualBounds = this.fixBounds_(el, actualBounds, dataItem, void 0, isSelected);
 
     var tag = this.createTag(dataItem, el, actualBounds);
@@ -4188,7 +4154,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsMilestone_ = function(dataItem, to
     var itemBounds = new anychart.math.Rect(centerLeft - halfHeight, totalTop, height, itemHeight);
     var bounds = this.getBarBounds_(el, itemBounds);
 
-    var isSelected = this.selectedItem == dataItem;
+    var isSelected = this.interactivityHandler.selection().isRowSelected(dataItem);
     bounds = this.fixBounds_(el, bounds, dataItem, void 0, isSelected);
 
     var tag = this.createTag(dataItem, el, bounds);
@@ -4325,16 +4291,7 @@ anychart.ganttModule.TimeLine.prototype.connectItems_ = function(from, to, opt_c
   var toRowHeight = this.controller.getItemHeight(toItem);
 
   if (fromBounds && toBounds) {
-    var selected = !goog.isNull(this.selectedConnectorData_) &&
-        this.selectedConnectorData_['fromItemIndex'] == fromIndex &&
-        this.selectedConnectorData_['toItemIndex'] == toIndex &&
-        this.selectedConnectorData_['connType'] == opt_connType;
-
-    if (this.controller.isResources()) {
-      if (this.selectedConnectorData_) {
-        selected &= (this.selectedConnectorData_['fromPeriodIndex'] == fromPeriodIndex && this.selectedConnectorData_['toPeriodIndex'] == toPeriodIndex);
-      }
-    }
+    var selected = this.interactivityHandler.selection().isConnectorSelected(fromItem, toItem, fromIndex, toIndex, fromPeriodIndex, toPeriodIndex, opt_connType);
 
     var drawPreview = goog.isDefAndNotNull(opt_path);
     var pointFill, pointStroke;
@@ -5101,24 +5058,41 @@ anychart.ganttModule.TimeLine.prototype.drawLabels_ = function() {
  * @inheritDoc
  */
 anychart.ganttModule.TimeLine.prototype.deleteKeyHandler = function(e) {
-  if (this.selectedConnectorData_ && this.elements().edit().getOption('enabled')) {
-    var fromItemIndex = this.selectedConnectorData_['fromItemIndex'];
-    var toItemIndex = this.selectedConnectorData_['toItemIndex'];
-    var connType = this.selectedConnectorData_['connType'];
+  var selection = this.interactivityHandler.selection();
+  if (selection.hasSelectedConnector() && this.elements().edit().getOption('enabled')) {
+    var selectedConnectorData = selection.getSelectedConnectorData();
+    var fromItemIndex = selectedConnectorData.fromItemIndex;
+    var toItemIndex = selectedConnectorData.toItemIndex;
+    var connType = selectedConnectorData.connType;
     var visibleItems = this.controller.getVisibleItems();
     var fromItem = visibleItems[fromItemIndex];
     var toItem = visibleItems[toItemIndex];
     var i = 0;
 
+    var removeEvent = {
+      'type': anychart.enums.EventType.BEFORE_REMOVE_CONNECTOR,
+      'fromItem': fromItem,
+      'toItem': toItem,
+      'fromItemIndex': fromItemIndex,
+      'toItemIndex': toItemIndex,
+      'connectorType': connType
+    };
+
     if (this.controller.isResources()) {
-      var fromPeriodIndex = this.selectedConnectorData_['fromPeriodIndex'];
+      var fromPeriodIndex = selectedConnectorData.fromPeriodIndex;
       var fromPeriods = fromItem.get(anychart.enums.GanttDataFields.PERIODS);
       var fromPeriod = fromPeriods[fromPeriodIndex];
       var fromPeriodConnectors = fromPeriod[anychart.enums.GanttDataFields.CONNECTOR];
 
+      var toPeriodIndex = selectedConnectorData.toPeriodIndex;
       var toPeriods = toItem.get(anychart.enums.GanttDataFields.PERIODS);
-      var toPeriod = toPeriods[this.selectedConnectorData_['toPeriodIndex']];
+      var toPeriod = toPeriods[toPeriodIndex];
       var toPeriodId = toPeriod[anychart.enums.GanttDataFields.ID];
+
+      removeEvent['fromPeriodIndex'] = fromPeriodIndex;
+      removeEvent['fromPeriod'] = fromPeriod;
+      removeEvent['toPeriodIndex'] = toPeriodIndex;
+      removeEvent['toPeriod'] = toPeriod;
 
       if (goog.isArray(fromPeriodConnectors)) {
         for (i = 0; i < fromPeriodConnectors.length; i++) {//New behaviour.
@@ -5128,14 +5102,20 @@ anychart.ganttModule.TimeLine.prototype.deleteKeyHandler = function(e) {
             var perConnType = perConn[anychart.enums.GanttDataFields.CONNECTOR_TYPE] ||
                 anychart.enums.ConnectorType.FINISH_START;
             if (perId == toPeriodId && perConnType == connType) {
-              fromItem.del(anychart.enums.GanttDataFields.PERIODS, fromPeriodIndex, anychart.enums.GanttDataFields.CONNECTOR, i);
+              if (this.interactivityHandler.dispatchEvent(removeEvent)) {
+                fromItem.del(anychart.enums.GanttDataFields.PERIODS, fromPeriodIndex, anychart.enums.GanttDataFields.CONNECTOR, i);
+                selection.selectConnector(null);
+              }
             }
           }
         }
       } else { //Old behaviour.
-        fromItem.del(anychart.enums.GanttDataFields.PERIODS, fromPeriodIndex, anychart.enums.GanttDataFields.CONNECTOR);
-        fromItem.del(anychart.enums.GanttDataFields.PERIODS, fromPeriodIndex, anychart.enums.GanttDataFields.CONNECTOR_TYPE);
-        fromItem.del(anychart.enums.GanttDataFields.PERIODS, fromPeriodIndex, anychart.enums.GanttDataFields.CONNECT_TO);
+        if (this.interactivityHandler.dispatchEvent(removeEvent)) {
+          fromItem.del(anychart.enums.GanttDataFields.PERIODS, fromPeriodIndex, anychart.enums.GanttDataFields.CONNECTOR);
+          fromItem.del(anychart.enums.GanttDataFields.PERIODS, fromPeriodIndex, anychart.enums.GanttDataFields.CONNECTOR_TYPE);
+          fromItem.del(anychart.enums.GanttDataFields.PERIODS, fromPeriodIndex, anychart.enums.GanttDataFields.CONNECT_TO);
+          selection.selectConnector(null);
+        }
       }
     } else {
       var toItemId = toItem.get(anychart.enums.GanttDataFields.ID);
@@ -5147,18 +5127,22 @@ anychart.ganttModule.TimeLine.prototype.deleteKeyHandler = function(e) {
             var currentConnType = connector[anychart.enums.GanttDataFields.CONNECTOR_TYPE] ||
                 anychart.enums.ConnectorType.FINISH_START;
             if (toItemId == connector[anychart.enums.GanttDataFields.CONNECT_TO] && currentConnType == connType) {
-              fromItem.del(anychart.enums.GanttDataFields.CONNECTOR, i);
+              if (this.interactivityHandler.dispatchEvent(removeEvent)) {
+                fromItem.del(anychart.enums.GanttDataFields.CONNECTOR, i);
+                selection.selectConnector(null);
+              }
             }
           }
         }
       } else { //Old behaviour.
-        fromItem.del(anychart.enums.GanttDataFields.CONNECTOR);
-        fromItem.del(anychart.enums.GanttDataFields.CONNECTOR_TYPE);
-        fromItem.del(anychart.enums.GanttDataFields.CONNECT_TO);
+        if (this.interactivityHandler.dispatchEvent(removeEvent)) {
+          fromItem.del(anychart.enums.GanttDataFields.CONNECTOR);
+          fromItem.del(anychart.enums.GanttDataFields.CONNECTOR_TYPE);
+          fromItem.del(anychart.enums.GanttDataFields.CONNECT_TO);
+          selection.selectConnector(null);
+        }
       }
     }
-
-    this.selectedConnectorData_ = null;
   }
 };
 

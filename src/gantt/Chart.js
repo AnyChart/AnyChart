@@ -6,6 +6,7 @@ goog.require('anychart.format.Context');
 goog.require('anychart.ganttModule.Controller');
 goog.require('anychart.ganttModule.DataGrid');
 goog.require('anychart.ganttModule.IInteractiveGrid');
+goog.require('anychart.ganttModule.Selection');
 goog.require('anychart.ganttModule.Splitter');
 goog.require('anychart.ganttModule.TimeLine');
 goog.require('anychart.ganttModule.edit.StructureEdit');
@@ -75,6 +76,13 @@ anychart.ganttModule.Chart = function(opt_isResourcesChart) {
    * @private
    */
   this.splitter_ = null;
+
+  /**
+   * Selection.
+   * @type {anychart.ganttModule.Selection}
+   * @private
+   */
+  this.selection_ = new anychart.ganttModule.Selection();
 
   /**
    * Context provider.
@@ -766,6 +774,16 @@ anychart.ganttModule.Chart.prototype.editStructureHighlight = function(opt_index
 };
 
 
+//region -- Selection.
+/**
+ * @inheritDoc
+ */
+anychart.ganttModule.Chart.prototype.selection = function() {
+  return this.selection_;
+};
+
+
+//endregion
 /**
  * Row mouse move interactivity handler.
  * @param {Object} event - Dispatched event object.
@@ -815,17 +833,36 @@ anychart.ganttModule.Chart.prototype.rowMouseOut = function(event) {
  */
 anychart.ganttModule.Chart.prototype.rowSelect = function(event) {
   if (!this.tl_.checkRowSelection(event)) {
-    this.tl_.connectorUnselect(event);
     var item = event['item'];
     var period = event['period'];
-    var periodId = period ? period[anychart.enums.GanttDataFields.ID] : void 0;
-    if (item && ((!item.meta('selected') && this.dg_.selectRow(item)) | this.tl_.selectTimelineRow(item, periodId))) {
+    var periodIndex = event['periodIndex'];
+
+    var selection = this.selection();
+    var isSelected = this.isResourcesChart_ ?
+        selection.isPeriodSelected(item, periodIndex) :
+        selection.isRowSelected(item);
+
+    if (item && !isSelected) {
       var eventObj = {
         'type': anychart.enums.EventType.ROW_SELECT,
-        'item': item
+        'item': item,
+        'prevItem': selection.getSelectedItem()
       };
-      if (goog.isDef(period)) eventObj['period'] = period;
-      this.dispatchEvent(eventObj);
+      if (goog.isDef(period)) {
+        eventObj['period'] = period;
+        eventObj['periodIndex'] = periodIndex;
+      }
+      if (selection.hasSelectedPeriod()) {
+        var pIndex = selection.getSelectedPeriodIndex();
+        eventObj['prevPeriodIndex'] = pIndex;
+        eventObj['prevPeriod'] = selection.getSelectedItem().get(anychart.enums.GanttDataFields.PERIODS, pIndex);
+      }
+
+      if (this.dispatchEvent(eventObj)) {
+        this.tl_.connectorUnselect(event);
+        this.dg_.selectRow(item);
+        this.tl_.selectTimelineRow(item, periodIndex);
+      }
     }
   }
 };
@@ -866,20 +903,28 @@ anychart.ganttModule.Chart.prototype.rowMouseDown = function(event) {
  * @inheritDoc
  */
 anychart.ganttModule.Chart.prototype.rowUnselect = function(event) {
-  if (this.dg_.selectedItem || this.tl_.selectedItem) {
+  var selection = this.selection();
+  //NOTE: this event will not be dispatched by dg_ or tl_ because their interactivity handler is chart but not they are.
+  var newEvent = {
+    'type': anychart.enums.EventType.ROW_SELECT,
+    'actualTarget': event ? event.target : this,
+    'target': this,
+    'originalEvent': event,
+    'item': null, //This is a real difference between 'select' and 'unselect' events.
+    'prevItem': selection.getSelectedItem()
+  };
+
+  if (selection.hasSelectedPeriod()) {
+    var pIndex = selection.getSelectedPeriodIndex();
+    newEvent['prevPeriodIndex'] = pIndex;
+    newEvent['prevPeriod'] = selection.getSelectedItem().get(anychart.enums.GanttDataFields.PERIODS, pIndex);
+  }
+
+  if (this.dispatchEvent(newEvent)) {
     this.dg_.rowUnselect(event);
     this.tl_.rowUnselect(event);
-
-    //NOTE: this event will not be dispatched by dg_ or tl_ because their interactivity handler is chart but not they are.
-    var newEvent = {
-      'type': anychart.enums.EventType.ROW_SELECT,
-      'actualTarget': event ? event.target : this,
-      'target': this,
-      'originalEvent': event,
-      'item': null //This is a real difference between 'select' and 'unselect' events.
-    };
-    this.dispatchEvent(newEvent);
   }
+  this.tl_.connectorUnselect(event);
 };
 
 
@@ -1175,7 +1220,8 @@ anychart.ganttModule.Chart.prototype.disposeInternal = function() {
       this.dg_,
       this.tl_,
       this.splitter_,
-      this.edit_);
+      this.edit_,
+      this.selection_);
   this.palette_ = null;
   this.controller_ = null;
   this.verticalScrollBar_ = null;
@@ -1183,6 +1229,7 @@ anychart.ganttModule.Chart.prototype.disposeInternal = function() {
   this.tl_ = null;
   this.splitter_ = null;
   this.edit_ = null;
+  this.selection_ = null;
   anychart.ganttModule.Chart.base(this, 'disposeInternal');
 };
 

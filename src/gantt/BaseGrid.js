@@ -9,6 +9,7 @@ goog.require('anychart.format.Context');
 goog.require('anychart.ganttModule.Controller');
 goog.require('anychart.ganttModule.IInteractiveGrid');
 goog.require('anychart.ganttModule.ScrollBar');
+goog.require('anychart.ganttModule.Selection');
 goog.require('anychart.ganttModule.edit.StructureEdit');
 goog.require('anychart.math.Rect');
 goog.require('goog.Timer');
@@ -78,6 +79,7 @@ anychart.ganttModule.BaseGrid = function(opt_controller, opt_isResource) {
     this.isStandalone = false;
   } else {
     this.createController(opt_isResource);
+    this.selection_ = new anychart.ganttModule.Selection();
   }
 
   /**
@@ -251,12 +253,6 @@ anychart.ganttModule.BaseGrid = function(opt_controller, opt_isResource) {
   this.hoveredIndex = -1;
 
   /**
-   * Currently selected data item.
-   * @type {anychart.treeDataModule.Tree.DataItem}
-   */
-  this.selectedItem = null;
-
-  /**
    * Vertical upper coordinate (top) of highlighted row.
    * @type {number|undefined}
    * @private
@@ -360,6 +356,7 @@ anychart.ganttModule.BaseGrid = function(opt_controller, opt_isResource) {
     this.setOption('rowOddFill', null);
     this.setOption('rowEvenFill', null);
   }
+
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['backgroundFill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
     ['rowFill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW, void 0, beforeRowFillInvalidation],
@@ -415,6 +412,7 @@ anychart.ganttModule.BaseGrid.EVENTS_RECT_Z_INDEX = 20;
  * @type {number}
  */
 anychart.ganttModule.BaseGrid.CELLS_Z_INDEX = 30;
+
 
 /**
  * Draw layer z-index.
@@ -511,6 +509,16 @@ anychart.ganttModule.BaseGrid.HIGHER_DRAG_EDIT_RATIO = 1 - anychart.ganttModule.
 
 
 //endregion
+//region -- Selection.
+/**
+ * @inheritDoc
+ */
+anychart.ganttModule.BaseGrid.prototype.selection = function() {
+  return this.selection_;
+};
+
+
+//endregion
 /**
  * Checks whether tree data item is actually a milestone.
  * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} treeDataItem - Tree data item.
@@ -563,12 +571,27 @@ anychart.ganttModule.BaseGrid.prototype.createFormatProvider = function(item, op
           item.getMeta(anychart.enums.GanttDataFields.PERIODS, opt_periodIndex, anychart.enums.GanttDataFields.END) :
           void 0, type: anychart.enums.TokenType.DATE_TIME
     };
-    values['start'] = {value: values['periodStart'].value || values['minPeriodDate'].value, type: anychart.enums.TokenType.DATE_TIME};
-    values['end'] = {value: values['periodEnd'].value || values['maxPeriodDate'].value, type: anychart.enums.TokenType.DATE_TIME};
-    values['barBounds'] = {value: item.getMeta('periodBounds', opt_periodIndex), type: anychart.enums.TokenType.UNKNOWN};
+    values['start'] = {
+      value: values['periodStart'].value || values['minPeriodDate'].value,
+      type: anychart.enums.TokenType.DATE_TIME
+    };
+    values['end'] = {
+      value: values['periodEnd'].value || values['maxPeriodDate'].value,
+      type: anychart.enums.TokenType.DATE_TIME
+    };
+    values['barBounds'] = {
+      value: item.getMeta('periodBounds', opt_periodIndex),
+      type: anychart.enums.TokenType.UNKNOWN
+    };
   } else {
-    values['actualStart'] = {value: item.meta(anychart.enums.GanttDataFields.ACTUAL_START), type: anychart.enums.TokenType.DATE_TIME};
-    values['actualEnd'] = {value: item.meta(anychart.enums.GanttDataFields.ACTUAL_END), type: anychart.enums.TokenType.DATE_TIME};
+    values['actualStart'] = {
+      value: item.meta(anychart.enums.GanttDataFields.ACTUAL_START),
+      type: anychart.enums.TokenType.DATE_TIME
+    };
+    values['actualEnd'] = {
+      value: item.meta(anychart.enums.GanttDataFields.ACTUAL_END),
+      type: anychart.enums.TokenType.DATE_TIME
+    };
 
     var isParent = !!item.numChildren();
     var progressValue = isParent ?
@@ -578,7 +601,10 @@ anychart.ganttModule.BaseGrid.prototype.createFormatProvider = function(item, op
     values['progressValue'] = {value: progressValue, type: anychart.enums.TokenType.PERCENT};
     values['autoStart'] = {value: isParent ? item.meta('autoStart') : void 0, type: anychart.enums.TokenType.DATE_TIME};
     values['autoEnd'] = {value: isParent ? item.meta('autoEnd') : void 0, type: anychart.enums.TokenType.DATE_TIME};
-    values['autoProgress'] = {value: isParent ? item.meta('autoProgress') : void 0, type: anychart.enums.TokenType.PERCENT};
+    values['autoProgress'] = {
+      value: isParent ? item.meta('autoProgress') : void 0,
+      type: anychart.enums.TokenType.PERCENT
+    };
     values['barBounds'] = {value: item.meta('relBounds'), type: anychart.enums.TokenType.UNKNOWN};
 
     var progress = item.meta(anychart.enums.GanttDataFields.PROGRESS_VALUE);
@@ -590,9 +616,15 @@ anychart.ganttModule.BaseGrid.prototype.createFormatProvider = function(item, op
     values['progress'] = {value: resultProgress, type: anychart.enums.TokenType.PERCENT};
 
     if (goog.isDef(item.get(anychart.enums.GanttDataFields.BASELINE_START)))
-      values['baselineStart'] = {value: item.get(anychart.enums.GanttDataFields.BASELINE_START), type: anychart.enums.TokenType.DATE_TIME};
+      values['baselineStart'] = {
+        value: item.get(anychart.enums.GanttDataFields.BASELINE_START),
+        type: anychart.enums.TokenType.DATE_TIME
+      };
     if (goog.isDef(item.get(anychart.enums.GanttDataFields.BASELINE_END)))
-      values['baselineEnd'] = {value: item.get(anychart.enums.GanttDataFields.BASELINE_END), type: anychart.enums.TokenType.DATE_TIME};
+      values['baselineEnd'] = {
+        value: item.get(anychart.enums.GanttDataFields.BASELINE_END),
+        type: anychart.enums.TokenType.DATE_TIME
+      };
   }
 
   if (goog.isDef(opt_type))
@@ -1351,7 +1383,7 @@ anychart.ganttModule.BaseGrid.getColorResolver = function(colorName, colorType, 
  * @return {acgraph.vector.Fill|acgraph.vector.Stroke|acgraph.vector.PatternFill}
  * @private
  */
-anychart.ganttModule.BaseGrid.getColor_ = function(colorName, normalizer, isHatchFill, canBeHoveredSelected, baseGrid, state, opt_dataItem,  opt_dataItemTo, opt_connType, opt_periodIndex, opt_periodIndexTo) {
+anychart.ganttModule.BaseGrid.getColor_ = function(colorName, normalizer, isHatchFill, canBeHoveredSelected, baseGrid, state, opt_dataItem, opt_dataItemTo, opt_connType, opt_periodIndex, opt_periodIndexTo) {
   var stateColor, context;
   state = anychart.core.utils.InteractivityState.clarifyState(state);
   if (canBeHoveredSelected && (state != anychart.PointState.NORMAL)) {
@@ -1900,8 +1932,9 @@ anychart.ganttModule.BaseGrid.prototype.drawRowFills = function() {
     }
 
     if (item.meta('selected')) {
-      this.selectedItem_ = item; //In case of restoration from XML/JSON, this allows to save selected item state.
+      this.interactivityHandler.selection().selectRow(item); //In case of restoration from XML/JSON, this allows to save selected item state.
       this.selectedPath_
+          .clear()
           .moveTo(this.pixelBoundsCache.left, top)
           .lineTo(this.pixelBoundsCache.left + this.pixelBoundsCache.width, top)
           .lineTo(this.pixelBoundsCache.left + this.pixelBoundsCache.width, newTop)
@@ -2224,7 +2257,9 @@ anychart.ganttModule.BaseGrid.prototype.drawInternal = function(positionRecalcul
     rowEvenFill = anychart.utils.isNone(rowEvenFill) ? rowFill : rowEvenFill;
     this.getOddPath().fill(/** @type {acgraph.vector.Fill} */(rowOddFill));
     this.getEvenPath().fill(/** @type {acgraph.vector.Fill} */(rowEvenFill));
-    var rowSelectedFill = anychart.ganttModule.BaseGrid.getColorResolver('rowSelectedFill', anychart.enums.ColorType.FILL, false)(this, 0, this.selectedItem);
+
+    var selectedItem = this.interactivityHandler.selection().getSelectedItem();
+    var rowSelectedFill = anychart.ganttModule.BaseGrid.getColorResolver('rowSelectedFill', anychart.enums.ColorType.FILL, false)(this, 0, selectedItem);
     this.getSelectedPath().fill(/** @type {acgraph.vector.Fill} */(rowSelectedFill));
 
     var rowStrokeColor;
@@ -2558,12 +2593,8 @@ anychart.ganttModule.BaseGrid.prototype.scroll = goog.abstractMethod;
  * @return {boolean} - Whether has been selected.
  */
 anychart.ganttModule.BaseGrid.prototype.selectRow = function(item) {
-  if (item && item != this.selectedItem) {
-    this.controller.data().suspendSignalsDispatching();//this.controller.data() can be Tree or TreeView.
-    item.meta('selected', true);
-    if (this.selectedItem) this.selectedItem.meta('selected', false); //selectedItem has the same tree as item.
-    this.selectedItem = item;
-    this.controller.data().resumeSignalsDispatching(false);
+  if (item) {
+    this.interactivityHandler.selection().selectRow(item);
     this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
     return true;
   }
@@ -2593,22 +2624,19 @@ anychart.ganttModule.BaseGrid.prototype.markersInvalidated = goog.nullFunction;
  * @inheritDoc
  */
 anychart.ganttModule.BaseGrid.prototype.rowUnselect = function(event) {
-  if (this.selectedItem && this.controller.data()) {
-    this.controller.data().suspendSignalsDispatching();
-    this.selectedItem.meta('selected', false);
-    this.selectedItem = null;
-    this.controller.data().resumeSignalsDispatching(false);
-
+  if (this.controller.data()) {
     if (this.interactivityHandler == this) { //Should dispatch 'unselect-event' by itself.
       var newEvent = {
         'type': anychart.enums.EventType.ROW_SELECT,
         'actualTarget': event ? event.target : this,
         'target': this,
         'originalEvent': event,
-        'item': null //This is a real difference between 'select' and 'unselect' events.
+        'item': null, //This is a real difference between 'select' and 'unselect' events.
+        'prevItem': this.interactivityHandler.selection().getSelectedItem()
       };
       this.dispatchEvent(newEvent);
     }
+    this.interactivityHandler.selection().reset();
 
     this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW);
   }
@@ -2779,7 +2807,7 @@ anychart.ganttModule.BaseGrid.prototype.disposeInternal = function() {
       this.rowStrokePath_, this.selectedPath_, this.hoverPath_,
       this.evenPath_, this.oddPath_, this.scrollsLayer_, this.clipLayer_,
       this.editLayer_, this.contentLayer_, this.drawLayer_, this.rangeLineMarkersLayer_,
-      this.textMarkersLayer_, this.cellsLayer_, this.base_);
+      this.textMarkersLayer_, this.cellsLayer_, this.base_, this.selection_);
   this.tooltip_ = null;
   this.eventsRect_ = null;
   this.bgRect_ = null;
@@ -2802,6 +2830,7 @@ anychart.ganttModule.BaseGrid.prototype.disposeInternal = function() {
   this.cellsLayer_ = null;
   this.base_ = null;
   this.edit_ = null;
+  this.selection_ = null;
   anychart.ganttModule.BaseGrid.base(this, 'disposeInternal');
 };
 
@@ -2861,7 +2890,7 @@ anychart.ganttModule.BaseGrid.prototype.setupByJSON = function(config, opt_defau
     this.tooltip().setupInternal(!!opt_default, config['tooltip']);
 
   this.headerHeight(config['headerHeight']);
-  
+
   if ('edit' in config)
     /** @type {anychart.ganttModule.edit.StructureEdit} */ (this.edit()).setupInternal(!!opt_default, config['edit']);
   // this.editStructurePreviewFill(config['editStructurePreviewFill']);
