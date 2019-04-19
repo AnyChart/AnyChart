@@ -92,6 +92,21 @@ anychart.core.ui.LabelsSettings = function() {
    */
   this.suspendedSignal = 0;
 
+
+  /*
+    Please be very careful on using these signals, here are some
+    special cases like:
+      - you set width value to 100 (anychart.Signal.BOUNDS_CHANGED is dispatched, but there's
+        no need to measure anything because default this.needsBoundsCalculation() returns false).
+      - set wordBreak to 'break-all' (anychart.Signal.BOUNDS_CHANGED is dispatched,
+        this.needsBoundsCalculation() return true and we need to measure labels with Measuriator).
+      - you set width value to null (anychart.Signal.BOUNDS_CHANGED is still dispatched, but
+        here is no more need to measure labels anymore because width is not set, this.needsBoundsCalculation()
+        returns false).
+      - the same is in another BOUNDS_CHANGED dispatching.
+      - That's why always use this.needsBoundsCalculation() on listening and
+        processing of LabelsSettings signals.
+   */
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['format', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
     ['adjustFontSize', 0, 0], //TODO (A.Kudryavtsev): Not supported for a while.
@@ -99,14 +114,27 @@ anychart.core.ui.LabelsSettings = function() {
     ['letterSpacing', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
     ['textDirection', 0, 0], //TODO (A.Kudryavtsev): Not supported for a while.
     ['textIndent', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
-    ['textOverflow', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
-    ['useHtml', 0, 0], //TODO (A.Kudryavtsev): Not supported for a while.
+
+    //Doesn't affect bounds.
+    ['textOverflow', 0, anychart.Signal.NEEDS_REDRAW, 0, this.resetFlatSettings],
+
+    /*
+      This is a very special case.
+      New implementation uses foreignObject. In this case, browser
+      places labels itself and here's no need to measure anything.
+      That's why developer should always consider this.needsBoundsCalculation().
+     */
+    ['useHtml', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
     ['wordBreak', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
     ['wordWrap', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
-    ['fontColor', 0, anychart.Signal.NEEDS_REDRAW, 0, this.resetFlatSettings], //Doesn't affect bounds.
+
+    //Doesn't affect bounds.
+    ['fontColor', 0, anychart.Signal.NEEDS_REDRAW, 0, this.resetFlatSettings],
     ['fontDecoration', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
     ['fontFamily', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
-    ['fontOpacity', 0, anychart.Signal.NEEDS_REDRAW, 0, this.resetFlatSettings], //Doesn't affect bounds.
+
+    //Doesn't affect bounds.
+    ['fontOpacity', 0, anychart.Signal.NEEDS_REDRAW, 0, this.resetFlatSettings],
     ['fontSize', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
     ['fontStyle', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
     ['fontWeight', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
@@ -115,11 +143,19 @@ anychart.core.ui.LabelsSettings = function() {
     ['maxFontSize', 0, 0], //TODO (A.Kudryavtsev): Not supported for a while.
     ['minFontSize', 0, 0], //TODO (A.Kudryavtsev): Not supported for a while.
     ['vAlign', 0, anychart.Signal.NEEDS_REDRAW, 0, this.resetFlatSettings],
-    ['anchor', 0, anychart.Signal.NEEDS_REAPPLICATION, 0], //Has no BOUNDS_CHANGED because affects only positioning, not bounds.
+
+    //Has no BOUNDS_CHANGED because affects only positioning, not bounds.
+    ['anchor', 0, anychart.Signal.NEEDS_REAPPLICATION, 0],
     ['height', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
-    ['offsetX', 0, anychart.Signal.NEEDS_REAPPLICATION, 0], //Has no BOUNDS_CHANGED because affects only positioning, not bounds.
-    ['offsetY', 0, anychart.Signal.NEEDS_REAPPLICATION, 0], //Has no BOUNDS_CHANGED because affects only positioning, not bounds.
-    ['position', 0, anychart.Signal.NEEDS_REAPPLICATION, 0], //Has no BOUNDS_CHANGED because affects only positioning, not bounds.
+
+    //Has no BOUNDS_CHANGED because affects only positioning, not bounds.
+    ['offsetX', 0, anychart.Signal.NEEDS_REAPPLICATION, 0],
+
+    //Has no BOUNDS_CHANGED because affects only positioning, not bounds.
+    ['offsetY', 0, anychart.Signal.NEEDS_REAPPLICATION, 0],
+
+    //Has no BOUNDS_CHANGED because affects only positioning, not bounds.
+    ['position', 0, anychart.Signal.NEEDS_REAPPLICATION, 0],
     ['rotation', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
     ['width', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
     ['allowMultiline', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
@@ -438,7 +474,22 @@ anychart.core.ui.LabelsSettings.prototype.getText = function(context) {
  * @return {boolean} - If text needs bounds calculation to be placed correctly.
  */
 anychart.core.ui.LabelsSettings.prototype.needsBoundsCalculation = function() {
-  return (this.considerHAlign() || this.considerWordWrap() || this.considerTextOverflow() || this.considerWordBreak());
+  return (
+      this.considerHAlign() ||
+      this.considerWordWrap() ||
+      this.considerWordBreak()
+  );
+};
+
+
+/**
+ * Checks useHtml condition for not IE browsers.
+ * @return {boolean}
+ * @private
+ */
+anychart.core.ui.LabelsSettings.prototype.isUseHtml_ = function() {
+  var conf = this.flatten();
+  return !!conf['useHtml'] && !goog.labs.userAgent.browser.isIE();
 };
 
 
@@ -449,7 +500,7 @@ anychart.core.ui.LabelsSettings.prototype.needsBoundsCalculation = function() {
 anychart.core.ui.LabelsSettings.prototype.considerHAlign = function() {
   var conf = this.flatten();
   var widthIsSet = goog.isDefAndNotNull(conf['width']);
-  return widthIsSet && conf['hAlign'] != acgraph.vector.Text.HAlign.LEFT;
+  return !this.isUseHtml_() && (widthIsSet && conf['hAlign'] != acgraph.vector.Text.HAlign.LEFT);
 };
 
 
@@ -460,7 +511,7 @@ anychart.core.ui.LabelsSettings.prototype.considerHAlign = function() {
 anychart.core.ui.LabelsSettings.prototype.considerVAlign = function() {
   var conf = this.flatten();
   var heightIsSet = goog.isDefAndNotNull(conf['height']);
-  return heightIsSet && conf['vAlign'] != acgraph.vector.Text.VAlign.TOP;
+  return !this.isUseHtml_() && (heightIsSet && conf['vAlign'] != acgraph.vector.Text.VAlign.TOP);
 };
 
 
@@ -471,7 +522,7 @@ anychart.core.ui.LabelsSettings.prototype.considerVAlign = function() {
 anychart.core.ui.LabelsSettings.prototype.considerWordWrap = function() {
   var conf = this.flatten();
   var widthIsSet = goog.isDefAndNotNull(conf['width']);
-  return widthIsSet && conf['wordWrap'] == anychart.enums.WordWrap.BREAK_WORD;
+  return !this.isUseHtml_() && (widthIsSet && conf['wordWrap'] == anychart.enums.WordWrap.BREAK_WORD);
 };
 
 
@@ -482,18 +533,7 @@ anychart.core.ui.LabelsSettings.prototype.considerWordWrap = function() {
 anychart.core.ui.LabelsSettings.prototype.considerWordBreak = function() {
   var conf = this.flatten();
   var widthIsSet = goog.isDefAndNotNull(conf['width']);
-  return widthIsSet && conf['wordBreak'];
-};
-
-
-/**
- * Checks whether texts needs to calculate its bounds because of textOverflow option value.
- * @return {boolean}
- */
-anychart.core.ui.LabelsSettings.prototype.considerTextOverflow = function() {
-  var conf = this.flatten();
-  var widthIsSet = goog.isDefAndNotNull(conf['width']);
-  return widthIsSet && conf['textOverflow'];
+  return !this.isUseHtml_() && (widthIsSet && conf['wordBreak']);
 };
 
 

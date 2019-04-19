@@ -2302,8 +2302,12 @@ anychart.ganttModule.BaseGrid.prototype.drawInternal = function(positionRecalcul
 
   if (manualSuspend) stage.resume();
   if (this.isStandalone) {
-    this.initMouseFeatures();
-    this.initKeysFeatures();
+    if (stage && !this.mwh_) {
+      stage.listenOnce(acgraph.vector.Stage.EventType.STAGE_RENDERED, function() {
+        this.initMouseFeatures();
+        this.initKeysFeatures();
+      }, void 0, this);
+    }
   }
 
   return this;

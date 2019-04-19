@@ -39,9 +39,8 @@ anychart.circularGaugeModule.AxisMarker.OWN_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
 
-  var d = anychart.core.settings.descriptors;
   anychart.core.settings.createDescriptors(map, [
-    d.FILL,
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'fill', acgraph.vector.normalizeFill],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'axisIndex', anychart.core.settings.numberNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'position', anychart.enums.normalizeGaugeSidePosition],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'startSize', anychart.core.settings.nullOrPercentNormalizer],
