@@ -98,6 +98,8 @@ anychart.heatmapModule.Series.prototype.calcMinFontSize_ = function(point, point
       var padding = new anychart.core.utils.Padding().setup(mergedSettings['padding']);
       width -= padding.getOption('left') + padding.getOption('right');
       height -= padding.getOption('top') + padding.getOption('bottom');
+      goog.dispose(padding);
+      padding = null;
       var fontSize = label.calculateFontSize(
           width,
           height,

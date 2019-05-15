@@ -1309,7 +1309,10 @@ anychart.stockModule.Chart.prototype.drawContent = function(bounds) {
     if (!!(changed & 2)) {
       this.scroller_.invalidateScaleDependend();
       this.invalidate(anychart.ConsistencyState.STOCK_SCROLLER);
+      this.dispatchRangeChange_(anychart.enums.EventType.SELECTED_RANGE_CHANGE,
+          anychart.enums.StockRangeChangeSource.DATA_CHANGE);
     }
+
     this.markConsistent(anychart.ConsistencyState.STOCK_DATA);
     anychart.performance.end('Stock data calc');
   }
@@ -2596,7 +2599,7 @@ anychart.stockModule.Chart.prototype.handleMouseWheel_ = function(e) {
 
     var interactivity = /** @type {anychart.stockModule.Interactivity} */(this.interactivity());
     if (doZoom) {
-      if (interactivity.zoomOnMouseWheel()) {
+      if (interactivity.getOption('zoomOnMouseWheel')) {
         var first,
             last,
             start,
@@ -2664,7 +2667,7 @@ anychart.stockModule.Chart.prototype.handleMouseWheel_ = function(e) {
         }
       }
     } else {
-      if (interactivity.scrollOnMouseWheel()) {
+      if (interactivity.getOption('scrollOnMouseWheel')) {
         var anchor = this.getDragAnchor();
         if (isNaN(anchor.firstIndex) || isNaN(anchor.lastIndex))
           return;

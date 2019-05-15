@@ -860,7 +860,6 @@ anychart.ganttModule.Splitter.prototype.drawVisualSplitter_ = function() {
 anychart.ganttModule.Splitter.prototype.getBase_ = function() {
   if (!this.base_) {
     this.base_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
-    this.registerDisposable(this.base_);
   }
   return this.base_;
 };
@@ -1014,8 +1013,6 @@ anychart.ganttModule.Splitter.prototype.getDragArea_ = function() {
     acgraph.events.listen(this.dragArea_, acgraph.events.EventType.DRAG_START, this.dragStartHandler_, false, this);
     acgraph.events.listen(this.dragArea_, acgraph.events.EventType.DRAG, this.dragHandler_, false, this);
     acgraph.events.listen(this.dragArea_, acgraph.events.EventType.DRAG_END, this.dragEndHandler_, false, this);
-
-    this.registerDisposable(this.dragArea_);
   }
   return this.dragArea_;
 };
@@ -1030,8 +1027,6 @@ anychart.ganttModule.Splitter.prototype.getDragPreview_ = function() {
   if (!this.dragPreview_) {
     this.dragPreview_ = /** @type {acgraph.vector.Rect} */ (acgraph.rect()
         .visible(false));
-
-    this.registerDisposable(this.dragPreview_);
   }
   return this.dragPreview_;
 };
@@ -1048,8 +1043,6 @@ anychart.ganttModule.Splitter.prototype.getCenterLine_ = function() {
         .disablePointerEvents(true)
         .fill(this.fill_)
         .stroke(this.stroke_));
-
-    this.registerDisposable(this.centerLine_);
   }
   return this.centerLine_;
 };
@@ -1139,6 +1132,21 @@ anychart.ganttModule.Splitter.prototype.isVertical_ = function() {
 anychart.ganttModule.Splitter.prototype.remove = function() {
   //this.base_ is actually a layer. All the other elements are children of this.base_.
   if (this.base_) this.base_.parent(null);
+};
+
+
+/** @inheritDoc */
+anychart.ganttModule.Splitter.prototype.disposeInternal = function() {
+  goog.disposeAll(
+      this.dragPreview_,
+      this.dragArea_,
+      this.centerLine_,
+      this.base_);
+  this.dragPreview_ = null;
+  this.dragArea_ = null;
+  this.centerLine_ = null;
+  this.base_ = null;
+  anychart.ganttModule.Splitter.base(this, 'disposeInternal');
 };
 
 
@@ -1458,7 +1466,6 @@ anychart.core.ui.SimpleSplitter.prototype.globalCursor_ = function(opt_clear) {
 anychart.core.ui.SimpleSplitter.prototype.getBase_ = function() {
   if (!this.base_) {
     this.base_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
-    this.registerDisposable(this.base_);
   }
   return this.base_;
 };
@@ -1601,7 +1608,6 @@ anychart.core.ui.SimpleSplitter.prototype.getDragArea_ = function() {
 
     this.bindHandlersToGraphics(this.dragArea_, null, this.mouseOutHandler_, null, this.mouseMoveHandler_, null, this.mouseUpHandler_);
 
-    this.registerDisposable(this.dragArea_);
   }
   return this.dragArea_;
 };
@@ -1616,7 +1622,6 @@ anychart.core.ui.SimpleSplitter.prototype.getDragPreview_ = function() {
   if (!this.dragPreview_) {
     this.dragPreview_ = /** @type {acgraph.vector.Path} */ (acgraph.path());
     this.dragPreview_.fill(this.dragPreviewFill_).stroke(null);
-    this.registerDisposable(this.dragPreview_);
   }
   return this.dragPreview_;
 };
@@ -1632,8 +1637,6 @@ anychart.core.ui.SimpleSplitter.prototype.getCenterLine_ = function() {
     this.centerLine_ = /** @type {acgraph.vector.Path} */ (acgraph.path()
         .disablePointerEvents(true)
         .stroke(this.stroke_));
-
-    this.registerDisposable(this.centerLine_);
   }
   return this.centerLine_;
 };
@@ -1706,6 +1709,19 @@ anychart.core.ui.SimpleSplitter.prototype.draw = function() {
 };
 
 
+/** @inheritDoc */
+anychart.core.ui.SimpleSplitter.prototype.disposeInternal = function() {
+  goog.disposeAll(
+    this.dragPreview_,
+    this.dragArea_,
+    this.centerLine_,
+    this.base_);
+  this.dragPreview_ = null;
+  this.dragArea_ = null;
+  this.centerLine_ = null;
+  this.base_ = null;
+  anychart.core.ui.SimpleSplitter.base(this, 'disposeInternal');
+};
 
 //proto['layout'] = proto.layout;
 //proto['position'] = proto.position;

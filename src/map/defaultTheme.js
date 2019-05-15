@@ -261,6 +261,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'zIndex': 5
       },
       'minorLabels': {
+        'enabled': null,
         'padding': 2,
         'rotation': null,
         'fontSize': 9,

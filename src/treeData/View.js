@@ -356,6 +356,12 @@ anychart.treeDataModule.View.DataItem = function(treeView, dataItem, parentView)
    * @private
    */
   this.meta_ = {};
+
+  /**
+   * UID.
+   * @type {number}
+   */
+  this.uid = anychart.utils.getUid();
 };
 
 

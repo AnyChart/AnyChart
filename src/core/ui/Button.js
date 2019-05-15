@@ -246,7 +246,6 @@ anychart.core.ui.Button.prototype.disabled = function(opt_enable) {
 anychart.core.ui.Button.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.padding_) {
     this.padding_ = new anychart.core.utils.Padding();
-    this.registerDisposable(this.padding_);
     this.padding_.listenSignals(this.boundsInvalidated_, this);
   }
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
@@ -341,7 +340,6 @@ anychart.core.ui.Button.prototype.drawText = function(textSettings) {
     this.textElement.attr('aria-hidden', 'true');
     this.bindHandlersToGraphics(this.textElement, this.handleMouseOver, this.handleMouseOut, null, null,
         this.handleMouseDown, this.handleMouseUp);
-    this.registerDisposable(this.textElement);
     this.textElement.disablePointerEvents(true);
   }
 
@@ -378,7 +376,6 @@ anychart.core.ui.Button.prototype.drawBackground = function(fill, stroke) {
     this.backgroundPath = acgraph.path();
     this.bindHandlersToGraphics(this.backgroundPath, this.handleMouseOver, this.handleMouseOut, null, null,
         this.handleMouseDown, this.handleMouseUp);
-    this.registerDisposable(this.backgroundPath);
   }
 
   var path = this.backgroundPath;
@@ -835,6 +832,21 @@ anychart.core.ui.Button.prototype.cursor = function(opt_value) {
     return this;
   }
   return this.cursor_;
+};
+
+
+/** @inheritDoc */
+anychart.core.ui.Button.prototype.disposeInternal = function() {
+  goog.disposeAll(
+      this.padding_,
+      this.textElement,
+      this.backgroundPath);
+
+  this.padding_ = null;
+  this.textElement = null;
+  this.backgroundPath = null;
+
+  anychart.core.ui.Button.base(this, 'disposeInternal');
 };
 
 

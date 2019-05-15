@@ -19,18 +19,6 @@ anychart.core.utils.Interactivity = function(parent) {
   this.parent_ = parent;
 
   /**
-   * @type {boolean}
-   * @private
-   */
-  this.allowMultiSeriesSelection_;
-
-  /**
-   * @type {boolean}
-   * @private
-   */
-  this.zoomOnMouseWheel_;
-
-  /**
    * Descriptors meta.
    * @type {!Object.<string, anychart.core.settings.PropertyDescriptorMeta>}
    */
@@ -41,7 +29,9 @@ anychart.core.utils.Interactivity = function(parent) {
     ['multiSelectOnClick', 0, 0],
     ['unselectOnClickOutOfPoint', 0, 0],
     ['hoverMode', 0, anychart.Signal.NEEDS_REAPPLICATION],
-    ['selectionMode', 0, 0]
+    ['selectionMode', 0, 0],
+    ['zoomOnMouseWheel', 0, 0],
+    ['scrollOnMouseWheel', 0, 0]
   ]);
 };
 goog.inherits(anychart.core.utils.Interactivity, anychart.core.Base);
@@ -59,7 +49,9 @@ anychart.core.utils.Interactivity.PROPERTY_DESCRIPTORS = (function() {
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'multiSelectOnClick', anychart.core.settings.booleanNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'unselectOnClickOutOfPoint', anychart.core.settings.booleanNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'hoverMode', anychart.enums.normalizeHoverMode],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'selectionMode', anychart.enums.normalizeSelectMode]
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'selectionMode', anychart.enums.normalizeSelectMode],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'zoomOnMouseWheel', anychart.core.settings.booleanNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'scrollOnMouseWheel', anychart.core.settings.booleanNormalizer]
   ]);
   return map;
 })();
@@ -74,53 +66,10 @@ anychart.core.utils.Interactivity.prototype.SUPPORTED_SIGNALS = anychart.Signal.
 
 
 /**
- * todo (blackart) not implemented yet, I don't remember what it should be to do.
- * @param {boolean=} opt_value Allow selects more then one series on a chart or not.
- * @return {anychart.core.utils.Interactivity|boolean} .
- */
-anychart.core.utils.Interactivity.prototype.allowMultiSeriesSelection = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = !!opt_value;
-    if (opt_value != this.allowMultiSeriesSelection_) {
-      this.allowMultiSeriesSelection_ = opt_value;
-    }
-    return this;
-  }
-  return /** @type {boolean}*/(this.allowMultiSeriesSelection_);
-};
-
-
-/**
- * Allows use mouse wheel for zooming.
- * @param {boolean=} opt_value Whether will use mouse wheel.
- * @return {anychart.core.utils.Interactivity|boolean} .
- */
-anychart.core.utils.Interactivity.prototype.zoomOnMouseWheel = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = !!opt_value;
-    if (opt_value != this.zoomOnMouseWheel_) {
-      this.zoomOnMouseWheel_ = opt_value;
-    }
-    return this;
-  }
-  return /** @type {boolean} */(this.zoomOnMouseWheel_);
-};
-
-
-/**
  * @inheritDoc
  */
 anychart.core.utils.Interactivity.prototype.setupByJSON = function(config, opt_default) {
-  anychart.core.utils.Interactivity.base(this, 'setupByJSON', config, opt_default);
-
   anychart.core.settings.deserialize(this, anychart.core.utils.Interactivity.PROPERTY_DESCRIPTORS, config, opt_default);
-  this.parent_.suspendSignalsDispatching();
-  //TODO(AntonKagakin): uncomment this line when zoom will be implemented in chart
-  //TODO(AntonKagakin): and remove it from map and stock interactivity class
-  //this.zoomOnMouseWheel(config['zoomOnMouseWheel']);
-  if ('allowMultiSeriesSelection' in config)
-    this.allowMultiSeriesSelection(config['allowMultiSeriesSelection']);
-  this.parent_.resumeSignalsDispatching(true);
 };
 
 
@@ -130,27 +79,19 @@ anychart.core.utils.Interactivity.prototype.setupByJSON = function(config, opt_d
  */
 anychart.core.utils.Interactivity.prototype.serialize = function() {
   var json = {};
-
   anychart.core.settings.serialize(this, anychart.core.utils.Interactivity.PROPERTY_DESCRIPTORS, json);
-  //TODO(AntonKagakin): uncomment this line when zoom will be implemented in chart
-  //TODO(AntonKagakin): and remove it from map and stock interactivity class
-  //json['zoomOnMouseWheel'] = this.zoomOnMouseWheel();
-  // json['allowMultiSeriesSelection'] = this.allowMultiSeriesSelection();
   return json;
 };
 
 
 //exports
 (function() {
-  var proto = anychart.core.utils.Interactivity.prototype;
-  //proto['allowMultiSeriesSelection'] = proto.allowMultiSeriesSelection;
-  //TODO(AntonKagakin): uncomment this line when zoom will be implemented in chart
-  //TODO(AntonKagakin): also remove export from map and stock interactivity class
-  //proto['zoomOnMouseWheel'] = proto.zoomOnMouseWheel;
   // auto generated
   // proto['spotRadius'] = proto.spotRadius;
   // proto['multiSelectOnClick'] = proto.multiSelectOnClick;
   // proto['unselectOnClickOutOfPoint'] = proto.unselectOnClickOutOfPoint;
   // proto['hoverMode'] = proto.hoverMode;
   // proto['selectionMode'] = proto.selectionMode;
+  // proto['zoomOnMouseWheel'] = proto.zoomOnMouseWheel;
+  // proto['scrollOnMouseWheel'] = proto.scrollOnMouseWheel;
 })();

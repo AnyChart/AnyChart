@@ -43,13 +43,12 @@ anychart.mapModule.elements.AxisTicks = function() {
 
   /**
    * Path with ticks.
-   * @type {!acgraph.vector.Path}
+   * @type {acgraph.vector.Path}
    * @protected
    */
   this.path = acgraph.path();
   this.path.disableStrokeScaling(true);
   this.bindHandlersToGraphics(this.path);
-  this.registerDisposable(this.path);
 
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['stroke', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
@@ -453,6 +452,8 @@ anychart.mapModule.elements.AxisTicks.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.mapModule.elements.AxisTicks.prototype.disposeInternal = function() {
+  goog.dispose(this.path);
+  this.path = null;
   anychart.mapModule.elements.AxisTicks.base(this, 'disposeInternal');
 };
 

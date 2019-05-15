@@ -76,7 +76,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         }
       },
       'marker': {
-        'size': 4,
+        'size': '4%',
         'hoverSize': 6,
         'selectSize': 6,
         'position': 'inside',

@@ -19,6 +19,8 @@ goog.require('anychart.core.ui.Tooltip');
 anychart.vennModule.Intersections = function(chart) {
   anychart.vennModule.Intersections.base(this, 'constructor');
 
+  this.addThemes('venn.intersections');
+
   /**
    * Chart.
    * @type {anychart.core.Chart}
@@ -34,12 +36,14 @@ anychart.vennModule.Intersections = function(chart) {
     ['labels', 0, 0],
     ['markers', 0, 0]
   ]);
+
   this.normal_ = new anychart.core.StateSettings(this, normalDescriptorsMeta, anychart.PointState.NORMAL);
-  this.normal_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR,  anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME);
+  this.normal_.setOption(anychart.core.StateSettings.MARKERS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.DEFAULT_MARKERS_CONSTRUCTOR_NO_THEME);
+  this.normal_.setOption(anychart.core.StateSettings.MARKERS_AFTER_INIT_CALLBACK, anychart.core.StateSettings.DEFAULT_MARKERS_AFTER_INIT_CALLBACK);
+  this.normal_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME);
   this.normal_.setOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK, /** @this {anychart.vennModule.Intersections} */ function(factory) {
     factory.listenSignals(this.labelsInvalidated_, this);
   });
-  this.normal_.setOption(anychart.core.StateSettings.MARKERS_AFTER_INIT_CALLBACK, anychart.core.StateSettings.DEFAULT_MARKERS_AFTER_INIT_CALLBACK);
 
   var descriptorsMeta = {};
   anychart.core.settings.createDescriptorsMeta(descriptorsMeta, [
@@ -50,13 +54,16 @@ anychart.vennModule.Intersections = function(chart) {
     ['markers', 0, 0]
   ]);
   this.hovered_ = new anychart.core.StateSettings(this, descriptorsMeta, anychart.PointState.HOVER);
-  this.hovered_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR,  anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME);
+  this.hovered_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME);
+  this.hovered_.setOption(anychart.core.StateSettings.MARKERS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.DEFAULT_MARKERS_CONSTRUCTOR_NO_THEME);
 
   this.selected_ = new anychart.core.StateSettings(this, descriptorsMeta, anychart.PointState.SELECT);
-  this.selected_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR,  anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME);
+  this.selected_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME);
+  this.selected_.setOption(anychart.core.StateSettings.MARKERS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.DEFAULT_MARKERS_CONSTRUCTOR_NO_THEME);
   function markAllConsistent(factory) {
     factory.markConsistent(anychart.ConsistencyState.ALL);
   }
+
   this.hovered_.setOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK, markAllConsistent);
   this.hovered_.setOption(anychart.core.StateSettings.MARKERS_AFTER_INIT_CALLBACK, markAllConsistent);
   this.selected_.setOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK, markAllConsistent);
@@ -78,6 +85,7 @@ anychart.vennModule.Intersections.prototype.SUPPORTED_SIGNALS =
     anychart.Signal.NEED_UPDATE_LEGEND;
 
 
+//region State settings
 /**
  * Normal state settings.
  * @param {!Object=} opt_value
@@ -119,7 +127,7 @@ anychart.vennModule.Intersections.prototype.selected = function(opt_value) {
   return this.selected_;
 };
 
-
+//endregion
 //region -- Labels
 /**
  * Listener for labels invalidation.
@@ -174,7 +182,8 @@ anychart.vennModule.Intersections.prototype.tooltip = function(opt_value) {
   if (!this.tooltip_) {
     this.tooltip_ = new anychart.core.ui.Tooltip(0);
     var parent = /** @type {anychart.core.ui.Tooltip} */ (this.chart_.tooltip());
-    this.tooltip_.dropThemes().parent(parent);
+    this.setupCreated('tooltip', this.tooltip_);
+    this.tooltip_.parent(parent);
     this.tooltip_.chart(this.chart_);
   }
   if (goog.isDef(opt_value)) {
@@ -188,6 +197,18 @@ anychart.vennModule.Intersections.prototype.tooltip = function(opt_value) {
 
 //endregion
 //region -- Serialization/Deserialization
+
+
+/**
+ * Setup theme for elements
+ * */
+anychart.vennModule.Intersections.prototype.setupElements = function() {
+  this.setupCreated('normal', this.normal_);
+  this.setupCreated('hovered', this.hovered_);
+  this.setupCreated('selected', this.selected_);
+};
+
+
 /** @inheritDoc */
 anychart.vennModule.Intersections.prototype.serialize = function() {
   var json = anychart.vennModule.Intersections.base(this, 'serialize');

@@ -577,7 +577,6 @@ anychart.pieModule.Chart.prototype.data = function(opt_value, opt_csvSettings) {
           else
             parentView = (this.parentViewToDispose_ = new anychart.data.Set(
                 (goog.isArray(opt_value) || goog.isString(opt_value)) ? opt_value : null, opt_csvSettings)).mapAs();
-          this.registerDisposable(this.parentViewToDispose_);
         }
         this.parentView_ = parentView.derive();
       }
@@ -622,7 +621,6 @@ anychart.pieModule.Chart.prototype.redefineView_ = function() {
   delete this.iterator_;
   this.view_ = this.prepareData_(this.parentView_);
   this.view_.listenSignals(this.dataInvalidated_, this);
-  this.registerDisposable(this.view_);
   this.invalidate(
       anychart.ConsistencyState.APPEARANCE |
       anychart.ConsistencyState.PIE_LABELS |
@@ -769,7 +767,6 @@ anychart.pieModule.Chart.prototype.setupPalette_ = function(cls, opt_cloneFrom) 
     if (opt_cloneFrom)
       this.palette_.setup(opt_cloneFrom);
     this.palette_.listenSignals(this.paletteInvalidated_, this);
-    this.registerDisposable(this.palette_);
     if (doDispatch)
       this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
   }
@@ -787,7 +784,6 @@ anychart.pieModule.Chart.prototype.hatchFillPalette = function(opt_value) {
   if (!this.hatchFillPalette_) {
     this.hatchFillPalette_ = new anychart.palettes.HatchFills();
     this.hatchFillPalette_.listenSignals(this.paletteInvalidated_, this);
-    this.registerDisposable(this.hatchFillPalette_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -4677,7 +4673,6 @@ anychart.pieModule.Chart.prototype.getStartValueForAppearanceReduction = goog.nu
 /** @inheritDoc */
 anychart.pieModule.Chart.prototype.createTooltip = function() {
   var tooltip = new anychart.core.ui.Tooltip(0);
-  this.registerDisposable(tooltip);
   tooltip.chart(this);
   tooltip.containerProvider(this);
   tooltip.listenSignals(this.onTooltipSignal_, this);
@@ -4813,7 +4808,28 @@ anychart.pieModule.Chart.prototype.setupStateSettings = function() {
  * @inheritDoc
  */
 anychart.pieModule.Chart.prototype.disposeInternal = function() {
-  goog.disposeAll(this.animationQueue_, this.normal_, this.hovered_, this.selected_, this.center_);
+  goog.disposeAll(
+      this.animationQueue_,
+      this.normal_,
+      this.hovered_,
+      this.selected_,
+      this.center_,
+      this.parentViewToDispose_,
+      this.parentView_,
+      this.view_,
+      this.palette_,
+      this.hatchFillPalette_);
+  this.animationQueue_ = null;
+  this.normal_ = null;
+  this.hovered_ = null;
+  this.selected_ = null;
+  this.center_ = null;
+  this.parentViewToDispose_ = null;
+  this.parentView_ = null;
+  this.view_ = null;
+  delete this.iterator_;
+  this.palette_ = null;
+  this.hatchFillPalette_ = null;
   anychart.pieModule.Chart.base(this, 'disposeInternal');
 };
 

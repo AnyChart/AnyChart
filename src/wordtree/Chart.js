@@ -1257,7 +1257,8 @@ anychart.wordtreeModule.Chart.prototype.setupByJSON = function(config, opt_defau
 /** @inheritDoc */
 anychart.wordtreeModule.Chart.prototype.disposeInternal = function() {
   anychart.wordtreeModule.Chart.base(this, 'disposeInternal');
-  goog.disposeAll(this.connectorElement_, this.textElements_, this.textPool_, this.data_, this.rootLayer);
+  goog.disposeAll(this.connectors_, this.connectorElement_, this.textElements_, this.textPool_, this.data_, this.rootLayer);
+  this.connectors_ = null;
   this.connectorElement_ = null;
   this.data_ = null;
   this.textElements_.length = 0;

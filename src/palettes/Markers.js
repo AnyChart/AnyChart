@@ -93,6 +93,7 @@ anychart.palettes.Markers.prototype.items = function(opt_items, var_args) {
     if (!goog.isArray(opt_items)) {
       opt_items = goog.array.slice(arguments, 0);
     }
+    goog.disposeAll(this.markers_);
     this.markers_ = goog.array.map(opt_items, function(marker) {
       return anychart.enums.normalizeAnyMarkerType(marker);
     });

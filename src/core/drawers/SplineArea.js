@@ -97,6 +97,9 @@ anychart.core.drawers.SplineArea.prototype.drawFirstPoint = function(point, stat
   var zeroMissing = /** @type {boolean} */(point.meta('zeroMissing'));
   var y = /** @type {number} */(point.meta('value'));
 
+  zero = anychart.utils.applyPixelShiftToYCoodrinate(zero);
+  y = anychart.utils.applyPixelShiftToYCoodrinate(y);
+
   this.queue_.resetDrawer(false);
   this.queue_.baseline(zero);
   this.queue_.processPoint(x, y);
@@ -142,6 +145,9 @@ anychart.core.drawers.SplineArea.prototype.drawSubsequentPoint = function(point,
   var zero = /** @type {number} */(point.meta('zero'));
   var zeroMissing = /** @type {boolean} */(point.meta('zeroMissing'));
   var y = /** @type {number} */(point.meta('value'));
+
+  zero = anychart.utils.applyPixelShiftToYCoodrinate(zero);
+  y = anychart.utils.applyPixelShiftToYCoodrinate(y);
 
   this.queue_.processPoint(x, y);
 

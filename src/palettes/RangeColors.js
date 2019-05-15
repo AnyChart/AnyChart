@@ -119,6 +119,7 @@ anychart.palettes.RangeColors.prototype.items = function(opt_value, var_args) {
       if (!goog.isArray(opt_value)) {
         opt_value = goog.array.slice(arguments, 0);
       }
+      goog.disposeAll(this.colors_);
       this.colors_ = goog.array.map(/** @type {Array} */ (opt_value), function(element) {
         return acgraph.vector.normalizeFill(element);
       });

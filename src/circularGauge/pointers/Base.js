@@ -19,34 +19,6 @@ anychart.circularGaugeModule.pointers.Base = function() {
   anychart.circularGaugeModule.pointers.Base.base(this, 'constructor');
 
   /**
-   * Pointer stroke.
-   * @type {acgraph.vector.Stroke|string|Function}
-   * @private
-   */
-  this.stroke_;
-
-  /**
-   * Pointer fill.
-   * @type {acgraph.vector.Fill|string|Function}
-   * @private
-   */
-  this.fill_;
-
-  /**
-   * Pointer hatch fill.
-   * @type {acgraph.vector.PatternFill|acgraph.vector.HatchFill|boolean}
-   * @private
-   */
-  this.hatchFill_;
-
-  /**
-   * Defines index of axis which will be used to display its data value.
-   * @type {number}
-   * @private
-   */
-  this.axisIndex_;
-
-  /**
    * @type {anychart.core.ui.MarkersFactory|acgraph.vector.Path}
    * @protected
    */
@@ -69,6 +41,13 @@ anychart.circularGaugeModule.pointers.Base = function() {
    * @type {anychart.core.utils.InteractivityState}
    */
   this.state = new anychart.core.utils.InteractivityState(this);
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['stroke', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['fill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['hatchFill', anychart.ConsistencyState.GAUGE_HATCH_FILL, anychart.Signal.NEEDS_REDRAW],
+    ['axisIndex', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEEDS_RECALCULATION]
+  ]);
 };
 goog.inherits(anychart.circularGaugeModule.pointers.Base, anychart.core.VisualBase);
 
@@ -90,6 +69,26 @@ anychart.circularGaugeModule.pointers.Base.prototype.SUPPORTED_CONSISTENCY_STATE
 anychart.circularGaugeModule.pointers.Base.prototype.SUPPORTED_SIGNALS =
     anychart.core.VisualBase.prototype.SUPPORTED_SIGNALS |
     anychart.Signal.NEEDS_RECALCULATION;
+
+
+/**
+ *
+ * @type {!Object<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.circularGaugeModule.pointers.Base.OWN_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  var d = anychart.core.settings.descriptors;
+  anychart.core.settings.createDescriptors(map, [
+    d.STROKE_FUNCTION,
+    d.FILL_FUNCTION,
+    d.HATCH_FILL,
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'axisIndex', anychart.core.settings.numberNormalizer]
+  ]);
+  return map;
+})();
+anychart.core.settings.populate(anychart.circularGaugeModule.pointers.Base, anychart.circularGaugeModule.pointers.Base.OWN_DESCRIPTORS);
 
 
 /**
@@ -137,58 +136,6 @@ anychart.circularGaugeModule.pointers.Base.prototype.isChart = function() {
 
 
 /**
- * Pointer stroke.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|Function|string|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {(!anychart.circularGaugeModule.pointers.Base|acgraph.vector.Stroke|Function)} .
- */
-anychart.circularGaugeModule.pointers.Base.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var stroke = goog.isFunction(opt_strokeOrFill) ?
-        opt_strokeOrFill :
-        acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (stroke != this.stroke_) {
-      this.stroke_ = stroke;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.stroke_;
-};
-
-
-/**
- * Pointer fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {(!anychart.circularGaugeModule.pointers.Base|acgraph.vector.Fill|Function)} .
- */
-anychart.circularGaugeModule.pointers.Base.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-
-    var fill = goog.isFunction(opt_fillOrColorOrKeys) ?
-        opt_fillOrColorOrKeys :
-        acgraph.vector.normalizeFill.apply(null, arguments);
-    if (fill != this.fill_) {
-      this.fill_ = fill;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.fill_;
-};
-
-
-/**
  * Gets final normalized fill or stroke color.
  * @param {acgraph.vector.Fill|acgraph.vector.Stroke|Function} color Normal state color.
  * @param {boolean} isFill Is it fill?
@@ -205,55 +152,6 @@ anychart.circularGaugeModule.pointers.Base.prototype.normalizeColor = function(c
   } else
     fill = color;
   return /** @type {acgraph.vector.Fill|acgraph.vector.Stroke} */(fill);
-};
-
-
-/**
- * Pointer hatch fill.
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|acgraph.vector.HatchFill.HatchFillType|
- * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.circularGaugeModule.pointers.Base|boolean} Hatch fill.
- */
-anychart.circularGaugeModule.pointers.Base.prototype.hatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrTypeOrState)) {
-    if (goog.isBoolean(opt_patternFillOrTypeOrState))
-      opt_patternFillOrTypeOrState = opt_patternFillOrTypeOrState ?
-          anychart.circularGaugeModule.Chart.DEFAULT_HATCH_FILL_TYPE : 'none';
-
-    var hatchFill = acgraph.vector.normalizeHatchFill.apply(null, arguments);
-
-    if (hatchFill !== this.hatchFill_) {
-      this.hatchFill_ = hatchFill;
-      this.invalidate(anychart.ConsistencyState.GAUGE_HATCH_FILL,
-          anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.hatchFill_;
-};
-
-
-/**
- * Axis index.
- * @param {number=} opt_index .
- * @return {number|anychart.circularGaugeModule.pointers.Base} .
- */
-anychart.circularGaugeModule.pointers.Base.prototype.axisIndex = function(opt_index) {
-  if (goog.isDef(opt_index)) {
-    if (this.axisIndex_ != opt_index) {
-      this.axisIndex_ = opt_index;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW |
-          anychart.Signal.NEEDS_RECALCULATION
-      );
-    }
-    return this;
-  } else {
-    return this.axisIndex_;
-  }
 };
 
 
@@ -478,8 +376,11 @@ anychart.circularGaugeModule.pointers.Base.prototype.ensureCreated = function() 
  */
 anychart.circularGaugeModule.pointers.Base.prototype.draw = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    this.domElement.fill(/** @type {acgraph.vector.Fill} */(this.normalizeColor(this.fill_, true)));
-    this.domElement.stroke(/** @type {acgraph.vector.Stroke} */(this.normalizeColor(this.stroke_, false)));
+    var fill = /** @type {acgraph.vector.Fill|Function} */(this.getOption('fill'));
+    var stroke = /** @type {acgraph.vector.Stroke|Function} */(this.getOption('stroke'));
+
+    this.domElement.fill(/** @type {acgraph.vector.Fill} */(this.normalizeColor(fill, true)));
+    this.domElement.stroke(/** @type {acgraph.vector.Stroke} */(this.normalizeColor(stroke, false)));
 
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
@@ -828,32 +729,9 @@ anychart.circularGaugeModule.pointers.Base.prototype.hoverMode = function(opt_va
 /** @inheritDoc */
 anychart.circularGaugeModule.pointers.Base.prototype.serialize = function() {
   var json = anychart.circularGaugeModule.pointers.Base.base(this, 'serialize');
+  anychart.core.settings.serialize(this, anychart.circularGaugeModule.pointers.Base.OWN_DESCRIPTORS, json);
   json['pointerType'] = this.getType();
 
-  if (goog.isFunction(this['fill'])) {
-    if (goog.isFunction(this.fill())) {
-      anychart.core.reporting.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          ['Pointers fill']
-      );
-    } else {
-      json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.fill()));
-    }
-  }
-  if (goog.isFunction(this['stroke'])) {
-    if (goog.isFunction(this.stroke())) {
-      anychart.core.reporting.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          ['Pointers stroke']
-      );
-    } else {
-      json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.stroke()));
-    }
-  }
-  json['hatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hatchFill()));
-  json['axisIndex'] = this.axisIndex();
   if (this.ownData) {
     json['data'] = this.data().serialize();
   }
@@ -874,13 +752,11 @@ anychart.circularGaugeModule.pointers.Base.prototype.serialize = function() {
 anychart.circularGaugeModule.pointers.Base.prototype.setupByJSON = function(config, opt_default) {
   anychart.circularGaugeModule.pointers.Base.base(this, 'setupByJSON', config, opt_default);
 
+  anychart.core.settings.deserialize(this, anychart.circularGaugeModule.pointers.Base.OWN_DESCRIPTORS, config, opt_default);
+
   this.id(config['id']);
   this.autoIndex(config['autoIndex']);
 
-  this.fill(config['fill']);
-  this.stroke(config['stroke']);
-  this.hatchFill(config['hatchFill']);
-  this.axisIndex(config['axisIndex']);
   this.dataIndex(config['dataIndex']);
   if ('data' in config)
     this.data(config['data'] || null);
@@ -892,9 +768,11 @@ anychart.circularGaugeModule.pointers.Base.prototype.setupByJSON = function(conf
   var proto = anychart.circularGaugeModule.pointers.Base.prototype;
   proto['id'] = proto.id;
   proto['data'] = proto.data;
-  proto['stroke'] = proto.stroke;
-  proto['fill'] = proto.fill;
-  proto['hatchFill'] = proto.hatchFill;
-  proto['axisIndex'] = proto.axisIndex;
   proto['dataIndex'] = proto.dataIndex;
+
+  // auto
+  // proto['stroke'] = proto.stroke;
+  // proto['fill'] = proto.fill;
+  // proto['hatchFill'] = proto.hatchFill;
+  // proto['axisIndex'] = proto.axisIndex;
 })();

@@ -486,7 +486,7 @@ anychart.stockModule.eventMarkers.Group.prototype.drawEventMarker = function(opt
   var drawer = this.SINGLE_MARKER_DRAWERS[type];
   var position = /** @type {anychart.enums.EventMarkerPosition} */(this.resolveOption('position', 0, iterator, anychart.enums.normalizeEventMarkerPosition, false, undefined, true));
   var y = NaN;
-  var direction = /** @type {anychart.enums.EventMarkerDirection} */(this.resolveOption('direction', state, iterator, anychart.enums.normalizeEventMarkerDirection, false, undefined, true));
+  var direction = /** @type {anychart.enums.Direction} */(this.resolveOption('direction', state, iterator, anychart.enums.normalizeDirection, false, undefined, true));
   var seriesId = '';
   var fieldName = '';
   if (position != anychart.enums.EventMarkerPosition.AXIS) {
@@ -519,19 +519,19 @@ anychart.stockModule.eventMarkers.Group.prototype.drawEventMarker = function(opt
         }
         y = goog.math.clamp(y, this.pixelBoundsCache.top, this.pixelBoundsCache.top + this.pixelBoundsCache.height);
       }
-      if (direction == anychart.enums.EventMarkerDirection.AUTO) {
+      if (direction == anychart.enums.Direction.AUTO) {
         direction = (yValue < 0 || !yValue && position == anychart.enums.EventMarkerPosition.SERIES_NEGATIVE) ?
-            anychart.enums.EventMarkerDirection.DOWN :
-            anychart.enums.EventMarkerDirection.UP;
+            anychart.enums.Direction.DOWN :
+            anychart.enums.Direction.UP;
       }
     }
   }
   if (isNaN(y)) {
     y = this.pixelBoundsCache.top + this.pixelBoundsCache.height;
     position = anychart.enums.EventMarkerPosition.AXIS;
-    direction = anychart.enums.EventMarkerDirection.UP;
+    direction = anychart.enums.Direction.UP;
   }
-  var directionIsUp = direction != anychart.enums.EventMarkerDirection.DOWN;
+  var directionIsUp = direction != anychart.enums.Direction.DOWN;
   hash = this.getPositionHash_(position, seriesId, fieldName, directionIsUp);
   iterator.meta('positionHash', hash);
   var x = xScale.transform(iterator.getX(), 0.5) * this.pixelBoundsCache.width + this.pixelBoundsCache.left;

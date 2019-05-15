@@ -31,11 +31,14 @@ goog.require('goog.cssom');
  * Try to flatten settings before multiple labelsSettings.getOption(...) usage.
  * Getting value from flat object is faster than the getOption() resolving.
  *
+ *
+ * @param {boolean=} opt_skipDefaultThemes
+ *
  * @constructor
  * @implements {anychart.core.settings.IResolvable}
  * @extends {anychart.core.Base}
  */
-anychart.core.ui.LabelsSettings = function() {
+anychart.core.ui.LabelsSettings = function(opt_skipDefaultThemes) {
   anychart.core.ui.LabelsSettings.base(this, 'constructor');
 
   /**
@@ -86,6 +89,27 @@ anychart.core.ui.LabelsSettings = function() {
    */
   this.styleElement = null;
 
+  /**
+   * Accumulated signal to dispatch.
+   * @type {number}
+   */
+  this.suspendedSignal = 0;
+
+
+  /*
+    Please be very careful on using these signals, here are some
+    special cases like:
+      - you set width value to 100 (anychart.Signal.BOUNDS_CHANGED is dispatched, but there's
+        no need to measure anything because default this.needsBoundsCalculation() returns false).
+      - set wordBreak to 'break-all' (anychart.Signal.BOUNDS_CHANGED is dispatched,
+        this.needsBoundsCalculation() return true and we need to measure labels with Measuriator).
+      - you set width value to null (anychart.Signal.BOUNDS_CHANGED is still dispatched, but
+        here is no more need to measure labels anymore because width is not set, this.needsBoundsCalculation()
+        returns false).
+      - the same is in another BOUNDS_CHANGED dispatching.
+      - That's why always use this.needsBoundsCalculation() on listening and
+        processing of LabelsSettings signals.
+   */
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['format', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
     ['adjustFontSize', 0, 0], //TODO (A.Kudryavtsev): Not supported for a while.
@@ -93,14 +117,27 @@ anychart.core.ui.LabelsSettings = function() {
     ['letterSpacing', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
     ['textDirection', 0, 0], //TODO (A.Kudryavtsev): Not supported for a while.
     ['textIndent', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
-    ['textOverflow', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
-    ['useHtml', 0, 0], //TODO (A.Kudryavtsev): Not supported for a while.
+
+    //Doesn't affect bounds.
+    ['textOverflow', 0, anychart.Signal.NEEDS_REDRAW, 0, this.resetFlatSettings],
+
+    /*
+      This is a very special case.
+      New implementation uses foreignObject. In this case, browser
+      places labels itself and here's no need to measure anything.
+      That's why developer should always consider this.needsBoundsCalculation().
+     */
+    ['useHtml', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
     ['wordBreak', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
     ['wordWrap', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
-    ['fontColor', 0, anychart.Signal.NEEDS_REDRAW, 0, this.resetFlatSettings], //Doesn't affect bounds.
+
+    //Doesn't affect bounds.
+    ['fontColor', 0, anychart.Signal.NEEDS_REDRAW, 0, this.resetFlatSettings],
     ['fontDecoration', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
     ['fontFamily', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
-    ['fontOpacity', 0, anychart.Signal.NEEDS_REDRAW, 0, this.resetFlatSettings], //Doesn't affect bounds.
+
+    //Doesn't affect bounds.
+    ['fontOpacity', 0, anychart.Signal.NEEDS_REDRAW, 0, this.resetFlatSettings],
     ['fontSize', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
     ['fontStyle', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
     ['fontWeight', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
@@ -109,19 +146,33 @@ anychart.core.ui.LabelsSettings = function() {
     ['maxFontSize', 0, 0], //TODO (A.Kudryavtsev): Not supported for a while.
     ['minFontSize', 0, 0], //TODO (A.Kudryavtsev): Not supported for a while.
     ['vAlign', 0, anychart.Signal.NEEDS_REDRAW, 0, this.resetFlatSettings],
-    ['anchor', 0, anychart.Signal.NEEDS_REAPPLICATION, 0], //Has no BOUNDS_CHANGED because affects only positioning, not bounds.
+
+    //Only left, middle and right position. Has no BOUNDS_CHANGED because affects only positioning, not bounds.
+    ['anchor', 0, anychart.Signal.NEEDS_REDRAW, 0, this.resetFlatSettings],
     ['height', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
-    ['offsetX', 0, anychart.Signal.NEEDS_REAPPLICATION, 0], //Has no BOUNDS_CHANGED because affects only positioning, not bounds.
-    ['offsetY', 0, anychart.Signal.NEEDS_REAPPLICATION, 0], //Has no BOUNDS_CHANGED because affects only positioning, not bounds.
-    ['position', 0, anychart.Signal.NEEDS_REAPPLICATION, 0], //Has no BOUNDS_CHANGED because affects only positioning, not bounds.
+
+    //Has no BOUNDS_CHANGED because affects only positioning, not bounds.
+    ['offsetX', 0, anychart.Signal.NEEDS_REAPPLICATION, 0],
+
+    //Has no BOUNDS_CHANGED because affects only positioning, not bounds.
+    ['offsetY', 0, anychart.Signal.NEEDS_REAPPLICATION, 0],
+
+    //We dispatch two signals here because we need set new style for text element and call putAt method for update 'x' and 'y' attributes.
+    ['position', 0, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEEDS_REAPPLICATION, 0, this.resetFlatSettings],
     ['rotation', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
     ['width', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
     ['allowMultiline', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
     ['zIndex', 0, 0], //TODO (A.Kudryavtsev): Not supported for a while.
-    ['clip', 0, 0] ////TODO (A.Kudryavtsev): Not supported for a while.
+    ['clip', 0, 0], ////TODO (A.Kudryavtsev): Not supported for a while.
+    ['enabled', 0, anychart.Signal.ENABLED_STATE_CHANGED, 0, this.resetFlatSettings],
+    ['selectable', 0, anychart.Signal.NEEDS_REDRAW, 0, this.resetFlatSettings],
+    ['disablePointerEvents', 0, anychart.Signal.NEEDS_REDRAW, 0, this.resetFlatSettings],
+    ['autoRotate', 0, anychart.Signal.NEEDS_REDRAW, 0, this.resetFlatSettings]
   ]);
 
-  this.addThemes('defaultSimpleLabelsSettings');
+  if (!opt_skipDefaultThemes) {
+    this.addThemes('defaultSimpleLabelsSettings');
+  }
 };
 goog.inherits(anychart.core.ui.LabelsSettings, anychart.core.Base);
 
@@ -145,7 +196,32 @@ anychart.core.ui.LabelsSettings.prototype.SUPPORTED_SIGNALS =
     anychart.core.Base.prototype.SUPPORTED_SIGNALS |
     anychart.Signal.NEEDS_REDRAW | // Regular redraw, no bounds affecting changes.
     anychart.Signal.BOUNDS_CHANGED | // Settings that affect the text bounds only.
-    anychart.Signal.NEEDS_REAPPLICATION; // Settings not related to text itself (like padding).
+    anychart.Signal.NEEDS_REAPPLICATION | // Settings not related to text itself (like padding).
+    anychart.Signal.ENABLED_STATE_CHANGED; // Special state to start collecting suspended signal or to dispatch collected signal.
+
+
+/**
+ * @inheritDoc
+ */
+anychart.core.ui.LabelsSettings.prototype.getSignal = function(fieldName) {
+  var signal = anychart.core.ui.LabelsSettings.base(this, 'getSignal', fieldName);
+  var style = this.flatten();
+  var enabled = style['enabled'];
+
+  if (fieldName == 'enabled') {
+    signal = anychart.Signal.ENABLED_STATE_CHANGED;
+    if (enabled) {
+      signal |= this.suspendedSignal;
+      this.suspendedSignal = 0;
+    }
+    //TODO (A.Kudryavtsev): debug else-condition.
+  } else {
+    if (!enabled) {
+      this.suspendedSignal |= signal;
+    }
+  }
+  return signal;
+};
 
 
 //endregion
@@ -181,7 +257,7 @@ anychart.core.ui.LabelsSettings.DESCRIPTORS = (function() {
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'minFontSize', anychart.core.settings.numberOrStringNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'maxFontSize', anychart.core.settings.numberOrStringNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'vAlign', anychart.enums.normalizeVAlign],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'anchor', anychart.core.ui.LabelsFactory.anchorNoAutoNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'anchor', anychart.enums.normalizeAnchor],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'height', anychart.core.settings.numberOrPercentNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'offsetX', anychart.core.settings.numberOrPercentNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'offsetY', anychart.core.settings.numberOrPercentNormalizer],
@@ -190,7 +266,11 @@ anychart.core.ui.LabelsSettings.DESCRIPTORS = (function() {
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'width', anychart.core.settings.numberOrPercentNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'zIndex', anychart.core.settings.numberNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'allowMultiline', anychart.core.settings.boolOrNullNormalizer],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'clip', anychart.core.settings.asIsNormalizer]
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'clip', anychart.core.settings.asIsNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'enabled', anychart.core.settings.boolOrNullNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'selectable', anychart.core.settings.booleanNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'disablePointerEvents', anychart.core.settings.booleanNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'autoRotate', anychart.core.settings.booleanNormalizer]
   ]);
 
   return map;
@@ -219,6 +299,7 @@ anychart.core.ui.LabelsSettings.prototype.parent = function(opt_value) {
         this.parent_ = opt_value;
         this.padding().parent(this.parent_.padding());
         this.parent_.listenSignals(this.parentInvalidated_, this);
+        this.resetFlatSettings();
       }
     }
     return this;
@@ -233,6 +314,7 @@ anychart.core.ui.LabelsSettings.prototype.parent = function(opt_value) {
  * @private
  */
 anychart.core.ui.LabelsSettings.prototype.parentInvalidated_ = function(e) {
+  this.resetFlatSettings();
   this.dispatchSignal(e.signals);
 };
 
@@ -404,7 +486,22 @@ anychart.core.ui.LabelsSettings.prototype.getText = function(context) {
  * @return {boolean} - If text needs bounds calculation to be placed correctly.
  */
 anychart.core.ui.LabelsSettings.prototype.needsBoundsCalculation = function() {
-  return (this.considerHAlign() || this.considerWordWrap() || this.considerTextOverflow() || this.considerWordBreak());
+  return (
+      this.considerHAlign() ||
+      this.considerWordWrap() ||
+      this.considerWordBreak()
+  );
+};
+
+
+/**
+ * Checks useHtml condition for not IE browsers.
+ * @return {boolean}
+ * @private
+ */
+anychart.core.ui.LabelsSettings.prototype.isUseHtml_ = function() {
+  var conf = this.flatten();
+  return !!conf['useHtml'] && !goog.labs.userAgent.browser.isIE();
 };
 
 
@@ -415,7 +512,7 @@ anychart.core.ui.LabelsSettings.prototype.needsBoundsCalculation = function() {
 anychart.core.ui.LabelsSettings.prototype.considerHAlign = function() {
   var conf = this.flatten();
   var widthIsSet = goog.isDefAndNotNull(conf['width']);
-  return widthIsSet && conf['hAlign'] != acgraph.vector.Text.HAlign.LEFT;
+  return !this.isUseHtml_() && (widthIsSet && conf['hAlign'] != acgraph.vector.Text.HAlign.LEFT);
 };
 
 
@@ -426,7 +523,7 @@ anychart.core.ui.LabelsSettings.prototype.considerHAlign = function() {
 anychart.core.ui.LabelsSettings.prototype.considerVAlign = function() {
   var conf = this.flatten();
   var heightIsSet = goog.isDefAndNotNull(conf['height']);
-  return heightIsSet && conf['vAlign'] != acgraph.vector.Text.VAlign.TOP;
+  return !this.isUseHtml_() && (heightIsSet && conf['vAlign'] != acgraph.vector.Text.VAlign.TOP);
 };
 
 
@@ -437,7 +534,7 @@ anychart.core.ui.LabelsSettings.prototype.considerVAlign = function() {
 anychart.core.ui.LabelsSettings.prototype.considerWordWrap = function() {
   var conf = this.flatten();
   var widthIsSet = goog.isDefAndNotNull(conf['width']);
-  return widthIsSet && conf['wordWrap'] == anychart.enums.WordWrap.BREAK_WORD;
+  return !this.isUseHtml_() && (widthIsSet && conf['wordWrap'] == anychart.enums.WordWrap.BREAK_WORD);
 };
 
 
@@ -448,18 +545,7 @@ anychart.core.ui.LabelsSettings.prototype.considerWordWrap = function() {
 anychart.core.ui.LabelsSettings.prototype.considerWordBreak = function() {
   var conf = this.flatten();
   var widthIsSet = goog.isDefAndNotNull(conf['width']);
-  return widthIsSet && conf['wordBreak'];
-};
-
-
-/**
- * Checks whether texts needs to calculate its bounds because of textOverflow option value.
- * @return {boolean}
- */
-anychart.core.ui.LabelsSettings.prototype.considerTextOverflow = function() {
-  var conf = this.flatten();
-  var widthIsSet = goog.isDefAndNotNull(conf['width']);
-  return widthIsSet && conf['textOverflow'];
+  return !this.isUseHtml_() && (widthIsSet && conf['wordBreak']);
 };
 
 
@@ -526,6 +612,16 @@ anychart.core.ui.LabelsSettings.prototype.background = function(opt_value) {
 //endregion
 //region -- Serialize/Deserialize.
 /** @inheritDoc */
+anychart.core.ui.LabelsSettings.prototype.setupSpecial = function(isDefault, var_args) {
+  if (goog.isBoolean(var_args)) {
+    this.enabled(var_args);
+    return true;
+  }
+  return false;
+};
+
+
+/** @inheritDoc */
 anychart.core.ui.LabelsSettings.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.ui.LabelsSettings.base(this, 'setupByJSON', config, opt_default);
   anychart.core.settings.deserialize(this, anychart.core.ui.LabelsSettings.DESCRIPTORS, config, opt_default);
@@ -540,8 +636,16 @@ anychart.core.ui.LabelsSettings.prototype.serialize = function() {
   var json = anychart.core.ui.LabelsSettings.base(this, 'serialize');
   anychart.core.settings.serialize(this, anychart.core.ui.LabelsSettings.DESCRIPTORS, json, void 0, void 0, true);
   var padding = this.getCreated('padding');
-  if (padding)
-    json['padding'] = padding.serialize();
+  if (padding) {
+    /*
+      TODO (A.Kudryavtsev):
+      Probably we should avoid this magic with just correct serialization of anychart.core.utils.Space.
+      But currently it might break some existing serialization behaviour.
+     */
+    var sett = goog.object.clone(padding.ownSettings);
+    if (!goog.object.isEmpty(sett))
+      json['padding'] = sett;
+  }
   return json;
 };
 
@@ -552,8 +656,8 @@ anychart.core.ui.LabelsSettings.prototype.serialize = function() {
 anychart.core.ui.LabelsSettings.prototype.disposeInternal = function() {
   this.flatSettings_ = null;
   this.parent(null);
+  goog.disposeAll(this.padding_, this.background_);
   this.padding_ = null;
-  goog.dispose(this.background_);
   this.background_ = null;
   anychart.core.ui.LabelsSettings.base(this, 'disposeInternal');
 };

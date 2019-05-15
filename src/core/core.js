@@ -78,7 +78,7 @@ anychart.core.IChart.prototype.resumeSignalsDispatching = function(dispatch) {};
 
 
 /**
- * @return {anychart.scales.IXScale|anychart.core.IChart}
+ * @return {anychart.scales.IXScale|anychart.core.IChart|anychart.scales.GanttDateTime}
  */
 anychart.core.IChart.prototype.xScale = function() {};
 

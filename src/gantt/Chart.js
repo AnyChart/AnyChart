@@ -6,6 +6,7 @@ goog.require('anychart.format.Context');
 goog.require('anychart.ganttModule.Controller');
 goog.require('anychart.ganttModule.DataGrid');
 goog.require('anychart.ganttModule.IInteractiveGrid');
+goog.require('anychart.ganttModule.Selection');
 goog.require('anychart.ganttModule.Splitter');
 goog.require('anychart.ganttModule.TimeLine');
 goog.require('anychart.ganttModule.edit.StructureEdit');
@@ -77,6 +78,13 @@ anychart.ganttModule.Chart = function(opt_isResourcesChart) {
   this.splitter_ = null;
 
   /**
+   * Selection.
+   * @type {anychart.ganttModule.Selection}
+   * @private
+   */
+  this.selection_ = new anychart.ganttModule.Selection();
+
+  /**
    * Context provider.
    * @type {anychart.format.Context}
    * @private
@@ -96,7 +104,6 @@ anychart.ganttModule.Chart = function(opt_isResourcesChart) {
   this.verticalScrollBar_ = this.controller_.getScrollBar();
   this.verticalScrollBar_.zIndex(anychart.ganttModule.Chart.Z_INDEX_SCROLL);
   this.verticalScrollBar_.listenSignals(this.scrollInvalidated_, this);
-  this.registerDisposable(this.verticalScrollBar_);
 
   this.listenOnce(anychart.enums.EventType.CHART_DRAW, function() {
     this.dataGrid().initMouseFeatures();
@@ -398,7 +405,6 @@ anychart.ganttModule.Chart.prototype.getDataGrid_ = function() {
     this.dg_.setOption('backgroundFill', null);
     this.dg_.zIndex(anychart.ganttModule.Chart.Z_INDEX_DG_TL);
     this.dg_.setInteractivityHandler(this);
-    this.registerDisposable(this.dg_);
     var ths = this;
     this.dg_.listenSignals(function() {
       ths.controller_.run();
@@ -441,7 +447,6 @@ anychart.ganttModule.Chart.prototype.getTimeline = function() {
     this.tl_.setOption('backgroundFill', null);
     this.tl_.zIndex(anychart.ganttModule.Chart.Z_INDEX_DG_TL);
     this.tl_.setInteractivityHandler(this);
-    this.registerDisposable(this.tl_);
     var ths = this;
     this.tl_.listenSignals(function() {
       ths.controller_.run();
@@ -587,14 +592,14 @@ anychart.ganttModule.Chart.prototype.scrollToRow = function(rowIndex) {
 /**
  * Gets timeline scale.
  * @param {Object=} opt_value - Scale config.
- * @return {anychart.ganttModule.Chart|anychart.ganttModule.Scale}
+ * @return {anychart.ganttModule.Chart|anychart.scales.GanttDateTime}
  */
 anychart.ganttModule.Chart.prototype.xScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.getTimeline().scale(opt_value);
     return this;
   }
-  return /** @type {anychart.ganttModule.Scale} */ (this.getTimeline().scale());
+  return /** @type {anychart.scales.GanttDateTime} */ (this.getTimeline().scale());
 };
 
 
@@ -686,7 +691,6 @@ anychart.ganttModule.Chart.prototype.collapseTask = function(taskId) {
 anychart.ganttModule.Chart.prototype.splitter = function(opt_value) {
   if (!this.splitter_) {
     this.splitter_ = new anychart.ganttModule.Splitter();
-    this.registerDisposable(this.splitter_);
     this.splitter_.zIndex(anychart.ganttModule.Chart.Z_INDEX_SPLITTER);
 
     this.splitter_.listenSignals(function() {
@@ -708,7 +712,11 @@ anychart.ganttModule.Chart.prototype.splitter = function(opt_value) {
     this.splitter_.listen(anychart.enums.EventType.SPLITTER_CHANGE, function() {
       //This also stores current position for case if dg is being disabled.
       //Here we don't check if newPosition == oldPosition because it is handled by splitter.
-      ths.setOption('splitterPosition', Math.round(ths.splitter().position() * ths.getPixelBounds().width));
+      var padding = ths.padding();
+      var w = padding.tightenWidth(ths.getPixelBounds().width); //This fixes case when chart.padding() is not zero.
+      var pos = ths.splitter().position();
+      var result = Math.round(pos * w);
+      ths.setOption('splitterPosition', result);
       ths.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
     });
 
@@ -766,6 +774,16 @@ anychart.ganttModule.Chart.prototype.editStructureHighlight = function(opt_index
 };
 
 
+//region -- Selection.
+/**
+ * @inheritDoc
+ */
+anychart.ganttModule.Chart.prototype.selection = function() {
+  return this.selection_;
+};
+
+
+//endregion
 /**
  * Row mouse move interactivity handler.
  * @param {Object} event - Dispatched event object.
@@ -815,17 +833,36 @@ anychart.ganttModule.Chart.prototype.rowMouseOut = function(event) {
  */
 anychart.ganttModule.Chart.prototype.rowSelect = function(event) {
   if (!this.tl_.checkRowSelection(event)) {
-    this.tl_.connectorUnselect(event);
     var item = event['item'];
     var period = event['period'];
-    var periodId = period ? period[anychart.enums.GanttDataFields.ID] : void 0;
-    if (item && ((!item.meta('selected') && this.dg_.selectRow(item)) | this.tl_.selectTimelineRow(item, periodId))) {
+    var periodIndex = event['periodIndex'];
+
+    var selection = this.selection();
+    var isSelected = this.isResourcesChart_ ?
+        selection.isPeriodSelected(item, periodIndex) :
+        selection.isRowSelected(item);
+
+    if (item && !isSelected) {
       var eventObj = {
         'type': anychart.enums.EventType.ROW_SELECT,
-        'item': item
+        'item': item,
+        'prevItem': selection.getSelectedItem()
       };
-      if (goog.isDef(period)) eventObj['period'] = period;
-      this.dispatchEvent(eventObj);
+      if (goog.isDef(period)) {
+        eventObj['period'] = period;
+        eventObj['periodIndex'] = periodIndex;
+      }
+      if (selection.hasSelectedPeriod()) {
+        var pIndex = selection.getSelectedPeriodIndex();
+        eventObj['prevPeriodIndex'] = pIndex;
+        eventObj['prevPeriod'] = selection.getSelectedItem().get(anychart.enums.GanttDataFields.PERIODS, pIndex);
+      }
+
+      if (this.dispatchEvent(eventObj)) {
+        this.tl_.connectorUnselect(event);
+        this.dg_.selectRow(item);
+        this.tl_.selectTimelineRow(item, periodIndex);
+      }
     }
   }
 };
@@ -866,20 +903,28 @@ anychart.ganttModule.Chart.prototype.rowMouseDown = function(event) {
  * @inheritDoc
  */
 anychart.ganttModule.Chart.prototype.rowUnselect = function(event) {
-  if (this.dg_.selectedItem || this.tl_.selectedItem) {
+  var selection = this.selection();
+  //NOTE: this event will not be dispatched by dg_ or tl_ because their interactivity handler is chart but not they are.
+  var newEvent = {
+    'type': anychart.enums.EventType.ROW_SELECT,
+    'actualTarget': event ? event.target : this,
+    'target': this,
+    'originalEvent': event,
+    'item': null, //This is a real difference between 'select' and 'unselect' events.
+    'prevItem': selection.getSelectedItem()
+  };
+
+  if (selection.hasSelectedPeriod()) {
+    var pIndex = selection.getSelectedPeriodIndex();
+    newEvent['prevPeriodIndex'] = pIndex;
+    newEvent['prevPeriod'] = selection.getSelectedItem().get(anychart.enums.GanttDataFields.PERIODS, pIndex);
+  }
+
+  if (this.dispatchEvent(newEvent)) {
     this.dg_.rowUnselect(event);
     this.tl_.rowUnselect(event);
-
-    //NOTE: this event will not be dispatched by dg_ or tl_ because their interactivity handler is chart but not they are.
-    var newEvent = {
-      'type': anychart.enums.EventType.ROW_SELECT,
-      'actualTarget': event ? event.target : this,
-      'target': this,
-      'originalEvent': event,
-      'item': null //This is a real difference between 'select' and 'unselect' events.
-    };
-    this.dispatchEvent(newEvent);
   }
+  this.tl_.connectorUnselect(event);
 };
 
 
@@ -1168,9 +1213,23 @@ anychart.ganttModule.Chart.prototype.setupByJSON = function(config, opt_default)
 /** @inheritDoc */
 anychart.ganttModule.Chart.prototype.disposeInternal = function() {
   this.controller_.unlistenSignals(this.controllerInvalidated_, this);
-  goog.disposeAll(this.palette_, this.controller_);
+  goog.disposeAll(
+      this.palette_,
+      this.controller_,
+      this.verticalScrollBar_,
+      this.dg_,
+      this.tl_,
+      this.splitter_,
+      this.edit_,
+      this.selection_);
   this.palette_ = null;
   this.controller_ = null;
+  this.verticalScrollBar_ = null;
+  this.dg_ = null;
+  this.tl_ = null;
+  this.splitter_ = null;
+  this.edit_ = null;
+  this.selection_ = null;
   anychart.ganttModule.Chart.base(this, 'disposeInternal');
 };
 

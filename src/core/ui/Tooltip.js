@@ -1228,7 +1228,6 @@ anychart.core.ui.Tooltip.prototype.contentInternal = function(opt_value) {
     //TODO (A.Kudryavtsev): Dirty hack.
     //TODO (A.Kudryavtsev): Can't avoid it because width_ and height_ values are hardcoded in LabelsBase.
     this.content_.width('100%').height('100%');
-    this.registerDisposable(this.content_);
 
     this.setupCreated('contentInternal', this.content_);
   }
@@ -1409,7 +1408,6 @@ anychart.core.ui.Tooltip.prototype.applyTextSettings = function() {
 anychart.core.ui.Tooltip.prototype.getRootLayer_ = function() {
   if (!this.rootLayer_) {
     this.rootLayer_ = acgraph.layer();
-    this.registerDisposable(this.rootLayer_);
     this.bindHandlersToGraphics(this.rootLayer_);
 
     var background = /** @type {anychart.core.ui.Background} */(this.background());
@@ -2312,7 +2310,7 @@ anychart.core.ui.Tooltip.prototype.disposeInternal = function() {
   for (var key in this.childTooltipsMap) {
     var childTooltip = this.childTooltipsMap[key];
     if (childTooltip)
-      childTooltip.dispose();
+      goog.dispose(childTooltip);
   }
 
   if (this.tooltipContainer_ && !this.tooltipContainer_.isLocal())
@@ -2320,12 +2318,14 @@ anychart.core.ui.Tooltip.prototype.disposeInternal = function() {
 
   goog.disposeAll(this.title_, this.separator_, this.content_, this.background_, this.padding_, this.rootLayer_, this.delay_, this.htmlTooltip);
 
-  delete this.title_;
-  delete this.separator_;
-  delete this.content_;
-  delete this.background_;
-  delete this.padding_;
-  delete this.delay_;
+  this.title_ = null;
+  this.separator_ = null;
+  this.content_ = null;
+  this.background_ = null;
+  this.padding_ = null;
+  this.rootLayer_ = null;
+  this.delay_ = null;
+  this.htmlTooltip = null;
 
   if (this.tooltipContainer_ && this.tooltipContainer_.isLocal() && this.getContainer_(this)) {
     var allowDisposing = true;

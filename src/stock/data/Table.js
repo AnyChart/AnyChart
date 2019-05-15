@@ -186,7 +186,10 @@ anychart.stockModule.data.Table.prototype.removeFirst = function(opt_count) {
  * @return {!anychart.stockModule.data.TableMapping}
  */
 anychart.stockModule.data.Table.prototype.mapAs = function(opt_fields) {
-  return new anychart.stockModule.data.TableMapping(this, opt_fields);
+  var res = new anychart.stockModule.data.TableMapping(this, opt_fields);
+  // we register mapping, to dispose it on table disposing
+  this.registerDisposable(res);
+  return res;
 };
 
 
@@ -246,8 +249,8 @@ anychart.stockModule.data.Table.prototype.deregisterComputer = function(computer
     goog.array.sort(this.reusableComputedColumns_);
 
     for (i = this.reusableComputedColumns_.length; i-- && this.reusableComputedColumns_[i] == this.computedColumnsCount_ - 1;) {
-        this.computedColumnsCount_--;
-        this.reusableComputedColumns_.pop();
+      this.computedColumnsCount_--;
+      this.reusableComputedColumns_.pop();
     }
 
     for (i = 0; i < itemsToRemove.length; i++)
@@ -417,11 +420,10 @@ anychart.stockModule.data.Table.prototype.getDTPatten = function() {
 anychart.stockModule.data.Table.prototype.disposeInternal = function() {
   this.suspendSignalsDispatching();
   delete this.storage_;
-  goog.disposeAll(this.aggregators_);
-  delete this.aggregators_;
-  delete this.aggregates_;
-  goog.disposeAll(this.computers_);
-  delete this.computers_;
+  goog.disposeAll(this.aggregators_, this.computers_);
+  this.aggregators_.length = 0;
+  this.aggregates_ = {};
+  this.computers_.length = 0;
   this.resumeSignalsDispatching(false);
 
   anychart.stockModule.data.Table.base(this, 'disposeInternal');

@@ -10,7 +10,7 @@ goog.require('anychart.enums');
 
 /**
  * Gantt chart line marker.
- * @param {anychart.ganttModule.Scale} scale - Gantt date times cale.
+ * @param {anychart.scales.GanttDateTime} scale - Gantt date times cale.
  * @constructor
  * @extends {anychart.core.axisMarkers.PathBase}
  */
@@ -83,15 +83,15 @@ anychart.ganttModule.axisMarkers.Line.prototype.SUPPORTED_CONSISTENCY_STATES =
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Getter for scale.
- * @param {anychart.ganttModule.Scale=} opt_value Scale.
- * @return {anychart.ganttModule.Scale|!anychart.ganttModule.axisMarkers.Line} - Scale or itself for method chaining.
+ * @param {anychart.scales.GanttDateTime=} opt_value Scale.
+ * @return {anychart.scales.GanttDateTime|!anychart.ganttModule.axisMarkers.Line} - Scale or itself for method chaining.
  */
 anychart.ganttModule.axisMarkers.Line.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
     anychart.core.reporting.warning(anychart.enums.WarningCode.IMMUTABLE_MARKER_SCALE);
     return this;
   }
-  return /** @type {anychart.ganttModule.Scale} */ (this.scaleInternal());
+  return /** @type {anychart.scales.GanttDateTime} */ (this.scaleInternal());
 };
 
 

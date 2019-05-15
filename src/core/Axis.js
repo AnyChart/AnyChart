@@ -120,25 +120,26 @@ anychart.core.Axis.prototype.getOption = function(name) {
  * Simple properties descriptors.
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.core.Axis.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
+anychart.core.Axis.SIMPLE_PROPS_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
+  var descriptors = anychart.core.settings.descriptors;
 
   anychart.core.settings.createDescriptors(map, [
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'width', anychart.core.settings.numberOrPercentNormalizer],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'drawFirstLabel', anychart.core.settings.booleanNormalizer],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'drawLastLabel', anychart.core.settings.booleanNormalizer],
+    descriptors.WIDTH,
+    descriptors.DRAW_FIRST_LABEL,
+    descriptors.DRAW_LAST_LABEL,
+    descriptors.OVERLAP_MODE,
+    descriptors.STROKE,
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'staggerMode', anychart.core.settings.booleanNormalizer],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'overlapMode', anychart.enums.normalizeLabelsOverlapMode],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'staggerMaxLines', anychart.core.settings.numberOrNullNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'staggerLines', anychart.core.settings.numberOrNullNormalizer],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'orientation', anychart.core.settings.orientationNormalizer],
-    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'stroke', anychart.core.settings.strokeNormalizer]
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'orientation', anychart.core.settings.orientationNormalizer]
   ]);
 
   return map;
 })();
-anychart.core.settings.populate(anychart.core.Axis, anychart.core.Axis.prototype.SIMPLE_PROPS_DESCRIPTORS);
+anychart.core.settings.populate(anychart.core.Axis, anychart.core.Axis.SIMPLE_PROPS_DESCRIPTORS);
 
 
 //region --- States and Signals
@@ -283,7 +284,6 @@ anychart.core.Axis.prototype.title = function(opt_value) {
     this.setupCreated('title', this.title_);
     this.title_.setParentEventTarget(this);
     this.title_.listenSignals(this.titleInvalidated_, this);
-    this.registerDisposable(this.title_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -324,7 +324,6 @@ anychart.core.Axis.prototype.labels = function(opt_value) {
     this.setupCreated('labels', this.labels_);
     this.labels_.setParentEventTarget(this);
     this.labels_.listenSignals(this.labelsInvalidated_, this);
-    this.registerDisposable(this.labels_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -372,7 +371,6 @@ anychart.core.Axis.prototype.minorLabels = function(opt_value) {
     this.setupCreated('minorLabels', this.minorLabels_);
     this.minorLabels_.setParentEventTarget(this);
     this.minorLabels_.listenSignals(this.minorLabelsInvalidated_, this);
-    this.registerDisposable(this.minorLabels_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -438,7 +436,6 @@ anychart.core.Axis.prototype.ticks = function(opt_value) {
     this.setupCreated('ticks', this.ticks_);
     this.ticks_.setParentEventTarget(this);
     this.ticks_.listenSignals(this.ticksInvalidated, this);
-    this.registerDisposable(this.ticks_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -460,7 +457,6 @@ anychart.core.Axis.prototype.minorTicks = function(opt_value) {
     this.setupCreated('minorTicks', this.minorTicks_);
     this.minorTicks_.setParentEventTarget(this);
     this.minorTicks_.listenSignals(this.ticksInvalidated, this);
-    this.registerDisposable(this.minorTicks_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -573,7 +569,6 @@ anychart.core.Axis.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, op
   if (!this.padding_) {
     this.padding_ = new anychart.core.utils.Padding();
     this.setupCreated('padding', this.padding_);
-    this.registerDisposable(this.padding_);
     this.padding_.listenSignals(this.paddingInvalidated_, this);
   }
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
@@ -1711,10 +1706,13 @@ anychart.core.Axis.prototype.insideBounds = function(opt_value) {
  * @protected
  */
 anychart.core.Axis.prototype.drawTopLine = function(bounds, pixelShift, lineThickness, offset, size) {
-  var y = bounds.top + bounds.height + lineThickness / 2;
+  var y = bounds.getBottom();
+  // axes lines grow inside content area
+  y += lineThickness / 2;
   this.line
-      .moveTo(bounds.left + pixelShift, y)
-      .lineTo(bounds.left - pixelShift + bounds.width, y);
+      // pixel shifts here to draw line from first tick to last
+      .moveTo(anychart.utils.applyPixelShift(bounds.left, 1) - 0.5, y)
+      .lineTo(anychart.utils.applyPixelShift(bounds.getRight(), 1) + 0.5, y);
 };
 
 
@@ -1728,10 +1726,14 @@ anychart.core.Axis.prototype.drawTopLine = function(bounds, pixelShift, lineThic
  * @protected
  */
 anychart.core.Axis.prototype.drawRightLine = function(bounds, pixelShift, lineThickness, offset, size) {
-  var x = bounds.left - lineThickness / 2;
+  var x = bounds.left;
+  // axes lines grow inside content area
+  x -= lineThickness / 2 - 1;
   this.line
-      .moveTo(x, bounds.top + pixelShift)
-      .lineTo(x, bounds.top - pixelShift + bounds.height);
+      // should fix line going out of top tick on retina
+      .moveTo(x, anychart.utils.applyPixelShift(bounds.top, 1) - 0.5)
+      // draw line till bottom tick
+      .lineTo(x, anychart.utils.applyPixelShift(bounds.getBottom(), 1) + 0.5);
 };
 
 
@@ -1745,10 +1747,13 @@ anychart.core.Axis.prototype.drawRightLine = function(bounds, pixelShift, lineTh
  * @protected
  */
 anychart.core.Axis.prototype.drawBottomLine = function(bounds, pixelShift, lineThickness, offset, size) {
-  var y = bounds.top - lineThickness / 2;
+  var y = bounds.top;
+  // axes lines grow inside content area
+  y -= lineThickness / 2 - 1;
   this.line
-      .moveTo(bounds.left + pixelShift, y)
-      .lineTo(bounds.left - pixelShift + bounds.width, y);
+      // pixel shifts here to draw line from first tick to last
+      .moveTo(anychart.utils.applyPixelShift(bounds.left, 1) - 0.5, y)
+      .lineTo(anychart.utils.applyPixelShift(bounds.getRight(), 1) + 0.5, y);
 };
 
 
@@ -1762,10 +1767,14 @@ anychart.core.Axis.prototype.drawBottomLine = function(bounds, pixelShift, lineT
  * @protected
  */
 anychart.core.Axis.prototype.drawLeftLine = function(bounds, pixelShift, lineThickness, offset, size) {
-  var x = bounds.left + bounds.width + lineThickness / 2;
+  var x = bounds.getRight();
+  // axes lines grow inside content area
+  x += lineThickness / 2;
   this.line
-      .moveTo(x, bounds.top + pixelShift)
-      .lineTo(x, bounds.top - pixelShift + bounds.height);
+      // should fix line going out of top tick on retina
+      .moveTo(x, anychart.utils.applyPixelShift(bounds.top, 1) - 0.5)
+      // draw line till bottom tick
+      .lineTo(x, anychart.utils.applyPixelShift(bounds.getBottom(), 1) + 0.5);
 };
 
 
@@ -2088,7 +2097,16 @@ anychart.core.Axis.prototype.draw = function() {
         minorTickVal = scaleMinorTicksArr[j];
         ratio = scale.transform(tickVal);
         minorRatio = scale.transform(minorTickVal);
-
+        /*
+        Fix for logarithmic scale, bc sometimes it returns nonzero ratio for scale.minimum() value,
+        like this: "7.230440002281568e-8", or this "-1.0641554004653386e-7"
+        This leads to missing first tick or problems with pixel shift when yAxis tick,
+        or grid line in {value == scale.minimum()} is drawn one pixel above xAxis.
+        */
+        if (scale.getType() == 'log') {
+          ratio = anychart.math.round(ratio, 6);
+          minorRatio = anychart.math.round(minorRatio, 6);
+        }
         if (((ratio <= minorRatio && i < ticksArrLen) || j == minorTicksArrLen)) {
           var majorPixelShift = tickThickness % 2 == 0 ? 0 : -.5;
           drawLabel = goog.isArray(needDrawLabels) ? needDrawLabels[i] : needDrawLabels;
@@ -2414,7 +2432,7 @@ anychart.core.Axis.prototype.hasInsideElements = function() {
 /** @inheritDoc */
 anychart.core.Axis.prototype.serialize = function() {
   var json = anychart.core.Axis.base(this, 'serialize');
-  anychart.core.settings.serialize(this, this.SIMPLE_PROPS_DESCRIPTORS, json);
+  anychart.core.settings.serialize(this, anychart.core.Axis.SIMPLE_PROPS_DESCRIPTORS, json);
   json['title'] = this.title().serialize();
   json['labels'] = this.labels().serialize();
   json['minorLabels'] = this.minorLabels().serialize();
@@ -2427,9 +2445,13 @@ anychart.core.Axis.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.core.Axis.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.Axis.base(this, 'setupByJSON', config, opt_default);
-  anychart.core.settings.deserialize(this, this.SIMPLE_PROPS_DESCRIPTORS, config, opt_default);
+  anychart.core.settings.deserialize(this, anychart.core.Axis.SIMPLE_PROPS_DESCRIPTORS, config, opt_default);
+
   if ('title' in config)
     this.title().setupInternal(!!opt_default, config['title']);
+
+  if ('padding' in config)
+    this.padding(config['padding']);
 
   this.labels().setupInternal(!!opt_default, config['labels']);
   this.minorLabels().setupInternal(!!opt_default, config['minorLabels']);
@@ -2440,25 +2462,36 @@ anychart.core.Axis.prototype.setupByJSON = function(config, opt_default) {
 
 /** @inheritDoc */
 anychart.core.Axis.prototype.disposeInternal = function() {
-  anychart.core.Axis.base(this, 'disposeInternal');
-
+  // since we can't be sure that this instance isn't created by user
+  // (e.g. standalone scale) - disposing is not an option. We just
+  // unlisten signals and null it.
   if (this.internalScale)
     this.internalScale.unlistenSignals(this.scaleInvalidated, this);
-  delete this.internalScale;
-  this.labelsBounds_ = null;
-  this.minorLabelsBounds_ = null;
+  this.internalScale = null;
+
+  goog.disposeAll(
+      this.title_,
+      this.padding_,
+      this.line,
+      this.labels_,
+      this.minorLabels_,
+      this.ticks_,
+      this.minorTicks_);
 
   this.title_ = null;
-
-  goog.disposeAll(this.padding_, this.line, this.labels_, this.minorLabels_);
-
   this.padding_ = null;
+
   this.line = null;
-  this.ticks_ = null;
-  this.minorTicks_ = null;
-  this.pixelBounds = null;
   this.labels_ = null;
   this.minorLabels_ = null;
+  this.ticks_ = null;
+  this.minorTicks_ = null;
+
+  this.labelsBounds_.length = 0;
+  this.minorLabelsBounds_.length = 0;
+  this.pixelBounds = null;
+
+  anychart.core.Axis.base(this, 'disposeInternal');
 };
 
 

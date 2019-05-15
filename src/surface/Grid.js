@@ -92,7 +92,6 @@ anychart.surfaceModule.Grid.prototype.isZGrid = function(opt_value) {
 anychart.surfaceModule.Grid.prototype.lineElementBackSide = function(opt_isMajor) {
   this.lineElementInternalBackSide = (this.lineElementInternalBackSide ?
       this.lineElementInternalBackSide : acgraph.path());
-  this.registerDisposable(this.lineElementInternalBackSide);
   return this.lineElementInternalBackSide;
 };
 
@@ -465,4 +464,12 @@ anychart.surfaceModule.Grid.prototype.rotationY = function(opt_value) {
     return this;
   }
   return this.rotationY_;
+};
+
+
+/** @inheritDoc */
+anychart.surfaceModule.Grid.prototype.disposeInternal = function() {
+  goog.dispose(this.lineElementInternalBackSide);
+  this.lineElementInternalBackSide = null;
+  anychart.surfaceModule.Grid.base(this, 'disposeInternal');
 };

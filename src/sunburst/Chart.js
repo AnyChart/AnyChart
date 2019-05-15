@@ -795,7 +795,6 @@ anychart.sunburstModule.Chart.prototype.setupPalette_ = function(cls, opt_cloneF
     if (opt_cloneFrom)
       this.palette_.setup(opt_cloneFrom);
     this.palette_.listenSignals(this.paletteInvalidated_, this);
-    this.registerDisposable(this.palette_);
     if (doDispatch)
       this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
   }
@@ -813,7 +812,6 @@ anychart.sunburstModule.Chart.prototype.hatchFillPalette = function(opt_value) {
   if (!this.hatchFillPalette_) {
     this.hatchFillPalette_ = new anychart.palettes.HatchFills();
     this.hatchFillPalette_.listenSignals(this.paletteInvalidated_, this);
-    this.registerDisposable(this.hatchFillPalette_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -2344,7 +2342,16 @@ anychart.sunburstModule.Chart.prototype.getLabelRadialTextPath = function(label,
   var x2 = anychart.math.angleDx(angleRad, outerRadius, this.cx);
   var y2 = anychart.math.angleDy(angleRad, outerRadius, this.cy);
 
-  var path = label.getTextElement().path() ? label.getTextElement().path().clear() : acgraph.path();
+  var path = /** @type {acgraph.vector.Path} */ (label.getTextElement().path());
+  if (path) {
+    path.clear();
+  } else {
+    path = acgraph.path();
+    // since this anonymous path not managed anywhere
+    // by chart, we register it to dispose with chart
+    this.registerDisposable(path);
+  }
+
   path
       .moveTo(x1, y1)
       .lineTo(x2, y2);
@@ -2381,6 +2388,8 @@ anychart.sunburstModule.Chart.prototype.getLabelCircularTextPath = function(labe
   var tmpSweep = Math.abs(endAngle - startAngle);
   var stroke = /** @type {acgraph.vector.Stroke} */(this.getOption('stroke'));
   var dw = ((tmpSweep - (padding.tightenWidth(tmpSweep * pxPerDegree) - acgraph.vector.getThickness(stroke)) / pxPerDegree)) / 2;
+  goog.dispose(padding);
+  padding = null;
 
   startAngle += dw;
   endAngle -= dw;
@@ -2421,7 +2430,16 @@ anychart.sunburstModule.Chart.prototype.getLabelCircularTextPath = function(labe
   var dx = anychart.math.angleDx(startAngleRad, radius, this.cx);
   var dy = anychart.math.angleDy(startAngleRad, radius, this.cy);
 
-  var path = label.getTextElement().path() ? label.getTextElement().path().clear() : acgraph.path();
+  var path = /** @type {acgraph.vector.Path} */ (label.getTextElement().path());
+  if (path) {
+    path.clear();
+  } else {
+    path = acgraph.path();
+    // since this anonymous path not managed anywhere
+    // by chart, we register it to dispose with chart
+    this.registerDisposable(path);
+  }
+
   if (endAngle != startAngle) {
     path
         .moveTo(dx, dy)
@@ -2682,6 +2700,8 @@ anychart.sunburstModule.Chart.prototype.drawLabel_ = function(pointState, opt_up
       height = padding.tightenHeight(arcLength);
       width = padding.tightenWidth(radiusDelta);
     }
+    goog.dispose(padding);
+    padding = null;
 
     label
         .width(width)
@@ -3015,7 +3035,26 @@ anychart.sunburstModule.Chart.prototype.serialize = function() {
  * @inheritDoc
  */
 anychart.sunburstModule.Chart.prototype.disposeInternal = function() {
-  goog.disposeAll(this.normal_, this.hovered_, this.selected_, this.center_);
+  goog.disposeAll(
+      this.normal_,
+      this.hovered_,
+      this.selected_,
+      this.center_,
+      this.palette_,
+      this.hatchFillPalette_,
+      this.levelsPositive_,
+      this.levelsNegative_,
+      this.leavesLevel_,
+      this.shortcutHandler);
+  this.normal_ = null;
+  this.hovered_ = null;
+  this.selected_ = null;
+  this.palette_ = null;
+  this.hatchFillPalette_ = null;
+  this.levelsPositive_ = null;
+  this.levelsNegative_ = null;
+  this.leavesLevel_ = null;
+  this.shortcutHandler = null;
   anychart.sunburstModule.Chart.base(this, 'disposeInternal');
 };
 

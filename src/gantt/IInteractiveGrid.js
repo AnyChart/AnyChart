@@ -165,3 +165,11 @@ anychart.ganttModule.IInteractiveGrid.prototype.invalidate = function(state, opt
  * @param {boolean} lock - True to lock, false to unlock.
  */
 anychart.ganttModule.IInteractiveGrid.prototype.lockInteractivity = function(lock) {};
+
+
+/**
+ * Selection.
+ * @return {anychart.ganttModule.Selection}
+ */
+anychart.ganttModule.IInteractiveGrid.prototype.selection = function() {};
+

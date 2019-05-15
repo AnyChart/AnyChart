@@ -428,7 +428,8 @@ anychart.format.dateTimeSymbolsCache_ = {};
  */
 anychart.format.getLocale = function(locale) {
   if (!goog.isObject(locale)) {
-    locale = anychart.window['anychart']['format']['locales'][String(locale)];
+    locale = String(locale);
+    locale = anychart.format.mergedLocales[locale] || anychart.window['anychart']['format']['locales'][locale];
   }
   return locale || null;
 };
@@ -511,6 +512,37 @@ anychart.format.localeToDateTimeSymbols_ = function(locale) {
 
 
 //endregion
+//region -- Locales merging.
+/**
+ * Merged locales map.
+ * @type {Object.<string, anychart.format.Locale>}
+ */
+anychart.format.mergedLocales = {};
+
+
+/**
+ * Creates merged locale object and caches it.
+ * @param {string|anychart.format.Locale} value - Locale value to merge.
+ * @param {string=} opt_name - Name required for case if locale is set as Object
+ *  instead of string. Currently 'input' and 'output' are in use.
+ */
+anychart.format.merge = function(value, opt_name) {
+  var loc = anychart.format.getLocale(value);
+  if (loc) {
+    var isObject = (goog.typeOf(value) == 'object');
+    var locales = anychart.window['anychart']['format']['locales'];
+    var name = /** @type {string} */ (isObject ? opt_name : value);
+
+    /*
+      Here we suppose 'default' always presents in locales.
+      Yes, also it remerges locale on set.
+     */
+    anychart.format.mergedLocales[name] = /** @type {anychart.format.Locale} */ (anychart.utils.recursiveExtend(locales['default'], loc));
+  }
+};
+
+
+//endregion
 //region --- Public getters/setters
 //------------------------------------------------------------------------------
 //
@@ -524,8 +556,13 @@ anychart.format.localeToDateTimeSymbols_ = function(locale) {
  */
 anychart.format.inputLocale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (goog.isString(opt_value) || goog.isObject(opt_value)) {
-      anychart.format.inputLocale_ = opt_value;
+    var isString = goog.isString(opt_value);
+    var isObject = goog.typeOf(opt_value) == 'object';
+    if (isString || isObject) {
+      var name = /** @type {string} */ (isObject ? 'input' : opt_value);
+      anychart.format.merge(opt_value, name);
+      anychart.format.inputLocale_ = isString ? name :
+          (anychart.format.mergedLocales[name] || anychart.format.mergedLocales['input'] || opt_value);
     } else {
       anychart.format.inputLocale_ = 'default';
     }
@@ -582,8 +619,13 @@ anychart.format.inputBaseDate = function(opt_value) {
  */
 anychart.format.outputLocale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (goog.isString(opt_value) || goog.isObject(opt_value)) {
-      anychart.format.outputLocale_ = opt_value;
+    var isString = goog.isString(opt_value);
+    var isObject = goog.typeOf(opt_value) == 'object';
+    if (isString || isObject) {
+      var name = /** @type {string} */ (isObject ? 'output' : opt_value);
+      anychart.format.merge(opt_value, name);
+      anychart.format.outputLocale_ = isString ? name :
+          (anychart.format.mergedLocales[name] || anychart.format.mergedLocales['output'] || opt_value);
     } else {
       anychart.format.outputLocale_ = 'default';
     }
@@ -607,6 +649,7 @@ anychart.format.outputDateTimeFormat = function(opt_value) {
   }
   return anychart.format.outputDateTimeFormat_ ||
       anychart.format.getOutputDateTimeFormat_(anychart.format.outputLocale_) ||
+      anychart.format.getOutputDateTimeFormat_('output') ||
       anychart.format.getOutputDateTimeFormat_('default') ||
       'yyyy.MM.dd';
 };
@@ -627,6 +670,7 @@ anychart.format.outputDateFormat = function(opt_value) {
   }
   return anychart.format.outputDateFormat_ ||
       anychart.format.getOutputDateTimeFormat_(anychart.format.outputLocale_, 'dateFormat') ||
+      anychart.format.getOutputDateTimeFormat_('output', 'dateFormat') ||
       anychart.format.getOutputDateTimeFormat_('default', 'dateFormat') ||
       'yyyy.MM.dd';
 };
@@ -647,6 +691,7 @@ anychart.format.outputTimeFormat = function(opt_value) {
   }
   return anychart.format.outputTimeFormat_ ||
       anychart.format.getOutputDateTimeFormat_(anychart.format.outputLocale_, 'timeFormat') ||
+      anychart.format.getOutputDateTimeFormat_('output', 'timeFormat') ||
       anychart.format.getOutputDateTimeFormat_('default', 'timeFormat') ||
       'HH:mm:ss';
 };
@@ -824,6 +869,7 @@ anychart.format.getIntervalIdentifier = function(intervalUnit, opt_parentInterva
 anychart.format.getDateTimeFormat = function(identifier, opt_index, opt_locale) {
   var locale = anychart.format.getDateTimeLocale(opt_locale) ||
       anychart.format.getDateTimeLocale(anychart.format.outputLocale_) ||
+      anychart.format.getDateTimeLocale('output') ||
       anychart.format.getDateTimeLocale('default');
   var formats = locale && locale['formats'] && locale['formats'][identifier];
   var format = goog.isArray(formats) ?
@@ -844,6 +890,7 @@ anychart.format.getDateTimeFormat = function(identifier, opt_index, opt_locale) 
 anychart.format.getDateTimeFormats = function(identifier, opt_locale) {
   var locale = anychart.format.getDateTimeLocale(opt_locale) ||
       anychart.format.getDateTimeLocale(anychart.format.outputLocale_) ||
+      anychart.format.getDateTimeLocale('output') ||
       anychart.format.getDateTimeLocale('default');
   var formats = locale && locale['formats'] && locale['formats'][identifier];
   return goog.isArray(formats) ?
@@ -895,6 +942,7 @@ anychart.format.dateTime = function(date, opt_format, opt_timeZone, opt_locale) 
 
   var locale = anychart.format.getDateTimeLocale(opt_locale) ||
       anychart.format.getDateTimeLocale(anychart.format.outputLocale_) ||
+      anychart.format.getDateTimeLocale('output') ||
       anychart.format.getDateTimeLocale('default');
   var pattern = opt_format ||
       anychart.format.outputDateTimeFormat_ ||
@@ -1043,8 +1091,6 @@ anychart.format.number = function(number, opt_decimalsCountOrLocale, opt_decimal
 };
 
 
-
-
 //endregion
 //region --- Utility
 //------------------------------------------------------------------------------
@@ -1070,6 +1116,7 @@ anychart.format.parseDateTimeStr_ = function(value, opt_format, opt_baseDate, op
   if (format) {
     var locale = anychart.format.getDateTimeLocale(opt_locale) ||
         anychart.format.getDateTimeLocale(anychart.format.inputLocale_) ||
+        anychart.format.getDateTimeLocale('input') ||
         anychart.format.getDateTimeLocale('default');
     var localeHash = goog.getUid(locale);
     var parserCacheKey = format + localeHash;
@@ -1147,3 +1194,4 @@ goog.exportSymbol('anychart.format.date', anychart.format.date);
 goog.exportSymbol('anychart.format.time', anychart.format.time);
 goog.exportSymbol('anychart.format.dateTime', anychart.format.dateTime);
 goog.exportSymbol('anychart.format.number', anychart.format.number);
+goog.exportSymbol('anychart.format.getLocale', anychart.format.getLocale);

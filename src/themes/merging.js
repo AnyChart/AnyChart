@@ -427,9 +427,9 @@ anychart.themes.merging.demergeCredits_ = function(target) {
     var trgt = target['chart'] || target['gauge'] || target['gantt'] || target['map'];
     if (!trgt) return target;
     var targetType = goog.typeOf(trgt['credits']);
-    var defaultType = goog.typeOf(anychart.getFullTheme('stageCredits'));
+    var defaultType = goog.typeOf(anychart.getFlatTheme('stageCredits'));
     if (targetType == 'object' && defaultType == 'object') {
-      var defVal = anychart.getFullTheme('stageCredits');
+      var defVal = anychart.getFlatTheme('stageCredits');
       var val = anychart.themes.merging.demerge_(trgt['credits'], defVal);
       if (goog.isDef(val)) {
         trgt['credits'] = val;
@@ -1453,14 +1453,6 @@ anychart.themes.merging.mergingMap_ = (function() {
       ]
     },
     {
-      defaultObj: 'map',
-      targets: [
-        'choropleth',
-        'connector',
-        [['bubble', 'marker', 'seat'], 'Map']
-      ]
-    },
-    {
       defaultObj: 'heatMap.defaultAnnotationSettings.base',
       targets: [
         ['heatMap.defaultAnnotationSettings.', [
@@ -2108,7 +2100,6 @@ anychart.themes.DefaultThemes = {
   'labelsFactory': ['defaultFontSettings', 'defaultLabelFactory'],
   'markersFactory': ['defaultMarkerFactory'],
   'axis': ['defaultAxis'],
-  'map.axisSettings': ['map.axesSettings'],
   'scroller': ['defaultScroller'],
   'thumbs': ['defaultScroller.thumbs']
 };

@@ -88,6 +88,10 @@ anychart.tagCloudModule.Chart = function(opt_data, opt_settings) {
   this.normal_ = new anychart.core.StateSettings(this, normalDescriptorsMeta, anychart.PointState.NORMAL, descriptorsOverride);
   this.hovered_ = new anychart.core.StateSettings(this, hoveredSelectedDescriptorsMeta, anychart.PointState.HOVER, descriptorsOverride);
   this.selected_ = new anychart.core.StateSettings(this, hoveredSelectedDescriptorsMeta, anychart.PointState.SELECT, descriptorsOverride);
+  this.normal_.addThemes(this.themeSettings);
+  this.setupCreated('normal', this.normal_);
+  this.setupCreated('hovered', this.hovered_);
+  this.setupCreated('selected', this.selected_);
 
   /**
    * Scale.
@@ -116,6 +120,8 @@ anychart.tagCloudModule.Chart = function(opt_data, opt_settings) {
     ['anglesCount', anychart.ConsistencyState.TAG_CLOUD_ANGLES, anychart.Signal.NEEDS_REDRAW],
     ['textSpacing', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW]
   ]);
+  //We need create tootlip here because now we don't call setupByJson method.
+  this.tooltip();
 };
 goog.inherits(anychart.tagCloudModule.Chart, anychart.core.SeparateChart);
 anychart.core.settings.populateAliases(anychart.tagCloudModule.Chart, [
@@ -177,7 +183,7 @@ anychart.tagCloudModule.Chart.Tag;
  * Simple properties descriptors.
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.tagCloudModule.Chart.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
+anychart.tagCloudModule.Chart.SIMPLE_PROPS_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
 
@@ -191,7 +197,7 @@ anychart.tagCloudModule.Chart.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
 
   return map;
 })();
-anychart.core.settings.populate(anychart.tagCloudModule.Chart, anychart.tagCloudModule.Chart.prototype.SIMPLE_PROPS_DESCRIPTORS);
+anychart.core.settings.populate(anychart.tagCloudModule.Chart, anychart.tagCloudModule.Chart.SIMPLE_PROPS_DESCRIPTORS);
 
 
 //endregion
@@ -370,7 +376,6 @@ anychart.tagCloudModule.Chart.prototype.setupPalette_ = function(cls, opt_cloneF
     if (opt_cloneFrom)
       this.palette_.setup(opt_cloneFrom);
     this.palette_.listenSignals(this.paletteInvalidated_, this);
-    this.registerDisposable(this.palette_);
     if (doDispatch)
       this.invalidate(anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
   }
@@ -1116,12 +1121,11 @@ anychart.tagCloudModule.Chart.prototype.selected = function(opt_value) {
 anychart.tagCloudModule.Chart.prototype.colorRange = function(opt_value) {
   if (!this.colorRange_) {
     this.colorRange_ = new anychart.colorScalesModule.ui.ColorRange();
-    this.colorRange_.dropThemes();
+    this.setupCreated('colorRange', this.colorRange_);
     this.colorRange_.listenSignals(this.colorRangeInvalidated_, this);
     this.invalidate(anychart.ConsistencyState.TAG_CLOUD_COLOR_RANGE | anychart.ConsistencyState.BOUNDS,
         anychart.Signal.NEEDS_REDRAW);
   }
-
   if (goog.isDef(opt_value)) {
     this.colorRange_.setup(opt_value);
     return this;
@@ -1292,8 +1296,9 @@ anychart.tagCloudModule.Chart.prototype.legendItemOver = function(item, event) {
         }
       }
 
-      if (this.colorRange_ && this.colorRange_.enabled() && this.colorRange_.target()) {
-        this.colorRange_.showMarker(goog.isDef(range.equal) ? range.equal : (range.start + range.end) / 2);
+      var colorRange = this.getCreated('colorRange');
+      if (colorRange && colorRange.enabled() && colorRange.target()) {
+        colorRange.showMarker(goog.isDef(range.equal) ? range.equal : (range.start + range.end) / 2);
       }
     }
   }
@@ -1311,8 +1316,9 @@ anychart.tagCloudModule.Chart.prototype.legendItemOut = function(item, event) {
       if (tag)
         tag.series = meta.series;
     }
-    if (this.colorRange_ && this.colorRange_.enabled() && this.colorRange_.target()) {
-      this.colorRange_.hideMarker();
+    var colorRange = this.getCreated('colorRange');
+    if (colorRange && colorRange.enabled() && colorRange.target()) {
+      colorRange.hideMarker();
     }
   }
 };
@@ -1893,24 +1899,24 @@ anychart.tagCloudModule.Chart.prototype.beforeDraw = function() {
 
 /** @inheritDoc */
 anychart.tagCloudModule.Chart.prototype.drawContent = function(bounds) {
-  var scale = this.scale_;
-
+  var scale = this.scale();
+  var colorRange = this.getCreated('colorRange');
   if (this.hasInvalidationState(anychart.ConsistencyState.TAG_CLOUD_COLOR_RANGE)) {
-    if (this.colorRange_) {
-      this.colorRange_.suspendSignalsDispatching();
-      this.colorRange_.scale(this.getColorScale());
-      this.colorRange_.target(this);
-      this.colorRange_.setParentEventTarget(this);
-      this.colorRange_.resumeSignalsDispatching(false);
-      if (this.colorRange_.enabled())
+    if (colorRange) {
+      colorRange.suspendSignalsDispatching();
+      colorRange.scale(this.getColorScale());
+      colorRange.target(this);
+      colorRange.setParentEventTarget(this);
+      colorRange.resumeSignalsDispatching(false);
+      if (colorRange.enabled())
         this.invalidate(anychart.ConsistencyState.BOUNDS);
     }
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    if (this.colorRange_ && this.colorRange_.enabled()) {
-      this.colorRange_.parentBounds(bounds.clone().round());
-      this.internalBounds_ = this.colorRange_.getRemainingBounds();
+    if (colorRange && colorRange.enabled()) {
+      colorRange.parentBounds(bounds.clone().round());
+      this.internalBounds_ = colorRange.getRemainingBounds();
     } else {
       this.internalBounds_ = bounds.clone();
     }
@@ -2060,11 +2066,11 @@ anychart.tagCloudModule.Chart.prototype.drawContent = function(bounds) {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.TAG_CLOUD_COLOR_RANGE)) {
-    if (this.colorRange_) {
-      this.colorRange_.suspendSignalsDispatching();
-      this.colorRange_.container(this.rootElement);
-      this.colorRange_.draw();
-      this.colorRange_.resumeSignalsDispatching(false);
+    if (colorRange) {
+      colorRange.suspendSignalsDispatching();
+      colorRange.container(this.rootElement);
+      colorRange.draw();
+      colorRange.resumeSignalsDispatching(false);
     }
     this.markConsistent(anychart.ConsistencyState.TAG_CLOUD_COLOR_RANGE);
   }
@@ -2131,49 +2137,55 @@ anychart.tagCloudModule.Chart.prototype.isNoData = function() {
  * @param {!Object} config
  */
 anychart.tagCloudModule.Chart.prototype.setThemeSettings = function(config) {
-  anychart.core.settings.copy(this.themeSettings, this.SIMPLE_PROPS_DESCRIPTORS, config);
+  anychart.core.settings.copy(this.themeSettings, anychart.tagCloudModule.Chart.SIMPLE_PROPS_DESCRIPTORS, config);
+};
+
+
+/**
+ * Create scale instance from config and return it.
+ * @param {?(Object|string)} config
+ * @return {?anychart.scales.Base} scale instance or null.
+ * */
+anychart.tagCloudModule.Chart.prototype.getScale = function(config) {
+  var scale;
+  if (goog.isString(config)) {
+    scale = anychart.scales.Base.fromString(config, null);
+    if (!scale)
+      scale = null;
+  } else if (goog.isObject(config)) {
+    scale = anychart.scales.Base.fromString(config['type'], true);
+    scale.setup(config);
+  } else {
+    scale = null;
+  }
+  return scale;
+};
+
+
+/**
+ * Setup scale and color scale if in config.
+ * @param {Object} config Json config or config from theme.
+ * */
+anychart.tagCloudModule.Chart.prototype.setupScales = function(config) {
+
+  var scaleConfig = config['scale'];
+  var scale = this.getScale(scaleConfig);
+  if (scale)
+    this.scale(scale);
+
+  scaleConfig = config['colorScale'];
+  scale = this.getScale(scaleConfig);
+  if (scale)
+    this.colorScale(/** @type {anychart.colorScalesModule.Linear|anychart.colorScalesModule.Ordinal} */(scale));
 };
 
 
 /** @inheritDoc */
 anychart.tagCloudModule.Chart.prototype.setupByJSON = function(config, opt_default) {
   anychart.tagCloudModule.Chart.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.settings.deserialize(this, anychart.tagCloudModule.Chart.SIMPLE_PROPS_DESCRIPTORS, config, opt_default);
 
-  if (opt_default) {
-    this.setThemeSettings(config);
-  } else {
-    anychart.core.settings.deserialize(this, this.SIMPLE_PROPS_DESCRIPTORS, config);
-  }
-
-  var scale;
-  var scaleConfig = config['scale'];
-  if (goog.isString(scaleConfig)) {
-    scale = anychart.scales.Base.fromString(scaleConfig, null);
-    if (!scale)
-      scale = null;
-  } else if (goog.isObject(scaleConfig)) {
-    scale = anychart.scales.Base.fromString(scaleConfig['type'], true);
-    scale.setup(scaleConfig);
-  } else {
-    scale = null;
-  }
-  if (scale)
-    this.scale(scale);
-
-  scaleConfig = config['colorScale'];
-  if (goog.isString(scaleConfig)) {
-    scale = anychart.scales.Base.fromString(scaleConfig, null);
-    if (!scale)
-      scale = null;
-  } else if (goog.isObject(scaleConfig)) {
-    scale = anychart.scales.Base.fromString(scaleConfig['type'], true);
-    scale.setup(scaleConfig);
-  } else {
-    scale = null;
-  }
-  if (scale)
-    this.colorScale(/** @type {anychart.colorScalesModule.Linear|anychart.colorScalesModule.Ordinal} */(scale));
-
+  this.setupScales(config);
   this.data(config['data']);
   this.angles(config['angles']);
   this.palette(config['palette']);
@@ -2189,7 +2201,7 @@ anychart.tagCloudModule.Chart.prototype.setupByJSON = function(config, opt_defau
 anychart.tagCloudModule.Chart.prototype.serialize = function() {
   var json = anychart.tagCloudModule.Chart.base(this, 'serialize');
 
-  anychart.core.settings.serialize(this, this.SIMPLE_PROPS_DESCRIPTORS, json);
+  anychart.core.settings.serialize(this, anychart.tagCloudModule.Chart.SIMPLE_PROPS_DESCRIPTORS, json);
 
   json['data'] = this.data().serialize();
   if (goog.isDef(this.angles_))
@@ -2209,24 +2221,39 @@ anychart.tagCloudModule.Chart.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.tagCloudModule.Chart.prototype.disposeInternal = function() {
-  goog.array.forEach(this.normalizedData, function(t) {
-    goog.disposeAll(
-        t.textEl,
-        t.eHandler,
-        t.sprite);
-  });
+  for (var i = 0; i < this.normalizedData.length; i++) {
+    var item = this.normalizedData[i];
+    goog.dispose(item.textEl);
+    goog.dispose(item.eHandler);
+    goog.dispose(item.sprite);
+  }
 
   goog.disposeAll(
-      this.layer_,
       this.texts_,
       this.handlers_,
+      this.layer_,
       this.normal_,
       this.hovered_,
       this.selected_,
       this.colorRange_,
-      this.colorScale_,
-      this.scale_,
-      this.state);
+      this.state,
+      this.palette_,
+      this.data_,
+      this.parentViewToDispose_);
+
+  this.texts_ = null;
+  this.handlers_ = null;
+  this.layer_ = null;
+  this.normal_ = null;
+  this.hovered_ = null;
+  this.selected_ = null;
+  this.colorRange_ = null;
+  this.colorScale_ = null;
+  this.scale_ = null;
+  this.state = null;
+  this.palette_ = null;
+  delete this.data_;
+  this.parentViewToDispose_ = null;
 
   anychart.tagCloudModule.Chart.base(this, 'disposeInternal');
 };

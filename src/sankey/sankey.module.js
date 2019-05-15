@@ -15,9 +15,7 @@ goog.require('anychart.sankeyModule.Chart');
  * @return {anychart.sankeyModule.Chart} Sankey chart with defaults.
  */
 anychart.sankey = function(opt_data, opt_csvSettings) {
-  var chart = new anychart.sankeyModule.Chart(opt_data, opt_csvSettings);
-  chart.setupInternal(true, anychart.getFullTheme('sankey'));
-  return chart;
+  return new anychart.sankeyModule.Chart(opt_data, opt_csvSettings);
 };
 anychart.chartTypesMap[anychart.enums.ChartTypes.SANKEY] = anychart.sankey;
 

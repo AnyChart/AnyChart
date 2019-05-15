@@ -106,12 +106,12 @@ anychart.sparklineModule.Chart = function(opt_data, opt_csvSettings) {
    */
   this.markersInternal_ = new anychart.core.ui.MarkersFactory();
   // defaults that was deleted form MarkersFactory
-  this.markersInternal_.positionFormatter(anychart.utils.DEFAULT_FORMATTER);
-  this.markersInternal_.size(10);
-  this.markersInternal_.anchor(anychart.enums.Anchor.CENTER);
-  this.markersInternal_.offsetX(0);
-  this.markersInternal_.offsetY(0);
-  this.markersInternal_.rotation(0);
+  this.markersInternal_.setOption('positionFormatter', anychart.utils.DEFAULT_FORMATTER);
+  this.markersInternal_.setOption('size', 10);
+  this.markersInternal_.setOption('anchor', anychart.enums.Anchor.CENTER);
+  this.markersInternal_.setOption('offsetX', 0);
+  this.markersInternal_.setOption('offsetY', 0);
+  this.markersInternal_.setOption('rotation', 0);
   this.markersInternal_.setParentEventTarget(this);
   this.markersInternal_.setAutoZIndex(anychart.sparklineModule.Chart.ZINDEX_MARKER);
 
@@ -132,7 +132,6 @@ anychart.sparklineModule.Chart = function(opt_data, opt_csvSettings) {
   this.labelsInternal_['maxFontSize'](72);
   this.labelsInternal_.setParentEventTarget(this);
   this.labelsInternal_.setAutoZIndex(anychart.sparklineModule.Chart.ZINDEX_LABEL);
-  this.labelsInternal_.dropThemes(true);
 
   this.data(opt_data || null, opt_csvSettings);
 
@@ -144,10 +143,11 @@ anychart.sparklineModule.Chart = function(opt_data, opt_csvSettings) {
    */
   function typeBeforeInvalidation() {
     if (this.series_) {
-      this.series_.dispose();
+      goog.dispose(this.series_);
       this.series_ = null;
     }
   }
+
   /**
    * @this {anychart.sparklineModule.Chart}
    */
@@ -156,6 +156,7 @@ anychart.sparklineModule.Chart = function(opt_data, opt_csvSettings) {
       this.series_.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL | anychart.ConsistencyState.APPEARANCE,
           anychart.Signal.NEEDS_REDRAW);
   }
+
   /**
    * @this {anychart.sparklineModule.Chart}
    */
@@ -164,11 +165,44 @@ anychart.sparklineModule.Chart = function(opt_data, opt_csvSettings) {
       this.series_.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL | anychart.ConsistencyState.APPEARANCE,
           anychart.Signal.NEEDS_REDRAW);
   }
+
+  /**
+   * @this {anychart.sparklineModule.Chart}
+   */
+  function invalidateSeriesAppearance() {
+    if (this.series_)
+      this.series_.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+  }
+
+  /**
+   * @this {anychart.sparklineModule.Chart}
+   */
+  function invalidateSeriesHatchFill() {
+    if (this.series_)
+      this.series_.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
+  }
+
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['seriesType', anychart.ConsistencyState.SPARK_SERIES, anychart.Signal.NEEDS_REDRAW, 0, typeBeforeInvalidation],
     ['pointWidth', 0, 0, 0, pointWidthBeforeInvalidation],
-    ['connectMissingPoints', 0, 0, 0, connectMissingBeforeInvalidation]
+    ['connectMissingPoints', 0, 0, 0, connectMissingBeforeInvalidation],
+    ['fill', 0, 0, 0, invalidateSeriesAppearance, this],
+    ['negativeFill', 0, 0, 0, invalidateSeriesAppearance, this],
+    ['firstFill', 0, 0, 0, invalidateSeriesAppearance, this],
+    ['lastFill', 0, 0, 0, invalidateSeriesAppearance, this],
+    ['maxFill', 0, 0, 0, invalidateSeriesAppearance, this],
+    ['minFill', 0, 0, 0, invalidateSeriesAppearance, this],
+    ['stroke', 0, 0, 0, invalidateSeriesAppearance, this],
+    ['hatchFill', 0, 0, 0, invalidateSeriesHatchFill, this],
+    ['firstHatchFill', 0, 0, 0, invalidateSeriesHatchFill, this],
+    ['lastHatchFill', 0, 0, 0, invalidateSeriesHatchFill, this],
+    ['maxHatchFill', 0, 0, 0, invalidateSeriesHatchFill, this],
+    ['minHatchFill', 0, 0, 0, invalidateSeriesHatchFill, this],
+    ['negativeHatchFill', 0, 0, 0, invalidateSeriesHatchFill, this]
   ]);
+
+  //We need create tootlip here because now we don't call setupByJson method.
+  this.tooltip();
   //endregion
 };
 goog.inherits(anychart.sparklineModule.Chart, anychart.core.Chart);
@@ -530,7 +564,16 @@ anychart.sparklineModule.Chart.prototype.defaultSeriesSettings = function(opt_va
     this.defaultSeriesSettings_ = opt_value;
     return this;
   }
-  return this.defaultSeriesSettings_ || {};
+  if (!this.defaultSeriesSettings_) {
+    this.defaultSeriesSettings_ = {};
+  }
+
+  var seriesType = anychart.utils.toCamelCase(/**@type {string}*/(this.getOption('seriesType')));
+  if (!this.defaultSeriesSettings_[seriesType]) { //append default theme for current series type if not exists
+    this.defaultSeriesSettings_[seriesType] = goog.object.clone(this.series_.themeSettings);
+  }
+
+  return this.defaultSeriesSettings_;
 };
 
 
@@ -666,8 +709,8 @@ anychart.sparklineModule.Chart.prototype.lineMarker = function(opt_indexOrValue,
   var lineMarker = this.lineAxesMarkers_[index];
   if (!lineMarker) {
     lineMarker = new anychart.core.axisMarkers.Line();
+    this.setupCreated('lineMarker', lineMarker);
     this.lineAxesMarkers_[index] = lineMarker;
-    this.registerDisposable(lineMarker);
     lineMarker.listenSignals(this.onMarkersSignal_, this);
     this.invalidate(anychart.ConsistencyState.SPARK_AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -701,7 +744,6 @@ anychart.sparklineModule.Chart.prototype.rangeMarker = function(opt_indexOrValue
   if (!rangeMarker) {
     rangeMarker = new anychart.core.axisMarkers.Range();
     this.rangeAxesMarkers_[index] = rangeMarker;
-    this.registerDisposable(rangeMarker);
     rangeMarker.listenSignals(this.onMarkersSignal_, this);
     this.invalidate(anychart.ConsistencyState.SPARK_AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -734,8 +776,8 @@ anychart.sparklineModule.Chart.prototype.textMarker = function(opt_indexOrValue,
   var textMarker = this.textAxesMarkers_[index];
   if (!textMarker) {
     textMarker = new anychart.core.axisMarkers.Text();
+    this.setupCreated('textMarker', textMarker);
     this.textAxesMarkers_[index] = textMarker;
-    this.registerDisposable(textMarker);
     textMarker.listenSignals(this.onMarkersSignal_, this);
     this.invalidate(anychart.ConsistencyState.SPARK_AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -782,7 +824,6 @@ anychart.sparklineModule.Chart.prototype.data = function(opt_value, opt_csvSetti
       else
         this.parentView_ = (this.parentViewToDispose_ = new anychart.data.Set(
             (goog.isArray(opt_value) || goog.isString(opt_value)) ? opt_value : null, opt_csvSettings)).mapAs();
-      this.registerDisposable(this.parentViewToDispose_);
       this.data_ = this.parentView_;
       this.data_.listenSignals(this.dataInvalidated_, this);
       if (this.series_)
@@ -860,7 +901,14 @@ anychart.sparklineModule.Chart.prototype.createSeriesByType_ = function(type) {
 
   if (ctl) {
     instance = new ctl(this);
-    this.registerDisposable(instance);
+    type = anychart.utils.toCamelCase(type);
+    instance.addThemes('chart.defaultSeriesSettings.base.normal');
+    instance.addThemes('chart.defaultSeriesSettings.' + type + '.normal');
+    var pathForTheme = this.themeSettings['defaultSeriesSettings'];
+    if (pathForTheme)
+      instance.addThemes(pathForTheme['base']);
+    if (pathForTheme[type])
+      instance.addThemes(pathForTheme[type]);
 
     this.series_ = instance;
     instance.setAutoZIndex(anychart.sparklineModule.Chart.ZINDEX_SERIES);
@@ -919,26 +967,28 @@ anychart.sparklineModule.Chart.PROPERTY_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
 
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'seriesType',
-      anychart.enums.normalizeSparklineSeriesType);
-
   function pointWidthNormalizer(opt_value) {
     return anychart.utils.normalizeNumberOrPercent(opt_value, /** @type {number|string} */ (this.getOption('pointWidth')));
   }
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'pointWidth',
-      pointWidthNormalizer);
 
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'connectMissingPoints',
-      anychart.core.settings.booleanNormalizer);
+  anychart.core.settings.createDescriptors(map, [
+    anychart.core.settings.descriptors.FILL_FUNCTION,
+    anychart.core.settings.descriptors.NEGATIVE_FILL,
+    anychart.core.settings.descriptors.STROKE_FUNCTION,
+    anychart.core.settings.descriptors.NEGATIVE_HATCH_FILL,
+    anychart.core.settings.descriptors.HATCH_FILL_FUNCTION,
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'seriesType', anychart.enums.normalizeSparklineSeriesType],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'pointWidth', pointWidthNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'connectMissingPoints', anychart.core.settings.booleanNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'firstFill', anychart.core.settings.fillOrFunctionNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'lastFill', anychart.core.settings.fillOrFunctionNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'maxFill', anychart.core.settings.fillOrFunctionNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'minFill', anychart.core.settings.fillOrFunctionNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'lastHatchFill', anychart.core.settings.hatchFillOrFunctionNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'firstHatchFill', anychart.core.settings.hatchFillOrFunctionNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'maxHatchFill', anychart.core.settings.hatchFillOrFunctionNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'minHatchFill', anychart.core.settings.hatchFillOrFunctionNormalizer]
+  ]);
 
   return map;
 })();
@@ -995,165 +1045,31 @@ anychart.sparklineModule.Chart.prototype.normalizeColor = function(color, var_ar
 };
 
 
-/**
- * Getter/setter for fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.sparklineModule.Chart|Function} .
- */
-anychart.sparklineModule.Chart.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var fill = goog.isFunction(opt_fillOrColorOrKeys) ?
-        opt_fillOrColorOrKeys :
-        acgraph.vector.normalizeFill.apply(null, arguments);
-    if (fill != this.fill_) {
-      this.fill_ = fill;
-      if (this.series_)
-        this.series_.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+/** @inheritDoc */
+anychart.sparklineModule.Chart.prototype.getOption = function(name) {
+  var val = anychart.sparklineModule.Chart.base(this, 'getOption', name);
+  if (!val) {
+    switch (name) {
+      case 'fill':
+      case 'negativeFill':
+      case 'firstFill':
+      case 'lastFill':
+      case 'maxFill':
+      case 'minFill':
+      case 'stroke':
+      case 'lastHatchFill':
+      case 'firstHatchFill':
+      case 'maxHatchFill':
+      case 'minHatchFill':
+        val = this.seriesDefaults_[name];
+        break;
+      case 'hatchFill':
+      case 'negativeHatchFill':
+        val = goog.isDef(val) ? val : this.seriesDefaults_[name];
+        break;
     }
-    return this;
   }
-  return this.fill_ || this.seriesDefaults_['fill'];
-};
-
-
-/**
- * Getter/setter for negativeFill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.sparklineModule.Chart|Function} .
- */
-anychart.sparklineModule.Chart.prototype.negativeFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var fill = goog.isFunction(opt_fillOrColorOrKeys) ?
-        opt_fillOrColorOrKeys :
-        acgraph.vector.normalizeFill.apply(null, arguments);
-    if (fill != this.negativeFill_) {
-      this.negativeFill_ = fill;
-      if (this.series_)
-        this.series_.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.negativeFill_ || this.seriesDefaults_['negativeFill'];
-};
-
-
-/**
- * Getter/setter for firstFill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.sparklineModule.Chart|Function} .
- */
-anychart.sparklineModule.Chart.prototype.firstFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var fill = goog.isFunction(opt_fillOrColorOrKeys) ?
-        opt_fillOrColorOrKeys :
-        acgraph.vector.normalizeFill.apply(null, arguments);
-    if (fill != this.firstFill_) {
-      this.firstFill_ = fill;
-      if (this.series_)
-        this.series_.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.firstFill_ || this.seriesDefaults_['firstFill'];
-};
-
-
-/**
- * Getter/setter for lastFill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.sparklineModule.Chart|Function} .
- */
-anychart.sparklineModule.Chart.prototype.lastFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var fill = goog.isFunction(opt_fillOrColorOrKeys) ?
-        opt_fillOrColorOrKeys :
-        acgraph.vector.normalizeFill.apply(null, arguments);
-    if (fill != this.lastFill_) {
-      this.lastFill_ = fill;
-      if (this.series_)
-        this.series_.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.lastFill_ || this.seriesDefaults_['lastFill'];
-};
-
-
-/**
- * Getter/setter for maxFill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.sparklineModule.Chart|Function} .
- */
-anychart.sparklineModule.Chart.prototype.maxFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var fill = goog.isFunction(opt_fillOrColorOrKeys) ?
-        opt_fillOrColorOrKeys :
-        acgraph.vector.normalizeFill.apply(null, arguments);
-    if (fill != this.maxFill_) {
-      this.maxFill_ = fill;
-      if (this.series_)
-        this.series_.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.maxFill_ || this.seriesDefaults_['maxFill'];
-};
-
-
-/**
- * Getter/setter for minFill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.sparklineModule.Chart|Function} .
- */
-anychart.sparklineModule.Chart.prototype.minFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var fill = goog.isFunction(opt_fillOrColorOrKeys) ?
-        opt_fillOrColorOrKeys :
-        acgraph.vector.normalizeFill.apply(null, arguments);
-    if (fill != this.minFill_) {
-      this.minFill_ = fill;
-      if (this.series_)
-        this.series_.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.minFill_ || this.seriesDefaults_['minFill'];
+  return val;
 };
 
 
@@ -1171,24 +1087,24 @@ anychart.sparklineModule.Chart.prototype.getFinalFill = function(usePointSetting
   if (usePointSettings && goog.isDef(iterator.get('fill'))) {
     //user settings defined
     finalFill = iterator.get('fill');
-  } else if (index == iterator.getRowsCount() - 1 && goog.isDef(this.lastFill())) {
+  } else if (index == iterator.getRowsCount() - 1 && goog.isDef(this.getOption('lastFill'))) {
     //last point
-    finalFill = this.lastFill();
-  } else if (!index && goog.isDef(this.firstFill())) {
+    finalFill = this.getOption('lastFill');
+  } else if (!index && goog.isDef(this.getOption('firstFill'))) {
     //first point
-    finalFill = this.firstFill();
-  } else if (val == this.getStat(anychart.enums.Statistics.MAX) && goog.isDef(this.maxFill())) {
+    finalFill = this.getOption('firstFill');
+  } else if (val == this.getStat(anychart.enums.Statistics.MAX) && goog.isDef(this.getOption('maxFill'))) {
     //point have max value
-    finalFill = this.maxFill();
-  } else if (val == this.getStat(anychart.enums.Statistics.MIN) && goog.isDef(this.minFill())) {
+    finalFill = this.getOption('maxFill');
+  } else if (val == this.getStat(anychart.enums.Statistics.MIN) && goog.isDef(this.getOption('minFill'))) {
     //point have min value
-    finalFill = this.minFill();
-  } else if (val < 0 && goog.isDef(this.negativeFill())) {
+    finalFill = this.getOption('minFill');
+  } else if (val < 0 && goog.isDef(this.getOption('negativeFill'))) {
     //point have negative value
-    finalFill = this.negativeFill();
+    finalFill = this.getOption('negativeFill');
   } else {
     //another case
-    finalFill = this.fill();
+    finalFill = this.getOption('fill');
   }
 
   var result = /** @type {!acgraph.vector.Fill} */(this.normalizeColor(/** @type {acgraph.vector.Fill|Function} */(finalFill)));
@@ -1197,37 +1113,11 @@ anychart.sparklineModule.Chart.prototype.getFinalFill = function(usePointSetting
 
 
 /**
- * Getter/setter for stroke.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.sparklineModule.Chart|acgraph.vector.Stroke|Function} .
- */
-anychart.sparklineModule.Chart.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var stroke = goog.isFunction(opt_strokeOrFill) ?
-        opt_strokeOrFill :
-        acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (stroke != this.stroke_) {
-      this.stroke_ = stroke;
-      if (this.series_)
-        this.series_.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.stroke_ || this.seriesDefaults_['stroke'];
-};
-
-
-/**
  * Method that gets final line color for the current point, with all fallbacks taken into account.
  * @return {!acgraph.vector.Stroke} Final stroke for the current row.
  */
 anychart.sparklineModule.Chart.prototype.getFinalStroke = function() {
-  return acgraph.vector.normalizeStroke(/** @type {!acgraph.vector.Stroke} */(this.normalizeColor(/** @type {!acgraph.vector.Stroke} */(this.stroke()))));
+  return acgraph.vector.normalizeStroke(/** @type {!acgraph.vector.Stroke} */(this.normalizeColor(/** @type {!acgraph.vector.Stroke} */(this.getOption('stroke')))));
 };
 
 
@@ -1257,162 +1147,6 @@ anychart.sparklineModule.Chart.prototype.normalizeHatchFill = function(hatchFill
 
 
 /**
- * Getter/setter for hatchFill.
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.sparklineModule.Chart|Function|boolean} Hatch fill.
- */
-anychart.sparklineModule.Chart.prototype.hatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrTypeOrState)) {
-    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
-        opt_patternFillOrTypeOrState :
-        acgraph.vector.normalizeHatchFill.apply(null, arguments);
-
-    if (hatchFill != this.hatchFill_) {
-      this.hatchFill_ = hatchFill;
-      if (this.series_)
-        this.series_.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return goog.isDef(this.hatchFill_) ? this.hatchFill_ : this.seriesDefaults_['hatchFill'];
-};
-
-
-/**
- * Getter/setter for negativeHatchFill.
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.sparklineModule.Chart|Function|boolean} Hatch fill.
- */
-anychart.sparklineModule.Chart.prototype.negativeHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrTypeOrState)) {
-    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
-        opt_patternFillOrTypeOrState :
-        acgraph.vector.normalizeHatchFill.apply(null, arguments);
-
-    if (hatchFill != this.negativeHatchFill_) {
-      this.negativeHatchFill_ = hatchFill;
-      if (this.series_)
-        this.series_.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return goog.isDef(this.negativeHatchFill_) ? this.negativeHatchFill_ : this.seriesDefaults_['negativeHatchFill'];
-};
-
-
-/**
- * Getter/setter for firstHatchFill.
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.sparklineModule.Chart|Function|boolean} Hatch fill.
- */
-anychart.sparklineModule.Chart.prototype.firstHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrTypeOrState)) {
-    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
-        opt_patternFillOrTypeOrState :
-        acgraph.vector.normalizeHatchFill.apply(null, arguments);
-
-    if (hatchFill != this.firstHatchFill_) {
-      this.firstHatchFill_ = hatchFill;
-      if (this.series_)
-        this.series_.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.firstHatchFill_ || this.seriesDefaults_['firstHatchFill'];
-};
-
-
-/**
- * Getter/setter for lastHatchFill.
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.sparklineModule.Chart|Function|boolean} Hatch fill.
- */
-anychart.sparklineModule.Chart.prototype.lastHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrTypeOrState)) {
-    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
-        opt_patternFillOrTypeOrState :
-        acgraph.vector.normalizeHatchFill.apply(null, arguments);
-
-    if (hatchFill != this.lastHatchFill_) {
-      this.lastHatchFill_ = hatchFill;
-      if (this.series_)
-        this.series_.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.lastHatchFill_ || this.seriesDefaults_['lastHatchFill'];
-};
-
-
-/**
- * Getter/setter for maxHatchFill.
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.sparklineModule.Chart|Function|boolean} Hatch fill.
- */
-anychart.sparklineModule.Chart.prototype.maxHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrTypeOrState)) {
-    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
-        opt_patternFillOrTypeOrState :
-        acgraph.vector.normalizeHatchFill.apply(null, arguments);
-
-    if (hatchFill != this.maxHatchFill_) {
-      this.maxHatchFill_ = hatchFill;
-      if (this.series_)
-        this.series_.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.maxHatchFill_ || this.seriesDefaults_['maxHatchFill'];
-};
-
-
-/**
- * Getter/setter for minHatchFill.
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.sparklineModule.Chart|Function|boolean} Hatch fill.
- */
-anychart.sparklineModule.Chart.prototype.minHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrTypeOrState)) {
-    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
-        opt_patternFillOrTypeOrState :
-        acgraph.vector.normalizeHatchFill.apply(null, arguments);
-
-    if (hatchFill != this.minHatchFill_) {
-      this.minHatchFill_ = hatchFill;
-      if (this.series_)
-        this.series_.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.minHatchFill_ || this.seriesDefaults_['minHatchFill'];
-};
-
-
-/**
  * Method that gets the final hatch fill for a current point, with all fallbacks taken into account.
  * @param {boolean} usePointSettings If point settings should count too (iterator questioning).
  * @return {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} Final hatch fill for the current row.
@@ -1426,24 +1160,24 @@ anychart.sparklineModule.Chart.prototype.getFinalHatchFill = function(usePointSe
   if (usePointSettings && goog.isDef(iterator.get('hatchFill'))) {
     //user settings defined
     finalHatchFill = iterator.get('hatchFill');
-  } else if (index == iterator.getRowsCount() - 1 && goog.isDef(this.lastHatchFill())) {
+  } else if (index == iterator.getRowsCount() - 1 && goog.isDef(this.getOption('lastHatchFill'))) {
     //last point
-    finalHatchFill = this.lastHatchFill();
-  } else if (!index && goog.isDef(this.firstHatchFill())) {
+    finalHatchFill = this.getOption('lastHatchFill');
+  } else if (!index && goog.isDef(this.getOption('firstHatchFill'))) {
     //first point
-    finalHatchFill = this.firstHatchFill();
-  } else if (val == this.getStat(anychart.enums.Statistics.MAX) && goog.isDef(this.maxHatchFill())) {
+    finalHatchFill = this.getOption('firstHatchFill');
+  } else if (val == this.getStat(anychart.enums.Statistics.MAX) && goog.isDef(this.getOption('maxHatchFill'))) {
     //point have max value
-    finalHatchFill = this.maxHatchFill();
-  } else if (val == this.getStat(anychart.enums.Statistics.MIN) && goog.isDef(this.minHatchFill())) {
+    finalHatchFill = this.getOption('maxHatchFill');
+  } else if (val == this.getStat(anychart.enums.Statistics.MIN) && goog.isDef(this.getOption('minHatchFill'))) {
     //point have min value
-    finalHatchFill = this.minHatchFill();
-  } else if (val < 0 && goog.isDef(this.negativeHatchFill())) {
+    finalHatchFill = this.getOption('minHatchFill');
+  } else if (val < 0 && goog.isDef(this.getOption('negativeHatchFill'))) {
     //point have negative value
-    finalHatchFill = this.negativeHatchFill();
+    finalHatchFill = this.getOption('negativeHatchFill');
   } else {
     //another case
-    finalHatchFill = this.hatchFill();
+    finalHatchFill = this.getOption('hatchFill');
   }
 
   return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */(
@@ -1526,7 +1260,7 @@ anychart.sparklineModule.Chart.prototype.mergeFactorySettingsEasy_ = function(se
 anychart.sparklineModule.Chart.prototype.markers = function(opt_value) {
   if (!this.markers_) {
     this.markers_ = new anychart.core.ui.MarkersFactory.Marker();
-    this.registerDisposable(this.markers_);
+    this.setupCreated('markers', this.markers_);
     this.markers_.listenSignals(this.markersInvalidated_, this);
   }
 
@@ -1548,7 +1282,7 @@ anychart.sparklineModule.Chart.prototype.markers = function(opt_value) {
 anychart.sparklineModule.Chart.prototype.negativeMarkers = function(opt_value) {
   if (!this.negativeMarkers_) {
     this.negativeMarkers_ = new anychart.core.ui.MarkersFactory.Marker();
-    this.registerDisposable(this.negativeMarkers_);
+    this.setupCreated('negativeMarkers', this.negativeMarkers_);
     this.negativeMarkers_.listenSignals(this.markersInvalidated_, this);
   }
 
@@ -1570,7 +1304,7 @@ anychart.sparklineModule.Chart.prototype.negativeMarkers = function(opt_value) {
 anychart.sparklineModule.Chart.prototype.firstMarkers = function(opt_value) {
   if (!this.firstMarkers_) {
     this.firstMarkers_ = new anychart.core.ui.MarkersFactory.Marker();
-    this.registerDisposable(this.firstMarkers_);
+    this.setupCreated('firstMarkers', this.firstMarkers_);
     this.firstMarkers_.listenSignals(this.markersInvalidated_, this);
   }
 
@@ -1592,7 +1326,7 @@ anychart.sparklineModule.Chart.prototype.firstMarkers = function(opt_value) {
 anychart.sparklineModule.Chart.prototype.lastMarkers = function(opt_value) {
   if (!this.lastMarkers_) {
     this.lastMarkers_ = new anychart.core.ui.MarkersFactory.Marker();
-    this.registerDisposable(this.lastMarkers_);
+    this.setupCreated('lastMarkers', this.lastMarkers_);
     this.lastMarkers_.listenSignals(this.markersInvalidated_, this);
   }
 
@@ -1614,7 +1348,7 @@ anychart.sparklineModule.Chart.prototype.lastMarkers = function(opt_value) {
 anychart.sparklineModule.Chart.prototype.maxMarkers = function(opt_value) {
   if (!this.maxMarkers_) {
     this.maxMarkers_ = new anychart.core.ui.MarkersFactory.Marker();
-    this.registerDisposable(this.maxMarkers_);
+    this.setupCreated('maxMarkers', this.maxMarkers_);
     this.maxMarkers_.listenSignals(this.markersInvalidated_, this);
   }
 
@@ -1636,7 +1370,7 @@ anychart.sparklineModule.Chart.prototype.maxMarkers = function(opt_value) {
 anychart.sparklineModule.Chart.prototype.minMarkers = function(opt_value) {
   if (!this.minMarkers_) {
     this.minMarkers_ = new anychart.core.ui.MarkersFactory.Marker();
-    this.registerDisposable(this.minMarkers_);
+    this.setupCreated('minMarkers', this.minMarkers_);
     this.minMarkers_.listenSignals(this.markersInvalidated_, this);
   }
 
@@ -1724,20 +1458,20 @@ anychart.sparklineModule.Chart.prototype.getFinalMarker = function(usePointSetti
   finalSettings = this.mergeFactorySettingsEasy_([finalSettings, finalDefaultSettings],
       anychart.sparklineModule.Chart.MARKERS_FIELD_NAMES_FOR_MERGE_);
 
-  var marker = this.markersInternal_.getMarker(index);
+  var marker = this.getMarkersInternal().getMarker(index);
   var res = null;
   if (finalSettings['enabled']) {
-    var position = finalSettings['position'] || this.markersInternal_.position();
+    var position = finalSettings['position'] || this.getMarkersInternal().getOption('position');
     var positionProvider = this.series_.createPositionProvider(/** @type {anychart.enums.Position|string} */(position));
 
     if (marker) {
       marker.positionProvider(positionProvider);
     } else {
-      marker = this.markersInternal_.add(positionProvider, index);
+      marker = this.getMarkersInternal().add(positionProvider, index);
     }
 
     marker.resetSettings();
-    marker.currentMarkersFactory(this.markersInternal_);
+    marker.currentMarkersFactory(this.getMarkersInternal());
     marker.setSettings(/** @type {Object} */(finalSettings));
     res = marker;
   } else if (marker) {
@@ -1773,7 +1507,7 @@ anychart.sparklineModule.Chart.prototype.markersInvalidated_ = function(event) {
 anychart.sparklineModule.Chart.prototype.labels = function(opt_value) {
   if (!this.labels_) {
     this.labels_ = new anychart.core.ui.LabelsFactory.Label();
-    this.registerDisposable(this.labels_);
+    this.setupCreated('labels', this.labels_);
     this.labels_.listenSignals(this.labelsInvalidated_, this);
   }
 
@@ -1795,7 +1529,7 @@ anychart.sparklineModule.Chart.prototype.labels = function(opt_value) {
 anychart.sparklineModule.Chart.prototype.negativeLabels = function(opt_value) {
   if (!this.negativeLabels_) {
     this.negativeLabels_ = new anychart.core.ui.LabelsFactory.Label();
-    this.registerDisposable(this.negativeLabels_);
+    this.setupCreated('negativeLabels', this.negativeLabels_);
     this.negativeLabels_.listenSignals(this.labelsInvalidated_, this);
   }
 
@@ -1817,7 +1551,7 @@ anychart.sparklineModule.Chart.prototype.negativeLabels = function(opt_value) {
 anychart.sparklineModule.Chart.prototype.firstLabels = function(opt_value) {
   if (!this.firstLabels_) {
     this.firstLabels_ = new anychart.core.ui.LabelsFactory.Label();
-    this.registerDisposable(this.firstLabels_);
+    this.setupCreated('firstLabels', this.firstLabels_);
     this.firstLabels_.listenSignals(this.labelsInvalidated_, this);
   }
 
@@ -1839,7 +1573,7 @@ anychart.sparklineModule.Chart.prototype.firstLabels = function(opt_value) {
 anychart.sparklineModule.Chart.prototype.lastLabels = function(opt_value) {
   if (!this.lastLabels_) {
     this.lastLabels_ = new anychart.core.ui.LabelsFactory.Label();
-    this.registerDisposable(this.lastLabels_);
+    this.setupCreated('lastLabels', this.lastLabels_);
     this.lastLabels_.listenSignals(this.labelsInvalidated_, this);
   }
 
@@ -1861,7 +1595,7 @@ anychart.sparklineModule.Chart.prototype.lastLabels = function(opt_value) {
 anychart.sparklineModule.Chart.prototype.maxLabels = function(opt_value) {
   if (!this.maxLabels_) {
     this.maxLabels_ = new anychart.core.ui.LabelsFactory.Label();
-    this.registerDisposable(this.maxLabels_);
+    this.setupCreated('maxLabels', this.maxLabels_);
     this.maxLabels_.listenSignals(this.labelsInvalidated_, this);
   }
 
@@ -1883,7 +1617,7 @@ anychart.sparklineModule.Chart.prototype.maxLabels = function(opt_value) {
 anychart.sparklineModule.Chart.prototype.minLabels = function(opt_value) {
   if (!this.minLabels_) {
     this.minLabels_ = new anychart.core.ui.LabelsFactory.Label();
-    this.registerDisposable(this.minLabels_);
+    this.setupCreated('minLabels', this.minLabels_);
     this.minLabels_.listenSignals(this.labelsInvalidated_, this);
   }
 
@@ -1968,10 +1702,10 @@ anychart.sparklineModule.Chart.prototype.getFinalLabel = function(usePointSettin
   finalSettings = this.mergeFactorySettingsEasy_([finalSettings, finalDefaultSettings],
       anychart.sparklineModule.Chart.LABELS_FIELD_NAMES_FOR_MERGE_);
 
-  var label = this.labelsInternal_.getLabel(index);
+  var label = this.getLabelsInternal().getLabel(index);
   var res = null;
   if (finalSettings['enabled']) {
-    var position = finalSettings['position'] || this.labelsInternal_.getOption('position');
+    var position = finalSettings['position'] || this.getLabelsInternal().getOption('position');
     var positionProvider = this.series_.createPositionProvider(/** @type {anychart.enums.Position|string} */(position));
     var formatProvider = this.series_.createFormatProvider();
 
@@ -1979,7 +1713,7 @@ anychart.sparklineModule.Chart.prototype.getFinalLabel = function(usePointSettin
       label.formatProvider(formatProvider);
       label.positionProvider(positionProvider);
     } else {
-      label = this.labelsInternal_.add(formatProvider, positionProvider, index);
+      label = this.getLabelsInternal().add(formatProvider, positionProvider, index);
     }
 
     label.resetSettings();
@@ -2220,6 +1954,109 @@ anychart.sparklineModule.Chart.prototype.isNoData = function() {
 
 //endregion
 
+//region Elements setup
+/**
+ * Returns scale instances.
+ * @param {(Array.<(string|Object)>|Object)} scalesConfig
+ * @return {Object}
+ * */
+anychart.sparklineModule.Chart.prototype.getScaleInstances = function(scalesConfig) {
+  var i, json, scale, type = this.getType();
+
+  var scalesInstances = {};
+  if (goog.isArray(scalesConfig)) {
+    for (i = 0; i < scalesConfig.length; i++) {
+      json = scalesConfig[i];
+      if (goog.isString(json)) {
+        json = {'type': json};
+      }
+      json = anychart.themes.merging.mergeScale(json, i, type, anychart.enums.ScaleTypes.LINEAR);
+      scale = anychart.scales.Base.fromString(json['type'], false);
+      scale.setup(json);
+      scalesInstances[i] = scale;
+    }
+  } else if (goog.isObject(scalesConfig)) {
+    for (i in scalesConfig) {
+      if (!scalesConfig.hasOwnProperty(i)) continue;
+      json = scalesConfig[i];
+      if (goog.isString(json)) {
+        json = {'type': json};
+      }
+      json = anychart.themes.merging.mergeScale(json, i, type, anychart.enums.ScaleTypes.LINEAR);
+      scale = anychart.scales.Base.fromString(json['type'], false);
+      scale.setup(json);
+      scalesInstances[i] = scale;
+    }
+  }
+  return scalesInstances;
+};
+
+
+/**
+ * Setup scale for chart.
+ * @param {(number|string|Object)} scaleConfig
+ * @param {Object} scalesInstances
+ * @param {string} scaleType
+ * */
+anychart.sparklineModule.Chart.prototype.setupScale = function(scaleConfig, scalesInstances, scaleType) {
+  var scale;
+  if (goog.isNumber(scaleConfig)) {
+    scale = scalesInstances[scaleConfig];
+  } else if (goog.isString(scaleConfig)) {
+    scale = anychart.scales.Base.fromString(scaleConfig, null);
+    if (!scale)
+      scale = scalesInstances[scaleConfig];
+  } else if (goog.isObject(scaleConfig)) {
+    scale = anychart.scales.Base.fromString(scaleConfig['type'], true);
+    scale.setup(scaleConfig);
+  } else {
+    scale = null;
+  }
+  if (scale)
+    this[scaleType](scale);
+};
+
+
+/**
+ * Setup marker with scale.
+ * @param {Array.<Object>} markerConfig
+ * @param {Object} scalesInstances
+ * @param {string} markerType
+ * */
+anychart.sparklineModule.Chart.prototype.setupMarker = function(markerConfig, scalesInstances, markerType) {
+  var json;
+  if (goog.isArray(markerConfig)) {
+    for (var i = 0; i < markerConfig.length; i++) {
+      json = markerConfig[i];
+      this[markerType](i, json);
+      if (goog.isObject(json) && 'scale' in json && json['scale'] > 1) this[markerType](i).scale(scalesInstances[json['scale']]);
+    }
+  }
+};
+
+
+/**
+ * Setup elements that we need setup.
+ * */
+anychart.sparklineModule.Chart.prototype.setupElements = function() {
+  this.setupScaleForElements(this.themeSettings);
+};
+
+
+/**
+ * Setup scale and scales for markers.
+ * @param {Object} config Config with settings.
+ * */
+anychart.sparklineModule.Chart.prototype.setupScaleForElements = function(config) {
+  var scalesInstances = this.getScaleInstances(config['scales']);
+  this.setupScale(config['xScale'], scalesInstances, 'xScale');
+  this.setupScale(config['yScale'], scalesInstances, 'yScale');
+  this.setupMarker(config['lineAxesMarkers'], scalesInstances, 'lineMarker');
+  this.setupMarker(config['rangeAxesMarkers'], scalesInstances, 'rangeMarker');
+  this.setupMarker(config['textAxesMarkers'], scalesInstances, 'textMarker');
+};
+
+//endregion
 
 /** @inheritDoc */
 anychart.sparklineModule.Chart.prototype.setupByJSON = function(config, opt_default) {
@@ -2228,116 +2065,14 @@ anychart.sparklineModule.Chart.prototype.setupByJSON = function(config, opt_defa
   if ('defaultSeriesSettings' in config)
     this.defaultSeriesSettings(config['defaultSeriesSettings']);
 
-  var i, json, scale;
-  var lineAxesMarkers = config['lineAxesMarkers'];
-  var rangeAxesMarkers = config['rangeAxesMarkers'];
-  var textAxesMarkers = config['textAxesMarkers'];
-  var scales = config['scales'];
-
   this.data(config['data']);
 
   anychart.core.settings.deserialize(this, anychart.sparklineModule.Chart.PROPERTY_DESCRIPTORS, config);
   this.clip(config['clip']);
   this.data(config['data']);
 
-  var type = this.getType();
+  this.setupScaleForElements(config);
 
-  var scalesInstances = {};
-  if (goog.isArray(scales)) {
-    for (i = 0; i < scales.length; i++) {
-      json = scales[i];
-      if (goog.isString(json)) {
-        json = {'type': json};
-      }
-      json = anychart.themes.merging.mergeScale(json, i, type, anychart.enums.ScaleTypes.LINEAR);
-      scale = anychart.scales.Base.fromString(json['type'], false);
-      scale.setup(json);
-      scalesInstances[i] = scale;
-    }
-  } else if (goog.isObject(scales)) {
-    for (i in scales) {
-      if (!scales.hasOwnProperty(i)) continue;
-      json = scales[i];
-      if (goog.isString(json)) {
-        json = {'type': json};
-      }
-      json = anychart.themes.merging.mergeScale(json, i, type, anychart.enums.ScaleTypes.LINEAR);
-      scale = anychart.scales.Base.fromString(json['type'], false);
-      scale.setup(json);
-      scalesInstances[i] = scale;
-    }
-  }
-
-  json = config['xScale'];
-  if (goog.isNumber(json)) {
-    scale = scalesInstances[json];
-  } else if (goog.isString(json)) {
-    scale = anychart.scales.Base.fromString(json, null);
-    if (!scale)
-      scale = scalesInstances[json];
-  } else if (goog.isObject(json)) {
-    scale = anychart.scales.Base.fromString(json['type'], true);
-    scale.setup(json);
-  } else {
-    scale = null;
-  }
-  if (scale)
-    this.xScale(scale);
-
-  json = config['yScale'];
-  if (goog.isNumber(json)) {
-    scale = scalesInstances[json];
-  } else if (goog.isString(json)) {
-    scale = anychart.scales.Base.fromString(json, null);
-    if (!scale)
-      scale = scalesInstances[json];
-  } else if (goog.isObject(json)) {
-    scale = anychart.scales.Base.fromString(json['type'], false);
-    scale.setup(json);
-  } else {
-    scale = null;
-  }
-  if (scale)
-    this.yScale(scale);
-
-  if (goog.isArray(lineAxesMarkers)) {
-    for (i = 0; i < lineAxesMarkers.length; i++) {
-      json = lineAxesMarkers[i];
-      this.lineMarker(i, json);
-      if (goog.isObject(json) && 'scale' in json && json['scale'] > 1) this.lineMarker(i).scale(scalesInstances[json['scale']]);
-    }
-  }
-
-  if (goog.isArray(rangeAxesMarkers)) {
-    for (i = 0; i < rangeAxesMarkers.length; i++) {
-      json = rangeAxesMarkers[i];
-      this.rangeMarker(i, json);
-      if (goog.isObject(json) && 'scale' in json && json['scale'] > 1) this.rangeMarker(i).scale(scalesInstances[json['scale']]);
-    }
-  }
-
-  if (goog.isArray(textAxesMarkers)) {
-    for (i = 0; i < textAxesMarkers.length; i++) {
-      json = textAxesMarkers[i];
-      this.textMarker(i, json);
-      if (goog.isObject(json) && 'scale' in json && json['scale'] > 1) this.textMarker(i).scale(scalesInstances[json['scale']]);
-    }
-  }
-
-  this.stroke(config['stroke']);
-
-  this.lastFill(config['lastFill']);
-  this.firstFill(config['firstFill']);
-  this.maxFill(config['maxFill']);
-  this.minFill(config['minFill']);
-  this.negativeFill(config['negativeFill']);
-  this.fill(config['fill']);
-  this.lastHatchFill(config['lastHatchFill']);
-  this.firstHatchFill(config['firstHatchFill']);
-  this.maxHatchFill(config['maxHatchFill']);
-  this.minHatchFill(config['minHatchFill']);
-  this.negativeHatchFill(config['negativeHatchFill']);
-  this.hatchFill(config['hatchFill']);
   if (config['lastMarkers']) this.lastMarkers().setupInternal(!!opt_default, config['lastMarkers']);
   if (config['firstMarkers']) this.firstMarkers().setupInternal(!!opt_default, config['firstMarkers']);
   if (config['maxMarkers']) this.maxMarkers().setupInternal(!!opt_default, config['maxMarkers']);
@@ -2358,6 +2093,7 @@ anychart.sparklineModule.Chart.prototype.setupByJSON = function(config, opt_defa
  */
 anychart.sparklineModule.Chart.prototype.serialize = function() {
   var json = anychart.sparklineModule.Chart.base(this, 'serialize');
+  anychart.core.settings.serialize(this, anychart.sparklineModule.Chart.PROPERTY_DESCRIPTORS, json);
   var i;
   var scalesIds = {};
   var scales = [];
@@ -2373,115 +2109,20 @@ anychart.sparklineModule.Chart.prototype.serialize = function() {
     scales.push(scalesIds[goog.getUid(this.yScale())]);
   }
   json['yScale'] = scales.length - 1;
-
-  anychart.core.settings.serialize(this, anychart.sparklineModule.Chart.PROPERTY_DESCRIPTORS, json);
   json['clip'] = (anychart.utils.instanceOf(this.clip_, anychart.math.Rect)) ? this.clip_.serialize() : this.clip_;
   json['data'] = this.data().serialize();
-
-
-  if (goog.isFunction(this['lastFill'])) {
-    if (goog.isFunction(this.lastFill())) {
-      anychart.core.reporting.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series last fill']);
-    } else if (goog.isDef(this.lastFill())) {
-      json['lastFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.lastFill()));
-    }
-  }
-  if (goog.isFunction(this['lastHatchFill'])) {
-    if (goog.isFunction(this.lastHatchFill())) {
-      anychart.core.reporting.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series last hatch fill']);
-    } else if (goog.isDef(this.lastHatchFill())) {
-      json['lastHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.lastHatchFill()));
-    }
-  }
   json['lastMarkers'] = this.lastMarkers().serialize();
   json['lastLabels'] = this.lastLabels().serialize();
-  if (goog.isFunction(this['firstFill'])) {
-    if (goog.isFunction(this.firstFill())) {
-      anychart.core.reporting.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series first fill']);
-    } else if (goog.isDef(this.firstFill())) {
-      json['firstFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.firstFill()));
-    }
-  }
-  if (goog.isFunction(this['firstHatchFill'])) {
-    if (goog.isFunction(this.firstHatchFill())) {
-      anychart.core.reporting.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series first hatch fill']);
-    } else if (goog.isDef(this.firstHatchFill())) {
-      json['firstHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.firstHatchFill()));
-    }
-  }
   json['firstMarkers'] = this.firstMarkers().serialize();
   json['firstLabels'] = this.firstLabels().serialize();
-  if (goog.isFunction(this['maxFill'])) {
-    if (goog.isFunction(this.maxFill())) {
-      anychart.core.reporting.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series max fill']);
-    } else if (goog.isDef(this.maxFill())) {
-      json['maxFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.maxFill()));
-    }
-  }
-  if (goog.isFunction(this['maxHatchFill'])) {
-    if (goog.isFunction(this.maxHatchFill())) {
-      anychart.core.reporting.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series max hatch fill']);
-    } else if (goog.isDef(this.maxHatchFill())) {
-      json['maxHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.maxHatchFill()));
-    }
-  }
   json['maxMarkers'] = this.maxMarkers().serialize();
   json['maxLabels'] = this.maxLabels().serialize();
-  if (goog.isFunction(this['minFill'])) {
-    if (goog.isFunction(this.minFill())) {
-      anychart.core.reporting.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series min fill']);
-    } else if (goog.isDef(this.minFill())) {
-      json['minFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.minFill()));
-    }
-  }
-  if (goog.isFunction(this['minHatchFill'])) {
-    if (goog.isFunction(this.minHatchFill())) {
-      anychart.core.reporting.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series min hatch fill']);
-    } else if (goog.isDef(this.minHatchFill())) {
-      json['minHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.minHatchFill()));
-    }
-  }
   json['minMarkers'] = this.minMarkers().serialize();
   json['minLabels'] = this.minLabels().serialize();
-  if (goog.isFunction(this['negativeFill'])) {
-    if (goog.isFunction(this.negativeFill())) {
-      anychart.core.reporting.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series negative fill']);
-    } else if (goog.isDef(this.negativeFill())) {
-      json['negativeFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.negativeFill()));
-    }
-  }
-  if (goog.isFunction(this['negativeHatchFill'])) {
-    if (goog.isFunction(this.negativeHatchFill())) {
-      anychart.core.reporting.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series negative hatch fill']);
-    } else if (goog.isDef(this.negativeHatchFill())) {
-      json['negativeHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.negativeHatchFill()));
-    }
-  }
   json['negativeMarkers'] = this.negativeMarkers().serialize();
   json['negativeLabels'] = this.negativeLabels().serialize();
-  if (goog.isFunction(this['fill'])) {
-    if (goog.isFunction(this.fill())) {
-      anychart.core.reporting.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series fill']);
-    } else if (goog.isDef(this.fill())) {
-      json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.fill()));
-    }
-  }
-  if (goog.isFunction(this['hatchFill'])) {
-    if (goog.isFunction(this.hatchFill())) {
-      anychart.core.reporting.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series hatch fill']);
-    } else if (goog.isDef(this.hatchFill())) {
-      json['hatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hatchFill()));
-    }
-  }
   json['markers'] = this.markers().serialize();
   json['labels'] = this.labels().serialize();
-  if (goog.isFunction(this['stroke'])) {
-    if (goog.isFunction(this.stroke())) {
-      anychart.core.reporting.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series stroke']);
-    } else if (goog.isDef(this.stroke())) {
-      json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.stroke()));
-    }
-  }
 
   var lineAxesMarkers = [];
   for (i = 0; i < this.lineAxesMarkers_.length; i++) {
@@ -2551,6 +2192,53 @@ anychart.sparklineModule.Chart.prototype.serialize = function() {
 };
 
 
+/** @inheritDoc */
+anychart.sparklineModule.Chart.prototype.disposeInternal = function() {
+  goog.disposeAll(
+      this.lineAxesMarkers_,
+      this.rangeAxesMarkers_,
+      this.textAxesMarkers_,
+      this.parentViewToDispose_,
+      this.parentView_,
+      this.data_,
+      this.series_,
+      this.markers_,
+      this.negativeMarkers_,
+      this.firstMarkers_,
+      this.lastMarkers_,
+      this.maxMarkers_,
+      this.minMarkers_,
+      this.labels_,
+      this.negativeLabels_,
+      this.firstLabels_,
+      this.lastLabels_,
+      this.maxLabels_,
+      this.minLabels_);
+  this.lineAxesMarkers_.length = 0;
+  this.rangeAxesMarkers_.length = 0;
+  this.textAxesMarkers_.length = 0;
+  this.parentViewToDispose_ = null;
+  this.parentView_ = null;
+  delete this.data_;
+  delete this.iterator_;
+  this.series_ = null;
+  this.markers_ = null;
+  this.negativeMarkers_ = null;
+  this.firstMarkers_ = null;
+  this.lastMarkers_ = null;
+  this.maxMarkers_ = null;
+  this.minMarkers_ = null;
+  this.labels_ = null;
+  this.negativeLabels_ = null;
+  this.firstLabels_ = null;
+  this.lastLabels_ = null;
+  this.maxLabels_ = null;
+  this.minLabels_ = null;
+  this.seriesDefaults_ = null;
+  anychart.sparklineModule.Chart.base(this, 'disposeInternal');
+};
+
+
 anychart.chartTypesMap[anychart.enums.ChartTypes.SPARKLINE] = anychart.sparkline;
 
 
@@ -2569,40 +2257,40 @@ anychart.chartTypesMap[anychart.enums.ChartTypes.SPARKLINE] = anychart.sparkline
   // proto['type'] = proto.type;
   // proto['connectMissingPoints'] = proto.connectMissingPoints;
   // proto['pointWidth'] = proto.pointWidth;
+  // proto['lastFill'] = proto.lastFill;
+  // proto['firstFill'] = proto.firstFill;
+  // proto['maxFill'] = proto.maxFill;
+  // proto['minFill'] = proto.minFill;
+  // proto['negativeFill'] = proto.negativeFill;
+  // proto['fill'] = proto.fill;
+  // proto['stroke'] = proto.stroke;
+  // proto['lastHatchFill'] = proto.lastHatchFill;
+  // proto['firstHatchFill'] = proto.firstHatchFill;
+  // proto['maxHatchFill'] = proto.maxHatchFill;
+  // proto['minHatchFill'] = proto.minHatchFill;
+  // proto['hatchFill'] = proto.hatchFill;
+  // proto['negativeHatchFill'] = proto.negativeHatchFill;
+
   proto['data'] = proto.data;
   proto['clip'] = proto.clip;
 
-  proto['lastFill'] = proto.lastFill;
-  proto['lastHatchFill'] = proto.lastHatchFill;
   proto['lastMarkers'] = proto.lastMarkers;
   proto['lastLabels'] = proto.lastLabels;
 
-  proto['firstFill'] = proto.firstFill;
-  proto['firstHatchFill'] = proto.firstHatchFill;
   proto['firstMarkers'] = proto.firstMarkers;
   proto['firstLabels'] = proto.firstLabels;
 
-  proto['maxFill'] = proto.maxFill;
-  proto['maxHatchFill'] = proto.maxHatchFill;
   proto['maxMarkers'] = proto.maxMarkers;
   proto['maxLabels'] = proto.maxLabels;
 
-  proto['minFill'] = proto.minFill;
-  proto['minHatchFill'] = proto.minHatchFill;
   proto['minMarkers'] = proto.minMarkers;
   proto['minLabels'] = proto.minLabels;
 
-  proto['negativeFill'] = proto.negativeFill;
-  proto['negativeHatchFill'] = proto.negativeHatchFill;
   proto['negativeMarkers'] = proto.negativeMarkers;
   proto['negativeLabels'] = proto.negativeLabels;
 
-  proto['fill'] = proto.fill;
-  proto['hatchFill'] = proto.hatchFill;
   proto['markers'] = proto.markers;
   proto['labels'] = proto.labels;
-
-  proto['stroke'] = proto.stroke;
 
   proto['getType'] = proto.getType;
   proto['noData'] = proto.noData;

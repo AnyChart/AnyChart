@@ -18,7 +18,7 @@ goog.require('anychart.tagCloudModule.Chart');
  */
 anychart.tagCloud = function(opt_data, opt_settings) {
   var chart = new anychart.tagCloudModule.Chart(opt_data, opt_settings);
-  chart.setupInternal(true, anychart.getFullTheme('tagCloud'));
+  chart.setupScales(chart.themeSettings);
 
   return chart;
 };

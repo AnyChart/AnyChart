@@ -703,9 +703,11 @@ anychart.stockModule.Axis.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     if (background) {
-      var bgBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
+      var bgBounds = /** @type {anychart.math.Rect} */(this.parentBounds().clone().round());
       bgBounds.top = bgBounds.top + bgBounds.height - /** @type {number} */(this.getOption('height'));
       bgBounds.height = /** @type {number} */(this.getOption('height'));
+      // fixes axis background being 1px shorter than axis line
+      bgBounds.width = Math.ceil(anychart.utils.applyPixelShift(bgBounds.getRight(), 1)) - bgBounds.left;
       background.parentBounds(bgBounds);
     }
     this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.STOCK_DTAXIS_BACKGROUND);

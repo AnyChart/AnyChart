@@ -100,11 +100,29 @@ anychart.mekkoModule.Drawer.prototype.drawPoint_ = function(point, shapes, opt_u
   var stroke = point.meta('stroke') ? point.meta('stroke') : shapes['path'].stroke();
   var thickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(stroke));
   var halfThickness = thickness / 2;
+
+  /* Alight top and bottom sides of point to ticks */
+  if (this.isVertical) {
+    leftX = anychart.utils.applyPixelShift(leftX, 1);
+    rightX = anychart.utils.applyPixelShift(rightX, 1);
+  } else {
+    y = anychart.utils.applyPixelShift(y, 1);
+    zero = anychart.utils.applyPixelShift(zero, 1);
+  }
+
   leftX += halfThickness;
   rightX -= halfThickness;
   leftX = anychart.utils.applyPixelShift(leftX, thickness);
   rightX = anychart.utils.applyPixelShift(rightX, thickness);
 
+  /*
+  We change sign depending on it's position to avoid transparent pixels on ends:
+    bottom and right round up,
+    top and left round down.
+  When position changes - bottom becomes left and top becomes right.
+  With left and right coordinates there is no such problem.
+  Left becomes top. Right becomes bottom.
+  */
   y += this.isVertical ? -halfThickness : halfThickness;
   zero -= this.isVertical ? -halfThickness : halfThickness;
   y = anychart.utils.applyPixelShift(y, thickness);
@@ -114,8 +132,8 @@ anychart.mekkoModule.Drawer.prototype.drawPoint_ = function(point, shapes, opt_u
     // Adjust vertical padding depend on available space
     var height = Math.abs(zero - y);
     var vPadding = (height > pointsPadding * 2) ? pointsPadding : (height / 2 - 1);
-    zero -= this.isVertical ? -vPadding : vPadding;
-    y += this.isVertical ? -vPadding : vPadding;
+    zero -= vPadding;
+    y += vPadding;
   }
 
   var path = /** @type {acgraph.vector.Path} */(shapes['path']);

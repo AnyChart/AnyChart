@@ -1314,7 +1314,6 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
       'hoverMode': 'single',
       'selectionMode': 'multi-select',
       'spotRadius': 2,
-      'allowMultiSeriesSelection': true,
       'multiSelectOnClick': false,
       'unselectOnClickOutOfPoint': true
     },

@@ -1,6 +1,15 @@
 goog.provide('anychart.vennModule.defaultTheme');
 
 
+/**
+ * Default tooltip for intersections and chart.
+ * */
+anychart.vennModule.defaultTheme.tooltip = {
+  'titleFormat': '{%Name}',
+  'format': 'Value: {%Value}'
+};
+
+
 goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
   'venn': {
     'dataSeparator': '&',
@@ -60,10 +69,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'enabled': null
       }
     },
-    'tooltip': {
-      'titleFormat': '{%Name}',
-      'format': 'Value: {%Value}'
-    },
+    'tooltip': anychart.vennModule.defaultTheme.tooltip,
     'intersections': {
       'normal': {
         'fill': '#fff 0.00001',
@@ -97,9 +103,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
           'enabled': null
         }
       },
-      'tooltip': {
-        'titleFormat': '{%Name}'
-      }
+      'tooltip': anychart.vennModule.defaultTheme.tooltip
     },
     'legend': {
       'enabled': true,

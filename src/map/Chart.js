@@ -242,7 +242,8 @@ anychart.mapModule.Chart = function() {
    */
   this.callouts_ = [];
 
-  this.unboundRegions(anychart.enums.MapUnboundRegionsMode.AS_IS);
+  this.unboundRegions(this.themeSettings['unboundRegions'] || anychart.enums.MapUnboundRegionsMode.AS_IS);
+
   this.setOption('defaultSeriesType', anychart.enums.MapSeriesType.CHOROPLETH);
 
   this.eventsHandler.listen(this, [goog.events.EventType.POINTERDOWN, acgraph.events.EventType.TOUCHSTART], this.tapHandler);
@@ -571,13 +572,13 @@ anychart.mapModule.Chart.prototype.getType = function() {
 
 /** @inheritDoc */
 anychart.mapModule.Chart.prototype.getXAxisByIndex = function(index) {
-  return this.axesSettings_.getItems()[index];
+  return this.axes().getItems()[index];
 };
 
 
 /** @inheritDoc */
 anychart.mapModule.Chart.prototype.getYAxisByIndex = function(index) {
-  return this.axesSettings_.getItems()[index];
+  return this.axes().getItems()[index];
 };
 
 
@@ -620,7 +621,7 @@ anychart.mapModule.Chart.prototype.controlsInteractivity_ = function() {
     }
 
     this.listen('pointsselect', function(e) {
-      anychart.mapTextarea.innerHTML = this.interactivity().copyFormat().call(e, e);
+      anychart.mapTextarea.innerHTML = this.interactivity().getOption('copyFormat').call(e, e);
       anychart.mapTextarea.select();
     }, false, this);
 
@@ -661,7 +662,7 @@ anychart.mapModule.Chart.prototype.controlsInteractivity_ = function() {
     var maxZoomLevel = /** @type {number} */ (this.getOption('maxZoomLevel'));
 
     this.shortcutHandler.listen(goog.ui.KeyboardShortcutHandler.EventType.SHORTCUT_TRIGGERED, function(e) {
-      if (!this.interactivity_.keyboardZoomAndMove())
+      if (!this.interactivity_.getOption('keyboardZoomAndMove'))
         return;
 
       if (anychart.mapTextarea.chart && anychart.mapTextarea.chart != this)
@@ -741,7 +742,7 @@ anychart.mapModule.Chart.prototype.controlsInteractivity_ = function() {
       var zoomFactor = goog.math.clamp(1 - be.deltaY / 120, 0.7, 2);
       var maxZoomFactor = maxZoomLevel;
       var minZoomFactor = minZoomLevel;
-      var isMouseWheel = scene.interactivity().zoomOnMouseWheel();
+      var isMouseWheel = scene.interactivity().getOption('zoomOnMouseWheel');
       var bounds = this.getPlotBounds();
 
       var insideBounds = bounds &&
@@ -772,7 +773,7 @@ anychart.mapModule.Chart.prototype.controlsInteractivity_ = function() {
           e.clientY >= bounds.top + containerPosition.y &&
           e.clientY <= bounds.top + containerPosition.y + bounds.height;
 
-      if (this.interactivity_.zoomOnMouseWheel() && insideBounds) {
+      if (this.interactivity_.getOption('zoomOnMouseWheel') && insideBounds) {
         if (scene.goingToHome) return;
         var zoomFactor = goog.math.clamp(1 - e.deltaY / 120, 0.7, 2);
 
@@ -844,7 +845,7 @@ anychart.mapModule.Chart.prototype.controlsInteractivity_ = function() {
       }
     };
     this.mapDbClickHandler_ = function(e) {
-      if (this.interactivity_.zoomOnDoubleClick()) {
+      if (this.interactivity_.getOption('zoomOnDoubleClick')) {
         var scene = this.getCurrentScene();
         var containerPosition = this.container().getStage().getClientPosition();
         var bounds = scene.getPlotBounds();
@@ -916,7 +917,7 @@ anychart.mapModule.Chart.prototype.controlsInteractivity_ = function() {
     this.mouseMoveHandler = function(e) {
       var scene = this.getCurrentScene();
 
-      if (this.interactivity_.drag() && scene.getZoomLevel() != 1 && !this.legendDragInProcess) {
+      if (this.interactivity_.getOption('drag') && scene.getZoomLevel() != 1 && !this.legendDragInProcess) {
         scene.startDrag();
 
         scene.move(e.clientX - startX, e.clientY - startY);
@@ -970,7 +971,7 @@ anychart.mapModule.Chart.prototype.endDrag = function() {
   if (this.drag) {
     this.drag = false;
 
-    if (this.interactivity_.drag() &&
+    if (this.interactivity_.getOption('drag') &&
         this.getCurrentScene().getZoomLevel() != 1 &&
         !this.legendDragInProcess) {
       this.dispatchEvent(anychart.enums.EventType.DRAG_END);
@@ -1024,7 +1025,7 @@ anychart.mapModule.Chart.prototype.tapHandler = function(event) {
           this.tap = false;
         });
 
-        if (this.interactivity_.drag() && this.getZoomLevel() != 1) {
+        if (this.interactivity_.getOption('drag') && this.getZoomLevel() != 1) {
           var mapLayer = this.getMapLayer();
           var boundsWithoutTx = mapLayer.getBoundsWithoutTransform();
           var boundsWithTx = mapLayer.getBounds();
@@ -1227,7 +1228,7 @@ anychart.mapModule.Chart.prototype.touchMoveHandler = function(e) {
 
     var minZoomLevel = /** @type {number} */ (this.getOption('minZoomLevel'));
     var maxZoomLevel = /** @type {number} */ (this.getOption('maxZoomLevel'));
-    if (this.interactivity_.zoomOnMouseWheel() && isZooming) {
+    if (this.interactivity_.getOption('zoomOnMouseWheel') && isZooming) {
       var zoomRatio = 1.3;
       var zoomFactor = (dist - this.touchDist) > 0 ? zoomRatio : 1 / zoomRatio;
 
@@ -1265,7 +1266,7 @@ anychart.mapModule.Chart.prototype.touchMoveHandler = function(e) {
       }
     }
   } else if (touchCount == 1) {
-    if (this.drag && this.interactivity_.drag() && this.getZoomLevel() != 1) {
+    if (this.drag && this.interactivity_.getOption('drag') && this.getZoomLevel() != 1) {
       var dx = e.clientX - scene.startTouchX;
       var dy = e.clientY - scene.startTouchY;
 
@@ -1439,7 +1440,7 @@ anychart.mapModule.Chart.prototype.createEventSeriesStatus = function(seriesStat
 
 /** @inheritDoc */
 anychart.mapModule.Chart.prototype.doAdditionActionsOnMouseOverAndMove = function(index, series) {
-  var colorRange = this.getCurrentScene().colorRange();
+  var colorRange = this.getCurrentScene().getCreated('colorRange');
   index = goog.isArray(index) ? index.length ? index[0] : NaN : index;
   if (colorRange && colorRange.target() && !isNaN(index)) {
     var target = /** @type {anychart.mapModule.Series} */(colorRange.target());
@@ -1455,7 +1456,7 @@ anychart.mapModule.Chart.prototype.doAdditionActionsOnMouseOverAndMove = functio
 
 /** @inheritDoc */
 anychart.mapModule.Chart.prototype.doAdditionActionsOnMouseOut = function() {
-  var colorRange = this.getCurrentScene().colorRange();
+  var colorRange = this.getCurrentScene().getCreated('colorRange');
   if (colorRange && colorRange.enabled()) {
     colorRange.hideMarker();
   }
@@ -1503,7 +1504,7 @@ anychart.mapModule.Chart.prototype.updateSeriesOnZoomOrMove = function() {
       callout.updateOnZoomOrMove();
   }
 
-  if (this.axesSettings_) {
+  if (this.getCreated('axesSettings')) {
     var axes = this.axesSettings_.getItems();
     for (i = 0; i < axes.length; i++) {
       var axis = axes[i];
@@ -1512,8 +1513,8 @@ anychart.mapModule.Chart.prototype.updateSeriesOnZoomOrMove = function() {
     }
   }
 
-  if (this.gridSettings_) {
-    var grids = this.gridSettings_.getItems();
+  if (this.getCreated('gridsSettings')) {
+    var grids = this.gridsSettings_.getItems();
     for (i = grids.length; i--;) {
       var grid = grids[i];
       if (grid.enabled())
@@ -1539,6 +1540,7 @@ anychart.mapModule.Chart.prototype.updateSeriesOnZoomOrMove = function() {
 anychart.mapModule.Chart.prototype.crsAnimation = function(opt_enabledOrJson, opt_duration) {
   if (!this.crsAnimation_) {
     this.crsAnimation_ = new anychart.core.utils.Animation();
+    this.setupCreated('crsAnimation', this.crsAnimation_);
     this.crsAnimation_.listenSignals(this.onCrsAnimationSignal_, this);
   }
   if (goog.isDef(opt_enabledOrJson)) {
@@ -1574,7 +1576,7 @@ anychart.mapModule.Chart.prototype.onCrsAnimationSignal_ = function() {
 anychart.mapModule.Chart.prototype.colorRange = function(opt_value) {
   if (!this.colorRange_) {
     this.colorRange_ = new anychart.colorScalesModule.ui.ColorRange();
-    this.colorRange_.dropThemes();
+    this.setupCreated('colorRange', this.colorRange_);
     this.colorRange_.listenSignals(this.colorRangeInvalidated_, this);
     this.invalidate(anychart.ConsistencyState.MAP_COLOR_RANGE | anychart.ConsistencyState.BOUNDS,
         anychart.Signal.NEEDS_REDRAW);
@@ -1647,9 +1649,9 @@ anychart.mapModule.Chart.prototype.callout = function(opt_indexOrValue, opt_valu
   if (!callout) {
     callout = new anychart.mapModule.elements.Callout();
     callout.setParentEventTarget(this);
-    callout.setup(this.defaultCalloutSettings());
+    callout.addThemes(this.defaultCalloutSettings());
+    callout.setupStateSettings();
     this.callouts_[index] = callout;
-    this.registerDisposable(callout);
     callout.listenSignals(this.onCalloutSignal_, this);
     this.invalidate(anychart.ConsistencyState.MAP_CALLOUT | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -1690,10 +1692,15 @@ anychart.mapModule.Chart.prototype.onCalloutSignal_ = function(event) {
  * @return {Object}
  */
 anychart.mapModule.Chart.prototype.defaultCalloutSettings = function(opt_value) {
+  if (!this.defaultCalloutSettings_) {
+    this.defaultCalloutSettings_ = anychart.getFlatTheme('map.defaultCalloutSettings');
+  }
+
   if (goog.isDef(opt_value)) {
-    this.defaultCalloutSettings_ = opt_value;
+    goog.mixin(this.defaultCalloutSettings_, opt_value);
     return this;
   }
+
   return this.defaultCalloutSettings_ || {};
 };
 
@@ -1706,6 +1713,9 @@ anychart.mapModule.Chart.prototype.defaultCalloutSettings = function(opt_value) 
 anychart.mapModule.Chart.prototype.axes = function(opt_value) {
   if (!this.axesSettings_) {
     this.axesSettings_ = new anychart.mapModule.elements.AxisSettings(this);
+    this.setupCreated('axesSettings', this.axesSettings_);
+    this.axesSettings_.setupElements(true);
+    this.axesSettings_.setScale(/** @type {anychart.mapModule.scales.Geo} */(this.scale()));
   }
 
   if (goog.isDef(opt_value)) {
@@ -1738,16 +1748,17 @@ anychart.mapModule.Chart.prototype.onAxesSettingsSignal = function(event) {
  * @return {anychart.mapModule.Chart|anychart.mapModule.elements.GridSettings}
  */
 anychart.mapModule.Chart.prototype.grids = function(opt_value) {
-  if (!this.gridSettings_) {
-    this.gridSettings_ = new anychart.mapModule.elements.GridSettings(this);
-    this.setupCreated('gridsSettings', this.gridSettings_);
+  if (!this.gridsSettings_) {
+    this.gridsSettings_ = new anychart.mapModule.elements.GridSettings(this);
+    this.setupCreated('gridsSettings', this.gridsSettings_);
+    this.gridsSettings_.setupElements(true);
   }
 
   if (goog.isDef(opt_value)) {
-    this.gridSettings_.setupInternal(false, opt_value);
+    this.gridsSettings_.setupInternal(false, opt_value);
     return this;
   }
-  return this.gridSettings_;
+  return this.gridsSettings_;
 };
 
 
@@ -1776,9 +1787,8 @@ anychart.mapModule.Chart.prototype.onGridsSettingsSignal = function(event) {
 anychart.mapModule.Chart.prototype.crosshair = function(opt_value) {
   if (!this.crosshair_) {
     this.crosshair_ = new anychart.mapModule.elements.Crosshair();
-    this.crosshair_.enabled(false);
+    this.setupCreated('crosshair', this.crosshair_);
     this.crosshair_.interactivityTarget(this);
-    this.registerDisposable(this.crosshair_);
     this.crosshair_.listenSignals(this.onCrosshairSignal_, this);
   }
 
@@ -1880,9 +1890,11 @@ anychart.mapModule.Chart.prototype.seriesInvalidated = function(event) {
   }
   if (event.hasSignal(anychart.Signal.NEED_UPDATE_COLOR_RANGE)) {
     state |= anychart.ConsistencyState.MAP_COLOR_RANGE;
-    var colorRange = this.colorRange();
-    colorRange.dropBoundsCache();
-    colorRange.invalidate(colorRange.ALL_VISUAL_STATES);
+    var colorRange = this.getCreated('colorRange');
+    if (colorRange) {
+      colorRange.dropBoundsCache();
+      colorRange.invalidate(colorRange.ALL_VISUAL_STATES);
+    }
   }
 
   this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
@@ -2026,6 +2038,7 @@ anychart.mapModule.Chart.prototype.scale = function(opt_value) {
     } else {
       if (!this.scale_) {
         this.scale_ = new anychart.mapModule.scales.Geo();
+        this.scale_.setupByJSON(this.scale_.themeSettings, true);
         this.scale_.listenSignals(this.geoScaleInvalidated_, this);
       }
       this.scale_.setup(opt_value);
@@ -2034,6 +2047,7 @@ anychart.mapModule.Chart.prototype.scale = function(opt_value) {
   } else {
     if (!this.scale_) {
       this.scale_ = new anychart.mapModule.scales.Geo();
+      this.scale_.setupByJSON(this.scale_.themeSettings, true);
       this.scale_.listenSignals(this.geoScaleInvalidated_, this);
     }
     return this.scale_;
@@ -2072,7 +2086,7 @@ anychart.mapModule.Chart.prototype.yScale = function() { return null; };
 /**
  * Sets/gets settings for regions doesn't linked to anything regions.
  * @param {(Object|string)=} opt_value Settings object or boolean value like enabled state.
- * @return {anychart.mapModule.utils.UnboundRegionsSettings|anychart.mapModule.Chart}
+ * @return {string|anychart.mapModule.utils.UnboundRegionsSettings|anychart.mapModule.Chart}
  */
 anychart.mapModule.Chart.prototype.unboundRegions = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -2084,9 +2098,11 @@ anychart.mapModule.Chart.prototype.unboundRegions = function(opt_value) {
     } else {
       this.unboundRegionsSettings_ = anychart.enums.normalizeMapUnboundRegionsMode(opt_value, anychart.enums.MapUnboundRegionsMode.HIDE);
     }
+
     this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     return this;
   }
+
   return this.unboundRegionsSettings_;
 };
 
@@ -2789,7 +2805,7 @@ anychart.mapModule.Chart.prototype.getBoundsWithoutCallouts = function(bounds) {
     callout = /** @type {anychart.mapModule.elements.Callout} */(callouts[i]);
     if (callout && callout.enabled()) {
       callout.parentBounds(bounds);
-      orientation = callout.orientation();
+      orientation = callout['orientation']();
 
       if (orientation == anychart.enums.Orientation.TOP) {
         remainingBounds = callout.getRemainingBounds();
@@ -2827,7 +2843,7 @@ anychart.mapModule.Chart.prototype.getBoundsWithoutAxes = function(bounds) {
   // this.boundsssss.setBounds(bounds);
 
   var boundsWithoutAxis = bounds.clone();
-  if (this.axesSettings_) {
+  if (this.getCreated('axesSettings')) {
     var leftOffset = 0;
     var topOffset = 0;
     var rightOffset = 0;
@@ -2994,7 +3010,8 @@ anychart.mapModule.Chart.prototype.calculate = function() {
 
       var destinationProjection, currentProjection, sourceProjection;
 
-      if ((tx.crs != this.newCrs_ && tx.srcCrs != this.newCrs_) || this.crsAnimation_.enabled()) {
+      if ((tx.crs != this.newCrs_ && tx.srcCrs != this.newCrs_) ||
+          (this.getCreated('crsAnimation') && this.crsAnimation_.getOption('enabled'))) {
         if (!anychart.mapModule.projections.isBaseProjection(tx.srcCrs)) {
           sourceProjection = tx.srcProj;
         }
@@ -3027,9 +3044,10 @@ anychart.mapModule.Chart.prototype.calculate = function() {
         geoData = this.internalGeoData;
       }
 
+      var crsAnimation = this.getCreated('crsAnimation');
       if ((this.crsMapAnimation && this.crsMapAnimation.isStopped()) || !this.crsMapAnimation) {
-        var isAnimate = this.crsAnimation_ && /** @type {boolean} */(this.crsAnimation_.getOption('enabled')) &&
-            /** @type {number} */(this.crsAnimation_.getOption('duration')) > 0 && !initInternalGeoData && changeProjection;
+        var isAnimate = crsAnimation && /** @type {boolean} */(crsAnimation.getOption('enabled')) &&
+            /** @type {number} */(crsAnimation.getOption('duration')) > 0 && !initInternalGeoData && changeProjection;
         if (isAnimate) {
           tx.curProj = new anychart.mapModule.projections.TwinProjection(
               /** @type {anychart.mapModule.projections.Base} */(currentProjection),
@@ -3039,7 +3057,7 @@ anychart.mapModule.Chart.prototype.calculate = function() {
               /** @type {!Array.<anychart.mapModule.geom.Point|anychart.mapModule.geom.Line|anychart.mapModule.geom.Polygon|anychart.mapModule.geom.Collection>} */(geoData),
               sourceProjection,
               tx,
-              /** @type {number} */(this.crsAnimation_.getOption('duration')),
+              /** @type {number} */(crsAnimation.getOption('duration')),
               this != this.getCurrentScene());
           this.crsMapAnimation.listenOnce(goog.fx.Transition.EventType.END,
               /**
@@ -3101,7 +3119,6 @@ anychart.mapModule.Chart.prototype.calculate = function() {
         sum += /** @type {number} */(series.statistics(anychart.enums.Statistics.SERIES_SUM));
         pointsCount += /** @type {number} */(series.statistics(anychart.enums.Statistics.SERIES_POINTS_COUNT));
         //----------------------------------end calc statistics for series
-        // series.calculate();
       }
 
       //----------------------------------calc statistics for series
@@ -3182,6 +3199,8 @@ anychart.mapModule.Chart.prototype.drawContent = function(bounds) {
       series = this.seriesList[i];
       series.suspendSignalsDispatching();
       series.container(this.dataLayer_);
+      if (series.isChoropleth())
+        series.calculate();
       series.resumeSignalsDispatching(false);
     }
     this.applyLabelsOverlapState_ = {};
@@ -3194,20 +3213,18 @@ anychart.mapModule.Chart.prototype.drawContent = function(bounds) {
       callout.invalidate(anychart.ConsistencyState.BOUNDS);
     }
 
-    if (this.axesSettings_) {
+    if (this.getCreated('axesSettings')) {
       axes = this.axesSettings_.getItems();
       for (i = 0, len = axes.length; i < len; i++) {
         axis = axes[i];
         axis.labels().dropCallsCache();
         axis.minorLabels().dropCallsCache();
-        if (!axis.scale())
-          axis.scale(/** @type {anychart.mapModule.scales.Geo} */(this.scale()));
         axis.invalidate(axis.ALL_VISUAL_STATES);
       }
     }
 
-    if (this.gridSettings_) {
-      grids = this.gridSettings_.getItems();
+    if (this.getCreated('gridsSettings')) {
+      grids = this.gridsSettings_.getItems();
       for (i = 0, len = grids.length; i < len; i++) {
         grid = grids[i];
         grid.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.GRIDS_POSITION);
@@ -3220,14 +3237,13 @@ anychart.mapModule.Chart.prototype.drawContent = function(bounds) {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_COLOR_RANGE)) {
-    if (this.colorRange_) {
+    if (this.getCreated('colorRange')) {
       var targetSeries;
       for (i = 0, len = this.seriesList.length; i < len; i++) {
         if (this.seriesList[i].isChoropleth())
           targetSeries = this.seriesList[i];
       }
       if (targetSeries) {
-        targetSeries.calculate();
         this.colorRange_.suspendSignalsDispatching();
         this.colorRange_.scale(targetSeries.colorScale());
         this.colorRange_.target(targetSeries);
@@ -3280,8 +3296,8 @@ anychart.mapModule.Chart.prototype.drawContent = function(bounds) {
 
     this.rootElement.clip(this.getPixelBounds());
 
-    var unboundRegionsStrokeThickness = goog.isObject(this.unboundRegionsSettings_) ?
-        acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(this.unboundRegionsSettings_.stroke())) : 0;
+    var unboundRegionsStrokeThickness = goog.isObject(this.unboundRegions()) ?
+        acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(this.unboundRegions().stroke())) : 0;
 
     if (unboundRegionsStrokeThickness > this.maxStrokeThickness_)
       this.maxStrokeThickness_ = unboundRegionsStrokeThickness;
@@ -3310,7 +3326,7 @@ anychart.mapModule.Chart.prototype.drawContent = function(bounds) {
     scale.setBounds(dataBounds);
     this.dataBounds_ = dataBounds;
 
-    if (this.axesSettings_) {
+    if (this.getCreated('axesSettings')) {
       axes = this.axesSettings_.getItems();
       for (i = 0, len = axes.length; i < len; i++) {
         axis = axes[i];
@@ -3538,7 +3554,7 @@ anychart.mapModule.Chart.prototype.drawContent = function(bounds) {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_AXES)) {
-    if (this.axesSettings_) {
+    if (this.getCreated('axesSettings')) {
       axes = this.axesSettings_.getItems();
       for (i = 0; i < axes.length; i++) {
         axis = axes[i];
@@ -3552,8 +3568,8 @@ anychart.mapModule.Chart.prototype.drawContent = function(bounds) {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_GRIDS)) {
-    if (this.gridSettings_) {
-      grids = this.gridSettings_.getItems();
+    if (this.getCreated('gridsSettings')) {
+      grids = this.gridsSettings_.getItems();
       for (i = 0, len = grids.length; i < len; i++) {
         grid = grids[i];
         grid.suspendSignalsDispatching();
@@ -3579,14 +3595,15 @@ anychart.mapModule.Chart.prototype.drawContent = function(bounds) {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     var path;
-    if (this.unboundRegionsSettings_ == anychart.enums.MapUnboundRegionsMode.AS_IS) {
+    var unboundRegions = this.unboundRegions();
+    if (unboundRegions == anychart.enums.MapUnboundRegionsMode.AS_IS) {
       for (i = 0, len = this.mapPaths.length; i < len; i++) {
         path = this.mapPaths[i];
         path.visible(true);
         path.removeAllListeners();
         delete path.tag;
       }
-    } else if (goog.isObject(this.unboundRegionsSettings_) && this.unboundRegionsSettings_.enabled()) {
+    } else if (goog.isObject(unboundRegions) && unboundRegions.enabled()) {
       for (i = 0, len = this.mapPaths.length; i < len; i++) {
         path = this.mapPaths[i];
         path.visible(true);
@@ -3594,8 +3611,8 @@ anychart.mapModule.Chart.prototype.drawContent = function(bounds) {
         delete path.tag;
         if (anychart.utils.instanceOf(path, acgraph.vector.Shape)) {
           path
-              .fill(this.unboundRegionsSettings_.fill())
-              .stroke(this.unboundRegionsSettings_.stroke());
+              .fill(unboundRegions.fill())
+              .stroke(unboundRegions.stroke());
         }
       }
     } else {
@@ -3635,7 +3652,7 @@ anychart.mapModule.Chart.prototype.drawContent = function(bounds) {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_COLOR_RANGE)) {
-    if (this.colorRange_) {
+    if (this.getCreated('colorRange')) {
       this.colorRange_.suspendSignalsDispatching();
       this.colorRange_.container(this.rootElement);
       this.colorRange_.zIndex(anychart.mapModule.Chart.ZINDEX_COLOR_RANGE);
@@ -4106,8 +4123,9 @@ anychart.mapModule.Chart.prototype.hide = function() {
   }
   root.unlisten(goog.events.EventType.MOUSEMOVE, root.updateTooltip);
 
-  if (this.colorRange().enabled()) {
-    this.colorRange().hideMarker();
+  var colorRange = this.getCreated('colorRange');
+  if (colorRange && colorRange.enabled()) {
+    colorRange.hideMarker();
   }
 };
 
@@ -4287,26 +4305,22 @@ anychart.mapModule.Chart.prototype.drillDown_ = function(id, target) {
     featureProperties[scene.getOption('geoIdField')] = id;
   }
 
-  var json = newScene.serialize();
-  var theme = {'map': anychart.getFullTheme('map')};
-  var diff = anychart.themes.merging.demerge(json, theme);
-  var mapDiff = diff['map'];
-  var series = mapDiff['series'];
+  var mapDefaultTheme = anychart.getFlatTheme('map');
 
-  if (!goog.isDef(mapDiff['maxZoomLevel'])) {
+  if (newScene.getOption('maxZoomLevel') == mapDefaultTheme['maxZoomLevel']) {
     newScene.setOption('maxZoomLevel', (/** @type {number} */(scene.getOption('maxZoomLevel'))));
   }
 
-  if (!goog.isDef(mapDiff['minZoomLevel'])) {
+  if (newScene.getOption('minZoomLevel') == mapDefaultTheme['minZoomLevel']) {
     newScene.setOption('minZoomLevel', (/** @type {number} */(scene.getOption('minZoomLevel'))));
   }
 
-  if (series && series.length && !goog.isDef(series[0]['colorScale'])) {
+  if (newScene.getSeriesCount() && !newScene.getSeries(0).colorScale()) {
     var sourceScale = /** @type {anychart.colorScalesModule.Ordinal|anychart.colorScalesModule.Linear} */(scene.getSeries(0).colorScale());
     newScene.getSeries(0).colorScale(sourceScale);
   }
 
-  if (series && series.length && series[0]['seriesType'] == 'choropleth' && !mapDiff['colorRange']) {
+  if (newScene.getSeriesCount() && newScene.getSeries(0).seriesType() == 'choropleth' && !newScene.getCreated('colorRange') && scene.getCreated('colorRange')) {
     var sourceColorRange = scene.colorRange();
     newScene.colorRange(sourceColorRange.serialize());
 
@@ -4317,7 +4331,7 @@ anychart.mapModule.Chart.prototype.drillDown_ = function(id, target) {
     colorRange.minorLabels()['positionFormatter'](/** @type {Function} */(sourceColorRange.minorLabels()['positionFormatter']()));
   }
 
-  if (!mapDiff['legend']) {
+  if (!newScene.getCreated('legend') && scene.getCreated('legend')) {
     var sourceLegend = scene.legend();
     newScene.legend(sourceLegend.serialize());
   }
@@ -5048,8 +5062,11 @@ anychart.mapModule.Chart.prototype.setupByJSON = function(config, opt_default) {
   if ('defaultCalloutSettings' in config)
     this.defaultCalloutSettings(config['defaultCalloutSettings']);
 
-  this.colorRange().setupInternal(!!opt_default, config['colorRange']);
-  this.unboundRegions(config['unboundRegions']);
+  if ('colorRange' in config)
+    this.colorRange().setupInternal(!!opt_default, config['colorRange']);
+
+  if ('unboundRegions' in config)
+    this.unboundRegions(config['unboundRegions']);
 
   anychart.core.settings.deserialize(this, anychart.mapModule.Chart.PROPERTY_DESCRIPTORS, config);
 
@@ -5068,10 +5085,6 @@ anychart.mapModule.Chart.prototype.setupByJSON = function(config, opt_default) {
     this.scale(scale);
   }
 
-  var series = config['series'];
-  var scales = config['colorScales'];
-  var drillDownMap = config['drillDownMap'];
-
   if ('callouts' in config) {
     var callouts = config['callouts'];
     for (var j = 0, len = callouts.length; j < len; j++) {
@@ -5082,15 +5095,16 @@ anychart.mapModule.Chart.prototype.setupByJSON = function(config, opt_default) {
     }
   }
 
-  if ('axesSettings' in config) {
+  if ('axesSettings' in config)
     this.axes().setupInternal(!!opt_default, config['axesSettings']);
-  }
-  if ('gridsSettings' in config) {
+
+  if ('gridsSettings' in config)
     this.grids().setupInternal(!!opt_default, config['gridsSettings']);
-  }
 
-  this.crosshair(config['crosshair']);
+  if ('crosshair' in config)
+    this.crosshair(config['crosshair']);
 
+  var scales = config['colorScales'];
   var scalesInstances = {};
   if (goog.isObject(scales)) {
     for (i in scales) {
@@ -5114,6 +5128,7 @@ anychart.mapModule.Chart.prototype.setupByJSON = function(config, opt_default) {
     }
   }
 
+  var series = config['series'];
   if (goog.isArray(series)) {
     for (i = 0; i < series.length; i++) {
       json = series[i];
@@ -5138,6 +5153,7 @@ anychart.mapModule.Chart.prototype.setupByJSON = function(config, opt_default) {
     }
   }
 
+  var drillDownMap = config['drillDownMap'];
   if (goog.isObject(drillDownMap)) {
     this.drilldownMap_ = {};
     goog.object.forEach(drillDownMap, function(value, key) {
@@ -5152,7 +5168,10 @@ anychart.mapModule.Chart.prototype.serialize = function() {
   var json = anychart.mapModule.Chart.base(this, 'serialize');
 
   json['unboundRegions'] = goog.isString(this.unboundRegions()) ? this.unboundRegions() : this.unboundRegions().serialize();
-  json['colorRange'] = this.colorRange().serialize();
+
+  if (this.getCreated('colorRange'))
+    json['colorRange'] = this.colorRange().serialize();
+
   json['geoScale'] = this.scale().serialize();
 
   anychart.core.settings.serialize(this, anychart.mapModule.Chart.PROPERTY_DESCRIPTORS, json);
@@ -5221,9 +5240,14 @@ anychart.mapModule.Chart.prototype.serialize = function() {
   if (scales.length)
     json['colorScales'] = scales;
 
-  json['axesSettings'] = this.axes().serialize();
-  json['gridsSettings'] = this.grids().serialize();
-  json['crosshair'] = this.crosshair().serialize();
+  if (this.getCreated('axesSettings'))
+    json['axesSettings'] = this.axes().serialize();
+
+  if (this.getCreated('gridsSettings'))
+    json['gridsSettings'] = this.grids().serialize();
+
+  if (this.getCreated('crosshair'))
+    json['crosshair'] = this.crosshair().serialize();
 
   if (this.drilldownMap_) {
     json['drillDownMap'] = {};
@@ -5244,11 +5268,23 @@ anychart.mapModule.Chart.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.mapModule.Chart.prototype.disposeInternal = function() {
-  goog.dispose(this.shortcutHandler);
+  goog.disposeAll(
+      this.shortcutHandler,
+      this.mouseWheelHandler,
+      this.crosshair_,
+      this.colorRange_,
+      this.callouts_,
+      this.axesSettings_,
+      this.gridSettings_,
+      this.crsAnimation_);
   this.shortcutHandler = null;
-
-  goog.dispose(this.mouseWheelHandler);
   this.mouseWheelHandler = null;
+  this.crosshair_ = null;
+  this.colorRange_ = null;
+  this.callouts_.length = 0;
+  this.axesSettings_ = null;
+  this.gridSettings_ = null;
+  this.crsAnimation_ = null;
 
   if (this.container() && this.container().getStage()) {
     var container = this.container().getStage().getDomWrapper();

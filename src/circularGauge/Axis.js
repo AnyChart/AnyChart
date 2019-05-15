@@ -20,6 +20,8 @@ goog.require('anychart.utils');
 anychart.circularGaugeModule.Axis = function() {
   anychart.circularGaugeModule.Axis.base(this, 'constructor');
 
+  this.addThemes('defaultAxis');
+
   /**
    * @type {Array.<Array.<number>>}
    * @private
@@ -53,9 +55,58 @@ anychart.circularGaugeModule.Axis = function() {
       anychart.ConsistencyState.AXIS_LABELS |
       anychart.ConsistencyState.AXIS_TICKS |
       anychart.ConsistencyState.BOUNDS;
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['overlapMode', this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW],
+    ['startAngle', this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['sweepAngle', this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['fill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['width', this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW],
+    ['radius', this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['cornersRounding', this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['drawFirstLabel', this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['drawLastLabel', this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED]
+  ]);
 };
 goog.inherits(anychart.circularGaugeModule.Axis, anychart.core.VisualBase);
 
+
+/**
+ * Circular gauge axis descriptors.
+ * @type {!Object<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.circularGaugeModule.Axis.OWN_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  function sweepAngleNormalizer(opt_value) {
+    return goog.isNull(opt_value) ? opt_value : goog.math.clamp(anychart.utils.toNumber(opt_value) || 0, -360, 360);
+  }
+
+  function startAngleNormalizer(opt_value) {
+    return goog.isNull(opt_value) ? opt_value : goog.math.standardAngle(anychart.utils.toNumber(opt_value) || 0);
+  }
+
+  function nullPercentNormalizer(opt_value) {
+    return goog.isNull(opt_value) ? opt_value : anychart.utils.normalizeToPercent(opt_value);
+  }
+
+  var d = anychart.core.settings.descriptors;
+  anychart.core.settings.createDescriptors(map, [
+    d.FILL,
+    d.OVERLAP_MODE,
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'startAngle', startAngleNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'width', nullPercentNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'sweepAngle', sweepAngleNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'radius', nullPercentNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'cornersRounding', anychart.utils.normalizeToPercent],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'drawFirstLabel', anychart.core.settings.booleanNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'drawLastLabel', anychart.core.settings.booleanNormalizer]
+  ]);
+
+  return map;
+})();
+anychart.core.settings.populate(anychart.circularGaugeModule.Axis, anychart.circularGaugeModule.Axis.OWN_DESCRIPTORS);
 
 /**
  * Supported consistency states.
@@ -142,24 +193,10 @@ anychart.circularGaugeModule.Axis.prototype.minorTicks_ = null;
 
 
 /**
- * @type {string|acgraph.vector.Fill}
- * @private
- */
-anychart.circularGaugeModule.Axis.prototype.fill_;
-
-
-/**
  * @type {anychart.scales.Base}
  * @private
  */
 anychart.circularGaugeModule.Axis.prototype.scale_;
-
-
-/**
- * @type {anychart.enums.LabelsOverlapMode}
- * @private
- */
-anychart.circularGaugeModule.Axis.prototype.overlapMode_;
 
 
 /**
@@ -229,9 +266,9 @@ anychart.circularGaugeModule.Axis.prototype.scaleInvalidated_ = function(event) 
 anychart.circularGaugeModule.Axis.prototype.minorLabels = function(opt_value) {
   if (!this.minorLabels_) {
     this.minorLabels_ = new anychart.core.ui.CircularLabelsFactory();
+    this.setupCreated('minorLabels', this.minorLabels_);
     this.minorLabels_.setParentEventTarget(this);
     this.minorLabels_.listenSignals(this.labelsInvalidated_, this);
-    this.registerDisposable(this.minorLabels_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -251,9 +288,10 @@ anychart.circularGaugeModule.Axis.prototype.minorLabels = function(opt_value) {
 anychart.circularGaugeModule.Axis.prototype.labels = function(opt_value) {
   if (!this.labels_) {
     this.labels_ = new anychart.core.ui.CircularLabelsFactory();
+    this.setupCreated('labels', this.labels_);
+    this.labels_.setupInternal(true, this.getThemeOption('labels'));
     this.labels_.setParentEventTarget(this);
     this.labels_.listenSignals(this.labelsInvalidated_, this);
-    this.registerDisposable(this.labels_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -278,48 +316,16 @@ anychart.circularGaugeModule.Axis.prototype.labelsInvalidated_ = function(event)
 
 
 /**
- * @param {boolean=} opt_value Drawing flag.
- * @return {boolean|!anychart.circularGaugeModule.Axis} Drawing flag or itself for method chaining.
- */
-anychart.circularGaugeModule.Axis.prototype.drawFirstLabel = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.drawFirstLabel_ != opt_value) {
-      this.drawFirstLabel_ = opt_value;
-      this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.drawFirstLabel_;
-};
-
-
-/**
- * @param {boolean=} opt_value Drawing flag.
- * @return {boolean|!anychart.circularGaugeModule.Axis} Drawing flag or itself for method chaining.
- */
-anychart.circularGaugeModule.Axis.prototype.drawLastLabel = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.drawLastLabel_ != opt_value) {
-      this.drawLastLabel_ = opt_value;
-      this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.drawLastLabel_;
-};
-
-
-/**
  * @param {(Object|boolean|null)=} opt_value Axis ticks.
  * @return {!(anychart.circularGaugeModule.AxisTicks|anychart.circularGaugeModule.Axis)} Axis ticks or itself for method chaining.
  */
 anychart.circularGaugeModule.Axis.prototype.minorTicks = function(opt_value) {
   if (!this.minorTicks_) {
     this.minorTicks_ = new anychart.circularGaugeModule.AxisTicks();
+    this.setupCreated('minorTicks', this.minorTicks_);
     this.minorTicks_.setParentEventTarget(this);
     this.minorTicks_.setAxis(this);
     this.minorTicks_.listenSignals(this.ticksInvalidated_, this);
-    this.registerDisposable(this.minorTicks_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -337,10 +343,10 @@ anychart.circularGaugeModule.Axis.prototype.minorTicks = function(opt_value) {
 anychart.circularGaugeModule.Axis.prototype.ticks = function(opt_value) {
   if (!this.ticks_) {
     this.ticks_ = new anychart.circularGaugeModule.AxisTicks();
+    this.setupCreated('ticks', this.ticks_);
     this.ticks_.setParentEventTarget(this);
     this.ticks_.setAxis(this);
     this.ticks_.listenSignals(this.ticksInvalidated_, this);
-    this.registerDisposable(this.ticks_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -369,140 +375,6 @@ anychart.circularGaugeModule.Axis.prototype.ticksInvalidated_ = function(event) 
 };
 
 
-/**
- * @param {(null|string|number)=} opt_value .
- * @return {(number|anychart.circularGaugeModule.Axis)} .
- */
-anychart.circularGaugeModule.Axis.prototype.startAngle = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : goog.math.standardAngle(anychart.utils.toNumber(opt_value) || 0);
-    if (this.startAngle_ != opt_value) {
-      this.startAngle_ = opt_value;
-      this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.startAngle_;
-  }
-};
-
-
-/**
- * @param {(null|string|number)=} opt_value .
- * @return {(number|anychart.circularGaugeModule.Axis)} .
- */
-anychart.circularGaugeModule.Axis.prototype.sweepAngle = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : goog.math.clamp(anychart.utils.toNumber(opt_value) || 0, -360, 360);
-    if (this.sweepAngle_ != opt_value) {
-      this.sweepAngle_ = opt_value;
-      this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.sweepAngle_;
-  }
-};
-
-
-/**
- * Axis radius.
- * @param {(null|number|string)=} opt_value .
- * @return {string|anychart.circularGaugeModule.Axis} .
- */
-anychart.circularGaugeModule.Axis.prototype.radius = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : anychart.utils.normalizeToPercent(opt_value);
-    if (this.radius_ != opt_value) {
-      this.radius_ = opt_value;
-      this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.radius_;
-  }
-};
-
-
-/**
- * Axis ends radius.
- * @param {(null|number|string)=} opt_value .
- * @return {string|anychart.circularGaugeModule.Axis} .
- */
-anychart.circularGaugeModule.Axis.prototype.cornersRounding = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizeToPercent(opt_value);
-    if (this.cornersRounding_ != opt_value) {
-      this.cornersRounding_ = opt_value;
-      this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.cornersRounding_;
-  }
-};
-
-
-/**
- * Axis width.
- * @param {(null|number|string)=} opt_value .
- * @return {string|anychart.circularGaugeModule.Axis} .
- */
-anychart.circularGaugeModule.Axis.prototype.width = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : anychart.utils.normalizeToPercent(opt_value);
-    if (this.width_ != opt_value) {
-      this.width_ = opt_value;
-      this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  } else {
-    return this.width_;
-  }
-};
-
-
-/**
- * Axis fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.circularGaugeModule.Axis} .
- */
-anychart.circularGaugeModule.Axis.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var fill = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (fill != this.fill_) {
-      this.fill_ = fill;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.fill_;
-};
-
-
-/**
- * @param {(anychart.enums.LabelsOverlapMode|string|boolean)=} opt_value Value to set.
- * @return {anychart.enums.LabelsOverlapMode|string|anychart.circularGaugeModule.Axis} Drawing flag or itself for method chaining.
- */
-anychart.circularGaugeModule.Axis.prototype.overlapMode = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var overlap = anychart.enums.normalizeLabelsOverlapMode(opt_value, this.overlapMode_);
-    if (this.overlapMode_ != overlap) {
-      this.overlapMode_ = overlap;
-      this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.overlapMode_;
-};
-
-
 //----------------------------------------------------------------------------------------------------------------------
 //                                                Axis internal methods
 //----------------------------------------------------------------------------------------------------------------------
@@ -527,9 +399,20 @@ anychart.circularGaugeModule.Axis.prototype.getPixRadius = function() {
  * @return {number}
  */
 anychart.circularGaugeModule.Axis.prototype.getStartAngle = function() {
-  return goog.isDefAndNotNull(this.startAngle_) ?
-      this.startAngle_ + anychart.circularGaugeModule.Chart.DEFAULT_START_ANGLE :
+  var startAngle = this.getOption('startAngle');
+  return goog.isDefAndNotNull(startAngle) ?
+      startAngle + anychart.circularGaugeModule.Chart.DEFAULT_START_ANGLE :
       this.gauge_.getStartAngle();
+};
+
+
+/**
+ * Internal getter for sweep angle. All for human comfort.
+ * @return {number}
+ */
+anychart.circularGaugeModule.Axis.prototype.getSweepAngle = function() {
+  var sweepAngle = /** @type {number} */(this.getOption('sweepAngle'));
+  return goog.isDef(sweepAngle) ? sweepAngle : /** @type {number} */(this.gauge_.getOption('sweepAngle'));
 };
 
 
@@ -553,12 +436,14 @@ anychart.circularGaugeModule.Axis.prototype.dropBoundsCache_ = function() {
  */
 anychart.circularGaugeModule.Axis.prototype.getOverlappedLabels_ = function() {
   if (!this.overlappedLabels_ || this.hasInvalidationState(anychart.ConsistencyState.AXIS_OVERLAP)) {
-    if (this.overlapMode_ == anychart.enums.LabelsOverlapMode.ALLOW_OVERLAP) {
+    if (this.getOption('overlapMode') == anychart.enums.LabelsOverlapMode.ALLOW_OVERLAP) {
       return false;
     } else {
       var scale = /** @type {anychart.scales.ScatterBase} */(this.scale());
       var labels = [];
       var minorLabels = [];
+      var drawFirstLabel = /** @type {boolean} */(this.getOption('drawFirstLabel'));
+      var drawLastLabel = /** @type {boolean} */(this.getOption('drawLastLabel'));
 
       var scaleTicksArr = scale.ticks().get();
       var ticksArrLen = scaleTicksArr.length;
@@ -572,7 +457,7 @@ anychart.circularGaugeModule.Axis.prototype.getOverlappedLabels_ = function() {
        * Index of previous major label which is displayed.
        * @type {number}
        */
-      var prevDrawableLabel = this.drawLastLabel() && !this.drawFirstLabel() ? ticksArrLen - 1 : -1;
+      var prevDrawableLabel = drawLastLabel && !drawFirstLabel ? ticksArrLen - 1 : -1;
       /**
        * Index of the next label, which we should display and it doesn't overlap previous major label and the
        * very last if it is on.
@@ -609,7 +494,7 @@ anychart.circularGaugeModule.Axis.prototype.getOverlappedLabels_ = function() {
           k = i;
           while (nextDrawableLabel == -1 && k < ticksArrLen) {
             //bounds of current label
-            if ((!k && this.drawFirstLabel()) || (k == ticksArrLen - 1 && this.drawLastLabel()) || (k != 0 && k != ticksArrLen - 1))
+            if ((!k && drawFirstLabel) || (k == ticksArrLen - 1 && drawLastLabel) || (k != 0 && k != ticksArrLen - 1))
               bounds1 = this.getLabelBounds_(k, true);
             else
               bounds1 = null;
@@ -621,7 +506,7 @@ anychart.circularGaugeModule.Axis.prototype.getOverlappedLabels_ = function() {
               bounds2 = null;
 
             //for circular usage we need compare all labels with first drawable label
-            if (this.drawLastLabel() && !this.drawFirstLabel()) {
+            if (drawLastLabel && !drawFirstLabel) {
               bounds3 = k == ticksArrLen - 1 ? null : this.getLabelBounds_(ticksArrLen - 1, true);
             } else if (k != firstDrawableLabel)
               bounds3 = this.getLabelBounds_(firstDrawableLabel, true);
@@ -631,7 +516,7 @@ anychart.circularGaugeModule.Axis.prototype.getOverlappedLabels_ = function() {
             if (!(anychart.math.checkRectIntersection(bounds1, bounds2) ||
                 anychart.math.checkRectIntersection(bounds1, bounds3))) {
               tempRatio = scale.transform(scaleTicksArr[k]);
-              if ((tempRatio <= 0 && this.drawFirstLabel()) || (tempRatio >= 1 && this.drawLastLabel()))
+              if ((tempRatio <= 0 && drawFirstLabel) || (tempRatio >= 1 && drawLastLabel))
                 nextDrawableLabel = k;
               else if (tempRatio > 0 && tempRatio < 1)
                 nextDrawableLabel = k;
@@ -722,22 +607,23 @@ anychart.circularGaugeModule.Axis.prototype.getLabelRadius_ = function(height, i
   var ticks = isMajor ? this.ticks() : this.minorTicks();
   var labels = isMajor ? this.labels() : this.minorLabels();
 
-  var position = anychart.enums.normalizeGaugeSidePosition(labels.getOption('position'));
+  var labelsPosition = anychart.enums.normalizeGaugeSidePosition(labels.getOption('position'));
 
   var radius = this.pixRadius_;
-  if (position == anychart.enums.GaugeSidePosition.OUTSIDE) {
+  var ticksPosition = /** @type {anychart.enums.GaugeSidePosition} */(ticks.getOption('position'));
+  if (labelsPosition == anychart.enums.GaugeSidePosition.OUTSIDE) {
     radius += this.axisWidth_ / 2 + radiusOffset;
     if (ticks.enabled())
-      if (ticks.position() == anychart.enums.GaugeSidePosition.OUTSIDE)
+      if (ticksPosition == anychart.enums.GaugeSidePosition.OUTSIDE)
         radius += ticks.getPixLength();
-      else if (ticks.position() == anychart.enums.GaugeSidePosition.CENTER)
+      else if (ticksPosition == anychart.enums.GaugeSidePosition.CENTER)
         radius += ticks.getPixLength() > this.axisWidth_ ? (ticks.getPixLength() - this.axisWidth_) / 2 : 0;
-  } else if (position == anychart.enums.GaugeSidePosition.INSIDE) {
+  } else if (labelsPosition == anychart.enums.GaugeSidePosition.INSIDE) {
     radius -= this.axisWidth_ / 2 + radiusOffset;
     if (ticks.enabled())
-      if (ticks.position() == anychart.enums.GaugeSidePosition.INSIDE)
+      if (ticksPosition == anychart.enums.GaugeSidePosition.INSIDE)
         radius -= ticks.getPixLength();
-      else if (ticks.position() == anychart.enums.GaugeSidePosition.CENTER)
+      else if (ticksPosition == anychart.enums.GaugeSidePosition.CENTER)
         radius -= ticks.getPixLength() > this.axisWidth_ ? (ticks.getPixLength() - this.axisWidth_) / 2 : 0;
   }
 
@@ -819,7 +705,7 @@ anychart.circularGaugeModule.Axis.prototype.getLabelBounds_ = function(index, is
   radius += anychart.utils.normalizeSize(/** @type {number|string} */(offsetY), this.gauge_.getPixRadius());
 
   var startAngle = this.getStartAngle();
-  var sweepAngle = goog.isDef(this.sweepAngle_) ? this.sweepAngle_ : /** @type {number} */ (this.gauge_.getOption('sweepAngle'));
+  var sweepAngle = this.getSweepAngle();
 
   var angle = goog.math.standardAngle(startAngle + ratio * sweepAngle);
   angle += anychart.utils.normalizeSize(/** @type {number|string} */(offsetX), sweepAngle);
@@ -967,7 +853,7 @@ anychart.circularGaugeModule.Axis.prototype.drawLabel_ = function(index, angle, 
   label = labels.add(formatProvider, positionProvider, index);
 
   if (!autoRotate) {
-    var sweepAngle = goog.isDef(this.sweepAngle_) ? this.sweepAngle_ : /** @type {number} */ (this.gauge_.getOption('sweepAngle'));
+    var sweepAngle = this.getSweepAngle();
     var offsetX = label && goog.isDef(label['offsetX']()) ? label['offsetX']() : labels['offsetX']();
     angle += anychart.utils.normalizeSize(/** @type {number|string} */(offsetX), sweepAngle);
 
@@ -1016,23 +902,24 @@ anychart.circularGaugeModule.Axis.prototype.draw = function() {
   var ticksDrawer, labelsDrawer, minorTicksDrawer, minorLabelsDrawer;
 
   var startAngle = this.getStartAngle();
-  var sweepAngle = goog.isDefAndNotNull(this.sweepAngle_) ? this.sweepAngle_ : /** @type {number} */ (this.gauge_.getOption('sweepAngle'));
+  var sweepAngle = this.getSweepAngle();
   var cx = this.gauge_.getCx();
   var cy = this.gauge_.getCy();
 
   if (!this.line_) {
     this.line_ = acgraph.path();
     this.bindHandlersToGraphics(this.line_);
-    this.registerDisposable(this.line_);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
+    var radius = /** @type {null|string|number} */(this.getOption('radius'));
+    var width = /** @type {null|number|string} */(this.getOption('width'));
     this.pixRadius_ = anychart.utils.normalizeSize(
-        goog.isDefAndNotNull(this.radius_) ? this.radius_ : '100%', this.gauge_.getPixRadius());
+        goog.isDefAndNotNull(radius) ? radius : '100%', this.gauge_.getPixRadius());
     this.axisWidth_ = anychart.utils.normalizeSize(
-        goog.isDefAndNotNull(this.width_) ? this.width_ : '3%', this.gauge_.getPixRadius());
+        goog.isDefAndNotNull(width) ? width : '3%', this.gauge_.getPixRadius());
 
-    var cornersRoundingPix = anychart.utils.normalizeSize(/** @type {string} */ (this.cornersRounding()), this.axisWidth_);
+    var cornersRoundingPix = anychart.utils.normalizeSize(/** @type {string} */ (this.getOption('cornersRounding')), this.axisWidth_);
 
     var x, y;
     var innerR = this.pixRadius_ - this.axisWidth_ / 2;
@@ -1086,7 +973,7 @@ anychart.circularGaugeModule.Axis.prototype.draw = function() {
   this.minorTicks().suspendSignalsDispatching();
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    this.line_.fill(this.fill_);
+    this.line_.fill(/** @type {acgraph.vector.Fill} */(this.getOption('fill')));
     this.line_.stroke(null);
 
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
@@ -1234,6 +1121,7 @@ anychart.circularGaugeModule.Axis.prototype.draw = function() {
 /** @inheritDoc */
 anychart.circularGaugeModule.Axis.prototype.serialize = function() {
   var json = anychart.circularGaugeModule.Axis.base(this, 'serialize');
+  anychart.core.settings.serialize(this, anychart.circularGaugeModule.Axis.OWN_DESCRIPTORS, json);
 
   json['scale'] = this.scale().serialize();
 
@@ -1242,24 +1130,6 @@ anychart.circularGaugeModule.Axis.prototype.serialize = function() {
   json['labels'] = this.labels().serialize();
   json['minorLabels'] = this.minorLabels().serialize();
 
-  if (goog.isDef(this.startAngle()))
-    json['startAngle'] = this.startAngle();
-  if (goog.isDef(this.sweepAngle()))
-    json['sweepAngle'] = this.sweepAngle();
-
-  if (goog.isDef(this.width()))
-    json['width'] = this.width();
-  if (goog.isDef(this.radius()))
-    json['radius'] = this.radius();
-  if (goog.isDef(this.cornersRounding()))
-    json['cornersRounding'] = this.cornersRounding();
-
-  json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill()));
-  json['overlapMode'] = this.overlapMode();
-
-  json['drawFirstLabel'] = this.drawFirstLabel();
-  json['drawLastLabel'] = this.drawLastLabel();
-
   return json;
 };
 
@@ -1267,6 +1137,8 @@ anychart.circularGaugeModule.Axis.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.circularGaugeModule.Axis.prototype.setupByJSON = function(config, opt_default) {
   anychart.circularGaugeModule.Axis.base(this, 'setupByJSON', config, opt_default);
+
+  anychart.core.settings.deserialize(this, anychart.circularGaugeModule.Axis.OWN_DESCRIPTORS, config, opt_default);
 
   var scale;
   var json = config['scale'];
@@ -1286,18 +1158,18 @@ anychart.circularGaugeModule.Axis.prototype.setupByJSON = function(config, opt_d
 
   this.labels().setupInternal(!!opt_default, config['labels']);
   this.minorLabels().setupInternal(!!opt_default, config['minorLabels']);
+};
 
-  this.startAngle(config['startAngle']);
-  this.sweepAngle(config['sweepAngle']);
 
-  this.overlapMode(config['overlapMode']);
-  this.fill(config['fill']);
-  this.width(config['width']);
-  this.radius(config['radius']);
-  this.cornersRounding(config['cornersRounding']);
-
-  this.drawFirstLabel(config['drawFirstLabel']);
-  this.drawLastLabel(config['drawLastLabel']);
+/** @inheritDoc */
+anychart.circularGaugeModule.Axis.prototype.disposeInternal = function() {
+  goog.disposeAll(this.labels_, this.minorLabels_, this.ticks_, this.minorTicks_, this.line_);
+  this.minorLabels_ = null;
+  this.labels_ = null;
+  this.ticks_ = null;
+  this.minorTicks_ = null;
+  this.line_ = null;
+  anychart.circularGaugeModule.Axis.base(this, 'disposeInternal');
 };
 
 
@@ -1306,24 +1178,22 @@ anychart.circularGaugeModule.Axis.prototype.setupByJSON = function(config, opt_d
   var proto = anychart.circularGaugeModule.Axis.prototype;
   proto['scale'] = proto.scale;
 
-  proto['overlapMode'] = proto.overlapMode;
-
   proto['ticks'] = proto.ticks;
   proto['minorTicks'] = proto.minorTicks;
 
   proto['labels'] = proto.labels;
   proto['minorLabels'] = proto.minorLabels;
 
-  proto['startAngle'] = proto.startAngle;
-  proto['sweepAngle'] = proto.sweepAngle;
-
-  proto['fill'] = proto.fill;
-  proto['width'] = proto.width;
-  proto['radius'] = proto.radius;
-  proto['cornersRounding'] = proto.cornersRounding;
-
-  proto['drawFirstLabel'] = proto.drawFirstLabel;
-  proto['drawLastLabel'] = proto.drawLastLabel;
+  // auto
+  // proto['overlapMode'] = proto.overlapMode;
+  // proto['startAngle'] = proto.startAngle;
+  // proto['sweepAngle'] = proto.sweepAngle;
+  // proto['fill'] = proto.fill;
+  // proto['width'] = proto.width;
+  // proto['radius'] = proto.radius;
+  // proto['cornersRounding'] = proto.cornersRounding;
+  // proto['drawFirstLabel'] = proto.drawFirstLabel;
+  // proto['drawLastLabel'] = proto.drawLastLabel;
 })();
 
 

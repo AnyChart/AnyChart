@@ -1238,7 +1238,6 @@ anychart.core.series.Base.prototype.axesLinesSpace = function(opt_spaceOrTopOrTo
   if (!this.axesLinesSpace_) {
     this.axesLinesSpace_ = new anychart.core.utils.Padding();
     this.axesLinesSpace_.set(0);
-    this.registerDisposable(this.axesLinesSpace_);
   }
 
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
@@ -1735,8 +1734,8 @@ anychart.core.series.Base.prototype.getLegendItemData = function(itemsFormat) {
   json['disabled'] = 'disabled' in json ? !!json['disabled'] : !this.enabled();
   json['meta'] = /** @type {Object} */ (this.meta());
   if (json['iconType'] == anychart.enums.LegendItemIconType.MARKER && !this.check(anychart.core.drawers.Capabilities.IS_MARKER_BASED)) {
-    json['iconFill'] = this.normal_.markers().fill();
-    json['iconStroke'] = this.normal_.markers().stroke();
+    json['iconFill'] = this.normal_.markers().getOption('fill');
+    json['iconStroke'] = this.normal_.markers().getOption('stroke');
   }
   json['iconType'] = this.getLegendIconType(json['iconType'], context);
   json['iconEnabled'] = 'iconEnabled' in json ? !!json['iconEnabled'] : true;
@@ -1758,8 +1757,8 @@ anychart.core.series.Base.prototype.getLegendItemData = function(itemsFormat) {
 
   if (this.supportsMarkers() && this.normal_.markers().enabled()) {
     json['iconMarkerType'] = json['iconMarkerType'] || this.normal_.markers().type();
-    json['iconMarkerFill'] = json['iconMarkerFill'] || this.normal_.markers().fill();
-    json['iconMarkerStroke'] = json['iconMarkerStroke'] || this.normal_.markers().stroke();
+    json['iconMarkerFill'] = json['iconMarkerFill'] || this.normal_.markers().getOption('fill');
+    json['iconMarkerStroke'] = json['iconMarkerStroke'] || this.normal_.markers().getOption('stroke');
   } else {
     json['iconMarkerType'] = null;
     json['iconMarkerFill'] = null;
@@ -2551,12 +2550,22 @@ anychart.core.series.Base.prototype.setupLabelDrawingPlan = function(label,
     seriesExtremumState, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
     seriesState, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
     chartState, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
+    label, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
     label, anychart.utils.ExtractSettingModes.AUTO_SETTINGS,
     seriesExtremumNormal, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
     seriesNormal, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
     chartNormal, anychart.utils.ExtractSettingModes.THEME_SETTINGS
   ]));
 };
+
+
+/**
+ * Applies additional settings to the label, if needed.
+ * Only used in Timeline chart.
+ * @param {anychart.core.ui.LabelsFactory.Label} label
+ * @param {number|undefined} index
+ */
+anychart.core.series.Base.prototype.applyAdditionalLabelSettings = goog.nullFunction;
 
 
 /**
@@ -2596,6 +2605,8 @@ anychart.core.series.Base.prototype.drawSingleFactoryElement = function(factorie
       label.autoAnchor(this.resolveAutoAnchor(opt_position, Number(label.getFinalSettings('rotation')) || 0));
       this.checkBoundsCollision(/** @type {anychart.core.ui.LabelsFactory} */(mainFactory), label);
     }
+
+    this.applyAdditionalLabelSettings(label, index);
   } else {
     var currentFactory = /** @type {anychart.core.ui.MarkersFactory} */(factories[1] || mainFactory);
     var iterator = this.getIterator();
@@ -2820,7 +2831,7 @@ anychart.core.series.Base.prototype.getMarkerFill = function(opt_baseFill) {
  * @protected
  */
 anychart.core.series.Base.prototype.getMarkerStroke = function() {
-  return /** @type {acgraph.vector.Stroke} */(anychart.color.darken(/** @type {acgraph.vector.Fill} */(this.normal_.markers().fill())));
+  return /** @type {acgraph.vector.Stroke} */(anychart.color.darken(/** @type {acgraph.vector.Fill} */(this.normal_.markers().getOption('fill'))));
 };
 
 
@@ -3053,7 +3064,6 @@ anychart.core.series.Base.prototype.remove = function() {
 anychart.core.series.Base.prototype.a11y = function(opt_enabledOrJson) {
   if (!this.a11y_) {
     this.a11y_ = new anychart.core.utils.SeriesA11y(this);
-    this.registerDisposable(this.a11y_);
     this.a11y_.listenSignals(this.onA11ySignal_, this);
     if (anychart.utils.instanceOf(this.chart, anychart.core.Chart)) {
       this.a11y_.parentA11y(/** @type {anychart.core.utils.A11y} */ (/** @type {anychart.core.Chart} */ (this.chart).a11y()));
@@ -3457,7 +3467,30 @@ anychart.core.series.Base.prototype.applyZIndex = function() {
 anychart.core.series.Base.prototype.calcFullClipBounds = function() {
   var clip = this.clip_;
   if (goog.isBoolean(clip)) {
-    clip = this.boundsWithoutAxes;
+    clip = this.boundsWithoutAxes.clone();
+
+    /*
+    Apply pixelShift to clip to synchronize it with other pixelShifted elements.
+    Like axes, ticks, etc.
+    Rounding is used to avoid transparent pixels appearing on line ends
+    if line is drawn to or from nonround value (at least in chrome).
+     */
+    clip = anychart.utils.applyPixelShiftToRect(clip, 1);
+
+    var top = clip.top;
+    var bottom = clip.getBottom();
+    top = Math.floor(top);
+    bottom = Math.ceil(bottom);
+    clip.top = top;
+    clip.height = bottom - top;
+
+    var left = clip.left;
+    var right = clip.getRight();
+    left = Math.floor(left);
+    right = Math.ceil(right);
+    clip.left = left;
+    clip.width = right - left;
+
     if (this.check(anychart.core.drawers.Capabilities.IS_3D_BASED)) {
       clip = (/** @type {anychart.math.Rect} */(clip)).clone();
       var provider = this.get3DProvider();
@@ -4708,23 +4741,30 @@ anychart.core.series.Base.prototype.disposeInternal = function() {
       this.tooltipInternal,
       this.legendItem_,
       this.error_,
-      this.renderingSettings_
+      this.renderingSettings_,
+      this.axesLinesSpace_,
+      this.a11y_
   );
+  this.normal_ = null;
+  this.hovered_ = null;
+  this.selected_ = null;
+  this.drawer_ = null;
   this.rootLayer = null;
   this.errorPaths_ = null;
   this.yScale_ = null;
+  this.axesLinesSpace_ = null;
+  this.a11y_ = null;
+  this.error_ = null;
+  this.renderingSettings_ = null;
+  this.legendItem_ = null;
+  this.tooltipInternal = null;
+  delete this.shapeManager;
   delete this.chart;
   delete this.plot;
   delete this.iterator;
   delete this.themeSettings;
   delete this.autoSettings;
   delete this.ownSettings;
-  delete this.shapeManager;
-  delete this.drawer;
-  delete this.tooltipInternal;
-  delete this.legendItem_;
-  delete this.error_;
-  delete this.renderingSettings_;
   anychart.core.series.Base.base(this, 'disposeInternal');
 };
 

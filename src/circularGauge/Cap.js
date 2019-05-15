@@ -16,48 +16,44 @@ anychart.circularGaugeModule.Cap = function() {
   anychart.circularGaugeModule.Cap.base(this, 'constructor');
 
   /**
-   * Cap radius.
-   * @type {string}
-   * @private
-   */
-  this.radius_;
-
-  /**
-   * Ticks stroke.
-   * @type {acgraph.vector.Stroke|string}
-   * @private
-   */
-  this.stroke_;
-
-  /**
-   * Ticks fill.
-   * @type {acgraph.vector.Fill|string}
-   * @private
-   */
-  this.fill_;
-
-  /**
-   * Ticks hatch fill.
-   * @type {acgraph.vector.PatternFill|acgraph.vector.HatchFill|boolean}
-   * @private
-   */
-  this.hatchFill_;
-
-  /**
    * Root layer.
-   * @type {!acgraph.vector.Layer}
+   * @type {acgraph.vector.Layer}
    * @private
    */
   this.rootLayer_ = acgraph.layer();
 
   /**
    * Cap dom element.
-   * @type {!acgraph.vector.Circle}
+   * @type {acgraph.vector.Circle}
    * @private
    */
   this.domElement_ = acgraph.circle();
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['radius', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['stroke', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['fill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['hatchFill', anychart.ConsistencyState.GAUGE_HATCH_FILL, anychart.Signal.NEEDS_REDRAW]
+  ]);
 };
 goog.inherits(anychart.circularGaugeModule.Cap, anychart.core.VisualBase);
+
+
+anychart.circularGaugeModule.Cap.OWN_DESCRIPTORS = (function(){
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  var d = anychart.core.settings.descriptors;
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'radius', anychart.core.settings.nullOrPercentNormalizer],
+    d.STROKE,
+    d.FILL,
+    d.HATCH_FILL
+  ]);
+
+  return map;
+})();
+anychart.core.settings.populate(anychart.circularGaugeModule.Cap, anychart.circularGaugeModule.Cap.OWN_DESCRIPTORS);
 
 
 /**
@@ -68,101 +64,6 @@ anychart.circularGaugeModule.Cap.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.APPEARANCE |
     anychart.ConsistencyState.GAUGE_HATCH_FILL;
-
-
-/**
- * Cap radius (c)cap.
- * @param {(number|string)=} opt_value .
- * @return {string|anychart.circularGaugeModule.Cap} .
- */
-anychart.circularGaugeModule.Cap.prototype.radius = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
-    if (this.radius_ != opt_value) {
-      this.radius_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.radius_;
-  }
-};
-
-
-/**
- * Cap stroke (c)cap.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {(!anychart.circularGaugeModule.Cap|acgraph.vector.Stroke)} .
- */
-anychart.circularGaugeModule.Cap.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (stroke != this.stroke_) {
-      this.stroke_ = stroke;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.stroke_;
-};
-
-
-/**
- * Cap fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {(!anychart.circularGaugeModule.Cap|acgraph.vector.Fill)} .
- */
-anychart.circularGaugeModule.Cap.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var fill = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (fill != this.fill_) {
-      this.fill_ = fill;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.fill_;
-};
-
-
-/**
- * Cap hatch fill.
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|acgraph.vector.HatchFill.HatchFillType|
- * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|boolean|anychart.circularGaugeModule.Cap} Hatch fill.
- */
-anychart.circularGaugeModule.Cap.prototype.hatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrTypeOrState)) {
-    if (goog.isBoolean(opt_patternFillOrTypeOrState))
-      opt_patternFillOrTypeOrState = opt_patternFillOrTypeOrState ?
-          anychart.circularGaugeModule.Chart.DEFAULT_HATCH_FILL_TYPE : 'none';
-
-    var hatchFill = acgraph.vector.normalizeHatchFill.apply(null, arguments);
-
-    if (hatchFill !== this.hatchFill_) {
-      this.hatchFill_ = hatchFill;
-      this.invalidate(anychart.ConsistencyState.GAUGE_HATCH_FILL,
-          anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.hatchFill_;
-};
 
 
 /** @inheritDoc */
@@ -197,20 +98,21 @@ anychart.circularGaugeModule.Cap.prototype.draw = function() {
     return this;
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    this.domElement_.fill(this.fill_);
-    this.domElement_.stroke(this.stroke_);
+    this.domElement_.fill(/** @type {acgraph.vector.Fill} */(this.getOption('fill')));
+    this.domElement_.stroke(/** @type {acgraph.vector.Stroke} */(this.getOption('stroke')));
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
 
+  var hatchFill = this.getOption('hatchFill');
   if (this.hasInvalidationState(anychart.ConsistencyState.GAUGE_HATCH_FILL)) {
-    if (!this.hatchFillElement_ && !anychart.utils.isNone(this.hatchFill_)) {
+    if (!this.hatchFillElement_ && hatchFill && !anychart.utils.isNone(hatchFill)) {
       this.hatchFillElement_ = acgraph.circle();
       this.hatchFillElement_.parent(this.rootLayer_);
       this.hatchFillElement_.zIndex(1);
     }
 
     if (this.hatchFillElement_) {
-      this.hatchFillElement_.fill(this.hatchFill_);
+      this.hatchFillElement_.fill(hatchFill);
       this.hatchFillElement_.stroke(null);
 
       this.invalidate(anychart.ConsistencyState.BOUNDS);
@@ -236,7 +138,7 @@ anychart.circularGaugeModule.Cap.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    var pixRadius = anychart.utils.normalizeSize(this.radius_, this.gauge_.getPixRadius());
+    var pixRadius = anychart.utils.normalizeSize(/** @type {null|string} */(this.getOption('radius')), this.gauge_.getPixRadius());
     var cx = this.gauge_.getCx();
     var cy = this.gauge_.getCy();
 
@@ -263,12 +165,7 @@ anychart.circularGaugeModule.Cap.prototype.draw = function() {
 /** @inheritDoc */
 anychart.circularGaugeModule.Cap.prototype.serialize = function() {
   var json = anychart.circularGaugeModule.Cap.base(this, 'serialize');
-
-  json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill()));
-  json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
-  json['hatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hatchFill()));
-  json['radius'] = this.radius();
-
+  anychart.core.settings.serialize(this, anychart.circularGaugeModule.Cap.OWN_DESCRIPTORS, json);
   return json;
 };
 
@@ -276,19 +173,25 @@ anychart.circularGaugeModule.Cap.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.circularGaugeModule.Cap.prototype.setupByJSON = function(config, opt_default) {
   anychart.circularGaugeModule.Cap.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.settings.deserialize(this, anychart.circularGaugeModule.Cap.OWN_DESCRIPTORS, config, opt_default);
+};
 
-  this.fill(config['fill']);
-  this.stroke(config['stroke']);
-  this.hatchFill(config['hatchFill']);
-  this.radius(config['radius']);
+
+/** @inheritDoc */
+anychart.circularGaugeModule.Cap.prototype.disposeInternal = function() {
+  goog.disposeAll(this.domElement_, this.hatchFillElement_, this.rootLayer_);
+  this.domElement_ = null;
+  this.hatchFillElement_ = null;
+  this.rootLayer_ = null;
+  anychart.circularGaugeModule.Cap.base(this, 'disposeInternal');
 };
 
 
 //exports
-(function() {
-  var proto = anychart.circularGaugeModule.Cap.prototype;
-  proto['radius'] = proto.radius;
-  proto['stroke'] = proto.stroke;
-  proto['fill'] = proto.fill;
-  proto['hatchFill'] = proto.hatchFill;
-})();
+// (function() {
+//   var proto = anychart.circularGaugeModule.Cap.prototype;
+//   proto['radius'] = proto.radius;
+//   proto['stroke'] = proto.stroke;
+//   proto['fill'] = proto.fill;
+//   proto['hatchFill'] = proto.hatchFill;
+// })();

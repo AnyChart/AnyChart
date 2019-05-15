@@ -77,6 +77,7 @@ anychart.palettes.DistinctColors.prototype.items = function(opt_value, var_args)
     if (!goog.isArray(opt_value)) {
       opt_value = goog.array.slice(arguments, 0);
     }
+    goog.disposeAll(this.colors_);
     this.colors_ = goog.array.map(opt_value, function(element) {
       return acgraph.vector.normalizeFill(element);
     });

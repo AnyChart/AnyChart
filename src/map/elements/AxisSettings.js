@@ -20,8 +20,6 @@ goog.require('anychart.mapModule.elements.AxisTicks');
 anychart.mapModule.elements.AxisSettings = function(map) {
   anychart.mapModule.elements.AxisSettings.base(this, 'constructor');
 
-  this.addThemes(anychart.themes.DefaultThemes['map.axisSettings']);
-
   /**
    * Map.
    * @private
@@ -139,46 +137,27 @@ anychart.mapModule.elements.AxisSettings.prototype.getHighPriorityResolutionChai
  * Simple properties descriptors.
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.mapModule.elements.AxisSettings.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
+anychart.mapModule.elements.AxisSettings.SIMPLE_PROPS_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'stroke',
-      anychart.core.settings.strokeNormalizer);
+  var descriptors = anychart.core.settings.descriptors;
 
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'overlapMode',
-      anychart.enums.normalizeLabelsOverlapMode);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'drawFirstLabel',
-      anychart.core.settings.booleanNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'drawLastLabel',
-      anychart.core.settings.booleanNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'enabled',
-      anychart.core.settings.booleanNormalizer);
+  anychart.core.settings.createDescriptors(map, [
+    descriptors.STROKE,
+    descriptors.OVERLAP_MODE,
+    descriptors.DRAW_FIRST_LABEL,
+    descriptors.DRAW_LAST_LABEL,
+    descriptors.ENABLED
+  ]);
 
   return map;
 })();
-anychart.core.settings.populate(anychart.mapModule.elements.AxisSettings, anychart.mapModule.elements.AxisSettings.prototype.SIMPLE_PROPS_DESCRIPTORS);
-
+anychart.core.settings.populate(anychart.mapModule.elements.AxisSettings, anychart.mapModule.elements.AxisSettings.SIMPLE_PROPS_DESCRIPTORS);
 
 //endregion
 //region --- Axes
+
+
 /**
  * Return all exist axes.
  * @return {Array.<anychart.mapModule.elements.Axis>}
@@ -196,7 +175,8 @@ anychart.mapModule.elements.AxisSettings.prototype.getItems = function() {
 anychart.mapModule.elements.AxisSettings.prototype.top = function(opt_value) {
   if (!this.topAxis_) {
     this.topAxis_ = new anychart.mapModule.elements.Axis();
-    this.topAxis_.dropThemes(); // todo: Remove this when mapModule.elements.Axis is refactored
+    this.topAxis_.dropThemes();
+    this.setupCreated('top', this.topAxis_);
     this.topAxis_.orientation(anychart.enums.Orientation.TOP);
     this.topAxis_.parent(this);
     this.topAxis_.listenSignals(this.map_.onAxesSettingsSignal, this.map_);
@@ -204,7 +184,6 @@ anychart.mapModule.elements.AxisSettings.prototype.top = function(opt_value) {
     var zIndex = anychart.mapModule.Chart.ZINDEX_AXIS + index * anychart.mapModule.Chart.ZINDEX_INCREMENT_MULTIPLIER;
     this.topAxis_.setAutoZIndex(/** @type {number} */(zIndex));
     this.axes_[index] = this.topAxis_;
-    this.registerDisposable(this.topAxis_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -223,7 +202,8 @@ anychart.mapModule.elements.AxisSettings.prototype.top = function(opt_value) {
 anychart.mapModule.elements.AxisSettings.prototype.right = function(opt_value) {
   if (!this.rightAxis_) {
     this.rightAxis_ = new anychart.mapModule.elements.Axis();
-    this.rightAxis_.dropThemes(); // todo: Remove this when mapModule.elements.Axis is refactored
+    this.rightAxis_.dropThemes();
+    this.setupCreated('right', this.rightAxis_);
     this.rightAxis_.orientation(anychart.enums.Orientation.RIGHT);
     this.rightAxis_.parent(this);
     this.rightAxis_.listenSignals(this.map_.onAxesSettingsSignal, this.map_);
@@ -231,7 +211,6 @@ anychart.mapModule.elements.AxisSettings.prototype.right = function(opt_value) {
     var zIndex = anychart.mapModule.Chart.ZINDEX_AXIS + index * anychart.mapModule.Chart.ZINDEX_INCREMENT_MULTIPLIER;
     this.rightAxis_.setAutoZIndex(/** @type {number} */(zIndex));
     this.axes_[index] = this.rightAxis_;
-    this.registerDisposable(this.rightAxis_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -250,7 +229,8 @@ anychart.mapModule.elements.AxisSettings.prototype.right = function(opt_value) {
 anychart.mapModule.elements.AxisSettings.prototype.bottom = function(opt_value) {
   if (!this.bottomAxis_) {
     this.bottomAxis_ = new anychart.mapModule.elements.Axis();
-    this.bottomAxis_.dropThemes(); // todo: Remove this when mapModule.elements.Axis is refactored
+    this.bottomAxis_.dropThemes();
+    this.setupCreated('bottom', this.bottomAxis_);
     this.bottomAxis_.orientation(anychart.enums.Orientation.BOTTOM);
     this.bottomAxis_.parent(this);
     this.bottomAxis_.listenSignals(this.map_.onAxesSettingsSignal, this.map_);
@@ -258,7 +238,6 @@ anychart.mapModule.elements.AxisSettings.prototype.bottom = function(opt_value) 
     var zIndex = anychart.mapModule.Chart.ZINDEX_AXIS + index * anychart.mapModule.Chart.ZINDEX_INCREMENT_MULTIPLIER;
     this.bottomAxis_.setAutoZIndex(/** @type {number} */(zIndex));
     this.axes_[index] = this.bottomAxis_;
-    this.registerDisposable(this.bottomAxis_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -277,7 +256,8 @@ anychart.mapModule.elements.AxisSettings.prototype.bottom = function(opt_value) 
 anychart.mapModule.elements.AxisSettings.prototype.left = function(opt_value) {
   if (!this.leftAxis_) {
     this.leftAxis_ = new anychart.mapModule.elements.Axis();
-    this.leftAxis_.dropThemes(); // todo: Remove this when mapModule.elements.Axis is refactored
+    this.leftAxis_.dropThemes();
+    this.setupCreated('left', this.leftAxis_);
     this.leftAxis_.orientation(anychart.enums.Orientation.LEFT);
     this.leftAxis_.parent(this);
     this.leftAxis_.listenSignals(this.map_.onAxesSettingsSignal, this.map_);
@@ -285,7 +265,6 @@ anychart.mapModule.elements.AxisSettings.prototype.left = function(opt_value) {
     var zIndex = anychart.mapModule.Chart.ZINDEX_AXIS + index * anychart.mapModule.Chart.ZINDEX_INCREMENT_MULTIPLIER;
     this.leftAxis_.setAutoZIndex(/** @type {number} */(zIndex));
     this.axes_[index] = this.leftAxis_;
-    this.registerDisposable(this.leftAxis_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -293,6 +272,20 @@ anychart.mapModule.elements.AxisSettings.prototype.left = function(opt_value) {
     return this;
   }
   return this.leftAxis_;
+};
+
+
+/**
+ * Set scale for every axis.
+ * @param {anychart.mapModule.scales.Geo} scale
+ */
+anychart.mapModule.elements.AxisSettings.prototype.setScale = function(scale) {
+  var axes = this.getItems();
+  for (var i = 0; i < axes.length; i++) {
+    var axis = axes[i];
+    if (axis.scale() !== scale)
+      axis.scale(scale);
+  }
 };
 
 
@@ -306,12 +299,9 @@ anychart.mapModule.elements.AxisSettings.prototype.left = function(opt_value) {
 anychart.mapModule.elements.AxisSettings.prototype.title = function(opt_value) {
   if (!this.title_) {
     this.title_ = new anychart.core.ui.Title();
-    //this.setupCreated('title', this.title_);
-    this.title_.dropThemes(); // todo: Remove this when mapModule.elements.Axis is refactored
+    this.setupCreated('title', this.title_);
     this.title_.listenSignals(this.titleInvalidated_, this);
     this.title_.markConsistent(anychart.ConsistencyState.ALL);
-    this.registerDisposable(this.title_);
-
   }
 
   if (goog.isDef(opt_value)) {
@@ -341,10 +331,11 @@ anychart.mapModule.elements.AxisSettings.prototype.titleInvalidated_ = function(
 anychart.mapModule.elements.AxisSettings.prototype.labels = function(opt_value) {
   if (!this.labels_) {
     this.labels_ = new anychart.core.ui.LabelsFactory();
-    this.labels_.dropThemes(); // todo: Remove this when mapModule.elements.Axis is refactored
+    this.setupCreated('labels', this.labels_);
+    this.labels_.setupByJSON(this.labels_.themeSettings, true);
+
     this.labels_.listenSignals(this.labelsInvalidated_, this);
     this.labels_.markConsistent(anychart.ConsistencyState.ALL);
-    this.registerDisposable(this.labels_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -384,10 +375,11 @@ anychart.mapModule.elements.AxisSettings.prototype.labelsInvalidated_ = function
 anychart.mapModule.elements.AxisSettings.prototype.minorLabels = function(opt_value) {
   if (!this.minorLabels_) {
     this.minorLabels_ = new anychart.core.ui.LabelsFactory();
-    this.minorLabels_.dropThemes(); // todo: Remove this when mapModule.elements.Axis is refactored
+    this.setupCreated('minorLabels', this.minorLabels_);
+    this.minorLabels_.setupByJSON(this.minorLabels_.themeSettings, true);
+
     this.minorLabels_.listenSignals(this.minorLabelsInvalidated_, this);
     this.minorLabels_.markConsistent(anychart.ConsistencyState.ALL);
-    this.registerDisposable(this.minorLabels_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -426,9 +418,8 @@ anychart.mapModule.elements.AxisSettings.prototype.minorLabelsInvalidated_ = fun
 anychart.mapModule.elements.AxisSettings.prototype.ticks = function(opt_value) {
   if (!this.ticks_) {
     this.ticks_ = new anychart.mapModule.elements.AxisTicks();
-    this.ticks_.dropThemes(); // todo: Remove this when mapModule.elements.Axis is refactored
+    this.setupCreated('ticks', this.ticks_);
     this.ticks_.listenSignals(this.ticksInvalidated_, this);
-    this.registerDisposable(this.ticks_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -447,9 +438,8 @@ anychart.mapModule.elements.AxisSettings.prototype.ticks = function(opt_value) {
 anychart.mapModule.elements.AxisSettings.prototype.minorTicks = function(opt_value) {
   if (!this.minorTicks_) {
     this.minorTicks_ = new anychart.mapModule.elements.AxisTicks();
-    this.minorTicks_.dropThemes(); // todo: Remove this when mapModule.elements.Axis is refactored
+    this.setupCreated('minorTicks', this.minorTicks_);
     this.minorTicks_.listenSignals(this.ticksInvalidated_, this);
-    this.registerDisposable(this.minorTicks_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -478,15 +468,6 @@ anychart.mapModule.elements.AxisSettings.prototype.ticksInvalidated_ = function(
 
 //endregion
 //region --- Setup and Dispose
-/**
- * Sets default settings.
- * @param {!Object} config
- */
-anychart.mapModule.elements.AxisSettings.prototype.setThemeSettings = function(config) {
-  anychart.core.settings.copy(this.themeSettings, this.SIMPLE_PROPS_DESCRIPTORS, config);
-};
-
-
 /** @inheritDoc */
 anychart.mapModule.elements.AxisSettings.prototype.resolveSpecialValue = function(var_args) {
   var arg0 = arguments[0];
@@ -510,29 +491,40 @@ anychart.mapModule.elements.AxisSettings.prototype.setupSpecial = function(isDef
   return false;
 };
 
+/**
+ * Create and setup elements that should be created before draw
+ * @param {boolean=} opt_default
+ * @param {Object=} opt_config
+ */
+anychart.mapModule.elements.AxisSettings.prototype.setupElements = function(opt_default, opt_config) {
+  var config = goog.isDef(opt_config) ? opt_config : {};
+
+  this.left().setupInternal(!!opt_default, config['left']);
+  this.top().setupInternal(!!opt_default, config['top']);
+  this.right().setupInternal(!!opt_default, config['right']);
+  this.bottom().setupInternal(!!opt_default, config['bottom']);
+};
+
 
 /** @inheritDoc */
 anychart.mapModule.elements.AxisSettings.prototype.setupByJSON = function(config, opt_default) {
   this.map_.suspendSignalsDispatching();
 
-  if (opt_default) {
-    this.setThemeSettings(config);
-  } else {
-    anychart.core.settings.deserialize(this, this.SIMPLE_PROPS_DESCRIPTORS, config);
+  anychart.core.settings.deserialize(this, anychart.mapModule.elements.AxisSettings.SIMPLE_PROPS_DESCRIPTORS, config, opt_default);
+
+  if (!opt_default) {
     this['enabled']('enabled' in config ? config['enabled'] : true);
   }
 
   this.title().setupInternal(!!opt_default, config['title']);
+
   this.ticks().setupInternal(!!opt_default, config['ticks']);
   this.minorTicks().setupInternal(!!opt_default, config['minorTicks']);
 
   this.labels().setupInternal(!!opt_default, config['labels']);
   this.minorLabels().setupInternal(!!opt_default, config['minorLabels']);
 
-  this.left().setupInternal(!!opt_default, config['left']);
-  this.top().setupInternal(!!opt_default, config['top']);
-  this.right().setupInternal(!!opt_default, config['right']);
-  this.bottom().setupInternal(!!opt_default, config['bottom']);
+  this.setupElements(!!opt_default, config);
 
   this.map_.resumeSignalsDispatching(true);
 };
@@ -564,13 +556,13 @@ anychart.mapModule.elements.AxisSettings.prototype.serialize = function() {
       json['bottom'] = axisSettings;
   }
 
-  json['title'] = this.title_.serialize();
+  json['title'] = this.title().serialize();
   json['ticks'] = this.ticks().serialize();
   json['minorTicks'] = this.minorTicks().serialize();
   json['labels'] = this.labels().serialize();
   json['minorLabels'] = this.minorLabels().serialize();
 
-  anychart.core.settings.serialize(this, this.SIMPLE_PROPS_DESCRIPTORS, json, 'Map axes props');
+  anychart.core.settings.serialize(this, anychart.mapModule.elements.AxisSettings.SIMPLE_PROPS_DESCRIPTORS, json, 'Map axes props');
 
   return json;
 };
@@ -578,6 +570,26 @@ anychart.mapModule.elements.AxisSettings.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.mapModule.elements.AxisSettings.prototype.disposeInternal = function() {
+  goog.disposeAll(
+      this.topAxis_,
+      this.rightAxis_,
+      this.bottomAxis_,
+      this.leftAxis_,
+      this.title_,
+      this.labels_,
+      this.minorLabels_,
+      this.ticks_,
+      this.minorTicks_);
+  this.topAxis_ = null;
+  this.rightAxis_ = null;
+  this.bottomAxis_ = null;
+  this.leftAxis_ = null;
+  this.axes_.length = 0;
+  this.title_ = null;
+  this.labels_ = null;
+  this.minorLabels_ = null;
+  this.ticks_ = null;
+  this.minorTicks_ = null;
   anychart.mapModule.elements.AxisSettings.base(this, 'disposeInternal');
 };
 

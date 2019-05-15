@@ -408,7 +408,6 @@ anychart.ganttModule.DataGrid.prototype.getHeaderPath_ = function() {
     this.headerPath_ = acgraph.path();
     this.getCellsLayer().addChildAt(this.headerPath_, 0);
     this.headerPath_.stroke(null);
-    this.registerDisposable(this.headerPath_);
   }
   return this.headerPath_;
 };
@@ -490,7 +489,6 @@ anychart.ganttModule.DataGrid.prototype.addSplitter_ = function() {
   //(columnsCount > this.splitters_.length) is totally the same as (columnsCount - 1 == this.splitters_.length).
   if (columnsCount > this.splitters_.length) {
     var newSplitter = new anychart.core.ui.SimpleSplitter();
-    this.registerDisposable(newSplitter);
     newSplitter.stroke(/** @type {acgraph.vector.Stroke} */(anychart.ganttModule.BaseGrid.getColorResolver('columnStroke', anychart.enums.ColorType.STROKE, false)(this, 0)));
     newSplitter.container(this.getClipLayer());
     newSplitter.listenSignals(function() {
@@ -500,7 +498,7 @@ anychart.ganttModule.DataGrid.prototype.addSplitter_ = function() {
     newSplitter.listen(acgraph.events.EventType.DBLCLICK, goog.bind(this.splitterDblClickHandler_, this, columnsCount - 1));
     newSplitter.listen(anychart.enums.EventType.DRAG_START, goog.bind(this.denyDragging, this, true));
     newSplitter.listen(anychart.enums.EventType.DRAG, goog.bind(this.denyDragging, this, true));
-    newSplitter.listen(anychart.enums.EventType.DRAG_END, goog.bind(this.denyDragging, this, false));
+    // newSplitter.listen(anychart.enums.EventType.DRAG_END, goog.bind(this.denyDragging, this, false));
     this.splitters_.push(newSplitter);
   }
 };
@@ -549,7 +547,6 @@ anychart.ganttModule.DataGrid.prototype.columnInternal_ = function(opt_indexOrVa
     column.listenSignals(this.columnInvalidated_, this);
     // column.labels().installStyle();
     anychart.measuriator.register(column);
-    this.registerDisposable(column);
     newColumn = true;
   }
 
@@ -1291,8 +1288,12 @@ anychart.ganttModule.DataGrid.prototype.setupByJSON = function(config, opt_defau
 
 /** @inheritDoc */
 anychart.ganttModule.DataGrid.prototype.disposeInternal = function() {
-  goog.dispose(this.horizontalScrollBar_);
+  goog.disposeAll(this.horizontalScrollBar_, this.headerPath_, this.splitters_, this.columns_, this.buttons_);
+  this.buttons_ = null;
   this.horizontalScrollBar_ = null;
+  this.headerPath_ = null;
+  this.splitters_.length = 0;
+  this.columns_.length = 0;
   anychart.ganttModule.DataGrid.base(this, 'disposeInternal');
 };
 

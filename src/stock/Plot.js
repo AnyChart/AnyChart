@@ -1308,7 +1308,6 @@ anychart.stockModule.Plot.prototype.background = function(opt_value) {
 anychart.stockModule.Plot.prototype.legend = function(opt_value) {
   if (!this.legend_) {
     this.legend_ = new anychart.core.ui.Legend();
-    this.registerDisposable(this.legend_);
     this.legend_.listenSignals(this.onLegendSignal_, this);
     this.legend_.listen(anychart.enums.EventType.DRAG_START, function(e) {
       this.chart_.preventHighlight();
@@ -1536,7 +1535,6 @@ anychart.stockModule.Plot.prototype.xGrid = function(opt_indexOrValue, opt_value
     grid.addThemes('stock.defaultPlotSettings.defaultGridSettings', this.defaultGridSettings());
     grid.zIndex(this.getGridZIndex(grid));
     this.xGrids_[index] = grid;
-    this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal_, this);
     this.invalidate(anychart.ConsistencyState.STOCK_PLOT_GRIDS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -1573,7 +1571,6 @@ anychart.stockModule.Plot.prototype.yGrid = function(opt_indexOrValue, opt_value
     grid.addThemes('stock.defaultPlotSettings.defaultGridSettings', this.defaultGridSettings());
     grid.zIndex(this.getGridZIndex(grid));
     this.yGrids_[index] = grid;
-    this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal_, this);
     this.invalidate(anychart.ConsistencyState.STOCK_PLOT_GRIDS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -1613,7 +1610,6 @@ anychart.stockModule.Plot.prototype.xMinorGrid = function(opt_indexOrValue, opt_
     grid.setDefaultLayout(anychart.enums.Layout.VERTICAL);
     grid.zIndex(this.getGridZIndex(grid));
     this.xMinorGrids_[index] = grid;
-    this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal_, this);
     this.invalidate(anychart.ConsistencyState.STOCK_PLOT_GRIDS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -1653,7 +1649,6 @@ anychart.stockModule.Plot.prototype.yMinorGrid = function(opt_indexOrValue, opt_
         this.defaultMinorGridSettings());
     grid.zIndex(this.getGridZIndex(grid));
     this.yMinorGrids_[index] = grid;
-    this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal_, this);
     this.invalidate(anychart.ConsistencyState.STOCK_PLOT_GRIDS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -3168,13 +3163,29 @@ anychart.stockModule.Plot.prototype.disposeInternal = function() {
       this.eventMarkers_,
       this.background_,
       this.xAxis_,
+      this.yAxes_,
       this.noDataSettings_,
       this.rootLayer_,
       this.crosshair_,
       this.defaultSeriesSettings_,
       this.defaultGridSettings_,
       this.defaultMinorGridSettings_,
-      this.defaultYAxisSettings_);
+      this.defaultYAxisSettings_,
+      this.legend_,
+      this.xGrids_,
+      this.yGrids_,
+      this.xMinorGrids_,
+      this.yMinorGrids_,
+      this.series_,
+      this.dataArea_,
+      this.indicators_,
+      this.priceIndicators_,
+      this.lineAxesMarkers_,
+      this.rangeAxesMarkers_,
+      this.textAxesMarkers_,
+      this.palette_,
+      this.markerPalette_,
+      this.hatchFillPalette_);
 
   this.annotations_ = null;
   this.title_ = null;
@@ -3188,6 +3199,11 @@ anychart.stockModule.Plot.prototype.disposeInternal = function() {
   this.defaultGridSettings_ = null;
   this.defaultMinorGridSettings_ = null;
   this.defaultYAxisSettings_ = null;
+  this.legend_ = null;
+  this.dataArea_ = null;
+  this.palette_ = null;
+  this.markerPalette_ = null;
+  this.hatchFillPalette_ = null;
 
   this.indicators_.length = 0;
   this.series_.length = 0;
@@ -3200,9 +3216,6 @@ anychart.stockModule.Plot.prototype.disposeInternal = function() {
   this.rangeAxesMarkers_.length = 0;
   this.textAxesMarkers_.length = 0;
   this.priceIndicators_.length = 0;
-
-  goog.disposeAll(this.palette_, this.markerPalette_, this.hatchFillPalette_);
-  this.palette_ = this.markerPalette_ = this.hatchFillPalette_ = null;
 
   anychart.stockModule.Plot.base(this, 'disposeInternal');
 

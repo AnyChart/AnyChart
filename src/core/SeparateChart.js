@@ -80,6 +80,7 @@ anychart.core.SeparateChart.prototype.legend = function(opt_value) {
     this.legend_.listenSignals(this.onLegendSignal, this);
     this.legend_.setParentEventTarget(this);
     this.setupCreated('legend', this.legend_);
+    this.invalidate(anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(opt_value)) {
@@ -204,7 +205,7 @@ anychart.core.SeparateChart.prototype.drawLegend = function(bounds) {
 
   // DVF-1518
   var legendBounds = legend.getRemainingBounds();
-  if (!goog.math.Rect.equals(this.legendBoundsCache_, legendBounds)) {
+  if (!goog.math.Rect.equals(this.legendBoundsCache_, legendBounds) && !(goog.math.Rect.equals(bounds, legendBounds))) {
     this.legendBoundsCache_ = legendBounds;
     this.invalidate(anychart.ConsistencyState.BOUNDS);
   }

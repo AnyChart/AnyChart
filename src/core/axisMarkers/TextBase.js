@@ -35,7 +35,7 @@ anychart.core.axisMarkers.TextBase = function() {
 
   /**
    * Current scale.
-   * @type {anychart.scales.Base|anychart.ganttModule.Scale}
+   * @type {anychart.scales.Base|anychart.scales.GanttDateTime}
    * @private
    */
   this.scale_;
@@ -43,7 +43,7 @@ anychart.core.axisMarkers.TextBase = function() {
 
   /**
    * Auto scale.
-   * @type {anychart.scales.Base|anychart.ganttModule.Scale}
+   * @type {anychart.scales.Base|anychart.scales.GanttDateTime}
    * @private
    */
   this.autoScale_ = null;
@@ -80,6 +80,13 @@ anychart.core.axisMarkers.TextBase = function() {
    * @private
    */
   this.contBounds_ = null;
+
+  /**
+   * Flag to allow drawing with any ratio.
+   * @type {boolean}
+   * @private
+   */
+  this.drawAtAnyRatio_ = false;
 
   this.bindHandlersToComponent(this);
 
@@ -175,7 +182,7 @@ anychart.core.axisMarkers.TextBase.DESCRIPTORS = (function() {
   var map = {};
 
   anychart.core.settings.createDescriptors(map, [
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'align', anychart.enums.normalizeAlign],
+    anychart.core.settings.descriptors.ALIGN,
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'scaleRangeMode', anychart.enums.normalizeScaleRangeMode]
   ]);
 
@@ -209,8 +216,8 @@ anychart.core.axisMarkers.TextBase.prototype.getChart = function() {
 /**
  * Getter/setter for auto scale.
  * Works with instances of anychart.scales.Base only.
- * @param {(anychart.scales.Base|anychart.ganttModule.Scale|Object|anychart.enums.ScaleTypes)=} opt_value - Scale.
- * @return {anychart.scales.Base|anychart.ganttModule.Scale|!anychart.core.axisMarkers.TextBase} - Axis scale or
+ * @param {(anychart.scales.Base|anychart.scales.GanttDateTime|Object|anychart.enums.ScaleTypes)=} opt_value - Scale.
+ * @return {anychart.scales.Base|anychart.scales.GanttDateTime|!anychart.core.axisMarkers.TextBase} - Axis scale or
  * itself for method chaining.
  */
 anychart.core.axisMarkers.TextBase.prototype.autoScale = function(opt_value) {
@@ -222,7 +229,7 @@ anychart.core.axisMarkers.TextBase.prototype.autoScale = function(opt_value) {
         anychart.scales.Base.setupScale(/** @type {anychart.scales.Base} */(this.autoScale_), opt_value, null, anychart.scales.Base.ScaleTypes.ALL_DEFAULT, null, this.scaleInvalidated, this);
     if (val) {
       var dispatch = this.autoScale_ == val;
-      this.autoScale_ = /** @type {anychart.scales.Base|anychart.ganttModule.Scale} */(val);
+      this.autoScale_ = /** @type {anychart.scales.Base|anychart.scales.GanttDateTime} */(val);
       var scaleIsSet = this.scale_ || (this.axis_ && /** @type {?anychart.scales.Base} */ (this.axis_.scale()));
       if (scaleIsSet) {
         val.resumeSignalsDispatching(false);
@@ -242,8 +249,8 @@ anychart.core.axisMarkers.TextBase.prototype.autoScale = function(opt_value) {
 /**
  * Getter/setter for default scale.
  * Works with instances of anychart.scales.Base only.
- * @param {(anychart.scales.Base|anychart.ganttModule.Scale|Object|anychart.enums.ScaleTypes)=} opt_value - Scale.
- * @return {anychart.scales.Base|anychart.ganttModule.Scale|!anychart.core.axisMarkers.TextBase} - Axis scale or
+ * @param {(anychart.scales.Base|anychart.scales.GanttDateTime|Object|anychart.enums.ScaleTypes)=} opt_value - Scale.
+ * @return {anychart.scales.Base|anychart.scales.GanttDateTime|!anychart.core.axisMarkers.TextBase} - Axis scale or
  * itself for method chaining.
  */
 anychart.core.axisMarkers.TextBase.prototype.scaleInternal = function(opt_value) {
@@ -255,7 +262,7 @@ anychart.core.axisMarkers.TextBase.prototype.scaleInternal = function(opt_value)
         anychart.scales.Base.setupScale(/** @type {anychart.scales.Base} */(this.scale_), opt_value, null, anychart.scales.Base.ScaleTypes.ALL_DEFAULT, null, this.scaleInvalidated, this);
     if (val) {
       var dispatch = this.scale_ == val;
-      this.scale_ = /** @type {anychart.scales.Base|anychart.ganttModule.Scale} */(val);
+      this.scale_ = /** @type {anychart.scales.Base|anychart.scales.GanttDateTime} */(val);
       if (!ganttScale)
         val.resumeSignalsDispatching(dispatch);
       if (!dispatch)
@@ -295,6 +302,23 @@ anychart.core.axisMarkers.TextBase.prototype.scaleInvalidated = function(event) 
 
     this.invalidate(anychart.ConsistencyState.BOUNDS, signal);
   }
+};
+
+
+/**
+ * If set to true - allows drawing marker using any ratio, even (-Infinity, 0) and (1, Infinity).
+ * Default value is false.
+ * Should not be in the public API.
+ * @param {boolean=} opt_value
+ * @return {anychart.core.axisMarkers.TextBase|boolean}
+ */
+anychart.core.axisMarkers.TextBase.prototype.drawAtAnyRatio = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.drawAtAnyRatio_ = opt_value;
+    return this;
+  }
+
+  return this.drawAtAnyRatio_;
 };
 
 
@@ -424,7 +448,7 @@ anychart.core.axisMarkers.TextBase.prototype.checkDrawingNeeded = function() {
     return draw;
 
   var ratio = this.scale().transform(this.valueInternal(), 0.5);
-  if (ratio >= 0 && ratio <= 1) {
+  if ((ratio >= 0 && ratio <= 1) || this.drawAtAnyRatio_) {
     this.invalidate(anychart.ConsistencyState.CONTAINER | anychart.ConsistencyState.BOUNDS);
     return true;
   } else {

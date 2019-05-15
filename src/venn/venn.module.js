@@ -17,8 +17,6 @@ goog.require('anychart.vennModule.Chart');
 anychart.venn = function(opt_data, opt_csvSettings) {
   var chart = new anychart.vennModule.Chart(opt_data, opt_csvSettings);
 
-  chart.setupInternal(true, anychart.getFullTheme('venn'));
-
   return chart;
 };
 anychart.chartTypesMap[anychart.enums.ChartTypes.VENN] = anychart.venn;

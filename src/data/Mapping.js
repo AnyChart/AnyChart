@@ -222,7 +222,12 @@ anychart.data.Mapping.DEFAULT_MAPPING = {
   'weight': [2, 'value', 'flow', 'weight'],
 
   // surface
-  'z': [2]
+  'z': [2],
+
+  // timeline
+  'name': [0],
+  'start': [1],
+  'end': [2]
 };
 
 

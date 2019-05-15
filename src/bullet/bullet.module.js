@@ -19,11 +19,7 @@ goog.require('anychart.bulletModule.Chart');
  * @return {!anychart.bulletModule.Chart} Bullet chart.
  */
 anychart.bullet = function(opt_data, opt_csvSettings) {
-  var chart = new anychart.bulletModule.Chart(opt_data, opt_csvSettings);
-
-  chart.setupInternal(true, anychart.getFullTheme('bullet'));
-
-  return chart;
+  return new anychart.bulletModule.Chart(opt_data, opt_csvSettings);
 };
 anychart.chartTypesMap[anychart.enums.ChartTypes.BULLET] = anychart.bullet;
 

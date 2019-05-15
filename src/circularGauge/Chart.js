@@ -35,6 +35,8 @@ anychart.circularGaugeModule.Chart = function(opt_data, opt_csvSettings) {
   this.suspendSignalsDispatching();
   anychart.circularGaugeModule.Chart.base(this, 'constructor');
 
+  this.addThemes('circularGauge');
+
   /**
    * @type {!Array.<anychart.circularGaugeModule.Axis>}
    * @private
@@ -123,6 +125,8 @@ anychart.circularGaugeModule.Chart = function(opt_data, opt_csvSettings) {
   ]);
 
   this.resumeSignalsDispatching(true);
+  // Initializing tooltip, before flat themes it was done in setupByJSON
+  this.getCreated('tooltip');
 };
 goog.inherits(anychart.circularGaugeModule.Chart, anychart.core.Chart);
 
@@ -263,48 +267,6 @@ anychart.circularGaugeModule.Chart.prototype.useUnionTooltipAsSingle = function(
 //  Methods to set defaults for multiple entities.
 //
 //----------------------------------------------------------------------------------------------------------------------
-/**
- * Getter/setter for axis default settings.
- * @param {Object=} opt_value Object with x-axis settings.
- * @return {Object}
- */
-anychart.circularGaugeModule.Chart.prototype.defaultAxisSettings = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.defaultAxisSettings_ = opt_value;
-    return this;
-  }
-  return this.defaultAxisSettings_ || {};
-};
-
-
-/**
- * Getter/setter for bar pointer default settings.
- * @param {Object=} opt_value Object with bar pointer settings.
- * @return {Object}
- */
-anychart.circularGaugeModule.Chart.prototype.defaultPointerSettings = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.defaultPointerSettings_ = opt_value;
-    return this;
-  }
-  return this.defaultPointerSettings_ || {};
-};
-
-
-/**
- * Getter/setter for range marker default settings.
- * @param {Object=} opt_value Object with range marker settings.
- * @return {Object}
- */
-anychart.circularGaugeModule.Chart.prototype.defaultRangeSettings = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.defaultRangeSettings_ = opt_value;
-    return this;
-  }
-  return this.defaultRangeSettings_ || {};
-};
-
-
 /** @inheritDoc */
 anychart.circularGaugeModule.Chart.prototype.createChartLabel = function() {
   return new anychart.circularGaugeModule.Label();
@@ -330,7 +292,6 @@ anychart.circularGaugeModule.Chart.prototype.data = function(opt_value, opt_csvS
       else
         this.parentView_ = (this.parentViewToDispose_ = new anychart.data.Set(
             (goog.isArray(opt_value) || goog.isString(opt_value)) ? opt_value : null, opt_csvSettings)).mapAs();
-      this.registerDisposable(this.parentViewToDispose_);
       this.data_ = this.parentView_;
       this.data_.listenSignals(this.dataInvalidated_, this);
 
@@ -408,8 +369,8 @@ anychart.circularGaugeModule.Chart.prototype.makeInteractivityPointEvent = funct
 anychart.circularGaugeModule.Chart.prototype.cap = function(opt_value) {
   if (!this.cap_) {
     this.cap_ = new anychart.circularGaugeModule.Cap();
+    this.setupCreated('cap', this.cap_);
     this.cap_.gauge(this);
-    this.registerDisposable(this.cap_);
     this.cap_.listenSignals(this.onCapSignal_, this);
     this.invalidate(anychart.ConsistencyState.GAUGE_CAP, anychart.Signal.NEEDS_REDRAW);
   }
@@ -466,9 +427,7 @@ anychart.circularGaugeModule.Chart.prototype.range = function(opt_indexOrValue, 
     circularRange.zIndex(anychart.circularGaugeModule.Chart.ZINDEX_CIRCULAR_RANGE + anychart.circularGaugeModule.Chart.ZINDEX_MULTIPLIER * this.circularRangeCounter_);
     this.circularRangeCounter_++;
     circularRange.gauge(this);
-    circularRange.axisIndex(0);
-    circularRange.setup(this.defaultRangeSettings());
-    this.registerDisposable(circularRange);
+    circularRange.addThemes(/** @type {Object} */(this.getThemeOption('defaultRangeSettings')));
     circularRange.listenSignals(this.onCircularRangeSignal_, this);
     this.invalidate(anychart.ConsistencyState.GAUGE_POINTERS |
         anychart.ConsistencyState.GAUGE_SCALE,
@@ -508,7 +467,6 @@ anychart.circularGaugeModule.Chart.prototype.createPointerByType_ = function(typ
   type = anychart.enums.normalizeCircularGaugePointerType(type);
   var isKnob = (type == anychart.enums.CircularGaugePointerType.KNOB);
   var ctl = anychart.circularGaugeModule.Chart.PointersTypesMap[type];
-  var config = this.defaultPointerSettings()[anychart.utils.toCamelCase(type)];
   /**
    * @type {anychart.circularGaugeModule.pointers.Base}
    */
@@ -537,9 +495,10 @@ anychart.circularGaugeModule.Chart.prototype.createPointerByType_ = function(typ
     } else {
       instance.data(/** @type {anychart.data.View|anychart.data.Set|Array|string} */(opt_dataIndexOrData), opt_csvSettings);
     }
-    instance.axisIndex(0);
     instance.gauge(this);
-    instance.setupInternal(true, config);
+    var defaultPointerSettings = /** @type {Object} */(this.getThemeOption('defaultPointerSettings'));
+    instance.addThemes(defaultPointerSettings['base']);
+    instance.addThemes(defaultPointerSettings[anychart.utils.toCamelCase(type)]);
     instance.listenSignals(this.onPointersSignal_, this);
 
     this.invalidate(anychart.ConsistencyState.GAUGE_POINTERS |
@@ -958,10 +917,9 @@ anychart.circularGaugeModule.Chart.prototype.axis = function(opt_indexOrValue, o
   var axis = this.axes_[index];
   if (!axis) {
     axis = new anychart.circularGaugeModule.Axis();
-    axis.setup(this.defaultAxisSettings());
+    axis.addThemes(/** @type {Object} */(this.getThemeOption('defaultAxisSettings')));
     axis.gauge(this);
     this.axes_[index] = axis;
-    this.registerDisposable(axis);
     axis.listenSignals(this.onAxisSignal_, this);
     this.invalidate(anychart.ConsistencyState.GAUGE_AXES | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -1110,7 +1068,7 @@ anychart.circularGaugeModule.Chart.prototype.createFrame_ = function(path, cx, c
   var endAngleRad = goog.math.toRadians(endAngle);
 
   this.capRadius_ = this.cap_ && this.cap_.enabled() ?
-      anychart.utils.normalizeSize(/** @type {string} */(this.cap_.radius()), radius) :
+      anychart.utils.normalizeSize(/** @type {string} */(this.cap_.getOption('radius')), radius) :
       0;
 
   var startCenterPt_x = cx + (radius * Math.cos(startAngleRad));
@@ -1353,7 +1311,7 @@ anychart.circularGaugeModule.Chart.prototype.drawContent = function(bounds) {
         pointer = /** @type {anychart.circularGaugeModule.pointers.Base} */(pointers[i]);
         if (pointer) {
           var iterator = pointer.getIterator();
-          var axisIndex = /** @type {number} */(pointer.axisIndex());
+          var axisIndex = /** @type {number} */(pointer.getOption('axisIndex'));
 
           iterator.select(/** @type {number} */(pointer.dataIndex()));
           axis = this.axes_[axisIndex];
@@ -1487,30 +1445,15 @@ anychart.circularGaugeModule.Chart.prototype.isNoData = function() {
 
 
 //endregion
-
-
-/** @inheritDoc */
-anychart.circularGaugeModule.Chart.prototype.setupByJSON = function(config, opt_default) {
-  anychart.circularGaugeModule.Chart.base(this, 'setupByJSON', config, opt_default);
-
-  if ('defaultAxisSettings' in config)
-    this.defaultAxisSettings(config['defaultAxisSettings']);
-
-  if ('defaultPointerSettings' in config)
-    this.defaultPointerSettings(config['defaultPointerSettings']);
-
-  if ('defaultRangeSettings' in config)
-    this.defaultRangeSettings(config['defaultRangeSettings']);
-
-  anychart.core.settings.deserialize(this, anychart.circularGaugeModule.Chart.PROPERTY_DESCRIPTORS, config, opt_default);
-
-  this.data(config['data']);
-  if (goog.isDef(config['cap']))
-    this.cap(config['cap']);
-  this.interactivity(config['interactivity']);
+/**
+ * Initializes elements with config or theme settings.
+ * @param {Object=} opt_config
+ */
+anychart.circularGaugeModule.Chart.prototype.setupElements = function(opt_config) {
+  opt_config = opt_config ? opt_config : this.themeSettings;
 
   var i, len;
-  var axes = config['axes'];
+  var axes = opt_config['axes'];
   if (axes) {
     for (i = 0, len = axes.length; i < len; i++) {
       if (axes[i])
@@ -1518,8 +1461,8 @@ anychart.circularGaugeModule.Chart.prototype.setupByJSON = function(config, opt_
     }
   }
 
-  if ('pointers' in config) {
-    var pointers = config['pointers'];
+  if ('pointers' in opt_config) {
+    var pointers = opt_config['pointers'];
     var json;
     if (goog.isArray(pointers)) {
       for (i = 0; i < pointers.length; i++) {
@@ -1539,7 +1482,7 @@ anychart.circularGaugeModule.Chart.prototype.setupByJSON = function(config, opt_
     }
   } else {
     // legacy
-    var bars = config['bars'];
+    var bars = opt_config['bars'];
     if (bars) {
       for (i = 0, len = bars.length; i < len; i++) {
         if (bars[i])
@@ -1547,7 +1490,7 @@ anychart.circularGaugeModule.Chart.prototype.setupByJSON = function(config, opt_
       }
     }
 
-    var markers = config['markers'];
+    var markers = opt_config['markers'];
     if (markers) {
       for (i = 0, len = markers.length; i < len; i++) {
         if (markers[i])
@@ -1555,7 +1498,7 @@ anychart.circularGaugeModule.Chart.prototype.setupByJSON = function(config, opt_
       }
     }
 
-    var needles = config['needles'];
+    var needles = opt_config['needles'];
     if (needles) {
       for (i = 0, len = needles.length; i < len; i++) {
         if (needles[i])
@@ -1563,7 +1506,7 @@ anychart.circularGaugeModule.Chart.prototype.setupByJSON = function(config, opt_
       }
     }
 
-    var knobs = config['knobs'];
+    var knobs = opt_config['knobs'];
     if (knobs) {
       for (i = 0, len = knobs.length; i < len; i++) {
         if (knobs[i])
@@ -1572,13 +1515,28 @@ anychart.circularGaugeModule.Chart.prototype.setupByJSON = function(config, opt_
     }
   }
 
-  var ranges = config['ranges'];
+  var ranges = opt_config['ranges'];
   if (ranges) {
     for (i = 0, len = ranges.length; i < len; i++) {
       if (ranges[i])
         this.range(i, ranges[i]);
     }
   }
+};
+
+
+/** @inheritDoc */
+anychart.circularGaugeModule.Chart.prototype.setupByJSON = function(config, opt_default) {
+  anychart.circularGaugeModule.Chart.base(this, 'setupByJSON', config, opt_default);
+
+  anychart.core.settings.deserialize(this, anychart.circularGaugeModule.Chart.PROPERTY_DESCRIPTORS, config, opt_default);
+
+  this.data(config['data']);
+  if (goog.isDef(config['cap']))
+    this.cap(config['cap']);
+  this.interactivity(config['interactivity']);
+
+  this.setupElements(config);
 };
 
 
@@ -1621,12 +1579,33 @@ anychart.circularGaugeModule.Chart.prototype.serialize = function() {
 };
 
 
-/**
- * Returns default theme object.
- * @return {Object}
- */
-anychart.circularGaugeModule.Chart.prototype.getDefaultThemeObj = function() {
-  return {'gauge': anychart.getFullTheme('circularGauge')};
+/** @inheritDoc */
+anychart.circularGaugeModule.Chart.prototype.disposeInternal = function() {
+  goog.disposeAll(
+      this.parentViewToDispose_,
+      this.parentView_,
+      this.data_,
+      this.cap_,
+      this.ranges_,
+      this.axes_,
+      this.bars_,
+      this.markers_,
+      this.needles_,
+      this.knobs_,
+      this.pointers_);
+  this.parentViewToDispose_ = null;
+  this.parentView_ = null;
+  this.data_ = null;
+  this.iterator_ = null;
+  this.cap_ = null;
+  this.ranges_.length = 0;
+  this.axes_.length = 0;
+  this.bars_.length = 0;
+  this.markers_.length = 0;
+  this.needles_.length = 0;
+  this.knobs_.length = 0;
+  this.pointers_.length = 0;
+  anychart.circularGaugeModule.Chart.base(this, 'disposeInternal');
 };
 
 

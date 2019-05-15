@@ -22,6 +22,8 @@ goog.require('goog.array');
 anychart.sankeyModule.Chart = function(opt_data, opt_csvSettings) {
   anychart.sankeyModule.Chart.base(this, 'constructor');
 
+  this.addThemes('sankey');
+
   this.bindHandlersToComponent(this,
       this.handleMouseOverAndMove,    // override from anychart.core.Chart
       this.handleMouseOut,            // override from anychart.core.Chart
@@ -115,14 +117,15 @@ anychart.sankeyModule.Chart.prototype.data = function(opt_value, opt_csvSettings
     if (this.rawData_ !== opt_value) {
       this.rawData_ = opt_value;
       goog.dispose(this.data_);
+      goog.dispose(this.parentViewToDispose_);
       this.iterator_ = null;
       if (anychart.utils.instanceOf(opt_value, anychart.data.View))
         this.data_ = (/** @type {anychart.data.View} */ (opt_value)).derive();
       else if (anychart.utils.instanceOf(opt_value, anychart.data.Set))
         this.data_ = (/** @type {anychart.data.Set} */ (opt_value)).mapAs();
       else
-        this.data_ = new anychart.data.Set(
-            (goog.isArray(opt_value) || goog.isString(opt_value)) ? opt_value : null, opt_csvSettings).mapAs();
+        this.data_ = (this.parentViewToDispose_ = new anychart.data.Set(
+            (goog.isArray(opt_value) || goog.isString(opt_value)) ? opt_value : null, opt_csvSettings)).mapAs();
       this.data_.listenSignals(this.dataInvalidated_, this);
       this.invalidate(anychart.ConsistencyState.CHART_LABELS); // for noData label
       this.invalidateState(anychart.enums.Store.SANKEY, anychart.enums.State.DATA, anychart.Signal.NEEDS_REDRAW);
@@ -899,6 +902,8 @@ anychart.sankeyModule.Chart.prototype.elementInvalidated_ = function(event) {
 anychart.sankeyModule.Chart.prototype.dropoff = function(opt_value) {
   if (!this.dropoff_) {
     this.dropoff_ = new anychart.sankeyModule.elements.VisualElement(this, anychart.sankeyModule.Chart.ElementType.DROPOFF);
+    this.setupCreated('dropoff', this.dropoff_);
+    this.dropoff_.setupElements();
     this.dropoff_.listenSignals(this.elementInvalidated_, this);
   }
   if (goog.isDef(opt_value)) {
@@ -917,6 +922,8 @@ anychart.sankeyModule.Chart.prototype.dropoff = function(opt_value) {
 anychart.sankeyModule.Chart.prototype.flow = function(opt_value) {
   if (!this.flow_) {
     this.flow_ = new anychart.sankeyModule.elements.VisualElement(this, anychart.sankeyModule.Chart.ElementType.FLOW);
+    this.setupCreated('flow', this.flow_);
+    this.flow_.setupElements();
     this.flow_.listenSignals(this.elementInvalidated_, this);
   }
   if (goog.isDef(opt_value)) {
@@ -935,6 +942,8 @@ anychart.sankeyModule.Chart.prototype.flow = function(opt_value) {
 anychart.sankeyModule.Chart.prototype.node = function(opt_value) {
   if (!this.node_) {
     this.node_ = new anychart.sankeyModule.elements.VisualElement(this, anychart.sankeyModule.Chart.ElementType.NODE);
+    this.setupCreated('node', this.node_);
+    this.node_.setupElements();
     this.node_.listenSignals(this.elementInvalidated_, this);
   }
   if (goog.isDef(opt_value)) {
@@ -1306,6 +1315,10 @@ anychart.sankeyModule.Chart.prototype.drawContent = function(bounds) {
   if (!this.rootLayer) {
     this.rootLayer = this.rootElement.layer();
     this.rootLayer.zIndex(anychart.sankeyModule.Chart.ZINDEX_SANKEY);
+    //We need create elements here because now we don't call setupByJson method.
+    this.node();
+    this.flow();
+    this.dropoff();
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
@@ -1929,7 +1942,31 @@ anychart.sankeyModule.Chart.prototype.setupByJSON = function(config, opt_default
 
 /** @inheritDoc */
 anychart.sankeyModule.Chart.prototype.disposeInternal = function() {
-  goog.disposeAll(this.palette_, this.dropoff_, this.flow_, this.node_, this.tooltip_, this.dropoffPaths, this.nodePaths, this.flowPaths, this.hoverPaths);
+  goog.disposeAll(
+      this.palette_,
+      this.dropoff_,
+      this.flow_,
+      this.node_,
+      this.tooltip_,
+      this.dropoffPaths,
+      this.nodePaths,
+      this.flowPaths,
+      this.hoverPaths,
+      this.data_,
+      this.parentViewToDispose_);
+  this.palette_ = null;
+  this.dropoff_ = null;
+  this.flow_ = null;
+  this.node_ = null;
+  this.tooltip_ = null;
+  this.dropoffPaths.length = 0;
+  this.nodePaths.length = 0;
+  this.flowPaths.length = 0;
+  this.hoverPaths.length = 0;
+  this.data_ = null;
+  this.parentViewToDispose_ = null;
+  this.iterator_ = null;
+
   anychart.sankeyModule.Chart.base(this, 'disposeInternal');
 };
 

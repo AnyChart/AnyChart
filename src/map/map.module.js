@@ -19,7 +19,6 @@ goog.require('anychart.mapModule.drawers.Marker');
 anychart.map = function() {
   var chart = new anychart.mapModule.Chart();
   chart.setupStateSettings();
-  chart.setupInternal(true, anychart.getFullTheme('map'));
   return chart;
 };
 anychart.mapTypesMap[anychart.enums.MapTypes.MAP] = anychart.map;
@@ -33,9 +32,9 @@ anychart.mapTypesMap[anychart.enums.MapTypes.MAP] = anychart.map;
  */
 anychart.bubbleMap = function(var_args) {
   var chart = new anychart.mapModule.Chart();
+  chart.addThemes('bubbleMap');
   chart.setupStateSettings();
   chart.setOption('defaultSeriesType', anychart.enums.MapSeriesType.BUBBLE);
-  chart.setupInternal(true, anychart.getFullTheme('bubbleMap'));
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['bubble'](arguments[i]);
@@ -54,10 +53,9 @@ anychart.mapTypesMap[anychart.enums.MapTypes.BUBBLE] = anychart.bubbleMap;
  */
 anychart.choropleth = function(var_args) {
   var chart = new anychart.mapModule.Chart();
+  chart.addThemes('choropleth');
   chart.setupStateSettings();
   chart.setOption('defaultSeriesType', anychart.enums.MapSeriesType.CHOROPLETH);
-
-  chart.setupInternal(true, anychart.getFullTheme('choropleth'));
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['choropleth'](arguments[i]);
@@ -76,9 +74,9 @@ anychart.mapTypesMap[anychart.enums.MapTypes.CHOROPLETH] = anychart.choropleth;
  */
 anychart.connector = function(var_args) {
   var chart = new anychart.mapModule.Chart();
+  chart.addThemes('connector');
   chart.setupStateSettings();
   chart.setOption('defaultSeriesType', anychart.enums.MapSeriesType.CONNECTOR);
-  chart.setupInternal(true, anychart.getFullTheme('connector'));
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['connector'](arguments[i]);
@@ -97,10 +95,9 @@ anychart.mapTypesMap[anychart.enums.MapTypes.CONNECTOR] = anychart.connector;
  */
 anychart.markerMap = function(var_args) {
   var chart = new anychart.mapModule.Chart();
+  chart.addThemes('markerMap');
   chart.setupStateSettings();
   chart.setOption('defaultSeriesType', anychart.enums.MapSeriesType.MARKER);
-
-  chart.setupInternal(true, anychart.getFullTheme('markerMap'));
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['marker'](arguments[i]);
@@ -119,10 +116,9 @@ anychart.mapTypesMap[anychart.enums.MapTypes.MARKER] = anychart.markerMap;
  */
 anychart.seatMap = function(var_args) {
   var chart = new anychart.mapModule.Chart();
+  chart.addThemes('seatMap');
   chart.setupStateSettings();
   chart.setOption('defaultSeriesType', anychart.enums.MapSeriesType.CHOROPLETH);
-
-  chart.setupInternal(true, anychart.getFullTheme('seatMap'));
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['choropleth'](arguments[i]);

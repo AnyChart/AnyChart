@@ -27,6 +27,7 @@ goog.require('anychart.utils');
 
 /**
  * Pyramid/Funnel Base Chart Class.<br/>
+ * @param {anychart.enums.ChartTypes} type - Type.
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data for the chart.
  * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @extends {anychart.core.SeparateChart}
@@ -34,11 +35,13 @@ goog.require('anychart.utils');
  * @implements {anychart.core.IShapeManagerUser}
  * @constructor
  */
-anychart.pyramidFunnelModule.Chart = function(opt_data, opt_csvSettings) {
+anychart.pyramidFunnelModule.Chart = function(type, opt_data, opt_csvSettings) {
   anychart.pyramidFunnelModule.Chart.base(this, 'constructor');
   this.suspendSignalsDispatching();
 
-  this.addThemes('pieFunnelPyramidBase', 'funnel');
+  this.setType(type);
+
+  this.addThemes('pieFunnelPyramidBase', type);
 
   /**
    * @type {anychart.palettes.HatchFills}
@@ -353,7 +356,6 @@ anychart.pyramidFunnelModule.Chart.prototype.data = function(opt_value, opt_csvS
             parentView = (this.parentViewToDispose_ = new anychart.data.Set(opt_value, opt_csvSettings)).mapAs();
           else
             parentView = (this.parentViewToDispose_ = new anychart.data.Set(null)).mapAs();
-          this.registerDisposable(this.parentViewToDispose_);
         }
         this.parentView_ = parentView.derive();
       }
@@ -361,7 +363,6 @@ anychart.pyramidFunnelModule.Chart.prototype.data = function(opt_value, opt_csvS
       goog.dispose(this.view_);
       this.view_ = this.parentView_;
       this.view_.listenSignals(this.dataInvalidated_, this);
-      this.registerDisposable(this.view_);
       this.invalidate(
           anychart.ConsistencyState.APPEARANCE |
           anychart.ConsistencyState.PYRAMID_FUNNEL_LABELS |
@@ -486,8 +487,8 @@ anychart.pyramidFunnelModule.Chart.prototype.palette = function(opt_value) {
 anychart.pyramidFunnelModule.Chart.prototype.markerPalette = function(opt_value) {
   if (!this.markerPalette_) {
     this.markerPalette_ = new anychart.palettes.Markers();
+    this.setupCreated('markerPalette', this.markerPalette_);
     this.markerPalette_.listenSignals(this.markerPaletteInvalidated_, this);
-    this.registerDisposable(this.markerPalette_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -509,8 +510,8 @@ anychart.pyramidFunnelModule.Chart.prototype.markerPalette = function(opt_value)
 anychart.pyramidFunnelModule.Chart.prototype.hatchFillPalette = function(opt_value) {
   if (!this.hatchFillPalette_) {
     this.hatchFillPalette_ = new anychart.palettes.HatchFills();
+    this.setupCreated('hatchFillPalette', this.hatchFillPalette_);
     this.hatchFillPalette_.listenSignals(this.hatchFillPaletteInvalidated_, this);
-    this.registerDisposable(this.hatchFillPalette_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -542,7 +543,6 @@ anychart.pyramidFunnelModule.Chart.prototype.setupPalette_ = function(cls, opt_c
     }
 
     this.palette_.listenSignals(this.paletteInvalidated_, this);
-    this.registerDisposable(this.palette_);
     if (doDispatch) {
       this.invalidate(anychart.ConsistencyState.APPEARANCE |
           anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
@@ -622,8 +622,6 @@ anychart.pyramidFunnelModule.Chart.prototype.applyHatchFill = function(pointStat
  * @inheritDoc
  */
 anychart.pyramidFunnelModule.Chart.prototype.remove = function() {
-  this.markers().container(null);
-  this.labels().container(null);
   this.clearLabelDomains_();
 
   if (this.dataLayer_) this.dataLayer_.parent(null);
@@ -671,7 +669,6 @@ anychart.pyramidFunnelModule.Chart.prototype.drawContent = function(bounds) {
       }, function(child) {
         (/** @type {acgraph.vector.Path} */ (child)).clear();
       });
-      this.registerDisposable(this.dataLayer_);
       this.dataLayer_.zIndex(anychart.pyramidFunnelModule.Chart.ZINDEX_PYRAMID_FUNNEL);
       this.dataLayer_.parent(this.rootElement);
     }
@@ -684,7 +681,6 @@ anychart.pyramidFunnelModule.Chart.prototype.drawContent = function(bounds) {
       }, function(child) {
         (/** @type {acgraph.vector.Path} */ (child)).clear();
       });
-      this.registerDisposable(this.hatchLayer_);
       this.hatchLayer_.parent(this.rootElement);
       this.hatchLayer_.zIndex(anychart.pyramidFunnelModule.Chart.ZINDEX_HATCH_FILL).disablePointerEvents(true);
     }
@@ -783,8 +779,9 @@ anychart.pyramidFunnelModule.Chart.prototype.drawContent = function(bounds) {
     }
 
     var themePart = this.isInsideLabels() ?
-        anychart.getFullTheme('pieFunnelPyramidBase.insideLabels') :
-        anychart.getFullTheme('pieFunnelPyramidBase.outsideLabels');
+        this.themeSettings['insideLabels'] :
+        this.themeSettings['outsideLabels'];
+
     this.labels().setAutoColor(themePart['autoColor']);
     this.labels()['disablePointerEvents'](themePart['disablePointerEvents']);
 
@@ -805,7 +802,6 @@ anychart.pyramidFunnelModule.Chart.prototype.drawContent = function(bounds) {
         }, function(child) {
           (/** @type {acgraph.vector.Path} */ (child)).clear();
         });
-        this.registerDisposable(this.connectorsLayer_);
         this.connectorsLayer_.parent(this.rootElement);
         this.connectorsLayer_.zIndex(anychart.pyramidFunnelModule.Chart.ZINDEX_LABELS_CONNECTOR);
       }
@@ -2803,9 +2799,9 @@ anychart.pyramidFunnelModule.Chart.prototype.drawMarker = function(pointState) {
     var markerHoverPosition = hoverPointMarker && hoverPointMarker['position'] ? hoverPointMarker['position'] : null;
     var markerSelectPosition = selectPointMarker && selectPointMarker['position'] ? selectPointMarker['position'] : null;
 
-    var position = (hovered && (markerHoverPosition || hoverMarkers.position())) ||
-        (selected && (markerSelectPosition || selectMarkers.position())) ||
-        markerPosition || this.markers().position();
+    var position = (hovered && (markerHoverPosition || hoverMarkers.getOption('position'))) ||
+        (selected && (markerSelectPosition || selectMarkers.getOption('position'))) ||
+        markerPosition || this.markers().getOption('position');
 
     var positionProvider = this.createMarkersPositionProvider_(/** @type {anychart.enums.Position|string} */(position));
     if (marker) {
@@ -2886,7 +2882,7 @@ anychart.pyramidFunnelModule.Chart.prototype.drawMarker = function(pointState) {
 /** @inheritDoc */
 anychart.pyramidFunnelModule.Chart.prototype.createTooltip = function() {
   var tooltip = new anychart.core.ui.Tooltip(0);
-  this.registerDisposable(tooltip);
+  this.setupCreated('tooltip', tooltip);
   tooltip.chart(this);
   tooltip.listenSignals(this.onTooltipSignal_, this);
   return tooltip;
@@ -3199,7 +3195,34 @@ anychart.pyramidFunnelModule.Chart.prototype.setupByJSON = function(config, opt_
  * @inheritDoc
  */
 anychart.pyramidFunnelModule.Chart.prototype.disposeInternal = function() {
-  goog.disposeAll(this.animationQueue_, this.normal_, this.hovered_, this.selected_);
+  goog.disposeAll(
+      this.animationQueue_,
+      this.normal_,
+      this.hovered_,
+      this.selected_,
+      this.parentViewToDispose_,
+      this.parentView_,
+      this.view_,
+      this.palette_,
+      this.hatchFillPalette_,
+      this.markerPalette_,
+      this.dataLayer_,
+      this.hatchLayer_,
+      this.connectorsLayer_);
+  this.animationQueue_ = null;
+  this.normal_ = null;
+  this.hovered_ = null;
+  this.selected_ = null;
+  this.parentViewToDispose_ = null;
+  this.parentView_ = null;
+  this.view_ = null;
+  delete this.iterator_;
+  this.palette_ = null;
+  this.hatchFillPalette_ = null;
+  this.markerPalette_ = null;
+  this.dataLayer_ = null;
+  this.hatchLayer_ = null;
+  this.connectorsLayer_ = null;
   anychart.pyramidFunnelModule.Chart.base(this, 'disposeInternal');
 };
 
@@ -3390,6 +3413,20 @@ anychart.pyramidFunnelModule.Chart.LabelsDomain.prototype.getLabelBounds_ = func
   var labelBounds = this.chart.labels().measureWithTransform(label.formatProvider(), label.positionProvider(), /** @type {Object} */(labelSettings));
 
   return anychart.math.Rect.fromCoordinateBox(labelBounds);
+};
+
+
+/** @inheritDoc */
+anychart.pyramidFunnelModule.Chart.prototype.setupStateSettings = function() {
+  this.normal_.addThemes(this.themeSettings);
+  this.setupCreated('normal', this.normal_);
+  this.normal_.setupInternal(true, {});
+
+  this.setupCreated('hovered', this.hovered_);
+  this.hovered_.setupInternal(true, {});
+
+  this.setupCreated('selected', this.selected_);
+  this.selected_.setupInternal(true, {});
 };
 
 

@@ -774,7 +774,6 @@ anychart.core.ui.Crosshair.prototype.drawLine_ = function(axis, xDirection, mous
     var height = bounds.getBottom() - bounds.getTop();
     var dataPlotOffsetX = mouseX - bounds.getLeft();
     var dataPlotOffsetY = mouseY - bounds.getTop();
-    var shift = line.strokeThickness() % 2 == 0 ? 0 : -.5;
     var isHorizontal = axis.isHorizontal();
 
     var startX, startY, endX, endY;
@@ -784,21 +783,28 @@ anychart.core.ui.Crosshair.prototype.drawLine_ = function(axis, xDirection, mous
     var side = isHorizontal ? width : height;
     var start = isHorizontal ? bounds.getLeft() : bounds.getTop();
 
-    var ratio = scale.transform(scale.inverseTransform(offset / side), .5); //aligning
+    var ratio;
+    var scaleType = scale.getType();
+    // on this scales there is no need in aligning and precision is lost on inversetTransform/transform
+    if (scaleType == 'linear' || scaleType == 'datetime' || scaleType == 'log')
+      ratio = offset / side;
+    else
+      ratio = scale.transform(scale.inverseTransform(offset / side), .5); //aligning
     if (ratio < 0 || ratio > 1) {
       line.clear();
       return;
     }
 
-    var coord = Math.round(start + ratio * side);
+    var coord = start + ratio * side;
+    var strokeThickness = /** @type {number} */(line.strokeThickness());
     if (isHorizontal) {
-      startX = coord - shift;
+      startX = anychart.utils.applyPixelShift(coord, strokeThickness);
       startY = bounds.getTop();
       endX = startX;
       endY = bounds.getBottom();
     } else {
       startX = bounds.getLeft();
-      startY = coord - shift;
+      startY = anychart.utils.applyPixelShift(coord, strokeThickness);
       endX = bounds.getRight();
       endY = startY;
     }

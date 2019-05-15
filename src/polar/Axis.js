@@ -451,11 +451,11 @@ anychart.polarModule.Axis.prototype.calculateAxisBounds_ = function() {
       var majorAffectsRadiusTicksLength = parseFloat(anychart.utils.getAffectBoundsTickLength(ticks, majorLabelsSidePosition));
       var minorTicks = /** @type {!anychart.radarPolarBaseModule.RadialAxisTicks} */(this.minorTicks());
       // var majorLabelsOffsetByTicks = isOrdinal ? 0 : majorTicksLength;
-      var minorTicksLength = isOrdinal ? 0 : anychart.utils.getAffectBoundsTickLength(minorTicks) ;
+      var minorTicksLength = isOrdinal ? 0 : anychart.utils.getAffectBoundsTickLength(minorTicks);
       if (anychart.utils.isPercent(minorTicksLength)) {
         minorTicksLength = parseFloat(minorTicksLength);
       }
-      var minorAffectsRadiusTicksLength = isOrdinal ? 0 : parseFloat(anychart.utils.getAffectBoundsTickLength(minorTicks, minorLabelsSidePosition)) ;
+      var minorAffectsRadiusTicksLength = isOrdinal ? 0 : parseFloat(anychart.utils.getAffectBoundsTickLength(minorTicks, minorLabelsSidePosition));
 
       var majorTicksArr = (majorTicksLength || majorLabelsEnabled) ? scale.ticks().get() : [];
       var minorTicksArr = (!isOrdinal && (minorTicksLength || minorLabelsEnabled)) ? scale.minorTicks().get() : [];
@@ -484,6 +484,8 @@ anychart.polarModule.Axis.prototype.calculateAxisBounds_ = function() {
       var padding, commonIndex, radiusChanged, labelsOriginRadius;
       var changerIndex = NaN;
       var iterateStep = 0;
+
+      var maxAttempts = 10;
       do {
         radiusChanged = false;
         i = j = 0;
@@ -529,7 +531,12 @@ anychart.polarModule.Axis.prototype.calculateAxisBounds_ = function() {
             this.configureLabel_(labels, index, ticksArr, angle, labelsOriginRadius, radiusDelta);
             label = labels.getLabel(index);
 
-            if (label.getFinalSettings('position') == 'normal') {
+            /*
+              iterateStep > maxAttempts condition fixes DVF-4218.
+              This method is undebuggable shit without any comments, that why
+              we just break the endless cycle here.
+             */
+            if (label.getFinalSettings('position') == 'normal' || iterateStep > maxAttempts) {
               points = labels.measureWithTransform(label);
               boundsCache[index] = points;
               radiusDelta = Math.max(boundsChecker.call(this, angle, dx, dy, points), radiusDelta);
@@ -550,13 +557,15 @@ anychart.polarModule.Axis.prototype.calculateAxisBounds_ = function() {
                 // if (!this[___name]) this[___name] = stage.rect().zIndex(1000).setBounds(bounds).stroke('blue');
                 // this[___name].setBounds(bounds);
 
-                radiusDelta += Math.max(
-                    parentBounds.left - bounds.left,
-                    parentBounds.top - bounds.top,
-                    bounds.getRight() - parentBounds.getRight(),
-                    bounds.getBottom() - parentBounds.getBottom(),
-                    0);
+                var leftDelta = parentBounds.left - bounds.left;
+                var topDelta = parentBounds.top - bounds.top;
+                var rightDelta = bounds.getRight() - parentBounds.getRight();
+                var bottomDelta = bounds.getBottom() - parentBounds.getBottom();
+                var max = Math.max(leftDelta, topDelta, rightDelta, bottomDelta, 0);
+                radiusDelta += max;
               }
+              goog.dispose(padding);
+              padding = null;
 
               var deltaChanged = radiusDelta > prevRadiusDelta;
               if (deltaChanged) {
@@ -594,7 +603,11 @@ anychart.polarModule.Axis.prototype.calculateAxisBounds_ = function() {
               // this['lbl_fb99' + index].centerX(x).centerY(y);
 
               prevRadiusDelta = radiusDelta;
-              radiusDelta = Math.max(boundsChecker.call(this, tickAngle, tickDx, tickDy, [x, y]), radiusDelta);
+              var checked = boundsChecker.call(this, tickAngle, tickDx, tickDy, [x, y]);
+              radiusDelta = Math.max(checked, radiusDelta);
+
+              //DVF-4218. Prevents endless growth of radius.
+              radiusDelta = Math.min(radiusDelta, this.radius_);
 
               deltaChanged = radiusDelta > prevRadiusDelta;
               if (deltaChanged) {
@@ -611,6 +624,10 @@ anychart.polarModule.Axis.prototype.calculateAxisBounds_ = function() {
         }
 
         iterateStep++;
+        if (iterateStep > maxAttempts) { // DVF-4218.
+          radiusChanged = false;
+        }
+
       } while (radiusChanged);
 
       this.originalRadius_ = this.radius_;
@@ -1040,6 +1057,8 @@ anychart.polarModule.Axis.prototype.calcLabelTextPath = function(label, index, t
     startAngle = angle - da;
     endAngle = angle + da;
   }
+  goog.dispose(padding);
+  padding = null;
 
   if (angle > 0 && angle < 180) {
     var tmpA = startAngle;
@@ -1051,7 +1070,15 @@ anychart.polarModule.Axis.prototype.calcLabelTextPath = function(label, index, t
   var dx = anychart.math.angleDx(startAngleRad, radius, this.cx_);
   var dy = anychart.math.angleDy(startAngleRad, radius, this.cy_);
 
-  var path = label.getTextElement().path() ? label.getTextElement().path().clear() : acgraph.path();
+  var path = /** @type {acgraph.vector.Path} */ (label.getTextElement().path());
+  if (path) {
+    path.clear();
+  } else {
+    path = acgraph.path();
+    // since this anonymous path not managed anywhere
+    // by axis, we register it to dispose with axis
+    this.registerDisposable(path);
+  }
   path
       .moveTo(dx, dy)
       .arcToAsCurves(radius, radius, startAngle, endAngle - startAngle);
@@ -1322,8 +1349,13 @@ anychart.polarModule.Axis.prototype.setupByJSON = function(config, opt_default) 
 
 /** @inheritDoc */
 anychart.polarModule.Axis.prototype.disposeInternal = function() {
-  goog.disposeAll(this.minorLabels_, this.labels_, this.minorTicks_, this.ticks_,
-    this.line_, this.bg_);
+  goog.disposeAll(
+      this.minorLabels_,
+      this.labels_,
+      this.minorTicks_,
+      this.ticks_,
+      this.line_,
+      this.bg_);
 
   delete this.scale_;
   this.minorLabels_ = null;

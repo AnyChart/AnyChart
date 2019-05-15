@@ -66,7 +66,7 @@ anychart.ganttBaseModule.TimeLineHeader = function() {
 
   /**
    * X scale holder.
-   * @type {anychart.resourceModule.Scale|anychart.ganttModule.Scale}
+   * @type {anychart.resourceModule.Scale|anychart.scales.GanttDateTime}
    * @private
    */
   this.xScale_ = null;
@@ -266,8 +266,8 @@ anychart.core.settings.populate(anychart.ganttBaseModule.TimeLineHeader, anychar
 
 /**
  * Getter/setter for xScale.
- * @param {(anychart.resourceModule.Scale|anychart.ganttModule.Scale)=} opt_value
- * @return {anychart.resourceModule.Scale|anychart.ganttModule.Scale|anychart.ganttBaseModule.TimeLineHeader}
+ * @param {(anychart.resourceModule.Scale|anychart.scales.GanttDateTime)=} opt_value
+ * @return {anychart.resourceModule.Scale|anychart.scales.GanttDateTime|anychart.ganttBaseModule.TimeLineHeader}
  */
 anychart.ganttBaseModule.TimeLineHeader.prototype.xScale = function(opt_value) {
   if (goog.isDef(opt_value)) {

@@ -269,6 +269,9 @@ anychart.sunburstModule.Level.prototype.serialize = function() {
  */
 anychart.sunburstModule.Level.prototype.disposeInternal = function() {
   goog.disposeAll(this.normal_, this.hovered_, this.selected_);
+  this.normal_ = null;
+  this.hovered_ = null;
+  this.selected_ = null;
   anychart.sunburstModule.Level.base(this, 'disposeInternal');
 };
 

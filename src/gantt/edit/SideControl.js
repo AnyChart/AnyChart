@@ -224,6 +224,8 @@ anychart.ganttModule.edit.SideControl.prototype.disposeInternal = function() {
   this.thumb_.unlistenSignals(this.redispatch_, this);
   this.connectorThumb_.unlistenSignals(this.redispatch_, this);
   goog.disposeAll(this.thumb_, this.connectorThumb_);
+  this.thumb_ = null;
+  this.connectorThumb_ = null;
 
   anychart.ganttModule.edit.SideControl.base(this, 'disposeInternal');
 };

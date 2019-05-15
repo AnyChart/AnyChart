@@ -23,8 +23,7 @@ goog.require('anychart.sparklineModule.series.WinLoss');
  */
 anychart.sparkline = function(opt_data, opt_csvSettings) {
   var chart = new anychart.sparklineModule.Chart(opt_data, opt_csvSettings);
-
-  chart.setupInternal(true, anychart.getFullTheme('sparkline'));
+  chart.setupElements();
 
   return chart;
 };

@@ -340,6 +340,21 @@ anychart.ganttModule.edit.ElementEdit.prototype.serialize = function() {
 };
 
 
+/** @inheritDoc */
+anychart.ganttModule.edit.ElementEdit.prototype.disposeInternal = function() {
+  goog.disposeAll(
+      this.thumbs_,
+      this.connectorThumbs_,
+      this.start_,
+      this.end_);
+  this.thumbs_ = null;
+  this.connectorThumbs_ = null;
+  this.start_ = null;
+  this.end_ = null;
+  anychart.ganttModule.edit.ElementEdit.base(this, 'disposeInternal');
+};
+
+
 //endregion
 //region -- Exports.
 //exports

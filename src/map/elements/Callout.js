@@ -21,6 +21,8 @@ goog.require('anychart.math.Rect');
 anychart.mapModule.elements.Callout = function() {
   anychart.mapModule.elements.Callout.base(this, 'constructor');
 
+  this.addThemes('defaultCallout');
+
   /**
    * @type {?number}
    * @private
@@ -40,6 +42,7 @@ anychart.mapModule.elements.Callout = function() {
     ['labels', 0, 0]
   ]);
   this.normal_ = new anychart.core.StateSettings(this, normalHoveredSelectedDescriptorsMeta, anychart.PointState.NORMAL);
+  this.normal_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR,  anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME);
   this.normal_.setOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK, anychart.core.StateSettings.DEFAULT_LABELS_AFTER_INIT_CALLBACK);
 
   function afterInitCallback(factory) {
@@ -56,9 +59,43 @@ anychart.mapModule.elements.Callout = function() {
   this.ALL_VISUAL_STATES = anychart.ConsistencyState.CALLOUT_TITLE |
       anychart.ConsistencyState.CALLOUT_LABELS |
       anychart.ConsistencyState.CALLOUT_BACKGROUND;
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['orientation', this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['align', this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['length', this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['width', this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED]
+  ]);
 };
 goog.inherits(anychart.mapModule.elements.Callout, anychart.core.VisualBase);
 anychart.core.settings.populateAliases(anychart.mapModule.elements.Callout, ['labels'], 'normal');
+
+
+/**
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.mapModule.elements.Callout.PROPERTY_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  /**
+   * @param {*} value
+   * @return {anychart.enums.Orientation} Normalized orientation.
+   */
+  var orientationNormalizer = function(value) {
+    return anychart.enums.normalizeOrientation(value, anychart.enums.Orientation.RIGHT);
+  };
+
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'orientation', orientationNormalizer],
+    anychart.core.settings.descriptors.ALIGN,
+    anychart.core.settings.descriptors.LENGTH,
+    anychart.core.settings.descriptors.WIDTH
+  ]);
+
+  return map;
+})();
+anychart.core.settings.populate(anychart.mapModule.elements.Callout, anychart.mapModule.elements.Callout.PROPERTY_DESCRIPTORS);
 
 
 //region --- Class constants
@@ -175,79 +212,6 @@ anychart.mapModule.elements.Callout.prototype.labelsInvalidated_ = function(even
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter/setter for orientation.
- * @param {(string|anychart.enums.Orientation|null)=} opt_value Callout orientation.
- * @return {anychart.enums.Orientation|!anychart.mapModule.elements.Callout} Callout orientation or itself for method chaining.
- */
-anychart.mapModule.elements.Callout.prototype.orientation = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var orientation = goog.isNull(opt_value) ? null : anychart.enums.normalizeOrientation(opt_value);
-    if (this.orientation_ != orientation) {
-      this.orientation_ = orientation;
-      this.invalidate(this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.orientation_ || anychart.enums.Orientation.RIGHT;
-  }
-};
-
-
-/**
- * Getter/setter for color range align setting.
- * @param {(anychart.enums.Align|string)=} opt_value Color range align.
- * @return {(anychart.enums.Align|anychart.mapModule.elements.Callout)} Color range align or self for chaining.
- */
-anychart.mapModule.elements.Callout.prototype.align = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeAlign(opt_value);
-    if (this.align_ != opt_value) {
-      this.align_ = opt_value;
-      this.invalidate(this.ALL_VISUAL_STATES,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.align_;
-  }
-};
-
-
-/**
- * Color range line length.
- * @param {string|number|null=} opt_value Color line length.
- * @return {null|number|string|anychart.mapModule.elements.Callout} Color line length.
- */
-anychart.mapModule.elements.Callout.prototype.length = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.length_ != opt_value) {
-      this.length_ = opt_value;
-      this.invalidate(this.ALL_VISUAL_STATES,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.length_;
-};
-
-
-/**
- * @param {?(number|string)=} opt_value .
- * @return {anychart.mapModule.elements.Callout|number|string|null} .
- */
-anychart.mapModule.elements.Callout.prototype.width = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.width_ != opt_value) {
-      this.width_ = opt_value;
-      this.invalidate(this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.width_;
-};
-
-
-/**
  * Padding.
  * @param {(string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_spaceOrTopOrTopAndBottom .
  * @param {(string|number)=} opt_rightOrRightAndLeft .
@@ -258,7 +222,7 @@ anychart.mapModule.elements.Callout.prototype.width = function(opt_value) {
 anychart.mapModule.elements.Callout.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.padding_) {
     this.padding_ = new anychart.core.utils.Padding();
-    this.registerDisposable(this.padding_);
+    this.setupCreated('padding', this.padding_);
     this.padding_.listenSignals(this.boundsInvalidated_, this);
   }
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
@@ -280,7 +244,7 @@ anychart.mapModule.elements.Callout.prototype.padding = function(opt_spaceOrTopO
 anychart.mapModule.elements.Callout.prototype.margin = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.margin_) {
     this.margin_ = new anychart.core.utils.Margin();
-    this.registerDisposable(this.margin_);
+    this.setupCreated('margin', this.margin_);
     this.margin_.listenSignals(this.boundsInvalidated_, this);
   }
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
@@ -334,7 +298,7 @@ anychart.mapModule.elements.Callout.prototype.items = function(opt_value) {
 anychart.mapModule.elements.Callout.prototype.background = function(opt_value) {
   if (!this.background_) {
     this.background_ = new anychart.core.ui.Background();
-    this.registerDisposable(this.background_);
+    this.setupCreated('background', this.background_);
     this.background_.listenSignals(this.backgroundInvalidated_, this);
   }
 
@@ -366,11 +330,8 @@ anychart.mapModule.elements.Callout.prototype.backgroundInvalidated_ = function(
 anychart.mapModule.elements.Callout.prototype.title = function(opt_value) {
   if (!this.title_) {
     this.title_ = new anychart.core.ui.Title();
+    this.setupCreated('title', this.title_);
     this.title_.listenSignals(this.titleInvalidated_, this);
-    this.registerDisposable(this.title_);
-
-    // todo: (chernetsky) Remove this when Callout is refactored
-    this.title_.dropThemes();
   }
 
   if (goog.isDef(opt_value)) {
@@ -459,7 +420,7 @@ anychart.mapModule.elements.Callout.prototype.setProcessedItems = function(value
  * @return {boolean} If the axis is horizontal.
  */
 anychart.mapModule.elements.Callout.prototype.isHorizontal = function() {
-  var orientation = this.orientation();
+  var orientation = this.getOption('orientation');
   return orientation == anychart.enums.Orientation.TOP ||
       orientation == anychart.enums.Orientation.BOTTOM;
 };
@@ -511,7 +472,7 @@ anychart.mapModule.elements.Callout.prototype.getRemainingBounds = function() {
       var heightOffset = calloutBounds.height;
       var widthOffset = calloutBounds.width;
 
-      switch (this.orientation()) {
+      switch (this.getOption('orientation')) {
         case anychart.enums.Orientation.TOP:
           remainingBounds.height -= heightOffset;
           remainingBounds.top += heightOffset;
@@ -589,15 +550,15 @@ anychart.mapModule.elements.Callout.prototype.getPixelBounds = function() {
       }
 
       var itemsCount = this.processedItems_.length;
-      var autoLength = !goog.isDefAndNotNull(this.length_);
-      var autoSize = !goog.isDefAndNotNull(this.width_);
+      var autoLength = !goog.isDefAndNotNull(this.getOption('length'));
+      var autoSize = !goog.isDefAndNotNull(this.getOption('width'));
 
-      var length = goog.isDefAndNotNull(this.length_) ?
-          anychart.utils.normalizeSize(/** @type {null|number|string} */(this.length()), parentLength) :
+      var length = goog.isDefAndNotNull(this.getOption('length')) ?
+          anychart.utils.normalizeSize(/** @type {null|number|string} */(this.getOption('length')), parentLength) :
           maxLabelLength * itemsCount;
 
-      var size = goog.isDefAndNotNull(this.width_) ?
-          anychart.utils.normalizeSize(/** @type {null|number|string} */(this.width()), parentSize) :
+      var size = goog.isDefAndNotNull(this.getOption('width')) ?
+          anychart.utils.normalizeSize(/** @type {null|number|string} */(this.getOption('width')), parentSize) :
           maxLabelSize;
 
       var titleSize = 0;
@@ -605,12 +566,13 @@ anychart.mapModule.elements.Callout.prototype.getPixelBounds = function() {
       var affectSize = false;
       var affectLength = false;
 
+      var titleOrientation;
       var title = this.title();
       if (title.enabled()) {
         if (!title.container()) title.container(/** @type {acgraph.vector.ILayer} */(this.container()));
         title.suspendSignalsDispatching();
         title.parentBounds(parentBounds);
-        title.defaultOrientation(/** @type {anychart.enums.Orientation} */(this.orientation()));
+        title.defaultOrientation(/** @type {anychart.enums.Orientation} */(this.getOption('orientation')));
 
         if (this.isHorizontal()) {
           titleSize = title.getContentBounds().height;
@@ -620,7 +582,7 @@ anychart.mapModule.elements.Callout.prototype.getPixelBounds = function() {
           titleLength = title.getContentBounds().height;
         }
 
-        var titleOrientation = title.getOption('orientation') || title.defaultOrientation();
+        titleOrientation = title.getOption('orientation') || title.defaultOrientation();
         if (titleOrientation == anychart.enums.Orientation.TOP || titleOrientation == anychart.enums.Orientation.BOTTOM) {
           affectSize = this.isHorizontal();
           affectLength = !this.isHorizontal();
@@ -674,7 +636,7 @@ anychart.mapModule.elements.Callout.prototype.getPixelBounds = function() {
         this.internalItemSize_ = size - (affectSize ? titleSize : 0);
       }
 
-      var align = this.align();
+      var align = this.getOption('align');
       var offset;
       if (this.isHorizontal()) {
         if (length + rightPad + leftPad + rightMargin + leftMargin > parentLength) {
@@ -701,7 +663,7 @@ anychart.mapModule.elements.Callout.prototype.getPixelBounds = function() {
       }
 
       var width, height;
-      switch (this.orientation()) {
+      switch (this.getOption('orientation')) {
         case anychart.enums.Orientation.TOP:
           y = parentBounds.top + topPad + topMargin;
           x = parentBounds.left + offset;
@@ -735,7 +697,7 @@ anychart.mapModule.elements.Callout.prototype.getPixelBounds = function() {
       }
 
       if (title.enabled()) {
-        var titleOrientation = title.getOption('orientation') || title.defaultOrientation();
+        titleOrientation = title.getOption('orientation') || title.defaultOrientation();
         switch (titleOrientation) {
           case anychart.enums.Orientation.TOP:
             this.labelSpace.left = x;
@@ -795,7 +757,7 @@ anychart.mapModule.elements.Callout.prototype.createPositionProvider = function(
     var x, y;
     var bounds = this.labelSpace;
 
-    switch (this.orientation()) {
+    switch (this.getOption('orientation')) {
       case anychart.enums.Orientation.TOP:
         x = bounds.left + this.internalItemLength_ * index + this.internalItemLength_ / 2;
         y = bounds.top + this.internalItemSize_;
@@ -921,7 +883,7 @@ anychart.mapModule.elements.Callout.prototype.configureLabel = function(item, la
     label['height'](this.internalItemLength_);
   }
 
-  switch (this.orientation()) {
+  switch (this.getOption('orientation')) {
     case anychart.enums.Orientation.TOP:
       label['anchor'](anychart.enums.Anchor.CENTER_BOTTOM);
       break;
@@ -976,7 +938,7 @@ anychart.mapModule.elements.Callout.prototype.calculateLabels = function() {
     var y = positionProvider['value']['y'];
     var width, height;
 
-    switch (this.orientation()) {
+    switch (this.getOption('orientation')) {
       case anychart.enums.Orientation.TOP:
         x -= this.internalItemLength_ / 2;
         y -= this.internalItemSize_;
@@ -1187,26 +1149,36 @@ anychart.mapModule.elements.Callout.prototype.remove = function() {
 
 //endregion
 //region --- Setup and dispose
+/**
+ * Setup own settings of the state settings to make possible parent to child relations mechanism to work.
+ */
+anychart.mapModule.elements.Callout.prototype.setupStateSettings = function() {
+  this.normal_.addThemes(this.themeSettings);
+  this.setupCreated('normal', this.normal_);
+  this.normal_.setup(this.normal_.themeSettings);
+
+  this.setupCreated('hovered', this.hovered_);
+  this.hovered_.setup(this.hovered_.themeSettings);
+
+  this.setupCreated('selected', this.selected_);
+  this.selected_.setup(this.selected_.themeSettings);
+};
+
+
 /** @inheritDoc */
 anychart.mapModule.elements.Callout.prototype.serialize = function() {
   var json = anychart.mapModule.elements.Callout.base(this, 'serialize');
+  anychart.core.settings.serialize(this, anychart.mapModule.elements.Callout.PROPERTY_DESCRIPTORS, json);
+
   json['title'] = this.title().serialize();
   json['background'] = this.background().serialize();
+  json['padding'] = this.padding().serialize();
+  json['margin'] = this.margin().serialize();
+  json['items'] = this.items();
 
   json['normal'] = this.normal_.serialize();
   json['hovered'] = this.hovered_.serialize();
   json['selected'] = this.selected_.serialize();
-
-  json['width'] = this.width();
-  json['length'] = this.length();
-
-  json['orientation'] = this.orientation();
-  json['align'] = this.align();
-
-  json['items'] = this.items();
-
-  json['padding'] = this.padding().serialize();
-  json['margin'] = this.margin().serialize();
 
   return json;
 };
@@ -1215,8 +1187,9 @@ anychart.mapModule.elements.Callout.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.mapModule.elements.Callout.prototype.setupByJSON = function(config, opt_default) {
   this.suspendSignalsDispatching();
-  anychart.mapModule.elements.Callout.base(this, 'setupByJSON', config, opt_default);
 
+  anychart.mapModule.elements.Callout.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.settings.deserialize(this, anychart.mapModule.elements.Callout.PROPERTY_DESCRIPTORS, config);
 
   if ('title' in config)
     this.title(config['title']);
@@ -1235,12 +1208,6 @@ anychart.mapModule.elements.Callout.prototype.setupByJSON = function(config, opt
   this.hovered_.setupInternal(!!opt_default, config['hovered']);
   this.selected_.setupInternal(!!opt_default, config['selected']);
 
-  this.width(config['width']);
-  this.length(config['length']);
-
-  this.orientation(config['orientation']);
-  this.align(config['align']);
-
   this.items(config['items']);
 
   this.resumeSignalsDispatching(true);
@@ -1249,14 +1216,19 @@ anychart.mapModule.elements.Callout.prototype.setupByJSON = function(config, opt
 
 /** @inheritDoc */
 anychart.mapModule.elements.Callout.prototype.disposeInternal = function() {
-  anychart.mapModule.elements.Callout.base(this, 'disposeInternal');
+  goog.disposeAll(
+      this.padding_,
+      this.margin_,
+      this.background_,
+      this.title_);
 
-  this.title_ = null;
   this.padding_ = null;
   this.margin_ = null;
   this.background_ = null;
-
+  this.title_ = null;
   this.paddingBounds = null;
+
+  anychart.mapModule.elements.Callout.base(this, 'disposeInternal');
 };
 
 
@@ -1272,10 +1244,12 @@ anychart.mapModule.elements.Callout.prototype.disposeInternal = function() {
   proto['background'] = proto.background;
   proto['padding'] = proto.padding;
   proto['margin'] = proto.margin;
-  proto['length'] = proto.length;
-  proto['width'] = proto.width;
-  proto['align'] = proto.align;
   proto['items'] = proto.items;
-  proto['orientation'] = proto.orientation;
+
+  // auto generated
+  // proto['orientation'] = proto.orientation;
+  // proto['align'] = proto.align;
+  // proto['length'] = proto.length;
+  // proto['width'] = proto.width;
 })();
 //endregion

@@ -58,7 +58,6 @@ anychart.scales.DateTime.prototype.ticks = function(opt_value) {
     this.ticksObj = new anychart.scales.DateTimeTicks(this);
     this.setupCreated('ticks', this.ticksObj);
 
-    this.registerDisposable(this.ticksObj);
     this.ticksObj.listenSignals(this.ticksInvalidated_, this);
   }
   if (goog.isDef(opt_value)) {
@@ -79,7 +78,6 @@ anychart.scales.DateTime.prototype.minorTicks = function(opt_value) {
   if (!this.minorTicksObj) {
     this.minorTicksObj = new anychart.scales.DateTimeTicks(this);
     this.setupCreated('minorTicks', this.minorTicksObj);
-    this.registerDisposable(this.minorTicksObj);
     this.minorTicksObj.listenSignals(this.ticksInvalidated_, this);
   }
   if (goog.isDef(opt_value)) {
@@ -146,6 +144,15 @@ anychart.scales.DateTime.prototype.setupByJSON = function(config, opt_default) {
   anychart.scales.DateTime.base(this, 'setupByJSON', config, opt_default);
   this.ticks(config['ticks']);
   this.minorTicks(config['minorTicks']);
+};
+
+
+/** @inheritDoc */
+anychart.scales.DateTime.prototype.disposeInternal = function() {
+  goog.disposeAll(this.ticksObj, this.minorTicksObj);
+  this.ticksObj = null;
+  this.minorTicksObj = null;
+  anychart.scales.DateTime.base(this, 'disposeInternal');
 };
 
 
