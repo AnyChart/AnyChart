@@ -104,13 +104,33 @@ anychart.ui.Zoom.prototype.isMapChart_ = function(chart) {
 
 
 /**
+ * @param {*} chart
+ * @return {boolean}
+ * @private
+ */
+anychart.ui.Zoom.prototype.isTimelineChart_ = function(chart) {
+  return /** @type {boolean} */(chart && goog.isFunction(chart['getType']) && chart['getType']() == anychart.enums.ChartTypes.TIMELINE);
+};
+
+
+/**
+ * @param {*} chart
+ * @return {boolean}
+ * @private
+ */
+anychart.ui.Zoom.prototype.isGraphChart_ = function(chart) {
+  return /** @type {boolean} */(chart && goog.isFunction(chart['getType']) && chart['getType']() == anychart.enums.ChartTypes.GRAPH);
+};
+
+
+/**
  * @param {(anychart.mapModule.Chart|Element)=} opt_parentElement Optional parent element or Map chart to render the
  *    range picker into.
  * @return {Element|undefined}
  * @private
  */
 anychart.ui.Zoom.prototype.extractChartContainer_ = function(opt_parentElement) {
-  if (this.isMapChart_(opt_parentElement)) {
+  if (this.isMapChart_(opt_parentElement) || this.isTimelineChart_(opt_parentElement) || this.isGraphChart_(opt_parentElement)) {
     this.target(/** @type {anychart.mapModule.Chart} */(opt_parentElement));
     var stage = this.target_['container']() ? this.target_['container']()['getStage']() : null;
     if (stage && stage['container']()) {

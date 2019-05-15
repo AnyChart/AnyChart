@@ -392,8 +392,13 @@ anychart.core.drawers.Area.prototype.finalizeSegment = function() {
     for (var i = this.zeroesStack.length - 1; i >= 0; i -= 2) {
       /** @type {number} */
       var x = /** @type {number} */(this.zeroesStack[i - 1]);
+
       /** @type {number} */
       var y = /** @type {number} */(this.zeroesStack[i]);
+      // align area bottom (or top in case of baseline being under value) horizontal line to tick
+      y = anychart.utils.applyPixelShift(y, 1);
+      y = y < this.prevY ? Math.floor(y) : Math.ceil(y);
+
       anychart.core.drawers.line(path, this.isVertical, x, y);
       anychart.core.drawers.line(hatchPath, this.isVertical, x, y);
     }

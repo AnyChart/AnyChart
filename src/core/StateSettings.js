@@ -5,6 +5,7 @@ goog.require('anychart.core.settings.IObjectWithSettings');
 goog.require('anychart.core.ui.Background');
 goog.require('anychart.core.ui.CircularLabelsFactory');
 goog.require('anychart.core.ui.LabelsFactory');
+goog.require('anychart.core.ui.LabelsSettings');
 goog.require('anychart.core.ui.MarkersFactory');
 goog.require('anychart.core.ui.Outline');
 goog.require('anychart.core.utils.Connector');
@@ -147,6 +148,26 @@ anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR = function() {
  */
 anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME = function() {
   return new anychart.core.ui.LabelsFactory(true);
+};
+
+
+/**
+ * Default labels settings constructor.
+ * @this {*}
+ * @return {anychart.core.ui.LabelsSettings}
+ */
+anychart.core.StateSettings.OPTIMIZED_LABELS_CONSTRUCTOR = function() {
+  return new anychart.core.ui.LabelsSettings();
+};
+
+
+/**
+ * Default labels settings constructor. But without using defaultSimpleLabelsSettings theme
+ * @this {*}
+ * @return {anychart.core.ui.LabelsSettings}
+ */
+anychart.core.StateSettings.OPTIMIZED_LABELS_CONSTRUCTOR_NO_THEME = function() {
+  return new anychart.core.ui.LabelsSettings(true);
 };
 
 
@@ -387,7 +408,12 @@ anychart.core.StateSettings.prototype.PROPERTY_DESCRIPTORS = (function() {
     // pie tasks
     descriptors.EXPLODE,
     // button content
-    descriptors.CONTENT
+    descriptors.CONTENT,
+
+    descriptors.WIDTH_NUMBER,
+    descriptors.HEIGHT_NUMBER,
+
+    descriptors.SHAPE
   ]);
 
   return map;
@@ -436,7 +462,7 @@ anychart.core.StateSettings.prototype.getState = function() {
 /**
  * Labels.
  * @param {(Object|boolean|null)=} opt_value
- * @return {anychart.core.StateSettings|anychart.core.ui.LabelsFactory|anychart.core.ui.CircularLabelsFactory}
+ * @return {anychart.core.StateSettings|anychart.core.ui.LabelsFactory|anychart.core.ui.CircularLabelsFactory|anychart.core.ui.LabelsSettings}
  */
 anychart.core.StateSettings.prototype.labels = function(opt_value) {
   if (!this.labels_) {
@@ -539,7 +565,7 @@ anychart.core.StateSettings.prototype.headers = function(opt_value) {
 /**
  * Upper labels (tasks).
  * @param {(Object|boolean|null)=} opt_value
- * @return {anychart.core.StateSettings|anychart.core.ui.LabelsFactory}
+ * @return {anychart.core.StateSettings|anychart.core.ui.LabelsFactory|anychart.core.ui.LabelsSettings}
  */
 anychart.core.StateSettings.prototype.upperLabels = function(opt_value) {
   return this.labels(opt_value);

@@ -20,3 +20,5 @@ externs.js
 tests
 .travis.yml
 demos-local
+./dist/js/graphics.js
+./dist/js/graphics.min.js

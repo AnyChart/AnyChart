@@ -2,9 +2,9 @@ goog.provide('anychart.ganttModule.Controller');
 
 goog.require('anychart.core.Base');
 goog.require('anychart.format');
-goog.require('anychart.ganttModule.Scale');
 goog.require('anychart.ganttModule.ScrollBar');
 goog.require('anychart.math.Rect');
+goog.require('anychart.scales.GanttDateTime');
 goog.require('anychart.treeDataModule.Tree');
 
 goog.require('goog.array');
@@ -541,8 +541,16 @@ anychart.ganttModule.Controller.prototype.linearizeData_ = function() {
   this.linearIndex_ = 0;
   this.minDate_ = NaN;
   this.maxDate_ = NaN;
-  this.startIndex_ = NaN;
-  this.endIndex_ = NaN;
+
+  /*
+    Setting NaN values fixes some bug with no data but breaks live edit on editing
+    item scrolled to bottom.
+    I really can't find the bug that was fixed by setting NaNs.
+    Hope, CAT will help us to find an issue.
+   */
+  // this.startIndex_ = NaN;
+  // this.endIndex_ = NaN;
+
   this.allItems_.length = 0;
 
   this.data_.suspendSignalsDispatching();
@@ -1057,8 +1065,8 @@ anychart.ganttModule.Controller.prototype.run = function() {
     this.recalculate();
 
     if (!isNaN(this.minDate_) && this.minDate_ == this.maxDate_) {
-      this.minDate_ -= anychart.ganttModule.Scale.MILLISECONDS_IN_DAY;
-      this.maxDate_ += anychart.ganttModule.Scale.MILLISECONDS_IN_DAY;
+      this.minDate_ -= anychart.scales.GanttDateTime.MILLISECONDS_IN_DAY;
+      this.maxDate_ += anychart.scales.GanttDateTime.MILLISECONDS_IN_DAY;
     }
   }
 

@@ -942,7 +942,7 @@ anychart.core.settings.descriptors = (function() {
   map.LENGTH = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'length', anychart.core.settings.numberOrPercentNormalizer];
 
   // event markers
-  map.DIRECTION = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'direction', anychart.enums.normalizeEventMarkerDirection];
+  map.DIRECTION = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'direction', anychart.enums.normalizeDirection];
   map.POSITION = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'position', anychart.enums.normalizeEventMarkerPosition];
   map.SERIES_ID = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'seriesId', anychart.core.settings.stringNormalizer];
   map.FIELD_NAME = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'fieldName', anychart.core.settings.stringNormalizer];
@@ -972,6 +972,9 @@ anychart.core.settings.descriptors = (function() {
   map.DRAW_FIRST_LABEL = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'drawFirstLabel', anychart.core.settings.booleanNormalizer];
   map.DRAW_LAST_LABEL = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'drawLastLabel', anychart.core.settings.booleanNormalizer];
 
+  map.WIDTH_NUMBER = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'width', anychart.core.settings.numberOrNullNormalizer];
+  map.HEIGHT_NUMBER = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'height', anychart.core.settings.numberOrNullNormalizer];
+  map.SHAPE = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'shape', anychart.core.settings.stringOrNullNormalizer];
   return map;
 })();
 

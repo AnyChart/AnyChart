@@ -26,14 +26,14 @@ anychart.core.axisMarkers.PathBase = function() {
 
   /**
    * Current scale.
-   * @type {anychart.scales.Base|anychart.ganttModule.Scale}
+   * @type {anychart.scales.Base|anychart.scales.GanttDateTime}
    * @private
    */
   this.scale_;
 
   /**
    * Auto scale.
-   * @type {anychart.scales.Base|anychart.ganttModule.Scale}
+   * @type {anychart.scales.Base|anychart.scales.GanttDateTime}
    * @private
    */
   this.autoScale_ = null;
@@ -58,6 +58,13 @@ anychart.core.axisMarkers.PathBase = function() {
    * @private
    */
   this.markerElement_;
+
+  /**
+   * Flag to allow drawing with any ratio.
+   * @type {boolean}
+   * @private
+   */
+  this.drawAtAnyRatio_ = false;
 
   this.bindHandlersToComponent(this);
 
@@ -186,8 +193,8 @@ anychart.core.axisMarkers.PathBase.prototype.layout = goog.abstractMethod;
 /**
  * Getter/setter for auto scale.
  * Works with instances of anychart.scales.Base only.
- * @param {(anychart.scales.Base|anychart.ganttModule.Scale|Object|anychart.enums.ScaleTypes)=} opt_value - Scale.
- * @return {anychart.scales.Base|anychart.ganttModule.Scale|!anychart.core.axisMarkers.PathBase} - Axis scale or
+ * @param {(anychart.scales.Base|anychart.scales.GanttDateTime|Object|anychart.enums.ScaleTypes)=} opt_value - Scale.
+ * @return {anychart.scales.Base|anychart.scales.GanttDateTime|!anychart.core.axisMarkers.PathBase} - Axis scale or
  * itself for method chaining.
  */
 anychart.core.axisMarkers.PathBase.prototype.autoScale = function(opt_value) {
@@ -199,7 +206,7 @@ anychart.core.axisMarkers.PathBase.prototype.autoScale = function(opt_value) {
         anychart.scales.Base.setupScale(/** @type {anychart.scales.Base} */(this.autoScale_), opt_value, null, anychart.scales.Base.ScaleTypes.ALL_DEFAULT, null, this.scaleInvalidated, this);
     if (val) {
       var dispatch = this.autoScale_ == val;
-      this.autoScale_ = /** @type {anychart.scales.Base|anychart.ganttModule.Scale} */(val);
+      this.autoScale_ = /** @type {anychart.scales.Base|anychart.scales.GanttDateTime} */(val);
       var scaleIsSet = this.scale_ || (this.axis_ && /** @type {?anychart.scales.Base} */ (this.axis_.scale()));
       if (scaleIsSet) {
         val.resumeSignalsDispatching(false);
@@ -219,8 +226,8 @@ anychart.core.axisMarkers.PathBase.prototype.autoScale = function(opt_value) {
 /**
  * Getter/setter for default scale.
  * Works with instances of anychart.scales.Base only.
- * @param {(anychart.scales.Base|anychart.ganttModule.Scale|Object|anychart.enums.ScaleTypes)=} opt_value - Scale.
- * @return {anychart.scales.Base|anychart.ganttModule.Scale|!anychart.core.axisMarkers.PathBase} - Axis scale or
+ * @param {(anychart.scales.Base|anychart.scales.GanttDateTime|Object|anychart.enums.ScaleTypes)=} opt_value - Scale.
+ * @return {anychart.scales.Base|anychart.scales.GanttDateTime|!anychart.core.axisMarkers.PathBase} - Axis scale or
  *  itself for method chaining.
  */
 anychart.core.axisMarkers.PathBase.prototype.scaleInternal = function(opt_value) {
@@ -235,7 +242,7 @@ anychart.core.axisMarkers.PathBase.prototype.scaleInternal = function(opt_value)
       var listenForGantt = (ganttScale && !this.scale_);
       if (!val)
         this.scale_.unlistenSignals(this.scaleInvalidated, this);
-      this.scale_ = /** @type {anychart.ganttModule.Scale|anychart.scales.Base} */(val);
+      this.scale_ = /** @type {anychart.scales.GanttDateTime|anychart.scales.Base} */(val);
       if (listenForGantt)
         this.scale_.listenSignals(this.scaleInvalidated, this);
       if (val && !ganttScale)
@@ -360,6 +367,23 @@ anychart.core.axisMarkers.PathBase.prototype.axis = function(opt_value) {
 };
 
 
+/**
+ * If set to true - allows drawing marker using any ratio, even (-Infinity, 0) and (1, Infinity).
+ * Default value is false.
+ * Should not be in the public API.
+ * @param {boolean=} opt_value
+ * @return {anychart.core.axisMarkers.PathBase|boolean}
+ */
+anychart.core.axisMarkers.PathBase.prototype.drawAtAnyRatio = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.drawAtAnyRatio_ = opt_value;
+    return this;
+  }
+
+  return this.drawAtAnyRatio_;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //  Bounds.
 //----------------------------------------------------------------------------------------------------------------------
@@ -457,7 +481,7 @@ anychart.core.axisMarkers.PathBase.prototype.draw = function() {
  * @return {anychart.core.axisMarkers.PathBase} - Itself for method chaining.
  */
 anychart.core.axisMarkers.PathBase.prototype.drawLine = function() {
-  var scale = /** @type {anychart.scales.Base|anychart.ganttModule.Scale} */ (this.scale());
+  var scale = /** @type {anychart.scales.Base|anychart.scales.GanttDateTime} */ (this.scale());
 
   if (!scale) { //Here we can get null.
     anychart.core.reporting.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
@@ -470,7 +494,7 @@ anychart.core.axisMarkers.PathBase.prototype.drawLine = function() {
   el.clear();
   if (isNaN(ratio)) return this;
 
-  if (ratio >= 0 && ratio <= 1) {
+  if ((ratio >= 0 && ratio <= 1) || this.drawAtAnyRatio_) {
     var bounds = this.parentBounds();
     var axesLinesSpace = this.axesLinesSpace();
     var strokeThickness = /** @type {number} */(el.strokeThickness());
@@ -486,7 +510,8 @@ anychart.core.axisMarkers.PathBase.prototype.drawLine = function() {
       el.moveTo(x, bounds.getTop());
       el.lineTo(x, bounds.getBottom());
     }
-    el.clip(axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds)));
+    if (!this.drawAtAnyRatio_)//sacrifice clipping, to draw marker out of bounds
+      el.clip(axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds)));
   }
   return this;
 };
@@ -497,7 +522,7 @@ anychart.core.axisMarkers.PathBase.prototype.drawLine = function() {
  * @return {anychart.core.axisMarkers.PathBase} - Itself for method chaining.
  */
 anychart.core.axisMarkers.PathBase.prototype.drawRange = function() {
-  var scale = /** @type {anychart.scales.Base|anychart.ganttModule.Scale} */ (this.scale());
+  var scale = /** @type {anychart.scales.Base|anychart.scales.GanttDateTime} */ (this.scale());
 
   if (!scale) { //Here we can get null.
     anychart.core.reporting.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
@@ -528,10 +553,12 @@ anychart.core.axisMarkers.PathBase.prototype.drawRange = function() {
 
   if (isNaN(ratioMinValue) || isNaN(ratioMaxValue)) return this;
 
-  if (ratioMaxValue >= 0 && ratioMinValue <= 1) { //range or part of it is visible.
-    // clamping to prevent range marker go out from the bounds. Ratio should be between 0 and 1.
-    ratioMinValue = goog.math.clamp(ratioMinValue, 0, 1);
-    ratioMaxValue = goog.math.clamp(ratioMaxValue, 0, 1);
+  if ((ratioMaxValue >= 0 && ratioMinValue <= 1) || this.drawAtAnyRatio_) { //range or part of it is visible.
+    if (!this.drawAtAnyRatio_) {//clamp only if we restrict ratio to [0, 1] range.
+      // clamping to prevent range marker go out from the bounds. Ratio should be between 0 and 1.
+      ratioMinValue = goog.math.clamp(ratioMinValue, 0, 1);
+      ratioMaxValue = goog.math.clamp(ratioMaxValue, 0, 1);
+    }
 
     var bounds = this.parentBounds();
     var axesLinesSpace = this.axesLinesSpace();
@@ -557,7 +584,8 @@ anychart.core.axisMarkers.PathBase.prototype.drawRange = function() {
           .lineTo(x_max, y_start)
           .close();
     }
-    el.clip(axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds)));
+    if (!this.drawAtAnyRatio_)//sacrifice clipping, to draw marker out of bounds
+      el.clip(axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds)));
   }
   return this;
 };

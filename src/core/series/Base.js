@@ -2550,12 +2550,22 @@ anychart.core.series.Base.prototype.setupLabelDrawingPlan = function(label,
     seriesExtremumState, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
     seriesState, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
     chartState, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
+    label, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
     label, anychart.utils.ExtractSettingModes.AUTO_SETTINGS,
     seriesExtremumNormal, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
     seriesNormal, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
     chartNormal, anychart.utils.ExtractSettingModes.THEME_SETTINGS
   ]));
 };
+
+
+/**
+ * Applies additional settings to the label, if needed.
+ * Only used in Timeline chart.
+ * @param {anychart.core.ui.LabelsFactory.Label} label
+ * @param {number|undefined} index
+ */
+anychart.core.series.Base.prototype.applyAdditionalLabelSettings = goog.nullFunction;
 
 
 /**
@@ -2595,6 +2605,8 @@ anychart.core.series.Base.prototype.drawSingleFactoryElement = function(factorie
       label.autoAnchor(this.resolveAutoAnchor(opt_position, Number(label.getFinalSettings('rotation')) || 0));
       this.checkBoundsCollision(/** @type {anychart.core.ui.LabelsFactory} */(mainFactory), label);
     }
+
+    this.applyAdditionalLabelSettings(label, index);
   } else {
     var currentFactory = /** @type {anychart.core.ui.MarkersFactory} */(factories[1] || mainFactory);
     var iterator = this.getIterator();

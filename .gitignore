@@ -8,3 +8,5 @@ out/*
 *.swo
 *.pyc
 demos-local
+./dist/js/graphics.js
+./dist/js/graphics.min.js

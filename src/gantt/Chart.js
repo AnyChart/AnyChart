@@ -592,14 +592,14 @@ anychart.ganttModule.Chart.prototype.scrollToRow = function(rowIndex) {
 /**
  * Gets timeline scale.
  * @param {Object=} opt_value - Scale config.
- * @return {anychart.ganttModule.Chart|anychart.ganttModule.Scale}
+ * @return {anychart.ganttModule.Chart|anychart.scales.GanttDateTime}
  */
 anychart.ganttModule.Chart.prototype.xScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.getTimeline().scale(opt_value);
     return this;
   }
-  return /** @type {anychart.ganttModule.Scale} */ (this.getTimeline().scale());
+  return /** @type {anychart.scales.GanttDateTime} */ (this.getTimeline().scale());
 };
 
 

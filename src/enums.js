@@ -61,13 +61,15 @@ anychart.enums.ChartTypes = {
   MOSAIC: 'mosaic',
   BARMEKKO: 'barmekko',
   TAG_CLOUD: 'tag-cloud',
+  TIMELINE: 'timeline',
   VENN: 'venn',
   HILO: 'hilo',
   WATERFALL: 'waterfall',
   SUNBURST: 'sunburst',
   SANKEY: 'sankey',
   SURFACE: 'surface',
-  WORDTREE: 'wordtree'
+  WORDTREE: 'wordtree',
+  GRAPH: 'graph'
 };
 
 
@@ -826,25 +828,26 @@ anychart.enums.normalizeEventMarkerType = function(value, opt_default) {
 
 
 /**
- * Event marker direction enum.
+ * Direction enum.
  * @enum {string}
  */
-anychart.enums.EventMarkerDirection = {
+anychart.enums.Direction = {
   UP: 'up',
   DOWN: 'down',
-  AUTO: 'auto'
+  AUTO: 'auto',
+  ODD_EVEN: 'odd-even'
 };
 
 
 /**
- * Method to get event marker direction.
+ * Method to get normalized direction.
  * @param {*} value
- * @param {anychart.enums.EventMarkerDirection=} opt_default
- * @return {anychart.enums.EventMarkerDirection}
+ * @param {anychart.enums.Direction=} opt_default
+ * @return {anychart.enums.Direction}
  */
-anychart.enums.normalizeEventMarkerDirection = function(value, opt_default) {
-  return /** @type {anychart.enums.EventMarkerDirection} */(anychart.enums.normalize(anychart.enums.EventMarkerDirection, value,
-      opt_default || anychart.enums.EventMarkerDirection.AUTO));
+anychart.enums.normalizeDirection = function(value, opt_default) {
+  return /** @type {anychart.enums.Direction} */(anychart.enums.normalize(anychart.enums.Direction, value,
+      opt_default || anychart.enums.Direction.AUTO));
 };
 
 
@@ -2311,6 +2314,33 @@ anychart.enums.normalizeScatterSeriesType = function(value, opt_default) {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  TimelineSeriesType
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * List of all series types.
+ * @enum {string}
+ */
+anychart.enums.TimelineSeriesType = {
+  RANGE: 'range',
+  MOMENT: 'moment'
+};
+
+
+/**
+ * Normalizes timeline series type.
+ * @param {*} value Series type to normalize.
+ * @param {anychart.enums.TimelineSeriesType=} opt_default Custom default value (defaults to timeline chart).
+ * @return {anychart.enums.TimelineSeriesType}
+ */
+anychart.enums.normalizeTimelineSeriesType = function(value, opt_default) {
+  return /** @type {anychart.enums.TimelineSeriesType} */(anychart.enums.normalize(anychart.enums.TimelineSeriesType, value,
+      opt_default || anychart.enums.TimelineSeriesType.MOMENT));
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  HeatMapSeriesType
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -2606,8 +2636,17 @@ anychart.enums.WarningCode = {
   STORE_LAST_STATE_USED: 701,
   STORE_STATE_PAIR_EXISTS: 702,
 
-  SURFACE_POOR_PERFORMANCE: 800
+  SURFACE_POOR_PERFORMANCE: 800,
 
+  //graph
+  GRAPH_NODES_ALREADY_CONNECTED: 900,
+  GRAPH_NO_COORDINATE_FOR_FIXED_MODE: 901,
+  GRAPH_NODE_ALREADY_EXIST: 902,
+  GRAPH_NO_NODE_TO_CONNECT_EDGE: 903,
+  GRAPH_CONNECT_SAME_NODE: 904,
+  GRAPH_NO_GROUP: 905,
+  GRAPH_DATA_HAS_NO_FIELD: 906,
+  GRAPH_NO_ID: 907
 };
 
 
@@ -4705,7 +4744,9 @@ anychart.enums.SeriesDrawerTypes = {
   HEAT_MAP: 30,
   RANGE_STICK: 31,
   WATERFALL: 32,
-  LINE_3D: 33
+  LINE_3D: 33,
+  MOMENT: 34,
+  RANGE: 35
 };
 
 
@@ -5074,7 +5115,9 @@ anychart.enums.Store = {
   SERIES_CHART: 'serieschart',
   PLOT: 'plot',
   DATA_AREA: 'dataarea',
-  SANKEY: 'sankey'
+  SANKEY: 'sankey',
+  TIMELINE_CHART: 'timelinechart',
+  GRAPH: 'graph'
 };
 
 
@@ -5087,7 +5130,15 @@ anychart.enums.State = {
   APPEARANCE: 'appearance',
   DATA: 'data',
   NODE_LABELS: 'nodelabels',
-  FLOW_LABELS: 'flowlabels'
+  FLOW_LABELS: 'flowlabels',
+  LABELS_STYLE: 'labelsStyle',
+  LABELS_ENABLED: 'labelsEnabled',
+  LABELS_BOUNDS: 'labelsBounds',
+  NODES: 'nodes',
+  EDGES: 'edges',
+  LAYOUT: 'layout',
+  TRANSFORM: 'transform',
+  ROTATE: 'rotate'
 };
 //endregion
 
@@ -5155,6 +5206,18 @@ anychart.enums.OrdinalScaleMode = {
 };
 
 
+//region --- Graph
+/**
+ * Layout types for graph chart
+ * @enum {string}
+ */
+anychart.enums.LayoutType = {
+  FIXED: 'fixed',
+  FORCED: 'forced'
+};
+
+
+//endregion
 /**
  * Normalizes ordinal scale mode.
  * @param {*} value

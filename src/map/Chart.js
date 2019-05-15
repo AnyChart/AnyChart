@@ -242,6 +242,8 @@ anychart.mapModule.Chart = function() {
    */
   this.callouts_ = [];
 
+  this.unboundRegions(this.themeSettings['unboundRegions'] || anychart.enums.MapUnboundRegionsMode.AS_IS);
+
   this.setOption('defaultSeriesType', anychart.enums.MapSeriesType.CHOROPLETH);
 
   this.eventsHandler.listen(this, [goog.events.EventType.POINTERDOWN, acgraph.events.EventType.TOUCHSTART], this.tapHandler);
@@ -2087,11 +2089,6 @@ anychart.mapModule.Chart.prototype.yScale = function() { return null; };
  * @return {string|anychart.mapModule.utils.UnboundRegionsSettings|anychart.mapModule.Chart}
  */
 anychart.mapModule.Chart.prototype.unboundRegions = function(opt_value) {
-  if (!this.unboundRegionsSettings_ && !goog.isDef(opt_value)) {
-    var settings = /** @type {?(Object|string)} */(this.themeSettings['unboundRegions']);
-    opt_value = goog.isDef(settings) ? settings : anychart.enums.MapUnboundRegionsMode.AS_IS;
-  }
-
   if (goog.isDef(opt_value)) {
     if (goog.isObject(opt_value)) {
       if (!this.unboundRegionsSettings_ || goog.isString(this.unboundRegionsSettings_))

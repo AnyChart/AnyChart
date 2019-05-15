@@ -598,6 +598,10 @@ anychart.core.ui.OptimizedText.prototype.finalizeComplexity = function() {
           this.container = null;
         }
       } else if (this.multilineOnly_) {
+        // if (this.domElement) {
+        //   goog.dom.removeNode(this.domElement);
+        //   this.container = null;
+        // }
         for (i = 0; i < this.textsToRender_.length; i++) {
           text = this.textsToRender_[i];
           text.applySettings();
@@ -735,16 +739,17 @@ anychart.core.ui.OptimizedText.prototype.renderTo = function(element, opt_stage)
   } else {
     var i, line;
     if (this.wordBreakKeepAll_ || this.wordBreakBreakAll_) {
+      var measurementsLayer = anychart.measuriator.getMeasurementsLayer();
       this.container = element;
       if (this.wText_)
-        this.wText_.renderTo(element);
+        this.wText_.renderTo(measurementsLayer);
       if (this.w_wText_)
-        this.w_wText_.renderTo(element);
+        this.w_wText_.renderTo(measurementsLayer);
       for (i = 0; i < this.multilineTexts_.length; i++) {
         line = this.multilineTexts_[i];
         if (line) {
           for (var j = 0; j < line.length; j++) {
-            line[j].renderTo(element, opt_stage);
+            line[j].renderTo(measurementsLayer, opt_stage);
           }
         }
       }
@@ -959,13 +964,16 @@ anychart.core.ui.OptimizedText.prototype.putMultiline_ = function(bounds) {
   if (heightIsSet && this.style_['vAlign']) {
     vAlign = this.style_['vAlign'];
   }
+  var anchor = this.style_['anchor'];
+  var position = this.style_['position'];
+  var textPosition = this.getTextPosition(bounds,textHeight, position, anchor);
 
   var width = anychart.utils.normalizeSize(this.style_['width'], bounds.width);
   var height = heightIsSet ?
       anychart.utils.normalizeSize(this.style_['height'], bounds.height) :
       bounds.height;
 
-  var startTop = bounds.top;
+  var startTop = textPosition.top;
   if (vAlign == acgraph.vector.Text.VAlign.MIDDLE) {
     startTop = Math.max(startTop, (bounds.top + height / 2 - textHeight / 2));
   } else if (vAlign == acgraph.vector.Text.VAlign.BOTTOM) {
@@ -973,7 +981,7 @@ anychart.core.ui.OptimizedText.prototype.putMultiline_ = function(bounds) {
   }
 
   var top = startTop;
-  var left = bounds.left;
+  var left = textPosition.left;
   var accumulatedHeight = 0;
   switch (hAlign) {
     case acgraph.vector.Text.HAlign.START:
@@ -1027,6 +1035,9 @@ anychart.core.ui.OptimizedText.prototype.putSimple_ = function(bounds) {
   var widthIsSet = goog.isDefAndNotNull(this.style_['width']);
   var height = this.height();
 
+  var anchor = this.style_['anchor'];
+  var position = this.style_['position'];
+
   var vAlign = acgraph.vector.Text.VAlign.TOP;
   var hAlign = acgraph.vector.Text.HAlign.LEFT;
 
@@ -1037,8 +1048,11 @@ anychart.core.ui.OptimizedText.prototype.putSimple_ = function(bounds) {
     vAlign = this.style_['vAlign'];
   }
 
-  var left = bounds.left;
-  var top = bounds.top + this.baseline;
+  var textPosition = this.getTextPosition(bounds, height, position, anchor);
+
+  var left = textPosition.left;
+  var top = textPosition.top;
+  top += this.baseline;
 
   switch (vAlign) {
     case acgraph.vector.Text.VAlign.TOP:
@@ -1281,6 +1295,49 @@ anychart.core.ui.OptimizedText.prototype.applySettings = function() {
         dom.removeAttribute('pointer-events');
       }
 
+      if ('selectable' in style && !style['selectable']) {
+        dom.style['-webkit-touch-callout'] = 'none';
+        dom.style['-webkit-user-select'] = 'none';
+        dom.style['-khtml-user-select'] = 'none';
+        dom.style['-moz-user-select'] = 'moz-none';
+        dom.style['-ms-user-select'] = 'none';
+        dom.style['-o-user-select'] = 'none';
+        dom.style['user-select'] = 'none';
+
+        if ((goog.userAgent.IE && goog.userAgent.DOCUMENT_MODE == 9) || goog.userAgent.OPERA) {
+          dom.setAttribute('unselectable', 'on');
+          dom.setAttribute('onselectstart', 'return false;');
+        }
+      } else {
+        dom.style['-webkit-touch-callout'] = '';
+        dom.style['-webkit-user-select'] = '';
+        dom.style['-khtml-user-select'] = '';
+        dom.style['-moz-user-select'] = '';
+        dom.style['-ms-user-select'] = '';
+        dom.style['-o-user-select'] = '';
+        dom.style['user-select'] = '';
+
+        if ((goog.userAgent.IE && goog.userAgent.DOCUMENT_MODE == 9) || goog.userAgent.OPERA) {
+          dom.removeAttribute('unselectable');
+          dom.removeAttribute('onselectstart');
+        }
+      }
+
+      if ('anchor' in style) {
+        var anchor;
+        var anchorFromStyle = style['anchor'];
+        if (goog.string.startsWith(anchorFromStyle, 'center')) {
+          anchor = 'middle';
+        } else if (goog.string.startsWith(anchorFromStyle, 'right')) {
+          anchor = 'end';
+        } else {
+          anchor = 'start';
+        }
+        dom.setAttribute('text-anchor', anchor);
+      } else {
+        dom.removeAttribute('text-anchor');
+      }
+
       this.consistency.style = false;
     }
 
@@ -1410,6 +1467,26 @@ anychart.core.ui.OptimizedText.prototype.getBounds = function() {
  */
 anychart.core.ui.OptimizedText.prototype.dropBounds = function() {
   this.bounds = null;
+};
+
+
+/**
+ * Return position for label depend on anchor and position.
+ * @param {anychart.math.Rect} bounds - .
+ * @param {number} height textHeight .
+ * @param {anychart.enums.Position} position .
+ * @param {anychart.enums.Anchor} anchor .
+ * @return {{left: number, top: number}}
+ */
+anychart.core.ui.OptimizedText.prototype.getTextPosition = function(bounds, height, position, anchor) {
+  if (goog.string.endsWith(anchor, 'center')) {//center
+    bounds.top -= height / 2;
+  } else if (goog.string.endsWith(anchor, 'bottom')) { //top
+    bounds.top -= height;
+  }
+
+  var result = anychart.utils.getCoordinateByAnchor(bounds, position);
+  return {left: result.x, top: result.y};
 };
 
 

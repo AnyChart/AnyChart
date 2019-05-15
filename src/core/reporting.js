@@ -294,6 +294,22 @@ anychart.core.reporting.getWarningDescription_ = function(code, opt_arguments) {
       return 'Surface chart has ' + opt_arguments[0] + ' points now. If more than 3000 points are drawn on surface' +
           ' chart you may experience instability and poor performance.';
 
+    case anychart.enums.WarningCode.GRAPH_NODES_ALREADY_CONNECTED:
+      return 'Nodes with id "' + opt_arguments[0] + '" and "' + opt_arguments[1] + '" already connected. Supports only one connection between nodes now.';
+    case anychart.enums.WarningCode.GRAPH_NO_COORDINATE_FOR_FIXED_MODE:
+      return 'Node with id "' + opt_arguments[0] + '" has\'t "' + opt_arguments[1] + '" coordinate. Set ' + opt_arguments[1] + ' = 0.';
+    case anychart.enums.WarningCode.GRAPH_NODE_ALREADY_EXIST:
+      return 'Node with id "' + opt_arguments[0] + '" already exist.';
+    case anychart.enums.WarningCode.GRAPH_NO_NODE_TO_CONNECT_EDGE:
+      return 'Can\'t connect edge with id: "' + opt_arguments[0] + '" to node with id "' + opt_arguments[1] + '", node not exists.';
+    case anychart.enums.WarningCode.GRAPH_CONNECT_SAME_NODE:
+      return 'You try make edge with id "' + opt_arguments[0] + '" on one node with id "' + opt_arguments[1] + '".';
+    case anychart.enums.WarningCode.GRAPH_NO_GROUP:
+      return 'No group with id "' + opt_arguments[0] + '". At first set groups for nodes then use groups method.';
+    case anychart.enums.WarningCode.GRAPH_DATA_HAS_NO_FIELD:
+      return 'Data must contain "nodes" and "edges" fields';
+    case anychart.enums.WarningCode.GRAPH_NO_ID:
+      return 'Nodes data must has "id" field';
     default:
       return 'Unknown error. Please, contact support team at http://support.anychart.com/.\n' +
           'We will be very grateful for your report!';

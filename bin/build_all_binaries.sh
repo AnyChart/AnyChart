@@ -13,8 +13,8 @@ mv ./dist/js/resources.json ./dist/
 echo Building binary CSS files
 python ./build.py css --output ./dist/css
 
-echo Building binary Themes files
-python ./build.py themes --output ./dist/themes
+#echo Building binary Themes files
+#python ./build.py themes --output ./dist/themes
 
 #cd libs/graphicsjs
 #python build.py plain

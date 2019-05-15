@@ -931,7 +931,9 @@ anychart.core.ChartWithSeries.seriesReferenceValues = {
   'marker-map': ['id', 'long', 'lat'],
   'bubble-map': ['id', 'long', 'lat', 'size'],
   'hilo': ['high', 'low'],
-  'waterfall': ['value']
+  'waterfall': ['value'],
+  'moment': ['value'],
+  'range': ['start', 'end']
 };
 
 

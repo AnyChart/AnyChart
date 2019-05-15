@@ -570,20 +570,22 @@ anychart.treemapModule.Chart.prototype.createLegendItemsProvider = function(sour
       var ranges = scale.getProcessedRanges();
       for (i = 0, count = ranges.length; i < count; i++) {
         var range = ranges[i];
-        data.push({
-          'text': range.name,
-          'iconEnabled': true,
-          'iconType': anychart.enums.LegendItemIconType.SQUARE,
-          'iconFill': range.color,
-          'disabled': !this.enabled(),
-          'sourceUid': goog.getUid(this),
-          'sourceKey': i,
-          'meta': {
-            series: this,
-            scale: scale,
-            range: range
-          }
-        });
+        if (range.name !== 'default') {
+          data.push({
+            'text': range.name,
+            'iconEnabled': true,
+            'iconType': anychart.enums.LegendItemIconType.SQUARE,
+            'iconFill': range.color,
+            'disabled': !this.enabled(),
+            'sourceUid': goog.getUid(this),
+            'sourceKey': i,
+            'meta': {
+              series: this,
+              scale: scale,
+              range: range
+            }
+          });
+        }
       }
     }
   }

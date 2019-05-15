@@ -30,7 +30,8 @@ anychart.core.utils.Interactivity = function(parent) {
     ['unselectOnClickOutOfPoint', 0, 0],
     ['hoverMode', 0, anychart.Signal.NEEDS_REAPPLICATION],
     ['selectionMode', 0, 0],
-    ['zoomOnMouseWheel', 0, 0]
+    ['zoomOnMouseWheel', 0, 0],
+    ['scrollOnMouseWheel', 0, 0]
   ]);
 };
 goog.inherits(anychart.core.utils.Interactivity, anychart.core.Base);
@@ -49,7 +50,8 @@ anychart.core.utils.Interactivity.PROPERTY_DESCRIPTORS = (function() {
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'unselectOnClickOutOfPoint', anychart.core.settings.booleanNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'hoverMode', anychart.enums.normalizeHoverMode],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'selectionMode', anychart.enums.normalizeSelectMode],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'zoomOnMouseWheel', anychart.core.settings.booleanNormalizer]
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'zoomOnMouseWheel', anychart.core.settings.booleanNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'scrollOnMouseWheel', anychart.core.settings.booleanNormalizer]
   ]);
   return map;
 })();
@@ -61,7 +63,6 @@ anychart.core.settings.populate(anychart.core.utils.Interactivity, anychart.core
  * @type {number}
  */
 anychart.core.utils.Interactivity.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS_REAPPLICATION;
-
 
 
 /**
@@ -92,4 +93,5 @@ anychart.core.utils.Interactivity.prototype.serialize = function() {
   // proto['hoverMode'] = proto.hoverMode;
   // proto['selectionMode'] = proto.selectionMode;
   // proto['zoomOnMouseWheel'] = proto.zoomOnMouseWheel;
+  // proto['scrollOnMouseWheel'] = proto.scrollOnMouseWheel;
 })();

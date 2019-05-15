@@ -31,11 +31,14 @@ goog.require('goog.cssom');
  * Try to flatten settings before multiple labelsSettings.getOption(...) usage.
  * Getting value from flat object is faster than the getOption() resolving.
  *
+ *
+ * @param {boolean=} opt_skipDefaultThemes
+ *
  * @constructor
  * @implements {anychart.core.settings.IResolvable}
  * @extends {anychart.core.Base}
  */
-anychart.core.ui.LabelsSettings = function() {
+anychart.core.ui.LabelsSettings = function(opt_skipDefaultThemes) {
   anychart.core.ui.LabelsSettings.base(this, 'constructor');
 
   /**
@@ -144,8 +147,8 @@ anychart.core.ui.LabelsSettings = function() {
     ['minFontSize', 0, 0], //TODO (A.Kudryavtsev): Not supported for a while.
     ['vAlign', 0, anychart.Signal.NEEDS_REDRAW, 0, this.resetFlatSettings],
 
-    //Has no BOUNDS_CHANGED because affects only positioning, not bounds.
-    ['anchor', 0, anychart.Signal.NEEDS_REAPPLICATION, 0],
+    //Only left, middle and right position. Has no BOUNDS_CHANGED because affects only positioning, not bounds.
+    ['anchor', 0, anychart.Signal.NEEDS_REDRAW, 0, this.resetFlatSettings],
     ['height', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
 
     //Has no BOUNDS_CHANGED because affects only positioning, not bounds.
@@ -154,17 +157,22 @@ anychart.core.ui.LabelsSettings = function() {
     //Has no BOUNDS_CHANGED because affects only positioning, not bounds.
     ['offsetY', 0, anychart.Signal.NEEDS_REAPPLICATION, 0],
 
-    //Has no BOUNDS_CHANGED because affects only positioning, not bounds.
-    ['position', 0, anychart.Signal.NEEDS_REAPPLICATION, 0],
+    //We dispatch two signals here because we need set new style for text element and call putAt method for update 'x' and 'y' attributes.
+    ['position', 0, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEEDS_REAPPLICATION, 0, this.resetFlatSettings],
     ['rotation', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
     ['width', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
     ['allowMultiline', 0, anychart.Signal.BOUNDS_CHANGED, 0, this.resetFlatSettings],
     ['zIndex', 0, 0], //TODO (A.Kudryavtsev): Not supported for a while.
     ['clip', 0, 0], ////TODO (A.Kudryavtsev): Not supported for a while.
-    ['enabled', 0, anychart.Signal.ENABLED_STATE_CHANGED, 0, this.resetFlatSettings]
+    ['enabled', 0, anychart.Signal.ENABLED_STATE_CHANGED, 0, this.resetFlatSettings],
+    ['selectable', 0, anychart.Signal.NEEDS_REDRAW, 0, this.resetFlatSettings],
+    ['disablePointerEvents', 0, anychart.Signal.NEEDS_REDRAW, 0, this.resetFlatSettings],
+    ['autoRotate', 0, anychart.Signal.NEEDS_REDRAW, 0, this.resetFlatSettings]
   ]);
 
-  this.addThemes('defaultSimpleLabelsSettings');
+  if (!opt_skipDefaultThemes) {
+    this.addThemes('defaultSimpleLabelsSettings');
+  }
 };
 goog.inherits(anychart.core.ui.LabelsSettings, anychart.core.Base);
 
@@ -249,7 +257,7 @@ anychart.core.ui.LabelsSettings.DESCRIPTORS = (function() {
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'minFontSize', anychart.core.settings.numberOrStringNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'maxFontSize', anychart.core.settings.numberOrStringNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'vAlign', anychart.enums.normalizeVAlign],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'anchor', anychart.core.ui.LabelsFactory.anchorNoAutoNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'anchor', anychart.enums.normalizeAnchor],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'height', anychart.core.settings.numberOrPercentNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'offsetX', anychart.core.settings.numberOrPercentNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'offsetY', anychart.core.settings.numberOrPercentNormalizer],
@@ -259,7 +267,10 @@ anychart.core.ui.LabelsSettings.DESCRIPTORS = (function() {
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'zIndex', anychart.core.settings.numberNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'allowMultiline', anychart.core.settings.boolOrNullNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'clip', anychart.core.settings.asIsNormalizer],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'enabled', anychart.core.settings.boolOrNullNormalizer]
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'enabled', anychart.core.settings.boolOrNullNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'selectable', anychart.core.settings.booleanNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'disablePointerEvents', anychart.core.settings.booleanNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'autoRotate', anychart.core.settings.booleanNormalizer]
   ]);
 
   return map;
@@ -288,6 +299,7 @@ anychart.core.ui.LabelsSettings.prototype.parent = function(opt_value) {
         this.parent_ = opt_value;
         this.padding().parent(this.parent_.padding());
         this.parent_.listenSignals(this.parentInvalidated_, this);
+        this.resetFlatSettings();
       }
     }
     return this;
@@ -599,6 +611,16 @@ anychart.core.ui.LabelsSettings.prototype.background = function(opt_value) {
 
 //endregion
 //region -- Serialize/Deserialize.
+/** @inheritDoc */
+anychart.core.ui.LabelsSettings.prototype.setupSpecial = function(isDefault, var_args) {
+  if (goog.isBoolean(var_args)) {
+    this.enabled(var_args);
+    return true;
+  }
+  return false;
+};
+
+
 /** @inheritDoc */
 anychart.core.ui.LabelsSettings.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.ui.LabelsSettings.base(this, 'setupByJSON', config, opt_default);

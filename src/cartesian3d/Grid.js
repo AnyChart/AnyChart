@@ -43,7 +43,10 @@ anychart.cartesian3dModule.Grid.prototype.drawLineHorizontal = function(ratio, s
   var parentBounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
   /** @type {number}*/
   var y = Math.round(parentBounds.getBottom() - ratio * parentBounds.height);
-  ratio == 1 ? y -= shift : y += shift;
+
+  var stroke = /** @type {acgraph.vector.Stroke} */(this.lineElement().stroke());
+  var strokeThickness = anychart.utils.extractThickness(stroke);
+  y = anychart.utils.applyPixelShift(y, strokeThickness);
 
   var x1 = parentBounds.getLeft() + this.x3dShift;
   var y1 = y - this.y3dShift;
@@ -60,13 +63,17 @@ anychart.cartesian3dModule.Grid.prototype.drawLineVertical = function(ratio, shi
   var parentBounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
   /** @type {number}*/
   var x = Math.round(parentBounds.getLeft() + ratio * parentBounds.width);
-  ratio == 1 ? x += shift : x -= shift;
+
+  var stroke = /** @type {acgraph.vector.Stroke} */(this.lineElement().stroke());
+  var strokeThickness = anychart.utils.extractThickness(stroke);
+
+  x = anychart.utils.applyPixelShift(x, strokeThickness);
 
   var x1 = x + this.x3dShift;
-  var y1 = parentBounds.getBottom() - this.y3dShift;
+  var y1 = Math.ceil(anychart.utils.applyPixelShift(parentBounds.getBottom() - this.y3dShift, 1));
 
   this.lineElementInternal
-      .moveTo(x, parentBounds.getBottom())
+      .moveTo(x, Math.ceil(anychart.utils.applyPixelShift(parentBounds.getBottom(), 1)))
       .lineTo(x1, y1)
       .lineTo(x1, parentBounds.getTop() - this.y3dShift);
 };
@@ -116,6 +123,7 @@ anychart.cartesian3dModule.Grid.prototype.drawInterlaceVertical = function(ratio
         .close();
   }
 };
+
 
 
 //endregion

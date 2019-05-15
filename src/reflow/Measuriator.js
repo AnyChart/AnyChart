@@ -100,6 +100,19 @@ anychart.reflow.Measuriator.prototype.register = function(provider) {
 
 
 /**
+ * Initializes and return measurements layer.
+ * @return {Element}
+ */
+anychart.reflow.Measuriator.prototype.getMeasurementsLayer = function() {
+  if (!this.measurementLayer_) {
+    this.measurementLayer_ = this.renderer_.createLayerElement();
+    goog.dom.appendChild(this.renderer_.createMeasurement(), this.measurementLayer_);
+  }
+  return this.measurementLayer_;
+};
+
+
+/**
  * Runs measuring process with two passages and single forced reflow calling.
  * The general feature of this legendary sword. Class, I mean.
  * NOTE: on chart first draw this method must be called only once and measure all labels.
@@ -110,10 +123,7 @@ anychart.reflow.Measuriator.prototype.register = function(provider) {
  *   ~18ms with two passages (styling first, measuring second)
  */
 anychart.reflow.Measuriator.prototype.measure = function() {
-  if (!this.measurementLayer_) {
-    this.measurementLayer_ = this.renderer_.createLayerElement();
-    goog.dom.appendChild(this.renderer_.createMeasurement(), this.measurementLayer_);
-  }
+  this.getMeasurementsLayer();
 
   /**
    * @type {Array.<anychart.core.ui.OptimizedText>}

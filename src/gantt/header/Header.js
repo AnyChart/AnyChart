@@ -3,9 +3,9 @@ goog.provide('anychart.ganttModule.header.Header');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.ui.Background');
 goog.require('anychart.core.ui.LabelsSettings');
+goog.require('anychart.format.FormatSelector');
 goog.require('anychart.ganttBaseModule.Overlay');
 goog.require('anychart.ganttBaseModule.TimeLineHeaderLevelHolidaysSettings');
-goog.require('anychart.ganttModule.header.FormatSelector');
 goog.require('anychart.ganttModule.header.Level');
 goog.require('anychart.math.Rect');
 
@@ -84,9 +84,9 @@ anychart.ganttModule.header.Header = function(timeline) {
   /**
    * Format selector.
    * Common selector for levels to avoid multiple format measurements.
-   * @type {anychart.ganttModule.header.FormatSelector}
+   * @type {anychart.format.FormatSelector}
    */
-  this.formatSelector = new anychart.ganttModule.header.FormatSelector();
+  this.formatSelector = new anychart.format.FormatSelector();
   this.formatSelector.labels(/** @type {anychart.core.ui.LabelsSettings} */ (this.labels()));
   this.formatSelector.selectFormats();
   anychart.measuriator.register(this.formatSelector);
@@ -297,7 +297,7 @@ anychart.ganttModule.header.Header.prototype.getLevels = function() {
 
 /**
  * Internal method, used to propagate zooming settings to levels.
- * @param {Array.<anychart.ganttModule.Scale.LevelData>} configs - Levels configurations.
+ * @param {Array.<anychart.scales.GanttDateTime.LevelData>} configs - Levels configurations.
  * @return {anychart.ganttModule.header.Header}
  */
 anychart.ganttModule.header.Header.prototype.setLevels = function(configs) {

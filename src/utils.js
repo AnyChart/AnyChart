@@ -929,6 +929,19 @@ anychart.utils.applyPixelShift = function(value, thickness, opt_invert) {
 
 
 /**
+ * Applies pixel shift to y coordinate in aim to align series bottom (or top in case of baseline being above start value) horizontal line to axis tick
+ * @param {number} value Y coordinate to offset
+ * @param {number=} opt_compareValue Value to compare with to decide which way to round value
+ * @return {number}
+ */
+anychart.utils.applyPixelShiftToYCoodrinate = function(value, opt_compareValue) {
+  value = anychart.utils.applyPixelShift(value, 1);
+  value = (goog.isDef(opt_compareValue) && value < opt_compareValue) ? Math.floor(value) : Math.ceil(value);
+  return value;
+};
+
+
+/**
  * Applies pixel shift to the rect.
  * @param {!anychart.math.Rect} rect
  * @param {number} thickness
