@@ -74,28 +74,21 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'vAlign': 'middle',
         'fontColor': '#7c868e',
         'fontSize': 12,
-        'content': '+'
+        // 'content': '+',
+        'content': '▸',
+        'background': {
+          'fill': '#fff 0.00001',
+          'stroke': 'none'
+        }
       },
       'hovered': {},
       'selected': {
-        'content': '-'
+        'content': '▾'
+        // 'content': '-'
       }
     },
 
     'zIndex': 5,
-    // 'editing': false,
-    // 'editStructurePreviewFill': {
-    //   'color': '#4285F4',
-    //   'opacity': 0.2
-    // },
-    // 'editStructurePreviewStroke': {
-    //   'color': '#4285F4',
-    //   'thickness': 2
-    // },
-    // 'editStructurePreviewDashStroke': {
-    //   'color': '#4285F4',
-    //   'dash': '4 4'
-    // },
     'headerFill': '#f7f7f7',
     'tooltip': {
       'padding': 5,
@@ -113,24 +106,10 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'defaultColumnSettings': {
       'width': 90,
       'buttonCursor': 'pointer',
-      // 'labels': {
-      //   'enabled': true,
-      //   'wordBreak': 'break-all',
-      //   'anchor': 'left-center',
-      //   'vAlign': 'middle',
-      //   'padding': {
-      //     'top': 0,
-      //     'right': 5,
-      //     'bottom': 0,
-      //     'left': 5
-      //   },
-      //   'background': null,
-      //   'fontSize': 11,
-      //   'disablePointerEvents': true
-      // },
       'depthPaddingMultiplier': 0,
       'collapseExpandButtons': false,
       'title': {
+        'text': 'Column',
         'enabled': true,
         'margin': 0,
         'vAlign': 'middle',
@@ -145,9 +124,6 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'columns': [
       {
         'width': 50,
-        // 'labels': {
-        //   'format': '{%linearIndex}'
-        // },
         'title': {
           'text': '#'
         }
@@ -156,9 +132,6 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'width': 170,
         'collapseExpandButtons': true,
         'depthPaddingMultiplier': 15,
-        // 'labels': {
-        //   'format': '{%name}'
-        // },
         'title': {
           'text': 'Name'
         }
@@ -184,6 +157,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'headerHeight': 70,
 
     'elements': {
+      'enabled': true,
       'anchor': 'auto',
       'position': 'left-center',
       'offset': 0,
@@ -242,8 +216,19 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'stroke': {
           'color': '#aaa',
           'dash': '3 3'
+        }
+      },
+      'tooltip': {
+        'padding': 5,
+        'title': {
+          'enabled': true,
+          'fontSize': '14px',
+          'fontWeight': 'normal',
+          'fontColor': '#e5e5e5'
         },
-        'enabled': null
+        'separator': {
+          'enabled': true
+        }
       }
     },
 
@@ -263,8 +248,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         },
         'edit': {
           'fill': '#eaeaea',
-          'stroke': '#545f69',
-          'enabled': null
+          'stroke': '#545f69'
         }
       }
     },
@@ -310,6 +294,44 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
           var radius = bounds.width / 2;
           anychart.graphics['vector']['primitives']['diamond'](path, bounds.left + radius, bounds.top + radius, radius);
         }
+      },
+      'preview': {
+        'enabled': false,
+        'rendering': {
+          /**
+           * @this {*}
+           * @return {*}
+           */
+          'drawer': function() {
+            var shapes = this['shapes'];
+            var path = shapes['path'];
+            var bounds = this['predictedBounds'];
+            path
+                .clear()
+                .moveTo(bounds.left, bounds.top)
+                .lineTo(bounds.left + bounds.width, bounds.top)
+                .lineTo(bounds.left + bounds.width / 2, bounds.top + bounds.height)
+                .close();
+          },
+          'shapes': [
+            {
+              'name': 'path',
+              'shapeType': 'path',
+              'zIndex': 12,
+              'disablePointerEvents': false
+            }
+          ]
+        },
+        'labels': {
+          'enabled': false,
+          'format': '{%Name}',
+          'background': {
+            'enabled': true,
+            'fill': 'white 0.7'
+          }
+        },
+        'depth': null,
+        'position': 'left-top'
       }
     },
 
@@ -459,20 +481,20 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'dataGrid': {
       'tooltip': {
         'titleFormat': '{%Name}',
-        'format': 'Start Date: {%actualStart}\nEnd Date: {%actualEnd}\nComplete: {%progress}'
+        'format': 'Start Date: {%start}\nEnd Date: {%end}\nComplete: {%progress}'
       }
     },
     'timeline': {
-      'tooltip': {
-        'titleFormat': '{%Name}',
-        'format': 'Start Date: {%actualStart}\nEnd Date: {%actualEnd}\nComplete: {%progress}'
-      },
       'elements': {
         'labels': {
           'format': '{%Progress}',
           'position': 'right-center',
           'anchor': 'left-center',
           'enabled': null
+        },
+        'tooltip': {
+          'titleFormat': '{%Name}',
+          'format': 'Start Date: {%start}\nEnd Date: {%end}\nComplete: {%progress}'
         }
       },
       'tasks': {
@@ -497,6 +519,9 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
           'anchor': 'left-center',
           'format': 'Baseline Label',
           'enabled': false
+        },
+        'tooltip': {
+          'format': 'Start Date: {%start}\nEnd Date: {%end}\nBaseline Start: {%baselineStart}\nBaseline End: {%baselineEnd}\nComplete: {%progress}'
         }
       },
       'milestones': {
@@ -505,6 +530,9 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
           'anchor': 'left-center',
           'position': 'right-center',
           'enabled': null
+        },
+        'tooltip': {
+          'format': '{%start}'
         }
       }
     }
@@ -515,7 +543,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme']['standalones'], {
   'projectTimeline': {
     'tooltip': {
       'titleFormat': '{%Name}',
-      'format': 'Start Date: {%actualStart}\nEnd Date: {%actualEnd}\nComplete: {%progress}'
+      'format': 'Start Date: {%start}\nEnd Date: {%start}\nComplete: {%progress}'
     }
   },
   'resourceTimeline': {

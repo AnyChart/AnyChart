@@ -1657,6 +1657,10 @@ anychart.themes.merging.mergingMap_ = (function() {
       ]
     },
     {
+      defaultObj: 'defaultTimeline.elements.milestones',
+      targets: ['defaultTimeline.elements.milestones.preview']
+    },
+    {
       defaultObj: 'defaultTimeline.tasks',
       targets: [
         ['defaultTimeline.', ['groupingTasks']]

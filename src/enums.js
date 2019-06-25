@@ -2141,6 +2141,7 @@ anychart.enums.TLElementTypes = {
   PROGRESS: 'progress',
   BASELINES: 'baselines',
   MILESTONES: 'milestones',
+  MILESTONES_PREVIEW: 'milestones-preview',
   PERIODS: 'periods',
   CONNECTORS: 'connectors'
 };
@@ -5218,6 +5219,17 @@ anychart.enums.LayoutType = {
 
 
 //endregion
+/**
+ * Gantt tollbar buttons mode.
+ * @enum {string}
+ */
+anychart.enums.GanttToolbarButtonsMode = {
+  ICON: 'icon',
+  TEXT: 'text',
+  ALL: 'all'
+};
+
+
 /**
  * Normalizes ordinal scale mode.
  * @param {*} value

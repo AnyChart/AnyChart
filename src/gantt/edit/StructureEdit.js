@@ -163,13 +163,23 @@ anychart.ganttModule.edit.StructureEdit.prototype.onParentSignal_ = function(e) 
 //endregion
 //region -- Serialization/Deserialization.
 /** @inheritDoc */
-anychart.ganttModule.edit.StructureEdit.prototype.setupSpecial = function(isDefault, var_args) {
-  var arg0 = arguments[1];
+anychart.ganttModule.edit.StructureEdit.prototype.resolveSpecialValue = function(var_args) {
+  var arg0 = arguments[0];
   if (goog.isBoolean(arg0) || goog.isNull(arg0)) {
+    return {'enabled': !!arg0};
+  }
+  return null;
+};
+
+
+/** @inheritDoc */
+anychart.ganttModule.edit.StructureEdit.prototype.setupSpecial = function(isDefault, var_args) {
+  var resolvedValue = this.resolveSpecialValue(arguments[1]);
+  if (resolvedValue) {
     if (isDefault)
-      this.themeSettings['enabled'] = arg0;
+      this.themeSettings['enabled'] = resolvedValue['enabled'];
     else
-      this['enabled'](arg0);
+      this.enabled(resolvedValue['enabled']);
     return true;
   }
   return false;

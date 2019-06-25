@@ -357,10 +357,12 @@ anychart.ganttModule.Controller.prototype.datesToMeta_ = function(item) {
 
     var actValue = item.get(field);
 
-    if (goog.isDef(actValue)) {
+    if (goog.isDefAndNotNull(actValue)) {
       var parsedDate = anychart.format.parseDateTime(actValue);
-      var parsedVal = goog.isNull(parsedDate) ? null : +parsedDate;
+      var parsedVal = goog.isNull(parsedDate) ? NaN : +parsedDate;
       item.meta(field, parsedVal);
+    } else {
+      item.meta(field, NaN);
     }
 
     this.checkDate_(item.meta(field));
@@ -449,9 +451,11 @@ anychart.ganttModule.Controller.prototype.autoCalcItem_ = function(item, current
   this.allItems_.push(item);
 
   var itemProgressValue = item.get(anychart.enums.GanttDataFields.PROGRESS_VALUE);
-  if (goog.isDef(itemProgressValue)) {
+  if (goog.isDefAndNotNull(itemProgressValue)) {
     itemProgressValue = anychart.utils.isPercent(itemProgressValue) ? parseFloat(itemProgressValue) / 100 : +itemProgressValue;
     item.meta('progressValue', itemProgressValue);
+  } else {
+    item.meta('progressValue', null);
   }
 
   var collapsed = item.get(anychart.enums.GanttDataFields.COLLAPSED);
@@ -463,11 +467,11 @@ anychart.ganttModule.Controller.prototype.autoCalcItem_ = function(item, current
   this.periodsToMeta_(item);
   this.markersToMeta_(item);
 
-  var resultStart = item.meta(anychart.enums.GanttDataFields.ACTUAL_START);
-  var resultEnd = item.meta(anychart.enums.GanttDataFields.ACTUAL_END);
-
   var progressLength = 0;
   var totalLength = 0;
+
+  var autoStart = NaN;
+  var autoEnd = NaN;
 
   for (var i = 0, l = item.numChildren(); i < l; i++) {
     var child = item.getChildAt(i);
@@ -485,35 +489,22 @@ anychart.ganttModule.Controller.prototype.autoCalcItem_ = function(item, current
     }
 
     if (!this.isResources_) {
-      var childStart = goog.isNumber(child.meta(anychart.enums.GanttDataFields.ACTUAL_START)) ?
-          child.meta(anychart.enums.GanttDataFields.ACTUAL_START) :
-          (child.meta('autoStart') || NaN);
+      var metaStart = child.meta(anychart.enums.GanttDataFields.ACTUAL_START);
+      var childStart = /** @type {number} */ ((goog.isNumber(metaStart) && !isNaN(metaStart)) ? metaStart : (child.meta('autoStart') || NaN));
 
-      var childEnd = goog.isNumber(child.meta(anychart.enums.GanttDataFields.ACTUAL_END)) ?
-          child.meta(anychart.enums.GanttDataFields.ACTUAL_END) :
-          (child.meta('autoEnd') || childStart);
+      var metaEnd = child.meta(anychart.enums.GanttDataFields.ACTUAL_END);
+      var childEnd = /** @type {number} */ ((goog.isNumber(metaEnd) && !isNaN(metaEnd)) ? metaEnd : (child.meta('autoEnd') || childStart));
 
       var progressValue = child.get(anychart.enums.GanttDataFields.PROGRESS_VALUE);
-      if (goog.isDef(progressValue)) {
+      if (goog.isDefAndNotNull(progressValue)) {
         progressValue = anychart.utils.isPercent(progressValue) ? parseFloat(progressValue) / 100 : +progressValue;
       }
 
-      var childProgress = goog.isDef(progressValue) ? progressValue : (child.meta('autoProgress') || 0);
+      var childProgress = goog.isDefAndNotNull(progressValue) ? progressValue : (child.meta('autoProgress') || 0);
       child.meta('progressValue', childProgress);
 
-      if (isNaN(resultStart)) {
-        resultStart = childStart;
-      } else if (!isNaN(childStart) && !isNaN(childEnd)) {
-        resultStart = Math.min(resultStart, childStart, childEnd);
-      }
-
-      if (isNaN(resultEnd)) {
-        resultEnd = childEnd;
-      } else if (!isNaN(childStart) && !isNaN(childEnd)) {
-        resultEnd = Math.max(resultEnd, childStart, childEnd);
-      } else {
-        resultEnd = childEnd;
-      }
+      autoStart = this.actualizeDates_(Math.min, autoStart, autoEnd, childStart, childEnd);
+      autoEnd = this.actualizeDates_(Math.max, autoStart, autoEnd, childStart, childEnd);
 
       if (!isNaN(childStart) && !isNaN(childEnd)) {
         var delta = (/** @type {number} */(childEnd) - /** @type {number} */(childStart));
@@ -525,10 +516,47 @@ anychart.ganttModule.Controller.prototype.autoCalcItem_ = function(item, current
 
   if (item.numChildren() && !this.isResources_) {
     if (totalLength != 0) item.meta('autoProgress', progressLength / totalLength);
-    if (goog.isDef(resultStart) && !isNaN(resultStart)) item.meta('autoStart', resultStart);
-    if (goog.isDef(resultEnd) && !isNaN(resultEnd)) item.meta('autoEnd', resultEnd);
+    item.meta('autoStart', autoStart);
+    item.meta('autoEnd', autoEnd);
   }
 
+};
+
+
+/**
+ * Gets min or max value, filters invalid values.
+ * @param {Function} fn - Math.min() or Math.max(), function to get min or max value.
+ * @param {number} autoStart - Value to select from.
+ * @param {number} autoEnd - Value to select from.
+ * @param {number} childStart - Value to select from.
+ * @param {number} childEnd - Value to select from.
+ * @return {number} - Min or max value depending on fn passed.
+ * @private
+ */
+anychart.ganttModule.Controller.prototype.actualizeDates_ = function(fn, autoStart, autoEnd, childStart, childEnd) {
+  var vals = [];
+  if (this.isValidNumber_(autoStart)) {
+    vals.push(autoStart);
+    if (this.isValidNumber_(autoEnd))
+      vals.push(autoEnd);
+  }
+  if (this.isValidNumber_(childStart)) {
+    vals.push(childStart);
+    if (this.isValidNumber_(childEnd))
+      vals.push(childEnd);
+  }
+  return vals.length ? fn.apply(null, vals) : NaN;
+};
+
+
+/**
+ * Checks for valid numeric value.
+ * @param {number} val - Value to check.
+ * @return {boolean}
+ * @private
+ */
+anychart.ganttModule.Controller.prototype.isValidNumber_ = function(val) {
+  return goog.isNumber(val) && !isNaN(val);
 };
 
 
@@ -1138,6 +1166,7 @@ anychart.ganttModule.Controller.prototype.run = function() {
 anychart.ganttModule.Controller.prototype.getScrollBar = function() {
   if (!this.verticalScrollBar_) {
     this.verticalScrollBar_ = new anychart.ganttModule.ScrollBar();
+    this.verticalScrollBar_.setupByJSON(/** @type {!Object} */ (anychart.getFlatTheme('defaultScrollBar')));
     this.verticalScrollBar_.layout(anychart.enums.Layout.VERTICAL);
 
     var controller = this;

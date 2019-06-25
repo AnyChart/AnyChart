@@ -16,6 +16,7 @@ goog.require('anychart.enums');
  */
 anychart.ganttModule.axisMarkers.Line = function(scale) {
   anychart.ganttModule.axisMarkers.Line.base(this, 'constructor');
+  this.addThemes('defaultLineMarkerSettings');
 
   this.scaleInternal(scale);
 

@@ -204,6 +204,7 @@ anychart.ganttModule.edit.ElementEdit.prototype.parent = function(opt_value) {
 anychart.ganttModule.edit.ElementEdit.prototype.thumbs = function(opt_value) {
   if (!this.thumbs_) {
     this.thumbs_ = new anychart.ganttModule.edit.Thumb();
+    this.setupCreated('thumbs', this.thumbs_);
     this.thumbs_.listenSignals(this.redispatch_, this);
   }
 
@@ -224,6 +225,7 @@ anychart.ganttModule.edit.ElementEdit.prototype.thumbs = function(opt_value) {
 anychart.ganttModule.edit.ElementEdit.prototype.connectorThumbs = function(opt_value) {
   if (!this.connectorThumbs_) {
     this.connectorThumbs_ = new anychart.ganttModule.edit.Thumb();
+    this.setupCreated('connectorThumbs', this.connectorThumbs_);
     // this.connectorThumbs_.parent(/** @type {anychart.ganttModule.edit.Thumb} */ (this.thumbs()));
     this.connectorThumbs_.listenSignals(this.redispatch_, this);
   }
@@ -245,6 +247,7 @@ anychart.ganttModule.edit.ElementEdit.prototype.connectorThumbs = function(opt_v
 anychart.ganttModule.edit.ElementEdit.prototype.start = function(opt_value) {
   if (!this.start_) {
     this.start_ = new anychart.ganttModule.edit.SideControl();
+    this.setupCreated('start', this.start_);
     this.start_.thumb().parent(/** @type {anychart.ganttModule.edit.Thumb} */ (this.thumbs()));
     this.start_.connectorThumb().parent(this.connectorThumbs());
     this.start_.listenSignals(this.redispatch_, this);
@@ -267,6 +270,7 @@ anychart.ganttModule.edit.ElementEdit.prototype.start = function(opt_value) {
 anychart.ganttModule.edit.ElementEdit.prototype.end = function(opt_value) {
   if (!this.end_) {
     this.end_ = new anychart.ganttModule.edit.SideControl();
+    this.setupCreated('end', this.end_);
     this.end_.thumb().parent(/** @type {anychart.ganttModule.edit.Thumb} */ (this.thumbs()));
     this.end_.connectorThumb().parent(this.connectorThumbs());
     this.end_.listenSignals(this.redispatch_, this);
@@ -293,20 +297,6 @@ anychart.ganttModule.edit.ElementEdit.prototype.redispatch_ = function(e) {
 
 //endregion
 //region -- Serialization/Deserialization.
-/** @inheritDoc */
-anychart.ganttModule.edit.ElementEdit.prototype.setupSpecial = function(isDefault, var_args) {
-  var arg0 = arguments[1];
-  if (goog.isBoolean(arg0) || goog.isNull(arg0)) {
-    if (isDefault)
-      this.themeSettings['enabled'] = arg0;
-    else
-      this['enabled'](arg0);
-    return true;
-  }
-  return false;
-};
-
-
 /**
  * @inheritDoc
  */

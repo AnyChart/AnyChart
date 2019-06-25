@@ -563,7 +563,16 @@ anychart.timelineModule.Chart.prototype.calculate = function() {
       series = drawingPlan.series;
       var maxTotalRange = this.scale().getTotalRange()['max'];
       for (k = 0; k < data.length; k++) {
+        it = series.getResetIterator();
+        it.select(k);
         point = data[k];
+
+        var startValue = it.get('start');
+        if (!goog.isDefAndNotNull(startValue) || isNaN(startValue) || !goog.isDefAndNotNull(it.get('name'))) {
+          it.meta('missing', true);
+          continue;
+        }
+
         sX = this.scale().transform(point.data['start']) * this.dataBounds.width;
         eX = isNaN(point.data['end']) ? this.scale().transform(maxTotalRange) * this.dataBounds.width :
             this.scale().transform(point.data['end']) * this.dataBounds.width;
@@ -603,12 +612,17 @@ anychart.timelineModule.Chart.prototype.calculate = function() {
       var markersFactoryEnabled = markersFactory.enabled();
       var markersFactorySize = markersFactoryEnabled ? markersFactory.getOption('size') : 0;
       for (k = 0; k < data.length; k++) {
+        var it = series.getResetIterator();
+        it.select(k);
+
+        if (!goog.isDefAndNotNull(it.get('value')) || !goog.isDefAndNotNull(it.get('x'))) {
+          it.meta('missing', true);
+          continue;
+        }
 
         var label = labelsFactory.getLabel(k);// = factory.add(formatProvider, positionProvider);
         if (goog.isNull(label)) {
           var formatProvider = series.createLabelsContextProvider();
-          var it = series.getResetIterator();
-          it.select(k);
           var text = it.get('value');
           formatProvider['value'] = text;
           var positionProvider = series.createPositionProvider(series.labels().anchor());

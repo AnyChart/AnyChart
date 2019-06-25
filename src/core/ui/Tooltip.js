@@ -137,6 +137,36 @@ anychart.core.ui.Tooltip = function(capability) {
    */
   this.htmlTooltip = null;
 
+  /**
+   * Special flag.
+   * By default, tooltip uses overridden this.needsForceSignalsDispatching() to decide whether
+   * it is parent tooltip. It checks own capabilities and child tooltips map.
+   * Flag this.predeclareAsParent allows to declare just created tooltip as parent without capabilities an children set.
+   * If is set to 'true', needsForceSignalsDispatching() will return true. If set to 'false', will check
+   * capabilities and child tooltips map (default behaviour).
+   *
+   * Use it like this:
+   *
+   * {code}
+   *  var tooltip = anychart.core.ui.Tooltip(0); // No capabilities for this example.
+   *  tooltip.predeclareAsParent = true; // Here we declare that this tooltip will definitely have children.
+   *  tooltip.updateForceInvalidation(); // Will correctly set force invalidation requirements.
+   * {code}
+   *
+   * @type {boolean}
+   */
+  this.predeclareAsParent = false;
+
+  /**
+   *
+   * @type {{format: (string|Function|undefined), titleFormat: (string|Function|undefined)}}
+   * @private
+   */
+  this.middleFormats_ = {
+    'format': void 0,
+    'titleFormat': void 0
+  };
+
   anychart.utils.tooltipsRegistry[String(goog.getUid(this))] = this;
 
   anychart.core.settings.createTextPropertiesDescriptorsMeta(this.descriptorsMeta,
@@ -678,6 +708,26 @@ anychart.core.ui.Tooltip.prototype.chart = function(opt_value) {
 
 
 /**
+ * Sets format and titleFormat "in the middle".
+ * Tooltip has the resolution chain that consists of highPriorityResolutionChain and lowPriorityResolutionChain.
+ * In DVF-4244 we add independent tooltips for gantt timeline elements and tooltip gets new functionality in
+ * its resolution chain building: it gets this.middleFormats_ object between high- and low-priority chains.
+ *
+ * This method allows to manipulate fields in this.middleFormats_ object to set the formats.
+ * It allows to get timeline's elements tooltip formats and proxy it to datagrid's tooltip.
+ * In this case, if datagrid's tooltip doesn't have own formats set, it will be taken from formats of timeline element's
+ * tooltip.
+ *
+ * @param {(string|Function)=} opt_format - Middle tooltip content format.
+ * @param {(string|Function)=} opt_titleFormat - Middle tooltip title format.
+ */
+anychart.core.ui.Tooltip.prototype.setMiddleFormats = function(opt_format, opt_titleFormat) {
+  this.middleFormats_['format'] = opt_format;
+  this.middleFormats_['titleFormat'] = opt_titleFormat;
+};
+
+
+/**
  * Shows as single.
  * @param {Array} points - Points.
  * @param {number} clientX - ClientX coordinate.
@@ -706,12 +756,12 @@ anychart.core.ui.Tooltip.prototype.showAsSingle_ = function(points, clientX, cli
   this.tooltipInUse_.title().autoText(this.tooltipInUse_.getFormattedTitle(contextProvider));
   this.tooltipInUse_.contentInternal().text(this.tooltipInUse_.getFormattedContent_(contextProvider));
 
-  // this.hideChildTooltips_();
+  // this.hideChildTooltips();
   if (this.tooltipInUse_ == this) {
-    this.hideChildTooltips_();
+    this.hideChildTooltips();
   } else {
     this.hideSelf();
-    this.hideChildTooltips_([this.tooltipInUse_]);
+    this.hideChildTooltips([this.tooltipInUse_]);
   }
 
   var isHtml = this.getOption('useHtml');
@@ -903,7 +953,7 @@ anychart.core.ui.Tooltip.prototype.showAsUnion_ = function(points, clientX, clie
 
     this.tooltipInUse_ = hoveredSeries ? /** @type {anychart.core.ui.Tooltip} */ (hoveredSeries.tooltip()) : this;
 
-    this.hideChildTooltips_([this.tooltipInUse_]);
+    this.hideChildTooltips([this.tooltipInUse_]);
 
     if (!this.tooltipInUse_.enabled())
       return;
@@ -989,7 +1039,7 @@ anychart.core.ui.Tooltip.prototype.showAsUnion_ = function(points, clientX, clie
     this.tooltipInUse_.contentInternal().text(this.getFormattedContent_(unionContextProvider, true));
     this.tooltipInUse_.title().autoText(this.getFormattedTitle(unionContextProvider));
 
-    this.tooltipInUse_.hideChildTooltips_();
+    this.tooltipInUse_.hideChildTooltips();
     if (this.tooltipInUse_.getOption('useHtml'))
       this.tooltipInUse_.htmlTooltip.updateTexts();
 
@@ -1329,7 +1379,8 @@ anychart.core.ui.Tooltip.prototype.remove = function() {
  * @inheritDoc
  */
 anychart.core.ui.Tooltip.prototype.needsForceSignalsDispatching = function(opt_value) {
-  return (this.check(anychart.core.ui.Tooltip.Capabilities.CAN_CHANGE_DISPLAY_MODE) && !goog.object.isEmpty(this.childTooltipsMap));
+  return this.predeclareAsParent ||
+      (this.check(anychart.core.ui.Tooltip.Capabilities.CAN_CHANGE_DISPLAY_MODE) && !goog.object.isEmpty(this.childTooltipsMap));
 };
 
 
@@ -1475,9 +1526,8 @@ anychart.core.ui.Tooltip.prototype.createDelayObject_ = function() {
 /**
  * Hides child tooltips. Hide delay will be ignored.
  * @param {Array.<anychart.core.ui.Tooltip>=} opt_ignoreTooltips
- * @private
  */
-anychart.core.ui.Tooltip.prototype.hideChildTooltips_ = function(opt_ignoreTooltips) {
+anychart.core.ui.Tooltip.prototype.hideChildTooltips = function(opt_ignoreTooltips) {
   opt_ignoreTooltips = opt_ignoreTooltips || [];
   for (var uid in this.childTooltipsMap) {
     var exclude = goog.array.some(opt_ignoreTooltips, function(tooltip) {
@@ -2207,7 +2257,17 @@ anychart.core.ui.Tooltip.prototype.resolutionChainCache = function(opt_value) {
 
 
 /** @inheritDoc */
-anychart.core.ui.Tooltip.prototype.getResolutionChain = anychart.core.settings.getResolutionChain;
+anychart.core.ui.Tooltip.prototype.getResolutionChain = function() {
+  /*
+    This override allows to use this.middleFormats_ settings object (@see anychart.core.ui.Tooltip.prototype.setMiddleFormats).
+   */
+  var chain = this.resolutionChainCache();
+  if (!chain) {
+    chain = goog.array.concat(this.getHighPriorityResolutionChain(), [this.middleFormats_], this.getLowPriorityResolutionChain());
+    this.resolutionChainCache(chain);
+  }
+  return chain;
+};
 
 
 /** @inheritDoc */

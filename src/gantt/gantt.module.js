@@ -15,11 +15,7 @@ goog.require('anychart.ganttModule.Splitter');
  * @return {!anychart.ganttModule.Chart}
  */
 anychart.ganttProject = function() {
-  var chart = new anychart.ganttModule.Chart(false);
-  chart.addThemes('ganttProject');
-  chart.setupInternal(true, anychart.getFullTheme('ganttProject'));
-
-  return chart;
+  return new anychart.ganttModule.Chart(false);
 };
 
 
@@ -28,11 +24,7 @@ anychart.ganttProject = function() {
  * @return {!anychart.ganttModule.Chart}
  */
 anychart.ganttResource = function() {
-  var chart = new anychart.ganttModule.Chart(true);
-  chart.addThemes('ganttResource');
-  chart.setupInternal(true, anychart.getFullTheme('ganttResource'));
-
-  return chart;
+  return new anychart.ganttModule.Chart(true);
 };
 
 

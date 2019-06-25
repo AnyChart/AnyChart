@@ -14,6 +14,8 @@ goog.require('anychart.enums');
 anychart.ganttModule.axisMarkers.Text = function(scale) {
   anychart.ganttModule.axisMarkers.Text.base(this, 'constructor');
 
+  this.addThemes('defaultTextMarkerSettings');
+
   this.scaleInternal(scale);
 
   /*

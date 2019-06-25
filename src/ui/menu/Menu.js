@@ -7,13 +7,13 @@ goog.require('goog.ui.Menu');
 /**
  * A basic menu class.
  * @param {goog.dom.DomHelper=} opt_domHelper Optional DOM helper.
- * @param {goog.ui.MenuRenderer=} opt_renderer Renderer used to render or
+ * @param {goog.ui.MenuRenderer|anychart.ui.menu.ToolbarMenuRenderer=} opt_renderer Renderer used to render or
  *     decorate the container; defaults to {@link goog.ui.MenuRenderer}.
  * @constructor
  * @extends {goog.ui.Menu}
  */
 anychart.ui.menu.Menu = function(opt_domHelper, opt_renderer) {
-  anychart.ui.menu.Menu.base(this, 'constructor', opt_domHelper, opt_renderer);
+  anychart.ui.menu.Menu.base(this, 'constructor', opt_domHelper, /** @type {goog.ui.MenuRenderer}*/(opt_renderer));
 
   /**
    * Scrollable container.

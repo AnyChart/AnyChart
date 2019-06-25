@@ -146,6 +146,7 @@ anychart.ganttModule.edit.SideControl.prototype.getHighPriorityResolutionChain =
 anychart.ganttModule.edit.SideControl.prototype.thumb = function(opt_value) {
   if (!this.thumb_) {
     this.thumb_ = new anychart.ganttModule.edit.Thumb();
+    this.setupCreated('thumb', this.thumb_);
     this.thumb_.listenSignals(this.redispatch_, this);
   }
 
@@ -166,6 +167,7 @@ anychart.ganttModule.edit.SideControl.prototype.thumb = function(opt_value) {
 anychart.ganttModule.edit.SideControl.prototype.connectorThumb = function(opt_value) {
   if (!this.connectorThumb_) {
     this.connectorThumb_ = new anychart.ganttModule.edit.Thumb();
+    this.setupCreated('connectorThumb', this.connectorThumb_);
     this.connectorThumb_.listenSignals(this.redispatch_, this);
   }
 

@@ -198,9 +198,10 @@ anychart.ganttModule.rendering.Settings.prototype.parentInvalidated_ = function(
  * @param {Object} tag - Tag data object. NOTE: not optional because current implementation (16 Jan 2018) depends on this data a lot.
  * @param {number=} opt_periodIndex - .
  * @param {boolean=} opt_selected - Whether is selected. TODO (A.Kudryavtsev): Replace this with State in future implementation.
+ * @param {number=} opt_initializerUid - UID of item that has initialized the milestone preview drawing.
  */
-anychart.ganttModule.rendering.Settings.prototype.callDrawer = function(item, predictedBounds, tag, opt_periodIndex, opt_selected) {
-  var context = new anychart.ganttModule.rendering.Context(this.element_, item, predictedBounds, tag, opt_periodIndex, opt_selected);
+anychart.ganttModule.rendering.Settings.prototype.callDrawer = function(item, predictedBounds, tag, opt_periodIndex, opt_selected, opt_initializerUid) {
+  var context = new anychart.ganttModule.rendering.Context(this.element_, item, predictedBounds, tag, opt_periodIndex, opt_selected, opt_initializerUid);
   var drawer = this.getOption('drawer');
   drawer.call(context, context);
 };

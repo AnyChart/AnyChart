@@ -16,6 +16,8 @@ goog.require('anychart.enums');
 anychart.ganttModule.axisMarkers.Range = function(scale) {
   anychart.ganttModule.axisMarkers.Range.base(this, 'constructor');
 
+  this.addThemes('defaultRangeMarkerSettings');
+
   this.scaleInternal(scale);
 
   /*

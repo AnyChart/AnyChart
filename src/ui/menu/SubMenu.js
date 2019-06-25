@@ -23,10 +23,11 @@ goog.require('goog.ui.MenuItem');
  *     display as the content of the submenu (use to add icons or styling to
  *     menus).
  * @param {Element=} opt_wrapper Wrapper element.
+ * @param {boolean=} opt_toolbar Whether the sub menu is used within toolbar.
  * @constructor
  * @extends {goog.ui.MenuItem}
  */
-anychart.ui.menu.SubMenu = function(content, opt_wrapper) {
+anychart.ui.menu.SubMenu = function(content, opt_wrapper, opt_toolbar) {
   /*
     TODO (A.Kudryavtsev):
     We can't extend goog.ui.SubMenu because we can't access private (not @protected) field subMenu_ and override
@@ -36,6 +37,7 @@ anychart.ui.menu.SubMenu = function(content, opt_wrapper) {
   anychart.ui.menu.SubMenu.base(this, 'constructor', content, undefined, undefined,
       anychart.ui.menu.SubMenuRenderer.getInstance());
 
+  this.usedWithinToolbar_ = opt_toolbar || false;
   this.wrapper_ = opt_wrapper || null;
 };
 goog.inherits(anychart.ui.menu.SubMenu, goog.ui.MenuItem);
@@ -576,8 +578,9 @@ anychart.ui.menu.SubMenu.prototype.getItemCount = function() {
  */
 anychart.ui.menu.SubMenu.prototype.getMenu = function() {
   if (!this.subMenu_) {
+    var renderer = this.usedWithinToolbar_ ? anychart.ui.menu.ToolbarMenuRenderer.getInstance() : undefined;
     this.setMenu(
-        new anychart.ui.menu.Menu(this.getDomHelper()), /* opt_internal */ true);
+        new anychart.ui.menu.Menu(this.getDomHelper(), renderer), /* opt_internal */ true);
   } else if (this.externalSubMenu_ && this.subMenu_.getParent() != this) {
     // Since it is possible for the same popup menu to be attached to multiple
     // submenus, we need to ensure that it has the correct parent event target.
