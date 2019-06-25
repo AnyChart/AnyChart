@@ -4855,7 +4855,9 @@ anychart.enums.AnnotationTypes = {
   FIBONACCI_RETRACEMENT: 'fibonacci-retracement',
   FIBONACCI_TIMEZONES: 'fibonacci-timezones',
   MARKER: 'marker',
-  LABEL: 'label'
+  LABEL: 'label',
+  HORIZONTAL_RANGE: 'horizontal-range',
+  VERTICAL_RANGE: 'vertical-range'
 };
 
 

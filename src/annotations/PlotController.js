@@ -6,6 +6,7 @@ goog.require('anychart.annotationsModule.FibonacciFan');
 goog.require('anychart.annotationsModule.FibonacciRetracement');
 goog.require('anychart.annotationsModule.FibonacciTimezones');
 goog.require('anychart.annotationsModule.HorizontalLine');
+goog.require('anychart.annotationsModule.HorizontalRange');
 goog.require('anychart.annotationsModule.InfiniteLine');
 goog.require('anychart.annotationsModule.Label');
 goog.require('anychart.annotationsModule.Line');
@@ -15,6 +16,7 @@ goog.require('anychart.annotationsModule.Rectangle');
 goog.require('anychart.annotationsModule.TrendChannel');
 goog.require('anychart.annotationsModule.Triangle');
 goog.require('anychart.annotationsModule.VerticalLine');
+goog.require('anychart.annotationsModule.VerticalRange');
 goog.require('anychart.core.IPlot');
 goog.require('anychart.core.VisualBase');
 goog.require('goog.array');
@@ -505,7 +507,7 @@ anychart.annotationsModule.PlotController.prototype.setupDrawing = function(acti
     if (!active && this.drawingOverlayRect_) {
       this.drawingOverlayRect_.unlisten(acgraph.events.EventType.MOUSEOUT, this.handleDrawingMouseOut_, false, this);
       this.drawingOverlayRect_.unlisten(acgraph.events.EventType.MOUSEDOWN, this.handleDrawingMouseDown_, false, this);
-      acgraph.events.unlisten(anychart.window, acgraph.events.EventType.MOUSEUP, this.handleDrawingMouseMove_, false, this);
+      acgraph.events.unlisten(anychart.window, acgraph.events.EventType.MOUSEUP, this.handleDrawingMouseUp_, false, this);
       acgraph.events.unlisten(anychart.window, acgraph.events.EventType.MOUSEMOVE, this.handleDrawingMouseMove_, false, this);
     }
     this.invalidate(anychart.ConsistencyState.ANNOTATIONS_CONTROLLER_DRAWING_MODE, anychart.Signal.NEEDS_REDRAW);
@@ -779,6 +781,34 @@ anychart.annotationsModule.PlotController.prototype.verticalLine = function(opt_
 anychart.annotationsModule.PlotController.prototype.horizontalLine = function(opt_config) {
   var annotation = /** @type {anychart.annotationsModule.HorizontalLine} */(
       this.controller_.createAnnotationByType(anychart.enums.AnnotationTypes.HORIZONTAL_LINE));
+  annotation.setup(opt_config);
+  this.bindAnnotation(annotation, true);
+  return annotation;
+};
+
+
+/**
+ * Creates and returns a horizontalLine annotation.
+ * @param {Object=} opt_config
+ * @return {anychart.annotationsModule.VerticalRange}
+ */
+anychart.annotationsModule.PlotController.prototype.verticalRange = function(opt_config) {
+  var annotation = /** @type {anychart.annotationsModule.VerticalRange} */(
+      this.controller_.createAnnotationByType(anychart.enums.AnnotationTypes.VERTICAL_RANGE));
+  annotation.setup(opt_config);
+  this.bindAnnotation(annotation, true);
+  return annotation;
+};
+
+
+/**
+ * Creates and returns a horizontalLine annotation.
+ * @param {Object=} opt_config
+ * @return {anychart.annotationsModule.HorizontalRange}
+ */
+anychart.annotationsModule.PlotController.prototype.horizontalRange = function(opt_config) {
+  var annotation = /** @type {anychart.annotationsModule.HorizontalRange} */(
+      this.controller_.createAnnotationByType(anychart.enums.AnnotationTypes.HORIZONTAL_RANGE));
   annotation.setup(opt_config);
   this.bindAnnotation(annotation, true);
   return annotation;
@@ -1269,7 +1299,9 @@ anychart.annotationsModule.PlotController.AnchorDragger.prototype.handleDragEnd_
   proto['line'] = proto.line;
   proto['infiniteLine'] = proto.infiniteLine;
   proto['verticalLine'] = proto.verticalLine;
+  proto['verticalRange'] = proto.verticalRange;
   proto['horizontalLine'] = proto.horizontalLine;
+  proto['horizontalRange'] = proto.horizontalRange;
   proto['rectangle'] = proto.rectangle;
   proto['ellipse'] = proto.ellipse;
   proto['triangle'] = proto.triangle;
