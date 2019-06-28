@@ -209,7 +209,8 @@ goog.addDependency('../../../../src/data/data.js', ['anychart.data'], ['anychart
 goog.addDependency('../../../../src/dataAdapter/data-adapter.module.js', ['anychart.dataAdapterModule.entry'], ['anychart.base', 'anychart.core.reporting', 'anychart.enums', 'anychart.exportsModule.entry', 'goog.Uri', 'goog.dom', 'goog.net.XhrIo'], {});
 goog.addDependency('../../../../src/enums.js', ['anychart.enums'], [], {});
 goog.addDependency('../../../../src/exports/Exports.js', ['anychart.exportsModule.Exports'], [], {});
-goog.addDependency('../../../../src/exports/exports.module.js', ['anychart.exportsModule.entry'], ['acgraph.exporting', 'anychart', 'anychart.base', 'anychart.core.Chart', 'anychart.core.VisualBase', 'anychart.exportsModule.Exports', 'anychart.utils', 'goog.dom'], {});
+goog.addDependency('../../../../src/exports/OfflineExports.js', ['anychart.exportsModule.offline'], [], {});
+goog.addDependency('../../../../src/exports/exports.module.js', ['anychart.exportsModule.entry'], ['acgraph.exporting', 'anychart', 'anychart.base', 'anychart.core.Chart', 'anychart.core.VisualBase', 'anychart.exportsModule.Exports', 'anychart.exportsModule.offline', 'anychart.utils', 'goog.dom'], {});
 goog.addDependency('../../../../src/format/Context.js', ['anychart.format.Context'], ['anychart.base', 'anychart.core.BaseContext', 'anychart.format'], {});
 goog.addDependency('../../../../src/format/FormatSelector.js', ['anychart.format.FormatSelector'], ['anychart.core.Base', 'anychart.core.ui.OptimizedText', 'anychart.format', 'anychart.reflow.IMeasurementsTargetProvider'], {});
 goog.addDependency('../../../../src/format/format.js', ['anychart.format'], ['anychart.enums', 'anychart.math', 'anychart.utils', 'goog.i18n.DateTimeFormat', 'goog.i18n.DateTimeParse', 'goog.i18n.TimeZone', 'goog.string'], {});

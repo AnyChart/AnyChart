@@ -48,10 +48,88 @@ anychart.exportsModule.Exports = function() {
    * @private
    */
   this.pinterest_ = {};
+  /**
+   * Dependencies names.
+   * @type {Object}
+   * @private
+   */
+  this.externalDependencies_ = ['svg2pdf.min.js', 'jspdf.min.js', 'canvg.min.js'];
+
+  /**
+   * Default clientside config.
+   * @type {anychart.exportsModule.Exports.ClientsideConfig}
+   * @private
+   */
+  this.clientsideConfig_ = {
+    'path': 'https://cdn.anychart.com/3rd/',
+    'enabled': true,
+    'fallback': true
+  };
+
+  this.loadExternalDependencies();
 };
 
 
 //region --- Settings
+/**
+ * Path to dependencies.
+ * @return {string}
+ */
+anychart.exportsModule.Exports.prototype.clientsidePath = function() {
+  return this.clientsideConfig_['path'];
+};
+
+
+/**
+ * Whether to fallback to export server in case client-side exporting didn't work.
+ * @return {boolean}
+ */
+anychart.exportsModule.Exports.prototype.clientsideFallback = function() {
+  return this.clientsideConfig_['fallback'];
+};
+
+
+/**
+ * Whether to use client-side export feature.
+ * @return {boolean}
+ */
+anychart.exportsModule.Exports.prototype.clientsideEnabled = function() {
+  return this.clientsideConfig_['enabled'];
+};
+
+
+/**
+ * @typedef {{
+ *    path: string,
+ *    enabled: boolean,
+ *    fallback: boolean
+ * }}
+ */
+anychart.exportsModule.Exports.ClientsideConfig;
+
+
+/**
+ * Getter/setter for the clientside export options.
+ * @param {anychart.exportsModule.Exports.ClientsideConfig=} opt_value
+ * @return {anychart.exportsModule.Exports.ClientsideConfig|anychart.exportsModule.Exports}
+ */
+anychart.exportsModule.Exports.prototype.clientside = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var fields = ['path', 'enabled', 'fallback'];
+
+    for (var i = 0; i < fields.length; i++) {
+      var fieldName = fields[i];
+      if (goog.isDef(opt_value[fieldName])) {
+        this.clientsideConfig_[fieldName] = opt_value[fieldName];
+      }
+    }
+
+    return this;
+  }
+  return this.clientsideConfig_;
+};
+
+
 /**
  * Get/set file name for exported files.
  * @param {string=} opt_value New file name.
@@ -167,6 +245,23 @@ anychart.exportsModule.Exports.prototype.pinterest = function(opt_linkOrOptions,
 
 //endregion
 
+
+/**
+ * Loads dependencies needed for offline export to work.
+ */
+anychart.exportsModule.Exports.prototype.loadExternalDependencies = function() {
+  var deps = this.externalDependencies_;
+  var depsUrl = this.clientsidePath();
+  depsUrl += goog.string.endsWith(depsUrl, '/') ? '' : '/'; //append slash if not present, to assemble correct path
+  for (var i = 0; i < deps.length; i++) {
+    var fullUrl = depsUrl + deps[i];
+    var script = goog.dom.createElement('script');
+    script.setAttribute('src', fullUrl);
+    anychart.document.head.appendChild(script);
+  }
+};
+
+
 /**
  * Applying defaults.
  */
@@ -245,6 +340,7 @@ anychart.exportsModule.Exports.prototype.serialize = function() {
   this.serializeInternal_(json, 'twitter', this.twitter_);
   this.serializeInternal_(json, 'linkedin', this.linkedIn_);
   this.serializeInternal_(json, 'pinterest', this.pinterest_);
+  this.serializeInternal_(json, 'clientside', this.clientsideConfig_);
 
   return json;
 };
@@ -261,6 +357,7 @@ anychart.exportsModule.Exports.prototype.setupByJSON = function(json) {
   this.twitter(json['twitter']);
   this.linkedin(json['linkedin']);
   this.pinterest(json['pinterest']);
+  this.clientside(json['clientside']);
 };
 
 
@@ -273,4 +370,5 @@ anychart.exportsModule.Exports.prototype.setupByJSON = function(json) {
   proto['twitter'] = proto.twitter;
   proto['linkedin'] = proto.linkedin;
   proto['pinterest'] = proto.pinterest;
+  proto['clientside'] = proto.clientside;
 })();
