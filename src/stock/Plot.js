@@ -2540,8 +2540,9 @@ anychart.stockModule.Plot.prototype.highlight = function(value, rawValue, hlSour
   if (sticky && opt_closestSeriesInfo) {
     var pointYRatio = opt_closestSeriesInfo['pointYRatio'];
     var chartOffset = this.container().getStage().getClientPosition();
-    var y = (this.seriesBounds_.height - pointYRatio * this.seriesBounds_.height) + this.seriesBounds_.top + chartOffset.y;
-    opt_y = anychart.utils.applyPixelShift(y, thickness);
+    // Apply no pixelshift for y value because scale use it for transform.
+    // We need this value as is.
+    opt_y = (this.seriesBounds_.height - pointYRatio * this.seriesBounds_.height) + this.seriesBounds_.top + chartOffset.y;
   }
 
   this.crosshair().xLabelAutoEnabled(this.isLastPlot_);
