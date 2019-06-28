@@ -220,15 +220,15 @@ anychart.core.SeparateChart.prototype.calculateContentAreaSpace = function(total
 
   var legend = this.getCreated('legend');
   if (this.hasInvalidationState(anychart.ConsistencyState.CHART_LEGEND | anychart.ConsistencyState.BOUNDS)) {
-    if (legend && /** @type {anychart.core.ui.Legend} */(legend).getOption('positionMode') == anychart.enums.LegendPositionMode.OUTSIDE)
+    //if legend positionMode 'inside', redraw legend in specialDraw method
+    if (legend && /** @type {anychart.core.ui.Legend} */(legend).getOption('positionMode') == anychart.enums.LegendPositionMode.OUTSIDE) {
       this.drawLegend(bounds);
-    else
+      if (legend.enabled()) {
+        bounds = legend.getRemainingBounds();
+      }
       this.markConsistent(anychart.ConsistencyState.CHART_LEGEND);
+    }
   }
-  bounds = legend && legend.enabled() && /** @type {anychart.core.ui.Legend} */(legend).getOption('positionMode') == anychart.enums.LegendPositionMode.OUTSIDE ?
-      legend.getRemainingBounds() :
-      bounds;
-
   return bounds.clone();
 };
 
