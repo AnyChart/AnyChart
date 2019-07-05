@@ -609,6 +609,8 @@ anychart.core.ui.LegendItem.prototype.getIconDrawer = function(opt_iconType) {
 
     case anychart.enums.LegendItemIconType.TRIANGLE_UP:
     case anychart.enums.LegendItemIconType.TRIANGLE_DOWN:
+    case anychart.enums.LegendItemIconType.TRIANGLE_RIGHT:
+    case anychart.enums.LegendItemIconType.TRIANGLE_LEFT:
     case anychart.enums.LegendItemIconType.DIAMOND:
     case anychart.enums.LegendItemIconType.CROSS:
     case anychart.enums.LegendItemIconType.DIAGONAL_CROSS:
