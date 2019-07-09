@@ -169,6 +169,7 @@ anychart.ganttModule.IInteractiveGrid.prototype.lockInteractivity = function(loc
 
 /**
  * Selection.
+ * Old gantt chart selection behaviour.
  * @return {anychart.ganttModule.SingleSelection}
  */
 anychart.ganttModule.IInteractiveGrid.prototype.singleSelection = function() {};
