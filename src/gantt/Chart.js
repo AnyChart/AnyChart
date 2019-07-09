@@ -6,7 +6,7 @@ goog.require('anychart.format.Context');
 goog.require('anychart.ganttModule.Controller');
 goog.require('anychart.ganttModule.DataGrid');
 goog.require('anychart.ganttModule.IInteractiveGrid');
-goog.require('anychart.ganttModule.Selection');
+goog.require('anychart.ganttModule.SingleSelection');
 goog.require('anychart.ganttModule.Splitter');
 goog.require('anychart.ganttModule.TimeLine');
 goog.require('anychart.ganttModule.edit.StructureEdit');
@@ -79,10 +79,10 @@ anychart.ganttModule.Chart = function(opt_isResourcesChart) {
 
   /**
    * Selection.
-   * @type {anychart.ganttModule.Selection}
+   * @type {anychart.ganttModule.SingleSelection}
    * @private
    */
-  this.selection_ = new anychart.ganttModule.Selection();
+  this.singleSelection_ = new anychart.ganttModule.SingleSelection();
 
   /**
    * Context provider.
@@ -782,8 +782,8 @@ anychart.ganttModule.Chart.prototype.editStructureHighlight = function(opt_index
 /**
  * @inheritDoc
  */
-anychart.ganttModule.Chart.prototype.selection = function() {
-  return this.selection_;
+anychart.ganttModule.Chart.prototype.singleSelection = function() {
+  return this.singleSelection_;
 };
 
 
@@ -848,7 +848,7 @@ anychart.ganttModule.Chart.prototype.rowSelect = function(event) {
     var period = event['period'];
     var periodIndex = event['periodIndex'];
 
-    var selection = this.selection();
+    var selection = this.singleSelection();
     var isSelected = this.isResourcesChart_ ?
         selection.isPeriodSelected(item, periodIndex) :
         selection.isRowSelected(item);
@@ -914,7 +914,7 @@ anychart.ganttModule.Chart.prototype.rowMouseDown = function(event) {
  * @inheritDoc
  */
 anychart.ganttModule.Chart.prototype.rowUnselect = function(event) {
-  var selection = this.selection();
+  var selection = this.singleSelection();
   //NOTE: this event will not be dispatched by dg_ or tl_ because their interactivity handler is chart but not they are.
   var newEvent = {
     'type': anychart.enums.EventType.ROW_SELECT,
@@ -1233,7 +1233,7 @@ anychart.ganttModule.Chart.prototype.disposeInternal = function() {
       this.tl_,
       this.splitter_,
       this.edit_,
-      this.selection_);
+      this.singleSelection_);
   this.palette_ = null;
   this.controller_ = null;
   this.verticalScrollBar_ = null;
@@ -1241,7 +1241,7 @@ anychart.ganttModule.Chart.prototype.disposeInternal = function() {
   this.tl_ = null;
   this.splitter_ = null;
   this.edit_ = null;
-  this.selection_ = null;
+  this.singleSelection_ = null;
   anychart.ganttModule.Chart.base(this, 'disposeInternal');
 };
 

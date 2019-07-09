@@ -3615,13 +3615,13 @@ anychart.ganttModule.TimeLine.prototype.checkRowSelection = function(event) {
       var connSelectEvent = this.patchConnectorEvent_(event);
       connSelectEvent.type = anychart.enums.EventType.CONNECTOR_SELECT;
 
-      if (this.interactivityHandler.selection().hasSelectedConnector())
+      if (this.interactivityHandler.singleSelection().hasSelectedConnector())
         this.connectorUnselect(event['originalEvent']);
 
       if (this.interactivityHandler.dispatchEvent(connSelectEvent)) {
         this.interactivityHandler.rowUnselect(event['originalEvent']);
         var m = domTarget.meta;
-        this.interactivityHandler.selection().selectConnector(
+        this.interactivityHandler.singleSelection().selectConnector(
             m['fromItem'], m['toItem'],
             m['fromItemIndex'], m['toItemIndex'],
             m['fromPeriodIndex'], m['toPeriodIndex'],
@@ -3641,7 +3641,7 @@ anychart.ganttModule.TimeLine.prototype.checkRowSelection = function(event) {
  * @param {Object} event - Dispatched event object.
  */
 anychart.ganttModule.TimeLine.prototype.connectorUnselect = function(event) {
-  var selection = this.interactivityHandler.selection();
+  var selection = this.interactivityHandler.singleSelection();
   if (selection.hasSelectedConnector()) {
     var connEvent = this.getConnectorInteractivityEvent_(/** @type {anychart.core.MouseEvent} */ (event)); //empty event.
     connEvent.type = anychart.enums.EventType.CONNECTOR_SELECT;
@@ -3692,7 +3692,7 @@ anychart.ganttModule.TimeLine.prototype.getInteractivityEvent = function(event) 
  * @return {boolean} - Whether has been selected.
  */
 anychart.ganttModule.TimeLine.prototype.selectTimelineRow = function(item, opt_periodIndex) {
-  var selection = this.interactivityHandler.selection();
+  var selection = this.interactivityHandler.singleSelection();
   selection.selectPeriod(item, opt_periodIndex);
   if (selection.hasSelectedRow()) {
     this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
@@ -3974,7 +3974,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsPeriods_ = function(dataItem, tota
 
           var coord = anychart.utils.getCoordinateByAnchor(itemBounds, position);
           var top = this.fixBarTop_(coord.y, height, anchor) + offsetNorm;
-          var isSelected = this.interactivityHandler.selection().isPeriodSelected(dataItem, j);
+          var isSelected = this.interactivityHandler.singleSelection().isPeriodSelected(dataItem, j);
 
           var bounds = this.fixBounds_(el, new anychart.math.Rect(coord.x, top, width, height), dataItem, j, isSelected);
 
@@ -4030,7 +4030,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsBaseline_ = function(dataItem, tot
 
       this.fixBaselineBarsPositioning_(actualBounds, baselineBounds, element, dataItem);
 
-      var isSelected = this.interactivityHandler.selection().isRowSelected(dataItem);
+      var isSelected = this.interactivityHandler.singleSelection().isRowSelected(dataItem);
       actualBounds = this.fixBounds_(element, actualBounds, dataItem, void 0, isSelected);
 
       baselineBounds = this.fixBounds_(baselines, baselineBounds, dataItem, void 0, isSelected);
@@ -4151,7 +4151,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsParent_ = function(dataItem, total
       var actualItemBounds = new anychart.math.Rect(actualLeft, totalTop, actualWidth, itemHeight);
       var actualBounds = this.getBarBounds_(el, actualItemBounds);
 
-      var isSelected = this.interactivityHandler.selection().isRowSelected(dataItem);
+      var isSelected = this.interactivityHandler.singleSelection().isRowSelected(dataItem);
       actualBounds = this.fixBounds_(el, actualBounds, dataItem, void 0, isSelected);
 
       var tag = this.createTag(dataItem, el, actualBounds);
@@ -4226,7 +4226,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsProgress_ = function(dataItem, tot
       var actualItemBounds = new anychart.math.Rect(actualLeft, totalTop, actualWidth, itemHeight);
       var actualBounds = this.getBarBounds_(el, actualItemBounds);
 
-      var isSelected = this.interactivityHandler.selection().isRowSelected(dataItem);
+      var isSelected = this.interactivityHandler.singleSelection().isRowSelected(dataItem);
       actualBounds = this.fixBounds_(el, actualBounds, dataItem, void 0, isSelected);
 
       var tag = this.createTag(dataItem, el, actualBounds);
@@ -4278,7 +4278,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsMilestone_ = function(dataItem, to
       var itemBounds = new anychart.math.Rect(centerLeft - halfHeight, totalTop, height, itemHeight);
       var bounds = this.getBarBounds_(el, itemBounds);
 
-      var isSelected = this.interactivityHandler.selection().isRowSelected(dataItem);
+      var isSelected = this.interactivityHandler.singleSelection().isRowSelected(dataItem);
       bounds = this.fixBounds_(el, bounds, dataItem, void 0, isSelected);
 
       var tag = this.createTag(dataItem, el, bounds);
@@ -4320,7 +4320,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsMilestonePreview_ = function(dataI
       var itemBounds = new anychart.math.Rect(centerLeft - halfHeight, totalTop, height, itemHeight);
       var bounds = this.getBarBounds_(el, itemBounds);
 
-      var isSelected = this.interactivityHandler.selection().isRowSelected(dataItem);
+      var isSelected = this.interactivityHandler.singleSelection().isRowSelected(dataItem);
       bounds = this.fixBounds_(el, bounds, dataItem, void 0, isSelected);
 
       var tag = this.createTag(dataItem, el, bounds);
@@ -4455,7 +4455,7 @@ anychart.ganttModule.TimeLine.prototype.connectItems_ = function(from, to, opt_c
   var toRowHeight = this.controller.getItemHeight(toItem);
 
   if (fromBounds && toBounds && fromElement.getOption('enabled') && toElement.getOption('enabled')) {
-    var selected = this.interactivityHandler.selection().isConnectorSelected(fromItem, toItem, fromIndex, toIndex, fromPeriodIndex, toPeriodIndex, opt_connType);
+    var selected = this.interactivityHandler.singleSelection().isConnectorSelected(fromItem, toItem, fromIndex, toIndex, fromPeriodIndex, toPeriodIndex, opt_connType);
 
     var drawPreview = goog.isDefAndNotNull(opt_path);
     var pointFill, pointStroke;
@@ -5225,7 +5225,7 @@ anychart.ganttModule.TimeLine.prototype.drawLabels_ = function() {
  * @inheritDoc
  */
 anychart.ganttModule.TimeLine.prototype.deleteKeyHandler = function(e) {
-  var selection = this.interactivityHandler.selection();
+  var selection = this.interactivityHandler.singleSelection();
   if (selection.hasSelectedConnector() && this.elements().edit().getOption('enabled')) {
     var selectedConnectorData = selection.getSelectedConnectorData();
     var fromItemIndex = selectedConnectorData.fromItemIndex;
@@ -5621,6 +5621,7 @@ anychart.ganttModule.TimeLine.prototype.disposeInternal = function() {
 
   anychart.ganttModule.TimeLine.base(this, 'disposeInternal');
 };
+
 
 
 //region --- Standalone

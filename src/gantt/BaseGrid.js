@@ -9,7 +9,7 @@ goog.require('anychart.format.Context');
 goog.require('anychart.ganttModule.Controller');
 goog.require('anychart.ganttModule.IInteractiveGrid');
 goog.require('anychart.ganttModule.ScrollBar');
-goog.require('anychart.ganttModule.Selection');
+goog.require('anychart.ganttModule.SingleSelection');
 goog.require('anychart.ganttModule.edit.StructureEdit');
 goog.require('anychart.math.Rect');
 goog.require('goog.Timer');
@@ -79,7 +79,7 @@ anychart.ganttModule.BaseGrid = function(opt_controller, opt_isResource) {
     this.isStandalone = false;
   } else {
     this.createController(opt_isResource);
-    this.selection_ = new anychart.ganttModule.Selection();
+    this.singleSelection_ = new anychart.ganttModule.SingleSelection();
   }
 
   /**
@@ -543,8 +543,8 @@ anychart.ganttModule.BaseGrid.HIGHER_DRAG_EDIT_RATIO = 1 - anychart.ganttModule.
 /**
  * @inheritDoc
  */
-anychart.ganttModule.BaseGrid.prototype.selection = function() {
-  return this.selection_;
+anychart.ganttModule.BaseGrid.prototype.singleSelection = function() {
+  return this.singleSelection_;
 };
 
 
@@ -2124,7 +2124,7 @@ anychart.ganttModule.BaseGrid.prototype.drawRowFills = function() {
     }
 
     if (item.meta('selected')) {
-      this.interactivityHandler.selection().selectRow(item); //In case of restoration from XML/JSON, this allows to save selected item state.
+      this.interactivityHandler.singleSelection().selectRow(item); //In case of restoration from XML/JSON, this allows to save selected item state.
       this.selectedPath_
           .clear()
           .moveTo(this.pixelBoundsCache.left, top)
@@ -2450,7 +2450,7 @@ anychart.ganttModule.BaseGrid.prototype.drawInternal = function(positionRecalcul
     this.getOddPath().fill(/** @type {acgraph.vector.Fill} */(rowOddFill));
     this.getEvenPath().fill(/** @type {acgraph.vector.Fill} */(rowEvenFill));
 
-    var selectedItem = this.interactivityHandler.selection().getSelectedItem();
+    var selectedItem = this.interactivityHandler.singleSelection().getSelectedItem();
     var rowSelectedFill = anychart.ganttModule.BaseGrid.getColorResolver('rowSelectedFill', anychart.enums.ColorType.FILL, false)(this, 0, selectedItem);
     this.getSelectedPath().fill(/** @type {acgraph.vector.Fill} */(rowSelectedFill));
 
@@ -2755,7 +2755,7 @@ anychart.ganttModule.BaseGrid.prototype.scroll = goog.abstractMethod;
  */
 anychart.ganttModule.BaseGrid.prototype.selectRow = function(item) {
   if (item) {
-    this.interactivityHandler.selection().selectRow(item);
+    this.interactivityHandler.singleSelection().selectRow(item);
     this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
     return true;
   }
@@ -2793,11 +2793,11 @@ anychart.ganttModule.BaseGrid.prototype.rowUnselect = function(event) {
         'target': this,
         'originalEvent': event,
         'item': null, //This is a real difference between 'select' and 'unselect' events.
-        'prevItem': this.interactivityHandler.selection().getSelectedItem()
+        'prevItem': this.interactivityHandler.singleSelection().getSelectedItem()
       };
       this.dispatchEvent(newEvent);
     }
-    this.interactivityHandler.selection().reset();
+    this.interactivityHandler.singleSelection().reset();
 
     this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW);
   }
@@ -2983,7 +2983,7 @@ anychart.ganttModule.BaseGrid.prototype.disposeInternal = function() {
       this.rowStrokePath_, this.selectedPath_, this.hoverPath_,
       this.evenPath_, this.oddPath_, this.scrollsLayer_, this.clipLayer_,
       this.editLayer_, this.contentLayer_, this.drawLayer_, this.rangeLineMarkersLayer_,
-      this.textMarkersLayer_, this.cellsLayer_, this.base_, this.selection_);
+      this.textMarkersLayer_, this.cellsLayer_, this.base_, this.singleSelection_);
   this.tooltip_ = null;
   this.eventsRect_ = null;
   this.bgRect_ = null;
@@ -3006,7 +3006,7 @@ anychart.ganttModule.BaseGrid.prototype.disposeInternal = function() {
   this.cellsLayer_ = null;
   this.base_ = null;
   this.edit_ = null;
-  this.selection_ = null;
+  this.singleSelection_ = null;
   anychart.ganttModule.BaseGrid.base(this, 'disposeInternal');
 };
 

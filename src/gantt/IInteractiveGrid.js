@@ -169,7 +169,7 @@ anychart.ganttModule.IInteractiveGrid.prototype.lockInteractivity = function(loc
 
 /**
  * Selection.
- * @return {anychart.ganttModule.Selection}
+ * @return {anychart.ganttModule.SingleSelection}
  */
-anychart.ganttModule.IInteractiveGrid.prototype.selection = function() {};
+anychart.ganttModule.IInteractiveGrid.prototype.singleSelection = function() {};
 
