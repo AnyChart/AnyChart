@@ -6,6 +6,7 @@ goog.require('anychart.format.Context');
 goog.require('anychart.ganttModule.Controller');
 goog.require('anychart.ganttModule.DataGrid');
 goog.require('anychart.ganttModule.IInteractiveGrid');
+goog.require('anychart.ganttModule.MultiSelection');
 goog.require('anychart.ganttModule.SingleSelection');
 goog.require('anychart.ganttModule.Splitter');
 goog.require('anychart.ganttModule.TimeLine');
@@ -77,12 +78,19 @@ anychart.ganttModule.Chart = function(opt_isResourcesChart) {
    */
   this.splitter_ = null;
 
+  // /**
+  //  * Selection.
+  //  * @type {anychart.ganttModule.SingleSelection}
+  //  * @private
+  //  */
+  // this.singleSelection_ = new anychart.ganttModule.SingleSelection();
+
   /**
    * Selection.
-   * @type {anychart.ganttModule.SingleSelection}
+   * @type {anychart.ganttModule.MultiSelection}
    * @private
    */
-  this.singleSelection_ = new anychart.ganttModule.SingleSelection();
+  this.selection_ = new anychart.ganttModule.MultiSelection();
 
   /**
    * Context provider.
@@ -787,6 +795,14 @@ anychart.ganttModule.Chart.prototype.singleSelection = function() {
 };
 
 
+/**
+ * @inheritDoc
+ */
+anychart.ganttModule.Chart.prototype.selection = function() {
+  return this.selection_;
+};
+
+
 //endregion
 /**
  * Row mouse move interactivity handler.
@@ -843,40 +859,112 @@ anychart.ganttModule.Chart.prototype.rowMouseOut = function(event) {
  * @param {Object} event - Dispatched event object.
  */
 anychart.ganttModule.Chart.prototype.rowSelect = function(event) {
-  if (!this.tl_.checkRowSelection(event)) {
-    var item = event['item'];
-    var period = event['period'];
-    var periodIndex = event['periodIndex'];
+  var item = event['item'];
+  var period = event['period'];
+  var periodIndex = event['periodIndex'];
 
-    var selection = this.singleSelection();
-    var isSelected = this.isResourcesChart_ ?
-        selection.isPeriodSelected(item, periodIndex) :
-        selection.isRowSelected(item);
+  if (item) {
+    // NOTE: in Qlik implementation event is not preventable for a while.
+    var eventObj = {
+      'type': anychart.enums.EventType.ROW_SELECT,
+      'item': item,
+      'previousSelection': this.selection().getSelectedItems()
+    };
 
-    if (item && !isSelected) {
-      var eventObj = {
-        'type': anychart.enums.EventType.ROW_SELECT,
-        'item': item,
-        'prevItem': selection.getSelectedItem()
-      };
-      if (goog.isDef(period)) {
-        eventObj['period'] = period;
-        eventObj['periodIndex'] = periodIndex;
-      }
-      if (selection.hasSelectedPeriod()) {
-        var pIndex = selection.getSelectedPeriodIndex();
-        eventObj['prevPeriodIndex'] = pIndex;
-        eventObj['prevPeriod'] = selection.getSelectedItem().get(anychart.enums.GanttDataFields.PERIODS, pIndex);
-      }
+    this.selection().selectInternal(item);
+    eventObj['currentSelection'] = this.selection().getSelectedItems();
+    eventObj['currentItem'] = item.meta('selected') ? item : null;
 
-      if (this.dispatchEvent(eventObj)) {
-        this.tl_.connectorUnselect(event);
-        this.dg_.selectRow(item);
-        this.tl_.selectTimelineRow(item, periodIndex);
-      }
+    if (goog.isDef(period)) {
+      eventObj['period'] = period;
+      eventObj['periodIndex'] = periodIndex;
     }
+
+    this.dispatchEvent(eventObj); // Not preventable for a while.
+
+    this.dg_.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW);
+    this.tl_.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW);
+    this.controller_.run();
   }
+
+  // if (!this.tl_.checkRowSelection(event)) {
+  //   var item = event['item'];
+  //   var period = event['period'];
+  //   var periodIndex = event['periodIndex'];
+  //
+  //   var prevSelection =
+  //
+  //
+  //   var selection = this.singleSelection();
+  //   var isSelected = this.isResourcesChart_ ?
+  //       selection.isPeriodSelected(item, periodIndex) :
+  //       selection.isRowSelected(item);
+  //
+  //   if (item && !isSelected) {
+  //     var eventObj = {
+  //       'type': anychart.enums.EventType.ROW_SELECT,
+  //       'item': item,
+  //       'prevItem': selection.getSelectedItem()
+  //     };
+  //     if (goog.isDef(period)) {
+  //       eventObj['period'] = period;
+  //       eventObj['periodIndex'] = periodIndex;
+  //     }
+  //     if (selection.hasSelectedPeriod()) {
+  //       var pIndex = selection.getSelectedPeriodIndex();
+  //       eventObj['prevPeriodIndex'] = pIndex;
+  //       eventObj['prevPeriod'] = selection.getSelectedItem().get(anychart.enums.GanttDataFields.PERIODS, pIndex);
+  //     }
+  //
+  //     if (this.dispatchEvent(eventObj)) {
+  //       this.tl_.connectorUnselect(event);
+  //       this.dg_.selectRow(item);
+  //       this.tl_.selectTimelineRow(item, periodIndex);
+  //     }
+  //   }
+  // }
 };
+
+// /**
+//  * Handles row selection.
+//  * TODO (A.Kudryavtsev): Old behaviour, left for a while.
+//  * @param {Object} event - Dispatched event object.
+//  */
+// anychart.ganttModule.Chart.prototype.rowSelectOld = function(event) {
+//   if (!this.tl_.checkRowSelection(event)) {
+//     var item = event['item'];
+//     var period = event['period'];
+//     var periodIndex = event['periodIndex'];
+//
+//     var selection = this.singleSelection();
+//     var isSelected = this.isResourcesChart_ ?
+//         selection.isPeriodSelected(item, periodIndex) :
+//         selection.isRowSelected(item);
+//
+//     if (item && !isSelected) {
+//       var eventObj = {
+//         'type': anychart.enums.EventType.ROW_SELECT,
+//         'item': item,
+//         'prevItem': selection.getSelectedItem()
+//       };
+//       if (goog.isDef(period)) {
+//         eventObj['period'] = period;
+//         eventObj['periodIndex'] = periodIndex;
+//       }
+//       if (selection.hasSelectedPeriod()) {
+//         var pIndex = selection.getSelectedPeriodIndex();
+//         eventObj['prevPeriodIndex'] = pIndex;
+//         eventObj['prevPeriod'] = selection.getSelectedItem().get(anychart.enums.GanttDataFields.PERIODS, pIndex);
+//       }
+//
+//       if (this.dispatchEvent(eventObj)) {
+//         this.tl_.connectorUnselect(event);
+//         this.dg_.selectRow(item);
+//         this.tl_.selectTimelineRow(item, periodIndex);
+//       }
+//     }
+//   }
+// };
 
 
 /**
@@ -914,28 +1002,28 @@ anychart.ganttModule.Chart.prototype.rowMouseDown = function(event) {
  * @inheritDoc
  */
 anychart.ganttModule.Chart.prototype.rowUnselect = function(event) {
-  var selection = this.singleSelection();
-  //NOTE: this event will not be dispatched by dg_ or tl_ because their interactivity handler is chart but not they are.
-  var newEvent = {
-    'type': anychart.enums.EventType.ROW_SELECT,
-    'actualTarget': event ? event.target : this,
-    'target': this,
-    'originalEvent': event,
-    'item': null, //This is a real difference between 'select' and 'unselect' events.
-    'prevItem': selection.getSelectedItem()
-  };
-
-  if (selection.hasSelectedPeriod()) {
-    var pIndex = selection.getSelectedPeriodIndex();
-    newEvent['prevPeriodIndex'] = pIndex;
-    newEvent['prevPeriod'] = selection.getSelectedItem().get(anychart.enums.GanttDataFields.PERIODS, pIndex);
-  }
-
-  if (this.dispatchEvent(newEvent)) {
-    this.dg_.rowUnselect(event);
-    this.tl_.rowUnselect(event);
-  }
-  this.tl_.connectorUnselect(event);
+  // var selection = this.singleSelection();
+  // //NOTE: this event will not be dispatched by dg_ or tl_ because their interactivity handler is chart but not they are.
+  // var newEvent = {
+  //   'type': anychart.enums.EventType.ROW_SELECT,
+  //   'actualTarget': event ? event.target : this,
+  //   'target': this,
+  //   'originalEvent': event,
+  //   'item': null, //This is a real difference between 'select' and 'unselect' events.
+  //   'prevItem': selection.getSelectedItem()
+  // };
+  //
+  // if (selection.hasSelectedPeriod()) {
+  //   var pIndex = selection.getSelectedPeriodIndex();
+  //   newEvent['prevPeriodIndex'] = pIndex;
+  //   newEvent['prevPeriod'] = selection.getSelectedItem().get(anychart.enums.GanttDataFields.PERIODS, pIndex);
+  // }
+  //
+  // if (this.dispatchEvent(newEvent)) {
+  //   this.dg_.rowUnselect(event);
+  //   this.tl_.rowUnselect(event);
+  // }
+  // this.tl_.connectorUnselect(event);
 };
 
 
@@ -1233,7 +1321,8 @@ anychart.ganttModule.Chart.prototype.disposeInternal = function() {
       this.tl_,
       this.splitter_,
       this.edit_,
-      this.singleSelection_);
+      this.singleSelection_,
+      this.selection_);
   this.palette_ = null;
   this.controller_ = null;
   this.verticalScrollBar_ = null;
@@ -1242,6 +1331,7 @@ anychart.ganttModule.Chart.prototype.disposeInternal = function() {
   this.splitter_ = null;
   this.edit_ = null;
   this.singleSelection_ = null;
+  this.selection_ = null;
   anychart.ganttModule.Chart.base(this, 'disposeInternal');
 };
 
@@ -1274,6 +1364,7 @@ anychart.ganttModule.Chart.prototype.disposeInternal = function() {
   proto['xScale'] = proto.xScale;
   proto['defaultRowHeight'] = proto.defaultRowHeight;
   proto['palette'] = proto.palette;
+  proto['selection'] = proto.selection;
 
   // auto generated
   // proto['rowHoverFill'] = proto.rowHoverFill;

@@ -8,6 +8,7 @@ goog.require('anychart.core.ui.Tooltip');
 goog.require('anychart.format.Context');
 goog.require('anychart.ganttModule.Controller');
 goog.require('anychart.ganttModule.IInteractiveGrid');
+goog.require('anychart.ganttModule.MultiSelection');
 goog.require('anychart.ganttModule.ScrollBar');
 goog.require('anychart.ganttModule.SingleSelection');
 goog.require('anychart.ganttModule.edit.StructureEdit');
@@ -79,7 +80,8 @@ anychart.ganttModule.BaseGrid = function(opt_controller, opt_isResource) {
     this.isStandalone = false;
   } else {
     this.createController(opt_isResource);
-    this.singleSelection_ = new anychart.ganttModule.SingleSelection();
+    // this.singleSelection_ = new anychart.ganttModule.SingleSelection();
+    this.selection_ = new anychart.ganttModule.MultiSelection();
   }
 
   /**
@@ -545,6 +547,14 @@ anychart.ganttModule.BaseGrid.HIGHER_DRAG_EDIT_RATIO = 1 - anychart.ganttModule.
  */
 anychart.ganttModule.BaseGrid.prototype.singleSelection = function() {
   return this.singleSelection_;
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.ganttModule.BaseGrid.prototype.selection = function() {
+  return this.selection_;
 };
 
 
@@ -2123,10 +2133,12 @@ anychart.ganttModule.BaseGrid.prototype.drawRowFills = function() {
           .close();
     }
 
+    this.interactivityHandler.selection().syncSelection(item);
     if (item.meta('selected')) {
-      this.interactivityHandler.singleSelection().selectRow(item); //In case of restoration from XML/JSON, this allows to save selected item state.
+      //TODO (A.Kudryavtsev): Commented for Qlik purposes for a while.
+      // this.interactivityHandler.singleSelection().selectRow(item); //In case of restoration from XML/JSON, this allows to save selected item state.
+
       this.selectedPath_
-          .clear()
           .moveTo(this.pixelBoundsCache.left, top)
           .lineTo(this.pixelBoundsCache.left + this.pixelBoundsCache.width, top)
           .lineTo(this.pixelBoundsCache.left + this.pixelBoundsCache.width, newTop)
@@ -2450,8 +2462,9 @@ anychart.ganttModule.BaseGrid.prototype.drawInternal = function(positionRecalcul
     this.getOddPath().fill(/** @type {acgraph.vector.Fill} */(rowOddFill));
     this.getEvenPath().fill(/** @type {acgraph.vector.Fill} */(rowEvenFill));
 
-    var selectedItem = this.interactivityHandler.singleSelection().getSelectedItem();
-    var rowSelectedFill = anychart.ganttModule.BaseGrid.getColorResolver('rowSelectedFill', anychart.enums.ColorType.FILL, false)(this, 0, selectedItem);
+    // var selectedItem = this.interactivityHandler.singleSelection().getSelectedItem();
+    // var rowSelectedFill = anychart.ganttModule.BaseGrid.getColorResolver('rowSelectedFill', anychart.enums.ColorType.FILL, false)(this, 0, selectedItem);
+    var rowSelectedFill = anychart.ganttModule.BaseGrid.getColorResolver('rowSelectedFill', anychart.enums.ColorType.FILL, false)(this, 0, null);
     this.getSelectedPath().fill(/** @type {acgraph.vector.Fill} */(rowSelectedFill));
 
     var rowStrokeColor;
@@ -2754,11 +2767,12 @@ anychart.ganttModule.BaseGrid.prototype.scroll = goog.abstractMethod;
  * @return {boolean} - Whether has been selected.
  */
 anychart.ganttModule.BaseGrid.prototype.selectRow = function(item) {
-  if (item) {
-    this.interactivityHandler.singleSelection().selectRow(item);
-    this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
-    return true;
-  }
+  //TODO (A.Kudryavtsev): Commented for Qlik purposes for a while.
+  // if (item) {
+  //   this.interactivityHandler.singleSelection().selectRow(item);
+  //   this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
+  //   return true;
+  // }
   return false;
 };
 
@@ -2785,22 +2799,23 @@ anychart.ganttModule.BaseGrid.prototype.markersInvalidated = goog.nullFunction;
  * @inheritDoc
  */
 anychart.ganttModule.BaseGrid.prototype.rowUnselect = function(event) {
-  if (this.controller.data()) {
-    if (this.interactivityHandler == this) { //Should dispatch 'unselect-event' by itself.
-      var newEvent = {
-        'type': anychart.enums.EventType.ROW_SELECT,
-        'actualTarget': event ? event.target : this,
-        'target': this,
-        'originalEvent': event,
-        'item': null, //This is a real difference between 'select' and 'unselect' events.
-        'prevItem': this.interactivityHandler.singleSelection().getSelectedItem()
-      };
-      this.dispatchEvent(newEvent);
-    }
-    this.interactivityHandler.singleSelection().reset();
-
-    this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW);
-  }
+  //TODO (A.Kudryavtsev): Commented for Qlik purposes for a while.
+  // if (this.controller.data()) {
+  //   if (this.interactivityHandler == this) { //Should dispatch 'unselect-event' by itself.
+  //     var newEvent = {
+  //       'type': anychart.enums.EventType.ROW_SELECT,
+  //       'actualTarget': event ? event.target : this,
+  //       'target': this,
+  //       'originalEvent': event,
+  //       'item': null, //This is a real difference between 'select' and 'unselect' events.
+  //       'prevItem': this.interactivityHandler.singleSelection().getSelectedItem()
+  //     };
+  //     this.dispatchEvent(newEvent);
+  //   }
+  //   this.interactivityHandler.singleSelection().reset();
+  //
+  //   this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW);
+  // }
 };
 
 
