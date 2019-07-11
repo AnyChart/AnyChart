@@ -120,7 +120,12 @@ anychart.ganttModule.MultiSelection.prototype.select = function(items, opt_only)
   }
   var it = goog.isArray(items) ? items : [items];
   for (var i = 0; i < it.length; i++) {
-    this.selectInternal(it[i]);
+    var item = it[i];
+    var tree = item.tree();
+    tree.suspendSignalsDispatching();
+    item.meta('selected', true);
+    tree.resumeSignalsDispatching(false);
+    this.syncSelection(item);
   }
   this.handler_.refreshSelection();
   return this;
