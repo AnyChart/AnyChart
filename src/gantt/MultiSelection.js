@@ -21,10 +21,19 @@ goog.require('goog.Disposable');
  *   N       N   OOOOOO       T      EEEEEEEE
  *
  *
+ * @param {anychart.ganttModule.Chart} handler - Handler. TODO (A.Kudryavtsev): Describe.
  * @constructor
  * @extends {goog.Disposable}
  */
-anychart.ganttModule.MultiSelection = function() {
+anychart.ganttModule.MultiSelection = function(handler) {
+
+  /**
+   *
+   * @type {anychart.ganttModule.Chart}
+   * @private
+   */
+  this.handler_ = handler;
+
   /**
    *
    * @type {Object.<anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem>}
@@ -104,14 +113,16 @@ anychart.ganttModule.MultiSelection.prototype.isRowSelected = function(item) {
  */
 anychart.ganttModule.MultiSelection.prototype.select = function(items, opt_only) {
   if (opt_only) {
-    for (var key in this.selectedItemsMap_) { // Slow death of object content to keep this.selectedItemsMap_ object reference.
-      delete this.selectedItemsMap_[key];
+    for (var key in this.selectedItemsMap_) {
+      //This inverts selected state and clears this.selectedItemsMap_.
+      this.selectInternal(this.selectedItemsMap_[key]);
     }
   }
   var it = goog.isArray(items) ? items : [items];
   for (var i = 0; i < it.length; i++) {
     this.selectInternal(it[i]);
   }
+  this.handler_.refreshSelection();
   return this;
 };
 

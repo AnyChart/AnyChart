@@ -90,7 +90,7 @@ anychart.ganttModule.Chart = function(opt_isResourcesChart) {
    * @type {anychart.ganttModule.MultiSelection}
    * @private
    */
-  this.selection_ = new anychart.ganttModule.MultiSelection();
+  this.selection_ = new anychart.ganttModule.MultiSelection(this);
 
   /**
    * Context provider.
@@ -855,6 +855,16 @@ anychart.ganttModule.Chart.prototype.rowMouseOut = function(event) {
 
 
 /**
+ * Refreshes selection.
+ */
+anychart.ganttModule.Chart.prototype.refreshSelection = function() {
+  this.dg_.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW);
+  this.tl_.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW);
+  this.controller_.run();
+};
+
+
+/**
  * Handles row selection.
  * @param {Object} event - Dispatched event object.
  */
@@ -882,9 +892,7 @@ anychart.ganttModule.Chart.prototype.rowSelect = function(event) {
 
     this.dispatchEvent(eventObj); // Not preventable for a while.
 
-    this.dg_.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW);
-    this.tl_.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW);
-    this.controller_.run();
+    this.refreshSelection();
   }
 
   // if (!this.tl_.checkRowSelection(event)) {

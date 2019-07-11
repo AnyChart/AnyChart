@@ -81,7 +81,8 @@ anychart.ganttModule.BaseGrid = function(opt_controller, opt_isResource) {
   } else {
     this.createController(opt_isResource);
     // this.singleSelection_ = new anychart.ganttModule.SingleSelection();
-    this.selection_ = new anychart.ganttModule.MultiSelection();
+    // this.selection_ = new anychart.ganttModule.MultiSelection();
+    this.selection_ = null;
   }
 
   /**
