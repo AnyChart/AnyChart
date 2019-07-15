@@ -874,25 +874,37 @@ anychart.ganttModule.Chart.prototype.rowSelect = function(event) {
   var periodIndex = event['periodIndex'];
 
   if (item) {
+    var prevSelection = this.selection().getSelectedItems();
     // NOTE: in Qlik implementation event is not preventable for a while.
     var eventObj = {
       'type': anychart.enums.EventType.ROW_SELECT,
       'item': item,
-      'previousSelection': this.selection().getSelectedItems()
+      'previousSelection': prevSelection,
+      'currItem': item.meta('selected') ? null : item
     };
-
-    this.selection().selectInternal(item);
-    eventObj['currentSelection'] = this.selection().getSelectedItems();
-    eventObj['currentItem'] = item.meta('selected') ? item : null;
 
     if (goog.isDef(period)) {
       eventObj['period'] = period;
       eventObj['periodIndex'] = periodIndex;
     }
 
-    this.dispatchEvent(eventObj); // Not preventable for a while.
+    var currentSelection = [];
+    if (item.meta('selected')) { //Should provide currentSelection without item.
+      for (var i = 0; i < prevSelection.length; i++) {
+        var it = prevSelection[i];
+        if (it != item)
+          currentSelection.push(it);
+      }
+    } else {
+      currentSelection = goog.array.clone(prevSelection);
+      currentSelection.push(item);
+    }
+    eventObj['currentSelection'] = currentSelection;
 
-    this.refreshSelection();
+    if (this.dispatchEvent(eventObj)) {
+      this.selection().selectInternal(item);
+      this.refreshSelection();
+    }
   }
 
   // if (!this.tl_.checkRowSelection(event)) {
