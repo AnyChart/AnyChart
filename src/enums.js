@@ -1201,6 +1201,8 @@ anychart.enums.LegendItemIconType = {
   // icons by marker type
   TRIANGLE_UP: 'triangle-up',
   TRIANGLE_DOWN: 'triangle-down',
+  TRIANGLE_RIGHT: 'triangle-right',
+  TRIANGLE_LEFT: 'triangle-left',
   DIAMOND: 'diamond',
   CROSS: 'cross',
   DIAGONAL_CROSS: 'diagonal-cross',
