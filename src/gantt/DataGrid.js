@@ -1216,6 +1216,8 @@ anychart.ganttModule.DataGrid.prototype.serialize = function() {
   if (this.horizontalScrollBar_)
     json['horizontalScrollBar'] = this.horizontalScrollBar().serialize();
 
+  json['tooltip'] = this.tooltip().serialize();
+
   return json;
 };
 

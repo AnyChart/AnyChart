@@ -254,6 +254,24 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     },
 
     'groupingTasks': {
+      'progress': {
+        'height': '100%',
+        'anchor': 'left-center',
+        'rendering': {
+          'shapes': [
+            {
+              'name': 'path',
+              'shapeType': 'path',
+              'zIndex': 11,
+              'disablePointerEvents': true
+            }
+          ]
+        },
+        'edit': {
+          'fill': '#eaeaea',
+          'stroke': '#545f69'
+        }
+      },
       'rendering': {
         /**
          * @this {*}

@@ -7,6 +7,8 @@ goog.require('anychart.core.ui.OptimizedText');
 goog.require('anychart.format.Context');
 goog.require('anychart.format.FormatSelector');
 goog.require('anychart.math.Rect');
+goog.require('goog.date.Interval');
+goog.require('goog.date.UtcDateTime');
 
 
 
@@ -351,8 +353,32 @@ anychart.ganttModule.header.Level.prototype.getLabelsFormatProvider_ = function(
 
   var startLabelText = anychart.format.dateTime(start, format);
   var endLabelText = anychart.format.dateTime(end, format);
+
+  var fiscalStartLabelText = startLabelText;
+
+  var fiscalStartMonth = /** @type {number} */ (this.scale_.fiscalYearStartMonth());
+  if (fiscalStartMonth > 1) {
+    var fiscalStart;
+    if (this.unit === anychart.enums.Interval.YEAR ||
+        this.unit === anychart.enums.Interval.SEMESTER ||
+        this.unit === anychart.enums.Interval.QUARTER) {
+      fiscalStart = anychart.utils.getFiscalDate(start, fiscalStartMonth);
+      fiscalStartLabelText = anychart.format.dateTime(fiscalStart, format);
+    } else if (goog.string.contains(format, 'y') || goog.string.contains(format, 'Q')) {
+      var utcStartDate = new goog.date.UtcDateTime(new Date(start));
+      var month = utcStartDate.getMonth() + 1;
+      if (month < fiscalStartMonth) {
+        var interval = (new goog.date.Interval(goog.date.Interval.YEARS, 1)).getInverse();
+        utcStartDate.add(interval);
+        fiscalStart = utcStartDate.getTime();
+        fiscalStartLabelText = anychart.format.dateTime(fiscalStart, format);
+      }
+    }
+  }
+
+  //TODO (A.Kudryavtsev): Add fiscal formatted values.
   var context = new anychart.format.Context({
-    'value': {value: startLabelText, type: anychart.enums.TokenType.STRING},
+    'value': {value: fiscalStartLabelText, type: anychart.enums.TokenType.STRING},
     'tickValue': {value: start, type: anychart.enums.TokenType.NUMBER},
     'scale': {value: this.scale_, type: anychart.enums.TokenType.UNKNOWN},
     'end': {value: end, type: anychart.enums.TokenType.NUMBER},

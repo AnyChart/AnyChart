@@ -3036,7 +3036,6 @@ anychart.ganttModule.BaseGrid.prototype.serialize = function() {
   // json['editStructurePreviewDashStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */ (this.editStructurePreviewDashStroke_));
 
   // json['editing'] = this.editable;
-  json['tooltip'] = this.tooltip().serialize();
 
   return json;
 };
