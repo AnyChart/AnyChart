@@ -608,7 +608,7 @@ anychart.scales.GanttDateTime.prototype.maximumGap = function(opt_value) {
  */
 anychart.scales.GanttDateTime.prototype.fiscalYearStartMonth = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = Math.min(Math.max(1, opt_value), 12);
+    opt_value = goog.math.clamp(opt_value, 1, 12);
     if (this.fiscalYearStartMonth_ != opt_value) {
       this.fiscalYearStartMonth_ = opt_value;
       this.consistent = false;
