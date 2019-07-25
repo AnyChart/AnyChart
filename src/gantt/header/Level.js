@@ -382,7 +382,9 @@ anychart.ganttModule.header.Level.prototype.getLabelsFormatProvider_ = function(
     'tickValue': {value: start, type: anychart.enums.TokenType.NUMBER},
     'scale': {value: this.scale_, type: anychart.enums.TokenType.UNKNOWN},
     'end': {value: end, type: anychart.enums.TokenType.NUMBER},
-    'endValue': {value: endLabelText, type: anychart.enums.TokenType.STRING}
+    'endValue': {value: endLabelText, type: anychart.enums.TokenType.STRING},
+    'unit': {value: this.unit, type: anychart.enums.TokenType.STRING},
+    'count': {value: this.count, type: anychart.enums.TokenType.NUMBER}
   });
 
   return context.propagate();

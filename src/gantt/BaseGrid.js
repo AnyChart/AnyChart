@@ -2319,8 +2319,11 @@ anychart.ganttModule.BaseGrid.prototype.drawInternal = function(positionRecalcul
 
   var container = /** @type {acgraph.vector.ILayer} */(this.container());
   var stage = container ? container.getStage() : null;
-  var manualSuspend = stage && !stage.isSuspended() && this.isStandalone; //Not standalone stage is suspended by chart.
-  if (manualSuspend) stage.suspend();
+  if (stage)
+    stage.suspend();
+  // var manualSuspend = stage && !stage.isSuspended() && this.isStandalone; //Not standalone stage is suspended by chart.
+  // if (manualSuspend) stage.suspend();
+  // console.log(stage.isSuspended());
 
   var verticalScrollBar, horizontalScrollBar;
 
@@ -2366,6 +2369,19 @@ anychart.ganttModule.BaseGrid.prototype.drawInternal = function(positionRecalcul
 
     this.base_.listenOnce(acgraph.events.EventType.MOUSEDOWN, this.dragMouseDown_, false, this);
     this.base_.listenOnce(acgraph.events.EventType.TOUCHSTART, this.dragMouseDown_, false, this);
+    if (anychart.isAsync()) {
+      /*
+        In current implementation chart must get mouse and
+        keyboard features before all stage rendering actions are
+        finished, on first mouse move, for example.
+        Since the feature is experimental, we'll probably find another
+        moment to initialize these features in future.
+       */
+      this.base_.listenOnce(acgraph.events.EventType.MOUSEMOVE, function() {
+        this.initMouseFeatures();
+        this.initKeysFeatures();
+      }, false, this);
+    }
 
     this.initDom();
 
@@ -2493,7 +2509,9 @@ anychart.ganttModule.BaseGrid.prototype.drawInternal = function(positionRecalcul
   this.labelsInvalidated();
   this.markersInvalidated();
 
-  if (manualSuspend) stage.resume();
+  // if (manualSuspend) stage.resume();
+  if (stage)
+    stage.resume();
   if (this.isStandalone) {
     if (stage && !this.mwh_) {
       stage.listenOnce(acgraph.vector.Stage.EventType.STAGE_RENDERED, function() {

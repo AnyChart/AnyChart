@@ -356,7 +356,6 @@ anychart.ganttModule.TimeLine.prototype.SUPPORTED_SIGNALS = anychart.ganttModule
 anychart.ganttModule.TimeLine.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ganttModule.BaseGrid.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.TIMELINE_SCALES |
-    anychart.ConsistencyState.TIMELINE_ELEMENTS_APPEARANCE |
     anychart.ConsistencyState.TIMELINE_ELEMENTS_LABELS |
     anychart.ConsistencyState.TIMELINE_MARKERS;
 

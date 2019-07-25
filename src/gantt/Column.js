@@ -356,21 +356,29 @@ anychart.ganttModule.Column.prototype.hasLabelsOverrider = function() {
 
 //region -- anychart.reflow.IMeasurementsTargetProvider implementation + tools.
 /**
+ * Resets texts.
+ */
+anychart.ganttModule.Column.prototype.resetTexts = function() {
+  /*
+    anychart.core.ui.OptimizedText is not IDisposable, that's why we
+    use such a killing for a while.
+   */
+  for (var i = 0; i < this.texts_.length; i++) {
+    var text = this.texts_[i];
+    text.dispose();
+  }
+  this.texts_.length = 0;
+};
+
+
+/**
  *
  * @param {anychart.SignalEvent} event - Signal event.
  * @private
  */
 anychart.ganttModule.Column.prototype.controllerListener_ = function(event) {
   if (event.hasSignal(anychart.Signal.DATA_CHANGED)) {
-    /*
-      anychart.core.ui.OptimizedText is not IDisposable, that's why we
-      use such a killing for a while.
-     */
-    for (var i = 0; i < this.texts_.length; i++) {
-      var text = this.texts_[i];
-      text.dispose();
-    }
-    this.texts_.length = 0;
+    this.resetTexts();
     var state = anychart.ConsistencyState.DATA_GRID_COLUMN_DATA;
 
     /*
@@ -413,7 +421,13 @@ anychart.ganttModule.Column.prototype.setupText_ = function(text, opt_item, opt_
     }
 
     var provider = this.dataGrid_.createFormatProvider(opt_item);
-    this.fixDeprecatedFormatting(provider, opt_item);
+
+    if (!anychart.isAsync()) {
+      /*
+        ASYNC is an experimental feature, that's why it doesn't need deprecates.
+       */
+      this.fixDeprecatedFormatting(provider, opt_item);
+    }
     var textVal = labels.getText(provider);
     text.text(textVal);
   }
@@ -427,15 +441,32 @@ anychart.ganttModule.Column.prototype.setupText_ = function(text, opt_item, opt_
  * @inheritDoc
  */
 anychart.ganttModule.Column.prototype.provideMeasurements = function() {
-  if (!this.texts_.length) {
-    this.allItems_ = this.dataGrid_.controller.getAllItems();
-    for (var i = 0; i < this.allItems_.length; i++) {
-      var text = new anychart.core.ui.OptimizedText();
-      // text.setClassName(this.labels().cssClass);
-      this.texts_.push(text);
+  var i;
+  this.allItems_ = this.dataGrid_.controller.getAllItems();
+
+  if (anychart.isAsync()) {
+    /*
+      General anychart.ASYNC difference: partial labels providing and processing.
+     */
+    var partialData = this.dataGrid_.partialLabels;
+
+    var prov = [];
+    for (i = partialData.first; i <= partialData.last; i++) {
+      if (!this.texts_[i])
+        this.texts_[i] = new anychart.core.ui.OptimizedText();
+      prov.push(this.texts_[i]);
     }
+    return prov;
+  } else {
+    if (!this.texts_.length) {
+      for (i = 0; i < this.allItems_.length; i++) {
+        var text = new anychart.core.ui.OptimizedText();
+        // text.setClassName(this.labels().cssClass);
+        this.texts_.push(text);
+      }
+    }
+    return this.texts_;
   }
-  return this.texts_;
 };
 
 
@@ -445,28 +476,49 @@ anychart.ganttModule.Column.prototype.provideMeasurements = function() {
  */
 anychart.ganttModule.Column.prototype.applyLabelsStyle = function(opt_needsToDropOldBounds) {
   var labelsAreOverridden = this.hasLabelsOverrider();
-  for (var i = 0; i < this.texts_.length; i++) {
-    var text = this.texts_[i];
-    var item = this.allItems_[i];
-
-    var overriddenSettings;
-    if (labelsAreOverridden) {
-      overriddenSettings = this.overriddenLabels_[i];
-      if (!overriddenSettings) {
-        //TODO (A.Kudryavtsev): Can we use one new overriddenSettings instead of multiple?
-        overriddenSettings = new anychart.core.ui.LabelsSettings();
-        overriddenSettings.dropThemes(true);
-        overriddenSettings.parent(/** @type {anychart.core.ui.LabelsSettings} */ (this.labels()));
-        this.overriddenLabels_[i] = overriddenSettings;
-      }
-      this.labelsOverrider_(overriddenSettings, item);
+  var i;
+  if (anychart.isAsync()) {
+    var partialData = this.dataGrid_.partialLabels;
+    for (i = partialData.first; i <= partialData.last; i++) {
+      this.applyLabelStyle_(i, labelsAreOverridden, opt_needsToDropOldBounds);
     }
-    if (opt_needsToDropOldBounds) {
-      text.resetComplexity();
-      text.dropBounds();
+  } else {
+    for (i = 0; i < this.texts_.length; i++) {
+      this.applyLabelStyle_(i, labelsAreOverridden, opt_needsToDropOldBounds);
     }
-    this.setupText_(text, item, labelsAreOverridden);
   }
+
+};
+
+
+/**
+ * Single label setup.
+ * @param {number} index - Index.
+ * @param {boolean} labelsAreOverridden - Whether labels are overridden.
+ * @param {boolean=} opt_needsToDropOldBounds - .
+ * @private
+ */
+anychart.ganttModule.Column.prototype.applyLabelStyle_ = function(index, labelsAreOverridden, opt_needsToDropOldBounds) {
+  var text = this.texts_[index];
+  var item = this.allItems_[index];
+
+  var overriddenSettings;
+  if (labelsAreOverridden) {
+    overriddenSettings = this.overriddenLabels_[index];
+    if (!overriddenSettings) {
+      //TODO (A.Kudryavtsev): Can we use one new overriddenSettings instead of multiple?
+      overriddenSettings = new anychart.core.ui.LabelsSettings();
+      overriddenSettings.dropThemes(true);
+      overriddenSettings.parent(/** @type {anychart.core.ui.LabelsSettings} */ (this.labels()));
+      this.overriddenLabels_[index] = overriddenSettings;
+    }
+    this.labelsOverrider_(overriddenSettings, item);
+  }
+  if (opt_needsToDropOldBounds) {
+    text.resetComplexity();
+    text.dropBounds();
+  }
+  this.setupText_(text, item, labelsAreOverridden);
 };
 
 
@@ -539,18 +591,6 @@ anychart.ganttModule.Column.prototype.cellTextSettings = function(opt_value) {
 
 
 /**
- * Label invalidation handler.
- * @param {anychart.SignalEvent} event - Signal event.
- * @private
- */
-anychart.ganttModule.Column.prototype.labelsInvalidated_ = function(event) {
-  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION, anychart.Signal.NEEDS_REDRAW);
-  }
-};
-
-
-/**
  * Label settings invalidation handler.
  * @param {anychart.SignalEvent} event - Signal event.
  * @private
@@ -560,6 +600,8 @@ anychart.ganttModule.Column.prototype.labelsSettingsInvalidated_ = function(even
   var signal = anychart.Signal.NEEDS_REDRAW;
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
     state |= anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_APPEARANCE;
+    if (anychart.isAsync())
+      signal |= anychart.Signal.NEEDS_REDRAW_LABELS;
   }
   if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
     state |= anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_BOUNDS;
@@ -573,6 +615,19 @@ anychart.ganttModule.Column.prototype.labelsSettingsInvalidated_ = function(even
     state |= anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION;
     if (this.labelsSettings_['enabled']()) {
       signal |= anychart.Signal.NEEDS_REDRAW_LABELS;
+    }
+  }
+
+  if (anychart.isAsync()) {
+    /*
+      Async feature needs to reset current consistency for
+      correct labels appearance. Kind of hacky hack.
+     */
+    if (signal & anychart.Signal.NEEDS_REDRAW_LABELS) { // If signal has anychart.Signal.NEEDS_REDRAW_LABELS.
+      this.dataGrid_.partialLabels.reset = true;
+      this.dataGrid_.controller.resetTimeouts();
+      this.dataGrid_.interactivityHandler.dispatchEvent(anychart.enums.EventType.WORKING_CANCEL);
+      this.markConsistent(state); //Reinvalidate. Kind of elegant hack.
     }
   }
 
@@ -894,35 +949,42 @@ anychart.ganttModule.Column.prototype.draw = function() {
       this.markConsistent(anychart.ConsistencyState.BOUNDS);
     }
 
-    if (this.hasInvalidationState(anychart.ConsistencyState.DATA_GRID_COLUMN_DATA)) {
+    if (!anychart.isAsync()) {
       /*
-      No actions here, this state is just used be data grid to make column dispatch COLLECT signal on dg.prepareLabels() call.
+        ASYNC feature doesn't need to clear these states on column draw:
+        column remains inconsistent until all async working is complete
+        because dataGrid considers these states in partial labels processing.
        */
-      this.markConsistent(anychart.ConsistencyState.DATA_GRID_COLUMN_DATA);
+      if (this.hasInvalidationState(anychart.ConsistencyState.DATA_GRID_COLUMN_DATA)) {
+        /*
+        No actions here, this state is just used be data grid to make column dispatch COLLECT signal on dg.prepareLabels() call.
+         */
+        this.markConsistent(anychart.ConsistencyState.DATA_GRID_COLUMN_DATA);
 
-      //This will actually place the labels.
-      this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION);
-    }
+        //This will actually place the labels.
+        this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION);
+      }
 
-    if (this.hasInvalidationState(anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_APPEARANCE)) {
-      /*
-      No actions here, this state is just used be data grid to make column reapply labels style.
-       */
-      this.markConsistent(anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_APPEARANCE);
+      if (this.hasInvalidationState(anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_APPEARANCE)) {
+        /*
+        No actions here, this state is just used be data grid to make column reapply labels style.
+         */
+        this.markConsistent(anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_APPEARANCE);
 
-      //This will actually place the labels.
-      this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION);
-    }
+        //This will actually place the labels.
+        this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION);
+      }
 
-    if (this.hasInvalidationState(anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_BOUNDS)) {
-      /*
-      No actions here, this state is just used be data grid to make column reapply labels style
-      and make measuriator remeasure labels.
-       */
-      this.markConsistent(anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_BOUNDS);
+      if (this.hasInvalidationState(anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_BOUNDS)) {
+        /*
+        No actions here, this state is just used be data grid to make column reapply labels style
+        and make measuriator remeasure labels.
+         */
+        this.markConsistent(anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_BOUNDS);
 
-      //This will actually place the labels.
-      this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION);
+        //This will actually place the labels.
+        this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION);
+      }
     }
 
     var data, startIndex, endIndex, item, i, counter, button;
@@ -1010,6 +1072,7 @@ anychart.ganttModule.Column.prototype.draw = function() {
           }
         }
       }
+
       this.previousStartIndex_ = data[startIndex] ? /** @type {number} */ (data[startIndex].meta('index')) : NaN;
       this.previousEndIndex_ = data[endIndex] ? /** @type {number} */ (data[endIndex].meta('index')) : NaN;
 
@@ -1075,19 +1138,21 @@ anychart.ganttModule.Column.prototype.draw = function() {
         var ind = /** @type {number} */ (item.meta('index'));
         var t = this.texts_[ind];
 
-        if (this.labels()['enabled']()) {
-          var r = new anychart.math.Rect(this.pixelBoundsCache_.left, totalTop, this.pixelBoundsCache_.width, height);
-          var cellBounds = labelsPadding.tightenBounds(r);
-          cellBounds.left += (addButton + depthLeft);
-          cellBounds.width -= (addButton + depthLeft);
+        if (t) {
+          if (this.labels()['enabled']()) {
+            var r = new anychart.math.Rect(this.pixelBoundsCache_.left, totalTop, this.pixelBoundsCache_.width, height);
+            var cellBounds = labelsPadding.tightenBounds(r);
+            cellBounds.left += (addButton + depthLeft);
+            cellBounds.width -= (addButton + depthLeft);
 
-          t.renderTo(this.labelsLayerEl_);
-          t.putAt(cellBounds, stage);
+            t.renderTo(this.labelsLayerEl_);
+            t.putAt(cellBounds, stage);
 
-          t.finalizeComplexity();
-          this.labelsTexts_.push(/** @type {string} */ (t.text()));
-        } else {
-          t.renderTo(null);
+            t.finalizeComplexity();
+            this.labelsTexts_[ind] = (/** @type {string} */ (t.text()));
+          } else {
+            t.renderTo(null);
+          }
         }
 
         totalTop = (newTop + this.dataGrid_.rowStrokeThickness);
@@ -1098,9 +1163,18 @@ anychart.ganttModule.Column.prototype.draw = function() {
         this.buttons_[counter].enabled(false).draw();
       }
 
-      this.markConsistent(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION |
-          anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_APPEARANCE |
-          anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_BOUNDS);
+      if (anychart.isAsync()) {
+        /*
+          See description on cleared and not cleared states for async/not async
+          drawing above.
+         */
+        this.markConsistent(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION);
+      } else {
+        this.markConsistent(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION |
+            anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_APPEARANCE |
+            anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_BOUNDS);
+      }
+
     }
 
     if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
@@ -1174,6 +1248,7 @@ anychart.ganttModule.Column.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.ganttModule.Column.prototype.disposeInternal = function() {
+  this.resetTexts();
   goog.disposeAll(
       this.labelsSettings_,
       this.overriddenLabels_,

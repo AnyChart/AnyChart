@@ -2917,9 +2917,56 @@ anychart.utils.getFadeGradient = function(ratio, opacity, fontColor, opt_fadeSte
 };
 
 
+//region -- Async actions.
+/**
+ * Executes fn-function in next execution frame.
+ * Be very careful in using anychart.utils.schedule
+ * inside another anychart.utils.schedule, setTimeout really
+ * moves function in the end of execution order:
+ *
+ *  <code>
+ *    anychart.utils.schedule(function() {
+ *      anychart.utils.schedule(function() {
+ *        console.log(1);
+ *      });
+ *    });
+ *
+ *    anychart.utils.schedule(function() {
+ *      console.log(2);
+ *    });
+ *
+ *    //Output: 2, 1
+ *  <code>
+ *
+ * @param {Function} fn - setTimeout callback.
+ * @param {Function=} opt_complete - Complete callback.
+ *  NOTE: Complete callback is synchronous! Do not preform any heavyweight operations here!
+ * @param {Object=} opt_context - Callback context.
+ * @return {number} - Timeout id.
+ */
+anychart.utils.schedule = function(fn, opt_complete, opt_context) {
+  var tid = setTimeout(function() {
+    fn.call(opt_context);
+    if (opt_complete)
+      opt_complete.call(opt_context);
+
+    //This must prevent huge memory leak.
+    clearTimeout(tid);
+    fn = null;
+    opt_complete = null;
+    opt_context = null;
+  }, 1); //setTimeout(function, 0) is unacceptable for IE.
+  return tid;
+};
+
+
+//endregion
+
+
 //exports
 goog.exportSymbol('anychart.utils.printUtilsBoolean', anychart.utils.printUtilsBoolean);
 goog.exportSymbol('anychart.utils.xml2json', anychart.utils.xml2json);
 goog.exportSymbol('anychart.utils.json2xml', anychart.utils.json2xml);
 goog.exportSymbol('anychart.utils.hideTooltips', anychart.utils.hideTooltips);
 goog.exportSymbol('anychart.utils.htmlTableFromCsv', anychart.utils.htmlTableFromCsv);
+goog.exportSymbol('anychart.utils.schedule', anychart.utils.schedule);

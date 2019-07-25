@@ -1555,7 +1555,13 @@ anychart.enums.EventType = {
   //axis marker events
   AXIS_MARKER_OVER: 'axismarkerover',
   AXIS_MARKER_MOVE: 'axismarkermove',
-  AXIS_MARKER_OUT: 'axismarkerout'
+  AXIS_MARKER_OUT: 'axismarkerout',
+
+  //Async working
+  WORKING_START: 'workingstart',
+  WORKING: 'working',
+  WORKING_CANCEL: 'workingcancel',
+  WORKING_FINISH: 'workingfinish'
 };
 
 
