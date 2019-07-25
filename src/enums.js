@@ -5252,3 +5252,34 @@ anychart.enums.normalizeOrdinalScaleMode = function(value) {
   return /** @type {anychart.enums.OrdinalScaleMode} */ (anychart.enums.normalize(anychart.enums.OrdinalScaleMode, value,
       anychart.enums.OrdinalScaleMode.DISCRETE));
 };
+
+
+/**
+ * Enum used by anychart.stockModule.PlotControls
+ * @enum {string}
+ */
+anychart.enums.PlotPosition = {
+  /**
+   * Means chart has only one plot.
+   * Renders only zoom control.
+   */
+  SINGLE: 'single',
+
+  /**
+   * Means plot placed top - first plot of the chart.
+   * Renders down and zoom control.
+   */
+  TOP: 'top',
+
+  /**
+   * Means plot placed between others - neither top, neither bottom.
+   * Renders up, down and zoom control.
+   */
+  CENTER: 'center',
+
+  /**
+   * Means plot placed bottom - last plot of the chart.
+   * Renders up and zoom control.
+   */
+  BOTTOM: 'bottom'
+};
