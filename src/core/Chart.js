@@ -2095,7 +2095,7 @@ anychart.core.Chart.prototype.setupByJSON = function(config, opt_default) {
   if ('credits' in config)
     this.credits(config['credits']);
 
-  if (config['exports'])
+  if ('exports' in config)
     this.exports(config['exports']);
 
   anychart.core.settings.deserialize(this, anychart.core.Chart.PROPERTY_DESCRIPTORS, config);

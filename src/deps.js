@@ -208,7 +208,7 @@ goog.addDependency('../../../../src/data/csv/Parser.js', ['anychart.data.csv.Par
 goog.addDependency('../../../../src/data/data.js', ['anychart.data'], ['anychart.data.ConcatView', 'anychart.data.FilterView', 'anychart.data.Set', 'anychart.data.SortView', 'anychart.data.csv.Parser', 'anychart.enums'], {});
 goog.addDependency('../../../../src/dataAdapter/data-adapter.module.js', ['anychart.dataAdapterModule.entry'], ['anychart.base', 'anychart.core.reporting', 'anychart.enums', 'anychart.exportsModule.entry', 'goog.Uri', 'goog.dom', 'goog.net.XhrIo'], {});
 goog.addDependency('../../../../src/enums.js', ['anychart.enums'], [], {});
-goog.addDependency('../../../../src/exports/Exports.js', ['anychart.exportsModule.Exports'], [], {});
+goog.addDependency('../../../../src/exports/Exports.js', ['anychart.exportsModule.Exports'], ['goog.Promise'], {});
 goog.addDependency('../../../../src/exports/OfflineExports.js', ['anychart.exportsModule.offline'], [], {});
 goog.addDependency('../../../../src/exports/exports.module.js', ['anychart.exportsModule.entry'], ['acgraph.exporting', 'anychart', 'anychart.base', 'anychart.core.Chart', 'anychart.core.VisualBase', 'anychart.exportsModule.Exports', 'anychart.exportsModule.offline', 'anychart.utils', 'goog.dom'], {});
 goog.addDependency('../../../../src/format/Context.js', ['anychart.format.Context'], ['anychart.base', 'anychart.core.BaseContext', 'anychart.format'], {});

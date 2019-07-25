@@ -1,5 +1,7 @@
 goog.provide('anychart.exportsModule.Exports');
 
+goog.require('goog.Promise');
+
 
 
 /**
@@ -56,6 +58,12 @@ anychart.exportsModule.Exports = function() {
   this.externalDependencies_ = ['svg2pdf.min.js', 'jspdf.min.js', 'canvg.min.js'];
 
   /**
+   *
+   * @type {boolean}
+   */
+  this.isExternLoaded = false;
+
+  /**
    * Default clientside config.
    * @type {anychart.exportsModule.Exports.ClientsideConfig}
    * @private
@@ -65,17 +73,15 @@ anychart.exportsModule.Exports = function() {
     'enabled': true,
     'fallback': true
   };
-
-  this.loadExternalDependencies();
 };
 
 
 //region --- Settings
 /**
- * Path to dependencies.
+ * Path to dependencies getter.
  * @return {string}
  */
-anychart.exportsModule.Exports.prototype.clientsidePath = function() {
+anychart.exportsModule.Exports.prototype.getClientsidePath = function() {
   return this.clientsideConfig_['path'];
 };
 
@@ -84,7 +90,7 @@ anychart.exportsModule.Exports.prototype.clientsidePath = function() {
  * Whether to fallback to export server in case client-side exporting didn't work.
  * @return {boolean}
  */
-anychart.exportsModule.Exports.prototype.clientsideFallback = function() {
+anychart.exportsModule.Exports.prototype.isClientsideFallback = function() {
   return this.clientsideConfig_['fallback'];
 };
 
@@ -93,7 +99,7 @@ anychart.exportsModule.Exports.prototype.clientsideFallback = function() {
  * Whether to use client-side export feature.
  * @return {boolean}
  */
-anychart.exportsModule.Exports.prototype.clientsideEnabled = function() {
+anychart.exportsModule.Exports.prototype.isClientsideEnabled = function() {
   return this.clientsideConfig_['enabled'];
 };
 
@@ -114,16 +120,8 @@ anychart.exportsModule.Exports.ClientsideConfig;
  * @return {anychart.exportsModule.Exports.ClientsideConfig|anychart.exportsModule.Exports}
  */
 anychart.exportsModule.Exports.prototype.clientside = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var fields = ['path', 'enabled', 'fallback'];
-
-    for (var i = 0; i < fields.length; i++) {
-      var fieldName = fields[i];
-      if (goog.isDef(opt_value[fieldName])) {
-        this.clientsideConfig_[fieldName] = opt_value[fieldName];
-      }
-    }
-
+  if (goog.typeOf(opt_value) == 'object') {
+    goog.mixin(this.clientsideConfig_, /** @type {anychart.exportsModule.Exports.ClientsideConfig} */ (opt_value));
     return this;
   }
   return this.clientsideConfig_;
@@ -248,16 +246,41 @@ anychart.exportsModule.Exports.prototype.pinterest = function(opt_linkOrOptions,
 
 /**
  * Loads dependencies needed for offline export to work.
+ * @return {goog.Promise}
  */
 anychart.exportsModule.Exports.prototype.loadExternalDependencies = function() {
-  var deps = this.externalDependencies_;
-  var depsUrl = this.clientsidePath();
-  depsUrl += goog.string.endsWith(depsUrl, '/') ? '' : '/'; //append slash if not present, to assemble correct path
-  for (var i = 0; i < deps.length; i++) {
-    var fullUrl = depsUrl + deps[i];
-    var script = goog.dom.createElement('script');
-    script.setAttribute('src', fullUrl);
-    anychart.document.head.appendChild(script);
+  var exports = goog.global['anychart']['exports'];
+  if (exports && exports.isExternLoaded)
+    this.isExternLoaded = true;
+
+  if (this.isExternLoaded) {
+    return goog.Promise.resolve();
+  } else {
+    var deps = this.externalDependencies_;
+    var depsUrl = this.getClientsidePath();
+    depsUrl += goog.string.endsWith(depsUrl, '/') ? '' : '/'; //append slash if not present, to assemble correct path
+    var proms = [];
+    for (var i = 0; i < deps.length; i++) {
+      var p = new goog.Promise(function(resolve, reject) {
+        var fullUrl = depsUrl + deps[i];
+        var script = goog.dom.createElement('script');
+        script.setAttribute('src', fullUrl);
+
+        script.onload = script.onreadystatechange = function() {
+          anychart.core.reporting.callLog('info', 'Loaded external exporting script ' + fullUrl);
+          resolve();
+        };
+
+        script.onerror = function() {
+          anychart.core.reporting.callLog('warn', 'Failed tp load external script ' + fullUrl);
+          reject();
+        };
+
+        anychart.document.head.appendChild(script);
+      });
+      proms.push(p);
+    }
+    return goog.Promise.all(proms);
   }
 };
 

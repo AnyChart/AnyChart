@@ -310,6 +310,8 @@ anychart.core.reporting.getWarningDescription_ = function(code, opt_arguments) {
       return 'Data must contain "nodes" and "edges" fields';
     case anychart.enums.WarningCode.GRAPH_NO_ID:
       return 'Nodes data must has "id" field';
+    case anychart.enums.WarningCode.OFFLINE_EXPORT_FAILED:
+      return 'Offline export failed. Using server export fallback.';
     default:
       return 'Unknown error. Please, contact support team at http://support.anychart.com/.\n' +
           'We will be very grateful for your report!';
