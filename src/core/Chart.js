@@ -211,7 +211,7 @@ anychart.core.Chart = function() {
    */
   function selectMarqueeFillBeforeInvalidation() {
     if (this.inMarquee()) {
-      this.interactivityRect.fill(/** @type {acgraph.vector.Fill} */ (this.getOption('selectMarqueeFill')));
+      this.interactivityRect.fill(/** @type {acgraph.vector.Fill} */ (this.getOption('selectRectangleMarqueeFill')));
     }
   }
 
@@ -220,13 +220,13 @@ anychart.core.Chart = function() {
    */
   function selectMarqueeStrokeBeforeInvalidation() {
     if (this.inMarquee()) {
-      this.interactivityRect.stroke(/** @type {acgraph.vector.Stroke} */ (this.getOption('selectMarqueeStroke')));
+      this.interactivityRect.stroke(/** @type {acgraph.vector.Stroke} */ (this.getOption('selectRectangleMarqueeStroke')));
     }
   }
 
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
-    ['selectMarqueeFill', 0, 0, 0, selectMarqueeFillBeforeInvalidation],
-    ['selectMarqueeStroke', 0, 0, 0, selectMarqueeStrokeBeforeInvalidation]
+    ['selectRectangleMarqueeFill', 0, 0, 0, selectMarqueeFillBeforeInvalidation],
+    ['selectRectangleMarqueeStroke', 0, 0, 0, selectMarqueeStrokeBeforeInvalidation]
   ]);
   //endregion
 
@@ -1068,13 +1068,13 @@ anychart.core.Chart.prototype.getSelectedPoints = function() {
  * @type {Object.<string, anychart.ui.ContextMenu.Item>}
  */
 anychart.core.Chart.contextMenuItems = {
-  // Item 'Print Chart'.
+  // Select marquee
   'select-marquee-start': {
     'index': 9.3,
     'text': 'Start selection marquee',
     'eventType': 'anychart.startSelectMarquee',
     'action': function(context) {
-      context['menuParent'].startSelectMarquee(false);
+      context['menuParent'].startSelectRectangleMarquee(false);
     }
   },
 
@@ -1899,14 +1899,29 @@ anychart.core.Chart.PROPERTY_DESCRIPTORS = (function() {
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'selectMarqueeFill',
+      'selectRectangleMarqueeFill',
       anychart.core.settings.fillNormalizer);
 
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'selectMarqueeStroke',
+      'selectRectangleMarqueeStroke',
       anychart.core.settings.strokeNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.MULTI_ARG_DEPRECATED,
+      'selectRectangleMarqueeFill',
+      anychart.core.settings.fillNormalizer,
+      'selectMarqueeFill');
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.MULTI_ARG_DEPRECATED,
+      'selectRectangleMarqueeStroke',
+      anychart.core.settings.strokeNormalizer,
+      'selectMarqueeStroke');
+
   return map;
 })();
 anychart.core.settings.populate(anychart.core.Chart, anychart.core.Chart.PROPERTY_DESCRIPTORS);
@@ -3212,13 +3227,25 @@ anychart.core.Chart.IRDragger.prototype.defaultAction = function(x, y) {};
 //------------------------------------------------------------------------------
 /**
  * Starts select marquee drawing.
+ * @deprecated since 8.6.0 use chart.startSelectRectangleMarquee() instead. DVF-4300
  * @param {boolean=} opt_repeat
  * @return {anychart.core.Chart}
  */
 anychart.core.Chart.prototype.startSelectMarquee = function(opt_repeat) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['chart.startSelectMarquee()', 'chart.startSelectRectangleMarquee()'], true);
+  return this.startSelectRectangleMarquee(opt_repeat);
+};
+
+
+/**
+ * Starts select marquee drawing.
+ * @param {boolean=} opt_repeat
+ * @return {anychart.core.Chart}
+ */
+anychart.core.Chart.prototype.startSelectRectangleMarquee = function(opt_repeat) {
   this.preventMouseDownInteractivity =
       this.startIRDrawing(this.onSelectMarqueeStart, this.onSelectMarqueeChange, this.onSelectMarqueeFinish, this.getSelectMarqueeBounds(),
-          false, undefined, opt_repeat, /** @type {acgraph.vector.Stroke} */ (this.getOption('selectMarqueeStroke')), /** @type {acgraph.vector.Fill} */ (this.getOption('selectMarqueeFill')));
+          false, undefined, opt_repeat, /** @type {acgraph.vector.Stroke} */ (this.getOption('selectRectangleMarqueeStroke')), /** @type {acgraph.vector.Fill} */ (this.getOption('selectRectangleMarqueeFill')));
   return this;
 };
 
@@ -3872,6 +3899,9 @@ anychart.core.Chart.prototype.id = function(opt_value) {
 
 //endregion
 //exports
+/**
+ * @suppress {deprecated}
+ */
 (function() {
   var proto = anychart.core.Chart.prototype;
   proto['a11y'] = proto.a11y;
@@ -3921,6 +3951,7 @@ anychart.core.Chart.prototype.id = function(opt_value) {
   proto['shareWithLinkedIn'] = proto.shareWithLinkedIn;
   proto['shareWithPinterest'] = proto.shareWithPinterest;
   proto['startSelectMarquee'] = proto.startSelectMarquee;
+  proto['startSelectRectangleMarquee'] = proto.startSelectRectangleMarquee;
   // auto generated
   // proto['selectMarqueeFill'] = proto.selectMarqueeFill;
   // proto['selectMarqueeStroke'] = proto.selectMarqueeStroke;

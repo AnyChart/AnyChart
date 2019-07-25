@@ -39,7 +39,9 @@ goog.require('anychart.math.Rect');
 goog.require('anychart.palettes.HatchFills');
 goog.require('anychart.palettes.Markers');
 goog.require('goog.dom');
+goog.require('goog.events.EventHandler');
 goog.require('goog.math.AffineTransform');
+goog.require('goog.math.Coordinate');
 goog.require('goog.ui.KeyboardShortcutHandler');
 //endregion
 
@@ -248,11 +250,48 @@ anychart.mapModule.Chart = function() {
 
   this.eventsHandler.listen(this, [goog.events.EventType.POINTERDOWN, acgraph.events.EventType.TOUCHSTART], this.tapHandler);
 
+  /**
+   * @this {anychart.mapModule.Chart}
+   */
+  function selectMarqueeFillBeforeInvalidation() {
+    if (this.inPolygon() && this.ipPath_) {
+      this.ipPath_.fill(/** @type {acgraph.vector.Fill} */ (this.getOption('selectPolygonMarqueeFill')));
+    }
+  }
+
+  /**
+   * @this {anychart.mapModule.Chart}
+   */
+  function selectMarqueeStrokeBeforeInvalidation() {
+    if (this.inPolygon() && this.ipPath_) {
+      this.ipPath_.stroke(/** @type {acgraph.vector.Stroke} */ (this.getOption('selectPolygonMarqueeStroke')));
+    }
+  }
+
+  /**
+   * @this {anychart.mapModule.Chart}
+   */
+  function selectMarqueeMarkerBeforeInvalidation() {
+    if (this.inPolygon() && this.ipCloseCircle_) {
+      var circleConfig = this.getOption('selectPolygonMarqueeMarker') || {};
+      var circleFill = acgraph.vector.normalizeFill(circleConfig['fill']);
+      var circleStroke = acgraph.vector.normalizeStroke(circleConfig['stroke']);
+      var circleRadius = circleConfig['radius'] || 15;
+      this.ipCloseCircle_.stroke(circleStroke);
+      this.ipCloseCircle_.fill(circleFill);
+      this.ipCloseDelta_ = circleRadius;
+    }
+  }
+
+
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['geoIdField', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.MAP_GEO_DATA_INDEX, anychart.Signal.NEEDS_REDRAW],
     ['overlapMode', anychart.ConsistencyState.MAP_LABELS, anychart.Signal.NEEDS_REDRAW],
     ['minZoomLevel', 0, 0],
-    ['maxZoomLevel', 0, 0]
+    ['maxZoomLevel', 0, 0],
+    ['selectPolygonMarqueeFill', 0, 0, 0, selectMarqueeFillBeforeInvalidation],
+    ['selectPolygonMarqueeStroke', 0, 0, 0, selectMarqueeStrokeBeforeInvalidation],
+    ['selectPolygonMarqueeMarker', 0, 0, 0, selectMarqueeMarkerBeforeInvalidation]
     //['zoomFactor', 0, 0] uncomment when it will be needed
   ]);
 };
@@ -338,35 +377,19 @@ anychart.core.ChartWithSeries.generateSeriesConstructors(anychart.mapModule.Char
 anychart.mapModule.Chart.PROPERTY_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'geoIdField',
-      anychart.core.settings.asIsNormalizer);
 
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'overlapMode',
-      anychart.enums.normalizeLabelsOverlapMode);
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'geoIdField', anychart.core.settings.asIsNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'overlapMode', anychart.enums.normalizeLabelsOverlapMode],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'minZoomLevel', anychart.utils.toNumber],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'maxZoomLevel', anychart.utils.toNumber],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'selectPolygonMarqueeStroke', anychart.core.settings.strokeNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'selectPolygonMarqueeFill', anychart.core.settings.fillNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'selectPolygonMarqueeMarker', anychart.core.settings.asIsNormalizer]
+    //TODO(AntonKagakin): Uncomment descriptor when it will be needed
+    // [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'zoomFactor', anychart.core.settings.asIsNormalizer]
+  ]);
 
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'minZoomLevel',
-      anychart.utils.toNumber);
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'maxZoomLevel',
-      anychart.utils.toNumber);
-
-  //TODO(AntonKagakin): Uncomment descriptor when it will be needed
-  /*anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'zoomFactor',
-      anychart.core.settings.asIsNormalizer);*/
   return map;
 })();
 anychart.core.settings.populate(anychart.mapModule.Chart, anychart.mapModule.Chart.PROPERTY_DESCRIPTORS);
@@ -1524,8 +1547,430 @@ anychart.mapModule.Chart.prototype.updateSeriesOnZoomOrMove = function() {
 };
 
 
+/** @inheritDoc */
+anychart.mapModule.Chart.prototype.selectByRect = function(marqueeFinishEvent) {
+  var append = marqueeFinishEvent['shiftKey'] || marqueeFinishEvent['ctrlKey'] || marqueeFinishEvent['metaKey'];
+
+  var left, top, width, height;
+  left = marqueeFinishEvent['left'];
+  top = marqueeFinishEvent['top'];
+  width = marqueeFinishEvent['width'];
+  height = marqueeFinishEvent['height'];
+
+  for (var i = 0; i < this.seriesList.length; i++) {
+    var series = this.seriesList[i];
+    var selectionMode = series.selectionMode() || this.interactivity().getOption('selectionMode');
+
+    // all of the mode except none allow points selection
+    if (selectionMode != anychart.enums.SelectionMode.NONE) {
+      var pointsInRect = series.getPointsInRect(left, top, width, height);
+
+      // single select only allows one point selected, so it'll be first point returned previously
+      if (selectionMode == anychart.enums.SelectionMode.SINGLE_SELECT) {
+        append = false;
+        pointsInRect = pointsInRect[0];
+      }
+      series.selectPointInternal(pointsInRect, append);
+    }
+  }
+};
+
+
 //endregion
-//region --- Animaions
+//region --- Polygonal select
+/**
+ * Start selecting by interactive polygon.
+ * @param {boolean=} opt_repeat
+ * @return {anychart.mapModule.Chart}
+ */
+anychart.mapModule.Chart.prototype.startSelectPolygonMarquee = function(opt_repeat) {
+  this.preventMouseDownInteractivity = this.startIPDrawing(this.onSelectPolygonStart, this.onSelectPolygonChange,
+      this.onSelectPolygonFinish, opt_repeat,
+      /** @type {acgraph.vector.Stroke} */(this.getOption('selectPolygonMarqueeStroke')),
+      /** @type {acgraph.vector.Stroke} */(this.getOption('selectPolygonMarqueeFill'))
+      );
+  return this;
+};
+
+
+/**
+ * Starts interactive polygon drawing.
+ * @param {?function(Array.<number>,anychart.math.Rect,acgraph.events.BrowserEvent):(boolean)=} opt_onStart
+ * @param {?function(Array.<number>,anychart.math.Rect,acgraph.events.BrowserEvent):(boolean)=} opt_onChange
+ * @param {?function(Array.<number>,anychart.math.Rect,acgraph.events.BrowserEvent):(boolean)=} opt_onFinish
+ * @param {boolean=} opt_repeat
+ * @param {acgraph.vector.Stroke|string=} opt_stroke
+ * @param {acgraph.vector.Fill|string=} opt_fill
+ * @return {boolean}
+ */
+anychart.mapModule.Chart.prototype.startIPDrawing = function(opt_onStart, opt_onChange, opt_onFinish, opt_repeat, opt_stroke, opt_fill) {
+  if (!this.rootElement) {
+    return false;
+  }
+
+  opt_stroke = opt_stroke || 'red 0.5';
+  opt_fill = opt_fill || 'red 0.2';
+  var circleConfig = this.getOption('selectPolygonMarqueeMarker') || {};
+  var circleFill = acgraph.vector.normalizeFill(circleConfig['fill'] || opt_fill);
+  var circleStroke = acgraph.vector.normalizeStroke(circleConfig['stroke'] || opt_stroke);
+  var circleRadius = circleConfig['radius'] || 15;
+
+  this.ipOnStart = opt_onStart;
+  this.ipOnChange = opt_onChange;
+  this.ipOnFinish = opt_onFinish;
+
+  this.ipPoints_ = [];
+  this.ipMinX_ = +Infinity;
+  this.ipMaxX_ = -Infinity;
+  this.ipMinY_ = +Infinity;
+  this.ipMaxY_ = -Infinity;
+  this.inPolygon_ = true;
+
+  this.ipCloseDelta_ = circleRadius;
+
+  this.ipRepeat_ = !!opt_repeat;
+
+  if (!this.ipPath_) {
+    this.ipPath_ = this.rootElement.path();
+    this.ipClosePath_ = this.rootElement.path();
+    this.ipCloseCircle_ = this.rootElement.circle();
+  }
+
+  this.ipCloseCircle_.parent(this.rootElement);
+  this.ipCloseCircle_.stroke(circleStroke);
+  this.ipCloseCircle_.fill(circleFill);
+  // this.ipCloseCircle_.radius(circleRadius);
+  this.ipCloseCircle_.zIndex(999);
+
+  this.ipClosePath_.parent(this.rootElement);
+  this.ipClosePath_.stroke(opt_stroke, 3, '3 3');
+  this.ipClosePath_.zIndex(1000);
+
+  this.ipPath_.parent(this.rootElement);
+  this.ipPath_.stroke(opt_stroke);
+  this.ipPath_.fill(opt_fill);
+  this.ipPath_.zIndex(1000);
+
+  this.rootElement.listen(acgraph.events.EventType.MOUSEMOVE, this.polygonDrawingMouseMoveHandler_, true, this);
+  this.rootElement.listen(acgraph.events.EventType.DBLCLICK, this.polygonDrawingMouseDblclickHandler_, true, this);
+  this.rootElement.listen(acgraph.events.EventType.CLICK, this.polygonDrawingMouseClickHandler_, true, this);
+
+  return true;
+};
+
+
+/**
+ * Mouse move handler, draws interactive polygon.
+ * @param {acgraph.events.BrowserEvent} event
+ * @private
+ */
+anychart.mapModule.Chart.prototype.polygonDrawingMouseMoveHandler_ = function(event) {
+  if (this.ipPoints_.length) {
+    var cp = this.container().getStage().getClientPosition();
+    var x = event['clientX'] - cp.x;
+    var y = event['clientY'] - cp.y;
+
+    var dToStartPoint = goog.math.Coordinate.distance(new goog.math.Coordinate(this.ipPoints_[0], this.ipPoints_[1]),
+        new goog.math.Coordinate(x, y));
+    var closePolygon = (dToStartPoint <= this.ipCloseDelta_);
+    this.ipClosePath_.clear();
+    if (closePolygon) {//draws closing line when the point is within close delta to the first point
+      this.ipClosePath_.moveTo(x, y);
+      this.ipClosePath_.lineTo(this.ipPoints_[0], this.ipPoints_[1]);
+    }
+
+    this.ipPath_.clear();
+    this.ipPath_.moveTo(this.ipPoints_[0], this.ipPoints_[1]);
+    for (var xInd = 2; xInd < this.ipPoints_.length; xInd += 2) {
+      this.ipPath_.lineTo(this.ipPoints_[xInd], this.ipPoints_[xInd + 1]);
+    }
+    this.ipPath_.lineTo(x, y);
+  }
+};
+
+
+/**
+ * Mouse click handler for interactive polygon, adds points to polygon
+ * and cancels interactive polygon drawing if point is within close delta to the first point.
+ * @param {acgraph.events.BrowserEvent} event
+ * @private
+ */
+anychart.mapModule.Chart.prototype.polygonDrawingMouseClickHandler_ = function(event) {
+  event.stopPropagation();
+  event.preventDefault();
+
+  var cp = this.container().getStage().getClientPosition();
+  var x, y;
+  x = event['clientX'] - cp.x;
+  y = event['clientY'] - cp.y;
+
+  this.ipMinX_ = Math.min(x, this.ipMinX_);
+  this.ipMaxX_ = Math.max(x, this.ipMaxX_);
+  this.ipMinY_ = Math.min(y, this.ipMinY_);
+  this.ipMaxY_ = Math.max(y, this.ipMaxY_);
+
+  this.ipPoints_.push(x, y);
+
+  var closePolygon = false;
+  //if current point is not the first - check if it's within polygon closing distance to the first point
+  if (this.ipPoints_.length > 2) {
+    var dToStartPoint = goog.math.Coordinate.distance(new goog.math.Coordinate(this.ipPoints_[0], this.ipPoints_[1]),
+        new goog.math.Coordinate(x, y));
+    closePolygon = dToStartPoint <= this.ipCloseDelta_; //if distance is less than close delta - polygon closes
+  }
+
+  var polygonBounds = new anychart.math.Rect(this.ipMinX_, this.ipMinY_, this.ipMaxX_ - this.ipMinX_, this.ipMaxY_ - this.ipMinY_);
+  //polygon closing on click within close radius near the first point
+  if (closePolygon) {
+    if (goog.isDef(this.ipOnFinish)) {
+      this.ipOnFinish.call(this, this.ipPoints_, polygonBounds, event);
+    }
+
+    if (this.ipRepeat_) {
+      this.resetPolygonElements();
+      this.ipPoints_.length = 0;
+      this.ipMaxX_ = this.ipMaxY_ = -Infinity;
+      this.ipMinX_ = this.ipMinY_ = +Infinity;
+    } else {
+      this.finishIPDrawing();
+    }
+  } else if (this.ipPoints_.length == 2) {//current point is first
+    //draw close circle on first point added
+    this.ipCloseCircle_.centerX(x);
+    this.ipCloseCircle_.centerY(y);
+    this.ipCloseCircle_.radius(this.ipCloseDelta_);
+
+    if (goog.isDef(this.ipOnStart)) {
+      this.ipOnStart.call(this, this.ipPoints_, polygonBounds, event);
+    }
+  } else {//adding subsequent points
+    if (goog.isDef(this.ipOnChange)) {
+      this.ipOnChange.call(this, this.ipPoints_, polygonBounds, event);
+    }
+  }
+};
+
+
+/**
+ * Double click handler, cancels interactive polygon drawing.
+ * @param {acgraph.events.BrowserEvent} event
+ * @private
+ */
+anychart.mapModule.Chart.prototype.polygonDrawingMouseDblclickHandler_ = function(event) {
+  var polygonBounds = new anychart.math.Rect(this.ipMinX_, this.ipMinY_, this.ipMaxX_ - this.ipMinX_, this.ipMaxY_ - this.ipMinY_);
+  if (this.ipOnFinish) {
+    this.ipOnFinish.call(this, this.ipPoints_, polygonBounds, event);
+  }
+
+  if (this.ipRepeat_) {
+    this.resetPolygonElements();
+    this.ipPoints_.length = 0;
+    this.ipMaxX_ = this.ipMaxY_ = -Infinity;
+    this.ipMinX_ = this.ipMinY_ = +Infinity;
+  } else {
+    this.finishIPDrawing();
+  }
+  event.stopPropagation();
+  event.preventDefault();
+};
+
+
+/**
+ * Cancels polygon selection.
+ * @return {anychart.mapModule.Chart}
+ */
+anychart.mapModule.Chart.prototype.cancelPolygonMarquee = function() {
+  this.finishIPDrawing();
+  return this;
+};
+
+
+/**
+ * Cleans up interactive polygon drawing.
+ */
+anychart.mapModule.Chart.prototype.finishIPDrawing = function() {
+  this.inPolygon_ = false;
+
+  this.resetPolygonElements();
+  this.ipPath_.parent(null);
+  this.ipClosePath_.parent(null);
+  this.ipCloseCircle_.parent(null);
+
+  this.rootElement.unlisten(acgraph.events.EventType.MOUSEMOVE, this.polygonDrawingMouseMoveHandler_, true, this);
+  this.rootElement.unlisten(acgraph.events.EventType.DBLCLICK, this.polygonDrawingMouseDblclickHandler_, true, this);
+  this.rootElement.unlisten(acgraph.events.EventType.CLICK, this.polygonDrawingMouseClickHandler_, true, this);
+
+  this.ipPoints_.length = 0;
+  this.ipOnStart = this.ipOnChange = this.ipOnFinish = null;
+
+  this.preventMouseDownInteractivity = false;
+};
+
+
+/**
+ * Resets polygon elements but keeps their parent.
+ */
+anychart.mapModule.Chart.prototype.resetPolygonElements = function() {
+  if (this.ipPath_) {
+    this.ipPath_.clear();
+    this.ipClosePath_.clear();
+    this.ipCloseCircle_.radius(0);
+  }
+};
+
+
+/**
+ * If polygon selection process is going on.
+ * @return {boolean}
+ */
+anychart.mapModule.Chart.prototype.inPolygon = function() {
+  return !!this.inPolygon_;
+};
+
+
+/**
+ * Dispatches selectPolygonStart event.
+ * @param {Array.<number>} polygon
+ * @param {anychart.math.Rect} polygonBounds
+ * @param {acgraph.events.BrowserEvent} browserEvent
+ * @return {boolean}
+ */
+anychart.mapModule.Chart.prototype.onSelectPolygonStart = function(polygon, polygonBounds, browserEvent) {
+  return this.dispatchEvent(this.createSelectPolygonEvent(anychart.enums.EventType.SELECT_MARQUEE_START, polygon, polygonBounds, browserEvent));
+};
+
+
+/**
+ * Dispatches selectPolygonChange event.
+ * @param {Array.<number>} polygon
+ * @param {anychart.math.Rect} polygonBounds
+ * @param {acgraph.events.BrowserEvent} browserEvent
+ * @return {boolean}
+ */
+anychart.mapModule.Chart.prototype.onSelectPolygonChange = function(polygon, polygonBounds, browserEvent) {
+  return this.dispatchEvent(this.createSelectPolygonEvent(anychart.enums.EventType.SELECT_MARQUEE_CHANGE, polygon, polygonBounds, browserEvent));
+};
+
+
+/**
+ * Dispatches selectPolygonFinish event.
+ * @param {Array.<number>} polygon
+ * @param {anychart.math.Rect} polygonBounds
+ * @param {acgraph.events.BrowserEvent} browserEvent
+ * @return {boolean}
+ */
+anychart.mapModule.Chart.prototype.onSelectPolygonFinish = function(polygon, polygonBounds, browserEvent) {
+  var e = this.createSelectPolygonEvent(anychart.enums.EventType.SELECT_MARQUEE_FINISH, polygon, polygonBounds, browserEvent);
+  var rv = this.dispatchEvent(e);
+  if (rv) {
+    this.selectByPolygon(e);
+  }
+  return rv;
+};
+
+
+/**
+ * @typedef {{
+ *  offsetX: number,
+ *  offsetY: number,
+ *  clientX: number,
+ *  clientY: number,
+ *  screenX: number,
+ *  screenY: number,
+ *  button: acgraph.events.BrowserEvent.MouseButton,
+ *  actionButton: boolean,
+ *  keyCode: number,
+ *  charCode: number,
+ *  ctrlKey: boolean,
+ *  altKey: boolean,
+ *  shiftKey: boolean,
+ *  metaKey: boolean,
+ *  platformModifierKey: boolean,
+ *  originalEvent: acgraph.events.BrowserEvent,
+ *  polygon: Array.<number>,
+ *  polygonBounds: anychart.math.Rect
+ * }}
+ */
+anychart.mapModule.Chart.PolygonEvent;
+
+
+/**
+ * Creates selectPolygon event.
+ * It contains 'polygon' field with plain array of polygon points,
+ * where odd items of array are x's and even items are y's.
+ * And polygonBounds which is rect containing polygon bounds.
+ * @param {string} eventType
+ * @param {Array.<number>} polygon
+ * @param {anychart.math.Rect} polygonBounds
+ * @param {acgraph.events.BrowserEvent} browserEvent
+ * @return {anychart.mapModule.Chart.PolygonEvent}
+ */
+anychart.mapModule.Chart.prototype.createSelectPolygonEvent = function(eventType, polygon, polygonBounds, browserEvent) {
+  return {
+    type: eventType, // dispatch expects it to be an obfuscated property
+    'offsetX': browserEvent['offsetX'],
+    'offsetY': browserEvent['offsetY'],
+    'clientX': browserEvent['clientX'],
+    'clientY': browserEvent['clientY'],
+    'screenX': browserEvent['screenX'],
+    'screenY': browserEvent['screenY'],
+    'button': browserEvent['button'],
+    'actionButton': browserEvent['actionButton'],
+    'keyCode': browserEvent['keyCode'],
+    'charCode': browserEvent['charCode'],
+    'ctrlKey': browserEvent['ctrlKey'],
+    'altKey': browserEvent['altKey'],
+    'shiftKey': browserEvent['shiftKey'],
+    'metaKey': browserEvent['metaKey'],
+    'platformModifierKey': browserEvent['platformModifierKey'],
+    'originalEvent': browserEvent,
+    'polygon': polygon,
+    'polygonBounds': polygonBounds
+  };
+};
+
+
+/**
+ * Selects points inside polygon.
+ * @param {anychart.mapModule.Chart.PolygonEvent} event
+ */
+anychart.mapModule.Chart.prototype.selectByPolygon = function(event) {
+  var tx = this.getMapLayer().getFullTransformation();
+
+  var polygon = event['polygon'];
+  for (var i = 0; i < polygon.length; i += 2) {//convert polygon points according to current zoom and translate
+    polygon[i] -= tx.getTranslateX(); polygon[i] /= tx.getScaleX();
+    polygon[i + 1] -= tx.getTranslateY(); polygon[i + 1] /= tx.getScaleY();
+  }
+
+  var polygonBounds = event['polygonBounds'];
+  //convert polygon bounds according to current zoom and translate
+  polygonBounds.left -= tx.getTranslateX(); polygonBounds.left /= tx.getScaleX();
+  polygonBounds.top -= tx.getTranslateY(); polygonBounds.top /= tx.getScaleY();
+
+  var append = event['shiftKey'] || event['ctrlKey'] || event['metaKey'];
+
+  for (var i = 0; i < this.seriesList.length; i++) {
+    var series = this.seriesList[i];
+    var selectionMode = series.selectionMode() || this.interactivity().getOption('selectionMode');
+
+    // drilldown and multi select allow selecting several points
+    if (selectionMode != anychart.enums.SelectionMode.NONE) {
+      var pointsInPolygon = series.getPointsInPolygon(polygon, polygonBounds);
+
+      // in single select mode we don't append selected points and select only first point caught in polygon.
+      if (selectionMode == anychart.enums.SelectionMode.SINGLE_SELECT) {
+        append = false;
+        pointsInPolygon = pointsInPolygon[0];
+      }
+      series.selectPointInternal(pointsInPolygon, append);
+    }
+  }
+};
+
+
+//endregion
+//region --- Animations
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Animations.
@@ -5042,6 +5487,61 @@ anychart.mapModule.Chart.prototype.toCsv = function(opt_chartDataExportMode, opt
 
 
 //endregion
+//region --- Context menu
+/**
+ * Items map.
+ * @type {Object.<string, anychart.ui.ContextMenu.Item>}
+ */
+anychart.mapModule.Chart.contextMenuItems = {
+  // Select submenu containing both marquee and polygon for map chart
+  'select-submenu': {
+    'index': 9,
+    'text': 'Select points',
+    'iconClass': 'ac ac-mouse-pointer',
+    'subMenu': {
+      'select-polygon': {
+        'index': 9.2,
+        'text': 'Polygon',
+        'iconClass': 'ac ac-pentagon',
+        'eventType': 'anychart.startSelectPolygonMarquee',
+        'action': function(context) {
+          context['menuParent'].startSelectPolygonMarquee(false);
+        }
+      },
+      'select-marquee': {
+        'index': 9.3,
+        'text': 'Marquee',
+        'iconClass': 'ac ac-square',
+        'eventType': 'anychart.startSelectMarquee',
+        'action': function(context) {
+          context['menuParent'].startSelectRectangleMarquee(false);
+        }
+      }
+    }
+  }
+};
+
+
+/**
+ * Menu map.
+ * @type {Object.<string, Object.<string, anychart.ui.ContextMenu.Item>>}
+ */
+anychart.mapModule.Chart.contextMenuMap = {
+  'select-submenu': {
+    'select-submenu': anychart.mapModule.Chart.contextMenuItems['select-submenu']
+  }
+};
+
+
+/** @inheritDoc */
+anychart.mapModule.Chart.prototype.specificContextMenuItems = function(items, context, isPointContext) {
+  var newItems = {};
+  goog.object.extend(newItems, /** @type {Object} */(anychart.utils.recursiveClone(anychart.mapModule.Chart.contextMenuMap['select-submenu'])), items);
+  return newItems;
+};
+
+
+//endregion
 //region --- Setup and Dispose
 /**
  * Exports map to GeoJSON format.
@@ -5276,7 +5776,10 @@ anychart.mapModule.Chart.prototype.disposeInternal = function() {
       this.callouts_,
       this.axesSettings_,
       this.gridSettings_,
-      this.crsAnimation_);
+      this.crsAnimation_,
+      this.ipPath_,
+      this.ipClosePath_,
+      this.ipCloseCircle_);
   this.shortcutHandler = null;
   this.mouseWheelHandler = null;
   this.crosshair_ = null;
@@ -5285,6 +5788,9 @@ anychart.mapModule.Chart.prototype.disposeInternal = function() {
   this.axesSettings_ = null;
   this.gridSettings_ = null;
   this.crsAnimation_ = null;
+  this.ipPath_ = null;
+  this.ipClosePath_ = null;
+  this.ipCloseCircle_ = null;
 
   if (this.container() && this.container().getStage()) {
     var container = this.container().getStage().getDomWrapper();
@@ -5372,5 +5878,12 @@ anychart.mapModule.Chart.prototype.disposeInternal = function() {
   proto['drillUp'] = proto.drillUp;
   proto['drillDownMap'] = proto.drillDownMap;
   proto['getDrilldownPath'] = proto.getDrilldownPath;
+  //polygon select
+  proto['startSelectPolygonMarquee'] = proto.startSelectPolygonMarquee;
+  proto['inPolygon'] = proto.inPolygon;
+  proto['cancelPolygonMarquee'] = proto.cancelPolygonMarquee;
+  // auto generated
+  // proto['selectPolygonMarqueeFill'] = proto.selectPolygonMarqueeFill
+  // proto['selectPolygonMarqueeStroke'] = proto.selectPolygonMarqueeStroke
 })();
 //endregion

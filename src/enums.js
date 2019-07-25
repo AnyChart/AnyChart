@@ -1534,6 +1534,7 @@ anychart.enums.EventType = {
   CLOSE: 'close',
   COMPLETE: 'complete',
 
+  // Select rectangular marquee events
   SELECT_MARQUEE_START: 'selectmarqueestart',
   SELECT_MARQUEE_CHANGE: 'selectmarqueechange',
   SELECT_MARQUEE_FINISH: 'selectmarqueefinish',

@@ -1792,8 +1792,8 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
         }
       }
     },
-    'selectMarqueeFill': '#d3d3d3 0.4',
-    'selectMarqueeStroke': '#d3d3d3',
+    'selectRectangleMarqueeFill': '#d3d3d3 0.4',
+    'selectRectangleMarqueeStroke': '#d3d3d3',
 
     'maxPointWidth': '100%',
     'minPointLength': 0,

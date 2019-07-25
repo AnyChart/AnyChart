@@ -1844,6 +1844,259 @@ anychart.core.settings.populate(anychart.mapModule.Series, anychart.mapModule.Se
 
 
 //endregion
+//region --- Polygon select related methods
+/**
+ * Returns indexes of points inside the polygon.
+ * @param {Array.<number>} polygon
+ * @param {anychart.math.Rect} polygonBounds
+ * @return {Array.<number>}
+ */
+anychart.mapModule.Series.prototype.getPointsInPolygon = function(polygon, polygonBounds) {
+  var it = this.getResetIterator();
+  var pointsInside = [];
+
+  while (it.advance()) {
+    if (this.isPointInPolygon(it, polygon, polygonBounds)) {
+      pointsInside.push(it.getIndex());
+    }
+  }
+  return pointsInside;
+};
+
+
+/**
+ * Prepares point shapes for polygon selection check.
+ * These are paths, which may represent acgraph.vector.Path element, point coordinates (path will contain only one
+ * point in this case!) and point bounds. Paths are plain arrays where odd items are x coordinates and even are y's.
+ * And circles, which represent acgraph.vector.Circles with center point and radius.
+ * @param {anychart.data.IRowInfo} point
+ * @param {anychart.math.Rect} polygonBounds
+ * @return {{paths: Array<Array<number>>, circles: Array<{x: number, y: number, r: number}>}}
+ */
+anychart.mapModule.Series.prototype.prepareShapes = function(point, polygonBounds) {
+  var shapes;
+  /**
+   * Array of paths. Each array represents different shape.
+   * @type {Array.<Array.<number>>}
+   */
+  var pointsToCheck = [];
+  /**
+   *
+   * @type {Array.<{x: number, y: number, r: number}>}
+   */
+  var circlesToCheck = [];
+  var shapeBBox;
+  var x1, y1, x2, y2;
+  if (anychart.utils.instanceOf(this.shapeManager, anychart.core.shapeManagers.PerPoint) &&
+      (shapes = /** @type {Object.<acgraph.vector.Element>} */(point.meta(this.shapeManager.shapesFieldName)))) {
+    for (var shape in shapes) {
+      var pointShape = shapes[shape];
+      if (anychart.utils.instanceOf(pointShape, acgraph.vector.Path)) {
+        var args = pointShape.serializePathArgs();
+
+        //if path contains arcTo or curveTo segments - we need to simplify them to get an array of simple points
+        if (args['segments'].indexOf(acgraph.vector.PathBase.Segment.ARCTO) >= 0 || args['segments'].indexOf(acgraph.vector.PathBase.Segment.CURVETO) >= 0) {
+          pointShape.simplify();
+          args = pointShape.serializePathArgs();
+        }
+
+        if (goog.array.lastIndexOf(args['segments'], acgraph.vector.PathBase.Segment.MOVETO) > 0) {
+          //this path contains several polygons and needs to be split
+          var polygon = [];
+          var prevIndex = 0;
+          var xMin, xMax, yMin, yMax;
+          xMin = yMin = +Infinity;
+          xMax = yMax = -Infinity;
+          /*
+          On maps some data points are drawn as one path, but contain several distinct polygons (for example countries with islands).
+          While checks onto whether the point of the path is inside the selection polygon doesn't require knowledge about
+          path parts - intersection checks do so, because we need to check intersections onto segments. And if path isn't
+          split into several polygons - we lose some of the segments and get new ones, which aren't present.
+           */
+          for (var i = 0; i < args['segments'].length; i++) {
+            var segment = args['segments'][i];
+            var count = args['count'][i];
+            polygon = polygon.concat(args['arguments'].slice(prevIndex, prevIndex + count * 2));
+            prevIndex += count * 2;
+
+            //if next segment is moveto or there are no more data - current polygon is finished
+            if ((i + 1) >= args['segments'].length || args['segments'][i + 1] == acgraph.vector.PathBase.Segment.MOVETO) {
+              for (var xIndex = 0; xIndex < polygon.length; xIndex += 2) {
+                xMin = Math.min(xMin, polygon[xIndex]);
+                xMax = Math.max(xMax, polygon[xIndex]);
+                yMin = Math.min(yMin, polygon[xIndex + 1]);
+                yMax = Math.max(yMax, polygon[xIndex + 1]);
+              }
+              var coordinateBoxPolygon = [xMin, yMin, xMax, yMin, xMax, yMax, xMin, yMax];
+              if (polygon.length > 0 && anychart.math.checkRectIntersection(polygonBounds.toCoordinateBox(), coordinateBoxPolygon)) {
+                pointsToCheck.push(polygon);
+                polygon = [];
+              }
+            }
+          }
+        } else {
+          shapeBBox = pointShape.getBounds();
+          if (anychart.math.checkRectIntersection(shapeBBox.toCoordinateBox(), polygonBounds.toCoordinateBox())) {
+            pointsToCheck.push(args['arguments']);
+          }
+        }
+      } else if (anychart.utils.instanceOf(pointShape, acgraph.vector.Circle)) {
+        //circles are handled slightly different than points of the path
+        var center = pointShape.center();
+        var radius = pointShape.radius();
+        pointsToCheck.push([center.x, center.y]);
+        circlesToCheck.push({x: center.x, y: center.y, r: radius});
+      } else {
+        //any shapes different than path or circle are handled as bounding boxes
+        pointsToCheck.push(shapeBBox.toCoordinateBox());
+      }
+    }
+  } else {
+    x1 = /** @type {number} */(point.meta(this.config.anchoredPositionBottom + 'X'));
+    y1 = /** @type {number} */(point.meta(this.config.anchoredPositionBottom));
+    if (this.config.anchoredPositionBottom == this.config.anchoredPositionTop) {
+      pointsToCheck.push([x1, y1]);
+    } else {
+      x2 = /** @type {number} */(point.meta(this.config.anchoredPositionTop + 'X'));
+      y2 = /** @type {number} */(point.meta(this.config.anchoredPositionTop));
+
+      pointsToCheck.push([
+        x1, y1,
+        x2, y2,
+        x1, y2,
+        x2, y1
+      ]);
+    }
+  }
+  return {paths: pointsToCheck, circles: circlesToCheck};
+};
+
+
+/**
+ * Performs simple check of series point paths intersection with polygon by checking if any of the paths points is
+ * inside the polygon.
+ * Returns result of this check where true means some point is inside the polygon and false means none of the points are
+ * inside the polygon.
+ * @param {Array.<Array.<number>>} paths
+ * @param {Array.<number>} polygonPoints
+ * @param {anychart.math.Rect} polygonBounds
+ * @return {boolean} true if any of path points is inside polygon
+ */
+anychart.mapModule.Series.prototype.isAnyPathPointInsidePolygon = function(paths, polygonPoints, polygonBounds) {
+  var i;
+  var path;
+  var result = false;
+  //raytracing points to check if they are inside polygon
+  for (i = 0; i < paths.length; i++) {
+    path = paths[i];
+    for (var xInd = 0; xInd < path.length; xInd += 2) {
+      if (anychart.math.isPointInsidePolygon(path[xInd], path[xInd + 1], polygonPoints, polygonBounds)) {
+        result = true;
+        break;
+      }
+    }
+  }
+  return result;
+};
+
+
+/**
+ * Checks if any of the polygon segments intersects with any of the path segments.
+ * @param {Array.<Array.<number>>} paths
+ * @param {Array.<number>} polygonPoints
+ * @return {boolean}
+ */
+anychart.mapModule.Series.prototype.isAnyPathSegmentIntersectingWithPolygon = function(paths, polygonPoints) {
+  var result = false;
+  var path;
+  // check segments intersections between polygon and path
+  var pathInd;
+  for (pathInd = 0; pathInd < paths.length; pathInd++) {
+    path = paths[pathInd];
+    if (path.length < 4) continue; //if path doesn't have at least 2 points - there is no point to check intersections
+
+    var pathPrevXInd = path.length - 2;
+    for (var pathXInd = 0; pathXInd < path.length; pathXInd += 2) {
+      var polygonPrevXInd = polygonPoints.length - 2;
+      for (var polygonXInd = 0; polygonXInd < polygonPoints.length; polygonXInd += 2) {
+        if (anychart.math.checkSegmentsIntersection(path[pathXInd], path[pathXInd + 1], path[pathPrevXInd], path[pathPrevXInd + 1],
+            polygonPoints[polygonXInd], polygonPoints[polygonXInd + 1], polygonPoints[polygonPrevXInd], polygonPoints[polygonPrevXInd + 1])) {
+          result = true;
+          break;
+        }
+        polygonPrevXInd = polygonXInd;
+      }
+      if (result) break;
+      pathPrevXInd = pathXInd;
+    }
+    if (result) break;
+  }
+  return result;
+};
+
+
+/**
+ * Checks circle intersection by any of the polygon segments.
+ * @param {Array.<{x: number, y: number, r: number}>} circlesToCheck
+ * @param {Array.<number>} polygonPoints
+ * @return {boolean}
+ */
+anychart.mapModule.Series.prototype.isAnyCircleIntersectedByPolygon = function(circlesToCheck, polygonPoints) {
+  var result = false;
+  var x1, y1, x2, y2;
+  //check circles
+  for (var i = 0; i < circlesToCheck.length; i++) {
+    var circle = circlesToCheck[i];
+    var curInd;
+    var prevInd = polygonPoints.length - 2;
+    for (curInd = 0; curInd < polygonPoints.length; curInd += 2) {
+      x1 = polygonPoints[curInd];
+      y1 = polygonPoints[curInd + 1];
+      x2 = polygonPoints[prevInd];
+      y2 = polygonPoints[prevInd + 1];
+      //if closest point on polygon segment to the center of circle is less or equal the radius - this segment intersects circle.
+      if (anychart.math.getClosestDistanceFromSegmentToPoint(x1, y1, x2, y2, circle.x, circle.y) <= circle.r) {
+        result = true;
+        break;
+      }
+      prevInd = curInd;
+    }
+
+    if (result) {
+      break;
+    }
+  }
+  return result;
+};
+
+
+/**
+ * Checks if point is inside the polygon.
+ * @param {anychart.data.IRowInfo} point
+ * @param {Array.<number>} polygonPoints as flat array of numbers
+ * @param {anychart.math.Rect} polygonBounds
+ * @return {boolean} whether the point is inside polygon
+ */
+anychart.mapModule.Series.prototype.isPointInPolygon = function(point, polygonPoints, polygonBounds) {
+  var shapes = this.prepareShapes(point, polygonBounds);
+
+  /*
+    First check handles cases when:
+      1) path points are inside polygon
+      2) center of circle is inside polygon
+      3) corners of series point bounds are inside polygon
+    If this no points are inside the polygon - next check looks up if
+    polygon segments intersect with any of the paths segments.
+    Last one checks polygon segments intersection with circles, wich helps for cases
+    when circle center is outside of polygon bounds, but circle is intersected by polygon.
+   */
+  return this.isAnyPathPointInsidePolygon(shapes.paths, polygonPoints, polygonBounds) ||
+      this.isAnyPathSegmentIntersectingWithPolygon(shapes.paths, polygonPoints) ||
+      this.isAnyCircleIntersectedByPolygon(shapes.circles, polygonPoints);
+};
+
+
+//endregion
 //region --- Setup
 /** @inheritDoc */
 anychart.mapModule.Series.prototype.serialize = function() {
