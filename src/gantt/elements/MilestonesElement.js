@@ -2,6 +2,7 @@ goog.provide('anychart.ganttModule.elements.MilestonesElement');
 goog.provide('anychart.ganttModule.elements.MilestonesElement.Preview');
 
 //region -- Requirements.
+goog.require('anychart.core.settings');
 goog.require('anychart.ganttModule.elements.TimelineElement');
 
 
@@ -23,8 +24,30 @@ anychart.ganttModule.elements.MilestonesElement = function(timeline) {
    * @private
    */
   this.preview_ = null;
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['markerType', 0, anychart.Signal.NEEDS_REDRAW]
+  ]);
 };
 goog.inherits(anychart.ganttModule.elements.MilestonesElement, anychart.ganttModule.elements.TimelineElement);
+
+
+//endregion
+//region -- Optimized props descriptors
+/**
+ * Simple descriptors.
+ * @type {!Object.<anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.ganttModule.elements.MilestonesElement.DESCRIPTORS = (function() {
+  /** @type {!Object.<anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'markerType', anychart.enums.normalizeMarkerType]
+  ]);
+  return map;
+})();
+anychart.core.settings.populate(anychart.ganttModule.elements.MilestonesElement, anychart.ganttModule.elements.MilestonesElement.DESCRIPTORS);
 
 
 //endregion
@@ -154,6 +177,16 @@ anychart.core.settings.populate(anychart.ganttModule.elements.MilestonesElement.
 /** @inheritDoc */
 anychart.ganttModule.elements.MilestonesElement.Preview.prototype.getType = function() {
   return anychart.enums.TLElementTypes.MILESTONES_PREVIEW;
+};
+
+
+/** @inheritDoc */
+anychart.ganttModule.elements.MilestonesElement.Preview.prototype.getPointSettingsResolutionOrder = function() {
+  if (!this.pointSettingsResolution) {
+    this.pointSettingsResolution = [this.getType()];
+    this.pointSettingsResolution.push.apply(this.pointSettingsResolution, this.parent().getPointSettingsResolutionOrder());
+  }
+  return this.pointSettingsResolution;
 };
 
 

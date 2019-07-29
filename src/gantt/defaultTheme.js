@@ -1,4 +1,5 @@
 goog.provide('anychart.ganttModule.defaultTheme');
+goog.require('anychart.utils');
 
 
 goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
@@ -309,8 +310,9 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
           var shapes = this['shapes'];
           var path = shapes['path'];
           var bounds = this['predictedBounds'];
+          var markerType = this['markerType'];
           var radius = bounds.width / 2;
-          anychart.graphics['vector']['primitives']['diamond'](path, bounds.left + radius, bounds.top + radius, radius);
+          anychart.utils.getMarkerDrawer(markerType)(path, bounds.left + radius, bounds.top + radius, radius);
         }
       },
       'preview': {
@@ -324,12 +326,9 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
             var shapes = this['shapes'];
             var path = shapes['path'];
             var bounds = this['predictedBounds'];
-            path
-                .clear()
-                .moveTo(bounds.left, bounds.top)
-                .lineTo(bounds.left + bounds.width, bounds.top)
-                .lineTo(bounds.left + bounds.width / 2, bounds.top + bounds.height)
-                .close();
+            var markerType = this['markerType'];
+            var radius = bounds.width / 2;
+            anychart.utils.getMarkerDrawer(markerType)(path, bounds.left + radius, bounds.top + radius, radius);
           },
           'shapes': [
             {
@@ -349,8 +348,10 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
           }
         },
         'depth': null,
-        'position': 'left-top'
-      }
+        'position': 'left-top',
+        'markerType': 'diamond'
+      },
+      'markerType': 'diamond'
     },
 
     'baselines': {
