@@ -1943,6 +1943,7 @@ anychart.enums.StockIndicatorTypes = {
   MMA: 'mma',
   MOMENTUM: 'momentum',
   OBV: 'obv',
+  PPO: 'ppo',
   PRICE_CHANNELS: 'price-channels',
   PSAR: 'psar',
   ROC: 'roc',
