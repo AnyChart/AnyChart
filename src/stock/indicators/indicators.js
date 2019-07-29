@@ -30,6 +30,7 @@ goog.require('anychart.stockModule.indicators.PPO');
 goog.require('anychart.stockModule.indicators.PSAR');
 goog.require('anychart.stockModule.indicators.PSY');
 goog.require('anychart.stockModule.indicators.PriceChannels');
+goog.require('anychart.stockModule.indicators.RCI');
 goog.require('anychart.stockModule.indicators.RSI');
 goog.require('anychart.stockModule.indicators.RoC');
 goog.require('anychart.stockModule.indicators.SMA');
@@ -77,6 +78,7 @@ anychart.stockModule.indicators.config = (function() {
   res[anychart.enums.StockIndicatorTypes.PRICE_CHANNELS] = anychart.stockModule.indicators.PriceChannels;
   res[anychart.enums.StockIndicatorTypes.PSAR] = anychart.stockModule.indicators.PSAR;
   res[anychart.enums.StockIndicatorTypes.PSY] = anychart.stockModule.indicators.PSY;
+  res[anychart.enums.StockIndicatorTypes.RCI] = anychart.stockModule.indicators.RCI;
   res[anychart.enums.StockIndicatorTypes.ROC] = anychart.stockModule.indicators.RoC;
   res[anychart.enums.StockIndicatorTypes.RSI] = anychart.stockModule.indicators.RSI;
   res[anychart.enums.StockIndicatorTypes.SMA] = anychart.stockModule.indicators.SMA;
