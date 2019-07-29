@@ -1936,6 +1936,7 @@ anychart.enums.StockIndicatorTypes = {
   EMA: 'ema',
   ENV: 'env',
   HA: 'ha',
+  IKH: 'ikh',
   KDJ: 'kdj',
   KELTNER_CHANNELS: 'keltner-channels',
   MACD: 'macd',

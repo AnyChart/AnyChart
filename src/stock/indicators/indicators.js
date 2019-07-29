@@ -18,6 +18,7 @@ goog.require('anychart.stockModule.indicators.DMI');
 goog.require('anychart.stockModule.indicators.EMA');
 goog.require('anychart.stockModule.indicators.ENV');
 goog.require('anychart.stockModule.indicators.HA');
+goog.require('anychart.stockModule.indicators.IKH');
 goog.require('anychart.stockModule.indicators.KDJ');
 goog.require('anychart.stockModule.indicators.KeltnerChannels');
 goog.require('anychart.stockModule.indicators.MACD');
@@ -63,6 +64,7 @@ anychart.stockModule.indicators.config = (function() {
   res[anychart.enums.StockIndicatorTypes.EMA] = anychart.stockModule.indicators.EMA;
   res[anychart.enums.StockIndicatorTypes.ENV] = anychart.stockModule.indicators.ENV;
   res[anychart.enums.StockIndicatorTypes.HA] = anychart.stockModule.indicators.HA;
+  res[anychart.enums.StockIndicatorTypes.IKH] = anychart.stockModule.indicators.IKH;
   res[anychart.enums.StockIndicatorTypes.KDJ] = anychart.stockModule.indicators.KDJ;
   res[anychart.enums.StockIndicatorTypes.KELTNER_CHANNELS] = anychart.stockModule.indicators.KeltnerChannels;
   res[anychart.enums.StockIndicatorTypes.MACD] = anychart.stockModule.indicators.MACD;
