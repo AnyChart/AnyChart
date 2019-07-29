@@ -1947,6 +1947,7 @@ anychart.enums.StockIndicatorTypes = {
   PPO: 'ppo',
   PRICE_CHANNELS: 'price-channels',
   PSAR: 'psar',
+  PSY: 'psy',
   ROC: 'roc',
   RSI: 'rsi',
   SMA: 'sma',
