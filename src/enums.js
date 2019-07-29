@@ -1934,6 +1934,7 @@ anychart.enums.StockIndicatorTypes = {
   CMF: 'cmf',
   DMI: 'dmi',
   EMA: 'ema',
+  ENV: 'env',
   HA: 'ha',
   KDJ: 'kdj',
   KELTNER_CHANNELS: 'keltner-channels',
