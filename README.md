@@ -291,6 +291,8 @@ The `dist` folder contains binaries and JSON/XML Schemas.
 * [AnyChart Sample Solutions](https://www.anychart.com/solutions/)
 * [AnyChart Integrations](https://www.anychart.com/technical-integrations/samples/)
 
+[<img src="https://cdn.anychart.com/images/Browserstack-logo.png" width="134px">](https://www.browserstack.com/)
+
 ## License
 
 [© AnyChart.com - JavaScript charts](https://www.anychart.com). All rights reserved.
