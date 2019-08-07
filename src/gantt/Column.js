@@ -108,25 +108,11 @@ anychart.ganttModule.Column = function(dataGrid, index) {
   this.clip_ = null;
 
   /**
-   * Width of column.
-   * @type {(string|number)}
-   * @private
-   */
-  this.width_ = 0;
-
-  /**
    * Height of column.
    * @type {(string|number)}
    * @private
    */
   this.height_ = 0;
-
-  /**
-   * Default column width.
-   * @type {number}
-   * @private
-   */
-  this.defaultWidth_;
 
   /**
    * Pixel bounds cache.
@@ -141,22 +127,6 @@ anychart.ganttModule.Column = function(dataGrid, index) {
    * @private
    */
   this.format_ = this.defaultFormat_;
-
-  /**
-   * Multiplier to choose a left padding in a cell depending on a tree data item's depth.
-   * Used to highlight a hierarchy of data items.
-   * Overall left padding will be calculated as anychart.ganttModule.DataGrid.DEFAULT_PADDING + depthPaddingMultiplier_ * item.meta('depth');
-   * @type {number}
-   * @private
-   */
-  this.depthPaddingMultiplier_ = 0;
-
-  /**
-   * Flag if collapse/expand buttons must be used.
-   * @type {boolean}
-   * @private
-   */
-  this.collapseExpandButtons_ = false;
 
   /**
    * Pool of collapse/expand buttons.
@@ -215,6 +185,20 @@ anychart.ganttModule.Column = function(dataGrid, index) {
 
   this.setParentEventTarget(this.dataGrid_);
 
+  /**
+   * @this {anychart.ganttModule.Column}
+   */
+  function resetPixelBoundsCache() {
+    this.pixelBoundsCache_ = null;
+  }
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['width', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED, 0, resetPixelBoundsCache],
+    ['defaultWidth', 0, 0],
+    ['collapseExpandButtons', anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION, anychart.Signal.NEEDS_REDRAW],
+    ['depthPaddingMultiplier', anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION, anychart.Signal.NEEDS_REDRAW]
+  ]);
+
   /*
     Enabling/disabling column makes data grid redraw.
     When column is just created, we suppose it is enabled to avoid unnecessary data grid redraw.
@@ -268,6 +252,46 @@ anychart.ganttModule.Column.LF_Z_INDEX = 0;
 anychart.ganttModule.Column.BUTTONS_Z_INDEX = 10;
 
 
+//region -- Descriptors.
+/**
+ * @type {!Object.<anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.ganttModule.Column.DESCRIPTORS = (function() {
+  /** @type {!Object.<anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'width',
+      anychart.core.settings.numberOrPercentNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'defaultWidth',
+      anychart.core.settings.numberNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'collapseExpandButtons',
+      anychart.core.settings.booleanNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'depthPaddingMultiplier',
+      anychart.core.settings.numberNormalizer);
+
+  return map;
+})();
+anychart.core.settings.populate(anychart.ganttModule.Column, anychart.ganttModule.Column.DESCRIPTORS);
+
+
+
+//endregion
+
+
 /**
  * Sets column format.
  * @param {string} fieldName - Name of field of data item to work with.
@@ -288,7 +312,10 @@ anychart.ganttModule.Column.prototype.setColumnFormat = function(fieldName, pres
       return formatter(item.get(fieldName));
     });
 
-    if (goog.isDef(width)) this.width(width).defaultWidth(width);
+    if (goog.isDef(width)) {
+      this['width'](width);
+      this['defaultWidth'](width);
+    }
 
     if (goog.isDef(textStyle)) this.labels(textStyle);
 
@@ -306,25 +333,6 @@ anychart.ganttModule.Column.prototype.setColumnFormat = function(fieldName, pres
  */
 anychart.ganttModule.Column.prototype.defaultFormat_ = function(opt_item) {
   return '';
-};
-
-
-/**
- * Gets/sets multiplier to choose a left padding in a cell depending on a tree data item's depth.
- * Used to highlight a hierarchy of data items.
- * Overall left padding will be calculated as anychart.ganttModule.DataGrid.DEFAULT_PADDING + depthPaddingMultiplier_ * item.meta('depth');
- * @param {number=} opt_value - Value to be set.
- * @return {(number|anychart.ganttModule.Column)} - Current value or itself for method chaining.
- */
-anychart.ganttModule.Column.prototype.depthPaddingMultiplier = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.depthPaddingMultiplier_ != opt_value) {
-      this.depthPaddingMultiplier_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.depthPaddingMultiplier_;
 };
 
 
@@ -348,21 +356,29 @@ anychart.ganttModule.Column.prototype.hasLabelsOverrider = function() {
 
 //region -- anychart.reflow.IMeasurementsTargetProvider implementation + tools.
 /**
+ * Resets texts.
+ */
+anychart.ganttModule.Column.prototype.resetTexts = function() {
+  /*
+    anychart.core.ui.OptimizedText is not IDisposable, that's why we
+    use such a killing for a while.
+   */
+  for (var i = 0; i < this.texts_.length; i++) {
+    var text = this.texts_[i];
+    text.dispose();
+  }
+  this.texts_.length = 0;
+};
+
+
+/**
  *
  * @param {anychart.SignalEvent} event - Signal event.
  * @private
  */
 anychart.ganttModule.Column.prototype.controllerListener_ = function(event) {
   if (event.hasSignal(anychart.Signal.DATA_CHANGED)) {
-    /*
-      anychart.core.ui.OptimizedText is not IDisposable, that's why we
-      use such a killing for a while.
-     */
-    for (var i = 0; i < this.texts_.length; i++) {
-      var text = this.texts_[i];
-      text.dispose();
-    }
-    this.texts_.length = 0;
+    this.resetTexts();
     var state = anychart.ConsistencyState.DATA_GRID_COLUMN_DATA;
 
     /*
@@ -405,7 +421,13 @@ anychart.ganttModule.Column.prototype.setupText_ = function(text, opt_item, opt_
     }
 
     var provider = this.dataGrid_.createFormatProvider(opt_item);
-    this.fixDeprecatedFormatting(provider, opt_item);
+
+    if (!anychart.isAsync()) {
+      /*
+        ASYNC is an experimental feature, that's why it doesn't need deprecates.
+       */
+      this.fixDeprecatedFormatting(provider, opt_item);
+    }
     var textVal = labels.getText(provider);
     text.text(textVal);
   }
@@ -419,15 +441,32 @@ anychart.ganttModule.Column.prototype.setupText_ = function(text, opt_item, opt_
  * @inheritDoc
  */
 anychart.ganttModule.Column.prototype.provideMeasurements = function() {
-  if (!this.texts_.length) {
-    this.allItems_ = this.dataGrid_.controller.getAllItems();
-    for (var i = 0; i < this.allItems_.length; i++) {
-      var text = new anychart.core.ui.OptimizedText();
-      // text.setClassName(this.labels().cssClass);
-      this.texts_.push(text);
+  var i;
+  this.allItems_ = this.dataGrid_.controller.getAllItems();
+
+  if (anychart.isAsync()) {
+    /*
+      General anychart.ASYNC difference: partial labels providing and processing.
+     */
+    var partialData = this.dataGrid_.partialLabels;
+
+    var prov = [];
+    for (i = partialData.first; i <= partialData.last; i++) {
+      if (!this.texts_[i])
+        this.texts_[i] = new anychart.core.ui.OptimizedText();
+      prov.push(this.texts_[i]);
     }
+    return prov;
+  } else {
+    if (!this.texts_.length) {
+      for (i = 0; i < this.allItems_.length; i++) {
+        var text = new anychart.core.ui.OptimizedText();
+        // text.setClassName(this.labels().cssClass);
+        this.texts_.push(text);
+      }
+    }
+    return this.texts_;
   }
-  return this.texts_;
 };
 
 
@@ -437,28 +476,49 @@ anychart.ganttModule.Column.prototype.provideMeasurements = function() {
  */
 anychart.ganttModule.Column.prototype.applyLabelsStyle = function(opt_needsToDropOldBounds) {
   var labelsAreOverridden = this.hasLabelsOverrider();
-  for (var i = 0; i < this.texts_.length; i++) {
-    var text = this.texts_[i];
-    var item = this.allItems_[i];
-
-    var overriddenSettings;
-    if (labelsAreOverridden) {
-      overriddenSettings = this.overriddenLabels_[i];
-      if (!overriddenSettings) {
-        //TODO (A.Kudryavtsev): Can we use one new overriddenSettings instead of multiple?
-        overriddenSettings = new anychart.core.ui.LabelsSettings();
-        overriddenSettings.dropThemes(true);
-        overriddenSettings.parent(/** @type {anychart.core.ui.LabelsSettings} */ (this.labels()));
-        this.overriddenLabels_[i] = overriddenSettings;
-      }
-      this.labelsOverrider_(overriddenSettings, item);
+  var i;
+  if (anychart.isAsync()) {
+    var partialData = this.dataGrid_.partialLabels;
+    for (i = partialData.first; i <= partialData.last; i++) {
+      this.applyLabelStyle_(i, labelsAreOverridden, opt_needsToDropOldBounds);
     }
-    if (opt_needsToDropOldBounds) {
-      text.resetComplexity();
-      text.dropBounds();
+  } else {
+    for (i = 0; i < this.texts_.length; i++) {
+      this.applyLabelStyle_(i, labelsAreOverridden, opt_needsToDropOldBounds);
     }
-    this.setupText_(text, item, labelsAreOverridden);
   }
+
+};
+
+
+/**
+ * Single label setup.
+ * @param {number} index - Index.
+ * @param {boolean} labelsAreOverridden - Whether labels are overridden.
+ * @param {boolean=} opt_needsToDropOldBounds - .
+ * @private
+ */
+anychart.ganttModule.Column.prototype.applyLabelStyle_ = function(index, labelsAreOverridden, opt_needsToDropOldBounds) {
+  var text = this.texts_[index];
+  var item = this.allItems_[index];
+
+  var overriddenSettings;
+  if (labelsAreOverridden) {
+    overriddenSettings = this.overriddenLabels_[index];
+    if (!overriddenSettings) {
+      //TODO (A.Kudryavtsev): Can we use one new overriddenSettings instead of multiple?
+      overriddenSettings = new anychart.core.ui.LabelsSettings();
+      overriddenSettings.dropThemes(true);
+      overriddenSettings.parent(/** @type {anychart.core.ui.LabelsSettings} */ (this.labels()));
+      this.overriddenLabels_[index] = overriddenSettings;
+    }
+    this.labelsOverrider_(overriddenSettings, item);
+  }
+  if (opt_needsToDropOldBounds) {
+    text.resetComplexity();
+    text.dropBounds();
+  }
+  this.setupText_(text, item, labelsAreOverridden);
 };
 
 
@@ -531,18 +591,6 @@ anychart.ganttModule.Column.prototype.cellTextSettings = function(opt_value) {
 
 
 /**
- * Label invalidation handler.
- * @param {anychart.SignalEvent} event - Signal event.
- * @private
- */
-anychart.ganttModule.Column.prototype.labelsInvalidated_ = function(event) {
-  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION, anychart.Signal.NEEDS_REDRAW);
-  }
-};
-
-
-/**
  * Label settings invalidation handler.
  * @param {anychart.SignalEvent} event - Signal event.
  * @private
@@ -552,6 +600,8 @@ anychart.ganttModule.Column.prototype.labelsSettingsInvalidated_ = function(even
   var signal = anychart.Signal.NEEDS_REDRAW;
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
     state |= anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_APPEARANCE;
+    if (anychart.isAsync())
+      signal |= anychart.Signal.NEEDS_REDRAW_LABELS;
   }
   if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
     state |= anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_BOUNDS;
@@ -565,6 +615,19 @@ anychart.ganttModule.Column.prototype.labelsSettingsInvalidated_ = function(even
     state |= anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION;
     if (this.labelsSettings_['enabled']()) {
       signal |= anychart.Signal.NEEDS_REDRAW_LABELS;
+    }
+  }
+
+  if (anychart.isAsync()) {
+    /*
+      Async feature needs to reset current consistency for
+      correct labels appearance. Kind of hacky hack.
+     */
+    if (signal & anychart.Signal.NEEDS_REDRAW_LABELS) { // If signal has anychart.Signal.NEEDS_REDRAW_LABELS.
+      this.dataGrid_.partialLabels.reset = true;
+      this.dataGrid_.controller.resetTimeouts();
+      this.dataGrid_.interactivityHandler.dispatchEvent(anychart.enums.EventType.WORKING_CANCEL);
+      this.markConsistent(state); //Reinvalidate. Kind of elegant hack.
     }
   }
 
@@ -609,24 +672,6 @@ anychart.ganttModule.Column.prototype.cellTextSettingsOverrider = function(opt_v
 
 
 /**
- * Gets/sets a flag if column must use expand/collapse buttons.
- * Do not export.
- * @param {boolean=} opt_value - Value to be set.
- * @return {(anychart.ganttModule.Column|boolean)} - Current value or itself for method chaining.
- */
-anychart.ganttModule.Column.prototype.collapseExpandButtons = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.collapseExpandButtons_ != opt_value) {
-      this.collapseExpandButtons_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.collapseExpandButtons_;
-};
-
-
-/**
  * Gets/sets column title.
  * @param {(null|boolean|Object|string)=} opt_value - Value to be set.
  * @return {!(anychart.core.ui.Title|anychart.ganttModule.Column)} - Current value or itself for method chaining.
@@ -634,6 +679,7 @@ anychart.ganttModule.Column.prototype.collapseExpandButtons = function(opt_value
 anychart.ganttModule.Column.prototype.title = function(opt_value) {
   if (!this.title_) {
     this.title_ = new anychart.core.ui.Title();
+    this.setupCreated('title', this.title_);
 
     this.title_.suspendSignalsDispatching();
     this.title_
@@ -731,42 +777,10 @@ anychart.ganttModule.Column.prototype.position = function(opt_value) {
 
 
 /**
- * Column width.
- * @param {(number|string)=} opt_value Width value.
- * @return {(number|string|anychart.ganttModule.Column)} - Width or itself for method chaining.
- */
-anychart.ganttModule.Column.prototype.width = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.width_ != opt_value) {
-      this.width_ = opt_value;
-      this.pixelBoundsCache_ = null;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.width_;
-};
-
-
-/**
  * Resets pixel bounds cache.
  */
 anychart.ganttModule.Column.prototype.resetBounds = function() {
   this.pixelBoundsCache_ = null;
-};
-
-
-/**
- * Column default width.
- * @param {number=} opt_value - Default width value.
- * @return {(number|anychart.ganttModule.Column)} - Width or itself for method chaining.
- */
-anychart.ganttModule.Column.prototype.defaultWidth = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.defaultWidth_ = opt_value; //We don't invalidate anything right here.
-    return this;
-  }
-  return this.defaultWidth_;
 };
 
 
@@ -849,7 +863,8 @@ anychart.ganttModule.Column.prototype.calculateBounds = function() {
     return this.pixelBoundsCache_;
 
   var parentBounds = this.dataGrid_.getPixelBounds();
-  var width = anychart.utils.normalizeSize(this.width_ || 0, parentBounds.width);
+
+  var width = anychart.utils.normalizeSize(/** @type {number|string} */ (this.getOption('width')) || 0, parentBounds.width);
   width = Math.max(anychart.ganttModule.DataGrid.MIN_COLUMN_WIDTH, width);
   var height = anychart.utils.normalizeSize(this.height_ || 0, parentBounds.height);
   var position = anychart.math.normalizeCoordinate(this.position_);
@@ -934,35 +949,42 @@ anychart.ganttModule.Column.prototype.draw = function() {
       this.markConsistent(anychart.ConsistencyState.BOUNDS);
     }
 
-    if (this.hasInvalidationState(anychart.ConsistencyState.DATA_GRID_COLUMN_DATA)) {
+    if (!anychart.isAsync()) {
       /*
-      No actions here, this state is just used be data grid to make column dispatch COLLECT signal on dg.prepareLabels() call.
+        ASYNC feature doesn't need to clear these states on column draw:
+        column remains inconsistent until all async working is complete
+        because dataGrid considers these states in partial labels processing.
        */
-      this.markConsistent(anychart.ConsistencyState.DATA_GRID_COLUMN_DATA);
+      if (this.hasInvalidationState(anychart.ConsistencyState.DATA_GRID_COLUMN_DATA)) {
+        /*
+        No actions here, this state is just used be data grid to make column dispatch COLLECT signal on dg.prepareLabels() call.
+         */
+        this.markConsistent(anychart.ConsistencyState.DATA_GRID_COLUMN_DATA);
 
-      //This will actually place the labels.
-      this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION);
-    }
+        //This will actually place the labels.
+        this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION);
+      }
 
-    if (this.hasInvalidationState(anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_APPEARANCE)) {
-      /*
-      No actions here, this state is just used be data grid to make column reapply labels style.
-       */
-      this.markConsistent(anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_APPEARANCE);
+      if (this.hasInvalidationState(anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_APPEARANCE)) {
+        /*
+        No actions here, this state is just used be data grid to make column reapply labels style.
+         */
+        this.markConsistent(anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_APPEARANCE);
 
-      //This will actually place the labels.
-      this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION);
-    }
+        //This will actually place the labels.
+        this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION);
+      }
 
-    if (this.hasInvalidationState(anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_BOUNDS)) {
-      /*
-      No actions here, this state is just used be data grid to make column reapply labels style
-      and make measuriator remeasure labels.
-       */
-      this.markConsistent(anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_BOUNDS);
+      if (this.hasInvalidationState(anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_BOUNDS)) {
+        /*
+        No actions here, this state is just used be data grid to make column reapply labels style
+        and make measuriator remeasure labels.
+         */
+        this.markConsistent(anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_BOUNDS);
 
-      //This will actually place the labels.
-      this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION);
+        //This will actually place the labels.
+        this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION);
+      }
     }
 
     var data, startIndex, endIndex, item, i, counter, button;
@@ -975,7 +997,7 @@ anychart.ganttModule.Column.prototype.draw = function() {
         item = data[i];
         if (!item) break;
 
-        if (this.collapseExpandButtons_ && item.numChildren()) {
+        if (this.getOption('collapseExpandButtons') && item.numChildren()) {
           counter++;
           button = this.buttons_[counter];
           if (button)
@@ -1002,7 +1024,7 @@ anychart.ganttModule.Column.prototype.draw = function() {
       var titleParentBounds = new anychart.math.Rect(this.pixelBoundsCache_.left, this.pixelBoundsCache_.top,
           this.pixelBoundsCache_.width, headerHeight);
 
-      this.title_.suspendSignalsDispatching();
+      this.title().suspendSignalsDispatching();
       this.title_.parentBounds(titleParentBounds);
       this.title_.height(headerHeight);
       this.title_.resumeSignalsDispatching(false);
@@ -1050,6 +1072,7 @@ anychart.ganttModule.Column.prototype.draw = function() {
           }
         }
       }
+
       this.previousStartIndex_ = data[startIndex] ? /** @type {number} */ (data[startIndex].meta('index')) : NaN;
       this.previousEndIndex_ = data[endIndex] ? /** @type {number} */ (data[endIndex].meta('index')) : NaN;
 
@@ -1059,11 +1082,11 @@ anychart.ganttModule.Column.prototype.draw = function() {
 
         var height = this.dataGrid_.controller.getItemHeight(item);
         var depth = item.meta('depth') || 0;
-        var depthLeft = this.depthPaddingMultiplier_ * /** @type {number} */ (depth);
+        var depthLeft = /** @type {number} */ (this.getOption('depthPaddingMultiplier')) * /** @type {number} */ (depth);
         var padding = paddingLeft + depthLeft;
         var addButton = 0;
 
-        if (this.collapseExpandButtons_ && item.numChildren()) {
+        if (this.getOption('collapseExpandButtons') && item.numChildren()) {
           counter++;
           button = this.buttons_[counter];
           if (!button) {
@@ -1115,32 +1138,43 @@ anychart.ganttModule.Column.prototype.draw = function() {
         var ind = /** @type {number} */ (item.meta('index'));
         var t = this.texts_[ind];
 
-        if (this.labels()['enabled']()) {
-          var r = new anychart.math.Rect(this.pixelBoundsCache_.left, totalTop, this.pixelBoundsCache_.width, height);
-          var cellBounds = labelsPadding.tightenBounds(r);
-          cellBounds.left += (addButton + depthLeft);
-          cellBounds.width -= (addButton + depthLeft);
+        if (t) {
+          if (this.labels()['enabled']()) {
+            var r = new anychart.math.Rect(this.pixelBoundsCache_.left, totalTop, this.pixelBoundsCache_.width, height);
+            var cellBounds = labelsPadding.tightenBounds(r);
+            cellBounds.left += (addButton + depthLeft);
+            cellBounds.width -= (addButton + depthLeft);
 
-          t.renderTo(this.labelsLayerEl_);
-          t.putAt(cellBounds, stage);
+            t.renderTo(this.labelsLayerEl_);
+            t.putAt(cellBounds, stage);
 
-          t.finalizeComplexity();
-          this.labelsTexts_.push(/** @type {string} */ (t.text()));
-        } else {
-          t.renderTo(null);
+            t.finalizeComplexity();
+            this.labelsTexts_[ind] = (/** @type {string} */ (t.text()));
+          } else {
+            t.renderTo(null);
+          }
         }
 
         totalTop = (newTop + this.dataGrid_.rowStrokeThickness);
       }
 
-      while (++counter < this.buttons_.length && this.collapseExpandButtons_) { //This disables all remaining buttons.
+      while (++counter < this.buttons_.length && this.getOption('collapseExpandButtons')) { //This disables all remaining buttons.
         if (!this.buttons_[counter].enabled()) break;
         this.buttons_[counter].enabled(false).draw();
       }
 
-      this.markConsistent(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION |
-          anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_APPEARANCE |
-          anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_BOUNDS);
+      if (anychart.isAsync()) {
+        /*
+          See description on cleared and not cleared states for async/not async
+          drawing above.
+         */
+        this.markConsistent(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION);
+      } else {
+        this.markConsistent(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION |
+            anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_APPEARANCE |
+            anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_BOUNDS);
+      }
+
     }
 
     if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
@@ -1181,16 +1215,7 @@ anychart.ganttModule.Column.prototype.getLabelTexts = function() {
 anychart.ganttModule.Column.prototype.setupByJSON = function(json, opt_default) {
   anychart.ganttModule.Column.base(this, 'setupByJSON', json, opt_default);
 
-  this.width(json['width']);
-  this.defaultWidth(json['defaultWidth']);
-  this.collapseExpandButtons(json['collapseExpandButtons']);
-  this.depthPaddingMultiplier(json['depthPaddingMultiplier']);
-
-  //TODO (A.Kudryavtsev): Issue for themes flatting.
-  // var labels = this.labels();
-  // labels.suspendSignalsDispatching();
-  // labels.setupInternal(!!opt_default, json['labels'] || json['cellTextSettings']);
-  // labels.resumeSignalsDispatching(false)
+  anychart.core.settings.deserialize(this, anychart.ganttModule.Column.DESCRIPTORS, json, opt_default);
 
   if (goog.isDef(json['format']))
     this.format(json['format']);
@@ -1202,7 +1227,28 @@ anychart.ganttModule.Column.prototype.setupByJSON = function(json, opt_default) 
 
 
 /** @inheritDoc */
+anychart.ganttModule.Column.prototype.serialize = function() {
+  var json = anychart.ganttModule.Column.base(this, 'serialize');
+  anychart.core.settings.serialize(this, anychart.ganttModule.Column.DESCRIPTORS, json, void 0, void 0, true);
+
+  json['labels'] = this.labels().serialize();
+  json['title'] = this.title().serialize();
+
+  if (this.hasLabelsOverrider()) {
+    anychart.core.reporting.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Data Grid Column cellTextSettingsOverrider']
+    );
+  }
+
+  return json;
+};
+
+
+/** @inheritDoc */
 anychart.ganttModule.Column.prototype.disposeInternal = function() {
+  this.resetTexts();
   goog.disposeAll(
       this.labelsSettings_,
       this.overriddenLabels_,
@@ -1224,29 +1270,6 @@ anychart.ganttModule.Column.prototype.disposeInternal = function() {
 };
 
 
-/** @inheritDoc */
-anychart.ganttModule.Column.prototype.serialize = function() {
-  var json = anychart.ganttModule.Column.base(this, 'serialize');
-
-  json['width'] = this.width_;
-  if (goog.isDef(this.defaultWidth_)) json['defaultWidth'] = this.defaultWidth_;
-  json['collapseExpandButtons'] = this.collapseExpandButtons_;
-  json['depthPaddingMultiplier'] = this.depthPaddingMultiplier_;
-  json['labels'] = this.labels().serialize();
-  json['title'] = this.title_.serialize();
-
-  if (this.hasLabelsOverrider()) {
-    anychart.core.reporting.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Data Grid Column cellTextSettingsOverrider']
-    );
-  }
-
-  return json;
-};
-
-
 //exports
 /**
  * @suppress {deprecated}
@@ -1254,16 +1277,12 @@ anychart.ganttModule.Column.prototype.serialize = function() {
 (function() {
   var proto = anychart.ganttModule.Column.prototype;
   proto['title'] = proto.title;
-  proto['width'] = proto.width;
-  proto['defaultWidth'] = proto.defaultWidth;
   proto['enabled'] = proto.enabled;
   proto['format'] = proto.format;
   proto['labels'] = proto.labels;
   proto['cellTextSettings'] = proto.cellTextSettings;
   proto['labelsOverrider'] = proto.labelsOverrider;
   proto['cellTextSettingsOverrider'] = proto.cellTextSettingsOverrider;
-  proto['collapseExpandButtons'] = proto.collapseExpandButtons;
-  proto['depthPaddingMultiplier'] = proto.depthPaddingMultiplier;
   proto['setColumnFormat'] = proto.setColumnFormat;
   proto['buttonCursor'] = proto.buttonCursor;
   proto['draw'] = proto.draw;

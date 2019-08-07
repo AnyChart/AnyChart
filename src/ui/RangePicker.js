@@ -131,8 +131,8 @@ anychart.ui.RangePicker.prototype.target = function(chart) {
  * @private
  */
 anychart.ui.RangePicker.prototype.changeSelectedRange_ = function(range) {
-  this.fromValue_ = range['firstSelected'];
-  this.toValue_ = range['lastSelected'];
+  this.fromValue_ = range['firstVisible'];
+  this.toValue_ = range['lastVisible'];
   this.update_();
 };
 

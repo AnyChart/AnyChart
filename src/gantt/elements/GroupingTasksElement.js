@@ -17,6 +17,8 @@ goog.require('anychart.ganttModule.elements.TimelineElement');
 anychart.ganttModule.elements.GroupingTasksElement = function(timeline) {
   anychart.ganttModule.elements.GroupingTasksElement.base(this, 'constructor', timeline);
 
+  this.addThemes('defaultTimeline.groupingTasks');
+
   /**
    *
    * @type {anychart.ganttModule.elements.ProgressElement}
@@ -63,6 +65,7 @@ anychart.ganttModule.elements.GroupingTasksElement.prototype.getPointSettingsRes
 anychart.ganttModule.elements.GroupingTasksElement.prototype.progress = function(opt_value) {
   if (!this.progress_) {
     this.progress_ = new anychart.ganttModule.elements.ProgressElement(this.getTimeline());
+    this.setupCreated('progress', this.progress_);
     var parent = /** @type {anychart.ganttModule.elements.TasksElement} */ (this.parent());
     var parentProgress = /** @type {anychart.ganttModule.elements.ProgressElement} */ (parent.progress());
     this.progress_.parent(parentProgress);

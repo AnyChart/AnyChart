@@ -28,7 +28,7 @@ goog.require('anychart.treeDataModule.utils');
 anychart.ganttModule.Chart = function(opt_isResourcesChart) {
   anychart.ganttModule.Chart.base(this, 'constructor');
 
-  this.addThemes('ganttBase');
+  this.addThemes('ganttBase', opt_isResourcesChart ? 'ganttResource' : 'ganttProject');
 
   /**
    * Flag if chart must be created as resource chart.
@@ -121,6 +121,7 @@ anychart.ganttModule.Chart = function(opt_isResourcesChart) {
     this.getTimeline()['rowHoverFill'](/** @type {acgraph.vector.Fill} */ (this.getOption('rowHoverFill')));
     this.getDataGrid_()['rowHoverFill'](/** @type {acgraph.vector.Fill} */ (this.getOption('rowHoverFill')));
   }
+
   /**
    * @this {anychart.ganttModule.Chart}
    */
@@ -130,6 +131,7 @@ anychart.ganttModule.Chart = function(opt_isResourcesChart) {
     this.dg_['rowSelectedFill'](/** @type {acgraph.vector.Fill} */ (this.getOption('rowSelectedFill')));
     anychart.core.Base.resumeSignalsDispatchingTrue(this.dg_, this.tl_);
   }
+
   /**
    * @this {anychart.ganttModule.Chart}
    */
@@ -139,17 +141,19 @@ anychart.ganttModule.Chart = function(opt_isResourcesChart) {
     this.tl_['columnStroke'](/** @type {acgraph.vector.Stroke} */ (this.getOption('columnStroke')));
     anychart.core.Base.resumeSignalsDispatchingTrue(this.dg_, this.tl_);
   }
+
   /**
    * @this {anychart.ganttModule.Chart}
    */
   function rowStrokeBeforeInvalidation() {
     anychart.core.Base.suspendSignalsDispatching(this.getTimeline(), this.getDataGrid_(), this.controller_);
     var val = /** @type {acgraph.vector.Stroke} */ (this.getOption('rowStroke'));
-    this.dg_.rowStroke(val);
-    this.tl_.rowStroke(val);
+    this.dg_['rowStroke'](val);
+    this.tl_['rowStroke'](val);
     this.controller_.rowStrokeThickness(anychart.utils.extractThickness(val));
     anychart.core.Base.resumeSignalsDispatchingTrue(this.dg_, this.tl_, this.controller_);
   }
+
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['headerHeight', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW],
     ['splitterPosition', anychart.ConsistencyState.GANTT_SPLITTER_POSITION, anychart.Signal.NEEDS_REDRAW],
@@ -402,8 +406,8 @@ anychart.core.settings.populate(anychart.ganttModule.Chart, anychart.ganttModule
 anychart.ganttModule.Chart.prototype.getDataGrid_ = function() {
   if (!this.dg_) {
     this.dg_ = new anychart.ganttModule.DataGrid(this.controller_);
-    this.dg_.setOption('backgroundFill', null);
-    this.dg_.zIndex(anychart.ganttModule.Chart.Z_INDEX_DG_TL);
+    this.setupCreated('dataGrid', this.dg_);
+    this.dg_.zIndex(anychart.getFlatTheme('defaultDataGrid')['zIndex']);
     this.dg_.setInteractivityHandler(this);
     var ths = this;
     this.dg_.listenSignals(function() {
@@ -444,8 +448,8 @@ anychart.ganttModule.Chart.prototype.dataGrid = function(opt_enabled) {
 anychart.ganttModule.Chart.prototype.getTimeline = function() {
   if (!this.tl_) {
     this.tl_ = new anychart.ganttModule.TimeLine(this.controller_, this.isResourcesChart_);
-    this.tl_.setOption('backgroundFill', null);
-    this.tl_.zIndex(anychart.ganttModule.Chart.Z_INDEX_DG_TL);
+    this.setupCreated('timeline', this.tl_);
+    this.tl_.zIndex(anychart.getFlatTheme('defaulTimeline')['zIndex']);
     this.tl_.setInteractivityHandler(this);
     var ths = this;
     this.tl_.listenSignals(function() {
@@ -794,14 +798,23 @@ anychart.ganttModule.Chart.prototype.rowMouseMove = function(event) {
     this.highlight(event['hoveredIndex'], event['startY'], event['endY']);
 
     var tooltip;
+    var item = event['item'];
+    tooltip = /** @type {anychart.core.ui.Tooltip} */(target.getTooltipInternal(void 0, item));
+
     if (anychart.utils.instanceOf(target, anychart.ganttModule.DataGrid)) {
-      tooltip = /** @type {anychart.core.ui.Tooltip} */(this.dg_.tooltip());
+      var tlTooltip = this.tl_.getTooltipOfElementByItem(item);
+      tooltip.setMiddleFormats(
+          /** @type {Function|null|string|undefined} */ (tlTooltip.getOption('format')),
+          /** @type {Function|null|string|undefined} */ (tlTooltip.getOption('titleFormat')));
     } else {
-      tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tl_.tooltip());
+      target.tooltip().hideChildTooltips(); //This fixes appearance of tooltip on fast row mouse change.
     }
 
     if (tooltip.enabled()) {
-      var formatProvider = target.createFormatProvider(event['item'], event['period'], event['periodIndex'], event['elementType'], event['hoverRatio'], event['hoverDateTime']);
+      var formatProvider = target.createFormatProvider(item, event['period'], event['periodIndex'], event['elementType'], event['hoverRatio'], event['hoverDateTime']);
+      if (tooltip.parent()) {
+        tooltip.parent().hideChildTooltips();
+      }
       tooltip.showFloat(event['originalEvent']['clientX'], event['originalEvent']['clientY'], formatProvider);
     }
   }
@@ -822,8 +835,8 @@ anychart.ganttModule.Chart.prototype.rowMouseOver = function(event) {
  */
 anychart.ganttModule.Chart.prototype.rowMouseOut = function(event) {
   this.highlight();
-  this.dg_.tooltip().hide();
-  this.tl_.tooltip().hide();
+  this.dg_.getTooltipInternal().hide();
+  this.tl_.getTooltipInternal(void 0, event['item']).hide();
 };
 
 
@@ -875,7 +888,7 @@ anychart.ganttModule.Chart.prototype.rowSelect = function(event) {
 anychart.ganttModule.Chart.prototype.rowExpandCollapse = function(event) {
   if (event && !this.tl_.checkConnectorDblClick(event)) {
     var item = event['item'];
-    if (item && item.numChildren()) {
+    if (item && anychart.ganttModule.BaseGrid.isGroupingTask(item)) {
       var value = !item.meta(anychart.enums.GanttDataFields.COLLAPSED);
       var evtObj = {
         'type': anychart.enums.EventType.ROW_COLLAPSE_EXPAND,
@@ -941,6 +954,7 @@ anychart.ganttModule.Chart.prototype.rowMouseUp = function(event) {
 anychart.ganttModule.Chart.prototype.edit = function(opt_value) {
   if (!this.edit_) {
     this.edit_ = new anychart.ganttModule.edit.StructureEdit();
+    this.setupCreated('edit', this.edit_);
     // this.edit_.listenSignals(this.onEditSignal_, this);
   }
 
@@ -1075,6 +1089,24 @@ anychart.ganttModule.Chart.prototype.drawContent = function(bounds) {
   }
 
   anychart.core.Base.resumeSignalsDispatchingTrue(this.dg_, this.tl_, this.splitter_, this.controller_);
+
+  if (anychart.isAsync()) {
+    /*
+      Without ASYNC flag, chart and all its components are consistent after
+      draw() because all drawing and another JS activities are synchronous.
+
+      With ASYNC flag chart's controller, dataGrid and timeline are not
+      consistent and are ready to preform asynchronous operations.
+
+      It means that data grid will not take any settings by its API right after
+      chart.draw() is called. To make data grid work, it gets needsForceSignalsDispatching
+      flag set as true.
+
+      Probably, timeline needs the same flag, this moment needs to be researched.
+     */
+    this.dg_.needsForceSignalsDispatching(true);
+  }
+
   this.controller_.run(); //This must redraw DG and TL.
   if (bounds.width > 0) {
     this.splitter().draw();
@@ -1085,6 +1117,8 @@ anychart.ganttModule.Chart.prototype.drawContent = function(bounds) {
     this.markConsistent(anychart.ConsistencyState.GANTT_POSITION);
   }
 
+  if (anychart.isAsync()) // ASYNC feature, not needed in regular gantt flow.
+    this.dispatchEvent(anychart.enums.EventType.WORKING_START);
 };
 
 
@@ -1175,7 +1209,7 @@ anychart.ganttModule.Chart.prototype.paletteInvalidated_ = function(event) {
 anychart.ganttModule.Chart.prototype.serialize = function() {
   var json = anychart.ganttModule.Chart.base(this, 'serialize');
 
-  anychart.core.settings.serialize(this, anychart.ganttModule.Chart.PROPERTY_DESCRIPTORS, json);
+  anychart.core.settings.serialize(this, anychart.ganttModule.Chart.PROPERTY_DESCRIPTORS, json, void 0, void 0, true);
   json['defaultRowHeight'] = this.defaultRowHeight();
 
   json['controller'] = this.controller_.serialize();
@@ -1200,7 +1234,7 @@ anychart.ganttModule.Chart.prototype.setupByJSON = function(config, opt_default)
 
   this.palette(config['palette']);
 
-  anychart.core.settings.deserialize(this, anychart.ganttModule.Chart.PROPERTY_DESCRIPTORS, config);
+  anychart.core.settings.deserialize(this, anychart.ganttModule.Chart.PROPERTY_DESCRIPTORS, config, opt_default);
   this.defaultRowHeight(config['defaultRowHeight']);
   // this.editing(config['editing']);
   if ('edit' in config)

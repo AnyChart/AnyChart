@@ -60,6 +60,29 @@ anychart.global = function(opt_value) {
 
 
 /**
+ * Experimental flag, not for public usage.
+ * Initially implemented for DVF-4279 for gantt big data processing purposes.
+ * DEV NOTE: do not describe for a while.
+ * @type {boolean}
+ * @private
+ */
+anychart.isAsync_ = false;
+
+
+/**
+ * Experimental setter of async mode.
+ * @param {boolean=} opt_value - Value to set.
+ * @return {boolean}
+ */
+anychart.isAsync = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    anychart.isAsync_ = opt_value;
+  }
+  return anychart.isAsync_;
+};
+
+
+/**
  * If the credits is allowed to be disabled for the stage regardless of the product key.
  * @type {boolean}
  */
@@ -879,6 +902,7 @@ goog.exportSymbol('anychart.theme', anychart.theme);
 goog.exportSymbol('anychart.appendTheme', anychart.appendTheme);
 goog.exportSymbol('anychart.global', anychart.global);
 goog.exportSymbol('anychart.getChartById', anychart.getChartById);
+goog.exportSymbol('anychart.isAsync', anychart.isAsync);
 goog.exportSymbol('anychart.area', anychart.getFeatureOrError('anychart.area', 'Area chart'));
 goog.exportSymbol('anychart.area3d', anychart.getFeatureOrError('anychart.area3d', '3D Area chart'));
 goog.exportSymbol('anychart.bar', anychart.getFeatureOrError('anychart.bar', 'Bar chart'));

@@ -556,7 +556,7 @@ anychart.core.VisualBase.prototype.dependsOnContainerSize = function() {
   return true;
 };
 
-    
+
 //region --- Saving
 /**
  * Saves the current visual state into PNG file.

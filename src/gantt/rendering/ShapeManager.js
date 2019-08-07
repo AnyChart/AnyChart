@@ -232,12 +232,32 @@ anychart.ganttModule.rendering.ShapeManager.prototype.clearShapes = function() {
  * @param {number=} opt_baseZIndex - zIndex that is used as a base zIndex for all shapes of the group.
  * @param {acgraph.vector.Shape=} opt_shape Foreign shape.
  * @param {number=} opt_periodIndex - .
+ * @param {number=} opt_initializerUid - UID of item that has initialized the milestone preview drawing.
  * @return {Object.<string, acgraph.vector.Shape>}
  */
-anychart.ganttModule.rendering.ShapeManager.prototype.getShapesGroup = function(item, tag, state, opt_only, opt_baseZIndex, opt_shape, opt_periodIndex) {
+anychart.ganttModule.rendering.ShapeManager.prototype.getShapesGroup = function(item, tag, state, opt_only, opt_baseZIndex, opt_shape, opt_periodIndex, opt_initializerUid) {
   var res = {};
   var names = opt_only || this.defs;
   var uid = goog.getUid(item) + (goog.isDef(opt_periodIndex) ? ('_' + String(opt_periodIndex)) : '');
+
+  /*
+    Magic in this "if" allows to identify milestone preview by its initializer (grouping
+    task that milestone preview belongs to).
+    It allows to draw preview labels for each parent task, not only to closest by keeping
+    the uid unique (see anychart.ganttModule.TimeLine.prototype.drawLabels_ that uses tagsData
+    to draw labels).
+   */
+  if (tag.type == anychart.enums.TLElementTypes.MILESTONES_PREVIEW) {
+    var iterItem = item;
+    while (iterItem.getParent()) {
+      var parent = iterItem.getParent();
+      uid += ('_' + goog.getUid(parent));
+      iterItem = parent;
+    }
+
+    if (goog.isDef(opt_initializerUid))
+      uid += ('_' + opt_initializerUid);
+  }
   this.tagsData_[uid] = tag;
 
   for (var name in names) {

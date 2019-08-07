@@ -194,6 +194,8 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme']['chart'], {
           'size': 3
         }
       }
-    }
+    },
+    'horizontalRange': {},
+    'verticalRange': {}
   }
 });

@@ -5,11 +5,15 @@ goog.require('anychart.base');
 goog.require('anychart.core.Chart');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.exportsModule.Exports');
+goog.require('anychart.exportsModule.offline');
 goog.require('anychart.utils');
 goog.require('goog.dom');
 
 
-
+/**
+ *
+ * @type {anychart.exportsModule.Exports}
+ */
 anychart.exports = new anychart.exportsModule.Exports();
 anychart.exports.applyDefaults();
 
@@ -95,7 +99,20 @@ anychart.exports.saveAsPng = function(target, container, opt_widthOrOptions, opt
       'filename': anychart.exports.getFinalSettings(target, 'filename')
     });
 
-    stage.saveAsPng(args['width'], args['height'], args['quality'], args['filename']);
+    var failCallback = function(args) {
+      if (anychart.exports.isClientsideFallback()) {
+        anychart.core.reporting.info('Offline export failed, falling back to server.');
+        stage.saveAsSvg(args['paperSize'] || args['width'], args['landscape'] || args['height'], args['filename']);
+      } else {
+        anychart.core.reporting.info('Offline export failed, fallback to server disabled.');
+      }
+    };
+
+    if (anychart.exports.isClientsideEnabled()) {
+      anychart.exportsModule.offline.exportChartOffline(target, acgraph.vector.Stage.ExportType.PNG, args, goog.nullFunction, failCallback);
+    } else {
+      stage.saveAsPng(args['width'], args['height'], args['quality'], args['filename']);
+    }
   }
 };
 
@@ -139,7 +156,20 @@ anychart.exports.saveAsJpg = function(target, container, opt_widthOrOptions, opt
           'filename': anychart.exports.getFinalSettings(target, 'filename')
         });
 
-    stage.saveAsJpg(args['width'], args['height'], args['quality'], args['forceTransparentWhite'], args['filename']);
+    var failCallback = function(args) {
+      if (anychart.exports.isClientsideFallback()) {
+        anychart.core.reporting.info('Offline export failed, falling back to server.');
+        stage.saveAsJpg(args['paperSize'] || args['width'], args['landscape'] || args['height'], args['filename']);
+      } else {
+        anychart.core.reporting.info('Offline export failed, fallback to server disabled.');
+      }
+    };
+
+    if (anychart.exports.isClientsideEnabled()) {
+      anychart.exportsModule.offline.exportChartOffline(target, acgraph.vector.Stage.ExportType.JPG, args, goog.nullFunction, failCallback);
+    } else {
+      stage.saveAsJpg(args['width'], args['height'], args['quality'], args['forceTransparentWhite'], args['filename']);
+    }
   }
 };
 
@@ -185,7 +215,20 @@ anychart.exports.saveAsPdf = function(target, container, opt_paperSizeOrWidthOrO
           'filename': anychart.exports.getFinalSettings(target, 'filename')
         });
 
-    stage.saveAsPdf(args['paperSize'] || args['width'], args['landscape'] || args['height'], args['x'], args['y'], args['filename']);
+    var failCallback = function(args) {
+      if (anychart.exports.isClientsideFallback()) {
+        anychart.core.reporting.info('Offline export failed, falling back to server.');
+        stage.saveAsPdf(args['paperSize'] || args['width'], args['landscape'] || args['height'], args['x'], args['y'], args['filename']);
+      } else {
+        anychart.core.reporting.info('Offline export failed, fallback to server disabled.');
+      }
+    };
+
+    if (anychart.exports.isClientsideEnabled()) {
+      anychart.exportsModule.offline.exportChartOffline(target, acgraph.vector.Stage.ExportType.PDF, args, goog.nullFunction, failCallback);
+    } else {
+      stage.saveAsPdf(args['paperSize'] || args['width'], args['landscape'] || args['height'], args['x'], args['y'], args['filename']);
+    }
   }
 };
 
@@ -227,7 +270,20 @@ anychart.exports.saveAsSvg = function(target, container, opt_paperSizeOrWidthOrO
           'filename': anychart.exports.getFinalSettings(target, 'filename')
         });
 
-    stage.saveAsSvg(args['paperSize'] || args['width'], args['landscape'] || args['height'], args['filename']);
+    var failCallback = function(args) {
+      if (anychart.exports.isClientsideFallback()) {
+        anychart.core.reporting.info('Offline export failed, falling back to server.');
+        stage.saveAsSvg(args['paperSize'] || args['width'], args['landscape'] || args['height'], args['filename']);
+      } else {
+        anychart.core.reporting.info('Offline export failed, fallback to server disabled.');
+      }
+    };
+
+    if (anychart.exports.isClientsideEnabled()) {
+      anychart.exportsModule.offline.exportChartOffline(target, acgraph.vector.Stage.ExportType.SVG, args, goog.nullFunction, failCallback);
+    } else {
+      stage.saveAsSvg(args['paperSize'] || args['width'], args['landscape'] || args['height'], args['filename']);
+    }
   }
 };
 
@@ -857,6 +913,11 @@ anychart.exports.shareWithPinterest = function(target, container, opt_linkOrOpti
 
   anychart.exports.shareAsPng(target, container, onSuccess, undefined, false, exportOptions['width'], exportOptions['height']);
 };
+//endregion
+//region --- Client-side
+
+
+
 //endregion
 
 

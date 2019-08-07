@@ -77,7 +77,7 @@ anychart.annotationsModule.HorizontalLine.prototype.ensureCreated = function() {
   anychart.annotationsModule.HorizontalLine.base(this, 'ensureCreated');
 
   if (!this.paths_) {
-    // main, hatch, hover
+    // main, hover
     this.paths_ = [this.rootLayer.path(), this.rootLayer.path()];
     this.paths_[0].zIndex(anychart.annotationsModule.Base.SHAPES_ZINDEX);
     this.paths_[1].zIndex(anychart.annotationsModule.Base.HOVER_SHAPE_ZINDEX);

@@ -17,6 +17,8 @@ goog.require('anychart.ganttModule.elements.TimelineElement');
 anychart.ganttModule.elements.TasksElement = function(timeline) {
   anychart.ganttModule.elements.TasksElement.base(this, 'constructor', timeline);
 
+  this.addThemes('defaultTimeline.tasks');
+
   /**
    *
    * @type {anychart.ganttModule.elements.ProgressElement}
@@ -83,6 +85,8 @@ anychart.ganttModule.elements.TasksElement.prototype.getPointSettingsResolutionO
 anychart.ganttModule.elements.TasksElement.prototype.progress = function(opt_value) {
   if (!this.progress_) {
     this.progress_ = new anychart.ganttModule.elements.ProgressElement(this.getTimeline());
+    this.setupCreated('progress', this.progress_);
+    this.progress_.setupStateSettings();
     var par = /** @type {anychart.ganttModule.elements.TimelineElement} */ (this.getTimeline().elements());
     this.progress_.parent(par);
     this.progress_.edit().parent(this.edit());

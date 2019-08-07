@@ -15,6 +15,8 @@ goog.require('anychart.math.Rect');
 anychart.core.ui.NewButton = function() {
   anychart.core.ui.NewButton.base(this, 'constructor');
 
+  this.addThemes('defaultButtonSettings');
+
   /**
    * @type {anychart.SettingsState}
    * @private

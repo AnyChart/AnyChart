@@ -50,7 +50,12 @@ anychart.ui.toolbar.Toolbar.ControlContent;
  */
 anychart.ui.toolbar.Toolbar.prototype.container = function(opt_element) {
   if (goog.isDef(opt_element)) {
-    this.container_ = goog.dom.getElement(opt_element);
+    var newContainer = goog.dom.getElement(opt_element);
+    if (this.container_ != newContainer) {
+      this.exitDocument();
+      this.container_ = newContainer;
+      this.draw();
+    }
     return this;
   }
   return this.container_;
@@ -77,7 +82,11 @@ anychart.ui.toolbar.Toolbar.prototype.target = function(opt_value) {
  */
 anychart.ui.toolbar.Toolbar.prototype.draw = function() {
   if (this.container_) {
-    this.render(this.container_);
+    if (this.container_.firstChild) {
+      this.renderBefore(this.container_.firstChild);
+    } else {
+      this.render(this.container_);
+    }
   } else {
     anychart.core.reporting.warning(anychart.enums.WarningCode.TOOLBAR_CONTAINER);
   }

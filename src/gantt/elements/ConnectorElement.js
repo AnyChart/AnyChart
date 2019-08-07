@@ -122,6 +122,19 @@ anychart.ganttModule.elements.ConnectorElement.prototype.selected = function(opt
 };
 
 
+/**
+ * Sets state settings up.
+ */
+anychart.ganttModule.elements.ConnectorElement.prototype.setupStateSettings = function() {
+  this.normal_.addThemes(this.themeSettings);
+  this.setupCreated('normal', this.normal_);
+  this.normal_.setupInternal(true, {});
+
+  this.setupCreated('selected', this.selected_);
+  this.selected_.setupInternal(true, {});
+};
+
+
 //endregion
 //region -- Color resolution.
 /**

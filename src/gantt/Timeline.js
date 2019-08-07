@@ -45,6 +45,8 @@ goog.require('goog.fx.Dragger');
 anychart.ganttModule.TimeLine = function(opt_controller, opt_isResources) {
   anychart.ganttModule.TimeLine.base(this, 'constructor', opt_controller, opt_isResources);
 
+  this.addThemes('defaultTimeline');
+
   /**
    * Labels factory.
    * @type {anychart.core.ui.LabelsFactory}
@@ -354,7 +356,6 @@ anychart.ganttModule.TimeLine.prototype.SUPPORTED_SIGNALS = anychart.ganttModule
 anychart.ganttModule.TimeLine.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ganttModule.BaseGrid.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.TIMELINE_SCALES |
-    anychart.ConsistencyState.TIMELINE_ELEMENTS_APPEARANCE |
     anychart.ConsistencyState.TIMELINE_ELEMENTS_LABELS |
     anychart.ConsistencyState.TIMELINE_MARKERS;
 
@@ -538,6 +539,8 @@ anychart.core.settings.populate(anychart.ganttModule.TimeLine, anychart.ganttMod
 anychart.ganttModule.TimeLine.prototype.elements = function(opt_value) {
   if (!this.elements_) {
     this.elements_ = new anychart.ganttModule.elements.TimelineElement(this);
+    this.setupCreated('elements', this.elements_);
+    this.elements_.setupStateSettings();
     this.elements_.listenSignals(this.visualElementInvalidated_, this);
   }
 
@@ -557,6 +560,8 @@ anychart.ganttModule.TimeLine.prototype.elements = function(opt_value) {
 anychart.ganttModule.TimeLine.prototype.periods = function(opt_value) {
   if (!this.periods_) {
     this.periods_ = new anychart.ganttModule.elements.PeriodsElement(this);
+    this.setupCreated('periods', this.periods_);
+    this.periods_.setupStateSettings();
     this.periods_.parent(/** @type {anychart.ganttModule.elements.TimelineElement} */ (this.elements()));
     this.periods_.listenSignals(this.visualElementInvalidated_, this);
   }
@@ -577,6 +582,8 @@ anychart.ganttModule.TimeLine.prototype.periods = function(opt_value) {
 anychart.ganttModule.TimeLine.prototype.tasks = function(opt_value) {
   if (!this.tasks_) {
     this.tasks_ = new anychart.ganttModule.elements.TasksElement(this);
+    this.setupCreated('tasks', this.tasks_);
+    this.tasks_.setupStateSettings();
     this.tasks_.parent(/** @type {anychart.ganttModule.elements.TimelineElement} */ (this.elements()));
     this.tasks_.listenSignals(this.visualElementInvalidated_, this);
   }
@@ -597,8 +604,11 @@ anychart.ganttModule.TimeLine.prototype.tasks = function(opt_value) {
 anychart.ganttModule.TimeLine.prototype.milestones = function(opt_value) {
   if (!this.milestones_) {
     this.milestones_ = new anychart.ganttModule.elements.MilestonesElement(this);
+    this.setupCreated('milestones', this.milestones_);
+    this.milestones_.setupStateSettings();
     this.milestones_.parent(/** @type {anychart.ganttModule.elements.TimelineElement} */ (this.elements()));
     this.milestones_.listenSignals(this.visualElementInvalidated_, this);
+    this.milestones_.preview().listenSignals(this.visualElementInvalidated_, this);
   }
 
   if (goog.isDef(opt_value)) {
@@ -617,6 +627,8 @@ anychart.ganttModule.TimeLine.prototype.milestones = function(opt_value) {
 anychart.ganttModule.TimeLine.prototype.groupingTasks = function(opt_value) {
   if (!this.groupingTasks_) {
     this.groupingTasks_ = new anychart.ganttModule.elements.GroupingTasksElement(this);
+    this.setupCreated('groupingTasks', this.groupingTasks_);
+    this.groupingTasks_.setupStateSettings();
     this.groupingTasks_.parent(/** @type {anychart.ganttModule.elements.TimelineElement} */ (this.tasks()));
     this.groupingTasks_.listenSignals(this.visualElementInvalidated_, this);
   }
@@ -637,6 +649,8 @@ anychart.ganttModule.TimeLine.prototype.groupingTasks = function(opt_value) {
 anychart.ganttModule.TimeLine.prototype.baselines = function(opt_value) {
   if (!this.baselines_) {
     this.baselines_ = new anychart.ganttModule.elements.BaselinesElement(this);
+    this.setupCreated('baselines', this.baselines_);
+    this.baselines_.setupStateSettings();
     this.baselines_.parent(/** @type {anychart.ganttModule.elements.TimelineElement} */ (this.elements()));
     this.baselines_.listenSignals(this.visualElementInvalidated_, this);
   }
@@ -657,6 +671,8 @@ anychart.ganttModule.TimeLine.prototype.baselines = function(opt_value) {
 anychart.ganttModule.TimeLine.prototype.connectors = function(opt_value) {
   if (!this.connectors_) {
     this.connectors_ = new anychart.ganttModule.elements.ConnectorElement(this);
+    this.setupCreated('connectors', this.connectors_);
+    this.connectors_.setupStateSettings();
     this.connectors_.listenSignals(this.visualElementInvalidated_, this);
   }
 
@@ -1757,7 +1773,7 @@ anychart.ganttModule.TimeLine.prototype.lineMarker = function(opt_indexOrValue, 
   var lineMarker = this.lineMarkers_[index];
   if (!lineMarker) {
     lineMarker = new anychart.ganttModule.axisMarkers.Line(this.scale_);
-    lineMarker.setup(this.defaultLineMarkerSettings());
+    lineMarker.addThemes(this.themeSettings['defaultLineMarkerSettings']);
     lineMarker.setParentEventTarget(this);
     this.lineMarkers_[index] = lineMarker;
     lineMarker.listenSignals(this.onMarkersSignal_, this);
@@ -1793,7 +1809,7 @@ anychart.ganttModule.TimeLine.prototype.rangeMarker = function(opt_indexOrValue,
   var rangeMarker = this.rangeMarkers_[index];
   if (!rangeMarker) {
     rangeMarker = new anychart.ganttModule.axisMarkers.Range(this.scale_);
-    rangeMarker.setup(this.defaultRangeMarkerSettings());
+    rangeMarker.addThemes(this.themeSettings['defaultRangeMarkerSettings']);
     rangeMarker.setParentEventTarget(this);
     this.rangeMarkers_[index] = rangeMarker;
     rangeMarker.listenSignals(this.onMarkersSignal_, this);
@@ -1828,7 +1844,7 @@ anychart.ganttModule.TimeLine.prototype.textMarker = function(opt_indexOrValue, 
   var textMarker = this.textMarkers_[index];
   if (!textMarker) {
     textMarker = new anychart.ganttModule.axisMarkers.Text(this.scale_);
-    textMarker.setup(this.defaultTextMarkerSettings());
+    textMarker.addThemes(this.themeSettings['defaultTextMarkerSettings']);
     textMarker.setParentEventTarget(this);
     this.textMarkers_[index] = textMarker;
     textMarker.listenSignals(this.onMarkersSignal_, this);
@@ -1867,7 +1883,8 @@ anychart.ganttModule.TimeLine.prototype.labels = function(opt_value) {
     this.labelsFactory_.setParentEventTarget(this);
     this.labelsFactory_.listenSignals(this.labelsInvalidated_, this);
 
-    this.labelsFactory_.dropThemes();
+    // this.labelsFactory_.dropThemes();
+    this.setupCreated('labels', this.labelsFactory_);
   }
 
   if (goog.isDef(opt_value)) {
@@ -1899,6 +1916,7 @@ anychart.ganttModule.TimeLine.prototype.labels = function(opt_value) {
 anychart.ganttModule.TimeLine.prototype.markers = function(opt_value) {
   if (!this.markersFactory_) {
     this.markersFactory_ = new anychart.core.ui.MarkersFactory();
+    this.markersFactory_.addThemes('defaultTimeline.markers');
     this.markersFactory_.setParentEventTarget(this);
   }
 
@@ -2263,7 +2281,7 @@ anychart.ganttModule.TimeLine.prototype.editPreviewEnd_ = function(e) {
 
     tree.suspendSignalsDispatching();
 
-    var newActualStartRatio = (el.tag.type == anychart.enums.TLElementTypes.MILESTONES) ?
+    var newActualStartRatio = (el.tag.type == anychart.enums.TLElementTypes.MILESTONES || el.tag.type == anychart.enums.TLElementTypes.MILESTONES_PREVIEW) ?
         ((draggedBounds.left + draggedBounds.width / 2 - this.pixelBoundsCache.left) / (this.pixelBoundsCache.width)) :
         ((draggedBounds.left - this.pixelBoundsCache.left) / (this.pixelBoundsCache.width));
     var newActualStart = this.scale_.ratioToTimestamp(newActualStartRatio);
@@ -2278,6 +2296,7 @@ anychart.ganttModule.TimeLine.prototype.editPreviewEnd_ = function(e) {
 
       switch (el.tag.type) {
         case anychart.enums.TLElementTypes.MILESTONES:
+        case anychart.enums.TLElementTypes.MILESTONES_PREVIEW:
           dataItem.set(anychart.enums.GanttDataFields.ACTUAL_START, newActualStart);
           dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_START, newActualStart);
           if (goog.isDef(dataItem.get(anychart.enums.GanttDataFields.ACTUAL_END))) {
@@ -2311,13 +2330,10 @@ anychart.ganttModule.TimeLine.prototype.editPreviewEnd_ = function(e) {
           dataItem.meta(anychart.enums.GanttDataFields.BASELINE_END, baselineEnd + delta);
           break;
         default:
-          var actualStart = /** @type {number} */ ((goog.isNumber(dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_START)) ?
-              dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_START) :
-              dataItem.meta('autoStart')));
+          var info = anychart.ganttModule.BaseGrid.getProjectItemInfo(dataItem);
+          var actualStart = info.start;
+          var actualEnd = info.end;
 
-          var actualEnd = goog.isNumber(dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_END)) ?
-              dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_END) :
-              dataItem.meta('autoEnd');
           delta = newActualStart - actualStart;
           var newActualEnd = actualEnd + delta;
           if (!isNaN(newActualEnd)) {
@@ -2531,14 +2547,11 @@ anychart.ganttModule.TimeLine.prototype.drawThumbPreview_ = function(event, opt_
             item.getMeta(anychart.enums.GanttDataFields.PERIODS, periodIndex, anychart.enums.GanttDataFields.START);
         break;
       default:
+        var info = anychart.ganttModule.BaseGrid.getProjectItemInfo(item);
         if (this.currentThumbDragger_.isLeft) {
-          time = goog.isNumber(item.meta(anychart.enums.GanttDataFields.ACTUAL_END)) ?
-              item.meta(anychart.enums.GanttDataFields.ACTUAL_END) :
-              item.meta('autoEnd');
+          time = info.end;
         } else {
-          time = goog.isNumber(item.meta(anychart.enums.GanttDataFields.ACTUAL_START)) ?
-              item.meta(anychart.enums.GanttDataFields.ACTUAL_START) :
-              item.meta('autoStart');
+          time = info.start;
         }
     }
 
@@ -3066,7 +3079,7 @@ anychart.ganttModule.TimeLine.prototype.addMouseMoveAndOver = function(evt, orig
           }
 
           // Drawing any resizeable bar
-          if (dataItem && tag.type != anychart.enums.TLElementTypes.MILESTONES) {
+          if (dataItem && tag.type != anychart.enums.TLElementTypes.MILESTONES && tag.type != anychart.enums.TLElementTypes.MILESTONES_PREVIEW) {
             this.drawEditThumbs_(tag.type, tag.bounds, tag.item, periodIndex);
           } else {
             this.getEditLeftThumbPath_().clear();
@@ -3074,7 +3087,7 @@ anychart.ganttModule.TimeLine.prototype.addMouseMoveAndOver = function(evt, orig
           }
 
           // Drawing connectors thumbs
-          if (dataItem && tag.type != anychart.enums.TLElementTypes.BASELINES) {
+          if (dataItem && tag.type != anychart.enums.TLElementTypes.BASELINES && tag.type != anychart.enums.TLElementTypes.MILESTONES_PREVIEW) {
             var ind = evt['hoveredIndex'] + this.controller.startIndex();
             this.drawConnectorsEditThumbs_(tag.type, ind, tag.bounds, tag.item, periodIndex);
           } else {
@@ -3127,7 +3140,9 @@ anychart.ganttModule.TimeLine.prototype.drawEditConnector_ = function(evt, origi
       var tag = /** @type {anychart.ganttModule.TimeLine.Tag} */ (domTarget.tag);
       var destinationDataItem = tag.item;
 
-      if (tag.type != anychart.enums.TLElementTypes.BASELINES && tag.type != anychart.enums.TLElementTypes.CONNECTORS) {
+      if (tag.type != anychart.enums.TLElementTypes.BASELINES &&
+          tag.type != anychart.enums.TLElementTypes.CONNECTORS &&
+          tag.type != anychart.enums.TLElementTypes.MILESTONES_PREVIEW) {
         var editTag = /** @type {anychart.ganttModule.TimeLine.EditTag} */ (this.currentConnectorDragger_.element.tag);
         var startItem = editTag.item;
         var startIndex = editTag.index;
@@ -3234,7 +3249,7 @@ anychart.ganttModule.TimeLine.prototype.addMouseUp = function(evt) {
       var originalEvent = evt['originalEvent'];
       var domTarget = originalEvent['domTarget'];
       var tag = domTarget ? domTarget.tag : void 0;
-      if (tag && tag.isElement && tag.type != anychart.enums.TLElementTypes.BASELINES) {
+      if (tag && tag.isElement && tag.type != anychart.enums.TLElementTypes.BASELINES && tag.type != anychart.enums.TLElementTypes.MILESTONES_PREVIEW) {
         var left = originalEvent.clientX - this.container().getStage().getClientPosition().x;
         var elBounds = tag.bounds;
         var dropRatio = (left - elBounds.left) / elBounds.width;
@@ -3312,9 +3327,77 @@ anychart.ganttModule.TimeLine.prototype.getElementByType_ = function(type) {
       return /** @type {anychart.ganttModule.elements.TimelineElement} */ (this.baselines());
     case anychart.enums.TLElementTypes.MILESTONES:
       return /** @type {anychart.ganttModule.elements.TimelineElement} */ (this.milestones());
+    case anychart.enums.TLElementTypes.MILESTONES_PREVIEW:
+      return /** @type {anychart.ganttModule.elements.TimelineElement} */ (this.milestones().preview());
   }
   return /** @type {anychart.ganttModule.elements.TimelineElement} */ (this.elements());
 };
+
+
+/**
+ * Defines type by item. Used to defined whether to draw connector.
+ * @param {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} item - .
+ * @private
+ * @return {anychart.ganttModule.elements.TimelineElement} - .
+ */
+anychart.ganttModule.TimeLine.prototype.getConnectionElementByItem_ = function(item) {
+  if (this.controller.isResources()) {
+    return /** @type {anychart.ganttModule.elements.TimelineElement} */ (this.periods());
+  }
+  if (anychart.ganttModule.BaseGrid.isMilestone(item)) {
+    return /** @type {anychart.ganttModule.elements.TimelineElement} */ (this.milestones());
+  }
+  if (anychart.ganttModule.BaseGrid.isGroupingTask(item)) {
+    return /** @type {anychart.ganttModule.elements.TimelineElement} */ (this.groupingTasks());
+  }
+
+  /*
+    this.milestones().preview(), this.baselines(), progresses can't appear here.
+   */
+  return /** @type {anychart.ganttModule.elements.TimelineElement} */ (this.tasks());
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.ganttModule.TimeLine.prototype.tooltip = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.elements().tooltip(opt_value);
+    return this;
+  }
+  return /** @type {!anychart.core.ui.Tooltip} */ (this.elements().tooltip());
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.ganttModule.TimeLine.prototype.getTooltipInternal = function(opt_value, opt_item) {
+  return /** @type {!anychart.core.ui.Tooltip} */ (opt_item ?
+      this.getTooltipOfElementByItem(/** @type {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} */ (opt_item)) :
+      this.tooltip());
+};
+
+
+/**
+ * @param {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} item - .
+ * @return {anychart.core.ui.Tooltip} - Tooltip of element.
+ */
+anychart.ganttModule.TimeLine.prototype.getTooltipOfElementByItem = function(item) {
+  var el;
+  if (anychart.ganttModule.BaseGrid.isMilestone(item)) {
+    el = this.milestones();
+  } else if (anychart.ganttModule.BaseGrid.isBaseline(item)) {
+    el = this.baselines();
+  } else if (anychart.ganttModule.BaseGrid.isGroupingTask(item)) {
+    el = this.groupingTasks();
+  } else {
+    el = this.tasks();
+  }
+  return /** @type {anychart.core.ui.Tooltip} */ (el.tooltip());
+};
+
 
 /**
  * Creates connector.
@@ -3458,7 +3541,6 @@ anychart.ganttModule.TimeLine.prototype.addConnector = function(startItem, targe
 };
 
 
-
 /**
  * Handles row collapse/expand.
  * @param {Object} event - Dispatched event object.
@@ -3467,7 +3549,7 @@ anychart.ganttModule.TimeLine.prototype.addConnector = function(startItem, targe
 anychart.ganttModule.TimeLine.prototype.rowExpandCollapse = function(event) {
   if (!this.checkConnectorDblClick(event)) {
     var item = event['item'];
-    if (item && item.numChildren()) {
+    if (item && anychart.ganttModule.BaseGrid.isGroupingTask(item)) {
       var value = !item.meta(anychart.enums.GanttDataFields.COLLAPSED);
       var evtObj = {
         'type': anychart.enums.EventType.ROW_COLLAPSE_EXPAND,
@@ -3647,7 +3729,7 @@ anychart.ganttModule.TimeLine.prototype.genElement_ = function() {
 anychart.ganttModule.TimeLine.prototype.drawTimelineElements_ = function() {
   var els = this.controller.isResources() ?
       [this.periods()] :
-      [this.tasks(), this.groupingTasks(), this.milestones(), this.baselines(), this.tasks().progress(), this.groupingTasks().progress()];
+      [this.tasks(), this.groupingTasks(), this.milestones(), this.milestones().preview(), this.baselines(), this.tasks().progress(), this.groupingTasks().progress()];
   for (var j = 0; j < els.length; j++) {
     var element = els[j];
     if (!element.shapeManager)
@@ -3728,19 +3810,21 @@ anychart.ganttModule.TimeLine.prototype.drawRowFills = function() {
  * @private
  */
 anychart.ganttModule.TimeLine.prototype.drawResourceTimeline_ = function() {
-  var totalTop = /** @type {number} */ (this.pixelBoundsCache.top + this.headerHeight() + 1 - this.controller.verticalOffset());
-  var visibleItems = this.controller.getVisibleItems();
-  for (var i = /** @type {number} */(this.controller.startIndex()); i <= /** @type {number} */(this.controller.endIndex()); i++) {
-    var item = visibleItems[i];
-    if (!item) break;
+  if (this.periods().getOption('enabled')) {
+    var totalTop = /** @type {number} */ (this.pixelBoundsCache.top + this.headerHeight() + 1 - this.controller.verticalOffset());
+    var visibleItems = this.controller.getVisibleItems();
+    for (var i = /** @type {number} */(this.controller.startIndex()); i <= /** @type {number} */(this.controller.endIndex()); i++) {
+      var item = visibleItems[i];
+      if (!item) break;
 
-    var itemHeight = this.controller.getItemHeight(item);
-    var newTop = /** @type {number} */ (totalTop + itemHeight);
+      var itemHeight = this.controller.getItemHeight(item);
+      var newTop = /** @type {number} */ (totalTop + itemHeight);
 
-    this.drawAsPeriods_(item, totalTop, itemHeight);
-    this.drawMarkers_(item, totalTop, itemHeight);
+      this.drawAsPeriods_(item, totalTop, itemHeight);
+      this.drawMarkers_(item, totalTop, itemHeight);
 
-    totalTop = (newTop + this.rowStrokeThickness);
+      totalTop = (newTop + this.rowStrokeThickness);
+    }
   }
 };
 
@@ -3760,14 +3844,11 @@ anychart.ganttModule.TimeLine.prototype.drawProjectTimeline_ = function() {
     var itemHeight = this.controller.getItemHeight(item);
     var newTop = /** @type {number} */ (totalTop + itemHeight);
 
-    var baselineStart = item.get(anychart.enums.GanttDataFields.BASELINE_START);
-    var baselineEnd = item.get(anychart.enums.GanttDataFields.BASELINE_END);
-
     if (anychart.ganttModule.BaseGrid.isMilestone(item)) {
       this.drawAsMilestone_(item, totalTop, itemHeight);
-    } else if (goog.isDef(baselineStart) && goog.isDef(baselineEnd)) {
+    } else if (anychart.ganttModule.BaseGrid.isBaseline(item)) {
       this.drawAsBaseline_(item, totalTop, itemHeight);
-    } else if (item.numChildren()) {
+    } else if (anychart.ganttModule.BaseGrid.isGroupingTask(item)) {
       this.drawAsParent_(item, totalTop, itemHeight);
     } else {
       this.drawAsProgress_(item, totalTop, itemHeight);
@@ -3914,14 +3995,12 @@ anychart.ganttModule.TimeLine.prototype.drawAsPeriods_ = function(dataItem, tota
  * @private
  */
 anychart.ganttModule.TimeLine.prototype.drawAsBaseline_ = function(dataItem, totalTop, itemHeight) {
-  var actualStart = goog.isNumber(dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_START)) ?
-      dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_START) :
-      dataItem.meta('autoStart');
-  var actualEnd = goog.isNumber(dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_END)) ?
-      dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_END) :
-      dataItem.meta('autoEnd');
-  var baselineStart = dataItem.meta(anychart.enums.GanttDataFields.BASELINE_START);
-  var baselineEnd = dataItem.meta(anychart.enums.GanttDataFields.BASELINE_END);
+  var info = anychart.ganttModule.BaseGrid.getProjectItemInfo(dataItem);
+
+  var actualStart = info.start;
+  var actualEnd = info.end;
+  var baselineStart = info.baselineStart;
+  var baselineEnd = info.baselineEnd;
 
   var actualStartRatio = this.scale_.timestampToRatio(actualStart);
   var actualEndRatio = this.scale_.timestampToRatio(actualEnd);
@@ -3934,43 +4013,63 @@ anychart.ganttModule.TimeLine.prototype.drawAsBaseline_ = function(dataItem, tot
     var actualRight = b.left + b.width * actualEndRatio;
     var actualWidth = actualRight - actualLeft;
 
-    var isParent = !!dataItem.numChildren();
+    var isParent = anychart.ganttModule.BaseGrid.isGroupingTask(dataItem);
     var element = /** @type {anychart.ganttModule.elements.GroupingTasksElement|anychart.ganttModule.elements.TasksElement} */ (isParent ? this.groupingTasks() : this.tasks());
     var baselines = /** @type {anychart.ganttModule.elements.BaselinesElement} */ (this.baselines());
 
-    var actualItemBounds = new anychart.math.Rect(actualLeft, totalTop, actualWidth, itemHeight);
-    var actualBounds = this.getBarBounds_(element, actualItemBounds, true);
+    if (element.getOption('enabled') || baselines.getOption('enabled')) {
+      var actualItemBounds = new anychart.math.Rect(actualLeft, totalTop, actualWidth, itemHeight);
+      var actualBounds = this.getBarBounds_(element, actualItemBounds, true);
 
-    var baselineLeft = b.left + b.width * baselineStartRatio;
-    var baselineRight = b.left + b.width * baselineEndRatio;
-    var baselineWidth = baselineRight - baselineLeft;
-    var baselineItemBounds = new anychart.math.Rect(baselineLeft, totalTop, baselineWidth, itemHeight);
-    var baselineBounds = this.getBarBounds_(baselines, baselineItemBounds, true);
+      var baselineLeft = b.left + b.width * baselineStartRatio;
+      var baselineRight = b.left + b.width * baselineEndRatio;
+      var baselineWidth = baselineRight - baselineLeft;
+      var baselineItemBounds = new anychart.math.Rect(baselineLeft, totalTop, baselineWidth, itemHeight);
+      var baselineBounds = this.getBarBounds_(baselines, baselineItemBounds, true);
 
-    this.fixBaselineBarsPositioning_(actualBounds, baselineBounds, element, dataItem);
+      this.fixBaselineBarsPositioning_(actualBounds, baselineBounds, element, dataItem);
 
-    var isSelected = this.interactivityHandler.selection().isRowSelected(dataItem);
-    actualBounds = this.fixBounds_(element, actualBounds, dataItem, void 0, isSelected);
+      var isSelected = this.interactivityHandler.selection().isRowSelected(dataItem);
+      actualBounds = this.fixBounds_(element, actualBounds, dataItem, void 0, isSelected);
 
-    baselineBounds = this.fixBounds_(baselines, baselineBounds, dataItem, void 0, isSelected);
+      baselineBounds = this.fixBounds_(baselines, baselineBounds, dataItem, void 0, isSelected);
 
-    var tag = this.createTag(dataItem, element, actualBounds);
-    var baselineTag = this.createTag(dataItem, baselines, baselineBounds);
-    baselines.rendering().callDrawer(dataItem, baselineBounds, baselineTag, void 0, isSelected);
+      var tag = this.createTag(dataItem, element, actualBounds);
+      if (this.baselines().getOption('enabled')) {
+        var baselineTag = this.createTag(dataItem, baselines, baselineBounds);
+        baselines.rendering().callDrawer(dataItem, baselineBounds, baselineTag, void 0, isSelected);
+      }
 
-    this.setRelatedBounds_(dataItem, actualBounds);
-    element.rendering().callDrawer(dataItem, actualBounds, tag, void 0, isSelected);
+      if (element.getOption('enabled')) {
+        if (isParent) {
+          if (this.milestones().preview().getOption('enabled') && this.milestones().preview().getOption('depth') != 0)
+            this.iterateChildMilestones_(0, dataItem, totalTop, itemHeight, goog.getUid(dataItem));
+        }
+        this.setRelatedBounds_(dataItem, actualBounds);
 
-    var progressValue = goog.isDef(dataItem.meta(anychart.enums.GanttDataFields.PROGRESS_VALUE)) ?
-        dataItem.meta(anychart.enums.GanttDataFields.PROGRESS_VALUE) :
-        dataItem.meta('autoProgress');
+        /*
+          This condition allows to skip drawing of "actual"-bar with incorrect
+          start and end values, and keep "baseline"-bar drawn.
+          Despite "actual"-bar has invalid values (it means that actualBounds
+          has NaN actualBounds.left and actualBounds.width values),
+          fixBaselineBarsPositioning_() uses only actualBounds.top and actualBounds.height
+          and doesn't break baseline bar correct drawing.
+         */
+        if (info.isValidTask) {
+          element.rendering().callDrawer(dataItem, actualBounds, tag, void 0, isSelected);
+          var progressEl = /** @type {anychart.ganttModule.elements.TimelineElement} */ (element.progress());
+          if (info.isValidProgress && progressEl.getOption('enabled')) { //Draw progress.
+            var progressValue = info.progress;
+            var progressWidth = /** @type {number} */ (progressValue) * actualBounds.width;
+            var progressItemBounds = new anychart.math.Rect(actualBounds.left, actualBounds.top, progressWidth, actualBounds.height);
+            var progressBounds = this.getBarBounds_(progressEl, progressItemBounds);
+            var progressTag = this.createTag(dataItem, progressEl, progressBounds);
+            progressEl.rendering().callDrawer(dataItem, progressBounds, progressTag, void 0, isSelected);
+          }
+        }
 
-    if (goog.isDefAndNotNull(progressValue)) { //Draw progress.
-      var progressWidth = /** @type {number} */ (progressValue) * actualBounds.width;
-      var progressItemBounds = new anychart.math.Rect(actualBounds.left, actualBounds.top, progressWidth, actualBounds.height);
-      var progressBounds = this.getBarBounds_(/** @type {anychart.ganttModule.elements.TimelineElement} */ (element.progress()), progressItemBounds);
-      var progressTag = this.createTag(dataItem, element.progress(), progressBounds);
-      element.progress().rendering().callDrawer(dataItem, progressBounds, progressTag, void 0, isSelected);
+
+      }
     }
   }
 };
@@ -4031,41 +4130,70 @@ anychart.ganttModule.TimeLine.prototype.fixBaselineBarsPositioning_ = function(b
  * @private
  */
 anychart.ganttModule.TimeLine.prototype.drawAsParent_ = function(dataItem, totalTop, itemHeight) {
-  var actualStart = goog.isNumber(dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_START)) ?
-      dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_START) :
-      dataItem.meta('autoStart');
-  var actualEnd = goog.isNumber(dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_END)) ?
-      dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_END) :
-      dataItem.meta('autoEnd');
-  var startRatio = this.scale_.timestampToRatio(actualStart);
-  var endRatio = this.scale_.timestampToRatio(actualEnd);
+  var info = anychart.ganttModule.BaseGrid.getProjectItemInfo(dataItem);
 
-  if (endRatio > 0 && startRatio < 1) { //Is visible
-    var b = this.pixelBoundsCache;
-    var el = /** @type {anychart.ganttModule.elements.GroupingTasksElement} */ (this.groupingTasks());
-    var actualLeft = b.left + b.width * startRatio;
-    var actualRight = b.left + b.width * endRatio;
-    var actualWidth = actualRight - actualLeft;
-    var actualItemBounds = new anychart.math.Rect(actualLeft, totalTop, actualWidth, itemHeight);
-    var actualBounds = this.getBarBounds_(el, actualItemBounds);
+  if (this.groupingTasks().getOption('enabled') && info.isValidTask) {
+    if (this.milestones().preview().getOption('enabled') && this.milestones().preview().getOption('depth') != 0)
+      this.iterateChildMilestones_(0, dataItem, totalTop, itemHeight, goog.getUid(dataItem));
 
-    var isSelected = this.interactivityHandler.selection().isRowSelected(dataItem);
-    actualBounds = this.fixBounds_(el, actualBounds, dataItem, void 0, isSelected);
+    var actualStart = info.start;
+    var actualEnd = info.end;
+    var startRatio = this.scale_.timestampToRatio(actualStart);
+    var endRatio = this.scale_.timestampToRatio(actualEnd);
 
-    var tag = this.createTag(dataItem, el, actualBounds);
-    this.setRelatedBounds_(dataItem, actualBounds);
-    el.rendering().callDrawer(dataItem, actualBounds, tag, void 0, isSelected);
+    if (endRatio > 0 && startRatio < 1) { //Is visible
+      var b = this.pixelBoundsCache;
+      var el = /** @type {anychart.ganttModule.elements.GroupingTasksElement} */ (this.groupingTasks());
+      var actualLeft = b.left + b.width * startRatio;
+      var actualRight = b.left + b.width * endRatio;
+      var actualWidth = actualRight - actualLeft;
+      var actualItemBounds = new anychart.math.Rect(actualLeft, totalTop, actualWidth, itemHeight);
+      var actualBounds = this.getBarBounds_(el, actualItemBounds);
 
-    var progressValue = goog.isDef(dataItem.meta(anychart.enums.GanttDataFields.PROGRESS_VALUE)) ?
-        dataItem.meta(anychart.enums.GanttDataFields.PROGRESS_VALUE) :
-        dataItem.meta('autoProgress');
+      var isSelected = this.interactivityHandler.selection().isRowSelected(dataItem);
+      actualBounds = this.fixBounds_(el, actualBounds, dataItem, void 0, isSelected);
 
-    if (goog.isDefAndNotNull(progressValue)) { //Draw progress.
-      var progressWidth = /** @type {number} */ (progressValue) * actualWidth;
-      var progressItemBounds = new anychart.math.Rect(actualBounds.left, actualBounds.top, progressWidth, actualBounds.height);
-      var progressBounds = this.getBarBounds_(/** @type {anychart.ganttModule.elements.TimelineElement} */ (el.progress()), progressItemBounds);
-      var progressTag = this.createTag(dataItem, el.progress(), progressBounds);
-      el.progress().rendering().callDrawer(dataItem, progressBounds, progressTag, void 0, isSelected);
+      var tag = this.createTag(dataItem, el, actualBounds);
+      this.setRelatedBounds_(dataItem, actualBounds);
+      el.rendering().callDrawer(dataItem, actualBounds, tag, void 0, isSelected);
+
+
+      var progressEl = /** @type {anychart.ganttModule.elements.TimelineElement} */ (el.progress());
+      if (info.isValidProgress && progressEl.getOption('enabled')) { //Draw progress.
+        var progressValue = info.progress;
+        var progressWidth = /** @type {number} */ (progressValue) * actualWidth;
+        var progressItemBounds = new anychart.math.Rect(actualBounds.left, actualBounds.top, progressWidth, actualBounds.height);
+        var progressBounds = this.getBarBounds_(progressEl, progressItemBounds);
+        var progressTag = this.createTag(dataItem, progressEl, progressBounds);
+        progressEl.rendering().callDrawer(dataItem, progressBounds, progressTag, void 0, isSelected);
+      }
+    }
+  }
+};
+
+
+/**
+ * Draws data item as milestone preview on grouping task.
+ * @param {number} depth - Current depth.
+ * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} item - Current tree data item.
+ * @param {number} totalTop - Pixel value of total top. Is needed to place item correctly.
+ * @param {number} itemHeight - Height of row.
+ * @param {number} initializerUid - UID of item that has initialized the milestone preview drawing.
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.iterateChildMilestones_ = function(depth, item, totalTop, itemHeight, initializerUid) {
+  var depthOption = this.milestones().preview().getOption('depth');
+  var depthMatches = !goog.isDefAndNotNull(depthOption) || //null or undefined value will display ALL submilestones of parent.
+      (depth <= depthOption);
+
+  if (depthMatches) {
+    if (anychart.ganttModule.BaseGrid.isMilestone(item)) {
+      this.drawAsMilestonePreview_(item, totalTop, itemHeight, initializerUid);
+    } else if (anychart.ganttModule.BaseGrid.isGroupingTask(item)) {
+      for (var i = 0; i < item.numChildren(); i++) {
+        var child = /** @type {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} */ (item.getChildAt(i));
+        this.iterateChildMilestones_(depth + 1, child, totalTop, itemHeight, initializerUid);
+      }
     }
   }
 };
@@ -4079,44 +4207,42 @@ anychart.ganttModule.TimeLine.prototype.drawAsParent_ = function(dataItem, total
  * @private
  */
 anychart.ganttModule.TimeLine.prototype.drawAsProgress_ = function(dataItem, totalTop, itemHeight) {
-  var actualStart = goog.isNumber(dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_START)) ?
-      dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_START) :
-      dataItem.meta('autoStart');
-  var actualEnd = goog.isNumber(dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_END)) ?
-      dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_END) :
-      dataItem.meta('autoEnd');
+  var info = anychart.ganttModule.BaseGrid.getProjectItemInfo(dataItem);
+  var el = /** @type {anychart.ganttModule.elements.TasksElement} */ (this.tasks());
 
-  var startRatio = this.scale_.timestampToRatio(actualStart);
-  var endRatio = this.scale_.timestampToRatio(actualEnd);
+  if (el.getOption('enabled') && info.isValidTask) {
+    var actualStart = info.start;
+    var actualEnd = info.end;
 
-  if (endRatio > 0 && startRatio < 1) { //Is visible
-    var b = this.pixelBoundsCache;
-    var el = /** @type {anychart.ganttModule.elements.TasksElement} */ (this.tasks());
-    var actualLeft = b.left + b.width * startRatio;
-    var actualRight = b.left + b.width * endRatio;
-    var actualWidth = actualRight - actualLeft;
-    var actualItemBounds = new anychart.math.Rect(actualLeft, totalTop, actualWidth, itemHeight);
-    var actualBounds = this.getBarBounds_(el, actualItemBounds);
+    var startRatio = this.scale_.timestampToRatio(actualStart);
+    var endRatio = this.scale_.timestampToRatio(actualEnd);
 
-    var isSelected = this.interactivityHandler.selection().isRowSelected(dataItem);
-    actualBounds = this.fixBounds_(el, actualBounds, dataItem, void 0, isSelected);
+    if (endRatio > 0 && startRatio < 1) { //Is visible
+      var b = this.pixelBoundsCache;
+      var actualLeft = b.left + b.width * startRatio;
+      var actualRight = b.left + b.width * endRatio;
+      var actualWidth = actualRight - actualLeft;
+      var actualItemBounds = new anychart.math.Rect(actualLeft, totalTop, actualWidth, itemHeight);
+      var actualBounds = this.getBarBounds_(el, actualItemBounds);
 
-    var tag = this.createTag(dataItem, el, actualBounds);
-    this.setRelatedBounds_(dataItem, actualBounds);
-    this.tasks().rendering().callDrawer(dataItem, actualBounds, tag, void 0, isSelected);
+      var isSelected = this.interactivityHandler.selection().isRowSelected(dataItem);
+      actualBounds = this.fixBounds_(el, actualBounds, dataItem, void 0, isSelected);
 
-    var progressValue = goog.isDef(dataItem.meta(anychart.enums.GanttDataFields.PROGRESS_VALUE)) ?
-        dataItem.meta(anychart.enums.GanttDataFields.PROGRESS_VALUE) :
-        dataItem.meta('autoProgress');
+      var tag = this.createTag(dataItem, el, actualBounds);
+      this.setRelatedBounds_(dataItem, actualBounds);
+      this.tasks().rendering().callDrawer(dataItem, actualBounds, tag, void 0, isSelected);
 
-    if (goog.isDefAndNotNull(progressValue)) { //Draw progress.
-      var progressWidth = /** @type {number} */ (progressValue) * actualWidth;
-      var progressItemBounds = new anychart.math.Rect(actualBounds.left, actualBounds.top, progressWidth, actualBounds.height);
-      var progressBounds = this.getBarBounds_(/** @type {anychart.ganttModule.elements.TimelineElement} */ (this.tasks().progress()), progressItemBounds);
-      var progressTag = this.createTag(dataItem, this.tasks().progress(), actualBounds);
-      this.tasks().progress().rendering().callDrawer(dataItem, progressBounds, progressTag, void 0, isSelected);
+      var progressEl = /** @type {anychart.ganttModule.elements.TimelineElement} */ (el.progress());
+      if (info.isValidProgress && progressEl.getOption('enabled')) { //Draw progress.
+        var progressValue = info.progress;
+        var progressWidth = /** @type {number} */ (progressValue) * actualWidth;
+        var progressItemBounds = new anychart.math.Rect(actualBounds.left, actualBounds.top, progressWidth, actualBounds.height);
+        var progressBounds = this.getBarBounds_(progressEl, progressItemBounds);
+        var progressTag = this.createTag(dataItem, progressEl, actualBounds);
+        progressEl.rendering().callDrawer(dataItem, progressBounds, progressTag, void 0, isSelected);
+      }
+
     }
-
   }
 };
 
@@ -4129,37 +4255,77 @@ anychart.ganttModule.TimeLine.prototype.drawAsProgress_ = function(dataItem, tot
  * @private
  */
 anychart.ganttModule.TimeLine.prototype.drawAsMilestone_ = function(dataItem, totalTop, itemHeight) {
-  var actualStart = dataItem.get(anychart.enums.GanttDataFields.ACTUAL_START);
-  var ratio = this.scale_.timestampToRatio(actualStart);
-  if (ratio >= 0 && ratio <= 1) { //Is visible
-    var el = /** @type {anychart.ganttModule.elements.MilestonesElement} */ (this.milestones());
-    // var settings = dataItem.get(anychart.enums.GanttDataFields.MILESTONE);
+  var info = anychart.ganttModule.BaseGrid.getProjectItemInfo(dataItem);
+  if (info.isValidStart && this.milestones().getOption('enabled')) {
+    var actualStart = info.start;
+    var ratio = this.scale_.timestampToRatio(actualStart);
+    if (ratio >= 0 && ratio <= 1) { //Is visible
+      var el = /** @type {anychart.ganttModule.elements.MilestonesElement} */ (this.milestones());
+      var stroke = el.getStroke(dataItem, anychart.PointState.NORMAL);
 
-    // var stroke = /** @type {acgraph.vector.Stroke} */ (settings && goog.isDef(settings[anychart.enums.GanttDataFields.STROKE]) ?
-    //     acgraph.vector.normalizeStroke(settings[anychart.enums.GanttDataFields.STROKE]) :
-    //     anychart.ganttModule.BaseGrid.getColorResolver('milestoneStroke', anychart.enums.ColorType.STROKE, false)(this, 0, dataItem));
-    var stroke = el.getStroke(dataItem, anychart.PointState.NORMAL);
+      var lineThickness = anychart.utils.isNone(stroke) ? 0 :
+          goog.isString(stroke) ? 1 :
+              stroke['thickness'] ? stroke['thickness'] : 1;
 
-    var lineThickness = anychart.utils.isNone(stroke) ? 0 :
-        goog.isString(stroke) ? 1 :
-            stroke['thickness'] ? stroke['thickness'] : 1;
+      var pixelShift = (lineThickness % 2 && acgraph.type() === acgraph.StageType.SVG) ? 0.5 : 0;
+      var optionHeight = /** @type {string|number} */ (el.getOption('height'));
+      var height = anychart.utils.normalizeSize(optionHeight, itemHeight);
 
-    var pixelShift = (lineThickness % 2 && acgraph.type() === acgraph.StageType.SVG) ? 0.5 : 0;
-    var optionHeight = /** @type {string|number} */ (el.getOption('height'));
-    var height = anychart.utils.normalizeSize(optionHeight, itemHeight);
+      var halfHeight = Math.round(height / 2);
 
-    var halfHeight = Math.round(height / 2);
+      var centerLeft = Math.round(this.pixelBoundsCache.left + this.pixelBoundsCache.width * ratio) + pixelShift;
+      var itemBounds = new anychart.math.Rect(centerLeft - halfHeight, totalTop, height, itemHeight);
+      var bounds = this.getBarBounds_(el, itemBounds);
 
-    var centerLeft = Math.round(this.pixelBoundsCache.left + this.pixelBoundsCache.width * ratio) + pixelShift;
-    var itemBounds = new anychart.math.Rect(centerLeft - halfHeight, totalTop, height, itemHeight);
-    var bounds = this.getBarBounds_(el, itemBounds);
+      var isSelected = this.interactivityHandler.selection().isRowSelected(dataItem);
+      bounds = this.fixBounds_(el, bounds, dataItem, void 0, isSelected);
 
-    var isSelected = this.interactivityHandler.selection().isRowSelected(dataItem);
-    bounds = this.fixBounds_(el, bounds, dataItem, void 0, isSelected);
+      var tag = this.createTag(dataItem, el, bounds);
+      this.setRelatedBounds_(dataItem, bounds);
+      el.rendering().callDrawer(dataItem, bounds, tag, void 0, isSelected);
+    }
+  }
+};
 
-    var tag = this.createTag(dataItem, el, bounds);
-    this.setRelatedBounds_(dataItem, bounds);
-    this.milestones().rendering().callDrawer(dataItem, bounds, tag, void 0, isSelected);
+
+/**
+ * Draws data item as milestone.
+ * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} dataItem - Current tree data item.
+ * @param {number} totalTop - Pixel value of total top. Is needed to place item correctly.
+ * @param {number} itemHeight - Height of row.
+ * @param {number} initializerUid - UID of item that has initialized the milestone preview drawing.
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.drawAsMilestonePreview_ = function(dataItem, totalTop, itemHeight, initializerUid) {
+  var info = anychart.ganttModule.BaseGrid.getProjectItemInfo(dataItem);
+  if (info.isValidStart) {
+    var actualStart = info.start;
+    var ratio = this.scale_.timestampToRatio(actualStart);
+    if (ratio >= 0 && ratio <= 1) { //Is visible
+      var el = /** @type {anychart.ganttModule.elements.MilestonesElement.Preview} */ (this.milestones().preview());
+      var stroke = el.getStroke(dataItem, anychart.PointState.NORMAL);
+
+      var lineThickness = anychart.utils.isNone(stroke) ? 0 :
+          goog.isString(stroke) ? 1 :
+              stroke['thickness'] ? stroke['thickness'] : 1;
+
+      var pixelShift = (lineThickness % 2 && acgraph.type() === acgraph.StageType.SVG) ? 0.5 : 0;
+      var optionHeight = /** @type {string|number} */ (el.getOption('height'));
+      var height = anychart.utils.normalizeSize(optionHeight, itemHeight);
+
+      var halfHeight = Math.round(height / 2);
+
+      var centerLeft = Math.round(this.pixelBoundsCache.left + this.pixelBoundsCache.width * ratio) + pixelShift;
+      var itemBounds = new anychart.math.Rect(centerLeft - halfHeight, totalTop, height, itemHeight);
+      var bounds = this.getBarBounds_(el, itemBounds);
+
+      var isSelected = this.interactivityHandler.selection().isRowSelected(dataItem);
+      bounds = this.fixBounds_(el, bounds, dataItem, void 0, isSelected);
+
+      var tag = this.createTag(dataItem, el, bounds);
+      this.setRelatedBounds_(dataItem, bounds);
+      el.rendering().callDrawer(dataItem, bounds, tag, void 0, isSelected, initializerUid);
+    }
   }
 };
 
@@ -4202,14 +4368,10 @@ anychart.ganttModule.TimeLine.prototype.getItemBounds_ = function(index, opt_per
   var visibleItems = this.controller.getVisibleItems();
   var item = visibleItems[index];
   var rowHeight = this.controller.getItemHeight(item);
+  var info = anychart.ganttModule.BaseGrid.getProjectItemInfo(item);
 
-  var actStart = goog.isNumber(item.meta(anychart.enums.GanttDataFields.ACTUAL_START)) ?
-      item.meta(anychart.enums.GanttDataFields.ACTUAL_START) :
-      item.meta('autoStart');
-
-  var actEnd = goog.isNumber(item.meta(anychart.enums.GanttDataFields.ACTUAL_END)) ?
-      item.meta(anychart.enums.GanttDataFields.ACTUAL_END) :
-      item.meta('autoEnd');
+  var actStart = info.start;
+  var actEnd = info.end;
 
   var startTimestamp = this.controller.isResources() ?
       item.getMeta(anychart.enums.GanttDataFields.PERIODS, opt_periodIndex, anychart.enums.GanttDataFields.START) :
@@ -4242,14 +4404,13 @@ anychart.ganttModule.TimeLine.prototype.getItemBounds_ = function(index, opt_per
     if (!this.controller.isResources()) {
       if (isMilestone) {
         return this.getBarBounds_(/** @type {anychart.ganttModule.elements.TimelineElement} */ (this.milestones()), itemBounds);
-      } else if (goog.isDef(item.get(anychart.enums.GanttDataFields.BASELINE_START)) &&
-          goog.isDef(item.get(anychart.enums.GanttDataFields.BASELINE_END))) {
-        var element = /** @type {anychart.ganttModule.elements.TasksElement|anychart.ganttModule.elements.GroupingTasksElement} */ (item.numChildren() ? this.groupingTasks() : this.tasks());
+      } else if (anychart.ganttModule.BaseGrid.isBaseline(item)) {
+        var element = /** @type {anychart.ganttModule.elements.TasksElement|anychart.ganttModule.elements.GroupingTasksElement} */ (anychart.ganttModule.BaseGrid.isGroupingTask(item) ? this.groupingTasks() : this.tasks());
         var barBounds = this.getBarBounds_(/** @type {anychart.ganttModule.elements.TimelineElement} */ (element), itemBounds, true);
         var baselineBounds = this.getBarBounds_(/** @type {anychart.ganttModule.elements.TimelineElement} */ (this.baselines()), itemBounds, true);
         this.fixBaselineBarsPositioning_(barBounds, baselineBounds, element, item);
         return barBounds;
-      } else if (item.numChildren()) {
+      } else if (anychart.ganttModule.BaseGrid.isGroupingTask(item)) {
         return this.getBarBounds_(/** @type {anychart.ganttModule.elements.TimelineElement} */ (this.groupingTasks()), itemBounds);
       } else {
         return this.getBarBounds_(/** @type {anychart.ganttModule.elements.TimelineElement} */ (this.tasks()), itemBounds);
@@ -4285,12 +4446,14 @@ anychart.ganttModule.TimeLine.prototype.connectItems_ = function(from, to, opt_c
   var visibleItems = this.controller.getVisibleItems();
   var fromItem = visibleItems[fromIndex];
   var toItem = visibleItems[toIndex];
+  var fromElement = this.getConnectionElementByItem_(fromItem);
+  var toElement = this.getConnectionElementByItem_(toItem);
 
   var fromBounds = this.getItemBounds_(fromIndex, from['period'], fromPeriodIndex);
   var toBounds = this.getItemBounds_(toIndex, to['period'], toPeriodIndex);
   var toRowHeight = this.controller.getItemHeight(toItem);
 
-  if (fromBounds && toBounds) {
+  if (fromBounds && toBounds && fromElement.getOption('enabled') && toElement.getOption('enabled')) {
     var selected = this.interactivityHandler.selection().isConnectorSelected(fromItem, toItem, fromIndex, toIndex, fromPeriodIndex, toPeriodIndex, opt_connType);
 
     var drawPreview = goog.isDefAndNotNull(opt_path);
@@ -4947,91 +5110,93 @@ anychart.ganttModule.TimeLine.prototype.drawLabels_ = function() {
 
   var els = this.controller.isResources() ?
       [this.periods()] :
-      [this.tasks(), this.groupingTasks(), this.milestones(), this.baselines(), this.tasks().progress(), this.groupingTasks().progress()];
+      [this.tasks(), this.groupingTasks(), this.milestones(), this.milestones().preview(), this.baselines(), this.tasks().progress(), this.groupingTasks().progress()];
 
   for (var i = 0; i < els.length; i++) {
     var element = els[i];
-    if (!element.shapeManager)
-      element.recreateShapeManager();
-    var tagsData = element.shapeManager.getTagsData();
-    for (var j in tagsData) {
-      if (tagsData.hasOwnProperty(j)) {
-        var tag = tagsData[j];
-        if (tag.isElement) {
+    if (element.getOption('enabled')) {
+      if (!element.shapeManager)
+        element.recreateShapeManager();
+      var tagsData = element.shapeManager.getTagsData();
+      for (var j in tagsData) {
+        if (tagsData.hasOwnProperty(j)) {
+          var tag = tagsData[j];
+          if (tag.isElement) {
 
-          var context = this.createFormatProvider(tag.item, tag.period, tag.periodIndex);
-          tag.label = this.labels().add(context, {
-            'value': {
-              'x': 0,
-              'y': 0
-            }
-          });
+            var context = this.createFormatProvider(tag.item, tag.period, tag.periodIndex);
+            tag.label = this.labels().add(context, {
+              'value': {
+                'x': 0,
+                'y': 0
+              }
+            });
 
-          var pointLabels = tag.labelPointSettings;
-          // var typeLabels = tag.labels;
-          var resolutionLabels = tag.labels;
-          var typeLabels = resolutionLabels && resolutionLabels[0] ? resolutionLabels[0] : null; //smth like this.tasks().labels() always here.
-          var elementsLabels = this.elements().labels();
-          var normalLabels = this.labels();
+            var pointLabels = tag.labelPointSettings;
+            // var typeLabels = tag.labels;
+            var resolutionLabels = tag.labels;
+            var typeLabels = resolutionLabels && resolutionLabels[0] ? resolutionLabels[0] : null; //smth like this.tasks().labels() always here.
+            var elementsLabels = this.elements().labels();
+            var normalLabels = this.labels();
 
-          var pointLabelsEnabled = pointLabels && goog.isDef(pointLabels['enabled']) ? pointLabels['enabled'] : null;
-          var elementsLabelsEnabled = element && goog.isDef(elementsLabels.enabled()) ? elementsLabels.enabled() : null;
-          var typeLabelsEnabled = typeLabels && goog.isDef(typeLabels.enabled()) ? typeLabels.enabled() : null;
+            var pointLabelsEnabled = pointLabels && goog.isDef(pointLabels['enabled']) ? pointLabels['enabled'] : null;
+            var elementsLabelsEnabled = element && goog.isDef(elementsLabels.enabled()) ? elementsLabels.enabled() : null;
+            var typeLabelsEnabled = typeLabels && goog.isDef(typeLabels.enabled()) ? typeLabels.enabled() : null;
 
-          var draw = false;
-          if (goog.isNull(pointLabelsEnabled)) {
-            if (goog.isNull(elementsLabelsEnabled)) {
-              if (goog.isNull(typeLabelsEnabled)) {
-                draw = normalLabels.enabled();
+            var draw = false;
+            if (goog.isNull(pointLabelsEnabled)) {
+              if (goog.isNull(elementsLabelsEnabled)) {
+                if (goog.isNull(typeLabelsEnabled)) {
+                  draw = normalLabels.enabled();
+                } else {
+                  draw = typeLabelsEnabled;
+                }
               } else {
-                draw = typeLabelsEnabled;
+                draw = elementsLabelsEnabled;
               }
             } else {
-              draw = elementsLabelsEnabled;
+              draw = pointLabelsEnabled;
             }
-          } else {
-            draw = pointLabelsEnabled;
+
+            if (draw) {
+              tag.label.resetSettings();
+              tag.label.enabled(true);
+
+              tag.label.state('labelOwnSettings', tag.label.ownSettings, 0);
+              tag.label.state('pointState', pointLabels, 1);
+
+              var len = resolutionLabels.length;
+              var k, count, stateLabels;
+              for (k = 0; k < len; k++) {
+                stateLabels = resolutionLabels[k];
+                count = 2 + k;
+                tag.label.state('st' + count, stateLabels, count);
+              }
+
+              //Second passage provides correct theme settings order
+              for (k = 0; k < len; k++) {
+                stateLabels = resolutionLabels[k];
+                count = 2 + k + len;
+                tag.label.state('st' + count, stateLabels.themeSettings, count);
+              }
+
+              var position = anychart.enums.normalizeAnchor(tag.label.getFinalSettings('position'));
+              var positionProvider = {'value': anychart.utils.getCoordinateByAnchor(tag.bounds, position)};
+              tag.label.positionProvider(positionProvider);
+
+              var values = context.contextValues();
+              values['label'] = {value: tag.label, type: anychart.enums.TokenType.UNKNOWN};
+              context.propagate();
+
+              tag.label.formatProvider(context);
+
+              this.controller.data().suspendSignalsDispatching();//this.controller.data() can be Tree or TreeView.
+              tag.item.meta('label', tag.label);
+              this.controller.data().resumeSignalsDispatching(false);
+            } else {
+              tag.label.enabled(false);
+            }
+            tag.label.draw();
           }
-
-          if (draw) {
-            tag.label.resetSettings();
-            tag.label.enabled(true);
-
-            tag.label.state('labelOwnSettings', tag.label.ownSettings, 0);
-            tag.label.state('pointState', pointLabels, 1);
-
-            var len = resolutionLabels.length;
-            var k, count, stateLabels;
-            for (k = 0; k < len; k++) {
-              stateLabels = resolutionLabels[k];
-              count = 2 + k;
-              tag.label.state('st' + count, stateLabels, count);
-            }
-
-            //Second passage provides correct theme settings order
-            for (k = 0; k < len; k++) {
-              stateLabels = resolutionLabels[k];
-              count = 2 + k + len;
-              tag.label.state('st' + count, stateLabels.themeSettings, count);
-            }
-
-            var position = anychart.enums.normalizeAnchor(tag.label.getFinalSettings('position'));
-            var positionProvider = {'value': anychart.utils.getCoordinateByAnchor(tag.bounds, position)};
-            tag.label.positionProvider(positionProvider);
-
-            var values = context.contextValues();
-            values['label'] = {value: tag.label, type: anychart.enums.TokenType.UNKNOWN};
-            context.propagate();
-
-            tag.label.formatProvider(context);
-
-            this.controller.data().suspendSignalsDispatching();//this.controller.data() can be Tree or TreeView.
-            tag.item.meta('label', tag.label);
-            this.controller.data().resumeSignalsDispatching(false);
-          } else {
-            tag.label.enabled(false);
-          }
-          tag.label.draw();
         }
       }
     }
@@ -5049,6 +5214,7 @@ anychart.ganttModule.TimeLine.prototype.drawLabels_ = function() {
     this.groupingTasks().labels().markConsistent(anychart.ConsistencyState.ALL);
     this.groupingTasks().progress().labels().markConsistent(anychart.ConsistencyState.ALL);
     this.milestones().labels().markConsistent(anychart.ConsistencyState.ALL);
+    this.milestones().preview().labels().markConsistent(anychart.ConsistencyState.ALL);
     this.baselines().labels().markConsistent(anychart.ConsistencyState.ALL);
   }
 };
@@ -5165,6 +5331,7 @@ anychart.ganttModule.TimeLine.prototype.verticalScrollBar = function(opt_value) 
 anychart.ganttModule.TimeLine.prototype.horizontalScrollBar = function(opt_value) {
   if (!this.horizontalScrollBar_) {
     this.horizontalScrollBar_ = new anychart.ganttModule.ScrollBar();
+    this.horizontalScrollBar_.setupByJSON(/** @type {!Object} */ (anychart.getFlatTheme('defaultScrollBar')));
     this.horizontalScrollBar_.layout(anychart.enums.Layout.HORIZONTAL);
 
     var scale = this.scale_;
@@ -5254,7 +5421,7 @@ anychart.ganttModule.TimeLine.prototype.serialize = function() {
   json['markers'] = this.markers().serialize();
   json['header'] = this.header().serialize();
 
-  anychart.core.settings.serialize(this, anychart.ganttModule.TimeLine.COLOR_DESCRIPTORS, json);
+  anychart.core.settings.serialize(this, anychart.ganttModule.TimeLine.COLOR_DESCRIPTORS, json, void 0, void 0, true);
 
   json['elements'] = this.elements().serialize();
   json['connectors'] = this.connectors().serialize();
@@ -5623,7 +5790,6 @@ anychart.standalones.resourceTimeline = function() {
   proto['data'] = proto.data;
   proto['parentBounds'] = proto.parentBounds;
   proto['container'] = proto.container;
-  proto['rowStroke'] = proto.rowStroke;
   proto['headerHeight'] = proto.headerHeight;
   proto['defaultRowHeight'] = proto.defaultRowHeight;
   proto['palette'] = proto.palette;
@@ -5633,7 +5799,6 @@ anychart.standalones.resourceTimeline = function() {
   proto['data'] = proto.data;
   proto['parentBounds'] = proto.parentBounds;
   proto['container'] = proto.container;
-  proto['rowStroke'] = proto.rowStroke;
   proto['headerHeight'] = proto.headerHeight;
   proto['defaultRowHeight'] = proto.defaultRowHeight;
   proto['palette'] = proto.palette;

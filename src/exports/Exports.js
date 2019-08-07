@@ -1,5 +1,7 @@
 goog.provide('anychart.exportsModule.Exports');
 
+goog.require('goog.Promise');
+
 
 
 /**
@@ -48,10 +50,84 @@ anychart.exportsModule.Exports = function() {
    * @private
    */
   this.pinterest_ = {};
+  /**
+   * Dependencies names.
+   * @type {Object}
+   * @private
+   */
+  this.externalDependencies_ = ['svg2pdf.min.js', 'jspdf.min.js', 'canvg.min.js'];
+
+  /**
+   *
+   * @type {boolean}
+   */
+  this.isExternLoaded = false;
+
+  /**
+   * Default clientside config.
+   * @type {anychart.exportsModule.Exports.ClientsideConfig}
+   * @private
+   */
+  this.clientsideConfig_ = {
+    'path': 'https://cdn.anychart.com/3rd/',
+    'enabled': true,
+    'fallback': true
+  };
 };
 
 
 //region --- Settings
+/**
+ * Path to dependencies getter.
+ * @return {string}
+ */
+anychart.exportsModule.Exports.prototype.getClientsidePath = function() {
+  return this.clientsideConfig_['path'];
+};
+
+
+/**
+ * Whether to fallback to export server in case client-side exporting didn't work.
+ * @return {boolean}
+ */
+anychart.exportsModule.Exports.prototype.isClientsideFallback = function() {
+  return this.clientsideConfig_['fallback'];
+};
+
+
+/**
+ * Whether to use client-side export feature.
+ * @return {boolean}
+ */
+anychart.exportsModule.Exports.prototype.isClientsideEnabled = function() {
+  return this.clientsideConfig_['enabled'];
+};
+
+
+/**
+ * @typedef {{
+ *    path: string,
+ *    enabled: boolean,
+ *    fallback: boolean
+ * }}
+ */
+anychart.exportsModule.Exports.ClientsideConfig;
+
+
+/**
+ * Getter/setter for the clientside export options.
+ * @param {anychart.exportsModule.Exports.ClientsideConfig=} opt_value
+ * @return {anychart.exportsModule.Exports.ClientsideConfig|anychart.exportsModule.Exports}
+ */
+anychart.exportsModule.Exports.prototype.clientside = function(opt_value) {
+  if (goog.typeOf(opt_value) == 'object') {
+    goog.mixin(this.clientsideConfig_, /** @type {anychart.exportsModule.Exports.ClientsideConfig} */ (opt_value));
+    return this;
+  }
+  return this.clientsideConfig_;
+};
+
+
 /**
  * Get/set file name for exported files.
  * @param {string=} opt_value New file name.
@@ -167,6 +243,48 @@ anychart.exportsModule.Exports.prototype.pinterest = function(opt_linkOrOptions,
 
 //endregion
 
+
+/**
+ * Loads dependencies needed for offline export to work.
+ * @return {goog.Promise}
+ */
+anychart.exportsModule.Exports.prototype.loadExternalDependencies = function() {
+  var exports = goog.global['anychart']['exports'];
+  if (exports && exports.isExternLoaded)
+    this.isExternLoaded = true;
+
+  if (this.isExternLoaded) {
+    return goog.Promise.resolve();
+  } else {
+    var deps = this.externalDependencies_;
+    var depsUrl = this.getClientsidePath();
+    depsUrl += goog.string.endsWith(depsUrl, '/') ? '' : '/'; //append slash if not present, to assemble correct path
+    var proms = [];
+    for (var i = 0; i < deps.length; i++) {
+      var p = new goog.Promise(function(resolve, reject) {
+        var fullUrl = depsUrl + deps[i];
+        var script = goog.dom.createElement('script');
+        script.setAttribute('src', fullUrl);
+
+        script.onload = script.onreadystatechange = function() {
+          anychart.core.reporting.callLog('info', 'Loaded external exporting script ' + fullUrl);
+          resolve();
+        };
+
+        script.onerror = function() {
+          anychart.core.reporting.callLog('warn', 'Failed tp load external script ' + fullUrl);
+          reject();
+        };
+
+        anychart.document.head.appendChild(script);
+      });
+      proms.push(p);
+    }
+    return goog.Promise.all(proms);
+  }
+};
+
+
 /**
  * Applying defaults.
  */
@@ -245,6 +363,7 @@ anychart.exportsModule.Exports.prototype.serialize = function() {
   this.serializeInternal_(json, 'twitter', this.twitter_);
   this.serializeInternal_(json, 'linkedin', this.linkedIn_);
   this.serializeInternal_(json, 'pinterest', this.pinterest_);
+  this.serializeInternal_(json, 'clientside', this.clientsideConfig_);
 
   return json;
 };
@@ -261,6 +380,7 @@ anychart.exportsModule.Exports.prototype.setupByJSON = function(json) {
   this.twitter(json['twitter']);
   this.linkedin(json['linkedin']);
   this.pinterest(json['pinterest']);
+  this.clientside(json['clientside']);
 };
 
 
@@ -273,4 +393,5 @@ anychart.exportsModule.Exports.prototype.setupByJSON = function(json) {
   proto['twitter'] = proto.twitter;
   proto['linkedin'] = proto.linkedin;
   proto['pinterest'] = proto.pinterest;
+  proto['clientside'] = proto.clientside;
 })();

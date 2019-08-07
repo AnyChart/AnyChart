@@ -31,8 +31,21 @@ anychart.ui.button.Base = function(opt_content, opt_renderer, opt_domHelper) {
    * @private
    */
   this.iconPositionIndex_ = 0;
+
+  /**
+   * @type {?string}
+   * @private
+   */
+  this.fallbackSymbol_ = null;
 };
 goog.inherits(anychart.ui.button.Base, goog.ui.Button);
+
+
+/**
+ * CSS class name for fallback symbol element.
+ * @type {string}
+ */
+anychart.ui.button.Base.FALLBACK_CSS_CLASS = goog.getCssName('ac-fallback-symbol');
 
 
 /**
@@ -54,6 +67,16 @@ anychart.ui.button.Base.prototype.setIcon = function(iconClass, opt_index) {
 
 
 /**
+ * Set symbol to be shown as an icon if special font symbols are not available.
+ *
+ * @param {?string} value
+ */
+anychart.ui.button.Base.prototype.setFallbackSymbol = function(value) {
+  this.fallbackSymbol_ = value;
+};
+
+
+/**
  * Apply icon class to button.
  * @private
  */
@@ -71,6 +94,11 @@ anychart.ui.button.Base.prototype.setIcon_ = function() {
       iconElement = goog.dom.createDom(goog.dom.TagName.I, this.iconClass_);
       goog.a11y.aria.setState(iconElement, goog.a11y.aria.State.HIDDEN, true);
       goog.dom.insertChildAt(contentElement, iconElement, this.iconPositionIndex_);
+
+      if (this.fallbackSymbol_) {
+        var fallbackSymbolElement = goog.dom.createDom(goog.dom.TagName.SPAN, anychart.ui.button.Base.FALLBACK_CSS_CLASS, this.fallbackSymbol_);
+        goog.dom.insertChildAt(contentElement, fallbackSymbolElement, this.iconPositionIndex_ + 1);
+      }
     }
   } else {
     if (iconElement) goog.style.setElementShown(iconElement, false);

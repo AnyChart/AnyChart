@@ -850,6 +850,84 @@ anychart.utils.alignDateLeftByUnit = function(date, unit, count, flagDateValue) 
 
 
 /**
+ * Turns passed calendar UTC-date to fiscal date.
+ * @see https://en.wikipedia.org/wiki/Fiscal_year
+ * @param {number} date - Calendar UTC timestamp.
+ * @param {number} yearStartMonth - Number of month (1 - 12).
+ *  DEV NOTE: provide correct clamping before passing this parameter here.
+ * @return {number} - Shifted timestamp.
+ */
+anychart.utils.shiftFiscalDate = function(date, yearStartMonth) {
+  if (yearStartMonth > 1) {
+    var dateObj = new Date(date);
+
+    var years = dateObj.getUTCFullYear();
+    var months = dateObj.getUTCMonth();
+    var days = dateObj.getUTCDate();
+    var hours = dateObj.getUTCHours();
+    var minutes = dateObj.getUTCMinutes();
+    var seconds = dateObj.getUTCSeconds();
+    var milliseconds = dateObj.getUTCMilliseconds();
+
+    // Can't use just dateObj.setUTCMonth() because dateObj already contains timezone offset.
+    return Date.UTC(years, months + yearStartMonth - 1, days, hours, minutes, seconds, milliseconds);
+  }
+  return date;
+};
+
+
+/**
+ * Gets fiscal date. TODO (A.Kudryavtsev): Describe.
+ * @see https://en.wikipedia.org/wiki/Fiscal_year
+ * @param {number} date - Calendar UTC timestamp.
+ * @param {number} yearStartMonth - Number of month (1 - 12).
+ *  DEV NOTE: provide correct clamping before passing this parameter here.
+ * @return {number} - Shifted timestamp.
+ */
+anychart.utils.getFiscalDate = function(date, yearStartMonth) {
+  if (yearStartMonth > 1) {
+    var dateObj = new Date(date);
+
+    var years = dateObj.getUTCFullYear();
+    var months = dateObj.getUTCMonth();
+    var days = dateObj.getUTCDate();
+    var hours = dateObj.getUTCHours();
+    var minutes = dateObj.getUTCMinutes();
+    var seconds = dateObj.getUTCSeconds();
+    var milliseconds = dateObj.getUTCMilliseconds();
+
+    months -= (yearStartMonth - 1);
+    return Date.UTC(years, months, days, hours, minutes, seconds, milliseconds);
+  }
+  return date;
+};
+
+
+/**
+ * Check if month of passed timestamp falls into fiscal year range,
+ * and if not, set timestamp's year value by previous year.
+ *
+ * @param {number} date - Calendar UTC timestamp.
+ * @param {number} yearStartMonth - Number of month (1 - 12).
+ * @return {number} - Timestamp with correct fiscal year value.
+ */
+anychart.utils.updateFiscalYear = function(date, yearStartMonth) {
+  if (yearStartMonth > 1) {
+    var dateObj = new Date(date);
+    var month = dateObj.getUTCMonth();
+
+    if (month < (yearStartMonth - 1)) {
+      var year = dateObj.getUTCFullYear();
+      dateObj.setUTCFullYear(year - 1);
+    }
+
+    return dateObj.getTime();
+  }
+  return date;
+};
+
+
+/**
  * Creates a goog interval from StockInterval and count.
  * @param {anychart.enums.Interval} unit
  * @param {number} count
@@ -1540,7 +1618,7 @@ anychart.utils.json2xml = function(json, opt_rootNodeName, opt_returnAsXmlNode) 
   var root = anychart.utils.json2xml_(json, opt_rootNodeName || 'anychart', result);
   if (root) {
     if (!opt_rootNodeName)
-      root.setAttribute('xmlns', 'http://anychart.com/schemas/8.6.0/xml-schema.xsd');
+      root.setAttribute('xmlns', 'http://anychart.com/schemas/8.7.0/xml-schema.xsd');
     result.appendChild(root);
   }
   return opt_returnAsXmlNode ? result : goog.dom.xml.serialize(result);
@@ -2839,9 +2917,56 @@ anychart.utils.getFadeGradient = function(ratio, opacity, fontColor, opt_fadeSte
 };
 
 
+//region -- Async actions.
+/**
+ * Executes fn-function in next execution frame.
+ * Be very careful in using anychart.utils.schedule
+ * inside another anychart.utils.schedule, setTimeout really
+ * moves function in the end of execution order:
+ *
+ *  <code>
+ *    anychart.utils.schedule(function() {
+ *      anychart.utils.schedule(function() {
+ *        console.log(1);
+ *      });
+ *    });
+ *
+ *    anychart.utils.schedule(function() {
+ *      console.log(2);
+ *    });
+ *
+ *    //Output: 2, 1
+ *  <code>
+ *
+ * @param {Function} fn - setTimeout callback.
+ * @param {Function=} opt_complete - Complete callback.
+ *  NOTE: Complete callback is synchronous! Do not preform any heavyweight operations here!
+ * @param {Object=} opt_context - Callback context.
+ * @return {number} - Timeout id.
+ */
+anychart.utils.schedule = function(fn, opt_complete, opt_context) {
+  var tid = setTimeout(function() {
+    fn.call(opt_context);
+    if (opt_complete)
+      opt_complete.call(opt_context);
+
+    //This must prevent huge memory leak.
+    clearTimeout(tid);
+    fn = null;
+    opt_complete = null;
+    opt_context = null;
+  }, 1); //setTimeout(function, 0) is unacceptable for IE.
+  return tid;
+};
+
+
+//endregion
+
+
 //exports
 goog.exportSymbol('anychart.utils.printUtilsBoolean', anychart.utils.printUtilsBoolean);
 goog.exportSymbol('anychart.utils.xml2json', anychart.utils.xml2json);
 goog.exportSymbol('anychart.utils.json2xml', anychart.utils.json2xml);
 goog.exportSymbol('anychart.utils.hideTooltips', anychart.utils.hideTooltips);
 goog.exportSymbol('anychart.utils.htmlTableFromCsv', anychart.utils.htmlTableFromCsv);
+goog.exportSymbol('anychart.utils.schedule', anychart.utils.schedule);

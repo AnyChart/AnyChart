@@ -88,7 +88,7 @@ anychart.ganttModule.Selection.prototype.selectRow = function(item) {
 
 /**
  *
- * @param {!(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} item
+ * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} item
  * @return {boolean} - Whether row is selected.
  */
 anychart.ganttModule.Selection.prototype.isRowSelected = function(item) {

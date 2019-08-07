@@ -664,6 +664,15 @@ anychart.stockModule.data.TableSelectable.RowProxy.prototype.getKey = function()
 };
 
 
+/**
+ * Returns aggregated state.
+ * @return {boolean}
+ */
+anychart.stockModule.data.TableSelectable.RowProxy.prototype.isAggregated = function() {
+  return this.aggregated_;
+};
+
+
 //proto['getFieldColumn'] = proto.getFieldColumn;
 //proto['getMin'] = proto.getMin;
 //proto['getMax'] = proto.getMax;

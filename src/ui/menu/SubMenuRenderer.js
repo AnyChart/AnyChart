@@ -176,3 +176,17 @@ anychart.ui.menu.SubMenuRenderer.prototype.addArrow_ = function(subMenu, element
   arrow.innerHTML = '&nbsp;';
   goog.dom.appendChild(this.getContentElement(element), arrow);
 };
+
+
+/**
+ * Fixes cases with gantt toolbar when first child is icon element.
+ * @override
+ */
+anychart.ui.menu.SubMenuRenderer.prototype.getContentElement = function(element) {
+  var content = /** @type {Node} */(element && element.firstChild);
+  // <i> element is for icon and it lies before the content element in gantt toolbar buttons.
+  if (content.tagName == goog.dom.TagName.I) {
+    return /** @type {Element} */(content.nextSibling);
+  }
+  return /** @type {Element} */(content);
+};

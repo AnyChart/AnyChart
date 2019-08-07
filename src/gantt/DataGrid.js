@@ -5,6 +5,7 @@ goog.require('acgraph');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.Button');
+goog.require('anychart.core.ui.Label');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.SimpleSplitter');
 goog.require('anychart.core.ui.Title');
@@ -34,6 +35,7 @@ goog.require('goog.string');
  */
 anychart.ganttModule.DataGrid = function(opt_controller) {
   anychart.ganttModule.DataGrid.base(this, 'constructor', opt_controller);
+  this.addThemes('defaultDataGrid');
 
   /**
    * Array of columns.
@@ -95,6 +97,13 @@ anychart.ganttModule.DataGrid = function(opt_controller) {
    */
   this.editItem_ = null;
 
+  this.partialLabels = {
+    first: NaN,
+    last: NaN,
+    count: NaN,
+    reset: true
+  };
+
   /**
    *
    * @type {Array.<number>}
@@ -102,24 +111,22 @@ anychart.ganttModule.DataGrid = function(opt_controller) {
    */
   this.columnsWidthsCache_ = [];
 
-  /**
-   *
-   * @type {?function():(Object|undefined)}
-   * @private
-   */
-  this.onEditStart_ = null;
-
-  /**
-   *
-   * @type {?function():(Object|undefined)}
-   * @private
-   */
-  this.onEditEnd_ = null;
-
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['columnStroke', anychart.ConsistencyState.DATA_GRID_GRIDS, anychart.Signal.NEEDS_REDRAW],
-    ['headerFill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW]
+    ['headerFill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['onEditStart', 0, 0],
+    ['onEditEnd', 0, 0]
   ]);
+
+  var dgTheme = this.themeSettings;
+  if ('columns' in dgTheme) {
+    for (var i = 0; i < dgTheme['columns'].length; i++) {
+      var columnConfig = dgTheme['columns'][i];
+      if (columnConfig) {
+        this.columnInternal_(i);
+      }
+    }
+  }
 };
 goog.inherits(anychart.ganttModule.DataGrid, anychart.ganttModule.BaseGrid);
 
@@ -186,6 +193,14 @@ anychart.ganttModule.DataGrid.NAME_COLUMN_WIDTH = 170;
  * @type {number}
  */
 anychart.ganttModule.DataGrid.DEFAULT_COLUMN_WIDTH = 90;
+
+
+/**
+ * Average maximal allowed labels count at once
+ * to be processed.
+ * @type {number}
+ */
+anychart.ganttModule.DataGrid.MAX_LABELS_AT_ONCE = 300;
 
 
 /**
@@ -344,18 +359,20 @@ anychart.ganttModule.DataGrid.prototype.defaultColumnSettings = function(opt_val
 
 //region --- Coloring
 /**
- * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
+ * @type {!Object.<anychart.core.settings.PropertyDescriptor>}
  */
-anychart.ganttModule.DataGrid.COLOR_DESCRIPTORS = (function() {
-  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+anychart.ganttModule.DataGrid.DG_DESCRIPTORS = (function() {
+  /** @type {!Object.<anychart.core.settings.PropertyDescriptor>} */
   var map = {};
   anychart.core.settings.createDescriptors(map, [
     [anychart.enums.PropertyHandlerType.MULTI_ARG, 'columnStroke', anychart.core.settings.strokeNormalizer],
-    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'headerFill', anychart.core.settings.fillNormalizer]
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'headerFill', anychart.core.settings.fillNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'onEditStart', anychart.core.settings.functionNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'onEditEnd', anychart.core.settings.functionNormalizer]
   ]);
   return map;
 })();
-anychart.core.settings.populate(anychart.ganttModule.DataGrid, anychart.ganttModule.DataGrid.COLOR_DESCRIPTORS);
+anychart.core.settings.populate(anychart.ganttModule.DataGrid, anychart.ganttModule.DataGrid.DG_DESCRIPTORS);
 
 
 /**
@@ -364,36 +381,6 @@ anychart.core.settings.populate(anychart.ganttModule.DataGrid, anychart.ganttMod
  */
 anychart.ganttModule.DataGrid.prototype.resolveHeaderFill = function() {
   return /** @type {acgraph.vector.Fill} */(this.getOption('headerFill'));
-};
-
-
-//endregion
-//region -- Edit input editing.
-/**
- *
- * @param {(function():(Object|undefined))=} opt_value - On edit start callback.
- * @return {anychart.ganttModule.DataGrid|function():(Object|undefined)}
- */
-anychart.ganttModule.DataGrid.prototype.onEditStart = function(opt_value) {
-  if (goog.isFunction(opt_value)) {
-    this.onEditStart_ = opt_value;
-    return this;
-  }
-  return this.onEditStart_;
-};
-
-
-/**
- *
- * @param {(function():(Object|undefined))=} opt_value - On edit end callback.
- * @return {anychart.ganttModule.DataGrid|function():(Object|undefined)}
- */
-anychart.ganttModule.DataGrid.prototype.onEditEnd = function(opt_value) {
-  if (goog.isFunction(opt_value)) {
-    this.onEditEnd_ = opt_value;
-    return this;
-  }
-  return this.onEditEnd_;
 };
 
 
@@ -425,7 +412,7 @@ anychart.ganttModule.DataGrid.prototype.forEachVisibleColumn_ = function(fn, opt
   var counter = -1;
   for (var i = 0, l = this.columns_.length; i < l; i++) {
     var column = this.columns_[i];
-    if (column && column.enabled()) {
+    if (column && column.enabled() && !column.isDisposed()) {
       counter++;
       var args = [column, counter];
       args.push.apply(args, goog.array.slice(arguments, 2));
@@ -444,7 +431,7 @@ anychart.ganttModule.DataGrid.prototype.forEachVisibleColumn_ = function(fn, opt
  */
 anychart.ganttModule.DataGrid.prototype.collapseExpandItem = function(itemIndex, state) {
   var item = this.controller.getVisibleItems()[itemIndex];
-  if (item && item.numChildren()) {
+  if (item && anychart.ganttModule.BaseGrid.isParent(item)) {
     var evtObj = {
       'type': anychart.enums.EventType.ROW_COLLAPSE_EXPAND,
       'item': item,
@@ -542,8 +529,11 @@ anychart.ganttModule.DataGrid.prototype.columnInternal_ = function(opt_indexOrVa
   var column = this.columns_[index];
   if (!column) {
     column = new anychart.ganttModule.Column(this, index);
-    // column.setup(this.defaultColumnSettings());
-    column.setupInternal(!!opt_default, this.defaultColumnSettings());
+    var dgTheme = this.themeSettings;
+    column.addThemes(dgTheme['defaultColumnSettings']);
+    if ('columns' in dgTheme) {
+      column.addThemes(dgTheme['columns'][index]);
+    }
     column.listenSignals(this.columnInvalidated_, this);
     // column.labels().installStyle();
     anychart.measuriator.register(column);
@@ -560,20 +550,7 @@ anychart.ganttModule.DataGrid.prototype.columnInternal_ = function(opt_indexOrVa
     return this;
   } else {
     if (newColumn) {
-      var columnWidth = index ?
-          (index == 1 ? anychart.ganttModule.DataGrid.NAME_COLUMN_WIDTH : anychart.ganttModule.DataGrid.DEFAULT_COLUMN_WIDTH) :
-          anychart.ganttModule.DataGrid.DEFAULT_COLUMN_WIDTH;
-
-      var columnTitle = index ? (index == 1 ? 'Name' : ('Column #' + index)) : '#';
-      column.suspendSignalsDispatching();
-      column
-          .container(this.getContentLayer())
-          .width(columnWidth)
-          .height('100%');
-
-      column.title()['text'](columnTitle);
-
-      column.resumeSignalsDispatching(true);
+      column.container(this.getContentLayer());
       this.columns_[index] = column;
       this.addSplitter_();
 
@@ -585,9 +562,119 @@ anychart.ganttModule.DataGrid.prototype.columnInternal_ = function(opt_indexOrVa
 
 
 /**
- * @inheritDoc
+ * Gets all (enabled and disabled) existing not disposed columns count.
+ * @return {number}
  */
-anychart.ganttModule.DataGrid.prototype.prepareLabels = function() {
+anychart.ganttModule.DataGrid.prototype.getColumnsCount = function() {
+  var res = 0;
+  for (var i = 0; i < this.columns_.length; i++) {
+    var col = this.columns_[i];
+    if (col && !col.isDisposed())
+      res++;
+  }
+  return res;
+};
+
+
+/**
+ * Initializes this.partialLabels object (@see typedef).
+ * Contains information about data rows to be processed.
+ * Works with linear list of data items (rows) to asynchronously
+ * process portions of labels.
+ */
+anychart.ganttModule.DataGrid.prototype.initPartialData = function() {
+  /*
+    Since this method will be called anyway during the async processing,
+    the "reset" flag allows to keep resetting under control.
+   */
+  if (this.partialLabels.reset) {
+    var enabledColumnsCount = 0;
+    for (var i = 0, l = this.columns_.length; i < l; i++) {
+      var column = this.columns_[i];
+      if (column && column.enabled() && !column.isDisposed()) {
+        enabledColumnsCount++;
+      }
+    }
+
+    var allItems = this.controller.getAllItems();
+    var part = this.partialLabels;
+    if (allItems.length) {
+      part.first = 0;
+      var maxRowsAllowed = Math.max(1, Math.floor(anychart.ganttModule.DataGrid.MAX_LABELS_AT_ONCE / enabledColumnsCount));
+      part.count = Math.min(maxRowsAllowed, allItems.length);
+      part.last = part.first + Math.max(0, part.count - 1);
+      part.reset = false;
+    } else {
+      part.first = NaN;
+      part.last = NaN;
+      part.count = NaN;
+      part.reset = true;
+    }
+  }
+};
+
+
+/**
+ * Resets partial columns texts.
+ */
+anychart.ganttModule.DataGrid.prototype.resetColumnsSync = function() {
+  this.partialLabels.reset = true;
+  this.forEachVisibleColumn_(function(col) {
+    col.resetTexts();
+  });
+};
+
+
+/**
+ * TODO (A.Kudryavtsev): Describe.
+ * @return {boolean}
+ */
+anychart.ganttModule.DataGrid.prototype.partialMeasurement = function() {
+  var allItems = this.controller.getAllItems();
+  var part = this.partialLabels;
+  if (isNaN(part.last) || part.last >= allItems.length - 1) {
+    return false;
+  } else {
+    part.first = part.last + 1;
+    var c = Math.min(allItems.length - 1 - part.first, part.count);
+    part.last = part.first + c;
+  }
+  return true;
+};
+
+
+/**
+ * Getter/setter for loading message label.
+ * @param {Object=} opt_value - Config.
+ * @return {anychart.ganttModule.DataGrid|anychart.core.ui.Label}
+ */
+anychart.ganttModule.DataGrid.prototype.loadingMessage = function(opt_value) {
+  if (!this.loadingMessage_) {
+    this.loadingMessage_ = new anychart.core.ui.Label();
+    this.loadingMessage_.container(this.getScrollsLayer());
+    this.loadingMessage_.background().enabled(true).fill('red 0.5');
+    this.loadingMessage_['text']('Working...');
+    this.loadingMessage_['anchor']('left-top');
+    this.loadingMessage_['position']('left-top');
+    this.loadingMessage_.padding(5);
+    this.loadingMessage_.enabled(true);
+    this.loadingMessage_.parentBounds(this.pixelBoundsCache);
+  }
+
+  if (opt_value) {
+    this.loadingMessage_.setupInternal(false, opt_value);
+    return this;
+  }
+
+  return this.loadingMessage_;
+};
+
+
+/**
+ * Sync labels preparation.
+ * @private
+ */
+anychart.ganttModule.DataGrid.prototype.prepareSync_ = function() {
   this.forEachVisibleColumn_(function(col) {
     col.provideMeasurements();
     var applyStyling = false;
@@ -625,9 +712,111 @@ anychart.ganttModule.DataGrid.prototype.prepareLabels = function() {
       measure it.
      */
     col.dispatchSignal(signal);
-
-
   });
+};
+
+
+/**
+ * Async labels preparation.
+ * @private
+ */
+anychart.ganttModule.DataGrid.prototype.prepareAsync_ = function() {
+  this.controller.timeouts.push(anychart.utils.schedule(function() {
+    this.initPartialData();
+
+    var hasInconsistentColumns = false;
+    this.forEachVisibleColumn_(function(col) {
+      if (!col.isConsistent()) {
+        hasInconsistentColumns = true;
+        col.provideMeasurements();
+        var applyStyling = false;
+        var needsToDropOldBounds = false;
+
+        var signal = 0;
+        if (col.hasInvalidationState(anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_APPEARANCE)) {
+          applyStyling = true;
+        }
+
+        if (col.hasInvalidationState(anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_BOUNDS)) {
+          if (col.labels().needsBoundsCalculation())
+            signal |= anychart.Signal.MEASURE_BOUNDS;
+          needsToDropOldBounds = true;
+          applyStyling = true;
+        }
+
+        if (col.hasInvalidationState(anychart.ConsistencyState.DATA_GRID_COLUMN_DATA)) {
+          /*
+            Measuriator will collect labels itself on this signal.
+           */
+          signal |= anychart.Signal.MEASURE_COLLECT;
+          needsToDropOldBounds = true;
+          applyStyling = true;
+        }
+
+        /*
+          Labels are already collected here, applies the style if needed.
+         */
+        if (applyStyling)
+          col.applyLabelsStyle(needsToDropOldBounds);
+
+        /*
+          Signal makes Measuriator to collect labels and be ready to
+          measure it.
+         */
+        col.dispatchSignal(signal);
+      }
+    });
+
+    if (hasInconsistentColumns) {
+      if (this.partialMeasurement()) {
+        var percent = Math.round(this.partialLabels.last / this.controller.getAllItems().length * 100);
+        if (isNaN(percent)) {
+          this.loadingMessage().enabled(false);
+        } else {
+          this.loadingMessage().enabled(true).parentBounds(this.pixelBoundsCache)['text']('Working: ' + percent + '%').draw();
+          this.interactivityHandler.dispatchEvent({
+            'type': anychart.enums.EventType.WORKING,
+            'progress': percent
+          });
+        }
+
+        anychart.measuriator.measure();
+        this.forEachVisibleColumn_(function(col) {
+          col.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION);
+          col.draw();
+        });
+        this.prepareLabels();
+      } else {
+        this.forEachVisibleColumn_(function(col) {
+          //Here we suppose everything is applied correctly.
+          col.markConsistent(anychart.ConsistencyState.DATA_GRID_COLUMN_DATA |
+              anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_APPEARANCE |
+              anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_BOUNDS);
+          col.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION);
+          col.draw();
+        });
+        this.needsForceSignalsDispatching(false); //TODO (A.Kudryavtsev): Describe.
+        this.loadingMessage().enabled(false).draw();
+        this.controller.run(); //this clears remaining async consistency states on timeline.
+        this.controller.timeouts.push(anychart.utils.schedule(function() {
+          this.controller.resetTimeouts();
+          this.interactivityHandler.dispatchEvent(anychart.enums.EventType.WORKING_FINISH);
+        }, void 0, this));
+      }
+    }
+  }, void 0, this));
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.ganttModule.DataGrid.prototype.prepareLabels = function() {
+  if (anychart.isAsync()) {
+    this.prepareAsync_();
+  } else {
+    this.prepareSync_();
+  }
 };
 
 
@@ -665,7 +854,7 @@ anychart.ganttModule.DataGrid.prototype.splitterDblClickHandler_ = function(spli
  */
 anychart.ganttModule.DataGrid.prototype.resizeColumn_ = function(column, columnIndex, splitterIndex, width) {
   if (splitterIndex == columnIndex) { //If splitter_index == column_index.
-    column.width(width); //Sets new width.
+    column['width'](width); //Sets new width.
   }
 };
 
@@ -680,14 +869,13 @@ anychart.ganttModule.DataGrid.prototype.resizeColumn_ = function(column, columnI
  */
 anychart.ganttModule.DataGrid.prototype.dblClickResizeColumn_ = function(column, columnIndex, splitterIndex, event) {
   if (splitterIndex == columnIndex) { //If splitter_index == column_index.
-
     var title = column.title();
     var height = title.height();
     var eventY = event['offsetY'] - this.pixelBoundsCache.top;
     if (eventY < height) {
       var titleOriginalBoundsWidth = title.getOriginalBounds().width;
       titleOriginalBoundsWidth += (title.padding().getOption('left') + title.padding().getOption('right'));
-      column.width(/** @type {number} */ (column.defaultWidth() ? column.defaultWidth() : titleOriginalBoundsWidth));
+      column['width'](/** @type {number} */ (column['defaultWidth']() ? column['defaultWidth']() : titleOriginalBoundsWidth));
     }
   }
 };
@@ -706,8 +894,11 @@ anychart.ganttModule.DataGrid.prototype.columnInvalidated_ = function(event) {
     state |= anychart.ConsistencyState.APPEARANCE;
   if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED))
     state |= anychart.ConsistencyState.DATA_GRID_GRIDS;
-  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW_LABELS))
+  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW_LABELS)) {
     state |= anychart.ConsistencyState.GRIDS_POSITION;
+    if (anychart.isAsync())
+      this.partialLabels.reset = true;
+  }
 
   this.invalidate(state, signal);
 };
@@ -717,6 +908,7 @@ anychart.ganttModule.DataGrid.prototype.columnInvalidated_ = function(event) {
 anychart.ganttModule.DataGrid.prototype.horizontalScrollBar = function(opt_value) {
   if (!this.horizontalScrollBar_) {
     this.horizontalScrollBar_ = new anychart.ganttModule.ScrollBar();
+    this.horizontalScrollBar_.setupByJSON(/** @type {!Object} */ (anychart.getFlatTheme('defaultScrollBar')));
     this.horizontalScrollBar_.layout(anychart.enums.Layout.HORIZONTAL);
 
     var ths = this;
@@ -798,7 +990,7 @@ anychart.ganttModule.DataGrid.prototype.boundsInvalidated = function() {
   for (var i = 0, l = this.columns_.length; i < l; i++) {
     var col = this.columns_[i];
     if (col && col.enabled()) {
-      if (anychart.utils.isPercent(col.width()))
+      if (anychart.utils.isPercent(col.getOption('width')))
         col.resetBounds();
       var colWidth = col.calculateBounds().width; //We need pixel value here.
       totalWidth += (colWidth + splitterWidth);
@@ -972,9 +1164,8 @@ anychart.ganttModule.DataGrid.prototype.editInputSubmitHandler_ = function(e) {
     'item': this.editItem_,
     'value': e['value']
   };
-  if (goog.isFunction(this.onEditEnd_)) {
-    var result = this.onEditEnd_.call(context);
-    // var changes = onEdit(val);
+  if (goog.isFunction(this.getOption('onEditEnd'))) {
+    var result = /** @type {Function} */ (this.getOption('onEditEnd')).call(context);
     if (result && goog.typeOf(result) == 'object' && !(result['cancelEdit']) && goog.typeOf(result['itemMap']) == 'object' && this.editItem_) {
       var changes = result['itemMap'];
       var tree = this.controller.data();//this.controller.data() can be Tree or TreeView.
@@ -1154,8 +1345,8 @@ anychart.ganttModule.DataGrid.prototype.addMouseDblClick = function(e) {
           'value': val
         };
 
-        if (goog.isFunction(this.onEditStart_)) {
-          var result = this.onEditStart_.call(context);
+        if (goog.isFunction(this.getOption('onEditStart'))) {
+          var result = /** @type {Function} */ (this.getOption('onEditStart')).call(context);
           if (result && goog.typeOf(result) == 'object' && !(result['cancelEdit']) && this.editItem_) {
             var valueToShow = goog.isDefAndNotNull(result['value']) ? result['value'] : val;
             this.editInput_.show(valueToShow, bounds);
@@ -1163,7 +1354,6 @@ anychart.ganttModule.DataGrid.prototype.addMouseDblClick = function(e) {
           }
         }
       }
-
     }
   }
 };
@@ -1210,6 +1400,8 @@ anychart.ganttModule.DataGrid.prototype.mouseOutMove = function(event) {
 anychart.ganttModule.DataGrid.prototype.buttons = function(opt_value) {
   if (!this.buttons_) {
     this.buttons_ = new anychart.ganttModule.DataGridButton(this);
+    this.setupCreated('buttons', this.buttons_);
+    this.buttons_.setupStateSettings();
     this.buttons_.listenSignals(this.buttonsInvalidated_, this);
   }
   if (goog.isDef(opt_value)) {
@@ -1240,7 +1432,7 @@ anychart.ganttModule.DataGrid.prototype.buttonsInvalidated_ = function(e) {
 anychart.ganttModule.DataGrid.prototype.serialize = function() {
   var json = anychart.ganttModule.DataGrid.base(this, 'serialize');
 
-  anychart.core.settings.serialize(this, anychart.ganttModule.DataGrid.COLOR_DESCRIPTORS, json);
+  anychart.core.settings.serialize(this, anychart.ganttModule.DataGrid.DG_DESCRIPTORS, json, void 0, void 0, true);
   json['horizontalOffset'] = this.horizontalOffset();
 
   json['buttons'] = this.buttons().serialize();
@@ -1255,6 +1447,8 @@ anychart.ganttModule.DataGrid.prototype.serialize = function() {
   if (this.horizontalScrollBar_)
     json['horizontalScrollBar'] = this.horizontalScrollBar().serialize();
 
+  json['tooltip'] = this.tooltip().serialize();
+
   return json;
 };
 
@@ -1263,7 +1457,7 @@ anychart.ganttModule.DataGrid.prototype.serialize = function() {
 anychart.ganttModule.DataGrid.prototype.setupByJSON = function(config, opt_default) {
   anychart.ganttModule.DataGrid.base(this, 'setupByJSON', config, opt_default);
 
-  anychart.core.settings.deserialize(this, anychart.ganttModule.DataGrid.COLOR_DESCRIPTORS, config, opt_default);
+  anychart.core.settings.deserialize(this, anychart.ganttModule.DataGrid.DG_DESCRIPTORS, config, opt_default);
   this.horizontalOffset(config['horizontalOffset']);
 
   this.buttons().setupInternal(!!opt_default, config['buttons']);
@@ -1271,8 +1465,8 @@ anychart.ganttModule.DataGrid.prototype.setupByJSON = function(config, opt_defau
   if ('defaultColumnSettings' in config)
     this.defaultColumnSettings(config['defaultColumnSettings']);
 
-  this.onEditStart(config['onEditStart']);
-  this.onEditEnd(config['onEditEnd']);
+  this['onEditStart'](config['onEditStart']);
+  this['onEditEnd'](config['onEditEnd']);
 
   if ('columns' in config) {
     for (var i = 0, l = config['columns'].length; i < l; i++) {
@@ -1386,9 +1580,7 @@ anychart.standalones.dataGrid = function() {
   proto['editStructurePreviewStroke'] = proto.editStructurePreviewStroke;
   proto['editStructurePreviewDashStroke'] = proto.editStructurePreviewDashStroke;
   proto['buttons'] = proto.buttons;
-
-  proto['onEditStart'] = proto.onEditStart;
-  proto['onEditEnd'] = proto.onEditEnd;
+  proto['getColumnsCount'] = proto.getColumnsCount;
 
 
   proto = anychart.standalones.DataGrid.prototype;
@@ -1397,7 +1589,6 @@ anychart.standalones.dataGrid = function() {
   proto['data'] = proto.data;
   proto['parentBounds'] = proto.parentBounds;
   proto['container'] = proto.container;
-  proto['rowStroke'] = proto.rowStroke;
   proto['headerHeight'] = proto.headerHeight;
   proto['verticalScrollBar'] = proto.verticalScrollBar;
   proto['defaultRowHeight'] = proto.defaultRowHeight;
