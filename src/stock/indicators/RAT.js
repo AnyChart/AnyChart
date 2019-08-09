@@ -45,9 +45,11 @@ anychart.stockModule.indicators.RAT.prototype.createComputer = function(mapping)
 
 /** @inheritDoc */
 anychart.stockModule.indicators.RAT.prototype.createNameForSeries = function(seriesId, series) {
-  if (isNaN(this.baseDate_))
-    return 'RAT(base)';
-  return 'RAT(' + anychart.format.dateTime(this.baseDate_) + ')';
+  // TODO: (Shestacov) we thought to show the base date in series name, but we can't access first point key here if the baseDate is undefined
+  // if (isNaN(this.baseDate_))
+  //   return 'RAT(base)';
+  // return 'RAT(' + anychart.format.dateTime(this.baseDate_) + ')';
+  return 'RAT';
 };
 
 

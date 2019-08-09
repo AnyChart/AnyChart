@@ -41,6 +41,7 @@ anychart.stockModule.PlotControls.BUTTONS_META = {
   'up': {
     'tooltip': 'Move plot up',
     'icon': 'ac ac-caret-up',
+    'fallbackSymbol': '\u25B2',
     'model': {
       'type': 'up'
     }
@@ -48,6 +49,7 @@ anychart.stockModule.PlotControls.BUTTONS_META = {
   'down': {
     'tooltip': 'Move plot down',
     'icon': 'ac ac-caret-down',
+    'fallbackSymbol': '\u25bc',
     'model': {
       'type': 'down'
     }
@@ -55,6 +57,7 @@ anychart.stockModule.PlotControls.BUTTONS_META = {
   'zoom': {
     'tooltip': 'Expand/Collapse plot',
     'icon': 'ac ac-enlarge',
+    'fallbackSymbol': '\u26f6',
     'toggle': true,
     'model': {
       'type': 'zoom'
@@ -150,6 +153,7 @@ anychart.stockModule.PlotControls.prototype.update = function() {
     button.addClassName('anychart-button-standard');
     button.setTooltip(buttonInfo['tooltip']);
     button.setIcon(buttonInfo['icon']);
+    button.setFallbackSymbol(buttonInfo['fallbackSymbol']);
     button.setModel(buttonInfo['model']);
     if (buttonInfo['toggle']) {
       expanded ? button.setIcon('ac ac-dot-square-o') : button.setIcon('ac ac-enlarge');

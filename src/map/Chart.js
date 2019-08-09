@@ -1077,6 +1077,9 @@ anychart.mapModule.Chart.prototype.tapHandler = function(event) {
 
 /** @inheritDoc */
 anychart.mapModule.Chart.prototype.handleMouseDown = function(event) {
+  if (this.preventMouseDownInteractivity)
+    return;
+
   this.itWasDrag = false;
   this.originEvent = event;
 
@@ -1966,6 +1969,12 @@ anychart.mapModule.Chart.prototype.selectByPolygon = function(event) {
       series.selectPointInternal(pointsInPolygon, append);
     }
   }
+  //TODO (A.Kudryavtsev): Do we need to provide more information here?
+  this.dispatchEvent({
+    'type': anychart.enums.EventType.POINTS_SELECT,
+    'points': this.getSelectedPoints(),
+    'seriesStatus': [] //TODO left as is for a while.
+  });
 };
 
 

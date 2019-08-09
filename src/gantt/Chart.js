@@ -806,6 +806,8 @@ anychart.ganttModule.Chart.prototype.rowMouseMove = function(event) {
       tooltip.setMiddleFormats(
           /** @type {Function|null|string|undefined} */ (tlTooltip.getOption('format')),
           /** @type {Function|null|string|undefined} */ (tlTooltip.getOption('titleFormat')));
+    } else {
+      target.tooltip().hideChildTooltips(); //This fixes appearance of tooltip on fast row mouse change.
     }
 
     if (tooltip.enabled()) {
