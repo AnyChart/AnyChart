@@ -1401,8 +1401,9 @@ anychart.core.Base.prototype.getCreated = function(getterName, opt_ignoreEnabled
             }
           }
           if (goog.isDef(theme)) {
-            if (goog.isBoolean(theme))
-              theme = {'enabled': theme};
+            //goog.isNull condition covers cases like {'background': null}
+            if (goog.isBoolean(theme) || goog.isNull(theme))
+              theme = {'enabled': !!theme};
 
             if (goog.isDef(theme['enabled'])) {
               if (theme['enabled'])
