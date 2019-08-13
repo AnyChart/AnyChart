@@ -2429,7 +2429,6 @@ anychart.utils.getMarkerDrawer = function(type) {
            * @return {!acgraph.vector.Path}
            */
           (function(path, x, y, size, opt_strokeThickness) {
-            opt_strokeThickness = opt_strokeThickness || 0;
             var height = size * 2;
             var width = height / 2;
 
