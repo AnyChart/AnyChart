@@ -170,10 +170,9 @@ anychart.scales.Linear.prototype.setupTransformer = function() {
 
 /** @inheritDoc */
 anychart.scales.Linear.prototype.setupTicks = function() {
-  var setupResult = this.ticks().setupAsMajor(this.min, this.max,
-      this.minimumModeAuto && this.min != this.softMin && this.alignMinimumVal,
-      this.maximumModeAuto && this.max != this.softMax && this.alignMaximumVal,
-      this.logBaseVal, this.borderLog || 0);
+  var canModifyMin = this.minimumModeAuto && this.min != this.softMin && this.alignMinimumVal;
+  var canModifyMax = this.maximumModeAuto && this.max != this.softMax && this.alignMaximumVal;
+  var setupResult = this.ticks().setupAsMajor(this.min, this.max, canModifyMin, canModifyMax, this.logBaseVal, this.borderLog || 0);
 
   if (!isNaN(setupResult[4]))
     this.borderLog = setupResult[4];
@@ -184,7 +183,9 @@ anychart.scales.Linear.prototype.setupTicks = function() {
   if (this.maximumModeAuto)
     this.max = setupResult[1]; // new max
 
-  this.minorTicks().setupAsMinor(this.ticks().getInternal(), this.logBaseVal, setupResult[2], setupResult[3], this.borderLog);
+  var minorTicks = this.minorTicks();
+  var internalTicks = this.ticks().getInternal();
+  minorTicks.setupAsMinor(internalTicks, this.logBaseVal, setupResult[2], setupResult[3], this.borderLog);
 };
 
 

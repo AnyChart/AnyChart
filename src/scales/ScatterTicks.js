@@ -353,7 +353,7 @@ anychart.scales.ScatterTicks.prototype.setupAsMinor = function(values, opt_logBa
     if (goog.isDef(opt_majorDesiredMin)) {
       min = values[0];
       max = values[1];
-      adder.call(this, min, max, opt_majorDesiredMin, max, this.minCount_, opt_logBase, opt_borderLog || 0);
+      adder.call(this, min, max, opt_majorDesiredMin, max, this.minCount_, opt_logBase, opt_borderLog || 0, true);
       start = 1;
     } else
       start = 0;
@@ -570,15 +570,14 @@ anychart.scales.ScatterTicks.prototype.setupLinear_ = function(min, max, canModi
  * @param {number} count
  * @param {number} logBase
  * @param {number} borderLog
+ * @param {boolean=} opt_isInitial
  * @private
  */
-anychart.scales.ScatterTicks.prototype.addMinorLinearTicksPortion_ = function(min, max, rangeMin, rangeMax, count, logBase, borderLog) {
-  this.putLinearTicks_(
-      min,
-      max,
-      this.getLinearInterval_(rangeMin, rangeMax, count),
-      this.autoTicks_[this.autoTicks_.length - 1],
-      this.autoTicks_);
+anychart.scales.ScatterTicks.prototype.addMinorLinearTicksPortion_ = function(min, max, rangeMin, rangeMax, count, logBase, borderLog, opt_isInitial) {
+  var interval = this.getLinearInterval_(rangeMin, rangeMax, count);
+  var skipVal = this.autoTicks_[this.autoTicks_.length - 1];
+  var result = this.autoTicks_;
+  this.putLinearTicks_(min, max, interval, skipVal, result, opt_isInitial);
 };
 
 
@@ -588,19 +587,36 @@ anychart.scales.ScatterTicks.prototype.addMinorLinearTicksPortion_ = function(mi
  * @param {number} interval
  * @param {number} skipVal
  * @param {Array.<number>=} opt_res
+ * @param {boolean=} opt_isInitial
  * @return {Array.<number>}
  * @private
  */
-anychart.scales.ScatterTicks.prototype.putLinearTicks_ = function(min, max, interval, skipVal, opt_res) {
+anychart.scales.ScatterTicks.prototype.putLinearTicks_ = function(min, max, interval, skipVal, opt_res, opt_isInitial) {
   var res = opt_res || [];
   max = anychart.math.round(max, 7);
   var prev, i, iter = 0;
-  for (i = prev = anychart.math.round(min, 7); i <= max; i = anychart.math.round(i + interval, 7)) {
-    if (skipVal != i)
-      res.push(i);
-    if (iter && prev == i)
-      break;
-    iter++;
+
+  if (opt_isInitial && max <= this.base_) {
+    /*
+      This if (opt_isInitial && max <= this.base_) condition fixes
+      https://anychart.atlassian.net/browse/DVF-4292 by
+      adding tick not from min to base_ value, but from base_ to min.
+     */
+    for (i = prev = anychart.math.round(max, 7); i >= min; i = anychart.math.round(i - interval, 7)) {
+      if (skipVal != i)
+        goog.array.insertAt(res, i);
+      if (iter && prev == i)
+        break;
+      iter++;
+    }
+  } else {
+    for (i = prev = anychart.math.round(min, 7); i <= max; i = anychart.math.round(i + interval, 7)) {
+      if (skipVal != i)
+        res.push(i);
+      if (iter && prev == i)
+        break;
+      iter++;
+    }
   }
   return res;
 };
