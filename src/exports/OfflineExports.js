@@ -126,8 +126,8 @@ anychart.exportsModule.offline.renderSvgAsImage = function(target, svgElement, a
   var blob = new Blob([svgString], {'type': 'image/svg+xml'});
   var svgUrl = goog.fs.url.createObjectUrl(blob);
 
-  try {
-    image.onload = function() {
+  image.onload = function() {
+    try {
       if (canvas['msToBlob'] && ctx['drawSvg']) {
         //this method is imported by canvg
         ctx['drawSvg'](svgString, 0, 0, width, height);
@@ -143,13 +143,13 @@ anychart.exportsModule.offline.renderSvgAsImage = function(target, svgElement, a
 
       goog.dom.removeNode(canvas);
       goog.fs.url.revokeObjectUrl(svgUrl);
-    };
+    } catch (e) {
+      failCallback(args);
+    }
+  };
 
 
-    image.src = svgUrl;
-  } catch (e) {
-    failCallback(args);
-  }
+  image.src = svgUrl;
 };
 
 
@@ -386,11 +386,19 @@ anychart.exportsModule.offline.dataURItoBlob = function(dataURI) {
 
   var ab = new ArrayBuffer(byteString.length);
 
-  //TODO (A.Kudryavtsev): Why is it done? Unused code.
-  // var ia = new Uint8Array(ab);
-  // for (var i = 0; i < byteString.length; i++) {
-  //   ia[i] = byteString.charCodeAt(i);
-  // }
+  /*
+  Array buffer, we created above, only allocates peace of memory and doesn't allow us to write there.
+  To manipulate this memory we have to use typed arrays, like: Uint{8,16,32,64}Array and Float64Array, or DataView.
+  Typed arrays allow us to read and write data in array buffer, using array-like syntax: uintArray[i].
+  As we are writing byte sized data (char codes, limited to 255 max value), we use here Uint8Array.
+  More info:
+  https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer
+  https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray
+   */
+  var ia = new Uint8Array(ab);
+  for (var i = 0; i < byteString.length; i++) {
+    ia[i] = byteString.charCodeAt(i);
+  }
 
   return new Blob([ab], {type: mimeString});
 };

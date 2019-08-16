@@ -102,7 +102,7 @@ anychart.exports.saveAsPng = function(target, container, opt_widthOrOptions, opt
     var failCallback = function(args) {
       if (anychart.exports.isClientsideFallback()) {
         anychart.core.reporting.info('Offline export failed, falling back to server.');
-        stage.saveAsSvg(args['paperSize'] || args['width'], args['landscape'] || args['height'], args['filename']);
+        stage.saveAsPng(args['width'], args['height'], args['quality'], args['filename']);
       } else {
         anychart.core.reporting.info('Offline export failed, fallback to server disabled.');
       }
@@ -159,7 +159,7 @@ anychart.exports.saveAsJpg = function(target, container, opt_widthOrOptions, opt
     var failCallback = function(args) {
       if (anychart.exports.isClientsideFallback()) {
         anychart.core.reporting.info('Offline export failed, falling back to server.');
-        stage.saveAsJpg(args['paperSize'] || args['width'], args['landscape'] || args['height'], args['filename']);
+        stage.saveAsJpg(args['width'], args['height'], args['quality'], args['forceTransparentWhite'], args['filename']);
       } else {
         anychart.core.reporting.info('Offline export failed, fallback to server disabled.');
       }
