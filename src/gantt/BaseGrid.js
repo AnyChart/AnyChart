@@ -412,12 +412,14 @@ anychart.ganttModule.BaseGrid.prototype.SUPPORTED_CONSISTENCY_STATES =
  *   end: number,
  *   baselineStart: number,
  *   baselineEnd: number,
+ *   baselineProgress: number,
  *   progress: number,
  *   isValidStart: boolean,
  *   isValidEnd: boolean,
  *   isValidTask: boolean,
  *   isValidBaseline: boolean,
- *   isValidProgress: boolean
+ *   isValidProgress: boolean,
+ *   baselineProgressPresents: boolean
  * }}
  */
 anychart.ganttModule.BaseGrid.ItemData;
@@ -571,7 +573,7 @@ anychart.ganttModule.BaseGrid.isMilestone = function(item, opt_info) {
  */
 anychart.ganttModule.BaseGrid.isBaseline = function(item, opt_info) {
   var info = opt_info || anychart.ganttModule.BaseGrid.getProjectItemInfo(item);
-  return info.isValidBaseline;
+  return info.isValidBaseline || info.baselineProgressPresents;
 };
 
 
@@ -679,6 +681,11 @@ anychart.ganttModule.BaseGrid.getProjectItemInfo = function(item) {
   var baselineEnd = item.meta(anychart.enums.GanttDataFields.BASELINE_END);
   var progress = item.meta('progressValue');
   var autoProgress = item.meta('autoProgress');
+  var baselineProgress = item.get(anychart.enums.GanttDataFields.BASELINE_PROGRESS_VALUE);
+  var baselineProgressPresents = goog.isNumber(baselineProgress) || anychart.utils.isPercent(baselineProgress);
+  baselineProgress = baselineProgressPresents ?
+      anychart.utils.isPercent(baselineProgress) ? parseFloat(baselineProgress) / 100 : Number(baselineProgress) :
+      NaN;
 
   var startVal = anychart.ganttModule.BaseGrid.checkNaN(start, autoStart);
   var endVal = anychart.ganttModule.BaseGrid.checkNaN(end, autoEnd);
@@ -689,12 +696,14 @@ anychart.ganttModule.BaseGrid.getProjectItemInfo = function(item) {
     end: endVal,
     baselineStart: baselineStart,
     baselineEnd: baselineEnd,
+    baselineProgress: baselineProgress,
     progress: progressVal,
     isValidStart: !isNaN(startVal),
     isValidEnd: !isNaN(endVal),
     isValidTask: !isNaN(startVal) && !isNaN(endVal) && startVal != endVal,
     isValidBaseline: goog.isNumber(baselineStart) && !isNaN(baselineStart) && goog.isNumber(baselineEnd) && !isNaN(baselineEnd),
-    isValidProgress: !isNaN(progressVal)
+    isValidProgress: !isNaN(progressVal),
+    baselineProgressPresents: baselineProgressPresents
   });
 };
 
@@ -784,6 +793,8 @@ anychart.ganttModule.BaseGrid.prototype.createFormatProvider = function(item, op
     values['barBounds'] = {value: item.meta('relBounds'), type: anychart.enums.TokenType.UNKNOWN};
 
     values['progress'] = {value: info.progress, type: anychart.enums.TokenType.PERCENT};
+
+    values['baselineProgress'] = {value: info.baselineProgressPresents ? info.baselineProgress : 0, type: anychart.enums.TokenType.PERCENT};
 
     if (info.isValidBaseline) {
       rowType = anychart.enums.TLElementTypes.BASELINES;

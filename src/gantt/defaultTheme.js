@@ -355,7 +355,29 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     },
 
     'baselines': {
-      'above': false
+      'above': false,
+      'progress': {
+        'height': '50%',
+        'anchor': 'left-bottom',
+        'position': 'left-bottom',
+        'rendering': {
+          'shapes': [
+            {
+              'name': 'path',
+              'shapeType': 'path',
+              'zIndex': 11,
+              'disablePointerEvents': true
+            }
+          ]
+        },
+        'labels': {
+          'format': '{%baselineProgress}'
+        },
+        'edit': {
+          'fill': '#eaeaea',
+          'stroke': '#545f69'
+        }
+      }
     },
 
     'connectors': {
@@ -540,7 +562,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
           'enabled': false
         },
         'tooltip': {
-          'format': 'Start Date: {%start}\nEnd Date: {%end}\nBaseline Start: {%baselineStart}\nBaseline End: {%baselineEnd}\nComplete: {%progress}'
+          'format': 'Start Date: {%start}\nEnd Date: {%end}\nBaseline Start: {%baselineStart}\nBaseline End: {%baselineEnd}\nComplete: {%progress}\nBaseline Progress: {%baselineProgress}'
         }
       },
       'milestones': {

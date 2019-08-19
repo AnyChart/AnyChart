@@ -503,9 +503,9 @@ anychart.ganttModule.Controller.prototype.autoCalcItem_ = function(item, current
       var metaEnd = child.meta(anychart.enums.GanttDataFields.ACTUAL_END);
       var childEnd = /** @type {number} */ ((goog.isNumber(metaEnd) && !isNaN(metaEnd)) ? metaEnd : (child.meta('autoEnd') || childStart));
 
-      var progressValue = child.get(anychart.enums.GanttDataFields.PROGRESS_VALUE);
+      var progressValue = /** @type {number|string} */ (child.get(anychart.enums.GanttDataFields.PROGRESS_VALUE));
       if (goog.isDefAndNotNull(progressValue)) {
-        progressValue = anychart.utils.isPercent(progressValue) ? parseFloat(progressValue) / 100 : +progressValue;
+        progressValue = anychart.utils.normalizeToRatio(progressValue);
       }
 
       var childProgress = goog.isDefAndNotNull(progressValue) ? progressValue : (child.meta('autoProgress') || 0);

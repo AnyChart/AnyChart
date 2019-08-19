@@ -349,6 +349,17 @@ anychart.utils.normalizeToPercent = function(value, opt_canReturnNaN) {
 
 
 /**
+ * Normalizes passed value to numeric ratio value.
+ * @param {string|number} value Value to normalize. If is string, must be treated as percent.
+ *  Numeric value is treated as ratio value anyway.
+ * @return {number}
+ */
+anychart.utils.normalizeToRatio = function(value) {
+  return anychart.utils.isPercent(value) ? parseFloat(value) / 100 : +value;
+};
+
+
+/**
  * Converts value of any type to number, according to these rules:
  * 1) number -> number
  * 2) string -> number only if it is a number (no parseFloat, just +)
