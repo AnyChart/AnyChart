@@ -27,7 +27,7 @@ anychart.sankeyModule.Chart = function(opt_data, opt_csvSettings) {
   this.bindHandlersToComponent(this,
       this.handleMouseOverAndMove,    // override from anychart.core.Chart
       this.handleMouseOut,            // override from anychart.core.Chart
-      null,                           // click handler
+      this.handleMouseClick,          // override from anychart.core.Chart
       this.handleMouseOverAndMove,    // override from anychart.core.Chart
       null,                           // all handler
       null);                          // anychart.core.Chart
@@ -849,6 +849,68 @@ anychart.sankeyModule.Chart.prototype.handleMouseOverAndMove = function(event) {
   } else {
     this.tooltip().hide();
   }
+};
+
+anychart.sankeyModule.Chart.prototype.handleMouseClick = function(event) {
+  var tag = /** @type {Object} */ (event['domTarget'].tag);
+
+  if (!goog.isDef(tag))
+    return;
+
+  var element = tag.element;
+  var isFlow = element.type;
+
+  // console.log(tag);
+
+  var evt = {
+    'originalEvent': event,
+    'type': anychart.enums.EventType.POINT_CLICK,
+    'actualTarget': event['target'],
+    'target': this
+  };
+
+  if (isFlow) {
+    evt['elementType'] = 'flow';
+    evt['dataIndex'] = element.dataIndex;
+    evt['weight'] = element.weight;
+    evt['from'] = {
+      'name': element.from.name,
+      'outcomeValue': element.from.outcomeValue,
+      'level': element.from.level
+    };
+    evt['to'] = {
+      'name': element.to.name,
+      'incomeValue': element.to.incomeValue,
+      'level': element.to.level
+    };
+  } else {
+    evt['elementType'] = 'node';
+    evt['name'] = element.name;
+    evt['level'] = element.level;
+    evt['incomeValue'] = element.incomeValue;
+    evt['outcomeValue'] = element.outcomeValue;
+    evt['dropoffValue'] = element.dropoffValue;
+
+    evt['outcomeFlows'] = element.outcomeFlows.map(function(flow) {
+      return {
+        'to': flow.to.name,
+        'level': flow.to.level,
+        'weight': flow.weight
+      };
+    });
+
+    evt['incomeFlows'] = element.incomeFlows.map(function(flow) {
+      return {
+        'from': flow.from.name,
+        'level': flow.from.level,
+        'weight': flow.weight
+      };
+    });
+
+  }
+
+
+  this.dispatchEvent(evt);
 };
 
 
