@@ -61,6 +61,12 @@ anychart.ganttModule.rendering.Context = function(element, item, predictedBounds
     this['period'] = item.get(anychart.enums.GanttDataFields.PERIODS, opt_periodIndex);
   }
 
+  var type = element.getType();
+  if (type == anychart.enums.TLElementTypes.MILESTONES_PREVIEW || type == anychart.enums.TLElementTypes.MILESTONES) {
+    var pointSetting = element.getPointSettings(item);
+    if (pointSetting) pointSetting = pointSetting['markerType'];
+    this['markerType'] = pointSetting || element.getOption('markerType');
+  }
 };
 
 

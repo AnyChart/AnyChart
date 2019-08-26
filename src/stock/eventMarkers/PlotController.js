@@ -554,6 +554,7 @@ anychart.stockModule.eventMarkers.PlotController.prototype.setupByJSON = functio
   var groups, data;
   if (goog.isDef(groups = config['groups'])) {
     this.disposeGroups();
+    this.clearConnectors_();
     if (goog.isArray(groups)) {
       for (var i = 0; i < groups.length; i++) {
         var group = groups[i];

@@ -26,6 +26,8 @@ goog.require('goog.array');
 anychart.ganttModule.elements.TimelineElement = function(timeline) {
   anychart.ganttModule.elements.TimelineElement.base(this, 'constructor');
 
+  this.addThemes('defaultTimeline.elements');
+
   /**
    * State settings state holder.
    * @type {anychart.core.settings.IObjectWithSettings}
@@ -835,7 +837,9 @@ anychart.ganttModule.elements.TimelineElement.prototype.serialize = function() {
   json['normal'] = this.normal().serialize();
   json['selected'] = this.selected().serialize();
   json['edit'] = this.edit().serialize();
-  json['tooltip'] = this.tooltip().serialize();
+  var tooltip = this.tooltip().serialize();
+  if (!goog.object.isEmpty(tooltip))
+    json['tooltip'] = tooltip;
   return json;
 };
 

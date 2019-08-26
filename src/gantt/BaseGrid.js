@@ -415,12 +415,14 @@ anychart.ganttModule.BaseGrid.prototype.SUPPORTED_CONSISTENCY_STATES =
  *   end: number,
  *   baselineStart: number,
  *   baselineEnd: number,
+ *   baselineProgress: number,
  *   progress: number,
  *   isValidStart: boolean,
  *   isValidEnd: boolean,
  *   isValidTask: boolean,
  *   isValidBaseline: boolean,
- *   isValidProgress: boolean
+ *   isValidProgress: boolean,
+ *   baselineProgressPresents: boolean
  * }}
  */
 anychart.ganttModule.BaseGrid.ItemData;
@@ -582,7 +584,7 @@ anychart.ganttModule.BaseGrid.isMilestone = function(item, opt_info) {
  */
 anychart.ganttModule.BaseGrid.isBaseline = function(item, opt_info) {
   var info = opt_info || anychart.ganttModule.BaseGrid.getProjectItemInfo(item);
-  return info.isValidBaseline;
+  return info.isValidBaseline || info.baselineProgressPresents;
 };
 
 
@@ -690,6 +692,11 @@ anychart.ganttModule.BaseGrid.getProjectItemInfo = function(item) {
   var baselineEnd = item.meta(anychart.enums.GanttDataFields.BASELINE_END);
   var progress = item.meta('progressValue');
   var autoProgress = item.meta('autoProgress');
+  var baselineProgress = item.get(anychart.enums.GanttDataFields.BASELINE_PROGRESS_VALUE);
+  var baselineProgressPresents = goog.isNumber(baselineProgress) || anychart.utils.isPercent(baselineProgress);
+  baselineProgress = baselineProgressPresents ?
+      anychart.utils.isPercent(baselineProgress) ? parseFloat(baselineProgress) / 100 : Number(baselineProgress) :
+      NaN;
 
   var startVal = anychart.ganttModule.BaseGrid.checkNaN(start, autoStart);
   var endVal = anychart.ganttModule.BaseGrid.checkNaN(end, autoEnd);
@@ -700,12 +707,14 @@ anychart.ganttModule.BaseGrid.getProjectItemInfo = function(item) {
     end: endVal,
     baselineStart: baselineStart,
     baselineEnd: baselineEnd,
+    baselineProgress: baselineProgress,
     progress: progressVal,
     isValidStart: !isNaN(startVal),
     isValidEnd: !isNaN(endVal),
     isValidTask: !isNaN(startVal) && !isNaN(endVal) && startVal != endVal,
     isValidBaseline: goog.isNumber(baselineStart) && !isNaN(baselineStart) && goog.isNumber(baselineEnd) && !isNaN(baselineEnd),
-    isValidProgress: !isNaN(progressVal)
+    isValidProgress: !isNaN(progressVal),
+    baselineProgressPresents: baselineProgressPresents
   });
 };
 
@@ -795,6 +804,8 @@ anychart.ganttModule.BaseGrid.prototype.createFormatProvider = function(item, op
     values['barBounds'] = {value: item.meta('relBounds'), type: anychart.enums.TokenType.UNKNOWN};
 
     values['progress'] = {value: info.progress, type: anychart.enums.TokenType.PERCENT};
+
+    values['baselineProgress'] = {value: info.baselineProgressPresents ? info.baselineProgress : 0, type: anychart.enums.TokenType.PERCENT};
 
     if (info.isValidBaseline) {
       rowType = anychart.enums.TLElementTypes.BASELINES;
@@ -2332,8 +2343,11 @@ anychart.ganttModule.BaseGrid.prototype.drawInternal = function(positionRecalcul
 
   var container = /** @type {acgraph.vector.ILayer} */(this.container());
   var stage = container ? container.getStage() : null;
-  var manualSuspend = stage && !stage.isSuspended() && this.isStandalone; //Not standalone stage is suspended by chart.
-  if (manualSuspend) stage.suspend();
+  if (stage)
+    stage.suspend();
+  // var manualSuspend = stage && !stage.isSuspended() && this.isStandalone; //Not standalone stage is suspended by chart.
+  // if (manualSuspend) stage.suspend();
+  // console.log(stage.isSuspended());
 
   var verticalScrollBar, horizontalScrollBar;
 
@@ -2379,6 +2393,19 @@ anychart.ganttModule.BaseGrid.prototype.drawInternal = function(positionRecalcul
 
     this.base_.listenOnce(acgraph.events.EventType.MOUSEDOWN, this.dragMouseDown_, false, this);
     this.base_.listenOnce(acgraph.events.EventType.TOUCHSTART, this.dragMouseDown_, false, this);
+    if (anychart.isAsync()) {
+      /*
+        In current implementation chart must get mouse and
+        keyboard features before all stage rendering actions are
+        finished, on first mouse move, for example.
+        Since the feature is experimental, we'll probably find another
+        moment to initialize these features in future.
+       */
+      this.base_.listenOnce(acgraph.events.EventType.MOUSEMOVE, function() {
+        this.initMouseFeatures();
+        this.initKeysFeatures();
+      }, false, this);
+    }
 
     this.initDom();
 
@@ -2507,7 +2534,9 @@ anychart.ganttModule.BaseGrid.prototype.drawInternal = function(positionRecalcul
   this.labelsInvalidated();
   this.markersInvalidated();
 
-  if (manualSuspend) stage.resume();
+  // if (manualSuspend) stage.resume();
+  if (stage)
+    stage.resume();
   if (this.isStandalone) {
     if (stage && !this.mwh_) {
       stage.listenOnce(acgraph.vector.Stage.EventType.STAGE_RENDERED, function() {
@@ -3052,7 +3081,6 @@ anychart.ganttModule.BaseGrid.prototype.serialize = function() {
   // json['editStructurePreviewDashStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */ (this.editStructurePreviewDashStroke_));
 
   // json['editing'] = this.editable;
-  json['tooltip'] = this.tooltip().serialize();
 
   return json;
 };

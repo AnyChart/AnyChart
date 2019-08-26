@@ -5,6 +5,7 @@ goog.require('acgraph');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.Button');
+goog.require('anychart.core.ui.Label');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.SimpleSplitter');
 goog.require('anychart.core.ui.Title');
@@ -96,6 +97,13 @@ anychart.ganttModule.DataGrid = function(opt_controller) {
    */
   this.editItem_ = null;
 
+  this.partialLabels = {
+    first: NaN,
+    last: NaN,
+    count: NaN,
+    reset: true
+  };
+
   /**
    *
    * @type {Array.<number>}
@@ -185,6 +193,14 @@ anychart.ganttModule.DataGrid.NAME_COLUMN_WIDTH = 170;
  * @type {number}
  */
 anychart.ganttModule.DataGrid.DEFAULT_COLUMN_WIDTH = 90;
+
+
+/**
+ * Average maximal allowed labels count at once
+ * to be processed.
+ * @type {number}
+ */
+anychart.ganttModule.DataGrid.MAX_LABELS_AT_ONCE = 300;
 
 
 /**
@@ -396,7 +412,7 @@ anychart.ganttModule.DataGrid.prototype.forEachVisibleColumn_ = function(fn, opt
   var counter = -1;
   for (var i = 0, l = this.columns_.length; i < l; i++) {
     var column = this.columns_[i];
-    if (column && column.enabled()) {
+    if (column && column.enabled() && !column.isDisposed()) {
       counter++;
       var args = [column, counter];
       args.push.apply(args, goog.array.slice(arguments, 2));
@@ -546,9 +562,119 @@ anychart.ganttModule.DataGrid.prototype.columnInternal_ = function(opt_indexOrVa
 
 
 /**
- * @inheritDoc
+ * Gets all (enabled and disabled) existing not disposed columns count.
+ * @return {number}
  */
-anychart.ganttModule.DataGrid.prototype.prepareLabels = function() {
+anychart.ganttModule.DataGrid.prototype.getColumnsCount = function() {
+  var res = 0;
+  for (var i = 0; i < this.columns_.length; i++) {
+    var col = this.columns_[i];
+    if (col && !col.isDisposed())
+      res++;
+  }
+  return res;
+};
+
+
+/**
+ * Initializes this.partialLabels object (@see typedef).
+ * Contains information about data rows to be processed.
+ * Works with linear list of data items (rows) to asynchronously
+ * process portions of labels.
+ */
+anychart.ganttModule.DataGrid.prototype.initPartialData = function() {
+  /*
+    Since this method will be called anyway during the async processing,
+    the "reset" flag allows to keep resetting under control.
+   */
+  if (this.partialLabels.reset) {
+    var enabledColumnsCount = 0;
+    for (var i = 0, l = this.columns_.length; i < l; i++) {
+      var column = this.columns_[i];
+      if (column && column.enabled() && !column.isDisposed()) {
+        enabledColumnsCount++;
+      }
+    }
+
+    var allItems = this.controller.getAllItems();
+    var part = this.partialLabels;
+    if (allItems.length) {
+      part.first = 0;
+      var maxRowsAllowed = Math.max(1, Math.floor(anychart.ganttModule.DataGrid.MAX_LABELS_AT_ONCE / enabledColumnsCount));
+      part.count = Math.min(maxRowsAllowed, allItems.length);
+      part.last = part.first + Math.max(0, part.count - 1);
+      part.reset = false;
+    } else {
+      part.first = NaN;
+      part.last = NaN;
+      part.count = NaN;
+      part.reset = true;
+    }
+  }
+};
+
+
+/**
+ * Resets partial columns texts.
+ */
+anychart.ganttModule.DataGrid.prototype.resetColumnsSync = function() {
+  this.partialLabels.reset = true;
+  this.forEachVisibleColumn_(function(col) {
+    col.resetTexts();
+  });
+};
+
+
+/**
+ * TODO (A.Kudryavtsev): Describe.
+ * @return {boolean}
+ */
+anychart.ganttModule.DataGrid.prototype.partialMeasurement = function() {
+  var allItems = this.controller.getAllItems();
+  var part = this.partialLabels;
+  if (isNaN(part.last) || part.last >= allItems.length - 1) {
+    return false;
+  } else {
+    part.first = part.last + 1;
+    var c = Math.min(allItems.length - 1 - part.first, part.count);
+    part.last = part.first + c;
+  }
+  return true;
+};
+
+
+/**
+ * Getter/setter for loading message label.
+ * @param {Object=} opt_value - Config.
+ * @return {anychart.ganttModule.DataGrid|anychart.core.ui.Label}
+ */
+anychart.ganttModule.DataGrid.prototype.loadingMessage = function(opt_value) {
+  if (!this.loadingMessage_) {
+    this.loadingMessage_ = new anychart.core.ui.Label();
+    this.loadingMessage_.container(this.getScrollsLayer());
+    this.loadingMessage_.background().enabled(true).fill('red 0.5');
+    this.loadingMessage_['text']('Working...');
+    this.loadingMessage_['anchor']('left-top');
+    this.loadingMessage_['position']('left-top');
+    this.loadingMessage_.padding(5);
+    this.loadingMessage_.enabled(true);
+    this.loadingMessage_.parentBounds(this.pixelBoundsCache);
+  }
+
+  if (opt_value) {
+    this.loadingMessage_.setupInternal(false, opt_value);
+    return this;
+  }
+
+  return this.loadingMessage_;
+};
+
+
+/**
+ * Sync labels preparation.
+ * @private
+ */
+anychart.ganttModule.DataGrid.prototype.prepareSync_ = function() {
   this.forEachVisibleColumn_(function(col) {
     col.provideMeasurements();
     var applyStyling = false;
@@ -586,9 +712,111 @@ anychart.ganttModule.DataGrid.prototype.prepareLabels = function() {
       measure it.
      */
     col.dispatchSignal(signal);
-
-
   });
+};
+
+
+/**
+ * Async labels preparation.
+ * @private
+ */
+anychart.ganttModule.DataGrid.prototype.prepareAsync_ = function() {
+  this.controller.timeouts.push(anychart.utils.schedule(function() {
+    this.initPartialData();
+
+    var hasInconsistentColumns = false;
+    this.forEachVisibleColumn_(function(col) {
+      if (!col.isConsistent()) {
+        hasInconsistentColumns = true;
+        col.provideMeasurements();
+        var applyStyling = false;
+        var needsToDropOldBounds = false;
+
+        var signal = 0;
+        if (col.hasInvalidationState(anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_APPEARANCE)) {
+          applyStyling = true;
+        }
+
+        if (col.hasInvalidationState(anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_BOUNDS)) {
+          if (col.labels().needsBoundsCalculation())
+            signal |= anychart.Signal.MEASURE_BOUNDS;
+          needsToDropOldBounds = true;
+          applyStyling = true;
+        }
+
+        if (col.hasInvalidationState(anychart.ConsistencyState.DATA_GRID_COLUMN_DATA)) {
+          /*
+            Measuriator will collect labels itself on this signal.
+           */
+          signal |= anychart.Signal.MEASURE_COLLECT;
+          needsToDropOldBounds = true;
+          applyStyling = true;
+        }
+
+        /*
+          Labels are already collected here, applies the style if needed.
+         */
+        if (applyStyling)
+          col.applyLabelsStyle(needsToDropOldBounds);
+
+        /*
+          Signal makes Measuriator to collect labels and be ready to
+          measure it.
+         */
+        col.dispatchSignal(signal);
+      }
+    });
+
+    if (hasInconsistentColumns) {
+      if (this.partialMeasurement()) {
+        var percent = Math.round(this.partialLabels.last / this.controller.getAllItems().length * 100);
+        if (isNaN(percent)) {
+          this.loadingMessage().enabled(false);
+        } else {
+          this.loadingMessage().enabled(true).parentBounds(this.pixelBoundsCache)['text']('Working: ' + percent + '%').draw();
+          this.interactivityHandler.dispatchEvent({
+            'type': anychart.enums.EventType.WORKING,
+            'progress': percent
+          });
+        }
+
+        anychart.measuriator.measure();
+        this.forEachVisibleColumn_(function(col) {
+          col.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION);
+          col.draw();
+        });
+        this.prepareLabels();
+      } else {
+        this.forEachVisibleColumn_(function(col) {
+          //Here we suppose everything is applied correctly.
+          col.markConsistent(anychart.ConsistencyState.DATA_GRID_COLUMN_DATA |
+              anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_APPEARANCE |
+              anychart.ConsistencyState.DATA_GRID_COLUMN_LABELS_BOUNDS);
+          col.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION);
+          col.draw();
+        });
+        this.needsForceSignalsDispatching(false); //TODO (A.Kudryavtsev): Describe.
+        this.loadingMessage().enabled(false).draw();
+        this.controller.run(); //this clears remaining async consistency states on timeline.
+        this.controller.timeouts.push(anychart.utils.schedule(function() {
+          this.controller.resetTimeouts();
+          this.interactivityHandler.dispatchEvent(anychart.enums.EventType.WORKING_FINISH);
+        }, void 0, this));
+      }
+    }
+  }, void 0, this));
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.ganttModule.DataGrid.prototype.prepareLabels = function() {
+  if (anychart.isAsync()) {
+    this.prepareAsync_();
+  } else {
+    this.prepareSync_();
+  }
 };
 
 
@@ -666,8 +894,11 @@ anychart.ganttModule.DataGrid.prototype.columnInvalidated_ = function(event) {
     state |= anychart.ConsistencyState.APPEARANCE;
   if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED))
     state |= anychart.ConsistencyState.DATA_GRID_GRIDS;
-  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW_LABELS))
+  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW_LABELS)) {
     state |= anychart.ConsistencyState.GRIDS_POSITION;
+    if (anychart.isAsync())
+      this.partialLabels.reset = true;
+  }
 
   this.invalidate(state, signal);
 };
@@ -1216,6 +1447,8 @@ anychart.ganttModule.DataGrid.prototype.serialize = function() {
   if (this.horizontalScrollBar_)
     json['horizontalScrollBar'] = this.horizontalScrollBar().serialize();
 
+  json['tooltip'] = this.tooltip().serialize();
+
   return json;
 };
 
@@ -1347,6 +1580,7 @@ anychart.standalones.dataGrid = function() {
   proto['editStructurePreviewStroke'] = proto.editStructurePreviewStroke;
   proto['editStructurePreviewDashStroke'] = proto.editStructurePreviewDashStroke;
   proto['buttons'] = proto.buttons;
+  proto['getColumnsCount'] = proto.getColumnsCount;
 
 
   proto = anychart.standalones.DataGrid.prototype;

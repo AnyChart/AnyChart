@@ -271,6 +271,7 @@ anychart.ConsistencyState = {
   STOCK_DATA: 1 << 14,
   STOCK_SCALES: 1 << 15,
   STOCK_GAP: 1 << 16,
+  STOCK_SPLITTERS: 1 << 17,
   //---------------------------------- STOCK PLOT (VB) -------------------------------------------
   STOCK_PLOT_BACKGROUND: 1 << 6,
   STOCK_PLOT_SERIES: 1 << 7,
@@ -1400,8 +1401,9 @@ anychart.core.Base.prototype.getCreated = function(getterName, opt_ignoreEnabled
             }
           }
           if (goog.isDef(theme)) {
-            if (goog.isBoolean(theme))
-              theme = {'enabled': theme};
+            //goog.isNull condition covers cases like {'background': null}
+            if (goog.isBoolean(theme) || goog.isNull(theme))
+              theme = {'enabled': !!theme};
 
             if (goog.isDef(theme['enabled'])) {
               if (theme['enabled'])

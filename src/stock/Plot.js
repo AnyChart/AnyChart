@@ -24,6 +24,7 @@ goog.require('anychart.scales.Linear');
 goog.require('anychart.stockModule.Axis');
 goog.require('anychart.stockModule.CurrentPriceIndicator');
 goog.require('anychart.stockModule.Grid');
+goog.require('anychart.stockModule.PlotControls');
 goog.require('anychart.stockModule.Series');
 goog.require('anychart.stockModule.eventMarkers.PlotController');
 goog.require('anychart.stockModule.indicators');
@@ -191,11 +192,26 @@ anychart.stockModule.Plot = function(chart) {
   this.statistics_ = {};
 
   /**
+   * Whether this plot is first in chart.
+   * @type {boolean}
+   * @private
+   */
+  this.isFirstPlot_ = false;
+
+  /**
    * Whether this plot is last in chart.
    * @type {boolean}
    * @private
    */
   this.isLastPlot_ = false;
+
+  /**
+   * Whether this plot is expanded or collapsed by plot controls.
+   * True is for expanded, false - otherwise.
+   * @type {boolean}
+   * @private
+   */
+  this.isExpanded_ = false;
 
   /**
    * @type {number|undefined}
@@ -242,7 +258,16 @@ anychart.stockModule.Plot = function(chart) {
     ['pointWidth', anychart.ConsistencyState.STOCK_PLOT_SERIES, anychart.Signal.NEEDS_REDRAW, 0, this.invalidateWidthBasedSeries],
     ['maxPointWidth', anychart.ConsistencyState.STOCK_PLOT_SERIES, anychart.Signal.NEEDS_REDRAW, 0, this.invalidateWidthBasedSeries],
     ['minPointLength', anychart.ConsistencyState.STOCK_PLOT_SERIES, anychart.Signal.NEEDS_REDRAW, 0, this.resetSeriesStack],
-    ['baseline', anychart.ConsistencyState.STOCK_PLOT_SERIES, anychart.Signal.NEEDS_REDRAW, 0, this.resetSeriesBaseline]
+    ['baseline', anychart.ConsistencyState.STOCK_PLOT_SERIES, anychart.Signal.NEEDS_REDRAW, 0, this.resetSeriesBaseline],
+
+    /*
+      NOTE: DVF-4261 - weight option is added to simplify value access
+            and provide correct serialization/deserialization.
+            Despite method plot.weight() becomes exported
+            (available), it must not be exported and described
+            in docs for a while (20 June 2019).
+     */
+    ['weight', anychart.ConsistencyState.BOUNDS, anychart.Signal.BOUNDS_CHANGED | anychart.Signal.NEEDS_REDRAW]
   ]);
 };
 goog.inherits(anychart.stockModule.Plot, anychart.core.VisualBaseWithBounds);
@@ -396,12 +421,14 @@ anychart.stockModule.Plot.PROPERTY_DESCRIPTORS = (function() {
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'pointWidth', anychart.utils.normalizeNumberOrPercent],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'maxPointWidth', anychart.utils.normalizeNumberOrPercent],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'minPointLength', anychart.utils.normalizeNumberOrPercent],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'baseline', anychart.core.settings.numberNormalizer]
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'baseline', anychart.core.settings.numberNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'weight', anychart.core.settings.numberNormalizer]
   ]);
 
   return map;
 })();
 anychart.core.settings.populate(anychart.stockModule.Plot, anychart.stockModule.Plot.PROPERTY_DESCRIPTORS);
+
 
 //region --- Statistics
 //------------------------------------------------------------------------------
@@ -2146,6 +2173,27 @@ anychart.stockModule.Plot.prototype.draw = function() {
 
   this.resumeSignalsDispatching(false);
 
+  var plotsCount = this.chart_.getEnabledPlotsCount();
+  var plotPosition;
+  if (plotsCount == 1) {
+    plotPosition = anychart.enums.PlotPosition.SINGLE;
+  } else if (this.isFirstPlot()) {
+    plotPosition = anychart.enums.PlotPosition.TOP;
+  } else if (this.isLastPlot()) {
+    plotPosition = anychart.enums.PlotPosition.BOTTOM;
+  } else {
+    plotPosition = anychart.enums.PlotPosition.CENTER;
+  }
+
+  if (!this.plotControls_) {
+    this.plotControls_ = new anychart.stockModule.PlotControls(this);
+    this.plotControls_.plotPosition(plotPosition);
+    this.plotControls_.render();
+    this.plotControls_.hide();
+  }
+  this.plotControls_.plotPosition(plotPosition);
+  this.plotControls_.update();
+
   // this is a debug code and should remain until we finally decide what to do with auto gaps
   // if (!this.__zeroPath)
   //   this.__zeroPath = this.container().getStage().rect().zIndex(1000).stroke('3 red');
@@ -2209,15 +2257,24 @@ anychart.stockModule.Plot.prototype.ensureBoundsDistributed_ = function() {
           anychart.ConsistencyState.STOCK_PLOT_TITLE)) {
     var seriesBounds = this.getPixelBounds();
 
+    var background = this.getCreated('background');
+    if (background) {
+      background.parentBounds(seriesBounds);
+    }
+
     var title = this.getCreated('title');
     if (title && title.enabled()) {
       title.parentBounds(seriesBounds);
       seriesBounds = title.getRemainingBounds();
     }
 
-    var background = this.getCreated('background');
-    if (background) {
-      background.parentBounds(seriesBounds);
+    if (this.xAxis_ && this.xAxis_.enabled()) {
+      this.xAxis_.suspendSignalsDispatching();
+      this.xAxis_.parentBounds(seriesBounds);
+      this.xAxis_.resumeSignalsDispatching(false);
+      // we need this to reduce bounds height by the height of the axis
+      seriesBounds = this.xAxis_.getRemainingBounds();
+      this.invalidate(anychart.ConsistencyState.STOCK_PLOT_DT_AXIS);
     }
 
     var legendTitleDate;
@@ -2237,14 +2294,6 @@ anychart.stockModule.Plot.prototype.ensureBoundsDistributed_ = function() {
       seriesBounds = this.legend().getRemainingBounds();
     }
 
-    if (this.xAxis_ && this.xAxis_.enabled()) {
-      this.xAxis_.suspendSignalsDispatching();
-      this.xAxis_.parentBounds(seriesBounds);
-      this.xAxis_.resumeSignalsDispatching(false);
-      // we need this to reduce bounds height by the height of the axis
-      seriesBounds = this.xAxis_.getRemainingBounds();
-      this.invalidate(anychart.ConsistencyState.STOCK_PLOT_DT_AXIS);
-    }
 
     var leftPadding = 0;
     var rightPadding = 0;
@@ -2281,7 +2330,8 @@ anychart.stockModule.Plot.prototype.ensureBoundsDistributed_ = function() {
       seriesBounds.width = 1;
     }
     if (seriesBounds.height < 0) {
-      seriesBounds.height = 1;
+      seriesBounds.top += seriesBounds.height;
+      seriesBounds.height = -seriesBounds.height;
     }
 
     if (this.xAxis_ && this.xAxis_.enabled()) {
@@ -2524,9 +2574,10 @@ anychart.stockModule.Plot.prototype.prepareHighlight = function(value) {
  * @param {number} rawValue - As is date.
  * @param {anychart.stockModule.Plot} hlSource - Highlight source.
  * @param {number=} opt_y - .
- * @param {(anychart.stockModule.Plot.HighlightedSeriesInfo|null)=} opt_closestSeriesInfo - highlighted data row for series closest to cursor.
+ * @param {(?anychart.stockModule.Plot.HighlightedSeriesInfo)=} opt_closestSeriesInfo - highlighted data row for series closest to cursor.
+ * @param {boolean=} opt_showControls Whether to show controls on highlight. (Plot is source of highlight)
  */
-anychart.stockModule.Plot.prototype.highlight = function(value, rawValue, hlSource, opt_y, opt_closestSeriesInfo) {
+anychart.stockModule.Plot.prototype.highlight = function(value, rawValue, hlSource, opt_y, opt_closestSeriesInfo, opt_showControls) {
   if (!this.rootLayer_ || !this.seriesBounds_ || !this.enabled()) return;
 
   var sticky = this.crosshair().getOption('displayMode') == anychart.enums.CrosshairDisplayMode.STICKY;
@@ -2561,6 +2612,8 @@ anychart.stockModule.Plot.prototype.highlight = function(value, rawValue, hlSour
     this.updateLegend_(null, value, rawValue, clear);
   }
   this.dispatchSignal(anychart.Signal.NEED_UPDATE_LEGEND);
+  if (opt_showControls)
+    this.plotControls_.show();
 };
 
 
@@ -2583,6 +2636,7 @@ anychart.stockModule.Plot.prototype.unhighlight = function() {
     this.updateLegend_(null, this.chart_.getLastDate());
   }
   this.dispatchSignal(anychart.Signal.NEED_UPDATE_LEGEND);
+  this.plotControls_.hide();
 };
 
 
@@ -2768,6 +2822,20 @@ anychart.stockModule.Plot.prototype.handlePlotMouseDown_ = function(e) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
+ * Sets whether this plot is first in chart.
+ * @param {boolean=} opt_value - Value to set.
+ * @return {anychart.stockModule.Plot|boolean}
+ */
+anychart.stockModule.Plot.prototype.isFirstPlot = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.isFirstPlot_ = opt_value;
+    return this;
+  }
+  return this.isFirstPlot_;
+};
+
+
+/**
  * Sets whether this plot is last in chart.
  * @param {boolean=} opt_value - Value to set.
  * @return {anychart.stockModule.Plot|boolean}
@@ -2778,6 +2846,20 @@ anychart.stockModule.Plot.prototype.isLastPlot = function(opt_value) {
     return this;
   }
   return this.isLastPlot_;
+};
+
+
+/**
+ * Whether plot is expanded by plot controls.
+ * @param {boolean=} opt_value
+ * @return {anychart.stockModule.Plot|boolean}
+ */
+anychart.stockModule.Plot.prototype.isExpanded = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.isExpanded_ = opt_value;
+    return this;
+  }
+  return this.isExpanded_;
 };
 
 

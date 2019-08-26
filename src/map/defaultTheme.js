@@ -350,6 +350,13 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
           }
         }
       }
+    },
+    'selectPolygonMarqueeFill': '#d3d3d3 0.4',
+    'selectPolygonMarqueeStroke': '#d3d3d3',
+    'selectPolygonMarqueeMarker': {
+      'fill': '#d3d3d3 0.4',
+      'stroke': '#d3d3d3',
+      'radius': 15
     }
   },
   // merge with map

@@ -19,6 +19,9 @@ goog.require('anychart.stockModule.eventMarkers.ChartController');
 goog.require('anychart.stockModule.scales.IKeyIndexTransformer');
 goog.require('anychart.stockModule.scales.Ordinal');
 goog.require('anychart.stockModule.scales.Scatter');
+goog.require('anychart.stockModule.splitter.Controller');
+goog.require('anychart.stockModule.splitter.SplittersSettings');
+
 goog.require('anychart.utils');
 goog.require('goog.array');
 goog.require('goog.events.MouseWheelHandler');
@@ -174,6 +177,13 @@ anychart.stockModule.Chart = function(opt_allowPointSettings) {
   this.mwZoomAction_ = goog.bind(this.doMWZoom_, this);
 
   /**
+   * Index of first plot.
+   * @type {number}
+   * @private
+   */
+  this.firstPlotIndex_ = Infinity;
+
+  /**
    * Index of last plot.
    * @type {number}
    * @private
@@ -227,6 +237,7 @@ anychart.stockModule.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.STOCK_SCROLLER |
     anychart.ConsistencyState.STOCK_DATA |
     anychart.ConsistencyState.STOCK_SCALES |
+    anychart.ConsistencyState.STOCK_SPLITTERS |
     anychart.ConsistencyState.STOCK_GAP;
 
 
@@ -741,12 +752,26 @@ anychart.stockModule.Chart.prototype.plotInternal = function(opt_indexOrValue, o
   }
   var plot = this.plots_[index];
   if (!plot) {
+    var existingPlots = this.getEnabledPlots();
+    var weightsSum = 0;
+    if (existingPlots.length) {
+      for (var i = 0; i < existingPlots.length; i++) {
+        var existingPlot = existingPlots[i];
+        var w = existingPlot.getOption('weight');
+        if (w)
+          weightsSum += w;
+      }
+    }
+
     //NOTE: plot.crosshair().interactivityTarget() is not set because stock chart controls crosshair itself.
     plot = new anychart.stockModule.Plot(this);
     plot.addThemes('stock.defaultPlotSettings', this.defaultPlotSettings());
     plot.crosshair().parent(/** @type {anychart.core.ui.Crosshair} */ (this.crosshair()));
     plot.setupElements(true);
     plot.setParentEventTarget(this);
+    if (weightsSum)
+      plot.setOption('weight', weightsSum / existingPlots.length); //existingPlots.length is not zero if weightsSum is not zero.
+
     this.plots_[index] = plot;
     plot.listenSignals(this.plotInvalidated_, this);
     if (index > this.lastPlotIndex_) {
@@ -755,6 +780,13 @@ anychart.stockModule.Chart.prototype.plotInternal = function(opt_indexOrValue, o
         prevPlot.isLastPlot(false);
       plot.isLastPlot(true);
       this.lastPlotIndex_ = index;
+    }
+    if (index < this.firstPlotIndex_) {
+      var firstPlot = this.plots_[this.firstPlotIndex_];
+      if (firstPlot)
+        firstPlot.isFirstPlot(false);
+      plot.isFirstPlot(true);
+      this.firstPlotIndex_ = index;
     }
     this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.STOCK_PLOTS_APPEARANCE,
         anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
@@ -766,6 +798,110 @@ anychart.stockModule.Chart.prototype.plotInternal = function(opt_indexOrValue, o
   } else {
     return plot;
   }
+};
+
+
+/**
+ * Gets enabled plots.
+ * @return {Array.<anychart.stockModule.Plot>}
+ */
+anychart.stockModule.Chart.prototype.getEnabledPlots = function() {
+  var res = [];
+  for (var i = 0; i < this.plots_.length; i++) {
+    var plot = this.plots_[i];
+    if (plot && plot.enabled() && !plot.isDisposed()) {
+      res.push(plot);
+    }
+  }
+  return res;
+};
+
+
+/**
+ * Returns previous plot.
+ * Used to swap plots position.
+ * @see {anychart.stockModule.PlotControls#handleButtonAction_}
+ * @param {anychart.stockModule.Plot} plot
+ * @return {anychart.stockModule.Plot}
+ */
+anychart.stockModule.Chart.prototype.getPrevPlot = function(plot) {
+  var index = goog.array.indexOf(this.plots_, plot);
+  for (var i = index - 1; i > -1; i--) {
+    var prevPlot = this.plots_[i];
+    if (prevPlot && prevPlot.enabled())
+      return prevPlot;
+  }
+  return null;
+};
+
+
+/**
+ * Returns next plot.
+ * Used to swap plots position.
+ * @see {anychart.stockModule.PlotControls#handleButtonAction_}
+ * @param {anychart.stockModule.Plot} plot
+ * @return {anychart.stockModule.Plot}
+ */
+anychart.stockModule.Chart.prototype.getNextPlot = function(plot) {
+  var index = goog.array.indexOf(this.plots_, plot);
+  for (var i = index + 1; i < this.plots_.length; i++) {
+    var nextPlot = this.plots_[i];
+    if (nextPlot && nextPlot.enabled())
+      return nextPlot;
+  }
+  return null;
+};
+
+
+/**
+ * Swap plots by it's indexes.
+ * @param {anychart.stockModule.Plot} plot1 Plot to swap.
+ * @param {anychart.stockModule.Plot} plot2 Plot to swap.
+ */
+anychart.stockModule.Chart.prototype.swapPlots = function(plot1, plot2) {
+  if (plot1 === plot2 || goog.isNull(plot1) || goog.isNull(plot2))
+    return;
+
+  var index1 = goog.array.indexOf(this.plots_, plot1);
+  var index2 = goog.array.indexOf(this.plots_, plot2);
+  this.plots_[index1] = plot2;
+  this.plots_[index2] = plot1;
+
+  if (plot1.isLastPlot()) {
+    plot1.isLastPlot(false);
+    plot2.isLastPlot(true);
+  } else if (plot2.isLastPlot()) {
+    plot1.isLastPlot(true);
+    plot2.isLastPlot(false);
+  }
+
+  if (plot1.isFirstPlot()) {
+    plot1.isFirstPlot(false);
+    plot2.isFirstPlot(true);
+  } else if (plot2.isFirstPlot()) {
+    plot1.isFirstPlot(true);
+    plot2.isFirstPlot(false);
+  }
+
+  this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.STOCK_PLOTS_APPEARANCE,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+};
+
+
+/**
+ * Expand or collapse plot.
+ * @param {anychart.stockModule.Plot} plot Plot to expand or collapse.
+ * @param {boolean} expand Expand or collapse (true - for expand, false - collapse)
+ */
+anychart.stockModule.Chart.prototype.expandPlot = function(plot, expand) {
+  plot.isExpanded(expand);
+  this.suspendSignalsDispatching();
+  for (var i = 0; i < this.plots_.length; i++) {
+    var thePlot = this.plots_[i];
+    if (thePlot !== plot)
+      thePlot.enabled(!expand);
+  }
+  this.resumeSignalsDispatching(true);
 };
 
 
@@ -1231,6 +1367,20 @@ anychart.stockModule.Chart.prototype.getPlotsCount = function() {
 };
 
 
+/**
+ * Returns plots count that are enabled.
+ * @return {number} Number of enabled plots.
+ */
+anychart.stockModule.Chart.prototype.getEnabledPlotsCount = function() {
+  var count = 0;
+  for (var i = 0; i < this.plots_.length; i++) {
+    if (this.plots_[i] && this.plots_[i].enabled())
+      count++;
+  }
+  return count;
+};
+
+
 /** @inheritDoc */
 anychart.stockModule.Chart.prototype.supportsNoData = function() {
   return false;
@@ -1259,6 +1409,10 @@ anychart.stockModule.Chart.prototype.drawContent = function(bounds) {
 
   if (this.annotationsModule)
     this.annotations().ready(true);
+
+  if (!this.splitterController_) {
+    this.splitterController_ = new anychart.stockModule.splitter.Controller(this);
+  }
 
   // anychart.core.Base.suspendSignalsDispatching(this.plots_, this.scroller_);
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
@@ -1352,6 +1506,11 @@ anychart.stockModule.Chart.prototype.drawContent = function(bounds) {
   }
 
   this.refreshHighlight_();
+  if (this.hasInvalidationState(anychart.ConsistencyState.STOCK_SPLITTERS)) {
+    // State is needed to call this.splitterController_.sync()
+    this.markConsistent(anychart.ConsistencyState.STOCK_SPLITTERS);
+  }
+  this.splitterController_.sync();
 
   if (!this.mouseWheelHandler_) {
     this.mouseWheelHandler_ = new goog.events.MouseWheelHandler(
@@ -1696,6 +1855,147 @@ anychart.stockModule.Chart.prototype.calculateScales_ = function() {
 
 
 /**
+ * Distributes weights among plots.
+ * @private
+ */
+anychart.stockModule.Chart.prototype.distributeWeights_ = function() {
+  // this.plotsBounds_ muse be already set here.
+  var remainingBounds = this.plotsBounds_;
+  var i, plot, bounds, height;
+
+  /**
+   * List of enabled plots.
+   * @type {Array.<anychart.stockModule.Plot>}
+   */
+  var enabledPlots = this.getEnabledPlots();
+
+  /**
+   * Sum of heights set by user.
+   * @type {number}
+   */
+  var heightsSetSum = 0;
+
+  var allHeightsSum = 0;
+
+  /**
+   * Storage of heights set by user.
+   * Also contains calculated heights.
+   * @type {Array.<number>}
+   */
+  var exactHeights = [];
+
+  var remHeight = remainingBounds.height;
+
+  var enabledPlotsCount = enabledPlots.length;
+  if (enabledPlotsCount) {
+    var calculatedHeight = remHeight / enabledPlotsCount;
+    var autoHeightsCount = 0;
+
+    /*
+      This cycle calculates heights set to plots by user.
+     */
+    for (i = 0; i < enabledPlotsCount; i++) {
+      plot = enabledPlots[i];
+      plot.parentBounds(remainingBounds);
+      height = NaN;
+      bounds = plot.bounds();
+
+      var plotMinHeight = anychart.utils.normalizeSize(/** @type {number|string} */(bounds.minHeight()), remHeight);
+      var plotHeight = anychart.utils.normalizeSize(/** @type {number|string} */(bounds.height()), remHeight);
+      var plotMaxHeight = anychart.utils.normalizeSize(/** @type {number|string} */(bounds.maxHeight()), remHeight);
+
+      if (!isNaN(plotMinHeight)) {
+        height = Math.max(plotMinHeight, calculatedHeight);
+        plot.setOption('weight', null);
+      }
+
+      if (!isNaN(plotHeight)) {
+        height = isNaN(height) ? plotHeight : Math.max(plotHeight, height);
+        plot.setOption('weight', null);
+      }
+
+      if (!isNaN(plotMaxHeight)) {
+        height = isNaN(height) ? Math.min(plotMaxHeight, calculatedHeight) : Math.min(plotMaxHeight, height);
+        plot.setOption('weight', null);
+      }
+
+      if (isNaN(height))
+        autoHeightsCount += 1;
+      else
+        heightsSetSum += height;
+
+      allHeightsSum += isNaN(height) ? calculatedHeight : height;
+      exactHeights.push(height); // Can contain NaNs. NaN means height autocalculation.
+
+      bounds.suspendSignalsDispatching();
+      bounds.top(null).bottom(null).height(null).minHeight(null).maxHeight(null);
+      bounds.resumeSignalsDispatching(false);
+    }
+
+    // Good variable naming ;)
+    var exactHeightExceedsAvailableHeight = heightsSetSum > remHeight;
+
+    var weightsSum = 0;
+    var weights = [];
+    var weight, exactHeight;
+
+    /*
+      This passage calculates weights and sums.
+     */
+    for (i = 0; i < enabledPlotsCount; i++) {
+      plot = enabledPlots[i];
+      exactHeight = exactHeights[i]; // Can be NaN.
+      weight = /** @type {number} */ (plot.getOption('weight'));
+
+      if (!goog.isDefAndNotNull(weight)) {
+        /*
+          This condition processes cases when
+          bounds set by user exceed available height.
+         */
+        if (exactHeightExceedsAvailableHeight) {
+          if (isNaN(exactHeight)) {
+            weight = calculatedHeight;
+          } else {
+            weight = exactHeight;
+          }
+        } else {
+          if (isNaN(exactHeight)) {
+            weight = (remHeight - heightsSetSum) / autoHeightsCount;
+          } else {
+            weight = exactHeight;
+          }
+        }
+      }
+
+      weights.push(weight);
+      weightsSum += weight;
+    }
+
+    var currentTop = 0;
+    /*
+      This passage sets auto top and ayot height.
+     */
+    for (i = 0; i < enabledPlotsCount; i++) {
+      plot = enabledPlots[i];
+      bounds = plot.bounds();
+      bounds.suspendSignalsDispatching();
+
+      weight = weights[i];
+      plot.setOption('weight', weight); // Here we don't need signals dispatching.
+
+      var size = Math.round((weight / weightsSum) * remHeight);
+
+      bounds.setAutoTop(currentTop);
+      bounds.setAutoHeight(size);
+      currentTop += size;
+
+      bounds.resumeSignalsDispatching(true);
+    }
+  }
+};
+
+
+/**
  * Distributes content bounds among plots.
  * @param {anychart.math.Rect} contentBounds
  * @private
@@ -1708,41 +2008,14 @@ anychart.stockModule.Chart.prototype.distributeBounds_ = function(contentBounds)
     scroller.parentBounds(remainingBounds);
     remainingBounds = scroller.getRemainingBounds();
   }
+  this.plotsBounds_ = remainingBounds;
 
-  var plot;
-  var currentTop = 0;
-  var currentBottom = NaN;
-  var boundsArray = [];
-  for (var i = 0; i < this.plots_.length; i++) {
-    plot = this.plots_[i];
-    if (plot && plot.enabled()) {
-      plot.parentBounds(remainingBounds);
-      var bounds = /** @type {anychart.core.utils.Bounds} */(plot.bounds());
-      var usedInDistribution = false;
-      if (!goog.isNull(bounds.top())) {
-        currentBottom = anychart.utils.normalizeSize(/** @type {number|string} */(bounds.top()), remainingBounds.height);
-      } else if (!goog.isNull(bounds.bottom())) {
-        usedInDistribution = true;
-        boundsArray.push(bounds);
-        currentBottom = anychart.utils.normalizeSize(/** @type {number|string} */(bounds.bottom()), remainingBounds.height, true);
-      }
-      if (!isNaN(currentBottom)) {
-        if (boundsArray.length)
-          this.distributeBoundsLocal_(boundsArray, currentTop, currentBottom, remainingBounds.height);
-        currentTop = currentBottom;
-        currentBottom = NaN;
-        boundsArray.length = 0;
-      }
-      if (!usedInDistribution)
-        boundsArray.push(bounds);
-    }
-  }
-  if (boundsArray.length)
-    this.distributeBoundsLocal_(boundsArray, currentTop, remainingBounds.height, remainingBounds.height);
+  // Since DVF-4261, weight distribution replaces previous behaviour.
+  this.distributeWeights_();
 
   this.minPlotsDrawingWidth_ = Infinity;
-  for (i = 0; i < this.plots_.length; i++) {
-    plot = this.plots_[i];
+  for (var i = 0; i < this.plots_.length; i++) {
+    var plot = this.plots_[i];
     if (plot && plot.enabled()) {
       var width = plot.getDrawingWidth();
       if (this.minPlotsDrawingWidth_ > width)
@@ -1751,120 +2024,6 @@ anychart.stockModule.Chart.prototype.distributeBounds_ = function(contentBounds)
   }
   if (!isFinite(this.minPlotsDrawingWidth_))
     this.minPlotsDrawingWidth_ = NaN;
-};
-
-
-/**
- * Bounds distribution.
- * @param {Array.<anychart.core.utils.Bounds>} boundsArray
- * @param {number} top
- * @param {number} bottom
- * @param {number} fullHeight - Parent bounds height to get percent heights normalized.
- * @private
- */
-anychart.stockModule.Chart.prototype.distributeBoundsLocal_ = function(boundsArray, top, bottom, fullHeight) {
-  var i, size, minSize, maxSize;
-  var bounds;
-  var distributedSize = 0;
-  var fixedSizes = [];
-  var minSizes = [];
-  var maxSizes = [];
-  var autoSizesCount = 0;
-  var hardWay = false;
-  var height = bottom - top;
-  for (i = 0; i < boundsArray.length; i++) {
-    bounds = boundsArray[i];
-    bounds.suspendSignalsDispatching();
-    minSize = anychart.utils.normalizeSize(/** @type {number|string|null} */(bounds.minHeight()), fullHeight);
-    maxSize = anychart.utils.normalizeSize(/** @type {number|string|null} */(bounds.minHeight()), fullHeight);
-    // getting normalized size
-    size = anychart.utils.normalizeSize(/** @type {number|string|null} */(bounds.height()), fullHeight);
-    // if it is NaN (not fixed)
-    if (isNaN(size)) {
-      autoSizesCount++;
-      // if there are any limitations on that non-fixed size - we are going to do it hard way:(
-      // we cache those limitations
-      if (!isNaN(minSize)) {
-        minSizes[i] = minSize;
-        hardWay = true;
-      }
-      if (!isNaN(maxSize)) {
-        maxSizes[i] = maxSize;
-        hardWay = true;
-      }
-    } else {
-      if (!isNaN(minSize))
-        size = Math.max(size, minSize);
-      if (!isNaN(maxSize))
-        size = Math.min(size, maxSize);
-      distributedSize += size;
-      fixedSizes[i] = size;
-    }
-  }
-
-  var autoSize;
-  var restrictedSizes;
-  if (hardWay && autoSizesCount > 0) {
-    restrictedSizes = [];
-    // we limit max cycling times to guarantee finite exec time in case my calculations are wrong
-    var maxTimes = autoSizesCount * autoSizesCount;
-    do {
-      var repeat = false;
-      // min to 3px per autoPlot to make them visible, but not good-looking.
-      autoSize = Math.max(3, (height - distributedSize) / autoSizesCount);
-      for (i = 0; i < boundsArray.length; i++) {
-        // if the size of the column is not fixed
-        if (!(i in fixedSizes)) {
-          // we recheck if the limitation still exist and drop it if it doesn't
-          if (i in restrictedSizes) {
-            if (restrictedSizes[i] == minSizes[i] && minSizes[i] < autoSize) {
-              distributedSize -= minSizes[i];
-              autoSizesCount++;
-              delete restrictedSizes[i];
-              repeat = true;
-              break;
-            }
-            if (restrictedSizes[i] == maxSizes[i] && maxSizes[i] > autoSize) {
-              distributedSize -= maxSizes[i];
-              autoSizesCount++;
-              delete restrictedSizes[i];
-              repeat = true;
-              break;
-            }
-          } else {
-            if ((i in minSizes) && minSizes[i] > autoSize) {
-              distributedSize += restrictedSizes[i] = minSizes[i];
-              autoSizesCount--;
-              repeat = true;
-              break;
-            }
-            if ((i in maxSizes) && maxSizes[i] < autoSize) {
-              distributedSize += restrictedSizes[i] = maxSizes[i];
-              autoSizesCount--;
-              repeat = true;
-              break;
-            }
-          }
-        }
-      }
-    } while (repeat && autoSizesCount > 0 && maxTimes--);
-  }
-  var current = top;
-  autoSize = Math.max(3, (height - distributedSize) / autoSizesCount);
-  for (i = 0; i < boundsArray.length; i++) {
-    bounds = boundsArray[i];
-    if (i in fixedSizes)
-      size = fixedSizes[i];
-    else if (restrictedSizes && (i in restrictedSizes))
-      size = restrictedSizes[i];
-    else
-      size = autoSize;
-    size = Math.round(size);
-    bounds.setAutoTop(current);
-    bounds.setAutoHeight(size);
-    bounds.resumeSignalsDispatching(true);
-    current += size;
-  }
 };
 
 
@@ -2058,7 +2217,7 @@ anychart.stockModule.Chart.prototype.defaultAnnotationSettings = function(opt_va
 
 
 //endregion
-//region --- Event markers
+//region Event markers
 //------------------------------------------------------------------------------
 //
 //  Event markers
@@ -2199,7 +2358,7 @@ anychart.stockModule.Chart.prototype.highlightAtRatio_ = function(xRatio, yRatio
     if (this.plots_[i]) {
       var plot = this.plots_[i];
       var closestSeriesInfoArg = plot == sourcePlot ? closestSeriesInfo : void 0; // We need this argument only for the current plot.
-      plot.highlight(value, rawValue, sourcePlot, clientY, closestSeriesInfoArg);
+      plot.highlight(value, rawValue, sourcePlot, clientY, closestSeriesInfoArg, plot === sourcePlot);
     }
   }
   this.highlighted_ = true;
@@ -2272,7 +2431,7 @@ anychart.stockModule.Chart.prototype.highlightAtRatio_ = function(xRatio, yRatio
  * @return {(anychart.stockModule.Plot.HighlightedSeriesInfo|null)} Highlighted data row for series that is actually closest to cursor.
  * @private
  */
-anychart.stockModule.Chart.prototype.getClosestSeriesInfo_ = function (sourcePlotInfo, yRatio) {
+anychart.stockModule.Chart.prototype.getClosestSeriesInfo_ = function(sourcePlotInfo, yRatio) {
   var result = null;
   var closestIndex = -1;
   var distance = Infinity;
@@ -2544,6 +2703,39 @@ anychart.stockModule.Chart.prototype.onZoomMarqueeFinish_ = function(plotIndex, 
   }
   this.allowHighlight();
   return true;
+};
+
+
+//endregion
+//region --- Splitters
+/**
+ * Splitters settings.
+ * @param {(Object|boolean|null)=} opt_value
+ * @return {!(anychart.stockModule.splitter.SplittersSettings|anychart.stockModule.Chart)}
+ */
+anychart.stockModule.Chart.prototype.splitters = function(opt_value) {
+  if (!this.splitters_) {
+    this.splitters_ = new anychart.stockModule.splitter.SplittersSettings();
+    this.setupCreated('splitters', this.splitters_);
+    this.splitters_.listenSignals(this.splittersInvalidated_, this);
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.splitters_.setup(opt_value);
+    return this;
+  } else {
+    return this.splitters_;
+  }
+};
+
+
+/**
+ * Splitters signals handler.
+ * @param {anychart.SignalEvent} e - .
+ * @private
+ */
+anychart.stockModule.Chart.prototype.splittersInvalidated_ = function(e) {
+  this.invalidate(anychart.ConsistencyState.STOCK_SPLITTERS, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -3097,7 +3289,9 @@ anychart.stockModule.Chart.prototype.disposeInternal = function() {
       this.annotations_,
       this.eventMarkers_,
       this.mouseWheelHandler_,
-      this.crosshair_);
+      this.crosshair_,
+      this.splitters_,
+      this.splitterController_);
 
   this.plots_ = null;
   this.scroller_ = null;
@@ -3105,6 +3299,8 @@ anychart.stockModule.Chart.prototype.disposeInternal = function() {
   this.eventMarkers_ = null;
   this.mouseWheelHandler_ = null;
   this.crosshair_ = null;
+  this.splitters_ = null;
+  this.splitterController_ = null;
 
   delete this.dataController_;
   delete this.defaultAnnotationSettings_;
@@ -3186,18 +3382,7 @@ anychart.stockModule.Chart.prototype.setupElements = function(opt_default, opt_c
 
 
 //endregion
-/**
- * Stock chart constructor function.
- * @param {boolean=} opt_allowPointSettings Allows to set point settings from data.
- * @return {anychart.stockModule.Chart}
- */
-anychart.stock = function(opt_allowPointSettings) {
-  var chart = new anychart.stockModule.Chart(opt_allowPointSettings);
-  chart.setupElements(true);
-  return chart;
-};
-
-
+//region CSV
 /** @inheritDoc */
 anychart.stockModule.Chart.prototype.getRawCsvDataSources = function() {
   var tables = this.dataController_.getAllTables();
@@ -3280,8 +3465,23 @@ anychart.stockModule.Chart.prototype.getCsvData = function(mode) {
   res.data.sort(function(a, b) {
     return /** @type {number} */(a[0]) - /** @type {number} */(b[0]);
   });
-  goog.array.forEach(res.data, function(item) { item.shift(); });
+  goog.array.forEach(res.data, function(item) {
+    item.shift();
+  });
   return res;
+};
+
+
+//endregion
+/**
+ * Stock chart constructor function.
+ * @param {boolean=} opt_allowPointSettings Allows to set point settings from data.
+ * @return {anychart.stockModule.Chart}
+ */
+anychart.stock = function(opt_allowPointSettings) {
+  var chart = new anychart.stockModule.Chart(opt_allowPointSettings);
+  chart.setupElements(true);
+  return chart;
 };
 
 
@@ -3292,6 +3492,7 @@ anychart.stockModule.Chart.prototype.getCsvData = function(mode) {
   proto['plot'] = proto.plot;
   proto['crosshair'] = proto.crosshair;
   proto['scroller'] = proto.scroller;
+  proto['splitters'] = proto.splitters;
   proto['xScale'] = proto.xScale;
   proto['selectRange'] = proto.selectRange;
   proto['getSelectedRange'] = proto.getSelectedRange;

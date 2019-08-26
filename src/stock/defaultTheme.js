@@ -532,7 +532,8 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
           'fill': 'none'
         }
       },
-      'baseline': 0
+      'baseline': 0,
+      'weight': null
     },
     'padding': [20, 30, 20, 60],
     'plots': [{}],
@@ -725,6 +726,18 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         },
         'zIndex': 75,
         'showHelperLabel': true
+      }
+    },
+    'splitters': {
+      'enabled': true,
+      'normal': {
+        'stroke': '1 #ddd 0.5'
+      },
+      'hovered': {
+        'stroke': '1 #ddd 0.8'
+      },
+      'preview': {
+        'fill': '#000 0.1'
       }
     },
     'tooltip': {

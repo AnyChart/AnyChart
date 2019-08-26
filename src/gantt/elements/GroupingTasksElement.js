@@ -17,6 +17,8 @@ goog.require('anychart.ganttModule.elements.TimelineElement');
 anychart.ganttModule.elements.GroupingTasksElement = function(timeline) {
   anychart.ganttModule.elements.GroupingTasksElement.base(this, 'constructor', timeline);
 
+  this.addThemes('defaultTimeline.groupingTasks');
+
   /**
    *
    * @type {anychart.ganttModule.elements.ProgressElement}

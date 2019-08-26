@@ -5,6 +5,7 @@ goog.provide('anychart.math.Rect');
 
 goog.require('acgraph.math');
 goog.require('goog.math.Coordinate');
+goog.require('goog.math.Line');
 goog.require('goog.math.Rect');
 
 
@@ -487,6 +488,64 @@ anychart.math.checkForPointIsOutOfCircleBounds = function(x1, y1, cx, cy, r) {
 
 
 /**
+ * Checks if point is inside the polygon by raytracing.
+ * It works by tracing ray from outside of the polygon bounds to the given point
+ * and then counting intersections of this ray with segments of polygon.
+ * If number of intersections is odd - point is inside the polygon.
+ * If number is even - point is outside of bounds.
+ *                   point outside
+ *           _____     \/  ____
+ *   ray >--!-----!----o--!--o | <- point inside
+ *          |     |_______|    |
+ *          |__________________| <- U-shaped polygon
+ * ! - intersections
+ * o - points
+ * @param {number} x1 of point
+ * @param {number} y1 of point
+ * @param {Array.<number>} polygon points where odd are x's, even are y's
+ * @param {anychart.math.Rect=} opt_polygonBounds it's advised to path polygon bounds for better performance
+ * @return {boolean}
+ */
+anychart.math.isPointInsidePolygon = function(x1, y1, polygon, opt_polygonBounds) {
+  var minX = +Infinity;
+  if (goog.isDef(opt_polygonBounds)) {
+    //if point is outside of the polygon bounding box - it's definitely outside of the polygon
+    if (x1 < opt_polygonBounds.getLeft() || x1 > opt_polygonBounds.getRight() || y1 < opt_polygonBounds.getTop() || y1 > opt_polygonBounds.getBottom()) {
+      return false;
+    }
+  } else {
+    for (var i = 0; i < polygon.length; i += 2) {
+      minX = Math.min(minX, polygon[i]);
+    }
+  }
+
+  var secondPoint = goog.isDef(opt_polygonBounds) ? {x: opt_polygonBounds.left - 100, y: 0} : {x: minX, y: 0};
+
+  var curX;
+  var prevX = polygon.length - 2;
+  var isInside = false;
+  for (curX = 0; curX < polygon.length; curX += 2) {
+    /*
+    We trace a ray from outside of the polygon bounding box (from secondPoint).
+    If this ray hits polygon edges odd number of times - point is inside the polygon.
+    If it hits even number of times - point is outside the bounding box.
+     */
+    if (anychart.math.checkSegmentsIntersection(
+        polygon[curX], polygon[curX + 1],
+        polygon[prevX], polygon[prevX + 1],
+        x1, y1,
+        secondPoint.x, secondPoint.y)) {
+      isInside = !isInside;
+    }
+
+    prevX = curX;
+  }
+
+  return isInside;
+};
+
+
+/**
  * Clips a line defined by two points with a given rect and returns an array of four coordinates (two points) or null.
  * The resulting points are returned in the same direction as the original vector lays.
  * @param {number} x1
@@ -619,6 +678,23 @@ anychart.math.clipRayByRect = function(x1, y1, x2, y2, rect) {
     }
   }
   return res;
+};
+
+
+/**
+ * Returns shortest distance from given segment to point.
+ * @param {number} x1 first point of segment X coordinate
+ * @param {number} y1 first point of segment Y coordinate
+ * @param {number} x2 second point of segment X coordinate
+ * @param {number} y2 second point of segment Y coordinate
+ * @param {number} px point X coordinate
+ * @param {number} py point Y coordinate
+ * @return {number}
+ */
+anychart.math.getClosestDistanceFromSegmentToPoint = function(x1, y1, x2, y2, px, py) {
+  var line = new goog.math.Line(x1, y1, x2, y2);
+  var closestPoint = line.getClosestSegmentPoint(px, py);
+  return goog.math.Coordinate.distance(closestPoint, new goog.math.Coordinate(px, py));
 };
 
 

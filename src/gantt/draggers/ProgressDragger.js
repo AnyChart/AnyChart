@@ -48,17 +48,26 @@ anychart.ganttModule.draggers.ProgressDragger.prototype.defaultAction = function
 
 
 /**
- * @override
+ * Gets progress value.
+ * @return {number}
  */
-anychart.ganttModule.draggers.ProgressDragger.prototype.limitX = function(x) {
-  var b = this.element.tag.bounds;
+anychart.ganttModule.draggers.ProgressDragger.prototype.getProgressValue = function() {
   var dataItem = this.element.tag.item;
 
   var progressValue = goog.isDef(dataItem.meta('progressValue')) ?
       dataItem.meta('progressValue') :
       dataItem.meta('autoProgress');
 
-  progressValue = /** @type {number} */ (progressValue || 0);
+  return /** @type {number} */ (progressValue || 0);
+};
+
+
+/**
+ * @override
+ */
+anychart.ganttModule.draggers.ProgressDragger.prototype.limitX = function(x) {
+  var b = this.element.tag.bounds;
+  var progressValue = this.getProgressValue();
   var progress = b.width * progressValue;
   this.limits.left = -progress;
   this.limits.width = b.width;

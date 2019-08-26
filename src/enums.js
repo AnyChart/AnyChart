@@ -1534,6 +1534,7 @@ anychart.enums.EventType = {
   CLOSE: 'close',
   COMPLETE: 'complete',
 
+  // Select rectangular marquee events
   SELECT_MARQUEE_START: 'selectmarqueestart',
   SELECT_MARQUEE_CHANGE: 'selectmarqueechange',
   SELECT_MARQUEE_FINISH: 'selectmarqueefinish',
@@ -1555,7 +1556,13 @@ anychart.enums.EventType = {
   //axis marker events
   AXIS_MARKER_OVER: 'axismarkerover',
   AXIS_MARKER_MOVE: 'axismarkermove',
-  AXIS_MARKER_OUT: 'axismarkerout'
+  AXIS_MARKER_OUT: 'axismarkerout',
+
+  //Async working
+  WORKING_START: 'workingstart',
+  WORKING: 'working',
+  WORKING_CANCEL: 'workingcancel',
+  WORKING_FINISH: 'workingfinish'
 };
 
 
@@ -1927,7 +1934,9 @@ anychart.enums.StockIndicatorTypes = {
   CMF: 'cmf',
   DMI: 'dmi',
   EMA: 'ema',
+  ENV: 'env',
   HA: 'ha',
+  IKH: 'ikh',
   KDJ: 'kdj',
   KELTNER_CHANNELS: 'keltner-channels',
   MACD: 'macd',
@@ -1935,8 +1944,12 @@ anychart.enums.StockIndicatorTypes = {
   MMA: 'mma',
   MOMENTUM: 'momentum',
   OBV: 'obv',
+  PPO: 'ppo',
   PRICE_CHANNELS: 'price-channels',
   PSAR: 'psar',
+  PSY: 'psy',
+  RAT: 'rat',
+  RCI: 'rci',
   ROC: 'roc',
   RSI: 'rsi',
   SMA: 'sma',
@@ -2081,6 +2094,8 @@ anychart.enums.GanttDataFields = {
   BASELINE: 'baseline',
   BASELINE_START: 'baselineStart',
   BASELINE_END: 'baselineEnd',
+  BASELINE_PROGRESS_VALUE: 'baselineProgressValue',
+  BASELINE_PROGRESS: 'baselineProgress',
   PROGRESS: 'progress',
   PROGRESS_VALUE: 'progressValue',
   MILESTONE: 'milestone',
@@ -2141,6 +2156,7 @@ anychart.enums.TLElementTypes = {
   GROUPING_TASKS: 'grouping-tasks',
   TASKS: 'tasks',
   PROGRESS: 'progress',
+  BASELINE_PROGRESS: 'baseline-progress',
   BASELINES: 'baselines',
   MILESTONES: 'milestones',
   MILESTONES_PREVIEW: 'milestones-preview',
@@ -2649,7 +2665,9 @@ anychart.enums.WarningCode = {
   GRAPH_CONNECT_SAME_NODE: 904,
   GRAPH_NO_GROUP: 905,
   GRAPH_DATA_HAS_NO_FIELD: 906,
-  GRAPH_NO_ID: 907
+  GRAPH_NO_ID: 907,
+
+  OFFLINE_EXPORT_FAILED: 1000
 };
 
 
@@ -5242,4 +5260,35 @@ anychart.enums.GanttToolbarButtonsMode = {
 anychart.enums.normalizeOrdinalScaleMode = function(value) {
   return /** @type {anychart.enums.OrdinalScaleMode} */ (anychart.enums.normalize(anychart.enums.OrdinalScaleMode, value,
       anychart.enums.OrdinalScaleMode.DISCRETE));
+};
+
+
+/**
+ * Enum used by anychart.stockModule.PlotControls
+ * @enum {string}
+ */
+anychart.enums.PlotPosition = {
+  /**
+   * Means chart has only one plot.
+   * Renders only zoom control.
+   */
+  SINGLE: 'single',
+
+  /**
+   * Means plot placed top - first plot of the chart.
+   * Renders down and zoom control.
+   */
+  TOP: 'top',
+
+  /**
+   * Means plot placed between others - neither top, neither bottom.
+   * Renders up, down and zoom control.
+   */
+  CENTER: 'center',
+
+  /**
+   * Means plot placed bottom - last plot of the chart.
+   * Renders up and zoom control.
+   */
+  BOTTOM: 'bottom'
 };

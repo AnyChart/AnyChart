@@ -419,6 +419,7 @@ anychart.core.utils.Space.prototype.setThemeSettings = function(config) {
 anychart.core.utils.Space.prototype.serialize = function() {
   var json = anychart.core.utils.Space.base(this, 'serialize');
   anychart.core.settings.serialize(this, anychart.core.utils.Space.SIMPLE_PROPS_DESCRIPTORS, json, 'Space');
+  // anychart.core.settings.serialize(this, anychart.core.utils.Space.SIMPLE_PROPS_DESCRIPTORS, json, 'Space', void 0, true);
   return json;
 };
 

@@ -79,8 +79,25 @@ anychart.scales.Linear.prototype.getType = function() {
 /** @inheritDoc */
 anychart.scales.Linear.prototype.roundToTicksPrecision = function(value, opt_addPrec) {
   var ticks = this.ticks().getInternal();
-  var prec = anychart.math.getPrecision(anychart.math.specialRound(ticks[1] - ticks[0]));
-  return anychart.math.round(Number(value), Math.max(prec, 0) + (isNaN(opt_addPrec) ? 0 : Number(opt_addPrec)));
+
+  var prec = 0;
+
+  /*
+    Cycle calculates maximum required precision for available ticks.
+    It is needed to avoid incorrect rounding coming to tick label format
+    when first and second ticks values are rounded correctly, but 2nd and 3rd
+    are not.
+    Issue: https://anychart.atlassian.net/browse/DVF-4289
+   */
+  for (var i = 0; i < ticks.length - 1; i++) {
+    var first = ticks[i];
+    var second = ticks[i + 1];
+
+    var roundedDiff = anychart.math.specialRound(second - first);
+    prec = Math.max(prec, anychart.math.getPrecision(roundedDiff));
+  }
+
+  return anychart.math.round(Number(value), prec + (isNaN(opt_addPrec) ? 0 : Number(opt_addPrec)));
 };
 
 
@@ -153,10 +170,9 @@ anychart.scales.Linear.prototype.setupTransformer = function() {
 
 /** @inheritDoc */
 anychart.scales.Linear.prototype.setupTicks = function() {
-  var setupResult = this.ticks().setupAsMajor(this.min, this.max,
-      this.minimumModeAuto && this.min != this.softMin && this.alignMinimumVal,
-      this.maximumModeAuto && this.max != this.softMax && this.alignMaximumVal,
-      this.logBaseVal, this.borderLog || 0);
+  var canModifyMin = this.minimumModeAuto && this.min != this.softMin && this.alignMinimumVal;
+  var canModifyMax = this.maximumModeAuto && this.max != this.softMax && this.alignMaximumVal;
+  var setupResult = this.ticks().setupAsMajor(this.min, this.max, canModifyMin, canModifyMax, this.logBaseVal, this.borderLog || 0);
 
   if (!isNaN(setupResult[4]))
     this.borderLog = setupResult[4];
@@ -167,7 +183,9 @@ anychart.scales.Linear.prototype.setupTicks = function() {
   if (this.maximumModeAuto)
     this.max = setupResult[1]; // new max
 
-  this.minorTicks().setupAsMinor(this.ticks().getInternal(), this.logBaseVal, setupResult[2], setupResult[3], this.borderLog);
+  var minorTicks = this.minorTicks();
+  var internalTicks = this.ticks().getInternal();
+  minorTicks.setupAsMinor(internalTicks, this.logBaseVal, setupResult[2], setupResult[3], this.borderLog);
 };
 
 

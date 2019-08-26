@@ -2316,6 +2316,7 @@ anychart.core.ui.Tooltip.prototype.serialize = function() {
 
   delete json['x'];
   delete json['y'];
+  delete json['zIndex'];
 
   var titleConfig = this.title().serialize();
   if (!goog.object.isEmpty(titleConfig))
@@ -2329,7 +2330,7 @@ anychart.core.ui.Tooltip.prototype.serialize = function() {
   if (!goog.object.isEmpty(bgConfig))
     json['background'] = bgConfig;
 
-  var paddingConfig = this.padding().serialize();
+  var paddingConfig = this.padding().ownSettings;
   if (!goog.object.isEmpty(paddingConfig))
     json['padding'] = paddingConfig;
 

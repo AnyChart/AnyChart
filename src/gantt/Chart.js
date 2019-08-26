@@ -822,6 +822,8 @@ anychart.ganttModule.Chart.prototype.rowMouseMove = function(event) {
       tooltip.setMiddleFormats(
           /** @type {Function|null|string|undefined} */ (tlTooltip.getOption('format')),
           /** @type {Function|null|string|undefined} */ (tlTooltip.getOption('titleFormat')));
+    } else {
+      target.tooltip().hideChildTooltips(); //This fixes appearance of tooltip on fast row mouse change.
     }
 
     if (tooltip.enabled()) {
@@ -1195,6 +1197,24 @@ anychart.ganttModule.Chart.prototype.drawContent = function(bounds) {
   }
 
   anychart.core.Base.resumeSignalsDispatchingTrue(this.dg_, this.tl_, this.splitter_, this.controller_);
+
+  if (anychart.isAsync()) {
+    /*
+      Without ASYNC flag, chart and all its components are consistent after
+      draw() because all drawing and another JS activities are synchronous.
+
+      With ASYNC flag chart's controller, dataGrid and timeline are not
+      consistent and are ready to preform asynchronous operations.
+
+      It means that data grid will not take any settings by its API right after
+      chart.draw() is called. To make data grid work, it gets needsForceSignalsDispatching
+      flag set as true.
+
+      Probably, timeline needs the same flag, this moment needs to be researched.
+     */
+    this.dg_.needsForceSignalsDispatching(true);
+  }
+
   this.controller_.run(); //This must redraw DG and TL.
   if (bounds.width > 0) {
     this.splitter().draw();
@@ -1205,6 +1225,8 @@ anychart.ganttModule.Chart.prototype.drawContent = function(bounds) {
     this.markConsistent(anychart.ConsistencyState.GANTT_POSITION);
   }
 
+  if (anychart.isAsync()) // ASYNC feature, not needed in regular gantt flow.
+    this.dispatchEvent(anychart.enums.EventType.WORKING_START);
 };
 
 

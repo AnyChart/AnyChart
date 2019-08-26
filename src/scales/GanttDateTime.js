@@ -158,6 +158,13 @@ anychart.scales.GanttDateTime = function() {
    * @private
    */
   this.ranges_ = this.normalizeLevels_(anychart.scales.GanttDateTime.DEFAULT_LEVELS);
+
+  /**
+   * Fiscal year start month (1-12)
+   * @type {number}
+   * @private
+   */
+  this.fiscalYearStartMonth_ = 1;
 };
 goog.inherits(anychart.scales.GanttDateTime, anychart.core.Base);
 
@@ -594,6 +601,26 @@ anychart.scales.GanttDateTime.prototype.maximumGap = function(opt_value) {
 
 
 /**
+ * Start month of the fiscal year setter/getter.
+ *
+ * @param {number=} opt_value - Number of month (1 - 12)
+ * @return {number|anychart.scales.GanttDateTime} - Current value or itself for method chaining.
+ */
+anychart.scales.GanttDateTime.prototype.fiscalYearStartMonth = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = goog.math.clamp(opt_value, 1, 12);
+    if (this.fiscalYearStartMonth_ != opt_value) {
+      this.fiscalYearStartMonth_ = opt_value;
+      this.consistent = false;
+      this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
+    }
+    return this;
+  }
+  return this.fiscalYearStartMonth_;
+};
+
+
+/**
  * @param {number} pixStart - TODO (A.Kudryavtsev): Unused parameter, from previous scale implementation.
  * @param {number} pixEnd - TODO (A.Kudryavtsev): Unused parameter, from previous scale implementation.
  * @param {anychart.enums.Interval} unit
@@ -604,18 +631,39 @@ anychart.scales.GanttDateTime.prototype.maximumGap = function(opt_value) {
 anychart.scales.GanttDateTime.prototype.getTicks = function(pixStart, pixEnd, unit, count, opt_range) {
   var range = opt_range || this.getRange();
   var start = anychart.utils.alignDateLeftByUnit(range['min'], unit, count, 2000);
+  var interval = anychart.utils.getIntervalFromInfo(unit, count);
+
   var end = range['max'];
   var res = [];
-  var current = new goog.date.UtcDateTime(new Date(start));
-  var interval = anychart.utils.getIntervalFromInfo(unit, count);
-  var curr = current.getTime();
-  while (curr < end) {
-    var prev = curr;
+
+  //TODO (A.Kudryavtsev): Describe fiscal behaviour.
+  var current, currentMs;
+  if (this.fiscalYearStartMonth_ > 1 &&
+      (unit == anychart.enums.Interval.YEAR ||
+      unit == anychart.enums.Interval.SEMESTER ||
+      unit == anychart.enums.Interval.QUARTER)) {
+    var fiscalStart = anychart.utils.shiftFiscalDate(start, this.fiscalYearStartMonth_);
+    if (fiscalStart > start) {
+      var invertedInterval = interval.getInverse();
+      current = new goog.date.UtcDateTime(new Date(fiscalStart));
+      currentMs = current.getTime();
+      do {
+        current.add(invertedInterval);
+        currentMs = current.getTime();
+      } while (currentMs > start);
+    }
+  } else {
+    current = new goog.date.UtcDateTime(new Date(start));
+  }
+
+  currentMs = current.getTime();
+  while (currentMs < end) {
+    var prev = currentMs;
     current.add(interval);
-    curr = current.getTime();
+    currentMs = current.getTime();
     res.push({
       'start': prev,
-      'end': curr
+      'end': currentMs
     });
   }
   return res;
@@ -1103,6 +1151,9 @@ anychart.scales.GanttDateTime.prototype.serialize = function() {
   json['maximumGap'] = this.maximumGap_;
   json['zoomLevels'] = this.zoomLevels();
 
+  if (this.fiscalYearStartMonth_ > 1)
+    json['fiscalYearStartMonth'] = this.fiscalYearStartMonth_;
+
   return json;
 };
 
@@ -1150,6 +1201,9 @@ anychart.scales.GanttDateTime.prototype.setupByJSON = function(config, opt_defau
   if ('zoomLevels' in config)
     this.zoomLevels(config['zoomLevels']);
 
+  if ('fiscalYearStartMonth' in config)
+    this.fiscalYearStartMonth(config['fiscalYearStartMonth']);
+
   if (recalc) {
     this.consistent = false;
     this.calculate();
@@ -1172,6 +1226,7 @@ anychart.scales.GanttDateTime.prototype.setupByJSON = function(config, opt_defau
   proto['zoomLevels'] = proto.zoomLevels;
   proto['transform'] = proto.transform;
   proto['inverseTransform'] = proto.inverseTransform;
+  proto['fiscalYearStartMonth'] = proto.fiscalYearStartMonth;
   // proto['zoomIn'] = proto.zoomIn;
   // proto['zoomOut'] = proto.zoomOut;
   // proto['zoomTo'] = proto.zoomTo;

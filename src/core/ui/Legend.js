@@ -1473,7 +1473,6 @@ anychart.core.ui.Legend.prototype.initializeLegendItems_ = function(items) {
   sett = this.paginator().textSettings();
   style = anychart.utils.toStyleString(/** @type {Object} */ (sett));
   paginatorTextEl.style.cssText = style;
-  paginatorTextEl.textContent = '0 / 0';
 
   for (i = 0; i < this.items_.length; i++) {
     item = this.items_[i];
@@ -1481,8 +1480,9 @@ anychart.core.ui.Legend.prototype.initializeLegendItems_ = function(items) {
     var bbox = textEl['getBBox']();
     item.predefinedBounds(new goog.math.Rect(bbox.x, bbox.y, bbox.width, bbox.height));
   }
-  var pb = paginatorTextEl['getBBox']();
-  this.paginator_.predefinedTextBounds(new goog.math.Rect(pb.x, pb.y, pb.width, pb.height));
+
+  // provide paginator text DOM element reference
+  this.paginator_.paginatorTextElement(paginatorTextEl);
 
   this.recreateItems_ = false;
   this.invalidate(anychart.ConsistencyState.BOUNDS);

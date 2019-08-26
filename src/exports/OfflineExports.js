@@ -126,8 +126,8 @@ anychart.exportsModule.offline.renderSvgAsImage = function(target, svgElement, a
   var blob = new Blob([svgString], {'type': 'image/svg+xml'});
   var svgUrl = goog.fs.url.createObjectUrl(blob);
 
-  try {
-    image.onload = function() {
+  image.onload = function() {
+    try {
       if (canvas['msToBlob'] && ctx['drawSvg']) {
         //this method is imported by canvg
         ctx['drawSvg'](svgString, 0, 0, width, height);
@@ -143,13 +143,13 @@ anychart.exportsModule.offline.renderSvgAsImage = function(target, svgElement, a
 
       goog.dom.removeNode(canvas);
       goog.fs.url.revokeObjectUrl(svgUrl);
-    };
+    } catch (e) {
+      failCallback(args);
+    }
+  };
 
 
-    image.src = svgUrl;
-  } catch (e) {
-    failCallback(args);
-  }
+  image.src = svgUrl;
 };
 
 
@@ -217,109 +217,120 @@ anychart.exportsModule.offline.saveSvgToFileType = function(target, svgElement, 
  * @param {Function} failCallback handles falling back to export server, should accept args param.
  */
 anychart.exportsModule.offline.exportChartOffline = function(target, exportType, args, successCallback, failCallback) {
-  var stageDomElementClone;
-  var stage = target.container().getStage();
-  var exportPixelWidth, exportPixelHeight;
-  var paperSize = args['paperSize'];
-  var landscape = args['landscape'];
+  anychart.exports.loadExternalDependencies()
+      .then(function() {
+        anychart.exports.isExternLoaded = true;
 
-  //size is passed as paper size (a{0,1,2,3,4,etc})
-  if (goog.isString(paperSize)) {
-    exportPixelWidth = acgraph.utils.exporting.PdfPaperSize[paperSize].width;
-    exportPixelHeight = acgraph.utils.exporting.PdfPaperSize[paperSize].height;
-  } else {
-    exportPixelWidth = args['width'] || stage.width();
-    exportPixelHeight = args['height'] || stage.height();
-  }
+        var stageDomElementClone;
+        var stage = target.container().getStage();
+        var exportPixelWidth, exportPixelHeight;
+        var paperSize = args['paperSize'];
+        var landscape = args['landscape'];
 
-  var stageOrigWidth = /** @type {number} */(stage.width());
-  var stageOrigHeight = /** @type {number} */(stage.height());
+        //size is passed as paper size (a{0,1,2,3,4,etc})
+        if (goog.isString(paperSize)) {
+          exportPixelWidth = acgraph.utils.exporting.PdfPaperSize[paperSize].width;
+          exportPixelHeight = acgraph.utils.exporting.PdfPaperSize[paperSize].height;
+        } else {
+          exportPixelWidth = args['width'] || stage.width();
+          exportPixelHeight = args['height'] || stage.height();
+        }
 
-
-  /*
-  If landscape true - width should be longer than height.
-  Otherwise height > width.
-  It should be switched only if paperSize is given as string ('a4', 'a5', etc).
-   */
-  if (exportType == acgraph.vector.Stage.ExportType.PDF && goog.isString(paperSize) &&
-      ((landscape && (exportPixelHeight > exportPixelWidth)) || (!landscape && (exportPixelHeight < exportPixelWidth)))) {
-    exportPixelWidth = [exportPixelHeight, exportPixelHeight = exportPixelWidth][0];//switch width <-> height
-  }
-
-  stage.resize(exportPixelWidth, exportPixelHeight);
-  stageDomElementClone = stage.domElement().cloneNode(true);
-  stage.resize(goog.isString(stageOrigWidth) ? stageOrigWidth : '100%' , goog.isString(stageOrigHeight) ? stageOrigHeight : '100%');
-
-  stageDomElementClone.setAttribute('width', exportPixelWidth);
-  stageDomElementClone.setAttribute('height', exportPixelHeight);
-
-  //number of images converted into base64 string
-  var imagesConverted = 0;
-  var images = stageDomElementClone.getElementsByTagName('image');
-
-  var svgPrepared = function() {
-    anychart.exportsModule.offline.saveSvgToFileType(target, stageDomElementClone, exportType, args, exportPixelWidth, exportPixelHeight, successCallback, failCallback);
-  };
-
-  var conversionSuccess = function() {
-    imagesConverted++;
-
-    if (imagesConverted == images.length) {
-      svgPrepared();
-    }
-  };
+        var stageOrigWidth = /** @type {number} */(stage.width());
+        var stageOrigHeight = /** @type {number} */(stage.height());
 
 
-  var convertImage = function(image) {
-    var link = image.getAttribute('href');
-    var canvas = (goog.dom.createElement(goog.dom.TagName.CANVAS));
-    goog.dom.appendChild(anychart.document.body, canvas);
-    var ctx = goog.dom.getCanvasContext2D(canvas);
-    var newImage = new Image();
-    var width = parseFloat(image.getAttribute('width'));
-    var height = parseFloat(image.getAttribute('height'));
-    width = width || 1;//sometimes images have zero width/height, wich results in empty imageDataUrl
-    height = height || 1;
-    canvas.width = width;
-    canvas.height = height;
+        /*
+        If landscape true - width should be longer than height.
+        Otherwise height > width.
+        It should be switched only if paperSize is given as string ('a4', 'a5', etc).
+         */
+        if (exportType == acgraph.vector.Stage.ExportType.PDF && goog.isString(paperSize) &&
+            ((landscape && (exportPixelHeight > exportPixelWidth)) || (!landscape && (exportPixelHeight < exportPixelWidth)))) {
+          exportPixelWidth = [exportPixelHeight, exportPixelHeight = exportPixelWidth][0];//switch width <-> height
+        }
 
-    newImage.onload = function() {
-      ctx.drawImage(newImage, 0, 0, width, height);
-      var imageDataUrl = canvas.toDataURL();
-      image.setAttribute('href', imageDataUrl);
-      image.setAttribute('src', imageDataUrl);
-      conversionSuccess();
-      goog.dom.removeNode(canvas);
-    };
-    newImage.crossOrigin = 'anonymous';
-    newImage.src = link;
-  };
+        stage.resize(exportPixelWidth, exportPixelHeight);
+        stageDomElementClone = stage.domElement().cloneNode(true);
+        stage.resize(goog.isString(stageOrigWidth) ? stageOrigWidth : '100%' , goog.isString(stageOrigHeight) ? stageOrigHeight : '100%');
 
-  var exportToImagesOrPdf = goog.array.contains([
-    acgraph.vector.Stage.ExportType.PNG,
-    acgraph.vector.Stage.ExportType.JPG,
-    acgraph.vector.Stage.ExportType.PDF
-  ], exportType);
+        stageDomElementClone.setAttribute('width', exportPixelWidth);
+        stageDomElementClone.setAttribute('height', exportPixelHeight);
+
+        //number of images converted into base64 string
+        var imagesConverted = 0;
+        var images = stageDomElementClone.getElementsByTagName('image');
+
+        var svgPrepared = function() {
+          anychart.exportsModule.offline.saveSvgToFileType(target, stageDomElementClone, exportType, args, exportPixelWidth, exportPixelHeight, successCallback, failCallback);
+        };
+
+        var conversionSuccess = function() {
+          imagesConverted++;
+
+          if (imagesConverted == images.length) {
+            svgPrepared();
+          }
+        };
 
 
-  try {
-    if (images.length > 0) {
+        var convertImage = function(image) {
+          var link = image.getAttribute('href');
+          var newImage = new Image();
+          var width = parseFloat(image.getAttribute('width'));
+          var height = parseFloat(image.getAttribute('height'));
+          width = width || 1;//sometimes images have zero width/height, wich results in empty imageDataUrl
+          height = height || 1;
 
-      //There are problems exporting chart with images in IE browsers to images or pdf.
-      if (goog.labs.userAgent.engine.isTrident() && exportToImagesOrPdf) {
-        throw 'Internet explorer can\'t export chart with images to pdf, jpg or png';
-      }
+          newImage.onload = function() {
+            var canvas = (goog.dom.createElement(goog.dom.TagName.CANVAS));
+            goog.dom.appendChild(anychart.document.body, canvas);
+            var ctx = goog.dom.getCanvasContext2D(canvas);
+            canvas.width = width;
+            canvas.height = height;
 
-      for (var i = 0; i < images.length; i++) {
-        convertImage(images[i]);
-      }
-    } else {
-      svgPrepared();
-    }
-  } catch (e) {
-    console.log('Offline export failed');
-    failCallback();
-  }
+            ctx.drawImage(newImage, 0, 0, width, height);
+            var imageDataUrl = canvas.toDataURL();
+            image.setAttribute('href', imageDataUrl);
+            image.setAttribute('src', imageDataUrl);
+            conversionSuccess();
+            goog.dom.removeNode(canvas);
+          };
+          newImage.crossOrigin = 'anonymous';
+          newImage.src = link;
+        };
+
+        var exportToImagesOrPdf = goog.array.contains([
+          acgraph.vector.Stage.ExportType.PNG,
+          acgraph.vector.Stage.ExportType.JPG,
+          acgraph.vector.Stage.ExportType.PDF
+        ], exportType);
+
+
+        try {
+          if (images.length > 0) {
+
+            //There are problems exporting chart with images in IE browsers to images or pdf.
+            if (goog.labs.userAgent.engine.isTrident() && exportToImagesOrPdf) {
+              throw 'Internet explorer can\'t export chart with images to pdf, jpg or png';
+            }
+
+            for (var i = 0; i < images.length; i++) {
+              convertImage(images[i]);
+            }
+          } else {
+            svgPrepared();
+          }
+        } catch (e) {
+          anychart.core.reporting.warning(anychart.enums.WarningCode.OFFLINE_EXPORT_FAILED, null, [], true);
+          failCallback();
+        }
+      })
+      .thenCatch(function() {
+        anychart.core.reporting.warning(anychart.enums.WarningCode.OFFLINE_EXPORT_FAILED, null, [], true);
+        failCallback();
+      });
+
 };
 
 
@@ -374,6 +385,16 @@ anychart.exportsModule.offline.dataURItoBlob = function(dataURI) {
   var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
 
   var ab = new ArrayBuffer(byteString.length);
+
+  /*
+  Array buffer, we created above, only allocates peace of memory and doesn't allow us to write there.
+  To manipulate this memory we have to use typed arrays, like: Uint{8,16,32,64}Array and Float64Array, or DataView.
+  Typed arrays allow us to read and write data in array buffer, using array-like syntax: uintArray[i].
+  As we are writing byte sized data (char codes, limited to 255 max value), we use here Uint8Array.
+  More info:
+  https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer
+  https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray
+   */
   var ia = new Uint8Array(ab);
   for (var i = 0; i < byteString.length; i++) {
     ia[i] = byteString.charCodeAt(i);
