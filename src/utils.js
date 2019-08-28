@@ -2760,7 +2760,7 @@ anychart.utils.decomposeArguments = function(namedArguments, opt_options, opt_de
     }
 
     if (goog.isDef(opt_defaults)) {
-      result[name] = result[name] || opt_defaults[name];
+      result[name] = goog.isDef(result[name]) ? result[name] : opt_defaults[name];
     }
   });
 
