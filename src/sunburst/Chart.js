@@ -532,7 +532,7 @@ anychart.sunburstModule.Chart.prototype.unselect = function(opt_indexOrIndexes) 
 /** @inheritDoc */
 anychart.sunburstModule.Chart.prototype.applyAppearanceToPoint = function(pointState, opt_value) {
   this.colorizePoint(pointState);
-  this.drawLabel_(pointState, true);
+  this.drawLabel_(pointState);
 };
 
 
@@ -2566,10 +2566,8 @@ anychart.sunburstModule.Chart.prototype.drawNode_ = function(node, parentValue, 
  * Draws label for a slice.
  * @private
  * @param {anychart.PointState|number} pointState Point state.
- * @param {boolean=} opt_update .
- * @return {anychart.core.ui.LabelsFactory.Label} Label.
  */
-anychart.sunburstModule.Chart.prototype.drawLabel_ = function(pointState, opt_update) {
+anychart.sunburstModule.Chart.prototype.drawLabel_ = function(pointState) {
   pointState = anychart.core.utils.InteractivityState.clarifyState(pointState);
 
   var hovered = pointState == anychart.PointState.HOVER;
@@ -2709,13 +2707,10 @@ anychart.sunburstModule.Chart.prototype.drawLabel_ = function(pointState, opt_up
         .positionProvider(positionProvider);
   }
 
-  if (!needToDraw || !fitToSlice) {
+  if (!needToDraw || !fitToSlice)
     chartLabels.clear(label.getIndex());
-  } else if (opt_update) {
+  else
     label.draw();
-  }
-
-  return /** @type {anychart.core.ui.LabelsFactory.Label}*/(label);
 };
 
 
@@ -2749,7 +2744,7 @@ anychart.sunburstModule.Chart.prototype.createFormatProvider = function(opt_forc
   var values = { //TODO (A.Kudryavtsev): Check types!!!
     'value': {value: value, type: anychart.enums.TokenType.NUMBER},
     'name': {value: item.get('name'), type: anychart.enums.TokenType.STRING},
-    'index': {value: item.get('index'), type: anychart.enums.TokenType.NUMBER},
+    'index': {value: item.meta('index'), type: anychart.enums.TokenType.NUMBER},
     'chart': {value: this, type: anychart.enums.TokenType.UNKNOWN},
     'item': {value: item, type: anychart.enums.TokenType.UNKNOWN},
     'depth': {value: item.meta('depth'), type: anychart.enums.TokenType.NUMBER}
