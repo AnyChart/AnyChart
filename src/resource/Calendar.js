@@ -201,7 +201,7 @@ anychart.resourceModule.Calendar.prototype.weekendRange = function(opt_value) {
     if (goog.isArray(opt_value)) {
       start = anychart.utils.normalizeToNaturalNumber(opt_value[0], NaN, true);
       start = goog.math.clamp(start, 0, 6);
-      end = anychart.utils.normalizeToNaturalNumber(opt_value[0], NaN, true);
+      end = anychart.utils.normalizeToNaturalNumber(opt_value[1], NaN, true);
       end = goog.math.clamp(end, 0, 6);
       if (isNaN(start)) {
         if (isNaN(end)) {
