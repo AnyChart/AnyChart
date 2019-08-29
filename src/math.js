@@ -164,7 +164,7 @@ anychart.math.roughlyEqual = function(value, value2, opt_eps) {
 anychart.math.log = function(val, opt_base) {
   var res = Math.log(Math.max(1e-7, val));
   if (opt_base)
-    return res / Math.log(opt_base);
+    return anychart.math.specialRound(res / Math.log(opt_base), 14);
   else
     return res;
 };
