@@ -1325,6 +1325,7 @@ anychart.core.Chart.prototype.credits = function(opt_value) {
     this.credits_ = new anychart.core.ui.ChartCredits(this);
     this.credits_.listenSignals(this.onCreditsSignal_, this);
     this.setupCreated('credits', this.credits_);
+    this.credits_.setupByJSON(this.credits_.themeSettings);
   }
 
   if (goog.isDef(opt_value)) {
