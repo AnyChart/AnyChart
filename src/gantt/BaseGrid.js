@@ -2408,7 +2408,8 @@ anychart.ganttModule.BaseGrid.prototype.drawInternal = function(positionRecalcul
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    this.pixelBoundsCache = /** @type {anychart.math.Rect} */ (anychart.utils.applyPixelShiftToRect(/** @type {!anychart.math.Rect} */ (this.getPixelBounds()), 0));
+    var pb = /** @type {!anychart.math.Rect} */ (this.getPixelBounds());
+    this.pixelBoundsCache = /** @type {anychart.math.Rect} */ (anychart.utils.applyPixelShiftToRect(pb, 0));
     this.base_.clip(/** @type {anychart.math.Rect} */ (this.pixelBoundsCache));
     this.bgRect_.setBounds(/** @type {anychart.math.Rect} */ (this.pixelBoundsCache));
     this.eventsRect_.setBounds(/** @type {anychart.math.Rect} */ (this.pixelBoundsCache));

@@ -189,6 +189,13 @@ anychart.ganttModule.Splitter = function() {
 
 
   /**
+   * Center line default stroke.
+   * @type {acgraph.vector.Fill}
+   */
+  this.defaultFill = acgraph.vector.normalizeFill('#cecece');
+
+
+  /**
    * Drag preview fill.
    * @type {acgraph.vector.Fill}
    * @private
@@ -295,7 +302,7 @@ anychart.ganttModule.Splitter.prototype.position = function(opt_value) {
     if (!isNaN(pos)) {
       if (this.pixelBoundsCache_) { //TODO (A.Kudryavtsev): Move after this.invalidate() ?
         this.position_ = pos; //Here we must do it before handler call.
-        if (this.handlePositionChange_) this.dispatchEvent(anychart.enums.EventType.SPLITTER_CHANGE); //Trigger user defined event if offset is not zero.
+        if (this.handlePositionChange_) this.dispatchEvent(anychart.enums.EventType.SPLITTER_POSITION_CHANGE); //Trigger user defined event if offset is not zero.
       }
       this.position_ = pos;
       this.invalidate(anychart.ConsistencyState.SPLITTER_POSITION, anychart.Signal.NEEDS_REDRAW);
@@ -541,6 +548,17 @@ anychart.ganttModule.Splitter.prototype.startLimit_ = function(opt_value) {
     return this;
   }
   return this.startLimitSize_;
+};
+
+
+/**
+ * Dummy for DVF-4323.
+ * @param {number} val - .
+ */
+anychart.ganttModule.Splitter.prototype.setStartLimitForce = function(val) {
+  this.startLimitSize_ = val;
+  this.newStartLimitSize_ = val;
+  this.invalidate(anychart.ConsistencyState.SPLITTER_POSITION);
 };
 
 
@@ -968,6 +986,7 @@ anychart.ganttModule.Splitter.prototype.dragEndHandler_ = function() {
  */
 anychart.ganttModule.Splitter.prototype.mouseMoveHandler_ = function() {
   this.mouseOver_ = true;
+  this.centerLine_.fill('black');
 };
 
 
@@ -992,6 +1011,7 @@ anychart.ganttModule.Splitter.prototype.mouseDblClickHandler_ = function(e) {
 anychart.ganttModule.Splitter.prototype.mouseOutHandler_ = function() {
   this.mouseOver_ = false;
   if (!this.dragging_) this.globalCursor_(this.isVertical_(), true);
+  this.centerLine_.fill(this.defaultFill);
 };
 
 
@@ -1076,7 +1096,12 @@ anychart.ganttModule.Splitter.prototype.draw = function() {
 
     if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
       this.pixelBoundsCache_ = /** @type {goog.math.Rect} */ (this.getPixelBounds());
-      if (this.handlePositionChange_) this.dispatchEvent(anychart.enums.EventType.SPLITTER_CHANGE); //Trigger user defined event if offset is not zero.
+      if (this.handlePositionChange_)
+        this.dispatchEvent( //Trigger user defined event if offset is not zero.
+            {
+              'type': anychart.enums.EventType.SPLITTER_POSITION_CHANGE,
+              'src': 'drawing'
+            });
       this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SPLITTER_POSITION);
       this.markConsistent(anychart.ConsistencyState.BOUNDS);
     }
@@ -1250,6 +1275,13 @@ anychart.core.ui.SimpleSplitter = function() {
    * @private
    */
   this.stroke_ = acgraph.vector.normalizeStroke('1 #acbece');
+
+
+  /**
+   * Center line default stroke.
+   * @type {acgraph.vector.Stroke}
+   */
+  this.defaultStroke = acgraph.vector.normalizeStroke('1 #acbece');
 
   /**
    * Thickness of row stroke.
@@ -1579,6 +1611,7 @@ anychart.core.ui.SimpleSplitter.prototype.drawVisualSplitter_ = function() {
  */
 anychart.core.ui.SimpleSplitter.prototype.mouseMoveHandler_ = function() {
   this.mouseOver_ = true;
+  this.centerLine_.stroke('2 black');
 };
 
 
@@ -1589,6 +1622,7 @@ anychart.core.ui.SimpleSplitter.prototype.mouseMoveHandler_ = function() {
 anychart.core.ui.SimpleSplitter.prototype.mouseOutHandler_ = function() {
   this.mouseOver_ = false;
   if (!this.dragging_) this.globalCursor_(true);
+  this.centerLine_.stroke(this.defaultStroke);
 };
 
 
@@ -1670,7 +1704,7 @@ anychart.core.ui.SimpleSplitter.prototype.draw = function() {
 
     if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
       this.pixelBoundsCache_ = /** @type {goog.math.Rect} */ (this.getPixelBounds());
-      if (this.handlePositionChange_) this.dispatchEvent(anychart.enums.EventType.SPLITTER_CHANGE); //Trigger user defined event if offset is not zero.
+      if (this.handlePositionChange_) this.dispatchEvent(anychart.enums.EventType.SPLITTER_POSITION_CHANGE); //Trigger user defined event if offset is not zero.
       this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SPLITTER_POSITION);
       this.markConsistent(anychart.ConsistencyState.BOUNDS);
     }
@@ -1690,7 +1724,7 @@ anychart.core.ui.SimpleSplitter.prototype.draw = function() {
     if (this.hasInvalidationState(anychart.ConsistencyState.SPLITTER_POSITION)) {
       if (isNaN(this.position_)) this.position_ = Math.round((this.pixelBoundsCache_.width - this.strokeThickness_) / 2);
       if (this.handlePositionChange_) {
-        this.dispatchEvent(anychart.enums.EventType.SPLITTER_CHANGE);
+        this.dispatchEvent(anychart.enums.EventType.SPLITTER_POSITION_CHANGE);
       } //Trigger user defined event if offset is not zero.
       this.drawVisualSplitter_();
       this.markConsistent(anychart.ConsistencyState.SPLITTER_POSITION);

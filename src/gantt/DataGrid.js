@@ -111,9 +111,14 @@ anychart.ganttModule.DataGrid = function(opt_controller) {
    */
   this.columnsWidthsCache_ = [];
 
+  var fixedColumnsBeforeInvalidationHook = function() {
+    this.interactivityHandler.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+  };
+
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['columnStroke', anychart.ConsistencyState.DATA_GRID_GRIDS, anychart.Signal.NEEDS_REDRAW],
     ['headerFill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['fixedColumns', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW, 0, fixedColumnsBeforeInvalidationHook],
     ['onEditStart', 0, 0],
     ['onEditEnd', 0, 0]
   ]);
@@ -368,7 +373,8 @@ anychart.ganttModule.DataGrid.DG_DESCRIPTORS = (function() {
     [anychart.enums.PropertyHandlerType.MULTI_ARG, 'columnStroke', anychart.core.settings.strokeNormalizer],
     [anychart.enums.PropertyHandlerType.MULTI_ARG, 'headerFill', anychart.core.settings.fillNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'onEditStart', anychart.core.settings.functionNormalizer],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'onEditEnd', anychart.core.settings.functionNormalizer]
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'onEditEnd', anychart.core.settings.functionNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'fixedColumns', anychart.core.settings.booleanNormalizer]
   ]);
   return map;
 })();
@@ -476,12 +482,18 @@ anychart.ganttModule.DataGrid.prototype.addSplitter_ = function() {
   //(columnsCount > this.splitters_.length) is totally the same as (columnsCount - 1 == this.splitters_.length).
   if (columnsCount > this.splitters_.length) {
     var newSplitter = new anychart.core.ui.SimpleSplitter();
-    newSplitter.stroke(/** @type {acgraph.vector.Stroke} */(anychart.ganttModule.BaseGrid.getColorResolver('columnStroke', anychart.enums.ColorType.STROKE, false)(this, 0)));
+    var splitterStroke = /** @type {acgraph.vector.Stroke} */(anychart.ganttModule.BaseGrid.getColorResolver('columnStroke', anychart.enums.ColorType.STROKE, false)(this, 0));
+    newSplitter.stroke(splitterStroke);
+    newSplitter.defaultStroke = splitterStroke;
     newSplitter.container(this.getClipLayer());
     newSplitter.listenSignals(function() {
       newSplitter.draw();
-    }, newSplitter);
-    newSplitter.listen(anychart.enums.EventType.SPLITTER_CHANGE, goog.bind(this.splitterChangedHandler_, this, columnsCount - 1));
+      if (this.getOption('fixedColumns')) {
+        // Will be invalidated only if interactivityHandler is chart.
+        this.interactivityHandler.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+      }
+    }, this);
+    newSplitter.listen(anychart.enums.EventType.SPLITTER_POSITION_CHANGE, goog.bind(this.splitterChangedHandler_, this, columnsCount - 1));
     newSplitter.listen(acgraph.events.EventType.DBLCLICK, goog.bind(this.splitterDblClickHandler_, this, columnsCount - 1));
     newSplitter.listen(anychart.enums.EventType.DRAG_START, goog.bind(this.denyDragging, this, true));
     newSplitter.listen(anychart.enums.EventType.DRAG, goog.bind(this.denyDragging, this, true));
@@ -501,6 +513,59 @@ anychart.ganttModule.DataGrid.prototype.addSplitter_ = function() {
  */
 anychart.ganttModule.DataGrid.prototype.column = function(opt_indexOrValue, opt_value) {
   return this.columnInternal_(opt_indexOrValue, opt_value);
+};
+
+
+/**
+ * Adds column.
+ * @param {Object=} opt_config - Column config.
+ * @return {anychart.ganttModule.Column}
+ */
+anychart.ganttModule.DataGrid.prototype.addColumn = function(opt_config) {
+  return /** @type {anychart.ganttModule.Column} */ (this.column(this.columns_.length, opt_config));
+};
+
+
+/**
+ * Extracts splitter width.
+ * @return {number}
+ */
+anychart.ganttModule.DataGrid.prototype.getSplitterWidth = function() {
+  var colorResolver = anychart.ganttModule.BaseGrid.getColorResolver('columnStroke', anychart.enums.ColorType.STROKE, false);
+  var stroke = /** @type {acgraph.vector.Stroke|string} */ (colorResolver(this, 0));
+  return anychart.utils.extractThickness(stroke);
+};
+
+
+/**
+ * Calculates sum of columns width.
+ * @param {boolean=} opt_skipLastColumn - Whether to get the sum without last column.
+ * @return {number}
+ */
+anychart.ganttModule.DataGrid.prototype.getTotalColumnsWidth = function(opt_skipLastColumn) {
+  var splitterWidth = this.getSplitterWidth();
+
+  var rv = 0;
+  var lastTrackedWidth = 0;
+  for (var i = 0, l = this.columns_.length; i < l; i++) {
+    var col = this.columns_[i];
+    if (col && col.enabled() && !col.isDisposed()) {
+      var width = col['width']();
+      if (anychart.utils.isPercent(width)) {
+        width = anychart.ganttModule.DataGrid.DEFAULT_COLUMN_WIDTH;
+        col.resetBounds();
+        col.suspendSignalsDispatching();
+        col.resumeSignalsDispatching(false);
+      }
+      col['width'](width);
+
+      lastTrackedWidth = width + splitterWidth;
+      rv += lastTrackedWidth;
+    }
+  }
+
+  rv = rv - (opt_skipLastColumn ? lastTrackedWidth : 0);
+  return rv;
 };
 
 
@@ -555,6 +620,10 @@ anychart.ganttModule.DataGrid.prototype.columnInternal_ = function(opt_indexOrVa
       this.addSplitter_();
 
       this.invalidate(anychart.ConsistencyState.DATA_GRID_GRIDS | anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+      if (this.getOption('fixedColumns')) {
+        // Will be invalidated only if interactivityHandler is chart.
+        this.interactivityHandler.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+      }
     }
     return column;
   }
@@ -571,6 +640,21 @@ anychart.ganttModule.DataGrid.prototype.getColumnsCount = function() {
     var col = this.columns_[i];
     if (col && !col.isDisposed())
       res++;
+  }
+  return res;
+};
+
+
+/**
+ * Gets last enabled column.
+ * @return {anychart.ganttModule.Column}
+ */
+anychart.ganttModule.DataGrid.prototype.getLastEnabledColumn = function() {
+  var res = null;
+  for (var i = this.columns_.length - 1; i > -1; i--) {
+    var col = this.columns_[i];
+    if (col && col.enabled() && !col.isDisposed())
+      return col;
   }
   return res;
 };
@@ -854,7 +938,17 @@ anychart.ganttModule.DataGrid.prototype.splitterDblClickHandler_ = function(spli
  */
 anychart.ganttModule.DataGrid.prototype.resizeColumn_ = function(column, columnIndex, splitterIndex, width) {
   if (splitterIndex == columnIndex) { //If splitter_index == column_index.
+    var ev = {
+      'type': anychart.enums.EventType.SPLITTER_POSITION_CHANGE,
+      'columnIndex': column.getIndex(), //not the same as columnIndex parameter.
+      'targetColumn': column,
+      'linearColumnIndex': columnIndex,
+      'oldWidth': column.getPixelBounds().width,
+      'newWidth': width
+    };
+
     column['width'](width); //Sets new width.
+    this.dispatchDetachedEvent(ev);
   }
 };
 
@@ -876,6 +970,10 @@ anychart.ganttModule.DataGrid.prototype.dblClickResizeColumn_ = function(column,
       var titleOriginalBoundsWidth = title.getOriginalBounds().width;
       titleOriginalBoundsWidth += (title.padding().getOption('left') + title.padding().getOption('right'));
       column['width'](/** @type {number} */ (column['defaultWidth']() ? column['defaultWidth']() : titleOriginalBoundsWidth));
+      if (this.getOption('fixedColumns')) {
+        // Will be invalidated only if interactivityHandler is chart.
+        this.interactivityHandler.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+      }
     }
   }
 };
@@ -899,8 +997,14 @@ anychart.ganttModule.DataGrid.prototype.columnInvalidated_ = function(event) {
     if (anychart.isAsync())
       this.partialLabels.reset = true;
   }
-
+  var redrawChart = false;
+  if (this.getOption('fixedColumns') && event.hasSignal(anychart.Signal.ENABLED_STATE_CHANGED)) {
+    state |= anychart.ConsistencyState.BOUNDS;
+    redrawChart = true;
+  }
   this.invalidate(state, signal);
+  if (redrawChart)
+    this.interactivityHandler.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -983,7 +1087,7 @@ anychart.ganttModule.DataGrid.prototype.boundsInvalidated = function() {
       .lineTo(this.pixelBoundsCache.left, headerHeight)
       .close();
 
-  var splitterWidth = anychart.utils.extractThickness(/** @type {acgraph.vector.Stroke|string} */ (anychart.ganttModule.BaseGrid.getColorResolver('columnStroke', anychart.enums.ColorType.STROKE, false)(this, 0)));
+  var splitterWidth = this.getSplitterWidth();
 
   var totalWidth = 0;
 
@@ -1042,6 +1146,18 @@ anychart.ganttModule.DataGrid.prototype.positionInvalidated = function() {
 
 
 /**
+ * @inheritDoc
+ */
+anychart.ganttModule.DataGrid.prototype.getPixelBounds = function() {
+  var rv = anychart.ganttModule.DataGrid.base(this, 'getPixelBounds');
+  if (this.getOption('fixedColumns')) {
+    rv.width = this.getTotalColumnsWidth();
+  }
+  return rv;
+};
+
+
+/**
  * @override
  */
 anychart.ganttModule.DataGrid.prototype.specialInvalidated = function() {
@@ -1054,7 +1170,7 @@ anychart.ganttModule.DataGrid.prototype.specialInvalidated = function() {
     var totalWidth = 0;
     left = this.pixelBoundsCache.left;
     top = this.pixelBoundsCache.top;
-    var columnStroke = anychart.ganttModule.BaseGrid.getColorResolver('columnStroke', anychart.enums.ColorType.STROKE, false)(this, 0);
+    var columnStroke = /** @type {acgraph.vector.Stroke} */(anychart.ganttModule.BaseGrid.getColorResolver('columnStroke', anychart.enums.ColorType.STROKE, false)(this, 0));
     var splitterWidth = anychart.utils.extractThickness(/** @type {acgraph.vector.Stroke|string} */ (columnStroke));
 
     var enabledColumns = [];
@@ -1092,31 +1208,41 @@ anychart.ganttModule.DataGrid.prototype.specialInvalidated = function() {
       var splitter = this.splitters_[i];
 
       var add = colWidth;
+      var drawSplitter = !(this.getOption('fixedColumns') && i == enabledColumns.length - 1);
 
-      if (splitter) { //Amount of splitters is (amountOfColumns - 1).
+      if (splitter) {
         splitter.suspendSignalsDispatching();
-        splitter.stroke(/** @type {acgraph.vector.Stroke} */(columnStroke));
+        if (drawSplitter) { //Amount of splitters is (amountOfColumns - 1).
+          splitter.stroke(columnStroke);
+          splitter.defaultStroke = columnStroke;
 
-        splitter.enabled(true);
-        this.columnsWidthsCache_.push(colLeft + colWidth + splitterWidth);
+          // splitter.enabled(true);
+          this.columnsWidthsCache_.push(colLeft + colWidth + splitterWidth);
 
-        add += splitterWidth;
-        var boundsWidth = add + this.pixelBoundsCache.width;
+          add += splitterWidth;
+          var boundsWidth = add + this.pixelBoundsCache.width;
 
-        var splitterBounds = {
-          left: (left + colLeft + anychart.ganttModule.DataGrid.MIN_COLUMN_WIDTH),
-          top: top,
-          width: boundsWidth,
-          height: this.pixelBoundsCache.height
-        };
+          var splitterBounds = {
+            left: (left + colLeft + anychart.ganttModule.DataGrid.MIN_COLUMN_WIDTH),
+            top: top,
+            width: boundsWidth,
+            height: this.pixelBoundsCache.height
+          };
 
-        splitter
-            .bounds(splitterBounds)
-            .handlePositionChange(false)
-            .position(colWidth - anychart.ganttModule.DataGrid.MIN_COLUMN_WIDTH)
-            .resumeSignalsDispatching(false)
-            .draw()
-            .handlePositionChange(true);
+          splitter
+              .bounds(splitterBounds)
+              .handlePositionChange(false)
+              .enabled(true)
+              .position(colWidth - anychart.ganttModule.DataGrid.MIN_COLUMN_WIDTH)
+              .resumeSignalsDispatching(false)
+              .draw()
+              .handlePositionChange(true);
+        } else {
+          splitter
+              .enabled(false)
+              .resumeSignalsDispatching(false)
+              .draw();
+        }
       }
 
       colLeft += add;
@@ -1568,6 +1694,7 @@ anychart.standalones.dataGrid = function() {
   proto['column'] = proto.column;
 
   proto['data'] = proto.data;
+  proto['addColumn'] = proto.addColumn;
   proto['startIndex'] = proto.startIndex;
   proto['endIndex'] = proto.endIndex;
   proto['getVisibleItems'] = proto.getVisibleItems;
@@ -1587,6 +1714,7 @@ anychart.standalones.dataGrid = function() {
   goog.exportSymbol('anychart.standalones.dataGrid', anychart.standalones.dataGrid);
   proto['draw'] = proto.draw;
   proto['data'] = proto.data;
+  proto['addColumn'] = proto.addColumn;
   proto['parentBounds'] = proto.parentBounds;
   proto['container'] = proto.container;
   proto['headerHeight'] = proto.headerHeight;

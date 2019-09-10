@@ -156,7 +156,7 @@ anychart.ganttModule.Chart = function(opt_isResourcesChart) {
 
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['headerHeight', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW],
-    ['splitterPosition', anychart.ConsistencyState.GANTT_SPLITTER_POSITION, anychart.Signal.NEEDS_REDRAW],
+    ['splitterPosition', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW],
     ['rowHoverFill', 0, 0, 0, rowHoverFillBeforeInvalidation],
     ['rowSelectedFill', 0, 0, 0, rowSelectedFillBeforeInvalidation],
     ['columnStroke', 0, 0, 0, columnStrokeBeforeInvalidation],
@@ -182,8 +182,7 @@ anychart.ganttModule.Chart.prototype.getType = function() {
 anychart.ganttModule.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.SeparateChart.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.GANTT_DATA | //New data is set.
-    anychart.ConsistencyState.GANTT_POSITION | //Position means that position of data items in DG and TL was changed.
-    anychart.ConsistencyState.GANTT_SPLITTER_POSITION; //Position of splitter has been changed.
+    anychart.ConsistencyState.GANTT_POSITION; //Position means that position of data items in DG and TL was changed.
 
 
 /**
@@ -409,10 +408,9 @@ anychart.ganttModule.Chart.prototype.getDataGrid_ = function() {
     this.setupCreated('dataGrid', this.dg_);
     this.dg_.zIndex(anychart.getFlatTheme('defaultDataGrid')['zIndex']);
     this.dg_.setInteractivityHandler(this);
-    var ths = this;
     this.dg_.listenSignals(function() {
-      ths.controller_.run();
-    }, this.controller_);
+      this.controller_.run();
+    }, this);
   }
 
   return this.dg_;
@@ -712,17 +710,36 @@ anychart.ganttModule.Chart.prototype.splitter = function(opt_value) {
         .considerSplitterWidth(true)
         .resumeSignalsDispatching(false);
 
-    var ths = this;
-    this.splitter_.listen(anychart.enums.EventType.SPLITTER_CHANGE, function() {
+    this.splitter_.listen(anychart.enums.EventType.SPLITTER_POSITION_CHANGE, function(e) {
       //This also stores current position for case if dg is being disabled.
       //Here we don't check if newPosition == oldPosition because it is handled by splitter.
-      var padding = ths.padding();
-      var w = padding.tightenWidth(ths.getPixelBounds().width); //This fixes case when chart.padding() is not zero.
-      var pos = ths.splitter().position();
-      var result = Math.round(pos * w);
-      ths.setOption('splitterPosition', result);
-      ths.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
-    });
+      var padding = this.padding();
+      var chartBounds = this.getPixelBounds();
+      var w = padding.tightenWidth(chartBounds.width); //This fixes case when chart.padding() is not zero.
+      var pos = this.splitter().position();
+      var newLeftPixelWidth = Math.floor(pos * w);
+
+      if (this.dg_.getOption('fixedColumns') && e['src'] != 'drawing') { //DVF-4323
+        var dgWidthWithoutLastColumn = this.dg_.getTotalColumnsWidth(true);
+        var lastColumnWidth = newLeftPixelWidth - dgWidthWithoutLastColumn - this.dg_.getSplitterWidth();
+        var lastColumn = this.dg_.getLastEnabledColumn();
+        if (lastColumn) {
+          lastColumn.suspendSignalsDispatching();
+          lastColumn['width'](lastColumnWidth);
+          lastColumn.resumeSignalsDispatching(false);
+        }
+      }
+
+      var ev = {
+        'type': anychart.enums.EventType.SPLITTER_POSITION_CHANGE,
+        'newPosition': newLeftPixelWidth,
+        'oldPosition': this.getOption('splitterPosition')
+      };
+
+      this.setOption('splitterPosition', newLeftPixelWidth);
+      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+      this.dispatchDetachedEvent(ev);
+    }, void 0, this);
 
   }
 
@@ -1026,32 +1043,61 @@ anychart.ganttModule.Chart.prototype.deleteKeyHandler = function(e) {
  * @param {anychart.math.Rect} bounds - Bounds of gantt chart content area.
  */
 anychart.ganttModule.Chart.prototype.drawContent = function(bounds) {
-  anychart.core.Base.suspendSignalsDispatching(this.getDataGrid_(), this.getTimeline(), this.splitter_, this.controller_);
+  anychart.core.Base.suspendSignalsDispatching(this.getDataGrid_(), this.getTimeline(), this.splitter(), this.controller_);
 
-  if (!this.splitter().container()) {
+  if (!this.splitter_.container()) {
     this.dg_.container(this.rootElement);
     this.tl_.container(this.rootElement);
-    this.splitter().container(this.rootElement);
+    this.splitter_.container(this.rootElement);
     this.verticalScrollBar_.container(this.rootElement);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.GANTT_SPLITTER_POSITION) || this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    if (bounds.width > 0) {
-      var dgWidth = Math.round(anychart.utils.normalizeSize(/** @type {number|string} */ (this.getOption('splitterPosition')), bounds.width));
-      var dgRatio = goog.math.clamp(dgWidth / bounds.width, 0, 1);
-      this.splitter().handlePositionChange(false);
-      this.splitter().position(dgRatio);
-      this.splitter().handlePositionChange(true);
-      this.markConsistent(anychart.ConsistencyState.GANTT_SPLITTER_POSITION);
-      this.invalidate(anychart.ConsistencyState.BOUNDS);
-    }
-  }
+  var isFixedDG = this.dg_.getOption('fixedColumns');
 
   var headerHeight = /** @type {number} */ (this.getOption('headerHeight'));
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     if (bounds.width > 0) {
       if (this.dg_.enabled()) {
-        this.splitter().bounds(bounds).draw();
+        var dgWidth = isFixedDG ?
+            this.dg_.getTotalColumnsWidth() :
+            Math.round(anychart.utils.normalizeSize(/** @type {number|string} */ (this.getOption('splitterPosition')), bounds.width));
+
+        this.splitter_.bounds(bounds);
+        if (isFixedDG) {
+          var widthWithoutLastColumn = this.dg_.getTotalColumnsWidth(true);
+          if (widthWithoutLastColumn) {
+            var limit = widthWithoutLastColumn + anychart.ganttModule.DataGrid.MIN_COLUMN_WIDTH;
+            this.splitter_.setStartLimitForce(limit);
+          } else {
+            this.splitter_.leftLimitSize(0);
+          }
+        } else {
+          this.splitter_.leftLimitSize(0);
+        }
+
+        var dgRatio = goog.math.clamp(dgWidth / bounds.width, 0, 1);
+        this.splitter_.handlePositionChange(false);
+        this.splitter_.position(dgRatio);
+        this.splitter_.draw();
+        this.splitter_.handlePositionChange(true);
+
+        if (isFixedDG && this.splitter_.position() != dgRatio) {
+          /*
+            This condition is kind of stupid hack that fixes the following case:
+              - set chart.dataGrid().fixedColumns(true);
+              - reduce chart width to make DG width exceed the chart's width
+              - it will turn this.splitter_.position() to 1.
+              - very quickly expand chart width to make DG width fit inside chart's width.
+              - chart's splitter doesn't fit DG width because of internal splitter's mechanisms.
+
+            I can't find the reason of this bug in splitter's implementation because it's really
+            old. The better way would be to completely rewrite the splitter.
+           */
+          this.splitter_.handlePositionChange(false);
+          this.splitter_.position(dgRatio);
+          this.splitter_.draw();
+          this.splitter_.handlePositionChange(true);
+        }
       } else {
         this.tl_.bounds().set(bounds);
       }
@@ -1064,8 +1110,8 @@ anychart.ganttModule.Chart.prototype.drawContent = function(bounds) {
       }
 
       if (this.dg_.enabled()) {
-        var b1 = this.splitter().getLeftBounds();
-        var b2 = this.splitter().getRightBounds();
+        var b1 = this.splitter_.getLeftBounds();
+        var b2 = this.splitter_.getRightBounds();
         this.dg_.bounds().set(b1);
         this.tl_.bounds().set(b2);
       }

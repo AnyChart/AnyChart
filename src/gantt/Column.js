@@ -874,6 +874,15 @@ anychart.ganttModule.Column.prototype.calculateBounds = function() {
 
 
 /**
+ * Gets column pixel bounds.
+ * @return {anychart.math.Rect}
+ */
+anychart.ganttModule.Column.prototype.getPixelBounds = function() {
+  return this.calculateBounds();
+};
+
+
+/**
  * Button invalidation handler.
  * @param {anychart.SignalEvent} event
  * @private
@@ -1286,4 +1295,5 @@ anychart.ganttModule.Column.prototype.disposeInternal = function() {
   proto['setColumnFormat'] = proto.setColumnFormat;
   proto['buttonCursor'] = proto.buttonCursor;
   proto['draw'] = proto.draw;
+  proto['getPixelBounds'] = proto.getPixelBounds;
 })();

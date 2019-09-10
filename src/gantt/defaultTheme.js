@@ -37,6 +37,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
   'defaultDataGrid': {
     'isStandalone': true,
     'headerHeight': 25,
+    'fixedColumns': false,
 
     'backgroundFill': 'none',
     'columnStroke': anychart.core.defaultTheme.ganttDefaultStroke,

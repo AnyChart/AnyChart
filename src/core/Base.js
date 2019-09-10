@@ -104,7 +104,6 @@ anychart.ConsistencyState = {
   //---------------------------------- GANTT STATES (CHART) ---------------------------------
   GANTT_DATA: 1 << 12,
   GANTT_POSITION: 1 << 13,
-  GANTT_SPLITTER_POSITION: 1 << 14,
   //---------------------------------- TAG CLOUD STATES (CHART) ---------------------------------
   TAG_CLOUD_DATA: 1 << 12,
   TAG_CLOUD_ANGLES: 1 << 13,

@@ -1477,7 +1477,7 @@ anychart.enums.EventType = {
   SCROLLING: 'scrolling',
   SCROLL_END: 'scrollend',
 
-  SPLITTER_CHANGE: 'splitterchange',
+  SPLITTER_POSITION_CHANGE: 'splitterpositionchange',
 
   SCROLLER_CHANGE_START: 'scrollerchangestart',
   SCROLLER_CHANGE: 'scrollerchange',
