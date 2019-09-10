@@ -417,6 +417,7 @@ anychart.ganttModule.BaseGrid.prototype.SUPPORTED_CONSISTENCY_STATES =
  *   isValidStart: boolean,
  *   isValidEnd: boolean,
  *   isValidTask: boolean,
+ *   isFlatGroupingTask: boolean,
  *   isValidBaseline: boolean,
  *   isValidProgress: boolean,
  *   baselineProgressPresents: boolean
@@ -701,6 +702,7 @@ anychart.ganttModule.BaseGrid.getProjectItemInfo = function(item) {
     isValidStart: !isNaN(startVal),
     isValidEnd: !isNaN(endVal),
     isValidTask: !isNaN(startVal) && !isNaN(endVal) && startVal != endVal,
+    isFlatGroupingTask: !isNaN(startVal) && !isNaN(endVal) && startVal == endVal && item.numChildren(),
     isValidBaseline: goog.isNumber(baselineStart) && !isNaN(baselineStart) && goog.isNumber(baselineEnd) && !isNaN(baselineEnd),
     isValidProgress: !isNaN(progressVal),
     baselineProgressPresents: baselineProgressPresents

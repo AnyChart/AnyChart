@@ -238,6 +238,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       'progress': {
         'height': '100%',
         'anchor': 'left-center',
+        'drawOverEnd': true,
         'rendering': {
           'shapes': [
             {
@@ -361,6 +362,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'height': '50%',
         'anchor': 'left-bottom',
         'position': 'left-bottom',
+        'drawOverEnd': true,
         'rendering': {
           'shapes': [
             {

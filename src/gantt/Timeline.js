@@ -4013,6 +4013,21 @@ anychart.ganttModule.TimeLine.prototype.drawProjectTimeline_ = function() {
 
 
 /**
+ * Limits progress bar width (DVF-4324).
+ * @param {number} progressValue - Progress ratio value.
+ * @param {number} width - Element with that progress belongs to.
+ * @param {anychart.ganttModule.elements.ProgressElement} el - related
+ * @return {number} - Limited width.
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.limitProgressWidth_ = function(progressValue, width, el) {
+  var drawOverEnd = el.getOption('drawOverEnd');
+  var w = progressValue * width;
+  return drawOverEnd ? w : Math.min(w, width);
+};
+
+
+/**
  * Gets bar bounds.
  * @param {anychart.ganttModule.elements.TimelineElement} element - Element.
  * @param {anychart.math.Rect} itemBounds - Full item bounds. Left and width must be taken
@@ -4216,10 +4231,10 @@ anychart.ganttModule.TimeLine.prototype.drawAsBaseline_ = function(dataItem, tot
        */
       if (info.isValidTask) {
         element.rendering().callDrawer(dataItem, actualBounds, tag, void 0, isSelected);
-        var progressEl = /** @type {anychart.ganttModule.elements.TimelineElement} */ (element.progress());
+        var progressEl = /** @type {anychart.ganttModule.elements.ProgressElement} */ (element.progress());
         if (info.isValidProgress && progressEl.getOption('enabled')) { //Draw progress.
           var progressValue = info.progress;
-          var progressWidth = /** @type {number} */ (progressValue) * actualBounds.width;
+          var progressWidth = this.limitProgressWidth_(/** @type {number} */ (progressValue), actualBounds.width, progressEl);
           var progressItemBounds = new anychart.math.Rect(actualBounds.left, actualBounds.top, progressWidth, actualBounds.height);
           var progressBounds = this.getBarBounds_(progressEl, progressItemBounds);
           var progressTag = this.createTag(dataItem, progressEl, progressBounds);
@@ -4244,10 +4259,10 @@ anychart.ganttModule.TimeLine.prototype.drawAsBaseline_ = function(dataItem, tot
     }
 
     if (baselineProgressBounds) {
-      var blProgressEl = /** @type {anychart.ganttModule.elements.TimelineElement} */ (baselines.progress());
+      var blProgressEl = /** @type {anychart.ganttModule.elements.ProgressElement} */ (baselines.progress());
       if (info.baselineProgressPresents && blProgressEl.getOption('enabled')) { //Draw baseline progress.
         var blProgressValue = info.baselineProgress;
-        var blProgressWidth = /** @type {number} */ (blProgressValue) * baselineProgressBounds.width;
+        var blProgressWidth = this.limitProgressWidth_(/** @type {number} */ (blProgressValue), baselineProgressBounds.width, blProgressEl);
         var blProgressItemBounds = new anychart.math.Rect(baselineProgressBounds.left, baselineProgressBounds.top, blProgressWidth, baselineProgressBounds.height);
         var blProgressBounds = this.getBarBounds_(blProgressEl, blProgressItemBounds);
         var blProgressTag = this.createTag(dataItem, blProgressEl, blProgressBounds);
@@ -4307,6 +4322,7 @@ anychart.ganttModule.TimeLine.prototype.fixBaselineBarsPositioning_ = function(b
 
 /**
  * Draws data item as parent.
+ * TODO (A.Kudryavtsev): Think of pixel shift rounding.
  * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} dataItem - Current tree data item.
  * @param {number} totalTop - Pixel value of total top. Is needed to place item correctly.
  * @param {number} itemHeight - Height of row.
@@ -4315,7 +4331,7 @@ anychart.ganttModule.TimeLine.prototype.fixBaselineBarsPositioning_ = function(b
 anychart.ganttModule.TimeLine.prototype.drawAsParent_ = function(dataItem, totalTop, itemHeight) {
   var info = anychart.ganttModule.BaseGrid.getProjectItemInfo(dataItem);
 
-  if (this.groupingTasks().getOption('enabled') && info.isValidTask) {
+  if (this.groupingTasks().getOption('enabled') && (info.isValidTask || info.isFlatGroupingTask)) {
     if (this.milestones().preview().getOption('enabled') && this.milestones().preview().getOption('depth') != 0)
       this.iterateChildMilestones_(0, dataItem, totalTop, itemHeight, goog.getUid(dataItem));
 
@@ -4333,6 +4349,13 @@ anychart.ganttModule.TimeLine.prototype.drawAsParent_ = function(dataItem, total
       var actualItemBounds = new anychart.math.Rect(actualLeft, totalTop, actualWidth, itemHeight);
       var actualBounds = this.getBarBounds_(el, actualItemBounds);
 
+      if (!actualBounds.width) {
+        var h = actualBounds.height;
+        actualBounds.left -= h / 2;
+        actualWidth = h;
+        actualBounds.width = actualWidth;
+      }
+
       var isSelected = this.interactivityHandler.selection().isRowSelected(dataItem);
       actualBounds = this.fixBounds_(el, actualBounds, dataItem, void 0, isSelected);
 
@@ -4341,10 +4364,10 @@ anychart.ganttModule.TimeLine.prototype.drawAsParent_ = function(dataItem, total
       el.rendering().callDrawer(dataItem, actualBounds, tag, void 0, isSelected);
 
 
-      var progressEl = /** @type {anychart.ganttModule.elements.TimelineElement} */ (el.progress());
+      var progressEl = /** @type {anychart.ganttModule.elements.ProgressElement} */ (el.progress());
       if (info.isValidProgress && progressEl.getOption('enabled')) { //Draw progress.
         var progressValue = info.progress;
-        var progressWidth = /** @type {number} */ (progressValue) * actualWidth;
+        var progressWidth = this.limitProgressWidth_(/** @type {number} */ (progressValue), actualWidth, progressEl);
         var progressItemBounds = new anychart.math.Rect(actualBounds.left, actualBounds.top, progressWidth, actualBounds.height);
         var progressBounds = this.getBarBounds_(progressEl, progressItemBounds);
         var progressTag = this.createTag(dataItem, progressEl, progressBounds);
@@ -4415,10 +4438,10 @@ anychart.ganttModule.TimeLine.prototype.drawAsProgress_ = function(dataItem, tot
       this.setRelatedBounds_(dataItem, actualBounds);
       this.tasks().rendering().callDrawer(dataItem, actualBounds, tag, void 0, isSelected);
 
-      var progressEl = /** @type {anychart.ganttModule.elements.TimelineElement} */ (el.progress());
+      var progressEl = /** @type {anychart.ganttModule.elements.ProgressElement} */ (el.progress());
       if (info.isValidProgress && progressEl.getOption('enabled')) { //Draw progress.
         var progressValue = info.progress;
-        var progressWidth = /** @type {number} */ (progressValue) * actualWidth;
+        var progressWidth = this.limitProgressWidth_(/** @type {number} */ (progressValue), actualWidth, progressEl);
         var progressItemBounds = new anychart.math.Rect(actualBounds.left, actualBounds.top, progressWidth, actualBounds.height);
         var progressBounds = this.getBarBounds_(progressEl, progressItemBounds);
         var progressTag = this.createTag(dataItem, progressEl, actualBounds);
