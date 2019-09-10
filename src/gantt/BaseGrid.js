@@ -2102,6 +2102,29 @@ anychart.ganttModule.BaseGrid.prototype.drawRowFills = function() {
   this.getSelectedPath().clear();
   this.getRowStrokePath().clear();
 
+  // COLORS CONFIG MAGIC PREPARATION!
+  var colorsPrepared = false;
+  var colors, checkers;
+  if (this.interactivityHandler.rowsColoringInternal) {
+    colors = this.interactivityHandler.rowsColoringInternal.colors;
+    if (colors) {
+      checkers = this.interactivityHandler.rowsColoringInternal.checkers;
+      if (checkers) {
+        this.rowsColoringPaths = this.rowsColoringPaths || {};
+        colorsPrepared = true;
+        for (var key in colors) {
+          if (!(key in this.rowsColoringPaths)) {
+            var p = /** @type {acgraph.vector.Path} */ (this.getCellsLayer().path());
+            p.stroke(null).zIndex(5);
+            this.rowsColoringPaths[key] = p;
+          }
+          this.rowsColoringPaths[key].clear();
+        }
+      }
+    }
+  }
+  // END OF COLORS CONFIG MAGIC PREPARATION!
+
   var pixelShift = (this.rowStrokeThickness % 2 && acgraph.type() === acgraph.StageType.SVG) ? 0.5 : 0;
 
   for (var i = startIndex; i <= endIndex; i++) {
@@ -2146,6 +2169,29 @@ anychart.ganttModule.BaseGrid.prototype.drawRowFills = function() {
           .lineTo(this.pixelBoundsCache.left, newTop)
           .close();
     }
+
+    // COLORS CONFIG MAGIC!
+    if (colorsPrepared) {
+      var state = this.interactivityHandler.rowsColoringInternal.state;
+      for (var c = 0; c < checkers.length; c++) {
+        var checker = checkers[c];
+        var res = checker(item, state);
+        if (res && res in colors) {
+          var fillRef = colors[res];
+          path = this.rowsColoringPaths[res];
+          path
+              .moveTo(this.pixelBoundsCache.left, top)
+              .lineTo(this.pixelBoundsCache.left + this.totalGridsWidth, top)
+              .lineTo(this.pixelBoundsCache.left + this.totalGridsWidth, newTop)
+              .lineTo(this.pixelBoundsCache.left, newTop)
+              .close()
+              .fill(fillRef);
+          break;
+        }
+      }
+    }
+
+    // END OF COLOR CONFIG MAGIC!
 
     totalTop = (newTop + this.rowStrokeThickness);
 

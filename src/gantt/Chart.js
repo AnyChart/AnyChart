@@ -10,6 +10,7 @@ goog.require('anychart.ganttModule.Selection');
 goog.require('anychart.ganttModule.Splitter');
 goog.require('anychart.ganttModule.TimeLine');
 goog.require('anychart.ganttModule.edit.StructureEdit');
+goog.require('anychart.ganttModule.rendering.RowsColoring');
 goog.require('anychart.treeDataModule.Tree');
 goog.require('anychart.treeDataModule.utils');
 
@@ -76,6 +77,12 @@ anychart.ganttModule.Chart = function(opt_isResourcesChart) {
    * @private
    */
   this.splitter_ = null;
+
+  /**
+   *
+   * @type {anychart.ganttModule.rendering.RowsColoring}
+   */
+  this.rowsColoringInternal = null;
 
   /**
    * Selection.
@@ -752,6 +759,23 @@ anychart.ganttModule.Chart.prototype.splitter = function(opt_value) {
 };
 
 
+/**
+ * @return {anychart.ganttModule.rendering.RowsColoring}
+ */
+anychart.ganttModule.Chart.prototype.rowsColoring = function() {
+  if (!this.rowsColoringInternal) {
+    this.rowsColoringInternal = new anychart.ganttModule.rendering.RowsColoring(this);
+    this.rowsColoringInternal.listen('statechange', function() {
+      anychart.core.Base.suspendSignalsDispatching(this.getTimeline(), this.getDataGrid_());
+      this.tl_.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
+      this.dg_.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
+      anychart.core.Base.resumeSignalsDispatchingTrue(this.dg_, this.tl_);
+    }, void 0, this);
+  }
+  return this.rowsColoringInternal;
+};
+
+
 /** @inheritDoc */
 anychart.ganttModule.Chart.prototype.createLegendItemsProvider = function(sourceMode) {
   return []; //TODO (A.Kudryavtsev): Do we need any kind of standard legend here?
@@ -1342,6 +1366,7 @@ anychart.ganttModule.Chart.prototype.disposeInternal = function() {
   proto['xScale'] = proto.xScale;
   proto['defaultRowHeight'] = proto.defaultRowHeight;
   proto['palette'] = proto.palette;
+  proto['rowsColoring'] = proto.rowsColoring;
 
   // auto generated
   // proto['rowHoverFill'] = proto.rowHoverFill;
