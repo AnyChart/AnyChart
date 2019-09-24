@@ -1242,10 +1242,20 @@ anychart.core.ui.OptimizedText.prototype.applySettings = function() {
         dom.removeAttribute('font-variant');
       }
 
+      /*
+      ENV-1377
+      Font family is additionally written into style because there was a case when
+      chart was drawn inside an element with class .some-class and
+      <style> .some-class * {font-family: "Comic Sans"} </style>
+      And in this case css style takes precedence over the attribute declaration.
+      https://www.w3.org/TR/SVG11/styling.html#UsingPresentationAttributes
+       */
       if ('fontFamily' in style) {
         dom.setAttribute('font-family', style['fontFamily']);
+        dom['style']['fontFamily'] = style['fontFamily'];
       } else {
         dom.removeAttribute('fontFamily');
+        dom['style']['fontFamily'] = '';
       }
 
       if ('fontSize' in style) {
