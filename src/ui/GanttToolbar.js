@@ -189,14 +189,14 @@ anychart.ui.GanttToolbar.prototype.createButtonsAndMenus = function() {
   var expandMessage = anychart.format.getMessage('Expand All');
   var expandAllButton = new goog.ui.ToolbarButton(expandMessage);
   expandAllButton.addClassName(anychart.ui.GanttToolbar.CssClass.EXPAND_ALL);
-  expandAllButton.setModel({func: 'expandAll', text: expandMessage, icon: 'ac-plus'});
+  expandAllButton.setModel({func: 'expandAll', text: expandMessage, icon: 'ac-expand'});
   this.addChild(expandAllButton, true);
   this.buttonsWithIcons_.push(expandAllButton);
 
   var collapseMessage = anychart.format.getMessage('Collapse All');
   var collapseAllButton = new goog.ui.ToolbarButton(collapseMessage);
   collapseAllButton.addClassName(anychart.ui.GanttToolbar.CssClass.COLLAPSE_ALL);
-  collapseAllButton.setModel({func: 'collapseAll', text: collapseMessage, icon: 'ac-minus'});
+  collapseAllButton.setModel({func: 'collapseAll', text: collapseMessage, icon: 'ac-collapse'});
   this.addChild(collapseAllButton, true);
   this.buttonsWithIcons_.push(collapseAllButton);
 };
