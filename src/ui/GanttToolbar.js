@@ -316,10 +316,13 @@ anychart.ui.GanttToolbar.prototype.handleAction_ = function(e) {
   var funcName = model.func;
 
   if (funcName == 'switchPageOrientation') {
+    var landscapeString = anychart.format.getMessage('Landscape');
+    var portraitString = anychart.format.getMessage('Portrait');
+
     this.printMenu_.forEachChild(function(printItem) {
       var printItemModel = printItem.getModel();
       if (printItemModel && printItemModel.func == 'print') {
-        var caption = model.isLandscape ? 'Portrait' : 'Landscape';
+        var caption = model.isLandscape ? portraitString : landscapeString;
         caption += ',';
         caption += printItem.getCaption().split(',')[1];
         printItem.setCaption(caption);
@@ -395,9 +398,10 @@ anychart.ui.GanttToolbar.prototype.draw = function() {
 
   if (!this.isInDocument()) {
     var sizes = this.printPaperSizes();
+    var landscapeString = anychart.format.getMessage('Landscape');
     for (var i = 0; i < sizes.length; i++) {
       var size = sizes[i];
-      var printItem = new anychart.ui.menu.Item('Landscape, ' + anychart.enums.normalizePaperSizeCaption(size));
+      var printItem = new anychart.ui.menu.Item(landscapeString + ', ' + anychart.enums.normalizePaperSizeCaption(size));
       printItem.setModel({func: 'print', args: [size]});
       printItem.addClassName(anychart.ui.GanttToolbar.CssClass.PRINT + '-' + size);
       this.printMenu_.addChild(printItem, true);
