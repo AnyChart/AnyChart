@@ -228,10 +228,10 @@ anychart.treeDataModule.Tree.prototype.dispatchEvents = function(opt_val) {
 
 
 /** @inheritDoc */
-anychart.treeDataModule.Tree.prototype.dispatchSignal = function(value) {
+anychart.treeDataModule.Tree.prototype.dispatchSignal = function(value, opt_force, opt_meta) {
   if (!this.suspendedDispatching && !!(value & anychart.Signal.DATA_CHANGED))
     this.traverserToArrayCache_ = null;
-  anychart.treeDataModule.Tree.base(this, 'dispatchSignal', value);
+  anychart.treeDataModule.Tree.base(this, 'dispatchSignal', value, opt_force, opt_meta);
 };
 
 
@@ -1577,7 +1577,9 @@ anychart.treeDataModule.Tree.DataItem.prototype.setMeta = function(var_args) {
 
       if (parent[prevItem] != value) {
         parent[prevItem] = value;
-        this.tree_.dispatchSignal(anychart.Signal.META_CHANGED);
+        this.tree_.dispatchSignal(anychart.Signal.META_CHANGED, void 0, {
+          'item': this
+        });
       }
     }
   }

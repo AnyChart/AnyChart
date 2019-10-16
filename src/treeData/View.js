@@ -788,7 +788,9 @@ anychart.treeDataModule.View.DataItem.prototype.setMeta = function(var_args) {
       }
       if (parent[prevItem] != value) {
         parent[prevItem] = value;
-        this.treeView_.dispatchSignal(anychart.Signal.META_CHANGED);
+        this.treeView_.dispatchSignal(anychart.Signal.META_CHANGED, void 0, {
+          'item': this
+        });
       }
     }
   }

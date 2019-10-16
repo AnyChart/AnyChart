@@ -643,6 +643,14 @@ anychart.ganttModule.Chart.prototype.expandAll = function() {
   return this;
 };
 
+/**
+ * Gets collapsed items map for https://anychart.atlassian.net/browse/ENV-1391.
+ * @returns {Object.<anychart.treeDataModule.Tree.DataItem>}
+ */
+anychart.ganttModule.Chart.prototype.getCollapsedItemsMap = function() {
+  return this.controller_.collapsedItemsMap;
+};
+
 
 /**
  * Expands/collapses task.
@@ -1367,6 +1375,7 @@ anychart.ganttModule.Chart.prototype.disposeInternal = function() {
   proto['defaultRowHeight'] = proto.defaultRowHeight;
   proto['palette'] = proto.palette;
   proto['rowsColoring'] = proto.rowsColoring;
+  proto['getCollapsedItemsMap'] = proto.getCollapsedItemsMap;
 
   // auto generated
   // proto['rowHoverFill'] = proto.rowHoverFill;
