@@ -398,10 +398,6 @@ anychart.ganttModule.BaseGrid.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 //endregion
-//endregion
-//region -- Constants.
-
-
 //region -- Type definitions.
 /**
  * Type definition to simplify getting data item's dates and
@@ -420,12 +416,15 @@ anychart.ganttModule.BaseGrid.prototype.SUPPORTED_CONSISTENCY_STATES =
  *   isFlatGroupingTask: boolean,
  *   isValidBaseline: boolean,
  *   isValidProgress: boolean,
- *   baselineProgressPresents: boolean
+ *   baselineProgressPresents: boolean,
+ *   isLoadable: boolean
  * }}
  */
 anychart.ganttModule.BaseGrid.ItemData;
 
 
+//endregion
+//region -- Constants.
 /**
  * Background rect z-index.
  * @type {number}
@@ -705,7 +704,8 @@ anychart.ganttModule.BaseGrid.getProjectItemInfo = function(item) {
     isFlatGroupingTask: !isNaN(startVal) && !isNaN(endVal) && startVal == endVal && item.numChildren(),
     isValidBaseline: goog.isNumber(baselineStart) && !isNaN(baselineStart) && goog.isNumber(baselineEnd) && !isNaN(baselineEnd),
     isValidProgress: !isNaN(progressVal),
-    baselineProgressPresents: baselineProgressPresents
+    baselineProgressPresents: baselineProgressPresents,
+    isLoadable: !!item.get(anychart.enums.GanttDataFields.IS_LOADABLE) // ENV-1410.
   });
 };
 

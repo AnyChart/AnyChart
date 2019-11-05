@@ -2116,7 +2116,8 @@ anychart.enums.GanttDataFields = {
   START_MARKER: 'startMarker',
   END_MARKER: 'endMarker',
   LABEL: 'label',
-  MARKERS: 'markers'
+  MARKERS: 'markers',
+  IS_LOADABLE: 'acIsLoadable' // ENV-1410.
 };
 
 

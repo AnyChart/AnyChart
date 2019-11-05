@@ -1095,7 +1095,10 @@ anychart.ganttModule.Column.prototype.draw = function() {
         var padding = paddingLeft + depthLeft;
         var addButton = 0;
 
-        if (this.getOption('collapseExpandButtons') && item.numChildren()) {
+        var itemInfo = anychart.ganttModule.BaseGrid.getProjectItemInfo(item);
+
+
+        if (this.getOption('collapseExpandButtons') && (item.numChildren() || itemInfo.isLoadable)) {
           counter++;
           button = this.buttons_[counter];
           if (!button) {
@@ -1115,6 +1118,24 @@ anychart.ganttModule.Column.prototype.draw = function() {
           var top = totalTop + ((height - (/** @type {number} */ (dataGridButtons.getOption('height')) || 0)) / 2);
 
           var pixelShift = (acgraph.type() === acgraph.StageType.SVG) ? .5 : 0;
+
+
+          // TODO CONSIDER HERE THAT ITEM CAN BE LOADABLE!!!
+          var buttonState = !!item.meta('collapsed') ? // is item collapsed ?
+
+              // check if hovered (when collapse state triggered by button)
+              button.isHovered() ?
+
+                  // save hovered state in case of hovered
+                  anychart.SettingsState.HOVERED :
+
+                  // set to normal (collapsed) in case of normal and not hovered
+                  // (when buttons are redrawn by clicking other buttons)
+                  anychart.SettingsState.NORMAL :
+
+              // SELECTED (expanded) otherwise
+              anychart.SettingsState.SELECTED;
+
           button
               .enabled(true)
               .dataItemIndex(i)
@@ -1123,20 +1144,7 @@ anychart.ganttModule.Column.prototype.draw = function() {
                 'x': Math.floor(this.pixelBoundsCache_.left + padding) + pixelShift,
                 'y': Math.floor(top) + pixelShift
               })
-              .state(!!item.meta('collapsed') ? // is item collapsed ?
-
-                  // check if hovered (when collapse state triggered by button)
-                  button.isHovered() ?
-
-                      // save hovered state in case of hovered
-                      anychart.SettingsState.HOVERED :
-
-                      // set to normal (collapsed) in case of normal and not hovered
-                      // (when buttons are redrawn by clicking other buttons)
-                      anychart.SettingsState.NORMAL :
-
-                  // SELECTED (expanded) otherwise
-                  anychart.SettingsState.SELECTED);
+              .state(buttonState);
 
           button.resumeSignalsDispatching(false);
           button.draw();
