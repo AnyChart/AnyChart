@@ -3999,7 +3999,7 @@ anychart.ganttModule.TimeLine.prototype.drawProjectTimeline_ = function() {
       this.drawAsMilestone_(item, totalTop, itemHeight);
     } else if (anychart.ganttModule.BaseGrid.isBaseline(item)) {
       this.drawAsBaseline_(item, totalTop, itemHeight);
-    } else if (anychart.ganttModule.BaseGrid.isGroupingTask(item)) {
+    } else if (anychart.ganttModule.BaseGrid.isGroupingTask(item) || item.get(anychart.enums.GanttDataFields.IS_LOADABLE)) {
       this.drawAsParent_(item, totalTop, itemHeight);
     } else {
       this.drawAsProgress_(item, totalTop, itemHeight);
@@ -4163,7 +4163,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsPeriods_ = function(dataItem, tota
 anychart.ganttModule.TimeLine.prototype.drawAsBaseline_ = function(dataItem, totalTop, itemHeight) {
   var info = anychart.ganttModule.BaseGrid.getProjectItemInfo(dataItem);
 
-  var isParent = anychart.ganttModule.BaseGrid.isGroupingTask(dataItem);
+  var isParent = info.isLoadable || anychart.ganttModule.BaseGrid.isGroupingTask(dataItem);
   var element = /** @type {anychart.ganttModule.elements.GroupingTasksElement|anychart.ganttModule.elements.TasksElement} */ (isParent ? this.groupingTasks() : this.tasks());
   var baselines = /** @type {anychart.ganttModule.elements.BaselinesElement} */ (this.baselines());
   var isSelected = this.interactivityHandler.selection().isRowSelected(dataItem);
@@ -4331,7 +4331,7 @@ anychart.ganttModule.TimeLine.prototype.fixBaselineBarsPositioning_ = function(b
 anychart.ganttModule.TimeLine.prototype.drawAsParent_ = function(dataItem, totalTop, itemHeight) {
   var info = anychart.ganttModule.BaseGrid.getProjectItemInfo(dataItem);
 
-  if (this.groupingTasks().getOption('enabled') && (info.isValidTask || info.isFlatGroupingTask)) {
+  if (this.groupingTasks().getOption('enabled') && (info.isValidTask || info.isFlatGroupingTask || info.isLoadable)) {
     if (this.milestones().preview().getOption('enabled') && this.milestones().preview().getOption('depth') != 0)
       this.iterateChildMilestones_(0, dataItem, totalTop, itemHeight, goog.getUid(dataItem));
 

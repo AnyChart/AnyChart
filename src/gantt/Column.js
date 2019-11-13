@@ -1097,7 +1097,6 @@ anychart.ganttModule.Column.prototype.draw = function() {
 
         var itemInfo = anychart.ganttModule.BaseGrid.getProjectItemInfo(item);
 
-
         if (this.getOption('collapseExpandButtons') && (item.numChildren() || itemInfo.isLoadable)) {
           counter++;
           button = this.buttons_[counter];
@@ -1119,22 +1118,16 @@ anychart.ganttModule.Column.prototype.draw = function() {
 
           var pixelShift = (acgraph.type() === acgraph.StageType.SVG) ? .5 : 0;
 
+          var isCollapsed = (itemInfo.isLoadable && !item.numChildren()) || item.meta('collapsed');
 
-          // TODO CONSIDER HERE THAT ITEM CAN BE LOADABLE!!!
-          var buttonState = !!item.meta('collapsed') ? // is item collapsed ?
-
-              // check if hovered (when collapse state triggered by button)
-              button.isHovered() ?
-
-                  // save hovered state in case of hovered
-                  anychart.SettingsState.HOVERED :
-
-                  // set to normal (collapsed) in case of normal and not hovered
-                  // (when buttons are redrawn by clicking other buttons)
-                  anychart.SettingsState.NORMAL :
-
-              // SELECTED (expanded) otherwise
-              anychart.SettingsState.SELECTED;
+          var buttonState;
+          if (isCollapsed) {
+            buttonState = button.isHovered() ?
+                anychart.SettingsState.HOVERED :
+                anychart.SettingsState.NORMAL; // Collapsed.
+          } else {
+            buttonState = anychart.SettingsState.SELECTED; // Expanded.
+          }
 
           button
               .enabled(true)

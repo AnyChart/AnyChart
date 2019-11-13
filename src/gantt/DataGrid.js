@@ -430,6 +430,8 @@ anychart.ganttModule.DataGrid.prototype.forEachVisibleColumn_ = function(fn, opt
 
 /**
  * Collapses data item.
+ *
+ * Added by ENV-1410: also dispatches detached event to load additional data
  * NOTE: Do not export.
  * @param {number} itemIndex - Index of data item.
  * @param {boolean} state - State to be set.
@@ -437,16 +439,39 @@ anychart.ganttModule.DataGrid.prototype.forEachVisibleColumn_ = function(fn, opt
  */
 anychart.ganttModule.DataGrid.prototype.collapseExpandItem = function(itemIndex, state) {
   var item = this.controller.getVisibleItems()[itemIndex];
-  if (item && anychart.ganttModule.BaseGrid.isParent(item)) {
-    var evtObj = {
-      'type': anychart.enums.EventType.ROW_COLLAPSE_EXPAND,
+
+  if (item) {
+    var eventObj = {
       'item': item,
       'collapsed': state
     };
 
-    if (this.interactivityHandler.dispatchEvent(evtObj))
+    if (item.get(anychart.enums.GanttDataFields.IS_LOADABLE) && !item.numChildren()) {
+      /*
+        ENV-1410:
+
+        This condition is applied when the item is declared as parent item, but doesn't
+        contain children.
+
+        This item becomes loadable and related event to load additional data must be
+        received by listener.
+       */
+
+      eventObj['type'] = anychart.enums.EventType.GANTT_LOAD_DATA;
+
+      state = goog.isDef(state) ? state : false;
+
       item.meta(anychart.enums.GanttDataFields.COLLAPSED, state);
+      /** @type {anychart.ganttModule.Chart}*/ (this.interactivityHandler).dispatchDetachedEvent(eventObj);
+    } else if (anychart.ganttModule.BaseGrid.isParent(item)) {
+      // Regular expand/collapse condition and action.
+
+      eventObj['type'] = anychart.enums.EventType.ROW_COLLAPSE_EXPAND;
+      if (this.interactivityHandler.dispatchEvent(eventObj))
+        item.meta(anychart.enums.GanttDataFields.COLLAPSED, state);
+    }
   }
+
   return this;
 };
 
