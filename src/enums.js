@@ -1505,6 +1505,7 @@ anychart.enums.EventType = {
   BEFORE_CREATE_CONNECTOR: 'beforeCreateConnector',
   BEFORE_REMOVE_CONNECTOR: 'beforeRemoveConnector',
   ROW_COLLAPSE_EXPAND: 'rowcollapseexpand',
+  GANTT_LOAD_DATA: 'ganttloaddata', // ENV-1410.
 
   //Connectors events.
   CONNECTOR_SELECT: 'connectorselect',
@@ -2116,7 +2117,8 @@ anychart.enums.GanttDataFields = {
   START_MARKER: 'startMarker',
   END_MARKER: 'endMarker',
   LABEL: 'label',
-  MARKERS: 'markers'
+  MARKERS: 'markers',
+  IS_LOADABLE: 'anychartIsLoadable' // ENV-1410.
 };
 
 
