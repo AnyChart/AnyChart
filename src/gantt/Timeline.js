@@ -3995,12 +3995,12 @@ anychart.ganttModule.TimeLine.prototype.drawProjectTimeline_ = function() {
     var itemHeight = this.controller.getItemHeight(item);
     var newTop = /** @type {number} */ (totalTop + itemHeight);
 
-    if (anychart.ganttModule.BaseGrid.isMilestone(item)) {
-      this.drawAsMilestone_(item, totalTop, itemHeight);
-    } else if (anychart.ganttModule.BaseGrid.isBaseline(item)) {
+    if (anychart.ganttModule.BaseGrid.isBaseline(item)) {
       this.drawAsBaseline_(item, totalTop, itemHeight);
     } else if (anychart.ganttModule.BaseGrid.isGroupingTask(item) || item.get(anychart.enums.GanttDataFields.IS_LOADABLE)) {
       this.drawAsParent_(item, totalTop, itemHeight);
+    } else if (anychart.ganttModule.BaseGrid.isMilestone(item)) {
+      this.drawAsMilestone_(item, totalTop, itemHeight);
     } else {
       this.drawAsProgress_(item, totalTop, itemHeight);
     }
@@ -4170,6 +4170,13 @@ anychart.ganttModule.TimeLine.prototype.drawAsBaseline_ = function(dataItem, tot
 
   var actualStart = info.start;
   var actualEnd = info.end;
+
+  if (isParent) {
+    // Lines below allow to draw parent as flat grouping task on fields missing.
+    actualEnd = isNaN(actualEnd) ? actualStart : actualEnd;
+    actualStart = isNaN(actualStart) ? actualEnd : actualStart;
+  }
+
   var baselineStart = info.baselineStart;
   var baselineEnd = info.baselineEnd;
 
@@ -4212,6 +4219,13 @@ anychart.ganttModule.TimeLine.prototype.drawAsBaseline_ = function(dataItem, tot
     }
 
     if (actualBounds) {
+      if (isParent && !actualBounds.width) {
+        var h = actualBounds.height;
+        actualBounds.left -= h / 2;
+        actualWidth = h;
+        actualBounds.width = actualWidth;
+        info.isValidTask = true;
+      }
       actualBounds = this.fixBounds_(element, actualBounds, dataItem, void 0, isSelected);
       var tag = this.createTag(dataItem, element, actualBounds);
 
@@ -4337,6 +4351,11 @@ anychart.ganttModule.TimeLine.prototype.drawAsParent_ = function(dataItem, total
 
     var actualStart = info.start;
     var actualEnd = info.end;
+
+    // Lines below allow to draw parent as flat grouping task on fields missing.
+    actualEnd = isNaN(actualEnd) ? actualStart : actualEnd;
+    actualStart = isNaN(actualStart) ? actualEnd : actualStart;
+
     var startRatio = this.scale_.timestampToRatio(actualStart);
     var endRatio = this.scale_.timestampToRatio(actualEnd);
 

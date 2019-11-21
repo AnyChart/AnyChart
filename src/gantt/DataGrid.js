@@ -1015,15 +1015,19 @@ anychart.ganttModule.DataGrid.prototype.columnInvalidated_ = function(event) {
 
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW))
     state |= anychart.ConsistencyState.APPEARANCE;
+
   if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED))
     state |= anychart.ConsistencyState.DATA_GRID_GRIDS;
+
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW_LABELS)) {
     state |= anychart.ConsistencyState.GRIDS_POSITION;
     if (anychart.isAsync())
       this.partialLabels.reset = true;
   }
+
   var redrawChart = false;
-  if (this.getOption('fixedColumns') && event.hasSignal(anychart.Signal.ENABLED_STATE_CHANGED)) {
+
+  if (this.getOption('fixedColumns') && event.hasSignal(anychart.Signal.ENABLED_STATE_CHANGED | anychart.Signal.BOUNDS_CHANGED)) {
     state |= anychart.ConsistencyState.BOUNDS;
     redrawChart = true;
   }
