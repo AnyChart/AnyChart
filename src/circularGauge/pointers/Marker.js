@@ -226,15 +226,6 @@ anychart.circularGaugeModule.pointers.Marker.prototype.setupByJSON = function(co
 };
 
 
-/** @inheritDoc */
-anychart.circularGaugeModule.pointers.Marker.prototype.disposeInternal = function() {
-  goog.disposeAll(this.domElement, this.hatchFillElement);
-  this.domElement = null;
-  this.hatchFillElement = null;
-  anychart.circularGaugeModule.pointers.Marker.base(this, 'disposeInternal');
-};
-
-
 //endregion
 
 

@@ -1,5 +1,7 @@
 goog.provide('anychart.circularGaugeModule.pointers.Base');
+
 goog.require('acgraph');
+goog.require('anychart.color');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.utils.IInteractiveSeries');
@@ -29,6 +31,18 @@ anychart.circularGaugeModule.pointers.Base = function() {
    * @protected
    */
   this.hatchFillElement;
+
+  /**
+   * Interactive path added to simplify tapping on needle
+   * for https://anychart.atlassian.net/browse/DVF-4327.
+   *
+   * @type {acgraph.vector.Path}
+   * @protected
+   */
+  this.interactivityElement = acgraph.path();
+  this.interactivityElement
+    .stroke('none')
+    .fill(anychart.color.TRANSPARENT_HANDLER);
 
   /**
    * @type {Object}
@@ -387,9 +401,13 @@ anychart.circularGaugeModule.pointers.Base.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
     this.domElement.zIndex(/** @type {number} */(this.zIndex()));
+    this.interactivityElement.zIndex((/** @type {number} */(this.zIndex()) + 1));
 
-    if (this.hatchFillElement)
+    if (this.hatchFillElement) {
       this.hatchFillElement.zIndex(/** @type {number} */(this.zIndex() + anychart.circularGaugeModule.Chart.ZINDEX_MULTIPLIER * 0.1));
+      this.interactivityElement.zIndex((/** @type {number} */(this.hatchFillElement.zIndex()) + 1));
+    }
+
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 
@@ -405,6 +423,8 @@ anychart.circularGaugeModule.pointers.Base.prototype.draw = function() {
       else
         this.hatchFillElement.container(/** @type {acgraph.vector.ILayer} */(this.container()));
     }
+
+    this.interactivityElement.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
 
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
@@ -760,6 +780,22 @@ anychart.circularGaugeModule.pointers.Base.prototype.setupByJSON = function(conf
   this.dataIndex(config['dataIndex']);
   if ('data' in config)
     this.data(config['data'] || null);
+};
+
+
+/** @inheritDoc */
+anychart.circularGaugeModule.pointers.Base.prototype.disposeInternal = function() {
+  goog.disposeAll(
+      this.domElement,
+      this.hatchFillElement,
+      this.interactivityElement
+  );
+
+  this.domElement = null;
+  this.hatchFillElement = null;
+  this.interactivityElement = null;
+
+  anychart.circularGaugeModule.pointers.Base.base(this, 'disposeInternal');
 };
 
 
