@@ -3543,6 +3543,8 @@ anychart.ganttModule.TimeLine.prototype.getTooltipOfElementByItem = function(ite
     el = this.baselines();
   } else if (anychart.ganttModule.BaseGrid.isGroupingTask(item)) {
     el = this.groupingTasks();
+  } else if (anychart.ganttModule.BaseGrid.isPeriod(item)) {
+    el = this.periods();
   } else {
     el = this.tasks();
   }

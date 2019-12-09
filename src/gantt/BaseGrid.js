@@ -417,7 +417,10 @@ anychart.ganttModule.BaseGrid.prototype.SUPPORTED_CONSISTENCY_STATES =
  *   isValidBaseline: boolean,
  *   isValidProgress: boolean,
  *   baselineProgressPresents: boolean,
- *   isLoadable: boolean
+ *   isLoadable: boolean,
+ *   minPeriodDate: number,
+ *   maxPeriodDate: number,
+ *   isValidPeriod: boolean
  * }}
  */
 anychart.ganttModule.BaseGrid.ItemData;
@@ -647,6 +650,18 @@ anychart.ganttModule.BaseGrid.isRegularTaskWithBaseline = function(item, opt_inf
 };
 
 
+/**
+ * Checks whether tree data item contains resource chart periods.
+ * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} item - Tree data item.
+ * @param {anychart.ganttModule.BaseGrid.ItemData=} opt_info - Already calculated info. Used to avoid recalculation.
+ * @return {boolean} - Whether tree data item contains periods.
+ */
+anychart.ganttModule.BaseGrid.isPeriod = function(item, opt_info) {
+  var info = opt_info || anychart.ganttModule.BaseGrid.getProjectItemInfo(item);
+  return info.isValidPeriod;
+};
+
+
 //endregion
 //region -- Item field checkers.
 /**
@@ -691,6 +706,9 @@ anychart.ganttModule.BaseGrid.getProjectItemInfo = function(item) {
   var endVal = anychart.ganttModule.BaseGrid.checkNaN(end, autoEnd);
   var progressVal = anychart.ganttModule.BaseGrid.checkNaN(progress, autoProgress);
 
+  var minPeriodDate = item.meta('minPeriodDate');
+  var maxPeriodDate = item.meta('maxPeriodDate');
+
   return /** @type {anychart.ganttModule.BaseGrid.ItemData} */ ({
     start: startVal,
     end: endVal,
@@ -705,6 +723,9 @@ anychart.ganttModule.BaseGrid.getProjectItemInfo = function(item) {
     isValidBaseline: goog.isNumber(baselineStart) && !isNaN(baselineStart) && goog.isNumber(baselineEnd) && !isNaN(baselineEnd),
     isValidProgress: !isNaN(progressVal),
     baselineProgressPresents: baselineProgressPresents,
+    minPeriodDate: minPeriodDate,
+    maxPeriodDate: maxPeriodDate,
+    isValidPeriod: !isNaN(minPeriodDate) && !isNaN(maxPeriodDate),
     isLoadable: !!item.get(anychart.enums.GanttDataFields.IS_LOADABLE) // ENV-1410.
   });
 };
@@ -738,6 +759,13 @@ anychart.ganttModule.BaseGrid.prototype.createFormatProvider = function(item, op
   var rowType;
 
   if (isResources) {
+    // If period is given for current format provider - set it's values as token custom values.
+    if (goog.isDef(opt_period)) {
+      var tokenCustomValues = this.getPeriodCustomTokenValues(opt_period);
+      this.formatProvider_.tokenCustomValues(tokenCustomValues);
+    } else {
+      this.formatProvider_.tokenCustomValues({});
+    }
     rowType = anychart.enums.TLElementTypes.PERIODS;
     values['minPeriodDate'] = {value: item.meta('minPeriodDate'), type: anychart.enums.TokenType.DATE_TIME};
     values['maxPeriodDate'] = {value: item.meta('maxPeriodDate'), type: anychart.enums.TokenType.DATE_TIME};
@@ -840,6 +868,52 @@ anychart.ganttModule.BaseGrid.prototype.createFormatProvider = function(item, op
 
   this.formatProvider_.dataSource(item);
   return /** @type {anychart.format.Context} */ (this.formatProvider_.propagate(values));
+};
+
+
+/**
+ * Creates custom token values from period data.
+ * @param {Object} period - Object containing period data.
+ * @return {Object.<string, anychart.core.BaseContext.TypedValue>} - context values.
+ */
+anychart.ganttModule.BaseGrid.prototype.getPeriodCustomTokenValues = function(period) {
+  var periodKeys = goog.object.getKeys(period);
+  var contextValues = {};
+
+  /*
+    No use overriding these tokens, they are correctly extracted from periods
+    in createFormatProvider.
+   */
+  var forbiddenKeys = [
+    anychart.enums.GanttDataFields.START,
+    anychart.enums.GanttDataFields.END
+  ];
+
+  for (var i = 0; i < periodKeys.length; i++) {
+    var key = periodKeys[i];
+
+    // We don't want to override some of the keys.
+    if (goog.array.contains(forbiddenKeys, key)) {
+      continue;
+    }
+
+    var value = period[key];
+    var type = anychart.enums.TokenType.UNKNOWN;
+
+    if (goog.isNumber(value)) {
+      type = anychart.enums.TokenType.NUMBER;
+    } else if (anychart.utils.isPercent(value)) {
+      type = anychart.enums.TokenType.PERCENT;
+    } else if (goog.isString(value)) {
+      type = anychart.enums.TokenType.STRING;
+    }
+
+    contextValues[key] = {
+      value: value,
+      type: type
+    };
+  }
+  return contextValues;
 };
 
 

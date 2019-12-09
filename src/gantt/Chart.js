@@ -848,6 +848,7 @@ anychart.ganttModule.Chart.prototype.rowMouseMove = function(event) {
 
     var tooltip;
     var item = event['item'];
+
     tooltip = /** @type {anychart.core.ui.Tooltip} */(target.getTooltipInternal(void 0, item));
 
     if (anychart.utils.instanceOf(target, anychart.ganttModule.DataGrid)) {
