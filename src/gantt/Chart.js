@@ -848,7 +848,10 @@ anychart.ganttModule.Chart.prototype.rowMouseMove = function(event) {
 
     var tooltip;
     var item = event['item'];
-
+    if (event['elementType'] == anychart.enums.TLElementTypes.MILESTONES_PREVIEW) {
+      // https://anychart.atlassian.net/browse/DVF-4356
+      item = event['originalEvent']['domTarget'].tag.item;
+    }
     tooltip = /** @type {anychart.core.ui.Tooltip} */(target.getTooltipInternal(void 0, item));
 
     if (anychart.utils.instanceOf(target, anychart.ganttModule.DataGrid)) {
