@@ -165,6 +165,13 @@ anychart.scales.GanttDateTime = function() {
    * @private
    */
   this.fiscalYearStartMonth_ = 1;
+
+  /**
+   * Maximum number of ticks.
+   * @type {number}
+   * @private
+   */
+  this.maxTicksCount_ = 1000;
 };
 goog.inherits(anychart.scales.GanttDateTime, anychart.core.Base);
 
@@ -621,6 +628,54 @@ anychart.scales.GanttDateTime.prototype.fiscalYearStartMonth = function(opt_valu
 
 
 /**
+ * Normalize interval value, depends on 'maxTicksCount',
+ *  to prevent ticks draw overhead when user pass wrong zoomLevels config.
+ *
+ * This method exists because user can pass bad zoomLevels config - {unit: 'millisecond', count: 1} on wide time range.
+ *  And it will be cause of browser tab crash.
+ * @see https://anychart.atlassian.net/browse/DVF-4357
+ *
+ * @param {anychart.enums.Interval} unit - Interval unit.
+ * @param {number} count - Interval unit count.
+ * @return {{unit: anychart.enums.Interval, count: number}} - Normalized values.
+ */
+anychart.scales.GanttDateTime.prototype.getNormalizedIntervalValues_ = function(unit, count) {
+  var range = this.getRange();
+  var start = range['min'];
+  var end = range['max'];
+  var initialDate = new goog.date.UtcDateTime(new Date(start));
+
+  var timeRange = end - start;
+
+  var ticksCount;
+
+  do {
+    // Get interval in milliseconds
+    var interval = anychart.utils.getIntervalFromInfo(unit, count);
+    var temp = initialDate.clone();
+    initialDate.add(interval);
+    var timeWithInterval = initialDate.getTime();
+    var timeWithoutInterval = temp.getTime();
+    var intervalInMs = timeWithInterval - timeWithoutInterval;
+
+    // Ticks count with current interval settings.
+    ticksCount = Math.ceil(timeRange / intervalInMs);
+
+    if (ticksCount > this.maxTicksCount_) {
+      var increasedVal = anychart.utils.getIncreasedIntervalValue(unit, count);
+      unit = increasedVal.unit;
+      count = increasedVal.count;
+    }
+  } while (ticksCount > this.maxTicksCount_);
+
+  return {
+    unit: unit,
+    count: count
+  };
+};
+
+
+/**
  * @param {number} pixStart - TODO (A.Kudryavtsev): Unused parameter, from previous scale implementation.
  * @param {number} pixEnd - TODO (A.Kudryavtsev): Unused parameter, from previous scale implementation.
  * @param {anychart.enums.Interval} unit
@@ -630,6 +685,11 @@ anychart.scales.GanttDateTime.prototype.fiscalYearStartMonth = function(opt_valu
  */
 anychart.scales.GanttDateTime.prototype.getTicks = function(pixStart, pixEnd, unit, count, opt_range) {
   var range = opt_range || this.getRange();
+  var normalizedValues = this.getNormalizedIntervalValues_(unit, count);
+
+  unit = normalizedValues.unit;
+  count = normalizedValues.count;
+
   var start = anychart.utils.alignDateLeftByUnit(range['min'], unit, count, 2000);
   var interval = anychart.utils.getIntervalFromInfo(unit, count);
 
@@ -1012,6 +1072,27 @@ anychart.scales.GanttDateTime.prototype.zoomLevels = function(opt_value) {
 
 
 /**
+ * Setup max ticks count.
+ * It prevent long chart drawing with bad user zoomLevels config
+ *
+ * @param {number=} opt_value - Ticks count.
+ * @return {number|anychart.scales.GanttDateTime} - Scale instance or max tick count.
+ */
+anychart.scales.GanttDateTime.prototype.maxTicksCount = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var val = anychart.utils.normalizeToNaturalNumber(opt_value, 1000, false);
+    if (this.maxTicksCount_ != val) {
+      this.maxTicksCount_ = val;
+      this.consistent = false;
+      this.dispatchSignal(anychart.Signal.NEED_UPDATE_TICK_DEPENDENT | anychart.Signal.NEEDS_RECALCULATION);
+    }
+    return this;
+  }
+  return this.maxTicksCount_;
+};
+
+
+/**
  * Normalizes anychart.scales.GanttDateTime.ZoomLevelsSettings-like representation to anychart.scales.GanttDateTime.ZoomLevelsSettingsRep.
  * @param {*} value
  * @return {anychart.scales.GanttDateTime.ZoomLevelsSettingsRep}
@@ -1149,6 +1230,8 @@ anychart.scales.GanttDateTime.prototype.serialize = function() {
 
   json['minimumGap'] = this.minimumGap_;
   json['maximumGap'] = this.maximumGap_;
+  json['maxTicksCount'] = this.maxTicksCount_;
+
   json['zoomLevels'] = this.zoomLevels();
 
   if (this.fiscalYearStartMonth_ > 1)
@@ -1204,6 +1287,9 @@ anychart.scales.GanttDateTime.prototype.setupByJSON = function(config, opt_defau
   if ('fiscalYearStartMonth' in config)
     this.fiscalYearStartMonth(config['fiscalYearStartMonth']);
 
+  if ('maxTicksCount' in config)
+    this.maxTicksCount(config['maxTicksCount']);
+
   if (recalc) {
     this.consistent = false;
     this.calculate();
@@ -1227,6 +1313,7 @@ anychart.scales.GanttDateTime.prototype.setupByJSON = function(config, opt_defau
   proto['transform'] = proto.transform;
   proto['inverseTransform'] = proto.inverseTransform;
   proto['fiscalYearStartMonth'] = proto.fiscalYearStartMonth;
+  proto['maxTicksCount'] = proto.maxTicksCount;
   // proto['zoomIn'] = proto.zoomIn;
   // proto['zoomOut'] = proto.zoomOut;
   // proto['zoomTo'] = proto.zoomTo;
