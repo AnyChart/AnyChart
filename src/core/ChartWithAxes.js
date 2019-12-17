@@ -1177,7 +1177,7 @@ anychart.core.ChartWithAxes.prototype.getBoundsWithoutAxes = function(contentAre
       if (axis && axis.enabled()) {
         axis.parentBounds(contentAreaBounds);
         orientation = axis.getOption('orientation');
-        var stroke = /**@type {acgraph.vector.Stroke|string}*/(axis.getOption('stroke'));
+        var stroke = /** @type {acgraph.vector.Stroke|string} */(axis.getOption('stroke'));
         if (!goog.isObject(stroke))
           stroke = acgraph.vector.normalizeStroke(stroke);
         axisStrokeThickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(stroke));
@@ -1706,8 +1706,8 @@ anychart.core.ChartWithAxes.prototype.setupByJSONWithScales = function(config, s
  * @param {Object=} opt_config configuration to use for elements initialization.
  */
 anychart.core.ChartWithAxes.prototype.setupAxes = function(opt_config) {
-  var scalesInstances = /**@type {Object}*/(this.getScaleInstances());
-  var config  = goog.isDef(opt_config) ? opt_config : this.themeSettings;
+  var scalesInstances = /** @type {Object} */(this.getScaleInstances());
+  var config = goog.isDef(opt_config) ? opt_config : this.themeSettings;
   var setupElement = goog.isDef(opt_config);
 
   this.setupElementsWithScales(config['xAxes'], this.xAxis, scalesInstances, setupElement);

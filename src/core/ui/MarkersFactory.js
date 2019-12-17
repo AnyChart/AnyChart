@@ -333,7 +333,7 @@ anychart.core.ui.MarkersFactory.prototype.getOption = function(name) {
 };
 
 
-/**@inheritDoc*/
+/** @inheritDoc */
 anychart.core.ui.MarkersFactory.prototype.setOption = function(name, value) {
   anychart.core.ui.MarkersFactory.base(this, 'setOption', name, value);
   this.changedSettings[name] = true;

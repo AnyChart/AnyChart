@@ -203,7 +203,7 @@ anychart.core.utils.InteractivityState.prototype.setPointState = function(state,
             this.target.applyAppearanceToSeries(state);
         }
       }
-      this.seriesState = /** @type {anychart.PointState|number}*/(state);
+      this.seriesState = /** @type {anychart.PointState|number} */(state);
     }
   }
 };
@@ -270,7 +270,7 @@ anychart.core.utils.InteractivityState.prototype.addPointState = function(state,
           goog.array.splice(this.stateIndex, i, 1);
         }
       }
-      this.seriesState = /** @type {anychart.PointState|number}*/(state);
+      this.seriesState = /** @type {anychart.PointState|number} */(state);
     } else if (state == anychart.PointState.HOVER) {
       for (i = this.stateValue.length; i--;) {
         if (this.removePointStateByIndex(state, i)) {
@@ -434,7 +434,7 @@ anychart.core.utils.InteractivityState.prototype.getPointStateByIndex = function
   var pointIndex = +index;
   if (!isNaN(pointIndex)) {
     var arrIndex = goog.array.binarySearch(this.stateIndex, pointIndex);
-    return /** @type {anychart.PointState|number}*/(arrIndex >= 0 ? this.stateValue[arrIndex] : anychart.PointState.NORMAL);
+    return /** @type {anychart.PointState|number} */(arrIndex >= 0 ? this.stateValue[arrIndex] : anychart.PointState.NORMAL);
   }
   return anychart.PointState.NORMAL;
 };
@@ -576,7 +576,7 @@ anychart.core.utils.LinearGaugeInteractivityState.prototype.setPointState = func
           this.target.applyAppearanceToSeries(state);
         }
       }
-      this.seriesState = /** @type {anychart.PointState|number}*/(state);
+      this.seriesState = /** @type {anychart.PointState|number} */(state);
     }
   }
 };

@@ -54,7 +54,7 @@ anychart.core.ui.Legend = function() {
    * @type {number}
    * @private
    */
-  this.drawedPage_ = NaN;
+  this.drawnPage_ = NaN;
 
   /**
    * Flag that shows what we need: true - create items, false - update them.
@@ -130,6 +130,7 @@ anychart.core.ui.Legend = function() {
     ['titleFormat', anychart.ConsistencyState.LEGEND_TITLE | anychart.ConsistencyState.BOUNDS,
           anychart.Signal.BOUNDS_CHANGED | anychart.Signal.NEEDS_REDRAW],
     ['itemsSpacing', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['itemsHAlign', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
     ['itemsSourceMode', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.LEGEND_RECREATE_ITEMS,
           anychart.Signal.NEEDS_REDRAW],
     ['hoverCursor', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW,
@@ -181,6 +182,7 @@ anychart.core.ui.Legend.PROPERTY_DESCRIPTORS = (function() {
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'drag', anychart.core.settings.booleanNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'itemsFormat', anychart.core.settings.asIsNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'titleFormat', anychart.core.settings.asIsNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'itemsHAlign', anychart.enums.normalizeAlign],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'itemsSpacing', spacingNormalizer('itemsSpacing')],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'itemsSourceMode', anychart.enums.normalizeLegendItemsSourceMode],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'hoverCursor', anychart.enums.normalizeCursor],
@@ -1473,7 +1475,6 @@ anychart.core.ui.Legend.prototype.initializeLegendItems_ = function(items) {
   sett = this.paginator().textSettings();
   style = anychart.utils.toStyleString(/** @type {Object} */ (sett));
   paginatorTextEl.style.cssText = style;
-  paginatorTextEl.textContent = '0 / 0';
 
   for (i = 0; i < this.items_.length; i++) {
     item = this.items_[i];
@@ -1481,8 +1482,9 @@ anychart.core.ui.Legend.prototype.initializeLegendItems_ = function(items) {
     var bbox = textEl['getBBox']();
     item.predefinedBounds(new goog.math.Rect(bbox.x, bbox.y, bbox.width, bbox.height));
   }
-  var pb = paginatorTextEl['getBBox']();
-  this.paginator_.predefinedTextBounds(new goog.math.Rect(pb.x, pb.y, pb.width, pb.height));
+
+  // provide paginator text DOM element reference
+  this.paginator_.paginatorTextElement(paginatorTextEl);
 
   this.recreateItems_ = false;
   this.invalidate(anychart.ConsistencyState.BOUNDS);
@@ -1607,7 +1609,7 @@ anychart.core.ui.Legend.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
 
-  this.clearLastDrawedPage_();
+  this.clearLastDrawnPage_();
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     // Reset items width (needs when container was resized) for DVF-2119
     if (this.items_ && this.getOption('textOverflow') == acgraph.vector.Text.TextOverflow.ELLIPSIS) {
@@ -1758,16 +1760,254 @@ anychart.core.ui.Legend.prototype.draw = function() {
 
 
 /**
- * Clears last drawed page.
+ * Clears last drawn page.
  * @private
  */
-anychart.core.ui.Legend.prototype.clearLastDrawedPage_ = function() {
-  if (goog.isDefAndNotNull(this.drawedPage_) && !isNaN(this.drawedPage_)) {
-    var items = this.distributedItems_[this.drawedPage_];
+anychart.core.ui.Legend.prototype.clearLastDrawnPage_ = function() {
+  if (goog.isDefAndNotNull(this.drawnPage_) && !isNaN(this.drawnPage_)) {
+    var items = this.distributedItems_[this.drawnPage_];
     if (items) {
       for (var i = 0; i < items.length; i++) {
         items[i].enabled(false).draw();
       }
+    }
+  }
+};
+
+/**
+ * Put single legend item to correct location.
+ *
+ * @param {anychart.core.ui.LegendItem} item - Legend item to be put to x, y.
+ * @param {number} x - X coordinate to put the item.
+ * @param {number} y - Y Coordinate to put the item.
+ * @param {anychart.math.Rect} contentBounds - Bounds of the content area.
+ * @private
+ */
+anychart.core.ui.Legend.prototype.putSingleItem_ = function(item, x, y, contentBounds) {
+  // Fixes ellipsis applying when change content page throughout paginator.
+  item.invalidate(anychart.ConsistencyState.BOUNDS);
+  item
+  .suspendSignalsDispatching()
+  .parentBounds(contentBounds)
+      ['x'](x)
+      ['y'](y)
+  .enabled(true)
+  .resumeSignalsDispatching(false)
+  .draw();
+};
+
+
+/**
+ * Puts items in horizontal layout aligned left.
+ *
+ * @see { anychart.core.ui.Legend.prototype.drawLegendContent_ }
+ * @param {Array.<anychart.core.ui.LegendItem>} items - Items to put.
+ * @param {anychart.math.Rect} contentBounds - Bounds of the content area.
+ * @private
+ */
+anychart.core.ui.Legend.prototype.putItemsHorizontalLeft_ = function(items, contentBounds) {
+  var x = 0;
+  var y = 0;
+  var itemsSpacing = /** @type {number} */(this.getOption('itemsSpacing'));
+  for (var i = 0; i < items.length; i++) {
+    var item = items[i];
+    this.putSingleItem_(item, x, y, contentBounds);
+    x += item.getPixelBounds().getWidth() + itemsSpacing;
+  }
+};
+
+
+/**
+* Puts items in horizontal layout aligned right.
+*
+* @see { anychart.core.ui.Legend.prototype.drawLegendContent_ }
+* @param {Array.<anychart.core.ui.LegendItem>} items - Items to put.
+* @param {anychart.math.Rect} contentBounds - Bounds of the content area.
+* @private
+*/
+anychart.core.ui.Legend.prototype.putItemsHorizontalRight_ = function(items, contentBounds) {
+  var itemsSpacing = /** @type {number} */(this.getOption('itemsSpacing'));
+  var x = contentBounds.width;
+  var y = 0;
+
+  for (var i = items.length - 1; i >= 0; i--) {
+    var item = items[i];
+    x -= item.getPixelBounds().getWidth() + itemsSpacing;
+    this.putSingleItem_(item, x, y, contentBounds);
+  }
+};
+
+
+/**
+ * Puts items in horizontal layout aligned center.
+ *
+ * @see { anychart.core.ui.Legend.prototype.drawLegendContent_ }
+ * @param {Array.<anychart.core.ui.LegendItem>} items - Items to put.
+ * @param {anychart.math.Rect} contentBounds - Bounds of the content area.
+ * @private
+ */
+anychart.core.ui.Legend.prototype.putItemsHorizontalCenter_ = function(items, contentBounds) {
+  var itemsSpacing = /** @type {number} */(this.getOption('itemsSpacing'));
+  var i, item;
+  var totalWidth = 0;
+
+  for (i = 0; i < items.length; i++) {
+    item = items[i];
+    totalWidth += items[i].getPixelBounds().getWidth() + itemsSpacing;
+  }
+  totalWidth -= itemsSpacing; // Removing last spacing.
+
+  var x = (contentBounds.width - totalWidth) / 2;
+  var y = 0;
+  for (i = 0; i < items.length; i++) {
+    item = items[i];
+    this.putSingleItem_(item, x, y, contentBounds);
+    x += item.getPixelBounds().getWidth() + itemsSpacing;
+  }
+};
+
+
+/**
+ * Puts items in horizontal layout.
+ *
+ * @see { anychart.core.ui.Legend.prototype.drawLegendContent_ }
+ * @param {Array.<anychart.core.ui.LegendItem>} items - Items to put.
+ * @param {anychart.math.Rect} contentBounds - Bounds of the content area.
+ * @private
+ */
+anychart.core.ui.Legend.prototype.putItemsHorizontalLayout_ = function(items, contentBounds) {
+  var itemsHAlign = /** @type {anychart.enums.HAlign} */ (this.getOption('itemsHAlign'));
+  switch (itemsHAlign) {
+    case anychart.enums.HAlign.LEFT:
+    case anychart.enums.HAlign.START:
+      this.putItemsHorizontalLeft_(items, contentBounds);
+      break;
+    case anychart.enums.HAlign.RIGHT:
+    case anychart.enums.HAlign.END:
+      this.putItemsHorizontalRight_(items, contentBounds);
+      break;
+    case anychart.enums.HAlign.CENTER:
+      this.putItemsHorizontalCenter_(items, contentBounds);
+      break;
+  }
+};
+
+
+/**
+ * Puts items in vertical layout.
+ *
+ * @see { anychart.core.ui.Legend.prototype.drawLegendContent_ }
+ * @param {Array.<anychart.core.ui.LegendItem>} items - Items to put.
+ * @param {anychart.math.Rect} contentBounds - Bounds of the content area.
+ * @private
+ */
+anychart.core.ui.Legend.prototype.putItemsVerticalLayout_ = function(items, contentBounds) {
+  var x = 0;
+  var y = 0;
+  var itemsSpacing = /** @type {number} */(this.getOption('itemsSpacing'));
+
+  for (var i = 0; i < items.length; i++) {
+    var item = items[i];
+    this.putSingleItem_(item, x, y, contentBounds);
+    y += item.getPixelBounds().getHeight() + itemsSpacing;
+  }
+};
+
+
+/**
+ * Puts items in horizontal expandable layout.
+ *
+ * @see { anychart.core.ui.Legend.prototype.drawLegendContent_ }
+ * @param {Array.<anychart.core.ui.LegendItem>} items - Items to put.
+ * @param {anychart.math.Rect} contentBounds - Bounds of the content area.
+ * @private
+ */
+anychart.core.ui.Legend.prototype.putItemsHorizontalExpandableLayout_ = function(items, contentBounds) {
+  var x = 0;
+  var y = 0;
+  var rowHeight = 0;
+  var itemsSpacing = /** @type {number} */(this.getOption('itemsSpacing'));
+
+  for (var i = 0; i < items.length; i++) {
+    var item = items[i];
+    var itemBounds = item.getPixelBounds();
+
+    if (x + itemBounds.getWidth() > contentBounds.width) {
+      y += rowHeight;
+      x = 0;
+      rowHeight = 0;
+    }
+
+    this.putSingleItem_(item, x, y, contentBounds);
+
+    x += item.getPixelBounds().getWidth() + itemsSpacing;
+    rowHeight = Math.max(rowHeight, itemBounds.getHeight() + itemsSpacing);
+  }
+};
+
+
+/**
+ * Puts items in vertical expandable layout.
+ *
+ * @see { anychart.core.ui.Legend.prototype.drawLegendContent_ }
+ * @param {Array.<anychart.core.ui.LegendItem>} items - Items to put.
+ * @param {anychart.math.Rect} contentBounds - Bounds of the content area.
+ * @private
+ */
+anychart.core.ui.Legend.prototype.putItemsVerticalExpandableLayout_ = function(items, contentBounds) {
+  var x = 0;
+  var y = 0;
+  var colWidth = 0;
+  var itemsSpacing = /** @type {number} */(this.getOption('itemsSpacing'));
+
+  for (var i = 0; i < items.length; i++) {
+    var item = items[i];
+    var itemBounds = item.getPixelBounds();
+
+    if (y + itemBounds.getHeight() > contentBounds.height) {
+      x += colWidth;
+      y = 0;
+      colWidth = 0;
+    }
+
+    this.putSingleItem_(item, x, y, contentBounds);
+
+    y += item.getPixelBounds().getHeight() + itemsSpacing;
+    colWidth = Math.max(colWidth, itemBounds.getWidth() + itemsSpacing);
+  }
+};
+
+
+/**
+ * This is a very strange method. Its code has been extracted from
+ * drawLegendContent_ method during the DVF-4340 minor refactoring.
+ *
+ * Basically it does nothing, just not needed calculations.
+ * Left as is for a while with commented code as it was.
+ *
+ * @private
+ */
+anychart.core.ui.Legend.prototype.putTitle_ = function() {
+  var title = this.getCreated('title');
+  if (title && title.enabled()) {
+    var titleOrientation = title.getOption('orientation') || title.defaultOrientation();
+    var titleIsHorizontal = titleOrientation == 'top' || titleOrientation == 'bottom';
+
+    if (!titleIsHorizontal) {
+      var tx, dx = 0, dy = 0;
+      if (tx = this.rootElement.getSelfTransformation()) {
+        dx = tx.getTranslateX();
+        dy = tx.getTranslateY();
+      }
+      // var itemsContentBounds = this.itemsLayer_.getAbsoluteBounds();
+      var titleBounds = this.title_.getContentBounds();
+      titleBounds.top += dy;
+      titleBounds.left += dx;
+
+      // var topTranslate = titleBounds.top + titleBounds.height / 2 - (itemsContentBounds.top + itemsContentBounds.height / 2);
+      // topTranslate = Math.min(this.contentAreaBounds_.height - itemsContentBounds.height, Math.max(topTranslate, 0));
+      //
+      // // this.itemsLayer_.setTransformationMatrix(1, 0, 0, 1, 0, topTranslate);
     }
   }
 };
@@ -1784,126 +2024,29 @@ anychart.core.ui.Legend.prototype.drawLegendContent_ = function(pageNumber, cont
   if (goog.isDefAndNotNull(this.items_)) {
     this.itemsLayer_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
 
-    var x = 0;
-    var y = 0;
-    var rowHeight = 0, colWidth = 0;
-    var i;
     var items = this.distributedItems_[pageNumber];
-    var item, itemBounds;
-    var itemsSpacing = /** @type {number} */(this.getOption('itemsSpacing'));
     var itemsLayout = /** @type {anychart.enums.LegendLayout} */(this.getOption('itemsLayout'));
 
     if (items) {
       switch (itemsLayout) {
         case anychart.enums.LegendLayout.HORIZONTAL:
-          for (i = 0; i < items.length; i++) {
-            item = items[i];
-            // fixes ellipsis applying when change content page throughout paginator
-            item.invalidate(anychart.ConsistencyState.BOUNDS);
-            item
-                .suspendSignalsDispatching()
-                .parentBounds(contentBounds)
-                ['x'](x)
-                ['y'](y)
-                .enabled(true)
-                .resumeSignalsDispatching(false)
-                .draw();
-            x += items[i].getPixelBounds().getWidth() + itemsSpacing;
-          }
+          this.putItemsHorizontalLayout_(items, contentBounds);
           break;
         case anychart.enums.LegendLayout.VERTICAL:
-          for (i = 0; i < items.length; i++) {
-            item = items[i];
-            // fixes ellipsis applying when change content page throughout paginator
-            item.invalidate(anychart.ConsistencyState.BOUNDS);
-            item
-                .suspendSignalsDispatching()
-                .parentBounds(contentBounds)
-                ['x'](x)
-                ['y'](y)
-                .enabled(true)
-                .resumeSignalsDispatching(false)
-                .draw();
-            y += items[i].getPixelBounds().getHeight() + itemsSpacing;
-          }
+          this.putItemsVerticalLayout_(items, contentBounds);
           break;
         case anychart.enums.LegendLayout.HORIZONTAL_EXPANDABLE:
-          for (i = 0; i < items.length; i++) {
-            item = items[i];
-            itemBounds = item.getPixelBounds();
-
-            if (x + itemBounds.getWidth() > contentBounds.width) {
-              y += rowHeight;
-              x = 0;
-              rowHeight = 0;
-            }
-
-            // fixes ellipsis applying when change content page throughout paginator
-            item.invalidate(anychart.ConsistencyState.BOUNDS);
-            item
-                .suspendSignalsDispatching()
-                .parentBounds(contentBounds)
-                ['x'](x)
-                ['y'](y)
-                .enabled(true)
-                .resumeSignalsDispatching(false)
-                .draw();
-
-            x += item.getPixelBounds().getWidth() + itemsSpacing;
-            rowHeight = Math.max(rowHeight, itemBounds.getHeight() + itemsSpacing);
-          }
+          this.putItemsHorizontalExpandableLayout_(items, contentBounds);
           break;
         case anychart.enums.LegendLayout.VERTICAL_EXPANDABLE:
-          for (i = 0; i < items.length; i++) {
-            item = items[i];
-            itemBounds = item.getPixelBounds();
-
-            if (y + itemBounds.getHeight() > contentBounds.height) {
-              x += colWidth;
-              y = 0;
-              colWidth = 0;
-            }
-            // fixes ellipsis applying when change content page throughout paginator
-            item.invalidate(anychart.ConsistencyState.BOUNDS);
-            item
-                .suspendSignalsDispatching()
-                .parentBounds(contentBounds)
-                ['x'](x)
-                ['y'](y)
-                .enabled(true)
-                .resumeSignalsDispatching(false)
-                .draw();
-            y += items[i].getPixelBounds().getHeight() + itemsSpacing;
-            colWidth = Math.max(colWidth, itemBounds.getWidth() + itemsSpacing);
-          }
+          this.putItemsVerticalExpandableLayout_(items, contentBounds);
           break;
       }
     }
 
-    var title = this.getCreated('title');
-    if (title && title.enabled()) {
-      var titleOrientation = title.getOption('orientation') || title.defaultOrientation();
-      var titleIsHorizontal = titleOrientation == 'top' || titleOrientation == 'bottom';
-
-      if (!titleIsHorizontal) {
-        var tx, dx = 0, dy = 0;
-        if (tx = this.rootElement.getSelfTransformation()) {
-          dx = tx.getTranslateX();
-          dy = tx.getTranslateY();
-        }
-        // var itemsContentBounds = this.itemsLayer_.getAbsoluteBounds();
-        var titleBounds = this.title_.getContentBounds();
-        titleBounds.top += dy;
-        titleBounds.left += dx;
-
-        // var topTranslate = titleBounds.top + titleBounds.height / 2 - (itemsContentBounds.top + itemsContentBounds.height / 2);
-        // topTranslate = Math.min(this.contentAreaBounds_.height - itemsContentBounds.height, Math.max(topTranslate, 0));
-        //
-        // // this.itemsLayer_.setTransformationMatrix(1, 0, 0, 1, 0, topTranslate);
-      }
-    }
+    this.putTitle_();
   }
-  this.drawedPage_ = pageNumber;
+  this.drawnPage_ = pageNumber;
 };
 
 

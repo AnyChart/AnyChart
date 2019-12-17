@@ -2477,9 +2477,9 @@ anychart.pieModule.Chart.prototype.drawOutsideLabel_ = function(pointState, opt_
   }
 
   if (opt_updateConnector)
-    this.updateConnector_(/** @type {anychart.core.ui.CircularLabelsFactory.Label}*/(label), isDraw);
+    this.updateConnector_(/** @type {anychart.core.ui.CircularLabelsFactory.Label} */(label), isDraw);
 
-  return /** @type {anychart.core.ui.CircularLabelsFactory.Label}*/(label);
+  return /** @type {anychart.core.ui.CircularLabelsFactory.Label} */(label);
 };
 
 
@@ -2677,7 +2677,7 @@ anychart.pieModule.Chart.prototype.drawLabel_ = function(pointState, opt_updateC
   } else if (label) {
     mainFactory.clear(label.getIndex());
   }
-  return /** @type {anychart.core.ui.CircularLabelsFactory.Label}*/(label);
+  return /** @type {anychart.core.ui.CircularLabelsFactory.Label} */(label);
 };
 
 
@@ -4434,7 +4434,7 @@ anychart.pieModule.Chart.prototype.hoverMode = function(opt_value) {
     }
     return this;
   }
-  return /** @type {anychart.enums.HoverMode}*/(this.hoverMode_);
+  return /** @type {anychart.enums.HoverMode} */(this.hoverMode_);
 };
 
 
@@ -4538,7 +4538,7 @@ anychart.pieModule.Chart.prototype.selectionMode = function(opt_value) {
     }
     return this;
   }
-  return /** @type {anychart.enums.SelectionMode}*/(this.selectMode_);
+  return /** @type {anychart.enums.SelectionMode} */(this.selectMode_);
 };
 
 

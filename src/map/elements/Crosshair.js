@@ -266,7 +266,7 @@ anychart.mapModule.elements.Crosshair.prototype.drawLabel = function(axis, label
 
   var positionCoords = axis.ticks().calcTick(value);
 
-  label.x(/** @type {number}*/(positionCoords[0])).y(/** @type {number}*/(positionCoords[1]));
+  label.x(/** @type {number} */(positionCoords[0])).y(/** @type {number} */(positionCoords[1]));
   label['rotation'](this.getLabelRotation_(axis, positionCoords[4]));
   label.container(this.rootLayer_).draw();
 };

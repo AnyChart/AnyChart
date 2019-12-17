@@ -1325,6 +1325,7 @@ anychart.core.Chart.prototype.credits = function(opt_value) {
     this.credits_ = new anychart.core.ui.ChartCredits(this);
     this.credits_.listenSignals(this.onCreditsSignal_, this);
     this.setupCreated('credits', this.credits_);
+    this.credits_.setupByJSON(this.credits_.themeSettings);
   }
 
   if (goog.isDef(opt_value)) {
@@ -3264,6 +3265,9 @@ anychart.core.Chart.prototype.inMarquee = function() {
  * @return {anychart.core.Chart}
  */
 anychart.core.Chart.prototype.cancelMarquee = function() {
+  // DVF-4341 Cancel marquee after start breaks select.
+  this.preventMouseDownInteractivity = false;
+
   this.finishIRDrawing();
   return this;
 };

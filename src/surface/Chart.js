@@ -697,12 +697,24 @@ anychart.surfaceModule.Chart.prototype.drawContent = function(bounds) {
   this.calculate();
 
   if (this.hasInvalidationState(anychart.ConsistencyState.SCALE_CHART_SCALES)) {
-    if (zAxis && !zAxis.scale()) zAxis.scale(this.zScale());
-    if (xAxis && !xAxis.scale()) xAxis.scale(this.xScale());
-    if (yAxis && !yAxis.scale()) yAxis.scale(this.yScale());
-    if (xGrid) xGrid.scale(/** @type {anychart.scales.IXScale}*/(this.xScale()));
-    if (yGrid) yGrid.scale(/** @type {anychart.scales.IXScale}*/(this.yScale()));
-    if (zGrid) zGrid.scale(/** @type {anychart.scales.IXScale}*/(this.zScale()));
+    if (zAxis && !zAxis.scale()){
+      zAxis.scale(this.zScale());
+    }
+    if (xAxis && !xAxis.scale()){
+      xAxis.scale(this.xScale());
+    }
+    if (yAxis && !yAxis.scale()){
+      yAxis.scale(this.yScale());
+    }
+    if (xGrid){
+      xGrid.scale(/** @type {anychart.scales.IXScale} */(this.xScale()));
+    }
+    if (yGrid){
+      yGrid.scale(/** @type {anychart.scales.IXScale} */(this.yScale()));
+    }
+    if (zGrid){
+      zGrid.scale(/** @type {anychart.scales.IXScale} */(this.zScale()));
+    }
     this.markConsistent(anychart.ConsistencyState.SCALE_CHART_SCALES);
   }
 
@@ -890,7 +902,7 @@ anychart.surfaceModule.Chart.prototype.cropFaceByScales = function(face) {
 anychart.surfaceModule.Chart.prototype.drawSurface = function(bounds) {
   var iterator = this.data().getIterator();
   iterator.reset();
-  var stroke = /** @type {acgraph.vector.Stroke}*/(this.getOption('stroke'));
+  var stroke = /** @type {acgraph.vector.Stroke} */(this.getOption('stroke'));
 
   this.surfaceLayer_.removeChildren();
 
@@ -1169,7 +1181,7 @@ anychart.surfaceModule.Chart.prototype.drawLine = function(path, points, zIndex,
 anychart.surfaceModule.Chart.prototype.xGrid = function(opt_value) {
   if (!this.xGrid_) {
     this.xGrid_ = new anychart.surfaceModule.Grid();
-    this.xGrid_.setOwner(/** @type {anychart.core.IChart}*/(this));
+    this.xGrid_.setOwner(/** @type {anychart.core.IChart} */(this));
     this.xGrid_.listenSignals(this.onGridSignal_, this);
     this.xGrid_.rotationZ(/** @type {number} */(this.getOption('rotationZ')));
     this.xGrid_.rotationY(/** @type {number} */(this.getOption('rotationY')));
@@ -1193,7 +1205,7 @@ anychart.surfaceModule.Chart.prototype.xGrid = function(opt_value) {
 anychart.surfaceModule.Chart.prototype.yGrid = function(opt_value) {
   if (!this.yGrid_) {
     this.yGrid_ = new anychart.surfaceModule.Grid();
-    this.yGrid_.setOwner(/** @type {anychart.core.IChart}*/(this));
+    this.yGrid_.setOwner(/** @type {anychart.core.IChart} */(this));
     this.yGrid_.listenSignals(this.onGridSignal_, this);
     this.yGrid_.rotationZ(/** @type {number} */(this.getOption('rotationZ')));
     this.yGrid_.rotationY(/** @type {number} */(this.getOption('rotationY')));
@@ -1218,7 +1230,7 @@ anychart.surfaceModule.Chart.prototype.yGrid = function(opt_value) {
 anychart.surfaceModule.Chart.prototype.zGrid = function(opt_value) {
   if (!this.zGrid_) {
     this.zGrid_ = new anychart.surfaceModule.Grid();
-    this.zGrid_.setOwner(/** @type {anychart.core.IChart}*/(this));
+    this.zGrid_.setOwner(/** @type {anychart.core.IChart} */(this));
     this.zGrid_.listenSignals(this.onGridSignal_, this);
     this.zGrid_.rotationZ(/** @type {number} */(this.getOption('rotationZ')));
     this.zGrid_.rotationY(/** @type {number} */(this.getOption('rotationY')));

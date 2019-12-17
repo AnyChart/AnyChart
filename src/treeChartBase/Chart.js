@@ -149,7 +149,7 @@ anychart.treeChartBase.Chart.prototype.hoverMode = function(opt_value) {
     }
     return this;
   }
-  return /** @type {anychart.enums.HoverMode}*/(this.hoverMode_);
+  return /** @type {anychart.enums.HoverMode} */(this.hoverMode_);
 };
 
 
@@ -165,7 +165,7 @@ anychart.treeChartBase.Chart.prototype.selectionMode = function(opt_value) {
     }
     return this;
   }
-  return /** @type {anychart.enums.SelectionMode}*/(this.selectionMode_);
+  return /** @type {anychart.enums.SelectionMode} */(this.selectionMode_);
 };
 
 

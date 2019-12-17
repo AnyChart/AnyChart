@@ -86,6 +86,13 @@ anychart.core.ui.Paginator = function() {
   this.text_ = null;
 
   /**
+   * Paginator text DOM element.
+   * @type {Element}
+   * @private
+   */
+  this.paginatorTextEl_ = null;
+
+  /**
    *
    * @type {goog.math.Rect}
    * @private
@@ -258,6 +265,23 @@ anychart.core.ui.Paginator.prototype.backgroundInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
     this.invalidate(anychart.ConsistencyState.PAGINATOR_BACKGROUND, anychart.Signal.NEEDS_REDRAW);
   }
+};
+
+
+/**
+ * Getter/setter for paginator text DOM element.
+ * Required for calculating bounds on draw paginator.
+ * @param {Element=} opt_value Paginator text DOM element.
+ * @return {anychart.core.ui.Paginator|Element}
+ */
+anychart.core.ui.Paginator.prototype.paginatorTextElement = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (!this.paginatorTextEl_)
+      this.paginatorTextEl_ = opt_value;
+
+    return this;
+  }
+  return this.paginatorTextEl_;
 };
 
 
@@ -474,8 +498,11 @@ anychart.core.ui.Paginator.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    // var textBounds = this.text_.getBounds();
-    var textBounds = this.predefinedTextBounds_;
+    // get current paginator text
+    this.paginatorTextEl_.textContent = this.createTextString_();
+    // get measured bounds
+    var textBounds = this.paginatorTextEl_['getBBox']();
+
     var buttonSize = textBounds.height;
     var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
     this.previousButton_.width(buttonSize).height(buttonSize).parentBounds(parentBounds);

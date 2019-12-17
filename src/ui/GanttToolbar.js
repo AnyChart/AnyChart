@@ -76,6 +76,35 @@ anychart.ui.GanttToolbar.CssClass = {
 
 
 /**
+ * Id strings for buttons with captions that can be localized.
+ * @enum {string}
+ */
+anychart.ui.GanttToolbar.ButtonIds = {
+  PRINT: 'print',
+  SWITCH_PAGE_ORIENTATION: 'switchPageOrientation',
+  SAVE_AS: 'saveAs',
+  ZOOM_IN: 'zoomIn',
+  ZOOM_OUT: 'zoomOut',
+  FIT_ALL: 'fitAll',
+  EXPAND_ALL: 'expandAll',
+  COLLAPSE_ALL: 'collapseAll'
+};
+
+/**
+ * @enum {string}
+ */
+anychart.ui.GanttToolbar.ButtonCaptions = {};
+anychart.ui.GanttToolbar.ButtonCaptions[anychart.ui.GanttToolbar.ButtonIds.PRINT] = 'Print';
+anychart.ui.GanttToolbar.ButtonCaptions[anychart.ui.GanttToolbar.ButtonIds.SWITCH_PAGE_ORIENTATION] = 'Switch page orientation';
+anychart.ui.GanttToolbar.ButtonCaptions[anychart.ui.GanttToolbar.ButtonIds.SAVE_AS] = 'Save As';
+anychart.ui.GanttToolbar.ButtonCaptions[anychart.ui.GanttToolbar.ButtonIds.ZOOM_IN] = 'Zoom In';
+anychart.ui.GanttToolbar.ButtonCaptions[anychart.ui.GanttToolbar.ButtonIds.ZOOM_OUT] = 'Zoom Out';
+anychart.ui.GanttToolbar.ButtonCaptions[anychart.ui.GanttToolbar.ButtonIds.FIT_ALL] = 'Fit All';
+anychart.ui.GanttToolbar.ButtonCaptions[anychart.ui.GanttToolbar.ButtonIds.EXPAND_ALL] = 'Expand All';
+anychart.ui.GanttToolbar.ButtonCaptions[anychart.ui.GanttToolbar.ButtonIds.COLLAPSE_ALL] = 'Collapse All';
+
+
+/**
  * All the buttons and menus are created here.
  * Also this.buttonsWithIcons_ is populated. It is later used to reapply icons/texts.
  */
@@ -86,22 +115,27 @@ anychart.ui.GanttToolbar.prototype.createButtonsAndMenus = function() {
    * @type {anychart.ui.menu.Menu}
    * @private
    */
-  this.printMenu_ = new anychart.ui.menu.Menu(undefined, anychart.ui.menu.ToolbarMenuRenderer.getInstance());
+  this.printMenu_ = new anychart.ui.menu.Menu(void 0, anychart.ui.menu.ToolbarMenuRenderer.getInstance());
 
-  var switchMessage = anychart.format.getMessage('Switch page orientation');
+  var switchMessage = this.getLocalizedCaption(anychart.ui.GanttToolbar.ButtonIds.SWITCH_PAGE_ORIENTATION);
   this.switchPageOrientation_ = new anychart.ui.menu.Item(switchMessage);
   this.switchPageOrientation_.setModel({
-    func: 'switchPageOrientation',
+    id: anychart.ui.GanttToolbar.ButtonIds.SWITCH_PAGE_ORIENTATION,
+    func: anychart.ui.GanttToolbar.ButtonIds.SWITCH_PAGE_ORIENTATION,
     isLandscape: true
   });
 
   this.printMenu_.addChild(this.switchPageOrientation_, true);
   this.printMenu_.addChild(new goog.ui.MenuSeparator(), true);
 
-  var printMessage = anychart.format.getMessage('Print');
+  var printMessage = this.getLocalizedCaption(anychart.ui.GanttToolbar.ButtonIds.PRINT);
   this.printButton_ = new anychart.ui.toolbar.MenuButton(printMessage, this.printMenu_);
   this.printButton_.addClassName(anychart.ui.GanttToolbar.CssClass.PRINT);
-  this.printButton_.setModel({text: printMessage, icon: 'ac-print'});
+  this.printButton_.setModel({
+    id: anychart.ui.GanttToolbar.ButtonIds.PRINT,
+    text: printMessage,
+    icon: 'ac-print'
+  });
   this.addChild(this.printButton_, true);
   this.buttonsWithIcons_.push(this.printButton_);
 
@@ -113,7 +147,7 @@ anychart.ui.GanttToolbar.prototype.createButtonsAndMenus = function() {
    * @type {anychart.ui.menu.Menu}
    * @private
    */
-  this.saveAsMenu_ = new anychart.ui.menu.Menu(undefined, anychart.ui.menu.ToolbarMenuRenderer.getInstance());
+  this.saveAsMenu_ = new anychart.ui.menu.Menu(void 0, anychart.ui.menu.ToolbarMenuRenderer.getInstance());
 
   var saveAsSvg = new anychart.ui.menu.Item('SVG');
   saveAsSvg.addClassName(anychart.ui.GanttToolbar.CssClass.SAVE_AS_SVG);
@@ -151,52 +185,81 @@ anychart.ui.GanttToolbar.prototype.createButtonsAndMenus = function() {
   this.setIconTo_(pdfSubMenu, true, true);
   this.subButtonsWithIcons_.push(pdfSubMenu);
 
-  var saveAsMessage = anychart.format.getMessage('Save As');
+  var saveAsMessage = this.getLocalizedCaption(anychart.ui.GanttToolbar.ButtonIds.SAVE_AS);
   var saveAsButton = new anychart.ui.toolbar.MenuButton(saveAsMessage, this.saveAsMenu_);
   saveAsButton.addClassName(anychart.ui.GanttToolbar.CssClass.SAVE_AS);
-  saveAsButton.setModel({text: saveAsMessage, icon: 'ac-save'});
+  saveAsButton.setModel({
+    id: anychart.ui.GanttToolbar.ButtonIds.SAVE_AS,
+    text: saveAsMessage,
+    icon: 'ac-save'
+  });
   this.addChild(saveAsButton, true);
   this.buttonsWithIcons_.push(saveAsButton);
 
   // --------- ZOOM IN, ZOOM OUT, FIT ALL ----------
   this.addChild(new anychart.ui.toolbar.Separator(), true);
 
-  var zoomInMessage = anychart.format.getMessage('Zoom In');
+  var zoomInMessage = this.getLocalizedCaption(anychart.ui.GanttToolbar.ButtonIds.ZOOM_IN);
   var zoomInButton = new goog.ui.ToolbarButton(zoomInMessage);
   zoomInButton.addClassName(anychart.ui.GanttToolbar.CssClass.ZOOM_IN);
-  zoomInButton.setModel({func: 'zoomIn', text: zoomInMessage, icon: 'ac-zoom-in'});
+  zoomInButton.setModel({
+    id: anychart.ui.GanttToolbar.ButtonIds.ZOOM_IN,
+    func: anychart.ui.GanttToolbar.ButtonIds.ZOOM_IN,
+    text: zoomInMessage,
+    icon: 'ac-zoom-in'
+  });
   this.addChild(zoomInButton, true);
   // this.setIconTo_(zoomInButton, 'ac-zoom-in');
   this.buttonsWithIcons_.push(zoomInButton);
 
-  var zoomOutMessage = anychart.format.getMessage('Zoom Out');
+  var zoomOutMessage = this.getLocalizedCaption(anychart.ui.GanttToolbar.ButtonIds.ZOOM_OUT);
   var zoomOutButton = new goog.ui.ToolbarButton(zoomOutMessage);
   zoomOutButton.addClassName(anychart.ui.GanttToolbar.CssClass.ZOOM_OUT);
-  zoomOutButton.setModel({func: 'zoomOut', text: zoomOutMessage, icon: 'ac-zoom-out'});
+  zoomOutButton.setModel({
+    id: anychart.ui.GanttToolbar.ButtonIds.ZOOM_OUT,
+    func: anychart.ui.GanttToolbar.ButtonIds.ZOOM_OUT,
+    text: zoomOutMessage,
+    icon: 'ac-zoom-out'
+  });
   this.addChild(zoomOutButton, true);
   this.buttonsWithIcons_.push(zoomOutButton);
 
-  var fitAllMessage = anychart.format.getMessage('Fit All');
+  var fitAllMessage = this.getLocalizedCaption(anychart.ui.GanttToolbar.ButtonIds.FIT_ALL);
   var fitAllButton = new goog.ui.ToolbarButton(fitAllMessage);
   fitAllButton.addClassName(anychart.ui.GanttToolbar.CssClass.FIT_ALL);
-  fitAllButton.setModel({func: 'fitAll', text: fitAllMessage, icon: 'ac-dot-square-o'});
+  fitAllButton.setModel({
+    id: anychart.ui.GanttToolbar.ButtonIds.FIT_ALL,
+    func: anychart.ui.GanttToolbar.ButtonIds.FIT_ALL,
+    text: fitAllMessage,
+    icon: 'ac-dot-square-o'
+  });
   this.addChild(fitAllButton, true);
   this.buttonsWithIcons_.push(fitAllButton);
 
   // --------- EXPAND/COLLAPSE ----------
   this.addChild(new anychart.ui.toolbar.Separator(), true);
 
-  var expandMessage = anychart.format.getMessage('Expand All');
+  var expandMessage = this.getLocalizedCaption(anychart.ui.GanttToolbar.ButtonIds.EXPAND_ALL);
   var expandAllButton = new goog.ui.ToolbarButton(expandMessage);
   expandAllButton.addClassName(anychart.ui.GanttToolbar.CssClass.EXPAND_ALL);
-  expandAllButton.setModel({func: 'expandAll', text: expandMessage, icon: 'ac-plus'});
+  expandAllButton.setModel({
+    id: anychart.ui.GanttToolbar.ButtonIds.EXPAND_ALL,
+    func: anychart.ui.GanttToolbar.ButtonIds.EXPAND_ALL,
+    text: expandMessage,
+    icon: 'ac-expand'
+  });
   this.addChild(expandAllButton, true);
   this.buttonsWithIcons_.push(expandAllButton);
 
-  var collapseMessage = anychart.format.getMessage('Collapse All');
+  var collapseMessage = this.getLocalizedCaption(anychart.ui.GanttToolbar.ButtonIds.COLLAPSE_ALL);
   var collapseAllButton = new goog.ui.ToolbarButton(collapseMessage);
   collapseAllButton.addClassName(anychart.ui.GanttToolbar.CssClass.COLLAPSE_ALL);
-  collapseAllButton.setModel({func: 'collapseAll', text: collapseMessage, icon: 'ac-minus'});
+  collapseAllButton.setModel({
+    id: anychart.ui.GanttToolbar.ButtonIds.COLLAPSE_ALL,
+    func: anychart.ui.GanttToolbar.ButtonIds.COLLAPSE_ALL,
+    text: collapseMessage,
+    icon: 'ac-collapse'
+  });
   this.addChild(collapseAllButton, true);
   this.buttonsWithIcons_.push(collapseAllButton);
 };
@@ -207,8 +270,9 @@ anychart.ui.GanttToolbar.prototype.createButtonsAndMenus = function() {
  * Affects only top level buttons, not the menus.
  */
 anychart.ui.GanttToolbar.prototype.applyIconsAndTexts = function() {
+  var button;
   for (var i = 0; i < this.buttonsWithIcons_.length; i++) {
-    var button = this.buttonsWithIcons_[i];
+    button = this.buttonsWithIcons_[i];
     switch (this.buttonsMode_) {
       case anychart.enums.GanttToolbarButtonsMode.ALL:
         this.setIconTo_(button, true, true);
@@ -223,7 +287,7 @@ anychart.ui.GanttToolbar.prototype.applyIconsAndTexts = function() {
   }
 
   for (i = 0; i < this.subButtonsWithIcons_.length; i++) {
-    var button = this.subButtonsWithIcons_[i];
+    button = this.subButtonsWithIcons_[i];
     switch (this.buttonsMode_) {
       case anychart.enums.GanttToolbarButtonsMode.TEXT:
         this.setIconTo_(button, false, true);
@@ -315,21 +379,11 @@ anychart.ui.GanttToolbar.prototype.handleAction_ = function(e) {
   var model = item.getModel();
   var funcName = model.func;
 
-  if (funcName == 'switchPageOrientation') {
-    this.printMenu_.forEachChild(function(printItem) {
-      var printItemModel = printItem.getModel();
-      if (printItemModel && printItemModel.func == 'print') {
-        var caption = model.isLandscape ? 'Portrait' : 'Landscape';
-        caption += ',';
-        caption += printItem.getCaption().split(',')[1];
-        printItem.setCaption(caption);
-      }
-    });
+  if (funcName == anychart.ui.GanttToolbar.ButtonIds.SWITCH_PAGE_ORIENTATION) {
+    var newOrientation = !model.isLandscape;
 
-    item.setModel({
-      func: 'switchPageOrientation',
-      isLandscape: !model.isLandscape
-    });
+    this.updatePrintButtonsCaptions(newOrientation);
+    model.isLandscape = newOrientation;
 
     // To save the menu is opened and first item highlighted.
     this.printButton_.setOpen(true);
@@ -339,14 +393,14 @@ anychart.ui.GanttToolbar.prototype.handleAction_ = function(e) {
     var args = model.args || [];
     var switchPageOrientationModel = this.switchPageOrientation_.getModel();
 
-    if (funcName == 'print') args[1] = switchPageOrientationModel.isLandscape;
+    if (funcName == anychart.ui.GanttToolbar.ButtonIds.PRINT) args[1] = switchPageOrientationModel.isLandscape;
 
     var chart = this.target();
     /*
     External print function is used in qlik to call custom gantt printing function.
     On DVF-4248 refactor this case should be considered. And Qlik code altered according to new api.
      */
-    if (funcName == 'print' && goog.isFunction(this.externalPrintFunction)) {
+    if (funcName == anychart.ui.GanttToolbar.ButtonIds.PRINT && goog.isFunction(this.externalPrintFunction)) {
       this.externalPrintFunction.apply(null, goog.array.concat([chart], args));
       return;
     }
@@ -395,10 +449,11 @@ anychart.ui.GanttToolbar.prototype.draw = function() {
 
   if (!this.isInDocument()) {
     var sizes = this.printPaperSizes();
+    var landscapeString = anychart.format.getMessage('Landscape');
     for (var i = 0; i < sizes.length; i++) {
       var size = sizes[i];
-      var printItem = new anychart.ui.menu.Item('Landscape, ' + anychart.enums.normalizePaperSizeCaption(size));
-      printItem.setModel({func: 'print', args: [size]});
+      var printItem = new anychart.ui.menu.Item(landscapeString + ', ' + anychart.enums.normalizePaperSizeCaption(size));
+      printItem.setModel({func: anychart.ui.GanttToolbar.ButtonIds.PRINT, args: [size]});
       printItem.addClassName(anychart.ui.GanttToolbar.CssClass.PRINT + '-' + size);
       this.printMenu_.addChild(printItem, true);
     }
@@ -426,6 +481,58 @@ anychart.ui.GanttToolbar.prototype.printFunction = function(opt_function) {
 
 
 /**
+ * Returns localized caption for a button by it's id.
+ * @param {anychart.ui.GanttToolbar.ButtonIds} buttonId
+ * @return {string} Localized caption.
+ */
+anychart.ui.GanttToolbar.prototype.getLocalizedCaption = function(buttonId) {
+  return anychart.format.getMessage(anychart.ui.GanttToolbar.ButtonCaptions[buttonId]);
+};
+
+
+/**
+ * Updates localized captions of all print buttons.
+ * @param {boolean} isLandscape - Current print orientation.
+ */
+anychart.ui.GanttToolbar.prototype.updatePrintButtonsCaptions = function(isLandscape) {
+  var captionBase = anychart.format.getMessage(isLandscape ? 'Landscape' : 'Portrait');
+
+  this.printMenu_.forEachChild(function(item) {
+    var itemModel = item.getModel();
+    if (itemModel && itemModel.func == anychart.ui.GanttToolbar.ButtonIds.PRINT) {
+      var caption = captionBase + ',' + item.getCaption().split(',')[1];
+      item.setCaption(caption);
+    }
+  });
+};
+
+
+/**
+ * Updates localized captions for all menu items and buttons according to current locale settings.
+ * @return {anychart.ui.GanttToolbar}
+ */
+anychart.ui.GanttToolbar.prototype.updateLocalizedCaptions = function() {
+  var buttons = goog.array.concat(this.buttonsWithIcons_, this.switchPageOrientation_);
+  for (var i = 0; i < buttons.length; i++) {
+    var button = buttons[i];
+    var buttonModel = button.getModel();
+    var newContent = this.getLocalizedCaption(buttonModel.id);
+    if (newContent) {
+      button.setCaption(newContent);
+      buttonModel.text = newContent;
+    }
+  }
+
+  this.updatePrintButtonsCaptions(this.switchPageOrientation_.getModel().isLandscape);
+
+  // We should call this method to make icons visible again.
+  this.applyIconsAndTexts();
+
+  return this;
+};
+
+
+/**
  * Constructor function for gantt toolbar.
  * @return {anychart.ui.GanttToolbar}
  */
@@ -444,4 +551,5 @@ anychart.ui.ganttToolbar = function() {
   proto['target'] = proto.target;
   proto['buttonsMode'] = proto.buttonsMode;
   proto['printFunction'] = proto.printFunction;
+  proto['updateLocalizedCaptions'] = proto.updateLocalizedCaptions;
 })();

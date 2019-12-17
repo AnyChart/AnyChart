@@ -1080,6 +1080,7 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'fontSize': 12,
     'textOverflow': '...',
     'itemsLayout': 'horizontal',
+    'itemsHAlign': 'left',
     'positionMode': 'outside',
     'itemsSpacing': 15,
     'items': null,

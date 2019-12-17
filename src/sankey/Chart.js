@@ -1645,7 +1645,7 @@ anychart.sankeyModule.Chart.prototype.drawContent = function(bounds) {
 
         lastTop = nodeBottom + levelPadding;
       }
-    }*/
+    } */
 
     // var curvy = /** @type {number} */ (this.getOption('curveFactor')) * (bounds.width - nodeWidth) / (this.levels.length - 1);
 
@@ -1725,7 +1725,7 @@ anychart.sankeyModule.Chart.prototype.drawContent = function(bounds) {
             .lineTo(left, y2)
             .close();
       }
-    }*/
+    } */
     //endregion
 
     this.invalidateMultiState(anychart.enums.Store.SANKEY, [

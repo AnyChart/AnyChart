@@ -874,6 +874,15 @@ anychart.ganttModule.Column.prototype.calculateBounds = function() {
 
 
 /**
+ * Gets column pixel bounds.
+ * @return {anychart.math.Rect}
+ */
+anychart.ganttModule.Column.prototype.getPixelBounds = function() {
+  return this.calculateBounds();
+};
+
+
+/**
  * Button invalidation handler.
  * @param {anychart.SignalEvent} event
  * @private
@@ -1086,7 +1095,9 @@ anychart.ganttModule.Column.prototype.draw = function() {
         var padding = paddingLeft + depthLeft;
         var addButton = 0;
 
-        if (this.getOption('collapseExpandButtons') && item.numChildren()) {
+        var itemInfo = anychart.ganttModule.BaseGrid.getProjectItemInfo(item);
+
+        if (this.getOption('collapseExpandButtons') && (item.numChildren() || itemInfo.isLoadable)) {
           counter++;
           button = this.buttons_[counter];
           if (!button) {
@@ -1106,6 +1117,18 @@ anychart.ganttModule.Column.prototype.draw = function() {
           var top = totalTop + ((height - (/** @type {number} */ (dataGridButtons.getOption('height')) || 0)) / 2);
 
           var pixelShift = (acgraph.type() === acgraph.StageType.SVG) ? .5 : 0;
+
+          var isCollapsed = (itemInfo.isLoadable && !item.numChildren()) || item.meta('collapsed');
+
+          var buttonState;
+          if (isCollapsed) {
+            buttonState = button.isHovered() ?
+                anychart.SettingsState.HOVERED :
+                anychart.SettingsState.NORMAL; // Collapsed.
+          } else {
+            buttonState = anychart.SettingsState.SELECTED; // Expanded.
+          }
+
           button
               .enabled(true)
               .dataItemIndex(i)
@@ -1114,20 +1137,7 @@ anychart.ganttModule.Column.prototype.draw = function() {
                 'x': Math.floor(this.pixelBoundsCache_.left + padding) + pixelShift,
                 'y': Math.floor(top) + pixelShift
               })
-              .state(!!item.meta('collapsed') ? // is item collapsed ?
-
-                  // check if hovered (when collapse state triggered by button)
-                  button.isHovered() ?
-
-                      // save hovered state in case of hovered
-                      anychart.SettingsState.HOVERED :
-
-                      // set to normal (collapsed) in case of normal and not hovered
-                      // (when buttons are redrawn by clicking other buttons)
-                      anychart.SettingsState.NORMAL :
-
-                  // SELECTED (expanded) otherwise
-                  anychart.SettingsState.SELECTED);
+              .state(buttonState);
 
           button.resumeSignalsDispatching(false);
           button.draw();
@@ -1286,4 +1296,5 @@ anychart.ganttModule.Column.prototype.disposeInternal = function() {
   proto['setColumnFormat'] = proto.setColumnFormat;
   proto['buttonCursor'] = proto.buttonCursor;
   proto['draw'] = proto.draw;
+  proto['getPixelBounds'] = proto.getPixelBounds;
 })();

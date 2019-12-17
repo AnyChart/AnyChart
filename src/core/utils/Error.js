@@ -604,7 +604,7 @@ anychart.core.utils.Error.prototype.serialize = function() {
           ['x error stroke']
       );
     } else {
-      json['xErrorStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.xErrorStroke()));
+      json['xErrorStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.xErrorStroke()));
     }
   }
   if (goog.isFunction(this['valueErrorStroke'])) {
@@ -615,7 +615,7 @@ anychart.core.utils.Error.prototype.serialize = function() {
           ['value error stroke']
       );
     } else {
-      json['valueErrorStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.valueErrorStroke()));
+      json['valueErrorStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.valueErrorStroke()));
     }
   }
   return json;

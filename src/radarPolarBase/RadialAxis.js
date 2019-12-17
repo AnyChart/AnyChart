@@ -665,7 +665,7 @@ anychart.radarPolarBaseModule.RadialAxis.prototype.calcLabels_ = function(opt_bo
 anychart.radarPolarBaseModule.RadialAxis.prototype.calculateAxis_ = function() {
   var parentBounds = this.parentBounds();
   this.length_ = Math.min(parentBounds.width, parentBounds.height) / 2;
-  this.innerLength_ = anychart.utils.normalizeSize(/** @type {number}*/(this.getOption('innerRadius')), this.length_);
+  this.innerLength_ = anychart.utils.normalizeSize(/** @type {number} */(this.getOption('innerRadius')), this.length_);
   if (this.innerLength_ == this.length_) this.innerLength_--;
   this.cx_ = Math.round(parentBounds.left + parentBounds.width / 2);
   this.cy_ = Math.round(parentBounds.top + parentBounds.height / 2);
@@ -876,7 +876,7 @@ anychart.radarPolarBaseModule.RadialAxis.prototype.drawLine_ = function() {
   var xPixelShift = 0;
   var yPixelShift = 0;
 
-  var lineThickness = anychart.utils.extractThickness(/** @type {acgraph.vector.Stroke}*/(this.getOption('stroke')));
+  var lineThickness = anychart.utils.extractThickness(/** @type {acgraph.vector.Stroke} */(this.getOption('stroke')));
   if (!angle) {
     yPixelShift = lineThickness % 2 == 0 ? 0 : -.5;
   } else if (angle == 90) {
@@ -915,7 +915,7 @@ anychart.radarPolarBaseModule.RadialAxis.prototype.drawTick_ = function(ratio, i
   var ticksSidePosition = anychart.utils.sidePositionToNumber(ticksPosition);
 
   var ticksThickness = ticksStroke['thickness'] ? parseFloat(ticksStroke['thickness']) : 1;
-  var lineThickness = anychart.utils.extractThickness(/** @type {acgraph.vector.Stroke}*/(this.getOption('stroke')));
+  var lineThickness = anychart.utils.extractThickness(/** @type {acgraph.vector.Stroke} */(this.getOption('stroke')));
 
   var xPixelShift = 0;
   var yPixelShift = 0;

@@ -477,8 +477,8 @@ anychart.linearGaugeModule.ScaleBar.prototype.draw = function() {
 
         var shift = 0.5;
 
-        var start = range['start'] || scale.minimum();
-        var end = range['end'] || scale.maximum();
+        var start = goog.isDef(range['start']) ? range['start'] : scale.minimum();
+        var end = goog.isDef(range['end']) ? range['end'] : scale.maximum();
         var pixelStart = this.applyRatioToBounds(scale.transform(start));
         var pixelEnd = this.applyRatioToBounds(scale.transform(end));
         if (isNaN(pixelStart) || isNaN(pixelEnd))

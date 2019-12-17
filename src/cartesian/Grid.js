@@ -43,7 +43,7 @@ anychart.cartesianModule.Grid.prototype.scaleInvalidated = function(event) {
 /** @inheritDoc */
 anychart.cartesianModule.Grid.prototype.drawLineHorizontal = function(ratio, shift) {
   var parentBounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
-  /** @type {number}*/
+  /** @type {number} */
   var y = parentBounds.getBottom() - ratio * parentBounds.height;
   y = anychart.utils.applyPixelShift(y, /** @type {number} */(this.lineElement().strokeThickness()));
   this.lineElementInternal.moveTo(parentBounds.getLeft(), y);
@@ -54,7 +54,7 @@ anychart.cartesianModule.Grid.prototype.drawLineHorizontal = function(ratio, shi
 /** @inheritDoc */
 anychart.cartesianModule.Grid.prototype.drawLineVertical = function(ratio, shift) {
   var parentBounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
-  /** @type {number}*/
+  /** @type {number} */
   var x = parentBounds.getLeft() + ratio * parentBounds.width;
   var thickness = /** @type {number} */(this.lineElement().strokeThickness());
   x = anychart.utils.applyPixelShift(x, thickness);

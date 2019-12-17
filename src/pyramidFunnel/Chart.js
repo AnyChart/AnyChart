@@ -1885,7 +1885,7 @@ anychart.pyramidFunnelModule.Chart.prototype.createLabelsPositionProvider_ = fun
   // get label width and height
   var labelBounds;
   if (opt_label) {
-    labelBounds = this.getTrueLabelBounds(opt_label, /** @type {anychart.PointState|number}*/(opt_pointState));
+    labelBounds = this.getTrueLabelBounds(opt_label, /** @type {anychart.PointState|number} */(opt_pointState));
   } else {
     labelBounds = this.labels().measureWithTransform(this.createFormatProvider(), null, /** @type {Object} */(labelSettings));
     labelBounds = anychart.math.Rect.fromCoordinateBox(labelBounds);
@@ -3134,7 +3134,7 @@ anychart.pyramidFunnelModule.Chart.prototype.hoverMode = function(opt_value) {
     }
     return this;
   }
-  return /** @type {anychart.enums.HoverMode}*/(this.hoverMode_);
+  return /** @type {anychart.enums.HoverMode} */(this.hoverMode_);
 };
 
 

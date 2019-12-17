@@ -41,7 +41,7 @@ anychart.cartesian3dModule.Grid.prototype.scaleInvalidated = function(event) {
 /** @inheritDoc */
 anychart.cartesian3dModule.Grid.prototype.drawLineHorizontal = function(ratio, shift) {
   var parentBounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
-  /** @type {number}*/
+  /** @type {number} */
   var y = Math.round(parentBounds.getBottom() - ratio * parentBounds.height);
 
   var stroke = /** @type {acgraph.vector.Stroke} */(this.lineElement().stroke());
@@ -61,7 +61,7 @@ anychart.cartesian3dModule.Grid.prototype.drawLineHorizontal = function(ratio, s
 /** @inheritDoc */
 anychart.cartesian3dModule.Grid.prototype.drawLineVertical = function(ratio, shift) {
   var parentBounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
-  /** @type {number}*/
+  /** @type {number} */
   var x = Math.round(parentBounds.getLeft() + ratio * parentBounds.width);
 
   var stroke = /** @type {acgraph.vector.Stroke} */(this.lineElement().stroke());

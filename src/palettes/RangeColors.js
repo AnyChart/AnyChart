@@ -172,7 +172,7 @@ anychart.palettes.RangeColors.prototype.itemAt = function(index, opt_item) {
   } else {
     if (index > count - 1) index = count - 1;
     if (index < 0) index = 0;
-    var color = /**@type {acgraph.vector.SolidFill} */(this.colorPalette_[index]);
+    var color = /** @type {acgraph.vector.SolidFill} */(this.colorPalette_[index]);
     return color ? color : null;
   }
 };

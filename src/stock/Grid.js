@@ -40,7 +40,7 @@ anychart.stockModule.Grid.prototype.scaleInvalidated = function(event) {
  */
 anychart.stockModule.Grid.prototype.drawLineHorizontal = function(ratio, shift) {
   var parentBounds = this.parentBounds().round() || anychart.math.rect(0, 0, 0, 0);
-  /** @type {number}*/
+  /** @type {number} */
   var y = parentBounds.getBottom() - ratio * parentBounds.height;
   y = anychart.utils.applyPixelShift(y, /** @type {number} */(this.lineElement().strokeThickness()));
   this.lineElementInternal.moveTo(anychart.utils.applyPixelShift(parentBounds.getLeft(), 1) - 0.5, y);
@@ -119,7 +119,7 @@ anychart.stockModule.Grid.prototype.drawInterlaceVertical = function(ratio, prev
 };
 
 
-/** @inheritDoc */  
+/** @inheritDoc */
 anychart.stockModule.Grid.prototype.drawInternal = function() {
   var scale = /** @type {anychart.scales.Base|anychart.stockModule.scales.Scatter} */(this.scale());
 
@@ -163,7 +163,7 @@ anychart.stockModule.Grid.prototype.drawInternal = function() {
   clip.width = right - clip.left;
   clip.height = bottom - clip.top;
 
-  this.lineElement().clip(/** @type {goog.math.Rect}*/(clip));
+  this.lineElement().clip(/** @type {goog.math.Rect} */(clip));
 
   var drawInterlace = layout[1];
   var drawLine = layout[0];

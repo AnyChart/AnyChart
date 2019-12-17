@@ -167,6 +167,15 @@ anychart.graphModule.Chart = function(opt_data) {
    * @type {boolean}
    */
   this.isfixed = false;
+
+  /**
+   * Does drag element dragging.
+   * Call dragger.isDragging() returns true if no move made.
+   * @type {boolean}
+   * @private
+   */
+  this.isDraggerDragging_ = false;
+
   this.data(opt_data);
 };
 goog.inherits(anychart.graphModule.Chart, anychart.core.Chart);
@@ -364,9 +373,9 @@ anychart.graphModule.Chart.prototype.deselectAllElements_ = function() {
  */
 anychart.graphModule.Chart.prototype.handleMouseClick = function(event) {
   if (!this.preventClickAfterDrag) {
-    var tag = /**@type {anychart.graphModule.Chart.Tag}*/(event['domTarget'].tag);
+    var tag = /** @type {anychart.graphModule.Chart.Tag} */(event['domTarget'].tag);
     if (tag) {
-      var element = element = {id: tag.id, type: tag.type};
+      var element = {id: tag.id, type: tag.type};
       var i;
       if ((!goog.userAgent.MAC && event.ctrlKey) || (goog.userAgent.MAC && event.metaKey)) {
         if (tag.currentState == anychart.SettingsState.SELECTED) {
@@ -394,16 +403,7 @@ anychart.graphModule.Chart.prototype.handleMouseClick = function(event) {
         }
         this.updateElementStateById(tag.id, tag.type, anychart.SettingsState.SELECTED);
       } else {
-        for (i in this.selectedNodes_) { //deselect previous selected element
-          element = this.selectedNodes_[i];
-          this.updateElementStateById(element.id, anychart.graphModule.Chart.Element.NODE, anychart.SettingsState.NORMAL);
-          delete this.selectedNodes_[i];
-        }
-        for (i in this.selectedEdges_) { //deselect previous selected element
-          element = this.selectedEdges_[i];
-          this.updateElementStateById(element.id, anychart.graphModule.Chart.Element.EDGE, anychart.SettingsState.NORMAL);
-          delete this.selectedEdges_[i];
-        }
+        this.deselectAllElements_();
       }
       this.updateElementStateById(tag.id, tag.type, anychart.SettingsState.SELECTED);
     } else {
@@ -423,7 +423,7 @@ anychart.graphModule.Chart.prototype.handleMouseClick = function(event) {
 anychart.graphModule.Chart.prototype.handleMouseOver = function(event) {
   if (!this.dragger_ || !this.dragger_.isDragging()) {
     var domTarget = event['domTarget'];
-    var tag = /**@type {anychart.graphModule.Chart.Tag}*/(domTarget.tag);
+    var tag = /** @type {anychart.graphModule.Chart.Tag} */(domTarget.tag);
     var tooltip;
     if (tag) {
       var type = tag.type;
@@ -457,7 +457,7 @@ anychart.graphModule.Chart.prototype.handleMouseOver = function(event) {
 anychart.graphModule.Chart.prototype.handleMouseMove = function(event) {
   if (!this.dragger_ || !this.dragger_.isDragging()) { //Prevent display tooltip when node is dragging.
     var domTarget = event['domTarget'];
-    var tag = /**@type {anychart.graphModule.Chart.Tag}*/(domTarget.tag);
+    var tag = /** @type {anychart.graphModule.Chart.Tag} */(domTarget.tag);
     var tooltip;
     if (tag) {
       var type = tag.type;
@@ -475,6 +475,54 @@ anychart.graphModule.Chart.prototype.handleMouseMove = function(event) {
       this.tooltip().hide();
     }
   }
+};
+
+
+/**
+ * Context menu handler.
+ * Show context menu only for layer long press.
+ * @param {acgraph.events.BrowserEvent} event - Context menu event.
+ */
+anychart.graphModule.Chart.prototype.handleContextMenu = function(event) {
+  if (!event.target.tag) {
+    this.handleBrowserEvent(event);
+  }
+};
+
+
+/**
+ * Setup two touch listeners, one for long press, second for simple touch.
+ * TODO(anton.chengaev): Need to implement pitch-to-zoom and rework dragger.
+ */
+anychart.graphModule.Chart.prototype.initTouchHandlers = function() {
+  var timeout = 300;
+  var timerId = null;
+  var isLongPressDone = false;
+
+  // If user pressing graph element greater 300 millisecond, do select for element.
+  this.eventsHandler.listen(this, acgraph.events.EventType.TOUCHSTART, function(event) {
+    isLongPressDone = false;
+
+    timerId = goog.Timer.callOnce(function() {
+      // Prevent select if element is dragging.
+      if (!this.isDraggerDragging_) {
+        this.preventClickAfterDrag = false;
+        // Do select.
+        this.handleMouseClick(event);
+      }
+
+      isLongPressDone = true;
+    }, timeout, this);
+  });
+
+  // If less than 300 milliseconds show tooltip.
+  this.eventsHandler.listen(this, acgraph.events.EventType.TOUCHEND, function(event) {
+    // Clear timer with event we create inside 'touchstart'
+    goog.Timer.clear(timerId);
+    if (!isLongPressDone) {
+      this.handleMouseMove(event);
+    }
+  });
 };
 
 
@@ -781,10 +829,10 @@ anychart.graphModule.Chart.prototype.getYWithTranslate = function(y) {
 /** @inheritDoc */
 anychart.graphModule.Chart.prototype.handleMouseOut = function(event) {
   if ((!this.dragger_ || !this.dragger_.isDragging()) ||
-    !this.interactivity().getOption('enabled') ||
-    !this.interactivity().getOption('nodes')) { //Prevent mouse out when node is dragging
+      !this.interactivity().getOption('enabled') ||
+      !this.interactivity().getOption('nodes')) { //Prevent mouse out when node is dragging
     var domTarget = event['domTarget'];
-    var tag = /**@type {anychart.graphModule.Chart.Tag}*/(domTarget.tag);
+    var tag = /** @type {anychart.graphModule.Chart.Tag} */(domTarget.tag);
     if (tag && tag.currentState != anychart.SettingsState.SELECTED) {
       this.updateElementStateById(tag.id, tag.type, anychart.SettingsState.NORMAL);
     }
@@ -1279,6 +1327,8 @@ anychart.graphModule.Chart.prototype.paletteInvalidated_ = function(event) {
     this.invalidateState(anychart.enums.Store.SANKEY, anychart.enums.State.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
   }
 };
+
+
 //endregion
 //region Elements
 /**
@@ -1573,8 +1623,13 @@ anychart.graphModule.Chart.prototype.initDragger_ = function(event) {
       if (interactivityEnabled) {
         element = e.browserEvent.target;
         tag = element.tag;
-        this.tooltip().hide();
-
+        if (goog.labs.userAgent.device.isDesktop()) {
+          /*
+            In tests we hide tooltip on click.
+            todo(anton.chengaev) Rework dragger.
+           */
+          this.tooltip().hide();
+        }
         if (tag && tag.type == anychart.graphModule.Chart.Element.NODE) {
           if (nodeInteractivityEnabled) {
             var id = tag.id;
@@ -1605,6 +1660,8 @@ anychart.graphModule.Chart.prototype.initDragger_ = function(event) {
     }, false, this);
     this.dragger_.listen(goog.fx.Dragger.EventType.DRAG, function(e) {
       if (interactivityEnabled) {
+        this.isDraggerDragging_ = true;
+        this.tooltip().hide();
         var scale = this.getTransformationMatrix().m00_;
 
         var x = e.clientX;
@@ -1644,8 +1701,9 @@ anychart.graphModule.Chart.prototype.initDragger_ = function(event) {
         }
       }
     }, false, this);
-    this.dragger_.listen(goog.fx.Dragger.EventType.END, /** @this {anychart.graphModule.Chart}*/ function(e) {
+    this.dragger_.listen(goog.fx.Dragger.EventType.END, /** @this {anychart.graphModule.Chart} */ function(e) {
       if (interactivityEnabled) {
+        this.isDraggerDragging_ = false;
         if (tag && tag.type == anychart.graphModule.Chart.Element.NODE) {
           if (nodeInteractivityEnabled) {
             if (!nodesForDrag.length) {
@@ -1761,13 +1819,20 @@ anychart.graphModule.Chart.prototype.drawContent = function(bounds) {
     this.eventsHandler.listenOnce(this, anychart.enums.EventType.CHART_DRAW, this.initDragger_);
     this.eventsHandler.listenOnce(this, anychart.enums.EventType.CHART_DRAW, this.initMouseWheel_);
 
-    this.bindHandlersToComponent(this,
-      this.handleMouseOver,
-      this.handleMouseOut,
-      this.handleMouseClick,
-      this.handleMouseMove,
-      null,
-      null);
+    if (goog.labs.userAgent.device.isDesktop()) {
+      this.bindHandlersToComponent(this,
+        this.handleMouseOver,
+        this.handleMouseOut,
+        this.handleMouseClick,
+        this.handleMouseMove,
+        null,
+        null);
+    } else {
+      // Dont show context menu on nodes or edges if it is dragging or selected.
+      this.eventsHandler.unlisten(this.rootElement, acgraph.events.EventType.CONTEXTMENU, this.handleBrowserEvent);
+      this.eventsHandler.listen(this.rootElement, acgraph.events.EventType.CONTEXTMENU, this.handleContextMenu);
+      this.initTouchHandlers();
+    }
 
     this.layerForElements_ = acgraph.layer();
 

@@ -869,7 +869,7 @@ anychart.core.ui.Crosshair.prototype.drawLabel_ = function(axis, xDirection, lab
     label.text(labelFormat.call(provider, provider));
     label.autoAnchor(this.getAnchorByAxis(axis));
     var labelPosition = this.getLabelPosition_(axis, label, side, start, ratio);
-    label.x(/** @type {number}*/(labelPosition.x)).y(/** @type {number}*/(labelPosition.y));
+    label.x(/** @type {number} */(labelPosition.x)).y(/** @type {number} */(labelPosition.y));
     label.container(/** @type {acgraph.vector.ILayer} */(this.container()));
     label.draw();
   }

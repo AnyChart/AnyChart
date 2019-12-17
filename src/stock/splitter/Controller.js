@@ -60,7 +60,9 @@ goog.inherits(anychart.stockModule.splitter.Controller, anychart.core.Base);
  * Synchronizes plot bounds for splitter settings.
  */
 anychart.stockModule.splitter.Controller.prototype.sync = function() {
-  if (!this.dragging_) {
+  this.splitters_.reset();
+
+  if (!this.chart.isPlotsManualBounds() && !this.dragging_) {
     var plots = this.chart.getEnabledPlots();
 
     var i, plot, hasExpandedPlot = false;
@@ -72,7 +74,6 @@ anychart.stockModule.splitter.Controller.prototype.sync = function() {
       }
     }
 
-    this.splitters_.reset();
     if (!hasExpandedPlot && this.chart.splitters()['enabled']()) {
       for (i = 0; i < plots.length; i++) {
         plot = plots[i];

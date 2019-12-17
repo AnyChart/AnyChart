@@ -114,8 +114,8 @@ anychart.mapModule.utils.GeoJSONParser.prototype.parseGeometry_ = function(geojs
       return (/middle-y/).test(key);
     });
 
-    var middleX = /** @type {number}*/(geoMiddleX || .5);
-    var middleY = /** @type {number}*/(geoMiddleY || .5);
+    var middleX = /** @type {number} */(geoMiddleX || .5);
+    var middleY = /** @type {number} */(geoMiddleY || .5);
 
     properties['middle-x'] = middleX;
     properties['middle-y'] = middleY;

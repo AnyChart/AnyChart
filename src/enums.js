@@ -1477,7 +1477,7 @@ anychart.enums.EventType = {
   SCROLLING: 'scrolling',
   SCROLL_END: 'scrollend',
 
-  SPLITTER_CHANGE: 'splitterchange',
+  SPLITTER_POSITION_CHANGE: 'splitterpositionchange',
 
   SCROLLER_CHANGE_START: 'scrollerchangestart',
   SCROLLER_CHANGE: 'scrollerchange',
@@ -1505,6 +1505,7 @@ anychart.enums.EventType = {
   BEFORE_CREATE_CONNECTOR: 'beforeCreateConnector',
   BEFORE_REMOVE_CONNECTOR: 'beforeRemoveConnector',
   ROW_COLLAPSE_EXPAND: 'rowcollapseexpand',
+  GANTT_LOAD_DATA: 'ganttloaddata', // ENV-1410.
 
   //Connectors events.
   CONNECTOR_SELECT: 'connectorselect',
@@ -2094,6 +2095,8 @@ anychart.enums.GanttDataFields = {
   BASELINE: 'baseline',
   BASELINE_START: 'baselineStart',
   BASELINE_END: 'baselineEnd',
+  BASELINE_PROGRESS_VALUE: 'baselineProgressValue',
+  BASELINE_PROGRESS: 'baselineProgress',
   PROGRESS: 'progress',
   PROGRESS_VALUE: 'progressValue',
   MILESTONE: 'milestone',
@@ -2114,7 +2117,8 @@ anychart.enums.GanttDataFields = {
   START_MARKER: 'startMarker',
   END_MARKER: 'endMarker',
   LABEL: 'label',
-  MARKERS: 'markers'
+  MARKERS: 'markers',
+  IS_LOADABLE: 'anychartIsLoadable' // ENV-1410.
 };
 
 
@@ -2154,6 +2158,7 @@ anychart.enums.TLElementTypes = {
   GROUPING_TASKS: 'grouping-tasks',
   TASKS: 'tasks',
   PROGRESS: 'progress',
+  BASELINE_PROGRESS: 'baseline-progress',
   BASELINES: 'baselines',
   MILESTONES: 'milestones',
   MILESTONES_PREVIEW: 'milestones-preview',

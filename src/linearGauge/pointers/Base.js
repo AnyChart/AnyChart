@@ -1080,7 +1080,7 @@ anychart.linearGaugeModule.pointers.Base.prototype.hoverMode = function(opt_valu
   if (goog.isDef(opt_value)) {
     return this;
   }
-  return /** @type {anychart.enums.HoverMode} */((/** @type {anychart.linearGaugeModule.Chart}*/(this.gauge_)).interactivity().getOption('hoverMode'));
+  return /** @type {anychart.enums.HoverMode} */((/** @type {anychart.linearGaugeModule.Chart} */(this.gauge_)).interactivity().getOption('hoverMode'));
 };
 
 
@@ -1096,7 +1096,7 @@ anychart.linearGaugeModule.pointers.Base.prototype.selectionMode = function(opt_
     }
     return this;
   }
-  return /** @type {anychart.enums.SelectionMode}*/(this.selectionMode_);
+  return /** @type {anychart.enums.SelectionMode} */(this.selectionMode_);
 };
 
 
@@ -1401,7 +1401,7 @@ anychart.linearGaugeModule.pointers.Base.prototype.serialize = function() {
     json['autoIndex'] = this.autoIndex();
 
   if (this.color_)
-    json['color'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.color_));
+    json['color'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.color_));
   json['normal'] = this.normal().serialize();
   json['hovered'] = this.hovered().serialize();
   json['selected'] = this.selected().serialize();

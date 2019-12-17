@@ -99,16 +99,18 @@ anychart.exports.saveAsPng = function(target, container, opt_widthOrOptions, opt
       'filename': anychart.exports.getFinalSettings(target, 'filename')
     });
 
+    var clientside = anychart.exports.getFinalSettings(target, 'clientside');
+
     var failCallback = function(args) {
-      if (anychart.exports.isClientsideFallback()) {
+      if (clientside['fallback']) {
         anychart.core.reporting.info('Offline export failed, falling back to server.');
-        stage.saveAsSvg(args['paperSize'] || args['width'], args['landscape'] || args['height'], args['filename']);
+        stage.saveAsPng(args['width'], args['height'], args['quality'], args['filename']);
       } else {
         anychart.core.reporting.info('Offline export failed, fallback to server disabled.');
       }
     };
 
-    if (anychart.exports.isClientsideEnabled()) {
+    if (clientside['enabled']) {
       anychart.exportsModule.offline.exportChartOffline(target, acgraph.vector.Stage.ExportType.PNG, args, goog.nullFunction, failCallback);
     } else {
       stage.saveAsPng(args['width'], args['height'], args['quality'], args['filename']);
@@ -156,16 +158,18 @@ anychart.exports.saveAsJpg = function(target, container, opt_widthOrOptions, opt
           'filename': anychart.exports.getFinalSettings(target, 'filename')
         });
 
+    var clientside = anychart.exports.getFinalSettings(target, 'clientside');
+
     var failCallback = function(args) {
-      if (anychart.exports.isClientsideFallback()) {
+      if (clientside['fallback']) {
         anychart.core.reporting.info('Offline export failed, falling back to server.');
-        stage.saveAsJpg(args['paperSize'] || args['width'], args['landscape'] || args['height'], args['filename']);
+        stage.saveAsJpg(args['width'], args['height'], args['quality'], args['forceTransparentWhite'], args['filename']);
       } else {
         anychart.core.reporting.info('Offline export failed, fallback to server disabled.');
       }
     };
 
-    if (anychart.exports.isClientsideEnabled()) {
+    if (clientside['enabled']) {
       anychart.exportsModule.offline.exportChartOffline(target, acgraph.vector.Stage.ExportType.JPG, args, goog.nullFunction, failCallback);
     } else {
       stage.saveAsJpg(args['width'], args['height'], args['quality'], args['forceTransparentWhite'], args['filename']);
@@ -215,8 +219,10 @@ anychart.exports.saveAsPdf = function(target, container, opt_paperSizeOrWidthOrO
           'filename': anychart.exports.getFinalSettings(target, 'filename')
         });
 
+    var clientside = anychart.exports.getFinalSettings(target, 'clientside');
+
     var failCallback = function(args) {
-      if (anychart.exports.isClientsideFallback()) {
+      if (clientside['fallback']) {
         anychart.core.reporting.info('Offline export failed, falling back to server.');
         stage.saveAsPdf(args['paperSize'] || args['width'], args['landscape'] || args['height'], args['x'], args['y'], args['filename']);
       } else {
@@ -224,7 +230,7 @@ anychart.exports.saveAsPdf = function(target, container, opt_paperSizeOrWidthOrO
       }
     };
 
-    if (anychart.exports.isClientsideEnabled()) {
+    if (clientside['enabled']) {
       anychart.exportsModule.offline.exportChartOffline(target, acgraph.vector.Stage.ExportType.PDF, args, goog.nullFunction, failCallback);
     } else {
       stage.saveAsPdf(args['paperSize'] || args['width'], args['landscape'] || args['height'], args['x'], args['y'], args['filename']);
@@ -270,8 +276,10 @@ anychart.exports.saveAsSvg = function(target, container, opt_paperSizeOrWidthOrO
           'filename': anychart.exports.getFinalSettings(target, 'filename')
         });
 
+    var clientside = anychart.exports.getFinalSettings(target, 'clientside');
+
     var failCallback = function(args) {
-      if (anychart.exports.isClientsideFallback()) {
+      if (clientside['fallback']) {
         anychart.core.reporting.info('Offline export failed, falling back to server.');
         stage.saveAsSvg(args['paperSize'] || args['width'], args['landscape'] || args['height'], args['filename']);
       } else {
@@ -279,7 +287,7 @@ anychart.exports.saveAsSvg = function(target, container, opt_paperSizeOrWidthOrO
       }
     };
 
-    if (anychart.exports.isClientsideEnabled()) {
+    if (clientside['enabled']) {
       anychart.exportsModule.offline.exportChartOffline(target, acgraph.vector.Stage.ExportType.SVG, args, goog.nullFunction, failCallback);
     } else {
       stage.saveAsSvg(args['paperSize'] || args['width'], args['landscape'] || args['height'], args['filename']);

@@ -24,7 +24,7 @@ anychart.mapModule.ChoroplethPoint.prototype.getFeatureProp = function() {
   var iterator = this.series.getIterator();
   iterator.select(this.index);
   var features = iterator.meta('features');
-  return /** @type {Object}*/(features[0]['properties']);
+  return /** @type {Object} */(features[0]['properties']);
 };
 
 
@@ -58,7 +58,7 @@ anychart.mapModule.ChoroplethPoint.prototype.middleX = function(opt_value) {
     var properties = features && features.length ? features[0]['properties'] : null;
     var midX = this.get('middle-x');
 
-    return /** @type {number}*/(goog.isDef(midX) ? midX : properties ? properties['middle-x'] : .5);
+    return /** @type {number} */(goog.isDef(midX) ? midX : properties ? properties['middle-x'] : .5);
   }
 };
 
@@ -80,7 +80,7 @@ anychart.mapModule.ChoroplethPoint.prototype.middleY = function(opt_value) {
     var properties = features && features.length ? features[0]['properties'] : null;
     var midY = this.get('middle-y');
 
-    return /** @type {number}*/(goog.isDef(midY) ? midY : properties ? properties['middle-y'] : .5);
+    return /** @type {number} */(goog.isDef(midY) ? midY : properties ? properties['middle-y'] : .5);
   }
 };
 

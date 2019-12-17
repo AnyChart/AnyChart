@@ -376,15 +376,6 @@ anychart.circularGaugeModule.pointers.Knob.prototype.setupByJSON = function(conf
 };
 
 
-/** @inheritDoc */
-anychart.circularGaugeModule.pointers.Knob.prototype.disposeInternal = function() {
-  goog.disposeAll(this.domElement, this.hatchFillElement);
-  this.domElement = null;
-  this.hatchFillElement = null;
-  anychart.circularGaugeModule.pointers.Knob.base(this, 'disposeInternal');
-};
-
-
 //endregion
 
 

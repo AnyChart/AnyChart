@@ -211,6 +211,8 @@ anychart.stockModule.Chart = function(opt_allowPointSettings) {
   this.dummyTable_ = null;
 
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['plotsManualBounds', anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.STOCK_PLOTS_APPEARANCE,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
     ['zoomMarqueeFill', 0, 0],
     ['zoomMarqueeStroke', 0, 0]
   ]);
@@ -1510,7 +1512,7 @@ anychart.stockModule.Chart.prototype.drawContent = function(bounds) {
     // State is needed to call this.splitterController_.sync()
     this.markConsistent(anychart.ConsistencyState.STOCK_SPLITTERS);
   }
-  this.splitterController_.sync();
+  this.splitterController_.sync(); // This will do nothing if isPlotsManualBounds() is TRUE.
 
   if (!this.mouseWheelHandler_) {
     this.mouseWheelHandler_ = new goog.events.MouseWheelHandler(
@@ -1853,13 +1855,21 @@ anychart.stockModule.Chart.prototype.calculateScales_ = function() {
     scales[i].finishAutoCalc();
 };
 
+/**
+ * Whether bounds of plots must be set manually (https://anychart.atlassian.net/browse/DVF-4331).
+ * @return {boolean} - Whether chart is configured to have a plot with manually set bounds.
+ */
+anychart.stockModule.Chart.prototype.isPlotsManualBounds = function() {
+  return !!this.getOption('plotsManualBounds');
+};
+
 
 /**
  * Distributes weights among plots.
  * @private
  */
 anychart.stockModule.Chart.prototype.distributeWeights_ = function() {
-  // this.plotsBounds_ muse be already set here.
+  // this.plotsBounds_ must be already set here.
   var remainingBounds = this.plotsBounds_;
   var i, plot, bounds, height;
 
@@ -1996,6 +2006,158 @@ anychart.stockModule.Chart.prototype.distributeWeights_ = function() {
 
 
 /**
+ * Bounds distribution.
+ * @param {Array.<anychart.core.utils.Bounds>} boundsArray
+ * @param {number} top
+ * @param {number} bottom
+ * @param {number} fullHeight - Parent bounds height to get percent heights normalized.
+ * @private
+ */
+anychart.stockModule.Chart.prototype.distributeBoundsLocal_ = function(boundsArray, top, bottom, fullHeight) {
+  var i, size, minSize, maxSize;
+  var bounds;
+  var distributedSize = 0;
+  var fixedSizes = [];
+  var minSizes = [];
+  var maxSizes = [];
+  var autoSizesCount = 0;
+  var hardWay = false;
+  var height = bottom - top;
+  for (i = 0; i < boundsArray.length; i++) {
+    bounds = boundsArray[i];
+    bounds.suspendSignalsDispatching();
+    minSize = anychart.utils.normalizeSize(/** @type {number|string|null} */(bounds.minHeight()), fullHeight);
+    maxSize = anychart.utils.normalizeSize(/** @type {number|string|null} */(bounds.maxHeight()), fullHeight);
+    // getting normalized size
+    size = anychart.utils.normalizeSize(/** @type {number|string|null} */(bounds.height()), fullHeight);
+    // if it is NaN (not fixed)
+    if (isNaN(size)) {
+      autoSizesCount++;
+      // if there are any limitations on that non-fixed size - we are going to do it hard way:(
+      // we cache those limitations
+      if (!isNaN(minSize)) {
+        minSizes[i] = minSize;
+        hardWay = true;
+      }
+      if (!isNaN(maxSize)) {
+        maxSizes[i] = maxSize;
+        hardWay = true;
+      }
+    } else {
+      if (!isNaN(minSize))
+        size = Math.max(size, minSize);
+      if (!isNaN(maxSize))
+        size = Math.min(size, maxSize);
+      distributedSize += size;
+      fixedSizes[i] = size;
+    }
+  }
+
+  var autoSize;
+  var restrictedSizes;
+  if (hardWay && autoSizesCount > 0) {
+    restrictedSizes = [];
+    // we limit max cycling times to guarantee finite exec time in case my calculations are wrong
+    var maxTimes = autoSizesCount * autoSizesCount;
+    do {
+      var repeat = false;
+      // min to 3px per autoPlot to make them visible, but not good-looking.
+      autoSize = Math.max(3, (height - distributedSize) / autoSizesCount);
+      for (i = 0; i < boundsArray.length; i++) {
+        // if the size of the column is not fixed
+        if (!(i in fixedSizes)) {
+          // we recheck if the limitation still exist and drop it if it doesn't
+          if (i in restrictedSizes) {
+            if (restrictedSizes[i] == minSizes[i] && minSizes[i] < autoSize) {
+              distributedSize -= minSizes[i];
+              autoSizesCount++;
+              delete restrictedSizes[i];
+              repeat = true;
+              break;
+            }
+            if (restrictedSizes[i] == maxSizes[i] && maxSizes[i] > autoSize) {
+              distributedSize -= maxSizes[i];
+              autoSizesCount++;
+              delete restrictedSizes[i];
+              repeat = true;
+              break;
+            }
+          } else {
+            if ((i in minSizes) && minSizes[i] > autoSize) {
+              distributedSize += restrictedSizes[i] = minSizes[i];
+              autoSizesCount--;
+              repeat = true;
+              break;
+            }
+            if ((i in maxSizes) && maxSizes[i] < autoSize) {
+              distributedSize += restrictedSizes[i] = maxSizes[i];
+              autoSizesCount--;
+              repeat = true;
+              break;
+            }
+          }
+        }
+      }
+    } while (repeat && autoSizesCount > 0 && maxTimes--);
+  }
+  var current = top;
+  autoSize = Math.max(3, (height - distributedSize) / autoSizesCount);
+  for (i = 0; i < boundsArray.length; i++) {
+    bounds = boundsArray[i];
+    if (i in fixedSizes)
+      size = fixedSizes[i];
+    else if (restrictedSizes && (i in restrictedSizes))
+      size = restrictedSizes[i];
+    else
+      size = autoSize;
+    size = Math.round(size);
+    bounds.setAutoTop(current);
+    bounds.setAutoHeight(size);
+    bounds.resumeSignalsDispatching(true);
+    current += size;
+  }
+};
+
+/**
+ *
+ * @param {anychart.math.Rect} remainingBounds - .
+ * @private
+ */
+anychart.stockModule.Chart.prototype.distributeManualBounds_ = function(remainingBounds) {
+  var plot;
+  var currentTop = 0;
+  var currentBottom = NaN;
+  var boundsArray = [];
+  for (var i = 0; i < this.plots_.length; i++) {
+    plot = this.plots_[i];
+    if (plot && plot.enabled()) {
+      plot.parentBounds(remainingBounds);
+      var bounds = /** @type {anychart.core.utils.Bounds} */(plot.bounds());
+      var usedInDistribution = false;
+      if (!goog.isNull(bounds.top())) {
+        currentBottom = anychart.utils.normalizeSize(/** @type {number|string} */(bounds.top()), remainingBounds.height);
+      } else if (!goog.isNull(bounds.bottom())) {
+        usedInDistribution = true;
+        boundsArray.push(bounds);
+        currentBottom = anychart.utils.normalizeSize(/** @type {number|string} */(bounds.bottom()), remainingBounds.height, true);
+      }
+      if (!isNaN(currentBottom)) {
+        if (boundsArray.length)
+          this.distributeBoundsLocal_(boundsArray, currentTop, currentBottom, remainingBounds.height);
+        currentTop = currentBottom;
+        currentBottom = NaN;
+        boundsArray.length = 0;
+      }
+      if (!usedInDistribution)
+        boundsArray.push(bounds);
+    }
+  }
+  if (boundsArray.length)
+    this.distributeBoundsLocal_(boundsArray, currentTop, remainingBounds.height, remainingBounds.height);
+};
+
+
+/**
  * Distributes content bounds among plots.
  * @param {anychart.math.Rect} contentBounds
  * @private
@@ -2008,10 +2170,16 @@ anychart.stockModule.Chart.prototype.distributeBounds_ = function(contentBounds)
     scroller.parentBounds(remainingBounds);
     remainingBounds = scroller.getRemainingBounds();
   }
-  this.plotsBounds_ = remainingBounds;
 
-  // Since DVF-4261, weight distribution replaces previous behaviour.
-  this.distributeWeights_();
+  if (this.isPlotsManualBounds()) {
+    // https://anychart.atlassian.net/browse/DVF-4331.
+    this.distributeManualBounds_(remainingBounds);
+  } else {
+    this.plotsBounds_ = remainingBounds;
+
+    // Since DVF-4261, weight distribution replaces previous behaviour.
+    this.distributeWeights_();
+  }
 
   this.minPlotsDrawingWidth_ = Infinity;
   for (var i = 0; i < this.plots_.length; i++) {
@@ -2600,6 +2768,11 @@ anychart.stockModule.Chart.prototype.createSelectMarqueeEvent = function(eventTy
 anychart.stockModule.Chart.PROPERTY_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'plotsManualBounds',
+      anychart.core.settings.booleanNormalizer);
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,

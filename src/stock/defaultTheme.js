@@ -740,6 +740,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'fill': '#000 0.1'
       }
     },
+    'plotsManualBounds': false,
     'tooltip': {
       'allowLeaveScreen': true,
       'displayMode': 'union',

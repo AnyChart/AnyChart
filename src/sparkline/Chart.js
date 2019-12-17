@@ -516,7 +516,7 @@ anychart.sparklineModule.Chart.prototype.hoverMode = function(opt_value) {
     }
     return this;
   }
-  return /** @type {anychart.enums.HoverMode}*/(this.hoverMode_);
+  return /** @type {anychart.enums.HoverMode} */(this.hoverMode_);
 };
 
 
@@ -568,7 +568,7 @@ anychart.sparklineModule.Chart.prototype.defaultSeriesSettings = function(opt_va
     this.defaultSeriesSettings_ = {};
   }
 
-  var seriesType = anychart.utils.toCamelCase(/**@type {string}*/(this.getOption('seriesType')));
+  var seriesType = anychart.utils.toCamelCase(/** @type {string} */(this.getOption('seriesType')));
   if (!this.defaultSeriesSettings_[seriesType]) { //append default theme for current series type if not exists
     this.defaultSeriesSettings_[seriesType] = goog.object.clone(this.series_.themeSettings);
   }

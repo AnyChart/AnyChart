@@ -400,7 +400,7 @@ anychart.core.utils.LegendItemSettings.prototype.serialize = function() {
   //  );
   //} else {
   if (goog.isDef(this.iconFill()) && !goog.isFunction(this.iconFill()))
-    json['iconFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.iconFill()));
+    json['iconFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.iconFill()));
   //}
 
   //if (goog.isFunction(this.iconStroke())) {
@@ -411,7 +411,7 @@ anychart.core.utils.LegendItemSettings.prototype.serialize = function() {
   //  );
   //} else {
   if (goog.isDef(this.iconStroke()) && !goog.isFunction(this.iconStroke()))
-    json['iconStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.iconStroke()));
+    json['iconStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.iconStroke()));
   //}
 
   //if (goog.isFunction(this.iconHatchFill())) {
@@ -422,7 +422,7 @@ anychart.core.utils.LegendItemSettings.prototype.serialize = function() {
   //  );
   //} else {
   if (goog.isDef(this.iconHatchFill()) && !goog.isFunction(this.iconHatchFill()))
-    json['iconHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.iconHatchFill()));
+    json['iconHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.iconHatchFill()));
   //}
 
   if (goog.isDef(this.iconMarkerFill()) && !goog.isFunction(this.iconMarkerFill()))

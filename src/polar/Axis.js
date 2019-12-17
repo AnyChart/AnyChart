@@ -475,7 +475,7 @@ anychart.polarModule.Axis.prototype.calculateAxisBounds_ = function() {
       var majorTickAngles = [];
       var minorTickAngles = [];
       var radiusDelta = lineThickness / 2;
-      var hasFill = /** @type {acgraph.vector.Fill}*/(this.getOption('fill')) != 'none';
+      var hasFill = /** @type {acgraph.vector.Fill} */(this.getOption('fill')) != 'none';
       var boundsChecker = hasFill ? this.checkCrossesParentRadius_ : this.checkCrossesParentBounds_;
       var overlapMode = !isOrdinal ?
                 anychart.enums.LabelsOverlapMode.NO_OVERLAP :
@@ -863,7 +863,7 @@ anychart.polarModule.Axis.prototype.getRemainingBounds = function() {
  */
 anychart.polarModule.Axis.prototype.configureLabel_ = function(labels, index, ticksArr, angle, radius, radiusDelta) {
   var value = ticksArr[index];
-  var hasFill = /** @type {acgraph.vector.Fill}*/(this.getOption('fill')) != 'none';
+  var hasFill = /** @type {acgraph.vector.Fill} */(this.getOption('fill')) != 'none';
   var formatProvider = this.getLabelsFormatProvider_(index, value);
   var label = labels.getLabel(index);
   if (label) {

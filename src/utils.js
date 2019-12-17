@@ -349,6 +349,17 @@ anychart.utils.normalizeToPercent = function(value, opt_canReturnNaN) {
 
 
 /**
+ * Normalizes passed value to numeric ratio value.
+ * @param {string|number} value Value to normalize. If is string, must be treated as percent.
+ *  Numeric value is treated as ratio value anyway.
+ * @return {number}
+ */
+anychart.utils.normalizeToRatio = function(value) {
+  return anychart.utils.isPercent(value) ? parseFloat(value) / 100 : +value;
+};
+
+
+/**
  * Converts value of any type to number, according to these rules:
  * 1) number -> number
  * 2) string -> number only if it is a number (no parseFloat, just +)
@@ -991,6 +1002,79 @@ anychart.utils.getIntervalFromInfo = function(unit, count) {
 
 
 /**
+ * Returns increased interval value.
+ *
+ * @example
+ *  1) {unit: 'second', count: 1} -> {unit: 'second', count: 2}
+ *  2) {unit: 'second', count: 59} -> {unit: 'minute', count: 1}
+ *  3) {unit: 'hour', count: 23} -> {unit: 'day', count: 1}
+ *  4) {unit: 'day', count: 29} -> {unit: 'month', count: 1}
+ *  5) {unit: 'month', count: 11} -> {unit: 'year', count: 1}
+ *
+ * @param {anychart.enums.Interval} unit - Interval unit.
+ * @param {number} count - Interval unit count.
+ * @return {{unit: anychart.enums.Interval, count: number}} - Increased interval.
+ */
+anychart.utils.getIncreasedIntervalValue = function(unit, count) {
+  switch (unit) {
+    case  anychart.enums.Interval.MILLISECOND:
+      // 1000 iterations will be a lot. Go to seconds.
+      unit = anychart.enums.Interval.SECOND;
+      count = 1;
+      break;
+    case  anychart.enums.Interval.SECOND:
+      if (count < 59) {
+        count++;
+      } else {
+        count = 1;
+        unit = anychart.enums.Interval.MINUTE;
+      }
+      break;
+    case  anychart.enums.Interval.MINUTE:
+      if (count < 59) {
+        count++;
+      } else {
+        count = 1;
+        unit = anychart.enums.Interval.HOUR;
+      }
+      break;
+    case  anychart.enums.Interval.HOUR:
+      if (count < 23) {
+        count++;
+      } else {
+        count = 1;
+        unit = anychart.enums.Interval.DAY;
+      }
+      break;
+    case  anychart.enums.Interval.DAY:
+      if (count < 29) {
+        count++;
+      } else {
+        count = 1;
+        unit = anychart.enums.Interval.MONTH;
+      }
+      break;
+    case  anychart.enums.Interval.MONTH:
+      if (count < 11) {
+        count++;
+      } else {
+        count = 1;
+        unit = anychart.enums.Interval.YEAR;
+      }
+      break;
+    default:
+      count++;
+      break;
+  }
+
+  return {
+    unit: unit,
+    count: count
+  };
+};
+
+
+/**
  * Returns closest aligned pixel.
  * @param {number} value
  * @param {number|boolean} thickness
@@ -1618,7 +1702,7 @@ anychart.utils.json2xml = function(json, opt_rootNodeName, opt_returnAsXmlNode) 
   var root = anychart.utils.json2xml_(json, opt_rootNodeName || 'anychart', result);
   if (root) {
     if (!opt_rootNodeName)
-      root.setAttribute('xmlns', 'http://anychart.com/schemas/8.7.0/xml-schema.xsd');
+      root.setAttribute('xmlns', 'http://anychart.com/schemas/8.7.1/xml-schema.xsd');
     result.appendChild(root);
   }
   return opt_returnAsXmlNode ? result : goog.dom.xml.serialize(result);
@@ -2429,7 +2513,6 @@ anychart.utils.getMarkerDrawer = function(type) {
            * @return {!acgraph.vector.Path}
            */
           (function(path, x, y, size, opt_strokeThickness) {
-            opt_strokeThickness = opt_strokeThickness || 0;
             var height = size * 2;
             var width = height / 2;
 
@@ -2750,7 +2833,7 @@ anychart.utils.decomposeArguments = function(namedArguments, opt_options, opt_de
     }
 
     if (goog.isDef(opt_defaults)) {
-      result[name] = result[name] || opt_defaults[name];
+      result[name] = goog.isDef(result[name]) ? result[name] : opt_defaults[name];
     }
   });
 

@@ -235,6 +235,13 @@ anychart.ganttModule.Controller = function(opt_isResources) {
    */
   this.timeouts = [];
 
+  /**
+   * Contains map of items that are collapsed.
+   * Added for https://anychart.atlassian.net/browse/ENV-1391.
+   * @type {Object.<anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem>}
+   */
+  this.collapsedItemsMap = {};
+
 };
 goog.inherits(anychart.ganttModule.Controller, anychart.core.Base);
 
@@ -310,6 +317,7 @@ anychart.ganttModule.Controller.prototype.dataInvalidated_ = function(event) {
    We have to initialize rebuilding of visible data items.
    */
   if (event.hasSignal(anychart.Signal.META_CHANGED)) {
+    this.processCollapse(event['item']);
     state |= anychart.ConsistencyState.CONTROLLER_VISIBILITY;
   }
 
@@ -445,6 +453,23 @@ anychart.ganttModule.Controller.prototype.markersToMeta_ = function(item) {
   }
 };
 
+/**
+ * Processes collapsed-state.
+ * @see https://anychart.atlassian.net/browse/ENV-1391.
+ * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)=} opt_item - Item to
+ *  be processed.
+ */
+anychart.ganttModule.Controller.prototype.processCollapse = function(opt_item) {
+  if (opt_item) {
+    var uid = opt_item.uid;
+    if (opt_item.meta(anychart.enums.GanttDataFields.COLLAPSED)) {
+      this.collapsedItemsMap[uid] = opt_item;
+    } else {
+      delete this.collapsedItemsMap[uid];
+    }
+  }
+};
+
 
 /**
  * Item's values auto calculation.
@@ -470,6 +495,9 @@ anychart.ganttModule.Controller.prototype.autoCalcItem_ = function(item, current
   if (goog.isBoolean(collapsed)) {
     item.meta(anychart.enums.GanttDataFields.COLLAPSED, collapsed);
   }
+
+  // Block below is for https://anychart.atlassian.net/browse/ENV-1391.
+  this.processCollapse(item);
 
   this.datesToMeta_(item);
   this.periodsToMeta_(item);
@@ -503,9 +531,9 @@ anychart.ganttModule.Controller.prototype.autoCalcItem_ = function(item, current
       var metaEnd = child.meta(anychart.enums.GanttDataFields.ACTUAL_END);
       var childEnd = /** @type {number} */ ((goog.isNumber(metaEnd) && !isNaN(metaEnd)) ? metaEnd : (child.meta('autoEnd') || childStart));
 
-      var progressValue = child.get(anychart.enums.GanttDataFields.PROGRESS_VALUE);
+      var progressValue = /** @type {number|string} */ (child.get(anychart.enums.GanttDataFields.PROGRESS_VALUE));
       if (goog.isDefAndNotNull(progressValue)) {
-        progressValue = anychart.utils.isPercent(progressValue) ? parseFloat(progressValue) / 100 : +progressValue;
+        progressValue = anychart.utils.normalizeToRatio(progressValue);
       }
 
       var childProgress = goog.isDefAndNotNull(progressValue) ? progressValue : (child.meta('autoProgress') || 0);
@@ -921,6 +949,8 @@ anychart.ganttModule.Controller.prototype.data = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if ((this.data_ != opt_value) && (anychart.utils.instanceOf(opt_value, anychart.treeDataModule.Tree) || anychart.utils.instanceOf(opt_value, anychart.treeDataModule.View))) {
       var dispatchWorkingCancel = false;
+      this.collapsedItemsMap = {};
+
       if (this.data_) { //Stop listening old tree.
         this.data_.unlistenSignals(this.dataInvalidated_, this);
         dispatchWorkingCancel = true;
@@ -1396,6 +1426,7 @@ anychart.ganttModule.Controller.prototype.collapseAll_ = function(value) {
   while (traverser.advance()) {
     var item = traverser.current();
     item.meta(anychart.enums.GanttDataFields.COLLAPSED, value);
+    this.processCollapse(item);
   }
 
   this.data_.resumeSignalsDispatching(true);

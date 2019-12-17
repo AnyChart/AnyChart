@@ -266,7 +266,7 @@ anychart.surfaceModule.Axis.prototype.drawLine = function() {
 
 /** @inheritDoc */
 anychart.surfaceModule.Axis.prototype.getLabelDrawPosition = function(ratio, labelBounds, staggerSize, tickLength, pixelShift, labelsSidePosition, isMajor) {
-  var bounds = /** @type {goog.math.Rect}*/(this.parentBounds());
+  var bounds = /** @type {goog.math.Rect} */(this.parentBounds());
   var labels, ticks;
   if (isMajor) {
     labels = this.labels();
@@ -299,7 +299,7 @@ anychart.surfaceModule.Axis.prototype.getLabelDrawPosition = function(ratio, lab
       // hack, bc we can only set zIndex for labelsFactory as a whole, not individual labels
       zIndex = this.zIndex() + (this.rotationY_ < 0 ? 2 : -2);
 
-      var convertedPoints = anychart.surfaceModule.math.pointsToScreenCoordinates([point, nextPoint], /** @type {goog.math.Rect}*/(bounds));
+      var convertedPoints = anychart.surfaceModule.math.pointsToScreenCoordinates([point, nextPoint], /** @type {goog.math.Rect} */(bounds));
 
       startX = convertedPoints[0][1];
       startY = convertedPoints[0][2];
@@ -439,12 +439,12 @@ anychart.surfaceModule.Axis.prototype.getLabelPositionXY = function(bounds, rati
       nextPoint = anychart.surfaceModule.math.applyTransformationMatrixToPoint(this.preparedMatrix_, nextPoint);
 
       // hack, bc we can only set zIndex for labelsFactory as a whole, not individual labels
-      if (/** @type {number}*/(this.rotationY_) < 0)
+      if (/** @type {number} */(this.rotationY_) < 0)
         zIndex = this.zIndex() + 2;
       else
         zIndex = this.zIndex() - 2;
 
-      var convertedPoints = anychart.surfaceModule.math.pointsToScreenCoordinates([point, nextPoint], /** @type {goog.math.Rect}*/(bounds));
+      var convertedPoints = anychart.surfaceModule.math.pointsToScreenCoordinates([point, nextPoint], /** @type {goog.math.Rect} */(bounds));
 
       startX = convertedPoints[0][1];
       startY = convertedPoints[0][2];
@@ -474,7 +474,7 @@ anychart.surfaceModule.Axis.prototype.getLabelPositionXY = function(bounds, rati
       labelPoint.push((m * nextPoint[2] + n * point[2]));
 
       // hack, bc we can only set zIndex for labelsFactory as a whole, not individual labels
-      if (/** @type {number}*/(this.rotationY_) < 0)
+      if (/** @type {number} */(this.rotationY_) < 0)
         zIndex = this.zIndex() + 2;
       else
         zIndex = this.zIndex() - 2;

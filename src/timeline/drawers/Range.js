@@ -73,7 +73,7 @@ anychart.timelineModule.drawers.Range.prototype.drawSubsequentPoint = function(p
  * @param {acgraph.vector.Path} path
  */
 anychart.timelineModule.drawers.Range.prototype.drawPointShape = function(point, path) {
-  var startX = /** @type {number}*/(point.meta('startX'));
+  var startX = /** @type {number} */(point.meta('startX'));
   var endX = /** @type {number} */(point.meta('endX'));
   var zero = /** @type {number} */(point.meta('zero'));
   var axisHeight = /** @type {number} */(point.meta('axisHeight'));
@@ -99,7 +99,7 @@ anychart.timelineModule.drawers.Range.prototype.drawPointShape = function(point,
     pointUpperLine = pointZero + endY;
   }
 
-  var thickness = anychart.utils.extractThickness(/** @type {acgraph.vector.Stroke}*/(path.stroke()));
+  var thickness = anychart.utils.extractThickness(/** @type {acgraph.vector.Stroke} */(path.stroke()));
   startX = anychart.utils.applyPixelShift(startX, thickness);
   endX = anychart.utils.applyPixelShift(endX, thickness);
 

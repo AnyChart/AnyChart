@@ -696,7 +696,7 @@ anychart.radarModule.Axis.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     this.line_.clear();
-    this.line_.stroke(/** @type {acgraph.vector.Stroke}*/(this.getOption('stroke')));
+    this.line_.stroke(/** @type {acgraph.vector.Stroke} */(this.getOption('stroke')));
 
     lineDrawer = this.drawLine_;
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);

@@ -37,6 +37,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
   'defaultDataGrid': {
     'isStandalone': true,
     'headerHeight': 25,
+    'fixedColumns': false,
 
     'backgroundFill': 'none',
     'columnStroke': anychart.core.defaultTheme.ganttDefaultStroke,
@@ -237,6 +238,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       'progress': {
         'height': '100%',
         'anchor': 'left-center',
+        'drawOverEnd': true,
         'rendering': {
           'shapes': [
             {
@@ -355,7 +357,30 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     },
 
     'baselines': {
-      'above': false
+      'above': false,
+      'progress': {
+        'height': '50%',
+        'anchor': 'left-bottom',
+        'position': 'left-bottom',
+        'drawOverEnd': true,
+        'rendering': {
+          'shapes': [
+            {
+              'name': 'path',
+              'shapeType': 'path',
+              'zIndex': 11,
+              'disablePointerEvents': true
+            }
+          ]
+        },
+        'labels': {
+          'format': '{%baselineProgress}'
+        },
+        'edit': {
+          'fill': '#eaeaea',
+          'stroke': '#545f69'
+        }
+      }
     },
 
     'connectors': {
@@ -540,7 +565,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
           'enabled': false
         },
         'tooltip': {
-          'format': 'Start Date: {%start}\nEnd Date: {%end}\nBaseline Start: {%baselineStart}\nBaseline End: {%baselineEnd}\nComplete: {%progress}'
+          'format': 'Start Date: {%start}\nEnd Date: {%end}\nBaseline Start: {%baselineStart}\nBaseline End: {%baselineEnd}\nComplete: {%progress}\nBaseline Progress: {%baselineProgress}'
         }
       },
       'milestones': {

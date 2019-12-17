@@ -90,7 +90,7 @@ anychart.graphModule.elements.Layout.prototype.SUPPORTED_SIGNALS = anychart.Sign
  * Call layout function for current layout type.
  */
 anychart.graphModule.elements.Layout.prototype.getCoordinatesForCurrentLayout = function() {
-  var type = /**@type {anychart.enums.LayoutType}*/(this.getOption('type'));
+  var type = /** @type {anychart.enums.LayoutType} */(this.getOption('type'));
 
   switch (type) {
     case anychart.enums.LayoutType.FORCED:
@@ -207,7 +207,7 @@ anychart.graphModule.elements.Layout.prototype.forceLayout_ = function() {
     angle += step;
   }
 
-  var iterationCount = /**@type {number}*/(this.getOption('iterationCount'));
+  var iterationCount = /** @type {number} */(this.getOption('iterationCount'));
   for (var iteration = 0; iteration < iterationCount; iteration++) {
 
     for (i = 0, length = nodes.length; i < length; i++) {

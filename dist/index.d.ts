@@ -1,4 +1,4 @@
-// Type definitions for AnyChart JavaScript Charting Library, v8.7.0
+// Type definitions for AnyChart JavaScript Charting Library, v8.7.1
 // Project: https://www.anychart.com/
 // Definitions by: AnyChart <https://www.anychart.com>
 declare namespace anychart {
@@ -220,6 +220,8 @@ declare namespace anychart.charts {
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.Sunburst;
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.Sunburst;
         selectRectangleMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.Sunburst;
+        selectRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Sunburst;
         selected(): anychart.core.StateSettings;
         selected(settings?: Object): anychart.charts.Sunburst;
         shareAsJpg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
@@ -235,8 +237,6 @@ declare namespace anychart.charts {
         sort(sortFunction?: ((dataItem_1:anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem,dataItem_2:anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)=>number)): anychart.charts.Sunburst;
         startAngle(): string | number;
         startAngle(startAngle?: string | number): anychart.charts.Sunburst;
-        startRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
-        startRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Sunburst;
         startSelectRectangleMarquee(repeat?: boolean): anychart.charts.Sunburst;
         stroke(): anychart.graphics.vector.Stroke | (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill);
         stroke(strokeFunction?: (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill)): anychart.charts.Sunburst;
@@ -379,6 +379,8 @@ declare namespace anychart.charts {
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.Surface;
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.Surface;
         selectRectangleMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.Surface;
+        selectRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Surface;
         shareAsJpg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
         shareAsPdf(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, paperSizeOrWidth?: number | string, landscapeOrWidth?: number | boolean, x?: number, y?: number, filename?: string): void;
         shareAsPng(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, filename?: string): void;
@@ -387,8 +389,6 @@ declare namespace anychart.charts {
         shareWithLinkedIn(captionOrOptions?: string | Object, description?: string): void;
         shareWithPinterest(linkOrOptions?: string | Object, description?: string): void;
         shareWithTwitter(): void;
-        startRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
-        startRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Surface;
         startSelectRectangleMarquee(repeat?: boolean): anychart.charts.Surface;
         stroke(): anychart.graphics.vector.Stroke;
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Surface;
@@ -566,6 +566,8 @@ declare namespace anychart.charts {
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.TreeMap;
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.TreeMap;
         selectRectangleMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.TreeMap;
+        selectRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.TreeMap;
         selected(): anychart.core.StateSettings;
         selected(settings?: Object): anychart.charts.TreeMap;
         selectionMode(): string;
@@ -580,8 +582,6 @@ declare namespace anychart.charts {
         shareWithTwitter(): void;
         sort(): string;
         sort(type?: string): anychart.charts.TreeMap;
-        startRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
-        startRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.TreeMap;
         startSelectRectangleMarquee(repeat?: boolean): anychart.charts.TreeMap;
         stroke(): anychart.graphics.vector.Stroke | (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill);
         stroke(strokeFunction?: (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill)): anychart.charts.TreeMap;
@@ -740,6 +740,8 @@ declare namespace anychart.charts {
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.Timeline;
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.Timeline;
         selectRectangleMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.Timeline;
+        selectRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Timeline;
         shareAsJpg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
         shareAsPdf(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, paperSizeOrWidth?: number | string, landscapeOrWidth?: number | boolean, x?: number, y?: number, filename?: string): void;
         shareAsPng(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, filename?: string): void;
@@ -748,8 +750,6 @@ declare namespace anychart.charts {
         shareWithLinkedIn(captionOrOptions?: string | Object, description?: string): void;
         shareWithPinterest(linkOrOptions?: string | Object, description?: string): void;
         shareWithTwitter(): void;
-        startRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
-        startRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Timeline;
         title(): anychart.core.ui.Title;
         title(settings?: boolean | Object | string): anychart.charts.Timeline;
         toA11yTable(title?: string, asString?: boolean): Element | string;
@@ -946,6 +946,8 @@ declare namespace anychart.charts {
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.Cartesian;
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.Cartesian;
         selectRectangleMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.Cartesian;
+        selectRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Cartesian;
         selected(): anychart.core.StateSettings;
         selected(settings?: Object): anychart.charts.Cartesian;
         shareAsJpg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
@@ -958,8 +960,6 @@ declare namespace anychart.charts {
         shareWithTwitter(): void;
         spline(data?: anychart.data.View | anychart.data.Set | Array<any> | string, csvSettings?: string | anychart.data.TextParsingSettings): anychart.core.cartesian.series.Spline;
         splineArea(data?: anychart.data.View | anychart.data.Set | Array<any> | string, csvSettings?: string | anychart.data.TextParsingSettings): anychart.core.cartesian.series.SplineArea;
-        startRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
-        startRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Cartesian;
         startSelectRectangleMarquee(repeat?: boolean): anychart.charts.Cartesian;
         stepArea(data?: anychart.data.View | anychart.data.Set | Array<any> | string, csvSettings?: string | anychart.data.TextParsingSettings): anychart.core.cartesian.series.StepArea;
         stepLine(data?: anychart.data.View | anychart.data.Set | Array<any> | string, csvSettings?: string | anychart.data.TextParsingSettings): anychart.core.cartesian.series.StepLine;
@@ -1119,6 +1119,8 @@ declare namespace anychart.charts {
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.Bullet;
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.Bullet;
         selectRectangleMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.Bullet;
+        selectRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Bullet;
         shareAsJpg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
         shareAsPdf(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, paperSizeOrWidth?: number | string, landscapeOrWidth?: number | boolean, x?: number, y?: number, filename?: string): void;
         shareAsPng(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, filename?: string): void;
@@ -1127,8 +1129,6 @@ declare namespace anychart.charts {
         shareWithLinkedIn(captionOrOptions?: string | Object, description?: string): void;
         shareWithPinterest(linkOrOptions?: string | Object, description?: string): void;
         shareWithTwitter(): void;
-        startRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
-        startRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Bullet;
         startSelectRectangleMarquee(repeat?: boolean): anychart.charts.Bullet;
         title(): anychart.core.ui.Title;
         title(settings?: boolean | Object | string): anychart.charts.Bullet;
@@ -1298,6 +1298,8 @@ declare namespace anychart.charts {
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.Polar;
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.Polar;
         selectRectangleMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.Polar;
+        selectRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Polar;
         selected(): anychart.core.StateSettings;
         selected(settings?: Object): anychart.charts.Polar;
         shareWithFacebook(captionOrOptions?: string | Object, link?: string, name?: string, description?: string): void;
@@ -1308,8 +1310,6 @@ declare namespace anychart.charts {
         sortPointsByX(enabled?: boolean): anychart.charts.Polar;
         startAngle(): string | number;
         startAngle(angle?: string | number): anychart.charts.Polar;
-        startRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
-        startRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Polar;
         startSelectRectangleMarquee(repeat?: boolean): anychart.charts.Polar;
         title(): anychart.core.ui.Title;
         title(settings?: boolean | Object | string): anychart.charts.Polar;
@@ -1455,6 +1455,8 @@ declare namespace anychart.charts {
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.Pert;
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.Pert;
         selectRectangleMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.Pert;
+        selectRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Pert;
         shareAsJpg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
         shareAsPdf(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, paperSizeOrWidth?: number | string, landscapeOrWidth?: number | boolean, x?: number, y?: number, filename?: string): void;
         shareAsPng(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, filename?: string): void;
@@ -1463,8 +1465,6 @@ declare namespace anychart.charts {
         shareWithLinkedIn(captionOrOptions?: string | Object, description?: string): void;
         shareWithPinterest(linkOrOptions?: string | Object, description?: string): void;
         shareWithTwitter(): void;
-        startRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
-        startRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Pert;
         startSelectRectangleMarquee(repeat?: boolean): anychart.charts.Pert;
         tasks(): anychart.core.pert.Tasks;
         tasks(settings?: Object): anychart.charts.Pert;
@@ -1648,6 +1648,8 @@ declare namespace anychart.charts {
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.Scatter;
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.Scatter;
         selectRectangleMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.Scatter;
+        selectRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Scatter;
         selected(): anychart.core.StateSettings;
         selected(settings?: Object): anychart.charts.Scatter;
         shareAsJpg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
@@ -1658,8 +1660,6 @@ declare namespace anychart.charts {
         shareWithLinkedIn(captionOrOptions?: string | Object, description?: string): void;
         shareWithPinterest(linkOrOptions?: string | Object, description?: string): void;
         shareWithTwitter(): void;
-        startRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
-        startRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Scatter;
         startSelectRectangleMarquee(repeat?: boolean): anychart.charts.Scatter;
         textMarker(index?: number): anychart.core.axisMarkers.Text;
         textMarker(settings?: Object | boolean): anychart.charts.Scatter;
@@ -1836,6 +1836,8 @@ declare namespace anychart.charts {
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.Pareto;
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.Pareto;
         selectRectangleMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.Pareto;
+        selectRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Pareto;
         selected(): anychart.core.StateSettings;
         selected(settings?: Object): anychart.charts.Pareto;
         shareAsJpg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
@@ -1846,8 +1848,6 @@ declare namespace anychart.charts {
         shareWithLinkedIn(captionOrOptions?: string | Object, description?: string): void;
         shareWithPinterest(linkOrOptions?: string | Object, description?: string): void;
         shareWithTwitter(): void;
-        startRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
-        startRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Pareto;
         startSelectRectangleMarquee(repeat?: boolean): anychart.charts.Pareto;
         textMarker(index?: number): anychart.core.axisMarkers.Text;
         textMarker(settings?: Object | boolean): anychart.charts.Pareto;
@@ -2099,8 +2099,8 @@ declare namespace anychart.charts {
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.Venn;
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.Venn;
         selectRectangleMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.Venn;
-        startRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
-        startRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Venn;
+        selectRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Venn;
         startSelectRectangleMarquee(repeat?: boolean): anychart.charts.Venn;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.charts.Venn;
@@ -2252,6 +2252,8 @@ declare namespace anychart.charts {
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.Waterfall;
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.Waterfall;
         selectRectangleMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.Waterfall;
+        selectRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Waterfall;
         selected(): anychart.core.StateSettings;
         selected(settings?: Object): anychart.charts.Waterfall;
         shareAsJpg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
@@ -2262,8 +2264,6 @@ declare namespace anychart.charts {
         shareWithLinkedIn(captionOrOptions?: string | Object, description?: string): void;
         shareWithPinterest(linkOrOptions?: string | Object, description?: string): void;
         shareWithTwitter(): void;
-        startRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
-        startRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Waterfall;
         startSelectRectangleMarquee(repeat?: boolean): anychart.charts.Waterfall;
         textMarker(index?: number): anychart.core.axisMarkers.Text;
         textMarker(settings?: Object | boolean): anychart.charts.Waterfall;
@@ -2480,8 +2480,8 @@ declare namespace anychart.charts {
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.TagCloud;
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.TagCloud;
         selectRectangleMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.TagCloud;
-        startRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
-        startRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.TagCloud;
+        selectRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.TagCloud;
         startSelectRectangleMarquee(repeat?: boolean): anychart.charts.TagCloud;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.charts.TagCloud;
@@ -2634,6 +2634,8 @@ declare namespace anychart.charts {
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.Cartesian3d;
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.Cartesian3d;
         selectRectangleMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.Cartesian3d;
+        selectRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Cartesian3d;
         selected(): anychart.core.StateSettings;
         selected(settings?: Object): anychart.charts.Cartesian3d;
         shareAsJpg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
@@ -2644,8 +2646,6 @@ declare namespace anychart.charts {
         shareWithLinkedIn(captionOrOptions?: string | Object, description?: string): void;
         shareWithPinterest(linkOrOptions?: string | Object, description?: string): void;
         shareWithTwitter(): void;
-        startRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
-        startRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Cartesian3d;
         startSelectRectangleMarquee(repeat?: boolean): anychart.charts.Cartesian3d;
         textMarker(index?: number): anychart.core.axisMarkers.Text;
         textMarker(settings?: Object | boolean): anychart.charts.Cartesian3d;
@@ -2794,6 +2794,8 @@ declare namespace anychart.charts {
         plot(index?: number): anychart.core.stock.Plot;
         plot(settings?: Object | boolean): anychart.charts.Stock;
         plot(index?: number, settings?: Object | boolean): anychart.charts.Stock;
+        plotsManualBounds(): boolean;
+        plotsManualBounds(value: boolean): anychart.charts.Stock;
         preserveSelectedRangeOnDataUpdate(): boolean;
         preserveSelectedRangeOnDataUpdate(enabled?: boolean): anychart.charts.Stock;
         print(paperSize?: anychart.graphics.vector.PaperSize, landscape?: boolean): void;
@@ -2823,6 +2825,8 @@ declare namespace anychart.charts {
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.Stock;
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.Stock;
         selectRectangleMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.Stock;
+        selectRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Stock;
         shareAsJpg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
         shareAsPdf(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, paperSizeOrWidth?: number | string, landscapeOrWidth?: number | boolean, x?: number, y?: number, filename?: string): void;
         shareAsPng(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, filename?: string): void;
@@ -2833,8 +2837,6 @@ declare namespace anychart.charts {
         shareWithTwitter(): void;
         splitters(): anychart.core.stock.splitters.Settings;
         splitters(settings?: boolean | Object): anychart.charts.Stock;
-        startRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
-        startRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Stock;
         startSelectRectangleMarquee(repeat?: boolean): anychart.charts.Stock;
         startZoomMarquee(repeat?: boolean, asRect?: boolean): anychart.charts.Stock;
         title(): anychart.core.ui.Title;
@@ -3000,6 +3002,8 @@ declare namespace anychart.charts {
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.Resource;
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.Resource;
         selectRectangleMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.Resource;
+        selectRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Resource;
         shareAsJpg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
         shareAsPdf(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, paperSizeOrWidth?: number | string, landscapeOrWidth?: number | boolean, x?: number, y?: number, filename?: string): void;
         shareAsPng(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, filename?: string): void;
@@ -3010,8 +3014,6 @@ declare namespace anychart.charts {
         shareWithTwitter(): void;
         splitterStroke(): anychart.graphics.vector.Stroke;
         splitterStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Resource;
-        startRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
-        startRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Resource;
         startSelectRectangleMarquee(repeat?: boolean): anychart.charts.Resource;
         timeLine(): anychart.core.gantt.TimeLineHeader;
         timeLine(settings?: Object | boolean): anychart.charts.Resource;
@@ -3176,6 +3178,8 @@ declare namespace anychart.charts {
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.Wordtree;
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.Wordtree;
         selectRectangleMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.Wordtree;
+        selectRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Wordtree;
         shareAsJpg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
         shareAsPdf(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, paperSizeOrWidth?: number | string, landscapeOrWidth?: number | boolean, x?: number, y?: number, filename?: string): void;
         shareAsPng(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, filename?: string): void;
@@ -3184,8 +3188,6 @@ declare namespace anychart.charts {
         shareWithLinkedIn(captionOrOptions?: string | Object, description?: string): void;
         shareWithPinterest(linkOrOptions?: string | Object, description?: string): void;
         shareWithTwitter(): void;
-        startRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
-        startRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Wordtree;
         startSelectRectangleMarquee(repeat?: boolean): anychart.charts.Wordtree;
         title(): anychart.core.ui.Title;
         title(settings?: boolean | Object | string): anychart.charts.Wordtree;
@@ -3450,8 +3452,8 @@ declare namespace anychart.charts {
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.Sparkline;
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.Sparkline;
         selectRectangleMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.Sparkline;
-        startRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
-        startRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Sparkline;
+        selectRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Sparkline;
         startSelectRectangleMarquee(repeat?: boolean): anychart.charts.Sparkline;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.charts.Sparkline;
@@ -3586,6 +3588,8 @@ declare namespace anychart.charts {
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.Radar;
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.Radar;
         selectRectangleMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.Radar;
+        selectRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Radar;
         selected(): anychart.core.StateSettings;
         selected(settings?: Object): anychart.charts.Radar;
         shareAsJpg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
@@ -3598,8 +3602,6 @@ declare namespace anychart.charts {
         shareWithTwitter(): void;
         startAngle(): string | number;
         startAngle(angle?: string | number): anychart.charts.Radar;
-        startRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
-        startRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Radar;
         startSelectRectangleMarquee(repeat?: boolean): anychart.charts.Radar;
         title(): anychart.core.ui.Title;
         title(settings?: boolean | Object | string): anychart.charts.Radar;
@@ -3765,6 +3767,8 @@ declare namespace anychart.charts {
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.LinearGauge;
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.LinearGauge;
         selectRectangleMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.LinearGauge;
+        selectRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.LinearGauge;
         shareAsJpg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
         shareAsPdf(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, paperSizeOrWidth?: number | string, landscapeOrWidth?: number | boolean, x?: number, y?: number, filename?: string): void;
         shareAsPng(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, filename?: string): void;
@@ -3773,8 +3777,6 @@ declare namespace anychart.charts {
         shareWithLinkedIn(captionOrOptions?: string | Object, description?: string): void;
         shareWithPinterest(linkOrOptions?: string | Object, description?: string): void;
         shareWithTwitter(): void;
-        startRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
-        startRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.LinearGauge;
         startSelectRectangleMarquee(repeat?: boolean): anychart.charts.LinearGauge;
         tank(dataIndex: number): anychart.core.linearGauge.pointers.Tank;
         thermometer(dataIndex: number): anychart.core.linearGauge.pointers.Thermometer;
@@ -3931,6 +3933,8 @@ declare namespace anychart.charts {
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.HeatMap;
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.HeatMap;
         selectRectangleMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.HeatMap;
+        selectRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.HeatMap;
         selected(): anychart.core.StateSettings;
         selected(settings?: Object): anychart.charts.HeatMap;
         shareAsJpg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
@@ -3941,8 +3945,6 @@ declare namespace anychart.charts {
         shareWithLinkedIn(captionOrOptions?: string | Object, description?: string): void;
         shareWithPinterest(linkOrOptions?: string | Object, description?: string): void;
         shareWithTwitter(): void;
-        startRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
-        startRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.HeatMap;
         startSelectRectangleMarquee(repeat?: boolean): anychart.charts.HeatMap;
         stroke(): anychart.graphics.vector.Stroke | (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill);
         stroke(value?: (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill)): anychart.charts.HeatMap;
@@ -4168,8 +4170,8 @@ declare namespace anychart.charts {
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.Gantt;
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.Gantt;
         selectRectangleMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.Gantt;
-        startRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
-        startRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Gantt;
+        selectRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Gantt;
         tooltip(): anychart.core.ui.Tooltip;
         tooltip(settings?: Object | boolean): anychart.charts.Gantt;
         startSelectRectangleMarquee(repeat?: boolean): anychart.charts.Gantt;
@@ -4283,6 +4285,8 @@ declare namespace anychart.charts {
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.Graph;
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.Graph;
         selectRectangleMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.Graph;
+        selectRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Graph;
         shareAsJpg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
         shareAsPdf(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, paperSizeOrWidth?: number | string, landscapeOrWidth?: number | boolean, x?: number, y?: number, filename?: string): void;
         shareAsPng(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, filename?: string): void;
@@ -4291,8 +4295,6 @@ declare namespace anychart.charts {
         shareWithLinkedIn(captionOrOptions?: string | Object, description?: string): void;
         shareWithPinterest(linkOrOptions?: string | Object, description?: string): void;
         shareWithTwitter(): void;
-        startRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
-        startRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Graph;
         startSelectRectangleMarquee(repeat?: boolean): anychart.charts.Graph;
         title(): anychart.core.ui.Title;
         title(settings?: boolean | Object | string): anychart.charts.Graph;
@@ -4452,8 +4454,8 @@ declare namespace anychart.charts {
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.Sankey;
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.Sankey;
         selectRectangleMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.Sankey;
-        startRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
-        startRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Sankey;
+        selectRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Sankey;
         startSelectRectangleMarquee(repeat?: boolean): anychart.charts.Sankey;
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.charts.Sankey;
@@ -4588,6 +4590,8 @@ declare namespace anychart.charts {
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.CircularGauge;
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.CircularGauge;
         selectRectangleMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.CircularGauge;
+        selectRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.CircularGauge;
         shareAsJpg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
         shareAsPdf(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, paperSizeOrWidth?: number | string, landscapeOrWidth?: number | boolean, x?: number, y?: number, filename?: string): void;
         shareAsPng(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, filename?: string): void;
@@ -4598,8 +4602,6 @@ declare namespace anychart.charts {
         shareWithTwitter(): void;
         startAngle(): number;
         startAngle(angle?: string | number): anychart.charts.CircularGauge;
-        startRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
-        startRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.CircularGauge;
         startSelectRectangleMarquee(repeat?: boolean): anychart.charts.CircularGauge;
         stroke(): anychart.graphics.vector.Stroke;
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.CircularGauge;
@@ -4764,6 +4766,8 @@ declare namespace anychart.charts {
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.Mekko;
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.Mekko;
         selectRectangleMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.Mekko;
+        selectRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Mekko;
         selected(): anychart.core.StateSettings;
         selected(settings?: Object): anychart.charts.Mekko;
         shareAsJpg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
@@ -4774,8 +4778,6 @@ declare namespace anychart.charts {
         shareWithLinkedIn(captionOrOptions?: string | Object, description?: string): void;
         shareWithPinterest(linkOrOptions?: string | Object, description?: string): void;
         shareWithTwitter(): void;
-        startRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
-        startRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Mekko;
         startSelectRectangleMarquee(repeat?: boolean): anychart.charts.Mekko;
         textMarker(index?: number): anychart.core.axisMarkers.Text;
         textMarker(settings?: Object | boolean): anychart.charts.Mekko;
@@ -4968,6 +4970,8 @@ declare namespace anychart.charts {
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.Pie;
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.Pie;
         selectRectangleMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.Pie;
+        selectRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Pie;
         selected(): anychart.core.StateSettings;
         selected(settings?: Object): anychart.charts.Pie;
         shareAsJpg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
@@ -4982,8 +4986,6 @@ declare namespace anychart.charts {
         sort(value?: string): anychart.charts.Pie;
         startAngle(): string | number;
         startAngle(angle?: string | number): anychart.charts.Pie;
-        startRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
-        startRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Pie;
         startSelectRectangleMarquee(repeat?: boolean): anychart.charts.Pie;
         stroke(): anychart.graphics.vector.Stroke | (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill);
         stroke(fillFunction?: (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill)): anychart.charts.Pie;
@@ -5155,6 +5157,8 @@ declare namespace anychart.charts {
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.Funnel;
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.Funnel;
         selectRectangleMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.Funnel;
+        selectRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Funnel;
         selected(): anychart.core.StateSettings;
         selected(settings?: Object): anychart.charts.Funnel;
         shareAsJpg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
@@ -5165,8 +5169,6 @@ declare namespace anychart.charts {
         shareWithLinkedIn(captionOrOptions?: string | Object, description?: string): void;
         shareWithPinterest(linkOrOptions?: string | Object, description?: string): void;
         shareWithTwitter(): void;
-        startRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
-        startRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Funnel;
         startSelectRectangleMarquee(repeat?: boolean): anychart.charts.Funnel;
         stroke(): anychart.graphics.vector.Stroke | (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill);
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Funnel;
@@ -5356,13 +5358,16 @@ declare namespace anychart.charts {
         selectPolygonMarqueeFill(): anychart.graphics.vector.Fill;
         selectPolygonMarqueeFill(color: anychart.graphics.vector.Fill): anychart.charts.Map;
         selectPolygonMarqueeMarker(config?: Object): anychart.charts.Map;
-        selectPolygonMarqueeStroke(color: anychart.graphics.vector.Stroke): anychart.charts.Map;
+        selectPolygonMarqueeStroke(color?: anychart.graphics.vector.Stroke): anychart.charts.Map;
         selectRectangleMarqueeFill(): anychart.graphics.vector.Fill;
         selectRectangleMarqueeFill(color: anychart.graphics.vector.Fill | Array<anychart.graphics.vector.GradientKey|string>): anychart.charts.Map;
         selectRectangleMarqueeFill(color: string, opacity?: number): anychart.charts.Map;
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.Map;
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.Map;
         selectRectangleMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.Map;
+        selectRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Map;
+        selectRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
         selected(): anychart.core.StateSettings;
         selected(settings?: Object): anychart.charts.Map;
         shareAsJpg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
@@ -5373,9 +5378,6 @@ declare namespace anychart.charts {
         shareWithLinkedIn(captionOrOptions?: string | Object, description?: string): void;
         shareWithPinterest(linkOrOptions?: string | Object, description?: string): void;
         shareWithTwitter(): void;
-        startRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
-        startRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Map;
-        startRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
         startSelectPolygonMarquee(repeat?: boolean): anychart.charts.Map;
         startSelectRectangleMarquee(repeat?: boolean): anychart.charts.Map;
         title(): anychart.core.ui.Title;
@@ -5551,6 +5553,8 @@ declare namespace anychart.charts {
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.Pyramid;
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.Pyramid;
         selectRectangleMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.Pyramid;
+        selectRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Pyramid;
         selected(): anychart.core.StateSettings;
         selected(settings?: Object): anychart.charts.Pyramid;
         shareAsJpg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
@@ -5561,8 +5565,6 @@ declare namespace anychart.charts {
         shareWithLinkedIn(captionOrOptions?: string | Object, description?: string): void;
         shareWithPinterest(linkOrOptions?: string | Object, description?: string): void;
         shareWithTwitter(): void;
-        startRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
-        startRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Pyramid;
         startSelectRectangleMarquee(repeat?: boolean): anychart.charts.Pyramid;
         stroke(): anychart.graphics.vector.Stroke | (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill);
         stroke(value?: anychart.graphics.vector.Stroke | (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill)): anychart.charts.Pyramid;
@@ -5987,6 +5989,8 @@ declare namespace anychart.core {
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.core.SeparateChart;
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.core.SeparateChart;
         selectRectangleMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.core.SeparateChart;
+        selectRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.SeparateChart;
         shareAsJpg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
         shareAsPdf(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, paperSizeOrWidth?: number | string, landscapeOrWidth?: number | boolean, x?: number, y?: number, filename?: string): void;
         shareAsPng(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, filename?: string): void;
@@ -5995,8 +5999,6 @@ declare namespace anychart.core {
         shareWithLinkedIn(captionOrOptions?: string | Object, description?: string): void;
         shareWithPinterest(linkOrOptions?: string | Object, description?: string): void;
         shareWithTwitter(): void;
-        startRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
-        startRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.SeparateChart;
         title(): anychart.core.ui.Title;
         title(settings?: boolean | Object | string): anychart.core.SeparateChart;
         toA11yTable(title?: string, asString?: boolean): Element | string;
@@ -6109,6 +6111,8 @@ declare namespace anychart.core {
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.core.Chart;
         selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.core.Chart;
         selectRectangleMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.core.Chart;
+        selectRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.Chart;
         shareAsJpg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
         shareAsPdf(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, paperSizeOrWidth?: number | string, landscapeOrWidth?: number | boolean, x?: number, y?: number, filename?: string): void;
         shareAsPng(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, filename?: string): void;
@@ -6117,8 +6121,6 @@ declare namespace anychart.core {
         shareWithLinkedIn(captionOrOptions?: string | Object, description?: string): void;
         shareWithPinterest(linkOrOptions?: string | Object, description?: string): void;
         shareWithTwitter(): void;
-        startRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
-        startRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.Chart;
         startSelectRectangleMarquee(repeat?: boolean): anychart.core.Chart;
         title(): anychart.core.ui.Title;
         title(settings?: boolean | Object | string): anychart.core.Chart;
@@ -13875,6 +13877,8 @@ declare namespace anychart.core.gantt.elements {
     interface ProgressElement extends anychart.core.gantt.elements.TimelineElement {
         anchor(): string;
         anchor(anchor?: string): anychart.core.gantt.elements.ProgressElement;
+        drawOverEnd(): boolean;
+        drawOverEnd(value: boolean): anychart.core.gantt.elements.ProgressElement;
         edit(): anychart.core.gantt.edit.ElementEdit;
         edit(settings?: Object | boolean): anychart.core.gantt.elements.ProgressElement;
         enabled(): boolean;
@@ -13911,6 +13915,47 @@ declare namespace anychart.core.gantt.elements {
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
     }
+    interface BaselineProgressElement extends anychart.core.gantt.elements.ProgressElement {
+        anchor(): string;
+        anchor(anchor?: string): anychart.core.gantt.elements.BaselineProgressElement;
+        edit(): anychart.core.gantt.edit.ElementEdit;
+        edit(settings?: Object | boolean): anychart.core.gantt.elements.BaselineProgressElement;
+        enabled(): boolean;
+        enabled(settings?: boolean): anychart.core.gantt.elements.BaselineProgressElement;
+        fill(): anychart.graphics.vector.Fill | string;
+        fill(color: anychart.graphics.vector.Fill | Array<anychart.graphics.vector.GradientKey|string>): anychart.core.gantt.elements.BaselineProgressElement;
+        fill(fillFunction?: (()=>anychart.graphics.vector.Fill)): anychart.core.gantt.elements.BaselineProgressElement;
+        fill(color: string, opacity?: number): anychart.core.gantt.elements.BaselineProgressElement;
+        fill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.core.gantt.elements.BaselineProgressElement;
+        fill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.core.gantt.elements.BaselineProgressElement;
+        fill(imageSettings: anychart.graphics.vector.Fill): anychart.core.gantt.elements.BaselineProgressElement;
+        height(): string | number;
+        height(height?: string | number): anychart.core.gantt.elements.BaselineProgressElement;
+        labels(): anychart.core.ui.LabelsFactory;
+        labels(settings?: Object | boolean): anychart.core.gantt.elements.BaselineProgressElement;
+        normal(): anychart.core.StateSettings;
+        normal(settings?: Object): anychart.core.gantt.elements.BaselineProgressElement;
+        offset(): string | number;
+        offset(offset?: string | number): anychart.core.gantt.elements.BaselineProgressElement;
+        position(): string;
+        position(position?: string): anychart.core.gantt.elements.BaselineProgressElement;
+        rendering(): anychart.core.gantt.rendering.Settings;
+        rendering(settings?: Object): anychart.core.gantt.elements.BaselineProgressElement;
+        selected(): anychart.core.StateSettings;
+        selected(settings?: Object): anychart.core.gantt.elements.BaselineProgressElement;
+        stroke(): anychart.graphics.vector.Stroke | string;
+        stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.gantt.elements.BaselineProgressElement;
+        stroke(settings?: Object): anychart.core.gantt.elements.BaselineProgressElement;
+        drawOverEnd(): boolean;
+        drawOverEnd(value: boolean): anychart.core.gantt.elements.BaselineProgressElement;
+        tooltip(): anychart.core.ui.Tooltip;
+        tooltip(value?: Object | boolean): anychart.core.gantt.elements.BaselineProgressElement;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
+    }
     interface BaselinesElement extends anychart.core.gantt.elements.TimelineElement {
         above(): boolean;
         above(enabled?: boolean): anychart.core.gantt.elements.BaselinesElement;
@@ -13935,6 +13980,8 @@ declare namespace anychart.core.gantt.elements {
         offset(offset?: string | number): anychart.core.gantt.elements.BaselinesElement;
         position(): string;
         position(position?: string): anychart.core.gantt.elements.BaselinesElement;
+        progress(): anychart.core.gantt.elements.BaselineProgressElement;
+        progress(settings?: Object): anychart.core.gantt.elements.BaselinesElement;
         removeAllListeners(type?: string): number;
         rendering(): anychart.core.gantt.rendering.Settings;
         rendering(settings?: Object): anychart.core.gantt.elements.BaselinesElement;
@@ -29937,6 +29984,8 @@ declare namespace anychart.scales {
         getRange(): {[prop:string]:number};
         getTotalRange(): {[prop:string]:number};
         inverseTransform(ratio: number): number;
+        maxTicksCount(): number;
+        maxTicksCount(count?: number): anychart.scales.GanttDateTime;
         maximum(): number;
         maximum(maximum?: number): anychart.scales.GanttDateTime;
         maximumGap(): number;
@@ -32317,6 +32366,7 @@ declare namespace anychart.ui {
         printPaperSizes(paperSizeList?: Array<anychart.graphics.vector.PaperSize>): anychart.ui.GanttToolbar;
         target(): anychart.core.Chart;
         target(target?: anychart.core.Chart): anychart.ui.GanttToolbar;
+        updateLocalizedCaptions(): anychart.ui.GanttToolbar;
     }
     interface Preloader {
         decorate(element: Element): void;
