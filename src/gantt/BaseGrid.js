@@ -576,7 +576,11 @@ anychart.ganttModule.BaseGrid.isMilestone = function(item, opt_info) {
  */
 anychart.ganttModule.BaseGrid.isBaseline = function(item, opt_info) {
   var info = opt_info || anychart.ganttModule.BaseGrid.getProjectItemInfo(item);
-  return info.isValidBaseline || info.baselineProgressPresents;
+  /*
+    If item has baselineProgressValue field and has valid start and end assume it is a baseline.
+    isValidTask field has true value if item has valid actualStart and valid actualEnd values.
+   */
+  return info.isValidBaseline || (info.isValidTask && info.baselineProgressPresents);
 };
 
 
