@@ -415,7 +415,7 @@ anychart.wordtreeModule.Chart.prototype.dataInvalidated_ = function(event) {
  */
 anychart.wordtreeModule.Chart.prototype.handleMouseClick = function(event) {
   if (event['button'] != acgraph.events.BrowserEvent.MouseButton.LEFT) return;
-  var tag = /**@type {anychart.wordtreeModule.Chart.DOMdata}*/(event['domTarget'].tag);
+  var tag = /** @type {anychart.wordtreeModule.Chart.DOMdata} */(event['domTarget'].tag);
   if (tag && tag.node) {
     this.showAll();
     this.drillTo(tag.node);
@@ -516,11 +516,11 @@ anychart.wordtreeModule.Chart.prototype.generateNodes = function(implicitDataFor
  * */
 anychart.wordtreeModule.Chart.prototype.insertArrayInToTree = function(rootNode, array) {
   if (array.length) {
-    var children = rootNode.getChildren(),
-      has = false,
-      node;
+    var children = rootNode.getChildren();
+    var has = false;
+    var node;
     for (var i = 0; i < rootNode.numChildren(); i++) {
-      if (/**@type{string}*/(children[i].get('value')) == array[0]) {
+      if (/** @type {string} */(children[i].get('value')) == array[0]) {
         has = true;
         break;
       }
@@ -564,7 +564,7 @@ anychart.wordtreeModule.Chart.prototype.getSentences = function(text) {
 anychart.wordtreeModule.Chart.prototype.getWords = function(sentence) {
   var array = sentence.split(/([!?,;:.&"-]+|\S*[A-Z]\.|\S*(?:[^!?,;:.\s&-]))/);
   array = goog.array.filter(array, function(word) {
-    return /**@type {boolean}*/(word.length && word != ' ');
+    return /** @type {boolean} */(word.length && word != ' ');
   });
   return array;
 };
@@ -576,7 +576,7 @@ anychart.wordtreeModule.Chart.prototype.getWords = function(sentence) {
  * @return {Array<string>} text represented as array of string arrays.
  * */
 anychart.wordtreeModule.Chart.prototype.proceedText = function(text) {
-  var sentences = this.getSentences(/**@type {string}*/(text));
+  var sentences = this.getSentences(/** @type {string} */(text));
   var sentencesAsArrayOfWords = [];
   for (var i = 0; i < sentences.length; i++) {
     sentencesAsArrayOfWords.push(this.getWords(sentences[i]));
@@ -606,7 +606,7 @@ anychart.wordtreeModule.Chart.prototype.proceedData = function(data) {
       }
     }
   } else if (goog.typeOf(data) == 'string') {
-    this.implicitData = this.proceedText(/**@type {string}*/(data));
+    this.implicitData = this.proceedText(/** @type {string} */(data));
   } else {
     this.implicitData = [[data.toString()]];
   }
@@ -643,7 +643,7 @@ anychart.wordtreeModule.Chart.prototype.implicitDataSetup_ = function(data) {
 anychart.wordtreeModule.Chart.prototype.data = function(opt_value, opt_fillMethod) {
   if (goog.isDef(opt_value)) {
     if ((anychart.utils.instanceOf(opt_value, anychart.treeDataModule.Tree) ||
-      anychart.utils.instanceOf(opt_value, anychart.treeDataModule.View))) {
+            anychart.utils.instanceOf(opt_value, anychart.treeDataModule.View))) {
       if (this.data_ != opt_value) {
         if (this.data_) {
           this.data_.unlistenSignals(this.dataInvalidated_, this);
@@ -654,7 +654,7 @@ anychart.wordtreeModule.Chart.prototype.data = function(opt_value, opt_fillMetho
         this.invalidate(anychart.ConsistencyState.TREE_DATA | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
       }
     } else if (goog.typeOf(opt_value) == 'array' && goog.typeOf(opt_value[0]) == 'object') {
-      this.data(/**@type {anychart.treeDataModule.Tree}*/(anychart.data.tree(/**@type {Array<Object>}*/(opt_value), opt_fillMethod)));
+      this.data(/** @type {anychart.treeDataModule.Tree} */(anychart.data.tree(/** @type {Array<Object>} */(opt_value), opt_fillMethod)));
     } else if (goog.isNull(opt_value)) {
       if (this.data_) {
         this.data_.unlistenSignals(this.dataInvalidated_);
@@ -669,7 +669,7 @@ anychart.wordtreeModule.Chart.prototype.data = function(opt_value, opt_fillMetho
        * @type {string|
        * Array<Object>|
        * Array<Array<string>>|
-       * Array<string>}*/(opt_value));
+       * Array<string>} */(opt_value));
     }
 
     return this;
@@ -771,7 +771,7 @@ anychart.wordtreeModule.Chart.prototype.getFontSize = function(node, hasHidden) 
   if (node) {
     var fontSize = node.get('fontSize');
     if (goog.isDefAndNotNull(fontSize)) {
-      return /**@type {number}*/(fontSize);
+      return /** @type {number} */(fontSize);
     } else {
       var parent = node.getParent();
       if (parent) {
@@ -781,12 +781,12 @@ anychart.wordtreeModule.Chart.prototype.getFontSize = function(node, hasHidden) 
           return fontSize;
         }
       }
-      var maxFontSize = /**@type {number}*/(this.getOption('maxFontSize')),
-        minFontSize = /**@type {number}*/(this.getOption('minFontSize'));
+      var maxFontSize = /** @type {number} */(this.getOption('maxFontSize'));
+      var minFontSize = /** @type {number} */(this.getOption('minFontSize'));
 
       //relation between line height and font size.
       //suppose line height equal node height
-      var calculated = /**@type {number}*/(node.meta('height')) / this.lineHeightFactor_;
+      var calculated = /** @type {number} */(node.meta('height')) / this.lineHeightFactor_;
       fontSize = goog.math.clamp(calculated, minFontSize, maxFontSize); //clamp font size between max and min
       node.meta('fontSize', fontSize);
       return fontSize;
@@ -803,14 +803,14 @@ anychart.wordtreeModule.Chart.prototype.applyFontSettings = function() {
   var node;
   var textElement;
 
-  var fontColor,
-    fontDecoration,
-    fontStyle,
-    fontOpacity,
-    chartFontColor = this.getOption('fontColor'),
-    chartFontDecoration = this.getOption('fontDecoration'),
-    chartFontStyle = this.getOption('fontStyle'),
-    chartFontOpacity = this.getOption('fontOpacity');
+  var fontColor;
+  var fontDecoration;
+  var fontStyle;
+  var fontOpacity;
+  var chartFontColor = this.getOption('fontColor');
+  var chartFontDecoration = this.getOption('fontDecoration');
+  var chartFontStyle = this.getOption('fontStyle');
+  var chartFontOpacity = this.getOption('fontOpacity');
 
   for (var i = 0; i < this.textElements_.length; i++) {
     textElement = this.textElements_[i];
@@ -822,10 +822,10 @@ anychart.wordtreeModule.Chart.prototype.applyFontSettings = function() {
       fontStyle = node.get('fontStyle') || chartFontStyle;
       fontOpacity = node.get('fontOpacity') || chartFontOpacity;
     }
-    textElement.color(/**@type{string}*/(fontColor));
-    textElement.decoration(/**@type {(acgraph.vector.Text.Decoration|string)}*/(fontDecoration));
-    textElement.fontStyle(/**@type {(acgraph.vector.Text.FontStyle|string)}*/(fontStyle));
-    textElement.opacity(/**@type {number}*/(fontOpacity));
+    textElement.color(/** @type{string} */(fontColor));
+    textElement.decoration(/** @type {(acgraph.vector.Text.Decoration|string)} */(fontDecoration));
+    textElement.fontStyle(/** @type {(acgraph.vector.Text.FontStyle|string)} */(fontStyle));
+    textElement.opacity(/** @type {number} */(fontOpacity));
     textElement.selectable(false);
   }
 };
@@ -853,9 +853,9 @@ anychart.wordtreeModule.Chart.prototype.getTextElement = function() {
  * */
 anychart.wordtreeModule.Chart.prototype.nodeWidth = function(node) {
   if (node) {
-    var lengthOfWord = /**@type {number}*/(node.meta('textWidth')),
-      wordPadding = /**@type {number}*/(this.connectors().getOption('offset')),
-      parent = node.getParent();
+    var lengthOfWord = /** @type {number} */(node.meta('textWidth'));
+    var wordPadding = /** @type {number} */(this.connectors().getOption('offset'));
+    var parent = node.getParent();
     if (parent && parent.numChildren() > 1)
       lengthOfWord += wordPadding;
     if (node.numChildren() > 1)
@@ -873,17 +873,17 @@ anychart.wordtreeModule.Chart.prototype.nodeWidth = function(node) {
  * */
 anychart.wordtreeModule.Chart.prototype.leaf = function(node) {
   if (node) {
-    var childrenCount = node.numChildren(),
-      leaf = 0;
-    if (childrenCount)
+    var childrenCount = node.numChildren();
+    var leaf = 0;
+    if (childrenCount) {
       for (var i = 0; i < childrenCount; i++) {
-        leaf += this.leaf(/**@type {anychart.treeDataModule.Tree.DataItem}}*/(node.getChildAt(i)));
+        leaf += this.leaf(/** @type {anychart.treeDataModule.Tree.DataItem}} */(node.getChildAt(i)));
       }
-    else
-      leaf = /**@type {number}*/(node.get('weight')) || 1;
+    } else {
+      leaf = /** @type {number} */(node.get('weight')) || 1;
+    }
 
-    node.meta('leafCount', leaf)
-      .meta('weight', leaf);
+    node.meta('leafCount', leaf).meta('weight', leaf);
     return leaf;
   }
   return 0;
@@ -896,15 +896,15 @@ anychart.wordtreeModule.Chart.prototype.leaf = function(node) {
  * */
 anychart.wordtreeModule.Chart.prototype.depth = function(node) {
   if (node) {
-    var childrenCount = node.numChildren(),
-      depth = 0,
-      parent = node.getParent();
+    var childrenCount = node.numChildren();
+    var depth = 0;
+    var parent = node.getParent();
     if (parent) {
       depth = parent.meta('depth') + 1;
     }
     node.meta('depth', depth);
     for (var i = 0; i < childrenCount; i++) {
-      this.depth(/**@type {anychart.treeDataModule.Tree.DataItem}*/(node.getChildAt(i)));
+      this.depth(/** @type {anychart.treeDataModule.Tree.DataItem} */(node.getChildAt(i)));
     }
   }
 };
@@ -921,9 +921,9 @@ anychart.wordtreeModule.Chart.prototype.depth = function(node) {
  * @return {acgraph.vector.Text} text element with main settings.
  * */
 anychart.wordtreeModule.Chart.prototype.drawText = function(x, y, text, fontSize, fontFamily, fontWeight) {
-  var textElement = /**@type {acgraph.vector.Text}*/(this.getTextElement());
+  var textElement = /** @type {acgraph.vector.Text} */(this.getTextElement());
   if (!textElement.tag) {
-    textElement.tag = /**@type {anychart.wordtreeModule.Chart.DOMdata}*/({});
+    textElement.tag = /** @type {anychart.wordtreeModule.Chart.DOMdata} */({});
   }
 
   textElement.text(text);
@@ -963,27 +963,29 @@ anychart.wordtreeModule.Chart.prototype.drawConnector = function(x0, y0, x1, y1,
  * @param {boolean} hasHidden Has hidden siblings.
  * */
 anychart.wordtreeModule.Chart.prototype.drawNode = function(node, hasHidden) {
-  var paddingLeft = 0,
-    parent = node.getParent(),
-    word,
-    height,
-    width;
+  var paddingLeft = 0;
+  var parent = node.getParent();
+  var word;
+  var height;
+  var width;
+
   if (parent && parent.numChildren() > 1) {
-    paddingLeft += /**@type {number}*/(this.connectors().getOption('offset'));
+    paddingLeft += /** @type {number} */(this.connectors().getOption('offset'));
   }
-  word = /**@type {string}*/(node.get('value'));
+  word = /** @type {string} */(node.get('value'));
+
   if (node.numChildren() == 1) {
     word += ' ';
   }
 
-  var wordPositionX = /**@type {number}*/(node.meta('nodePositionX')) + paddingLeft,
-    wordPositionY = /**@type {number}*/(node.meta('nodePositionY')),
-    fontFamily = /**@type {string}*/(node.get('fontFamily') || this.getOption('fontFamily')),
-    fontWeight = /**@type {string|number}*/(node.get('fontWeight') || this.getOption('fontWeight')),
-    fontSize = this.getFontSize(node, hasHidden),
-    textElement = this.drawText(wordPositionX, wordPositionY, word, fontSize, fontFamily, fontWeight);
+  var wordPositionX = /** @type {number} */(node.meta('nodePositionX')) + paddingLeft;
+  var wordPositionY = /** @type {number} */(node.meta('nodePositionY'));
+  var fontFamily = /** @type {string} */(node.get('fontFamily') || this.getOption('fontFamily'));
+  var fontWeight = /** @type {string|number} */(node.get('fontWeight') || this.getOption('fontWeight'));
+  var fontSize = this.getFontSize(node, hasHidden);
+  var textElement = this.drawText(wordPositionX, wordPositionY, word, fontSize, fontFamily, fontWeight);
 
-  textElement.tag = /**@type {anychart.wordtreeModule.Chart.DOMdata}*/({
+  textElement.tag = /** @type {anychart.wordtreeModule.Chart.DOMdata} */({
     node: node,
     type: 'node',
     isPlug: false
@@ -992,10 +994,9 @@ anychart.wordtreeModule.Chart.prototype.drawNode = function(node, hasHidden) {
   height = textElement.getTextHeight();
   width = textElement.getTextWidth();
 
-  node.meta('textHeight', height)
-    .meta('textWidth', width);
+  node.meta('textHeight', height).meta('textWidth', width);
 
-  wordPositionY -= /**@type {number}*/(height) / 2;
+  wordPositionY -= /** @type {number} */(height) / 2;
 
   var wordEnd = wordPositionX + width;
   var boundsRight = this.contentBounds.getRight();
@@ -1019,17 +1020,17 @@ anychart.wordtreeModule.Chart.prototype.drawNode = function(node, hasHidden) {
 anychart.wordtreeModule.Chart.prototype.drawAllChildren = function(node, currentNodeStartPosition, xOffsetFromPrevious, yMin, yMax) {
   if (node) {
     node.meta('connectorInXPosition', currentNodeStartPosition[0])
-      .meta('connectorInYPosition', currentNodeStartPosition[1])
-      .meta('connectorOutXPosition', currentNodeStartPosition[0] + this.nodeWidth(node))
-      .meta('connectorOutYPosition', currentNodeStartPosition[1]);
+        .meta('connectorInYPosition', currentNodeStartPosition[1])
+        .meta('connectorOutXPosition', currentNodeStartPosition[0] + this.nodeWidth(node))
+        .meta('connectorOutYPosition', currentNodeStartPosition[1]);
     var boundsRight = this.contentBounds.getRight();
     if (xOffsetFromPrevious < boundsRight) { //Draw nodes only inside bounds
-      var connectors = this.connectors(),
-        childrenLength = /**@type {number}*/(node.numChildren()),
-        connectorLength = /**@type {number}*/(connectors.getOption('length')),
-        connectorOffset = /**@type {number}*/(connectors.getOption('offset')),
-        connectorCurveFactor = /**@type {number}*/(connectors.getOption('curveFactor')),
-        minFontSize = /**@type {number}*/(this.getOption('minFontSize'));
+      var connectors = this.connectors();
+      var childrenLength = /** @type {number} */(node.numChildren());
+      var connectorLength = /** @type {number} */(connectors.getOption('length'));
+      var connectorOffset = /** @type {number} */(connectors.getOption('offset'));
+      var connectorCurveFactor = /** @type {number} */(connectors.getOption('curveFactor'));
+      var minFontSize = /** @type {number} */(this.getOption('minFontSize'));
 
       if (childrenLength) {
         //Add padding top and bottom
@@ -1053,13 +1054,13 @@ anychart.wordtreeModule.Chart.prototype.drawAllChildren = function(node, current
 
         //If children height less then minimum font size draw count of children leaf
         if ((yMax - yMin) / childrenLength < minFontSize * this.lineHeightFactor_ && childrenLength > 1) {
-          var text = '+' + node.meta('leafCount') + ' ' + this.getOption('postfix'),
-            y = (yMax + yMin) / 2,
-            x = xOffsetFromPrevious,
-            textElement = this.drawText(x, y, text,
-              /**@type {number}*/(node.meta('fontSize') || minFontSize),
-              /**@type {string}*/(this.getOption('fontFamily')),
-              /**@type {string|number}*/(this.getOption('fontWeight')));
+          var text = '+' + node.meta('leafCount') + ' ' + this.getOption('postfix');
+          var y = (yMax + yMin) / 2;
+          var x = xOffsetFromPrevious;
+          var textElement = this.drawText(x, y, text,
+              /** @type {number} */(node.meta('fontSize') || minFontSize),
+              /** @type {string} */(this.getOption('fontFamily')),
+              /** @type {string|number} */(this.getOption('fontWeight')));
           y = y - textElement.getTextHeight() / 2;
           textElement.y(y);
           textElement.tag.node = node;
@@ -1071,11 +1072,11 @@ anychart.wordtreeModule.Chart.prototype.drawAllChildren = function(node, current
           }
 
           this.drawConnector(
-            /**@type {number}*/(node.meta('connectorOutXPosition')),
-            /**@type {number}*/(node.meta('connectorOutYPosition')),
-            /**@type {number}*/(node.meta('connectorOutXPosition')) + this.offsetForPlug_,
-            (yMax + yMin) / 2,
-            /**@type {number}*/(connectorCurveFactor)
+              /** @type {number} */(node.meta('connectorOutXPosition')),
+              /** @type {number} */(node.meta('connectorOutYPosition')),
+              /** @type {number} */(node.meta('connectorOutXPosition')) + this.offsetForPlug_,
+              (yMax + yMin) / 2,
+              /** @type {number} */(connectorCurveFactor)
           );
           return;
         }
@@ -1088,15 +1089,15 @@ anychart.wordtreeModule.Chart.prototype.drawAllChildren = function(node, current
             continue;
           }
 
-          var childrenWeight = currentChildrenElement.meta('leafCount'),
-            nodeWeight = /**@type{number}*/(node.meta('leafCount')),
-            nodeHeight = hasHidden ? (yMax - yMin) : ((yMax - yMin) * Math.max(1, childrenWeight) / Math.max(1, nodeWeight)),
-            yStart = yEndPrev,
-            nextChildXOffset = 0,
-            childPosition,
-            halfTextHeight,
-            widthOfNode,
-            currentChildPosition;
+          var childrenWeight = currentChildrenElement.meta('leafCount');
+          var nodeWeight = /** @type{number} */(node.meta('leafCount'));
+          var nodeHeight = hasHidden ? (yMax - yMin) : ((yMax - yMin) * Math.max(1, childrenWeight) / Math.max(1, nodeWeight));
+          var yStart = yEndPrev;
+          var nextChildXOffset = 0;
+          var childPosition;
+          var halfTextHeight;
+          var widthOfNode;
+          var currentChildPosition;
 
           yEndPrev = yStart + nodeHeight;
           x = xOffsetFromPrevious;
@@ -1104,19 +1105,19 @@ anychart.wordtreeModule.Chart.prototype.drawAllChildren = function(node, current
           childPosition = [x, y];
 
           currentChildrenElement.meta('height', nodeHeight)
-            .meta('nodePositionX', x)
-            .meta('nodePositionY', y);
+              .meta('nodePositionX', x)
+              .meta('nodePositionY', y);
 
           this.drawNode(currentChildrenElement, hasHidden);
 
-          halfTextHeight = /**@type {number}*/(node.meta('textHeight')) / 2;
+          halfTextHeight = /** @type {number} */(node.meta('textHeight')) / 2;
           childPosition[1] -= halfTextHeight;
 
           if (currentChildrenElement.numChildren() != 1) {
             nextChildXOffset += connectorLength;
           }
 
-          widthOfNode = /**@type {number}*/(this.nodeWidth(currentChildrenElement));
+          widthOfNode = /** @type {number} */(this.nodeWidth(currentChildrenElement));
           currentChildPosition = [childPosition[0], childPosition[1] + halfTextHeight];
           nextChildXOffset += childPosition[0] + widthOfNode;
 
@@ -1124,11 +1125,11 @@ anychart.wordtreeModule.Chart.prototype.drawAllChildren = function(node, current
 
           if (node.numChildren() > 1 && !hasHidden)
             this.drawConnector(
-              /**@type {number}*/(node.meta('connectorOutXPosition')),
-              /**@type {number}*/(node.meta('connectorOutYPosition')),
-              /**@type {number}*/(currentChildrenElement.meta('connectorInXPosition')),
-              /**@type {number}*/(currentChildrenElement.meta('connectorInYPosition')),
-              connectorCurveFactor);
+                /** @type {number} */(node.meta('connectorOutXPosition')),
+                /** @type {number} */(node.meta('connectorOutYPosition')),
+                /** @type {number} */(currentChildrenElement.meta('connectorInXPosition')),
+                /** @type {number} */(currentChildrenElement.meta('connectorInYPosition')),
+                connectorCurveFactor);
         }
       }
     }
@@ -1166,15 +1167,15 @@ anychart.wordtreeModule.Chart.prototype.drawContent = function(bounds) {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     this.rootLayer.removeChildren();
-    var nodePosition,
-      element,
-      xOffset,
-      xCoord = bounds.left,
-      yCoord = bounds.top,
-      width = bounds.width,
-      height = bounds.height,
-      connectors = this.connectors(),
-      connectorsOffset = connectors.getOption('offset');
+    var nodePosition;
+    var element;
+    var xOffset;
+    var xCoord = bounds.left;
+    var yCoord = bounds.top;
+    var width = bounds.width;
+    var height = bounds.height;
+    var connectors = this.connectors();
+    var connectorsOffset = connectors.getOption('offset');
 
     //Add text element already drawn in to pool of text elements
     for (var i = 0; i < this.textElements_.length; i++) {
@@ -1188,11 +1189,11 @@ anychart.wordtreeModule.Chart.prototype.drawContent = function(bounds) {
 
     nodePosition = [xCoord + connectorsOffset, yCoord + height / 2];
     node.meta('nodePositionX', nodePosition[0])
-      .meta('nodePositionY', nodePosition[1])
-      .meta('height', height);
+        .meta('nodePositionY', nodePosition[1])
+        .meta('height', height);
     this.drawNode(node, false);
 
-    xOffset = /**@type {number}*/(xCoord + connectorsOffset + this.nodeWidth(node) + (node.numChildren() > 1 ? connectors.getOption('length') : 0));
+    xOffset = /** @type {number} */(xCoord + connectorsOffset + this.nodeWidth(node) + (node.numChildren() > 1 ? connectors.getOption('length') : 0));
     this.drawAllChildren(node, nodePosition, xOffset, yCoord, yCoord + height);
     this.connectorElement_.parent(this.rootLayer);
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
@@ -1207,7 +1208,7 @@ anychart.wordtreeModule.Chart.prototype.drawContent = function(bounds) {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     this.rootLayer.suspend();//suspend layer because method applyFontSettings change settings for many text elements.
-    this.connectorElement_.stroke(/**@type {acgraph.vector.Stroke}*/(this.connectors().getOption('stroke')));
+    this.connectorElement_.stroke(/** @type {acgraph.vector.Stroke} */(this.connectors().getOption('stroke')));
     this.applyFontSettings();
     this.rootLayer.resume();
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
@@ -1239,7 +1240,7 @@ anychart.wordtreeModule.Chart.prototype.setupByJSON = function(config, opt_defau
   anychart.core.settings.deserialize(this, anychart.wordtreeModule.Chart.OWN_DESCRIPTORS, config, opt_default);
 
   if ('wordTreeRawData' in config) {
-    this.data(/**@type {(Array<(Object|Array<string>|string)>)}*/(JSON.parse(config['wordTreeRawData'])));
+    this.data(/** @type {(Array<(Object|Array<string>|string)>)} */(JSON.parse(config['wordTreeRawData'])));
     if ('word' in config) {
       this.word(config['word']);
     }
@@ -1247,7 +1248,7 @@ anychart.wordtreeModule.Chart.prototype.setupByJSON = function(config, opt_defau
       this.implicitDataSetup_(anychart.treeDataModule.Tree.fromJson(config['treeData']));
     }
   } else if ('treeData' in config)
-    this.data(/**@type{anychart.treeDataModule.Tree}*/(anychart.treeDataModule.Tree.fromJson(config['treeData'])));
+    this.data(/** @type {anychart.treeDataModule.Tree} */(anychart.treeDataModule.Tree.fromJson(config['treeData'])));
 
   if ('connectors' in config)
     this.connectors().setupInternal(!!opt_default, config['connectors']);
@@ -1257,7 +1258,13 @@ anychart.wordtreeModule.Chart.prototype.setupByJSON = function(config, opt_defau
 /** @inheritDoc */
 anychart.wordtreeModule.Chart.prototype.disposeInternal = function() {
   anychart.wordtreeModule.Chart.base(this, 'disposeInternal');
-  goog.disposeAll(this.connectors_, this.connectorElement_, this.textElements_, this.textPool_, this.data_, this.rootLayer);
+  goog.disposeAll(
+      this.connectors_,
+      this.connectorElement_,
+      this.textElements_,
+      this.textPool_,
+      this.data_,
+      this.rootLayer);
   this.connectors_ = null;
   this.connectorElement_ = null;
   this.data_ = null;

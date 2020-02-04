@@ -47,19 +47,19 @@ anychart.surfaceModule.Grid.prototype.fillElementBackSide = function() {
   var path;
   if (this.fillElementsBackSide.free.length == 0) {
     path = acgraph.path();
-    path.parent(/** @type {acgraph.vector.ILayer}*/(this.container())).zIndex(/** @type {number}*/(this.zIndex()));
+    path.parent(/** @type {acgraph.vector.ILayer} */(this.container())).zIndex(/** @type {number} */(this.zIndex()));
     path.stroke('none');
     this.fillElementsBackSide.used.push(path);
     return path;
   }
   path = this.fillElementsBackSide.free.pop();
   this.fillElementsBackSide.used.push(path);
-  path.parent(/** @type {acgraph.vector.ILayer}*/(this.container()));
+  path.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
   return path;
 };
 
 
-/**@inheritDoc */
+/** @inheritDoc */
 anychart.surfaceModule.Grid.prototype.clearFillElements = function() {
   anychart.surfaceModule.Grid.base(this, 'clearFillElements');
   var path;
@@ -224,7 +224,7 @@ anychart.surfaceModule.Grid.prototype.drawZGrid = function(innerRatio) {
  */
 anychart.surfaceModule.Grid.prototype.drawXYGrid = function(points) {
   var pointsOriginal = points;
-  var parentBounds = /** @type {goog.math.Rect}*/(this.parentBounds());
+  var parentBounds = /** @type {goog.math.Rect} */(this.parentBounds());
   var matrix = anychart.surfaceModule.math.createTransformationMatrix(this.rotationZ_, this.rotationY_);
   var pointsTransformed = [];
   pointsTransformed[0] = anychart.surfaceModule.math.applyTransformationMatrixToPoint(matrix, pointsOriginal[0]);
@@ -370,7 +370,7 @@ anychart.surfaceModule.Grid.prototype.drawInterlaceHorizontal = function(ratio, 
   pathBackSide.lineTo(pointsToRenderBackSide[3][1], pointsToRenderBackSide[3][2]);
   pathBackSide.close();
 
-  pathBackSide.fill(/** @type {acgraph.vector.Fill}*/(path.fill()));
+  pathBackSide.fill(/** @type {acgraph.vector.Fill} */(path.fill()));
   pathBackSide.zIndex(20);
 };
 
@@ -422,7 +422,7 @@ anychart.surfaceModule.Grid.prototype.drawInterlaceVertical = function(ratio, pr
   pathBackSide.lineTo(pointsToRenderBackSide[3][1], pointsToRenderBackSide[3][2]);
   pathBackSide.close();
 
-  pathBackSide.fill(/** @type {acgraph.vector.Fill}*/(path.fill()));
+  pathBackSide.fill(/** @type {acgraph.vector.Fill} */(path.fill()));
   pathBackSide.zIndex(20);
 };
 

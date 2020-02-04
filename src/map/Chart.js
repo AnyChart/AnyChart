@@ -1353,7 +1353,7 @@ anychart.mapModule.Chart.prototype.getSeriesStatus = function(event) {
   var i, len, series;
 
   if (interactivity.getOption('hoverMode') == anychart.enums.HoverMode.BY_SPOT) {
-    var spotRadius = /** @type {number}*/(interactivity.getOption('spotRadius'));
+    var spotRadius = /** @type {number} */(interactivity.getOption('spotRadius'));
 
     for (i = 0, len = this.seriesList.length; i < len; i++) {
       series = this.seriesList[i];
@@ -4707,7 +4707,7 @@ anychart.mapModule.Chart.prototype.drillTo = function(id, opt_map) {
       for (var i = root.currentBreadcrumbsPath.length; i--;) {
         var crumb = root.currentBreadcrumbsPath[i];
         if (crumb.getId() == id) {
-          target = /** @type {anychart.mapModule.Chart}*/(crumb.getCurrentChart());
+          target = /** @type {anychart.mapModule.Chart} */(crumb.getCurrentChart());
           break;
         }
       }

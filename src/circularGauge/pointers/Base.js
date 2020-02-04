@@ -721,7 +721,7 @@ anychart.circularGaugeModule.pointers.Base.prototype.selectionMode = function(op
     }
     return this;
   }
-  return /** @type {anychart.enums.SelectionMode}*/(this.selectionMode_);
+  return /** @type {anychart.enums.SelectionMode} */(this.selectionMode_);
 };
 
 
@@ -737,7 +737,7 @@ anychart.circularGaugeModule.pointers.Base.prototype.hoverMode = function(opt_va
     }
     return this;
   }
-  return /** @type {anychart.enums.HoverMode}*/(this.hoverMode_);
+  return /** @type {anychart.enums.HoverMode} */(this.hoverMode_);
 };
 
 

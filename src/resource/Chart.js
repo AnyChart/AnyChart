@@ -1562,7 +1562,7 @@ anychart.resourceModule.Chart.prototype.hoverMode = function(opt_value) {
     }
     return this;
   }
-  return /** @type {anychart.enums.HoverMode}*/(this.hoverMode_);
+  return /** @type {anychart.enums.HoverMode} */(this.hoverMode_);
 };
 
 
@@ -1579,7 +1579,7 @@ anychart.resourceModule.Chart.prototype.selectionMode = function(opt_value) {
     }
     return this;
   }
-  return /** @type {anychart.enums.SelectionMode}*/(this.selectMode_);
+  return /** @type {anychart.enums.SelectionMode} */(this.selectMode_);
 };
 
 

@@ -92,7 +92,7 @@ anychart.radarModule.Grid.prototype.drawInterlaceCircuit = function(ratio, prevR
 
     if (xScaleTicksCount != 0) {
       var x, y, angleRad, i, radius, angle, xRatio;
-      var startAngle = /** @type {number}*/(this.getOption('startAngle')) - 90;
+      var startAngle = /** @type {number} */(this.getOption('startAngle')) - 90;
       radius = this.iRadius_ + (this.radius_ - this.iRadius_) * ratio;
       for (i = 0; i < xScaleTicksCount; i++) {
         xRatio = this.xScale().transform(xScaleTicks[i]);

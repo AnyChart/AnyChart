@@ -342,11 +342,11 @@ anychart.graphModule.elements.Edge.prototype.createPath = function(edge) {
 
   path = edge.path;
   path.tag = this.createTag(edge);
-  edge.currentState = /**@type {anychart.SettingsState}*/(this.state(edge));
+  edge.currentState = /** @type {anychart.SettingsState} */(this.state(edge));
   edge.path = path;
 
   if (this.chart_.interactivity().getOption('edges')) {
-    var thickness = this.getEdgeThickness(edge) + /**@type {number}*/(this.chart_.interactivity().getOption('hoverGap'));
+    var thickness = this.getEdgeThickness(edge) + /** @type {number} */(this.chart_.interactivity().getOption('hoverGap'));
     var hoverPath = this.getEdgePath();
     hoverPath.tag = path.tag;
     hoverPath.fill(/** @type {acgraph.vector.SolidFill} */(anychart.color.TRANSPARENT_HANDLER));

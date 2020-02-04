@@ -13,7 +13,7 @@ goog.require('goog.ui.Menu');
  * @extends {goog.ui.Menu}
  */
 anychart.ui.menu.Menu = function(opt_domHelper, opt_renderer) {
-  anychart.ui.menu.Menu.base(this, 'constructor', opt_domHelper, /** @type {goog.ui.MenuRenderer}*/(opt_renderer));
+  anychart.ui.menu.Menu.base(this, 'constructor', opt_domHelper, /** @type {goog.ui.MenuRenderer} */(opt_renderer));
 
   /**
    * Scrollable container.

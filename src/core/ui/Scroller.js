@@ -513,14 +513,14 @@ anychart.core.ui.Scroller.prototype.draw = function() {
 
     this.nonSelectedClipRect.shape(this.pixelBoundsCache);
 
-    var fill = /** @type {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)}*/ (this.getOption('fill'));
+    var fill = /** @type {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)} */ (this.getOption('fill'));
     this.nonSelectedBackground_.fill(fill == 'none' ?
         anychart.color.TRANSPARENT_HANDLER : fill).stroke(null);
 
-    var selectedFill = /** @type {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)}*/ (this.getOption('selectedFill'));
+    var selectedFill = /** @type {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)} */ (this.getOption('selectedFill'));
     this.selectedBackground_.fill(selectedFill == 'none' ?
         anychart.color.TRANSPARENT_HANDLER : selectedFill).stroke(null);
-    this.selectedRangeOutline_.stroke(/**@type {acgraph.vector.Stroke}*/ (this.getOption('outlineStroke'))).fill(null);
+    this.selectedRangeOutline_.stroke(/** @type {acgraph.vector.Stroke} */ (this.getOption('outlineStroke'))).fill(null);
 
     this.colorizeThumb_(this.startThumb_, this.startThumbHovered_);
     this.colorizeThumb_(this.endThumb_, this.endThumbHovered_);
@@ -1022,7 +1022,7 @@ anychart.core.ui.Scroller.prototype.maybeHideThumbs_ = function() {
  * @private
  */
 anychart.core.ui.Scroller.prototype.prepareThumbs_ = function() {
-  var thicknessHalf = (Math.max(acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke}*/(this.getOption('outlineStroke'))), 5) - 1) / 2;
+  var thicknessHalf = (Math.max(acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(this.getOption('outlineStroke'))), 5) - 1) / 2;
   if (this.isHorizontal()) {
     var top = this.pixelBoundsCache.top;
     if (this.thumbs().getOption('enabled')) {

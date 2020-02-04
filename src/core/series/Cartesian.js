@@ -1308,7 +1308,7 @@ anychart.core.series.Cartesian.prototype.selectionMode = function(opt_value) {
     }
     return this;
   }
-  return /** @type {anychart.enums.SelectionMode}*/(this.selectionMode_);
+  return /** @type {anychart.enums.SelectionMode} */(this.selectionMode_);
 };
 
 
@@ -1320,7 +1320,7 @@ anychart.core.series.Cartesian.prototype.hoverMode = function(opt_value) {
   if (goog.isDef(opt_value)) {
     return this;
   }
-  return /** @type {anychart.enums.HoverMode} */((/** @type {anychart.core.CartesianBase}*/(this.chart)).interactivity().getOption('hoverMode'));
+  return /** @type {anychart.enums.HoverMode} */((/** @type {anychart.core.CartesianBase} */(this.chart)).interactivity().getOption('hoverMode'));
 };
 
 

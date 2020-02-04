@@ -1228,7 +1228,7 @@ anychart.treemapModule.Chart.prototype.getMarkersPosition = function(pointState)
   var markerHoverPosition = hoverPointMarker && hoverPointMarker['position'] ? hoverPointMarker['position'] : null;
   var markerSelectPosition = selectPointMarker && selectPointMarker['position'] ? selectPointMarker['position'] : null;
 
-  return /**@type{string}*/((hovered && (markerHoverPosition || this.hovered().markers().getOption('position'))) ||
+  return /** @type{string} */((hovered && (markerHoverPosition || this.hovered().markers().getOption('position'))) ||
       (selected && (markerSelectPosition || this.selected().markers().getOption('position'))) ||
       markerPosition || this.normal().markers().getOption('position'));
 };

@@ -32,7 +32,7 @@ goog.inherits(anychart.graphModule.elements.Group, anychart.graphModule.elements
 
 /** @inheritDoc */
 anychart.graphModule.elements.Group.prototype.setupElements = function() {
-  this.normal().labels().parent(/**@type {anychart.core.ui.LabelsSettings}*/(this.chart_.nodes().labels()));
-  this.hovered().labels().parent(/**@type {anychart.core.ui.LabelsSettings}*/(this.normal().labels()));
-  this.selected().labels().parent(/**@type {anychart.core.ui.LabelsSettings}*/(this.normal().labels()));
+  this.normal().labels().parent(/** @type {anychart.core.ui.LabelsSettings} */(this.chart_.nodes().labels()));
+  this.hovered().labels().parent(/** @type {anychart.core.ui.LabelsSettings} */(this.normal().labels()));
+  this.selected().labels().parent(/** @type {anychart.core.ui.LabelsSettings} */(this.normal().labels()));
 };

@@ -49,7 +49,7 @@ anychart.mapModule.utils.UnboundRegionsSettings.prototype.stroke = function(opt_
     }
     return this;
   }
-  return /** @type {acgraph.vector.Stroke}*/(this.stroke_);
+  return /** @type {acgraph.vector.Stroke} */(this.stroke_);
 };
 
 
@@ -73,7 +73,7 @@ anychart.mapModule.utils.UnboundRegionsSettings.prototype.fill = function(opt_fi
     }
     return this;
   }
-  return /** @type {acgraph.vector.Fill}*/(this.fill_);
+  return /** @type {acgraph.vector.Fill} */(this.fill_);
 };
 
 

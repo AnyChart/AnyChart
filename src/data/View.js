@@ -443,7 +443,7 @@ anychart.data.View.prototype.findClosestByX = function(fieldValue, isOrdinal) {
     }
   }
 
-  return /** @type {Array.<number>}*/(indexes);
+  return /** @type {Array.<number>} */(indexes);
 };
 
 

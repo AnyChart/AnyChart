@@ -702,7 +702,7 @@ anychart.mapModule.Series.prototype.applyZoomMoveTransformToLabel = function(lab
   }
 
   if (goog.isDef(labelRotation))
-    domElement.rotateByAnchor(/** @type {number}*/(labelRotation), /** @type {anychart.enums.Anchor} */(labelAnchor));
+    domElement.rotateByAnchor(/** @type {number} */(labelRotation), /** @type {anychart.enums.Anchor} */(labelAnchor));
 };
 
 
@@ -744,7 +744,7 @@ anychart.mapModule.Series.prototype.applyZoomMoveTransformToMarker = function(ma
   domElement.translate(trX, trY);
 
   if (goog.isDef(markerRotation))
-    domElement.rotateByAnchor(/** @type {number}*/(markerRotation), /** @type {anychart.enums.Anchor} */(markerAnchor));
+    domElement.rotateByAnchor(/** @type {number} */(markerRotation), /** @type {anychart.enums.Anchor} */(markerAnchor));
 };
 
 
@@ -1341,7 +1341,7 @@ anychart.mapModule.Series.prototype.getMiddlePoint = function() {
   if (!feature || !this.isChoropleth())
     return {'x': 0, 'y': 0};
 
-  var pointGeoProp = /** @type {Object}*/(feature['properties']);
+  var pointGeoProp = /** @type {Object} */(feature['properties']);
 
   var middleXYModeGeoSettings = pointGeoProp && pointGeoProp['middleXYMode'];
   var middleXYModeDataSettings = iterator.get('middleXYMode');
@@ -1355,8 +1355,8 @@ anychart.mapModule.Series.prototype.getMiddlePoint = function() {
   } else if (middleXYMode == anychart.enums.MapPointMiddlePositionMode.ABSOLUTE) {
     midX = iterator.get('middle-x');
     midY = iterator.get('middle-y');
-    middleX = /** @type {number}*/(goog.isDef(midX) ? midX : pointGeoProp ? pointGeoProp['middle-x'] : 0);
-    middleY = /** @type {number}*/(goog.isDef(midY) ? midY : pointGeoProp ? pointGeoProp['middle-y'] : 0);
+    middleX = /** @type {number} */(goog.isDef(midX) ? midX : pointGeoProp ? pointGeoProp['middle-x'] : 0);
+    middleY = /** @type {number} */(goog.isDef(midY) ? midY : pointGeoProp ? pointGeoProp['middle-y'] : 0);
 
     middleX = anychart.utils.toNumber(middleX);
     middleY = anychart.utils.toNumber(middleY);
@@ -1594,7 +1594,7 @@ anychart.mapModule.Series.prototype.createChoroplethPositionProvider_ = function
       dataLabelYPos = dataLabel['y'];
     }
 
-    var pointGeoProp = /** @type {Object}*/(feature['properties']);
+    var pointGeoProp = /** @type {Object} */(feature['properties']);
     var geoLabel = pointGeoProp && pointGeoProp['label'];
     var geoLabelPositionMode, geoLabelXPos, geoLabelYPos;
     if (geoLabel) {
@@ -1716,7 +1716,7 @@ anychart.mapModule.Series.prototype.getPositionByRegion = function() {
 
   var features = iterator.meta('features');
   var feature = features && features.length ? features[0] : null;
-  var pointGeoProp = /** @type {Object}*/(feature ? feature['properties'] : null);
+  var pointGeoProp = /** @type {Object} */(feature ? feature['properties'] : null);
 
   var midX = iterator.get('middle-x');
   var midY = iterator.get('middle-y');

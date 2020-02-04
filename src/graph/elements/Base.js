@@ -125,9 +125,9 @@ anychart.graphModule.elements.Base.prototype.setupElements = function() {
   this.setupCreated('hovered', this.hovered_);
   this.setupCreated('selected', this.selected_);
 
-  this.normal_.labels().parent(/**@type {anychart.core.ui.LabelsSettings}*/(this.chart_.labels()));
-  this.hovered_.labels().parent(/**@type {anychart.core.ui.LabelsSettings}*/(this.normal_.labels()));
-  this.selected_.labels().parent(/**@type {anychart.core.ui.LabelsSettings}*/(this.normal_.labels()));
+  this.normal_.labels().parent(/** @type {anychart.core.ui.LabelsSettings} */(this.chart_.labels()));
+  this.hovered_.labels().parent(/** @type {anychart.core.ui.LabelsSettings} */(this.normal_.labels()));
+  this.selected_.labels().parent(/** @type {anychart.core.ui.LabelsSettings} */(this.normal_.labels()));
 };
 
 
@@ -182,19 +182,19 @@ anychart.graphModule.elements.Base.prototype.selected = function(opt_value) {
  * @return {acgraph.vector.Stroke}
  */
 anychart.graphModule.elements.Base.prototype.getStroke = function(context, opt_element) {
-  /**@type {acgraph.vector.Stroke|Function}*/
+  /** @type {acgraph.vector.Stroke|Function} */
   var stroke;
 
   if (goog.isDef(opt_element)) {
-    stroke = /**@type {acgraph.vector.Stroke|Function}*/(this.resolveSettings(opt_element, 'stroke'));
+    stroke = /** @type {acgraph.vector.Stroke|Function} */(this.resolveSettings(opt_element, 'stroke'));
   } else {
-    stroke = /**@type {acgraph.vector.Stroke|Function}*/(this.normal_.getOption('stroke'));
+    stroke = /** @type {acgraph.vector.Stroke|Function} */(this.normal_.getOption('stroke'));
   }
 
   if (goog.isFunction(stroke)) {
     stroke = stroke.call(context, context);
   }
-  return /**@type {acgraph.vector.Stroke}*/(stroke);
+  return /** @type {acgraph.vector.Stroke} */(stroke);
 };
 
 
@@ -205,7 +205,7 @@ anychart.graphModule.elements.Base.prototype.getStroke = function(context, opt_e
  * @return {acgraph.vector.Fill}
  */
 anychart.graphModule.elements.Base.prototype.getFill = function(element, context) {
-  var fill = /**@type {acgraph.vector.Fill}*/(this.resolveSettings(element, 'fill'));
+  var fill = /** @type {acgraph.vector.Fill} */(this.resolveSettings(element, 'fill'));
 
   if (goog.isFunction(fill)) {
     fill = fill.call(context, context);
@@ -229,12 +229,12 @@ anychart.graphModule.elements.Base.prototype.getType = function() {
  * @return {anychart.core.ui.LabelsSettings} instance of LabelSettings.
  */
 anychart.graphModule.elements.Base.prototype.resolveLabelSettings = function(element) {
-  var state = /**@type {anychart.SettingsState}*/(this.state(element));
+  var state = /** @type {anychart.SettingsState} */(this.state(element));
   var stringState = anychart.utils.pointStateToName(state);
   var id = this.getElementId(element);
   var dataRow = element.dataRow;
 
-  var groupSettings = this.chart_.group(/**@type {string}*/(element.groupId));
+  var groupSettings = this.chart_.group(/** @type {string} */(element.groupId));
   if (!this.settingsForLabels[stringState][id]) {
     var specificLblSettings;
 
@@ -244,7 +244,7 @@ anychart.graphModule.elements.Base.prototype.resolveLabelSettings = function(ele
     var labelSettingFromData = iterator.get('labels');
     var labelSettingForState = iterator.get(stringState);
     labelSettingForState = labelSettingForState ? labelSettingForState['labels'] ? labelSettingForState['labels'] : {} : {};
-    var setting = /**@type {Object}*/(labelSettingFromData || {});
+    var setting = /** @type {Object} */(labelSettingFromData || {});
     goog.mixin(setting, labelSettingForState);
     if (!goog.object.isEmpty(setting)) {
       specificLblSettings = new anychart.core.ui.LabelsSettings(true);
@@ -280,7 +280,7 @@ anychart.graphModule.elements.Base.prototype.resolveLabelSettings = function(ele
 
     this.settingsForLabels[stringState][id] = finalLblSetting;
   }
-  return /**@type {anychart.core.ui.LabelsSettings}*/(this.settingsForLabels[stringState][id]);
+  return /** @type {anychart.core.ui.LabelsSettings} */(this.settingsForLabels[stringState][id]);
 };
 
 
@@ -482,10 +482,10 @@ anychart.graphModule.elements.Base.prototype.isLabelEnabled = function(element) 
  * @return {anychart.graphModule.Chart.Tag}
  */
 anychart.graphModule.elements.Base.prototype.createTag = function(element) {
-  var tag = /**@type {anychart.graphModule.Chart.Tag}*/({});
+  var tag = /** @type {anychart.graphModule.Chart.Tag} */({});
   tag.type = this.getType();
   tag.id = this.getElementId(element);
-  tag.currentState = /**@type {anychart.SettingsState}*/(this.state(element));
+  tag.currentState = /** @type {anychart.SettingsState} */(this.state(element));
   return tag;
 };
 

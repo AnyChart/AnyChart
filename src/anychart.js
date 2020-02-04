@@ -439,7 +439,7 @@ anychart.attachDomEvents_ = function() {
   acgraph.events.listen(document, [goog.events.EventType.DOMCONTENTLOADED, goog.events.EventType.READYSTATECHANGE], anychart.completed_, false);
 
   // A fallback to window.onload that will always work
-  acgraph.events.listen(/** @type {EventTarget}*/ (window), goog.events.EventType.LOAD, anychart.completed_, false);
+  acgraph.events.listen(/** @type {EventTarget} */ (window), goog.events.EventType.LOAD, anychart.completed_, false);
 };
 
 
@@ -452,7 +452,7 @@ anychart.detachDomEvents_ = function() {
   var document = anychart.document;
 
   acgraph.events.unlisten(document, [goog.events.EventType.DOMCONTENTLOADED, goog.events.EventType.READYSTATECHANGE], anychart.completed_, false);
-  acgraph.events.unlisten(/** @type {EventTarget}*/ (window), goog.events.EventType.LOAD, anychart.completed_, false);
+  acgraph.events.unlisten(/** @type {EventTarget} */ (window), goog.events.EventType.LOAD, anychart.completed_, false);
 };
 
 

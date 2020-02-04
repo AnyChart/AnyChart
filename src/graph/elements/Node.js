@@ -85,7 +85,7 @@ anychart.graphModule.elements.Node.prototype.SUPPORTED_SIGNALS = anychart.graphM
  */
 anychart.graphModule.elements.Node.prototype.getLabelsLayer = function() {
   if (!this.labelsLayer_) {
-    this.labelsLayerEl_ = /**@type {Element}*/(acgraph.getRenderer().createLayerElement());
+    this.labelsLayerEl_ = /** @type {Element} */(acgraph.getRenderer().createLayerElement());
     this.labelsLayer_ = acgraph.unmanagedLayer(this.labelsLayerEl_);
   }
   return this.labelsLayer_;
@@ -172,7 +172,7 @@ anychart.graphModule.elements.Node.prototype.resolveSettings = function(node, se
       finalSetting = ownNormalSetting;
     }
   }
-  var group = this.chart_.group(/**@type {string}*/(node.groupId));
+  var group = this.chart_.group(/** @type {string} */(node.groupId));
 
   if (goog.isDef(group)) {
     var ownGroupNormalSetting = group[normalStingState]().getOwnOption(setting);
@@ -425,7 +425,7 @@ anychart.graphModule.elements.Node.prototype.drawLabels = function() {
  */
 anychart.graphModule.elements.Node.prototype.stickNode = function(node) {
   var gap = 5;
-  var subGraph = this.chart_.getSubGraphsMap()[/**@type {string}*/(node.subGraphId)];
+  var subGraph = this.chart_.getSubGraphsMap()[/** @type {string} */(node.subGraphId)];
   var closestX, closestY;
   closestX = closestY = Infinity;
   var x = node.position.x;
@@ -464,7 +464,7 @@ anychart.graphModule.elements.Node.prototype.stickNode = function(node) {
  * @return {number}
  */
 anychart.graphModule.elements.Node.prototype.getHeight = function(node) {
-  return /**@type {number}*/(this.resolveSettings(node, 'height'));
+  return /** @type {number} */(this.resolveSettings(node, 'height'));
 };
 
 
@@ -478,7 +478,7 @@ anychart.graphModule.elements.Node.prototype.getWidth = function(node) {
   if (shape == anychart.enums.normalizeMarkerType(shape)) {
     return this.getHeight(node);
   } else {
-    return /**@type {number}*/(this.resolveSettings(node, 'width'));
+    return /** @type {number} */(this.resolveSettings(node, 'width'));
   }
 };
 
@@ -659,7 +659,7 @@ anychart.graphModule.elements.Node.prototype.createPath = function(node) {
   var path = node.path;
 
   path.tag = this.createTag(node);
-  node.currentState = /**@type {anychart.SettingsState}*/(this.state(node));
+  node.currentState = /** @type {anychart.SettingsState} */(this.state(node));
   node.path = path;
   return path;
 };

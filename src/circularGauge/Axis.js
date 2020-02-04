@@ -220,7 +220,7 @@ anychart.circularGaugeModule.Axis.prototype.scale = function(opt_value) {
       this.scale_ = anychart.scales.linear();
       this.scale_.listenSignals(this.scaleInvalidated_, this);
     }
-    return /** @type {anychart.scales.Linear|anychart.scales.Logarithmic}*/(this.scale_);
+    return /** @type {anychart.scales.Linear|anychart.scales.Logarithmic} */(this.scale_);
   }
 };
 

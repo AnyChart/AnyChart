@@ -456,7 +456,7 @@ anychart.colorScalesModule.ui.ColorRange.prototype.drawLine = function() {
       break;
   }
 
-  var stroke = /**@type {acgraph.vector.Stroke|string}*/(this.getOption('stroke'));
+  var stroke = /** @type {acgraph.vector.Stroke|string} */(this.getOption('stroke'));
   stroke = acgraph.vector.normalizeStroke(stroke);
   var lineThickness = !stroke || anychart.utils.isNone(stroke) ? 0 : stroke['thickness'] ? parseFloat(stroke['thickness']) : 1;
   var pixelShift = lineThickness % 2 == 0 ? 0 : 0.5;
@@ -478,7 +478,7 @@ anychart.colorScalesModule.ui.ColorRange.prototype.drawLine = function() {
  */
 anychart.colorScalesModule.ui.ColorRange.prototype.getMarkerSpace_ = function() {
   var markerSpace = 0;
-  var marker = /**@type {anychart.core.ui.MarkersFactory.Marker}*/(this.getCreated('marker'));
+  var marker = /** @type {anychart.core.ui.MarkersFactory.Marker} */(this.getCreated('marker'));
   if (marker && marker.enabled()) {
     var orientation = /** @type {anychart.enums.Orientation} */(this.getOption('orientation'));
     markerSpace = /** @type {number} */(marker.getOption('size')) * 2;
@@ -685,7 +685,7 @@ anychart.colorScalesModule.ui.ColorRange.prototype.showMarker = function(value) 
     // if (isNaN(+value)) return;
 
     var scale = this.scale();
-    var marker = /**@type {anychart.core.ui.MarkersFactory.Marker}*/(this.getCreated('marker'));
+    var marker = /** @type {anychart.core.ui.MarkersFactory.Marker} */(this.getCreated('marker'));
     var target = /** @type {anychart.mapModule.Series|anychart.tagCloudModule.Chart} */(this.target_);
     var targetScale = target.colorScale() || (target.getColorScale ? target.getColorScale() : void 0);
     var isMarker = marker && marker.enabled();
@@ -698,7 +698,7 @@ anychart.colorScalesModule.ui.ColorRange.prototype.showMarker = function(value) 
       if (isNaN(ratio)) return;
 
       var orientation = this.getOption('orientation');
-      var markerSize = /**@type {number}*/(marker.getOption('size'));
+      var markerSize = /** @type {number} */(marker.getOption('size'));
       var x, y, rotation;
       switch (orientation) {
         case anychart.enums.Orientation.TOP:

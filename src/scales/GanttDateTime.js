@@ -171,7 +171,7 @@ anychart.scales.GanttDateTime = function() {
    * @type {number}
    * @private
    */
-  this.maxTicksCount_ = 1000;
+  this.maxTicksCount_ = anychart.scales.GanttDateTime.DEFAULT_MAX_TICKS_COUNT;
 };
 goog.inherits(anychart.scales.GanttDateTime, anychart.core.Base);
 
@@ -248,6 +248,13 @@ anychart.scales.GanttDateTime.MILLISECONDS_IN_DAY = anychart.scales.GanttDateTim
  * @type {number}
  */
 anychart.scales.GanttDateTime.DEFAULT_ZOOM_FACTOR = 1.25;
+
+
+/**
+ * Hardcoded default value of maximum ticks count.
+ * @type {number}
+ */
+anychart.scales.GanttDateTime.DEFAULT_MAX_TICKS_COUNT = 200;
 
 
 /**
@@ -1080,7 +1087,7 @@ anychart.scales.GanttDateTime.prototype.zoomLevels = function(opt_value) {
  */
 anychart.scales.GanttDateTime.prototype.maxTicksCount = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    var val = anychart.utils.normalizeToNaturalNumber(opt_value, 1000, false);
+    var val = anychart.utils.normalizeToNaturalNumber(opt_value, anychart.scales.GanttDateTime.DEFAULT_MAX_TICKS_COUNT, false);
     if (this.maxTicksCount_ != val) {
       this.maxTicksCount_ = val;
       this.consistent = false;

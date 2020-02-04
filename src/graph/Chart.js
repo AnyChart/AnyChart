@@ -373,7 +373,7 @@ anychart.graphModule.Chart.prototype.deselectAllElements_ = function() {
  */
 anychart.graphModule.Chart.prototype.handleMouseClick = function(event) {
   if (!this.preventClickAfterDrag) {
-    var tag = /**@type {anychart.graphModule.Chart.Tag}*/(event['domTarget'].tag);
+    var tag = /** @type {anychart.graphModule.Chart.Tag} */(event['domTarget'].tag);
     if (tag) {
       var element = {id: tag.id, type: tag.type};
       var i;
@@ -423,7 +423,7 @@ anychart.graphModule.Chart.prototype.handleMouseClick = function(event) {
 anychart.graphModule.Chart.prototype.handleMouseOver = function(event) {
   if (!this.dragger_ || !this.dragger_.isDragging()) {
     var domTarget = event['domTarget'];
-    var tag = /**@type {anychart.graphModule.Chart.Tag}*/(domTarget.tag);
+    var tag = /** @type {anychart.graphModule.Chart.Tag} */(domTarget.tag);
     var tooltip;
     if (tag) {
       var type = tag.type;
@@ -457,7 +457,7 @@ anychart.graphModule.Chart.prototype.handleMouseOver = function(event) {
 anychart.graphModule.Chart.prototype.handleMouseMove = function(event) {
   if (!this.dragger_ || !this.dragger_.isDragging()) { //Prevent display tooltip when node is dragging.
     var domTarget = event['domTarget'];
-    var tag = /**@type {anychart.graphModule.Chart.Tag}*/(domTarget.tag);
+    var tag = /** @type {anychart.graphModule.Chart.Tag} */(domTarget.tag);
     var tooltip;
     if (tag) {
       var type = tag.type;
@@ -829,10 +829,10 @@ anychart.graphModule.Chart.prototype.getYWithTranslate = function(y) {
 /** @inheritDoc */
 anychart.graphModule.Chart.prototype.handleMouseOut = function(event) {
   if ((!this.dragger_ || !this.dragger_.isDragging()) ||
-    !this.interactivity().getOption('enabled') ||
-    !this.interactivity().getOption('nodes')) { //Prevent mouse out when node is dragging
+      !this.interactivity().getOption('enabled') ||
+      !this.interactivity().getOption('nodes')) { //Prevent mouse out when node is dragging
     var domTarget = event['domTarget'];
-    var tag = /**@type {anychart.graphModule.Chart.Tag}*/(domTarget.tag);
+    var tag = /** @type {anychart.graphModule.Chart.Tag} */(domTarget.tag);
     if (tag && tag.currentState != anychart.SettingsState.SELECTED) {
       this.updateElementStateById(tag.id, tag.type, anychart.SettingsState.NORMAL);
     }
@@ -1701,7 +1701,7 @@ anychart.graphModule.Chart.prototype.initDragger_ = function(event) {
         }
       }
     }, false, this);
-    this.dragger_.listen(goog.fx.Dragger.EventType.END, /** @this {anychart.graphModule.Chart}*/ function(e) {
+    this.dragger_.listen(goog.fx.Dragger.EventType.END, /** @this {anychart.graphModule.Chart} */ function(e) {
       if (interactivityEnabled) {
         this.isDraggerDragging_ = false;
         if (tag && tag.type == anychart.graphModule.Chart.Element.NODE) {
