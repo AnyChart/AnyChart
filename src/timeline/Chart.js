@@ -711,11 +711,11 @@ anychart.timelineModule.Chart.prototype.calculateMomentSeriesPointsBounds = func
       var positionProvider = series.createPositionProvider(labelsAnchor);
       label = labelsFactory.add(formatProvider, positionProvider);
     }
-    label.draw();
-    var labelBounds = /** @type {!anychart.math.Rect} */(label.getTextElement().getBounds());
-    if (labelsFactory.background().enabled()) {
-      labelBounds = labelsFactory.padding().widenBounds(labelBounds);
-    }
+
+    // Drop cached settings, so that label will be measured with updated settings.
+    label.dropMergedSettings();
+    // Method getDimension() returns full label size, taking padding into account.
+    var labelBounds = labelsFactory.getDimension(label);
 
     var offsetX = labelsFactory.getOption('offsetX') || 0;
 
@@ -936,14 +936,19 @@ anychart.timelineModule.Chart.prototype.calculate = function() {
       }
     }
 
+    var halfHeight = this.dataBounds.height / 2;
     if (this.autoChartTranslating) {
-      if (this.totalRange.sY > -(this.dataBounds.height / 2) && this.totalRange.eY > (this.dataBounds.height / 2)) {
+      if (this.totalRange.sY > -halfHeight && this.totalRange.eY > halfHeight) {
         this.verticalTranslate = this.totalRange.sY + this.dataBounds.height / 2 - halfAxisHeight - scrollerHeightBottom;
         this.invalidateState(anychart.enums.Store.TIMELINE_CHART, anychart.timelineModule.Chart.States.SCROLL, anychart.Signal.NEEDS_REDRAW);
-      } else if (this.totalRange.eY < (this.dataBounds.height / 2) && this.totalRange.sY < -(this.dataBounds.height / 2)) {//white space over the axis
+      } else if (this.totalRange.eY < halfHeight && this.totalRange.sY < -halfHeight) {//white space over the axis
         this.verticalTranslate = this.totalRange.eY - this.dataBounds.height / 2 + halfAxisHeight + scrollerHeightTop;
         this.invalidateState(anychart.enums.Store.TIMELINE_CHART, anychart.timelineModule.Chart.States.SCROLL, anychart.Signal.NEEDS_REDRAW);
       }
+    }
+    // center timeline if there is empty space both above and under
+    if (this.totalRange.sY > -halfHeight && this.totalRange.eY < halfHeight) {
+      this.invalidateState(anychart.enums.Store.TIMELINE_CHART, anychart.timelineModule.Chart.States.SCROLL, anychart.Signal.NEEDS_REDRAW);
     }
   }
 };
