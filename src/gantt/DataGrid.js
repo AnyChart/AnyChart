@@ -635,14 +635,12 @@ anychart.ganttModule.DataGrid.prototype.columnInternal_ = function(opt_indexOrVa
     column.setupInternal(!!opt_default, conf);
     if (column.enabled()) column.container(this.getContentLayer());
     this.columns_[index] = column;
-    this.addSplitter_();
     this.invalidate(anychart.ConsistencyState.DATA_GRID_GRIDS | anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     return this;
   } else {
     if (newColumn) {
       column.container(this.getContentLayer());
       this.columns_[index] = column;
-      this.addSplitter_();
 
       this.invalidate(anychart.ConsistencyState.DATA_GRID_GRIDS | anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
       if (this.getOption('fixedColumns')) {
@@ -650,6 +648,14 @@ anychart.ganttModule.DataGrid.prototype.columnInternal_ = function(opt_indexOrVa
         this.interactivityHandler.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
       }
     }
+
+    /*
+      Create splitters on demand.
+      Because splitters creates only for enabled columns we need check - If another one splitter needed?
+      Then update splitters count.
+     */
+    this.addSplitter_();
+
     return column;
   }
 };
