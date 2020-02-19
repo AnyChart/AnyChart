@@ -1196,8 +1196,8 @@ anychart.stockModule.eventMarkers.Group.prototype.setupByJSON = function(config,
 
 /** @inheritDoc */
 anychart.stockModule.eventMarkers.Group.prototype.disposeInternal = function() {
-  goog.disposeAll(this.shapeManager_, this.normal_, this.hovered_, this.selected_, this.tooltip_);
-  this.normal_ = this.hovered_ = this.selected_ = this.shapeManager_ = this.plot = this.tooltip_ = null;
+  goog.disposeAll(this.shapeManager_, this.normal_, this.hovered_, this.selected_, this.tooltip_, this.labels_);
+  this.normal_ = this.hovered_ = this.selected_ = this.shapeManager_ = this.plot = this.tooltip_ = this.labels_= null;
   anychart.stockModule.eventMarkers.Group.base(this, 'disposeInternal');
 };
 
