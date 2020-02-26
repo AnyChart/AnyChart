@@ -297,6 +297,31 @@ anychart.ganttModule.edit.ElementEdit.prototype.redispatch_ = function(e) {
 
 //endregion
 //region -- Serialization/Deserialization.
+/** @inheritDoc */
+anychart.ganttModule.edit.ElementEdit.prototype.setupSpecial = function(isDefault, var_args) {
+  var resolvedValue = this.resolveSpecialValue(arguments[1]);
+  if (resolvedValue) {
+    if (isDefault) {
+      this.themeSettings['enabled'] = resolvedValue['enabled'];
+    } else {
+      this.enabled(resolvedValue['enabled']);
+    }
+    return true;
+  }
+  return false;
+};
+
+
+/** @inheritDoc */
+anychart.ganttModule.edit.ElementEdit.prototype.resolveSpecialValue = function(var_args) {
+  var arg0 = arguments[0];
+  if (goog.isBoolean(arg0) || goog.isNull(arg0)) {
+    return {'enabled': !!arg0};
+  }
+  return null;
+};
+
+
 /**
  * @inheritDoc
  */
