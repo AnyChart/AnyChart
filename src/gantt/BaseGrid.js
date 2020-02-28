@@ -2300,19 +2300,24 @@ anychart.ganttModule.BaseGrid.prototype.drawRowFills = function() {
 
 
 /**
+ * Check if context menu is visible, if visible hide it.
+ */
+anychart.ganttModule.BaseGrid.prototype.hideContextMenu = function() {
+  if (anychart.window['anychart']['ui']['ContextMenu'] && this.interactivityHandler.contextMenu) {
+    var menu = this.interactivityHandler.contextMenu();
+    if (menu.isVisible()) menu.hide();
+  }
+};
+
+
+/**
  * Mouse wheel default handler.
  * TODO (A.Kudryavtsev): Test it carefully on Windows OS!
  * @param {goog.events.MouseWheelEvent} e - Mouse wheel event.
- * @private
+ * @protected
  */
-anychart.ganttModule.BaseGrid.prototype.mouseWheelHandler_ = function(e) {
-  if (anychart.window['anychart']['ui']['ContextMenu']) {
-    if (this.interactivityHandler.contextMenu) {
-      var menu = this.interactivityHandler.contextMenu();
-      if (menu.isVisible()) menu.hide();
-    }
-  }
-
+anychart.ganttModule.BaseGrid.prototype.mouseWheelHandler = function(e) {
+  this.hideContextMenu();
   var dx = e.deltaX;
   var dy = e.deltaY;
 
@@ -2782,10 +2787,10 @@ anychart.ganttModule.BaseGrid.prototype.initMouseFeatures = function() {
     if (element) {
       this.mwh_ = new goog.events.MouseWheelHandler(element);
       var mouseWheelEvent = goog.events.MouseWheelHandler.EventType.MOUSEWHEEL;
-      goog.events.listen(this.mwh_, mouseWheelEvent, this.mouseWheelHandler_, false, this);
+      goog.events.listen(this.mwh_, mouseWheelEvent, this.mouseWheelHandler, false, this);
 
       goog.events.listen(anychart.window, 'unload', function(e) {
-        goog.events.unlisten(ths.mwh_, mouseWheelEvent, ths.mouseWheelHandler_, false, this);
+        goog.events.unlisten(ths.mwh_, mouseWheelEvent, ths.mouseWheelHandler, false, this);
       });
     }
 

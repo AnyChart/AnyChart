@@ -891,15 +891,25 @@ anychart.scales.GanttDateTime.prototype.maxReached_ = function() {
 /**
  * Zooms scale in.
  * @param {number=} opt_zoomFactor - Zoom in factor value. "opt_zoomFactor = 5" means 5 times closer.
+ * @param {number=} opt_ratio - Ratio by x we need to zoom in.
  * @return {anychart.scales.GanttDateTime} - Itself for method chaining.
  */
-anychart.scales.GanttDateTime.prototype.zoomIn = function(opt_zoomFactor) {
+anychart.scales.GanttDateTime.prototype.zoomIn = function(opt_zoomFactor, opt_ratio) {
+  var factor = 1 / (opt_zoomFactor || anychart.scales.GanttDateTime.DEFAULT_ZOOM_FACTOR);
+  var ratio = goog.isDef(opt_ratio) ? opt_ratio : 0.5;
+
   if (!this.isEmpty()) {
-    opt_zoomFactor = opt_zoomFactor ? (1 / opt_zoomFactor) : (1 / anychart.scales.GanttDateTime.DEFAULT_ZOOM_FACTOR);
     var range = this.max_ - this.min_;
-    var msInterval = Math.round(range * (opt_zoomFactor - 1) / 2);
-    var newMin = this.min_ - msInterval;
-    var newMax = this.max_ + msInterval;
+
+    /*
+      Determinate how many milliseconds we must cut or add to each side of range to do zoom with correct ratio.
+     */
+    var msIntervalLeft = Math.round(range * (factor - 1) * ratio);
+    var msIntervalRight = Math.round(range * (factor - 1) * (1 - ratio));
+
+    var newMin = this.min_ - msIntervalLeft;
+    var newMax = this.max_ + msIntervalRight;
+
     if (Math.abs(newMin - newMax) <= anychart.scales.GanttDateTime.MILLISECONDS_IN_MINUTE) {
       var middle = (this.min_ + this.max_) / 2;
       newMin = middle - anychart.scales.GanttDateTime.MILLISECONDS_IN_MINUTE / 2;
@@ -915,15 +925,22 @@ anychart.scales.GanttDateTime.prototype.zoomIn = function(opt_zoomFactor) {
 /**
  * Zooms scale out.
  * @param {number=} opt_zoomFactor - Zoom out factor value. "opt_zoomFactor = 5" means 5 times further.
+ * @param {number=} opt_ratio - Ratio by x we need to zoom out.
  * @return {anychart.scales.GanttDateTime} - Itself for method chaining.
  */
-anychart.scales.GanttDateTime.prototype.zoomOut = function(opt_zoomFactor) {
-  if (!this.minReached_() || !this.maxReached_()) {
-    opt_zoomFactor = opt_zoomFactor || anychart.scales.GanttDateTime.DEFAULT_ZOOM_FACTOR;
-    var msInterval = Math.round((this.max_ - this.min_) * (opt_zoomFactor - 1) / 2);
+anychart.scales.GanttDateTime.prototype.zoomOut = function(opt_zoomFactor, opt_ratio) {
+  var factor = opt_zoomFactor || anychart.scales.GanttDateTime.DEFAULT_ZOOM_FACTOR;
+  var ratio = goog.isDef(opt_ratio) ? opt_ratio : 0.5;
 
-    var newMin = this.min_ - msInterval;
-    var newMax = this.max_ + msInterval;
+  if (!this.minReached_() || !this.maxReached_()) {
+    /*
+      Determinate how many milliseconds we must cut or add to each side of range to do zoom with correct ratio.
+    */
+    var msIntervalLeft = Math.round((this.max_ - this.min_) * (factor - 1) * ratio);
+    var msIntervalRight = Math.round((this.max_ - this.min_) * (factor - 1) * (1 - ratio));
+
+    var newMin = this.min_ - msIntervalLeft;
+    var newMax = this.max_ + msIntervalRight;
 
     this.getTotalRange();
 

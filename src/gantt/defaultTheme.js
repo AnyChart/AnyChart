@@ -447,7 +447,8 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'defaultTextMarkerSettings': {
       'layout': 'vertical',
       'zIndex': 2
-    }
+    },
+    'zoomOnMouseWheel': false
   },
 
   // merge with chart

@@ -337,7 +337,8 @@ anychart.ganttModule.TimeLine = function(opt_controller, opt_isResources) {
   this.connectors_ = null;
 
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
-    ['columnStroke', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW]
+    ['columnStroke', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['zoomOnMouseWheel', 0, 0]
   ]);
 
   this.controller.timeline(this);
@@ -530,7 +531,8 @@ anychart.ganttModule.TimeLine.COLOR_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
   anychart.core.settings.createDescriptors(map, [
-    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'columnStroke', anychart.core.settings.strokeNormalizer]
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'columnStroke', anychart.core.settings.strokeNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'zoomOnMouseWheel', anychart.core.settings.booleanNormalizer]
   ]);
   return map;
 })();
@@ -5639,6 +5641,67 @@ anychart.ganttModule.TimeLine.prototype.scroll = function(horizontalPixelOffset,
     return true;
   }
   return false;
+};
+
+/**
+ * Return mousepoint ratio based on mouse x location
+ * @param {number} mouseX - Mouse x location on timeline.
+ * @returns {number} - Ratio.
+ */
+anychart.ganttModule.TimeLine.prototype.getMousePointRatioByX = function(mouseX) {
+  /**
+   * Left offset of stage.
+   * @type {number}
+   */
+  var clientOffsetX = this.container().getStage().getClientPosition().x;
+
+  /**
+   * Mouse x location on timeline.
+   * @type {number}
+   */
+  var x = mouseX - this.bounds_.left() - clientOffsetX;
+  return x / this.bounds().width();
+};
+
+
+/**
+ * Returns zoom factor based on passed dy.
+ * Do some additional math for trackpad users.
+ *
+ * @param {number} dy - Mouse wheel dy.
+ * @returns {number} - ZoomFactor
+ */
+anychart.ganttModule.TimeLine.prototype.getZoomFactor = function(dy) {
+  var maxDy = 100;
+
+  // We need to clamp because of trackpads.
+  dy = goog.math.clamp(dy, -maxDy, maxDy);
+
+  // 1.05 is a little bit smaller than default gantt zoom factor.
+  return 1.05 + Math.abs(dy) / maxDy;
+};
+
+
+/**@inheritDoc*/
+anychart.ganttModule.TimeLine.prototype.mouseWheelHandler = function(e) {
+  if (this.getOption('zoomOnMouseWheel')) {
+    e.preventDefault();
+
+    this.hideContextMenu();
+    this.tooltip().hide();
+
+    var dy = e.deltaY;
+    var zoomFactor = this.getZoomFactor(dy);
+    var ratio = this.getMousePointRatioByX(e.clientX);
+
+    if (dy < 0) {
+      this.scale_.zoomIn(zoomFactor, ratio);
+    } else {
+      this.scale_.zoomOut(zoomFactor, ratio);
+    }
+  } else {
+    anychart.ganttModule.TimeLine.base(this, 'mouseWheelHandler', e);
+  }
 };
 
 
