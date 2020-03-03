@@ -3000,6 +3000,29 @@ anychart.utils.getFadeGradient = function(ratio, opacity, fontColor, opt_fadeSte
 };
 
 
+/**
+ * Check if theme contains space object inside if contains normalize it otherwise do nothing.
+ * @param {string} name - Name of space object margin or padding.
+ * @param {Object} theme - Object that contains space object.
+ */
+anychart.utils.normalizeThemeSpaceObject = function(name, theme) {
+  if (goog.isDef(theme[name])) {
+    theme[name] = anychart.core.utils.Space.normalizeSpace(theme[name]);
+  }
+};
+
+
+/**
+ * Normalize theme items.
+ * @param {Object} theme - Theme object.
+ */
+anychart.utils.normalizeTheme = function(theme) {
+  // Normalize margins and paddings.
+  anychart.utils.normalizeThemeSpaceObject('padding', theme);
+  anychart.utils.normalizeThemeSpaceObject('margin', theme);
+};
+
+
 //region -- Async actions.
 /**
  * Executes fn-function in next execution frame.

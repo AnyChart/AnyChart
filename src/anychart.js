@@ -693,7 +693,9 @@ anychart.getFlatTheme = function(themePath, opt_flatTheme, opt_resolver) {
     }
 
     if (goog.isDef(theme)) {
-      if (goog.typeOf(theme) != 'object') {
+      if (goog.typeOf(theme) == 'object') {
+        anychart.utils.normalizeTheme(theme);
+      } else {
         if (goog.isFunction(opt_resolver))
           theme = opt_resolver(theme);
         else if (goog.isBoolean(theme))
