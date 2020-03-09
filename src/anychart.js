@@ -11,6 +11,7 @@ goog.require('anychart.base');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.StageCredits');
 goog.require('anychart.performance');
+goog.require('anychart.reflow.CanvasMeasuriator');
 goog.require('anychart.reflow.Measuriator');
 goog.require('anychart.themes.merging');
 goog.require('anychart.utils');
@@ -760,9 +761,34 @@ anychart.getFullTheme = function(root) {
 //region -- Measuriator.
 /**
  * Shared measuriator.
+ *
  * @type {anychart.reflow.Measuriator}
  */
 anychart.measuriator = new anychart.reflow.Measuriator();
+
+
+/**
+ * Anychart text measurements canvas.
+ *
+ * @type {?Element}
+ */
+anychart.canvas = (function() {
+  var canvas = (goog.dom.createElement(goog.dom.TagName.CANVAS));
+  return canvas.getContext && canvas.getContext('2d') ?
+    canvas:
+    null;
+})();
+
+
+if (anychart.canvas) {
+  /**
+   * Shared canvas measuriator.
+   * Works differently than regular anychart.reflow.Measuriator.
+   * 
+   * @type {anychart.reflow.CanvasMeasuriator}
+   */
+  anychart.canvasMeasuriator = new anychart.reflow.CanvasMeasuriator();
+}
 
 
 //endregion
