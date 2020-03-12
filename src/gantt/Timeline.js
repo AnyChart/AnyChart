@@ -4189,8 +4189,14 @@ anychart.ganttModule.TimeLine.prototype.drawAsBaseline_ = function(dataItem, tot
   var baselineStartRatio = this.scale_.timestampToRatio(baselineStart);
   var baselineEndRatio = this.scale_.timestampToRatio(baselineEnd);
 
-  var actualPresents = (actualEndRatio > 0 && actualStartRatio < 1 && element.getOption('enabled')); //ratios can contain NaNs
-  var baselinePresents = (baselineEndRatio > 0 && baselineStartRatio < 1 && baselines.getOption('enabled')); //ratios can contain NaNs
+  var isElementEnabled = element.getOption('enabled');
+
+  // DVF-4389.
+  var considerElement = baselines.getOption('disableWithRelatedTask');
+  var isBaselineEnabled = baselines.getOption('enabled') && (considerElement ? isElementEnabled : true);
+
+  var actualPresents = (actualEndRatio > 0 && actualStartRatio < 1 && isElementEnabled); // ratios can contain NaNs
+  var baselinePresents = (baselineEndRatio > 0 && baselineStartRatio < 1 && isBaselineEnabled); // ratios can contain NaNs
 
   if (actualPresents || baselinePresents) {
     var b = this.pixelBoundsCache;

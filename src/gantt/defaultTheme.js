@@ -358,6 +358,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
 
     'baselines': {
       'above': false,
+      'disableWithRelatedTask': false,
       'progress': {
         'height': '50%',
         'anchor': 'left-bottom',
