@@ -521,52 +521,52 @@ anychart.ganttModule.Chart.prototype.fitAll = function() {
  * @return {anychart.ganttModule.Chart} - Itself for method chaining.
  */
 anychart.ganttModule.Chart.prototype.fitToTask = function(taskId) {
-  var foundTasks = this.data_.searchItems(anychart.enums.GanttDataFields.ID, taskId);
-  if (foundTasks.length) {
-    var task = foundTasks[0];
-    var actualStart = task.meta(anychart.enums.GanttDataFields.ACTUAL_START);
-    var actualEnd = task.meta(anychart.enums.GanttDataFields.ACTUAL_END);
-    var isMilestone = goog.isDef(actualStart) && ((!isNaN(actualStart) && !goog.isDef(actualEnd)) || (actualStart == actualEnd));
-    if (isMilestone) { //no range for milestone.
-      anychart.core.reporting.warning(anychart.enums.WarningCode.GANTT_FIT_TO_TASK, null, [taskId]);
-    } else {
-      this.getTimeline().getScale().setRange(actualStart, actualEnd); //this will redraw timeline first time.
+  var bounds = this.tl_.pixelBoundsCache;
+  if (bounds && bounds.width) { // This condition fixes falling test on hidden container when bounds is null.
+    var foundTasks = this.data_.searchItems(anychart.enums.GanttDataFields.ID, taskId);
+    if (foundTasks.length) {
+      var task = foundTasks[0];
+      var actualStart = task.meta(anychart.enums.GanttDataFields.ACTUAL_START);
+      var actualEnd = task.meta(anychart.enums.GanttDataFields.ACTUAL_END);
+      var isMilestone = goog.isDef(actualStart) && ((!isNaN(actualStart) && !goog.isDef(actualEnd)) || (actualStart == actualEnd));
+      if (isMilestone) { //no range for milestone.
+        anychart.core.reporting.warning(anychart.enums.WarningCode.GANTT_FIT_TO_TASK, null, [taskId]);
+      } else {
+        this.getTimeline().getScale().setRange(actualStart, actualEnd); //this will redraw timeline first time.
 
-      var bounds = this.tl_.pixelBoundsCache;
+        if (bounds.width > 0) {
+          var relatedBounds = task.meta('relBounds');
+          var label = task.meta('label');
+          if (label) {
+            var labelBounds = this.tl_.labels().measure(label, label.positionProvider());
+            if (relatedBounds && labelBounds) {
+              var labelLefter = labelBounds.left < relatedBounds.left;
+              var labelRighter = labelBounds.left + labelBounds.width > relatedBounds.left + relatedBounds.width;
 
-      if (bounds.width > 0) {
-        var relatedBounds = task.meta('relBounds');
-        var label = task.meta('label');
-        if (label) {
-          var labelBounds = this.tl_.labels().measure(label, label.positionProvider());
-          if (relatedBounds && labelBounds) {
-            var labelLefter = labelBounds.left < relatedBounds.left;
-            var labelRighter = labelBounds.left + labelBounds.width > relatedBounds.left + relatedBounds.width;
-
-            var leftVal, rightVal;
-            if (labelBounds.width < bounds.width) {
-              var enlargeRatio = bounds.width / (bounds.width - labelBounds.width);
-              if (labelLefter && !labelRighter) {
-                leftVal = this.tl_.scale().ratioToTimestamp(1 - enlargeRatio);
-                rightVal = this.tl_.scale().ratioToTimestamp(1);
-              }
-              if (labelRighter && !labelLefter) {
+              var leftVal, rightVal;
+              if (labelBounds.width < bounds.width) {
+                var enlargeRatio = bounds.width / (bounds.width - labelBounds.width);
+                if (labelLefter && !labelRighter) {
+                  leftVal = this.tl_.scale().ratioToTimestamp(1 - enlargeRatio);
+                  rightVal = this.tl_.scale().ratioToTimestamp(1);
+                }
+                if (labelRighter && !labelLefter) {
+                  leftVal = this.tl_.scale().ratioToTimestamp(0);
+                  rightVal = this.tl_.scale().ratioToTimestamp(enlargeRatio);
+                }
+              } else {
                 leftVal = this.tl_.scale().ratioToTimestamp(0);
-                rightVal = this.tl_.scale().ratioToTimestamp(enlargeRatio);
+                rightVal = this.tl_.scale().ratioToTimestamp(labelBounds.width / bounds.width);
               }
-            } else {
-              leftVal = this.tl_.scale().ratioToTimestamp(0);
-              rightVal = this.tl_.scale().ratioToTimestamp(labelBounds.width / bounds.width);
+              this.getTimeline().getScale().setRange(leftVal, rightVal); //this will redraw timeline second time.
             }
-            this.getTimeline().getScale().setRange(leftVal, rightVal); //this will redraw timeline second time.
           }
         }
       }
+    } else {
+      anychart.core.reporting.warning(anychart.enums.WarningCode.NOT_FOUND, null, ['Task', taskId]);
     }
-  } else {
-    anychart.core.reporting.warning(anychart.enums.WarningCode.NOT_FOUND, null, ['Task', taskId]);
   }
-
   return this;
 };
 

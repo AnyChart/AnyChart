@@ -169,6 +169,7 @@ anychart.ConsistencyState = {
   TIMELINE_ELEMENTS_APPEARANCE: 1 << 10,
   TIMELINE_ELEMENTS_LABELS: 1 << 11,
   TIMELINE_MARKERS: 1 << 12,
+  TIMELINE_CALENDAR: 1 << 13,
   //---------------------------------- GANTT TIMELINE HEADER STATES (VB) ---------------------------------
   TIMELINE_HEADER_SCALES: 1 << 6,
   //---------------------------------- GANTT TIMELINE HEADER LEVEL STATES (VB) ---------------------------------
@@ -1782,6 +1783,7 @@ anychart.core.Base.prototype.removeAllListeners = function(opt_type) {
   proto['unlistenByKey'] = proto.unlistenByKey;//doc|ex
   proto['removeAllListeners'] = proto.removeAllListeners;//doc|ex
   proto['dispose'] = proto.dispose;
+  proto['isConsistent'] = proto.isConsistent; // Added for debug purposes! Do not add to API and docs.
   proto = anychart.SignalEvent.prototype;
   proto['targetNeedsRedraw'] = proto.targetNeedsRedraw;//doc
   proto['targetBoundsChanged'] = proto.targetBoundsChanged;//doc

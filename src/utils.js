@@ -3001,6 +3001,19 @@ anychart.utils.getFadeGradient = function(ratio, opacity, fontColor, opt_fadeSte
 
 
 /**
+ * DOM-debug util method, gives 'data-ac-name' attribute to acgraph.vector.Element.
+ *
+ * @param {acgraph.vector.Element} element - Element to get DOM-debug name.
+ * @param {string} name - 'data-ac-name' attribute value.
+ */
+anychart.utils.nameElement = function(element, name) {
+  if (anychart.DEVELOP && element && name) {
+    element.attr('data-ac-name', name);
+  }
+};
+
+
+/**
  * Check if theme contains space object inside if contains normalize it otherwise do nothing.
  * @param {string} name - Name of space object margin or padding.
  * @param {Object} theme - Object that contains space object.

@@ -336,9 +336,35 @@ anychart.ganttModule.TimeLine = function(opt_controller, opt_isResources) {
    */
   this.connectors_ = null;
 
+  /**
+   * Currently used low ticks unit.
+   * Used to correctly draw calendar intervals that
+   * depend on current low ticks unit.
+   *
+   * @type {?anychart.enums.Interval}
+   * @private
+   */
+  this.currentLowerTicksUnit_ = null;
+
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['columnStroke', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
-    ['zoomOnMouseWheel', 0, 0]
+    ['zoomOnMouseWheel', 0, 0],
+    ['workingFill', 0, 0, 0, function() {
+      var fill = /** @type {acgraph.vector.Fill} */ (this.getOption('workingFill'));
+      this.getWorkingPath_().fill(fill);
+    }],
+    ['notWorkingFill', 0, 0, 0, function() {
+      var fill = /** @type {acgraph.vector.Fill} */ (this.getOption('notWorkingFill'));
+      this.getNotWorkingPath_().fill(fill);
+    }],
+    ['holidaysFill', 0, 0, 0, function() {
+      var fill = /** @type {acgraph.vector.Fill} */ (this.getOption('holidaysFill'));
+      this.getHolidaysPath_().fill(fill);
+    }],
+    ['weekendsFill', 0, 0, 0, function() {
+      var fill = /** @type {acgraph.vector.Fill} */ (this.getOption('weekendsFill'));
+      this.getWeekendsPath_().fill(fill);
+    }]
   ]);
 
   this.controller.timeline(this);
@@ -366,7 +392,8 @@ anychart.ganttModule.TimeLine.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ganttModule.BaseGrid.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.TIMELINE_SCALES |
     anychart.ConsistencyState.TIMELINE_ELEMENTS_LABELS |
-    anychart.ConsistencyState.TIMELINE_MARKERS;
+    anychart.ConsistencyState.TIMELINE_MARKERS |
+    anychart.ConsistencyState.TIMELINE_CALENDAR;
 
 
 //endregion
@@ -522,6 +549,30 @@ anychart.ganttModule.TimeLine.EDIT_CORNER_HEIGHT = 5;
 anychart.ganttModule.TimeLine.EDIT_CONNECTOR_RADIUS = 5;
 
 
+/**
+ * Intervals weight growth map.
+ *
+ * @type {Object.<anychart.enums.Interval, number>}
+ * @const
+ */
+anychart.ganttModule.TimeLine.TICK_INTERVAL_GROWTH_MAP = (function() {
+  var rv = {};
+  rv[anychart.enums.Interval.MILLISECOND] = 0;
+  rv[anychart.enums.Interval.SECOND] = 1;
+  rv[anychart.enums.Interval.MINUTE] = 2;
+  rv[anychart.enums.Interval.HOUR] = 3;
+  rv[anychart.enums.Interval.DAY] = 4;
+  rv[anychart.enums.Interval.WEEK] = 5;
+  rv[anychart.enums.Interval.THIRD_OF_MONTH] = 6;
+  rv[anychart.enums.Interval.MONTH] = 7;
+  rv[anychart.enums.Interval.QUARTER] = 8;
+  rv[anychart.enums.Interval.SEMESTER] = 9;
+  rv[anychart.enums.Interval.YEAR] = 10;
+
+  return rv;
+})();
+
+
 //endregion
 //region -- Coloring.
 /**
@@ -532,7 +583,11 @@ anychart.ganttModule.TimeLine.COLOR_DESCRIPTORS = (function() {
   var map = {};
   anychart.core.settings.createDescriptors(map, [
     [anychart.enums.PropertyHandlerType.MULTI_ARG, 'columnStroke', anychart.core.settings.strokeNormalizer],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'zoomOnMouseWheel', anychart.core.settings.booleanNormalizer]
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'zoomOnMouseWheel', anychart.core.settings.booleanNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'workingFill', anychart.core.settings.fillNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'notWorkingFill', anychart.core.settings.fillNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'holidaysFill', anychart.core.settings.fillNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'weekendsFill', anychart.core.settings.fillNormalizer]
   ]);
   return map;
 })();
@@ -1669,9 +1724,15 @@ anychart.ganttModule.TimeLine.prototype.scale = function(opt_value) {
  * @private
  */
 anychart.ganttModule.TimeLine.prototype.scaleInvalidated_ = function(event) {
+  var state = 0;
   if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION)) {
-    this.invalidate(anychart.ConsistencyState.TIMELINE_SCALES | anychart.ConsistencyState.TIMELINE_MARKERS, anychart.Signal.NEEDS_REDRAW);
+    state |= anychart.ConsistencyState.TIMELINE_SCALES | anychart.ConsistencyState.TIMELINE_MARKERS;
   }
+  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
+    // Calendar settings has been changed.
+    state |= anychart.ConsistencyState.TIMELINE_CALENDAR;
+  }
+  this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -1954,6 +2015,78 @@ anychart.ganttModule.TimeLine.prototype.markers = function(opt_value) {
 //endregion
 //region -- Paths getters.
 /**
+ * Getter for this.holidaysPath_.
+ * @return {acgraph.vector.Path}
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.getHolidaysPath_ = function() {
+  if (!this.holidaysPath_) {
+    this.holidaysPath_ = /** @type {acgraph.vector.Path} */ (this.getCalendarLayer().path());
+    this.holidaysPath_.zIndex(0);
+    anychart.utils.nameElement(this.holidaysPath_, 'holidays-path');
+    this.holidaysPath_
+      .stroke('none')
+      .fill(/** @type {acgraph.vector.Fill} */ (this.getOption('holidaysFill')));
+  }
+  return this.holidaysPath_;
+};
+
+
+/**
+ * Getter for this.weekendsPath_.
+ * @return {acgraph.vector.Path}
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.getWeekendsPath_ = function() {
+  if (!this.weekendsPath_) {
+    this.weekendsPath_ = /** @type {acgraph.vector.Path} */ (this.getCalendarLayer().path());
+    this.weekendsPath_.zIndex(0);
+    anychart.utils.nameElement(this.weekendsPath_, 'weekends-path');
+    this.weekendsPath_
+      .stroke('none')
+      .fill(/** @type {acgraph.vector.Fill} */ (this.getOption('weekendsFill')));
+  }
+  return this.weekendsPath_;
+};
+
+
+/**
+ * Getter for this.workingPath_.
+ * @return {acgraph.vector.Path}
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.getWorkingPath_ = function() {
+  if (!this.workingPath_) {
+    this.workingPath_ = /** @type {acgraph.vector.Path} */ (this.getCalendarLayer().path());
+    this.workingPath_.zIndex(1);
+    anychart.utils.nameElement(this.workingPath_, 'working-path');
+    this.workingPath_
+      .stroke('none')
+      .fill(/** @type {acgraph.vector.Fill} */ (this.getOption('workingFill')));
+  }
+  return this.workingPath_;
+};
+
+
+/**
+ * Getter for this.notWorkingPath_.
+ * @return {acgraph.vector.Path}
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.getNotWorkingPath_ = function() {
+  if (!this.notWorkingPath_) {
+    this.notWorkingPath_ = /** @type {acgraph.vector.Path} */ (this.getCalendarLayer().path());
+    this.notWorkingPath_.zIndex(1);
+    anychart.utils.nameElement(this.notWorkingPath_, 'not-working-path');
+    this.notWorkingPath_
+      .stroke('none')
+      .fill(/** @type {acgraph.vector.Fill} */ (this.getOption('notWorkingFill')));
+  }
+  return this.notWorkingPath_;
+};
+
+
+/**
  * Getter for this.separationPath_.
  * @return {acgraph.vector.Path}
  * @private
@@ -1962,6 +2095,7 @@ anychart.ganttModule.TimeLine.prototype.getSeparationPath_ = function() {
   if (!this.separationPath_) {
     this.separationPath_ = /** @type {acgraph.vector.Path} */ (this.getClipLayer().path());
     this.separationPath_.zIndex(6);
+    anychart.utils.nameElement(this.separationPath_, 'low-ticks-separation-path');
     this.separationPath_.stroke(/** @type {acgraph.vector.Stroke} */(anychart.ganttModule.BaseGrid.getColorResolver('columnStroke', anychart.enums.ColorType.STROKE, false)(this, 0)));
   }
   return this.separationPath_;
@@ -5086,6 +5220,150 @@ anychart.ganttModule.TimeLine.prototype.drawLowTicks_ = function(ticks) {
 
 
 /**
+ * @inheritDoc
+ */
+anychart.ganttModule.TimeLine.prototype.applyClip = function(clipRect) {
+  anychart.ganttModule.TimeLine.base(this, 'applyClip', clipRect);
+  this.getCalendarLayer().clip(clipRect);
+};
+
+
+/**
+ * Clears calendar drawn.
+ *
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.clearCalendar_ = function() {
+  this.getWorkingPath_().clear();
+  this.getNotWorkingPath_().clear();
+  this.getHolidaysPath_().clear();
+  this.getWeekendsPath_().clear();
+};
+
+
+/**
+ * Draws calendar period.
+ *
+ * @param {acgraph.vector.Path} path - Path to be drawn.
+ * @param {number} start - Start timestamp.
+ * @param {number} end - End timestamp.
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.drawCalendarRange_ = function(path, start, end) {
+  var top = this.pixelBoundsCache.top + /** @type {number} */ (this.headerHeight()) + 1;
+  var bottom = this.pixelBoundsCache.top + this.pixelBoundsCache.height;
+
+  var startRatio = this.scale_.timestampToRatio(start);
+  var endRatio = this.scale_.timestampToRatio(end);
+
+  var pxStart = this.pixelBoundsCache.left + this.pixelBoundsCache.width * startRatio;
+  var pxEnd = this.pixelBoundsCache.left + this.pixelBoundsCache.width * endRatio;
+  pxStart = anychart.utils.applyPixelShift(pxStart, 1);
+  pxEnd = anychart.utils.applyPixelShift(pxEnd, 1);
+  path
+    .moveTo(pxStart, top)
+    .lineTo(pxEnd, top)
+    .lineTo(pxEnd, bottom)
+    .lineTo(pxStart, bottom)
+    .close();
+};
+
+
+/**
+ * Draws single working time item.
+ * Actually draws working and not working time in single passage.
+ *
+ * @param {anychart.ganttModule.Calendar.DailyScheduleData} dailySchedule - Single day working schedule.
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.drawWorkingTime_ = function(dailySchedule) {
+  if (this.isIntervalUnitEqualsOrBelow_(anychart.enums.Interval.HOUR)) {
+    var i;
+    var workingIntervals = dailySchedule['workingIntervals'];
+    var notWorkingIntervals = dailySchedule['notWorkingIntervals'];
+
+    for (i = 0; i < notWorkingIntervals.length; i++) {
+      var notWorkingInterval = notWorkingIntervals[i];
+      this.drawCalendarRange_(this.getNotWorkingPath_(), notWorkingInterval['from'], notWorkingInterval['to']);
+    }
+    for (i = 0; i < workingIntervals.length; i++) {
+      var workingInterval = workingIntervals[i];
+      this.drawCalendarRange_(this.getWorkingPath_(), workingInterval['from'], workingInterval['to']);
+    }
+  }
+};
+
+
+/**
+ * Defines whether currentLowerTicksUnit_ is below allowedInterval.
+ * For example, DAY is below or equal MONTH, YEAR is not below or equal SEMESTER.
+ *
+ * @param {anychart.enums.Interval} allowedInterval - Interval that currentLowerTicksUnit_ must equal
+ *  or be below.
+ * @return {boolean}
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.isIntervalUnitEqualsOrBelow_ = function(allowedInterval) {
+  if (this.currentLowerTicksUnit_) {
+    var currentUnitWeight = anychart.ganttModule.TimeLine.TICK_INTERVAL_GROWTH_MAP[this.currentLowerTicksUnit_];
+    var allowedUnitWeight = anychart.ganttModule.TimeLine.TICK_INTERVAL_GROWTH_MAP[allowedInterval];
+    return allowedUnitWeight >= currentUnitWeight;
+  }
+  return false;
+};
+
+
+/**
+ * Defines whether the calendar values must be drawn.
+ *
+ * Basically, as it was decided in DVF-4370, holidays and weekends
+ * must be drawn for anychart.enums.Interval.DAY and below,
+ * working/not working hours must be drawn for anychart.enums.Interval.HOUR
+ * and below.
+ *
+ * @return {boolean}
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.isCalendarMustBeDrawn_ = function() {
+  return this.scale_.hasCalendar() && this.isIntervalUnitEqualsOrBelow_(anychart.enums.Interval.DAY);
+};
+
+
+/**
+ * Draws current working, not working and holidays periods depending on availabilities settings.
+ *
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.drawCalendar_ = function() {
+  this.clearCalendar_();
+
+  if (this.isCalendarMustBeDrawn_()) {
+    var workingSchedule = this.scale_.getWorkingSchedule();
+
+    for (var i = 0; i < workingSchedule.length; i++) {
+      var singleWorkingScheduleItemInfo = workingSchedule[i];
+      var start = singleWorkingScheduleItemInfo['start'];
+      var end = singleWorkingScheduleItemInfo['end'];
+      var isHoliday = singleWorkingScheduleItemInfo['isHoliday'];
+      var isWeekend = singleWorkingScheduleItemInfo['isWeekend'];
+
+      if (isHoliday) {
+        if (this.currentLowerTicksUnit_ === anychart.enums.Interval.DAY) {
+          this.drawCalendarRange_(this.getHolidaysPath_(), start, end);
+        } else {
+          this.drawWorkingTime_(singleWorkingScheduleItemInfo);
+        }
+      } else if (isWeekend) {
+        this.drawCalendarRange_(this.getWeekendsPath_(), start, end);
+      } else {
+        this.drawWorkingTime_(singleWorkingScheduleItemInfo);
+      }
+    }
+  }
+};
+
+
+/**
  * Recalculates scale depending on current controller's state.
  */
 anychart.ganttModule.TimeLine.prototype.initScale = function() {
@@ -5168,12 +5446,27 @@ anychart.ganttModule.TimeLine.prototype.appearanceInvalidated = function() {
 
 
 /**
+ * Inner getter for this.calendarLayer_.
+ * @return {acgraph.vector.Layer}
+ */
+anychart.ganttModule.TimeLine.prototype.getCalendarLayer = function() {
+  if (!this.calendarLayer_) {
+    this.calendarLayer_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
+    anychart.utils.nameElement(this.calendarLayer_, 'calendar-layer');
+    this.calendarLayer_.zIndex(anychart.ganttModule.BaseGrid.DRAW_Z_INDEX - 2);
+  }
+  return this.calendarLayer_;
+};
+
+
+/**
  * Inner getter for this.rangeLineMarkersLayer_.
  * @return {acgraph.vector.Layer}
  */
 anychart.ganttModule.TimeLine.prototype.getRangeLineMarkersLayer = function() {
   if (!this.rangeLineMarkersLayer_) {
     this.rangeLineMarkersLayer_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
+    anychart.utils.nameElement(this.rangeLineMarkersLayer_, 'range-line-markers-layer');
     this.rangeLineMarkersLayer_.zIndex(anychart.ganttModule.BaseGrid.DRAW_Z_INDEX - 1);
   }
   return this.rangeLineMarkersLayer_;
@@ -5187,6 +5480,7 @@ anychart.ganttModule.TimeLine.prototype.getRangeLineMarkersLayer = function() {
 anychart.ganttModule.TimeLine.prototype.getTextMarkersLayer = function() {
   if (!this.textMarkersLayer_) {
     this.textMarkersLayer_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
+    anychart.utils.nameElement(this.textMarkersLayer_, 'text-markers-layer');
     this.textMarkersLayer_.zIndex(anychart.ganttModule.BaseGrid.DRAW_Z_INDEX + 1);
   }
   return this.textMarkersLayer_;
@@ -5199,6 +5493,7 @@ anychart.ganttModule.TimeLine.prototype.getTextMarkersLayer = function() {
 anychart.ganttModule.TimeLine.prototype.initLayersStructure = function(base) {
   base
       .addChild(/** @type {!acgraph.vector.Layer} */ (this.getCellsLayer()))
+      .addChild(/** @type {!acgraph.vector.Layer} */ (this.getCalendarLayer()))
       .addChild(/** @type {!acgraph.vector.Layer} */ (this.getRangeLineMarkersLayer()))
       .addChild(/** @type {!acgraph.vector.Layer} */ (this.getDrawLayer()))
       .addChild(/** @type {!acgraph.vector.Layer} */ (this.getTextMarkersLayer()))
@@ -5229,18 +5524,20 @@ anychart.ganttModule.TimeLine.prototype.specialInvalidated = function() {
     this.redrawPosition = true;
     this.redrawHeader = true;
     header.invalidate(anychart.ConsistencyState.RESOURCE_TIMELINE_LEVELS);
+    this.invalidate(anychart.ConsistencyState.TIMELINE_CALENDAR);
     this.markConsistent(anychart.ConsistencyState.TIMELINE_SCALES);
   }
 
+  var levelsData = this.scale_.getLevelsData();
   if (this.redrawHeader) {
     header.suspendSignalsDispatching();
-    var levelsData = this.scale_.getLevelsData();
     header.setLevels(levelsData);
 
     var ticks = [];
     for (var i = 0; i < levelsData.length; i++) {
       if (header.level(i).enabled()) {
         var levelData = levelsData[i];
+        this.currentLowerTicksUnit_ = levelData['unit'];
         ticks = this.scale_.getTicks(NaN, NaN, levelData['unit'], levelData['count']);
         break;
       }
@@ -5274,6 +5571,11 @@ anychart.ganttModule.TimeLine.prototype.specialInvalidated = function() {
 
       if (this.horizontalScrollBar_.container()) this.horizontalScrollBar_.draw();
     }
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.TIMELINE_CALENDAR)) {
+    this.drawCalendar_();
+    this.markConsistent(anychart.ConsistencyState.TIMELINE_CALENDAR);
   }
 };
 

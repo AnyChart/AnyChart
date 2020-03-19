@@ -1,8 +1,10 @@
 goog.provide('anychart.scales.GanttDateTime');
 
+//region -- Requirements.
 goog.require('anychart.core.Base');
 goog.require('anychart.enums');
 goog.require('anychart.format');
+goog.require('anychart.ganttModule.Calendar');
 
 goog.require('goog.array');
 goog.require('goog.date.Interval');
@@ -10,7 +12,8 @@ goog.require('goog.date.UtcDateTime');
 goog.require('goog.string.format');
 
 
-
+//endregion
+//region -- Constructor.
 /**
  * Gantt date time scale implementation.
  *
@@ -172,18 +175,31 @@ anychart.scales.GanttDateTime = function() {
    * @private
    */
   this.maxTicksCount_ = anychart.scales.GanttDateTime.DEFAULT_MAX_TICKS_COUNT;
+
+  /**
+   * Calendar.
+   *
+   * @type {anychart.ganttModule.Calendar}
+   * @private
+   */
+  this.calendar_ = null;
 };
 goog.inherits(anychart.scales.GanttDateTime, anychart.core.Base);
 
 
+//endregion
+//region -- Supported signals.
 /**
  * Supported signals mask.
  * @type {number}
  */
 anychart.scales.GanttDateTime.prototype.SUPPORTED_SIGNALS =
-    anychart.Signal.NEEDS_RECALCULATION;
+    anychart.Signal.NEEDS_RECALCULATION | // Any scale changes, except calendar.
+    anychart.Signal.NEEDS_REAPPLICATION;  // Calendar-specific signal.
 
 
+//endregion
+//region -- Type Definitions.
 /**
  * @typedef {Array.<Array.<(anychart.enums.Interval|{unit:anychart.enums.Interval,count:number})>>}
  */
@@ -215,6 +231,8 @@ anychart.scales.GanttDateTime.LevelData;
 anychart.scales.GanttDateTime.Tick;
 
 
+//endregion
+//region -- Constants.
 /**
  * Amount of milliseconds in second.
  * @type {number}
@@ -249,46 +267,11 @@ anychart.scales.GanttDateTime.MILLISECONDS_IN_DAY = anychart.scales.GanttDateTim
  */
 anychart.scales.GanttDateTime.DEFAULT_ZOOM_FACTOR = 1.25;
 
-
 /**
  * Hardcoded default value of maximum ticks count.
  * @type {number}
  */
 anychart.scales.GanttDateTime.DEFAULT_MAX_TICKS_COUNT = 200;
-
-
-/**
- * @return {anychart.enums.ScaleTypes}
- */
-anychart.scales.GanttDateTime.prototype.getType = function() {
-  return anychart.enums.ScaleTypes.GANTT;
-};
-
-
-/**
- * Creates function that returns formatted string by pattern.
- * @param {string} pattern - Pattern.
- * @param {string=} opt_template - Template to create a resulting string.
- *  Note: Template must be used to express date ranges, so it MUST contain two '%s' expressions. First one means
- *  formatted start date, second one means formatted end date.
- * @return {Function} - Formatter function.
- * @private
- */
-anychart.scales.GanttDateTime.createFormat_ = function(pattern, opt_template) {
-  if (opt_template) {
-    return function(startDate, endDate) {
-      return goog.string.format(
-          /** @type {string} */ (opt_template),
-          anychart.format.dateTime(startDate, pattern),
-          anychart.format.dateTime(endDate, pattern)
-      );
-    };
-  } else {
-    return function(startDate) {
-      return anychart.format.dateTime(startDate, pattern);
-    };
-  }
-};
 
 
 /**
@@ -302,6 +285,16 @@ anychart.scales.GanttDateTime.DEFAULT_LEVELS = [
   [{'unit': anychart.enums.Interval.MONTH, 'count': 1}, {'unit': anychart.enums.Interval.QUARTER, 'count': 1}, {'unit': anychart.enums.Interval.YEAR, 'count': 1}],
   [{'unit': anychart.enums.Interval.QUARTER, 'count': 1}, {'unit': anychart.enums.Interval.YEAR, 'count': 1}, {'unit': anychart.enums.Interval.YEAR, 'count': 10}]
 ];
+
+
+//endregion
+//region -- Developer's API.
+/**
+ * @return {anychart.enums.ScaleTypes}
+ */
+anychart.scales.GanttDateTime.prototype.getType = function() {
+  return anychart.enums.ScaleTypes.GANTT;
+};
 
 
 /**
@@ -388,98 +381,6 @@ anychart.scales.GanttDateTime.prototype.setDataRange = function(min, max) {
 
 
 /**
- * Gets minimum and maximum visible dates set for scale.
- * @return {{min: number, max: number}}
- */
-anychart.scales.GanttDateTime.prototype.getRange = function() {
-  this.calculate();
-  return this.isEmpty() ? this.getEmptyRange() : {'min': this.min_, 'max': this.max_};
-};
-
-
-/**
- * Gets total minimum and maximum dates set for scale.
- * @return {{min: number, max: number}}
- */
-anychart.scales.GanttDateTime.prototype.getTotalRange = function() {
-  var range, gap;
-  if (isNaN(this.totalMin_)) {
-    if (isNaN(this.manualMin_)) {
-      if (isNaN(this.softMin_)) {
-        var max = (isNaN(this.manualMax_) ? (isNaN(this.softMax_) ? this.dataMax_ : Math.max(this.dataMax_, this.softMax_)) : this.manualMax_);
-        range = max - this.dataMin_;
-        gap = range * this.minimumGap_;
-        this.totalMin_ = this.dataMin_ - gap;
-      } else {
-        this.totalMin_ = Math.min(this.softMin_, this.dataMin_);
-      }
-    } else {
-      this.totalMin_ = this.manualMin_;
-    }
-  }
-
-  if (isNaN(this.totalMax_)) {
-    if (isNaN(this.manualMax_)) {
-      if (isNaN(this.softMax_)) {
-        var min = (isNaN(this.manualMin_) ? (isNaN(this.softMin_) ? this.dataMin_ : Math.min(this.dataMin_, this.softMin_)) : this.manualMin_);
-        range = this.dataMax_ - min;
-        gap = range * this.maximumGap_;
-        this.totalMax_ = this.dataMax_ + gap;
-      } else {
-        this.totalMax_ = Math.max(this.softMax_, this.dataMax_);
-      }
-    } else {
-      this.totalMax_ = this.manualMax_;
-    }
-  }
-
-  return this.isEmpty() ? this.getEmptyRange() : {'min': this.totalMin_, 'max': this.totalMax_};
-};
-
-
-/**
- * Calculates and fits values.
- */
-anychart.scales.GanttDateTime.prototype.calculate = function() {
-  if (!this.consistent && !this.isEmpty()) {
-    this.consistent = true;
-    var totalRange = this.getTotalRange();
-    var tMin = totalRange['min'];
-    var tMax = totalRange['max'];
-    if (isNaN(tMin)) {
-      if (!isNaN(this.min_)) {
-        this.dataMin_ = this.min_;
-      }
-    } else {
-      if (isNaN(this.min_)) {
-        this.min_ = tMin;
-      } else {
-        this.min_ = Math.max(this.min_, tMin);
-      }
-    }
-
-    if (isNaN(tMax)) {
-      if (!isNaN(this.max_)) {
-        this.dataMax_ = this.max_;
-      }
-    } else {
-      if (isNaN(this.max_)) {
-        this.max_ = tMax;
-      } else {
-        this.max_ = Math.min(this.max_, tMax);
-      }
-    }
-
-    if (this.min_ > this.max_) {
-      var range = this.min_ - this.max_;
-      this.min_ = Math.max(this.max_, tMin);
-      this.max_ = Math.min(this.min_ + range, tMax);
-    }
-  }
-};
-
-
-/**
  * Fits scale to its total range.
  * @return {anychart.scales.GanttDateTime} - Itself for method chaining.
  */
@@ -495,396 +396,6 @@ anychart.scales.GanttDateTime.prototype.fitAll = function() {
     this.needsFitAll = true;
   }
   return this;
-};
-
-
-/**
- * Manually sets scale's minimum.
- * @param {number=} opt_value - Value to set.
- * @return {number|anychart.scales.GanttDateTime} - Current value or itself for method chaining.
- */
-anychart.scales.GanttDateTime.prototype.minimum = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var val = anychart.utils.normalizeTimestamp(opt_value);
-    if (this.manualMin_ != val) {
-      this.manualMin_ = val;
-      this.totalMin_ = NaN;
-      this.consistent = false;
-      this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
-    }
-  }
-  return this.manualMin_;
-};
-
-
-/**
- * Manually sets scale's maximum.
- * @param {number=} opt_value - Value to set.
- * @return {number|anychart.scales.GanttDateTime} - Current value or itself for method chaining.
- */
-anychart.scales.GanttDateTime.prototype.maximum = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var val = anychart.utils.normalizeTimestamp(opt_value);
-    if (this.manualMax_ != val) {
-      this.manualMax_ = val;
-      this.totalMax_ = NaN;
-      this.consistent = false;
-      this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
-    }
-  }
-  return this.manualMax_;
-};
-
-
-/**
- * Manually sets scale's soft minimum.
- * @param {number=} opt_value - Value to set.
- * @return {number|anychart.scales.GanttDateTime} - Current value or itself for method chaining.
- */
-anychart.scales.GanttDateTime.prototype.softMinimum = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var val = anychart.utils.normalizeTimestamp(opt_value);
-    if (this.softMin_ != val) {
-      this.softMin_ = val;
-      this.totalMin_ = NaN;
-      this.consistent = false;
-      this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
-    }
-  }
-  return this.softMin_;
-};
-
-
-/**
- * Manually sets scale's soft maximum.
- * @param {number=} opt_value - Value to set.
- * @return {number|anychart.scales.GanttDateTime} - Current value or itself for method chaining.
- */
-anychart.scales.GanttDateTime.prototype.softMaximum = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var val = anychart.utils.normalizeTimestamp(opt_value);
-    if (this.softMax_ != val) {
-      this.softMax_ = val;
-      this.totalMax_ = NaN;
-      this.consistent = false;
-      this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
-    }
-  }
-  return this.softMax_;
-};
-
-
-/**
- * Gets/sets minimum gap.
- * @param {number=} opt_value - Value to be set.
- * @return {number|anychart.scales.GanttDateTime} - Current value or itself for method chaining.
- */
-anychart.scales.GanttDateTime.prototype.minimumGap = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = +opt_value || 0;
-    if (this.minimumGap_ != opt_value) {
-      this.minimumGap_ = opt_value;
-      this.totalMin_ = NaN;
-      this.consistent = false;
-      this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
-    }
-    return this;
-  }
-  return this.minimumGap_;
-};
-
-
-/**
- * Gets/sets maximum gap.
- * @param {number=} opt_value - Value to be set.
- * @return {number|anychart.scales.GanttDateTime} - Current value or itself for method chaining.
- */
-anychart.scales.GanttDateTime.prototype.maximumGap = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = +opt_value || 0;
-    if (this.maximumGap_ != opt_value) {
-      this.maximumGap_ = opt_value;
-      this.totalMax_ = NaN;
-      this.consistent = false;
-      this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
-    }
-    return this;
-  }
-  return this.maximumGap_;
-};
-
-
-/**
- * Start month of the fiscal year setter/getter.
- *
- * @param {number=} opt_value - Number of month (1 - 12)
- * @return {number|anychart.scales.GanttDateTime} - Current value or itself for method chaining.
- */
-anychart.scales.GanttDateTime.prototype.fiscalYearStartMonth = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = goog.math.clamp(opt_value, 1, 12);
-    if (this.fiscalYearStartMonth_ != opt_value) {
-      this.fiscalYearStartMonth_ = opt_value;
-      this.consistent = false;
-      this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
-    }
-    return this;
-  }
-  return this.fiscalYearStartMonth_;
-};
-
-
-/**
- * Normalize interval value, depends on 'maxTicksCount',
- *  to prevent ticks draw overhead when user pass wrong zoomLevels config.
- *
- * This method exists because user can pass bad zoomLevels config - {unit: 'millisecond', count: 1} on wide time range.
- *  And it will be cause of browser tab crash.
- * @see https://anychart.atlassian.net/browse/DVF-4357
- *
- * @param {anychart.enums.Interval} unit - Interval unit.
- * @param {number} count - Interval unit count.
- * @return {{unit: anychart.enums.Interval, count: number}} - Normalized values.
- */
-anychart.scales.GanttDateTime.prototype.getNormalizedIntervalValues_ = function(unit, count) {
-  var range = this.getRange();
-  var start = range['min'];
-  var end = range['max'];
-  var initialDate = new goog.date.UtcDateTime(new Date(start));
-
-  var timeRange = end - start;
-
-  var ticksCount;
-
-  do {
-    // Get interval in milliseconds
-    var interval = anychart.utils.getIntervalFromInfo(unit, count);
-    var temp = initialDate.clone();
-    initialDate.add(interval);
-    var timeWithInterval = initialDate.getTime();
-    var timeWithoutInterval = temp.getTime();
-    var intervalInMs = timeWithInterval - timeWithoutInterval;
-
-    // Ticks count with current interval settings.
-    ticksCount = Math.ceil(timeRange / intervalInMs);
-
-    if (ticksCount > this.maxTicksCount_) {
-      var increasedVal = anychart.utils.getIncreasedIntervalValue(unit, count);
-      unit = increasedVal.unit;
-      count = increasedVal.count;
-    }
-  } while (ticksCount > this.maxTicksCount_);
-
-  return {
-    unit: unit,
-    count: count
-  };
-};
-
-
-/**
- * @param {number} pixStart - TODO (A.Kudryavtsev): Unused parameter, from previous scale implementation.
- * @param {number} pixEnd - TODO (A.Kudryavtsev): Unused parameter, from previous scale implementation.
- * @param {anychart.enums.Interval} unit
- * @param {number} count
- * @param {{min: number, max: number}=} opt_range we want ticks from, visible range by default
- * @return {Array.<anychart.scales.GanttDateTime.Tick>}
- */
-anychart.scales.GanttDateTime.prototype.getTicks = function(pixStart, pixEnd, unit, count, opt_range) {
-  var range = opt_range || this.getRange();
-  var normalizedValues = this.getNormalizedIntervalValues_(unit, count);
-
-  unit = normalizedValues.unit;
-  count = normalizedValues.count;
-
-  var start = anychart.utils.alignDateLeftByUnit(range['min'], unit, count, 2000);
-  var interval = anychart.utils.getIntervalFromInfo(unit, count);
-
-  var end = range['max'];
-  var res = [];
-
-  //TODO (A.Kudryavtsev): Describe fiscal behaviour.
-  var current, currentMs;
-  if (this.fiscalYearStartMonth_ > 1 &&
-      (unit == anychart.enums.Interval.YEAR ||
-      unit == anychart.enums.Interval.SEMESTER ||
-      unit == anychart.enums.Interval.QUARTER)) {
-    var fiscalStart = anychart.utils.shiftFiscalDate(start, this.fiscalYearStartMonth_);
-    if (fiscalStart > start) {
-      var invertedInterval = interval.getInverse();
-      current = new goog.date.UtcDateTime(new Date(fiscalStart));
-      currentMs = current.getTime();
-      do {
-        current.add(invertedInterval);
-        currentMs = current.getTime();
-      } while (currentMs > start);
-    }
-  } else {
-    current = new goog.date.UtcDateTime(new Date(start));
-  }
-
-  currentMs = current.getTime();
-  while (currentMs < end) {
-    var prev = currentMs;
-    current.add(interval);
-    currentMs = current.getTime();
-    res.push({
-      'start': prev,
-      'end': currentMs
-    });
-  }
-  return res;
-};
-
-
-/**
- * @param {anychart.enums.Interval} unit
- * @param {number} count
- * @return {Array.<number>}
- */
-anychart.scales.GanttDateTime.prototype.getSimpleTicks = function(unit, count) {
-  return goog.array.map(this.getTicks(NaN, NaN, unit, count), function(item) {
-    return item['end'];
-  });
-};
-
-
-/**
- * Transforms a passed value into a ratio depending on current scale date range.
- * <b>Example: </b>
- * If current range is 12.00 - 13.00 ([0..1] in ratio expression), then
- *  12.30 -> 0.5
- *  12.15 -> 0.25
- *  14.00 -> 2
- *  11.00 -> -1
- *  11.30 -> -0.5
- *
- * @param {*} value - Value to transform.
- * @return {number} - Value transformed to ratio scope. Returns NaN if scale range is not set.
- */
-anychart.scales.GanttDateTime.prototype.timestampToRatio = function(value) {
-  this.calculate();
-  var val;
-  if (goog.isString(value)) {
-    switch (value.toLowerCase()) { //Got string like 'current'.
-      case anychart.enums.GanttDateTimeMarkers.CURRENT:
-        if (isNaN(this.currentDate))
-          this.currentDate = goog.now();
-        val = this.currentDate;
-        break;
-      case anychart.enums.GanttDateTimeMarkers.START:
-        val = this.trackedDataMin;
-        break;
-      case anychart.enums.GanttDateTimeMarkers.END:
-        val = this.trackedDataMax;
-    }
-
-    if (!goog.isDef(val)) { //Got string representation of date.
-      val = anychart.format.parseDateTime(value);
-    }
-  }
-
-  val = goog.isDefAndNotNull(val) ? val : anychart.utils.normalizeTimestamp(value);
-
-  var range = this.getRange();
-  var min = range['min'];
-  var max = range['max'];
-
-  //You will get this return expression if you draw a time axis and mark a values there.
-  return (val - min) / (max - min);
-};
-
-
-/**
- * This method is added only for compatibility with line/range/text markers of gantt chart's timeline.
- * NOTE: Use timestampToRatio method instead.
- * @param {*} value - Value to transform.
- * @return {number} - Value transformed to ratio scope. Returns NaN if scale range is not set.
- */
-anychart.scales.GanttDateTime.prototype.transform = function(value) {
-  return this.timestampToRatio(value);
-};
-
-
-/**
- * This method is added only for compatibility with line/range/text markers of gantt chart's timeline.
- * @param {number} ratio - Ratio to transform.
- * @return {number} - Ratio transformed to datetime.
- */
-anychart.scales.GanttDateTime.prototype.inverseTransform = function(ratio) {
-  return this.ratioToTimestamp(ratio);
-};
-
-
-/**
- * Transforms a passed ratio value into a timestamp depending on current scale date range.
- * @param {number} value - Ratio.
- * @return {number} - Timestamp.
- */
-anychart.scales.GanttDateTime.prototype.ratioToTimestamp = function(value) {
-  var range = this.getRange();
-  var min = range['min'];
-  var max = range['max'];
-
-  //You will get this return expression if you draw a time axis and mark a values there.
-  return Math.round(value * (max - min) + min);
-};
-
-
-/**
- * Gets level settings for current scale state.
- * @return {Array.<anychart.scales.GanttDateTime.LevelData>}
- */
-anychart.scales.GanttDateTime.prototype.getLevelsData = function() {
-  this.calculate();
-  var r = this.getRange();
-  var min = r['min'];
-  var max = r['max'];
-
-  var minorTickRange = (max - min) / 20;
-  var last = this.ranges_.length - 1;
-  var row;
-  for (var i = 0; i < last; i++) {
-    if (minorTickRange <= this.ranges_[i]['range']) {
-      row = this.ranges_[i];
-      break;
-    }
-  }
-  if (!row) {
-    row = this.ranges_[last];
-  }
-
-  return /** @type {Array.<anychart.scales.GanttDateTime.LevelData>} */(row['levels']);
-};
-
-
-/**
- * If total min is visually reached.
- * @return {boolean}
- * @private
- */
-anychart.scales.GanttDateTime.prototype.minReached_ = function() {
-  if (this.isEmpty())
-    return true;
-  else {
-    var totalRange = this.getTotalRange();
-    return this.min_ <= totalRange['min'];
-  }
-};
-
-
-/**
- * If total max is visually reached.
- * @return {boolean}
- * @private
- */
-anychart.scales.GanttDateTime.prototype.maxReached_ = function() {
-  if (this.isEmpty())
-    return true;
-  else {
-    var totalRange = this.getTotalRange();
-    return this.max_ >= totalRange['max'];
-  }
 };
 
 
@@ -1060,59 +571,118 @@ anychart.scales.GanttDateTime.prototype.zoomTo = function(startOrUnit, opt_endOr
 
 
 /**
- * Zoom levels settings.
- * @param {anychart.scales.GanttDateTime.ZoomLevelsSettings=} opt_value
- * @return {anychart.scales.GanttDateTime.ZoomLevelsSettings|anychart.scales.GanttDateTime}
+ * Quick hack to make anychart.core.drawers.Base work with gantt scale.
+ * @param {*=} opt_value
+ * @return {boolean}
  */
-anychart.scales.GanttDateTime.prototype.zoomLevels = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var newZoomLevels = this.normalizeLevels_(opt_value);
-    var same = newZoomLevels.length == this.ranges_.length &&
-        goog.array.every(newZoomLevels, function(newZoomLevel, index) {
-          var oldZoomLevelLevels = this.ranges_[index]['levels'];
-          return newZoomLevel['levels'].length == oldZoomLevelLevels.length &&
-              goog.array.every(newZoomLevel['levels'], function(item, index) {
-                return item['unit'] == oldZoomLevelLevels[index]['unit'] &&
-                    item['count'] == oldZoomLevelLevels[index]['count'];
-              });
-        }, this);
-    if (!same) {
-      this.ranges_ = newZoomLevels;
-      this.consistent = false;
-      this.dispatchSignal(anychart.Signal.NEED_UPDATE_TICK_DEPENDENT | anychart.Signal.NEEDS_RECALCULATION);
-    }
-    return this;
+anychart.scales.GanttDateTime.prototype.checkWeights = function(opt_value) {
+  return false;
+};
+
+
+//endregion
+//region -- Private methods.
+/**
+ * Creates function that returns formatted string by pattern.
+ * @param {string} pattern - Pattern.
+ * @param {string=} opt_template - Template to create a resulting string.
+ *  Note: Template must be used to express date ranges, so it MUST contain two '%s' expressions. First one means
+ *  formatted start date, second one means formatted end date.
+ * @return {Function} - Formatter function.
+ * @private
+ */
+anychart.scales.GanttDateTime.createFormat_ = function(pattern, opt_template) {
+  if (opt_template) {
+    return function(startDate, endDate) {
+      return goog.string.format(
+          /** @type {string} */ (opt_template),
+          anychart.format.dateTime(startDate, pattern),
+          anychart.format.dateTime(endDate, pattern)
+      );
+    };
+  } else {
+    return function(startDate) {
+      return anychart.format.dateTime(startDate, pattern);
+    };
   }
-  return /** @type {anychart.scales.GanttDateTime.ZoomLevelsSettings} */(
-      goog.array.map(this.ranges_, function(item) {
-        return goog.array.map(item['levels'], function(level) {
-          return {
-            'unit': level['unit'],
-            'count': level['count']
-          };
-        });
-      }));
 };
 
 
 /**
- * Setup max ticks count.
- * It prevent long chart drawing with bad user zoomLevels config
+ * Normalize interval value, depends on 'maxTicksCount',
+ *  to prevent ticks draw overhead when user pass wrong zoomLevels config.
  *
- * @param {number=} opt_value - Ticks count.
- * @return {number|anychart.scales.GanttDateTime} - Scale instance or max tick count.
+ * This method exists because user can pass bad zoomLevels config - {unit: 'millisecond', count: 1} on wide time range.
+ *  And it will be cause of browser tab crash.
+ * @see https://anychart.atlassian.net/browse/DVF-4357
+ *
+ * @param {anychart.enums.Interval} unit - Interval unit.
+ * @param {number} count - Interval unit count.
+ * @return {{unit: anychart.enums.Interval, count: number}} - Normalized values.
  */
-anychart.scales.GanttDateTime.prototype.maxTicksCount = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var val = anychart.utils.normalizeToNaturalNumber(opt_value, anychart.scales.GanttDateTime.DEFAULT_MAX_TICKS_COUNT, false);
-    if (this.maxTicksCount_ != val) {
-      this.maxTicksCount_ = val;
-      this.consistent = false;
-      this.dispatchSignal(anychart.Signal.NEED_UPDATE_TICK_DEPENDENT | anychart.Signal.NEEDS_RECALCULATION);
+anychart.scales.GanttDateTime.prototype.getNormalizedIntervalValues_ = function(unit, count) {
+  var range = this.getRange();
+  var start = range['min'];
+  var end = range['max'];
+  var initialDate = new goog.date.UtcDateTime(new Date(start));
+
+  var timeRange = end - start;
+
+  var ticksCount;
+
+  do {
+    // Get interval in milliseconds
+    var interval = anychart.utils.getIntervalFromInfo(unit, count);
+    var temp = initialDate.clone();
+    initialDate.add(interval);
+    var timeWithInterval = initialDate.getTime();
+    var timeWithoutInterval = temp.getTime();
+    var intervalInMs = timeWithInterval - timeWithoutInterval;
+
+    // Ticks count with current interval settings.
+    ticksCount = Math.ceil(timeRange / intervalInMs);
+
+    if (ticksCount > this.maxTicksCount_) {
+      var increasedVal = anychart.utils.getIncreasedIntervalValue(unit, count);
+      unit = increasedVal.unit;
+      count = increasedVal.count;
     }
-    return this;
+  } while (ticksCount > this.maxTicksCount_);
+
+  return {
+    unit: unit,
+    count: count
+  };
+};
+
+
+/**
+ * If total min is visually reached.
+ * @return {boolean}
+ * @private
+ */
+anychart.scales.GanttDateTime.prototype.minReached_ = function() {
+  if (this.isEmpty())
+    return true;
+  else {
+    var totalRange = this.getTotalRange();
+    return this.min_ <= totalRange['min'];
   }
-  return this.maxTicksCount_;
+};
+
+
+/**
+ * If total max is visually reached.
+ * @return {boolean}
+ * @private
+ */
+anychart.scales.GanttDateTime.prototype.maxReached_ = function() {
+  if (this.isEmpty())
+    return true;
+  else {
+    var totalRange = this.getTotalRange();
+    return this.max_ >= totalRange['max'];
+  }
 };
 
 
@@ -1164,6 +734,541 @@ anychart.scales.GanttDateTime.prototype.normalizeLevels_ = function(value) {
 
 
 /**
+ * Handles calendar signals.
+ * @param {anychart.SignalEvent} e
+ * @private
+ */
+anychart.scales.GanttDateTime.prototype.handleCalendarSignal_ = function(e) {
+  if (e.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
+    this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
+  }
+};
+
+
+//endregion
+//region -- Public API.
+/**
+ * Gets minimum and maximum visible dates set for scale.
+ * @return {{min: number, max: number}}
+ */
+anychart.scales.GanttDateTime.prototype.getRange = function() {
+  this.calculate();
+  return this.isEmpty() ? this.getEmptyRange() : {'min': this.min_, 'max': this.max_};
+};
+
+
+/**
+ * Gets total minimum and maximum dates set for scale.
+ * @return {{min: number, max: number}}
+ */
+anychart.scales.GanttDateTime.prototype.getTotalRange = function() {
+  var range, gap;
+  if (isNaN(this.totalMin_)) {
+    if (isNaN(this.manualMin_)) {
+      if (isNaN(this.softMin_)) {
+        var max = (isNaN(this.manualMax_) ? (isNaN(this.softMax_) ? this.dataMax_ : Math.max(this.dataMax_, this.softMax_)) : this.manualMax_);
+        range = max - this.dataMin_;
+        gap = range * this.minimumGap_;
+        this.totalMin_ = this.dataMin_ - gap;
+      } else {
+        this.totalMin_ = Math.min(this.softMin_, this.dataMin_);
+      }
+    } else {
+      this.totalMin_ = this.manualMin_;
+    }
+  }
+
+  if (isNaN(this.totalMax_)) {
+    if (isNaN(this.manualMax_)) {
+      if (isNaN(this.softMax_)) {
+        var min = (isNaN(this.manualMin_) ? (isNaN(this.softMin_) ? this.dataMin_ : Math.min(this.dataMin_, this.softMin_)) : this.manualMin_);
+        range = this.dataMax_ - min;
+        gap = range * this.maximumGap_;
+        this.totalMax_ = this.dataMax_ + gap;
+      } else {
+        this.totalMax_ = Math.max(this.softMax_, this.dataMax_);
+      }
+    } else {
+      this.totalMax_ = this.manualMax_;
+    }
+  }
+
+  return this.isEmpty() ? this.getEmptyRange() : {'min': this.totalMin_, 'max': this.totalMax_};
+};
+
+
+/**
+ * Manually sets scale's minimum.
+ * @param {number=} opt_value - Value to set.
+ * @return {number|anychart.scales.GanttDateTime} - Current value or itself for method chaining.
+ */
+anychart.scales.GanttDateTime.prototype.minimum = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var val = anychart.utils.normalizeTimestamp(opt_value);
+    if (this.manualMin_ != val) {
+      this.manualMin_ = val;
+      this.totalMin_ = NaN;
+      this.consistent = false;
+      this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
+    }
+  }
+  return this.manualMin_;
+};
+
+
+/**
+ * Manually sets scale's maximum.
+ * @param {number=} opt_value - Value to set.
+ * @return {number|anychart.scales.GanttDateTime} - Current value or itself for method chaining.
+ */
+anychart.scales.GanttDateTime.prototype.maximum = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var val = anychart.utils.normalizeTimestamp(opt_value);
+    if (this.manualMax_ != val) {
+      this.manualMax_ = val;
+      this.totalMax_ = NaN;
+      this.consistent = false;
+      this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
+    }
+  }
+  return this.manualMax_;
+};
+
+
+/**
+ * Manually sets scale's soft minimum.
+ * @param {number=} opt_value - Value to set.
+ * @return {number|anychart.scales.GanttDateTime} - Current value or itself for method chaining.
+ */
+anychart.scales.GanttDateTime.prototype.softMinimum = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var val = anychart.utils.normalizeTimestamp(opt_value);
+    if (this.softMin_ != val) {
+      this.softMin_ = val;
+      this.totalMin_ = NaN;
+      this.consistent = false;
+      this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
+    }
+  }
+  return this.softMin_;
+};
+
+
+/**
+ * Manually sets scale's soft maximum.
+ * @param {number=} opt_value - Value to set.
+ * @return {number|anychart.scales.GanttDateTime} - Current value or itself for method chaining.
+ */
+anychart.scales.GanttDateTime.prototype.softMaximum = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var val = anychart.utils.normalizeTimestamp(opt_value);
+    if (this.softMax_ != val) {
+      this.softMax_ = val;
+      this.totalMax_ = NaN;
+      this.consistent = false;
+      this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
+    }
+  }
+  return this.softMax_;
+};
+
+
+/**
+ * Gets/sets minimum gap.
+ * @param {number=} opt_value - Value to be set.
+ * @return {number|anychart.scales.GanttDateTime} - Current value or itself for method chaining.
+ */
+anychart.scales.GanttDateTime.prototype.minimumGap = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = +opt_value || 0;
+    if (this.minimumGap_ != opt_value) {
+      this.minimumGap_ = opt_value;
+      this.totalMin_ = NaN;
+      this.consistent = false;
+      this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
+    }
+    return this;
+  }
+  return this.minimumGap_;
+};
+
+
+/**
+ * Gets/sets maximum gap.
+ * @param {number=} opt_value - Value to be set.
+ * @return {number|anychart.scales.GanttDateTime} - Current value or itself for method chaining.
+ */
+anychart.scales.GanttDateTime.prototype.maximumGap = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = +opt_value || 0;
+    if (this.maximumGap_ != opt_value) {
+      this.maximumGap_ = opt_value;
+      this.totalMax_ = NaN;
+      this.consistent = false;
+      this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
+    }
+    return this;
+  }
+  return this.maximumGap_;
+};
+
+
+/**
+ * Start month of the fiscal year setter/getter.
+ *
+ * @param {number=} opt_value - Number of month (1 - 12)
+ * @return {number|anychart.scales.GanttDateTime} - Current value or itself for method chaining.
+ */
+anychart.scales.GanttDateTime.prototype.fiscalYearStartMonth = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = goog.math.clamp(opt_value, 1, 12);
+    if (this.fiscalYearStartMonth_ != opt_value) {
+      this.fiscalYearStartMonth_ = opt_value;
+      this.consistent = false;
+      this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
+    }
+    return this;
+  }
+  return this.fiscalYearStartMonth_;
+};
+
+
+/**
+ * This method is added only for compatibility with line/range/text markers of gantt chart's timeline.
+ * NOTE: Use timestampToRatio method instead.
+ * @param {*} value - Value to transform.
+ * @return {number} - Value transformed to ratio scope. Returns NaN if scale range is not set.
+ */
+anychart.scales.GanttDateTime.prototype.transform = function(value) {
+  return this.timestampToRatio(value);
+};
+
+
+/**
+ * This method is added only for compatibility with line/range/text markers of gantt chart's timeline.
+ * @param {number} ratio - Ratio to transform.
+ * @return {number} - Ratio transformed to datetime.
+ */
+anychart.scales.GanttDateTime.prototype.inverseTransform = function(ratio) {
+  return this.ratioToTimestamp(ratio);
+};
+
+/**
+ * Zoom levels settings.
+ * @param {anychart.scales.GanttDateTime.ZoomLevelsSettings=} opt_value
+ * @return {anychart.scales.GanttDateTime.ZoomLevelsSettings|anychart.scales.GanttDateTime}
+ */
+anychart.scales.GanttDateTime.prototype.zoomLevels = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var newZoomLevels = this.normalizeLevels_(opt_value);
+    var same = newZoomLevels.length == this.ranges_.length &&
+        goog.array.every(newZoomLevels, function(newZoomLevel, index) {
+          var oldZoomLevelLevels = this.ranges_[index]['levels'];
+          return newZoomLevel['levels'].length == oldZoomLevelLevels.length &&
+              goog.array.every(newZoomLevel['levels'], function(item, index) {
+                return item['unit'] == oldZoomLevelLevels[index]['unit'] &&
+                    item['count'] == oldZoomLevelLevels[index]['count'];
+              });
+        }, this);
+    if (!same) {
+      this.ranges_ = newZoomLevels;
+      this.consistent = false;
+      this.dispatchSignal(anychart.Signal.NEED_UPDATE_TICK_DEPENDENT | anychart.Signal.NEEDS_RECALCULATION);
+    }
+    return this;
+  }
+  return /** @type {anychart.scales.GanttDateTime.ZoomLevelsSettings} */(
+      goog.array.map(this.ranges_, function(item) {
+        return goog.array.map(item['levels'], function(level) {
+          return {
+            'unit': level['unit'],
+            'count': level['count']
+          };
+        });
+      }));
+};
+
+
+/**
+ * Setup max ticks count.
+ * It prevent long chart drawing with bad user zoomLevels config
+ *
+ * @param {number=} opt_value - Ticks count.
+ * @return {number|anychart.scales.GanttDateTime} - Scale instance or max tick count.
+ */
+anychart.scales.GanttDateTime.prototype.maxTicksCount = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var val = anychart.utils.normalizeToNaturalNumber(opt_value, 1000, false);
+    if (this.maxTicksCount_ != val) {
+      this.maxTicksCount_ = val;
+      this.consistent = false;
+      this.dispatchSignal(anychart.Signal.NEED_UPDATE_TICK_DEPENDENT | anychart.Signal.NEEDS_RECALCULATION);
+    }
+    return this;
+  }
+  return this.maxTicksCount_;
+};
+
+
+/**
+ * Getter/setter for the scale calendar.
+ *
+ * @param {anychart.ganttModule.Calendar=} opt_value -
+ * @return {anychart.ganttModule.Calendar|anychart.scales.GanttDateTime}
+ */
+anychart.scales.GanttDateTime.prototype.calendar = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.calendar_ != opt_value) {
+      if (this.calendar_)
+        this.calendar_.unlistenSignals(this.handleCalendarSignal_, this);
+      this.calendar_ = opt_value;
+      if (this.calendar_)
+        this.calendar_.listenSignals(this.handleCalendarSignal_, this);
+      this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
+    }
+    return this;
+  }
+  if (!this.calendar_) {
+    this.calendar_ = new anychart.ganttModule.Calendar();
+    this.calendar_.listenSignals(this.handleCalendarSignal_, this);
+
+    /*
+      This dispatching is required to redraw chart with default
+      locale weekend range on calendar initialization.
+     */
+    this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
+  }
+  return this.calendar_;
+};
+
+
+//endregion
+//region -- Scale calculations.
+/**
+ * Calculates and fits values.
+ */
+anychart.scales.GanttDateTime.prototype.calculate = function() {
+  if (!this.consistent && !this.isEmpty()) {
+    this.consistent = true;
+    var totalRange = this.getTotalRange();
+    var tMin = totalRange['min'];
+    var tMax = totalRange['max'];
+    if (isNaN(tMin)) {
+      if (!isNaN(this.min_)) {
+        this.dataMin_ = this.min_;
+      }
+    } else {
+      if (isNaN(this.min_)) {
+        this.min_ = tMin;
+      } else {
+        this.min_ = Math.max(this.min_, tMin);
+      }
+    }
+
+    if (isNaN(tMax)) {
+      if (!isNaN(this.max_)) {
+        this.dataMax_ = this.max_;
+      }
+    } else {
+      if (isNaN(this.max_)) {
+        this.max_ = tMax;
+      } else {
+        this.max_ = Math.min(this.max_, tMax);
+      }
+    }
+
+    if (this.min_ > this.max_) {
+      var range = this.min_ - this.max_;
+      this.min_ = Math.max(this.max_, tMin);
+      this.max_ = Math.min(this.min_ + range, tMax);
+    }
+  }
+};
+
+
+/**
+ * @param {number} pixStart - TODO (A.Kudryavtsev): Unused parameter, from previous scale implementation.
+ * @param {number} pixEnd - TODO (A.Kudryavtsev): Unused parameter, from previous scale implementation.
+ * @param {anychart.enums.Interval} unit
+ * @param {number} count
+ * @param {{min: number, max: number}=} opt_range we want ticks from, visible range by default
+ * @return {Array.<anychart.scales.GanttDateTime.Tick>}
+ */
+anychart.scales.GanttDateTime.prototype.getTicks = function(pixStart, pixEnd, unit, count, opt_range) {
+  var range = opt_range || this.getRange();
+  var normalizedValues = this.getNormalizedIntervalValues_(unit, count);
+
+  unit = normalizedValues.unit;
+  count = normalizedValues.count;
+
+  var start = anychart.utils.alignDateLeftByUnit(range['min'], unit, count, 2000);
+  var interval = anychart.utils.getIntervalFromInfo(unit, count);
+
+  var end = range['max'];
+  var res = [];
+
+  //TODO (A.Kudryavtsev): Describe fiscal behaviour.
+  var current, currentMs;
+  if (this.fiscalYearStartMonth_ > 1 &&
+      (unit == anychart.enums.Interval.YEAR ||
+      unit == anychart.enums.Interval.SEMESTER ||
+      unit == anychart.enums.Interval.QUARTER)) {
+    var fiscalStart = anychart.utils.shiftFiscalDate(start, this.fiscalYearStartMonth_);
+    if (fiscalStart > start) {
+      var invertedInterval = interval.getInverse();
+      current = new goog.date.UtcDateTime(new Date(fiscalStart));
+      currentMs = current.getTime();
+      do {
+        current.add(invertedInterval);
+        currentMs = current.getTime();
+      } while (currentMs > start);
+    }
+  } else {
+    current = new goog.date.UtcDateTime(new Date(start));
+  }
+
+  currentMs = current.getTime();
+  while (currentMs < end) {
+    var prev = currentMs;
+    current.add(interval);
+    currentMs = current.getTime();
+    res.push({
+      'start': prev,
+      'end': currentMs
+    });
+  }
+  return res;
+};
+
+
+/**
+ * @param {anychart.enums.Interval} unit
+ * @param {number} count
+ * @return {Array.<number>}
+ */
+anychart.scales.GanttDateTime.prototype.getSimpleTicks = function(unit, count) {
+  return goog.array.map(this.getTicks(NaN, NaN, unit, count), function(item) {
+    return item['end'];
+  });
+};
+
+
+/**
+ * Transforms a passed value into a ratio depending on current scale date range.
+ * <b>Example: </b>
+ * If current range is 12.00 - 13.00 ([0..1] in ratio expression), then
+ *  12.30 -> 0.5
+ *  12.15 -> 0.25
+ *  14.00 -> 2
+ *  11.00 -> -1
+ *  11.30 -> -0.5
+ *
+ * @param {*} value - Value to transform.
+ * @return {number} - Value transformed to ratio scope. Returns NaN if scale range is not set.
+ */
+anychart.scales.GanttDateTime.prototype.timestampToRatio = function(value) {
+  this.calculate();
+  var val;
+  if (goog.isString(value)) {
+    switch (value.toLowerCase()) { //Got string like 'current'.
+      case anychart.enums.GanttDateTimeMarkers.CURRENT:
+        if (isNaN(this.currentDate))
+          this.currentDate = goog.now();
+        val = this.currentDate;
+        break;
+      case anychart.enums.GanttDateTimeMarkers.START:
+        val = this.trackedDataMin;
+        break;
+      case anychart.enums.GanttDateTimeMarkers.END:
+        val = this.trackedDataMax;
+    }
+
+    if (!goog.isDef(val)) { //Got string representation of date.
+      val = anychart.format.parseDateTime(value);
+    }
+  }
+
+  val = goog.isDefAndNotNull(val) ? val : anychart.utils.normalizeTimestamp(value);
+
+  var range = this.getRange();
+  var min = range['min'];
+  var max = range['max'];
+
+  //You will get this return expression if you draw a time axis and mark a values there.
+  return (val - min) / (max - min);
+};
+
+
+/**
+ * Transforms a passed ratio value into a timestamp depending on current scale date range.
+ * @param {number} value - Ratio.
+ * @return {number} - Timestamp.
+ */
+anychart.scales.GanttDateTime.prototype.ratioToTimestamp = function(value) {
+  var range = this.getRange();
+  var min = range['min'];
+  var max = range['max'];
+
+  //You will get this return expression if you draw a time axis and mark a values there.
+  return Math.round(value * (max - min) + min);
+};
+
+
+/**
+ * Gets level settings for current scale state.
+ * @return {Array.<anychart.scales.GanttDateTime.LevelData>}
+ */
+anychart.scales.GanttDateTime.prototype.getLevelsData = function() {
+  this.calculate();
+  var r = this.getRange();
+  var min = r['min'];
+  var max = r['max'];
+
+  var minorTickRange = (max - min) / 20;
+  var last = this.ranges_.length - 1;
+  var row;
+  for (var i = 0; i < last; i++) {
+    if (minorTickRange <= this.ranges_[i]['range']) {
+      row = this.ranges_[i];
+      break;
+    }
+  }
+  if (!row) {
+    row = this.ranges_[last];
+  }
+
+  return /** @type {Array.<anychart.scales.GanttDateTime.LevelData>} */(row['levels']);
+};
+
+/**
+ * Whether scale has calendar initialized.
+ *
+ * @return {boolean}
+ */
+anychart.scales.GanttDateTime.prototype.hasCalendar = function() {
+  return !!this.calendar_;
+};
+
+
+/**
+ * Calculates working schedule.
+ *
+ * @return {Array.<anychart.ganttModule.Calendar.DailyScheduleData>} - Gets current working schedule
+ *  defined by calendar settings.
+ */
+anychart.scales.GanttDateTime.prototype.getWorkingSchedule = function() {
+  if (this.calendar_) {
+    this.calculate();
+    var r = this.getRange();
+    return this.calendar_.getWorkingSchedule(r['min'], r['max']);
+  }
+  return [];
+};
+
+
+//endregion
+//region -- Scrolling.
+/**
  * Performs scroll by ratio passed.
  * @param {number} ratio - Ratio.
  * @return {anychart.scales.GanttDateTime} - Itself for method chaining.
@@ -1214,16 +1319,8 @@ anychart.scales.GanttDateTime.prototype.ratioForceScroll = function(ratio) {
 };
 
 
-/**
- * Quick hack to make anychart.core.drawers.Base work with gantt scale.
- * @param {*=} opt_value
- * @return {boolean}
- */
-anychart.scales.GanttDateTime.prototype.checkWeights = function(opt_value) {
-  return false;
-};
-
-
+//endregion
+//region -- Serialization/Deserialization.
 /** @inheritDoc */
 anychart.scales.GanttDateTime.prototype.serialize = function() {
   var json = anychart.scales.GanttDateTime.base(this, 'serialize');
@@ -1260,6 +1357,13 @@ anychart.scales.GanttDateTime.prototype.serialize = function() {
 
   if (this.fiscalYearStartMonth_ > 1)
     json['fiscalYearStartMonth'] = this.fiscalYearStartMonth_;
+
+  if (this.calendar_) {
+    var calendarConfig = this.calendar_.serialize();
+    if (!goog.object.isEmpty(calendarConfig)) {
+      json['calendar'] = calendarConfig;
+    }
+  }
 
   return json;
 };
@@ -1314,6 +1418,10 @@ anychart.scales.GanttDateTime.prototype.setupByJSON = function(config, opt_defau
   if ('maxTicksCount' in config)
     this.maxTicksCount(config['maxTicksCount']);
 
+  if ('calendar' in config) {
+    this.calendar().setupByJSON(config['calendar']);
+  }
+
   if (recalc) {
     this.consistent = false;
     this.calculate();
@@ -1322,24 +1430,30 @@ anychart.scales.GanttDateTime.prototype.setupByJSON = function(config, opt_defau
 };
 
 
+//endregion
+//region -- Exports.
 //exports
 (function() {
   var proto = anychart.scales.GanttDateTime.prototype;
-  proto['minimumGap'] = proto.minimumGap;
-  proto['maximumGap'] = proto.maximumGap;
+  proto['getRange'] = proto.getRange;
+  proto['getTotalRange'] = proto.getTotalRange;
   proto['minimum'] = proto.minimum;
   proto['maximum'] = proto.maximum;
   proto['softMinimum'] = proto.softMinimum;
   proto['softMaximum'] = proto.softMaximum;
-  proto['getRange'] = proto.getRange;
-  proto['getTotalRange'] = proto.getTotalRange;
-  proto['zoomLevels'] = proto.zoomLevels;
+  proto['minimumGap'] = proto.minimumGap;
+  proto['maximumGap'] = proto.maximumGap;
+  proto['fiscalYearStartMonth'] = proto.fiscalYearStartMonth;
   proto['transform'] = proto.transform;
   proto['inverseTransform'] = proto.inverseTransform;
-  proto['fiscalYearStartMonth'] = proto.fiscalYearStartMonth;
+  proto['zoomLevels'] = proto.zoomLevels;
   proto['maxTicksCount'] = proto.maxTicksCount;
+  proto['calendar'] = proto.calendar;
   // proto['zoomIn'] = proto.zoomIn;
   // proto['zoomOut'] = proto.zoomOut;
   // proto['zoomTo'] = proto.zoomTo;
   // proto['fitAll'] = proto.fitAll;
 })();
+
+
+//endregion

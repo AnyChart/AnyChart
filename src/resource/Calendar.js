@@ -1,7 +1,10 @@
 goog.provide('anychart.resourceModule.Calendar');
+
 goog.require('anychart.core.Base');
 goog.require('anychart.format');
+goog.require('anychart.resourceModule.AvailabilityStorage');
 goog.require('anychart.utils');
+
 goog.require('goog.array');
 goog.require('goog.date.Interval');
 goog.require('goog.date.UtcDateTime');
@@ -19,7 +22,7 @@ anychart.resourceModule.Calendar = function(opt_parentCalendar) {
 
   /**
    * Availabilities.
-   * @type {Array.<anychart.resourceModule.Calendar.AStorage>}
+   * @type {Array.<anychart.resourceModule.AvailabilityStorage>}
    * @private
    */
   this.availabilities_ = [];
@@ -104,7 +107,8 @@ anychart.resourceModule.Calendar.prototype.SUPPORTED_SIGNALS = anychart.Signal.N
  *    to: (Date|number|string|undefined),
  *    starts: (Date|number|string|undefined),
  *    ends: (Date|number|string|undefined),
- *    isWorking: (boolean|undefined)
+ *    isWorking: (boolean|undefined),
+ *    isHoliday: (boolean|undefined)
  * }}
  */
 anychart.resourceModule.Calendar.Availability;
@@ -124,41 +128,36 @@ anychart.resourceModule.Calendar.ScheduleItem;
 /**
  * Date format for ON clauses.
  * @type {string}
- * @private
  */
-anychart.resourceModule.Calendar.DATE_FORMAT_ = 'dd.MM';
+anychart.resourceModule.Calendar.DATE_FORMAT = 'dd.MM';
 
 
 /**
  * Base date for dates without year.
  * @type {Date}
- * @private
  */
-anychart.resourceModule.Calendar.BASE_DATE_ = new Date(Date.UTC(2000, 0));
+anychart.resourceModule.Calendar.BASE_DATE = new Date(Date.UTC(2000, 0));
 
 
 /**
  * Milliseconds in minute const.
  * @const {number}
- * @private
  */
-anychart.resourceModule.Calendar.MS_IN_MINUTE_ = 60 * 1000;
+anychart.resourceModule.Calendar.MS_IN_MINUTE = 60 * 1000;
 
 
 /**
  * Milliseconds in minute const.
  * @const {number}
- * @private
  */
-anychart.resourceModule.Calendar.MS_IN_HOUR_ = 60 * 60 * 1000;
+anychart.resourceModule.Calendar.MS_IN_HOUR = 60 * 60 * 1000;
 
 
 /**
  * Milliseconds in day const.
  * @const {number}
- * @private
  */
-anychart.resourceModule.Calendar.MS_IN_DAY_ = 24 * 60 * 60 * 1000;
+anychart.resourceModule.Calendar.MS_IN_DAY = 24 * 60 * 60 * 1000;
 
 
 /**
@@ -178,9 +177,8 @@ anychart.resourceModule.Calendar.MAXIMUM_DATE = new goog.date.UtcDateTime(9999, 
 /**
  * A 1-Day interval.
  * @const {goog.date.Interval}
- * @private
  */
-anychart.resourceModule.Calendar.DAY_ = new goog.date.Interval(0, 0, 1);
+anychart.resourceModule.Calendar.DAY = new goog.date.Interval(0, 0, 1);
 
 
 //endregion
@@ -281,12 +279,12 @@ anychart.resourceModule.Calendar.prototype.availabilities = function(opt_value) 
  * @return {Array.<anychart.resourceModule.Calendar.ScheduleItem>} An array of schedule items.
  */
 anychart.resourceModule.Calendar.prototype.getWorkingSchedule = function(startDate, endDate, opt_unit, opt_count) {
-  return this.getWorkingScheduleInternal(
-      anychart.utils.normalizeTimestamp(startDate),
-      anychart.utils.normalizeTimestamp(endDate),
-      anychart.utils.getIntervalFromInfo(
-          /** @type {anychart.enums.Interval} */(anychart.enums.normalizeInterval(opt_unit, anychart.enums.Interval.DAY, true)),
-          anychart.utils.normalizeToNaturalNumber(opt_count)));
+  var start = anychart.utils.normalizeTimestamp(startDate);
+  var end = anychart.utils.normalizeTimestamp(endDate);
+  var unit = /** @type {anychart.enums.Interval} */(anychart.enums.normalizeInterval(opt_unit, anychart.enums.Interval.DAY, true));
+  var count = anychart.utils.normalizeToNaturalNumber(opt_count);
+  var interval = anychart.utils.getIntervalFromInfo(unit, count);
+  return this.getWorkingScheduleInternal(start, end, interval);
 };
 
 
@@ -305,11 +303,11 @@ anychart.resourceModule.Calendar.prototype.getWorkingTime = function(start, end)
     for (var i = 0; i < daySchedule.length; i++) {
       var time = daySchedule[i];
       result.push([
-        time[0] - this.tzOffset_ * anychart.resourceModule.Calendar.MS_IN_MINUTE_,
-        time[1] - this.tzOffset_ * anychart.resourceModule.Calendar.MS_IN_MINUTE_
+        time[0] - this.tzOffset_ * anychart.resourceModule.Calendar.MS_IN_MINUTE,
+        time[1] - this.tzOffset_ * anychart.resourceModule.Calendar.MS_IN_MINUTE
       ]);
     }
-    current.add(anychart.resourceModule.Calendar.DAY_);
+    current.add(anychart.resourceModule.Calendar.DAY);
   }
   return result;
 };
@@ -328,7 +326,7 @@ anychart.resourceModule.Calendar.prototype.hasWorkingTime = function(start, end)
     var daySchedule = this.getDaySchedule_(current);
     if (daySchedule.length)
       return true;
-    current.add(anychart.resourceModule.Calendar.DAY_);
+    current.add(anychart.resourceModule.Calendar.DAY);
   }
   return false;
 };
@@ -494,7 +492,7 @@ anychart.resourceModule.Calendar.prototype.getDaySchedule_ = function(date) {
     // weekendRange zero is Monday, getUTCDay zero is Sunday - converting
     var day = (date.getUTCDay() + 6) % 7;
     if (day < this.weekendRange_[0] || day > this.weekendRange_[1]) {
-      res.push([date.getTime(), date.getTime() + anychart.resourceModule.Calendar.MS_IN_DAY_ - anychart.resourceModule.Calendar.MS_IN_MINUTE_]);
+      res.push([date.getTime(), date.getTime() + anychart.resourceModule.Calendar.MS_IN_DAY - anychart.resourceModule.Calendar.MS_IN_MINUTE]);
     }
   }
   // checking parent
@@ -528,7 +526,7 @@ anychart.resourceModule.Calendar.prototype.dropCache_ = function() {
 anychart.resourceModule.Calendar.prototype.createAvailabilities_ = function() {
   this.availabilities_.length = 0;
   for (var i = 0; i < this.rawAvailabilities_.length; i++) {
-    this.availabilities_.push(new anychart.resourceModule.Calendar.AStorage(this.rawAvailabilities_[i]));
+    this.availabilities_.push(new anychart.resourceModule.AvailabilityStorage(this.rawAvailabilities_[i]));
   }
 };
 
@@ -545,392 +543,6 @@ anychart.resourceModule.Calendar.prototype.handleParentSignals_ = function(e) {
 
 
 
-//endregion
-//region --- anychart.resourceModule.Calendar.AStorage
-//------------------------------------------------------------------------------
-//
-//  anychart.resourceModule.Calendar.AStorage
-//
-//------------------------------------------------------------------------------
-/**
- * Stores availability info.
- * @param {anychart.resourceModule.Calendar.Availability} availability
- * @constructor
- */
-anychart.resourceModule.Calendar.AStorage = function(availability) {
-  var isWorking = availability['isWorking'];
-  this.holidays = goog.isDef(isWorking) ? !isWorking : false;
-
-  var period = anychart.enums.normalizeAvailabilityPeriod(availability['each']);
-  switch (period) {
-    case anychart.enums.AvailabilityPeriod.YEAR:
-      this.initYearly_(availability['on'], availability['from'], availability['to']);
-      break;
-    case anychart.enums.AvailabilityPeriod.WEEK:
-      this.initWeekly_(availability['on'], availability['from'], availability['to']);
-      break;
-    case anychart.enums.AvailabilityPeriod.DAY:
-      this.initWeekly_(NaN, availability['from'], availability['to']);
-      break;
-    default:
-      this.initNonPeriodic_(availability['on'], availability['from'], availability['to']);
-  }
-
-  if (period == anychart.enums.AvailabilityPeriod.NONE) {
-    if (this.on_) {
-      this.starts = this.on_.clone();
-      this.ends = this.on_.clone();
-      this.ends.add(anychart.resourceModule.Calendar.DAY_);
-    } else {
-      this.starts = this.from_.clone();
-      this.ends = this.to_.clone();
-    }
-  } else {
-    var tmp = anychart.format.parseDateTime(availability['starts']);
-    this.starts = tmp ?
-        new goog.date.UtcDateTime(tmp.getUTCFullYear(), tmp.getUTCMonth(), tmp.getUTCDate()) :
-        anychart.resourceModule.Calendar.MINIMUM_DATE;
-
-    tmp = anychart.format.parseDateTime(availability['ends']);
-    if (tmp) {
-      this.ends = new goog.date.UtcDateTime(tmp.getUTCFullYear(), tmp.getUTCMonth(), tmp.getUTCDate());
-      this.ends.add(anychart.resourceModule.Calendar.DAY_);
-    } else {
-      this.ends = anychart.resourceModule.Calendar.MAXIMUM_DATE;
-    }
-  }
-};
-
-
-//region --- Properties
-//------------------------------------------------------------------------------
-//
-//  Properties
-//
-//------------------------------------------------------------------------------
-/**
- * If the passed availability is a holiday period.
- * @type {boolean}
- */
-anychart.resourceModule.Calendar.AStorage.prototype.holidays;
-
-
-/**
- * When the availability starts to make effect.
- * @type {?goog.date.UtcDateTime}
- */
-anychart.resourceModule.Calendar.AStorage.prototype.starts;
-
-
-/**
- * When the availability ends to make effect.
- * @type {?goog.date.UtcDateTime}
- */
-anychart.resourceModule.Calendar.AStorage.prototype.ends;
-
-
-/**
- * @type {goog.date.UtcDateTime|null|number}
- * @private
- */
-anychart.resourceModule.Calendar.AStorage.prototype.on_;
-
-
-/**
- * @type {Array.<number>|goog.date.UtcDateTime}
- * @private
- */
-anychart.resourceModule.Calendar.AStorage.prototype.from_;
-
-
-/**
- * @type {Array.<number>|goog.date.UtcDateTime}
- * @private
- */
-anychart.resourceModule.Calendar.AStorage.prototype.to_;
-
-
-//endregion
-//region --- Public methods
-//------------------------------------------------------------------------------
-//
-//  Public methods
-//
-//------------------------------------------------------------------------------
-/**
- *
- * @param {Array} result
- * @param {goog.date.UtcDateTime} date
- * @return {Array}
- */
-anychart.resourceModule.Calendar.AStorage.prototype.applyToSchedule = function(result, date) {
-  return this.applies_(date) ? this.merge_(result || [], date) : result;
-};
-
-
-//endregion
-//region --- Private methods
-//------------------------------------------------------------------------------
-//
-//  Private methods
-//
-//------------------------------------------------------------------------------
-/**
- * Initializes this instance as a yearly-periodic availability.
- * @param {*} on
- * @param {*} from
- * @param {*} to
- * @private
- */
-anychart.resourceModule.Calendar.AStorage.prototype.initYearly_ = function(on, from, to) {
-  this.applies_ = this.appliesByDay_;
-  on = anychart.format.parseDateTime(on, anychart.resourceModule.Calendar.DATE_FORMAT_, anychart.resourceModule.Calendar.BASE_DATE_);
-  if (on) {
-    this.merge_ = this.mergeTime_;
-    this.on_ = new goog.date.UtcDateTime(2000, on.getUTCMonth(), on.getUTCDate());
-    var timeRange = this.parseTime_(from, to);
-    this.from_ = timeRange[0];
-    this.to_ = timeRange[1];
-  } else {
-    this.merge_ = this.replaceDay_;
-    this.on_ = null;
-    var tmp = anychart.format.parseDateTime(from, anychart.resourceModule.Calendar.DATE_FORMAT_, anychart.resourceModule.Calendar.BASE_DATE_);
-    tmp = tmp ? new goog.date.UtcDateTime(tmp) : anychart.resourceModule.Calendar.MINIMUM_DATE;
-    this.from_ = new goog.date.UtcDateTime(2000, tmp.getUTCMonth(), tmp.getUTCDate());
-    tmp = anychart.format.parseDateTime(to, anychart.resourceModule.Calendar.DATE_FORMAT_, anychart.resourceModule.Calendar.BASE_DATE_);
-    tmp = tmp ? new goog.date.UtcDateTime(tmp) : anychart.resourceModule.Calendar.MAXIMUM_DATE;
-    this.to_ = new goog.date.UtcDateTime(2000, tmp.getUTCMonth(), tmp.getUTCDate());
-    this.to_.add(anychart.resourceModule.Calendar.DAY_);
-  }
-};
-
-
-/**
- * Initializes this instance as a weekly-periodic availability.
- * @param {*} on
- * @param {*} from
- * @param {*} to
- * @private
- */
-anychart.resourceModule.Calendar.AStorage.prototype.initWeekly_ = function(on, from, to) {
-  this.applies_ = this.appliesByWeekDay_;
-  this.merge_ = this.mergeTime_;
-  on = this.toElement_(on, 6, NaN);
-  this.on_ = isNaN(on) ? null : on;
-  var timeRange = this.parseTime_(from, to);
-  this.from_ = timeRange[0];
-  this.to_ = timeRange[1];
-};
-
-
-/**
- * Initializes this instance as a Nonperiodic-periodic availability.
- * @param {*} on
- * @param {*} from
- * @param {*} to
- * @private
- */
-anychart.resourceModule.Calendar.AStorage.prototype.initNonPeriodic_ = function(on, from, to) {
-  this.applies_ = this.withinRange_;
-  on = anychart.format.parseDateTime(on);
-  if (on) {
-    this.merge_ = this.mergeTime_;
-    this.on_ = new goog.date.UtcDateTime(on.getUTCFullYear(), on.getUTCMonth(), on.getUTCDate());
-    var timeRange = this.parseTime_(from, to);
-    this.from_ = timeRange[0];
-    this.to_ = timeRange[1];
-  } else {
-    this.merge_ = this.replaceDay_;
-    this.on_ = null;
-    var tmp = anychart.format.parseDateTime(from);
-    tmp = tmp ? new goog.date.UtcDateTime(tmp) : anychart.resourceModule.Calendar.MINIMUM_DATE;
-    this.from_ = new goog.date.UtcDateTime(tmp.getUTCFullYear(), tmp.getUTCMonth(), tmp.getUTCDate());
-    tmp = anychart.format.parseDateTime(to);
-    tmp = tmp ? new goog.date.UtcDateTime(tmp) : anychart.resourceModule.Calendar.MAXIMUM_DATE;
-    this.to_ = new goog.date.UtcDateTime(tmp.getUTCFullYear(), tmp.getUTCMonth(), tmp.getUTCDate());
-    this.to_.add(anychart.resourceModule.Calendar.DAY_);
-  }
-};
-
-
-/**
- * Returns if the date is within the starts-ends range.
- * @param {goog.date.UtcDateTime} date
- * @return {boolean}
- * @private
- */
-anychart.resourceModule.Calendar.AStorage.prototype.withinRange_ = function(date) {
-  return (date.getTime() >= this.starts.getTime() && date.getTime() <= this.ends.getTime());
-};
-
-
-/**
- * Checks applicability with on_ being a null or ISO weekday number (0-Monday).
- * @param {goog.date.UtcDateTime} date
- * @return {boolean}
- * @private
- */
-anychart.resourceModule.Calendar.AStorage.prototype.appliesByWeekDay_ = function(date) {
-  return this.withinRange_(date) && (goog.isNull(this.on_) || ((date.getUTCDay() + 6) % 7) == this.on_);
-};
-
-
-/**
- * Checks applicability with on_ being a null or ISO weekday number (0-Monday).
- * @param {goog.date.UtcDateTime} date
- * @return {boolean}
- * @private
- */
-anychart.resourceModule.Calendar.AStorage.prototype.appliesByDay_ = function(date) {
-  if (!this.withinRange_(date)) return false;
-  if (this.on_) {
-    return (date.getUTCMonth() == this.on_.getUTCMonth() &&
-        date.getUTCDate() == this.on_.getUTCDate());
-  } else {
-    var year = date.getUTCFullYear();
-    var time = date.getTime();
-    var from = this.from_.clone();
-    from.setUTCFullYear(year);
-    var to = this.to_.clone();
-    to.setUTCFullYear(year);
-    return (time >= from.getTime() && time <= to.getTime());
-  }
-};
-
-
-/**
- * Merges time range intervals in assumption that current interval has more priority.
- * @param {Array} prevResult
- * @param {goog.date.UtcDateTime} date
- * @return {Array}
- * @private
- */
-anychart.resourceModule.Calendar.AStorage.prototype.mergeTime_ = function(prevResult, date) {
-  var tmp = /** @type {Array} */(this.from_);
-  var from = date.getTime() +
-      tmp[0] * anychart.resourceModule.Calendar.MS_IN_HOUR_ +
-      tmp[1] * anychart.resourceModule.Calendar.MS_IN_MINUTE_;
-  tmp = /** @type {Array} */(this.to_);
-  var to = date.getTime() +
-      tmp[0] * anychart.resourceModule.Calendar.MS_IN_HOUR_ +
-      tmp[1] * anychart.resourceModule.Calendar.MS_IN_MINUTE_;
-  var result = [];
-  var i = 0;
-  // skipping all ranges that are to the left of the current range
-  while ((tmp = prevResult[i]) && tmp[1] < from) {
-    result.push(tmp);
-    i++;
-  }
-  if (i < prevResult.length) { // i-th prev range ends after the from
-    // prevResult[i] is in tmp now
-    if (tmp[0] > to) { // no overlap
-      // if current range is a holiday - nothing changes
-      // otherwise we just add it as is - it overlaps nothing
-      if (!this.holidays) {
-        result.push([from, to]);
-      }
-    } else { // current range overlaps at least one range of prevResult
-      if (this.holidays) { // we should reduce that range
-        if (tmp[0] < from) { // there is a segment in front
-          result.push([tmp[0], from]);
-        }
-        from = to; // the next range would start at least at the end of the current range
-      } else { // we should concat the ranges
-        from = Math.min(from, tmp[0]);
-      }
-      // skipping parts that are completely inside the range
-      // can be a noop, if i-th part contains the current range completely
-      while (tmp && tmp[1] <= to) {
-        i++;
-        tmp = prevResult[i];
-      }
-      // if there is a part that overlaps the right end of the current range
-      if (i < prevResult.length && tmp[0] <= to) {
-        result.push([from, tmp[1]]);
-        i++;
-      }
-    }
-    // adding ranges that are completely to the right of the current range
-    for (; i < prevResult.length; i++) {
-      result.push(prevResult[i]);
-    }
-  } else if (!this.holidays) {
-    result.push([from, to]);
-  }
-  return result;
-};
-
-
-/**
- * Merges result for situations when there is a full day set.
- * @param {Array} result
- * @param {goog.date.UtcDateTime} date
- * @return {Array}
- * @private
- */
-anychart.resourceModule.Calendar.AStorage.prototype.replaceDay_ = function(result, date) {
-  result.length = 0;
-  if (!this.holidays)
-    result.push([date.getTime(), date.getTime() + anychart.resourceModule.Calendar.MS_IN_DAY_ - anychart.resourceModule.Calendar.MS_IN_MINUTE_]);
-  return result;
-};
-
-
-/**
- * Parses passed from and to as a time period within a day.
- * @param {*} from
- * @param {*} to
- * @return {Array.<Array.<number>>}
- * @private
- */
-anychart.resourceModule.Calendar.AStorage.prototype.parseTime_ = function(from, to) {
-  var resFrom, resTo, tmp;
-  if (goog.isString(from)) {
-    tmp = from.split(':', 2);
-    resFrom = [
-      this.toElement_(tmp[0], 23, 0),
-      tmp.length == 2 ? this.toElement_(tmp[1], 59, 0) : 0
-    ];
-  } else if (goog.isNumber(from)) {
-    resFrom = [
-      Math.max(0, Math.min(23, Math.floor(from))),
-      0
-    ];
-  } else {
-    resFrom = null;
-  }
-  if (goog.isString(to)) {
-    tmp = to.split(':', 2);
-    resTo = [
-      this.toElement_(tmp[0], 23, 23),
-      tmp.length == 2 ? this.toElement_(tmp[1], 59, 0) : 0
-    ];
-  } else if (goog.isNumber(to) && !isNaN(to)) {
-    resTo = [
-      Math.max(0, Math.min(23, Math.floor(to))),
-      0
-    ];
-  } else {
-    resTo = null;
-  }
-  return (resFrom && resTo) ? [resFrom, resTo] : [[0, 0], [23, 59]];
-};
-
-
-/**
- * Returns an natural number between 0 and maxVal.
- * @param {*} str
- * @param {number} maxVal
- * @param {number} defVal
- * @return {number}
- * @private
- */
-anychart.resourceModule.Calendar.AStorage.prototype.toElement_ = function(str, maxVal, defVal) {
-  return Math.min(anychart.utils.normalizeToNaturalNumber(str, defVal, true), maxVal);
-};
-
-
-//endregion
 //endregion
 //region --- Serialization / Deserialization / Disposing
 //------------------------------------------------------------------------------
