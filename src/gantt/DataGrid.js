@@ -703,6 +703,9 @@ anychart.ganttModule.DataGrid.prototype.initPartialData = function() {
     the "reset" flag allows to keep resetting under control.
    */
   if (this.partialLabels.reset) {
+    // This dispatching is for DVF-4398.
+    this.interactivityHandler.dispatchEvent(anychart.enums.EventType.WORKING_START);
+
     var enabledColumnsCount = 0;
     for (var i = 0, l = this.columns_.length; i < l; i++) {
       var column = this.columns_[i];
@@ -900,7 +903,7 @@ anychart.ganttModule.DataGrid.prototype.prepareAsync_ = function() {
           col.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION);
           col.draw();
         });
-        this.prepareLabels();
+        this.prepareAsync_();
       } else {
         this.forEachVisibleColumn_(function(col) {
           //Here we suppose everything is applied correctly.
@@ -915,6 +918,13 @@ anychart.ganttModule.DataGrid.prototype.prepareAsync_ = function() {
         this.controller.run(); //this clears remaining async consistency states on timeline.
         this.controller.timeouts.push(anychart.utils.schedule(function() {
           this.controller.resetTimeouts();
+
+          // This dispatching is for DVF-4398.
+          this.interactivityHandler.dispatchEvent({
+            'type': anychart.enums.EventType.WORKING,
+            'progress': 100
+          });
+
           this.interactivityHandler.dispatchEvent(anychart.enums.EventType.WORKING_FINISH);
         }, void 0, this));
       }

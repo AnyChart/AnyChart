@@ -1198,9 +1198,6 @@ anychart.ganttModule.Chart.prototype.drawContent = function(bounds) {
     //This consistency state is used to set 'checkDrawingNeeded()' to TRUE. Controller must be run anyway.
     this.markConsistent(anychart.ConsistencyState.GANTT_POSITION);
   }
-
-  if (anychart.isAsync()) // ASYNC feature, not needed in regular gantt flow.
-    this.dispatchEvent(anychart.enums.EventType.WORKING_START);
 };
 
 
