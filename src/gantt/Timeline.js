@@ -4170,13 +4170,14 @@ anychart.ganttModule.TimeLine.prototype.limitProgressWidth_ = function(progressV
  * @param {anychart.ganttModule.elements.TimelineElement} element - Element.
  * @param {anychart.math.Rect} itemBounds - Full item bounds. Left and width must be taken
  *  from scale transformed values, top and height are values from item's position in grid.
+ * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} dataItem - Element point data.
  * @param {boolean=} opt_considerBaseline - Whether to consider baseline appearance in itemBounds.
  * @return {anychart.math.Rect} - Bar bounds considering anchor/position settings.
  * @private
  */
-anychart.ganttModule.TimeLine.prototype.getBarBounds_ = function(element, itemBounds, opt_considerBaseline) {
+anychart.ganttModule.TimeLine.prototype.getBarBounds_ = function(element, itemBounds, dataItem, opt_considerBaseline) {
   var fixParentHeight = element.getType() == anychart.enums.TLElementTypes.GROUPING_TASKS;
-  var optionHeight = /** @type {string|number} */ (element.getOption('height'));
+  var optionHeight = /** @type {string|number} */ (element.getHeight(dataItem));
   var height = opt_considerBaseline || fixParentHeight ? itemBounds.height / 2 : itemBounds.height;
   var barHeight = anychart.utils.normalizeSize(optionHeight, height);
   var anchor = /** @type {anychart.enums.Anchor} */ (element.getOption('anchor'));
@@ -4341,7 +4342,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsBaseline_ = function(dataItem, tot
       var actualRight = b.left + b.width * actualEndRatio;
       var actualWidth = actualRight - actualLeft;
       var actualItemBounds = new anychart.math.Rect(actualLeft, totalTop, actualWidth, itemHeight);
-      actualBounds = this.getBarBounds_(element, actualItemBounds, true);
+      actualBounds = this.getBarBounds_(element, actualItemBounds, dataItem, true);
     }
 
     if (baselinePresents) {
@@ -4349,7 +4350,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsBaseline_ = function(dataItem, tot
       var baselineRight = b.left + b.width * baselineEndRatio;
       var baselineWidth = baselineRight - baselineLeft;
       var baselineItemBounds = new anychart.math.Rect(baselineLeft, totalTop, baselineWidth, itemHeight);
-      baselineBounds = this.getBarBounds_(baselines, baselineItemBounds, true);
+      baselineBounds = this.getBarBounds_(baselines, baselineItemBounds, dataItem, true);
     }
 
     if (actualBounds && baselineBounds) {
@@ -4394,7 +4395,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsBaseline_ = function(dataItem, tot
           var progressValue = info.progress;
           var progressWidth = this.limitProgressWidth_(/** @type {number} */ (progressValue), actualBounds.width, progressEl);
           var progressItemBounds = new anychart.math.Rect(actualBounds.left, actualBounds.top, progressWidth, actualBounds.height);
-          var progressBounds = this.getBarBounds_(progressEl, progressItemBounds);
+          var progressBounds = this.getBarBounds_(progressEl, progressItemBounds, dataItem);
           var progressTag = this.createTag(dataItem, progressEl, progressBounds);
           progressEl.rendering().callDrawer(dataItem, progressBounds, progressTag, void 0, isSelected);
         }
@@ -4408,7 +4409,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsBaseline_ = function(dataItem, tot
       baselineProgressBounds = actualBounds.clone();
       baselineProgressBounds.top = totalTop;
       baselineProgressBounds.height = itemHeight;
-      baselineProgressBounds = this.getBarBounds_(baselines, baselineProgressBounds, true);
+      baselineProgressBounds = this.getBarBounds_(baselines, baselineProgressBounds, dataItem, true);
 
       //TODO (A.Kudryavtsev): This is kind of dirty hack, needs to be reworked.
       baselineProgressBounds.top += 0.5;
@@ -4422,7 +4423,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsBaseline_ = function(dataItem, tot
         var blProgressValue = info.baselineProgress;
         var blProgressWidth = this.limitProgressWidth_(/** @type {number} */ (blProgressValue), baselineProgressBounds.width, blProgressEl);
         var blProgressItemBounds = new anychart.math.Rect(baselineProgressBounds.left, baselineProgressBounds.top, blProgressWidth, baselineProgressBounds.height);
-        var blProgressBounds = this.getBarBounds_(blProgressEl, blProgressItemBounds);
+        var blProgressBounds = this.getBarBounds_(blProgressEl, blProgressItemBounds, dataItem);
         var blProgressTag = this.createTag(dataItem, blProgressEl, blProgressBounds);
         blProgressEl.rendering().callDrawer(dataItem, blProgressBounds, blProgressTag, void 0, isSelected);
       }
@@ -4510,7 +4511,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsParent_ = function(dataItem, total
       var actualRight = b.left + b.width * endRatio;
       var actualWidth = actualRight - actualLeft;
       var actualItemBounds = new anychart.math.Rect(actualLeft, totalTop, actualWidth, itemHeight);
-      var actualBounds = this.getBarBounds_(el, actualItemBounds);
+      var actualBounds = this.getBarBounds_(el, actualItemBounds, dataItem);
 
       if (!actualBounds.width) {
         var h = actualBounds.height;
@@ -4532,7 +4533,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsParent_ = function(dataItem, total
         var progressValue = info.progress;
         var progressWidth = this.limitProgressWidth_(/** @type {number} */ (progressValue), actualWidth, progressEl);
         var progressItemBounds = new anychart.math.Rect(actualBounds.left, actualBounds.top, progressWidth, actualBounds.height);
-        var progressBounds = this.getBarBounds_(progressEl, progressItemBounds);
+        var progressBounds = this.getBarBounds_(progressEl, progressItemBounds, dataItem);
         var progressTag = this.createTag(dataItem, progressEl, progressBounds);
         progressEl.rendering().callDrawer(dataItem, progressBounds, progressTag, void 0, isSelected);
       }
@@ -4592,7 +4593,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsProgress_ = function(dataItem, tot
       var actualRight = b.left + b.width * endRatio;
       var actualWidth = actualRight - actualLeft;
       var actualItemBounds = new anychart.math.Rect(actualLeft, totalTop, actualWidth, itemHeight);
-      var actualBounds = this.getBarBounds_(el, actualItemBounds);
+      var actualBounds = this.getBarBounds_(el, actualItemBounds, dataItem);
 
       var isSelected = this.interactivityHandler.selection().isRowSelected(dataItem);
       actualBounds = this.fixBounds_(el, actualBounds, dataItem, void 0, isSelected);
@@ -4606,7 +4607,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsProgress_ = function(dataItem, tot
         var progressValue = info.progress;
         var progressWidth = this.limitProgressWidth_(/** @type {number} */ (progressValue), actualWidth, progressEl);
         var progressItemBounds = new anychart.math.Rect(actualBounds.left, actualBounds.top, progressWidth, actualBounds.height);
-        var progressBounds = this.getBarBounds_(progressEl, progressItemBounds);
+        var progressBounds = this.getBarBounds_(progressEl, progressItemBounds, dataItem);
         var progressTag = this.createTag(dataItem, progressEl, actualBounds);
         progressEl.rendering().callDrawer(dataItem, progressBounds, progressTag, void 0, isSelected);
       }
@@ -4637,14 +4638,14 @@ anychart.ganttModule.TimeLine.prototype.drawAsMilestone_ = function(dataItem, to
               stroke['thickness'] ? stroke['thickness'] : 1;
 
       var pixelShift = (lineThickness % 2 && acgraph.type() === acgraph.StageType.SVG) ? 0.5 : 0;
-      var optionHeight = /** @type {string|number} */ (el.getOption('height'));
+      var optionHeight = /** @type {string|number} */ (el.getHeight(dataItem));
       var height = anychart.utils.normalizeSize(optionHeight, itemHeight);
 
       var halfHeight = Math.round(height / 2);
 
       var centerLeft = Math.round(this.pixelBoundsCache.left + this.pixelBoundsCache.width * ratio) + pixelShift;
       var itemBounds = new anychart.math.Rect(centerLeft - halfHeight, totalTop, height, itemHeight);
-      var bounds = this.getBarBounds_(el, itemBounds);
+      var bounds = this.getBarBounds_(el, itemBounds, dataItem);
 
       var isSelected = this.interactivityHandler.selection().isRowSelected(dataItem);
       bounds = this.fixBounds_(el, bounds, dataItem, void 0, isSelected);
@@ -4686,7 +4687,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsMilestonePreview_ = function(dataI
 
       var centerLeft = Math.round(this.pixelBoundsCache.left + this.pixelBoundsCache.width * ratio) + pixelShift;
       var itemBounds = new anychart.math.Rect(centerLeft - halfHeight, totalTop, height, itemHeight);
-      var bounds = this.getBarBounds_(el, itemBounds);
+      var bounds = this.getBarBounds_(el, itemBounds, dataItem);
 
       var isSelected = this.interactivityHandler.selection().isRowSelected(dataItem);
       bounds = this.fixBounds_(el, bounds, dataItem, void 0, isSelected);
@@ -4755,7 +4756,7 @@ anychart.ganttModule.TimeLine.prototype.getItemBounds_ = function(index, opt_per
   if (anychart.ganttModule.BaseGrid.isMilestone(item)) {
     isMilestone = true;
     endTimestamp = startTimestamp;
-    var optionHeight = /** @type {string|number} */ (this.milestones().getOption('height'));
+    var optionHeight = /** @type {string|number} */ (this.milestones().getHeight(item));
     var mHeight = anychart.utils.normalizeSize(optionHeight, rowHeight);
     milestoneHalfWidth = Math.round(mHeight / 2);
   }
@@ -4772,20 +4773,42 @@ anychart.ganttModule.TimeLine.prototype.getItemBounds_ = function(index, opt_per
 
     if (!this.controller.isResources()) {
       if (isMilestone) {
-        return this.getBarBounds_(/** @type {anychart.ganttModule.elements.TimelineElement} */ (this.milestones()), itemBounds);
+        return this.getBarBounds_(
+            /** @type {anychart.ganttModule.elements.TimelineElement} */ (this.milestones()),
+            itemBounds,
+            item);
       } else if (anychart.ganttModule.BaseGrid.isBaseline(item)) {
         var element = /** @type {anychart.ganttModule.elements.TasksElement|anychart.ganttModule.elements.GroupingTasksElement} */ (anychart.ganttModule.BaseGrid.isGroupingTask(item) ? this.groupingTasks() : this.tasks());
-        var barBounds = this.getBarBounds_(/** @type {anychart.ganttModule.elements.TimelineElement} */ (element), itemBounds, true);
-        var baselineBounds = this.getBarBounds_(/** @type {anychart.ganttModule.elements.TimelineElement} */ (this.baselines()), itemBounds, true);
+        var barBounds = this.getBarBounds_(
+            /** @type {anychart.ganttModule.elements.TimelineElement} */ (element),
+            itemBounds,
+            item,
+            true);
+
+        var baselineBounds = this.getBarBounds_(
+            /** @type {anychart.ganttModule.elements.TimelineElement} */(this.baselines()),
+            itemBounds,
+            item,
+            true);
+
         this.fixBaselineBarsPositioning_(barBounds, baselineBounds, element, item);
         return barBounds;
       } else if (anychart.ganttModule.BaseGrid.isGroupingTask(item)) {
-        return this.getBarBounds_(/** @type {anychart.ganttModule.elements.TimelineElement} */ (this.groupingTasks()), itemBounds);
+        return this.getBarBounds_(
+            /** @type {anychart.ganttModule.elements.TimelineElement} */ (this.groupingTasks()),
+            itemBounds,
+            item);
       } else {
-        return this.getBarBounds_(/** @type {anychart.ganttModule.elements.TimelineElement} */ (this.tasks()), itemBounds);
+        return this.getBarBounds_(
+            /** @type {anychart.ganttModule.elements.TimelineElement} */ (this.tasks()),
+            itemBounds,
+            item);
       }
     }
-    return this.getBarBounds_(/** @type {anychart.ganttModule.elements.TimelineElement} */ (this.periods()), itemBounds);
+    return this.getBarBounds_(
+        /** @type {anychart.ganttModule.elements.TimelineElement} */ (this.periods()),
+        itemBounds,
+        item);
   }
 };
 

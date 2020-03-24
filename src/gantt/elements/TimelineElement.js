@@ -702,6 +702,18 @@ anychart.ganttModule.elements.TimelineElement.prototype.recreateShapeManager = f
 };
 
 
+/**
+ * Returns height of the element.
+ * Leave dataItem argument here because maybe in future it will be used for all gantt elements.
+ *
+ * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} dataItem - Point data.
+ * @return {number|string} - Height of the element.
+ */
+anychart.ganttModule.elements.TimelineElement.prototype.getHeight = function(dataItem) {
+  return /**@type {number|string}*/(this.getOption('height'));
+};
+
+
 //endregion
 //region -- External API.
 /**
