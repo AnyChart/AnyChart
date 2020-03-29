@@ -829,6 +829,7 @@ anychart.core.ui.Title.prototype.applyTextSettings = function(isInitial) {
   this.text_.letterSpacing(/** @type {number|string} */ (this.getOption('letterSpacing')));
   this.text_.lineHeight(/** @type {number|string} */ (this.getOption('lineHeight')));
   this.text_.textIndent(/** @type {number} */ (this.getOption('textIndent')));
+  this.text_.textShadow(/** @type {string} */ (this.getOption('textShadow')));
   this.text_.vAlign(/** @type {string} */ (this.getOption('vAlign')));
   this.text_.hAlign(/** @type {string} */ (this.getOption('hAlign')));
   this.text_.textOverflow(/** @type {string} */ (this.getOption('textOverflow')));

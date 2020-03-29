@@ -82,6 +82,7 @@ anychart.core.ui.LabelsFactory = function(opt_skipDefaultThemes) {
     'fontFamily',
     'fontColor',
     'textDirection',
+    'textShadow',
     'wordWrap',
     'wordBreak',
     'fontOpacity',
@@ -2339,6 +2340,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.applyTextSettings = function(text
     textElement.letterSpacing(/** @type {number|string} */ (target.call(this, 'letterSpacing')));
     textElement.lineHeight(/** @type {number|string} */ (target.call(this, 'lineHeight')));
     textElement.textIndent(/** @type {number} */ (target.call(this, 'textIndent')));
+    textElement.textShadow(/** @type {string} */ (target.call(this, 'textShadow')));
     textElement.vAlign(/** @type {string} */ (target.call(this, 'vAlign')));
     textElement.hAlign(/** @type {string} */ (target.call(this, 'hAlign')));
     textElement.textOverflow(/** @type {string} */ (target.call(this, 'textOverflow')));

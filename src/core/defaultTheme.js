@@ -776,6 +776,7 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'letterSpacing': 'normal',
     'lineHeight': 'normal',
     'textIndent': 0,
+    'textShadow': 'none',
     'vAlign': 'top',
     'hAlign': 'start',
     'wordWrap': 'normal',
@@ -815,6 +816,7 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'fontSize': 12,
     'minFontSize': 8,
     'maxFontSize': 72,
+    'textShadow': 'none',
     'adjustFontSize': {
       'width': false,
       'height': false
@@ -839,6 +841,7 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
     'letterSpacing': 'normal',
     'lineHeight': 'normal',
     'textIndent': 0,
+    'textShadow': 'none',
     'vAlign': 'top',
     'hAlign': 'left',
     'wordWrap': null,
