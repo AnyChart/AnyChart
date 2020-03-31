@@ -316,6 +316,19 @@ anychart.ganttModule.Chart.prototype.scrollInvalidated_ = function(event) {
 
 
 /**
+ * Data grid invalidation handler.
+ * @param {anychart.SignalEvent} event - Event object.
+ * @private
+ */
+anychart.ganttModule.Chart.prototype.dataGridInvalidated_ = function(event) {
+  if (event.hasSignal(anychart.Signal.ENABLED_STATE_CHANGED)) {
+    this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+  }
+  this.controller_.run();
+};
+
+
+/**
  * Gets/sets chart data.
  * @param {(anychart.treeDataModule.Tree|anychart.treeDataModule.View|Array.<Object>)=} opt_value - Data tree or raw data.
  * @param {anychart.enums.TreeFillingMethod=} opt_fillMethod - Fill method.
@@ -415,9 +428,7 @@ anychart.ganttModule.Chart.prototype.getDataGrid_ = function() {
     this.setupCreated('dataGrid', this.dg_);
     this.dg_.zIndex(anychart.getFlatTheme('defaultDataGrid')['zIndex']);
     this.dg_.setInteractivityHandler(this);
-    this.dg_.listenSignals(function() {
-      this.controller_.run();
-    }, this);
+    this.dg_.listenSignals(this.dataGridInvalidated_, this);
   }
 
   return this.dg_;
@@ -432,14 +443,7 @@ anychart.ganttModule.Chart.prototype.getDataGrid_ = function() {
  */
 anychart.ganttModule.Chart.prototype.dataGrid = function(opt_enabled) {
   if (goog.isDef(opt_enabled)) {
-    if (this.getDataGrid_().enabled() != opt_enabled) {
-      anychart.core.Base.suspendSignalsDispatching(this.getDataGrid_(), this.splitter());
-      this.getDataGrid_().enabled(opt_enabled);
-      this.splitter().enabled(opt_enabled);
-      anychart.core.Base.resumeSignalsDispatchingFalse(this.getDataGrid_(), this.splitter()); //We don't need to send any signal.
-
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW); //Invalidate a whole chart.
-    }
+    this.getDataGrid_().enabled(opt_enabled);
     return this;
   }
   return this.getDataGrid_();
@@ -1145,7 +1149,10 @@ anychart.ganttModule.Chart.prototype.drawContent = function(bounds) {
         this.controller_.availableHeight(newAvailableHeight);
       }
 
-      if (this.dg_.enabled()) {
+      var isDataGridEnabled = /** @type {boolean} */(this.dg_.enabled());
+      this.splitter_.enabled(isDataGridEnabled);
+
+      if (isDataGridEnabled) {
         var b1 = this.splitter_.getLeftBounds();
         var b2 = this.splitter_.getRightBounds();
         this.dg_.bounds().set(b1);
