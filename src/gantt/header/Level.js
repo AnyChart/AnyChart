@@ -355,24 +355,27 @@ anychart.ganttModule.header.Level.prototype.getLabelsFormatProvider_ = function(
   var endLabelText = anychart.format.dateTime(end, format);
 
   var fiscalStartLabelText = startLabelText;
-
   var fiscalStartMonth = /** @type {number} */ (this.scale_.fiscalYearStartMonth());
+
+  // DVF-4399.
+  var fiscalYearShift = /** @type {number} */ (this.scale_.fiscalYearOffset());
+
   if (fiscalStartMonth > 1) {
     var fiscalStart;
     if (this.unit === anychart.enums.Interval.YEAR ||
         this.unit === anychart.enums.Interval.SEMESTER ||
         this.unit === anychart.enums.Interval.QUARTER) {
-      fiscalStart = anychart.utils.getFiscalDate(start, fiscalStartMonth);
+      // DVF-4399.
+      fiscalStart = anychart.utils.getFiscalDate(start, fiscalStartMonth, fiscalYearShift);
       fiscalStartLabelText = anychart.format.dateTime(fiscalStart, format);
     } else if (goog.string.contains(format, 'y') || goog.string.contains(format, 'Q')) {
       var utcStartDate = new goog.date.UtcDateTime(new Date(start));
       var month = utcStartDate.getMonth() + 1;
-      if (month < fiscalStartMonth) {
-        var interval = (new goog.date.Interval(goog.date.Interval.YEARS, 1)).getInverse();
-        utcStartDate.add(interval);
-        fiscalStart = utcStartDate.getTime();
-        fiscalStartLabelText = anychart.format.dateTime(fiscalStart, format);
-      }
+
+      // DVF-4399.
+      var yearChangeShift = month < fiscalStartMonth ? -1 : 0;
+      fiscalStart = anychart.utils.shiftDateByInterval(start, anychart.enums.Interval.YEAR, fiscalYearShift + yearChangeShift);
+      fiscalStartLabelText = anychart.format.dateTime(fiscalStart, format);
     }
   }
 

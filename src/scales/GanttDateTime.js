@@ -163,11 +163,20 @@ anychart.scales.GanttDateTime = function() {
   this.ranges_ = this.normalizeLevels_(anychart.scales.GanttDateTime.DEFAULT_LEVELS);
 
   /**
-   * Fiscal year start month (1-12)
+   * Fiscal year start month (1-12).
+   *
    * @type {number}
    * @private
    */
   this.fiscalYearStartMonth_ = 1;
+
+  /**
+   * Fiscal year offset for DVF-4399.
+   *
+   * @type {number}
+   * @private
+   */
+  this.fiscalYearOffset_ = 0;
 
   /**
    * Maximum number of ticks.
@@ -916,7 +925,7 @@ anychart.scales.GanttDateTime.prototype.maximumGap = function(opt_value) {
 /**
  * Start month of the fiscal year setter/getter.
  *
- * @param {number=} opt_value - Number of month (1 - 12)
+ * @param {number=} opt_value - Number of month (1 - 12).
  * @return {number|anychart.scales.GanttDateTime} - Current value or itself for method chaining.
  */
 anychart.scales.GanttDateTime.prototype.fiscalYearStartMonth = function(opt_value) {
@@ -930,6 +939,26 @@ anychart.scales.GanttDateTime.prototype.fiscalYearStartMonth = function(opt_valu
     return this;
   }
   return this.fiscalYearStartMonth_;
+};
+
+
+/**
+ * DVF-4399. Fiscal offset getter/setter.
+ *
+ * @param {number=} opt_value - How much years to shift.
+ * @return {number|anychart.scales.GanttDateTime} - Current value or itself for method chaining.
+ */
+anychart.scales.GanttDateTime.prototype.fiscalYearOffset = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = +opt_value;
+    if (!isNaN(opt_value) && this.fiscalYearOffset_ != opt_value) {
+      this.fiscalYearOffset_ = opt_value;
+      this.consistent = false;
+      this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
+    }
+    return this;
+  }
+  return this.fiscalYearOffset_;
 };
 
 
@@ -1107,18 +1136,49 @@ anychart.scales.GanttDateTime.prototype.getTicks = function(pixStart, pixEnd, un
   var end = range['max'];
   var res = [];
 
-  //TODO (A.Kudryavtsev): Describe fiscal behaviour.
   var current, currentMs;
+
+  /*
+    This condition allows to perform additional calculations only when it's needed:
+      - fiscal year start date value is not trivial (this.fiscalYearStartMonth_ > 1).
+      - shifted value can be seen (unit is year, semester or quarter).
+   */
   if (this.fiscalYearStartMonth_ > 1 &&
-      (unit == anychart.enums.Interval.YEAR ||
-      unit == anychart.enums.Interval.SEMESTER ||
-      unit == anychart.enums.Interval.QUARTER)) {
+      (unit === anychart.enums.Interval.YEAR ||
+      unit === anychart.enums.Interval.SEMESTER ||
+      unit === anychart.enums.Interval.QUARTER)) {
+
+    /*
+      This calculations shifts start value:
+        - let start be Date.UTC(2020, 2, 1), it is '2020-03-01' represented as milliseconds.
+        - let fiscalYearStartMonth_ be 5 (May).
+        - this method gets fiscalStart as Date.UTC(2020, 4, 1), it is exactly '2020-05-01'.
+     */
     var fiscalStart = anychart.utils.shiftFiscalDate(start, this.fiscalYearStartMonth_);
+
+    /*
+      If fiscalYearStartMonth_ is set, getting the positive: yes, Date.UTC(2020, 4, 1) > Date.UTC(2020, 2, 1).
+     */
     if (fiscalStart > start) {
+
+      /*
+        In this sample case let's deal with quarters to get timeline levels looking like this:
+
+            Q4     | Q1
+          ---------+-------------------
+          | Apr    | May    | Jun    |
+
+        Interval in this case is 3 months (1 quarter).
+        Inverse is -3 months (-1 quarter).
+       */
       var invertedInterval = interval.getInverse();
       current = new goog.date.UtcDateTime(new Date(fiscalStart));
-      currentMs = current.getTime();
+      currentMs = current.getTime(); // This is Date.UTC(2020, 4, 1).
       do {
+        /*
+          Here we are subtracting these 3-month intervals
+          until it becomes less than Date.UTC(2020, 5, 1).
+         */
         current.add(invertedInterval);
         currentMs = current.getTime();
       } while (currentMs > start);
@@ -1358,6 +1418,9 @@ anychart.scales.GanttDateTime.prototype.serialize = function() {
   if (this.fiscalYearStartMonth_ > 1)
     json['fiscalYearStartMonth'] = this.fiscalYearStartMonth_;
 
+  if (this.fiscalYearOffset_)
+    json['fiscalYearOffset'] = this.fiscalYearOffset_;
+
   if (this.calendar_) {
     var calendarConfig = this.calendar_.serialize();
     if (!goog.object.isEmpty(calendarConfig)) {
@@ -1415,6 +1478,9 @@ anychart.scales.GanttDateTime.prototype.setupByJSON = function(config, opt_defau
   if ('fiscalYearStartMonth' in config)
     this.fiscalYearStartMonth(config['fiscalYearStartMonth']);
 
+  if ('fiscalYearOffset' in config)
+    this.fiscalYearOffset(config['fiscalYearOffset']);
+
   if ('maxTicksCount' in config)
     this.maxTicksCount(config['maxTicksCount']);
 
@@ -1444,6 +1510,7 @@ anychart.scales.GanttDateTime.prototype.setupByJSON = function(config, opt_defau
   proto['minimumGap'] = proto.minimumGap;
   proto['maximumGap'] = proto.maximumGap;
   proto['fiscalYearStartMonth'] = proto.fiscalYearStartMonth;
+  proto['fiscalYearOffset'] = proto.fiscalYearOffset;
   proto['transform'] = proto.transform;
   proto['inverseTransform'] = proto.inverseTransform;
   proto['zoomLevels'] = proto.zoomLevels;

@@ -888,15 +888,34 @@ anychart.utils.shiftFiscalDate = function(date, yearStartMonth) {
 
 
 /**
- * Gets fiscal date. TODO (A.Kudryavtsev): Describe.
+ * Shifts incoming timestamp by units and count.
+ *
+ * @param {number} date - Timestamp to shift.
+ * @param {anychart.enums.Interval} unit - Unit to create interval.
+ * @param {number} count - Count of units to create interval.
+ * @returns {number} - Shifted timestamp.
+ */
+anychart.utils.shiftDateByInterval = function(date, unit, count) {
+  var interval = anychart.utils.getIntervalFromInfo(unit, count);
+  var utcWrapper = new goog.date.UtcDateTime(new Date(date));
+  utcWrapper.add(interval);
+  return utcWrapper.getTime();
+};
+
+
+/**
+ * Gets fiscal date.
+ *
  * @see https://en.wikipedia.org/wiki/Fiscal_year
  * @param {number} date - Calendar UTC timestamp.
  * @param {number} yearStartMonth - Number of month (1 - 12).
  *  DEV NOTE: provide correct clamping before passing this parameter here.
+ * @param {number=} opt_yearOffset - Actually is a fiscal year shift for DVF-4399. Another one strange feature.
  * @return {number} - Shifted timestamp.
  */
-anychart.utils.getFiscalDate = function(date, yearStartMonth) {
+anychart.utils.getFiscalDate = function(date, yearStartMonth, opt_yearOffset) {
   if (yearStartMonth > 1) {
+    opt_yearOffset = opt_yearOffset || 0;
     var dateObj = new Date(date);
 
     var years = dateObj.getUTCFullYear();
@@ -908,7 +927,7 @@ anychart.utils.getFiscalDate = function(date, yearStartMonth) {
     var milliseconds = dateObj.getUTCMilliseconds();
 
     months -= (yearStartMonth - 1);
-    return Date.UTC(years, months, days, hours, minutes, seconds, milliseconds);
+    return Date.UTC(years + opt_yearOffset, months, days, hours, minutes, seconds, milliseconds);
   }
   return date;
 };
