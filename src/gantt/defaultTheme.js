@@ -236,6 +236,26 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'separator': {
           'enabled': true
         }
+      },
+      'startMarker': {
+        'enabled': false,
+        'anchor': 'center',
+        'size': 6,
+        'offsetX': 0,
+        'offsetY': 0,
+        'rotation': 0,
+        'position': 'left-center',
+        'type': 'triangle-right'
+      },
+      'endMarker': {
+        'enabled': false,
+        'anchor': 'center',
+        'size': 6,
+        'offsetX': 0,
+        'offsetY': 0,
+        'rotation': 0,
+        'position': 'right-center',
+        'type': 'triangle-left'
       }
     },
 
@@ -436,7 +456,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       'disablePointerEvents': true
     },
     'markers': {
-      'anchor': 'center-top',
+      'anchor': 'center',
       'zIndex': 50,
       'type': 'star5',
       'fill': '#ff0',

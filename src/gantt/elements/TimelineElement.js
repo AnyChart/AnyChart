@@ -7,6 +7,7 @@ goog.require('anychart.core.settings');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.Tooltip');
 goog.require('anychart.ganttModule.edit.ElementEdit');
+goog.require('anychart.ganttModule.elements.MarkerConfig');
 goog.require('anychart.ganttModule.rendering.Settings');
 goog.require('anychart.ganttModule.rendering.ShapeManager');
 
@@ -287,6 +288,8 @@ anychart.ganttModule.elements.TimelineElement.prototype.parent = function(opt_va
         this.rendering().parent(null);
         this.edit().parent(null);
         this.tooltip().parent(null);
+        this.startMarker().parent(null);
+        this.endMarker().parent(null);
         this.parent_ = null;
       } else {
         if (this.parent_)
@@ -295,6 +298,8 @@ anychart.ganttModule.elements.TimelineElement.prototype.parent = function(opt_va
         this.rendering().parent(this.parent_.rendering());
         this.edit().parent(this.parent_.edit());
         this.tooltip().parent(this.parent_.tooltip());
+        this.startMarker().parent(this.parent_.startMarker());
+        this.endMarker().parent(this.parent_.endMarker());
         this.parent_.listenSignals(this.parentInvalidated_, this);
       }
     }
@@ -638,12 +643,78 @@ anychart.ganttModule.elements.TimelineElement.prototype.edit = function(opt_valu
 
 
 /**
+ * Edit signal redispatcher.
  *
  * @param {anychart.SignalEvent} e - Signal event.
  * @private
  */
 anychart.ganttModule.elements.TimelineElement.prototype.onEditSignal_ = function(e) {
   this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
+};
+
+
+//endregion
+//region -- Start/End markers.
+/**
+ * Timeline element start marker config.
+ *
+ * @param {(Object|boolean)=} opt_value - Value to set.
+ * @return {anychart.ganttModule.elements.TimelineElement|anychart.ganttModule.elements.MarkerConfig} - Current value or itself for chaining.
+ */
+anychart.ganttModule.elements.TimelineElement.prototype.startMarker = function(opt_value) {
+  if (!this.startMarker_) {
+    this.startMarker_ = new anychart.ganttModule.elements.MarkerConfig();
+    this.setupCreated('startMarker', this.startMarker_);
+    this.startMarker_.listenSignals(this.startEndMarkerSignal_, this);
+  }
+
+  if (goog.isDef(opt_value)) {
+    if (goog.typeOf(opt_value) === 'object' && !('enabled' in opt_value)) {
+      opt_value['enabled'] = true;
+    }
+    this.startMarker_.setup(opt_value);
+    return this;
+  }
+
+  return this.startMarker_;
+};
+
+
+/**
+ * Timeline element end marker config.
+ *
+ * @param {(Object|boolean)=} opt_value - Value to set.
+ * @return {anychart.ganttModule.elements.TimelineElement|anychart.ganttModule.elements.MarkerConfig} - Current value or itself for chaining.
+ */
+anychart.ganttModule.elements.TimelineElement.prototype.endMarker = function(opt_value) {
+  if (!this.endMarker_) {
+    this.endMarker_ = new anychart.ganttModule.elements.MarkerConfig();
+    this.setupCreated('endMarker', this.endMarker_);
+    this.endMarker_.listenSignals(this.startEndMarkerSignal_, this);
+  }
+
+  if (goog.isDef(opt_value)) {
+    if (goog.typeOf(opt_value) === 'object' && !('enabled' in opt_value)) {
+      opt_value['enabled'] = true;
+    }
+    this.endMarker_.setup(opt_value);
+    return this;
+  }
+
+  return this.endMarker_;
+};
+
+
+/**
+ * Start/End markers signal redispatcher.
+ *
+ * @param {anychart.SignalEvent} e - Signal event.
+ * @private
+ */
+anychart.ganttModule.elements.TimelineElement.prototype.startEndMarkerSignal_ = function(e) {
+  if (e.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
+    this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
+  }
 };
 
 
@@ -902,6 +973,8 @@ anychart.ganttModule.elements.TimelineElement.prototype.disposeInternal = functi
   proto['labels'] = proto.labels;
   proto['edit'] = proto.edit;
   proto['tooltip'] = proto.tooltip;
+  proto['startMarker'] = proto.startMarker;
+  proto['endMarker'] = proto.endMarker;
 })();
 
 

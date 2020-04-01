@@ -101,7 +101,7 @@ anychart.stockModule.eventMarkers.Group.OWN_DESCRIPTORS = (function() {
   var map = {};
   anychart.core.settings.createDescriptors(map, [
     anychart.core.settings.descriptors.DIRECTION,
-    anychart.core.settings.descriptors.POSITION,
+    anychart.core.settings.descriptors.EVENT_MARKERS_POSITION,
     anychart.core.settings.descriptors.SERIES_ID,
     anychart.core.settings.descriptors.FIELD_NAME,
     anychart.core.settings.descriptors.STICK_TO_LEFT

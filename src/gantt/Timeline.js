@@ -4069,7 +4069,7 @@ anychart.ganttModule.TimeLine.prototype.drawMarkers_ = function(dataItem, totalT
             var height = itemHeight * anychart.ganttModule.TimeLine.DEFAULT_HEIGHT_REDUCTION;
 
             var left = Math.round(this.pixelBoundsCache.left + this.pixelBoundsCache.width * ratio);
-            var top = Math.round(totalTop + (itemHeight - height) / 2);
+            var top = Math.round(totalTop + itemHeight / 2);
 
             var markerEl = this.markers().add({value: {x: left, y: top}});
             markerEl.setOption('size', height / 2);
@@ -4240,6 +4240,65 @@ anychart.ganttModule.TimeLine.prototype.setRelatedBounds_ = function(item, bound
 
 
 /**
+ * Draws single element's start or end marker.
+ *
+ * @param {anychart.ganttModule.elements.MarkerConfig} marker - Marker instance.
+ * @param {{ x: number, y: number}} position - Marker position.
+ * @param {acgraph.vector.Fill} elementFill - Fill value resolved from element.
+ * @param {acgraph.vector.Stroke} elementStroke - Stroke value resolved from element.
+ * @param {Object=} opt_pointSettings - Point settings config, can be undefined.
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.drawSingleMarker_ = function(marker, position, elementFill, elementStroke, opt_pointSettings) {
+  var config = opt_pointSettings || marker.getFlatConfig();
+  if (config['enabled']) {
+    var markerEl = this.markers().add({ value: position });
+
+    var isMissingFill = !('fill' in config);
+    var isMissingStroke = !('stroke' in config);
+    if (isMissingFill || isMissingStroke) {
+      config = goog.object.clone(config);
+
+      if (isMissingFill) {
+        config['fill'] = anychart.color.lighten(elementFill);
+      }
+      if (isMissingStroke) {
+        config['stroke'] = anychart.color.lighten(elementStroke);
+      }
+    }
+
+    markerEl.setup(config);
+  }
+};
+
+
+/**
+ * Draws single element's start and end markers.
+ *
+ * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} item - Current tree data item.
+ * @param {anychart.ganttModule.elements.TimelineElement} element - Related timeline element.
+ * @param {anychart.math.Rect} bounds - Item's bounds.
+ * @param {number=} opt_periodIndex - Period index.
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.drawStartEndMarkers_ = function(item, element, bounds, opt_periodIndex) {
+  var pointSettings = element.getPointSettings(item, opt_periodIndex);
+  var startMarkerConfig = pointSettings && pointSettings[anychart.enums.GanttDataFields.START_MARKER];
+  var endMarkerConfig = pointSettings && pointSettings[anychart.enums.GanttDataFields.END_MARKER];
+  var top = bounds.top + bounds.height / 2;
+  var startMarkerPosition = { x: bounds.left, y: top };
+  var endMarkerPosition = { x: bounds.left + bounds.width, y: top };
+  var fill = element.getFill(item, anychart.PointState.NORMAL, opt_periodIndex);
+  var stroke = element.getStroke(item, anychart.PointState.NORMAL, opt_periodIndex);
+  var startMarker = /** @type {anychart.ganttModule.elements.MarkerConfig} */ (element.startMarker());
+  var endMarker = /** @type {anychart.ganttModule.elements.MarkerConfig} */ (element.endMarker());
+
+  this.drawSingleMarker_(startMarker, startMarkerPosition, fill, stroke, startMarkerConfig);
+  this.drawSingleMarker_(endMarker, endMarkerPosition, fill, stroke, endMarkerConfig);
+};
+
+
+/**
  * Draws data item as periods.
  * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} dataItem - Current tree data item.
  * @param {number} totalTop - Pixel value of total top. Is needed to place item correctly.
@@ -4285,6 +4344,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsPeriods_ = function(dataItem, tota
           var tag = this.createTag(dataItem, el, bounds, j);
           this.setRelatedBounds_(dataItem, bounds, j);
           el.rendering().callDrawer(dataItem, bounds, tag, j, isSelected);
+          this.drawStartEndMarkers_(dataItem, el, bounds, j);
         }
       }
     }
@@ -4361,6 +4421,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsBaseline_ = function(dataItem, tot
       baselineBounds = this.fixBounds_(baselines, baselineBounds, dataItem, void 0, isSelected);
       var baselineTag = this.createTag(dataItem, baselines, baselineBounds);
       baselines.rendering().callDrawer(dataItem, baselineBounds, baselineTag, void 0, isSelected);
+      this.drawStartEndMarkers_(dataItem, baselines, baselineBounds);
     }
 
     if (actualBounds) {
@@ -4390,6 +4451,8 @@ anychart.ganttModule.TimeLine.prototype.drawAsBaseline_ = function(dataItem, tot
        */
       if (info.isValidTask) {
         element.rendering().callDrawer(dataItem, actualBounds, tag, void 0, isSelected);
+        this.drawStartEndMarkers_(dataItem, element, actualBounds);
+
         var progressEl = /** @type {anychart.ganttModule.elements.ProgressElement} */ (element.progress());
         if (info.isValidProgress && progressEl.getOption('enabled')) { //Draw progress.
           var progressValue = info.progress;
@@ -4398,6 +4461,9 @@ anychart.ganttModule.TimeLine.prototype.drawAsBaseline_ = function(dataItem, tot
           var progressBounds = this.getBarBounds_(progressEl, progressItemBounds, dataItem);
           var progressTag = this.createTag(dataItem, progressEl, progressBounds);
           progressEl.rendering().callDrawer(dataItem, progressBounds, progressTag, void 0, isSelected);
+          if (progressWidth) {
+            this.drawStartEndMarkers_(dataItem, progressEl, progressBounds);
+          }
         }
       }
     }
@@ -4426,6 +4492,9 @@ anychart.ganttModule.TimeLine.prototype.drawAsBaseline_ = function(dataItem, tot
         var blProgressBounds = this.getBarBounds_(blProgressEl, blProgressItemBounds, dataItem);
         var blProgressTag = this.createTag(dataItem, blProgressEl, blProgressBounds);
         blProgressEl.rendering().callDrawer(dataItem, blProgressBounds, blProgressTag, void 0, isSelected);
+        if (blProgressWidth) {
+          this.drawStartEndMarkers_(dataItem, blProgressEl, blProgressBounds);
+        }
       }
     }
   }
@@ -4526,7 +4595,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsParent_ = function(dataItem, total
       var tag = this.createTag(dataItem, el, actualBounds);
       this.setRelatedBounds_(dataItem, actualBounds);
       el.rendering().callDrawer(dataItem, actualBounds, tag, void 0, isSelected);
-
+      this.drawStartEndMarkers_(dataItem, el, actualBounds);
 
       var progressEl = /** @type {anychart.ganttModule.elements.ProgressElement} */ (el.progress());
       if (info.isValidProgress && progressEl.getOption('enabled')) { //Draw progress.
@@ -4536,6 +4605,9 @@ anychart.ganttModule.TimeLine.prototype.drawAsParent_ = function(dataItem, total
         var progressBounds = this.getBarBounds_(progressEl, progressItemBounds, dataItem);
         var progressTag = this.createTag(dataItem, progressEl, progressBounds);
         progressEl.rendering().callDrawer(dataItem, progressBounds, progressTag, void 0, isSelected);
+        if (progressWidth) {
+          this.drawStartEndMarkers_(dataItem, progressEl, progressBounds);
+        }
       }
     }
   }
@@ -4600,7 +4672,8 @@ anychart.ganttModule.TimeLine.prototype.drawAsProgress_ = function(dataItem, tot
 
       var tag = this.createTag(dataItem, el, actualBounds);
       this.setRelatedBounds_(dataItem, actualBounds);
-      this.tasks().rendering().callDrawer(dataItem, actualBounds, tag, void 0, isSelected);
+      el.rendering().callDrawer(dataItem, actualBounds, tag, void 0, isSelected);
+      this.drawStartEndMarkers_(dataItem, el, actualBounds);
 
       var progressEl = /** @type {anychart.ganttModule.elements.ProgressElement} */ (el.progress());
       if (info.isValidProgress && progressEl.getOption('enabled')) { //Draw progress.
@@ -4610,6 +4683,9 @@ anychart.ganttModule.TimeLine.prototype.drawAsProgress_ = function(dataItem, tot
         var progressBounds = this.getBarBounds_(progressEl, progressItemBounds, dataItem);
         var progressTag = this.createTag(dataItem, progressEl, actualBounds);
         progressEl.rendering().callDrawer(dataItem, progressBounds, progressTag, void 0, isSelected);
+        if (progressWidth) {
+          this.drawStartEndMarkers_(dataItem, progressEl, progressBounds);
+        }
       }
 
     }
@@ -4653,6 +4729,10 @@ anychart.ganttModule.TimeLine.prototype.drawAsMilestone_ = function(dataItem, to
       var tag = this.createTag(dataItem, el, bounds);
       this.setRelatedBounds_(dataItem, bounds);
       el.rendering().callDrawer(dataItem, bounds, tag, void 0, isSelected);
+      /*
+        Don't call this.drawStartEndMarkers_ because milestones-element has an ability
+        to set start and end markers with API, but it must not be drawn.
+       */
     }
   }
 };
@@ -4695,6 +4775,10 @@ anychart.ganttModule.TimeLine.prototype.drawAsMilestonePreview_ = function(dataI
       var tag = this.createTag(dataItem, el, bounds);
       this.setRelatedBounds_(dataItem, bounds);
       el.rendering().callDrawer(dataItem, bounds, tag, void 0, isSelected, initializerUid);
+      /*
+        Don't call this.drawStartEndMarkers_ because milestones-preview-element has an ability
+        to set start and end markers with API, but it must not be drawn.
+       */
     }
   }
 };
@@ -6389,7 +6473,6 @@ anychart.standalones.resourceTimeline = function() {
 
   proto['markers'] = proto.markers;
   proto['scale'] = proto.scale;
-
 
   proto['textMarker'] = proto.textMarker;
   proto['lineMarker'] = proto.lineMarker;

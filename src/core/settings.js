@@ -945,7 +945,7 @@ anychart.core.settings.descriptors = (function() {
 
   // event markers
   map.DIRECTION = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'direction', anychart.enums.normalizeDirection];
-  map.POSITION = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'position', anychart.enums.normalizeEventMarkerPosition];
+  map.EVENT_MARKERS_POSITION = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'position', anychart.enums.normalizeEventMarkerPosition];
   map.SERIES_ID = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'seriesId', anychart.core.settings.stringNormalizer];
   map.FIELD_NAME = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'fieldName', anychart.core.settings.stringNormalizer];
   map.WIDTH = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'width', anychart.core.settings.numberOrPercentNormalizer];
@@ -965,6 +965,7 @@ anychart.core.settings.descriptors = (function() {
 
   //markers and markers factory
   map.ANCHOR = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'anchor', anychart.enums.normalizeAnchor];
+  map.POSITION = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'position', anychart.enums.normalizePosition];
   map.OFFSET_X = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'offsetY', anychart.core.settings.numberNormalizer];
   map.OFFSET_Y = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'offsetX', anychart.core.settings.numberNormalizer];
   map.POSITION_FORMATTER = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'positionFormatter', anychart.core.settings.functionNormalizer];
