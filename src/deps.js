@@ -622,11 +622,9 @@ goog.addDependency('../../../../src/timeline/Chart.js', ['anychart.timelineModul
 goog.addDependency('../../../../src/timeline/ConnectorSettings.js', ['anychart.timelineModule.ConnectorSettings'], ['anychart.core.Base', 'anychart.core.settings'], {});
 goog.addDependency('../../../../src/timeline/Intersections.js', ['anychart.timelineModule.Intersections'], [], {});
 goog.addDependency('../../../../src/timeline/defaultTheme.js', ['anychart.timelineModule.defaultTheme'], [], {});
-goog.addDependency('../../../../src/timeline/drawers/Event.js', ['anychart.timelineModule.drawers.Event'], ['anychart.core.drawers', 'anychart.core.drawers.Base'], {});
 goog.addDependency('../../../../src/timeline/drawers/Moment.js', ['anychart.timelineModule.drawers.Moment'], ['anychart.core.drawers', 'anychart.core.drawers.Base'], {});
 goog.addDependency('../../../../src/timeline/drawers/Range.js', ['anychart.timelineModule.drawers.Range'], ['anychart.core.drawers', 'anychart.core.drawers.Base'], {});
 goog.addDependency('../../../../src/timeline/series/Base.js', ['anychart.timelineModule.series.Base'], ['anychart.core.series.Cartesian'], {});
-goog.addDependency('../../../../src/timeline/series/Event.js', ['anychart.timelineModule.series.Event'], ['anychart.timelineModule.ConnectorSettings', 'anychart.timelineModule.drawers.Event', 'anychart.timelineModule.drawers.Range', 'anychart.timelineModule.series.Base'], {});
 goog.addDependency('../../../../src/timeline/series/Moment.js', ['anychart.timelineModule.series.Moment'], ['anychart.timelineModule.ConnectorSettings', 'anychart.timelineModule.drawers.Moment', 'anychart.timelineModule.series.Base'], {});
 goog.addDependency('../../../../src/timeline/series/Range.js', ['anychart.timelineModule.series.Range'], ['anychart.timelineModule.drawers.Range', 'anychart.timelineModule.series.Base'], {});
 goog.addDependency('../../../../src/timeline/timeline.module.js', ['anychart.timelineModule.entry'], ['anychart.timelineModule.Chart'], {});

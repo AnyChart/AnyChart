@@ -110,23 +110,29 @@ anychart.timelineModule.series.Range.prototype.createPositionProvider = function
   var zero = /** @type {number} */(iterator.meta('zero'));
   var axisHeight = /** @type {number} */(iterator.meta('axisHeight'));
   var startX = /** @type {number} */(iterator.meta('startX'));
-  var direction = /** @type {anychart.enums.Direction} */(this.getFinalDirection());
   var endY = /** @type {number} */(iterator.meta('endY'));
 
+  var direction = /** @type {anychart.enums.Direction} */(iterator.get('direction') || this.getFinalDirection());
+  var isDirectionUp = direction == anychart.enums.Direction.UP;
+
   var halfAxisHeight = axisHeight / 2;
-  zero += direction == anychart.enums.Direction.UP ? -halfAxisHeight : halfAxisHeight;
+  zero += isDirectionUp ? -halfAxisHeight : halfAxisHeight;
 
   var yOffset = endY - height / 2;
   x = startX;
-  y = zero + (direction == anychart.enums.Direction.UP ? -yOffset : yOffset);
+  y = zero + (isDirectionUp ? -yOffset : yOffset);
 
   var viewPortLeft = this.chart.getDataBounds().left + this.chart.getHorizontalTranslate();
   if (viewPortLeft > x) {
     x = viewPortLeft;
   }
 
-  var point = {'x': x, 'y': y};
-  return {'value': point};
+  return {
+    'value': {
+      'x': x || 0,
+      'y': y || 0
+    }
+  };
 };
 
 

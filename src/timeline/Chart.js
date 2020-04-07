@@ -42,6 +42,14 @@ anychart.timelineModule.Chart = function() {
   this.xScale_ = new anychart.scales.GanttDateTime();
   this.setupCreated('scale', this.xScale_);
   this.initScale_(this.xScale_);
+
+  /*
+    Axis listener should be attached first to scale, so that when chart starts redrawing
+    on scale signal, axis is invalidated and will be redrawn correctly.
+   */
+  var axis = this.axis();
+  axis.scale(this.xScale_);
+
   this.xScale_.listenSignals(this.scaleInvalidated_, this);
 
   /**
@@ -81,16 +89,40 @@ anychart.timelineModule.Chart = function() {
   this.horizontalTranslate = 0;
 
   /**
+   * Relative offset consists of two components:
+   *  1) Axis ratio which lays in [-0.5, 0.5] where 0 is chart center
+   *    and uttermost values are half axis height from chart top and bottom.
+   *  2) Series offset value, which is relative to axis center line. Used
+   *    only when total (absolute) offset is out of the chart bounds minus axis height.
+   * @type {{axisRatio: number, seriesOffset: number}}
+   * @private
+   */
+  this.verticalRelativeOffset_ = {
+    axisRatio: 0,
+    seriesOffset: 0
+  };
+
+  /**
    * Automagically translate chart so, that there are no white spaces.
    * Works only if one side has free space and other don't.
    * @type {boolean}
    */
   this.autoChartTranslating = true;
 
+  /**
+   * Minimal vertical offset. Defines how much chart can scrolled down.
+   * @type {number}
+   */
+  this.minVerticalOffset = 0;
+
+  /**
+   * Maximal vertical offset. Defines how much chart can be scrolled up.
+   * @type {number}
+   */
+  this.maxVerticalOffset = 0;
+
   this.rangeSeriesList = [];
   this.momentSeriesList = [];
-
-  this.initInteractivity_();
 };
 goog.inherits(anychart.timelineModule.Chart, anychart.core.ChartWithSeries);
 
@@ -180,7 +212,7 @@ anychart.timelineModule.Chart.RANGE_BASE_Z_INDEX = 34;
 
 
 //endregion
-//region -- Axis markers
+//region -- Axis markers.
 /**
  * Getter/setter for rangeMarker.
  * @param {(Object|boolean|null|number)=} opt_indexOrValue Chart range marker settings to set.
@@ -374,7 +406,178 @@ anychart.timelineModule.Chart.prototype.todayMarker = function(opt_value) {
 
 
 //endregion
-//region -- Methods used in calculate
+//region -- Series points position calculation.
+/**
+ * This method calculates sizes of range and moment series points.
+ * Range point size consists of it path.
+ * Moment point size consists of label + background with its paddings.
+ * These points are then stacked onto each other, so that they do not
+ * intersect and are readable to user.
+ */
+anychart.timelineModule.Chart.prototype.calculateAndArrangeSeriesPoints = function() {
+  var dateMin = +Infinity;
+  var dateMax = -Infinity;
+
+  this.drawingPlans = [];
+  this.drawingPlansRange = [];
+  this.drawingPlansEvent = [];
+
+  var axisHeight = this.getAxisHeight();
+
+  if (this.getSeriesCount() == 0) {
+    this.scale().reset();
+    this.axis().invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.AXIS_TICKS | anychart.ConsistencyState.AXIS_LABELS);
+
+    this.dateMax = +Infinity;
+    this.dateMin = -Infinity;
+
+    this.momentSeriesList.length = 0;
+    this.rangeSeriesList.length = 0;
+
+    this.totalRange = {
+      sX: 0,
+      eX: this.dataBounds.width,
+      sY: -this.dataBounds.height / 2,
+      eY: this.dataBounds.height / 2
+    };
+
+    this.verticalOffsets(0, 0);
+    return;
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_CHART_SERIES | anychart.ConsistencyState.SCALE_CHART_SCALES)) {
+    var minMax = this.prepareSeries();
+    dateMin = minMax.min;
+    dateMax = minMax.max;
+
+    var markers = goog.array.concat(
+        this.lineAxesMarkers_,
+        this.rangeAxesMarkers_,
+        this.textAxesMarkers_,
+        [this.todayMarker_]);
+
+    var valuesToConsider = [];
+
+    for (var mid = 0; mid < markers.length; mid++) {
+      var m = markers[mid];
+      if (m) {
+        if (m.getOption('scaleRangeMode') == anychart.enums.ScaleRangeMode.CONSIDER) {
+          var refVals = m.getReferenceValues();
+          for (var valId = 0; valId < refVals.length; valId++) {
+            valuesToConsider.push(anychart.format.parseDateTime(refVals[valId]).getTime());
+          }
+        }
+      }
+    }
+
+    var markersMin = Math.min.apply(null, valuesToConsider);
+    var markersMax = Math.max.apply(null, valuesToConsider);
+
+    dateMin = Math.min(dateMin, markersMin);
+    dateMax = Math.max(dateMax, markersMax);
+
+    if (dateMin == dateMax) {
+      var day = anychart.utils.getIntervalRange(anychart.enums.Interval.DAY, 1);
+      dateMin -= day / 2;
+      dateMax += day / 2;
+    }
+
+    var rangeChanged = (this.dateMin != dateMin || this.dateMax != dateMax);
+
+    if (rangeChanged) {
+      this.dateMin = dateMin;
+      this.dateMax = dateMax;
+
+      this.scale().setDataRange(this.dateMin, this.dateMax);
+
+      // NeedsZoomTo is set when zoomTo was called on hidden container.
+      if (this.xScale_.needsZoomTo) {
+        this.xScale_.zoomTo.apply(this.xScale_, this.xScale_.neededZoomToArgs);
+        this.xScale_.needsZoomTo = false;
+        this.xScale_.neededZoomToArgs = null;
+      } else {
+        this.scale().suspendSignalsDispatching();
+        this.scale().fitAll();
+        this.scale().resumeSignalsDispatching(false);
+      }
+    }
+
+    /*
+       =============================
+       | Measures moment and range |
+       |    series points bounds   |
+       =============================
+     */
+    var intersectingBounds = this.calculatePointsBounds(this.drawingPlans);
+
+    goog.array.sort(intersectingBounds.rangeUp, anychart.timelineModule.Chart.rangeSortCallback);
+    goog.array.sort(intersectingBounds.rangeDown, anychart.timelineModule.Chart.rangeSortCallback);
+
+    goog.array.sort(intersectingBounds.momentUp, anychart.timelineModule.Chart.momentSortCallback);
+    goog.array.sort(intersectingBounds.momentDown, anychart.timelineModule.Chart.momentSortCallback);
+
+    var scaleTotalRange = this.scale().getTotalRange();
+
+    this.totalRange = {
+      sX: +Infinity,
+      eX: -Infinity,
+      sY: +Infinity,
+      eY: -Infinity
+    };
+    this.totalRange.sX = Math.min(this.totalRange.sX, this.scale().transform(scaleTotalRange.min) * this.dataBounds.width);
+    this.totalRange.eX = Math.max(this.totalRange.eX, this.scale().transform(scaleTotalRange.max) * this.dataBounds.width);
+
+    /*
+       ===========================
+       | Positions series points |
+       ===========================
+     */
+    this.arrangeSeriesPoints(intersectingBounds);
+
+    //fixing white space under the axis
+    var halfAxisHeight = axisHeight / 2;
+
+    this.totalRange.sY -= halfAxisHeight;
+    this.totalRange.eY += halfAxisHeight;
+
+    var scroller = this.getCreated('scroller');
+    var scrollerOrientation;
+    var scrollerHeightTop = 0;
+    var scrollerHeightBottom = 0;
+    if (scroller && scroller.enabled()) {
+      scrollerOrientation = scroller.getOption('orientation');
+      var scrollerHeight = /** @type {number} */(scroller.getOption('height'));
+      switch (scrollerOrientation) {
+        case anychart.enums.Orientation.TOP:
+          scrollerHeightTop = scrollerHeight;
+          break;
+        case anychart.enums.Orientation.BOTTOM:
+          scrollerHeightBottom = scrollerHeight;
+          break;
+      }
+    }
+
+    var halfHeight = this.dataBounds.height / 2;
+    var minOffset = halfHeight - Math.abs(this.totalRange.sY) - scrollerHeightBottom;
+    var maxOffset = this.totalRange.eY - halfHeight - scrollerHeightTop;
+    // If chart fits into container.
+    if ((this.totalRange.eY - this.totalRange.sY) <= this.dataBounds.height) {
+      var lookingUp = intersectingBounds.momentUp.length + intersectingBounds.rangeUp.length;
+      var lookingDown = intersectingBounds.momentDown.length + intersectingBounds.rangeDown.length;
+      if (lookingUp && !lookingDown) {
+        this.verticalOffsets(minOffset, minOffset);
+      } else if (!lookingUp && lookingDown) {
+        this.verticalOffsets(maxOffset, maxOffset);
+      } else if (lookingUp && lookingDown) {
+        this.verticalOffsets(0, 0);
+      }
+    } else {
+      this.verticalOffsets(minOffset, maxOffset);
+    }
+  }
+};
+
+
 /**
  * Stores point bounds and some additional information.
  * @typedef {{
@@ -409,6 +612,9 @@ anychart.timelineModule.Chart.SeriesPointBounds;
 
 /**
  * Handles series points positioning. Arranges them so, that they don't overlap with each other.
+ * Series pointing up and down are handled separately.
+ * First range series are stacked with each other.
+ * Then moment series are stacked over range series.
  * @param {anychart.timelineModule.Chart.SeriesPointBounds} intersectingBounds previously calculated point sizes.
  */
 anychart.timelineModule.Chart.prototype.arrangeSeriesPoints = function(intersectingBounds) {
@@ -537,14 +743,14 @@ anychart.timelineModule.Chart.prototype.prepareSeries = function() {
         break;
     }
 
-    // this.setSeriesAutoDirection(series);
+    //region obtaining drawing plan for series
+    var drawingPlan = series.getScatterDrawingPlan(false, true);
 
+    // This method should be called after getScatterDrawingPlan, to operate updated data.
     var minMax = this.getSeriesMinMaxValues(series);
     dateMin = Math.min(dateMin, minMax.min);
     dateMax = Math.max(dateMax, minMax.max);
 
-    //region obtaining drawing plan for series
-    var drawingPlan = series.getScatterDrawingPlan(false, true);
     this.drawingPlans.push(drawingPlan);
     if (seriesType == anychart.enums.TimelineSeriesType.RANGE) {
       this.drawingPlansRange.push(drawingPlan);
@@ -580,6 +786,10 @@ anychart.timelineModule.Chart.prototype.getSeriesMinMaxValues = function(series)
     while (it.advance()) {
       var start = anychart.utils.normalizeTimestamp(it.get('start'));
       var end = anychart.utils.normalizeTimestamp(it.get('end'));
+
+      // If start value is not valid - point is missing, skip it.
+      if (isNaN(start)) continue;
+
       if (!isNaN(end)) {
         dateMin = Math.min(dateMin, end);
         dateMax = Math.max(dateMax, end);
@@ -641,7 +851,7 @@ anychart.timelineModule.Chart.prototype.calculateRangeSeriesPointsBounds = funct
         this.scale().transform(point.data['end']) * this.dataBounds.width;
     startY = 0;
     endY = anychart.utils.normalizeSize(/** @type {number|string} */(series.getOption('height')), this.dataBounds.height);
-    var direction = series.getFinalDirection();
+    var direction = it.get('direction') || series.getFinalDirection();
 
     var pointBounds = {
       sX: startX,
@@ -687,35 +897,42 @@ anychart.timelineModule.Chart.prototype.calculateMomentSeriesPointsBounds = func
   var axisHeight = this.getAxisHeight();
 
   var labelsFactory = series.labels();
+  /*
+    Drop cached text values.
+    If cache is not dropped, after applying new label formatter,
+    factory still returns previous text bounds down here.
+   */
+  labelsFactory.dropCallsCache();
+
   var markersFactory = series.markers();
   var markersFactoryEnabled = markersFactory.enabled();
   var markersFactorySize = markersFactoryEnabled ? /** @type {number} */(markersFactory.getOption('size')) : 0;
-  var it = series.getResetIterator();
+  var it = series.getIterator();
 
   for (var k = 0; k < data.length; k++) {
     it.select(k);
 
-    var text = it.get('value');
-
-    if (!goog.isDefAndNotNull(text) || !goog.isDefAndNotNull(it.get('x'))) {
+    if (!goog.isDefAndNotNull(it.get('value')) || !goog.isDefAndNotNull(it.get('x'))) {
       it.meta('missing', true);
       continue;
     }
 
     var label = labelsFactory.getLabel(k);
-    if (goog.isNull(label)) {
-      //create labels context provider
-      var formatProvider = series.updateContext(new anychart.format.Context());
-      formatProvider['value'] = text;
-      var labelsAnchor = /** @type {string} */(labelsFactory.getOption('anchor'));
-      var positionProvider = series.createPositionProvider(labelsAnchor);
-      label = labelsFactory.add(formatProvider, positionProvider);
-    }
+    //create labels context provider
+    var formatProvider = series.updateContext(new anychart.format.Context());
+    /*
+      We reapply format provider each time, because series on
+      each redraw, that involves labels updating, reset iterator.
+      Series iterator is bound to label formatProvider and should
+      be pointing at the label we currently draw/measure.
+     */
+    goog.isNull(label) ?
+        label = labelsFactory.add(formatProvider, {'value': {'x': 0, 'y': 0}}, k) :
+        label.formatProvider(formatProvider);
 
-    // Drop cached settings, so that label will be measured with updated settings.
+    // Drop cached settings, so that label will be measured with up to date settings.
     label.dropMergedSettings();
-    // Method getDimension() returns full label size, taking padding into account.
-    var labelBounds = labelsFactory.getDimension(label);
+    var labelBounds = labelsFactory.measure(label);
 
     var offsetX = labelsFactory.getOption('offsetX') || 0;
 
@@ -724,7 +941,7 @@ anychart.timelineModule.Chart.prototype.calculateMomentSeriesPointsBounds = func
     endX = startX + labelBounds.width + offsetX + markersFactorySize;
     startY = 50 - labelBounds.height / 2;
     endY = 50 + labelBounds.height / 2;
-    var direction = series.getFinalDirection();
+    var direction = it.get('direction') || series.getFinalDirection();
 
     var pointBounds = {
       sX: startX,
@@ -739,11 +956,9 @@ anychart.timelineModule.Chart.prototype.calculateMomentSeriesPointsBounds = func
 
     boundsMoment.push(pointBounds);
 
-    if (direction == anychart.enums.Direction.UP) {
-      boundsMomentUp.push(pointBounds);
-    } else {
+    direction == anychart.enums.Direction.UP ?
+      boundsMomentUp.push(pointBounds) :
       boundsMomentDown.push(pointBounds);
-    }
 
     point.meta['axisHeight'] = axisHeight;
   }
@@ -811,146 +1026,30 @@ anychart.timelineModule.Chart.prototype.calculatePointsBounds = function(drawing
 
 //endregion
 //region -- Chart Infrastructure Overrides.
-/** @inheritDoc */
-anychart.timelineModule.Chart.prototype.calculate = function() {
-  var dateMin = +Infinity;
-  var dateMax = -Infinity;
-
-  this.drawingPlans = [];
-  this.drawingPlansRange = [];
-  this.drawingPlansEvent = [];
-
-  var axisHeight = this.getAxisHeight();
-
-  if (this.getSeriesCount() == 0) {
-    this.scale().reset();
-    this.axis().invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.AXIS_TICKS | anychart.ConsistencyState.AXIS_LABELS);
-
-    this.dateMax = +Infinity;
-    this.dateMin = -Infinity;
-
-    this.momentSeriesList.length = 0;
-    this.rangeSeriesList.length = 0;
-
-    this.totalRange = {
-      sX: 0,
-      eX: this.dataBounds.width,
-      sY: -this.dataBounds.height / 2,
-      eY: this.dataBounds.height / 2
-    };
-    return;
+/**
+ * Set vertical offset range.
+ * @param {number} min - Minimal offset
+ * @param {number} max - Maximal offset
+ * @return {anychart.timelineModule.Chart|{min: number, max: number}}
+ */
+anychart.timelineModule.Chart.prototype.verticalOffsets = function(min, max) {
+  if (goog.isDef(min)) {
+    if (min != this.minVerticalOffset || max != this.maxVerticalOffset) {
+      this.minVerticalOffset = min;
+      this.maxVerticalOffset = max;
+      this.invalidateState(
+        anychart.enums.Store.TIMELINE_CHART,
+        anychart.timelineModule.Chart.States.SCROLL,
+        anychart.Signal.NEEDS_REDRAW
+      );
+    }
+    return this;
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_CHART_SERIES | anychart.ConsistencyState.SCALE_CHART_SCALES)) {
-
-    var minMax = this.prepareSeries();
-    dateMin = minMax.min;
-    dateMax = minMax.max;
-
-    var markers = goog.array.concat(
-        this.lineAxesMarkers_,
-        this.rangeAxesMarkers_,
-        this.textAxesMarkers_,
-        [this.todayMarker_]);
-
-    var valuesToConsider = [];
-
-    for (var mid = 0; mid < markers.length; mid++) {
-      var m = markers[mid];
-      if (m) {
-        if (m.getOption('scaleRangeMode') == anychart.enums.ScaleRangeMode.CONSIDER) {
-          var refVals = m.getReferenceValues();
-          for (var valId = 0; valId < refVals.length; valId++) {
-            valuesToConsider.push(anychart.format.parseDateTime(refVals[valId]).getTime());
-          }
-        }
-      }
-    }
-
-    var markersMin = Math.min.apply(null, valuesToConsider);
-    var markersMax = Math.max.apply(null, valuesToConsider);
-
-    dateMin = Math.min(dateMin, markersMin);
-    dateMax = Math.max(dateMax, markersMax);
-
-    if (dateMin == dateMax) {
-      var day = anychart.utils.getIntervalRange(anychart.enums.Interval.DAY, 1);
-      dateMin -= day / 2;
-      dateMax += day / 2;
-    }
-
-    var rangeChanged = (this.dateMin != dateMin || this.dateMax != dateMax);
-
-    if (rangeChanged) {
-      this.dateMin = dateMin;
-      this.dateMax = dateMax;
-
-      this.scale().setDataRange(this.dateMin, this.dateMax);
-
-      this.scale().suspendSignalsDispatching();
-      this.scale().fitAll();
-      this.scale().resumeSignalsDispatching(false);
-    }
-
-    var intersectingBounds = this.calculatePointsBounds(this.drawingPlans);
-
-    goog.array.sort(intersectingBounds.rangeUp, anychart.timelineModule.Chart.rangeSortCallback);
-    goog.array.sort(intersectingBounds.rangeDown, anychart.timelineModule.Chart.rangeSortCallback);
-
-    goog.array.sort(intersectingBounds.momentUp, anychart.timelineModule.Chart.momentSortCallback);
-    goog.array.sort(intersectingBounds.momentDown, anychart.timelineModule.Chart.momentSortCallback);
-
-    var scaleTotalRange = this.scale().getTotalRange();
-
-    this.totalRange = {
-      sX: +Infinity,
-      eX: -Infinity,
-      sY: +Infinity,
-      eY: -Infinity
-    };
-    this.totalRange.sX = Math.min(this.totalRange.sX, this.scale().transform(scaleTotalRange.min) * this.dataBounds.width);
-    this.totalRange.eX = Math.max(this.totalRange.eX, this.scale().transform(scaleTotalRange.max) * this.dataBounds.width);
-
-    this.arrangeSeriesPoints(intersectingBounds);
-
-    //fixing white space under the axis
-    var halfAxisHeight = axisHeight / 2;
-
-    this.totalRange.sY -= halfAxisHeight;
-    this.totalRange.eY += halfAxisHeight;
-
-    var scroller = this.getCreated('scroller');
-    var scrollerOrientation;
-    var scrollerHeightTop = 0;
-    var scrollerHeightBottom = 0;
-    if (scroller && scroller.enabled()) {
-      scrollerOrientation = scroller.getOption('orientation');
-      var scrollerHeight = /** @type {number} */(scroller.getOption('height'));
-      switch (scrollerOrientation) {
-        case anychart.enums.Orientation.TOP:
-          scrollerHeightTop = scrollerHeight;
-          break;
-        case anychart.enums.Orientation.BOTTOM:
-          scrollerHeightBottom = scrollerHeight;
-          break;
-      }
-    }
-
-    var halfHeight = this.dataBounds.height / 2;
-    if (this.autoChartTranslating) {
-      if (this.totalRange.sY > -halfHeight && this.totalRange.eY > halfHeight) {
-        this.verticalTranslate = this.totalRange.sY + this.dataBounds.height / 2 - halfAxisHeight - scrollerHeightBottom;
-        this.invalidateState(anychart.enums.Store.TIMELINE_CHART, anychart.timelineModule.Chart.States.SCROLL, anychart.Signal.NEEDS_REDRAW);
-      } else if (this.totalRange.eY < halfHeight && this.totalRange.sY < -halfHeight) {//white space over the axis
-        this.verticalTranslate = this.totalRange.eY - this.dataBounds.height / 2 + halfAxisHeight + scrollerHeightTop;
-        this.invalidateState(anychart.enums.Store.TIMELINE_CHART, anychart.timelineModule.Chart.States.SCROLL, anychart.Signal.NEEDS_REDRAW);
-      }
-    }
-    // center timeline if there is empty space both above and under
-    if (this.totalRange.sY > -halfHeight && this.totalRange.eY < halfHeight) {
-      this.invalidateState(anychart.enums.Store.TIMELINE_CHART, anychart.timelineModule.Chart.States.SCROLL, anychart.Signal.NEEDS_REDRAW);
-    }
-  }
+  return {
+    min: this.minVerticalOffset,
+    max: this.maxVerticalOffset
+  };
 };
 
 
@@ -1005,6 +1104,8 @@ anychart.timelineModule.Chart.prototype.drawContent = function(bounds) {
   if (!this.timelineLayer_) {
     this.timelineLayer_ = this.rootElement.layer();
     this.timelineLayer_.zIndex(1);
+
+    this.eventsHandler.listenOnce(this, anychart.enums.EventType.CHART_DRAW, this.initInteractivity_);
   }
 
   /*
@@ -1029,7 +1130,7 @@ anychart.timelineModule.Chart.prototype.drawContent = function(bounds) {
   }
 
   // calculate needs data bounds populated for event series overlap processing
-  this.calculate();
+  this.calculateAndArrangeSeriesPoints();
 
   var scroller = this.getCreated('scroller');
   var axis = this.getCreated('axis');
@@ -1046,6 +1147,8 @@ anychart.timelineModule.Chart.prototype.drawContent = function(bounds) {
   if (this.hasStateInvalidation(anychart.enums.Store.TIMELINE_CHART, anychart.timelineModule.Chart.States.SCROLL)) {
     var matrix = this.timelineLayer_.getTransformationMatrix();
 
+    this.verticalTranslate = this.getAbsoluteOffset(this.verticalRelativeOffset_);
+
     //fix horizontal translate going places
     if (this.totalRange && (this.horizontalTranslate + this.dataBounds.getRight() > (this.totalRange.eX + this.dataBounds.left))) {
       this.horizontalTranslate = (this.totalRange.eX - this.dataBounds.getRight() + this.dataBounds.left);
@@ -1054,12 +1157,7 @@ anychart.timelineModule.Chart.prototype.drawContent = function(bounds) {
       this.horizontalTranslate = (this.totalRange.sX - this.dataBounds.getLeft() + this.dataBounds.left);
     }
 
-    //fix vertical translate going places
-    if (this.totalRange && (this.verticalTranslate + this.dataBounds.height / 2 > Math.max(this.totalRange.eY, this.dataBounds.height / 2))) {
-      this.verticalTranslate = Math.max(this.totalRange.eY - this.dataBounds.height / 2, 0);
-    } else if (this.totalRange && (this.verticalTranslate - this.dataBounds.height / 2 < Math.min(this.totalRange.sY, -(this.dataBounds.height / 2)))) {
-      this.verticalTranslate = Math.min(this.totalRange.sY + this.dataBounds.height / 2, 0);
-    }
+    this.verticalTranslate = goog.math.clamp(this.verticalTranslate, this.minVerticalOffset, this.maxVerticalOffset);
 
     matrix[4] = -this.horizontalTranslate;
     matrix[5] = this.verticalTranslate;
@@ -1119,11 +1217,11 @@ anychart.timelineModule.Chart.prototype.drawContent = function(bounds) {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.SCALE_CHART_SCALES)) {
-    if (axis) {
-      axis.scale(this.scale());
-    }
-    this.invalidate(anychart.ConsistencyState.SERIES_CHART_SERIES | anychart.ConsistencyState.AXES_CHART_AXES |
-        anychart.ConsistencyState.AXES_CHART_AXES_MARKERS);
+    this.invalidate(
+      anychart.ConsistencyState.SERIES_CHART_SERIES |
+      anychart.ConsistencyState.AXES_CHART_AXES |
+      anychart.ConsistencyState.AXES_CHART_AXES_MARKERS
+    );
     this.markConsistent(anychart.ConsistencyState.SCALE_CHART_SCALES);
   }
 
@@ -1175,12 +1273,6 @@ anychart.timelineModule.Chart.prototype.drawContent = function(bounds) {
     }
     this.markConsistent(anychart.ConsistencyState.AXES_CHART_AXES_MARKERS);
   }
-
-  if (!this.mouseWheelHandler_) {
-    this.mouseWheelHandler_ = new goog.events.MouseWheelHandler(
-        this.container().getStage().getDomWrapper(), false);
-    this.mouseWheelHandler_.listen('mousewheel', this.handleMouseWheel_, false, this);
-  }
 };
 
 
@@ -1225,6 +1317,11 @@ anychart.timelineModule.Chart.prototype.handleMouseWheel_ = function(event) {
     }
     this.resumeSignalsDispatching(true);
   }
+
+  if (this.interactivity().getOption('scrollOnMouseWheel')) {
+    event.preventDefault();
+    this.move(0, dy);
+  }
 };
 
 
@@ -1251,7 +1348,6 @@ anychart.timelineModule.Chart.prototype.moveTo = function(x, y) {
   var dy = y - this.verticalTranslate;
 
   if (this.timelineLayer_) {
-    var matrix = this.timelineLayer_.getTransformationMatrix();
     this.horizontalTranslate = x;
     this.verticalTranslate = y;
 
@@ -1265,20 +1361,23 @@ anychart.timelineModule.Chart.prototype.moveTo = function(x, y) {
     }
 
     if (dy != 0) {
-      if (this.verticalTranslate + this.dataBounds.height / 2 > Math.max(this.totalRange.eY, (this.dataBounds.height / 2))) {
-        this.verticalTranslate = Math.max(this.totalRange.eY, (this.dataBounds.height / 2)) - this.dataBounds.height / 2;
-      }
-      else if (this.verticalTranslate - this.dataBounds.height / 2 < Math.min(this.totalRange.sY, -(this.dataBounds.height / 2))) {
-        this.verticalTranslate = Math.min(this.totalRange.sY, -(this.dataBounds.height / 2)) + this.dataBounds.height / 2;
-      }
+      this.verticalTranslate = goog.math.clamp(y, this.minVerticalOffset, this.maxVerticalOffset);
     }
+
+    // Update vertical translate ratio.
+    var height = this.dataBounds.height - this.getAxisHeight();
+    var verticalTranslateRatio = this.verticalTranslate / height;
+    // clamp vertical translate ratio inbetween -0.5 and 0.5 and save it as axis translate ratio
+    var axisRatio = goog.math.clamp(verticalTranslateRatio, -0.5, 0.5);
+    this.verticalRelativeOffset_.axisRatio = axisRatio;
+    // how much series must be shifted against axis
+    this.verticalRelativeOffset_.seriesOffset = (verticalTranslateRatio - axisRatio) * height;
 
     var leftDate = this.scale().inverseTransform(this.horizontalTranslate / this.dataBounds.width);
     var rightDate = this.scale().inverseTransform((this.horizontalTranslate + this.dataBounds.width) / this.dataBounds.width);
     var offset = leftDate - range['min'];
 
     var delta = totalRange['max'] - totalRange['min'];
-    var scroller = this.scroller();
     this.scroller().setRangeInternal((leftDate - totalRange['min']) / delta, (rightDate - totalRange['min']) / delta);
 
     //this is hack to redraw axis ticks and labels using offset
@@ -1298,7 +1397,14 @@ anychart.timelineModule.Chart.prototype.moveTo = function(x, y) {
  * @private
  */
 anychart.timelineModule.Chart.prototype.initInteractivity_ = function() {
-  goog.events.listen(document, goog.events.EventType.MOUSEDOWN, this.mouseDownHandler, false, this);
+  if (!this.mouseWheelHandler_) {
+    this.mouseWheelHandler_ = new goog.events.MouseWheelHandler(
+        this.container().getStage().getDomWrapper(),
+        false);
+    this.mouseWheelHandler_.listen(goog.events.MouseWheelHandler.EventType.MOUSEWHEEL, this.handleMouseWheel_, false, this);
+  }
+
+  this.rootElement.listen(goog.events.EventType.MOUSEDOWN, this.mouseDownHandler, true, this);
 };
 
 
@@ -1326,8 +1432,8 @@ anychart.timelineModule.Chart.prototype.mouseDownHandler = function(event) {
     this.startTranslateHorizontal = this.horizontalTranslate;
     this.startTranslateVertical = this.verticalTranslate;
 
-    goog.events.listen(document, goog.events.EventType.MOUSEMOVE, this.mouseMoveHandler, true, this);
-    goog.events.listen(document, goog.events.EventType.MOUSEUP, this.mouseUpHandler, true, this);
+    this.rootElement.listen(goog.events.EventType.MOUSEMOVE, this.mouseMoveHandler, true, this);
+    goog.events.listen(anychart.document, goog.events.EventType.MOUSEUP, this.mouseUpHandler, true, this);
   }
 };
 
@@ -1349,7 +1455,7 @@ anychart.timelineModule.Chart.prototype.mouseMoveHandler = function(event) {
  * @param {anychart.core.MouseEvent} event
  */
 anychart.timelineModule.Chart.prototype.mouseUpHandler = function(event) {
-  goog.events.unlisten(document, goog.events.EventType.MOUSEMOVE, this.mouseMoveHandler, true, this);
+  this.rootElement.unlisten(goog.events.EventType.MOUSEMOVE, this.mouseMoveHandler, true, this);
   goog.events.unlisten(document, goog.events.EventType.MOUSEUP, this.mouseUpHandler, true, this);
 };
 
@@ -1437,6 +1543,7 @@ anychart.timelineModule.Chart.prototype.initScale_ = function(scale) {
 anychart.timelineModule.Chart.prototype.scaleInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION)) {
     this.updateZoomState_();
+    // Reset horizontal translation, because chart should be redrawn to match updated scale range.
     this.moveTo(0, this.verticalTranslate);
     this.invalidate(anychart.ConsistencyState.SCALE_CHART_SCALES | anychart.ConsistencyState.AXES_CHART_AXES, anychart.Signal.NEEDS_REDRAW);
   }
@@ -1526,21 +1633,65 @@ anychart.timelineModule.Chart.prototype.fitAll = function() {
 anychart.timelineModule.Chart.prototype.scroll = function(opt_value) {
   if (goog.isDef(opt_value)) {
     opt_value = +opt_value;
-    if (this.scroll_ != opt_value) {
-      this.scroll_ = opt_value;
-      if (this.scroll_ > 0) {
-        this.verticalTranslate = - this.dataBounds.height / 2;
-      } else if (this.scroll_ < 0) {
-        this.verticalTranslate = this.dataBounds.height / 2;
-      } else {
-        this.verticalTranslate = 0;
-      }
-      this.invalidateState(anychart.enums.Store.TIMELINE_CHART, anychart.timelineModule.Chart.States.SCROLL, anychart.Signal.NEEDS_REDRAW);
+    if (this.verticalTranslate != opt_value) {
+      this.moveTo(this.horizontalTranslate, opt_value);
       return this;
     }
   }
 
-  return this.scroll_;
+  return this.verticalTranslate;
+};
+
+
+/**
+ * Getter and setter of vertical offset ratio.
+ * Relative offset consists of two components:
+ *  1) Axis ratio which lays in [-0.5, 0.5] where 0 is chart center
+ *    and uttermost values are half axis height from chart top and bottom.
+ *  2) Series offset value, which is relative to axis center line. Used
+ *    only when total (absolute) offset is out of the chart bounds minus axis height.
+ * @param {{axisRatio: number, seriesOffset: number}=} opt_value - vertical offset ratio.
+ * @return {anychart.timelineModule.Chart|{axisRatio: number, seriesOffset: number}}
+ */
+anychart.timelineModule.Chart.prototype.verticalRelativeOffset = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var axisRatio = goog.isDef(opt_value.axisRatio) ?
+        goog.math.clamp(opt_value.axisRatio, -0.5, 0.5) :
+        0;
+    var seriesOffset = (goog.isDef(opt_value.seriesOffset) && Math.abs(axisRatio) == 0.5) ?
+        opt_value.seriesOffset :
+        0;
+
+    if (this.verticalRelativeOffset_.axisRatio !== axisRatio || this.verticalRelativeOffset_.seriesOffset !== seriesOffset) {
+      this.verticalRelativeOffset_ = {
+        axisRatio: axisRatio,
+        seriesOffset: seriesOffset
+      };
+
+      this.invalidateState(anychart.enums.Store.TIMELINE_CHART, anychart.timelineModule.Chart.States.SCROLL);
+    }
+    return this;
+  }
+
+  return this.verticalRelativeOffset_;
+};
+
+
+/**
+ * Converts offset based on combination of ratio and absolute values to absolute.
+ * @param {{axisRatio: number, seriesOffset: number}} value
+ * @return {number}
+ */
+anychart.timelineModule.Chart.prototype.getAbsoluteOffset = function(value) {
+  var axisRatio = value.axisRatio;
+  var seriesOffset = value.seriesOffset;
+
+  var absoluteOffset = axisRatio * (this.dataBounds.height - this.axis().height());
+  if (Math.abs(axisRatio) == 0.5) {
+    absoluteOffset += seriesOffset;
+  }
+
+  return absoluteOffset;
 };
 
 
@@ -1754,17 +1905,23 @@ anychart.timelineModule.Chart.prototype.setupByJSON = function(config, opt_defau
   anychart.timelineModule.Chart.base(this, 'setupByJSON', config, opt_default);
   if (config['scale']) {
     this.scale(config['scale']);
+    this.dateMin = config['scale']['dataMinimum'];
+    this.dateMax = config['scale']['dataMaximum'];
   }
 
   if (config['axis']) {
     this.axis(config['axis']);
   }
 
-  this.scroll(config['scroll']);
+  this.verticalRelativeOffset(config['verticalRelativeOffset']);
 
   this.setupElements(config['lineAxesMarkers'], this.lineMarker);
   this.setupElements(config['textAxesMarkers'], this.textMarker);
   this.setupElements(config['rangeAxesMarkers'], this.rangeMarker);
+
+  if (config['todayMarker']) {
+    this.todayMarker(config['todayMarker']);
+  }
 
   this.setupSeriesByJSON(config);
 };
@@ -1777,12 +1934,14 @@ anychart.timelineModule.Chart.prototype.setupByJSON = function(config, opt_defau
 anychart.timelineModule.Chart.prototype.setupSeriesByJSON = function(config) {
   var json;
   var series = config['series'];
-  for (var i = 0; i < series.length; i++) {
-    json = series[i];
-    var seriesType = json['seriesType'] || this.getOption('defaultSeriesType');
-    var seriesInstance = this.createSeriesByType(seriesType, json);
-    if (seriesInstance) {
-      seriesInstance.setup(json);
+  if (goog.isArray(series)) {
+    for (var i = 0; i < series.length; i++) {
+      json = series[i];
+      var seriesType = json['seriesType'] || this.getOption('defaultSeriesType');
+      var seriesInstance = this.createSeriesByType(seriesType, json);
+      if (seriesInstance) {
+        seriesInstance.setup(json);
+      }
     }
   }
 };
@@ -1825,11 +1984,15 @@ anychart.timelineModule.Chart.prototype.serialize = function() {
     json['rangeAxesMarkers'].push(this.rangeAxesMarkers_[i].serialize());
   }
 
+  if (goog.isDef(this.todayMarker_)) {
+    json['todayMarker'] = this.todayMarker_.serialize();
+  }
+
   this.serializeSeries(json);
 
   json['type'] = this.getType();
-  if (goog.isDef(this.scroll_))
-    json['scroll'] = this.scroll_;
+
+  json['verticalRelativeOffset'] = this.verticalRelativeOffset();
 
   return {'chart': json};
 };
@@ -1852,6 +2015,34 @@ anychart.timelineModule.Chart.prototype.serializeSeries = function(json) {
 };
 
 
+/**
+ * Force update scale range to the current visible range.
+ * @return {anychart.timelineModule.Chart}
+ */
+anychart.timelineModule.Chart.prototype.forceScaleUpdate = function() {
+  var visibleRange = this.getVisibleRange();
+  this.scale().setRange(visibleRange['min'], visibleRange['max']);
+  return this;
+};
+
+
+/**
+ * Returns visible scale range taking horizontal translate into account.
+ * @return {{min: number, max: number}}
+ */
+anychart.timelineModule.Chart.prototype.getVisibleRange = function() {
+  var scale = this.scale();
+  var scaleVisibleRange = scale.getRange();
+  var horizontalTranslateRatio = this.horizontalTranslate / this.dataBounds.width;
+  var horizontalTranslateDate = scale.inverseTransform(horizontalTranslateRatio);
+
+  return {
+    'min': horizontalTranslateDate,
+    'max': horizontalTranslateDate + (scaleVisibleRange['max'] - scaleVisibleRange['min'])
+  };
+};
+
+
 //endregion
 //region -- Disposing.
 /**
@@ -1860,6 +2051,10 @@ anychart.timelineModule.Chart.prototype.serializeSeries = function(json) {
 anychart.timelineModule.Chart.prototype.disposeInternal = function() {
   this.xScale_.unlistenSignals(this.scaleInvalidated_, this);
   this.axis_.unlistenSignals(this.axisInvalidated_, this);
+  this.rootElement.unlisten(goog.events.EventType.MOUSEDOWN, this.mouseDownHandler, true, this);
+  this.rootElement.unlisten(goog.events.EventType.MOUSEMOVE, this.mouseMoveHandler, true, this);
+  goog.events.unlisten(anychart.document, goog.events.EventType.MOUSEUP, this.mouseUpHandler, true, this);
+  this.mouseWheelHandler_.unlisten(goog.events.MouseWheelHandler.EventType.MOUSEWHEEL, this.handleMouseWheel_, false, this);
 
   goog.disposeAll(this.axis_, this.xScale_, this.yScale_, this.lineAxesMarkers_, this.textAxesMarkers_,
       this.rangeAxesMarkers_, this.timelineLayer_, this.todayMarker_, this.axesMarkersLayer_);
@@ -1906,6 +2101,10 @@ anychart.timelineModule.Chart.prototype.disposeInternal = function() {
   proto['rangeMarker'] = proto.rangeMarker;
   proto['todayMarker'] = proto.todayMarker;
   proto['scroller'] = proto.scroller;
+
+  proto['forceScaleUpdate'] = proto.forceScaleUpdate;
+  proto['getVisibleRange'] = proto.getVisibleRange;
+  proto['verticalRelativeOffset'] = proto.verticalRelativeOffset;
 })();
 //exports
 

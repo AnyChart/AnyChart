@@ -78,7 +78,7 @@ anychart.timelineModule.drawers.Range.prototype.drawPointShape = function(point,
   var zero = /** @type {number} */(point.meta('zero'));
   var axisHeight = /** @type {number} */(point.meta('axisHeight'));
   var stackLevel = /** @type {number} */(point.meta('stackLevel'));
-  var direction = /** @type {anychart.enums.Direction} */(point.meta('direction'));
+  var direction = /** @type {anychart.enums.Direction} */(point.get('direction') || point.meta('direction'));
 
   var startY = /** @type {number} */(point.meta('startY'));
   var endY = /** @type {number} */(point.meta('endY'));
