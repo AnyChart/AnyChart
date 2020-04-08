@@ -241,6 +241,7 @@ anychart.timelineModule.Chart.prototype.rangeMarker = function(opt_indexOrValue,
     rangeMarker.setDefaultLayout(anychart.enums.Layout.VERTICAL);
     this.rangeAxesMarkers_[index] = rangeMarker;
     rangeMarker.listenSignals(this.markerInvalidated_, this);
+    rangeMarker.addOnDisposeCallback(this.markerDisposed_, this);
     this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
 
@@ -292,6 +293,7 @@ anychart.timelineModule.Chart.prototype.textMarker = function(opt_indexOrValue, 
     textMarker.setDefaultLayout(anychart.enums.Layout.VERTICAL);
     this.textAxesMarkers_[index] = textMarker;
     textMarker.listenSignals(this.markerInvalidated_, this);
+    textMarker.addOnDisposeCallback(this.markerDisposed_, this);
     this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
 
@@ -342,6 +344,7 @@ anychart.timelineModule.Chart.prototype.lineMarker = function(opt_indexOrValue, 
     lineMarker.setDefaultLayout(anychart.enums.Layout.VERTICAL);
     this.lineAxesMarkers_[index] = lineMarker;
     lineMarker.listenSignals(this.markerInvalidated_, this);
+    lineMarker.addOnDisposeCallback(this.markerDisposed_, this);
     this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
 
@@ -376,6 +379,15 @@ anychart.timelineModule.Chart.prototype.markerInvalidated_ = function(event) {
 
 
 /**
+ * Invalidate scale on marker disposal.
+ * @private
+ */
+anychart.timelineModule.Chart.prototype.markerDisposed_ = function() {
+  this.invalidate(anychart.ConsistencyState.SCALE_CHART_SCALES, anychart.Signal.NEEDS_REDRAW);
+};
+
+
+/**
  * Returns instance of today marker. Today marker is line marker with current date, for now.
  * @param {(Object|boolean|null)=} opt_value
  * @return {anychart.core.axisMarkers.Line|anychart.timelineModule.Chart}
@@ -392,6 +404,7 @@ anychart.timelineModule.Chart.prototype.todayMarker = function(opt_value) {
     this.todayMarker_.setChart(this);
     this.todayMarker_.setDefaultLayout(anychart.enums.Layout.VERTICAL);
     this.todayMarker_.listenSignals(this.markerInvalidated_, this);
+    this.todayMarker_.addOnDisposeCallback(this.markerDisposed_, this);
     var curDate = new Date();
     this.todayMarker_['value'](Date.UTC(curDate.getUTCFullYear(), curDate.getUTCMonth(), curDate.getUTCDay()));
     this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES_MARKERS | anychart.ConsistencyState.SCALE_CHART_SCALES, anychart.Signal.NEEDS_REDRAW);
@@ -450,6 +463,8 @@ anychart.timelineModule.Chart.prototype.calculateAndArrangeSeriesPoints = functi
     dateMin = minMax.min;
     dateMax = minMax.max;
 
+    this.removeDisposedMarkers();
+
     var markers = goog.array.concat(
         this.lineAxesMarkers_,
         this.rangeAxesMarkers_,
@@ -460,7 +475,7 @@ anychart.timelineModule.Chart.prototype.calculateAndArrangeSeriesPoints = functi
 
     for (var mid = 0; mid < markers.length; mid++) {
       var m = markers[mid];
-      if (m) {
+      if (m && m.enabled()) {
         if (m.getOption('scaleRangeMode') == anychart.enums.ScaleRangeMode.CONSIDER) {
           var refVals = m.getReferenceValues();
           for (var valId = 0; valId < refVals.length; valId++) {
@@ -573,6 +588,33 @@ anychart.timelineModule.Chart.prototype.calculateAndArrangeSeriesPoints = functi
       }
     } else {
       this.verticalOffsets(minOffset, maxOffset);
+    }
+  }
+};
+
+
+/**
+ * Removes disposed markers, so that they won't participate in scale calculations.
+ */
+anychart.timelineModule.Chart.prototype.removeDisposedMarkers = function() {
+  this.removeDisposedMarkersFromArray(this.lineAxesMarkers_);
+  this.removeDisposedMarkersFromArray(this.rangeAxesMarkers_);
+  this.removeDisposedMarkersFromArray(this.textAxesMarkers_);
+  if (this.todayMarker_ && this.todayMarker_.isDisposed()) {
+    this.todayMarker_ = void 0;
+  }
+};
+
+
+/**
+ * Removes disposed markers from array. Array is modified.
+ * @param {Array.<anychart.core.axisMarkers.PathBase|anychart.core.axisMarkers.TextBase>} arr - Array with markers.
+ */
+anychart.timelineModule.Chart.prototype.removeDisposedMarkersFromArray = function(arr) {
+  for (var i = arr.length - 1; i >= 0; i--) {
+    var marker = arr[i];
+    if (marker.isDisposed()) {
+      goog.array.splice(arr, i, 1);
     }
   }
 };
