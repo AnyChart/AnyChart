@@ -694,7 +694,7 @@ anychart.ganttModule.TimeLine.prototype.groupingTasks = function(opt_value) {
     this.groupingTasks_ = new anychart.ganttModule.elements.GroupingTasksElement(this);
     this.setupCreated('groupingTasks', this.groupingTasks_);
     this.groupingTasks_.setupStateSettings();
-    this.groupingTasks_.parent(/** @type {anychart.ganttModule.elements.TimelineElement} */ (this.tasks()));
+    this.groupingTasks_.parent(/** @type {anychart.ganttModule.elements.TimelineElement} */ (this.elements()));
     this.groupingTasks_.listenSignals(this.visualElementInvalidated_, this);
   }
 

@@ -51,7 +51,8 @@ anychart.ganttModule.elements.GroupingTasksElement.prototype.getPaletteNormalStr
 
 /** @inheritDoc */
 anychart.ganttModule.elements.GroupingTasksElement.prototype.getPointSettingsResolutionOrder = function() {
-  return this.pointSettingsResolution || (this.pointSettingsResolution = [this.getType(), anychart.enums.TLElementTypes.TASKS, 'actual']);
+  // Remove fallback to regular tasks as per DVF-4404.
+  return this.pointSettingsResolution || (this.pointSettingsResolution = [this.getType()]);
 };
 
 
@@ -66,19 +67,12 @@ anychart.ganttModule.elements.GroupingTasksElement.prototype.progress = function
   if (!this.progress_) {
     this.progress_ = new anychart.ganttModule.elements.ProgressElement(this.getTimeline());
     this.setupCreated('progress', this.progress_);
-    var parent = /** @type {anychart.ganttModule.elements.TasksElement} */ (this.parent());
-    var parentProgress = /** @type {anychart.ganttModule.elements.ProgressElement} */ (parent.progress());
-    this.progress_.parent(parentProgress);
     this.progress_.listenSignals(this.progressInvalidated_, this);
-    this.progress_.edit().parent(parentProgress.edit());
-    //TODO (A.Kudryavtsev): Do we need add this.progress_.edit() parent?
 
-    this.progress_.labelsResolution = [
-      this.progress().labels(),
-      parentProgress.labels(),
-      this.getTimeline().elements().labels(),
-      this.getTimeline().labels()
-    ];
+    var parent = /** @type {anychart.ganttModule.elements.TimelineElement} */(this.getTimeline().elements());
+    this.progress_.parent(parent);
+    this.progress_.edit().parent(this.edit());
+    //TODO (A.Kudryavtsev): Do we need add this.progress_.edit() parent?
   }
 
   if (goog.isDef(opt_value)) {
