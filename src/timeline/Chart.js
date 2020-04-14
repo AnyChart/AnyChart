@@ -613,7 +613,7 @@ anychart.timelineModule.Chart.prototype.removeDisposedMarkers = function() {
 anychart.timelineModule.Chart.prototype.removeDisposedMarkersFromArray = function(arr) {
   for (var i = arr.length - 1; i >= 0; i--) {
     var marker = arr[i];
-    if (marker.isDisposed()) {
+    if (goog.isDef(marker) && marker.isDisposed()) {
       goog.array.splice(arr, i, 1);
     }
   }
