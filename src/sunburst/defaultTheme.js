@@ -46,7 +46,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       'normal': {
         'labels': {
           'padding': '10%',
-          'hAlign': 'end',
+          'hAlign': 'center',
           'position': 'radial',
           'format': anychart.core.defaultTheme.returnName
         }
