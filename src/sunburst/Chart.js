@@ -378,7 +378,7 @@ anychart.sunburstModule.Chart.prototype.makeBrowserEvent = function(e) {
 
   var tag = anychart.utils.extractTag(res['domTarget']);
   var pointIndex = tag.index;
-  
+
   // fix for domTarget == layer (mouseDown on label + mouseUp on path = click on layer)
   if (!goog.isDef(pointIndex) && this.state.hasPointState(anychart.PointState.HOVER)) {
     var hoveredPointsIndex = this.state.getIndexByPointState(anychart.PointState.HOVER);
@@ -2574,143 +2574,160 @@ anychart.sunburstModule.Chart.prototype.drawLabel_ = function(pointState) {
   var selected = pointState == anychart.PointState.SELECT;
 
   var iterator = this.getIterator();
-  var item = iterator.getItem();
+  var sweep = /** @type {number} */ (iterator.meta('sweep'));
+  var innerRadius = /** @type {number} */ (iterator.meta('innerRadius'));
+  var outerRadius = /** @type {number} */ (iterator.meta('outerRadius'));
 
-  var chartLabels = this.normal_.labels();
-  var chartStateLabels = selected ? this.selected_.labels() : hovered ? this.hovered_.labels() : null;
+  var halfSweep = goog.math.toRadians(sweep / 2);
+  var medianSegmentWidth = (outerRadius + innerRadius) / 2 * Math.sin(halfSweep);
+  var sweepCondition = sweep <= 180 ? medianSegmentWidth >= 5 : outerRadius >= 10;
 
-  var pointLabel = item.get('normal');
-  pointLabel = goog.isDef(pointLabel) ? pointLabel['label'] : void 0;
-  pointLabel = anychart.utils.getFirstDefinedValue(pointLabel, item.get('label'));
+  if (sweepCondition && outerRadius - innerRadius >= 20) {
+    /*
+      For performance purposes, no label will be drawn if it has not enough space
+      to be drawn.
 
-  var statePointLabel = selected ? item.get('selected') : hovered ? item.get('hovered') : void 0;
-  statePointLabel = goog.isDef(statePointLabel) ? statePointLabel['label'] : void 0;
-  statePointLabel = selected ? anychart.utils.getFirstDefinedValue(statePointLabel, item.get('selectLabel')) :
-      hovered ? anychart.utils.getFirstDefinedValue(statePointLabel, item.get('hoverLabel')) : null;
+      It includes:
+        - available medianSegmentWidth is less than 5 pixels.
+        - available levelThickness = (outerRadius - innerRadius) difference is less than 20 pixels.
+        - @see QLIK-115 for explanations.
+     */
+    var item = iterator.getItem();
 
-  var index = iterator.getIndex();
-  var label = chartLabels.getLabel(index);
-  if (!label)
-    label = chartLabels.add(null, null, index);
+    var chartLabels = this.normal_.labels();
+    var chartStateLabels = selected ? this.selected_.labels() : hovered ? this.hovered_.labels() : null;
 
-  var depth = item.meta('depth');
-  var positiveLevel = this.levelsPositive_[depth];
-  var negativeLevel = this.levelsNegative_[this.treeMaxDepth - depth];
+    var pointLabel = item.get('normal');
+    pointLabel = goog.isDef(pointLabel) ? pointLabel['label'] : void 0;
+    pointLabel = anychart.utils.getFirstDefinedValue(pointLabel, item.get('label'));
 
-  var positiveLevelLabels, positiveStateLevelLabels;
-  if (positiveLevel) {
-    positiveLevelLabels = positiveLevel.normal().labels();
-    positiveStateLevelLabels = selected ? positiveLevel.selected().labels() : hovered ? positiveLevel.hovered().labels() : null;
-  }
+    var statePointLabel = selected ? item.get('selected') : hovered ? item.get('hovered') : void 0;
+    statePointLabel = goog.isDef(statePointLabel) ? statePointLabel['label'] : void 0;
+    statePointLabel = selected ? anychart.utils.getFirstDefinedValue(statePointLabel, item.get('selectLabel')) :
+        hovered ? anychart.utils.getFirstDefinedValue(statePointLabel, item.get('hoverLabel')) : null;
 
-  var negativeLevelLabels, negativeStateLevelLabels;
-  if (negativeLevel) {
-    negativeLevelLabels = negativeLevel.normal().labels();
-    negativeStateLevelLabels = selected ? negativeLevel.selected().labels() : hovered ? negativeLevel.hovered().labels() : null;
-  }
+    var index = iterator.getIndex();
+    var label = chartLabels.getLabel(index);
+    if (!label)
+      label = chartLabels.add(null, null, index);
 
-  var isLeaf = item.meta('isLeaf');
-  var leavesLabels, leavesStateLabels;
-  if (isLeaf) {
-    var leaves = this.leaves();
-    leavesLabels = leaves.normal().labels();
-    leavesStateLabels = selected ? leaves.selected().labels() : hovered ? leaves.hovered().labels() : null;
-  }
+    var depth = item.meta('depth');
+    var positiveLevel = this.levelsPositive_[depth];
+    var negativeLevel = this.levelsNegative_[this.treeMaxDepth - depth];
 
-  label.resetSettings();
-  label.stateOrder(anychart.utils.extractSettings([
-    //own state
-    statePointLabel, anychart.utils.ExtractSettingModes.PLAIN_OBJECT,
-    leavesStateLabels, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
-    negativeStateLevelLabels, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
-    positiveStateLevelLabels, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
-    chartStateLabels, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
-    //own normal
-    pointLabel, anychart.utils.ExtractSettingModes.PLAIN_OBJECT,
-    leavesLabels, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
-    negativeLevelLabels, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
-    positiveLevelLabels, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
-    chartLabels, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
-    //sunburst auto settings
-    label, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
-    //theme state
-    leavesStateLabels, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
-    positiveStateLevelLabels, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
-    negativeStateLevelLabels, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
-    chartStateLabels, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
-    //theme normal
-    leavesLabels, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
-    negativeLevelLabels, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
-    positiveLevelLabels, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
-    chartLabels, anychart.utils.ExtractSettingModes.THEME_SETTINGS
-  ]));
+    var positiveLevelLabels, positiveStateLevelLabels;
+    if (positiveLevel) {
+      positiveLevelLabels = positiveLevel.normal().labels();
+      positiveStateLevelLabels = selected ? positiveLevel.selected().labels() : hovered ? positiveLevel.hovered().labels() : null;
+    }
 
-  var needToDraw = label.getFinalSettings('enabled');
-  var fitToSlice = true;
-  if (needToDraw) {
-    // var start
-    var sweep, innerRadius, outerRadius, radiusDelta, angle, radius, path, textElement, arcLength;
-    var position, padding, positionProvider, formatProvider;
-    var width = null;
-    var height = null;
+    var negativeLevelLabels, negativeStateLevelLabels;
+    if (negativeLevel) {
+      negativeLevelLabels = negativeLevel.normal().labels();
+      negativeStateLevelLabels = selected ? negativeLevel.selected().labels() : hovered ? negativeLevel.hovered().labels() : null;
+    }
 
-    positionProvider = this.createPositionProvider();
-    formatProvider = this.createFormatProvider(true);
-    label.formatProvider(formatProvider);
+    var isLeaf = item.meta('isLeaf');
+    var leavesLabels, leavesStateLabels;
+    if (isLeaf) {
+      var leaves = this.leaves();
+      leavesLabels = leaves.normal().labels();
+      leavesStateLabels = selected ? leaves.selected().labels() : hovered ? leaves.hovered().labels() : null;
+    }
 
-    label
-        .height(height)
-        .width(width);
+    label.resetSettings();
+    label.stateOrder(anychart.utils.extractSettings([
+      //own state
+      statePointLabel, anychart.utils.ExtractSettingModes.PLAIN_OBJECT,
+      leavesStateLabels, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+      negativeStateLevelLabels, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+      positiveStateLevelLabels, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+      chartStateLabels, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+      //own normal
+      pointLabel, anychart.utils.ExtractSettingModes.PLAIN_OBJECT,
+      leavesLabels, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+      negativeLevelLabels, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+      positiveLevelLabels, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+      chartLabels, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+      //sunburst auto settings
+      label, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+      //theme state
+      leavesStateLabels, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
+      positiveStateLevelLabels, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
+      negativeStateLevelLabels, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
+      chartStateLabels, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
+      //theme normal
+      leavesLabels, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
+      negativeLevelLabels, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
+      positiveLevelLabels, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
+      chartLabels, anychart.utils.ExtractSettingModes.THEME_SETTINGS
+    ]));
 
-    position = label.getFinalSettings('position');
-    padding = new anychart.core.utils.Padding().setup(label.getFinalSettings('padding'));
-    // start = /** @type {number} */ (iterator.meta('start'));
-    sweep = /** @type {number} */ (iterator.meta('sweep'));
-    innerRadius = /** @type {number} */ (iterator.meta('innerRadius'));
-    outerRadius = /** @type {number} */ (iterator.meta('outerRadius'));
-    radiusDelta = (outerRadius - innerRadius);
-    angle = positionProvider['value']['angle'];
-    radius = positionProvider['value']['radius'];
+    var needToDraw = label.getFinalSettings('enabled');
+    var fitToSlice = true;
+    if (needToDraw) {
+      // var start
+      var radiusDelta, angle, radius, path, textElement, arcLength;
+      var position, padding, positionProvider, formatProvider;
+      var width = null;
+      var height = null;
 
-    if (position == 'circular' || (position == 'radial' && sweep == 360)) {
-      if (sweep == 360 && !innerRadius) {
-        textElement = label.getTextElement();
-        path = textElement.path();
-        if (path)
-          textElement.path(null);
+      positionProvider = this.createPositionProvider();
+      formatProvider = this.createFormatProvider(true);
+      label.formatProvider(formatProvider);
 
-        width = height = radiusDelta * 2;
-        width = padding.tightenWidth(width);
-        height = padding.tightenHeight(height);
-      } else {
-        path = this.getLabelCircularTextPath(label, radius);
+      label
+          .height(height)
+          .width(width);
+
+      position = label.getFinalSettings('position');
+      padding = new anychart.core.utils.Padding().setup(label.getFinalSettings('padding'));
+      // start = /** @type {number} */ (iterator.meta('start'));
+
+      radiusDelta = (outerRadius - innerRadius);
+      angle = positionProvider['value']['angle'];
+      radius = positionProvider['value']['radius'];
+
+      if (position == 'circular' || (position == 'radial' && sweep == 360)) {
+        if (sweep == 360 && !innerRadius) {
+          textElement = label.getTextElement();
+          path = textElement.path();
+          if (path)
+            textElement.path(null);
+
+          width = height = radiusDelta * 2;
+          width = padding.tightenWidth(width);
+          height = padding.tightenHeight(height);
+        } else {
+          path = this.getLabelCircularTextPath(label, radius);
+          label.getTextElement().path(path);
+
+          arcLength = (Math.PI * radius * sweep) / 180;
+          width = padding.tightenWidth(arcLength);
+          height = padding.tightenHeight(radiusDelta) - 15;
+        }
+      } else if (position == 'radial') {
+        path = this.getLabelRadialTextPath(label, radius, angle);
         label.getTextElement().path(path);
 
         arcLength = (Math.PI * radius * sweep) / 180;
-        width = padding.tightenWidth(arcLength);
-        height = padding.tightenHeight(radiusDelta) - 15;
+        height = padding.tightenHeight(arcLength);
+        width = padding.tightenWidth(radiusDelta);
       }
-    } else if (position == 'radial') {
-      path = this.getLabelRadialTextPath(label, radius, angle);
-      label.getTextElement().path(path);
+      goog.dispose(padding);
+      padding = null;
 
-      arcLength = (Math.PI * radius * sweep) / 180;
-      height = padding.tightenHeight(arcLength);
-      width = padding.tightenWidth(radiusDelta);
+      label
+          .width(width)
+          .height(height)
+          .positionProvider(positionProvider);
     }
-    goog.dispose(padding);
-    padding = null;
 
-    label
-        .width(width)
-        .height(height)
-        .positionProvider(positionProvider);
+    if (!needToDraw || !fitToSlice)
+      chartLabels.clear(label.getIndex());
+    else
+      label.draw();
   }
-
-  if (!needToDraw || !fitToSlice)
-    chartLabels.clear(label.getIndex());
-  else
-    label.draw();
 };
 
 
