@@ -856,7 +856,7 @@ anychart.ganttModule.Chart.prototype.rowMouseMove = function(event) {
       // https://anychart.atlassian.net/browse/DVF-4356
       item = event['originalEvent']['domTarget'].tag.item;
     }
-    tooltip = /** @type {anychart.core.ui.Tooltip} */(target.getTooltipInternal(void 0, item));
+    tooltip = /** @type {anychart.core.ui.Tooltip} */(target.getTooltipInternal(void 0, item, event['periodIndex']));
 
     if (anychart.utils.instanceOf(target, anychart.ganttModule.DataGrid)) {
       var tlTooltip = this.tl_.getTooltipOfElementByItem(item);

@@ -39,5 +39,20 @@ anychart.ganttModule.elements.PeriodsElement.prototype.getPaletteNormalStroke = 
 };
 
 
+/** @inheritDoc */
+anychart.ganttModule.elements.PeriodsElement.prototype.getHeight = function(dataItem, opt_periodIndex) {
+  var pointSettings = this.getPointSettings(dataItem, opt_periodIndex);
+
+  if (pointSettings) {
+    var height = pointSettings['height'];
+
+    if (goog.isDefAndNotNull(height))
+      return height;
+  }
+
+  return anychart.ganttModule.elements.PeriodsElement.base(this, 'getHeight', dataItem, opt_periodIndex);
+};
+
+
 //endregion
 

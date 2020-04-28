@@ -541,10 +541,20 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'format': 'Start Date: {%start}\nEnd Date: {%end}'
       },
       'labels': {
-        'format': 'Progress Label',
+        'format': '{%Name}',
         'position': 'center',
         'anchor': 'center',
         'enabled': false
+      },
+      'milestones': {
+        'labels': {
+          'anchor': 'left-center',
+          'position': 'right-center',
+          'enabled': null
+        },
+        'tooltip': {
+          'format': '{%start}'
+        }
       }
     }
   },

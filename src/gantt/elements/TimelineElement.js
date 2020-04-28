@@ -778,9 +778,10 @@ anychart.ganttModule.elements.TimelineElement.prototype.recreateShapeManager = f
  * Leave dataItem argument here because maybe in future it will be used for all gantt elements.
  *
  * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} dataItem - Point data.
+ * @param {number=} opt_periodIndex - Index of period for resources chart case.
  * @return {number|string} - Height of the element.
  */
-anychart.ganttModule.elements.TimelineElement.prototype.getHeight = function(dataItem) {
+anychart.ganttModule.elements.TimelineElement.prototype.getHeight = function(dataItem, opt_periodIndex) {
   return /**@type {number|string}*/(this.getOption('height'));
 };
 

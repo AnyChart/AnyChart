@@ -77,8 +77,8 @@ anychart.ganttModule.elements.MilestonesElement.prototype.getPointSettingsResolu
 
 
 /** @inheritDoc */
-anychart.ganttModule.elements.MilestonesElement.prototype.getHeight = function(dataItem) {
-  var pointSettings = this.getPointSettings(dataItem);
+anychart.ganttModule.elements.MilestonesElement.prototype.getHeight = function(dataItem, opt_periodIndex) {
+  var pointSettings = this.getPointSettings(dataItem, opt_periodIndex);
 
   if (pointSettings) {
     var height = pointSettings['height'];
@@ -87,7 +87,7 @@ anychart.ganttModule.elements.MilestonesElement.prototype.getHeight = function(d
       return height;
   }
 
-  return anychart.ganttModule.elements.MilestonesElement.base(this, 'getHeight', dataItem);
+  return anychart.ganttModule.elements.MilestonesElement.base(this, 'getHeight', dataItem, opt_periodIndex);
 };
 
 

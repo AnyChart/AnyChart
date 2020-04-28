@@ -388,6 +388,7 @@ anychart.ganttModule.Controller.prototype.datesToMeta_ = function(item) {
 
 /**
  * Writes item's periods to meta as timestamp.
+ *
  * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} item - Tree data item.
  * @private
  */
@@ -416,27 +417,23 @@ anychart.ganttModule.Controller.prototype.periodsToMeta_ = function(item) {
         periodEnd = periodEndVal;
       }
 
-      if (!isNaN(periodStart) && !isNaN(periodEnd)) {
-        minPeriodDate = isNaN(minPeriodDate) ? Math.min(periodStart, periodEnd) : Math.min(minPeriodDate, periodStart, periodEnd);
-        maxPeriodDate = isNaN(maxPeriodDate) ? Math.max(periodStart, periodEnd) : Math.max(maxPeriodDate, periodStart, periodEnd);
+      minPeriodDate = this.actualizeResourceDates_(Math.min, minPeriodDate, maxPeriodDate, periodStart, periodEnd);
+      maxPeriodDate = this.actualizeResourceDates_(Math.max, minPeriodDate, maxPeriodDate, periodStart, periodEnd);
 
-        //This extends dates range.
-        this.checkDate_(periodStart);
-        this.checkDate_(periodEnd);
-      }
+      // This extends dates range.
+      this.checkDate_(periodStart);
+      this.checkDate_(periodEnd);
     }
 
-    if (!isNaN(minPeriodDate) && !isNaN(maxPeriodDate)) {
-      item.meta('minPeriodDate', minPeriodDate);
-      item.meta('maxPeriodDate', maxPeriodDate);
-    }
-
+    item.meta('minPeriodDate', minPeriodDate);
+    item.meta('maxPeriodDate', maxPeriodDate);
   }
 };
 
 
 /**
  * Writes item's markers to meta.
+ *
  * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} item - Tree data item.
  * @private
  */
@@ -455,6 +452,7 @@ anychart.ganttModule.Controller.prototype.markersToMeta_ = function(item) {
 
 /**
  * Processes collapsed-state.
+ *
  * @see https://anychart.atlassian.net/browse/ENV-1391.
  * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)=} opt_item - Item to
  *  be processed.
@@ -473,6 +471,7 @@ anychart.ganttModule.Controller.prototype.processCollapse = function(opt_item) {
 
 /**
  * Item's values auto calculation.
+ *
  * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} item - Current tree data item.
  * @param {number} currentDepth - Current depth.
  * @private
@@ -539,8 +538,8 @@ anychart.ganttModule.Controller.prototype.autoCalcItem_ = function(item, current
       var childProgress = goog.isDefAndNotNull(progressValue) ? progressValue : (child.meta('autoProgress') || 0);
       child.meta('progressValue', childProgress);
 
-      autoStart = this.actualizeDates_(Math.min, autoStart, autoEnd, childStart, childEnd);
-      autoEnd = this.actualizeDates_(Math.max, autoStart, autoEnd, childStart, childEnd);
+      autoStart = this.actualizeProjectDates_(Math.min, autoStart, autoEnd, childStart, childEnd);
+      autoEnd = this.actualizeProjectDates_(Math.max, autoStart, autoEnd, childStart, childEnd);
 
       if (!isNaN(childStart) && !isNaN(childEnd)) {
         var delta = (/** @type {number} */(childEnd) - /** @type {number} */(childStart));
@@ -561,6 +560,39 @@ anychart.ganttModule.Controller.prototype.autoCalcItem_ = function(item, current
 
 /**
  * Gets min or max value, filters invalid values.
+ * This method differs from actualizeProjectDates_ according to ticket's task (DVF-4405).
+ *
+ * @param {Function} fn - Math.min() or Math.max(), function to get min or max value.
+ * @param {*} autoStart - Value to select from.
+ * @param {*} autoEnd - Value to select from.
+ * @param {*} childStart - Value to select from.
+ * @param {*} childEnd - Value to select from.
+ * @return {number} - Min or max value depending on fn passed.
+ * @private
+ */
+anychart.ganttModule.Controller.prototype.actualizeResourceDates_ = function(fn, autoStart, autoEnd, childStart, childEnd) {
+  var vals = [];
+
+  if (this.isValidNumber_(autoStart)) {
+    vals.push(autoStart);
+  }
+  if (this.isValidNumber_(autoEnd)) {
+    vals.push(autoEnd);
+  }
+  if (this.isValidNumber_(childStart)) {
+    vals.push(childStart);
+  }
+  if (this.isValidNumber_(childEnd)) {
+    vals.push(childEnd);
+  }
+
+  return vals.length ? fn.apply(null, vals) : NaN;
+};
+
+
+/**
+ * Gets min or max value, filters invalid values.
+ *
  * @param {Function} fn - Math.min() or Math.max(), function to get min or max value.
  * @param {number} autoStart - Value to select from.
  * @param {number} autoEnd - Value to select from.
@@ -569,13 +601,15 @@ anychart.ganttModule.Controller.prototype.autoCalcItem_ = function(item, current
  * @return {number} - Min or max value depending on fn passed.
  * @private
  */
-anychart.ganttModule.Controller.prototype.actualizeDates_ = function(fn, autoStart, autoEnd, childStart, childEnd) {
+anychart.ganttModule.Controller.prototype.actualizeProjectDates_ = function(fn, autoStart, autoEnd, childStart, childEnd) {
   var vals = [];
+
   if (this.isValidNumber_(autoStart)) {
     vals.push(autoStart);
     if (this.isValidNumber_(autoEnd))
       vals.push(autoEnd);
   }
+
   if (this.isValidNumber_(childStart)) {
     vals.push(childStart);
     if (this.isValidNumber_(childEnd))
@@ -587,7 +621,7 @@ anychart.ganttModule.Controller.prototype.actualizeDates_ = function(fn, autoSta
 
 /**
  * Checks for valid numeric value.
- * @param {number} val - Value to check.
+ * @param {*} val - Value to check.
  * @return {boolean}
  * @private
  */
