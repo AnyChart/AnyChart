@@ -21,6 +21,9 @@ import re
 import json
 
 
+import shutil
+
+
 # region --- Project paths
 # ======================================================================================================================
 # Project paths
@@ -679,6 +682,107 @@ def __make_manifest(module_name, files, theme_name='none', gen_manifest=False, a
 
     return module_files
 
+def _debug_distro_replace_in_file(filePath, pathMatch, search, replace):
+    filePath = filePath.lower()
+    pathMatch = pathMatch.lower()
+    if not pathMatch in filePath:
+        return
+    print("Replace ...")
+
+    filedata = None
+    with open(filePath, 'r') as file:
+      filedata = file.read()
+
+    filedata = filedata.replace(search, replace)
+
+    # Write the file out again
+    with open(filePath, 'w') as file:
+      file.write(filedata)
+
+
+def _debug_distro_replace_file_contents(filePath):
+    _debug_distro_replace_in_file(filePath, "goog/base.js", "goog.global.CLOSURE_NO_DEPS;", "goog.global.CLOSURE_NO_DEPS = true;")
+
+
+def _debug_distro_fixOutputPath(path):
+    path=path.replace("_debugDistro/AnyChart/src/", "_debugDistro/AnyChart/js/")
+    path=path.replace("_debugDistro/AnyChart/libs/", "_debugDistro/AnyChart/_external_libs/")
+    return path
+
+def _debug_distro_writeBundleFile(dest_files, debugDistroRoot):
+    bundle_file=os.path.join(debugDistroRoot, "AnyChart_Bundle.js");
+    bundleFile = open(bundle_file, "w")
+    for destFilePath in dest_files:
+        with open(destFilePath, 'r') as destFile:
+            contents = destFile.read()
+            bundleFile.write("// ################### BEGIN_FILE: ")
+            relPath = destFilePath.replace(debugDistroRoot + "/", "")
+            bundleFile.write("//  " + relPath + "\n\n")
+            bundleFile.write(contents)
+            bundleFile.write("// ################### END_FILE: ")
+            relPath = destFilePath.replace(debugDistroRoot, "")
+            bundleFile.write("//  " + relPath + "\n\n")
+
+    bundleFile.close()
+
+def _debug_distro_copyExtraFiles(rootDir, debugDistroRoot):
+     shutil.copytree(os.path.join(rootDir, "dist/css"), os.path.join(debugDistroRoot, "css"))  
+     shutil.copytree(os.path.join(rootDir, "dist/fonts"), os.path.join(debugDistroRoot, "fonts"))  
+     shutil.copytree(os.path.join(rootDir, "src/themes"), os.path.join(debugDistroRoot, "themes"))  
+
+
+def _debug_distro_writeBundleListFile(dest_files, debugDistroRoot):
+    bundle_list_file=os.path.join(debugDistroRoot, "bundle_list.cfg");
+    bundleListFile = open(bundle_list_file, "w")
+
+    bundleListFile.write("String[] js_bundle_files = {\n");
+
+    for destFilePath in dest_files:
+        relPath = destFilePath.replace(debugDistroRoot + "/", "")
+        entry = '    "lib/AnyChart/{fileName}",\n'.format(fileName = relPath)
+        bundleListFile.write(entry)
+    bundleListFile.write("}\n\n");
+
+    bundleListFile.close()
+
+def __build_debug_distr(file_list):
+    print ("===================================================================================")
+    print ("Creating debug distro ... ")
+    print ("===================================================================================")
+
+    rootDir = os.path.dirname(os.path.realpath(__file__))
+    debugDistroRoot = os.path.join(rootDir, "out/_debugDistro/AnyChart");
+    shutil.rmtree(debugDistroRoot)
+
+    if not os.path.exists(debugDistroRoot):
+        os.makedirs(debugDistroRoot)
+
+    dest_files = []
+    for file_path in file_list:
+        if not file_path.startswith(rootDir):
+            print ("Error: File apparently not in root directory: " + file_path)
+            sys.exit(1) 
+        dest_path = file_path.replace(rootDir, debugDistroRoot)
+        dest_path = _debug_distro_fixOutputPath(dest_path)
+        dest_dir = os.path.dirname(dest_path)
+
+        if not os.path.exists(dest_dir):
+            os.makedirs(dest_dir)
+        shutil.copyfile(file_path, dest_path)
+        _debug_distro_replace_file_contents(dest_path)
+        dest_files.append(dest_path)
+
+    _debug_distro_writeBundleFile(dest_files, debugDistroRoot)
+    _debug_distro_writeBundleListFile(dest_files, debugDistroRoot)
+    _debug_distro_copyExtraFiles(rootDir, debugDistroRoot)
+
+    print ("===================================================================================")
+    print ("Done creating debug distro.")
+    print ("===================================================================================")
+    
+    print ("Debug exit ... ") 
+    exit(1)
+
 
 @stopwatch()
 def __make_build(build_name, modules, checks_only=False, theme_name='none', dev_edition=False, perf_mon=False,
@@ -711,6 +815,8 @@ def __make_build(build_name, modules, checks_only=False, theme_name='none', dev_
         additional_flags.append(module_def)
         additional_flags.append(module_wrapper)
         all_files.extend(module_files)
+
+    __build_debug_distr(all_files)
 
     with open(files_list_file_name, 'w') as files_list:
         with open(CHECKS_FLAGS, 'r') as checks:
