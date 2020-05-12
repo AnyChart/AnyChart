@@ -3055,6 +3055,21 @@ anychart.utils.normalizeTheme = function(theme) {
 };
 
 
+/**
+ * Dispatches detached event.
+ *
+ * @param {goog.events.EventTarget} dispatcher - Event target that dispatched detached event.
+ * @param {goog.events.EventLike} event - Event to be dispatched.
+ */
+anychart.utils.dispatchDetachedEvent = function(dispatcher, event) {
+  var timeout = setTimeout(function() {
+    if (!dispatcher.isDisposed())
+      dispatcher.dispatchEvent(event);
+    clearTimeout(timeout);
+  }, 0);
+};
+
+
 //region -- Async actions.
 /**
  * Executes fn-function in next execution frame.

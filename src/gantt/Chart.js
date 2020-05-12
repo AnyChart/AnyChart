@@ -1,6 +1,7 @@
 goog.provide('anychart.ganttModule.Chart');
 
 goog.require('anychart.core.SeparateChart');
+goog.require('anychart.core.StatefulColoring');
 goog.require('anychart.core.reporting');
 goog.require('anychart.format.Context');
 goog.require('anychart.ganttModule.Controller');
@@ -10,7 +11,6 @@ goog.require('anychart.ganttModule.Selection');
 goog.require('anychart.ganttModule.Splitter');
 goog.require('anychart.ganttModule.TimeLine');
 goog.require('anychart.ganttModule.edit.StructureEdit');
-goog.require('anychart.ganttModule.rendering.RowsColoring');
 goog.require('anychart.treeDataModule.Tree');
 goog.require('anychart.treeDataModule.utils');
 
@@ -80,9 +80,9 @@ anychart.ganttModule.Chart = function(opt_isResourcesChart) {
 
   /**
    *
-   * @type {anychart.ganttModule.rendering.RowsColoring}
+   * @type {anychart.core.StatefulColoring}
    */
-  this.rowsColoringInternal = null;
+  this.statefulColoringInternal = null;
 
   /**
    * Selection.
@@ -772,19 +772,22 @@ anychart.ganttModule.Chart.prototype.splitter = function(opt_value) {
 
 
 /**
- * @return {anychart.ganttModule.rendering.RowsColoring}
+ * Stateful coloring getter.
+ * Internal QLIK-specific feature, no need to work like getter/setter.
+ *
+ * @return {anychart.core.StatefulColoring}
  */
-anychart.ganttModule.Chart.prototype.rowsColoring = function() {
-  if (!this.rowsColoringInternal) {
-    this.rowsColoringInternal = new anychart.ganttModule.rendering.RowsColoring(this);
-    this.rowsColoringInternal.listen('statechange', function() {
+anychart.ganttModule.Chart.prototype.statefulColoring = function() {
+  if (!this.statefulColoringInternal) {
+    this.statefulColoringInternal = new anychart.core.StatefulColoring();
+    this.statefulColoringInternal.listen(anychart.enums.EventType.STATE_CHANGE, function() {
       anychart.core.Base.suspendSignalsDispatching(this.getTimeline(), this.getDataGrid_());
       this.tl_.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
       this.dg_.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
       anychart.core.Base.resumeSignalsDispatchingTrue(this.dg_, this.tl_);
     }, void 0, this);
   }
-  return this.rowsColoringInternal;
+  return this.statefulColoringInternal;
 };
 
 
@@ -1382,7 +1385,8 @@ anychart.ganttModule.Chart.prototype.disposeInternal = function() {
   proto['xScale'] = proto.xScale;
   proto['defaultRowHeight'] = proto.defaultRowHeight;
   proto['palette'] = proto.palette;
-  proto['rowsColoring'] = proto.rowsColoring;
+  proto['rowsColoring'] = proto.statefulColoring; // Legacy.
+  proto['statefulColoring'] = proto.statefulColoring;
   proto['getCollapsedItemsMap'] = proto.getCollapsedItemsMap;
 
   // auto generated

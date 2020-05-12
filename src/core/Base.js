@@ -1461,12 +1461,7 @@ anychart.core.Base.prototype.setupCreated = function(getterName, instance) {
  * @param {goog.events.EventLike} event Event object.
  */
 anychart.core.Base.prototype.dispatchDetachedEvent = function(event) {
-  var self = this;
-  var timeout = setTimeout(function() {
-    if (!self.isDisposed())
-      self.dispatchEvent(event);
-    clearTimeout(timeout);
-  }, 0);
+  anychart.utils.dispatchDetachedEvent(this, event);
 };
 
 

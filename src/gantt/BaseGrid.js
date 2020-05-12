@@ -2314,20 +2314,20 @@ anychart.ganttModule.BaseGrid.prototype.drawRowFills = function() {
   // COLORS CONFIG MAGIC PREPARATION!
   var colorsPrepared = false;
   var colors, checkers;
-  if (this.interactivityHandler.rowsColoringInternal) {
-    colors = this.interactivityHandler.rowsColoringInternal.colors;
+  if (this.interactivityHandler.statefulColoringInternal) {
+    colors = this.interactivityHandler.statefulColoringInternal.colors;
     if (colors) {
-      checkers = this.interactivityHandler.rowsColoringInternal.checkers;
+      checkers = this.interactivityHandler.statefulColoringInternal.checkers;
       if (checkers) {
-        this.rowsColoringPaths = this.rowsColoringPaths || {};
+        this.statefulColoringPaths = this.statefulColoringPaths || {};
         colorsPrepared = true;
         for (var key in colors) {
-          if (!(key in this.rowsColoringPaths)) {
+          if (!(key in this.statefulColoringPaths)) {
             var p = /** @type {acgraph.vector.Path} */ (this.getCellsLayer().path());
             p.stroke(null).zIndex(5);
-            this.rowsColoringPaths[key] = p;
+            this.statefulColoringPaths[key] = p;
           }
-          this.rowsColoringPaths[key].clear();
+          this.statefulColoringPaths[key].clear();
         }
       }
     }
@@ -2381,13 +2381,13 @@ anychart.ganttModule.BaseGrid.prototype.drawRowFills = function() {
 
     // COLORS CONFIG MAGIC!
     if (colorsPrepared) {
-      var state = this.interactivityHandler.rowsColoringInternal.state;
+      var state = this.interactivityHandler.statefulColoringInternal.state;
       for (var c = 0; c < checkers.length; c++) {
         var checker = checkers[c];
         var res = checker(item, state);
         if (res && res in colors) {
           var fillRef = colors[res];
-          path = this.rowsColoringPaths[res];
+          path = this.statefulColoringPaths[res];
           path
               .moveTo(this.pixelBoundsCache.left, top)
               .lineTo(this.pixelBoundsCache.left + this.totalGridsWidth, top)
