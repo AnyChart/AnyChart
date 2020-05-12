@@ -781,10 +781,8 @@ anychart.ganttModule.Chart.prototype.statefulColoring = function() {
   if (!this.statefulColoringInternal) {
     this.statefulColoringInternal = new anychart.core.StatefulColoring();
     this.statefulColoringInternal.listen(anychart.enums.EventType.STATE_CHANGE, function() {
-      anychart.core.Base.suspendSignalsDispatching(this.getTimeline(), this.getDataGrid_());
       this.tl_.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
       this.dg_.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
-      anychart.core.Base.resumeSignalsDispatchingTrue(this.dg_, this.tl_);
     }, void 0, this);
   }
   return this.statefulColoringInternal;

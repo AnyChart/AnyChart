@@ -1285,11 +1285,13 @@ anychart.ganttModule.Controller.prototype.remainingInvalidationProcessor_ = func
  */
 anychart.ganttModule.Controller.prototype.finalProcessor_ = function() {
   // console.log('Final Processor');
-  if (this.dataGrid_)
+  var isDataGridEnabled = this.dataGrid_ && this.dataGrid_.enabled();
+
+  if (isDataGridEnabled)
     this.dataGrid_.prepareLabels();
 
   this.timeouts.push(anychart.utils.schedule(function() {
-    if (this.dataGrid_)
+    if (isDataGridEnabled)
       this.dataGrid_.drawInternal(this.positionRecalculated_);
     if (this.timeline_)
       this.timeline_.drawInternal(this.positionRecalculated_);
