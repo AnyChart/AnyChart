@@ -1,4 +1,4 @@
-// Type definitions for AnyChart JavaScript Charting Library, v8.7.1
+// Type definitions for AnyChart JavaScript Charting Library, v8.8.0
 // Project: https://www.anychart.com/
 // Definitions by: AnyChart <https://www.anychart.com>
 declare namespace anychart {
