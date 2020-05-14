@@ -1645,6 +1645,20 @@ anychart.utils.xml2json = function(xml) {
               result[name] = [result[name], subnode];
               multiProp[name] = true;
             }
+            /*
+              There was a problem with restoring chart from xml when data was set as array of
+              arrays and contained only one point, like:
+              data: [
+                ['name', 10]
+              ]
+              This problem has been observed in timeline, pie, cartesian charts.
+              When parsing xml above mentioned data turned into:
+                data: ['name', 10]
+              instead of:
+                data: [ ['name', 10] ]
+             */
+          } else if (node.nodeName === 'data' && len === 1 && goog.isArray(subnode)) {
+              result[name] = [subnode];
           } else {
             result[name] = subnode;
           }
