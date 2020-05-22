@@ -200,4 +200,25 @@ anychart.timelineModule.series.Base.prototype.makeTimelineMeta = function(rowInf
 anychart.timelineModule.series.Base.prototype.prepareMetaMakers = function(yNames, yColumns) {
   this.metaMakers.push(this.makeTimelineMeta);
 };
+
+
+//endregion
+//region --- Serialization and setup
+/**
+ * @inheritDoc
+ */
+anychart.timelineModule.series.Base.prototype.serialize = function() {
+  var json = anychart.timelineModule.series.Base.base(this, 'serialize');
+  anychart.core.settings.serialize(this, anychart.timelineModule.series.Base.PROPERTY_DESCRIPTORS, json);
+  return json;
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.timelineModule.series.Base.prototype.setupByJSON = function(config, opt_default) {
+  anychart.timelineModule.series.Base.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.settings.deserialize(this, anychart.timelineModule.series.Base.PROPERTY_DESCRIPTORS, config, opt_default);
+};
 //endregion

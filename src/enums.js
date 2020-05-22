@@ -1563,7 +1563,10 @@ anychart.enums.EventType = {
   WORKING_START: 'workingstart',
   WORKING: 'working',
   WORKING_CANCEL: 'workingcancel',
-  WORKING_FINISH: 'workingfinish'
+  WORKING_FINISH: 'workingfinish',
+
+  // stateful activities
+  STATE_CHANGE: 'statechange'
 };
 
 

@@ -1876,7 +1876,7 @@ anychart.core.ui.Legend.prototype.putItemsHorizontalCenter_ = function(items, co
  * @private
  */
 anychart.core.ui.Legend.prototype.putItemsHorizontalLayout_ = function(items, contentBounds) {
-  var itemsHAlign = /** @type {anychart.enums.HAlign} */ (this.getOption('itemsHAlign'));
+  var itemsHAlign = /** @type {anychart.enums.HAlign}*/ (this.getOption('itemsHAlign'));
   switch (itemsHAlign) {
     case anychart.enums.HAlign.LEFT:
     case anychart.enums.HAlign.START:

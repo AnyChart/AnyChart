@@ -243,8 +243,11 @@ anychart.timelineModule.Axis.prototype.draw = function() {
 
   if (!this.rootElement) {
     this.rootElement = this.container().layer();
-    if (!this.line_) {
-      this.line_ = this.rootElement.path();
+    if (!this.axisPath_) {
+      this.axisPath_ = this.rootElement.path();
+      this.axisStrokePath_ = this.rootElement.path();
+      // One above default ticks z-index.
+      this.axisStrokePath_.zIndex(37);
     }
     this.rootElement.addChild(this.getLabelsLayer_());
   }
@@ -592,7 +595,8 @@ anychart.timelineModule.Axis.prototype.drawAxis = function() {
 
   var height = /** @type {number} */(this.getOption('height'));
   var halfHeight = height / 2;
-  this.line_.clear();
+  this.axisPath_.clear();
+  this.axisStrokePath_.clear();
 
   var stroke = /** @type {acgraph.vector.Stroke} */(this.getOption('stroke'));
   var fill = /** @type {acgraph.vector.Fill} */(this.getOption('fill'));
@@ -623,12 +627,19 @@ anychart.timelineModule.Axis.prototype.drawAxis = function() {
   this.rootElement.clip(clipRect);
 
   if (height != 0) {
-    this.line_.moveTo(left, top).
+    this.axisPath_.moveTo(left, top).
         lineTo(right, top).
         lineTo(right, bottom).
         lineTo(left, bottom).close();
-    this.line_.stroke(stroke);
-    this.line_.fill(fill);
+
+    this.axisStrokePath_.moveTo(left, top).
+        lineTo(right, top).
+        lineTo(right, bottom).
+        lineTo(left, bottom).close();
+
+    this.axisStrokePath_.stroke(stroke);
+    this.axisPath_.fill(fill);
+    this.axisPath_.stroke('none');
   }
 };
 
@@ -692,9 +703,10 @@ anychart.timelineModule.Axis.prototype.provideMeasurements = function() {
 
 /** @inheritDoc */
 anychart.timelineModule.Axis.prototype.disposeInternal = function() {
-  goog.disposeAll(this.ticks_, this.line_, this.labelsSettings_, this.texts_);
+  goog.disposeAll(this.ticks_, this.axisPath_, this.axisStrokePath_, this.labelsSettings_, this.texts_);
   this.ticks_ = null;
-  this.line_ = null;
+  this.axisPath_ = null;
+  this.axisStrokePath_ = null;
   this.labelsSettings_ = null;
   this.texts_.length = 0;
   anychart.timelineModule.Axis.base(this, 'disposeInternal');

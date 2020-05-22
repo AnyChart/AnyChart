@@ -387,6 +387,7 @@ anychart.annotationsModule.Label.prototype.applyTextSettings = function(state) {
   this.textElement_.letterSpacing(/** @type {number|string} */ (this.getOption('letterSpacing')));
   this.textElement_.lineHeight(/** @type {number|string} */ (this.getOption('lineHeight')));
   this.textElement_.textIndent(/** @type {number} */ (this.getOption('textIndent')));
+  this.textElement_.textShadow(/** @type {string} */ (this.getOption('textShadow')));
   this.textElement_.vAlign(/** @type {string} */ (this.getOption('vAlign')));
   this.textElement_.hAlign(/** @type {string} */ (this.getOption('hAlign')));
   this.textElement_.textOverflow(/** @type {string} */ (this.getOption('textOverflow')));

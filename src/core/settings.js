@@ -190,6 +190,7 @@ anychart.core.settings.createTextPropertiesDescriptorsTemplate = function() {
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'fontWeight', anychart.core.settings.numberOrStringNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'letterSpacing', anychart.core.settings.numberOrStringNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'textDirection', anychart.enums.normalizeTextDirection],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'textShadow', acgraph.vector.normalizeTextShadow],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'lineHeight', anychart.core.settings.numberOrStringNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'textIndent', anychart.core.settings.numberNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'vAlign', anychart.enums.normalizeVAlign],
@@ -230,6 +231,7 @@ anychart.core.settings.createTextPropertiesDescriptorsMeta = function(map, inval
     ['fontWeight', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
     ['letterSpacing', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
     ['textDirection', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
+    ['textShadow', nonBoundsState, nonBoundsSignal],
     ['lineHeight', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
     ['textIndent', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
     ['vAlign', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
@@ -943,7 +945,7 @@ anychart.core.settings.descriptors = (function() {
 
   // event markers
   map.DIRECTION = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'direction', anychart.enums.normalizeDirection];
-  map.POSITION = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'position', anychart.enums.normalizeEventMarkerPosition];
+  map.EVENT_MARKERS_POSITION = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'position', anychart.enums.normalizeEventMarkerPosition];
   map.SERIES_ID = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'seriesId', anychart.core.settings.stringNormalizer];
   map.FIELD_NAME = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'fieldName', anychart.core.settings.stringNormalizer];
   map.WIDTH = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'width', anychart.core.settings.numberOrPercentNormalizer];
@@ -963,6 +965,7 @@ anychart.core.settings.descriptors = (function() {
 
   //markers and markers factory
   map.ANCHOR = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'anchor', anychart.enums.normalizeAnchor];
+  map.POSITION = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'position', anychart.enums.normalizePosition];
   map.OFFSET_X = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'offsetY', anychart.core.settings.numberNormalizer];
   map.OFFSET_Y = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'offsetX', anychart.core.settings.numberNormalizer];
   map.POSITION_FORMATTER = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'positionFormatter', anychart.core.settings.functionNormalizer];

@@ -1495,14 +1495,22 @@ anychart.stockModule.Chart.prototype.drawContent = function(bounds) {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.STOCK_PLOTS_APPEARANCE)) {
     anychart.performance.start('Stock drawing plots');
+    var isFirstPlotFound = false;
     for (i = 0; i < this.plots_.length; i++) {
       plot = this.plots_[i];
       if (plot) {
+        // Condition below fixes DVF-4361.
+        if (plot.enabled()) {
+          plot.isFirstPlot(!isFirstPlotFound);
+          isFirstPlotFound = true;
+        }
+
         plot
             .container(this.rootElement)
             .draw();
       }
     }
+
     this.markConsistent(anychart.ConsistencyState.STOCK_PLOTS_APPEARANCE);
     anychart.performance.end('Stock drawing plots');
   }

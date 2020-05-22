@@ -1189,6 +1189,9 @@ anychart.core.ui.OptimizedText.prototype.getDivStyle = function(width, height) {
   if ('wordBreak' in style && style['wordBreak'])
     result += ('word-break: ' + style['wordBreak'] + '; ');
 
+  if ('textShadow' in style && style['textShadow'] != 'none')
+    result += ('text-shadow: ' + style['textShadow'] + '; ');
+
   result += (
       'width: ' + width + 'px; ' +
       'height: ' + height + 'px; ' +
@@ -1256,6 +1259,12 @@ anychart.core.ui.OptimizedText.prototype.applySettings = function() {
       } else {
         dom.removeAttribute('fontFamily');
         dom['style']['fontFamily'] = '';
+      }
+
+      if ('textShadow' in style && style['textShadow'] != 'none') {
+        dom['style']['textShadow'] = style['textShadow'];
+      } else {
+        dom['style']['textShadow'] = '';
       }
 
       if ('fontSize' in style) {

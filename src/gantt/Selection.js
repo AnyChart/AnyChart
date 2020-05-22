@@ -149,7 +149,7 @@ anychart.ganttModule.Selection.prototype.selectPeriod = function(item, opt_perio
 
 /**
  *
- * @param {!(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} item - Item.
+ * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} item - Item.
  * @param {number} periodIndex - Period index.
  * @return {boolean}
  */

@@ -713,6 +713,7 @@ anychart.core.ui.NewButton.prototype.applyTextSettings = function(opt_textElemen
     textElement.letterSpacing(/** @type {number|string} */ (this.resolveOption('letterSpacing')));
     textElement.lineHeight(/** @type {number|string} */ (this.resolveOption('lineHeight')));
     textElement.textIndent(/** @type {number} */ (this.resolveOption('textIndent')));
+    textElement.textShadow(/** @type {string} */ (this.resolveOption('textShadow')));
     textElement.vAlign(/** @type {string} */ (this.resolveOption('vAlign')));
     textElement.hAlign(/** @type {string} */ (this.resolveOption('hAlign')));
     textElement.textOverflow(/** @type {string} */ (this.resolveOption('textOverflow')));

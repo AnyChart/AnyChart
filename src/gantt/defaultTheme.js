@@ -155,6 +155,11 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'rowEvenFill': 'none',
     'rowFill': 'none',
 
+    'workingFill': 'none',
+    'notWorkingFill': 'lightblue 0.5',
+    'holidaysFill': '#cecece 0.5',
+    'weekendsFill': '#cecece 0.5',
+
     'zIndex': 5,
     'headerHeight': 70,
 
@@ -231,6 +236,26 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'separator': {
           'enabled': true
         }
+      },
+      'startMarker': {
+        'enabled': false,
+        'anchor': 'center',
+        'size': 6,
+        'offsetX': 0,
+        'offsetY': 0,
+        'rotation': 0,
+        'position': 'left-center',
+        'type': 'triangle-right'
+      },
+      'endMarker': {
+        'enabled': false,
+        'anchor': 'center',
+        'size': 6,
+        'offsetX': 0,
+        'offsetY': 0,
+        'rotation': 0,
+        'position': 'right-center',
+        'type': 'triangle-left'
       }
     },
 
@@ -358,6 +383,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
 
     'baselines': {
       'above': false,
+      'disableWithRelatedTask': false,
       'progress': {
         'height': '50%',
         'anchor': 'left-bottom',
@@ -430,7 +456,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       'disablePointerEvents': true
     },
     'markers': {
-      'anchor': 'center-top',
+      'anchor': 'center',
       'zIndex': 50,
       'type': 'star5',
       'fill': '#ff0',
@@ -447,7 +473,8 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'defaultTextMarkerSettings': {
       'layout': 'vertical',
       'zIndex': 2
-    }
+    },
+    'zoomOnMouseWheel': false
   },
 
   // merge with chart
@@ -514,10 +541,20 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'format': 'Start Date: {%start}\nEnd Date: {%end}'
       },
       'labels': {
-        'format': 'Progress Label',
+        'format': '{%Name}',
         'position': 'center',
         'anchor': 'center',
         'enabled': false
+      },
+      'milestones': {
+        'labels': {
+          'anchor': 'left-center',
+          'position': 'right-center',
+          'enabled': null
+        },
+        'tooltip': {
+          'format': '{%start}'
+        }
       }
     }
   },

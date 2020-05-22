@@ -18,7 +18,8 @@ anychart.ganttModule.elements.BaselinesElement = function(timeline) {
   anychart.ganttModule.elements.BaselinesElement.base(this, 'constructor', timeline);
 
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
-    ['above', 0, anychart.Signal.NEEDS_REDRAW]
+    ['above', 0, anychart.Signal.NEEDS_REDRAW],
+    ['disableWithRelatedTask', 0, anychart.Signal.NEEDS_REDRAW] // DVF-4389.
   ]);
 };
 goog.inherits(anychart.ganttModule.elements.BaselinesElement, anychart.ganttModule.elements.TimelineElement);
@@ -38,6 +39,12 @@ anychart.ganttModule.elements.BaselinesElement.DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'above',
+      anychart.core.settings.booleanNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'disableWithRelatedTask',
       anychart.core.settings.booleanNormalizer);
 
   return map;

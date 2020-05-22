@@ -888,15 +888,34 @@ anychart.utils.shiftFiscalDate = function(date, yearStartMonth) {
 
 
 /**
- * Gets fiscal date. TODO (A.Kudryavtsev): Describe.
+ * Shifts incoming timestamp by units and count.
+ *
+ * @param {number} date - Timestamp to shift.
+ * @param {anychart.enums.Interval} unit - Unit to create interval.
+ * @param {number} count - Count of units to create interval.
+ * @returns {number} - Shifted timestamp.
+ */
+anychart.utils.shiftDateByInterval = function(date, unit, count) {
+  var interval = anychart.utils.getIntervalFromInfo(unit, count);
+  var utcWrapper = new goog.date.UtcDateTime(new Date(date));
+  utcWrapper.add(interval);
+  return utcWrapper.getTime();
+};
+
+
+/**
+ * Gets fiscal date.
+ *
  * @see https://en.wikipedia.org/wiki/Fiscal_year
  * @param {number} date - Calendar UTC timestamp.
  * @param {number} yearStartMonth - Number of month (1 - 12).
  *  DEV NOTE: provide correct clamping before passing this parameter here.
+ * @param {number=} opt_yearOffset - Actually is a fiscal year shift for DVF-4399. Another one strange feature.
  * @return {number} - Shifted timestamp.
  */
-anychart.utils.getFiscalDate = function(date, yearStartMonth) {
+anychart.utils.getFiscalDate = function(date, yearStartMonth, opt_yearOffset) {
   if (yearStartMonth > 1) {
+    opt_yearOffset = opt_yearOffset || 0;
     var dateObj = new Date(date);
 
     var years = dateObj.getUTCFullYear();
@@ -908,7 +927,7 @@ anychart.utils.getFiscalDate = function(date, yearStartMonth) {
     var milliseconds = dateObj.getUTCMilliseconds();
 
     months -= (yearStartMonth - 1);
-    return Date.UTC(years, months, days, hours, minutes, seconds, milliseconds);
+    return Date.UTC(years + opt_yearOffset, months, days, hours, minutes, seconds, milliseconds);
   }
   return date;
 };
@@ -1626,6 +1645,20 @@ anychart.utils.xml2json = function(xml) {
               result[name] = [result[name], subnode];
               multiProp[name] = true;
             }
+            /*
+              There was a problem with restoring chart from xml when data was set as array of
+              arrays and contained only one point, like:
+              data: [
+                ['name', 10]
+              ]
+              This problem has been observed in timeline, pie, cartesian charts.
+              When parsing xml above mentioned data turned into:
+                data: ['name', 10]
+              instead of:
+                data: [ ['name', 10] ]
+             */
+          } else if (node.nodeName === 'data' && len === 1 && goog.isArray(subnode)) {
+              result[name] = [subnode];
           } else {
             result[name] = subnode;
           }
@@ -1702,7 +1735,7 @@ anychart.utils.json2xml = function(json, opt_rootNodeName, opt_returnAsXmlNode) 
   var root = anychart.utils.json2xml_(json, opt_rootNodeName || 'anychart', result);
   if (root) {
     if (!opt_rootNodeName)
-      root.setAttribute('xmlns', 'http://anychart.com/schemas/8.7.1/xml-schema.xsd');
+      root.setAttribute('xmlns', 'http://anychart.com/schemas/8.8.0/xml-schema.xsd');
     result.appendChild(root);
   }
   return opt_returnAsXmlNode ? result : goog.dom.xml.serialize(result);
@@ -2997,6 +3030,57 @@ anychart.utils.getFadeGradient = function(ratio, opacity, fontColor, opt_fadeSte
   return {
     'keys': anychart.utils.getFadeGradientKeys(ratio, opacity, fontColor, opt_fadeStep, opt_hAlign)
   };
+};
+
+
+/**
+ * DOM-debug util method, gives 'data-ac-name' attribute to acgraph.vector.Element.
+ *
+ * @param {acgraph.vector.Element} element - Element to get DOM-debug name.
+ * @param {string} name - 'data-ac-name' attribute value.
+ */
+anychart.utils.nameElement = function(element, name) {
+  if (anychart.DEVELOP && element && name) {
+    element.attr('data-ac-name', name);
+  }
+};
+
+
+/**
+ * Check if theme contains space object inside if contains normalize it otherwise do nothing.
+ * @param {string} name - Name of space object margin or padding.
+ * @param {Object} theme - Object that contains space object.
+ */
+anychart.utils.normalizeThemeSpaceObject = function(name, theme) {
+  if (goog.isDef(theme[name])) {
+    theme[name] = anychart.core.utils.Space.normalizeSpace(theme[name]);
+  }
+};
+
+
+/**
+ * Normalize theme items.
+ * @param {Object} theme - Theme object.
+ */
+anychart.utils.normalizeTheme = function(theme) {
+  // Normalize margins and paddings.
+  anychart.utils.normalizeThemeSpaceObject('padding', theme);
+  anychart.utils.normalizeThemeSpaceObject('margin', theme);
+};
+
+
+/**
+ * Dispatches detached event.
+ *
+ * @param {goog.events.EventTarget} dispatcher - Event target that dispatched detached event.
+ * @param {goog.events.EventLike} event - Event to be dispatched.
+ */
+anychart.utils.dispatchDetachedEvent = function(dispatcher, event) {
+  var timeout = setTimeout(function() {
+    if (!dispatcher.isDisposed())
+      dispatcher.dispatchEvent(event);
+    clearTimeout(timeout);
+  }, 0);
 };
 
 

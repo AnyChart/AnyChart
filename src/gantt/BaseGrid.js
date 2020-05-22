@@ -400,9 +400,9 @@ anychart.ganttModule.BaseGrid.prototype.SUPPORTED_CONSISTENCY_STATES =
 //endregion
 //region -- Type definitions.
 /**
- * Type definition to simplify getting data item's dates and
- * validation info. Contains correctly calculated fields in
- * suitable default format.
+ * Type definition to simplify getting project data item's dates and
+ * validation info. Contains correctly calculated fields in suitable default format.
+ *
  * @typedef {{
  *   start: number,
  *   end: number,
@@ -423,7 +423,24 @@ anychart.ganttModule.BaseGrid.prototype.SUPPORTED_CONSISTENCY_STATES =
  *   isValidPeriod: boolean
  * }}
  */
-anychart.ganttModule.BaseGrid.ItemData;
+anychart.ganttModule.BaseGrid.ProjectItemData;
+
+
+/**
+ * Type definition to simplify getting resource data item's period dates and
+ * validation info. Contains correctly calculated fields in suitable default format.
+ *
+ * @typedef {{
+ *   start: number,
+ *   end: number,
+ *   milestoneTimestamp: number,
+ *   isValidStart: boolean,
+ *   isValidEnd: boolean,
+ *   isValidPeriod: boolean,
+ *   isValidMilestone: boolean,
+ * }}
+ */
+anychart.ganttModule.BaseGrid.PeriodData;
 
 
 //endregion
@@ -557,11 +574,12 @@ anychart.ganttModule.BaseGrid.prototype.selection = function() {
 //region -- Row type definition
 /**
  * Checks whether tree data item is actually a milestone.
+ *
  * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} item - Tree data item.
- * @param {anychart.ganttModule.BaseGrid.ItemData=} opt_info - Already calculated info. Used to avoid recalculation.
+ * @param {anychart.ganttModule.BaseGrid.ProjectItemData=} opt_info - Already calculated info. Used to avoid recalculation.
  * @return {boolean} - Whether tree data item is milestone.
  */
-anychart.ganttModule.BaseGrid.isMilestone = function(item, opt_info) {
+anychart.ganttModule.BaseGrid.isProjectMilestone = function(item, opt_info) {
   var info = opt_info || anychart.ganttModule.BaseGrid.getProjectItemInfo(item);
   return !item.numChildren() &&
       ((info.isValidStart && !info.isValidEnd) || (info.isValidStart && info.isValidEnd && info.start == info.end));
@@ -570,20 +588,26 @@ anychart.ganttModule.BaseGrid.isMilestone = function(item, opt_info) {
 
 /**
  * Checks whether tree data item is actually a general baseline (this method doesn't check whether item is grouping task or not).
+ *
  * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} item - Tree data item.
- * @param {anychart.ganttModule.BaseGrid.ItemData=} opt_info - Already calculated info. Used to avoid recalculation.
+ * @param {anychart.ganttModule.BaseGrid.ProjectItemData=} opt_info - Already calculated info. Used to avoid recalculation.
  * @return {boolean} - Whether tree data item is baseline.
  */
 anychart.ganttModule.BaseGrid.isBaseline = function(item, opt_info) {
   var info = opt_info || anychart.ganttModule.BaseGrid.getProjectItemInfo(item);
-  return info.isValidBaseline || info.baselineProgressPresents;
+  /*
+    If item has baselineProgressValue field and has valid start and end assume it is a baseline.
+    isValidTask field has true value if item has valid actualStart and valid actualEnd values.
+   */
+  return info.isValidBaseline || (info.isValidTask && info.baselineProgressPresents);
 };
 
 
 /**
  * Checks whether tree data item is actually a grouping task.
+ *
  * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} item - Tree data item.
- * @param {anychart.ganttModule.BaseGrid.ItemData=} opt_info - Already calculated info. Used to avoid recalculation.
+ * @param {anychart.ganttModule.BaseGrid.ProjectItemData=} opt_info - Already calculated info. Used to avoid recalculation.
  * @return {boolean} - Whether tree data item is grouping task.
  */
 anychart.ganttModule.BaseGrid.isGroupingTask = function(item, opt_info) {
@@ -605,7 +629,7 @@ anychart.ganttModule.BaseGrid.isParent = function(item) {
 /**
  * Checks whether tree data item is actually a regular task (not milestones or grouping).
  * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} item - Tree data item.
- * @param {anychart.ganttModule.BaseGrid.ItemData=} opt_info - Already calculated info. Used to avoid recalculation.
+ * @param {anychart.ganttModule.BaseGrid.ProjectItemData=} opt_info - Already calculated info. Used to avoid recalculation.
  * @return {boolean} - Whether tree data item is regular task .
  */
 anychart.ganttModule.BaseGrid.isRegularTask = function(item, opt_info) {
@@ -620,8 +644,9 @@ anychart.ganttModule.BaseGrid.isRegularTask = function(item, opt_info) {
 
 /**
  * Checks whether tree data item is actually a grouping task with baseline.
+ *
  * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} item - Tree data item.
- * @param {anychart.ganttModule.BaseGrid.ItemData=} opt_info - Already calculated info. Used to avoid recalculation.
+ * @param {anychart.ganttModule.BaseGrid.ProjectItemData=} opt_info - Already calculated info. Used to avoid recalculation.
  * @return {boolean} - Whether tree data item is grouping task with baseline.
  */
 anychart.ganttModule.BaseGrid.isGroupingTaskWithBaseline = function(item, opt_info) {
@@ -636,8 +661,9 @@ anychart.ganttModule.BaseGrid.isGroupingTaskWithBaseline = function(item, opt_in
 
 /**
  * Checks whether tree data item is actually a regular task with baseline.
+ *
  * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} item - Tree data item.
- * @param {anychart.ganttModule.BaseGrid.ItemData=} opt_info - Already calculated info. Used to avoid recalculation.
+ * @param {anychart.ganttModule.BaseGrid.ProjectItemData=} opt_info - Already calculated info. Used to avoid recalculation.
  * @return {boolean} - Whether tree data item is regular task with baseline.
  */
 anychart.ganttModule.BaseGrid.isRegularTaskWithBaseline = function(item, opt_info) {
@@ -652,8 +678,9 @@ anychart.ganttModule.BaseGrid.isRegularTaskWithBaseline = function(item, opt_inf
 
 /**
  * Checks whether tree data item contains resource chart periods.
+ *
  * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} item - Tree data item.
- * @param {anychart.ganttModule.BaseGrid.ItemData=} opt_info - Already calculated info. Used to avoid recalculation.
+ * @param {anychart.ganttModule.BaseGrid.ProjectItemData=} opt_info - Already calculated info. Used to avoid recalculation.
  * @return {boolean} - Whether tree data item contains periods.
  */
 anychart.ganttModule.BaseGrid.isPeriod = function(item, opt_info) {
@@ -667,6 +694,7 @@ anychart.ganttModule.BaseGrid.isPeriod = function(item, opt_info) {
 /**
  * Checks NaN values in parameters passed and selects suitable
  * by priority (from own not NaN value to autoValue).
+ *
  * @param {*} val - Value.
  * @param {*} autoVal - Auto value.
  * @return {number}
@@ -683,9 +711,11 @@ anychart.ganttModule.BaseGrid.checkNaN = function(val, autoVal) {
 
 
 /**
+ * Gets complex project data item information represented
+ * as anychart.ganttModule.BaseGrid.ProjectItemData.
  *
  * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} item - Tree data item.
- * @return {anychart.ganttModule.BaseGrid.ItemData}
+ * @return {anychart.ganttModule.BaseGrid.ProjectItemData}
  */
 anychart.ganttModule.BaseGrid.getProjectItemInfo = function(item) {
   var start = item.meta(anychart.enums.GanttDataFields.ACTUAL_START);
@@ -709,7 +739,7 @@ anychart.ganttModule.BaseGrid.getProjectItemInfo = function(item) {
   var minPeriodDate = item.meta('minPeriodDate');
   var maxPeriodDate = item.meta('maxPeriodDate');
 
-  return /** @type {anychart.ganttModule.BaseGrid.ItemData} */ ({
+  return /** @type {anychart.ganttModule.BaseGrid.ProjectItemData} */ ({
     start: startVal,
     end: endVal,
     baselineStart: baselineStart,
@@ -731,11 +761,163 @@ anychart.ganttModule.BaseGrid.getProjectItemInfo = function(item) {
 };
 
 
+/**
+ * Gets complex resource chart period information represented
+ * as anychart.ganttModule.BaseGrid.PeriodData.
+ *
+ * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} item - Tree data item.
+ * @param {number} periodIndex - Period index.
+ * @return {anychart.ganttModule.BaseGrid.PeriodData}
+ */
+anychart.ganttModule.BaseGrid.getPeriodInfo = function(item, periodIndex) {
+  var metaPeriod = item.getMeta(anychart.enums.GanttDataFields.PERIODS, periodIndex);
+  var start = metaPeriod ? metaPeriod[anychart.enums.GanttDataFields.START] : void 0;
+  var end = metaPeriod ? metaPeriod[anychart.enums.GanttDataFields.END] : void 0;
+  var milestoneTimestamp = goog.isDef(start) ? start : end;
+
+  // By idea, start and end can be only number or undefined, but let this check be.
+  var isValidStart = goog.isDefAndNotNull(start) && !isNaN(start);
+  var isValidEnd = goog.isDefAndNotNull(end) && !isNaN(end);
+
+  return /** @type {anychart.ganttModule.BaseGrid.PeriodData} */ ({
+    start: start,
+    end: end,
+    milestoneTimestamp: milestoneTimestamp,
+    isValidStart: isValidStart,
+    isValidEnd: isValidEnd,
+    isValidPeriod: isValidStart && isValidEnd,
+    isValidMilestone: !!(isValidStart ^ isValidEnd)
+  });
+};
+
+
 //endregion
+//region -- Format providers.
+/**
+ * Fill values-object of context-provider with resource specific data.
+ *
+ * @param {Object.<string, anychart.core.BaseContext.TypedValue>} values - Typed values to be filled.
+ * @param {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} item - Data item.
+ * @param {Object=} opt_period - Optional current period.
+ * @param {number=} opt_periodIndex - Period index. Required is opt_period is set.
+ * @private
+ */
+anychart.ganttModule.BaseGrid.prototype.processResourceFormatProviderValues_ = function(values, item, opt_period, opt_periodIndex) {
+  var info = anychart.ganttModule.BaseGrid.getPeriodInfo(item, /** @type {number} */ (opt_periodIndex));
+  var isMilestone = info.isValidMilestone;
+
+  values['rowType'] = {value: anychart.enums.TLElementTypes.PERIODS, type: anychart.enums.TokenType.STRING};
+  values['minPeriodDate'] = {value: item.meta('minPeriodDate'), type: anychart.enums.TokenType.DATE_TIME};
+  values['maxPeriodDate'] = {value: item.meta('maxPeriodDate'), type: anychart.enums.TokenType.DATE_TIME};
+  values['period'] = {value: opt_period, type: anychart.enums.TokenType.UNKNOWN};
+
+  values['periodIndex'] = {
+    value: (goog.isDefAndNotNull(opt_periodIndex) && opt_periodIndex >= 0) ? opt_periodIndex : void 0,
+    type: anychart.enums.TokenType.NUMBER
+  };
+
+  values['periodStart'] = {
+    value: opt_period ? info.start : void 0,
+    type: anychart.enums.TokenType.DATE_TIME
+  };
+
+  values['periodEnd'] = {
+    value: opt_period ? info.end : void 0,
+    type: anychart.enums.TokenType.DATE_TIME
+  };
+
+  var start = isMilestone ?
+      info.milestoneTimestamp :
+      values['periodStart'].value || values['minPeriodDate'].value;
+
+  var end = isMilestone ?
+      info.milestoneTimestamp :
+      values['periodEnd'].value || values['maxPeriodDate'].value;
+
+  values['start'] = {
+    value: start,
+    type: anychart.enums.TokenType.DATE_TIME
+  };
+
+  values['end'] = {
+    value: end,
+    type: anychart.enums.TokenType.DATE_TIME
+  };
+
+  values['barBounds'] = {
+    value: item.getMeta('periodBounds', opt_periodIndex),
+    type: anychart.enums.TokenType.UNKNOWN
+  };
+};
+
+
+/**
+ * Fill values-object of context-provider with project specific data.
+ *
+ * @param {Object.<string, anychart.core.BaseContext.TypedValue>} values - Typed values to be filled.
+ * @param {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} item - Data item.
+ * @private
+ */
+anychart.ganttModule.BaseGrid.prototype.processProjectFormatProviderValues_ = function(values, item) {
+  var rowType;
+  var info = anychart.ganttModule.BaseGrid.getProjectItemInfo(item);
+
+  values['actualStart'] = {
+    value: item.meta(anychart.enums.GanttDataFields.ACTUAL_START),
+    type: anychart.enums.TokenType.DATE_TIME
+  };
+  values['actualEnd'] = {
+    value: item.meta(anychart.enums.GanttDataFields.ACTUAL_END),
+    type: anychart.enums.TokenType.DATE_TIME
+  };
+
+  var isParent = anychart.ganttModule.BaseGrid.isGroupingTask(item, info);
+
+  values['progressValue'] = {value: info.progress, type: anychart.enums.TokenType.PERCENT};
+  values['autoStart'] = {value: isParent ? item.meta('autoStart') : void 0, type: anychart.enums.TokenType.DATE_TIME};
+  values['autoEnd'] = {value: isParent ? item.meta('autoEnd') : void 0, type: anychart.enums.TokenType.DATE_TIME};
+
+  values['start'] = {value: info.start, type: anychart.enums.TokenType.DATE_TIME};
+  values['end'] = {value: info.end, type: anychart.enums.TokenType.DATE_TIME};
+
+  values['autoProgress'] = {
+    value: isParent ? item.meta('autoProgress') : void 0,
+    type: anychart.enums.TokenType.PERCENT
+  };
+
+  values['barBounds'] = {value: item.meta('relBounds'), type: anychart.enums.TokenType.UNKNOWN};
+
+  values['progress'] = {value: info.progress, type: anychart.enums.TokenType.PERCENT};
+
+  values['baselineProgress'] = {value: info.baselineProgressPresents ? info.baselineProgress : 0, type: anychart.enums.TokenType.PERCENT};
+
+  if (info.isValidBaseline) {
+    rowType = anychart.enums.TLElementTypes.BASELINES;
+    values['baselineStart'] = {
+      value: info.baselineStart,
+      type: anychart.enums.TokenType.DATE_TIME
+    };
+    values['baselineEnd'] = {
+      value: info.baselineEnd,
+      type: anychart.enums.TokenType.DATE_TIME
+    };
+  } else if (anychart.ganttModule.BaseGrid.isProjectMilestone(item, info)) {
+    rowType = anychart.enums.TLElementTypes.MILESTONES;
+  } else if (anychart.ganttModule.BaseGrid.isGroupingTask(item, info)) {
+    rowType = anychart.enums.TLElementTypes.GROUPING_TASKS;
+  } else if (anychart.ganttModule.BaseGrid.isRegularTask(item, info)) {
+    rowType = anychart.enums.TLElementTypes.TASKS;
+  }
+
+  if (goog.isDef(rowType))
+    values['rowType'] = {value: rowType, type: anychart.enums.TokenType.STRING};
+};
+
 
 
 /**
  * Creates gantt format provider.
+ *
  * @param {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} item - Data item.
  * @param {Object=} opt_period - Optional current period.
  * @param {number=} opt_periodIndex - Period index. Required is opt_period is set.
@@ -756,93 +938,17 @@ anychart.ganttModule.BaseGrid.prototype.createFormatProvider = function(item, op
     'linearIndex': {value: item.meta('index') + 1, type: anychart.enums.TokenType.NUMBER}
   };
 
-  var rowType;
-
   if (isResources) {
-    // If period is given for current format provider - set it's values as token custom values.
     if (goog.isDef(opt_period)) {
       var tokenCustomValues = this.getPeriodCustomTokenValues(opt_period);
       this.formatProvider_.tokenCustomValues(tokenCustomValues);
     } else {
       this.formatProvider_.tokenCustomValues({});
     }
-    rowType = anychart.enums.TLElementTypes.PERIODS;
-    values['minPeriodDate'] = {value: item.meta('minPeriodDate'), type: anychart.enums.TokenType.DATE_TIME};
-    values['maxPeriodDate'] = {value: item.meta('maxPeriodDate'), type: anychart.enums.TokenType.DATE_TIME};
-    values['period'] = {value: opt_period, type: anychart.enums.TokenType.UNKNOWN};
-    values['periodIndex'] = {
-      value: (goog.isDefAndNotNull(opt_periodIndex) && opt_periodIndex >= 0) ? opt_periodIndex : void 0,
-      type: anychart.enums.TokenType.NUMBER
-    };
-    values['periodStart'] = {
-      value: opt_period ?
-          item.getMeta(anychart.enums.GanttDataFields.PERIODS, opt_periodIndex, anychart.enums.GanttDataFields.START) :
-          void 0, type: anychart.enums.TokenType.DATE_TIME
-    };
-    values['periodEnd'] = {
-      value: opt_period ?
-          item.getMeta(anychart.enums.GanttDataFields.PERIODS, opt_periodIndex, anychart.enums.GanttDataFields.END) :
-          void 0, type: anychart.enums.TokenType.DATE_TIME
-    };
-    values['start'] = {
-      value: values['periodStart'].value || values['minPeriodDate'].value,
-      type: anychart.enums.TokenType.DATE_TIME
-    };
-    values['end'] = {
-      value: values['periodEnd'].value || values['maxPeriodDate'].value,
-      type: anychart.enums.TokenType.DATE_TIME
-    };
-    values['barBounds'] = {
-      value: item.getMeta('periodBounds', opt_periodIndex),
-      type: anychart.enums.TokenType.UNKNOWN
-    };
+
+    this.processResourceFormatProviderValues_(values, item, opt_period, opt_periodIndex);
   } else {
-    var info = anychart.ganttModule.BaseGrid.getProjectItemInfo(item);
-    values['actualStart'] = {
-      value: item.meta(anychart.enums.GanttDataFields.ACTUAL_START),
-      type: anychart.enums.TokenType.DATE_TIME
-    };
-    values['actualEnd'] = {
-      value: item.meta(anychart.enums.GanttDataFields.ACTUAL_END),
-      type: anychart.enums.TokenType.DATE_TIME
-    };
-
-    var isParent = anychart.ganttModule.BaseGrid.isGroupingTask(item, info);
-
-    values['progressValue'] = {value: info.progress, type: anychart.enums.TokenType.PERCENT};
-    values['autoStart'] = {value: isParent ? item.meta('autoStart') : void 0, type: anychart.enums.TokenType.DATE_TIME};
-    values['autoEnd'] = {value: isParent ? item.meta('autoEnd') : void 0, type: anychart.enums.TokenType.DATE_TIME};
-
-    values['start'] = {value: info.start, type: anychart.enums.TokenType.DATE_TIME};
-    values['end'] = {value: info.end, type: anychart.enums.TokenType.DATE_TIME};
-
-    values['autoProgress'] = {
-      value: isParent ? item.meta('autoProgress') : void 0,
-      type: anychart.enums.TokenType.PERCENT
-    };
-    values['barBounds'] = {value: item.meta('relBounds'), type: anychart.enums.TokenType.UNKNOWN};
-
-    values['progress'] = {value: info.progress, type: anychart.enums.TokenType.PERCENT};
-
-    values['baselineProgress'] = {value: info.baselineProgressPresents ? info.baselineProgress : 0, type: anychart.enums.TokenType.PERCENT};
-
-    if (info.isValidBaseline) {
-      rowType = anychart.enums.TLElementTypes.BASELINES;
-      values['baselineStart'] = {
-        value: info.baselineStart,
-        type: anychart.enums.TokenType.DATE_TIME
-      };
-      values['baselineEnd'] = {
-        value: info.baselineEnd,
-        type: anychart.enums.TokenType.DATE_TIME
-      };
-    } else if (anychart.ganttModule.BaseGrid.isMilestone(item, info)) {
-      rowType = anychart.enums.TLElementTypes.MILESTONES;
-    } else if (anychart.ganttModule.BaseGrid.isGroupingTask(item, info)) {
-      rowType = anychart.enums.TLElementTypes.GROUPING_TASKS;
-    } else if (anychart.ganttModule.BaseGrid.isRegularTask(item, info)) {
-      rowType = anychart.enums.TLElementTypes.TASKS;
-    }
+    this.processProjectFormatProviderValues_(values, item);
   }
 
   /*
@@ -853,9 +959,6 @@ anychart.ganttModule.BaseGrid.prototype.createFormatProvider = function(item, op
     elementType appears in context only on bar hover.
     rowType always appears in context if data item contains no errors in date-time representation.
    */
-
-  if (goog.isDef(rowType))
-    values['rowType'] = {value: rowType, type: anychart.enums.TokenType.STRING};
 
   if (goog.isDef(opt_type))
     values['elementType'] = {value: opt_type, type: anychart.enums.TokenType.STRING};
@@ -917,6 +1020,7 @@ anychart.ganttModule.BaseGrid.prototype.getPeriodCustomTokenValues = function(pe
 };
 
 
+//endregion
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Interactivity.
@@ -1405,6 +1509,7 @@ anychart.ganttModule.BaseGrid.prototype.enableDocMouseMove = function(value) {
 anychart.ganttModule.BaseGrid.prototype.getBase = function() {
   if (!this.base_) {
     this.base_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
+    anychart.utils.nameElement(this.base_, 'base-layer');
     //We handle mouseDown here to prevent double click selection.
     this.bindHandlersToGraphics(this.base_, null, null, null, null, /** @type {Function} */ (this.handleMouseDown_));
   }
@@ -1419,6 +1524,7 @@ anychart.ganttModule.BaseGrid.prototype.getBase = function() {
 anychart.ganttModule.BaseGrid.prototype.getCellsLayer = function() {
   if (!this.cellsLayer_) {
     this.cellsLayer_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
+    anychart.utils.nameElement(this.cellsLayer_, 'cells-layer');
     this.cellsLayer_.zIndex(anychart.ganttModule.BaseGrid.CELLS_Z_INDEX);
   }
   return this.cellsLayer_;
@@ -1432,6 +1538,7 @@ anychart.ganttModule.BaseGrid.prototype.getCellsLayer = function() {
 anychart.ganttModule.BaseGrid.prototype.getDrawLayer = function() {
   if (!this.drawLayer_) {
     this.drawLayer_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
+    anychart.utils.nameElement(this.drawLayer_, 'draw-layer');
     this.drawLayer_.zIndex(anychart.ganttModule.BaseGrid.DRAW_Z_INDEX);
   }
   return this.drawLayer_;
@@ -1445,6 +1552,7 @@ anychart.ganttModule.BaseGrid.prototype.getDrawLayer = function() {
 anychart.ganttModule.BaseGrid.prototype.getContentLayer = function() {
   if (!this.contentLayer_) {
     this.contentLayer_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
+    anychart.utils.nameElement(this.contentLayer_, 'content-layer');
     this.contentLayer_.zIndex(anychart.ganttModule.BaseGrid.CONTENT_Z_INDEX);
   }
   return this.contentLayer_;
@@ -1458,6 +1566,7 @@ anychart.ganttModule.BaseGrid.prototype.getContentLayer = function() {
 anychart.ganttModule.BaseGrid.prototype.getEditLayer = function() {
   if (!this.editLayer_) {
     this.editLayer_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
+    anychart.utils.nameElement(this.editLayer_, 'edit-layer');
     this.editLayer_.zIndex(anychart.ganttModule.BaseGrid.EDIT_Z_INDEX);
   }
   return this.editLayer_;
@@ -1471,9 +1580,27 @@ anychart.ganttModule.BaseGrid.prototype.getEditLayer = function() {
 anychart.ganttModule.BaseGrid.prototype.getClipLayer = function() {
   if (!this.clipLayer_) {
     this.clipLayer_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
+    anychart.utils.nameElement(this.clipLayer_, 'clip-layer');
     this.clipLayer_.zIndex(anychart.ganttModule.BaseGrid.CLIP_Z_INDEX);
   }
   return this.clipLayer_;
+};
+
+
+/**
+ * Applies clip when it's necessary.
+ *
+ * @param {anychart.math.Rect} clipRect - Clip bounds to be applied.
+ */
+anychart.ganttModule.BaseGrid.prototype.applyClip = function(clipRect) {
+  this.getClipLayer().clip(clipRect);
+
+  if (this.rangeLineMarkersLayer_) //Data grid doesn't create own markers layer.
+    this.rangeLineMarkersLayer_.clip(clipRect);
+  if (this.textMarkersLayer_) //Data grid doesn't create own markers layer.
+    this.textMarkersLayer_.clip(clipRect);
+
+  this.getDrawLayer().clip(clipRect);
 };
 
 
@@ -1484,6 +1611,7 @@ anychart.ganttModule.BaseGrid.prototype.getClipLayer = function() {
 anychart.ganttModule.BaseGrid.prototype.getScrollsLayer = function() {
   if (!this.scrollsLayer_) {
     this.scrollsLayer_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
+    anychart.utils.nameElement(this.scrollsLayer_, 'scrolls-layer');
     this.scrollsLayer_.zIndex(anychart.ganttModule.BaseGrid.SCROLLS_Z_INDEX);
   }
   return this.scrollsLayer_;
@@ -1497,6 +1625,7 @@ anychart.ganttModule.BaseGrid.prototype.getScrollsLayer = function() {
 anychart.ganttModule.BaseGrid.prototype.getOddPath = function() {
   if (!this.oddPath_) {
     this.oddPath_ = /** @type {acgraph.vector.Path} */ (this.getCellsLayer().path());
+    anychart.utils.nameElement(this.oddPath_, 'odd-path');
     this.oddPath_.stroke(null).zIndex(1);
   }
   return this.oddPath_;
@@ -1510,6 +1639,7 @@ anychart.ganttModule.BaseGrid.prototype.getOddPath = function() {
 anychart.ganttModule.BaseGrid.prototype.getEvenPath = function() {
   if (!this.evenPath_) {
     this.evenPath_ = /** @type {acgraph.vector.Path} */ (this.getCellsLayer().path());
+    anychart.utils.nameElement(this.evenPath_, 'even-path');
     this.evenPath_.stroke(null).zIndex(1);
   }
   return this.evenPath_;
@@ -1523,6 +1653,7 @@ anychart.ganttModule.BaseGrid.prototype.getEvenPath = function() {
 anychart.ganttModule.BaseGrid.prototype.getHoverPath = function() {
   if (!this.hoverPath_) {
     this.hoverPath_ = /** @type {acgraph.vector.Path} */ (this.getCellsLayer().path());
+    anychart.utils.nameElement(this.hoverPath_, 'hover-path');
     this.hoverPath_.stroke(null)/*.fill(/!** @type {acgraph.vector.Fill} *!/(this.getOption('rowHoverFill')))*/.zIndex(2);
   }
   return this.hoverPath_;
@@ -1536,6 +1667,7 @@ anychart.ganttModule.BaseGrid.prototype.getHoverPath = function() {
 anychart.ganttModule.BaseGrid.prototype.getSelectedPath = function() {
   if (!this.selectedPath_) {
     this.selectedPath_ = /** @type {acgraph.vector.Path} */ (this.getCellsLayer().path());
+    anychart.utils.nameElement(this.selectedPath_, 'selected-path');
     this.selectedPath_.stroke(null)/*.fill(/!** @type {acgraph.vector.Fill} *!/(this.getOption('rowSelectedFill')))*/.zIndex(3);
   }
   return this.selectedPath_;
@@ -1549,6 +1681,7 @@ anychart.ganttModule.BaseGrid.prototype.getSelectedPath = function() {
 anychart.ganttModule.BaseGrid.prototype.getRowStrokePath = function() {
   if (!this.rowStrokePath_) {
     this.rowStrokePath_ = /** @type {acgraph.vector.Path} */ (this.getCellsLayer().path());
+    anychart.utils.nameElement(this.rowStrokePath_, 'row-stroke-path');
     this.rowStrokePath_.stroke(/** @type {acgraph.vector.Stroke} */ (this.getOption('rowStroke'))).zIndex(4);
   }
   return this.rowStrokePath_;
@@ -1563,6 +1696,7 @@ anychart.ganttModule.BaseGrid.prototype.getRowStrokePath = function() {
 anychart.ganttModule.BaseGrid.prototype.getEditStructurePreviewPath_ = function() {
   if (!this.editStructurePreviewPath_) {
     this.editStructurePreviewPath_ = this.getEditLayer().path();
+    anychart.utils.nameElement(this.editStructurePreviewPath_, 'edit-structure-preview-path');
   }
   return this.editStructurePreviewPath_;
 };
@@ -1575,6 +1709,7 @@ anychart.ganttModule.BaseGrid.prototype.getEditStructurePreviewPath_ = function(
 anychart.ganttModule.BaseGrid.prototype.getHeaderSeparationPath = function() {
   if (!this.headerSeparationPath_) {
     this.headerSeparationPath_ = /** @type {acgraph.vector.Path} */ (this.getCellsLayer().path());
+    anychart.utils.nameElement(this.headerSeparationPath_, 'header-separation-path');
     this.headerSeparationPath_.zIndex(40);
   }
   return this.headerSeparationPath_;
@@ -2013,7 +2148,7 @@ anychart.ganttModule.BaseGrid.prototype.dragHandler_ = function(e) {
             var top = itemHeightMouseRatio < anychart.ganttModule.BaseGrid.LOWER_DRAG_EDIT_RATIO ? startY : endY;
             this.interactivityHandler.editStructureHighlight(top, void 0, 'auto');
           } else {
-            if (anychart.ganttModule.BaseGrid.isMilestone(destinationItem)) {
+            if (anychart.ganttModule.BaseGrid.isProjectMilestone(destinationItem)) {
               this.interactivityHandler.editStructureHighlight(void 0, void 0, 'not-allowed');
             } else {
               this.interactivityHandler.editStructureHighlight(startY, endY, 'auto');
@@ -2115,7 +2250,7 @@ anychart.ganttModule.BaseGrid.prototype.dragEndHandler_ = function(e) {
             destIndex = tree.indexOfChild(firstItem) + 1;
             tree.addChildAt(this.draggingItem, destIndex);
           }
-        } else if (!anychart.ganttModule.BaseGrid.isMilestone(destinationItem)) {
+        } else if (!anychart.ganttModule.BaseGrid.isProjectMilestone(destinationItem)) {
           //Dropping data item inside. Setting dragged data item as child of destinationItem.
           destinationItem.addChild(this.draggingItem);
         }
@@ -2179,20 +2314,20 @@ anychart.ganttModule.BaseGrid.prototype.drawRowFills = function() {
   // COLORS CONFIG MAGIC PREPARATION!
   var colorsPrepared = false;
   var colors, checkers;
-  if (this.interactivityHandler.rowsColoringInternal) {
-    colors = this.interactivityHandler.rowsColoringInternal.colors;
+  if (this.interactivityHandler.statefulColoringInternal) {
+    colors = this.interactivityHandler.statefulColoringInternal.colors;
     if (colors) {
-      checkers = this.interactivityHandler.rowsColoringInternal.checkers;
+      checkers = this.interactivityHandler.statefulColoringInternal.checkers;
       if (checkers) {
-        this.rowsColoringPaths = this.rowsColoringPaths || {};
+        this.statefulColoringPaths = this.statefulColoringPaths || {};
         colorsPrepared = true;
         for (var key in colors) {
-          if (!(key in this.rowsColoringPaths)) {
+          if (!(key in this.statefulColoringPaths)) {
             var p = /** @type {acgraph.vector.Path} */ (this.getCellsLayer().path());
             p.stroke(null).zIndex(5);
-            this.rowsColoringPaths[key] = p;
+            this.statefulColoringPaths[key] = p;
           }
-          this.rowsColoringPaths[key].clear();
+          this.statefulColoringPaths[key].clear();
         }
       }
     }
@@ -2246,13 +2381,13 @@ anychart.ganttModule.BaseGrid.prototype.drawRowFills = function() {
 
     // COLORS CONFIG MAGIC!
     if (colorsPrepared) {
-      var state = this.interactivityHandler.rowsColoringInternal.state;
+      var state = this.interactivityHandler.statefulColoringInternal.state;
       for (var c = 0; c < checkers.length; c++) {
         var checker = checkers[c];
         var res = checker(item, state);
         if (res && res in colors) {
           var fillRef = colors[res];
-          path = this.rowsColoringPaths[res];
+          path = this.statefulColoringPaths[res];
           path
               .moveTo(this.pixelBoundsCache.left, top)
               .lineTo(this.pixelBoundsCache.left + this.totalGridsWidth, top)
@@ -2281,17 +2416,20 @@ anychart.ganttModule.BaseGrid.prototype.drawRowFills = function() {
 
   var clipRect = new anychart.math.Rect(this.pixelBoundsCache.left, this.pixelBoundsCache.top - 1,
       this.pixelBoundsCache.width, totalTop - this.pixelBoundsCache.top + 1);
-  this.getClipLayer().clip(clipRect);
-  // this.getCellsLayer().clip(clipRect);
-
-  if (this.rangeLineMarkersLayer_) //Data grid doesn't create own markers layer.
-    this.rangeLineMarkersLayer_.clip(clipRect);
-  if (this.textMarkersLayer_) //Data grid doesn't create own markers layer.
-    this.textMarkersLayer_.clip(clipRect);
-
-  this.getDrawLayer().clip(clipRect);
+  this.applyClip(clipRect);
 
   return clipRect;
+};
+
+
+/**
+ * Check if context menu is visible, if visible hide it.
+ */
+anychart.ganttModule.BaseGrid.prototype.hideContextMenu = function() {
+  if (anychart.window['anychart']['ui']['ContextMenu'] && this.interactivityHandler.contextMenu) {
+    var menu = this.interactivityHandler.contextMenu();
+    if (menu.isVisible()) menu.hide();
+  }
 };
 
 
@@ -2299,16 +2437,10 @@ anychart.ganttModule.BaseGrid.prototype.drawRowFills = function() {
  * Mouse wheel default handler.
  * TODO (A.Kudryavtsev): Test it carefully on Windows OS!
  * @param {goog.events.MouseWheelEvent} e - Mouse wheel event.
- * @private
+ * @protected
  */
-anychart.ganttModule.BaseGrid.prototype.mouseWheelHandler_ = function(e) {
-  if (anychart.window['anychart']['ui']['ContextMenu']) {
-    if (this.interactivityHandler.contextMenu) {
-      var menu = this.interactivityHandler.contextMenu();
-      if (menu.isVisible()) menu.hide();
-    }
-  }
-
+anychart.ganttModule.BaseGrid.prototype.mouseWheelHandler = function(e) {
+  this.hideContextMenu();
   var dx = e.deltaX;
   var dy = e.deltaY;
 
@@ -2778,10 +2910,10 @@ anychart.ganttModule.BaseGrid.prototype.initMouseFeatures = function() {
     if (element) {
       this.mwh_ = new goog.events.MouseWheelHandler(element);
       var mouseWheelEvent = goog.events.MouseWheelHandler.EventType.MOUSEWHEEL;
-      goog.events.listen(this.mwh_, mouseWheelEvent, this.mouseWheelHandler_, false, this);
+      goog.events.listen(this.mwh_, mouseWheelEvent, this.mouseWheelHandler, false, this);
 
       goog.events.listen(anychart.window, 'unload', function(e) {
-        goog.events.unlisten(ths.mwh_, mouseWheelEvent, ths.mouseWheelHandler_, false, this);
+        goog.events.unlisten(ths.mwh_, mouseWheelEvent, ths.mouseWheelHandler, false, this);
       });
     }
 
@@ -3083,12 +3215,14 @@ anychart.ganttModule.BaseGrid.prototype.tooltip = function(opt_value) {
 /**
  * Internal getter for tooltip settings.
  * DEV NOTE: Internal tooltip getter, DO NOT EXPORT!
+ *
  * @param {(Object|boolean|null)=} opt_value - Tooltip settings.
  * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)=} opt_item - Item. Parameter is required for timeline
  *  to define, which tooltip will be used.
+ * @param {number=} opt_periodIndex - Index of hovered period.
  * @return {!(anychart.ganttModule.BaseGrid|anychart.core.ui.Tooltip)} - Tooltip instance or self for method chaining.
  */
-anychart.ganttModule.BaseGrid.prototype.getTooltipInternal = function(opt_value, opt_item) {
+anychart.ganttModule.BaseGrid.prototype.getTooltipInternal = function(opt_value, opt_item, opt_periodIndex) {
   return this.tooltip(opt_value);
 };
 

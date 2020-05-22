@@ -1,7 +1,6 @@
 goog.provide('anychart.timelineModule.series.Moment');
 goog.require('anychart.timelineModule.ConnectorSettings');
 goog.require('anychart.timelineModule.drawers.Moment');
-// goog.require('anychart.timelineModule.drawers.Range');
 goog.require('anychart.timelineModule.series.Base');
 
 
@@ -100,23 +99,23 @@ anychart.timelineModule.series.Moment.prototype.transformY = function(value, opt
   var minLength = /** @type {number} */(iterator.meta('minLength'));
   var bounds = this.parentBounds();
   var zero = bounds.top + bounds.height / 2;
-  // var length = /** @type {number|string} */(this.connector().getOption('length'));
-  var directionUp = this.getFinalDirection() == anychart.enums.Direction.UP;
+
+  var direction = /** @type {anychart.enums.Direction} */(iterator.get('direction') || this.getFinalDirection());
+  var isDirectionUp = direction == anychart.enums.Direction.UP;
+
   var halfAxisHeight = /** @type {number} */(iterator.meta('axisHeight')) / 2;
-  // length = anychart.utils.normalizeSize(length, this.parentBounds().height);
-  return directionUp ? zero - minLength - halfAxisHeight : zero + minLength + halfAxisHeight;
+  return isDirectionUp ? zero - minLength - halfAxisHeight : zero + minLength + halfAxisHeight;
 };
 
 
 /** @inheritDoc */
 anychart.timelineModule.series.Moment.prototype.resolveAutoAnchor = function(position, rotation) {
-  var direction = this.getFinalDirection();
+  var iterator = this.getIterator();
+  var direction = iterator.get('direction') || this.getFinalDirection();
 
-  if (direction == anychart.enums.Direction.UP) {
-    return anychart.enums.Anchor.CENTER_BOTTOM;
-  } else {
-    return anychart.enums.Anchor.CENTER_TOP;
-  }
+  return direction == anychart.enums.Direction.UP ?
+      anychart.enums.Anchor.CENTER_BOTTOM :
+      anychart.enums.Anchor.CENTER_TOP;
 };
 
 

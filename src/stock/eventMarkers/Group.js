@@ -101,7 +101,7 @@ anychart.stockModule.eventMarkers.Group.OWN_DESCRIPTORS = (function() {
   var map = {};
   anychart.core.settings.createDescriptors(map, [
     anychart.core.settings.descriptors.DIRECTION,
-    anychart.core.settings.descriptors.POSITION,
+    anychart.core.settings.descriptors.EVENT_MARKERS_POSITION,
     anychart.core.settings.descriptors.SERIES_ID,
     anychart.core.settings.descriptors.FIELD_NAME,
     anychart.core.settings.descriptors.STICK_TO_LEFT
@@ -1196,8 +1196,8 @@ anychart.stockModule.eventMarkers.Group.prototype.setupByJSON = function(config,
 
 /** @inheritDoc */
 anychart.stockModule.eventMarkers.Group.prototype.disposeInternal = function() {
-  goog.disposeAll(this.shapeManager_, this.normal_, this.hovered_, this.selected_, this.tooltip_);
-  this.normal_ = this.hovered_ = this.selected_ = this.shapeManager_ = this.plot = this.tooltip_ = null;
+  goog.disposeAll(this.shapeManager_, this.normal_, this.hovered_, this.selected_, this.tooltip_, this.labels_);
+  this.normal_ = this.hovered_ = this.selected_ = this.shapeManager_ = this.plot = this.tooltip_ = this.labels_= null;
   anychart.stockModule.eventMarkers.Group.base(this, 'disposeInternal');
 };
 

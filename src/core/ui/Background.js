@@ -31,7 +31,7 @@ anychart.core.ui.Background = function() {
   /**
    * Serialize only own properties
    * @type {boolean}
-  **/
+   **/
   this.serializeOnlyOwn = true; //todo: Should think about it after themes refactoring. Hack for gantt serialize
 
   /**
@@ -78,8 +78,8 @@ anychart.core.ui.Background.prototype.SUPPORTED_SIGNALS =
  */
 anychart.core.ui.Background.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES |
-        anychart.ConsistencyState.APPEARANCE |
-        anychart.ConsistencyState.BACKGROUND_POINTER_EVENTS;
+    anychart.ConsistencyState.APPEARANCE |
+    anychart.ConsistencyState.BACKGROUND_POINTER_EVENTS;
 
 
 //endregion
@@ -175,10 +175,10 @@ anychart.core.ui.Background.prototype.cornersFormatter_ = function(var_args) {
     val = arg0;
   } else if (goog.isObject(arg0)) {
     val = [
-      anychart.utils.toNumber(arg0['leftTop']) || 0,
-      anychart.utils.toNumber(arg0['rightTop']) || 0,
-      anychart.utils.toNumber(arg0['rightBottom']) || 0,
-      anychart.utils.toNumber(arg0['leftBottom']) || 0
+      arg0['leftTop'] || 0,
+      arg0['rightTop'] || 0,
+      arg0['rightBottom'] || 0,
+      arg0['leftBottom'] || 0
     ];
   } else {
     val = goog.array.slice(arguments, 0);
@@ -209,12 +209,17 @@ anychart.core.ui.Background.prototype.corners = function(opt_value) {
 /**
  * Returns corner size by index.
  * @param {number} value Corner index.
- * @return {number}
+ * @param {number} width - Width of element corner calculate for.
+ * @param {number} height - Height of element corner calculate for.
+ * @return {number} - Radius size.
  * @private
  */
-anychart.core.ui.Background.prototype.getCornerSize_ = function(value) {
+anychart.core.ui.Background.prototype.getCornerSize_ = function(value, width, height) {
   var corners = this.corners();
-  return corners ? parseFloat(corners.length < 4 ? corners[0] : corners[value]) : 0;
+  var corner = corners.length < 4 ? corners[0] : corners[value];
+  var minSide = Math.min(height, width);
+
+  return anychart.utils.normalizeSize(corner, minSide) || 0;
 };
 
 
@@ -392,11 +397,13 @@ anychart.core.ui.Background.prototype.draw = function() {
     }
 
     var bounds = this.getBoundsForDrawing();
+    var width = bounds.width;
+    var height = bounds.height;
 
-    var leftTopCorner = this.getCornerSize_(0) || 0;
-    var rightTopCorner = this.getCornerSize_(1) || 0;
-    var rightBottomCorner = this.getCornerSize_(2) || 0;
-    var leftBottomCorner = this.getCornerSize_(3) || 0;
+    var leftTopCorner = this.getCornerSize_(0, width, height);
+    var rightTopCorner = this.getCornerSize_(1, width, height);
+    var rightBottomCorner = this.getCornerSize_(2, width, height);
+    var leftBottomCorner = this.getCornerSize_(3, width, height);
     var points;
 
     var currentPath, sideIndex;
@@ -450,6 +457,8 @@ anychart.core.ui.Background.prototype.draw = function() {
       for (i = 0, len = points.length; i < len; i = i + 8) {
         sideIndex = i / 8;
 
+        var cornerSize = this.getCornerSize_(sideIndex, width, height);
+
         if (!i) {
           this.fillPath_.moveTo(points[points.length - 4], points[points.length - 3]);
         }
@@ -458,7 +467,7 @@ anychart.core.ui.Background.prototype.draw = function() {
             this.fillPath_,
             points[i + 2], points[i + 3],
             points[i + 4], points[i + 5],
-            this.getCornerSize_(sideIndex));
+            cornerSize);
 
         currentPath = this.strokePaths_[sideIndex];
         if (!currentPath)
@@ -470,20 +479,20 @@ anychart.core.ui.Background.prototype.draw = function() {
               currentPath,
               points[points.length - 6], points[points.length - 5],
               points[points.length - 4], points[points.length - 3],
-              this.getCornerSize_(sideIndex));
+              cornerSize);
         } else if (prevPath != currentPath) {
           currentPath.moveTo(points[i - 2], points[i - 1]);
           this.drawCorner(
               currentPath,
               points[i - 6], points[i - 5],
               points[i - 4], points[i - 3],
-              this.getCornerSize_(sideIndex));
+              cornerSize);
         } else {
           this.drawCorner(
               currentPath,
               points[i - 6], points[i - 5],
               points[i - 4], points[i - 3],
-              this.getCornerSize_(sideIndex));
+              cornerSize);
         }
 
         currentPath.lineTo(points[i], points[i + 1]);
@@ -491,7 +500,7 @@ anychart.core.ui.Background.prototype.draw = function() {
             currentPath,
             points[i + 2], points[i + 3],
             points[i + 6], points[i + 7],
-            this.getCornerSize_(sideIndex));
+            cornerSize);
 
         prevPath = currentPath;
       }
@@ -532,7 +541,7 @@ anychart.core.ui.Background.prototype.draw = function() {
             this.strokePath_,
             points[i + 2], points[i + 3],
             points[i + 4], points[i + 5],
-            this.getCornerSize_((i / 6 + 1) % 4));
+            this.getCornerSize_((i / 6 + 1) % 4, width, height));
       }
       this.strokePath_.close();
     }
@@ -711,7 +720,7 @@ anychart.core.ui.Background.prototype.setupByJSON = function(config, opt_default
     if ('corners' in config)
       this.themeSettings['corners'] = this.cornersFormatter_(config['corners']);
   } else
-      this.corners(config['corners']);
+    this.corners(config['corners']);
 };
 
 

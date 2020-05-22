@@ -6,6 +6,7 @@ goog.require('anychart.color');
 goog.require('anychart.core.ICenterContentChart');
 goog.require('anychart.core.IShapeManagerUser');
 goog.require('anychart.core.StateSettings');
+goog.require('anychart.core.StatefulColoring');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.settings');
 goog.require('anychart.core.ui.Center');
@@ -86,6 +87,22 @@ anychart.sunburstModule.Chart = function(opt_data, opt_fillMethod) {
    * @private
    */
   this.hatchFillPalette_ = null;
+
+  /**
+   * Stateful coloring instance.
+   *
+   * @type {anychart.core.StatefulColoring}
+   * @private
+   */
+  this.statefulColoring_ = null;
+
+  /**
+   * Paths cache for stateful coloring.
+   *
+   * @type {Object.<acgraph.vector.Path>}
+   * @private
+   */
+  this.statefulColoringPaths_ = {};
 
   this.invalidate(anychart.ConsistencyState.ALL);
 
@@ -378,7 +395,7 @@ anychart.sunburstModule.Chart.prototype.makeBrowserEvent = function(e) {
 
   var tag = anychart.utils.extractTag(res['domTarget']);
   var pointIndex = tag.index;
-  
+
   // fix for domTarget == layer (mouseDown on label + mouseUp on path = click on layer)
   if (!goog.isDef(pointIndex) && this.state.hasPointState(anychart.PointState.HOVER)) {
     var hoveredPointsIndex = this.state.getIndexByPointState(anychart.PointState.HOVER);
@@ -1228,6 +1245,44 @@ anychart.sunburstModule.Chart.prototype.getStroke_ = function(pointState) {
   return strokeColor;
 };
 
+/**
+ * Extracts stateful coloring for exact data item and puts it to meta.
+ *
+ * @private
+ */
+anychart.sunburstModule.Chart.prototype.extractStateColor_ = function() {
+  // ..**^^ Stateful coloring magic starts here ^^**..
+  var item = this.getIterator().getItem();
+  var statefulFill = null;
+  var statefulName = null;
+  if (this.statefulColoring_) {
+    // TODO (A.Kudryavtsev): Can we move these calculations to StatefulColoring somehow?
+    var colors = this.statefulColoring_.colors;
+    if (colors) {
+      var checkers = this.statefulColoring_.checkers;
+      if (checkers) {
+        var state = this.statefulColoring_.state;
+        for (var i = 0; i < checkers.length; i++) {
+          var checker = checkers[i];
+          var res = checker(item, state);
+          if (res && res in colors) {
+            statefulFill = colors[res];
+            statefulName = res;
+          }
+        }
+      }
+    }
+  }
+
+  // Used to set fill.
+  item.meta('statefulFill', statefulFill);
+
+  // Used to get path from stateful coloring paths cache.
+  item.meta('statefulName', statefulName);
+
+  // ..**^^ Stateful coloring magic ends here ^^**..
+};
+
 
 /**
  * @param {number} pointState
@@ -1295,10 +1350,28 @@ anychart.sunburstModule.Chart.prototype.colorizePoint = function(pointState) {
 };
 
 
+/**
+ * Stateful coloring getter.
+ * Internal QLIK-specific feature, no need to work like getter/setter.
+ *
+ * @return {anychart.core.StatefulColoring}
+ */
+anychart.sunburstModule.Chart.prototype.statefulColoring = function() {
+  if (!this.statefulColoring_) {
+    this.statefulColoring_ = new anychart.core.StatefulColoring();
+    this.statefulColoring_.listen(anychart.enums.EventType.STATE_CHANGE, function() {
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }, void 0, this);
+  }
+  return this.statefulColoring_;
+};
+
+
 //endregion
 //region --- Center content
 /**
- * Pie center settings.
+ * Chart center settings.
+ *
  * @param {Object=} opt_value
  * @return {anychart.sunburstModule.Chart|anychart.core.ui.Center}
  */
@@ -2008,6 +2081,70 @@ anychart.sunburstModule.Chart.prototype.calculate = function() {
   }
 };
 
+/**
+ * Initializes basic dom elements.
+ *
+ * @private
+ */
+anychart.sunburstModule.Chart.prototype.initDom_ = function() {
+  if (!this.dataLayer_) {
+    // --- Initializing data layer.
+    this.dataLayer_ = new anychart.core.utils.TypedLayer(function() {
+      return acgraph.path();
+    }, function(el) {
+      (/** @type {!acgraph.vector.Path} */(el)).clear();
+    });
+    anychart.utils.nameElement(this.dataLayer_, 'data_layer');
+
+    this.dataLayer_.zIndex(anychart.sunburstModule.Chart.ZINDEX_SERIES);
+    this.dataLayer_.parent(this.rootElement);
+    this.initInteractivityControlsWrapper_();
+
+    // --- Initializing hatch layer.
+    this.hatchLayer_ = new anychart.core.utils.TypedLayer(function() {
+      return acgraph.path();
+    }, function(el) {
+      (/** @type {!acgraph.vector.Path} */(el)).clear();
+    });
+    anychart.utils.nameElement(this.hatchLayer_, 'hatch_layer');
+
+    this.hatchLayer_.zIndex(anychart.sunburstModule.Chart.ZINDEX_HATCH_FILL);
+    this.hatchLayer_.parent(this.rootElement);
+    this.hatchLayer_.disablePointerEvents(true);
+
+
+    this.statefulColoringLayer_ = this.rootElement.layer();
+    anychart.utils.nameElement(this.statefulColoringLayer_, 'stateful_coloring_layer');
+    //TODO (A.Kudryavtsev): Is it really must be above?
+    this.statefulColoringLayer_.zIndex(anychart.sunburstModule.Chart.ZINDEX_HATCH_FILL + 1);
+    this.statefulColoringLayer_.disablePointerEvents(true);
+  }
+};
+
+/**
+ * TODO (A.Kudryavtsev): JSDoc.
+ *
+ * @private
+ */
+anychart.sunburstModule.Chart.prototype.prepareStatefulColoring_ = function() {
+  if (this.statefulColoring_) {
+    var colors = this.statefulColoring_.colors;
+    if (colors) {
+      var checkers = this.statefulColoring_.checkers;
+      if (checkers) {
+        for (var key in colors) {
+          if (!(key in this.statefulColoringPaths_)) {
+            var p = /** @type {acgraph.vector.Path} */ (this.statefulColoringLayer_.path());
+            p.stroke(null);
+            this.statefulColoringPaths_[key] = p;
+          }
+          this.statefulColoringPaths_[key].clear();
+        }
+      }
+    }
+  }
+};
+
 
 /** @inheritDoc */
 anychart.sunburstModule.Chart.prototype.drawContent = function(bounds) {
@@ -2015,6 +2152,7 @@ anychart.sunburstModule.Chart.prototype.drawContent = function(bounds) {
     return;
 
   this.calculate();
+  this.initDom_();
 
   if (this.hasInvalidationState(anychart.ConsistencyState.SUNBURST_CENTER_CONTENT)) {
     if (this.center_.contentLayer) {
@@ -2037,47 +2175,16 @@ anychart.sunburstModule.Chart.prototype.drawContent = function(bounds) {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     this.calculateBounds_(bounds);
-
-    if (this.dataLayer_)
-      this.dataLayer_.clip(this.dataBounds_);
-
-    if (this.hatchLayer_)
-      this.hatchLayer_.clip(this.dataBounds_);
-
+    this.dataLayer_.clip(this.dataBounds_);
+    this.hatchLayer_.clip(this.dataBounds_);
+    this.statefulColoringLayer_.clip(this.dataBounds_);
     this.invalidate(anychart.ConsistencyState.APPEARANCE);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    if (this.dataLayer_) {
-      this.dataLayer_.clear();
-    } else {
-      this.dataLayer_ = new anychart.core.utils.TypedLayer(function() {
-        return acgraph.path();
-      }, function(el) {
-        (/** @type {!acgraph.vector.Path} */(el)).clear();
-      });
-
-      this.dataLayer_.clip(this.dataBounds_);
-      this.dataLayer_.zIndex(anychart.sunburstModule.Chart.ZINDEX_SERIES);
-      this.dataLayer_.parent(this.rootElement);
-
-      this.initInteractivityControlsWrapper_();
-    }
-
-    if (this.hatchLayer_) {
-      this.hatchLayer_.clear();
-    } else {
-      this.hatchLayer_ = new anychart.core.utils.TypedLayer(function() {
-        return acgraph.path();
-      }, function(el) {
-        (/** @type {!acgraph.vector.Path} */(el)).clear();
-      });
-
-      this.hatchLayer_.clip(this.dataBounds_);
-      this.hatchLayer_.zIndex(anychart.sunburstModule.Chart.ZINDEX_HATCH_FILL);
-      this.hatchLayer_.parent(this.rootElement);
-      this.hatchLayer_.disablePointerEvents(true);
-    }
+    this.dataLayer_.clear();
+    this.hatchLayer_.clear();
+    this.prepareStatefulColoring_();
 
     var labels = this.normal_.labels();
     labels.clear();
@@ -2457,6 +2564,40 @@ anychart.sunburstModule.Chart.prototype.getLabelCircularTextPath = function(labe
   return path;
 };
 
+/**
+ * Draws path over the real slice path by stateful coloring.
+ *
+ * @param {anychart.PointState|number} pointState - Point state to define stroke.
+ * @private
+ */
+anychart.sunburstModule.Chart.prototype.drawStatefulFill_ = function(pointState) {
+  var iterator = this.getIterator();
+  var statefulFill = /** @type {acgraph.vector.Fill} */ (iterator.meta('statefulFill'));
+  var statefulName = /** @type {string} */ (iterator.meta('statefulName'));
+  if (statefulName in this.statefulColoringPaths_) {
+    var path = this.statefulColoringPaths_[statefulName];
+    var stroke = this.getStroke_(pointState);
+    path.fill(statefulFill);
+    path.stroke(stroke);
+
+    var innerRadius = /** @type {number} */ (iterator.meta('innerRadius'));
+    var outerRadius = /** @type {number} */ (iterator.meta('outerRadius'));
+    var halfStrokeThickness = /** @type {number} */ (iterator.meta('halfStrokeThickness'));
+    var start = /** @type {number} */ (iterator.meta('start'));
+    var sweep = /** @type {number} */ (iterator.meta('sweep'));
+
+    acgraph.vector.primitives.donut(
+        path,
+        this.cx,
+        this.cy,
+        innerRadius + halfStrokeThickness,
+        outerRadius - halfStrokeThickness,
+        start,
+        sweep
+    );
+  }
+};
+
 
 /**
  * Recursively draws node into specified bounds.
@@ -2479,6 +2620,7 @@ anychart.sunburstModule.Chart.prototype.drawNode_ = function(node, parentValue, 
   var index = /** @type {number} */(node.meta('index'));
   var iterator = this.getIterator();
   iterator.select(index);
+  this.extractStateColor_();
 
   var pointState = this.state.getPointStateByIndex(index);
   var numChildren = node.numChildren();
@@ -2531,9 +2673,11 @@ anychart.sunburstModule.Chart.prototype.drawNode_ = function(node, parentValue, 
     iterator.meta('sweep', sweep);
     iterator.meta('innerRadius', innerRadius);
     iterator.meta('outerRadius', outerRadius);
+    iterator.meta('halfStrokeThickness', halfStrokeThickness);
 
     this.makeInteractive(nodePath);
     this.drawLabel_(pointState);
+    this.drawStatefulFill_(pointState);
   } else {
     iterator.meta('path', void 0);
   }
@@ -2574,143 +2718,160 @@ anychart.sunburstModule.Chart.prototype.drawLabel_ = function(pointState) {
   var selected = pointState == anychart.PointState.SELECT;
 
   var iterator = this.getIterator();
-  var item = iterator.getItem();
+  var sweep = /** @type {number} */ (iterator.meta('sweep'));
+  var innerRadius = /** @type {number} */ (iterator.meta('innerRadius'));
+  var outerRadius = /** @type {number} */ (iterator.meta('outerRadius'));
 
-  var chartLabels = this.normal_.labels();
-  var chartStateLabels = selected ? this.selected_.labels() : hovered ? this.hovered_.labels() : null;
+  var halfSweep = goog.math.toRadians(sweep / 2);
+  var medianSegmentWidth = (outerRadius + innerRadius) / 2 * Math.sin(halfSweep);
+  var sweepCondition = sweep <= 180 ? medianSegmentWidth >= 5 : outerRadius >= 10;
 
-  var pointLabel = item.get('normal');
-  pointLabel = goog.isDef(pointLabel) ? pointLabel['label'] : void 0;
-  pointLabel = anychart.utils.getFirstDefinedValue(pointLabel, item.get('label'));
+  if (sweepCondition && outerRadius - innerRadius >= 20) {
+    /*
+      For performance purposes, no label will be drawn if it has not enough space
+      to be drawn.
 
-  var statePointLabel = selected ? item.get('selected') : hovered ? item.get('hovered') : void 0;
-  statePointLabel = goog.isDef(statePointLabel) ? statePointLabel['label'] : void 0;
-  statePointLabel = selected ? anychart.utils.getFirstDefinedValue(statePointLabel, item.get('selectLabel')) :
-      hovered ? anychart.utils.getFirstDefinedValue(statePointLabel, item.get('hoverLabel')) : null;
+      It includes:
+        - available medianSegmentWidth is less than 5 pixels.
+        - available levelThickness = (outerRadius - innerRadius) difference is less than 20 pixels.
+        - @see QLIK-115 for explanations.
+     */
+    var item = iterator.getItem();
 
-  var index = iterator.getIndex();
-  var label = chartLabels.getLabel(index);
-  if (!label)
-    label = chartLabels.add(null, null, index);
+    var chartLabels = this.normal_.labels();
+    var chartStateLabels = selected ? this.selected_.labels() : hovered ? this.hovered_.labels() : null;
 
-  var depth = item.meta('depth');
-  var positiveLevel = this.levelsPositive_[depth];
-  var negativeLevel = this.levelsNegative_[this.treeMaxDepth - depth];
+    var pointLabel = item.get('normal');
+    pointLabel = goog.isDef(pointLabel) ? pointLabel['label'] : void 0;
+    pointLabel = anychart.utils.getFirstDefinedValue(pointLabel, item.get('label'));
 
-  var positiveLevelLabels, positiveStateLevelLabels;
-  if (positiveLevel) {
-    positiveLevelLabels = positiveLevel.normal().labels();
-    positiveStateLevelLabels = selected ? positiveLevel.selected().labels() : hovered ? positiveLevel.hovered().labels() : null;
-  }
+    var statePointLabel = selected ? item.get('selected') : hovered ? item.get('hovered') : void 0;
+    statePointLabel = goog.isDef(statePointLabel) ? statePointLabel['label'] : void 0;
+    statePointLabel = selected ? anychart.utils.getFirstDefinedValue(statePointLabel, item.get('selectLabel')) :
+        hovered ? anychart.utils.getFirstDefinedValue(statePointLabel, item.get('hoverLabel')) : null;
 
-  var negativeLevelLabels, negativeStateLevelLabels;
-  if (negativeLevel) {
-    negativeLevelLabels = negativeLevel.normal().labels();
-    negativeStateLevelLabels = selected ? negativeLevel.selected().labels() : hovered ? negativeLevel.hovered().labels() : null;
-  }
+    var index = iterator.getIndex();
+    var label = chartLabels.getLabel(index);
+    if (!label)
+      label = chartLabels.add(null, null, index);
 
-  var isLeaf = item.meta('isLeaf');
-  var leavesLabels, leavesStateLabels;
-  if (isLeaf) {
-    var leaves = this.leaves();
-    leavesLabels = leaves.normal().labels();
-    leavesStateLabels = selected ? leaves.selected().labels() : hovered ? leaves.hovered().labels() : null;
-  }
+    var depth = item.meta('depth');
+    var positiveLevel = this.levelsPositive_[depth];
+    var negativeLevel = this.levelsNegative_[this.treeMaxDepth - depth];
 
-  label.resetSettings();
-  label.stateOrder(anychart.utils.extractSettings([
-    //own state
-    statePointLabel, anychart.utils.ExtractSettingModes.PLAIN_OBJECT,
-    leavesStateLabels, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
-    negativeStateLevelLabels, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
-    positiveStateLevelLabels, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
-    chartStateLabels, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
-    //own normal
-    pointLabel, anychart.utils.ExtractSettingModes.PLAIN_OBJECT,
-    leavesLabels, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
-    negativeLevelLabels, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
-    positiveLevelLabels, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
-    chartLabels, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
-    //sunburst auto settings
-    label, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
-    //theme state
-    leavesStateLabels, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
-    positiveStateLevelLabels, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
-    negativeStateLevelLabels, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
-    chartStateLabels, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
-    //theme normal
-    leavesLabels, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
-    negativeLevelLabels, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
-    positiveLevelLabels, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
-    chartLabels, anychart.utils.ExtractSettingModes.THEME_SETTINGS
-  ]));
+    var positiveLevelLabels, positiveStateLevelLabels;
+    if (positiveLevel) {
+      positiveLevelLabels = positiveLevel.normal().labels();
+      positiveStateLevelLabels = selected ? positiveLevel.selected().labels() : hovered ? positiveLevel.hovered().labels() : null;
+    }
 
-  var needToDraw = label.getFinalSettings('enabled');
-  var fitToSlice = true;
-  if (needToDraw) {
-    // var start
-    var sweep, innerRadius, outerRadius, radiusDelta, angle, radius, path, textElement, arcLength;
-    var position, padding, positionProvider, formatProvider;
-    var width = null;
-    var height = null;
+    var negativeLevelLabels, negativeStateLevelLabels;
+    if (negativeLevel) {
+      negativeLevelLabels = negativeLevel.normal().labels();
+      negativeStateLevelLabels = selected ? negativeLevel.selected().labels() : hovered ? negativeLevel.hovered().labels() : null;
+    }
 
-    positionProvider = this.createPositionProvider();
-    formatProvider = this.createFormatProvider(true);
-    label.formatProvider(formatProvider);
+    var isLeaf = item.meta('isLeaf');
+    var leavesLabels, leavesStateLabels;
+    if (isLeaf) {
+      var leaves = this.leaves();
+      leavesLabels = leaves.normal().labels();
+      leavesStateLabels = selected ? leaves.selected().labels() : hovered ? leaves.hovered().labels() : null;
+    }
 
-    label
-        .height(height)
-        .width(width);
+    label.resetSettings();
+    label.stateOrder(anychart.utils.extractSettings([
+      //own state
+      statePointLabel, anychart.utils.ExtractSettingModes.PLAIN_OBJECT,
+      leavesStateLabels, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+      negativeStateLevelLabels, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+      positiveStateLevelLabels, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+      chartStateLabels, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+      //own normal
+      pointLabel, anychart.utils.ExtractSettingModes.PLAIN_OBJECT,
+      leavesLabels, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+      negativeLevelLabels, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+      positiveLevelLabels, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+      chartLabels, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+      //sunburst auto settings
+      label, anychart.utils.ExtractSettingModes.OWN_SETTINGS,
+      //theme state
+      leavesStateLabels, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
+      positiveStateLevelLabels, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
+      negativeStateLevelLabels, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
+      chartStateLabels, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
+      //theme normal
+      leavesLabels, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
+      negativeLevelLabels, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
+      positiveLevelLabels, anychart.utils.ExtractSettingModes.THEME_SETTINGS,
+      chartLabels, anychart.utils.ExtractSettingModes.THEME_SETTINGS
+    ]));
 
-    position = label.getFinalSettings('position');
-    padding = new anychart.core.utils.Padding().setup(label.getFinalSettings('padding'));
-    // start = /** @type {number} */ (iterator.meta('start'));
-    sweep = /** @type {number} */ (iterator.meta('sweep'));
-    innerRadius = /** @type {number} */ (iterator.meta('innerRadius'));
-    outerRadius = /** @type {number} */ (iterator.meta('outerRadius'));
-    radiusDelta = (outerRadius - innerRadius);
-    angle = positionProvider['value']['angle'];
-    radius = positionProvider['value']['radius'];
+    var needToDraw = label.getFinalSettings('enabled');
+    var fitToSlice = true;
+    if (needToDraw) {
+      // var start
+      var radiusDelta, angle, radius, path, textElement, arcLength;
+      var position, padding, positionProvider, formatProvider;
+      var width = null;
+      var height = null;
 
-    if (position == 'circular' || (position == 'radial' && sweep == 360)) {
-      if (sweep == 360 && !innerRadius) {
-        textElement = label.getTextElement();
-        path = textElement.path();
-        if (path)
-          textElement.path(null);
+      positionProvider = this.createPositionProvider();
+      formatProvider = this.createFormatProvider(true);
+      label.formatProvider(formatProvider);
 
-        width = height = radiusDelta * 2;
-        width = padding.tightenWidth(width);
-        height = padding.tightenHeight(height);
-      } else {
-        path = this.getLabelCircularTextPath(label, radius);
+      label
+          .height(height)
+          .width(width);
+
+      position = label.getFinalSettings('position');
+      padding = new anychart.core.utils.Padding().setup(label.getFinalSettings('padding'));
+      // start = /** @type {number} */ (iterator.meta('start'));
+
+      radiusDelta = (outerRadius - innerRadius);
+      angle = positionProvider['value']['angle'];
+      radius = positionProvider['value']['radius'];
+
+      if (position == 'circular' || (position == 'radial' && sweep == 360)) {
+        if (sweep == 360 && !innerRadius) {
+          textElement = label.getTextElement();
+          path = textElement.path();
+          if (path)
+            textElement.path(null);
+
+          width = height = radiusDelta * 2;
+          width = padding.tightenWidth(width);
+          height = padding.tightenHeight(height);
+        } else {
+          path = this.getLabelCircularTextPath(label, radius);
+          label.getTextElement().path(path);
+
+          arcLength = (Math.PI * radius * sweep) / 180;
+          width = padding.tightenWidth(arcLength);
+          height = padding.tightenHeight(radiusDelta) - 15;
+        }
+      } else if (position == 'radial') {
+        path = this.getLabelRadialTextPath(label, radius, angle);
         label.getTextElement().path(path);
 
         arcLength = (Math.PI * radius * sweep) / 180;
-        width = padding.tightenWidth(arcLength);
-        height = padding.tightenHeight(radiusDelta) - 15;
+        height = padding.tightenHeight(arcLength);
+        width = padding.tightenWidth(radiusDelta);
       }
-    } else if (position == 'radial') {
-      path = this.getLabelRadialTextPath(label, radius, angle);
-      label.getTextElement().path(path);
+      goog.dispose(padding);
+      padding = null;
 
-      arcLength = (Math.PI * radius * sweep) / 180;
-      height = padding.tightenHeight(arcLength);
-      width = padding.tightenWidth(radiusDelta);
+      label
+          .width(width)
+          .height(height)
+          .positionProvider(positionProvider);
     }
-    goog.dispose(padding);
-    padding = null;
 
-    label
-        .width(width)
-        .height(height)
-        .positionProvider(positionProvider);
+    if (!needToDraw || !fitToSlice)
+      chartLabels.clear(label.getIndex());
+    else
+      label.draw();
   }
-
-  if (!needToDraw || !fitToSlice)
-    chartLabels.clear(label.getIndex());
-  else
-    label.draw();
 };
 
 
@@ -3121,5 +3282,7 @@ anychart.sunburstModule.Chart.prototype.setupByJSON = function(config, opt_defau
   proto['hatchFillPalette'] = proto.hatchFillPalette;
 
   proto['toCsv'] = proto.toCsv;
+
+  proto['statefulColoring'] = proto.statefulColoring;
 })();
 //endregion

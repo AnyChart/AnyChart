@@ -35,7 +35,8 @@ anychart.ganttModule.elements.BaselineProgressElement.prototype.getPaletteNormal
 
 /** @inheritDoc */
 anychart.ganttModule.elements.BaselineProgressElement.prototype.getPointSettingsResolutionOrder = function() {
-  return this.pointSettingsResolution || (this.pointSettingsResolution = [this.getType(), anychart.enums.GanttDataFields.BASELINE_PROGRESS, anychart.enums.TLElementTypes.PROGRESS]);
+  // Regular task's progress is removed from this resolution during the DVF-4397.
+  return this.pointSettingsResolution || (this.pointSettingsResolution = [this.getType(), anychart.enums.GanttDataFields.BASELINE_PROGRESS]);
 };
 
 

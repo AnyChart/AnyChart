@@ -80,11 +80,12 @@ anychart.timelineModule.drawers.Moment.prototype.drawPointShape = function(point
   var thickness = anychart.utils.extractThickness(/** @type {acgraph.vector.Stroke} */(path.stroke()));
   var axisHeight = /** @type {number} */(point.meta('axisHeight'));
   // false - direction is down, it can't be auto
-  var directionUp = /** @type {anychart.enums.Direction} */(point.meta('direction')) == anychart.enums.Direction.UP;
+  var direction = /** @type {anychart.enums.Direction} */(point.get('direction') || point.meta('direction'));
+  var isDirectionUp = direction == anychart.enums.Direction.UP;
 
-  zero += directionUp ? -axisHeight / 2 : axisHeight / 2;
+  zero += isDirectionUp ? -axisHeight / 2 : axisHeight / 2;
 
   x = anychart.utils.applyPixelShift(x, thickness);
   anychart.core.drawers.move(path, this.isVertical, x, zero);
-  anychart.core.drawers.line(path, this.isVertical, x, directionUp ? zero - minLength : zero + minLength);
+  anychart.core.drawers.line(path, this.isVertical, x, isDirectionUp ? zero - minLength : zero + minLength);
 };
