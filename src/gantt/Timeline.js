@@ -380,9 +380,19 @@ anychart.ganttModule.TimeLine = function(opt_controller, opt_isResources) {
    */
   this.currentLowerTicksUnit_ = null;
 
+  /**
+   * Indexes of this array represent gantt chart rows
+   * and each contains array of sorted tags.
+   *
+   * @type {Array.<Array.<anychart.ganttModule.TimeLine.Tag>>}
+   * @private
+   */
+  this.tagsForCropLabels_ = [];
+
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
-    ['columnStroke', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['cropLabels', anychart.ConsistencyState.TIMELINE_ELEMENTS_LABELS, anychart.Signal.NEEDS_REDRAW],
     ['zoomOnMouseWheel', 0, 0],
+    ['columnStroke', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
     ['workingFill', 0, 0, 0, function() {
       var fill = /** @type {acgraph.vector.Fill} */ (this.getOption('workingFill'));
       this.getWorkingPath_().fill(fill);
@@ -443,7 +453,8 @@ anychart.ganttModule.TimeLine.prototype.SUPPORTED_CONSISTENCY_STATES =
  *   periodIndex: number,
  *   period: Object,
  *   label: anychart.core.ui.LabelsFactory.Label,
- *   labelPointSettings: Object
+ *   labelPointSettings: Object,
+ *   row: number
  * }}
  */
 anychart.ganttModule.TimeLine.Tag;
@@ -608,16 +619,19 @@ anychart.ganttModule.TimeLine.TICK_INTERVAL_GROWTH_MAP = (function() {
 
 
 //endregion
-//region -- Coloring.
+//region -- Descriptors.
 /**
+ * Timeline descriptors.
+ *
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.ganttModule.TimeLine.COLOR_DESCRIPTORS = (function() {
+anychart.ganttModule.TimeLine.DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
   anychart.core.settings.createDescriptors(map, [
-    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'columnStroke', anychart.core.settings.strokeNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'cropLabels', anychart.core.settings.booleanNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'zoomOnMouseWheel', anychart.core.settings.booleanNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'columnStroke', anychart.core.settings.strokeNormalizer],
     [anychart.enums.PropertyHandlerType.MULTI_ARG, 'workingFill', anychart.core.settings.fillNormalizer],
     [anychart.enums.PropertyHandlerType.MULTI_ARG, 'notWorkingFill', anychart.core.settings.fillNormalizer],
     [anychart.enums.PropertyHandlerType.MULTI_ARG, 'holidaysFill', anychart.core.settings.fillNormalizer],
@@ -625,7 +639,7 @@ anychart.ganttModule.TimeLine.COLOR_DESCRIPTORS = (function() {
   ]);
   return map;
 })();
-anychart.core.settings.populate(anychart.ganttModule.TimeLine, anychart.ganttModule.TimeLine.COLOR_DESCRIPTORS);
+anychart.core.settings.populate(anychart.ganttModule.TimeLine, anychart.ganttModule.TimeLine.DESCRIPTORS);
 
 
 //endregion
@@ -828,7 +842,8 @@ anychart.ganttModule.TimeLine.prototype.createTag = function(item, element, boun
     item: item,
     labels: element.getLabelsResolutionOrder(),
     bounds: bounds,
-    labelPointSettings: element.getLabelPointSettings(item, opt_periodIndex)
+    labelPointSettings: element.getLabelPointSettings(item, opt_periodIndex),
+    row: this.getElementRowNumber_(bounds)
   };
 
   if (goog.isDef(opt_periodIndex)) {
@@ -5873,12 +5888,256 @@ anychart.ganttModule.TimeLine.prototype.labelsInvalidated_ = function(event) {
 
 
 /**
+ * Sorting function for binary insert, used while collecting tags for label crop.
+ * If anchor is left, sort by bounds left side.
+ * If anchor is center, sort by bounds center.
+ * If anchor is right, sort by right side.
+ *
+ * @param {?anychart.ganttModule.TimeLine.Tag} tag1
+ * @param {?anychart.ganttModule.TimeLine.Tag} tag2
+ * @return {number}
+ */
+anychart.ganttModule.TimeLine.tagsBinaryInsertCallback = function(tag1, tag2) {
+  var pos1 = /** @type {string} */(tag1.label.getFinalSettings('position'));
+  var pos2 = /** @type {string} */(tag2.label.getFinalSettings('position'));
+
+  var tag1Anchor = anychart.utils.getCoordinateByAnchor(tag1.bounds, pos1);
+  var tag2Anchor = anychart.utils.getCoordinateByAnchor(tag2.bounds, pos2);
+
+  return (tag1Anchor.x - tag2Anchor.x) || -1;
+};
+
+
+/**
+ * Calculates element row number by bounds.
+ *
+ * @param {anychart.math.Rect} elementBounds - Element bounds.
+ * @return {number} - Row number.
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.getElementRowNumber_ = function(elementBounds) {
+  var height = this.controller.verticalOffset() + elementBounds.top - this.headerHeight() - this.pixelBoundsCache.top;
+
+  var startIndex = this.controller.startIndex();
+  var startRowTop = this.controller.getHeightCache()[startIndex - 1] || 0;
+
+  return this.controller.getIndexByHeight(startRowTop + height);
+};
+
+
+/**
+ * Checks if elements labels intersect on the row and crops them if they do.
+ * Only checks intersection of milestone previews on project and milestones + periods on
+ * resource chart.
+ *
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.cropElementsLabels_ = function() {
+  // Get indexes of items currently displayed on timeline.
+  var startIndex = /** @type {number} */(this.controller.startIndex());
+  var endIndex = /** @type {number} */(this.controller.endIndex());
+
+  for (var i = startIndex; i <= endIndex; i++) {
+    /*
+      Tags are used, because they have all the information needed to crop labels.
+      They contain element bounds and instance of label being drawn. And also when we collect
+      tags we only get what is drawn on the screen.
+     */
+    var tags = this.tagsForCropLabels_[i] || [];
+    this.cropTagsLabels_(tags);
+  }
+};
+
+
+/**
+ * Returns rightmost available x value for current tag label.
+ *
+ * @param {anychart.ganttModule.TimeLine.Tag} cur - Current tag.
+ * @param {?anychart.ganttModule.TimeLine.Tag} next - Next tag.
+ * @returns {number} - Right restraint for current tag label.
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.getRightRestraint_ = function(cur, next) {
+  if (!next) {
+    return +Infinity;
+  }
+
+  var delta = next.bounds.getLeft() - cur.bounds.getRight();
+  var nextTagLabelBounds = this.getTagLabelBounds_(next.label);
+
+  var halfDeltaX = cur.bounds.getRight() + delta / 2;
+
+  /*
+    ● - next element
+    █ - current element
+    As simple as that:
+      1) If next label is righter than next element itself, right restraint is left side of the next element.
+        █Long lab●Long label text
+      2) If next label is on the left side, but no further than middle point between current element right
+        and next element left, next label left side is a restraint.
+        █Long label text:Short●
+      3) If next label is on the left and crosses the middle point between elements, use middle point as a restraint.
+        █Long la:Long la●
+   */
+
+  if (nextTagLabelBounds.getLeft() < next.bounds.getLeft() && delta > 0) {
+    if (nextTagLabelBounds.getLeft() <= halfDeltaX) {
+      return halfDeltaX;
+    } else {
+      return nextTagLabelBounds.getLeft();
+    }
+  }
+
+  return next.bounds.getLeft();
+};
+
+
+/**
+ * Returns left restraint, based on previous element and label bounds.
+ * Left restraint is always the rightmost x value of previous element or label.
+ * If label is enabled, it is label right boundary. If label is disabled,
+ * it is element right boundary.
+ *
+ * @param {?anychart.ganttModule.TimeLine.Tag} prev - Previous tag.
+ * @returns {number} - Left restraint for current label.
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.getLeftRestraint_ = function(prev) {
+  if (prev) {
+    var elementRightBoundary = prev.bounds.getRight();
+
+    if (prev.label.enabled()) {
+      // Previous label might have been cropped. Draw method updates bounds.
+      prev.label.draw();
+      var prevLabelRight = this.getTagLabelBounds_(prev.label).getRight();
+      return Math.max(elementRightBoundary, prevLabelRight);
+    } else {
+      return elementRightBoundary;
+    }
+  }
+
+  return -Infinity;
+};
+
+
+/**
+ * Crops current tag label, taking previous and next tags and their labels into account.
+ *
+ * @param {?anychart.ganttModule.TimeLine.Tag} prev - Previous tag.
+ * @param {?anychart.ganttModule.TimeLine.Tag} cur - Current tag.
+ * @param {?anychart.ganttModule.TimeLine.Tag} next - Next tag.
+ */
+anychart.ganttModule.TimeLine.prototype.cropCurrentTagLabel_ = function(prev, cur, next) {
+  var curTagLabelBounds = this.getTagLabelBounds_(cur.label);
+
+  // Get left and right bounds of available space for label.
+  var hardRightRestraint = this.getRightRestraint_(cur, next);
+  var hardLeftRestraint = this.getLeftRestraint_(prev);
+
+  var labelFinalRight = Math.min(hardRightRestraint, curTagLabelBounds.getRight());
+  var labelFinalLeft = Math.max(hardLeftRestraint, curTagLabelBounds.getLeft());
+
+  var newWidth = labelFinalRight - labelFinalLeft;
+
+  var curTagLabelAnchor = cur.label.getFinalSettings('anchor').split('-')[0];
+  if (curTagLabelAnchor === 'center') {
+    var curTagLabelPosition = cur.label.getFinalSettings('position').split('-')[0];
+    var anchorPoint = anychart.utils.getCoordinateByAnchor(cur.bounds, curTagLabelPosition);
+    newWidth = Math.min(anchorPoint.x - labelFinalLeft, labelFinalRight - anchorPoint.x) * 2;
+  }
+
+  // Minimum allowed width for labels, currently is not configurable.
+  var minimumAllowedWidth = 20;
+
+  if (newWidth >= minimumAllowedWidth && newWidth < curTagLabelBounds.width) {
+    cur.label.width(newWidth);
+    cur.label.height(curTagLabelBounds.height);
+  } else if (newWidth < minimumAllowedWidth) {
+    cur.label.enabled(false);
+  }
+};
+
+
+/**
+ * Returns tag label with widened bounds if needed.
+ *
+ * @param {anychart.core.ui.LabelsFactory.Label} label
+ * @returns {anychart.math.Rect}
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.getTagLabelBounds_ = function(label) {
+  var backgroundSettings = label.getFinalSettings('background');
+
+  var textBounds = label.getTextElement().getBounds();
+  if (backgroundSettings && backgroundSettings.enabled) {
+    var padding = /** @type {Object} */(label.getFinalSettings('padding'));
+    var widenedBounds = /** @type {anychart.math.Rect} */(anychart.core.utils.Padding.widenBounds(textBounds, padding));
+    return widenedBounds;
+  }
+  return textBounds;
+};
+
+
+/**
+ * Iterates over sorted array of tags and crops their labels.
+ *
+ * @param {Array.<anychart.ganttModule.TimeLine.Tag>} tags - Sorted array of tags.
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.cropTagsLabels_ = function(tags) {
+  for (var i = 0; i < tags.length; i++) {
+    var previousTag = tags[i - 1] || null;
+    var currentTag = tags[i];
+    var nextTag = tags[i + 1] || null;
+
+    this.cropCurrentTagLabel_(previousTag, currentTag, nextTag);
+  }
+};
+
+
+/**
+ * Inserts tag using binary insert, to have sorted array.
+ * These tags are later used to crop elements labels.
+ *
+ * @param {anychart.ganttModule.TimeLine.Tag} tag
+ */
+anychart.ganttModule.TimeLine.prototype.insertTagForCropLabels_ = function(tag) {
+  if (!goog.isArray(this.tagsForCropLabels_[tag.row])) {
+    this.tagsForCropLabels_[tag.row] = [];
+  }
+  
+  var isResourcePeriodOrMilestone =
+    (tag.type === anychart.enums.TLElementTypes.PERIODS) ||
+    (tag.type === anychart.enums.TLElementTypes.MILESTONES);
+  
+    var isProjectMilestonePreview =
+    (tag.type === anychart.enums.TLElementTypes.MILESTONES_PREVIEW);
+  
+  var isResource = this.controller.isResources();
+
+  var suits1 = (isResource && isResourcePeriodOrMilestone);
+  var suits2 = (!isResource && isProjectMilestonePreview);
+
+  if (suits1 || suits2) {
+    goog.array.binaryInsert(
+      this.tagsForCropLabels_[tag.row],
+      tag,
+      anychart.ganttModule.TimeLine.tagsBinaryInsertCallback
+    );
+  }
+};
+
+
+/**
  * Draws labels.
  * @private
  */
 anychart.ganttModule.TimeLine.prototype.drawLabels_ = function() {
   this.labels().suspendSignalsDispatching();
   this.labels().clear();
+  this.tagsForCropLabels_ = [];
+
+  var isCropLabelsEnabled = this.getOption('cropLabels');
 
   var els = this.initializeElements_();
 
@@ -5966,10 +6225,18 @@ anychart.ganttModule.TimeLine.prototype.drawLabels_ = function() {
               tag.label.enabled(false);
             }
             tag.label.draw();
+
+            if (isCropLabelsEnabled) {
+              this.insertTagForCropLabels_(tag);
+            }
           }
         }
       }
     }
+  }
+
+  if (isCropLabelsEnabled) {
+    this.cropElementsLabels_();
   }
 
   this.labels().resumeSignalsDispatching(true);
@@ -6246,7 +6513,7 @@ anychart.ganttModule.TimeLine.prototype.serialize = function() {
   json['markers'] = this.markers().serialize();
   json['header'] = this.header().serialize();
 
-  anychart.core.settings.serialize(this, anychart.ganttModule.TimeLine.COLOR_DESCRIPTORS, json, void 0, void 0, true);
+  anychart.core.settings.serialize(this, anychart.ganttModule.TimeLine.DESCRIPTORS, json, void 0, void 0, true);
 
   json['elements'] = this.elements().serialize();
   json['connectors'] = this.connectors().serialize();
@@ -6305,7 +6572,7 @@ anychart.ganttModule.TimeLine.prototype.setupByJSON = function(config, opt_defau
   if (('header' in config) && !opt_default)
     this.header().setupInternal(false, config['header']);
 
-  anychart.core.settings.deserialize(this, anychart.ganttModule.TimeLine.COLOR_DESCRIPTORS, config, opt_default);
+  anychart.core.settings.deserialize(this, anychart.ganttModule.TimeLine.DESCRIPTORS, config, opt_default);
 
   this.elements().setupInternal(!!opt_default, config['elements']);
   this.milestones().setupInternal(!!opt_default, config['milestones']);
@@ -6510,6 +6777,7 @@ anychart.standalones.resourceTimeline = function() {
   // auto generated
   //proto['backgroundFill'] = proto.backgroundFill;
   //proto['columnStroke'] = proto.columnStroke;
+  //proto['cropLabels'] = proto.cropLabels;
 
   // row coloring
   //proto['rowFill'] = proto.rowFill;

@@ -522,6 +522,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     },
     'timeline': {
       'isStandalone': false,
+      'cropLabels': false,
       'labels': {
         'padding': [0, 4, 0, 4]
       }
