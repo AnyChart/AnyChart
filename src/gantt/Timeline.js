@@ -4780,7 +4780,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsProgress_ = function(dataItem, tot
         var progressWidth = this.limitProgressWidth_(/** @type {number} */ (progressValue), actualWidth, progressEl);
         var progressItemBounds = new anychart.math.Rect(actualBounds.left, actualBounds.top, progressWidth, actualBounds.height);
         var progressBounds = this.getBarBounds_(progressEl, progressItemBounds, dataItem);
-        var progressTag = this.createTag(dataItem, progressEl, actualBounds);
+        var progressTag = this.createTag(dataItem, progressEl, progressBounds);
         progressEl.rendering().callDrawer(dataItem, progressBounds, progressTag, void 0, isSelected);
         if (progressWidth) {
           this.drawStartEndMarkers_(dataItem, progressEl, progressBounds);
