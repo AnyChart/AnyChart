@@ -11,6 +11,7 @@ goog.require('anychart.core.reporting');
 goog.require('anychart.core.settings');
 goog.require('anychart.core.ui.Background');
 goog.require('anychart.core.ui.Text');
+goog.require('anychart.core.utils.InternalLabelsFormatters');
 goog.require('anychart.core.utils.Padding');
 goog.require('anychart.core.utils.TokenParser');
 goog.require('anychart.enums');
@@ -72,6 +73,7 @@ anychart.core.ui.LabelsFactory = function(opt_skipDefaultThemes) {
     'positionFormatter',
     'minFontSize',
     'maxFontSize',
+    'maxLength',
     'clip',
     'connectorStroke',
     'adjustFontSize',
@@ -2159,7 +2161,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.createSizeMeasureElement_ = funct
     this.factory_.dropCallsCache(this.getIndex());
     this.markConsistent(anychart.ConsistencyState.LABELS_FACTORY_CACHE);
   }
-  var text = this.factory_.callFormat(mergedSettings['format'], formatProvider, this.getIndex());
+  var text = this.getText(mergedSettings['format'], formatProvider, this.getIndex());
 
   if (!this.fontSizeMeasureElement_) {
     this.fontSizeMeasureElement_ = acgraph.text();
@@ -2377,7 +2379,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.isComplexText = function() {
   var isHtml = mergedSettings['useHtml'];
   var isTextByPath = this.textElement ? !!this.textElement.path() : false;
 
-  var text = String(this.factory_.callFormat(mergedSettings['format'], this.formatProvider(), this.getIndex()));
+  var text = String(this.getText(mergedSettings['format'], this.formatProvider(), this.getIndex()));
 
   text = goog.string.canonicalizeNewlines(goog.string.normalizeSpaces(text));
   var textArr = text.split(/\n/g);
@@ -2421,7 +2423,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.firstDraw = function() {
     }
 
     var mergedSettings = this.getMergedSettings();
-    var text = this.factory_.callFormat(mergedSettings['format'], this.formatProvider(), this.getIndex());
+    var text = this.getText(mergedSettings['format'], this.formatProvider(), this.getIndex());
     textElement.text(goog.isDef(text) ? String(text) : '');
     this.applyTextSettings(textElement, true, mergedSettings);
   }
@@ -2509,7 +2511,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.draw = function() {
     var isHtml = mergedSettings['useHtml'];
 
     var formatProvider = this.formatProvider();
-    var text = factory.callFormat(mergedSettings['format'], formatProvider, this.getIndex());
+    var text = this.getText(mergedSettings['format'], formatProvider, this.getIndex());
 
     this.layer_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
 
@@ -2817,7 +2819,34 @@ anychart.core.ui.LabelsFactory.Label.prototype.getTextElement = function() {
   return /** @type {!(acgraph.vector.Text|anychart.core.ui.Text)} */(this.textElement);
 };
 
+/**
+ * Call formatting functions on passed text value and return it.
+ *
+ * @param {string} text - Initial text value.
+ * @return {string} - Formatted text value.
+ */
+anychart.core.ui.LabelsFactory.Label.prototype.applyInternalTextFormatters = function (text) {
+  var mergedSettings = this.getMergedSettings();
+  var maxLength = mergedSettings['maxLength'];
 
+  text = anychart.core.utils.InternalLabelsFormatters.textLengthFormatter(text, maxLength);
+
+  return text;
+};
+
+/**
+ * Returns text value need to be displayed.
+ *
+ * @param {Function|string} formatter Text formatter function.
+ * @param {*} provider Provider for text formatter.
+ * @param {number=} opt_cacheIndex Label index.
+ * @return {string}
+ */
+anychart.core.ui.LabelsFactory.Label.prototype.getText = function(formatter, provider, opt_cacheIndex) {
+  var initialText = this.factory_.callFormat(formatter, provider, opt_cacheIndex);
+
+  return this.applyInternalTextFormatters(initialText);
+};
 //endregion
 //region --- Setup & Dispose
 /** @inheritDoc */
