@@ -77,7 +77,6 @@ anychart.exportsModule.offline.saveAsPdf = function(stage, svgDomElementOrDataUr
 
 /**
  * Renders svg on canvas and passes dataUrl to success callback.
- * @param {anychart.core.VisualBase} target
  * @param {Element} svgElement
  * @param {Object} args
  * @param {acgraph.vector.Stage.ExportType} fileType
@@ -86,7 +85,7 @@ anychart.exportsModule.offline.saveAsPdf = function(stage, svgDomElementOrDataUr
  * @param {Function} successCallback
  * @param {Function} failCallback
  */
-anychart.exportsModule.offline.renderSvgAsImage = function(target, svgElement, args, fileType, width, height, successCallback, failCallback) {
+anychart.exportsModule.offline.renderSvgAsImage = function(svgElement, args, fileType, width, height, successCallback, failCallback) {
   var mimeType;
   switch (fileType) {
     case acgraph.vector.Stage.ExportType.JPG:
@@ -155,7 +154,7 @@ anychart.exportsModule.offline.renderSvgAsImage = function(target, svgElement, a
 
 /**
  *
- * @param {anychart.core.VisualBase} target
+ * @param {acgraph.vector.Stage} stage
  * @param {Element} svgElement
  * @param {acgraph.vector.Stage.ExportType} fileType
  * @param {Object} args
@@ -164,9 +163,8 @@ anychart.exportsModule.offline.renderSvgAsImage = function(target, svgElement, a
  * @param {Function} successCallback
  * @param {Function} failCallback
  */
-anychart.exportsModule.offline.saveSvgToFileType = function(target, svgElement, fileType, args, width, height, successCallback, failCallback) {
+anychart.exportsModule.offline.saveSvgToFileType = function(stage, svgElement, fileType, args, width, height, successCallback, failCallback) {
   var fileName = args['filename'] || 'anychart';//last arg is always opt_filename
-  var stage = target.container().getStage();
 
   var hasImages = svgElement.getElementsByTagName('image').length > 0;
 
@@ -184,17 +182,17 @@ anychart.exportsModule.offline.saveSvgToFileType = function(target, svgElement, 
         successCallback();
         break;
       case acgraph.vector.Stage.ExportType.PNG:
-        anychart.exportsModule.offline.renderSvgAsImage(target, svgElement, args, fileType, width, height, saveDataUrl, failCallback);
+        anychart.exportsModule.offline.renderSvgAsImage(svgElement, args, fileType, width, height, saveDataUrl, failCallback);
         break;
       case acgraph.vector.Stage.ExportType.JPG:
-        anychart.exportsModule.offline.renderSvgAsImage(target, svgElement, args, fileType, width, height, saveDataUrl, failCallback);
+        anychart.exportsModule.offline.renderSvgAsImage(svgElement, args, fileType, width, height, saveDataUrl, failCallback);
         break;
       case acgraph.vector.Stage.ExportType.PDF:
         if (hasImages) {
           var saveAsPdfCallback = function(imageDataUrl) {
             anychart.exportsModule.offline.saveAsPdf(stage, imageDataUrl, args, successCallback, failCallback);
           };
-          anychart.exportsModule.offline.renderSvgAsImage(target, svgElement, args, fileType, width, height, saveAsPdfCallback, failCallback);
+          anychart.exportsModule.offline.renderSvgAsImage(svgElement, args, fileType, width, height, saveAsPdfCallback, failCallback);
         } else {
           anychart.exportsModule.offline.saveAsPdf(stage, svgElement, args, successCallback, failCallback);
         }
@@ -210,7 +208,7 @@ anychart.exportsModule.offline.saveSvgToFileType = function(target, svgElement, 
 
 /**
  *
- * @param {anychart.core.VisualBase} target
+ * @param {anychart.core.VisualBase|acgraph.vector.Stage} target
  * @param {acgraph.vector.Stage.ExportType} exportType
  * @param {Object} args these are arguments, that export module passes to stage.saveAs{Png,Jpg,Svg,Pdf} methods.
  * @param {Function} successCallback
@@ -222,7 +220,11 @@ anychart.exportsModule.offline.exportChartOffline = function(target, exportType,
         anychart.exports.isExternLoaded = true;
 
         var stageDomElementClone;
-        var stage = target.container().getStage();
+
+        var stage = acgraph.utils.instanceOf(target, acgraph.vector.Stage) ?
+            target :
+            target.container().getStage();
+
         var exportPixelWidth, exportPixelHeight;
         var paperSize = args['paperSize'];
         var landscape = args['landscape'];
@@ -262,7 +264,16 @@ anychart.exportsModule.offline.exportChartOffline = function(target, exportType,
         var images = stageDomElementClone.getElementsByTagName('image');
 
         var svgPrepared = function() {
-          anychart.exportsModule.offline.saveSvgToFileType(target, stageDomElementClone, exportType, args, exportPixelWidth, exportPixelHeight, successCallback, failCallback);
+          anychart.exportsModule.offline.saveSvgToFileType(
+              stage,
+              stageDomElementClone,
+              exportType,
+              args,
+              exportPixelWidth,
+              exportPixelHeight,
+              successCallback,
+              failCallback
+          );
         };
 
         var conversionSuccess = function() {
