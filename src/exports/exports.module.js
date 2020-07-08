@@ -103,17 +103,19 @@ anychart.exports.saveAsPng = function(target, container, opt_widthOrOptions, opt
 
     var failCallback = function(args) {
       if (clientside['fallback']) {
-        anychart.core.reporting.info('Offline export failed, falling back to server.');
+        anychart.core.reporting.warning(anychart.enums.WarningCode.OFFLINE_EXPORT_FAILED, null, [], true);
         stage.defaultSaveAsPng(args['width'], args['height'], args['quality'], args['filename']);
       } else {
-        anychart.core.reporting.info('Offline export failed, fallback to server disabled.');
+        anychart.core.reporting.warning(anychart.enums.WarningCode.OFFLINE_EXPORT_FAILED_SERVER_DISABLED, null, [], true);
       }
     };
 
     if (clientside['enabled']) {
       anychart.exportsModule.offline.exportChartOffline(target, acgraph.vector.Stage.ExportType.PNG, args, goog.nullFunction, failCallback);
-    } else {
+    } else if (clientside['fallback']) { // Only use export server if fallback enabled in clientside settings.
       stage.defaultSaveAsPng(args['width'], args['height'], args['quality'], args['filename']);
+    } else {
+      anychart.core.reporting.warning(anychart.enums.WarningCode.OFFLINE_AND_SERVER_EXPORT_DISABLED, null, [], true);
     }
   }
 };
@@ -162,17 +164,19 @@ anychart.exports.saveAsJpg = function(target, container, opt_widthOrOptions, opt
 
     var failCallback = function(args) {
       if (clientside['fallback']) {
-        anychart.core.reporting.info('Offline export failed, falling back to server.');
+        anychart.core.reporting.warning(anychart.enums.WarningCode.OFFLINE_EXPORT_FAILED, null, [], true);
         stage.defaultSaveAsJpg(args['width'], args['height'], args['quality'], args['forceTransparentWhite'], args['filename']);
       } else {
-        anychart.core.reporting.info('Offline export failed, fallback to server disabled.');
+        anychart.core.reporting.warning(anychart.enums.WarningCode.OFFLINE_EXPORT_FAILED_SERVER_DISABLED, null, [], true);
       }
     };
 
     if (clientside['enabled']) {
       anychart.exportsModule.offline.exportChartOffline(target, acgraph.vector.Stage.ExportType.JPG, args, goog.nullFunction, failCallback);
-    } else {
+    } else if (clientside['fallback']) { // Only use export server if fallback enabled in clientside settings.
       stage.defaultSaveAsJpg(args['width'], args['height'], args['quality'], args['forceTransparentWhite'], args['filename']);
+    } else {
+      anychart.core.reporting.warning(anychart.enums.WarningCode.OFFLINE_AND_SERVER_EXPORT_DISABLED, null, [], true);
     }
   }
 };
@@ -223,17 +227,19 @@ anychart.exports.saveAsPdf = function(target, container, opt_paperSizeOrWidthOrO
 
     var failCallback = function(args) {
       if (clientside['fallback']) {
-        anychart.core.reporting.info('Offline export failed, falling back to server.');
+        anychart.core.reporting.warning(anychart.enums.WarningCode.OFFLINE_EXPORT_FAILED, null, [], true);
         stage.defaultSaveAsPdf(args['paperSize'] || args['width'], args['landscape'] || args['height'], args['x'], args['y'], args['filename']);
       } else {
-        anychart.core.reporting.info('Offline export failed, fallback to server disabled.');
+        anychart.core.reporting.warning(anychart.enums.WarningCode.OFFLINE_EXPORT_FAILED_SERVER_DISABLED, null, [], true);
       }
     };
 
     if (clientside['enabled']) {
       anychart.exportsModule.offline.exportChartOffline(target, acgraph.vector.Stage.ExportType.PDF, args, goog.nullFunction, failCallback);
-    } else {
+    } else if (clientside['fallback']) { // Only use export server if fallback enabled in clientside settings.
       stage.defaultSaveAsPdf(args['paperSize'] || args['width'], args['landscape'] || args['height'], args['x'], args['y'], args['filename']);
+    } else {
+      anychart.core.reporting.warning(anychart.enums.WarningCode.OFFLINE_AND_SERVER_EXPORT_DISABLED, null, [], true);
     }
   }
 };
@@ -280,17 +286,19 @@ anychart.exports.saveAsSvg = function(target, container, opt_paperSizeOrWidthOrO
 
     var failCallback = function(args) {
       if (clientside['fallback']) {
-        anychart.core.reporting.info('Offline export failed, falling back to server.');
+        anychart.core.reporting.warning(anychart.enums.WarningCode.OFFLINE_EXPORT_FAILED, null, [], true);
         stage.defaultSaveAsSvg(args['paperSize'] || args['width'], args['landscape'] || args['height'], args['filename']);
       } else {
-        anychart.core.reporting.info('Offline export failed, fallback to server disabled.');
+        anychart.core.reporting.warning(anychart.enums.WarningCode.OFFLINE_EXPORT_FAILED_SERVER_DISABLED, null, [], true);
       }
     };
 
     if (clientside['enabled']) {
       anychart.exportsModule.offline.exportChartOffline(target, acgraph.vector.Stage.ExportType.SVG, args, goog.nullFunction, failCallback);
-    } else {
+    } else if (clientside['fallback']) { // Only use export server if fallback enabled in clientside settings.
       stage.defaultSaveAsSvg(args['paperSize'] || args['width'], args['landscape'] || args['height'], args['filename']);
+    } else {
+      anychart.core.reporting.warning(anychart.enums.WarningCode.OFFLINE_AND_SERVER_EXPORT_DISABLED, null, [], true);
     }
   }
 };
