@@ -240,6 +240,7 @@ anychart.timelineModule.Chart.prototype.rangeMarker = function(opt_indexOrValue,
     rangeMarker.setChart(this);
     rangeMarker.setDefaultLayout(anychart.enums.Layout.VERTICAL);
     this.rangeAxesMarkers_[index] = rangeMarker;
+    rangeMarker.setParentEventTarget(this);
     rangeMarker.listenSignals(this.markerInvalidated_, this);
     rangeMarker.addOnDisposeCallback(this.markerDisposed_, this);
     this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
@@ -292,6 +293,7 @@ anychart.timelineModule.Chart.prototype.textMarker = function(opt_indexOrValue, 
     textMarker.setChart(this);
     textMarker.setDefaultLayout(anychart.enums.Layout.VERTICAL);
     this.textAxesMarkers_[index] = textMarker;
+    textMarker.setParentEventTarget(this);
     textMarker.listenSignals(this.markerInvalidated_, this);
     textMarker.addOnDisposeCallback(this.markerDisposed_, this);
     this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
@@ -343,6 +345,7 @@ anychart.timelineModule.Chart.prototype.lineMarker = function(opt_indexOrValue, 
     lineMarker.setChart(this);
     lineMarker.setDefaultLayout(anychart.enums.Layout.VERTICAL);
     this.lineAxesMarkers_[index] = lineMarker;
+    lineMarker.setParentEventTarget(this);
     lineMarker.listenSignals(this.markerInvalidated_, this);
     lineMarker.addOnDisposeCallback(this.markerDisposed_, this);
     this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
@@ -403,6 +406,7 @@ anychart.timelineModule.Chart.prototype.todayMarker = function(opt_value) {
 
     this.todayMarker_.setChart(this);
     this.todayMarker_.setDefaultLayout(anychart.enums.Layout.VERTICAL);
+    this.todayMarker_.setParentEventTarget(this);
     this.todayMarker_.listenSignals(this.markerInvalidated_, this);
     this.todayMarker_.addOnDisposeCallback(this.markerDisposed_, this);
     var curDate = new Date();

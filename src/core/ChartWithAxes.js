@@ -728,6 +728,7 @@ anychart.core.ChartWithAxes.prototype.lineMarker = function(opt_indexOrValue, op
     lineMarker.setChart(this);
     lineMarker.setDefaultLayout(this.isVertical() ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
     this.lineAxesMarkers_[index] = lineMarker;
+    lineMarker.setParentEventTarget(this);
     lineMarker.listenSignals(this.onMarkersSignal, this);
     this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES_MARKERS | anychart.ConsistencyState.SCALE_CHART_SCALES_STATISTICS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -777,6 +778,7 @@ anychart.core.ChartWithAxes.prototype.rangeMarker = function(opt_indexOrValue, o
     rangeMarker.setChart(this);
     rangeMarker.setDefaultLayout(this.isVertical() ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
     this.rangeAxesMarkers_[index] = rangeMarker;
+    rangeMarker.setParentEventTarget(this);
     rangeMarker.listenSignals(this.onMarkersSignal, this);
     this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES_MARKERS | anychart.ConsistencyState.SCALE_CHART_SCALES_STATISTICS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -827,6 +829,7 @@ anychart.core.ChartWithAxes.prototype.textMarker = function(opt_indexOrValue, op
     textMarker.setChart(this);
     textMarker.setDefaultLayout(this.isVertical() ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
     this.textAxesMarkers_[index] = textMarker;
+    textMarker.setParentEventTarget(this);
     textMarker.listenSignals(this.onMarkersSignal, this);
     this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES_MARKERS | anychart.ConsistencyState.SCALE_CHART_SCALES_STATISTICS, anychart.Signal.NEEDS_REDRAW);
   }
