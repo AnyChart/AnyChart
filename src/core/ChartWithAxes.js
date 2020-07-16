@@ -849,7 +849,8 @@ anychart.core.ChartWithAxes.prototype.textMarker = function(opt_indexOrValue, op
  * @protected
  */
 anychart.core.ChartWithAxes.prototype.onMarkersSignal = function(event) {
-  var state = anychart.ConsistencyState.AXES_CHART_AXES_MARKERS;
+  // Invalidate chart series because need to recalculate label position dropped in calculate method call.
+  var state = anychart.ConsistencyState.AXES_CHART_AXES_MARKERS | anychart.ConsistencyState.SERIES_CHART_SERIES;
   if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION))
     state |= anychart.ConsistencyState.SCALE_CHART_SCALES | anychart.ConsistencyState.SCALE_CHART_Y_SCALES;
   this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
