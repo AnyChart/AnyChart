@@ -2898,11 +2898,23 @@ anychart.utils.STYLE_EXCEPTIONS_ = {
 
 /**
  * Converts style object to DOM-attribute style string.
+ *
  * @param {Object} obj - Settings object.
+ *
  * @return {string} - Style string.
  */
 anychart.utils.toStyleString = function(obj) {
   var result = '';
+
+  if (obj['textOverflow'] == '...') {
+    obj['textOverflow'] = 'ellipsis';
+  }
+
+  var fontSize = obj['fontSize'];
+  if (goog.isNumber(fontSize)) {
+    obj['fontSize'] = fontSize.toString()+'px';
+  }
+
   for (var key in obj) {
     var selCase = anychart.utils.STYLE_EXCEPTIONS_[key] || goog.string.toSelectorCase(key);
     result += (selCase + ': ' + obj[key] + ';');
