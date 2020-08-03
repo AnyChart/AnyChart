@@ -24,8 +24,8 @@ anychart.waterfallModule.Chart = function() {
   this.setType(anychart.enums.ChartTypes.WATERFALL);
 
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
-    ['dataMode', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
-    ['connectorStroke', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW]
+    ['dataMode', anychart.ConsistencyState.SERIES_CHART_SERIES | anychart.ConsistencyState.SCALE_CHART_SCALES | anychart.ConsistencyState.SCALE_CHART_Y_SCALES, anychart.Signal.NEEDS_REDRAW],
+    ['connectorStroke', anychart.ConsistencyState.SERIES_CHART_SERIES, anychart.Signal.NEEDS_REDRAW]
   ]);
 };
 goog.inherits(anychart.waterfallModule.Chart, anychart.core.CartesianBase);
