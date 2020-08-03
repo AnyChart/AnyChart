@@ -215,7 +215,7 @@ anychart.polarModule.Grid.prototype.drawInternal = function() {
       if (i == ticksArrLen - 1) {
         if (isOrdinal) {
           this.drawInterlaceCircuit(ratio, prevRatio, path);
-          path = this.getFillElement(i - 1);
+          path = this.getFillElement(i);
           this.drawInterlaceCircuit(yScale.transform(rightTick, 1), ratio, path);
           this.drawLineCircuit(ratio);
           if (this.getOption('drawLastLine'))
