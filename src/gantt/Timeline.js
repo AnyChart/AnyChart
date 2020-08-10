@@ -320,6 +320,7 @@ anychart.ganttModule.TimeLine = function(opt_controller, opt_isResources) {
    */
   this.scale_ = new anychart.scales.GanttDateTime();
   this.scale_.listenSignals(this.scaleInvalidated_, this);
+  this.scale_.boundsProvider(this);
 
   /**
    *
@@ -1802,13 +1803,16 @@ anychart.ganttModule.TimeLine.prototype.scale = function(opt_value) {
  */
 anychart.ganttModule.TimeLine.prototype.scaleInvalidated_ = function(event) {
   var state = 0;
+
   if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION)) {
     state |= anychart.ConsistencyState.TIMELINE_SCALES | anychart.ConsistencyState.TIMELINE_MARKERS;
   }
+
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
     // Calendar settings has been changed.
     state |= anychart.ConsistencyState.TIMELINE_CALENDAR;
   }
+
   this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
 };
 
@@ -5629,14 +5633,16 @@ anychart.ganttModule.TimeLine.prototype.initScale = function() {
   this.scale_.trackedDataMax = dataMax;
 
   if (newScale && !isNaN(dataMin) && !isNaN(dataMax)) {
-    if (this.scale_.needsFitAll) {//If scale demands fit all - we call it.
+    if (this.scale_.needsFitAll) { // If scale demands fit all - we call it.
       this.scale_.fitAll();
-      this.scale_.needsFitAll = false;
-    } else if (this.scale_.needsZoomTo) {//If zoomTo was called on hidden container.
+    } else if (this.scale_.needsZoomTo) { // If zoomTo was called on hidden container.
       this.scale_.zoomTo.apply(this.scale_, this.scale_.neededZoomToArgs);
       this.scale_.needsZoomTo = false;
       this.scale_.neededZoomToArgs = null;
-    } else {// Or apply default zoom.
+    } else if (this.scale_.needsReapplyGaps) { // Before draw pixel gapping case.
+      this.scale_.reapplyGaps();
+    } else {
+      // Apply default zoom.
       var totalRange = this.scale_.getTotalRange();
       var newRange = Math.round((totalRange['max'] - totalRange['min']) / 10);
       this.scale_.zoomTo(totalRange['min'], totalRange['min'] + newRange); //Initial visible range: 10% of total range.

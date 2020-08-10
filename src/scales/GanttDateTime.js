@@ -118,17 +118,25 @@ anychart.scales.GanttDateTime = function() {
 
   /**
    * Minimum gap.
-   * @type {number}
+   *
+   * @type {anychart.scales.GanttDateTime.Gap}
    * @private
    */
-  this.minimumGap_ = .01;
+  this.minimumGap_ = {
+    'value': .01,
+    'isPixels': false
+  };
 
   /**
    * Maximum gap.
-   * @type {number}
+   *
+   * @type {anychart.scales.GanttDateTime.Gap}
    * @private
    */
-  this.maximumGap_ = .01;
+  this.maximumGap_ = {
+    'value': .01,
+    'isPixels': false
+  };
 
   /**
    * Current date. Used for this.timestampToRatio('current') to make this method return the same on different calls.
@@ -192,6 +200,15 @@ anychart.scales.GanttDateTime = function() {
    * @private
    */
   this.calendar_ = null;
+
+  /**
+   * Entity that provides an ability to ask provider.getPixelBounds().width
+   * for pixel-gapping purposes.
+   *
+   * @type {?anychart.core.VisualBaseWithBounds}
+   * @private
+   */
+  this.boundsProvider_ = null;
 };
 goog.inherits(anychart.scales.GanttDateTime, anychart.core.Base);
 
@@ -232,12 +249,21 @@ anychart.scales.GanttDateTime.LevelData;
 
 /**
  * @typedef {{
- *  start:number,
- *  end:number,
- *  holiday:(boolean|undefined)
+ *  start: number,
+ *  end: number,
+ *  holiday: (boolean|undefined)
  * }}
  */
 anychart.scales.GanttDateTime.Tick;
+
+
+/**
+ * @typedef {{
+ *  value: number,
+ *  isPixels: boolean
+ * }}
+ */
+anychart.scales.GanttDateTime.Gap;
 
 
 //endregion
@@ -305,6 +331,82 @@ anychart.scales.GanttDateTime.prototype.getType = function() {
   return anychart.enums.ScaleTypes.GANTT;
 };
 
+/**
+ * Gets/sets this.boundsProvider_. @see this.boundsProvider_ description.
+ * Must be set anyway and set before any scale calculations.
+ *
+ * @param {?anychart.core.VisualBaseWithBounds=} opt_value - Provider to be set.
+ * @return {?anychart.core.VisualBaseWithBounds|anychart.scales.GanttDateTime} - Current provider
+ *  or itself for chaining.
+ */
+anychart.scales.GanttDateTime.prototype.boundsProvider = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.boundsProvider_ !== opt_value) {
+      if (goog.isNull(opt_value)) { // this.boundsProvider_ is not null here.
+        this.boundsProvider_.unlistenSignals(this.boundsProviderInvalidated_, this);
+        this.boundsProvider_ = null;
+      } else {
+        if (this.boundsProvider_) {
+          this.boundsProvider_.unlistenSignals(this.boundsProviderInvalidated_, this);
+        }
+        this.boundsProvider_ = opt_value;
+        this.boundsProvider_.listenSignals(this.boundsProviderInvalidated_, this);
+      }
+    }
+    return this;
+  }
+  return this.boundsProvider_;
+};
+
+
+/**
+ * Handler of bounds changed.
+ *
+ * @param {anychart.SignalEvent} e - .
+ * @private
+ */
+anychart.scales.GanttDateTime.prototype.boundsProviderInvalidated_ = function(e) {
+  if (e.hasSignal(anychart.Signal.BOUNDS_CHANGED) && !this.isEmpty() && this.hasPixelGaps_()) {
+    var isMinReached = this.minReached_();
+    var isMaxReached = this.maxReached_();
+    var isPixelMinGap = this.minimumGap_['isPixels'];
+    var isPixelMaxGap = this.maximumGap_['isPixels'];
+    var width = this.boundsProvider_.getPixelBounds().width;
+
+    var newMsGap;
+    var limitedGap;
+
+    // @see detailed math description in DVF-4444.
+    if (isMinReached && isMaxReached) {
+      this.fitAll();
+    } else if (isMinReached && isPixelMinGap) {
+      limitedGap = this.limitPixelGap_(this.minimumGap_['value'], width);
+      newMsGap = (limitedGap * (this.max_ - this.dataMin_) / (width - limitedGap)) || 0;
+      this.min_ = this.dataMin_ - newMsGap;
+      this.totalMin_ = this.min_;
+      if (isPixelMaxGap) {
+        var limitedMaxGap = this.getMsGap_(this.max_ - this.min_, this.maximumGap_);
+        this.totalMax_ = this.dataMax_ + limitedMaxGap;
+      }
+      this.consistent = true;
+    } else if (isMaxReached && isPixelMaxGap) {
+      limitedGap = this.limitPixelGap_(this.maximumGap_['value'], width);
+      newMsGap = (limitedGap * (this.dataMax_ - this.min_) / (width - limitedGap)) || 0;
+      this.max_ = this.dataMax_ + newMsGap;
+      this.totalMax_ = this.max_;
+      if (isPixelMinGap) {
+        var limitedMinGap = this.getMsGap_(this.max_ - this.min_, this.minimumGap_);
+        this.totalMin_ = this.dataMin_ - limitedMinGap;
+      }
+      this.consistent = true;
+    } else {
+      this.resetLimitsByGaps_();
+    }
+
+    this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
+  }
+};
+
 
 /**
  * Whether scale is not configured.
@@ -356,6 +458,7 @@ anychart.scales.GanttDateTime.prototype.setRange = function(min, max) {
   min = anychart.utils.normalizeTimestamp(min);
   max = anychart.utils.normalizeTimestamp(max);
   if ((this.min_ != min || this.max_ != max) && !isNaN(max) && !isNaN(min)) {
+    this.resetLimitsByGaps_();
     this.min_ = min;
     this.max_ = max;
     this.consistent = false;
@@ -390,19 +493,195 @@ anychart.scales.GanttDateTime.prototype.setDataRange = function(min, max) {
 
 
 /**
+ * Calculates total min/max on both pixel gaps for fitAll() case.
+ *
+ * A mathematical explanation:
+ *
+ *
+ *    .<------------------ timeline pixel width ------------------>.
+ *    .                                                            .
+ *    .<-min pixel gap ->.                       .<-max pixel gap->.
+ *    .                  .                       .                 .
+ *    .                  .                       .                 .
+ *    +----------------------timenline area------------------------+
+ *    |                  .                       .                 |
+ *    |                  .                       .                 |
+ *    |                  +-----------------------+                 |
+ *    |<---min ms gap--->| total data range (ms) |<---max ms gap-->|
+ *    |                  +-----------------------+                 |
+ *    |                                                            |
+ *    +------------------------------------------------------------|
+ *
+ *    Let's put
+ *      g1 = min pixel gap (pixels)
+ *      g2 = max pixel gap (pixels)
+ *      w = timeline width (pixels)
+ *      r = total data range (milliseconds)
+ *
+ *    Needs to find:
+ *      m1 = min ms gap (milliseconds)
+ *      m2 = max ms gap (milliseconds)
+ *
+ *    First correct system of proportions:
+ *
+ *      w - g1 - g2         r
+ *      -----------  =  -----------
+ *           w          r + m1 + m2
+ *
+ *      w - g2       r + m1
+ *      ------  =  -----------
+ *        w        r + m1 + m2
+ *
+ *     Solving this we can get
+ *
+ *      +---------------------------------------+
+ *      | m1 = r * g1 / (w - g1 - g2)           | (1)
+ *      +---------------------------------------+
+ *
+ *
+ *     Second correct system of proportions:
+ *
+ *      w - g1 - g2         r
+ *      -----------  =  -----------
+ *           w          r + m1 + m2
+ *
+ *      w - g2       r + m2
+ *      ------  =  -----------
+ *        w        r + m1 + m2
+ *
+ *     Solving this we can get
+ *
+ *      +---------------------------------------+
+ *      | m2 = r * g2 / (w - g1 - g2)           | (2)
+ *      +---------------------------------------+
+ *
+ *
+ * DEV NOTE: This method is named by existing name 'getTotalRange'.
+ *
+ * @private
+ */
+anychart.scales.GanttDateTime.prototype.getBothPixelGapsTotals_ = function() {
+  var w = this.boundsProvider_.getPixelBounds().width;
+  var g1 = this.limitPixelGap_(this.minimumGap_['value'], w);
+  var g2 = this.limitPixelGap_(this.maximumGap_['value'], w);
+  var r = this.dataMax_ - this.dataMin_;
+
+  if (isNaN(this.manualMin_)) {
+    if (isNaN(this.softMin_)) {
+      var m1 = r * g1 / (w - g1 - g2); // (1) Left as is to look like math in description.
+
+      /*
+         This code prevents the following cases:
+           - if width is zero and gap is normalized to zero, 0/0 gives NaN.
+           - for some cases totalMin_ can be more than totalMax_. It is basically unacceptable.
+        */
+      m1 = Math.max(m1, 0) || 0;
+      this.totalMin_ = Math.round(this.dataMin_ - m1);
+    } else {
+      this.totalMin_ = Math.min(this.softMin_, this.dataMin_);
+    }
+  } else {
+    this.totalMin_ = this.manualMin_;
+  }
+
+  if (isNaN(this.manualMax_)) {
+    if (isNaN(this.softMax_)) {
+      var m2 = r * g2 / (w - g1 - g2); // (2) Left as is to look like math in description.
+      /*
+        This code prevents the following cases:
+        - if width is zero and gap is normalized to zero, 0/0 gives NaN.
+        - for some cases totalMin_ can be more than totalMax_. It is basically unacceptable.
+      */
+      m2 = Math.max(m2, 0) || 0;
+      this.totalMax_ = Math.round(this.dataMax_ + m2);
+    } else {
+      this.totalMax_ = Math.max(this.softMax_, this.dataMax_);
+    }
+  } else {
+    this.totalMax_ = this.manualMax_;
+  }
+};
+
+
+/**
+ * Calculates new total min/max for fitAll() case.
+ * Used for case when one gap is 'pixels', another one is 'percents'.
+ *
+ * DEV NOTE: This method is named by existing name 'getTotalRange'.
+ * DEV NOTE 2: Must be used for fitAll() only.
+ *
+ * @param {boolean} isMin - Whether to deal with case when pixels gap is minimum gap. Maximum gap otherwise.
+ * @private
+ */
+anychart.scales.GanttDateTime.prototype.getPartialGapsTotals_ = function(isMin) {
+  var pixelsGap = isMin ? this.minimumGap_ : this.maximumGap_;
+  var percentsGap = isMin ? this.maximumGap_ : this.minimumGap_;
+  var width = this.boundsProvider_.getPixelBounds().width;
+
+  var range = this.dataMax_ - this.dataMin_;
+  var percentsGapMs = range * percentsGap['value'];
+  var pixelsGapValue = this.limitPixelGap_(pixelsGap['value'], width);
+
+  // This calculates correct ms value and prevents case when timeline zero width gives NaN on division.
+  var pixelsGapMs = (pixelsGapValue * (range + percentsGapMs) / (width - pixelsGapValue)) || 0;
+
+  if (isNaN(this.manualMin_)) {
+    if (isNaN(this.softMin_)) {
+      this.totalMin_ = isMin ? this.dataMin_ - pixelsGapMs : this.dataMin_ - percentsGapMs;
+    } else {
+      this.totalMin_ = Math.min(this.softMin_, this.dataMin_);
+    }
+  } else {
+    this.totalMin_ = this.manualMin_;
+  }
+
+  if (isNaN(this.manualMax_)) {
+    if (isNaN(this.softMax_)) {
+      this.totalMax_ = isMin ? this.dataMax_ + percentsGapMs : this.dataMax_ + pixelsGapMs;
+    } else {
+      this.totalMax_ = Math.max(this.softMax_, this.dataMax_);
+    }
+  } else {
+    this.totalMax_ = this.manualMax_;
+  }
+};
+
+
+/**
  * Fits scale to its total range.
+ *
  * @return {anychart.scales.GanttDateTime} - Itself for method chaining.
  */
 anychart.scales.GanttDateTime.prototype.fitAll = function() {
-  if (!this.isEmpty()) {
-    var range = this.getTotalRange();
-    return this.setRange(range['min'], range['max']);
-  } else {
+  if (this.isEmpty()) {
     /*
      * We save our intention to fit scale until scale is initialized.
      * See anychart.ganttModule.TimeLine.prototype.initScale.
      */
     this.needsFitAll = true;
+  } else {
+    this.needsFitAll = false;
+
+    var isPixelMinGap = this.minimumGap_['isPixels'];
+    var isPixelMaxGap = this.maximumGap_['isPixels'];
+
+    if (isPixelMinGap && isPixelMaxGap) {
+      this.getBothPixelGapsTotals_();
+    } else if (isPixelMinGap) {
+      this.getPartialGapsTotals_(true);
+    } else if (isPixelMaxGap) {
+      this.getPartialGapsTotals_(false);
+    } else {
+      this.getTotalRange();
+    }
+
+    // Code below skips this.calculate() and used instead of this.setRange();
+    this.min_ = this.totalMin_;
+    this.max_ = this.totalMax_;
+    this.consistent = true;
+    this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
+
+    return this;
   }
   return this;
 };
@@ -417,6 +696,8 @@ anychart.scales.GanttDateTime.prototype.fitAll = function() {
 anychart.scales.GanttDateTime.prototype.zoomIn = function(opt_zoomFactor, opt_ratio) {
   var factor = 1 / (opt_zoomFactor || anychart.scales.GanttDateTime.DEFAULT_ZOOM_FACTOR);
   var ratio = goog.isDef(opt_ratio) ? opt_ratio : 0.5;
+
+  this.resetLimitsByGaps_();
 
   if (!this.isEmpty()) {
     var range = this.max_ - this.min_;
@@ -452,6 +733,8 @@ anychart.scales.GanttDateTime.prototype.zoomOut = function(opt_zoomFactor, opt_r
   var factor = opt_zoomFactor || anychart.scales.GanttDateTime.DEFAULT_ZOOM_FACTOR;
   var ratio = goog.isDef(opt_ratio) ? opt_ratio : 0.5;
 
+  this.resetLimitsByGaps_();
+
   if (!this.minReached_() || !this.maxReached_()) {
     /*
       Determinate how many milliseconds we must cut or add to each side of range to do zoom with correct ratio.
@@ -464,9 +747,30 @@ anychart.scales.GanttDateTime.prototype.zoomOut = function(opt_zoomFactor, opt_r
 
     this.getTotalRange();
 
+    if (this.hasPixelGaps_()) {
+      var widthPx = this.boundsProvider_.getPixelBounds().width;
+
+      var limitedGapPx;
+      var pixelGapRatio;
+
+      if (this.minimumGap_['isPixels']) {
+        limitedGapPx = this.limitPixelGap_(this.minimumGap_['value'], widthPx);
+        pixelGapRatio = limitedGapPx / widthPx || 0; // Prevents 0/0 = NaN.
+        var newMinGap = Math.round(pixelGapRatio * (newMax - newMin));
+        this.totalMin_ = this.dataMin_ - newMinGap;
+      }
+
+      if (this.maximumGap_['isPixels']) {
+        limitedGapPx = this.limitPixelGap_(this.maximumGap_['value'], widthPx);
+        pixelGapRatio = limitedGapPx / widthPx || 0;  // Prevents 0/0 = NaN.
+        var newMaxGap = Math.round(pixelGapRatio * (newMax - newMin));
+        this.totalMax_ = this.dataMax_ + newMaxGap;
+      }
+    }
+
     if (newMin < this.totalMin_ || newMax > this.totalMax_) {
-      if (newMin < this.totalMin_ && newMax > this.totalMax_) { //Total range overflow.
-        this.setRange(this.totalMin_, this.totalMax_);
+      if (newMin < this.totalMin_ && newMax > this.totalMax_) { // Total range overflow.
+        this.fitAll();
         return this;
       }
 
@@ -488,23 +792,18 @@ anychart.scales.GanttDateTime.prototype.zoomOut = function(opt_zoomFactor, opt_r
 
 
 /**
- * Zooms to the dates set.
- * Note:
- *  1) Start can't be set less than total start date, as well as end date can't be set more than total max.
- *  2) If end date is not set, current visible range will be used to calculate end.
- *  3) If start is less than total start, total min will be used as start, the range will be saved.
- *  4) If end is set more than total end, total max will be used as end, that range will be saved.
- *  5) In all this cases, this method can be used as safe scroller and zoomer.
- *  TODO (A.Kudryavtsev): Pretty bad english, fix this.
+ * Regular zoomTo without pixel gaps.
  *
  * @param {number|anychart.enums.Interval} startOrUnit - Start date timestamp or interval unit.
  * @param {number=} opt_endOrCount - End date timestamp or interval units count.
  * @param {anychart.enums.GanttRangeAnchor=} opt_anchor - Anchor to zoom from.
  * @return {anychart.scales.GanttDateTime} - Itself for method chaining.
+ * @private
  */
-anychart.scales.GanttDateTime.prototype.zoomTo = function(startOrUnit, opt_endOrCount, opt_anchor) {
+anychart.scales.GanttDateTime.prototype.regularZoomTo_ = function(startOrUnit, opt_endOrCount, opt_anchor) {
   var range;
   var start, end;
+
   this.calculate();
   if (goog.isString(startOrUnit)) {
     if (opt_endOrCount === 0) {
@@ -576,6 +875,127 @@ anychart.scales.GanttDateTime.prototype.zoomTo = function(startOrUnit, opt_endOr
   }
 
   return this.setRange(start, end);
+};
+
+
+/**
+ * Regular zoomTo with pixel gaps.
+ *
+ * @param {number} start - Start date timestamp.
+ * @param {number} end - End date timestamp.
+ * @return {anychart.scales.GanttDateTime} - Itself for method chaining.
+ * @private
+ */
+anychart.scales.GanttDateTime.prototype.gapsZoomTo_ = function(start, end) {
+  var isPixelMinGap = this.minimumGap_['isPixels'];
+  var isPixelMaxGap = this.maximumGap_['isPixels'];
+
+  // Defining totalMin and totalMax for fitAll() case.
+  if (isPixelMinGap && isPixelMaxGap) {
+    this.getBothPixelGapsTotals_();
+  } else if (isPixelMinGap) {
+    this.getPartialGapsTotals_(true);
+  } else if (isPixelMaxGap) {
+    this.getPartialGapsTotals_(false);
+  }
+
+  // Dummy is because totalMin and totalMax will be probably redefined.
+  var dummyTotalRange = this.totalMax_ - this.totalMin_;
+
+  var dataRange = this.dataMax_ - this.dataMin_;
+
+  var range = end - start;
+
+  if (range >= dummyTotalRange) {
+    // Code below skips this.calculate() and used instead of this.setRange();
+    this.min_ = this.totalMin_;
+    this.max_ = this.totalMax_;
+  } else {
+    // This record is dummy as well because this.min_ and this.max_ will be probably redefined.
+    this.min_ = Math.min(start, end);
+    this.max_ = Math.max(start, end);
+    var minMsGap = this.getMsGap_(dataRange, this.minimumGap_);
+    var maxMsGap = this.getMsGap_(dataRange, this.maximumGap_);
+
+    var predictedTotalMin;
+    var predictedTotalMax;
+
+    if (isNaN(this.manualMin_)) {
+      if (isNaN(this.softMin_)) {
+        predictedTotalMin = this.dataMin_ - minMsGap;
+      } else {
+        predictedTotalMin = Math.min(this.softMin_, this.dataMin_);
+      }
+    } else {
+      predictedTotalMin = this.manualMin_;
+    }
+
+    if (isNaN(this.manualMax_)) {
+      if (isNaN(this.softMax_)) {
+        predictedTotalMax = this.dataMax_ + maxMsGap;
+      } else {
+        predictedTotalMax = Math.max(this.softMax_, this.dataMax_);
+      }
+    } else {
+      predictedTotalMax = this.manualMax_;
+    }
+
+    if (start < predictedTotalMin) {
+      this.min_ = predictedTotalMin;
+      this.max_ = this.min_ + range;
+    } else if (end > predictedTotalMax) { // else-condition can be used here because range < dummyTotalRange.
+      this.max_ = predictedTotalMax;
+      this.min_ = this.max_ - range;
+    } else {
+      // this.min_ and this.max_ here are already correct.
+    }
+
+  }
+
+  this.totalMin_ = /** @type {number} */ (predictedTotalMin);
+  this.totalMax_ = /** @type {number} */ (predictedTotalMax);
+  this.consistent = true;
+
+  if (this.isEmpty()) {
+    /*
+     * We save our intention to zoom, until scale is initialized.
+     * See anychart.ganttModule.TimeLine.prototype.initScale.
+     */
+    this.needsZoomTo = true;
+    this.neededZoomToArgs = [start, end];
+  }
+
+  this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
+  return this;
+};
+
+
+/**
+ * Zooms to the dates set.
+ * Note:
+ *  1) Start can't be set less than total start date, as well as end date can't be set more than total max.
+ *  2) If end date is not set, current visible range will be used to calculate end.
+ *  3) If start is less than total start, total min will be used as start, the range will be saved.
+ *  4) If end is set more than total end, total max will be used as end, that range will be saved.
+ *  5) In all this cases, this method can be used as safe scroller and zoomer.
+ *  TODO (A.Kudryavtsev): Pretty bad english, fix this.
+ *
+ * @param {number|anychart.enums.Interval} startOrUnit - Start date timestamp or interval unit.
+ * @param {number=} opt_endOrCount - End date timestamp or interval units count.
+ * @param {anychart.enums.GanttRangeAnchor=} opt_anchor - Anchor to zoom from.
+ * @return {anychart.scales.GanttDateTime} - Itself for method chaining.
+ */
+anychart.scales.GanttDateTime.prototype.zoomTo = function(startOrUnit, opt_endOrCount, opt_anchor) {
+  /*
+     TODO (A.Kudryavtsev):
+     - Does not support pixel gap with anchoring feature for a while.
+     - Also does not support case with undefined end for a while.
+   */
+  if (this.hasPixelGaps_() && goog.isNumber(startOrUnit) && goog.isNumber(opt_endOrCount)) {
+    return this.gapsZoomTo_(/** @type {number} */ (startOrUnit), /** @type {number} */ (opt_endOrCount));
+  } else {
+    return this.regularZoomTo_(startOrUnit, opt_endOrCount, opt_anchor);
+  }
 };
 
 
@@ -765,19 +1185,89 @@ anychart.scales.GanttDateTime.prototype.getRange = function() {
   return this.isEmpty() ? this.getEmptyRange() : {'min': this.min_, 'max': this.max_};
 };
 
+/**
+ * Limits pixel gap in correct way:
+ *  - Resulting gap can't be negative.
+ *  - Width can be 0 or have another unacceptable value.
+ *
+ * @param {number} value - Pixel gap value.
+ * @param {number} width - Timeline pixel width.
+ * @return {number} - Limited gap pixel value.
+ * @private
+ */
+anychart.scales.GanttDateTime.prototype.limitPixelGap_ = function(value, width) {
+  if (width > 0) {
+    var limitedGapPx = Math.min(Math.floor(width / 2) - 1, value);
+    return Math.max(limitedGapPx, 0);
+  }
+
+  return 0;
+};
+
+
+/**
+ * Turns any gap to milliseconds value.
+ *
+ * @param {number} range - Range to calculate from.
+ * @param {anychart.scales.GanttDateTime.Gap} gap - Gap to calculate from.
+ * @return {number} - Milliseconds gap from range and gap settings.
+ * @private
+ */
+anychart.scales.GanttDateTime.prototype.getMsGap_ = function(range, gap) {
+  var value = gap['value'];
+
+  if (gap['isPixels']) {
+    var visibleRangeMs = this.max_ - this.min_;
+
+    if (isNaN(visibleRangeMs)) {
+      // This is a before-draw case.
+      this.needsReapplyGaps = true;
+      return range * 0.01;
+    }
+
+    // this.boundsProvider_ must be already defined here.
+    var widthPx = this.boundsProvider_.getPixelBounds().width;
+
+    // Pixel gap can't be more than (width/2 - 1) px.
+    var limitedGapPx = this.limitPixelGap_(value, widthPx);
+
+    var rv =  Math.round((limitedGapPx * visibleRangeMs) / widthPx);
+    return rv || 0;
+  }
+
+  return range * value;
+};
+
+
+/**
+ * Before-draw pixel gaps handler.
+ * Pixel gaps correct calculation needs timeline pixel bounds and visible min/max defined.
+ * For before-draw case these values might be unavailable.
+ * This method must be called when all necessary calculations are done.
+ */
+anychart.scales.GanttDateTime.prototype.reapplyGaps = function() {
+  if (this.needsReapplyGaps) {
+    this.needsReapplyGaps = false;
+    this.resetLimitsByGaps_();
+    this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
+  }
+};
+
 
 /**
  * Gets total minimum and maximum dates set for scale.
+ *
  * @return {{min: number, max: number}}
  */
 anychart.scales.GanttDateTime.prototype.getTotalRange = function() {
   var range, gap;
+
   if (isNaN(this.totalMin_)) {
     if (isNaN(this.manualMin_)) {
       if (isNaN(this.softMin_)) {
         var max = (isNaN(this.manualMax_) ? (isNaN(this.softMax_) ? this.dataMax_ : Math.max(this.dataMax_, this.softMax_)) : this.manualMax_);
         range = max - this.dataMin_;
-        gap = range * this.minimumGap_;
+        gap = this.getMsGap_(range, this.minimumGap_);
         this.totalMin_ = this.dataMin_ - gap;
       } else {
         this.totalMin_ = Math.min(this.softMin_, this.dataMin_);
@@ -792,7 +1282,7 @@ anychart.scales.GanttDateTime.prototype.getTotalRange = function() {
       if (isNaN(this.softMax_)) {
         var min = (isNaN(this.manualMin_) ? (isNaN(this.softMin_) ? this.dataMin_ : Math.min(this.dataMin_, this.softMin_)) : this.manualMin_);
         range = this.dataMax_ - min;
-        gap = range * this.maximumGap_;
+        gap = this.getMsGap_(range, this.maximumGap_);
         this.totalMax_ = this.dataMax_ + gap;
       } else {
         this.totalMax_ = Math.max(this.softMax_, this.dataMax_);
@@ -802,7 +1292,24 @@ anychart.scales.GanttDateTime.prototype.getTotalRange = function() {
     }
   }
 
-  return this.isEmpty() ? this.getEmptyRange() : {'min': this.totalMin_, 'max': this.totalMax_};
+  // TODO (A.Kudryavtsev): DEBUGGING CODE!
+  // if (this.minimumGap_['isPixels'] && this.maximumGap_['isPixels']) {
+  //   var width = this.boundsProvider_.getPixelBounds().width;
+  //   var limitedMin = this.limitPixelGap_(this.minimumGap_['value'], width);
+  //   var limitedMax = this.limitPixelGap_(this.maximumGap_['value'], width);
+  //   var pxRatio = (width - limitedMin - limitedMax) / width;
+  //   var msRatio = (this.dataMax_ - this.dataMin_) / (this.totalMax_ - this.totalMin_);
+  //   console.log('');
+  //   console.log('width: ' + width + ', minGap: ' + limitedMin + ', maxGap: ' + limitedMax);
+  //   console.log('MinGapMs: ' + (this.dataMin_ - this.totalMin_) + ', MaxGapMs: ' + (this.totalMax_ - this.dataMax_));
+  //   console.log('pxRatio: ' + pxRatio + ' msRatio: ' + msRatio);
+  //
+  // }
+  // if (this.totalMin_ > this.totalMax_) debugger;
+
+  return this.isEmpty() ?
+      this.getEmptyRange() :
+      {'min': this.totalMin_, 'max': this.totalMax_};
 };
 
 
@@ -879,46 +1386,6 @@ anychart.scales.GanttDateTime.prototype.softMaximum = function(opt_value) {
     }
   }
   return this.softMax_;
-};
-
-
-/**
- * Gets/sets minimum gap.
- * @param {number=} opt_value - Value to be set.
- * @return {number|anychart.scales.GanttDateTime} - Current value or itself for method chaining.
- */
-anychart.scales.GanttDateTime.prototype.minimumGap = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = +opt_value || 0;
-    if (this.minimumGap_ != opt_value) {
-      this.minimumGap_ = opt_value;
-      this.totalMin_ = NaN;
-      this.consistent = false;
-      this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
-    }
-    return this;
-  }
-  return this.minimumGap_;
-};
-
-
-/**
- * Gets/sets maximum gap.
- * @param {number=} opt_value - Value to be set.
- * @return {number|anychart.scales.GanttDateTime} - Current value or itself for method chaining.
- */
-anychart.scales.GanttDateTime.prototype.maximumGap = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = +opt_value || 0;
-    if (this.maximumGap_ != opt_value) {
-      this.maximumGap_ = opt_value;
-      this.totalMax_ = NaN;
-      this.consistent = false;
-      this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
-    }
-    return this;
-  }
-  return this.maximumGap_;
 };
 
 
@@ -1068,6 +1535,140 @@ anychart.scales.GanttDateTime.prototype.calendar = function(opt_value) {
     this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
   }
   return this.calendar_;
+};
+
+
+//endregion
+//region -- Gaps.
+/**
+ * Normalizes gap to definitely typed value.
+ *
+ * @param {(number|anychart.scales.GanttDateTime.Gap)=} opt_value - Numeric value of gap or
+ *  prepared normalized value.
+ * @param {boolean=} opt_treatAsPixels - Whether to treat opt_value as pixels, not as percents.
+ * @private
+ * @return {anychart.scales.GanttDateTime.Gap} - Normalized gap object
+ */
+anychart.scales.GanttDateTime.prototype.normalizeGap_ = function(opt_value, opt_treatAsPixels) {
+  /**
+   * @type {anychart.scales.GanttDateTime.Gap}
+   */
+  var normalized = {
+    'value': 0,
+    'isPixels': Boolean(opt_treatAsPixels)
+  };
+
+  if (goog.isDef(opt_value)) {
+    if (goog.typeOf(opt_value) === 'object') {
+      normalized['value'] = +opt_value['value'] || 0;
+      normalized['isPixels'] = Boolean(opt_value['isPixels']);
+    } else {
+      normalized['value'] = +opt_value || 0;
+    }
+  }
+
+  return normalized;
+};
+
+
+/**
+ * Compares normalized gaps.
+ *
+ * @param {anychart.scales.GanttDateTime.Gap} oldGap - Old gap normalized value.
+ * @param {anychart.scales.GanttDateTime.Gap} newGap - New gap normalized value.
+ * @return {boolean} - TRUE if gaps have totally the same values, FALSE otherwise.
+ * @private
+ */
+anychart.scales.GanttDateTime.prototype.compareGaps_ = function(oldGap, newGap) {
+  // TODO (A.Kudryavtsev): I could use goog.object.equals here, but it would be slower.
+  return (oldGap['value'] === newGap['value'] && oldGap['isPixels'] === newGap['isPixels']);
+};
+
+
+/**
+ * Gets/sets minimum gap.
+ *
+ * @param {(number|anychart.scales.GanttDateTime.Gap)=} opt_value - Numeric value of gap or
+ *  prepared normalized value.
+ * @param {boolean=} opt_treatAsPixels - Whether to treat opt_value as pixels, not as percents.
+ * @return {number|anychart.scales.GanttDateTime|anychart.scales.GanttDateTime.Gap} - Current
+ *  value or itself for method chaining.
+ *  NOTE: for legacy purposes, if gap is percent, number will be returned.
+ */
+anychart.scales.GanttDateTime.prototype.minimumGap = function(opt_value, opt_treatAsPixels) {
+  if (goog.isDef(opt_value)) {
+    var newGap = this.normalizeGap_(opt_value, opt_treatAsPixels);
+    if (!this.compareGaps_(this.minimumGap_, newGap)) {
+      this.minimumGap_ = newGap;
+      this.totalMin_ = NaN;
+      this.consistent = false;
+      this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
+    }
+    return this;
+  }
+
+  // TODO (A.Kudryavtsev): This mess is for legacy. Actually is @deprecated since 8.8.0.
+  return this.minimumGap_['isPixels'] ?
+      this.minimumGap_ :
+      this.minimumGap_['value'];
+};
+
+
+/**
+ * Gets/sets maximum gap.
+ *
+ * @param {(number|anychart.scales.GanttDateTime.Gap)=} opt_value - Numeric value of gap or
+ *  prepared normalized value.
+ * @param {boolean=} opt_treatAsPixels - Whether to treat opt_value as pixels, not as percents.
+ * @return {number|anychart.scales.GanttDateTime|anychart.scales.GanttDateTime.Gap} - Current
+ *  value or itself for method chaining.
+ *  NOTE: for legacy purposes, if gap is percent, number will be returned.
+ */
+anychart.scales.GanttDateTime.prototype.maximumGap = function(opt_value, opt_treatAsPixels) {
+  if (goog.isDef(opt_value)) {
+    var newGap = this.normalizeGap_(opt_value, opt_treatAsPixels);
+    if (!this.compareGaps_(this.maximumGap_, newGap)) {
+      this.maximumGap_ = newGap;
+      this.totalMax_ = NaN;
+      this.consistent = false;
+      this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
+    }
+    return this;
+  }
+
+  // TODO (A.Kudryavtsev): This mess is for legacy. Actually is @deprecated since 8.8.0.
+  return this.maximumGap_['isPixels'] ?
+      this.maximumGap_ :
+      this.maximumGap_['value'];
+};
+
+
+/**
+ * See return description.
+ *
+ * @return {boolean} - Whether scale has pixel-gap set.
+ * @private
+ */
+anychart.scales.GanttDateTime.prototype.hasPixelGaps_ = function() {
+  return Boolean(this.minimumGap_['isPixels'] || this.maximumGap_['isPixels']);
+};
+
+
+/**
+ * Actually resets total min and max and marks scale as inconsistent
+ * to be recalculated.
+ *
+ * @private
+ * @return {boolean} - Whether scale has been reset.
+ */
+anychart.scales.GanttDateTime.prototype.resetLimitsByGaps_ = function() {
+  if (this.hasPixelGaps_() && !this.isEmpty()) {
+    this.totalMin_ = NaN;
+    this.totalMax_ = NaN;
+    this.consistent = false;
+    return true;
+  }
+  return false;
 };
 
 
@@ -1335,6 +1936,7 @@ anychart.scales.GanttDateTime.prototype.getWorkingSchedule = function() {
  */
 anychart.scales.GanttDateTime.prototype.ratioScroll = function(ratio) {
   if (ratio && !this.isEmpty()) {
+    this.resetLimitsByGaps_();
     var totalRange = this.getTotalRange();
     var msInterval = Math.round((this.max_ - this.min_) * ratio);
     var interval = 0;
@@ -1357,6 +1959,7 @@ anychart.scales.GanttDateTime.prototype.ratioScroll = function(ratio) {
  */
 anychart.scales.GanttDateTime.prototype.ratioForceScroll = function(ratio) {
   if (ratio && !this.isEmpty()) {
+    this.resetLimitsByGaps_();
     this.getTotalRange();
 
     var msInterval = Math.round((this.max_ - this.min_) * ratio);
@@ -1516,10 +2119,6 @@ anychart.scales.GanttDateTime.prototype.setupByJSON = function(config, opt_defau
   proto['zoomLevels'] = proto.zoomLevels;
   proto['maxTicksCount'] = proto.maxTicksCount;
   proto['calendar'] = proto.calendar;
-  // proto['zoomIn'] = proto.zoomIn;
-  // proto['zoomOut'] = proto.zoomOut;
-  // proto['zoomTo'] = proto.zoomTo;
-  // proto['fitAll'] = proto.fitAll;
 })();
 
 
