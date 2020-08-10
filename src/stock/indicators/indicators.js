@@ -37,6 +37,7 @@ goog.require('anychart.stockModule.indicators.RoC');
 goog.require('anychart.stockModule.indicators.SMA');
 goog.require('anychart.stockModule.indicators.Stochastic');
 goog.require('anychart.stockModule.indicators.TRIX');
+goog.require('anychart.stockModule.indicators.VWAP');
 goog.require('anychart.stockModule.indicators.VolumeMA');
 goog.require('anychart.stockModule.indicators.WilliamsR');
 
@@ -86,6 +87,7 @@ anychart.stockModule.indicators.config = (function() {
   res[anychart.enums.StockIndicatorTypes.SMA] = anychart.stockModule.indicators.SMA;
   res[anychart.enums.StockIndicatorTypes.STOCHASTIC] = anychart.stockModule.indicators.Stochastic;
   res[anychart.enums.StockIndicatorTypes.TRIX] = anychart.stockModule.indicators.TRIX;
+  res[anychart.enums.StockIndicatorTypes.VWAP] = anychart.stockModule.indicators.VWAP;
   res[anychart.enums.StockIndicatorTypes.VOLUME_MA] = anychart.stockModule.indicators.VolumeMA;
   res[anychart.enums.StockIndicatorTypes.WILLIAMS_R] = anychart.stockModule.indicators.WilliamsR;
   return res;

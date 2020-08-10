@@ -1959,6 +1959,7 @@ anychart.enums.StockIndicatorTypes = {
   SMA: 'sma',
   STOCHASTIC: 'stochastic',
   TRIX: 'trix',
+  VWAP: 'vwap',
   VOLUME_MA: 'volume-ma',
   WILLIAMS_R: 'williams-r'
 };
